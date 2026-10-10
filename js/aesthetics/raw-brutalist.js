@@ -15,7 +15,7 @@ registerAesthetic({
   slideShape: 'geometric',
   labels: { material: 'Hard surfaces', states: ['Rest', 'Hover', 'Pressed'], statesKind: 'button' },
   layout: { hero: 'poster', palette: 'strips' },
-  type: { ui: 'mono', label: 'mono', display: 1.5 },
+  type: { ui: 'mono', label: 'mono', display: 1.35 },
   highlight: 'band',
 
   roles: {
@@ -36,18 +36,17 @@ registerAesthetic({
   // --ab-tr scales the tight headline tracking: 0 for condensed/heavy faces (they collide when tightened), 1 otherwise
   tokens(t) {
     return {
+      '--ab-type-pick-w': 400,
       '--ab-tr': (typeof state !== 'undefined' && state.headingFont && { condensed: 0, heavy: 0, wide: 0.4, techno: 0.4 }[state.headingFont.cls]) ?? 1,
        '--ab-grid': t.alpha(t.ink, t.isDark ? 0.1 : 0.06) };
   },
 
-  // A full-height outline initial cropped by the right edge (behind the headline),
-  // a primary block behind the right end of the headline, and one mono caption.
+  // A mono spec index (exposed metadata) at the top right of the hero: four
+  // key / value rows, ruled like a data sheet.
   art(ctx) {
-    return `<div class="rba">
-      <i class="rba-block"></i>
-      <div class="rba-ghost"><span class="rba-initial">${escapeHtml(ctx.initial)}</span></div>
-      <span class="rba-cap">FIG. 01</span>
-    </div>`;
+    const subject = String(ctx.brandName || '').toUpperCase().slice(0, 24);
+    const rows = [['SUBJECT', subject], ['SYSTEM', '5 COLORS / 2 FACES'], ['SURFACE', ctx.t.isDark ? 'DARK' : 'LIGHT'], ['FIG.', '01']];
+    return `<dl class="rba-spec">${rows.map(([k, v]) => `<div class="rba-row"><dt>${escapeHtml(k)}</dt><dd>${escapeHtml(v)}</dd></div>`).join('')}</dl>`;
   },
 
   materials: [

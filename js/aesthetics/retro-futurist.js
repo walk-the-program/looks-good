@@ -84,7 +84,10 @@
         '--ab-key-top': d ? t.mix('#ffffff', t.canvas, 0.14) : t.mix('#ffffff', t.canvas, 0.75),
         '--ab-key-bot': d ? t.mix('#000000', t.canvas, 0.04) : t.mix('#000000', t.canvas, 0.1),
         '--ab-key-lip': d ? t.mix('#000000', t.canvas, 0.45) : t.mix('#000000', t.canvas, 0.22),
-        '--ab-chrome': `linear-gradient(180deg, ${t.ink} 0%, ${t.mix(t.ink, t.muted, 0.45)} 32%, ${t.muted} 54.5%, ${t.ink} 55.5%, ${t.mix(t.ink, t.muted, 0.35)} 100%)`,
+        '--ab-chrome': d
+          ? `linear-gradient(180deg, ${t.ink} 0%, ${t.mix(t.ink, t.muted, 0.45)} 32%, ${t.muted} 54.5%, ${t.ink} 55.5%, ${t.mix(t.ink, t.muted, 0.35)} 100%)`
+          // light canvases: the dark-mode chrome washes out to grey on cream, so keep a dark top, a hard horizon and a dark base
+          : `linear-gradient(180deg, ${t.ink} 0%, ${t.mix(t.ink, t.canvas, 0.45)} 54%, ${t.ink} 55%, ${t.mix(t.ink, t.canvas, 0.25)} 100%)`,
         '--ab-star': t.alpha(screenInk, d ? 0.65 : 0.45),
         '--ab-spark': `url("data:image/svg+xml,${spark}")`,
       };
@@ -141,6 +144,12 @@
       const screws = [[6, 6], [94, 6], [6, 94], [94, 94]].map((p, i) =>
         `<g transform="rotate(${i * 47} ${p[0]} ${p[1]})"><circle cx="${p[0]}" cy="${p[1]}" r="2.1" fill="url(#${id}m)" stroke="${metalLo}" stroke-width=".35"/><line x1="${p[0] - 1.3}" y1="${p[1]}" x2="${p[0] + 1.3}" y2="${p[1]}" stroke="${metalLo}" stroke-width=".5"/></g>`).join('');
       const mono = 'font-family="ui-monospace,SF Mono,Menlo,monospace"';
+      // LCD digits: a faint unlit "8 88.8" sits behind the live value ("M  9.5", its
+      // tens slot left dark) so the unlit segments show. VT323 (a segment-like pixel face) when it is loaded.
+      const hasVT = typeof document !== 'undefined' && document.fonts && [...document.fonts].some(f => String(f.family).replace(/["']/g, '') === 'VT323' && f.status === 'loaded');
+      const lcdFace = hasVT ? 'font-family="VT323,ui-monospace,monospace"' : mono;
+      const lcdSize = hasVT ? 13.4 : 10.6;
+      const lcdY = hasVT ? 22.2 : 22.7;
       const initial = ctx.initial && ctx.initial !== '·' ? ctx.initial : 'M';
       return `<svg viewBox="0 0 100 100" width="100%" height="100%" focusable="false">
         <defs>
@@ -153,9 +162,9 @@
         </defs>
         ${screws}
         <rect x="9" y="9.5" width="82" height="18" rx="2.6" fill="url(#${id}w)" stroke="${t.alpha('#000000', 0.75)}" stroke-width="1"/>
-        <text x="14" y="22.7" ${mono} font-size="10.6" font-weight="700" fill="${readout}" opacity=".13" letter-spacing=".4">8 88.8</text>
-        <text x="14" y="22.7" ${mono} font-size="10.6" font-weight="700" fill="${readout}" letter-spacing=".4" filter="url(#${id}n)" opacity=".7">${escapeHtml(initial)} 88.8</text>
-        <text x="14" y="22.7" ${mono} font-size="10.6" font-weight="700" fill="${readout}" letter-spacing=".4">${escapeHtml(initial)} 88.8</text>
+        <text x="14" y="${lcdY}" ${lcdFace} font-size="${lcdSize}" font-weight="700" fill="${readout}" opacity=".14" letter-spacing=".4">8 88.8</text>
+        <text x="14" y="${lcdY}" ${lcdFace} font-size="${lcdSize}" font-weight="700" fill="${readout}" letter-spacing=".4" filter="url(#${id}n)" opacity=".7">${escapeHtml(initial)} \u00a0${'9.5'}</text>
+        <text x="14" y="${lcdY}" ${lcdFace} font-size="${lcdSize}" font-weight="700" fill="${readout}" letter-spacing=".4">${escapeHtml(initial)} \u00a0${'9.5'}</text>
         <text x="86" y="15.6" ${mono} font-size="2.8" fill="${readout}" opacity=".8" text-anchor="end" letter-spacing=".5">FREQ</text>
         <text x="86" y="24.2" ${mono} font-size="2.8" fill="${readout}" opacity=".8" text-anchor="end" letter-spacing=".5">MHZ</text>
         <rect x="9" y="9.5" width="82" height="18" rx="2.6" fill="url(#${id}s)"/>

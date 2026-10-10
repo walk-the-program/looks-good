@@ -1,7 +1,7 @@
 /* 03 Neo-Brutal Pop — chunky, playful, loud. Reference: neobrutalism.dev and
    Gumroad. Near-square radii (6px controls, 10px cards), a colored canvas with a
    32px line grid, 2px ink outlines, hard offset shadows that lift and squish.
-   Centered hero with outlined star and flower stickers either side of the
+   Centered hero with outlined star and flower stickers overlapping the
    statement and one centered CTA. Look lives in css/aesthetics/neo-brutal-pop.css. */
 registerAesthetic({
   key: 'neo-brutal-pop', order: 3,
@@ -15,7 +15,7 @@ registerAesthetic({
   slideShape: 'geometric',
   labels: { material: 'Stickers & squish', states: ['Rest', 'Lift', 'Squish'], statesKind: 'button' },
   layout: { hero: 'centered' },
-  type: { ui: 'sans', label: 'sans', display: 1.1 },
+  type: { ui: 'sans', label: 'sans', display: 1.0 },
   highlight: 'band',
   cardFill: '--ab-paper',
 
@@ -50,54 +50,49 @@ registerAesthetic({
     const fill = k => t.mix(t.secondary, t.canvas, k);
     let a = 0.5;
     while (a > 0.1 && t.contrast(t.ink, fill(a)) < 7) a -= 0.05;
-    return {
-      '--ab-tr': (typeof state !== 'undefined' && state.headingFont && { condensed: 0, heavy: 0, wide: 0.4, techno: 0.4 }[state.headingFont.cls]) ?? 1,
-      
-      '--ab-card-fill': fill(a),
-      '--ab-paper': t.isDark ? t.mix(t.ink, t.canvas, 0.1) : t.mix('#ffffff', t.canvas, 0.9),
-      '--ab-grid': t.alpha(t.ink, 0.07),
-    };
-  },
-
-  // Two outlined stickers that flank the centered headline (a starburst in the
-  // accent, a flower in the primary) and a decorative paper CTA centered under it
-  // (the filled primary CTA lives in the card).
-  // The art layer covers the whole hero and is aria-hidden; every shape is a
-  // 2px ink outline with a hard 3px offset shadow.
-  art(ctx) {
-    const t = ctx.t;
-    const ink = t.ink;
-    const sk = `stroke="${ink}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke"`;
+    // The stickers are CSS pseudo-elements anchored to the headline text itself
+    // (starburst on the first letter, flower on the highlight pill), so they are
+    // passed to the stylesheet as data-URI images. The starburst's initial is a
+    // pseudo-element `content` string.
+    const uri = svg => "url('data:image/svg+xml," + encodeURIComponent(svg).replace(/'/g, '%27') + "')";
+    const sk = `stroke="${t.ink}" stroke-width="2" stroke-linejoin="round" vector-effect="non-scaling-stroke"`;
     const off = 'translate(3.2 3.2)';
-    // 12-point starburst
     const pts = [];
     for (let i = 0; i < 24; i++) {
       const r = i % 2 ? 33 : 46;
-      const a = (i * Math.PI) / 12 - Math.PI / 2;
-      pts.push((50 + r * Math.cos(a)).toFixed(2) + ',' + (50 + r * Math.sin(a)).toFixed(2));
+      const an = (i * Math.PI) / 12 - Math.PI / 2;
+      pts.push((50 + r * Math.cos(an)).toFixed(2) + ',' + (50 + r * Math.sin(an)).toFixed(2));
     }
     const star = pts.join(' ');
-    // 8-petal flower: petals stroked first, then filled on top, so only the outer outline shows
+    const starSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="-4 -4 108 108"><polygon points="${star}" fill="${t.ink}" transform="${off}"/><polygon points="${star}" fill="${t.accent}" ${sk}/></svg>`;
     const petals = [];
     for (let i = 0; i < 8; i++) {
-      const a = (i * Math.PI) / 4;
-      petals.push([(50 + 27 * Math.cos(a)).toFixed(2), (50 + 27 * Math.sin(a)).toFixed(2)]);
+      const an = (i * Math.PI) / 4;
+      petals.push([(50 + 27 * Math.cos(an)).toFixed(2), (50 + 27 * Math.sin(an)).toFixed(2)]);
     }
-    const ring = (attrs) => petals.map(p => `<circle cx="${p[0]}" cy="${p[1]}" r="17" ${attrs}/>`).join('');
-    return `<div class="nba">
-      <svg class="nba-star" viewBox="-4 -4 108 108" focusable="false">
-        <polygon points="${star}" fill="${ink}" transform="${off}"/>
-        <polygon points="${star}" fill="${t.accent}" ${sk}/>
-        <text x="50" y="52" text-anchor="middle" dominant-baseline="central" font-size="30" font-weight="800" style="font-family:var(--ab-font-h)" fill="${t.onAccent}">${escapeHtml(ctx.initial)}</text>
-      </svg>
-      <svg class="nba-flower" viewBox="-4 -4 108 108" focusable="false">
-        <g transform="${off}">${ring(`fill="${ink}"`)}</g>
-        ${ring(`fill="${ink}" stroke="${ink}" stroke-width="4" vector-effect="non-scaling-stroke"`)}
-        ${ring(`fill="${t.primary}"`)}
-        <circle cx="50" cy="50" r="13" fill="${t.accent}" ${sk}/>
-      </svg>
-      <span class="nba-cta">Get started<i>→</i></span>
-    </div>`;
+    const ring = attrs => petals.map(p => `<circle cx="${p[0]}" cy="${p[1]}" r="17" ${attrs}/>`).join('');
+    const flowerSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="-4 -4 108 108"><g transform="${off}">${ring(`fill="${t.ink}"`)}</g>${ring(`fill="${t.ink}" stroke="${t.ink}" stroke-width="4" vector-effect="non-scaling-stroke"`)}${ring(`fill="${t.primary}"`)}<circle cx="50" cy="50" r="13" fill="${t.accent}" ${sk}/></svg>`;
+    let initial = '·';
+    try { initial = abInitial(effectiveContent().brandName); } catch (e) { /* keep the dot */ }
+    if (!/^[\p{L}\p{N}·]$/u.test(initial)) initial = '·';
+    return {
+      '--ab-type-pick-w': 700,
+      '--ab-tr': (typeof state !== 'undefined' && state.headingFont && { condensed: 0, heavy: 0, wide: 0.4, techno: 0.4 }[state.headingFont.cls]) ?? 1,
+      '--ab-card-fill': fill(a),
+      '--ab-paper': t.isDark ? t.mix(t.ink, t.canvas, 0.1) : t.mix('#ffffff', t.canvas, 0.9),
+      '--ab-grid': t.alpha(t.ink, 0.07),
+      '--np-star-img': uri(starSvg),
+      '--np-flower-img': uri(flowerSvg),
+      '--np-initial': `'${initial}'`,
+    };
+  },
+
+  // The stickers (a starburst with the initial, a flower) are drawn in CSS from
+  // the headline's own pseudo-elements, so they overlap the first letter and the
+  // highlight pill (see tokens()). The art layer holds only the decorative paper
+  // CTA centered under the statement (the filled primary CTA lives in the card).
+  art(ctx) {
+    return `<div class="nba"><span class="nba-cta">Get started<i>→</i></span></div>`;
   },
 
   materials: [

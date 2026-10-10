@@ -49,7 +49,7 @@ registerAesthetic({
       coverage: '≈8–12%',
     },
     accent: {
-      use: 'Status dots and the "New" badge, plus the highlighted headline word (shaded to read as text)',
+      use: 'The "New" badge, the focus-mode status dot and the highlighted headline word (shaded to read as text); header and footer dots stay muted',
       never: 'Buttons, body text, borders, aurora washes',
       coverage: '≤3%',
     },

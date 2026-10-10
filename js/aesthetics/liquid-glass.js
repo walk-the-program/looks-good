@@ -1,11 +1,12 @@
 /* 05 Liquid Glass — fluid, luminous, layered. Reference: Apple Liquid Glass
-   (iOS / macOS 26). Real Liquid Glass is clear glass with bright specular rims
-   floating over vivid content, so: a full-width scene of saturated brand-color
-   light over a dark base, a few glass controls floating on it (tab bar, round
-   button, card), and near-opaque "regular material" panels everywhere else.
-   Two mechanisms on purpose: backdrop blur (frosting) and a simulated
-   refraction lens (a clipped, scaled duplicate of the scene). Blur alone is
-   not refraction. */
+   (iOS / macOS 26). Real Liquid Glass is a control layer of clear glass with
+   bright specular rims floating over vivid content, so: a full-width scene of
+   saturated brand-color light over a dark base holding one crisp element (the
+   brand initial) for the glass to bend, a single glass lens refracting it, a
+   glass tab bar and a glass timer, and near-opaque "regular material" panels
+   everywhere else. The hero copy is set directly on the scene (never on a
+   frosted slab). Two mechanisms on purpose: backdrop blur (frosting) and a
+   simulated refraction lens (a clipped, scaled duplicate of the scene). */
 registerAesthetic({
   key: 'liquid-glass', order: 5,
   name: 'Liquid Glass',
@@ -20,7 +21,7 @@ registerAesthetic({
   layout: { hero: 'scene' },
   type: { ui: 'sans' },
   highlight: 'custom',
-  highlightNote: 'The word is set as text, no fill or band: in --ab-hl-ink (the accent-ink shaded toward ink to hold 3:1 on the translucent hero card) over the card, and in plain --accent-ink when it sits directly on the canvas.',
+  highlightNote: 'The word is set as text, no fill or band: the raw accent (lightened toward white if it would fall under 3:1) over the dark scene on wide boards, and plain --accent-ink when the copy sits on the canvas below the scene.',
 
   roles: {
     primary: {
@@ -28,40 +29,37 @@ registerAesthetic({
       never: 'Body text, large solid fills, a second CTA',
     },
     secondary: {
-      use: 'The second light in the scene, status chips and the second data series',
+      use: 'The second light in the scene, the timer progress ring, status chips and the second data series',
       never: 'The main CTA, body text',
     },
     accent: {
-      use: 'The highlighted headline word (shaded to read as text), one light and one shape in the scene',
+      use: 'The highlighted headline word (set as text over the scene) and the third light in the scene',
       never: 'Buttons, body text, borders',
     },
   },
 
   tokens(t) {
     const d = t.isDark;
-    // The hero card is a translucent regular material (84% of --ab-hero-card over
-    // the scene). Worst-case backdrop: the darkest scene color on a light board,
-    // white on a dark one. The highlight word is shaded toward ink until it holds
-    // 3:1 against that worst case (sub-copy uses --ab-ink, which clears 4.5:1).
-    const sceneBase = t.mix(t.primary, '#06070d', 0.14);
+    // The scene is the dark "content" the glass floats over: half of the ink on a
+    // light board; half of the canvas on a dark one (a light ink would make it grey).
+    const sceneBase = t.mix(d ? t.canvas : t.ink, '#000000', 0.5);
     const material = t.mix('#ffffff', t.canvas, d ? 0.07 : 0.72);
-    // the hero card is tinted toward the brand (warm on a warm brand), not neutral grey
-    const heroCard = d ? t.mix(t.primary, material, 0.1) : t.mix('#ffffff', t.mix(t.primary, t.canvas, 0.1), 0.45);
-    const cardFloor = t.mix(heroCard, d ? '#ffffff' : sceneBase, 0.84);
-    let hl = t.accentInk;
-    for (let k = 0; k <= 1.001 && t.contrast(hl, cardFloor) < 3.2; k += 0.05) hl = t.mix(t.ink, t.accentInk, k);
+    // headline word on the scene: the raw accent if it holds 3:1 on the scene base, else lightened toward white
+    const hlScene = t.contrast(t.accent, sceneBase) >= 3 ? t.accent : t.mix(t.accent, '#ffffff', 0.35);
+    // timer progress ring: the secondary, lightened if it would fall under 3:1 on the scene
+    const ring = t.contrast(t.secondary, sceneBase) >= 3 ? t.secondary : t.mix(t.secondary, '#ffffff', 0.35);
     return {
       '--ab-tr': (typeof state !== 'undefined' && state.headingFont && { condensed: 0, heavy: 0, wide: 0.4, techno: 0.4 }[state.headingFont.cls]) ?? 1,
-      
-      '--ab-hl-ink': hl,
-      '--ab-hero-card': heroCard,
-      // vivid scene: a dark base the brand colors glow on (the "content" the glass floats over)
+      '--ab-hl-scene': hlScene,
+      '--ab-ring': ring,
       '--ab-scene-base': sceneBase,
       // regular material: a near-opaque panel, one step lighter than the canvas
       '--ab-material': material,
       '--ab-material-line': t.alpha(t.ink, d ? 0.14 : 0.09),
       '--ab-glass': t.alpha(t.canvas, d ? 0.35 : 0.45),
       '--ab-glass-solid': t.mix('#ffffff', t.canvas, d ? 0.1 : 0.6),
+      // opaque stand-in for glass under prefers-reduced-transparency (lens and timer)
+      '--ab-glass-opaque': t.mix(t.canvas, t.ink, 0.1),
       '--ab-rim': d ? 'rgba(255,255,255,0.3)' : 'rgba(255,255,255,0.6)',
       '--ab-spec': d ? 'rgba(255,255,255,0.28)' : 'rgba(255,255,255,0.8)',
       '--ab-drop': d ? 'rgba(0,0,0,0.4)' : 'rgba(10,14,30,0.16)',
@@ -69,18 +67,21 @@ registerAesthetic({
       '--ab-lens-lo': d ? 'rgba(255,255,255,0.12)' : 'rgba(255,255,255,0.55)',
       '--ab-well': d ? 'rgba(255,255,255,0.08)' : 'rgba(20,24,40,0.07)',
       '--ab-pri-glow': t.alpha(t.primary, 0.35),
+      '--ab-pri-glow-strong': t.alpha(t.primary, 0.55),
       '--ab-primary-a': t.alpha(t.primary, 0.88),
     };
   },
 
   art(ctx) {
-    // The scene: saturated mesh light plus a few bold shapes, all <i> elements
-    // sized in cqw (the art box is a size container) so the lens duplicate
-    // lines up. Over it float glass controls. The round button carries the
-    // refraction: a clipped duplicate of the scene, scaled and offset, masked
-    // to a ring so only content near the glass edge is magnified (simulated
-    // refraction, not real optics); its center is plain backdrop blur.
-    const scene = '<i class="lgs-mesh"></i><i class="lgs-sun"></i><i class="lgs-ring"></i><i class="lgs-pill"></i><i class="lgs-dot"></i>';
+    // The scene: a vivid three-light field plus ONE crisp element (the brand
+    // initial) for the glass to bend. All <i> elements are sized in cqw (the art
+    // box is a size container) so the lens duplicate lines up. Over it float a
+    // glass tab bar, a glass timer and a single squircle lens that refracts the
+    // initial (a clipped, scaled and offset duplicate of the scene: simulated
+    // refraction, not real optics). Two lenses are drawn, one per hero geometry
+    // (wide: 21/10 art box; narrow: 4/4.2); CSS shows one.
+    const initial = ctx.initial && ctx.initial !== '·' ? ctx.initial : 'M';
+    const scene = `<i class="lgs-mesh"></i><i class="lgs-initial">${escapeHtml(initial)}</i>`;
     const icon = d => `<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${d}</svg>`;
     const tabs = [
       ['Home', '<path d="M4 11l8-7 8 7v8a1 1 0 0 1-1 1h-4v-6h-6v6H5a1 1 0 0 1-1-1z"/>'],
@@ -88,23 +89,23 @@ registerAesthetic({
       ['Library', '<rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><rect x="13" y="13" width="7" height="7" rx="1.5"/>'],
     ].map(([n, d], i) => `<span class="lgs-tab${i === 0 ? ' on' : ''}">${icon(d)}<em>${n}</em></span>`).join('');
     return `<div class="lgs"><div class="lgs-scene">${scene}</div>`
-      + '<i class="lgs-btn"></i>'
-      + abLens(scene, { x: 72.5, y: 41, w: 10, h: 21, scale: 1.16, cls: 'lgs-lens' })
-      + '<svg class="lgs-play" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M8 5.5v13l11-6.5z" fill="currentColor"/></svg>'
+      + abLens(scene, { x: 63, y: 20.5, w: 30, h: 63, scale: 1.12, dx: -6, cls: 'lgs-lens lgs-lens-w' })
+      + abLens(scene, { x: 48, y: 29, w: 44, h: 41.9, scale: 1.12, dx: -6, cls: 'lgs-lens lgs-lens-n' })
       + `<div class="lgs-tabs">${tabs}</div>`
       + '<div class="lgs-card"><div class="lgs-time"><span class="lgs-cap">Focus</span><b>18:24</b></div>'
       + '<svg class="lgs-timer" viewBox="0 0 44 44" aria-hidden="true"><circle cx="22" cy="22" r="17" fill="none" stroke="rgba(255,255,255,.28)" stroke-width="4"/>'
-      + '<circle cx="22" cy="22" r="17" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round" pathLength="100" stroke-dasharray="74 100" transform="rotate(-90 22 22)"/>'
+      + '<circle class="lgs-ring" cx="22" cy="22" r="17" fill="none" stroke-width="4" stroke-linecap="round" pathLength="100" stroke-dasharray="74 100" transform="rotate(-90 22 22)"/>'
       + '<path d="M18.5 16.5v11M25.5 16.5v11" stroke="#fff" stroke-width="3" stroke-linecap="round"/></svg></div>'
       + '</div>';
   },
 
   materials: [
-    { name: 'Scene', css: 'background: radial-gradient(ellipse 42% 60% at 16% 30%, {primary}, transparent 72%), radial-gradient(ellipse 40% 55% at 80% 24%, {secondary}, transparent 72%), radial-gradient(ellipse 34% 50% at 64% 88%, {accent}, transparent 72%), {sceneBase}; /* the content glass floats over; colors at full saturation */' },
+    { name: 'Scene', css: 'background: radial-gradient(55% 70% at 18% 22%, {primary}, transparent 70%), radial-gradient(50% 65% at 86% 86%, {secondary}, transparent 70%), radial-gradient(34% 44% at 68% 24%, {accent}, transparent 70%), {sceneBase}; /* the content glass floats over; colors at full saturation. One crisp element sits in it for the glass to bend: the brand initial, white at 92%, set large in the heading face. */' },
+    { name: 'Glass lens', css: 'background: rgba(255,255,255,.08); backdrop-filter: blur(2px) saturate(160%); border-radius: 28%; /* a squircle over the right half of the initial, holding a magnified, offset duplicate of the scene */ box-shadow: inset 1px 1px 0 rgba(255,255,255,.6), inset -1px -1px 0 rgba(255,255,255,.25), 0 0 0 .5px rgba(0,0,0,.25);' },
     { name: 'Floating glass control', css: 'background: rgba(255,255,255,.12); backdrop-filter: blur(14px) saturate(160%); border-radius: 999px; box-shadow: inset 1px 1px 0 rgba(255,255,255,.6), inset -1px -1px 0 rgba(255,255,255,.25), 0 0 0 .5px rgba(0,0,0,.35), 0 8px 24px {drop}; /* glass fill never above 12% white */' },
     { name: 'Regular material (panels)', css: 'background: {material}; border: 1px solid {materialLine}; border-radius: 28px; box-shadow: 0 1px 2px rgba(0,0,0,.05), 0 12px 32px -16px {drop}; /* near-opaque; no backdrop blur */' },
     { name: 'Opaque fallback', css: 'background: {glassSolid}; backdrop-filter: none; /* under prefers-reduced-transparency, keep the rim */' },
-    { name: 'Primary action', css: 'background: linear-gradient(180deg, rgba(255,255,255,.5), rgba(255,255,255,.12) 50%, transparent 51%), {primaryA}; color: {onPrimary}; border: 1px solid rgba(255,255,255,.7); border-radius: 999px; box-shadow: inset 0 1px 0 rgba(255,255,255,.8), 0 8px 20px {priGlow};' },
+    { name: 'Primary action', css: 'background: radial-gradient(120% 90% at 30% 0%, rgba(255,255,255,.30), transparent 55%), {primary}; color: {onPrimary}; border: 1px solid rgba(255,255,255,.7); border-radius: 999px; box-shadow: inset 0 1px 0 rgba(255,255,255,.5), inset 0 -1px 0 rgba(0,0,0,.10), 0 8px 20px -8px {priGlowStrong}; /* tinted glass with a soft specular, not a split gloss */' },
     { name: 'Selected segment (lens)', css: 'background: linear-gradient(180deg, {lensHi}, {lensLo}); border-radius: 999px; box-shadow: 0 2px 8px rgba(0,0,0,.14), inset 0 1px 0 #fff; /* inside a capsule track */' },
     { name: 'Glass droplet knob', css: 'background: radial-gradient(circle at 35% 28%, #fff, rgba(255,255,255,.85) 22%, rgba(255,255,255,.35) 60%, rgba(255,255,255,.55)); border: 1px solid rgba(255,255,255,.8); border-radius: 50%; box-shadow: 0 2px 6px rgba(0,0,0,.2);' },
   ],

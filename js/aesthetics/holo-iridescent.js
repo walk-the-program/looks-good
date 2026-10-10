@@ -30,7 +30,7 @@
         coverage: '70–80%',
       },
       primary: {
-        use: 'The one solid action (with a thin spectral top edge), the "on" track of toggles and one small bead on the art ribbon',
+        use: 'The one solid action (with a thin spectral top edge) and the "on" track of toggles',
         never: 'Body text, large fills, a second CTA',
       },
       secondary: {
@@ -97,24 +97,50 @@
       };
     },
 
-    // A thin-film soap bubble (transparent centre, a blurred conic rim bright at
-    // the top left, an inner secondary reflection arc) crossed by one spectral
-    // ribbon. Static, decorative; the stage and bubble are styled in the css.
+    // A thin-film soap bubble (transparent centre, spectral color gathered toward
+    // a blurred conic rim bright at the top left, an inner secondary reflection arc)
+    // crossed by one wide foil ribbon that twists once: its left segment is drawn
+    // behind the bubble, its right segment in front. Static, decorative; the stage
+    // and bubble are styled in the css.
     art(ctx) {
       const t = ctx.t;
       const id = 'hoa' + (++seq);
       const d = t.isDark;
       const art = d ? ['#ff8fd0', '#7fdcff', '#a98cff', '#7df0bd', '#ffd978'] : ['#e46bb4', '#4fb3e6', '#8f6bef', '#38c08f', '#ecb23e'];
-      const stops = [0.05, 0.22, 0.42, 0.62, 0.8, 0.95]
-        .map((o, i) => `<stop offset="${o}" stop-color="${art[i % 5]}" stop-opacity="${i === 0 || i === 5 ? 0 : 1}"/>`).join('');
-      const main = 'M-6 66 C28 88 56 66 82 44 S128 6 168 20';
-      const strands = [[0, 1.7, 1], [2.6, 1, 0.55], [5.2, 0.6, 0.3]]
-        .map(s => `<path d="${main}" transform="translate(0 ${s[0]})" fill="none" stroke="url(#${id}g)" stroke-width="${s[1]}" stroke-opacity="${s[2]}" stroke-linecap="round" vector-effect="non-scaling-stroke"/>`).join('');
+      // spectrum across the ribbon (userSpaceOnUse, 0..160)
+      const stops = [0.02, 0.2, 0.4, 0.6, 0.8, 0.98]
+        .map((o, i) => `<stop offset="${o}" stop-color="${art[i % 5]}"/>`).join('');
+      const rstops = [0.02, 0.2, 0.4, 0.6, 0.8, 0.98]
+        .map((o, i) => `<stop offset="${o}" stop-color="${art[(5 - i) % 5]}"/>`).join('');
+      // Foil ribbon geometry: a band 22-34 units tall that narrows to ~4 at one twist.
+      const xt = 118, seam = 73.6;
+      const centre = x => 41 + 13 * Math.sin((x / 160) * Math.PI * 1.7 + 0.5);
+      const thick = x => {
+        const base = 28 + 6 * Math.sin((x / 160) * Math.PI * 2.2 + 1);
+        return Math.max(4, base * (1 - Math.exp(-(((x - xt) / 9) ** 2))));
+      };
+      const top = x => centre(x) - thick(x) / 2, bot = x => centre(x) + thick(x) / 2;
+      const xs = (x0, x1) => { const o = []; for (let x = x0; x < x1; x += 2) o.push(x); o.push(x1); return o; };
+      const f = n => n.toFixed(2);
+      const piece = (x0, x1) => {
+        const p = xs(x0, x1);
+        return 'M' + p.map(x => f(x) + ' ' + f(top(x))).join(' L') + ' L' + p.slice().reverse().map(x => f(x) + ' ' + f(bot(x))).join(' L') + ' Z';
+      };
+      const edge = (x0, x1) => 'M' + xs(x0, x1).map(x => f(x) + ' ' + f(top(x))).join(' L');
+      const defs = `<defs>
+            <linearGradient id="${id}g" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="160" y2="0">${stops}</linearGradient>
+            <linearGradient id="${id}h" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="160" y2="0">${rstops}</linearGradient>
+          </defs>`;
+      const seg = (cls, parts) => `<svg class="hoa-ribbon ${cls}" viewBox="0 0 160 80" preserveAspectRatio="none" focusable="false">${defs}
+          ${parts.map(([x0, x1, g]) => `<path d="${piece(x0, x1)}" fill="url(#${id}${g})" fill-opacity=".9"/>`).join('')}
+          ${parts.map(([x0, x1]) => `<path d="${edge(x0, x1)}" fill="none" stroke="#fff" stroke-opacity=".35" stroke-width="1" stroke-linecap="round" vector-effect="non-scaling-stroke"/>`).join('')}
+        </svg>`;
       const sec = t.secondary;
       return `<div class="hoa">
         <i class="hoa-bloom"></i>
+        ${seg('hoa-ribbon-back', [[-4, seam, 'g']])}
         <div class="hob">
-          <i class="hob-halo"></i><i class="hob-body"></i><i class="hob-film"></i><i class="hob-rim"></i><i class="hob-rim hob-rim-hi"></i>
+          <i class="hob-halo"></i><i class="hob-body"></i><i class="hob-thin"></i><i class="hob-film"></i><i class="hob-rim"></i><i class="hob-rim hob-rim-hi"></i>
           <svg class="hob-arcs" viewBox="0 0 100 100" focusable="false">
             <path d="M87.2 67.3 A41 41 0 0 1 60.6 89.6" fill="none" stroke="${sec}" stroke-width="3" stroke-linecap="round" opacity=".5" style="filter:blur(2px)"/>
             <path d="M87.2 67.3 A41 41 0 0 1 60.6 89.6" fill="none" stroke="${sec}" stroke-width="1.3" stroke-linecap="round" opacity=".95"/>
@@ -122,12 +148,7 @@
             <circle cx="39" cy="12.6" r="0.9" fill="#fff" opacity=".8"/>
           </svg>
         </div>
-        <svg class="hoa-ribbon" viewBox="0 0 160 80" preserveAspectRatio="none" focusable="false">
-          <defs><linearGradient id="${id}g" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="160" y2="0">${stops}</linearGradient></defs>
-          <path d="${main}" fill="none" stroke="url(#${id}g)" stroke-width="7" stroke-opacity=".6" vector-effect="non-scaling-stroke" style="filter:blur(5px)"/>
-          ${strands}
-        </svg>
-        <i class="hoa-bead" style="left:74.8%;top:23.1%"></i>
+        ${seg('hoa-ribbon-front', [[seam, xt, 'g'], [xt, 164, 'h']])}
       </div>`;
     },
 

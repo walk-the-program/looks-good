@@ -2,8 +2,9 @@
    no blur anywhere: geometry only (circles, half and quarter circles,
    squares), flat fills with no outlines on art shapes, 2px ink borders on UI
    controls that are either square or fully round. Reference: Bauhaus exhibition
-   posters. Poster hero (a huge tight uppercase headline, vertical kicker), the
-   art is a 3x3 pattern tile, palette as strips. Secondary and accent may be
+   posters. Poster hero (a huge tight lowercase headline after Bayer's universal
+   alphabet, vertical kicker), the art is a 3x3 pattern tile, palette as geometric
+   swatches (square, circle, quarter circle, semicircle). Secondary and accent may be
    large planes in the art only; the UI keeps the universal role rules. */
 registerAesthetic({
   key: 'bauhaus-poster', order: 8,
@@ -16,13 +17,14 @@ registerAesthetic({
   mode: 'light',
   slideShape: 'minimal',
   labels: { material: 'Form', states: ['Rest', 'Hover', 'Pressed'], statesKind: 'button' },
-  layout: { hero: 'poster', palette: 'strips' },
+  layout: { hero: 'poster', palette: 'swatches' },
   type: { ui: 'sans', label: 'sans', display: 1.4 },
-  highlight: 'band',
+  highlight: 'custom',
+  highlightNote: 'The highlight word sits on a flat accent plane covering its lower half; no outline, no full band.',
 
   // --ab-tr scales the tight headline tracking: 0 for condensed/heavy faces (they collide when tightened), 1 otherwise
   tokens() {
-    return { '--ab-tr': (typeof state !== 'undefined' && state.headingFont && { condensed: 0, heavy: 0, wide: 0.4, techno: 0.4 }[state.headingFont.cls]) ?? 1 };
+    return { '--ab-type-pick-w': 600, '--ab-tr': (typeof state !== 'undefined' && state.headingFont && { condensed: 0, heavy: 0, wide: 0.4, techno: 0.4 }[state.headingFont.cls]) ?? 1 };
   },
 
   roles: {
@@ -36,7 +38,7 @@ registerAesthetic({
       coverage: '≈10–15%',
     },
     accent: {
-      use: 'Large planes inside the art tile only (half circles, backgrounds), where it may exceed its 5%; in the UI, one spark: the highlighted headline word (a flat plane, no outline) and the footer dot',
+      use: 'Large planes inside the art tile only (half circles, backgrounds), where it may exceed its 5%; in the UI, one spark: the highlighted headline word (a flat plane under its lower half, no outline, no full band) and the footer dot',
       never: 'Buttons, body text, borders, large fills in the interface',
       coverage: '≤5%',
     },
@@ -73,7 +75,8 @@ registerAesthetic({
     { name: 'Flat form (art)', css: 'background: {primary}; border: 0; border-radius: 0; box-shadow: none; /* art shapes are flat fills with no outlines; or a quarter circle, semicircle or circle in primary, secondary, accent or ink on a flat square plane */' },
     { name: 'Control (UI)', css: 'background: {canvas}; border: 2px solid {ink}; border-radius: 0; color: {ink}; /* or border-radius: 999px; never in between */' },
     { name: 'Primary action', css: 'background: {primary}; color: {onPrimary}; border: 2px solid {ink}; border-radius: 0; /* ends in an ink circle holding the arrow: background {ink}; color {canvas}; border-radius: 50%. Hover: background {ink}, color {canvas}; pressed: background {canvas}, color {ink}, translate(2px, 2px) */' },
-    { name: 'Highlight plane', css: 'background: {accent}; color: {onAccent}; border: 0; padding: 0 .1em; /* a flat accent plane behind one headline word, no outline */' },
+    { name: 'Highlight plane', css: 'background: linear-gradient(to top, {accent} 0 46%, transparent 46%); color: {ink}; border: 0; padding: 0 .04em; /* a flat accent plane (a hard stop, not a gradient) behind the lower half of one headline word; ink text; no outline, no full band */' },
+    { name: 'Palette shapes', css: 'one geometric form per role in a 1:1 box, max 96px, flat fill, no shadow: canvas = square with a 2px {ink} border, ink = circle, primary = circle, secondary = quarter circle (border-radius: 100% 0 0 0), accent = semicircle (half height, bottom aligned).' },
     { name: 'Selected segment', css: 'background: {primary}; color: {onPrimary}; border: 2px solid {ink}; border-radius: 0; /* unselected: background {canvas}; color {ink} */' },
     { name: 'Field', css: 'background: transparent; border: 0; border-bottom: 3px solid {ink}; border-radius: 0; text-transform: uppercase; font-weight: 700;' },
     { name: 'Switch', css: 'track: 2px solid {ink}, border-radius 0, background {canvas} (off) or {primary} (on); knob: circle, background {ink}.' },
@@ -83,7 +86,7 @@ registerAesthetic({
     do: [
       'Build art from circles, half and quarter circles and squares, tiled on a grid and rotated in 90° steps; flat fills only, with no outlines on art shapes.',
       'Make every control either square (radius 0) or fully round; nothing in between.',
-      'Draw every UI control and panel with a 2px ink border and set headlines in huge, tight uppercase.',
+      'Draw every UI control and panel with a 2px ink border and set headlines in huge, tight lowercase (card titles and list names stay uppercase).',
       'Let secondary and accent run as large flat planes in the poster art, and keep them small in the interface.',
     ],
     dont: [

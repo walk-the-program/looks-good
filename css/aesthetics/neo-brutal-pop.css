@@ -61,7 +61,30 @@
   color: var(--ab-ink); font-size: 11px; font-weight: 800; letter-spacing: 0.1em;
   transform: rotate(-1.5deg);
 }
-.ab[data-ae="neo-brutal-pop"] .ab-headline { font-weight: 800; letter-spacing: calc(-0.02em * var(--ab-tr, 1)); line-height: 1.04; }
+.ab[data-ae="neo-brutal-pop"] .ab-headline { position: relative; z-index: 1; font-weight: 800; letter-spacing: calc(-0.02em * var(--ab-tr, 1)); line-height: 1.04; }
+/* stickers: pseudo-elements anchored to the text so they overlap it. The
+   starburst is an in-flow inline-block with negative margins that net to zero
+   advance, so it sits at the start of the first line (the first letter's
+   top-left, whatever the centering) and the line layout is unchanged; letters
+   after it paint over it. The flower hangs off the highlight pill's bottom-right. */
+.ab[data-ae="neo-brutal-pop"] {
+  --np-star: clamp(84px, 15cqw, 140px);
+  --np-flower: clamp(72px, 12cqw, 120px);
+}
+.ab[data-ae="neo-brutal-pop"] .ab-headline::before {
+  content: var(--np-initial); display: inline-block; vertical-align: top; pointer-events: none; position: relative; z-index: -1;
+  box-sizing: border-box; width: var(--np-star); height: var(--np-star); padding-top: calc(var(--np-star) * 0.5 - 0.5em);
+  margin: calc(1.1em - var(--np-star)) calc(-0.9em) calc(-1.1em) calc(0.9em - var(--np-star));
+  background: var(--np-star-img) center / 100% 100% no-repeat; text-align: center;
+  font-family: var(--ab-font-h); font-weight: 800; font-size: 0.4em; line-height: 1; color: var(--ab-on-accent);
+  letter-spacing: 0; text-transform: none; rotate: -12deg;
+}
+.ab[data-ae="neo-brutal-pop"] .ab-hl { position: relative; }
+.ab[data-ae="neo-brutal-pop"] .ab-hl::after {
+  content: ""; position: absolute; z-index: -1; right: 0; bottom: 0; pointer-events: none;
+  width: var(--np-flower); aspect-ratio: 1; background: var(--np-flower-img) center / 100% 100% no-repeat;
+  transform: translate(85%, 85%) rotate(10deg);
+}
 /* the highlight word: a color fill with a 2px ink outline and a hard shadow */
 .ab[data-ae="neo-brutal-pop"] .ab-hl {
   display: inline-block; max-width: 100%; padding: 0 0.16em 0.06em; margin: 0 0.02em;
@@ -78,14 +101,11 @@
   position: absolute; inset: 0; z-index: 0; width: auto; max-width: none; aspect-ratio: auto; pointer-events: none;
 }
 .ab[data-ae="neo-brutal-pop"] .ab-hero-copy { position: relative; z-index: 1; }
-/* keep the statement at least ~24px clear of the stickers on wide boards */
+/* wide boards: the statement gets 86cqw so it sets in two lines */
 @container ab (min-width: 601px) {
-  .ab[data-ae="neo-brutal-pop"][data-hero="centered"] .ab-hero-copy { max-width: calc(62cqw - 48px); }
+  .ab[data-ae="neo-brutal-pop"][data-hero="centered"] .ab-hero-copy { max-width: 86cqw; }
 }
 .ab[data-ae="neo-brutal-pop"] .nba { position: absolute; inset: 0; }
-.ab[data-ae="neo-brutal-pop"] .nba svg { position: absolute; display: block; overflow: visible; }
-.ab[data-ae="neo-brutal-pop"] .nba-star { width: 13.5cqw; max-width: 132px; min-width: 70px; left: 0.5%; top: 12%; transform: rotate(-12deg); }
-.ab[data-ae="neo-brutal-pop"] .nba-flower { width: 14cqw; max-width: 140px; min-width: 72px; right: 2%; top: 34%; transform: rotate(10deg); }
 .ab[data-ae="neo-brutal-pop"] .nba-cta {
   position: absolute; left: 50%; bottom: clamp(24px, 3.6cqw, 40px); transform: translateX(-50%);
   display: inline-flex; align-items: center; gap: 12px; white-space: nowrap;
@@ -207,6 +227,18 @@
 }
 .ab[data-ae="neo-brutal-pop"] .ab-row-pct { font-weight: 800; }
 
+/* type block: a sticker card per column */
+.ab[data-ae="neo-brutal-pop"] .ab-type-col {
+  padding: 18px; background: var(--ab-paper); border: var(--np-b) solid var(--ab-ink); border-radius: var(--np-rc);
+  box-shadow: 4px 4px 0 var(--ab-ink);
+}
+.ab[data-ae="neo-brutal-pop"] .ab-type-apply {
+  background: var(--ab-canvas); color: var(--ab-ink); border: var(--np-b) solid var(--ab-ink); border-radius: var(--np-r);
+  box-shadow: 4px 4px 0 var(--ab-ink); font-weight: 700; transition: transform 0.1s, box-shadow 0.1s;
+}
+.ab[data-ae="neo-brutal-pop"] .ab-type-apply:hover { background: var(--ab-canvas); transform: translate(-2px, -2px); box-shadow: 6px 6px 0 var(--ab-ink); }
+.ab[data-ae="neo-brutal-pop"] .ab-type-apply:active { transform: translate(4px, 4px); box-shadow: 0 0 0 var(--ab-ink); }
+
 /* footer */
 .ab[data-ae="neo-brutal-pop"] .ab-foot {
   border-top: 0; padding-top: 20px; color: var(--ab-ink);
@@ -227,11 +259,14 @@
   .ab[data-ae="neo-brutal-pop"] .ab-hero { padding-top: 84px; padding-bottom: 92px; }
   .ab[data-ae="neo-brutal-pop"] .ab-hero-copy { text-align: left; }
   .ab[data-ae="neo-brutal-pop"] .ab-subcopy { margin-left: 0 !important; }
-  .ab[data-ae="neo-brutal-pop"] .nba-star { width: 64px; min-width: 0; left: 0; top: 0; }
-  .ab[data-ae="neo-brutal-pop"] .nba-flower { width: 60px; min-width: 0; right: 0; top: 8px; }
+  .ab[data-ae="neo-brutal-pop"] { --np-star: 64px; --np-flower: 56px; }
+  .ab[data-ae="neo-brutal-pop"] .ab-headline::before { font-size: 0.55em; margin: calc(1.6em - var(--np-star)) calc(-2.8em) calc(-1.6em) calc(2.8em - var(--np-star)); }
+  .ab[data-ae="neo-brutal-pop"] .ab-kicker { margin-bottom: 42px !important; }
+  .ab[data-ae="neo-brutal-pop"] .ab-hl::after { transform: translate(55%, 80%) rotate(10deg); }
+  .ab[data-ae="neo-brutal-pop"] .ab-subcopy { margin-top: 52px !important; }
   .ab[data-ae="neo-brutal-pop"] .nba-cta { left: 0; transform: none; font-size: 14px; padding: 10px 12px 10px 18px; }
   .ab[data-ae="neo-brutal-pop"] .ab-row { grid-template-columns: auto minmax(0, 1fr) auto 4.5ch; }
-  .ab[data-ae="neo-brutal-pop"] .ab-tag { border-radius: var(--np-r); padding: 5px 12px; max-width: 140px; line-height: 1.35; }
+  .ab[data-ae="neo-brutal-pop"] .ab-tag { border-radius: var(--np-r); padding: 5px 12px; }
   .ab[data-ae="neo-brutal-pop"] .ab-swatch { column-gap: 16px; }
   .ab[data-ae="neo-brutal-pop"] .ab-chip { height: 50px; }
   .ab[data-ae="neo-brutal-pop"] .ab-state-ctl { font-size: 12px; padding: 9px 4px; }
@@ -239,5 +274,5 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .ab[data-ae="neo-brutal-pop"] .ab-cta:hover, .ab[data-ae="neo-brutal-pop"] .ab-cta:active, .ab[data-ae="neo-brutal-pop"] .ab-input:focus { transform: none; }
+  .ab[data-ae="neo-brutal-pop"] .ab-cta:hover, .ab[data-ae="neo-brutal-pop"] .ab-cta:active, .ab[data-ae="neo-brutal-pop"] .ab-input:focus, .ab[data-ae="neo-brutal-pop"] .ab-type-apply:hover, .ab[data-ae="neo-brutal-pop"] .ab-type-apply:active { transform: none; }
 }

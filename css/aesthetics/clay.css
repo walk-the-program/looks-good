@@ -33,10 +33,8 @@
   padding: 6px 14px; border-radius: 999px; background: var(--cl-tray-c); box-shadow: var(--cl-well);
   font-size: 11.5px; letter-spacing: 0.01em; text-transform: none;
 }
-.ab[data-ae="clay"] .ab-rule {
-  height: 7px; border-radius: 99px; background: var(--cl-tray-c);
-  box-shadow: inset 0 2px 4px var(--ab-clay-lo), inset 0 -1px 0 var(--ab-clay-hi);
-}
+/* clay separates with space and soft cards, not rules: the rule is spacing only */
+.ab[data-ae="clay"] .ab-rule { height: 0; background: none; margin: 10px 0; box-shadow: none; border: 0; }
 
 /* labels: friendly sentence case, numbers as little puffs */
 .ab[data-ae="clay"] .ab-label { display: inline-flex; align-items: center; gap: 9px; font-size: 13px; font-weight: 700; letter-spacing: 0; text-transform: none; color: var(--ab-ink); }
