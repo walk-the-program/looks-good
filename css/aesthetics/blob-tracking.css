@@ -1,2 +1,272 @@
-/* 21 Blob Tracking - STUB (P4 scaffold). Every selector in this file is scoped under
-   .ab[data-ae="blob-tracking"]. Reference: the TouchDesigner / After Effects blob-track look, OpenCV-style detection overlays on footage: 1px bounding boxes with ID and confidence label tabs, crosshair centroids and connector lines over dithered monochrome footage. Spec: docs/aesthetics-round4.md. */
+/* ---------------------------------------------------------------------
+   21 Blob Tracking — tracked, clinical, live. Reference: TouchDesigner / After
+   Effects blob tracking and OpenCV detection overlays. A near-black frame, 1px
+   white bounding boxes with 1.5px corner ticks and solid mono label tabs
+   ("ID 07 · 0.93"), centroid crosshairs, connector lines and confidence bars.
+   Square, hairline, no glow (that is Cyber HUD). Primary appears only as the
+   locked target: one box in the footage, the one main action, selected states.
+   Vars --ab-plate / --ab-lit / --ab-lock / --ab-box* / --ab-ticks* come from
+   js/aesthetics/blob-tracking.js tokens(). The footage plate and its overlay
+   (.bta-*) are built by art(). Hooks used: hero 'centered' (art = a full-width
+   footage frame), type ui/label 'mono', highlight 'custom', states 'button'.
+------------------------------------------------------------------------ */
+
+.ab[data-ae="blob-tracking"] {
+  border-radius: 4px;
+  --ab-art-ratio: 200 / 92; --ab-art-ratio-narrow: 200 / 92;
+  --bt-tab-bg: var(--ab-ink); --bt-tab-fg: var(--ab-canvas);
+  --bt-grain: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n' x='0' y='0' width='100%25' height='100%25'><feTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='2' stitchTiles='stitch' seed='3'/><feColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 1.6 -.62'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+  --bt-grain-op: 0.5;
+}
+.ab[data-ae="blob-tracking"][data-mode="light"] {
+  --bt-grain: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n' x='0' y='0' width='100%25' height='100%25'><feTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='2' stitchTiles='stitch' seed='3'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 1.6 -.62'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+  --bt-grain-op: 0.4;
+}
+/* fine static grain over the frame, behind the content */
+.ab[data-ae="blob-tracking"]::after {
+  content: ""; position: absolute; inset: 0; z-index: 0; pointer-events: none;
+  background: var(--bt-grain) 0 0 / 220px 220px; opacity: var(--bt-grain-op);
+}
+
+/* ---- shared detection vocabulary ---- */
+/* solid label tab: mono, tight, always a filled ink plane (the only filled ink plane) */
+.ab[data-ae="blob-tracking"] .ab-type-col::before,
+.ab[data-ae="blob-tracking"] .ab-card::after,
+.ab[data-ae="blob-tracking"] .ab-panel::after,
+.ab[data-ae="blob-tracking"] .ab-list::after,
+.ab[data-ae="blob-tracking"] .ab-headline::after,
+.ab[data-ae="blob-tracking"] .ab-hl::after,
+.ab[data-ae="blob-tracking"] .ab-seg-btn[aria-pressed="true"]::after,
+.ab[data-ae="blob-tracking"] .ab-state-ctl.is-hover::after {
+  position: absolute; z-index: 3; padding: 0 6px; background: var(--bt-tab-bg); color: var(--bt-tab-fg);
+  font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  font-size: 9.5px; font-weight: 700; line-height: 15px; letter-spacing: 0.05em; text-transform: uppercase; white-space: nowrap; pointer-events: none;
+}
+/* the tick frame: 1.5px corner brackets, drawn just outside a box */
+.ab[data-ae="blob-tracking"] .ab-card::before, .ab[data-ae="blob-tracking"] .ab-panel::before, .ab[data-ae="blob-tracking"] .ab-list::before {
+  content: ""; position: absolute; inset: -4px; z-index: 2; pointer-events: none; background: var(--ab-ticks); transition: inset 0.14s;
+}
+
+/* ---- header ---- */
+.ab[data-ae="blob-tracking"] .ab-brand { font-weight: var(--ab-hw, 600); letter-spacing: calc(-0.02em * var(--ab-tr, 1)); }
+.ab[data-ae="blob-tracking"] .ab-mark {
+  position: relative; border-radius: 0; background: none; color: var(--ab-ink); font-family: ui-monospace, "SF Mono", Menlo, monospace; font-weight: 700; font-size: 13px;
+  box-shadow: inset 0 0 0 1px var(--ab-box);
+}
+.ab[data-ae="blob-tracking"] .ab-mark::before { content: ""; position: absolute; inset: -3px; background: var(--ab-ticks); pointer-events: none; }
+.ab[data-ae="blob-tracking"] .ab-tag { padding: 3px 8px; background: var(--bt-tab-bg); color: var(--bt-tab-fg); font-size: 10px; font-weight: 700; letter-spacing: 0.1em; }
+.ab[data-ae="blob-tracking"] .ab-tag b { color: inherit; font-weight: 700; }
+.ab[data-ae="blob-tracking"] .ab-tag-pre { font-weight: 500; opacity: 0.7; }
+.ab[data-ae="blob-tracking"] .ab-rule { background: var(--ab-box-hair); }
+
+/* ---- hero: a statement on the left, a footage frame under it ---- */
+.ab[data-ae="blob-tracking"][data-hero="centered"] .ab-hero { justify-items: stretch; gap: clamp(30px, 4.6cqw, 60px); padding: clamp(40px, 5.6cqw, 72px) 0 clamp(26px, 4cqw, 44px); }
+.ab[data-ae="blob-tracking"][data-hero="centered"] .ab-hero-copy {
+  max-width: none; text-align: left;
+  display: grid; grid-template-columns: minmax(0, 1.8fr) minmax(0, 1fr); column-gap: clamp(24px, 5cqw, 72px); align-items: end;
+}
+.ab[data-ae="blob-tracking"] .ab-kicker {
+  grid-column: 1 / -1; display: inline-flex; align-items: center; gap: 10px; margin-bottom: 38px !important;
+  font-size: 11px; font-weight: 500; letter-spacing: 0.2em; color: var(--ab-ink);
+}
+.ab[data-ae="blob-tracking"] .ab-kicker::before {
+  content: ""; flex: none; width: 11px; height: 11px;
+  background: linear-gradient(var(--ab-ink), var(--ab-ink)) center / 100% 1px no-repeat, linear-gradient(var(--ab-ink), var(--ab-ink)) center / 1px 100% no-repeat;
+}
+.ab[data-ae="blob-tracking"] .ab-kicker::after { content: ""; width: 38px; height: 1px; background: var(--ab-box-soft); }
+
+.ab[data-ae="blob-tracking"] .ab-headline {
+  grid-column: 1; position: relative; font-weight: var(--ab-hw, 600); letter-spacing: calc(-0.035em * var(--ab-tr, 1)); line-height: 1.06; text-wrap: balance;
+}
+/* the whole headline is a detected text region: a fainter parent box with its own tab */
+.ab[data-ae="blob-tracking"] .ab-headline::before {
+  content: ""; position: absolute; inset: -16px -18px -34px -18px; border: 1px solid var(--ab-box-soft); background: var(--ab-ticks-soft); pointer-events: none;
+}
+.ab[data-ae="blob-tracking"] .ab-headline::after { content: "ID 01 · TEXT · 0.99"; left: -18px; top: -16px; transform: translateY(-100%); background: var(--ab-box-soft); color: var(--ab-ink); }
+/* the highlight word is the tracked child: 1px white box, ticks, ID tab hanging below */
+.ab[data-ae="blob-tracking"] .ab-hl { position: relative; display: inline-block; color: var(--ab-accent-ink); background: none; background-image: none; padding: 0 0.04em; margin: 0 0.06em; }
+.ab[data-ae="blob-tracking"][data-accent-text="low"] .ab-hl { background-image: none; }
+.ab[data-ae="blob-tracking"] .ab-hl::before {
+  content: ""; position: absolute; inset: 0.04em -0.1em 0.02em -0.1em; z-index: 1; border: 1px solid var(--ab-box); background: var(--ab-ticks); pointer-events: none;
+}
+.ab[data-ae="blob-tracking"] .ab-hl::after { content: "ID 07 · 0.93"; left: -0.1em; top: calc(100% + 0.02em); }
+.ab[data-ae="blob-tracking"] .ab-subcopy {
+  grid-column: 2; margin: 0 !important; padding-left: 14px; border-left: 1px solid var(--ab-box-soft); max-width: 28em; align-self: end;
+}
+.ab[data-ae="blob-tracking"] .ab-sub-lead { color: var(--ab-ink); }
+
+/* art: the footage frame */
+.ab[data-ae="blob-tracking"] .ab-art { border: 1px solid var(--ab-box-soft); background: var(--ab-plate); overflow: hidden; }
+.ab[data-ae="blob-tracking"] .bta { position: absolute; inset: 0; font-family: ui-monospace, "SF Mono", Menlo, monospace; color: var(--ab-lit); }
+.ab[data-ae="blob-tracking"] .bta-fx { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.ab[data-ae="blob-tracking"] .bta-tab {
+  position: absolute; transform: translateY(-100%); padding: 0 0.45em; background: var(--ab-lit); color: var(--ab-plate);
+  font-size: clamp(7px, 0.95cqw, 10px); font-weight: 700; line-height: 1.6; letter-spacing: 0.04em; white-space: nowrap;
+}
+.ab[data-ae="blob-tracking"] .bta-tab i { font-weight: 500; }
+.ab[data-ae="blob-tracking"] .bta-tab.is-lock { background: var(--ab-lock); }
+.ab[data-ae="blob-tracking"] .bta-xy { position: absolute; padding-top: 0.5em; margin-left: 1px; font-size: clamp(6.5px, 0.85cqw, 9px); letter-spacing: 0.06em; white-space: pre; color: var(--ab-lock); font-weight: 600; }
+.ab[data-ae="blob-tracking"] .bta-hud { position: absolute; font-size: clamp(6.5px, 0.9cqw, 9.5px); font-weight: 600; letter-spacing: 0.12em; white-space: nowrap; text-shadow: 0 0 3px var(--ab-plate), 0 0 3px var(--ab-plate); }
+.ab[data-ae="blob-tracking"] .bta-tl { left: 4.2%; top: 8%; }
+.ab[data-ae="blob-tracking"] .bta-tr { right: 4.2%; top: 8%; }
+.ab[data-ae="blob-tracking"] .bta-bl { left: 4.2%; bottom: 9.5%; opacity: 0.75; }
+.ab[data-ae="blob-tracking"] .bta-br { right: 4.2%; bottom: 9.5%; opacity: 0.75; }
+.ab[data-ae="blob-tracking"] .bta-rec { display: inline-block; width: 0.75em; height: 0.75em; margin-right: 0.7em; border-radius: 50%; background: var(--ab-accent); vertical-align: -0.04em; }
+
+/* ---- labels, palette ---- */
+.ab[data-ae="blob-tracking"] .ab-label { letter-spacing: 0.18em; }
+.ab[data-ae="blob-tracking"] .ab-labelrow { margin-bottom: 24px; }
+.ab[data-ae="blob-tracking"] .ab-n { display: inline-block; margin-right: 10px; padding: 1px 6px; background: var(--bt-tab-bg); color: var(--bt-tab-fg); font-size: 10px; font-weight: 700; letter-spacing: 0.06em; }
+.ab[data-ae="blob-tracking"] .ab-n::after { content: none; }
+.ab[data-ae="blob-tracking"] .ab-swatches { counter-reset: btsw; }
+.ab[data-ae="blob-tracking"] .ab-swatch { counter-increment: btsw; }
+.ab[data-ae="blob-tracking"] .ab-chip { position: relative; border-radius: 0; margin-bottom: 14px; box-shadow: inset 0 0 0 1px var(--ab-box-soft); }
+.ab[data-ae="blob-tracking"] .ab-chip::after { content: ""; position: absolute; inset: -4px; background: var(--ab-ticks-soft); pointer-events: none; }
+.ab[data-ae="blob-tracking"] .ab-sw-role { font-size: 11.5px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; }
+.ab[data-ae="blob-tracking"] .ab-sw-role::before { content: "ID " counter(btsw, decimal-leading-zero) " · "; color: var(--ab-muted); font-weight: 500; }
+.ab[data-ae="blob-tracking"] .ab-sw-hex { color: var(--ab-ink); }
+
+/* ---- type recommendations: detected regions with edge tabs ---- */
+.ab[data-ae="blob-tracking"] .ab-type-grid { counter-reset: bttc; gap: clamp(16px, 2.6cqw, 32px); padding-top: 8px; }
+.ab[data-ae="blob-tracking"] .ab-type-col { position: relative; counter-increment: bttc; padding: 24px 18px 14px; border: 1px solid var(--ab-box-soft); background: var(--ab-box-fill); }
+.ab[data-ae="blob-tracking"] .ab-type-col::before { content: "ID " counter(bttc, decimal-leading-zero) " · 0.9" counter(bttc); left: 12px; top: -8px; }
+.ab[data-ae="blob-tracking"] .ab-type-col::after { content: ""; position: absolute; inset: -4px; background: var(--ab-ticks-soft); pointer-events: none; }
+.ab[data-ae="blob-tracking"] .ab-type-role { color: var(--ab-ink); letter-spacing: 0.18em; }
+.ab[data-ae="blob-tracking"] .ab-type-pick:first-child { letter-spacing: calc(-0.02em * var(--ab-tr, 1)); }
+.ab[data-ae="blob-tracking"] .ab-type-cur { font-size: 11.5px; }
+.ab[data-ae="blob-tracking"] .ab-fit {
+  padding: 1px 7px; border: 1px solid var(--ab-box); border-radius: 0; background: none; color: var(--ab-ink);
+  font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+}
+.ab[data-ae="blob-tracking"] .ab-fit[data-fit="match"] { background: var(--ab-box-fill); border-color: var(--ab-box); color: var(--ab-ink); }
+.ab[data-ae="blob-tracking"] .ab-fit[data-fit="consider"] { border-style: dashed; border-color: var(--ab-box-soft); }
+.ab[data-ae="blob-tracking"] .ab-fit[data-fit="avoid"] { background: var(--ab-ink); border-color: var(--ab-ink); color: var(--ab-canvas); }
+.ab[data-ae="blob-tracking"] .ab-type-k { letter-spacing: 0.18em; }
+.ab[data-ae="blob-tracking"] .ab-type-apply {
+  position: relative; padding: 11px 16px 11px 38px; border: 1px solid var(--ab-box); border-radius: 0; background: var(--ab-box-fill);
+  font-size: 11px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; transition: background 0.12s;
+}
+.ab[data-ae="blob-tracking"] .ab-type-apply::before {
+  content: ""; position: absolute; left: 14px; top: 50%; width: 12px; height: 12px; margin-top: -6px;
+  background: linear-gradient(var(--ab-ink), var(--ab-ink)) center / 100% 1px no-repeat, linear-gradient(var(--ab-ink), var(--ab-ink)) center / 1px 100% no-repeat;
+}
+.ab[data-ae="blob-tracking"] .ab-type-apply:hover { background: var(--ab-box-hair); }
+
+/* ---- 01 interface: a region with a selected, labelled detection ---- */
+.ab[data-ae="blob-tracking"] .ab-card, .ab[data-ae="blob-tracking"] .ab-panel {
+  position: relative; border: 1px solid var(--ab-box-soft); border-radius: 0; background: var(--ab-box-fill);
+}
+.ab[data-ae="blob-tracking"] .ab-card { padding: clamp(24px, 3cqw, 32px) clamp(18px, 2.8cqw, 26px) clamp(20px, 3cqw, 28px); }
+.ab[data-ae="blob-tracking"] .ab-card::after { content: "ID 02 · 0.91"; right: 14px; top: -8px; }
+.ab[data-ae="blob-tracking"] .ab-panel { padding: clamp(24px, 3cqw, 32px) clamp(18px, 2.8cqw, 24px) clamp(18px, 2.8cqw, 24px); }
+.ab[data-ae="blob-tracking"] .ab-panel::after { content: "ID 04 · 0.88"; right: 14px; top: -8px; }
+.ab[data-ae="blob-tracking"] .ab-seg { gap: 0; padding: 0; border-radius: 0; background: none; box-shadow: inset 0 -1px 0 var(--ab-box-hair); }
+.ab[data-ae="blob-tracking"] .ab-seg-btn {
+  position: relative; border-radius: 0; min-height: 38px; font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase;
+  transition: color 0.12s, background 0.12s;
+}
+.ab[data-ae="blob-tracking"] .ab-seg-btn + .ab-seg-btn { box-shadow: inset 1px 0 0 var(--ab-box-hair); }
+.ab[data-ae="blob-tracking"] .ab-seg-btn:hover { color: var(--ab-ink); }
+.ab[data-ae="blob-tracking"] .ab-seg-btn[aria-pressed="true"] {
+  color: var(--ab-ink); font-weight: 700; background: var(--ab-ticks), var(--ab-box-fill); background-origin: border-box; box-shadow: inset 0 0 0 1px var(--ab-box);
+}
+.ab[data-ae="blob-tracking"] .ab-seg-btn[aria-pressed="true"]::after { content: "ID 01 · 0.98"; left: -1px; top: -1px; transform: translateY(-100%); }
+.ab[data-ae="blob-tracking"] .ab-seg-btn[data-stage="Build"][aria-pressed="true"]::after { content: "ID 02 · 0.96"; }
+.ab[data-ae="blob-tracking"] .ab-seg-btn[data-stage="Launch"][aria-pressed="true"]::after { content: "ID 03 · 0.94"; }
+.ab[data-ae="blob-tracking"] .ab-card-title { font-weight: var(--ab-hw, 600); letter-spacing: calc(-0.025em * var(--ab-tr, 1)); }
+.ab[data-ae="blob-tracking"] .ab-cta {
+  position: relative; border-radius: 0; margin: 4px 0 0; padding: 14px 16px; font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  font-size: 12px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; transition: filter 0.12s;
+}
+.ab[data-ae="blob-tracking"] .ab-cta::before { content: ""; position: absolute; inset: -5px; background: var(--ab-ticks); pointer-events: none; transition: inset 0.14s; }
+.ab[data-ae="blob-tracking"] .ab-cta:hover::before { inset: -2px; }
+.ab[data-ae="blob-tracking"] .ab-cta:hover { filter: brightness(1.08); }
+.ab[data-ae="blob-tracking"] .ab-cta:active { filter: brightness(0.9); }
+.ab[data-ae="blob-tracking"] .ab-cta-arrow::before {
+  content: ""; display: block; width: 15px; height: 15px; border: 1.5px solid currentColor; border-radius: 50%;
+  background: linear-gradient(currentColor, currentColor) center / 100% 1.5px no-repeat, linear-gradient(currentColor, currentColor) center / 1.5px 100% no-repeat;
+}
+
+/* ---- 02 detection: field, switch, three states of the one control ---- */
+.ab[data-ae="blob-tracking"] .ab-fieldlabel { font-size: 10.5px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--ab-muted); }
+.ab[data-ae="blob-tracking"] .ab-input { border: 1px solid var(--ab-box-soft); border-radius: 0; background: var(--ab-canvas); font-size: 14px; letter-spacing: 0.02em; caret-color: var(--ab-ink); transition: border-color 0.12s, background 0.12s; }
+.ab[data-ae="blob-tracking"] .ab-input:focus { border-color: var(--ab-box); background: var(--ab-ticks), var(--ab-canvas); background-origin: border-box; }
+.ab[data-ae="blob-tracking"] .ab-toggle { font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; }
+.ab[data-ae="blob-tracking"] .ab-switch { width: 62px; height: 28px; border-radius: 0; background: none; box-shadow: inset 0 0 0 1px var(--ab-box-soft); transition: box-shadow 0.12s; }
+.ab[data-ae="blob-tracking"] .ab-switch::before {
+  left: 4px; top: 4px; width: 20px; height: 20px; border-radius: 0; background: var(--ab-box-soft); transition: transform 0.14s, background 0.14s;
+}
+.ab[data-ae="blob-tracking"] .ab-switch::after {
+  content: "IDLE"; position: absolute; right: 7px; top: 50%; transform: translateY(-50%); font: 700 9px/1 ui-monospace, "SF Mono", Menlo, monospace; letter-spacing: 0.1em; color: var(--ab-muted);
+}
+.ab[data-ae="blob-tracking"] .ab-switch:checked { box-shadow: inset 0 0 0 1px var(--ab-box); background: var(--ab-ticks); background-origin: border-box; }
+.ab[data-ae="blob-tracking"] .ab-switch:checked::before { transform: translateX(30px); background: var(--ab-primary); }
+.ab[data-ae="blob-tracking"] .ab-switch:checked::after { content: "LOCK"; right: auto; left: 7px; color: var(--ab-ink); }
+.ab[data-ae="blob-tracking"] .ab-status { font-size: 10.5px; letter-spacing: 0.12em; text-transform: uppercase; }
+.ab[data-ae="blob-tracking"] .ab-status::before { content: "● "; color: var(--ab-accent); }
+.ab[data-ae="blob-tracking"] .ab-states { margin-top: 30px; }
+.ab[data-ae="blob-tracking"] .ab-states[data-kind="button"] { gap: 14px; }
+.ab[data-ae="blob-tracking"] .ab-states .ab-state-ctl {
+  position: relative; border-radius: 0; margin-bottom: 14px; padding: 12px 6px; font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 11px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase;
+  transform: none; filter: none; box-shadow: none; transition: none;
+}
+.ab[data-ae="blob-tracking"] .ab-state { font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; }
+/* Searching: a dashed, unconfirmed region */
+.ab[data-ae="blob-tracking"] .ab-states .ab-state-ctl.is-rest { background: none; border: 1px dashed var(--ab-box); color: var(--ab-muted); }
+.ab[data-ae="blob-tracking"] .ab-states .ab-state-ctl.is-rest .ab-cta-label::after { content: " ···"; }
+.ab[data-ae="blob-tracking"] .ab-states .ab-state-ctl::before { content: none; }
+/* Locked: solid primary, ticks, an ID tab */
+.ab[data-ae="blob-tracking"] .ab-states .ab-state-ctl.is-hover { background: var(--ab-primary); border: 1px solid var(--ab-primary); color: var(--ab-on-primary); }
+.ab[data-ae="blob-tracking"] .ab-states .ab-state-ctl.is-hover::before { content: ""; position: absolute; inset: -5px; background: var(--ab-ticks); }
+.ab[data-ae="blob-tracking"] .ab-states .ab-state-ctl.is-hover::after { content: "ID 07"; left: 0; top: -5px; transform: translateY(-100%); font-size: 8.5px; line-height: 13px; padding: 0 5px; }
+/* Lost: the box is gone, a stale outline remains where it was */
+.ab[data-ae="blob-tracking"] .ab-states .ab-state-ctl.is-pressed { background: none; border: 1px dotted var(--ab-box-soft); color: var(--ab-muted); }
+.ab[data-ae="blob-tracking"] .ab-states .ab-state-ctl.is-pressed::before { content: ""; position: absolute; inset: 0; transform: translate(7px, -5px); border: 1px dashed var(--ab-box-hair); }
+.ab[data-ae="blob-tracking"] .ab-states .ab-state-ctl.is-pressed .ab-cta-label::after { content: " ?"; }
+
+/* ---- 03 in use: a roster of tracked objects ---- */
+.ab[data-ae="blob-tracking"] .ab-list { position: relative; border: 1px solid var(--ab-box-soft); background: var(--ab-box-fill); counter-reset: btrow; }
+.ab[data-ae="blob-tracking"] .ab-list::after { content: "TRACKED · 3 OBJECTS"; left: 14px; top: -8px; }
+.ab[data-ae="blob-tracking"] .ab-row { grid-template-columns: 6ch minmax(0, 1fr) auto minmax(60px, 150px) 4.5ch; counter-increment: btrow; position: relative; padding: 14px 18px; border-top: 1px solid var(--ab-box-hair); }
+.ab[data-ae="blob-tracking"] .ab-row:first-child { border-top: 0; background: var(--ab-ticks-lock); background-origin: border-box; box-shadow: inset 0 0 0 1px var(--ab-box); }
+.ab[data-ae="blob-tracking"] .ab-row:last-child { border-bottom: 0; }
+.ab[data-ae="blob-tracking"] .ab-row-n { font-size: 0; white-space: nowrap; }
+.ab[data-ae="blob-tracking"] .ab-row-n::before { content: "ID " counter(btrow, decimal-leading-zero); font-size: 10.5px; font-weight: 700; letter-spacing: 0.06em; color: var(--ab-ink); }
+.ab[data-ae="blob-tracking"] .ab-row-name { font-size: 12.5px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; }
+.ab[data-ae="blob-tracking"] .ab-row-status { padding: 2px 8px; border: 1px solid var(--ab-box-soft); border-radius: 0; background: none; font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; }
+.ab[data-ae="blob-tracking"] .ab-row-bar {
+  position: relative; height: 9px; border-radius: 0; overflow: visible;
+  background: linear-gradient(var(--ab-box-soft), var(--ab-box-soft)) center / 100% 1px no-repeat, repeating-linear-gradient(90deg, var(--ab-box-soft) 0 1px, transparent 1px 6px) bottom / 100% 4px no-repeat;
+}
+.ab[data-ae="blob-tracking"] .ab-row-bar i { position: relative; height: 100%; border-radius: 0; background: linear-gradient(var(--ab-ink), var(--ab-ink)) center / 100% 1.5px no-repeat; }
+.ab[data-ae="blob-tracking"] .ab-row-bar i::after { content: ""; position: absolute; right: -3px; top: 50%; width: 6px; height: 6px; margin-top: -3px; background: var(--ab-ink); }
+.ab[data-ae="blob-tracking"] .ab-row:first-child .ab-row-bar i { background: linear-gradient(var(--ab-lock), var(--ab-lock)) center / 100% 1.5px no-repeat; }
+.ab[data-ae="blob-tracking"] .ab-row:first-child .ab-row-bar i::after { background: var(--ab-primary); }
+.ab[data-ae="blob-tracking"] .ab-row-pct { font-weight: 700; letter-spacing: 0.02em; }
+
+/* ---- footer ---- */
+.ab[data-ae="blob-tracking"] .ab-foot { border-top: 1px solid var(--ab-box-hair); font-size: 10.5px; letter-spacing: 0.14em; text-transform: uppercase; }
+.ab[data-ae="blob-tracking"] .ab-motto { color: var(--ab-ink); }
+.ab[data-ae="blob-tracking"] .ab-dot { width: 7px; height: 7px; background: var(--ab-accent); }
+
+.ab[data-ae="blob-tracking"] .ab-seg-btn:focus-visible, .ab[data-ae="blob-tracking"] .ab-cta:focus-visible,
+.ab[data-ae="blob-tracking"] .ab-switch:focus-visible, .ab[data-ae="blob-tracking"] .ab-type-apply:focus-visible { outline: 1.5px solid var(--ab-ink); outline-offset: 4px; }
+
+@container ab (max-width: 600px) {
+  .ab[data-ae="blob-tracking"][data-hero="centered"] .ab-hero { gap: 26px; padding: 38px 0 24px; }
+  .ab[data-ae="blob-tracking"][data-hero="centered"] .ab-hero-copy { grid-template-columns: minmax(0, 1fr); }
+  .ab[data-ae="blob-tracking"] .ab-kicker { margin-bottom: 34px !important; letter-spacing: 0.14em; }
+  .ab[data-ae="blob-tracking"] .ab-headline::before { inset: -12px -10px -32px -10px; }
+  .ab[data-ae="blob-tracking"] .ab-headline::after { left: -10px; top: -12px; }
+  .ab[data-ae="blob-tracking"] .ab-subcopy { grid-column: 1; margin-top: 52px !important; }
+  .ab[data-ae="blob-tracking"] .bta-tab i, .ab[data-ae="blob-tracking"] .bta-xy { display: none; }
+  .ab[data-ae="blob-tracking"] .bta-tr, .ab[data-ae="blob-tracking"] .bta-bl { display: none; }
+  .ab[data-ae="blob-tracking"] .ab-tag { font-size: 9px; padding: 3px 6px; letter-spacing: 0.06em; }
+  .ab[data-ae="blob-tracking"] .ab-row { padding: 12px 14px; grid-template-columns: 5.6ch minmax(0, 1fr) 4.5ch; }
+  .ab[data-ae="blob-tracking"] .ab-row-n { grid-row: 1 / span 2; align-self: start; }
+  .ab[data-ae="blob-tracking"] .ab-states .ab-state-ctl { font-size: 10px; letter-spacing: 0.06em; }
+  .ab[data-ae="blob-tracking"] .ab-states[data-kind="button"] { gap: 10px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ab[data-ae="blob-tracking"] .ab-switch::before, .ab[data-ae="blob-tracking"] .ab-cta::before, .ab[data-ae="blob-tracking"] .ab-card::before, .ab[data-ae="blob-tracking"] .ab-panel::before, .ab[data-ae="blob-tracking"] .ab-list::before { transition: none; }
+}

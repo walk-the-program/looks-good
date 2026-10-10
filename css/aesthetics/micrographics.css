@@ -1,2 +1,246 @@
-/* 23 Micrographics - STUB (P4 scaffold). Every selector in this file is scoped under
-   .ab[data-ae="micrographics"]. Reference: streetwear and tech-editorial layouts (Acronym, Nike ISPA, modern Swiss posters): a giant headline or glyph against 7-9px mono microtype, registration marks, tick rulers, tiny barcodes and coordinate pairs. Spec: docs/aesthetics-round4.md. */
+/* ---------------------------------------------------------------------
+   23 Micrographics — tiny, technical, precise. Reference: Acronym / Nike ISPA /
+   techwear graphics, modern Swiss posters and product spec sheets. A flat light
+   sheet, 1px ink hairlines and crop marks, one giant tight headline and glyph
+   against 7-9px mono microtype with wide tracking. Every panel carries micro
+   corner labels: index (top-left: the section label), code (top-right: the label
+   row's ::after) and page (bottom-right: the card's ::after). Primary is only a
+   handful of 3-5px marks and the one main action; accent is the headline word.
+   Vars --ab-hair* / --ab-hw come from js/aesthetics/micrographics.js tokens().
+   Hooks: hero 'centered' (art = a full-width spec plate), type ui/label 'mono',
+   highlight 'custom', states 'swatch'.
+------------------------------------------------------------------------ */
+
+.ab[data-ae="micrographics"] {
+  border-radius: 0; font-size: 13px;
+  --ab-art-ratio: 2.3 / 1; --ab-art-ratio-narrow: 1 / 1.52;
+  --mg-micro: 500 8.5px/1.6 ui-monospace, "SF Mono", Menlo, monospace;
+  --mg-crops:
+    linear-gradient(var(--ab-ink), var(--ab-ink)) 0 9px / 6px 1px no-repeat, linear-gradient(var(--ab-ink), var(--ab-ink)) 9px 0 / 1px 6px no-repeat,
+    linear-gradient(var(--ab-ink), var(--ab-ink)) 100% 9px / 6px 1px no-repeat, linear-gradient(var(--ab-ink), var(--ab-ink)) calc(100% - 9px) 0 / 1px 6px no-repeat,
+    linear-gradient(var(--ab-ink), var(--ab-ink)) 0 calc(100% - 9px) / 6px 1px no-repeat, linear-gradient(var(--ab-ink), var(--ab-ink)) 9px 100% / 1px 6px no-repeat,
+    linear-gradient(var(--ab-ink), var(--ab-ink)) 100% calc(100% - 9px) / 6px 1px no-repeat, linear-gradient(var(--ab-ink), var(--ab-ink)) calc(100% - 9px) 100% / 1px 6px no-repeat;
+}
+/* board furniture: a vertical running line on the left edge and four corner registration marks */
+.ab[data-ae="micrographics"]::before {
+  content: "MICROGRAPHICS · SPEC 01/26 · ISSUE 04 · PRINTED IN 1 COLOR + 1 MARK · SCALE 1:1"; position: absolute; left: 6px; top: 50%; z-index: 2; pointer-events: none;
+  transform: translateY(-50%) rotate(180deg); writing-mode: vertical-rl; white-space: nowrap; font: 500 6.5px/1 ui-monospace, "SF Mono", Menlo, monospace; letter-spacing: 0.3em; color: var(--ab-hair);
+}
+.ab[data-ae="micrographics"]::after {
+  content: ""; position: absolute; inset: 0; z-index: 2; pointer-events: none;
+  --c: var(--ab-ink);
+  background:
+    linear-gradient(var(--c), var(--c)) 11px 11px / 9px 1px no-repeat, linear-gradient(var(--c), var(--c)) 15px 7px / 1px 9px no-repeat,
+    linear-gradient(var(--c), var(--c)) calc(100% - 11px) 11px / 9px 1px no-repeat, linear-gradient(var(--c), var(--c)) calc(100% - 15px) 7px / 1px 9px no-repeat,
+    linear-gradient(var(--c), var(--c)) 11px calc(100% - 11px) / 9px 1px no-repeat, linear-gradient(var(--c), var(--c)) 15px calc(100% - 15px) / 1px 9px no-repeat,
+    linear-gradient(var(--c), var(--c)) calc(100% - 11px) calc(100% - 11px) / 9px 1px no-repeat, linear-gradient(var(--c), var(--c)) calc(100% - 15px) calc(100% - 15px) / 1px 9px no-repeat;
+}
+
+/* microtype everywhere small */
+.ab[data-ae="micrographics"] :is(.ab-label, .ab-tag, .ab-kicker, .ab-fieldlabel, .ab-state, .ab-foot, .ab-sw-job, .ab-sw-hex, .ab-status, .ab-type-role, .ab-type-class, .ab-type-avoid, .ab-type-pair, .ab-type-k) {
+  font: var(--mg-micro); letter-spacing: 0.18em; text-transform: uppercase;
+}
+.ab[data-ae="micrographics"] .ab-label { color: var(--ab-ink); font-size: 9px; }
+.ab[data-ae="micrographics"] .ab-label:last-child:not(:first-child) { color: var(--ab-muted); }
+.ab[data-ae="micrographics"] .ab-labelrow { margin-bottom: 22px; padding-top: 7px; border-top: 1px solid var(--ab-hair); }
+.ab[data-ae="micrographics"] .ab-n { margin-right: 6px; font-weight: 700; letter-spacing: 0.1em; }
+.ab[data-ae="micrographics"] .ab-n::before { content: "["; }
+.ab[data-ae="micrographics"] .ab-n::after { content: "]"; }
+.ab[data-ae="micrographics"] .ab-sec .ab-labelrow::after { font: var(--mg-micro); font-size: 7.5px; letter-spacing: 0.18em; color: var(--ab-muted); }
+.ab[data-ae="micrographics"] .ab-sec-ui .ab-labelrow::after { content: "MG–0412–A"; }
+.ab[data-ae="micrographics"] .ab-sec-touch .ab-labelrow::after { content: "MG–0412–B"; }
+.ab[data-ae="micrographics"] .ab-sec-use .ab-labelrow::after { content: "MG–0412–C"; }
+
+/* header */
+.ab[data-ae="micrographics"] .ab-head { padding-top: 6px; }
+.ab[data-ae="micrographics"] .ab-brand { font-weight: var(--ab-hw, 700); letter-spacing: calc(-0.03em * var(--ab-tr, 1)); }
+.ab[data-ae="micrographics"] .ab-mark { width: 26px; height: 26px; border-radius: 0; background: none; color: var(--ab-ink); font-weight: var(--ab-hw, 700); box-shadow: inset 0 0 0 1px var(--ab-ink); font-size: 13px; }
+.ab[data-ae="micrographics"] .ab-tag { padding: 0; font: var(--mg-micro); font-size: 8px; letter-spacing: 0.2em; color: var(--ab-muted); }
+.ab[data-ae="micrographics"] .ab-tag b { color: var(--ab-ink); font-weight: 700; }
+.ab[data-ae="micrographics"] .ab-rule { background: var(--ab-hair-soft); }
+
+/* hero: the giant headline, then the spec plate */
+.ab[data-ae="micrographics"][data-hero="centered"] .ab-hero { justify-items: stretch; gap: clamp(24px, 3.4cqw, 40px); padding: clamp(24px, 3.6cqw, 40px) 0 clamp(24px, 3.4cqw, 38px); }
+.ab[data-ae="micrographics"][data-hero="centered"] .ab-hero-copy { max-width: none; text-align: left; }
+.ab[data-ae="micrographics"] .ab-kicker { display: flex; justify-content: space-between; gap: 12px; margin-bottom: clamp(18px, 2.6cqw, 28px) !important; padding-top: 7px; border-top: 1px solid var(--ab-ink); color: var(--ab-ink); font-weight: 700; }
+.ab[data-ae="micrographics"] .ab-kicker::after { content: "N 51.5074° · W 0.1278° · REV 03"; font-weight: 500; color: var(--ab-muted); }
+.ab[data-ae="micrographics"] .ab-headline { font-weight: var(--ab-hw, 700); letter-spacing: calc(-0.058em * var(--ab-tr, 1)); line-height: 0.88; text-wrap: balance; }
+.ab[data-ae="micrographics"] .ab-hl { position: relative; color: var(--ab-accent-ink); background: none; background-image: none; }
+.ab[data-ae="micrographics"][data-accent-text="low"] .ab-hl { background-image: none; }
+.ab[data-ae="micrographics"] .ab-hl::after { content: "(01)"; position: relative; top: -0.52em; margin-left: 0.28em; font: 500 8.5px/1 ui-monospace, "SF Mono", Menlo, monospace; letter-spacing: 0.14em; color: var(--ab-ink); vertical-align: baseline; }
+.ab[data-ae="micrographics"][data-hero="centered"] .ab-subcopy { margin-left: 0 !important; margin-right: 0 !important; }
+.ab[data-ae="micrographics"] .ab-subcopy { max-width: 30em; margin-top: clamp(16px, 2.2cqw, 24px) !important; padding-top: 7px; border-top: 1px solid var(--ab-hair); color: var(--ab-ink); font-size: clamp(13px, 1.5cqw, 15px); }
+.ab[data-ae="micrographics"] .ab-subcopy::before { content: "B.01 · DESCRIPTION"; display: block; margin-bottom: 7px; font: var(--mg-micro); letter-spacing: 0.18em; color: var(--ab-muted); }
+.ab[data-ae="micrographics"] .ab-sub-lead { font-weight: 600; }
+.ab[data-ae="micrographics"] .ab-sub-rest { color: var(--ab-muted); }
+
+/* ---- the spec plate ---- */
+.ab[data-ae="micrographics"] .ab-art { border: 1px solid var(--ab-ink); }
+.ab[data-ae="micrographics"] .mga {
+  position: absolute; inset: 0; display: grid; grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.6fr) minmax(0, 0.9fr); gap: 0 clamp(8px, 2cqw, 20px); padding: 34px clamp(12px, 2.2cqw, 20px);
+  font: var(--mg-micro); font-size: clamp(6px, 1.02cqw, 8.4px); letter-spacing: 0.16em; text-transform: uppercase; color: var(--ab-ink);
+}
+.ab[data-ae="micrographics"] .mga p { margin: 0; }
+.ab[data-ae="micrographics"] .mga b { font-weight: 700; }
+.ab[data-ae="micrographics"] .mga-corner { position: absolute; font-size: 0.92em; color: var(--ab-muted); }
+.ab[data-ae="micrographics"] .mga-c-tl { left: 12px; top: 7px; } .ab[data-ae="micrographics"] .mga-c-tr { right: 12px; top: 7px; }
+.ab[data-ae="micrographics"] .mga-c-bl { left: 12px; bottom: 7px; } .ab[data-ae="micrographics"] .mga-c-br { right: 12px; bottom: 7px; color: var(--ab-ink); font-weight: 700; }
+.ab[data-ae="micrographics"] .mga-ruler { position: absolute; left: 12px; right: 12px; height: 12px; display: flex; justify-content: space-between; font-size: 0.82em; color: var(--ab-muted); }
+.ab[data-ae="micrographics"] .mga-ruler i { font-style: normal; }
+.ab[data-ae="micrographics"] .mga-r-t { top: 17px; align-items: flex-start; background: repeating-linear-gradient(90deg, var(--ab-hair) 0 1px, transparent 1px 6px) 0 100% / 100% 4px no-repeat, repeating-linear-gradient(90deg, var(--ab-ink) 0 1px, transparent 1px 30px) 0 100% / 100% 7px no-repeat; }
+.ab[data-ae="micrographics"] .mga-r-b { bottom: 17px; align-items: flex-end; background: repeating-linear-gradient(90deg, var(--ab-hair) 0 1px, transparent 1px 6px) 0 0 / 100% 4px no-repeat, repeating-linear-gradient(90deg, var(--ab-ink) 0 1px, transparent 1px 30px) 0 0 / 100% 7px no-repeat; }
+.ab[data-ae="micrographics"] .mga-col { min-width: 0; display: flex; flex-direction: column; gap: 9px; padding-top: 6px; }
+.ab[data-ae="micrographics"] .mga-l { border-right: 1px solid var(--ab-hair-soft); padding-right: clamp(6px, 1.4cqw, 14px); }
+.ab[data-ae="micrographics"] .mga-r { border-left: 1px solid var(--ab-hair-soft); padding-left: clamp(6px, 1.4cqw, 14px); }
+.ab[data-ae="micrographics"] .mga-h { line-height: 1.7; }
+.ab[data-ae="micrographics"] .mga-note { margin-top: auto !important; color: var(--ab-muted); line-height: 1.7; }
+.ab[data-ae="micrographics"] .mga-tab { display: grid; border-top: 1px solid var(--ab-ink); }
+.ab[data-ae="micrographics"] .mga-row { display: grid; grid-template-columns: 2.2ch 4.2ch minmax(0, 1fr); gap: 0 1.3em; padding: 3px 0; border-bottom: 1px solid var(--ab-hair-soft); white-space: nowrap; }
+.ab[data-ae="micrographics"] .mga-row span:nth-child(1) { color: var(--ab-muted); }
+.ab[data-ae="micrographics"] .mga-row span:nth-child(3) { overflow: hidden; text-overflow: ellipsis; letter-spacing: 0.08em; }
+.ab[data-ae="micrographics"] .mga-sq { display: inline-block; width: 4px; height: 4px; margin-right: 0.7em; vertical-align: 0.1em; background: var(--ab-ink); }
+.ab[data-ae="micrographics"] .mga-sq-p { background: var(--ab-primary); }
+.ab[data-ae="micrographics"] .mga-sq-s { background: var(--ab-secondary); }
+.ab[data-ae="micrographics"] .mga-glyph { position: relative; min-width: 0; }
+.ab[data-ae="micrographics"] .mga-g, .ab[data-ae="micrographics"] .mga-lines { position: absolute; inset: 0; width: 100%; height: 100%; display: block; overflow: visible; }
+.ab[data-ae="micrographics"] .mga-call { position: absolute; line-height: 1.55; white-space: nowrap; }
+.ab[data-ae="micrographics"] .mga-call em { font-style: normal; color: var(--ab-muted); letter-spacing: 0.1em; }
+.ab[data-ae="micrographics"] .mga-call.mga-sr { transform: translateX(-100%); text-align: right; }
+.ab[data-ae="micrographics"] .mga-call.mga-sc { transform: translateX(-50%); text-align: center; }
+.ab[data-ae="micrographics"] .mga-mk { position: absolute; width: 9px; height: 9px; margin: -4.5px 0 0 -4.5px; }
+.ab[data-ae="micrographics"] .mga-mk::before {
+  content: ""; position: absolute; inset: -4px; border: 1px solid var(--ab-ink); border-radius: 50%; background-color: var(--ab-canvas);
+  background-image: linear-gradient(var(--ab-ink), var(--ab-ink)), linear-gradient(var(--ab-ink), var(--ab-ink)); background-position: center; background-size: 100% 1px, 1px 100%; background-repeat: no-repeat;
+}
+.ab[data-ae="micrographics"] .mga-mk.is-p::after { content: ""; position: absolute; left: 3px; top: 3px; width: 3px; height: 3px; background: var(--ab-primary); }
+.ab[data-ae="micrographics"] .mga-qrrow { display: flex; align-items: flex-start; gap: 10px; }
+.ab[data-ae="micrographics"] .mga-qr { flex: none; width: clamp(34px, 6.4cqw, 54px); height: auto; aspect-ratio: 1; }
+.ab[data-ae="micrographics"] .mga-warn { display: flex; flex-direction: column; gap: 4px; line-height: 1.6; }
+.ab[data-ae="micrographics"] .mga-warn svg { width: 12px; height: 11px; }
+.ab[data-ae="micrographics"] .mga-bar { display: block; width: 100%; height: clamp(12px, 2.4cqw, 20px); }
+
+/* palette: spec swatches */
+.ab[data-ae="micrographics"] .ab-palette { position: relative; padding-bottom: 38px; }
+.ab[data-ae="micrographics"] .ab-palette::after, .ab[data-ae="micrographics"] .ab-type::after { position: absolute; right: 0; bottom: 14px; font: var(--mg-micro); font-size: 7.5px; letter-spacing: 0.18em; color: var(--ab-ink); font-weight: 700; }
+.ab[data-ae="micrographics"] .ab-palette::after { content: "P.01/04"; }
+.ab[data-ae="micrographics"] .ab-chip { position: relative; height: clamp(34px, 4.6cqw, 50px); margin-bottom: 10px; border-radius: 0; box-shadow: inset 0 0 0 1px var(--ab-ink); }
+.ab[data-ae="micrographics"] .ab-swatches { counter-reset: mgsw; }
+.ab[data-ae="micrographics"] .ab-swatch { counter-increment: mgsw; }
+.ab[data-ae="micrographics"] .ab-sw-role { font: 700 9px/1.4 ui-monospace, "SF Mono", Menlo, monospace; letter-spacing: 0.16em; text-transform: uppercase; }
+.ab[data-ae="micrographics"] .ab-sw-role::before { content: "C–" counter(mgsw, decimal-leading-zero) "  "; color: var(--ab-muted); font-weight: 500; }
+.ab[data-ae="micrographics"] .ab-sw-hex { color: var(--ab-ink); }
+
+/* type recommendations: a scale-contrast specimen, one big pick over a list of small ones */
+.ab[data-ae="micrographics"] .ab-type { position: relative; padding-bottom: 38px; }
+.ab[data-ae="micrographics"] .ab-type::after { content: "P.02/04"; }
+.ab[data-ae="micrographics"] .ab-type-grid { counter-reset: mgtc; }
+.ab[data-ae="micrographics"] .ab-type-col { position: relative; counter-increment: mgtc; padding: 20px 14px 12px; border: 1px solid var(--ab-ink); }
+.ab[data-ae="micrographics"] .ab-type-col::before { content: "T." counter(mgtc, decimal-leading-zero); position: absolute; left: 14px; top: 7px; font: var(--mg-micro); font-size: 7.5px; letter-spacing: 0.18em; color: var(--ab-muted); }
+.ab[data-ae="micrographics"] .ab-type-col::after { content: "MG–T" counter(mgtc); position: absolute; right: 14px; top: 7px; font: var(--mg-micro); font-size: 7.5px; letter-spacing: 0.18em; color: var(--ab-muted); }
+.ab[data-ae="micrographics"] .ab-type-role { margin-top: 4px; color: var(--ab-ink); font-weight: 700; }
+.ab[data-ae="micrographics"] .ab-type-class { margin: 2px 0 12px !important; color: var(--ab-muted); }
+.ab[data-ae="micrographics"] .ab-type-pick { font-size: 12.5px; line-height: 1.5; font-weight: var(--ab-type-pick-w, 600); letter-spacing: 0; }
+.ab[data-ae="micrographics"] .ab-type-pick:first-child { font-size: clamp(28px, 4.4cqw, 44px); line-height: 0.98; letter-spacing: -0.045em; margin-bottom: 8px; }
+.ab[data-ae="micrographics"] .ab-type-fit { font: var(--mg-micro); letter-spacing: 0.14em; text-transform: uppercase; }
+.ab[data-ae="micrographics"] .ab-type-cur { font-size: 8.5px; }
+.ab[data-ae="micrographics"] .ab-fit { padding: 1px 6px; border: 1px solid var(--ab-ink); border-radius: 0; background: none; color: var(--ab-ink); font: 700 8px/1.6 ui-monospace, "SF Mono", Menlo, monospace; letter-spacing: 0.16em; text-transform: uppercase; }
+.ab[data-ae="micrographics"] .ab-fit[data-fit="match"] { background: none; }
+.ab[data-ae="micrographics"] .ab-fit[data-fit="consider"] { border-style: dashed; }
+.ab[data-ae="micrographics"] .ab-fit[data-fit="avoid"] { background: var(--ab-ink); color: var(--ab-canvas); }
+.ab[data-ae="micrographics"] .ab-type-why { font-size: 12.5px; color: var(--ab-muted); }
+.ab[data-ae="micrographics"] .ab-type-apply { position: relative; padding: 11px 16px; border: 1px solid var(--ab-ink); border-radius: 0; font: 700 9px/1 ui-monospace, "SF Mono", Menlo, monospace; letter-spacing: 0.2em; text-transform: uppercase; }
+.ab[data-ae="micrographics"] .ab-type-apply::after { content: " →"; }
+.ab[data-ae="micrographics"] .ab-type-apply:hover { background: var(--ab-ink); color: var(--ab-canvas); }
+
+/* 01 / 02 / 03: hairline boxes with crop marks and a page label */
+.ab[data-ae="micrographics"] .ab-card, .ab[data-ae="micrographics"] .ab-panel { position: relative; border: 1px solid var(--ab-ink); border-radius: 0; background: none; padding: clamp(22px, 3cqw, 28px) clamp(18px, 2.6cqw, 24px); }
+.ab[data-ae="micrographics"] .ab-card::before, .ab[data-ae="micrographics"] .ab-panel::before, .ab[data-ae="micrographics"] .ab-list::before { content: ""; position: absolute; inset: -9px; pointer-events: none; background: var(--mg-crops); }
+.ab[data-ae="micrographics"] .ab-card::after, .ab[data-ae="micrographics"] .ab-panel::after, .ab[data-ae="micrographics"] .ab-list::after { position: absolute; right: 0; bottom: -18px; font: 700 7.5px/1 ui-monospace, "SF Mono", Menlo, monospace; letter-spacing: 0.18em; color: var(--ab-ink); }
+.ab[data-ae="micrographics"] .ab-card::after { content: "P.03/04"; }
+.ab[data-ae="micrographics"] .ab-panel::after { content: "P.03/04"; }
+.ab[data-ae="micrographics"] .ab-list::after { content: "P.04/04"; }
+.ab[data-ae="micrographics"] .ab-sections { padding-bottom: 20px; row-gap: clamp(36px, 4.6cqw, 48px); }
+.ab[data-ae="micrographics"] .ab-seg { gap: 0; padding: 0; border: 1px solid var(--ab-ink); border-radius: 0; background: none; }
+.ab[data-ae="micrographics"] .ab-seg-btn { min-height: 34px; border-radius: 0; color: var(--ab-ink); font: 600 9px/1 ui-monospace, "SF Mono", Menlo, monospace; letter-spacing: 0.2em; text-transform: uppercase; }
+.ab[data-ae="micrographics"] .ab-seg-btn + .ab-seg-btn { box-shadow: inset 1px 0 0 var(--ab-ink); }
+.ab[data-ae="micrographics"] .ab-seg-btn:hover { background: var(--ab-hair-faint); }
+.ab[data-ae="micrographics"] .ab-seg-btn[aria-pressed="true"] { background: var(--ab-ink); color: var(--ab-canvas); box-shadow: none; font-weight: 700; }
+.ab[data-ae="micrographics"] .ab-seg-btn[aria-pressed="true"]::before { content: ""; display: inline-block; width: 4px; height: 4px; margin-right: 8px; vertical-align: 1px; background: var(--ab-primary); }
+.ab[data-ae="micrographics"] .ab-card-title { margin: 22px 0 6px !important; font-weight: var(--ab-hw, 700); letter-spacing: calc(-0.045em * var(--ab-tr, 1)); font-size: clamp(26px, 3.4cqw, 34px); line-height: 0.98; }
+.ab[data-ae="micrographics"] .ab-card-body { font-size: 13px; color: var(--ab-muted); }
+.ab[data-ae="micrographics"] .ab-cta { position: relative; border-radius: 0; padding: 14px 16px; font: 700 9.5px/1 ui-monospace, "SF Mono", Menlo, monospace; letter-spacing: 0.24em; text-transform: uppercase; transition: filter 0.1s; }
+.ab[data-ae="micrographics"] .ab-cta::before { content: ""; position: absolute; inset: -9px; pointer-events: none; background: var(--mg-crops); }
+.ab[data-ae="micrographics"] .ab-cta:hover { filter: brightness(1.08); }
+.ab[data-ae="micrographics"] .ab-cta:active { filter: brightness(0.9); }
+.ab[data-ae="micrographics"] .ab-cta-arrow::before { content: "→"; font-size: 14px; font-weight: 400; letter-spacing: 0; }
+
+.ab[data-ae="micrographics"] .ab-fieldlabel { color: var(--ab-ink); font-weight: 700; }
+.ab[data-ae="micrographics"] .ab-input { padding: 9px 0; border: 0; border-bottom: 1px solid var(--ab-ink); border-radius: 0; font-size: 14px; letter-spacing: 0.02em; transition: border-color 0.1s; }
+.ab[data-ae="micrographics"] .ab-input:focus { box-shadow: 0 1px 0 var(--ab-ink); }
+.ab[data-ae="micrographics"] .ab-toggle { font: 600 9px/1 ui-monospace, "SF Mono", Menlo, monospace; letter-spacing: 0.2em; text-transform: uppercase; }
+.ab[data-ae="micrographics"] .ab-switch { width: 48px; height: 20px; border-radius: 0; background: none; box-shadow: inset 0 0 0 1px var(--ab-ink); transition: none; }
+.ab[data-ae="micrographics"] .ab-switch::before { left: 3px; top: 3px; width: 14px; height: 14px; border-radius: 0; background: none; box-shadow: inset 0 0 0 1px var(--ab-ink); transition: transform 0.12s; }
+.ab[data-ae="micrographics"] .ab-switch::after { content: "OFF"; position: absolute; right: 5px; top: 50%; transform: translateY(-50%); font: 700 6.5px/1 ui-monospace, "SF Mono", Menlo, monospace; letter-spacing: 0.14em; color: var(--ab-ink); }
+.ab[data-ae="micrographics"] .ab-switch:checked { background: none; }
+.ab[data-ae="micrographics"] .ab-switch:checked::before { transform: translateX(28px); background: var(--ab-primary); box-shadow: inset 0 0 0 1px var(--ab-ink); }
+.ab[data-ae="micrographics"] .ab-switch:checked::after { content: "ON"; right: auto; left: 6px; }
+.ab[data-ae="micrographics"] .ab-status { color: var(--ab-muted); font-size: 8px; }
+.ab[data-ae="micrographics"] .ab-status::before { content: "› "; }
+/* three samples of the same specimen: base, annotated (a leader and index), marked (crop marks and a primary dot) */
+.ab[data-ae="micrographics"] .ab-states { margin-top: 26px; gap: 14px; }
+.ab[data-ae="micrographics"] .ab-disc { position: relative; width: 58px; height: 58px; border: 0; border-radius: 0; background: linear-gradient(var(--ab-ink), var(--ab-ink)) center / 26px 26px no-repeat; margin-bottom: 14px; }
+.ab[data-ae="micrographics"] .ab-disc[data-s="1"] {
+  background:
+    linear-gradient(var(--ab-ink), var(--ab-ink)) 100% 4px / 17px 1px no-repeat, linear-gradient(var(--ab-ink), var(--ab-ink)) calc(100% - 17px) 4px / 1px 14px no-repeat,
+    linear-gradient(var(--ab-ink), var(--ab-ink)) center / 26px 26px no-repeat;
+}
+.ab[data-ae="micrographics"] .ab-disc[data-s="1"]::after { content: "A.1"; position: absolute; right: 0; top: -9px; font: 700 6.5px/1 ui-monospace, "SF Mono", Menlo, monospace; letter-spacing: 0.1em; }
+.ab[data-ae="micrographics"] .ab-disc[data-s="2"] { background: var(--mg-crops), linear-gradient(var(--ab-ink), var(--ab-ink)) center / 26px 26px no-repeat; }
+.ab[data-ae="micrographics"] .ab-disc[data-s="2"]::after { content: ""; position: absolute; left: 50%; top: 50%; width: 5px; height: 5px; margin: -2.5px 0 0 -2.5px; background: var(--ab-primary); }
+.ab[data-ae="micrographics"] .ab-state { color: var(--ab-ink); font-size: 8px; }
+
+/* in use: a spec table */
+.ab[data-ae="micrographics"] .ab-list { position: relative; border-top: 1px solid var(--ab-ink); border-bottom: 1px solid var(--ab-ink); }
+.ab[data-ae="micrographics"] .ab-list::before { inset: -9px -9px -9px -9px; }
+.ab[data-ae="micrographics"] .ab-row { padding: 12px 2px; border-top: 1px solid var(--ab-hair-soft); }
+.ab[data-ae="micrographics"] .ab-row:first-child { border-top: 0; }
+.ab[data-ae="micrographics"] .ab-row:last-child { border-bottom: 0; }
+.ab[data-ae="micrographics"] .ab-row-n { font: 500 8.5px/1 ui-monospace, "SF Mono", Menlo, monospace; letter-spacing: 0.12em; color: var(--ab-muted); }
+.ab[data-ae="micrographics"] .ab-row:first-child .ab-row-n::after { content: ""; display: inline-block; width: 4px; height: 4px; margin-left: 6px; background: var(--ab-primary); vertical-align: 1px; }
+.ab[data-ae="micrographics"] .ab-row-name { font-family: var(--ab-font-b); font-size: 14px; font-weight: 600; letter-spacing: -0.01em; }
+.ab[data-ae="micrographics"] .ab-row-status { padding: 0; border-radius: 0; background: none; font: 500 8px/1 ui-monospace, "SF Mono", Menlo, monospace; letter-spacing: 0.18em; text-transform: uppercase; color: var(--ab-ink); }
+.ab[data-ae="micrographics"] .ab-row-status::before { content: "["; } .ab[data-ae="micrographics"] .ab-row-status::after { content: "]"; }
+.ab[data-ae="micrographics"] .ab-row-bar { height: 7px; border-radius: 0; background: linear-gradient(var(--ab-hair), var(--ab-hair)) 0 50% / 100% 1px no-repeat, repeating-linear-gradient(90deg, var(--ab-hair) 0 1px, transparent 1px 10%) 0 100% / 100% 3px no-repeat; }
+.ab[data-ae="micrographics"] .ab-row-bar i { height: 100%; background: linear-gradient(var(--ab-secondary), var(--ab-secondary)) 0 50% / 100% 3px no-repeat; }
+.ab[data-ae="micrographics"] .ab-row-pct { font: 600 9px/1 ui-monospace, "SF Mono", Menlo, monospace; letter-spacing: 0.08em; }
+
+/* footer */
+.ab[data-ae="micrographics"] .ab-foot { border-top: 1px solid var(--ab-ink); padding-top: 8px; font-size: 8px; letter-spacing: 0.2em; color: var(--ab-muted); }
+.ab[data-ae="micrographics"] .ab-motto { color: var(--ab-ink); font-weight: 700; }
+.ab[data-ae="micrographics"] .ab-dot { width: 5px; height: 5px; margin-right: 8px; border-radius: 0; background: var(--ab-ink); vertical-align: 1px; }
+
+.ab[data-ae="micrographics"] .ab-seg-btn:focus-visible, .ab[data-ae="micrographics"] .ab-cta:focus-visible, .ab[data-ae="micrographics"] .ab-switch:focus-visible, .ab[data-ae="micrographics"] .ab-type-apply:focus-visible { outline: 1px solid var(--ab-ink); outline-offset: 4px; }
+
+/* the plate on a phone: glyph on top, the two clusters side by side under it */
+@container (max-width: 560px) {
+  .ab[data-ae="micrographics"] .mga { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); grid-template-rows: minmax(0, 1.05fr) minmax(0, 1fr); padding: 32px 10px; gap: 8px 10px; }
+  .ab[data-ae="micrographics"] .mga-glyph { grid-column: 1 / -1; grid-row: 1; }
+  .ab[data-ae="micrographics"] .mga-l { grid-column: 1; grid-row: 2; font-size: 6px; }
+  .ab[data-ae="micrographics"] .mga-r { grid-column: 2; grid-row: 2; font-size: 6px; }
+  .ab[data-ae="micrographics"] .mga-call { font-size: 5.8px; }
+  .ab[data-ae="micrographics"] .mga-call em { display: none; }
+  .ab[data-ae="micrographics"] .mga-row { grid-template-columns: 2ch 3.6ch minmax(0, 1fr); }
+  .ab[data-ae="micrographics"] .mga-note { display: none; }
+  .ab[data-ae="micrographics"] .mga-ruler { font-size: 0.8em; }
+}
+@container ab (max-width: 600px) {
+  .ab[data-ae="micrographics"] .ab-kicker::after { content: "REV 03"; }
+  .ab[data-ae="micrographics"] .ab-tag { font-size: 7.5px; letter-spacing: 0.12em; }
+  .ab[data-ae="micrographics"] .ab-row { grid-template-columns: 4.2ch minmax(0, 1fr) 4.5ch; }
+  .ab[data-ae="micrographics"] .ab-row-n { grid-row: 1 / span 2; align-self: start; }
+  .ab[data-ae="micrographics"] .ab-states { gap: 8px; }
+  .ab[data-ae="micrographics"] .ab-labelrow { margin-bottom: 18px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ab[data-ae="micrographics"] .ab-switch::before, .ab[data-ae="micrographics"] .ab-cta { transition: none; }
+}
