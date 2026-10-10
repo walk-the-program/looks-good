@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Branding Designer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="css/styles.css" />
+<link rel="stylesheet" href="css/slides.css" />
+</head>
+<body data-view="library">
+
+<section class="library" id="library" aria-label="Brand library">
+  <div class="lib-top"><span class="logo-mark" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0 16 8 8 16 0 8Z"/></svg></span><span>Branding Designer</span></div>
+  <div class="lib-inner">
+    <header class="lib-head">
+      <div>
+        <h1>Brands</h1>
+        <p class="lib-count" id="libCount"></p>
+      </div>
+      <button type="button" class="btn btn-primary" id="libNew">New brand</button>
+    </header>
+    <div class="lib-empty" id="libEmpty" hidden>
+      <div class="lib-empty-mark" aria-hidden="true">Aa</div>
+      <h2>No brands yet</h2>
+      <p>Create a brand to try fonts, colors and shapes together, then save the combination you like.</p>
+      <button type="button" class="btn btn-primary" id="libEmptyNew">New brand</button>
+    </div>
+    <div class="lib-grid" id="libGrid" hidden></div>
+  </div>
+</section>
+
+<div class="app">
+
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <span class="logo-mark" aria-hidden="true">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0 16 8 8 16 0 8Z"/></svg>
+      </span>
+      <span>Branding Designer</span>
+    </div>
+
+    <div class="brand-bar">
+      <button type="button" class="back-link" id="backToLibrary">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>
+        Library
+      </button>
+      <div class="brand-bar-main">
+        <div class="brand-bar-text">
+          <div class="brand-bar-name" id="brandBarName">Brand</div>
+          <div class="save-status" id="saveStatus" aria-live="polite">Saved</div>
+        </div>
+        <button type="button" class="btn btn-primary btn-small" id="saveBrand" disabled>Save</button>
+      </div>
+      <p class="draft-note" id="draftNote" hidden>Restored unsaved changes &middot; <button type="button" id="draftNoteRevert">Revert</button></p>
+    </div>
+
+    <div class="sidebar-actions">
+      <button id="shuffleAll" class="btn btn-primary btn-block">
+        <svg class="ico" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 1 1-9-9c2.5 0 4.9 1.1 6.6 2.9L21 8"/><path d="M21 3v5h-5"/></svg>
+        Shuffle everything <kbd>space</kbd>
+      </button>
+
+      <div class="session-row">
+        <button id="undoShuffle" class="btn btn-ghost btn-small" disabled>
+          <svg class="ico" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 14 4 9l5-5"/><path d="M4 9h10a6 6 0 0 1 0 12h-3"/></svg>
+          Undo
+        </button>
+        <button id="revertBrand" class="btn btn-ghost btn-small" disabled>Revert</button>
+      </div>
+    </div>
+
+    <details class="panel" open>
+      <summary class="panel-head"><h2>Brand</h2></summary>
+      <div class="panel-body">
+        <label class="field">
+          <span>Brand name</span>
+          <input type="text" id="brandName" value="Aster &amp; Co." />
+        </label>
+        <label class="field">
+          <span>Tagline</span>
+          <input type="text" id="tagline" value="A short tagline that captures the brand." />
+        </label>
+
+        <details class="subpanel">
+          <summary>Slide copy</summary>
+          <div class="subpanel-body">
+            <label class="field">
+              <span>Section title</span>
+              <input type="text" id="sectionTitle" value="Our Approach" />
+            </label>
+            <label class="field">
+              <span>Quote</span>
+              <input type="text" id="quoteText" value="Design is the silent ambassador of your brand." />
+            </label>
+            <label class="field">
+              <span>Quote author</span>
+              <input type="text" id="quoteAuthor" value="Paul Rand" />
+            </label>
+          </div>
+        </details>
+      </div>
+    </details>
+
+    <details class="panel" open>
+      <summary class="panel-head"><h2>Typography</h2></summary>
+      <div class="panel-body">
+        <label class="lock">Lock<input type="checkbox" id="lockTypography" /></label>
+        <label class="field">
+          <span>Heading font</span>
+          <select id="headingFont"></select>
+        </label>
+        <label class="field">
+          <span>Body font</span>
+          <select id="bodyFont"></select>
+        </label>
+        <div class="font-specimen" id="fontSpecimen" aria-hidden="true">
+          <div class="font-specimen-heading" id="fontSpecimenHeading"></div>
+          <div class="font-specimen-body" id="fontSpecimenBody"></div>
+        </div>
+        <div class="font-actions">
+          <button id="shuffleFonts" class="btn btn-ghost">Shuffle fonts</button>
+          <button id="swapFonts" class="btn btn-ghost btn-small">Swap</button>
+        </div>
+        <div class="suggest" id="sg-typography" hidden></div>
+
+        <details class="subpanel">
+          <summary>Fine-tune</summary>
+          <div class="subpanel-body">
+            <label class="field">
+              <span>Heading size <output id="headingSizeVal">44px</output></span>
+              <input type="range" id="headingSize" min="24" max="96" step="1" value="44" />
+            </label>
+            <label class="field">
+              <span>Heading weight</span>
+              <select id="headingWeight">
+                <option value="400">Regular</option>
+                <option value="500">Medium</option>
+                <option value="600">Semibold</option>
+                <option value="700" selected>Bold</option>
+              </select>
+            </label>
+            <label class="field">
+              <span>Heading letter spacing <output id="headingTrackingVal">0px</output></span>
+              <input type="range" id="headingTracking" min="-2" max="8" step="0.5" value="0" />
+            </label>
+            <label class="field">
+              <span>Heading case</span>
+              <select id="headingCase">
+                <option value="none">Normal</option>
+                <option value="uppercase">UPPERCASE</option>
+                <option value="lowercase">lowercase</option>
+                <option value="capitalize">Capitalize Each Word</option>
+              </select>
+            </label>
+            <label class="field">
+              <span>Body size <output id="bodySizeVal">16px</output></span>
+              <input type="range" id="bodySize" min="12" max="24" step="1" value="16" />
+            </label>
+            <label class="field">
+              <span>Body weight</span>
+              <select id="bodyWeight">
+                <option value="400" selected>Regular</option>
+                <option value="500">Medium</option>
+                <option value="600">Semibold</option>
+                <option value="700">Bold</option>
+              </select>
+            </label>
+            <label class="field">
+              <span>Body letter spacing <output id="bodyTrackingVal">0px</output></span>
+              <input type="range" id="bodyTracking" min="-1" max="4" step="0.25" value="0" />
+            </label>
+            <label class="field">
+              <span>Body case</span>
+              <select id="bodyCase">
+                <option value="none">Normal</option>
+                <option value="uppercase">UPPERCASE</option>
+                <option value="lowercase">lowercase</option>
+                <option value="capitalize">Capitalize Each Word</option>
+              </select>
+            </label>
+            <button id="resetTypography" class="btn btn-ghost btn-block">Reset typography</button>
+          </div>
+        </details>
+      </div>
+    </details>
+
+    <details class="panel" open>
+      <summary class="panel-head"><h2>Color palette</h2></summary>
+      <div class="panel-body">
+        <label class="lock">Lock<input type="checkbox" id="lockColor" /></label>
+        <label class="field">
+          <span>Scheme</span>
+          <select id="schemeSelect"></select>
+        </label>
+        <div class="swatch-grid">
+          <label class="swatch"><input type="color" id="colorPrimary" /><span>Primary</span></label>
+          <label class="swatch"><input type="color" id="colorSecondary" /><span>Secondary</span></label>
+          <label class="swatch"><input type="color" id="colorAccent" /><span>Accent</span></label>
+          <label class="swatch"><input type="color" id="colorNeutralDark" /><span>Dark</span></label>
+          <label class="swatch"><input type="color" id="colorNeutralLight" /><span>Light</span></label>
+        </div>
+        <button id="shuffleColors" class="btn btn-ghost btn-block">Shuffle colors</button>
+        <div class="suggest" id="sg-colors" hidden></div>
+      </div>
+    </details>
+
+    <details class="panel" open>
+      <summary class="panel-head"><h2>Shape &amp; style</h2></summary>
+      <div class="panel-body">
+        <label class="lock">Lock<input type="checkbox" id="lockShape" /></label>
+        <label class="field">
+          <span>Preset</span>
+          <select id="shapeSelect"></select>
+        </label>
+        <button id="shuffleShape" class="btn btn-ghost btn-block">Shuffle shape</button>
+        <div class="suggest" id="sg-shape" hidden></div>
+      </div>
+    </details>
+
+    <details class="panel">
+      <summary class="panel-head"><h2>Background &amp; logo</h2></summary>
+      <div class="panel-body">
+        <div class="segmented">
+          <label><input type="radio" name="bgMode" value="light" checked /> Light</label>
+          <label><input type="radio" name="bgMode" value="dark" /> Dark</label>
+        </div>
+        <input type="file" id="logoInput" accept="image/*" aria-label="Upload logo image" />
+        <div class="logo-row" id="logoPreviewRow" hidden>
+          <img id="logoPreview" alt="Logo preview" />
+          <button id="removeLogo" class="btn btn-ghost btn-small">Remove</button>
+        </div>
+      </div>
+    </details>
+
+    <div class="sidebar-foot">
+      <button id="exportCss" class="btn btn-ghost btn-block">
+        <svg class="ico" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+        Copy brand as CSS
+      </button>
+      <button id="saveAsNewBrand" class="btn btn-ghost btn-block">Save as new brand</button>
+      <button id="openBrandGuide" class="btn btn-primary btn-block">
+        <svg class="ico" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H19a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1H6.5a2.5 2.5 0 0 1 0-5H20"/></svg>
+        Open brand guide
+      </button>
+    </div>
+  </aside>
+
+  <main class="workspace">
+    <header class="workspace-header">
+      <div class="workspace-header-top">
+        <div>
+          <h1>Live preview</h1>
+          <p>Pick, lock and shuffle fonts, colors and shapes — brand copy lives in the Brand panel on the left.</p>
+        </div>
+        <button id="exportPalettePng" class="btn btn-ghost btn-small">
+          <svg class="ico" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M21 21H3"/></svg>
+          Export PNG
+        </button>
+      </div>
+    </header>
+
+    <section class="preview-scope" id="previewCard">
+      <div class="pv-nav">
+        <div class="preview-logo" id="previewLogoBox"></div>
+        <nav class="pv-links" aria-hidden="true"><span class="is-on">Work</span><span>Studio</span><span>Journal</span></nav>
+        <span class="pv-signin" aria-hidden="true">Sign in</span>
+      </div>
+      <div class="pv-hero">
+        <div class="pv-copy">
+          <span class="preview-chip" id="previewChip">New this season</span>
+          <h2 class="preview-heading" id="previewHeading">Aster &amp; Co.</h2>
+          <p class="preview-body" id="previewBody">A short tagline that captures the brand.</p>
+          <div class="preview-actions">
+            <button class="preview-btn preview-btn-primary" id="previewBtnPrimary">Primary action</button>
+            <button class="preview-btn preview-btn-secondary" id="previewBtnSecondary">Secondary</button>
+          </div>
+        </div>
+        <aside class="pv-panel" aria-hidden="true">
+          <div class="preview-shape" id="previewShape"></div>
+          <div class="pv-panel-label">Repeat customers</div>
+          <div class="pv-panel-num">+128%</div>
+          <div class="pv-bars"><i style="height:38%"></i><i style="height:52%"></i><i style="height:46%"></i><i style="height:74%"></i><i style="height:100%"></i></div>
+        </aside>
+      </div>
+      <div class="pv-row" aria-hidden="true">
+        <div class="pv-card">
+          <div class="pv-card-title">Collections</div>
+          <div class="pv-tags"><span class="pv-tag pv-tag-1">Identity</span><span class="pv-tag pv-tag-2">Packaging</span><span class="pv-tag pv-tag-3">Editorial</span></div>
+        </div>
+        <div class="pv-card">
+          <div class="pv-card-title">Launch progress</div>
+          <div class="pv-progress"><i></i></div>
+          <div class="pv-progress-meta"><span>72% complete</span><span class="pv-dot-label">On track</span></div>
+        </div>
+      </div>
+      <div class="pv-foot" aria-hidden="true">
+        <span>Palette</span>
+        <div class="swatch-strip" id="swatchStrip"></div>
+      </div>
+    </section>
+
+    <section class="recommendations">
+      <div class="section-head">
+        <h2>Design language recommendations</h2>
+        <span class="score-pill" id="scorePill">–</span>
+      </div>
+      <div class="findings" id="findings"></div>
+    </section>
+
+    <section class="slides">
+      <div class="section-head">
+        <h2>Slide mockups</h2>
+        <!-- Icon is a CSS ::before rather than an inline <svg>: slide-mocks.js
+             swaps this button's textContent while exporting, which would wipe
+             a real child element out of the DOM for good. -->
+        <button id="downloadAllSlides" class="btn btn-ghost btn-small btn-ico-download">Download all</button>
+      </div>
+      <div class="slide-grid">
+        <div class="slide-card">
+          <div class="slide-mock" id="slideTitle"></div>
+          <div class="slide-card-foot">
+            <span>01 · Cover</span>
+            <button class="btn btn-ghost btn-small" data-download-slide="slideTitle" data-name="cover-slide.png">Download PNG</button>
+          </div>
+        </div>
+        <div class="slide-card">
+          <div class="slide-mock" id="slideDivider"></div>
+          <div class="slide-card-foot">
+            <span>02 · What we do</span>
+            <button class="btn btn-ghost btn-small" data-download-slide="slideDivider" data-name="what-we-do-slide.png">Download PNG</button>
+          </div>
+        </div>
+        <div class="slide-card">
+          <div class="slide-mock" id="slideContent"></div>
+          <div class="slide-card-foot">
+            <span>03 · Results</span>
+            <button class="btn btn-ghost btn-small" data-download-slide="slideContent" data-name="results-slide.png">Download PNG</button>
+          </div>
+        </div>
+        <div class="slide-card">
+          <div class="slide-mock" id="slideChart"></div>
+          <div class="slide-card-foot">
+            <span>04 · Growth</span>
+            <button class="btn btn-ghost btn-small" data-download-slide="slideChart" data-name="growth-slide.png">Download PNG</button>
+          </div>
+        </div>
+        <div class="slide-card">
+          <div class="slide-mock" id="slideQuote"></div>
+          <div class="slide-card-foot">
+            <span>05 · Testimonial</span>
+            <button class="btn btn-ghost btn-small" data-download-slide="slideQuote" data-name="testimonial-slide.png">Download PNG</button>
+          </div>
+        </div>
+        <div class="slide-card">
+          <div class="slide-mock" id="slideClosing"></div>
+          <div class="slide-card-foot">
+            <span>06 · Closing</span>
+            <button class="btn btn-ghost btn-small" data-download-slide="slideClosing" data-name="closing-slide.png">Download PNG</button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div class="modal-overlay" id="brandGuideModal" hidden>
+    <div class="modal-box" role="dialog" aria-modal="true" aria-label="Brand guide" tabindex="-1">
+      <div class="modal-head">
+        <h2>Brand guide</h2>
+        <div class="modal-actions">
+          <button id="exportGuideHtml" class="btn btn-ghost btn-small">Export HTML</button>
+          <button id="exportGuidePdf" class="btn btn-ghost btn-small">Export PDF</button>
+          <button id="closeBrandGuide" class="btn btn-ghost btn-small btn-icon" aria-label="Close brand guide">
+            <svg class="ico" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg>
+          </button>
+        </div>
+      </div>
+      <div class="modal-body brand-guide-doc" id="brandGuideContent"></div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="js/library-store.js"></script>
+<script src="js/data.js"></script>
+<script src="js/color.js"></script>
+<script src="js/rules.js"></script>
+<script src="js/slide-mocks.js"></script>
+<script src="js/persistence.js"></script>
+<script src="js/undo-history.js"></script>
+<script src="js/brand-guide.js"></script>
+<script src="js/export-html.js"></script>
+<script src="js/export-pdf.js"></script>
+<script src="js/font-picker.js"></script>
+<script src="js/suggest.js"></script>
+<script src="js/app.js"></script>
+<script src="js/brand-guide-ui.js"></script>
+<script src="js/suggest-ui.js"></script>
+<script src="js/library-ui.js"></script>
+<script src="js/brand-session.js"></script>
+</body>
+</html>

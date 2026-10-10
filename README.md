@@ -1,0 +1,160 @@
+# Branding Designer
+
+A local, no-build-step tool for rapidly auditioning brand combinations —
+fonts, color palettes, and shape/style language — with live heuristic
+design feedback and a six-slide sample pitch deck for an uploaded logo. The
+app chrome is a light warm-grey workspace so the only colors on screen
+are the brand's own.
+
+## Run it
+
+No dependencies, no build step. From this folder, start any static file
+server, for example:
+
+```bash
+python3 -m http.server 8080
+# then open http://localhost:8080
+```
+
+or, if you have Node:
+
+```bash
+npx serve .
+```
+
+Requires an internet connection on first load (it pulls the type family
+set from Google Fonts, plus html2canvas/jsPDF for PNG/PDF export, from
+CDNs); everything else runs entirely client-side — no backend, no
+analytics, no data leaves your machine.
+
+## Mac app
+
+A native macOS build (AppKit + WKWebView, no Electron) lives in `mac/`.
+To build and install it:
+
+```bash
+./mac/build.sh
+```
+
+This compiles the Swift wrapper, generates the icon, copies the current
+`index.html`, `css/` and `js/` into the bundle, vendors html2canvas and
+jsPDF (from `mac/vendor/`) so PNG/PDF export works offline, ad-hoc signs
+it, and installs **Branding Designer.app** to `/Applications` (or
+`~/Applications` if that isn't writable). Re-run it after any web change;
+it quits a running copy first. Your session autosave persists between
+launches. The browser version (`python3 -m http.server`) is unchanged.
+
+## Brand library
+
+The app opens on a **Library**: a grid of tiles, one per saved brand, most
+recently edited first. Each tile is a live rendering of the brand (primary
+field, logo or "Aa", name in its heading font, a palette band, corners from
+its shape preset). **New brand** asks for a name and tagline, then opens the
+editor on a fresh random combination. The tile's "..." menu (or right-click)
+has Open, Rename, Duplicate and Delete.
+
+In the editor, shuffling and editing never change the saved brand until you
+press **Save** (Cmd+S). The sidebar header shows the brand name with
+"Saved" or "Unsaved changes", plus **Revert**, **Save as new brand** and a
+"Library" back link that asks Save / Don't save / Cancel when there are edits.
+A separate working draft is autosaved, so quitting with unsaved edits and
+reopening the brand restores them, still marked unsaved, with a Revert link.
+Undo history is per session.
+
+Storage goes through `js/library-store.js`: one JSON file per brand in
+`~/Library/Application Support/Branding Designer/brands/<id>.json` in the Mac
+app, IndexedDB in a browser. The old single-session autosave is imported once
+as a brand. The Mac app has a File menu (New Brand, Save, Save as New Brand,
+Revert to Saved, Back to Library).
+
+## Suggestions
+
+Under Typography, Color palette and Shape the editor can show one quiet
+suggestion line (`js/suggest.js` is a pure engine, `js/suggest-ui.js` the
+display). Apply previews on hover, goes through the normal state path (so Undo
+works and the brand becomes unsaved), the refresh arrow shows the next one and
+x dismisses it for that brand. Locked sections get none.
+
+## What it does
+
+- **Brand copy in one place** — the sidebar's **Brand** panel holds the
+  brand name and tagline, plus a collapsed **Slide copy** subpanel for the
+  section title, quote and quote author. Everything downstream — the live
+  preview, the six slides and the brand guide — renders from those
+  fields, and blank fields fall back to a sensible default rather than
+  rendering an empty line.
+- **Combination engine** — pick heading/body fonts from 70+ Google Fonts
+  grouped by category (serif, sans, display, slab, mono), a color scheme
+  (monochromatic / analogous / complementary / split-complementary /
+  triadic / custom) with editable swatches, and a shape/style preset
+  (Minimal & Sharp, Modern & Refined, Soft & Friendly, Corporate Classic,
+  Bold & Geometric). Most shuffles draw from a list of hand-picked
+  heading/body pairings so results stay usable; **Swap** flips the two
+  faces, and a live specimen under the pickers shows what the current pair
+  actually looks like. "Shuffle everything" (or hit **space**) rerolls
+  anything not locked; per-section lock toggles and shuffle buttons let
+  you pin down the parts you like while rerolling the rest. **Undo** steps
+  back one combo at a time, and your whole session (fonts, colors, shape,
+  typography, text, logo) autosaves to `localStorage` and restores itself
+  next time you open the page — **Start fresh** clears it.
+- **Typography fine-tuning** — independent size, weight, and letter-spacing
+  sliders for heading and body, plus a text-case control (Normal /
+  UPPERCASE / lowercase / Capitalize Each Word) for each. These live-update
+  the preview card only; the slides keep their own type scale.
+- **Design language recommendations** — a rule-based list that checks
+  WCAG contrast (body text, primary button, accent) against real
+  thresholds, flags risky/strong font pairings by category (serif,
+  sans, display, mono), and reads the palette's hue/saturation/lightness
+  relationships to call out clashing, flat, or well-separated color
+  choices.
+- **Slide mockups** — a six-slide sample pitch deck (cover, what we do,
+  results, growth chart, testimonial, closing) with example copy that adapts to the brand name: shared footer, index, kicker and
+  shape motif, driven entirely by the current fonts, palette and shape
+  preset. Upload a logo (stays in-browser, never uploaded anywhere) and it
+  appears on the cover panel and in the slide footers. These are plain
+  DOM/CSS elements (not canvas) so they always reflect your actual font
+  choice; each has a "Download PNG" button, and **Download all** saves the
+  set one file at a time (rasterized via html2canvas).
+- **Quick brand guide deck** — "Open brand guide" assembles a 5-page deck
+  (cover, color palette with hex + contrast notes, type specimen, logo &
+  style, voice/quote) from your current picks, viewable in a modal and
+  exportable as a standalone **HTML** file or straight to a downloaded
+  **PDF** (via html2canvas + jsPDF — no browser print dialog involved).
+- **Export** — "Copy brand as CSS variables" puts a ready-to-paste
+  `:root { --primary: ...; }` block (now including the typography
+  fine-tuning vars) on your clipboard.
+
+## Project structure
+
+```
+index.html
+css/styles.css           app chrome — the light workspace, the sidebar's
+                         collapsible sections, and the live "preview-scope"
+                         theme surface
+css/slides.css           the six-slide deck template (all `.sl-*` classes),
+                         sized in container-query units off .slide-card
+js/data.js               font list, curated pairings, shape presets,
+                         color-scheme recipes
+js/color.js              HSL/hex conversion, WCAG contrast math, palette generation
+js/rules.js              the recommendation/heuristics engine
+js/slide-mocks.js        renders the six slides + single/"Download all" PNG export
+js/persistence.js        session autosave/restore via localStorage
+js/undo-history.js       bounded undo stack for shuffle actions
+js/library-store.js      brand storage: native files or IndexedDB
+js/library-ui.js         Library screen, tiles, in-page dialogs
+js/brand-session.js      open brand, save/revert/draft, editor save state
+js/suggest.js            suggestion engine (pure functions)
+js/suggest-ui.js         inline suggestion lines
+js/font-picker.js        visual font picker (replaces the selects' look, keeps them as state)
+js/brand-guide.js        brand guide deck content + styles
+js/export-html.js        standalone HTML export of the brand guide
+js/export-pdf.js         PDF export via html2canvas + jsPDF (real file, no print dialog)
+js/app.js                state, rendering, event wiring
+js/brand-guide-ui.js     brand guide modal open/close/export wiring
+```
+
+html2canvas and jsPDF are loaded via CDN `<script>` tags in `index.html`
+(same pattern as the Google Fonts `<link>`) — no bundler, no npm install.
+
+No framework, no bundler — open `index.html` through a static server and
+edit the files directly.
