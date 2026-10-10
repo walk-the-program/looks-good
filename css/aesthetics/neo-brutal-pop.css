@@ -61,7 +61,7 @@
   color: var(--ab-ink); font-size: 11px; font-weight: 800; letter-spacing: 0.1em;
   transform: rotate(-1.5deg);
 }
-.ab[data-ae="neo-brutal-pop"] .ab-headline { position: relative; z-index: 1; font-weight: 800; letter-spacing: calc(-0.02em * var(--ab-tr, 1)); line-height: 1.04; }
+.ab[data-ae="neo-brutal-pop"] .ab-headline { position: relative; isolation: isolate; z-index: 1; font-weight: 800; letter-spacing: calc(-0.02em * var(--ab-tr, 1)); line-height: 1.04; }
 /* stickers: pseudo-elements anchored to the text so they overlap it. The
    starburst is an in-flow inline-block with negative margins that net to zero
    advance, so it sits at the start of the first line (the first letter's
@@ -260,8 +260,13 @@
   .ab[data-ae="neo-brutal-pop"] .ab-hero-copy { text-align: left; }
   .ab[data-ae="neo-brutal-pop"] .ab-subcopy { margin-left: 0 !important; }
   .ab[data-ae="neo-brutal-pop"] { --np-star: 64px; --np-flower: 56px; }
-  .ab[data-ae="neo-brutal-pop"] .ab-headline::before { font-size: 0.55em; margin: calc(1.6em - var(--np-star)) calc(-2.8em) calc(-1.6em) calc(2.8em - var(--np-star)); }
-  .ab[data-ae="neo-brutal-pop"] .ab-kicker { margin-bottom: 42px !important; }
+  /* narrow: the starburst is taken out of flow, 56px, hung off the headline's top-left corner so it
+     clears the first glyph (which also paints over it: z-index -1 inside the headline's isolated context) */
+  .ab[data-ae="neo-brutal-pop"] .ab-headline::before {
+    position: absolute; left: -8px; top: -40px; width: 56px; height: 56px; margin: 0; padding: 0;
+    display: grid; place-items: center; font-size: 16px;
+  }
+  .ab[data-ae="neo-brutal-pop"] .ab-kicker { margin-bottom: 52px !important; }
   .ab[data-ae="neo-brutal-pop"] .ab-hl::after { transform: translate(55%, 80%) rotate(10deg); }
   .ab[data-ae="neo-brutal-pop"] .ab-subcopy { margin-top: 52px !important; }
   .ab[data-ae="neo-brutal-pop"] .nba-cta { left: 0; transform: none; font-size: 14px; padding: 10px 12px 10px 18px; }

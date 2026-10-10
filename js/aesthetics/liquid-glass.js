@@ -82,6 +82,16 @@ registerAesthetic({
     // (wide: 21/10 art box; narrow: 4/4.2); CSS shows one.
     const initial = ctx.initial && ctx.initial !== '·' ? ctx.initial : 'M';
     const scene = `<i class="lgs-mesh"></i><i class="lgs-initial">${escapeHtml(initial)}</i>`;
+    // Lens centered on the initial (same x/y as .lgs-initial), width 1.15 x the glyph's
+    // advance (estimated per letter in em), height ~ the glyph's cap height + margin,
+    // no offset, so the bend shows only at the rim. cx/cy and fs are the CSS left/top (%)
+    // and font-size (cqw) of .lgs-initial; ar is the art box width/height.
+    const adv = { M: 0.9, W: 0.95, I: 0.34, J: 0.5, L: 0.6, F: 0.62, E: 0.64, T: 0.66, Y: 0.7, Z: 0.68, B: 0.7, P: 0.68, S: 0.64, R: 0.7, K: 0.7, X: 0.7, V: 0.72 }[initial.toUpperCase()] || 0.78;
+    const lens = (cx, cy, fs, ar, cls) => {
+      const w = adv * fs * 1.15;
+      const h = Math.max(fs * 0.95 * ar, w * ar * 0.9);
+      return abLens(scene, { x: +(cx - w / 2).toFixed(2), y: +(cy - h / 2).toFixed(2), w: +w.toFixed(2), h: +h.toFixed(2), scale: 1.08, dx: 0, dy: 0, cls });
+    };
     const icon = d => `<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${d}</svg>`;
     const tabs = [
       ['Home', '<path d="M4 11l8-7 8 7v8a1 1 0 0 1-1 1h-4v-6h-6v6H5a1 1 0 0 1-1-1z"/>'],
@@ -89,8 +99,8 @@ registerAesthetic({
       ['Library', '<rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><rect x="13" y="13" width="7" height="7" rx="1.5"/>'],
     ].map(([n, d], i) => `<span class="lgs-tab${i === 0 ? ' on' : ''}">${icon(d)}<em>${n}</em></span>`).join('');
     return `<div class="lgs"><div class="lgs-scene">${scene}</div>`
-      + abLens(scene, { x: 63, y: 20.5, w: 30, h: 63, scale: 1.12, dx: -6, cls: 'lgs-lens lgs-lens-w' })
-      + abLens(scene, { x: 48, y: 29, w: 44, h: 41.9, scale: 1.12, dx: -6, cls: 'lgs-lens lgs-lens-n' })
+      + lens(72, 52, 30, 21 / 10, 'lgs-lens lgs-lens-w')
+      + lens(62, 50, 50, 4 / 4.2, 'lgs-lens lgs-lens-n')
       + `<div class="lgs-tabs">${tabs}</div>`
       + '<div class="lgs-card"><div class="lgs-time"><span class="lgs-cap">Focus</span><b>18:24</b></div>'
       + '<svg class="lgs-timer" viewBox="0 0 44 44" aria-hidden="true"><circle cx="22" cy="22" r="17" fill="none" stroke="rgba(255,255,255,.28)" stroke-width="4"/>'

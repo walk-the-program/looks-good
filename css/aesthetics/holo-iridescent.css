@@ -101,8 +101,11 @@
 .ab[data-ae="holo-iridescent"] .hoa-ribbon-back { z-index: 0; }
 .ab[data-ae="holo-iridescent"] .hoa-ribbon-front { z-index: 2; }
 .ab[data-ae="holo-iridescent"] .hob { z-index: 1; }
+.ab[data-ae="holo-iridescent"] .hoa-rn { display: none; }
 @container (max-width: 420px) {
   .ab[data-ae="holo-iridescent"] .hoa { --hob-d: 50cqw; }
+  .ab[data-ae="holo-iridescent"] .hoa-rw { display: none; }
+  .ab[data-ae="holo-iridescent"] .hoa-rn { display: block; }
 }
 
 /* palette: chips with the same 1px iridescent hairline as the cards (no sheen streak) */

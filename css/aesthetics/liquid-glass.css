@@ -82,7 +82,7 @@
   content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
   background: linear-gradient(135deg, rgba(255, 255, 255, 0.38), rgba(255, 255, 255, 0) 38%, rgba(255, 255, 255, 0) 70%, rgba(255, 255, 255, 0.14));
 }
-/* the lens: a squircle over the right half of the initial. Light blur (so the bend is visible), a
+/* the lens: a squircle centered on the initial (1.15x its width). Light blur (so the bend is visible), a
    magnified and offset duplicate of the scene inside, bright rim, dark hairline, soft specular. */
 .ab[data-ae="liquid-glass"] .lgs-lens {
   border-radius: 28%; border: 0; background: rgba(255, 255, 255, 0.08);

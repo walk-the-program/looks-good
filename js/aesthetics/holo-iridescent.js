@@ -113,7 +113,7 @@
       const rstops = [0.02, 0.2, 0.4, 0.6, 0.8, 0.98]
         .map((o, i) => `<stop offset="${o}" stop-color="${art[(5 - i) % 5]}"/>`).join('');
       // Foil ribbon geometry: a band 22-34 units tall that narrows to ~4 at one twist.
-      const xt = 118, seam = 73.6;
+      const xt = 118;
       const centre = x => 41 + 13 * Math.sin((x / 160) * Math.PI * 1.7 + 0.5);
       const thick = x => {
         const base = 28 + 6 * Math.sin((x / 160) * Math.PI * 2.2 + 1);
@@ -127,18 +127,29 @@
         return 'M' + p.map(x => f(x) + ' ' + f(top(x))).join(' L') + ' L' + p.slice().reverse().map(x => f(x) + ' ' + f(bot(x))).join(' L') + ' Z';
       };
       const edge = (x0, x1) => 'M' + xs(x0, x1).map(x => f(x) + ' ' + f(top(x))).join(' L');
-      const defs = `<defs>
-            <linearGradient id="${id}g" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="160" y2="0">${stops}</linearGradient>
-            <linearGradient id="${id}h" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="160" y2="0">${rstops}</linearGradient>
-          </defs>`;
-      const seg = (cls, parts) => `<svg class="hoa-ribbon ${cls}" viewBox="0 0 160 80" preserveAspectRatio="none" focusable="false">${defs}
-          ${parts.map(([x0, x1, g]) => `<path d="${piece(x0, x1)}" fill="url(#${id}${g})" fill-opacity=".9"/>`).join('')}
+      // each geometry variant (wide / narrow) carries its own gradients: an id resolved into a
+      // display:none svg paints nothing, so variants must not share ids.
+      const seg = (cls, v, parts) => {
+        const gid = id + v;
+        return `<svg class="hoa-ribbon ${cls} hoa-r${v}" viewBox="0 0 160 80" preserveAspectRatio="none" focusable="false"><defs>
+            <linearGradient id="${gid}g" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="160" y2="0">${stops}</linearGradient>
+            <linearGradient id="${gid}h" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="160" y2="0">${rstops}</linearGradient>
+          </defs>
+          ${parts.map(([x0, x1, g]) => `<path d="${piece(x0, x1)}" fill="url(#${gid}${g})"/>`).join('')}
           ${parts.map(([x0, x1]) => `<path d="${edge(x0, x1)}" fill="none" stroke="#fff" stroke-opacity=".35" stroke-width="1" stroke-linecap="round" vector-effect="non-scaling-stroke"/>`).join('')}
         </svg>`;
+      };
       const sec = t.secondary;
+      // The ribbon changes layer where the band crosses the bubble's right rim (centre x
+      // 46% of 160 = 73.6; radius = half the bubble diameter, 17cqw wide / 25cqw narrow),
+      // so no join falls inside the bubble. The back segment runs 1.5 units past the
+      // seam; both use the same userSpaceOnUse gradient so the colours match across it.
+      const seamW = 73.6 + 27.2, seamN = 73.6 + 40;
+      const back = (v, sm) => seg('hoa-ribbon-back', v, [[-4, sm + 1.5, 'g']]);
+      const front = (v, sm) => seg('hoa-ribbon-front', v, [[sm, xt, 'g'], [xt, 164, 'h']]);
       return `<div class="hoa">
         <i class="hoa-bloom"></i>
-        ${seg('hoa-ribbon-back', [[-4, seam, 'g']])}
+        ${back('w', seamW)}${back('n', seamN)}
         <div class="hob">
           <i class="hob-halo"></i><i class="hob-body"></i><i class="hob-thin"></i><i class="hob-film"></i><i class="hob-rim"></i><i class="hob-rim hob-rim-hi"></i>
           <svg class="hob-arcs" viewBox="0 0 100 100" focusable="false">
@@ -148,7 +159,7 @@
             <circle cx="39" cy="12.6" r="0.9" fill="#fff" opacity=".8"/>
           </svg>
         </div>
-        ${seg('hoa-ribbon-front', [[seam, xt, 'g'], [xt, 164, 'h']])}
+        ${front('w', seamW)}${front('n', seamN)}
       </div>`;
     },
 

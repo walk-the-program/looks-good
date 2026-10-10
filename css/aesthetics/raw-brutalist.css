@@ -148,6 +148,8 @@
 .ab[data-ae="raw-brutalist"] .ab-row-bar i { background: var(--ab-ink); }
 .ab[data-ae="raw-brutalist"] .ab-row-pct { font-weight: 700; }
 @container ab (max-width: 600px) {
+  .ab[data-ae="raw-brutalist"] .ab-wordmark { font-size: 13px; letter-spacing: 0; }
+  .ab[data-ae="raw-brutalist"] .ab-tag { font-size: 9px; letter-spacing: .06em; }
   .ab[data-ae="raw-brutalist"] .ab-row { grid-template-columns: 4ch minmax(0, 1fr) auto 4.5ch; }
   .ab[data-ae="raw-brutalist"] .ab-hero { padding-bottom: 24px; }
   .ab[data-ae="raw-brutalist"] .ab-art { position: relative; top: auto; right: auto; width: 100%; max-width: 280px; justify-self: start; margin-right: 0; }
