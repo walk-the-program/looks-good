@@ -82,7 +82,6 @@
 .ab[data-ae="groovy-70s"] .ab-type-class { color: var(--ab-ink); opacity: 0.72; }
 .ab[data-ae="groovy-70s"] .ab-type-pick { letter-spacing: calc(-0.01em * var(--ab-tr, 1)); }
 .ab[data-ae="groovy-70s"] .ab-fit { border: 0; background: var(--ab-lift); color: var(--ab-ink); }
-.ab[data-ae="groovy-70s"] .ab-fit[data-fit="match"] { background: var(--ab-primary); color: var(--ab-on-primary); }
 .ab[data-ae="groovy-70s"] .ab-fit[data-fit="avoid"] { background: var(--ab-ink); color: var(--ab-canvas); }
 .ab[data-ae="groovy-70s"] .ab-type-k { color: var(--ab-ink); font-weight: 700; }
 .ab[data-ae="groovy-70s"] .ab-type-apply {
@@ -95,11 +94,11 @@
 .ab[data-ae="groovy-70s"] .ab-card, .ab[data-ae="groovy-70s"] .ab-panel { border: 0; border-radius: 36px; box-shadow: none; padding: clamp(22px, 3.2cqw, 32px); position: relative; overflow: hidden; isolation: isolate; }
 .ab[data-ae="groovy-70s"] .ab-card { background: var(--ab-card-a); }
 .ab[data-ae="groovy-70s"] .ab-panel { background: var(--ab-kraft); }
-/* the sunburst is centred on the CTA (a disc 0.9x the CTA width), fading out toward the top so it never sits behind the copy */
+/* the sunburst is centred on the CTA (a disc 0.7x the CTA width), fading out toward the top so it never sits behind the copy */
 .ab[data-ae="groovy-70s"] .ab-card::after {
-  content: ""; position: absolute; z-index: -1; left: 50%; bottom: calc(clamp(22px, 3.2cqw, 32px) + 30px); width: calc((100% - 2 * clamp(22px, 3.2cqw, 32px)) * 0.9); aspect-ratio: 1; transform: translate(-50%, 50%); pointer-events: none; border-radius: 50%;
+  content: ""; position: absolute; z-index: -1; left: 50%; bottom: calc(clamp(22px, 3.2cqw, 32px) + 30px); width: calc((100% - 2 * clamp(22px, 3.2cqw, 32px)) * 0.7); aspect-ratio: 1; transform: translate(-50%, 50%); pointer-events: none; border-radius: 50%;
   opacity: 0.55; background: repeating-conic-gradient(var(--ab-ray) 0 5deg, transparent 5deg 12deg);
-  -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 45%); mask-image: linear-gradient(to bottom, transparent 0, #000 45%);
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0 50%, #000 78%); mask-image: linear-gradient(to bottom, transparent 0 50%, #000 78%);
 }
 .ab[data-ae="groovy-70s"] .ab-seg { gap: 4px; padding: 5px; border-radius: 999px; background: var(--ab-track); }
 .ab[data-ae="groovy-70s"] .ab-seg-btn { min-height: 38px; border-radius: 999px; font-size: 13px; font-weight: 600; color: var(--ab-ink); opacity: 0.8; transition: background .15s, transform .15s; }
@@ -160,8 +159,8 @@
 @container ab (max-width: 600px) {
   .ab[data-ae="groovy-70s"] .ab-hero { padding: 14px 0 28px; }
   .ab[data-ae="groovy-70s"] .ab-art { max-width: none; aspect-ratio: 200 / 112; }
-  .ab[data-ae="groovy-70s"] .ab-hero-copy { max-width: none; margin-top: calc(var(--gv-w) * -0.2); }
-  .ab[data-ae="groovy-70s"] .ab-headline { font-size: calc(clamp(26px, 9.2cqw, 46px) * var(--ab-hl-scale, 1) * var(--ab-hs, 1) * var(--ab-display, 1)); text-align: center; }
+  .ab[data-ae="groovy-70s"] .ab-hero-copy { max-width: 58cqw; margin-inline: auto; margin-top: calc(var(--gv-w) * -0.2); }
+  .ab[data-ae="groovy-70s"] .ab-headline { font-size: calc(clamp(24px, 8.2cqw, 36px) * var(--ab-hl-scale, 1) * var(--ab-hs, 1) * var(--ab-display, 1)); text-align: center; }
   .ab[data-ae="groovy-70s"] .ab-hero-copy { text-align: center; }
   .ab[data-ae="groovy-70s"] .ab-swatches[data-kind="strips"] .ab-swatch { flex-wrap: wrap; gap: 2px 12px; padding: 10px 22px; border-radius: 30px; min-height: 0; }
   .ab[data-ae="groovy-70s"] .ab-sw-role { flex: 1 1 auto; }

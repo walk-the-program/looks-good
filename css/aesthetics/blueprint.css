@@ -127,11 +127,11 @@
 .ab[data-ae="blueprint"] .ab-seg-btn { min-height: 36px; border-radius: 0; border-left: 1px solid var(--ab-l2); font: 500 11px var(--bp-mono); letter-spacing: 0.12em; text-transform: uppercase; color: var(--ab-muted); }
 .ab[data-ae="blueprint"] .ab-seg-btn:first-child { border-left: 0; }
 .ab[data-ae="blueprint"] .ab-seg-btn:hover { color: var(--ab-ink); background: var(--ab-grid-l); }
-.ab[data-ae="blueprint"] .ab-seg-btn[aria-pressed="true"] { background: var(--ab-pri-ui); color: var(--ab-on-pri-ui); font-weight: 700; }
+.ab[data-ae="blueprint"] .ab-seg-btn[aria-pressed="true"] { background: var(--ab-primary); color: var(--ab-on-primary); outline: 1px solid var(--ab-ink); outline-offset: -1px; font-weight: 700; }
 .ab[data-ae="blueprint"] .ab-card-title { margin: 24px 0 8px !important; font-weight: 600; text-transform: uppercase; letter-spacing: calc(0.02em * var(--ab-tr, 1)); font-size: clamp(18px, 2.3cqw, 22px); }
 .ab[data-ae="blueprint"] .ab-card-body { font-size: 12.5px; }
 .ab[data-ae="blueprint"] .ab-cta, .ab[data-ae="blueprint"] .ab-states .ab-state-ctl {
-  position: relative; width: calc(100% - 10px); margin: 5px; padding: 13px 14px; border: 1px solid var(--ab-l1); border-radius: 0; background: var(--ab-pri-ui); color: var(--ab-on-pri-ui);
+  position: relative; width: calc(100% - 10px); margin: 5px; padding: 13px 14px; border: 1px solid var(--ab-l1); border-radius: 0; background: var(--ab-primary); color: var(--ab-on-primary);
   font: 700 12px var(--bp-mono); letter-spacing: 0.1em; text-transform: uppercase; box-shadow: none; transition: outline-offset .12s, background .12s;
 }
 .ab[data-ae="blueprint"] .ab-cta:hover { outline: 1px solid var(--ab-l1); outline-offset: 4px; }
@@ -146,7 +146,7 @@
 .ab[data-ae="blueprint"] .ab-switch { width: 48px; height: 22px; border-radius: 0; background: transparent; border: 1px solid var(--ab-l1); transition: none; }
 .ab[data-ae="blueprint"] .ab-switch::before { left: 3px; top: 3px; width: 14px; height: 14px; border-radius: 0; background: var(--ab-l1); transition: transform .1s; }
 .ab[data-ae="blueprint"] .ab-switch:checked { background: transparent; }
-.ab[data-ae="blueprint"] .ab-switch:checked::before { transform: translateX(26px); background: var(--ab-pri-ui); outline: 1px solid var(--ab-ink); }
+.ab[data-ae="blueprint"] .ab-switch:checked::before { transform: translateX(26px); background: var(--ab-primary); outline: 1px solid var(--ab-ink); }
 .ab[data-ae="blueprint"] .ab-status { margin-top: 10px; font: 500 10px var(--bp-mono); letter-spacing: 0.12em; text-transform: uppercase; }
 .ab[data-ae="blueprint"] .ab-status::before { content: ""; display: inline-block; width: 6px; height: 6px; margin-right: 8px; background: var(--ab-sec-ui); }
 .ab[data-ae="blueprint"] .ab-states { gap: 14px; margin-top: 22px; }

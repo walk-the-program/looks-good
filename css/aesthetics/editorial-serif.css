@@ -85,16 +85,16 @@
 }
 .ab[data-ae="editorial-serif"] .eds-no {
   position: absolute; z-index: 3; left: 7%; top: 5%; font: 500 clamp(8px, 4.2cqw, 12px)/1 var(--ab-font-ui); letter-spacing: 0.22em; text-transform: uppercase; color: var(--ab-canvas);
-  text-shadow: 0 0 5px var(--ab-eds-plate), 0 0 10px var(--ab-eds-plate);
 }
-/* the brand initial: 150% of the plate height, cropped by the bottom and left edges */
+/* the brand initial: 150% of the plate height, cropped by the bottom and left edges; a tonal letter
+   (plate mixed 28% toward canvas) so the cover type sits on top of it without a halo */
 .ab[data-ae="editorial-serif"] .eds-cap {
-  position: absolute; z-index: 2; left: -8%; bottom: -38%; font-family: var(--ab-font-h); font-weight: 400; font-size: 150cqh; line-height: 1; color: var(--ab-canvas);
+  position: absolute; z-index: 2; left: -8%; bottom: -38%; font-family: var(--ab-font-h); font-weight: 400; font-size: 150cqh; line-height: 1; color: color-mix(in srgb, var(--ab-eds-plate) 72%, var(--ab-canvas) 28%);
   text-transform: uppercase; text-shadow: none; pointer-events: none;
 }
 .ab[data-ae="editorial-serif"] .eds-cover { position: absolute; z-index: 3; left: 7%; right: 7%; bottom: 5%; display: flex; flex-direction: column; gap: 6px; }
-.ab[data-ae="editorial-serif"] .eds-line { font-family: var(--ab-font-h); font-style: italic; font-weight: 400; font-size: 22px; line-height: 1.1; color: var(--ab-canvas); text-shadow: 0 0 6px var(--ab-eds-plate), 0 0 12px var(--ab-eds-plate), 0 0 20px var(--ab-eds-plate); }
-.ab[data-ae="editorial-serif"] .eds-sub { font: 400 9px/1.3 var(--ab-font-ui); letter-spacing: 0.2em; text-transform: uppercase; color: color-mix(in srgb, var(--ab-canvas) 80%, transparent); text-shadow: 0 0 5px var(--ab-eds-plate), 0 0 10px var(--ab-eds-plate); }
+.ab[data-ae="editorial-serif"] .eds-line { font-family: var(--ab-font-h); font-style: italic; font-weight: 400; font-size: 22px; line-height: 1.1; position: relative; z-index: 2; color: var(--ab-canvas); }
+.ab[data-ae="editorial-serif"] .eds-sub { font: 400 9px/1.3 var(--ab-font-ui); letter-spacing: 0.2em; text-transform: uppercase;  position: relative; z-index: 2; color: var(--ab-canvas); }
 .ab[data-ae="editorial-serif"] .eds-fig {
   display: flex; justify-content: space-between; gap: 10px; font-family: var(--ab-font-b); font-size: clamp(10.5px, 3.8cqw, 12.5px); line-height: 1.3; color: var(--ab-muted);
 }

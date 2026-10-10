@@ -203,8 +203,8 @@ registerAesthetic({
   materials: [
     { name: 'Drawing field', css: 'background: {canvas}; background-image: 1px grid lines every 24px in {gridS} and every 120px in {gridL}; /* the sheet: the brand\'s bluest hue at 45-62% saturation, 21% lightness (a desaturated dark tint when no hue is blue-ish) */' },
     { name: 'Line work', css: 'border: 1px solid {ink}; border-radius: 0; background: transparent; box-shadow: none; /* 1px strokes only: {l1} for outlines, {l2} for hidden or secondary lines, {l3} for hairlines */' },
-    { name: 'Filled CTA', css: 'background: {priUi}; color: {onPriUi}; border: 1px solid {ink}; border-radius: 0; font: 600 12px ui-monospace, "SF Mono", Menlo, monospace; text-transform: uppercase; letter-spacing: .08em; /* accent corner ticks at two corners; hover: a second outline 3px outside; active: background {ink}, color {canvas} */' },
-    { name: 'Selected tab', css: 'background: {priUi}; color: {onPriUi}; border: 1px solid {ink}; /* the only other filled element; unselected tabs are 1px outlines */' },
+    { name: 'Filled CTA', css: 'background: {primary}; color: {onPrimary}; border: 1px solid {ink}; border-radius: 0; font: 600 12px ui-monospace, "SF Mono", Menlo, monospace; text-transform: uppercase; letter-spacing: .08em; /* accent corner ticks at two corners; hover: a second outline 3px outside; active: background {ink}, color {canvas} */' },
+    { name: 'Selected tab', css: 'background: {primary}; color: {onPrimary}; border: 1px solid {ink}; /* the only other filled element; unselected tabs are 1px outlines */' },
     { name: 'Dimension line', css: 'border-top: 1px solid {accUi}; /* end ticks, a mono measurement set in a gap of the line; drawn over the highlighted headline word */' },
     { name: 'Field', css: 'border: 0; border-bottom: 1px solid {ink}; background: transparent; border-radius: 0; font: 14px ui-monospace, "SF Mono", Menlo, monospace; /* focus: border-bottom-color {accUi} */' },
     { name: 'Title block', css: 'border: 1px solid {ink}; display: grid; grid-template-columns: 1fr 1fr; /* four ruled cells at the bottom right: project, scale and sheet, title, reference */' },
