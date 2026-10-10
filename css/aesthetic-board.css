@@ -90,10 +90,6 @@
   font-family: var(--ab-font-b); font-size: clamp(13.5px, 1.5cqw, 16px); line-height: 1.5; color: var(--ab-muted);
 }
 .ab[data-subcopy="off"] .ab-subcopy { display: none; }
-/* Compat until R2 migrates Bauhaus Poster: its hero copy is a row flex (vertical
-   kicker | headline), so the sub-copy would become a third column. Delete this
-   rule when that aesthetic sets layout.subcopy false or restructures its hero. */
-.ab[data-ae="bauhaus-poster"] .ab-subcopy { display: none; }
 
 /* Highlight word (def.highlight). 'ink' = the accent shaded/tinted to >= 3:1 on
    the canvas, as text. 'band' = opt-in highlighter plane. 'custom' = the

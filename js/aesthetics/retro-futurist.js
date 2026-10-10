@@ -1,7 +1,8 @@
-/* 04 Retro-Futurist — a mission-control console: bezelled panels, inset CRT
-   screens with scanlines, lit keys, glowing lamps and a synthwave sun.
-   Screens stay dark in both modes; bezels follow the canvas. Look lives in
-   css/aesthetics/retro-futurist.css. */
+/* 04 Retro-Futurist — a hardware control panel: bezelled panels, inset CRT
+   screens with scanlines, lit keys, glowing lamps, and in the hero a real
+   hardware module (analog dial, amber LCD, LED level meter). Mono interface
+   type. Screens stay dark in both modes; bezels follow the canvas. Look lives
+   in css/aesthetics/retro-futurist.css. */
 (function () {
   let seq = 0;
 
@@ -15,7 +16,9 @@
     kicker: 'Mission control',
     mode: 'dark',
     slideShape: 'refined',
-    labels: { material: 'Console', states: ['Idle', 'Armed', 'Engaged'] },
+    labels: { material: 'Console', states: ['Idle', 'Armed', 'Engaged'], statesKind: 'swatch' },
+    type: { ui: 'mono', label: 'mono' },
+    highlight: 'custom',
 
     roles: {
       ink: {
@@ -23,15 +26,15 @@
         never: 'Large background fields in light mode',
       },
       primary: {
-        use: 'The one illuminated action, the lit key and the "engaged" lamp',
+        use: 'The one illuminated action, the lit key, the dial needle and the "engaged" lamp',
         never: 'Body text, bezel fills, a second CTA',
       },
       secondary: {
-        use: 'Readouts: telemetry values, LED meter bars, the grid floor and chart lines',
+        use: 'Readouts: the LCD digits, LED meter bars, telemetry values and chart lines',
         never: 'The main CTA, body text, bezels',
       },
       accent: {
-        use: 'Status lamps (glowing dots) and one headline word',
+        use: 'Status lamps (glowing dots), the peak LED at the top of the level meter and one headline word (lamp glow on dark canvases)',
         never: 'Buttons, body text, bezel fills, large areas',
       },
     },
@@ -86,6 +89,9 @@
       };
     },
 
+    // A hardware module: bezel plate with screws, an amber LCD readout (brand
+    // initial + 88.8) in the secondary color, an analog dial (ticks, value arc,
+    // primary needle) and a 5-bar LED level meter with the accent at the top.
     art(ctx) {
       const t = ctx.t;
       const id = 'rf' + (++seq);
@@ -102,47 +108,69 @@
       const readout = lift(t.secondary, 4.5);
       const lamp = lift(t.accent, 3.5);
       const priLit = lift(t.primary, 3);
-      const horizon = 64;
-      const vx = 50;
-      // perspective floor: rays from the vanishing point and horizontals that bunch toward the horizon
-      let grid = '';
-      for (let i = -9; i <= 9; i++) {
-        grid += `<line x1="${vx + i * 1.4}" y1="${horizon}" x2="${vx + i * 17}" y2="100"/>`;
+      const metalHi = d ? t.mix('#ffffff', t.canvas, 0.3) : t.mix('#ffffff', t.canvas, 0.85);
+      const metalLo = d ? t.mix('#000000', t.canvas, 0.25) : t.mix('#000000', t.canvas, 0.2);
+      const cx = 36, cy = 59;
+      const pt = (deg, r) => {
+        const a = (deg - 90) * Math.PI / 180;
+        return [(cx + r * Math.cos(a)).toFixed(2), (cy + r * Math.sin(a)).toFixed(2)];
+      };
+      // 31 ticks across 270 degrees; every fifth is a long major tick
+      let ticks = '';
+      for (let i = 0; i <= 30; i++) {
+        const deg = -135 + i * 9;
+        const major = i % 5 === 0;
+        const p1 = pt(deg, major ? 15.6 : 17.2), p2 = pt(deg, 19.4);
+        ticks += `<line x1="${p1[0]}" y1="${p1[1]}" x2="${p2[0]}" y2="${p2[1]}" stroke="${screenInk}" stroke-opacity="${major ? 0.95 : 0.55}" stroke-width="${major ? 0.9 : 0.5}" stroke-linecap="round"/>`;
       }
-      for (let k = 1; k <= 7; k++) {
-        const y = horizon + 36 * Math.pow(k / 7, 2);
-        grid += `<line x1="0" y1="${y.toFixed(2)}" x2="100" y2="${y.toFixed(2)}"/>`;
+      // value arc (from the start of the scale to the needle) and the needle
+      const needleDeg = 38;
+      const s0 = pt(-135, 13.8), s1 = pt(needleDeg, 13.8);
+      const arc = `M${s0[0]} ${s0[1]} A13.8 13.8 0 ${needleDeg + 135 > 180 ? 1 : 0} 1 ${s1[0]} ${s1[1]}`;
+      const tip = pt(needleDeg, 15.4), tail = pt(needleDeg + 180, 4.2);
+      // LED level meter: five bars, the peak (top) in the accent, the rest in the readout color
+      let bars = '';
+      for (let i = 0; i < 5; i++) {
+        const y = 38 + i * 9;
+        const col = i === 0 ? lamp : readout;
+        bars += `<rect x="68" y="${y}" width="20" height="6.4" rx="1" fill="${col}" filter="url(#${id}g)" opacity=".55"/>`
+          + `<rect x="68" y="${y}" width="20" height="6.4" rx="1" fill="${col}"/>`
+          + `<rect x="68" y="${y}" width="20" height="2" rx="1" fill="#fff" opacity=".22"/>`;
       }
-      const stars = [[10, 10, 0.7], [22, 24, 0.5], [34, 8, 0.6], [68, 12, 0.8], [84, 22, 0.55], [92, 8, 0.5], [14, 40, 0.5], [90, 40, 0.6], [58, 6, 0.45]]
-        .map(s => `<circle cx="${s[0]}" cy="${s[1]}" r="${s[2]}" fill="${screenInk}" opacity=".75"/>`).join('');
-      // slices cut out of the sun, thicker toward the horizon
-      const slices = [[44, 1], [49.5, 1.5], [55, 2.1], [60, 2.8]]
-        .map(s => `<rect x="0" y="${s[0]}" width="100" height="${s[1]}" fill="#000"/>`).join('');
+      const screws = [[6, 6], [94, 6], [6, 94], [94, 94]].map((p, i) =>
+        `<g transform="rotate(${i * 47} ${p[0]} ${p[1]})"><circle cx="${p[0]}" cy="${p[1]}" r="2.1" fill="url(#${id}m)" stroke="${metalLo}" stroke-width=".35"/><line x1="${p[0] - 1.3}" y1="${p[1]}" x2="${p[0] + 1.3}" y2="${p[1]}" stroke="${metalLo}" stroke-width=".5"/></g>`).join('');
+      const mono = 'font-family="ui-monospace,SF Mono,Menlo,monospace"';
+      const initial = ctx.initial && ctx.initial !== '·' ? ctx.initial : 'M';
       return `<svg viewBox="0 0 100 100" width="100%" height="100%" focusable="false">
         <defs>
-          <clipPath id="${id}c"><rect width="100" height="100" rx="5"/></clipPath>
-          <linearGradient id="${id}s" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0" stop-color="${screen}"/><stop offset=".64" stop-color="${t.mix(t.primary, screen, 0.3)}"/><stop offset=".641" stop-color="${screen}"/><stop offset="1" stop-color="${t.mix(t.primary, screen, 0.14)}"/>
-          </linearGradient>
-          <linearGradient id="${id}u" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0" stop-color="${lamp}"/><stop offset=".55" stop-color="${priLit}"/><stop offset="1" stop-color="${t.primary}"/>
-          </linearGradient>
-          <mask id="${id}m"><rect width="100" height="100" fill="#fff"/>${slices}</mask>
+          <linearGradient id="${id}m" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${metalHi}"/><stop offset="1" stop-color="${metalLo}"/></linearGradient>
+          <linearGradient id="${id}r" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${metalHi}"/><stop offset=".5" stop-color="${t.canvas}"/><stop offset="1" stop-color="${metalLo}"/></linearGradient>
+          <radialGradient id="${id}w" cx=".5" cy=".28" r=".8"><stop offset="0" stop-color="${t.mix('#ffffff', screen, 0.1)}"/><stop offset="1" stop-color="${screen}"/></radialGradient>
+          <pattern id="${id}s" width="2" height="1.5" patternUnits="userSpaceOnUse"><rect width="2" height=".6" fill="#000" opacity=".28"/></pattern>
+          <filter id="${id}g" x="-30%" y="-80%" width="160%" height="260%"><feGaussianBlur stdDeviation="1.1"/></filter>
+          <filter id="${id}n" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation=".7"/></filter>
         </defs>
-        <g clip-path="url(#${id}c)">
-          <rect width="100" height="100" fill="url(#${id}s)"/>
-          ${stars}
-          <g transform="rotate(-18 50 44)"><ellipse cx="50" cy="44" rx="47" ry="12" fill="none" stroke="${screenInk}" stroke-opacity=".4" stroke-width="1" vector-effect="non-scaling-stroke" stroke-dasharray="3 3"/></g>
-          <circle cx="50" cy="40" r="33" fill="${t.primary}" opacity=".16"/>
-          <circle cx="50" cy="40" r="25" fill="url(#${id}u)" mask="url(#${id}m)"/>
-          <g transform="rotate(-18 50 44)">
-            <path d="M3 44 A47 12 0 0 0 97 44" fill="none" stroke="${lamp}" stroke-width="1.3" vector-effect="non-scaling-stroke"/>
-            <circle cx="77" cy="54" r="6.5" fill="${lamp}" opacity=".28"/>
-            <circle cx="77" cy="54" r="3.4" fill="${lamp}"/>
-          </g>
-          <line x1="0" y1="${horizon}" x2="100" y2="${horizon}" stroke="${readout}" stroke-width="1.4" vector-effect="non-scaling-stroke"/>
-          <g stroke="${readout}" stroke-width="1" stroke-opacity=".8" vector-effect="non-scaling-stroke" fill="none">${grid.replace(/<line /g, '<line vector-effect="non-scaling-stroke" ')}</g>
-        </g>
+        ${screws}
+        <rect x="9" y="9.5" width="82" height="18" rx="2.6" fill="url(#${id}w)" stroke="${t.alpha('#000000', 0.75)}" stroke-width="1"/>
+        <text x="14" y="22.7" ${mono} font-size="10.6" font-weight="700" fill="${readout}" opacity=".13" letter-spacing=".4">8 88.8</text>
+        <text x="14" y="22.7" ${mono} font-size="10.6" font-weight="700" fill="${readout}" letter-spacing=".4" filter="url(#${id}n)" opacity=".7">${escapeHtml(initial)} 88.8</text>
+        <text x="14" y="22.7" ${mono} font-size="10.6" font-weight="700" fill="${readout}" letter-spacing=".4">${escapeHtml(initial)} 88.8</text>
+        <text x="86" y="15.6" ${mono} font-size="2.8" fill="${readout}" opacity=".8" text-anchor="end" letter-spacing=".5">FREQ</text>
+        <text x="86" y="24.2" ${mono} font-size="2.8" fill="${readout}" opacity=".8" text-anchor="end" letter-spacing=".5">MHZ</text>
+        <rect x="9" y="9.5" width="82" height="18" rx="2.6" fill="url(#${id}s)"/>
+        <circle cx="${cx}" cy="${cy}" r="25.2" fill="url(#${id}r)" stroke="${t.alpha('#000000', 0.55)}" stroke-width=".7"/>
+        <circle cx="${cx}" cy="${cy}" r="22" fill="url(#${id}w)" stroke="${t.alpha('#000000', 0.8)}" stroke-width="1.1"/>
+        ${ticks}
+        <path d="${arc}" fill="none" stroke="${readout}" stroke-width="1.3" stroke-linecap="round" opacity=".9"/>
+        <line x1="${tail[0]}" y1="${tail[1]}" x2="${tip[0]}" y2="${tip[1]}" stroke="${priLit}" stroke-width="3" stroke-linecap="round" opacity=".35" filter="url(#${id}g)"/>
+        <line x1="${tail[0]}" y1="${tail[1]}" x2="${tip[0]}" y2="${tip[1]}" stroke="${priLit}" stroke-width="1.5" stroke-linecap="round"/>
+        <circle cx="${cx}" cy="${cy}" r="3.6" fill="url(#${id}m)" stroke="${metalLo}" stroke-width=".5"/>
+        <circle cx="${cx}" cy="${cy}" r="1.1" fill="${screen}"/>
+        <rect x="64.5" y="33.5" width="27" height="51" rx="2.6" fill="url(#${id}w)" stroke="${t.alpha('#000000', 0.8)}" stroke-width="1.1"/>
+        ${bars}
+        <rect x="64.5" y="33.5" width="27" height="51" rx="2.6" fill="url(#${id}s)"/>
+        <text x="${cx}" y="91.4" ${mono} font-size="3" fill="${t.muted}" text-anchor="middle" letter-spacing=".9">GAIN</text>
+        <text x="78" y="91.4" ${mono} font-size="3" fill="${t.muted}" text-anchor="middle" letter-spacing=".9">LEVEL</text>
       </svg>`;
     },
 
@@ -152,6 +180,7 @@
       { name: 'Illuminated primary', css: 'background: {primary}; color: {onPrimary}; border-radius: 999px; box-shadow: inset 0 1px 0 rgba(255,255,255,.55), inset 0 -2px 4px rgba(0,0,0,.25), 0 0 24px {priGlow}; font: 700 12.5px ui-monospace, "SF Mono", Menlo, monospace; text-transform: uppercase;' },
       { name: 'Bevelled key', css: 'background: linear-gradient(180deg, {keyTop}, {keyBot}); border-radius: 8px; box-shadow: inset 0 1px 0 {bezelHi}, 0 3px 0 {keyLip}; /* lit: background {primary}, glow {priGlow} */' },
       { name: 'Status lamp', css: 'background: radial-gradient(circle at 35% 30%, #fff, {lamp} 35%); border-radius: 50%; box-shadow: 0 0 10px {lampGlow}; /* off: {lampDim} */' },
+      { name: 'Hardware module', css: 'background: linear-gradient(180deg, {bezelTop}, {bezelBot}); border-radius: 20px; box-shadow: inset 0 1px 0 {bezelHi}, 0 0 0 1px {bezelEdge}, 0 18px 36px -10px {bezelDrop}; /* holds an amber LCD in {readout}, an analog dial with a {primary} needle and a 5-bar LED meter: {readout} bars, the top one in {lamp} */' },
       { name: 'Chrome headline', css: 'background: {chrome}; -webkit-background-clip: text; background-clip: text; color: transparent; text-transform: uppercase; letter-spacing: .02em; /* hard horizon at 55% */' },
     ],
 
@@ -160,13 +189,15 @@
         'Build panels as bezels: a vertical gradient, a 1px top highlight and a deep outer shadow.',
         'Put information on inset dark screens with scanlines, and set readouts in monospace in the secondary color.',
         'Light things that are active: the primary key, the CTA and the lamps glow; idle ones sit dim.',
-        'Set the headline in uppercase chrome with a hard horizon line, and one headline word in the accent.',
+        'Set the headline in uppercase chrome with a hard horizon line, and one headline word in the accent (lamp glow on dark canvases, shaded accent on light ones).',
+        'Set all interface text in monospace: tabs, buttons, labels, readouts and table cells.',
       ],
       dont: [
         'Glow everything; glow means active, so idle controls stay dim.',
         'Use the accent for anything but lamps and one headline word.',
         'Put body text on a glowing surface or a scanline screen at low contrast.',
         'Flatten the bezels: no flat fills, thin hairline cards or soft white shadows.',
+        'Use the synthwave sun, a planet or a flat illustration; the hero art is a hardware module (dial, LCD, LED meter).',
       ],
     },
   });

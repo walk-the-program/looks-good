@@ -1,5 +1,8 @@
 /* 02 Raw Brutalist — exposed, severe, honest. Zero radius, 2px ink borders,
-   hard offset shadows, monospace labels, color only where a role says so. */
+   hard offset shadows, monospace UI, color only where a role says so.
+   Reference: brutalistwebsites.com / Swiss editorial brutalism. Poster hero
+   (an enormous uppercase headline bleeding off the right edge), palette as
+   full-width strips, the real CTA shown at rest / hover / pressed. */
 registerAesthetic({
   key: 'raw-brutalist', order: 2,
   name: 'Raw Brutalist',
@@ -10,7 +13,10 @@ registerAesthetic({
   kicker: 'Index of hard surfaces',
   mode: 'light',
   slideShape: 'geometric',
-  labels: { material: 'Hard surfaces', states: ['Default', 'Hover', 'Pressed'] },
+  labels: { material: 'Hard surfaces', states: ['Rest', 'Hover', 'Pressed'], statesKind: 'button' },
+  layout: { hero: 'poster', palette: 'strips' },
+  type: { ui: 'mono', label: 'mono', display: 1.5 },
+  highlight: 'band',
 
   roles: {
     primary: {
@@ -31,11 +37,12 @@ registerAesthetic({
     return { '--ab-grid': t.alpha(t.ink, t.isDark ? 0.1 : 0.06) };
   },
 
+  // A cropped initial in a bordered frame, a primary block behind the right end
+  // of the headline, and one mono caption. No barcode.
   art(ctx) {
     return `<div class="rba">
-      <div class="rba-frame"><span class="rba-initial">${escapeHtml(ctx.initial)}</span></div>
       <i class="rba-block"></i>
-      <i class="rba-bars"></i>
+      <div class="rba-frame"><span class="rba-initial">${escapeHtml(ctx.initial)}</span></div>
       <span class="rba-cap">FIG. 01</span>
     </div>`;
   },
@@ -43,23 +50,24 @@ registerAesthetic({
   materials: [
     { name: 'Hard surface', css: 'background: {canvas}; border: 2px solid {ink}; border-radius: 0; box-shadow: 6px 6px 0 {ink};' },
     { name: 'Pressed state', css: 'transform: translate(6px, 6px); box-shadow: none;' },
-    { name: 'Primary action block', css: 'background: {primary}; color: {onPrimary}; border: 2px solid {ink}; border-radius: 0; box-shadow: 6px 6px 0 {ink}; font: 600 13px ui-monospace, "SF Mono", Menlo, monospace; text-transform: uppercase;' },
+    { name: 'Primary action block', css: 'background: {primary}; color: {onPrimary}; border: 2px solid {ink}; border-radius: 0; box-shadow: 6px 6px 0 {ink}; font: 600 13px ui-monospace, "SF Mono", Menlo, monospace; text-transform: uppercase; /* hover: translate(-2px, -2px) with 8px 8px 0 {ink}; pressed: translate(6px, 6px) with no shadow */' },
+    { name: 'Palette strips', css: 'one full-width row, border: 2px solid {ink}; each color is a flat band sized by its coverage, the label inside it; strips are separated by 2px {ink} rules.' },
     { name: 'Selected segment', css: 'background: {ink}; color: {canvas}; /* joined boxes share 2px {ink} borders */' },
     { name: 'Field', css: 'background: {canvas}; border: 2px solid {ink}; border-radius: 0; font: 15px ui-monospace, "SF Mono", Menlo, monospace; caret-color: {ink};' },
-    { name: 'Highlighter band', css: 'background: {accent}; color: {onAccent}; padding: 0 .06em; /* behind one headline word, never colored text */' },
+    { name: 'Highlighter band', css: 'background: {accent}; color: {onAccent}; padding: 0 .06em; /* behind one headline word, never colored text; may run off the board edge */' },
   ],
 
   rules: {
     do: [
       'Use zero radius and 2px ink borders on every control and panel.',
       'Cast a hard offset shadow (6px 6px 0 ink) for raised things, and remove it entirely when pressed.',
-      'Set labels in monospace, uppercase, numbered like [01], with plain arrows.',
+      'Set every label, tab, button and table cell in monospace, uppercase, numbered like [01], with plain arrows.',
       'Keep the page monochrome: color appears only where a color role says so.',
     ],
     dont: [
       'Round any corner, blur any shadow or add a gradient.',
       'Set the accent as text color; it is only ever the highlighter band behind a word.',
-      'Soften the headline: it stays huge, uppercase and may be cropped by its box.',
+      'Soften the headline: it stays enormous, uppercase and tight, and may be cropped by the board edge.',
       'Spend primary on anything but the single main action and active states.',
     ],
   },

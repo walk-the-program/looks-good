@@ -1,8 +1,10 @@
 /* 08 Bauhaus Poster — constructive, flat, rhythmic. No shadows, no gradients,
    no blur anywhere: geometry only (circles, half and quarter circles,
-   rectangles, 45° and -15° diagonals), 2px ink borders, controls that are
-   either square or fully round. Secondary and accent may be large planes in
-   the art only; the UI keeps the universal role rules. */
+   squares), flat fills with no outlines on art shapes, 2px ink borders on UI
+   controls that are either square or fully round. Reference: Bauhaus exhibition
+   posters. Poster hero (a huge tight uppercase headline, vertical kicker), the
+   art is a 3x3 pattern tile, palette as strips. Secondary and accent may be
+   large planes in the art only; the UI keeps the universal role rules. */
 registerAesthetic({
   key: 'bauhaus-poster', order: 8,
   name: 'Bauhaus Poster',
@@ -13,45 +15,60 @@ registerAesthetic({
   kicker: 'Constructed',
   mode: 'light',
   slideShape: 'minimal',
-  labels: { material: 'Form', states: ['Flat', 'Outlined', 'Filled'] },
+  labels: { material: 'Form', states: ['Rest', 'Hover', 'Pressed'], statesKind: 'button' },
+  layout: { hero: 'poster', palette: 'strips' },
+  type: { ui: 'sans', label: 'sans', display: 1.4 },
+  highlight: 'band',
 
   roles: {
     primary: {
-      use: 'The one flat CTA block, the selected segment, the "on" switch, and the main circle of the art',
+      use: 'The one flat CTA block, the selected segment, the "on" switch, and the largest planes of the art tile',
       never: 'Body text, borders, a second CTA',
     },
     secondary: {
-      use: 'Large planes inside the art only (the quarter circle); in the UI, only small tags and status chips',
+      use: 'Large planes inside the art tile only (quarter circles and backgrounds); in the UI, only small tags and status chips',
       never: 'The main CTA, body text, page background, large planes in the interface',
       coverage: '≈10–15%, more in art',
     },
     accent: {
-      use: 'Large planes inside the art only (the half circle); in the UI, one spark: the highlighted headline word and the footer dot',
+      use: 'Large planes inside the art tile only (half circles, backgrounds); in the UI, one spark: the highlighted headline word (a flat plane, no outline) and the footer dot',
       never: 'Buttons, body text, borders, large fills in the interface',
       coverage: '≤5%, more in art',
     },
   },
 
+  // The classic Bauhaus pattern tile: a 3x3 grid of 30-unit cells, each a flat
+  // quarter circle, semicircle, circle or plane in primary / secondary / accent /
+  // ink, rotated 0/90/180/270. Flat fills only: no strokes, shadows or blend modes.
   art(ctx) {
     const t = ctx.t;
-    const ln = `stroke="${t.ink}" stroke-width="1.3"`;
-    // Flat shapes only. Later elements sit on earlier ones (no blend modes).
-    return `<svg viewBox="0 0 100 100" width="100%" height="100%" focusable="false">
-      <path d="M100 42 A58 58 0 0 0 42 100 L100 100 Z" fill="${t.secondary}" ${ln}/>
-      <path d="M61 27 A20 20 0 0 1 101 27 Z" fill="${t.accent}" ${ln}/>
-      <circle cx="39" cy="43" r="31" fill="${t.primary}" ${ln}/>
-      <circle cx="39" cy="43" r="19" fill="none" stroke="${t.canvas}" stroke-width="1.6"/>
-      <circle cx="39" cy="43" r="7" fill="${t.canvas}" ${ln}/>
-      <rect x="4" y="80" width="68" height="7.5" fill="${t.ink}" transform="rotate(-15 38 84)"/>
-      <path d="M66 100 L100 66" stroke="${t.ink}" stroke-width="2.2" fill="none"/>
-      <rect x="9" y="8" width="9" height="9" fill="${t.ink}"/>
-    </svg>`;
+    const P = t.primary, S = t.secondary, A = t.accent, I = t.ink;
+    const shapes = {
+      quarter: 'M0 0 H30 A30 30 0 0 1 0 30 Z',
+      semi: 'M0 30 A15 15 0 0 1 30 30 Z',
+      circle: 'M15 0 A15 15 0 1 1 15 30 A15 15 0 1 1 15 0 Z',
+      square: 'M7 7 H23 V23 H7 Z',
+    };
+    // [background or null, shape, fill, rotation]
+    const cells = [
+      [S, 'quarter', A, 0], [null, 'circle', P, 0], [I, 'semi', S, 90],
+      [null, 'semi', I, 180], [P, 'quarter', I, 270], [A, 'circle', S, 0],
+      [I, 'quarter', P, 90], [S, 'semi', A, 0], [null, 'quarter', S, 180],
+    ];
+    const out = cells.map((c, i) => {
+      const x = (i % 3) * 30;
+      const y = Math.floor(i / 3) * 30;
+      return `<g transform="translate(${x} ${y})">${c[0] ? `<rect width="30" height="30" fill="${c[0]}"/>` : ''}`
+        + `<path d="${shapes[c[1]]}" fill="${c[2]}" transform="rotate(${c[3]} 15 15)"/></g>`;
+    }).join('');
+    return `<svg viewBox="0 0 90 90" width="100%" height="100%" focusable="false" shape-rendering="geometricPrecision">${out}</svg>`;
   },
 
   materials: [
-    { name: 'Flat form', css: 'background: {primary}; border: 2px solid {ink}; border-radius: 0; box-shadow: none; /* or border-radius: 999px; never in between */' },
-    { name: 'Outlined form', css: 'background: {canvas}; border: 2px solid {ink}; border-radius: 0; color: {ink};' },
-    { name: 'Primary action', css: 'background: {primary}; color: {onPrimary}; border: 2px solid {ink}; border-radius: 0; /* ends in an ink circle holding the arrow: background {ink}; color {canvas}; border-radius: 50% */' },
+    { name: 'Flat form (art)', css: 'background: {primary}; border: 0; border-radius: 0; box-shadow: none; /* art shapes are flat fills with no outlines; or a quarter circle, semicircle or circle in primary, secondary, accent or ink on a flat square plane */' },
+    { name: 'Control (UI)', css: 'background: {canvas}; border: 2px solid {ink}; border-radius: 0; color: {ink}; /* or border-radius: 999px; never in between */' },
+    { name: 'Primary action', css: 'background: {primary}; color: {onPrimary}; border: 2px solid {ink}; border-radius: 0; /* ends in an ink circle holding the arrow: background {ink}; color {canvas}; border-radius: 50%. Hover: background {ink}, color {canvas}; pressed: background {canvas}, color {ink}, translate(2px, 2px) */' },
+    { name: 'Highlight plane', css: 'background: {accent}; color: {onAccent}; border: 0; padding: 0 .1em; /* a flat accent plane behind one headline word, no outline */' },
     { name: 'Selected segment', css: 'background: {primary}; color: {onPrimary}; border: 2px solid {ink}; border-radius: 0; /* unselected: background {canvas}; color {ink} */' },
     { name: 'Field', css: 'background: transparent; border: 0; border-bottom: 3px solid {ink}; border-radius: 0; text-transform: uppercase; font-weight: 700;' },
     { name: 'Switch', css: 'track: 2px solid {ink}, border-radius 0, background {canvas} (off) or {primary} (on); knob: circle, background {ink}.' },
@@ -59,9 +76,9 @@ registerAesthetic({
 
   rules: {
     do: [
-      'Build with circles, half and quarter circles, rectangles and 45° or -15° bars; flat fills only.',
+      'Build art from circles, half and quarter circles and squares, tiled on a grid and rotated in 90° steps; flat fills only, with no outlines on art shapes.',
       'Make every control either square (radius 0) or fully round; nothing in between.',
-      'Draw every control and panel with a 2px ink border and set headlines in tight uppercase.',
+      'Draw every UI control and panel with a 2px ink border and set headlines in huge, tight uppercase.',
       'Let secondary and accent run as large flat planes in the poster art, and keep them small in the interface.',
     ],
     dont: [

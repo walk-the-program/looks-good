@@ -12,26 +12,30 @@
   border-radius: 6px;
 }
 
-/* paper grain: inline SVG noise over everything (multiply, ~10%) */
+/* paper grain: inline SVG noise. Behind the page content (z 0) so the headline stays
+   crisp; cards and art carry their own grain on top (--rz-grain). */
+.ab[data-ae="riso-print"] {
+  --rz-grain: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><filter id='n' x='0' y='0' width='100%25' height='100%25'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch' seed='7'/><feColorMatrix values='0 0 0 0 .25  0 0 0 0 .17  0 0 0 0 .1  2.4 0 0 0 -.85'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+  --rz-grain-op: 0.42;
+}
+.ab[data-ae="riso-print"][data-mode="dark"] {
+  --rz-grain: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><filter id='n' x='0' y='0' width='100%25' height='100%25'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch' seed='7'/><feColorMatrix values='0 0 0 0 .96  0 0 0 0 .92  0 0 0 0 .84  2.4 0 0 0 -.85'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+  --rz-grain-op: 0.28;
+}
 .ab[data-ae="riso-print"]::after {
-  content: ""; position: absolute; inset: 0; z-index: 5; pointer-events: none; opacity: 0.4;
-  mix-blend-mode: multiply; background-size: 240px 240px;
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><filter id='n' x='0' y='0' width='100%25' height='100%25'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch' seed='7'/><feColorMatrix values='0 0 0 0 .25  0 0 0 0 .17  0 0 0 0 .1  2.4 0 0 0 -.85'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+  content: ""; position: absolute; inset: 0; z-index: 0; pointer-events: none; opacity: calc(var(--rz-grain-op) * 0.6);
+  mix-blend-mode: var(--ab-blend); background-size: 240px 240px; background-image: var(--rz-grain);
 }
-.ab[data-ae="riso-print"][data-mode="dark"]::after {
-  mix-blend-mode: screen; opacity: 0.28;
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><filter id='n' x='0' y='0' width='100%25' height='100%25'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch' seed='7'/><feColorMatrix values='0 0 0 0 .96  0 0 0 0 .92  0 0 0 0 .84  2.4 0 0 0 -.85'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
-}
-/* a halftone corner of the second ink, fading out */
-.ab[data-ae="riso-print"]::before {
-  content: ""; position: absolute; right: -40px; top: -40px; width: 380px; height: 380px; z-index: 0; pointer-events: none; opacity: 0.2;
-  background: radial-gradient(circle, var(--ab-secondary) 1.5px, transparent 1.9px) 0 0 / 7px 7px;
-  -webkit-mask-image: radial-gradient(circle at 70% 30%, #000, transparent 68%); mask-image: radial-gradient(circle at 70% 30%, #000, transparent 68%);
+/* grain on cards, art cards and swatches (they paint over the page grain) */
+.ab[data-ae="riso-print"] .ab-card::after, .ab[data-ae="riso-print"] .rza-card::after {
+  content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none; z-index: 3;
+  mix-blend-mode: var(--ab-blend); background-size: 240px 240px; background-image: var(--rz-grain); opacity: var(--rz-grain-op);
 }
 
 /* labels: tracked caps, like zine captions */
 .ab[data-ae="riso-print"] .ab-label, .ab[data-ae="riso-print"] .ab-tag, .ab[data-ae="riso-print"] .ab-kicker, .ab[data-ae="riso-print"] .ab-sw-role, .ab[data-ae="riso-print"] .ab-fieldlabel, .ab[data-ae="riso-print"] .ab-state { text-transform: uppercase; font-weight: 700; letter-spacing: 0.15em; }
-.ab[data-ae="riso-print"] .ab-label { color: var(--ab-ink); font-size: 11px; display: inline-flex; align-items: center; }
+.ab[data-ae="riso-print"] .ab-label, .ab[data-ae="riso-print"] .ab-tag, .ab[data-ae="riso-print"] .ab-kicker, .ab[data-ae="riso-print"] .ab-fieldlabel, .ab[data-ae="riso-print"] .ab-state { font-weight: 600; letter-spacing: 0.1em; }
+.ab[data-ae="riso-print"] .ab-label { color: var(--ab-ink); font-size: 10.5px; display: inline-flex; align-items: center; }
 .ab[data-ae="riso-print"] .ab-label:last-child:not(:first-child) { color: var(--ab-muted); font-weight: 600; }
 .ab[data-ae="riso-print"] .ab-labelrow { align-items: center; padding-bottom: 9px; border-bottom: 1.5px dashed var(--ab-ink); }
 .ab[data-ae="riso-print"] .ab-n {
@@ -52,10 +56,12 @@
   display: inline-block; margin-bottom: 20px !important; padding: 4px 10px; border: var(--rz-line); color: var(--ab-ink);
   font-size: 11px; transform: rotate(-2deg); background: var(--ab-pri-tint);
 }
+/* one crisp ink: no text-shadow, no misregistration on type */
 .ab[data-ae="riso-print"] .ab-headline {
-  font-weight: 800; letter-spacing: -0.03em; line-height: 0.96; color: var(--ab-primary-text);
-  text-shadow: max(2px, 0.035em) max(1.5px, 0.028em) 0 var(--ab-secondary);
+  font-weight: 800; letter-spacing: -0.035em; line-height: 0.94; color: var(--ab-primary-text); text-transform: uppercase;
 }
+.ab[data-ae="riso-print"] .ab-subcopy { color: var(--ab-ink); font-size: clamp(13.5px, 1.5cqw, 16px); }
+.ab[data-ae="riso-print"] .ab-sub-rest { color: var(--ab-muted); }
 /* the accent word is circled in fluorescent ink, drawn by hand */
 .ab[data-ae="riso-print"] .ab-hl { position: relative; display: inline-block; color: inherit; padding: 0 0.04em; }
 .ab[data-ae="riso-print"] .ab-hl::after {
@@ -70,8 +76,18 @@
   content: ""; position: absolute; left: -0.1em; right: -0.1em; top: 0.04em; bottom: 0; z-index: -1; pointer-events: none;
   border-radius: 50%; background: var(--ab-accent); opacity: 0.5; mix-blend-mode: var(--ab-blend); transform: rotate(-2deg);
 }
-.ab[data-ae="riso-print"] .ab-art { max-width: 300px; }
-.ab[data-ae="riso-print"] .ab-art svg { display: block; overflow: visible; }
+/* art: a zine spread of three riso cards, each a flat ink with a second-ink shape on it */
+.ab[data-ae="riso-print"] .ab-art { max-width: 330px; aspect-ratio: 1.22 / 1; }
+.ab[data-ae="riso-print"] .rza { position: absolute; inset: 0; }
+.ab[data-ae="riso-print"] .rza-card {
+  position: absolute; width: 42%; aspect-ratio: 3 / 4; border-radius: 6px; overflow: hidden;
+  box-shadow: 0.8cqw 0.6cqw 0 color-mix(in srgb, var(--ab-ink) 16%, transparent);
+}
+.ab[data-ae="riso-print"] .rza-card svg { position: absolute; inset: 0; display: block; }
+.ab[data-ae="riso-print"] .rza-1 { left: 0; top: 14%; transform: rotate(-4deg); z-index: 1; }
+.ab[data-ae="riso-print"] .rza-2 { left: 29%; top: 0; transform: rotate(2deg); z-index: 2; }
+.ab[data-ae="riso-print"] .rza-3 { left: 58%; top: 19%; transform: rotate(-2.5deg); z-index: 3; }
+.ab[data-ae="riso-print"] .rza-cap { position: absolute; left: 1%; bottom: 0; font: 600 2.7cqw/1 ui-monospace, Menlo, monospace; letter-spacing: 0.1em; color: var(--ab-ink); }
 
 /* palette: inked chips with a dot grain */
 .ab[data-ae="riso-print"] .ab-chip { position: relative; overflow: hidden; border: var(--rz-line); border-radius: 3px; box-shadow: 2px 1.5px 0 var(--ab-plate); }
@@ -80,7 +96,7 @@
 .ab[data-ae="riso-print"] .ab-sw-hex { color: var(--ab-ink); }
 
 /* 01 interface: a paper card with the second ink printed off-register behind it */
-.ab[data-ae="riso-print"] .ab-card { border: var(--rz-line); border-radius: 4px; background: var(--ab-paper-card); box-shadow: 4px 3px 0 var(--ab-plate); }
+.ab[data-ae="riso-print"] .ab-card { position: relative; border: var(--rz-line); border-radius: 4px; background: var(--ab-paper-card); box-shadow: 4px 3px 0 var(--ab-plate); }
 .ab[data-ae="riso-print"] .ab-seg { gap: 6px; padding: 0; background: none; border-radius: 0; }
 .ab[data-ae="riso-print"] .ab-seg-btn {
   min-height: 38px; border: var(--rz-line); border-radius: 4px; color: var(--ab-ink); font-size: 11.5px; font-weight: 600; letter-spacing: 0.06em;
@@ -89,15 +105,17 @@
 .ab[data-ae="riso-print"] .ab-card-title { font-weight: 800; letter-spacing: -0.025em; }
 .ab[data-ae="riso-print"] .ab-card-body { color: var(--ab-ink); font-size: 13px; }
 .ab[data-ae="riso-print"] .ab-cta {
+  --rz-ox: 3px; --rz-oy: 2px;
   position: relative; border-radius: 2px; padding: 14px 16px; background: var(--rz-ink-dot), var(--ab-primary); color: var(--ab-on-primary);
   font-weight: 700; letter-spacing: 0.02em; transition: transform 0.12s;
 }
 .ab[data-ae="riso-print"] .ab-cta::after {
   content: ""; position: absolute; inset: 0; border: 1.5px solid var(--ab-secondary); border-radius: 2px; pointer-events: none;
-  transform: translate(3px, 2px); mix-blend-mode: var(--ab-blend);
+  transform: translate(var(--rz-ox), var(--rz-oy)); mix-blend-mode: var(--ab-blend); transition: transform 0.12s;
 }
-.ab[data-ae="riso-print"] .ab-cta:hover { transform: translate(-1px, -1px); }
-.ab[data-ae="riso-print"] .ab-cta:active { transform: translate(2px, 1px); }
+/* rest: second ink 3,2 off-register; hover: it drifts further; pressed: the inks register */
+.ab[data-ae="riso-print"] .ab-cta:hover, .ab[data-ae="riso-print"] .ab-cta.is-hover { --rz-ox: 5px; --rz-oy: 4px; transform: translate(-1px, -1px); }
+.ab[data-ae="riso-print"] .ab-cta:active, .ab[data-ae="riso-print"] .ab-cta.is-pressed { --rz-ox: 0px; --rz-oy: 0px; transform: translate(2px, 1px); }
 .ab[data-ae="riso-print"] .ab-cta-arrow::before { content: "→"; font-size: 17px; line-height: 1; }
 
 /* 02 ink */
@@ -117,19 +135,10 @@
 .ab[data-ae="riso-print"] .ab-switch:checked { background: var(--ab-primary); }
 .ab[data-ae="riso-print"] .ab-switch:checked::before { transform: translateX(24px); }
 .ab[data-ae="riso-print"] .ab-status { font-size: 11px; color: var(--ab-ink); font-style: italic; }
-.ab[data-ae="riso-print"] .ab-states { gap: 14px; margin-top: 22px; }
+.ab[data-ae="riso-print"] .ab-states { margin-top: 24px; }
+.ab[data-ae="riso-print"] .ab-states[data-kind="button"] { gap: 14px; }
+.ab[data-ae="riso-print"] .ab-states .ab-state-ctl { padding: 12px 8px; margin-bottom: 14px; }
 .ab[data-ae="riso-print"] .ab-state { color: var(--ab-ink); font-size: 10px; letter-spacing: 0.12em; }
-.ab[data-ae="riso-print"] .ab-disc { position: relative; width: 58px; height: 58px; border: 0; background: none; }
-.ab[data-ae="riso-print"] .ab-disc::before, .ab[data-ae="riso-print"] .ab-disc::after { content: ""; position: absolute; border-radius: 50%; }
-/* solid ink */
-.ab[data-ae="riso-print"] .ab-disc[data-s="0"]::before { inset: 3px; background: var(--ab-primary); }
-.ab[data-ae="riso-print"] .ab-disc[data-s="0"]::after { inset: 3px; border: 1.5px solid var(--ab-ink); }
-/* overprint: two inks, the overlap darkens */
-.ab[data-ae="riso-print"] .ab-disc[data-s="1"]::before { left: 0; top: 7px; width: 38px; height: 38px; background: var(--ab-primary); mix-blend-mode: var(--ab-blend); }
-.ab[data-ae="riso-print"] .ab-disc[data-s="1"]::after { left: 19px; top: 13px; width: 38px; height: 38px; background: var(--ab-secondary); mix-blend-mode: var(--ab-blend); }
-/* halftone */
-.ab[data-ae="riso-print"] .ab-disc[data-s="2"]::before { inset: 3px; background: radial-gradient(circle, var(--ab-secondary) 1.9px, transparent 2.3px) 0 0 / 6px 6px; }
-.ab[data-ae="riso-print"] .ab-disc[data-s="2"]::after { inset: 3px; border: 1.5px solid var(--ab-ink); }
 
 /* 03 in use: dashed rules, stamped statuses, halftone bars */
 .ab[data-ae="riso-print"] .ab-row { padding: 12px 2px; border-top: 1.5px dashed var(--ab-ink); font-size: 13.5px; }
@@ -147,7 +156,7 @@
 .ab[data-ae="riso-print"] .ab-row-pct { font-weight: 700; }
 
 @container ab (max-width: 600px) {
-  .ab[data-ae="riso-print"] .ab-art { max-width: 240px; }
+  .ab[data-ae="riso-print"] .ab-art { max-width: 280px; }
   .ab[data-ae="riso-print"] .ab-tag { max-width: 140px; font-size: 9px; letter-spacing: 0.1em; padding: 2px 6px; }
 }
 
@@ -158,5 +167,6 @@
 
 .ab[data-ae="riso-print"] .ab-seg-btn:focus-visible, .ab[data-ae="riso-print"] .ab-cta:focus-visible, .ab[data-ae="riso-print"] .ab-switch:focus-visible { outline: 2px solid var(--ab-ink); outline-offset: 3px; }
 @media (prefers-reduced-motion: reduce) {
-  .ab[data-ae="riso-print"] .ab-cta:hover, .ab[data-ae="riso-print"] .ab-cta:active { transform: none; }
+  .ab[data-ae="riso-print"] .ab-cta:hover, .ab[data-ae="riso-print"] .ab-cta:active, .ab[data-ae="riso-print"] .ab-cta.is-hover, .ab[data-ae="riso-print"] .ab-cta.is-pressed { transform: none; }
+  .ab[data-ae="riso-print"] .ab-cta, .ab[data-ae="riso-print"] .ab-cta::after { transition: none; }
 }

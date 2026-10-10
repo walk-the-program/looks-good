@@ -1,8 +1,12 @@
-/* 10 Riso Print — inked, grainy, human. Primary and secondary behave like two
-   riso inks printed on warm paper: they overprint (multiply), sit a few pixels
-   off-register on purpose, and shade with halftone dots. Accent is a third,
-   tiny fluorescent ink (a hand-drawn ring, a stamp). Paper grain is an inline
-   SVG feTurbulence data URI in css/aesthetics/riso-print.css. */
+/* 10 Riso Print — inked, grainy, human, in the editorial riso-zine mode: a
+   crisp single-ink headline on warm paper; grain and misregistration live on
+   the art, cards and swatches only. Primary and secondary behave like two riso
+   inks: they overprint (multiply), sit a few pixels off-register on purpose and
+   shade with halftone dots. Accent is a third, tiny fluorescent ink (a
+   hand-drawn ring, one art card, the footer dot). Paper grain is an inline SVG
+   feTurbulence data URI in css/aesthetics/riso-print.css. */
+(function () {
+let seq = 0;
 registerAesthetic({
   key: 'riso-print', order: 10,
   name: 'Riso Print',
@@ -13,7 +17,9 @@ registerAesthetic({
   kicker: 'Two inks, one pass',
   mode: 'light',
   slideShape: 'minimal',
-  labels: { material: 'Ink', states: ['Solid ink', 'Overprint', 'Halftone'] },
+  labels: { material: 'Ink', states: ['Rest', 'Hover', 'Pressed'], statesKind: 'button' },
+  type: { ui: 'sans', label: 'mono', display: 1.04 },
+  highlight: 'custom',
 
   roles: {
     canvas: {
@@ -21,16 +27,16 @@ registerAesthetic({
       never: 'Text, or a pure-white card that breaks the paper',
     },
     primary: {
-      use: 'The first ink: the headline, the one flat CTA block, selected segments and the "on" switch',
+      use: 'The first ink: the headline (one crisp ink, no shadow), the one flat CTA block, selected segments, the "on" switch and the first art card',
       never: 'Body text, a second CTA, smooth gradients',
     },
     secondary: {
-      use: 'The second ink: the misregistered shadow, halftone shading, the off-register plate behind panels and the overprinted art shape',
+      use: 'The second ink: the misregistered plate behind cards and the CTA, halftone shading and the overprinted shapes and second card in the art',
       never: 'The main CTA, body text, page background',
       coverage: '≈10–15%',
     },
     accent: {
-      use: 'A third fluorescent ink, used tiny: the hand-drawn ring around one headline word, a stamp or asterisk in the art, the footer dot',
+      use: 'A third fluorescent ink, used tiny: the hand-drawn ring around one headline word, the third art card and the footer dot',
       never: 'Buttons, body text, borders, large fills',
       coverage: '≤3%',
     },
@@ -50,48 +56,45 @@ registerAesthetic({
     };
   },
 
+  // A zine spread: three riso cards (primary, secondary, accent), each a flat
+  // ink color carrying one shape (circle, arch, zigzag) printed in a second ink
+  // with multiply, a solid pass plus a halftone pass 2 units off-register.
   art(ctx) {
     const t = ctx.t;
+    const id = 'rz' + (++seq);
     const blend = 'style="mix-blend-mode:var(--ab-blend,multiply)"';
-    // True halftone: a rotated grid of dots whose radius grows toward the
-    // lower right, clipped to the plate.
-    const x0 = 40, y0 = 28, w = 52, h = 60, step = 4.3, ang = 15 * Math.PI / 180;
-    const cx = x0 + w / 2, cy = y0 + h / 2;
-    let dots = '';
-    for (let i = -18; i <= 18; i++) {
-      for (let j = -18; j <= 18; j++) {
-        const gx = i * step, gy = j * step;
-        const x = cx + gx * Math.cos(ang) - gy * Math.sin(ang);
-        const y = cy + gx * Math.sin(ang) + gy * Math.cos(ang);
-        if (x < x0 - 2 || x > x0 + w + 2 || y < y0 - 2 || y > y0 + h + 2) continue;
-        const f = Math.min(1, Math.max(0, ((x - x0) / w) * 0.45 + ((y - y0) / h) * 0.55));
-        const r = (0.35 + 1.75 * Math.sqrt(f)).toFixed(2);
-        dots += `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${r}"/>`;
-      }
-    }
-    const mono = 'font-family="ui-monospace,Menlo,monospace"';
-    const reg = (x, y) => `<g stroke="${t.ink}" stroke-width=".5" fill="none"><circle cx="${x}" cy="${y}" r="2.6"/><path d="M${x - 4.2} ${y}H${x + 4.2}M${x} ${y - 4.2}V${y + 4.2}"/></g>`;
-    return `<svg viewBox="0 0 100 100" width="100%" height="100%" focusable="false">
-      <defs><clipPath id="rz-plate-${ctx.key}"><rect x="${x0}" y="${y0}" width="${w}" height="${h}"/></clipPath></defs>
-      <g ${blend}>
-        <g fill="${t.secondary}" clip-path="url(#rz-plate-${ctx.key})">${dots}</g>
-        <rect x="${x0}" y="${y0}" width="${w}" height="${h}" fill="none" stroke="${t.secondary}" stroke-width=".7"/>
-      </g>
-      <circle cx="37" cy="45" r="27.5" fill="${t.primary}" ${blend}/>
-      <circle cx="39.8" cy="47.4" r="27.5" fill="none" stroke="${t.secondary}" stroke-width=".9" ${blend}/>
-      <g ${blend} stroke="${t.accent}" stroke-width="3.4" stroke-linecap="round" fill="none">
-        <path d="M80 9V31M70.5 14.5L89.5 25.5M70.5 25.5L89.5 14.5"/>
-      </g>
-      <circle cx="80" cy="20" r="14.5" fill="none" stroke="${t.accent}" stroke-width="1" stroke-dasharray="1.2 2.2" ${blend}/>
-      ${reg(8, 92)}${reg(95, 52)}
-      <text x="40" y="95.5" font-size="3.1" fill="${t.ink}" ${mono} letter-spacing=".25">PLATE 1 + 2 · 2 INKS</text>
-    </svg>`;
+    const cards = [
+      { bg: t.primary, ink: t.secondary, shape: 'circle', cls: 'rza-1' },
+      { bg: t.secondary, ink: t.primary, shape: 'arch', cls: 'rza-2' },
+      { bg: t.accent, ink: t.primary, shape: 'zig', cls: 'rza-3' },
+    ];
+    const shapeSvg = (c, fill, extra) => {
+      if (c.shape === 'circle') return `<circle cx="30" cy="35" r="19" fill="${fill}" ${extra}/>`;
+      if (c.shape === 'arch') return `<path d="M11 62V37a19 19 0 0 1 38 0V62Z" fill="${fill}" ${extra}/>`;
+      return `<polyline points="7,52 19,24 31,52 43,24 55,52" fill="none" stroke="${fill}" stroke-width="8" stroke-linejoin="miter" stroke-miterlimit="4" ${extra}/>`;
+    };
+    const html = cards.map((c, i) => {
+      const on = t.readable(c.bg);
+      const pat = `${id}p${i}`;
+      return `<div class="rza-card ${c.cls}" style="background:${c.bg}">
+        <svg viewBox="0 0 60 80" width="100%" height="100%" focusable="false">
+          <defs><pattern id="${pat}" width="3.4" height="3.4" patternUnits="userSpaceOnUse" patternTransform="rotate(20)"><circle cx="1.7" cy="1.7" r="1.05" fill="${t.ink}"/></pattern></defs>
+          <g ${blend}>${shapeSvg(c, c.ink, c.shape === 'zig' ? 'stroke-opacity=".92"' : 'fill-opacity=".92"')}</g>
+          <g ${blend} transform="translate(2 2)" opacity=".55">${c.shape === 'zig'
+    ? `<polyline points="7,52 19,24 31,52 43,24 55,52" fill="none" stroke="url(#${pat})" stroke-width="8" stroke-linejoin="miter" stroke-miterlimit="4"/>`
+    : shapeSvg(c, `url(#${pat})`, '')}</g>
+          <text x="5" y="74.5" font-size="4.2" fill="${on}" font-family="ui-monospace,Menlo,monospace" letter-spacing=".3" opacity=".9">NO. 0${i + 1}</text>
+        </svg>
+      </div>`;
+    }).join('');
+    return `<div class="rza">${html}<span class="rza-cap">FIG. 01 · 3 INKS · 1 PASS</span></div>`;
   },
 
   materials: [
     { name: 'Solid ink block', css: 'background: radial-gradient(circle, {speck} .9px, transparent 1.2px) 0 0 / 4px 4px, {primary}; color: {onPrimary}; border-radius: 2px; /* flat ink with a grain of dots, never a smooth gradient */' },
     { name: 'Overprint', css: 'background: {secondary}; mix-blend-mode: multiply; transform: translate(3px, 2px); /* printed 2–3px off-register over the first ink; darkens where inks overlap */' },
     { name: 'Halftone shading', css: 'background: radial-gradient(circle, {secondary} 1.2px, transparent 1.6px) 0 0 / 6px 6px; /* dot size carries the shade; use for shading, not decoration */' },
+    { name: 'Riso art card', css: 'background: {primary}; border-radius: 6px; /* a flat ink color with grain; one shape printed in a second ink with multiply, a solid pass plus a halftone pass offset 2px; secondary and accent cards alongside it */' },
     { name: 'Paper card', css: 'background: {paperCard}; border: 1.5px solid {ink}; border-radius: 4px; box-shadow: 4px 3px 0 {plate}; /* the plate is the secondary ink printed off-register behind the card */' },
     { name: 'Paper grain', css: 'background-color: {canvas}; /* overlay: an inline SVG feTurbulence noise (baseFrequency .85, 2 octaves) as a data URI, mix-blend-mode: multiply, ~8% */' },
     { name: 'Accent ring', css: 'border: 2px solid {accent}; border-radius: 50%; transform: rotate(-3deg); mix-blend-mode: multiply; /* a hand-drawn ring around one word; third ink, tiny */' },
@@ -102,13 +105,16 @@ registerAesthetic({
       'Print with two inks only (primary and secondary); let them overlap with multiply so the third color appears where they cross.',
       'Misregister on purpose: shift the second ink 2–3px and keep it consistent across the board.',
       'Shade with halftone dots whose size changes, not with smooth gradients or soft shadows.',
-      'Keep the accent tiny and hand-drawn: one ring, one stamp, one dot.',
+      'Keep the accent tiny and hand-drawn: one ring, one art card, one dot.',
+      'Set the headline in one crisp ink (primary) with no shadow; grain and misregistration belong to art, cards and swatches.',
     ],
     dont: [
       'Use gradients, blur, glow or soft drop shadows; every edge is a printed edge.',
       'Fill large areas with the accent or run body text in either ink.',
+      'Offset or blur the headline text with a shadow; it reads as a smudge, not a second ink.',
       'Align the two inks perfectly, or add more than two inks.',
       'Print flat white cards on the paper; panels stay paper-toned with an ink outline.',
     ],
   },
 });
+})();

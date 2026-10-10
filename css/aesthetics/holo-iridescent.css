@@ -1,13 +1,18 @@
 /* ---------------------------------------------------------------------
-   06 Holo Iridescent — pearl surfaces, 1px holographic edges, chrome pills,
-   a static foil sheen. The spectrum is decorative and fixed; variables
-   (--ab-pearl, --ab-spec-conic, --ab-card-solid, --ab-chrome ...) come from
+   06 Holo Iridescent — thin chromatic light on near-black: a thin-film bubble
+   rim and a spectral ribbon, panels with a 1px iridescent hairline, chrome
+   pills, a solid CTA with a spectral top edge. Light mode is a quiet pearl.
+   The spectrum is decorative and fixed; variables (--ab-pearl, --ab-spec-conic,
+   --ab-rim-conic, --ab-card-solid, --ab-chrome ...) come from
    js/aesthetics/holo-iridescent.js tokens(). Nothing here moves.
+   Layout hooks: hero 'centered', type ui/label 'sans', states 'chip'.
 ------------------------------------------------------------------------ */
 
 .ab[data-ae="holo-iridescent"] {
   --ho-edge: linear-gradient(var(--ab-card-solid), var(--ab-card-solid)) padding-box, var(--ab-spec-conic) border-box;
   --ho-knob: radial-gradient(circle at 35% 28%, #fff 0, #eceef2 32%, #c9ccd4 72%, #f4f4f6);
+  --ab-art-ratio: 2.15 / 1;
+  --ab-art-ratio-narrow: 3 / 2;
   border-radius: 24px;
   background: var(--ab-pearl), var(--ab-canvas);
 }
@@ -21,7 +26,7 @@
 }
 .ab[data-ae="holo-iridescent"] .ab-tag { font-size: 10px; letter-spacing: 0.24em; }
 .ab[data-ae="holo-iridescent"] .ab-rule {
-  background: var(--ab-spec-linear);
+  background: var(--ab-spec-linear); opacity: 0.7;
   -webkit-mask: linear-gradient(90deg, transparent, #000 14%, #000 86%, transparent);
   mask: linear-gradient(90deg, transparent, #000 14%, #000 86%, transparent);
 }
@@ -30,46 +35,71 @@
 .ab[data-ae="holo-iridescent"] .ab-label { font-size: 10.5px; font-weight: 500; letter-spacing: 0.24em; }
 .ab[data-ae="holo-iridescent"] .ab-n { color: var(--ab-ink); }
 
-/* hero */
+/* hero: a centred statement over a stage with a thin-film bubble and a ribbon */
 .ab[data-ae="holo-iridescent"] .ab-kicker { letter-spacing: 0.28em; font-size: 10.5px; }
-.ab[data-ae="holo-iridescent"] .ab-headline { font-weight: 500; letter-spacing: -0.04em; line-height: 1.02; }
+.ab[data-ae="holo-iridescent"] .ab-headline { font-weight: 500; letter-spacing: -0.045em; line-height: 1; }
+.ab[data-ae="holo-iridescent"] .ab-subcopy { margin-top: clamp(14px, 2cqw, 22px) !important; }
 .ab[data-ae="holo-iridescent"] .ab-hl {
-  color: var(--ab-accent-text);
+  color: var(--ab-accent-ink);
   background: var(--ab-hl-fill); -webkit-background-clip: text; background-clip: text;
   -webkit-text-fill-color: transparent;
   -webkit-box-decoration-break: clone; box-decoration-break: clone;
   padding-right: 0.06em;
 }
 
-/* art: orb + Saturn ring + foil ribbon */
-.ab[data-ae="holo-iridescent"] .ab-art { max-width: 300px; }
-.ab[data-ae="holo-iridescent"] .hoa { position: absolute; inset: 0; }
+/* art stage: open space; the bubble and ribbon float on the canvas */
+.ab[data-ae="holo-iridescent"] .ab-art { overflow: hidden; border-radius: clamp(18px, 2.6cqw, 26px); }
+.ab[data-ae="holo-iridescent"] .hoa { position: absolute; inset: 0; --hob-d: 36cqw; }
 .ab[data-ae="holo-iridescent"] .hoa i { position: absolute; display: block; }
-.ab[data-ae="holo-iridescent"] .hoa-orb {
-  left: 17%; top: 21%; width: 58%; height: 58%; border-radius: 50%;
+.ab[data-ae="holo-iridescent"] .hoa-bloom {
+  inset: 0; background:
+    radial-gradient(34% 70% at 50% 50%, var(--ab-rim-glow), transparent 70%);
+  filter: blur(14px); opacity: 0.9;
+}
+.ab[data-ae="holo-iridescent"] .hob {
+  position: absolute; left: 50%; top: 50%; width: var(--hob-d); aspect-ratio: 1; transform: translate(-50%, -50%);
+}
+.ab[data-ae="holo-iridescent"] .hob > i { inset: 0; border-radius: 50%; }
+.ab[data-ae="holo-iridescent"] .hob-halo {
+  inset: -9% !important; background: radial-gradient(circle, transparent 60%, var(--ab-rim-glow) 70%, transparent 76%);
+  filter: blur(9px);
+}
+/* transparent centre, faint spectral tint toward the edge */
+.ab[data-ae="holo-iridescent"] .hob-body {
   background:
-    radial-gradient(circle at 30% 23%, #fff 0, rgba(255, 255, 255, 0.72) 13%, rgba(255, 255, 255, 0) 38%),
-    radial-gradient(circle at 74% 86%, rgba(255, 255, 255, 0.45), transparent 42%),
-    var(--ab-spec-conic);
-  box-shadow: inset -3cqw -4cqw 8cqw rgba(70, 40, 150, 0.26), inset 0 0 0 1px rgba(255, 255, 255, 0.7),
-    0 8cqw 12cqw -5cqw rgba(120, 90, 210, 0.5);
+    radial-gradient(circle at 34% 28%, rgba(255, 255, 255, 0.1), transparent 34%),
+    radial-gradient(circle, transparent 54%, color-mix(in srgb, var(--ab-rim-glow) 40%, transparent) 84%, var(--ab-rim-glow) 100%);
 }
-.ab[data-ae="holo-iridescent"] .hoa-ribbon {
-  left: -6%; top: 46%; width: 112%; height: 13%; border-radius: 99px; transform: rotate(-32deg);
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0) 46%, rgba(40, 20, 90, 0.12)), var(--ab-spec-linear);
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.65), 0 3cqw 6cqw -2cqw rgba(110, 80, 190, 0.45);
+/* the thin film: a blurred 1.5px conic ring, plus a fainter inner ring and a hot top-left */
+.ab[data-ae="holo-iridescent"] .hob-rim {
+  background: var(--ab-rim-conic);
+  -webkit-mask: radial-gradient(circle farthest-side, transparent calc(100% - 3px), #000 calc(100% - 1.6px), #000 calc(100% - 0.6px), transparent 100%);
+  mask: radial-gradient(circle farthest-side, transparent calc(100% - 3px), #000 calc(100% - 1.6px), #000 calc(100% - 0.6px), transparent 100%);
+  filter: blur(0.8px);
 }
-.ab[data-ae="holo-iridescent"] .hoa-ring {
-  left: -1%; top: 34%; width: 94%; height: 32%; border-radius: 50%; transform: rotate(-20deg);
-  border: 0.6cqw solid var(--ab-primary);
+.ab[data-ae="holo-iridescent"] .hob-film {
+  inset: 3.6% !important; background: var(--ab-rim-conic-2); opacity: 0.5;
+  -webkit-mask: radial-gradient(circle farthest-side, transparent calc(100% - 2px), #000 calc(100% - 1px), transparent 100%);
+  mask: radial-gradient(circle farthest-side, transparent calc(100% - 2px), #000 calc(100% - 1px), transparent 100%);
+  filter: blur(1.4px);
 }
-.ab[data-ae="holo-iridescent"] .hoa-ring-f { clip-path: inset(50% 0 0 0); }
-.ab[data-ae="holo-iridescent"] .hoa-star {
-  background: var(--ab-spec-conic);
-  clip-path: polygon(50% 0, 60% 40%, 100% 50%, 60% 60%, 50% 100%, 40% 60%, 0 50%, 40% 40%);
+.ab[data-ae="holo-iridescent"] .hob-rim-hi {
+  background: conic-gradient(from 238deg, transparent 0deg, rgba(255, 255, 255, 0.95) 38deg, transparent 96deg);
+  -webkit-mask: radial-gradient(circle farthest-side, transparent calc(100% - 4.4px), #000 calc(100% - 2.4px), #000 calc(100% - 1px), transparent 100%);
+  mask: radial-gradient(circle farthest-side, transparent calc(100% - 4.4px), #000 calc(100% - 2.4px), #000 calc(100% - 1px), transparent 100%);
+  filter: blur(1.6px);
 }
-.ab[data-ae="holo-iridescent"] .hoa-star-1 { left: 76%; top: 8%; width: 14%; height: 14%; }
-.ab[data-ae="holo-iridescent"] .hoa-star-2 { left: 6%; top: 74%; width: 9%; height: 9%; }
+.ab[data-ae="holo-iridescent"] .hob-arcs { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+.ab[data-ae="holo-iridescent"] .hoa-ribbon { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+.ab[data-ae="holo-iridescent"] .hoa-bead {
+  width: 1.9cqw; height: 1.9cqw; margin: -0.95cqw 0 0 -0.95cqw; border-radius: 50%;
+  background: radial-gradient(circle at 34% 28%, #fff, transparent 55%), var(--ab-primary);
+  box-shadow: 0 0 0 0.35cqw color-mix(in srgb, var(--ab-primary) 30%, transparent), 0 0 2.4cqw color-mix(in srgb, var(--ab-primary) 75%, transparent);
+}
+@container (max-width: 420px) {
+  .ab[data-ae="holo-iridescent"] .hoa { --hob-d: 50cqw; }
+  .ab[data-ae="holo-iridescent"] .hoa-bead { width: 3cqw; height: 3cqw; margin: -1.5cqw 0 0 -1.5cqw; }
+}
 
 /* palette: pearl chips with a holographic rim */
 .ab[data-ae="holo-iridescent"] .ab-chip {
@@ -91,7 +121,7 @@
 /* pearl panels with a holographic hairline edge */
 .ab[data-ae="holo-iridescent"] .ab-card, .ab[data-ae="holo-iridescent"] .ab-panel, .ab[data-ae="holo-iridescent"] .ab-list {
   border: 1px solid transparent; border-radius: 20px; background: var(--ho-edge);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7), var(--ab-lift);
+  box-shadow: inset 0 1px 0 var(--ab-hl-line), var(--ab-lift);
 }
 .ab[data-ae="holo-iridescent"] .ab-panel { padding: clamp(18px, 2.8cqw, 26px); }
 
@@ -103,12 +133,19 @@
   box-shadow: inset 0 1px 0 #fff, 0 0 0 1px rgba(255, 255, 255, 0.7), 0 3px 8px -2px rgba(20, 20, 50, 0.3);
 }
 .ab[data-ae="holo-iridescent"] .ab-card-title { font-weight: 500; letter-spacing: -0.03em; }
+/* the main action: a solid primary with a thin spectral line along the top edge */
 .ab[data-ae="holo-iridescent"] .ab-cta {
-  padding: 14px 18px; border: 1px solid transparent; border-radius: 12px; font-weight: 600; letter-spacing: 0.02em;
-  background: var(--ab-foil-sheen) padding-box, linear-gradient(var(--ab-primary), var(--ab-primary)) padding-box, var(--ab-spec-conic) border-box;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35), 0 12px 24px -10px color-mix(in srgb, var(--ab-primary) 60%, transparent);
+  position: relative; padding: 14px 18px; border: 0; border-radius: 12px; font-weight: 600; letter-spacing: 0.02em;
+  background: var(--ab-primary);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.22), 0 12px 24px -12px var(--ab-cta-glow);
+  transition: filter 0.15s, transform 0.12s;
 }
-.ab[data-ae="holo-iridescent"] .ab-cta:active { transform: translateY(1px); }
+.ab[data-ae="holo-iridescent"] .ab-cta::before {
+  content: ""; position: absolute; left: 14px; right: 14px; top: -1px; height: 1.5px; border-radius: 2px;
+  background: var(--ab-spec-linear); pointer-events: none;
+}
+.ab[data-ae="holo-iridescent"] .ab-cta:hover, .ab[data-ae="holo-iridescent"] .ab-cta.is-hover { filter: brightness(1.08) saturate(1.05); }
+.ab[data-ae="holo-iridescent"] .ab-cta:active, .ab[data-ae="holo-iridescent"] .ab-cta.is-pressed { transform: translateY(1px); filter: brightness(0.94); }
 
 /* 02 finish */
 .ab[data-ae="holo-iridescent"] .ab-fieldlabel { font-size: 10.5px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--ab-muted); }
@@ -132,19 +169,22 @@
 }
 .ab[data-ae="holo-iridescent"] .ab-switch:checked { background: var(--ab-primary); border-color: transparent; box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.25); }
 .ab[data-ae="holo-iridescent"] .ab-switch:checked::before { transform: translateX(24px); }
-.ab[data-ae="holo-iridescent"] .ab-disc { width: 54px; height: 54px; border: 1px solid var(--ab-hair-strong); }
-.ab[data-ae="holo-iridescent"] .ab-disc[data-s="0"] { background: color-mix(in srgb, var(--ab-ink) 8%, var(--ab-card-solid)); }
-.ab[data-ae="holo-iridescent"] .ab-disc[data-s="1"] {
-  border-color: rgba(255, 255, 255, 0.8);
-  background: radial-gradient(circle at 30% 24%, #fff, rgba(255, 255, 255, 0) 58%), linear-gradient(135deg, #ffd6f0, #c9f6ff 50%, #e3d4ff);
-  box-shadow: inset 0 -5px 10px rgba(110, 80, 190, 0.14), 0 8px 16px -8px rgba(110, 80, 190, 0.4);
+/* states: three finishes shown as chips */
+.ab[data-ae="holo-iridescent"] .ab-states { gap: 10px; margin-top: 22px; }
+.ab[data-ae="holo-iridescent"] .ab-state-chip {
+  padding: 10px 18px; font-size: 12px; font-weight: 500; letter-spacing: 0.04em; color: var(--ab-ink);
+  border: 1px solid var(--ab-hair-strong); background: color-mix(in srgb, var(--ab-ink) 7%, var(--ab-card-solid));
 }
-.ab[data-ae="holo-iridescent"] .ab-disc[data-s="2"] {
-  border-color: rgba(255, 255, 255, 0.85);
-  background: radial-gradient(circle at 30% 22%, rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0) 38%), var(--ab-spec-conic);
-  box-shadow: inset 0 -5px 10px rgba(70, 40, 150, 0.2), 0 8px 18px -6px rgba(120, 90, 210, 0.55);
+.ab[data-ae="holo-iridescent"] .ab-state-chip[data-s="1"] {
+  border-color: rgba(255, 255, 255, 0.85); color: var(--ab-chrome-ink);
+  background: radial-gradient(circle at 28% 18%, #fff, rgba(255, 255, 255, 0) 60%), linear-gradient(135deg, #ffd6f0, #c9f6ff 50%, #e3d4ff);
+  box-shadow: inset 0 -4px 8px rgba(110, 80, 190, 0.14), 0 6px 16px -8px var(--ab-rim-glow);
 }
-.ab[data-ae="holo-iridescent"] .ab-state { letter-spacing: 0.1em; text-transform: uppercase; font-size: 10px; }
+.ab[data-ae="holo-iridescent"] .ab-state-chip[data-s="2"] {
+  border-color: transparent;
+  background: linear-gradient(var(--ab-card-solid), var(--ab-card-solid)) padding-box, var(--ab-spec-conic) border-box;
+  box-shadow: 0 0 18px -6px var(--ab-rim-glow);
+}
 
 /* 03 in use: chrome hairlines, tiny spectral dots */
 .ab[data-ae="holo-iridescent"] .ab-list { padding: 4px clamp(16px, 2.6cqw, 24px); }
@@ -153,7 +193,7 @@
   gap: 4px clamp(12px, 2.2cqw, 20px); padding: 14px 2px; border: 0;
   background:
     linear-gradient(90deg, transparent, var(--ab-hair-strong) 18%, var(--ab-hair-strong) 82%, transparent) top / 100% 1px no-repeat,
-    linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.9) 18%, rgba(255, 255, 255, 0.9) 82%, transparent) 0 1px / 100% 1px no-repeat;
+    linear-gradient(90deg, transparent, var(--ab-hl-line) 18%, var(--ab-hl-line) 82%, transparent) 0 1px / 100% 1px no-repeat;
 }
 .ab[data-ae="holo-iridescent"] .ab-row:first-child { background: none; }
 .ab[data-ae="holo-iridescent"] .ab-row:last-child { border: 0; }
@@ -182,10 +222,11 @@
 }
 
 @container ab (max-width: 600px) {
+  .ab[data-ae="holo-iridescent"] .ab-tag { max-width: 170px; letter-spacing: 0.14em; }
+  .ab[data-ae="holo-iridescent"] .ab-label, .ab[data-ae="holo-iridescent"] .ab-kicker { letter-spacing: 0.16em; }
   .ab[data-ae="holo-iridescent"] .ab-row { grid-template-columns: 9px minmax(0, 1fr) auto 4.5ch; }
-  .ab[data-ae="holo-iridescent"] .ab-art { max-width: 240px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .ab[data-ae="holo-iridescent"] .ab-cta:active { transform: none; }
+  .ab[data-ae="holo-iridescent"] .ab-cta:active, .ab[data-ae="holo-iridescent"] .ab-cta.is-pressed { transform: none; }
 }

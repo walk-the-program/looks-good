@@ -1,7 +1,10 @@
 /* 01 Soft Form — warm, graphic, tactile. Materials follow the
    soft-form-design skill: same-color raised/recessed surfaces lit from a
    fixed top-left light, an iridescent glass panel, a glossy primary. The art
-   is a new composition built from those materials (not the reference's). */
+   is a new composition built from those materials (not the reference's):
+   a recessed well, a raised disc, a primary semicircle and a slim glass bar
+   lens. Reference proportions: the approved Soft Form board (large tight
+   headline, flat swatches, few large forms). */
 registerAesthetic({
   key: 'soft-form', order: 1,
   name: 'Soft Form',
@@ -13,6 +16,10 @@ registerAesthetic({
   mode: 'dark',
   slideShape: 'soft',
   labels: { material: 'Touch & depth', states: ['Flat', 'Raised', 'Recessed'] },
+  // Flat / Raised / Recessed discs are the point of this aesthetic, so the
+  // states row stays 'swatch'. The accent word is shaded text, not a band.
+  type: { ui: 'sans', label: 'sans', display: 1.12 },
+  highlight: 'ink',
 
   roles: {
     ink: {
@@ -43,14 +50,18 @@ registerAesthetic({
 
   art(ctx) {
     // One scene, drawn twice: once as the art and once, scaled and offset,
-    // inside the lens (simulated refraction, clipped and decorative).
-    const scene = '<i class="sfa-plinth"></i><i class="sfa-dome"></i><i class="sfa-disc"></i><i class="sfa-bar"></i>';
+    // inside the lens (simulated refraction, clipped and decorative). Few, large
+    // forms: a recessed well, a raised canvas disc off-centre inside it, a
+    // primary semicircle, and a slim glass bar crossing the semicircle and the
+    // well rim.
+    const scene = '<i class="sfa-well"></i><i class="sfa-disc"></i><i class="sfa-semi"></i>';
     return `<div class="sfa"><div class="sfa-scene">${scene}</div>`
-      + abLens(scene, { x: 40, y: 20, w: 44, h: 46, scale: 1.22, dx: -2.5, dy: -1.5, cls: 'sfa-lens' })
+      + abLens(scene, { x: 61, y: 5, w: 15, h: 90, scale: 1.24, dx: 3, dy: 0, cls: 'sfa-lens' })
       + '</div>';
   },
 
   materials: [
+    { name: 'Recessed well', css: 'background: {canvas}; border-radius: 50%; box-shadow: inset 9px 9px 20px {lo}, inset -9px -9px 20px {hi};' },
     { name: 'Raised control', css: 'background: {canvas}; box-shadow: 6px 6px 13px {lo}, -6px -6px 13px {hi};' },
     { name: 'Recessed field', css: 'background: {canvas}; box-shadow: inset 6px 6px 13px {lo}, inset -6px -6px 13px {hi}; border-radius: 12px;' },
     { name: 'Glass panel', css: 'background: linear-gradient(135deg, {gloss}, transparent 48%), {canvas}; border: 1px solid {rim}; border-radius: 24px; box-shadow: inset 1px 1px 2px rgba(255,255,255,.5), inset -1px -1px 2px rgba(255,255,255,.15), 6px 9px 20px {lo}, -4px -4px 12px {hi}; /* plus a 1.5px iridescent ring: white, cyan, lilac, peach */' },
