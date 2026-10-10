@@ -8,7 +8,12 @@
      Patterns.inksFor(stateOrTokens, colorway, {tints})
      Patterns.render(canvas, key, params, inks, seed, opts)   -> {ms,w,h}
      Patterns.renderSVG(key, params, inks, seed, opts)        -> string|null
+         opts.tile = true: a seamless repeating tile (seamless vector families only,
+         else null), grain forced to 0; same composition as tileCSS at any size
+     Patterns.tileSVG(key, params, inks, seed, size)          -> svg|null  (size 16..512, default 160)
      Patterns.tileCSS(key, params, inks, seed, size)          -> css|null
+     Patterns.finalInks(key, params, inks)                    -> the inks a render actually uses
+         (the + tints toggle and tone applied), for hex readouts
    Patterns.E holds shared helpers used by the family files.
 
    Tone (quiet patterns). `tone` is a common numeric param, 0..1, default 1:
@@ -597,11 +602,12 @@
     };
   }
 
-  function runFamily(surface, fam, W, H, params, inks, seed, opts) {
-    const p = resolveParams(fam, params);
+  // The inks a family actually draws with: the "+ tints" toggle honoured even when the
+  // caller built inks without it, then quiet tone applied (every non-ground ink moves
+  // toward the ground; spark keeps its colour).
+  function finalizeInks(inks, p) {
     const ink = Object.assign({}, inks);
     if (p.tints !== ink.tints) {
-      // honour the tints toggle even when the caller built inks without it
       ink.tints = p.tints;
       ink.pool = p.tints ? [ink.ink1, ink.ink2, ink.t1, ink.t2] : [ink.ink1, ink.ink2];
       const cand = [ink.ground, ink.ink2, ink.ink1, ink.deep].concat(p.tints ? [ink.t1, ink.t2] : []);
@@ -610,7 +616,6 @@
     }
     const tone = clamp(Number(p.tone), 0, 1);
     if (tone < 1) {
-      // quiet: every non-ground ink moves toward the ground; spark keeps its colour
       const q = c => mix(c, ink.ground, tone);
       ink.ink1 = q(ink.ink1); ink.ink2 = q(ink.ink2); ink.deep = q(ink.deep);
       ink.t1 = q(ink.t1); ink.t2 = q(ink.t2); ink.mute = q(ink.mute);
@@ -619,6 +624,18 @@
       const ramp = []; cand.forEach(c => { if (ramp.indexOf(c) < 0) ramp.push(c); });
       ramp.sort((a, b) => lum(b) - lum(a)); ink.ramp = ramp;
     }
+    return { ink, tone };
+  }
+
+  Patterns.finalInks = function (key, params, inks) {
+    const fam = families.get(key);
+    if (!fam) return null;
+    return finalizeInks(inks, resolveParams(fam, params)).ink;
+  };
+
+  function runFamily(surface, fam, W, H, params, inks, seed, opts) {
+    const p = resolveParams(fam, params);
+    const { ink, tone } = finalizeInks(inks, p);
     const env = makeEnv(W, H, seed, fam.key, opts, tone);
     const rng = makeRng(seed, fam.key);
     const noise = makeNoise(hashSeed(seed) + ':' + fam.key);
@@ -647,10 +664,22 @@
     const fam = families.get(key);
     if (!fam || !fam.vector) return null;
     opts = Object.assign({ dpr: 1 }, opts || {});
+    if (opts.tile) {
+      // seamless repeating tile: only for families that wrap, and without the grain
+      // filter (it would not tile)
+      if (!fam.seamless) return null;
+      params = Object.assign({}, params, { grain: 0 });
+      if (!opts.width && !opts.height) opts.width = opts.height = 160;
+    }
     const { W, H } = sizeFor(fam, opts, null);
     const surface = new SvgSurface(W, H);
     const p = runFamily(surface, fam, W, H, params, inks, seed, opts);
     return surface.toString(grainSVG(p.grain, seed, W, H));
+  };
+
+  Patterns.tileSVG = function (key, params, inks, seed, size) {
+    size = clamp(Math.round(size || 160), 16, 512);
+    return Patterns.renderSVG(key, params, inks, seed, { width: size, height: size, tile: true });
   };
 
   Patterns.tileCSS = function (key, params, inks, seed, size) {

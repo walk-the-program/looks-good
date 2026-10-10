@@ -323,6 +323,7 @@
         <svg class="ico" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9z"/><path d="M19 15l.7 1.8L21.5 17.5l-1.8.7L19 20l-.7-1.8-1.8-.7 1.8-.7z"/></svg>
         Copy AI brief
       </button>
+      <button type="button" id="aibNote" class="aib-note is-empty" aria-haspopup="dialog" aria-controls="briefTray" title="Open the patterns in your AI brief">No patterns added</button>
       <button id="exportCss" class="btn btn-ghost btn-block">
         <svg class="ico" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
         Copy brand as CSS
@@ -357,6 +358,10 @@
             <label><input type="radio" name="boardView" value="compare" /> Compare all</label>
             <label><input type="radio" name="boardView" value="patterns" /> Patterns</label>
           </div>
+          <button type="button" id="briefCart" class="btn btn-ghost btn-small cart-btn is-empty" aria-haspopup="dialog" aria-expanded="false" aria-controls="briefTray" title="Patterns in your AI brief">
+            <svg class="ico" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 8h14l-1 12H6z"/><path d="M9 8V6.5a3 3 0 0 1 6 0V8"/></svg>
+            Brief · <span id="briefCartCount">0</span>
+          </button>
           <button id="exportPalettePng" class="btn btn-ghost btn-small">
             <svg class="ico" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M21 21H3"/></svg>
             Export PNG
@@ -417,6 +422,22 @@
 
 <div class="toast" id="toast"></div>
 
+<div class="cart-backdrop" id="briefBackdrop" hidden></div>
+<section class="cart-tray" id="briefTray" role="dialog" aria-modal="true" aria-labelledby="briefTrayTitle" tabindex="-1" hidden>
+  <header class="cart-head">
+    <h2 id="briefTrayTitle">In your brief</h2>
+    <span class="cart-count" id="briefTrayCount"></span>
+    <button type="button" class="cart-x" id="briefTrayClose" aria-label="Close" title="Close (Esc)">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>
+    </button>
+  </header>
+  <div class="cart-body" id="briefTrayBody"></div>
+  <footer class="cart-foot">
+    <button type="button" class="btn btn-primary btn-small" id="briefCopyFull">Copy full AI brief</button>
+    <button type="button" class="btn btn-ghost btn-small" id="briefCopyPatterns">Copy patterns only</button>
+  </footer>
+</section>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="js/library-store.js"></script>
@@ -461,6 +482,7 @@
 <script src="js/patterns/fit.js"></script>
 <script src="js/patterns-ui.js"></script>
 <script src="js/patterns-deck.js"></script>
+<script src="js/pattern-cart.js"></script>
 <script src="js/persistence.js"></script>
 <script src="js/undo-history.js"></script>
 <script src="js/brand-guide.js"></script>

@@ -1,8 +1,8 @@
 /* ---------------------------------------------------------------------
    patterns-deck.js — patterns in the Brand deck (js/brand-deck.js).
 
-   1. A "Patterns" slide after "Material & graphics": a wall of the pinned
-      patterns (or the aesthetic's six-pattern suite when nothing is pinned).
+   1. A "Patterns" slide after "Material & graphics": a wall of the patterns in
+      the brief (state.patterns; or the aesthetic's six-pattern suite when none).
    2. deckPatternHook: the closing slide gets a full-height pattern strip down
       its left edge (css/patterns.css pads the slide content away from it); the
       cover gets a full-width, 132px band along the bottom (css/brand-deck.css
@@ -34,7 +34,7 @@
   const famName = key => (P.get(key) || {}).name || key;
   const cwLabel = v => (P.E.COLORWAYS.find(c => c.value === v) || {}).label || v;
 
-  // Quiet tone (0-1). A suite entry carries it as `tone` (or in params); pins keep it in params.
+  // Quiet tone (0-1). A suite entry carries it as `tone` (or in params); entries in the brief keep it in params.
   const toneOf = (en, src) => {
     const v = [src && src.tone, en.params && en.params.tone].find(x => x != null && isFinite(x));
     return v == null ? 1 : Math.max(0, Math.min(1, Number(v)));
@@ -51,7 +51,7 @@
     }).filter(Boolean);
   }
 
-  // The patterns shown on the wall: pinned ones, else the suite.
+  // The patterns shown on the wall: the ones in the brief, else the suite.
   function wallEntries(state, def) {
     const pinned = PatternPins.normalizeList(state.patterns).slice(0, 6);
     return pinned.length ? { pinned: true, list: pinned } : { pinned: false, list: suiteEntries(def) };
@@ -86,13 +86,13 @@
           <figcaption><span class="ab-label">${e(famName(en.key))}</span><span class="ab-label ab-deck-ptcw">${e(cwLabel(en.colorway))}</span></figcaption>
         </figure>`).join('');
       return `<div class="ab-deck-patterns">
-        <div class="ab-labelrow"><span class="ab-label">${pinned ? 'Pinned patterns' : 'Pattern suite'}</span><span class="ab-label">${e(def.name)}</span></div>
+        <div class="ab-labelrow"><span class="ab-label">${pinned ? 'Patterns in the brief' : 'Pattern suite'}</span><span class="ab-label">${e(def.name)}</span></div>
         <div class="ab-deck-ptgrid" data-n="${n}">${tiles}</div>
       </div>`;
     },
   }, 'material');
 
-  // The first pinned pattern, else the first of the suite.
+  // The first pattern in the brief, else the first of the suite.
   const leadEntry = Parts => (PatternPins.normalizeList(Parts.state.patterns)[0]) || suiteEntries(Parts.def)[0];
 
   // Cover: a full-width bottom band. Closing: a strip down the left edge.

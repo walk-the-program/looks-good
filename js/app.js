@@ -24,7 +24,7 @@ const state = {
   aesthetic: 'soft-form',   // key into AESTHETICS (js/aesthetics/registry.js)
   locks: { typography: false, color: false, shape: false, aesthetic: false },
   dismissed: [],   // suggestion ids dismissed for this brand
-  patterns: [],    // pinned patterns: [{ key, params, colorway, seed }] (js/patterns-ui.js)
+  patterns: [],    // patterns in the brief (the cart): [{ key, params, colorway, seed, use, svg }] (js/patterns-ui.js)
 };
 
 function pickRandom(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
@@ -321,6 +321,7 @@ function render() {
   if (window.syncFontPickers) syncFontPickers();
   renderFindings();
   renderBrandDeck();
+  if (typeof PatternCart !== 'undefined') PatternCart.refresh();   // brief cart: count, sidebar line, open tray
 }
 
 /* ---------------- Toast + export ---------------- */
@@ -610,7 +611,7 @@ function wireEvents() {
     if (e.repeat) return true;
     if (e.ctrlKey || e.metaKey || e.altKey || e.shiftKey) return true;
 
-    if (document.body.dataset.view !== 'editor' || document.body.classList.contains('has-dialog')) return true;
+    if (document.body.dataset.view !== 'editor' || document.body.classList.contains('has-dialog') || document.body.classList.contains('has-cart')) return true;
     const modal = document.getElementById('brandGuideModal');
     if (modal && !modal.hidden) return true;
 

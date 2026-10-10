@@ -29,11 +29,14 @@
 .pt-bar-name { display: flex; align-items: baseline; flex-wrap: wrap; gap: 2px 10px; min-width: 0; }
 .pt-bar-name strong { font-size: 13px; font-weight: 600; color: var(--ink); }
 .pt-bar-name span { font-family: var(--font-mono); font-size: 11px; color: var(--muted); font-variant-numeric: tabular-nums; }
-.pt-pin { flex: none; }
+/* "Add to brief" leads the export row: filled until the pattern is in the brief, then outlined with a check */
+.pt-pin { flex: none; background: var(--ink); border-color: var(--ink); color: #fff; }
+.pt-pin:hover { background: #333; border-color: #333; }
 .pt-pin svg { flex: none; }
-.pt-pin[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: #fff; }
-.pt-pin[aria-pressed="true"]:hover { background: #333; border-color: #333; }
+.pt-pin[aria-pressed="true"] { background: var(--surface); border-color: var(--ink); color: var(--ink); }
+.pt-pin[aria-pressed="true"]:hover { background: var(--hover); }
 .pt-exports { display: flex; flex-wrap: wrap; gap: 6px; }
+.pt-exports .pt-pin { margin-right: 6px; }
 .pt-exports .btn:disabled { opacity: 0.35; cursor: default; }
 
 /* strips: suite, pinned, all families */
@@ -60,14 +63,19 @@
 .pt-tile-cap b { font-size: 12px; font-weight: 500; line-height: 1.25; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .pt-tile-cap i { font-style: normal; font-size: 11px; line-height: 1.25; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
-.pt-star {
+/* round add / in-brief button on a thumbnail */
+.pt-add {
   position: absolute; top: 6px; right: 6px; display: grid; place-items: center; width: 26px; height: 26px; padding: 0;
   color: var(--ink); background: rgba(255, 255, 255, 0.92); border: 1px solid rgba(0, 0, 0, 0.12); border-radius: 50%;
   cursor: pointer; transition: transform var(--dur) var(--ease), background-color var(--dur) var(--ease);
 }
-.pt-star:hover { transform: scale(1.08); background: #fff; }
-.pt-star[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: #fff; }
-.pt-star svg { display: block; }
+.pt-add:hover { transform: scale(1.08); background: #fff; }
+.pt-add:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.pt-add[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: #fff; }
+.pt-add svg { display: block; }
+.pt-fam-wrap { position: relative; min-width: 0; }
+.pt-fam-wrap .pt-fam { width: 100%; }
+.pt-fam-wrap .pt-add { top: 5px; right: 5px; width: 22px; height: 22px; }
 
 .pt-picker { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 10px 10px; }
 .pt-fam {
@@ -223,6 +231,103 @@
 .pt-view.is-narrow .pt-adjust > summary:focus-visible { outline: 2px solid var(--ink); outline-offset: -2px; border-radius: var(--r-card); }
 .pt-view.is-narrow .pt-adjust[open] > summary { border-bottom: 1px solid var(--line-strong); }
 .pt-view.is-narrow .pt-adjust-body { padding: 16px; }
+
+/* ======================= Part 3: the brief cart (js/pattern-cart.js) ======================= */
+
+/* header button: muted at 0, a pulse when something is added */
+.cart-btn { gap: 6px; font-variant-numeric: tabular-nums; }
+.cart-btn.is-empty { color: var(--muted); }
+.cart-btn[aria-expanded="true"] { background: var(--hover); border-color: var(--ink); }
+@media (prefers-reduced-motion: no-preference) {
+  .cart-btn.is-pulse { animation: cartPulse 700ms var(--ease); }
+  @keyframes cartPulse {
+    0% { box-shadow: 0 0 0 0 rgba(17, 17, 17, 0.35); }
+    60% { box-shadow: 0 0 0 7px rgba(17, 17, 17, 0); transform: scale(1.04); }
+    100% { box-shadow: 0 0 0 0 rgba(17, 17, 17, 0); }
+  }
+}
+
+/* sidebar line under "Copy AI brief" */
+.aib-note {
+  align-self: center; margin: -2px 0 0; padding: 2px 6px; border: 0; border-radius: 4px; background: none;
+  font: inherit; font-size: 11.5px; line-height: 1.4; color: var(--ink-2); cursor: pointer;
+  text-decoration: underline; text-underline-offset: 2px; text-decoration-color: var(--line-strong);
+}
+.aib-note.is-empty { color: var(--muted); }
+.aib-note:hover { color: var(--ink); background: var(--hover); }
+.aib-note:focus-visible { outline: 2px solid var(--ink); outline-offset: 1px; }
+
+/* the tray: a popover on wide screens, a bottom sheet at <= 720px */
+.cart-tray {
+  position: fixed; z-index: 150; top: 64px; left: 24px; width: min(440px, calc(100vw - 24px));
+  display: flex; flex-direction: column; box-sizing: border-box; max-height: calc(100vh - 80px);
+  background: var(--surface); border: 1px solid var(--line-strong); border-radius: var(--r-card);
+  box-shadow: var(--shadow-modal); outline: none;
+}
+.cart-tray[hidden] { display: none; }
+@media (prefers-reduced-motion: no-preference) {
+  .cart-tray:not([hidden]) { animation: cartIn 180ms var(--ease) both; }
+  @keyframes cartIn { from { opacity: 0; transform: translateY(6px); } }
+}
+.cart-head { position: relative; flex: none; display: flex; align-items: baseline; gap: 10px; padding: 14px 16px 10px; border-bottom: 1px solid var(--line-strong); }
+.cart-head h2 { margin: 0; font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); }
+.cart-count { font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.cart-x, .cart-rm {
+  display: grid; place-items: center; flex: none; width: 28px; height: 28px; padding: 0; border: 0; border-radius: 6px;
+  background: none; color: var(--muted); cursor: pointer;
+}
+.cart-x { margin-left: auto; align-self: center; }
+.cart-x:hover, .cart-rm:hover { background: var(--hover); color: var(--ink); }
+.cart-x:focus-visible, .cart-rm:focus-visible, .cart-svg:has(input:focus-visible), .cart-use select:focus-visible { outline: 2px solid var(--ink); outline-offset: 1px; }
+.cart-body { flex: 1 1 auto; min-height: 0; overflow-y: auto; padding: 4px 16px; overscroll-behavior: contain; }
+.cart-empty { margin: 0; padding: 18px 2px 20px; font-size: 12.5px; line-height: 1.55; color: var(--muted); }
+.cart-list { list-style: none; margin: 0; padding: 0; }
+.cart-item {
+  display: grid; grid-template-columns: 72px minmax(0, 1fr) auto; column-gap: 12px; row-gap: 10px; align-items: center;
+  padding: 12px 0; border-bottom: 1px solid var(--line);
+}
+.cart-item:last-child { border-bottom: 0; }
+.cart-thumb canvas { display: block; width: 72px; height: 40.5px; border-radius: 6px; background: var(--canvas); box-shadow: 0 0 0 1px var(--line-strong); }
+.cart-meta { display: flex; flex-wrap: wrap; align-items: baseline; gap: 1px 8px; min-width: 0; }
+.cart-name { flex: 1 0 100%; font-size: 13px; font-weight: 600; line-height: 1.3; color: var(--ink); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cart-sub { font-size: 11.5px; color: var(--muted); line-height: 1.3; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+.cart-chip {
+  padding: 2px 7px; border-radius: 999px; font-size: 10.5px; font-weight: 500; line-height: 1.2; color: var(--ink-2);
+  box-shadow: 0 0 0 1px var(--line-strong); white-space: nowrap;
+}
+.cart-opts { grid-column: 1 / -1; display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; }
+.cart-use { display: inline-flex; align-items: center; gap: 8px; margin: 0; font-size: 12px; color: var(--muted); min-width: 0; }
+.cart-use select { height: 28px; max-width: 168px; font-size: 12px; }
+.cart-svg { display: inline-flex; align-items: center; gap: 6px; margin: 0; font-size: 12px; color: var(--ink-2); cursor: pointer; }
+.cart-svg input { margin: 0; accent-color: var(--ink); }
+.cart-note { font-size: 11.5px; color: var(--muted); }
+.cart-copy { margin-left: auto; }
+.cart-foot { flex: none; display: flex; flex-wrap: wrap; gap: 8px; padding: 12px 16px 14px; border-top: 1px solid var(--line-strong); }
+.cart-foot .btn { flex: 1 1 auto; }
+.cart-foot .btn:disabled { opacity: 0.4; cursor: default; }
+
+.cart-backdrop { display: none; }
+@media (max-width: 720px) {
+  .cart-backdrop:not([hidden]) {
+    display: block; position: fixed; inset: 0; z-index: 140; background: rgba(20, 20, 20, 0.35);
+    -webkit-backdrop-filter: blur(3px); backdrop-filter: blur(3px);
+  }
+  .cart-tray {
+    left: 0; right: 0; top: auto; bottom: 0; width: auto; max-height: min(82vh, 640px);
+    border-radius: 16px 16px 0 0; border-bottom: 0; padding-bottom: env(safe-area-inset-bottom, 0);
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .cart-tray:not([hidden]) { animation: cartSheetIn 240ms var(--ease) both; }
+    @keyframes cartSheetIn { from { transform: translateY(24px); opacity: 0; } }
+  }
+  .cart-head::before { content: ""; position: absolute; top: 7px; left: 50%; width: 36px; height: 4px; margin-left: -18px; border-radius: 99px; background: var(--line-strong); }
+  .cart-x, .cart-rm { width: 36px; height: 36px; }
+  .cart-svg { min-height: 36px; }
+  .cart-use select { height: 36px; }
+  .cart-copy { height: 36px; }
+  .cart-foot .btn { height: 40px; }
+  .pt-add, .pt-fam-wrap .pt-add { width: 32px; height: 32px; }
+}
 
 /* ======================= Part 2: deck ======================= */
 

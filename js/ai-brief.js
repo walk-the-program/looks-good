@@ -199,8 +199,151 @@ function aibTypeRecommendation(state, def) {
   return out;
 }
 
+/* ---------------- Patterns ---------------- */
+
+// How much generated SVG the brief may carry per pattern. Over the cap the code is
+// left out and the brief says to attach the exported file (never base64 PNGs).
+const AIB_TILE_SVG_CAP = 8192;      // a 160px seamless tile
+const AIB_FULL_SVG_CAP = 12288;     // a 1200x675 non-seamless SVG
+const AIB_TILE_PX = 160;
+const AIB_FULL_W = 1200;
+const AIB_FULL_H = 675;
+
+// Placement rules per `use` (see PatternPins.USES). `png` is the export to attach for a
+// raster family: PNG 2x (2560x1440) for large areas, 1x (1280x720) for small ones.
+const AIB_USE_RULES = {
+  hero: {
+    cls: 'pattern-hero', png: '2x',
+    rule: 'Full-bleed background behind the hero section, edge to edge (`background-size: cover`; a tile uses `background-repeat: repeat`). Keep the headline and copy on a solid `--canvas` area or behind a `--canvas` scrim so text stays at 4.5:1 or better. Never set text directly on the pattern. One pattern hero per page.',
+  },
+  band: {
+    cls: 'pattern-band', png: '2x',
+    rule: 'Full-width background band behind one section (a quote, a stats row, a call to action), 160 to 320px tall. Copy sits on a solid `--canvas` plate (4.5:1 or better), never directly on the pattern. At most two bands per page, and never two bands of the same pattern next to each other.',
+  },
+  card: {
+    cls: 'pattern-card', png: '1x',
+    rule: 'Low-contrast texture on a card or media tile. At most one textured card per view. Labels and body text sit on a solid `--canvas` plate inside the card (4.5:1 or better); the pattern reads as texture, not as content.',
+  },
+  divider: {
+    cls: 'pattern-divider', png: '2x',
+    rule: 'Decorative band between two sections, 24 to 64px tall and full width (`background-repeat: repeat-x` for a tile). No text, icons or controls on it. Mark it `aria-hidden="true"`.',
+  },
+  accent: {
+    cls: 'pattern-accent', png: '1x',
+    rule: 'Small decorative detail: a badge or avatar fill, an empty-state or icon-sized tile, at most 200px across and at most one per view. Never behind text. Mark it `aria-hidden="true"`.',
+  },
+};
+
+const AIB_INK_SLOT_JOB = {
+  ground: 'background',
+  ink1: 'main shapes',
+  ink2: 'secondary shapes',
+  deep: 'darkest shade',
+  spark: 'accent flecks, 5% of the area at most',
+};
+
+// Minimal data-URI escaping for an SVG inside url("..."): double quotes become single
+// quotes, then only the characters that break a CSS url are percent-encoded.
+function aibSvgDataUri(svg) {
+  const q = svg.replace(/"/g, "'");
+  return 'data:image/svg+xml,' + q.replace(/%/g, '%25').replace(/</g, '%3C').replace(/>/g, '%3E').replace(/#/g, '%23').replace(/\{/g, '%7B').replace(/\}/g, '%7D');
+}
+
+const aibKb = n => (n / 1024 < 10 ? (n / 1024).toFixed(1) : Math.round(n / 1024)) + ' KB';
+
+// Markdown lines for ONE pattern in the brief: what it is, where it goes, the exact inks,
+// the settings and how to reproduce it. `level` is the heading depth ('###' or '####'),
+// `n` the 1-based position (or null for a standalone block). Pure: no DOM.
+function aibPatternItemLines(state, def, entry, n, level) {
+  const P = Patterns;
+  const f = P.list().find(x => x.key === entry.key);
+  if (!f) return [];
+  const t = boardTokens(state, def);
+  const oneLine = x => String(x || '').replace(/\s+/g, ' ').trim();
+  const cwWord = v => ((P.E.COLORWAYS.find(c => c.value === v) || {}).label || v);
+  const use = entry.use || PatternPins.defaultUse(entry.key);
+  const rules = AIB_USE_RULES[use] || AIB_USE_RULES.hero;
+  const useName = PatternPins.useLabel(use);
+  const out = [`${level || '####'} ${n ? n + '. ' : ''}${f.name}: ${useName}`, ''];
+
+  out.push(`Family: ${f.name} (\`${f.key}\`). ${oneLine(f.blurb)} ${f.vector ? 'Vector' : 'Raster'}${f.seamless ? ', seamless' : ''}.`, '');
+  out.push(`Use: ${useName}. ${rules.rule}`, '');
+
+  // colors: the final hex for every ink the family draws with
+  const inks = P.inksFor(t, entry.colorway, { tints: !!entry.params.tints });   // from the board tokens, the same ones the brief lists
+  const fin = P.finalInks(entry.key, entry.params, inks);
+  const tokenOf = hex => {
+    const h = String(hex).toLowerCase();
+    const hit = [['--canvas', t.canvas], ['--ink', t.ink], ['--primary', t.primary], ['--secondary', t.secondary], ['--accent', t.accent]]
+      .find(([, v]) => String(v).toLowerCase() === h);
+    if (hit) return '`' + hit[0] + '`';
+    const pct = Math.round(tone * 100);
+    return entry.colorway === 'brand'
+      ? `derived (a brand token mixed toward the canvas at strength ${pct}%)`
+      : `derived (${cwWord(entry.colorway)} mix of the brand tokens${tone < 1 ? ', strength ' + pct + '%' : ''})`;
+  };
+  const slots = (f.ink || ['ground', 'ink1']).slice();
+  if (entry.params.tints) slots.push('t1', 't2');
+  const tone = entry.params.tone == null ? 1 : entry.params.tone;
+  out.push(`Colorway: ${cwWord(entry.colorway)}. Final inks${tone < 1 ? ' (strength already applied)' : ''}; use these hexes as written:`);
+  slots.forEach(k => {
+    if (!fin[k]) return;
+    const job = AIB_INK_SLOT_JOB[k] || (k === 't1' ? 'lighter tint of ink1' : k === 't2' ? 'lighter tint of ink2' : '');
+    out.push(`- ${k} \`${fin[k]}\`: ${tokenOf(fin[k])}.${job ? ' ' + job.charAt(0).toUpperCase() + job.slice(1) + '.' : ''}`);
+  });
+  out.push('');
+
+  // settings that differ from the defaults, plus seed and strength
+  const schema = P.schema(entry.key);
+  const defaults = P.defaults(entry.key);
+  const fmt = v => (typeof v === 'boolean' ? (v ? 'on' : 'off') : String(v));
+  const changed = schema.filter(sc => sc.key !== 'tone' && entry.params[sc.key] !== defaults[sc.key])
+    .map(sc => `${sc.label} (\`${sc.key}\`) ${fmt(entry.params[sc.key])}`);
+  out.push(`Settings: seed \`${entry.seed}\`; strength ${Math.round(tone * 100)}% (\`tone\` ${tone}). ` +
+    (changed.length ? 'Changed from the defaults: ' + changed.join('; ') + '. Everything else is at the default.' : 'Every other setting is at the default.'), '');
+
+  // reproduction
+  const grain = entry.params.grain;
+  if (f.vector && entry.svg) {
+    if (f.seamless) {
+      const svg = P.tileSVG(entry.key, entry.params, inks, entry.seed, AIB_TILE_PX);
+      const css = svg ? aibSvgDataUri(svg) : '';
+      if (svg && svg.length <= AIB_TILE_SVG_CAP && css.length <= AIB_TILE_SVG_CAP * 1.4) {
+        out.push(`Reproduce: a seamless ${AIB_TILE_PX}x${AIB_TILE_PX}px SVG tile (this exact tile; grain is left out${grain > 0 ? ' of the tile' : ''} so it repeats cleanly):`, '',
+          '```svg', svg, '```', '',
+          'Ready-made CSS for the same tile:', '',
+          '```css',
+          `.${rules.cls} {`,
+          `  background-color: ${fin.ground};`,
+          `  background-image: url("${css}");`,
+          `  background-size: ${AIB_TILE_PX}px ${AIB_TILE_PX}px;`,
+          `  background-repeat: ${use === 'divider' ? 'repeat-x' : 'repeat'};`,
+          '}', '```', '');
+      } else {
+        out.push(`Reproduce: this tile is ${svg ? 'about ' + aibKb(svg.length) : 'too large'} as SVG, too long to paste here. Attach the exported SVG (Patterns view, SVG) and use it as a repeating background (${AIB_TILE_PX}px tile). The seed and settings above regenerate it exactly.`, '');
+      }
+    } else {
+      const svg = P.renderSVG(entry.key, entry.params, inks, entry.seed, { width: AIB_FULL_W, height: AIB_FULL_H });
+      if (svg && svg.length <= AIB_FULL_SVG_CAP) {
+        const fit = svg.replace(/^(<svg [^>]*?) width="\d+" height="\d+">/, '$1 width="100%" height="100%" preserveAspectRatio="xMidYMid slice">');
+        out.push(`Reproduce: this exact ${AIB_FULL_W}x${AIB_FULL_H} SVG. It does not tile, and the root is set to fill its box and crop to fit (\`preserveAspectRatio="xMidYMid slice"\`):`, '',
+          '```svg', fit, '```', '');
+      } else {
+        out.push(`Reproduce: this pattern does not tile and its SVG is ${svg ? 'about ' + aibKb(svg.length) : 'too large'}, too long to paste here. Attach the exported SVG (1600x900) or PNG (1x 1280x720, 2x 2560x1440, 4K 3840x2160) from the Patterns view and use it with \`background-size: cover\`. The seed and settings above regenerate it exactly.`, '');
+      }
+    }
+  } else if (f.vector) {
+    out.push(`Reproduce: the SVG code is not included for this pattern. Attach the exported SVG (1600x900) or PNG (1x 1280x720, 2x 2560x1440, 4K 3840x2160) from the Patterns view${f.seamless ? ', or build the ' + AIB_TILE_PX + 'px tile from the family, seed and settings above' : ''}, and use it with \`background-size: cover\`.`, '');
+  } else {
+    const png = rules.png === '2x' ? 'PNG 2x (2560x1440)' : 'PNG 1x (1280x720)';
+    out.push(`Reproduce: raster family, so there is no SVG. Attach the exported ${png} from the Patterns view and use it as a background with \`background-size: cover\`. Do not trace or redraw it by hand. If the file is missing, regenerate it in Branding Designer from the family, colorway, seed and settings above. Other sizes: PNG 1x 1280x720, 2x 2560x1440, 4K 3840x2160.`, '');
+  }
+  return out;
+}
+
 // "Patterns" section: which generative pattern families suit the aesthetic, how
-// pattern inks map to the brand roles, and the parameters of any pinned patterns.
+// pattern inks map to the brand roles, and every pattern added to the brief (the
+// cart, state.patterns) with its use, exact inks, settings and reproduction.
 // Pure: reads js/patterns/*, never the DOM. Returns [] when the engine is absent.
 function aibPatternLines(state, def) {
   if (typeof Patterns === 'undefined' || typeof Patterns.suiteFor !== 'function') return [];
@@ -209,7 +352,7 @@ function aibPatternLines(state, def) {
   const cwWord = v => ((Patterns.E.COLORWAYS.find(c => c.value === v) || {}).label || v);
   const oneLine = s => String(s || '').replace(/\s+/g, ' ').trim();
   out.push('## Patterns', '',
-    `Generative textures made only from the brand colors (Patterns view in Branding Designer). Use them as hero backgrounds, cover panels, section dividers and swatch walls. Keep body text on a plain \`--canvas\` area, never on a pattern.`, '',
+    `Generative textures made only from the brand colors (Patterns view in Branding Designer). Use them as hero backgrounds, section bands, card textures, divider strips and small accent details. Keep body text on a plain \`--canvas\` area, never on a pattern.`, '',
     '### Ink mapping', '',
     '- ground = `--canvas`.',
     '- ink1 = `--primary` (or `--ink` in the Mono colorway).',
@@ -224,22 +367,37 @@ function aibPatternLines(state, def) {
     out.push(`- **${s.name}** (${f.name}, ${cwWord(s.colorway)}): ${oneLine(f.blurb)}`);
   });
   out.push('');
-  const pinned = typeof PatternPins !== 'undefined' ? PatternPins.normalizeList(state.patterns) : [];
-  if (pinned.length) {
-    out.push('### Pinned patterns', '', 'These were chosen for this brand. Reproduce them with the same family, colorway, seed and parameters.', '');
-    pinned.forEach((p, i) => {
-      const f = infoOf(p.key);
-      const defaults = Patterns.defaults(p.key);
-      const changed = Object.keys(p.params).filter(k => p.params[k] !== defaults[k]).map(k => `${k} ${p.params[k]}`);
-      out.push(`${i + 1}. **${f.name}**, ${cwWord(p.colorway)} colorway, seed \`${p.seed}\`. ${changed.length ? 'Changed from defaults: ' + changed.join(', ') + '.' : 'Default parameters.'}` +
-        `${f.seamless ? ' Seamless: tiles as a 128px square CSS background tile (Patterns view, "Copy CSS tile"; not inlined here, the data URI is too long).' : ''}` +
-        `${f.vector ? ' Available as SVG.' : ''}`);
-    });
-    out.push('');
+  const items = typeof PatternPins !== 'undefined' ? PatternPins.normalizeList(state.patterns) : [];
+  if (items.length) {
+    out.push('### In your brief', '',
+      `${items.length === 1 ? 'This pattern was' : 'These ' + items.length + ' patterns were'} chosen for this brand. Reproduce each one exactly as described: same family, colorway, hexes, seed and settings, in the place named by its use.`, '');
+    items.forEach((p, i) => aibPatternItemLines(state, def, p, i + 1, '####').forEach(l => out.push(l)));
   } else {
-    out.push('No patterns are pinned for this brand yet. Pick from the families above.', '');
+    out.push('No patterns have been added to the brief yet. Pick from the families above.', '');
   }
   return out;
+}
+
+function aibBrandName(state) {
+  const c = state.content || {};
+  return (typeof c.brandName === 'string' && c.brandName.trim()) ? c.brandName.trim() : AIB_CONTENT_FALLBACK.brandName;
+}
+
+// "Copy patterns only": the Patterns section on its own, with a one-line preamble so it
+// can be pasted after an existing brief.
+function buildPatternsBrief(state) {
+  const def = aestheticByKey(state.aesthetic);
+  return `Add this Patterns section to the ${aibBrandName(state)} brand brief. Its colors are the CSS custom properties from that brief, and every hex is final.\n\n` +
+    aibPatternLines(state, def).join('\n');
+}
+
+// One pattern's block (item i of state.patterns), for the per-item Copy in the cart.
+function buildPatternItemBrief(state, i) {
+  const def = aestheticByKey(state.aesthetic);
+  const items = typeof PatternPins !== 'undefined' ? PatternPins.normalizeList(state.patterns) : [];
+  if (!items[i]) return '';
+  return `Pattern for the ${aibBrandName(state)} brand brief. Its colors are the CSS custom properties from that brief, and every hex is final.\n\n` +
+    aibPatternItemLines(state, def, items[i], null, '###').join('\n');
 }
 
 function buildAiBrief(state) {

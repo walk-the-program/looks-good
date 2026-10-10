@@ -119,13 +119,20 @@ is a spark under 5% of the area. **Colorway** switches between Brand, Mono,
 Duotone and Night, **+ tints** adds lighter mixes, and every family's own
 controls are built from its schema. Seed plus parameters reproduce the same
 pixels; **New variation** reseeds. The **Brand suite** is six patterns tuned
-to the current aesthetic (click to load); the star **pins** a pattern to the
-brand. Pins are saved with the brand, are one Undo step, and show up in the
-**Patterns** deck slide (slide 7), as the strip on the cover and closing
-slides, and in the AI brief. Export PNG at 1x, 2x or 4K, SVG for the vector
+to the current aesthetic (click to load). **Add to brief** (on the canvas, and
+the + on every suite and family thumbnail) works like a shopping cart: the
+**Brief · N** button in the workspace header (and the "Includes N patterns" line
+under **Copy AI brief**) opens a tray listing what you added, with a **Use** for
+each (hero background, section band, card texture, divider strip or accent
+detail), an **Include SVG** toggle for vector families, a per-pattern **Copy**,
+**Copy full AI brief** and **Copy patterns only**. Patterns in the brief are
+saved with the brand, are one Undo step, and show up in the **Patterns** deck
+slide (slide 7), as the strip on the cover and closing slides, and in the AI
+brief with their exact colors, settings, placement rules and an SVG tile or
+snippet. Export PNG at 1x, 2x or 4K, SVG for the vector
 families, or **Copy CSS tile** (a seamless 128px background) for the
 families that tile. Files: `js/patterns/` (engine, families, aesthetic fit),
-`js/patterns-ui.js`, `js/patterns-deck.js`, `css/patterns.css`; spec in
+`js/patterns-ui.js`, `js/pattern-cart.js`, `js/patterns-deck.js`, `css/patterns.css`; spec in
 `docs/patterns.md`. `dev/patterns-lab.html` is a developer test bench only and
 is not part of the app or the Mac build's runtime.
 
@@ -152,7 +159,7 @@ never / coverage, hard rules (one primary action per view, accent at 5% or
 less, text only in ink, muted or on-* tokens), a component-by-component color
 map, contrast ratios, fonts with a Google Fonts URL, the aesthetic's material
 recipes with real values, a Patterns section (ink mapping, the six families that fit the aesthetic,
-the pinned patterns' parameters), do / don't lists and a CSS variables block. It
+each pattern added to the brief with its use, exact inks, settings and SVG), do / don't lists and a CSS variables block. It
 describes the current brand in its current mode and aesthetic. File:
 `js/ai-brief.js` (`buildAiBrief(state)`, no DOM access).
 
@@ -202,7 +209,7 @@ x dismisses it for that brand. Locked sections get none.
   typography (face specimens, type scale, the recommended faces and how the
   current ones fit), interface (segmented control, CTA, field, toggle and
   the three states), material and graphics (the signature art plus the
-  aesthetic's material names), patterns (the pinned patterns, or the aesthetic's
+  aesthetic's material names), patterns (the patterns in the brief, or the aesthetic's
   suite), in product (a composed app screen), do and
   don't, and a closing slide. Each slide is its own `.ab[data-ae]` root at a
   fixed 1280x720, so every aesthetic's CSS applies unchanged; the cards
@@ -256,7 +263,8 @@ js/aesthetic-meta.js     per-aesthetic family and font recommendations
 js/color-roles.js        the five color roles (use / never / coverage)
 js/color-picker.js       inline HSV picker; js/color-import.js parses pasted colors
 js/patterns/             pattern engine, 18 families, aesthetic fit (suites)
-js/patterns-ui.js        Patterns workspace view and pin helpers
+js/patterns-ui.js        Patterns workspace view and the brief-cart storage (PatternPins)
+js/pattern-cart.js       Brief tray (header button, sidebar line)
 js/patterns-deck.js      Patterns deck slide and cover/closing strips
 js/ai-brief.js           Markdown AI brief (buildAiBrief)
 js/brand-guide.js        brand guide deck content + styles

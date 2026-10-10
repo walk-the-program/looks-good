@@ -1,24 +1,46 @@
 /* ---------------------------------------------------------------------
    patterns-ui.js — the "Patterns" workspace view (third option next to
-   Board and Compare all) and the pin helpers shared with persistence, the
-   deck and the AI brief.
+   Board and Compare all) and the brief-cart storage shared with persistence,
+   the deck, the AI brief and the cart tray (js/pattern-cart.js).
 
    Needs js/patterns/* (the engine, families and aesthetic fit), app.js
    (state, render, showToast, copyText), aesthetic-board.js (the view toggle
    calls PatternsUI.setVisible) and brand-deck.js (bdSaveBlob, brandFileSlug).
 
-   - PatternPins: pin storage rules. state.patterns is a list of immutable
-     { key, params, colorway, seed } entries (max PIN_MAX). Always replace the
-     array, never mutate it, so undo snapshots stay valid. params.tone (0..1,
-     1 = full strength, the "Strength" slider) is part of params, so a pin
-     remembers how quiet it is.
-   - PatternsUI: the view. UI-only working pattern (not saved); pins are what
-     persist. Nothing renders while the view is hidden.
+   - PatternPins: the patterns "in your brief" (state.patterns, the shopping
+     cart; the name is historical). A list of immutable
+     { key, params, colorway, seed, use, svg } entries (max PIN_MAX). Always
+     replace the array and the entries, never mutate them, so undo snapshots
+     stay valid. params.tone (0..1, 1 = full strength, the "Strength" slider) is
+     part of params, so an entry remembers how quiet it is. `use` is where the
+     pattern goes on the page (one of USES); `svg` says whether the AI brief
+     should paste the SVG code (vector families only). Saved brands from before
+     `use` / `svg` existed load with the family default.
+   - PatternsUI: the view. UI-only working pattern (not saved); the brief list
+     is what persists. Nothing renders while the view is hidden.
 ------------------------------------------------------------------------ */
 
 const PatternPins = (function () {
   const PIN_MAX = 8;
   const SUITE_SEED = 'brand';   // seed behind the suite thumbnails, the deck wall and the default canvas
+
+  // Where a pattern goes. The AI brief turns each value into placement rules.
+  const USES = [
+    { value: 'hero', label: 'Hero background' },
+    { value: 'band', label: 'Section band' },
+    { value: 'card', label: 'Card texture' },
+    { value: 'divider', label: 'Divider strip' },
+    { value: 'accent', label: 'Accent detail' },
+  ];
+  // Default role per family (anything not listed is a hero background).
+  const USE_BY_FAMILY = {
+    aura: 'hero', terrain: 'hero', flow: 'hero', counterchange: 'hero', arcrise: 'hero', oprings: 'hero', modulargrid: 'hero',
+    halftone: 'card', stipple: 'card', glyphgrid: 'card', pixelquilt: 'card',
+    zigzag: 'divider', chevron: 'divider',
+    weave: 'band', signal: 'band', tornbands: 'band', gradpanes: 'band', typeterrain: 'band',
+  };
+  const defaultUse = key => USE_BY_FAMILY[key] || 'hero';
+  const useLabel = v => (USES.find(u => u.value === v) || USES[0]).label;
 
   function colorways() { return window.Patterns ? Patterns.E.COLORWAYS.map(c => c.value) : ['brand']; }
 
@@ -28,20 +50,68 @@ const PatternPins = (function () {
     if (!P || !raw || typeof raw !== 'object' || typeof raw.key !== 'string' || !P.get(raw.key)) return null;
     const colorway = colorways().includes(raw.colorway) ? raw.colorway : 'brand';
     const seed = String(raw.seed == null || raw.seed === '' ? 'brand' : raw.seed).slice(0, 40);
-    return { key: raw.key, params: P.resolve(raw.key, raw.params || {}), colorway, seed };
+    const vector = !!P.get(raw.key).vector;
+    const use = USES.some(u => u.value === raw.use) ? raw.use : defaultUse(raw.key);
+    const svg = vector && (raw.svg == null ? true : !!raw.svg);
+    return { key: raw.key, params: P.resolve(raw.key, raw.params || {}), colorway, seed, use, svg };
   }
 
   function normalizeList(list) {
     return (Array.isArray(list) ? list : []).map(normalize).filter(Boolean).slice(0, PIN_MAX);
   }
 
-  // Stable identity of an entry (family, colorway, seed and every parameter).
+  // Stable identity of a pattern (family, colorway, seed and every parameter). `use` and
+  // `svg` are choices about the pattern, not part of which pattern it is.
   function sig(p) {
     const n = normalize(p);
     return n ? [n.key, n.colorway, n.seed, JSON.stringify(n.params)].join('|') : '';
   }
 
-  return { PIN_MAX, SUITE_SEED, normalize, normalizeList, sig };
+  // Identity plus the choices (use, svg): changes when anything the cart shows changes.
+  function fullSig(p) {
+    const n = normalize(p);
+    return n ? sig(n) + '|' + n.use + '|' + (n.svg ? 1 : 0) : '';
+  }
+
+  const list = () => (Array.isArray(state.patterns) ? state.patterns : []);
+  const indexOf = entry => { const s = sig(entry); return s ? list().findIndex(p => sig(p) === s) : -1; };
+  const has = entry => indexOf(entry) >= 0;
+
+  // Undoable, marks the brand unsaved, re-renders everything that shows the list.
+  function commit(next, message) {
+    pushUndoSnapshot(state);
+    state.patterns = next;
+    render();
+    if (message) showToast(message);
+  }
+
+  // Add the pattern, or take it out when it is already in the brief.
+  function toggle(entry) {
+    const e = normalize(entry);
+    if (!e) return null;
+    const at = indexOf(e);
+    if (at >= 0) { commit(list().filter((_, i) => i !== at), 'Removed from brief'); return 'removed'; }
+    if (list().length >= PIN_MAX) { showToast(`Brief is full (${PIN_MAX} patterns). Remove one first`); return 'full'; }
+    commit(list().concat([e]), 'Added to brief');
+    if (typeof PatternCart !== 'undefined') PatternCart.pulse();
+    return 'added';
+  }
+
+  function removeAt(i) {
+    if (!list()[i]) return;
+    commit(list().filter((_, k) => k !== i), 'Removed from brief');
+  }
+
+  // Change the use / svg choice of item i (a new object; one undo step).
+  function patch(i, change) {
+    const cur = list()[i];
+    if (!cur) return;
+    const next = normalize(Object.assign({}, cur, change));
+    if (!next || fullSig(next) === fullSig(cur)) return;
+    commit(list().map((p, k) => (k === i ? next : p)));
+  }
+
+  return { PIN_MAX, SUITE_SEED, USES, defaultUse, useLabel, normalize, normalizeList, sig, fullSig, list, indexOf, has, commit, toggle, removeAt, patch };
 })();
 
 const PatternsUI = (function () {
@@ -71,8 +141,9 @@ const PatternsUI = (function () {
   let pumping = false;
   const thumbCache = new Map();
 
-  const STAR = '<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" aria-hidden="true"><path d="m12 3 2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1-4.4-4.3 6.1-.9z"/></svg>';
-  const STAR_LINE = STAR.replace('fill="currentColor"', 'fill="none"');
+  const ICO = d => `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${d}</svg>`;
+  const PLUS = ICO('<path d="M12 5v14M5 12h14"/>');
+  const CHECK = ICO('<path d="m5 12.5 4.5 4.5L19 7.5"/>');
 
   /* ---------------- helpers ---------------- */
 
@@ -126,7 +197,7 @@ const PatternsUI = (function () {
   function redrawThumbs() {
     queue = [];
     pumping = false;
-    // visible-first order: suite, pinned, then the family picker
+    // visible-first order: suite, in your brief, then the family picker
     const order = ['#ptSuite canvas', '#ptPins canvas', '#ptPicker canvas'];
     queueThumbs(order.flatMap(sel => Array.from(root.querySelectorAll(sel))));
   }
@@ -152,9 +223,9 @@ const PatternsUI = (function () {
             <div class="pt-canvas-wrap"><canvas id="ptCanvas" aria-label="Pattern preview"></canvas></div>
             <div class="pt-bar">
               <div class="pt-bar-name"><strong id="ptName"></strong><span id="ptTiming"></span></div>
-              <button type="button" class="btn btn-ghost btn-small pt-pin" id="ptPin" aria-pressed="false"></button>
             </div>
-            <div class="pt-exports" role="group" aria-label="Export">
+            <div class="pt-exports" role="group" aria-label="Add to brief and export">
+              <button type="button" class="btn btn-small pt-pin" id="ptPin" aria-pressed="false"></button>
               <button type="button" class="btn btn-ghost btn-small" data-export="png1">PNG 1x</button>
               <button type="button" class="btn btn-ghost btn-small" data-export="png2">PNG 2x</button>
               <button type="button" class="btn btn-ghost btn-small" data-export="png4k">PNG 4K</button>
@@ -194,10 +265,10 @@ const PatternsUI = (function () {
             <div class="pt-block-head"><h3>Brand suite</h3><span id="ptSuiteFor"></span></div>
             <div class="pt-strip" id="ptSuite"></div>
           </section>
-          <section class="pt-block pt-block-pins" aria-label="Pinned patterns">
-            <div class="pt-block-head"><h3>Pinned</h3><span id="ptPinCount"></span></div>
+          <section class="pt-block pt-block-pins" aria-label="In your brief">
+            <div class="pt-block-head"><h3>In your brief</h3><span id="ptPinCount"></span></div>
             <div class="pt-strip pt-strip-pins" id="ptPins"></div>
-            <p class="pt-empty" id="ptPinsEmpty">Star a pattern to keep it with this brand. Pinned patterns appear in the brand deck and the AI brief.</p>
+            <p class="pt-empty" id="ptPinsEmpty">Add a pattern to include it in the AI brief, with its colors, where to use it and the SVG. Patterns in your brief also appear in the brand deck.</p>
           </section>
           <section class="pt-block pt-block-fams" aria-label="All families">
             <div class="pt-block-head"><h3>All families</h3><span>${P().list().length} generators</span></div>
@@ -240,8 +311,10 @@ const PatternsUI = (function () {
   }
 
   function buildPicker() {
-    $('ptPicker').innerHTML = P().list().map((f, i) => `<button type="button" class="pt-fam" data-key="${f.key}" aria-pressed="false" title="${escapeHtml(f.blurb)}">
-        <canvas width="${THUMB_W}" height="${THUMB_H}" aria-hidden="true"></canvas><span>${escapeHtml(f.name)}</span></button>`).join('');
+    $('ptPicker').innerHTML = P().list().map((f, i) => `<div class="pt-fam-wrap" data-key="${f.key}">
+        <button type="button" class="pt-fam" data-key="${f.key}" aria-pressed="false" title="${escapeHtml(f.blurb)}">
+          <canvas width="${THUMB_W}" height="${THUMB_H}" aria-hidden="true"></canvas><span>${escapeHtml(f.name)}</span></button>
+        ${addButton(false, f.name)}</div>`).join('');
     $('ptPicker').querySelectorAll('.pt-fam').forEach(btn => {
       const f = famInfo(btn.dataset.key);
       btn.querySelector('canvas')._mk = () => entryOf(f.key, Object.assign({}, f.defaults, { tone: curTone() }), cur ? cur.colorway : 'brand', SUITE_SEED);
@@ -257,23 +330,36 @@ const PatternsUI = (function () {
     host.querySelectorAll('.pt-tile').forEach((tile, i) => {
       const s = list[i];
       tile.querySelector('canvas')._mk = () => entryOf(s.key, Object.assign(P().defaults(s.key), s.params), s.colorway, SUITE_SEED);
-      tile.insertAdjacentHTML('beforeend', starButton(false, 'Pin ' + s.name));
+      tile.insertAdjacentHTML('beforeend', addButton(false, s.name));
     });
   }
 
-  function starButton(on, label) {
-    return `<button type="button" class="pt-star" aria-pressed="${on}" aria-label="${escapeHtml(label)}" title="${escapeHtml(label)}">${on ? STAR : STAR_LINE}</button>`;
+  // The round add / in-brief button on a thumbnail (pressed = in the brief).
+  function addLabel(on, name) { return (on ? 'Remove ' : 'Add ') + name + (on ? ' from brief' : ' to brief'); }
+  function addButton(on, name) {
+    return `<button type="button" class="pt-add" aria-pressed="${on}" aria-label="${escapeHtml(addLabel(on, name))}" title="${escapeHtml(addLabel(on, name))}">${on ? CHECK : PLUS}</button>`;
+  }
+  function setAddButton(b, on, name) {
+    b.setAttribute('aria-pressed', String(on));
+    b.setAttribute('aria-label', addLabel(on, name));
+    b.title = addLabel(on, name);
+    b.innerHTML = on ? CHECK : PLUS;
+  }
+  function setPinButton(btn, on) {
+    btn.setAttribute('aria-pressed', String(on));
+    btn.innerHTML = (on ? CHECK : PLUS) + (on ? 'In brief' : 'Add to brief');
+    btn.title = on ? 'In your AI brief. Click to remove' : 'Add this pattern, with its colorway, seed and settings, to the AI brief';
   }
 
   function buildPins() {
     const list = pins();
-    lastPinSig = list.map(PatternPins.sig).join('\n');
+    lastPinSig = list.map(PatternPins.fullSig).join('\n');
     const host = $('ptPins');
-    host.innerHTML = list.map((p, i) => tileHtml('pin', i, famInfo(p.key).name, 'Seed ' + p.seed, colorwayLabel(p.colorway))).join('');
+    host.innerHTML = list.map((p, i) => tileHtml('pin', i, famInfo(p.key).name, PatternPins.useLabel(p.use), colorwayLabel(p.colorway))).join('');
     host.querySelectorAll('.pt-tile').forEach((tile, i) => {
       const p = list[i];
       tile.querySelector('canvas')._mk = () => p;
-      tile.insertAdjacentHTML('beforeend', starButton(true, 'Unpin ' + famInfo(p.key).name));
+      tile.insertAdjacentHTML('beforeend', addButton(true, famInfo(p.key).name));
     });
     $('ptPinsEmpty').hidden = list.length > 0;
     host.hidden = list.length === 0;
@@ -339,35 +425,34 @@ const PatternsUI = (function () {
     root.querySelector('[data-export="css"]').disabled = !info.seamless;
     root.querySelector('[data-export="svg"]').title = info.vector ? 'Download as SVG' : 'This family is raster only';
     root.querySelector('[data-export="css"]').title = info.seamless ? 'Copy a seamless 128px CSS background tile' : 'This family does not tile seamlessly';
-    const pinned = isPinned(cur);
-    const btn = $('ptPin');
-    btn.setAttribute('aria-pressed', String(pinned));
-    btn.innerHTML = (pinned ? STAR : STAR_LINE) + (pinned ? 'Pinned to brand' : 'Pin to brand');
+    setPinButton($('ptPin'), isPinned(cur));
     const reset = $('ptReset');
     reset.disabled = pristine;
     root.querySelectorAll('#ptSuite .pt-tile').forEach((t, i) => t.classList.toggle('is-on', pristine && origin === i));
-    root.querySelectorAll('#ptSuite .pt-star').forEach((b, i) => {
+    root.querySelectorAll('#ptSuite .pt-add').forEach((b, i) => {
       const s = suite()[i];
       const e = entryOf(s.key, Object.assign(P().defaults(s.key), s.params), s.colorway, SUITE_SEED);
-      const on = isPinned(e);
-      b.setAttribute('aria-pressed', String(on));
-      b.innerHTML = on ? STAR : STAR_LINE;
+      setAddButton(b, isPinned(e), s.name);
+    });
+    syncPickerAdds();
+  }
+
+  // Family tiles show a check when the exact pattern their thumbnail draws is in the brief.
+  function syncPickerAdds() {
+    root.querySelectorAll('#ptPicker .pt-fam-wrap').forEach(w => {
+      const e = w.querySelector('canvas')._mk();
+      setAddButton(w.querySelector('.pt-add'), !!e && isPinned(e), famInfo(w.dataset.key).name);
     });
   }
 
-  function isPinned(entry) {
-    const s = PatternPins.sig(entry);
-    return pins().some(p => PatternPins.sig(p) === s);
-  }
+  function isPinned(entry) { return PatternPins.has(entry); }
 
   function edited() {
     pristine = false;
     $('ptReset').disabled = false;
     root.querySelectorAll('#ptSuite .pt-tile').forEach(t => t.classList.remove('is-on'));
-    const btn = $('ptPin');
-    const pinned = isPinned(cur);
-    btn.setAttribute('aria-pressed', String(pinned));
-    btn.innerHTML = (pinned ? STAR : STAR_LINE) + (pinned ? 'Pinned to brand' : 'Pin to brand');
+    setPinButton($('ptPin'), isPinned(cur));
+    syncPickerAdds();
   }
 
   /* ---------------- main canvas ---------------- */
@@ -442,7 +527,7 @@ const PatternsUI = (function () {
 
   /* ---------------- narrow layout (<= 760px) ----------------
      Order: canvas, exports, "Adjust pattern" (a <details>, closed), In use, brand suite,
-     pinned, all families. The CSS does the ordering off .is-narrow; wide layouts keep the
+     in your brief, all families. The CSS does the ordering off .is-narrow; wide layouts keep the
      sidebar, so the <details> is forced open and its summary is hidden there. */
   const NARROW_MAX = 760;
   let narrow = null;
@@ -472,7 +557,7 @@ const PatternsUI = (function () {
     applyBrand();
     const aestheticChanged = lastAesthetic !== state.aesthetic;
     const sig = brandSig();
-    const pinSig = pins().map(PatternPins.sig).join('\n');
+    const pinSig = pins().map(PatternPins.fullSig).join('\n');
     if (aestheticChanged) {
       lastAesthetic = state.aesthetic;
       buildSuite();
@@ -500,25 +585,10 @@ const PatternsUI = (function () {
     }
   }
 
-  /* ---------------- pins (undoable, mark the brand unsaved) ---------------- */
+  /* ---------------- the brief list (PatternPins: undoable, marks the brand unsaved) ---------------- */
 
-  function commitPins(next, message) {
-    pushUndoSnapshot(state);
-    state.patterns = next;
-    render();
-    if (message) showToast(message);
-  }
-
-  function pinEntry(entry) {
-    const e = PatternPins.normalize(entry);
-    if (!e) return;
-    const s = PatternPins.sig(e);
-    const list = pins();
-    const at = list.findIndex(p => PatternPins.sig(p) === s);
-    if (at >= 0) return commitPins(list.filter((_, i) => i !== at), 'Unpinned');
-    if (list.length >= PatternPins.PIN_MAX) return showToast(`Pin limit reached (${PatternPins.PIN_MAX}). Unpin one first`);
-    commitPins(list.concat([e]), 'Pinned to this brand');
-  }
+  // Add the pattern to the brief, or take it out again when it is already there.
+  const pinEntry = entry => PatternPins.toggle(entry);
 
   /* ---------------- exports ---------------- */
 
@@ -576,13 +646,18 @@ const PatternsUI = (function () {
 
   function wire() {
     root.addEventListener('click', e => {
-      const star = e.target.closest('.pt-star');
+      const add = e.target.closest('.pt-add');
       const tile = e.target.closest('.pt-tile');
-      if (star && tile) {
+      if (add && tile) {
         const i = Number(tile.dataset.i);
-        if (tile.dataset.kind === 'pin') return commitPins(pins().filter((_, k) => k !== i), 'Unpinned');
+        if (tile.dataset.kind === 'pin') return PatternPins.removeAt(i);
         const s = suite()[i];
         return pinEntry(entryOf(s.key, Object.assign(P().defaults(s.key), s.params), s.colorway, SUITE_SEED));
+      }
+      if (add) {
+        const wrap = add.closest('.pt-fam-wrap');
+        const en = wrap && wrap.querySelector('canvas')._mk();
+        return en && pinEntry(en);
       }
       if (tile && e.target.closest('.pt-tile-main')) {
         const i = Number(tile.dataset.i);
@@ -673,7 +748,7 @@ const PatternsUI = (function () {
   document.addEventListener('DOMContentLoaded', init);
 
   return {
-    setVisible, refresh, makeExport, pinEntry,
+    setVisible, refresh, makeExport, pinEntry, isPinned,
     // test / tooling access
     current: () => (cur ? { key: cur.key, params: Object.assign({}, cur.params), colorway: cur.colorway, seed: cur.seed } : null),
     setCurrent,

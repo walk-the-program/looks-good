@@ -14,8 +14,9 @@ long-established generative techniques.
    auto-picked for the current aesthetic. This is the "flip over to patterns" page.
 2. **Brand deck** — a "Patterns" slide (the suite as a 3×2 swatch wall with names) and the
    chosen hero pattern available as the cover/closing background treatment.
-3. **AI brief** — a short "Patterns" section: which pattern families fit, the ink-role mapping
-   rules, and one exported SVG tile (for vector families) or a description + parameters.
+3. **AI brief** — a "Patterns" section: which pattern families fit, the ink-role mapping
+   rules, and every pattern the user added to the brief (see "Brief cart" below), each with its
+   use, exact ink hexes, settings, and an SVG snippet or a pointer to the exported file.
 Not added to the board UI itself.
 
 ## Engine (js/patterns/)
@@ -64,22 +65,56 @@ ASCII Art → type terrain; Xerox → halftone (threshold), stipple, signal mosa
 ## Patterns view UI
 - Big canvas (16:9, fills the workspace width), "New variation" (reseed), family picker (visual
   tiles), auto-generated controls from the schema, Colorway control, Grain, Scale, Seed field.
-- Brand suite strip (6 thumbnails) — click to load into the big canvas; star to pin a pattern to
-  the brand (saved in state.patterns, persisted with the brand, undoable, marks unsaved).
+- Brand suite strip (6 thumbnails) — click to load into the big canvas; the + on a thumbnail adds
+  the pattern to the brief (saved in state.patterns, persisted with the brand, undoable, marks
+  unsaved). The canvas has "Add to brief" next to the exports; each All-families thumbnail has
+  the same + (it adds exactly what the thumbnail shows). In-brief items show a check. The
+  "In your brief" strip lists them.
 - Export: PNG (1×/2×/4K), SVG for vector families, "Copy CSS background" for small seamless
   tiles (data URI, size-capped).
 - Respects locks? No — patterns are their own section; Shuffle everything does not reseed them.
 - 390px: controls stack under the canvas.
 
+## Brief cart (js/pattern-cart.js)
+The old "pin" is now "Add to brief": same storage (`state.patterns`, max 8, undoable, marks the
+brand unsaved), so brands saved with pins load unchanged. Each entry is
+`{ key, params, colorway, seed, use, svg }` (`PatternPins`, js/patterns-ui.js):
+- `use` is one of `hero` (Hero background), `band` (Section band), `card` (Card texture),
+  `divider` (Divider strip), `accent` (Accent detail). Defaults by family: aura, terrain, flow,
+  counterchange, arcrise, oprings, modulargrid -> hero; halftone, stipple, glyphgrid, pixelquilt ->
+  card; zigzag, chevron -> divider; weave, signal, tornbands, gradpanes, typeterrain -> band.
+  Brands saved without `use` load with the family default.
+- `svg` (vector families only, default on) puts the SVG code in the AI brief.
+- Tray: a "Brief · N" button in the workspace header (all three views; muted at 0, pulses on add)
+  and a "Includes N patterns" line under "Copy AI brief". The tray lists thumbnail, name, colorway,
+  use select, include-SVG toggle, per-item Copy and remove, plus "Copy full AI brief" and "Copy
+  patterns only". Popover on wide screens, bottom sheet at <= 720px; Esc or an outside click closes.
+- Brief text (js/ai-brief.js): `buildAiBrief(state)` (full), `buildPatternsBrief(state)` (the
+  "## Patterns" section with a one-line preamble) and `buildPatternItemBrief(state, i)` (one
+  block). Each block: family, use with placement rules, the exact final ink hexes by role (strength
+  applied) with the brand token each one is, only the settings that differ from the defaults plus
+  seed and strength, and reproduction:
+  - seamless vector with SVG on: a 160x160 SVG tile plus a CSS `background-image: url("data:image/svg+xml,...")`
+    block, only when the tile is <= 8 KB (`AIB_TILE_SVG_CAP`); over the cap the brief says to
+    attach the exported SVG.
+  - non-seamless vector with SVG on: a 1200x675 SVG (root set to fill its box) when <= 12 KB
+    (`AIB_FULL_SVG_CAP`), else "attach the exported SVG/PNG" with the sizes.
+  - raster families and SVG off: "attach the exported PNG at <size>" plus the regeneration settings.
+  - Base64 PNGs are never pasted.
+- Engine: `Patterns.renderSVG(..., { tile: true })` / `Patterns.tileSVG(key, params, inks, seed, size)`
+  render a seamless tile of a seamless vector family (grain forced off, same composition as
+  `tileCSS`); `Patterns.finalInks(key, params, inks)` returns the inks a render really uses (tints and
+  strength applied).
+
 ## Deck integration
-- Patterns slide shows pinned patterns (or the suite if none pinned) with family names and
-  colorway labels; cover/closing may use the first pinned pattern as a background panel (behind a
+- Patterns slide shows the patterns in the brief (or the suite if none) with family names and
+  colorway labels; cover/closing may use the first one as a background panel (behind a
   solid copy area so text contrast holds).
 
 ## Acceptance
 1. 18 families render well at defaults with brand inks for 3 palettes; none copy third-party code.
 2. Aesthetic-fit suites look coherent with their boards for all 26.
 3. Controls regenerate live; seed reproducible (same seed + params → identical pixels).
-4. Pins persist with the brand and undo; exports work (PNG, SVG, CSS tile).
+4. Patterns in the brief persist with the brand (including `use` and `svg`) and undo; exports work (PNG, SVG, CSS tile).
 5. Deck Patterns slide renders and exports.
 6. No console errors; renders within budget; 390px usable.

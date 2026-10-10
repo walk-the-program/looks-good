@@ -246,7 +246,7 @@ const BrandSession = (function () {
     // undo-history.js only snapshots fonts, colors, shape and typography.
     // Selecting an aesthetic also changes the aesthetic itself and bgMode, so
     // both ride along on every snapshot and come back on Undo. So do the
-    // pinned patterns (pin / unpin is one undo step).
+    // patterns in the brief (add / remove / change use is one undo step).
     const pushBase = window.pushUndoSnapshot;
     window.pushUndoSnapshot = function (st, withTypography) {
       pushBase(st, withTypography);
