@@ -704,3 +704,168 @@ Also drop the blueprint.css:205 tag cap (F5).
 - Faces other than each aesthetic's first recommended pairing, such as a serif heading on Cyber
   HUD.
 - Real Google Fonts italic availability per family; F10 requires the curl check.
+
+---
+
+## Second pass (CAO-2)
+
+Evidence: `cao/v2-<key>-A..D.png` and `cao/sheet-v2-<key>.png`, compared against v1. I reviewed
+every A shot at full resolution and every sheet for B, C and D.
+
+The round worked. All three Rework boards are fixed at the root:
+- Bento's section 01 is now a composed card with a primary CTA tile.
+- Liquid Glass has a vivid scene with white copy and a real lens.
+- Holo's art is a foil ribbon and bubble instead of planet and orbit.
+
+Bauhaus now reads clearly differently from Raw Brutalist. The olive accent is gone everywhere. The
+brand name is no longer cut off at 390 on 19 of 20 boards.
+
+**10 boards are signed off.** The other 10 have one to three small fixes each: 12 fixes in total,
+none of them structural. Three are regressions introduced this round.
+
+### Updated ranking
+
+| # | Aesthetic | Status | Note |
+|---|-----------|--------|------|
+| 1 | Aurora Noir | Sign-off | Unchanged leader. |
+| 2 | Bauhaus Poster | Sign-off | Lowercase Bayer stack, half-plane highlight and shape swatches. Now unmistakable. |
+| 3 | Retro-Futurist | 1 fix | The LCD ghost segments sell the hardware. Narrow list rows are misaligned. |
+| 4 | Cyber HUD | Sign-off | |
+| 5 | Bento Grid | Sign-off | Up from 20th. The 01 card and the stat tiles are Apple-grade. |
+| 6 | Industrial Device | Sign-off | Orange now spent on function only. |
+| 7 | Soft Form | Sign-off | The states tray reads as a specimen. |
+| 8 | Blueprint | 1 fix (regression) | The teal field is right, but the primary now renders as pastel salmon. |
+| 9 | Clay | 1 fix | |
+| 10 | Neo Deco | Sign-off | Translucent stepped frame over the fan; small text now holds. |
+| 11 | Editorial Serif | 1 fix | True italics land. Cover labels collide with the initial. |
+| 12 | Pixel Arcade | Sign-off | Brand-initial blocks and a dusk sky; no longer a Mario quote. |
+| 13 | Riso Print | Sign-off | |
+| 14 | Raw Brutalist | 1 fix | The spec index fills the hero. The name still truncates at 390. |
+| 15 | Neo-Brutal Pop | 1 fix (regression) | Stickers now overlap the headline correctly at 1280, but cover the "G" at 390. |
+| 16 | Mesh Gradient | Sign-off | |
+| 17 | Groovy 70s | 3 fixes | Neutral waves and kraft panels fixed the noise. Sunburst, fit pill and narrow arch remain. |
+| 18 | Liquid Glass | 1 fix | The hero is now Liquid Glass. The lens splits the initial into a broken glyph. |
+| 19 | Holo Iridescent | 1 fix | Foil ribbon reads correctly. A visible seam runs through the bubble. |
+| 20 | Y2K Chrome | 1 fix | The chrome type is fixed. Palette chips leave Accent orphaned on a second row. |
+
+### Rulings on worker deviations
+
+| Deviation | Ruling |
+|-----------|--------|
+| F1 accent ink #C27E00 (3.07:1) instead of #A86A00 | **Accept.** It reads as warm amber/gold, not olive, in Soft Form B, Editorial A, Bento A, Industrial A and Aurora B. My number was illustrative; the rule is what matters. |
+| Retro LCD "M  9.5" with ghost segments at 14% | **Accept.** The ghost 8s read correctly. |
+| Pop stickers as headline pseudo-elements, 2px outline | **Accept** the mechanism and the 2px weight (it matches the hero CTA). The narrow overlap is a separate bug (fix 3.4). |
+| Bauhaus `::before` half-plane with a two-colour text clip | **Accept.** It renders correctly in A, B, C and D. |
+| Liquid Glass timer top-left; second lens at narrow | **Accept.** Over the primary light the timer reads orange; that is physically right for clear glass. |
+| Riso `text-wrap: wrap` to reach three lines | **Accept.** |
+| Editorial initial at bottom −38% with a plate halo | **Accept the position, overrule the halo.** The labels are still cut by the strokes (fix 11.4). |
+| Mesh zone contrast 7.4 plus a scrim lobe | **Accept.** Secondary shows only at the right edge, but the copy zone is clean and the mesh reads as multi-hue. |
+| Groovy sunburst radius 0.9× CTA width | **Overrule.** Rays still sit behind the card body copy (fix 19.4). |
+| Groovy's own `.ab-fit[match]` still primary-filled | **Overrule.** This is the same role violation F2 removed (fix 19.5). |
+| Pixel light-mode `.ab-hl` shadow at 2px | **Accept.** |
+| Bento 02 field label overlaying the input (`pointer-events: none`) | **Accept.** |
+
+### Regressions vs v1
+
+1. **Neo-Brutal Pop at 390:** the starburst sticker paints over the "G", so the headline reads
+   "ood design". Fix 3.4.
+2. **Blueprint:** with the new teal field, `--ab-pri-ui` (the primary lifted toward white for
+   contrast) now fills the CTA, the selected tab and the state buttons. The brand's #E4572E shows
+   as pastel salmon; in green it shows as mint. Fix 20.3.
+3. **Holo:** the new two-segment ribbon leaves a visible vertical seam inside the bubble. Fix 6.6.
+
+### Remaining fixes
+
+**X0 (framework): none.**
+
+**X1 (keys 1–10)**
+
+Signed off: Soft Form, Aurora Noir, Bauhaus Poster, Riso Print.
+
+- **2.5 Raw Brutalist, 390 header.**
+  - WHAT: inside `@container ab (max-width: 600px)`.
+  - CHANGE:
+    `.ab[data-ae="raw-brutalist"] .ab-wordmark { font-size: 13px; letter-spacing: 0; }`
+    `.ab[data-ae="raw-brutalist"] .ab-tag { font-size: 9px; letter-spacing: .06em; }`
+  - CHECK: D shows the full "MARIGOLD STUDIO".
+  - WHY: Archivo Black is wide enough to defeat F5.
+- **3.4 Neo-Brutal Pop, stickers vs headline (regression).**
+  - CHANGE: `.ab[data-ae="neo-brutal-pop"] .ab-headline { position: relative; isolation: isolate; }`
+    with both sticker pseudo-elements at `z-index: -1`, so glyphs always paint over stickers.
+  - At ≤600px the starburst is 56px wide at `left: -8px; top: -30px`; it may overlap at most the
+    top-left 10% of the first glyph.
+  - CHECK: D reads "Good design" in full; A is unchanged.
+- **4.3 Retro-Futurist, narrow list.**
+  - WHAT: inside the 600px block.
+  - CHANGE:
+    - `.ab[data-ae="retro-futurist"] .ab-row { grid-template-columns: 3ch minmax(0, 1fr) 5ch; }`
+    - `.ab-row-n { grid-column: 1; grid-row: 1 / span 2; align-self: start; display: block; }`
+    - `.ab-row-name { grid-column: 2; justify-self: start; text-align: left; }`
+    - `.ab-row-status { grid-column: 2; grid-row: 2; justify-self: start; }`
+    - `.ab-row-pct { grid-column: 3; grid-row: 1; }`
+    - Remove any right-justification the file applies to the name at narrow.
+  - WHY: names are currently pushed right, with an empty left half and no row numbers.
+- **5.5 Liquid Glass, lens alignment.**
+  - WHAT: `abLens` call(s) in `art()`, both wide and narrow.
+  - CHANGE: center the lens on the initial's center (same x/y), lens width = 1.15 × the glyph's
+    width, scale 1.08, dx 0, dy 0.
+  - WHY: the current offset turns the M into a split "И" with a stray stem outside the lens, which
+    reads as a rendering bug. A centered lens magnifies, and the bend shows only at the rim, as real
+    glass does.
+- **6.6 Holo Iridescent, ribbon seam (regression).**
+  - CHANGE: split the two ribbon segments where the band crosses the bubble's right rim, not at the
+    bubble's center. Overlap the segments by 1.5 units.
+  - Give both segments the same `linearGradient` with `gradientUnits="userSpaceOnUse"`, x1=0 and
+    x2=160, so the colors match across the join.
+  - CHECK: no vertical line inside the bubble in A, B or C.
+- **9.2 Clay, footer bar.**
+  - CHANGE: `.ab[data-ae="clay"] .ab-foot { border-top: 0; }`. Also remove any `::before` bar on it.
+  - WHY: the last grey "scrollbar" rule survived 9.1.
+
+**X2 (keys 11–20)**
+
+Signed off: Neo Deco, Cyber HUD, Bento Grid, Mesh Gradient, Industrial Device, Pixel Arcade.
+
+- **11.4 Editorial Serif, cover labels.**
+  - CHANGE:
+    - Initial fill = `mix(plate, canvas, .28)`, a tonal letter instead of a canvas-colored one.
+    - "NO. 01", the coverline and the brand/season line stay canvas color at full opacity with
+      `position: relative; z-index: 2`.
+    - Remove the halo.
+  - WHY: the labels are cut by the M's strokes ("MARIGOLD STUD|O"). A tonal giant letter keeps the
+    crop drama and lets the cover type sit on top, as on Kinfolk and Gentlewoman covers.
+- **13.5 Y2K Chrome, palette chips.**
+  - CHANGE (above 600px):
+    `.ab[data-ae="y2k-chrome"] .ab-swatches[data-kind="chips"] { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px; }`
+    with chips `min-width: 0`.
+  - Hide `.ab-sw-hex` in `@container ab (max-width: 820px)` and above 600px; the framework narrow
+    layout keeps showing it below that.
+  - WHY: Accent alone on a second row reads as an afterthought.
+- **19.4 Groovy 70s, sunburst.**
+  - CHANGE: radius 0.7 × CTA width; mask `linear-gradient(to bottom, transparent 0 50%, #000 78%)`.
+  - CHECK: no ray behind "Your next good idea." or the body line.
+- **19.5 Groovy 70s, fit pill.**
+  - CHANGE: delete the aesthetic's `.ab-fit[data-fit="match"]` fill so the framework's sec-tint and
+    ink text apply. The pill shape may stay.
+- **19.6 Groovy 70s, 390 hero.**
+  - CHANGE (≤600px):
+    `.ab[data-ae="groovy-70s"] .ab-hero-copy { max-width: 58cqw; margin-inline: auto; }`
+    `.ab[data-ae="groovy-70s"] .ab-headline { font-size: calc(clamp(24px, 8.2cqw, 36px) * var(--ab-hl-scale, 1) * var(--ab-hs, 1) * var(--ab-display, 1)); }`
+  - CHECK: in D no glyph crosses an arch band.
+- **20.3 Blueprint, primary fills (regression).**
+  - CHANGE: these fills become `background: var(--ab-primary); color: var(--ab-on-primary)`, with
+    the existing 1px ink outline kept for edge definition:
+    - `.ab-cta`
+    - the selected `.ab-seg-btn[aria-pressed="true"]`
+    - `.ab-state-ctl` (all three states)
+    - the switch "on" fill
+  - The lifted `--ab-pri-ui` stays only for strokes, small markers and text.
+  - CHECK: A shows #E4572E fills; C shows #2F6B4F fills.
+  - WHY: the brand's primary must render as itself wherever it fills; a pastel version reads as a
+    different brand.
+
+**Totals:** X0 0 · X1 6 · X2 6.
+
+**Verification:** regenerate only the affected keys with `TAG=v3` and check the named CHECK lines.
+These fixes are small and local. I do not need another full review round; a coordinator spot-check
+of the ten v3 sheets is enough to accept.
