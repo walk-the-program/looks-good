@@ -17,7 +17,7 @@ registerAesthetic({
   slideShape: 'minimal',
   labels: { material: 'Page', states: ['Rest', 'Hover', 'Pressed'], statesKind: 'button' },
   layout: { hero: 'poster', palette: 'chips', sections: 'asym' },
-  type: { ui: 'sans', label: 'sans', display: 1 },
+  type: { ui: 'sans', label: 'sans', display: 1.22 },
   highlight: 'custom',
   highlightNote: 'The last word is set in italic (same face, weight 400) in --accent-ink, no fill, no underline; the rest of the headline stays upright ink.',
 
@@ -75,6 +75,7 @@ registerAesthetic({
       // duotone plate: primary multiplied over a greyscale image; the plate's
       // lights and darks are derived from the brand primary, never invented
       '--ab-eds-plate-dark': t.mix(t.primary, '#000000', 0.5),
+      '--ab-eds-plate': t.mix(t.primary, t.ink, 0.35),
       '--ab-eds-paper': d ? t.ink : t.canvas,
       '--ab-eds-ink-hover': t.mix(t.ink, t.primary, 0.88),
       '--ab-eds-primary-press': t.mix(t.primary, '#000000', 0.78),
@@ -82,19 +83,17 @@ registerAesthetic({
     };
   },
 
-  // The cover plate: a greyscale "photograph" of sun, haze and three hills,
-  // multiplied with the brand primary (the duotone), a giant drop-cap initial in
-  // the paper colour, and a caption under it. Pure HTML/CSS (css/aesthetics/editorial-serif.css).
+  // The cover plate: a dark duotone field (primary mixed toward ink) with 5% grain, a giant
+  // brand initial in the heading face cropped by the bottom and left edges, a coverline and
+  // a caption under the plate. Pure HTML/CSS (css/aesthetics/editorial-serif.css).
   art(ctx) {
     const e = escapeHtml;
     return `<figure class="eds">
       <div class="eds-plate">
-        <i class="eds-sun"></i><i class="eds-haze"></i>
-        <i class="eds-hill eds-h1"></i><i class="eds-hill eds-h2"></i><i class="eds-hill eds-h3"></i>
-        <i class="eds-duo"></i>
         <i class="eds-grain"></i>
         <span class="eds-no">No. 01</span>
         <span class="eds-cap">${e(ctx.initial)}</span>
+        <div class="eds-cover"><em class="eds-line">The design issue</em><span class="eds-sub">${e(ctx.brandName || ctx.name || '')} · Spring</span></div>
       </div>
       <figcaption class="eds-fig"><span><em>Fig. 1</em> — the brand at rest</span><span>p. 01</span></figcaption>
     </figure>`;
@@ -104,7 +103,7 @@ registerAesthetic({
     { name: 'Paper', css: 'background: {canvas}; color: {ink}; border-radius: 0; box-shadow: none; /* canvas warmed ~25% toward cream; no cards, panels are the same paper */' },
     { name: 'Masthead rule', css: 'border-top: 3px solid {hairStrong}; border-bottom: 1px solid {hairStrong}; height: 7px; /* thick over thin, under the masthead only */' },
     { name: 'Hairline', css: 'border-top: 1px solid {hair}; /* every divider, every panel edge; never a shadow */' },
-    { name: 'Duotone plate', css: 'background: greyscale image; overlay: {primary} with mix-blend-mode: multiply; border: 1px solid {hairStrong}; border-radius: 0; /* caption "Fig. 1 — the brand at rest" below */' },
+    { name: 'Duotone plate', css: 'background: {edsPlate}; /* primary mixed 35% toward ink, 5% multiply grain */ border: 1px solid {hairStrong}; border-radius: 0; /* cropped brand initial, coverline "The design issue", caption "Fig. 1 — the brand at rest" below */' },
     { name: 'Primary action', css: 'background: {primary}; color: {onPrimary}; border-radius: 0; text-transform: uppercase; letter-spacing: .14em; font-size: 12px; /* hover: background {ink}, color {canvas}; pressed: {edsPrimaryPress}, text {edsOnPress} */' },
     { name: 'Contents row', css: 'border-top: 1px solid {hairSoft}; /* name, dotted leader (1px dotted {hair}), status in small caps, page number right */' },
   ],

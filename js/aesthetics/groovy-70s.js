@@ -32,11 +32,11 @@ registerAesthetic({
       never: 'Body text, large card fills, a second CTA',
     },
     secondary: {
-      use: 'The second rainbow band, the tint of the first card, status pills and the wavy divider',
+      use: 'The second rainbow band, the tint of the first card, status pills and the second wave in the header and footer stripes',
       never: 'The main CTA, body text, page background',
     },
     accent: {
-      use: 'The third rainbow band, the wavy underline under the headline word, the sunburst behind the CTA and the tint of the second card',
+      use: 'The third rainbow band, the wavy underline under the headline word, the sunburst behind the CTA and the third wave in the header and footer stripes',
       never: 'Buttons, body text, borders',
       coverage: '≤8%',
     },
@@ -51,11 +51,17 @@ registerAesthetic({
     const d = t.isDark;
     const st = typeof state !== 'undefined' ? state : null;
     const cls = st && st.headingFont ? st.headingFont.cls : '';
+    // three stacked waves (3px strokes, 3px apart) in the brand colours, as an SVG tile for the header and footer stripes
+    const wave = (y, c) => `<path d="M0 ${y} Q10 ${y - 7} 20 ${y} T40 ${y}" fill="none" stroke="${c}" stroke-width="3" stroke-linecap="round"/>`;
+    const waveSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="40" height="24" viewBox="0 0 40 24">${wave(6, t.primary)}${wave(12, t.secondary)}${wave(18, t.accent)}</svg>`;
     return {
+      '--ab-wave3': 'url(data:image/svg+xml,' + encodeURIComponent(waveSvg).replace(/\(/g, '%28').replace(/\)/g, '%29').replace(/'/g, '%27') + ')',
+      '--ab-wave-ink': t.alpha(t.ink, 0.28),
+      '--ab-kraft': d ? t.mix('#5a4426', t.canvas, 0.45) : t.mix('#e9d6ae', t.canvas, 0.35),
       '--ab-tr': ({ condensed: 0, heavy: 0, wide: 0.4, techno: 0.4 }[cls]) ?? 1,
       '--ab-hw': cls === 'groovy' ? 400 : 800,
       '--ab-card-a': t.mix(t.secondary, t.canvas, d ? 0.2 : 0.26),
-      '--ab-card-b': t.mix(t.accent, t.canvas, d ? 0.2 : 0.32),
+      '--ab-card-b': t.mix(t.accent, t.canvas, d ? 0.2 : 0.32),   // accent tint: small pills only (the tag), never a panel
       '--ab-card-c': t.mix(t.primary, t.canvas, d ? 0.22 : 0.16),
       '--ab-track': t.mix(t.ink, t.canvas, d ? 0.14 : 0.08),
       '--ab-lift': d ? t.mix('#ffffff', t.canvas, 0.1) : t.mix('#ffffff', t.canvas, 0.62),
@@ -86,19 +92,20 @@ registerAesthetic({
 
   materials: [
     { name: 'Rainbow arch', css: 'four concentric arches with straight legs, 9 units wide with 1.5 gaps: {primary}, {secondary}, {accent}, {ink} from the outside in; the gaps show {canvas}' },
-    { name: 'Color-block card', css: 'background: {cardA}; border: 0; border-radius: 36px; box-shadow: none; /* alternate {cardA} (secondary tint), {cardB} (accent tint), {cardC} (primary tint); flat, no outline, no offset shadow */' },
+    { name: 'Color-block card', css: 'background: {cardA}; border: 0; border-radius: 36px; box-shadow: none; /* alternate {cardA} (secondary tint), {kraft} (a warm kraft-paper tone, for the 02 panel, the body type column and list row 3) and {cardC} (primary tint); flat, no outline, no offset shadow */' },
     { name: 'Fat pill CTA', css: 'background: {primary}; color: {onPrimary}; border-radius: 999px; padding: 15px 26px; font-weight: 700; box-shadow: none; /* hover: scale(1.04) with a 4px {ring} halo; pressed: scale(.96) and background {priDark}; a sunburst of rays behind it: repeating-conic-gradient({accent} 0 6deg, transparent 6deg 15deg) */' },
     { name: 'Selected tab', css: 'background: {primary}; color: {onPrimary}; border-radius: 999px; /* track: {track}, radius 999 */' },
     { name: 'Field', css: 'background: {lift}; border: 0; border-radius: 999px; padding: 14px 22px; /* focus: box-shadow 0 0 0 4px {ring} */' },
     { name: 'Wavy underline', css: 'text-decoration: underline wavy {accent}; text-decoration-thickness: .09em; text-underline-offset: .14em; /* under the highlighted word, in the accent */' },
-    { name: 'Wavy divider', css: 'a sine-wave line (stroke 3px, rounded) in a {primary} to {accent} to {secondary} gradient, used instead of every straight rule' },
+    { name: 'Wavy divider', css: 'a sine-wave line (stroke 3px, rounded) in one flat color ({waveInk}, ink at 28%) instead of every straight rule; never a gradient through the hues' },
+    { name: 'Wave stripe', css: 'three stacked waves, 3px strokes 3px apart, in {primary}, {secondary} and {accent}; only under the header and above the footer' },
   ],
 
   rules: {
     do: [
       'Build the signature from concentric arches in primary, secondary, accent and ink, with canvas gaps between bands and straight legs.',
       'Set the headline in a fat, soft display face, tight, and put the highlighted word on a thick wavy accent underline.',
-      'Use pills and blobs only (radius full or 36px), flat color blocks, and wavy dividers instead of straight rules.',
+      'Use pills and blobs only (radius full or 36px), flat color blocks, and wavy dividers instead of straight rules; the three-color wave stripe appears twice, under the header and above the footer.',
       'Keep the canvas warm cream and put a sunburst of accent rays behind the one main action.',
     ],
     dont: [

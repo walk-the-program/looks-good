@@ -59,17 +59,17 @@
 .ab[data-ae="neo-deco"][data-hero="centered"] .ab-hero-copy {
   grid-area: 1 / 1; position: relative; z-index: 2; justify-self: center; align-self: start; width: min(100%, 66cqw); max-width: none;
   margin: clamp(10px, 2.4cqw, 28px) 0 clamp(78px, 13cqw, 150px);
-  padding: clamp(18px, 2.6cqw, 30px) clamp(22px, 3.2cqw, 40px) clamp(20px, 2.8cqw, 32px);
-  border: 28px solid transparent; border-image: var(--ab-nd-frame) 28 / 28px stretch;
+  padding: clamp(12px, 1.8cqw, 22px) clamp(16px, 2.4cqw, 32px) clamp(14px, 2cqw, 24px);
+  border: 36px solid transparent; border-image: var(--ab-nd-frame) 36 / 36px stretch;
   text-align: center;
 }
 /* the frame's fill: the same two-step ziggurat corners, so the rays stop at the outer line */
 .ab[data-ae="neo-deco"][data-hero="centered"] .ab-hero-copy::before {
-  content: ""; position: absolute; inset: -28px; z-index: -1; background: var(--ab-veil);
-  clip-path: polygon(0 12px, 6px 12px, 6px 6px, 12px 6px, 12px 0,
-    calc(100% - 12px) 0, calc(100% - 12px) 6px, calc(100% - 6px) 6px, calc(100% - 6px) 12px, 100% 12px,
-    100% calc(100% - 12px), calc(100% - 6px) calc(100% - 12px), calc(100% - 6px) calc(100% - 6px), calc(100% - 12px) calc(100% - 6px), calc(100% - 12px) 100%,
-    12px 100%, 12px calc(100% - 6px), 6px calc(100% - 6px), 6px calc(100% - 12px), 0 calc(100% - 12px));
+  content: ""; position: absolute; inset: -36px; z-index: -1; background: var(--ab-veil);
+  clip-path: polygon(0 20px, 10px 20px, 10px 10px, 20px 10px, 20px 0,
+    calc(100% - 20px) 0, calc(100% - 20px) 10px, calc(100% - 10px) 10px, calc(100% - 10px) 20px, 100% 20px,
+    100% calc(100% - 20px), calc(100% - 10px) calc(100% - 20px), calc(100% - 10px) calc(100% - 10px), calc(100% - 20px) calc(100% - 10px), calc(100% - 20px) 100%,
+    20px 100%, 20px calc(100% - 10px), 10px calc(100% - 10px), 10px calc(100% - 20px), 0 calc(100% - 20px));
 }
 .ab[data-ae="neo-deco"] .ab-kicker {
   display: flex; align-items: center; justify-content: center; gap: 14px; margin-bottom: clamp(12px, 1.8cqw, 18px) !important;
@@ -126,7 +126,8 @@
 .ab[data-ae="neo-deco"] .ab-seg-btn[aria-pressed="true"]::after {
   content: ""; position: absolute; left: 50%; bottom: -5px; width: 7px; height: 7px; background: var(--ab-gilt); transform: translateX(-50%) rotate(45deg);
 }
-.ab[data-ae="neo-deco"] .ab-card-title { margin: 28px 0 14px !important; font-weight: 400; text-transform: uppercase; letter-spacing: calc(0.1em * var(--ab-tr, 1)); font-size: clamp(18px, 2.3cqw, 26px); }
+.ab[data-ae="neo-deco"] .ab-card-title { margin: 28px 0 14px !important; font-weight: 400; text-transform: uppercase; letter-spacing: calc(0.1em * var(--ab-tr, 1)); font-size: clamp(24px, 2.6cqw, 28px); }
+.ab[data-ae="neo-deco"][data-hcls="deco"] .ab-card-title { font-family: var(--ab-font-b); font-weight: 500; }
 .ab[data-ae="neo-deco"] .ab-card-title::after { content: ""; display: block; height: 11px; margin: 14px auto 0; width: min(64%, 200px); background: var(--nd-orn); }
 .ab[data-ae="neo-deco"] .ab-card-body { color: var(--ab-muted); margin-bottom: 26px !important; }
 .ab[data-ae="neo-deco"] .ab-cta {
@@ -174,7 +175,7 @@
 .ab[data-ae="neo-deco"] .ab-row:first-child::before { display: none; }
 .ab[data-ae="neo-deco"] .ab-row-n { font-size: 0; }
 .ab[data-ae="neo-deco"] .ab-row-n::before { content: counter(ndr, upper-roman); font-size: 12px; letter-spacing: 0.14em; color: var(--ab-gilt); }
-.ab[data-ae="neo-deco"] .ab-row-name { font-family: var(--ab-font-h); font-weight: 400; letter-spacing: calc(0.08em * var(--ab-tr, 1)); text-transform: uppercase; font-size: 14px; }
+.ab[data-ae="neo-deco"] .ab-row-name { font-family: var(--ab-font-b); font-weight: 500; font-size: 12.5px; letter-spacing: .18em; text-transform: uppercase; }
 .ab[data-ae="neo-deco"] .ab-row-status { background: none; border: 1px solid var(--ab-gilt-b); border-radius: 0; padding: 3px 10px; font-size: 9.5px; letter-spacing: 0.2em; text-transform: uppercase; }
 .ab[data-ae="neo-deco"] .ab-row-bar { height: 1px; border-radius: 0; background: var(--ab-gilt-c); overflow: visible; position: relative; }
 .ab[data-ae="neo-deco"] .ab-row-bar i { position: relative; height: 1px; background: var(--ab-gilt); }
@@ -217,9 +218,9 @@
   .ab[data-ae="neo-deco"][data-hero="centered"] .ab-hero { grid-template-rows: auto auto; gap: 0; padding: 18px 0 20px; }
   .ab[data-ae="neo-deco"][data-hero="centered"] .ab-art { grid-area: 1 / 1; height: auto; aspect-ratio: 16 / 8; align-self: start; }
   .ab[data-ae="neo-deco"][data-hero="centered"] .ab-hero-copy {
-    grid-area: 2 / 1; width: 100%; margin: -34px 0 0; padding: 14px 10px 18px; border-width: 22px; border-image-width: 22px; border-image-slice: 28;
+    grid-area: 2 / 1; width: 100%; margin: -34px 0 0; padding: 10px 8px 14px; border-width: 26px; border-image-width: 26px; border-image-slice: 36;
   }
-  .ab[data-ae="neo-deco"][data-hero="centered"] .ab-hero-copy::before { inset: -22px; }
+  .ab[data-ae="neo-deco"][data-hero="centered"] .ab-hero-copy::before { inset: -26px; }
   .ab[data-ae="neo-deco"][data-hero="centered"] .ab-headline { font-size: calc(clamp(24px, 8cqw, 40px) * var(--ab-hl-scale, 1) * var(--ab-hs, 1) * var(--ab-display, 1)); padding-left: 0; }
   .ab[data-ae="neo-deco"] .ab-swatches { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .ab[data-ae="neo-deco"] .ab-swatch { display: flex; grid-template-columns: none; }

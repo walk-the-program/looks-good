@@ -20,7 +20,7 @@ registerAesthetic({
   slideShape: 'refined',
   labels: { material: 'Surfaces', states: ['Rest', 'Hover', 'Pressed'], statesKind: 'button' },
   layout: { hero: 'split', palette: 'swatches', sections: 'two-col' },
-  type: { ui: 'sans', label: 'sans', display: 0.96 },
+  type: { ui: 'sans', label: 'sans', display: 0.92 },
   highlight: 'custom',
   highlightNote: 'The word keeps the mesh text color (white or ink, computed for contrast on the mesh) and carries a thick accent underline swash beneath it; no fill, no color change. When the accent would not hold 3:1 on the mesh the swash falls back to the text color at 55%.',
   cardFill: '--ab-paper',
@@ -60,7 +60,7 @@ registerAesthetic({
     let ink = lightBrand ? '#101014' : '#ffffff';
     let l = lightBrand ? Math.max(78, hp.l) : Math.min(34, hp.l);
     let deep = deepAt(l), zone = zoneOf(deep);
-    for (let i = 0; i < 30 && t.contrast(ink, zone) < 5.2; i++) {
+    for (let i = 0; i < 30 && t.contrast(ink, zone) < 7.4; i++) {
       l += lightBrand ? 2 : -2;
       deep = deepAt(Math.max(4, Math.min(96, l)));
       zone = zoneOf(deep);
@@ -143,7 +143,7 @@ registerAesthetic({
   },
 
   materials: [
-    { name: 'Mesh band', css: 'background: radial-gradient(60% 90% at 6% 10%, {meshDeep}, transparent 72%), radial-gradient(38% 70% at 100% 0%, {mA}, transparent 70%), radial-gradient(52% 85% at 80% 100%, {mS}, transparent 70%), radial-gradient(56% 90% at 38% 104%, {mP}, transparent 70%), radial-gradient(42% 64% at 62% 22%, {mMid}, transparent 74%), {meshDeep}; /* five overlapping lights, clipped to a -6deg diagonal at the bottom edge; copy on it is {meshInk} */' },
+    { name: 'Mesh band', css: 'background: radial-gradient(48% 72% at 88% 78%, {mS}, transparent 68%), radial-gradient(36% 58% at 76% 6%, {mA}, transparent 66%), radial-gradient(44% 64% at 48% 34%, {mMid}, transparent 70%), radial-gradient(64% 92% at 8% 12%, {meshDeep}, transparent 72%), radial-gradient(70% 100% at 30% 112%, {mP}, transparent 70%), {meshDeep}; /* five distinct color fields (secondary lower right, accent top right, light primary centre, deep primary left, primary bottom) over a deep base, clipped to a -6deg diagonal at the bottom edge; copy on it is {meshInk} */' },
     { name: 'White card', css: 'background: {paper}; border: 1px solid {hair}; border-radius: 12px; box-shadow: {shadow}; /* layered: 1px contact, 6px 18px mid, 24px 48px ambient, tinted with primary at low alpha */' },
     { name: 'Primary pill', css: 'background: {primary}; color: {onPrimary}; border-radius: 999px; font-weight: 600; box-shadow: {ctaSh}; /* arrow nudges 3px right on hover; pressed: translateY(1px) and a smaller shadow */' },
     { name: 'Selected segment', css: 'background: {paper}; color: {primaryText}; border-radius: 8px; box-shadow: {shadow}; /* track: {fill}, 1px {hair} */' },

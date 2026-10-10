@@ -33,12 +33,12 @@ registerAesthetic({
       coverage: '15–20%',
     },
     primary: {
-      use: 'The one solid tile, the main action, switch "on" and the product mock; exactly one primary tile per view',
+      use: 'The one solid tile (the 01 action tile, a composed square with the label bottom-left and an arrow circle top-right), switch "on" and the product mock; exactly one primary tile per view',
       never: 'Body text, a second solid tile, tile borders',
       coverage: '≈10–12%',
     },
     secondary: {
-      use: 'The one secondary-tinted tile (the product stage), the status tags and the second progress color',
+      use: 'The product stage tint, the 72% stat tile, the status tags and every progress bar (progress is a data series)',
       never: 'The main action, body text',
       coverage: '≈10–15%',
     },
@@ -65,6 +65,7 @@ registerAesthetic({
     return {
       '--ab-font-ui': uiFace, '--ab-font-label': uiFace,
       '--ab-tr': (hf && { condensed: 0, heavy: 0, wide: 0.4, techno: 0.4 }[hf.cls]) ?? 1,
+      '--ab-type-pick-w': 600,
       '--ab-tile': tile,
       '--ab-tile-sec': t.mix(t.secondary, tile, d ? 0.24 : 0.2),
       '--ab-tile-pri': t.mix(t.primary, tile, d ? 0.2 : 0.14),
@@ -114,9 +115,9 @@ registerAesthetic({
   materials: [
     { name: 'Board', css: 'background: {canvas}; /* a step darker than the tiles; the gaps between tiles are this color */' },
     { name: 'Tile', css: 'background: {tile}; border: 0; border-radius: 28px; box-shadow: {shadow}; /* no borders; hover lifts 2px with {shadowHi} */' },
-    { name: 'Primary tile (main action)', css: 'background: {primary}; color: {onPrimary}; border-radius: 28px; /* exactly one per view; hover {priHover}, pressed {priPress} */' },
+    { name: 'Primary tile (main action)', css: 'background: {primary}; color: {onPrimary}; border-radius: 28px; padding: 22px; /* the 01 action: a square tile beside the title tile, label bottom-left (22px, 600), 40px arrow circle top-right at on-primary 18%; exactly one per view; hover {priHover}, pressed {priPress} */' },
     { name: 'Secondary-tinted tile', css: 'background: {tileSec}; border-radius: 28px; /* the product stage; 20% secondary over the tile white */' },
-    { name: 'Primary-tinted stat tile', css: 'background: {tilePri}; border-radius: 28px; /* huge numeral in ink, tabular, tracking -0.05em */' },
+    { name: 'Secondary-tinted stat tile', css: 'background: {secTint}; border-radius: 28px; /* the 72% tile: huge numeral in ink, tabular, tracking -0.05em; its progress bar is {secondary} */' },
     { name: 'Sub-tile (inside a tile)', css: 'background: {sub}; border-radius: 18px; /* fields, type columns, state samples */' },
   ],
 
@@ -124,7 +125,7 @@ registerAesthetic({
     do: [
       'Build every block as a rounded tile (radius 28) on a slightly darker canvas; separate tiles with a 14px gap, never a border or rule.',
       'Make each tile say one thing; give stats a huge numeral in the heading face with a small label.',
-      'Fill exactly one tile solid primary (the main action) and tint one tile with secondary; the rest are plain tile white.',
+      'Fill exactly one tile solid primary (the action tile beside the title) and tint the product stage and the lead stat tile with secondary; the rest are plain tile white.',
       'Vary spans (2x2 hero, 1x1 stats, wide bars) so the grid has rhythm, but keep gaps and radii identical.',
     ],
     dont: [

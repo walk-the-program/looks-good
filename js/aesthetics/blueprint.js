@@ -1,7 +1,7 @@
 /* 20 Blueprint — technical, annotated, exact. Reference: cyanotype blueprints,
    patent drawings, engineering datasheets. The canvas is the drawing field (the
-   brand's primary deepened toward navy when it is blue-ish, otherwise the dark
-   color tinted toward the primary), ink is the near-white line color, and a
+   brand's bluest hue, deepened to a blueprint field; a desaturated dark tinted
+   toward the primary when no hue is blue-ish), ink is the near-white line color, and a
    24px / 120px double grid sits underneath. Everything is 1px line work with
    mono annotations; color appears only as tiny markers, the selected tab and the
    one filled CTA. The hero art is an oblique line drawing of the brand initial as an
@@ -47,12 +47,12 @@ registerAesthetic({
   layout: { hero: 'split', palette: 'swatches', sections: 'two-col' },
   type: { ui: 'mono', label: 'mono', display: 0.84 },
   highlight: 'custom',
-  highlightNote: 'The word keeps the ink headline color and is boxed by a dimension line above it (end ticks, a measurement set in mono in a gap in the line) drawn in the accent; no fill, no underline.',
+  highlightNote: 'The word keeps the ink headline color and is boxed by a dimension line below it (end ticks, a measurement set in mono in a gap in the line) drawn in the accent; no fill, no underline.',
   cardFill: '--ab-canvas',
 
   roles: {
     canvas: {
-      use: 'The drawing field: the primary deepened toward navy when blue-ish, otherwise the dark color tinted toward the primary; the 24px and 120px grid sits on it',
+      use: 'The drawing field, from the brand\'s bluest hue; the 24px and 120px grid sits on it',
       never: 'Text, or a lighter panel fill; panels are outlines on the field',
     },
     ink: {
@@ -70,21 +70,23 @@ registerAesthetic({
       coverage: '≈3–5%',
     },
     accent: {
-      use: 'The dimension line over the headline word, the corner ticks of the CTA and callout dots; always a hairline or a dot',
+      use: 'The dimension line under the headline word, the corner ticks of the CTA and callout dots; always a hairline or a dot',
       never: 'Buttons, body text, panel fills',
       coverage: '≤2%',
     },
   },
 
-  // Dark: the drawing field. Blue-ish primary -> deepened toward navy; otherwise the dark color tinted 20% toward the primary.
-  // Lightness settles in 12-24% so near-white line work holds above 8:1.
+  // Dark: the drawing field, taken from the brand's bluest hue. Of primary and secondary, the hue nearest 215 degrees;
+  // within +/-45 of it the field is that hue at saturation 45-62%, lightness 21%. A brand with no blue-ish hue gets the
+  // dark color tinted toward the primary, desaturated (<= 26%) and held at 16-18% lightness (a Vandyke print, not a brown page).
   canvas(b) {
     if (!b.isDark) return null;
-    const h = b.hexToHsl(b.primary);
-    const blue = h.h >= 185 && h.h <= 265;
-    const tinted = blue ? b.mix(b.primary, '#0a1a44', 0.4) : b.mix(b.primary, b.canvas, 0.2);
-    const c = b.hexToHsl(tinted);
-    return b.hslToHex(c.h, Math.max(blue ? 55 : 42, Math.min(c.s, 72)), blue ? Math.max(20, Math.min(c.l, 24)) : Math.max(16, Math.min(c.l, 19)));
+    const dist = h => { const d = Math.abs(h - 215) % 360; return d > 180 ? 360 - d : d; };
+    const hs = [b.hexToHsl(b.primary), b.hexToHsl(b.secondary)];
+    const best = dist(hs[0].h) <= dist(hs[1].h) ? hs[0] : hs[1];
+    if (dist(best.h) <= 45) return b.hslToHex(best.h, Math.max(45, Math.min(best.s, 62)), 21);
+    const c = b.hexToHsl(b.mix(b.primary, b.canvas, 0.2));
+    return b.hslToHex(c.h, Math.min(c.s, 26), Math.max(16, Math.min(c.l, 18)));
   },
 
   tokens(t) {
@@ -199,7 +201,7 @@ registerAesthetic({
   },
 
   materials: [
-    { name: 'Drawing field', css: 'background: {canvas}; background-image: 1px grid lines every 24px in {gridS} and every 120px in {gridL}; /* the sheet: primary deepened toward navy, or the dark color tinted toward the primary */' },
+    { name: 'Drawing field', css: 'background: {canvas}; background-image: 1px grid lines every 24px in {gridS} and every 120px in {gridL}; /* the sheet: the brand\'s bluest hue at 45-62% saturation, 21% lightness (a desaturated dark tint when no hue is blue-ish) */' },
     { name: 'Line work', css: 'border: 1px solid {ink}; border-radius: 0; background: transparent; box-shadow: none; /* 1px strokes only: {l1} for outlines, {l2} for hidden or secondary lines, {l3} for hairlines */' },
     { name: 'Filled CTA', css: 'background: {priUi}; color: {onPriUi}; border: 1px solid {ink}; border-radius: 0; font: 600 12px ui-monospace, "SF Mono", Menlo, monospace; text-transform: uppercase; letter-spacing: .08em; /* accent corner ticks at two corners; hover: a second outline 3px outside; active: background {ink}, color {canvas} */' },
     { name: 'Selected tab', css: 'background: {priUi}; color: {onPriUi}; border: 1px solid {ink}; /* the only other filled element; unselected tabs are 1px outlines */' },

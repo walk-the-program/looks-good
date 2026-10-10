@@ -32,6 +32,9 @@ const PXA_FONT = {
   '?': '01110 10001 00001 00110 00100 00000 00100',
 };
 
+// item-block fallback glyph for initials the 5x7 map does not cover
+const PXA_STAR = '00100 00100 11111 01110 01010 10001 00000';
+
 registerAesthetic({
   key: 'pixel-arcade', order: 18,
   name: 'Pixel Arcade',
@@ -46,7 +49,7 @@ registerAesthetic({
   layout: { hero: 'scene', palette: 'swatches', sections: 'two-col' },
   type: { ui: 'sans', label: 'sans', display: 1 },
   highlight: 'custom',
-  highlightNote: 'The word is set in the accent (shaded to read as text) with a hard stepped 4px shadow in a deep shade of the accent; no fill, no underline. The headline itself carries a hard 4px primary-deep shadow.',
+  highlightNote: 'The word is set in the accent (shaded to read as text) with a hard stepped 4px shadow in a deep shade of the accent; no fill, no underline. The headline itself carries a hard 4px primary-deep shadow (2px in a softened ink on a light canvas).',
   cardFill: '--ab-panel',
 
   roles: {
@@ -63,7 +66,7 @@ registerAesthetic({
       never: 'The main button, body text, page background',
     },
     accent: {
-      use: 'Coins, hearts, the headline word and the "?" blocks: collectibles and highlights',
+      use: 'Coins, hearts, the headline word and the item blocks: collectibles and highlights',
       never: 'Buttons, body text, borders, panel fills',
       coverage: '≤5%',
     },
@@ -105,6 +108,7 @@ registerAesthetic({
       '--ab-a-deep': dim(t.accent, 0.5),
       '--ab-dither': t.alpha(t.ink, d ? 0.07 : 0.08),
       '--ab-glow': t.alpha(t.primary, 0.5),
+      '--ab-hl-soft': t.mix(t.ink, t.canvas, 0.7),
     };
   },
 
@@ -116,8 +120,9 @@ registerAesthetic({
     const outline = mixc('#000000', t.canvas, 0.62);
     const rects = [];
     const R = (x, y, w, h, fill) => rects.push(`<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="${fill}"/>`);
-    // sky: five bands brighter toward the horizon, joined by 2x2 dither strips
-    const sky = [0.1, 0.17, 0.26, 0.37, 0.5].map(f => mixc(t.primary, t.canvas, f));
+    // sky: five bands joined by 2x2 dither strips
+    // cool-to-warm dusk, top to horizon: secondary, secondary/primary, then primary
+    const sky = [mixc(t.secondary, t.canvas, 0.22), mixc(t.secondary, t.canvas, 0.34), mixc(mixc(t.secondary, t.primary, 0.5), t.canvas, 0.48), mixc(t.primary, t.canvas, 0.62), mixc(t.primary, t.canvas, 0.78)];
     const ys = [0, 14, 26, 38, 48];
     const defs = [];
     sky.forEach((c, i) => {
@@ -167,11 +172,12 @@ registerAesthetic({
     R(0, 62, 168, 1, grassHi);
     for (let x = 2; x < 168; x += 6) R(x, 66, 2, 2, grass);
     for (let x = 0; x < 168; x += 8) R(x + 3, 60 + (x % 16 === 0 ? 1 : 0), 1, 2, grass);
-    // "?" blocks with a coin above
+    // item blocks (the brand initial, or a star when it has no glyph) with a coin above
+    const initialKey = String(ctx.initial || '').toUpperCase();
+    const blockGlyph = (PXA_FONT[initialKey] && initialKey !== '?' ? PXA_FONT[initialKey] : PXA_STAR).split(' ');
     const block = (bx, by) => {
       R(bx, by, 12, 12, outline); R(bx + 1, by + 1, 10, 10, t.accent); R(bx + 1, by + 1, 10, 1, mixc('#ffffff', t.accent, 0.45)); R(bx + 1, by + 10, 10, 1, mixc('#000000', t.accent, 0.3));
-      const q = [[4, 3, 4, 1], [3, 4, 2, 1], [7, 4, 2, 1], [7, 5, 2, 1], [5, 6, 2, 1], [5, 7, 2, 1], [5, 9, 2, 1]];
-      q.forEach(([qx, qy, w, h]) => R(bx + qx, by + qy, w, h, mixc('#000000', t.accent, 0.55)));
+      blockGlyph.forEach((row, r) => { for (let c = 0; c < 5; c++) if (row[c] === '1') R(bx + 3 + c, by + 3 + r, 1, 1, mixc('#000000', t.accent, 0.55)); });
     };
     block(105, 40); block(117, 40);
     // coins
@@ -229,7 +235,7 @@ registerAesthetic({
       'Draw every border as a stepped 4px box-shadow stack that notches the corners; keep every size a multiple of 4px.',
       'Shade with 2x2 dither and hard bands, never a smooth gradient or blur.',
       'Make the main button raise 4px on its underside and let that underside vanish when pressed.',
-      'Use the accent for collectibles: coins, hearts, "?" blocks and the headline word with a hard 4px shadow.',
+      'Use the accent for collectibles: coins, hearts, item blocks and the headline word with a hard 4px shadow.',
     ],
     dont: [
       'Use border-radius, soft shadows, blur or anti-aliased curves on UI or art.',

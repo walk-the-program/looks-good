@@ -17,7 +17,7 @@ registerAesthetic({
   slideShape: 'minimal',
   labels: { material: 'Controls', states: ['Up', 'Hover', 'Down'], statesKind: 'button' },
   layout: { hero: 'split', palette: 'swatches', sections: 'two-col' },
-  type: { ui: 'sans', label: 'mono', display: 0.94 },
+  type: { ui: 'sans', label: 'mono', display: 0.9 },
   highlight: 'ink',
   cardFill: '--ab-face',
 
@@ -27,7 +27,7 @@ registerAesthetic({
       never: 'Text, or a saturated fill',
     },
     primary: {
-      use: 'Active states only: the selected key, the switch "on", the knob arc, OLED text, progress segments and the one main action key',
+      use: 'Active states only: the selected key, the switch "on", the knob arc, OLED text and the one main action key (lit progress segments and the fit tag are ink, not primary)',
       never: 'Body text, decoration, large panel fills, more than one main key',
     },
     secondary: {

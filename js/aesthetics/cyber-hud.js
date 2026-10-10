@@ -23,7 +23,7 @@ registerAesthetic({
   kicker: 'Sync 98.2%',
   mode: 'dark',
   slideShape: 'minimal',
-  labels: { material: 'Interface', states: ['Idle', 'Target', 'Locked'], statesKind: 'button' },
+  labels: { material: 'Systems', states: ['Idle', 'Target', 'Locked'], statesKind: 'button' },
   layout: { hero: 'split', palette: 'swatches', sections: 'two-col' },
   type: { ui: 'mono', label: 'mono', display: 0.84 },
   highlight: 'custom',

@@ -42,7 +42,7 @@ const AIB_DERIVED_JOB = {
   onPrimary: 'Text and icons on a primary fill only',
   onSecondary: 'Text and icons on a secondary fill only',
   onAccent: 'Text and icons on an accent fill only',
-  accentInk: 'The accent as text: same hue, shaded (light canvas) or tinted (dark canvas) just enough to reach 3:1 on the canvas. Set the highlight word in it, never plain accent',
+  accentInk: 'The accent as text: same hue family (yellows shift toward amber on light canvases), shaded (light canvas) or tinted (dark canvas) just enough to reach 3:1 on the canvas. Set the highlight word in it, never plain accent',
   priTint: 'Quiet primary wash: selected state background, hover on primary-linked items',
   secTint: 'Quiet secondary wash: selected row, tonal fills, hover on secondary items',
 };
@@ -168,7 +168,7 @@ function aibFontUrl(fonts) {
   const seen = new Set();
   const families = fonts.filter(f => !seen.has(f.name) && seen.add(f.name))
     .sort((a, b) => a.name.localeCompare(b.name))
-    .map(f => `family=${encodeURIComponent(f.name).replace(/%20/g, '+')}:wght@${f.weights || '400;700'}`);
+    .map(f => googleFamilyParam(f));
   return `https://fonts.googleapis.com/css2?${families.join('&')}&display=swap`;
 }
 
@@ -278,7 +278,7 @@ function buildAiBrief(state) {
       : '8. The highlight word has a custom treatment (see Materials). Where it is set as text, use `' + t.accentInk + '` (`--accent-ink`), never plain `--accent` as text. Use it once per view.');
   } else {
     const same = t.accentInk.toLowerCase() === t.accent.toLowerCase();
-    push('8. The highlight word is set as text in `' + t.accentInk + '` (`--accent-ink`)' + (same ? ', which is the accent itself' : ', the accent ' + (t.isDark ? 'tinted' : 'shaded') + ' with the same hue') + ', at ' + aibRatio(t.accentInk, t.canvas) + ' on the canvas. Use it once per view; never set plain `--accent` as text' + (t.accentLow ? ' (it is only ' + aibRatio(t.accent, t.canvas) + ' on this canvas)' : '') + '.');
+    push('8. The highlight word is set as text in `' + t.accentInk + '` (`--accent-ink`)' + (same ? ', which is the accent itself' : ', the accent ' + (t.isDark ? 'tinted' : 'shaded') + ', same hue family (yellows shift toward amber on light canvases)') + ', at ' + aibRatio(t.accentInk, t.canvas) + ' on the canvas. Use it once per view; never set plain `--accent` as text' + (t.accentLow ? ' (it is only ' + aibRatio(t.accent, t.canvas) + ' on this canvas)' : '') + '.');
   }
   push('');
 

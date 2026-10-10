@@ -73,7 +73,7 @@ registerAesthetic({
     const panel = d ? t.mix(t.canvas, '#ffffff', 0.93) : t.mix(t.canvas, '#000000', 0.97);
     const hexOf = c => c;
     // 84x84 nine-slice frame: three nested 1px stepped-corner outlines (outer full, then 60% and 32%)
-    const line = (e, o) => `<path d="M${e} 56V${12 + e}H${6 + e}V${6 + e}H${12 + e}V${e}H56" fill="none" stroke="${hexOf(gilt)}" stroke-opacity="${o}" stroke-width="1" shape-rendering="crispEdges"/>`;
+    const line = (e, o) => `<path d="M${e} 56V${20 + e}H${10 + e}V${10 + e}H${20 + e}V${e}H56" fill="none" stroke="${hexOf(gilt)}" stroke-opacity="${o}" stroke-width="1" shape-rendering="crispEdges"/>`;
     const quad = line(0, 1) + line(5, 0.6) + line(10, 0.32);
     const mirror = ['', ' matrix(-1 0 0 1 84 0)', ' matrix(1 0 0 -1 0 84)', ' matrix(-1 0 0 -1 84 84)'];
     const frameSvg = '<svg xmlns="http://www.w3.org/2000/svg" width="84" height="84" viewBox="0 0 84 84">'
@@ -87,7 +87,7 @@ registerAesthetic({
       '--ab-gilt-b': t.alpha(gilt, 0.34),
       '--ab-gilt-c': t.alpha(gilt, 0.14),
       '--ab-panel': panel,
-      '--ab-veil': t.alpha(t.canvas, 0.9),
+      '--ab-veil': t.alpha(t.canvas, 0.8),
       '--ab-ray': t.alpha(gilt, d ? 0.5 : 0.36),
       '--ab-pri-hover': t.mix(t.primary, '#ffffff', 0.86),
       '--ab-pri-press': t.mix(t.primary, '#000000', 0.8),
@@ -105,14 +105,12 @@ registerAesthetic({
     const g = ctx.t.accentInk;
     const arcs = [20, 33, 47, 62, 79, 98].map((r, i) =>
       `<path d="M${100 - r} 100A${r} ${r} 0 0 1 ${100 + r} 100" stroke-opacity="${(0.62 - i * 0.085).toFixed(2)}"/>`).join('');
-    const dia = (x, y, s = 2.4) => `<path d="M${x} ${y - s}l${s} ${s}l${-s} ${s}l${-s} ${-s}z" fill="${g}" stroke="none" fill-opacity=".85"/>`;
     return `<div class="nds"><i class="nds-rays"></i>
       <svg class="nds-svg" viewBox="0 0 200 100" preserveAspectRatio="xMidYMax meet" focusable="false" fill="none" stroke="${g}" stroke-width="1">
         <g vector-effect="non-scaling-stroke">${arcs.replace(/<path /g, '<path vector-effect="non-scaling-stroke" ')}</g>
         <path vector-effect="non-scaling-stroke" d="M0 99.5H200" stroke-opacity=".5"/>
         <path vector-effect="non-scaling-stroke" d="M78 100V95H85V90H92V85H108V90H115V95H122V100" stroke-opacity=".9"/>
         <path vector-effect="non-scaling-stroke" d="M86 100V97H93V94H107V97H114V100" stroke-opacity=".5"/>
-        ${dia(100, 80, 3)}${dia(40, 99.5)}${dia(160, 99.5)}${dia(14, 99.5, 1.8)}${dia(186, 99.5, 1.8)}
       </svg></div>`;
   },
 
@@ -123,7 +121,7 @@ registerAesthetic({
     { name: 'Arch tile', css: 'border-radius: 999px 999px 0 0; background: <palette color>; box-shadow: 0 0 0 3px {canvas}, 0 0 0 4px {giltA}; /* palette swatches and the art window */' },
     { name: 'Ornamental rule', css: 'line, diamond, line: two 1px {giltB} lines meeting a 7px {gilt} diamond at the centre; replaces every plain divider' },
     { name: 'Primary action', css: 'background: {primary}; color: {onPrimary}; border-radius: 0; text-transform: uppercase; letter-spacing: .2em; box-shadow: inset 0 0 0 3px {primary}, inset 0 0 0 4px {gilt}; /* hover {priHover}; pressed {priPress} */' },
-    { name: 'Stepped frame', css: 'border-image: 28px nine-slice, three nested 1px {gilt} outlines (100% / 60% / 32%) with two-step cut corners, around the hero headline on a {veil} fill' },
+    { name: 'Stepped frame', css: 'border-image: 36px nine-slice, three nested 1px {gilt} outlines (100% / 60% / 32%) with two-step cut corners (10px and 20px steps), around the hero headline on a {veil} fill (canvas at 80%, the fan shows faintly through)' },
   ],
 
   rules: {
