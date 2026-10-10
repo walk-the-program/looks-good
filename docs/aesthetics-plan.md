@@ -443,7 +443,7 @@ switch toggles status text; the field is a real input. Compare tiles are `inert`
   "In use" previews (card 85:55, phone wallpaper 9:19.5, poster 3:4) render the working pattern at each aspect from the board tokens (`--pt-*` vars set on `#patternsView`) and brand fonts;
   at container width <= 760px `#patternsView.is-narrow` orders canvas, exports, "Adjust pattern" (`<details>`, closed), In use, suite, pinned, all families.
 - Deck (js/patterns-deck.js, loaded after brand-deck.js): `registerDeckSlide({ key: 'patterns' }, 'material')` adds slide 07 (pinned patterns, else the six-pattern suite, as `<img>` data URLs;
-  classes `ab-deck-patterns / -ptgrid / -pt / -ptcw`); `deckPatternHook` returns `.pt-deck-strip` (a 288px full-height pattern strip, right edge on the cover, left edge on the closing slide).
+  classes `ab-deck-patterns / -ptgrid / -pt / -ptcw`); `deckPatternHook` returns the cover's pattern as a full-width bottom band (`.pt-deck-band`, 132px) and the closing slide's as a 288px side strip down the left edge (`.pt-deck-strip`).
   css/patterns.css pads `.ab-slide-in` away from the strip with `:has(> .ab-deck-pattern > .pt-deck-strip)`, so slide text never sits on a pattern. `bdFitDeck` is wrapped to shrink the
   closing headline until the copy block clears the contact row.
 - AI brief: `aibPatternLines(state, def)` adds a `## Patterns` section (ink mapping, the aesthetic's six families, pinned patterns' parameters; seamless pins get a CSS tile size note, never the data URI).

@@ -245,3 +245,13 @@
   .ab[data-ae="bento-grid"] .ab-cta:hover, .ab[data-ae="bento-grid"] .ab-cta:active,
   .ab[data-ae="bento-grid"] .ab-states .ab-state-ctl.is-hover, .ab[data-ae="bento-grid"] .ab-states .ab-state-ctl.is-pressed { transform: none; }
 }
+
+/* ----- deck cover: a hero tile (statement) beside one tall tile (the phone).
+   The statement tile gives up its board min-height so the pair fits the slide
+   at full size. Deck-scoped; the board is unchanged. ----- */
+.ab[data-ae="bento-grid"].ab-slide[data-slide="cover"] .ab-deck-cover .ab-hero {
+  grid-template-columns: minmax(0, 1.75fr) minmax(0, 1fr); gap: var(--bn-gap, 14px); align-items: stretch;
+}
+.ab[data-ae="bento-grid"].ab-slide[data-slide="cover"] .ab-deck-cover .ab-hero-copy { min-height: 0; padding: 30px 36px 32px; }
+.ab[data-ae="bento-grid"].ab-slide[data-slide="cover"] .ab-deck-cover .ab-headline { margin: auto 0; padding: 18px 0 16px; }
+.ab[data-ae="bento-grid"].ab-slide[data-slide="cover"] .ab-deck-cover .ab-art { max-width: none !important; width: 100% !important; min-height: 0; height: 100%; }

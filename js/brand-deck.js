@@ -440,10 +440,23 @@ function bdFitHeadline(root) {
 // shrink in 4% steps only until the hero copy fits, never below 64px. If the
 // slide would still need a scale under 0.85, shrink the art box in 8% steps;
 // bdScaleToFit then scales the cover only as a last resort (floor 0.85).
+// scrollWidth also counts decoration that bleeds on purpose (a highlight band
+// that runs on). True when every line of text sits inside the copy's column,
+// so only the decoration overflows.
+function bdCopyTextInside(copy) {
+  const edge = copy.getBoundingClientRect().right + 1;
+  return [...copy.children].every(el => {
+    if (el.getBoundingClientRect().width < 4) return true;   // a visually-hidden headline (the art draws it)
+    const r = document.createRange();
+    r.selectNodeContents(el);
+    return [...r.getClientRects()].every(l => l.width < 1 || l.right <= edge);
+  });
+}
+
 function bdCoverCopyFits(root) {
   const copy = root.querySelector('.ab-hero-copy');
   if (!copy) return true;
-  if (copy.scrollWidth > copy.clientWidth + 1) return false;
+  if (copy.scrollWidth > copy.clientWidth + 1 && !bdCopyTextInside(copy)) return false;
   // Scene hero: the copy is laid over the art, so it has to stay inside it.
   const art = root.querySelector('.ab-hero .ab-art');
   if (root.dataset.hero === 'scene' && art) {
@@ -659,6 +672,25 @@ function bdFitDeck(grid) {
     else if (key === 'principles' || key === 'closing') bdFitHeadline(root);
     if (key === 'material') bdFitStage(root);
     bdScaleToFit(root);
+    bdBleedBands(root);
+  });
+}
+
+// A highlight band that runs on (Raw Brutalist) is drawn as a pseudo-element
+// sized by --ab-hl-bleed: the distance from the highlight's right edge to the
+// slide content's (the fitted wrapper), in the content's own (unzoomed, unscaled) px. The board's fixed
+// 100cqw would run past the slide's column and overflow it.
+function bdBleedBands(root) {
+  const bands = root.querySelectorAll('.ab-hl');
+  const body = root.querySelector('.ab-slide-body');
+  const wrap = body && body.firstElementChild;
+  if (!bands.length || !wrap) return;
+  const rr = wrap.getBoundingClientRect();
+  const zoom = root.offsetWidth ? root.getBoundingClientRect().width / root.offsetWidth : 1;
+  const s = parseFloat(root.dataset.fitScale) || 1;
+  bands.forEach(el => {
+    const r = el.getBoundingClientRect();
+    el.style.setProperty('--ab-hl-bleed', Math.max(0, (rr.right - r.right) / (zoom * s)).toFixed(1) + 'px');
   });
 }
 
@@ -944,9 +976,25 @@ function bdFlattenClippedText(doc, root) {
   });
 }
 
+// A scene hero (Liquid Glass) lays its copy over the art in the same grid cell,
+// and the browser paints the copy on top. html2canvas orders the positioned art
+// above a static sibling, so the copy vanished from the PNG/PDF. In the clone,
+// lift the copy above the art and drop the text-shadow glow (a blur it cannot
+// draw: it comes out as a grey smear on the white text).
+function bdLiftSceneCopy(doc, root) {
+  if (root.dataset.hero !== 'scene') return;
+  root.querySelectorAll('.ab-hero-copy').forEach(copy => {
+    copy.style.setProperty('position', 'relative', 'important');
+    copy.style.setProperty('z-index', '5', 'important');
+    copy.style.setProperty('text-shadow', 'none', 'important');
+    copy.querySelectorAll('*').forEach(el => el.style.setProperty('text-shadow', 'none', 'important'));
+  });
+}
+
 function bdSanitizeClone(doc, root) {
   const win = doc.defaultView;
   if (!win) return;
+  bdLiftSceneCopy(doc, root);
   bdFlattenSwitches(doc, root);
   bdFlattenClippedText(doc, root);
   const rules = [];

@@ -175,3 +175,23 @@
 @media (prefers-reduced-motion: reduce) {
   .ab[data-ae="raw-brutalist"] .ab-cta:hover, .ab[data-ae="raw-brutalist"] .ab-cta:active { transform: none; }
 }
+
+/* ----- deck cover: poster scale. The headline spans the slide at 120px+ (three
+   lines); the spec index becomes a one-row, four-column strip under it (it
+   stands in for the cover's meta row), so nothing narrows the headline.
+   Deck-scoped; the board is unchanged. ----- */
+.ab[data-ae="raw-brutalist"].ab-slide[data-slide="cover"] .ab-deck-cover .ab-hero { padding-top: 0; row-gap: 0; }
+.ab[data-ae="raw-brutalist"].ab-slide[data-slide="cover"] .ab-deck-cover .ab-kicker { display: none; }
+.ab[data-ae="raw-brutalist"].ab-slide[data-slide="cover"] .ab-deck-cover .ab-subcopy { max-width: none; margin-top: 8px; }
+.ab[data-ae="raw-brutalist"].ab-slide[data-slide="cover"] .ab-deck-cover .ab-headline { line-height: 0.88; }
+.ab[data-ae="raw-brutalist"].ab-slide[data-slide="cover"] .ab-deck-cover .ab-art {
+  position: relative; top: auto; right: auto; bottom: auto; width: 100%; max-width: none; justify-self: stretch; margin-top: 8px;
+}
+.ab[data-ae="raw-brutalist"].ab-slide[data-slide="cover"] .ab-deck-cover .rba-spec { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0 24px; }
+.ab[data-ae="raw-brutalist"].ab-slide[data-slide="cover"] .ab-deck-cover .rba-row { padding: 5px 0; }
+.ab[data-ae="raw-brutalist"].ab-slide[data-slide="cover"] .ab-deck-cover-meta { display: none; }
+
+/* ----- deck slides: the highlight band runs on to the slide edge, measured
+   by js/brand-deck.js (--ab-hl-bleed) so it does not count as column overflow. ----- */
+.ab[data-ae="raw-brutalist"].ab-slide .ab-hl::after { width: var(--ab-hl-bleed, 0px); }
+.ab[data-ae="raw-brutalist"].ab-slide .ab-headline { margin-right: 0; }

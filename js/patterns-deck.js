@@ -128,6 +128,7 @@
           hs *= 0.94;
           root.style.setProperty('--ab-hs', hs.toFixed(3));
         }
+        if (typeof bdBleedBands === 'function') bdBleedBands(root);   // the highlight moved with the headline
       });
     };
   }

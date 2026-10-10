@@ -47,12 +47,14 @@
 .ab-deck-pattern { position: absolute; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
 
 /* Aesthetics that draw their headline inside the art (Mixed Type, Rebus) hide
-   the real .ab-headline with a visually-hidden rule. Deck headings are real text. */
+   the real .ab-headline with a visually-hidden rule. Deck headings are real text.
+   They stay `relative` (not static) so an aesthetic's tracking boxes and labels
+   (Blob Tracking's ::before/::after) anchor to the heading, as on the board. */
 .ab.ab-slide[data-ae] .ab-headline.ab-deck-h,
 .ab.ab-slide[data-ae] .ab-headline.ab-deck-sample,
 .ab.ab-slide[data-ae] .ab-headline.ab-deck-aa,
 .ab.ab-slide[data-ae] .ab-headline.ab-deck-screentitle {
-  position: static; width: auto; height: auto; padding: 0; overflow: visible; clip: auto; clip-path: none;
+  position: relative; width: auto; height: auto; padding: 0; overflow: visible; clip: auto; clip-path: none;
   white-space: normal; display: block;
 }
 .ab.ab-slide[data-ae] .ab-deck-scale[data-face="h"] .ab-deck-sample { white-space: nowrap; }
@@ -160,8 +162,10 @@
 
 /* 05 Interface: the board's 01 + 02, always side by side */
 .ab.ab-slide[data-ae] .ab-sections.ab-deck-sections {
-  grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 0 44px; padding: 0; align-content: safe center;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 0 44px; padding: 0 24px 0 0; align-content: safe center;
 }
+/* The 24px on the right is a gutter for panels that offset themselves (a pressed
+   button, a rotated or shadowed card): they stay inside the slide's column. */
 
 /* 06 Material & graphics */
 .ab-deck-material { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); gap: 48px; align-items: stretch; }

@@ -88,8 +88,20 @@ The deck now has ten slides (Patterns is slide 07, added by js/patterns-deck.js)
 - **D6 Type scale.** The Display / H1 / H2 samples of light serifs rendered at ~20-30px because Editorial gives its hero headline `grid-column: 1; grid-row: 2`, which leaked into the type-scale grid and squeezed every sample into the 120px label column (so `bdFitSamples` shrank them). The deck headings now reset their grid placement (css/brand-deck.css); the caps are 96 / 56 / 40px, and the label states the size actually shown.
 - **A1-A4** are scoped rules appended to css/aesthetics/{xerox,liquid-glass,editorial-serif}.css (`.ab[data-ae="key"].ab-slide ...`): Xerox cover art lower and narrower with the tear-off strip hidden; Liquid Glass cover copy `max-width: 46%` (and its small timer card hidden: it sits where the headline goes); Editorial's drop cap off on slides. Rebus needs no CSS (D3 `materialStage: 'pattern'`).
 
-### Known limits
-- Covers that cannot reach scale 0.85 with the 132px band: neo-deco (about 0.5; its title-card row is a fixed 560px stage), mixed-type (about 0.65; the statement is the tall art) and bento-grid (about 0.79). They are scaled, never clipped.
-- Pre-existing, not from this change: Blob Tracking's slide header overflows 34px on four slides; Raw Brutalist's closing headline is wider than its column; the Interface slide is 2-20px wider than its box in a few aesthetics.
-- PNG/PDF export (html2canvas) flattens backdrop effects; Liquid Glass's cover copy is missing from the export (it was before this change too).
+### Cover-scoped rules and final cleanup (ZC)
+- **Per-aesthetic covers** (deck-scoped rules appended to css/aesthetics/{rebus,raw-brutalist,neo-deco,mixed-type,bento-grid}.css; the board is unchanged):
+  - Rebus: one full-width column (the `data-cover-side` split is overridden): kicker, the rebus headline at 112px, the equation and legend as a supporting row.
+  - Raw Brutalist: poster scale. The spec index becomes a one-row, four-column strip under the headline, the kicker and the cover meta row are hidden, the headline runs 120px+ (three lines) across the slide.
+  - Neo Deco: header and footer compacted to one row each, the fixed 560px stage row dropped, thinner frame; the sunburst and the stepped frame stay.
+  - Mixed Type: full-width art, 104px mixed headline, one caption line and the four-voice specimen row (glyph set and scale row stay on the board).
+  - Bento Grid: hero tile (statement) beside one tall tile (the phone), the tile's board min-height dropped.
+- **bdCoverCopyFits** (js/brand-deck.js): `scrollWidth` also counts decoration that bleeds on purpose (Raw Brutalist's highlight band), so when it reports overflow the check looks at the text lines themselves (`bdCopyTextInside`). That is what held Raw Brutalist's cover headline at 64px.
+- **Highlight band** (`bdBleedBands`, Raw Brutalist deck slides): the band's pseudo-element is sized to the slide content's right edge (`--ab-hl-bleed`) instead of the board's fixed `100cqw`, so it no longer overflows the slide's column.
+- **Deck headings stay `position: relative`** (css/brand-deck.css), not static, so an aesthetic's tracking boxes and labels anchor to the heading as on the board. Static anchored Blob Tracking's `.ab-headline::before` to the slide (a 745px box) and made the slide header overflow 34px.
+- **Interface slide** keeps a 24px right gutter so a pressed button, a rotated or shadowed panel stays inside the column.
+- **Export**: `bdLiftSceneCopy` lifts a scene hero's copy above the art in the html2canvas clone (and drops the text-shadow glow), which fixed the Liquid Glass cover copy missing from PNG/PDF.
 
+### Known limits
+- Cover scale: every cover reaches 0.85 or better (Neo Deco 1.0, Mixed Type 0.88, Bento Grid 0.98). They are scaled, never clipped.
+- Covers whose art deliberately bleeds past the content column into the slide margin (Neo Brutal Pop, Aurora Noir, Bauhaus Poster, Riso Print, Mesh Gradient, Xerox: 2-55px) report a wider `scrollWidth` than their box; the slide root clips and nothing leaves the slide.
+- PNG/PDF export (html2canvas) flattens backdrop effects, conic gradients and some blend modes; the aesthetics affected stay flatter in the export than on screen.

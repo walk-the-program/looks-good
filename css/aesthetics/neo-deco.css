@@ -233,3 +233,23 @@
 @media (prefers-reduced-motion: reduce) {
   .ab[data-ae="neo-deco"] .ab-switch::before { transition: none; }
 }
+
+/* ----- deck slides: compact the stacked header and the footer (every slide; the
+   In product slide was scaled to 0.63 by them). Deck cover: drop the fixed
+   stage row (the fan is the art box behind the title card and shows beneath
+   it), thin the card's frame. The sunburst and the stepped frame stay.
+   Deck-scoped; the board is unchanged. ----- */
+.ab[data-ae="neo-deco"].ab-slide .ab-head { gap: 4px; padding-bottom: 12px; }
+.ab[data-ae="neo-deco"].ab-slide .ab-brand { flex-direction: row; align-items: center; gap: 16px; }
+.ab[data-ae="neo-deco"].ab-slide .ab-mark { margin: 0 4px 0 2px; }
+.ab[data-ae="neo-deco"].ab-slide .ab-foot { flex-direction: row; justify-content: center; gap: 28px; padding-top: 16px; }
+.ab[data-ae="neo-deco"].ab-slide[data-slide="cover"][data-hero="centered"] .ab-deck-cover .ab-hero { grid-template-rows: auto; padding: 14px 0 0; }
+.ab[data-ae="neo-deco"].ab-slide[data-slide="cover"][data-hero="centered"] .ab-deck-cover .ab-art { max-width: none !important; width: 100% !important; height: 100%; }
+.ab[data-ae="neo-deco"].ab-slide[data-slide="cover"][data-hero="centered"] .ab-deck-cover .ab-hero-copy {
+  width: min(100%, 62cqw); margin: 0 0 56px; padding: 6px 22px 8px;
+  border-width: 26px; border-image: var(--ab-nd-frame) 36 / 26px stretch;
+}
+.ab[data-ae="neo-deco"].ab-slide[data-slide="cover"][data-hero="centered"] .ab-deck-cover .ab-hero-copy::before { inset: -26px; }
+.ab[data-ae="neo-deco"].ab-slide[data-slide="cover"] .ab-deck-cover .ab-kicker { margin-bottom: 8px !important; }
+.ab[data-ae="neo-deco"].ab-slide[data-slide="cover"] .ab-deck-cover .ab-subcopy { margin-top: 10px !important; }
+.ab[data-ae="neo-deco"].ab-slide[data-slide="cover"] .ab-deck-cover-meta { padding-top: 0; }

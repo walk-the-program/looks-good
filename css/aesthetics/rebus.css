@@ -210,3 +210,20 @@
 @media (prefers-reduced-motion: reduce) {
   .ab[data-ae="rebus"] .ab-cta:hover, .ab[data-ae="rebus"] .ab-type-apply:hover { transform: none; }
 }
+
+/* ----- deck cover: the rebus headline is the cover. One full-width column (no
+   copy/art split): kicker above, the large rebus line, then the equation and the
+   legend as a supporting row. Deck-scoped; the board is unchanged. ----- */
+.ab[data-ae="rebus"].ab-slide[data-slide="cover"] .ab-deck-cover .ab-hero,
+.ab[data-ae="rebus"].ab-slide[data-slide="cover"][data-cover-side] .ab-deck-cover .ab-hero {
+  grid-template-columns: minmax(0, 1fr); gap: 14px; padding: 0; align-content: center; align-items: start;
+}
+.ab[data-ae="rebus"].ab-slide[data-slide="cover"] .ab-deck-cover .ab-hero-copy { width: 100%; max-width: none; }
+.ab[data-ae="rebus"].ab-slide[data-slide="cover"] .ab-deck-cover .ab-art { width: 100%; max-width: none; justify-self: stretch; }
+.ab[data-ae="rebus"].ab-slide[data-slide="cover"] .rb { --rb-s: 112px; --rb-eq-fs: 50px; }
+.ab[data-ae="rebus"].ab-slide[data-slide="cover"] .rb-hl-row { line-height: 1.08; }
+.ab[data-ae="rebus"].ab-slide[data-slide="cover"] .rb-eq { margin-top: 20px; }
+.ab[data-ae="rebus"].ab-slide[data-slide="cover"] .rb-eq-t { height: 84px; min-width: 84px; border-radius: 22px; }
+.ab[data-ae="rebus"].ab-slide[data-slide="cover"] .rb-eq-txt { font-size: 36px; }
+.ab[data-ae="rebus"].ab-slide[data-slide="cover"] .rb-eq-cap { display: none; }
+.ab[data-ae="rebus"].ab-slide[data-slide="cover"] .rb-legend { margin-top: 16px; }

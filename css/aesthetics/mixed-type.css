@@ -259,3 +259,17 @@
   .ab[data-ae="mixed-type"] .ab-type-col, .ab[data-ae="mixed-type"] .ab-type-col:first-child { padding-left: 0; padding-right: 0; border-left: 0; border-top: 1px solid var(--ab-line); }
   .ab[data-ae="mixed-type"] .ab-type-col:first-child { border-top: 1px solid var(--ab-ink); }
 }
+
+/* ----- deck cover: the mixed headline is the cover. Full-width art, a large
+   headline, one caption line and a compact specimen row of the four voices (the
+   glyph set and scale row stay on the board). Deck-scoped; the board is unchanged. ----- */
+.ab[data-ae="mixed-type"].ab-slide[data-slide="cover"][data-hero] .ab-deck-cover .ab-hero,
+.ab[data-ae="mixed-type"].ab-slide[data-slide="cover"][data-cover-side] .ab-deck-cover .ab-hero { grid-template-columns: minmax(0, 1fr); gap: 12px; padding: 0; }
+.ab[data-ae="mixed-type"].ab-slide[data-slide="cover"][data-cover-side] .ab-deck-cover .ab-hero-copy { width: 100%; max-width: none; }
+.ab[data-ae="mixed-type"].ab-slide[data-slide="cover"] .ab-deck-cover .ab-art { max-width: none !important; width: 100% !important; }
+.ab[data-ae="mixed-type"].ab-slide[data-slide="cover"] .mt-hl-wrap { --mt-s: 104px; }
+.ab[data-ae="mixed-type"].ab-slide[data-slide="cover"] .mt-lead { margin-top: 10px; padding-top: 8px; grid-template-columns: 84px minmax(0, 80em); }
+.ab[data-ae="mixed-type"].ab-slide[data-slide="cover"] .mt-spec { margin-top: 10px; }
+.ab[data-ae="mixed-type"].ab-slide[data-slide="cover"] .mt-cell { padding-top: 8px; padding-bottom: 8px; }
+.ab[data-ae="mixed-type"].ab-slide[data-slide="cover"] .mt-cell svg { margin: 2px 0; max-height: 34px; }
+.ab[data-ae="mixed-type"].ab-slide[data-slide="cover"] .mt-lower { display: none; }

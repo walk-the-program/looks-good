@@ -274,3 +274,8 @@
 @media (prefers-reduced-motion: reduce) {
   .ab[data-ae="blob-tracking"] .ab-switch::before, .ab[data-ae="blob-tracking"] .ab-cta::before, .ab[data-ae="blob-tracking"] .ab-card::before, .ab[data-ae="blob-tracking"] .ab-panel::before, .ab[data-ae="blob-tracking"] .ab-list::before { transition: none; }
 }
+
+/* ----- deck slides: the swatch tick frames reach 4px past the right edge of the
+   colour slide; a gutter keeps them inside it. Deck-scoped; the board is unchanged. ----- */
+.ab[data-ae="blob-tracking"].ab-slide .ab-deck-color { padding-right: 6px; }
+.ab[data-ae="blob-tracking"].ab-slide .ab-headline::before { right: 0; }
