@@ -1,0 +1,329 @@
+/* ---------------------------------------------------------------------
+   color-picker.css — inline color picker, role guidance and the
+   "Paste brand colors" importer, inside the Color palette panel.
+   Same quiet chrome as styles.css: hairlines, warm greys, small caps
+   labels, Geist. The only hues are the user's own palette.
+------------------------------------------------------------------------ */
+
+.cp {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-width: 0;
+}
+
+/* ---------- Role rows ---------- */
+
+.cp-roles {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.cp-role {
+  --cp-sw: #cccccc;
+  display: grid;
+  grid-template-columns: 22px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  min-width: 0;
+  padding: 6px 8px;
+  background: var(--surface);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-ui);
+  font: inherit;
+  color: var(--ink);
+  text-align: left;
+  cursor: pointer;
+  transition: background-color var(--dur) var(--ease), border-color var(--dur) var(--ease);
+}
+.cp-role:hover { background: var(--hover); }
+.cp-role[aria-pressed="true"] {
+  border-color: var(--ink);
+  box-shadow: inset 0 0 0 1px var(--ink);
+}
+.cp-role-sw {
+  width: 22px;
+  height: 22px;
+  border-radius: 5px;
+  background: var(--cp-sw);
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.12);
+}
+.cp-role-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  line-height: 1.25;
+}
+.cp-role-text b {
+  font-size: 12.5px;
+  font-weight: 500;
+}
+.cp-role-text small {
+  font-size: 11px;
+  color: var(--muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.cp-role-hex {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--muted);
+  letter-spacing: 0;
+}
+.cp-role[aria-pressed="true"] .cp-role-hex { color: var(--ink); }
+
+/* ---------- Wheel ---------- */
+
+.cp-wheel {
+  position: relative;
+  width: 188px;
+  height: 188px;
+  margin: 2px auto;
+  border-radius: 50%;
+  box-shadow: 0 0 0 1px var(--line), var(--shadow-2);
+  touch-action: none;
+  cursor: crosshair;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.cp-wheel canvas {
+  display: block;
+  width: 188px;
+  height: 188px;
+  border-radius: 50%;
+}
+#cpDots { position: absolute; inset: 0; pointer-events: none; }
+
+.cp-handle,
+.cp-dot {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  border: 2px solid #ffffff;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.35), 0 1px 4px rgba(0, 0, 0, 0.3);
+}
+.cp-handle {
+  --cp-sw: #888888;
+  width: 22px;
+  height: 22px;
+  background: var(--cp-sw);
+  cursor: grab;
+}
+.cp-wheel:active .cp-handle { cursor: grabbing; }
+.cp-handle:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 3px;
+}
+.cp-dot {
+  width: 17px;
+  height: 17px;
+  padding: 0;
+  display: grid;
+  place-items: center;
+  font: 600 8.5px/1 var(--font-ui);
+  border-width: 1.5px;
+  cursor: pointer;
+  pointer-events: auto;
+  transition: transform var(--dur) var(--ease);
+}
+.cp-dot:hover { transform: translate(-50%, -50%) scale(1.2); }
+.cp-dot:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+
+/* ---------- Brightness + hex ---------- */
+
+.cp-fields { display: flex; flex-direction: column; gap: 12px; }
+.cp-fields output {
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: 0;
+}
+.cp-readout {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  white-space: pre;
+}
+
+.cp-bright { --cp-track: linear-gradient(to right, #000, #fff); }
+input.cp-bright::-webkit-slider-runnable-track {
+  height: 10px;
+  border-radius: 5px;
+  background: var(--cp-track);
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.1);
+}
+input.cp-bright::-webkit-slider-thumb {
+  width: 16px;
+  height: 16px;
+  margin-top: -3px;
+  background: #ffffff;
+  border: 2px solid var(--ink);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+}
+input.cp-bright::-moz-range-track {
+  height: 10px;
+  border-radius: 5px;
+  background: var(--cp-track);
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.1);
+}
+input.cp-bright::-moz-range-thumb {
+  width: 12px;
+  height: 12px;
+  background: #ffffff;
+  border: 2px solid var(--ink);
+}
+
+.cp-hex {
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  text-transform: uppercase;
+}
+.cp-hex.is-invalid,
+.cp-hex.is-invalid:hover,
+.cp-hex.is-invalid:focus-visible { border-color: var(--bad-ink); }
+
+/* ---------- Role guidance ---------- */
+
+.cp-guide {
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-ui);
+  background: var(--canvas);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+}
+.cp-guide-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+.cp-guide-head b { font-size: 13px; font-weight: 600; }
+.cp-guide-head span {
+  font-size: 11px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+.cp-guide dl { margin: 0; display: grid; gap: 2px; }
+.cp-guide dt {
+  margin-top: 6px;
+  font-size: 10.5px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+}
+.cp-guide dt:first-child { margin-top: 0; }
+.cp-guide dd {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--ink-2);
+  overflow-wrap: anywhere;
+}
+.cp-contrast {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding-top: 10px;
+  border-top: 1px solid var(--line);
+}
+.cp-contrast-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--ink-2);
+}
+.cp-contrast-row b { font-family: var(--font-mono); font-size: 11.5px; font-weight: 500; color: var(--ink); }
+.cp-pill,
+.cp-tag {
+  font-style: normal;
+  font-size: 10px;
+  font-weight: 500;
+  line-height: 1;
+  padding: 4px 7px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+.cp-pill-pass { background: var(--good-bg); color: var(--good-ink); }
+.cp-pill-warn { background: var(--warn-bg); color: var(--warn-ink); }
+.cp-pill-bad { background: var(--bad-bg); color: var(--bad-ink); }
+
+/* ---------- Paste brand colors ---------- */
+
+.cp-paste {
+  width: 100%;
+  min-height: 92px;
+  resize: vertical;
+  padding: 8px 10px;
+  background: var(--surface);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-ui);
+  color: var(--ink);
+  font: 400 12px/1.5 var(--font-mono);
+  text-transform: none;
+  letter-spacing: 0;
+  transition: border-color var(--dur) var(--ease);
+}
+.cp-paste::placeholder { color: #aaa9a5; }
+.cp-paste:hover { border-color: #d8d7d3; }
+.cp-paste:focus-visible { border-color: #c9c8c4; }
+
+.cp-imp-rows { display: flex; flex-direction: column; gap: 6px; }
+.cp-imp-row {
+  display: grid;
+  grid-template-columns: 18px 64px minmax(0, 1fr) 52px;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+}
+.cp-imp-sw {
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.12);
+}
+.cp-imp-name { color: var(--ink-2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cp-imp-row select {
+  height: 28px;
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  padding: 0 24px 0 8px;
+  background-position: right 8px center;
+}
+.cp-tag { text-align: center; background: var(--hover); color: var(--muted); }
+.cp-tag-labeled { background: var(--good-bg); color: var(--good-ink); }
+.cp-tag-auto { background: var(--warn-bg); color: var(--warn-ink); }
+.cp-tag-swapped { background: var(--hover); color: var(--ink-2); }
+
+.cp-imp-note {
+  margin: 0;
+  font-size: 11.5px;
+  line-height: 1.5;
+  color: var(--muted);
+}
+.cp-unused {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-right: 6px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+}
+.cp-unused i {
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.15);
+}
+.cp-imp-actions { display: flex; gap: 8px; }
+.cp-imp-actions .btn-primary { flex: 1; }
+
+@media (prefers-reduced-motion: reduce) {
+  .cp-dot { transition: none; }
+}

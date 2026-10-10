@@ -9,6 +9,18 @@
 <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="css/styles.css" />
 <link rel="stylesheet" href="css/slides.css" />
+<link rel="stylesheet" href="css/aesthetic-board.css" />
+<link rel="stylesheet" href="css/aesthetics/soft-form.css" />
+<link rel="stylesheet" href="css/aesthetics/raw-brutalist.css" />
+<link rel="stylesheet" href="css/aesthetics/neo-brutal-pop.css" />
+<link rel="stylesheet" href="css/aesthetics/retro-futurist.css" />
+<link rel="stylesheet" href="css/aesthetics/liquid-glass.css" />
+<link rel="stylesheet" href="css/aesthetics/holo-iridescent.css" />
+<link rel="stylesheet" href="css/aesthetics/aurora-noir.css" />
+<link rel="stylesheet" href="css/aesthetics/bauhaus-poster.css" />
+<link rel="stylesheet" href="css/aesthetics/clay.css" />
+<link rel="stylesheet" href="css/aesthetics/riso-print.css" />
+<link rel="stylesheet" href="css/color-picker.css" />
 </head>
 <body data-view="library">
 
@@ -104,6 +116,15 @@
       </div>
     </details>
 
+    <details class="panel" open id="aestheticPanel">
+      <summary class="panel-head"><h2>Aesthetic</h2></summary>
+      <div class="panel-body">
+        <label class="lock">Lock<input type="checkbox" id="lockAesthetic" /></label>
+        <div class="ae-list" id="aeList" role="group" aria-label="Aesthetic"></div>
+        <button id="shuffleAesthetic" class="btn btn-ghost btn-block">Shuffle aesthetic</button>
+      </div>
+    </details>
+
     <details class="panel" open>
       <summary class="panel-head"><h2>Typography</h2></summary>
       <div class="panel-body">
@@ -195,15 +216,55 @@
           <span>Scheme</span>
           <select id="schemeSelect"></select>
         </label>
-        <div class="swatch-grid">
-          <label class="swatch"><input type="color" id="colorPrimary" /><span>Primary</span></label>
-          <label class="swatch"><input type="color" id="colorSecondary" /><span>Secondary</span></label>
-          <label class="swatch"><input type="color" id="colorAccent" /><span>Accent</span></label>
-          <label class="swatch"><input type="color" id="colorNeutralDark" /><span>Dark</span></label>
-          <label class="swatch"><input type="color" id="colorNeutralLight" /><span>Light</span></label>
+        <!-- Inline picker (js/color-picker.js). No <input type="color">: in the
+             Mac app that opens the system color panel. -->
+        <div class="cp" id="colorPicker">
+          <div class="cp-roles" id="cpRoles" role="group" aria-label="Palette colors">
+            <button type="button" class="cp-role" data-key="primary" aria-pressed="true"><i class="cp-role-sw"></i><span class="cp-role-text"><b>Primary</b><small></small></span><code class="cp-role-hex"></code></button>
+            <button type="button" class="cp-role" data-key="secondary" aria-pressed="false"><i class="cp-role-sw"></i><span class="cp-role-text"><b>Secondary</b><small></small></span><code class="cp-role-hex"></code></button>
+            <button type="button" class="cp-role" data-key="accent" aria-pressed="false"><i class="cp-role-sw"></i><span class="cp-role-text"><b>Accent</b><small></small></span><code class="cp-role-hex"></code></button>
+            <button type="button" class="cp-role" data-key="neutralDark" aria-pressed="false"><i class="cp-role-sw"></i><span class="cp-role-text"><b>Dark</b><small></small></span><code class="cp-role-hex"></code></button>
+            <button type="button" class="cp-role" data-key="neutralLight" aria-pressed="false"><i class="cp-role-sw"></i><span class="cp-role-text"><b>Light</b><small></small></span><code class="cp-role-hex"></code></button>
+          </div>
+
+          <div class="cp-wheel" id="cpWheel">
+            <canvas id="cpWheelCanvas" aria-hidden="true"></canvas>
+            <div id="cpDots"></div>
+            <div class="cp-handle" id="cpHandle" tabindex="0" role="slider" aria-label="Hue and saturation" aria-valuemin="0" aria-valuemax="360" aria-valuenow="0" title="Arrow keys: left/right hue, up/down saturation. Hold Shift for bigger steps."></div>
+          </div>
+
+          <div class="cp-fields">
+            <label class="field">
+              <span>Brightness <output id="cpSelectedName"></output></span>
+              <input type="range" id="cpBright" class="cp-bright" min="0" max="100" step="1" value="100" />
+            </label>
+            <label class="field">
+              <span>Hex <output id="cpReadout" class="cp-readout"></output></span>
+              <input type="text" id="cpHex" class="cp-hex" maxlength="9" spellcheck="false" autocomplete="off" autocapitalize="off" />
+            </label>
+          </div>
+
+          <div class="cp-guide" id="cpGuide" aria-live="polite"></div>
         </div>
+
         <button id="shuffleColors" class="btn btn-ghost btn-block">Shuffle colors</button>
         <div class="suggest" id="sg-colors" hidden></div>
+
+        <details class="subpanel" id="cpImport">
+          <summary>Paste brand colors</summary>
+          <div class="subpanel-body">
+            <label class="field">
+              <span>Text from a brand guide</span>
+              <textarea id="cpPaste" class="cp-paste" rows="5" spellcheck="false" placeholder="Primary: #E4572E&#10;Secondary: #17BEBB&#10;Accent: #FFC914&#10;Text: #2E282A&#10;Background: #F6F5F1"></textarea>
+            </label>
+            <div class="cp-imp-rows" id="cpImpRows"></div>
+            <p class="cp-imp-note" id="cpImpNote" hidden></p>
+            <div class="cp-imp-actions">
+              <button type="button" id="cpImpApply" class="btn btn-primary btn-small" disabled>Apply colors</button>
+              <button type="button" id="cpImpClear" class="btn btn-ghost btn-small" disabled>Clear</button>
+            </div>
+          </div>
+        </details>
       </div>
     </details>
 
@@ -252,54 +313,34 @@
     <header class="workspace-header">
       <div class="workspace-header-top">
         <div>
-          <h1>Live preview</h1>
-          <p>Pick, lock and shuffle fonts, colors and shapes — brand copy lives in the Brand panel on the left.</p>
+          <h1>Design language</h1>
+          <p class="ae-current"><strong id="aeName">Soft Form</strong><span id="aeDesc"></span></p>
+          <p class="ae-summary" id="aeSummary"></p>
         </div>
-        <button id="exportPalettePng" class="btn btn-ghost btn-small">
-          <svg class="ico" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M21 21H3"/></svg>
-          Export PNG
-        </button>
+        <div class="ws-tools">
+          <div class="ae-step">
+            <button type="button" id="aePrev" class="btn btn-ghost btn-small" aria-label="Previous aesthetic">
+              <svg class="ico" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>
+            </button>
+            <button type="button" id="aeNext" class="btn btn-ghost btn-small" aria-label="Next aesthetic">
+              <svg class="ico" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
+            </button>
+          </div>
+          <div class="segmented view-toggle" role="radiogroup" aria-label="Board view">
+            <label><input type="radio" name="boardView" value="board" checked /> Board</label>
+            <label><input type="radio" name="boardView" value="compare" /> Compare all</label>
+          </div>
+          <button id="exportPalettePng" class="btn btn-ghost btn-small">
+            <svg class="ico" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M21 21H3"/></svg>
+            Export PNG
+          </button>
+        </div>
       </div>
     </header>
 
-    <section class="preview-scope" id="previewCard">
-      <div class="pv-nav">
-        <div class="preview-logo" id="previewLogoBox"></div>
-        <nav class="pv-links" aria-hidden="true"><span class="is-on">Work</span><span>Studio</span><span>Journal</span></nav>
-        <span class="pv-signin" aria-hidden="true">Sign in</span>
-      </div>
-      <div class="pv-hero">
-        <div class="pv-copy">
-          <span class="preview-chip" id="previewChip">New this season</span>
-          <h2 class="preview-heading" id="previewHeading">Aster &amp; Co.</h2>
-          <p class="preview-body" id="previewBody">A short tagline that captures the brand.</p>
-          <div class="preview-actions">
-            <button class="preview-btn preview-btn-primary" id="previewBtnPrimary">Primary action</button>
-            <button class="preview-btn preview-btn-secondary" id="previewBtnSecondary">Secondary</button>
-          </div>
-        </div>
-        <aside class="pv-panel" aria-hidden="true">
-          <div class="preview-shape" id="previewShape"></div>
-          <div class="pv-panel-label">Repeat customers</div>
-          <div class="pv-panel-num">+128%</div>
-          <div class="pv-bars"><i style="height:38%"></i><i style="height:52%"></i><i style="height:46%"></i><i style="height:74%"></i><i style="height:100%"></i></div>
-        </aside>
-      </div>
-      <div class="pv-row" aria-hidden="true">
-        <div class="pv-card">
-          <div class="pv-card-title">Collections</div>
-          <div class="pv-tags"><span class="pv-tag pv-tag-1">Identity</span><span class="pv-tag pv-tag-2">Packaging</span><span class="pv-tag pv-tag-3">Editorial</span></div>
-        </div>
-        <div class="pv-card">
-          <div class="pv-card-title">Launch progress</div>
-          <div class="pv-progress"><i></i></div>
-          <div class="pv-progress-meta"><span>72% complete</span><span class="pv-dot-label">On track</span></div>
-        </div>
-      </div>
-      <div class="pv-foot" aria-hidden="true">
-        <span>Palette</span>
-        <div class="swatch-strip" id="swatchStrip"></div>
-      </div>
+    <section class="ab-stage" aria-label="Design language board">
+      <div id="previewCard"></div>
+      <div class="cmp-grid" id="compareGrid" hidden></div>
     </section>
 
     <section class="recommendations">
@@ -391,6 +432,18 @@
 <script src="js/color.js"></script>
 <script src="js/rules.js"></script>
 <script src="js/slide-mocks.js"></script>
+<script src="js/aesthetics/registry.js"></script>
+<script src="js/aesthetics/soft-form.js"></script>
+<script src="js/aesthetics/raw-brutalist.js"></script>
+<script src="js/aesthetics/neo-brutal-pop.js"></script>
+<script src="js/aesthetics/retro-futurist.js"></script>
+<script src="js/aesthetics/liquid-glass.js"></script>
+<script src="js/aesthetics/holo-iridescent.js"></script>
+<script src="js/aesthetics/aurora-noir.js"></script>
+<script src="js/aesthetics/bauhaus-poster.js"></script>
+<script src="js/aesthetics/clay.js"></script>
+<script src="js/aesthetics/riso-print.js"></script>
+<script src="js/aesthetic-board.js"></script>
 <script src="js/persistence.js"></script>
 <script src="js/undo-history.js"></script>
 <script src="js/brand-guide.js"></script>
@@ -398,6 +451,9 @@
 <script src="js/export-pdf.js"></script>
 <script src="js/font-picker.js"></script>
 <script src="js/suggest.js"></script>
+<script src="js/color-roles.js"></script>
+<script src="js/color-import.js"></script>
+<script src="js/color-picker.js"></script>
 <script src="js/app.js"></script>
 <script src="js/brand-guide-ui.js"></script>
 <script src="js/suggest-ui.js"></script>

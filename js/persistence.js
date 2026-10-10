@@ -15,6 +15,7 @@ function serializeState(state) {
     colors: state.colors,
     shapePresetKey: state.shapePreset.key,
     bgMode: state.bgMode,
+    aestheticKey: state.aesthetic,
     logoDataUrl: state.logoDataUrl,
     content: state.content,
     locks: state.locks,
@@ -83,9 +84,16 @@ function applySavedSessionToState(saved, state) {
     state.content = saved.content;
   }
 
-  // Restore locks
+  // Restore aesthetic. Brands saved before aesthetics existed (or against a
+  // key that no longer exists) keep the default set by resetState().
+  if (typeof saved.aestheticKey === 'string' && AESTHETICS.some(a => a.key === saved.aestheticKey)) {
+    state.aesthetic = saved.aestheticKey;
+  }
+
+  // Restore locks. Merged onto the defaults so a brand saved before a lock
+  // existed (e.g. aesthetic) still has every key.
   if (saved.locks && typeof saved.locks === 'object') {
-    state.locks = saved.locks;
+    state.locks = Object.assign({ typography: false, color: false, shape: false, aesthetic: false }, saved.locks);
   }
 
   // Restore typography fine-tuning (size/weight/tracking/case). Merge onto

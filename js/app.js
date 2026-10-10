@@ -21,7 +21,8 @@ const state = {
   logoImg: null,
   logoDataUrl: null,
   content: {},
-  locks: { typography: false, color: false, shape: false },
+  aesthetic: 'soft-form',   // key into AESTHETICS (js/aesthetics/registry.js)
+  locks: { typography: false, color: false, shape: false, aesthetic: false },
   dismissed: [],   // suggestion ids dismissed for this brand
 };
 
@@ -63,8 +64,53 @@ function randomizeColor() {
   state.hue = Math.random() * 360;
   state.colors = generatePalette(state.scheme, state.hue);
 }
+// Hand-editing one palette color. Primary drives the rest of the palette under
+// a real scheme; under 'custom' it is just another color. Editing any other
+// color means the palette no longer follows a formula, so drop into 'custom' —
+// further scheme/primary changes won't clobber what was just set. Callers own
+// the undo snapshot and the render().
+function setBrandColor(key, hex) {
+  if (key === 'primary' && state.scheme !== 'custom') {
+    state.colors = derivePalette(hex, state.scheme);
+    return;
+  }
+  state.colors = { ...state.colors, [key]: hex };
+  if (key !== 'primary') state.scheme = 'custom';
+}
+
+// Several colors at once (Paste brand colors): always becomes a custom palette,
+// and is exactly one undo step.
+function applyBrandColors(colors) {
+  pushUndoSnapshot(state);
+  state.colors = { ...state.colors, ...colors };
+  state.scheme = 'custom';
+  render();
+}
 function randomizeShape() {
   state.shapePreset = pickRandom(SHAPE_PRESETS);
+}
+
+// Selecting an aesthetic also takes its recommended background mode and (unless
+// shape is locked) its slide shape preset.
+function applyAesthetic(key) {
+  const def = aestheticByKey(key);
+  state.aesthetic = def.key;
+  state.bgMode = def.mode;
+  if (!state.locks.shape) {
+    const preset = SHAPE_PRESETS.find(p => p.key === def.slideShape);
+    if (preset) state.shapePreset = preset;
+  }
+}
+// Panel tiles, prev/next and Compare tiles: one undo step, then a normal render
+// (which also marks the brand unsaved via the serialized state).
+function chooseAesthetic(key) {
+  if (key === state.aesthetic) return;
+  pushUndoSnapshot(state);
+  applyAesthetic(key);
+  render();
+}
+function randomizeAesthetic() {
+  applyAesthetic(pickRandom(AESTHETICS.filter(a => a.key !== state.aesthetic)).key);
 }
 
 /* ---------------- Google Fonts loading ---------------- */
@@ -185,17 +231,15 @@ function updateControlsFromState() {
   document.getElementById('bodyCase').value = state.typography.bodyCase;
   document.getElementById('schemeSelect').value = state.scheme;
   document.getElementById('shapeSelect').value = state.shapePreset.key;
-  document.getElementById('colorPrimary').value = state.colors.primary;
-  document.getElementById('colorSecondary').value = state.colors.secondary;
-  document.getElementById('colorAccent').value = state.colors.accent;
-  document.getElementById('colorNeutralDark').value = state.colors.neutralDark;
-  document.getElementById('colorNeutralLight').value = state.colors.neutralLight;
+  // Role rows, wheel, brightness, hex and guidance (js/color-picker.js).
+  if (window.ColorPicker) ColorPicker.sync();
   document.querySelectorAll('input[name="bgMode"]').forEach(r => { r.checked = r.value === state.bgMode; });
   // Lock toggles must mirror state too — a restored session can arrive with a
   // lock already on, and a lock the UI doesn't show is a lock nobody can find.
   document.getElementById('lockTypography').checked = !!state.locks.typography;
   document.getElementById('lockColor').checked = !!state.locks.color;
   document.getElementById('lockShape').checked = !!state.locks.shape;
+  document.getElementById('lockAesthetic').checked = !!state.locks.aesthetic;
 }
 
 /* ---------------- Rendering ---------------- */
@@ -206,92 +250,11 @@ function escapeHtml(str) {
   }[c]));
 }
 
-// Extra roles so every palette color has a visible job in the preview card:
-// secondary tints for surfaces/tags/tracks, both neutrals for page + footer,
-// and contrast-checked picks for anything drawn on the primary panel.
-function previewRoleVars(bg, text) {
-  const c = state.colors;
-  const dark = state.bgMode === 'dark';
-  const secTint = slMix(c.secondary, bg, 0.16);
-  const secLine = slMix(c.secondary, bg, 0.45);
-  const priTint = slMix(c.primary, bg, 0.12);
-  const footBg = dark ? c.neutralLight : c.neutralDark;
-  const onPrimary = pickReadableText(c.primary);
-  const accentOnPrimary = slVisible(c.primary, [c.accent], 2.6, onPrimary);
-  return {
-    '--on-secondary': pickReadableText(c.secondary),
-    '--sec-tint': secTint,
-    '--sec-line': secLine,
-    '--on-sec-tint': pickReadableText(secTint),
-    '--pri-tint': priTint,
-    '--on-pri-tint': pickReadableText(priTint),
-    '--link-accent': slVisible(bg, [c.accent, c.primary], 3, text),
-    '--foot-bg': footBg,
-    '--foot-ink': pickReadableText(footBg),
-    '--panel-num': accentOnPrimary,
-    '--panel-shape': accentOnPrimary,
-    '--bar-a': slVisible(c.primary, [c.secondary], 1.6, onPrimary),
-    '--bar-b': slVisible(c.primary, [c.neutralLight, c.neutralDark], 2, onPrimary),
-    '--bar-c': slVisible(c.primary, [c.accent], 1.6, onPrimary),
-    '--track': secLine,
-  };
-}
-
+// The board (js/aesthetic-board.js) replaced the old preview card. suggest-ui.js
+// still calls this for hover previews, so it stays as the single entry point
+// for "repaint the board from state".
 function applyPreviewTheme() {
-  const card = document.getElementById('previewCard');
-  const bg = state.bgMode === 'dark' ? state.colors.neutralDark : state.colors.neutralLight;
-  const text = pickReadableText(bg);
-  const onPrimary = pickReadableText(state.colors.primary);
-  const onAccent = pickReadableText(state.colors.accent);
-
-  const vars = {
-    '--primary': state.colors.primary,
-    '--secondary': state.colors.secondary,
-    '--accent': state.colors.accent,
-    '--neutral-dark': state.colors.neutralDark,
-    '--neutral-light': state.colors.neutralLight,
-    '--bg': bg,
-    '--text': text,
-    '--on-primary': onPrimary,
-    '--on-accent': onAccent,
-    ...previewRoleVars(bg, text),
-    '--font-heading': state.headingFont.css,
-    '--font-body': state.bodyFont.css,
-    '--heading-size': state.typography.headingSize + 'px',
-    '--body-size': state.typography.bodySize + 'px',
-    '--heading-weight': state.typography.headingWeight,
-    '--body-weight': state.typography.bodyWeight,
-    '--heading-tracking': state.typography.headingTracking + 'px',
-    '--body-tracking': state.typography.bodyTracking + 'px',
-    '--heading-transform': state.typography.headingCase,
-    '--body-transform': state.typography.bodyCase,
-    '--radius': state.shapePreset.radius,
-    '--radius-lg': state.shapePreset.radiusLg,
-    '--shadow': state.shapePreset.shadow,
-    '--border-w': state.shapePreset.borderWidth,
-  };
-  Object.entries(vars).forEach(([k, v]) => card.style.setProperty(k, v));
-  card.className = 'preview-scope shape-' + state.shapePreset.decorative;
-
-  const strip = document.getElementById('swatchStrip');
-  strip.innerHTML = '';
-  ['primary', 'secondary', 'accent', 'neutralDark', 'neutralLight'].forEach(key => {
-    const span = document.createElement('span');
-    span.style.background = state.colors[key];
-    span.title = `${key}: ${state.colors[key]}`;
-    strip.appendChild(span);
-  });
-
-  const logoBox = document.getElementById('previewLogoBox');
-  logoBox.innerHTML = state.logoDataUrl
-    ? `<img src="${state.logoDataUrl}" alt="logo" />`
-    : `<strong style="font-family:${state.headingFont.css.replace(/"/g, "'")}">LOGO</strong>`;
-
-  // The preview headline/body are read-only projections of the Brand panel's
-  // name and tagline — the same copy the title slide and brand guide use.
-  const copy = effectiveContent();
-  document.getElementById('previewHeading').textContent = copy.brandName;
-  document.getElementById('previewBody').textContent = copy.tagline;
+  renderAestheticBoard();
 }
 
 // Small live sample of the two selected faces, so the picker shows what the
@@ -330,7 +293,7 @@ function renderFindings() {
 
 function render() {
   updateControlsFromState();
-  applyPreviewTheme();
+  renderAestheticBoard();
   renderFontSpecimen();
   if (window.syncFontPickers) syncFontPickers();
   renderFindings();
@@ -441,6 +404,8 @@ function wireEvents() {
     if (!state.locks.typography) randomizeTypography();
     if (!state.locks.color) randomizeColor();
     if (!state.locks.shape) randomizeShape();
+    // Last, so an unlocked aesthetic's slide shape wins over the random one.
+    if (!state.locks.aesthetic) randomizeAesthetic();
     render();
   });
 
@@ -457,6 +422,12 @@ function wireEvents() {
     randomizeShape(); render();
   });
 
+  document.getElementById('shuffleAesthetic').addEventListener('click', () => {
+    if (state.locks.aesthetic) return showToast('Unlock aesthetic to shuffle');
+    randomizeAesthetic(); render();
+  });
+
+  document.getElementById('lockAesthetic').addEventListener('change', e => state.locks.aesthetic = e.target.checked);
   document.getElementById('lockTypography').addEventListener('change', e => state.locks.typography = e.target.checked);
   document.getElementById('lockColor').addEventListener('change', e => state.locks.color = e.target.checked);
   document.getElementById('lockShape').addEventListener('change', e => state.locks.shape = e.target.checked);
@@ -486,30 +457,9 @@ function wireEvents() {
     render();
   });
 
-  // Primary color drives the rest of the palette under a real scheme; under
-  // 'custom' it's just another color the user is free to set directly.
-  document.getElementById('colorPrimary').addEventListener('input', e => {
-    const hex = e.target.value;
-    state.colors = state.scheme === 'custom'
-      ? { ...state.colors, primary: hex }
-      : derivePalette(hex, state.scheme);
-    render();
-  });
-
-  // Hand-editing any non-primary swatch means the palette no longer follows
-  // a formula, so drop into 'custom' automatically — further scheme/primary
-  // changes won't clobber what was just picked.
-  const colorFieldMap = {
-    colorSecondary: 'secondary', colorAccent: 'accent',
-    colorNeutralDark: 'neutralDark', colorNeutralLight: 'neutralLight',
-  };
-  Object.entries(colorFieldMap).forEach(([id, field]) => {
-    document.getElementById(id).addEventListener('input', e => {
-      state.colors[field] = e.target.value;
-      state.scheme = 'custom';
-      render();
-    });
-  });
+  // Palette colors are edited by the inline picker (js/color-picker.js), which
+  // goes through setBrandColor() / applyBrandColors() above.
+  if (window.ColorPicker) ColorPicker.init();
 
   document.getElementById('shapeSelect').addEventListener('change', e => {
     state.shapePreset = SHAPE_PRESETS.find(p => p.key === e.target.value); render();
@@ -688,6 +638,7 @@ function init() {
   randomizeColor();
   randomizeShape();
 
+  initAestheticUi();
   wireEvents();
   render();
 }

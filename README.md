@@ -67,6 +67,24 @@ app, IndexedDB in a browser. The old single-session autosave is imported once
 as a brand. The Mac app has a File menu (New Brand, Save, Save as New Brand,
 Revert to Saved, Back to Library).
 
+## Design language board and aesthetics
+
+The old "Live preview" card is now a **Design language board** modeled on a
+design-language study sheet: wordmark and "Design language / <aesthetic>"
+header, hero (kicker, your tagline with the last word in the accent color,
+signature art), a palette row that names each color's job and coverage,
+`01 / Interface`, `02 / <material>` and `03 / In use` sections, and a footer.
+It renders in the brand's own fonts, colors, name and logo. The sidebar's
+**Aesthetic** panel picks one of ten aesthetics (lockable, with Shuffle
+aesthetic); choosing one also takes its recommended Light/Dark mode and, unless
+Shape is locked, its slide shape. **Compare all** shows all ten boards at once
+in the current brand; click a tile to select it. The choice is saved with the
+brand and is one Undo step. Soft Form, Raw Brutalist and Liquid Glass are fully
+built; the other seven use the shared layout with a placeholder illustration
+until they are filled in. Files: `js/aesthetic-board.js`, `css/aesthetic-board.css`,
+`js/aesthetics/<key>.js` and `css/aesthetics/<key>.css` (see
+`docs/aesthetics-plan.md`).
+
 ## Suggestions
 
 Under Typography, Color palette and Shape the editor can show one quiet

@@ -1,0 +1,152 @@
+/* ---------------------------------------------------------------------
+   01 Soft Form — same-color raised and recessed surfaces, one iridescent
+   glass panel, a glossy primary, a strong ink-filled selected segment.
+   Fixed top-left light. Variables --ab-hi / --ab-lo / --ab-rim / --ab-gloss
+   come from js/aesthetics/soft-form.js tokens().
+------------------------------------------------------------------------ */
+
+.ab[data-ae="soft-form"] {
+  --sf-raised: 6px 6px 13px var(--ab-lo), -6px -6px 13px var(--ab-hi);
+  --sf-raised-s: 3px 3px 7px var(--ab-lo), -3px -3px 7px var(--ab-hi);
+  --sf-inset: inset 6px 6px 13px var(--ab-lo), inset -6px -6px 13px var(--ab-hi);
+  --sf-inset-s: inset 3px 3px 6px var(--ab-lo), inset -3px -3px 6px var(--ab-hi);
+  border-radius: 24px;
+}
+
+/* header */
+.ab[data-ae="soft-form"] .ab-brand { font-weight: 600; letter-spacing: -0.03em; }
+.ab[data-ae="soft-form"] .ab-mark {
+  position: relative; width: 30px; height: 30px; border-radius: 10px;
+  background: var(--ab-canvas); box-shadow: var(--sf-raised-s);
+}
+.ab[data-ae="soft-form"] .ab-mark span { display: none; }
+.ab[data-ae="soft-form"] .ab-mark::after {
+  content: ""; position: absolute; left: 8px; top: 8px; width: 14px; height: 14px; border-radius: 50%;
+  background: radial-gradient(circle at 30% 27%, rgba(255, 255, 255, 0.4), transparent 45%), var(--ab-primary);
+  box-shadow: 2px 3px 4px rgba(0, 0, 0, 0.2);
+}
+.ab[data-ae="soft-form"] .ab-tag { letter-spacing: 0.14em; }
+
+/* hero */
+.ab[data-ae="soft-form"] .ab-kicker { letter-spacing: 0.17em; }
+.ab[data-ae="soft-form"] .ab-headline { font-weight: 500; letter-spacing: -0.04em; line-height: 0.98; }
+
+/* signature art: a recessed plinth, a raised dome, a primary disc, a
+   secondary bar and a glass lens that refracts a duplicate of the scene */
+.ab[data-ae="soft-form"] .sfa { position: absolute; inset: 0; }
+.ab[data-ae="soft-form"] .sfa-scene { position: absolute; inset: 0; }
+.ab[data-ae="soft-form"] .sfa i { position: absolute; display: block; }
+.ab[data-ae="soft-form"] .sfa-plinth {
+  left: 3%; top: 66%; width: 94%; height: 30%; border-radius: 15cqw; background: var(--ab-canvas);
+  box-shadow: inset 3cqw 3cqw 6cqw var(--ab-lo), inset -3cqw -3cqw 6cqw var(--ab-hi);
+}
+.ab[data-ae="soft-form"] .sfa-dome {
+  left: 10%; top: 56%; width: 46%; height: 23%; border-radius: 50cqw 50cqw 0 0; background: var(--ab-canvas);
+  box-shadow: 4cqw 3.4cqw 6cqw var(--ab-lo), -3cqw -3cqw 6cqw var(--ab-hi);
+}
+.ab[data-ae="soft-form"] .sfa-disc {
+  left: 13%; top: 9%; width: 35%; height: 35%; border-radius: 50%;
+  background: radial-gradient(circle at 30% 27%, rgba(255, 255, 255, 0.4), transparent 44%), var(--ab-primary);
+  box-shadow: 3cqw 4.5cqw 5.5cqw rgba(0, 0, 0, 0.2), inset 1.5cqw 1.5cqw 4cqw rgba(255, 255, 255, 0.3), inset -1.5cqw -1.5cqw 4.5cqw rgba(0, 0, 0, 0.16);
+}
+.ab[data-ae="soft-form"] .sfa-bar {
+  left: 69%; top: 12%; width: 11%; height: 68%; border-radius: 99px;
+  background: linear-gradient(100deg, rgba(255, 255, 255, 0.3), transparent 45%), var(--ab-secondary);
+  box-shadow: 2.6cqw 3.6cqw 5cqw rgba(0, 0, 0, 0.2), inset 1cqw 1cqw 2.5cqw rgba(255, 255, 255, 0.25), inset -1cqw -1cqw 3cqw rgba(0, 0, 0, 0.14);
+}
+.ab[data-ae="soft-form"] .sfa-lens {
+  border-radius: 30%; border: 1px solid var(--ab-rim); background: var(--ab-canvas-a);
+  box-shadow: inset 4px 2px 4px rgba(255, 255, 255, 0.7), inset -4px -2px 5px rgba(203, 187, 242, 0.7),
+    inset 10px 0 18px rgba(178, 238, 227, 0.23), 4cqw 5cqw 7cqw rgba(0, 0, 0, 0.18);
+}
+.ab[data-ae="soft-form"] .sfa-lens .ab-lens-scene { filter: saturate(1.3); }
+.ab[data-ae="soft-form"] .sfa-lens::before {
+  content: ""; position: absolute; inset: 0; z-index: 2; pointer-events: none;
+  background: linear-gradient(118deg, rgba(255, 255, 255, 0.62) 0%, rgba(255, 255, 255, 0.03) 23%, rgba(155, 231, 230, 0.16) 38%,
+    rgba(183, 188, 250, 0.3) 52%, rgba(239, 175, 211, 0.24) 66%, rgba(244, 228, 165, 0.3) 79%, rgba(255, 255, 255, 0.34) 100%);
+}
+.ab[data-ae="soft-form"] .sfa-lens::after {
+  content: ""; position: absolute; inset: 5px; z-index: 2; border-radius: inherit; pointer-events: none;
+  border-top: 2px solid rgba(255, 255, 255, 0.65); border-left: 1px solid rgba(255, 255, 255, 0.45);
+  border-right: 2px solid rgba(236, 212, 242, 0.45);
+}
+
+/* palette */
+.ab[data-ae="soft-form"] .ab-chip { border-radius: 12px; height: clamp(40px, 6cqw, 60px); box-shadow: inset 0 0 0 1px rgba(128, 128, 128, 0.16), 2px 3px 6px var(--ab-lo); }
+.ab[data-ae="soft-form"] .ab-swatch[data-role="canvas"] .ab-chip { box-shadow: var(--sf-raised-s); }
+
+/* 01 / interface: the one glass panel */
+.ab[data-ae="soft-form"] .ab-card {
+  position: relative; isolation: isolate; border-radius: 24px;
+  background: linear-gradient(135deg, var(--ab-gloss), transparent 48%), var(--ab-canvas);
+  border: 1px solid var(--ab-rim);
+  box-shadow: inset 1px 1px 2px rgba(255, 255, 255, 0.5), inset -1px -1px 2px rgba(255, 255, 255, 0.15),
+    6px 9px 20px var(--ab-lo), -4px -4px 12px var(--ab-hi);
+}
+.ab[data-ae="soft-form"] .ab-card::before {
+  content: ""; position: absolute; inset: 0; z-index: -1; border-radius: inherit; pointer-events: none;
+  background: radial-gradient(ellipse at 100% 0%, rgba(214, 189, 255, 0.24), transparent 45%),
+    radial-gradient(ellipse at 0% 100%, rgba(164, 230, 232, 0.24), transparent 48%);
+}
+.ab[data-ae="soft-form"] .ab-card::after {
+  content: ""; position: absolute; inset: -1px; border-radius: inherit; padding: 1.5px; pointer-events: none;
+  background: linear-gradient(125deg, #ffffffdd 0%, #ffffff55 28%, #b6dce7aa 45%, #d6b9edcc 64%, #efcfbbcc 79%, #ffffffaa);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor; mask-composite: exclude;
+}
+.ab[data-ae="soft-form"] .ab-seg { border-radius: 12px; background: var(--ab-canvas); box-shadow: var(--sf-inset-s); }
+.ab[data-ae="soft-form"] .ab-seg-btn { border-radius: 9px; transition: background 0.18s, color 0.18s; }
+.ab[data-ae="soft-form"] .ab-seg-btn[aria-pressed="true"] {
+  background: var(--ab-ink); color: var(--ab-canvas); font-weight: 500; box-shadow: 2px 3px 5px rgba(0, 0, 0, 0.16);
+}
+.ab[data-ae="soft-form"] .ab-card-title { font-weight: 500; letter-spacing: -0.03em; }
+.ab[data-ae="soft-form"] .ab-cta {
+  border-radius: 10px; border: 1px solid rgba(255, 255, 255, 0.27);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0) 55%), var(--ab-primary);
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.44), 3px 5px 9px rgba(0, 0, 0, 0.16);
+  transition: transform 0.14s, box-shadow 0.14s;
+}
+.ab[data-ae="soft-form"] .ab-cta:active { transform: translateY(1px) scale(0.99); box-shadow: inset 1px 2px 4px rgba(0, 0, 0, 0.25); }
+
+/* 02 / touch & depth */
+.ab[data-ae="soft-form"] .ab-input {
+  border: 1px solid transparent; border-radius: 12px; padding: 15px; background: var(--ab-canvas); box-shadow: var(--sf-inset);
+  transition: border-color 0.18s;
+}
+.ab[data-ae="soft-form"] .ab-input:focus { border-color: var(--ab-primary-text); }
+.ab[data-ae="soft-form"] .ab-switch { background: var(--ab-canvas); box-shadow: var(--sf-inset-s); }
+.ab[data-ae="soft-form"] .ab-switch::before {
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0) 55%), var(--ab-muted);
+  box-shadow: inset 1px 1px 2px rgba(255, 255, 255, 0.7), 1px 2px 4px rgba(0, 0, 0, 0.25);
+}
+.ab[data-ae="soft-form"] .ab-switch:checked { background: var(--ab-canvas); }
+.ab[data-ae="soft-form"] .ab-switch:checked::before {
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0) 55%), var(--ab-primary);
+}
+.ab[data-ae="soft-form"] .ab-disc { border: 0; background: var(--ab-canvas); }
+.ab[data-ae="soft-form"] .ab-disc[data-s="0"] { border: 1px solid var(--ab-line); }
+.ab[data-ae="soft-form"] .ab-disc[data-s="1"] { box-shadow: var(--sf-raised); }
+.ab[data-ae="soft-form"] .ab-disc[data-s="2"] { box-shadow: var(--sf-inset); }
+
+/* 03 / in use: dense rows stay flat */
+.ab[data-ae="soft-form"] .ab-row-status { background: var(--ab-sec-tint); box-shadow: none; }
+.ab[data-ae="soft-form"] .ab-row-bar { height: 8px; border-radius: 6px; background: var(--ab-canvas); box-shadow: var(--sf-inset-s); }
+.ab[data-ae="soft-form"] .ab-row-bar i { border-radius: 6px; background: linear-gradient(180deg, rgba(255, 255, 255, 0.3), transparent 60%), var(--ab-secondary); }
+
+/* footer */
+.ab[data-ae="soft-form"] .ab-foot { font-size: 11px; letter-spacing: 0.02em; }
+
+/* focus and motion */
+.ab[data-ae="soft-form"] .ab-seg-btn:focus-visible, .ab[data-ae="soft-form"] .ab-cta:focus-visible, .ab[data-ae="soft-form"] .ab-switch:focus-visible {
+  outline: 2px solid var(--ab-primary-text); outline-offset: 3px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .ab[data-ae="soft-form"] .ab-cta:active { transform: none; }
+}
+@media (prefers-reduced-transparency: reduce) {
+  .ab[data-ae="soft-form"] .ab-card::before { display: none; }
+}
+@media (prefers-contrast: more) {
+  .ab[data-ae="soft-form"] .ab-card { border-color: var(--ab-ink); }
+  .ab[data-ae="soft-form"] .ab-seg-btn[aria-pressed="false"] { color: var(--ab-ink); }
+}
