@@ -149,7 +149,7 @@ function googleFontChunkUrls() {
   const urls = [];
   for (let i = 0; i < sorted.length; i += GOOGLE_FONT_CHUNK_SIZE) {
     const families = sorted.slice(i, i + GOOGLE_FONT_CHUNK_SIZE)
-      .map(f => `family=${encodeURIComponent(f.name).replace(/%20/g, '+')}:wght@${f.weights}`)
+      .map(f => googleFamilyParam(f))
       .join('&');
     urls.push(`https://fonts.googleapis.com/css2?${families}&display=swap`);
   }

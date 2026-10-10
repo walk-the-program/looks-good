@@ -4,12 +4,14 @@
 
 function downloadBrandGuideHtml(state) {
   // Build Google Fonts URL
-  const headingFont = state.headingFont.name;
-  const bodyFont = state.bodyFont.name;
-  const fontParams = [
-    `family=${headingFont.replace(/ /g, '+')}:wght@400;700`,
-    `family=${bodyFont.replace(/ /g, '+')}:wght@400;700`
-  ].join('&');
+  // Same family rule as the app (googleFamilyParam in data.js): real weights
+  // for each face, plus the true italic where the family has one. Families
+  // must be alphabetical and de-duplicated for the css2 endpoint.
+  const fontParams = [state.headingFont, state.bodyFont]
+    .filter((f, i, a) => a.findIndex(x => x.name === f.name) === i)
+    .sort((a, b) => a.name.localeCompare(b.name))
+    .map(f => googleFamilyParam(f))
+    .join('&');
   const fontsUrl = `https://fonts.googleapis.com/css2?${fontParams}&display=swap`;
 
   // Build the complete HTML document

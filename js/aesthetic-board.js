@@ -23,13 +23,19 @@ function abAlpha(hex, a) {
 // text AA), otherwise the same hue and saturation shaded toward black on a
 // light canvas or tinted toward white on a dark one, one lightness step at a
 // time, until it does. Falls back to ink only if no step reaches 3:1.
+// Exception (light canvas only): a yellow or yellow-green accent (hue 38-80)
+// darkened at constant hue turns olive, so the hue rotates toward 34 (amber)
+// while it darkens: h' = h - min(14, (h - 34) * 0.6), s' = max(s, 85).
 function abAccentInk(accent, canvas, ink) {
   if (contrastRatio(accent, canvas) >= 3) return accent;
   const hsl = hexToHsl(accent);
   const darken = contrastRatio(canvas, '#000000') >= contrastRatio(canvas, '#ffffff');
   const step = darken ? -1 : 1;
+  const warm = darken && hsl.h >= 38 && hsl.h <= 80;
+  const h = warm ? hsl.h - Math.min(14, (hsl.h - 34) * 0.6) : hsl.h;
+  const s = warm ? Math.max(hsl.s, 85) : hsl.s;
   for (let l = Math.round(hsl.l); l >= 0 && l <= 100; l += step) {
-    const hex = hslToHex(hsl.h, hsl.s, l);
+    const hex = hslToHex(h, s, l);
     if (contrastRatio(hex, canvas) >= 3) return hex;
   }
   return ink;
@@ -282,7 +288,10 @@ function abTypeBlockHtml(state, def) {
       </div>`;
   const cols = [col('heading', 'Headings', f.heading, state.headingFont, fits.heading),
     col('body', 'Body', f.body, state.bodyFont, fits.body)];
-  if (f.mono) cols.push(col('mono', 'UI &amp; mono', f.mono, null, null));
+  // Skip the mono column when every mono pick is already a body pick (it would
+  // just repeat the body card, e.g. Pixel Arcade's VT323).
+  const bodyPicks = f.body && f.body.picks ? f.body.picks : [];
+  if (f.mono && f.mono.picks.some(n => !bodyPicks.includes(n))) cols.push(col('mono', 'UI &amp; mono', f.mono, null, null));
   const pair = f.pairings[0];
   const used = abUsingRecommended(state, meta);
   return `<section class="ab-type" data-cols="${cols.length}" data-applied="${used}" aria-label="Type recommendations">
@@ -368,11 +377,11 @@ function boardHtml(state, def) {
       <span class="ab-row-pct">${r[2]}%</span>
     </li>`).join('');
 
-  return `<section class="ab" data-ae="${def.key}" data-mode="${t.isDark ? 'dark' : 'light'}" data-accent-text="${t.accentLow ? 'low' : 'ok'}" data-hero="${layout.hero}" data-palette="${layout.palette}" data-sections="${layout.sections}" data-highlight="${hlKind}" data-states="${statesKind}" data-subcopy="${layout.subcopy ? 'on' : 'off'}" style="${style}">
+  return `<section class="ab" data-ae="${def.key}" data-mode="${t.isDark ? 'dark' : 'light'}" data-accent-text="${t.accentLow ? 'low' : 'ok'}" data-hero="${layout.hero}" data-palette="${layout.palette}" data-sections="${layout.sections}" data-highlight="${hlKind}" data-states="${statesKind}" data-subcopy="${layout.subcopy ? 'on' : 'off'}" data-hcls="${e(state.headingFont.cls || '')}" data-bcls="${e(state.bodyFont.cls || '')}" style="${style}">
   <div class="ab-in">
     <header class="ab-head">
       <div class="ab-brand">${brand}</div>
-      <span class="ab-tag">Design language / <b>${e(def.name)}</b></span>
+      <span class="ab-tag"><span class="ab-tag-pre">Design language / </span><b>${e(def.name)}</b></span>
     </header>
     <div class="ab-rule"></div>
     <section class="ab-hero">

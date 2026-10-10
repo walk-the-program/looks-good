@@ -272,15 +272,18 @@
 .ab-type-role { font-family: var(--ab-font-label, var(--ab-font-ui, var(--ab-font-b))); font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ab-muted); }
 .ab-type-class { margin: 3px 0 10px !important; font-family: var(--ab-font-b); font-size: 12.5px; color: var(--ab-muted); }
 .ab-type-picks { list-style: none; display: grid; gap: 3px; }
-.ab-type-pick { font-size: clamp(16px, 2.2cqw, 22px); font-weight: 400; line-height: 1.25; letter-spacing: 0; text-transform: none; overflow-wrap: anywhere; }
-.ab-type-fit { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; margin-top: 12px !important; font-family: var(--ab-font-label, var(--ab-font-ui, var(--ab-font-b))); font-size: 12px; color: var(--ab-muted); }
+/* the first pick is the one "Use recommended fonts" applies: it leads. Aesthetics set --ab-type-pick-w to their headline weight. */
+.ab-type-pick { font-size: clamp(16px, 2.2cqw, 22px); font-weight: var(--ab-type-pick-w, 400); line-height: 1.25; letter-spacing: 0; text-transform: none; overflow-wrap: anywhere; }
+.ab-type-pick:first-child { font-size: clamp(22px, 3.1cqw, 32px); line-height: 1.12; margin-bottom: 4px; }
+.ab-type-fit { display: grid; justify-items: start; gap: 6px; margin-top: 12px !important; font-family: var(--ab-font-label, var(--ab-font-ui, var(--ab-font-b))); font-size: 12px; color: var(--ab-muted); }
 .ab-type-cur b { font-weight: 600; color: var(--ab-ink); }
 .ab-fit {
   display: inline-block; padding: 2px 9px; border: 1px solid var(--ab-line); border-radius: 999px;
   font-family: var(--ab-font-label, var(--ab-font-ui, var(--ab-font-b))); font-size: 11px; font-weight: 600; line-height: 1.5; white-space: nowrap;
   letter-spacing: 0; text-transform: none; color: var(--ab-ink);
 }
-.ab-fit[data-fit="match"] { background: var(--ab-pri-tint); border-color: var(--ab-primary); }
+/* a "fits" tag is the secondary role; primary is for the one action and selected states */
+.ab-fit[data-fit="match"] { background: var(--ab-sec-tint); border-color: transparent; color: var(--ab-ink); }
 .ab-fit[data-fit="avoid"] { background: var(--ab-ink); border-color: var(--ab-ink); color: var(--ab-canvas); }
 .ab-type-foot { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 6px clamp(16px, 3cqw, 32px); align-items: center; margin-top: clamp(16px, 2.4cqw, 24px); }
 .ab-type-avoid { grid-column: 1; font-family: var(--ab-font-label, var(--ab-font-ui, var(--ab-font-b))); font-size: 12px; color: var(--ab-muted); }
@@ -322,8 +325,16 @@
   .ab-swatch { display: grid; grid-template-columns: 72px minmax(0, 1fr); column-gap: 14px; align-items: center; }
   .ab-chip { grid-row: 1 / 4; margin: 0; height: 48px; }
   .ab-sections { grid-template-columns: minmax(0, 1fr); }
-  .ab-tag { max-width: 118px; font-size: 9.5px; }
-  .ab-row { grid-template-columns: 2.6ch minmax(0, 1fr) auto 4.5ch; }
+  .ab-tag-pre { display: none; }
+  .ab-tag { max-width: none; white-space: nowrap; font-size: 9.5px; }
+  .ab-brand { flex: 1 1 auto; }
+  .ab-labelrow { flex-wrap: wrap; row-gap: 4px; }
+  .ab-labelrow > .ab-label:last-child:not(:first-child) { white-space: nowrap; }
+  .ab-row { grid-template-columns: 2.6ch minmax(0, 1fr) 4.5ch; row-gap: 6px; }
+  .ab-row-n { grid-column: 1; grid-row: 1; }
+  .ab-row-name { white-space: normal; overflow: visible; grid-column: 2; grid-row: 1; }
+  .ab-row-status { grid-column: 2; grid-row: 2; justify-self: start; }
+  .ab-row-pct { grid-column: 3; grid-row: 1; }
   .ab-row-bar { display: none; }
   .ab-type-grid, .ab-type[data-cols="2"] .ab-type-grid { grid-template-columns: minmax(0, 1fr); gap: 16px; }
   .ab-type-foot { grid-template-columns: minmax(0, 1fr); margin-top: 24px; }

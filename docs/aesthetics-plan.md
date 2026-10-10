@@ -321,7 +321,9 @@ aesthetic CSS can key off them.
 - The AI brief derives highlight wording only from `def.highlight`; the old `AIB_BAND_HL` fallback list was removed.
 - Token `t.accentInk` (`abAccentInk`): the accent itself when it is already >= 3:1 on the canvas, else the same hue and
   saturation shaded toward black (light canvas) or tinted toward white (dark canvas) one HSL lightness step at a time
-  until it reaches 3:1; ink if none does. CSS var `--ab-accent-ink`; listed as `--accent-ink` in the AI brief tokens table.
+  until it reaches 3:1; ink if none does. On a light canvas a yellow or yellow-green accent (hue 38-80) is not darkened at
+  constant hue (that turns olive): at each step it uses `h' = h - min(14, (h - 34) * 0.6)` and `s' = max(s, 85)`, so
+  yellows go amber. Other hues and the dark-canvas (lightening) branch are unchanged. CSS var `--ab-accent-ink`; listed as `--accent-ink` in the AI brief tokens table.
   `t.accentText` / `--ab-accent-text` is unchanged (accent, else primary, else ink). `data-accent-text="ok|low"` still exists.
 - Sub-copy: every hero gets `p.ab-subcopy` inside `.ab-hero-copy`, after the headline:
   `<span class="ab-sub-lead">A design language for <Brand></span><span class="ab-sub-rest"> — type, color and material in one place.</span>`.
@@ -333,11 +335,13 @@ aesthetic CSS can key off them.
 - Aurora Noir (hero centered, sections asym, states button, ink CTA) and Liquid Glass (hero scene, states chip) are the
   reference implementations of these hooks.
 
-**DOM** (root `section.ab[data-ae=key][data-mode=light|dark][data-hero][data-palette][data-sections][data-highlight][data-states][data-subcopy]`, inline base vars, size container named `ab`):
+**DOM** (root `section.ab[data-ae=key][data-mode=light|dark][data-hero][data-palette][data-sections][data-highlight][data-states][data-subcopy][data-hcls][data-bcls]`, inline base vars, size container named `ab`):
+
+`data-hcls` / `data-bcls` carry the heading and body face's `FONTS[].cls` (`didone`, `soft-serif`, `pixel`, `deco`, ...; empty when unset), so an aesthetic can adapt to the face in CSS without reading globals (e.g. `.ab[data-ae="neo-deco"][data-hcls="deco"] .ab-card-title`).
 
 ```
 .ab > .ab-in
-  header.ab-head: .ab-brand (.ab-mark>span initial + .ab-wordmark | img.ab-logo), .ab-tag (<b> aesthetic name)
+  header.ab-head: .ab-brand (.ab-mark>span initial + .ab-wordmark | img.ab-logo), .ab-tag (span.ab-tag-pre "Design language / " + <b> aesthetic name)
   .ab-rule
   .ab-hero: .ab-hero-copy (.ab-kicker, h2.ab-headline > .ab-hl, p.ab-subcopy > .ab-sub-lead + .ab-sub-rest), .ab-art[aria-hidden] (def.art output)
   .ab-rule
@@ -380,6 +384,12 @@ switch toggles status text; the field is a real input. Compare tiles are `inert`
   (p.ab-type-avoid > .ab-type-k, p.ab-type-why, .ab-type-act > button.ab-type-apply + span.ab-type-pair)`, followed by an `.ab-rule`. An aesthetic restyles it from its own css
   under `.ab[data-ae="key"] .ab-type…` (it is neutral by default, built from `--ab-*` tokens); do not change the markup. The apply button is wired in `wireBoardInteractions` and
   calls `applyRecommendedFonts()` (app.js: first pairing, one undo step, honours `locks.typography`).
+  Framework behaviour (aesthetics may override any of it from scoped css):
+  - The first `.ab-type-pick` is the lead (it is the face "Use recommended fonts" applies): `clamp(22px, 3.1cqw, 32px)`, the rest stay at the base size. Pick weight is `var(--ab-type-pick-w, 400)`; an aesthetic sets `--ab-type-pick-w` in `tokens()` to its headline weight (Pop 700, Raw 400, Bauhaus 600, Groovy 400, Bento 600).
+  - `.ab-fit[data-fit=match]` is a neutral tag (secondary tint, ink text), not primary; `.ab-type-fit` is a grid, so the pill sits under "Your heading: X".
+  - The mono column is only emitted when `fonts.mono` has a pick that is not also in `fonts.body.picks` (Pixel Arcade's VT323 is a body pick, so it renders 2 columns).
+- Narrow boards (container <= 600px): `.ab-tag-pre` is hidden and `.ab-tag` is `white-space: nowrap` with no width cap (aesthetic css must not re-add a narrow `.ab-tag { max-width }`; the brand name is never truncated); `.ab-brand` grows; `.ab-labelrow` wraps (the descriptor drops under the label); list rows use `2.6ch / 1fr / 4.5ch` with the name on row 1 (wrapping), the status pill under it and the percent at the right. Aesthetics with their own narrow `.ab-row` grid (Blueprint, Pixel) keep it.
+- True italics: FONTS entries with `ital: '400'` (Instrument Serif, Playfair Display, Bodoni Moda, Newsreader, Fraunces, Source Serif 4, Lora, Literata, EB Garamond, Cormorant Garamond, Libre Caslon Text, Spectral) are requested as `family=Name:ital,wght@0,w1;0,w2;1,400` (`googleFamilyParam` in data.js; used by app.js `googleFontChunkUrls` and export-html.js). `font-style: italic` therefore renders the real italic, not an oblique. Tuples are sorted `0,` before `1,`, weights ascending; every chunk URL was checked for HTTP 200.
 - Sidebar: `#aeFamilies > button.ae-fam[data-family]` filters `#aeList` (stored in localStorage `bd.aestheticFamily`); `visibleAesthetics()` is the filtered list used by the tiles, prev/next, **Shuffle aesthetic**
   (so Shuffle everything and the Space shortcut too) and Compare all. Typography panel: `#fontRec` (`#frText`, `#frFit`, `#applyRecFonts`). Each tile needs a `[data-motif="<key>"]` rule in aesthetic-board.css.
 - Compare all builds its tiles only while that view is open; the hidden view's DOM is emptied.

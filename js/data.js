@@ -14,24 +14,27 @@
 // Google Fonts css2 endpoint answers 400 for the WHOLE request if any one
 // family/weight is wrong, which would silently drop every webfont on the
 // page. Every entry below was verified against the live endpoint.
+//
+// `ital: '400'` marks families whose true italic is served; googleFamilyParam
+// (below) then requests it so italic text is not a synthesized oblique.
 const FONTS = [
   /* ---- Serif ---- */
-  { name: 'Playfair Display', css: '"Playfair Display", Georgia, serif', category: 'serif', weights: '400;700', cls: 'didone' },
-  { name: 'Lora', css: '"Lora", Georgia, serif', category: 'serif', weights: '400;600', cls: 'text-serif' },
+  { name: 'Playfair Display', css: '"Playfair Display", Georgia, serif', category: 'serif', weights: '400;700', ital: '400', cls: 'didone' },
+  { name: 'Lora', css: '"Lora", Georgia, serif', category: 'serif', weights: '400;600', ital: '400', cls: 'text-serif' },
   { name: 'Merriweather', css: '"Merriweather", Georgia, serif', category: 'serif', weights: '400;700', cls: 'text-serif' },
-  { name: 'Source Serif 4', css: '"Source Serif 4", Georgia, serif', category: 'serif', weights: '400;600', cls: 'text-serif' },
+  { name: 'Source Serif 4', css: '"Source Serif 4", Georgia, serif', category: 'serif', weights: '400;600', ital: '400', cls: 'text-serif' },
   { name: 'Libre Baskerville', css: '"Libre Baskerville", Georgia, serif', category: 'serif', weights: '400;700', cls: 'text-serif' },
-  { name: 'Cormorant Garamond', css: '"Cormorant Garamond", Georgia, serif', category: 'serif', weights: '400;600', cls: 'old-style' },
-  { name: 'EB Garamond', css: '"EB Garamond", Georgia, serif', category: 'serif', weights: '400;600', cls: 'old-style' },
+  { name: 'Cormorant Garamond', css: '"Cormorant Garamond", Georgia, serif', category: 'serif', weights: '400;600', ital: '400', cls: 'old-style' },
+  { name: 'EB Garamond', css: '"EB Garamond", Georgia, serif', category: 'serif', weights: '400;600', ital: '400', cls: 'old-style' },
   { name: 'Crimson Pro', css: '"Crimson Pro", Georgia, serif', category: 'serif', weights: '400;600', cls: 'old-style' },
-  { name: 'Newsreader', css: '"Newsreader", Georgia, serif', category: 'serif', weights: '400;600', cls: 'text-serif' },
-  { name: 'Instrument Serif', css: '"Instrument Serif", Georgia, serif', category: 'serif', weights: '400', cls: 'soft-serif' },
+  { name: 'Newsreader', css: '"Newsreader", Georgia, serif', category: 'serif', weights: '400;600', ital: '400', cls: 'text-serif' },
+  { name: 'Instrument Serif', css: '"Instrument Serif", Georgia, serif', category: 'serif', weights: '400', ital: '400', cls: 'soft-serif' },
   { name: 'DM Serif Display', css: '"DM Serif Display", Georgia, serif', category: 'serif', weights: '400', cls: 'didone' },
-  { name: 'Libre Caslon Text', css: '"Libre Caslon Text", Georgia, serif', category: 'serif', weights: '400;700', cls: 'old-style' },
-  { name: 'Spectral', css: '"Spectral", Georgia, serif', category: 'serif', weights: '400;600', cls: 'old-style' },
-  { name: 'Literata', css: '"Literata", Georgia, serif', category: 'serif', weights: '400;600', cls: 'text-serif' },
+  { name: 'Libre Caslon Text', css: '"Libre Caslon Text", Georgia, serif', category: 'serif', weights: '400;700', ital: '400', cls: 'old-style' },
+  { name: 'Spectral', css: '"Spectral", Georgia, serif', category: 'serif', weights: '400;600', ital: '400', cls: 'old-style' },
+  { name: 'Literata', css: '"Literata", Georgia, serif', category: 'serif', weights: '400;600', ital: '400', cls: 'text-serif' },
   { name: 'Gloock', css: '"Gloock", Georgia, serif', category: 'serif', weights: '400', cls: 'soft-serif' },
-  { name: 'Fraunces', css: '"Fraunces", Georgia, serif', category: 'serif', weights: '400;600', cls: 'soft-serif' },
+  { name: 'Fraunces', css: '"Fraunces", Georgia, serif', category: 'serif', weights: '400;600', ital: '400', cls: 'soft-serif' },
 
   /* ---- Sans-serif ---- */
   { name: 'Inter', css: '"Inter", -apple-system, sans-serif', category: 'sans', weights: '400;500;700', cls: 'neo-grotesk' },
@@ -76,7 +79,7 @@ const FONTS = [
   { name: 'Big Shoulders Display', css: '"Big Shoulders Display", -apple-system, sans-serif', category: 'display', weights: '400;700', cls: 'condensed' },
   { name: 'Archivo Black', css: '"Archivo Black", -apple-system, sans-serif', category: 'display', weights: '400', cls: 'heavy' },
   { name: 'Dela Gothic One', css: '"Dela Gothic One", -apple-system, sans-serif', category: 'display', weights: '400', cls: 'heavy' },
-  { name: 'Bodoni Moda', css: '"Bodoni Moda", Georgia, serif', category: 'display', weights: '400;700', cls: 'didone' },
+  { name: 'Bodoni Moda', css: '"Bodoni Moda", Georgia, serif', category: 'display', weights: '400;700', ital: '400', cls: 'didone' },
   { name: 'Italiana', css: '"Italiana", Georgia, serif', category: 'display', weights: '400', cls: 'deco' },
   { name: 'Cinzel', css: '"Cinzel", Georgia, serif', category: 'display', weights: '400;700', cls: 'deco' },
   { name: 'Marcellus', css: '"Marcellus", Georgia, serif', category: 'display', weights: '400', cls: 'deco' },
@@ -112,6 +115,17 @@ const FONTS = [
   { name: 'Azeret Mono', css: '"Azeret Mono", monospace', category: 'mono', weights: '400;600', cls: 'mono' },
   { name: 'VT323', css: '"VT323", monospace', category: 'mono', weights: '400', cls: 'pixel' },
 ];
+
+// Google Fonts css2 family parameter for a FONTS entry. Entries with
+// `ital: '400'` also request the true italic (tuples sorted: all `0,` before
+// all `1,`, weights ascending); others use the plain `:wght@` form.
+function googleFamilyParam(font, weights) {
+  const name = encodeURIComponent(font.name).replace(/%20/g, '+');
+  const w = String(weights || font.weights || '400;700').split(';').map(Number).filter(Boolean).sort((a, b) => a - b);
+  if (!font.ital) return `family=${name}:wght@${w.join(';')}`;
+  const tuples = w.map(n => `0,${n}`).concat(String(font.ital).split(';').map(Number).filter(Boolean).sort((a, b) => a - b).map(n => `1,${n}`));
+  return `family=${name}:ital,wght@${tuples.join(';')}`;
+}
 
 // Font class taxonomy. Every FONTS entry carries exactly one `cls` key from
 // here. `label` is the plain-words name shown on the board and in the brief,
