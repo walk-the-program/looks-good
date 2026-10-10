@@ -1,7 +1,140 @@
-/* 24 Mixed Type - STUB (P4 scaffold): header metadata and a placeholder art only.
-   The builder replaces art, adds roles, tokens, materials, rules and fills css/aesthetics/mixed-type.css.
-   Reference: the current type-mixing trend in identities and editorial covers, specimen posters (Pangram Pangram, Displaay, Commercial Type): word-by-word face changes with cap heights aligned, on a strict grid.
-   Spec: docs/aesthetics-round4.md. */
+/* 24 Mixed Type — eclectic, editorial, witty. Reference: the current type-mixing
+   trend in identities and editorial covers, and specimen posters (Pangram Pangram,
+   Displaay, Commercial Type): one headline set word by word in contrasting faces,
+   cap heights aligned (not font sizes), on a strict grid.
+
+   Mechanism. The headline is rendered inside the art (the framework's headline is a
+   single text run and cannot change face per word), and the real <h2> stays in the
+   DOM visually hidden for assistive tech. The art box is also the specimen: the same
+   four voices shown as "Aa" with cap line / x-height / baseline guides, a glyph set
+   split across the voices and a size scale.
+
+   Voices (resolved per brand by mtVoices): B = the brand's own heading face, I = a
+   serif italic, H = a heavy grotesk, M = a mono; the contrast faces never repeat the
+   brand's family. Each voice carries a size factor k = capHeight(B) / capHeight(voice)
+   so capitals line up on one line. Cap heights come from MT_METRICS (measured in
+   Chromium) or, for any other brand face, from a canvas measurement when it is loaded. */
+
+// [capHeight, xHeight] per 1 em, from canvas measureText on "H" / "x"
+const MT_METRICS = {
+  'Instrument Serif': [0.720, 0.510], 'Playfair Display': [0.708, 0.525], 'Fraunces': [0.700, 0.470],
+  'Bricolage Grotesque': [0.660, 0.528], 'Archivo Black': [0.688, 0.528], 'Inter Tight': [0.728, 0.546],
+  'Inter': [0.728, 0.546], 'DM Mono': [0.700, 0.496], 'Space Mono': [0.700, 0.496], 'DM Sans': [0.700, 0.504],
+  'Lexend': [0.700, 0.529], 'Instrument Sans': [0.720, 0.510],
+};
+const MT_CAT_METRICS = { serif: [0.70, 0.48], sans: [0.71, 0.52], display: [0.70, 0.52], mono: [0.70, 0.50], slab: [0.70, 0.50] };
+const mtMeasured = {};
+
+function mtFace(name) {
+  return (typeof FONTS !== 'undefined' && FONTS.find(f => f.name === name)) || null;
+}
+
+function mtWeight(font, prefer) {
+  const have = String(font.weights || '400').split(';').map(Number);
+  for (const w of prefer) if (have.includes(w)) return w;
+  return have[0] || 400;
+}
+
+// [cap, x] for a font, preferring the table, then a canvas measurement of the
+// loaded face, then the category default.
+function mtMetrics(font, weight, style) {
+  if (MT_METRICS[font.name]) return MT_METRICS[font.name];
+  const key = font.name + weight + style;
+  if (mtMeasured[key]) return mtMeasured[key];
+  const spec = `${style} ${weight} 1000px "${font.name}"`;
+  try {
+    if (document.fonts && document.fonts.check(spec)) {
+      const c = document.createElement('canvas').getContext('2d');
+      c.font = spec;
+      const cap = c.measureText('H').actualBoundingBoxAscent / 1000;
+      const xh = c.measureText('x').actualBoundingBoxAscent / 1000;
+      if (cap > 0.4 && cap < 1) return (mtMeasured[key] = [cap, xh || cap * 0.7]);
+    }
+  } catch (err) { /* fall back to the category default */ }
+  return MT_CAT_METRICS[font.category] || MT_CAT_METRICS.sans;
+}
+
+// First candidate whose name differs from the brand's heading face.
+function mtPick(names, avoid) {
+  for (const n of names) {
+    const f = mtFace(n);
+    if (f && f.name !== avoid) return f;
+  }
+  return mtFace(names[0]);
+}
+
+// The four voices for a state. Each: { key, font, weight, style, k, cap, x, label }.
+function mtVoices(st) {
+  const brand = st.headingFont;
+  const bw = brand.cls === 'didone' || brand.cls === 'soft-serif' || brand.cls === 'old-style' || brand.cls === 'text-serif' || brand.cls === 'deco'
+    ? mtWeight(brand, [400, 500, 600]) : mtWeight(brand, [600, 700, 500, 400]);
+  const defs = [
+    { key: 'b', font: brand, weight: bw, style: 'normal', label: 'Heading' },
+    { key: 'i', font: mtPick(['Instrument Serif', 'Playfair Display', 'Fraunces'], brand.name), weight: 400, style: 'italic', label: 'Italic' },
+    { key: 'h', font: mtPick(['Bricolage Grotesque', 'Inter Tight', 'Archivo Black'], brand.name), weight: 0, style: 'normal', label: 'Heavy' },
+    { key: 'm', font: mtPick(['DM Mono', 'Space Mono'], brand.name), weight: 400, style: 'normal', label: 'Mono' },
+  ];
+  defs[2].weight = mtWeight(defs[2].font, [800, 700, 400]);
+  const capB = mtMetrics(brand, bw, 'normal')[0];
+  defs.forEach(v => {
+    const [cap, x] = mtMetrics(v.font, v.weight, v.style);
+    v.cap = cap; v.x = x; v.k = Math.round((capB / cap) * 1000) / 1000;
+  });
+  return defs;
+}
+
+const MT_STOP = new Set(('a an the and or but nor for of to in on at by with from as is are be was were should would could can will do does did your our my their it its this that these those not no so up out into over than then more most').split(' '));
+
+// One voice key per word: function words go to the mono, content words alternate
+// heavy / brand, and the last word (the highlight) is always the italic serif.
+function mtAssign(words) {
+  const n = words.length;
+  let flip = 0;
+  return words.map((w, i) => {
+    if (i === n - 1) return 'i';
+    const bare = w.toLowerCase().replace(/[^a-z']/g, '');
+    if (MT_STOP.has(bare) && n > 2) return 'm';
+    const v = flip % 2 === 0 ? 'h' : 'b';
+    flip += 1;
+    return v;
+  });
+}
+
+function mtHeadlineHtml(tagline, voices) {
+  const words = String(tagline || '').trim().split(/\s+/).filter(Boolean);
+  if (!words.length) return '';
+  const keys = mtAssign(words);
+  return words.map((w, i) => {
+    const m = w.match(/^([\s\S]*?)([.,;:!?…]*)$/);
+    const last = i === words.length - 1;
+    const body = escapeHtml(m[1]);
+    return `<span class="mt-w${last ? ' mt-hl' : ''}" data-v="${keys[i]}">${body}${last ? '<i class="mt-ast" aria-hidden="true">*</i>' : ''}${escapeHtml(m[2])}</span>`;
+  }).join(' ');
+}
+
+const MT_GLYPHS = [
+  ['h', 'A–Z', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'],
+  ['i', 'a–z', 'abcdefghijklmnopqrstuvwxyz'],
+  ['m', '0–9', '0123456789 &@#?!%'],
+];
+
+function mtCell(v, n) {
+  const size = 54 * v.k;
+  const base = 66;
+  const capY = base - v.cap * size;
+  const xY = base - v.x * size;
+  const wLabel = v.style === 'italic' ? 'Italic ' + v.weight : (v.weight >= 700 ? 'Bold ' : v.weight >= 500 ? 'Medium ' : 'Regular ') + v.weight;
+  return `<figure class="mt-cell" data-v="${v.key}">
+        <p class="mt-cell-k"><b>0${n}</b>${escapeHtml(v.label)}</p>
+        <svg viewBox="0 0 124 80" width="100%" focusable="false">
+          <g class="mt-guides"><line x1="0" x2="124" y1="${base}" y2="${base}"/><line class="mt-cap" x1="0" x2="124" y1="${capY.toFixed(1)}" y2="${capY.toFixed(1)}"/><line class="mt-xh" x1="0" x2="124" y1="${xY.toFixed(1)}" y2="${xY.toFixed(1)}"/></g>
+          <text x="4" y="${base}" class="mt-aa" font-size="${size.toFixed(1)}" style="font-family:var(--mt-f-${v.key});font-weight:var(--mt-w-${v.key});font-style:${v.style}">Aa</text>
+          <g class="mt-gl" font-size="4.6"><text x="121" y="${base - 2}" text-anchor="end">base</text><text x="121" y="${(capY - 2).toFixed(1)}" text-anchor="end">cap</text></g>
+        </svg>
+        <p class="mt-cell-n" style="font-family:var(--mt-f-${v.key});font-weight:var(--mt-w-${v.key});font-style:${v.style}">${escapeHtml(v.font.name)}</p>
+        <p class="mt-cell-m">${escapeHtml(wLabel)} · cap ${v.cap.toFixed(2)}</p>
+      </figure>`;
+}
 
 registerAesthetic({
   key: 'mixed-type', order: 24,
@@ -14,20 +147,88 @@ registerAesthetic({
   mode: 'light',
   slideShape: 'refined',
   labels: { material: 'Voice', states: ['Roman', 'Italic', 'Mono'], statesKind: 'swatch' },
+  layout: { hero: 'centered', palette: 'swatches', sections: 'two-col', subcopy: false },
+  type: { ui: 'body' },
   highlight: 'custom',
-  highlightNote: 'Builder to fill in.',
+  highlightNote: 'The last word is set in the serif italic voice in the accent (shaded to read as text) and ends in a small asterisk; no fill, no underline, no band.',
+  cardFill: '--ab-paper',
 
-  art(ctx) {
-    const t = ctx.t;
-    return `<svg viewBox="0 0 200 150" width="100%" height="100%" focusable="false">
-      <text x="14" y="70" font-size="58" fill="${t.ink}">Aa</text>
-      <text x="100" y="70" font-size="58" font-style="italic" fill="${t.ink}">Aa</text>
-      <text x="14" y="128" font-size="58" font-weight="800" fill="${t.ink}">Aa</text>
-      <text x="100" y="128" font-size="50" font-family="ui-monospace, Menlo, monospace" fill="${t.primary}">Aa</text>
-    </svg>`;
+  roles: {
+    canvas: { use: 'Paper: the page, and the one quiet surface every panel sits on (cards are a 4% ink tint of it with a hairline)', never: 'Text' },
+    ink: { use: 'Headline words, body text, hairlines, the type-specimen guide lines and the "Aa" glyphs', never: 'Large filled fields' },
+    primary: { use: 'The one CTA and the selected segment; nothing in the type specimen', never: 'Headline words, body text, a second CTA, specimen decoration' },
+    secondary: { use: 'Status pills, the list bars and the "fits" tag; the second voice of the data', never: 'The main CTA, headline words, the page background' },
+    accent: { use: 'One spark: the last headline word (serif italic) with its asterisk, and the footer dot', never: 'Buttons, body text, borders, specimen fills' },
   },
 
-  materials: [],
+  tokens(t) {
+    const st = typeof state !== 'undefined' ? state : null;
+    const vars = {
+      '--ab-type-pick-w': 400,
+      '--ab-font-label': 'var(--mt-f-m, ui-monospace), ui-monospace, Menlo, monospace',
+      '--ab-paper': t.mix(t.canvas, t.ink, 0.955),
+      '--ab-guide': t.alpha(t.ink, 0.28),
+      '--ab-tr': (st && st.headingFont && { condensed: 0, heavy: 0, wide: 0.4, techno: 0.4 }[st.headingFont.cls]) ?? 1,
+    };
+    if (st && st.headingFont) {
+      mtVoices(st).forEach(v => {
+        vars[`--mt-f-${v.key}`] = v.font.css;
+        vars[`--mt-w-${v.key}`] = v.weight;
+        vars[`--mt-k-${v.key}`] = v.k;
+      });
+    }
+    return vars;
+  },
 
-  rules: { do: [], dont: [] },
+  art(ctx) {
+    const voices = mtVoices(ctx.state);
+    const e = escapeHtml;
+    // warm the contrast faces so they are ready by the next paint (cap sizes do not depend on it)
+    if (typeof window !== 'undefined' && window.loadFontFamily) voices.forEach(v => { if (v.key !== 'b') window.loadFontFamily(v.font); });
+    const cells = voices.map((v, i) => mtCell(v, i + 1)).join('');
+    const glyphs = MT_GLYPHS.map(([key, lab, str]) => {
+      const v = voices.find(x => x.key === key);
+      return `<div class="mt-grow" data-v="${key}"><span class="mt-grow-k">${lab}</span><span class="mt-grow-s" style="font-family:var(--mt-f-${key});font-weight:var(--mt-w-${key});font-style:${v.style}">${e(str)}</span></div>`;
+    }).join('');
+    const scale = [11, 16, 24, 36, 54].map(n => `<span class="mt-sc" style="font-size:${n}px"><i>Aa</i><b>${n}</b></span>`).join('');
+    const ks = voices.map(v => v.k.toFixed(2)).join(' / ');
+    return `<div class="mt">
+      <div class="mt-hl-wrap">
+        <p class="mt-hl-row">${mtHeadlineHtml(ctx.tagline, voices)}</p>
+      </div>
+      <p class="mt-lead"><span class="mt-lead-k">Fig. 1</span><span class="mt-lead-t">A design language for ${e(ctx.brandName)}: four voices on one baseline grid, sized to a shared cap height (× ${ks}).</span></p>
+      <div class="mt-spec">
+        <div class="mt-cells">${cells}</div>
+        <div class="mt-lower">
+          <div class="mt-glyphs">${glyphs}</div>
+          <div class="mt-scale" style="font-family:var(--mt-f-b);font-weight:var(--mt-w-b)"><p class="mt-scale-k">Scale · px</p><div class="mt-scale-row">${scale}</div></div>
+        </div>
+      </div>
+    </div>`;
+  },
+
+  materials: [
+    { name: 'Heading voice', css: 'font-family: the brand heading face; /* content words alternate between it and the heavy voice; sized 1x, the other voices are scaled to its cap height */' },
+    { name: 'Italic voice', css: 'font-family: Instrument Serif, Playfair Display or Fraunces; font-style: italic; font-weight: 400; color: {accentInk}; /* the last headline word only, scaled so its capitals match the heading voice */' },
+    { name: 'Heavy voice', css: 'font-family: Bricolage Grotesque 800, Inter Tight 800 or Archivo Black; text-transform: uppercase; letter-spacing: -0.02em; /* content words, scaled to match cap height */' },
+    { name: 'Mono voice', css: 'font-family: DM Mono or Space Mono; font-weight: 400; letter-spacing: -0.04em; /* function words (for, the, should) and all small labels */' },
+    { name: 'Paper panel', css: 'background: color-mix(in srgb, {ink} 4.5%, {canvas}); border: 1px solid {line}; border-radius: 2px; box-shadow: none;' },
+    { name: 'Specimen guide', css: 'stroke: {ink} at 28%; stroke-width: 0.5; /* baseline solid, cap line dashed, x-height dotted behind each "Aa" */' },
+    { name: 'Primary action', css: 'background: {primary}; color: {onPrimary}; border: 0; border-radius: 2px; padding: 14px 18px;' },
+  ],
+
+  rules: {
+    do: [
+      'Set the headline word by word in three or four faces (heading, serif italic, heavy grotesk, mono), sizing each so the capitals share one cap height rather than one font size.',
+      'Keep the last word in the serif italic and the accent, ending in a small asterisk; it is the only coloured word in the line.',
+      'Keep every interface control in the one quiet body face; the mixing lives in headlines, card-title initials, palette labels and the specimen.',
+      'Lay everything on a strict grid with hairline rules, mono captions and generous whitespace so four voices read as composed rather than chaotic.',
+    ],
+    dont: [
+      'Use more than four faces, or mix faces inside a button, a field or a list row.',
+      'Match the voices by font size; compare capital heights and adjust.',
+      'Colour more than the one highlight word, or underline, outline or fill the words.',
+      'Use primary as decoration in the type specimen or the headline.',
+    ],
+  },
 });
