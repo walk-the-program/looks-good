@@ -1,3 +1,162 @@
-/* 10 Riso Print — STUB. Every selector must be scoped under
-   .ab[data-ae="riso-print"]. Until the owning worker fills this in, the board
-   renders with the neutral defaults from css/aesthetic-board.css. */
+/* ---------------------------------------------------------------------
+   10 Riso Print — warm paper with feTurbulence grain, two inks that
+   overprint (multiply) and sit slightly off-register, halftone shading.
+   --ab-blend / --ab-speck / --ab-plate / --ab-paper-card come from
+   js/aesthetics/riso-print.js tokens(). Dark mode screens instead of
+   multiplies (ink on black paper).
+------------------------------------------------------------------------ */
+
+.ab[data-ae="riso-print"] {
+  --rz-ink-dot: radial-gradient(circle, var(--ab-speck) 0.9px, transparent 1.2px) 0 0 / 4px 4px;
+  --rz-line: 1.5px solid var(--ab-ink);
+  border-radius: 6px;
+}
+
+/* paper grain: inline SVG noise over everything (multiply, ~10%) */
+.ab[data-ae="riso-print"]::after {
+  content: ""; position: absolute; inset: 0; z-index: 5; pointer-events: none; opacity: 0.4;
+  mix-blend-mode: multiply; background-size: 240px 240px;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><filter id='n' x='0' y='0' width='100%25' height='100%25'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch' seed='7'/><feColorMatrix values='0 0 0 0 .25  0 0 0 0 .17  0 0 0 0 .1  2.4 0 0 0 -.85'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+}
+.ab[data-ae="riso-print"][data-mode="dark"]::after {
+  mix-blend-mode: screen; opacity: 0.28;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><filter id='n' x='0' y='0' width='100%25' height='100%25'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch' seed='7'/><feColorMatrix values='0 0 0 0 .96  0 0 0 0 .92  0 0 0 0 .84  2.4 0 0 0 -.85'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+}
+/* a halftone corner of the second ink, fading out */
+.ab[data-ae="riso-print"]::before {
+  content: ""; position: absolute; right: -40px; top: -40px; width: 380px; height: 380px; z-index: 0; pointer-events: none; opacity: 0.2;
+  background: radial-gradient(circle, var(--ab-secondary) 1.5px, transparent 1.9px) 0 0 / 7px 7px;
+  -webkit-mask-image: radial-gradient(circle at 70% 30%, #000, transparent 68%); mask-image: radial-gradient(circle at 70% 30%, #000, transparent 68%);
+}
+
+/* labels: tracked caps, like zine captions */
+.ab[data-ae="riso-print"] .ab-label, .ab[data-ae="riso-print"] .ab-tag, .ab[data-ae="riso-print"] .ab-kicker, .ab[data-ae="riso-print"] .ab-sw-role, .ab[data-ae="riso-print"] .ab-fieldlabel, .ab[data-ae="riso-print"] .ab-state { text-transform: uppercase; font-weight: 700; letter-spacing: 0.15em; }
+.ab[data-ae="riso-print"] .ab-label { color: var(--ab-ink); font-size: 11px; display: inline-flex; align-items: center; }
+.ab[data-ae="riso-print"] .ab-label:last-child:not(:first-child) { color: var(--ab-muted); font-weight: 600; }
+.ab[data-ae="riso-print"] .ab-labelrow { align-items: center; padding-bottom: 9px; border-bottom: 1.5px dashed var(--ab-ink); }
+.ab[data-ae="riso-print"] .ab-n {
+  display: inline-grid; place-items: center; width: 25px; height: 25px; margin-right: 9px; border: var(--rz-line); border-radius: 50%;
+  background: var(--ab-sec-tint); font-size: 10px; font-weight: 700; letter-spacing: 0; transform: rotate(-4deg);
+}
+.ab[data-ae="riso-print"] .ab-n::after { content: none; }
+
+/* header */
+.ab[data-ae="riso-print"] .ab-brand { font-weight: 800; letter-spacing: -0.02em; }
+.ab[data-ae="riso-print"] .ab-mark { position: relative; width: 30px; height: 30px; border-radius: 50%; background: var(--ab-primary); color: var(--ab-on-primary); font-weight: 800; }
+.ab[data-ae="riso-print"] .ab-mark::after { content: ""; position: absolute; inset: 0; border: 1.5px solid var(--ab-secondary); border-radius: 50%; transform: translate(3px, 2px); mix-blend-mode: var(--ab-blend); }
+.ab[data-ae="riso-print"] .ab-tag { padding: 3px 8px; border: var(--rz-line); color: var(--ab-ink); font-size: 10px; transform: rotate(-1.5deg); }
+.ab[data-ae="riso-print"] .ab-rule { height: 0; background: none; border-top: 1.5px dashed var(--ab-ink); opacity: 0.55; }
+
+/* hero */
+.ab[data-ae="riso-print"] .ab-kicker {
+  display: inline-block; margin-bottom: 20px !important; padding: 4px 10px; border: var(--rz-line); color: var(--ab-ink);
+  font-size: 11px; transform: rotate(-2deg); background: var(--ab-pri-tint);
+}
+.ab[data-ae="riso-print"] .ab-headline {
+  font-weight: 800; letter-spacing: -0.03em; line-height: 0.96; color: var(--ab-primary-text);
+  text-shadow: max(2px, 0.035em) max(1.5px, 0.028em) 0 var(--ab-secondary);
+}
+/* the accent word is circled in fluorescent ink, drawn by hand */
+.ab[data-ae="riso-print"] .ab-hl { position: relative; display: inline-block; color: inherit; padding: 0 0.04em; }
+.ab[data-ae="riso-print"] .ab-hl::after {
+  content: ""; position: absolute; left: -0.16em; right: -0.16em; top: -0.04em; bottom: -0.08em; pointer-events: none;
+  background: var(--ab-accent); mix-blend-mode: var(--ab-blend); transform: rotate(-2deg);
+  -webkit-mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 70' preserveAspectRatio='none'><path d='M172 13 C145 2 75 0 32 13 C5 22 2 48 34 59 C75 71 152 68 182 52 C201 41 196 20 158 8' fill='none' stroke='black' stroke-width='4.5' stroke-linecap='round' vector-effect='non-scaling-stroke'/></svg>") center / 100% 100% no-repeat;
+  mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 70' preserveAspectRatio='none'><path d='M172 13 C145 2 75 0 32 13 C5 22 2 48 34 59 C75 71 152 68 182 52 C201 41 196 20 158 8' fill='none' stroke='black' stroke-width='4.5' stroke-linecap='round' vector-effect='non-scaling-stroke'/></svg>") center / 100% 100% no-repeat;
+}
+/* accent too pale to read as a ring alone: the ring gets a fluorescent wash inside it */
+.ab[data-ae="riso-print"][data-accent-text="low"] .ab-hl { color: inherit; background: none; }
+.ab[data-ae="riso-print"][data-accent-text="low"] .ab-hl::before {
+  content: ""; position: absolute; left: -0.1em; right: -0.1em; top: 0.04em; bottom: 0; z-index: -1; pointer-events: none;
+  border-radius: 50%; background: var(--ab-accent); opacity: 0.5; mix-blend-mode: var(--ab-blend); transform: rotate(-2deg);
+}
+.ab[data-ae="riso-print"] .ab-art { max-width: 300px; }
+.ab[data-ae="riso-print"] .ab-art svg { display: block; overflow: visible; }
+
+/* palette: inked chips with a dot grain */
+.ab[data-ae="riso-print"] .ab-chip { position: relative; overflow: hidden; border: var(--rz-line); border-radius: 3px; box-shadow: 2px 1.5px 0 var(--ab-plate); }
+.ab[data-ae="riso-print"] .ab-chip::after { content: ""; position: absolute; inset: 0; background: var(--rz-ink-dot); opacity: 0.8; }
+.ab[data-ae="riso-print"] .ab-sw-role { font-size: 11px; letter-spacing: 0.12em; }
+.ab[data-ae="riso-print"] .ab-sw-hex { color: var(--ab-ink); }
+
+/* 01 interface: a paper card with the second ink printed off-register behind it */
+.ab[data-ae="riso-print"] .ab-card { border: var(--rz-line); border-radius: 4px; background: var(--ab-paper-card); box-shadow: 4px 3px 0 var(--ab-plate); }
+.ab[data-ae="riso-print"] .ab-seg { gap: 6px; padding: 0; background: none; border-radius: 0; }
+.ab[data-ae="riso-print"] .ab-seg-btn {
+  min-height: 38px; border: var(--rz-line); border-radius: 4px; color: var(--ab-ink); font-size: 11.5px; font-weight: 600; letter-spacing: 0.06em;
+}
+.ab[data-ae="riso-print"] .ab-seg-btn[aria-pressed="true"] { background: var(--rz-ink-dot), var(--ab-primary); color: var(--ab-on-primary); font-weight: 700; }
+.ab[data-ae="riso-print"] .ab-card-title { font-weight: 800; letter-spacing: -0.025em; }
+.ab[data-ae="riso-print"] .ab-card-body { color: var(--ab-ink); font-size: 13px; }
+.ab[data-ae="riso-print"] .ab-cta {
+  position: relative; border-radius: 2px; padding: 14px 16px; background: var(--rz-ink-dot), var(--ab-primary); color: var(--ab-on-primary);
+  font-weight: 700; letter-spacing: 0.02em; transition: transform 0.12s;
+}
+.ab[data-ae="riso-print"] .ab-cta::after {
+  content: ""; position: absolute; inset: 0; border: 1.5px solid var(--ab-secondary); border-radius: 2px; pointer-events: none;
+  transform: translate(3px, 2px); mix-blend-mode: var(--ab-blend);
+}
+.ab[data-ae="riso-print"] .ab-cta:hover { transform: translate(-1px, -1px); }
+.ab[data-ae="riso-print"] .ab-cta:active { transform: translate(2px, 1px); }
+.ab[data-ae="riso-print"] .ab-cta-arrow::before { content: "→"; font-size: 17px; line-height: 1; }
+
+/* 02 ink */
+.ab[data-ae="riso-print"] .ab-panel { padding: clamp(16px, 2.4cqw, 22px); border: 1.5px dashed var(--ab-ink); border-radius: 4px; }
+.ab[data-ae="riso-print"] .ab-fieldlabel { font-size: 10.5px; }
+.ab[data-ae="riso-print"] .ab-input {
+  border: var(--rz-line); border-radius: 2px; background: transparent; padding: 11px 13px; font-weight: 600;
+  transition: box-shadow 0.12s;
+}
+.ab[data-ae="riso-print"] .ab-input:focus { box-shadow: 3px 2px 0 var(--ab-secondary); }
+.ab[data-ae="riso-print"] .ab-toggle > span { font-size: 13px; font-weight: 600; }
+.ab[data-ae="riso-print"] .ab-switch { width: 54px; height: 30px; border: var(--rz-line); border-radius: 999px; background: transparent; transition: background 0.12s; }
+.ab[data-ae="riso-print"] .ab-switch::before {
+  left: 3px; top: 3px; width: 21px; height: 21px; border: var(--rz-line);
+  background: radial-gradient(circle, var(--ab-ink) 1.1px, transparent 1.5px) 0 0 / 4px 4px, var(--ab-canvas); transition: transform 0.12s;
+}
+.ab[data-ae="riso-print"] .ab-switch:checked { background: var(--ab-primary); }
+.ab[data-ae="riso-print"] .ab-switch:checked::before { transform: translateX(24px); }
+.ab[data-ae="riso-print"] .ab-status { font-size: 11px; color: var(--ab-ink); font-style: italic; }
+.ab[data-ae="riso-print"] .ab-states { gap: 14px; margin-top: 22px; }
+.ab[data-ae="riso-print"] .ab-state { color: var(--ab-ink); font-size: 10px; letter-spacing: 0.12em; }
+.ab[data-ae="riso-print"] .ab-disc { position: relative; width: 58px; height: 58px; border: 0; background: none; }
+.ab[data-ae="riso-print"] .ab-disc::before, .ab[data-ae="riso-print"] .ab-disc::after { content: ""; position: absolute; border-radius: 50%; }
+/* solid ink */
+.ab[data-ae="riso-print"] .ab-disc[data-s="0"]::before { inset: 3px; background: var(--ab-primary); }
+.ab[data-ae="riso-print"] .ab-disc[data-s="0"]::after { inset: 3px; border: 1.5px solid var(--ab-ink); }
+/* overprint: two inks, the overlap darkens */
+.ab[data-ae="riso-print"] .ab-disc[data-s="1"]::before { left: 0; top: 7px; width: 38px; height: 38px; background: var(--ab-primary); mix-blend-mode: var(--ab-blend); }
+.ab[data-ae="riso-print"] .ab-disc[data-s="1"]::after { left: 19px; top: 13px; width: 38px; height: 38px; background: var(--ab-secondary); mix-blend-mode: var(--ab-blend); }
+/* halftone */
+.ab[data-ae="riso-print"] .ab-disc[data-s="2"]::before { inset: 3px; background: radial-gradient(circle, var(--ab-secondary) 1.9px, transparent 2.3px) 0 0 / 6px 6px; }
+.ab[data-ae="riso-print"] .ab-disc[data-s="2"]::after { inset: 3px; border: 1.5px solid var(--ab-ink); }
+
+/* 03 in use: dashed rules, stamped statuses, halftone bars */
+.ab[data-ae="riso-print"] .ab-row { padding: 12px 2px; border-top: 1.5px dashed var(--ab-ink); font-size: 13.5px; }
+.ab[data-ae="riso-print"] .ab-row:first-child { border-top: 0; }
+.ab[data-ae="riso-print"] .ab-row:last-child { border-bottom: 1.5px dashed var(--ab-ink); }
+.ab[data-ae="riso-print"] .ab-row-n { font: 800 13px var(--ab-font-h); color: var(--ab-primary-text); }
+.ab[data-ae="riso-print"] .ab-row-name { font-family: var(--ab-font-h); font-weight: 700; font-size: 15px; letter-spacing: -0.01em; }
+.ab[data-ae="riso-print"] .ab-row-status {
+  padding: 2px 9px; border: var(--rz-line); border-radius: 3px; background: var(--ab-sec-tint); color: var(--ab-ink);
+  font-size: 9.5px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; transform: rotate(-2deg);
+}
+.ab[data-ae="riso-print"] .ab-row:nth-child(2) .ab-row-status { transform: rotate(1.5deg); }
+.ab[data-ae="riso-print"] .ab-row-bar { height: 11px; border: var(--rz-line); border-radius: 2px; background: var(--ab-pri-tint); }
+.ab[data-ae="riso-print"] .ab-row-bar i { background: radial-gradient(circle, var(--ab-primary) 1.25px, transparent 1.65px) 0 0 / 4px 4px; border-right: 1.5px solid var(--ab-ink); }
+.ab[data-ae="riso-print"] .ab-row-pct { font-weight: 700; }
+
+@container ab (max-width: 600px) {
+  .ab[data-ae="riso-print"] .ab-art { max-width: 240px; }
+  .ab[data-ae="riso-print"] .ab-tag { max-width: 140px; font-size: 9px; letter-spacing: 0.1em; padding: 2px 6px; }
+}
+
+/* footer */
+.ab[data-ae="riso-print"] .ab-foot { border-top: 1.5px dashed var(--ab-ink); color: var(--ab-ink); }
+.ab[data-ae="riso-print"] .ab-foot .ab-infl { color: var(--ab-muted); font-style: italic; }
+.ab[data-ae="riso-print"] .ab-dot { width: 12px; height: 12px; border: var(--rz-line); background: var(--ab-accent); }
+
+.ab[data-ae="riso-print"] .ab-seg-btn:focus-visible, .ab[data-ae="riso-print"] .ab-cta:focus-visible, .ab[data-ae="riso-print"] .ab-switch:focus-visible { outline: 2px solid var(--ab-ink); outline-offset: 3px; }
+@media (prefers-reduced-motion: reduce) {
+  .ab[data-ae="riso-print"] .ab-cta:hover, .ab[data-ae="riso-print"] .ab-cta:active { transform: none; }
+}

@@ -55,6 +55,9 @@ function boardTokens(state, def) {
     // primary, then ink, when it would vanish on the canvas).
     accentText: slVisible(canvas, [c.accent, c.primary], 3, ink),
     primaryText: slVisible(canvas, [c.primary], 3, ink),
+    // true when the accent itself is under 3:1 on the canvas: .ab-hl then gets
+    // a marker treatment (ink text on an accent band) instead of accent text.
+    accentLow: contrastRatio(c.accent, canvas) < 3,
     mix: slMix,
     alpha: abAlpha,
     contrast: contrastRatio,
@@ -197,7 +200,7 @@ function boardHtml(state, def) {
       <span class="ab-row-pct">${r[2]}%</span>
     </li>`).join('');
 
-  return `<section class="ab" data-ae="${def.key}" data-mode="${t.isDark ? 'dark' : 'light'}" style="${style}">
+  return `<section class="ab" data-ae="${def.key}" data-mode="${t.isDark ? 'dark' : 'light'}" data-accent-text="${t.accentLow ? 'low' : 'ok'}" style="${style}">
   <div class="ab-in">
     <header class="ab-head">
       <div class="ab-brand">${brand}</div>

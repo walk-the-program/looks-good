@@ -288,6 +288,12 @@ Written by T1 (W1) after building. Source of truth: `js/aesthetic-board.js` (`bo
   and `muted` is pulled toward ink until it reaches 4.5:1 on canvas.
 - `materials[].css` placeholders: `{name}` resolves `t[name]` first, else the extra var `tokens(t)['--ab-' + kebab(name)]`
   (e.g. `{lo}` -> `--ab-lo`, `{glassSolid}` -> `--ab-glass-solid`).
+- Accent highlight fallback (T4): `boardTokens` also returns `accentLow` (true when accent < 3:1 on the canvas) and the root carries
+  `data-accent-text="ok|low"`. In `low` the base CSS renders `.ab-hl` as ink text on an accent highlighter band
+  (`.ab:where([data-accent-text="low"]) .ab-hl`, specificity 0,2,0), so the accent is always visible. Any aesthetic rule
+  `.ab[data-ae="key"] .ab-hl` (0,3,0) overrides it; an aesthetic that restyles the accent word should also handle
+  `.ab[data-ae="key"][data-accent-text="low"] .ab-hl` (set `background-image: none` if it draws its own).
+  `--ab-accent-text` is unchanged (accent, else primary, else ink) for other uses such as badges.
 - Undo: brand-session.js wraps `pushUndoSnapshot`/`applyUndoSnapshot` so snapshots also carry `aesthetic` and `bgMode`.
 - Compare tiles render `boardHtml(state, def)` for each def with `state.aesthetic` overridden only inside `boardRoles`.
 

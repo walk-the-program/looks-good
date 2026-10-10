@@ -79,6 +79,16 @@
   text-wrap: balance; overflow-wrap: anywhere;
 }
 .ab-hl { color: var(--ab-accent-text); }
+/* Accent under 3:1 on the canvas (data-accent-text="low"): accent text would
+   vanish, so the spark becomes a highlighter band in the accent behind ink
+   text. :where() keeps this at lower specificity than any aesthetic's own
+   .ab[data-ae] .ab-hl rule, which always wins. */
+.ab:where([data-accent-text="low"]) .ab-hl {
+  color: var(--ab-ink);
+  background: linear-gradient(transparent 0.36em, var(--ab-accent) 0.36em calc(100% - 0.02em), transparent 0);
+  padding: 0 0.1em; margin: 0 -0.04em;
+  -webkit-box-decoration-break: clone; box-decoration-break: clone;
+}
 .ab-art {
   position: relative; justify-self: end; width: 100%; max-width: 290px; aspect-ratio: 1;
   container-type: inline-size; isolation: isolate;
