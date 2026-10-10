@@ -90,16 +90,26 @@ const AIB_HEX = /^#[0-9a-f]{6}$/i;
 // Color treatments that differ per aesthetic. Everything is a token name;
 // the role rules always win over the look.
 // The highlight treatment is def.highlight ('ink' | 'band' | 'custom', default
-// 'ink'). AIB_BAND_HL is only the fallback for aesthetics that have not
-// declared def.highlight yet; it can be deleted once every aesthetic does.
-const AIB_BAND_HL = ['raw-brutalist', 'neo-brutal-pop', 'clay', 'bauhaus-poster', 'riso-print'];
+// 'ink'). 'custom' is described by def.highlightNote (one sentence).
 function aibHighlightKind(def) {
-  if (def.highlight === 'band' || def.highlight === 'ink' || def.highlight === 'custom') return def.highlight;
-  return AIB_BAND_HL.includes(def.key) ? 'band' : 'ink';
+  return def.highlight === 'band' || def.highlight === 'custom' ? def.highlight : 'ink';
 }
+// Aesthetics whose UI controls (cards, inputs, buttons, selected segments) carry
+// an ink border. In Bauhaus Poster only the controls do; the art shapes have no
+// outline.
 const AIB_INK_BORDER = ['raw-brutalist', 'neo-brutal-pop', 'bauhaus-poster'];
 
-function aibComponentRows(t, def) {
+// Card / panel background: def.cardFill (an aesthetic extra token such as
+// '--ab-paper', or a hex) when the aesthetic has one, else --canvas.
+function aibCardFill(def, t, extras) {
+  const raw = def.cardFill;
+  if (!raw) return '--canvas';
+  const name = String(raw);
+  if (extras && extras[name] != null && AIB_HEX.test(String(extras[name]).trim())) return name + ' (' + String(extras[name]).trim() + ')';
+  return t[name] != null ? '--' + aibKebab(name) : name;
+}
+
+function aibComponentRows(t, def, extras) {
   const key = def.key;
   const focusLow = contrastRatio(t.primary, t.canvas) < 3;
   const hlKind = aibHighlightKind(def);
@@ -121,11 +131,11 @@ function aibComponentRows(t, def) {
   const hl = hlKind === 'band'
     ? ['--accent (band behind the word)', '--on-accent', 'none']
     : hlKind === 'custom'
-      ? ['custom treatment, see Materials', '--accent-ink (text base)', 'none']
+      ? (def.highlightNote ? [def.highlightNote, 'per the treatment', 'none'] : ['custom treatment, see Materials', '--accent-ink (text base)', 'none'])
       : ['none', '--accent-ink', 'none'];
 
   const inkBorder = AIB_INK_BORDER.includes(key);
-  const cardBg = key === 'neo-brutal-pop' ? '--sec-tint' : '--canvas';
+  const cardBg = aibCardFill(def, t, extras);
 
   return [
     ['Page', '--canvas', '--ink', 'none'],
@@ -236,7 +246,9 @@ function buildAiBrief(state) {
   if (hlKind === 'band') {
     push('8. In this aesthetic the highlight word is a highlighter band: background `' + t.accent + '` (`--accent`) behind the word, text in `' + t.onAccent + '` (`--on-accent`). Never set accent-colored text.');
   } else if (hlKind === 'custom') {
-    push('8. The highlight word has a custom treatment (see Materials). Where it is set as text, use `' + t.accentInk + '` (`--accent-ink`), never plain `--accent` as text. Use it once per view.');
+    push(def.highlightNote
+      ? '8. Headline highlight word, once per view: ' + def.highlightNote.replace(/\s*Use it once per view\.?$/, '') + ' Never set plain `--accent` as text.'
+      : '8. The highlight word has a custom treatment (see Materials). Where it is set as text, use `' + t.accentInk + '` (`--accent-ink`), never plain `--accent` as text. Use it once per view.');
   } else {
     const same = t.accentInk.toLowerCase() === t.accent.toLowerCase();
     push('8. The highlight word is set as text in `' + t.accentInk + '` (`--accent-ink`)' + (same ? ', which is the accent itself' : ', the accent ' + (t.isDark ? 'tinted' : 'shaded') + ' with the same hue') + ', at ' + aibRatio(t.accentInk, t.canvas) + ' on the canvas. Use it once per view; never set plain `--accent` as text' + (t.accentLow ? ' (it is only ' + aibRatio(t.accent, t.canvas) + ' on this canvas)' : '') + '.');
@@ -245,8 +257,8 @@ function buildAiBrief(state) {
 
   /* 6. Component color map */
   push('## Component color map', '',
-    'Which token goes where. Shadows, blur and borders beyond these tokens come from Materials.', '',
-    aibTable(['Element', 'Background', 'Text', 'Border / edge'], aibComponentRows(t, def)), '');
+    'Which token goes where. Shadows, blur and borders beyond these tokens come from Materials.' + (def.key === 'bauhaus-poster' ? ' Ink borders apply to UI controls only (cards, inputs, buttons); the art shapes have no outline.' : ''), '',
+    aibTable(['Element', 'Background', 'Text', 'Border / edge'], aibComponentRows(t, def, extras)), '');
 
   /* 7. Contrast */
   const pairs = [

@@ -1,7 +1,8 @@
 /* ---------------------------------------------------------------------
    03 Neo-Brutal Pop — near-square radii (6px controls, 10px cards), 2px ink
    outlines, hard offset shadows, a colored canvas with a 32px line grid,
-   outlined star/flower stickers. --ab-card-fill / --ab-paper / --ab-grid come
+   outlined star/flower stickers. Cards, panels and rows are near-white --ab-paper;
+   --ab-card-fill (secondary mix) is for chips only. --ab-card-fill / --ab-paper / --ab-grid come
    from js/aesthetics/neo-brutal-pop.js tokens().
    Layout hooks used: hero 'centered', type ui/label 'sans' (weight 700),
    highlight 'band', states 'button' (rest / lift / squish).
@@ -85,7 +86,7 @@
   position: absolute; left: 50%; bottom: clamp(24px, 3.6cqw, 40px); transform: translateX(-50%);
   display: inline-flex; align-items: center; gap: 12px; white-space: nowrap;
   padding: 12px 14px 12px 22px; border: var(--np-b) solid var(--ab-ink); border-radius: var(--np-r);
-  background: var(--ab-primary); color: var(--ab-on-primary); box-shadow: 4px 4px 0 var(--ab-ink);
+  background: var(--ab-paper); color: var(--ab-ink); box-shadow: 4px 4px 0 var(--ab-ink);
   font-family: var(--ab-font-ui); font-size: 15px; font-weight: 700; line-height: 1.2;
 }
 .ab[data-ae="neo-brutal-pop"] .nba-cta i {
@@ -110,7 +111,7 @@
 
 /* 01 interface */
 .ab[data-ae="neo-brutal-pop"] .ab-card {
-  background: var(--ab-card-fill); border: var(--np-b) solid var(--ab-ink); border-radius: var(--np-rc);
+  background: var(--ab-paper); border: var(--np-b) solid var(--ab-ink); border-radius: var(--np-rc);
   box-shadow: 4px 4px 0 var(--ab-ink);
 }
 .ab[data-ae="neo-brutal-pop"] .ab-seg {
@@ -143,7 +144,7 @@
 
 /* 02 stickers & squish */
 .ab[data-ae="neo-brutal-pop"] .ab-panel {
-  padding: clamp(18px, 2.8cqw, 26px); background: var(--ab-card-fill);
+  padding: clamp(18px, 2.8cqw, 26px); background: var(--ab-paper);
   border: var(--np-b) solid var(--ab-ink); border-radius: var(--np-rc); box-shadow: 4px 4px 0 var(--ab-ink);
 }
 .ab[data-ae="neo-brutal-pop"] .ab-fieldlabel { font-size: 12px; font-weight: 800; letter-spacing: 0.05em; }

@@ -16,6 +16,8 @@ registerAesthetic({
   labels: { material: 'Clay', states: ['Rest', 'Hover', 'Pressed'], statesKind: 'button' },
   type: { ui: 'sans', label: 'sans' },
   highlight: 'custom',
+  highlightNote: 'The word sits in a puffy accent clay pill (fully rounded, tilted about 1.5 degrees, soft accent-colored shadow, glossy top) with on-accent text.',
+  cardFill: '--ab-card-fill',
 
   roles: {
     primary: {

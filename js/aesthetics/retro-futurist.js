@@ -10,7 +10,7 @@
     key: 'retro-futurist', order: 4,
     name: 'Retro-Futurist',
     descriptor: 'Analog · Orbital · Glowing',
-    influences: '1970s space age / Mission control / Synthwave',
+    influences: '1970s space age / Mission control / Hardware consoles',
     summary: 'A mission-control console that glows: bezels, lamps and readouts.',
     motto: 'All systems nominal.',
     kicker: 'Mission control',
@@ -19,6 +19,7 @@
     labels: { material: 'Console', states: ['Idle', 'Armed', 'Engaged'], statesKind: 'swatch' },
     type: { ui: 'mono', label: 'mono' },
     highlight: 'custom',
+    highlightNote: 'The word is a lit lamp: accent-ink text with a soft accent glow on dark canvases, plain shaded accent-ink with no glow on light ones. No fill or band.',
 
     roles: {
       ink: {
@@ -197,7 +198,7 @@
         'Use the accent for anything but lamps and one headline word.',
         'Put body text on a glowing surface or a scanline screen at low contrast.',
         'Flatten the bezels: no flat fills, thin hairline cards or soft white shadows.',
-        'Use the synthwave sun, a planet or a flat illustration; the hero art is a hardware module (dial, LCD, LED meter).',
+        'Fill the hero with a planet, a landscape or a flat illustration; the hero art is a hardware module (dial, LCD, LED meter).',
       ],
     },
   });

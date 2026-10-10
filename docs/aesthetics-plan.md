@@ -315,7 +315,10 @@ aesthetic CSS can key off them.
 | `highlight` | `'ink'`, `'band'`, `'custom'` | `data-highlight`, `--ab-accent-ink` | ink: `.ab-hl` is `t.accentInk` text. band: `--ab-accent` fill, `--ab-on-accent` text, padded. custom: the framework draws nothing; the aesthetic styles `.ab-hl` (use `--ab-accent-ink` where it needs a text colour). The base rules sit in `:where()` so any `.ab[data-ae] .ab-hl` rule still wins. The AI brief describes the treatment from this field. |
 | `labels.statesKind` | `'swatch'`, `'button'`, `'chip'` | `data-states`, `.ab-states[data-kind]` | swatch: three `.ab-disc[data-s]` + `.ab-state-name` (today). button: three non-interactive clones of the CTA, `span.ab-cta.ab-state-ctl.is-rest\|is-hover\|is-pressed[data-s=0..2]` (label "Save", arrow hidden) + `.ab-state-name`; the aesthetic's own CSS must give the states by also targeting `.ab-cta.is-hover` / `.ab-cta.is-pressed` (and may style `[data-s="2"]` for a third state such as focus). chip: `.ab-state-chip[data-s]` holding the state name, no separate name. |
 | `ctaFill` | `'primary'`, `'ink'` | none (CSS decides) | Documents that the main action is not primary-filled; only the AI brief reads it (component map, hard rule 1, contrast pair). Aurora Noir uses `'ink'`. |
+| `def.cardFill` | token name, e.g. `'--ab-paper'` (optional) | none (CSS decides) | Token used for cards and panels. The AI brief's "Card / panel" row reads it. Default `--canvas`. |
+| `def.highlightNote` | one sentence (string) | none | Describes a `highlight: 'custom'` treatment. The AI brief uses it verbatim (hard rule 8 and the component map). |
 
+- The AI brief derives highlight wording only from `def.highlight`; the old `AIB_BAND_HL` fallback list was removed.
 - Token `t.accentInk` (`abAccentInk`): the accent itself when it is already >= 3:1 on the canvas, else the same hue and
   saturation shaded toward black (light canvas) or tinted toward white (dark canvas) one HSL lightness step at a time
   until it reaches 3:1; ink if none does. CSS var `--ab-accent-ink`; listed as `--accent-ink` in the AI brief tokens table.

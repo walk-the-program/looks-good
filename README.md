@@ -85,6 +85,13 @@ mode. Files: `js/aesthetic-board.js`,
 `css/aesthetic-board.css`, `js/aesthetics/<key>.js` and
 `css/aesthetics/<key>.css` (see `docs/aesthetics-plan.md`).
 
+The second refinement round gave each aesthetic its own layout, interface
+typeface and headline-highlight treatment, calibrated against real references
+(for example near-white paper cards on Neo-Brutal Pop's colored grid, and a
+compact translucent hero card over Liquid Glass's scene). **Copy AI brief**
+reads those same declarations, so its component map and highlight wording match
+what the board shows.
+
 ## Color roles, picker and paste import
 
 Every color has one job, a "never" rule and a coverage target (canvas, ink,

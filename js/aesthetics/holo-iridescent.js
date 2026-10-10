@@ -21,6 +21,7 @@
     layout: { hero: 'centered' },
     type: { ui: 'sans', label: 'sans' },
     highlight: 'custom',
+    highlightNote: 'The word is filled with the spectral thin-film gradient, clipped to the letters, with no background, band or outline.',
 
     roles: {
       canvas: {

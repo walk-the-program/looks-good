@@ -20,6 +20,8 @@ registerAesthetic({
   labels: { material: 'Ink', states: ['Rest', 'Hover', 'Pressed'], statesKind: 'button' },
   type: { ui: 'sans', label: 'mono', display: 1.04 },
   highlight: 'custom',
+  highlightNote: 'The word keeps its ink color and is circled by a hand-drawn, slightly tilted accent-ink ring that overprints the paper (multiply). No fill behind the word.',
+  cardFill: '--ab-paper-card',
 
   roles: {
     canvas: {

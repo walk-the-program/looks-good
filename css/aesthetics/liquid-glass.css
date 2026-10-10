@@ -42,10 +42,24 @@
   box-shadow: 0 0 0 1px var(--ab-material-line), 0 26px 56px -30px rgba(10, 14, 30, 0.55);
 }
 .ab[data-ae="liquid-glass"] .ab-hero-copy {
-  background: color-mix(in srgb, var(--ab-material) 93%, transparent);
-  border: 1px solid var(--ab-material-line);
+  background: color-mix(in srgb, var(--ab-material) 78%, transparent);
+  border: 1px solid color-mix(in srgb, var(--ab-material-line) 60%, rgba(255, 255, 255, 0.55));
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7), 0 14px 36px -14px rgba(10, 14, 30, 0.45);
-  -webkit-backdrop-filter: blur(20px) saturate(140%); backdrop-filter: blur(20px) saturate(140%);
+  -webkit-backdrop-filter: blur(22px) saturate(150%); backdrop-filter: blur(22px) saturate(150%);
+}
+/* wide boards: a compact card (about 55% of the scene), so the scene and the floating glass keep the stage */
+@container ab (min-width: 601px) {
+  .ab[data-ae="liquid-glass"][data-hero="scene"] .ab-hero-copy {
+    width: fit-content; max-width: 55%;
+    margin: clamp(10px, 1.9cqw, 22px); padding: clamp(10px, 1.5cqw, 18px) clamp(14px, 2cqw, 24px);
+    border-radius: clamp(14px, 2cqw, 22px);
+  }
+  .ab[data-ae="liquid-glass"][data-hero="scene"] .ab-headline { font-size: calc(clamp(28px, 4.5cqw, 62px) * var(--ab-hl-scale, 1) * var(--ab-hs, 1) * var(--ab-display, 1)); }
+  .ab[data-ae="liquid-glass"][data-hero="scene"] .ab-kicker { margin-bottom: 6px !important; }
+  .ab[data-ae="liquid-glass"] .ab-subcopy { margin-top: 8px !important; }
+  /* text on the translucent card: ink for the copy, the shaded ink for the word (contrast: see tokens() in liquid-glass.js) */
+  .ab[data-ae="liquid-glass"] .ab-hero-copy .ab-subcopy, .ab[data-ae="liquid-glass"] .ab-hero-copy .ab-kicker { color: var(--ab-ink); }
+  .ab[data-ae="liquid-glass"] .ab-hero-copy .ab-hl { color: var(--ab-hl-ink); }
 }
 
 /* the scene: saturated light over a dark base, plus bold shapes to refract */

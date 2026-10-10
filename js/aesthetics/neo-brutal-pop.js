@@ -17,6 +17,7 @@ registerAesthetic({
   layout: { hero: 'centered' },
   type: { ui: 'sans', label: 'sans', display: 1.1 },
   highlight: 'band',
+  cardFill: '--ab-paper',
 
   roles: {
     ink: {
@@ -24,13 +25,13 @@ registerAesthetic({
       never: 'Large background fields in light mode',
     },
     primary: {
-      use: 'The one chunky CTA per view (shown in the hero and the card), the selected segment, the flower sticker and the "on" toggle',
-      never: 'Card fills, body text, a second CTA',
+      use: 'The one chunky CTA per view (the card button), the selected segment, the flower sticker and the "on" toggle',
+      never: 'Card fills, body text, a second filled CTA (the hero button is paper)',
     },
     secondary: {
-      use: 'Card fills, tags and chips, sticker circles and the second data series',
-      never: 'The main CTA, body text, page background',
-      coverage: '≈20%',
+      use: 'Tags and chips, sticker circles, progress stripes and the second data series',
+      never: 'Card or panel fills (those are paper), the main CTA, body text',
+      coverage: '≈12%',
     },
     accent: {
       use: 'The headline word as a color fill with a 2px ink outline, the starburst sticker and one avatar',
@@ -43,20 +44,22 @@ registerAesthetic({
   canvas(b) { return b.mix(b.secondary, b.canvas, b.isDark ? 0.16 : 0.22); },
 
   tokens(t) {
-    // Card fill: secondary pushed into the canvas, but never so strong that
-    // ink text drops under ~7:1.
+    // Chip fill (kicker, status pills, hover): secondary pushed into the canvas,
+    // but never so strong that ink text drops under ~7:1. Cards, panels and rows
+    // use --ab-paper instead (near-white, the neobrutalism.dev composition).
     const fill = k => t.mix(t.secondary, t.canvas, k);
     let a = 0.5;
     while (a > 0.1 && t.contrast(t.ink, fill(a)) < 7) a -= 0.05;
     return {
       '--ab-card-fill': fill(a),
-      '--ab-paper': t.isDark ? t.mix(t.ink, t.canvas, 0.1) : t.mix('#ffffff', t.canvas, 0.78),
+      '--ab-paper': t.isDark ? t.mix(t.ink, t.canvas, 0.1) : t.mix('#ffffff', t.canvas, 0.9),
       '--ab-grid': t.alpha(t.ink, 0.07),
     };
   },
 
   // Two outlined stickers that flank the centered headline (a starburst in the
-  // accent, a flower in the primary) and a decorative CTA centered under it.
+  // accent, a flower in the primary) and a decorative paper CTA centered under it
+  // (the filled primary CTA lives in the card).
   // The art layer covers the whole hero and is aria-hidden; every shape is a
   // 2px ink outline with a hard 3px offset shadow.
   art(ctx) {
@@ -96,8 +99,9 @@ registerAesthetic({
   },
 
   materials: [
-    { name: 'Sticker card', css: 'background: {cardFill}; border: 2px solid {ink}; border-radius: 10px; box-shadow: 4px 4px 0 {ink};' },
+    { name: 'Sticker card', css: 'background: {paper}; /* near-white paper, never the secondary */ border: 2px solid {ink}; border-radius: 10px; box-shadow: 4px 4px 0 {ink};' },
     { name: 'Chunky button', css: 'background: {primary}; color: {onPrimary}; border: 2px solid {ink}; border-radius: 6px; box-shadow: 4px 4px 0 {ink}; font-weight: 700; /* lift: translate(-2px,-2px) + 6px 6px 0; squish: translate(4px,4px), no shadow */' },
+    { name: 'Paper button', css: 'background: {paper}; color: {ink}; border: 2px solid {ink}; border-radius: 6px; box-shadow: 4px 4px 0 {ink}; font-weight: 700; /* secondary button, e.g. the hero CTA */' },
     { name: 'Squish state', css: 'transform: translate(4px, 4px); box-shadow: 0 0 0 {ink};' },
     { name: 'Segment track', css: 'background: {paper}; border: 2px solid {ink}; border-radius: 10px; padding: 4px; /* selected segment: {primary} fill, 2px {ink} outline, radius 6 */' },
     { name: 'Highlight fill', css: 'background: {accent}; color: {onAccent}; border: 2px solid {ink}; border-radius: .12em; padding: 0 .18em; box-shadow: 4px 4px 0 {ink}; /* a color fill with a 2px ink outline behind one headline word */' },
@@ -109,7 +113,7 @@ registerAesthetic({
     do: [
       'Outline every object in ink at 2px and give it a hard 4px offset shadow with no blur; keep corners near-square (6px controls, 10px cards).',
       'Make buttons physical: lift 2px up-left on hover, squish 4px down-right on press.',
-      'Fill cards with the secondary color eased into the canvas, sit them on the colored 32px grid canvas, and keep the headline mixed case at weight 800.',
+      'Fill cards, panels and list rows with near-white paper, sit them on the colored 32px grid canvas, and keep the headline mixed case at weight 800.',
       'Put the accent as a color fill with a 2px ink outline behind one headline word and in the starburst sticker.',
     ],
     dont: [

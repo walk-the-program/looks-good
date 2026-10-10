@@ -19,7 +19,8 @@ registerAesthetic({
   labels: { material: 'Optics', states: ['Clear', 'Tinted', 'Frosted'], statesKind: 'chip' },
   layout: { hero: 'scene' },
   type: { ui: 'sans' },
-  highlight: 'ink',
+  highlight: 'custom',
+  highlightNote: 'The word is set as text, no fill or band: in --ab-hl-ink (the accent-ink shaded toward ink to hold 3:1 on the translucent hero card) over the card, and in plain --accent-ink when it sits directly on the canvas.',
 
   roles: {
     primary: {
@@ -38,11 +39,21 @@ registerAesthetic({
 
   tokens(t) {
     const d = t.isDark;
+    // The hero card is a translucent regular material (78% of --ab-material over
+    // the scene). Worst-case backdrop: the darkest scene color on a light board,
+    // white on a dark one. The highlight word is shaded toward ink until it holds
+    // 3:1 against that worst case (sub-copy uses --ab-ink, which clears 4.5:1).
+    const sceneBase = t.mix(t.primary, '#06070d', 0.14);
+    const material = t.mix('#ffffff', t.canvas, d ? 0.07 : 0.72);
+    const cardFloor = t.mix(material, d ? '#ffffff' : sceneBase, 0.78);
+    let hl = t.accentInk;
+    for (let k = 0; k <= 1.001 && t.contrast(hl, cardFloor) < 3.2; k += 0.05) hl = t.mix(t.ink, t.accentInk, k);
     return {
+      '--ab-hl-ink': hl,
       // vivid scene: a dark base the brand colors glow on (the "content" the glass floats over)
-      '--ab-scene-base': t.mix(t.primary, '#06070d', 0.14),
+      '--ab-scene-base': sceneBase,
       // regular material: a near-opaque panel, one step lighter than the canvas
-      '--ab-material': t.mix('#ffffff', t.canvas, d ? 0.07 : 0.72),
+      '--ab-material': material,
       '--ab-material-line': t.alpha(t.ink, d ? 0.14 : 0.09),
       '--ab-glass': t.alpha(t.canvas, d ? 0.35 : 0.45),
       '--ab-glass-solid': t.mix('#ffffff', t.canvas, d ? 0.1 : 0.6),
