@@ -109,8 +109,30 @@ function chooseAesthetic(key) {
   applyAesthetic(key);
   render();
 }
+// Picks among the aesthetics visible under the sidebar family filter (all of
+// them when the filter is "All"; visibleAesthetics() is in aesthetic-board.js).
 function randomizeAesthetic() {
-  applyAesthetic(pickRandom(AESTHETICS.filter(a => a.key !== state.aesthetic)).key);
+  let pool = (window.visibleAesthetics ? visibleAesthetics() : AESTHETICS).filter(a => a.key !== state.aesthetic);
+  if (!pool.length) pool = AESTHETICS.filter(a => a.key !== state.aesthetic);
+  applyAesthetic(pickRandom(pool).key);
+}
+
+// "Use recommended fonts": the first pairing in the aesthetic's font
+// recommendation (js/aesthetic-meta.js). One undo step; render() marks the
+// brand unsaved. Respects the Typography lock with the same toast as shuffle/swap.
+function applyRecommendedFonts() {
+  const meta = window.aestheticMeta ? aestheticMeta(state.aesthetic) : null;
+  const pair = meta && meta.fonts.pairings[0];
+  const heading = pair && fontByName(pair[0]);
+  const body = pair && fontByName(pair[1]);
+  if (!heading || !body) return showToast('No font recommendation for this aesthetic');
+  if (state.locks.typography) return showToast('Unlock typography to use recommended fonts');
+  if (state.headingFont === heading && state.bodyFont === body) return showToast('Already using the recommended fonts');
+  pushUndoSnapshot(state);
+  state.headingFont = heading;
+  state.bodyFont = body;
+  render();
+  showToast(`Using ${heading.name} / ${body.name}`);
 }
 
 /* ---------------- Google Fonts loading ---------------- */
@@ -438,6 +460,7 @@ function wireEvents() {
   document.getElementById('bodyFont').addEventListener('change', e => {
     state.bodyFont = FONTS[Number(e.target.value)]; render();
   });
+  document.getElementById('applyRecFonts').addEventListener('click', applyRecommendedFonts);
   document.getElementById('swapFonts').addEventListener('click', () => {
     if (state.locks.typography) return showToast('Unlock typography to swap');
     const heading = state.headingFont;

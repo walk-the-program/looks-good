@@ -172,6 +172,33 @@ function aibFontUrl(fonts) {
   return `https://fonts.googleapis.com/css2?${families.join('&')}&display=swap`;
 }
 
+// "### Recommended type" subsection of Typography: the aesthetic's font classes,
+// picks, avoid list and why (js/aesthetic-meta.js), plus how the brand's current
+// faces fit. Returns [] when the aesthetic has no recommendation.
+function aibTypeRecommendation(state, def) {
+  const meta = typeof aestheticMeta === 'function' ? aestheticMeta(def.key) : null;
+  if (!meta || !meta.fonts) return [];
+  const f = meta.fonts;
+  const fits = fontFitFor(def.key, state);
+  const cls = font => (FONT_CLASSES[font.cls] ? FONT_CLASSES[font.cls].label : font.cls);
+  const fitText = (font, fit) => fit === 'match' ? 'fits this aesthetic'
+    : fit === 'avoid' ? `is on this aesthetic's avoid list (${cls(font)})`
+      : `is outside the recommended classes (${cls(font)}); acceptable, but check it against the picks`;
+  const out = [`### Recommended type for ${def.name}`, ''];
+  out.push(`- Headings: ${fontClassWords(f.heading.classes)}. Picks: ${f.heading.picks.join(', ')}.`);
+  out.push(`- Body: ${fontClassWords(f.body.classes)}. Picks: ${f.body.picks.join(', ')}.`);
+  if (f.mono) out.push(`- UI and mono: ${f.mono.picks.join(', ')}${f.mono.note ? ` (${f.mono.note})` : ''}.`);
+  out.push(`- Avoid: ${abAvoidWords(f.avoid)}.`);
+  out.push(`- Why: ${f.why}`);
+  out.push(`- Pairings (heading / body): ${f.pairings.map(p => p.join(' / ')).join('; ')}. The first is the recommended default.`);
+  const faces = f.pairings[0].map(n => FONTS.find(x => x.name === n)).filter(Boolean);
+  if (faces.length) out.push(`- Google Fonts for the recommended pairing: ${aibFontUrl(faces)}`);
+  out.push(`- This brand's heading font, ${state.headingFont.name}, ${fitText(state.headingFont, fits.heading)}.`);
+  out.push(`- This brand's body font, ${state.bodyFont.name}, ${fitText(state.bodyFont, fits.body)}.`);
+  out.push('');
+  return out;
+}
+
 function buildAiBrief(state) {
   const def = aestheticByKey(state.aesthetic);
   const t = boardTokens(state, def);
@@ -292,6 +319,7 @@ function buildAiBrief(state) {
   const notes = def.typeNotes;
   (Array.isArray(notes) ? notes : notes ? [notes] : []).forEach(n => push(`- ${n}`));
   push(`- Shape: ${state.shapePreset.name}, radius ${state.shapePreset.radius}, large radius ${state.shapePreset.radiusLg}`, '');
+  aibTypeRecommendation(state, def).forEach(line => push(line));
 
   /* 9. Materials */
   const unresolved = [];

@@ -75,10 +75,11 @@ header, hero (kicker, your tagline with the last word in the accent color,
 signature art), a palette row that names each color's job and coverage,
 `01 / Interface`, `02 / <material>` and `03 / In use` sections, and a footer.
 It renders in the brand's own fonts, colors, name and logo. The sidebar's
-**Aesthetic** panel picks one of ten aesthetics (lockable, with Shuffle
-aesthetic); choosing one also takes its recommended Light/Dark mode and, unless
-Shape is locked, its slide shape. **Compare all** shows all ten boards at once
-in the current brand; click a tile to select it. The choice is saved with the
+**Aesthetic** panel picks one of twenty aesthetics, narrowed by family chips (Tactile, Graphic,
+Digital, Print & editorial, Luminous; the choice is remembered, and Shuffle and
+Compare work within it), lockable, with Shuffle aesthetic; choosing one also takes its recommended Light/Dark mode and, unless
+Shape is locked, its slide shape. **Compare all** shows the boards at once
+in the current brand (built only while that view is open); click a tile to select it. The choice is saved with the
 brand and is one Undo step. Compare tiles use each aesthetic's recommended
 mode (what selecting it gives you); the main board stays in the brand's current
 mode. Files: `js/aesthetic-board.js`,
@@ -91,6 +92,19 @@ typeface and headline-highlight treatment, calibrated against real references
 compact translucent hero card over Liquid Glass's scene). **Copy AI brief**
 reads those same declarations, so its component map and highlight wording match
 what the board shows.
+
+**Font recommendations.** Every aesthetic recommends type: font classes for
+headings and body (and mono where it matters), three picks rendered in their own
+faces, what to avoid, a one-line reason, and a fit check of the brand's current
+fonts (fits / consider / avoid). It appears as a **Type** section on the board,
+as a line in the Typography panel, and as a "Recommended type" subsection of the
+AI brief. **Use recommended fonts** applies the aesthetic's first pairing (one
+Undo step; blocked by the Typography lock). Every font in `js/data.js` carries a
+class (`cls`, see `FONT_CLASSES`); the recommendations and families live in
+`js/aesthetic-meta.js`, keyed by aesthetic key. Sixteen Google Fonts were added
+for this (Inter Tight, Bricolage Grotesque, Fredoka, Baloo 2, Michroma, Orbitron,
+Chakra Petch, Rajdhani, Poiret One, Limelight, Shrikhand, Bagel Fat One, Press
+Start 2P, Silkscreen, Pixelify Sans, VT323).
 
 ## Color roles, picker and paste import
 
@@ -134,7 +148,7 @@ x dismisses it for that brand. Locked sections get none.
   preview, the six slides and the brand guide — renders from those
   fields, and blank fields fall back to a sensible default rather than
   rendering an empty line.
-- **Combination engine** — pick heading/body fonts from 70+ Google Fonts
+- **Combination engine** — pick heading/body fonts from 85+ Google Fonts
   grouped by category (serif, sans, display, slab, mono), a color scheme
   (monochromatic / analogous / complementary / split-complementary /
   triadic / custom) with editable swatches, and a shape/style preset
@@ -200,7 +214,8 @@ js/suggest.js            suggestion engine (pure functions)
 js/suggest-ui.js         inline suggestion lines
 js/font-picker.js        visual font picker (replaces the selects' look, keeps them as state)
 js/aesthetics/           registry + one file per aesthetic (styles in css/aesthetics/)
-js/aesthetic-board.js    design language board, Compare all, Aesthetic panel
+js/aesthetic-board.js    design language board, Compare all, Aesthetic panel, family filter
+js/aesthetic-meta.js     per-aesthetic family and font recommendations
 js/color-roles.js        the five color roles (use / never / coverage)
 js/color-picker.js       inline HSV picker; js/color-import.js parses pasted colors
 js/ai-brief.js           Markdown AI brief (buildAiBrief)

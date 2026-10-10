@@ -20,6 +20,16 @@
 <link rel="stylesheet" href="css/aesthetics/bauhaus-poster.css" />
 <link rel="stylesheet" href="css/aesthetics/clay.css" />
 <link rel="stylesheet" href="css/aesthetics/riso-print.css" />
+<link rel="stylesheet" href="css/aesthetics/editorial-serif.css" />
+<link rel="stylesheet" href="css/aesthetics/neo-deco.css" />
+<link rel="stylesheet" href="css/aesthetics/y2k-chrome.css" />
+<link rel="stylesheet" href="css/aesthetics/cyber-hud.css" />
+<link rel="stylesheet" href="css/aesthetics/bento-grid.css" />
+<link rel="stylesheet" href="css/aesthetics/mesh-gradient.css" />
+<link rel="stylesheet" href="css/aesthetics/industrial-device.css" />
+<link rel="stylesheet" href="css/aesthetics/pixel-arcade.css" />
+<link rel="stylesheet" href="css/aesthetics/groovy-70s.css" />
+<link rel="stylesheet" href="css/aesthetics/blueprint.css" />
 <link rel="stylesheet" href="css/color-picker.css" />
 </head>
 <body data-view="library">
@@ -120,6 +130,7 @@
       <summary class="panel-head"><h2>Aesthetic</h2></summary>
       <div class="panel-body">
         <label class="lock">Lock<input type="checkbox" id="lockAesthetic" /></label>
+        <div class="ae-families" id="aeFamilies" role="group" aria-label="Filter aesthetics by family"></div>
         <div class="ae-list" id="aeList" role="group" aria-label="Aesthetic"></div>
         <button id="shuffleAesthetic" class="btn btn-ghost btn-block">Shuffle aesthetic</button>
       </div>
@@ -140,6 +151,10 @@
         <div class="font-specimen" id="fontSpecimen" aria-hidden="true">
           <div class="font-specimen-heading" id="fontSpecimenHeading"></div>
           <div class="font-specimen-body" id="fontSpecimenBody"></div>
+        </div>
+        <div class="font-rec" id="fontRec" hidden>
+          <p class="font-rec-line"><span id="frText"></span> <span class="font-rec-fit" id="frFit"></span></p>
+          <button type="button" id="applyRecFonts" class="font-rec-apply">Use recommended fonts</button>
         </div>
         <div class="font-actions">
           <button id="shuffleFonts" class="btn btn-ghost">Shuffle fonts</button>
@@ -447,6 +462,17 @@
 <script src="js/aesthetics/bauhaus-poster.js"></script>
 <script src="js/aesthetics/clay.js"></script>
 <script src="js/aesthetics/riso-print.js"></script>
+<script src="js/aesthetics/editorial-serif.js"></script>
+<script src="js/aesthetics/neo-deco.js"></script>
+<script src="js/aesthetics/y2k-chrome.js"></script>
+<script src="js/aesthetics/cyber-hud.js"></script>
+<script src="js/aesthetics/bento-grid.js"></script>
+<script src="js/aesthetics/mesh-gradient.js"></script>
+<script src="js/aesthetics/industrial-device.js"></script>
+<script src="js/aesthetics/pixel-arcade.js"></script>
+<script src="js/aesthetics/groovy-70s.js"></script>
+<script src="js/aesthetics/blueprint.js"></script>
+<script src="js/aesthetic-meta.js"></script>
 <script src="js/aesthetic-board.js"></script>
 <script src="js/persistence.js"></script>
 <script src="js/undo-history.js"></script>

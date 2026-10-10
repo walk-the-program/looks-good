@@ -238,6 +238,70 @@ function abCoverageNum(text) {
   return vals.reduce((a, b) => a + b, 0) / vals.length;
 }
 
+/* ---------------- type recommendation block ---------------- */
+
+const AB_FIT_WORD = { match: '✓ Fits', consider: 'Consider', avoid: '✕ Avoid' };
+
+function abFitPill(fit) {
+  const f = AB_FIT_WORD[fit] ? fit : 'consider';
+  return `<span class="ab-fit" data-fit="${f}">${AB_FIT_WORD[f]}</span>`;
+}
+
+// Plain-words avoid list: "didone, condensed, pixel".
+function abAvoidWords(avoid) {
+  return (avoid || []).map(c => c === 'serif' ? 'serif faces' : FONT_CLASSES[c] ? FONT_CLASSES[c].label : c).join(', ');
+}
+
+// True when the brand already wears the aesthetic's first recommended pairing.
+function abUsingRecommended(state, meta) {
+  const pair = meta && meta.fonts.pairings[0];
+  return !!pair && state.headingFont.name === pair[0] && state.bodyFont.name === pair[1];
+}
+
+// Compact "Type" section between the palette and 01: what the aesthetic wants
+// in plain words, three picks in their own faces, what to avoid, how the
+// brand's current faces fit, and the one-click apply. Returns '' (no block, no
+// rule) when the aesthetic has no entry in js/aesthetic-meta.js. Restyle it per
+// aesthetic with the .ab-type* classes; the block holds no aesthetic logic.
+function abTypeBlockHtml(state, def) {
+  const meta = typeof aestheticMeta === 'function' ? aestheticMeta(def.key) : null;
+  if (!meta || !meta.fonts) return '';
+  const f = meta.fonts;
+  const e = escapeHtml;
+  const fits = fontFitFor(def.key, state);
+  const picks = names => names.slice(0, 3).map(n => {
+    const font = FONTS.find(x => x.name === n);
+    return `<li class="ab-type-pick" style="font-family:${font ? e(font.css) : 'inherit'}">${e(n)}</li>`;
+  }).join('');
+  const col = (role, label, block, cur, fit) => `
+      <div class="ab-type-col" data-role="${role}">
+        <p class="ab-type-role">${label}</p>
+        ${block.classes ? `<p class="ab-type-class">${e(fontClassWords(block.classes))}</p>` : (block.note ? `<p class="ab-type-class">${e(block.note)}</p>` : '<p class="ab-type-class">&nbsp;</p>')}
+        <ul class="ab-type-picks">${picks(block.picks)}</ul>${cur ? `
+        <p class="ab-type-fit"><span class="ab-type-cur">Your ${role}: <b style="font-family:${e(cur.css)}">${e(cur.name)}</b></span>${abFitPill(fit)}</p>` : ''}
+      </div>`;
+  const cols = [col('heading', 'Headings', f.heading, state.headingFont, fits.heading),
+    col('body', 'Body', f.body, state.bodyFont, fits.body)];
+  if (f.mono) cols.push(col('mono', 'UI &amp; mono', f.mono, null, null));
+  const pair = f.pairings[0];
+  const used = abUsingRecommended(state, meta);
+  return `<section class="ab-type" data-cols="${cols.length}" data-applied="${used}" aria-label="Type recommendations">
+      <div class="ab-labelrow"><span class="ab-label">Type</span><span class="ab-label">Recommended for ${e(def.name)}</span></div>
+      <div class="ab-type-grid">${cols.join('')}
+      </div>
+      <div class="ab-type-foot">
+        <p class="ab-type-avoid"><span class="ab-type-k">Avoid</span> ${e(abAvoidWords(f.avoid))}</p>
+        <p class="ab-type-why">${e(f.why)}</p>
+        <div class="ab-type-act">
+          <button type="button" class="ab-type-apply">Use recommended fonts</button>
+          <span class="ab-type-pair">${e(pair[0])} / ${e(pair[1])}${used ? ' · in use' : ''}</span>
+        </div>
+      </div>
+    </section>
+    <div class="ab-rule"></div>
+    `;
+}
+
 let abSeq = 0;
 
 function boardHtml(state, def) {
@@ -325,7 +389,7 @@ function boardHtml(state, def) {
       <div class="ab-swatches" data-kind="${layout.palette}">${swatches}</div>
     </section>
     <div class="ab-rule"></div>
-    <div class="ab-sections">
+    ${abTypeBlockHtml(state, def)}<div class="ab-sections">
       <section class="ab-sec ab-sec-ui" aria-label="Interface">
         <div class="ab-labelrow"><span class="ab-label"><i class="ab-n">01</i><span>Interface</span></span></div>
         <div class="ab-card">
@@ -375,12 +439,15 @@ function renderMainBoard() {
 
 // Each tile previews its aesthetic in its own recommended mode (def.mode), the
 // mode selecting it would switch to, via a per-tile state clone; the global
-// state and the main board keep the brand's actual bgMode.
+// state and the main board keep the brand's actual bgMode. The sidebar family
+// filter applies here too.
 function renderCompareGrid() {
   const grid = document.getElementById('compareGrid');
   if (!grid) return;
   setBoardFonts(grid);
-  grid.innerHTML = AESTHETICS.map(def => `
+  const defs = visibleAesthetics();
+  const note = aeFamily === 'all' ? '' : `<p class="cmp-note">${escapeHtml(aestheticFamilyLabel(aeFamily))}: ${defs.length} of ${AESTHETICS.length} aesthetics. Choose All in the sidebar to see every one.</p>`;
+  grid.innerHTML = note + defs.map(def => `
     <div class="cmp-tile${def.key === state.aesthetic ? ' is-current' : ''}" role="button" tabindex="0"
          data-key="${def.key}" aria-label="Use ${escapeHtml(def.name)}" aria-pressed="${def.key === state.aesthetic}">
       <div class="cmp-label"><span class="cmp-num">${String(def.order).padStart(2, '0')}</span><span class="cmp-name">${escapeHtml(def.name)}</span><span class="cmp-desc">${escapeHtml(def.descriptor)}</span></div>
@@ -409,8 +476,60 @@ function renderAestheticBoard() {
   const grid = document.getElementById('compareGrid');
   if (host) host.hidden = compare;
   if (grid) grid.hidden = !compare;
-  if (compare) renderCompareGrid(); else renderMainBoard();
+  // Only the visible view is built. The hidden one is emptied (Compare holds
+  // twenty full boards) and is rebuilt when its view is shown again.
+  if (compare) {
+    renderCompareGrid();
+    if (host && host.firstChild) host.innerHTML = '';
+  } else {
+    renderMainBoard();
+    if (grid && grid.firstChild) grid.innerHTML = '';
+  }
   syncAestheticChrome(def);
+}
+
+/* ---------------- family filter (sidebar + Compare) ---------------- */
+
+const AE_FAMILY_STORE = 'bd.aestheticFamily';   // localStorage, per viewer
+let aeFamily = 'all';                            // 'all' or an AESTHETIC_FAMILIES key
+
+function aeFamiliesAvailable() {
+  return typeof AESTHETIC_FAMILIES !== 'undefined' && typeof aestheticFamilyOf === 'function';
+}
+
+function loadAeFamily() {
+  try {
+    const v = localStorage.getItem(AE_FAMILY_STORE);
+    if (aeFamiliesAvailable() && AESTHETIC_FAMILIES.some(f => f.key === v)) aeFamily = v;
+  } catch (err) { /* storage unavailable: stay on All */ }
+}
+
+function saveAeFamily() {
+  try { localStorage.setItem(AE_FAMILY_STORE, aeFamily); } catch (err) { /* ignore */ }
+}
+
+// The aesthetics the sidebar, step buttons, shuffle and Compare work over.
+function visibleAesthetics() {
+  if (aeFamily === 'all' || !aeFamiliesAvailable()) return AESTHETICS;
+  const list = AESTHETICS.filter(a => aestheticFamilyOf(a.key) === aeFamily);
+  return list.length ? list : AESTHETICS;
+}
+
+function buildAestheticFamilies() {
+  const host = document.getElementById('aeFamilies');
+  if (!host) return;
+  if (!aeFamiliesAvailable()) { host.hidden = true; return; }
+  const chip = (key, label, n) =>
+    `<button type="button" class="ae-fam" data-family="${key}" aria-pressed="false">${escapeHtml(label)}<i>${n}</i></button>`;
+  host.innerHTML = chip('all', 'All', AESTHETICS.length)
+    + AESTHETIC_FAMILIES.map(f => chip(f.key, f.label, AESTHETICS.filter(a => aestheticFamilyOf(a.key) === f.key).length)).join('');
+}
+
+function setAeFamily(key) {
+  aeFamily = key;
+  saveAeFamily();
+  buildAestheticList();
+  renderAestheticBoard();
 }
 
 /* ---------------- header + sidebar panel ---------------- */
@@ -425,13 +544,35 @@ function syncAestheticChrome(def) {
   document.querySelectorAll('#aeList .ae-tile').forEach(b => {
     b.setAttribute('aria-pressed', String(b.dataset.key === def.key));
   });
+  document.querySelectorAll('#aeFamilies .ae-fam').forEach(b => {
+    b.setAttribute('aria-pressed', String(b.dataset.family === aeFamily));
+  });
+  const shuffle = document.getElementById('shuffleAesthetic');
+  if (shuffle) shuffle.textContent = aeFamily === 'all' ? 'Shuffle aesthetic' : `Shuffle in ${aestheticFamilyLabel(aeFamily)}`;
   document.querySelectorAll('input[name="boardView"]').forEach(r => { r.checked = r.value === boardView; });
+  renderFontRec(def);
+}
+
+// Typography panel: one line naming the recommendation and how the current
+// faces fit, plus the apply button (wired in app.js).
+const AB_FIT_PLAIN = { match: 'fits', consider: 'consider', avoid: 'avoid' };
+function renderFontRec(def) {
+  const host = document.getElementById('fontRec');
+  if (!host) return;
+  const meta = typeof aestheticMeta === 'function' ? aestheticMeta(def.key) : null;
+  if (!meta) { host.hidden = true; return; }
+  const pair = meta.fonts.pairings[0];
+  const fits = fontFitFor(def.key, state);
+  host.hidden = false;
+  document.getElementById('frText').textContent = `Suited to ${def.name}: ${pair[0]} / ${pair[1]}.`;
+  document.getElementById('frFit').innerHTML =
+    `Heading <b data-fit="${fits.heading}">${AB_FIT_PLAIN[fits.heading]}</b>, body <b data-fit="${fits.body}">${AB_FIT_PLAIN[fits.body]}</b>.`;
 }
 
 function buildAestheticList() {
   const list = document.getElementById('aeList');
   if (!list) return;
-  list.innerHTML = AESTHETICS.map(def => `
+  list.innerHTML = visibleAesthetics().map(def => `
     <button type="button" class="ae-tile" data-key="${def.key}" aria-pressed="false" title="${escapeHtml(def.summary || def.name)}">
       <span class="ae-motif" data-motif="${def.key}" aria-hidden="true"></span>
       <span class="ae-num">${String(def.order).padStart(2, '0')}</span>
@@ -440,9 +581,12 @@ function buildAestheticList() {
     </button>`).join('');
 }
 
+// Prev / next walk the visible (filtered) list; from an aesthetic outside the
+// filter they land on its first or last entry.
 function stepAesthetic(dir) {
-  const i = AESTHETICS.findIndex(a => a.key === state.aesthetic);
-  const next = AESTHETICS[(i + dir + AESTHETICS.length) % AESTHETICS.length];
+  const list = visibleAesthetics();
+  const i = list.findIndex(a => a.key === state.aesthetic);
+  const next = i < 0 ? (dir > 0 ? list[0] : list[list.length - 1]) : list[(i + dir + list.length) % list.length];
   chooseAesthetic(next.key);
 }
 
@@ -467,6 +611,7 @@ function wireBoardInteractions(host) {
       if (label) label.textContent = 'Save direction';
       return;
     }
+    if (e.target.closest('.ab-type-apply')) { applyRecommendedFonts(); return; }
     const cta = e.target.closest('.ab-cta:not(.ab-state-ctl)');
     if (cta) {
       cta.querySelector('.ab-cta-label').textContent = 'Direction saved';
@@ -480,7 +625,13 @@ function wireBoardInteractions(host) {
 }
 
 function initAestheticUi() {
+  loadAeFamily();
+  buildAestheticFamilies();
   buildAestheticList();
+  document.getElementById('aeFamilies').addEventListener('click', e => {
+    const chip = e.target.closest('.ae-fam');
+    if (chip) setAeFamily(chip.dataset.family);
+  });
   wireBoardInteractions(document.getElementById('previewCard'));
 
   document.getElementById('aeList').addEventListener('click', e => {

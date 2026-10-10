@@ -368,5 +368,22 @@ Extra CSS vars come from `def.tokens(t)` (applied inline on the root, so `var(--
 switch toggles status text; the field is a real input. Compare tiles are `inert` and scaled with CSS `zoom`
 (design width 900px, or 500px on one column).
 
+**Round 3 additions (F1):**
+
+- `js/aesthetic-meta.js` (loaded after the aesthetic files, before `aesthetic-board.js`): `AESTHETIC_META[key] = { family, fonts: { heading:{classes,picks}, body:{classes,picks}, mono?:{picks,note?}, avoid:[], why, pairings:[[h,b],…] } }`,
+  `AESTHETIC_FAMILIES` (ordered `{key,label}`), helpers `aestheticMeta(key)` (null when missing), `aestheticFamilyOf`, `fontFit(font, recBlock, avoid)` -> `'match'|'consider'|'avoid'`
+  (a pick or a font in a recommended class matches; a font whose class is in `avoid` is avoid; `'serif'` in `avoid` means every serif class), `fontFitFor(key, state)`, `fontClassWords(classes)`.
+  It prints a `console.warn` at startup if any pick, pairing, class or family is unknown, and prints nothing otherwise. A missing entry only means "no Type block, no family chip".
+- `FONT_CLASSES` and a `cls` on every `FONTS` entry (data.js).
+- Type block, between the palette's rule and `01`: `section.ab-type[data-cols=2|3][data-applied] > .ab-labelrow, .ab-type-grid > .ab-type-col[data-role=heading|body|mono]
+  (p.ab-type-role, p.ab-type-class, ul.ab-type-picks > li.ab-type-pick[style font-family], p.ab-type-fit > .ab-type-cur + span.ab-fit[data-fit=match|consider|avoid]), .ab-type-foot
+  (p.ab-type-avoid > .ab-type-k, p.ab-type-why, .ab-type-act > button.ab-type-apply + span.ab-type-pair)`, followed by an `.ab-rule`. An aesthetic restyles it from its own css
+  under `.ab[data-ae="key"] .ab-type…` (it is neutral by default, built from `--ab-*` tokens); do not change the markup. The apply button is wired in `wireBoardInteractions` and
+  calls `applyRecommendedFonts()` (app.js: first pairing, one undo step, honours `locks.typography`).
+- Sidebar: `#aeFamilies > button.ae-fam[data-family]` filters `#aeList` (stored in localStorage `bd.aestheticFamily`); `visibleAesthetics()` is the filtered list used by the tiles, prev/next, **Shuffle aesthetic**
+  (so Shuffle everything and the Space shortcut too) and Compare all. Typography panel: `#fontRec` (`#frText`, `#frFit`, `#applyRecFonts`). Each tile needs a `[data-motif="<key>"]` rule in aesthetic-board.css.
+- Compare all builds its tiles only while that view is open; the hidden view's DOM is emptied.
+- AI brief: Typography gets a `### Recommended type for <name>` subsection (`aibTypeRecommendation` in ai-brief.js).
+
 **Stubs:** the 7 unbuilt aesthetics have a js file (descriptors, placeholder SVG art, empty materials/rules) and an
 empty css file; their owners replace `art`, add `tokens`/`canvas` if needed, `materials`, `rules`, and fill the css.

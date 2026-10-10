@@ -1,0 +1,6 @@
+/* ---------------------------------------------------------------------
+   13 Y2K Chrome — STUB (owner N1). Empty on purpose: the base board styles apply.
+   Scope EVERY selector under .ab[data-ae="y2k-chrome"], restyle the shared
+   board classes (see docs/aesthetics-plan.md "Board anatomy"), and provide
+   prefers-reduced-motion / prefers-reduced-transparency handling where used.
+------------------------------------------------------------------------ */
