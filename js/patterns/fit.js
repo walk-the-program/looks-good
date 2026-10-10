@@ -233,6 +233,24 @@
     ],
   };
 
+  // Where each family lives, so a brief can point an AI tool at the exact generator.
+  // Keep in step with the P.register() calls in js/patterns/families/*.js (checked by
+  // the brief harness: every registered key must appear here, in the right file).
+  const FAMILY_FILES = {
+    'field.js':   ['halftone', 'stipple', 'terrain', 'typeterrain'],
+    'stripe.js':  ['zigzag', 'weave', 'oprings', 'counterchange', 'chevron', 'arcrise'],
+    'grid.js':    ['pixelquilt', 'gradpanes', 'glyphgrid', 'modulargrid', 'signal'],
+    'texture.js': ['tornbands', 'aura', 'flow'],
+  };
+  const FILE_OF = {};
+  Object.keys(FAMILY_FILES).forEach(f => FAMILY_FILES[f].forEach(k => { FILE_OF[k] = 'js/patterns/families/' + f; }));
+
+  P.ENGINE_FILE = 'js/patterns/engine.js';
+  // Plain scripts, no dependencies, in index.html order: engine, the family files, then fit.js.
+  P.LOAD_ORDER = ['js/patterns/engine.js'].concat(Object.keys(FAMILY_FILES).map(f => 'js/patterns/families/' + f), ['js/patterns/fit.js']);
+  P.FAMILY_FILES = FILE_OF;                       // { familyKey: 'js/patterns/families/<file>.js' }
+  P.fileOf = key => FILE_OF[key] || null;
+
   P.fit = FIT;
   P.suiteKeys = () => Object.keys(FIT);
   P.suiteFor = function (aestheticKey) {

@@ -101,6 +101,24 @@ brand unsaved), so brands saved with pins load unchanged. Each entry is
     (`AIB_FULL_SVG_CAP`), else "attach the exported SVG/PNG" with the sizes.
   - raster families and SVG off: "attach the exported PNG at <size>" plus the regeneration settings.
   - Base64 PNGs are never pasted.
+  - **Source** (every block, plus the "Families that fit" lines): where the exact generator lives, so an
+    AI tool can fetch it and reproduce the pattern. It is this project's own engine only. Each block
+    gets a `**Source**` sub-block with the project path (`PATTERN_SOURCE_ROOT` in js/ai-brief.js, default
+    `~/Desktop/Branding Designer`; change it there), the engine file `js/patterns/engine.js`, the
+    family file (e.g. `js/patterns/families/stripe.js`) with the family key, the load order (engine,
+    the family files, then `fit.js`; plain scripts, no dependencies) and the exact calls in a `js`
+    block: `Patterns.render(canvas, key, params, inks, seed, { width: 1200, height: 675, dpr: 1 })`, plus
+    `Patterns.renderSVG(...)` for vector families and `Patterns.tileSVG(..., 160)` for seamless ones.
+    `params` is the fully resolved set (`Patterns.resolve`, so `tone`, `grain`, `tints` included) and
+    `inks` is `Patterns.inksFor({canvas, ink, primary, secondary, accent}, colorway, { tints })` with
+    the five board-token hexes, so the call needs no `boardTokens`/aesthetic code and is deterministic
+    (`dpr: 1` pins the pixel size). The Patterns section, "Copy patterns only" and the per-item Copy
+    all start with one preamble line saying the patterns come from `js/patterns/` and that the same
+    seed + params + inks give identical output. Each "Families that fit" bullet ends with
+    `Source: <root>/js/patterns/families/<file>.js, family <key>.`
+  - Family to file map: `Patterns.fileOf(key)` / `Patterns.FAMILY_FILES` (js/patterns/fit.js, kept in
+    step with the `register()` calls in js/patterns/families/*.js), plus `Patterns.ENGINE_FILE` and
+    `Patterns.LOAD_ORDER`. When adding a family, add its key to the map in fit.js.
 - Engine: `Patterns.renderSVG(..., { tile: true })` / `Patterns.tileSVG(key, params, inks, seed, size)`
   render a seamless tile of a seamless vector family (grain forced off, same composition as
   `tileCSS`); `Patterns.finalInks(key, params, inks)` returns the inks a render really uses (tints and
