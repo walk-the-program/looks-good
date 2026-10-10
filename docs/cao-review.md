@@ -869,3 +869,204 @@ Signed off: Neo Deco, Cyber HUD, Bento Grid, Mesh Gradient, Industrial Device, P
 **Verification:** regenerate only the affected keys with `TAG=v3` and check the named CHECK lines.
 These fixes are small and local. I do not need another full review round; a coordinator spot-check
 of the ten v3 sheets is enough to accept.
+
+---
+
+## Round 4 (CAO-3) — six new aesthetics
+
+Evidence: the builders' shots `cao/b1-<key>-A..D.png` (blob-tracking, xerox, micrographics),
+`cao/b2-<key>-A..D.png` (mixed-type, ascii-art, rebus) and their `sheet-b1/b2-*` sheets. Every
+source file predates its sheet, so the shots match the current code. I did not re-shoot.
+
+**Verdict.** This is the strongest first-build round so far. Every board is clearly its own style
+at a glance, and none relies on clip-art. The builders applied the quality bar from the earlier
+reviews: no stranded words at 1280, primary limited to the CTA and selected states, a restyled
+Type block on every board, and the full brand name at 390.
+
+| # | Aesthetic | Verdict | One line |
+|---|-----------|---------|----------|
+| 1 | Micrographics | Ship (1 fix) | The scale contrast is the aesthetic, and the spec plate is excellent. The callout labels claim glyph features they don't point at. |
+| 2 | Xerox | Refine (2) | Toner, threshold type, tape and overprint are right. The hero leaves a dead paper field. |
+| 3 | ASCII Art | Ship (2) | A real character-density map with TUI controls. The light-mode map washes out, and the Type block has a near-empty column. |
+| 4 | Mixed Type | Ship (1) | A convincing specimen-poster headline. The card title's bold first letter looks like a bug. |
+| 5 | Blob Tracking | Refine (2) | The footage plate sells the look. Too many labels fall below readable contrast. |
+| 6 | Rebus | Refine (2) | The pictogram headline works. The brand "equation" claims a reading it doesn't have. |
+
+**Distinctness:** passes every pair the coordinator asked about.
+- **Xerox vs Riso:** black toner and degradation, not soft colored ink.
+- **Xerox vs Raw Brutalist:** dirty and analog, not a clean grid.
+- **Micrographics vs Blueprint and Cyber HUD:** light print microtype, with no drawing field and no glow.
+- **Blob Tracking vs Cyber HUD and Aurora:** clinical white overlays on footage, no neon.
+- **ASCII vs Pixel Arcade:** characters are the medium, not sprites.
+- **Rebus and Mixed Type vs Neo-Brutal Pop and Editorial:** no outlines or stickers. Rebus's language is pictograms; Mixed Type's is face-switching.
+
+### Rulings on builder choices
+
+| Choice | Ruling |
+|--------|--------|
+| Mixed Type and Rebus draw the visible headline in `def.art` with the real h2 visually hidden | **Accept for now, no hook.** Both render correctly at 1280 and 390, in both modes and both palettes, and the h2 keeps the semantics. Add a `def.headline(ctx)` hook (it would return the h2's inner HTML) only when a third aesthetic needs it; adding it now changes nothing a viewer sees. |
+| Blob Tracking boxes the whole headline plus the highlight word | **Accept.** A region box around the text with a nested target box is how real trackers nest detections, so no second-word hook is needed. |
+| Xerox leaves open paper left of the poster art | **Overrule.** At 1280 it is a ~500×280px dead field, and pasted-up flyers have no dead space (fix 22.1). |
+| Micrographics callouts point at grid positions, not glyph features | **Overrule.** "TERMINAL" and "COUNTER" landing on empty grid points is exactly what a spec-sheet reader notices (fix 23.1). |
+| ASCII Art falls back to JetBrains Mono when the brand face isn't a known mono | **Accept, with one refinement.** Also use the brand heading when its `data-hcls` is `pixel` (VT323, Silkscreen and similar). Order: heading if mono or pixel, else body if mono, else JetBrains Mono (fix 25.2). |
+
+### Framework (X0)
+
+- **X0-R4.1** `js/aesthetic-meta.js`, `ascii-art` entry.
+  - CHANGE: `mono: { picks: ['VT323', 'Space Mono'], note: 'VT323 for readouts' }`.
+  - WHY: F4 keeps the mono column because VT323 is not a body pick, so the third Type card shows a
+    lone "VT323" under an empty "//" line. Two picks fill it, and the note fills the class line.
+
+### X1 — blob-tracking, xerox, micrographics
+
+**21 Blob Tracking — Refine**
+*Benchmark:* TouchDesigner blob-track reels, OpenCV detection overlays, Zach Lieberman-style
+tracking studies.
+*Keep:* the dithered footage plate with the primary "locked" target, ID/confidence tabs, corner
+ticks, the constellation lines, detection-boxed UI, the boxed headline, and the TRACKED list.
+1. **WHAT:** dim labels in blob-tracking.css. These include palette job lines
+   ("Background · 70–75%"), unselected segments (BUILD, LAUNCH), state names (SEARCHING, LOST),
+   `.ab-kicker`, `.ab-sub-rest`, `.ab-type-class` and `.ab-type-why`.
+   - **CHANGE:** every one of these uses `color: var(--ab-muted)`, which the framework guarantees
+     at ≥ 4.5:1. Remove any extra opacity or alpha on them.
+   - "Lost" and "searching" may keep a dashed border to signal state, but their text stays muted,
+     not fainter.
+   - **WHY:** at roughly 2:1 on a speckled ground they read as missing text. Clinical UI is crisp.
+2. **WHAT:** the board-wide noise texture.
+   - **CHANGE:** keep the grain inside the footage plate (`.ab-art`) only. Cards, panels and the
+     Type block become flat `mix(canvas, ink, .04)` with no grain. Halve the opacity of the board
+     background grain.
+   - **WHY:** the footage plate and the overlay should read as two layers. Grain everywhere makes
+     the UI look like the footage, and the overlay loses its clinical contrast.
+
+**22 Xerox — Refine**
+*Benchmark:* 80s hardcore flyers (Pettibon, SST era), Sniffin' Glue, current xerox-revival gig
+posters.
+*Keep:* the threshold-toothed Anton headline with the primary overprint block, the halftone M plate
+with tape and the copy-machine edge band, the strike-through avoid list, the taped paper-scrap
+cards, the toner CTA with offset overprint, and the dashed-rule list.
+1. **WHAT:** the empty paper left of the art (hero, 1280).
+   - **CHANGE:** add a tear-off tab strip to `art()`, absolutely placed at the hero's bottom-left.
+     Its width is from the left edge to 16px before the art; its height is 38% of the art.
+     - 7 vertical tabs, each separated by a 1px dashed ink cut line.
+     - Each tab holds the brand name rotated −90° in the body face (Courier Prime), 10px,
+       uppercase, letter-spacing .08em.
+     - Above the tabs is a solid band: "TAKE ONE —" in the heading face at 22px, plus
+       "COPY 02 OF 50" in the body face at 10px.
+     - The whole strip rotates −0.8° and the third tab is missing: an irregular gap with a torn
+       edge drawn as an SVG zigzag clip.
+     - Hide the strip at ≤600px.
+   - **WHY:** tear-off tabs are the most recognisable flyer device, and they fill the dead field
+     with something functional rather than decorative.
+2. **WHAT:** accent highlighter spread.
+   - **CHANGE:** remove the yellow highlighter from list row 1 ("BRAND REFRESH"). Keep it on the
+     subcopy lead and the footer square.
+   - **WHY:** accent is one spark. Three highlighter swipes read as a theme color.
+
+**23 Micrographics — Ship**
+*Benchmark:* Acronym product sheets, Nike ISPA graphics, Experimental Jetset/Spin spec layouts.
+*Keep:* everything else, including the giant headline vs 8px microtype, the spec plate with
+rulers, QR, barcode and the BOM column, the per-panel micro corner labels, the vertical margin
+microtype, and the bracketed list.
+1. **WHAT:** `calls` in `art()` (micrographics.js ~121–128).
+   - **CHANGE:** draw four guide lines across the glyph area as 1px dashed ink at 35%:
+     - cap height at y=34%
+     - baseline at y=78%
+     - left bearing at x=21%
+     - right bearing at x=77%
+   - Rename and re-aim the callouts so every marker sits on a drawn guide or intersection:
+
+     | Callout | Label | Marker at (x, y) |
+     |---------|-------|------------------|
+     | A.01 | `CAP HEIGHT` | (30, 34) |
+     | A.02 | `L. BEARING` | (21, 58) |
+     | A.03 | `GRID 10` | unchanged |
+     | A.04 | `ADVANCE` | (77, 34) |
+     | A.05 | `OPT. CENTER` | (49, 56), the center of the guide box |
+     | A.06 | `BASELINE` | (77, 78) |
+     | A.07 | `REG. MARK` | unchanged |
+     | A.08 | `ORIGIN` | (21, 78) |
+
+   - Delete the "TERMINAL" and "COUNTER" labels.
+   - **WHY:** the labels must be true for any brand face. Font metrics are always true;
+     terminals and counters depend on the glyph.
+
+### X2 — mixed-type, ascii-art, rebus
+
+**24 Mixed Type — Ship**
+*Benchmark:* Pangram Pangram and Displaay specimen posters, Commercial Type specimens,
+It's Nice That covers.
+*Keep:* the four-voice headline on a shared cap height, the specimen "Aa" block with cap/base
+guides and the glyph rows, italic palette labels, the italic list numerals, and the Roman/Italic/
+Mono states.
+1. **WHAT:** `.ab-card-title` ("Your next good idea.", where only the "Y" is heavy).
+   - **CHANGE:** drop the first-letter treatment. Set "Your next" in the heavy grotesk voice
+     (weight 800, the same face as "GOOD") and "good idea." in the serif-italic voice, sized to
+     the same cap height.
+   - If the title is a single text node, wrap the last two words in a span in CSS-only fashion
+     via `::first-line`. Otherwise the worker adds the split where the board copy is rendered for
+     this aesthetic, with markup unchanged elsewhere.
+   - If neither is possible without touching shared markup, set the whole title in the serif
+     italic (weight 400) and remove the bold Y.
+   - **WHY:** one heavy capital reads as a rendering glitch, not a voice change.
+
+**25 ASCII Art — Ship**
+*Benchmark:* btop and lazygit TUIs, ASCII video-art renderers, text-mode landing pages.
+*Keep:* the generated density map with brand-gradient cells and accent sparks, box-drawing frames
+with tab labels, `[ Design ]` segments, `[■ ON ]`, the `> Save direction █` CTA, block progress,
+dither-tailed palette bars, and the sparse/dense/solid states.
+1. **WHAT:** light mode (B) density map and caret.
+   - **CHANGE:** when `!t.isDark`, color each cell with `mix(cellColor, ink, .35)`, and render
+     the headline caret block in light mode too (it is missing in B).
+   - **WHY:** pale orange and teal characters on cream drop below legibility, and the map
+     disappears.
+2. **WHAT:** the headline face fallback (see the ruling above).
+   - **CHANGE:** the chosen face is:
+     - the heading face if `data-hcls` is `mono` or `pixel`;
+     - else the body face if its class is `mono`;
+     - else JetBrains Mono.
+
+**26 Rebus — Refine**
+*Benchmark:* Paul Rand's IBM Eye-Bee-M poster, Eye on Design's "Nouveau Rebus" identities.
+*Keep:* the "Good [pencil] / should feel [sun]" headline, the symbol legend chips, pictogram
+palette tiles, icon tabs, symbol avatars, and the Word/Mixed/Symbol states.
+1. **WHAT:** the brand equation fallback (`rebus.js` ~163–172, the no-key branch).
+   - **CHANGE:** when no syllable key matches, the caption reads "the mark: `${initial}` +
+     `${sym}`", not "read it aloud: … = Marigold Studio".
+   - "Read it aloud" stays only for the keyed branch, which is a true phonetic rebus.
+   - **WHY:** "M + sun = Marigold Studio" is not a rebus; claiming it is undercuts the one idea
+     the board sells.
+2. **WHAT:** `.rb-eq-name` (the ink-filled pill holding the brand name).
+   - **CHANGE:** no fill. The brand name sits in the heading face at the same size and weight as
+     the "M" tile's letter, in ink, on canvas, with a 4px ink underline offset .12em.
+     Tile heights are unchanged.
+   - **WHY:** a full-width ink slab is the heaviest object on the board and outweighs the
+     headline. The result of the equation should read as a word, not as a button.
+3. **WHAT:** headline pictogram size (`.rb-hl-sym` or the equivalent svg class in rebus.css).
+   - **CHANGE:** height = 0.72em (cap height). `vertical-align: baseline` with
+     `transform: translateY(0.02em)`. The pencil stays rotated −35°, but its bounding box
+     respects the same cap height.
+   - **WHY:** the brief says symbols sit on the baseline at cap height. The pencil currently
+     floats high and small next to "Good".
+
+### Work split and counts
+
+- **X0:** 1 (R4.1)
+- **X1:** 5
+  - Blob Tracking 21.1, 21.2
+  - Xerox 22.1, 22.2
+  - Micrographics 23.1
+- **X2:** 6
+  - Mixed Type 24.1
+  - ASCII Art 25.1, 25.2
+  - Rebus 26.1, 26.2, 26.3
+
+Each worker re-shoots its keys with `TAG=v4` and checks:
+- **Xerox:** no dead paper field at 1280.
+- **Micrographics:** every marker sits on a drawn guide.
+- **Blob Tracking:** labels are readable in A.
+- **ASCII Art:** the map is legible in B.
+- **Rebus:** the caption is honest and the pill is gone.
+- **Mixed Type:** the card title has no lone bold capital.
+
+A coordinator spot-check is enough to accept; this doesn't need another CAO round.
