@@ -238,6 +238,71 @@ const AESTHETIC_META = {
       pairings: [['IBM Plex Sans', 'IBM Plex Mono'], ['Archivo', 'JetBrains Mono'], ['Big Shoulders Display', 'IBM Plex Mono']],
     },
   },
+  'blob-tracking': {
+    family: 'digital',
+    fonts: {
+      heading: { classes: ['neo-grotesk'], picks: ['Inter Tight', 'Geist', 'Archivo'] },
+      body: { classes: ['neo-grotesk'], picks: ['Inter', 'Geist'] },
+      mono: { picks: ['Geist Mono', 'JetBrains Mono', 'IBM Plex Mono'] },
+      avoid: ['serif', 'rounded', 'groovy', 'deco'],
+      why: 'Detection overlays read as clinical when the headline is a neutral grotesk and every ID, coordinate and confidence label is mono.',
+      pairings: [['Inter Tight', 'Inter'], ['Geist', 'Geist'], ['Archivo', 'Inter']],
+    },
+  },
+  'xerox': {
+    family: 'print',
+    fonts: {
+      heading: { classes: ['condensed', 'heavy'], picks: ['Anton', 'Archivo Black', 'Bebas Neue'] },
+      body: { classes: ['typewriter', 'grotesk'], picks: ['Courier Prime', 'Special Elite', 'Work Sans'] },
+      mono: { picks: ['Courier Prime'] },
+      avoid: ['rounded', 'soft-serif', 'deco', 'geometric'],
+      why: 'A photocopied flyer needs one blunt, heavy headline face over typewriter or plain grotesk text, because copying turns anything delicate to mush.',
+      pairings: [['Anton', 'Courier Prime'], ['Archivo Black', 'Work Sans'], ['Bebas Neue', 'Special Elite']],
+    },
+  },
+  'micrographics': {
+    family: 'graphic',
+    fonts: {
+      heading: { classes: ['neo-grotesk', 'heavy'], picks: ['Inter Tight', 'Archivo Black', 'Geist'] },
+      body: { classes: ['neo-grotesk'], picks: ['Inter', 'IBM Plex Sans'] },
+      mono: { picks: ['Geist Mono', 'Azeret Mono', 'IBM Plex Mono'] },
+      avoid: ['serif', 'groovy', 'rounded', 'deco'],
+      why: 'One huge neutral headline against 8px mono microtype is the whole contrast, so both faces must stay precise and stay out of each other\'s way.',
+      pairings: [['Inter Tight', 'Inter'], ['Archivo Black', 'IBM Plex Sans'], ['Geist', 'Geist']],
+    },
+  },
+  'mixed-type': {
+    family: 'graphic',
+    fonts: {
+      heading: { classes: ['soft-serif', 'didone', 'grotesk'], picks: ['Instrument Serif', 'Playfair Display', 'Bricolage Grotesque', 'Fraunces'] },
+      body: { classes: ['neo-grotesk'], picks: ['Inter', 'Instrument Sans'] },
+      mono: { picks: ['DM Mono', 'Space Mono'] },
+      avoid: ['pixel', 'techno', 'groovy'],
+      why: 'Switching between a serif italic, a heavy grotesk and a mono inside one headline works only when the rest of the page stays on one quiet face.',
+      pairings: [['Instrument Serif', 'Instrument Sans'], ['Bricolage Grotesque', 'Inter'], ['Playfair Display', 'Inter']],
+    },
+  },
+  'ascii-art': {
+    family: 'digital',
+    fonts: {
+      heading: { classes: ['mono', 'pixel'], picks: ['JetBrains Mono', 'IBM Plex Mono', 'VT323', 'Space Mono'] },
+      body: { classes: ['mono'], picks: ['IBM Plex Mono', 'JetBrains Mono'] },
+      mono: { picks: ['VT323'] },
+      avoid: ['serif', 'rounded', 'groovy', 'deco'],
+      why: 'Characters on a grid are the medium, so every face is fixed-width and the headline is a mono or a pixel font.',
+      pairings: [['JetBrains Mono', 'IBM Plex Mono'], ['VT323', 'JetBrains Mono'], ['Space Mono', 'IBM Plex Mono']],
+    },
+  },
+  'rebus': {
+    family: 'graphic',
+    fonts: {
+      heading: { classes: ['heavy', 'geometric', 'rounded'], picks: ['Bricolage Grotesque', 'Archivo Black', 'Lexend', 'Fredoka'] },
+      body: { classes: ['geometric', 'neo-grotesk'], picks: ['DM Sans', 'Inter'] },
+      avoid: ['didone', 'old-style', 'techno', 'pixel'],
+      why: 'Flat pictograms sit in the line at the weight of the letters, so the headline needs a heavy, friendly sans that matches their bold shapes.',
+      pairings: [['Bricolage Grotesque', 'DM Sans'], ['Archivo Black', 'Inter'], ['Fredoka', 'DM Sans']],
+    },
+  },
 };
 
 /* ---------------- helpers ---------------- */

@@ -397,3 +397,5 @@ switch toggles status text; the field is a real input. Compare tiles are `inert`
 
 **Stubs:** the 7 unbuilt aesthetics have a js file (descriptors, placeholder SVG art, empty materials/rules) and an
 empty css file; their owners replace `art`, add `tokens`/`canvas` if needed, `materials`, `rules`, and fill the css.
+
+**Round 4 keys (P4 scaffold):** `blob-tracking` (21), `xerox` (22), `micrographics` (23), `mixed-type` (24), `ascii-art` (25), `rebus` (26); spec in docs/aesthetics-round4.md. New font class `typewriter` (Special Elite, Courier Prime with true italics `ital: '400;700'`).

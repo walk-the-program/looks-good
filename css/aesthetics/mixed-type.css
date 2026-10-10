@@ -1,0 +1,4 @@
+/* 24 Mixed Type - STUB (P4 scaffold). Every selector in this file is scoped under
+   .ab[data-ae="mixed-type"]. Reference: the current type-mixing trend in identities and editorial covers, specimen posters (Pangram Pangram, Displaay, Commercial Type): word-by-word face changes with cap heights aligned, on a strict grid. Spec: docs/aesthetics-round4.md. */
+
+.ab[data-ae="mixed-type"] .ab-hl { color: var(--ab-accent-ink); }

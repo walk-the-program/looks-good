@@ -1,0 +1,4 @@
+/* 26 Rebus - STUB (P4 scaffold). Every selector in this file is scoped under
+   .ab[data-ae="rebus"]. Reference: AIGA Eye on Design's "Nouveau Rebus" and Rand's IBM poster: dingbat-like flat pictograms (built in SVG, not emoji) replacing words in the headline, a brand-name rebus equation, small symbols in components. Spec: docs/aesthetics-round4.md. */
+
+.ab[data-ae="rebus"] .ab-hl { color: var(--ab-accent-ink); }

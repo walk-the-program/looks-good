@@ -15,8 +15,9 @@
 // family/weight is wrong, which would silently drop every webfont on the
 // page. Every entry below was verified against the live endpoint.
 //
-// `ital: '400'` marks families whose true italic is served; googleFamilyParam
-// (below) then requests it so italic text is not a synthesized oblique.
+// `ital: '400'` (or '400;700') marks families whose true italic is served at
+// those weights; googleFamilyParam (below) then requests it so italic text is
+// not a synthesized oblique.
 const FONTS = [
   /* ---- Serif ---- */
   { name: 'Playfair Display', css: '"Playfair Display", Georgia, serif', category: 'serif', weights: '400;700', ital: '400', cls: 'didone' },
@@ -114,6 +115,8 @@ const FONTS = [
   { name: 'Geist Mono', css: '"Geist Mono", monospace', category: 'mono', weights: '400;600', cls: 'mono' },
   { name: 'Azeret Mono', css: '"Azeret Mono", monospace', category: 'mono', weights: '400;600', cls: 'mono' },
   { name: 'VT323', css: '"VT323", monospace', category: 'mono', weights: '400', cls: 'pixel' },
+  { name: 'Special Elite', css: '"Special Elite", "Courier New", monospace', category: 'mono', weights: '400', cls: 'typewriter' },
+  { name: 'Courier Prime', css: '"Courier Prime", "Courier New", monospace', category: 'mono', weights: '400;700', ital: '400;700', cls: 'typewriter' },
 ];
 
 // Google Fonts css2 family parameter for a FONTS entry. Entries with
@@ -149,6 +152,7 @@ const FONT_CLASSES = {
   'pixel': { label: 'pixel', blurb: 'bitmap faces' },
   'slab': { label: 'slab serif', blurb: 'slab serifs' },
   'mono': { label: 'monospace', blurb: 'fixed-width faces' },
+  'typewriter': { label: 'typewriter', blurb: 'strike-on typewriter and photocopied-office faces' },
 };
 
 // Hand-picked [heading, body] combinations that are known to work. A

@@ -1,0 +1,2 @@
+/* 21 Blob Tracking - STUB (P4 scaffold). Every selector in this file is scoped under
+   .ab[data-ae="blob-tracking"]. Reference: the TouchDesigner / After Effects blob-track look, OpenCV-style detection overlays on footage: 1px bounding boxes with ID and confidence label tabs, crosshair centroids and connector lines over dithered monochrome footage. Spec: docs/aesthetics-round4.md. */
