@@ -36,6 +36,7 @@
 <link rel="stylesheet" href="css/aesthetics/ascii-art.css" />
 <link rel="stylesheet" href="css/aesthetics/rebus.css" />
 <link rel="stylesheet" href="css/brand-deck.css" />
+<link rel="stylesheet" href="css/patterns.css" />
 <link rel="stylesheet" href="css/color-picker.css" />
 </head>
 <body data-view="library">
@@ -354,6 +355,7 @@
           <div class="segmented view-toggle" role="radiogroup" aria-label="Board view">
             <label><input type="radio" name="boardView" value="board" checked /> Board</label>
             <label><input type="radio" name="boardView" value="compare" /> Compare all</label>
+            <label><input type="radio" name="boardView" value="patterns" /> Patterns</label>
           </div>
           <button id="exportPalettePng" class="btn btn-ghost btn-small">
             <svg class="ico" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M21 21H3"/></svg>
@@ -366,6 +368,7 @@
     <section class="ab-stage" aria-label="Design language board">
       <div id="previewCard"></div>
       <div class="cmp-grid" id="compareGrid" hidden></div>
+      <div class="pt-view" id="patternsView" hidden></div>
     </section>
 
     <section class="recommendations">
@@ -380,7 +383,7 @@
       <div class="section-head">
         <div class="deck-title">
           <h2>Brand deck</h2>
-          <p class="deck-desc" id="deckDesc">Nine guideline slides in the selected aesthetic language.</p>
+          <p class="deck-desc" id="deckDesc">Ten guideline slides in the selected aesthetic language.</p>
         </div>
         <!-- Icon is a CSS ::before rather than an inline <svg>: brand-deck.js
              swaps these buttons' textContent while exporting, which would wipe
@@ -450,6 +453,14 @@
 <script src="js/aesthetics/rebus.js"></script>
 <script src="js/aesthetic-meta.js"></script>
 <script src="js/aesthetic-board.js"></script>
+<script src="js/patterns/engine.js"></script>
+<script src="js/patterns/families/field.js"></script>
+<script src="js/patterns/families/stripe.js"></script>
+<script src="js/patterns/families/grid.js"></script>
+<script src="js/patterns/families/texture.js"></script>
+<script src="js/patterns/fit.js"></script>
+<script src="js/patterns-ui.js"></script>
+<script src="js/patterns-deck.js"></script>
 <script src="js/persistence.js"></script>
 <script src="js/undo-history.js"></script>
 <script src="js/brand-guide.js"></script>

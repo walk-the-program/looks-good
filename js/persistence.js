@@ -25,6 +25,8 @@ function serializeState(state) {
     typography: state.typography || null,
     // Suggestion ids the user dismissed for this brand.
     dismissedSuggestions: Array.isArray(state.dismissed) ? state.dismissed.slice().sort() : [],
+    // Pinned patterns (js/patterns-ui.js). Entries are immutable { key, params, colorway, seed }.
+    patterns: Array.isArray(state.patterns) ? state.patterns.map(p => ({ key: p.key, params: p.params, colorway: p.colorway, seed: p.seed })) : [],
   };
 }
 
@@ -104,6 +106,10 @@ function applySavedSessionToState(saved, state) {
   }
 
   state.dismissed = Array.isArray(saved.dismissedSuggestions) ? saved.dismissedSuggestions.slice() : [];
+
+  // Pinned patterns. Older brands have none; entries are cleaned against the
+  // engine's schema (unknown families dropped, parameters clamped).
+  state.patterns = typeof PatternPins !== 'undefined' ? PatternPins.normalizeList(saved.patterns) : [];
 
   // Restore logo if present
   if (saved.logoDataUrl && typeof saved.logoDataUrl === 'string') {

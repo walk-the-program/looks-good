@@ -472,7 +472,7 @@ function boardHtml(state, def) {
 
 /* ---------------- main board + compare grid ---------------- */
 
-let boardView = 'board';          // 'board' | 'compare' (UI only, never saved)
+let boardView = 'board';          // 'board' | 'compare' | 'patterns' (UI only, never saved)
 const CMP_WIDE = 900;             // design width of a tile board on a wide grid
 const CMP_NARROW = 500;           // ...and on a one-column grid
 
@@ -523,13 +523,22 @@ function fitCompareGrid() {
 function renderAestheticBoard() {
   const def = aestheticByKey(state.aesthetic);
   const compare = boardView === 'compare';
+  const patterns = boardView === 'patterns';
   const host = document.getElementById('previewCard');
   const grid = document.getElementById('compareGrid');
-  if (host) host.hidden = compare;
+  const pview = document.getElementById('patternsView');
+  if (host) host.hidden = compare || patterns;
   if (grid) grid.hidden = !compare;
-  // Only the visible view is built. The hidden one is emptied (Compare holds
-  // twenty full boards) and is rebuilt when its view is shown again.
-  if (compare) {
+  if (pview) pview.hidden = !patterns;
+  // Only the visible view is built. The hidden ones are emptied (Compare holds
+  // twenty full boards) and rebuilt when their view is shown again. The
+  // Patterns view (js/patterns-ui.js) keeps its own DOM but draws nothing
+  // while hidden.
+  if (typeof PatternsUI !== 'undefined') PatternsUI.setVisible(patterns);
+  if (patterns) {
+    if (host && host.firstChild) host.innerHTML = '';
+    if (grid && grid.firstChild) grid.innerHTML = '';
+  } else if (compare) {
     renderCompareGrid();
     if (host && host.firstChild) host.innerHTML = '';
   } else {
@@ -642,7 +651,7 @@ function stepAesthetic(dir) {
 }
 
 function setBoardView(view) {
-  boardView = view === 'compare' ? 'compare' : 'board';
+  boardView = view === 'compare' || view === 'patterns' ? view : 'board';
   renderAestheticBoard();
 }
 

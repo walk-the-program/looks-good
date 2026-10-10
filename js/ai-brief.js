@@ -199,6 +199,49 @@ function aibTypeRecommendation(state, def) {
   return out;
 }
 
+// "Patterns" section: which generative pattern families suit the aesthetic, how
+// pattern inks map to the brand roles, and the parameters of any pinned patterns.
+// Pure: reads js/patterns/*, never the DOM. Returns [] when the engine is absent.
+function aibPatternLines(state, def) {
+  if (typeof Patterns === 'undefined' || typeof Patterns.suiteFor !== 'function') return [];
+  const out = [];
+  const infoOf = key => Patterns.list().find(f => f.key === key);
+  const cwWord = v => ((Patterns.E.COLORWAYS.find(c => c.value === v) || {}).label || v);
+  const oneLine = s => String(s || '').replace(/\s+/g, ' ').trim();
+  out.push('## Patterns', '',
+    `Generative textures made only from the brand colors (Patterns view in Branding Designer). Use them as hero backgrounds, cover panels, section dividers and swatch walls. Keep body text on a plain \`--canvas\` area, never on a pattern.`, '',
+    '### Ink mapping', '',
+    '- ground = `--canvas`.',
+    '- ink1 = `--primary` (or `--ink` in the Mono colorway).',
+    '- ink2 = `--secondary`.',
+    '- spark = `--accent`, at most 5% of the pattern area.',
+    '- Colorways: Brand (the roles above), Mono (ink on canvas), Duotone (primary on canvas), Night (canvas and ink swapped). "+ tints" adds lighter mixes of primary and secondary toward the canvas.',
+    '- Never introduce a color a pattern does not get from these roles.', '',
+    `### Families that fit ${def.name}`, '');
+  Patterns.suiteFor(def.key).forEach(s => {
+    const f = infoOf(s.key);
+    if (!f) return;
+    out.push(`- **${s.name}** (${f.name}, ${cwWord(s.colorway)}): ${oneLine(f.blurb)}`);
+  });
+  out.push('');
+  const pinned = typeof PatternPins !== 'undefined' ? PatternPins.normalizeList(state.patterns) : [];
+  if (pinned.length) {
+    out.push('### Pinned patterns', '', 'These were chosen for this brand. Reproduce them with the same family, colorway, seed and parameters.', '');
+    pinned.forEach((p, i) => {
+      const f = infoOf(p.key);
+      const defaults = Patterns.defaults(p.key);
+      const changed = Object.keys(p.params).filter(k => p.params[k] !== defaults[k]).map(k => `${k} ${p.params[k]}`);
+      out.push(`${i + 1}. **${f.name}**, ${cwWord(p.colorway)} colorway, seed \`${p.seed}\`. ${changed.length ? 'Changed from defaults: ' + changed.join(', ') + '.' : 'Default parameters.'}` +
+        `${f.seamless ? ' Seamless: tiles as a 128px square CSS background tile (Patterns view, "Copy CSS tile"; not inlined here, the data URI is too long).' : ''}` +
+        `${f.vector ? ' Available as SVG.' : ''}`);
+    });
+    out.push('');
+  } else {
+    out.push('No patterns are pinned for this brand yet. Pick from the families above.', '');
+  }
+  return out;
+}
+
 function buildAiBrief(state) {
   const def = aestheticByKey(state.aesthetic);
   const t = boardTokens(state, def);
@@ -331,6 +374,9 @@ function buildAiBrief(state) {
   if (!(def.materials || []).length) push('- None defined. Use flat fills from the tokens above.');
   if (unresolved.length) console.warn(`buildAiBrief: unresolved material placeholders for ${def.key}: ${unresolved.join(', ')}`);
   push('');
+
+  /* 9b. Patterns */
+  push(...aibPatternLines(state, def));
 
   /* 10. Do / Don't */
   const rules = def.rules || {};

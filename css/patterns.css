@@ -1,0 +1,153 @@
+/* ---------------------------------------------------------------------
+   patterns.css — the Patterns view (js/patterns-ui.js) and the pattern parts
+   of the Brand deck (js/patterns-deck.js).
+
+   Part 1: app chrome, same warm-grey language as the rest of the workspace
+   (small-caps labels, hairlines, no colour). The only colour on screen is the
+   pattern itself, drawn from the brand.
+   Part 2: deck slides, using board tokens (--ab-*) only.
+------------------------------------------------------------------------ */
+
+/* ======================= Part 1: Patterns view ======================= */
+
+/* Board | Compare all | Patterns */
+.view-toggle { width: 258px; grid-template-columns: repeat(3, 1fr); }
+
+.pt-view { min-width: 0; }
+.pt-grid { display: grid; grid-template-columns: minmax(0, 1fr) 280px; gap: 24px; align-items: start; }
+.pt-main { min-width: 0; display: flex; flex-direction: column; gap: 28px; }
+
+/* stage: the big live canvas */
+.pt-stage { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.pt-canvas-wrap {
+  position: relative; width: 100%; aspect-ratio: 16 / 9; overflow: hidden;
+  border-radius: var(--r-card); background: var(--surface);
+  box-shadow: 0 0 0 1px var(--line-strong), var(--shadow-2);
+}
+.pt-canvas-wrap canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.pt-bar { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 28px; }
+.pt-bar-name { display: flex; align-items: baseline; flex-wrap: wrap; gap: 2px 10px; min-width: 0; }
+.pt-bar-name strong { font-size: 13px; font-weight: 600; color: var(--ink); }
+.pt-bar-name span { font-family: var(--font-mono); font-size: 11px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.pt-pin { flex: none; }
+.pt-pin svg { flex: none; }
+.pt-pin[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: #fff; }
+.pt-pin[aria-pressed="true"]:hover { background: #333; border-color: #333; }
+.pt-exports { display: flex; flex-wrap: wrap; gap: 6px; }
+.pt-exports .btn:disabled { opacity: 0.35; cursor: default; }
+
+/* strips: suite, pinned, all families */
+.pt-block-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; padding-bottom: 8px; margin-bottom: 12px; border-bottom: 1px solid var(--line-strong); }
+.pt-block-head h3 { margin: 0; font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); }
+.pt-block-head span { font-size: 12px; color: var(--muted); }
+.pt-strip { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 10px; }
+.pt-strip-pins { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.pt-empty { margin: 0; font-size: 12.5px; line-height: 1.5; color: var(--muted); }
+
+.pt-tile { position: relative; min-width: 0; }
+.pt-tile-main {
+  display: flex; flex-direction: column; gap: 6px; width: 100%; padding: 0; margin: 0; text-align: left;
+  font: inherit; color: var(--ink); background: none; border: 0; cursor: pointer;
+}
+.pt-tile-main canvas {
+  display: block; width: 100%; height: auto; aspect-ratio: 16 / 9; border-radius: 8px; background: var(--surface);
+  box-shadow: 0 0 0 1px var(--line-strong); transition: box-shadow var(--dur) var(--ease);
+}
+.pt-tile-main:hover canvas { box-shadow: 0 0 0 1px var(--ink), 0 6px 18px rgba(0, 0, 0, 0.08); }
+.pt-tile-main:focus-visible canvas { box-shadow: 0 0 0 2px var(--ink); }
+.pt-tile.is-on canvas { box-shadow: 0 0 0 2px var(--ink); }
+.pt-tile-cap { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+.pt-tile-cap b { font-size: 12px; font-weight: 500; line-height: 1.25; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pt-tile-cap i { font-style: normal; font-size: 11px; line-height: 1.25; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.pt-star {
+  position: absolute; top: 6px; right: 6px; display: grid; place-items: center; width: 26px; height: 26px; padding: 0;
+  color: var(--ink); background: rgba(255, 255, 255, 0.92); border: 1px solid rgba(0, 0, 0, 0.12); border-radius: 50%;
+  cursor: pointer; transition: transform var(--dur) var(--ease), background-color var(--dur) var(--ease);
+}
+.pt-star:hover { transform: scale(1.08); background: #fff; }
+.pt-star[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: #fff; }
+.pt-star svg { display: block; }
+
+.pt-picker { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 10px 10px; }
+.pt-fam {
+  display: flex; flex-direction: column; gap: 5px; min-width: 0; padding: 0; text-align: left;
+  font: inherit; font-size: 11.5px; line-height: 1.25; color: var(--muted); background: none; border: 0; cursor: pointer;
+  transition: color var(--dur) var(--ease);
+}
+.pt-fam canvas { display: block; width: 100%; height: auto; aspect-ratio: 16 / 9; border-radius: 6px; background: var(--surface); box-shadow: 0 0 0 1px var(--line-strong); transition: box-shadow var(--dur) var(--ease); }
+.pt-fam span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pt-fam:hover { color: var(--ink); }
+.pt-fam:hover canvas { box-shadow: 0 0 0 1px var(--ink); }
+.pt-fam:focus-visible canvas { box-shadow: 0 0 0 2px var(--ink); }
+.pt-fam[aria-pressed="true"] { color: var(--ink); font-weight: 500; }
+.pt-fam[aria-pressed="true"] canvas { box-shadow: 0 0 0 2px var(--ink); }
+
+/* side: controls */
+.pt-side {
+  display: flex; flex-direction: column; gap: 18px; min-width: 0; padding: 18px;
+  background: var(--surface); border: 1px solid var(--line-strong); border-radius: var(--r-card);
+  position: sticky; top: 24px;
+}
+.pt-blurb { margin: 0; font-size: 12.5px; line-height: 1.5; color: var(--muted); }
+.pt-group { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.pt-label { font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); }
+.pt-seg { grid-template-columns: repeat(4, 1fr); }
+.pt-seg label { padding: 0 2px; }
+.pt-seedrow { display: flex; gap: 8px; align-items: center; }
+.pt-seedrow input[type="text"] { flex: 1 1 0; min-width: 0; font-family: var(--font-mono); font-size: 12px; }
+.pt-seedrow .btn { flex: none; }
+.pt-controls { display: flex; flex-direction: column; gap: 12px; }
+.pt-ctl { display: flex; flex-direction: column; gap: 6px; font-size: 12px; color: var(--ink-2); }
+.pt-ctl-top { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
+.pt-ctl output { font-family: var(--font-mono); font-size: 11px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.pt-ctl select { height: 30px; font-size: 12.5px; }
+.pt-tog { justify-content: space-between; width: 100%; margin: 0; font-size: 12px; text-transform: none; letter-spacing: 0; color: var(--ink-2); }
+.pt-side .btn:disabled { opacity: 0.4; cursor: default; }
+
+/* the workspace is a size container (.ab-stage); stack the controls under the canvas when narrow */
+@container cmp (max-width: 900px) {
+  .pt-grid { grid-template-columns: minmax(0, 1fr); }
+  .pt-side { position: static; }
+  .pt-controls { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px 18px; }
+  .pt-strip { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .pt-picker { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+@container cmp (max-width: 520px) {
+  .pt-controls { grid-template-columns: minmax(0, 1fr); }
+  .pt-strip, .pt-strip-pins { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .pt-picker { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .pt-exports .btn { flex: 1 1 auto; }
+  .pt-side { padding: 14px; }
+}
+@media (max-width: 900px) {
+  .view-toggle { width: 258px; max-width: 100%; }
+}
+
+/* ======================= Part 2: deck ======================= */
+
+/* Patterns slide */
+.ab-deck-patterns { display: flex; flex-direction: column; gap: 12px; min-height: 0; }
+.ab-deck-patterns > .ab-labelrow { flex: none; margin: 0; }
+.ab-deck-ptgrid { flex: 1 1 0; min-height: 0; display: grid; gap: 16px 18px; grid-template-columns: repeat(3, minmax(0, 1fr)); grid-template-rows: repeat(2, minmax(0, 1fr)); }
+.ab-deck-ptgrid[data-n="1"] { grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(0, 1fr); }
+.ab-deck-ptgrid[data-n="2"] { grid-template-columns: repeat(2, minmax(0, 1fr)); grid-template-rows: minmax(0, 1fr); }
+.ab-deck-ptgrid[data-n="3"] { grid-template-rows: minmax(0, 1fr); }
+.ab-deck-ptgrid[data-n="4"] { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.ab-deck-pt { margin: 0; min-width: 0; min-height: 0; display: flex; flex-direction: column; gap: 8px; }
+.ab-deck-pt img {
+  flex: 1 1 0; min-height: 0; width: 100%; display: block; object-fit: cover;
+  border-radius: min(var(--dk-r, 8px), 12px); box-shadow: 0 0 0 1px var(--ab-line);
+}
+.ab-deck-pt figcaption { flex: none; display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+.ab-deck-pt figcaption .ab-label { margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ab-deck-ptcw { color: var(--ab-muted) !important; }
+
+/* Cover / closing: a full-height pattern strip on one edge. The slide content is
+   padded away from it, so no text ever sits on the pattern. */
+.pt-deck-strip { position: absolute; top: 0; bottom: 0; width: 288px; overflow: hidden; }
+.pt-deck-strip[data-side="right"] { right: 0; box-shadow: inset 1px 0 0 var(--ab-line); }
+.pt-deck-strip[data-side="left"] { left: 0; box-shadow: inset -1px 0 0 var(--ab-line); }
+.pt-deck-strip img { position: absolute; inset: 0; width: 100%; height: 100%; display: block; object-fit: cover; }
+.ab.ab-slide:has(> .ab-deck-pattern > .pt-deck-strip[data-side="right"]) > .ab-in.ab-slide-in { padding-right: 372px; }
+.ab.ab-slide:has(> .ab-deck-pattern > .pt-deck-strip[data-side="left"]) > .ab-in.ab-slide-in { padding-left: 372px; }

@@ -48,6 +48,7 @@ const BrandSession = (function () {
     state.logoDataUrl = null;
     state.bgMode = 'light';
     state.dismissed = [];
+    state.patterns = [];
   }
 
   function syncLogoUi() {
@@ -244,12 +245,13 @@ const BrandSession = (function () {
 
     // undo-history.js only snapshots fonts, colors, shape and typography.
     // Selecting an aesthetic also changes the aesthetic itself and bgMode, so
-    // both ride along on every snapshot and come back on Undo.
+    // both ride along on every snapshot and come back on Undo. So do the
+    // pinned patterns (pin / unpin is one undo step).
     const pushBase = window.pushUndoSnapshot;
     window.pushUndoSnapshot = function (st, withTypography) {
       pushBase(st, withTypography);
       const snap = undoStack[undoStack.length - 1];
-      if (snap) { snap.aesthetic = st.aesthetic; snap.bgMode = st.bgMode; }
+      if (snap) { snap.aesthetic = st.aesthetic; snap.bgMode = st.bgMode; snap.patterns = (st.patterns || []).slice(); }
     };
     const applyBase = window.applyUndoSnapshot;
     window.applyUndoSnapshot = function (snap, st) {
@@ -257,6 +259,7 @@ const BrandSession = (function () {
       if (!snap) return;
       if (snap.aesthetic) st.aesthetic = snap.aesthetic;
       if (snap.bgMode) st.bgMode = snap.bgMode;
+      if (snap.patterns) st.patterns = snap.patterns.slice();
     };
 
     // Snapshot before each shuffle so Undo has something to go back to.

@@ -24,6 +24,7 @@ const state = {
   aesthetic: 'soft-form',   // key into AESTHETICS (js/aesthetics/registry.js)
   locks: { typography: false, color: false, shape: false, aesthetic: false },
   dismissed: [],   // suggestion ids dismissed for this brand
+  patterns: [],    // pinned patterns: [{ key, params, colorway, seed }] (js/patterns-ui.js)
 };
 
 function pickRandom(arr) { return arr[Math.floor(Math.random() * arr.length)]; }

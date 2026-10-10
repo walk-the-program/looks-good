@@ -2,7 +2,7 @@
 
 A local, no-build-step tool for rapidly auditioning brand combinations —
 fonts, color palettes, and shape/style language — with live heuristic
-design feedback and a nine-slide brand deck rendered in the selected aesthetic. The
+design feedback and a ten-slide brand deck rendered in the selected aesthetic. The
 app chrome is a light warm-grey workspace so the only colors on screen
 are the brand's own.
 
@@ -106,6 +106,29 @@ for this (Inter Tight, Bricolage Grotesque, Fredoka, Baloo 2, Michroma, Orbitron
 Chakra Petch, Rajdhani, Poiret One, Limelight, Shrikhand, Bagel Fat One, Press
 Start 2P, Silkscreen, Pixelify Sans, VT323).
 
+## Patterns
+
+A third workspace view, **Patterns** (next to Board and Compare all), is a
+generative pattern studio driven by the same brand colors. Eighteen original
+generators (halftone, stipple, zigzag, weave, op-art rings, counterchange,
+pixel quilt, gradient panes, glyph grid, torn bands, posterised terrain, aura
+wash, chevron mirror, modular grid, flow filaments, signal mosaic, type
+terrain, arc rise) paint a large live canvas. Patterns never invent colors:
+ground is the canvas, ink 1 the primary, ink 2 the secondary, and the accent
+is a spark under 5% of the area. **Colorway** switches between Brand, Mono,
+Duotone and Night, **+ tints** adds lighter mixes, and every family's own
+controls are built from its schema. Seed plus parameters reproduce the same
+pixels; **New variation** reseeds. The **Brand suite** is six patterns tuned
+to the current aesthetic (click to load); the star **pins** a pattern to the
+brand. Pins are saved with the brand, are one Undo step, and show up in the
+**Patterns** deck slide (slide 7), as the strip on the cover and closing
+slides, and in the AI brief. Export PNG at 1x, 2x or 4K, SVG for the vector
+families, or **Copy CSS tile** (a seamless 128px background) for the
+families that tile. Files: `js/patterns/` (engine, families, aesthetic fit),
+`js/patterns-ui.js`, `js/patterns-deck.js`, `css/patterns.css`; spec in
+`docs/patterns.md`. `dev/patterns-lab.html` is a developer test bench only and
+is not part of the app or the Mac build's runtime.
+
 ## Color roles, picker and paste import
 
 Every color has one job, a "never" rule and a coverage target (canvas, ink,
@@ -128,7 +151,8 @@ color "for whatever it wants". It lists every color token with its exact hex
 never / coverage, hard rules (one primary action per view, accent at 5% or
 less, text only in ink, muted or on-* tokens), a component-by-component color
 map, contrast ratios, fonts with a Google Fonts URL, the aesthetic's material
-recipes with real values, do / don't lists and a CSS variables block. It
+recipes with real values, a Patterns section (ink mapping, the six families that fit the aesthetic,
+the pinned patterns' parameters), do / don't lists and a CSS variables block. It
 describes the current brand in its current mode and aesthetic. File:
 `js/ai-brief.js` (`buildAiBrief(state)`, no DOM access).
 
@@ -172,13 +196,14 @@ x dismisses it for that brand. Locked sections get none.
   sans, display, mono), and reads the palette's hue/saturation/lightness
   relationships to call out clashing, flat, or well-separated color
   choices.
-- **Brand deck** — nine 16:9 brand-guideline slides rendered *inside* the
+- **Brand deck** — ten 16:9 brand-guideline slides rendered *inside* the
   selected aesthetic, so the slides and the board always agree: cover,
   principles, color system (roles, proportion bar, contrast pairs),
   typography (face specimens, type scale, the recommended faces and how the
   current ones fit), interface (segmented control, CTA, field, toggle and
   the three states), material and graphics (the signature art plus the
-  aesthetic's material names), in product (a composed app screen), do and
+  aesthetic's material names), patterns (the pinned patterns, or the aesthetic's
+  suite), in product (a composed app screen), do and
   don't, and a closing slide. Each slide is its own `.ab[data-ae]` root at a
   fixed 1280x720, so every aesthetic's CSS applies unchanged; the cards
   shrink them with CSS `zoom`. The brand name, tagline, logo, fonts and
@@ -208,13 +233,14 @@ index.html
 css/styles.css           app chrome — the light workspace, the sidebar's
                          collapsible sections, and the live "preview-scope"
                          theme surface
+css/patterns.css         Patterns view and pattern deck styles
 css/brand-deck.css       the brand deck: slide cards + neutral slide styles
                          (`.ab-slide`, `.ab-deck-*`)
 js/data.js               font list, curated pairings, shape presets,
                          color-scheme recipes
 js/color.js              HSL/hex conversion, WCAG contrast math, palette generation
 js/rules.js              the recommendation/heuristics engine
-js/brand-deck.js         the nine-slide brand deck (DECK_SLIDES), fit pass, PNG/PDF export,
+js/brand-deck.js         the ten-slide brand deck (DECK_SLIDES), fit pass, PNG/PDF export,
                          plus the shared slMix/slVisible/slFit/slRadius helpers
 js/persistence.js        session autosave/restore via localStorage
 js/undo-history.js       bounded undo stack for shuffle actions
@@ -229,6 +255,9 @@ js/aesthetic-board.js    design language board, Compare all, Aesthetic panel, fa
 js/aesthetic-meta.js     per-aesthetic family and font recommendations
 js/color-roles.js        the five color roles (use / never / coverage)
 js/color-picker.js       inline HSV picker; js/color-import.js parses pasted colors
+js/patterns/             pattern engine, 18 families, aesthetic fit (suites)
+js/patterns-ui.js        Patterns workspace view and pin helpers
+js/patterns-deck.js      Patterns deck slide and cover/closing strips
 js/ai-brief.js           Markdown AI brief (buildAiBrief)
 js/brand-guide.js        brand guide deck content + styles
 js/export-html.js        standalone HTML export of the brand guide

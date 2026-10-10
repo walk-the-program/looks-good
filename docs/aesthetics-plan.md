@@ -401,9 +401,9 @@ switch toggles status text; the field is a real input. Compare tiles are `inert`
   and its output is byte-identical to before the refactor. Builders on `P`: `rootOpen(extraClass, extraAttrs)`, `head(pre, name)`, `art()`, `hero()`, `swatches()`, `palette()`, `type()`,
   `card()` (01 card), `panel()` (02 field/toggle/states), `list()` (03 rows), `secUi() / secTouch() / secUse()`, `foot()`; data on `P`: `t` (tokens), `copy`, `roles`, `layout`, `labels`,
   `brand`, `style`, `uid`.
-- `js/brand-deck.js` renders nine slides (`DECK_SLIDES`: cover, principles, color, typography, interface, material, product, dodont, closing). Each is `section.ab.ab-slide[data-ae][data-slide=key]`
+- `js/brand-deck.js` renders ten slides (`DECK_SLIDES`: cover, principles, color, typography, interface, material, patterns, product, dodont, closing). Each is `section.ab.ab-slide[data-ae][data-slide=key]`
   at 1280x720 (`overflow: clip`), so every aesthetic's scoped css applies to the shared `.ab-*` classes inside it. Slide chrome: `.ab-in.ab-slide-in > .ab-head (Brand guidelines / <title>) +
-  .ab-rule + .ab-slide-body > one wrapper element + .ab-foot.ab-slide-foot (dot + aesthetic name, "n / 09")`.
+  .ab-rule + .ab-slide-body > one wrapper element + .ab-foot.ab-slide-foot (dot + aesthetic name, "n / 10")`.
 - An aesthetic may restyle any `.ab-deck-*` class with `.ab[data-ae="key"].ab-slide ...` (neutral defaults in css/brand-deck.css, which loads after the aesthetic css). Classes: `ab-deck-cover`,
   `ab-deck-principles / -lead / -plist / -principle / -ptitle / -pline`, `ab-deck-color / -roles / -role / -lower / -ratio / -bar / -seg / -legend / -pairs / -pair / -pchip`,
   `ab-deck-type / -faces / -face / -aa / -scalecol / -scale / -sample / -rec`, `ab-deck-sections`, `ab-deck-material / -stage / -matcol / -mats / -mat / -note`,
@@ -419,6 +419,21 @@ switch toggles status text; the field is a real input. Compare tiles are `inert`
   checkbox inputs for spans (html2canvas throws on both). `downloadDeckSlidePng`, `buildBrandDeckPdf(scale)` (jsPDF, landscape 1280x720 px pages, JPEG per slide).
 - Extension points: push `{ key, title, name?, foot?, pattern?, build(P, state, def, t) -> body HTML }` into `DECK_SLIDES` (or `registerDeckSlide(slide, afterKey)`); assign `deckPatternHook =
   (P, slideKey) => HTML` to lay a background pattern behind slides flagged `pattern: true` (cover and closing). Both are no-ops until used.
+
+**Patterns hooks (PU; spec in docs/patterns.md):**
+
+- Workspace view toggle is `Board | Compare all | Patterns` (`boardView` in aesthetic-board.js: `'board' | 'compare' | 'patterns'`, UI only, never saved). `renderAestheticBoard()` shows
+  `#patternsView` for `'patterns'`, empties the board and Compare DOM, and calls `PatternsUI.setVisible(on)` (js/patterns-ui.js), which draws nothing while hidden.
+- `state.patterns` = pinned patterns `[{ key, params, colorway, seed }]` (max 8, immutable entries: always replace the array). Saved by `serializeState` / `applySavedSessionToState`
+  (normalised through `PatternPins.normalizeList`), reset by `resetState`, and carried in every undo snapshot (brand-session.js wraps `pushUndoSnapshot` / `applyUndoSnapshot`).
+  Pin and unpin are one undo step and mark the brand unsaved like any other edit.
+- Pattern inks come from `Patterns.inksFor(state | P.t, colorway)`, which uses `boardTokens`, so patterns match the board exactly (ground = canvas, ink1 = primary, ink2 = secondary,
+  spark = accent).
+- Deck (js/patterns-deck.js, loaded after brand-deck.js): `registerDeckSlide({ key: 'patterns' }, 'material')` adds slide 07 (pinned patterns, else the six-pattern suite, as `<img>` data URLs;
+  classes `ab-deck-patterns / -ptgrid / -pt / -ptcw`); `deckPatternHook` returns `.pt-deck-strip` (a 288px full-height pattern strip, right edge on the cover, left edge on the closing slide).
+  css/patterns.css pads `.ab-slide-in` away from the strip with `:has(> .ab-deck-pattern > .pt-deck-strip)`, so slide text never sits on a pattern. `bdFitDeck` is wrapped to shrink the
+  closing headline until the copy block clears the contact row.
+- AI brief: `aibPatternLines(state, def)` adds a `## Patterns` section (ink mapping, the aesthetic's six families, pinned patterns' parameters; seamless pins get a CSS tile size note, never the data URI).
 
 **Stubs:** the 7 unbuilt aesthetics have a js file (descriptors, placeholder SVG art, empty materials/rules) and an
 empty css file; their owners replace `art`, add `tokens`/`canvas` if needed, `materials`, `rules`, and fill the css.

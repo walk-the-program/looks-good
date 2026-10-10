@@ -1,0 +1,100 @@
+/* ---------------------------------------------------------------------
+   patterns-deck.js — patterns in the Brand deck (js/brand-deck.js).
+
+   1. A "Patterns" slide after "Material & graphics": a wall of the pinned
+      patterns (or the aesthetic's six-pattern suite when nothing is pinned).
+   2. deckPatternHook: the cover and the closing slide get a full-height
+      pattern strip down one edge. css/patterns.css pads the slide content
+      away from the strip, so text never sits on a pattern.
+
+   Every pattern is rendered to a <canvas> and handed to the slide as a
+   data-URL <img>, which is what html2canvas (PNG / PDF export) can draw.
+   Results are cached by family, parameters, inks and size, so retyping the
+   brand name does not re-render anything.
+------------------------------------------------------------------------ */
+(function () {
+  'use strict';
+  if (!window.Patterns || typeof registerDeckSlide !== 'function') return;
+  const P = window.Patterns;
+  const cache = new Map();
+  const STRIP_W = 288;                 // CSS px of the cover / closing strip
+  // Image area (CSS px at the 1280x720 design size) for a wall of n patterns.
+  const WALL = { 1: [1168, 457], 2: [575, 457], 3: [377, 457], 4: [575, 208], 5: [377, 208], 6: [377, 208] };
+
+  const famName = key => (P.get(key) || {}).name || key;
+  const cwLabel = v => (P.E.COLORWAYS.find(c => c.value === v) || {}).label || v;
+
+  function suiteEntries(def) {
+    return P.suiteFor(def.key).map(s => PatternPins.normalize({
+      key: s.key, params: Object.assign(P.defaults(s.key), s.params), colorway: s.colorway, seed: PatternPins.SUITE_SEED,
+    })).filter(Boolean);
+  }
+
+  // The patterns shown on the wall: pinned ones, else the suite.
+  function wallEntries(state, def) {
+    const pinned = PatternPins.normalizeList(state.patterns).slice(0, 6);
+    return pinned.length ? { pinned: true, list: pinned } : { pinned: false, list: suiteEntries(def) };
+  }
+
+  // Data-URL for one pattern at w x h CSS px, rendered at `dpr`.
+  function urlFor(tokens, entry, w, h, dpr) {
+    const inks = P.inksFor(tokens, entry.colorway, { tints: !!entry.params.tints });
+    const key = [entry.key, JSON.stringify(entry.params), entry.colorway, entry.seed, inks.ground, inks.ink1, inks.ink2, inks.spark, inks.deep, inks.t1, inks.t2, w, h, dpr].join('|');
+    let url = cache.get(key);
+    if (!url) {
+      const c = document.createElement('canvas');
+      P.render(c, entry.key, entry.params, inks, entry.seed, { width: w, height: h, dpr, setStyle: false });
+      url = c.toDataURL('image/png');
+      if (url.length > 450000) url = c.toDataURL('image/jpeg', 0.92);   // grainy fields: PNG gets huge
+      cache.set(key, url);
+      if (cache.size > 40) cache.delete(cache.keys().next().value);
+    }
+    return url;
+  }
+
+  registerDeckSlide({
+    key: 'patterns', title: 'Patterns',
+    build(Parts, state, def, t) {
+      const e = escapeHtml;
+      const { pinned, list } = wallEntries(state, def);
+      const n = Math.max(1, Math.min(6, list.length));
+      const [w, h] = WALL[n];
+      const tiles = list.slice(0, 6).map(en => `<figure class="ab-deck-pt">
+          <img src="${urlFor(t, en, w, h, 2)}" alt="${e(famName(en.key))} pattern" />
+          <figcaption><span class="ab-label">${e(famName(en.key))}</span><span class="ab-label ab-deck-ptcw">${e(cwLabel(en.colorway))}</span></figcaption>
+        </figure>`).join('');
+      return `<div class="ab-deck-patterns">
+        <div class="ab-labelrow"><span class="ab-label">${pinned ? 'Pinned patterns' : 'Pattern suite'}</span><span class="ab-label">${e(def.name)}</span></div>
+        <div class="ab-deck-ptgrid" data-n="${n}">${tiles}</div>
+      </div>`;
+    },
+  }, 'material');
+
+  // Cover and closing: the first pinned pattern, else the first of the suite.
+  deckPatternHook = function (Parts, slideKey) {
+    const entry = (PatternPins.normalizeList(Parts.state.patterns)[0]) || suiteEntries(Parts.def)[0];
+    if (!entry) return '';
+    const side = slideKey === 'closing' ? 'left' : 'right';
+    return `<div class="pt-deck-strip" data-side="${side}"><img src="${urlFor(Parts.t, entry, STRIP_W, 720, 2)}" alt="" /></div>`;
+  };
+
+  // The closing slide's headline can outgrow its column once the pattern strip
+  // narrows it, and brand-deck.js only shrinks it when the whole slide body
+  // overflows. Shrink it further until the copy block fits above the contact row.
+  if (typeof bdFitDeck === 'function') {
+    const baseFit = bdFitDeck;
+    bdFitDeck = function (grid) {
+      baseFit(grid);
+      grid.querySelectorAll('.ab-slide[data-slide="closing"]').forEach(root => {
+        const main = root.querySelector('.ab-deck-closemain');
+        if (!main || !root.querySelector('.pt-deck-strip')) return;
+        let hs = parseFloat(root.style.getPropertyValue('--ab-hs')) || 1;
+        const floor = (parseFloat(root.dataset.hs0) || 1) * 0.4;
+        for (let i = 0; i < 30 && hs > floor && main.scrollHeight > main.clientHeight + 1; i++) {
+          hs *= 0.94;
+          root.style.setProperty('--ab-hs', hs.toFixed(3));
+        }
+      });
+    };
+  }
+})();
