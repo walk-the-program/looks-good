@@ -1,6 +1,215 @@
 /* ---------------------------------------------------------------------
-   13 Y2K Chrome — STUB (owner N1). Empty on purpose: the base board styles apply.
-   Scope EVERY selector under .ab[data-ae="y2k-chrome"], restyle the shared
-   board classes (see docs/aesthetics-plan.md "Board anatomy"), and provide
-   prefers-reduced-motion / prefers-reduced-transparency handling where used.
+   13 Y2K Chrome — liquid, metallic, hyper. Opaque polished metal on a
+   near-black field. The signature is a silver gradient with a HARD HORIZON
+   (--ab-chrome / --ab-chrome-fixed), used on the headline (background-clip:
+   text, repeated per line), the rims and the blobby pill buttons. Variables
+   --ab-chrome*, --ab-rim, --ab-metal-hi/-lo, --ab-gloss, --ab-pri-glow ...
+   come from js/aesthetics/y2k-chrome.js tokens().
+   Hooks used: hero 'split' (a large sculpture), palette 'chips' (chrome-rimmed
+   pills), highlight 'custom' (dark chrome on an acid plate), states 'swatch'.
 ------------------------------------------------------------------------ */
+
+.ab[data-ae="y2k-chrome"] {
+  --y2-metal: linear-gradient(180deg, var(--ab-metal-hi), var(--ab-metal-lo));
+  /* gloss + primary fill inside, chrome rim around: the blobby pill */
+  --y2-pill: var(--ab-gloss) padding-box, linear-gradient(var(--ab-primary), var(--ab-primary)) padding-box, var(--ab-chrome-fixed) border-box;
+  --y2-silver: linear-gradient(180deg, #ffffff 0%, #d5d9de 46%, #f6f6f6 50%, #a3a9b0 52%, #c9cdd2 100%);
+  border-radius: 26px;
+  background:
+    radial-gradient(circle at 12% 16%, rgba(255,255,255,0.8) 0 1px, transparent 1.6px),
+    radial-gradient(circle at 91% 9%, rgba(255,255,255,0.6) 0 1px, transparent 1.6px),
+    radial-gradient(circle at 6% 52%, rgba(255,255,255,0.45) 0 1px, transparent 1.6px),
+    radial-gradient(circle at 95% 47%, rgba(255,255,255,0.5) 0 1px, transparent 1.6px),
+    radial-gradient(circle at 48% 3%, rgba(255,255,255,0.45) 0 1px, transparent 1.6px),
+    var(--ab-canvas);
+}
+/* the faint primary glow the field sits in */
+.ab[data-ae="y2k-chrome"]::before {
+  content: ""; position: absolute; inset: 0 0 auto 0; height: 760px; z-index: 0; pointer-events: none;
+  background:
+    radial-gradient(ellipse 46% 42% at 76% 22%, var(--ab-pri-glow), transparent 70%),
+    radial-gradient(ellipse 34% 30% at 14% 38%, var(--ab-sec-glow), transparent 72%);
+  opacity: 0.55;
+}
+
+/* ---- header ---- */
+.ab[data-ae="y2k-chrome"] .ab-brand { font-weight: var(--ab-hw, 800); letter-spacing: calc(-0.02em * var(--ab-tr, 1)); }
+.ab[data-ae="y2k-chrome"] .ab-wordmark {
+  background: var(--ab-chrome) 0 0 / 100% 1.25em repeat-y; -webkit-background-clip: text; background-clip: text;
+  -webkit-text-fill-color: transparent; color: transparent; line-height: 1.25;
+}
+.ab[data-ae="y2k-chrome"] .ab-mark {
+  width: 32px; height: 32px; border-radius: 62% 38% 56% 44% / 48% 58% 42% 52%; color: #14161a;
+  background: var(--ab-gloss), var(--ab-chrome-fixed); box-shadow: 0 0 0 1px rgba(0,0,0,0.5), 0 0 16px -2px var(--ab-pri-glow);
+  font-weight: var(--ab-hw, 800);
+}
+.ab[data-ae="y2k-chrome"] .ab-tag { font-size: 10.5px; letter-spacing: 0.2em; }
+.ab[data-ae="y2k-chrome"] .ab-tag::before { content: "✦"; margin-right: 8px; color: var(--ab-accent); letter-spacing: 0; }
+.ab[data-ae="y2k-chrome"] .ab-rule { height: 2px; background: var(--ab-rim); opacity: 0.5; border-radius: 2px; }
+
+/* ---- hero: chrome headline beside a liquid chrome sculpture ---- */
+.ab[data-ae="y2k-chrome"] .ab-hero { grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); gap: clamp(14px, 3cqw, 40px); padding: clamp(30px, 5cqw, 64px) 0 clamp(26px, 4.4cqw, 54px); }
+.ab[data-ae="y2k-chrome"] .ab-kicker {
+  display: inline-flex; align-items: center; gap: 9px; padding: 6px 15px 6px 12px; margin-bottom: clamp(14px, 2cqw, 22px) !important;
+  border: 1.5px solid transparent; border-radius: 999px; font-size: 11px; font-weight: 600; letter-spacing: 0.18em; color: var(--ab-ink);
+  background: linear-gradient(var(--ab-metal-lo), var(--ab-metal-lo)) padding-box, var(--ab-chrome-fixed) border-box;
+}
+.ab[data-ae="y2k-chrome"] .ab-kicker::before { content: "✦"; color: var(--ab-accent); letter-spacing: 0; font-size: 13px; }
+.ab[data-ae="y2k-chrome"] .ab-headline {
+  font-weight: var(--ab-hw, 800); letter-spacing: calc(-0.035em * var(--ab-tr, 1)); line-height: 1.08; padding-bottom: 0.05em;
+  background: var(--ab-chrome) 0 0 / 100% 1.08em repeat-y; -webkit-background-clip: text; background-clip: text;
+  -webkit-text-fill-color: transparent; color: transparent; text-wrap: balance;
+  filter: drop-shadow(0 2px 0 rgba(0,0,0,0.5)) drop-shadow(0 0 22px var(--ab-pri-glow));
+}
+/* acid plate + dark chrome word */
+.ab[data-ae="y2k-chrome"] .ab-hl {
+  display: inline-block; padding: 0.01em 0.16em 0.06em; margin: 0 -0.02em; border-radius: 0.36em 0.52em 0.38em 0.5em; transform: rotate(-2.4deg);
+  -webkit-text-fill-color: transparent; color: transparent;
+  background: var(--ab-chrome-hl) 0 0 / 100% 1.08em repeat-y, linear-gradient(var(--ab-accent), var(--ab-accent));
+  -webkit-background-clip: text, padding-box; background-clip: text, padding-box;
+}
+.ab[data-ae="y2k-chrome"][data-accent-text="low"] .ab-hl { background-image: var(--ab-chrome-hl), linear-gradient(var(--ab-accent), var(--ab-accent)); }
+.ab[data-ae="y2k-chrome"] .ab-subcopy { color: var(--ab-muted); max-width: 30em; }
+.ab[data-ae="y2k-chrome"] .ab-sub-lead { color: var(--ab-ink); }
+
+.ab[data-ae="y2k-chrome"] .ab-art { max-width: 470px; justify-self: center; }
+.ab[data-ae="y2k-chrome"] .ab-art::before {
+  content: ""; position: absolute; inset: 4% 2% 2%; z-index: -1; border-radius: 50%; filter: blur(30px); opacity: 0.55;
+  background: radial-gradient(circle at 36% 62%, var(--ab-pri-glow), transparent 60%), radial-gradient(circle at 74% 30%, var(--ab-sec-glow), transparent 56%);
+}
+.ab[data-ae="y2k-chrome"] .y2s { display: block; filter: drop-shadow(0 0 0.6px rgba(0,0,0,0.9)) drop-shadow(0 10px 16px rgba(0,0,0,0.5)); }
+.ab[data-ae="y2k-chrome"] .y2s-spark { filter: drop-shadow(0 0 5px var(--ab-acc-glow)); }
+
+/* ---- palette: chrome-rimmed pills with glossy beads ---- */
+.ab[data-ae="y2k-chrome"] .ab-swatches[data-kind="chips"] .ab-swatch {
+  gap: 10px; padding: 6px 18px 6px 8px; border: 1.5px solid transparent; border-radius: 999px;
+  background: var(--y2-metal) padding-box, var(--ab-rim) border-box;
+}
+.ab[data-ae="y2k-chrome"] .ab-swatches[data-kind="chips"] .ab-chip {
+  width: 26px; height: 26px; box-shadow: inset 0 -2px 4px rgba(0,0,0,0.3), 0 0 0 1.5px rgba(255,255,255,0.65), 0 2px 6px rgba(0,0,0,0.4);
+  background-image: radial-gradient(circle at 32% 24%, rgba(255,255,255,0.85), rgba(255,255,255,0) 46%) !important;
+}
+.ab[data-ae="y2k-chrome"] .ab-sw-role { font-weight: 700; font-size: 12.5px; }
+.ab[data-ae="y2k-chrome"] .ab-sw-hex { letter-spacing: 0.04em; }
+.ab[data-ae="y2k-chrome"] .ab-label { font-weight: 600; letter-spacing: 0.2em; }
+
+/* ---- type recommendations: metal slabs ---- */
+.ab[data-ae="y2k-chrome"] .ab-type-grid { gap: clamp(10px, 1.8cqw, 18px); }
+.ab[data-ae="y2k-chrome"] .ab-type-col {
+  padding: 16px 18px 14px; border: 1px solid transparent; border-radius: 24px;
+  background: var(--y2-metal) padding-box, var(--ab-rim) border-box;
+}
+.ab[data-ae="y2k-chrome"] .ab-type-role { font-weight: 700; color: var(--ab-ink); }
+.ab[data-ae="y2k-chrome"] .ab-fit { border-radius: 999px; font-weight: 700; }
+.ab[data-ae="y2k-chrome"] .ab-fit[data-fit="match"] { background: var(--y2-silver); color: #14161a; border-color: transparent; }
+.ab[data-ae="y2k-chrome"] .ab-type-apply {
+  padding: 11px 20px; border: 1.5px solid transparent; border-radius: 999px; font-weight: 700;
+  background: linear-gradient(var(--ab-metal-lo), var(--ab-metal-lo)) padding-box, var(--ab-chrome-fixed) border-box;
+}
+.ab[data-ae="y2k-chrome"] .ab-type-apply:hover { background: var(--y2-pill); color: var(--ab-on-primary); }
+
+/* ---- surfaces: gunmetal slabs with a bevelled rim ---- */
+.ab[data-ae="y2k-chrome"] .ab-card, .ab[data-ae="y2k-chrome"] .ab-panel {
+  position: relative; border: 1.5px solid transparent; border-radius: 32px;
+  background: var(--y2-metal) padding-box, var(--ab-rim) border-box;
+  box-shadow: 0 18px 40px -18px rgba(0,0,0,0.7);
+}
+.ab[data-ae="y2k-chrome"] .ab-card { padding: clamp(20px, 3cqw, 30px); }
+.ab[data-ae="y2k-chrome"] .ab-panel { padding: clamp(20px, 3cqw, 28px); }
+
+/* 01 */
+.ab[data-ae="y2k-chrome"] .ab-seg { padding: 5px; gap: 4px; border-radius: 999px; background: var(--ab-well); box-shadow: inset 0 2px 7px rgba(0,0,0,0.55), 0 1px 0 rgba(255,255,255,0.1); }
+.ab[data-ae="y2k-chrome"] .ab-seg-btn { min-height: 36px; border: 1.5px solid transparent; border-radius: 999px; font-weight: 600; font-size: 12.5px; transition: color 0.15s; }
+.ab[data-ae="y2k-chrome"] .ab-seg-btn:hover { color: var(--ab-ink); }
+.ab[data-ae="y2k-chrome"] .ab-seg-btn[aria-pressed="true"] {
+  background: var(--y2-pill); color: var(--ab-on-primary); font-weight: 700; box-shadow: 0 6px 16px -6px var(--ab-pri-glow);
+}
+.ab[data-ae="y2k-chrome"] .ab-card-title {
+  font-weight: var(--ab-hw, 800); letter-spacing: calc(-0.025em * var(--ab-tr, 1)); line-height: 1.12; padding-bottom: 0.04em; margin: 26px 0 8px !important;
+  background: var(--ab-chrome) 0 0 / 100% 1.12em repeat-y; -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; color: transparent;
+}
+.ab[data-ae="y2k-chrome"] .ab-cta {
+  padding: 14px 14px 14px 24px; border: 1.5px solid transparent; border-radius: 999px; font-weight: 700; font-size: 14px;
+  background: var(--y2-pill); color: var(--ab-on-primary);
+  box-shadow: 0 0 0 1px rgba(0,0,0,0.45), 0 12px 26px -8px var(--ab-pri-glow);
+  transition: filter 0.15s, transform 0.12s;
+}
+.ab[data-ae="y2k-chrome"] .ab-cta:hover { filter: brightness(1.12) saturate(1.1); }
+.ab[data-ae="y2k-chrome"] .ab-cta:active { transform: translateY(1px) scale(0.985); filter: brightness(0.92); }
+.ab[data-ae="y2k-chrome"] .ab-cta-arrow::before {
+  content: "↗"; display: grid; place-items: center; width: 28px; height: 28px; border-radius: 50%; color: #14161a; font-size: 14px; font-weight: 700;
+  background: var(--ab-chrome-fixed); box-shadow: inset 0 1px 0 rgba(255,255,255,0.7), 0 1px 3px rgba(0,0,0,0.4);
+}
+
+/* 02 */
+.ab[data-ae="y2k-chrome"] .ab-fieldlabel { font-weight: 600; }
+.ab[data-ae="y2k-chrome"] .ab-input {
+  border: 0; border-radius: 999px; padding: 14px 20px; background: var(--ab-well);
+  box-shadow: inset 0 2px 8px rgba(0,0,0,0.6), 0 1px 0 rgba(255,255,255,0.14); transition: box-shadow 0.15s;
+}
+.ab[data-ae="y2k-chrome"] .ab-input:focus { box-shadow: inset 0 2px 8px rgba(0,0,0,0.6), 0 0 0 2px var(--ab-primary), 0 0 18px var(--ab-pri-glow); }
+.ab[data-ae="y2k-chrome"] .ab-toggle { font-weight: 600; }
+.ab[data-ae="y2k-chrome"] .ab-switch {
+  width: 64px; height: 34px; border-radius: 999px; background: var(--ab-well); box-shadow: inset 0 2px 7px rgba(0,0,0,0.6), 0 1px 0 rgba(255,255,255,0.14);
+  transition: background 0.18s;
+}
+.ab[data-ae="y2k-chrome"] .ab-switch::before {
+  left: 4px; top: 4px; width: 26px; height: 26px; background: radial-gradient(circle at 34% 24%, rgba(255,255,255,0.9), rgba(255,255,255,0) 42%), var(--ab-chrome-fixed);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.55), inset 0 -1px 2px rgba(0,0,0,0.3); transition: transform 0.18s;
+}
+.ab[data-ae="y2k-chrome"] .ab-switch:checked { background: var(--ab-gloss), linear-gradient(var(--ab-primary), var(--ab-primary)); box-shadow: inset 0 1px 2px rgba(0,0,0,0.3), 0 0 14px var(--ab-pri-glow); }
+.ab[data-ae="y2k-chrome"] .ab-switch:checked::before { transform: translateX(30px); }
+.ab[data-ae="y2k-chrome"] .ab-status { font-size: 11px; }
+.ab[data-ae="y2k-chrome"] .ab-states { justify-content: space-between; margin-top: 26px; }
+.ab[data-ae="y2k-chrome"] .ab-state { font-weight: 600; font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; }
+.ab[data-ae="y2k-chrome"] .ab-disc { width: 58px; height: 58px; border: 0; margin-bottom: 14px; box-shadow: 0 8px 14px -6px rgba(0,0,0,0.7), inset 0 -3px 5px rgba(0,0,0,0.35), inset 0 2px 2px rgba(255,255,255,0.6); }
+/* Brushed: fine horizontal grain on flat silver */
+.ab[data-ae="y2k-chrome"] .ab-disc[data-s="0"] {
+  background: repeating-linear-gradient(90deg, rgba(255,255,255,0.32) 0 1px, rgba(0,0,0,0.12) 1px 2px, transparent 2px 4px), linear-gradient(135deg, #d4d8dc, #7b8189 48%, #dde1e5);
+}
+/* Polished: the full chrome with a hard horizon */
+.ab[data-ae="y2k-chrome"] .ab-disc[data-s="1"] { background: radial-gradient(circle at 34% 24%, rgba(255,255,255,0.95), rgba(255,255,255,0) 38%), var(--ab-chrome-fixed); }
+/* Liquid: blobby chrome with primary and secondary edge-light */
+.ab[data-ae="y2k-chrome"] .ab-disc[data-s="2"] {
+  border-radius: 62% 38% 56% 44% / 46% 58% 42% 54%; transform: rotate(-12deg);
+  background: radial-gradient(circle at 30% 22%, rgba(255,255,255,0.95), rgba(255,255,255,0) 36%), radial-gradient(circle at 20% 90%, var(--ab-primary), transparent 52%), radial-gradient(circle at 92% 22%, var(--ab-secondary), transparent 48%), var(--ab-chrome-fixed);
+}
+
+/* 03: pills with chrome numerals and glossy tubes */
+.ab[data-ae="y2k-chrome"] .ab-list { display: grid; gap: 10px; }
+.ab[data-ae="y2k-chrome"] .ab-row {
+  padding: 10px 22px 10px 20px; border: 1.5px solid transparent; border-radius: 999px;
+  background: var(--y2-metal) padding-box, var(--ab-rim) border-box;
+}
+.ab[data-ae="y2k-chrome"] .ab-row:last-child { border: 1.5px solid transparent; }
+.ab[data-ae="y2k-chrome"] .ab-row-n {
+  font-weight: var(--ab-hw, 800); font-size: 14px; background: var(--ab-chrome-fixed) 0 0 / 100% 1.2em repeat-y; -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+}
+.ab[data-ae="y2k-chrome"] .ab-row-name { font-weight: 700; }
+.ab[data-ae="y2k-chrome"] .ab-row-status { padding: 3px 12px; font-size: 11px; font-weight: 700; color: #14161a; background: var(--y2-silver); box-shadow: 0 1px 3px rgba(0,0,0,0.4); }
+.ab[data-ae="y2k-chrome"] .ab-row-bar { height: 10px; border-radius: 999px; background: var(--ab-well); box-shadow: inset 0 1px 3px rgba(0,0,0,0.6), 0 1px 0 rgba(255,255,255,0.1); }
+.ab[data-ae="y2k-chrome"] .ab-row-bar i { border-radius: 999px; background: var(--ab-gloss), linear-gradient(var(--ab-primary), var(--ab-primary)); box-shadow: 0 0 10px var(--ab-pri-glow); }
+.ab[data-ae="y2k-chrome"] .ab-row-pct { font-weight: 700; }
+
+/* ---- footer ---- */
+.ab[data-ae="y2k-chrome"] .ab-foot { border-top: 0; padding-top: 22px; background: var(--ab-rim) top / 100% 2px no-repeat; }
+.ab[data-ae="y2k-chrome"] .ab-motto { font-weight: 600; }
+.ab[data-ae="y2k-chrome"] .ab-dot {
+  width: 14px; height: 14px; border-radius: 0; margin-right: 9px; vertical-align: -2px; background: var(--ab-accent);
+  clip-path: polygon(50% 0, 62% 38%, 100% 50%, 62% 62%, 50% 100%, 38% 62%, 0 50%, 38% 38%); filter: drop-shadow(0 0 4px var(--ab-acc-glow));
+}
+
+.ab[data-ae="y2k-chrome"] .ab-seg-btn:focus-visible, .ab[data-ae="y2k-chrome"] .ab-cta:focus-visible,
+.ab[data-ae="y2k-chrome"] .ab-switch:focus-visible, .ab[data-ae="y2k-chrome"] .ab-type-apply:focus-visible { outline: 2px solid var(--ab-ink); outline-offset: 3px; }
+
+@container ab (max-width: 600px) {
+  .ab[data-ae="y2k-chrome"] .ab-hero { grid-template-columns: minmax(0, 1fr); gap: 18px; padding: 24px 0 26px; }
+  .ab[data-ae="y2k-chrome"] .ab-art { max-width: 320px; justify-self: center; }
+  .ab[data-ae="y2k-chrome"] .ab-swatches[data-kind="chips"] .ab-swatch { display: flex; padding: 6px 14px 6px 7px; }
+  .ab[data-ae="y2k-chrome"] .ab-row { border-radius: 26px; padding: 10px 16px; }
+  .ab[data-ae="y2k-chrome"] .ab-card, .ab[data-ae="y2k-chrome"] .ab-panel { border-radius: 26px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ab[data-ae="y2k-chrome"] .ab-cta:active { transform: none; }
+}
