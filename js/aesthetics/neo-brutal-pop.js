@@ -51,6 +51,8 @@ registerAesthetic({
     let a = 0.5;
     while (a > 0.1 && t.contrast(t.ink, fill(a)) < 7) a -= 0.05;
     return {
+      '--ab-tr': (typeof state !== 'undefined' && state.headingFont && { condensed: 0, heavy: 0, wide: 0.4, techno: 0.4 }[state.headingFont.cls]) ?? 1,
+      
       '--ab-card-fill': fill(a),
       '--ab-paper': t.isDark ? t.mix(t.ink, t.canvas, 0.1) : t.mix('#ffffff', t.canvas, 0.9),
       '--ab-grid': t.alpha(t.ink, 0.07),

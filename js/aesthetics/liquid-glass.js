@@ -39,17 +39,22 @@ registerAesthetic({
 
   tokens(t) {
     const d = t.isDark;
-    // The hero card is a translucent regular material (78% of --ab-material over
+    // The hero card is a translucent regular material (84% of --ab-hero-card over
     // the scene). Worst-case backdrop: the darkest scene color on a light board,
     // white on a dark one. The highlight word is shaded toward ink until it holds
     // 3:1 against that worst case (sub-copy uses --ab-ink, which clears 4.5:1).
     const sceneBase = t.mix(t.primary, '#06070d', 0.14);
     const material = t.mix('#ffffff', t.canvas, d ? 0.07 : 0.72);
-    const cardFloor = t.mix(material, d ? '#ffffff' : sceneBase, 0.78);
+    // the hero card is tinted toward the brand (warm on a warm brand), not neutral grey
+    const heroCard = d ? t.mix(t.primary, material, 0.1) : t.mix('#ffffff', t.mix(t.primary, t.canvas, 0.1), 0.45);
+    const cardFloor = t.mix(heroCard, d ? '#ffffff' : sceneBase, 0.84);
     let hl = t.accentInk;
     for (let k = 0; k <= 1.001 && t.contrast(hl, cardFloor) < 3.2; k += 0.05) hl = t.mix(t.ink, t.accentInk, k);
     return {
+      '--ab-tr': (typeof state !== 'undefined' && state.headingFont && { condensed: 0, heavy: 0, wide: 0.4, techno: 0.4 }[state.headingFont.cls]) ?? 1,
+      
       '--ab-hl-ink': hl,
+      '--ab-hero-card': heroCard,
       // vivid scene: a dark base the brand colors glow on (the "content" the glass floats over)
       '--ab-scene-base': sceneBase,
       // regular material: a near-opaque panel, one step lighter than the canvas
@@ -75,7 +80,6 @@ registerAesthetic({
     // refraction: a clipped duplicate of the scene, scaled and offset, masked
     // to a ring so only content near the glass edge is magnified (simulated
     // refraction, not real optics); its center is plain backdrop blur.
-    const word = String(ctx.tagline || '').trim().split(/\s+/).pop().replace(/[.,;:!?…]+$/, '') || 'alive';
     const scene = '<i class="lgs-mesh"></i><i class="lgs-sun"></i><i class="lgs-ring"></i><i class="lgs-pill"></i><i class="lgs-dot"></i>';
     const icon = d => `<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${d}</svg>`;
     const tabs = [
@@ -88,7 +92,10 @@ registerAesthetic({
       + abLens(scene, { x: 72.5, y: 41, w: 10, h: 21, scale: 1.16, cls: 'lgs-lens' })
       + '<svg class="lgs-play" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M8 5.5v13l11-6.5z" fill="currentColor"/></svg>'
       + `<div class="lgs-tabs">${tabs}</div>`
-      + `<div class="lgs-card"><span class="lgs-cap">Now playing</span><b>${escapeHtml(word)}</b><span class="lgs-prog"><i></i></span></div>`
+      + '<div class="lgs-card"><div class="lgs-time"><span class="lgs-cap">Focus</span><b>18:24</b></div>'
+      + '<svg class="lgs-timer" viewBox="0 0 44 44" aria-hidden="true"><circle cx="22" cy="22" r="17" fill="none" stroke="rgba(255,255,255,.28)" stroke-width="4"/>'
+      + '<circle cx="22" cy="22" r="17" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round" pathLength="100" stroke-dasharray="74 100" transform="rotate(-90 22 22)"/>'
+      + '<path d="M18.5 16.5v11M25.5 16.5v11" stroke="#fff" stroke-width="3" stroke-linecap="round"/></svg></div>'
       + '</div>';
   },
 

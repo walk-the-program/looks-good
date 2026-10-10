@@ -45,7 +45,7 @@
 .ab[data-ae="riso-print"] .ab-n::after { content: none; }
 
 /* header */
-.ab[data-ae="riso-print"] .ab-brand { font-weight: 800; letter-spacing: -0.02em; }
+.ab[data-ae="riso-print"] .ab-brand { font-weight: 800; letter-spacing: calc(-0.02em * var(--ab-tr, 1)); }
 .ab[data-ae="riso-print"] .ab-mark { position: relative; width: 30px; height: 30px; border-radius: 50%; background: var(--ab-primary); color: var(--ab-on-primary); font-weight: 800; }
 .ab[data-ae="riso-print"] .ab-mark::after { content: ""; position: absolute; inset: 0; border: 1.5px solid var(--ab-secondary); border-radius: 50%; transform: translate(3px, 2px); mix-blend-mode: var(--ab-blend); }
 .ab[data-ae="riso-print"] .ab-tag { padding: 3px 8px; border: var(--rz-line); color: var(--ab-ink); font-size: 10px; transform: rotate(-1.5deg); }
@@ -58,23 +58,18 @@
 }
 /* one crisp ink: no text-shadow, no misregistration on type */
 .ab[data-ae="riso-print"] .ab-headline {
-  font-weight: 800; letter-spacing: -0.035em; line-height: 0.94; color: var(--ab-primary-text); text-transform: uppercase;
+  font-weight: 800; letter-spacing: calc(-0.035em * var(--ab-tr, 1)); line-height: 0.94; color: var(--ab-primary-text); text-transform: uppercase;
 }
 .ab[data-ae="riso-print"] .ab-subcopy { color: var(--ab-ink); font-size: clamp(13.5px, 1.5cqw, 16px); }
 .ab[data-ae="riso-print"] .ab-sub-rest { color: var(--ab-muted); }
-/* the accent word is circled in fluorescent ink, drawn by hand */
+/* the accent word is circled in fluorescent ink, drawn by hand: a stroke only, never a fill.
+   --ab-accent-ink keeps the stroke >= 3:1 on paper when the accent itself is pale. */
 .ab[data-ae="riso-print"] .ab-hl { position: relative; display: inline-block; color: inherit; padding: 0 0.04em; }
 .ab[data-ae="riso-print"] .ab-hl::after {
-  content: ""; position: absolute; left: -0.16em; right: -0.16em; top: -0.04em; bottom: -0.08em; pointer-events: none;
-  background: var(--ab-accent); mix-blend-mode: var(--ab-blend); transform: rotate(-2deg);
-  -webkit-mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 70' preserveAspectRatio='none'><path d='M172 13 C145 2 75 0 32 13 C5 22 2 48 34 59 C75 71 152 68 182 52 C201 41 196 20 158 8' fill='none' stroke='black' stroke-width='4.5' stroke-linecap='round' vector-effect='non-scaling-stroke'/></svg>") center / 100% 100% no-repeat;
-  mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 70' preserveAspectRatio='none'><path d='M172 13 C145 2 75 0 32 13 C5 22 2 48 34 59 C75 71 152 68 182 52 C201 41 196 20 158 8' fill='none' stroke='black' stroke-width='4.5' stroke-linecap='round' vector-effect='non-scaling-stroke'/></svg>") center / 100% 100% no-repeat;
-}
-/* accent too pale to read as a ring alone: the ring gets a fluorescent wash inside it */
-.ab[data-ae="riso-print"][data-accent-text="low"] .ab-hl { color: inherit; background: none; }
-.ab[data-ae="riso-print"][data-accent-text="low"] .ab-hl::before {
-  content: ""; position: absolute; left: -0.1em; right: -0.1em; top: 0.04em; bottom: 0; z-index: -1; pointer-events: none;
-  border-radius: 50%; background: var(--ab-accent); opacity: 0.5; mix-blend-mode: var(--ab-blend); transform: rotate(-2deg);
+  content: ""; position: absolute; z-index: -1; left: -0.16em; right: -0.16em; top: -0.04em; bottom: -0.08em; pointer-events: none;
+  background: var(--ab-accent-ink, var(--ab-accent)); mix-blend-mode: var(--ab-blend); transform: rotate(-3deg);
+  -webkit-mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 70' preserveAspectRatio='none'><path d='M172 13 C145 2 75 0 32 13 C5 22 2 48 34 59 C75 71 152 68 182 52 C201 41 196 20 158 8' fill='none' stroke='black' stroke-width='5' stroke-linecap='round' vector-effect='non-scaling-stroke'/></svg>") center / 100% 100% no-repeat;
+  mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 70' preserveAspectRatio='none'><path d='M172 13 C145 2 75 0 32 13 C5 22 2 48 34 59 C75 71 152 68 182 52 C201 41 196 20 158 8' fill='none' stroke='black' stroke-width='5' stroke-linecap='round' vector-effect='non-scaling-stroke'/></svg>") center / 100% 100% no-repeat;
 }
 /* art: a zine spread of three riso cards, each a flat ink with a second-ink shape on it */
 .ab[data-ae="riso-print"] .ab-art { max-width: 330px; aspect-ratio: 1.22 / 1; }
@@ -102,7 +97,7 @@
   min-height: 38px; border: var(--rz-line); border-radius: 4px; color: var(--ab-ink); font-size: 11.5px; font-weight: 600; letter-spacing: 0.06em;
 }
 .ab[data-ae="riso-print"] .ab-seg-btn[aria-pressed="true"] { background: var(--rz-ink-dot), var(--ab-primary); color: var(--ab-on-primary); font-weight: 700; }
-.ab[data-ae="riso-print"] .ab-card-title { font-weight: 800; letter-spacing: -0.025em; }
+.ab[data-ae="riso-print"] .ab-card-title { font-weight: 800; letter-spacing: calc(-0.025em * var(--ab-tr, 1)); }
 .ab[data-ae="riso-print"] .ab-card-body { color: var(--ab-ink); font-size: 13px; }
 .ab[data-ae="riso-print"] .ab-cta {
   --rz-ox: 3px; --rz-oy: 2px;
@@ -145,7 +140,7 @@
 .ab[data-ae="riso-print"] .ab-row:first-child { border-top: 0; }
 .ab[data-ae="riso-print"] .ab-row:last-child { border-bottom: 1.5px dashed var(--ab-ink); }
 .ab[data-ae="riso-print"] .ab-row-n { font: 800 13px var(--ab-font-h); color: var(--ab-primary-text); }
-.ab[data-ae="riso-print"] .ab-row-name { font-family: var(--ab-font-h); font-weight: 700; font-size: 15px; letter-spacing: -0.01em; }
+.ab[data-ae="riso-print"] .ab-row-name { font-family: var(--ab-font-h); font-weight: 700; font-size: 15px; letter-spacing: calc(-0.01em * var(--ab-tr, 1)); }
 .ab[data-ae="riso-print"] .ab-row-status {
   padding: 2px 9px; border: var(--rz-line); border-radius: 3px; background: var(--ab-sec-tint); color: var(--ab-ink);
   font-size: 9.5px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; transform: rotate(-2deg);

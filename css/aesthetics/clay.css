@@ -23,7 +23,7 @@
 }
 
 /* header */
-.ab[data-ae="clay"] .ab-brand { font-weight: 700; letter-spacing: -0.03em; }
+.ab[data-ae="clay"] .ab-brand { font-weight: 700; letter-spacing: calc(-0.03em * var(--ab-tr, 1)); }
 .ab[data-ae="clay"] .ab-mark {
   width: 34px; height: 34px; border-radius: 50%;
   background: var(--cl-gloss), var(--ab-primary); color: var(--ab-on-primary); font-weight: 800;
@@ -53,10 +53,10 @@
 .ab[data-ae="clay"] .ab-kicker {
   display: inline-block; padding: 6px 15px; margin-bottom: 20px !important; border-radius: 999px;
   background: var(--cl-gloss), var(--ab-secondary); color: var(--ab-on-secondary);
-  font-size: 12px; font-weight: 700; letter-spacing: 0.01em; text-transform: none;
-  box-shadow: 0 9px 14px -7px var(--ab-sec-sh), var(--cl-in-s);
+  font-size: 13px; font-weight: 700; letter-spacing: 0.01em; text-transform: none;
+  box-shadow: 0 9px 14px -7px var(--ab-sec-sh), 0 2px 3px -1px var(--ab-sec-sh), var(--cl-in-s);
 }
-.ab[data-ae="clay"] .ab-headline { font-weight: 700; letter-spacing: -0.035em; line-height: 1.06; }
+.ab[data-ae="clay"] .ab-headline { font-weight: 700; letter-spacing: calc(-0.035em * var(--ab-tr, 1)); line-height: 1.06; }
 .ab[data-ae="clay"] .ab-hl {
   display: inline-block; max-width: 100%; padding: 0 0.28em 0.07em; margin: 0 0.02em;
   border-radius: 999px; background: var(--cl-gloss), var(--ab-accent); color: var(--ab-on-accent);
@@ -79,7 +79,7 @@
   box-shadow: 0 7cqw 12cqw -4cqw var(--ab-pri-sh), inset 0 -3.6cqw 7cqw var(--ab-clay-lo), inset 0 3.4cqw 6cqw var(--ab-clay-hi);
 }
 .ab[data-ae="clay"] .cla-tile span {
-  font: 800 31cqw/1 var(--ab-font-h); letter-spacing: -0.02em; transform: translateY(-1cqw);
+  font: 800 31cqw/1 var(--ab-font-h); letter-spacing: calc(-0.02em * var(--ab-tr, 1)); transform: translateY(-1cqw);
   color: color-mix(in srgb, var(--ab-primary) 76%, #fff);
   text-shadow: -0.5cqw -0.5cqw 0.6cqw rgba(255, 255, 255, 0.5), 0.7cqw 1cqw 0.9cqw rgba(0, 0, 0, 0.3);
 }
@@ -109,15 +109,17 @@
   box-shadow: 0 4.5cqw 8cqw -3cqw var(--ab-pri-lo-sh), inset 0 -2.4cqw 4.8cqw var(--ab-clay-lo), inset 0 2.4cqw 4cqw var(--ab-clay-hi);
 }
 
-/* palette: clay beans */
+/* palette: clay beans, each with a soft colored drop plus a tight contact shadow where it touches the surface */
 .ab[data-ae="clay"] .ab-chip {
+  --cl-sh: var(--ab-ink-sh);
   position: relative; border-radius: 999px;
-  box-shadow: 0 12px 18px -10px var(--ab-ink-sh), inset 0 -6px 10px var(--ab-clay-lo), inset 0 6px 9px var(--ab-clay-hi);
+  box-shadow: 0 13px 16px -9px var(--cl-sh), 0 3px 4px -1px var(--cl-sh), inset 0 -6px 10px var(--ab-clay-lo), inset 0 6px 9px var(--ab-clay-hi);
 }
 .ab[data-ae="clay"] .ab-chip::after { content: ""; position: absolute; inset: 0; border-radius: inherit; background: var(--cl-gloss); pointer-events: none; }
-.ab[data-ae="clay"] .ab-swatch[data-role="primary"] .ab-chip { box-shadow: 0 12px 18px -10px var(--ab-pri-sh), inset 0 -6px 10px var(--ab-clay-lo), inset 0 6px 9px var(--ab-clay-hi); }
-.ab[data-ae="clay"] .ab-swatch[data-role="secondary"] .ab-chip { box-shadow: 0 12px 18px -10px var(--ab-sec-sh), inset 0 -6px 10px var(--ab-clay-lo), inset 0 6px 9px var(--ab-clay-hi); }
-.ab[data-ae="clay"] .ab-swatch[data-role="accent"] .ab-chip { box-shadow: 0 12px 18px -10px var(--ab-acc-sh), inset 0 -6px 10px var(--ab-clay-lo), inset 0 6px 9px var(--ab-clay-hi); }
+.ab[data-ae="clay"] .ab-swatch[data-role="canvas"] .ab-chip { --cl-sh: color-mix(in srgb, var(--ab-ink-sh) 80%, transparent); }
+.ab[data-ae="clay"] .ab-swatch[data-role="primary"] .ab-chip { --cl-sh: var(--ab-pri-sh); }
+.ab[data-ae="clay"] .ab-swatch[data-role="secondary"] .ab-chip { --cl-sh: var(--ab-sec-sh); }
+.ab[data-ae="clay"] .ab-swatch[data-role="accent"] .ab-chip { --cl-sh: var(--ab-acc-sh); }
 .ab[data-ae="clay"] .ab-chip { margin-bottom: 14px; }
 .ab[data-ae="clay"] .ab-sw-role { font-size: 13px; font-weight: 700; }
 
@@ -137,7 +139,7 @@
   background: radial-gradient(120% 120% at 30% 0, #fff, var(--ab-pearl) 60%); color: var(--ab-pearl-ink); font-weight: 800;
   box-shadow: 0 8px 12px -6px var(--ab-ink-sh), inset 0 -4px 8px rgba(0, 0, 0, 0.09), inset 0 4px 6px rgba(255, 255, 255, 0.95);
 }
-.ab[data-ae="clay"] .ab-card-title { font-weight: 700; letter-spacing: -0.03em; }
+.ab[data-ae="clay"] .ab-card-title { font-weight: 700; letter-spacing: calc(-0.03em * var(--ab-tr, 1)); }
 .ab[data-ae="clay"] .ab-card-body { color: color-mix(in srgb, var(--ab-ink) 80%, transparent); }
 .ab[data-ae="clay"] .ab-cta {
   padding: 15px 16px 15px 24px; border-radius: 999px; font-size: 14.5px; font-weight: 800;

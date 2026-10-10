@@ -39,7 +39,7 @@
 .ab[data-ae="aurora-noir"] .ab-sec-use::before { content: "FIG 0.3"; }
 
 /* header */
-.ab[data-ae="aurora-noir"] .ab-brand { font-weight: 600; letter-spacing: -0.03em; }
+.ab[data-ae="aurora-noir"] .ab-brand { font-weight: 600; letter-spacing: calc(-0.03em * var(--ab-tr, 1)); }
 .ab[data-ae="aurora-noir"] .ab-mark {
   width: 26px; height: 26px; border-radius: 7px; color: var(--ab-ink); border: 1px solid transparent;
   background: linear-gradient(var(--ab-solid), var(--ab-solid)) padding-box, linear-gradient(135deg, var(--ab-primary), var(--ab-secondary)) border-box;
@@ -57,10 +57,10 @@
 .ab[data-ae="aurora-noir"] .ab-hero-copy { text-align: left; justify-self: stretch; max-width: 78%; }
 .ab[data-ae="aurora-noir"] .ab-kicker { display: inline-flex; align-items: center; gap: 8px; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; }
 .ab[data-ae="aurora-noir"] .ab-kicker::before { content: "//"; color: var(--ab-primary-text); font-weight: 600; }
-.ab[data-ae="aurora-noir"] .ab-headline { font-weight: 510; letter-spacing: -0.045em; line-height: 0.98; text-wrap: balance; }
+.ab[data-ae="aurora-noir"] .ab-headline { font-weight: 510; letter-spacing: calc(-0.045em * var(--ab-tr, 1)); line-height: 0.98; text-wrap: balance; }
 /* the two-tone statement: first clause ink, the rest muted */
 .ab[data-ae="aurora-noir"] .ab-subcopy {
-  max-width: 24em; margin-left: 0 !important; font-family: var(--ab-font-ui); font-weight: 500; letter-spacing: -0.022em; line-height: 1.28;
+  max-width: 24em; margin-left: 0 !important; font-family: var(--ab-font-ui); font-weight: 500; letter-spacing: calc(-0.022em * var(--ab-tr, 1)); line-height: 1.28;
   font-size: clamp(17px, 2.4cqw, 28px);
 }
 .ab[data-ae="aurora-noir"] .ab-sub-lead { color: var(--ab-ink); }
@@ -85,7 +85,7 @@
 }
 .ab[data-ae="aurora-noir"] .ana-side { padding: 1.5em 1em; border-right: 1px solid var(--ab-hair); background: var(--ab-fill); min-width: 0; }
 .ab[data-ae="aurora-noir"] .ana-ws { display: flex; align-items: center; gap: 0.7em; margin-bottom: 1.4em; font-size: 1.05em; min-width: 0; }
-.ab[data-ae="aurora-noir"] .ana-ws b { font-weight: 600; letter-spacing: -0.01em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ab[data-ae="aurora-noir"] .ana-ws b { font-weight: 600; letter-spacing: calc(-0.01em * var(--ab-tr, 1)); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .ab[data-ae="aurora-noir"] .ana-wsmark {
   flex: none; width: 1.7em; height: 1.7em; border-radius: 0.45em; display: grid !important; place-items: center;
   background: linear-gradient(135deg, var(--ab-primary), var(--ab-secondary)); color: var(--ab-canvas); font-weight: 700; font-size: 0.9em;
@@ -103,7 +103,7 @@
 .ab[data-ae="aurora-noir"] .ana-sep { opacity: 0.5; }
 .ab[data-ae="aurora-noir"] .ana-crumb code, .ab[data-ae="aurora-noir"] .ana-props code, .ab[data-ae="aurora-noir"] .ana-log code { font: 500 0.92em var(--an-mono); letter-spacing: 0.02em; }
 .ab[data-ae="aurora-noir"] .ana-crumb code { color: var(--ab-ink); padding: 0.15em 0.55em; border: 1px solid var(--ab-hair2); border-radius: 0.4em; background: var(--ab-fill); }
-.ab[data-ae="aurora-noir"] .ana-title { margin: 1.1em 0 0.45em; font-size: 2em; font-weight: 600; letter-spacing: -0.035em; line-height: 1.1; }
+.ab[data-ae="aurora-noir"] .ana-title { margin: 1.1em 0 0.45em; font-size: 2em; font-weight: 600; letter-spacing: calc(-0.035em * var(--ab-tr, 1)); line-height: 1.1; }
 .ab[data-ae="aurora-noir"] .ana-desc { max-width: 34em; color: var(--ab-muted); }
 .ab[data-ae="aurora-noir"] .ana-props { margin: 1.8em 0 0; display: grid; gap: 0; border-top: 1px solid var(--ab-hair); }
 .ab[data-ae="aurora-noir"] .ana-props > div { display: grid; grid-template-columns: 8.5em minmax(0, 1fr); align-items: center; gap: 1em; padding: 0.75em 0; border-bottom: 1px solid var(--ab-hair); }
@@ -139,12 +139,12 @@
 }
 .ab[data-ae="aurora-noir"] .ab-panel { padding: clamp(18px, 2.8cqw, 24px); }
 
-/* 01 interface: the selected segment carries brand primary */
+/* 01 interface: the selected segment is a neutral lifted chip (ink alpha); primary stays on state */
 .ab[data-ae="aurora-noir"] .ab-seg { gap: 2px; padding: 3px; border-radius: 9px; background: var(--ab-fill2); border: 1px solid var(--ab-hair); }
 .ab[data-ae="aurora-noir"] .ab-seg-btn { min-height: 32px; border-radius: 6px; border: 1px solid transparent; font-size: 12px; transition: background 0.15s, border-color 0.15s, color 0.15s; }
 .ab[data-ae="aurora-noir"] .ab-seg-btn:hover { color: var(--ab-ink); }
 .ab[data-ae="aurora-noir"] .ab-seg-btn[aria-pressed="true"] { background: var(--ab-sel); border-color: var(--ab-sel-line); color: var(--ab-ink); font-weight: 500; }
-.ab[data-ae="aurora-noir"] .ab-card-title { font-weight: 600; letter-spacing: -0.03em; margin: 22px 0 8px !important; }
+.ab[data-ae="aurora-noir"] .ab-card-title { font-weight: 600; letter-spacing: calc(-0.03em * var(--ab-tr, 1)); margin: 22px 0 8px !important; }
 .ab[data-ae="aurora-noir"] .ab-card-title::after {
   content: "New"; display: inline-block; margin-left: 10px; vertical-align: 0.28em;
   padding: 3px 7px 2px; border-radius: 999px; border: 1px solid var(--ab-acc-line); background: var(--ab-acc-tint);
@@ -153,7 +153,7 @@
 .ab[data-ae="aurora-noir"] .ab-card-body { font-size: 13px; }
 /* the main action: an ink-filled pill with a canvas label (primary is for state) */
 .ab[data-ae="aurora-noir"] .ab-cta {
-  border-radius: 999px; padding: 12px 14px 12px 20px; font-weight: 600; letter-spacing: -0.005em;
+  border-radius: 999px; padding: 12px 14px 12px 20px; font-weight: 600; letter-spacing: calc(-0.005em * var(--ab-tr, 1));
   background: var(--ab-ink); color: var(--ab-canvas); box-shadow: none;
   transition: background 0.15s, transform 0.15s;
 }
@@ -218,7 +218,7 @@
   font: 600 10px/1 var(--ab-font-ui); color: var(--ab-ink); text-transform: uppercase;
   background: linear-gradient(135deg, var(--ab-pri-a), var(--ab-sec-a)); border: 1px solid var(--ab-hair2);
 }
-.ab[data-ae="aurora-noir"] .ab-row-name { font-weight: 500; letter-spacing: -0.01em; }
+.ab[data-ae="aurora-noir"] .ab-row-name { font-weight: 500; letter-spacing: calc(-0.01em * var(--ab-tr, 1)); }
 .ab[data-ae="aurora-noir"] .ab-row-status {
   display: inline-flex; align-items: center; gap: 6px; padding: 2px 8px 2px 7px; font: 500 10px/1.5 var(--an-mono);
   letter-spacing: 0.04em; text-transform: uppercase; background: var(--ab-fill); border: 1px solid var(--ab-hair2); color: var(--ab-ink);
@@ -256,4 +256,10 @@
 @media (prefers-reduced-motion: reduce) {
   .ab[data-ae="aurora-noir"] .ab-tag::before { animation: none; }
   .ab[data-ae="aurora-noir"] .ab-cta:active { transform: none; }
+}
+
+/* narrow boards: the section label stays on one line, the descriptor wraps to the right */
+@container ab (max-width: 600px) {
+  .ab[data-ae="aurora-noir"] .ab-labelrow .ab-label:first-child { white-space: nowrap; }
+  .ab[data-ae="aurora-noir"] .ab-labelrow .ab-label:last-child:not(:first-child) { text-align: right; }
 }

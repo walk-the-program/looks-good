@@ -62,6 +62,12 @@
 .ab[data-ae="retro-futurist"] .ab-label:last-child:not(:first-child)::before { content: none; }
 .ab[data-ae="retro-futurist"] .ab-n { color: var(--ab-ink); font-weight: 700; }
 .ab[data-ae="retro-futurist"] .ab-labelrow { margin-bottom: 16px; }
+@container ab (max-width: 600px) {
+  .ab[data-ae="retro-futurist"] .ab-brand { letter-spacing: 0.02em; font-size: 14px; }
+  .ab[data-ae="retro-futurist"] .ab-tag { max-width: 104px; letter-spacing: 0.08em; }
+  .ab[data-ae="retro-futurist"] .ab-label:first-child { white-space: nowrap; }
+  .ab[data-ae="retro-futurist"] .ab-label:last-child:not(:first-child) { text-align: right; letter-spacing: 0.1em; }
+}
 
 /* hero */
 .ab[data-ae="retro-futurist"] .ab-kicker { font-size: 10.5px; letter-spacing: 0.2em; color: var(--ab-muted); }

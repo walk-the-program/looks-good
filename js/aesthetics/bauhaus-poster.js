@@ -20,20 +20,25 @@ registerAesthetic({
   type: { ui: 'sans', label: 'sans', display: 1.4 },
   highlight: 'band',
 
+  // --ab-tr scales the tight headline tracking: 0 for condensed/heavy faces (they collide when tightened), 1 otherwise
+  tokens() {
+    return { '--ab-tr': (typeof state !== 'undefined' && state.headingFont && { condensed: 0, heavy: 0, wide: 0.4, techno: 0.4 }[state.headingFont.cls]) ?? 1 };
+  },
+
   roles: {
     primary: {
       use: 'The one flat CTA block, the selected segment, the "on" switch, and the largest planes of the art tile',
       never: 'Body text, borders, a second CTA',
     },
     secondary: {
-      use: 'Large planes inside the art tile only (quarter circles and backgrounds); in the UI, only small tags and status chips',
+      use: 'Large planes inside the art tile only (quarter circles and backgrounds), where it may well exceed its 10–15%; in the UI, only small tags and status chips',
       never: 'The main CTA, body text, page background, large planes in the interface',
-      coverage: '≈10–15%, more in art',
+      coverage: '≈10–15%',
     },
     accent: {
-      use: 'Large planes inside the art tile only (half circles, backgrounds); in the UI, one spark: the highlighted headline word (a flat plane, no outline) and the footer dot',
+      use: 'Large planes inside the art tile only (half circles, backgrounds), where it may exceed its 5%; in the UI, one spark: the highlighted headline word (a flat plane, no outline) and the footer dot',
       never: 'Buttons, body text, borders, large fills in the interface',
-      coverage: '≤5%, more in art',
+      coverage: '≤5%',
     },
   },
 

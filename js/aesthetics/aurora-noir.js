@@ -39,7 +39,7 @@ registerAesthetic({
       never: 'Large background fields in light mode',
     },
     primary: {
-      use: 'State only: selected segment and switch "on", the focus ring, progress bars, the status dot and the first aurora color (mostly seen as glow)',
+      use: 'State only: the switch "on", the focus ring, progress bars, the status dot and the first aurora color (mostly seen as glow)',
       never: 'The main action fill, body text, card fills, a second CTA',
       coverage: '≈8–10%',
     },
@@ -77,6 +77,8 @@ registerAesthetic({
     const a2 = wash(t.secondary, d ? 0.17 : 0.13);
     const a3 = wash(mid, d ? 0.12 : 0.09);
     return {
+      '--ab-tr': (typeof state !== 'undefined' && state.headingFont && { condensed: 0, heavy: 0, wide: 0.4, techno: 0.4 }[state.headingFont.cls]) ?? 1,
+      
       '--ab-hair': t.alpha(t.ink, d ? 0.09 : 0.1),
       '--ab-hair2': t.alpha(t.ink, d ? 0.14 : 0.16),
       '--ab-fill': t.alpha(t.ink, d ? 0.035 : 0.035),
@@ -87,8 +89,9 @@ registerAesthetic({
       '--ab-solid': t.mix(t.ink, t.canvas, d ? 0.045 : 0.04),
       '--ab-glow': t.alpha(t.primary, 0.35),
       '--ab-ring': t.alpha(t.primary, 0.4),
-      '--ab-sel': t.alpha(t.primary, d ? 0.2 : 0.14),
-      '--ab-sel-line': t.alpha(t.primary, 0.55),
+      // neutral lifted chip (Linear-style): ink at 9-10%, never primary
+      '--ab-sel': t.alpha(t.ink, d ? 0.1 : 0.08),
+      '--ab-sel-line': t.alpha(t.ink, d ? 0.16 : 0.14),
       '--ab-ink-hover': t.mix(t.ink, t.canvas, 0.86),
       '--ab-cta-kbd': t.alpha(t.canvas, 0.14),
       '--ab-au1': t.alpha(t.primary, a1.toFixed(2)),
@@ -137,7 +140,7 @@ registerAesthetic({
     { name: 'Hairline surface', css: 'background: {fill}; border: 1px solid {hair}; border-radius: 14px; /* plus a 1px top highlight: linear-gradient(90deg, transparent, {top}, transparent) */' },
     { name: 'Featured card', css: 'background: linear-gradient({solid}, {solid}) padding-box, linear-gradient(135deg, {primary}, {secondary}) border-box; border: 1px solid transparent; border-radius: 14px;' },
     { name: 'Main action (ink pill)', css: 'background: {ink}; color: {canvas}; border-radius: 999px; font-weight: 600; /* hover: background {inkHover}; primary is never the fill */' },
-    { name: 'Selected state', css: 'background: {sel}; border: 1px solid {selLine}; color: {ink}; /* selected segment; the switch "on" and progress fills use {primary} */' },
+    { name: 'Selected segment (lifted chip)', css: 'background: {sel}; border: 1px solid {selLine}; color: {ink}; /* neutral lifted chip for the selected segment, ink text; the switch "on", focus ring and progress fills use {primary} */' },
     { name: 'Product window', css: 'background: {solid}; border: 1px solid {hair2}; border-radius: 12px; /* sits on a faint aurora: primary and secondary at 18% alpha or less, 40px blur, behind the window only */' },
     { name: 'Ghost action', css: 'background: transparent; color: {ink}; border: 1px solid {hair2}; border-radius: 8px; /* hover: border-color {secondary} */' },
     { name: 'Field focus', css: 'background: {fill}; border: 1px solid {primary}; border-radius: 8px; box-shadow: 0 0 0 3px {ring};' },

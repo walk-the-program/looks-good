@@ -33,16 +33,19 @@ registerAesthetic({
     },
   },
 
+  // --ab-tr scales the tight headline tracking: 0 for condensed/heavy faces (they collide when tightened), 1 otherwise
   tokens(t) {
-    return { '--ab-grid': t.alpha(t.ink, t.isDark ? 0.1 : 0.06) };
+    return {
+      '--ab-tr': (typeof state !== 'undefined' && state.headingFont && { condensed: 0, heavy: 0, wide: 0.4, techno: 0.4 }[state.headingFont.cls]) ?? 1,
+       '--ab-grid': t.alpha(t.ink, t.isDark ? 0.1 : 0.06) };
   },
 
-  // A cropped initial in a bordered frame, a primary block behind the right end
-  // of the headline, and one mono caption. No barcode.
+  // A full-height outline initial cropped by the right edge (behind the headline),
+  // a primary block behind the right end of the headline, and one mono caption.
   art(ctx) {
     return `<div class="rba">
       <i class="rba-block"></i>
-      <div class="rba-frame"><span class="rba-initial">${escapeHtml(ctx.initial)}</span></div>
+      <div class="rba-ghost"><span class="rba-initial">${escapeHtml(ctx.initial)}</span></div>
       <span class="rba-cap">FIG. 01</span>
     </div>`;
   },

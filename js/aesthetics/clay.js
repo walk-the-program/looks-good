@@ -45,6 +45,8 @@ registerAesthetic({
     const priLo = t.mix('#000000', t.primary, 0.2);
     const pearl = t.mix('#ffffff', t.canvas, 0.9);
     return {
+      '--ab-tr': (typeof state !== 'undefined' && state.headingFont && { condensed: 0, heavy: 0, wide: 0.4, techno: 0.4 }[state.headingFont.cls]) ?? 1,
+      
       '--ab-pri-sh': sh(t.primary),
       '--ab-sec-sh': sh(t.secondary),
       '--ab-acc-sh': sh(t.accent),

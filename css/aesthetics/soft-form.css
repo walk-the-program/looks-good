@@ -14,7 +14,7 @@
 }
 
 /* header */
-.ab[data-ae="soft-form"] .ab-brand { font-weight: 600; letter-spacing: -0.03em; }
+.ab[data-ae="soft-form"] .ab-brand { font-weight: 600; letter-spacing: calc(-0.03em * var(--ab-tr, 1)); }
 .ab[data-ae="soft-form"] .ab-mark {
   position: relative; width: 30px; height: 30px; border-radius: 10px;
   background: var(--ab-canvas); box-shadow: var(--sf-raised-s);
@@ -29,7 +29,7 @@
 
 /* hero: large, tight headline (reference proportions: weight 500, -0.05em) */
 .ab[data-ae="soft-form"] .ab-kicker { letter-spacing: 0.17em; }
-.ab[data-ae="soft-form"] .ab-headline { font-weight: 500; letter-spacing: -0.05em; line-height: 0.96; }
+.ab[data-ae="soft-form"] .ab-headline { font-weight: 500; letter-spacing: calc(-0.05em * var(--ab-tr, 1)); line-height: 0.96; }
 .ab[data-ae="soft-form"] .ab-subcopy { max-width: 30em; }
 .ab[data-ae="soft-form"] .ab-art { max-width: 310px; }
 
@@ -69,11 +69,24 @@
   border-left: 2px solid rgba(255, 255, 255, 0.55); border-right: 2px solid rgba(236, 212, 242, 0.4);
 }
 
-/* palette: flat swatches, only the canvas swatch carries a hairline outline */
+/* palette: each color is a raised pad seated in a recessed socket, the same
+   vocabulary as the materials above; the primary pad carries the gloss */
 .ab[data-ae="soft-form"] .ab-palette { padding: clamp(30px, 4.6cqw, 50px) 0; }
 .ab[data-ae="soft-form"] .ab-swatches { gap: clamp(12px, 2.4cqw, 26px); }
-.ab[data-ae="soft-form"] .ab-chip { border-radius: 6px; height: clamp(38px, 5cqw, 54px); box-shadow: none; }
-.ab[data-ae="soft-form"] .ab-swatch[data-role="canvas"] .ab-chip { box-shadow: inset 0 0 0 1px rgba(128, 128, 128, 0.34); }
+.ab[data-ae="soft-form"] .ab-chip {
+  position: relative; border-radius: 14px; height: clamp(46px, 6cqw, 62px);
+  background: var(--ab-canvas) !important; box-shadow: var(--sf-inset-s);   /* !important: the board sets the chip color inline */
+}
+.ab[data-ae="soft-form"] .ab-chip::after {
+  content: ""; position: absolute; inset: 5px; border-radius: 9px; background: var(--sw);
+  box-shadow: 2px 3px 5px var(--ab-lo), -1px -1px 3px var(--ab-hi), inset 0 1px 1px rgba(255, 255, 255, 0.28);
+}
+.ab[data-ae="soft-form"] .ab-swatch[data-role="primary"] .ab-chip::after,
+.ab[data-ae="soft-form"] .ab-swatch[data-role="secondary"] .ab-chip::after,
+.ab[data-ae="soft-form"] .ab-swatch[data-role="accent"] .ab-chip::after {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.24), rgba(255, 255, 255, 0) 55%), var(--sw);
+}
+.ab[data-ae="soft-form"] .ab-swatch[data-role="canvas"] .ab-chip::after { box-shadow: var(--sf-raised-s), inset 0 0 0 1px rgba(128, 128, 128, 0.2); }
 .ab[data-ae="soft-form"] .ab-sw-role { font-weight: 600; }
 
 /* 01 / interface: the one glass panel */
@@ -100,7 +113,7 @@
 .ab[data-ae="soft-form"] .ab-seg-btn[aria-pressed="true"] {
   background: var(--ab-ink); color: var(--ab-canvas); font-weight: 500; box-shadow: 2px 3px 5px rgba(0, 0, 0, 0.16);
 }
-.ab[data-ae="soft-form"] .ab-card-title { font-weight: 500; letter-spacing: -0.03em; }
+.ab[data-ae="soft-form"] .ab-card-title { font-weight: 500; letter-spacing: calc(-0.03em * var(--ab-tr, 1)); }
 .ab[data-ae="soft-form"] .ab-cta {
   border-radius: 10px; border: 1px solid rgba(255, 255, 255, 0.27);
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0) 55%), var(--ab-primary);
@@ -129,10 +142,20 @@
 .ab[data-ae="soft-form"] .ab-disc[data-s="1"] { box-shadow: var(--sf-raised); }
 .ab[data-ae="soft-form"] .ab-disc[data-s="2"] { box-shadow: var(--sf-inset); }
 
-/* 03 / in use: dense rows stay flat */
-.ab[data-ae="soft-form"] .ab-row-status { background: var(--ab-sec-tint); box-shadow: none; }
-.ab[data-ae="soft-form"] .ab-row-bar { height: 8px; border-radius: 6px; background: var(--ab-canvas); box-shadow: var(--sf-inset-s); }
-.ab[data-ae="soft-form"] .ab-row-bar i { border-radius: 6px; background: linear-gradient(180deg, rgba(255, 255, 255, 0.3), transparent 60%), var(--ab-secondary); }
+/* 03 / in use: the list sits in one recessed well; progress tracks are recessed
+   channels with a raised, glossy fill */
+.ab[data-ae="soft-form"] .ab-list {
+  padding: 6px clamp(14px, 2.2cqw, 24px); border-radius: 22px; background: var(--ab-canvas); box-shadow: var(--sf-inset);
+}
+.ab[data-ae="soft-form"] .ab-row { border-color: color-mix(in srgb, var(--ab-line) 70%, transparent); }
+.ab[data-ae="soft-form"] .ab-row:first-child { border-top: 0; }
+.ab[data-ae="soft-form"] .ab-row:last-child { border-bottom: 0; }
+.ab[data-ae="soft-form"] .ab-row-status { background: var(--ab-canvas); box-shadow: var(--sf-raised-s); }
+.ab[data-ae="soft-form"] .ab-row-bar { height: 10px; border-radius: 6px; background: var(--ab-canvas); box-shadow: var(--sf-inset-s); overflow: visible; }
+.ab[data-ae="soft-form"] .ab-row-bar i {
+  border-radius: 6px; background: linear-gradient(180deg, rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0) 55%), var(--ab-secondary);
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.45), 1px 2px 4px var(--ab-lo);
+}
 
 /* footer */
 .ab[data-ae="soft-form"] .ab-foot { font-size: 11px; letter-spacing: 0.02em; }

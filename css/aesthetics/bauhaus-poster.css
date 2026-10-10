@@ -47,7 +47,7 @@
 }
 .ab[data-ae="bauhaus-poster"] .ab-kicker::before { content: ""; display: inline-block; width: 11px; height: 11px; margin-bottom: 12px; border-radius: 50%; background: var(--ab-ink); }
 .ab[data-ae="bauhaus-poster"] .ab-headline {
-  grid-column: 2; min-width: 0; font-weight: 800; text-transform: uppercase; line-height: 0.88; letter-spacing: -0.04em;
+  grid-column: 2; min-width: 0; font-weight: 800; text-transform: uppercase; line-height: calc(0.88 + 0.14 * (1 - var(--ab-tr, 1))); letter-spacing: calc(-0.04em * var(--ab-tr, 1));
 }
 /* the highlight word: a flat accent plane, no outline */
 .ab[data-ae="bauhaus-poster"] .ab-hl {
@@ -62,7 +62,7 @@
 /* palette: flat strips, labels inside, no outlines between colors */
 .ab[data-ae="bauhaus-poster"] .ab-swatches[data-kind="strips"] { border: 2px solid var(--ab-ink); border-radius: 0; box-shadow: none; }
 .ab[data-ae="bauhaus-poster"] .ab-sw-role { font-size: 11.5px; letter-spacing: 0.12em; }
-.ab[data-ae="bauhaus-poster"] .ab-swatches[data-kind="strips"] .ab-sw-job { font-size: 10px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; opacity: 0.9; }
+.ab[data-ae="bauhaus-poster"] .ab-swatches[data-kind="strips"] .ab-sw-job { font-size: 10px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; opacity: 0.9; }
 .ab[data-ae="bauhaus-poster"] .ab-swatches[data-kind="strips"] .ab-sw-hex { font-size: 11px; font-weight: 700; opacity: 1; letter-spacing: 0.08em; }
 
 /* 01 interface */
@@ -76,7 +76,7 @@
 .ab[data-ae="bauhaus-poster"] .ab-seg-btn::before { content: ""; flex: none; width: 9px; height: 9px; border: 2px solid var(--ab-ink); border-radius: 50%; }
 .ab[data-ae="bauhaus-poster"] .ab-seg-btn[aria-pressed="true"] { background: var(--ab-primary); color: var(--ab-on-primary); font-weight: 800; }
 .ab[data-ae="bauhaus-poster"] .ab-seg-btn[aria-pressed="true"]::before { background: var(--ab-ink); }
-.ab[data-ae="bauhaus-poster"] .ab-card-title { font-weight: 800; text-transform: uppercase; line-height: 0.95; letter-spacing: -0.015em; font-size: clamp(24px, 3.2cqw, 34px); margin: 22px 0 8px !important; }
+.ab[data-ae="bauhaus-poster"] .ab-card-title { font-weight: 800; text-transform: uppercase; line-height: 0.95; letter-spacing: calc(-0.015em * var(--ab-tr, 1)); font-size: clamp(24px, 3.2cqw, 34px); margin: 22px 0 8px !important; }
 .ab[data-ae="bauhaus-poster"] .ab-card-body { color: var(--ab-ink); font-size: 13px; font-weight: 500; }
 .ab[data-ae="bauhaus-poster"] .ab-cta {
   min-height: 54px; padding: 0 0 0 18px; border: 2px solid var(--ab-ink); border-radius: 0;
@@ -98,7 +98,7 @@
 .ab[data-ae="bauhaus-poster"] .ab-fieldlabel { font-size: 11px; letter-spacing: 0.16em; margin-bottom: 4px; }
 .ab[data-ae="bauhaus-poster"] .ab-input {
   border: 0; border-bottom: 3px solid var(--ab-ink); border-radius: 0; background: transparent; padding: 8px 2px 10px; margin-bottom: 20px;
-  font-family: var(--ab-font-h); font-size: 21px; font-weight: 800; text-transform: uppercase; letter-spacing: -0.005em;
+  font-family: var(--ab-font-h); font-size: 21px; font-weight: 800; text-transform: uppercase; letter-spacing: calc(-0.005em * var(--ab-tr, 1));
 }
 .ab[data-ae="bauhaus-poster"] .ab-input:focus { background: var(--ab-pri-tint); border-bottom-color: var(--ab-primary-text); }
 .ab[data-ae="bauhaus-poster"] .ab-toggle > span { font-size: 12px; letter-spacing: 0.12em; }
@@ -122,7 +122,7 @@
 }
 .ab[data-ae="bauhaus-poster"] .ab-row:first-child { border-top: 0; }
 .ab[data-ae="bauhaus-poster"] .ab-row:last-child { border-bottom: 2px solid var(--ab-ink); }
-.ab[data-ae="bauhaus-poster"] .ab-row-n { font: 800 clamp(30px, 4.8cqw, 46px)/0.9 var(--ab-font-h); color: var(--ab-ink); letter-spacing: -0.04em; }
+.ab[data-ae="bauhaus-poster"] .ab-row-n { font: 800 clamp(30px, 4.8cqw, 46px)/0.9 var(--ab-font-h); color: var(--ab-ink); letter-spacing: calc(-0.04em * var(--ab-tr, 1)); }
 .ab[data-ae="bauhaus-poster"] .ab-row-name { font-size: 15px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.04em; }
 .ab[data-ae="bauhaus-poster"] .ab-row-status {
   padding: 3px 12px; border: 2px solid var(--ab-ink); border-radius: 999px; background: var(--ab-secondary); color: var(--ab-on-secondary);
@@ -155,4 +155,10 @@
 .ab[data-ae="bauhaus-poster"] .ab-seg-btn:focus-visible, .ab[data-ae="bauhaus-poster"] .ab-cta:focus-visible, .ab[data-ae="bauhaus-poster"] .ab-switch:focus-visible { outline: 3px solid var(--ab-ink); outline-offset: 3px; }
 @media (prefers-reduced-motion: reduce) {
   .ab[data-ae="bauhaus-poster"] .ab-cta:hover .ab-cta-arrow, .ab[data-ae="bauhaus-poster"] .ab-cta:active { transform: none; }
+}
+
+/* narrow boards: the section label stays on one line, the descriptor wraps to the right */
+@container ab (max-width: 600px) {
+  .ab[data-ae="bauhaus-poster"] .ab-labelrow .ab-label:first-child { white-space: nowrap; }
+  .ab[data-ae="bauhaus-poster"] .ab-labelrow .ab-label:last-child:not(:first-child) { text-align: right; }
 }

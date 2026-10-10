@@ -19,7 +19,7 @@
 }
 
 /* header */
-.ab[data-ae="neo-brutal-pop"] .ab-brand { font-weight: 800; letter-spacing: -0.03em; }
+.ab[data-ae="neo-brutal-pop"] .ab-brand { font-weight: 800; letter-spacing: calc(-0.03em * var(--ab-tr, 1)); }
 .ab[data-ae="neo-brutal-pop"] .ab-mark {
   width: 34px; height: 34px; border-radius: var(--np-r); transform: rotate(-6deg);
   background: var(--ab-primary); color: var(--ab-on-primary);
@@ -61,7 +61,7 @@
   color: var(--ab-ink); font-size: 11px; font-weight: 800; letter-spacing: 0.1em;
   transform: rotate(-1.5deg);
 }
-.ab[data-ae="neo-brutal-pop"] .ab-headline { font-weight: 800; letter-spacing: -0.02em; line-height: 1.04; }
+.ab[data-ae="neo-brutal-pop"] .ab-headline { font-weight: 800; letter-spacing: calc(-0.02em * var(--ab-tr, 1)); line-height: 1.04; }
 /* the highlight word: a color fill with a 2px ink outline and a hard shadow */
 .ab[data-ae="neo-brutal-pop"] .ab-hl {
   display: inline-block; max-width: 100%; padding: 0 0.16em 0.06em; margin: 0 0.02em;
@@ -78,9 +78,13 @@
   position: absolute; inset: 0; z-index: 0; width: auto; max-width: none; aspect-ratio: auto; pointer-events: none;
 }
 .ab[data-ae="neo-brutal-pop"] .ab-hero-copy { position: relative; z-index: 1; }
+/* keep the statement at least ~24px clear of the stickers on wide boards */
+@container ab (min-width: 601px) {
+  .ab[data-ae="neo-brutal-pop"][data-hero="centered"] .ab-hero-copy { max-width: calc(62cqw - 48px); }
+}
 .ab[data-ae="neo-brutal-pop"] .nba { position: absolute; inset: 0; }
 .ab[data-ae="neo-brutal-pop"] .nba svg { position: absolute; display: block; overflow: visible; }
-.ab[data-ae="neo-brutal-pop"] .nba-star { width: 15cqw; max-width: 150px; min-width: 76px; left: 1%; top: 14%; transform: rotate(-12deg); }
+.ab[data-ae="neo-brutal-pop"] .nba-star { width: 13.5cqw; max-width: 132px; min-width: 70px; left: 0.5%; top: 12%; transform: rotate(-12deg); }
 .ab[data-ae="neo-brutal-pop"] .nba-flower { width: 14cqw; max-width: 140px; min-width: 72px; right: 2%; top: 34%; transform: rotate(10deg); }
 .ab[data-ae="neo-brutal-pop"] .nba-cta {
   position: absolute; left: 50%; bottom: clamp(24px, 3.6cqw, 40px); transform: translateX(-50%);
@@ -99,8 +103,8 @@
   height: clamp(40px, 5.6cqw, 58px); border: var(--np-b) solid var(--ab-ink); border-radius: var(--np-r);
   box-shadow: 3px 3px 0 var(--ab-ink);
 }
-.ab[data-ae="neo-brutal-pop"] .ab-swatch:nth-child(odd) .ab-chip { transform: rotate(-1.4deg); }
-.ab[data-ae="neo-brutal-pop"] .ab-swatch:nth-child(even) .ab-chip { transform: rotate(1.1deg); }
+.ab[data-ae="neo-brutal-pop"] .ab-swatch:nth-child(odd) .ab-chip { transform: rotate(-2deg); }
+.ab[data-ae="neo-brutal-pop"] .ab-swatch:nth-child(even) .ab-chip { transform: rotate(2deg); }
 .ab[data-ae="neo-brutal-pop"] .ab-sw-role { font-weight: 800; font-size: 13px; }
 .ab[data-ae="neo-brutal-pop"] .ab-sw-job { color: var(--ab-ink); opacity: 0.78; }
 .ab[data-ae="neo-brutal-pop"] .ab-sw-hex {
@@ -126,7 +130,7 @@
 .ab[data-ae="neo-brutal-pop"] .ab-seg-btn[aria-pressed="true"] {
   background: var(--ab-primary); color: var(--ab-on-primary); border-color: var(--ab-ink); font-weight: 800;
 }
-.ab[data-ae="neo-brutal-pop"] .ab-card-title { font-weight: 800; letter-spacing: -0.03em; }
+.ab[data-ae="neo-brutal-pop"] .ab-card-title { font-weight: 800; letter-spacing: calc(-0.03em * var(--ab-tr, 1)); }
 .ab[data-ae="neo-brutal-pop"] .ab-card-body { color: var(--ab-ink); font-size: 13.5px; }
 .ab[data-ae="neo-brutal-pop"] .ab-cta {
   padding: 12px 14px 12px 20px; border: var(--np-b) solid var(--ab-ink); border-radius: var(--np-r);
