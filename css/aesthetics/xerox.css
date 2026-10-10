@@ -227,3 +227,7 @@
 @media (prefers-reduced-motion: reduce) {
   .ab[data-ae="xerox"] .ab-cta::before, .ab[data-ae="xerox"] .ab-cta::after, .ab[data-ae="xerox"] .ab-input { transition: none; }
 }
+
+/* Brand deck cover (CAO-4 A1): the headline needs the room; the art plate sits lower and narrower, and the tear-off strip stays on the board. */
+.ab[data-ae="xerox"].ab-slide[data-slide="cover"] .ab-art { margin-top: clamp(150px, 22cqw, 230px); max-width: 38%; }
+.ab[data-ae="xerox"].ab-slide[data-slide="cover"] .xrt { display: none; }

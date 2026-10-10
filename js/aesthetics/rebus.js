@@ -195,6 +195,7 @@ registerAesthetic({
   slideShape: 'soft',
   labels: { material: 'Symbols', states: ['Word', 'Mixed', 'Symbol'], statesKind: 'swatch' },
   layout: { hero: 'centered', palette: 'swatches', sections: 'two-col', subcopy: false },
+  deck: { materialStage: 'pattern' },
   type: { ui: 'body', label: 'body' },
   highlight: 'custom',
   highlightNote: 'The last word is replaced by its pictogram on a flat accent disc (glyph in the on-accent colour); when it has no symbol it stays a word in the accent (shaded to read as text). The replaced word stays in visually-hidden text.',

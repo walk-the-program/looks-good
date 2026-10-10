@@ -15,6 +15,7 @@ registerAesthetic({
   slideShape: 'geometric',
   labels: { material: 'Hard surfaces', states: ['Rest', 'Hover', 'Pressed'], statesKind: 'button' },
   layout: { hero: 'poster', palette: 'strips' },
+  deck: { materialStage: 'pattern' },
   type: { ui: 'mono', label: 'mono', display: 1.35 },
   highlight: 'band',
 

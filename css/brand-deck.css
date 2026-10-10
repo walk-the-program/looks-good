@@ -56,6 +56,12 @@
   white-space: normal; display: block;
 }
 .ab.ab-slide[data-ae] .ab-deck-scale[data-face="h"] .ab-deck-sample { white-space: nowrap; }
+/* An aesthetic may place its hero headline on a grid line (Editorial: column 1, row 2).
+   Deck headings sit in their own grids and flows: never inherit that placement. */
+.ab.ab-slide[data-ae] .ab-headline.ab-deck-h,
+.ab.ab-slide[data-ae] .ab-headline.ab-deck-sample,
+.ab.ab-slide[data-ae] .ab-headline.ab-deck-aa,
+.ab.ab-slide[data-ae] .ab-headline.ab-deck-screentitle { grid-column: auto; grid-row: auto; }
 
 /* Slide headlines: the aesthetic's headline styling, sized here. --dk-fs is the
    base px; display scale and the fit pass (--ab-hs) multiply it. */
@@ -70,7 +76,24 @@
 .ab-deck-cover { display: flex; flex-direction: column; justify-content: safe center; }
 .ab-deck-cover .ab-hero { padding-top: 0; padding-bottom: 0; flex: 1 1 auto; }
 .ab.ab-slide[data-hero="poster"] .ab-deck-cover .ab-hero { padding-bottom: clamp(70px, 14cqw, 170px); }
+.ab.ab-slide[data-slide="cover"][data-hero]:not([data-hero="poster"]) .ab-deck-cover .ab-hero { padding-top: 0; padding-bottom: 0; gap: clamp(14px, 2cqw, 24px); }
+.ab.ab-slide[data-slide="cover"][data-cover-side] .ab-deck-cover .ab-hero { grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); justify-items: stretch; align-items: center; }
+.ab.ab-slide[data-slide="cover"][data-cover-side] .ab-deck-cover .ab-hero-copy { max-width: none; width: auto; text-align: left; }
+.ab.ab-slide[data-slide="cover"][data-cover-side] .ab-deck-cover .ab-art { justify-self: end; width: 100%; max-width: none; }
+.ab.ab-slide[data-slide="cover"][data-hero="scene"] .ab-art { --ab-art-ratio: 2.7 / 1; }
+.ab.ab-slide[data-slide="cover"][data-hero="scene"] .ab-hero-copy { margin: 0 0 28px 44px; }
+/* A hero that dissolves into the board's grid (display: contents, Bento) is a plain split here. */
+.ab.ab-slide[data-slide="cover"][data-cover-flat] .ab-deck-cover .ab-hero { display: grid; }
+.ab.ab-slide[data-slide="cover"][data-cover-flat] .ab-deck-cover .ab-hero > .ab-hero-copy,
+.ab.ab-slide[data-slide="cover"][data-cover-flat] .ab-deck-cover .ab-hero > .ab-art { grid-column: auto; }
+.ab.ab-slide[data-slide="cover"][data-cover-flat] .ab-deck-cover .ab-hero > .ab-hero-copy { min-height: 0; }
 .ab-deck-cover-meta { flex: none; margin: 0; padding-top: 6px; }
+
+/* Cover pattern band (D1): full width along the bottom, 132px, a 1px line on its
+   top edge. The content sits above it. Without a band the cover is unchanged. */
+.pt-deck-band { position: absolute; left: 0; right: 0; bottom: 0; height: 132px; box-sizing: border-box; border-top: 1px solid var(--ab-line); overflow: hidden; }
+.pt-deck-band img { position: absolute; inset: 0; width: 100%; height: 100%; display: block; object-fit: cover; }
+.ab.ab-slide[data-slide="cover"]:has(> .ab-deck-pattern > .pt-deck-band) > .ab-in.ab-slide-in { padding-bottom: 158px; }
 
 /* 02 Principles */
 .ab-deck-principles { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); gap: 56px; align-items: stretch; }
@@ -82,6 +105,10 @@
 .ab-deck-principle { display: grid; grid-template-columns: 56px minmax(0, 1fr); gap: 4px 12px; padding: 16px 0; border-top: 1px solid var(--ab-line); }
 .ab-deck-principle:last-child { border-bottom: 1px solid var(--ab-line); }
 .ab-deck-ptitle { margin: 0; font-family: var(--ab-font-h); font-size: 18px; font-weight: 600; line-height: 1.25; letter-spacing: -0.01em; }
+/* Display faces (pixel, deco, condensed) are for display lines, not sentences. */
+.ab.ab-slide[data-hcls="pixel"] .ab-deck-ptitle,
+.ab.ab-slide[data-hcls="deco"] .ab-deck-ptitle,
+.ab.ab-slide[data-hcls="condensed"] .ab-deck-ptitle { font-family: var(--ab-font-b); font-weight: 600; letter-spacing: 0; text-transform: none; }
 .ab-deck-pline { margin: 4px 0 0; font-family: var(--ab-font-b); font-size: 13px; line-height: 1.45; color: var(--ab-muted); }
 
 /* 03 Color system */
@@ -149,11 +176,15 @@
 .ab-deck-mat .ab-label { display: inline-flex; align-items: center; color: var(--ab-ink); }
 .ab-deck-note { margin-top: auto !important; padding-top: 14px; font-family: var(--ab-font-b); font-size: 13.5px; line-height: 1.5; color: var(--ab-muted); text-wrap: pretty; }
 
+/* Material stage that shows a pattern instead of the art (def.deck.materialStage) */
+.ab-deck-stage[data-stage="pattern"] { overflow: hidden; border: 1px solid var(--ab-line); border-radius: min(var(--dk-r, 8px), 14px); }
+.ab-deck-stage .pt-deck-stage { position: absolute; inset: 0; width: 100%; height: 100%; display: block; object-fit: cover; }
+
 /* 07 In product */
-.ab-deck-app { display: grid; grid-template-columns: 168px minmax(0, 1fr); border: 1px solid var(--ab-line); border-radius: var(--dk-r, 12px); }
-.ab-deck-side { border-radius: var(--dk-r, 12px) 0 0 var(--dk-r, 12px); display: flex; flex-direction: column; gap: 22px; padding: 20px 18px; border-right: 1px solid var(--ab-line); background: var(--ab-pri-tint); min-width: 0; }
+.ab-deck-app { display: grid; grid-template-columns: 196px minmax(0, 1fr); border: 1px solid var(--ab-line); border-radius: var(--dk-r, 12px); }
+.ab-deck-side { border-radius: var(--dk-r, 12px) 0 0 var(--dk-r, 12px); display: flex; flex-direction: column; gap: 22px; padding: 20px 18px; border-right: 1px solid var(--ab-line); background: color-mix(in srgb, var(--ab-ink) 4%, var(--ab-canvas)); min-width: 0; }
 .ab-deck-side .ab-brand { font-size: 15px; min-width: 0; }
-.ab.ab-slide[data-ae] .ab-deck-side .ab-wordmark { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ab.ab-slide[data-ae] .ab-deck-side .ab-wordmark { max-width: 100%; white-space: normal; overflow: visible; text-overflow: clip; font-size: 13px; line-height: 1.2; overflow-wrap: anywhere; }
 .ab-deck-navlist { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
 .ab-deck-nav { padding: 8px 10px; border-radius: min(var(--dk-r, 8px), 10px); }
 .ab-deck-nav .ab-label { color: var(--ab-muted); }

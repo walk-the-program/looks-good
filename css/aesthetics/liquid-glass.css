@@ -239,3 +239,8 @@
 @media (prefers-contrast: more) {
   .ab[data-ae="liquid-glass"] .ab-card, .ab[data-ae="liquid-glass"] .ab-panel, .ab[data-ae="liquid-glass"] .ab-list { border-color: var(--ab-ink); }
 }
+
+/* Brand deck cover (CAO-4 A2): keep the copy clear of the lens. */
+.ab[data-ae="liquid-glass"].ab-slide[data-slide="cover"] .ab-hero-copy { max-width: 46%; }
+/* ...and the scene's small timer card sits where the copy goes. */
+.ab[data-ae="liquid-glass"].ab-slide[data-slide="cover"] .lgs-card { display: none; }

@@ -257,3 +257,6 @@
 @media (prefers-reduced-motion: reduce) {
   .ab[data-ae="editorial-serif"] .ab-cta:active, .ab[data-ae="editorial-serif"] .ab-states .ab-state-ctl.is-pressed { transform: none; }
 }
+
+/* Brand deck (CAO-4 A3): a drop cap on a two-line card body reads as an error on the Interface and Product slides. */
+.ab[data-ae="editorial-serif"].ab-slide .ab-card-body::first-letter { float: none; font-size: inherit; line-height: inherit; margin: 0; padding: 0; }

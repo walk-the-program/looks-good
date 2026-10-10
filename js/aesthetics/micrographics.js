@@ -55,6 +55,7 @@ registerAesthetic({
   slideShape: 'minimal',
   labels: { material: 'Detail', states: ['Base', 'Annotated', 'Marked'], statesKind: 'swatch' },
   layout: { hero: 'centered', palette: 'swatches', sections: 'two-col' },
+  deck: { materialStage: 'pattern' },
   type: { ui: 'mono', label: 'mono', display: 1.28 },
   highlight: 'custom',
   highlightNote: 'The word is set solid in --accent-ink like the rest of the giant headline, followed by a tiny mono footnote reference "(01)" raised at its top right; no fill, no outline, no underline.',

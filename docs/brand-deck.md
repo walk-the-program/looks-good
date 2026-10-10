@@ -69,3 +69,27 @@ all", and a new "Download deck PDF" (jsPDF is already loaded; the Mac app vendor
 5. No console errors; render performance: switching aesthetic stays responsive (measure render()
    time before/after; deck rendering deferred).
 6. 390px: slides grid becomes one column, cards scale, no page overflow.
+
+## Cover, product slide and per-aesthetic overrides (CAO-4: D1-D6, A1-A4)
+
+The deck now has ten slides (Patterns is slide 07, added by js/patterns-deck.js); the table above lists the original nine.
+
+- **D1 Cover.** The cover's pattern is a full-width bottom band (`.pt-deck-band`, 1280x132, 1px `--ab-line` rule on its top edge, in css/brand-deck.css). The cover content is padded 158px above it. The closing slide keeps its 288px left strip.
+  `bdFitCover` (js/brand-deck.js) sizes the cover headline *first*: start at `min(132px, 11.5cqw) x display scale` (inline `!important`, since aesthetics size their hero headline themselves), then
+  1. shrink in 4% steps only until the copy stays inside its column (and, for the scene hero, inside the art);
+  2. if the cover would still need a scale under 0.85: shrink the headline down to 88px x display, then the art box (`max-width`, 8% steps, floor 40% of its width; the scene hero's art is left alone), then the headline on to the 64px floor;
+  3. an art-led hero that still cannot reach 0.85 may drop the headline below 64px (floor 40px) only if that actually helps; otherwise `bdScaleToFit` scales it (never below 0.4).
+  `bdScaleToFit` is the last resort. The scale it applied is left on each slide root as `data-fit-scale` (the cover also carries `data-cover-fs`, `data-cover-clear`) for the fit checks.
+  Cover layout helpers (all cover-only): a centered hero with a wide, short art stage (Aurora's window) goes side by side (`data-cover-side`); a scene hero's art ratio is 2.7:1; a hero that is `display: contents` on the board (Bento) becomes a plain split (`data-cover-flat`); the poster hero's reserved bottom padding is cut to what the art needs, and the copy is narrowed so no text line is within 24px of the art (`bdCoverClearArt`).
+- **D2 In product.** `.ab-deck-side` is a neutral panel (`ink 4% over canvas`, not the primary tint), 196px wide; the sidebar wordmark wraps (13px, line-height 1.2) instead of truncating.
+- **D3 Material stage.** `def.deck.materialStage`: `'art'` (default) or `'pattern'`. With `'pattern'` the stage shows the first pinned (else first suite) pattern at stage size, through the new `deckStageHook` (set by js/patterns-deck.js); the material chips are unchanged. Set for raw-brutalist, micrographics, rebus.
+- **D4 Quiet tone.** Every pattern render in the deck (wall, cover band, closing strip, material stage) passes `Object.assign({}, entry.params, { tone })` with the suite entry's `tone` (or the pin's `params.tone`), default 1. Quiet suites (Aurora, Soft Form, Liquid Glass, Blueprint) stay quiet on the deck.
+- **D5 Principle titles.** `.ab-deck-ptitle` uses the body face at weight 600 when the root has `data-hcls` `pixel`, `deco` or `condensed`.
+- **D6 Type scale.** The Display / H1 / H2 samples of light serifs rendered at ~20-30px because Editorial gives its hero headline `grid-column: 1; grid-row: 2`, which leaked into the type-scale grid and squeezed every sample into the 120px label column (so `bdFitSamples` shrank them). The deck headings now reset their grid placement (css/brand-deck.css); the caps are 96 / 56 / 40px, and the label states the size actually shown.
+- **A1-A4** are scoped rules appended to css/aesthetics/{xerox,liquid-glass,editorial-serif}.css (`.ab[data-ae="key"].ab-slide ...`): Xerox cover art lower and narrower with the tear-off strip hidden; Liquid Glass cover copy `max-width: 46%` (and its small timer card hidden: it sits where the headline goes); Editorial's drop cap off on slides. Rebus needs no CSS (D3 `materialStage: 'pattern'`).
+
+### Known limits
+- Covers that cannot reach scale 0.85 with the 132px band: neo-deco (about 0.5; its title-card row is a fixed 560px stage), mixed-type (about 0.65; the statement is the tall art) and bento-grid (about 0.79). They are scaled, never clipped.
+- Pre-existing, not from this change: Blob Tracking's slide header overflows 34px on four slides; Raw Brutalist's closing headline is wider than its column; the Interface slide is 2-20px wider than its box in a few aesthetics.
+- PNG/PDF export (html2canvas) flattens backdrop effects; Liquid Glass's cover copy is missing from the export (it was before this change too).
+

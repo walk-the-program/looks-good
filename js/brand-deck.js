@@ -17,6 +17,10 @@
    - deckPatternHook: set to function (P, slideKey) -> HTML. Its output is laid
      behind the content of every slide whose `pattern` flag is true (cover and
      closing). A no-op until something assigns it.
+   - deckStageHook: set to function (P, state, def, t) -> HTML. The Material
+     slide's stage shows that markup instead of the signature art when the
+     aesthetic sets `def.deck = { materialStage: 'pattern' }`. Falls back to the
+     art while unset or when it returns ''.
 
    Also holds the small colour/size helpers the board and the library tiles
    use (slMix, slVisible, slFit, slRadius, brandFileSlug). Plain <script>.
@@ -86,6 +90,18 @@ const DECK_H = 720;
 // Optional: function (P, slideKey) -> HTML laid behind the content of slides
 // flagged `pattern: true`. Null (no-op) until another script sets it.
 let deckPatternHook = null;
+
+// Optional: function (P, state, def, t) -> stage HTML for the Material slide
+// (see `def.deck.materialStage`). Null until another script sets it.
+let deckStageHook = null;
+
+// Cover headline sizing (D1): start at min(132px, 11.5cqw) x the aesthetic's
+// display scale, shrink in 4% steps only until the hero copy fits, never below 64px.
+const BD_COVER_START = Math.min(132, 0.115 * 1280);
+const BD_COVER_MIN_PX = 64;
+const BD_COVER_SOFT_PX = 88;          // x display scale: the headline gives up this much before the art box shrinks
+const BD_COVER_MIN_SCALE = 0.85;
+const BD_COVER_EMERGENCY_PX = 40;     // below the 64px floor only when the cover cannot otherwise reach 0.85
 
 function bdPatternHtml(P, key) {
   if (typeof deckPatternHook !== 'function') return '';
@@ -222,15 +238,15 @@ const DECK_SLIDES = [
       const disp = abTypeFor(def).display || 1;
       const shown = (px, cap) => Math.min(px, cap);
       const scale = [
-        { name: 'Display', px: Math.round(hsz * 1.6 * disp), face: 'h', cap: 64 },
-        { name: 'Heading 1', px: hsz, face: 'h', cap: 44 },
-        { name: 'Heading 2', px: Math.round(hsz * 0.7), face: 'h', cap: 32 },
+        { name: 'Display', px: Math.round(hsz * 1.6 * disp), face: 'h', cap: 96 },
+        { name: 'Heading 1', px: hsz, face: 'h', cap: 56 },
+        { name: 'Heading 2', px: Math.round(hsz * 0.7), face: 'h', cap: 40 },
         { name: 'Body', px: bsz, face: 'b', cap: 18 },
         { name: 'Caption', px: Math.round(bsz * 0.8), face: 'b', cap: 14 },
       ].map(s => {
         const sample = s.name === 'Display' ? 'Good design' : s.face === 'h' ? 'Good design feels alive' : 'Type, color and material, set in one place.';
         return `<li class="ab-deck-scale" data-face="${s.face}">
-          <span class="ab-label">${s.name}<i> · ${s.px}px</i></span>
+          <span class="ab-label">${s.name}<i> · ${shown(s.px, s.cap)}px</i></span>
           <span class="ab-deck-sample${s.face === 'h' ? ' ab-headline' : ''}" style="--dk-fs:${shown(s.px, s.cap)}px">${sample}</span>
         </li>`;
       }).join('');
@@ -281,13 +297,18 @@ const DECK_SLIDES = [
   },
   {
     key: 'material', title: 'Material & graphics',
-    build(P, state, def) {
+    build(P, state, def, t) {
       const e = escapeHtml;
       const mats = (def.materials || []).slice(0, 8).map((m, i) => `<li class="ab-deck-mat">
           <span class="ab-label"><i class="ab-n">${String(i + 1).padStart(2, '0')}</i><span>${e(m.name)}</span></span>
         </li>`).join('');
+      const patternStage = (def.deck && def.deck.materialStage === 'pattern' && typeof deckStageHook === 'function')
+        ? deckStageHook(P, state, def, t) : '';
+      const stage = patternStage
+        ? `<div class="ab-deck-stage" data-stage="pattern" data-hero="${P.layout.hero}">${patternStage}</div>`
+        : `<div class="ab-deck-stage" data-hero="${P.layout.hero}"><div class="ab-art" aria-hidden="true">${P.art()}</div></div>`;
       return `<div class="ab-deck-material">
-        <div class="ab-deck-stage" data-hero="${P.layout.hero}"><div class="ab-art" aria-hidden="true">${P.art()}</div></div>
+        ${stage}
         <div class="ab-deck-matcol">
           <div class="ab-labelrow"><span class="ab-label">${e(P.labels.material)}</span><span class="ab-label">${e(def.descriptor)}</span></div>
           <ul class="ab-deck-mats">${mats}</ul>
@@ -397,39 +418,186 @@ function bdBodyOverflows(root) {
   return !!body && body.scrollHeight > body.clientHeight + 1;
 }
 
-// Cover, Principles and Closing headlines scale with the container, so a long
-// tagline or an aesthetic with a big display scale can outgrow 720px. Shrink
-// --ab-hs (every headline size multiplies it) down to a floor, then let
-// bdScaleToFit take over.
+// Principles and Closing headlines scale with the container, so a long tagline
+// or an aesthetic with a big display scale can outgrow 720px. Shrink --ab-hs
+// (every headline size multiplies it) down to a floor, then let bdScaleToFit
+// take over. The cover has its own pass (bdFitCover).
 function bdFitHeadline(root) {
   if (!root.dataset.hs0) root.dataset.hs0 = root.style.getPropertyValue('--ab-hs') || '1';
-  const cover = root.dataset.slide === 'cover';
   const base = parseFloat(root.dataset.hs0) || 1;
-  // The cover starts a third larger than the board's hero, then shrinks to fit.
-  let hs = base * (cover ? 1.3 : 1);
+  let hs = base;
   root.style.setProperty('--ab-hs', String(hs));
-  const floor = base * (cover ? 0.75 : 0.5);
+  const floor = base * 0.5;
   for (let i = 0; i < 30 && hs > floor && bdBodyOverflows(root); i++) {
     hs *= 0.94;
     root.style.setProperty('--ab-hs', hs.toFixed(3));
   }
 }
 
+// Cover: the headline is the statement, so set its size first and fit second.
+// Start at min(132px, 11.5cqw) x the aesthetic's display scale (inline
+// !important: the aesthetics size their hero headline with their own rules),
+// shrink in 4% steps only until the hero copy fits, never below 64px. If the
+// slide would still need a scale under 0.85, shrink the art box in 8% steps;
+// bdScaleToFit then scales the cover only as a last resort (floor 0.85).
+function bdCoverCopyFits(root) {
+  const copy = root.querySelector('.ab-hero-copy');
+  if (!copy) return true;
+  if (copy.scrollWidth > copy.clientWidth + 1) return false;
+  // Scene hero: the copy is laid over the art, so it has to stay inside it.
+  const art = root.querySelector('.ab-hero .ab-art');
+  if (root.dataset.hero === 'scene' && art) {
+    const mb = parseFloat(getComputedStyle(copy).marginBottom) || 0;
+    if (copy.offsetHeight + mb > art.offsetHeight - 16) return false;
+  }
+  return true;
+}
+
+// The poster hero parks its art in a corner and pads the hero so the art clears
+// the copy. On the cover keep the art clear of the copy's text lines (with an
+// 24px air gap) the cheap way first: the smallest bottom padding (8px steps, up
+// to the stylesheet's own). If the art sits beside the text instead, narrow
+// the copy so its lines wrap short of the art. Returns false when it still collides.
+function bdCoverClearArt(root) {
+  const hero = root.querySelector('.ab-hero');
+  const art = hero && hero.querySelector('.ab-art');
+  if (!hero || !art || root.dataset.hero !== 'poster') return true;
+  const kids = [...hero.querySelectorAll('.ab-hero-copy > *')];
+  const z = root.offsetWidth ? root.getBoundingClientRect().width / root.offsetWidth : 1;   // CSS zoom of the card
+  kids.forEach(el => { el.style.maxWidth = ''; });
+  hero.style.paddingBottom = '';
+  const max = parseFloat(getComputedStyle(hero).paddingBottom) || 0;
+  const hits = () => {
+    const a = art.getBoundingClientRect();
+    return kids.some(el => {
+      const r = document.createRange();
+      r.selectNodeContents(el);
+      return [...r.getClientRects()].some(l => l.width > 1 && l.height > 1 && l.left < a.right - 2 && l.right + 24 * z > a.left && l.top < a.bottom - 2 && l.bottom > a.top + 2);
+    });
+  };
+  const pads = () => {
+    for (let pad = 0; pad <= max; pad += 8) {
+      hero.style.paddingBottom = pad + 'px';
+      if (!hits()) return true;
+    }
+    hero.style.paddingBottom = '';
+    return !hits();
+  };
+  if (pads()) return true;
+  const left = art.getBoundingClientRect().left;
+  kids.forEach(el => {
+    const w = (left - 24 * z - el.getBoundingClientRect().left) / z;
+    if (w > 240) el.style.maxWidth = Math.floor(w) + 'px';
+  });
+  return pads();
+}
+
+// Scale the cover's content would need to fit its body (1 = fits as is).
+function bdCoverNeed(root) {
+  if (!bdCoverClearArt(root)) return 0;
+  const body = root.querySelector('.ab-slide-body');
+  const wrap = body && body.firstElementChild;
+  if (!wrap) return 1;
+  wrap.style.transform = '';
+  return wrap.scrollHeight > wrap.clientHeight + 1 ? wrap.clientHeight / wrap.scrollHeight : 1;
+}
+
+// A centered hero normally stacks the statement above a wide art stage. On the
+// cover the two sit side by side instead (css/brand-deck.css, [data-cover-side]),
+// unless the aesthetic lays its copy over the art (same grid cell) or the art is
+// tall (it carries the statement): then the art is the page and stays where it is.
+function bdCoverSide(root) {
+  delete root.dataset.coverSide;
+  if (root.dataset.hero !== 'centered') return;
+  const copy = root.querySelector('.ab-hero-copy');
+  const art = root.querySelector('.ab-hero .ab-art');
+  if (!copy || !art) return;
+  const c = copy.getBoundingClientRect();
+  const a = art.getBoundingClientRect();
+  const w = Math.min(c.right, a.right) - Math.max(c.left, a.left);
+  const h = Math.min(c.bottom, a.bottom) - Math.max(c.top, a.top);
+  const overlap = w > 0 && h > 0 ? (w * h) / Math.max(1, Math.min(c.width * c.height, a.width * a.height)) : 0;
+  // Only a wide, short stage (Aurora's window) gives up its row; a tall art is the page.
+  if (overlap < 0.2 && art.offsetWidth && art.offsetHeight / art.offsetWidth < 0.6) root.dataset.coverSide = '1';
+}
+
+function bdFitCover(root) {
+  const hl = root.querySelector('.ab-hero .ab-headline');
+  if (!hl) return;
+  hl.style.removeProperty('font-size');
+  const art0 = root.querySelector('.ab-hero .ab-art');
+  if (art0) { art0.style.maxWidth = ''; art0.style.width = ''; }
+  delete root.dataset.coverFlat;
+  const hero0 = root.querySelector('.ab-hero');
+  if (hero0 && getComputedStyle(hero0).display === 'contents') root.dataset.coverFlat = '1';
+  bdCoverSide(root);
+  const display = parseFloat(root.style.getPropertyValue('--ab-display')) || 1;
+  const start = Math.max(BD_COVER_MIN_PX, BD_COVER_START * display);
+  let fs = start;
+  const setFs = v => hl.style.setProperty('font-size', v.toFixed(1) + 'px', 'important');
+  const shrinkTo = floor => {
+    for (let i = 0; i < 40 && fs > floor && bdCoverNeed(root) < BD_COVER_MIN_SCALE; i++) {
+      fs = Math.max(floor, fs * 0.96);
+      setFs(fs);
+    }
+  };
+  setFs(fs);
+  // 1. headline: only as far as the copy needs to stay inside its column.
+  for (let i = 0; i < 40 && fs > BD_COVER_MIN_PX && !bdCoverCopyFits(root); i++) {
+    fs = Math.max(BD_COVER_MIN_PX, fs * 0.96);
+    setFs(fs);
+  }
+  // 2. too tall for the 0.85 floor: shrink the headline, but only down to a
+  //    statement size, then the art box in 8% steps (the scene hero's copy
+  //    sits inside the art, so there it is left alone), then the headline on to 64px.
+  shrinkTo(Math.min(fs, Math.max(BD_COVER_MIN_PX, BD_COVER_SOFT_PX * display)));
+  const art = root.querySelector('.ab-hero .ab-art');
+  if (art) {
+    art.style.maxWidth = '';
+    art.style.width = '';
+    if (root.dataset.hero !== 'scene') {
+      let w = art.offsetWidth;
+      const minW = Math.max(96, w * 0.4);
+      for (let i = 0; i < 16 && w * 0.92 >= minW && bdCoverNeed(root) < BD_COVER_MIN_SCALE; i++) {
+        w *= 0.92;
+        art.style.maxWidth = Math.round(w) + 'px';
+        if (root.dataset.hero === 'poster') art.style.width = Math.round(w) + 'px';
+      }
+    }
+  }
+  shrinkTo(BD_COVER_MIN_PX);
+  // 4. An art-led hero (copy in a card on the art, a poster-size stage) that
+  //    still needs a scale under 0.85 at the 64px floor: give up the floor
+  //    rather than the 0.85 (never below 40px), then let bdScaleToFit scale the rest.
+  const fsKeep = fs;
+  const needKeep = bdCoverNeed(root);
+  shrinkTo(BD_COVER_EMERGENCY_PX);
+  if (fs < fsKeep && bdCoverNeed(root) < needKeep + 0.05) { fs = fsKeep; setFs(fs); }   // the headline was not the problem
+  root.dataset.coverClear = bdCoverClearArt(root) ? '1' : '0';
+  root.dataset.coverFs = fs.toFixed(1);
+}
+
 // Last resort for any slide whose body is still taller than its box (a long
 // brand name, an aesthetic with heavy chrome): scale the slide's content down
 // uniformly. A transform, not zoom, so html2canvas exports it faithfully.
+// bdFitCover works to keep the cover at 0.85 or above (headline, then art box);
+// only a hero that cannot get there falls through to a lower scale rather than
+// clipping. The applied scale is left on the root as data-fit-scale.
 function bdScaleToFit(root) {
   const body = root.querySelector('.ab-slide-body');
   const wrap = body && body.firstElementChild;
   if (!wrap) return;
   wrap.style.transform = '';
   wrap.style.transformOrigin = '';
+  root.dataset.fitScale = '1';
   const avail = wrap.clientHeight;
   const need = wrap.scrollHeight;
   if (!avail || need <= avail + 1) return;
-  const s = Math.max(0.55, avail / need);
-  wrap.style.transformOrigin = root.dataset.slide === 'cover' ? '50% 0' : '0 0';
+  const cover = root.dataset.slide === 'cover';
+  const s = Math.max(0.4, avail / need);   // the cover's 0.85 is met by bdFitCover where it can be; never clip
+  wrap.style.transformOrigin = cover ? '50% 0' : '0 0';
   wrap.style.transform = `scale(${s.toFixed(4)})`;
+  root.dataset.fitScale = s.toFixed(3);
 }
 
 // The Material slide shows the art at its own aspect ratio inside a stage; the
@@ -451,11 +619,15 @@ function bdFitStage(root) {
 // One-line type samples (the type scale) shrink until they sit inside their cell.
 function bdFitSamples(root) {
   root.querySelectorAll('.ab-deck-scale[data-face="h"] .ab-deck-sample').forEach(el => {
-    let fs = parseFloat(el.style.getPropertyValue('--dk-fs')) || 32;
+    const fs0 = parseFloat(el.style.getPropertyValue('--dk-fs')) || 32;
+    let fs = fs0;
     for (let i = 0; i < 12 && el.scrollWidth > el.clientWidth + 1; i++) {
       fs *= 0.93;
       el.style.setProperty('--dk-fs', fs.toFixed(1) + 'px');
     }
+    // The label states the size that is actually shown.
+    const note = fs < fs0 && el.closest('.ab-deck-scale').querySelector('.ab-label i');
+    if (note) note.textContent = ` · ${Math.round(fs)}px`;
   });
 }
 
@@ -483,7 +655,8 @@ function bdFitDeck(grid) {
     const key = root.dataset.slide;
     bdLegibleHeadings(root);
     if (key === 'typography') bdFitSamples(root);
-    if (key === 'cover' || key === 'principles' || key === 'closing') bdFitHeadline(root);
+    if (key === 'cover') bdFitCover(root);
+    else if (key === 'principles' || key === 'closing') bdFitHeadline(root);
     if (key === 'material') bdFitStage(root);
     bdScaleToFit(root);
   });
