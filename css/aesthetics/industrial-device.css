@@ -1,6 +1,279 @@
 /* ---------------------------------------------------------------------
-   17 Industrial Device — STUB (owner N2). Empty on purpose: the base board styles apply.
-   Scope EVERY selector under .ab[data-ae="industrial-device"], restyle the shared
-   board classes (see docs/aesthetics-plan.md "Board anatomy"), and provide
-   prefers-reduced-motion / prefers-reduced-transparency handling where used.
+   17 Industrial Device — machined flat panels on an aluminium canvas, square
+   physical keys with a 2px underside, tiny mono labels with numbered callouts.
+   Reference: teenage.engineering, Braun ET66. Variables (--ab-face, --ab-key,
+   --ab-key-edge, --ab-slot, --ab-oled*, --ab-led ...) come from
+   js/aesthetics/industrial-device.js tokens(). Hooks: hero split, type ui sans /
+   label mono, highlight ink, states button, canvas().
 ------------------------------------------------------------------------ */
+
+.ab[data-ae="industrial-device"] {
+  --id-mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --id-panel: inset 0 1px 0 var(--ab-edge-hi), inset 0 -1px 0 var(--ab-edge-lo);
+  --id-keyshadow: inset 0 1px 0 var(--ab-key-hi), 0 2px 0 var(--ab-key-edge);
+  border-radius: 18px;
+}
+
+/* ---- header ---- */
+.ab[data-ae="industrial-device"] .ab-brand { font-weight: 600; letter-spacing: calc(-0.02em * var(--ab-tr, 1)); }
+.ab[data-ae="industrial-device"] .ab-mark {
+  width: 28px; height: 28px; margin-bottom: 2px; border-radius: 6px; background: var(--ab-key); color: var(--ab-ink);
+  border: 1px solid var(--ab-hair); box-shadow: var(--id-keyshadow); font: 700 13px/1 var(--id-mono);
+}
+.ab[data-ae="industrial-device"] .ab-tag { font-size: 10px; letter-spacing: 0.12em; }
+.ab[data-ae="industrial-device"] .ab-tag::before {
+  content: ""; display: inline-block; width: 6px; height: 6px; margin-right: 8px; vertical-align: 1px; border-radius: 50%;
+  background: var(--ab-led); box-shadow: 0 0 0 1px var(--ab-hair), 0 0 8px var(--ab-led-glow);
+}
+.ab[data-ae="industrial-device"] .ab-rule { background: var(--ab-hair); box-shadow: 0 1px 0 var(--ab-edge-hi); }
+
+/* ---- labels: tiny mono, numbered, with a leader line out to the descriptor ---- */
+.ab[data-ae="industrial-device"] .ab-label { font-size: 10px; letter-spacing: 0.12em; }
+.ab[data-ae="industrial-device"] .ab-labelrow { align-items: center; gap: 14px; }
+.ab[data-ae="industrial-device"] .ab-labelrow .ab-label:first-child { display: flex; align-items: center; flex: 1; gap: 10px; color: var(--ab-ink); }
+.ab[data-ae="industrial-device"] .ab-labelrow .ab-label:first-child:not(:only-child)::after {
+  content: ""; flex: 1; min-width: 20px; height: 1px; background: var(--ab-hair);
+}
+.ab[data-ae="industrial-device"] .ab-label .ab-n {
+  display: inline-grid; place-items: center; flex: none; width: 21px; height: 21px; border: 1px solid var(--ab-ink); border-radius: 50%;
+  font-size: 8.5px; letter-spacing: 0; color: var(--ab-ink); background: var(--ab-canvas);
+}
+.ab[data-ae="industrial-device"] .ab-n::after { content: none; }
+.ab[data-ae="industrial-device"] .ab-labelrow .ab-label:last-child:not(:first-child) { flex: none; text-align: right; }
+
+/* ---- hero ---- */
+.ab[data-ae="industrial-device"] .ab-hero { grid-template-columns: minmax(0, 1fr) minmax(0, 1.04fr); align-items: center; gap: clamp(20px, 4cqw, 48px); padding: clamp(32px, 5.4cqw, 66px) 0 clamp(26px, 4cqw, 48px); }
+.ab[data-ae="industrial-device"] .ab-kicker { display: inline-flex; align-items: center; gap: 9px; font-size: 10.5px; letter-spacing: 0.14em; color: var(--ab-muted); }
+.ab[data-ae="industrial-device"] .ab-kicker::before {
+  content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--ab-led); box-shadow: 0 0 0 1px var(--ab-hair), 0 0 9px var(--ab-led-glow);
+}
+.ab[data-ae="industrial-device"] .ab-headline { font-weight: 600; line-height: 0.98; letter-spacing: calc(-0.035em * var(--ab-tr, 1)); }
+.ab[data-ae="industrial-device"] .ab-subcopy { max-width: 24em; font-size: clamp(13.5px, 1.5cqw, 16px); }
+.ab[data-ae="industrial-device"] .ab-sub-lead { color: var(--ab-ink); font-weight: 500; }
+.ab[data-ae="industrial-device"] .ab-art { max-width: 500px; justify-self: end; aspect-ratio: 100 / 82; }
+
+/* ---- the device face ---- */
+.ab[data-ae="industrial-device"] .idv { position: absolute; inset: 0; color: var(--ab-ink); font-family: var(--id-mono); }
+.ab[data-ae="industrial-device"] .idv > * { position: absolute; }
+.ab[data-ae="industrial-device"] .idv i, .ab[data-ae="industrial-device"] .idv em, .ab[data-ae="industrial-device"] .idv b { font-style: normal; }
+.ab[data-ae="industrial-device"] .idv-body {
+  border-radius: 3.4cqw; background: var(--ab-face); border: 1px solid var(--ab-hair);
+  box-shadow: var(--id-panel), 0 1px 1px rgba(0,0,0,.08), 0 14px 18px -16px rgba(0,0,0,.45);
+}
+/* OLED strip: black, brand name in primary pixels, a few level bars */
+.ab[data-ae="industrial-device"] .idv-oled {
+  display: flex; align-items: center; gap: 2cqw; padding: 0 2.2cqw; overflow: hidden; border-radius: 1.2cqw; background: var(--ab-oled); color: var(--ab-oled-ink);
+  box-shadow: 0 0 0 1px rgba(0,0,0,.4), 0 1px 0 var(--ab-edge-hi), inset 0 0 0 1px rgba(255,255,255,.06), inset 0 0 2.4cqw var(--ab-ring);
+  font-size: clamp(8px, 2.5cqw, 13px); line-height: 1;
+}
+.ab[data-ae="industrial-device"] .idv-oled::before {
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  background: repeating-linear-gradient(0deg, rgba(0,0,0,.4) 0 1px, transparent 1px 3px), repeating-linear-gradient(90deg, rgba(0,0,0,.28) 0 1px, transparent 1px 3px);
+}
+.ab[data-ae="industrial-device"] .idv-oled b { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 700; letter-spacing: 0.1em; text-shadow: 0 0 0.9em var(--ab-pri-glow); }
+.ab[data-ae="industrial-device"] .idv-bars { display: flex; align-items: flex-end; gap: 0.35em; height: 56%; }
+.ab[data-ae="industrial-device"] .idv-bars i { width: 0.45em; background: var(--ab-oled-ink); opacity: 0.9; }
+.ab[data-ae="industrial-device"] .idv-bars i:nth-child(even) { background: var(--ab-oled-dim); }
+.ab[data-ae="industrial-device"] .idv-oled em { color: var(--ab-oled-acc); letter-spacing: 0.08em; font-weight: 600; }
+
+/* knob: knurled ring, tick scale with a lit arc, cap with a primary indicator */
+.ab[data-ae="industrial-device"] .idv-ticks, .ab[data-ae="industrial-device"] .idv-arc {
+  border-radius: 50%;
+  -webkit-mask-image: radial-gradient(circle closest-side, transparent 0 82%, #000 83% 100%), conic-gradient(from -135deg, #000 0 270deg, transparent 270deg);
+  mask-image: radial-gradient(circle closest-side, transparent 0 82%, #000 83% 100%), conic-gradient(from -135deg, #000 0 270deg, transparent 270deg);
+  -webkit-mask-composite: source-in; mask-composite: intersect;
+}
+.ab[data-ae="industrial-device"] .idv-ticks { background: repeating-conic-gradient(from -136.6deg, var(--ab-dot) 0 3.2deg, transparent 3.2deg 27deg); }
+.ab[data-ae="industrial-device"] .idv-arc {
+  background: repeating-conic-gradient(from -136.6deg, var(--ab-primary) 0 3.2deg, transparent 3.2deg 27deg);
+  -webkit-mask-image: radial-gradient(circle closest-side, transparent 0 82%, #000 83% 100%), conic-gradient(from -135deg, #000 0 175deg, transparent 175deg);
+  mask-image: radial-gradient(circle closest-side, transparent 0 82%, #000 83% 100%), conic-gradient(from -135deg, #000 0 175deg, transparent 175deg);
+}
+.ab[data-ae="industrial-device"] .idv-knob {
+  border-radius: 50%; border: 1px solid var(--ab-hair); transform: translateY(0);
+  background: repeating-conic-gradient(rgba(0,0,0,.2) 0 2.4deg, rgba(255,255,255,.3) 2.4deg 4.8deg), linear-gradient(150deg, var(--ab-key-hi), var(--ab-key-edge));
+  box-shadow: 0 0 0 0.5cqw var(--ab-face), 0 0 0 calc(0.5cqw + 1px) var(--ab-hair), 0 1cqw 1.4cqw -0.6cqw rgba(0,0,0,.4), inset 0 1px 0 var(--ab-key-hi);
+}
+.ab[data-ae="industrial-device"] .idv-knob span {
+  position: absolute; inset: 17%; border-radius: 50%; transform: rotate(48deg);
+  background: radial-gradient(circle at 36% 30%, var(--ab-key-hi), var(--ab-key) 55%, var(--ab-key-edge) 130%);
+  border: 1px solid var(--ab-hair); box-shadow: inset 0 1px 0 var(--ab-key-hi), 0 0.35cqw 0.6cqw -0.2cqw rgba(0,0,0,.4);
+}
+.ab[data-ae="industrial-device"] .idv-knob span::after {
+  content: ""; position: absolute; left: 50%; top: 9%; width: 9%; height: 26%; transform: translateX(-50%); border-radius: 2px;
+  background: var(--ab-primary); box-shadow: 0 0 0.9cqw var(--ab-pri-glow);
+}
+/* keys */
+.ab[data-ae="industrial-device"] .idv-keys { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5cqw; align-content: start; }
+.ab[data-ae="industrial-device"] .idv-key {
+  position: relative; aspect-ratio: 1; border-radius: 1cqw; background: var(--ab-key); border: 1px solid var(--ab-hair);
+  box-shadow: inset 0 1px 0 var(--ab-key-hi), 0 0.4cqw 0 var(--ab-key-edge);
+}
+.ab[data-ae="industrial-device"] .idv-key::after {
+  content: ""; position: absolute; left: 50%; top: 50%; width: 26%; height: 1px; transform: translate(-50%, -50%); background: var(--ab-dot);
+}
+.ab[data-ae="industrial-device"] .idv-key.acc { background: var(--ab-accent); border-color: rgba(0,0,0,.12); }
+.ab[data-ae="industrial-device"] .idv-key.acc::after { background: var(--ab-on-accent); opacity: 0.55; }
+.ab[data-ae="industrial-device"] .idv-key.on {
+  background: var(--ab-primary); border-color: rgba(0,0,0,.14); transform: translateY(0.4cqw); box-shadow: inset 0 0.3cqw 0.6cqw rgba(0,0,0,.28), 0 0 0 transparent;
+}
+.ab[data-ae="industrial-device"] .idv-key.on::after { background: var(--ab-on-primary); opacity: 0.6; }
+/* speaker grille and LEDs */
+.ab[data-ae="industrial-device"] .idv-grille { display: grid; grid-template-columns: repeat(18, 1fr); align-content: space-between; }
+.ab[data-ae="industrial-device"] .idv-grille i { width: 62%; aspect-ratio: 1; justify-self: center; border-radius: 50%; background: var(--ab-dot); }
+.ab[data-ae="industrial-device"] .idv-leds { display: flex; align-items: center; gap: 1.5cqw; }
+.ab[data-ae="industrial-device"] .idv-leds i { width: 1.7cqw; height: 1.7cqw; border-radius: 50%; background: var(--ab-slot); box-shadow: 0 0 0 1px var(--ab-hair), inset 0 1px 1px rgba(0,0,0,.3); }
+.ab[data-ae="industrial-device"] .idv-leds i.on { background: var(--ab-led); box-shadow: 0 0 0 1px var(--ab-hair), 0 0 1.4cqw var(--ab-led-glow); }
+.ab[data-ae="industrial-device"] .idv-leds i.p { background: var(--ab-primary); box-shadow: 0 0 0 1px var(--ab-hair), 0 0 1.2cqw var(--ab-pri-glow); }
+.ab[data-ae="industrial-device"] .idv-leds code { margin-left: auto; font: 600 clamp(7px, 1.9cqw, 10px) var(--id-mono); letter-spacing: 0.14em; color: var(--ab-muted); }
+/* numbered callouts with leader lines, and the legend */
+.ab[data-ae="industrial-device"] .idv-marks { inset: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; }
+.ab[data-ae="industrial-device"] .idv-marks line { stroke: var(--ab-ink); stroke-width: 0.28; opacity: 0.7; }
+.ab[data-ae="industrial-device"] .idv-marks .m { fill: var(--ab-canvas); stroke: var(--ab-ink); stroke-width: 0.3; }
+.ab[data-ae="industrial-device"] .idv-marks .d { fill: var(--ab-ink); }
+.ab[data-ae="industrial-device"] .idv-marks text { fill: var(--ab-ink); font: 700 2.6px var(--id-mono); }
+.ab[data-ae="industrial-device"] .idv-legend { left: 0; right: 0; bottom: 0; display: flex; justify-content: space-between; gap: 2cqw; font-size: clamp(7px, 2.1cqw, 10.5px); letter-spacing: 0.1em; text-transform: uppercase; color: var(--ab-muted); white-space: nowrap; }
+.ab[data-ae="industrial-device"] .idv-legend b { display: inline-grid; place-items: center; width: 1.7em; height: 1.7em; margin-right: 0.6em; border: 1px solid var(--ab-ink); border-radius: 50%; font-size: 0.9em; color: var(--ab-ink); }
+
+/* ---- palette: CMF chips, numbered ---- */
+.ab[data-ae="industrial-device"] .ab-swatches { counter-reset: idsw; }
+.ab[data-ae="industrial-device"] .ab-swatch { counter-increment: idsw; }
+.ab[data-ae="industrial-device"] .ab-chip { height: clamp(44px, 6.4cqw, 68px); border-radius: 6px; box-shadow: inset 0 0 0 1px rgba(128,128,128,.3), inset 0 1px 0 rgba(255,255,255,.4), 0 2px 0 var(--ab-key-edge); margin-bottom: 14px; }
+.ab[data-ae="industrial-device"] .ab-sw-role { font: 700 10.5px/1.3 var(--id-mono); letter-spacing: 0.1em; text-transform: uppercase; }
+.ab[data-ae="industrial-device"] .ab-sw-role::before { content: counter(idsw, decimal-leading-zero) "  "; white-space: pre; color: var(--ab-muted); font-weight: 500; }
+.ab[data-ae="industrial-device"] .ab-sw-job { font-size: 10px; letter-spacing: 0.02em; }
+.ab[data-ae="industrial-device"] .ab-sw-hex { font-size: 10px; }
+
+/* ---- type block: spec plates ---- */
+.ab[data-ae="industrial-device"] .ab-type-col { padding: 14px 16px 14px; background: var(--ab-face); border: 1px solid var(--ab-hair); border-radius: 10px; box-shadow: var(--id-panel); }
+.ab[data-ae="industrial-device"] .ab-type-role { color: var(--ab-ink); font-weight: 700; font-size: 10px; }
+.ab[data-ae="industrial-device"] .ab-type-class { font-family: var(--id-mono); font-size: 10.5px; letter-spacing: 0.02em; }
+.ab[data-ae="industrial-device"] .ab-type-pick { letter-spacing: calc(-0.015em * var(--ab-tr, 1)); }
+.ab[data-ae="industrial-device"] .ab-fit { border-radius: 3px; font-size: 10px; letter-spacing: 0.06em; text-transform: uppercase; background: var(--ab-slot); border-color: var(--ab-hair); }
+.ab[data-ae="industrial-device"] .ab-fit[data-fit="match"] { background: var(--ab-primary); border-color: var(--ab-primary); color: var(--ab-on-primary); }
+.ab[data-ae="industrial-device"] .ab-fit[data-fit="avoid"] { background: var(--ab-ink); color: var(--ab-canvas); border-color: var(--ab-ink); }
+.ab[data-ae="industrial-device"] .ab-type-k { font-family: var(--id-mono); font-weight: 700; letter-spacing: 0.12em; }
+.ab[data-ae="industrial-device"] .ab-type-apply {
+  padding: 10px 16px; border: 1px solid var(--ab-hair); border-radius: 6px; background: var(--ab-key); color: var(--ab-ink);
+  font: 600 11px var(--id-mono); letter-spacing: 0.1em; text-transform: uppercase; box-shadow: var(--id-keyshadow); margin-bottom: 2px;
+}
+.ab[data-ae="industrial-device"] .ab-type-apply:hover { background: var(--ab-key-hi); }
+.ab[data-ae="industrial-device"] .ab-type-apply:active { transform: translateY(2px); box-shadow: inset 0 1px 2px var(--ab-edge-lo); }
+.ab[data-ae="industrial-device"] .ab-type-pair { font-family: var(--id-mono); font-size: 10px; letter-spacing: 0.04em; }
+
+/* ---- 01 interface: panel, key row, main key ---- */
+.ab[data-ae="industrial-device"] .ab-card, .ab[data-ae="industrial-device"] .ab-panel, .ab[data-ae="industrial-device"] .ab-list {
+  background: var(--ab-face); border: 1px solid var(--ab-hair); border-radius: 14px; box-shadow: var(--id-panel), 0 1px 1px rgba(0,0,0,.05), 0 12px 16px -14px rgba(0,0,0,.35);
+}
+.ab[data-ae="industrial-device"] .ab-card, .ab[data-ae="industrial-device"] .ab-panel { padding: clamp(18px, 2.8cqw, 24px); }
+.ab[data-ae="industrial-device"] .ab-seg { gap: 8px; padding: 0 0 2px; background: none; border-radius: 0; }
+.ab[data-ae="industrial-device"] .ab-seg-btn {
+  position: relative; min-height: 38px; border: 1px solid var(--ab-hair); border-radius: 6px; background: var(--ab-key); color: var(--ab-ink);
+  font: 600 10.5px var(--id-mono); letter-spacing: 0.1em; text-transform: uppercase; box-shadow: var(--id-keyshadow);
+  transition: transform .08s, box-shadow .08s, background .12s;
+}
+.ab[data-ae="industrial-device"] .ab-seg-btn::after {
+  content: ""; position: absolute; top: 6px; right: 6px; width: 5px; height: 5px; border-radius: 50%; background: var(--ab-slot); box-shadow: inset 0 1px 1px rgba(0,0,0,.35);
+}
+.ab[data-ae="industrial-device"] .ab-seg-btn:hover { background: var(--ab-key-hi); color: var(--ab-ink); }
+.ab[data-ae="industrial-device"] .ab-seg-btn:active { transform: translateY(2px); box-shadow: inset 0 1px 2px var(--ab-edge-lo); }
+.ab[data-ae="industrial-device"] .ab-seg-btn[aria-pressed="true"] {
+  background: var(--ab-primary); border-color: rgba(0,0,0,.14); color: var(--ab-on-primary); font-weight: 700; transform: translateY(2px);
+  box-shadow: inset 0 3px 5px rgba(0,0,0,.28);
+}
+.ab[data-ae="industrial-device"] .ab-seg-btn[aria-pressed="true"]::after { background: var(--ab-led); box-shadow: 0 0 0 1px rgba(0,0,0,.25), 0 0 7px var(--ab-led-glow); }
+.ab[data-ae="industrial-device"] .ab-card-title { margin: 22px 0 8px !important; font-weight: 600; letter-spacing: calc(-0.03em * var(--ab-tr, 1)); }
+.ab[data-ae="industrial-device"] .ab-card-body { font-size: 13.5px; }
+.ab[data-ae="industrial-device"] .ab-cta {
+  margin-bottom: 2px; padding: 13px 14px 13px 18px; border: 1px solid rgba(0,0,0,.16); border-radius: 6px; background: var(--ab-primary); color: var(--ab-on-primary);
+  font: 700 12px var(--id-mono); letter-spacing: 0.1em; text-transform: uppercase; box-shadow: inset 0 1px 0 rgba(255,255,255,.3), 0 2px 0 var(--ab-key-edge);
+  transition: transform .08s, box-shadow .08s, filter .12s;
+}
+.ab[data-ae="industrial-device"] .ab-cta:hover { filter: brightness(1.07); }
+.ab[data-ae="industrial-device"] .ab-cta:active { transform: translateY(2px); box-shadow: inset 0 2px 4px rgba(0,0,0,.3), 0 0 0 var(--ab-key-edge); }
+.ab[data-ae="industrial-device"] .ab-cta-arrow::before { content: "▸"; font-size: 14px; }
+
+/* ---- 02 controls ---- */
+.ab[data-ae="industrial-device"] .ab-fieldlabel { font: 700 10px var(--id-mono); letter-spacing: 0.12em; text-transform: uppercase; }
+.ab[data-ae="industrial-device"] .ab-input {
+  padding: 12px 14px; border: 1px solid var(--ab-hair); border-radius: 8px; background: var(--ab-slot); box-shadow: var(--ab-slot-sh);
+  font: 500 14px var(--id-mono); letter-spacing: 0.03em; caret-color: var(--ab-primary-text);
+}
+.ab[data-ae="industrial-device"] .ab-input:focus { border-color: var(--ab-primary); box-shadow: var(--ab-slot-sh), 0 0 0 3px var(--ab-ring); }
+.ab[data-ae="industrial-device"] .ab-toggle > span { font: 600 10.5px var(--id-mono); letter-spacing: 0.1em; text-transform: uppercase; }
+/* slide switch: a recessed track and a gripped block */
+.ab[data-ae="industrial-device"] .ab-switch { width: 52px; height: 26px; border-radius: 6px; background: var(--ab-slot); border: 1px solid var(--ab-hair); box-shadow: var(--ab-slot-sh); transition: none; }
+.ab[data-ae="industrial-device"] .ab-switch::before {
+  left: 2px; top: 2px; width: 24px; height: 20px; border-radius: 4px; transition: transform .1s;
+  background: repeating-linear-gradient(90deg, var(--ab-hair) 0 1px, transparent 1px 4px) center / 12px 10px no-repeat, var(--ab-key);
+  box-shadow: inset 0 1px 0 var(--ab-key-hi), 0 2px 0 var(--ab-key-edge);
+}
+.ab[data-ae="industrial-device"] .ab-switch:checked { background: var(--ab-slot); }
+.ab[data-ae="industrial-device"] .ab-switch:checked::before { transform: translateX(24px); background: repeating-linear-gradient(90deg, rgba(255,255,255,.4) 0 1px, transparent 1px 4px) center / 12px 10px no-repeat, var(--ab-primary); }
+.ab[data-ae="industrial-device"] .ab-status { display: flex; align-items: center; gap: 9px; margin-top: 10px; font: 500 10px var(--id-mono); letter-spacing: 0.1em; text-transform: uppercase; }
+.ab[data-ae="industrial-device"] .ab-status::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--ab-slot); box-shadow: 0 0 0 1px var(--ab-hair), inset 0 1px 1px rgba(0,0,0,.3); }
+.ab[data-ae="industrial-device"] .ab-panel:has(.ab-switch:checked) .ab-status::before { background: var(--ab-led); box-shadow: 0 0 0 1px var(--ab-hair), 0 0 8px var(--ab-led-glow); }
+/* states: the same key Up / Hover / Down */
+.ab[data-ae="industrial-device"] .ab-states { margin-top: 22px; gap: 12px; }
+.ab[data-ae="industrial-device"] .ab-state { font: 600 9.5px var(--id-mono); letter-spacing: 0.12em; text-transform: uppercase; }
+.ab[data-ae="industrial-device"] .ab-states .ab-state-ctl { padding: 11px 10px; margin-bottom: 14px; transition: none; }
+.ab[data-ae="industrial-device"] .ab-states .ab-state-ctl.is-hover { filter: brightness(1.08); box-shadow: inset 0 1px 0 rgba(255,255,255,.4), 0 2px 0 var(--ab-key-edge), 0 0 0 3px var(--ab-ring); }
+.ab[data-ae="industrial-device"] .ab-states .ab-state-ctl.is-pressed { transform: translateY(2px); box-shadow: inset 0 3px 5px rgba(0,0,0,.3), 0 0 0 var(--ab-key-edge); filter: brightness(0.94); }
+
+/* ---- 03 in use: channel strips with LED meters ---- */
+.ab[data-ae="industrial-device"] .ab-list { overflow: hidden; counter-reset: idrow; }
+.ab[data-ae="industrial-device"] .ab-list::before {
+  content: "CHANNEL STRIP  /  3 ACTIVE"; display: block; padding: 10px 18px; white-space: pre; overflow: hidden;
+  font: 600 9.5px/1.4 var(--id-mono); letter-spacing: 0.12em; color: var(--ab-muted); border-bottom: 1px solid var(--ab-hair); box-shadow: 0 1px 0 var(--ab-edge-hi);
+}
+.ab[data-ae="industrial-device"] .ab-list::after {
+  content: ""; display: block; height: 22px; border-top: 1px solid var(--ab-hair); box-shadow: 0 -1px 0 var(--ab-edge-hi);
+  background: radial-gradient(circle, var(--ab-dot) 1.3px, transparent 1.6px) 50% 50% / 8px 8px;
+}
+.ab[data-ae="industrial-device"] .ab-row {
+  counter-increment: idrow; grid-template-columns: 3.4ch minmax(0, 1fr) auto minmax(60px, 150px) 4.5ch; padding: 12px 18px; border-top: 1px solid var(--ab-hair);
+  box-shadow: 0 1px 0 var(--ab-edge-hi) inset; gap: 4px clamp(10px, 1.8cqw, 18px);
+}
+.ab[data-ae="industrial-device"] .ab-row:first-child { border-top: 0; }
+.ab[data-ae="industrial-device"] .ab-row:last-child { border-bottom: 0; }
+.ab[data-ae="industrial-device"] .ab-row-n { font-size: 0; }
+.ab[data-ae="industrial-device"] .ab-row-n::before { content: counter(idrow, decimal-leading-zero); font: 600 10.5px var(--id-mono); letter-spacing: 0.06em; color: var(--ab-muted); }
+.ab[data-ae="industrial-device"] .ab-row-name { font-weight: 600; letter-spacing: calc(-0.01em * var(--ab-tr, 1)); }
+.ab[data-ae="industrial-device"] .ab-row-status {
+  padding: 3px 9px 3px 8px; border: 1px solid var(--ab-hair); border-left: 3px solid var(--ab-secondary); border-radius: 3px; background: var(--ab-slot);
+  font: 600 9.5px var(--id-mono); letter-spacing: 0.1em; text-transform: uppercase; color: var(--ab-ink);
+}
+.ab[data-ae="industrial-device"] .ab-row-bar { height: 10px; border-radius: 0; background: repeating-linear-gradient(90deg, var(--ab-hair) 0 5px, transparent 5px 7px); overflow: hidden; }
+.ab[data-ae="industrial-device"] .ab-row-bar i {
+  background: var(--ab-primary); border-radius: 0;
+  -webkit-mask-image: repeating-linear-gradient(90deg, #000 0 5px, transparent 5px 7px); mask-image: repeating-linear-gradient(90deg, #000 0 5px, transparent 5px 7px);
+}
+.ab[data-ae="industrial-device"] .ab-row-pct { font: 600 11.5px var(--id-mono); letter-spacing: 0.02em; }
+
+/* ---- footer ---- */
+.ab[data-ae="industrial-device"] .ab-foot { border-top-color: var(--ab-hair); font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; }
+.ab[data-ae="industrial-device"] .ab-dot { box-shadow: 0 0 0 1px var(--ab-hair), 0 0 8px var(--ab-led-glow); background: var(--ab-led); }
+
+.ab[data-ae="industrial-device"] .ab-seg-btn:focus-visible, .ab[data-ae="industrial-device"] .ab-cta:focus-visible, .ab[data-ae="industrial-device"] .ab-switch:focus-visible, .ab[data-ae="industrial-device"] .ab-type-apply:focus-visible {
+  outline: 2px solid var(--ab-primary-text); outline-offset: 3px;
+}
+
+/* ---- narrow boards ---- */
+@container ab (max-width: 600px) {
+  .ab[data-ae="industrial-device"] .ab-hero { grid-template-columns: minmax(0, 1fr); gap: 26px; padding: 26px 0 30px; }
+  .ab[data-ae="industrial-device"] .ab-labelrow { flex-wrap: wrap; row-gap: 4px; }
+  .ab[data-ae="industrial-device"] .ab-labelrow .ab-label:first-child { flex: none; }
+  .ab[data-ae="industrial-device"] .ab-labelrow .ab-label:first-child:not(:only-child)::after { display: none; }
+  .ab[data-ae="industrial-device"] .ab-art { max-width: none; justify-self: stretch; }
+  .ab[data-ae="industrial-device"] .ab-row { grid-template-columns: 3.4ch minmax(0, 1fr) auto 4.5ch; padding: 11px 14px; }
+  .ab[data-ae="industrial-device"] .ab-list::before { padding: 10px 14px; }
+  .ab[data-ae="industrial-device"] .ab-tag { max-width: 130px; font-size: 9px; letter-spacing: 0.08em; }
+  .ab[data-ae="industrial-device"] .ab-tag::before { display: none; }
+  .ab[data-ae="industrial-device"] .ab-swatch .ab-chip { margin-bottom: 0; }
+  .ab[data-ae="industrial-device"] .ab-type-col { padding: 12px 14px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ab[data-ae="industrial-device"] .ab-seg-btn, .ab[data-ae="industrial-device"] .ab-cta, .ab[data-ae="industrial-device"] .ab-switch::before { transition: none; }
+  .ab[data-ae="industrial-device"] .ab-seg-btn:active, .ab[data-ae="industrial-device"] .ab-cta:active, .ab[data-ae="industrial-device"] .ab-type-apply:active { transform: none; }
+}
