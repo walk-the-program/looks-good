@@ -1070,3 +1070,192 @@ Each worker re-shoots its keys with `TAG=v4` and checks:
 - **Mixed Type:** the card title has no lone bold capital.
 
 A coordinator spot-check is enough to accept; this doesn't need another CAO round.
+
+---
+
+## Deck & patterns (CAO-4)
+
+**Evidence.** All renders are fresh, made with the warm palette and each aesthetic's first
+recommended pairing.
+
+- **Decks:** all 10 slides for 10 aesthetics at 1280×720, saved as `scratchpad/cao4/deck-<key>.png`.
+  The ten are soft-form, raw-brutalist, aurora-noir, bauhaus-poster, liquid-glass,
+  editorial-serif, pixel-arcade, blueprint, xerox and rebus.
+- **Patterns view:** five aesthetics at 1440 (`cao4/pv-<key>.png`, `pv-sheet.png`) and one 390px
+  view (`pv-390.png`).
+- **Suites:** the 26-aesthetic contact sheet `pe/contact-all26-warm.png`.
+
+The rig is `cao4/deck.sh`. It un-zooms every card to 1280 inside a 2600px viewport and screenshots
+each `.ab-slide`.
+
+### Verdict
+
+The deck is a real step up. It reads as one brand-guidelines book per aesthetic, not ten generic
+slides. Every slide inherits the board's type, color roles and materials, and the rhythm holds:
+cover, then statement, then four system pages, then product, then rules, then closing.
+
+**The best decks would go in a pitch today: Bauhaus Poster, Pixel Arcade, Blueprint, Raw Brutalist,
+Xerox and Rebus.** Bauhaus is the standout. Its patterns slide (counterchange, arc rise, chevron)
+and its material slide (the tile art at full height) are book-quality.
+
+Patterns add real flavor, and the 18 families are well made. But they undo the deck's discipline
+in exactly the aesthetics that live on restraint (Aurora Noir, Soft Form, Liquid Glass, Blueprint).
+The deck explains the restraint and then shows saturated, full-strength brand-colorway pattern
+walls next to it.
+
+The coordinator's Bauhaus closing collision no longer reproduces: "rhythm" and "QUESTIONS ABOUT
+THE BRAND" are clear of each other.
+
+**Problems that remain, by impact:**
+1. **Covers lack impact.** The cover reuses the board's split hero inside the ~990px left of a
+   288px pattern strip, so it gets fit-scaled. Aurora's window and headline float small in a big
+   field. Editorial's coverline is ~40px, which is smaller than its own principles slide. Liquid
+   Glass's scene card is ~430px wide.
+2. **Patterns are too loud for quiet aesthetics.** The patterns are applied at full saturation and
+   area in Aurora, Soft Form, Liquid Glass and Blueprint (P1–P3).
+3. **Primary is used as decoration on the "In product" slide** on all ten decks. The app sidebar
+   `.ab-deck-side` is filled with `--ab-pri-tint`, which reads pink, brown or maroon. The brand
+   name in it is also truncated ("MARIGO…", "Marigold Stu…").
+4. **Op-art rings is over-used and the weakest family at its presets.** It appears in ~9 suites,
+   and blobby warp at low frequency renders it as a fried-egg contour. It is the one pattern that
+   looks amateur.
+5. **Local collisions and duplications:**
+   - Xerox's cover headline runs into the art plate.
+   - Liquid Glass's cover subcopy runs under the glass M.
+   - Raw Brutalist's material slide is nearly empty (its art is a small spec index).
+   - Rebus's material slide repeats the cover.
+
+### D — deck framework (js/brand-deck.js, css/brand-deck.css, js/patterns-deck.js, css/patterns.css)
+
+1. **D1 Cover composition.**
+   - **WHAT:** the cover slide in `patterns-deck.js` and the `.ab-deck-cover` CSS.
+   - **CHANGE:** move the cover's pattern from a 288px side strip to a full-width bottom band,
+     `height: 132px` (on the closing slide the side strip stays). That gives the cover the full
+     1280 width. The band's top edge gets a 1px `--ab-line` rule.
+   - In `bdFitHeadline` for the cover, set the target headline size first and fit second:
+     - start at `min(132px, 11.5cqw) × def.type.display`, but never above the poster size;
+     - shrink in 4% steps only until the hero copy fits its column without overflow;
+     - floor at 64px.
+   - `bdScaleToFit` may scale the cover only as a last resort, with a floor of 0.85. If it would
+     go lower, shrink the art box (`.ab-art max-width` in 8% steps) first.
+   - **CHECK:** Aurora, Editorial and Liquid Glass covers show a headline ≥ 80px, and no cover
+     reports a scale below 0.85.
+   - **WHY:** the cover is the page a client remembers. A guidelines book's cover is one big
+     statement, not a scaled-down board.
+2. **D2 Product sidebar** (`css/brand-deck.css:153–154`).
+   - CHANGE: `.ab-deck-side { background: color-mix(in srgb, var(--ab-ink) 4%, var(--ab-canvas)); }`
+   - `.ab-deck-app { grid-template-columns: 196px minmax(0, 1fr); }`
+   - The sidebar wordmark: `white-space: normal; overflow: visible; text-overflow: clip;
+     font-size: 13px; line-height: 1.2`. It wraps to two lines instead of truncating.
+   - WHY: primary is for the one action and selected states. A tinted nav panel is decoration,
+     and a truncated brand name on a brand book is unacceptable.
+3. **D3 Material slide fallback.**
+   - **CHANGE:** add a `def.deck.materialStage` option: `'art'` (the default) or `'pattern'`. When
+     it is `'pattern'`, `.ab-deck-stage` renders the first suite (or pinned) pattern at stage size,
+     with the material chips unchanged.
+   - Set `'pattern'` for raw-brutalist, micrographics and rebus. This goes in their js def
+     (`deck: { materialStage: 'pattern' }`), assigned to D because it is one line each and needs
+     the D1 code.
+   - **WHY:** these three arts are a spec index or the headline itself, so the stage is either
+     empty or a repeat of the cover.
+4. **D4 Pattern strip / band tone.**
+   - **CHANGE:** the cover band and closing strip render the pattern with the P1 `quiet` tone
+     whenever the aesthetic's suite entry is marked quiet (see P1).
+   - Otherwise they render at full strength.
+5. **D5 Principles legibility.**
+   - **CHANGE:** `.ab-deck-ptitle` uses `--ab-font-b` at weight 600 when the root has
+     `data-hcls="pixel"`, `"deco"` or `"condensed"`.
+   - **WHY:** Pixel Arcade's four principle titles are set in all-caps Silkscreen and read as
+     noise. Display faces are for display lines, not sentences.
+
+### P — patterns engine and fit (js/patterns/*)
+
+1. **P1 Quiet tone.**
+   - **CHANGE:** add a fifth per-entry option `tone: 0..1` (default 1) to `engine.js` ink mapping.
+     Each non-ground ink becomes `mix(ink, ground, 1 - tone)`; spark stays at full strength but
+     its area is halved.
+   - Expose it in the UI as a "Strength" slider (U2).
+   - In `fit.js`, set:
+     - **Aurora Noir:** `tone: 0.35` on all six entries, with Halftone "Fine screen" also at
+       `tone: 0.25`.
+     - **Soft Form:** `tone: 0.45`.
+     - **Liquid Glass:** `tone: 0.6`, except Aura.
+     - **Blueprint:** `tone: 0.55`, and colorway `mono` for every entry (line ink on the field).
+       Blueprint must never show filled orange shapes.
+   - **WHY:** these aesthetics' own rules say "faint", "flat" and "line only". The pattern wall
+     must obey the same rules as the board.
+2. **P2 Op-art rings presets.**
+   - **CHANGE:** make every oprings fit entry follow: `warp ≤ 0.18`, `freq ≥ 16`, `bands: 'two'`.
+   - Keep op-art rings only in bauhaus-poster ("Target"), groovy-70s ("Concentric"), neo-deco and
+     neo-brutal-pop.
+   - Replace it elsewhere:
+     - soft-form → `gradpanes` second variant (rows 2, cols 4)
+     - liquid-glass → `flow` (field 'waves', duotone)
+     - blueprint → `flow` contour lines, mono
+     - mesh-gradient, y2k-chrome and holo-iridescent → `aura` (layout 'ribbon')
+   - Also lower the family's default warp to 0.2.
+   - **WHY:** at low frequency with heavy warp the rings turn into blobby fried-egg shapes. It is
+     the only family that looks amateur, and it currently appears in a third of the suites.
+3. **P3 Aura spark.**
+   - **CHANGE:** in the aura family, draw the accent spark with the same blur as the other fields,
+     and cap its radius at 6% of the short side.
+   - **WHY:** the crisp yellow disc reads as a sun or a lens flare. It is the most visible element
+     on Soft Form's and Liquid Glass's covers and closings, which breaks "accent = one small
+     spark".
+
+### U — Patterns view (js/patterns-ui.js, css/patterns.css)
+
+1. **U1 Narrow order.**
+   - **CHANGE:** at ≤760px, order the view: canvas → export row → controls (inside a
+     `<details>` "Adjust pattern", closed by default) → brand suite → pinned → all families.
+   - **WHY:** at 390 the controls currently sit below 18 family thumbnails.
+2. **U2 Strength slider.**
+   - **CHANGE:** add "Strength" (0–100%) under Colorway, bound to P1 `tone`, with the default from
+     the suite preset.
+3. **U3 Suite captions.**
+   - **CHANGE:** caption line 2 shows the family name only. Show the colorway as a small chip in
+     the thumbnail's bottom-left (10px, canvas pill), not as text.
+   - **WHY:** "Gradient panes · Bra…" and "Halftone field · Duot…" truncate.
+4. **U4 "In use" previews.**
+   - **CHANGE:** under the export row, add three small live applications of the current pattern,
+     built from the board tokens and the brand fonts. All three update with the canvas.
+     - **Card:** an 85×55 ratio card, the pattern full-bleed, a canvas plate holding the wordmark.
+     - **Phone wallpaper:** 9:19.5, the pattern with the time in the heading face.
+     - **Poster:** 3:4, the pattern on the top 60%, the tagline below.
+   - **WHY:** this answers "make it more exciting". A pattern only feels like a brand asset once
+     it is seen applied, and these three show scale and colorway decisions immediately.
+
+### A — per-aesthetic deck overrides (css/aesthetics/<key>.css, `.ab[data-ae="key"].ab-slide …`)
+
+1. **A1 xerox (cover):**
+   - `.ab[data-ae="xerox"].ab-slide[data-slide="cover"] .ab-art { margin-top: clamp(150px, 22cqw, 230px); max-width: 38%; }`
+   - Hide the tear-off strip on the cover slide.
+   - CHECK: no glyph of "ALIVE" touches the art plate or the tape.
+2. **A2 liquid-glass (cover):**
+   - `.ab[data-ae="liquid-glass"].ab-slide[data-slide="cover"] .ab-hero-copy { max-width: 46%; }`
+   - CHECK: the subcopy ends before the lens.
+3. **A3 editorial-serif:**
+   - `.ab[data-ae="editorial-serif"].ab-slide .ab-card-body::first-letter { float: none; font-size: inherit; line-height: inherit; margin: 0; padding: 0; }`
+   - WHY: a drop cap on a two-line card body reads as an error on the Interface and Product
+     slides.
+   - Also check the Typography slide's type scale. Its Display/H1/H2 samples render at ~20–30px
+     instead of 86/44/31px; `bdFitSamples` is over-shrinking light serifs. If the cause is in
+     `bdFitSamples`, that fix belongs to D (D6). Bring the samples back to their stated px.
+4. **A4 rebus (material slide):** with D3 `materialStage: 'pattern'`, no CSS is needed. Otherwise
+   hide `.rb-hl` on `[data-slide="material"]`.
+
+### Counts
+
+- **D:** 6 (D1–D5, plus D6 if `bdFitSamples` is the cause in A3)
+- **P:** 3
+- **U:** 4
+- **A:** 4 (xerox, liquid-glass, editorial-serif, rebus)
+
+Fix order: D1, D2 and P1 first; these three account for most of the remaining "not yet a pitch
+deck" impression.
+
+**Not assessed:**
+- PNG and PDF exports (html2canvas fidelity).
+- Opposite-mode and green-palette decks.
+- The remaining 16 decks beyond the cover thumbnails in the suite sheet.
+- Pinned-pattern behavior in the deck.
