@@ -138,4 +138,22 @@ registerAesthetic({
       'Break symmetry with left-aligned stacks or diagonal tilts in the hero.',
     ],
   },
+  // Deck copy (js/brand-deck.js): three principles, three do / don't lines, each short.
+  deck: {
+    principles: [
+      ['Symmetry, polished', 'A centered headline, centered ornaments, equal columns.'],
+      ['Thin gilt lines', '1px frames, double rules and small diamonds.'],
+      ['Wide-tracked uppercase headlines', 'Weight 400, generous tracking, plenty of room.'],
+    ],
+    do: [
+      'Keep everything symmetric on the vertical axis.',
+      'Draw accents as thin gilt lines.',
+      'Use the primary fill for one action.',
+    ],
+    dont: [
+      'Fill areas with the accent.',
+      'Use shadows, blur or glossy gradients.',
+      'Round controls or use pill shapes.',
+    ],
+  },
 });

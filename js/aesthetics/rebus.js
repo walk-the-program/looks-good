@@ -195,7 +195,25 @@ registerAesthetic({
   slideShape: 'soft',
   labels: { material: 'Symbols', states: ['Word', 'Mixed', 'Symbol'], statesKind: 'swatch' },
   layout: { hero: 'centered', palette: 'swatches', sections: 'two-col', subcopy: false },
-  deck: { materialStage: 'pattern' },
+  // Deck copy (js/brand-deck.js): three principles, three do / don't lines, each short.
+  deck: {
+    materialStage: 'pattern',
+    principles: [
+      ['Say it with a picture', 'Pictograms replace words in the headline.'],
+      ['Flat, heavy, on a 24-unit grid', 'Drawn at the weight of the heavy sans.'],
+      ['Icons wherever controls need one', 'Tabs, avatars, chips, the CTA arrow and the switch.'],
+    ],
+    do: [
+      'Replace the last word with its pictogram.',
+      'Draw pictograms flat on a 24-unit grid.',
+      'Use a pictogram wherever a control needs an icon.',
+    ],
+    dont: [
+      'Use emoji, outlined clip-art or gradients.',
+      'Replace more than two words.',
+      'Put text on the accent disc.',
+    ],
+  },
   type: { ui: 'body', label: 'body' },
   highlight: 'custom',
   highlightNote: 'The last word is replaced by its pictogram on a flat accent disc (glyph in the on-accent colour); when it has no symbol it stays a word in the accent (shaded to read as text). The replaced word stays in visually-hidden text.',

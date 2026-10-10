@@ -120,5 +120,23 @@ registerAesthetic({
       'Print flat white cards on the paper; panels stay paper-toned with an ink outline.',
     ],
   },
+  // Deck copy (js/brand-deck.js): three principles, three do / don't lines, each short.
+  deck: {
+    principles: [
+      ['Two inks, overlapped', 'Primary and secondary multiply into a third color.'],
+      ['Off-register on purpose', 'Shift the second ink 2 to 3px, the same everywhere.'],
+      ['Halftone, never gradients', 'Shade with dots; every edge is a printed edge.'],
+    ],
+    do: [
+      'Print with two inks only.',
+      'Misregister the second ink consistently.',
+      'Shade with halftone dots.',
+    ],
+    dont: [
+      'Use gradients, blur or soft shadows.',
+      'Fill large areas with the accent.',
+      'Align the two inks perfectly.',
+    ],
+  },
 });
 })();

@@ -105,3 +105,38 @@ The deck now has ten slides (Patterns is slide 07, added by js/patterns-deck.js)
 - Cover scale: every cover reaches 0.85 or better (Neo Deco 1.0, Mixed Type 0.88, Bento Grid 0.98). They are scaled, never clipped.
 - Covers whose art deliberately bleeds past the content column into the slide margin (Neo Brutal Pop, Aurora Noir, Bauhaus Poster, Riso Print, Mesh Gradient, Xerox: 2-55px) report a wider `scrollWidth` than their box; the slide root clips and nothing leaves the slide.
 - PNG/PDF export (html2canvas) flattens backdrop effects, conic gradients and some blend modes; the aesthetics affected stay flatter in the export than on screen.
+
+## Simplified deck and the gore detector (DS)
+
+The deck reused board components inside narrow containers (Bento's `display: contents` tiles, the board list and card), which squeezed, truncated and overlapped. The slides now carry less and render deck-owned components with fixed, comfortable sizes. The board is unchanged (`boardHtml` diffed for all 26 aesthetics in both modes: identical).
+
+### Content per slide (supersedes the table above where it differs)
+- **Principles**: the motto, one summary line, exactly three principles (title <= 6 words, optional line <= 12). Hand-written per aesthetic in `def.deck.principles = [[title, line], ...]`; without it `bdPrinciples` shortens the first three `rules.do`.
+- **Color system**: five swatches (role, job of 2-4 words, hex), the proportion bar with a one-line legend, three compact contrast chips (Text, Action, Highlight). No use / never paragraphs.
+- **Typography**: heading and body specimens ("Aa" + face name) and a three-row scale (Display, Heading, Body, with px). The recommended / fit lines live on the board.
+- **Interface**: three cells (segmented control with a fixed minimum segment width, the primary action, the toggle with its label) taken from the board's own markup (`bdPart`), plus the board's states row when it has one.
+- **Material**: the art and up to four material names (a parenthetical is dropped from the name).
+- **In product**: a deck-owned app screen (264px sidebar with the brand wrapping at word boundaries and three nav items; a title, three rows of dot + name + percentage, one CTA card). Status is a dot, never a chip over the number.
+- **Do / Don't**: three lines each, <= 10 words: `def.deck.do` / `def.deck.dont`, else the shortened rules.
+- Cover, Patterns and Closing keep their content; only gore was fixed.
+- `def.deck` may now hold `principles`, `do`, `dont` (and still `materialStage`).
+
+### Text floor
+Nothing on a slide is under 12px (tracked uppercase labels may be 11px). `bdMinText` lifts any text below the floor after the build; a slide that still has to scale (`bdScaleToFit`) lifts its text once more by `12 / scale`. Scales of 0.97 or more are not applied (the body's bottom padding absorbs them and a near-1 transform makes Y2K Chrome's clipped-text headline paint a ghost word). `BD_COVER_MIN_SCALE` is now 0.98.
+
+### `deckGoreReport(slideEl)` (js/brand-deck.js)
+Returns `[{ type, slide, el, text, detail }]` for one built slide (empty = clean); `.stats` holds `{ text, contrastSkipped, whitelisted }`. For every visible text-bearing element it checks:
+1. `overflow`: text runs past its own box, or a clipping box (`overflow` not visible) has `scrollWidth > clientWidth + 1` / ellipsis / `scrollHeight` overflow.
+2. `broken`: one word wrapped across lines (a Range per word; splits on spaces, hyphens, slashes).
+3. `overlap`: text of two unrelated elements intersects by more than 2px both ways (ink boxes, 0.8 x font size tall). Text drawn in the art counts as the second party; a painted label in the art (a floating button) counts as its whole box.
+4. `clipped`: text cut off by an ancestor with overflow hidden / clip, the slide root included.
+5. `small`: computed size under 12px (11px for tracked uppercase), after the slide's fit scale.
+6. `contrast`: under 3:1 against a flat background; skipped (counted in `contrastSkipped`) under gradients, images, absolutely positioned pseudo-element fills and over the art.
+Skipped as not text on the slide: anything `aria-hidden` (art), `.ab-deck-pattern`, `svg`, visually hidden 1px boxes (the real headline of aesthetics that draw it in the art), checkboxes. An intentional overlay can opt out of overlap / clipped with `data-gore-ok="reason"` on the element or an ancestor (the reason is required). None are used.
+Not detected by machine: text over decorative art shapes that carry no text (a sunburst behind a framed headline). Review those on contact sheets.
+
+### Deck-scoped aesthetic rules added (DS)
+mesh-gradient (header ink on non-cover slides, payout card hidden on the cover), neo-brutal-pop (mock "Get started" button hidden on the cover), groovy-70s (cover arch beside the statement, not around it), bento-grid ("Direction saved" chip hidden on slides).
+
+### Export
+`bdShadowFixes` drops blurred negative-spread box-shadow layers in the export clone (html2canvas draws them as a grey rectangle that ignores the radius). Other blurred shadows on rounded boxes still render with html2canvas artifacts in PNG / PDF (Bento, Soft Form, Clay); this is the existing limit listed above.

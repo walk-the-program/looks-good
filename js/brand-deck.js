@@ -100,7 +100,7 @@ let deckStageHook = null;
 const BD_COVER_START = Math.min(132, 0.115 * 1280);
 const BD_COVER_MIN_PX = 64;
 const BD_COVER_SOFT_PX = 88;          // x display scale: the headline gives up this much before the art box shrinks
-const BD_COVER_MIN_SCALE = 0.85;
+const BD_COVER_MIN_SCALE = 0.98;
 const BD_COVER_EMERGENCY_PX = 40;     // below the 64px floor only when the cover cannot otherwise reach 0.85
 
 function bdPatternHtml(P, key) {
@@ -120,14 +120,54 @@ function registerDeckSlide(slide, afterKey) {
 
 /* ---------------- slide content helpers ---------------- */
 
-// A rule sentence as { title, line }: the leading clause becomes the title, the
-// rest the supporting line. A rule with no natural break stays whole as the title.
-function bdRuleSplit(rule) {
-  const text = String(rule || '').trim().replace(/\.$/, '');
-  const m = text.match(/^(.{14,70}?)(?:;|:| — |, )(.+)$/);
-  const cap = s => s.charAt(0).toUpperCase() + s.slice(1);
-  if (m) return { title: cap(m[1].trim()), line: cap(m[2].trim()) + '.' };
-  return { title: cap(text) + '.', line: '' };
+// A rule sentence as { head, tail }: split at its first clause break (; : - , ) after
+// the first few characters. Fallback for aesthetics without hand-written deck copy
+// (def.deck.principles / do / dont): the deck wants short lines, the rules are sentences.
+function bdRuleParts(rule) {
+  const text = String(rule || '').replace(/\([^)]*\)/g, '').replace(/\s+/g, ' ').trim().replace(/\.$/, '');
+  const at = text.slice(10).search(/[;:]| — |, /);
+  if (at < 0) return { head: text, tail: '' };
+  const cut = at + 10;
+  return { head: text.slice(0, cut), tail: text.slice(cut).replace(/^(?:[;:,]| — )\s*/, '') };
+}
+
+// At most `max` words, no trailing punctuation or joining word, first letter capital.
+function bdWords(text, max) {
+  let w = String(text || '').split(' ').filter(Boolean).slice(0, max);
+  while (w.length > 3 && /^(?:a|an|the|and|or|of|to|for|with|on|in|at|by|is|are)$/i.test(w[w.length - 1])) w.pop();
+  const s = w.join(' ').replace(/[\s,;:—-]+$/, '').replace(/\.$/, '');
+  return s.charAt(0).toUpperCase() + s.slice(1);
+}
+
+// Three principles as [title, line]: hand-written in def.deck.principles
+// (title <= 6 words, line <= 12), else the first three do-rules shortened.
+function bdPrinciples(def) {
+  const own = def.deck && def.deck.principles;
+  if (Array.isArray(own) && own.length) return own.slice(0, 3).map(p => [String(p[0] || ''), String(p[1] || '')]);
+  return ((def.rules && def.rules.do) || []).slice(0, 3).map(r => {
+    const x = bdRuleParts(r);
+    return [bdWords(x.head, 6), x.tail ? bdWords(x.tail, 12) + '.' : ''];
+  });
+}
+
+// Three short do / don't lines (<= 10 words): def.deck.do / dont, else the rules shortened.
+function bdRuleLines(def, kind) {
+  const own = def.deck && def.deck[kind];
+  if (Array.isArray(own) && own.length) return own.slice(0, 3).map(String);
+  return ((def.rules && def.rules[kind]) || []).slice(0, 3).map(r => bdWords(bdRuleParts(r).head, 10) + '.');
+}
+
+// "Primary tile (main action)" -> "Primary tile": the deck lists names, the board explains them.
+function bdMatName(name) {
+  return String(name || '').replace(/\s*\([^)]*\)/g, '').trim();
+}
+
+// One element out of a board part's markup (the board's seg / cta / toggle / states).
+function bdPart(html, selector) {
+  const t = document.createElement('template');
+  t.innerHTML = html;
+  const el = t.content.querySelector(selector);
+  return el ? el.outerHTML : '';
 }
 
 // Base px for a motto-sized headline, stepped down as the line gets longer.
@@ -157,19 +197,15 @@ const DECK_SLIDES = [
     key: 'principles', title: 'Principles',
     build(P, state, def) {
       const e = escapeHtml;
-      const items = (def.rules && def.rules.do ? def.rules.do : []).slice(0, 4).map((r, i) => {
-        const s = bdRuleSplit(r);
-        return `<li class="ab-deck-principle">
+      const items = bdPrinciples(def).map((p, i) => `<li class="ab-deck-principle">
           <span class="ab-label"><i class="ab-n">${String(i + 1).padStart(2, '0')}</i></span>
-          <div><h3 class="ab-deck-ptitle">${e(s.title)}</h3>${s.line ? `<p class="ab-deck-pline">${e(s.line)}</p>` : ''}</div>
-        </li>`;
-      }).join('');
+          <div><h3 class="ab-deck-ptitle">${e(p[0])}</h3>${p[1] ? `<p class="ab-deck-pline">${e(p[1])}</p>` : ''}</div>
+        </li>`).join('');
       return `<div class="ab-deck-principles">
         <div class="ab-deck-lead">
           <p class="ab-label ab-deck-kick">How ${e(P.copy.brandName)} looks and feels</p>
           <h2 class="ab-headline ab-deck-h" style="--dk-fs:${bdMottoPx(def.motto, 70)}px">${abHeadline(def.motto)}</h2>
           <p class="ab-deck-desc">${e(def.summary || def.descriptor)}</p>
-          <p class="ab-label ab-deck-descriptor">${e(def.descriptor)}</p>
         </div>
         <ol class="ab-deck-plist">${items}</ol>
       </div>`;
@@ -181,26 +217,22 @@ const DECK_SLIDES = [
       const e = escapeHtml;
       const order = AB_ROLE_ORDER;
       const nums = order.map(k => abCoverageNum((P.roles[k] || {}).coverage));
-      const bar = order.map((k, i) => `<span class="ab-deck-seg" data-role="${k}" style="flex:${nums[i]};background:${t[k]}"></span>`).join('');
-      const legend = order.map(k => {
+      const sws = order.map(k => {
         const r = P.roles[k] || {};
-        return `<span class="ab-deck-key"><i style="background:${t[k]}"></i>${e(r.label || k)} <b>${e(r.coverage || '')}</b></span>`;
-      }).join('');
-      const roles = order.map(k => {
-        const r = P.roles[k] || {};
-        return `<div class="ab-deck-role" data-role="${k}">
-          <p class="ab-deck-rtitle">${e(r.label || k)}</p>
-          <p class="ab-deck-ruse"><span class="ab-deck-rk">Use</span> ${e(r.use || r.job || '')}</p>
-          <p class="ab-deck-rnever"><span class="ab-deck-rk">Never</span> ${e(r.never || '—')}</p>
+        return `<div class="ab-deck-sw" data-role="${k}">
+          <span class="ab-deck-swc" style="background:${t[k]}"></span>
+          <p class="ab-deck-swrole">${e(r.label || k)}</p>
+          <p class="ab-deck-swjob">${e(bdWords(r.job || '', 4))}</p>
+          <p class="ab-deck-swhex">${e(t[k].toUpperCase())}</p>
         </div>`;
       }).join('');
+      const bar = order.map((k, i) => `<span class="ab-deck-seg" data-role="${k}" style="flex:${nums[i]};background:${t[k]}"></span>`).join('');
+      const legend = order.map(k => `<span class="ab-deck-key"><i style="background:${t[k]}"></i>${e((P.roles[k] || {}).label || k)}</span>`).join('');
       const actionInk = def.ctaFill === 'ink';
       const pairs = [
-        { name: 'Body text', fg: t.ink, bg: t.canvas },
-        actionInk
-          ? { name: 'Main action', fg: t.canvas, bg: t.ink }
-          : { name: 'Main action', fg: t.onPrimary, bg: t.primary },
-        { name: 'Highlight word', fg: t.accentInk, bg: t.canvas },
+        { name: 'Text', fg: t.ink, bg: t.canvas },
+        actionInk ? { name: 'Action', fg: t.canvas, bg: t.ink } : { name: 'Action', fg: t.onPrimary, bg: t.primary },
+        { name: 'Highlight', fg: t.accentInk, bg: t.canvas },
       ].map(p => {
         const ratio = contrastRatio(p.fg, p.bg);
         return `<div class="ab-deck-pair">
@@ -209,11 +241,7 @@ const DECK_SLIDES = [
         </div>`;
       }).join('');
       return `<div class="ab-deck-color">
-        <section class="ab-palette" aria-label="Palette">
-          <div class="ab-labelrow"><span class="ab-label">The palette</span><span class="ab-label">${e(def.descriptor)}</span></div>
-          <div class="ab-swatches" data-kind="${P.layout.palette}">${P.swatches()}</div>
-        </section>
-        <div class="ab-deck-roles">${roles}</div>
+        <div class="ab-deck-sws">${sws}</div>
         <div class="ab-deck-lower">
           <div class="ab-deck-ratio">
             <p class="ab-label">Proportion</p>
@@ -230,58 +258,36 @@ const DECK_SLIDES = [
   },
   {
     key: 'typography', title: 'Typography',
-    build(P, state, def, t) {
+    build(P, state, def) {
       const e = escapeHtml;
       const ty = state.typography || {};
       const hsz = ty.headingSize || 44;
       const bsz = ty.bodySize || 16;
       const disp = abTypeFor(def).display || 1;
-      const shown = (px, cap) => Math.min(px, cap);
       const scale = [
-        { name: 'Display', px: Math.round(hsz * 1.6 * disp), face: 'h', cap: 96 },
-        { name: 'Heading 1', px: hsz, face: 'h', cap: 56 },
-        { name: 'Heading 2', px: Math.round(hsz * 0.7), face: 'h', cap: 40 },
-        { name: 'Body', px: bsz, face: 'b', cap: 18 },
-        { name: 'Caption', px: Math.round(bsz * 0.8), face: 'b', cap: 14 },
-      ].map(s => {
-        const sample = s.name === 'Display' ? 'Good design' : s.face === 'h' ? 'Good design feels alive' : 'Type, color and material, set in one place.';
-        return `<li class="ab-deck-scale" data-face="${s.face}">
-          <span class="ab-label">${s.name}<i> · ${shown(s.px, s.cap)}px</i></span>
-          <span class="ab-deck-sample${s.face === 'h' ? ' ab-headline' : ''}" style="--dk-fs:${shown(s.px, s.cap)}px">${sample}</span>
-        </li>`;
-      }).join('');
-      const clsLabel = f => (FONT_CLASSES[f.cls] ? FONT_CLASSES[f.cls].label : f.category);
-      const meta = typeof aestheticMeta === 'function' ? aestheticMeta(def.key) : null;
-      let rec = '';
-      if (meta && meta.fonts) {
-        const f = meta.fonts;
-        const fits = fontFitFor(def.key, state);
-        const pair = f.pairings[0];
-        rec = `<div class="ab-deck-rec">
-          <p class="ab-deck-reclead"><span class="ab-label">Recommended</span> ${e(pair[0])} / ${e(pair[1])}</p>
-          <p class="ab-deck-recwhy">Headings: ${e(fontClassWords(f.heading.classes))}. Body: ${e(fontClassWords(f.body.classes))}.</p>
-          <p class="ab-deck-recfit"><span>Your heading ${abFitPill(fits.heading)}</span><span>Your body ${abFitPill(fits.body)}</span></p>
-        </div>`;
-      }
+        { name: 'Display', px: Math.min(72, Math.round(hsz * 1.6 * disp)), face: 'h', sample: 'Good design' },
+        { name: 'Heading', px: Math.min(44, hsz), face: 'h', sample: 'Good design feels alive' },
+        { name: 'Body', px: Math.min(20, bsz), face: 'b', sample: 'Type, color and material, set in one place.' },
+      ].map(s => `<li class="ab-deck-scale" data-face="${s.face}">
+          <span class="ab-label">${s.name}<i> · ${s.px}px</i></span>
+          <span class="ab-deck-sample${s.face === 'h' ? ' ab-headline' : ''}" style="--dk-fs:${s.px}px">${s.sample}</span>
+        </li>`).join('');
       return `<div class="ab-deck-type">
         <div class="ab-deck-faces">
           <div class="ab-deck-face" data-face="h">
-            <p class="ab-label">Heading face</p>
-            <p class="ab-deck-aa ab-headline" style="--dk-fs:132px">Aa</p>
+            <p class="ab-label">Heading</p>
+            <p class="ab-deck-aa ab-headline" style="--dk-fs:120px">Aa</p>
             <p class="ab-deck-fname" style="font-family:var(--ab-font-h)">${e(state.headingFont.name)}</p>
-            <p class="ab-deck-fcls">${e(clsLabel(state.headingFont))} · ${hsz}px / ${ty.headingWeight || 700}</p>
           </div>
           <div class="ab-deck-face" data-face="b">
-            <p class="ab-label">Body face</p>
+            <p class="ab-label">Body</p>
             <p class="ab-deck-aa" style="--dk-fs:96px;font-family:var(--ab-font-b)">Aa</p>
             <p class="ab-deck-fname" style="font-family:var(--ab-font-b)">${e(state.bodyFont.name)}</p>
-            <p class="ab-deck-fcls">${e(clsLabel(state.bodyFont))} · ${bsz}px / ${ty.bodyWeight || 400}</p>
           </div>
         </div>
         <div class="ab-deck-scalecol">
-          <div class="ab-labelrow"><span class="ab-label">Type scale</span><span class="ab-label">${e(def.name)}</span></div>
+          <div class="ab-labelrow"><span class="ab-label">Type scale</span></div>
           <ul class="ab-deck-scales">${scale}</ul>
-          ${rec}
         </div>
       </div>`;
     },
@@ -289,18 +295,29 @@ const DECK_SLIDES = [
   {
     key: 'interface', title: 'Interface',
     build(P) {
-      return `<div class="ab-sections ab-deck-sections">
-      ${P.secUi()}
-      ${P.secTouch()}
-    </div>`;
+      const card = P.card();
+      const panel = P.panel();
+      const cell = (name, inner) => `<div class="ab-deck-cell">
+          <p class="ab-label ab-deck-cellname">${name}</p>
+          <div class="ab-deck-cellbody">${inner}</div>
+        </div>`;
+      const states = bdPart(panel, '.ab-states');
+      return `<div class="ab-deck-ui">
+        <div class="ab-deck-uirow">
+          ${cell('Segmented control', bdPart(card, '.ab-seg'))}
+          ${cell('Primary action', bdPart(card, '.ab-cta'))}
+          ${cell('Toggle', bdPart(panel, '.ab-toggle'))}
+        </div>
+        ${states ? `<div class="ab-deck-uistates">${states}</div>` : ''}
+      </div>`;
     },
   },
   {
     key: 'material', title: 'Material & graphics',
     build(P, state, def, t) {
       const e = escapeHtml;
-      const mats = (def.materials || []).slice(0, 8).map((m, i) => `<li class="ab-deck-mat">
-          <span class="ab-label"><i class="ab-n">${String(i + 1).padStart(2, '0')}</i><span>${e(m.name)}</span></span>
+      const mats = (def.materials || []).slice(0, 4).map((m, i) => `<li class="ab-deck-mat">
+          <span class="ab-label"><i class="ab-n">${String(i + 1).padStart(2, '0')}</i><span>${e(bdMatName(m.name))}</span></span>
         </li>`).join('');
       const patternStage = (def.deck && def.deck.materialStage === 'pattern' && typeof deckStageHook === 'function')
         ? deckStageHook(P, state, def, t) : '';
@@ -310,19 +327,25 @@ const DECK_SLIDES = [
       return `<div class="ab-deck-material">
         ${stage}
         <div class="ab-deck-matcol">
-          <div class="ab-labelrow"><span class="ab-label">${e(P.labels.material)}</span><span class="ab-label">${e(def.descriptor)}</span></div>
+          <div class="ab-labelrow"><span class="ab-label">${e(P.labels.material)}</span></div>
           <ul class="ab-deck-mats">${mats}</ul>
-          <p class="ab-deck-note">${e(def.summary || def.descriptor)}</p>
         </div>
       </div>`;
     },
   },
   {
     key: 'product', title: 'In product',
-    build(P, state, def) {
+    build(P) {
       const e = escapeHtml;
-      const nav = ['Overview', 'Projects', 'Assets', 'Team'].map((n, i) =>
+      const nav = ['Overview', 'Projects', 'Assets'].map((n, i) =>
         `<li class="ab-deck-nav${i === 1 ? ' is-on' : ''}"><span class="ab-label">${e(n)}</span></li>`).join('');
+      const roles = ['primary', 'secondary', 'accent'];
+      const rows = AB_ROWS.map((r, i) => `<li class="ab-deck-row">
+          <i class="ab-deck-dot" role="img" aria-label="${e(r[1])}" title="${e(r[1])}" style="background:var(--ab-${roles[i]})"></i>
+          <span class="ab-deck-rname">${e(r[0])}</span>
+          <span class="ab-deck-rpct">${r[2]}%</span>
+        </li>`).join('');
+      const stage = AB_STAGES.Design;
       return `<div class="ab-deck-app">
         <aside class="ab-deck-side">
           <div class="ab-brand">${P.brand}</div>
@@ -330,18 +353,16 @@ const DECK_SLIDES = [
         </aside>
         <div class="ab-deck-screen">
           <div class="ab-deck-screenhead">
-            <div><p class="ab-label">Workspace</p><h3 class="ab-deck-screentitle ab-headline">Projects</h3></div>
-            <span class="ab-row-status">3 active</span>
+            <h3 class="ab-deck-screentitle ab-headline">Projects</h3>
+            <span class="ab-deck-chip">3 active</span>
           </div>
           <div class="ab-deck-screenbody">
-            <section class="ab-sec ab-sec-use" aria-label="In use">
-              <div class="ab-labelrow"><span class="ab-label"><i class="ab-n">01</i><span>In use</span></span></div>
-              ${P.list()}
-            </section>
-            <section class="ab-sec ab-sec-ui" aria-label="Interface">
-              <div class="ab-labelrow"><span class="ab-label"><i class="ab-n">02</i><span>Next up</span></span></div>
-              ${P.card()}
-            </section>
+            <ul class="ab-deck-rows">${rows}</ul>
+            <div class="ab-deck-ctacard">
+              <h4 class="ab-deck-ctatitle">${e(stage[0])}</h4>
+              <p class="ab-deck-ctaline">${e(stage[1])}</p>
+              ${bdPart(P.card(), '.ab-cta')}
+            </div>
           </div>
         </div>
       </div>`;
@@ -351,12 +372,11 @@ const DECK_SLIDES = [
     key: 'dodont', title: "Do and don't",
     build(P, state, def) {
       const e = escapeHtml;
-      const rules = def.rules || { do: [], dont: [] };
       const col = (kind, list) => `<section class="ab-deck-col" data-kind="${kind}">
-          <div class="ab-labelrow"><span class="ab-label">${kind === 'do' ? 'Do' : "Don't"}</span><span class="ab-fit" data-fit="${kind === 'do' ? 'match' : 'avoid'}">${kind === 'do' ? '✓ Do' : "✕ Don't"}</span></div>
-          <ul class="ab-deck-rules">${list.slice(0, 4).map(r => `<li class="ab-deck-rule"><span class="ab-deck-mark" aria-hidden="true">${kind === 'do' ? '✓' : '✕'}</span><p>${e(r)}</p></li>`).join('')}</ul>
+          <div class="ab-labelrow"><span class="ab-label">${kind === 'do' ? 'Do' : "Don't"}</span></div>
+          <ul class="ab-deck-rules">${list.map(r => `<li class="ab-deck-rule"><span class="ab-deck-mark" aria-hidden="true">${kind === 'do' ? '✓' : '✕'}</span><p>${e(r)}</p></li>`).join('')}</ul>
         </section>`;
-      return `<div class="ab-deck-dodont">${col('do', rules.do || [])}${col('dont', rules.dont || [])}</div>`;
+      return `<div class="ab-deck-dodont">${col('do', bdRuleLines(def, 'do'))}${col('dont', bdRuleLines(def, 'dont'))}</div>`;
     },
   },
   {
@@ -607,7 +627,11 @@ function bdScaleToFit(root) {
   const need = wrap.scrollHeight;
   if (!avail || need <= avail + 1) return;
   const cover = root.dataset.slide === 'cover';
-  const s = Math.max(0.4, avail / need);   // the cover's 0.85 is met by bdFitCover where it can be; never clip
+  const s = Math.max(0.4, avail / need);   // never clip
+  // A scale this close to 1 saves under 3% (the body's own bottom padding absorbs it) and
+  // costs a rendering artifact: background-clip:text with a repeating tile (Y2K Chrome's
+  // chrome headline) paints a ghost copy of a word above the first line at a near-1 scale.
+  if (s >= 0.97) return;
   wrap.style.transformOrigin = cover ? '50% 0' : '0 0';
   wrap.style.transform = `scale(${s.toFixed(4)})`;
   root.dataset.fitScale = s.toFixed(3);
@@ -626,7 +650,19 @@ function bdFitStage(root) {
   const sw = stage.clientWidth;
   const sh = stage.clientHeight;
   if (!sw || !sh || !ratio) return;
-  stage.style.setProperty('--dk-art-w', Math.floor(Math.min(sw, sh * ratio)) + 'px');
+  let w = Math.floor(Math.min(sw, sh * ratio));
+  stage.style.setProperty('--dk-art-w', w + 'px');
+  // Some art hangs parts of itself past its own box (a floating card, a sticker). Those
+  // parts count towards the stage's scroll size, so shrink the art until they fit too.
+  // Not below 75% of the first size: art that is itself taller than its box (a specimen
+  // page set in a tall face) would otherwise collapse into a narrow, word-breaking layout.
+  const w0 = w;
+  for (let i = 0; i < 5; i++) {
+    const over = Math.max(stage.scrollHeight / sh, stage.scrollWidth / sw);
+    if (over <= 1.005 || w <= w0 * 0.75) break;
+    w = Math.max(Math.floor(w0 * 0.75), Math.floor(w / over * 0.99));
+    stage.style.setProperty('--dk-art-w', w + 'px');
+  }
 }
 
 // One-line type samples (the type scale) shrink until they sit inside their cell.
@@ -663,15 +699,57 @@ function bdLegibleHeadings(root) {
   });
 }
 
+// Nothing on a slide is smaller than 12px (tracked uppercase labels: 11px). The
+// aesthetics size their labels for a 900px board (micrographics sets 8px mono on
+// purpose); at 1280x720 that is unreadable, so lift any text under the floor.
+// Parents are visited before children, so em-based children follow.
+const BD_MIN_TEXT = 12;
+function bdMinText(root, floor) {
+  // `floor` (the 12px floor divided by the fit scale) applies inside the scaled wrapper only.
+  const body = root.querySelector('.ab-slide-body');
+  const wrap = body && body.firstElementChild;
+  root.querySelectorAll('.ab-slide-in *').forEach(el => {
+    const min = floor && wrap && wrap.contains(el) ? floor : BD_MIN_TEXT;
+    if (el.closest('[aria-hidden="true"], .ab-deck-pattern, svg') || el.tagName === 'INPUT') return;
+    if (![...el.childNodes].some(n => n.nodeType === 3 && n.nodeValue.trim())) return;
+    el.style.removeProperty('font-size');
+    const cs = getComputedStyle(el);
+    if (cs.display === 'none' || cs.visibility === 'hidden') return;
+    if (parseFloat(cs.fontSize) < min) el.style.setProperty('font-size', min.toFixed(2) + 'px', 'important');
+  });
+}
+
+// A brand name that is one very long word cannot wrap: shrink it until it fits (floor 12px).
+function bdFitBrandName(root) {
+  root.querySelectorAll('.ab-wordmark').forEach(el => {
+    el.style.removeProperty('font-size');
+    let fs = parseFloat(getComputedStyle(el).fontSize) || 16;
+    for (let i = 0; i < 24 && fs > 12 && el.scrollWidth > el.clientWidth + 1; i++) {
+      fs = Math.max(12, fs * 0.94);
+      el.style.setProperty('font-size', fs.toFixed(1) + 'px', 'important');
+    }
+  });
+}
+
 function bdFitDeck(grid) {
   grid.querySelectorAll('.ab-slide').forEach(root => {
     const key = root.dataset.slide;
     bdLegibleHeadings(root);
+    bdMinText(root);
+    bdFitBrandName(root);
     if (key === 'typography') bdFitSamples(root);
     if (key === 'cover') bdFitCover(root);
     else if (key === 'principles' || key === 'closing') bdFitHeadline(root);
     if (key === 'material') bdFitStage(root);
     bdScaleToFit(root);
+    // A slide that still had to scale down shrinks its small text with it: lift the
+    // text inside the scaled wrapper once so it reads at 12px after the scale (one
+    // step, not a loop: bigger text asks for a smaller scale), and fit again.
+    const sc = parseFloat(root.dataset.fitScale) || 1;
+    if (sc < 0.97) {
+      bdMinText(root, BD_MIN_TEXT / sc);
+      bdScaleToFit(root);
+    }
     bdBleedBands(root);
   });
 }
@@ -692,6 +770,243 @@ function bdBleedBands(root) {
     const r = el.getBoundingClientRect();
     el.style.setProperty('--ab-hl-bleed', Math.max(0, (rr.right - r.right) / (zoom * s)).toFixed(1) + 'px');
   });
+}
+
+/* ---------------- gore detector ---------------- */
+
+// deckGoreReport(slideEl) -> [{ type, el, text, detail }] — the automated "no UI
+// gore" check for one built slide (`.ab-slide` root). Empty array = clean. For
+// every visible text-bearing element it reports:
+//   overflow   text runs past its own box / scrollWidth > clientWidth / ellipsis
+//   broken     a single word wrapped across lines (Range per word, >1 line rect)
+//   overlap    text of two unrelated elements intersects (> 2px both ways)
+//   clipped    text cut off by an ancestor with overflow hidden/clip (or the slide)
+//   small      computed size < 12px (< 11px for tracked uppercase labels), after
+//              the slide's fit scale
+//   contrast   text under 3:1 against its effective background (only where that
+//              background is flat colours: skipped under gradients and images)
+// Decorative art (anything aria-hidden, .ab-deck-pattern, svg) is not text and is
+// skipped. An intentional overlay can opt out of overlap/clipped with
+// data-gore-ok="reason" on the element or an ancestor; the reason is mandatory
+// (empty values do not count). The array's `.stats` holds element counts.
+function deckGoreReport(slideEl) {
+  const issues = [];
+  const stats = { text: 0, contrastSkipped: 0, whitelisted: 0 };
+  issues.stats = stats;
+  const key = slideEl.dataset.slide || '';
+  const zoom = slideEl.offsetWidth ? slideEl.getBoundingClientRect().width / slideEl.offsetWidth : 1;
+  const tol = 2 * zoom;
+  const wrap = slideEl.querySelector('.ab-slide-body') && slideEl.querySelector('.ab-slide-body').firstElementChild;
+  const fitScale = parseFloat(slideEl.dataset.fitScale) || 1;
+
+  const short = el => {
+    const c = (el.getAttribute('class') || '').split(/\s+/).filter(Boolean).slice(0, 2).join('.');
+    return el.tagName.toLowerCase() + (c ? '.' + c : '');
+  };
+  const add = (type, el, detail) => issues.push({
+    type, slide: key, el: short(el),
+    text: (el.value != null && el.tagName === 'INPUT' ? el.value : el.textContent || '').trim().replace(/\s+/g, ' ').slice(0, 40),
+    detail,
+  });
+  const ownText = el => [...el.childNodes].filter(n => n.nodeType === 3 && n.nodeValue.trim());
+  const rectsOf = el => {
+    const out = [];
+    ownText(el).forEach(n => {
+      const r = document.createRange();
+      r.selectNodeContents(n);
+      [...r.getClientRects()].forEach(q => { if (q.width > 0.5 && q.height > 0.5) out.push(q); });
+    });
+    return out;
+  };
+  const parseColor = s => {
+    let m = String(s).match(/^rgba?\(([^)]+)\)$/);
+    if (m) {
+      const p = m[1].split(/[\s,\/]+/).filter(Boolean).map(Number);
+      return { r: p[0], g: p[1], b: p[2], a: p.length > 3 ? p[3] : 1 };
+    }
+    m = String(s).match(/^color\(srgb\s+([^)]+)\)$/);
+    if (m) {
+      const p = m[1].split(/[\s\/]+/).filter(Boolean).map(Number);
+      return { r: p[0] * 255, g: p[1] * 255, b: p[2] * 255, a: p.length > 3 ? p[3] : 1 };
+    }
+    return null;
+  };
+  const lum = c => {
+    const f = v => { v /= 255; return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); };
+    return 0.2126 * f(c.r) + 0.7152 * f(c.g) + 0.0722 * f(c.b);
+  };
+  const over = (fg, bg) => ({ r: fg.r * fg.a + bg.r * (1 - fg.a), g: fg.g * fg.a + bg.g * (1 - fg.a), b: fg.b * fg.a + bg.b * (1 - fg.a), a: 1 });
+  // Flat background behind an element, or null when a gradient/image is in the way.
+  const arts = [...slideEl.querySelectorAll('.ab-art, .ab-deck-pattern, .ab-deck-stage')].map(a => a.getBoundingClientRect());
+  const backdrop = (el, textBox) => {
+    // Text laid over the art or a pattern: whatever is behind it is a picture.
+    if (!el.closest('.ab-art, .ab-deck-stage') && arts.some(a => a.width > 0 && Math.min(a.right, textBox.r) - Math.max(a.left, textBox.l) > 1 && Math.min(a.bottom, textBox.b) - Math.max(a.top, textBox.t) > 1)) return null;
+    const layers = [];
+    for (let a = el; a && a !== document.documentElement; a = a.parentElement) {
+      const cs = getComputedStyle(a);
+      if (cs.backgroundImage && cs.backgroundImage !== 'none') return null;
+      for (const ps of (a === slideEl || a.matches('.ab-in, .ab-slide-in, .ab-slide-body')) ? [] : ['::before', '::after']) {
+        const pc = getComputedStyle(a, ps);
+        if (pc.content !== 'none' && pc.content !== 'normal' && pc.display !== 'none' && (pc.backgroundImage !== 'none' || (parseColor(pc.backgroundColor) || { a: 0 }).a > 0.05) && pc.position === 'absolute') return null;
+      }
+      const c = parseColor(cs.backgroundColor);
+      if (c && c.a > 0) { layers.push(c); if (c.a >= 0.999) break; }
+      if (a === slideEl) break;
+    }
+    if (!layers.length || layers[layers.length - 1].a < 0.999) return null;
+    let bg = layers.pop();
+    while (layers.length) bg = over(layers.pop(), bg);
+    return bg;
+  };
+  // The part of a text rect that carries ink: the content area (font ascent + descent)
+  // is taller than the glyphs, so a tight line-height clips empty space, not letters.
+  const inkOf = (q, fs, k) => {
+    const h = Math.min(q.height, fs * k * zoom);
+    const mid = (q.top + q.bottom) / 2;
+    return { l: q.left, r: q.right, t: mid - h / 2, b: mid + h / 2 };
+  };
+  const okReason = el => { const h = el.closest('[data-gore-ok]'); return h && h.getAttribute('data-gore-ok').trim() ? h : null; };
+
+  const items = [];
+  const artItems = [];
+  // Visually hidden boxes (an aesthetic that draws its headline in the art keeps the
+  // real one as a 1px clipped box for screen readers): their text is not on the slide.
+  const hiddenBoxes = [...slideEl.querySelectorAll('*')].filter(n => {
+    const r = n.getBoundingClientRect();
+    if (r.width > 2 || r.height > 2) return false;
+    const c = getComputedStyle(n);
+    return c.overflowX !== 'visible' || c.overflowY !== 'visible' || c.clip !== 'auto' || c.clipPath !== 'none';
+  });
+  // A rect cut down to what its ancestors (up to `stop`) leave visible.
+  const clipTo = (q, el, stop) => {
+    let l = q.l, r = q.r, t = q.t, b = q.b;
+    for (let a = el.parentElement; a && a !== stop; a = a.parentElement) {
+      const c = getComputedStyle(a);
+      if (c.overflowX === 'visible' && c.overflowY === 'visible') continue;
+      const x = a.getBoundingClientRect();
+      if (c.overflowX !== 'visible') { l = Math.max(l, x.left); r = Math.min(r, x.right); }
+      if (c.overflowY !== 'visible') { t = Math.max(t, x.top); b = Math.min(b, x.bottom); }
+    }
+    return { l, r, t, b };
+  };
+  slideEl.querySelectorAll('*').forEach(el => {
+    if (hiddenBoxes.some(h => h.contains(el))) return;
+    if (el.closest('.ab-deck-pattern, svg')) return;
+    if (el.tagName === 'STYLE' || el.tagName === 'SCRIPT') return;
+    if (el.closest('[aria-hidden="true"]')) {
+      // Text drawn inside the art is not checked itself, but content text must not
+      // collide with it (a floating button over the subcopy).
+      if (el.closest('.ab-art') && ownText(el).length) {
+        const q = rectsOf(el);
+        const fs0 = parseFloat(getComputedStyle(el).fontSize) || 0;
+        const acs = getComputedStyle(el);
+        if (q.length && acs.visibility !== 'hidden') {
+          // A painted label in the art (a floating button, a chip) covers what it sits on:
+          // its whole box counts, not just its text.
+          const edge = ['Top', 'Right', 'Bottom', 'Left'].some(sd => parseFloat(acs['border' + sd + 'Width']) > 0);
+          const filled = (parseColor(acs.backgroundColor) || { a: 0 }).a > 0.5 || acs.backgroundImage !== 'none';
+          const bx = el.getBoundingClientRect();
+          const art = el.closest('.ab-art');
+          const boxes = (edge || filled) && bx.width > 4 && bx.height > 4 ? [{ l: bx.left, r: bx.right, t: bx.top, b: bx.bottom }] : q.map(r => inkOf(r, fs0, 0.8));
+          artItems.push({ el, boxes: boxes.map(b => clipTo(b, el, art.parentElement)).filter(b => b.r - b.l > 1 && b.b - b.t > 1) });
+        }
+      }
+      return;
+    }
+    const isInput = el.tagName === 'INPUT' && el.type !== 'checkbox';
+    if (!isInput && !ownText(el).length) return;
+    const cs = getComputedStyle(el);
+    if (cs.visibility === 'hidden' || cs.display === 'none' || parseFloat(cs.opacity) < 0.05) return;
+    const box = el.getBoundingClientRect();
+    if (box.width <= 2 || box.height <= 2) return;                 // gone, or visually hidden
+    stats.text++;
+    const rects = isInput ? [box] : rectsOf(el);
+    if (!rects.length) return;
+    const fs = parseFloat(cs.fontSize) || 0;
+    const inks = rects.map(q => inkOf(q, fs, 0.9));
+    const U = { l: Math.min(...inks.map(r => r.l)), r: Math.max(...inks.map(r => r.r)), t: Math.min(...inks.map(r => r.t)), b: Math.max(...inks.map(r => r.b)) };
+
+    // 1. overflow / truncation
+    if (!isInput) {
+      if (U.r > box.right + tol || U.l < box.left - tol) add('overflow', el, `text ${Math.round(U.l - box.left)}..${Math.round(U.r - box.right)} outside its box`);
+      // scrollWidth / scrollHeight only count where the box clips (overflow not visible):
+      // a visible-overflow box that is wider than itself because of a decorative
+      // pseudo-element (a highlight band that runs on) is not text trouble; its text
+      // rects, checked above, are.
+      else if (cs.display !== 'inline' && cs.overflowX !== 'visible' && el.scrollWidth > el.clientWidth + 1) add('overflow', el, `scrollWidth ${el.scrollWidth} > clientWidth ${el.clientWidth}`);
+      else if (cs.textOverflow === 'ellipsis' && el.scrollWidth > el.clientWidth) add('overflow', el, 'ellipsis truncation');
+      else if (cs.display !== 'inline' && cs.overflowY !== 'visible' && el.scrollHeight > el.clientHeight + 1) add('overflow', el, `scrollHeight ${el.scrollHeight} > clientHeight ${el.clientHeight}`);
+    } else if (el.scrollWidth > el.clientWidth + 1) add('overflow', el, 'input value truncated');
+
+    // 2. a word broken across lines
+    if (!isInput) {
+      let broken = '';
+      ownText(el).forEach(n => {
+        if (broken) return;
+        const re = /[^\s\-‐-―\/]+/g;
+        let m;
+        while ((m = re.exec(n.nodeValue))) {
+          if (m[0].length < 2) continue;
+          const r = document.createRange();
+          r.setStart(n, m.index); r.setEnd(n, m.index + m[0].length);
+          const q = [...r.getClientRects()].filter(x => x.width > 0.5);
+          if (q.length > 1 && Math.max(...q.map(x => x.top)) - Math.min(...q.map(x => x.top)) > fs * 0.3 * zoom) { broken = m[0]; break; }
+        }
+      });
+      if (broken) add('broken', el, `"${broken}" wraps mid-word`);
+    }
+
+    // 4. clipped by an ancestor
+    for (let a = el.parentElement; a; a = a.parentElement) {
+      const acs = getComputedStyle(a);
+      if (acs.display === 'contents') { if (a === slideEl) break; continue; }
+      const cx = acs.overflowX !== 'visible', cy = acs.overflowY !== 'visible';
+      if (cx || cy) {
+        const c = a.getBoundingClientRect();
+        const side = [cx && U.l < c.left - tol ? 'left' : '', cx && U.r > c.right + tol ? 'right' : '', cy && U.t < c.top - tol ? 'top' : '', cy && U.b > c.bottom + tol ? 'bottom' : ''].filter(Boolean);
+        if (side.length) {
+          if (okReason(el)) stats.whitelisted++;
+          else add('clipped', el, `cut off at ${side.join('/')} by ${short(a)}`);
+          break;
+        }
+      }
+      if (a === slideEl) break;
+    }
+
+    // 5. text size (after the slide's fit scale)
+    const eff = fs * (wrap && wrap.contains(el) ? fitScale : 1);
+    const txt = (el.textContent || '').trim();
+    const caps = (cs.textTransform === 'uppercase' || (/[A-Z]/.test(txt) && txt === txt.toUpperCase())) && parseFloat(cs.letterSpacing) > 0;
+    if (eff < (caps ? 11 : 12) - 0.25) add('small', el, `${eff.toFixed(1)}px${caps ? ' (caps label)' : ''}`);
+
+    // 6. contrast
+    const fill = parseColor(cs.webkitTextFillColor) || parseColor(cs.color);
+    if (fill && fill.a > 0) {
+      const bg = backdrop(el, U);
+      if (!bg) stats.contrastSkipped++;
+      else {
+        const fg = over(fill, bg);
+        const L1 = lum(fg), L2 = lum(bg);
+        const ratio = (Math.max(L1, L2) + 0.05) / (Math.min(L1, L2) + 0.05);
+        if (ratio < 3) add('contrast', el, `${ratio.toFixed(2)}:1`);
+      }
+    }
+    items.push({ el, boxes: rects.map(q => inkOf(q, fs, 0.8)) });
+  });
+
+  // 3. overlapping text of unrelated elements (art text counts as the second party)
+  const pool = items.concat(artItems);
+  for (let i = 0; i < items.length; i++) {
+    for (let j = i + 1; j < pool.length; j++) {
+      const A = items[i], B = pool[j];
+      if (A.el.contains(B.el) || B.el.contains(A.el)) continue;
+      const hit = A.boxes.some(a => B.boxes.some(b => Math.min(a.r, b.r) - Math.max(a.l, b.l) > tol && Math.min(a.b, b.b) - Math.max(a.t, b.t) > tol));
+      if (!hit) continue;
+      if (okReason(A.el) || okReason(B.el)) { stats.whitelisted++; continue; }
+      add('overlap', A.el, `overlaps ${short(B.el)} "${(B.el.textContent || '').trim().slice(0, 24)}"`);
+    }
+  }
+  return issues;
 }
 
 /* ---------------- render (deferred) ---------------- */
@@ -991,6 +1306,20 @@ function bdLiftSceneCopy(doc, root) {
   });
 }
 
+// html2canvas draws a blurred box-shadow with a negative spread (the soft "lifted tile"
+// shadows) as a grey rectangle that ignores the border radius. In the clone, drop those
+// layers: a flat tile exports cleanly, a square grey halo does not.
+function bdShadowFixes(cs) {
+  const bs = cs.getPropertyValue('box-shadow');
+  if (!bs || bs === 'none') return [];
+  const layers = bdSplitList(bs);
+  const keep = layers.filter(layer => {
+    const nums = layer.replace(/(?:rgba?|color)\([^)]*\)/g, ' ').match(/-?[\d.]+px/g) || [];
+    return !(nums.length >= 4 && parseFloat(nums[3]) < 0 && parseFloat(nums[2]) > 0);
+  });
+  return keep.length === layers.length ? [] : [['box-shadow', keep.length ? bdSrgbToRgba(keep.join(', ')) : 'none']];
+}
+
 function bdSanitizeClone(doc, root) {
   const win = doc.defaultView;
   if (!win) return;
@@ -1007,6 +1336,7 @@ function bdSanitizeClone(doc, root) {
         const v = cs.getPropertyValue(prop);
         if (v && v.indexOf('color(') >= 0) fixes.push([prop, bdSrgbToRgba(v)]);
       });
+      bdShadowFixes(cs).forEach(f => { const at = fixes.findIndex(x => x[0] === f[0]); if (at >= 0) fixes.splice(at, 1); fixes.push(f); });
       bdLayerFixes(cs).forEach(f => fixes.push(f));
       bdCalcFixes(cs).forEach(f => fixes.push(f));
       if (!fixes.length) return;

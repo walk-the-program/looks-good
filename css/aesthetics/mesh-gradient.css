@@ -269,3 +269,10 @@
   .ab[data-ae="mesh-gradient"] .ab-cta, .ab[data-ae="mesh-gradient"] .ab-cta-arrow, .ab[data-ae="mesh-gradient"] .ab-type-apply { transition: none; }
   .ab[data-ae="mesh-gradient"] .ab-cta:hover, .ab[data-ae="mesh-gradient"] .ab-cta:active, .ab[data-ae="mesh-gradient"] .ab-cta:hover .ab-cta-arrow, .ab[data-ae="mesh-gradient"] .ab-type-apply:hover { transform: none; }
 }
+
+/* Deck: the board's header sits on the mesh band (white ink). Only the cover has the
+   band behind it; on the other slides the header is on the canvas, so it takes ink. */
+.ab[data-ae="mesh-gradient"].ab-slide:not([data-slide="cover"]) .ab-head { color: var(--ab-ink); }
+/* Deck cover: the third floating card (payout) drops into the meta row once the headline
+   runs long or wide; the metric and code cards carry the product story. */
+.ab[data-ae="mesh-gradient"].ab-slide[data-slide="cover"] .mga-pay { display: none; }

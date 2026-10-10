@@ -135,4 +135,22 @@ registerAesthetic({
       'Wash the page in pastel blobs; the only saturated color is the scene.',
     ],
   },
+  // Deck copy (js/brand-deck.js): three principles, three do / don't lines, each short.
+  deck: {
+    principles: [
+      ['Glass floats over vivid color', 'There has to be something to refract.'],
+      ['Thin fill, bright rim', '12% white fill, a specular rim and a dark hairline.'],
+      ['Panels stay solid', 'Near-opaque panels; glass is for floating controls.'],
+    ],
+    do: [
+      'Float glass only over vivid scenes.',
+      'Keep glass fill at 12% white or less.',
+      'Keep panels near-opaque on a neutral canvas.',
+    ],
+    dont: [
+      'Call blur alone refraction.',
+      'Nest glass inside glass.',
+      'Put text on strong distortion.',
+    ],
+  },
 });

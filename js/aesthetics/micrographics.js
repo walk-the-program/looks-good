@@ -55,7 +55,25 @@ registerAesthetic({
   slideShape: 'minimal',
   labels: { material: 'Detail', states: ['Base', 'Annotated', 'Marked'], statesKind: 'swatch' },
   layout: { hero: 'centered', palette: 'swatches', sections: 'two-col' },
-  deck: { materialStage: 'pattern' },
+  // Deck copy (js/brand-deck.js): three principles, three do / don't lines, each short.
+  deck: {
+    materialStage: 'pattern',
+    principles: [
+      ['One huge element', 'Everything else is at least ten times smaller.'],
+      ['Rings of tiny mono labels', 'Indexes, codes, coordinates and page marks.'],
+      ['Hairlines on a strict module', 'Ticks, crosshairs and a handful of primary marks.'],
+    ],
+    do: [
+      'Make one element huge.',
+      'Give every panel three micro labels.',
+      'Draw with 1px hairlines.',
+    ],
+    dont: [
+      'Add glow, gradients or shadows.',
+      'Set microtype in a proportional face.',
+      'Use accent for marks or small text.',
+    ],
+  },
   type: { ui: 'mono', label: 'mono', display: 1.28 },
   highlight: 'custom',
   highlightNote: 'The word is set solid in --accent-ink like the rest of the giant headline, followed by a tiny mono footnote reference "(01)" raised at its top right; no fill, no outline, no underline.',

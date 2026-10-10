@@ -158,4 +158,22 @@ registerAesthetic({
       'Place chrome text on a light canvas without the dark chrome variant.',
     ],
   },
+  // Deck copy (js/brand-deck.js): three principles, three do / don't lines, each short.
+  deck: {
+    principles: [
+      ['Chrome with a hard horizon', 'A bright line at 50% over a dark ground.'],
+      ['The heaviest wide type', 'Chrome-filled, with one acid-accent plate behind a word.'],
+      ['Opaque, saturated, bevelled', 'Gunmetal panels with a white rim and glossy pills.'],
+    ],
+    do: [
+      'Give every chrome surface a hard horizon.',
+      'Keep panels opaque gunmetal with a bevelled rim.',
+      'Scatter sparkles sparingly.',
+    ],
+    dont: [
+      'Use pastel or frosted transparency.',
+      'Fill text with accent or primary.',
+      'Flatten the bevelled rim.',
+    ],
+  },
 });

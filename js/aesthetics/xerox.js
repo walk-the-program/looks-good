@@ -219,5 +219,23 @@ registerAesthetic({
       'Round corners or use neon; toner is black, color is only the overprint and the highlighter.',
     ],
   },
+  // Deck copy (js/brand-deck.js): three principles, three do / don't lines, each short.
+  deck: {
+    principles: [
+      ['Toner on paper', 'Hard contrast, speckle and edge burn.'],
+      ['Paste-up components', 'Paper scraps, slight rotation and a strip of tape.'],
+      ['Color is a second pass', 'A primary overprint and one accent highlighter swipe.'],
+    ],
+    do: [
+      'Set type in one heavy uppercase face.',
+      'Build components like a paste-up.',
+      'Degrade on purpose.',
+    ],
+    dont: [
+      'Use smooth fills or soft shadows.',
+      'Set headlines as ransom-note letters.',
+      'Round corners or use neon.',
+    ],
+  },
 });
 })();

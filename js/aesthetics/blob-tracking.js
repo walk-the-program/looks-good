@@ -259,5 +259,23 @@ registerAesthetic({
       'Box more than the things that matter, or set boxes and labels in a serif or rounded face.',
     ],
   },
+  // Deck copy (js/brand-deck.js): three principles, three do / don't lines, each short.
+  deck: {
+    principles: [
+      ['Everything in frame is tracked', '1px boxes with corner ticks and ID labels.'],
+      ['Lock exactly one target', 'One primary box and action; the rest stay white.'],
+      ['Dark, grainy, dithered footage', 'Two tones under a soft brand wash.'],
+    ],
+    do: [
+      'Enclose things in 1px bounding boxes.',
+      'Lock one target in primary.',
+      'Show IDs and coordinates in mono.',
+    ],
+    dont: [
+      'Add neon glow or chamfered corners.',
+      'Round boxes or fill panels.',
+      'Box more than what matters.',
+    ],
+  },
 });
 })();

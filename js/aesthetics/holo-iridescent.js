@@ -188,5 +188,23 @@
         'Let the gradient word fall under 3:1 on the canvas; it starts at the shaded accent.',
       ],
     },
+    // Deck copy (js/brand-deck.js): three principles, three do / don't lines, each short.
+    deck: {
+      principles: [
+        ['Near-black, lit by thin light', 'One hairline, one bubble rim, one ribbon.'],
+        ['The primary stays solid', 'With a thin spectral line along its top edge.'],
+        ['The spectrum stays still', 'It is a finish, not a palette.'],
+      ],
+      do: [
+        'Keep the canvas near-black.',
+        'Give panels an iridescent hairline edge.',
+        'Use the primary as a solid color.',
+      ],
+      dont: [
+        'Fill large areas with the rainbow.',
+        'Animate the foil.',
+        'Treat spectrum colors as brand roles.',
+      ],
+    },
   });
 })();

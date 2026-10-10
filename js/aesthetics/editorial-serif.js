@@ -122,4 +122,22 @@ registerAesthetic({
       'Run body copy in sans or letter-space the serif.',
     ],
   },
+  // Deck copy (js/brand-deck.js): three principles, three do / don't lines, each short.
+  deck: {
+    principles: [
+      ['Set it like a page', 'High-contrast serif at weight 400, with room to breathe.'],
+      ['Hairline rules do the work', 'No shadows, no tinted cards, square corners.'],
+      ['One italic accent word', 'Everything else is ink on paper.'],
+    ],
+    do: [
+      'Set headlines in the serif at weight 400.',
+      'Separate everything with hairline rules.',
+      'Set labels in small-caps sans.',
+    ],
+    dont: [
+      'Bold the headline or round the controls.',
+      'Use the accent as a fill.',
+      'Run body copy in sans.',
+    ],
+  },
 });

@@ -159,4 +159,22 @@ registerAesthetic({
       'Mix in serif or script faces, or warm analog bezels (that is a different aesthetic).',
     ],
   },
+  // Deck copy (js/brand-deck.js): three principles, three do / don't lines, each short.
+  deck: {
+    principles: [
+      ['Cut corners, neon edges', 'Two opposite corners cut at 45 degrees, 1px neon lines.'],
+      ['Live data everywhere', 'Mono readouts, segmented bars and a gauge.'],
+      ['Neon is the only light', 'A near-black field with a faint grid.'],
+    ],
+    do: [
+      'Cut two opposite corners on every panel.',
+      'Draw 1px neon edges in primary.',
+      'Set labels and values in mono caps.',
+    ],
+    dont: [
+      'Round anything or add soft shadows.',
+      'Use accent as a fill or border.',
+      'Fill panels with solid neon.',
+    ],
+  },
 });

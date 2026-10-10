@@ -244,5 +244,23 @@ registerAesthetic({
       'Animate beyond a two-frame blink or a 4px press; no easing, no fades.',
     ],
   },
+  // Deck copy (js/brand-deck.js): three principles, three do / don't lines, each short.
+  deck: {
+    principles: [
+      ['Everything snaps to 4px', 'Stepped borders and sizes in multiples of four.'],
+      ['Dither, never gradients', '2x2 dither and hard bands for shading.'],
+      ['Collectibles use the accent', 'Coins, hearts, item blocks and one headline word.'],
+    ],
+    do: [
+      'Draw borders as stepped 4px stacks.',
+      'Shade with 2x2 dither.',
+      'Raise the main button 4px.',
+    ],
+    dont: [
+      'Use border-radius or soft shadows.',
+      'Set long text in a pixel face.',
+      'Animate beyond a two-frame blink.',
+    ],
+  },
 });
 

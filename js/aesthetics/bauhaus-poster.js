@@ -96,4 +96,22 @@ registerAesthetic({
       'Place text over the colored art planes without an ink or canvas ground.',
     ],
   },
+  // Deck copy (js/brand-deck.js): three principles, three do / don't lines, each short.
+  deck: {
+    principles: [
+      ['Flat geometry, hard ink lines', 'Circles, squares and quarter circles tiled on a grid.'],
+      ['Square or fully round', 'Nothing in between, and a 2px ink border on every control.'],
+      ['Loud, tight lowercase headlines', 'Secondary and accent run as flat planes in the art.'],
+    ],
+    do: [
+      'Build art from circles, squares and quarter circles.',
+      'Make every control square or fully round.',
+      'Draw every control with a 2px ink border.',
+    ],
+    dont: [
+      'Use shadows, gradients or blur.',
+      'Round corners to 4, 8 or 12px.',
+      'Fill panels with secondary or accent.',
+    ],
+  },
 });

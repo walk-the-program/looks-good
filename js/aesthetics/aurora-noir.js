@@ -162,4 +162,22 @@ registerAesthetic({
       'Round controls past 8px or cards past 14px; this look is exact, not soft.',
     ],
   },
+  // Deck copy (js/brand-deck.js): three principles, three do / don't lines, each short.
+  deck: {
+    principles: [
+      ['Quiet, exact, charged', 'Hairline surfaces on a near-black field.'],
+      ['Surfaces are alphas of ink', 'A 3% fill and an 8% hairline; no second background.'],
+      ['The aurora stays faint', 'Behind the product window only, at 18% or less.'],
+    ],
+    do: [
+      'Build surfaces from alphas of the ink color.',
+      'Fill the main action with ink.',
+      'Set numbers in mono with tabular figures.',
+    ],
+    dont: [
+      'Add drop shadows or blurred panels.',
+      'Fill the main action with primary.',
+      'Round cards past 14px.',
+    ],
+  },
 });

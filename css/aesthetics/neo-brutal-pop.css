@@ -281,3 +281,7 @@
 @media (prefers-reduced-motion: reduce) {
   .ab[data-ae="neo-brutal-pop"] .ab-cta:hover, .ab[data-ae="neo-brutal-pop"] .ab-cta:active, .ab[data-ae="neo-brutal-pop"] .ab-input:focus, .ab[data-ae="neo-brutal-pop"] .ab-type-apply:hover, .ab[data-ae="neo-brutal-pop"] .ab-type-apply:active { transform: none; }
 }
+
+/* Deck cover: the art's mock "Get started" button sits at the bottom of the hero, which
+   on the cover is where the subcopy lands. The stickers carry the cover without it. */
+.ab[data-ae="neo-brutal-pop"].ab-slide[data-slide="cover"] .nba-cta { display: none; }

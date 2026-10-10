@@ -275,4 +275,22 @@ registerAesthetic({
       'Let the density map run edge to edge with no empty cells, or colour it with more than the three brand hues.',
     ],
   },
+  // Deck copy (js/brand-deck.js): three principles, three do / don't lines, each short.
+  deck: {
+    principles: [
+      ['Everything is a character', 'Every image comes from a brightness ramp.'],
+      ['Panels framed in text', 'Titled top edges and bracketed controls.'],
+      ['A mostly empty field', 'Sparse dots make the dense glyphs read.'],
+    ],
+    do: [
+      'Build images from the character ramp.',
+      'Write controls as text.',
+      'Set labels in monospace.',
+    ],
+    dont: [
+      'Use sprites or rounded corners.',
+      'Mix in a proportional face.',
+      'Fill panels with primary or accent.',
+    ],
+  },
 });

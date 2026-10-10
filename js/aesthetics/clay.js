@@ -109,4 +109,22 @@ registerAesthetic({
       'Stack more than one saturated clay color in a single control.',
     ],
   },
+  // Deck copy (js/brand-deck.js): three principles, three do / don't lines, each short.
+  deck: {
+    principles: [
+      ['Soft objects on white cards', 'The clay finish lives on objects, not on panels.'],
+      ['Three layers on every object', 'A colored drop shadow, a dark underside, a light top.'],
+      ['Round and physical', 'Lift on hover, shrink a little on press.'],
+    ],
+    do: [
+      'Keep cards near-white with soft shadows.',
+      'Round everything generously.',
+      'Build objects from a tonal ramp of primary.',
+    ],
+    dont: [
+      'Fill whole cards with a brand color.',
+      'Use hard edges or black outlines.',
+      'Use a harsh black shadow.',
+    ],
+  },
 });

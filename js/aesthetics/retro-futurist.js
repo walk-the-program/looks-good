@@ -210,5 +210,23 @@
         'Fill the hero with a planet, a landscape or a flat illustration; the hero art is a hardware module (dial, LCD, LED meter).',
       ],
     },
+    // Deck copy (js/brand-deck.js): three principles, three do / don't lines, each short.
+    deck: {
+      principles: [
+        ['Panels are bezels', 'A gradient edge, a top highlight and a deep shadow.'],
+        ['Glow means active', 'Primary key, CTA and lamps glow; idle ones sit dim.'],
+        ['Readouts on dark screens', 'Monospace text on inset screens with scanlines.'],
+      ],
+      do: [
+        'Build panels as bezels with a top highlight.',
+        'Light only what is active.',
+        'Set interface text in monospace.',
+      ],
+      dont: [
+        'Glow everything.',
+        'Flatten the bezels.',
+        'Put body text on glowing surfaces.',
+      ],
+    },
   });
 })();

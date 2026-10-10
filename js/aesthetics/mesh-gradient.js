@@ -166,4 +166,22 @@ registerAesthetic({
       'Fill cards or buttons with the mesh, or set text over it in secondary or accent.',
     ],
   },
+  // Deck copy (js/brand-deck.js): three principles, three do / don't lines, each short.
+  deck: {
+    principles: [
+      ['Fluid on top, exact underneath', 'A saturated mesh above crisp white cards.'],
+      ['The mesh stays in the hero', 'Never behind body copy, forms or lists.'],
+      ['Layered, tinted shadows', 'Opaque cards with a hairline and three soft shadows.'],
+    ],
+    do: [
+      'Keep everything below the mesh opaque.',
+      'Set the headline in white or ink on the mesh.',
+      'Show real product detail at the mesh edge.',
+    ],
+    dont: [
+      'Add glass or translucent panels.',
+      'Run the mesh behind body copy.',
+      'Use flat black or hard shadows.',
+    ],
+  },
 });

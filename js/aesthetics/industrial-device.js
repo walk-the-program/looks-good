@@ -132,4 +132,22 @@ registerAesthetic({
       'Light more than one accent key per view or decorate with the dot grid beyond the speaker and vents.',
     ],
   },
+  // Deck copy (js/brand-deck.js): three principles, three do / don't lines, each short.
+  deck: {
+    principles: [
+      ['Machined, flat, numbered', 'A light top edge and a darker underside on every panel.'],
+      ['Keys you can press', 'Square-ish keys that compress 2px on press.'],
+      ['One label per control', 'Tiny uppercase mono, numbered callouts, leader lines.'],
+    ],
+    do: [
+      'Build panels flat with machined edges.',
+      'Compress keys 2px on press.',
+      'Label with tiny uppercase mono.',
+    ],
+    dont: [
+      'Add soft shadows or gradients.',
+      'Round things into pills.',
+      'Light more than one accent key.',
+    ],
+  },
 });

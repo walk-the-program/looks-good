@@ -231,4 +231,22 @@ registerAesthetic({
       'Use primary as decoration in the type specimen or the headline.',
     ],
   },
+  // Deck copy (js/brand-deck.js): three principles, three do / don't lines, each short.
+  deck: {
+    principles: [
+      ['Many voices, one page', 'Serif italic, heavy grotesk and mono in one line.'],
+      ['Match cap heights', 'Compare capitals, not font sizes.'],
+      ['Controls stay quiet', 'One body face; the mixing lives in headlines.'],
+    ],
+    do: [
+      'Set headlines word by word in several faces.',
+      'Keep every control in one body face.',
+      'Lay everything on a strict grid.',
+    ],
+    dont: [
+      'Use more than four faces.',
+      'Mix faces inside a button or field.',
+      'Color more than one highlight word.',
+    ],
+  },
 });

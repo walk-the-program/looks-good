@@ -15,7 +15,25 @@ registerAesthetic({
   slideShape: 'geometric',
   labels: { material: 'Hard surfaces', states: ['Rest', 'Hover', 'Pressed'], statesKind: 'button' },
   layout: { hero: 'poster', palette: 'strips' },
-  deck: { materialStage: 'pattern' },
+  // Deck copy (js/brand-deck.js): three principles, three do / don't lines, each short.
+  deck: {
+    materialStage: 'pattern',
+    principles: [
+      ['Hard edges, thick borders', 'Zero radius and 2px ink borders on every control.'],
+      ['Hard shadow lifts, press flattens', 'A 6px offset shadow raises things; pressing removes it.'],
+      ['Mono, uppercase, numbered like [01]', 'Every label, tab and button is set in monospace caps.'],
+    ],
+    do: [
+      'Use zero radius and 2px ink borders.',
+      'Number everything like [01].',
+      'Keep the page monochrome.',
+    ],
+    dont: [
+      'Round a corner or blur a shadow.',
+      'Set the accent as text color.',
+      'Soften the headline.',
+    ],
+  },
   type: { ui: 'mono', label: 'mono', display: 1.35 },
   highlight: 'band',
 

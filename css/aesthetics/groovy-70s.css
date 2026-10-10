@@ -175,3 +175,10 @@
   .ab[data-ae="groovy-70s"] .ab-cta, .ab[data-ae="groovy-70s"] .ab-seg-btn, .ab[data-ae="groovy-70s"] .ab-switch::before, .ab[data-ae="groovy-70s"] .ab-type-apply { transition: none; }
   .ab[data-ae="groovy-70s"] .ab-cta:hover, .ab[data-ae="groovy-70s"] .ab-cta:active, .ab[data-ae="groovy-70s"] .ab-type-apply:hover { transform: none; }
 }
+
+/* Deck cover: the board pulls the statement up into the arch's hollow, which only holds
+   a short, narrow headline. A wide face or a long tagline spills onto the rings, so on the
+   cover the arch sits above the statement instead of around it. */
+.ab[data-ae="groovy-70s"].ab-slide[data-slide="cover"] .ab-hero { padding: 0 0 8px; }
+.ab[data-ae="groovy-70s"].ab-slide[data-slide="cover"] .ab-art { max-width: 380px; }
+.ab[data-ae="groovy-70s"].ab-slide[data-slide="cover"] .ab-hero-copy { max-width: 82%; margin-top: 14px; }

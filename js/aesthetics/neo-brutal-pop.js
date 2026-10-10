@@ -120,4 +120,22 @@ registerAesthetic({
       'Drop the ink outline from a filled shape, or mix thin and thick outlines.',
     ],
   },
+  // Deck copy (js/brand-deck.js): three principles, three do / don't lines, each short.
+  deck: {
+    principles: [
+      ['Outline everything in ink', '2px outlines with a hard 4px shadow and no blur.'],
+      ['Buttons you can feel', 'They lift on hover and squish when pressed.'],
+      ['Loud, but friendly', 'Bright stickers on a colored grid, with paper-white cards.'],
+    ],
+    do: [
+      'Outline every object in 2px ink.',
+      'Lift on hover, squish on press.',
+      'Set near-white cards on the colored grid.',
+    ],
+    dont: [
+      'Blur a shadow or add a gradient.',
+      'Use accent as text or a button fill.',
+      'Round corners past 10px.',
+    ],
+  },
 });

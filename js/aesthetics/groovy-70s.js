@@ -115,4 +115,22 @@ registerAesthetic({
       'Spread the rainbow into small UI chrome; it appears once per view, as the arch.',
     ],
   },
+  // Deck copy (js/brand-deck.js): three principles, three do / don't lines, each short.
+  deck: {
+    principles: [
+      ['Warm, wavy, joyful', 'Cream canvas, fat soft type, concentric rainbow bands.'],
+      ['Pills, blobs, wavy dividers', 'Radius full or 36px, never straight rules.'],
+      ['One rainbow per view', 'The arch appears once, with sunburst rays behind the action.'],
+    ],
+    do: [
+      'Build the signature from concentric arches.',
+      'Set the headline in a fat soft face.',
+      'Use pills, blobs and wavy dividers.',
+    ],
+    dont: [
+      'Add outlines or offset shadows.',
+      'Use straight rules or sharp corners.',
+      'Spread the rainbow into small UI chrome.',
+    ],
+  },
 });

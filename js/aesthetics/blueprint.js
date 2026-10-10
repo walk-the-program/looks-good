@@ -224,4 +224,22 @@ registerAesthetic({
       'Break the grid: align panels and callouts to the 24px lattice.',
     ],
   },
+  // Deck copy (js/brand-deck.js): three principles, three do / don't lines, each short.
+  deck: {
+    principles: [
+      ['Draw it to scale', '1px white line work on a blue field.'],
+      ['Annotate like a drawing', 'Dimension lines, lettered callouts and a title block.'],
+      ['Color marks only a state', 'Primary fills the selected tab and one CTA.'],
+    ],
+    do: [
+      'Draw everything as 1px line work.',
+      'Annotate with dimensions and callouts.',
+      'Set labels and values in mono.',
+    ],
+    dont: [
+      'Fill panels or add shadows.',
+      'Break the 24px grid.',
+      'Use color for decoration.',
+    ],
+  },
 });

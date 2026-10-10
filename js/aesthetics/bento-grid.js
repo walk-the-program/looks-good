@@ -135,4 +135,22 @@ registerAesthetic({
       'Crowd copy: one idea per tile, with generous padding.',
     ],
   },
+  // Deck copy (js/brand-deck.js): three principles, three do / don't lines, each short.
+  deck: {
+    principles: [
+      ['One tile, one idea', 'Each block says a single thing, with room around it.'],
+      ['Rounded tiles, no borders', 'Radius 28 on a darker canvas, with 14px gaps.'],
+      ['One solid primary tile', 'The action tile; everything else stays quiet.'],
+    ],
+    do: [
+      'Build every block as a rounded tile.',
+      'Give stats a huge numeral and a small label.',
+      'Fill exactly one tile solid primary.',
+    ],
+    dont: [
+      'Add tile borders or heavy shadows.',
+      'Fill a tile with ink or accent.',
+      'Mix radii or crowd the copy.',
+    ],
+  },
 });

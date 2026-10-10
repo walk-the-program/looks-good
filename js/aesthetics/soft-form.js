@@ -86,4 +86,22 @@ registerAesthetic({
       'Add decorative circles or arcs to the product UI itself; keep geometry to the signature art.',
     ],
   },
+  // Deck copy (js/brand-deck.js): three principles, three do / don't lines, each short.
+  deck: {
+    principles: [
+      ['One material, pressed and lifted', 'Surfaces share the canvas color; shadow and light make the form.'],
+      ['Light always comes from top left', 'Dark shadow down-right, soft highlight up-left, everywhere.'],
+      ['One glossy action per screen', 'Raised buttons, recessed fields, flat rows and body text.'],
+    ],
+    do: [
+      'Fill raised and recessed surfaces with the canvas color.',
+      'Light everything from the top left.',
+      'Keep dense rows and body text flat.',
+    ],
+    dont: [
+      'Fill a raised element with a different color.',
+      'Move the light with pointer or scroll.',
+      'Use a plain frosted blur as glass.',
+    ],
+  },
 });

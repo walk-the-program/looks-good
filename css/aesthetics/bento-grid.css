@@ -255,3 +255,7 @@
 .ab[data-ae="bento-grid"].ab-slide[data-slide="cover"] .ab-deck-cover .ab-hero-copy { min-height: 0; padding: 30px 36px 32px; }
 .ab[data-ae="bento-grid"].ab-slide[data-slide="cover"] .ab-deck-cover .ab-headline { margin: auto 0; padding: 18px 0 16px; }
 .ab[data-ae="bento-grid"].ab-slide[data-slide="cover"] .ab-deck-cover .ab-art { max-width: none !important; width: 100% !important; min-height: 0; height: 100%; }
+
+/* Deck: the floating "Direction saved" chip lands on the phone's brand name once the phone
+   sits in a slide-sized tile. The phone shows the brand; the other chip stays. */
+.ab[data-ae="bento-grid"].ab-slide .bna-c1 { display: none; }
