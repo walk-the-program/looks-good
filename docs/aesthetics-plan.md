@@ -262,11 +262,11 @@ accent stamp/asterisk. List rows separated by dashed ink rules.
 
 | ID | Owner | Depends | Writes | Status |
 |----|-------|---------|--------|--------|
-| T1 | W1 Sonnet | — | registry, board js/css, 01/02/05 aesthetic files, 7 stub files, index.html workspace + Aesthetic panel + tags, app.js render/preview/state/shuffle, persistence.js, brand-session.js, styles.css (old preview styles) | ready |
-| T2 | W2 Sonnet | — | js/color-roles.js, js/color-picker.js, js/color-import.js, css/color-picker.css, index.html Color palette panel + its tags, app.js color handlers/controls sync | ready |
-| T3 | W3 Sonnet | T1 | 03, 04, 06, 09 aesthetic js/css files only | planned |
-| T4 | W4 Sonnet | T1 | 07, 08, 10 aesthetic js/css files only | planned |
-| T5 | W5 Sonnet | T1–T4 | js/ai-brief.js, sidebar-foot button, brand guide color-roles page | planned |
+| T1 | W1 Sonnet | — | registry, board js/css, 01/02/05 aesthetic files, 7 stub files, index.html workspace + Aesthetic panel + tags, app.js render/preview/state/shuffle, persistence.js, brand-session.js, styles.css (old preview styles) | built (files present, loads in T5 checks); coordinator acceptance pending |
+| T2 | W2 Sonnet | — | js/color-roles.js, js/color-picker.js, js/color-import.js, css/color-picker.css, index.html Color palette panel + its tags, app.js color handlers/controls sync | built (files present, loads in T5 checks); coordinator acceptance pending |
+| T3 | W3 Sonnet | T1 | 03, 04, 06, 09 aesthetic js/css files only | built (all 10 aesthetics registered with art/materials/rules; CSS files non-empty); coordinator acceptance pending |
+| T4 | W4 Sonnet | T1 | 07, 08, 10 aesthetic js/css files only | built (all 10 aesthetics registered with art/materials/rules; CSS files non-empty); coordinator acceptance pending |
+| T5 | W5 Sonnet | T1–T4 | js/ai-brief.js, sidebar-foot button, brand guide color-roles page | submitted (Compare uses def.mode; dead swatch CSS removed; README updated) |
 | T6 | Coordinator | all | review, visual QA, Mac build, README | planned |
 
 ## Board anatomy

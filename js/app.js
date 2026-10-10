@@ -324,29 +324,29 @@ function copyText(text) {
   return navigator.clipboard.writeText(text);
 }
 
-function brandCssText() {
-  const onPrimary = pickReadableText(state.colors.primary);
-  const onAccent = pickReadableText(state.colors.accent);
+function brandCssText(s = state) {
+  const onPrimary = pickReadableText(s.colors.primary);
+  const onAccent = pickReadableText(s.colors.accent);
   return `:root {
-  --primary: ${state.colors.primary};
-  --secondary: ${state.colors.secondary};
-  --accent: ${state.colors.accent};
-  --neutral-dark: ${state.colors.neutralDark};
-  --neutral-light: ${state.colors.neutralLight};
+  --primary: ${s.colors.primary};
+  --secondary: ${s.colors.secondary};
+  --accent: ${s.colors.accent};
+  --neutral-dark: ${s.colors.neutralDark};
+  --neutral-light: ${s.colors.neutralLight};
   --on-primary: ${onPrimary};
   --on-accent: ${onAccent};
-  --font-heading: ${state.headingFont.css};
-  --font-body: ${state.bodyFont.css};
-  --heading-size: ${state.typography.headingSize}px;
-  --body-size: ${state.typography.bodySize}px;
-  --heading-weight: ${state.typography.headingWeight};
-  --body-weight: ${state.typography.bodyWeight};
-  --heading-tracking: ${state.typography.headingTracking}px;
-  --body-tracking: ${state.typography.bodyTracking}px;
-  --heading-transform: ${state.typography.headingCase};
-  --body-transform: ${state.typography.bodyCase};
-  --radius: ${state.shapePreset.radius};
-  --radius-lg: ${state.shapePreset.radiusLg};
+  --font-heading: ${s.headingFont.css};
+  --font-body: ${s.bodyFont.css};
+  --heading-size: ${s.typography.headingSize}px;
+  --body-size: ${s.typography.bodySize}px;
+  --heading-weight: ${s.typography.headingWeight};
+  --body-weight: ${s.typography.bodyWeight};
+  --heading-tracking: ${s.typography.headingTracking}px;
+  --body-tracking: ${s.typography.bodyTracking}px;
+  --heading-transform: ${s.typography.headingCase};
+  --body-transform: ${s.typography.bodyCase};
+  --radius: ${s.shapePreset.radius};
+  --radius-lg: ${s.shapePreset.radiusLg};
 }`;
 }
 
@@ -565,6 +565,12 @@ function wireEvents() {
     copyText(text)
       .then(() => showToast('Copied brand CSS variables to clipboard'))
       .catch(() => showToast('Clipboard blocked — copy manually from devtools'));
+  });
+
+  document.getElementById('copyAiBrief').addEventListener('click', () => {
+    copyText(buildAiBrief(state))
+      .then(() => showToast('AI brief copied'))
+      .catch(() => showToast('Clipboard blocked — try again from the app window'));
   });
 
   document.getElementById('exportPalettePng').addEventListener('click', exportPalettePng);

@@ -268,6 +268,9 @@ function renderMainBoard() {
   host.innerHTML = boardHtml(state, aestheticByKey(state.aesthetic));
 }
 
+// Each tile previews its aesthetic in its own recommended mode (def.mode), the
+// mode selecting it would switch to, via a per-tile state clone; the global
+// state and the main board keep the brand's actual bgMode.
 function renderCompareGrid() {
   const grid = document.getElementById('compareGrid');
   if (!grid) return;
@@ -276,7 +279,7 @@ function renderCompareGrid() {
     <div class="cmp-tile${def.key === state.aesthetic ? ' is-current' : ''}" role="button" tabindex="0"
          data-key="${def.key}" aria-label="Use ${escapeHtml(def.name)}" aria-pressed="${def.key === state.aesthetic}">
       <div class="cmp-label"><span class="cmp-num">${String(def.order).padStart(2, '0')}</span><span class="cmp-name">${escapeHtml(def.name)}</span><span class="cmp-desc">${escapeHtml(def.descriptor)}</span></div>
-      <div class="cmp-frame"><div class="cmp-board" inert>${boardHtml(state, def)}</div></div>
+      <div class="cmp-frame"><div class="cmp-board" inert>${boardHtml(Object.assign({}, state, { bgMode: def.mode }), def)}</div></div>
     </div>`).join('');
   fitCompareGrid();
 }

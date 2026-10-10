@@ -79,11 +79,37 @@ It renders in the brand's own fonts, colors, name and logo. The sidebar's
 aesthetic); choosing one also takes its recommended Light/Dark mode and, unless
 Shape is locked, its slide shape. **Compare all** shows all ten boards at once
 in the current brand; click a tile to select it. The choice is saved with the
-brand and is one Undo step. Soft Form, Raw Brutalist and Liquid Glass are fully
-built; the other seven use the shared layout with a placeholder illustration
-until they are filled in. Files: `js/aesthetic-board.js`, `css/aesthetic-board.css`,
-`js/aesthetics/<key>.js` and `css/aesthetics/<key>.css` (see
-`docs/aesthetics-plan.md`).
+brand and is one Undo step. Compare tiles use each aesthetic's recommended
+mode (what selecting it gives you); the main board stays in the brand's current
+mode. Files: `js/aesthetic-board.js`,
+`css/aesthetic-board.css`, `js/aesthetics/<key>.js` and
+`css/aesthetics/<key>.css` (see `docs/aesthetics-plan.md`).
+
+## Color roles, picker and paste import
+
+Every color has one job, a "never" rule and a coverage target (canvas, ink,
+primary, secondary, accent; an aesthetic may tighten them). They show on the
+board's palette row and in the picker. The **Color palette** panel has an
+inline picker (no OS color panel): role chips, an always-visible hue/saturation
+wheel, a brightness slider and a hex field. **Paste brand colors** takes any
+text from a brand guide: hexes and rgb() values are found, labeled lines such
+as "Primary: #..." or "Background ..." are honored, the rest are auto-assigned,
+and you review and apply the result as one Undo step. Files:
+`js/color-roles.js`, `js/color-picker.js`, `js/color-import.js`,
+`css/color-picker.css`.
+
+## Copy AI brief
+
+**Copy AI brief** (sidebar, above "Copy brand as CSS") puts a Markdown brief on
+the clipboard to paste into an AI coding tool, so it stops using the secondary
+color "for whatever it wants". It lists every color token with its exact hex
+(including derived canvas, ink, muted, line, on-* and tints), each role's use /
+never / coverage, hard rules (one primary action per view, accent at 5% or
+less, text only in ink, muted or on-* tokens), a component-by-component color
+map, contrast ratios, fonts with a Google Fonts URL, the aesthetic's material
+recipes with real values, do / don't lists and a CSS variables block. It
+describes the current brand in its current mode and aesthetic. File:
+`js/ai-brief.js` (`buildAiBrief(state)`, no DOM access).
 
 ## Suggestions
 
@@ -133,14 +159,16 @@ x dismisses it for that brand. Locked sections get none.
   DOM/CSS elements (not canvas) so they always reflect your actual font
   choice; each has a "Download PNG" button, and **Download all** saves the
   set one file at a time (rasterized via html2canvas).
-- **Quick brand guide deck** — "Open brand guide" assembles a 5-page deck
-  (cover, color palette with hex + contrast notes, type specimen, logo &
-  style, voice/quote) from your current picks, viewable in a modal and
+- **Quick brand guide deck** — "Open brand guide" assembles a 6-page deck
+  (cover, color palette with hex + contrast notes, color roles with use /
+  never / coverage and key contrast pairs, type specimen, logo & style,
+  voice/quote) from your current picks, viewable in a modal and
   exportable as a standalone **HTML** file or straight to a downloaded
   **PDF** (via html2canvas + jsPDF — no browser print dialog involved).
 - **Export** — "Copy brand as CSS variables" puts a ready-to-paste
   `:root { --primary: ...; }` block (now including the typography
-  fine-tuning vars) on your clipboard.
+  fine-tuning vars) on your clipboard; "Copy AI brief" copies the full
+  Markdown brand brief described above.
 
 ## Project structure
 
@@ -164,6 +192,11 @@ js/brand-session.js      open brand, save/revert/draft, editor save state
 js/suggest.js            suggestion engine (pure functions)
 js/suggest-ui.js         inline suggestion lines
 js/font-picker.js        visual font picker (replaces the selects' look, keeps them as state)
+js/aesthetics/           registry + one file per aesthetic (styles in css/aesthetics/)
+js/aesthetic-board.js    design language board, Compare all, Aesthetic panel
+js/color-roles.js        the five color roles (use / never / coverage)
+js/color-picker.js       inline HSV picker; js/color-import.js parses pasted colors
+js/ai-brief.js           Markdown AI brief (buildAiBrief)
 js/brand-guide.js        brand guide deck content + styles
 js/export-html.js        standalone HTML export of the brand guide
 js/export-pdf.js         PDF export via html2canvas + jsPDF (real file, no print dialog)

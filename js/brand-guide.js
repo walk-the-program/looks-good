@@ -1,5 +1,5 @@
 /* ---------------------------------------------------------------------
-   brand-guide.js — the 5-page brand guide deck built from current state.
+   brand-guide.js — the 6-page brand guide deck built from current state.
 
    Same design language as the slide mockups (css/slides.css): flat
    surfaces, no gradients, generous whitespace, small uppercase tracked
@@ -221,6 +221,89 @@ const BRAND_GUIDE_CSS = `
   }
 
   .brand-guide-doc .bg-note-copy { font-size: 13px; line-height: 1.6; opacity: 0.8; margin: 0; }
+
+  /* ---------- color roles ---------- */
+
+  .brand-guide-doc .roles-sub {
+    font-size: 13px;
+    opacity: 0.6;
+    margin: -22px 0 26px 0;
+  }
+
+  .brand-guide-doc .role-list { display: flex; flex-direction: column; }
+
+  .brand-guide-doc .role-row {
+    display: grid;
+    grid-template-columns: 56px 168px 1fr 1fr;
+    gap: 22px;
+    align-items: start;
+    padding: 14px 0;
+    border-top: 1px solid var(--bg-hair, rgba(0, 0, 0, 0.14));
+  }
+
+  .brand-guide-doc .role-chip {
+    width: 56px;
+    height: 56px;
+    border-radius: 8px;
+    box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.10);
+  }
+
+  .brand-guide-doc .role-name { font-size: 15px; font-weight: 700; margin-bottom: 3px; }
+
+  .brand-guide-doc .role-meta {
+    font-size: 11px;
+    line-height: 1.55;
+    opacity: 0.65;
+  }
+
+  .brand-guide-doc .role-meta code {
+    font-family: 'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;
+    font-size: 11px;
+  }
+
+  .brand-guide-doc .role-copy { font-size: 12.5px; line-height: 1.55; margin: 0; }
+
+  .brand-guide-doc .role-copy b {
+    display: block;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    opacity: 0.5;
+    margin-bottom: 3px;
+  }
+
+  .brand-guide-doc .pair-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px 28px;
+    margin-top: 12px;
+    padding-top: 18px;
+    border-top: 1px solid var(--bg-hair, rgba(0, 0, 0, 0.14));
+  }
+
+  .brand-guide-doc .pair {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 12px;
+  }
+
+  .brand-guide-doc .pair-sample {
+    flex: none;
+    width: 34px;
+    height: 34px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 15px;
+    font-weight: 700;
+    box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.10);
+  }
+
+  .brand-guide-doc .pair-text { line-height: 1.4; }
+  .brand-guide-doc .pair-text span { display: block; opacity: 0.6; font-size: 11px; }
 
   /* ---------- typography ---------- */
 
@@ -444,7 +527,7 @@ function renderBrandGuideHTML(state) {
     return `
       <div class="bg-foot">
         ${brandmark}
-        <span class="bg-foot-index">${index}<i>/</i>05</span>
+        <span class="bg-foot-index">${index}<i>/</i>06</span>
       </div>
     `;
   }
@@ -531,7 +614,58 @@ function renderBrandGuideHTML(state) {
     </section>
   `;
 
-  /* ---------- 03 Typography ---------- */
+  /* ---------- 03 Color roles ---------- */
+
+  const aeDef = aestheticByKey(state.aesthetic);
+  const rt = boardTokens(state, aeDef);
+  const roleDefs = colorRolesFor(state);
+  const roleRows = ['canvas', 'ink', 'primary', 'secondary', 'accent'].map(k => {
+    const r = roleDefs[k];
+    return `
+        <div class="role-row">
+          <div class="role-chip" style="background-color: ${rt[k]};"></div>
+          <div>
+            <div class="role-name">${escapeHtml(r.label)}</div>
+            <div class="role-meta">${escapeHtml(r.job)}<br><code>${rt[k].toUpperCase()}</code> · ${escapeHtml(r.coverage)}</div>
+          </div>
+          <p class="role-copy"><b>Use for</b>${escapeHtml(r.use)}</p>
+          <p class="role-copy"><b>Never for</b>${escapeHtml(r.never)}</p>
+        </div>
+      `;
+  }).join('');
+
+  const rolePairs = [
+    ['Ink on canvas', rt.ink, rt.canvas],
+    ['Muted on canvas', rt.muted, rt.canvas],
+    ['On-primary on primary', rt.onPrimary, rt.primary],
+    ['On-secondary on secondary', rt.onSecondary, rt.secondary],
+    ['On-accent on accent', rt.onAccent, rt.accent],
+    ['Accent on canvas', rt.accent, rt.canvas],
+  ].map(([label, fg, bg]) => {
+    const ratio = contrastRatio(fg, bg);
+    const grade = ratio >= 7 ? 'AAA' : ratio >= 4.5 ? 'AA' : ratio >= 3 ? 'AA large text only' : 'Graphics only';
+    return `
+        <div class="pair">
+          <div class="pair-sample" style="background-color: ${bg}; color: ${fg};">Aa</div>
+          <div class="pair-text">${label}<span>${ratio.toFixed(2)}:1 · ${grade}</span></div>
+        </div>
+      `;
+  }).join('');
+
+  const rolesPage = `
+    <section class="bg-page" style="font-family: ${bodyFontCss}; --bg-hair: ${paperHair}; --bg-figure: ${paperFigure};">
+      <div class="bg-body">
+        <div class="bg-kicker">Roles</div>
+        <h2 style="font-family: ${headingFontCss};">Color roles</h2>
+        <p class="roles-sub">${escapeHtml(aeDef.name)} · ${rt.isDark ? 'dark' : 'light'} mode. Every color has one job; nothing else gets used.</p>
+        <div class="role-list">${roleRows}</div>
+        <div class="pair-grid">${rolePairs}</div>
+      </div>
+      ${foot('03')}
+    </section>
+  `;
+
+  /* ---------- 04 Typography ---------- */
 
   const SCALE = [
     { label: 'Display · 52 / 1.0', size: 52, font: headingFontCss, weight: 700, sample: brandName },
@@ -568,11 +702,11 @@ function renderBrandGuideHTML(state) {
           ${SCALE}
         </div>
       </div>
-      ${foot('03')}
+      ${foot('04')}
     </section>
   `;
 
-  /* ---------- 04 Logo & style ---------- */
+  /* ---------- 05 Logo & style ---------- */
 
   const logoContent = state.logoDataUrl
     ? `<img src="${state.logoDataUrl}" alt="Logo">`
@@ -601,11 +735,11 @@ function renderBrandGuideHTML(state) {
           </div>
         </div>
       </div>
-      ${foot('04')}
+      ${foot('05')}
     </section>
   `;
 
-  /* ---------- 05 Voice ---------- */
+  /* ---------- 06 Voice ---------- */
 
   const voiceBg = state.bgMode === 'dark' ? colors.neutralDark : colors.neutralLight;
   const voiceInk = pickReadableText(voiceBg);
@@ -638,9 +772,9 @@ function renderBrandGuideHTML(state) {
           </div>
         </div>
       </div>
-      ${foot('05')}
+      ${foot('06')}
     </section>
   `;
 
-  return coverPage + colorPage + typographyPage + logoPage + voicePage;
+  return coverPage + colorPage + rolesPage + typographyPage + logoPage + voicePage;
 }
