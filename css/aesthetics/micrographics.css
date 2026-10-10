@@ -101,10 +101,16 @@
 .ab[data-ae="micrographics"] .mga-sq { display: inline-block; width: 4px; height: 4px; margin-right: 0.7em; vertical-align: 0.1em; background: var(--ab-ink); }
 .ab[data-ae="micrographics"] .mga-sq-p { background: var(--ab-primary); }
 .ab[data-ae="micrographics"] .mga-sq-s { background: var(--ab-secondary); }
-.ab[data-ae="micrographics"] .mga-glyph { position: relative; min-width: 0; }
+.ab[data-ae="micrographics"] .mga-glyph { position: relative; min-width: 0; container-type: size; }
+/* the glyph is fitted to the drawn metric guides: its top is the cap line (34%), its trimmed bottom the baseline (78%); 44% of the box = cap height (0.72em assumed) */
+.ab[data-ae="micrographics"] .mga-gl {
+  position: absolute; left: 49%; top: 34%; transform: translateX(-50%); white-space: nowrap; color: var(--ab-ink);
+  font-family: var(--ab-font-h); font-weight: var(--ab-hw, 700); font-size: calc(44cqh / 0.72); line-height: 1; text-box: trim-both cap alphabetic; letter-spacing: 0; text-transform: none;
+}
+.ab[data-ae="micrographics"] .mga-gl.is-o { transform: translate(calc(-50% + 3.5px), 3px); color: transparent; -webkit-text-stroke: 1px var(--ab-hair); }
 .ab[data-ae="micrographics"] .mga-g, .ab[data-ae="micrographics"] .mga-lines { position: absolute; inset: 0; width: 100%; height: 100%; display: block; overflow: visible; }
-.ab[data-ae="micrographics"] .mga-call { position: absolute; line-height: 1.55; white-space: nowrap; }
-.ab[data-ae="micrographics"] .mga-call em { font-style: normal; color: var(--ab-muted); letter-spacing: 0.1em; }
+.ab[data-ae="micrographics"] .mga-call { position: absolute; line-height: 1.55; white-space: nowrap; font-size: var(--mg-call-fs, inherit); }
+.ab[data-ae="micrographics"] .mga-call em { display: var(--mg-em-display, inline); font-style: normal; color: var(--ab-muted); letter-spacing: 0.1em; }
 .ab[data-ae="micrographics"] .mga-call.mga-sr { transform: translateX(-100%); text-align: right; }
 .ab[data-ae="micrographics"] .mga-call.mga-sc { transform: translateX(-50%); text-align: center; }
 .ab[data-ae="micrographics"] .mga-mk { position: absolute; width: 9px; height: 9px; margin: -4.5px 0 0 -4.5px; }
@@ -227,8 +233,8 @@
   .ab[data-ae="micrographics"] .mga-glyph { grid-column: 1 / -1; grid-row: 1; }
   .ab[data-ae="micrographics"] .mga-l { grid-column: 1; grid-row: 2; font-size: 6px; }
   .ab[data-ae="micrographics"] .mga-r { grid-column: 2; grid-row: 2; font-size: 6px; }
-  .ab[data-ae="micrographics"] .mga-call { font-size: 5.8px; }
-  .ab[data-ae="micrographics"] .mga-call em { display: none; }
+  /* set on .mga: .mga-glyph is itself a size container now, so a query on .mga-call would measure the glyph box, not the plate */
+  .ab[data-ae="micrographics"] .mga { --mg-call-fs: 5.8px; --mg-em-display: none; }
   .ab[data-ae="micrographics"] .mga-row { grid-template-columns: 2ch 3.6ch minmax(0, 1fr); }
   .ab[data-ae="micrographics"] .mga-note { display: none; }
   .ab[data-ae="micrographics"] .mga-ruler { font-size: 0.8em; }

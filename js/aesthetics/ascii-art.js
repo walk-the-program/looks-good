@@ -38,7 +38,10 @@ const AA_FONT = {
 const AA_RING = '01110 10001 10001 10001 10001 10001 01110';
 
 // Faces whose character advance is 0.6em (the grid maths needs a known advance).
-const AA_MONO_ADV = { 'JetBrains Mono': 0.6, 'IBM Plex Mono': 0.6, 'Fira Code': 0.6, 'Geist Mono': 0.6, 'DM Mono': 0.6, 'Azeret Mono': 0.6, 'Space Mono': 0.612 };
+// Pixel faces count too when they are fixed-width and carry the box-drawing frame (measured: VT323, 0.4em).
+// Silkscreen and Pixelify Sans are proportional and Press Start 2P has no box-drawing glyphs, so those
+// cannot hold the character grid and fall through to the body mono or JetBrains Mono.
+const AA_MONO_ADV = { 'JetBrains Mono': 0.6, 'IBM Plex Mono': 0.6, 'Fira Code': 0.6, 'Geist Mono': 0.6, 'DM Mono': 0.6, 'Azeret Mono': 0.6, 'Space Mono': 0.612, 'VT323': 0.4 };
 const AA_LINE = 1.14;           // pre line-height in em
 const AA_CELL_A = AA_LINE / 0.6; // height of a cell in widths of a cell
 const aaCache = {};
@@ -49,11 +52,12 @@ function aaHash(i, j, s) {
   return ((h ^ (h >>> 16)) >>> 0) / 4294967295;
 }
 
-// The art face: the heading face when it is a mono we know, else the body face,
-// else JetBrains Mono. Returns { font, adv }.
+// The art face: the heading face when its class is mono or pixel (and it is fixed-width),
+// else the body face when its class is mono, else JetBrains Mono. Returns { font, adv }.
 function aaArtFace(st) {
-  const tries = [st.headingFont, st.bodyFont];
-  for (const f of tries) if (f && AA_MONO_ADV[f.name]) return { font: f, adv: AA_MONO_ADV[f.name] };
+  const h = st.headingFont, b = st.bodyFont;
+  if (h && (h.cls === 'mono' || h.cls === 'pixel') && AA_MONO_ADV[h.name]) return { font: h, adv: AA_MONO_ADV[h.name] };
+  if (b && b.cls === 'mono' && AA_MONO_ADV[b.name]) return { font: b, adv: AA_MONO_ADV[b.name] };
   const jb = (typeof FONTS !== 'undefined' && FONTS.find(f => f.name === 'JetBrains Mono')) || { name: 'JetBrains Mono', css: '"JetBrains Mono", monospace' };
   return { font: jb, adv: 0.6 };
 }
@@ -124,6 +128,7 @@ function aaPanel(ctx, cols, rows, o) {
   const field = aaField(ctx.initial, cols, rows);
   const grad = [t.primary, t.secondary, t.accent];
   const canvas = hexToRgb(t.canvas);
+  const inkRgb = hexToRgb(t.ink);
   // inverse "selection" cells: three cells inside the glyph body, picked deterministically
   const sel = new Set();
   for (let n = 0, tries = 0; n < 4 && tries < 400; tries++) {
@@ -157,7 +162,9 @@ function aaPanel(ctx, cols, rows, o) {
       const tg = Math.min(1, 0.52 * (i / cols) + 0.5 * (j / rows));
       const g = aaCol(tg, grad, aaHash(i, j, 21));
       const fade = 0.4 + 0.6 * Math.min(1, b * 1.3);
-      const rgb = { r: canvas.r + (g.r - canvas.r) * fade, g: canvas.g + (g.g - canvas.g) * fade, b: canvas.b + (g.b - canvas.b) * fade };
+      let rgb = { r: canvas.r + (g.r - canvas.r) * fade, g: canvas.g + (g.g - canvas.g) * fade, b: canvas.b + (g.b - canvas.b) * fade };
+      // light mode: pale orange and teal vanish on cream, so each cell moves 35% toward ink
+      if (!t.isDark) rgb = { r: rgb.r + (inkRgb.r - rgb.r) * 0.35, g: rgb.g + (inkRgb.g - rgb.g) * 0.35, b: rgb.b + (inkRgb.b - rgb.b) * 0.35 };
       const isSel = sel.has(j * cols + i);
       cells[i] = { ch: AA_RAMP[idx], style: aaRgb(rgb), cls: isSel ? 'sel' : '' };
     }
@@ -229,6 +236,7 @@ registerAesthetic({
       const f = aaArtFace(st);
       vars['--aa-font'] = f.font.css;
       vars['--aa-adv'] = f.adv;
+      vars['--aa-line'] = +(f.adv * AA_CELL_A).toFixed(3); // keeps the cell 1.9 : 1 for every face
       // interface text in the brand's own mono when it has one, else the art face
       const ui = st.bodyFont && st.bodyFont.category === 'mono' ? 'var(--ab-font-b)' : f.font.css;
       vars['--ab-font-ui'] = ui;

@@ -116,16 +116,18 @@ registerAesthetic({
     const hex = c => c.replace('#', '').toUpperCase();
     const vf = 'vector-effect="non-scaling-stroke"';
 
-    // callouts: label position (x,y %), the marker it points at (tx,ty %), side the label hangs to
+    // callouts: label position (x,y %), the marker it points at (tx,ty %), side the label hangs to.
+    // Every marker sits on a drawn metric guide (cap y34, baseline y78, left bearing x21, right bearing x77),
+    // the faint centre line (REG. MARK) or the guide box centre (49,56); the glyph is fitted to the same box in css.
     const calls = [
-      { i: 'A.01', k: 'OPT. CENTER', x: 2, y: 5, tx: 30, ty: 34, side: 'l' },
-      { i: 'A.02', k: 'BEARING', x: 2, y: 43, tx: 21, ty: 58, side: 'l' },
+      { i: 'A.01', k: 'CAP HEIGHT', x: 2, y: 5, tx: 30, ty: 34, side: 'l' },
+      { i: 'A.02', k: 'L. BEARING', x: 2, y: 43, tx: 21, ty: 58, side: 'l' },
       { i: 'A.03', k: 'GRID 10', x: 2, y: 86, tx: 25, ty: 78, side: 'l' },
-      { i: 'A.04', k: 'TERMINAL', x: 98, y: 5, tx: 73, ty: 28, side: 'r' },
-      { i: 'A.05', k: 'COUNTER', x: 98, y: 43, tx: 61, ty: 52, side: 'r', mark: true },
+      { i: 'A.04', k: 'ADVANCE', x: 98, y: 5, tx: 77, ty: 34, side: 'r' },
+      { i: 'A.05', k: 'OPT. CENTER', x: 98, y: 43, tx: 49, ty: 56, side: 'r', mark: true },
       { i: 'A.06', k: 'BASELINE', x: 98, y: 86, tx: 77, ty: 78, side: 'r' },
       { i: 'A.07', k: 'REG. MARK', x: 50, y: 0, tx: 50, ty: 16, side: 'c' },
-      { i: 'A.08', k: 'ORIGIN', x: 50, y: 88, tx: 50, ty: 84, side: 'c', mark: true },
+      { i: 'A.08', k: 'ORIGIN', x: 50, y: 88, tx: 21, ty: 78, side: 'c', mark: true },
     ];
     const leaders = calls.map(c => {
       // leader runs from the label edge to the marker, with one right-angle bend
@@ -161,11 +163,10 @@ registerAesthetic({
       <div class="mga-glyph">
         <svg class="mga-g" viewBox="0 0 130 100" focusable="false" preserveAspectRatio="xMidYMid meet">
           <path ${vf} d="${grid}" fill="none" stroke="${t.ink}" stroke-opacity=".28" stroke-width="1"/>
-          <text x="67.5" y="86" text-anchor="middle" font-size="84" fill="none" stroke="${t.ink}" stroke-opacity=".55" stroke-width="1" ${vf} style="font-family:var(--ab-font-h);font-weight:var(--ab-hw,700)">${esc(ctx.initial)}</text>
-          <text x="64" y="83" text-anchor="middle" font-size="84" fill="${t.ink}" style="font-family:var(--ab-font-h);font-weight:var(--ab-hw,700)">${esc(ctx.initial)}</text>
         </svg>
+        <span class="mga-gl is-o">${esc(ctx.initial)}</span><span class="mga-gl">${esc(ctx.initial)}</span>
         <svg class="mga-lines" viewBox="0 0 100 100" preserveAspectRatio="none" focusable="false" fill="none" stroke="${t.ink}" stroke-opacity=".6">
-          <path ${vf} d="M0 84H100" stroke-opacity=".45" stroke-width="1" stroke-dasharray="2 3"/>
+          <path ${vf} d="M0 34H100M0 78H100M21 0V100M77 0V100" stroke-opacity=".35" stroke-width="1" stroke-dasharray="3 3"/>
           <path ${vf} d="M50 0V100" stroke-opacity=".18" stroke-width="1"/>
           ${leaders}
         </svg>${markers}${labels}

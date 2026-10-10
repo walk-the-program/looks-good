@@ -287,7 +287,7 @@ const AESTHETIC_META = {
     fonts: {
       heading: { classes: ['mono', 'pixel'], picks: ['JetBrains Mono', 'IBM Plex Mono', 'VT323', 'Space Mono'] },
       body: { classes: ['mono'], picks: ['IBM Plex Mono', 'JetBrains Mono'] },
-      mono: { picks: ['VT323'] },
+      mono: { picks: ['VT323', 'Space Mono'], note: 'VT323 for readouts' },
       avoid: ['serif', 'rounded', 'groovy', 'deco'],
       why: 'Characters on a grid are the medium, so every face is fixed-width and the headline is a mono or a pixel font.',
       pairings: [['JetBrains Mono', 'IBM Plex Mono'], ['VT323', 'JetBrains Mono'], ['Space Mono', 'IBM Plex Mono']],

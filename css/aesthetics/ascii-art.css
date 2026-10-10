@@ -53,6 +53,8 @@
   content: ""; display: inline-block; width: 0.42em; height: 0.78em; margin-left: 0.16em; vertical-align: -0.04em; background: var(--ab-accent);
   animation: aa-blink 1.1s steps(1) infinite;
 }
+/* light mode: the pale accent block vanishes on cream, so the caret takes the text-safe accent */
+.ab[data-ae="ascii-art"][data-mode="light"] .ab-hl::after { background: var(--ab-accent-ink); }
 @keyframes aa-blink { 0%, 55% { opacity: 1; } 56%, 100% { opacity: 0; } }
 .ab[data-ae="ascii-art"] .ab-subcopy { margin: 14px 0 0 !important; max-width: 46em; font-family: var(--ab-font-ui); font-size: clamp(12.5px, 1.4cqw, 14px); }
 .ab[data-ae="ascii-art"] .ab-subcopy::before { content: "// "; color: var(--ab-frame); white-space: pre; }

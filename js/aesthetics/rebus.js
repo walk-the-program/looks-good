@@ -155,21 +155,23 @@ function rbEquation(ctx, plan) {
   const e = escapeHtml;
   const tile = (cls, inner) => `<span class="rb-eq-t ${cls}">${inner}</span>`;
   const nameTile = tile('rb-eq-name', `<b>${e(name)}</b>`);
-  let a, b, cap;
+  let a, b, capHtml;
   if (key) {
     const rest = words[0].slice(key.length);
     a = tile('rb-eq-sym', rbSvg(key, { a: t.onSecondary, b: t.secondary, k: t.onSecondary }, 'rb-eq-svg'));
     b = tile('rb-eq-txt', `<b>${e(rest.toLowerCase())}</b>`);
-    cap = `${key} + ${rest.toLowerCase()}`;
+    // a true phonetic rebus: the syllable key + the rest of the word really do say the name
+    capHtml = `read it aloud: ${e(key)} + ${e(rest.toLowerCase())} = ${e(name)}`;
   } else {
     // the idea of the tagline: its last word's symbol, else the first mapped word's, else a stable pick
     const hit = plan && ((plan.words[plan.last] && plan.words[plan.last].sym) ? plan.words[plan.last] : plan.words.find(w => w.sym));
     const sym = (hit && hit.sym) || ['star', 'sun', 'bolt', 'heart'][rbHash(name) % 4];
     a = tile('rb-eq-init', `<b>${e(ctx.initial)}</b>`);
     b = tile('rb-eq-sym', rbSvg(sym, { a: t.onSecondary, b: t.secondary, k: t.onSecondary }, 'rb-eq-svg'));
-    cap = `${ctx.initial} + ${sym}`;
+    // no syllable key: this is a mark (initial + symbol), not a phonetic reading, so the caption does not claim one
+    capHtml = `the mark: ${e(ctx.initial)} + ${e(sym)}`;
   }
-  return `<div class="rb-eq" role="presentation"><div class="rb-eq-row">${a}<i class="rb-op">+</i>${b}<i class="rb-op">=</i>${nameTile}</div><p class="rb-eq-cap">read it aloud: ${e(cap)} = ${e(name)}</p></div>`;
+  return `<div class="rb-eq" role="presentation"><div class="rb-eq-row">${a}<i class="rb-op">+</i>${b}<i class="rb-op">=</i>${nameTile}</div><p class="rb-eq-cap">${capHtml}</p></div>`;
 }
 
 function rbLegend(t) {

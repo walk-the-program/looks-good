@@ -221,7 +221,7 @@ registerAesthetic({
     do: [
       'Set the headline word by word in three or four faces (heading, serif italic, heavy grotesk, mono), sizing each so the capitals share one cap height rather than one font size.',
       'Keep the last word in the serif italic and the accent, ending in a small asterisk; it is the only coloured word in the line.',
-      'Keep every interface control in the one quiet body face; the mixing lives in headlines, card-title initials, palette labels and the specimen.',
+      'Keep every interface control in the one quiet body face; the mixing lives in headlines, palette labels and the specimen.',
       'Lay everything on a strict grid with hairline rules, mono captions and generous whitespace so four voices read as composed rather than chaotic.',
     ],
     dont: [

@@ -161,6 +161,7 @@ registerAesthetic({
       '--ab-box-soft': t.alpha(t.ink, 0.34),
       '--ab-box-hair': t.alpha(t.ink, 0.16),
       '--ab-box-fill': t.alpha(t.ink, d ? 0.045 : 0.035),
+      '--ab-flat': t.mix(t.canvas, t.ink, 0.96), // the canvas with a 4% ink lift (mix weights its first colour)
       '--ab-ticks': ticks(t.ink, 1.5, 7),
       '--ab-ticks-soft': ticks(t.alpha(t.ink, 0.55), 1, 5),
       '--ab-ticks-lock': ticks(t.primary, 2, 8),

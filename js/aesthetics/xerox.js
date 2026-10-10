@@ -62,6 +62,7 @@ function xrDefs() {
     </filter>
     ${gen('xrx-g2', 0.35, 2.4, 0.5)}
     ${gen('xrx-g5', 0.6, 9, 0.46)}
+    <clipPath id="xrx-torn" clipPathUnits="objectBoundingBox"><path d="M0 0H1V0.3L0.92 0.4L0.84 0.28L0.75 0.43L0.67 0.3L0.58 0.46L0.5 0.29L0.41 0.42L0.33 0.27L0.24 0.4L0.16 0.26L0.08 0.38L0 0.3Z"/></clipPath>
   </defs></svg>`;
 }
 
@@ -161,6 +162,12 @@ registerAesthetic({
       specks += `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${r.toFixed(2)}"/>`;
     }
     const font = 'font-family:var(--ab-font-label,var(--ab-font-b),monospace)';
+    // tear-off tab strip (fills the paper left of the art): a solid band, then 7 cut tabs
+    // carrying the brand name rotated -90deg; the third tab has been torn off (xrx-torn stub)
+    const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    const nm = esc(String(ctx.brandName || '').trim());
+    const tabs = [0, 1, 2, 3, 4, 5, 6].map(i => i === 2 ? '<span class="xrt-tab is-torn"></span>' : `<span class="xrt-tab"><span>${nm}</span></span>`).join('');
+    const strip = `<div class="xrt" aria-hidden="true"><div class="xrt-band"><b>TAKE ONE —</b><i>COPY 02 OF 50</i></div><div class="xrt-tabs">${tabs}</div></div>`;
     return `${xrDefs()}<div class="xra"><svg viewBox="0 0 ${W} ${H}" width="100%" height="100%" focusable="false" preserveAspectRatio="xMidYMid meet">
       <defs><mask id="${id}m" maskUnits="userSpaceOnUse" x="0" y="0" width="${W}" height="${H}"><text x="100" y="177" text-anchor="middle" font-size="184" fill="#fff" style="font-family:var(--ab-font-h);font-weight:var(--ab-hw,900)">${ctx.initial}</text></mask></defs>
       <g filter="url(#xrx-copy)">
@@ -184,7 +191,7 @@ registerAesthetic({
         <rect x="204" y="53" width="26" height="12" fill="${t.secondary}" opacity=".6" transform="rotate(-32 217 59)"/>
       </g>
       <path d="M70 0V200M170 0V200" stroke="${toner}" stroke-opacity=".09" stroke-width="1" fill="none"/>
-    </svg></div>`;
+    </svg></div>${strip}`;
   },
 
   materials: [

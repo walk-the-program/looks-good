@@ -13,7 +13,7 @@
 
 .ab[data-ae="xerox"] {
   border-radius: 0;
-  --ab-poster-art-w: 37cqw; --ab-art-ratio: 1.12 / 1;
+  --xr-aw: 37; --ab-poster-art-w: calc(var(--xr-aw) * 1cqw); --ab-art-ratio: 1.12 / 1;
   --xr-speck: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='360' height='360'><filter id='s' x='0' y='0' width='100%25' height='100%25'><feTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='2' seed='11' stitchTiles='stitch'/><feColorMatrix type='matrix' values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  28 0 0 0 -20.5'/></filter><rect width='100%25' height='100%25' filter='url(%23s)'/></svg>");
   --xr-blot: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='520' height='520'><filter id='s' x='0' y='0' width='100%25' height='100%25'><feTurbulence type='fractalNoise' baseFrequency='.07' numOctaves='3' seed='5' stitchTiles='stitch'/><feColorMatrix type='matrix' values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  24 0 0 0 -19.2'/></filter><rect width='100%25' height='100%25' filter='url(%23s)'/></svg>");
   --xr-burn: rgba(0, 0, 0, 0.3);
@@ -82,6 +82,29 @@
 .ab[data-ae="xerox"] .ab-art { overflow: visible; }
 .ab[data-ae="xerox"] .xra { position: absolute; inset: 0; transform: rotate(1.8deg); }
 .ab[data-ae="xerox"] .xra svg { display: block; overflow: visible; }
+
+/* tear-off tab strip: fills the paper left of the art, from the hero's left edge to 16px before the art.
+   Width/pad are written in the art's own cqw (art = --xr-aw % of the board): the board's pad is clamp(20px, 4.4B, 44px), B = art/--xr-aw. */
+.ab[data-ae="xerox"] .xrt {
+  position: absolute; right: calc(100% + 16px); bottom: calc(clamp(18px, 8.1cqw, 32px) + 10px); height: 38%; display: flex; flex-direction: column;
+  width: calc(100cqw * (100 - var(--xr-aw)) / var(--xr-aw) - clamp(20px, 11.89cqw, 44px) - 16px);
+  transform: rotate(-0.8deg); transform-origin: 100% 100%; filter: drop-shadow(1px 2px 0 var(--ab-ink));
+}
+.ab[data-ae="xerox"] .xrt-band {
+  position: relative; isolation: isolate; flex: none; display: flex; align-items: baseline; justify-content: space-between; gap: 10px; padding: 4px 12px 3px; color: var(--ab-canvas); white-space: nowrap; overflow: hidden;
+}
+.ab[data-ae="xerox"] .xrt-band::before { content: ""; position: absolute; inset: 0; z-index: -1; background: var(--ab-ink); filter: url(#xrx-toner); }
+.ab[data-ae="xerox"] .xrt-band b { font: var(--ab-hw, 900) 22px/1 var(--ab-font-h); text-transform: uppercase; letter-spacing: calc(0.03em * var(--ab-tr, 1)); }
+.ab[data-ae="xerox"] .xrt-band i { font: 400 10px/1 var(--ab-font-b); font-style: normal; text-transform: uppercase; letter-spacing: 0.08em; }
+.ab[data-ae="xerox"] .xrt-tabs { flex: 1; min-height: 0; display: flex; }
+.ab[data-ae="xerox"] .xrt-tab { flex: 1 1 0; min-width: 0; display: flex; align-items: center; justify-content: center; padding: 4px 0; background: var(--ab-scrap); border-left: 1px dashed var(--ab-ink); overflow: hidden; }
+.ab[data-ae="xerox"] .xrt-tab:first-child { border-left: 0; }
+.ab[data-ae="xerox"] .xrt-tab span {
+  display: block; max-height: 100%; writing-mode: vertical-rl; transform: rotate(180deg); overflow: hidden;
+  font: 400 10px/1.25 var(--ab-font-b); text-transform: uppercase; letter-spacing: 0.08em; color: var(--ab-ink); text-align: center;
+}
+/* the third tab is gone: only a stub with a torn zigzag edge is left under the band */
+.ab[data-ae="xerox"] .xrt-tab.is-torn { border-left: 0; background: var(--ab-scrap); clip-path: url(#xrx-torn); }
 
 /* palette: toner patches */
 .ab[data-ae="xerox"] .ab-chip { border-radius: 0; box-shadow: inset 0 0 0 2.5px var(--ab-ink); filter: url(#xrx-edge); margin-bottom: 14px; transform: rotate(-1deg); }
@@ -175,7 +198,6 @@
 .ab[data-ae="xerox"] .ab-row-n { font-size: 0; white-space: nowrap; }
 .ab[data-ae="xerox"] .ab-row-n::before { content: "No." counter(xrr, decimal-leading-zero); font-size: 11px; font-weight: 700; color: var(--ab-ink); }
 .ab[data-ae="xerox"] .ab-row-name { font-family: var(--ab-font-h); font-weight: var(--ab-hw, 900); font-size: 17px; letter-spacing: calc(0.03em * var(--ab-tr, 1)); text-transform: uppercase; }
-.ab[data-ae="xerox"] .ab-row:first-child .ab-row-name { background: linear-gradient(transparent 12%, var(--ab-hi) 12% 90%, transparent 90%); align-self: center; justify-self: start; padding: 0 5px; margin: 0 -5px; max-width: 100%; }
 .ab[data-ae="xerox"] .ab-row-status { padding: 2px 9px; border-radius: 0; background: var(--ab-ink); color: var(--ab-canvas); font-size: 10px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; transform: rotate(-1.5deg); }
 .ab[data-ae="xerox"] .ab-row:nth-child(2) .ab-row-status { transform: rotate(1.2deg); }
 .ab[data-ae="xerox"] .ab-row-bar { height: 12px; border: 2px solid var(--ab-ink); border-radius: 0; background: var(--ab-tape); }
@@ -194,6 +216,7 @@
   .ab[data-ae="xerox"][data-hero="poster"] .ab-hero { padding: 26px 0 26px; gap: 30px; }
   .ab[data-ae="xerox"][data-hero="poster"] .ab-art { position: relative; right: auto; bottom: auto; width: 100%; max-width: 330px; justify-self: center; margin-right: 0; }
   .ab[data-ae="xerox"] .ab-subcopy { max-width: none; }
+  .ab[data-ae="xerox"] .xrt { display: none; }
   .ab[data-ae="xerox"] .ab-tag { font-size: 9px; padding: 3px 7px; letter-spacing: 0.08em; }
   .ab[data-ae="xerox"] .ab-row { grid-template-columns: 6ch minmax(0, 1fr) 4.5ch; }
   .ab[data-ae="xerox"] .ab-row-n { grid-row: 1 / span 2; align-self: start; }

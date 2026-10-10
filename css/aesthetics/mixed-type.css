@@ -181,14 +181,12 @@
 .ab[data-ae="mixed-type"] .ab-seg-btn[aria-pressed="true"] { color: var(--ab-ink); font-weight: 600; }
 .ab[data-ae="mixed-type"] .ab-seg-btn[aria-pressed="true"]::after { content: ""; position: absolute; left: 0; right: 0; bottom: -1px; height: 3px; background: var(--ab-primary); }
 .ab[data-ae="mixed-type"] .ab-seg-btn:hover:not([aria-pressed="true"]) { color: var(--ab-ink); }
-/* the title: serif italic voice, its first capital in the heavy grotesk, sized to the same cap height */
+/* the title: one serif-italic voice. A two-voice split ("Your next" heavy, "good idea." serif) needs a span
+   in the shared card markup, which also rewrites the title through textContent on a stage change; so the whole
+   title stays in the serif italic (weight 400) and no lone bold capital is left. */
 .ab[data-ae="mixed-type"] .ab-card-title {
-  margin: 24px 0 8px !important; font-family: var(--mt-f-i); font-style: italic; font-weight: var(--mt-w-i, 400);
+  margin: 24px 0 8px !important; font-family: var(--mt-f-i); font-style: italic; font-weight: 400;
   font-size: calc(clamp(26px, 3.4cqw, 34px) * var(--mt-k-i, 1)); line-height: 1.08; letter-spacing: -0.01em;
-}
-.ab[data-ae="mixed-type"] .ab-card-title::first-letter {
-  font-family: var(--mt-f-h); font-style: normal; font-weight: var(--mt-w-h); text-transform: uppercase; letter-spacing: -0.02em;
-  font-size: calc(1em * var(--mt-k-h, 1) / var(--mt-k-i, 1));
 }
 .ab[data-ae="mixed-type"] .ab-card-body { color: var(--ab-muted); font-size: 13.5px; }
 .ab[data-ae="mixed-type"] .ab-cta {
