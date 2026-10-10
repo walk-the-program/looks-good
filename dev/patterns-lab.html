@@ -1,0 +1,329 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Patterns lab (dev)</title>
+<link rel="stylesheet" href="patterns-lab.css">
+</head>
+<body>
+<header>
+  <h1>Patterns lab</h1>
+  <label>Palette <select id="pal"></select></label>
+  <span id="swatches" style="display:inline-flex;gap:4px"></span>
+  <label><input type="checkbox" id="dark"> dark board</label>
+  <label>Colorway <select id="cw"></select></label>
+  <label>Seed <input type="text" id="seed" size="10"></label>
+  <button id="reseed" class="primary">New variation</button>
+  <label>Aesthetic <select id="aes"></select></label>
+</header>
+<main>
+  <div class="stage">
+    <div class="canvas-wrap">
+      <canvas id="big"></canvas>
+      <div class="meta">
+        <strong id="famname"></strong><span id="timing"></span>
+        <button id="png1">PNG 1x</button><button id="png2">PNG 2x</button><button id="png4k">PNG 4K</button>
+        <button id="svg">SVG</button><button id="tile">Copy CSS tile</button>
+      </div>
+    </div>
+    <div class="panel" id="suitepanel"><h2 style="margin:0 0 8px;font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:#6c675c">Brand suite for <span id="suitename">-</span></h2><div class="suite" id="suite"></div></div>
+    <div class="panel"><div class="picker" id="picker"></div></div>
+    <div class="panel" id="tilepanel" style="display:none"><div class="tile-demo" id="tiledemo"></div><pre class="css" id="tilecss"></pre></div>
+    <div class="panel">
+      <button id="timeall">Time all @1200x800</button> <button id="detall">Determinism check</button>
+      <table id="report" style="margin-top:8px"></table>
+    </div>
+  </div>
+  <aside>
+    <p class="blurb" id="blurb"></p>
+    <h2>Parameters</h2>
+    <div id="controls"></div>
+  </aside>
+</main>
+
+<!-- app files the lab reuses (kept independent of the deck refactor) -->
+<script src="../js/data.js"></script>
+<script src="../js/color.js"></script>
+<script>
+  // tiny stand-ins for the helpers that live in the deck module
+  function slMix(hex, base, amount) {
+    const a = hexToRgb(hex), b = hexToRgb(base);
+    const ch = (x, y) => Math.max(0, Math.min(255, Math.round(y + (x - y) * amount))).toString(16).padStart(2, '0');
+    return '#' + ch(a.r, b.r) + ch(a.g, b.g) + ch(a.b, b.b);
+  }
+  function slVisible(bg, cands, min, fb) { for (const c of cands) if (c && contrastRatio(c, bg) >= min) return c; return fb; }
+</script>
+<script src="../js/aesthetics/registry.js"></script>
+<script>
+  ['soft-form','raw-brutalist','neo-brutal-pop','retro-futurist','liquid-glass','holo-iridescent','aurora-noir','bauhaus-poster','clay','riso-print','editorial-serif','neo-deco','y2k-chrome','cyber-hud','bento-grid','mesh-gradient','industrial-device','pixel-arcade','groovy-70s','blueprint','blob-tracking','xerox','micrographics','mixed-type','ascii-art','rebus']
+    .forEach(k => document.write('<script src="../js/aesthetics/' + k + '.js"><\/script>'));
+</script>
+<script src="../js/aesthetic-meta.js"></script>
+<script src="../js/aesthetic-board.js"></script>
+
+<script src="../js/patterns/engine.js"></script>
+<script src="../js/patterns/families/field.js"></script>
+<script src="../js/patterns/families/stripe.js"></script>
+<script src="../js/patterns/families/grid.js"></script>
+<script src="../js/patterns/families/texture.js"></script>
+<script src="../js/patterns/fit.js"></script>
+
+<script>
+(function () {
+  const P = window.Patterns;
+  const $ = id => document.getElementById(id);
+  const PALETTES = {
+    warm:  { primary: '#E4572E', secondary: '#17BEBB', accent: '#FFC914', neutralDark: '#2E282A', neutralLight: '#F6F5F1' },
+    green: { primary: '#2F6B4F', secondary: '#5E9C7A', accent: '#A8D5BA', neutralDark: '#10211A', neutralLight: '#EEF4F0' },
+    bluepink: { primary: '#3F51D9', secondary: '#8FA8FF', accent: '#FF5C9E', neutralDark: '#14162B', neutralLight: '#F5F4FA' },
+  };
+  const q = new URLSearchParams(location.search);
+  const state = { colors: Object.assign({}, PALETTES[q.get('pal')] || PALETTES.warm), bgMode: 'light', aesthetic: '' };
+  let fam = q.get('fam') || 'halftone', params = {}, colorway = q.get('cw') || 'brand', seed = q.get('seed') || 'brand-1';
+  let lastCanvasInfo = null;
+
+  const inks = (cw, tints) => P.inksFor(state, cw || colorway, { tints });
+  const fmt = n => (Math.round(n * 10) / 10) + ' ms';
+
+  /* ------------- header ------------- */
+  const palSel = $('pal'); Object.keys(PALETTES).forEach(k => palSel.add(new Option(k, k)));
+  palSel.value = q.get('pal') || 'warm';
+  P.E.COLORWAYS.forEach(c => $('cw').add(new Option(c.label, c.value)));
+  $('cw').value = colorway;
+  $('seed').value = seed;
+  const aesSel = $('aes'); aesSel.add(new Option('(none: plain roles)', ''));
+  AESTHETICS.forEach(a => aesSel.add(new Option(a.name, a.key)));
+  const swEl = $('swatches');
+  ['primary', 'secondary', 'accent', 'neutralDark', 'neutralLight'].forEach(k => {
+    const i = document.createElement('input'); i.type = 'color'; i.title = k; i.dataset.k = k; i.value = state.colors[k];
+    i.addEventListener('input', () => { state.colors[k] = i.value; refreshAll(); });
+    swEl.appendChild(i);
+  });
+  function syncSwatches() { swEl.querySelectorAll('input').forEach(i => { i.value = state.colors[i.dataset.k]; }); }
+  palSel.addEventListener('change', () => { state.colors = Object.assign({}, PALETTES[palSel.value]); syncSwatches(); refreshAll(); });
+  $('dark').addEventListener('change', () => { state.bgMode = $('dark').checked ? 'dark' : 'light'; refreshAll(); });
+  $('cw').addEventListener('change', () => { colorway = $('cw').value; refreshAll(); });
+  $('seed').addEventListener('change', () => { seed = $('seed').value; renderMain(); });
+  $('reseed').addEventListener('click', () => { seed = 'v' + Math.random().toString(36).slice(2, 7); $('seed').value = seed; renderMain(); });
+  aesSel.addEventListener('change', () => {
+    state.aesthetic = aesSel.value;
+    if (state.aesthetic) { state.bgMode = aestheticByKey(state.aesthetic).mode || 'light'; $('dark').checked = state.bgMode === 'dark'; }
+    refreshAll();
+  });
+
+  /* ------------- controls ------------- */
+  function buildControls() {
+    const box = $('controls'); box.innerHTML = '';
+    P.schema(fam).forEach(s => {
+      const row = document.createElement('div');
+      const lab = document.createElement('label'); lab.textContent = s.label;
+      if (s.type === 'range') {
+        row.className = 'ctl';
+        const inp = document.createElement('input'); inp.type = 'range'; inp.min = s.min; inp.max = s.max; inp.step = s.step; inp.value = params[s.key];
+        const out = document.createElement('output'); out.textContent = params[s.key];
+        inp.addEventListener('input', () => { params[s.key] = Number(inp.value); out.textContent = inp.value; renderMain(); });
+        row.append(lab, inp, out);
+      } else if (s.type === 'select') {
+        row.className = 'ctl sel';
+        const sel = document.createElement('select');
+        s.options.forEach(o => sel.add(new Option(o.label || o.value, o.value)));
+        sel.value = params[s.key];
+        sel.addEventListener('change', () => { params[s.key] = sel.value; renderMain(); });
+        row.append(lab, sel);
+      } else {
+        row.className = 'ctl tog';
+        const c = document.createElement('input'); c.type = 'checkbox'; c.checked = !!params[s.key];
+        c.addEventListener('change', () => { params[s.key] = c.checked; renderMain(); });
+        row.append(lab, c);
+      }
+      box.appendChild(row);
+    });
+  }
+  function setFamily(key, preset) {
+    fam = key; params = Object.assign(P.defaults(key), preset || {});
+    const info = P.list().find(f => f.key === key);
+    $('blurb').textContent = info.blurb + '  [' + (info.vector ? 'vector' : 'raster') + (info.seamless ? ', seamless' : '') + ']';
+    $('famname').textContent = info.name;
+    document.querySelectorAll('#picker button').forEach(b => b.classList.toggle('on', b.dataset.k === key));
+    buildControls(); renderMain();
+  }
+
+  /* ------------- rendering ------------- */
+  function renderMain() {
+    const c = $('big'); const w = c.parentElement.clientWidth - 20 || 900;
+    const r = P.render(c, fam, params, inks(colorway, params.tints), seed, { width: w, height: Math.round(w * 2 / 3) });
+    $('timing').textContent = fmt(r.ms) + ' @ ' + r.w + 'x' + r.h;
+    const info = P.list().find(f => f.key === fam);
+    $('svg').disabled = !info.vector; $('tile').disabled = !info.seamless;
+    $('tilepanel').style.display = 'none';
+  }
+  function thumb(canvas, key, prm, cw, sd, width) {
+    const st = Object.assign({}, state);
+    return P.render(canvas, key, prm, P.inksFor(st, cw, { tints: prm && prm.tints }), sd, { width: width || 240, height: Math.round((width || 240) * 2 / 3), dpr: 1, setStyle: false });
+  }
+  function buildPicker() {
+    const box = $('picker'); box.innerHTML = '';
+    P.list().forEach(f => {
+      const b = document.createElement('button'); b.dataset.k = f.key;
+      const cv = document.createElement('canvas'); const sp = document.createElement('span'); sp.textContent = f.name;
+      b.append(cv, sp); box.appendChild(b);
+      thumb(cv, f.key, f.defaults, colorway, seed, 224);
+      b.addEventListener('click', () => setFamily(f.key));
+    });
+    document.querySelectorAll('#picker button').forEach(b => b.classList.toggle('on', b.dataset.k === fam));
+  }
+  function buildSuite() {
+    const box = $('suite'); box.innerHTML = '';
+    const key = state.aesthetic;
+    $('suitename').textContent = key ? aestheticByKey(key).name : '(pick an aesthetic)';
+    if (!key) return;
+    P.suiteFor(key).forEach(s => {
+      const b = document.createElement('button');
+      const cv = document.createElement('canvas'); const sp = document.createElement('span'); sp.textContent = s.name + ' · ' + s.colorway;
+      b.append(cv, sp); box.appendChild(b);
+      thumb(cv, s.key, s.params, s.colorway, seed, 300);
+      b.addEventListener('click', () => { colorway = s.colorway; $('cw').value = colorway; setFamily(s.key, s.params); document.querySelectorAll('#picker button').forEach(x => x.classList.toggle('on', x.dataset.k === s.key)); });
+    });
+  }
+  function refreshAll() { buildPicker(); buildSuite(); renderMain(); }
+
+  /* ------------- exports ------------- */
+  function download(name, href) { const a = document.createElement('a'); a.href = href; a.download = name; document.body.appendChild(a); a.click(); a.remove(); }
+  function png(w, h, label) {
+    const c = document.createElement('canvas');
+    P.render(c, fam, params, inks(colorway, params.tints), seed, { width: w, height: h, dpr: 1, setStyle: false });
+    c.toBlob(b => download(fam + '-' + label + '.png', URL.createObjectURL(b)));
+  }
+  $('png1').onclick = () => png(1200, 800, '1x');
+  $('png2').onclick = () => png(2400, 1600, '2x');
+  $('png4k').onclick = () => png(3840, 2160, '4k');
+  $('svg').onclick = () => {
+    const s = P.renderSVG(fam, params, inks(colorway, params.tints), seed, { width: 1200, height: 800 });
+    if (s) download(fam + '.svg', URL.createObjectURL(new Blob([s], { type: 'image/svg+xml' })));
+  };
+  $('tile').onclick = () => {
+    const css = P.tileCSS(fam, params, inks(colorway, params.tints), seed, 128);
+    if (!css) return;
+    $('tilepanel').style.display = ''; $('tilecss').textContent = css; $('tiledemo').setAttribute('style', css);
+    if (navigator.clipboard) navigator.clipboard.writeText(css).catch(() => {});
+  };
+
+  /* ------------- timing / determinism ------------- */
+  function hashCanvas(c) {
+    const d = c.getContext('2d').getImageData(0, 0, c.width, c.height).data;
+    let h = 2166136261 >>> 0;
+    for (let i = 0; i < d.length; i += 4) { h ^= d[i]; h = Math.imul(h, 16777619); h ^= d[i + 1]; h = Math.imul(h, 16777619); h ^= d[i + 2]; h = Math.imul(h, 16777619); }
+    return (h >>> 0).toString(16);
+  }
+  function timeAll() {
+    const rows = [];
+    P.list().forEach(f => {
+      const c = document.createElement('canvas'); const ts = [];
+      P.render(c, f.key, f.defaults, inks('brand'), 'timing', { width: 1200, height: 800, dpr: 1, setStyle: false });
+      for (let i = 0; i < 5; i++) ts.push(P.render(c, f.key, f.defaults, inks('brand'), 'timing', { width: 1200, height: 800, dpr: 1, setStyle: false }).ms);
+      ts.sort((a, b) => a - b);
+      rows.push({ key: f.key, name: f.name, median: ts[2], min: ts[0], max: ts[4], vector: f.vector });
+    });
+    return rows;
+  }
+  function detAll() {
+    const rows = [];
+    P.list().forEach(f => {
+      const a = document.createElement('canvas'), b = document.createElement('canvas');
+      const p2 = Object.assign({}, f.defaults);
+      const o = { width: 600, height: 400, dpr: 1, setStyle: false };
+      P.render(a, f.key, p2, inks('brand'), 'det-1', o); P.render(b, f.key, p2, inks('brand'), 'det-1', o);
+      const c = document.createElement('canvas'); P.render(c, f.key, p2, inks('brand'), 'det-2', o);
+      let svgOk = null;
+      if (f.vector) svgOk = P.renderSVG(f.key, p2, inks('brand'), 'det-1', o) === P.renderSVG(f.key, p2, inks('brand'), 'det-1', o);
+      rows.push({ key: f.key, same: hashCanvas(a) === hashCanvas(b), diffSeed: hashCanvas(a) !== hashCanvas(c), hash: hashCanvas(a), svgOk });
+    });
+    return rows;
+  }
+  function showReport(rows, kind) {
+    const t = $('report');
+    if (kind === 'time') t.innerHTML = '<tr><th>family</th><th>median ms</th><th>min</th><th>max</th><th>budget</th></tr>' + rows.map(r => '<tr><td>' + r.name + '</td><td>' + r.median.toFixed(1) + '</td><td>' + r.min.toFixed(1) + '</td><td>' + r.max.toFixed(1) + '</td><td class="' + (r.median <= 120 ? 'ok' : 'bad') + '">' + (r.median <= 120 ? 'ok' : 'over') + '</td></tr>').join('');
+    else t.innerHTML = '<tr><th>family</th><th>same seed identical</th><th>new seed differs</th><th>svg stable</th><th>hash</th></tr>' + rows.map(r => '<tr><td>' + r.key + '</td><td class="' + (r.same ? 'ok' : 'bad') + '">' + r.same + '</td><td class="' + (r.diffSeed ? 'ok' : 'bad') + '">' + r.diffSeed + '</td><td>' + r.svgOk + '</td><td>' + r.hash + '</td></tr>').join('');
+  }
+  $('timeall').onclick = () => showReport(timeAll(), 'time');
+  $('detall').onclick = () => showReport(detAll(), 'det');
+
+  /* ------------- contact sheets (?sheet=families | suites) ------------- */
+  function sheetFamilies() {
+    document.body.classList.add('sheet');
+    const g = document.createElement('div'); g.className = 'sheetgrid';
+    g.style.gridTemplateColumns = 'repeat(' + (Number(q.get('cols')) || 6) + ', 1fr)';
+    document.querySelector('main').appendChild(g);
+    const w = Number(q.get('w')) || 300;
+    const only = q.get('only') ? q.get('only').split(',') : null;
+    P.list().filter(f => !only || only.includes(f.key)).forEach(f => {
+      const fg = document.createElement('figure'); const cv = document.createElement('canvas'); const cap = document.createElement('figcaption');
+      fg.append(cv, cap); g.appendChild(fg);
+      const r = thumb(cv, f.key, f.defaults, colorway, seed, w);
+      cap.textContent = f.name + ' · ' + r.ms.toFixed(0) + ' ms';
+    });
+  }
+  function sheetSuites() {
+    document.body.classList.add('sheet');
+    const keys = (q.get('aes') || AESTHETICS.map(a => a.key).join(',')).split(',');
+    const main = document.querySelector('main');
+    const w = Number(q.get('w')) || 230;
+    keys.forEach(k => {
+      state.aesthetic = k; state.bgMode = aestheticByKey(k).mode || 'light';
+      const row = document.createElement('div'); row.className = 'sheetrow';
+      row.innerHTML = '<h3>' + aestheticByKey(k).name + ' <small style="color:#6c675c;font-weight:400">(' + state.bgMode + ')</small></h3>';
+      const r6 = document.createElement('div'); r6.className = 'row6'; row.appendChild(r6);
+      P.suiteFor(k).forEach(s => {
+        const fg = document.createElement('figure'); fg.style.margin = 0;
+        const cv = document.createElement('canvas'); cv.style.cssText = 'display:block;width:100%;height:auto;aspect-ratio:3/2';
+        const cap = document.createElement('div'); cap.style.cssText = 'font-size:11px;color:#6c675c;padding-top:2px';
+        cap.textContent = s.name + ' · ' + s.colorway;
+        fg.append(cv, cap); r6.appendChild(fg);
+        thumb(cv, s.key, s.params, s.colorway, seed, w);
+      });
+      main.appendChild(row);
+    });
+  }
+
+  function sheetTiles() {
+    document.body.classList.add('sheet');
+    const g = document.createElement('div'); g.className = 'sheetgrid'; g.style.gridTemplateColumns = 'repeat(4, 1fr)';
+    document.querySelector('main').appendChild(g);
+    P.list().filter(f => f.seamless).forEach(f => {
+      const fg = document.createElement('figure'); const d = document.createElement('div'); const cap = document.createElement('figcaption');
+      const css = P.tileCSS(f.key, f.defaults, inks(colorway), seed, Number(q.get('size')) || 128);
+      d.style.cssText = css + 'height:220px;border-radius:3px'; cap.textContent = f.name + ' · css ' + Math.round(css.length / 1024) + ' kB';
+      fg.append(d, cap); g.appendChild(fg);
+    });
+  }
+  function sheetSVG() {
+    document.body.classList.add('sheet');
+    const g = document.createElement('div'); g.className = 'sheetgrid'; g.style.gridTemplateColumns = 'repeat(4, 1fr)';
+    document.querySelector('main').appendChild(g);
+    P.list().filter(f => f.vector).forEach(f => {
+      const fg = document.createElement('figure'); const im = document.createElement('img'); const cap = document.createElement('figcaption');
+      const svg = P.renderSVG(f.key, f.defaults, inks(colorway), seed, { width: 600, height: 400 });
+      im.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg); im.style.cssText = 'display:block;width:100%;height:auto';
+      cap.textContent = f.name + ' · svg ' + Math.round(svg.length / 1024) + ' kB';
+      fg.append(im, cap); g.appendChild(fg);
+    });
+  }
+
+  /* ------------- boot ------------- */
+  buildPicker();
+  if (q.get('sheet') === 'families') { sheetFamilies(); }
+  else if (q.get('sheet') === 'suites') { sheetSuites(); }
+  else if (q.get('sheet') === 'tiles') { sheetTiles(); }
+  else if (q.get('sheet') === 'svg') { sheetSVG(); }
+  else {
+    if (q.get('aes')) { aesSel.value = q.get('aes'); state.aesthetic = aesSel.value; state.bgMode = aestheticByKey(state.aesthetic).mode || 'light'; $('dark').checked = state.bgMode === 'dark'; }
+    setFamily(fam);
+    buildSuite();
+  }
+  document.body.dataset.ready = '1';
+  window.__lab = { P, state, timeAll, detAll, hashCanvas, inks, setFamily, setColorway: v => { colorway = v; $('cw').value = v; refreshAll(); } };
+})();
+</script>
+</body>
+</html>
