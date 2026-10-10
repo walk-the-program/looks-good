@@ -9,7 +9,9 @@
 
    - PatternPins: pin storage rules. state.patterns is a list of immutable
      { key, params, colorway, seed } entries (max PIN_MAX). Always replace the
-     array, never mutate it, so undo snapshots stay valid.
+     array, never mutate it, so undo snapshots stay valid. params.tone (0..1,
+     1 = full strength, the "Strength" slider) is part of params, so a pin
+     remembers how quiet it is.
    - PatternsUI: the view. UI-only working pattern (not saved); pins are what
      persist. Nothing renders while the view is hidden.
 ------------------------------------------------------------------------ */
@@ -81,6 +83,7 @@ const PatternsUI = (function () {
   const entryOf = (key, params, colorway, seed) => PatternPins.normalize({ key, params, colorway, seed });
   const randomSeed = () => 'v' + Math.random().toString(36).slice(2, 7);
   const pins = () => (Array.isArray(state.patterns) ? state.patterns : []);
+  const curTone = () => (cur && cur.params && cur.params.tone != null ? cur.params.tone : 1);
 
   function brandSig() {
     const k = P().inksFor(state, 'brand');
@@ -130,10 +133,11 @@ const PatternsUI = (function () {
 
   /* ---------------- markup ---------------- */
 
-  function tileHtml(kind, i, caption, sub) {
+  // chip: small colorway pill in the thumbnail's bottom-left corner
+  function tileHtml(kind, i, caption, sub, chip) {
     return `<div class="pt-tile" data-kind="${kind}" data-i="${i}">
-      <button type="button" class="pt-tile-main" aria-label="${escapeHtml(caption + (sub ? ', ' + sub : ''))}">
-        <canvas width="${THUMB_W}" height="${THUMB_H}" aria-hidden="true"></canvas>
+      <button type="button" class="pt-tile-main" aria-label="${escapeHtml(caption + (sub ? ', ' + sub : '') + (chip ? ', ' + chip : ''))}">
+        <span class="pt-thumb"><canvas width="${THUMB_W}" height="${THUMB_H}" aria-hidden="true"></canvas>${chip ? `<span class="pt-chip" aria-hidden="true">${escapeHtml(chip)}</span>` : ''}</span>
         <span class="pt-tile-cap"><b>${escapeHtml(caption)}</b>${sub ? `<i>${escapeHtml(sub)}</i>` : ''}</span>
       </button>
     </div>`;
@@ -158,27 +162,62 @@ const PatternsUI = (function () {
               <button type="button" class="btn btn-ghost btn-small" data-export="css">Copy CSS tile</button>
             </div>
           </div>
-          <section class="pt-block" aria-label="Brand suite">
+          <section class="pt-block pt-inuse" id="ptInuse" aria-label="In use">
+            <div class="pt-block-head"><h3>In use</h3><span>Updates with the canvas</span></div>
+            <div class="pt-iu-stage">
+              <figure class="pt-iu pt-iu-card">
+                <div class="pt-iu-face">
+                  <canvas data-iu="card" aria-hidden="true"></canvas>
+                  <div class="pt-iu-plate"><span class="pt-iu-mark" id="ptIuMark"></span><b id="ptIuName"></b></div>
+                </div>
+                <figcaption>Card</figcaption>
+              </figure>
+              <figure class="pt-iu pt-iu-phone">
+                <div class="pt-iu-face">
+                  <canvas data-iu="phone" aria-hidden="true"></canvas>
+                  <span class="pt-iu-notch"></span>
+                  <div class="pt-iu-lock"><b class="pt-iu-time">9:41</b><span class="pt-iu-date" id="ptIuDate"></span></div>
+                  <span class="pt-iu-home"></span>
+                </div>
+                <figcaption>Phone wallpaper</figcaption>
+              </figure>
+              <figure class="pt-iu pt-iu-poster">
+                <div class="pt-iu-face">
+                  <div class="pt-iu-art"><canvas data-iu="poster" aria-hidden="true"></canvas></div>
+                  <div class="pt-iu-copy"><small id="ptIuKick"></small><h4 id="ptIuTag"></h4><span class="pt-iu-rule"></span></div>
+                </div>
+                <figcaption>Poster</figcaption>
+              </figure>
+            </div>
+          </section>
+          <section class="pt-block pt-block-suite" aria-label="Brand suite">
             <div class="pt-block-head"><h3>Brand suite</h3><span id="ptSuiteFor"></span></div>
             <div class="pt-strip" id="ptSuite"></div>
           </section>
-          <section class="pt-block" aria-label="Pinned patterns">
+          <section class="pt-block pt-block-pins" aria-label="Pinned patterns">
             <div class="pt-block-head"><h3>Pinned</h3><span id="ptPinCount"></span></div>
             <div class="pt-strip pt-strip-pins" id="ptPins"></div>
             <p class="pt-empty" id="ptPinsEmpty">Star a pattern to keep it with this brand. Pinned patterns appear in the brand deck and the AI brief.</p>
           </section>
-          <section class="pt-block" aria-label="All families">
+          <section class="pt-block pt-block-fams" aria-label="All families">
             <div class="pt-block-head"><h3>All families</h3><span>${P().list().length} generators</span></div>
             <div class="pt-picker" id="ptPicker" role="group" aria-label="Pattern family"></div>
           </section>
         </div>
         <aside class="pt-side" aria-label="Pattern controls">
+          <details class="pt-adjust" id="ptAdjust" open>
+            <summary>Adjust pattern</summary>
+            <div class="pt-adjust-body">
           <p class="pt-blurb" id="ptBlurb"></p>
           <div class="pt-group">
             <span class="pt-label">Colorway</span>
             <div class="segmented pt-seg" role="radiogroup" aria-label="Colorway">
               ${cws.map(c => `<label><input type="radio" name="ptColorway" value="${c.value}" /> ${escapeHtml(c.label)}</label>`).join('')}
             </div>
+          </div>
+          <div class="pt-group">
+            <label class="pt-ctl" for="ptTone"><span class="pt-ctl-top"><span class="pt-label">Strength</span><output id="ptTone-o">100%</output></span>
+              <input type="range" id="ptTone" min="0" max="100" step="5" value="100" /></label>
           </div>
           <div class="pt-group">
             <label class="pt-label" for="ptSeed">Seed</label>
@@ -190,6 +229,8 @@ const PatternsUI = (function () {
           <div class="pt-group"><span class="pt-label">Parameters</span><div id="ptControls" class="pt-controls"></div></div>
           <div class="pt-group"><span class="pt-label">Finish</span><div id="ptCommon" class="pt-controls"></div></div>
           <button type="button" class="btn btn-ghost btn-small btn-block" id="ptReset">Reset to suite preset</button>
+            </div>
+          </details>
         </aside>
       </div>`;
     canvas = $('ptCanvas');
@@ -203,7 +244,7 @@ const PatternsUI = (function () {
         <canvas width="${THUMB_W}" height="${THUMB_H}" aria-hidden="true"></canvas><span>${escapeHtml(f.name)}</span></button>`).join('');
     $('ptPicker').querySelectorAll('.pt-fam').forEach(btn => {
       const f = famInfo(btn.dataset.key);
-      btn.querySelector('canvas')._mk = () => entryOf(f.key, f.defaults, cur ? cur.colorway : 'brand', SUITE_SEED);
+      btn.querySelector('canvas')._mk = () => entryOf(f.key, Object.assign({}, f.defaults, { tone: curTone() }), cur ? cur.colorway : 'brand', SUITE_SEED);
     });
   }
 
@@ -212,7 +253,7 @@ const PatternsUI = (function () {
     const def = aestheticByKey(state.aesthetic);
     $('ptSuiteFor').textContent = def.name;
     const host = $('ptSuite');
-    host.innerHTML = list.map((s, i) => tileHtml('suite', i, s.name, famInfo(s.key).name + ' · ' + colorwayLabel(s.colorway))).join('');
+    host.innerHTML = list.map((s, i) => tileHtml('suite', i, s.name, famInfo(s.key).name, colorwayLabel(s.colorway))).join('');
     host.querySelectorAll('.pt-tile').forEach((tile, i) => {
       const s = list[i];
       tile.querySelector('canvas')._mk = () => entryOf(s.key, Object.assign(P().defaults(s.key), s.params), s.colorway, SUITE_SEED);
@@ -228,7 +269,7 @@ const PatternsUI = (function () {
     const list = pins();
     lastPinSig = list.map(PatternPins.sig).join('\n');
     const host = $('ptPins');
-    host.innerHTML = list.map((p, i) => tileHtml('pin', i, famInfo(p.key).name, colorwayLabel(p.colorway) + ' · ' + p.seed)).join('');
+    host.innerHTML = list.map((p, i) => tileHtml('pin', i, famInfo(p.key).name, 'Seed ' + p.seed, colorwayLabel(p.colorway))).join('');
     host.querySelectorAll('.pt-tile').forEach((tile, i) => {
       const p = list[i];
       tile.querySelector('canvas')._mk = () => p;
@@ -259,7 +300,7 @@ const PatternsUI = (function () {
       return `<label class="lock pt-tog" for="${id}">${escapeHtml(s.label)}<input type="checkbox" id="${id}" data-k="${s.key}"${v ? ' checked' : ''} /></label>`;
     };
     $('ptControls').innerHTML = schema.filter(s => !s.common).map(ctl).join('') || '<p class="pt-empty">No family controls.</p>';
-    $('ptCommon').innerHTML = schema.filter(s => s.common).map(ctl).join('');
+    $('ptCommon').innerHTML = schema.filter(s => s.common && s.key !== 'tone').map(ctl).join('');
   }
 
   /* ---------------- state of the working pattern ---------------- */
@@ -278,10 +319,17 @@ const PatternsUI = (function () {
     $('ptBlurb').textContent = `${info.blurb} ${info.vector ? 'Vector' : 'Raster'}${info.seamless ? ', seamless' : ''}.`;
     $('ptSeed').value = cur.seed;
     root.querySelectorAll('input[name="ptColorway"]').forEach(r => { r.checked = r.value === cur.colorway; });
+    syncTone();
     buildControls();
     syncChrome();
     $('ptPicker').querySelectorAll('.pt-fam').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.key === cur.key)));
     queueThumbs(Array.from($('ptPicker').querySelectorAll('canvas')));   // picker follows the colorway
+  }
+
+  function syncTone() {
+    const pct = Math.round(curTone() * 100);
+    $('ptTone').value = pct;
+    $('ptTone-o').textContent = pct + '%';
   }
 
   // Everything that depends on "which pattern is this" but not on its pixels.
@@ -333,10 +381,50 @@ const PatternsUI = (function () {
     const dpr = fast ? 1 : Math.min(window.devicePixelRatio || 1, 2);
     const inks = inksFor(cur);
     const sig = [cur.key, JSON.stringify(cur.params), cur.colorway, cur.seed, inks.ground, inks.ink1, inks.ink2, inks.spark, inks.deep, inks.t1, inks.t2, w, dpr].join('|');
-    if (sig === lastRenderSig) return;
+    if (sig === lastRenderSig) { renderInUse(inks, dpr); return; }   // previews can resize on their own
     lastRenderSig = sig;
     const r = P().render(canvas, cur.key, cur.params, inks, cur.seed, { width: w, height: h, dpr, setStyle: false });
     $('ptTiming').textContent = `${Math.round(r.ms)} ms · ${r.w}×${r.h}`;
+    renderInUse(inks, dpr);
+  }
+
+  /* ---------------- "In use" previews: card, phone wallpaper, poster ---------------- */
+
+  // Brand tokens, fonts and copy for the previews and the colorway chips. Cheap DOM
+  // writes only, so it runs on every refresh.
+  function applyBrand() {
+    const def = aestheticByKey(state.aesthetic);
+    const t = boardTokens(state, def);
+    const copy = effectiveContent();
+    const set = (k, v) => root.style.setProperty(k, v);
+    set('--pt-canvas', t.canvas); set('--pt-ink', t.ink); set('--pt-muted', t.muted); set('--pt-line', t.line);
+    set('--pt-primary', t.primary); set('--pt-on-primary', t.onPrimary);
+    set('--pt-accent', t.accent); set('--pt-on-accent', t.onAccent);
+    set('--font-heading', state.headingFont.css); set('--font-body', state.bodyFont.css);
+    const name = copy.brandName || 'Brand';
+    const mark = $('ptIuMark');
+    if (state.logoDataUrl) mark.innerHTML = `<img src="${state.logoDataUrl}" alt="" />`;
+    else mark.textContent = typeof abInitial === 'function' ? abInitial(name) : name.charAt(0).toUpperCase();
+    mark.classList.toggle('is-logo', !!state.logoDataUrl);
+    $('ptIuName').textContent = name;
+    $('ptIuKick').textContent = name;
+    $('ptIuTag').textContent = copy.tagline || '';
+    $('ptIuDate').textContent = new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
+  }
+
+  // Each preview is the pattern rendered at its own aspect ratio (the engine composes to the
+  // box it is given), so scale and colorway decisions read as they would on the real asset.
+  let lastUseSig = '';
+  function renderInUse(inks, dpr) {
+    const cvs = Array.from(root.querySelectorAll('canvas[data-iu]'));
+    const dims = cvs.map(c => [c.clientWidth, c.clientHeight]);
+    if (dims.some(d => !d[0] || !d[1])) return;
+    const sig = [cur.key, JSON.stringify(cur.params), cur.colorway, cur.seed, inks.ground, inks.ink1, inks.ink2, inks.spark, inks.deep, inks.t1, inks.t2, dpr, dims.join(',')].join('|');
+    if (sig === lastUseSig) return;
+    lastUseSig = sig;
+    cvs.forEach((c, i) => {
+      P().render(c, cur.key, cur.params, inks, cur.seed, { width: dims[i][0], height: dims[i][1], dpr, setStyle: false });
+    });
   }
 
   // While a control is being dragged: a quick 1x pass, then a full-resolution one once it settles.
@@ -352,6 +440,22 @@ const PatternsUI = (function () {
     renderMain(false);
   }
 
+  /* ---------------- narrow layout (<= 760px) ----------------
+     Order: canvas, exports, "Adjust pattern" (a <details>, closed), In use, brand suite,
+     pinned, all families. The CSS does the ordering off .is-narrow; wide layouts keep the
+     sidebar, so the <details> is forced open and its summary is hidden there. */
+  const NARROW_MAX = 760;
+  let narrow = null;
+  function syncNarrow() {
+    const w = root.clientWidth;
+    if (!w) return;
+    const n = w <= NARROW_MAX;
+    if (n === narrow) return;
+    narrow = n;
+    root.classList.toggle('is-narrow', n);
+    $('ptAdjust').open = !n;
+  }
+
   /* ---------------- brand changes ---------------- */
 
   function refresh() {
@@ -365,6 +469,7 @@ const PatternsUI = (function () {
     if (!root) root = $('patternsView');
     if (!root) return;
     if (!built) build();
+    applyBrand();
     const aestheticChanged = lastAesthetic !== state.aesthetic;
     const sig = brandSig();
     const pinSig = pins().map(PatternPins.sig).join('\n');
@@ -380,6 +485,7 @@ const PatternsUI = (function () {
       lastBrandSig = sig;
       redrawThumbs();
     }
+    syncNarrow();
     renderMain(false);
   }
 
@@ -387,7 +493,7 @@ const PatternsUI = (function () {
     on = !!on;
     if (on === visible) { if (on) refresh(); return; }
     visible = on;
-    if (on) { lastBrandSig = ''; lastRenderSig = ''; refresh(); }
+    if (on) { lastBrandSig = ''; lastRenderSig = ''; lastUseSig = ''; refresh(); }
     else {
       clearTimeout(refreshTimer); clearTimeout(fastTimer); clearTimeout(settleTimer);
       queue = []; pumping = false;
@@ -488,7 +594,7 @@ const PatternsUI = (function () {
       const fam = e.target.closest('.pt-fam');
       if (fam) {
         const f = famInfo(fam.dataset.key);
-        return setCurrent(entryOf(f.key, f.defaults, cur.colorway, cur.seed), null);
+        return setCurrent(entryOf(f.key, Object.assign({}, f.defaults, { tone: curTone() }), cur.colorway, cur.seed), null);
       }
       const ex = e.target.closest('[data-export]');
       if (ex) return runExport(ex.dataset.export, ex);
@@ -502,12 +608,19 @@ const PatternsUI = (function () {
       if (e.target.closest('#ptReset')) {
         if (origin != null) return loadSuite(origin);
         const f = famInfo(cur.key);
-        return setCurrent(entryOf(f.key, f.defaults, cur.colorway, cur.seed), null);
+        return setCurrent(entryOf(f.key, Object.assign({}, f.defaults, { tone: curTone() }), cur.colorway, cur.seed), null);
       }
     });
 
     root.addEventListener('input', e => {
       const el = e.target;
+      if (el.id === 'ptTone') {
+        cur.params.tone = Number(el.value) / 100;
+        $('ptTone-o').textContent = el.value + '%';
+        edited();
+        scheduleRender();
+        return;
+      }
       if (el.type === 'range' && el.dataset.k) {
         cur.params[el.dataset.k] = Number(el.value);
         const out = $(el.id + '-o');
@@ -524,6 +637,12 @@ const PatternsUI = (function () {
         else if (el.type === 'checkbox') cur.params[el.dataset.k] = el.checked;
         else cur.params[el.dataset.k] = el.value;
         edited();
+        return renderNow();
+      }
+      if (el.id === 'ptTone') {
+        cur.params.tone = Number(el.value) / 100;
+        edited();
+        queueThumbs(Array.from($('ptPicker').querySelectorAll('canvas')));   // picker follows the strength
         return renderNow();
       }
       if (el.name === 'ptColorway' && el.checked) {
@@ -543,6 +662,7 @@ const PatternsUI = (function () {
 
     if (window.ResizeObserver) {
       new ResizeObserver(() => { if (visible) { clearTimeout(settleTimer); settleTimer = setTimeout(() => renderMain(false), 120); } }).observe(canvas.parentElement);
+      new ResizeObserver(() => { if (visible) syncNarrow(); }).observe(root);
     }
   }
 

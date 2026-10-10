@@ -429,6 +429,19 @@ switch toggles status text; the field is a real input. Compare tiles are `inert`
   Pin and unpin are one undo step and mark the brand unsaved like any other edit.
 - Pattern inks come from `Patterns.inksFor(state | P.t, colorway)`, which uses `boardTokens`, so patterns match the board exactly (ground = canvas, ink1 = primary, ink2 = secondary,
   spark = accent).
+- **Tone (quiet patterns), CAO-4 P1.** `tone` is a common numeric pattern param, 0..1, default 1 (js/patterns/engine.js header has the same text). It is in every family's schema
+  (`Patterns.defaults(key).tone === 1`, `Patterns.resolve` clamps it), so it travels in `params` and in pins (`state.patterns[i].params.tone`).
+  - `tone < 1` = quieter. Every non-ground ink (ink1, ink2, deep, t1, t2, mute) becomes `mix(ink, ground, tone)`; the spark ink keeps its colour, but the spark area budget (and the aura
+    spark radius) shrinks to `clamp(tone, 0.5, 1)` of normal, so any tone <= 0.5 halves the spark. Families see it as `env.tone` / `env.sparkK`.
+  - `Patterns.render`, `renderSVG` and `tileCSS` all honor `params.tone`. Pass `entry.params` as is, or `Object.assign({}, params, { tone })`. Same seed + params + tone = identical pixels.
+  - `Patterns.suiteFor(key)` returns `{ key, name, colorway, params, tone }`; `entry.tone` and `entry.params.tone` are the same number (default 1). Quiet suites in js/patterns/fit.js:
+    aurora-noir 0.35 (Halftone "Fine screen" 0.25), soft-form 0.45, liquid-glass 0.6 (Aura "Glass light" stays 1), blueprint 0.55 with every entry colorway `mono`.
+  - Patterns view: "Strength" slider (0-100%, under Colorway) writes `tone`; suite presets set its default; picking a family from "All families" keeps the current strength.
+  - Op-art rings: fit entries use `warp <= 0.18`, `freq >= 16`, `bands: 'two'`; only retro-futurist ("Scope rings", lens), bauhaus-poster ("Target") and groovy-70s ("Concentric") keep it.
+  - Aura spark: drawn with the same feathered falloff as the colour fields, radius capped at 6% of the short side. The aura family's own old "Strength" param is labelled "Intensity" (key still `strength`).
+- Patterns view layout (js/patterns-ui.js, css/patterns.css): suite captions are the family name only, with the colorway as a canvas-coloured chip over the thumbnail's bottom-left;
+  "In use" previews (card 85:55, phone wallpaper 9:19.5, poster 3:4) render the working pattern at each aspect from the board tokens (`--pt-*` vars set on `#patternsView`) and brand fonts;
+  at container width <= 760px `#patternsView.is-narrow` orders canvas, exports, "Adjust pattern" (`<details>`, closed), In use, suite, pinned, all families.
 - Deck (js/patterns-deck.js, loaded after brand-deck.js): `registerDeckSlide({ key: 'patterns' }, 'material')` adds slide 07 (pinned patterns, else the six-pattern suite, as `<img>` data URLs;
   classes `ab-deck-patterns / -ptgrid / -pt / -ptcw`); `deckPatternHook` returns `.pt-deck-strip` (a 288px full-height pattern strip, right edge on the cover, left edge on the closing slide).
   css/patterns.css pads `.ab-slide-in` away from the strip with `:has(> .ab-deck-pattern > .pt-deck-strip)`, so slide text never sits on a pattern. `bdFitDeck` is wrapped to shrink the

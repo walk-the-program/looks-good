@@ -11,6 +11,21 @@
      Patterns.tileCSS(key, params, inks, seed, size)          -> css|null
    Patterns.E holds shared helpers used by the family files.
 
+   Tone (quiet patterns). `tone` is a common numeric param, 0..1, default 1:
+     params.tone = 1     full strength (the brand inks as mapped by inksFor)
+     params.tone < 1     quieter. Every non-ground ink (ink1, ink2, deep, t1, t2, mute)
+                         becomes mix(ink, ground, tone), i.e. it moves toward the ground
+                         by (1 - tone). The spark ink keeps its full colour, but its area
+                         budget (and the aura spark radius) shrinks to clamp(tone, 0.5, 1)
+                         of normal, so any tone <= 0.5 halves the spark.
+   It lives in the family schema (Patterns.defaults(key).tone === 1, resolve() clamps it),
+   so a pin's params carry it and Patterns.render / renderSVG / tileCSS all honor it:
+     Patterns.render(cv, e.key, e.params, inks, seed, opts)   // e.params.tone is enough
+     Patterns.render(cv, e.key, Object.assign({}, e.params, { tone: e.tone }), ...)   // also fine
+   Patterns.suiteFor(key) entries (js/patterns/fit.js) carry both `entry.tone` and
+   `entry.params.tone` (same number). Same seed + params + tone => identical pixels.
+   env.tone and env.sparkK (= clamp(tone, 0.5, 1)) are available to family renders.
+
    Family render signature (one surface API for canvas and SVG):
      render(g, w, h, p, inks, rng, noise, env)
    g is a Surface (rect/circle/ring/poly/line/polyline/path/clipRect/grad);
@@ -516,6 +531,7 @@
     { key: 'scale', label: 'Scale', type: 'range', min: 0.5, max: 2.5, step: 0.05, default: 1, common: true },
     { key: 'grain', label: 'Grain', type: 'range', min: 0, max: 1, step: 0.05, default: 0.15, common: true },
     { key: 'tints', label: '+ tints', type: 'toggle', default: false, common: true },
+    { key: 'tone', label: 'Strength', type: 'range', min: 0, max: 1, step: 0.05, default: 1, common: true },
   ];
 
   Patterns.register = function (def) {
@@ -570,13 +586,14 @@
     return { W, H, cw, ch, dpr };
   }
 
-  function makeEnv(W, H, seed, key, opts) {
+  function makeEnv(W, H, seed, key, opts, tone) {
     const tile = !!opts.tile;
+    const sparkK = clamp(tone, 0.5, 1);
     return {
-      W, H, tile, seed,
+      W, H, tile, seed, tone, sparkK,
       u: Math.sqrt(W * H) / 100 * (tile ? 3 : 1),
       dpr: opts.dpr || 1,
-      spark: E.budget(W * H * 0.045),
+      spark: E.budget(W * H * 0.045 * sparkK),
     };
   }
 
@@ -591,7 +608,18 @@
       const ramp = []; cand.forEach(c => { if (ramp.indexOf(c) < 0) ramp.push(c); });
       ramp.sort((a, b) => lum(b) - lum(a)); ink.ramp = ramp;
     }
-    const env = makeEnv(W, H, seed, fam.key, opts);
+    const tone = clamp(Number(p.tone), 0, 1);
+    if (tone < 1) {
+      // quiet: every non-ground ink moves toward the ground; spark keeps its colour
+      const q = c => mix(c, ink.ground, tone);
+      ink.ink1 = q(ink.ink1); ink.ink2 = q(ink.ink2); ink.deep = q(ink.deep);
+      ink.t1 = q(ink.t1); ink.t2 = q(ink.t2); ink.mute = q(ink.mute);
+      ink.pool = p.tints ? [ink.ink1, ink.ink2, ink.t1, ink.t2] : [ink.ink1, ink.ink2];
+      const cand = [ink.ground, ink.ink2, ink.ink1, ink.deep].concat(p.tints ? [ink.t1, ink.t2] : []);
+      const ramp = []; cand.forEach(c => { if (ramp.indexOf(c) < 0) ramp.push(c); });
+      ramp.sort((a, b) => lum(b) - lum(a)); ink.ramp = ramp;
+    }
+    const env = makeEnv(W, H, seed, fam.key, opts, tone);
     const rng = makeRng(seed, fam.key);
     const noise = makeNoise(hashSeed(seed) + ':' + fam.key);
     fam.render(surface, W, H, p, ink, rng, noise, env);

@@ -2,14 +2,20 @@
    patterns/fit.js — aesthetic fit: six tuned patterns for each of the 26
    aesthetics (keys match js/aesthetics/*.js).
 
-     Patterns.suiteFor(aestheticKey) -> [{ key, name, colorway, params }]
+     Patterns.suiteFor(aestheticKey) -> [{ key, name, colorway, params, tone }]
        key       pattern family key
        name      short display name for the suite wall
        colorway  'brand' | 'mono' | 'duotone' | 'night'
-       params    overrides on top of the family defaults (render() fills the rest)
+       params    overrides on top of the family defaults (render() fills the rest);
+                 includes params.tone, equal to entry.tone
+       tone      number 0..1, default 1. Lower = quieter: ink contrast/saturation moves
+                 toward the ground and the spark shrinks (see engine.js, "Tone"). Quiet
+                 suites: aurora-noir 0.35 (Fine screen 0.25), soft-form 0.45,
+                 liquid-glass 0.6 (Aura 1), blueprint 0.55 (all mono). Pass entry.params
+                 (or params + { tone }) to Patterns.render / renderSVG / tileCSS.
      Patterns.suiteKeys()            -> every aesthetic key that has a suite
 
-   Each entry is [family, name, colorway, params]. Nothing here invents a
+   Each entry is [family, name, colorway, params, tone?] (tone defaults to 1). Nothing here invents a
    colour: the colorway only chooses how the brand roles map to inks.
 ------------------------------------------------------------------------ */
 (function (global) {
@@ -18,12 +24,12 @@
 
   const FIT = {
     'soft-form': [
-      ['aura', 'Quiet glow', 'brand', { layout: 'horizon', blobs: 4, strength: 0.6, soft: 1, grain: 0.22 }],
-      ['gradpanes', 'Pressed panes', 'brand', { rows: 3, cols: 3, gap: 1.4, radius: 3.4, steps: 0, grain: 0.12 }],
-      ['halftone', 'Soft screen', 'duotone', { cell: 1.35, levels: 4, shape: 'round', field: 'clouds', duo: false }],
-      ['oprings', 'Ripple', 'duotone', { mode: 'rings', centres: 1, freq: 11, warp: 0.35, bands: 'two' }],
-      ['stipple', 'Fine stipple', 'duotone', { density: 1.1, dot: 0.9, duo: false, field: 'warp' }],
-      ['glyphgrid', 'Dot matrix', 'duotone', { glyphs: 'shapes', cell: 3.8, bands: 5, duo: false }],
+      ['aura', 'Quiet glow', 'brand', { layout: 'horizon', blobs: 4, strength: 0.6, soft: 1, grain: 0.22 }, 0.45],
+      ['gradpanes', 'Pressed panes', 'brand', { rows: 3, cols: 3, gap: 1.4, radius: 3.4, steps: 0, grain: 0.12 }, 0.45],
+      ['halftone', 'Soft screen', 'duotone', { cell: 1.35, levels: 4, shape: 'round', field: 'clouds', duo: false }, 0.45],
+      ['gradpanes', 'Long panes', 'brand', { rows: 2, cols: 4, gap: 1.4, radius: 3.4, steps: 0, grain: 0.12 }, 0.45],
+      ['stipple', 'Fine stipple', 'duotone', { density: 1.1, dot: 0.9, duo: false, field: 'warp' }, 0.45],
+      ['glyphgrid', 'Dot matrix', 'duotone', { glyphs: 'shapes', cell: 3.8, bands: 5, duo: false }, 0.45],
     ],
     'raw-brutalist': [
       ['modulargrid', 'Slab grid', 'mono', { cols: 7, merge: 0.8, gap: 0, empty: 0.12 }],
@@ -43,42 +49,42 @@
     ],
     'retro-futurist': [
       ['flow', 'Orbit lines', 'brand', { field: 'swirl', strands: 5, gap: 2.2, bend: 0.8 }],
-      ['oprings', 'Scope rings', 'brand', { mode: 'lens', centres: 2, freq: 14, warp: 0.05, bands: 'three' }],
+      ['oprings', 'Scope rings', 'brand', { mode: 'lens', centres: 2, freq: 16, warp: 0.05, bands: 'two' }],
       ['halftone', 'Ring screen', 'brand', { cell: 2, levels: 4, shape: 'ring', angle: 0, field: 'ridges', duo: false }],
       ['glyphgrid', 'Console marks', 'brand', { glyphs: 'crosses', cell: 3.6, bands: 5, duo: true }],
       ['signal', 'Telemetry', 'brand', { px: 0.55, bands: 24, noise: 0.5, blank: 0.14 }],
       ['typeterrain', 'Readout', 'brand', { charset: 'code', style: 'hills', size: 1.3 }],
     ],
     'liquid-glass': [
-      ['aura', 'Glass light', 'brand', { layout: 'scatter', blobs: 6, strength: 0.95, soft: 0.9, grain: 0.18 }],
-      ['oprings', 'Refraction', 'brand', { mode: 'rings', centres: 2, freq: 9, warp: 0.5, bands: 'three' }],
-      ['gradpanes', 'Glass panes', 'brand', { rows: 3, cols: 3, gap: 1.2, radius: 4, steps: 0, grain: 0.1 }],
-      ['flow', 'Currents', 'duotone', { field: 'waves', strands: 6, gap: 2.4, bend: 0.9, weight: 0.9 }],
-      ['halftone', 'Bubble screen', 'brand', { cell: 2.4, levels: 5, shape: 'ring', field: 'clouds', duo: true }],
-      ['stipple', 'Dew', 'duotone', { density: 0.9, dot: 1.1, field: 'warp', duo: false }],
+      ['aura', 'Glass light', 'brand', { layout: 'scatter', blobs: 6, strength: 0.95, soft: 0.9, grain: 0.18 }, 1],
+      ['flow', 'Refraction', 'duotone', { field: 'waves', strands: 3, gap: 3, bend: 1.3, weight: 0.8 }, 0.6],
+      ['gradpanes', 'Glass panes', 'brand', { rows: 3, cols: 3, gap: 1.2, radius: 4, steps: 0, grain: 0.1 }, 0.6],
+      ['flow', 'Currents', 'duotone', { field: 'waves', strands: 6, gap: 2.4, bend: 0.9, weight: 0.9 }, 0.6],
+      ['halftone', 'Bubble screen', 'brand', { cell: 2.4, levels: 5, shape: 'ring', field: 'clouds', duo: true }, 0.6],
+      ['stipple', 'Dew', 'duotone', { density: 0.9, dot: 1.1, field: 'warp', duo: false }, 0.6],
     ],
     'holo-iridescent': [
       ['aura', 'Spectral haze', 'brand', { layout: 'ribbon', blobs: 7, strength: 0.9, soft: 0.85, mode: 'glow' }],
       ['flow', 'Light threads', 'brand', { field: 'flow', strands: 7, gap: 1.6, bend: 1.1, weight: 0.8 }],
-      ['oprings', 'Bubble rims', 'brand', { mode: 'eyes', centres: 3, freq: 22, warp: 0.1, bands: 'four' }],
+      ['aura', 'Prism bands', 'brand', { layout: 'ribbon', blobs: 9, strength: 0.9, soft: 0.45, mode: 'paint' }],
       ['gradpanes', 'Foil strips', 'brand', { rows: 5, cols: 4, gap: 0.5, steps: 7, radius: 0 }],
       ['halftone', 'Ring screen', 'brand', { cell: 1.6, levels: 5, shape: 'ring', field: 'warp', duo: true }],
       ['stipple', 'Star dust', 'brand', { density: 1.2, dot: 0.8, field: 'clouds', duo: true }],
     ],
     'aurora-noir': [
-      ['flow', 'Filaments', 'brand', { field: 'flow', strands: 5, gap: 2.4, bend: 0.8, weight: 0.8 }],
-      ['aura', 'Faint aura', 'brand', { layout: 'ribbon', blobs: 4, strength: 0.55, soft: 1, mode: 'glow', grain: 0.3 }],
-      ['modulargrid', 'Hairline grid', 'brand', { cols: 9, style: 'line', merge: 0.5, gap: 0.8, empty: 0.3 }],
-      ['stipple', 'Night dust', 'brand', { density: 1, dot: 0.8, field: 'warp', duo: true }],
-      ['glyphgrid', 'Cross marks', 'brand', { glyphs: 'crosses', cell: 3.4, bands: 4, duo: false }],
-      ['halftone', 'Fine screen', 'brand', { cell: 1.2, levels: 4, shape: 'round', field: 'clouds', duo: false }],
+      ['flow', 'Filaments', 'brand', { field: 'flow', strands: 5, gap: 2.4, bend: 0.8, weight: 0.8 }, 0.35],
+      ['aura', 'Faint aura', 'brand', { layout: 'ribbon', blobs: 4, strength: 0.55, soft: 1, mode: 'glow', grain: 0.3 }, 0.35],
+      ['modulargrid', 'Hairline grid', 'brand', { cols: 9, style: 'line', merge: 0.5, gap: 0.8, empty: 0.3 }, 0.35],
+      ['stipple', 'Night dust', 'brand', { density: 1, dot: 0.8, field: 'warp', duo: true }, 0.35],
+      ['glyphgrid', 'Cross marks', 'brand', { glyphs: 'crosses', cell: 3.4, bands: 4, duo: false }, 0.35],
+      ['halftone', 'Fine screen', 'brand', { cell: 1.2, levels: 4, shape: 'round', field: 'clouds', duo: false }, 0.25],
     ],
     'bauhaus-poster': [
       ['counterchange', 'Counterchange', 'brand', { figure: 'circle', bar: 3.6, dir: 'v', size: 0.66, nest: 2, second: true }],
       ['arcrise', 'Arc rise', 'brand', { origin: 'bottom', bands: 6, bars: true, suns: 1, bar: 3.2 }],
       ['modulargrid', 'Modular grid', 'brand', { cols: 8, merge: 0.6, gap: 0, empty: 0.1 }],
       ['chevron', 'Chevron', 'brand', { bands: 7, slope: 45, mirror: 'quad', rhythm: 'even', colors: 'four' }],
-      ['oprings', 'Target', 'brand', { mode: 'rings', centres: 1, freq: 12, warp: 0, bands: 'three' }],
+      ['oprings', 'Target', 'brand', { mode: 'rings', centres: 1, freq: 16, warp: 0, bands: 'two' }],
       ['glyphgrid', 'Marks', 'brand', { glyphs: 'geometric', cell: 4, bands: 5, duo: true }],
     ],
     'clay': [
@@ -116,7 +122,7 @@
     'y2k-chrome': [
       ['gradpanes', 'Chrome strips', 'brand', { rows: 6, cols: 3, gap: 0.5, steps: 8, radius: 0 }],
       ['aura', 'Lens flare', 'brand', { layout: 'ribbon', blobs: 6, strength: 0.95, soft: 0.8, mode: 'glow' }],
-      ['oprings', 'Warp rings', 'brand', { mode: 'eyes', centres: 2, freq: 20, warp: 0.45, bands: 'four' }],
+      ['aura', 'Chrome haze', 'brand', { layout: 'ribbon', blobs: 10, strength: 0.8, soft: 0.35, mode: 'paint', grain: 0.2 }],
       ['flow', 'Swirl', 'brand', { field: 'swirl', strands: 6, gap: 2, bend: 0.9, weight: 0.9 }],
       ['halftone', 'Bubble screen', 'brand', { cell: 2.2, levels: 5, shape: 'ring', field: 'warp', duo: true }],
       ['glyphgrid', 'Sparkles', 'brand', { glyphs: 'shapes', cell: 3.8, bands: 5, duo: true }],
@@ -143,7 +149,7 @@
       ['halftone', 'Soft screen', 'brand', { cell: 2.4, levels: 5, shape: 'round', field: 'warp', duo: true }],
       ['stipple', 'Grain stipple', 'brand', { density: 1, dot: 1, field: 'warp', duo: true }],
       ['flow', 'Silk', 'brand', { field: 'waves', strands: 7, gap: 2, bend: 0.9, weight: 0.8 }],
-      ['oprings', 'Ripples', 'brand', { mode: 'rings', centres: 2, freq: 9, warp: 0.5, bands: 'three' }],
+      ['aura', 'Ribbon wash', 'brand', { layout: 'ribbon', blobs: 6, strength: 0.9, soft: 0.6, grain: 0.2 }],
     ],
     'industrial-device': [
       ['modulargrid', 'Panel grid', 'mono', { cols: 9, merge: 0.6, gap: 0.5, empty: 0.2 }],
@@ -164,18 +170,18 @@
     'groovy-70s': [
       ['arcrise', 'Rainbow rise', 'brand', { origin: 'bottom', bands: 9, bars: false, suns: 2 }],
       ['zigzag', 'Wavy stripes', 'brand', { style: 'rounded', colors: 'four', band: 7, amp: 5, period: 14, phase: 'parallel' }],
-      ['oprings', 'Concentric', 'brand', { mode: 'rings', centres: 1, freq: 14, warp: 0.25, bands: 'four' }],
+      ['oprings', 'Concentric', 'brand', { mode: 'rings', centres: 1, freq: 16, warp: 0.18, bands: 'two' }],
       ['flow', 'Smoke', 'brand', { field: 'waves', strands: 6, gap: 2.2, bend: 1, weight: 1.2 }],
       ['halftone', 'Big dots', 'brand', { cell: 3, levels: 4, shape: 'round', field: 'warp', duo: true, grain: 0.25 }],
       ['aura', 'Sunset', 'brand', { layout: 'horizon', blobs: 5, strength: 0.95, soft: 0.8, grain: 0.35 }],
     ],
     'blueprint': [
-      ['modulargrid', 'Drafting grid', 'brand', { cols: 10, style: 'line', merge: 0.5, gap: 0.6, empty: 0.3 }],
-      ['flow', 'Contour lines', 'brand', { field: 'flow', strands: 3, gap: 2.6, bend: 0.8, weight: 0.8 }],
-      ['glyphgrid', 'Survey marks', 'brand', { glyphs: 'crosses', cell: 3.6, bands: 4, duo: false }],
-      ['oprings', 'Elevation', 'brand', { mode: 'rings', centres: 2, freq: 12, warp: 0.4, bands: 'two' }],
-      ['stipple', 'Plot points', 'brand', { density: 0.9, dot: 1.2, layout: 'lattice', field: 'clouds', duo: false }],
-      ['halftone', 'Ring screen', 'brand', { cell: 1.9, levels: 4, shape: 'ring', field: 'ridges', duo: false }],
+      ['modulargrid', 'Drafting grid', 'mono', { cols: 10, style: 'line', merge: 0.5, gap: 0.6, empty: 0.3 }, 0.55],
+      ['flow', 'Contour lines', 'mono', { field: 'flow', strands: 3, gap: 2.6, bend: 0.8, weight: 0.8 }, 0.55],
+      ['glyphgrid', 'Survey marks', 'mono', { glyphs: 'crosses', cell: 3.6, bands: 4, duo: false }, 0.55],
+      ['flow', 'Elevation', 'mono', { field: 'swirl', strands: 1, gap: 2.2, bend: 0.6, weight: 0.8 }, 0.55],
+      ['stipple', 'Plot points', 'mono', { density: 0.9, dot: 1.2, layout: 'lattice', field: 'clouds', duo: false }, 0.55],
+      ['halftone', 'Ring screen', 'mono', { cell: 1.9, levels: 4, shape: 'ring', field: 'ridges', duo: false }, 0.55],
     ],
     'blob-tracking': [
       ['terrain', 'Dithered footage', 'mono', { levels: 5, pix: 0.6, dither: 1, style: 'hills' }],
@@ -231,6 +237,9 @@
   P.suiteKeys = () => Object.keys(FIT);
   P.suiteFor = function (aestheticKey) {
     const rows = FIT[aestheticKey] || FIT['bauhaus-poster'];
-    return rows.map(r => ({ key: r[0], name: r[1], colorway: r[2], params: Object.assign({}, r[3]) }));
+    return rows.map(r => {
+      const tone = r[4] == null ? 1 : r[4];
+      return { key: r[0], name: r[1], colorway: r[2], params: Object.assign({}, r[3], { tone }), tone };
+    });
   };
 })(window);

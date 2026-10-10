@@ -124,6 +124,106 @@
   .view-toggle { width: 258px; max-width: 100%; }
 }
 
+/* colorway chip: a small canvas-coloured pill in the thumbnail's bottom-left corner */
+.pt-thumb { position: relative; display: block; }
+.pt-thumb canvas { display: block; }
+.pt-chip {
+  position: absolute; left: 6px; bottom: 6px; max-width: calc(100% - 12px);
+  padding: 3px 7px; border-radius: 999px; font-size: 10px; font-weight: 500; line-height: 1; letter-spacing: 0.02em;
+  color: var(--pt-ink, #111); background: var(--pt-canvas, #fff);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--pt-ink, #111) 22%, transparent);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap; pointer-events: none;
+}
+
+/* "Adjust pattern": a plain sidebar when wide, a closed <details> when narrow */
+.pt-adjust > summary { display: none; list-style: none; }
+.pt-adjust > summary::-webkit-details-marker { display: none; }
+.pt-adjust-body { display: flex; flex-direction: column; gap: 18px; min-width: 0; }
+
+/* In use: the pattern on a card, a phone wallpaper and a poster, from the board tokens and brand fonts */
+.pt-iu-stage {
+  container-type: inline-size; container-name: iu;
+  display: flex; align-items: flex-end; justify-content: center; gap: 4cqw; box-sizing: border-box;
+  width: 100%; padding: clamp(18px, 4cqw, 34px) clamp(14px, 4cqw, 36px) clamp(12px, 2cqw, 18px);
+  border-radius: var(--r-card); border: 1px solid var(--line-strong);
+  background: linear-gradient(180deg, #f4f2ee 0%, #e9e6e0 100%);
+}
+.pt-iu { margin: 0; min-width: 0; display: flex; flex-direction: column; gap: 10px; align-items: stretch; }
+.pt-iu-card { flex: 0 1 36cqw; max-width: 330px; }
+.pt-iu-phone { flex: 0 1 17cqw; max-width: 150px; }
+.pt-iu-poster { flex: 0 1 29cqw; max-width: 262px; }
+.pt-iu figcaption { font-size: 11px; line-height: 1.25; color: var(--muted); text-align: center; }
+.pt-iu-face {
+  position: relative; overflow: hidden; width: 100%; background: var(--pt-canvas, #fff); color: var(--pt-ink, #111);
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1), 0 6px 14px -4px rgba(0, 0, 0, 0.22), 0 22px 36px -14px rgba(0, 0, 0, 0.3);
+}
+.pt-iu-face canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+
+/* card, 85 x 55 */
+.pt-iu-card .pt-iu-face { aspect-ratio: 85 / 55; border-radius: 2.2cqw; container-type: inline-size; }
+.pt-iu-plate {
+  position: absolute; left: 7%; bottom: 10%; max-width: 78%; display: flex; align-items: center; gap: 0.7em;
+  padding: 0.55em 0.9em 0.55em 0.55em; box-sizing: border-box; border-radius: 0.5em;
+  background: var(--pt-canvas, #fff); color: var(--pt-ink, #111); font-size: clamp(6px, 5.6cqw, 17px);
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.06), 0 4px 10px -3px rgba(0, 0, 0, 0.3);
+}
+.pt-iu-plate b { font-family: var(--font-heading, inherit); font-weight: 700; font-size: 1em; line-height: 1.1; letter-spacing: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+.pt-iu-mark {
+  flex: none; display: grid; place-items: center; width: 1.9em; height: 1.9em; border-radius: 0.34em; overflow: hidden;
+  background: var(--pt-primary, #111); color: var(--pt-on-primary, #fff); font-family: var(--font-heading, inherit); font-weight: 700; font-size: 0.95em; line-height: 1;
+}
+.pt-iu-mark img { width: 100%; height: 100%; object-fit: contain; display: block; }
+.pt-iu-mark.is-logo { background: transparent; }
+
+/* phone wallpaper, 9 : 19.5 */
+.pt-iu-phone .pt-iu-face { aspect-ratio: 9 / 19.5; border-radius: 15% / 7%; container-type: inline-size; box-shadow: 0 0 0 2.5px #1b1b1d, 0 0 0 3.5px #5a5a5e, 0 6px 14px -4px rgba(0, 0, 0, 0.3), 0 24px 36px -14px rgba(0, 0, 0, 0.4); }
+.pt-iu-notch { position: absolute; top: 2.2%; left: 50%; width: 30%; height: 2.4%; transform: translateX(-50%); border-radius: 99px; background: #0c0c0d; }
+.pt-iu-lock { position: absolute; top: 11%; left: 0; right: 0; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.pt-iu-time {
+  font-family: var(--font-heading, inherit); font-weight: 700; font-size: 38cqw; line-height: 1; letter-spacing: 0; color: var(--pt-ink, #111);
+  paint-order: stroke fill; -webkit-text-stroke: 0.1em var(--pt-canvas, #fff); font-variant-numeric: tabular-nums;
+}
+.pt-iu-date {
+  font-family: var(--font-body, inherit); font-weight: 600; font-size: 8.4cqw; line-height: 1.2; color: var(--pt-ink, #111);
+  padding: 0.25em 0.7em; border-radius: 99px; background: color-mix(in srgb, var(--pt-canvas, #fff) 88%, transparent); white-space: nowrap;
+}
+.pt-iu-home { position: absolute; bottom: 2.2%; left: 50%; width: 34%; height: 0.9%; min-height: 2px; transform: translateX(-50%); border-radius: 99px; background: var(--pt-canvas, #fff); box-shadow: 0 0 0 1px color-mix(in srgb, var(--pt-ink, #111) 35%, transparent); }
+
+/* poster, 3 : 4: pattern on the top 60%, tagline below */
+.pt-iu-poster .pt-iu-face { aspect-ratio: 3 / 4; border-radius: 1.2cqw; container-type: inline-size; }
+.pt-iu-art { position: absolute; left: 0; right: 0; top: 0; height: 60%; overflow: hidden; }
+.pt-iu-copy { position: absolute; left: 0; right: 0; top: 60%; bottom: 0; padding: 6.5cqw 7cqw 0; display: flex; flex-direction: column; gap: 3cqw; min-height: 0; overflow: hidden; }
+.pt-iu-copy small { font-family: var(--font-body, inherit); font-weight: 600; font-size: 5.2cqw; line-height: 1; letter-spacing: 0.12em; text-transform: uppercase; color: var(--pt-muted, #666); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pt-iu-copy h4 {
+  margin: 0; font-family: var(--font-heading, inherit); font-weight: 700; font-size: 10.5cqw; line-height: 1.08; letter-spacing: -0.005em; color: var(--pt-ink, #111);
+  display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
+}
+.pt-iu-rule { flex: none; width: 18%; height: 2.4cqw; border-radius: 99px; background: var(--pt-primary, #111); margin-top: auto; margin-bottom: 6cqw; }
+
+/* narrow (<= 760px, set by patterns-ui.js): canvas, exports, adjust, in use, suite, pinned, families */
+.pt-view.is-narrow .pt-grid { display: flex; flex-direction: column; align-items: stretch; gap: 14px; }
+.pt-view.is-narrow .pt-main, .pt-view.is-narrow .pt-stage { display: contents; }
+.pt-view.is-narrow .pt-canvas-wrap { order: 1; }
+.pt-view.is-narrow .pt-bar { order: 2; }
+.pt-view.is-narrow .pt-exports { order: 3; }
+.pt-view.is-narrow .pt-side { order: 4; position: static; padding: 0; gap: 0; }
+.pt-view.is-narrow .pt-inuse { order: 5; margin-top: 8px; }
+.pt-view.is-narrow .pt-block-suite { order: 6; margin-top: 8px; }
+.pt-view.is-narrow .pt-block-pins { order: 7; margin-top: 8px; }
+.pt-view.is-narrow .pt-block-fams { order: 8; margin-top: 8px; }
+.pt-view.is-narrow .pt-adjust > summary {
+  display: flex; align-items: center; justify-content: space-between; gap: 10px; min-height: 46px; padding: 0 16px; cursor: pointer;
+  font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.08em; color: var(--ink);
+}
+.pt-view.is-narrow .pt-adjust > summary::after {
+  content: ""; width: 8px; height: 8px; border-right: 1.5px solid var(--muted); border-bottom: 1.5px solid var(--muted);
+  transform: rotate(45deg) translate(-2px, -2px); transition: transform var(--dur) var(--ease);
+}
+.pt-view.is-narrow .pt-adjust[open] > summary::after { transform: rotate(-135deg) translate(-2px, -2px); }
+.pt-view.is-narrow .pt-adjust > summary:focus-visible { outline: 2px solid var(--ink); outline-offset: -2px; border-radius: var(--r-card); }
+.pt-view.is-narrow .pt-adjust[open] > summary { border-bottom: 1px solid var(--line-strong); }
+.pt-view.is-narrow .pt-adjust-body { padding: 16px; }
+
 /* ======================= Part 2: deck ======================= */
 
 /* Patterns slide */

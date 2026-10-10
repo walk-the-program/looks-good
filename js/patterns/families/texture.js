@@ -143,7 +143,7 @@
       { key: 'layout', label: 'Layout', type: 'select', options: SEL(['scatter', 'horizon', 'ribbon']), default: 'scatter' },
       { key: 'soft', label: 'Softness', type: 'range', min: 0.3, max: 1, step: 0.05, default: 0.75 },
       { key: 'mode', label: 'Light', type: 'select', options: SEL(['auto', 'paint', 'glow']), default: 'auto' },
-      { key: 'strength', label: 'Strength', type: 'range', min: 0.3, max: 1, step: 0.05, default: 0.95 },
+      { key: 'strength', label: 'Intensity', type: 'range', min: 0.3, max: 1, step: 0.05, default: 0.95 },
     ],
     render(g, W, H, p, inks, rng, noise, env) {
       const S = Math.sqrt(W * H);
@@ -183,13 +183,19 @@
         c.fillStyle = gr; c.fillRect(-b.r, -b.r, b.r * 2, b.r * 2);
         c.restore();
       });
-      // spark: one small glint
-      const sr = LS * 0.075;
+      // spark: one small, soft glint. Same feathered falloff as the colour fields (no hard
+      // disc, which reads as a sun), radius capped at 6% of the short side, shrunk by quiet tone.
+      const sr = Math.min(LS * 0.075, Math.min(lw, lh) * 0.06) * Math.sqrt(env.sparkK);
       if (env.spark.take(Math.PI * (sr * sc) * (sr * sc))) {
         const b = blobs[rng.int(0, blobs.length - 1)];
         const sx = Math.min(lw * 0.9, Math.max(lw * 0.1, b.x + rng.range(-0.1, 0.1) * lw)), sy = Math.min(lh * 0.9, Math.max(lh * 0.1, b.y + rng.range(-0.1, 0.1) * lh));
         const gr = c.createRadialGradient(sx, sy, 0, sx, sy, sr);
-        gr.addColorStop(0, E.rgba(inks.spark, glow ? 0.8 : 0.95)); gr.addColorStop(1, E.rgba(inks.spark, 0));
+        const a = glow ? 0.55 : 0.8;
+        gr.addColorStop(0, E.rgba(inks.spark, a));
+        gr.addColorStop(0.18, E.rgba(inks.spark, a * 0.7));
+        gr.addColorStop(0.5, E.rgba(inks.spark, a * 0.28));
+        gr.addColorStop(0.78, E.rgba(inks.spark, a * 0.07));
+        gr.addColorStop(1, E.rgba(inks.spark, 0));
         c.fillStyle = gr; c.fillRect(sx - sr, sy - sr, sr * 2, sr * 2);
       }
       const ctx = g.ctx;
