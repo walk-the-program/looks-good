@@ -19,6 +19,22 @@ function abAlpha(hex, a) {
   return `rgba(${r},${g},${b},${a})`;
 }
 
+// Accent as text: the accent itself when it reaches 3:1 on the canvas (large
+// text AA), otherwise the same hue and saturation shaded toward black on a
+// light canvas or tinted toward white on a dark one, one lightness step at a
+// time, until it does. Falls back to ink only if no step reaches 3:1.
+function abAccentInk(accent, canvas, ink) {
+  if (contrastRatio(accent, canvas) >= 3) return accent;
+  const hsl = hexToHsl(accent);
+  const darken = contrastRatio(canvas, '#000000') >= contrastRatio(canvas, '#ffffff');
+  const step = darken ? -1 : 1;
+  for (let l = Math.round(hsl.l); l >= 0 && l <= 100; l += step) {
+    const hex = hslToHex(hsl.h, hsl.s, l);
+    if (contrastRatio(hex, canvas) >= 3) return hex;
+  }
+  return ink;
+}
+
 // Derived colors are computed here and nowhere else (the AI brief prints
 // these exact hexes). `def.canvas(base)` may return an adjusted canvas hex
 // (e.g. Soft Form lifts very dark canvases); everything derives from that.
@@ -54,9 +70,12 @@ function boardTokens(state, def) {
     // Legible-as-text versions of the two hue colors (accent falls back to
     // primary, then ink, when it would vanish on the canvas).
     accentText: slVisible(canvas, [c.accent, c.primary], 3, ink),
+    // Accent shaded/tinted to >= 3:1 on the canvas, same hue: the colour of the
+    // highlight word when def.highlight is 'ink' (the default).
+    accentInk: abAccentInk(c.accent, canvas, ink),
     primaryText: slVisible(canvas, [c.primary], 3, ink),
-    // true when the accent itself is under 3:1 on the canvas: .ab-hl then gets
-    // a marker treatment (ink text on an accent band) instead of accent text.
+    // true when the accent itself is under 3:1 on the canvas (informational:
+    // drives data-accent-text; the default 'ink' highlight no longer needs it).
     accentLow: contrastRatio(c.accent, canvas) < 3,
     mix: slMix,
     alpha: abAlpha,
@@ -102,6 +121,42 @@ function abHeadlineScale(tagline) {
   return n <= 22 ? 1 : n <= 40 ? 0.86 : n <= 60 ? 0.72 : 0.6;
 }
 
+/* ---------------- interface type ---------------- */
+
+const AB_MONO = 'ui-monospace, "SF Mono", Menlo, monospace';
+
+// The brand face used for interface text when an aesthetic asks for 'sans':
+// a sans face first (body, then heading), then mono, then a display face, else
+// the heading face. Returns the FONTS entry.
+function abSansFace(state) {
+  const h = state.headingFont || {};
+  const b = state.bodyFont || h;
+  const tries = [[b, 'sans'], [h, 'sans'], [b, 'mono'], [h, 'mono'], [h, 'display'], [b, 'display']];
+  for (const [f, cat] of tries) if (f && f.category === cat) return f;
+  return h;
+}
+
+// kind: 'body' | 'heading' | 'sans' | 'mono'. Returns { name, expr } where expr
+// is the CSS value for the --ab-font-ui / --ab-font-label variables.
+function abResolveFace(kind, state) {
+  const h = state.headingFont || {};
+  const b = state.bodyFont || h;
+  if (kind === 'mono') return { name: 'System monospace', expr: AB_MONO };
+  let face = b;
+  if (kind === 'heading') face = h;
+  else if (kind === 'sans') face = abSansFace(state);
+  return { name: face.name, expr: face === h && face !== b ? 'var(--ab-font-h)' : 'var(--ab-font-b)' };
+}
+
+function abTypeFor(def) {
+  return Object.assign({ ui: 'body', label: null, display: 1 }, def && def.type);
+}
+
+// def.highlight: 'ink' (default) | 'band' | 'custom'.
+function abHighlightOf(def) {
+  return def && (def.highlight === 'band' || def.highlight === 'custom') ? def.highlight : 'ink';
+}
+
 function boardVars(t, state, def, tagline) {
   const ty = state.typography || {};
   const hs = Math.min(1.25, Math.max(0.8, (ty.headingSize || 44) / 44));
@@ -117,6 +172,13 @@ function boardVars(t, state, def, tagline) {
     '--ab-hl-scale': abHeadlineScale(tagline),
     '--ab-hs': hs,
   };
+  const ty2 = abTypeFor(def);
+  const ui = abResolveFace(ty2.ui, state);
+  const label = ty2.label ? abResolveFace(ty2.label, state) : ui;
+  vars['--ab-accent-ink'] = t.accentInk;
+  vars['--ab-font-ui'] = ui.expr;
+  vars['--ab-font-label'] = label.expr;
+  vars['--ab-display'] = Number(ty2.display) > 0 ? Number(ty2.display) : 1;
   if (typeof def.tokens === 'function') Object.assign(vars, def.tokens(t));
   return vars;
 }
@@ -152,6 +214,30 @@ const AB_ROWS = [
 ];
 const AB_ROLE_ORDER = ['canvas', 'ink', 'primary', 'secondary', 'accent'];
 
+const AB_LAYOUT_DEFAULT = { hero: 'split', palette: 'swatches', sections: 'two-col', subcopy: true };
+const AB_HEROES = ['split', 'centered', 'poster', 'scene'];
+const AB_PALETTES = ['swatches', 'strips', 'chips'];
+const AB_SECTIONS = ['two-col', 'stacked', 'asym'];
+const AB_STATE_KINDS = ['swatch', 'button', 'chip'];
+
+// Resolve def.layout against the defaults; unknown values fall back.
+function abLayoutOf(def) {
+  const l = Object.assign({}, AB_LAYOUT_DEFAULT, def && def.layout);
+  if (!AB_HEROES.includes(l.hero)) l.hero = 'split';
+  if (!AB_PALETTES.includes(l.palette)) l.palette = 'swatches';
+  if (!AB_SECTIONS.includes(l.sections)) l.sections = 'two-col';
+  l.subcopy = l.subcopy !== false;
+  return l;
+}
+
+// "60–70%" -> 65, "≈10%" -> 10, "≤5%" -> 5: the flex weight of a palette strip.
+function abCoverageNum(text) {
+  const nums = String(text || '').match(/\d+(?:\.\d+)?/g);
+  if (!nums || !nums.length) return 10;
+  const vals = nums.map(Number);
+  return vals.reduce((a, b) => a + b, 0) / vals.length;
+}
+
 let abSeq = 0;
 
 function boardHtml(state, def) {
@@ -173,10 +259,17 @@ function boardHtml(state, def) {
     ? `<img class="ab-logo" src="${state.logoDataUrl}" alt="${e(copy.brandName)}" />`
     : `<span class="ab-mark" aria-hidden="true"><span>${e(ctx.initial)}</span></span><span class="ab-wordmark">${e(copy.brandName)}</span>`;
 
+  const layout = abLayoutOf(def);
+  const hlKind = abHighlightOf(def);
+  const statesKind = AB_STATE_KINDS.includes(labels.statesKind) ? labels.statesKind : 'swatch';
+  // Text colour that reads on each role's own fill (strips put labels inside the band).
+  const onRole = { canvas: t.ink, ink: t.canvas, primary: t.onPrimary, secondary: t.onSecondary, accent: t.onAccent };
+
   const swatches = AB_ROLE_ORDER.map(k => {
     const r = roles[k] || {};
     const hex = t[k];
-    return `<div class="ab-swatch" data-role="${k}">
+    const cov = abCoverageNum(r.coverage);
+    return `<div class="ab-swatch" data-role="${k}" style="--sw:${hex};--sw-on:${onRole[k]};--cov:${cov}">
       <span class="ab-chip" style="background:${hex}"></span>
       <b class="ab-sw-role">${e(r.label || k)}</b>
       <span class="ab-sw-job">${e(r.job || '')}${r.coverage ? ' · ' + e(r.coverage) : ''}</span>
@@ -188,8 +281,19 @@ function boardHtml(state, def) {
   const segs = Object.keys(AB_STAGES).map((s, i) =>
     `<button type="button" class="ab-seg-btn" aria-pressed="${i === 0}" data-stage="${s}">${s}</button>`).join('');
 
-  const states = (labels.states || []).map((s, i) =>
-    `<div class="ab-state"><span class="ab-disc" data-s="${i}"></span><span class="ab-state-name">${e(s)}</span></div>`).join('');
+  // States row: three samples of the material (swatch), the real CTA in three
+  // states (button, classes is-rest / is-hover / is-pressed on a non-interactive
+  // .ab-cta clone) or three chips (chip, name inside the chip).
+  const stateCls = ['is-rest', 'is-hover', 'is-pressed'];
+  const states = (labels.states || []).map((s, i) => {
+    if (statesKind === 'button') {
+      return `<div class="ab-state" data-s="${i}"><span class="ab-cta ab-state-ctl ${stateCls[i] || ''}" data-s="${i}"><span class="ab-cta-label">Save</span><span class="ab-cta-arrow" aria-hidden="true"></span></span><span class="ab-state-name">${e(s)}</span></div>`;
+    }
+    if (statesKind === 'chip') {
+      return `<div class="ab-state" data-s="${i}"><span class="ab-state-chip" data-s="${i}">${e(s)}</span></div>`;
+    }
+    return `<div class="ab-state"><span class="ab-disc" data-s="${i}"></span><span class="ab-state-name">${e(s)}</span></div>`;
+  }).join('');
 
   const rows = AB_ROWS.map((r, i) => `<li class="ab-row">
       <span class="ab-row-n">${String(i + 1).padStart(2, '0')}</span>
@@ -200,7 +304,7 @@ function boardHtml(state, def) {
       <span class="ab-row-pct">${r[2]}%</span>
     </li>`).join('');
 
-  return `<section class="ab" data-ae="${def.key}" data-mode="${t.isDark ? 'dark' : 'light'}" data-accent-text="${t.accentLow ? 'low' : 'ok'}" style="${style}">
+  return `<section class="ab" data-ae="${def.key}" data-mode="${t.isDark ? 'dark' : 'light'}" data-accent-text="${t.accentLow ? 'low' : 'ok'}" data-hero="${layout.hero}" data-palette="${layout.palette}" data-sections="${layout.sections}" data-highlight="${hlKind}" data-states="${statesKind}" data-subcopy="${layout.subcopy ? 'on' : 'off'}" style="${style}">
   <div class="ab-in">
     <header class="ab-head">
       <div class="ab-brand">${brand}</div>
@@ -210,14 +314,15 @@ function boardHtml(state, def) {
     <section class="ab-hero">
       <div class="ab-hero-copy">
         <p class="ab-kicker">${e(def.kicker || def.descriptor)}</p>
-        <h2 class="ab-headline">${abHeadline(copy.tagline)}</h2>
+        <h2 class="ab-headline">${abHeadline(copy.tagline)}</h2>${layout.subcopy
+    ? `\n        <p class="ab-subcopy"><span class="ab-sub-lead">A design language for ${e(copy.brandName)}</span><span class="ab-sub-rest"> — type, color and material in one place.</span></p>` : ''}
       </div>
       <div class="ab-art" aria-hidden="true">${def.art ? def.art(ctx) : ''}</div>
     </section>
     <div class="ab-rule"></div>
     <section class="ab-palette" aria-label="Palette">
       <div class="ab-labelrow"><span class="ab-label">The palette</span><span class="ab-label">${e(def.descriptor)}</span></div>
-      <div class="ab-swatches">${swatches}</div>
+      <div class="ab-swatches" data-kind="${layout.palette}">${swatches}</div>
     </section>
     <div class="ab-rule"></div>
     <div class="ab-sections">
@@ -237,7 +342,7 @@ function boardHtml(state, def) {
           <input class="ab-input" id="${uid}-f" type="text" value="Something good" maxlength="48" autocomplete="off" />
           <label class="ab-toggle" for="${uid}-t"><span>Focus mode</span><input class="ab-switch" id="${uid}-t" type="checkbox" checked /></label>
           <div class="ab-status" aria-live="polite">Focus mode on</div>
-          <div class="ab-states">${states}</div>
+          <div class="ab-states" data-kind="${statesKind}">${states}</div>
         </div>
       </section>
       <section class="ab-sec ab-sec-use" aria-label="In use">
@@ -362,7 +467,7 @@ function wireBoardInteractions(host) {
       if (label) label.textContent = 'Save direction';
       return;
     }
-    const cta = e.target.closest('.ab-cta');
+    const cta = e.target.closest('.ab-cta:not(.ab-state-ctl)');
     if (cta) {
       cta.querySelector('.ab-cta-label').textContent = 'Direction saved';
     }

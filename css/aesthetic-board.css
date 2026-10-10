@@ -19,7 +19,10 @@
   overflow: hidden;
   background: var(--ab-canvas);
   color: var(--ab-ink);
-  font-family: var(--ab-font-b);
+  /* Interface text (tabs, buttons, labels, list cells, field values) uses
+     --ab-font-ui; reading copy (.ab-subcopy, .ab-card-body) pins --ab-font-b. */
+  font-family: var(--ab-font-ui, var(--ab-font-b));
+  --ab-pad: clamp(20px, 4.4cqw, 44px);
   font-size: 14px;
   font-weight: 400;
   line-height: 1.5;
@@ -35,7 +38,7 @@
 .ab i { font-style: normal; }
 .ab code { font-family: ui-monospace, "SF Mono", Menlo, monospace; }
 
-.ab-in { position: relative; z-index: 1; padding: clamp(20px, 4.4cqw, 44px); }
+.ab-in { position: relative; z-index: 1; padding: var(--ab-pad); }
 
 /* header */
 .ab-head {
@@ -61,7 +64,8 @@
 .ab-tag b { font-weight: inherit; color: var(--ab-ink); }
 .ab-rule { height: 1px; background: var(--ab-line); }
 
-/* labels */
+/* labels: small caps captions use --ab-font-label (defaults to the UI face) */
+.ab-label, .ab-kicker, .ab-tag, .ab-fieldlabel, .ab-status, .ab-state, .ab-foot, .ab-sw-job { font-family: var(--ab-font-label, var(--ab-font-ui, var(--ab-font-b))); }
 .ab-labelrow { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; margin-bottom: 16px; }
 .ab-label { font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ab-muted); }
 .ab-n::after { content: " / "; white-space: pre; }
@@ -72,20 +76,32 @@
   gap: clamp(12px, 3cqw, 32px); padding: clamp(28px, 5.5cqw, 60px) 0;
   position: relative;
 }
+.ab-hero-copy { min-width: 0; }
 .ab-kicker { margin-bottom: 16px !important; font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--ab-muted); }
 .ab-headline {
   font-family: var(--ab-font-h); font-weight: 600; line-height: 1; letter-spacing: -0.03em;
-  font-size: calc(clamp(32px, 7.4cqw, 70px) * var(--ab-hl-scale, 1) * var(--ab-hs, 1));
+  font-size: calc(clamp(32px, 7.4cqw, 70px) * var(--ab-hl-scale, 1) * var(--ab-hs, 1) * var(--ab-display, 1));
   text-wrap: balance; overflow-wrap: anywhere;
 }
-.ab-hl { color: var(--ab-accent-text); }
-/* Accent under 3:1 on the canvas (data-accent-text="low"): accent text would
-   vanish, so the spark becomes a highlighter band in the accent behind ink
-   text. :where() keeps this at lower specificity than any aesthetic's own
-   .ab[data-ae] .ab-hl rule, which always wins. */
-.ab:where([data-accent-text="low"]) .ab-hl {
-  color: var(--ab-ink);
-  background: linear-gradient(transparent 0.36em, var(--ab-accent) 0.36em calc(100% - 0.02em), transparent 0);
+/* Sub-copy under the headline: reading copy, so the brand body face. The two
+   spans let an aesthetic set a two-tone statement (.ab-sub-lead / .ab-sub-rest). */
+.ab-subcopy {
+  margin-top: clamp(14px, 2cqw, 22px) !important; max-width: 36em; text-wrap: pretty;
+  font-family: var(--ab-font-b); font-size: clamp(13.5px, 1.5cqw, 16px); line-height: 1.5; color: var(--ab-muted);
+}
+.ab[data-subcopy="off"] .ab-subcopy { display: none; }
+/* Compat until R2 migrates Bauhaus Poster: its hero copy is a row flex (vertical
+   kicker | headline), so the sub-copy would become a third column. Delete this
+   rule when that aesthetic sets layout.subcopy false or restructures its hero. */
+.ab[data-ae="bauhaus-poster"] .ab-subcopy { display: none; }
+
+/* Highlight word (def.highlight). 'ink' = the accent shaded/tinted to >= 3:1 on
+   the canvas, as text. 'band' = opt-in highlighter plane. 'custom' = the
+   aesthetic styles .ab-hl itself. :where() keeps these at lower specificity than
+   any aesthetic's own .ab[data-ae] .ab-hl rule, which always wins. */
+.ab:where([data-highlight="ink"]) .ab-hl { color: var(--ab-accent-ink); }
+.ab:where([data-highlight="band"]) .ab-hl {
+  color: var(--ab-on-accent); background: var(--ab-accent);
   padding: 0 0.1em; margin: 0 -0.04em;
   -webkit-box-decoration-break: clone; box-decoration-break: clone;
 }
@@ -95,6 +111,43 @@
 }
 .ab-lens { position: absolute; overflow: hidden; }
 .ab-lens-scene { position: absolute; }
+
+/* hero layouts (def.layout.hero). 'split' is the default grid above. The art
+   box is a size container in every layout, so art sized in cqw follows it;
+   --ab-art-ratio overrides the art's aspect ratio per aesthetic. */
+
+/* centered: statement centred over a full-width art stage */
+.ab[data-hero="centered"] .ab-hero { grid-template-columns: minmax(0, 1fr); justify-items: center; align-items: start; gap: clamp(26px, 4.4cqw, 52px); padding: clamp(34px, 6.4cqw, 76px) 0 clamp(28px, 4.4cqw, 48px); }
+.ab[data-hero="centered"] .ab-hero-copy { width: 100%; max-width: 62cqw; text-align: center; }
+.ab[data-hero="centered"] .ab-headline { font-size: calc(clamp(40px, 8.4cqw, 104px) * var(--ab-hl-scale, 1) * var(--ab-hs, 1) * var(--ab-display, 1)); line-height: 0.98; }
+.ab[data-hero="centered"] .ab-subcopy { margin-left: auto !important; margin-right: auto !important; }
+.ab[data-hero="centered"] .ab-art { justify-self: stretch; max-width: none; aspect-ratio: var(--ab-art-ratio, 16 / 7); }
+
+/* poster: headline spans the full width at display scale; the art is cropped by
+   the board's right edge, behind and below the headline's last line */
+.ab[data-hero="poster"] .ab-hero { grid-template-columns: minmax(0, 1fr); align-items: start; padding: clamp(30px, 5.4cqw, 64px) 0 clamp(120px, 21cqw, 270px); }
+.ab[data-hero="poster"] .ab-hero-copy { position: relative; z-index: 2; }
+.ab[data-hero="poster"] .ab-headline { font-size: calc(clamp(44px, 12.5cqw, 168px) * var(--ab-hl-scale, 1) * var(--ab-hs, 1) * var(--ab-display, 1)); line-height: 0.9; text-wrap: wrap; overflow-wrap: normal; }
+.ab[data-hero="poster"] .ab-art {
+  position: absolute; z-index: 1; right: calc(var(--ab-pad) * -1); bottom: calc(clamp(18px, 3cqw, 32px) * -1);
+  width: var(--ab-poster-art-w, 34cqw); max-width: none; aspect-ratio: var(--ab-art-ratio, 1); justify-self: auto;
+}
+
+/* scene: the art is a full-width framed scene panel; the copy sits over its
+   lower-left on a legible canvas substrate */
+.ab[data-hero="scene"] .ab-hero { grid-template-columns: minmax(0, 1fr); align-items: end; padding: clamp(24px, 4.4cqw, 48px) 0 clamp(26px, 4cqw, 44px); }
+.ab[data-hero="scene"] .ab-art {
+  grid-area: 1 / 1; justify-self: stretch; max-width: none; aspect-ratio: var(--ab-art-ratio, 21 / 10);
+  border-radius: clamp(18px, 2.8cqw, 30px); overflow: hidden;
+}
+.ab[data-hero="scene"] .ab-hero-copy {
+  grid-area: 1 / 1; z-index: 2; align-self: end; justify-self: start; width: min(100%, 58cqw);
+  margin: clamp(12px, 2.4cqw, 26px); padding: clamp(14px, 2.2cqw, 26px) clamp(16px, 2.6cqw, 30px);
+  border-radius: clamp(14px, 2.2cqw, 24px); background: color-mix(in srgb, var(--ab-canvas) 84%, transparent);
+  -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
+}
+.ab[data-hero="scene"] .ab-headline { font-size: calc(clamp(30px, 5.6cqw, 78px) * var(--ab-hl-scale, 1) * var(--ab-hs, 1) * var(--ab-display, 1)); line-height: 1.02; }
+.ab[data-hero="scene"] .ab-kicker { margin-bottom: 10px !important; }
 
 /* palette */
 .ab-palette { padding: clamp(22px, 3.4cqw, 34px) 0; }
@@ -108,6 +161,24 @@
 .ab-sw-job { margin-top: 2px; font-size: 11px; line-height: 1.35; color: var(--ab-muted); }
 .ab-sw-hex { margin-top: 5px; font-size: 10.5px; letter-spacing: 0.04em; color: var(--ab-muted); }
 
+/* palette layouts (def.layout.palette). Every .ab-swatch carries --sw (hex),
+   --sw-on (readable text colour on it) and --cov (coverage %, the strip weight). */
+.ab-swatches[data-kind="strips"] { display: flex; gap: 0; border-radius: 12px; overflow: hidden; box-shadow: 0 0 0 1px var(--ab-line); }
+.ab-swatches[data-kind="strips"] .ab-swatch {
+  flex: var(--cov, 10) 1 clamp(78px, 11cqw, 140px); justify-content: flex-end; min-height: clamp(120px, 16cqw, 190px);
+  padding: clamp(10px, 1.6cqw, 16px); background: var(--sw); color: var(--sw-on);
+}
+.ab-swatches[data-kind="strips"] .ab-chip { display: none; }
+.ab-swatches[data-kind="strips"] .ab-sw-job, .ab-swatches[data-kind="strips"] .ab-sw-hex { color: inherit; opacity: 0.78; overflow-wrap: anywhere; }
+.ab-swatches[data-kind="chips"] { display: flex; flex-wrap: wrap; gap: 8px 10px; }
+.ab-swatches[data-kind="chips"] .ab-swatch {
+  flex-direction: row; align-items: center; gap: 8px; padding: 5px 12px 5px 6px;
+  border: 1px solid var(--ab-line); border-radius: 999px;
+}
+.ab-swatches[data-kind="chips"] .ab-chip { width: 22px; height: 22px; margin: 0; border-radius: 50%; }
+.ab-swatches[data-kind="chips"] .ab-sw-job { display: none; }
+.ab-swatches[data-kind="chips"] .ab-sw-role, .ab-swatches[data-kind="chips"] .ab-sw-hex { margin: 0; }
+
 /* sections */
 .ab-sections {
   display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
@@ -115,6 +186,9 @@
 }
 .ab-sec { min-width: 0; }
 .ab-sec-use { grid-column: 1 / -1; }
+/* section layouts (def.layout.sections): two-col above, then stacked or ~7/5 */
+.ab[data-sections="stacked"] .ab-sections { grid-template-columns: minmax(0, 1fr); }
+.ab[data-sections="asym"] .ab-sections { grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); }
 
 .ab-card { padding: clamp(18px, 2.8cqw, 26px); border-radius: 16px; }
 .ab-seg { display: flex; gap: 4px; padding: 5px; border-radius: 12px; }
@@ -127,7 +201,7 @@
   margin: 24px 0 8px !important; font-family: var(--ab-font-h); font-weight: 600;
   font-size: clamp(21px, 2.7cqw, 27px); line-height: 1.12; letter-spacing: -0.02em;
 }
-.ab-card-body { margin-bottom: 22px !important; font-size: 13px; color: var(--ab-muted); }
+.ab-card-body { margin-bottom: 22px !important; font-family: var(--ab-font-b); font-size: 13px; color: var(--ab-muted); }
 .ab-cta {
   width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 10px;
   padding: 13px 16px; border: 0; border-radius: 10px; cursor: pointer;
@@ -160,6 +234,13 @@
 .ab-states { display: flex; gap: 16px; margin-top: 22px; }
 .ab-state { flex: 1; min-width: 0; text-align: center; font-size: 11px; color: var(--ab-muted); }
 .ab-disc { display: block; width: 52px; height: 52px; margin: 0 auto 12px; border-radius: 50%; border: 1px solid var(--ab-line); }
+/* states row, def.labels.statesKind 'button' / 'chip' */
+.ab-states[data-kind="button"] { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.ab-state-ctl { width: 100%; padding: 11px 12px; gap: 6px; font-size: 12.5px; cursor: default; pointer-events: none; white-space: nowrap; }
+.ab-states[data-kind="button"] .ab-state-ctl { margin-bottom: 10px; justify-content: center; }
+.ab-states[data-kind="button"] .ab-cta-arrow { display: none; }
+.ab-states[data-kind="chip"] .ab-state { display: flex; align-items: center; justify-content: center; }
+.ab-state-chip { display: inline-flex; align-items: center; justify-content: center; max-width: 100%; padding: 8px 16px; border-radius: 999px; border: 1px solid var(--ab-line); font-size: 12px; color: var(--ab-ink); white-space: nowrap; }
 
 /* in-use list */
 .ab-list { list-style: none; }
@@ -189,8 +270,26 @@
 @container ab (max-width: 600px) {
   .ab-hero { grid-template-columns: minmax(0, 1fr); gap: 22px; padding: 26px 0 30px; }
   .ab-art { justify-self: start; max-width: 230px; }
-  .ab-headline { font-size: calc(clamp(30px, 10.5cqw, 52px) * var(--ab-hl-scale, 1) * var(--ab-hs, 1)); }
+  .ab-headline { font-size: calc(clamp(30px, 10.5cqw, 52px) * var(--ab-hl-scale, 1) * var(--ab-hs, 1) * var(--ab-display, 1)); }
+  .ab[data-hero="centered"] .ab-hero { justify-items: stretch; padding: 28px 0 26px; }
+  .ab[data-hero="centered"] .ab-hero-copy { max-width: none; }
+  .ab[data-hero="centered"] .ab-headline { font-size: calc(clamp(34px, 11.4cqw, 56px) * var(--ab-hl-scale, 1) * var(--ab-hs, 1) * var(--ab-display, 1)); }
+  .ab[data-hero="centered"] .ab-art { max-width: none; aspect-ratio: var(--ab-art-ratio-narrow, 4 / 3); }
+  .ab[data-hero="poster"] .ab-hero { padding: 26px 0 24px; gap: 22px; }
+  .ab[data-hero="poster"] .ab-headline { font-size: calc(clamp(40px, 14.6cqw, 72px) * var(--ab-hl-scale, 1) * var(--ab-hs, 1) * var(--ab-display, 1)); }
+  .ab[data-hero="poster"] .ab-art { position: relative; right: auto; bottom: auto; width: 100%; max-width: 230px; justify-self: end; margin-right: calc(var(--ab-pad) * -0.6); }
+  .ab[data-hero="scene"] .ab-hero { padding: 22px 0 24px; gap: 14px; grid-template-columns: minmax(0, 1fr); }
+  .ab[data-hero="scene"] .ab-art { grid-area: auto; aspect-ratio: var(--ab-art-ratio-narrow, 4 / 3); max-width: none; justify-self: stretch; }
+  .ab[data-hero="scene"] .ab-hero-copy { grid-area: auto; width: auto; max-width: none; justify-self: stretch; margin: 0; padding: 0; background: none; -webkit-backdrop-filter: none; backdrop-filter: none; order: 2; }
+  .ab[data-hero="scene"] .ab-headline { font-size: calc(clamp(32px, 10.5cqw, 52px) * var(--ab-hl-scale, 1) * var(--ab-hs, 1) * var(--ab-display, 1)); }
   .ab-swatches { grid-template-columns: minmax(0, 1fr); gap: 12px; }
+  .ab-swatches[data-kind="strips"] { flex-direction: column; gap: 0; }
+  .ab-swatches[data-kind="strips"] .ab-swatch { display: flex; flex: none; min-height: 0; padding: 12px 14px; }
+  .ab-swatches[data-kind="chips"] { display: flex; gap: 8px; }
+  .ab-swatches[data-kind="chips"] .ab-swatch { display: flex; }
+  .ab-states[data-kind="button"] { gap: 6px; }
+  .ab-state-ctl { padding: 10px 6px; font-size: 11.5px; }
+  .ab[data-sections="asym"] .ab-sections { grid-template-columns: minmax(0, 1fr); }
   .ab-swatch { display: grid; grid-template-columns: 72px minmax(0, 1fr); column-gap: 14px; align-items: center; }
   .ab-chip { grid-row: 1 / 4; margin: 0; height: 48px; }
   .ab-sections { grid-template-columns: minmax(0, 1fr); }

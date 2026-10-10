@@ -27,6 +27,7 @@ const AIB_TOKEN_ROWS = [
   ['--on-primary', 'onPrimary', null],
   ['--on-secondary', 'onSecondary', null],
   ['--on-accent', 'onAccent', null],
+  ['--accent-ink', 'accentInk', null],
   ['--pri-tint', 'priTint', null],
   ['--sec-tint', 'secTint', null],
 ];
@@ -41,6 +42,7 @@ const AIB_DERIVED_JOB = {
   onPrimary: 'Text and icons on a primary fill only',
   onSecondary: 'Text and icons on a secondary fill only',
   onAccent: 'Text and icons on an accent fill only',
+  accentInk: 'The accent as text: same hue, shaded (light canvas) or tinted (dark canvas) just enough to reach 3:1 on the canvas. Set the highlight word in it, never plain accent',
   priTint: 'Quiet primary wash: selected state background, hover on primary-linked items',
   secTint: 'Quiet secondary wash: selected row, tonal fills, hover on secondary items',
 };
@@ -87,17 +89,25 @@ const AIB_HEX = /^#[0-9a-f]{6}$/i;
 
 // Color treatments that differ per aesthetic. Everything is a token name;
 // the role rules always win over the look.
+// The highlight treatment is def.highlight ('ink' | 'band' | 'custom', default
+// 'ink'). AIB_BAND_HL is only the fallback for aesthetics that have not
+// declared def.highlight yet; it can be deleted once every aesthetic does.
 const AIB_BAND_HL = ['raw-brutalist', 'neo-brutal-pop', 'clay', 'bauhaus-poster', 'riso-print'];
+function aibHighlightKind(def) {
+  if (def.highlight === 'band' || def.highlight === 'ink' || def.highlight === 'custom') return def.highlight;
+  return AIB_BAND_HL.includes(def.key) ? 'band' : 'ink';
+}
 const AIB_INK_BORDER = ['raw-brutalist', 'neo-brutal-pop', 'bauhaus-poster'];
 
 function aibComponentRows(t, def) {
   const key = def.key;
   const focusLow = contrastRatio(t.primary, t.canvas) < 3;
-  const bandHl = t.accentLow || AIB_BAND_HL.includes(key);
+  const hlKind = aibHighlightKind(def);
+  const inkCta = def.ctaFill === 'ink';
 
   let segOn;
   if (key === 'soft-form' || key === 'raw-brutalist') segOn = ['--ink', '--canvas', 'none'];
-  else if (key === 'aurora-noir') segOn = [t.mix(t.ink, t.canvas, 0.1) + ' (ink at 10% over canvas)', '--ink', 'ink at 12%'];
+  else if (key === 'aurora-noir') segOn = [t.mix(t.primary, t.canvas, t.isDark ? 0.2 : 0.14) + ' (primary at ' + (t.isDark ? '20' : '14') + '% over canvas)', '--ink', 'primary at 55%'];
   else if (key === 'liquid-glass') segOn = ['translucent lens: --canvas lightened toward white', '--ink', 'white at 50%'];
   else if (key === 'holo-iridescent') segOn = ['decorative silver chrome pill (see Materials)', '--ink', 'none'];
   else if (key === 'clay') segOn = ['near-white puffy pill (see Materials)', '--ink', 'none'];
@@ -108,9 +118,11 @@ function aibComponentRows(t, def) {
       : 'track --primary, knob --on-primary';
   const toggleOff = key === 'soft-form' ? 'track --canvas (recessed), knob --muted' : 'track --line, knob --muted';
 
-  const hl = bandHl
+  const hl = hlKind === 'band'
     ? ['--accent (band behind the word)', '--on-accent', 'none']
-    : ['none', '--accent', 'none'];
+    : hlKind === 'custom'
+      ? ['custom treatment, see Materials', '--accent-ink (text base)', 'none']
+      : ['none', '--accent-ink', 'none'];
 
   const inkBorder = AIB_INK_BORDER.includes(key);
   const cardBg = key === 'neo-brutal-pop' ? '--sec-tint' : '--canvas';
@@ -118,7 +130,9 @@ function aibComponentRows(t, def) {
   return [
     ['Page', '--canvas', '--ink', 'none'],
     ['Card / panel', cardBg, '--ink', inkBorder ? '--ink' : '--line'],
-    ['Primary button (one per view)', '--primary', '--on-primary', inkBorder ? '--ink' : 'none'],
+    inkCta
+      ? ['Main button (one per view, ink-filled)', '--ink', '--canvas', 'none']
+      : ['Primary button (one per view)', '--primary', '--on-primary', inkBorder ? '--ink' : 'none'],
     ['Secondary button', 'transparent (hover: --sec-tint)', '--ink', '--secondary'],
     ['Ghost / tertiary link', 'none', '--ink (underlined)', 'none'],
     ['Input field, rest', '--canvas', '--ink (placeholder: --muted)', inkBorder ? '--ink' : '--line'],
@@ -207,7 +221,9 @@ function buildAiBrief(state) {
       `- Coverage: ${r.coverage}`, '');
   });
   push('### Hard rules', '',
-    '1. Exactly one primary-filled action (the main call to action) per view.',
+    def.ctaFill === 'ink'
+      ? '1. Exactly one main call to action per view, filled with `--ink` with a `--canvas` label. `--primary` is never a button fill here; it marks state only (selected controls, switch on, focus ring, progress bars, status dot).'
+      : '1. Exactly one primary-filled action (the main call to action) per view.',
     '2. Secondary never fills the main call to action and never sets body text.',
     `3. Accent covers ${cov('accent')} of any view and is never used on buttons, body text or borders.`,
     '4. Text is set only in `--ink`, `--muted` or the matching `--on-*` token on its fill. The one exception is the single accent highlight word, and only where the highlight treatment below says so.',
@@ -216,12 +232,14 @@ function buildAiBrief(state) {
     contrastRatio(t.primary, t.canvas) < 3
       ? '7. Focus ring is `--primary` (3px) with an outer 1px `--ink` ring, because `--primary` alone is under 3:1 on this canvas.'
       : '7. Focus ring is always `--primary`.');
-  if (t.accentLow) {
-    push('8. The accent has low contrast on this canvas (' + aibRatio(t.accent, t.canvas) + '), so it must NOT be used as a text color. Show the highlight word as a highlighter band: background `' + t.accent + '` (`--accent`) behind the word, text in `' + t.onAccent + '` (`--on-accent`).');
-  } else if (AIB_BAND_HL.includes(def.key)) {
+  const hlKind = aibHighlightKind(def);
+  if (hlKind === 'band') {
     push('8. In this aesthetic the highlight word is a highlighter band: background `' + t.accent + '` (`--accent`) behind the word, text in `' + t.onAccent + '` (`--on-accent`). Never set accent-colored text.');
+  } else if (hlKind === 'custom') {
+    push('8. The highlight word has a custom treatment (see Materials). Where it is set as text, use `' + t.accentInk + '` (`--accent-ink`), never plain `--accent` as text. Use it once per view.');
   } else {
-    push('8. The highlight word may be set in `' + t.accent + '` (`--accent`), which has ' + aibRatio(t.accent, t.canvas) + ' on the canvas. Use it once per view.');
+    const same = t.accentInk.toLowerCase() === t.accent.toLowerCase();
+    push('8. The highlight word is set as text in `' + t.accentInk + '` (`--accent-ink`)' + (same ? ', which is the accent itself' : ', the accent ' + (t.isDark ? 'tinted' : 'shaded') + ' with the same hue') + ', at ' + aibRatio(t.accentInk, t.canvas) + ' on the canvas. Use it once per view; never set plain `--accent` as text' + (t.accentLow ? ' (it is only ' + aibRatio(t.accent, t.canvas) + ' on this canvas)' : '') + '.');
   }
   push('');
 
@@ -234,10 +252,11 @@ function buildAiBrief(state) {
   const pairs = [
     ['--ink on --canvas', t.ink, t.canvas, 'Body and headlines'],
     ['--muted on --canvas', t.muted, t.canvas, 'Captions and secondary text'],
-    ['--on-primary on --primary', t.onPrimary, t.primary, 'Primary button label'],
+    ...(def.ctaFill === 'ink' ? [['--canvas on --ink', t.canvas, t.ink, 'Main button label']] : [['--on-primary on --primary', t.onPrimary, t.primary, 'Primary button label']]),
     ['--on-secondary on --secondary', t.onSecondary, t.secondary, 'Chip and tag label'],
     ['--on-accent on --accent', t.onAccent, t.accent, 'Badge label, highlight band'],
-    ['--accent on --canvas', t.accent, t.canvas, t.accentLow ? 'Do not use as text; graphic fills only' : 'Highlight word and graphics'],
+    ['--accent-ink on --canvas', t.accentInk, t.canvas, 'Highlight word and accent text (the accent shaded to 3:1)'],
+    ['--accent on --canvas', t.accent, t.canvas, t.accentLow ? 'Do not use as text; graphic fills only' : 'Graphics and fills'],
     ['--primary on --canvas', t.primary, t.canvas, contrastRatio(t.primary, t.canvas) >= 3 ? 'Focus ring, graphics, large elements' : 'Graphics only; keep the label in --on-primary'],
   ];
   push('## Contrast pairs', '',
@@ -253,6 +272,11 @@ function buildAiBrief(state) {
     `- Google Fonts: ${fontUrl}`,
     `- Headings: ${ty.headingSize}px, weight ${ty.headingWeight}, letter-spacing ${ty.headingTracking}px, text-transform ${ty.headingCase}`,
     `- Body: ${ty.bodySize}px, weight ${ty.bodyWeight}, letter-spacing ${ty.bodyTracking}px, text-transform ${ty.bodyCase}`);
+  if (def.type && (def.type.ui || def.type.label)) {
+    const faceName = k => (typeof abResolveFace === 'function' ? abResolveFace(k, state).name : k);
+    if (def.type.ui) push(`- Interface text (tabs, buttons, field values, list cells): ${faceName(def.type.ui)}${def.type.ui === 'body' ? '' : `. The ${state.bodyFont.name} body face is for reading copy only`}.`);
+    if (def.type.label) push(`- Small labels and captions: ${faceName(def.type.label)}.`);
+  }
   const notes = def.typeNotes;
   (Array.isArray(notes) ? notes : notes ? [notes] : []).forEach(n => push(`- ${n}`));
   push(`- Shape: ${state.shapePreset.name}, radius ${state.shapePreset.radius}, large radius ${state.shapePreset.radiusLg}`, '');

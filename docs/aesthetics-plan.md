@@ -297,15 +297,48 @@ Written by T1 (W1) after building. Source of truth: `js/aesthetic-board.js` (`bo
 - Undo: brand-session.js wraps `pushUndoSnapshot`/`applyUndoSnapshot` so snapshots also carry `aesthetic` and `bgMode`.
 - Compare tiles render `boardHtml(state, def)` for each def with `state.aesthetic` overridden only inside `boardRoles`.
 
-**DOM** (root `section.ab[data-ae=key][data-mode=light|dark]`, inline base vars, size container named `ab`):
+**Round 2 hooks (R1, additive; defaults keep the previous look, except the default highlight is now `ink` and every hero gains the sub-copy line):**
+
+All optional on the def. Unknown values fall back to the default. Resolved by `abLayoutOf(def)`, `abTypeFor(def)`,
+`abHighlightOf(def)` in `js/aesthetic-board.js`; the board root carries the resolved choices as data attributes so
+aesthetic CSS can key off them.
+
+| Def field | Values (default first) | Root attribute / CSS var | Effect |
+|-----------|------------------------|--------------------------|--------|
+| `layout.hero` | `'split'`, `'centered'`, `'poster'`, `'scene'` | `data-hero` | split: copy left, art right. centered: statement centered (max 62cqw), art full width below (`--ab-art-ratio`, default 16/7; `--ab-art-ratio-narrow` default 4/3). poster: headline spans the full width at ~12.5cqw (cap 168px), art absolutely placed bottom-right, cropped by the board edge (`--ab-poster-art-w`, default 34cqw; `--ab-art-ratio` default 1); below 600px the art drops below the headline. scene: `.ab-art` becomes a full-width rounded framed panel (`--ab-art-ratio`, default 21/10) and `.ab-hero-copy` overlays its lower left on a frosted canvas substrate (58cqw wide); below 600px the panel sits above the copy. |
+| `layout.palette` | `'swatches'`, `'strips'`, `'chips'` | `data-palette`, `.ab-swatches[data-kind]` | strips: one full-width band, each `.ab-swatch` is a flex band weighted by `--cov` (coverage %), filled with `--sw`, text `--sw-on`, `.ab-chip` hidden, labels inside (stacked rows below 600px). chips: compact pill row (dot, role, hex; job hidden). Every `.ab-swatch` always carries inline `--sw` (hex), `--sw-on` (readable text colour on it) and `--cov` (number). |
+| `layout.sections` | `'two-col'`, `'stacked'`, `'asym'` | `data-sections` | two-col: 1.1fr / 1fr (today). stacked: one column. asym: 7fr / 5fr (01 left, 02 right; `.ab-sec-use` still spans). One column below 600px for all. |
+| `layout.subcopy` | `true`, `false` | `data-subcopy="on\|off"` | `false` omits the line (`p.ab-subcopy`) from the markup. |
+| `type.ui` | `'body'`, `'heading'`, `'sans'`, `'mono'` | `--ab-font-ui` | Face for tabs, buttons, list cells, field values (`.ab { font-family }`). `'sans'` = the body face if its FONTS category is `sans`, else the heading face if `sans`, else a `mono` face, else a `display` face, else the heading face. `'mono'` = `ui-monospace, "SF Mono", Menlo, monospace`. Default `'body'` (today). Resolved by `abResolveFace(kind, state)` -> `{name, expr}`. |
+| `type.label` | same | `--ab-font-label` | Small caps captions: `.ab-label .ab-kicker .ab-tag .ab-fieldlabel .ab-status .ab-state .ab-foot .ab-sw-job`. Defaults to the `ui` face. |
+| `type.display` | number, default 1 | `--ab-display` | Multiplies headline size (all hero layouts and the narrow size). Headline = `clamp(...cqw...) * --ab-hl-scale * --ab-hs * --ab-display`. Base sizes per hero: split `clamp(32px, 7.4cqw, 70px)`, centered `clamp(40px, 8.4cqw, 104px)`, poster `clamp(44px, 12.5cqw, 168px)`, scene `clamp(30px, 5.6cqw, 78px)`. An aesthetic that sets its own `.ab-headline` font-size should multiply by `var(--ab-display, 1)`. |
+| `highlight` | `'ink'`, `'band'`, `'custom'` | `data-highlight`, `--ab-accent-ink` | ink: `.ab-hl` is `t.accentInk` text. band: `--ab-accent` fill, `--ab-on-accent` text, padded. custom: the framework draws nothing; the aesthetic styles `.ab-hl` (use `--ab-accent-ink` where it needs a text colour). The base rules sit in `:where()` so any `.ab[data-ae] .ab-hl` rule still wins. The AI brief describes the treatment from this field. |
+| `labels.statesKind` | `'swatch'`, `'button'`, `'chip'` | `data-states`, `.ab-states[data-kind]` | swatch: three `.ab-disc[data-s]` + `.ab-state-name` (today). button: three non-interactive clones of the CTA, `span.ab-cta.ab-state-ctl.is-rest\|is-hover\|is-pressed[data-s=0..2]` (label "Save", arrow hidden) + `.ab-state-name`; the aesthetic's own CSS must give the states by also targeting `.ab-cta.is-hover` / `.ab-cta.is-pressed` (and may style `[data-s="2"]` for a third state such as focus). chip: `.ab-state-chip[data-s]` holding the state name, no separate name. |
+| `ctaFill` | `'primary'`, `'ink'` | none (CSS decides) | Documents that the main action is not primary-filled; only the AI brief reads it (component map, hard rule 1, contrast pair). Aurora Noir uses `'ink'`. |
+
+- Token `t.accentInk` (`abAccentInk`): the accent itself when it is already >= 3:1 on the canvas, else the same hue and
+  saturation shaded toward black (light canvas) or tinted toward white (dark canvas) one HSL lightness step at a time
+  until it reaches 3:1; ink if none does. CSS var `--ab-accent-ink`; listed as `--accent-ink` in the AI brief tokens table.
+  `t.accentText` / `--ab-accent-text` is unchanged (accent, else primary, else ink). `data-accent-text="ok|low"` still exists.
+- Sub-copy: every hero gets `p.ab-subcopy` inside `.ab-hero-copy`, after the headline:
+  `<span class="ab-sub-lead">A design language for <Brand></span><span class="ab-sub-rest"> — type, color and material in one place.</span>`.
+  Reading copy, so it is pinned to `--ab-font-b` and muted; an aesthetic may restyle the two spans (Aurora Noir sets the
+  lead in ink and the rest muted, in the UI face) or hide it with `layout.subcopy: false`.
+- `.ab-art` is a size container in every layout; art sized in `cqw` follows the art box, and `@container (max-width: Npx)`
+  queries written inside art CSS (unnamed) apply to the art box itself. `.ab` also defines `--ab-pad` (the board padding,
+  usable inside `.ab-in`).
+- Aurora Noir (hero centered, sections asym, states button, ink CTA) and Liquid Glass (hero scene, states chip) are the
+  reference implementations of these hooks.
+
+**DOM** (root `section.ab[data-ae=key][data-mode=light|dark][data-hero][data-palette][data-sections][data-highlight][data-states][data-subcopy]`, inline base vars, size container named `ab`):
 
 ```
 .ab > .ab-in
   header.ab-head: .ab-brand (.ab-mark>span initial + .ab-wordmark | img.ab-logo), .ab-tag (<b> aesthetic name)
   .ab-rule
-  .ab-hero: .ab-hero-copy (.ab-kicker, h2.ab-headline > .ab-hl), .ab-art[aria-hidden] (def.art output)
+  .ab-hero: .ab-hero-copy (.ab-kicker, h2.ab-headline > .ab-hl, p.ab-subcopy > .ab-sub-lead + .ab-sub-rest), .ab-art[aria-hidden] (def.art output)
   .ab-rule
-  .ab-palette: .ab-labelrow (.ab-label x2), .ab-swatches > .ab-swatch[data-role=canvas|ink|primary|secondary|accent]
+  .ab-palette: .ab-labelrow (.ab-label x2), .ab-swatches[data-kind] > .ab-swatch[data-role=canvas|ink|primary|secondary|accent][--sw,--sw-on,--cov]
                (.ab-chip, b.ab-sw-role, .ab-sw-job "job · coverage", code.ab-sw-hex)
   .ab-rule
   .ab-sections
@@ -314,7 +347,7 @@ Written by T1 (W1) after building. Source of truth: `js/aesthetic-board.js` (`bo
          button.ab-cta > .ab-cta-label + .ab-cta-arrow (glyph via ::before, per aesthetic)
     .ab-sec.ab-sec-touch: label row "02" + def.labels.material; .ab-panel >
          label.ab-fieldlabel, input.ab-input, label.ab-toggle > span + input.ab-switch[checkbox], .ab-status,
-         .ab-states > .ab-state > .ab-disc[data-s=0|1|2] + .ab-state-name
+         .ab-states[data-kind=swatch|button|chip] > .ab-state > (.ab-disc[data-s] | span.ab-cta.ab-state-ctl.is-* | .ab-state-chip[data-s]) + .ab-state-name
     .ab-sec.ab-sec-use: label row "03"; ul.ab-list > li.ab-row >
          .ab-row-n, .ab-av (hidden by default), .ab-row-name, .ab-row-status, .ab-row-bar>i, .ab-row-pct
   footer.ab-foot: .ab-motto (> i.ab-dot), .ab-infl
