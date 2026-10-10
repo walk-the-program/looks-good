@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
    app.js — main controller: state, rendering, and event wiring.
-   Depends on data.js, color.js, rules.js, slide-mocks.js (loaded first
+   Depends on data.js, color.js, rules.js, brand-deck.js (loaded first
    as plain <script> tags — no build step, no modules).
 ------------------------------------------------------------------------ */
 
@@ -319,8 +319,7 @@ function render() {
   renderFontSpecimen();
   if (window.syncFontPickers) syncFontPickers();
   renderFindings();
-  // Slide mocks get the blank-safe copy rather than raw state.content.
-  renderSlideMocks(Object.assign({}, state, { content: effectiveContent() }));
+  renderBrandDeck();
 }
 
 /* ---------------- Toast + export ---------------- */
@@ -381,7 +380,7 @@ const PALETTE_EXPORT_LABELS = {
 };
 
 // Built as real DOM (not Canvas ctx.fillText) so it always uses whatever
-// font is actually on screen — same reasoning as slide-mocks.js.
+// font is actually on screen — same reasoning as brand-deck.js.
 async function exportPalettePng() {
   const wrap = document.createElement('div');
   wrap.style.cssText = `position:fixed;left:-10000px;top:0;display:flex;gap:24px;
@@ -598,20 +597,7 @@ function wireEvents() {
 
   document.getElementById('exportPalettePng').addEventListener('click', exportPalettePng);
 
-  document.querySelectorAll('[data-download-slide]').forEach(btn => {
-    btn.addEventListener('click', async () => {
-      btn.disabled = true;
-      try {
-        const el = document.getElementById(btn.dataset.downloadSlide);
-        await downloadSlideMockPng(el, btn.dataset.name);
-        showToast('PNG downloaded');
-      } catch (err) {
-        showToast('PNG export failed');
-      } finally {
-        btn.disabled = false;
-      }
-    });
-  });
+  // Slide PNG / Download all / Download PDF are wired by js/brand-deck.js.
 
   // Space is the shuffle shortcut, but only when it isn't already doing a
   // more obvious job: typing into a field, toggling a focused control, or

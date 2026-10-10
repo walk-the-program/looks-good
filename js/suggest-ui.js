@@ -28,7 +28,7 @@
   function paintPreview() {
     applyPreviewTheme();
     renderFontSpecimen();
-    renderSlideMocks(Object.assign({}, state, { content: effectiveContent() }));
+    // The brand deck is skipped on purpose: a hover preview only retints the board.
   }
   function patchFields(patch) {
     if (patch.headingFont) state.headingFont = fontByName(patch.headingFont);

@@ -2,7 +2,7 @@
 
 A local, no-build-step tool for rapidly auditioning brand combinations —
 fonts, color palettes, and shape/style language — with live heuristic
-design feedback and a six-slide sample pitch deck for an uploaded logo. The
+design feedback and a nine-slide brand deck rendered in the selected aesthetic. The
 app chrome is a light warm-grey workspace so the only colors on screen
 are the brand's own.
 
@@ -145,7 +145,7 @@ x dismisses it for that brand. Locked sections get none.
 - **Brand copy in one place** — the sidebar's **Brand** panel holds the
   brand name and tagline, plus a collapsed **Slide copy** subpanel for the
   section title, quote and quote author. Everything downstream — the live
-  preview, the six slides and the brand guide — renders from those
+  preview, the brand deck and the brand guide — renders from those
   fields, and blank fields fall back to a sensible default rather than
   rendering an empty line.
 - **Combination engine** — pick heading/body fonts from 85+ Google Fonts
@@ -165,21 +165,31 @@ x dismisses it for that brand. Locked sections get none.
 - **Typography fine-tuning** — independent size, weight, and letter-spacing
   sliders for heading and body, plus a text-case control (Normal /
   UPPERCASE / lowercase / Capitalize Each Word) for each. These live-update
-  the preview card only; the slides keep their own type scale.
+  the preview card only; the brand deck shows the type scale they imply.
 - **Design language recommendations** — a rule-based list that checks
   WCAG contrast (body text, primary button, accent) against real
   thresholds, flags risky/strong font pairings by category (serif,
   sans, display, mono), and reads the palette's hue/saturation/lightness
   relationships to call out clashing, flat, or well-separated color
   choices.
-- **Slide mockups** — a six-slide sample pitch deck (cover, what we do,
-  results, growth chart, testimonial, closing) with example copy that adapts to the brand name: shared footer, index, kicker and
-  shape motif, driven entirely by the current fonts, palette and shape
-  preset. Upload a logo (stays in-browser, never uploaded anywhere) and it
-  appears on the cover panel and in the slide footers. These are plain
-  DOM/CSS elements (not canvas) so they always reflect your actual font
-  choice; each has a "Download PNG" button, and **Download all** saves the
-  set one file at a time (rasterized via html2canvas).
+- **Brand deck** — nine 16:9 brand-guideline slides rendered *inside* the
+  selected aesthetic, so the slides and the board always agree: cover,
+  principles, color system (roles, proportion bar, contrast pairs),
+  typography (face specimens, type scale, the recommended faces and how the
+  current ones fit), interface (segmented control, CTA, field, toggle and
+  the three states), material and graphics (the signature art plus the
+  aesthetic's material names), in product (a composed app screen), do and
+  don't, and a closing slide. Each slide is its own `.ab[data-ae]` root at a
+  fixed 1280x720, so every aesthetic's CSS applies unchanged; the cards
+  shrink them with CSS `zoom`. The brand name, tagline, logo, fonts and
+  palette all come from the current brand. The deck is built lazily (when
+  the section is near the viewport, in idle time), so it never slows
+  aesthetic switching. Each slide has a **Download PNG** button (rasterized
+  at 2x from an off-screen 1280x720 clone via html2canvas); **Download all**
+  saves the PNGs one at a time and **Download PDF** writes a 1280x720
+  landscape PDF, one image per slide (jsPDF). html2canvas cannot reproduce
+  `backdrop-filter`, conic gradients or some blend modes, so an aesthetic
+  that leans on them exports flatter than it looks on screen.
 - **Quick brand guide deck** — "Open brand guide" assembles a 6-page deck
   (cover, color palette with hex + contrast notes, color roles with use /
   never / coverage and key contrast pairs, type specimen, logo & style,
@@ -198,13 +208,14 @@ index.html
 css/styles.css           app chrome — the light workspace, the sidebar's
                          collapsible sections, and the live "preview-scope"
                          theme surface
-css/slides.css           the six-slide deck template (all `.sl-*` classes),
-                         sized in container-query units off .slide-card
+css/brand-deck.css       the brand deck: slide cards + neutral slide styles
+                         (`.ab-slide`, `.ab-deck-*`)
 js/data.js               font list, curated pairings, shape presets,
                          color-scheme recipes
 js/color.js              HSL/hex conversion, WCAG contrast math, palette generation
 js/rules.js              the recommendation/heuristics engine
-js/slide-mocks.js        renders the six slides + single/"Download all" PNG export
+js/brand-deck.js         the nine-slide brand deck (DECK_SLIDES), fit pass, PNG/PDF export,
+                         plus the shared slMix/slVisible/slFit/slRadius helpers
 js/persistence.js        session autosave/restore via localStorage
 js/undo-history.js       bounded undo stack for shuffle actions
 js/library-store.js      brand storage: native files or IndexedDB

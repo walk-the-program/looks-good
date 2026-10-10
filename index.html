@@ -8,7 +8,6 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="css/styles.css" />
-<link rel="stylesheet" href="css/slides.css" />
 <link rel="stylesheet" href="css/aesthetic-board.css" />
 <link rel="stylesheet" href="css/aesthetics/soft-form.css" />
 <link rel="stylesheet" href="css/aesthetics/raw-brutalist.css" />
@@ -36,6 +35,7 @@
 <link rel="stylesheet" href="css/aesthetics/mixed-type.css" />
 <link rel="stylesheet" href="css/aesthetics/ascii-art.css" />
 <link rel="stylesheet" href="css/aesthetics/rebus.css" />
+<link rel="stylesheet" href="css/brand-deck.css" />
 <link rel="stylesheet" href="css/color-picker.css" />
 </head>
 <body data-view="library">
@@ -376,58 +376,22 @@
       <div class="findings" id="findings"></div>
     </section>
 
-    <section class="slides">
+    <section class="slides deck" id="deckSection">
       <div class="section-head">
-        <h2>Slide mockups</h2>
-        <!-- Icon is a CSS ::before rather than an inline <svg>: slide-mocks.js
-             swaps this button's textContent while exporting, which would wipe
+        <div class="deck-title">
+          <h2>Brand deck</h2>
+          <p class="deck-desc" id="deckDesc">Nine guideline slides in the selected aesthetic language.</p>
+        </div>
+        <!-- Icon is a CSS ::before rather than an inline <svg>: brand-deck.js
+             swaps these buttons' textContent while exporting, which would wipe
              a real child element out of the DOM for good. -->
-        <button id="downloadAllSlides" class="btn btn-ghost btn-small btn-ico-download">Download all</button>
-      </div>
-      <div class="slide-grid">
-        <div class="slide-card">
-          <div class="slide-mock" id="slideTitle"></div>
-          <div class="slide-card-foot">
-            <span>01 · Cover</span>
-            <button class="btn btn-ghost btn-small" data-download-slide="slideTitle" data-name="cover-slide.png">Download PNG</button>
-          </div>
-        </div>
-        <div class="slide-card">
-          <div class="slide-mock" id="slideDivider"></div>
-          <div class="slide-card-foot">
-            <span>02 · What we do</span>
-            <button class="btn btn-ghost btn-small" data-download-slide="slideDivider" data-name="what-we-do-slide.png">Download PNG</button>
-          </div>
-        </div>
-        <div class="slide-card">
-          <div class="slide-mock" id="slideContent"></div>
-          <div class="slide-card-foot">
-            <span>03 · Results</span>
-            <button class="btn btn-ghost btn-small" data-download-slide="slideContent" data-name="results-slide.png">Download PNG</button>
-          </div>
-        </div>
-        <div class="slide-card">
-          <div class="slide-mock" id="slideChart"></div>
-          <div class="slide-card-foot">
-            <span>04 · Growth</span>
-            <button class="btn btn-ghost btn-small" data-download-slide="slideChart" data-name="growth-slide.png">Download PNG</button>
-          </div>
-        </div>
-        <div class="slide-card">
-          <div class="slide-mock" id="slideQuote"></div>
-          <div class="slide-card-foot">
-            <span>05 · Testimonial</span>
-            <button class="btn btn-ghost btn-small" data-download-slide="slideQuote" data-name="testimonial-slide.png">Download PNG</button>
-          </div>
-        </div>
-        <div class="slide-card">
-          <div class="slide-mock" id="slideClosing"></div>
-          <div class="slide-card-foot">
-            <span>06 · Closing</span>
-            <button class="btn btn-ghost btn-small" data-download-slide="slideClosing" data-name="closing-slide.png">Download PNG</button>
-          </div>
+        <div class="deck-actions">
+          <button id="downloadAllSlides" class="btn btn-ghost btn-small btn-ico-download">Download all</button>
+          <button id="downloadDeckPdf" class="btn btn-ghost btn-small btn-ico-download">Download PDF</button>
         </div>
       </div>
+      <!-- Slides are built by renderBrandDeck() (js/brand-deck.js) once this section is near the viewport. -->
+      <div class="slide-grid deck-grid" id="deckGrid"></div>
     </section>
   </main>
 
@@ -456,7 +420,7 @@
 <script src="js/data.js"></script>
 <script src="js/color.js"></script>
 <script src="js/rules.js"></script>
-<script src="js/slide-mocks.js"></script>
+<script src="js/brand-deck.js"></script>
 <script src="js/aesthetics/registry.js"></script>
 <script src="js/aesthetics/soft-form.js"></script>
 <script src="js/aesthetics/raw-brutalist.js"></script>

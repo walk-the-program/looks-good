@@ -395,6 +395,31 @@ switch toggles status text; the field is a real input. Compare tiles are `inert`
 - Compare all builds its tiles only while that view is open; the hidden view's DOM is emptied.
 - AI brief: Typography gets a `### Recommended type for <name>` subsection (`aibTypeRecommendation` in ai-brief.js).
 
+**Brand deck hooks (D1; spec in docs/brand-deck.md):**
+
+- `aesthetic-board.js` exposes `abBoardParts(state, def)`; `boardHtml` is `P.rootOpen() + P.head() + P.hero() + P.palette() + P.type() + sections + P.foot()`
+  and its output is byte-identical to before the refactor. Builders on `P`: `rootOpen(extraClass, extraAttrs)`, `head(pre, name)`, `art()`, `hero()`, `swatches()`, `palette()`, `type()`,
+  `card()` (01 card), `panel()` (02 field/toggle/states), `list()` (03 rows), `secUi() / secTouch() / secUse()`, `foot()`; data on `P`: `t` (tokens), `copy`, `roles`, `layout`, `labels`,
+  `brand`, `style`, `uid`.
+- `js/brand-deck.js` renders nine slides (`DECK_SLIDES`: cover, principles, color, typography, interface, material, product, dodont, closing). Each is `section.ab.ab-slide[data-ae][data-slide=key]`
+  at 1280x720 (`overflow: clip`), so every aesthetic's scoped css applies to the shared `.ab-*` classes inside it. Slide chrome: `.ab-in.ab-slide-in > .ab-head (Brand guidelines / <title>) +
+  .ab-rule + .ab-slide-body > one wrapper element + .ab-foot.ab-slide-foot (dot + aesthetic name, "n / 09")`.
+- An aesthetic may restyle any `.ab-deck-*` class with `.ab[data-ae="key"].ab-slide ...` (neutral defaults in css/brand-deck.css, which loads after the aesthetic css). Classes: `ab-deck-cover`,
+  `ab-deck-principles / -lead / -plist / -principle / -ptitle / -pline`, `ab-deck-color / -roles / -role / -lower / -ratio / -bar / -seg / -legend / -pairs / -pair / -pchip`,
+  `ab-deck-type / -faces / -face / -aa / -scalecol / -scale / -sample / -rec`, `ab-deck-sections`, `ab-deck-material / -stage / -matcol / -mats / -mat / -note`,
+  `ab-deck-app / -side / -nav / -screen / -screenbody`, `ab-deck-dodont / -col / -rules / -rule / -mark`, `ab-deck-closing / -closemain / -contact / -mail`. `--dk-r` (root var) is the container
+  radius taken from the shape preset; `--dk-fs` is a heading's base px.
+- Reused board classes inside slides: `.ab-hero / -hero-copy / -kicker / -headline / -hl / -art` (cover), `.ab-swatches` (color), `.ab-card / .ab-panel / .ab-list / .ab-row` (interface, product),
+  `.ab-label / .ab-n` (labels, numbers), `.ab-fit` (do / don't tags, type fit), `.ab-foot / .ab-dot / .ab-motto / .ab-infl` (slide footer).
+- Fit pass (`bdFitDeck`, runs after the build and again when webfonts load): cover / principles / closing shrink `--ab-hs` (every headline multiplies it) down to a floor, then any slide
+  whose body is still taller than its box is scaled with `transform: scale()` on its wrapper (floor 0.55). Aesthetics need no per-slide size rules. Headlines inside `.ab-deck-*` are forced
+  visible (Mixed Type / Rebus hide the real `.ab-headline`) and fall back to ink when the inherited colour would not read on the canvas (liquid glass white-on-scene).
+- Deferred: `render()` only marks the deck stale (`renderBrandDeck()`); slides are built when `#deckSection` is within 600px of the viewport, in idle time. Hover previews skip the deck.
+- Export (`rasterizeDeckSlide(key, scale)`): off-screen 1280x720 clone, html2canvas with an `onclone` pass that rewrites `color(srgb ...)` (what `color-mix()` computes to) to rgba and swaps
+  checkbox inputs for spans (html2canvas throws on both). `downloadDeckSlidePng`, `buildBrandDeckPdf(scale)` (jsPDF, landscape 1280x720 px pages, JPEG per slide).
+- Extension points: push `{ key, title, name?, foot?, pattern?, build(P, state, def, t) -> body HTML }` into `DECK_SLIDES` (or `registerDeckSlide(slide, afterKey)`); assign `deckPatternHook =
+  (P, slideKey) => HTML` to lay a background pattern behind slides flagged `pattern: true` (cover and closing). Both are no-ops until used.
+
 **Stubs:** the 7 unbuilt aesthetics have a js file (descriptors, placeholder SVG art, empty materials/rules) and an
 empty css file; their owners replace `art`, add `tokens`/`canvas` if needed, `materials`, `rules`, and fill the css.
 

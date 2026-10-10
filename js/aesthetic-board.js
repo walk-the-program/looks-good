@@ -6,7 +6,7 @@
    Aesthetic files (js/aesthetics/<key>.js) only contribute art, extra
    CSS variables and descriptors; their look lives in css/aesthetics/.
 
-   Depends on color.js / slide-mocks.js (slMix, slVisible) and app.js
+   Depends on color.js / brand-deck.js (slMix, slVisible) and app.js
    (state, effectiveContent, escapeHtml, chooseAesthetic, ...), all called at
    render time, so load order only needs this file before app.js.
    Plain <script>, no modules.
@@ -313,7 +313,12 @@ function abTypeBlockHtml(state, def) {
 
 let abSeq = 0;
 
-function boardHtml(state, def) {
+/* The board is assembled from these parts so other surfaces (the brand deck,
+   js/brand-deck.js) render the same markup inside the same `.ab[data-ae]` root.
+   abBoardParts(state, def) resolves tokens, copy, layout and root attributes once
+   and returns builders; each builder returns an HTML string that starts at its own
+   tag. boardHtml below is the only place that arranges them as the board. */
+function abBoardParts(state, def) {
   const t = boardTokens(state, def);
   const copy = effectiveContent();
   const ctx = {
@@ -338,7 +343,30 @@ function boardHtml(state, def) {
   // Text colour that reads on each role's own fill (strips put labels inside the band).
   const onRole = { canvas: t.ink, ink: t.canvas, primary: t.onPrimary, secondary: t.onSecondary, accent: t.onAccent };
 
-  const swatches = AB_ROLE_ORDER.map(k => {
+  const P = { state, def, t, copy, ctx, roles, vars, style, uid, labels, brand, layout, hlKind, statesKind, onRole };
+
+  // The root element's opening tag. `extraClass` / `extraAttrs` let a surface
+  // add its own class (e.g. ab-slide) and data attributes; defaults add nothing.
+  P.rootOpen = (extraClass = '', extraAttrs = '') =>
+    `<section class="ab${extraClass ? ' ' + extraClass : ''}" data-ae="${def.key}" data-mode="${t.isDark ? 'dark' : 'light'}" data-accent-text="${t.accentLow ? 'low' : 'ok'}" data-hero="${layout.hero}" data-palette="${layout.palette}" data-sections="${layout.sections}" data-highlight="${hlKind}" data-states="${statesKind}" data-subcopy="${layout.subcopy ? 'on' : 'off'}" data-hcls="${e(state.headingFont.cls || '')}" data-bcls="${e(state.bodyFont.cls || '')}"${extraAttrs} style="${P.style}">`;
+
+  P.head = (pre = 'Design language / ', name = def.name) => `<header class="ab-head">
+      <div class="ab-brand">${brand}</div>
+      <span class="ab-tag"><span class="ab-tag-pre">${pre}</span><b>${e(name)}</b></span>
+    </header>`;
+
+  P.art = () => (def.art ? def.art(ctx) : '');
+
+  P.hero = () => `<section class="ab-hero">
+      <div class="ab-hero-copy">
+        <p class="ab-kicker">${e(def.kicker || def.descriptor)}</p>
+        <h2 class="ab-headline">${abHeadline(copy.tagline)}</h2>${layout.subcopy
+    ? `\n        <p class="ab-subcopy"><span class="ab-sub-lead">A design language for ${e(copy.brandName)}</span><span class="ab-sub-rest"> — type, color and material in one place.</span></p>` : ''}
+      </div>
+      <div class="ab-art" aria-hidden="true">${P.art()}</div>
+    </section>`;
+
+  P.swatches = () => AB_ROLE_ORDER.map(k => {
     const r = roles[k] || {};
     const hex = t[k];
     const cov = abCoverageNum(r.coverage);
@@ -349,6 +377,13 @@ function boardHtml(state, def) {
       <code class="ab-sw-hex">${hex.toUpperCase()}</code>
     </div>`;
   }).join('');
+
+  P.palette = () => `<section class="ab-palette" aria-label="Palette">
+      <div class="ab-labelrow"><span class="ab-label">The palette</span><span class="ab-label">${e(def.descriptor)}</span></div>
+      <div class="ab-swatches" data-kind="${layout.palette}">${P.swatches()}</div>
+    </section>`;
+
+  P.type = () => abTypeBlockHtml(state, def);
 
   const stage = AB_STAGES.Design;
   const segs = Object.keys(AB_STAGES).map((s, i) =>
@@ -377,53 +412,60 @@ function boardHtml(state, def) {
       <span class="ab-row-pct">${r[2]}%</span>
     </li>`).join('');
 
-  return `<section class="ab" data-ae="${def.key}" data-mode="${t.isDark ? 'dark' : 'light'}" data-accent-text="${t.accentLow ? 'low' : 'ok'}" data-hero="${layout.hero}" data-palette="${layout.palette}" data-sections="${layout.sections}" data-highlight="${hlKind}" data-states="${statesKind}" data-subcopy="${layout.subcopy ? 'on' : 'off'}" data-hcls="${e(state.headingFont.cls || '')}" data-bcls="${e(state.bodyFont.cls || '')}" style="${style}">
-  <div class="ab-in">
-    <header class="ab-head">
-      <div class="ab-brand">${brand}</div>
-      <span class="ab-tag"><span class="ab-tag-pre">Design language / </span><b>${e(def.name)}</b></span>
-    </header>
-    <div class="ab-rule"></div>
-    <section class="ab-hero">
-      <div class="ab-hero-copy">
-        <p class="ab-kicker">${e(def.kicker || def.descriptor)}</p>
-        <h2 class="ab-headline">${abHeadline(copy.tagline)}</h2>${layout.subcopy
-    ? `\n        <p class="ab-subcopy"><span class="ab-sub-lead">A design language for ${e(copy.brandName)}</span><span class="ab-sub-rest"> — type, color and material in one place.</span></p>` : ''}
-      </div>
-      <div class="ab-art" aria-hidden="true">${def.art ? def.art(ctx) : ''}</div>
-    </section>
-    <div class="ab-rule"></div>
-    <section class="ab-palette" aria-label="Palette">
-      <div class="ab-labelrow"><span class="ab-label">The palette</span><span class="ab-label">${e(def.descriptor)}</span></div>
-      <div class="ab-swatches" data-kind="${layout.palette}">${swatches}</div>
-    </section>
-    <div class="ab-rule"></div>
-    ${abTypeBlockHtml(state, def)}<div class="ab-sections">
-      <section class="ab-sec ab-sec-ui" aria-label="Interface">
-        <div class="ab-labelrow"><span class="ab-label"><i class="ab-n">01</i><span>Interface</span></span></div>
-        <div class="ab-card">
+  // 01 card: segmented control, title, body, primary CTA.
+  P.card = () => `<div class="ab-card">
           <div class="ab-seg" role="group" aria-label="Project stage">${segs}</div>
           <h3 class="ab-card-title" data-ab-title>${e(stage[0])}</h3>
           <p class="ab-card-body" data-ab-body>${e(stage[1])}</p>
           <button type="button" class="ab-cta"><span class="ab-cta-label">Save direction</span><span class="ab-cta-arrow" aria-hidden="true"></span></button>
-        </div>
-      </section>
-      <section class="ab-sec ab-sec-touch" aria-label="${e(labels.material)}">
-        <div class="ab-labelrow"><span class="ab-label"><i class="ab-n">02</i><span>${e(labels.material)}</span></span></div>
-        <div class="ab-panel">
+        </div>`;
+
+  // 02 panel: field, toggle, status line, the three states.
+  P.panel = () => `<div class="ab-panel">
           <label class="ab-fieldlabel" for="${uid}-f">Project name</label>
           <input class="ab-input" id="${uid}-f" type="text" value="Something good" maxlength="48" autocomplete="off" />
           <label class="ab-toggle" for="${uid}-t"><span>Focus mode</span><input class="ab-switch" id="${uid}-t" type="checkbox" checked /></label>
           <div class="ab-status" aria-live="polite">Focus mode on</div>
           <div class="ab-states" data-kind="${statesKind}">${states}</div>
-        </div>
-      </section>
-      <section class="ab-sec ab-sec-use" aria-label="In use">
+        </div>`;
+
+  // 03 list rows.
+  P.list = () => `<ul class="ab-list">${rows}</ul>`;
+
+  P.secUi = () => `<section class="ab-sec ab-sec-ui" aria-label="Interface">
+        <div class="ab-labelrow"><span class="ab-label"><i class="ab-n">01</i><span>Interface</span></span></div>
+        ${P.card()}
+      </section>`;
+  P.secTouch = () => `<section class="ab-sec ab-sec-touch" aria-label="${e(labels.material)}">
+        <div class="ab-labelrow"><span class="ab-label"><i class="ab-n">02</i><span>${e(labels.material)}</span></span></div>
+        ${P.panel()}
+      </section>`;
+  P.secUse = () => `<section class="ab-sec ab-sec-use" aria-label="In use">
         <div class="ab-labelrow"><span class="ab-label"><i class="ab-n">03</i><span>In use</span></span></div>
-        <ul class="ab-list">${rows}</ul>
-      </section>
+        ${P.list()}
+      </section>`;
+
+  P.foot = () => `<footer class="ab-foot"><span class="ab-motto"><i class="ab-dot" aria-hidden="true"></i>${e(def.motto)}</span><span class="ab-infl">${e(def.influences)}</span></footer>`;
+
+  return P;
+}
+
+function boardHtml(state, def) {
+  const P = abBoardParts(state, def);
+  return `${P.rootOpen()}
+  <div class="ab-in">
+    ${P.head()}
+    <div class="ab-rule"></div>
+    ${P.hero()}
+    <div class="ab-rule"></div>
+    ${P.palette()}
+    <div class="ab-rule"></div>
+    ${P.type()}<div class="ab-sections">
+      ${P.secUi()}
+      ${P.secTouch()}
+      ${P.secUse()}
     </div>
-    <footer class="ab-foot"><span class="ab-motto"><i class="ab-dot" aria-hidden="true"></i>${e(def.motto)}</span><span class="ab-infl">${e(def.influences)}</span></footer>
+    ${P.foot()}
   </div>
 </section>`;
 }
