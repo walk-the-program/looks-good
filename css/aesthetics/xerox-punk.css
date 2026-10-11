@@ -1,5 +1,259 @@
 /* ---------------------------------------------------------------------
-   29 Xerox Punk — stub (P5 scaffold). Every selector in this file must be
-   scoped under .ab[data-ae="xerox-punk"]. The builder fills it in; see
-   js/aesthetics/xerox-punk.js and docs/aesthetics-round5.md.
+   29 Xerox Punk — ransom, pasted, defiant. Every selector is scoped under
+   .ab[data-ae="xerox-punk"]. A dark street wall (concrete grey in light mode) with
+   wheatpaste sheets on top: ransom-note letter tiles, torn paper, tape, a safety pin,
+   marker circles and cross-outs, censor bars, rubber stamps, ONE fluoro (the client
+   primary pushed to Day-Glo; tokens() overrides --ab-primary). Never a white page,
+   never a copier band, never one coherent column (that is Xerox). Vars from tokens():
+   --ab-fluoro, --xp-hot (fluoro on the wall, ink in light mode), --xp-stamp,
+   --ab-sheet / --ab-news / --ab-copy / --ab-wire (paper grounds), --ab-sheet-ink,
+   --ab-sheet-mute, --ab-tape(-edge). The SVG filters #xpn-torn and #xpn-copy are
+   defined by art() in js/aesthetics/xerox-punk.js. Hooks: hero 'centered' (the headline
+   lives in the art, the real h2 is visually hidden), highlight 'custom', states 'button'.
 ------------------------------------------------------------------------ */
+
+.ab[data-ae="xerox-punk"] {
+  border-radius: 0;
+  --xp-hand: "Marker Felt", "Bradley Hand", "Segoe Print", "Comic Sans MS", cursive;
+  --xp-type: var(--ab-font-b), "Courier New", monospace;
+  --xp-zig: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='10' viewBox='0 0 24 10'><polyline points='0,8 6,2 12,8 18,2 24,8' fill='none' stroke='%23E9E3D0' stroke-opacity='.5' stroke-width='1.5' stroke-linejoin='round'/></svg>");
+  --xp-grain: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><filter id='n' x='0' y='0' width='100%25' height='100%25'><feTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='2' seed='9' stitchTiles='stitch'/><feColorMatrix type='matrix' values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 .6 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+  --xp-circle-wall: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 60' preserveAspectRatio='none'><path d='M14 33C3 15 38 4 68 6c34 2 49 20 36 38C90 59 40 58 18 48 6 42 9 22 31 12' fill='none' stroke='%23E9E3D0' stroke-width='3' stroke-linecap='round' vector-effect='non-scaling-stroke'/><path d='M24 14C6 24 8 44 30 52c26 8 62 4 78-14 9-12-2-26-24-30' fill='none' stroke='%23E9E3D0' stroke-width='2.2' stroke-linecap='round' vector-effect='non-scaling-stroke'/></svg>");
+  --xp-circle: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 60' preserveAspectRatio='none'><path d='M14 33C3 15 38 4 68 6c34 2 49 20 36 38C90 59 40 58 18 48 6 42 9 22 31 12' fill='none' stroke='%23111' stroke-width='3' stroke-linecap='round' vector-effect='non-scaling-stroke'/><path d='M24 14C6 24 8 44 30 52c26 8 62 4 78-14 9-12-2-26-24-30' fill='none' stroke='%23111' stroke-width='2.2' stroke-linecap='round' vector-effect='non-scaling-stroke'/></svg>");
+}
+.ab[data-ae="xerox-punk"][data-mode="light"] {
+  --xp-circle-wall: var(--xp-circle);
+  --xp-zig: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='10' viewBox='0 0 24 10'><polyline points='0,8 6,2 12,8 18,2 24,8' fill='none' stroke='%23111' stroke-opacity='.55' stroke-width='1.5' stroke-linejoin='round'/></svg>");
+  --xp-grain: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><filter id='n' x='0' y='0' width='100%25' height='100%25'><feTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='2' seed='9' stitchTiles='stitch'/><feColorMatrix type='matrix' values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 .6 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+}
+/* wall grain, over everything but faint so text stays crisp */
+.ab[data-ae="xerox-punk"]::after { content: ""; position: absolute; inset: 0; z-index: 6; pointer-events: none; background: var(--xp-grain) 0 0 / 240px 240px; opacity: 0.05; }
+
+/* paper surfaces keep black type whatever the mode */
+.ab[data-ae="xerox-punk"] .ab-card, .ab[data-ae="xerox-punk"] .ab-panel, .ab[data-ae="xerox-punk"] .ab-list, .ab[data-ae="xerox-punk"] .ab-type-col, .ab[data-ae="xerox-punk"] .ab-subcopy {
+  --ab-ink: var(--ab-sheet-ink); --ab-muted: var(--ab-sheet-mute); --ab-line: rgba(0, 0, 0, 0.38); color: var(--ab-sheet-ink);
+}
+
+/* header: a pasted wordmark label, a fluoro initial, the tag as a rubber stamp */
+.ab[data-ae="xerox-punk"] .ab-brand { gap: 12px; }
+.ab[data-ae="xerox-punk"] .ab-wordmark {
+  padding: 2px 11px 1px; background: var(--ab-news); color: #111; text-transform: uppercase; font-weight: var(--ab-hw, 900); letter-spacing: 0.02em; transform: rotate(-1.6deg);
+  clip-path: polygon(0 4%, 100% 0, 99% 96%, 1% 100%); overflow: visible; text-overflow: clip;
+}
+.ab[data-ae="xerox-punk"] .ab-mark { width: 30px; height: 30px; border-radius: 0; background: var(--ab-fluoro); color: #0a0a0a; font-weight: var(--ab-hw, 900); transform: rotate(5deg); clip-path: polygon(0 6%, 96% 0, 100% 92%, 4% 100%); }
+.ab[data-ae="xerox-punk"] .ab-tag {
+  padding: 3px 9px; border: 2px solid var(--xp-stamp); color: var(--xp-stamp); font-size: 10px; font-weight: 700; letter-spacing: 0.14em; transform: rotate(-2.5deg);
+}
+.ab[data-ae="xerox-punk"] .ab-tag b { color: inherit; font-weight: 700; }
+.ab[data-ae="xerox-punk"] .ab-rule { height: 10px; background: var(--xp-zig) 0 50% / 24px 10px repeat-x; }
+
+.ab[data-ae="xerox-punk"] .ab-label { color: var(--ab-ink); font-size: 11.5px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; }
+.ab[data-ae="xerox-punk"] .ab-label:last-child:not(:first-child) { color: var(--ab-muted); font-weight: 400; }
+.ab[data-ae="xerox-punk"] .ab-n { display: inline-block; margin-right: 10px; padding: 0 7px; background: var(--ab-news); color: #111; transform: rotate(-3deg); letter-spacing: 0.04em; }
+.ab[data-ae="xerox-punk"] .ab-n::after { content: none; }
+
+/* hero: the ransom headline in the art; the kicker is a rubber stamp in the corner */
+.ab[data-ae="xerox-punk"][data-hero="centered"] .ab-hero { position: relative; gap: 14px; padding: clamp(40px, 6cqw, 66px) 0 clamp(26px, 4cqw, 40px); justify-items: stretch; }
+.ab[data-ae="xerox-punk"][data-hero="centered"] .ab-hero-copy { max-width: none; width: 100%; text-align: left; order: 2; }
+.ab[data-ae="xerox-punk"] .ab-kicker {
+  position: absolute; top: clamp(14px, 2.2cqw, 22px); left: 0; z-index: 3; margin: 0 !important; padding: 3px 11px; border: 2.5px solid var(--xp-stamp); color: var(--xp-stamp);
+  font-size: 12px; font-weight: 700; letter-spacing: 0.18em; transform: rotate(-3deg);
+}
+.ab[data-ae="xerox-punk"] .ab-headline { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; }
+.ab[data-ae="xerox-punk"] .ab-hl { color: inherit; background: none; padding: 0; margin: 0; }
+.ab[data-ae="xerox-punk"] .ab-subcopy {
+  display: inline-block; max-width: 34em; margin-top: 4px !important; padding: 11px 18px 12px; background: var(--ab-wire); font-family: var(--xp-type); font-size: clamp(13px, 1.5cqw, 15px); transform: rotate(-0.5deg);
+  clip-path: polygon(0 3%, 12% 0, 31% 4%, 55% 0, 78% 3%, 100% 0, 99% 100%, 70% 96%, 46% 100%, 22% 97%, 1% 100%);
+}
+.ab[data-ae="xerox-punk"] .ab-sub-lead { background: var(--ab-fluoro); padding: 1px 5px; margin: 0 -2px; font-weight: 700; color: #0a0a0a; }
+.ab[data-ae="xerox-punk"] .ab-sub-rest { color: var(--ab-sheet-mute); }
+
+/* art: the wall */
+.ab[data-ae="xerox-punk"] .ab-art { max-width: none; aspect-ratio: auto; justify-self: stretch; overflow: visible; }
+.ab[data-ae="xerox-punk"] .xpa { position: relative; display: grid; grid-template-columns: minmax(0, 1fr) 27%; gap: 0 3%; align-items: center; padding: 8px 0 12px; }
+.ab[data-ae="xerox-punk"] .xpa-wall { position: absolute; inset: -6% -2%; z-index: 0; pointer-events: none; }
+.ab[data-ae="xerox-punk"] .xpo { position: absolute; display: flex; flex-direction: column; gap: 9px; padding: 14px 12px; background: rgba(233, 227, 208, 0.07); clip-path: polygon(0 4%, 20% 0, 46% 3%, 71% 0, 100% 5%, 98% 52%, 100% 96%, 66% 100%, 38% 97%, 9% 100%, 2% 58%); }
+.ab[data-ae="xerox-punk"][data-mode="light"] .xpo { background: rgba(0, 0, 0, 0.06); }
+.ab[data-ae="xerox-punk"] .xpo b { display: block; height: 7px; background: rgba(233, 227, 208, 0.1); }
+.ab[data-ae="xerox-punk"][data-mode="light"] .xpo b { background: rgba(0, 0, 0, 0.1); }
+.ab[data-ae="xerox-punk"] .xpa-main { position: relative; z-index: 2; min-width: 0; }
+.ab[data-ae="xerox-punk"] .xpa-hl {
+  display: flex; flex-direction: column; align-items: flex-start; gap: 0.16em; line-height: 1;
+  font-size: calc(clamp(34px, 8.8cqw, 86px) * var(--ab-hl-scale, 1) * var(--ab-hs, 1) * var(--ab-display, 1));
+}
+.ab[data-ae="xerox-punk"] .xpl { display: flex; flex-wrap: nowrap; align-items: center; gap: 0.3em; }
+.ab[data-ae="xerox-punk"] .xpl:nth-child(2) { margin-left: 0.5em; }
+.ab[data-ae="xerox-punk"] .xpl:nth-child(3) { margin-left: 0.15em; }
+.ab[data-ae="xerox-punk"] .xpw { position: relative; display: inline-flex; align-items: center; gap: 0.05em; white-space: nowrap; filter: drop-shadow(1px 2px 0 rgba(0, 0, 0, 0.6)); }
+.ab[data-ae="xerox-punk"] .xpt {
+  display: inline-flex; align-items: center; justify-content: center; min-width: 0.6em; padding: 0.08em 0.14em 0.05em; font-style: normal; line-height: 1; text-transform: none; letter-spacing: 0;
+  transform: translateY(var(--dy, 0)) rotate(var(--r, 0deg)); box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.18);
+}
+.ab[data-ae="xerox-punk"] .xpt[data-g="news"] { background: #E9E3D0; color: #111; }
+.ab[data-ae="xerox-punk"] .xpt[data-g="paper"] { background: #F6F3EA; color: #111; }
+.ab[data-ae="xerox-punk"] .xpt[data-g="ink"] { background: #0B0B0B; color: #E9E3D0; box-shadow: inset 0 0 0 1px rgba(233, 227, 208, 0.3); }
+.ab[data-ae="xerox-punk"] .xpt[data-g="grey"] { background: #B9B6AB; color: #111; }
+.ab[data-ae="xerox-punk"] .xpt[data-g="hot"] { background: var(--ab-fluoro); color: #0a0a0a; text-shadow: 2px 2px 0 rgba(0, 0, 0, 0.3); }
+.ab[data-ae="xerox-punk"] .xpt[data-g="acc"] { background: var(--ab-accent); color: var(--ab-on-accent); }
+.ab[data-ae="xerox-punk"] .xpc { position: absolute; inset: -14% -7% -10% -7%; width: calc(100% + 14%); height: 124%; overflow: visible; color: var(--xp-hot); pointer-events: none; z-index: 2; filter: drop-shadow(1px 1px 0 rgba(0, 0, 0, 0.5)); }
+/* the fluoro strip: a marker-lettered scrap under the headline */
+.ab[data-ae="xerox-punk"] .xpa-strip { display: inline-block; margin: 1.1em 0 0 4%; padding: 6px 16px 7px; background: var(--ab-fluoro); color: #0a0a0a; transform: rotate(-1.4deg); clip-path: polygon(0 8%, 14% 0, 40% 6%, 66% 0, 100% 5%, 98% 100%, 62% 94%, 31% 100%, 2% 95%); }
+.ab[data-ae="xerox-punk"] .xpa-strip span { font: 700 clamp(11px, 1.4cqw, 13px)/1.2 var(--xp-type); letter-spacing: 0.14em; text-transform: uppercase; }
+/* the photocopied scrap: grey ground, the brand initial, a censor bar, tape, pin, caption */
+.ab[data-ae="xerox-punk"] .xpa-photo { position: relative; z-index: 1; margin-left: -9%; transform: rotate(3deg); }
+.ab[data-ae="xerox-punk"] .xpa-img { position: relative; aspect-ratio: 4 / 4.6; overflow: hidden; background: #B9B6AB; clip-path: polygon(0 2%, 24% 0, 52% 3%, 100% 0, 98% 48%, 100% 100%, 62% 97%, 30% 100%, 0 98%, 2% 50%); box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.3); }
+.ab[data-ae="xerox-punk"] .xpa-img b { position: absolute; inset: 0; display: grid; place-items: center; font: var(--ab-hw, 900) 18cqw/1 var(--ab-font-h); color: #111; filter: url(#xpn-copy); transform: translateY(15%); }
+.ab[data-ae="xerox-punk"] .xpa-bar { position: absolute; left: -6%; right: -6%; top: 21%; height: 14%; background: #000; transform: rotate(-1.5deg); }
+.ab[data-ae="xerox-punk"] .xpa-tape { position: absolute; z-index: 3; top: -10px; left: 50%; width: 60px; height: 19px; margin-left: -30px; background: var(--ab-tape); box-shadow: inset 0 0 0 1px var(--ab-tape-edge); transform: rotate(-9deg); }
+.ab[data-ae="xerox-punk"] .xpp { position: absolute; z-index: 3; right: -12px; bottom: 36px; transform: rotate(-26deg); filter: drop-shadow(1px 2px 0 rgba(0, 0, 0, 0.55)); }
+.ab[data-ae="xerox-punk"] .xpa-cap { margin-top: 9px !important; font: 15px/1.1 var(--xp-hand); color: var(--ab-ink); transform: rotate(-2.4deg); }
+@container (max-width: 560px) {
+  .ab[data-ae="xerox-punk"] .xpa { grid-template-columns: minmax(0, 1fr); gap: 18px 0; }
+  .ab[data-ae="xerox-punk"] .xpa-hl { font-size: calc(clamp(30px, 11cqw, 52px) * var(--ab-hl-scale, 1) * var(--ab-hs, 1) * var(--ab-display, 1)); }
+  .ab[data-ae="xerox-punk"] .xpa-photo { width: 52%; margin: -4px 0 0 auto; }
+  .ab[data-ae="xerox-punk"] .xpa-img b { font-size: 27cqw; }
+  .ab[data-ae="xerox-punk"] .xpa-strip { margin-left: 0; }
+}
+
+/* palette: torn scraps held by tape */
+.ab[data-ae="xerox-punk"] .ab-swatch { position: relative; }
+.ab[data-ae="xerox-punk"] .ab-swatch::before { content: ""; position: absolute; z-index: 2; top: -7px; left: 24%; width: 38px; height: 14px; background: var(--ab-tape); box-shadow: inset 0 0 0 1px var(--ab-tape-edge); transform: rotate(-12deg); }
+.ab[data-ae="xerox-punk"] .ab-swatch:nth-child(even)::before { left: auto; right: 14%; transform: rotate(9deg); }
+.ab[data-ae="xerox-punk"] .ab-chip::after { content: ""; position: absolute; inset: 0; border: 2px solid rgba(233, 227, 208, 0.38); pointer-events: none; }
+.ab[data-ae="xerox-punk"][data-mode="light"] .ab-chip::after { border-color: rgba(0, 0, 0, 0.4); }
+.ab[data-ae="xerox-punk"] .ab-chip { position: relative; margin-bottom: 14px; border-radius: 0; box-shadow: 0 0 0 1px rgba(128, 128, 128, 0.35); clip-path: polygon(0 4%, 22% 0, 55% 5%, 100% 0, 98% 52%, 100% 100%, 60% 95%, 28% 100%, 0 96%, 2% 50%); transform: rotate(-1.2deg); }
+.ab[data-ae="xerox-punk"] .ab-swatch:nth-child(2) .ab-chip { transform: rotate(1deg); clip-path: polygon(2% 0, 40% 4%, 74% 0, 100% 3%, 97% 48%, 100% 97%, 66% 100%, 36% 94%, 0 100%, 1% 46%); }
+.ab[data-ae="xerox-punk"] .ab-swatch:nth-child(3) .ab-chip { transform: rotate(-0.6deg); }
+.ab[data-ae="xerox-punk"] .ab-swatch:nth-child(4) .ab-chip { transform: rotate(1.3deg); clip-path: polygon(0 2%, 34% 5%, 68% 0, 100% 4%, 99% 54%, 100% 98%, 52% 94%, 20% 100%, 2% 95%, 0 52%); }
+.ab[data-ae="xerox-punk"] .ab-swatch:nth-child(5) .ab-chip { transform: rotate(-1.5deg); }
+.ab[data-ae="xerox-punk"] .ab-sw-role { font-size: 12px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; }
+.ab[data-ae="xerox-punk"] .ab-sw-hex { color: var(--ab-ink); }
+
+/* type recommendations: three pasted specimen scraps */
+.ab[data-ae="xerox-punk"] .ab-type-grid { gap: 12px; }
+.ab[data-ae="xerox-punk"] .ab-type-col { padding: 20px 20px 18px; border-top: 0; background: var(--ab-copy); clip-path: polygon(0 3%, 18% 0, 46% 3%, 78% 0, 100% 3%, 99% 52%, 100% 97%, 70% 100%, 38% 97%, 8% 100%, 1% 54%); transform: rotate(-0.6deg); }
+.ab[data-ae="xerox-punk"] .ab-type-col:nth-child(2) { background: var(--ab-news); transform: rotate(0.7deg); }
+.ab[data-ae="xerox-punk"] .ab-type-col:nth-child(3) { background: var(--ab-wire); transform: rotate(-0.3deg); }
+.ab[data-ae="xerox-punk"] .ab-type-role { font-weight: 700; letter-spacing: 0.16em; color: var(--ab-ink); }
+.ab[data-ae="xerox-punk"] .ab-fit { padding: 1px 9px; border: 2px solid #111; border-radius: 999px / 70%; background: none; color: #111; font-weight: 700; font-size: 10.5px; letter-spacing: 0.1em; text-transform: uppercase; transform: rotate(-3deg); }
+.ab[data-ae="xerox-punk"] .ab-fit[data-fit="match"] { background: none; border-color: #111; color: #111; }
+.ab[data-ae="xerox-punk"] .ab-fit[data-fit="consider"] { border-style: dashed; }
+.ab[data-ae="xerox-punk"] .ab-fit[data-fit="avoid"] { background: none; border-radius: 0; border-color: #111; text-decoration: line-through; text-decoration-thickness: 2px; }
+.ab[data-ae="xerox-punk"] .ab-type-k { color: var(--ab-ink); font-weight: 700; letter-spacing: 0.16em; }
+.ab[data-ae="xerox-punk"] .ab-type-avoid { text-decoration: line-through; text-decoration-thickness: 2px; text-decoration-color: rgba(128, 128, 128, 0.7); }
+.ab[data-ae="xerox-punk"] .ab-type-k { display: inline-block; text-decoration: none; }
+.ab[data-ae="xerox-punk"] .ab-type-apply { border: 2px solid #111; border-radius: 0; background: var(--ab-news); color: #111; box-shadow: 3px 3px 0 var(--ab-fluoro); font-family: var(--xp-type); font-weight: 700; font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; transform: rotate(0.6deg); }
+.ab[data-ae="xerox-punk"] .ab-type-apply:hover { background: var(--ab-fluoro); }
+
+/* 01 / 02: wheatpaste sheets, a torn edge, a hard shadow, a pin or tape */
+.ab[data-ae="xerox-punk"] .ab-card, .ab[data-ae="xerox-punk"] .ab-panel { position: relative; isolation: isolate; padding: clamp(22px, 3cqw, 30px) clamp(18px, 2.8cqw, 26px) clamp(22px, 3cqw, 30px); border: 0; border-radius: 0; background: none; }
+.ab[data-ae="xerox-punk"] .ab-card { transform: rotate(-0.6deg); }
+.ab[data-ae="xerox-punk"] .ab-panel { transform: rotate(0.5deg); }
+.ab[data-ae="xerox-punk"] .ab-card::after, .ab[data-ae="xerox-punk"] .ab-panel::after { content: ""; position: absolute; inset: -4px; z-index: -1; background: var(--ab-sheet); filter: url(#xpn-torn) drop-shadow(3px 4px 0 rgba(0, 0, 0, 0.65)); }
+.ab[data-ae="xerox-punk"] .ab-panel::after { background: var(--ab-copy); }
+.ab[data-ae="xerox-punk"] .ab-card::before, .ab[data-ae="xerox-punk"] .ab-panel::before { content: ""; position: absolute; z-index: 3; top: -9px; width: 58px; height: 19px; pointer-events: none; background: var(--ab-tape); box-shadow: inset 0 0 0 1px var(--ab-tape-edge); }
+.ab[data-ae="xerox-punk"] .ab-card::before { left: -14px; transform: rotate(-34deg); }
+.ab[data-ae="xerox-punk"] .ab-panel::before { right: -14px; transform: rotate(32deg); }
+
+/* tabs: pasted labels of unequal width; the chosen one is circled in marker */
+.ab[data-ae="xerox-punk"] .ab-seg { gap: 12px; padding: 0 0 4px; border-radius: 0; background: none; }
+.ab[data-ae="xerox-punk"] .ab-seg-btn { position: relative; flex: 1 1 0; min-height: 36px; padding: 6px 4px; border-radius: 0; background: color-mix(in srgb, var(--ab-ink) 12%, transparent); color: var(--ab-ink); font-family: var(--xp-type); font-size: 12px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; }
+.ab[data-ae="xerox-punk"] .ab-seg-btn:nth-child(1) { flex-grow: 1.1; transform: rotate(-1deg); }
+.ab[data-ae="xerox-punk"] .ab-seg-btn:nth-child(2) { flex-grow: 0.8; transform: rotate(0.8deg); }
+.ab[data-ae="xerox-punk"] .ab-seg-btn:nth-child(3) { flex-grow: 1.4; transform: rotate(-0.4deg); }
+.ab[data-ae="xerox-punk"] .ab-seg-btn:hover { background: color-mix(in srgb, var(--ab-ink) 20%, transparent); }
+.ab[data-ae="xerox-punk"] .ab-seg-btn[aria-pressed="true"] { background: none; color: var(--ab-ink); font-weight: 700; }
+.ab[data-ae="xerox-punk"] .ab-seg-btn[aria-pressed="true"]::after { content: ""; position: absolute; inset: -7px -9px; background: var(--xp-circle) 0 0 / 100% 100% no-repeat; pointer-events: none; }
+.ab[data-ae="xerox-punk"] .ab-card-title { margin: 26px 0 8px !important; font-weight: var(--ab-hw, 900); text-transform: uppercase; letter-spacing: 0.01em; font-size: clamp(24px, 3.1cqw, 32px); line-height: 1; color: var(--ab-ink); }
+.ab[data-ae="xerox-punk"] .ab-card-body { color: var(--ab-ink); font-family: var(--xp-type); font-size: 13.5px; margin-bottom: 20px !important; }
+.ab[data-ae="xerox-punk"] .ab-card-body::after { content: "  ← this one."; font: 16px/1 var(--xp-hand); color: #111; display: inline-block; transform: rotate(-3deg); margin-left: 6px; }
+
+/* the main action: a paper tile with a hard border and offset shadow; the primary is the fluoro */
+.ab[data-ae="xerox-punk"] .ab-cta {
+  position: relative; width: calc(100% - 4px); margin: 0 4px 4px 0; padding: 13px 16px; border: 2px solid #111; border-radius: 0; background: var(--ab-fluoro); color: #0a0a0a; box-shadow: 4px 4px 0 #111;
+  font-family: var(--xp-type); font-weight: 700; font-size: 13px; letter-spacing: 0.14em; text-transform: uppercase; transition: transform 0.1s steps(2);
+}
+.ab[data-ae="xerox-punk"] .ab-cta-arrow::before { content: "→"; font-size: 18px; line-height: 1; }
+.ab[data-ae="xerox-punk"] .ab-cta:hover, .ab[data-ae="xerox-punk"] .ab-cta.is-hover { transform: rotate(1deg) translate(-1px, -1px); }
+.ab[data-ae="xerox-punk"] .ab-cta:active::after, .ab[data-ae="xerox-punk"] .ab-cta.is-pressed::after {
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(to top right, transparent calc(50% - 1.6px), #111 calc(50% - 1.6px) calc(50% + 1.6px), transparent calc(50% + 1.6px)), linear-gradient(to bottom right, transparent calc(50% - 1.6px), #111 calc(50% - 1.6px) calc(50% + 1.6px), transparent calc(50% + 1.6px));
+}
+/* states: pasted / circled / crossed out */
+.ab[data-ae="xerox-punk"] .ab-state-ctl { margin: 0 0 14px; padding: 10px 6px; font-size: 12px; box-shadow: 3px 3px 0 #111; transform: none !important; }
+.ab[data-ae="xerox-punk"] .ab-state-ctl[data-s="1"]::after { content: ""; position: absolute; inset: -9px -10px; background: var(--xp-circle) 0 0 / 100% 100% no-repeat; pointer-events: none; }
+.ab[data-ae="xerox-punk"] .ab-state-ctl[data-s="1"] { transform: rotate(1deg) !important; }
+.ab[data-ae="xerox-punk"] .ab-state-ctl[data-s="2"] { opacity: 0.95; }
+.ab[data-ae="xerox-punk"] .ab-state-ctl[data-s="2"] .ab-cta-label { text-decoration: line-through; text-decoration-thickness: 2px; }
+.ab[data-ae="xerox-punk"] .ab-state-ctl[data-s="2"]::after {
+  content: ""; position: absolute; inset: -5px -8px; pointer-events: none; background:
+    linear-gradient(to top right, transparent calc(50% - 1.8px), #111 calc(50% - 1.8px) calc(50% + 1.8px), transparent calc(50% + 1.8px)) 0 0 / 100% 100% no-repeat,
+    linear-gradient(to bottom right, transparent calc(50% - 1.4px), #111 calc(50% - 1.4px) calc(50% + 1.4px), transparent calc(50% + 1.4px)) 4% 12% / 82% 76% no-repeat;
+}
+.ab[data-ae="xerox-punk"] .ab-state { color: var(--ab-ink); font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; font-family: var(--xp-type); font-weight: 700; }
+
+/* 02 paste-up: a ruled typewriter line, a hand-drawn tick box */
+.ab[data-ae="xerox-punk"] .ab-fieldlabel { font: 16px/1 var(--xp-hand); text-transform: none; letter-spacing: 0; color: #111; transform: rotate(-1.5deg); transform-origin: 0 100%; }
+.ab[data-ae="xerox-punk"] .ab-input { border: 0; border-bottom: 3px solid #111; border-radius: 0; background: none; padding: 9px 4px; font-family: var(--xp-type); font-weight: 700; letter-spacing: 0.02em; }
+.ab[data-ae="xerox-punk"] .ab-input:focus { background: linear-gradient(transparent 52%, var(--ab-fluoro) 52% 92%, transparent 92%); }
+.ab[data-ae="xerox-punk"] .ab-toggle { font-family: var(--xp-type); font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; font-size: 12px; }
+.ab[data-ae="xerox-punk"] .ab-switch { width: 30px; height: 30px; border: 3px solid var(--ab-ink); border-radius: 0; background: none; transition: none; transform: rotate(-2deg); }
+.ab[data-ae="xerox-punk"] .ab-switch::before { left: 1px; top: 1px; width: 20px; height: 20px; border-radius: 0; transform: none; transition: none; opacity: 0; background: linear-gradient(45deg, transparent 40%, #111 40% 60%, transparent 60%), linear-gradient(-45deg, transparent 40%, #111 40% 60%, transparent 60%); }
+.ab[data-ae="xerox-punk"] .ab-switch:checked { background: var(--ab-fluoro); }
+.ab[data-ae="xerox-punk"] .ab-switch:checked::before { opacity: 1; transform: none; }
+.ab[data-ae="xerox-punk"] .ab-status { color: #111; font-family: var(--xp-type); font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; }
+.ab[data-ae="xerox-punk"] .ab-status::before { content: "▸ "; }
+.ab[data-ae="xerox-punk"] .ab-states { margin-top: 24px; gap: 14px; }
+
+/* 03 a pasted newsprint column: typed rows, stamped numbers, one row circled, one censored */
+.ab[data-ae="xerox-punk"] .ab-list { position: relative; padding: 18px 18px 8px; background: var(--ab-wire); transform: rotate(-0.35deg); clip-path: polygon(0 1.2%, 7% 0, 19% 1.8%, 38% 0, 61% 1.6%, 84% 0, 100% 1.4%, 99.4% 50%, 100% 98.6%, 78% 100%, 52% 98.2%, 27% 100%, 9% 98.4%, 0 100%, 0.6% 52%); counter-reset: xpr; }
+.ab[data-ae="xerox-punk"] .ab-row { grid-template-columns: 6ch minmax(0, 1fr) auto minmax(60px, 150px) 4.5ch; counter-increment: xpr; padding: 12px 2px; border-top: 1px solid rgba(0, 0, 0, 0.4); }
+.ab[data-ae="xerox-punk"] .ab-row:first-child { border-top: 0; }
+.ab[data-ae="xerox-punk"] .ab-row:last-child { border-bottom: 0; }
+.ab[data-ae="xerox-punk"] .ab-row-n { font-size: 0; }
+.ab[data-ae="xerox-punk"] .ab-row-n::before { content: "No." counter(xpr, decimal-leading-zero); font: 700 11px/1 var(--xp-type); letter-spacing: 0.06em; color: #111; }
+.ab[data-ae="xerox-punk"] .ab-row-name { position: relative; overflow: visible; justify-self: start; font-family: var(--ab-font-h); font-weight: var(--ab-hw, 900); font-size: 17px; letter-spacing: 0.02em; text-transform: uppercase; }
+.ab[data-ae="xerox-punk"] .ab-row:nth-child(2) .ab-row-name::after { content: ""; position: absolute; inset: -9px -10px -7px -8px; background: var(--xp-circle) 0 0 / 100% 100% no-repeat; pointer-events: none; }
+.ab[data-ae="xerox-punk"] .ab-row-status { padding: 2px 9px; border-radius: 0; background: #111; color: #E9E3D0; font-family: var(--xp-type); font-size: 10px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; transform: rotate(-1.5deg); }
+.ab[data-ae="xerox-punk"] .ab-row:nth-child(3) .ab-row-status { color: transparent; background: #000; }
+.ab[data-ae="xerox-punk"] .ab-row-bar { height: 12px; border-radius: 0; background: repeating-linear-gradient(90deg, rgba(0, 0, 0, 0.3) 0 2px, transparent 2px 7px); overflow: visible; }
+.ab[data-ae="xerox-punk"] .ab-row-bar i { height: 12px; background: var(--ab-fluoro); clip-path: polygon(0 18%, 3% 0, 97% 14%, 100% 0, 99% 100%, 55% 86%, 0 100%); }
+.ab[data-ae="xerox-punk"] .ab-row-pct { font-family: var(--xp-type); font-weight: 700; color: #111; }
+
+/* footer: zine credits and a DIY stamp */
+.ab[data-ae="xerox-punk"] .ab-foot { border-top: 0; padding-top: 18px; color: var(--ab-ink); font-size: 11.5px; letter-spacing: 0.04em; }
+.ab[data-ae="xerox-punk"] .ab-foot::before { content: ""; flex: 1 1 100%; height: 10px; margin-bottom: 6px; background: var(--xp-zig) 0 50% / 24px 10px repeat-x; }
+.ab[data-ae="xerox-punk"] .ab-motto { font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; }
+.ab[data-ae="xerox-punk"] .ab-foot .ab-infl { color: var(--ab-muted); }
+.ab[data-ae="xerox-punk"] .ab-dot { border-radius: 0; width: 9px; height: 9px; background: var(--xp-hot); box-shadow: 0 0 0 2px #111; }
+.ab[data-ae="xerox-punk"]:not(.ab-slide) .ab-foot::after { content: "Do it yourself"; order: 3; margin-left: auto; padding: 2px 10px; border: 2px solid var(--xp-stamp); color: var(--xp-stamp); font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; transform: rotate(-3deg); }
+
+.ab[data-ae="xerox-punk"] .ab-seg-btn:focus-visible, .ab[data-ae="xerox-punk"] .ab-cta:focus-visible, .ab[data-ae="xerox-punk"] .ab-switch:focus-visible, .ab[data-ae="xerox-punk"] .ab-type-apply:focus-visible { outline: 3px solid var(--xp-hot); outline-offset: 4px; }
+
+@container ab (max-width: 600px) {
+  .ab[data-ae="xerox-punk"][data-hero="centered"] .ab-hero { padding: 44px 0 24px; }
+  .ab[data-ae="xerox-punk"] .ab-row { grid-template-columns: 6ch minmax(0, 1fr) 4.5ch; }
+  .ab[data-ae="xerox-punk"] .ab-row-n { grid-row: 1 / span 2; align-self: start; }
+  .ab[data-ae="xerox-punk"] .ab-tag { font-size: 9px; padding: 3px 6px; letter-spacing: 0.06em; }
+  .ab[data-ae="xerox-punk"] .ab-foot::after { margin-left: 0; }
+  .ab[data-ae="xerox-punk"] .ab-states { gap: 10px; }
+  .ab[data-ae="xerox-punk"] .ab-chip { margin-bottom: 0; }
+  .ab[data-ae="xerox-punk"] .ab-swatch::before, .ab[data-ae="xerox-punk"] .ab-swatch:nth-child(even)::before { left: 14px; right: auto; top: -5px; }
+  .ab[data-ae="xerox-punk"] .ab-state-ctl { font-size: 11px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ab[data-ae="xerox-punk"] .ab-cta { transition: none; }
+}
+
+/* deck: headlines are one cut label (cream scrap, black type, the highlight word on the fluoro) */
+.ab[data-ae="xerox-punk"].ab-slide[data-slide] .ab-headline.ab-deck-h {
+  display: block; width: fit-content; padding: 0.1em 0.3em 0.14em; background: var(--ab-news); color: #111; text-transform: uppercase; font-weight: var(--ab-hw, 900); letter-spacing: 0.01em; line-height: 1.02;
+  transform: rotate(-1.2deg); box-shadow: 5px 6px 0 rgba(0, 0, 0, 0.65); clip-path: none;
+}
+.ab[data-ae="xerox-punk"].ab-slide .ab-headline.ab-deck-h .ab-hl { background: var(--ab-fluoro); color: #0a0a0a; padding: 0 0.12em; margin: 0 -0.04em; }
+.ab[data-ae="xerox-punk"].ab-slide[data-slide="cover"] .xpa-hl { font-size: calc(clamp(34px, 8.8cqw, 96px) * var(--ab-hl-scale, 1) * var(--ab-hs, 1) * var(--ab-display, 1)); }
+
+/* on the bare wall (deck cells) the marker is bone, not black */
+.ab[data-ae="xerox-punk"] .ab-deck-cell .ab-seg-btn[aria-pressed="true"]::after, .ab[data-ae="xerox-punk"] .ab-deck-uistates .ab-state-ctl[data-s="1"]::after { background-image: var(--xp-circle-wall); }
+.ab[data-ae="xerox-punk"].ab-slide[data-slide] .ab-headline.ab-deck-h { color: #111 !important; }
+.ab[data-ae="xerox-punk"].ab-slide .ab-headline.ab-deck-h .ab-hl { color: #0a0a0a !important; }
