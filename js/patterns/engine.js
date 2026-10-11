@@ -713,4 +713,163 @@
 
   E.sel = (arr) => arr.map(a => (typeof a === 'string' ? { value: a, label: a.charAt(0).toUpperCase() + a.slice(1) } : a));
 
+  /* ------------------------------ round 2 helpers (PF2) ------------------------------ */
+  // Additive helpers for the organic2 / glitch2 / collage2 families. Namespace: E.r2.
+  const r2 = E.r2 = {};
+  // "#rrggbb" -> packed little-endian RGBA uint32 (for Uint32Array views over ImageData).
+  r2.pack = function (hex) { const c = rgb(hex); return (255 << 24) | (c[2] << 16) | (c[1] << 8) | c[0]; };
+  // Interpolated colour table: n packed entries across the hex stops.
+  r2.lut = function (stops, n) {
+    const out = new Uint32Array(n);
+    for (let i = 0; i < n; i++) {
+      const t = n > 1 ? i / (n - 1) : 0, f = t * (stops.length - 1), k = Math.min(stops.length - 2, Math.floor(f));
+      out[i] = stops.length < 2 ? r2.pack(stops[0]) : r2.pack(mix(stops[k + 1], stops[k], clamp(f - k, 0, 1)));
+    }
+    return out;
+  };
+  // Internal-resolution pixel buffer: at most maxPx pixels covering W x H. put() blits it
+  // (smooth=false keeps hard pixels, true gives anti-aliased upscaling).
+  r2.buf = function (W, H, maxPx) {
+    const sc = Math.max(1, Math.sqrt(W * H / maxPx));
+    const lw = Math.max(1, Math.ceil(W / sc)), lh = Math.max(1, Math.ceil(H / sc));
+    const cv = global.document.createElement('canvas'); cv.width = lw; cv.height = lh;
+    const c = cv.getContext('2d');
+    const id = c.createImageData(lw, lh);
+    return {
+      lw, lh, sc, cv, c, id, d32: new Uint32Array(id.data.buffer),
+      put(g, smooth) {
+        c.putImageData(id, 0, 0);
+        const ctx = g.ctx; ctx.save(); ctx.imageSmoothingEnabled = !!smooth; ctx.imageSmoothingQuality = 'high';
+        ctx.drawImage(cv, 0, 0, lw, lh, 0, 0, lw * sc, lh * sc); ctx.restore();
+      },
+    };
+  };
+  // Scalar field sampled on a coarse lattice (step px) and read back bilinearly,
+  // so hard-posterised contours stay smooth at full resolution.
+  r2.grid = function (W, H, step, fn) {
+    const gw = Math.ceil(W / step) + 2, gh = Math.ceil(H / step) + 2, d = new Float32Array(gw * gh);
+    for (let j = 0; j < gh; j++) for (let i = 0; i < gw; i++) d[j * gw + i] = fn(i * step, j * step);
+    return {
+      d, gw, gh, step,
+      at(x, y) {
+        const fx = x / step, fy = y / step;
+        let i = fx | 0, j = fy | 0; if (i > gw - 2) i = gw - 2; if (j > gh - 2) j = gh - 2; if (i < 0) i = 0; if (j < 0) j = 0;
+        const tx = fx - i, ty = fy - j, k = j * gw + i;
+        const a = d[k], b = d[k + 1], c = d[k + gw], e = d[k + gw + 1];
+        return a + (b - a) * tx + (c - a) * ty + (a - b - c + e) * tx * ty;
+      },
+    };
+  };
+  // Ragged blob outline: radius r perturbed by noise, `n` points, returns flat [x,y,...].
+  r2.blob = function (noise, cx, cy, rx, ry, rough, n, seedOff) {
+    const pts = [];
+    for (let i = 0; i < n; i++) {
+      const a = i / n * 6.283185307179586, ca = Math.cos(a), sa = Math.sin(a);
+      const k = 1 + rough * (noise.fbm(ca * 1.1 + seedOff, sa * 1.1 + seedOff * 0.7, 3) * 0.8 + noise.n2(ca * 4 + seedOff, sa * 4) * 0.22);
+      pts.push(cx + ca * rx * k, cy + sa * ry * k);
+    }
+    return pts;
+  };
+  // Snap an outline to a grid of `cell` px, inserting corners so edges become stairs.
+  r2.stair = function (pts, cell) {
+    const out = []; let px = null, py = null;
+    for (let i = 0; i < pts.length; i += 2) {
+      const x = Math.round(pts[i] / cell) * cell, y = Math.round(pts[i + 1] / cell) * cell;
+      if (px === null) { out.push(x, y); }
+      else if (x !== px || y !== py) { if (x !== px && y !== py) out.push(x, py); out.push(x, y); }
+      px = x; py = y;
+    }
+    return out;
+  };
+  // x positions where the horizontal line y crosses polygon pts (even-odd), sorted.
+  r2.spans = function (pts, y) {
+    const xs = [], n = pts.length / 2;
+    for (let i = 0; i < n; i++) {
+      const j = (i + 1) % n, ay = pts[i * 2 + 1], by = pts[j * 2 + 1];
+      if ((ay <= y && by > y) || (by <= y && ay > y)) xs.push(pts[i * 2] + (y - ay) / (by - ay) * (pts[j * 2] - pts[i * 2]));
+    }
+    return xs.sort((a, b) => a - b);
+  };
+  E.r2.pointInPoly = function (pts, x, y) {
+    let c = false; const n = pts.length / 2;
+    for (let i = 0, j = n - 1; i < n; j = i++) {
+      const xi = pts[i * 2], yi = pts[i * 2 + 1], xj = pts[j * 2], yj = pts[j * 2 + 1];
+      if ((yi > y) !== (yj > y) && x < (xj - xi) * (y - yi) / (yj - yi) + xi) c = !c;
+    }
+    return c;
+  };
+
+  /* ------------------------------ round 2 helpers (PF1) ------------------------------ */
+  // Additive only. Namespace E.pf1, used by families/print2.js, op2.js and pixel2.js.
+  E.pf1 = {
+    // Ink ladder starting at the ground and moving away from it in luminance
+    // (ground first, the most contrasting ink last).
+    ladder(inks) {
+      const others = [inks.ink2, inks.ink1, inks.deep].concat(inks.tints ? [inks.t1, inks.t2] : []);
+      others.sort((a, b) => Math.abs(lum(a) - lum(inks.ground)) - Math.abs(lum(b) - lum(inks.ground)));
+      const out = [inks.ground];
+      others.forEach(c => { if (out.indexOf(c) < 0) out.push(c); });
+      return out;
+    },
+    // n colours stepped along `list` (nearest stop; no mixing, so inks stay pure).
+    bands(list, n) {
+      const m = list.length, out = [];
+      if (n <= 1) return [list[0]];
+      for (let i = 0; i < n; i++) {
+        const pos = i / (n - 1) * (m - 1), a = Math.floor(pos), f = pos - a;
+        if (a >= m - 1) out.push(list[m - 1]);
+        else out.push(f < 0.5 ? list[a] : list[a + 1]);
+      }
+      return out;
+    },
+    darkest(list) { return list.reduce((a, b) => (lum(b) < lum(a) ? b : a)); },
+    lightest(list) { return list.reduce((a, b) => (lum(b) > lum(a) ? b : a)); },
+    // Bilinear sampler of fn(x,y) cached on a coarse grid (step px): cheap smooth fields.
+    sampler(fn, W, H, step) {
+      const gw = Math.ceil(W / step) + 2, gh = Math.ceil(H / step) + 2, a = new Float32Array(gw * gh);
+      for (let j = 0; j < gh; j++) for (let i = 0; i < gw; i++) a[j * gw + i] = fn(i * step, j * step);
+      return (x, y) => {
+        let fx = x / step, fy = y / step;
+        fx = fx < 0 ? 0 : fx > gw - 1.001 ? gw - 1.001 : fx; fy = fy < 0 ? 0 : fy > gh - 1.001 ? gh - 1.001 : fy;
+        const i = fx | 0, j = fy | 0, tx = fx - i, ty = fy - j, k = j * gw + i;
+        return (a[k] * (1 - tx) + a[k + 1] * tx) * (1 - ty) + (a[k + gw] * (1 - tx) + a[k + gw + 1] * tx) * ty;
+      };
+    },
+    // Draw a cell grid (colour index per cell, <0 = skip) as horizontal runs of
+    // pixel-snapped rects, so neighbours never leave hairline seams.
+    cells(g, idx, nx, ny, x0, y0, cw, ch, palette) {
+      const ov = g.svg ? 1.5 : 0;      // SVG only: overlap neighbours so scaled exports show no hairlines
+      for (let j = 0; j < ny; j++) {
+        const ya = Math.round(y0 + j * ch), yb = Math.round(y0 + (j + 1) * ch);
+        let i = 0;
+        while (i < nx) {
+          const c = idx[j * nx + i];
+          if (c < 0) { i++; continue; }
+          let e = i + 1;
+          while (e < nx && idx[j * nx + e] === c) e++;
+          const xa = Math.round(x0 + i * cw), xb = Math.round(x0 + e * cw);
+          g.rect(xa, ya, xb - xa + ov, yb - ya + ov, palette[c]);
+          i = e;
+        }
+      }
+    },
+    // 3x5 pixel glyphs for tick labels (abstract coordinates, not words).
+    GLYPH: {
+      '0': '111101101101111', '1': '010110010010111', '2': '111001111100111', '3': '111001111001111',
+      '4': '101101111001001', '5': '111100111001111', '6': '111100111101111', '7': '111001010010010',
+      '8': '111101111101111', '9': '111101111001111', 'A': '111101111101101', 'B': '110101110101110',
+      'C': '111100100100111', 'D': '110101101101110', 'E': '111100111100111', 'F': '111100111100100',
+      'N': '101111111111101', 'X': '101101010101101', 'Y': '101101010010010', '-': '000000111000000',
+    },
+    // Draw a string of glyphs at pixel size s; returns its width.
+    text(g, str, x, y, s, col) {
+      const G = E.pf1.GLYPH;
+      for (let k = 0; k < str.length; k++) {
+        const bits = G[str[k]];
+        if (bits) for (let r = 0; r < 5; r++) for (let c = 0; c < 3; c++) if (bits[r * 3 + c] === '1') g.rect(x + (k * 4 + c) * s, y + r * s, s, s, col);
+      }
+      return str.length * 4 * s - s;
+    },
+  };
+
 })(window);
