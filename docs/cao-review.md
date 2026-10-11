@@ -1259,3 +1259,322 @@ deck" impression.
 - Opposite-mode and green-palette decks.
 - The remaining 16 decks beyond the cover thumbnails in the suite sheet.
 - Pinned-pattern behavior in the deck.
+
+---
+
+## Round 5 (CAO-5) — ten new aesthetics, 27–36
+
+**Evidence:** the builders' renders from my rig.
+- Boards: `b5a/b5a-<key>-A..D.png` plus sheets (27–31), and `b5b/b5b-<key>-A..D.png` plus sheets
+  (32–36). I reviewed the full-res A for all ten and the B/C/D sheets.
+- Decks: `b5a/sheet-deck-<key>-rec.png` and `b5b/deck-b5b-<key>-rec.png`.
+
+I judged each board against `docs/aesthetics-round5.md` and the two research files. I did not
+re-render.
+
+**Verdict.** This is the best-researched round, and it shows. None of the ten is a reskin, and
+every one passes the distinctness pairs the coordinator named:
+- **Xerox Punk vs Xerox:** a dark collage wall, not a white copied page.
+- **Acid Graphics vs Y2K Chrome and Holo:** vibrating pairs and flyer information, with chrome
+  limited to one word.
+- **Industrial Hazard vs Industrial Device and Cyber HUD:** a heavy grey machine with no glow.
+- **Radical Memphis vs Neo-Brutal Pop and Groovy:** no outlines, laminates, primitives on a
+  diagonal.
+- **Dystopian Luxury vs Editorial and Aurora:** severity by removal, not a serif magazine and not
+  glow.
+
+Industrial Hazard, Pirate Broadcast and Corporate Vandalism are among the strongest boards in the
+whole set of 36.
+
+**What remains falls into three groups:**
+- **Invented or misplaced color.** Radical Memphis uses a fixed bubblegum pink. Xerox Punk has
+  three hues where one fluoro is the rule. Biomechanical Gothic shows full-saturation glossy
+  palette eggs.
+- **Generic deck slides.** Color, Interface and Product slides ignore each aesthetic's own
+  vocabulary.
+- **Pattern suites that break their aesthetic's rule.** These are the three conflicts the builders
+  reported, plus Religious Futurism's bullseye targets and Cybersigilism's chevrons.
+
+**Counts:** Ship 3, Refine 7, Rework 0.
+
+| # | Aesthetic | Verdict | One line |
+|---|-----------|---------|----------|
+| 1 | Industrial Hazard | Ship | A real ISA-101 grey machine with the Z535 ladder on states and a convincing interlock panel. Only its deck pattern breaks the stripe rule. |
+| 2 | Pirate Broadcast | Ship | A teletext and test-card frame where every element has a job. The color-bar rules are over-used. |
+| 3 | Corporate Vandalism | Refine | A deadpan MSCHF shell that is genuinely funny. Quotation marks on every label turn the gag into a template. |
+| 4 | Acid Graphics | Ship | A flyer-as-UI with a vibrating pair over a hidden grid. One contrast bug. |
+| 5 | Religious Futurism | Refine | The Richter-window hero, arched mosaic swatches and halo states are superb. The deck cover is timid and its patterns are bullseye targets. |
+| 6 | Xerox Punk | Refine | The ransom headline and paste-up are excellent. Teal tape and yellow labels break "exactly one fluoro". |
+| 7 | Dystopian Luxury | Refine | Severity by removal is right. The crop can spell an accidental word ("MARIO"), and the blood-red fallback replaces the client's primary. |
+| 8 | Radical Memphis | Refine | Laminates and the totem are right. The fixed pink is an invented color, and the shape swatches copy Bauhaus. |
+| 9 | Cybersigilism | Refine | The silver/obsidian discipline is good. The sigil reads as veins or lightning rather than tapered thorns, and the highlight word is warm yellow. |
+| 10 | Biomechanical Gothic | Refine | The nave is a credible signature. The blackletter goes against the research, and the brand colors are too bright for "dim glow". |
+
+### Rulings on builder choices
+
+| Choice | Ruling |
+|--------|--------|
+| Xerox Punk draws its headline in `def.art` with the h2 hidden (the third aesthetic to do this) | **A hook is now warranted.** Add `def.headline(ctx)` (X0-R5.1) and migrate Mixed Type, Rebus and Xerox Punk. Reason: the deck's cover, principles and closing fit code (`bdFitHeadline`) can only fit an h2 it can see, so art-drawn headlines are duplicated on the material slide and are not fitted on the cover. |
+| Xerox Punk and Acid Graphics override `--ab-primary` in `tokens()` while the palette and brief show the true primary | **Accept the intent, formalise it.** Pushing to Day-Glo is the spec. But a silent override means `--ab-on-primary`, `--ab-pri-tint` and the brief's contrast pairs describe a color that is never shown. Add `def.printPrimary(t)` (X0-R5.2). |
+| Religious Futurism uses `type.display 0.78` and a 1.26 CSS multiplier for the deck cover | **Overrule the workaround.** Add `def.deck.coverDisplay` (X0-R5.3), delete the 1.26 multiplier, and restore display to the board value. The deck cover is still timid (fix 28.1). |
+| Xerox Punk marker captions use system handwriting fonts | **Overrule.** System handwriting differs by OS: Marker Felt on Mac, Comic Sans or nothing on Windows, and html2canvas exports differ again. Add Permanent Marker to the library (X0-R5.4). |
+| Cybersigilism carries about 8 KB of data-URI ornament per board root | **Overrule.** The ornament is fixed silver, so it belongs in `css/aesthetics/cybersigilism.css` once, as a `mask-image` data URI colored by `background-color: var(--ab-silver)`. It should not be inlined per root. Compare renders 36 roots. Fix 31.3. |
+| Dystopian Luxury falls back to blood red #B3001B when the brand primary is dull | **Overrule.** The CTA and the single red-dot signal must be the client's primary. A dull primary is still the brand, and the green-palette board's red CTA is no longer the client. Fix 36.2. |
+| Industrial Hazard chevron suite paints orange bands on the deck cover/closing | **Confirmed conflict.** Fix P-R5.1. |
+| Biomechanical Gothic seafan/colony render teal/blue | **Confirmed conflict.** Fix P-R5.2. |
+| Pirate Broadcast cover noise band is busy | **Confirmed.** Fix P-R5.3. |
+
+### X0 — framework
+
+**js/aesthetic-board.js, css/aesthetic-board.css, js/data.js, js/aesthetic-meta.js, js/brand-deck.js, css/brand-deck.css**
+
+1. **X0-R5.1 `def.headline(ctx, text)` hook.**
+   - When present, the framework renders
+     `<h2 class="ab-headline ab-headline--custom" aria-label="${text}"><span aria-hidden="true">${def.headline(ctx, text)}</span></h2>`
+     in the normal h2 slot (board hero, deck cover, principles and closing).
+   - `bdFitHeadline` measures that h2 as usual.
+   - Delete the visually-hidden-h2 pattern from mixed-type, rebus and xerox-punk. Those three
+     files are owned by X1 (xerox-punk) and X2 (mixed-type, rebus) for the migration.
+2. **X0-R5.2 `def.printPrimary(t)` hook.**
+   - Optional. It returns the hex that the primary is printed as.
+   - `boardTokens` uses it for `--ab-primary` and recomputes `onPrimary`, `priTint` and
+     `primaryText` from it.
+   - The palette's primary swatch shows the true brand hex, plus a second line
+     `prints as #XXXXXX` (11px muted mono).
+   - The AI brief lists `--primary` (brand) and `--primary-print` with both contrast pairs.
+3. **X0-R5.3 `def.deck.coverDisplay` (number).**
+   - `bdFitHeadline` starts the cover headline at `coverDisplay × the cover base size` instead of
+     `type.display`, then fits as now.
+4. **X0-R5.4 Permanent Marker.**
+   - Add it to `FONTS` as `{ name: 'Permanent Marker', css: '"Permanent Marker", "Marker Felt", cursive', category: 'display', weights: '400', cls: 'groovy' }`.
+   - It must not appear in any recommendation list.
+   - Verify that its css2 chunk returns 200.
+5. **X0-R5.5 Biomechanical Gothic font recommendations** (`aesthetic-meta.js`).
+   - Pairings become `[['Cormorant Garamond','Spectral'], ['Cinzel','EB Garamond'], ['Grenze Gotisch','Spectral']]`.
+   - Heading classes become `['old-style','deco','didone']`, with picks Cormorant Garamond,
+     Cinzel, Italiana and Grenze Gotisch (last).
+   - Add `blackletter` to `avoid`.
+   - Update the `why` sentence to the research line on light inscriptional serifs.
+   - WHY: the research is the source of truth, and it says plainly that blackletter "push[es]
+     toward costume-store metal". At 1280, Grenze Gotisch on this board reads as band merch.
+     Cybersigilism keeps blackletter; it is right there.
+6. **X0-R5.6 Deck "In product" card** (`css/brand-deck.css:226`).
+   - `.ab-deck-ctacard { background: color-mix(in srgb, var(--ab-ink) 4%, var(--ab-canvas)); }`
+   - WHY: D2 neutralised the sidebar, but the CTA card is still `--ab-pri-tint` (pink, brown or
+     maroon in all ten decks), which is primary used as decoration.
+7. **X0-R5.7 Deck Color slide.**
+   - Render the board's own `.ab-swatches[data-kind]` block for that def (the same markup and
+     classes as the board palette) in place of the generic five squares.
+   - Keep the proportion bar and the contrast pairs below it.
+   - WHY: every aesthetic's palette vocabulary (arched mosaic tiles, torn paper chips, laminate
+     shapes, ISO-labelled plates, P201 teletext pages) currently disappears on the slide that is
+     supposed to present it. All 36 color slides look identical.
+8. **X0-R5.8 Deck Interface slide.**
+   - Scale the three component cells' contents with `zoom: 1.45` on each cell's inner wrapper
+     (segmented, CTA, toggle). Keep the states row at 1.2.
+   - Trim the cell min-height so the stage stays inside 720px.
+   - WHY: the components sit at about 40% of the cell, so the slide reads as empty boxes.
+
+### P — fit.js suites
+
+The first suite entry drives the deck cover band and the closing strip (`leadEntry`), so order
+matters.
+
+1. **P-R5.1 industrial-hazard.**
+   - Reorder to: `panels` "Steel plates" (mono, tone 0.6) first; then relief; slipgrid;
+     modulargrid; zigzag "Tread plate" (mono); chevron last.
+   - The chevron entry becomes colorway `mono` with `bands: 14`.
+   - WHY: the ANSI rule is stripes only on dangerous edges, and the cover is not a dangerous edge.
+2. **P-R5.2 biomechanical-gothic.**
+   - seafan, tissue and colony switch to colorway `mono` (bone/tarnish on charcoal).
+   - Lead with `rods` "Vertebral rods".
+   - Only `colony` keeps `nuclei: true` (the dim glow spots).
+   - WHY: "client colour only as dim glow". Teal and blue fields on the cover read as a coral
+     reef.
+3. **P-R5.3 pirate-broadcast.**
+   - Lead with `pixelgrid` "Block graphics" (brand, tone 0.7).
+   - `signal` "Dead air": `bands: 10, noise: 0.25, blank: 0.4`.
+   - WHY: teletext block graphics are structure. Full-width confetti noise is "overdoing noise",
+     the research's own pitfall.
+4. **P-R5.4 religious-futurism.**
+   - Lead with `kaleidopix` "Glass mosaic" (it is the Richter window).
+   - Replace `oprings` "Halo rings" with `burst` (origin 'centre', rays 48, tone 0.4).
+   - Change `specimens` `study: 'rings'` to `study: 'arches'`; if that value doesn't exist, use
+     `marble` mono.
+   - WHY: the cover band and closing strip are currently orange and teal bullseye targets, which
+     are the opposite of "slow, still, monumental".
+5. **P-R5.5 cybersigilism.**
+   - Replace `chevron` "Chevron mirror" and `oprings` "Op-art rings" with `flow` (mono, strands 3,
+     weight 0.6) and `seafan` (mono, ribs false).
+   - WHY: thick black and white bands contradict "decorative lines 0.75–1.25px". The op-art rings
+     again render as fried-egg contours.
+
+### X1 — 27–31
+
+**27 Corporate Vandalism — Refine**
+1. **WHAT:** quotation marks on section labels, type roles, segments and the field
+   (`"INTERFACE"`, `"HEADINGS"`, `"DESIGN"`, the `"COMPLIANCE"` label).
+   - **CHANGE:** remove them everywhere except the headline's `"alive"` and the material slide's
+     list items.
+   - Keep the dagger footnote markers. They are the one fine-print system.
+   - **WHY:** the research's own pitfalls are "one intrusion per screen" and "repeating a gag
+     until it is a template". The quote mark lands once; on every label it becomes a font effect.
+2. **WHAT:** the receipt (hero art). **CHANGE:** background `#FFFFFF` in both modes, ink `#1a1a1a`,
+   with the zigzag tear kept. It replaces the `sec-tint` cyan fill. **WHY:** a thermal receipt is
+   white paper. Cyan makes it a UI card and kills the found-object joke.
+3. **WHAT:** list rows 2–3 (`.ab-row-name` rendered muted grey).
+   - **CHANGE:** all names in ink.
+   - Keep the hierarchy through status chips only. Rows 2 and 3 currently read as disabled.
+
+**28 Religious Futurism — Refine**
+1. **WHAT:** the deck cover.
+   - **CHANGE:**
+     - Set `deck: { coverDisplay: 1.3 }` (X0-R5.3) and remove the 0.78 / 1.26 workaround.
+     - The cover headline is centred on two lines at ≥ 72px.
+     - `.ab[data-ae="religious-futurism"].ab-slide[data-slide="cover"] .ab-art { width: 62%; max-width: none; margin-inline: auto; }`
+     - The window row then fills the lower half above the pattern band.
+   - **WHY:** the art is currently ~100px tall in a 720px slide. A cathedral needs scale.
+2. **WHAT:** the light mode hero glow. **CHANGE:** the halo backlight in light mode becomes
+   `mix(accent, canvas, .85)`, not a pink-peach wash. **WHY:** the B shot reads as blush. Light
+   mode should be bone and parchment.
+
+**29 Xerox Punk — Refine**
+1. **WHAT:** fluoro discipline.
+   - **CHANGE:**
+     - Tape pieces become translucent paper: `rgba(236, 228, 206, .55)` with a 1px
+       `rgba(0,0,0,.15)` edge, not secondary teal.
+     - The yellow-outlined labels ("STICK NO BILLS", "DESIGN LANGUAGE / XEROX PUNK",
+       "DO IT YOURSELF") take a bone `#EDE6D3` outline and text.
+     - The accent stays only on one ransom tile in "ALIVE" and the footer square.
+   - **WHY:** the spec says "exactly ONE fluoro = client primary pushed to Day-Glo". Teal tape on
+     every swatch and card plus yellow labels make three.
+2. **WHAT:** marker captions ("fig. 1 — no comment.", "← this one.", "Project name").
+   - **CHANGE:** `font-family: "Permanent Marker", "Marker Felt", cursive` (X0-R5.4), sized 15px
+     and rotated −2°.
+3. **WHAT:** headline. **CHANGE:** migrate to `def.headline` (X0-R5.1).
+4. **WHAT:** deck material slide.
+   - **CHANGE:** `deck: { materialStage: 'pattern' }`, or stage only the M plate plus torn
+     sheets.
+   - **WHY:** it currently repeats the cover headline.
+5. **WHAT:** pushed primary. **CHANGE:** move the override from `tokens()` to
+   `printPrimary(t)` (X0-R5.2).
+
+**30 Acid Graphics — Ship**
+1. **WHAT:** strips palette text on the primary band (A shot: orange "PRIMARY / Main action"
+   on orange).
+   - **CHANGE:** every strip's text uses `var(--sw-on)`.
+   - Check the scoped rule that overrides it, `.ab[data-ae="acid-graphics"] .ab-swatch` color.
+2. **WHAT:** the pushed acid primary. **CHANGE:** move it to `printPrimary(t)` (X0-R5.2).
+
+**31 Cybersigilism — Refine**
+1. **WHAT:** the sigil generator in `art()`.
+   - **CHANGE:** follow the research recipe literally:
+     - depth 4 (not 6+), branch angle 28°, length ratio 0.68;
+     - straight segments drawn as filled tapered polygons, 2.2px at the base to 0 at the tip;
+     - two short barbs per segment at 35°, pointing outward;
+     - nodes only at forks;
+     - keep the left/right mirror and the central diamond;
+     - delete the scattered star dots.
+   - **WHY:** the current wispy, curved, deep branching reads as veins or lightning (the
+     research's "Eurotrash" cousin and "AI-generator look, branches with no junction logic"),
+     not an architectural thorn crest.
+2. **WHAT:** `.ab-hl` ("alive" in solid accent yellow).
+   - **CHANGE:** silver text
+     (`linear-gradient(180deg, #fff, #b9bec6 55%, #e9ebee)` with `background-clip: text`) plus
+     `text-shadow: 0 0 18px <accent at 40%>`.
+   - **WHY:** "silver fixed, client colour only as cold light/glow". A solid warm word is the
+     only warm object on the board.
+3. **WHAT:** the ornament data URIs. **CHANGE:** see the ruling above. Move them into the CSS
+   file once, as `mask-image`.
+
+### X2 — 32–36
+
+**32 Industrial Hazard — Ship.** No board fixes; P-R5.1 only.
+
+**33 Radical Memphis — Refine**
+1. **WHAT:** the fixed pink (offset sheets under the logo, cards, list, toggle and field; the
+   pink list rows).
+   - **CHANGE:** offset sheets behind primary-colored objects become `mix(secondary, canvas, .45)`.
+     Behind everything else, including cards, they become `mix(primary, canvas, .5)`.
+   - List row fills alternate `--ab-pri-tint` and `--ab-sec-tint`. The field fill becomes
+     `--ab-sec-tint`.
+   - **WHY:** pink is in no palette; the green-palette board still shows bubblegum pink. The
+     research's second-hue offset comes from the brand's own hues.
+2. **WHAT:** palette swatches (circle, square, triangle, semicircle).
+   - **CHANGE:** render them as laminate sample chips:
+     - 92×64px rounded rectangles, radius 6;
+     - rotations −5°, 3°, −2°, 4°, −3°;
+     - each chip's lower 30% printed with that aesthetic's squiggle laminate at 25% ink;
+     - an offset sheet per fix 33.1;
+     - the name and hex below.
+   - **WHY:** Bauhaus Poster already owns role-shaped swatches. Memphis's own idea is the
+     laminate swatch wall.
+
+**34 Biomechanical Gothic — Refine**
+1. **WHAT:** palette swatches (glossy 3D eggs).
+   - **CHANGE:** matte cast discs with a flat fill,
+     `box-shadow: inset 0 2px 3px rgba(255,255,255,.08), inset 0 -3px 6px rgba(0,0,0,.45)`, no
+     specular, and a 1px tarnish rim `mix(ink, canvas, .7)`.
+   - **WHY:** glossy candy eggs fight "one cast material".
+2. **WHAT:** glow color.
+   - **CHANGE:** add the token
+     `--ab-glow = hsl(h(primary), s(primary) × 0.75, min(l(primary), 42%))`.
+   - Use it for progress fills, the AWAKE lamp, the selected-segment pip and the CTA underline,
+     instead of raw primary.
+   - **WHY:** the research says the client primary appears as "lit sinew", desaturated 15–25% and
+     darkened. Bright orange bars read as UI, not as bioluminescence.
+3. **WHAT:** the stray accent dot after "alive" (`.ab-hl::after`).
+   - **CHANGE:** remove it.
+   - The highlight word becomes bone `mix(ink, accent, .2)` with `text-shadow: 0 0 16px <accent at 30%>`.
+   - **WHY:** at headline scale the dot reads as a typo.
+
+**35 Pirate Broadcast — Ship**
+1. **WHAT:** the multi-color bar rules (currently between every section, plus the palette strip
+   and the footer).
+   - **CHANGE:** keep only the header rule under the masthead and the footer bar.
+   - Section rules become 1px dashed `--ab-muted`; that is the teletext separator.
+   - **WHY:** used everywhere, the bars stop being diagnostic and become decoration, which is
+     the research's "scanlines alone are not the style".
+
+**36 Dystopian Luxury — Refine**
+1. **WHAT:** the cropped wordmark plate.
+   - **CHANGE:** set the brand name so its full width fits 104% of the plate (the right edge crops
+     at most half a letter), then crop vertically: show the top 70% and hide the rest under the
+     CLASSIFIED bar.
+   - **WHY:** a horizontal crop at a letter boundary spells accidental words. With this brand it
+     reads "MARIO". A vertical crop keeps the severity and never makes a new word.
+2. **WHAT:** the blood-red fallback.
+   - **CHANGE:** delete it. The CTA, the red dot and the underline are always the client's
+     primary.
+   - Update `roles.accent` / `highlightNote` text.
+   - **CHECK:** C (green) shows a #2F6B4F CTA.
+
+### Totals
+
+- **X0:** 8
+- **P:** 5
+- **X1:** 15
+  - Corporate Vandalism 3
+  - Religious Futurism 2
+  - Xerox Punk 5
+  - Acid Graphics 2
+  - Cybersigilism 3
+- **X2:** 8
+  - Industrial Hazard 0
+  - Radical Memphis 2
+  - Biomechanical Gothic 3
+  - Pirate Broadcast 1
+  - Dystopian Luxury 2
+
+Also X2: migrate mixed-type and rebus to `def.headline`.
+
+**Order:** X0-R5.1/R5.2/R5.3 must land before the X1 migrations (29.3, 29.5, 30.2, 28.1).
+Everything else is independent.
+
+**Verification:** re-shoot only the touched keys plus their decks, and run `dev/deck-gore.js`
+(expect 0). Check:
+- Memphis and Xerox Punk: no color that isn't in the palette (or the pushed primary).
+- Dystopian Luxury: the plate never forms an accidental word for "Marigold Studio",
+  "Northwind" or "Acme".
+- Industrial Hazard, Biomechanical Gothic, Pirate Broadcast and Religious Futurism covers: no
+  orange stripes, no teal reef, no confetti, no targets.
