@@ -3,16 +3,44 @@
    neon-green button, a grey footer), Maison Margiela's blank white label held by four
    stitches and its circled numerals 0-23, museum accession numbers (year.sequence.part),
    Lumon's benevolent-institution register. Severity by removal and labelling: near-pure
-   white and ink, a tiny wordmark, vast empty space, one enormous severely-cropped word,
-   hairlines, security-style labels and a single blood-red mark under 2% of the area.
+   white and ink, a tiny wordmark, vast empty space, one enormous word cropped vertically under a strip,
+   hairlines, security-style labels and a single mark in the client primary under 2% of the area.
    Metal only on hardware (not drawn here). No gothic horror, no gradients, no glow,
    no real brand names. The classifying labels never warn; they catalogue. */
 
-// The single disruptive mark: the brand primary when it is sharp enough on the canvas
-// (saturated, >= 3:1), otherwise a fixed blood red. Shared by tokens() and art().
+// The single disruptive mark is always the client's primary (a dull primary is still the
+// brand; there is no fixed fallback colour). Shared by tokens() and art().
 function dlMark(t) {
-  const h = hexToHsl(t.primary);
-  return h.s >= 45 && t.contrast(t.primary, t.canvas) >= 3 ? t.primary : '#B3001B';
+  return t.primary;
+}
+
+// The giant word: first word of the brand, uppercase, set so its full width is 103% of the
+// plate (the right edge crops at most half a letter), then cropped VERTICALLY: the top 70%
+// of the cap height shows and the rest hides under the CLASSIFIED strip. A horizontal crop at
+// a letter boundary can spell an accidental word, a vertical one never can.
+function dlWordFit(state, word) {
+  const W = 200 * 1.03;
+  let natural = 0;
+  try {
+    const cv = document.createElement('canvas').getContext('2d');
+    cv.font = `800 100px ${(state && state.headingFont && state.headingFont.css) || 'sans-serif'}`;
+    natural = cv.measureText(word).width;
+  } catch (err) { natural = 0; }
+  if (!(natural > 0)) natural = 64 * word.length;
+  // fsFull is the size at which the word is exactly W wide. Past 44 the glyph tops would climb
+  // behind the blank label, so a short word stays at 44 and takes letter-spacing to reach W; a
+  // very short one (under ~55% of W at 44) is allowed to grow, up to 119, before it is tracked out.
+  const fsFull = 100 * W / natural;
+  let fs = fsFull;
+  let mode = 'spacingAndGlyphs';
+  if (fsFull > 44) {
+    fs = Math.min(119, Math.max(44, 100 * 0.55 * W / natural));
+    mode = 'spacing';
+  } else if (fsFull < 18) {
+    fs = 18;
+    mode = 'spacingAndGlyphs';
+  }
+  return { fs, W, mode };
 }
 
 registerAesthetic({
@@ -29,7 +57,7 @@ registerAesthetic({
   layout: { hero: 'centered', palette: 'swatches', sections: 'asym' },
   type: { ui: 'sans', label: 'sans', display: 1.12 },
   highlight: 'custom',
-  highlightNote: 'The highlighted word stays in ink like the rest of the headline and carries one thin underline stripe (about 0.07em) in the single accent mark (the brand primary when it is sharp, else blood red); no colour on the word itself.',
+  highlightNote: 'The highlighted word stays in ink like the rest of the headline and carries one thin underline stripe (about 0.07em) in the single accent mark (always the client primary); no colour on the word itself.',
   cardFill: '--canvas',
 
   roles: {
@@ -44,7 +72,7 @@ registerAesthetic({
       coverage: '≈6–7%',
     },
     primary: {
-      use: 'The single disruptive accent: the one main action, one small mark per view (a dot, an end tick or a strike) and the "Classified" dot. When the brand primary is not saturated and sharp on the canvas (under 3:1 or dull) it is replaced by the fixed blood red #B3001B',
+      use: 'The single disruptive accent: the one main action, one small mark per view (a dot, an end tick or a strike) and the "Classified" dot. It is always the client primary, even a dull one; there is no red fallback',
       never: 'Body text, borders, backgrounds, a second accent, gradients, or more than 2% of the area',
       coverage: '≤2%',
     },
@@ -81,7 +109,7 @@ registerAesthetic({
     };
   },
 
-  // "Accession": one enormous word in ink, severely cropped by the right and bottom edges;
+  // "Accession": one enormous word in ink, fitted to 103% of the plate width and cropped vertically (top 70% visible) under the strip;
   // a blank white label held by four X stitches carrying an accession number, a circled
   // numeral and a barcode; one dot of the single accent; a black security strip along the
   // lower edge; crop marks. Pure SVG, viewBox 200 x 80.
@@ -89,7 +117,9 @@ registerAesthetic({
     const t = ctx.t;
     const e = escapeHtml;
     const word = e(String(ctx.brandName || 'Archive').trim().split(/\s+/)[0].toUpperCase());
-    const wordSize = Math.round(Math.max(76, Math.min(104, 255 / (0.64 * Math.max(1, word.length)))));
+    const fit = dlWordFit(ctx.state, word);
+    const strip = 69.5;
+    const baseline = (strip + 0.3 * 0.72 * fit.fs).toFixed(2);
     const mark = dlMark(t);
     const ink = t.isDark ? t.mix('#F7F7F5', t.ink, 0.7) : t.mix('#0A0A0A', t.ink, 0.75);
     const paper = t.isDark ? '#F2F2EF' : '#FFFFFF';
@@ -102,7 +132,7 @@ registerAesthetic({
     const crop = (x, y, dx, dy) => `<path d="M${x} ${y + dy * 4} V${y} H${x + dx * 4}" stroke="${ink}" stroke-width=".35" fill="none"/>`;
     return `<div class="dl-art"><svg viewBox="0 0 200 80" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg" role="presentation">
       <g>
-        <text class="dl-word" x="-5" y="86" font-size="${wordSize}" fill="${ink}">${word}</text>
+        <svg x="0" y="0" width="200" height="${strip}" viewBox="0 0 200 ${strip}" overflow="hidden"><text class="dl-word" x="1" y="${baseline}" font-size="${fit.fs.toFixed(2)}" textLength="${fit.W}" lengthAdjust="${fit.mode}" fill="${ink}">${word}</text></svg>
         <rect x="0" y="69.5" width="200" height="8.5" fill="#0A0A0A"/>
         <text class="dl-strip" x="6" y="75.2" fill="#F7F7F5">CLASSIFIED / DIVISION 07 / NOT FOR RELEASE</text>
         <text class="dl-strip" x="194" y="75.2" text-anchor="end" fill="#F7F7F5">2026.114</text>
@@ -133,13 +163,13 @@ registerAesthetic({
   rules: {
     do: [
       'Remove first: a tiny wordmark, vast empty space and at most three visible elements per zone.',
-      'Crop display type hard against the edge so only 70 to 85 percent of it shows, and keep the labels small and exact.',
+      'Crop display type hard under a strip so only about 70 percent of its height shows (crop vertically, never at a letter boundary), and keep the labels small and exact.',
       'Number everything: accession year.sequence.part (2026.114.3), a circled numeral, a barcode, a security-style label.',
-      'Keep the neutrals near-pure (about 92% neutrals, 7% greys, under 2% accent) and use one red mark per view.',
+      'Keep the neutrals near-pure (about 92% neutrals, 7% greys, under 2% accent) and use one mark in the client primary per view.',
     ],
     dont: [
       'Use gradients, glows, glass, soft shadows or rounded corners; hard cuts and hairlines only.',
-      'Spread the red: it is a single dot, tick, strike or button, never a wash or a second accent.',
+      'Spread the primary: it is a single dot, tick, strike or button, never a wash or a second accent.',
       'Add gothic horror tropes (chains, crosses, skulls, gore), concrete textures or warm literary serif layouts.',
       'Set tiny type below 4.5:1 contrast or leave the board with no readable controls; severity is never illegibility.',
     ],
@@ -149,13 +179,13 @@ registerAesthetic({
   deck: {
     principles: [
       ['Severity by removal', 'A tiny logo and vast white space say it all.'],
-      ['Enormous, severely cropped type', 'Headlines bleed off the edge; labels stay small.'],
+      ['Enormous, severely cropped type', 'Headlines are cropped under a strip; labels stay small.'],
       ['Label everything clinically', 'Accession numbers and blank tags classify each object.'],
     ],
     do: [
-      'Crop display type hard against the edge.',
+      'Crop display type vertically under a strip.',
       'Number items year.sequence.part.',
-      'Keep blood red under two percent.',
+      'Keep the brand mark under two percent.',
     ],
     dont: [
       'Add gradients, glows or glass.',

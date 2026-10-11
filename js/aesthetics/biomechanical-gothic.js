@@ -13,8 +13,9 @@ function bgPalette(t) {
   const W = '#ffffff';
   const K = '#000000';
   const hp = hexToHsl(t.primary);
-  // dim bioluminescence: desaturated 20% and held to a mid lightness
-  const glow = hslToHex(hp.h, Math.max(16, hp.s * 0.78), Math.min(d ? 56 : 44, Math.max(d ? 42 : 34, hp.l)));
+  // lit sinew: hsl(h, s x 0.75, min(l, 42%)), i.e. desaturated 25% and darkened; the floor
+  // only stops a very dark brand colour from vanishing into the charcoal
+  const glow = hslToHex(hp.h, hp.s * 0.75, Math.max(28, Math.min(hp.l, 42)));
   const bone = d ? t.mix('#D8D0BC', t.ink, 0.7) : t.mix('#15130F', t.ink, 0.55);
   const metal = d ? '#6F6A5C' : '#7B7564';
   const metalHi = d ? '#8E8670' : '#6A634F';
@@ -42,7 +43,7 @@ registerAesthetic({
   layout: { hero: 'centered', palette: 'swatches', sections: 'two-col' },
   type: { ui: 'body', label: 'mono' },
   highlight: 'custom',
-  highlightNote: 'The highlighted word is set in bone like the rest of the headline, lit from behind by a dim glow, with one small wet gloss dot in the accent at the end of the word.',
+  highlightNote: 'The highlighted word is set in bone with a hint of the accent mixed in (20% accent, 80% ink), lit from behind by a soft accent glow (a 16px text-shadow at 30%); no dot, no underline, no fill.',
   ctaFill: 'ink',
   cardFill: '--ab-bi-cast',
 
@@ -58,7 +59,7 @@ registerAesthetic({
       coverage: '≈15–20%',
     },
     primary: {
-      use: 'Lit sinew: a dim bioluminescent glow only, shown as thin lines inside the structure, the progress tube, the selected vertebra rim and the single lamp. Desaturated about 20% and held to a mid lightness (the glow token)',
+      use: 'Lit sinew: a dim bioluminescent glow only, shown as thin lines inside the structure, the progress tube, the selected vertebra rim and the single lamp. The glow token is hsl(h, s x 0.75, min(l, 42%)) of the brand primary: desaturated and darkened, never the raw colour',
       never: 'The main action fill, body text, large fills, or a bright UI colour; no neon, no cyan or lime glow',
       coverage: '≈4–6%',
     },
@@ -68,7 +69,7 @@ registerAesthetic({
       coverage: '≈6–10%',
     },
     accent: {
-      use: 'One wet gloss spot: a small specular dot at the end of the highlighted headline word, on the nave lamp and on the awake organ (under 2% of the area)',
+      use: 'One wet gloss spot: the faint warm tint in the highlighted headline word and its glow, the pinpoint on the nave lamp and the awake organ (under 2% of the area)',
       never: 'Buttons, borders, panel fills, or saturated red as a default (it reads as gore)',
       coverage: '≤2%',
     },
@@ -84,6 +85,10 @@ registerAesthetic({
     const d = t.isDark;
     return {
       '--ab-bi-glow': p.glow,
+      '--ab-glow': p.glow,
+      '--ab-bi-hl': t.mix(t.accent, t.ink, 0.2),
+      '--ab-bi-hl-glow': t.alpha(t.accent, 0.3),
+      '--ab-bi-disc-rim': t.mix(t.ink, t.canvas, 0.7),
       '--ab-bi-bone': p.bone,
       '--ab-bi-metal': p.metal,
       '--ab-bi-metal-hi': p.metalHi,

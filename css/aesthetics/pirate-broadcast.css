@@ -10,7 +10,6 @@
 .ab[data-ae="pirate-broadcast"] {
   --pb-scan: repeating-linear-gradient(0deg, var(--ab-tt-scan) 0 1px, transparent 1px 3px);
   --pb-bars: linear-gradient(90deg, var(--ab-tt-fg) 0 14.285%, var(--ab-tt-yellow) 0 28.57%, var(--ab-tt-sec) 0 42.855%, var(--ab-tt-green) 0 57.14%, var(--ab-tt-magenta) 0 71.425%, var(--ab-tt-acc) 0 85.71%, var(--ab-tt-pri) 0);
-  --pb-rev: linear-gradient(90deg, var(--ab-tt-pri) 0 14.285%, #000 0 28.57%, var(--ab-tt-magenta) 0 42.855%, #000 0 57.14%, var(--ab-tt-sec) 0 71.425%, #000 0 85.71%, var(--ab-tt-fg) 0);
   --pb-pad: clamp(18px, 2.8cqw, 24px);
   --pb-mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
   border-radius: 4px;
@@ -27,8 +26,10 @@
 .ab[data-ae="pirate-broadcast"] .ab-tag { font-size: 10.5px; letter-spacing: 0.1em; color: var(--ab-tt-dim); }
 .ab[data-ae="pirate-broadcast"] .ab-tag b { color: var(--ab-tt-fg); }
 .ab[data-ae="pirate-broadcast"] .ab-tag::before { content: "● REC 23:41:07  "; color: var(--ab-tt-acc); white-space: pre; }
-/* dividers: the colour-bar sequence, thin */
-.ab[data-ae="pirate-broadcast"] .ab-rule { height: 4px; background: var(--pb-bars); }
+/* dividers: the colour bars are diagnostic, so only the rule under the masthead keeps them
+   (the footer bar is the other). Every section rule is a 1px dashed teletext separator. */
+.ab[data-ae="pirate-broadcast"] .ab-rule { height: 0; background: none; border-top: 1px dashed var(--ab-muted); }
+.ab[data-ae="pirate-broadcast"] .ab-head + .ab-rule { height: 4px; border-top: 0; background: var(--pb-bars); }
 
 /* ---- labels ---- */
 .ab[data-ae="pirate-broadcast"] .ab-label { font-size: 11px; font-weight: 700; letter-spacing: 0.12em; }
@@ -72,10 +73,7 @@
 .ab[data-ae="pirate-broadcast"] .pb-rec::before { content: "● "; color: var(--ab-tt-acc); }
 .ab[data-ae="pirate-broadcast"] .pb-ch { right: 4.6%; }
 
-/* ---- palette: a test-pattern strip above the roles ---- */
-.ab[data-ae="pirate-broadcast"] .ab-palette::before {
-  content: ""; display: block; height: 19px; margin-bottom: 22px; background: var(--pb-bars) 0 0 / 100% 14px no-repeat, var(--pb-rev) 0 100% / 100% 5px no-repeat;
-}
+/* ---- palette ---- */
 .ab[data-ae="pirate-broadcast"] .ab-swatches { counter-reset: pbsw; }
 .ab[data-ae="pirate-broadcast"] .ab-swatch { counter-increment: pbsw; }
 .ab[data-ae="pirate-broadcast"] .ab-chip { height: clamp(34px, 4.8cqw, 50px); border-radius: 0; box-shadow: 0 0 0 1px var(--ab-line); margin-bottom: 12px; }

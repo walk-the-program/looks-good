@@ -4,8 +4,9 @@
    terrazzo, checker, dots, zig-zag) bind the saturated colours; objects are stacked
    primitives on a diagonal stance; a second-hue "offset sheet" sits behind every shape
    instead of an ink outline or a black shadow (that is Neo-Brutal Pop). Rule of the
-   screen: at most four hues plus black and white; the fourth is a borrowed pastel
-   (pink, or mint when the brand is already pink). Cards are always paper, so the board
+   screen: only the brand's own hues plus black and white. The offset sheet is a tint
+   of the brand's other hue: the secondary behind primary objects, the primary behind
+   everything else. Cards are always paper, so the board
    also works in dark mode. No Corporate-Memphis people, no confetti. */
 registerAesthetic({
   key: 'radical-memphis', order: 33,
@@ -21,7 +22,7 @@ registerAesthetic({
   layout: { hero: 'split', palette: 'swatches', sections: 'two-col' },
   type: { ui: 'body', label: 'body', display: 0.86 },
   highlight: 'custom',
-  highlightNote: 'The accent word is set in accent text (shaded to read on the canvas) with a pastel offset sheet one step down and to the right (a coloured text-shadow); never an outline, never a pill.',
+  highlightNote: 'The accent word is set in accent text (shaded to read on the canvas) with a primary-tint offset sheet one step down and to the right (a coloured text-shadow); never an outline, never a pill.',
   cardFill: '--ab-m-paper',
 
   roles: {
@@ -61,11 +62,10 @@ registerAesthetic({
     const d = t.isDark;
     const lightBrand = d ? t.ink : t.canvas;
     const darkBrand = d ? t.canvas : t.ink;
-    const hueNear = hex => { const h = hexToHsl(hex); const s = h.s; return s > 22 && Math.abs(((h.h - 340 + 540) % 360) - 180) < 30; };
-    // Borrowed pastel: pink (or mint when a brand colour is already pink). It is the
-    // offset sheet behind every shape and the fourth hue of the rule "four hues max".
-    const pink = [t.primary, t.secondary, t.accent].some(hueNear);
-    const pastel = pink ? '#A9E3CB' : '#F6A9C6';
+    // Offset sheets are the brand's own hues, mixed toward the canvas (never a fixed colour):
+    // behind primary-coloured objects the secondary at 45%, behind everything else the primary at 50%.
+    const sheetSec = t.mix(t.secondary, t.canvas, 0.45);
+    const sheetPri = t.mix(t.primary, t.canvas, 0.5);
     const paper = t.mix('#ffffff', lightBrand, 0.82);
     const black = d ? t.mix('#000000', darkBrand, 0.45) : t.mix('#000000', t.ink, 0.3);
     // text on paper that is quieter than black, kept >= 4.5:1
@@ -76,8 +76,8 @@ registerAesthetic({
       '--ab-m-paper': paper,
       '--ab-m-black': black,
       '--ab-m-soft': soft,
-      '--ab-m-pastel': pastel,
-      '--ab-m-pastel-lo': t.mix(pastel, paper, 0.45),
+      '--ab-m-sheet': sheetPri,
+      '--ab-m-sheet-sec': sheetSec,
       '--ab-m-sec-lo': t.mix(t.secondary, paper, 0.22),
       '--ab-m-pri-lo': t.mix(t.primary, paper, 0.16),
       '--ab-type-pick-w': '400',
@@ -86,7 +86,7 @@ registerAesthetic({
 
   // The showroom piece: a Carlton-like totem of stacked primitives (spine, two tilted
   // shelves, discs, a triangle, a semicircle) on a terrazzo floor tile, each in a
-  // different laminate, with a pastel offset sheet behind every shape. HTML shapes so the
+  // different laminate, with a second-hue offset sheet behind every shape. HTML shapes so the
   // laminates are the CSS ones; coordinates are percentages of the art box.
   art(ctx) {
     const e = escapeHtml;
@@ -104,28 +104,28 @@ registerAesthetic({
       S('circle', 'accent', 29, 1, 30, 30),
     ];
     const style = s => `left:${s.x}%;top:${s.y}%;width:${s.w}%;height:${s.h}%;`;
-    const sheets = shapes.map(s => `<i class="mm-s mm-${s.k} mm-sh" style="${style(s)}transform:translate(1.8cqw,1.8cqw) rotate(${s.r}deg)"></i>`).join('');
+    const sheets = shapes.map(s => `<i class="mm-s mm-${s.k} mm-sh mm-f-${s.f === 'primary' ? 'primary' : 'x'}" style="${style(s)}transform:translate(1.8cqw,1.8cqw) rotate(${s.r}deg)"></i>`).join('');
     const solids = shapes.map(s => `<i class="mm-s mm-${s.k} mm-f-${s.f}" style="${style(s)}transform:rotate(${s.r}deg)">${s.f === 'accent' ? `<b>${e(ctx.initial)}</b>` : ''}</i>`).join('');
     return `<div class="mm-art">${sheets}${solids}<span class="mm-cap">Tahiti &mdash; No.&thinsp;07</span></div>`;
   },
 
   materials: [
-    { name: 'Paper card (cabinet)', css: 'background: {mPaper}; color: {mBlack}; border-radius: 0 36px 0 0; box-shadow: 8px 8px 0 {mPastel}; /* no outline; a 12px laminate strip (Bacterio) runs down the left side; the offset sheet is the borrowed pastel */' },
-    { name: 'Offset sheet', css: 'box-shadow: 6px 6px 0 {mPastel}; /* the second-hue sheet behind a shape; replaces ink outlines and black shadows; {mPastel} is borrowed (pink, or mint when the brand is pink) */' },
+    { name: 'Paper card (cabinet)', css: 'background: {mPaper}; color: {mBlack}; border-radius: 0 36px 0 0; box-shadow: 8px 8px 0 {mSheet}; /* no outline; a 12px laminate strip (Bacterio) runs down the left side; the offset sheet is the primary mixed 50% into the canvas */' },
+    { name: 'Offset sheet', css: 'box-shadow: 6px 6px 0 {mSheet}; /* the second-hue sheet behind a shape; replaces ink outlines and black shadows; {mSheet} is the primary mixed 50% into the canvas, and behind a primary-coloured object it is {mSheetSec}, the secondary mixed 45% into the canvas */' },
     { name: 'Laminate: Bacterio', css: 'background: {mPaper}; /* black wavy lines, crosses and dots (stroke 2.4px, a 64px tile) on paper; a fixed black-and-white pattern, the neutral that holds the colours together */' },
-    { name: 'Laminate: Terrazzo', css: 'background: {mPaper}; /* random speckles of {primary}, {secondary}, {accent}, {mBlack} and {mPastel} at 3-9% of the area, tile 140px */' },
+    { name: 'Laminate: Terrazzo', css: 'background: {mPaper}; /* random speckles of {primary}, {secondary}, {accent}, {mBlack} and {mSheet} at 3-9% of the area, tile 140px */' },
     { name: 'Laminate: Checker', css: 'background: conic-gradient({mBlack} 25%, {mPaper} 0 50%, {mBlack} 0 75%, {mPaper} 0) 0 0 / 16px 16px; /* 8px squares; also the footer strip */' },
     { name: 'Laminate: Dots', css: 'background: radial-gradient(circle, {primary} 2.2px, transparent 2.7px) 0 0 / 11px 11px, {mPaper}; /* dot grid in the primary flat on paper */' },
     { name: 'Laminate: Zig-zag', css: 'background: linear-gradient(135deg, {secondary} 25%, transparent 25%) -6px 0 / 12px 12px, linear-gradient(225deg, {secondary} 25%, transparent 25%) -6px 0 / 12px 12px, linear-gradient(315deg, {secondary} 25%, transparent 25%) 0 0 / 12px 12px, linear-gradient(45deg, {secondary} 25%, transparent 25%) 0 0 / 12px 12px, {mPaper};' },
-    { name: 'Main action (circle on a plinth)', css: 'background: {primary}; color: {onPrimary}; border-radius: 999px; box-shadow: 6px 6px 0 {mPastel}; transition: transform 220ms cubic-bezier(.34,1.56,.64,1); /* an accent circle holds the arrow; press: scale(.94) with the overshoot curve */' },
+    { name: 'Main action (circle on a plinth)', css: 'background: {primary}; color: {onPrimary}; border-radius: 999px; box-shadow: 6px 6px 0 {mSheetSec}; transition: transform 220ms cubic-bezier(.34,1.56,.64,1); /* an accent circle holds the arrow; press: scale(.94) with the overshoot curve */' },
   ],
 
   rules: {
     do: [
       'Fill surfaces with a laminate (Bacterio squiggle, terrazzo, checker, dots, zig-zag) so the black-and-white pattern holds the saturated colours together.',
       'Build objects from stacked primitives on a diagonal: a circle on a rectangle on a trapezoid, tilted 3 to 12 degrees.',
-      'Put a pastel offset sheet behind each shape instead of an outline or a black shadow.',
-      'Keep to four hues plus black and white: about 60% flats, 30% pattern, 10% one screamer.',
+      'Put a second-hue offset sheet (the primary or secondary mixed into the canvas) behind each shape instead of an outline or a black shadow.',
+      'Keep to the brand\'s own hues plus black and white: about 60% flats, 30% pattern, 10% one screamer.',
     ],
     dont: [
       'Draw ink outlines, sticker strokes or black offset shadows; that is Neo-Brutal Pop.',

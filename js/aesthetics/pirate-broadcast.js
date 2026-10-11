@@ -171,7 +171,7 @@ registerAesthetic({
     { name: 'Selected channel (inverse video)', css: 'background: {ttPri}; color: {ttScreen}; /* CH 01 DESIGN; inverse video marks the active channel */' },
     { name: 'Fastext key (main action)', css: 'background: {ttPri}; color: {ttScreen}; border-radius: 0; font-weight: 700; text-transform: uppercase; /* {ttPri} is {primary} (lifted toward white only when it would not read on the screen); one row high, a leading > ; press inverts to {ttPri} on {ttScreen} */' },
     { name: 'Intrusion state', css: 'background: {ttAcc}; color: {ttScreen}; text-shadow: 1.5px 0 {ttRed}, -1.5px 0 {ttCyan}; /* REC colour with a 1.5px red / cyan split on the label only */' },
-    { name: 'Colour bars (strip and dividers)', css: 'background: linear-gradient(90deg, {ttFg} 0 14.28%, {ttYellow} 0 28.56%, {ttSec} 0 42.84%, {ttGreen} 0 57.12%, {ttMagenta} 0 71.4%, {ttAcc} 0 85.68%, {ttPri} 0); /* brand colours sit in the cyan, red and blue positions; yellow, green and magenta stay true so it still reads as a test pattern */' },
+    { name: 'Colour bars (masthead rule and footer bar only)', css: 'background: linear-gradient(90deg, {ttFg} 0 14.28%, {ttYellow} 0 28.56%, {ttSec} 0 42.84%, {ttGreen} 0 57.12%, {ttMagenta} 0 71.4%, {ttAcc} 0 85.68%, {ttPri} 0); /* brand colours sit in the cyan, red and blue positions; yellow, green and magenta stay true so it still reads as a test pattern */' },
     { name: 'Dotted leader row', css: 'border-bottom: 2px dotted {ttDim}; /* WEATHER ............ 401: title, dotted leader, right-aligned page number */' },
     { name: 'Signal meter', css: 'background: linear-gradient({ttPri}, {ttPri}) 0 100% / 3px 25% no-repeat, linear-gradient({ttPri}, {ttPri}) 5px 100% / 3px 50% no-repeat, linear-gradient({ttPri}, {ttPri}) 10px 100% / 3px 75% no-repeat, linear-gradient({ttDim}, {ttDim}) 15px 100% / 3px 100% no-repeat; /* five rising bars; lit bars are the phosphor, unlit bars are dim */' },
   ],
@@ -179,7 +179,7 @@ registerAesthetic({
   rules: {
     do: [
       'Set copy on a character grid: all caps, left aligned, page numbers first (P100, 101), with a coloured title row on every panel.',
-      'Give every colour-bar element a job: castellations, bars, grey ramp and grating each test something.',
+      'Give every colour-bar element a job: castellations, bars, grey ramp and grating each test something. Keep the colour bars to the rule under the masthead and the footer bar; section rules are 1px dashed muted lines.',
       'Show the intrusion as structure, not a filter: a tracking tear, a plain mono message, a chyron with timecode.',
       'Keep the client colour as the phosphor and bar colours, and the remaining bars true teletext values.',
     ],

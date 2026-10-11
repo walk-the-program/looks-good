@@ -65,8 +65,7 @@
 .ab[data-ae="biomechanical-gothic"] .ab-kicker::before { content: ""; width: 34px; height: 1px; background: linear-gradient(90deg, transparent, var(--ab-bi-metal-hi)); }
 .ab[data-ae="biomechanical-gothic"] .ab-headline { font-weight: 400; line-height: 1.02; letter-spacing: calc(-0.012em * var(--ab-tr, 1)); color: var(--ab-bi-bone); text-wrap: balance; }
 .ab[data-ae="biomechanical-gothic"][data-hcls="deco"] .ab-headline, .ab[data-ae="biomechanical-gothic"][data-hcls="didone"] .ab-headline { text-transform: uppercase; letter-spacing: 0.04em; line-height: 1.08; }
-.ab[data-ae="biomechanical-gothic"] .ab-hl { position: relative; color: var(--ab-bi-bone); text-shadow: 0 0 0.55em var(--ab-bi-glow-a), 0 0 0.14em var(--ab-bi-glow-b); }
-.ab[data-ae="biomechanical-gothic"] .ab-hl::after { content: ""; position: absolute; right: -0.1em; top: 0.7em; width: 0.1em; height: 0.15em; border-radius: 50% 50% 50% 50% / 38% 38% 62% 62%; background: var(--ab-accent); box-shadow: inset -0.02em -0.03em 0.03em rgba(0,0,0,.3); }
+.ab[data-ae="biomechanical-gothic"] .ab-hl { color: var(--ab-bi-hl); text-shadow: 0 0 16px var(--ab-bi-hl-glow); }
 .ab[data-ae="biomechanical-gothic"] .ab-subcopy { max-width: 31em; margin-left: 0 !important; margin-top: clamp(16px, 2.2cqw, 24px) !important; }
 .ab[data-ae="biomechanical-gothic"] .ab-sub-lead { color: var(--ab-bi-bone); font-weight: 500; }
 
@@ -81,12 +80,11 @@
 .ab[data-ae="biomechanical-gothic"] .bg-cap { left: 3.4cqw; bottom: 2.6cqw; }
 .ab[data-ae="biomechanical-gothic"] .bg-fig { right: 3.4cqw; top: 2.6cqw; }
 
-/* ---- palette: grown pebbles ---- */
+/* ---- palette: matte cast discs, flat fill, a tarnished rim ---- */
 .ab[data-ae="biomechanical-gothic"] .ab-chip {
-  width: clamp(54px, 7.2cqw, 80px); height: clamp(44px, 5.8cqw, 64px); border-radius: var(--bg-organ); margin-bottom: 14px;
-  box-shadow: inset 0 1px 0 rgba(255,255,255,.14), inset 0 -5px 9px rgba(0,0,0,.45), 0 0 0 1px var(--ab-bi-rim2);
+  width: clamp(48px, 6.2cqw, 62px); height: clamp(48px, 6.2cqw, 62px); border-radius: 50%; margin-bottom: 14px;
+  box-shadow: inset 0 2px 3px rgba(255,255,255,.08), inset 0 -3px 6px rgba(0,0,0,.45), 0 0 0 1px var(--ab-bi-disc-rim);
 }
-.ab[data-ae="biomechanical-gothic"] .ab-swatch:nth-child(even) .ab-chip { border-radius: 46% 54% 52% 48% / 54% 46% 54% 46%; }
 .ab[data-ae="biomechanical-gothic"] .ab-sw-role { font: 500 10.5px/1.3 var(--bg-mono); letter-spacing: 0.16em; text-transform: uppercase; }
 .ab[data-ae="biomechanical-gothic"] .ab-sw-job, .ab[data-ae="biomechanical-gothic"] .ab-sw-hex { font: 400 10px/1.4 var(--bg-mono); letter-spacing: 0.04em; }
 
@@ -138,7 +136,7 @@
   color: var(--ab-bi-bone); background: var(--ab-bi-cast-hi); transform: translateY(-2px) rotate(-1.5deg);
   box-shadow: inset 0 1px 0 var(--ab-bi-rim2), 0 0 0 1px var(--ab-bi-glow), 0 4px 12px -4px var(--ab-bi-glow-a);
 }
-.ab[data-ae="biomechanical-gothic"] .ab-seg-btn[aria-pressed="true"]::before { background: var(--ab-bi-glow); box-shadow: 0 0 6px var(--ab-bi-glow-a); }
+.ab[data-ae="biomechanical-gothic"] .ab-seg-btn[aria-pressed="true"]::before { background: var(--ab-glow); box-shadow: 0 0 6px var(--ab-bi-glow-a); }
 .ab[data-ae="biomechanical-gothic"] .ab-card-title { margin: 26px 0 8px !important; font-weight: 400; font-size: clamp(24px, 3.1cqw, 32px); line-height: 1.08; letter-spacing: calc(-0.005em * var(--ab-tr, 1)); }
 .ab[data-ae="biomechanical-gothic"][data-hcls="deco"] .ab-card-title { letter-spacing: 0.03em; font-size: clamp(20px, 2.5cqw, 26px); }
 .ab[data-ae="biomechanical-gothic"] .ab-card-body { font-size: 14px; }
@@ -147,7 +145,7 @@
   font: 600 11px var(--bg-mono); letter-spacing: 0.16em; text-transform: uppercase; transition: transform 0.2s ease-in-out, filter 0.2s;
 }
 .ab[data-ae="biomechanical-gothic"] .ab-cta::before { content: ""; position: absolute; left: 20px; top: 28%; bottom: 28%; width: 20px; background: repeating-linear-gradient(90deg, rgba(0,0,0,.4) 0 1.5px, transparent 1.5px 5px); }
-.ab[data-ae="biomechanical-gothic"] .ab-cta::after { content: ""; position: absolute; left: 54px; right: 54px; bottom: 8px; height: 1px; background: var(--ab-bi-glow); box-shadow: 0 0 6px var(--ab-bi-glow-a); }
+.ab[data-ae="biomechanical-gothic"] .ab-cta::after { content: ""; position: absolute; left: 54px; right: 54px; bottom: 8px; height: 1px; background: var(--ab-glow); box-shadow: 0 0 6px var(--ab-bi-glow-a); }
 .ab[data-ae="biomechanical-gothic"] .ab-cta:hover { filter: brightness(1.06); }
 .ab[data-ae="biomechanical-gothic"] .ab-cta:hover::before { background: repeating-linear-gradient(90deg, rgba(0,0,0,.4) 0 1.5px, transparent 1.5px 6px); }
 .ab[data-ae="biomechanical-gothic"] .ab-cta:active { transform: scale(0.97); box-shadow: inset 0 3px 8px rgba(0,0,0,.3), 0 0 0 1px var(--ab-bi-rim2); }
@@ -186,7 +184,7 @@
 .ab[data-ae="biomechanical-gothic"] .ab-disc[data-s="1"] { box-shadow: inset 0 -5px 9px rgba(0,0,0,.4), 0 0 0 1px var(--ab-bi-rim2), 0 0 0 5px var(--ab-bi-glow-b); transform: scale(1.04); }
 .ab[data-ae="biomechanical-gothic"] .ab-disc[data-s="2"] {
   background:
-    radial-gradient(ellipse 30% 26% at 50% 50%, var(--ab-bi-glow) 0 55%, transparent 100%),
+    radial-gradient(ellipse 30% 26% at 50% 50%, var(--ab-glow) 0 55%, transparent 100%),
     radial-gradient(ellipse 3px 1.6px at 22% 70%, var(--ab-bi-well) 0 70%, transparent 74%),
     radial-gradient(ellipse 2.6px 1.4px at 78% 30%, var(--ab-bi-well) 0 70%, transparent 74%),
     radial-gradient(ellipse at 36% 28%, var(--ab-bi-cast-hi), var(--ab-bi-cast) 70%);
@@ -213,7 +211,7 @@
 .ab[data-ae="biomechanical-gothic"] .ab-row-status::before { content: ""; width: 5px; height: 3px; border-radius: 50%; background: var(--ab-bi-metal); }
 .ab[data-ae="biomechanical-gothic"] .ab-row:nth-child(1) .ab-row-status::before, .ab[data-ae="biomechanical-gothic"] .ab-row:nth-child(2) .ab-row-status::before { background: var(--ab-bi-glow); box-shadow: 0 0 5px var(--ab-bi-glow-a); }
 .ab[data-ae="biomechanical-gothic"] .ab-row-bar { height: 9px; border-radius: 5px; background: linear-gradient(180deg, var(--ab-bi-cast-lo), var(--ab-bi-well)); box-shadow: inset 0 1px 2px rgba(0,0,0,.6), 0 0 0 1px var(--ab-bi-rim); }
-.ab[data-ae="biomechanical-gothic"] .ab-row-bar i { border-radius: 5px; background: linear-gradient(180deg, var(--ab-bi-glow-b), var(--ab-bi-glow) 45%, var(--ab-bi-glow-a)); box-shadow: 0 0 8px var(--ab-bi-glow-a); }
+.ab[data-ae="biomechanical-gothic"] .ab-row-bar i { border-radius: 5px; background: linear-gradient(180deg, var(--ab-bi-glow-b), var(--ab-glow) 45%, var(--ab-bi-glow-a)); box-shadow: 0 0 8px var(--ab-bi-glow-a); }
 .ab[data-ae="biomechanical-gothic"] .ab-row-pct { font: 500 11.5px var(--bg-mono); letter-spacing: 0.04em; }
 
 /* ---- footer: the base of the columns, a rib band, roman legal ---- */
