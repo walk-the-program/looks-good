@@ -77,6 +77,31 @@
 .pt-fam-wrap .pt-fam { width: 100%; }
 .pt-fam-wrap .pt-add { top: 5px; right: 5px; width: 22px; height: 22px; }
 
+/* family picker toolbar: search + category chips */
+.pt-famtools { display: flex; flex-direction: column; gap: 10px; margin-bottom: 12px; }
+.pt-search { position: relative; max-width: 360px; }
+.pt-search input[type="text"] { padding-right: 34px; }
+.pt-search-x {
+  position: absolute; top: 50%; right: 4px; transform: translateY(-50%); display: grid; place-items: center;
+  width: 28px; height: 28px; padding: 0; color: var(--muted); background: none; border: 0; border-radius: 6px; cursor: pointer;
+}
+.pt-search-x:hover { color: var(--ink); background: var(--hover); }
+.pt-search-x:focus-visible { outline: 2px solid var(--ink); outline-offset: 1px; }
+.pt-search-x[hidden] { display: none; }
+.pt-cats { display: flex; flex-wrap: wrap; gap: 6px; }
+.pt-cat {
+  display: inline-flex; align-items: center; gap: 6px; height: 28px; padding: 0 10px; font: inherit; font-size: 12px; line-height: 1; white-space: nowrap;
+  color: var(--ink-2); background: none; border: 1px solid var(--line-strong); border-radius: 99px; cursor: pointer;
+  transition: color var(--dur) var(--ease), background var(--dur) var(--ease), border-color var(--dur) var(--ease);
+}
+.pt-cat i { font-style: normal; font-size: 11px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.pt-cat:hover { color: var(--ink); border-color: var(--ink); }
+.pt-cat:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.pt-cat[aria-pressed="true"] { color: var(--surface); background: var(--ink); border-color: var(--ink); }
+.pt-cat[aria-pressed="true"] i { color: inherit; opacity: 0.7; }
+.pt-cat.is-empty:not([aria-pressed="true"]) { opacity: 0.45; }
+.pt-fam-wrap[hidden] { display: none; }
+
 .pt-picker { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 10px 10px; }
 .pt-fam {
   display: flex; flex-direction: column; gap: 5px; min-width: 0; padding: 0; text-align: left;
@@ -122,6 +147,9 @@
   .pt-picker { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 }
 @container cmp (max-width: 520px) {
+  .pt-search { max-width: none; }
+  .pt-cats { flex-wrap: nowrap; overflow-x: auto; margin: 0 -2px; padding: 2px 2px 6px; scrollbar-width: thin; }
+  .pt-cat { flex: none; height: 34px; }
   .pt-controls { grid-template-columns: minmax(0, 1fr); }
   .pt-strip, .pt-strip-pins { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .pt-picker { grid-template-columns: repeat(3, minmax(0, 1fr)); }

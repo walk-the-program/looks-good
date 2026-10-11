@@ -8,7 +8,7 @@
 
   /* ---------- 10. Torn bands ---------- */
   P.register({
-    key: 'tornbands', name: 'Torn bands',
+    key: 'tornbands', name: 'Torn bands', category: 'Collage & poster',
     blurb: 'Ragged paper strips laid edge over edge, each printed with its own little pattern, like a print collage.',
     ink: ['ground', 'ink1', 'ink2', 'deep', 'spark'], vector: false, seamless: false,
     common: { grain: 0.45 },
@@ -134,7 +134,7 @@
 
   /* ---------- 12. Aura wash ---------- */
   P.register({
-    key: 'aura', name: 'Aura wash',
+    key: 'aura', name: 'Aura wash', category: 'Soft color',
     blurb: 'Large blurred fields of colour that melt into each other, finished with film grain.',
     ink: ['ground', 'ink1', 'ink2', 'deep', 'spark'], vector: false, seamless: false,
     common: { grain: 0.32 },
@@ -206,7 +206,7 @@
 
   /* ---------- 15. Flow filaments ---------- */
   P.register({
-    key: 'flow', name: 'Flow filaments',
+    key: 'flow', name: 'Flow filaments', category: 'Botanical & line',
     blurb: 'Thin streamlines traced through a noise flow field and bundled into evenly spaced ribbons of hairlines.',
     ink: ['ground', 'ink1', 'ink2', 'spark'], vector: true, seamless: false,
     common: { grain: 0.1 },

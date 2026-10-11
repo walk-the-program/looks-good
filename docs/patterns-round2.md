@@ -1,4 +1,4 @@
-# Patterns round 2 — from 18 to ~51 families
+# Patterns round 2 — from 18 to 53 families (integrated)
 
 Goal: Branding Designer covers the full breadth of generative pattern techniques, driven by brand
 color roles, available in the Patterns view, the brief cart, the AI brief (with Source pointers)
@@ -113,7 +113,16 @@ Each family also gets a `category` (new field, used by the picker): one of
 
 (That is 34 entries incl. blades + rods split; total families ≈ 52.)
 
-## Integration (task P3 after the builders)
+## Integration (task P3) — done
+Status: integrated. 53 families (18 + 35) are loaded in index.html, the dev lab, `Patterns.FAMILY_FILES`
+/ `LOAD_ORDER`, and available in the picker (categories + search + lazy thumbnails), brand suites,
+brief cart, AI brief Source pointers, deck and dev lab. Harness and src-verify pass for all 53.
+src-verify note: snow, satellite and aura create canvases via `document.createElement`, so the node
+check stubs `createElement` and compares draw-call hashes rather than pixels (done for every family).
+Seamless vector tiles of relief and sprigs exceed the 8 KB brief cap, so the brief says to attach the
+exported SVG (caps unchanged); their "Copy CSS tile" works.
+
+Original task text:
 - Picker: category tabs/chips + search field above "All families"; thumbnails lazy-render on
   scroll (IntersectionObserver), cached by family+inks+tone; keep 390px usable.
 - fit.js: revisit every aesthetic's 6-pattern suite using the bigger library where a new family

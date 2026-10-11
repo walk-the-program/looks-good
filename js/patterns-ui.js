@@ -38,6 +38,11 @@ const PatternPins = (function () {
     halftone: 'card', stipple: 'card', glyphgrid: 'card', pixelquilt: 'card',
     zigzag: 'divider', chevron: 'divider',
     weave: 'band', signal: 'band', tornbands: 'band', gradpanes: 'band', typeterrain: 'band',
+    thermal: 'hero', cutup: 'hero', sonar: 'hero', inkstill: 'hero', warpcheck: 'hero', burst: 'hero', ribbonrise: 'band',
+    neonspray: 'hero', bloomgrid: 'hero', kaleidopix: 'hero', pixelgrid: 'card', parcels: 'card', prismpix: 'hero', totem: 'band',
+    slipgrid: 'band', tokens: 'card', relief: 'card', colony: 'hero', tissue: 'card', seafan: 'hero', pebbles: 'card', marble: 'hero',
+    thermalstreak: 'band', waves: 'hero', snow: 'band', onebit: 'band', satellite: 'hero', panels: 'hero', flyposter: 'hero',
+    festival: 'hero', patchwork: 'card', specimens: 'card', sprigs: 'card', blades: 'card', rods: 'band',
   };
   const defaultUse = key => USE_BY_FAMILY[key] || 'hero';
   const useLabel = v => (USES.find(u => u.value === v) || USES[0]).label;
@@ -149,7 +154,7 @@ const PatternsUI = (function () {
 
   const inksFor = entry => P().inksFor(state, entry.colorway, { tints: !!(entry.params && entry.params.tints) });
   const suite = () => P().suiteFor(state.aesthetic);
-  const famInfo = key => P().list().find(f => f.key === key);
+  const famInfo = key => fams.find(f => f.key === key) || P().list().find(f => f.key === key);
   const colorwayLabel = v => (P().E.COLORWAYS.find(c => c.value === v) || {}).label || v;
   const entryOf = (key, params, colorway, seed) => PatternPins.normalize({ key, params, colorway, seed });
   const randomSeed = () => 'v' + Math.random().toString(36).slice(2, 7);
@@ -168,16 +173,18 @@ const PatternsUI = (function () {
     if (!entry) return;
     const inks = inksFor(entry);
     const key = [entry.key, JSON.stringify(entry.params), entry.colorway, entry.seed, inks.ground, inks.ink1, inks.ink2, inks.spark, inks.deep, inks.t1, inks.t2].join('|');
+    if (cv._drawn === key) return;
     let off = thumbCache.get(key);
     if (!off) {
       off = document.createElement('canvas');
       P().render(off, entry.key, entry.params, inks, entry.seed, { width: THUMB_W, height: THUMB_H, dpr: 1, setStyle: false });
       thumbCache.set(key, off);
-      if (thumbCache.size > 140) thumbCache.delete(thumbCache.keys().next().value);
+      if (thumbCache.size > 220) thumbCache.delete(thumbCache.keys().next().value);
     }
     cv.width = off.width;
     cv.height = off.height;
     cv.getContext('2d').drawImage(off, 0, 0);
+    cv._drawn = key;
   }
 
   function pump() {
@@ -197,9 +204,58 @@ const PatternsUI = (function () {
   function redrawThumbs() {
     queue = [];
     pumping = false;
-    // visible-first order: suite, in your brief, then the family picker
-    const order = ['#ptSuite canvas', '#ptPins canvas', '#ptPicker canvas'];
+    // visible-first order: suite, in your brief, then the family picker (on-screen tiles only)
+    const order = ['#ptSuite canvas', '#ptPins canvas'];
     queueThumbs(order.flatMap(sel => Array.from(root.querySelectorAll(sel))));
+    queuePicker();
+  }
+
+  /* ---------------- family picker: categories, search, lazy thumbnails ---------------- */
+
+  let fams = [];                       // P().list(), with a lowercase search haystack
+  const famFilter = { cat: '', q: '' };   // cat '' = All
+  let thumbIO = null;
+
+  // Redraw the picker thumbnails that are on screen (or about to be); the rest draw when scrolled in.
+  function queuePicker() {
+    const host = $('ptPicker');
+    if (!host) return;
+    const cvs = Array.from(host.querySelectorAll('.pt-fam-wrap:not([hidden]) canvas'));
+    queueThumbs(thumbIO ? cvs.filter(c => c._vis) : cvs);
+  }
+
+  function famMatches(f, terms) {
+    return terms.every(t => f._hay.indexOf(t) >= 0);
+  }
+
+  function applyFilter() {
+    const terms = famFilter.q.toLowerCase().split(/\s+/).filter(Boolean);
+    const counts = {};
+    let shown = 0;
+    const byKey = {};
+    fams.forEach(f => {
+      const m = famMatches(f, terms);
+      if (m) counts[f.category] = (counts[f.category] || 0) + 1;
+      byKey[f.key] = m && (!famFilter.cat || f.category === famFilter.cat);
+      if (byKey[f.key]) shown++;
+    });
+    $('ptPicker').querySelectorAll('.pt-fam-wrap').forEach(w => { w.hidden = !byKey[w.dataset.key]; });
+    const matched = Object.keys(counts).reduce((n, k) => n + counts[k], 0);
+    root.querySelectorAll('.pt-cat').forEach(b => {
+      const cat = b.dataset.cat;
+      const n = cat ? (counts[cat] || 0) : matched;
+      b.querySelector('i').textContent = n;
+      b.setAttribute('aria-pressed', String(cat === famFilter.cat));
+      b.classList.toggle('is-empty', n === 0);
+    });
+    $('ptFamCount').textContent = shown === fams.length ? `${fams.length} generators` : `${shown} of ${fams.length} generators`;
+    $('ptFamEmpty').hidden = shown > 0;
+    $('ptSearchX').hidden = !famFilter.q;
+  }
+
+  function setFilter(change) {
+    Object.assign(famFilter, change);
+    applyFilter();
   }
 
   /* ---------------- markup ---------------- */
@@ -271,8 +327,16 @@ const PatternsUI = (function () {
             <p class="pt-empty" id="ptPinsEmpty">Add a pattern to include it in the AI brief, with its colors, where to use it and the SVG. Patterns in your brief also appear in the brand deck.</p>
           </section>
           <section class="pt-block pt-block-fams" aria-label="All families">
-            <div class="pt-block-head"><h3>All families</h3><span>${P().list().length} generators</span></div>
+            <div class="pt-block-head"><h3>All families</h3><span id="ptFamCount" aria-live="polite"></span></div>
+            <div class="pt-famtools">
+              <div class="pt-search">
+                <input type="text" id="ptSearch" placeholder="Search families" aria-label="Search families by name, look or category" autocomplete="off" spellcheck="false" inputmode="search" enterkeyhint="search" maxlength="40" />
+                <button type="button" class="pt-search-x" id="ptSearchX" aria-label="Clear search" hidden>${ICO('<path d="M6 6l12 12M18 6 6 18"/>')}</button>
+              </div>
+              <div class="pt-cats" id="ptCats" role="group" aria-label="Category"></div>
+            </div>
             <div class="pt-picker" id="ptPicker" role="group" aria-label="Pattern family"></div>
+            <p class="pt-empty" id="ptFamEmpty" hidden>No family matches that search. Clear it or pick another category.</p>
           </section>
         </div>
         <aside class="pt-side" aria-label="Pattern controls">
@@ -311,14 +375,29 @@ const PatternsUI = (function () {
   }
 
   function buildPicker() {
-    $('ptPicker').innerHTML = P().list().map((f, i) => `<div class="pt-fam-wrap" data-key="${f.key}">
-        <button type="button" class="pt-fam" data-key="${f.key}" aria-pressed="false" title="${escapeHtml(f.blurb)}">
+    const P_ = P();
+    fams = P_.list().map(f => Object.assign({}, f, { _hay: [f.name, f.key, f.blurb, f.category].join(' ').toLowerCase() }));
+    const cats = (P_.CATEGORIES || []).filter(c => fams.some(f => f.category === c));
+    $('ptCats').innerHTML = [''].concat(cats).map(c =>
+      `<button type="button" class="pt-cat" data-cat="${escapeHtml(c)}" aria-pressed="${c === ''}">${escapeHtml(c || 'All')} <i>${c ? fams.filter(f => f.category === c).length : fams.length}</i></button>`).join('');
+    $('ptPicker').innerHTML = fams.map(f => `<div class="pt-fam-wrap" data-key="${f.key}">
+        <button type="button" class="pt-fam" data-key="${f.key}" aria-pressed="false" title="${escapeHtml(f.category + ': ' + f.blurb)}">
           <canvas width="${THUMB_W}" height="${THUMB_H}" aria-hidden="true"></canvas><span>${escapeHtml(f.name)}</span></button>
         ${addButton(false, f.name)}</div>`).join('');
+    if (window.IntersectionObserver) {
+      thumbIO = new IntersectionObserver(entries => {
+        const now = [];
+        entries.forEach(en => { en.target._vis = en.isIntersecting; if (en.isIntersecting) now.push(en.target); });
+        if (now.length) queueThumbs(now);
+      }, { rootMargin: '240px 0px' });
+    }
     $('ptPicker').querySelectorAll('.pt-fam').forEach(btn => {
       const f = famInfo(btn.dataset.key);
-      btn.querySelector('canvas')._mk = () => entryOf(f.key, Object.assign({}, f.defaults, { tone: curTone() }), cur ? cur.colorway : 'brand', SUITE_SEED);
+      const cv = btn.querySelector('canvas');
+      cv._mk = () => entryOf(f.key, Object.assign({}, f.defaults, { tone: curTone() }), cur ? cur.colorway : 'brand', SUITE_SEED);
+      if (thumbIO) thumbIO.observe(cv);
     });
+    applyFilter();
   }
 
   function buildSuite() {
@@ -409,7 +488,7 @@ const PatternsUI = (function () {
     buildControls();
     syncChrome();
     $('ptPicker').querySelectorAll('.pt-fam').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.key === cur.key)));
-    queueThumbs(Array.from($('ptPicker').querySelectorAll('canvas')));   // picker follows the colorway
+    queuePicker();   // picker follows the colorway
   }
 
   function syncTone() {
@@ -666,6 +745,13 @@ const PatternsUI = (function () {
         if (p) setCurrent(p, null);
         return;
       }
+      const catBtn = e.target.closest('.pt-cat');
+      if (catBtn) return setFilter({ cat: catBtn.dataset.cat });
+      if (e.target.closest('#ptSearchX')) {
+        $('ptSearch').value = '';
+        setFilter({ q: '' });
+        return $('ptSearch').focus();
+      }
       const fam = e.target.closest('.pt-fam');
       if (fam) {
         const f = famInfo(fam.dataset.key);
@@ -689,6 +775,7 @@ const PatternsUI = (function () {
 
     root.addEventListener('input', e => {
       const el = e.target;
+      if (el.id === 'ptSearch') return setFilter({ q: el.value });
       if (el.id === 'ptTone') {
         cur.params.tone = Number(el.value) / 100;
         $('ptTone-o').textContent = el.value + '%';
@@ -705,6 +792,14 @@ const PatternsUI = (function () {
       }
     });
 
+    root.addEventListener('keydown', e => {
+      if (e.key === 'Escape' && e.target.id === 'ptSearch' && e.target.value) {
+        e.target.value = '';
+        setFilter({ q: '' });
+        e.preventDefault();
+      }
+    });
+
     root.addEventListener('change', e => {
       const el = e.target;
       if (el.dataset && el.dataset.k) {
@@ -717,13 +812,13 @@ const PatternsUI = (function () {
       if (el.id === 'ptTone') {
         cur.params.tone = Number(el.value) / 100;
         edited();
-        queueThumbs(Array.from($('ptPicker').querySelectorAll('canvas')));   // picker follows the strength
+        queuePicker();   // picker follows the strength
         return renderNow();
       }
       if (el.name === 'ptColorway' && el.checked) {
         cur.colorway = el.value;
         edited();
-        queueThumbs(Array.from($('ptPicker').querySelectorAll('canvas')));
+        queuePicker();
         return renderNow();
       }
       if (el.id === 'ptSeed') {

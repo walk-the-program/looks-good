@@ -3,7 +3,8 @@
 
    Plain script. Everything hangs off window.Patterns:
      Patterns.register(def)            add a family
-     Patterns.list()                   public info for every family
+     Patterns.list()                   public info for every family (incl. category)
+     Patterns.CATEGORIES               ordered picker categories
      Patterns.get(key) / defaults(key) / schema(key)
      Patterns.inksFor(stateOrTokens, colorway, {tints})
      Patterns.render(canvas, key, params, inks, seed, opts)   -> {ms,w,h}
@@ -558,9 +559,12 @@
     Patterns.schema(key).forEach(s => { out[s.key] = s.default; });
     return out;
   };
+  // Picker categories, in display order. Every family carries one of these in `category`.
+  Patterns.CATEGORIES = ['Halftone & print', 'Stripes & op-art', 'Pixel & grid', 'Organic & cellular',
+    'Glitch & signal', 'Collage & poster', 'Botanical & line', 'Soft color'];
   Patterns.list = function () {
     return Array.from(families.values()).map(f => ({
-      key: f.key, name: f.name, blurb: f.blurb, ink: f.ink, vector: !!f.vector, seamless: !!f.seamless,
+      key: f.key, name: f.name, blurb: f.blurb, category: f.category || 'Soft color', ink: f.ink, vector: !!f.vector, seamless: !!f.seamless,
       params: schemaOf(f), defaults: Patterns.defaults(f.key),
     }));
   };

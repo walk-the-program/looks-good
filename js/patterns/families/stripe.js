@@ -23,7 +23,7 @@
   }
 
   P.register({
-    key: 'zigzag', name: 'Zigzag',
+    key: 'zigzag', name: 'Zigzag', category: 'Stripes & op-art',
     blurb: 'Interlocking teeth in flat colour bands, rounded, chevron or staircase.',
     ink: ['ground', 'ink1', 'ink2', 'spark'], vector: true, seamless: true,
     common: { grain: 0.1 },
@@ -92,7 +92,7 @@
   /* ---------- 4. Weave ---------- */
   const RHYTHMS = [[1, 1], [2, 1], [1, 2], [3, 1], [1, 1, 1, 3], [2, 2, 1, 1], [1, 3, 1, 1], [4, 1]];
   P.register({
-    key: 'weave', name: 'Weave',
+    key: 'weave', name: 'Weave', category: 'Stripes & op-art',
     blurb: 'Stacked ribbons, each ruled with its own vertical stripe rhythm, like cloth tape laid edge to edge.',
     ink: ['ground', 'ink1', 'ink2', 'deep', 'spark'], vector: true, seamless: true,
     common: { grain: 0.15 },
@@ -157,7 +157,7 @@
 
   /* ---------- 5. Op-art rings ---------- */
   P.register({
-    key: 'oprings', name: 'Op-art rings',
+    key: 'oprings', name: 'Op-art rings', category: 'Stripes & op-art',
     blurb: 'Flat stripes bent around hidden centres until they read as rings, eyes and saddles.',
     ink: ['ground', 'ink1', 'ink2'], vector: false, seamless: false,
     common: { grain: 0.08 },
@@ -256,7 +256,7 @@
     return E.ellipsePoly(cx, cy, R, R, 120);
   }
   P.register({
-    key: 'counterchange', name: 'Counterchange',
+    key: 'counterchange', name: 'Counterchange', category: 'Stripes & op-art',
     blurb: 'An even bar field with a centred figure where the bars swap places with the gaps.',
     ink: ['ground', 'ink1', 'ink2', 'spark'], vector: true, seamless: false,
     common: { grain: 0.12 },
@@ -302,7 +302,7 @@
 
   /* ---------- 13. Chevron mirror ---------- */
   P.register({
-    key: 'chevron', name: 'Chevron mirror',
+    key: 'chevron', name: 'Chevron mirror', category: 'Stripes & op-art',
     blurb: 'Diagonal bands drawn in one quadrant and mirrored out into lozenges and arrowheads.',
     ink: ['ground', 'ink1', 'ink2', 'spark'], vector: true, seamless: true,
     common: { grain: 0.12 },
@@ -356,7 +356,7 @@
     return circ(r1, 1) + circ(r2, 0);
   }
   P.register({
-    key: 'arcrise', name: 'Arc rise',
+    key: 'arcrise', name: 'Arc rise', category: 'Stripes & op-art',
     blurb: 'Giant concentric colour bands rise from an edge across a field of upright bars.',
     ink: ['ground', 'ink1', 'ink2', 'deep', 'spark'], vector: true, seamless: false,
     common: { grain: 0.12 },

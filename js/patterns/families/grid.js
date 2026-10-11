@@ -32,7 +32,7 @@
   };
 
   P.register({
-    key: 'pixelquilt', name: 'Pixel quilt',
+    key: 'pixelquilt', name: 'Pixel quilt', category: 'Pixel & grid',
     blurb: 'A patchwork of coarse-pixel swatches: brick, plaid, checker, dithered ramps and stair steps.',
     ink: ['ground', 'ink1', 'ink2', 'deep', 'spark'], vector: true, seamless: true,
     common: { grain: 0.06 },
@@ -91,7 +91,7 @@
   /* ---------- 8. Gradient panes ---------- */
   const DIRS = [[1, 0], [-1, 0], [0, 1], [0, -1], [0.7071, 0.7071], [-0.7071, 0.7071], [0.7071, -0.7071], [-0.7071, -0.7071]];
   P.register({
-    key: 'gradpanes', name: 'Gradient panes',
+    key: 'gradpanes', name: 'Gradient panes', category: 'Soft color',
     blurb: 'Rows of uneven panes, each one a two-ink ramp running in its own direction.',
     ink: ['ground', 'ink1', 'ink2', 'deep', 'spark'], vector: true, seamless: false,
     common: { grain: 0.2 },
@@ -179,7 +179,7 @@
     shapes: ['dot', 'tri', 'diamond', 'ring', 'bigdot'],
   };
   P.register({
-    key: 'glyphgrid', name: 'Glyph grid',
+    key: 'glyphgrid', name: 'Glyph grid', category: 'Pixel & grid',
     blurb: 'A lattice of tiny marks: squares, diamonds, rings and crosses chosen by the height of a noise field.',
     ink: ['ground', 'ink1', 'ink2', 'spark'], vector: true, seamless: true,
     common: { grain: 0.1 },
@@ -215,7 +215,7 @@
 
   /* ---------- 14. Modular grid ---------- */
   P.register({
-    key: 'modulargrid', name: 'Modular grid',
+    key: 'modulargrid', name: 'Modular grid', category: 'Pixel & grid',
     blurb: 'A seeded grid of modules: solid blocks, dot matrices, line fields, bar ramps and quarter circles.',
     ink: ['ground', 'ink1', 'ink2', 'deep', 'spark'], vector: true, seamless: true,
     common: { grain: 0.1 },
@@ -309,7 +309,7 @@
 
   /* ---------- 16. Signal mosaic ---------- */
   P.register({
-    key: 'signal', name: 'Signal mosaic',
+    key: 'signal', name: 'Signal mosaic', category: 'Glitch & signal',
     blurb: 'Glitched horizontal bands of pixel confetti, block mosaics, vertical smears and scanlines.',
     ink: ['ground', 'ink1', 'ink2', 'deep', 'spark'], vector: true, seamless: false,
     common: { grain: 0.1 },

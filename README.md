@@ -109,11 +109,12 @@ Start 2P, Silkscreen, Pixelify Sans, VT323).
 ## Patterns
 
 A third workspace view, **Patterns** (next to Board and Compare all), is a
-generative pattern studio driven by the same brand colors. Eighteen original
-generators (halftone, stipple, zigzag, weave, op-art rings, counterchange,
-pixel quilt, gradient panes, glyph grid, torn bands, posterised terrain, aura
-wash, chevron mirror, modular grid, flow filaments, signal mosaic, type
-terrain, arc rise) paint a large live canvas. Patterns never invent colors:
+generative pattern studio driven by the same brand colors. Fifty-three original
+generators in eight categories (Halftone & print, Stripes & op-art, Pixel &
+grid, Organic & cellular, Glitch & signal, Collage & poster, Botanical & line,
+Soft color) paint a large live canvas; the **All families** picker has category
+chips with counts and a search box (name, look or category). Thumbnails draw as
+they scroll into view. paint a large live canvas. Patterns never invent colors:
 ground is the canvas, ink 1 the primary, ink 2 the secondary, and the accent
 is a spark under 5% of the area. **Colorway** switches between Brand, Mono,
 Duotone and Night, **+ tints** adds lighter mixes, and every family's own
@@ -262,7 +263,7 @@ js/aesthetic-board.js    design language board, Compare all, Aesthetic panel, fa
 js/aesthetic-meta.js     per-aesthetic family and font recommendations
 js/color-roles.js        the five color roles (use / never / coverage)
 js/color-picker.js       inline HSV picker; js/color-import.js parses pasted colors
-js/patterns/             pattern engine, 18 families, aesthetic fit (suites)
+js/patterns/             pattern engine, 53 families in 8 categories, aesthetic fit (suites)
 js/patterns-ui.js        Patterns workspace view and the brief-cart storage (PatternPins)
 js/pattern-cart.js       Brief tray (header button, sidebar line)
 js/patterns-deck.js      Patterns deck slide and cover/closing strips

@@ -7,7 +7,7 @@
 
   /* ---------- 1. Halftone field ---------- */
   P.register({
-    key: 'halftone', name: 'Halftone field',
+    key: 'halftone', name: 'Halftone field', category: 'Halftone & print',
     blurb: 'A cloudy noise field cut into a few levels and printed through a coarse dot screen.',
     ink: ['ground', 'ink1', 'ink2', 'spark'], vector: true, seamless: true,
     common: { grain: 0.18 },
@@ -68,7 +68,7 @@
 
   /* ---------- 2. Stipple ---------- */
   P.register({
-    key: 'stipple', name: 'Stipple',
+    key: 'stipple', name: 'Stipple', category: 'Halftone & print',
     blurb: 'Hand-inked dots that crowd together where the noise is dense and thin out where it fades.',
     ink: ['ground', 'ink1', 'ink2', 'spark'], vector: true, seamless: true,
     common: { grain: 0.15 },
@@ -165,7 +165,7 @@
   function offscreen(w, h) { const c = global.document.createElement('canvas'); c.width = w; c.height = h; return c; }
 
   P.register({
-    key: 'terrain', name: 'Posterised terrain',
+    key: 'terrain', name: 'Posterised terrain', category: 'Halftone & print',
     blurb: 'Noise cut into flat colour regions whose edges break up into chunky ordered dither.',
     ink: ['ground', 'ink1', 'ink2', 'deep', 'spark'], vector: false, seamless: false,
     common: { grain: 0.08 },
@@ -233,7 +233,7 @@
     binary: '  .0101',
   };
   P.register({
-    key: 'typeterrain', name: 'Type terrain',
+    key: 'typeterrain', name: 'Type terrain', category: 'Glitch & signal',
     blurb: 'Terraced noise typed out one character per cell, light punctuation in the lowlands and heavy glyphs on the peaks.',
     ink: ['ground', 'ink1', 'ink2', 'deep', 'spark'], vector: false, seamless: false,
     common: { grain: 0.06 },

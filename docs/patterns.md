@@ -55,6 +55,10 @@ Not added to the board UI itself.
   heavy families render progressively or at lower internal resolution then upscale crisply.
 
 ## Aesthetic fit
+Round 2: the library is now 53 families (see docs/patterns-round2.md) and every suite was revisited,
+e.g. Xerox -> thermal and onebit, Blueprint -> relief, tokens and rods in mono at tone 0.55, Pixel
+Arcade -> prismpix, totem, bloomgrid, kaleidopix, Riso -> cutup, inkstill, sonar, Neo-Brutal Pop ->
+panels, patchwork, festival. A suite never repeats a family. Original description:
 `js/patterns/fit.js`: for each of the 26 aesthetics, an ordered list of 6 fitting families with
 preset params (e.g. Riso Print → torn bands, halftone, stipple; Pixel Arcade → pixel quilt,
 signal mosaic, type terrain; Aurora Noir → flow filaments, aura wash (subtle), modular grid;
@@ -64,12 +68,18 @@ ASCII Art → type terrain; Xerox → halftone (threshold), stipple, signal mosa
 
 ## Patterns view UI
 - Big canvas (16:9, fills the workspace width), "New variation" (reseed), family picker (visual
-  tiles), auto-generated controls from the schema, Colorway control, Grain, Scale, Seed field.
+  tiles with a search field and category chips, see below), auto-generated controls from the schema, Colorway control, Grain, Scale, Seed field.
 - Brand suite strip (6 thumbnails) — click to load into the big canvas; the + on a thumbnail adds
   the pattern to the brief (saved in state.patterns, persisted with the brand, undoable, marks
   unsaved). The canvas has "Add to brief" next to the exports; each All-families thumbnail has
   the same + (it adds exactly what the thumbnail shows). In-brief items show a check. The
   "In your brief" strip lists them.
+- Family picker (round 2, 53 families): a search field (matches name, key, blurb and category, every
+  word must match) and chips for All plus the eight categories (`Patterns.CATEGORIES`, each family
+  carries `category`, returned by `Patterns.list()`). Chip counts follow the search. Thumbnails
+  are drawn lazily (IntersectionObserver, 240 px margin) and cached by family, params, colorway and
+  inks; filtering hides tiles with `hidden`. Chips and the clear button are real buttons, Escape
+  clears the search; at 390 px the chips scroll sideways.
 - Export: PNG (1×/2×/4K), SVG for vector families, "Copy CSS background" for small seamless
   tiles (data URI, size-capped).
 - Respects locks? No — patterns are their own section; Shuffle everything does not reseed them.
@@ -83,6 +93,8 @@ brand unsaved), so brands saved with pins load unchanged. Each entry is
   `divider` (Divider strip), `accent` (Accent detail). Defaults by family: aura, terrain, flow,
   counterchange, arcrise, oprings, modulargrid -> hero; halftone, stipple, glyphgrid, pixelquilt ->
   card; zigzag, chevron -> divider; weave, signal, tornbands, gradpanes, typeterrain -> band.
+  Round 2 families: see `USE_BY_FAMILY` in js/patterns-ui.js (e.g. sprigs, relief, tokens, parcels -> card;
+  ribbonrise, totem, slipgrid, onebit -> band; the rest hero).
   Brands saved without `use` load with the family default.
 - `svg` (vector families only, default on) puts the SVG code in the AI brief.
 - Tray: a "Brief · N" button in the workspace header (all three views; muted at 0, pulses on add)
@@ -130,7 +142,7 @@ brand unsaved), so brands saved with pins load unchanged. Each entry is
   solid copy area so text contrast holds).
 
 ## Acceptance
-1. 18 families render well at defaults with brand inks for 3 palettes; none copy third-party code.
+1. 53 families (18 original + 35 in round 2) render well at defaults with brand inks for 3 palettes; none copy third-party code.
 2. Aesthetic-fit suites look coherent with their boards for all 26.
 3. Controls regenerate live; seed reproducible (same seed + params → identical pixels).
 4. Patterns in the brief persist with the brand (including `use` and `svg`) and undo; exports work (PNG, SVG, CSS tile).
