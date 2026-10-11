@@ -452,3 +452,5 @@ switch toggles status text; the field is a real input. Compare tiles are `inert`
 empty css file; their owners replace `art`, add `tokens`/`canvas` if needed, `materials`, `rules`, and fill the css.
 
 **Round 4 keys (P4 scaffold):** `blob-tracking` (21), `xerox` (22), `micrographics` (23), `mixed-type` (24), `ascii-art` (25), `rebus` (26); spec in docs/aesthetics-round4.md. New font class `typewriter` (Special Elite, Courier Prime with true italics `ital: '400;700'`).
+
+**Round 5 keys (P5 scaffold):** `corporate-vandalism` (27), `religious-futurism` (28), `xerox-punk` (29), `acid-graphics` (30), `cybersigilism` (31), `industrial-hazard` (32), `radical-memphis` (33), `biomechanical-gothic` (34), `pirate-broadcast` (35), `dystopian-luxury` (36); spec in docs/aesthetics-round5.md. New font class `blackletter` (Grenze Gotisch, Pirata One; counted as serif-ish for `avoid: ['serif']`), plus Cinzel Decorative (deco), Barlow Condensed (condensed), Share Tech Mono (mono).

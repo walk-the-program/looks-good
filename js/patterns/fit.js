@@ -1,5 +1,5 @@
 /* ---------------------------------------------------------------------
-   patterns/fit.js — aesthetic fit: six tuned patterns for each of the 26
+   patterns/fit.js — aesthetic fit: six tuned patterns for each of the 36
    aesthetics (keys match js/aesthetics/*.js).
 
      Patterns.suiteFor(aestheticKey) -> [{ key, name, colorway, params, tone }]
@@ -11,7 +11,8 @@
        tone      number 0..1, default 1. Lower = quieter: ink contrast/saturation moves
                  toward the ground and the spark shrinks (see engine.js, "Tone"). Quiet
                  suites: aurora-noir 0.35 (Fine screen 0.25), soft-form 0.45,
-                 liquid-glass 0.6 (Aura 1), blueprint 0.55 (all mono); a few single entries are
+                 liquid-glass 0.6 (Aura 1), blueprint 0.55 (all mono), round 5: religious-futurism 0.5-0.6,
+                 cybersigilism 0.5-0.6, biomechanical-gothic 0.45-0.5, dystopian-luxury 0.45-0.5; a few single entries are
                  softened in clay (0.85) and editorial-serif (0.75). Pass entry.params
                  (or params + { tone }) to Patterns.render / renderSVG / tileCSS.
      Patterns.suiteKeys()            -> every aesthetic key that has a suite
@@ -231,6 +232,86 @@
       ['arcrise', 'Rising sun', 'brand', { origin: 'bottom', bands: 5, bars: false, suns: 1 }],
       ['counterchange', 'Eye', 'brand', { figure: 'circle', bar: 4.4, dir: 'h', size: 0.6, nest: 2, second: true }],
       ['sprigs', 'Marker sprigs', 'brand', { size: 1.1, line: 1, mix: 0.5, fills: 0.85, slip: 0.5 }],
+    ],
+    'corporate-vandalism': [
+      ['glyphgrid', 'Form field', 'mono', { glyphs: 'blocks', cell: 3.4, bands: 4, duo: false }],
+      ['onebit', 'Photocopy bureau', 'mono', { zones: 4, pixel: 1.6, dither: 'threshold', pair: 'ink1', glitch: 0.1 }],
+      ['parcels', 'Parcel labels', 'mono', { cell: 1.6, size: 1, every: 8, labels: true }],
+      ['modulargrid', 'Ledger cells', 'mono', { cols: 8, style: 'line', merge: 0.5, gap: 0.5, empty: 0.2 }],
+      ['signal', 'Barcode run', 'mono', { px: 0.9, bands: 14, noise: 0.25, blank: 0.3 }],
+      ['relief', 'Circuit memo', 'mono', { cols: 4, traces: 5, blocks: 3, trace: 0.8 }],
+    ],
+    'religious-futurism': [
+      ['specimens', 'Rose windows', 'brand', { cols: 4, gap: 1, round: 1.2, study: 'rings', line: 0.8 }, 0.55],
+      ['oprings', 'Halo rings', 'brand', { mode: 'rings', centres: 1, freq: 10, warp: 0.1, bands: 'two' }, 0.5],
+      ['marble', 'Veined stone', 'mono', { bands: 6, warp: 1, cover: 0.6, stars: 0.1, outline: false }, 0.5],
+      ['burst', 'Radiant mandorla', 'brand', { rays: 72, layers: 2, bend: 0.1, beads: 0.3, origin: 'centre' }, 0.5],
+      ['kaleidopix', 'Glass mosaic', 'brand', { px: 1.6, patches: 1, fold: 'quad' }, 0.6],
+      ['pixelquilt', 'Leaded panes', 'brand', { px: 1.2, block: 8, motifs: 'geometric', big: 0.1 }, 0.55],
+    ],
+    'xerox-punk': [
+      ['tornbands', 'Wheatpaste layers', 'brand', { bands: 7, tear: 1.4, tilt: 2.5, minis: 'mixed', shadow: 0.6 }],
+      ['onebit', 'Toner crush', 'mono', { zones: 5, pixel: 1.5, dither: 'threshold', pair: 'ink1', glitch: 0.5 }],
+      ['flyposter', 'Bill posting', 'brand', { stripe: 1.6, harden: 0.8, blocks: 4, marks: 2, angle: -12 }],
+      ['cutup', 'Cut-up sheets', 'brand', { pieces: 5, cell: 1.6, hills: 1.2, slip: 0.6 }],
+      ['halftone', 'Coarse screen', 'mono', { cell: 4, levels: 3, shape: 'square', angle: 20, field: 'warp', duo: false }],
+      ['snow', 'Dead channel', 'duotone', { cols: 5, static: 0.5, stairs: 0.3, lenses: 0.2, marks: 0.4 }],
+    ],
+    'acid-graphics': [
+      ['warpcheck', 'Warped check', 'brand', { pattern: 'check', warp: 'wave', cells: 24, amp: 0.8, waves: 3, second: true }],
+      ['burst', 'Strobe rays', 'brand', { rays: 96, layers: 3, bend: 0.6, beads: 0.2, origin: 'corner' }],
+      ['neonspray', 'Neon spray', 'brand', { streaks: 12, pastel: 0.1, bleed: 1.1, spray: 0.7 }],
+      ['oprings', 'Vibrating rings', 'brand', { mode: 'lens', centres: 2, freq: 24, warp: 0.6, bands: 'two' }],
+      ['ribbonrise', 'Ticket tabs', 'brand', { edge: 'bottom', bar: 1.8, bands: 5, shift: 0.2, ring: true }],
+      ['thermal', 'Heat melt', 'brand', { bands: 6, cell: 1.2, turb: 1.6, shape: 'mixed', flat: false }],
+    ],
+    'cybersigilism': [
+      ['rods', 'Thorn rods', 'mono', { density: 1.1, thick: 0.6, length: 4.5, fork: 0.7, slip: 0.4, second: 'ink2' }, 0.6],
+      ['flow', 'Silver filaments', 'mono', { field: 'swirl', strands: 5, gap: 1.8, bend: 1.6, weight: 0.5 }, 0.55],
+      ['seafan', 'Mirrored fans', 'mono', { fans: 2, branch: 1.2, ribs: true, screen: 0.2, lobes: 2 }, 0.6],
+      ['blades', 'Fine blades', 'mono', { count: 260, size: 0.9, curve: 0.6, take: 0.6, ink: 'ink2' }, 0.6],
+      ['chevron', 'Mirror chevrons', 'mono', { bands: 12, slope: 55, mirror: 'quad', rhythm: 'even', colors: 'two' }, 0.5],
+      ['oprings', 'Sigil saddle', 'mono', { mode: 'saddle', centres: 1, freq: 14, warp: 0.2, bands: 'two' }, 0.5],
+    ],
+    'industrial-hazard': [
+      ['chevron', 'Hazard stripes', 'duotone', { bands: 8, slope: 45, mirror: 'x', rhythm: 'even', colors: 'two' }],
+      ['relief', 'Panel traces', 'mono', { cols: 3, traces: 8, blocks: 4, trace: 1.1 }],
+      ['slipgrid', 'Indicator lamps', 'mono', { cell: 2.4, slip: 0.2, streak: 1, gutter: 0.18, scatter: 0.3 }],
+      ['panels', 'Steel plates', 'mono', { depth: 4, gutter: 0.4, pitch: 1, flat: 0.5, frame: true }],
+      ['modulargrid', 'Bay grid', 'mono', { cols: 6, style: 'filled', merge: 0.4, gap: 0.3, empty: 0.15 }],
+      ['zigzag', 'Tread plate', 'duotone', { style: 'stair', band: 6, amp: 3, period: 9, phase: 'parallel', colors: 'two' }],
+    ],
+    'radical-memphis': [
+      ['patchwork', 'Terrazzo', 'brand', { cell: 7, layers: 56, ragged: 0.6, motif: 'mixed', dotgrid: false }],
+      ['panels', 'Laminate stack', 'brand', { depth: 5, gutter: 0.6, pitch: 1.2, flat: 0.3, frame: false }],
+      ['festival', 'Squiggle party', 'brand', { patches: 7, loops: 0.8, weight: 1.2, stars: 3, echo: true }],
+      ['zigzag', 'Zig laminate', 'brand', { style: 'chevron', colors: 'four', band: 8, amp: 5, period: 12, phase: 'interlock' }],
+      ['pebbles', 'Speckle top', 'brand', { size: 1, gap: 1.2, erode: 0.5, mode: 'crumble', lit: 0.3 }],
+      ['glyphgrid', 'Primitive field', 'brand', { glyphs: 'shapes', cell: 5, bands: 5, duo: true }],
+    ],
+    'biomechanical-gothic': [
+      ['seafan', 'Rib lattice', 'brand', { fans: 2, branch: 1, ribs: true, screen: 0.5, lobes: 3 }, 0.5],
+      ['tissue', 'Cast membrane', 'brand', { cell: 12, loose: 0.5, levels: 4, veins: 0.5, wall: 0.8 }, 0.45],
+      ['colony', 'Spore colony', 'brand', { cells: 40, rings: 3, fuse: 1.2, finish: 'film', nuclei: true }, 0.45],
+      ['rods', 'Vertebral rods', 'mono', { density: 1.3, thick: 1.1, length: 3.5, fork: 0.3, slip: 0.2, second: 'deep' }, 0.45],
+      ['waves', 'Tubing runs', 'mono', { rows: 6, crests: 3, curl: 1.4, strands: 10, drops: 0 }, 0.45],
+      ['relief', 'Bone relief', 'mono', { cols: 4, traces: 4, blocks: 4, trace: 0.9 }, 0.5],
+    ],
+    'pirate-broadcast': [
+      ['signal', 'Dead air', 'brand', { px: 0.8, bands: 24, noise: 0.5, blank: 0.2 }],
+      ['satellite', 'Intercept', 'brand', { mosaic: 0.6, block: 1.6, bars: 0.5, slices: 3, tear: 0.5 }],
+      ['typeterrain', 'Teletext hills', 'brand', { charset: 'code', size: 1.2, levels: 6, style: 'ridges' }],
+      ['snow', 'Static', 'night', { cols: 6, static: 0.6, stairs: 0.5, lenses: 0.3, marks: 0.6 }],
+      ['pixelgrid', 'Block graphics', 'brand', { cell: 2.4, mode: 'crosses', zones: 4, density: 0.7, phase: 0 }],
+      ['warpcheck', 'Roll bars', 'duotone', { pattern: 'slash', warp: 'taper', cells: 18, amp: 0.4, waves: 2, second: false }],
+    ],
+    'dystopian-luxury': [
+      ['modulargrid', 'Cold modules', 'mono', { cols: 10, style: 'line', merge: 0.3, gap: 0.8, empty: 0.35 }, 0.5],
+      ['halftone', 'Clinical screen', 'mono', { cell: 1.2, levels: 4, shape: 'round', angle: 15, field: 'clouds', duo: false }, 0.45],
+      ['stipple', 'Dust grain', 'mono', { density: 0.7, dot: 0.7, layout: 'random', mirror: 'none', field: 'clouds', duo: false }, 0.45],
+      ['terrain', 'Survey contours', 'mono', { levels: 4, pix: 0.4, dither: 0.3, style: 'ridges' }, 0.45],
+      ['parcels', 'Accession tags', 'mono', { cell: 1.2, size: 0.8, every: 12, labels: true }, 0.5],
+      ['glyphgrid', 'Registration marks', 'mono', { glyphs: 'crosses', cell: 5, bands: 3, duo: false }, 0.45],
     ],
   };
 

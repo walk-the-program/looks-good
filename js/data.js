@@ -97,6 +97,10 @@ const FONTS = [
   { name: 'Press Start 2P', css: '"Press Start 2P", monospace', category: 'display', weights: '400', cls: 'pixel' },
   { name: 'Silkscreen', css: '"Silkscreen", monospace', category: 'display', weights: '400;700', cls: 'pixel' },
   { name: 'Pixelify Sans', css: '"Pixelify Sans", -apple-system, sans-serif', category: 'display', weights: '400;600', cls: 'pixel' },
+  { name: 'Grenze Gotisch', css: '"Grenze Gotisch", Georgia, serif', category: 'display', weights: '400;700', cls: 'blackletter' },
+  { name: 'Pirata One', css: '"Pirata One", Georgia, serif', category: 'display', weights: '400', cls: 'blackletter' },
+  { name: 'Cinzel Decorative', css: '"Cinzel Decorative", Georgia, serif', category: 'display', weights: '400;700', cls: 'deco' },
+  { name: 'Barlow Condensed', css: '"Barlow Condensed", -apple-system, sans-serif', category: 'display', weights: '400;600;800', cls: 'condensed' },
 
   /* ---- Slab serif ---- */
   { name: 'Roboto Slab', css: '"Roboto Slab", Georgia, serif', category: 'slab', weights: '400;700', cls: 'slab' },
@@ -117,6 +121,7 @@ const FONTS = [
   { name: 'VT323', css: '"VT323", monospace', category: 'mono', weights: '400', cls: 'pixel' },
   { name: 'Special Elite', css: '"Special Elite", "Courier New", monospace', category: 'mono', weights: '400', cls: 'typewriter' },
   { name: 'Courier Prime', css: '"Courier Prime", "Courier New", monospace', category: 'mono', weights: '400;700', ital: '400;700', cls: 'typewriter' },
+  { name: 'Share Tech Mono', css: '"Share Tech Mono", monospace', category: 'mono', weights: '400', cls: 'mono' },
 ];
 
 // Google Fonts css2 family parameter for a FONTS entry. Entries with
@@ -153,6 +158,7 @@ const FONT_CLASSES = {
   'slab': { label: 'slab serif', blurb: 'slab serifs' },
   'mono': { label: 'monospace', blurb: 'fixed-width faces' },
   'typewriter': { label: 'typewriter', blurb: 'strike-on typewriter and photocopied-office faces' },
+  'blackletter': { label: 'Blackletter', blurb: 'broken-stroke gothic letters with spiked, angular forms' },
 };
 
 // Hand-picked [heading, body] combinations that are known to work. A

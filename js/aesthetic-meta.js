@@ -26,7 +26,7 @@ const AESTHETIC_FAMILIES = [
 
 // Avoid lists may use two pseudo classes that are not a FONTS `cls`:
 // 'serif' (every serif-ish class below) and 'script' (the library has none yet).
-const AESTHETIC_SERIF_CLASSES = ['didone', 'old-style', 'text-serif', 'soft-serif', 'deco', 'slab'];
+const AESTHETIC_SERIF_CLASSES = ['didone', 'old-style', 'text-serif', 'soft-serif', 'deco', 'slab', 'blackletter'];
 
 const AESTHETIC_META = {
   'soft-form': {
@@ -301,6 +301,115 @@ const AESTHETIC_META = {
       avoid: ['didone', 'old-style', 'techno', 'pixel'],
       why: 'Flat pictograms sit in the line at the weight of the letters, so the headline needs a heavy, friendly sans that matches their bold shapes.',
       pairings: [['Bricolage Grotesque', 'DM Sans'], ['Archivo Black', 'Inter'], ['Fredoka', 'DM Sans']],
+    },
+  },
+  'corporate-vandalism': {
+    family: 'graphic',
+    fonts: {
+      heading: { classes: ['neo-grotesk', 'heavy'], picks: ['Inter Tight', 'Archivo Black', 'Archivo'] },
+      body: { classes: ['neo-grotesk'], picks: ['Inter', 'Public Sans'] },
+      mono: { picks: ['IBM Plex Mono', 'Space Mono'] },
+      avoid: ['soft-serif', 'groovy', 'deco', 'rounded'],
+      why: 'The joke only lands inside a flawless, bored shell, so the type is plain procurement-software grotesk with mono for receipts and fine print.',
+      pairings: [['Inter Tight', 'Inter'], ['Archivo Black', 'IBM Plex Sans'], ['Archivo', 'Public Sans']],
+    },
+  },
+  'religious-futurism': {
+    family: 'luminous',
+    fonts: {
+      heading: { classes: ['deco', 'old-style', 'didone'], picks: ['Cinzel', 'Cinzel Decorative', 'Cormorant Garamond', 'Italiana'] },
+      body: { classes: ['old-style', 'neo-grotesk'], picks: ['EB Garamond', 'Inter'] },
+      mono: { picks: ['DM Mono'] },
+      avoid: ['groovy', 'pixel', 'rounded', 'heavy'],
+      why: 'Monumental inscriptional caps and a quiet text serif give the cathedral its stillness, with tiny mono annotations as the liturgical footnotes.',
+      pairings: [['Cinzel', 'EB Garamond'], ['Cormorant Garamond', 'Inter'], ['Cinzel Decorative', 'Cormorant Garamond']],
+    },
+  },
+  'xerox-punk': {
+    family: 'print',
+    fonts: {
+      heading: { classes: ['heavy', 'condensed'], picks: ['Archivo Black', 'Anton', 'Bebas Neue'] },
+      body: { classes: ['typewriter'], picks: ['Special Elite', 'Courier Prime'] },
+      mono: { picks: ['Courier Prime'] },
+      avoid: ['soft-serif', 'geometric', 'deco', 'rounded'],
+      why: 'A pasted wall wants cut-out headline tiles in blunt condensed and heavy faces, with typewriter text as the scrap of paper underneath.',
+      pairings: [['Anton', 'Special Elite'], ['Archivo Black', 'Courier Prime'], ['Bebas Neue', 'Courier Prime']],
+    },
+  },
+  'acid-graphics': {
+    family: 'luminous',
+    fonts: {
+      heading: { classes: ['wide', 'heavy', 'techno'], picks: ['Unbounded', 'Dela Gothic One', 'Syne', 'Michroma'] },
+      body: { classes: ['grotesk', 'neo-grotesk'], picks: ['Space Grotesk', 'Inter'] },
+      mono: { picks: ['Space Mono'] },
+      avoid: ['serif', 'rounded', 'deco'],
+      why: 'Warped, stretched headlines need an extended or heavy face that survives distortion, while the dense info layer stays in a plain grotesk and mono.',
+      pairings: [['Unbounded', 'Space Grotesk'], ['Dela Gothic One', 'Inter'], ['Syne', 'Space Mono']],
+    },
+  },
+  'cybersigilism': {
+    family: 'luminous',
+    fonts: {
+      heading: { classes: ['blackletter', 'wide', 'deco'], picks: ['Grenze Gotisch', 'Pirata One', 'Michroma', 'Cinzel'] },
+      body: { classes: ['neo-grotesk'], picks: ['Inter', 'Geist'] },
+      mono: { picks: ['Geist Mono'] },
+      avoid: ['rounded', 'groovy', 'heavy', 'pixel'],
+      why: 'Spiked blackletter is set once as the sigil, and everything people have to read stays in a clean neo-grotesk with mono labels.',
+      pairings: [['Grenze Gotisch', 'Inter'], ['Pirata One', 'Geist'], ['Michroma', 'Inter']],
+    },
+  },
+  'industrial-hazard': {
+    family: 'tactile',
+    fonts: {
+      heading: { classes: ['condensed'], picks: ['Barlow Condensed', 'Big Shoulders Display', 'Oswald', 'Anton'] },
+      body: { classes: ['neo-grotesk'], picks: ['IBM Plex Sans', 'Inter'] },
+      mono: { picks: ['IBM Plex Mono', 'Azeret Mono'] },
+      avoid: ['serif', 'rounded', 'groovy', 'deco'],
+      why: 'Stamped signage and panel legends are condensed, uppercase and blunt, with a plain grotesk for instructions and mono for serial numbers.',
+      pairings: [['Barlow Condensed', 'IBM Plex Sans'], ['Big Shoulders Display', 'IBM Plex Sans'], ['Oswald', 'Inter']],
+    },
+  },
+  'radical-memphis': {
+    family: 'graphic',
+    fonts: {
+      heading: { classes: ['heavy', 'geometric', 'groovy'], picks: ['Archivo Black', 'Jost', 'Righteous', 'Outfit'] },
+      body: { classes: ['geometric'], picks: ['DM Sans', 'Jost'] },
+      avoid: ['text-serif', 'old-style', 'techno', 'pixel', 'mono'],
+      why: 'Laminate patterns and clashing colours already shout, so the type is a heavy or geometric sans that stays flat and confident beside them.',
+      pairings: [['Archivo Black', 'DM Sans'], ['Jost', 'Jost'], ['Righteous', 'DM Sans']],
+    },
+  },
+  'biomechanical-gothic': {
+    family: 'luminous',
+    fonts: {
+      heading: { classes: ['blackletter', 'deco', 'old-style'], picks: ['Grenze Gotisch', 'Cinzel', 'Cormorant Garamond', 'Italiana'] },
+      body: { classes: ['text-serif', 'old-style'], picks: ['Spectral', 'EB Garamond'] },
+      mono: { picks: ['IBM Plex Mono'] },
+      avoid: ['rounded', 'groovy', 'pixel', 'geometric'],
+      why: 'Ribbed, ancient forms call for lettering with spines and old-style text faces, kept dim and readable so the structure carries the mood.',
+      pairings: [['Grenze Gotisch', 'Spectral'], ['Cinzel', 'EB Garamond'], ['Cormorant Garamond', 'IBM Plex Sans']],
+    },
+  },
+  'pirate-broadcast': {
+    family: 'digital',
+    fonts: {
+      heading: { classes: ['condensed', 'pixel', 'mono'], picks: ['Bebas Neue', 'VT323', 'Share Tech Mono', 'Oswald'] },
+      body: { classes: ['mono'], picks: ['IBM Plex Mono', 'Share Tech Mono'] },
+      mono: { picks: ['VT323'], note: 'VT323 for teletext readouts' },
+      avoid: ['serif', 'rounded', 'groovy'],
+      why: 'Teletext pages and chyrons are fixed-width or tall condensed caps on a character grid, so the type behaves like broadcast hardware.',
+      pairings: [['Bebas Neue', 'IBM Plex Mono'], ['VT323', 'Share Tech Mono'], ['Oswald', 'IBM Plex Mono']],
+    },
+  },
+  'dystopian-luxury': {
+    family: 'print',
+    fonts: {
+      heading: { classes: ['neo-grotesk', 'didone'], picks: ['Inter Tight', 'Archivo', 'Bodoni Moda', 'Instrument Serif'] },
+      body: { classes: ['neo-grotesk'], picks: ['Inter', 'Public Sans'] },
+      mono: { picks: ['IBM Plex Mono'] },
+      avoid: ['groovy', 'rounded', 'pixel', 'techno', 'deco'],
+      why: 'Severity comes from removal, so a huge cropped grotesk or a single didone masthead sits over small clinical labels in a neutral sans.',
+      pairings: [['Inter Tight', 'Inter'], ['Bodoni Moda', 'Inter'], ['Archivo', 'Public Sans']],
     },
   },
 };
