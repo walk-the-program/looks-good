@@ -87,6 +87,8 @@
 .ab[data-ae="acid-graphics"] .ab-swatches[data-kind="strips"] { border-radius: 0; box-shadow: 0 0 0 2px var(--ab-ink); }
 .ab[data-ae="acid-graphics"] .ab-swatches[data-kind="strips"] .ab-swatch { min-height: clamp(110px, 14cqw, 160px); }
 .ab[data-ae="acid-graphics"] .ab-sw-role { font-family: var(--ac-mono); font-size: 12px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; }
+/* every strip's text is the readable colour chosen for that strip (the primary strip is filled with the brand hex) */
+.ab[data-ae="acid-graphics"] .ab-swatches[data-kind="strips"] .ab-swatch, .ab[data-ae="acid-graphics"] .ab-swatches[data-kind="strips"] .ab-sw-role, .ab[data-ae="acid-graphics"] .ab-swatches[data-kind="strips"] .ab-sw-job, .ab[data-ae="acid-graphics"] .ab-swatches[data-kind="strips"] .ab-sw-hex, .ab[data-ae="acid-graphics"] .ab-swatches[data-kind="strips"] .ab-sw-print { color: var(--sw-on); }
 .ab[data-ae="acid-graphics"] .ab-swatch[data-role="canvas"], .ab[data-ae="acid-graphics"] .ab-swatch[data-role="ink"] { box-shadow: inset 0 0 0 1px var(--ab-line); }
 
 /* type recommendations */

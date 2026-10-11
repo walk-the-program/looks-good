@@ -3,9 +3,9 @@
    Displaay, Commercial Type): one headline set word by word in contrasting faces,
    cap heights aligned (not font sizes), on a strict grid.
 
-   Mechanism. The headline is rendered inside the art (the framework's headline is a
-   single text run and cannot change face per word), and the real <h2> stays in the
-   DOM visually hidden for assistive tech. The art box is also the specimen: the same
+   Mechanism. The headline is drawn by def.headline(ctx, text): the framework puts it in
+   the real, visible <h2 aria-label> (board hero, deck cover, Principles, Closing) and the
+   deck fit code sizes it; the hook sets it word by word in the voices. The art box is the specimen: the same
    four voices shown as "Aa" with cap line / x-height / baseline guides, a glyph set
    split across the voices and a size scale.
 
@@ -100,7 +100,7 @@ function mtAssign(words) {
   });
 }
 
-function mtHeadlineHtml(tagline, voices) {
+function mtHeadlineHtml(tagline) {
   const words = String(tagline || '').trim().split(/\s+/).filter(Boolean);
   if (!words.length) return '';
   const keys = mtAssign(words);
@@ -161,6 +161,9 @@ registerAesthetic({
     accent: { use: 'One spark: the last headline word (serif italic) with its asterisk, and the footer dot', never: 'Buttons, body text, borders, specimen fills' },
   },
 
+  // The mixed headline for the real <h2> (the framework wraps it, escapes the label and sizes it).
+  headline(ctx, text) { return mtHeadlineHtml(text); },
+
   tokens(t) {
     const st = typeof state !== 'undefined' ? state : null;
     const vars = {
@@ -192,9 +195,6 @@ registerAesthetic({
     const scale = [11, 16, 24, 36, 54].map(n => `<span class="mt-sc" style="font-size:${n}px"><i>Aa</i><b>${n}</b></span>`).join('');
     const ks = voices.map(v => v.k.toFixed(2)).join(' / ');
     return `<div class="mt">
-      <div class="mt-hl-wrap">
-        <p class="mt-hl-row">${mtHeadlineHtml(ctx.tagline, voices)}</p>
-      </div>
       <p class="mt-lead"><span class="mt-lead-k">Fig. 1</span><span class="mt-lead-t">A design language for ${e(ctx.brandName)}: four voices on one baseline grid, sized to a shared cap height (× ${ks}).</span></p>
       <div class="mt-spec">
         <div class="mt-cells">${cells}</div>

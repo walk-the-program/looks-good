@@ -3,18 +3,18 @@
    .ab[data-ae="xerox-punk"]. A dark street wall (concrete grey in light mode) with
    wheatpaste sheets on top: ransom-note letter tiles, torn paper, tape, a safety pin,
    marker circles and cross-outs, censor bars, rubber stamps, ONE fluoro (the client
-   primary pushed to Day-Glo; tokens() overrides --ab-primary). Never a white page,
+   primary pushed to Day-Glo by def.printPrimary). Never a white page,
    never a copier band, never one coherent column (that is Xerox). Vars from tokens():
-   --ab-fluoro, --xp-hot (fluoro on the wall, ink in light mode), --xp-stamp,
+   --ab-fluoro, --xp-hot (fluoro on the wall, ink in light mode), --xp-stamp (bone on the wall),
    --ab-sheet / --ab-news / --ab-copy / --ab-wire (paper grounds), --ab-sheet-ink,
    --ab-sheet-mute, --ab-tape(-edge). The SVG filters #xpn-torn and #xpn-copy are
    defined by art() in js/aesthetics/xerox-punk.js. Hooks: hero 'centered' (the headline
-   lives in the art, the real h2 is visually hidden), highlight 'custom', states 'button'.
+   is the real h2 drawn by def.headline), highlight 'custom', states 'button'.
 ------------------------------------------------------------------------ */
 
 .ab[data-ae="xerox-punk"] {
   border-radius: 0;
-  --xp-hand: "Marker Felt", "Bradley Hand", "Segoe Print", "Comic Sans MS", cursive;
+  --xp-hand: "Permanent Marker", "Marker Felt", cursive;
   --xp-type: var(--ab-font-b), "Courier New", monospace;
   --xp-zig: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='10' viewBox='0 0 24 10'><polyline points='0,8 6,2 12,8 18,2 24,8' fill='none' stroke='%23E9E3D0' stroke-opacity='.5' stroke-width='1.5' stroke-linejoin='round'/></svg>");
   --xp-grain: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><filter id='n' x='0' y='0' width='100%25' height='100%25'><feTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='2' seed='9' stitchTiles='stitch'/><feColorMatrix type='matrix' values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 .6 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
@@ -52,14 +52,17 @@
 .ab[data-ae="xerox-punk"] .ab-n { display: inline-block; margin-right: 10px; padding: 0 7px; background: var(--ab-news); color: #111; transform: rotate(-3deg); letter-spacing: 0.04em; }
 .ab[data-ae="xerox-punk"] .ab-n::after { content: none; }
 
-/* hero: the ransom headline in the art; the kicker is a rubber stamp in the corner */
+/* hero: the ransom headline is the real h2 (def.headline); the kicker is a rubber stamp in the corner.
+   On the board the hero is one grid (headline | photocopied scrap, then the subcopy): the hero copy and the
+   art both dissolve into it so the headline sits where the old art-drawn one did. */
 .ab[data-ae="xerox-punk"][data-hero="centered"] .ab-hero { position: relative; gap: 14px; padding: clamp(40px, 6cqw, 66px) 0 clamp(26px, 4cqw, 40px); justify-items: stretch; }
 .ab[data-ae="xerox-punk"][data-hero="centered"] .ab-hero-copy { max-width: none; width: 100%; text-align: left; order: 2; }
+/* the hero is the size container for the headline (it was the art box when the headline lived in the art), so cqw sizes match */
+.ab[data-ae="xerox-punk"]:not(.ab-slide) .ab-hero { container-type: inline-size; }
 .ab[data-ae="xerox-punk"] .ab-kicker {
   position: absolute; top: clamp(14px, 2.2cqw, 22px); left: 0; z-index: 3; margin: 0 !important; padding: 3px 11px; border: 2.5px solid var(--xp-stamp); color: var(--xp-stamp);
   font-size: 12px; font-weight: 700; letter-spacing: 0.18em; transform: rotate(-3deg);
 }
-.ab[data-ae="xerox-punk"] .ab-headline { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; }
 .ab[data-ae="xerox-punk"] .ab-hl { color: inherit; background: none; padding: 0; margin: 0; }
 .ab[data-ae="xerox-punk"] .ab-subcopy {
   display: inline-block; max-width: 34em; margin-top: 4px !important; padding: 11px 18px 12px; background: var(--ab-wire); font-family: var(--xp-type); font-size: clamp(13px, 1.5cqw, 15px); transform: rotate(-0.5deg);
@@ -71,17 +74,26 @@
 /* art: the wall */
 .ab[data-ae="xerox-punk"] .ab-art { max-width: none; aspect-ratio: auto; justify-self: stretch; overflow: visible; }
 .ab[data-ae="xerox-punk"] .xpa { position: relative; display: grid; grid-template-columns: minmax(0, 1fr) 27%; gap: 0 3%; align-items: center; padding: 8px 0 12px; }
+/* board hero: one grid. The hero copy and the art dissolve into it, so the real h2 (left) sits beside the
+   photocopied scrap (right), the fluoro strip under the headline and the subcopy across the bottom. */
+.ab[data-ae="xerox-punk"][data-hero="centered"]:not(.ab-slide) .ab-hero { display: grid; grid-template-columns: minmax(0, 1fr) 27%; column-gap: 3%; row-gap: 14px; align-items: center; }
+.ab[data-ae="xerox-punk"]:not(.ab-slide) .ab-hero-copy, .ab[data-ae="xerox-punk"]:not(.ab-slide) .ab-art, .ab[data-ae="xerox-punk"]:not(.ab-slide) .xpa { display: contents; }
+.ab[data-ae="xerox-punk"]:not(.ab-slide) .ab-headline--custom { grid-column: 1; grid-row: 1; }
+.ab[data-ae="xerox-punk"]:not(.ab-slide) .xpa-main { grid-column: 1; grid-row: 2; align-self: start; }
+.ab[data-ae="xerox-punk"]:not(.ab-slide) .xpa-photo { grid-column: 2; grid-row: 1 / span 2; }
+.ab[data-ae="xerox-punk"]:not(.ab-slide) .ab-subcopy { grid-column: 1 / -1; grid-row: 3; justify-self: start; position: relative; z-index: 2; }
 .ab[data-ae="xerox-punk"] .xpa-wall { position: absolute; inset: -6% -2%; z-index: 0; pointer-events: none; }
 .ab[data-ae="xerox-punk"] .xpo { position: absolute; display: flex; flex-direction: column; gap: 9px; padding: 14px 12px; background: rgba(233, 227, 208, 0.07); clip-path: polygon(0 4%, 20% 0, 46% 3%, 71% 0, 100% 5%, 98% 52%, 100% 96%, 66% 100%, 38% 97%, 9% 100%, 2% 58%); }
 .ab[data-ae="xerox-punk"][data-mode="light"] .xpo { background: rgba(0, 0, 0, 0.06); }
 .ab[data-ae="xerox-punk"] .xpo b { display: block; height: 7px; background: rgba(233, 227, 208, 0.1); }
 .ab[data-ae="xerox-punk"][data-mode="light"] .xpo b { background: rgba(0, 0, 0, 0.1); }
 .ab[data-ae="xerox-punk"] .xpa-main { position: relative; z-index: 2; min-width: 0; }
-.ab[data-ae="xerox-punk"] .xpa-hl {
-  display: flex; flex-direction: column; align-items: flex-start; gap: 0.16em; line-height: 1;
+.ab[data-ae="xerox-punk"] .ab-headline--custom { position: relative; z-index: 2; margin: 0; line-height: 1; text-transform: none; letter-spacing: 0; text-wrap: nowrap; overflow-wrap: normal; }
+.ab[data-ae="xerox-punk"] .ab-headline--custom > span { display: flex; flex-direction: column; align-items: flex-start; gap: 0.16em; line-height: 1; }
+.ab[data-ae="xerox-punk"]:not(.ab-slide) .ab-headline--custom {
   font-size: calc(clamp(34px, 8.8cqw, 86px) * var(--ab-hl-scale, 1) * var(--ab-hs, 1) * var(--ab-display, 1));
 }
-.ab[data-ae="xerox-punk"] .xpl { display: flex; flex-wrap: nowrap; align-items: center; gap: 0.3em; }
+.ab[data-ae="xerox-punk"] .xpl { display: flex; flex-wrap: wrap; max-width: 100%; row-gap: 0.16em; align-items: center; gap: 0.3em; }
 .ab[data-ae="xerox-punk"] .xpl:nth-child(2) { margin-left: 0.5em; }
 .ab[data-ae="xerox-punk"] .xpl:nth-child(3) { margin-left: 0.15em; }
 .ab[data-ae="xerox-punk"] .xpw { position: relative; display: inline-flex; align-items: center; gap: 0.05em; white-space: nowrap; filter: drop-shadow(1px 2px 0 rgba(0, 0, 0, 0.6)); }
@@ -106,10 +118,13 @@
 .ab[data-ae="xerox-punk"] .xpa-bar { position: absolute; left: -6%; right: -6%; top: 21%; height: 14%; background: #000; transform: rotate(-1.5deg); }
 .ab[data-ae="xerox-punk"] .xpa-tape { position: absolute; z-index: 3; top: -10px; left: 50%; width: 60px; height: 19px; margin-left: -30px; background: var(--ab-tape); box-shadow: inset 0 0 0 1px var(--ab-tape-edge); transform: rotate(-9deg); }
 .ab[data-ae="xerox-punk"] .xpp { position: absolute; z-index: 3; right: -12px; bottom: 36px; transform: rotate(-26deg); filter: drop-shadow(1px 2px 0 rgba(0, 0, 0, 0.55)); }
-.ab[data-ae="xerox-punk"] .xpa-cap { margin-top: 9px !important; font: 15px/1.1 var(--xp-hand); color: var(--ab-ink); transform: rotate(-2.4deg); }
+.ab[data-ae="xerox-punk"] .xpa-cap { margin-top: 9px !important; font: 15px/1.1 var(--xp-hand); color: var(--ab-ink); transform: rotate(-2deg); }
 @container (max-width: 560px) {
   .ab[data-ae="xerox-punk"] .xpa { grid-template-columns: minmax(0, 1fr); gap: 18px 0; }
-  .ab[data-ae="xerox-punk"] .xpa-hl { font-size: calc(clamp(30px, 11cqw, 52px) * var(--ab-hl-scale, 1) * var(--ab-hs, 1) * var(--ab-display, 1)); }
+  .ab[data-ae="xerox-punk"]:not(.ab-slide) .ab-headline--custom { font-size: calc(clamp(30px, 11cqw, 52px) * var(--ab-hl-scale, 1) * var(--ab-hs, 1) * var(--ab-display, 1)); }
+  .ab[data-ae="xerox-punk"][data-hero="centered"]:not(.ab-slide) .ab-hero { grid-template-columns: minmax(0, 1fr); }
+  .ab[data-ae="xerox-punk"]:not(.ab-slide) .xpa-photo { grid-column: 1; grid-row: 3; }
+  .ab[data-ae="xerox-punk"]:not(.ab-slide) .ab-subcopy { grid-row: 4; }
   .ab[data-ae="xerox-punk"] .xpa-photo { width: 52%; margin: -4px 0 0 auto; }
   .ab[data-ae="xerox-punk"] .xpa-img b { font-size: 27cqw; }
   .ab[data-ae="xerox-punk"] .xpa-strip { margin-left: 0; }
@@ -166,7 +181,7 @@
 .ab[data-ae="xerox-punk"] .ab-seg-btn[aria-pressed="true"]::after { content: ""; position: absolute; inset: -7px -9px; background: var(--xp-circle) 0 0 / 100% 100% no-repeat; pointer-events: none; }
 .ab[data-ae="xerox-punk"] .ab-card-title { margin: 26px 0 8px !important; font-weight: var(--ab-hw, 900); text-transform: uppercase; letter-spacing: 0.01em; font-size: clamp(24px, 3.1cqw, 32px); line-height: 1; color: var(--ab-ink); }
 .ab[data-ae="xerox-punk"] .ab-card-body { color: var(--ab-ink); font-family: var(--xp-type); font-size: 13.5px; margin-bottom: 20px !important; }
-.ab[data-ae="xerox-punk"] .ab-card-body::after { content: "  ← this one."; font: 16px/1 var(--xp-hand); color: #111; display: inline-block; transform: rotate(-3deg); margin-left: 6px; }
+.ab[data-ae="xerox-punk"] .ab-card-body::after { content: "  ← this one."; font: 15px/1 var(--xp-hand); color: #111; display: inline-block; transform: rotate(-2deg); margin-left: 6px; }
 
 /* the main action: a paper tile with a hard border and offset shadow; the primary is the fluoro */
 .ab[data-ae="xerox-punk"] .ab-cta {
@@ -193,7 +208,7 @@
 .ab[data-ae="xerox-punk"] .ab-state { color: var(--ab-ink); font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; font-family: var(--xp-type); font-weight: 700; }
 
 /* 02 paste-up: a ruled typewriter line, a hand-drawn tick box */
-.ab[data-ae="xerox-punk"] .ab-fieldlabel { font: 16px/1 var(--xp-hand); text-transform: none; letter-spacing: 0; color: #111; transform: rotate(-1.5deg); transform-origin: 0 100%; }
+.ab[data-ae="xerox-punk"] .ab-fieldlabel { font: 15px/1 var(--xp-hand); text-transform: none; letter-spacing: 0; color: #111; transform: rotate(-2deg); transform-origin: 0 100%; }
 .ab[data-ae="xerox-punk"] .ab-input { border: 0; border-bottom: 3px solid #111; border-radius: 0; background: none; padding: 9px 4px; font-family: var(--xp-type); font-weight: 700; letter-spacing: 0.02em; }
 .ab[data-ae="xerox-punk"] .ab-input:focus { background: linear-gradient(transparent 52%, var(--ab-fluoro) 52% 92%, transparent 92%); }
 .ab[data-ae="xerox-punk"] .ab-toggle { font-family: var(--xp-type); font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; font-size: 12px; }
@@ -245,15 +260,16 @@
   .ab[data-ae="xerox-punk"] .ab-cta { transition: none; }
 }
 
-/* deck: headlines are one cut label (cream scrap, black type, the highlight word on the fluoro) */
-.ab[data-ae="xerox-punk"].ab-slide[data-slide] .ab-headline.ab-deck-h {
-  display: block; width: fit-content; padding: 0.1em 0.3em 0.14em; background: var(--ab-news); color: #111; text-transform: uppercase; font-weight: var(--ab-hw, 900); letter-spacing: 0.01em; line-height: 1.02;
-  transform: rotate(-1.2deg); box-shadow: 5px 6px 0 rgba(0, 0, 0, 0.65); clip-path: none;
-}
-.ab[data-ae="xerox-punk"].ab-slide .ab-headline.ab-deck-h .ab-hl { background: var(--ab-fluoro); color: #0a0a0a; padding: 0 0.12em; margin: 0 -0.04em; }
-.ab[data-ae="xerox-punk"].ab-slide[data-slide="cover"] .xpa-hl { font-size: calc(clamp(34px, 8.8cqw, 96px) * var(--ab-hl-scale, 1) * var(--ab-hs, 1) * var(--ab-display, 1)); }
+/* deck: cover, Principles and Closing headlines are the same ransom tiles (def.headline) straight on the wall;
+   the fit pass sizes the h2 and the tiles follow in em */
+.ab[data-ae="xerox-punk"].ab-slide[data-slide] .ab-headline--custom.ab-deck-h { display: block; width: fit-content; text-align: left; }
+
+.ab[data-ae="xerox-punk"].ab-slide .xpa { grid-template-columns: minmax(0, 0.8fr) minmax(0, 1fr); gap: 0 4%; }
+/* cover: ransom headline and subcopy on the left, the photocopied scrap and fluoro strip on the right */
+.ab[data-ae="xerox-punk"].ab-slide[data-slide="cover"][data-hero] .ab-deck-cover .ab-hero { grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); column-gap: 3%; align-items: center; justify-items: stretch; }
+.ab[data-ae="xerox-punk"].ab-slide[data-slide="cover"][data-hero] .ab-deck-cover .ab-hero-copy { order: 1; width: 100%; max-width: none; text-align: left; padding-top: 34px; }
+.ab[data-ae="xerox-punk"].ab-slide[data-slide="cover"] .ab-subcopy { display: none; }   /* the cover body is ~320px: headline and scrap only; the meta row carries the name */
+.ab[data-ae="xerox-punk"].ab-slide[data-slide="cover"][data-hero] .ab-deck-cover .ab-art { order: 2; width: 100% !important; max-width: none !important; justify-self: stretch; }   /* !important: the cover fit pass must not shrink the scrap, the headline column is what sets the height */
 
 /* on the bare wall (deck cells) the marker is bone, not black */
 .ab[data-ae="xerox-punk"] .ab-deck-cell .ab-seg-btn[aria-pressed="true"]::after, .ab[data-ae="xerox-punk"] .ab-deck-uistates .ab-state-ctl[data-s="1"]::after { background-image: var(--xp-circle-wall); }
-.ab[data-ae="xerox-punk"].ab-slide[data-slide] .ab-headline.ab-deck-h { color: #111 !important; }
-.ab[data-ae="xerox-punk"].ab-slide .ab-headline.ab-deck-h .ab-hl { color: #0a0a0a !important; }

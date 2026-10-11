@@ -60,7 +60,7 @@ registerAesthetic({
       coverage: '≈8–10%',
     },
     secondary: {
-      use: 'Receipt and form paper: the receipt tint, form-panel fills and the progress track',
+      use: 'Form-panel fills and the progress track. The receipt is plain white thermal paper (#FFFFFF, ink #1a1a1a), never tinted',
       never: 'Buttons, warning labels, body text',
       coverage: '≈8–10%',
     },
@@ -89,8 +89,8 @@ registerAesthetic({
       '--cv-paper': d ? '#F2F2F0' : '#FFFFFF',
       '--cv-bd': d ? t.mix(t.ink, t.canvas, 0.5) : t.ink,
       '--cv-rest': t.contrast(grey, t.canvas) >= 4.5 ? grey : t.muted,
-      '--cv-receipt': t.mix(t.secondary, '#ffffff', 0.22),
-      '--ab-receipt': t.mix(t.secondary, '#ffffff', 0.22),
+      '--cv-receipt': '#FFFFFF', // thermal paper: white in both modes
+      '--ab-receipt': '#FFFFFF',
       '--cv-form': d ? t.mix(t.secondary, t.canvas, 0.16) : t.mix(t.secondary, t.canvas, 0.14),
       '--ab-tr': (hf && { condensed: 0.4, heavy: 0.4, wide: 0.3, techno: 0.3 }[hf.cls]) ?? 1,
     };
@@ -112,7 +112,7 @@ registerAesthetic({
           <div class="cva-sign"><span>Initial here</span><i></i></div>
         </div>
       </div>
-      <div class="cva-rcpt">
+      <div class="cva-rw"><div class="cva-rcpt">
         <p class="cva-rh">Receipt</p>
         <p class="cva-rl"><span>Good design x1</span><b>0.00</b></p>
         <p class="cva-rl"><span>Feeling (alive) x1</span><b>0.00</b></p>
@@ -120,7 +120,7 @@ registerAesthetic({
         <p class="cva-rl cva-rt"><span>Total</span><b>0.00</b></p>
         <p class="cva-rn">Amount due: one (1) apology</p>
         ${cvBarcode()}
-      </div>
+      </div></div>
     </div>`;
   },
 
@@ -129,7 +129,7 @@ registerAesthetic({
     { name: 'Warning label', css: 'background: {hazard}; color: #ffffff; box-shadow: inset 0 0 0 2px {hazard}, inset 0 0 0 3px #ffffff; font: 700 10px ui-monospace, Menlo, monospace; text-transform: uppercase; letter-spacing: .06em; /* fixed hazard red, flat, square, never rotated; copy is oddly precise ("contains 14% opinion") */' },
     { name: 'Safety chip', css: 'background: {safety}; color: #000000; font: 700 10px ui-monospace, Menlo, monospace; padding: 1px 5px; /* the "!!!" chip in the header, fixed yellow */' },
     { name: 'Notice header strip', css: 'background: {primary}; color: {onPrimary}; font: 600 10px ui-monospace, Menlo, monospace; letter-spacing: .1em; text-transform: uppercase; /* the official shell: the only large use of the client primary */' },
-    { name: 'Receipt strip', css: 'background: {receipt}; color: #000000; font: 11px ui-monospace, Menlo, monospace; border-top: 1px dashed {ink}; /* zigzag top and bottom edge, dashed rules, TOTAL line, a barcode of 1/2/3px bars */' },
+    { name: 'Receipt strip', css: 'background: #FFFFFF; color: #1a1a1a; font: 11px ui-monospace, Menlo, monospace; border-top: 1px dashed {ink}; /* zigzag top and bottom edge, dashed rules, TOTAL line, a barcode of 1/2/3px bars */' },
     { name: 'Official button', css: 'background: {primary}; color: {onPrimary}; border-radius: 0; font: 600 12px ui-monospace, Menlo, monospace; letter-spacing: .08em; text-transform: uppercase; /* mundane copy ("Continue"); hover underlines; pressed inverts to {ink} on {canvas} */' },
     { name: 'Announcement bar', css: 'background: {accent}; color: {onAccent}; font: 600 10px ui-monospace, Menlo, monospace; letter-spacing: .08em; text-transform: uppercase; /* one line above the header, the only use of the client accent */' },
   ],
@@ -139,7 +139,7 @@ registerAesthetic({
       'Keep the shell flat, square and tidy: white or #000 page, 1px ink borders, no radius, no shadow, mundane button copy.',
       'Add exactly one intrusion per screen: a redaction bar of exact word width, a red warning label, or an absurd receipt line.',
       'Write fine print that parses as legal prose (sections, schedules, dagger footnotes); the footnotes should be the longest text on the page.',
-      'Name components in straight quotation marks and set the index in mono caps: grey at rest, ink on hover or select.',
+      'Set labels and the index in mono caps with no quotation marks; the one quote mark per screen belongs to the headline\'s last word.',
     ],
     dont: [
       'Rotate, tape, grain or distress anything; mess belongs to Xerox and Xerox Punk, the shell here must be tidy.',

@@ -12,8 +12,8 @@
    mono who / where / when blocks, a ticket stub, invented sponsor marks and an event
    strip. Underneath everything runs a hidden 12-column grid at 4-6% (the calm), and a
    neutral rest area (black / white) keeps density from becoming noise. Chrome is a
-   one-word accent only (Y2K Chrome owns chrome). tokens() overrides --ab-primary with
-   the acid and exposes --ab-clash. */
+   one-word accent only (Y2K Chrome owns chrome). def.printPrimary(t) prints the primary as
+   the acid (the palette keeps the true brand hex) and tokens() exposes --ab-clash. */
 (function () {
 let seq = 0;
 const AC_CLAMP = (v, a, b) => Math.max(a, Math.min(b, v));
@@ -85,13 +85,16 @@ registerAesthetic({
     return b.mix('#ffffff', b.canvas, 0.85);
   },
 
+  // The primary is printed as the acid (full chroma); the palette still shows the brand hex.
+  printPrimary(t) { return acPush(t.primary); },
+
   tokens(t) {
     const hf = typeof state !== 'undefined' && state && state.headingFont;
     const cls = hf && hf.cls;
     const ws = String((hf && hf.weights) || '400').split(';').map(Number).filter(Boolean);
     const le = ws.filter(x => x <= 900);
     const hw = le.length ? Math.max(...le) : Math.min(...ws);
-    const acid = acPush(t.primary), clash = acClash(acid), d = t.isDark;
+    const acid = t.printPrimary, clash = acClash(acid), d = t.isDark;
     const brand = typeof effectiveContent === 'function' ? String(effectiveContent().brandName || '') : '';
     const nm = brand.toUpperCase().replace(/['"\\;{}]/g, '').slice(0, 28);
     // horizontal squeeze that makes the headline tall: wide faces take the most
@@ -100,9 +103,6 @@ registerAesthetic({
     return {
       '--ab-type-pick-w': hw,
       '--ac-hw': hw,
-      '--ab-primary': acid,
-      '--ab-on-primary': on(acid),
-      '--ab-pri-tint': t.mix(acid, t.canvas, 0.14),
       '--ab-acid': acid,
       '--ab-clash': clash,
       '--ab-on-acid': on(acid),

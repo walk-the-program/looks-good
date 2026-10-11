@@ -4,8 +4,9 @@
    white paper): this is a dark street wall of many pasted sources that overlap and
    collide, with one fluorescent hit and the reader's own hand marking it up.
 
-   Mechanism. The ransom headline is rendered inside the art (the framework headline is
-   one text run), the real <h2> stays in the DOM visually hidden. Each LETTER is its own
+   Mechanism. The ransom headline is drawn by def.headline(ctx, text): the framework puts
+   it in the real, visible <h2 aria-label> (board hero, deck cover, Principles, Closing),
+   so the deck fit code measures it. Each LETTER is its own
    cut tile: its own face (brand heading + brand body + a pool of library faces), its own
    ground (newsprint, white, black, photocopy grey, the fluoro, one accent tile), size
    (0.82-1.3 of the cap size), a rotation of at most 5.5 degrees, a baseline offset and
@@ -13,7 +14,7 @@
    on re-render; one tile in five is fluoro. Torn wheatpaste sheets, a marker circle
    round one word, a censor bar over the photocopied initial, tape, a safety pin and a
    handwritten caption complete the wall. The fluoro is the client primary pushed to
-   Day-Glo (tokens() overrides --ab-primary). The hidden <svg> in art() defines the
+   Day-Glo (def.printPrimary(t)). The hidden <svg> in art() defines the
    filters the css uses: xpn-torn (fibrous torn edge) and xpn-copy (photocopy
    threshold, used only on the photo scrap). */
 (function () {
@@ -71,9 +72,10 @@ const XP_GROUNDS = [
 ];
 
 // ransom headline: lines of words of tiles. Returns the HTML.
-function xpHeadline(ctx, seed) {
+function xpHeadline(ctx, seed, text) {
   const rnd = xpRand(seed);
-  const words = String(ctx.tagline || '').trim().split(/\s+/).filter(Boolean);
+  const words = String(text || '').trim().split(/\s+/).filter(Boolean);
+  if (!words.length) return '';
   const hf = ctx.state && ctx.state.headingFont, bf = ctx.state && ctx.state.bodyFont;
   const faces = [];
   if (hf) faces.push({ css: 'var(--ab-font-h)', weight: 'var(--ab-hw, 700)', up: true, name: hf.name });
@@ -160,13 +162,13 @@ registerAesthetic({
       coverage: '≈10–12%',
     },
     secondary: {
-      use: 'The second pen: translucent tape strips holding sheets down, the progress track, and the stamp of a second tone; under 5%',
-      never: 'Buttons, body text, large panels',
-      coverage: '≈4–5%',
+      use: 'Held back: it shows in the palette and nowhere on the wall. The tape is translucent bone paper, never the secondary',
+      never: 'Tape, buttons, body text, large panels, a second fluoro',
+      coverage: '≤2%',
     },
     accent: {
-      use: 'A single tile in the ransom headline and the rubber stamp (kicker)',
-      never: 'Buttons, borders, panel fills, a second tile',
+      use: 'A single tile in the ransom headline. The rubber stamps and labels are bone (#EDE6D3), never the accent',
+      never: 'Stamps, buttons, borders, panel fills, a second tile',
       coverage: '≤2%',
     },
   },
@@ -179,30 +181,35 @@ registerAesthetic({
     return b.hslToHex(h.h, Math.min(h.s, 8), 70);
   },
 
+  // The one fluoro: the client primary pushed to Day-Glo (the palette still shows the true brand hex).
+  printPrimary(t) { return xpFluoro(t.primary); },
+
+  // The ransom headline for the real <h2> (the framework wraps it, escapes the label and sizes it).
+  headline(ctx, text) {
+    return xpHeadline(ctx, xpHash(String(ctx.brandName || 'brand') + '|' + String(text || '')), text);
+  },
+
   tokens(t) {
     const hf = typeof state !== 'undefined' && state && state.headingFont;
     const ws = String((hf && hf.weights) || '400').split(';').map(Number).filter(Boolean);
     const le = ws.filter(x => x <= 900);
     const hw = le.length ? Math.max(...le) : Math.min(...ws);
-    const fl = xpFluoro(t.primary);
+    const fl = t.printPrimary;   // the Day-Glo primary from printPrimary(t)
     const d = t.isDark;
     return {
       '--ab-type-pick-w': hw,
       '--ab-hw': hw,
       '--ab-tr': 0,
-      '--ab-primary': fl,
-      '--ab-on-primary': '#0a0a0a',
       '--ab-fluoro': fl,
-      '--ab-pri-tint': t.mix(fl, t.canvas, 0.14),
       '--xp-hot': d ? fl : t.ink,
-      '--xp-stamp': d ? t.accentInk : t.ink,
-      '--ab-stamp': d ? t.accentInk : t.ink,
+      '--xp-stamp': d ? '#EDE6D3' : t.ink,    // stamps and labels are bone on the wall, never the accent
+      '--ab-stamp': d ? '#EDE6D3' : t.ink,
       '--ab-news': '#E9E3D0',
       '--ab-sheet': '#E9E3D0',
       '--ab-copy': '#CFCBBF',
       '--ab-wire': '#F1EEE4',
-      '--ab-tape': t.alpha(t.secondary, d ? 0.62 : 0.7),
-      '--ab-tape-edge': t.alpha(t.secondary, 0.9),
+      '--ab-tape': 'rgba(236, 228, 206, 0.55)',   // translucent paper tape, not a second hue
+      '--ab-tape-edge': 'rgba(0, 0, 0, 0.15)',
       '--ab-sheet-ink': '#0d0d0d',
       '--ab-sheet-mute': '#4a463b',
     };
@@ -212,7 +219,8 @@ registerAesthetic({
     const t = ctx.t;
     const seed = xpHash(String(ctx.brandName || 'brand') + '|' + String(ctx.tagline || ''));
     const rnd = xpRand(seed ^ 0x9e3779b9);
-    const hl = xpHeadline(ctx, seed);
+    // marker captions use Permanent Marker (idempotent: the font loader dedupes)
+    if (typeof window !== 'undefined' && window.loadFontFamily && xpFace('Permanent Marker')) window.loadFontFamily(xpFace('Permanent Marker'));
     const ini = escapeHtml(ctx.initial);
     // old torn-poster fragments on the wall at about 6%: bars standing in for lines of print
     let frags = '';
@@ -242,7 +250,6 @@ registerAesthetic({
     <div class="xpa">
       <div class="xpa-wall">${frags}</div>
       <div class="xpa-main">
-        <div class="xpa-hl" aria-hidden="true">${hl}</div>
         <div class="xpa-strip"><span>No gods · no masters · no templates</span></div>
       </div>
       <div class="xpa-photo">
@@ -260,12 +267,13 @@ registerAesthetic({
     { name: 'Fluoro', css: 'background: {fluoro}; color: #0a0a0a; /* the client primary pushed to Day-Glo; tile, highlighter swipe or button, never text on newsprint; the ONLY fluoro */' },
     { name: 'Marker mark-up', css: 'stroke: #111111 (on a scrap) or {fluoro} (on the wall); stroke-width: 3.2px; stroke-linecap: round; /* an imperfect double-loop circle = selected, two unequal crossing strokes = deleted, a scribble = removed */' },
     { name: 'Censor bar', css: 'background: #000000; color: transparent; /* a solid black bar over an eyes line or a status; never a blur */' },
-    { name: 'Tape', css: 'background: {tape}; border: 1px solid {tapeEdge}; width: 52px; height: 18px; transform: rotate(-33deg); /* translucent strip of the client secondary across a sheet corner */' },
-    { name: 'Rubber stamp', css: 'color: {stamp}; border: 2px solid {stamp}; transform: rotate(-3deg); text-transform: uppercase; letter-spacing: .14em; /* kicker, nav and badges; accent-ink on the wall, never a rounded button */' },
+    { name: 'Tape', css: 'background: rgba(236,228,206,.55); border: 1px solid rgba(0,0,0,.15); width: 52px; height: 18px; transform: rotate(-33deg); /* translucent paper strip across a sheet corner; never a client colour */' },
+    { name: 'Rubber stamp', css: 'color: {stamp}; border: 2px solid {stamp}; transform: rotate(-3deg); text-transform: uppercase; letter-spacing: .14em; /* kicker, nav and badges; bone #EDE6D3 on the wall, never a rounded button */' },
   ],
 
   rules: {
     do: [
+      'Keep the fluoro the only hue: tape is translucent bone paper and stamps and labels are bone, never teal or yellow.',
       'Build every headline from ransom tiles: each letter its own face, ground, size (82–130%), tilt (at most 5.5 degrees) and scissor-cut edge; one tile in five is the fluoro.',
       'Keep the wall dark and the sheets layered: torn edges, overlap of 8–24px, a pin or strip of tape, black type on every scrap.',
       'Spend the single fluoro by hand: marker circles for selected, crossed-out for removed, a censor bar for hidden, a highlighter swipe for emphasis.',
@@ -280,6 +288,7 @@ registerAesthetic({
   },
   // Deck copy (js/brand-deck.js): three principles, three do / don't lines, each short.
   deck: {
+    materialStage: 'pattern',   // the material slide stages the pattern, not the art (it would repeat the cover)
     principles: [
       ['A wall, not a page', 'Many sources overlap on a dark ground; nothing sits neatly.'],
       ['Every tile is its own face', 'Ransom headlines vary font, size, ground and tilt.'],

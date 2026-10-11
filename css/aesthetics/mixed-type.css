@@ -30,23 +30,22 @@
   gap: clamp(12px, 2.2cqw, 22px); padding: clamp(22px, 3.8cqw, 40px) 0 clamp(28px, 4.4cqw, 48px);
 }
 .ab[data-ae="mixed-type"][data-hero] .ab-hero-copy { max-width: none; width: 100%; text-align: left; }
+/* the hero is the size container for the headline (it was the art box when the headline lived in the art), so cqw sizes match */
+.ab[data-ae="mixed-type"]:not(.ab-slide) .ab-hero { container-type: inline-size; }
 .ab[data-ae="mixed-type"] .ab-kicker {
   display: flex; align-items: center; gap: 14px; margin: 0 !important;
   font-size: 10.5px; letter-spacing: 0.16em; color: var(--ab-ink);
 }
 .ab[data-ae="mixed-type"] .ab-kicker::after { content: ""; flex: 1; height: 1px; background: var(--ab-line); }
-/* the real headline stays for assistive tech; the mixed one in the art is the visual */
-.ab[data-ae="mixed-type"] .ab-headline {
-  position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap;
-}
+/* the real h2 is the mixed headline (def.headline); the glyphs inside size in em from it */
 .ab[data-ae="mixed-type"][data-hero] .ab-art { aspect-ratio: auto; max-width: none; width: 100%; justify-self: stretch; }
 
-.ab[data-ae="mixed-type"] .mt-hl-wrap { --mt-s: calc(clamp(42px, 12.6cqw, 138px) * var(--ab-hl-scale, 1) * var(--ab-hs, 1) * var(--ab-display, 1)); }
-.ab[data-ae="mixed-type"] .mt-hl-row {
-  margin: 0; font-family: var(--mt-f-b); font-weight: var(--mt-w-b); font-size: var(--mt-s);
+.ab[data-ae="mixed-type"] .ab-headline--custom {
+  margin: 0; font-family: var(--mt-f-b); font-weight: var(--mt-w-b);
   line-height: 1.02; letter-spacing: calc(-0.025em * var(--ab-tr, 1)); word-spacing: 0.04em;
   text-wrap: balance; overflow-wrap: normal; color: var(--ab-ink);
 }
+.ab[data-ae="mixed-type"]:not(.ab-slide) .ab-headline--custom { font-size: calc(clamp(42px, 12.6cqw, 138px) * var(--ab-hl-scale, 1) * var(--ab-hs, 1) * var(--ab-display, 1)); }
 .ab[data-ae="mixed-type"] .mt-w { display: inline; white-space: nowrap; line-height: 0; }
 .ab[data-ae="mixed-type"] .mt-w[data-v="b"] { font-family: var(--mt-f-b); font-weight: var(--mt-w-b); font-size: calc(1em * var(--mt-k-b, 1)); }
 .ab[data-ae="mixed-type"] .mt-w[data-v="i"] {
@@ -109,7 +108,7 @@
 .ab[data-ae="mixed-type"] .mt-scale-row { margin-bottom: 26px; }
 
 @container ab (max-width: 600px) {
-  .ab[data-ae="mixed-type"] .mt-hl-wrap { --mt-s: calc(clamp(36px, 17.6cqw, 90px) * var(--ab-hl-scale, 1) * var(--ab-hs, 1) * var(--ab-display, 1)); }
+  .ab[data-ae="mixed-type"]:not(.ab-slide) .ab-headline--custom { font-size: calc(clamp(36px, 17.6cqw, 90px) * var(--ab-hl-scale, 1) * var(--ab-hs, 1) * var(--ab-display, 1)); }
   .ab[data-ae="mixed-type"] .mt-lead { grid-template-columns: minmax(0, 1fr); gap: 4px; }
   .ab[data-ae="mixed-type"] .mt-cells { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .ab[data-ae="mixed-type"] .mt-cell:nth-child(odd) { padding-left: 0; padding-right: calc(var(--mt-cp) * 2); border-left: 0; }
@@ -267,7 +266,6 @@
 .ab[data-ae="mixed-type"].ab-slide[data-slide="cover"][data-cover-side] .ab-deck-cover .ab-hero { grid-template-columns: minmax(0, 1fr); gap: 12px; padding: 0; }
 .ab[data-ae="mixed-type"].ab-slide[data-slide="cover"][data-cover-side] .ab-deck-cover .ab-hero-copy { width: 100%; max-width: none; }
 .ab[data-ae="mixed-type"].ab-slide[data-slide="cover"] .ab-deck-cover .ab-art { max-width: none !important; width: 100% !important; }
-.ab[data-ae="mixed-type"].ab-slide[data-slide="cover"] .mt-hl-wrap { --mt-s: 104px; }
 .ab[data-ae="mixed-type"].ab-slide[data-slide="cover"] .mt-lead { margin-top: 10px; padding-top: 8px; grid-template-columns: 84px minmax(0, 80em); }
 .ab[data-ae="mixed-type"].ab-slide[data-slide="cover"] .mt-spec { margin-top: 10px; }
 .ab[data-ae="mixed-type"].ab-slide[data-slide="cover"] .mt-cell { padding-top: 8px; padding-bottom: 8px; }

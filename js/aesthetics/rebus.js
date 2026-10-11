@@ -3,11 +3,11 @@
    eye-bee-M poster.
 
    Mechanism. A small dictionary (RB_DICT) maps words to flat SVG pictograms drawn on a
-   24-unit grid (RB_SYM; no emoji, no outlines). The headline is rendered inside the art
-   (the framework's headline is one text run): the last word becomes a symbol when it has
-   one, set on an accent disc, plus the best non-adjacent mapped word as a symbol in the
-   brand colours; the real <h2> stays in the DOM, visually hidden, so every replaced word
-   is still read. A tagline with no match gets one symbol placed between its middle words.
+   24-unit grid (RB_SYM; no emoji, no outlines). The headline is drawn by def.headline(ctx, text):
+   the framework puts it in the real, visible <h2 aria-label> (board hero, deck cover,
+   Principles, Closing), so every replaced word is still read. The last word becomes a
+   symbol when it has one, set on an accent disc, plus the best non-adjacent mapped word
+   as a symbol in the brand colours. A tagline with no match gets one symbol placed between its middle words.
    The art below it is the brand name as an equation (symbol + remaining letters = name,
    or initial + the tagline's symbol = name when no symbol hides in the name), then the
    dictionary legend. Components carry the same pictograms (icons in tabs, symbol avatars
@@ -267,11 +267,13 @@ registerAesthetic({
     return vars;
   },
 
+  // The rebus headline for the real <h2> (the framework wraps it, escapes the label and sizes it).
+  headline(ctx, text) { return rbHeadline(text, ctx.t, rbHash(ctx.brandName)).html; },
+
   art(ctx) {
     const t = ctx.t;
-    const { html, plan } = rbHeadline(ctx.tagline, t, rbHash(ctx.brandName));
+    const plan = rbPlan(ctx.tagline);
     return `<div class="rb">
-      <p class="rb-hl-row">${html}</p>
       ${rbEquation(ctx, plan)}
       ${rbLegend(t)}
     </div>`;

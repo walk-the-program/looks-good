@@ -67,7 +67,7 @@ registerAesthetic({
   slideShape: 'classic',
   labels: { material: 'Relics', states: ['Dormant', 'Lit', 'Consecrated'], statesKind: 'swatch' },
   layout: { hero: 'centered', palette: 'swatches', sections: 'two-col' },
-  type: { ui: 'body', label: 'mono', display: 0.78 },   // css multiplies the board / deck headings back by 1.26 (the deck cover fit starts from 132px x display)
+  type: { ui: 'body', label: 'mono', display: 1 },
   highlight: 'custom',
   highlightNote: 'The last word is set in the accent-ink colour (the relic jewel) with a 1px gold rule beneath it that tapers to nothing at both ends; no fill, no glow, no band.',
 
@@ -148,6 +148,9 @@ registerAesthetic({
     const pool = [];
     base.forEach(c => { pool.push(step(c, -7), c, step(c, 7)); });
     const jewel = rfGlass(t.accent, d ? 62 : 54, 60);
+    // backlight colour: the glass primary glows in dark mode; in light mode the nimbus and floor light are
+    // accent-on-canvas parchment (bone, not a pink-peach wash)
+    const halo = d ? g1 : t.mix(t.accent, t.canvas, 0.85);
 
     // one window: mirrored random lanes, cells grouped into one path per colour
     const paths = {};
@@ -214,9 +217,9 @@ registerAesthetic({
     const nameCaps = escapeHtml(String(ctx.brandName || '').trim().toUpperCase().slice(0, 22));
     return `<svg viewBox="0 0 ${W} ${H}" width="100%" height="100%" preserveAspectRatio="xMidYMid slice" focusable="false" class="rfa">
       <defs>
-        <linearGradient id="${id}b" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${g1}" stop-opacity="${d ? 0.34 : 0.28}"/><stop offset="1" stop-color="${g1}" stop-opacity="0"/></linearGradient>
+        <linearGradient id="${id}b" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${halo}" stop-opacity="${d ? 0.34 : 0.28}"/><stop offset="1" stop-color="${halo}" stop-opacity="0"/></linearGradient>
         <linearGradient id="${id}f" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="${line}" stop-opacity="0"/><stop offset=".18" stop-color="${line}" stop-opacity=".7"/><stop offset=".82" stop-color="${line}" stop-opacity=".7"/><stop offset="1" stop-color="${line}" stop-opacity="0"/></linearGradient>
-        <radialGradient id="${id}n" cx="50%" cy="35%" r="55%"><stop offset="0" stop-color="${g1}" stop-opacity="${d ? 0.22 : 0.16}"/><stop offset="1" stop-color="${g1}" stop-opacity="0"/></radialGradient>
+        <radialGradient id="${id}n" cx="50%" cy="35%" r="55%"><stop offset="0" stop-color="${halo}" stop-opacity="${d ? 0.22 : 0.16}"/><stop offset="1" stop-color="${halo}" stop-opacity="0"/></radialGradient>
         <clipPath id="${id}c">${clip}</clipPath>
         <filter id="${id}bl" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="${d ? 11 : 8}"/></filter>
       </defs>
@@ -265,6 +268,7 @@ registerAesthetic({
   },
   // Deck copy (js/brand-deck.js): three principles, three do / don't lines, each short.
   deck: {
+    coverDisplay: 1.3,   // two centred lines at >= 72px; the cathedral beneath takes the lower half of the cover
     principles: [
       ['Gold is a rim, never fill', 'Gold appears only as thin rims, rules and rings.'],
       ['Brand colour is the light', 'Client colours glow as stained glass, never as paint.'],

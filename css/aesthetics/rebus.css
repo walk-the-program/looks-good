@@ -26,19 +26,19 @@
   gap: clamp(14px, 2.4cqw, 24px); padding: clamp(24px, 4cqw, 44px) 0 clamp(28px, 4.4cqw, 48px);
 }
 .ab[data-ae="rebus"][data-hero] .ab-hero-copy { max-width: none; width: 100%; text-align: left; }
+/* the hero is the size container for the headline (it was the art box when the headline lived in the art), so cqw sizes match */
+.ab[data-ae="rebus"]:not(.ab-slide) .ab-hero { container-type: inline-size; }
 .ab[data-ae="rebus"] .ab-kicker {
   display: inline-flex; align-items: center; gap: 8px; margin: 0 !important; padding: 5px 14px 5px 8px; border-radius: 999px; background: var(--ab-tile);
   font-size: 11px; letter-spacing: 0.12em; color: var(--ab-ink); font-weight: 600;
 }
 .ab[data-ae="rebus"] .ab-kicker::before { content: ""; width: 20px; height: 20px; background: var(--rb-i-eye) center / contain no-repeat; }
-.ab[data-ae="rebus"] .ab-headline {
-  position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap;
-}
+/* the real h2 is the rebus headline (def.headline); symbols size in em from it */
 .ab[data-ae="rebus"][data-hero] .ab-art { aspect-ratio: auto; max-width: none; width: 100%; justify-self: stretch; }
 
-.ab[data-ae="rebus"] .rb { --rb-s: calc(clamp(42px, 11.6cqw, 128px) * var(--ab-hl-scale, 1) * var(--ab-hs, 1) * var(--ab-display, 1)); }
-.ab[data-ae="rebus"] .rb-hl-row {
-  margin: 0; font-family: var(--ab-font-h); font-weight: var(--rb-hw, 800); font-size: var(--rb-s); line-height: 1.12;
+.ab[data-ae="rebus"]:not(.ab-slide) .ab-headline--custom { font-size: calc(clamp(42px, 11.6cqw, 128px) * var(--ab-hl-scale, 1) * var(--ab-hs, 1) * var(--ab-display, 1)); }
+.ab[data-ae="rebus"] .ab-headline--custom {
+  margin: 0; font-family: var(--ab-font-h); font-weight: var(--rb-hw, 800); line-height: 1.12;
   letter-spacing: calc(-0.035em * var(--ab-tr, 1)); word-spacing: 0.04em; text-wrap: balance; overflow-wrap: normal; color: var(--ab-ink);
 }
 .ab[data-ae="rebus"] .rb-w { white-space: nowrap; }
@@ -75,7 +75,7 @@
 .ab[data-ae="rebus"] .rb-lg { width: 24px; height: 24px; flex: none; overflow: visible; }
 
 @container ab (max-width: 600px) {
-  .ab[data-ae="rebus"] .rb { --rb-s: calc(clamp(40px, 15.4cqw, 76px) * var(--ab-hl-scale, 1) * var(--ab-hs, 1) * var(--ab-display, 1)); }
+  .ab[data-ae="rebus"]:not(.ab-slide) .ab-headline--custom { font-size: calc(clamp(40px, 15.4cqw, 76px) * var(--ab-hl-scale, 1) * var(--ab-hs, 1) * var(--ab-display, 1)); }
   .ab[data-ae="rebus"] .rb-eq-t { height: 58px; min-width: 58px; border-radius: 16px; }
   .ab[data-ae="rebus"] .rb { --rb-eq-fs: 32px; }
   .ab[data-ae="rebus"] .rb-eq-row { flex-wrap: wrap; row-gap: 10px; }
@@ -220,8 +220,8 @@
 }
 .ab[data-ae="rebus"].ab-slide[data-slide="cover"] .ab-deck-cover .ab-hero-copy { width: 100%; max-width: none; }
 .ab[data-ae="rebus"].ab-slide[data-slide="cover"] .ab-deck-cover .ab-art { width: 100%; max-width: none; justify-self: stretch; }
-.ab[data-ae="rebus"].ab-slide[data-slide="cover"] .rb { --rb-s: 112px; --rb-eq-fs: 50px; }
-.ab[data-ae="rebus"].ab-slide[data-slide="cover"] .rb-hl-row { line-height: 1.08; }
+.ab[data-ae="rebus"].ab-slide[data-slide="cover"] .rb { --rb-eq-fs: 50px; }
+.ab[data-ae="rebus"].ab-slide[data-slide="cover"] .ab-headline--custom { line-height: 1.08; }
 .ab[data-ae="rebus"].ab-slide[data-slide="cover"] .rb-eq { margin-top: 20px; }
 .ab[data-ae="rebus"].ab-slide[data-slide="cover"] .rb-eq-t { height: 84px; min-width: 84px; border-radius: 22px; }
 .ab[data-ae="rebus"].ab-slide[data-slide="cover"] .rb-eq-txt { font-size: 36px; }

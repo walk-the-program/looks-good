@@ -5,17 +5,17 @@
    clear zone (16-24px) and ornament never touches text.
 
    Mechanism. Every thorn is a FILLED, TAPERED polygon (width 0 at the tip), not a stroked
-   path (stroked paths read as wire). A seeded L-system-style recursion (csThorn) grows a
-   branch along an S-curve (its heading follows sin(2*pi*s)), spawns children at fixed
-   positions along it at 28-38 degrees to the local tangent, each shorter (x0.66) and thinner
-   (x0.6) than its parent, three levels deep, with a node (r 1.2-2) at every junction. The
-   crest is built for one half and mirrored with <use transform="matrix(-1 0 0 1 ..)">,
-   so the symmetry is exact; the seed is fixed so a brand's sigil never changes. Silver is
-   fixed (a 4-stop ramp; graphite in light mode); the client colour exists only as cold
-   light (hue kept, chroma cut to 30-45%, lightness 75-85%) in the glow and the lit states.
-   The same generator draws the card corner brackets (border-image), the header / divider /
-   footer flourish and the thorn wreath of the state discs, all handed to the css as data-URI
-   custom properties by tokens(). */
+   path (stroked paths read as wire). The crest follows the research recipe: straight
+   segments, a fork at 80% of each into two children at 28 degrees with 0.68 of the length,
+   depth 4, two short barbs per segment at 35 degrees, a node only at each fork. The crest
+   is built for one half and mirrored with <use transform="matrix(-1 0 0 1 ..)">, so the
+   symmetry is exact; the seed (brand name) only nudges the four main branches a few
+   percent, so a brand's sigil never changes. Silver is fixed (a 4-stop ramp; graphite in
+   light mode); the client colour exists only as cold light (hue kept, chroma cut to 30-45%,
+   lightness 75-85%) in the glow, the lit states and the headline word's glow. The card
+   corner brackets, the header / divider / footer flourish and the thorn wreath of the state
+   discs are fixed silver ornament: they live in css/aesthetics/cybersigilism.css once, as
+   data-URI custom properties, not in every board root. */
 (function () {
 let seq = 0;
 const CS_CLAMP = (v, a, b) => Math.max(a, Math.min(b, v));
@@ -36,84 +36,35 @@ function csHash(str) {
   return h >>> 0;
 }
 
-// Grow one thorn and its descendants into `out` ({ polys: [[x,y]...][], nodes: [[x,y,r]...] }).
-// o: x, y, ang (rad, 0 = +x, y down), len, w (root width), bend (S-curve amplitude, rad),
-//    depth, kids (positions along the branch), sides ([1] / [-1] / default alternate), spread, ratio
-function csThorn(rnd, o, out) {
-  const N = 9, pts = [];
-  const th = s => o.ang + o.bend * Math.sin(2 * Math.PI * s);
-  let x = o.x, y = o.y;
-  pts.push([x, y, th(0), 0]);
-  for (let i = 1; i <= N; i++) {
-    const m = th((i - 0.5) / N);
-    x += Math.cos(m) * o.len / N; y += Math.sin(m) * o.len / N;
-    pts.push([x, y, th(i / N), i / N]);
-  }
-  const left = [], right = [];
-  pts.forEach(([px, py, t, s]) => {
-    const hw = o.w * Math.pow(1 - s, 1.15) / 2;
-    left.push([px - Math.sin(t) * hw, py + Math.cos(t) * hw]);
-    right.push([px + Math.sin(t) * hw, py - Math.cos(t) * hw]);
+// The sigil recipe (research, literally). Every segment is a straight, filled, tapered polygon: 2.2px at
+// the root of a main branch down to 0 at the tip (children start thinner, x0.78 per level). At 80% of its
+// length a segment forks: two children leave at 28 degrees either side of it, each 0.68 of the parent's
+// length, to depth 4; a node is drawn at each fork and nowhere else. Every segment also carries two short
+// barbs (35 degrees, swept toward the tip, one each side). The result is architectural thorn work, not veins.
+const CS_ANG = 28 * Math.PI / 180, CS_BARB = 35 * Math.PI / 180, CS_RATIO = 0.68, CS_TAPER = 2.2, CS_DEPTH = 4;
+// out: { polys: [[x,y]...][], nodes: [[x,y,r]...] }
+function csTri(out, x, y, ang, len, w) {
+  const nx = -Math.sin(ang) * w / 2, ny = Math.cos(ang) * w / 2;
+  out.polys.push([[x + nx, y + ny], [x - nx, y - ny], [x + Math.cos(ang) * len, y + Math.sin(ang) * len]]);
+}
+function csGrow(out, x, y, ang, len, w, depth) {
+  csTri(out, x, y, ang, len, w);
+  // two barbs, one each side, swept toward the tip
+  [[0.32, 1], [0.58, -1]].forEach(([s, side]) => {
+    csTri(out, x + Math.cos(ang) * len * s, y + Math.sin(ang) * len * s, ang + side * CS_BARB, len * 0.2, w * (1 - s) * 0.75);
   });
-  out.polys.push(left.concat(right.reverse().slice(1)));
-  if (o.depth <= 0) return;
-  const kids = o.kids && o.kids[o.depth] || (o.depth >= 3 ? [0.25, 0.5, 0.75] : o.depth === 2 ? [0.4, 0.7] : [0.55]);
-  kids.forEach((s, k) => {
-    const p = pts[Math.round(s * N)];
-    const side = o.sides ? o.sides[k % o.sides.length] : (k % 2 ? -1 : 1);
-    const spread = (o.spread || 0.55) + (rnd() - 0.5) * 0.14;
-    const ratio = (o.ratio || 0.66) + (rnd() - 0.5) * 0.08;
-    out.nodes.push([p[0], p[1], 1.1 + o.depth * 0.3]);
-    csThorn(rnd, {
-      x: p[0], y: p[1], ang: p[2] + side * spread, len: o.len * ratio * (1 - s * 0.3), w: o.w * 0.6 * (1 - s * 0.4),
-      bend: -o.bend * 0.8 + (rnd() - 0.5) * 0.12, depth: o.depth - 1, kids: o.kids, sides: o.sides ? o.sides : null, spread: o.spread, ratio: o.ratio,
-    }, out);
-  });
+  if (depth <= 0) return;
+  const fx = x + Math.cos(ang) * len * 0.8, fy = y + Math.sin(ang) * len * 0.8;
+  out.nodes.push([fx, fy, 1 + depth * 0.25]);
+  [1, -1].forEach(side => csGrow(out, fx, fy, ang + side * CS_ANG, len * CS_RATIO, w * 0.78, depth - 1));
 }
 
 const csNum = v => (Math.round(v * 10) / 10).toString();
-function csPath(polys, tf) {
-  return polys.map(pl => 'M' + pl.map(([x, y]) => { const q = tf ? tf(x, y) : [x, y]; return csNum(q[0]) + ' ' + csNum(q[1]); }).join('L') + 'Z').join('');
+function csPath(polys) {
+  return polys.map(pl => 'M' + pl.map(([x, y]) => csNum(x) + ' ' + csNum(y)).join('L') + 'Z').join('');
 }
-function csNodes(nodes, tf, fill) {
-  return nodes.map(([x, y, r]) => { const q = tf ? tf(x, y) : [x, y]; return `<circle cx="${csNum(q[0])}" cy="${csNum(q[1])}" r="${r.toFixed(1)}" fill="${fill}"/>`; }).join('');
-}
-// data URI safe inside an unquoted css url()
-function csUri(svg) {
-  return 'url(data:image/svg+xml,' + encodeURIComponent(svg).replace(/\(/g, '%28').replace(/\)/g, '%29').replace(/'/g, '%27') + ')';
-}
-
-// card corner brackets (60x60, four corners of 24px for border-image slice 24), a flourish tile (120x24), a thorn wreath mask (60x60)
-const csAssets = {};
-function csBuild(isDark) {
-  const key = isDark ? 'd' : 'l';
-  if (csAssets[key]) return csAssets[key];
-  const col = isDark ? '#C7CFDA' : '#323A45';
-  // corners
-  const rc = csRand(31);
-  const tl = { polys: [], nodes: [] };
-  csThorn(rc, { x: 1.2, y: 1.2, ang: 0, len: 23, w: 1.7, bend: 0, depth: 2, kids: { 2: [0.4, 0.72], 1: [0.55] }, sides: [1], spread: 0.62, ratio: 0.46 }, tl);
-  csThorn(rc, { x: 1.2, y: 1.2, ang: Math.PI / 2, len: 23, w: 1.7, bend: 0, depth: 2, kids: { 2: [0.4, 0.72], 1: [0.55] }, sides: [-1], spread: 0.62, ratio: 0.46 }, tl);
-  tl.nodes.push([1.2, 1.2, 1.9]);
-  const tfs = [null, (x, y) => [60 - x, y], (x, y) => [x, 60 - y], (x, y) => [60 - x, 60 - y]];
-  const corners = tfs.map(tf => `<path d="${csPath(tl.polys, tf)}" fill="${col}"/>${csNodes(tl.nodes, tf, col)}`).join('');
-  const cornerSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" viewBox="0 0 60 60">${corners}</svg>`;
-  // flourish: mirrored arms, a centre lozenge
-  const rf = csRand(77);
-  const fr = { polys: [], nodes: [] };
-  csThorn(rf, { x: 66, y: 12, ang: 0, len: 52, w: 1.8, bend: 0.1, depth: 1, kids: { 1: [0.5] }, sides: [1, -1], spread: 0.5, ratio: 0.5 }, fr);
-  const mir = (x, y) => [120 - x, y];
-  const flour = `<path d="${csPath(fr.polys)}${csPath(fr.polys, mir)}" fill="${col}"/>${csNodes(fr.nodes, null, col)}${csNodes(fr.nodes, mir, col)}<path d="M60 4.2 64.4 12 60 19.8 55.6 12Z" fill="none" stroke="${col}" stroke-width=".9"/>`;
-  const flourSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="120" height="24" viewBox="0 0 120 24">${flour}</svg>`;
-  // wreath: 24 spikes, two sizes, as an alpha mask
-  let w = '';
-  for (let i = 0; i < 24; i++) {
-    const a = (i / 24) * Math.PI * 2, long = i % 2 === 0, r0 = 17, r1 = long ? 29 : 23, hw = 0.075;
-    const p = (r, da) => `${csNum(30 + r * Math.cos(a + da))} ${csNum(30 + r * Math.sin(a + da))}`;
-    w += `M${p(r0, -hw)}L${p(r1, 0)}L${p(r0, hw)}Z`;
-  }
-  const wreathSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" viewBox="0 0 60 60"><path d="${w}" fill="#000"/><circle cx="30" cy="30" r="16" fill="none" stroke="#000" stroke-width="1"/></svg>`;
-  return (csAssets[key] = { corner: csUri(cornerSvg), flourish: csUri(flourSvg), wreath: csUri(wreathSvg) });
+function csNodes(nodes, fill) {
+  return nodes.map(([x, y, r]) => `<circle cx="${csNum(x)}" cy="${csNum(y)}" r="${r.toFixed(1)}" fill="${fill}"/>`).join('');
 }
 
 // cold light: the client hue, chroma cut to 30-45%, lightness 75-85%
@@ -136,7 +87,7 @@ registerAesthetic({
   layout: { hero: 'centered', palette: 'swatches', sections: 'two-col', subcopy: true },
   type: { ui: 'body', label: 'mono', display: 0.96 },
   highlight: 'custom',
-  highlightNote: 'The last word keeps the headline face and takes the accent-ink colour; a 1px line in the same colour tapers to a point at both ends beneath it. No fill, no glow, no outline.',
+  highlightNote: 'The last word keeps the headline face and is set in the silver ramp (a vertical #fff to #b9bec6 to #e9ebee gradient clipped to the text; graphite in light mode) with a soft glow of the accent at 40% around it; the 1px tapered line beneath is silver too. The accent is only ever that glow, never a solid fill on the word.',
   ctaFill: 'ink',
 
   roles: {
@@ -161,7 +112,7 @@ registerAesthetic({
       coverage: '≈5%',
     },
     accent: {
-      use: 'One sharp highlight per view: a node, the selected tab\'s lance, the progress head, the headline\'s last word',
+      use: 'One sharp highlight per view: a node, the selected tab\'s lance, the progress head, and the soft glow behind the headline\'s last word (the word itself is silver)',
       never: 'Buttons, fills, borders, more than one spark per view',
       coverage: '≤2%',
     },
@@ -178,7 +129,6 @@ registerAesthetic({
     const ws = String((hf && hf.weights) || '400').split(';').map(Number).filter(Boolean);
     const hw = ws.length ? Math.max(...ws.filter(x => x <= 700).concat([Math.min(...ws)])) : 400;
     const cold = csCold(t.primary, !d);   // light mode: the same cold light, read as a deep tint on cold void
-    const a = csBuild(d);
     const l1 = d ? '#F4F7FA' : '#1B2027', l2 = d ? '#9BA4B0' : '#4A5461', l3 = d ? '#5B6572' : '#7E8896';
     return {
       '--ab-type-pick-w': hw,
@@ -188,6 +138,8 @@ registerAesthetic({
       '--cs-faint': t.alpha(l2, d ? 0.24 : 0.3),
       '--cs-ghost': t.alpha(l2, d ? 0.09 : 0.12),
       '--cs-cold': cold,
+      '--cs-hl-glow': t.alpha(t.accent, d ? 0.4 : 0.32),
+      '--cs-hl-fill': d ? 'linear-gradient(180deg, #fff, #b9bec6 55%, #e9ebee)' : 'linear-gradient(180deg, #12161B, #4A5461 55%, #1B2027)',
       '--cs-glow': t.alpha(cold, d ? 0.42 : 0.5),
       '--cs-panel': d ? t.alpha('#0A0B0F', 0.7) : t.alpha('#FFFFFF', 0.55),
       '--cs-wash': t.mix(t.secondary, t.canvas, d ? 0.09 : 0.1),
@@ -197,9 +149,6 @@ registerAesthetic({
       '--ab-l1': l1, '--ab-silver': d ? 'linear-gradient(135deg, #F4F7FA 0%, #9BA4B0 38%, #EAF2FA 58%, #6C7684 100%)' : 'linear-gradient(135deg, #3A424D 0%, #1B2027 40%, #4A5461 62%, #12161B 100%)',
       '--ab-cold': cold, '--ab-glow': t.alpha(cold, d ? 0.42 : 0.5), '--ab-panel': d ? t.alpha('#0A0B0F', 0.7) : t.alpha('#FFFFFF', 0.55),
       '--ab-on-silver': d ? '#050507' : '#E7ECF2', '--ab-faint': t.alpha(l2, d ? 0.24 : 0.3),
-      '--cs-corner': a.corner,
-      '--cs-flourish': a.flourish,
-      '--cs-wreath': a.wreath,
     };
   },
 
@@ -211,25 +160,19 @@ registerAesthetic({
     const l1 = d ? '#F4F7FA' : '#1B2027', l2 = d ? '#9BA4B0' : '#4A5461', l3 = d ? '#5B6572' : '#7E8896';
     const cold = csCold(t.primary);
     const half = { polys: [], nodes: [] };
+    // three main branches fan out from the axis; a brand-seeded nudge of a few percent keeps each sigil its own
     const mains = [
-      { y: 174, ang: -0.52, len: 300, w: 3.0, bend: 0.30 },
-      { y: 179, ang: -0.13, len: 400, w: 3.4, bend: -0.26 },
-      { y: 184, ang: 0.14, len: 380, w: 3.2, bend: 0.26 },
-      { y: 189, ang: 0.54, len: 290, w: 2.8, bend: -0.30 },
+      { y: 174, ang: -0.62, len: 205, w: CS_TAPER },
+      { y: 181, ang: 0, len: 240, w: CS_TAPER },
+      { y: 188, ang: 0.62, len: 200, w: CS_TAPER },
     ];
-    mains.forEach((m, i) => {
+    mains.forEach(m => {
+      const len = m.len * (0.96 + rnd() * 0.08), ang = m.ang + (rnd() - 0.5) * 0.05;
       half.nodes.push([cx + 18, m.y, 1.9]);
-      csThorn(rnd, { x: cx + 18, y: m.y, ang: m.ang, len: m.len, w: m.w, bend: m.bend, depth: 3, spread: 0.55 + (i % 2) * 0.05 }, half);
+      csGrow(half, cx + 18, m.y, ang, len, m.w, CS_DEPTH);
     });
     const halfPath = csPath(half.polys);
-    const halfNodes = csNodes(half.nodes, null, `url(#${id}g)`);
-    // stipple: a cluster of 1px dots under the diamond (grey wash shading)
-    let dots = '';
-    for (let i = 0; i < 110; i++) {
-      const g = () => (rnd() + rnd() + rnd() - 1.5) * 2;
-      const x = cx + g() * 34, y = cy + g() * 80;
-      dots += `<circle cx="${csNum(x)}" cy="${csNum(y)}" r="${(0.45 + rnd() * 0.4).toFixed(2)}" opacity="${(0.25 + rnd() * 0.4).toFixed(2)}"/>`;
-    }
+    const halfNodes = csNodes(half.nodes, `url(#${id}g)`);
     // one diagram annotation on the right: a leader to a junction node, with coordinates
     const target = half.nodes.filter(n => n[0] > 600 && n[0] < 760 && n[1] > 90 && n[1] < 270)[1] || [660, 120, 1.5];
     const lx = target[0] + 34, ly = target[1] - 30;
@@ -248,7 +191,6 @@ registerAesthetic({
         <use href="#${id}h" transform="matrix(-1 0 0 1 ${cx * 2} 0)"/>
         <path d="M${cx} 20 ${cx + 1.8} 150 ${cx + 1.8} 210 ${cx} 342 ${cx - 1.8} 210 ${cx - 1.8} 150Z" fill="url(#${id}v)"/>
       </g>
-      <g fill="${l2}">${dots}</g>
       <path d="M${cx} 148 ${cx + 19} ${cy} ${cx} 212 ${cx - 19} ${cy}Z" fill="${d ? '#050507' : '#E7ECF2'}" stroke="${l1}" stroke-width="1"/>
       <path d="M${cx} 156 ${cx + 12} ${cy} ${cx} 204 ${cx - 12} ${cy}Z" fill="none" stroke="${l2}" stroke-width=".6"/>
       <text x="${cx}" y="${cy + 6}" text-anchor="middle" fill="none" stroke="${l1}" stroke-width=".7" style="font-family:var(--ab-font-h);font-size:17px">${initial}</text>
