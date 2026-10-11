@@ -1,7 +1,12 @@
-/* 33 Radical Memphis — laminate, clashing, springy. Memphis Group furniture and Bacterio laminate: saturated colours bound by black-and-white pattern, no outlines.
-   STUB (P5 scaffold): header metadata, deck copy and placeholder art only. The builder
-   replaces art(), adds tokens()/roles/materials/rules and fills css/aesthetics/radical-memphis.css.
-   Direction: docs/aesthetics-round5.md and docs/research/round5-*.md. */
+/* 33 Radical Memphis — laminate, clashing, springy. References: Memphis Group (1981),
+   Abet Laminati surfaces, Sottsass's Bacterio squiggle, Du Pasquier's patterns, Shire's
+   colour-block furniture. Pattern is a material: five laminates (Bacterio squiggle,
+   terrazzo, checker, dots, zig-zag) bind the saturated colours; objects are stacked
+   primitives on a diagonal stance; a second-hue "offset sheet" sits behind every shape
+   instead of an ink outline or a black shadow (that is Neo-Brutal Pop). Rule of the
+   screen: at most four hues plus black and white; the fourth is a borrowed pastel
+   (pink, or mint when the brand is already pink). Cards are always paper, so the board
+   also works in dark mode. No Corporate-Memphis people, no confetti. */
 registerAesthetic({
   key: 'radical-memphis', order: 33,
   name: 'Radical Memphis',
@@ -13,6 +18,123 @@ registerAesthetic({
   mode: 'light',
   slideShape: 'soft',
   labels: { material: 'Laminates', states: ['Plain', 'Patterned', 'Stacked'], statesKind: 'swatch' },
+  layout: { hero: 'split', palette: 'swatches', sections: 'two-col' },
+  type: { ui: 'body', label: 'body', display: 0.86 },
+  highlight: 'custom',
+  highlightNote: 'The accent word is set in accent text (shaded to read on the canvas) with a pastel offset sheet one step down and to the right (a coloured text-shadow); never an outline, never a pill.',
+  cardFill: '--ab-m-paper',
+
+  roles: {
+    canvas: {
+      use: 'The showroom floor: the light colour warmed toward #F6F1E7 (dark mode: the dark colour as a dusk floor). Paper cards sit on it',
+      never: 'A tinted pastel wash, or a pattern fill',
+      coverage: '35–40%',
+    },
+    ink: {
+      use: 'Type and the black in the laminates: Bacterio squiggles, checker squares, the stepped edges. Never an outline around a shape',
+      never: 'Outlines or borders around shapes or cards, black offset shadows, large flat fills',
+      coverage: '≈12–15%',
+    },
+    primary: {
+      use: 'The dominant flat, the cabinet colour: the main action, the spine of the art object, the selected token and the first progress bead row',
+      never: 'Body text, more than one main action, or sharing a surface with the accent at equal weight',
+      coverage: '≈25–30%',
+    },
+    secondary: {
+      use: 'The second laminate: zig-zag and stripe fills, tilted chips, alternate list rows and the supporting shapes of the art object',
+      never: 'The main action, body text, or the same surface as the primary flat',
+      coverage: '≈15–20%',
+    },
+    accent: {
+      use: 'The screamer: one circle or dot per view and the highlighted headline word (shaded to read as text)',
+      never: 'Buttons, body text, borders, or more than one large shape',
+      coverage: '≤5%',
+    },
+  },
+
+  // The ground is warmed toward #F6F1E7 (light) so the paper cards read as paper.
+  canvas(b) {
+    return b.isDark ? b.canvas : b.mix('#F6F1E7', b.canvas, 0.62);
+  },
+
+  tokens(t) {
+    const d = t.isDark;
+    const lightBrand = d ? t.ink : t.canvas;
+    const darkBrand = d ? t.canvas : t.ink;
+    const hueNear = hex => { const h = hexToHsl(hex); const s = h.s; return s > 22 && Math.abs(((h.h - 340 + 540) % 360) - 180) < 30; };
+    // Borrowed pastel: pink (or mint when a brand colour is already pink). It is the
+    // offset sheet behind every shape and the fourth hue of the rule "four hues max".
+    const pink = [t.primary, t.secondary, t.accent].some(hueNear);
+    const pastel = pink ? '#A9E3CB' : '#F6A9C6';
+    const paper = t.mix('#ffffff', lightBrand, 0.82);
+    const black = d ? t.mix('#000000', darkBrand, 0.45) : t.mix('#000000', t.ink, 0.3);
+    // text on paper that is quieter than black, kept >= 4.5:1
+    let k = 0.72;
+    let soft = t.mix(black, paper, k);
+    while (k < 1 && t.contrast(soft, paper) < 4.5) { k += 0.05; soft = t.mix(black, paper, Math.min(1, k)); }
+    return {
+      '--ab-m-paper': paper,
+      '--ab-m-black': black,
+      '--ab-m-soft': soft,
+      '--ab-m-pastel': pastel,
+      '--ab-m-pastel-lo': t.mix(pastel, paper, 0.45),
+      '--ab-m-sec-lo': t.mix(t.secondary, paper, 0.22),
+      '--ab-m-pri-lo': t.mix(t.primary, paper, 0.16),
+      '--ab-type-pick-w': '400',
+    };
+  },
+
+  // The showroom piece: a Carlton-like totem of stacked primitives (spine, two tilted
+  // shelves, discs, a triangle, a semicircle) on a terrazzo floor tile, each in a
+  // different laminate, with a pastel offset sheet behind every shape. HTML shapes so the
+  // laminates are the CSS ones; coordinates are percentages of the art box.
+  art(ctx) {
+    const e = escapeHtml;
+    const S = (k, f, x, y, w, h, r = 0) => ({ k, f, x, y, w, h, r });
+    const shapes = [
+      S('para', 'terrazzo', 4, 86, 92, 11),
+      S('rect', 'bacterio', 29, 71, 42, 15),
+      S('trap', 'secondary', 26, 58, 48, 14),
+      S('rect', 'primary', 44, 14, 12, 56),
+      S('bar', 'checker', 8, 38, 46, 7.5, -9),
+      S('bar', 'zig', 47, 27, 46, 7.5, 11),
+      S('tri', 'ink', 6, 21, 14, 16, -9),
+      S('semi', 'ink', 78, 19, 17, 8.5, 11),
+      S('circle', 'dots', 36.5, 44, 27, 27),
+      S('circle', 'accent', 29, 1, 30, 30),
+    ];
+    const style = s => `left:${s.x}%;top:${s.y}%;width:${s.w}%;height:${s.h}%;`;
+    const sheets = shapes.map(s => `<i class="mm-s mm-${s.k} mm-sh" style="${style(s)}transform:translate(1.8cqw,1.8cqw) rotate(${s.r}deg)"></i>`).join('');
+    const solids = shapes.map(s => `<i class="mm-s mm-${s.k} mm-f-${s.f}" style="${style(s)}transform:rotate(${s.r}deg)">${s.f === 'accent' ? `<b>${e(ctx.initial)}</b>` : ''}</i>`).join('');
+    return `<div class="mm-art">${sheets}${solids}<span class="mm-cap">Tahiti &mdash; No.&thinsp;07</span></div>`;
+  },
+
+  materials: [
+    { name: 'Paper card (cabinet)', css: 'background: {mPaper}; color: {mBlack}; border-radius: 0 36px 0 0; box-shadow: 8px 8px 0 {mPastel}; /* no outline; a 12px laminate strip (Bacterio) runs down the left side; the offset sheet is the borrowed pastel */' },
+    { name: 'Offset sheet', css: 'box-shadow: 6px 6px 0 {mPastel}; /* the second-hue sheet behind a shape; replaces ink outlines and black shadows; {mPastel} is borrowed (pink, or mint when the brand is pink) */' },
+    { name: 'Laminate: Bacterio', css: 'background: {mPaper}; /* black wavy lines, crosses and dots (stroke 2.4px, a 64px tile) on paper; a fixed black-and-white pattern, the neutral that holds the colours together */' },
+    { name: 'Laminate: Terrazzo', css: 'background: {mPaper}; /* random speckles of {primary}, {secondary}, {accent}, {mBlack} and {mPastel} at 3-9% of the area, tile 140px */' },
+    { name: 'Laminate: Checker', css: 'background: conic-gradient({mBlack} 25%, {mPaper} 0 50%, {mBlack} 0 75%, {mPaper} 0) 0 0 / 16px 16px; /* 8px squares; also the footer strip */' },
+    { name: 'Laminate: Dots', css: 'background: radial-gradient(circle, {primary} 2.2px, transparent 2.7px) 0 0 / 11px 11px, {mPaper}; /* dot grid in the primary flat on paper */' },
+    { name: 'Laminate: Zig-zag', css: 'background: linear-gradient(135deg, {secondary} 25%, transparent 25%) -6px 0 / 12px 12px, linear-gradient(225deg, {secondary} 25%, transparent 25%) -6px 0 / 12px 12px, linear-gradient(315deg, {secondary} 25%, transparent 25%) 0 0 / 12px 12px, linear-gradient(45deg, {secondary} 25%, transparent 25%) 0 0 / 12px 12px, {mPaper};' },
+    { name: 'Main action (circle on a plinth)', css: 'background: {primary}; color: {onPrimary}; border-radius: 999px; box-shadow: 6px 6px 0 {mPastel}; transition: transform 220ms cubic-bezier(.34,1.56,.64,1); /* an accent circle holds the arrow; press: scale(.94) with the overshoot curve */' },
+  ],
+
+  rules: {
+    do: [
+      'Fill surfaces with a laminate (Bacterio squiggle, terrazzo, checker, dots, zig-zag) so the black-and-white pattern holds the saturated colours together.',
+      'Build objects from stacked primitives on a diagonal: a circle on a rectangle on a trapezoid, tilted 3 to 12 degrees.',
+      'Put a pastel offset sheet behind each shape instead of an outline or a black shadow.',
+      'Keep to four hues plus black and white: about 60% flats, 30% pattern, 10% one screamer.',
+    ],
+    dont: [
+      'Draw ink outlines, sticker strokes or black offset shadows; that is Neo-Brutal Pop.',
+      'Scatter triangles, plus signs and squiggles as confetti, or add lanky flat people (Corporate Memphis).',
+      'Place text on a pattern; type sits on flat paper or a flat colour only.',
+      'Use warm earthy rounded type, rainbows or flower shapes (Groovy 70s) or glossy gradients.',
+    ],
+  },
+
   // Deck copy (js/brand-deck.js): three principles, three do / don't lines, each short.
   deck: {
     principles: [
@@ -23,21 +145,12 @@ registerAesthetic({
     do: [
       'Fill surfaces with squiggle, terrazzo or checker.',
       'Stack simple primitives on a diagonal.',
-      'Offset a second-hue sheet behind objects.',
+      'Set a coloured sheet behind each shape.',
     ],
     dont: [
-      'Outline shapes in thick black ink.',
-      'Scatter confetti without a system.',
-      'Place text over busy pattern.',
+      'Outline shapes in black.',
+      'Scatter confetti shapes at random.',
+      'Set text over a pattern.',
     ],
   },
-
-  // Placeholder art: replace with the signature artwork.
-  art(ctx) {
-    const t = ctx.t;
-    return `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" role="presentation"><rect x="12" y="52" width="40" height="36" fill="${t.primary}"/><circle cx="62" cy="38" r="22" fill="${t.secondary}"/><path d="M52 90 L82 40 L92 90 Z" fill="${t.accent}"/><g stroke="${t.ink}" stroke-width="1.5" fill="none"><path d="M16 60 q4 -5 8 0 t8 0 t8 0"/></g></svg>`;
-  },
-
-  materials: [],
-  rules: { do: [], dont: [] },
 });
