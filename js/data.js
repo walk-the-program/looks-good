@@ -101,6 +101,7 @@ const FONTS = [
   { name: 'Pirata One', css: '"Pirata One", Georgia, serif', category: 'display', weights: '400', cls: 'blackletter' },
   { name: 'Cinzel Decorative', css: '"Cinzel Decorative", Georgia, serif', category: 'display', weights: '400;700', cls: 'deco' },
   { name: 'Barlow Condensed', css: '"Barlow Condensed", -apple-system, sans-serif', category: 'display', weights: '400;600;800', cls: 'condensed' },
+  { name: 'Permanent Marker', css: '"Permanent Marker", "Marker Felt", cursive', category: 'display', weights: '400', cls: 'groovy' },
 
   /* ---- Slab serif ---- */
   { name: 'Roboto Slab', css: '"Roboto Slab", Georgia, serif', category: 'slab', weights: '400;700', cls: 'slab' },

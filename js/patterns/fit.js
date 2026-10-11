@@ -18,7 +18,9 @@
      Patterns.suiteKeys()            -> every aesthetic key that has a suite
 
    Each entry is [family, name, colorway, params, tone?] (tone defaults to 1). A suite never repeats a
-   family. Nothing here invents a colour: the colorway only chooses how the brand roles map to inks.
+   family. The FIRST entry of a suite drives the deck's cover band and closing strip
+   (js/patterns-deck.js leadEntry), so lead with a pattern that is safe at that size and obeys the
+   aesthetic's own rule (no hazard stripes, targets, reef colour or noise band on a cover). Nothing here invents a colour: the colorway only chooses how the brand roles map to inks.
 ------------------------------------------------------------------------ */
 (function (global) {
   'use strict';
@@ -242,11 +244,11 @@
       ['relief', 'Circuit memo', 'mono', { cols: 4, traces: 5, blocks: 3, trace: 0.8 }],
     ],
     'religious-futurism': [
-      ['specimens', 'Rose windows', 'brand', { cols: 4, gap: 1, round: 1.2, study: 'rings', line: 0.8 }, 0.55],
-      ['oprings', 'Halo rings', 'brand', { mode: 'rings', centres: 1, freq: 10, warp: 0.1, bands: 'two' }, 0.5],
-      ['marble', 'Veined stone', 'mono', { bands: 6, warp: 1, cover: 0.6, stars: 0.1, outline: false }, 0.5],
-      ['burst', 'Radiant mandorla', 'brand', { rays: 72, layers: 2, bend: 0.1, beads: 0.3, origin: 'centre' }, 0.5],
       ['kaleidopix', 'Glass mosaic', 'brand', { px: 1.6, patches: 1, fold: 'quad' }, 0.6],
+      ['specimens', 'Rose windows', 'brand', { cols: 4, gap: 1, round: 1.2, study: 'fans', line: 0.8 }, 0.55],
+      ['marble', 'Veined stone', 'mono', { bands: 6, warp: 1, cover: 0.6, stars: 0.1, outline: false }, 0.5],
+      ['burst', 'Radiant mandorla', 'brand', { rays: 48, layers: 2, bend: 0.1, beads: 0.3, origin: 'centre' }, 0.4],
+      ['modulargrid', 'Ashlar bays', 'mono', { cols: 6, style: 'line', merge: 0.4, gap: 0.6, empty: 0.2 }, 0.45],
       ['pixelquilt', 'Leaded panes', 'brand', { px: 1.2, block: 8, motifs: 'geometric', big: 0.1 }, 0.55],
     ],
     'xerox-punk': [
@@ -267,19 +269,19 @@
     ],
     'cybersigilism': [
       ['rods', 'Thorn rods', 'mono', { density: 1.1, thick: 0.6, length: 4.5, fork: 0.7, slip: 0.4, second: 'ink2' }, 0.6],
-      ['flow', 'Silver filaments', 'mono', { field: 'swirl', strands: 5, gap: 1.8, bend: 1.6, weight: 0.5 }, 0.55],
-      ['seafan', 'Mirrored fans', 'mono', { fans: 2, branch: 1.2, ribs: true, screen: 0.2, lobes: 2 }, 0.6],
+      ['flow', 'Silver filaments', 'mono', { field: 'swirl', strands: 3, gap: 1.8, bend: 1.6, weight: 0.6 }, 0.55],
+      ['seafan', 'Mirrored fans', 'mono', { fans: 2, branch: 1.2, ribs: false, screen: 0.2, lobes: 2 }, 0.6],
       ['blades', 'Fine blades', 'mono', { count: 260, size: 0.9, curve: 0.6, take: 0.6, ink: 'ink2' }, 0.6],
-      ['chevron', 'Mirror chevrons', 'mono', { bands: 12, slope: 55, mirror: 'quad', rhythm: 'even', colors: 'two' }, 0.5],
-      ['oprings', 'Sigil saddle', 'mono', { mode: 'saddle', centres: 1, freq: 14, warp: 0.2, bands: 'two' }, 0.5],
+      ['stipple', 'Silver dust', 'mono', { density: 0.7, dot: 0.7, layout: 'random', mirror: 'none', field: 'clouds', duo: false }, 0.5],
+      ['glyphgrid', 'Etched marks', 'mono', { glyphs: 'crosses', cell: 5, bands: 3, duo: false }, 0.5],
     ],
     'industrial-hazard': [
-      ['chevron', 'Hazard stripes', 'duotone', { bands: 8, slope: 45, mirror: 'x', rhythm: 'even', colors: 'two' }],
+      ['panels', 'Steel plates', 'mono', { depth: 4, gutter: 0.4, pitch: 1, flat: 0.5, frame: true }, 0.6],
       ['relief', 'Panel traces', 'mono', { cols: 3, traces: 8, blocks: 4, trace: 1.1 }],
       ['slipgrid', 'Indicator lamps', 'mono', { cell: 2.4, slip: 0.2, streak: 1, gutter: 0.18, scatter: 0.3 }],
-      ['panels', 'Steel plates', 'mono', { depth: 4, gutter: 0.4, pitch: 1, flat: 0.5, frame: true }],
       ['modulargrid', 'Bay grid', 'mono', { cols: 6, style: 'filled', merge: 0.4, gap: 0.3, empty: 0.15 }],
-      ['zigzag', 'Tread plate', 'duotone', { style: 'stair', band: 6, amp: 3, period: 9, phase: 'parallel', colors: 'two' }],
+      ['zigzag', 'Tread plate', 'mono', { style: 'stair', band: 6, amp: 3, period: 9, phase: 'parallel', colors: 'two' }],
+      ['chevron', 'Hazard stripes', 'mono', { bands: 14, slope: 45, mirror: 'x', rhythm: 'even', colors: 'two' }],
     ],
     'radical-memphis': [
       ['patchwork', 'Terrazzo', 'brand', { cell: 7, layers: 56, ragged: 0.6, motif: 'mixed', dotgrid: false }],
@@ -290,19 +292,19 @@
       ['glyphgrid', 'Primitive field', 'brand', { glyphs: 'shapes', cell: 5, bands: 5, duo: true }],
     ],
     'biomechanical-gothic': [
-      ['seafan', 'Rib lattice', 'brand', { fans: 2, branch: 1, ribs: true, screen: 0.5, lobes: 3 }, 0.5],
-      ['tissue', 'Cast membrane', 'brand', { cell: 12, loose: 0.5, levels: 4, veins: 0.5, wall: 0.8 }, 0.45],
-      ['colony', 'Spore colony', 'brand', { cells: 40, rings: 3, fuse: 1.2, finish: 'film', nuclei: true }, 0.45],
       ['rods', 'Vertebral rods', 'mono', { density: 1.3, thick: 1.1, length: 3.5, fork: 0.3, slip: 0.2, second: 'deep' }, 0.45],
+      ['seafan', 'Rib lattice', 'mono', { fans: 2, branch: 1, ribs: true, screen: 0.5, lobes: 3 }, 0.5],
+      ['tissue', 'Cast membrane', 'mono', { cell: 12, loose: 0.5, levels: 4, veins: 0.5, wall: 0.8 }, 0.45],
+      ['colony', 'Spore colony', 'mono', { cells: 40, rings: 3, fuse: 1.2, finish: 'film', nuclei: true }, 0.45],
       ['waves', 'Tubing runs', 'mono', { rows: 6, crests: 3, curl: 1.4, strands: 10, drops: 0 }, 0.45],
       ['relief', 'Bone relief', 'mono', { cols: 4, traces: 4, blocks: 4, trace: 0.9 }, 0.5],
     ],
     'pirate-broadcast': [
-      ['signal', 'Dead air', 'brand', { px: 0.8, bands: 24, noise: 0.5, blank: 0.2 }],
+      ['pixelgrid', 'Block graphics', 'brand', { cell: 2.4, mode: 'crosses', zones: 4, density: 0.7, phase: 0 }, 0.7],
+      ['signal', 'Dead air', 'brand', { px: 0.8, bands: 10, noise: 0.25, blank: 0.4 }],
       ['satellite', 'Intercept', 'brand', { mosaic: 0.6, block: 1.6, bars: 0.5, slices: 3, tear: 0.5 }],
       ['typeterrain', 'Teletext hills', 'brand', { charset: 'code', size: 1.2, levels: 6, style: 'ridges' }],
       ['snow', 'Static', 'night', { cols: 6, static: 0.6, stairs: 0.5, lenses: 0.3, marks: 0.6 }],
-      ['pixelgrid', 'Block graphics', 'brand', { cell: 2.4, mode: 'crosses', zones: 4, density: 0.7, phase: 0 }],
       ['warpcheck', 'Roll bars', 'duotone', { pattern: 'slash', warp: 'taper', cells: 18, amp: 0.4, waves: 2, second: false }],
     ],
     'dystopian-luxury': [

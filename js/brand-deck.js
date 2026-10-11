@@ -22,6 +22,10 @@
      aesthetic sets `def.deck = { materialStage: 'pattern' }`. Falls back to the
      art while unset or when it returns ''.
 
+   Aesthetic hooks the deck honours (docs/aesthetics-plan.md, "Round 5 framework
+   hooks"): def.headline(ctx, text) (the cover, Principles and Closing h2),
+   def.printPrimary(t) (Color slide) and def.deck.coverDisplay (cover headline start size).
+
    Also holds the small colour/size helpers the board and the library tiles
    use (slMix, slVisible, slFit, slRadius, brandFileSlug). Plain <script>.
 ------------------------------------------------------------------------ */
@@ -204,7 +208,7 @@ const DECK_SLIDES = [
       return `<div class="ab-deck-principles">
         <div class="ab-deck-lead">
           <p class="ab-label ab-deck-kick">How ${e(P.copy.brandName)} looks and feels</p>
-          <h2 class="ab-headline ab-deck-h" style="--dk-fs:${bdMottoPx(def.motto, 70)}px">${abHeadline(def.motto)}</h2>
+          ${abHeadlineH2(def, P.ctx, def.motto, ' ab-deck-h', ` style="--dk-fs:${bdMottoPx(def.motto, 70)}px"`)}
           <p class="ab-deck-desc">${e(def.summary || def.descriptor)}</p>
         </div>
         <ol class="ab-deck-plist">${items}</ol>
@@ -217,21 +221,15 @@ const DECK_SLIDES = [
       const e = escapeHtml;
       const order = AB_ROLE_ORDER;
       const nums = order.map(k => abCoverageNum((P.roles[k] || {}).coverage));
-      const sws = order.map(k => {
-        const r = P.roles[k] || {};
-        return `<div class="ab-deck-sw" data-role="${k}">
-          <span class="ab-deck-swc" style="background:${t[k]}"></span>
-          <p class="ab-deck-swrole">${e(r.label || k)}</p>
-          <p class="ab-deck-swjob">${e(bdWords(r.job || '', 4))}</p>
-          <p class="ab-deck-swhex">${e(t[k].toUpperCase())}</p>
-        </div>`;
-      }).join('');
+      // The board's own palette block (same markup and classes as P.palette), so each
+      // aesthetic's swatch vocabulary (arched tiles, paper chips, plates, strips) shows here too.
+      const sws = `<div class="ab-swatches" data-kind="${P.layout.palette}">${P.swatches()}</div>`;
       const bar = order.map((k, i) => `<span class="ab-deck-seg" data-role="${k}" style="flex:${nums[i]};background:${t[k]}"></span>`).join('');
       const legend = order.map(k => `<span class="ab-deck-key"><i style="background:${t[k]}"></i>${e((P.roles[k] || {}).label || k)}</span>`).join('');
       const actionInk = def.ctaFill === 'ink';
       const pairs = [
         { name: 'Text', fg: t.ink, bg: t.canvas },
-        actionInk ? { name: 'Action', fg: t.canvas, bg: t.ink } : { name: 'Action', fg: t.onPrimary, bg: t.primary },
+        actionInk ? { name: 'Action', fg: t.canvas, bg: t.ink } : { name: 'Action', fg: t.onPrimary, bg: t.printPrimary },
         { name: 'Highlight', fg: t.accentInk, bg: t.canvas },
       ].map(p => {
         const ratio = contrastRatio(p.fg, p.bg);
@@ -297,9 +295,11 @@ const DECK_SLIDES = [
     build(P) {
       const card = P.card();
       const panel = P.panel();
+      // inner is scaled (zoom 1.45, css/brand-deck.css) inside .ab-deck-cellzoom so the
+      // components fill their cell; the cell body itself stays plain for aesthetic css.
       const cell = (name, inner) => `<div class="ab-deck-cell">
           <p class="ab-label ab-deck-cellname">${name}</p>
-          <div class="ab-deck-cellbody">${inner}</div>
+          <div class="ab-deck-cellbody"><div class="ab-deck-cellzoom">${inner}</div></div>
         </div>`;
       const states = bdPart(panel, '.ab-states');
       return `<div class="ab-deck-ui">
@@ -386,7 +386,7 @@ const DECK_SLIDES = [
       return `<div class="ab-deck-closing">
         <div class="ab-deck-closemain">
           <div class="ab-brand ab-deck-wordmark">${P.brand}</div>
-          <h2 class="ab-headline ab-deck-h" style="--dk-fs:${bdMottoPx(def.motto, 104)}px">${abHeadline(def.motto)}</h2>
+          ${abHeadlineH2(def, P.ctx, def.motto, ' ab-deck-h', ` style="--dk-fs:${bdMottoPx(def.motto, 104)}px"`)}
           <p class="ab-deck-desc">${e(def.descriptor)}</p>
         </div>
         <div class="ab-deck-contact">
@@ -404,6 +404,9 @@ function bdSlideHtml(state, def, slide, index, total) {
   const P = abBoardParts(state, def);
   // Container radius for deck panels follows the aesthetic's shape preset.
   P.style += `;--dk-r:${slRadius(state.shapePreset && state.shapePreset.radiusLg, '12px')}`;
+  // def.deck.coverDisplay: the cover headline's start scale (bdFitCover); cover only.
+  const cd = Number(def.deck && def.deck.coverDisplay);
+  if (slide.key === 'cover' && cd > 0 && isFinite(cd)) P.style += `;--dk-cover-display:${cd}`;
   const n = String(index + 1).padStart(2, '0');
   const count = String(total).padStart(2, '0');
   const body = slide.build(P, state, def, P.t);
@@ -564,7 +567,9 @@ function bdFitCover(root) {
   const hero0 = root.querySelector('.ab-hero');
   if (hero0 && getComputedStyle(hero0).display === 'contents') root.dataset.coverFlat = '1';
   bdCoverSide(root);
-  const display = parseFloat(root.style.getPropertyValue('--ab-display')) || 1;
+  // def.deck.coverDisplay (--dk-cover-display) replaces type.display for the cover start size.
+  const display = parseFloat(root.style.getPropertyValue('--dk-cover-display'))
+    || parseFloat(root.style.getPropertyValue('--ab-display')) || 1;
   const start = Math.max(BD_COVER_MIN_PX, BD_COVER_START * display);
   let fs = start;
   const setFs = v => hl.style.setProperty('font-size', v.toFixed(1) + 'px', 'important');

@@ -382,12 +382,12 @@ const AESTHETIC_META = {
   'biomechanical-gothic': {
     family: 'luminous',
     fonts: {
-      heading: { classes: ['blackletter', 'deco', 'old-style'], picks: ['Grenze Gotisch', 'Cinzel', 'Cormorant Garamond', 'Italiana'] },
+      heading: { classes: ['old-style', 'deco', 'didone'], picks: ['Cormorant Garamond', 'Cinzel', 'Italiana', 'Grenze Gotisch'] },
       body: { classes: ['text-serif', 'old-style'], picks: ['Spectral', 'EB Garamond'] },
       mono: { picks: ['IBM Plex Mono'] },
-      avoid: ['rounded', 'groovy', 'pixel', 'geometric'],
-      why: 'Ribbed, ancient forms call for lettering with spines and old-style text faces, kept dim and readable so the structure carries the mood.',
-      pairings: [['Grenze Gotisch', 'Spectral'], ['Cinzel', 'EB Garamond'], ['Cormorant Garamond', 'IBM Plex Sans']],
+      avoid: ['rounded', 'groovy', 'pixel', 'geometric', 'blackletter'],
+      why: 'Light inscriptional and high-contrast serifs read as carved relics; blackletter pushes the structure toward costume-store metal, so it stays out.',
+      pairings: [['Cormorant Garamond', 'Spectral'], ['Cinzel', 'EB Garamond'], ['Grenze Gotisch', 'Spectral']],
     },
   },
   'pirate-broadcast': {

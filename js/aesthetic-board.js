@@ -68,6 +68,10 @@ function boardTokens(state, def) {
     canvas, ink, muted,
     line: slMix(canvas, ink, 0.85),
     primary: c.primary, onPrimary: pickReadableText(c.primary),
+    // The hex the primary is printed as on the board: the brand primary unless
+    // def.printPrimary(t) pushes it (see below). onPrimary, priTint and
+    // primaryText always describe this color, because it is the one on screen.
+    printPrimary: c.primary, printed: false,
     secondary: c.secondary, onSecondary: pickReadableText(c.secondary),
     accent: c.accent, onAccent: pickReadableText(c.accent),
     priTint: slMix(c.primary, canvas, 0.12),
@@ -88,6 +92,23 @@ function boardTokens(state, def) {
     contrast: contrastRatio,
     readable: pickReadableText,
   };
+  // def.printPrimary(t) (optional): the hex the primary is printed as (Xerox Punk
+  // and Acid Graphics push it to Day-Glo). t.primary stays the brand hex; the
+  // printed color replaces it in --ab-primary, and the colors derived from the
+  // primary are recomputed from it. A value that is not a #rrggbb hex is ignored.
+  if (def && typeof def.printPrimary === 'function') {
+    const hex = def.printPrimary(t);
+    if (typeof hex === 'string' && /^#[0-9a-f]{6}$/i.test(hex.trim())) {
+      const pp = hex.trim().toLowerCase();
+      if (pp !== String(c.primary).toLowerCase()) {
+        t.printPrimary = pp;
+        t.printed = true;
+        t.onPrimary = pickReadableText(pp);
+        t.priTint = slMix(pp, canvas, 0.12);
+        t.primaryText = slVisible(canvas, [pp], 3, ink);
+      }
+    }
+  }
   return t;
 }
 
@@ -120,6 +141,26 @@ function abHeadline(tagline) {
   const m = text.match(/^([\s\S]*?)([^\s]+?)([.,;:!?…]*)$/);
   if (!m) return escapeHtml(text);
   return `${escapeHtml(m[1])}<span class="ab-hl">${escapeHtml(m[2])}</span>${escapeHtml(m[3])}`;
+}
+
+// The headline's h2 for the board hero and the deck's cover, principles and closing
+// slides. Normal case: `<h2 class="ab-headline[ extra]">` with the last word wrapped in
+// .ab-hl. When the def has a `headline(ctx, text)` hook (an aesthetic that draws its own
+// headline: ransom tiles, rebus, mixed type) the h2 is still the headline, so the deck's
+// fit code (bdFitHeadline, bdFitCover) can measure it:
+//   <h2 class="ab-headline ab-headline--custom[ extra]" aria-label="text"><span aria-hidden="true">HOOK HTML</span></h2>
+// `text` is the plain (unescaped, trimmed) headline string and the hook returns inner HTML
+// it has escaped itself. A hook that returns a non-string or '' falls back to the normal h2.
+// `extraClass` starts with a space; `extraAttrs` starts with a space too.
+function abHeadlineH2(def, ctx, text, extraClass = '', extraAttrs = '') {
+  if (def && typeof def.headline === 'function') {
+    const plain = String(text == null ? '' : text).trim();
+    const inner = def.headline(ctx, plain);
+    if (typeof inner === 'string' && inner) {
+      return `<h2 class="ab-headline ab-headline--custom${extraClass}" aria-label="${escapeHtml(plain)}"${extraAttrs}><span aria-hidden="true">${inner}</span></h2>`;
+    }
+  }
+  return `<h2 class="ab-headline${extraClass}"${extraAttrs}>${abHeadline(text)}</h2>`;
 }
 
 function abHeadlineScale(tagline) {
@@ -168,7 +209,7 @@ function boardVars(t, state, def, tagline) {
   const hs = Math.min(1.25, Math.max(0.8, (ty.headingSize || 44) / 44));
   const vars = {
     '--ab-canvas': t.canvas, '--ab-ink': t.ink, '--ab-muted': t.muted, '--ab-line': t.line,
-    '--ab-primary': t.primary, '--ab-on-primary': t.onPrimary,
+    '--ab-primary': t.printPrimary, '--ab-on-primary': t.onPrimary,
     '--ab-secondary': t.secondary, '--ab-on-secondary': t.onSecondary,
     '--ab-accent': t.accent, '--ab-on-accent': t.onAccent,
     '--ab-pri-tint': t.priTint, '--ab-sec-tint': t.secTint,
@@ -182,6 +223,7 @@ function boardVars(t, state, def, tagline) {
   const ui = abResolveFace(ty2.ui, state);
   const label = ty2.label ? abResolveFace(ty2.label, state) : ui;
   vars['--ab-accent-ink'] = t.accentInk;
+  if (t.printed) vars['--ab-primary-brand'] = t.primary;   // the true brand hex, only where the board prints another
   vars['--ab-font-ui'] = ui.expr;
   vars['--ab-font-label'] = label.expr;
   vars['--ab-display'] = Number(ty2.display) > 0 ? Number(ty2.display) : 1;
@@ -369,7 +411,9 @@ function abBoardParts(state, def) {
   const hlKind = abHighlightOf(def);
   const statesKind = AB_STATE_KINDS.includes(labels.statesKind) ? labels.statesKind : 'swatch';
   // Text colour that reads on each role's own fill (strips put labels inside the band).
-  const onRole = { canvas: t.ink, ink: t.canvas, primary: t.onPrimary, secondary: t.onSecondary, accent: t.onAccent };
+  // The primary swatch is filled with the brand hex, so on a printed primary its label
+  // colour is chosen for the brand hex, not for the printed one (t.onPrimary).
+  const onRole = { canvas: t.ink, ink: t.canvas, primary: t.printed ? pickReadableText(t.primary) : t.onPrimary, secondary: t.onSecondary, accent: t.onAccent };
 
   const P = { state, def, t, copy, ctx, roles, vars, style, uid, labels, brand, layout, hlKind, statesKind, onRole };
 
@@ -388,7 +432,7 @@ function abBoardParts(state, def) {
   P.hero = () => `<section class="ab-hero">
       <div class="ab-hero-copy">
         <p class="ab-kicker">${e(def.kicker || def.descriptor)}</p>
-        <h2 class="ab-headline">${abHeadline(copy.tagline)}</h2>${layout.subcopy
+        ${abHeadlineH2(def, ctx, copy.tagline)}${layout.subcopy
     ? `\n        <p class="ab-subcopy"><span class="ab-sub-lead">A design language for ${e(copy.brandName)}</span><span class="ab-sub-rest"> — type, color and material in one place.</span></p>` : ''}
       </div>
       <div class="ab-art" aria-hidden="true">${P.art()}</div>
@@ -402,7 +446,8 @@ function abBoardParts(state, def) {
       <span class="ab-chip" style="background:${hex}"></span>
       <b class="ab-sw-role">${e(r.label || k)}</b>
       <span class="ab-sw-job">${e(r.job || '')}${r.coverage ? ' · ' + e(r.coverage) : ''}</span>
-      <code class="ab-sw-hex">${hex.toUpperCase()}</code>
+      <code class="ab-sw-hex">${hex.toUpperCase()}</code>${k === 'primary' && t.printed ? `
+      <code class="ab-sw-print">prints as ${t.printPrimary.toUpperCase()}</code>` : ''}
     </div>`;
   }).join('');
 

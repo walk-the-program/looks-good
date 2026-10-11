@@ -156,6 +156,8 @@
 .ab-sw-role { font-size: 12.5px; font-weight: 600; line-height: 1.3; }
 .ab-sw-job { margin-top: 2px; font-size: 11px; line-height: 1.35; color: var(--ab-muted); }
 .ab-sw-hex { margin-top: 5px; font-size: 10.5px; letter-spacing: 0.04em; color: var(--ab-muted); }
+/* Second line of a primary that is printed as another color (def.printPrimary). */
+.ab-sw-print { display: block; margin-top: 2px; font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 11px; letter-spacing: 0.02em; line-height: 1.3; color: var(--ab-muted); }
 
 /* palette layouts (def.layout.palette). Every .ab-swatch carries --sw (hex),
    --sw-on (readable text colour on it) and --cov (coverage %, the strip weight). */
@@ -165,7 +167,7 @@
   padding: clamp(10px, 1.6cqw, 16px); background: var(--sw); color: var(--sw-on);
 }
 .ab-swatches[data-kind="strips"] .ab-chip { display: none; }
-.ab-swatches[data-kind="strips"] .ab-sw-job, .ab-swatches[data-kind="strips"] .ab-sw-hex { color: inherit; opacity: 0.78; overflow-wrap: anywhere; }
+.ab-swatches[data-kind="strips"] .ab-sw-job, .ab-swatches[data-kind="strips"] .ab-sw-hex, .ab-swatches[data-kind="strips"] .ab-sw-print { color: inherit; opacity: 0.78; overflow-wrap: anywhere; }
 .ab-swatches[data-kind="chips"] { display: flex; flex-wrap: wrap; gap: 8px 10px; }
 .ab-swatches[data-kind="chips"] .ab-swatch {
   flex-direction: row; align-items: center; gap: 8px; padding: 5px 12px 5px 6px;
@@ -173,6 +175,7 @@
 }
 .ab-swatches[data-kind="chips"] .ab-chip { width: 22px; height: 22px; margin: 0; border-radius: 50%; }
 .ab-swatches[data-kind="chips"] .ab-sw-job { display: none; }
+.ab-swatches[data-kind="chips"] .ab-sw-print { margin: 0; }
 .ab-swatches[data-kind="chips"] .ab-sw-role, .ab-swatches[data-kind="chips"] .ab-sw-hex { margin: 0; }
 
 /* sections */

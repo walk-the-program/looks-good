@@ -40,6 +40,8 @@ const AIB_DERIVED_JOB = {
   muted: 'Secondary text, captions, placeholders, disabled labels',
   line: 'Hairlines, dividers, resting input borders',
   onPrimary: 'Text and icons on a primary fill only',
+  onPrintPrimary: 'Text and icons on a --primary-print fill only (the label on the printed primary)',
+  printPrimary: 'The primary as this aesthetic prints it: the brand primary pushed to a more vivid color. Use it wherever the board fills, rules or marks something with the primary (button, selected segment, switch on, focus ring, progress). The true brand primary appears only in the palette swatch',
   onSecondary: 'Text and icons on a secondary fill only',
   onAccent: 'Text and icons on an accent fill only',
   accentInk: 'The accent as text: same hue family (yellows shift toward amber on light canvases), shaded (light canvas) or tinted (dark canvas) just enough to reach 3:1 on the canvas. Set the highlight word in it, never plain accent',
@@ -111,7 +113,11 @@ function aibCardFill(def, t, extras) {
 
 function aibComponentRows(t, def, extras) {
   const key = def.key;
-  const focusLow = contrastRatio(t.primary, t.canvas) < 3;
+  // Where the aesthetic prints the primary as another color (def.printPrimary), the board's
+  // primary fills, rules and marks use --primary-print; --primary is the brand hex only.
+  const PRI = t.printed ? '--primary-print' : '--primary';
+  const ONP = t.printed ? '--on-primary-print' : '--on-primary';
+  const focusLow = contrastRatio(t.printPrimary, t.canvas) < 3;
   const hlKind = aibHighlightKind(def);
   const inkCta = def.ctaFill === 'ink';
 
@@ -121,11 +127,11 @@ function aibComponentRows(t, def, extras) {
   else if (key === 'liquid-glass') segOn = ['translucent lens: --canvas lightened toward white', '--ink', 'white at 50%'];
   else if (key === 'holo-iridescent') segOn = ['decorative silver chrome pill (see Materials)', '--ink', 'none'];
   else if (key === 'clay') segOn = ['near-white puffy pill (see Materials)', '--ink', 'none'];
-  else segOn = ['--primary', '--on-primary', AIB_INK_BORDER.includes(key) ? '--ink' : 'none'];
+  else segOn = [PRI, ONP, AIB_INK_BORDER.includes(key) ? '--ink' : 'none'];
 
   const toggleOn = key === 'soft-form' ? 'track --canvas (recessed), knob --primary'
     : key === 'retro-futurist' ? 'track --canvas, status lamp --accent (glow)'
-      : 'track --primary, knob --on-primary';
+      : `track ${PRI}, knob ${ONP}`;
   const toggleOff = key === 'soft-form' ? 'track --canvas (recessed), knob --muted' : 'track --line, knob --muted';
 
   const hl = hlKind === 'band'
@@ -142,11 +148,11 @@ function aibComponentRows(t, def, extras) {
     ['Card / panel', cardBg, '--ink', inkBorder ? '--ink' : '--line'],
     inkCta
       ? ['Main button (one per view, ink-filled)', '--ink', '--canvas', 'none']
-      : ['Primary button (one per view)', '--primary', '--on-primary', inkBorder ? '--ink' : 'none'],
+      : ['Primary button (one per view)', PRI, ONP, inkBorder ? '--ink' : 'none'],
     ['Secondary button', 'transparent (hover: --sec-tint)', '--ink', '--secondary'],
     ['Ghost / tertiary link', 'none', '--ink (underlined)', 'none'],
     ['Input field, rest', '--canvas', '--ink (placeholder: --muted)', inkBorder ? '--ink' : '--line'],
-    ['Input field, focus', '--canvas', '--ink', '--primary (plus a 3px ring of --primary at 40% opacity)'],
+    ['Input field, focus', '--canvas', '--ink', `${PRI} (plus a 3px ring of ${PRI} at 40% opacity)`],
     ['Segmented control, selected', ...segOn],
     ['Segmented control, unselected', 'transparent', '--muted', 'none'],
     ['Toggle, on', toggleOn, '--ink (label)', 'none'],
@@ -157,10 +163,10 @@ function aibComponentRows(t, def, extras) {
     key === 'aurora-noir' && !t.accentLow ? '--accent' : '--on-accent', 'none'],
     ['Headline highlight word (one per view)', ...hl],
     ['Divider / hairline', '--line', 'n/a', 'n/a'],
-    ['List row, selected', '--sec-tint', '--ink', 'left edge 2px --primary'],
+    ['List row, selected', '--sec-tint', '--ink', `left edge 2px ${PRI}`],
     ['List row, resting', 'transparent', '--ink (meta: --muted)', 'bottom 1px --line'],
-    ['Progress / data bar', 'track --line', 'n/a', 'fill --primary (second series: --secondary)'],
-    ['Focus ring (any control)', 'n/a', 'n/a', focusLow ? '3px --primary with an outer 1px --ink ring (primary alone is under 3:1 on this canvas)' : '--primary'],
+    ['Progress / data bar', 'track --line', 'n/a', `fill ${PRI} (second series: --secondary)`],
+    ['Focus ring (any control)', 'n/a', 'n/a', focusLow ? `3px ${PRI} with an outer 1px --ink ring (primary alone is under 3:1 on this canvas)` : PRI],
   ];
 }
 
@@ -471,11 +477,16 @@ function buildAiBrief(state) {
   /* 4. Color tokens */
   push('## Color tokens', '',
     'Define these as CSS custom properties and reference them by name. Hexes are exact; do not adjust them.', '');
-  const tokenRows = AIB_TOKEN_ROWS.map(([name, field, roleKey]) => {
+  const tokenRows = [];
+  AIB_TOKEN_ROWS.forEach(([name, field, roleKey]) => {
     const hex = t[field] != null ? t[field] : state.colors[field];
     const r = roleKey ? roles[roleKey] : null;
     const job = r ? r.job : (AIB_DERIVED_JOB[field] || '');
-    return [`\`${name}\``, hex, roleKey ? r.label : 'Derived', job];
+    // On a printed primary, --on-primary stays the label colour for the brand hex (it is what
+    // brandCssText defines); the printed primary has its own --primary-print / --on-primary-print.
+    tokenRows.push([`\`${name}\``, field === 'onPrimary' && t.printed ? pickReadableText(t.primary) : hex, roleKey ? r.label : 'Derived', job]);
+    if (field === 'primary' && t.printed) tokenRows.push(['`--primary-print`', t.printPrimary, 'Derived', AIB_DERIVED_JOB.printPrimary]);
+    if (field === 'onPrimary' && t.printed) tokenRows.push(['`--on-primary-print`', t.onPrimary, 'Derived', AIB_DERIVED_JOB.onPrintPrimary]);
   });
   Object.keys(extras).forEach(name => {
     const v = String(extras[name]).trim();
@@ -484,6 +495,9 @@ function buildAiBrief(state) {
   });
   push(aibTable(['Token', 'Hex', 'Role', 'Job'], tokenRows), '');
   push(`Canvas is derived from ${t.isDark ? 'Neutral dark' : 'Neutral light'}${def.canvas ? ` and then adjusted by the ${def.name} aesthetic` : ''}. Use \`--canvas\`, not the raw neutral, for page and panel backgrounds.`, '');
+  if (t.printed) {
+    push(`The brand primary is \`${t.primary}\` (\`--primary\`), but ${def.name} prints it as \`${t.printPrimary}\` (\`--primary-print\`). Every primary fill, rule and mark in this aesthetic uses \`--primary-print\`, with \`--on-primary-print\` text on it and \`--pri-tint\` for quiet washes (both are derived from \`--primary-print\`). Show \`--primary\` only where the palette names the brand color.`, '');
+  }
 
   /* 5. Where each color goes */
   push('## Where each color goes', '');
@@ -503,9 +517,9 @@ function buildAiBrief(state) {
     '4. Text is set only in `--ink`, `--muted` or the matching `--on-*` token on its fill. The one exception is the single accent highlight word, and only where the highlight treatment below says so.',
     `5. Color budget per view: canvas ${cov('canvas')}, ink ${cov('ink')}, primary ${cov('primary')}, secondary ${cov('secondary')}, accent ${cov('accent')}. Stay inside it.`,
     '6. No other colors, tints or gradients. Hover and pressed states use only the tokens above (for example `--pri-tint`, `--sec-tint`) or the shadows and overlays listed under Materials.',
-    contrastRatio(t.primary, t.canvas) < 3
-      ? '7. Focus ring is `--primary` (3px) with an outer 1px `--ink` ring, because `--primary` alone is under 3:1 on this canvas.'
-      : '7. Focus ring is always `--primary`.');
+    contrastRatio(t.printPrimary, t.canvas) < 3
+      ? `7. Focus ring is \`${t.printed ? '--primary-print' : '--primary'}\` (3px) with an outer 1px \`--ink\` ring, because \`${t.printed ? '--primary-print' : '--primary'}\` alone is under 3:1 on this canvas.`
+      : `7. Focus ring is always \`${t.printed ? '--primary-print' : '--primary'}\`.`);
   const hlKind = aibHighlightKind(def);
   if (hlKind === 'band') {
     push('8. In this aesthetic the highlight word is a highlighter band: background `' + t.accent + '` (`--accent`) behind the word, text in `' + t.onAccent + '` (`--on-accent`). Never set accent-colored text.');
@@ -528,12 +542,18 @@ function buildAiBrief(state) {
   const pairs = [
     ['--ink on --canvas', t.ink, t.canvas, 'Body and headlines'],
     ['--muted on --canvas', t.muted, t.canvas, 'Captions and secondary text'],
-    ...(def.ctaFill === 'ink' ? [['--canvas on --ink', t.canvas, t.ink, 'Main button label']] : [['--on-primary on --primary', t.onPrimary, t.primary, 'Primary button label']]),
+    ...(def.ctaFill === 'ink' ? [['--canvas on --ink', t.canvas, t.ink, 'Main button label']]
+      : t.printed ? [['--on-primary-print on --primary-print', t.onPrimary, t.printPrimary, 'Primary button label (the printed primary)'],
+        ['--on-primary on --primary', pickReadableText(t.primary), t.primary, 'Label on a brand-primary fill (the palette swatch only)']]
+        : [['--on-primary on --primary', t.onPrimary, t.primary, 'Primary button label']]),
     ['--on-secondary on --secondary', t.onSecondary, t.secondary, 'Chip and tag label'],
     ['--on-accent on --accent', t.onAccent, t.accent, 'Badge label, highlight band'],
     ['--accent-ink on --canvas', t.accentInk, t.canvas, 'Highlight word and accent text (the accent shaded to 3:1)'],
     ['--accent on --canvas', t.accent, t.canvas, t.accentLow ? 'Do not use as text; graphic fills only' : 'Graphics and fills'],
-    ['--primary on --canvas', t.primary, t.canvas, contrastRatio(t.primary, t.canvas) >= 3 ? 'Focus ring, graphics, large elements' : 'Graphics only; keep the label in --on-primary'],
+    ...(t.printed ? [['--primary-print on --canvas', t.printPrimary, t.canvas, contrastRatio(t.printPrimary, t.canvas) >= 3 ? 'Focus ring, graphics, large elements' : 'Graphics only; keep the label in --on-primary-print']] : []),
+    ['--primary on --canvas', t.primary, t.canvas, t.printed
+      ? (contrastRatio(t.primary, t.canvas) >= 3 ? 'The brand color in the palette swatch and brand marks' : 'The brand color in the palette swatch only; never as text or a thin line')
+      : (contrastRatio(t.primary, t.canvas) >= 3 ? 'Focus ring, graphics, large elements' : 'Graphics only; keep the label in --on-primary')],
   ];
   push('## Contrast pairs', '',
     aibTable(['Pair', 'Foreground', 'Background', 'Ratio', 'Grade', 'Use'],
@@ -581,6 +601,7 @@ function buildAiBrief(state) {
   const derived = AIB_TOKEN_ROWS
     .filter(([name]) => !['--primary', '--secondary', '--accent', '--neutral-dark', '--neutral-light', '--on-primary', '--on-accent'].includes(name))
     .map(([name, field]) => `  ${name}: ${t[field]};`);
+  if (t.printed) derived.unshift(`  --primary-print: ${t.printPrimary};`, `  --on-primary-print: ${t.onPrimary};`);
   const extraLines = Object.keys(extras).map(name => `  ${name}: ${String(extras[name]).replace(/\s*\n\s*/g, ' ').trim()};`);
   push('## CSS variables', '', '```css', brandCssText(state), '',
     `/* Derived tokens for the ${mode}-mode ${def.name} aesthetic. Computed, do not edit. */`,
