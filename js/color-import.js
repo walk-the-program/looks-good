@@ -54,15 +54,23 @@ function extractColors(text) {
   const out = [];
   const byHex = new Map();
   String(text || '').split(/\r?\n/).forEach((line, lineNo) => {
-    const matches = Array.from(line.matchAll(IMPORT_COLOR_RE));
+    // Not a color: "&#169;" (HTML entity), "x#fff" (inside a word) and "#123"
+    // (an issue/number reference; brand guides write six-digit hexes).
+    const matches = Array.from(line.matchAll(IMPORT_COLOR_RE)).filter(m =>
+      !(m[1] && (/[&\w]/.test(line[m.index - 1] || '') || /^\d{3}$/.test(m[1]))));
+    let consumed = 0;   // end of text already used as a label for an earlier color
     matches.forEach((m, i) => {
       const hex = importHexFromMatch(m);
       const prevEnd = i > 0 ? matches[i - 1].index + matches[i - 1][0].length : 0;
       const nextStart = i + 1 < matches.length ? matches[i + 1].index : line.length;
       // Label words sit before the color ("Primary: #…"); fall back to the
-      // words after it ("#… Primary") when nothing precedes it.
-      let hints = importHintsFrom(line.slice(prevEnd, m.index));
-      if (!hints.length) hints = importHintsFrom(line.slice(m.index + m[0].length, nextStart));
+      // words after it ("#… Primary") when nothing precedes it. Words already
+      // taken as the previous color's trailing label are never reused.
+      let hints = importHintsFrom(line.slice(Math.max(prevEnd, consumed), m.index));
+      if (!hints.length) {
+        hints = importHintsFrom(line.slice(m.index + m[0].length, nextStart));
+        if (hints.length) consumed = nextStart;
+      }
       const seen = byHex.get(hex);
       if (seen) { seen.hints.push(...hints); return; }
       const entry = { hex, hints, line: lineNo };

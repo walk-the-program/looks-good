@@ -56,7 +56,6 @@ registerAesthetic({
   tokens(t) {
     return {
       '--ab-type-pick-w': 400,
-      '--ab-tr': (typeof state !== 'undefined' && state.headingFont && { condensed: 0, heavy: 0, wide: 0.4, techno: 0.4 }[state.headingFont.cls]) ?? 1,
        '--ab-grid': t.alpha(t.ink, t.isDark ? 0.1 : 0.06) };
   },
 

@@ -77,7 +77,6 @@ registerAesthetic({
       ? `0 1px 1px rgba(0,0,0,.4), 0 6px 18px -6px rgba(0,0,0,.5), 0 24px 48px -24px ${pa(0.35)}`
       : `0 1px 1px ${pa(0.06)}, 0 6px 18px -6px ${pa(0.18)}, 0 24px 48px -24px ${pa(0.3)}`;
     return {
-      '--ab-tr': (typeof state !== 'undefined' && state.headingFont && { condensed: 0, heavy: 0, wide: 0.4, techno: 0.4 }[state.headingFont.cls]) ?? 1,
       '--ab-m-p': p, '--ab-m-s': s, '--ab-m-a': a,
       '--ab-m-mid': t.mix('#ffffff', p, 0.22),   // a lighter primary (not a primary/secondary blend, which goes grey)
       '--ab-mesh-deep': deep,

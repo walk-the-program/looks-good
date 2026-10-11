@@ -168,7 +168,6 @@ registerAesthetic({
       '--ab-font-label': 'var(--mt-f-m, ui-monospace), ui-monospace, Menlo, monospace',
       '--ab-paper': t.mix(t.canvas, t.ink, 0.955),
       '--ab-guide': t.alpha(t.ink, 0.28),
-      '--ab-tr': (st && st.headingFont && { condensed: 0, heavy: 0, wide: 0.4, techno: 0.4 }[st.headingFont.cls]) ?? 1,
     };
     if (st && st.headingFont) {
       mtVoices(st).forEach(v => {

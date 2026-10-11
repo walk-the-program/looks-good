@@ -20,9 +20,22 @@ const LibraryStore = (function () {
   /* ---- native (files) ---- */
   const nativeBackend = {
     kind: 'native',
+    // Each row is [file name, file text]. The file name is the record's id, so a
+    // Finder copy ("abc copy.json") can't masquerade as the original. Files that
+    // aren't readable brands are counted in `skipped` instead of vanishing silently.
     async list() {
       const rows = await native.postMessage({ op: 'list' });
-      return (rows || []).map(s => { try { return JSON.parse(s); } catch (e) { return null; } }).filter(Boolean);
+      const out = [];
+      store.skipped = 0;
+      (rows || []).forEach(row => {
+        const [name, text] = Array.isArray(row) ? row : [null, row];
+        let rec = null;
+        try { rec = JSON.parse(text); } catch (e) { /* counted below */ }
+        if (rec && typeof rec === 'object' && name !== null) rec.id = name;
+        if (rec && typeof rec === 'object' && /^[A-Za-z0-9_-]{1,64}$/.test(rec.id || '')) out.push(rec);
+        else store.skipped++;
+      });
+      return out;
     },
     async get(id) {
       const s = await native.postMessage({ op: 'get', id });
@@ -76,8 +89,8 @@ const LibraryStore = (function () {
     return run;
   }
 
-  return {
-    kind: backend.kind,
+  const store = {
+    skipped: 0,                  // brand files the last list() could not read (native only)
     list: () => backend.list(),
     get: id => backend.get(id),
     put: record => queued(() => backend.put(record)),
@@ -88,4 +101,5 @@ const LibraryStore = (function () {
       return Array.from(b, x => x.toString(16).padStart(2, '0')).join('');
     },
   };
+  return store;
 })();

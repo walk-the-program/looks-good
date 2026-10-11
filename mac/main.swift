@@ -143,7 +143,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, WKNavigationDelegate, 
         webView.uiDelegate = self
         webView.underPageBackgroundColor = chromeColor
         webView.allowsBackForwardNavigationGestures = false
+        #if TESTHOOK
         if #available(macOS 13.3, *) { webView.isInspectable = true }
+        #endif
 
         window = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 1360, height: 880),
                           styleMask: [.titled, .closable, .miniaturizable, .resizable, .fullSizeContentView],
@@ -295,13 +297,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate, WKNavigationDelegate, 
     func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction,
                  decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
         if navigationAction.shouldPerformDownload { decisionHandler(.download); return }
-        if let url = navigationAction.request.url, url.scheme == "http" || url.scheme == "https",
+        // The window only ever shows the app's own pages: the library bridge must
+        // never be reachable from a remote page. Web links open in the browser.
+        guard let url = navigationAction.request.url else { decisionHandler(.cancel); return }
+        if url.scheme == scheme || url.absoluteString == "about:blank" { decisionHandler(.allow); return }
+        if (url.scheme == "http" || url.scheme == "https"),
            navigationAction.navigationType == .linkActivated {
             NSWorkspace.shared.open(url)
-            decisionHandler(.cancel)
-            return
         }
-        decisionHandler(.allow)
+        decisionHandler(.cancel)
     }
 
     func webView(_ webView: WKWebView, decidePolicyFor navigationResponse: WKNavigationResponse,
@@ -415,6 +419,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, WKNavigationDelegate, 
     // MARK: JS -> native messages
 
     func userContentController(_ ucc: WKUserContentController, didReceive message: WKScriptMessage) {
+        guard message.frameInfo.request.url?.scheme == scheme else { return }
         switch message.name {
         case "clipboard":
             if let text = message.body as? String {
@@ -460,14 +465,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate, WKNavigationDelegate, 
 
     func userContentController(_ ucc: WKUserContentController, didReceive message: WKScriptMessage,
                                replyHandler: @escaping (Any?, String?) -> Void) {
+        guard message.frameInfo.request.url?.scheme == scheme else { replyHandler(nil, "denied"); return }
         guard message.name == "library", let body = message.body as? [String: Any],
               let op = body["op"] as? String else { replyHandler(nil, "bad request"); return }
         let fm = FileManager.default
         switch op {
         case "list":
             let files = (try? fm.contentsOfDirectory(at: brandsDir, includingPropertiesForKeys: nil)) ?? []
-            let rows = files.filter { $0.pathExtension == "json" }
-                .compactMap { try? String(contentsOf: $0, encoding: .utf8) }
+            // [file name without .json, file text]; JS keys each record by its file name.
+            let rows: [[String]] = files.filter { $0.pathExtension == "json" }
+                .map { [$0.deletingPathExtension().lastPathComponent, (try? String(contentsOf: $0, encoding: .utf8)) ?? ""] }
             replyHandler(rows, nil)
         case "get":
             guard let id = body["id"] as? String, let url = brandFile(id) else { replyHandler(nil, "bad id"); return }

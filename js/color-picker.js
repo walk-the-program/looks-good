@@ -43,7 +43,7 @@ const ColorPicker = (function () {
   let pending = null;
   let imp = { colors: [], assign: {}, source: {} };
 
-  const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const esc = s => escapeHtml(s);   // app.js
 
   /* ---------- color math (HSV is local; HSL/contrast come from color.js) ---------- */
 

@@ -24,7 +24,7 @@ registerAesthetic({
 
   // --ab-tr scales the tight headline tracking: 0 for condensed/heavy faces (they collide when tightened), 1 otherwise
   tokens() {
-    return { '--ab-type-pick-w': 600, '--ab-tr': (typeof state !== 'undefined' && state.headingFont && { condensed: 0, heavy: 0, wide: 0.4, techno: 0.4 }[state.headingFont.cls]) ?? 1 };
+    return { '--ab-type-pick-w': 600 };
   },
 
   roles: {

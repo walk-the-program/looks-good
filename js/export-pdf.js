@@ -65,7 +65,5 @@ async function exportBrandGuidePdf(state) {
     pdf.addImage(imgData, 'JPEG', 0, 0, pageW, pageH);
   }
 
-  const filename = (state.content.brandName || 'brand-guide')
-    .toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'brand-guide';
-  pdf.save(`${filename}-brand-guide.pdf`);
+  pdf.save(`${brandFileSlug()}-brand-guide.pdf`);
 }

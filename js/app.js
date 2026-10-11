@@ -4,15 +4,22 @@
    as plain <script> tags — no build step, no modules).
 ------------------------------------------------------------------------ */
 
-const state = {
-  headingFont: FONTS[0],
-  bodyFont: FONTS[0],
-  typography: {
+const LOGO_MAX_PX = 1024;
+const LOGO_MAX_BYTES = 400 * 1024;
+
+function defaultTypography() {
+  return {
     headingSize: 44, bodySize: 16,
     headingWeight: 700, bodyWeight: 400,
     headingTracking: 0, bodyTracking: 0,
     headingCase: 'none', bodyCase: 'none',
-  },
+  };
+}
+
+const state = {
+  headingFont: FONTS[0],
+  bodyFont: FONTS[0],
+  typography: defaultTypography(),
   scheme: 'analogous',
   hue: 210,
   colors: null,
@@ -422,8 +429,16 @@ async function exportPalettePng() {
 
 /* ---------------- Event wiring ---------------- */
 
+// Every shuffle button is exactly one undo step, taken from the committed state
+// (a suggestion hover preview is dropped first so it can't leak into the shuffle).
+function beginShuffle() {
+  if (window.endSuggestPreview) endSuggestPreview();
+  pushUndoSnapshot(state);
+}
+
 function wireEvents() {
   document.getElementById('shuffleAll').addEventListener('click', () => {
+    beginShuffle();
     if (!state.locks.typography) randomizeTypography();
     if (!state.locks.color) randomizeColor();
     if (!state.locks.shape) randomizeShape();
@@ -434,20 +449,20 @@ function wireEvents() {
 
   document.getElementById('shuffleFonts').addEventListener('click', () => {
     if (state.locks.typography) return showToast('Unlock typography to shuffle');
-    randomizeTypography(); render();
+    beginShuffle(); randomizeTypography(); render();
   });
   document.getElementById('shuffleColors').addEventListener('click', () => {
     if (state.locks.color) return showToast('Unlock color to shuffle');
-    randomizeColor(); render();
+    beginShuffle(); randomizeColor(); render();
   });
   document.getElementById('shuffleShape').addEventListener('click', () => {
     if (state.locks.shape) return showToast('Unlock shape to shuffle');
-    randomizeShape(); render();
+    beginShuffle(); randomizeShape(); render();
   });
 
   document.getElementById('shuffleAesthetic').addEventListener('click', () => {
     if (state.locks.aesthetic) return showToast('Unlock aesthetic to shuffle');
-    randomizeAesthetic(); render();
+    beginShuffle(); randomizeAesthetic(); render();
   });
 
   document.getElementById('lockAesthetic').addEventListener('change', e => state.locks.aesthetic = e.target.checked);
@@ -528,12 +543,7 @@ function wireEvents() {
   });
 
   document.getElementById('resetTypography').addEventListener('click', () => {
-    state.typography = {
-      headingSize: 44, bodySize: 16,
-      headingWeight: 700, bodyWeight: 400,
-      headingTracking: 0, bodyTracking: 0,
-      headingCase: 'none', bodyCase: 'none',
-    };
+    state.typography = defaultTypography();
     render();
   });
 
@@ -548,11 +558,28 @@ function wireEvents() {
     reader.onload = ev => {
       const img = new Image();
       img.onload = () => {
-        state.logoImg = img;
-        state.logoDataUrl = ev.target.result;
-        document.getElementById('logoPreview').src = ev.target.result;
-        document.getElementById('logoPreviewRow').hidden = false;
-        render();
+        // The logo is inlined into every board, slide and saved file, so store a
+        // copy no larger than LOGO_MAX_PX on its long side. Small files keep their bytes.
+        const src = ev.target.result;
+        const scale = Math.min(1, LOGO_MAX_PX / Math.max(img.naturalWidth || 1, img.naturalHeight || 1));
+        let url = src;
+        if (scale < 1 || src.length > LOGO_MAX_BYTES) {
+          const c = document.createElement('canvas');
+          c.width = Math.max(1, Math.round((img.naturalWidth || LOGO_MAX_PX) * scale));
+          c.height = Math.max(1, Math.round((img.naturalHeight || LOGO_MAX_PX) * scale));
+          c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+          // PNG keeps transparency; JPEG only for photos without it.
+          url = /^data:image\/jpe?g/i.test(src) ? c.toDataURL('image/jpeg', 0.88) : c.toDataURL('image/png');
+        }
+        const done = () => {
+          state.logoImg = shown;
+          state.logoDataUrl = url;
+          document.getElementById('logoPreview').src = url;
+          document.getElementById('logoPreviewRow').hidden = false;
+          render();
+        };
+        const shown = url === src ? img : new Image();
+        if (shown === img) done(); else { shown.onload = done; shown.src = url; }
       };
       img.src = ev.target.result;
     };

@@ -77,8 +77,6 @@ registerAesthetic({
     const a2 = wash(t.secondary, d ? 0.17 : 0.13);
     const a3 = wash(mid, d ? 0.12 : 0.09);
     return {
-      '--ab-tr': (typeof state !== 'undefined' && state.headingFont && { condensed: 0, heavy: 0, wide: 0.4, techno: 0.4 }[state.headingFont.cls]) ?? 1,
-      
       '--ab-hair': t.alpha(t.ink, d ? 0.09 : 0.1),
       '--ab-hair2': t.alpha(t.ink, d ? 0.14 : 0.16),
       '--ab-fill': t.alpha(t.ink, d ? 0.035 : 0.035),

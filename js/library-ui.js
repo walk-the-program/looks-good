@@ -185,6 +185,7 @@ const LibraryUI = (function () {
 
   async function refresh() {
     try { records = await LibraryStore.list(); } catch (e) { records = []; }
+    if (LibraryStore.skipped) showToast(LibraryStore.skipped === 1 ? '1 brand file couldn’t be read' : `${LibraryStore.skipped} brand files couldn’t be read`);
     records.sort((a, b) => (b.updatedAt || 0) - (a.updatedAt || 0));
     const grid = $('libGrid');
     const empty = $('libEmpty');

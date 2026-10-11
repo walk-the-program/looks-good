@@ -50,8 +50,6 @@ registerAesthetic({
   tokens(t) {
     const d = t.isDark;
     return {
-      '--ab-tr': (typeof state !== 'undefined' && state.headingFont && { condensed: 0, heavy: 0, wide: 0.4, techno: 0.4 }[state.headingFont.cls]) ?? 1,
-      
       // Overprint blend: ink darkens paper in light mode, glows on dark paper.
       '--ab-blend': d ? 'screen' : 'multiply',
       '--ab-speck': t.alpha(t.ink, d ? 0.2 : 0.2),

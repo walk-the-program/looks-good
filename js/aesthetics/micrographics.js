@@ -41,7 +41,6 @@ function mgBars(seed, count) {
   return { d, w: x };
 }
 
-const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 
 registerAesthetic({
   key: 'micrographics', order: 23,
@@ -113,7 +112,6 @@ registerAesthetic({
     const le = ws.filter(x => x <= 700);
     const hw = le.length ? Math.max(...le) : Math.min(...ws);
     return {
-      '--ab-tr': (hf && { condensed: 0, heavy: 0, wide: 0.4, techno: 0.4 }[hf.cls]) ?? 1,
       '--ab-type-pick-w': hw,
       '--ab-hw': hw,
       '--ab-hair': t.alpha(t.ink, 0.5),
@@ -130,8 +128,8 @@ registerAesthetic({
     const seed = MG_HASH(ctx.brandName || 'brand');
     const qrN = 21;
     const bars = mgBars(seed ^ 0x9e3779b1, 46);
-    const hName = esc(((st.headingFont && st.headingFont.name) || 'Heading').slice(0, 18));
-    const bName = esc(((st.bodyFont && st.bodyFont.name) || 'Body').slice(0, 18));
+    const hName = escapeHtml(((st.headingFont && st.headingFont.name) || 'Heading').slice(0, 18));
+    const bName = escapeHtml(((st.bodyFont && st.bodyFont.name) || 'Body').slice(0, 18));
     const hex = c => c.replace('#', '').toUpperCase();
     const vf = 'vector-effect="non-scaling-stroke"';
 
@@ -171,11 +169,11 @@ registerAesthetic({
 
     return `<div class="mga">
       <span class="mga-corner mga-c-tl">A–01</span><span class="mga-corner mga-c-tr">MG–0412</span>
-      <span class="mga-corner mga-c-bl">© 2026 ${esc(brand)}</span><span class="mga-corner mga-c-br">P.01/26</span>
+      <span class="mga-corner mga-c-bl">© 2026 ${escapeHtml(brand)}</span><span class="mga-corner mga-c-br">P.01/26</span>
       <span class="mga-ruler mga-r-t"><i>000</i><i>100</i><i>200</i><i>300</i><i>400</i></span>
       <span class="mga-ruler mga-r-b"><i>A</i><i>B</i><i>C</i><i>D</i><i>E</i></span>
       <div class="mga-col mga-l">
-        <p class="mga-h"><b>SPEC 01/26</b><br>${esc(brand)}<br>REV 03 · 2026.10</p>
+        <p class="mga-h"><b>SPEC 01/26</b><br>${escapeHtml(brand)}<br>REV 03 · 2026.10</p>
         <div class="mga-tab">${table}</div>
         <p class="mga-note">→ 01 · 02 · 03<br>ISSUE 04 / SEE SHEET B</p>
       </div>
@@ -183,7 +181,7 @@ registerAesthetic({
         <svg class="mga-g" viewBox="0 0 130 100" focusable="false" preserveAspectRatio="xMidYMid meet">
           <path ${vf} d="${grid}" fill="none" stroke="${t.ink}" stroke-opacity=".28" stroke-width="1"/>
         </svg>
-        <span class="mga-gl is-o">${esc(ctx.initial)}</span><span class="mga-gl">${esc(ctx.initial)}</span>
+        <span class="mga-gl is-o">${escapeHtml(ctx.initial)}</span><span class="mga-gl">${escapeHtml(ctx.initial)}</span>
         <svg class="mga-lines" viewBox="0 0 100 100" preserveAspectRatio="none" focusable="false" fill="none" stroke="${t.ink}" stroke-opacity=".6">
           <path ${vf} d="M0 34H100M0 78H100M21 0V100M77 0V100" stroke-opacity=".35" stroke-width="1" stroke-dasharray="3 3"/>
           <path ${vf} d="M50 0V100" stroke-opacity=".18" stroke-width="1"/>

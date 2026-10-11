@@ -9,29 +9,6 @@
 
 let pxaSeq = 0;
 
-// 5x7 bitmap capitals and digits for the sprite's face (rows of 5 bits)
-const PXA_FONT = {
-  A: '01110 10001 10001 11111 10001 10001 10001', B: '11110 10001 10001 11110 10001 10001 11110',
-  C: '01110 10001 10000 10000 10000 10001 01110', D: '11110 10001 10001 10001 10001 10001 11110',
-  E: '11111 10000 10000 11110 10000 10000 11111', F: '11111 10000 10000 11110 10000 10000 10000',
-  G: '01110 10001 10000 10111 10001 10001 01110', H: '10001 10001 10001 11111 10001 10001 10001',
-  I: '01110 00100 00100 00100 00100 00100 01110', J: '00111 00010 00010 00010 00010 10010 01100',
-  K: '10001 10010 10100 11000 10100 10010 10001', L: '10000 10000 10000 10000 10000 10000 11111',
-  M: '10001 11011 10101 10101 10001 10001 10001', N: '10001 11001 10101 10011 10001 10001 10001',
-  O: '01110 10001 10001 10001 10001 10001 01110', P: '11110 10001 10001 11110 10000 10000 10000',
-  Q: '01110 10001 10001 10001 10101 10010 01101', R: '11110 10001 10001 11110 10100 10010 10001',
-  S: '01111 10000 10000 01110 00001 00001 11110', T: '11111 00100 00100 00100 00100 00100 00100',
-  U: '10001 10001 10001 10001 10001 10001 01110', V: '10001 10001 10001 10001 10001 01010 00100',
-  W: '10001 10001 10001 10101 10101 11011 10001', X: '10001 10001 01010 00100 01010 10001 10001',
-  Y: '10001 10001 01010 00100 00100 00100 00100', Z: '11111 00001 00010 00100 01000 10000 11111',
-  0: '01110 10001 10011 10101 11001 10001 01110', 1: '00100 01100 00100 00100 00100 00100 01110',
-  2: '01110 10001 00001 00010 00100 01000 11111', 3: '11110 00001 00001 01110 00001 00001 11110',
-  4: '00010 00110 01010 10010 11111 00010 00010', 5: '11111 10000 11110 00001 00001 10001 01110',
-  6: '00110 01000 10000 11110 10001 10001 01110', 7: '11111 00001 00010 00100 01000 01000 01000',
-  8: '01110 10001 10001 01110 10001 10001 01110', 9: '01110 10001 10001 01111 00001 00010 01100',
-  '?': '01110 10001 00001 00110 00100 00000 00100',
-};
-
 // item-block fallback glyph for initials the 5x7 map does not cover
 const PXA_STAR = '00100 00100 11111 01110 01010 10001 00000';
 
@@ -174,7 +151,7 @@ registerAesthetic({
     for (let x = 0; x < 168; x += 8) R(x + 3, 60 + (x % 16 === 0 ? 1 : 0), 1, 2, grass);
     // item blocks (the brand initial, or a star when it has no glyph) with a coin above
     const initialKey = String(ctx.initial || '').toUpperCase();
-    const blockGlyph = (PXA_FONT[initialKey] && initialKey !== '?' ? PXA_FONT[initialKey] : PXA_STAR).split(' ');
+    const blockGlyph = (AB_FONT_5X7[initialKey] && initialKey !== '?' ? AB_FONT_5X7[initialKey] : PXA_STAR).split(' ');
     const block = (bx, by) => {
       R(bx, by, 12, 12, outline); R(bx + 1, by + 1, 10, 10, t.accent); R(bx + 1, by + 1, 10, 1, mixc('#ffffff', t.accent, 0.45)); R(bx + 1, by + 10, 10, 1, mixc('#000000', t.accent, 0.3));
       blockGlyph.forEach((row, r) => { for (let c = 0; c < 5; c++) if (row[c] === '1') R(bx + 3 + c, by + 3 + r, 1, 1, mixc('#000000', t.accent, 0.55)); });
@@ -200,7 +177,7 @@ registerAesthetic({
     // dither the shaded corner
     defs.push(`<pattern id="pxs${n}" width="2" height="2" patternUnits="userSpaceOnUse"><rect width="1" height="1" fill="${mixc('#000000', t.primary, 0.8)}"/><rect x="1" y="1" width="1" height="1" fill="${mixc('#000000', t.primary, 0.8)}"/></pattern>`);
     rects.push(`<rect x="${sx + sw - 6}" y="${sy + sh - 6}" width="5" height="4" fill="url(#pxs${n})"/>`);
-    const glyph = (PXA_FONT[String(ctx.initial).toUpperCase()] || PXA_FONT['?']).split(' ');
+    const glyph = (AB_FONT_5X7[String(ctx.initial).toUpperCase()] || AB_FONT_5X7['?']).split(' ');
     const gx = sx + 5, gy = sy + 3;
     glyph.forEach((row, r) => { for (let c = 0; c < 5; c++) if (row[c] === '1') { R(gx + c * 2 + 1, gy + r * 2 + 1, 2, 2, mixc('#000000', t.primary, 0.5)); } });
     glyph.forEach((row, r) => { for (let c = 0; c < 5; c++) if (row[c] === '1') { R(gx + c * 2, gy + r * 2, 2, 2, t.onPrimary); } });

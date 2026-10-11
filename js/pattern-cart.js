@@ -23,7 +23,7 @@ const PatternCart = (function () {
   const THUMB_W = 144, THUMB_H = 81;
 
   const $ = id => document.getElementById(id);
-  const esc = s => (typeof escapeHtml === 'function' ? escapeHtml(s) : String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])));
+  const esc = s => escapeHtml(s);   // app.js
   const P = () => window.Patterns;
 
   let tray = null, backdrop = null;

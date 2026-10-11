@@ -10,29 +10,6 @@
 
 let bprSeq = 0;
 
-// 5x7 block capitals and digits (rows of 5 bits) that the drawing extrudes
-const BPR_FONT = {
-  A: '01110 10001 10001 11111 10001 10001 10001', B: '11110 10001 10001 11110 10001 10001 11110',
-  C: '01110 10001 10000 10000 10000 10001 01110', D: '11110 10001 10001 10001 10001 10001 11110',
-  E: '11111 10000 10000 11110 10000 10000 11111', F: '11111 10000 10000 11110 10000 10000 10000',
-  G: '01110 10001 10000 10111 10001 10001 01110', H: '10001 10001 10001 11111 10001 10001 10001',
-  I: '01110 00100 00100 00100 00100 00100 01110', J: '00111 00010 00010 00010 00010 10010 01100',
-  K: '10001 10010 10100 11000 10100 10010 10001', L: '10000 10000 10000 10000 10000 10000 11111',
-  M: '10001 11011 10101 10101 10001 10001 10001', N: '10001 11001 10101 10011 10001 10001 10001',
-  O: '01110 10001 10001 10001 10001 10001 01110', P: '11110 10001 10001 11110 10000 10000 10000',
-  Q: '01110 10001 10001 10001 10101 10010 01101', R: '11110 10001 10001 11110 10100 10010 10001',
-  S: '01111 10000 10000 01110 00001 00001 11110', T: '11111 00100 00100 00100 00100 00100 00100',
-  U: '10001 10001 10001 10001 10001 10001 01110', V: '10001 10001 10001 10001 10001 01010 00100',
-  W: '10001 10001 10001 10101 10101 11011 10001', X: '10001 10001 01010 00100 01010 10001 10001',
-  Y: '10001 10001 01010 00100 00100 00100 00100', Z: '11111 00001 00010 00100 01000 10000 11111',
-  0: '01110 10001 10011 10101 11001 10001 01110', 1: '00100 01100 00100 00100 00100 00100 01110',
-  2: '01110 10001 00001 00010 00100 01000 11111', 3: '11110 00001 00001 01110 00001 00001 11110',
-  4: '00010 00110 01010 10010 11111 00010 00010', 5: '11111 10000 11110 00001 00001 10001 01110',
-  6: '00110 01000 10000 11110 10001 10001 01110', 7: '11111 00001 00010 00100 01000 01000 01000',
-  8: '01110 10001 10001 01110 10001 10001 01110', 9: '01110 10001 10001 01111 00001 00010 01100',
-  '?': '01110 10001 00001 00110 00100 00000 00100',
-};
-
 registerAesthetic({
   key: 'blueprint', order: 20,
   name: 'Blueprint',
@@ -99,9 +76,9 @@ registerAesthetic({
     const accUi = t.contrast(t.accent, t.canvas) >= 3 ? t.accent : ui(t.accent, 3);
     const secUi = t.contrast(t.secondary, t.canvas) >= 3 ? t.secondary : ui(t.secondary, 3);
     const brand = typeof effectiveContent === 'function' ? String(effectiveContent().brandName || '') : '';
-    const clean = s => s.replace(/[^A-Za-z0-9 .&\-]/g, '').toUpperCase().slice(0, 24) || 'PROJECT';
+    // Any letter or digit survives (Café, 東京); only characters that would break the CSS string go.
+    const clean = s => s.replace(/[^\p{L}\p{N} .&\-]/gu, '').toUpperCase().slice(0, 24) || 'PROJECT';
     return {
-      '--ab-tr': (st && st.headingFont && { condensed: 0, heavy: 0, wide: 0.4, techno: 0.4 }[st.headingFont.cls]) ?? 1,
       '--ab-l1': t.alpha(t.ink, 0.9),
       '--ab-l2': t.alpha(t.ink, 0.5),
       '--ab-l3': t.alpha(t.ink, 0.22),
@@ -114,7 +91,7 @@ registerAesthetic({
       '--ab-sec-ui': secUi,
       '--ab-ring': t.alpha(accUi, 0.45),
       '--ab-proj': `'${clean(brand)}'`,
-      '--ab-date': `'${new Date().toISOString().slice(0, 10)}'`,
+      '--ab-date': `'${(d => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`)(new Date())}'`,   // local date, not UTC
     };
   },
 
@@ -124,7 +101,7 @@ registerAesthetic({
   art(ctx) {
     const t = ctx.t;
     const n = ++bprSeq;
-    const rows = (BPR_FONT[String(ctx.initial).toUpperCase()] || BPR_FONT['?']).split(' ');
+    const rows = (AB_FONT_5X7[String(ctx.initial).toUpperCase()] || AB_FONT_5X7['?']).split(' ');
     const W = 5, H = 7;
     const f = (x, y) => x >= 0 && y >= 0 && x < W && y < H && rows[y][x] === '1';
     const c = 11, X0 = 46, Y0 = 38, dx = 19, dy = -12;

@@ -271,9 +271,9 @@ function aibPatternSourceLines(entry, f, t, tints) {
   const seed = JSON.stringify(entry.seed);
   const size = `{ width: ${AIB_FULL_W}, height: ${AIB_FULL_H}, dpr: 1 }`;
   const out = ['**Source**', '',
-    `- Project: \`${root}\` (this project's own pattern engine; no outside library is involved).`,
-    `- Engine: \`${root}/${engine}\`.`,
-    `- Family file: \`${root}/${famFile || 'js/patterns/families/'}\`, family key \`${entry.key}\`.`,
+    `- Project: the Branding Designer folder (the one holding \`index.html\`; usually \`${root}\`). Paths below are relative to it; this is the project's own pattern engine, no outside library is involved.`,
+    `- Engine: \`${engine}\`.`,
+    `- Family file: \`${famFile || 'js/patterns/families/'}\`, family key \`${entry.key}\`.`,
     `- Load order: ${order.map(x => '`' + x + '`').join(', ')}. Plain scripts with no dependencies; they define \`window.Patterns\`. All \`js/patterns/families/*.js\` files load before \`fit.js\`.`,
     '- Exact calls (same seed, params and inks give identical output; `dpr: 1` fixes the pixel size):', '',
     '```js',
@@ -400,7 +400,7 @@ function aibPatternLines(state, def) {
     const f = infoOf(s.key);
     if (!f) return;
     const file = typeof Patterns.fileOf === 'function' ? Patterns.fileOf(s.key) : null;
-    out.push(`- **${s.name}** (${f.name}, ${cwWord(s.colorway)}): ${oneLine(f.blurb)}${file ? ` Source: \`${PATTERN_SOURCE_ROOT}/${file}\`, family \`${s.key}\`.` : ''}`);
+    out.push(`- **${s.name}** (${f.name}, ${cwWord(s.colorway)}): ${oneLine(f.blurb)}${file ? ` Source: \`${file}\`, family \`${s.key}\`.` : ''}`);
   });
   out.push('');
   const items = typeof PatternPins !== 'undefined' ? PatternPins.normalizeList(state.patterns) : [];

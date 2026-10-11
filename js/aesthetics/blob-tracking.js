@@ -151,7 +151,6 @@ registerAesthetic({
     ].join(',');
     const w = n => { const ws = String((hf && hf.weights) || '400').split(';').map(Number).filter(Boolean); const le = ws.filter(x => x <= n); return le.length ? Math.max(...le) : Math.min(...ws); };
     return {
-      '--ab-tr': (hf && { condensed: 0, heavy: 0, wide: 0.4, techno: 0.4 }[hf.cls]) ?? 1,
       '--ab-type-pick-w': w(600),
       '--ab-hw': w(600),
       '--ab-plate': plate,

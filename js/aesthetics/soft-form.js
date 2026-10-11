@@ -40,8 +40,6 @@ registerAesthetic({
     const hi = t.isDark ? 'rgba(255,255,255,0.07)' : 'rgba(255,255,255,0.79)';
     const lo = t.isDark ? 'rgba(0,0,0,0.53)' : t.alpha(t.mix('#000000', t.canvas, 0.25), 0.6);
     return {
-      '--ab-tr': (typeof state !== 'undefined' && state.headingFont && { condensed: 0, heavy: 0, wide: 0.4, techno: 0.4 }[state.headingFont.cls]) ?? 1,
-      
       '--ab-hi': hi,
       '--ab-lo': lo,
       '--ab-rim': t.isDark ? 'rgba(255,255,255,0.44)' : 'rgba(255,255,255,0.85)',

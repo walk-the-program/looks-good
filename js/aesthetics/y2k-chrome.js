@@ -83,7 +83,6 @@ registerAesthetic({
     const chromeLight = 'linear-gradient(180deg,#ffffff 0%,#d6dadf 40%,#9aa0a6 49%,#f4f4f4 50.5%,#c4c9cf 100%)';
     return {
       '--ab-font-ui': uiFace, '--ab-font-label': uiFace,
-      '--ab-tr': (hf && { condensed: 0, heavy: 0, wide: 0.4, techno: 0.4 }[hf.cls]) ?? 1,
       '--ab-hw': y2kWeight(hf, 800),
       '--ab-chrome': chrome,
       '--ab-chrome-hl': brightAccent ? chromeDark : chromeLight,

@@ -164,8 +164,7 @@ registerAesthetic({
     const font = 'font-family:var(--ab-font-label,var(--ab-font-b),monospace)';
     // tear-off tab strip (fills the paper left of the art): a solid band, then 7 cut tabs
     // carrying the brand name rotated -90deg; the third tab has been torn off (xrx-torn stub)
-    const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-    const nm = esc(String(ctx.brandName || '').trim());
+    const nm = escapeHtml(String(ctx.brandName || '').trim());
     const tabs = [0, 1, 2, 3, 4, 5, 6].map(i => i === 2 ? '<span class="xrt-tab is-torn"></span>' : `<span class="xrt-tab"><span>${nm}</span></span>`).join('');
     const strip = `<div class="xrt" aria-hidden="true"><div class="xrt-band"><b>TAKE ONE —</b><i>COPY 02 OF 50</i></div><div class="xrt-tabs">${tabs}</div></div>`;
     return `${xrDefs()}<div class="xra"><svg viewBox="0 0 ${W} ${H}" width="100%" height="100%" focusable="false" preserveAspectRatio="xMidYMid meet">

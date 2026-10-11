@@ -58,7 +58,6 @@ registerAesthetic({
       '--ab-wave3': 'url(data:image/svg+xml,' + encodeURIComponent(waveSvg).replace(/\(/g, '%28').replace(/\)/g, '%29').replace(/'/g, '%27') + ')',
       '--ab-wave-ink': t.alpha(t.ink, 0.28),
       '--ab-kraft': d ? t.mix('#5a4426', t.canvas, 0.45) : t.mix('#e9d6ae', t.canvas, 0.35),
-      '--ab-tr': ({ condensed: 0, heavy: 0, wide: 0.4, techno: 0.4 }[cls]) ?? 1,
       '--ab-hw': cls === 'groovy' ? 400 : 800,
       '--ab-card-a': t.mix(t.secondary, t.canvas, d ? 0.2 : 0.26),
       '--ab-card-b': t.mix(t.accent, t.canvas, d ? 0.2 : 0.32),   // accent tint: small pills only (the tag), never a panel

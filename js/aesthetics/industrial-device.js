@@ -54,7 +54,6 @@ registerAesthetic({
     const lift = (hex, bg, min) => { let c = hex; for (let k = 1; k <= 20 && t.contrast(c, bg) < min; k++) c = t.mix('#ffffff', c, k * 0.05); return c; };
     const oled = '#07080a';
     return {
-      '--ab-tr': (typeof state !== 'undefined' && state.headingFont && { condensed: 0, heavy: 0, wide: 0.4, techno: 0.4 }[state.headingFont.cls]) ?? 1,
       '--ab-face': face,
       '--ab-key': key,
       '--ab-key-hi': d ? t.mix('#ffffff', key, 0.1) : '#ffffff',

@@ -72,8 +72,6 @@
       const h = hair(hairA);
       const rim = i => art[i];
       return {
-      '--ab-tr': (typeof state !== 'undefined' && state.headingFont && { condensed: 0, heavy: 0, wide: 0.4, techno: 0.4 }[state.headingFont.cls]) ?? 1,
-      
         '--ab-pearl': [
           `radial-gradient(55% 34% at 6% 0%, ${w('#ffd6f0')}, transparent)`,
           `radial-gradient(48% 30% at 96% 12%, ${w('#c9f6ff')}, transparent)`,

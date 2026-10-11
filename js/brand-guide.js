@@ -494,12 +494,6 @@ function bgGuideVisible(surface, candidates, minRatio, fallback) {
 }
 
 function renderBrandGuideHTML(state) {
-  function escapeHtml(str) {
-    const div = document.createElement('div');
-    div.textContent = str == null ? '' : str;
-    return div.innerHTML;
-  }
-
   const c = state.content || {};
   const brandName = escapeHtml(c.brandName || 'Brand Name');
   const tagline = escapeHtml(c.tagline || 'A short tagline that captures the brand.');

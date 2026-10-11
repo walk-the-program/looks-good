@@ -49,7 +49,6 @@ registerAesthetic({
     // timer progress ring: the secondary, lightened if it would fall under 3:1 on the scene
     const ring = t.contrast(t.secondary, sceneBase) >= 3 ? t.secondary : t.mix(t.secondary, '#ffffff', 0.35);
     return {
-      '--ab-tr': (typeof state !== 'undefined' && state.headingFont && { condensed: 0, heavy: 0, wide: 0.4, techno: 0.4 }[state.headingFont.cls]) ?? 1,
       '--ab-hl-scene': hlScene,
       '--ab-ring': ring,
       '--ab-scene-base': sceneBase,

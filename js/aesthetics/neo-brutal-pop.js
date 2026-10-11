@@ -77,7 +77,6 @@ registerAesthetic({
     if (!/^[\p{L}\p{N}·]$/u.test(initial)) initial = '·';
     return {
       '--ab-type-pick-w': 700,
-      '--ab-tr': (typeof state !== 'undefined' && state.headingFont && { condensed: 0, heavy: 0, wide: 0.4, techno: 0.4 }[state.headingFont.cls]) ?? 1,
       '--ab-card-fill': fill(a),
       '--ab-paper': t.isDark ? t.mix(t.ink, t.canvas, 0.1) : t.mix('#ffffff', t.canvas, 0.9),
       '--ab-grid': t.alpha(t.ink, 0.07),

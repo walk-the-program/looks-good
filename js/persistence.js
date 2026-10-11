@@ -12,17 +12,17 @@ function serializeState(state) {
     bodyFontName: state.bodyFont.name,
     scheme: state.scheme,
     hue: state.hue,
-    colors: state.colors,
+    colors: { ...state.colors },
     shapePresetKey: state.shapePreset.key,
     bgMode: state.bgMode,
     aestheticKey: state.aesthetic,
     logoDataUrl: state.logoDataUrl,
-    content: state.content,
-    locks: state.locks,
+    content: { ...state.content },
+    locks: { ...state.locks },
     // typography is a later addition (size/weight/tracking/case fine-tuning)
     // — guard with a plain object so older saved sessions without it still
     // restore cleanly.
-    typography: state.typography || null,
+    typography: state.typography ? { ...state.typography } : null,
     // Suggestion ids the user dismissed for this brand.
     dismissedSuggestions: Array.isArray(state.dismissed) ? state.dismissed.slice().sort() : [],
     // Patterns in the brief (js/patterns-ui.js). Entries are immutable
@@ -57,7 +57,7 @@ function applySavedSessionToState(saved, state) {
   }
 
   // Restore scheme
-  if (typeof saved.scheme === 'string') {
+  if (typeof saved.scheme === 'string' && COLOR_SCHEMES[saved.scheme]) {
     state.scheme = saved.scheme;
   }
 
@@ -67,8 +67,12 @@ function applySavedSessionToState(saved, state) {
   }
 
   // Restore colors
-  if (saved.colors && typeof saved.colors === 'object') {
-    state.colors = saved.colors;
+  // Only a complete, valid palette replaces the defaults; a partial or malformed
+  // one would crash the color picker mid-render.
+  const HEX = /^#[0-9a-f]{6}$/i;
+  const COLOR_KEYS = ['primary', 'secondary', 'accent', 'neutralDark', 'neutralLight'];
+  if (saved.colors && typeof saved.colors === 'object' && COLOR_KEYS.every(k => HEX.test(saved.colors[k]))) {
+    state.colors = Object.fromEntries(COLOR_KEYS.map(k => [k, saved.colors[k].toLowerCase()]));
   }
 
   // Restore shape preset. A session saved against a preset that no longer
@@ -85,7 +89,7 @@ function applySavedSessionToState(saved, state) {
 
   // Restore content
   if (saved.content && typeof saved.content === 'object') {
-    state.content = saved.content;
+    state.content = { ...saved.content };
   }
 
   // Restore aesthetic. Brands saved before aesthetics existed (or against a

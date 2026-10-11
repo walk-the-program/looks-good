@@ -81,7 +81,6 @@ registerAesthetic({
     const diaSvg = (fill, stroke) => `<svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 11 11"><path d="M5.5.5 10.5 5.5 5.5 10.5.5 5.5Z" fill="${fill}" stroke="${stroke}"/></svg>`;
     return {
       '--ab-font-ui': uiFace, '--ab-font-label': uiFace,
-      '--ab-tr': (typeof state !== 'undefined' && state.headingFont && { condensed: 0, heavy: 0, wide: 0.4, techno: 0.4 }[state.headingFont.cls]) ?? 1,
       '--ab-gilt': gilt,
       '--ab-gilt-a': t.alpha(gilt, 0.62),
       '--ab-gilt-b': t.alpha(gilt, 0.34),

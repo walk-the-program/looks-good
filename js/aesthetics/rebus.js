@@ -234,7 +234,6 @@ registerAesthetic({
       '--ab-type-pick-w': 800,
       '--ab-tile': t.mix(t.canvas, t.ink, t.isDark ? 0.93 : 0.94),
       '--ab-tile2': t.secTint,
-      '--ab-tr': (hf && { condensed: 0, heavy: 0, wide: 0.4, techno: 0.4 }[hf.cls]) ?? 1,
     };
     if (hf) {
       const have = String(hf.weights || '400').split(';').map(Number).filter(Boolean);

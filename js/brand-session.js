@@ -20,13 +20,6 @@ const BrandSession = (function () {
   let restoredDraft = false;   // true when the open brand came back with unsaved edits
   let draftTimer = null;
 
-  const defaultTypography = () => ({
-    headingSize: 44, bodySize: 16,
-    headingWeight: 700, bodyWeight: 400,
-    headingTracking: 0, bodyTracking: 0,
-    headingCase: 'none', bodyCase: 'none',
-  });
-
   // Always the committed state: a suggestion hover preview must never leak in.
   const snapshot = () => (window.withCommittedState ? window.withCommittedState(() => serializeState(state)) : serializeState(state));
   const snapshotJson = () => JSON.stringify(snapshot());
@@ -40,7 +33,16 @@ const BrandSession = (function () {
     if (side) side.scrollTop = 0;
   }
 
+  // Every field a brand file may omit or carry an unknown value for gets a fixed
+  // default first, so nothing leaks over from the previously open brand.
   function resetState() {
+    state.headingFont = fontByName('Inter') || FONTS[0];
+    state.bodyFont = fontByName('Inter') || FONTS[0];
+    state.scheme = 'analogous';
+    state.hue = 210;
+    state.colors = generatePalette('analogous', 210);
+    state.shapePreset = SHAPE_PRESETS[0];
+    state.content = {};
     state.typography = defaultTypography();
     state.locks = { typography: false, color: false, shape: false, aesthetic: false };
     state.aesthetic = 'soft-form';
@@ -88,7 +90,7 @@ const BrandSession = (function () {
   }
   function scheduleDraft() {
     clearTimeout(draftTimer);
-    draftTimer = setTimeout(flushDraft, DRAFT_DELAY_MS);
+    draftTimer = setTimeout(() => flushDraft().catch(() => showToast('Autosave failed')), DRAFT_DELAY_MS);
   }
 
   /* ---------- editor chrome ---------- */
@@ -141,6 +143,9 @@ const BrandSession = (function () {
       await persist();
       showToast('Saved');
     } catch (e) {
+      // Not on disk: show the brand as unsaved again so autosave keeps retrying.
+      baseline = '';
+      updateChrome();
       showToast('Could not save this brand');
     }
   }
@@ -224,6 +229,7 @@ const BrandSession = (function () {
       await flushDraft();
     }
     current = null;
+    if (window.PatternCart) PatternCart.close(false);
     setView('library');
     await LibraryUI.refresh();
     return true;
@@ -262,12 +268,6 @@ const BrandSession = (function () {
       if (snap.patterns) st.patterns = snap.patterns.slice();
     };
 
-    // Snapshot before each shuffle so Undo has something to go back to.
-    ['Typography', 'Color', 'Shape', 'Aesthetic'].forEach(part => {
-      const name = 'randomize' + part;
-      const original = window[name];
-      window[name] = function () { pushUndoSnapshot(state); original(); };
-    });
 
     undoBtn.addEventListener('click', () => {
       if (!canUndo()) { showToast('Nothing to undo'); return; }
@@ -290,8 +290,9 @@ const BrandSession = (function () {
     });
 
     // Last chance to get a pending draft onto disk.
-    window.addEventListener('pagehide', () => { flushDraft(); });
-    document.addEventListener('visibilitychange', () => { if (document.hidden) flushDraft(); });
+    const flushQuietly = () => flushDraft().catch(() => showToast('Autosave failed'));
+    window.addEventListener('pagehide', flushQuietly);
+    document.addEventListener('visibilitychange', () => { if (document.hidden) flushQuietly(); });
   }
 
   window.BD = {

@@ -23,10 +23,7 @@
   const pickers = [];
   let openPicker = null;
 
-  function esc(s) {
-    return String(s).replace(/[&<>"']/g, c =>
-      ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-  }
+  const esc = s => escapeHtml(s);   // app.js
   function primaryFamily(font) { return font.name; }
 
   /* ---- font loading: css2 <link>s are injected by app.js; wait for them,

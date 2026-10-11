@@ -64,7 +64,6 @@ registerAesthetic({
     const hf = typeof state !== 'undefined' && state.headingFont;
     return {
       '--ab-font-ui': uiFace, '--ab-font-label': uiFace,
-      '--ab-tr': (hf && { condensed: 0, heavy: 0, wide: 0.4, techno: 0.4 }[hf.cls]) ?? 1,
       '--ab-type-pick-w': 600,
       '--ab-tile': tile,
       '--ab-tile-sec': t.mix(t.secondary, tile, d ? 0.24 : 0.2),

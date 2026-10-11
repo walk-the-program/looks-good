@@ -143,6 +143,7 @@
   }
 
   window.renderSuggestions = renderSuggestions;
+  window.endSuggestPreview = endPreview;
   // A newly opened brand shouldn't inherit the previous brand's "what changed".
   window.resetSuggestionContext = () => { prev = null; Object.keys(shown).forEach(k => { shown[k] = null; lastSig[k] = null; }); };
 })();

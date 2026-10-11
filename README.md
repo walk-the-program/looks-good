@@ -280,3 +280,7 @@ html2canvas and jsPDF are loaded via CDN `<script>` tags in `index.html`
 
 No framework, no bundler — open `index.html` through a static server and
 edit the files directly.
+
+## Tests
+
+`node tests/run.js` checks saving/loading a brand (including old or hand-edited files) and the "Paste brand colors" reader. No dependencies. The deck overlap checker lives in `dev/deck-gore.js` (load it after `js/brand-deck.js` in a test page).
