@@ -291,10 +291,30 @@ const AB_ROWS = [
 const AB_ROLE_ORDER = ['canvas', 'ink', 'primary', 'secondary', 'accent'];
 
 const AB_LAYOUT_DEFAULT = { hero: 'split', palette: 'swatches', sections: 'two-col', subcopy: true };
-const AB_HEROES = ['split', 'centered', 'poster', 'scene'];
-const AB_PALETTES = ['swatches', 'strips', 'chips'];
+// Heroes: split (default), centered, poster, scene, plus (round 6)
+//   bleed      the art runs edge to edge across the board above the copy
+//   art-first  a mirrored split: the art leads on the left, the copy follows on the right
+//   type       a type-only poster: no art in the hero, the headline at poster scale
+//              (the art still shows on the deck's Material slide)
+const AB_HEROES = ['split', 'centered', 'poster', 'scene', 'bleed', 'art-first', 'type'];
+// Palettes: swatches (default), strips, chips, plus (round 6) stack (full-width bands,
+// stacked, height by coverage), dots (large circles) and list (a ruled index table).
+const AB_PALETTES = ['swatches', 'strips', 'chips', 'stack', 'dots', 'list'];
 const AB_SECTIONS = ['two-col', 'stacked', 'asym'];
 const AB_STATE_KINDS = ['swatch', 'button', 'chip'];
+// Board block order (def.layout.order) between the header and the footer, and the
+// order of the three numbered sections inside .ab-sections (def.layout.sectionOrder).
+const AB_ORDER_DEFAULT = ['hero', 'palette', 'type', 'sections'];
+const AB_SECTION_ORDER_DEFAULT = ['ui', 'touch', 'use'];
+
+// A known-key permutation: unknown and repeated keys are dropped, missing keys are
+// appended in their default order (nothing can be left off the board).
+function abOrderOf(list, defaults) {
+  const out = [];
+  (Array.isArray(list) ? list : []).forEach(k => { if (defaults.includes(k) && !out.includes(k)) out.push(k); });
+  defaults.forEach(k => { if (!out.includes(k)) out.push(k); });
+  return out;
+}
 
 // Resolve def.layout against the defaults; unknown values fall back.
 function abLayoutOf(def) {
@@ -303,6 +323,8 @@ function abLayoutOf(def) {
   if (!AB_PALETTES.includes(l.palette)) l.palette = 'swatches';
   if (!AB_SECTIONS.includes(l.sections)) l.sections = 'two-col';
   l.subcopy = l.subcopy !== false;
+  l.order = abOrderOf(l.order, AB_ORDER_DEFAULT);
+  l.sectionOrder = abOrderOf(l.sectionOrder, AB_SECTION_ORDER_DEFAULT);
   return l;
 }
 
@@ -387,6 +409,19 @@ function abTypeBlockHtml(state, def) {
 
 let abSeq = 0;
 
+// Run an aesthetic hook fn(ctx) that returns HTML. '' when fn is not a function, returns
+// a non-string or '', or throws (a broken hook falls back to the default markup).
+function abHookHtml(def, fn, ctx) {
+  if (typeof fn !== 'function') return '';
+  try {
+    const html = fn.call(def, ctx);
+    return typeof html === 'string' ? html : '';
+  } catch (err) {
+    if (typeof console !== 'undefined') console.warn(`hook failed (${def && def.key}):`, err);
+    return '';
+  }
+}
+
 /* The board is assembled from these parts so other surfaces (the brand deck,
    js/brand-deck.js) render the same markup inside the same `.ab[data-ae]` root.
    abBoardParts(state, def) resolves tokens, copy, layout and root attributes once
@@ -424,7 +459,7 @@ function abBoardParts(state, def) {
   // The root element's opening tag. `extraClass` / `extraAttrs` let a surface
   // add its own class (e.g. ab-slide) and data attributes; defaults add nothing.
   P.rootOpen = (extraClass = '', extraAttrs = '') =>
-    `<section class="ab${extraClass ? ' ' + extraClass : ''}" data-ae="${def.key}" data-mode="${t.isDark ? 'dark' : 'light'}" data-accent-text="${t.accentLow ? 'low' : 'ok'}" data-hero="${layout.hero}" data-palette="${layout.palette}" data-sections="${layout.sections}" data-highlight="${hlKind}" data-states="${statesKind}" data-subcopy="${layout.subcopy ? 'on' : 'off'}" data-hcls="${e(state.headingFont.cls || '')}" data-bcls="${e(state.bodyFont.cls || '')}"${extraAttrs} style="${P.style}">`;
+    `<section class="ab${extraClass ? ' ' + extraClass : ''}" data-ae="${def.key}" data-mode="${t.isDark ? 'dark' : 'light'}" data-accent-text="${t.accentLow ? 'low' : 'ok'}" data-hero="${layout.hero}" data-palette="${layout.palette}" data-sections="${layout.sections}" data-highlight="${hlKind}" data-states="${P.statesKind || statesKind}" data-subcopy="${layout.subcopy ? 'on' : 'off'}" data-hcls="${e(state.headingFont.cls || '')}" data-bcls="${e(state.bodyFont.cls || '')}"${extraAttrs} style="${P.style}">`;
 
   P.head = (pre = 'Design language / ', name = def.name) => `<header class="ab-head">
       <div class="ab-brand">${brand}</div>
@@ -512,6 +547,22 @@ function abBoardParts(state, def) {
   // 03 list rows.
   P.list = () => `<ul class="ab-list">${rows}</ul>`;
 
+  // def.panels = { card(ctx), panel(ctx), list(ctx) } (optional): the aesthetic's own
+  // markup for the 01 card, the 02 panel or the 03 list, as one element's outer HTML
+  // (real text and controls instead of CSS generated content). ctx is the board ctx plus
+  // parts, e, labels, rows (AB_ROWS) and stages (AB_STAGES). The default markup stays on
+  // P.cardBase / P.panelBase / P.listBase (the deck takes components from it when the
+  // aesthetic's own markup lacks one).
+  P.cardBase = P.card; P.panelBase = P.panel; P.listBase = P.list;
+  const panels = def.panels && typeof def.panels === 'object' ? def.panels : null;
+  if (panels) {
+    const pctx = Object.assign({}, ctx, { parts: P, e, labels, rows: AB_ROWS, stages: AB_STAGES });
+    [['card', 'cardBase'], ['panel', 'panelBase'], ['list', 'listBase']].forEach(([id, base]) => {
+      if (typeof panels[id] !== 'function') return;
+      P[id] = () => abHookHtml(def, panels[id], pctx) || P[base]();
+    });
+  }
+
   P.secUi = () => `<section class="ab-sec ab-sec-ui" aria-label="Interface">
         <div class="ab-labelrow"><span class="ab-label"><i class="ab-n">01</i><span>Interface</span></span></div>
         ${P.card()}
@@ -527,27 +578,49 @@ function abBoardParts(state, def) {
 
   P.foot = () => `<footer class="ab-foot"><span class="ab-motto"><i class="ab-dot" aria-hidden="true"></i>${e(def.motto)}</span><span class="ab-infl">${e(def.influences)}</span></footer>`;
 
+  // def.states(ctx) (optional): the aesthetic's own state component, as the inner HTML
+  // of <div class="ab-states" data-kind="custom"> (root data-states="custom"). ctx is
+  // the board ctx plus labels (def.labels.states, the three names), parts and e
+  // (escapeHtml). '' / non-string / a throw keeps the statesKind row.
+  const ownStates = abHookHtml(def, def.states, Object.assign({}, ctx, { labels: labels.states || [], parts: P, e }));
+  if (ownStates) {
+    P.statesKind = 'custom';
+    P.states = () => `<div class="ab-states" data-kind="custom">${ownStates}</div>`;
+  }
+
   // A blended def (js/blend.js) rewires the root attributes and the 02 states.
   if (def.blend && typeof blendParts === 'function') blendParts(P);
   return P;
 }
 
+// The board's blocks in def.layout.order (hero, palette, type, sections) and its three
+// numbered sections in def.layout.sectionOrder (ui, touch, use). A hero or palette is
+// followed by a rule unless it is the last block; the type block carries its own. The
+// default order produces exactly the markup the board always had.
 function boardHtml(state, def) {
   const P = abBoardParts(state, def);
+  const L = P.layout;
+  const sec = { ui: P.secUi, touch: P.secTouch, use: P.secUse };
+  const block = {
+    hero: () => P.hero(),
+    palette: () => P.palette(),
+    type: () => P.type(),
+    sections: () => `<div class="ab-sections">
+      ${L.sectionOrder.map(k => sec[k]()).join('\n      ')}
+    </div>`,
+  };
+  const ruled = { hero: true, palette: true };
+  let body = '';
+  L.order.forEach((k, i) => {
+    const last = i === L.order.length - 1;
+    // `type` ends with its own rule + newline indent; every other block gets one here.
+    body += block[k]() + (ruled[k] && !last ? '\n    <div class="ab-rule"></div>\n    ' : (k === 'type' ? '' : '\n    '));
+  });
   return `${P.rootOpen()}
   <div class="ab-in">
     ${P.head()}
     <div class="ab-rule"></div>
-    ${P.hero()}
-    <div class="ab-rule"></div>
-    ${P.palette()}
-    <div class="ab-rule"></div>
-    ${P.type()}<div class="ab-sections">
-      ${P.secUi()}
-      ${P.secTouch()}
-      ${P.secUse()}
-    </div>
-    ${P.foot()}
+    ${body}${P.foot()}
   </div>
 </section>`;
 }

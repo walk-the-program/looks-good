@@ -90,6 +90,11 @@
 .ab.ab-slide[data-slide="cover"][data-cover-flat] .ab-deck-cover .ab-hero > .ab-art { grid-column: auto; }
 .ab.ab-slide[data-slide="cover"][data-cover-flat] .ab-deck-cover .ab-hero > .ab-hero-copy { min-height: 0; }
 .ab-deck-cover-meta { flex: none; margin: 0; padding-top: 6px; }
+/* Round 6 heroes on the cover: bleed and art-first sit side by side (art-first keeps the
+   art on the left, bleed puts it on the right inside the slide margins); type is copy only. */
+.ab.ab-slide[data-slide="cover"][data-hero="bleed"] .ab-deck-cover .ab-hero { grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); align-items: center; }
+.ab.ab-slide[data-slide="cover"][data-hero="bleed"] .ab-deck-cover .ab-hero > .ab-art { order: 0; margin-inline: 0; justify-self: end; width: 100%; aspect-ratio: var(--ab-art-ratio, 4 / 3); }
+.ab.ab-slide[data-slide="cover"][data-hero="art-first"] .ab-deck-cover .ab-hero { align-items: center; }
 
 /* Cover pattern band (D1): full width along the bottom, 132px, a 1px line on its
    top edge. The content sits above it. Without a band the cover is unchanged. */
@@ -101,7 +106,8 @@
    own label sizes are tuned for a 900px board). */
 .ab.ab-slide[data-ae] .ab-label,
 .ab.ab-slide[data-ae] .ab-tag, .ab.ab-slide[data-ae] .ab-tag-pre, .ab.ab-slide[data-ae] .ab-tag b { font-size: 12px; }
-.ab.ab-slide[data-ae] .ab-slide-foot .ab-motto, .ab.ab-slide[data-ae] .ab-slide-foot .ab-infl { font-size: 12px; }
+/* :where() keeps this at (0,2,0), so an aesthetic's own foot rules win (bdMinText keeps the 12px floor). */
+:where(.ab.ab-slide[data-ae]) .ab-slide-foot .ab-motto, :where(.ab.ab-slide[data-ae]) .ab-slide-foot .ab-infl { font-size: 12px; }
 /* Labels inside slides read left to right with their content (Neo Deco centers its labels on the board). */
 .ab.ab-slide[data-ae] .ab-slide-body .ab-label:not(.ab-deck-cellname) { text-align: left; }
 /* Brand names: never ellipsized or clipped (the board's .ab-wordmark is nowrap + ellipsis).
@@ -172,7 +178,7 @@
 .ab.ab-slide[data-ae] .ab-deck-cell .ab-cta { flex: none; width: auto; min-width: 150px; max-width: none; height: auto; aspect-ratio: auto; margin: 0; white-space: nowrap; }
 .ab.ab-slide[data-ae] .ab-deck-cell .ab-toggle { flex: none; width: auto; max-width: none; margin: 0; display: inline-flex; align-items: center; gap: 16px; white-space: nowrap; }
 .ab-deck-uistates { zoom: 1.2; }
-.ab.ab-slide[data-ae] .ab-deck-uistates .ab-states { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; width: 100%; margin: 0; }
+.ab.ab-slide[data-ae] .ab-deck-uistates .ab-states:not([data-kind="custom"]) { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; width: 100%; margin: 0; }
 
 /* 06 Material & graphics: the art and up to four names */
 .ab-deck-material { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 56px; align-items: stretch; }
@@ -191,48 +197,41 @@
 .ab-deck-stage[data-stage="pattern"] { overflow: hidden; border: 1px solid var(--ab-line); border-radius: min(var(--dk-r, 8px), 14px); }
 .ab-deck-stage .pt-deck-stage { position: absolute; inset: 0; width: 100%; height: 100%; display: block; object-fit: cover; }
 
-/* 07 In product: one simple app screen. Fixed widths; nothing here is allowed to be
-   narrower than its content (the board's list and card are not reused: they squeeze). */
-.ab-slide-body > .ab-deck-app { flex: 0 0 auto; margin-block: auto; min-height: 420px; }
-.ab-deck-app { display: grid; grid-template-columns: 264px minmax(0, 1fr); border: 1px solid var(--ab-line); border-radius: var(--dk-r, 12px); overflow: clip; }
-.ab-deck-side { display: flex; flex-direction: column; gap: 28px; padding: 26px 22px; border-right: 1px solid var(--ab-line); background: color-mix(in srgb, var(--ab-ink) 4%, var(--ab-canvas)); min-width: 0; }
-.ab.ab-slide[data-ae] .ab-deck-side .ab-brand { display: flex; flex-wrap: nowrap; align-items: center; gap: 10px; min-width: 0; font-size: 15px; }
-.ab.ab-slide[data-ae] .ab-deck-side .ab-mark { flex: none; }
-.ab.ab-slide[data-ae] .ab-deck-side .ab-logo { max-width: 100%; height: auto; max-height: 40px; }
-.ab.ab-slide[data-ae] .ab-deck-side .ab-wordmark { flex: 1 1 0; min-width: 0; max-width: none; white-space: normal; overflow: visible; text-overflow: clip; font-size: 16px; line-height: 1.2; overflow-wrap: normal; word-break: normal; hyphens: manual; }
-.ab-deck-navlist { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
-.ab-deck-nav { padding: 11px 14px; border-radius: min(var(--dk-r, 8px), 10px); }
-.ab-deck-nav .ab-label { color: var(--ab-muted); white-space: nowrap; }
-.ab-deck-nav.is-on { background: var(--ab-canvas); box-shadow: 0 0 0 1px var(--ab-line); }
-.ab-deck-nav.is-on .ab-label { color: var(--ab-ink); }
-.ab-deck-screen { display: flex; flex-direction: column; min-width: 0; padding: 28px 36px; gap: 22px; }
-.ab-deck-screenhead { display: flex; align-items: center; justify-content: space-between; gap: 20px; }
-.ab.ab-slide[data-ae] .ab-headline.ab-deck-screentitle { margin: 0; font-size: calc(38px * var(--ab-hs, 1)); line-height: 1.05; }
-.ab-deck-chip { flex: none; white-space: nowrap; padding: 6px 14px; border: 1px solid var(--ab-line); border-radius: min(var(--dk-r, 8px), 999px); font-family: var(--ab-font-label, var(--ab-font-ui, var(--ab-font-b))); font-size: 13px; color: var(--ab-muted); }
-.ab-deck-screenbody { flex: 1 1 auto; display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); gap: 40px; align-items: start; }
-.ab-deck-rows { list-style: none; margin: 0; padding: 0; min-width: 0; }
-.ab-deck-row { display: grid; grid-template-columns: 14px minmax(0, 1fr) auto; gap: 18px; align-items: center; padding: 26px 0; border-top: 1px solid var(--ab-line); }
-.ab-deck-row:last-child { border-bottom: 1px solid var(--ab-line); }
-.ab-deck-dot { width: 14px; height: 14px; border-radius: 50%; box-shadow: 0 0 0 1px var(--ab-line); }
-.ab-deck-rname { font-family: var(--ab-font-b); font-size: 19px; font-weight: 500; line-height: 1.25; }
-.ab-deck-rpct { font-family: var(--ab-font-h); font-size: 30px; font-weight: 600; line-height: 1; white-space: nowrap; font-variant-numeric: tabular-nums; }
-.ab-deck-ctacard { min-width: 0; display: flex; flex-direction: column; align-items: flex-start; gap: 10px; padding: 26px 28px 28px; border: 1px solid var(--ab-line); border-radius: var(--dk-r, 12px); background: color-mix(in srgb, var(--ab-ink) 4%, var(--ab-canvas)); }
-.ab-deck-ctatitle { margin: 0; font-family: var(--ab-font-h); font-size: 27px; font-weight: 600; line-height: 1.15; }
-.ab.ab-slide[data-hcls="pixel"] .ab-deck-ctatitle,
-.ab.ab-slide[data-hcls="deco"] .ab-deck-ctatitle,
-.ab.ab-slide[data-hcls="condensed"] .ab-deck-ctatitle { font-family: var(--ab-font-b); letter-spacing: 0; text-transform: none; }
-.ab-deck-ctaline { margin: 0 0 14px; font-family: var(--ab-font-b); font-size: 16px; line-height: 1.4; color: var(--ab-muted); }
-.ab.ab-slide[data-ae] .ab-deck-ctacard .ab-cta { flex: none; width: auto; min-width: 0; max-width: none; height: auto; aspect-ratio: auto; margin: 0; white-space: nowrap; }
+/* 07 In product: the brand's own board parts (page header, list rows, 01 card, toggle)
+   in a screen frame. Everything inside keeps the aesthetic's styling; this only lays it
+   out. --dk-r is the aesthetic's card radius (bdApplyRadius), never the shape preset.
+   The frame is zoomed up a little from board scale so it reads at slide scale. */
+.ab-slide-body > .ab-deck-prod { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; justify-content: safe center; }
+.ab-deck-prodframe { min-width: 0; display: flex; flex-direction: column; padding: 30px 34px 34px; border: var(--dk-frame-bd, 1px solid var(--ab-line)); border-radius: var(--dk-r, 12px); background: var(--ab-canvas); }
+.ab-deck-prodgrid { display: grid; grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr); gap: 44px; align-items: start; }
+.ab-deck-prodframe[data-fit="wide"] .ab-deck-prodgrid { grid-template-columns: minmax(0, 2.3fr) minmax(0, 1fr); gap: 32px; }
+.ab-deck-prodframe[data-fit="stack"] .ab-deck-prodgrid { grid-template-columns: minmax(0, 1fr); gap: 26px; }
+.ab.ab-slide[data-ae] .ab-deck-prodgrid > .ab-sec { grid-column: auto; grid-row: auto; min-width: 0; margin: 0; }
+.ab.ab-slide[data-ae] .ab-deck-prodgrid .ab-card { margin: 0; }
+/* the percentage cell is a fixed 4.5ch track on the board; a wider face (a blend's type) may
+   need a hair more, so the cell grows past its track into the frame padding instead of spilling */
+.ab.ab-slide[data-ae] .ab-deck-prodgrid .ab-row-pct { min-width: max-content; }
+.ab-deck-prodtools { margin-top: 18px; }
+.ab.ab-slide[data-ae] .ab-deck-prodtools .ab-toggle { max-width: none; margin: 0; }
+/* a bespoke scene (def.deck.product) fills the body as it likes */
+.ab-deck-prod[data-prod="custom"] { position: relative; }
+/* hidden probe card that bdMeasureRadius reads the aesthetic's radius from */
+.ab-deck-probe { position: absolute; left: 0; top: 0; width: 120px; height: 80px; visibility: hidden; pointer-events: none; overflow: hidden; }
 
-/* 08 Do / Don't: three short lines each */
-.ab-deck-dodont { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 64px; align-content: safe center; }
-.ab-deck-col { min-width: 0; }
-.ab-deck-col .ab-labelrow { align-items: center; padding-bottom: 12px; border-bottom: 1px solid var(--ab-line); margin-bottom: 4px; }
-.ab-deck-rules { list-style: none; margin: 0; padding: 0; }
-.ab-deck-rule { display: grid; grid-template-columns: 32px minmax(0, 1fr); gap: 18px; align-items: center; padding: 26px 0; border-bottom: 1px solid var(--ab-line); }
-.ab-deck-rule p { margin: 0; font-family: var(--ab-font-b); font-size: 21px; line-height: 1.35; text-wrap: pretty; }
-.ab-deck-mark { display: grid; place-items: center; width: 30px; height: 30px; border-radius: 50%; font-family: var(--ab-font-ui, var(--ab-font-b)); font-size: 15px; font-weight: 700; line-height: 1; background: var(--ab-sec-tint); color: var(--ab-ink); }
-.ab-deck-col[data-kind="dont"] .ab-deck-mark { background: var(--ab-ink); color: var(--ab-canvas); }
+/* 08 Do / Don't: "Do" and "Don't" set in the aesthetic's headline face, three rules each.
+   Markers are text (def.deck.marks, else the rule number in the label face); no discs.
+   --dk-mark-do / --dk-mark-dont recolour them per aesthetic. */
+.ab-deck-dodont { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0; align-items: stretch; }
+.ab-deck-col { min-width: 0; display: flex; flex-direction: column; padding-right: 48px; }
+.ab-deck-col[data-kind="dont"] { padding: 0 0 0 48px; border-left: 1px solid var(--ab-line); }
+.ab.ab-slide[data-ae] .ab-headline.ab-deck-ddhead { flex: none; margin: 0 0 8px; line-height: 0.95; white-space: nowrap; }
+.ab.ab-slide[data-ae] .ab-deck-col[data-kind="dont"] .ab-headline.ab-deck-ddhead { color: var(--ab-muted); }
+.ab-deck-rules { list-style: none; margin: 0; padding: 0; flex: 1 1 auto; display: flex; flex-direction: column; }
+.ab-deck-rule { flex: 1 1 0; display: grid; grid-template-columns: 3.2em minmax(0, 1fr); gap: 16px; align-items: baseline; align-content: center; padding: 18px 0; border-top: 1px solid var(--ab-line); }
+.ab-deck-rule p { margin: 0; font-family: var(--ab-font-b); font-size: 22px; line-height: 1.35; text-wrap: pretty; }
+.ab-deck-mark { font-family: var(--ab-font-label, var(--ab-font-ui, var(--ab-font-b))); font-size: 14px; font-weight: 600; letter-spacing: 0.08em; line-height: 1; white-space: nowrap; color: var(--dk-mark-do, var(--ab-primary-text)); }
+.ab-deck-mark.is-own { font-size: 22px; letter-spacing: 0; }
+.ab-deck-col[data-kind="dont"] .ab-deck-mark { color: var(--dk-mark-dont, var(--ab-muted)); }
 .ab-deck-col[data-kind="dont"] .ab-deck-rule p { color: var(--ab-muted); }
 
 /* 09 Closing */

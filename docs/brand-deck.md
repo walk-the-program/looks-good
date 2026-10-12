@@ -140,3 +140,11 @@ mesh-gradient (header ink on non-cover slides, payout card hidden on the cover),
 
 ### Export
 `bdShadowFixes` drops blurred negative-spread box-shadow layers in the export clone (html2canvas draws them as a grey rectangle that ignores the radius). Other blurred shadows on rounded boxes still render with html2canvas artifacts in PNG / PDF (Bento, Soft Form, Clay); this is the existing limit listed above.
+
+## Round 6: native In product and Do/Don't, aesthetic radius, deck hooks (FW)
+
+- **In product** is assembled from the aesthetic's own board parts (list rows, 01 card, toggle) in their own section wrappers inside a screen frame that wears the aesthetic's card border and radius; `bdFitProduct` zooms it (1.3 → 1, then a wider list column, then stacked sections down to 0.72) so no text is cut. `def.deck.product(ctx)` (alias `productStage`) replaces the scene.
+- **Do and don't**: "Do" / "Don't" set big in the aesthetic's headline face (`bdFitDoDont` shrinks both together until they fit), three rules each as equal ruled bands, text markers (`def.deck.marks`, else the rule numbers in the label face). No teal discs.
+- **`--dk-r`** is the aesthetic's own card radius (probe card, `bdApplyRadius`) or `def.deck.radius`; the user's shape preset no longer reaches the deck.
+- New hooks: `def.deck.materialArt(ctx)`, `def.deck.patternsStage(ctx)`, `def.deck.coverBand: false`, `def.deck.closingStrip: false`, `def.deck.coverMin`, `--dk-min-text: off | <px>`; text at `font-size: 0` is never lifted by the 12px floor. Full contract: docs/aesthetics-plan.md, "Round 6 framework hooks".
+- `font-synthesis: none` on every slide (and board): single-weight faces are never fake-bolded.

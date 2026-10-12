@@ -82,6 +82,15 @@
       const e = escapeHtml;
       const nameOf = en => en.label || famName(en.key);   // suite entries carry their own name
       const { pinned, list } = wallEntries(state, def);
+      // def.deck.patternsStage(ctx): an aesthetic may replace this slide's body (Bento's
+      // tile system). ctx adds entries (the wall's patterns), pinned, and
+      // patternImg(entry, w, h) -> a data-URL of that pattern at w x h CSS px.
+      if (typeof bdCallHook === 'function' && typeof bdHookCtx === 'function') {
+        const own = bdCallHook(def, 'patternsStage', bdHookCtx(Parts, 'patterns', {
+          entries: list.slice(0, 6), pinned, patternImg: (en, w, h) => urlFor(t, en, w, h, 2), nameOf, colorwayLabel: cwLabel,
+        }));
+        if (own) return `<div class="ab-deck-patterns" data-stage="custom">${own}</div>`;
+      }
       const n = Math.max(1, Math.min(6, list.length));
       const [w, h] = WALL[n];
       const tiles = list.slice(0, 6).map(en => `<figure class="ab-deck-pt">

@@ -32,6 +32,26 @@ Not added to the board UI itself.
   ink1 = primary or ink, ink2 = secondary, spark = accent (≤5% area by design). A "Colorway"
   control switches between: Brand (roles), Mono (ink on canvas), Duotone (primary+canvas),
   Night (canvas↔ink swapped). Optional "+ tints" adds derived tints (pri-tint/sec-tint/muted).
+- **Fixed colourways (round 6, the documented exceptions to "never invent colours").** Some
+  styles fix their pattern colours by rule (a thin-film spectrum, teletext, poster primaries).
+  `E.COLORWAYS` entries with `fixed: true` (and a `note`) take their inks from
+  `Patterns.E.FIXED_INKS`, not from the brand roles; `inksFor` marks the result `fixed: true`.
+  "Dark ground" below means the canvas is darker than the ink (decided from the two hexes
+  alone, so the brief's Source call reproduces it).
+  | value | ground | ink1 / ink2 / deep / spark | t1 / t2 / mute |
+  | --- | --- | --- | --- |
+  | `spectrum` | canvas | light `#e46bb4` `#4fb3e6` `#8f6bef` `#ecb23e`; dark `#ff8fd0` `#7fdcff` `#a98cff` `#ffd978` | mint `#38c08f` / `#7df0bd`; mix(ink2, ground, .38); mix(deep, ground, .4) |
+  | `tonal` | canvas | mix(black, canvas, .08 / .04 / .14) (white on a dark ground); spark = brand primary | the usual mixes |
+  | `broadcast` | `#000000` | `#ffff00` `#00ffff` `#ffffff` `#ff0000` | `#00ff00` `#ff00ff` `#0000ff` (the 8 teletext colours, nothing else) |
+  | `primaries` | `#f1ece2` | `#d7332a` `#1f4fa2` `#151515` `#f2c230` | `#f2c230` `#151515` `#151515` |
+  | `earth` | canvas | brand primary (the one brand band) `#c8471e` `#6e3421` `#f2b62a` | `#e38b1f` `#8c8f2a` `#6e3421` |
+  | `brass` | canvas | light `#9a7425` `#c8a24a` `#5b4214` `#c8a24a`; dark `#c8a24a` `#f1d592` `#7a5a1e` `#f1d592` | the usual mixes |
+  | `safety` | canvas | `#ff4a1c` (yellow `#ffe500` on a dark ground), ink, ink, the safety colour | the usual mixes |
+  Tone still applies (inks move toward the ground). fit.js entries may name any of these values;
+  saved pins with them load (PatternPins whitelists `E.COLORWAYS`). The Patterns view shows them
+  as a second "Fixed colours" row under Colorway. The AI brief adds one line per fixed colourway
+  the brief actually uses ("- Spectrum colorway (fixed): …") and labels their hexes "fixed (part of
+  the X colorway, not a brand token)"; a brief that uses none is byte-identical to before.
 - Families (minimum 16, each visibly distinct and good at defaults):
   1 Halftone field — noise field banded into levels, printed through ringed or round halftone dots.
   2 Stipple — dot scatter whose density follows noise; lattice or random; optional mirror symmetry.
@@ -59,7 +79,7 @@ Round 2: the library is now 53 families (see docs/patterns-round2.md) and every 
 e.g. Xerox -> thermal and onebit, Blueprint -> relief, tokens and rods in mono at tone 0.55, Pixel
 Arcade -> prismpix, totem, bloomgrid, kaleidopix, Riso -> cutup, inkstill, sonar, Neo-Brutal Pop ->
 panels, patchwork, festival. A suite never repeats a family. Original description:
-`js/patterns/fit.js`: for each of the 26 aesthetics, an ordered list of 6 fitting families with
+`js/patterns/fit.js`: for each of the 48 aesthetics, an ordered list of 6 fitting families with
 preset params (e.g. Riso Print → torn bands, halftone, stipple; Pixel Arcade → pixel quilt,
 signal mosaic, type terrain; Aurora Noir → flow filaments, aura wash (subtle), modular grid;
 Bauhaus Poster → counterchange, arc rise, modular grid; Liquid Glass → aura wash, op-art rings;
@@ -140,6 +160,10 @@ brand unsaved), so brands saved with pins load unchanged. Each entry is
 - Patterns slide shows the patterns in the brief (or the suite if none) with family names and
   colorway labels; cover/closing may use the first one as a background panel (behind a
   solid copy area so text contrast holds).
+- Round 6 deck hooks (docs/aesthetics-plan.md, "Round 6 framework hooks"): `def.deck.patternsStage(ctx)`
+  replaces the Patterns slide body (ctx adds `entries`, `pinned`, `patternImg(entry, w, h)` -> data URL,
+  `nameOf(entry)`, `colorwayLabel(value)`); `def.deck.coverBand: false` / `closingStrip: false` drop the
+  cover band / closing strip.
 
 ## Acceptance
 1. 53 families (18 original + 35 in round 2) render well at defaults with brand inks for 3 palettes; none copy third-party code.

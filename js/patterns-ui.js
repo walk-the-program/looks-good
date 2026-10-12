@@ -355,8 +355,12 @@ const PatternsUI = (function () {
           <div class="pt-group">
             <span class="pt-label">Colorway</span>
             <div class="segmented pt-seg" role="radiogroup" aria-label="Colorway">
-              ${cws.map(c => `<label><input type="radio" name="ptColorway" value="${c.value}" /> ${escapeHtml(c.label)}</label>`).join('')}
-            </div>
+              ${cws.filter(c => !c.fixed).map(c => `<label><input type="radio" name="ptColorway" value="${c.value}" /> ${escapeHtml(c.label)}</label>`).join('')}
+            </div>${cws.some(c => c.fixed) ? `
+            <span class="pt-label pt-label-sub" style="display:block;margin-top:12px">Fixed colours</span>
+            <div class="segmented pt-seg pt-seg-fixed" role="radiogroup" aria-label="Fixed colorway">
+              ${cws.filter(c => c.fixed).map(c => `<label title="${escapeHtml(c.note || '')}"><input type="radio" name="ptColorway" value="${c.value}" /> ${escapeHtml(c.label)}</label>`).join('')}
+            </div>` : ''}
           </div>
           <div class="pt-group">
             <label class="pt-ctl" for="ptTone"><span class="pt-ctl-top"><span class="pt-label">Strength</span><output id="ptTone-o">100%</output></span>

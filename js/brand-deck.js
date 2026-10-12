@@ -23,8 +23,12 @@
      art while unset or when it returns ''.
 
    Aesthetic hooks the deck honours (docs/aesthetics-plan.md, "Round 5 framework
-   hooks"): def.headline(ctx, text) (the cover, Principles and Closing h2),
-   def.printPrimary(t) (Color slide) and def.deck.coverDisplay (cover headline start size).
+   hooks" and "Round 6 framework hooks"): def.headline(ctx, text) (the cover, Principles
+   and Closing h2), def.printPrimary(t) (Color slide), def.deck.coverDisplay / coverMin
+   (cover headline start size / floor), def.deck.product(ctx) (alias productStage; the In
+   product scene), def.deck.marks (Do/Don't markers), def.deck.radius (--dk-r; default
+   the aesthetic's own card radius), def.deck.materialArt(ctx), def.deck.patternsStage(ctx)
+   (js/patterns-deck.js), def.deck.coverBand / closingStrip (false drops the pattern).
 
    Also holds the small colour/size helpers the board and the library tiles
    use (slMix, slVisible, slFit, slRadius, brandFileSlug). Plain <script>.
@@ -107,6 +111,15 @@ const BD_COVER_SOFT_PX = 88;          // x display scale: the headline gives up 
 const BD_COVER_MIN_SCALE = 0.98;
 const BD_COVER_EMERGENCY_PX = 40;     // below the 64px floor only when the cover cannot otherwise reach 0.85
 
+// def.deck.coverBand === false drops the cover's pattern band, def.deck.closingStrip ===
+// false the closing slide's strip (the slide then lays out as if no pattern existed).
+function bdWantsPattern(def, key) {
+  const d = (def && def.deck) || {};
+  if (key === 'cover') return d.coverBand !== false;
+  if (key === 'closing') return d.closingStrip !== false;
+  return true;
+}
+
 function bdPatternHtml(P, key) {
   if (typeof deckPatternHook !== 'function') return '';
   const html = deckPatternHook(P, key);
@@ -178,6 +191,104 @@ function bdPart(html, selector) {
   t.innerHTML = html;
   const el = t.content.querySelector(selector);
   return el ? el.outerHTML : '';
+}
+
+/* ---------------- aesthetic deck hooks (def.deck.*) ---------------- */
+
+// The context every def.deck function hook receives: the board's ctx (t, key, state,
+// brandName, tagline, initial, logoDataUrl) plus
+//   parts   the abBoardParts builders (card(), list(), panel(), states(), art(),
+//           swatches(), head(pre, name), brand, labels, layout, roles, t)
+//   def, slide (slide key), e (escapeHtml), rows (AB_ROWS), stages (AB_STAGES)
+// and whatever the slide adds (`extra`).
+function bdHookCtx(P, slideKey, extra) {
+  return Object.assign({}, P.ctx, {
+    parts: P, def: P.def, slide: slideKey, e: escapeHtml, rows: AB_ROWS, stages: AB_STAGES,
+    layout: P.layout, labels: P.labels,
+  }, extra || {});
+}
+
+// Call def.deck[name](ctx) (the first of `names` that is a function). Returns its HTML,
+// or '' when the hook is absent, returns a non-string / '', or throws (a broken hook
+// falls back to the default slide instead of blanking the deck).
+function bdCallHook(def, names, ctx) {
+  const d = def && def.deck;
+  if (!d) return '';
+  for (const name of [].concat(names)) {
+    if (typeof d[name] !== 'function') continue;
+    try {
+      const html = d[name](ctx);
+      return typeof html === 'string' ? html : '';
+    } catch (err) {
+      if (typeof console !== 'undefined') console.warn(`def.deck.${name} (${def.key}) failed:`, err);
+      return '';
+    }
+  }
+  return '';
+}
+
+// def.deck.radius: the deck's container radius (a number of px, or a CSS length).
+// Returns the CSS length, or null when unset or unusable.
+function bdOwnRadius(def) {
+  const v = def && def.deck ? def.deck.radius : null;
+  if (v == null || v === '') return null;
+  if (typeof v === 'number' && isFinite(v) && v >= 0) return v + 'px';
+  return slRadius(v, null);
+}
+
+// The aesthetic's own container, read from its board card: a hidden probe card inside a
+// slide root, so the aesthetic's scoped CSS (.ab[data-ae] .ab-sec-ui .ab-card) applies.
+// radius: the smallest px corner (an arch-topped card reads as its square foot), clamped
+// to 0..28px; 12px when the card has no px radius at all. border: the card's own top
+// border ('' when it has none), which the In product frame wears.
+function bdMeasureCard(root) {
+  const host = root && root.querySelector('.ab-slide-in');
+  if (!host) return { radius: '12px', border: '' };
+  const probe = document.createElement('div');
+  probe.className = 'ab-deck-probe';
+  probe.setAttribute('aria-hidden', 'true');
+  probe.innerHTML = '<section class="ab-sec ab-sec-ui"><div class="ab-card"></div></section>';
+  host.appendChild(probe);
+  const cs = getComputedStyle(probe.querySelector('.ab-card'));
+  const bw = parseFloat(cs.borderTopWidth) || 0;
+  const border = bw >= 1 && cs.borderTopStyle !== 'none' && cs.borderTopStyle !== 'hidden' && !/rgba\([^)]*,\s*0\)$/.test(cs.borderTopColor)
+    ? `${Math.min(4, bw)}px ${cs.borderTopStyle} ${cs.borderTopColor}` : '';
+  const px = [cs.borderTopLeftRadius, cs.borderTopRightRadius, cs.borderBottomRightRadius, cs.borderBottomLeftRadius]
+    .map(v => String(v || '').trim().split(/\s+/)[0])
+    .filter(v => /^\d+(\.\d+)?px$/.test(v))
+    .map(parseFloat);
+  probe.remove();
+  const radius = px.length ? Math.round(Math.max(0, Math.min(28, Math.min(...px)))) + 'px' : '12px';
+  return { radius, border };
+}
+
+// Deck container radius (--dk-r) for every slide: def.deck.radius, else the measured
+// card radius. Never the user's shape preset: a square-cornered style stays square.
+function bdApplyRadius(grid, def) {
+  const roots = [...grid.querySelectorAll('.ab-slide')];
+  if (!roots.length) return;
+  const card = bdMeasureCard(roots[0]);
+  const r = bdOwnRadius(def) || card.radius;
+  roots.forEach(root => {
+    root.style.setProperty('--dk-r', r);
+    if (card.border) root.style.setProperty('--dk-frame-bd', card.border);
+  });
+}
+
+// Do / Don't marker for rule i of `kind`. def.deck.marks = { do, dont }: a string is
+// set as text (in the label face); a function (ctx, kind, i) returns HTML. Default: the
+// rule's number (01, 02, 03).
+function bdMark(def, ctx, kind, i) {
+  const m = def.deck && def.deck.marks;
+  if (typeof m === 'function') {
+    try {
+      const html = m(ctx, kind, i);
+      if (typeof html === 'string' && html) return { html, own: true };
+    } catch (err) { /* fall through to the default */ }
+  } else if (m && typeof m[kind] === 'string' && m[kind]) {
+    return { html: escapeHtml(m[kind]), own: true };
+  }
+  return { html: String(i + 1).padStart(2, '0'), own: false };
 }
 
 // Base px for a motto-sized headline, stepped down as the line gets longer.
@@ -307,12 +418,15 @@ const DECK_SLIDES = [
           <p class="ab-label ab-deck-cellname">${name}</p>
           <div class="ab-deck-cellbody"><div class="ab-deck-cellzoom">${inner}</div></div>
         </div>`;
-      const states = bdPart(panel, '.ab-states');
+      // An aesthetic's own card / panel markup (def.panels) may not carry every component:
+      // take the missing ones from the default markup.
+      const pick = (html, base, sel) => bdPart(html, sel) || (base ? bdPart(base(), sel) : '');
+      const states = pick(panel, P.panelBase, '.ab-states');
       return `<div class="ab-deck-ui">
         <div class="ab-deck-uirow">
-          ${cell('Segmented control', bdPart(card, '.ab-seg'))}
-          ${cell('Primary action', bdPart(card, '.ab-cta'))}
-          ${cell('Toggle', bdPart(panel, '.ab-toggle'))}
+          ${cell('Segmented control', pick(card, P.cardBase, '.ab-seg'))}
+          ${cell('Primary action', pick(card, P.cardBase, '.ab-cta'))}
+          ${cell('Toggle', pick(panel, P.panelBase, '.ab-toggle'))}
         </div>
         ${states ? `<div class="ab-deck-uistates">${states}</div>` : ''}
       </div>`;
@@ -329,9 +443,11 @@ const DECK_SLIDES = [
         </li>`).join('');
       const patternStage = (def.deck && def.deck.materialStage === 'pattern' && typeof deckStageHook === 'function')
         ? deckStageHook(P, state, def, t) : '';
+      // def.deck.materialArt(ctx): Material-slide art distinct from the board's hero art.
+      const ownArt = patternStage ? '' : bdCallHook(def, 'materialArt', bdHookCtx(P, 'material'));
       const stage = patternStage
         ? `<div class="ab-deck-stage" data-stage="pattern" data-hero="${P.layout.hero}">${patternStage}</div>`
-        : `<div class="ab-deck-stage" data-hero="${P.layout.hero}"><div class="ab-art" aria-hidden="true">${P.art()}</div></div>`;
+        : `<div class="ab-deck-stage"${ownArt ? ' data-stage="own"' : ''} data-hero="${P.layout.hero}"><div class="ab-art" aria-hidden="true">${ownArt || P.art()}</div></div>`;
       return `<div class="ab-deck-material">
         ${stage}
         <div class="ab-deck-matcol">
@@ -343,34 +459,28 @@ const DECK_SLIDES = [
   },
   {
     key: 'product', title: 'In product',
-    build(P) {
-      const e = escapeHtml;
-      const nav = ['Overview', 'Projects', 'Assets'].map((n, i) =>
-        `<li class="ab-deck-nav${i === 1 ? ' is-on' : ''}"><span class="ab-label">${e(n)}</span></li>`).join('');
-      const roles = ['primary', 'secondary', 'accent'];
-      const rows = AB_ROWS.map((r, i) => `<li class="ab-deck-row">
-          <i class="ab-deck-dot" role="img" aria-label="${e(r[1])}" title="${e(r[1])}" style="background:var(--ab-${roles[i]})"></i>
-          <span class="ab-deck-rname">${e(r[0])}</span>
-          <span class="ab-deck-rpct">${r[2]}%</span>
-        </li>`).join('');
-      const stage = AB_STAGES.Design;
-      return `<div class="ab-deck-app">
-        <aside class="ab-deck-side">
-          <div class="ab-brand">${P.brand}</div>
-          <ul class="ab-deck-navlist">${nav}</ul>
-        </aside>
-        <div class="ab-deck-screen">
-          <div class="ab-deck-screenhead">
-            <h3 class="ab-deck-screentitle ab-headline">Projects</h3>
-            <span class="ab-deck-chip">3 active</span>
-          </div>
-          <div class="ab-deck-screenbody">
-            <ul class="ab-deck-rows">${rows}</ul>
-            <div class="ab-deck-ctacard">
-              <h4 class="ab-deck-ctatitle">${e(stage[0])}</h4>
-              <p class="ab-deck-ctaline">${e(stage[1])}</p>
-              ${bdPart(P.card(), '.ab-cta')}
-            </div>
+    // The brand's product screen, assembled from the aesthetic's OWN board parts: its page
+    // header, its section labels, its list rows (status, progress, numbers) and its 01 card
+    // (segmented control, title, CTA) and toggle, all in the board's own section wrappers
+    // so every scoped rule of the aesthetic applies. def.deck.product(ctx) (alias
+    // productStage) replaces the whole scene with a bespoke one.
+    build(P, state, def) {
+      const own = bdCallHook(def, ['product', 'productStage'], bdHookCtx(P, 'product'));
+      if (own) return `<div class="ab-deck-prod" data-prod="custom">${own}</div>`;
+      const n = i => `<i class="ab-n">${String(i).padStart(2, '0')}</i>`;
+      const toggle = bdPart(P.panel(), '.ab-toggle') || (P.panelBase ? bdPart(P.panelBase(), '.ab-toggle') : '');
+      return `<div class="ab-deck-prod" data-prod="board">
+        <div class="ab-deck-prodframe">
+          <div class="ab-deck-prodgrid">
+            <section class="ab-sec ab-sec-use" aria-label="Projects">
+              <div class="ab-labelrow"><span class="ab-label">${n(1)}<span>Projects</span></span><span class="ab-label">${AB_ROWS.length} in progress</span></div>
+              ${P.list()}
+              ${toggle ? `<div class="ab-deck-prodtools">${toggle}</div>` : ''}
+            </section>
+            <section class="ab-sec ab-sec-ui" aria-label="Next step">
+              <div class="ab-labelrow"><span class="ab-label">${n(2)}<span>Next step</span></span></div>
+              ${P.card()}
+            </section>
           </div>
         </div>
       </div>`;
@@ -378,11 +488,18 @@ const DECK_SLIDES = [
   },
   {
     key: 'dodont', title: "Do and don't",
+    // Two columns headed by "Do" and "Don't" in the aesthetic's own headline face, three
+    // rules each. Markers come from def.deck.marks ({ do, dont } text, or a function
+    // (ctx, kind, i) -> HTML); by default the rule numbers in the label face. No discs.
     build(P, state, def) {
       const e = escapeHtml;
+      const ctx = bdHookCtx(P, 'dodont');
       const col = (kind, list) => `<section class="ab-deck-col" data-kind="${kind}">
-          <div class="ab-labelrow"><span class="ab-label">${kind === 'do' ? 'Do' : "Don't"}</span></div>
-          <ul class="ab-deck-rules">${list.map(r => `<li class="ab-deck-rule"><span class="ab-deck-mark" aria-hidden="true">${kind === 'do' ? '✓' : '✕'}</span><p>${e(r)}</p></li>`).join('')}</ul>
+          <h3 class="ab-headline ab-deck-h ab-deck-ddhead" style="--dk-fs:104px">${kind === 'do' ? 'Do' : 'Don’t'}</h3>
+          <ul class="ab-deck-rules">${list.map((r, i) => {
+            const m = bdMark(def, ctx, kind, i);
+            return `<li class="ab-deck-rule"><span class="ab-deck-mark${m.own ? ' is-own' : ''}" aria-hidden="true">${m.html}</span><p>${e(r)}</p></li>`;
+          }).join('')}</ul>
         </section>`;
       return `<div class="ab-deck-dodont">${col('do', bdRuleLines(def, 'do'))}${col('dont', bdRuleLines(def, 'dont'))}</div>`;
     },
@@ -410,17 +527,23 @@ const DECK_SLIDES = [
 
 function bdSlideHtml(state, def, slide, index, total) {
   const P = abBoardParts(state, def);
-  // Container radius for deck panels follows the aesthetic's shape preset.
-  P.style += `;--dk-r:${slRadius(state.shapePreset && state.shapePreset.radiusLg, '12px')}`;
+  // Container radius for deck panels: the aesthetic's own (def.deck.radius, else its
+  // card's radius, measured after render by bdApplyRadius). 12px until measured.
+// Its card border becomes --dk-frame-bd (the In product frame).
+  P.style += `;--dk-r:${bdOwnRadius(def) || '12px'}`;
   // def.deck.coverDisplay: the cover headline's start scale (bdFitCover); cover only.
   const cd = Number(def.deck && def.deck.coverDisplay);
   if (slide.key === 'cover' && cd > 0 && isFinite(cd)) P.style += `;--dk-cover-display:${cd}`;
+  // def.deck.coverMin: the cover headline's floor in px (default 64), 16..64, for a
+  // caption-sized cover statement (pair it with a small coverDisplay).
+  const cm = Number(def.deck && def.deck.coverMin);
+  if (slide.key === 'cover' && cm > 0 && isFinite(cm)) P.style += `;--dk-cover-min:${Math.max(16, Math.min(BD_COVER_MIN_PX, cm))}`;
   const n = String(index + 1).padStart(2, '0');
   const count = String(total).padStart(2, '0');
   const body = slide.build(P, state, def, P.t);
   const foot = `<footer class="ab-foot ab-slide-foot"><span class="ab-motto"><i class="ab-dot" aria-hidden="true"></i>${escapeHtml(def.name)}</span><span class="ab-infl">${slide.foot === 'closing' ? escapeHtml(def.influences) : `${n} / ${count}`}</span></footer>`;
   return `${P.rootOpen('ab-slide', ` data-slide="${slide.key}"`)}
-  ${slide.pattern ? bdPatternHtml(P, slide.key) : ''}
+  ${slide.pattern && bdWantsPattern(def, slide.key) ? bdPatternHtml(P, slide.key) : ''}
   <div class="ab-in ab-slide-in">
     ${P.head('Brand guidelines / ', slide.title)}
     <div class="ab-rule"></div>
@@ -603,7 +726,10 @@ function bdFitCover(root) {
   // def.deck.coverDisplay (--dk-cover-display) replaces type.display for the cover start size.
   const display = parseFloat(root.style.getPropertyValue('--dk-cover-display'))
     || parseFloat(root.style.getPropertyValue('--ab-display')) || 1;
-  const start = Math.max(BD_COVER_MIN_PX, BD_COVER_START * display);
+  // def.deck.coverMin (--dk-cover-min) lowers the 64px floor; the emergency floor follows it.
+  const minPx = parseFloat(root.style.getPropertyValue('--dk-cover-min')) || BD_COVER_MIN_PX;
+  const emergencyPx = Math.min(BD_COVER_EMERGENCY_PX, minPx);
+  const start = Math.max(minPx, BD_COVER_START * display);
   let fs = start;
   const setFs = v => hl.style.setProperty('font-size', v.toFixed(1) + 'px', 'important');
   const shrinkTo = floor => {
@@ -614,20 +740,20 @@ function bdFitCover(root) {
   };
   setFs(fs);
   // 1. headline: only as far as the copy needs to stay inside its column.
-  for (let i = 0; i < 40 && fs > BD_COVER_MIN_PX && !bdCoverCopyFits(root); i++) {
-    fs = Math.max(BD_COVER_MIN_PX, fs * 0.96);
+  for (let i = 0; i < 40 && fs > minPx && !bdCoverCopyFits(root); i++) {
+    fs = Math.max(minPx, fs * 0.96);
     setFs(fs);
   }
   // 1b. a word still broken at the 64px floor (a very wide or tracked face): give
   //     up the floor before breaking a word, never below 40px.
-  for (let i = 0; i < 20 && fs > BD_COVER_EMERGENCY_PX && bdTextSpills(hl, null, true); i++) {
-    fs = Math.max(BD_COVER_EMERGENCY_PX, fs * 0.96);
+  for (let i = 0; i < 20 && fs > emergencyPx && bdTextSpills(hl, null, true); i++) {
+    fs = Math.max(emergencyPx, fs * 0.96);
     setFs(fs);
   }
   // 2. too tall for the 0.85 floor: shrink the headline, but only down to a
   //    statement size, then the art box in 8% steps (the scene hero's copy
   //    sits inside the art, so there it is left alone), then the headline on to 64px.
-  shrinkTo(Math.min(fs, Math.max(BD_COVER_MIN_PX, BD_COVER_SOFT_PX * display)));
+  shrinkTo(Math.min(fs, Math.max(minPx, BD_COVER_SOFT_PX * display)));
   const art = root.querySelector('.ab-hero .ab-art');
   if (art) {
     art.style.maxWidth = '';
@@ -642,13 +768,13 @@ function bdFitCover(root) {
       }
     }
   }
-  shrinkTo(BD_COVER_MIN_PX);
+  shrinkTo(minPx);
   // 4. An art-led hero (copy in a card on the art, a poster-size stage) that
   //    still needs a scale under 0.85 at the 64px floor: give up the floor
   //    rather than the 0.85 (never below 40px), then let bdScaleToFit scale the rest.
   const fsKeep = fs;
   const needKeep = bdCoverNeed(root);
-  shrinkTo(BD_COVER_EMERGENCY_PX);
+  shrinkTo(emergencyPx);
   if (fs < fsKeep && bdCoverNeed(root) < needKeep + 0.05) { fs = fsKeep; setFs(fs); }   // the headline was not the problem
   root.dataset.coverClear = bdCoverClearArt(root) ? '1' : '0';
   root.dataset.coverFs = fs.toFixed(1);
@@ -766,7 +892,14 @@ function bdMinText(root, floor) {
     el.style.removeProperty('font-size');
     const cs = getComputedStyle(el);
     if (cs.display === 'none' || cs.visibility === 'hidden') return;
-    if (parseFloat(cs.fontSize) < min) el.style.setProperty('font-size', min.toFixed(2) + 'px', 'important');
+    // Opt-out: an aesthetic sets --dk-min-text (inherited) to `off` to keep its own sizes
+    // on an element or a whole component, or to a px number for its own floor there.
+    // font-size: 0 hides text on purpose (a counter or icon drawn by ::before / ::after).
+    if (parseFloat(cs.fontSize) === 0) return;
+    const own = cs.getPropertyValue('--dk-min-text').trim();
+    if (own === 'off' || own === 'none') return;
+    const floorPx = own && isFinite(parseFloat(own)) ? parseFloat(own) * (min / BD_MIN_TEXT) : min;
+    if (parseFloat(cs.fontSize) < floorPx) el.style.setProperty('font-size', floorPx.toFixed(2) + 'px', 'important');
   });
 }
 
@@ -782,6 +915,61 @@ function bdFitBrandName(root) {
   });
 }
 
+// In product (default scene): the board parts are drawn at board scale; zoom the frame up
+// (1.3 at most, 6% steps) while the slide body still fits and no row name, CTA label or
+// segment gets cut off.
+// True when some text in `scope` is cut (ellipsis, clipped scroll width) or runs outside
+// its own box by more than 2px: what the board parts do when squeezed below their width.
+function bdTextCut(scope) {
+  const r = document.createRange();
+  return [...scope.querySelectorAll('*')].some(el => {
+    if (el.closest('[aria-hidden="true"]')) return false;
+    const texts = [...el.childNodes].filter(n => n.nodeType === 3 && n.nodeValue.trim());
+    if (!texts.length) return false;
+    const cs = getComputedStyle(el);
+    if (cs.display === 'none' || cs.visibility === 'hidden' || parseFloat(cs.fontSize) === 0) return false;
+    if (cs.display !== 'inline' && cs.overflowX !== 'visible' && el.scrollWidth > el.clientWidth + 1) return true;
+    if (cs.textOverflow === 'ellipsis' && el.scrollWidth > el.clientWidth) return true;
+    const box = el.getBoundingClientRect();
+    if (box.width <= 2 || box.height <= 2) return false;
+    return texts.some(n => {
+      r.selectNodeContents(n);
+      return [...r.getClientRects()].some(q => q.width > 0.5 && (q.right > box.right + 2 || q.left < box.left - 2));
+    });
+  });
+}
+
+// In product (default scene): the board parts are drawn at board scale. Zoom the frame up
+// (1.3 at most) while the slide body fits and no text is cut; when even 1x cuts text (long
+// rows), give the list a wider column and step down to 0.88; when the card itself needs
+// the full width (a card laid out as several tiles), stack the two sections, down to 0.72.
+function bdFitProduct(root) {
+  const frame = root.querySelector('.ab-deck-prod[data-prod="board"] > .ab-deck-prodframe');
+  if (!frame) return;
+  const ok = () => !bdBodyOverflows(root) && !bdTextCut(frame);
+  const tries = [[1.3, ''], [1.24, ''], [1.18, ''], [1.12, ''], [1.06, ''], [1, ''], [1.06, 'wide'], [1, 'wide'], [0.94, 'wide'], [0.88, 'wide'],
+    [1, 'stack'], [0.92, 'stack'], [0.84, 'stack'], [0.78, 'stack'], [0.72, 'stack']];
+  for (const [z, mode] of tries) {
+    frame.style.zoom = z === 1 ? '' : String(z);
+    if (mode) frame.dataset.fit = mode; else delete frame.dataset.fit;
+    if (ok()) break;
+  }
+  root.dataset.prodZoom = frame.style.zoom || '1';
+}
+
+// Do / Don't: both column heads share one size, shrunk (6% steps, floor 40%) until the
+// longer one ("Don't" in a wide, tracked face) sits inside its column.
+function bdFitDoDont(root) {
+  const heads = [...root.querySelectorAll('.ab-deck-ddhead')];
+  if (!heads.length) return;
+  const fs0 = parseFloat(heads[0].style.getPropertyValue('--dk-fs')) || 104;
+  let fs = fs0;
+  const set = v => heads.forEach(h => h.style.setProperty('--dk-fs', v.toFixed(1) + 'px'));
+  set(fs);
+  const over = () => heads.some(h => h.scrollWidth > h.clientWidth + 1 || bdTextSpills(h)) || bdBodyOverflows(root);
+  for (let i = 0; i < 16 && fs > fs0 * 0.4 && over(); i++) { fs *= 0.94; set(fs); }
+}
+
 function bdFitDeck(grid) {
   grid.querySelectorAll('.ab-slide').forEach(root => {
     const key = root.dataset.slide;
@@ -793,6 +981,8 @@ function bdFitDeck(grid) {
     if (key === 'cover') bdFitCover(root);
     else if (key === 'principles' || key === 'closing') bdFitHeadline(root);
     if (key === 'material') bdFitStage(root);
+    if (key === 'product') bdFitProduct(root);
+    if (key === 'dodont') bdFitDoDont(root);
     bdScaleToFit(root);
     // A slide that still had to scale down shrinks its small text with it: lift the
     // text inside the scaled wrapper once so it reads at 12px after the scale (one
@@ -855,6 +1045,7 @@ function renderBrandDeckNow() {
   const slides = DECK_SLIDES;
   grid.innerHTML = slides.map((slide, i) => bdCardHtml(s, def, slide, i, slides.length)).join('');
   bdBuilt = true;
+  bdApplyRadius(grid, def);
   bdZoomCards(grid);
   bdFitDeck(grid);
   const desc = document.getElementById('deckDesc');

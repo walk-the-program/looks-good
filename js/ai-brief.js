@@ -320,6 +320,10 @@ function aibPatternItemLines(state, def, entry, n, level) {
       .find(([, v]) => String(v).toLowerCase() === h);
     if (hit) return '`' + hit[0] + '`';
     const pct = Math.round(tone * 100);
+    if (entry.colorway === 'tonal') return `derived (the canvas shaded a few percent, Tonal colorway${tone < 1 ? ', strength ' + pct + '%' : ''})`;
+    if (P.E.isFixedColorway && P.E.isFixedColorway(entry.colorway)) {
+      return `fixed (part of the ${cwWord(entry.colorway)} colorway, not a brand token${tone < 1 ? '; strength ' + pct + '% toward the ground' : ''})`;
+    }
     return entry.colorway === 'brand'
       ? `derived (a brand token mixed toward the canvas at strength ${pct}%)`
       : `derived (${cwWord(entry.colorway)} mix of the brand tokens${tone < 1 ? ', strength ' + pct + '%' : ''})`;
@@ -394,6 +398,16 @@ function aibPatternLines(state, def) {
   const infoOf = key => Patterns.list().find(f => f.key === key);
   const cwWord = v => ((Patterns.E.COLORWAYS.find(c => c.value === v) || {}).label || v);
   const oneLine = s => String(s || '').replace(/\s+/g, ' ').trim();
+  const suite = typeof blendSuite === 'function' ? blendSuite(def) : Patterns.suiteFor(def.key);
+  const pins = typeof PatternPins !== 'undefined' ? PatternPins.normalizeList(state.patterns) : [];
+  // Fixed colourways (Spectrum, Tonal, Broadcast, Primaries, Earth) are the documented
+  // exceptions to "never introduce a color": name the ones this brief uses. Briefs that
+  // use none keep the wording below unchanged.
+  const fixedUsed = (Patterns.E.COLORWAYS || []).filter(c => c.fixed && suite.concat(pins).some(s => s.colorway === c.value));
+  const fixedLines = fixedUsed.length
+    ? fixedUsed.map(c => `- ${c.label} colorway (fixed): ${c.note}. Its hexes are part of the style, not brand tokens; use them as listed.`)
+      .concat(['- Never introduce a color a pattern does not get from these roles or from the fixed colorways named above.', ''])
+    : ['- Never introduce a color a pattern does not get from these roles.', ''];
   out.push('## Patterns', '', AIB_PATTERN_PREAMBLE, '',
     `Generative textures made only from the brand colors (Patterns view in Branding Designer). Use them as hero backgrounds, section bands, card textures, divider strips and small accent details. Keep body text on a plain \`--canvas\` area, never on a pattern.`, '',
     '### Ink mapping', '',
@@ -402,16 +416,16 @@ function aibPatternLines(state, def) {
     '- ink2 = `--secondary`.',
     '- spark = `--accent`, at most 5% of the pattern area.',
     '- Colorways: Brand (the roles above), Mono (ink on canvas), Duotone (primary on canvas), Night (canvas and ink swapped). "+ tints" adds lighter mixes of primary and secondary toward the canvas.',
-    '- Never introduce a color a pattern does not get from these roles.', '',
+    ...fixedLines,
     `### Families that fit ${def.name}`, '');
-  (typeof blendSuite === 'function' ? blendSuite(def) : Patterns.suiteFor(def.key)).forEach(s => {
+  suite.forEach(s => {
     const f = infoOf(s.key);
     if (!f) return;
     const file = typeof Patterns.fileOf === 'function' ? Patterns.fileOf(s.key) : null;
     out.push(`- **${s.name}** (${f.name}, ${cwWord(s.colorway)}): ${oneLine(f.blurb)}${file ? ` Source: \`${file}\`, family \`${s.key}\`.` : ''}`);
   });
   out.push('');
-  const items = typeof PatternPins !== 'undefined' ? PatternPins.normalizeList(state.patterns) : [];
+  const items = pins;
   if (items.length) {
     out.push('### In your brief', '',
       `${items.length === 1 ? 'This pattern was' : 'These ' + items.length + ' patterns were'} chosen for this brand. Reproduce each one exactly as described: same family, colorway, hexes, seed and settings, in the place named by its use.`, '');

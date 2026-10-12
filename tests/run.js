@@ -163,5 +163,58 @@ check('paste: empty text', run(`extractColors('').length`) === 0, 'found colors 
   check('paste: out-of-range rgb() never makes an invalid hex', hexes.every(h => /^#[0-9a-f]{6}$/.test(h)), JSON.stringify(hexes));
 }
 
+/* ---- pattern colourways (js/patterns/engine.js) ---- */
+
+{
+  const w = { performance: { now: () => 0 } };
+  const pc = vm.createContext({ window: w, console });
+  vm.runInContext(fs.readFileSync(path.join(root, 'js/patterns/engine.js'), 'utf8'), pc, { filename: 'engine.js' });
+  const P = w.Patterns;
+  const light = { canvas: '#F6F5F1', ink: '#2E282A', primary: '#E4572E', secondary: '#17BEBB', accent: '#FFC914' };
+  const dark = Object.assign({}, light, { canvas: '#2E282A', ink: '#F6F5F1' });
+  const brandHexes = Object.values(light).map(h => h.toLowerCase());
+  const b = P.inksFor(light, 'brand');
+  check('colourways: brand still maps the roles', b.ground === light.canvas && b.ink1 === light.primary && b.ink2 === light.secondary
+    && b.spark === light.accent && b.deep === light.ink && !('fixed' in b), JSON.stringify(b));
+  const s1 = P.inksFor(light, 'spectrum'), s2 = P.inksFor(dark, 'spectrum');
+  check('colourways: spectrum is fixed and never a brand role',
+    s1.ink1 === '#e46bb4' && s1.ink2 === '#4fb3e6' && s1.deep === '#8f6bef' && s1.spark === '#ecb23e' && s1.ground === light.canvas
+    && s2.ink1 === '#ff8fd0' && s2.spark === '#ffd978' && s1.fixed === true
+    && ![s1.ink1, s1.ink2, s1.deep, s1.spark, s1.t1].some(h => brandHexes.includes(h.toLowerCase())), JSON.stringify([s1, s2]));
+  const t1 = P.inksFor(light, 'tonal'), t2 = P.inksFor(dark, 'tonal');
+  const E = P.E;
+  check('colourways: tonal is the canvas shaded 4/8/14% with the primary spark',
+    t1.ink1 === E.mix('#000000', light.canvas, 0.08) && t1.ink2 === E.mix('#000000', light.canvas, 0.04) && t1.deep === E.mix('#000000', light.canvas, 0.14)
+    && t2.ink1 === E.mix('#ffffff', dark.canvas, 0.08) && t1.spark === light.primary, JSON.stringify([t1, t2]));
+  const tt = P.inksFor(light, 'broadcast', { tints: true });
+  const teletext = ['#000000', '#ff0000', '#00ff00', '#ffff00', '#0000ff', '#ff00ff', '#00ffff', '#ffffff'];
+  check('colourways: broadcast uses only the eight teletext colours',
+    [tt.ground, tt.ink1, tt.ink2, tt.deep, tt.spark, tt.t1, tt.t2, tt.mute].every(h => teletext.includes(h))
+    && new Set([tt.ground, tt.ink1, tt.ink2, tt.deep, tt.spark, tt.t1, tt.t2, tt.mute]).size === 8, JSON.stringify(tt));
+  const pr = P.inksFor(dark, 'primaries'), ea = P.inksFor(light, 'earth');
+  check('colourways: primaries fixes its ground; earth keeps the canvas and one brand band',
+    pr.ground === '#f1ece2' && pr.ink1 === '#d7332a' && ea.ground === light.canvas && ea.ink1 === light.primary && ea.deep === '#6e3421', JSON.stringify([pr, ea]));
+  check('colourways: every listed colourway resolves, same input same inks',
+    E.COLORWAYS.every(c => JSON.stringify(P.inksFor(light, c.value, { tints: true })) === JSON.stringify(P.inksFor(Object.assign({}, light), c.value, { tints: true }))),
+    'nondeterministic');
+}
+
+/* ---- board layout contract (js/aesthetic-board.js) ---- */
+
+{
+  const bc = vm.createContext({ console });
+  vm.runInContext(fs.readFileSync(path.join(root, 'js/aesthetic-board.js'), 'utf8'), bc, { filename: 'aesthetic-board.js' });
+  const lay = d => vm.runInContext(`abLayoutOf(${JSON.stringify(d)})`, bc);
+  const d0 = lay({});
+  check('layout: defaults keep the board order', JSON.stringify(d0.order) === '["hero","palette","type","sections"]'
+    && JSON.stringify(d0.sectionOrder) === '["ui","touch","use"]' && d0.hero === 'split' && d0.palette === 'swatches', JSON.stringify(d0));
+  const d1 = lay({ layout: { order: ['palette', 'bogus', 'hero', 'palette'], sectionOrder: ['use'], hero: 'type', palette: 'list' } });
+  check('layout: order is a permutation (unknown and repeats dropped, missing appended)',
+    JSON.stringify(d1.order) === '["palette","hero","type","sections"]' && JSON.stringify(d1.sectionOrder) === '["use","ui","touch"]'
+    && d1.hero === 'type' && d1.palette === 'list', JSON.stringify(d1));
+  check('layout: unknown hero / palette fall back', lay({ layout: { hero: 'diagonal', palette: 'rainbow' } }).hero === 'split'
+    && lay({ layout: { palette: 'rainbow' } }).palette === 'swatches', 'no fallback');
+}
+
 console.log(failed ? `\n${failed} failed` : '\nall passed');
 process.exit(failed ? 1 : 0);

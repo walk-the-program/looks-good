@@ -7,6 +7,9 @@
      Patterns.CATEGORIES               ordered picker categories
      Patterns.get(key) / defaults(key) / schema(key)
      Patterns.inksFor(stateOrTokens, colorway, {tints})
+         colorway: brand | mono | duotone | night (brand roles), or a FIXED colourway
+         (spectrum | tonal | broadcast | primaries | earth | brass | safety: E.COLORWAYS
+         entries with fixed: true, hexes in E.FIXED_INKS; docs/patterns.md)
      Patterns.render(canvas, key, params, inks, seed, opts)   -> {ms,w,h}
      Patterns.renderSVG(key, params, inks, seed, opts)        -> string|null
          opts.tile = true: a seamless repeating tile (seamless vector families only,
@@ -284,12 +287,39 @@
   }
 
   /* ------------------------------ inks / colorways ------------------------------ */
+  // The first four map the brand roles. The rest are FIXED colourways: documented
+  // exceptions to "patterns never invent colours", for styles whose rules fix their
+  // pattern colours (a thin-film spectrum, teletext, poster primaries, an earth ramp)
+  // or keep them tonal. `fixed: true` marks them; `note` says where the inks come from.
   E.COLORWAYS = [
     { value: 'brand', label: 'Brand' },
     { value: 'mono', label: 'Mono' },
     { value: 'duotone', label: 'Duotone' },
     { value: 'night', label: 'Night' },
+    { value: 'spectrum', label: 'Spectrum', fixed: true, note: 'a fixed thin-film spectrum (pink, cyan, violet, mint, gold) on the canvas; never brand colours' },
+    { value: 'tonal', label: 'Tonal', fixed: true, note: 'the canvas shaded 4%, 8% and 14% toward black (toward white on a dark canvas), with the brand primary as the one spark' },
+    { value: 'broadcast', label: 'Broadcast', fixed: true, note: 'the eight teletext colours (black, red, green, yellow, blue, magenta, cyan, white), fixed by the hardware' },
+    { value: 'primaries', label: 'Primaries', fixed: true, note: 'fixed poster primaries (red, yellow, blue, black) on a fixed paper ground' },
+    { value: 'earth', label: 'Earth', fixed: true, note: 'a fixed 1970s earth ramp (brown, burnt orange, orange, harvest gold, avocado) on the canvas, with the brand primary as one band' },
+    { value: 'brass', label: 'Brass', fixed: true, note: 'fixed brass (gold, pale gold, dark bronze; deeper on a light canvas) on the canvas' },
+    { value: 'safety', label: 'Safety', fixed: true, note: 'one fixed safety colour (orange #FF4A1C on a light canvas, yellow #FFE500 on a dark one) with the ink' },
   ];
+  // The fixed hexes of each fixed colourway (light and dark ground where they differ).
+  E.FIXED_INKS = {
+    spectrum: {
+      light: { ink1: '#e46bb4', ink2: '#4fb3e6', deep: '#8f6bef', spark: '#ecb23e', t1: '#38c08f' },
+      dark: { ink1: '#ff8fd0', ink2: '#7fdcff', deep: '#a98cff', spark: '#ffd978', t1: '#7df0bd' },
+    },
+    broadcast: { ground: '#000000', ink1: '#ffff00', ink2: '#00ffff', deep: '#ffffff', spark: '#ff0000', t1: '#00ff00', t2: '#ff00ff', mute: '#0000ff' },
+    primaries: { ground: '#f1ece2', ink1: '#d7332a', ink2: '#1f4fa2', deep: '#151515', spark: '#f2c230', t1: '#f2c230', t2: '#151515', mute: '#151515' },
+    earth: { ink2: '#c8471e', deep: '#6e3421', spark: '#f2b62a', t1: '#e38b1f', t2: '#8c8f2a', mute: '#6e3421' },
+    brass: {
+      light: { ink1: '#9a7425', ink2: '#c8a24a', deep: '#5b4214', spark: '#c8a24a' },
+      dark: { ink1: '#c8a24a', ink2: '#f1d592', deep: '#7a5a1e', spark: '#f1d592' },
+    },
+    safety: { light: '#ff4a1c', dark: '#ffe500' },
+  };
+  E.isFixedColorway = v => !!(E.COLORWAYS.find(c => c.value === v) || {}).fixed;
 
   // Tokens from a board-state: use the app's boardTokens() when present so the
   // pattern inks match the board exactly, else a local equivalent.
@@ -316,7 +346,32 @@
     const cw = colorway || 'brand';
     const g = t.canvas, k = t.ink;
     let ground, ink1, ink2, spark, deep;
-    if (cw === 'mono') {
+    let fx = null;                       // fixed tints / mute, when a fixed colourway sets them
+    // A dark ground is decided from the two neutrals alone (no isDark flag), so the brief's
+    // Source call, which passes only the five token hexes, reproduces the same inks.
+    const darkGround = lum(g) < lum(k);
+    if (cw === 'spectrum') {
+      const s = E.FIXED_INKS.spectrum[darkGround ? 'dark' : 'light'];
+      ground = g; ink1 = s.ink1; ink2 = s.ink2; deep = s.deep; spark = s.spark;
+      fx = { t1: s.t1, t2: mix(s.ink2, g, 0.38), mute: mix(s.deep, g, 0.4) };
+    } else if (cw === 'tonal') {
+      const toward = darkGround ? '#ffffff' : '#000000';
+      ground = g; ink1 = mix(toward, g, 0.08); ink2 = mix(toward, g, 0.04); deep = mix(toward, g, 0.14); spark = t.primary;
+    } else if (cw === 'broadcast' || cw === 'primaries') {
+      const s = E.FIXED_INKS[cw];
+      ground = s.ground; ink1 = s.ink1; ink2 = s.ink2; deep = s.deep; spark = s.spark;
+      fx = { t1: s.t1, t2: s.t2, mute: s.mute };
+    } else if (cw === 'earth') {
+      const s = E.FIXED_INKS.earth;
+      ground = g; ink1 = t.primary; ink2 = s.ink2; deep = s.deep; spark = s.spark;
+      fx = { t1: s.t1, t2: s.t2, mute: s.mute };
+    } else if (cw === 'brass') {
+      const s = E.FIXED_INKS.brass[darkGround ? 'dark' : 'light'];
+      ground = g; ink1 = s.ink1; ink2 = s.ink2; deep = s.deep; spark = s.spark;
+    } else if (cw === 'safety') {
+      const sc = E.FIXED_INKS.safety[darkGround ? 'dark' : 'light'];
+      ground = g; ink1 = sc; ink2 = k; deep = k; spark = sc;
+    } else if (cw === 'mono') {
       ground = g; ink1 = k; ink2 = mix(k, g, 0.5); spark = k; deep = k;
     } else if (cw === 'duotone') {
       ground = g; ink1 = t.primary; ink2 = mix(t.primary, g, 0.42); deep = mix(t.primary, k, 0.55); spark = deep;
@@ -329,13 +384,15 @@
       ground = g; ink1 = t.primary; ink2 = t.secondary; spark = t.accent; deep = k;
     }
     const tints = !!(opts && opts.tints);
-    const t1 = mix(ink1, ground, 0.38), t2 = mix(ink2, ground, 0.38), mute = mix(deep, ground, 0.4);
+    const t1 = fx ? fx.t1 : mix(ink1, ground, 0.38), t2 = fx ? fx.t2 : mix(ink2, ground, 0.38), mute = fx ? fx.mute : mix(deep, ground, 0.4);
     const pool = tints ? [ink1, ink2, t1, t2] : [ink1, ink2];
     const cand = [ground, ink2, ink1, deep].concat(tints ? [t1, t2] : []);
     const ramp = [];
     cand.forEach(c => { if (!ramp.some(r => r === c)) ramp.push(c); });
     ramp.sort((a, b) => lum(b) - lum(a));
-    return { ground, ink1, ink2, spark, deep, t1, t2, mute, pool, ramp, colorway: cw, tints, dark: lum(ground) < 0.3 };
+    const out = { ground, ink1, ink2, spark, deep, t1, t2, mute, pool, ramp, colorway: cw, tints, dark: lum(ground) < 0.3 };
+    if (E.isFixedColorway(cw)) out.fixed = true;   // only on fixed colourways, so brand-mapped inks keep their exact shape
+    return out;
   };
 
   // Spark budget: spark ink may cover at most `frac` of the area.
