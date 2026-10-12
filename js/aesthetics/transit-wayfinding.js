@@ -303,7 +303,8 @@ registerAesthetic({
   },
   // Deck copy (js/brand-deck.js): three principles, three do / don't lines, each short.
   deck: {
-    coverDisplay: 0.6,
+    coverDisplay: 0.55,
+    coverMin: 50,
     principles: [
       ['Colour means a route', 'Each brand colour owns a line and a bullet.'],
       ['Arrow first, then words', 'Every arrow comes with a plain label.'],

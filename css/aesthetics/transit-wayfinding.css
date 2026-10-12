@@ -274,14 +274,15 @@
 }
 .ab[data-ae="transit-wayfinding"] .ab-row:first-child { border-top: 0; }
 .ab[data-ae="transit-wayfinding"] .ab-row:last-child { border-bottom: 0; }
-.ab[data-ae="transit-wayfinding"] .ab-row-n { display: grid; place-items: center; width: 32px; height: 32px; border-radius: 50%; font-size: 0; color: transparent; }
-.ab[data-ae="transit-wayfinding"] .ab-row-n::before { font: var(--tw-hw, 800) 15px/1 var(--ab-font-h); padding-top: 2px; }
+.ab[data-ae="transit-wayfinding"] .ab-row-n { position: relative; display: block; width: 32px; height: 32px; border-radius: 50%; font-size: 0; color: transparent; }
+.ab[data-ae="transit-wayfinding"] .ab-row-n::before { position: absolute; inset: 0; display: grid; place-items: center; font: var(--tw-hw, 800) 15px/1 var(--ab-font-h); padding-top: 2px; }
 .ab[data-ae="transit-wayfinding"] .ab-row:nth-child(1) .ab-row-n { background: var(--ab-route1); }
 .ab[data-ae="transit-wayfinding"] .ab-row:nth-child(1) .ab-row-n::before { content: var(--tw-l1); color: var(--tw-o1); }
 .ab[data-ae="transit-wayfinding"] .ab-row:nth-child(2) .ab-row-n { background: var(--ab-route2); }
 .ab[data-ae="transit-wayfinding"] .ab-row:nth-child(2) .ab-row-n::before { content: var(--tw-l2); color: var(--tw-o2); }
-.ab[data-ae="transit-wayfinding"] .ab-row:nth-child(3) .ab-row-n { background: var(--ab-route3); border-radius: 3px; width: 25px; height: 25px; margin-left: 4px; transform: rotate(45deg); }
-.ab[data-ae="transit-wayfinding"] .ab-row:nth-child(3) .ab-row-n::before { content: var(--tw-l3); color: var(--tw-o3); transform: rotate(-45deg); }
+.ab[data-ae="transit-wayfinding"] .ab-row:nth-child(3) .ab-row-n { position: relative; isolation: isolate; background: none; }
+.ab[data-ae="transit-wayfinding"] .ab-row:nth-child(3) .ab-row-n::after { content: ""; position: absolute; z-index: -1; left: 4px; top: 4px; width: 24px; height: 24px; border-radius: 3px; background: var(--ab-route3); transform: rotate(45deg); }
+.ab[data-ae="transit-wayfinding"] .ab-row:nth-child(3) .ab-row-n::before { content: var(--tw-l3); color: var(--tw-o3); }
 .ab[data-ae="transit-wayfinding"] .ab-row-name { font-weight: var(--tw-hw, 800); font-size: clamp(16px, 2.1cqw, 20px); letter-spacing: -0.01em; color: var(--tw-white); }
 .ab[data-ae="transit-wayfinding"] .ab-row-status { padding: 0; border-radius: 0; background: none; color: var(--tw-dim); font-size: 13px; font-weight: var(--tw-mw, 600); }
 .ab[data-ae="transit-wayfinding"] .ab-row-status::before { content: "Plat " counter(twr) "  ·  "; white-space: pre; color: var(--tw-white); font-variant-numeric: tabular-nums; }
@@ -367,3 +368,14 @@
 .ab.ab-slide[data-ae="transit-wayfinding"] .ab-deck-cell::before { content: ""; position: absolute; left: 6px; right: 6px; top: 6px; height: 1px; background: var(--tw-white); }
 .ab.ab-slide[data-ae="transit-wayfinding"] .ab-deck-cell .ab-label { color: var(--tw-white); }
 .ab.ab-slide[data-ae="transit-wayfinding"] .ab-deck-uistates { background: var(--ab-sign); border-radius: var(--tw-r); padding: 16px 18px 8px; }
+
+/* deck "In product": the departures board in a half-width column */
+.ab.ab-slide[data-ae="transit-wayfinding"] .ab-deck-prodframe { background: transparent; border: 0; padding: 0; }
+.ab.ab-slide[data-ae="transit-wayfinding"] .ab-deck-prod .ab-row { grid-template-columns: 34px minmax(0, 1fr) 5ch; }
+.ab.ab-slide[data-ae="transit-wayfinding"] .ab-deck-prod .ab-row-n { grid-row: 1 / span 2; align-self: center; }
+.ab.ab-slide[data-ae="transit-wayfinding"] .ab-deck-prod .ab-row-status { grid-column: 2; grid-row: 2; justify-self: start; }
+.ab.ab-slide[data-ae="transit-wayfinding"] .ab-deck-prod .ab-row-pct { grid-column: 3; grid-row: 1 / span 2; align-self: center; }
+.ab.ab-slide[data-ae="transit-wayfinding"] .ab-deck-prod .ab-row-bar { display: none; }
+.ab.ab-slide[data-ae="transit-wayfinding"] .ab-deck-prod .ab-row-name { white-space: normal; font-size: 18px; }
+.ab.ab-slide[data-ae="transit-wayfinding"] .ab-deck-prodtools { padding: 14px 18px; background: var(--ab-sign); border-radius: var(--tw-r); color: var(--tw-white); }
+.ab.ab-slide[data-ae="transit-wayfinding"] .ab-deck-prod .ab-sec > .ab-labelrow .ab-label:last-child:not(:first-child) { color: var(--ab-muted); }

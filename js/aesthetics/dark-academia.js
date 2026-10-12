@@ -82,7 +82,7 @@ function daShelf(ctx, id, rnd) {
   const ini = escapeHtml(ctx.initial || '·');
   const W = 240, base = 168;
   const cloths = [DA.calf, c1, DA.morocco, DA.vellum, c2, DA.navy, c1, DA.tan, DA.bottle, c2, DA.black, DA.calf, c1, DA.oxblood];
-  let books = '', x = 14, i = 0;
+  let books = '', x = 14, i = 0, tIdx = Math.floor(rnd() * DA_TITLES.length);
   const brandAt = 6;
   const shadowsTo = [];
   while (x < W - 30 && i < 14) {
@@ -109,7 +109,7 @@ function daShelf(ctx, id, rnd) {
       // lettering piece between band 1 and 2
       const ly = top + span / (n - 1) * 0.5 - 6;
       const lab = rnd() < 0.5 ? DA.oxblood : DA.black;
-      const title = DA_TITLES[Math.floor(rnd() * DA_TITLES.length)];
+      const title = DA_TITLES[(tIdx++) % DA_TITLES.length];
       if (w >= 13) {
         b += `<rect x="${x + 1.5}" y="${daF(ly)}" width="${w - 3}" height="12" fill="${col === lab ? DA.morocco : lab}"/><rect x="${x + 2.2}" y="${daF(ly + 0.7)}" width="${w - 4.4}" height="10.6" fill="none" stroke="${DA.gilt}" stroke-width=".3"/>`;
         b += `<text x="${daF(x + w / 2)}" y="${daF(ly + 7.8)}" text-anchor="middle" font-family="Georgia, serif" font-size="${Math.min(3.6, (w - 5) / (title.length * 0.62)).toFixed(2)}" letter-spacing=".2" fill="${DA.giltLite}">${title}</text>`;
@@ -118,7 +118,7 @@ function daShelf(ctx, id, rnd) {
       // cloth spine: two gilt rules top and bottom, a small gilt emblem, a vertical title
       b += `<path d="M${x + 1} ${y + 7}H${x + w - 1}M${x + 1} ${y + 9}H${x + w - 1}M${x + 1} ${base - 9}H${x + w - 1}M${x + 1} ${base - 7}H${x + w - 1}" stroke="${gilt}" stroke-width=".4"/>`;
       if (w >= 12 && h > 100) {
-        const title = DA_TITLES[Math.floor(rnd() * DA_TITLES.length)];
+        const title = DA_TITLES[(tIdx++) % DA_TITLES.length];
         b += `<text transform="translate(${daF(x + w / 2 + 1.3)} ${y + 16}) rotate(90)" font-family="Georgia, serif" font-size="3.7" letter-spacing=".9" fill="${vel ? '#6E5230' : DA.giltLite}">${title}</text>`;
       }
       b += `<path d="M${daF(x + w / 2)} ${base - 18}l1.6 2.2-1.6 2.2-1.6-2.2z" fill="${gilt}"/>`;
@@ -244,7 +244,7 @@ registerAesthetic({
   type: { ui: 'body', label: 'body', display: 0.86 },
   highlight: 'custom',
   highlightNote: 'The highlighted (last) word is set in the heading face\'s true italic in the rubric colour, and the headline opens with a raised rubricated initial; the rubric is the accent when it holds 3:1 on paper, else oxblood. Always on a paper leaf, never on the dark wood.',
-  cardFill: '--da-paper',
+  cardFill: '--ab-da-paper',
 
   roles: {
     canvas: {
@@ -286,22 +286,22 @@ registerAesthetic({
     const wax = daWax(t.accent);
     const paper = d ? DA.paper : '#F7F1E2';
     return {
-      '--da-paper': paper,
-      '--da-paper2': d ? '#E6DBC2' : '#EEE5D0',
-      '--da-ink': DA.ink,
-      '--da-pencil': DA.pencil,
-      '--da-gilt': DA.gilt,
-      '--da-label': d ? '#D4B47E' : '#5A4632',
-      '--da-label-dim': d ? '#B39A70' : '#6A5640',
-      '--da-cloth': c1,
-      '--da-cloth2': c2,
-      '--da-rubric': rub,
-      '--da-wax': wax,
-      '--da-wax-hi': t.mix('#ffffff', wax, 0.3),
-      '--da-wax-lo': t.mix('#000000', wax, 0.4),
-      '--da-pen': DA.pen,
-      '--da-lamp': d ? t.mix('#FFCB80', t.canvas, 0.1) : t.mix('#FFF6E0', t.canvas, 0.5),
-      '--da-dark': d ? t.mix('#000000', t.canvas, 0.45) : t.mix('#5A4632', t.canvas, 0.14),
+      '--ab-da-paper': paper,
+      '--ab-da-paper2': d ? '#E6DBC2' : '#EEE5D0',
+      '--ab-da-ink': DA.ink,
+      '--ab-da-pencil': DA.pencil,
+      '--ab-da-gilt': DA.gilt,
+      '--ab-da-label': d ? '#D4B47E' : '#5A4632',
+      '--ab-da-label-dim': d ? '#B39A70' : '#6A5640',
+      '--ab-da-cloth': c1,
+      '--ab-da-cloth2': c2,
+      '--ab-da-rubric': rub,
+      '--ab-da-wax': wax,
+      '--ab-da-wax-hi': t.mix('#ffffff', wax, 0.3),
+      '--ab-da-wax-lo': t.mix('#000000', wax, 0.4),
+      '--ab-da-pen': DA.pen,
+      '--ab-da-lamp': d ? t.mix('#FFCB80', t.canvas, 0.1) : t.mix('#FFF6E0', t.canvas, 0.5),
+      '--ab-da-dark': d ? t.mix('#000000', t.canvas, 0.45) : t.mix('#5A4632', t.canvas, 0.14),
       '--ab-line': d ? 'rgba(176, 141, 87, 0.42)' : 'rgba(90, 70, 50, 0.32)',
       '--ab-muted': d ? '#B39A70' : '#6A5640',
       '--ab-ink': d ? '#E9DFC8' : DA.ink,

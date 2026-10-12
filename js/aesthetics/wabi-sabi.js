@@ -149,6 +149,9 @@ function wsVessel(o) {
     const glazeShape = `M${wsF(cx - R - 8)} ${wsF(top - ry - 6)} L${wsF(cx + R + 8)} ${wsF(top - ry - 6)} L${wsF(cx + R + 8)} ${wsF(gy)}${edge.replace(/^ M/, ' L')} L${wsF(cx - R - 8)} ${wsF(top - ry - 6)} Z`;
     const pool = slMix('#000000', glaze, 0.22);
     s += `<path d="${glazeShape}" fill="${glaze}"/>`;
+    // variegation: the glaze breaks lighter and pools darker in a slow mottle, never a flat fill
+    s += `<path d="${glazeShape}" fill="${pool}" filter="url(#${id}mot)" opacity=".55"/>`;
+    s += `<path d="${glazeShape}" fill="${slMix('#ffffff', glaze, 0.3)}" filter="url(#${id}mot2)" opacity=".35"/>`;
     s += `<path d="${edge}" fill="none" stroke="${pool}" stroke-width="1.6" stroke-linejoin="round" opacity=".85"/>`;
     // second glaze: a pour from the rim over one side
     if (glaze2) {
@@ -195,6 +198,8 @@ function wsVessel(o) {
 
 function wsDefs(id, ink) {
   return `<filter id="${id}blur" x="-30%" y="-200%" width="160%" height="500%"><feGaussianBlur stdDeviation="1.6"/></filter>
+    <filter id="${id}mot" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency=".07 .035" numOctaves="3" seed="5" result="n"/><feColorMatrix in="n" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 2.2 -0.9" result="a"/><feComposite in="SourceGraphic" in2="a" operator="in"/></filter>
+    <filter id="${id}mot2" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency=".5" numOctaves="2" seed="11" result="n"/><feColorMatrix in="n" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 3 -1.9" result="a"/><feComposite in="SourceGraphic" in2="a" operator="in"/></filter>
     <filter id="${id}rough" x="-10%" y="-10%" width="120%" height="120%"><feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="2" seed="7"/><feDisplacementMap in="SourceGraphic" scale="1.4"/></filter>
     <linearGradient id="${id}vol" x1="0" x2="1" y1="0" y2="0"><stop offset="0" stop-color="#ffffff" stop-opacity=".2"/><stop offset=".3" stop-color="#ffffff" stop-opacity="0"/><stop offset=".62" stop-color="#000000" stop-opacity="0"/><stop offset="1" stop-color="#000000" stop-opacity=".26"/></linearGradient>
     <linearGradient id="${id}in" x1="0" x2="1" y1="0" y2="0"><stop offset="0" stop-color="#000000" stop-opacity=".18"/><stop offset=".55" stop-color="#000000" stop-opacity="0"/><stop offset="1" stop-color="#ffffff" stop-opacity=".16"/></linearGradient>
@@ -248,7 +253,7 @@ registerAesthetic({
   type: { ui: 'body', label: 'body', display: 0.62 },
   highlight: 'custom',
   highlightNote: 'The highlighted word keeps the ink colour and carries emphasis dots (one small sesame dot over each letter, as in Japanese bōten) in the seal colour; never a colour fill or a band.',
-  cardFill: '--ws-sheet',
+  cardFill: '--ab-ws-sheet',
 
   roles: {
     canvas: {
@@ -297,16 +302,16 @@ registerAesthetic({
       '--ab-ink': ink,
       '--ab-muted': t.contrast(t.mix(ink, t.canvas, 0.66), t.canvas) >= 4.6 ? t.mix(ink, t.canvas, 0.66) : t.muted,
       '--ab-line': t.alpha(ink, d ? 0.26 : 0.22),
-      '--ws-glaze': glaze,
-      '--ws-on-glaze': paperText,
-      '--ws-glaze-soft': glazeBase,
-      '--ws-glaze2': glaze2,
-      '--ws-seal': seal,
-      '--ws-sheet': sheet,
-      '--ws-clay': WS.clay,
-      '--ws-fired-accent': seal,
-      '--ws-ash': WS.ash,
-      '--ws-blot': ink,
+      '--ab-ws-glaze': glaze,
+      '--ab-ws-on-glaze': paperText,
+      '--ab-ws-glaze-soft': glazeBase,
+      '--ab-ws-glaze2': glaze2,
+      '--ab-ws-seal': seal,
+      '--ab-ws-sheet': sheet,
+      '--ab-ws-clay': WS.clay,
+      '--ab-ws-fired-accent': seal,
+      '--ab-ws-ash': WS.ash,
+      '--ab-ws-blot': ink,
       '--ab-type-pick-w': '400',
     };
   },
@@ -392,5 +397,7 @@ registerAesthetic({
       'Use saturated brand colour at full strength.',
     ],
     coverDisplay: 0.62,
+    coverBand: false,      // emptiness: no pattern band under the cover
+    closingStrip: false,
   },
 });
