@@ -263,12 +263,12 @@ const AESTHETIC_META = {
   'micrographics': {
     family: 'graphic',
     fonts: {
-      heading: { classes: ['neo-grotesk', 'heavy'], picks: ['IBM Plex Sans', 'Archivo Black', 'Inter Tight', 'Geist'] },
+      heading: { classes: ['neo-grotesk', 'heavy'], picks: ['Archivo Black', 'IBM Plex Sans', 'Inter Tight', 'Geist'] },
       body: { classes: ['neo-grotesk'], picks: ['Inter', 'IBM Plex Sans'] },
       mono: { picks: ['Geist Mono', 'Azeret Mono', 'IBM Plex Mono'] },
       avoid: ['serif', 'groovy', 'rounded', 'deco'],
-      why: 'One huge neutral headline against 8px mono microtype is the whole contrast, so both faces must stay precise and stay out of each other\'s way.',
-      pairings: [['IBM Plex Sans', 'IBM Plex Mono'], ['Archivo Black', 'IBM Plex Sans'], ['Inter Tight', 'Inter']],
+      why: 'One heavy headline and a giant glyph against 8px mono microtype is the whole contrast, so the faces must stay precise and stay out of each other\'s way.',
+      pairings: [['Archivo Black', 'IBM Plex Sans'], ['IBM Plex Sans', 'IBM Plex Mono'], ['Inter Tight', 'Inter']],
     },
   },
   'mixed-type': {
@@ -328,12 +328,12 @@ const AESTHETIC_META = {
   'xerox-punk': {
     family: 'print',
     fonts: {
-      heading: { classes: ['condensed', 'heavy', 'slab'], picks: ['Anton', 'Bebas Neue', 'Alfa Slab One'] },
+      heading: { classes: ['condensed', 'heavy', 'slab'], picks: ['Bebas Neue', 'Anton', 'Alfa Slab One'] },
       body: { classes: ['typewriter'], picks: ['Special Elite', 'Courier Prime'] },
       mono: { picks: ['Courier Prime'] },
       avoid: ['soft-serif', 'geometric', 'deco', 'rounded'],
       why: 'A pasted wall wants cut-out headline tiles in blunt condensed and heavy faces, with typewriter text as the scrap of paper underneath.',
-      pairings: [['Anton', 'Special Elite'], ['Bebas Neue', 'Courier Prime'], ['Alfa Slab One', 'Special Elite']],
+      pairings: [['Bebas Neue', 'Special Elite'], ['Anton', 'Courier Prime'], ['Alfa Slab One', 'Special Elite']],
     },
   },
   'acid-graphics': {
@@ -361,12 +361,12 @@ const AESTHETIC_META = {
   'industrial-hazard': {
     family: 'tactile',
     fonts: {
-      heading: { classes: ['condensed'], picks: ['Barlow Condensed', 'Big Shoulders Display', 'Oswald', 'Anton'] },
+      heading: { classes: ['condensed'], picks: ['Big Shoulders Display', 'Barlow Condensed', 'Oswald', 'Anton'] },
       body: { classes: ['neo-grotesk'], picks: ['IBM Plex Sans', 'Inter'] },
       mono: { picks: ['IBM Plex Mono', 'Azeret Mono'] },
       avoid: ['serif', 'rounded', 'groovy', 'deco'],
       why: 'Stamped signage and panel legends are condensed, uppercase and blunt, with a plain grotesk for instructions and mono for serial numbers.',
-      pairings: [['Barlow Condensed', 'IBM Plex Sans'], ['Big Shoulders Display', 'IBM Plex Sans'], ['Oswald', 'Inter']],
+      pairings: [['Big Shoulders Display', 'IBM Plex Sans'], ['Barlow Condensed', 'IBM Plex Sans'], ['Oswald', 'Inter']],
     },
   },
   'radical-memphis': {
@@ -408,7 +408,7 @@ const AESTHETIC_META = {
       body: { classes: ['neo-grotesk'], picks: ['Arimo', 'Inter', 'Public Sans'] },
       mono: { picks: ['Courier Prime', 'IBM Plex Mono'] },
       avoid: ['groovy', 'rounded', 'pixel', 'techno', 'deco'],
-      why: 'Severity comes from removal, so a huge cropped grotesk or a single didone masthead sits over small clinical labels in a neutral sans.',
+      why: 'Severity comes from removal, so a huge cropped grotesk or a single didone masthead sits over small clinical labels in a typewriter mono.',
       pairings: [['Archivo', 'Arimo'], ['Inter Tight', 'Inter'], ['Bodoni Moda', 'Arimo']],
     },
   },
@@ -445,12 +445,12 @@ const AESTHETIC_META = {
   'dark-academia': {
     family: 'print',
     fonts: {
-      heading: { classes: ['old-style', 'didone'], picks: ['IM Fell English', 'Cormorant Garamond', 'Libre Caslon Text', 'Playfair Display'] },
-      body: { classes: ['old-style'], picks: ['EB Garamond', 'Crimson Pro', 'Libre Caslon Text'] },
+      heading: { classes: ['old-style', 'didone'], picks: ['IM Fell English', 'Cormorant Garamond', 'Playfair Display'] },
+      body: { classes: ['old-style'], picks: ['EB Garamond', 'Crimson Pro', 'Spectral'] },
       mono: { picks: ['Courier Prime'] },
       avoid: ['geometric', 'rounded', 'techno', 'pixel', 'groovy', 'wide', 'blackletter'],
       why: 'Old-style book faces with a little printing irregularity make every screen feel like a page from the stacks.',
-      pairings: [['IM Fell English', 'EB Garamond'], ['Cormorant Garamond', 'Crimson Pro'], ['Playfair Display', 'Libre Caslon Text']],
+      pairings: [['IM Fell English', 'EB Garamond'], ['Cormorant Garamond', 'Crimson Pro'], ['Playfair Display', 'Spectral']],
     },
   },
   'mid-century': {
