@@ -15,7 +15,7 @@
 /* the hidden calm: 12 columns under everything */
 .ab[data-ae="acid-graphics"]::before {
   content: ""; position: absolute; inset: 0 var(--ab-pad); z-index: 0; pointer-events: none;
-  background: repeating-linear-gradient(90deg, var(--ac-grid) 0 1px, transparent 1px calc(100% / 12)), linear-gradient(90deg, transparent calc(100% - 1px), var(--ac-grid) 0);
+  background: linear-gradient(90deg, var(--ac-grid) 1px, transparent 1px) 0 0 / calc(100% / 12) 100%, linear-gradient(270deg, var(--ac-grid) 1px, transparent 1px);   /* no calc(): html2canvas read calc(100% - 1px) as 0 and filled the export with the line colour */
 }
 
 /* event strip across the top (board only): the clash colour, mono caps, a fixed slice of the marquee */
@@ -40,8 +40,9 @@
 .ab[data-ae="acid-graphics"] .ab-n::after { content: none; }
 /* section titles get the headline treatment, smaller: stretched tall, with an offset echo */
 .ab[data-ae="acid-graphics"] .ab-labelrow:not(.ab-deck-cover-meta) { position: relative; isolation: isolate; flex-wrap: wrap; align-items: flex-end; padding: 18px 0 8px; }
-.ab[data-ae="acid-graphics"] .ab-labelrow:not(.ab-deck-cover-meta) > .ab-label:first-child { display: inline-block; font: var(--ac-hw, 800) clamp(20px, 2.8cqw, 32px)/1 var(--ab-font-h); letter-spacing: calc(-0.01em * var(--ab-tr, 1)); text-transform: uppercase; color: var(--ab-ink); transform: scaleY(1.7); transform-origin: 0 100%; margin-top: 0.7em; text-shadow: 0.06em 0.06em 0 var(--ab-acid), 0.12em 0.12em 0 var(--ab-clash); }
-.ab[data-ae="acid-graphics"] .ab-labelrow > .ab-label:first-child .ab-n { font-size: 0.5em; vertical-align: 0.5em; text-shadow: none; }
+/* :not(.ab-label ~ .ab-label), not :first-child: the export (html2canvas) inserts the row's ::before as a first child */
+.ab[data-ae="acid-graphics"] .ab-labelrow:not(.ab-deck-cover-meta) > .ab-label:not(.ab-label ~ .ab-label) { display: inline-block; font: var(--ac-hw, 800) clamp(20px, 2.8cqw, 32px)/1 var(--ab-font-h); letter-spacing: calc(-0.01em * var(--ab-tr, 1)); text-transform: uppercase; color: var(--ab-ink); transform: scaleY(1.7); transform-origin: 0 100%; margin-top: 0.7em; text-shadow: 0.06em 0.06em 0 var(--ab-acid), 0.12em 0.12em 0 var(--ab-clash); }
+.ab[data-ae="acid-graphics"] .ab-labelrow > .ab-label:not(.ab-label ~ .ab-label) .ab-n { font-size: 0.5em; vertical-align: 0.5em; text-shadow: none; }
 /* a dense info strip under every section header: catalogue no., BPM, katakana, invented sponsors, a barcode */
 .ab[data-ae="acid-graphics"] .ab-labelrow::after {
   flex: 1 1 100%; order: 3; margin-top: 8px; padding: 3px 96px 3px 0; white-space: nowrap; overflow: hidden; color: var(--ab-muted);
@@ -92,7 +93,9 @@
   position: relative; isolation: isolate; overflow: hidden; display: flex; flex-direction: column; aspect-ratio: 4 / 5; padding: 4.2cqw 4.2cqw 14cqw; background: #050505; color: #f4f4f4;
   border: 2px solid var(--ab-acid); box-shadow: 5px 5px 0 var(--ab-clash); font-family: var(--ac-mono);
 }
-.ab[data-ae="acid-graphics"] .aca-rip { position: absolute; z-index: -1; left: -45%; top: -25%; width: 190%; aspect-ratio: 1; border-radius: 50%; background: repeating-radial-gradient(circle at 50% 50%, var(--ab-acid) 0 2.6cqw, var(--ab-clash) 2.6cqw 5.2cqw); filter: url(#acr); opacity: 0.92; }
+/* rip2 comes first in the DOM with z-index -1 over this one at -2: html2canvas 1.4.1 paints equal negative
+   z-indexes in reverse DOM order, so with both at -1 the export hid the small ripple under the big one */
+.ab[data-ae="acid-graphics"] .aca-rip { position: absolute; z-index: -2; left: -45%; top: -25%; width: 190%; aspect-ratio: 1; border-radius: 50%; background: repeating-radial-gradient(circle at 50% 50%, var(--ab-acid) 0 2.6cqw, var(--ab-clash) 2.6cqw 5.2cqw); filter: url(#acr); opacity: 0.92; }
 .ab[data-ae="acid-graphics"] .aca-top { display: flex; justify-content: space-between; font: 700 max(9px, 2.7cqw)/1 var(--ac-mono); letter-spacing: 0.14em; color: #f4f4f4; }
 .ab[data-ae="acid-graphics"] .aca-top span { padding: 3px 6px; background: #050505; }
 .ab[data-ae="acid-graphics"] .aca-word { margin: auto 0 1.4cqw; line-height: 0.85; overflow: visible; }
@@ -127,7 +130,7 @@
 .ab[data-ae="acid-graphics"] .aca-reg-b { position: absolute; right: 1.2cqw; bottom: 12.4cqw; width: 3cqw; height: 3cqw; }
 .ab[data-ae="acid-graphics"] .aca-reg-b .aca-reg { position: static; width: 100%; height: 100%; }
 .ab[data-ae="acid-graphics"] .aca-no { display: inline-flex; align-items: center; gap: 1.2cqw; }
-.ab[data-ae="acid-graphics"] .aca-bc { display: inline-block; width: 11cqw; height: 2.7cqw; background: repeating-linear-gradient(90deg, #f4f4f4 0 1px, transparent 1px 2px, #f4f4f4 2px 4px, transparent 4px 5px, #f4f4f4 5px 6px, transparent 6px 8px); }
+.ab[data-ae="acid-graphics"] .aca-bc { display: inline-block; width: 11cqw; height: 2.7cqw; background: linear-gradient(90deg, #f4f4f4 0 1px, transparent 1px 2px, #f4f4f4 2px 4px, transparent 4px 5px, #f4f4f4 5px 6px, transparent 6px 8px) 0 0 / 8px 100%; }   /* a tiled plain gradient: html2canvas does not repeat repeating-linear-gradient */
 .ab[data-ae="acid-graphics"] .aca-slogan { width: max-content; max-width: 100%; margin: 0 0 1.8cqw; padding: 0.7cqw 1.4cqw; background: #050505; color: #f4f4f4; font: 700 max(6.5px, 1.9cqw)/1.2 var(--ac-mono); letter-spacing: 0.12em; white-space: nowrap; }
 .ab[data-ae="acid-graphics"] .aca-slogan em { font-style: normal; color: var(--ab-acid); margin-left: 1cqw; }
 .ab[data-ae="acid-graphics"] .aca-spine { position: absolute; right: 0; top: 27cqw; bottom: 17cqw; width: 4cqw; margin: 0; padding: 1.4cqw 0; background: #050505; color: #cfcfcf; writing-mode: vertical-rl; font: 700 max(6px, 1.7cqw)/4cqw var(--ac-mono); letter-spacing: 0.14em; text-align: center; white-space: nowrap; overflow: hidden; }
@@ -283,3 +286,20 @@
 .ab[data-ae="acid-graphics"].ab-slide[data-slide="cover"] .acl-x { transform: none; margin-right: 0; }
 .ab[data-ae="acid-graphics"].ab-slide[data-slide="cover"] .acl-out { flex-basis: 100%; }
 .ab[data-ae="acid-graphics"].ab-slide[data-slide="cover"] .ab-hero-copy { padding-bottom: 14px; }
+
+/* PNG / PDF export (js/brand-deck.js clones the slide into .deck-export-host for html2canvas, which ignores
+   filter). The outline words' drop-shadow echoes become two stroked copies of the text (attr() content):
+   ::before is the near echo, ::after the far one. Both sit at z-index -1 inside their letter; html2canvas
+   paints equal negative z-indexes in reverse DOM order, so ::after lands under ::before and both under the
+   letter, as in the filter. The flyer word's turbulence warp (#acw) still does not export. */
+.deck-export-host .ab[data-ae="acid-graphics"] { --ac-e1: var(--ab-acid); --ac-e2: var(--ab-clash); }
+.deck-export-host .ab[data-ae="acid-graphics"][data-mode="light"] { --ac-e1: var(--ab-clash); --ac-e2: var(--ab-ink); }
+.deck-export-host .ab[data-ae="acid-graphics"] .acl-out { filter: none; }
+.deck-export-host .ab[data-ae="acid-graphics"] .acl-out .ac-l { position: relative; z-index: 0; }
+.deck-export-host .ab[data-ae="acid-graphics"] .acl-out .ac-l::before,
+.deck-export-host .ab[data-ae="acid-graphics"] .acl-out .ac-l::after { content: attr(data-c); position: absolute; z-index: -1; left: 0.05em; top: calc(0.05em / var(--s, 1)); -webkit-text-stroke-color: var(--ac-e1); pointer-events: none; }
+.deck-export-host .ab[data-ae="acid-graphics"] .acl-out .ac-l::after { left: 0.1em; top: calc(0.1em / var(--s, 1)); -webkit-text-stroke-color: var(--ac-e2); }
+.deck-export-host .ab[data-ae="acid-graphics"] .aca-word span { position: relative; z-index: 0; filter: none; }
+.deck-export-host .ab[data-ae="acid-graphics"] .aca-word span::before,
+.deck-export-host .ab[data-ae="acid-graphics"] .aca-word span::after { content: attr(data-w); position: absolute; z-index: -1; left: 0.05em; top: 0.05em; -webkit-text-stroke-color: var(--ab-clash); pointer-events: none; }
+.deck-export-host .ab[data-ae="acid-graphics"] .aca-word span::after { left: 0.1em; top: 0.1em; -webkit-text-stroke-color: #f4f4f4; }

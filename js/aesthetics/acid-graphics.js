@@ -199,7 +199,7 @@ registerAesthetic({
         if (ch === ' ') return '<span class="ac-sp"> </span>';
         const sy = last ? 1.5 : mid ? 1.8 : 1.4 + 0.8 * (0.5 + 0.5 * Math.sin(i * 0.9 + li * 1.7 + 0.6));
         mx = Math.max(mx, sy);
-        return `<span class="ac-l" style="--s:${sy.toFixed(2)}">${e(ch)}</span>`;
+        return `<span class="ac-l" style="--s:${sy.toFixed(2)}" data-c="${e(ch)}">${e(ch)}</span>`;
       }).join('');
       return `<span class="acl${last ? ' acl-out' : mid ? ' acl-x' : ''}" style="--mx:${mx.toFixed(2)}">${letters}</span>`;
     }).join('');
@@ -246,10 +246,10 @@ registerAesthetic({
       </filter>
     </defs></svg>
     <div class="aca" id="${id}">
+      <div class="aca-rip2"></div>
       <div class="aca-rip"></div>
       ${reg}<span class="aca-reg-b">${reg}</span>
       <div class="aca-top"><span>FRI 23.10</span><span class="aca-no">N° 030<i class="aca-bc" aria-hidden="true"></i></span></div>
-      <div class="aca-rip2"></div>
       <p class="aca-word"><span style="font-size:${wsz}cqw" data-w="${word}">${word}</span></p>
       <p class="aca-slogan">DANCE · FEEL · REPEAT™ <em>ダンス ・ リピート</em></p>
       <div class="aca-grid">
