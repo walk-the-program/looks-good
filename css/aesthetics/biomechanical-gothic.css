@@ -14,6 +14,7 @@
   --bg-organ: 54% 46% 50% 50% / 48% 54% 46% 52%;
   --ab-art-ratio: 20 / 8.6;
   --ab-art-ratio-narrow: 4 / 3.1;
+  --bg-ribrim: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 120' preserveAspectRatio='none'%3E%3Cpath d='M3.2 121A46.8 113 0 0 1 96.8 121' fill='none' stroke='%23D8D0BC' stroke-opacity='.3' stroke-width='5' stroke-dasharray='1.6 2.6' vector-effect='non-scaling-stroke'/%3E%3C/svg%3E");
   color: var(--ab-bi-bone);
   border-radius: 10px;
 }
@@ -23,6 +24,7 @@
   background-image: url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 width=%27200%27 height=%27200%27%3E%3Cfilter id=%27n%27%3E%3CfeTurbulence type=%27fractalNoise%27 baseFrequency=%27.7%27 numOctaves=%273%27 stitchTiles=%27stitch%27/%3E%3CfeColorMatrix values=%270 0 0 0 .85 0 0 0 0 .8 0 0 0 0 .7 1.2 0 0 0 -.4%27/%3E%3C/filter%3E%3Crect width=%27200%27 height=%27200%27 filter=%27url(%23n)%27/%3E%3C/svg%3E");
 }
 .ab[data-ae="biomechanical-gothic"][data-mode="light"]::before { opacity: 0.08; }
+.ab[data-ae="biomechanical-gothic"][data-mode="light"] { --bg-ribrim: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 120' preserveAspectRatio='none'%3E%3Cpath d='M3.2 121A46.8 113 0 0 1 96.8 121' fill='none' stroke='%2315130F' stroke-opacity='.28' stroke-width='5' stroke-dasharray='1.6 2.6' vector-effect='non-scaling-stroke'/%3E%3C/svg%3E"); }
 .ab[data-ae="biomechanical-gothic"]::after {
   content: ""; position: absolute; inset: 0; z-index: 0; pointer-events: none;
   background: radial-gradient(ellipse 120% 80% at 50% 30%, transparent 55%, var(--ab-bi-cast-lo) 130%); opacity: 0.55;
@@ -64,7 +66,10 @@
 .ab[data-ae="biomechanical-gothic"] .ab-kicker { display: inline-flex; align-items: center; gap: 12px; font-size: 10.5px; letter-spacing: 0.22em; color: var(--ab-muted); }
 .ab[data-ae="biomechanical-gothic"] .ab-kicker::before { content: ""; width: 34px; height: 1px; background: linear-gradient(90deg, transparent, var(--ab-bi-metal-hi)); }
 .ab[data-ae="biomechanical-gothic"] .ab-headline { font-weight: 400; line-height: 1.02; letter-spacing: calc(-0.012em * var(--ab-tr, 1)); color: var(--ab-bi-bone); text-wrap: balance; }
-.ab[data-ae="biomechanical-gothic"][data-hcls="deco"] .ab-headline, .ab[data-ae="biomechanical-gothic"][data-hcls="didone"] .ab-headline { text-transform: uppercase; letter-spacing: 0.04em; line-height: 1.08; }
+.ab[data-ae="biomechanical-gothic"][data-hcls="didone"] .ab-headline { text-transform: uppercase; letter-spacing: 0.04em; line-height: 1.08; }
+/* inscriptional caps (Marcellus, class deco): carved, flared, evenly tracked */
+.ab[data-ae="biomechanical-gothic"][data-hcls="deco"] .ab-headline { text-transform: uppercase; font-weight: 400; letter-spacing: calc(0.06em * var(--ab-tr, 1)); line-height: 1.1; }
+.ab[data-ae="biomechanical-gothic"][data-hero="centered"][data-hcls="deco"] .ab-hero .ab-headline { font-size: calc(clamp(40px, 8.4cqw, 104px) * 0.8 * var(--ab-hl-scale, 1) * var(--ab-hs, 1) * var(--ab-display, 1)); }
 .ab[data-ae="biomechanical-gothic"] .ab-hl { color: var(--ab-bi-hl); text-shadow: 0 0 16px var(--ab-bi-hl-glow); }
 .ab[data-ae="biomechanical-gothic"] .ab-subcopy { max-width: 31em; margin-left: 0 !important; margin-top: clamp(16px, 2.2cqw, 24px) !important; }
 .ab[data-ae="biomechanical-gothic"] .ab-sub-lead { color: var(--ab-bi-bone); font-weight: 500; }
@@ -82,8 +87,20 @@
 
 /* ---- palette: matte cast discs, flat fill, a tarnished rim ---- */
 .ab[data-ae="biomechanical-gothic"] .ab-chip {
-  width: clamp(48px, 6.2cqw, 62px); height: clamp(48px, 6.2cqw, 62px); border-radius: 50%; margin-bottom: 14px;
-  box-shadow: inset 0 2px 3px rgba(255,255,255,.08), inset 0 -3px 6px rgba(0,0,0,.45), 0 0 0 1px var(--ab-bi-disc-rim);
+  width: clamp(48px, 6.2cqw, 62px); height: clamp(44px, 5.7cqw, 57px); border-radius: var(--bg-organ); margin-bottom: 14px;
+  box-shadow: inset 0 2px 3px rgba(255,255,255,.08), inset 0 -4px 7px rgba(0,0,0,.45), 0 0 0 1px var(--ab-bi-disc-rim);
+}
+/* the brand roles are organ pods: cast bone with the colour only as a glowing core, never a candy marble;
+   canvas and ink stay solid */
+.ab[data-ae="biomechanical-gothic"] .ab-swatch[data-role="primary"] { --bg-core: var(--ab-primary); }
+.ab[data-ae="biomechanical-gothic"] .ab-swatch[data-role="secondary"] { --bg-core: var(--ab-secondary); }
+.ab[data-ae="biomechanical-gothic"] .ab-swatch[data-role="accent"] { --bg-core: var(--ab-accent); }
+.ab[data-ae="biomechanical-gothic"] .ab-swatch:is([data-role="primary"], [data-role="secondary"], [data-role="accent"]) .ab-chip {
+  background:
+    radial-gradient(ellipse 3px 1.6px at 28% 70%, var(--ab-bi-well) 0 70%, transparent 74%),
+    radial-gradient(ellipse 2.4px 1.3px at 72% 32%, var(--ab-bi-well) 0 70%, transparent 74%),
+    radial-gradient(circle at 50% 55%, var(--bg-core) 0 22%, transparent 60%),
+    radial-gradient(ellipse at 36% 28%, var(--ab-bi-cast-hi), var(--ab-bi-cast) 75%) !important;
 }
 .ab[data-ae="biomechanical-gothic"] .ab-sw-role { font: 500 10.5px/1.3 var(--bg-mono); letter-spacing: 0.16em; text-transform: uppercase; }
 .ab[data-ae="biomechanical-gothic"] .ab-sw-job, .ab[data-ae="biomechanical-gothic"] .ab-sw-hex { font: 400 10px/1.4 var(--bg-mono); letter-spacing: 0.04em; }
@@ -114,13 +131,19 @@
 
 /* ---- arch frames: card, panel; a ledger for the list ---- */
 .ab[data-ae="biomechanical-gothic"] .ab-card, .ab[data-ae="biomechanical-gothic"] .ab-panel {
-  position: relative; padding: 58px var(--bg-pad) var(--bg-pad); background: var(--ab-bi-cast); border: 0; border-radius: 120px 120px 0 0 / 64px 64px 0 0;
+  position: relative; padding: 76px var(--bg-pad) var(--bg-pad); background: var(--ab-bi-cast); border: 0; border-radius: 50% 50% 0 0 / 120px 120px 0 0;
   box-shadow: inset 0 0 0 1px var(--ab-bi-rim2), inset 0 0 0 7px var(--ab-canvas), inset 0 0 0 8px var(--ab-bi-rim);
 }
 .ab[data-ae="biomechanical-gothic"] .ab-card::before, .ab[data-ae="biomechanical-gothic"] .ab-panel::before {
   position: absolute; left: 50%; top: 20px; transform: translateX(-50%); font: 500 14px/1 var(--ab-font-b); letter-spacing: 0.12em; color: var(--ab-bi-bone);
 }
 .ab[data-ae="biomechanical-gothic"] .ab-card::before { content: "I"; }
+/* the ribbed rim: a ring of short bone ticks following the rounded cap (an SVG band, not a CSS mask, so it
+   exports) */
+.ab[data-ae="biomechanical-gothic"] .ab-card::after, .ab[data-ae="biomechanical-gothic"] .ab-panel::after {
+  content: ""; position: absolute; left: 0; right: 0; top: 0; height: 120px; pointer-events: none;
+  background: var(--bg-ribrim) 0 0 / 100% 100% no-repeat;
+}
 .ab[data-ae="biomechanical-gothic"] .ab-panel::before { content: "II"; }
 
 /* 01: a short spine of vertebrae, a title, the bone pill */
@@ -232,7 +255,8 @@
   .ab[data-ae="biomechanical-gothic"][data-hero="centered"] .ab-hero-copy { max-width: none; }
   .ab[data-ae="biomechanical-gothic"] .ab-tag { font-size: 8.5px; letter-spacing: 0.1em; }
   .ab[data-ae="biomechanical-gothic"] .ab-tag::before { display: none; }
-  .ab[data-ae="biomechanical-gothic"] .ab-card, .ab[data-ae="biomechanical-gothic"] .ab-panel { border-radius: 84px 84px 0 0 / 48px 48px 0 0; padding-top: 52px; }
+  .ab[data-ae="biomechanical-gothic"] .ab-card, .ab[data-ae="biomechanical-gothic"] .ab-panel { border-radius: 50% 50% 0 0 / 90px 90px 0 0; padding-top: 64px; }
+  .ab[data-ae="biomechanical-gothic"] .ab-card::after, .ab[data-ae="biomechanical-gothic"] .ab-panel::after { height: 90px; }
   .ab[data-ae="biomechanical-gothic"] .ab-row { grid-template-columns: 36px minmax(0, 1fr) 4.5ch; padding: 13px 4px; }
   .ab[data-ae="biomechanical-gothic"] .ab-swatch .ab-chip { margin-bottom: 0; }
   .ab[data-ae="biomechanical-gothic"] .bg-cap { font-size: 7px; letter-spacing: 0.12em; }
@@ -243,3 +267,13 @@
   .ab[data-ae="biomechanical-gothic"] .ab-seg-btn, .ab[data-ae="biomechanical-gothic"] .ab-cta, .ab[data-ae="biomechanical-gothic"] .ab-switch::before, .ab[data-ae="biomechanical-gothic"] .ab-type-apply { transition: none; }
   .ab[data-ae="biomechanical-gothic"] .ab-cta:active, .ab[data-ae="biomechanical-gothic"] .ab-type-apply:active { transform: none; }
 }
+
+/* deck cover: immersive, the nave fills the right half of the slide as one plate between the header rule
+   and the foot; the rods/tubing band and the cover meta row are dropped on the cover */
+.ab[data-ae="biomechanical-gothic"].ab-slide[data-slide="cover"] > .ab-deck-pattern { display: none; }
+.ab[data-ae="biomechanical-gothic"].ab-slide[data-slide="cover"] > .ab-in.ab-slide-in { padding-bottom: 0 !important; }
+.ab[data-ae="biomechanical-gothic"].ab-slide[data-slide="cover"] .ab-deck-cover-meta { display: none; }
+.ab[data-ae="biomechanical-gothic"].ab-slide[data-slide="cover"][data-hero] .ab-deck-cover .ab-hero { grid-template-columns: minmax(0, 1fr); position: static; }
+.ab[data-ae="biomechanical-gothic"].ab-slide[data-slide="cover"][data-hero] .ab-deck-cover .ab-hero-copy { position: relative; z-index: 2; max-width: 44%; }
+.ab[data-ae="biomechanical-gothic"].ab-slide[data-slide="cover"] .ab-hero .ab-art { position: absolute; z-index: 1; right: 0; top: 104px; bottom: 58px; height: auto; width: 50% !important; max-width: none !important; aspect-ratio: auto; margin: 0; border-right: 0; border-radius: 3px 0 0 3px; }
+

@@ -13,7 +13,7 @@
 
 .ab[data-ae="blob-tracking"] {
   border-radius: 4px;
-  --ab-art-ratio: 200 / 92; --ab-art-ratio-narrow: 200 / 92;
+  --ab-art-ratio: 2.4 / 1; --ab-art-ratio-narrow: 4 / 3;
   --bt-tab-bg: var(--ab-ink); --bt-tab-fg: var(--ab-canvas);
   --bt-grain: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n' x='0' y='0' width='100%25' height='100%25'><feTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='2' stitchTiles='stitch' seed='3'/><feColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 1.6 -.62'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
   --bt-grain-op: 0.25;
@@ -30,9 +30,6 @@
 
 /* ---- shared detection vocabulary ---- */
 /* solid label tab: mono, tight, always a filled ink plane (the only filled ink plane) */
-.ab[data-ae="blob-tracking"] .ab-type-col::before,
-.ab[data-ae="blob-tracking"] .ab-card::after,
-.ab[data-ae="blob-tracking"] .ab-panel::after,
 .ab[data-ae="blob-tracking"] .ab-list::after,
 .ab[data-ae="blob-tracking"] .ab-headline::after,
 .ab[data-ae="blob-tracking"] .ab-hl::after,
@@ -42,8 +39,8 @@
   font-family: ui-monospace, "SF Mono", Menlo, monospace;
   font-size: 9.5px; font-weight: 700; line-height: 15px; letter-spacing: 0.05em; text-transform: uppercase; white-space: nowrap; pointer-events: none;
 }
-/* the tick frame: 1.5px corner brackets, drawn just outside a box */
-.ab[data-ae="blob-tracking"] .ab-card::before, .ab[data-ae="blob-tracking"] .ab-panel::before, .ab[data-ae="blob-tracking"] .ab-list::before {
+/* the tick frame: 1.5px corner brackets, drawn just outside a box (tracked things only: the list, controls, the hero) */
+.ab[data-ae="blob-tracking"] .ab-list::before {
   content: ""; position: absolute; inset: -4px; z-index: 2; pointer-events: none; background: var(--ab-ticks); transition: inset 0.14s;
 }
 
@@ -96,23 +93,35 @@
 .ab[data-ae="blob-tracking"] .ab-sub-lead { color: var(--ab-ink); }
 .ab[data-ae="blob-tracking"] .ab-sub-rest { color: var(--ab-muted); opacity: 1; }
 
-/* art: the footage frame */
-.ab[data-ae="blob-tracking"] .ab-art { border: 1px solid var(--ab-box-soft); background: var(--ab-plate); overflow: hidden; }
-.ab[data-ae="blob-tracking"] .bta { position: absolute; inset: 0; font-family: ui-monospace, "SF Mono", Menlo, monospace; color: var(--ab-lit); }
+/* art: the footage plate, full-bleed (it escapes the board padding) */
+.ab[data-ae="blob-tracking"] .ab-art { border-top: 1px solid var(--ab-box-soft); border-bottom: 1px solid var(--ab-box-soft); background: var(--ab-plate); overflow: hidden; }
+.ab[data-ae="blob-tracking"]:not(.ab-slide)[data-hero="centered"] .ab-art { width: calc(100% + 2 * var(--ab-pad)); margin-inline: calc(-1 * var(--ab-pad)); justify-self: stretch; }
+.ab[data-ae="blob-tracking"] .bta { position: absolute; inset: 0; overflow: hidden; font-family: ui-monospace, "SF Mono", Menlo, monospace; color: var(--ab-lit); }
+/* the plate is always 2.4:1; a taller box (phone 4:3, the deck stage) crops its sides */
+.ab[data-ae="blob-tracking"] .bta-plate { position: absolute; top: 0; bottom: 0; left: 50%; height: 100%; width: auto; min-width: 100%; aspect-ratio: 2.4 / 1; transform: translateX(-50%); }
 .ab[data-ae="blob-tracking"] .bta-fx { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
 .ab[data-ae="blob-tracking"] .bta-tab {
-  position: absolute; transform: translateY(-100%); padding: 0 0.45em; background: var(--ab-lit); color: var(--ab-plate);
-  font-size: clamp(7px, 0.95cqw, 10px); font-weight: 700; line-height: 1.6; letter-spacing: 0.04em; white-space: nowrap;
+  position: absolute; transform: translateY(-100%); padding: 0 0.4em; background: var(--ab-lit); color: var(--ab-plate);
+  font-size: 8px; font-weight: 700; line-height: 1.55; letter-spacing: 0.03em; white-space: nowrap;
 }
-.ab[data-ae="blob-tracking"] .bta-tab i { font-weight: 500; }
-.ab[data-ae="blob-tracking"] .bta-tab.is-lock { background: var(--ab-lock); }
-.ab[data-ae="blob-tracking"] .bta-xy { position: absolute; padding-top: 0.5em; margin-left: 1px; font-size: clamp(6.5px, 0.85cqw, 9px); letter-spacing: 0.06em; white-space: pre; color: var(--ab-lock); font-weight: 600; }
-.ab[data-ae="blob-tracking"] .bta-hud { position: absolute; font-size: clamp(6.5px, 0.9cqw, 9.5px); font-weight: 600; letter-spacing: 0.12em; white-space: nowrap; text-shadow: 0 0 3px var(--ab-plate), 0 0 3px var(--ab-plate); }
-.ab[data-ae="blob-tracking"] .bta-tl { left: 4.2%; top: 8%; }
-.ab[data-ae="blob-tracking"] .bta-tr { right: 4.2%; top: 8%; }
-.ab[data-ae="blob-tracking"] .bta-bl { left: 4.2%; bottom: 9.5%; }
-.ab[data-ae="blob-tracking"] .bta-br { right: 4.2%; bottom: 9.5%; }
+.ab[data-ae="blob-tracking"] .bta-tab i { font-style: normal; font-weight: 500; }
+.ab[data-ae="blob-tracking"] .bta-tab.is-in { transform: translate(1px, 1px); }
+.ab[data-ae="blob-tracking"] .bta-tab.is-lock { background: var(--ab-lock); color: var(--ab-plate); font-size: 9px; }
+.ab[data-ae="blob-tracking"] .bta-tab.is-grp { background: var(--ab-plate); color: var(--ab-lit); box-shadow: inset 0 0 0 1px var(--ab-lit); }
+.ab[data-ae="blob-tracking"] .bta-xy { position: absolute; padding-top: 0.6em; margin-left: 1px; font-size: 8.5px; letter-spacing: 0.06em; white-space: pre; color: var(--ab-lock); font-weight: 700; text-shadow: 0 0 2px var(--ab-plate), 0 0 2px var(--ab-plate); }
+.ab[data-ae="blob-tracking"] .bta-hud { position: absolute; z-index: 2; font-size: clamp(7px, 0.82cqw, 9.5px); font-weight: 600; letter-spacing: 0.12em; white-space: nowrap; padding: 1px 4px; background: var(--ab-plate); }
+.ab[data-ae="blob-tracking"] .bta-tl { left: clamp(14px, 2.4cqw, 34px); top: clamp(12px, 2.2cqw, 26px); }
+.ab[data-ae="blob-tracking"] .bta-tr { right: clamp(14px, 2.4cqw, 34px); top: clamp(12px, 2.2cqw, 26px); }
+.ab[data-ae="blob-tracking"] .bta-bl { left: clamp(14px, 2.4cqw, 34px); bottom: clamp(12px, 2.2cqw, 26px); }
+.ab[data-ae="blob-tracking"] .bta-br { right: clamp(14px, 2.4cqw, 34px); bottom: clamp(12px, 2.2cqw, 26px); }
+.ab[data-ae="blob-tracking"] .bta-corner { position: absolute; inset: clamp(6px, 1cqw, 14px); z-index: 1; pointer-events: none; background: var(--ab-ticks); opacity: 0.85; }
 .ab[data-ae="blob-tracking"] .bta-rec { display: inline-block; width: 0.75em; height: 0.75em; margin-right: 0.7em; border-radius: 50%; background: var(--ab-accent); vertical-align: -0.04em; }
+@container (max-width: 600px) {
+  .ab[data-ae="blob-tracking"] .bta-tab.is-sm, .ab[data-ae="blob-tracking"] .bta-xy { display: none; }
+  .ab[data-ae="blob-tracking"] .bta-tab { font-size: 7px; }
+  .ab[data-ae="blob-tracking"] .bta-tab i { display: none; }
+  .ab[data-ae="blob-tracking"] .bta-tr, .ab[data-ae="blob-tracking"] .bta-bl { display: none; }
+}
 
 /* ---- labels, palette ---- */
 .ab[data-ae="blob-tracking"] .ab-label { letter-spacing: 0.18em; }
@@ -122,17 +131,13 @@
 .ab[data-ae="blob-tracking"] .ab-swatches { counter-reset: btsw; }
 .ab[data-ae="blob-tracking"] .ab-swatch { counter-increment: btsw; }
 .ab[data-ae="blob-tracking"] .ab-chip { position: relative; border-radius: 0; margin-bottom: 14px; box-shadow: inset 0 0 0 1px var(--ab-box-soft); }
-.ab[data-ae="blob-tracking"] .ab-chip::after { content: ""; position: absolute; inset: -4px; background: var(--ab-ticks-soft); pointer-events: none; }
 .ab[data-ae="blob-tracking"] .ab-sw-role { font-size: 11.5px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; }
-.ab[data-ae="blob-tracking"] .ab-sw-role::before { content: "ID " counter(btsw, decimal-leading-zero) " · "; color: var(--ab-muted); font-weight: 500; }
 .ab[data-ae="blob-tracking"] .ab-sw-hex { color: var(--ab-ink); }
 .ab[data-ae="blob-tracking"] .ab-sw-job { color: var(--ab-muted); opacity: 1; }
 
 /* ---- type recommendations: detected regions with edge tabs ---- */
 .ab[data-ae="blob-tracking"] .ab-type-grid { counter-reset: bttc; gap: clamp(16px, 2.6cqw, 32px); padding-top: 8px; }
-.ab[data-ae="blob-tracking"] .ab-type-col { position: relative; counter-increment: bttc; padding: 24px 18px 14px; z-index: 1; border: 1px solid var(--ab-box-soft); background: var(--ab-flat); }
-.ab[data-ae="blob-tracking"] .ab-type-col::before { content: "ID " counter(bttc, decimal-leading-zero) " · 0.9" counter(bttc); left: 12px; top: -8px; }
-.ab[data-ae="blob-tracking"] .ab-type-col::after { content: ""; position: absolute; inset: -4px; background: var(--ab-ticks-soft); pointer-events: none; }
+.ab[data-ae="blob-tracking"] .ab-type-col { position: relative; counter-increment: bttc; padding: 18px 18px 14px; z-index: 1; border: 1px solid var(--ab-box-soft); background: var(--ab-flat); }
 .ab[data-ae="blob-tracking"] .ab-type-class, .ab[data-ae="blob-tracking"] .ab-type-why { color: var(--ab-muted); opacity: 1; }
 .ab[data-ae="blob-tracking"] .ab-type-role { color: var(--ab-ink); letter-spacing: 0.18em; }
 .ab[data-ae="blob-tracking"] .ab-type-pick:first-child { letter-spacing: calc(-0.02em * var(--ab-tr, 1)); }
@@ -160,9 +165,7 @@
   position: relative; z-index: 1; border: 1px solid var(--ab-box-soft); border-radius: 0; background: var(--ab-flat);
 }
 .ab[data-ae="blob-tracking"] .ab-card { padding: clamp(24px, 3cqw, 32px) clamp(18px, 2.8cqw, 26px) clamp(20px, 3cqw, 28px); }
-.ab[data-ae="blob-tracking"] .ab-card::after { content: "ID 02 · 0.91"; right: 14px; top: -8px; }
 .ab[data-ae="blob-tracking"] .ab-panel { padding: clamp(24px, 3cqw, 32px) clamp(18px, 2.8cqw, 24px) clamp(18px, 2.8cqw, 24px); }
-.ab[data-ae="blob-tracking"] .ab-panel::after { content: "ID 04 · 0.88"; right: 14px; top: -8px; }
 .ab[data-ae="blob-tracking"] .ab-seg { gap: 0; padding: 0; border-radius: 0; background: none; box-shadow: inset 0 -1px 0 var(--ab-box-hair); }
 .ab[data-ae="blob-tracking"] .ab-seg-btn {
   position: relative; border-radius: 0; min-height: 38px; font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase;
@@ -263,8 +266,6 @@
   .ab[data-ae="blob-tracking"] .ab-headline::before { inset: -12px -10px -32px -10px; }
   .ab[data-ae="blob-tracking"] .ab-headline::after { left: -10px; top: -12px; }
   .ab[data-ae="blob-tracking"] .ab-subcopy { grid-column: 1; margin-top: 52px !important; }
-  .ab[data-ae="blob-tracking"] .bta-tab i, .ab[data-ae="blob-tracking"] .bta-xy { display: none; }
-  .ab[data-ae="blob-tracking"] .bta-tr, .ab[data-ae="blob-tracking"] .bta-bl { display: none; }
   .ab[data-ae="blob-tracking"] .ab-tag { font-size: 9px; padding: 3px 6px; letter-spacing: 0.06em; }
   .ab[data-ae="blob-tracking"] .ab-row { padding: 12px 14px; grid-template-columns: 5.6ch minmax(0, 1fr) 4.5ch; }
   .ab[data-ae="blob-tracking"] .ab-row-n { grid-row: 1 / span 2; align-self: start; }
@@ -272,10 +273,23 @@
   .ab[data-ae="blob-tracking"] .ab-states[data-kind="button"] { gap: 10px; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .ab[data-ae="blob-tracking"] .ab-switch::before, .ab[data-ae="blob-tracking"] .ab-cta::before, .ab[data-ae="blob-tracking"] .ab-card::before, .ab[data-ae="blob-tracking"] .ab-panel::before, .ab[data-ae="blob-tracking"] .ab-list::before { transition: none; }
+  .ab[data-ae="blob-tracking"] .ab-switch::before, .ab[data-ae="blob-tracking"] .ab-cta::before, .ab[data-ae="blob-tracking"] .ab-list::before { transition: none; }
 }
 
 /* ----- deck slides: the swatch tick frames reach 4px past the right edge of the
    colour slide; a gutter keeps them inside it. Deck-scoped; the board is unchanged. ----- */
 .ab[data-ae="blob-tracking"].ab-slide .ab-deck-color { padding-right: 6px; }
 .ab[data-ae="blob-tracking"].ab-slide .ab-headline::before { right: 0; }
+
+/* principles (and closing) slides: the headline's ID tab sits above the box; keep the kicker clear of it */
+.ab[data-ae="blob-tracking"].ab-slide .ab-kicker, .ab[data-ae="blob-tracking"].ab-slide .ab-deck-kick { margin-bottom: 34px !important; }
+/* cover band and closing strip: a crop of the hero plate, not a pattern (a coarse copy of the same footage and boxes) */
+.ab[data-ae="blob-tracking"].ab-slide .pt-deck-band, .ab[data-ae="blob-tracking"].ab-slide .pt-deck-strip { background: var(--ab-plate) var(--bt-band) center / cover no-repeat; }
+.ab[data-ae="blob-tracking"].ab-slide .pt-deck-band { border-top: 1px solid var(--ab-box-soft); }
+.ab[data-ae="blob-tracking"].ab-slide .pt-deck-band img, .ab[data-ae="blob-tracking"].ab-slide .pt-deck-strip img { display: none; }
+/* material slide: the plate runs the full stage height so the box density reads */
+.ab[data-ae="blob-tracking"].ab-slide[data-slide="material"] .ab-deck-stage .ab-art { inset: 0; width: 100%; height: 100%; aspect-ratio: auto; border: 1px solid var(--ab-box-soft); }
+/* phone: the board-wide display cut (0.7) would leave a one-line caption; the headline gets its size back */
+@container ab (max-width: 600px) {
+  .ab[data-ae="blob-tracking"]:not(.ab-slide) .ab-hero-copy { --ab-display: 1; }
+}

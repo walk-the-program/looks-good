@@ -35,7 +35,7 @@ const FONTS = [
   { name: 'Spectral', css: '"Spectral", Georgia, serif', category: 'serif', weights: '400;600', ital: '400', cls: 'old-style' },
   { name: 'Literata', css: '"Literata", Georgia, serif', category: 'serif', weights: '400;600', ital: '400', cls: 'text-serif' },
   { name: 'Gloock', css: '"Gloock", Georgia, serif', category: 'serif', weights: '400', cls: 'soft-serif' },
-  { name: 'Fraunces', css: '"Fraunces", Georgia, serif', category: 'serif', weights: '400;600', ital: '400', cls: 'soft-serif' },
+  { name: 'Fraunces', css: '"Fraunces", Georgia, serif', category: 'serif', weights: '400;600;900', ital: '400', cls: 'soft-serif' },
 
   /* ---- Sans-serif ---- */
   { name: 'Inter', css: '"Inter", -apple-system, sans-serif', category: 'sans', weights: '400;500;700', cls: 'neo-grotesk' },
@@ -85,7 +85,7 @@ const FONTS = [
   { name: 'Cinzel', css: '"Cinzel", Georgia, serif', category: 'display', weights: '400;700', cls: 'deco' },
   { name: 'Marcellus', css: '"Marcellus", Georgia, serif', category: 'display', weights: '400', cls: 'deco' },
   { name: 'Yeseva One', css: '"Yeseva One", Georgia, serif', category: 'display', weights: '400', cls: 'didone' },
-  { name: 'Unbounded', css: '"Unbounded", -apple-system, sans-serif', category: 'display', weights: '400;600', cls: 'wide' },
+  { name: 'Unbounded', css: '"Unbounded", -apple-system, sans-serif', category: 'display', weights: '200;400;600', cls: 'wide' },
   { name: 'Michroma', css: '"Michroma", -apple-system, sans-serif', category: 'display', weights: '400', cls: 'wide' },
   { name: 'Orbitron', css: '"Orbitron", -apple-system, sans-serif', category: 'display', weights: '400;600;800', cls: 'techno' },
   { name: 'Chakra Petch', css: '"Chakra Petch", -apple-system, sans-serif', category: 'display', weights: '400;500;700', cls: 'techno' },
@@ -99,6 +99,7 @@ const FONTS = [
   { name: 'Pixelify Sans', css: '"Pixelify Sans", -apple-system, sans-serif', category: 'display', weights: '400;600', cls: 'pixel' },
   { name: 'Grenze Gotisch', css: '"Grenze Gotisch", Georgia, serif', category: 'display', weights: '400;700', cls: 'blackletter' },
   { name: 'Pirata One', css: '"Pirata One", Georgia, serif', category: 'display', weights: '400', cls: 'blackletter' },
+  { name: 'Texturina', css: '"Texturina", Georgia, serif', category: 'display', weights: '400;700', cls: 'blackletter' },
   { name: 'Cinzel Decorative', css: '"Cinzel Decorative", Georgia, serif', category: 'display', weights: '400;700', cls: 'deco' },
   { name: 'Barlow Condensed', css: '"Barlow Condensed", -apple-system, sans-serif', category: 'display', weights: '400;600;800', cls: 'condensed' },
   { name: 'Permanent Marker', css: '"Permanent Marker", "Marker Felt", cursive', category: 'display', weights: '400', cls: 'groovy' },
@@ -120,6 +121,7 @@ const FONTS = [
   { name: 'Geist Mono', css: '"Geist Mono", monospace', category: 'mono', weights: '400;600', cls: 'mono' },
   { name: 'Azeret Mono', css: '"Azeret Mono", monospace', category: 'mono', weights: '400;600', cls: 'mono' },
   { name: 'VT323', css: '"VT323", monospace', category: 'mono', weights: '400', cls: 'pixel' },
+  { name: 'Doto', css: '"Doto", monospace', category: 'mono', weights: '400;700;900', cls: 'pixel' },
   { name: 'Special Elite', css: '"Special Elite", "Courier New", monospace', category: 'mono', weights: '400', cls: 'typewriter' },
   { name: 'Courier Prime', css: '"Courier Prime", "Courier New", monospace', category: 'mono', weights: '400;700', ital: '400;700', cls: 'typewriter' },
   { name: 'Share Tech Mono', css: '"Share Tech Mono", monospace', category: 'mono', weights: '400', cls: 'mono' },

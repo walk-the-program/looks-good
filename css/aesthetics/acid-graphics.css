@@ -2,10 +2,10 @@
    30 Acid Graphics — toxic, warped, loud. Every selector is scoped under
    .ab[data-ae="acid-graphics"]. Vibrating colour pairs (the acid = client primary pushed
    to full chroma, --ab-acid; its clash = hue +165deg at equal luminance, --ab-clash),
-   a headline squeezed tall (wide face, scaleX), op-art ripple, ticket tabs, an event
+   a headline stretched tall at the face's natural width (scaleY, with the last word's letters growing taller one by one), op-art ripple, ticket tabs, an event
    strip, dense mono info, over a hidden 12-column grid. Vars from tokens(): --ab-acid,
    --ab-clash, --ab-on-acid, --ab-on-clash, --ac-sx (headline squeeze), --ac-fg,
-   --ac-fg2, --ac-on-canvas, --ac-grid, --ac-brand. The flyer in the hero is HTML built
+   --ac-fg2, --ac-on-canvas, --ac-grid, --ac-brand, --ac-fs (type-size factor for the unsqueezed face), --ac-sy (stretch), --ac-spark. The flyer in the hero is HTML built
    by art() in js/aesthetics/acid-graphics.js (filters #acw and #acr). Hooks: hero
    'split', palette 'strips', highlight 'custom', states 'button', label face = mono.
 ------------------------------------------------------------------------ */
@@ -32,7 +32,7 @@
 .ab[data-ae="acid-graphics"] .ab-tag { padding: 3px 9px; background: var(--ab-ink); color: var(--ab-canvas); font-size: 10px; font-weight: 700; letter-spacing: 0.12em; }
 .ab[data-ae="acid-graphics"] .ab-tag b { color: inherit; font-weight: 700; }
 .ab[data-ae="acid-graphics"] .ab-rule { height: 14px; background: none; overflow: hidden; }
-.ab[data-ae="acid-graphics"] .ab-rule::before { content: "✱ ✱ ✱ ✱ ✱ ✱ ✱ ✱ ✱ ✱ ✱ ✱ ✱ ✱ ✱ ✱ ✱ ✱ ✱ ✱ ✱ ✱ ✱ ✱ ✱ ✱ ✱ ✱ ✱ ✱ ✱ ✱ ✱ ✱ ✱ ✱ ✱ ✱ ✱ ✱ ✱ ✱ ✱ ✱"; display: block; white-space: nowrap; font: 700 9px/14px var(--ac-mono); letter-spacing: 0.9em; color: var(--ab-muted); }
+.ab[data-ae="acid-graphics"] .ab-rule::before { content: "✱ ACG-030 ✱ ™ ✱ 1-800-NO-SLEEP ✱ ® ✱ CAT.NO 0230 ✱ NO RE-ENTRY ✱ ™ ✱ ACG-030 ✱ ® ✱ 1-800-NO-SLEEP ✱ ™ ✱ ACG-030 ✱ ® ✱ CAT.NO 0230 ✱ NO RE-ENTRY ✱ ™ ✱ ACG-030 ✱ ® ✱ 1-800-NO-SLEEP ✱ ™ ✱ ACG-030 ✱ ® ✱ CAT.NO 0230 ✱ NO RE-ENTRY"; display: block; white-space: nowrap; font: 700 7.5px/14px var(--ac-mono); letter-spacing: 0.22em; color: var(--ab-muted); }
 
 .ab[data-ae="acid-graphics"] .ab-label { color: var(--ab-ink); font-size: 11px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; }
 .ab[data-ae="acid-graphics"] .ab-label:last-child:not(:first-child) { color: var(--ab-muted); font-weight: 400; }
@@ -44,11 +44,13 @@
 .ab[data-ae="acid-graphics"][data-mode="light"] .ab-hero { margin: 0 calc(var(--ab-pad) * -1); padding-left: var(--ab-pad); padding-right: var(--ab-pad); background: var(--ab-acid); }
 .ab[data-ae="acid-graphics"] .ab-kicker { display: inline-block; margin-bottom: 18px !important; padding: 3px 9px; background: var(--ab-clash); color: var(--ab-on-clash); font-size: 10.5px; font-weight: 700; letter-spacing: 0.14em; }
 .ab[data-ae="acid-graphics"] .ab-headline {
-  width: calc(100% / var(--ac-sx, 0.8)); transform: scaleX(var(--ac-sx, 0.8)); transform-origin: 0 0; margin-bottom: 0;
-  color: var(--ac-fg); font-weight: var(--ac-hw, 800); text-transform: uppercase; letter-spacing: calc(-0.02em * var(--ab-tr, 1)); line-height: 0.88; text-wrap: balance; overflow-wrap: normal;
-  font-size: calc(clamp(40px, 12.4cqw, 148px) * var(--ab-hl-scale, 1) * var(--ab-hs, 1) * var(--ab-display, 1));
+  transform: scaleY(var(--ac-sy, 1.2)); transform-origin: 0 0; margin-bottom: 1.35em;
+  color: var(--ac-fg); font-weight: var(--ac-hw, 800); text-transform: uppercase; letter-spacing: calc(-0.03em * var(--ab-tr, 1)); line-height: 0.9; text-wrap: balance; overflow-wrap: normal;
+  font-size: calc(clamp(40px, 12.4cqw, 148px) * var(--ac-fs, 0.84) * var(--ab-hl-scale, 1) * var(--ab-hs, 1) * var(--ab-display, 1));
 }
-.ab[data-ae="acid-graphics"] .ab-hl { display: inline-block; color: transparent; background: none; padding: 0; margin: 0; -webkit-text-stroke: 2px var(--ac-fg2); filter: drop-shadow(0.06em 0.05em 0 var(--ab-acid)); }
+/* the stretch ramp: each letter of the last word grows taller than the one before, from the baseline; outlines kiss */
+.ab[data-ae="acid-graphics"] .ab-hl { display: inline-block; padding-top: 0.34em; letter-spacing: -0.06em; color: transparent; background: none; margin: 0; -webkit-text-stroke: 2px var(--ac-fg2); filter: drop-shadow(0.06em 0.05em 0 var(--ab-acid)); }
+.ab[data-ae="acid-graphics"] .ac-l { display: inline-block; transform-origin: 50% 100%; transform: scaleY(calc(1 + var(--i, 0) * var(--st, 0.1))); }
 .ab[data-ae="acid-graphics"][data-mode="light"] .ab-hl { filter: drop-shadow(0.06em 0.05em 0 var(--ab-clash)); }
 .ab[data-ae="acid-graphics"] .ab-subcopy { max-width: 28em; margin-top: 20px !important; color: var(--ab-muted); }
 .ab[data-ae="acid-graphics"][data-mode="light"] .ab-subcopy, .ab[data-ae="acid-graphics"][data-mode="light"] .ab-sub-rest { color: var(--ab-ink); }
@@ -61,26 +63,37 @@
   position: relative; isolation: isolate; overflow: hidden; display: flex; flex-direction: column; aspect-ratio: 4 / 5; padding: 4.2cqw 4.2cqw 14cqw; background: #050505; color: #f4f4f4;
   border: 2px solid var(--ab-acid); box-shadow: 5px 5px 0 var(--ab-clash); font-family: var(--ac-mono);
 }
-.ab[data-ae="acid-graphics"] .aca-rip { position: absolute; z-index: -1; left: -30%; top: -8%; width: 160%; aspect-ratio: 1; border-radius: 50%; background: repeating-radial-gradient(circle at 50% 50%, var(--ab-acid) 0 2.6cqw, var(--ab-clash) 2.6cqw 5.2cqw); filter: url(#acr); opacity: 0.92; -webkit-mask: radial-gradient(circle, #000 28%, transparent 60%); mask: radial-gradient(circle, #000 28%, transparent 60%); }
+.ab[data-ae="acid-graphics"] .aca-rip { position: absolute; z-index: -1; left: -45%; top: -25%; width: 190%; aspect-ratio: 1; border-radius: 50%; background: repeating-radial-gradient(circle at 50% 50%, var(--ab-acid) 0 2.6cqw, var(--ab-clash) 2.6cqw 5.2cqw); filter: url(#acr); opacity: 0.92; }
 .ab[data-ae="acid-graphics"] .aca-top { display: flex; justify-content: space-between; font: 700 max(9px, 2.7cqw)/1 var(--ac-mono); letter-spacing: 0.14em; color: #f4f4f4; }
 .ab[data-ae="acid-graphics"] .aca-top span { padding: 3px 6px; background: #050505; }
-.ab[data-ae="acid-graphics"] .aca-word { margin: auto 0 4cqw; line-height: 0.85; overflow: visible; }
+.ab[data-ae="acid-graphics"] .aca-word { margin: auto 0 1.4cqw; line-height: 0.85; overflow: visible; }
 .ab[data-ae="acid-graphics"] .aca-word span {
   display: block; width: max-content; font: var(--ac-hw, 800) 22cqw/0.9 var(--ab-font-h); text-transform: uppercase; letter-spacing: -0.02em; transform: scaleY(1.45); transform-origin: 0 100%; margin-bottom: 4cqw;
-  background: linear-gradient(180deg, #F4F7FA 0 46%, #6C7480 48%, #C9CED6 52% 72%, #5A6068); -webkit-background-clip: text; background-clip: text; color: transparent; filter: url(#acw);
+  background: linear-gradient(180deg, #fff 0 14%, #c9d0d8 26%, #3a3f47 47%, #0b0c0e 50%, #f4f7fa 53%, var(--ab-clash) 66%, #e9edf1 80%, var(--ab-acid) 94%); -webkit-background-clip: text; background-clip: text; color: transparent;
+  -webkit-text-stroke: 1px rgba(255, 255, 255, 0.85); filter: url(#acw) drop-shadow(0 0 0.08em var(--ab-acid)) drop-shadow(0.05em 0.05em 0 var(--ab-clash));
 }
-.ab[data-ae="acid-graphics"] .aca-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.6cqw; }
+.ab[data-ae="acid-graphics"] .aca-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.6cqw; margin-right: 3cqw; }
 .ab[data-ae="acid-graphics"] .aca-grid div { padding: 1.8cqw 2cqw; background: #050505; font: 600 max(8.5px, 2.5cqw)/1.3 var(--ac-mono); letter-spacing: 0.04em; color: #f4f4f4; border-left: 3px solid var(--ab-acid); }
 .ab[data-ae="acid-graphics"] .aca-grid div:nth-child(even) { border-left-color: var(--ab-clash); }
 .ab[data-ae="acid-graphics"] .aca-grid b { display: block; margin-bottom: 1px; font-weight: 700; font-size: max(8px, 2.2cqw); letter-spacing: 0.18em; color: #a8a8a8; }
 .ab[data-ae="acid-graphics"] .aca-ticket {
-  position: absolute; right: -1.4cqw; top: 14cqw; display: flex; align-items: center; gap: 1.6cqw; padding: 1.8cqw 5cqw 1.8cqw 6cqw; background: var(--ab-accent); color: var(--ab-on-accent); font: 700 max(9px, 2.7cqw)/1 var(--ac-mono); letter-spacing: 0.12em; transform: skewX(-8deg);
+  position: absolute; right: -1.4cqw; top: 14cqw; display: flex; align-items: center; gap: 1.6cqw; padding: 1.8cqw 5cqw 1.8cqw 6cqw; background: var(--ac-spark); color: var(--ac-on-spark); font: 700 max(9px, 2.7cqw)/1 var(--ac-mono); letter-spacing: 0.12em; transform: skewX(-8deg);
   -webkit-mask: radial-gradient(circle 1.5cqw at 0 50%, transparent 98%, #000) , radial-gradient(circle 1.5cqw at 100% 50%, transparent 98%, #000); -webkit-mask-composite: source-in; mask: radial-gradient(circle 1.5cqw at 0 50%, #0000 98%, #000), radial-gradient(circle 1.5cqw at 100% 50%, #0000 98%, #000); mask-composite: intersect;
 }
 .ab[data-ae="acid-graphics"] .aca-ticket i { font-style: normal; }
-.ab[data-ae="acid-graphics"] .aca-ticket b { padding: 1px 4px; background: var(--ab-on-accent); color: var(--ab-accent); }
-.ab[data-ae="acid-graphics"] .aca-spons { position: absolute; left: 4.2cqw; right: 4.2cqw; bottom: 8.6cqw; display: flex; justify-content: space-between; gap: 2cqw; color: #bdbdbd; font: 700 max(7.5px, 2cqw)/1 var(--ac-mono); letter-spacing: 0.1em; opacity: 0.85; }
-.ab[data-ae="acid-graphics"] .aca-spons span { display: inline-flex; align-items: center; gap: 4px; }
+.ab[data-ae="acid-graphics"] .aca-ticket b { padding: 1px 4px; background: var(--ac-on-spark); color: var(--ac-spark); }
+.ab[data-ae="acid-graphics"] .aca-spons { position: absolute; left: 0; right: 0; bottom: 8.6cqw; display: flex; justify-content: space-between; gap: 1cqw; padding: 1.1cqw 4.2cqw; background: #050505; color: #cfcfcf; font: 700 max(6.5px, 1.7cqw)/1 var(--ac-mono); letter-spacing: 0.06em; }
+.ab[data-ae="acid-graphics"] .aca-spons span { display: inline-flex; align-items: center; gap: 3px; white-space: nowrap; }
+.ab[data-ae="acid-graphics"] .aca-spons svg { width: 1.9cqw; height: 1.9cqw; flex: none; }
+/* micro-type density: registration crosshairs, barcode, trademark slogan, a vertical catalogue spine */
+.ab[data-ae="acid-graphics"] .aca-reg { position: absolute; left: 1.2cqw; top: 1.2cqw; width: 3cqw; height: 3cqw; }
+.ab[data-ae="acid-graphics"] .aca-reg-b { position: absolute; right: 1.2cqw; bottom: 12.4cqw; width: 3cqw; height: 3cqw; }
+.ab[data-ae="acid-graphics"] .aca-reg-b .aca-reg { position: static; width: 100%; height: 100%; }
+.ab[data-ae="acid-graphics"] .aca-no { display: inline-flex; align-items: center; gap: 1.2cqw; }
+.ab[data-ae="acid-graphics"] .aca-bc { display: inline-block; width: 11cqw; height: 2.7cqw; background: repeating-linear-gradient(90deg, #f4f4f4 0 1px, transparent 1px 2px, #f4f4f4 2px 4px, transparent 4px 5px, #f4f4f4 5px 6px, transparent 6px 8px); }
+.ab[data-ae="acid-graphics"] .aca-slogan { width: max-content; max-width: 100%; margin: 0 0 1.8cqw; padding: 0.7cqw 1.4cqw; background: #050505; color: #f4f4f4; font: 700 max(6.5px, 1.9cqw)/1.2 var(--ac-mono); letter-spacing: 0.12em; white-space: nowrap; }
+.ab[data-ae="acid-graphics"] .aca-slogan em { font-style: normal; color: var(--ab-acid); margin-left: 1cqw; }
+.ab[data-ae="acid-graphics"] .aca-spine { position: absolute; right: 0; top: 27cqw; bottom: 17cqw; width: 4cqw; margin: 0; padding: 1.4cqw 0; background: #050505; color: #cfcfcf; writing-mode: vertical-rl; font: 700 max(6px, 1.7cqw)/4cqw var(--ac-mono); letter-spacing: 0.14em; text-align: center; white-space: nowrap; overflow: hidden; }
 .ab[data-ae="acid-graphics"] .aca-strip { position: absolute; left: 0; right: 0; bottom: 0; padding: 1.6cqw 0; background: var(--ab-clash); color: var(--ab-on-clash); font: 700 max(8.5px, 2.5cqw)/1 var(--ac-mono); letter-spacing: 0.14em; white-space: nowrap; overflow: hidden; }
 
 /* palette: edge-to-edge colour strips with the labels inside */
@@ -163,6 +176,12 @@
 .ab[data-ae="acid-graphics"] .ab-row-bar i { background: repeating-linear-gradient(45deg, var(--ab-acid) 0 6px, var(--ab-clash) 6px 12px); }
 .ab[data-ae="acid-graphics"] .ab-row-pct { font-family: var(--ac-mono); font-weight: 700; }
 
+/* a second, reversed event strip above the footer (board only) */
+.ab[data-ae="acid-graphics"]:not(.ab-slide) .ab-foot::before {
+  content: "✱  CAT.NO ACG-030  ✱  NO PHOTOS  ✱  BRING EARPLUGS  ✱  18+  ✱  " var(--ac-brand) "™  ✱  CAT.NO ACG-030  ✱  NO PHOTOS  ✱  BRING EARPLUGS  ✱  18+";
+  order: -1; flex: 1 1 100%; margin: 0 calc(var(--ab-pad) * -1) 8px; padding: 5px 0 4px; background: var(--ab-acid); color: var(--ab-on-acid);
+  font: 700 10px/1.4 var(--ac-mono); letter-spacing: 0.12em; white-space: nowrap; overflow: hidden;
+}
 /* footer: dense, on the grid */
 .ab[data-ae="acid-graphics"] .ab-foot { border-top: 3px solid var(--ab-ink); color: var(--ab-ink); font-family: var(--ac-mono); font-size: 10.5px; letter-spacing: 0.08em; text-transform: uppercase; }
 .ab[data-ae="acid-graphics"] .ab-foot .ab-infl { color: var(--ab-muted); }
@@ -172,7 +191,7 @@
 @container ab (max-width: 600px) {
   .ab[data-ae="acid-graphics"] .ab-hero { grid-template-columns: minmax(0, 1fr); padding: 24px 0 28px; }
   .ab[data-ae="acid-graphics"][data-mode="light"] .ab-hero { padding-bottom: 28px; }
-  .ab[data-ae="acid-graphics"] .ab-headline { font-size: calc(clamp(40px, 15cqw, 80px) * var(--ab-hl-scale, 1) * var(--ab-hs, 1) * var(--ab-display, 1)); }
+  .ab[data-ae="acid-graphics"] .ab-headline { font-size: calc(clamp(40px, 15cqw, 80px) * var(--ac-fs, 0.84) * var(--ab-hl-scale, 1) * var(--ab-hs, 1) * var(--ab-display, 1)); }
   .ab[data-ae="acid-graphics"] .ab-art { max-width: 340px; }
   .ab[data-ae="acid-graphics"] .ab-brand { font-size: 13.5px; letter-spacing: 0; }
   .ab[data-ae="acid-graphics"] .ab-tag { padding: 3px 7px; font-size: 9px; letter-spacing: 0.06em; }
@@ -185,3 +204,13 @@
 @media (prefers-reduced-motion: reduce) {
   .ab[data-ae="acid-graphics"] .ab-cta, .ab[data-ae="acid-graphics"] .ab-switch, .ab[data-ae="acid-graphics"] .ab-switch::before { transition: none; }
 }
+
+/* ---- deck: the board's stretched headline, given room (deck headings carry margin: 0 in brand-deck.css) ---- */
+.ab[data-ae="acid-graphics"].ab-slide.ab-slide .ab-headline.ab-deck-h { margin-bottom: 0.6em; }
+.ab[data-ae="acid-graphics"].ab-slide.ab-slide .ab-headline.ab-deck-aa { margin-bottom: 0.32em; }
+.ab[data-ae="acid-graphics"].ab-slide.ab-slide .ab-headline.ab-deck-sample, .ab[data-ae="acid-graphics"].ab-slide.ab-slide .ab-headline.ab-deck-screentitle { transform: none; }
+/* deck product slide: the CTA card gets the pair edge (2px clash, 5px acid offset) and the nav a ticket tab */
+.ab[data-ae="acid-graphics"] .ab-deck-ctacard { border: 2px solid var(--ab-clash); border-radius: 0; box-shadow: 5px 5px 0 var(--ab-acid); background: var(--ab-canvas); margin: 0 6px 6px 0; }
+.ab[data-ae="acid-graphics"] .ab-deck-nav.is-on, .ab[data-ae="acid-graphics"] .ab-deck-nav.is-on .ab-label { color: var(--ac-on-spark); }
+.ab[data-ae="acid-graphics"] .ab-deck-nav.is-on { border-radius: 0; background: var(--ac-spark); color: var(--ac-on-spark); font-weight: 700; letter-spacing: 0.12em; }
+.ab[data-ae="acid-graphics"] .ab-deck-nav.is-on::before { content: "✱ "; }

@@ -47,7 +47,8 @@
       });
       if (!en) return null;
       const tone = toneOf(en, s);
-      return tone === 1 ? en : Object.assign({}, en, { params: Object.assign({}, en.params, { tone }) });
+      const named = Object.assign({}, en, { label: s.name });   // the suite's own name for it
+      return tone === 1 ? named : Object.assign(named, { params: Object.assign({}, en.params, { tone }) });
     }).filter(Boolean);
   }
 
@@ -78,12 +79,13 @@
     key: 'patterns', title: 'Patterns',
     build(Parts, state, def, t) {
       const e = escapeHtml;
+      const nameOf = en => en.label || famName(en.key);   // suite entries carry their own name
       const { pinned, list } = wallEntries(state, def);
       const n = Math.max(1, Math.min(6, list.length));
       const [w, h] = WALL[n];
       const tiles = list.slice(0, 6).map(en => `<figure class="ab-deck-pt">
-          <img src="${urlFor(t, en, w, h, 2)}" alt="${e(famName(en.key))} pattern" />
-          <figcaption><span class="ab-label">${e(famName(en.key))}</span><span class="ab-label ab-deck-ptcw">${e(cwLabel(en.colorway))}</span></figcaption>
+          <img src="${urlFor(t, en, w, h, 2)}" alt="${e(nameOf(en))} pattern" />
+          <figcaption><span class="ab-label">${e(nameOf(en))}</span><span class="ab-label ab-deck-ptcw">${e(cwLabel(en.colorway))}</span></figcaption>
         </figure>`).join('');
       return `<div class="ab-deck-patterns">
         <div class="ab-labelrow"><span class="ab-label">${pinned ? 'Patterns in the brief' : 'Pattern suite'}</span><span class="ab-label">${e(def.name)}</span></div>

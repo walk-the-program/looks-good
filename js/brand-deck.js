@@ -162,8 +162,14 @@ function bdRuleLines(def, kind) {
 }
 
 // "Primary tile (main action)" -> "Primary tile": the deck lists names, the board explains them.
-function bdMatName(name) {
-  return String(name || '').replace(/\s*\([^)]*\)/g, '').trim();
+// Takes the whole list: when stripping the qualifier would make two names collide
+// ("Key (up)" / "Key (down)"), that name keeps it as "Key · up".
+function bdMatNames(names) {
+  const bare = names.map(n => String(n || '').replace(/\s*\([^)]*\)/g, '').trim());
+  return names.map((n, i) => {
+    if (bare.filter(b => b.toLowerCase() === bare[i].toLowerCase()).length < 2) return bare[i];
+    return String(n || '').replace(/\s*\(([^)]*)\)/g, ' · $1').replace(/\s+/g, ' ').trim();
+  });
 }
 
 // One element out of a board part's markup (the board's seg / cta / toggle / states).
@@ -316,8 +322,10 @@ const DECK_SLIDES = [
     key: 'material', title: 'Material & graphics',
     build(P, state, def, t) {
       const e = escapeHtml;
-      const mats = (def.materials || []).slice(0, 4).map((m, i) => `<li class="ab-deck-mat">
-          <span class="ab-label"><i class="ab-n">${String(i + 1).padStart(2, '0')}</i><span>${e(bdMatName(m.name))}</span></span>
+      const shown = (def.materials || []).slice(0, 4);
+      const matNames = bdMatNames(shown.map(m => m.name));
+      const mats = shown.map((m, i) => `<li class="ab-deck-mat">
+          <span class="ab-label"><i class="ab-n">${String(i + 1).padStart(2, '0')}</i><span>${e(matNames[i])}</span></span>
         </li>`).join('');
       const patternStage = (def.deck && def.deck.materialStage === 'pattern' && typeof deckStageHook === 'function')
         ? deckStageHook(P, state, def, t) : '';

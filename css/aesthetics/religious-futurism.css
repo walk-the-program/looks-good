@@ -56,11 +56,16 @@
 .ab[data-ae="religious-futurism"] .ab-kicker::before { content: "§ "; color: var(--ab-gold); letter-spacing: 0; }
 .ab[data-ae="religious-futurism"] .ab-headline { font-weight: 400; text-transform: uppercase; letter-spacing: calc(0.07em * var(--ab-tr, 1)); line-height: 1.06; text-wrap: balance; }
 .ab[data-ae="religious-futurism"][data-hero="centered"] .ab-headline { line-height: 1.06; }
-.ab[data-ae="religious-futurism"] .ab-hl { position: relative; display: inline-block; color: var(--ab-accent-ink); background: none; padding: 0; margin: 0; }
+/* the Dune (2021) move: a wide geometric face (Unbounded class 'wide') set hairline-light, small and tracked so far
+   apart that the gaps weigh as much as the strokes */
+.ab[data-ae="religious-futurism"][data-hcls="wide"] .ab-headline { font-weight: 200; letter-spacing: 0.32em; line-height: 1.32; }
+.ab[data-ae="religious-futurism"][data-hero="centered"][data-hcls="wide"] .ab-hero .ab-headline { margin-right: -0.32em; }   /* re-centres the line: the trailing tracking after the last letter */   /* fixed tracking: the board's per-font --ab-tr damping would undo the move */
+.ab[data-ae="religious-futurism"][data-hero="centered"][data-hcls="wide"] .ab-hero .ab-headline { font-size: calc(clamp(40px, 8.4cqw, 104px) * 0.62 * var(--ab-hl-scale, 1) * var(--ab-hs, 1) * var(--ab-display, 1)); }
+.ab[data-ae="religious-futurism"] .ab-hl { position: relative; display: inline-block; color: var(--ab-hl-ink); background: none; padding: 0; margin: 0; }
 .ab[data-ae="religious-futurism"] .ab-hl::after { content: ""; position: absolute; left: 4%; right: 4%; bottom: -0.1em; height: 1px; background: linear-gradient(90deg, transparent, var(--ab-gold) 25%, var(--ab-gold) 75%, transparent); }
 .ab[data-ae="religious-futurism"] .ab-subcopy { margin-left: auto !important; margin-right: auto !important; max-width: 31em; text-align: center; }
 .ab[data-ae="religious-futurism"] .ab-sub-lead { color: var(--ab-ink); }
-.ab[data-ae="religious-futurism"] .ab-art { --ab-art-ratio: 800 / 340; --ab-art-ratio-narrow: 1 / 1; }
+.ab[data-ae="religious-futurism"] .ab-art { --ab-art-ratio: 800 / 420; --ab-art-ratio-narrow: 1 / 1; }
 .ab[data-ae="religious-futurism"] .ab-art svg { display: block; width: 100%; height: 100%; overflow: visible; }
 
 /* palette: leaded glass panes with a pointed arch (ogive clip), the colour is the real swatch */
@@ -132,11 +137,14 @@
 /* main action: stained glass in the client primary, a gold rim, small-caps letters */
 .ab[data-ae="religious-futurism"] .ab-cta {
   position: relative; justify-content: center; padding: 13px 18px; border: 1px solid var(--ab-gold-line); border-radius: 0; color: var(--ab-on-glass);
-  background: radial-gradient(120% 150% at 50% 0, var(--ab-glass), var(--ab-glass-deep)); box-shadow: 0 0 26px var(--ab-halo), inset 0 0 0 3px var(--ab-leading);
+  /* a lit strip of panes, not paint: leading every 22px over the glass, a soft (half-strength) halo */
+  background: repeating-linear-gradient(90deg, var(--ab-leading) 0 1.5px, transparent 1.5px 22px), linear-gradient(180deg, rgba(255,255,255,0.14), transparent 45%, rgba(0,0,0,0.16)), radial-gradient(120% 150% at 50% 0, var(--ab-glass), var(--ab-glass-deep));
+  box-shadow: 0 0 14px var(--ab-halo), inset 0 0 0 3px var(--ab-leading);
   font-size: 12px; font-weight: 600; letter-spacing: 0.22em; text-transform: uppercase; transition: filter 0.4s ease, box-shadow 0.4s ease;
+  text-shadow: 0 0 3px var(--ab-glass), 0 0 7px var(--ab-glass);   /* lifts the label off the leading lines */
 }
 .ab[data-ae="religious-futurism"] .ab-cta-arrow { display: none; }
-.ab[data-ae="religious-futurism"] .ab-cta:hover, .ab[data-ae="religious-futurism"] .ab-cta.is-hover { filter: brightness(1.12) saturate(1.05); box-shadow: 0 0 34px var(--ab-halo), inset 0 0 0 3px var(--ab-leading); }
+.ab[data-ae="religious-futurism"] .ab-cta:hover, .ab[data-ae="religious-futurism"] .ab-cta.is-hover { filter: brightness(1.12) saturate(1.05); box-shadow: 0 0 20px var(--ab-halo), inset 0 0 0 3px var(--ab-leading); }
 .ab[data-ae="religious-futurism"] .ab-cta:active, .ab[data-ae="religious-futurism"] .ab-cta.is-pressed { filter: brightness(0.85); box-shadow: 0 0 10px var(--ab-halo), inset 0 0 0 3px var(--ab-leading); }
 
 /* 02 relics: an underline field with a vesica, a reliquary switch, three halo rings */
@@ -192,6 +200,9 @@
   .ab[data-ae="religious-futurism"][data-hero="centered"] .ab-hero { padding: 28px 0 24px; }
   .ab[data-ae="religious-futurism"][data-hero="centered"] .ab-hero-copy { max-width: none; }
   .ab[data-ae="religious-futurism"] .ab-headline { letter-spacing: calc(0.04em * var(--ab-tr, 1)); }
+  .ab[data-ae="religious-futurism"][data-hcls="wide"] .ab-headline { letter-spacing: 0.2em; }
+  .ab[data-ae="religious-futurism"][data-hero="centered"][data-hcls="wide"] .ab-hero .ab-headline { margin-right: -0.2em; }
+  .ab[data-ae="religious-futurism"][data-hero="centered"][data-hcls="wide"] .ab-hero .ab-headline { font-size: calc(clamp(34px, 11.4cqw, 56px) * 0.7 * var(--ab-hl-scale, 1) * var(--ab-hs, 1) * var(--ab-display, 1)); }
   .ab[data-ae="religious-futurism"] .ab-brand { letter-spacing: calc(0.12em * var(--ab-tr, 1)); }
   .ab[data-ae="religious-futurism"] .ab-tag { letter-spacing: 0.14em; }
   .ab[data-ae="religious-futurism"] .ab-row { grid-template-columns: 4ch minmax(0, 1fr) 4.5ch; }
@@ -204,17 +215,19 @@
   .ab[data-ae="religious-futurism"] .ab-cta, .ab[data-ae="religious-futurism"] .ab-switch, .ab[data-ae="religious-futurism"] .ab-switch::before, .ab[data-ae="religious-futurism"] .ab-input { transition: none; }
 }
 
-/* deck cover: the statement on the axis in two lines (deck.coverDisplay 1.3), the cathedral at scale beneath it.
-   The cover body is only ~320px tall (chrome, pattern band), so the art cannot sit in the flow beside a two-line
-   headline of 72px+: it is taken out of the flow and stands on the pattern band instead (the cover meta row and the
-   slide foot, which would sit under it, and the kicker, are dropped on this slide), while the headline is fitted on its own.
-   The headline box is a fixed 14.4em wide (centred on the column): it stays on two lines and the fit pass lands it at about 81px. */
+/* deck cover: the statement on the axis, the cathedral monumental beneath it. No pattern band on the cover
+   ("never more than three forms per view"): the band and the bottom padding it reserves are dropped, and the
+   art stands on the slide's bottom edge, taking its lower ~58%. The art is out of the flow; the hero's bottom
+   padding reserves its height so the fit pass sizes the headline into the silence above it. The cover meta
+   row, the slide foot and the kicker are dropped on this slide. */
+.ab[data-ae="religious-futurism"].ab-slide[data-slide="cover"] > .ab-deck-pattern { display: none; }
+.ab[data-ae="religious-futurism"].ab-slide[data-slide="cover"] > .ab-in.ab-slide-in { padding-bottom: 0 !important; }
 .ab[data-ae="religious-futurism"].ab-slide[data-slide="cover"][data-hero] .ab-deck-cover .ab-hero { grid-template-columns: minmax(0, 1fr); justify-items: center; gap: 14px; }
 .ab[data-ae="religious-futurism"].ab-slide[data-slide="cover"][data-hero] .ab-deck-cover .ab-hero-copy { max-width: none; width: 100%; text-align: center; }
-.ab[data-ae="religious-futurism"].ab-slide[data-slide="cover"] .ab-hero { position: static; align-content: start; align-items: start; padding-bottom: 190px !important; }   /* reserves the part of the art that sits inside the body, so the fit pass sizes the headline against it */
-.ab[data-ae="religious-futurism"].ab-slide[data-slide="cover"] .ab-headline { width: 14.4em; max-width: none; margin-inline: calc(50% - 7.2em) 0; }
+.ab[data-ae="religious-futurism"].ab-slide[data-slide="cover"] .ab-hero { position: static; align-content: start; align-items: start; padding-bottom: 410px !important; }
+.ab[data-ae="religious-futurism"].ab-slide[data-slide="cover"] .ab-headline { max-width: 100%; margin-inline: auto; }
 .ab[data-ae="religious-futurism"].ab-slide[data-slide="cover"] .ab-deck-cover { justify-content: flex-start; }
-.ab[data-ae="religious-futurism"].ab-slide[data-slide="cover"] .ab-hero .ab-art { position: absolute; left: 50%; right: auto; bottom: 136px; width: 42% !important; max-width: none !important; margin: 0; justify-self: auto; transform: translateX(-50%); }
+.ab[data-ae="religious-futurism"].ab-slide[data-slide="cover"] .ab-hero .ab-art { position: absolute; left: 50%; right: auto; bottom: 0; width: 64% !important; max-width: none !important; margin: 0; justify-self: auto; transform: translateX(-50%); }
 .ab[data-ae="religious-futurism"].ab-slide[data-slide="cover"] .ab-kicker { display: none; }
 .ab[data-ae="religious-futurism"].ab-slide[data-slide="cover"] .ab-subcopy { display: none; }
 .ab[data-ae="religious-futurism"].ab-slide[data-slide="cover"] .ab-deck-cover-meta, .ab[data-ae="religious-futurism"].ab-slide[data-slide="cover"] .ab-slide-foot { display: none; }

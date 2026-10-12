@@ -1,306 +1,478 @@
-/* 26 Rebus — playful, symbolic, clever. Reference: AIGA Eye on Design's "Nouveau
-   Rebus" (dingbat-like pictograms standing in for words) and Paul Rand's IBM
-   eye-bee-M poster.
+/* 26 Rebus — read it aloud. Reference: Paul Rand's Eye-Bee-M poster (1981) and the
+   IBM rebus redraw, Glaser's I ♥ NY, Victorian rebus cards ("May I see you home my
+   dear"), the 1592 French rebus sheets and the Nouveau Rebus campaigns.
 
-   Mechanism. A small dictionary (RB_DICT) maps words to flat SVG pictograms drawn on a
-   24-unit grid (RB_SYM; no emoji, no outlines). The headline is drawn by def.headline(ctx, text):
-   the framework puts it in the real, visible <h2 aria-label> (board hero, deck cover,
-   Principles, Closing), so every replaced word is still read. The last word becomes a
-   symbol when it has one, set on an accent disc, plus the best non-adjacent mapped word
-   as a symbol in the brand colours. A tagline with no match gets one symbol placed between its middle words.
-   The art below it is the brand name as an equation (symbol + remaining letters = name,
-   or initial + the tagline's symbol = name when no symbol hides in the name), then the
-   dictionary legend. Components carry the same pictograms (icons in tabs, symbol avatars
-   in the list, a symbol per palette role, the arrow in the CTA), baked into CSS custom
-   properties as data URIs by tokens() so colours follow the brand and PNG export works. */
+   Mechanism: sound, never meaning. A picture stands in for a word or syllable only
+   when its NAME sounds like it: eye = I, bee = be, sea = see/c, ewe = you, 4 = for,
+   8 = ate, a signpost = -sign ("de" + [sign] = design). rbSegment(word) tries, in
+   order, a whole-word homophone (RB_WHOLE), then a prefix and / or suffix syllable
+   (RB_PRE / RB_SUF), keeping the rest of the word as letters. Words with no sound
+   match stay type; there is no synonym fallback, so the puzzle is always honest.
+   The brand-name lockup (rbEquation) uses the same engine, then spelling arithmetic
+   ([bee] - e + ar = bear) on one word, then a fixed rebus sign-off ("I see you").
 
-// ---- pictograms: inner SVG for a 24x24 box; a = main colour, b = detail, k = ink ----
-const RB_SYM = {
-  heart: ({ a }) => `<path d="M12 21.4C5.4 16.5 2 12.8 2 8.6 2 5.5 4.4 3.2 7.3 3.2c1.9 0 3.6 1 4.7 2.7 1.1-1.7 2.8-2.7 4.7-2.7 2.9 0 5.3 2.3 5.3 5.4 0 4.2-3.400 7.900-10 12.800z" fill="${a}"/>`,
-  star: ({ a }) => `<path d="M12 1.8l2.9 6.600 7.100.7-5.400 4.700 1.600 7-6.200-3.700-6.200 3.700 1.600-7L2 9.100l7.100-.7z" fill="${a}" stroke="${a}" stroke-width="1.400" stroke-linejoin="round"/>`,
-  sun: ({ a, k }) => {
-    const rays = Array.from({ length: 8 }, (_, i) => {
-      const r = i * Math.PI / 4, c = Math.cos(r), s = Math.sin(r);
-      return `<path d="M${(12 + c * 8.6).toFixed(2)} ${(12 + s * 8.6).toFixed(2)}L${(12 + c * 11).toFixed(2)} ${(12 + s * 11).toFixed(2)}" stroke="${k}" stroke-width="2.600" stroke-linecap="round"/>`;
-    }).join('');
-    return `<circle cx="12" cy="12" r="5.600" fill="${a}"/>${rays}`;
-  },
-  eye: ({ a, b, k }) => `<path d="M1.200 12C4.400 6.300 8 4.400 12 4.400s7.600 1.900 10.800 7.600c-3.200 5.700-6.800 7.600-10.800 7.600S4.400 17.700 1.200 12z" fill="${k}"/><circle cx="12" cy="12" r="5.200" fill="${a}"/><circle cx="12" cy="12" r="2.400" fill="${k}"/><circle cx="13.200" cy="10.800" r="1" fill="${b}"/>`,
-  arrow: ({ a }) => `<path d="M2.500 9.200h10V3.800L22 12l-9.500 8.200v-5.400h-10z" fill="${a}" stroke="${a}" stroke-width="1" stroke-linejoin="round"/>`,
-  key: ({ a }) => `<path fill-rule="evenodd" d="M7.600 5.800a6.200 6.200 0 1 0 5.600 8.800H15v3.200h3v-3.200h1.800v2.800h3V10.600h-9.600A6.200 6.200 0 0 0 7.600 5.800zm-1.600 4a2.300 2.300 0 1 1 0 4.600 2.300 2.300 0 0 1 0-4.600z" fill="${a}"/>`,
-  plant: ({ a, b, k }) => `<rect x="10.800" y="9" width="2.400" height="13" rx="1.200" fill="${k}"/><path d="M12 14.200C12 9.200 8.800 5.600 2.600 5.600 2.600 10.600 5.800 14.200 12 14.200z" fill="${a}"/><path d="M12 11C12 6.400 14.600 3 21.400 3 21.400 7.600 18.800 11 12 11z" fill="${b}"/>`,
-  bolt: ({ a }) => `<path d="M14.200 1.200L3.800 13.600h6.400l-1.800 9.200 11.800-13.400h-6.800z" fill="${a}" stroke="${a}" stroke-width="1" stroke-linejoin="round"/>`,
-  home: ({ a, b }) => `<path d="M12 2L1.200 11.800l1.800 2L4.600 12.400V21.800H9.800v-6.200h4.400v6.200h5.200V12.400l1.600 1.400 1.800-2z" fill="${a}"/><rect x="16.600" y="3.600" width="2.800" height="5" fill="${b}"/>`,
-  pencil: ({ a, b, k }) => `<g transform="rotate(45 12 12)"><rect x="8.800" y="0.600" width="6.400" height="15.600" rx="1.200" fill="${a}"/><rect x="8.800" y="0.600" width="6.400" height="3.800" rx="1.200" fill="${b}"/><path d="M8.800 16.200h6.400L12 23.400z" fill="${k}"/></g>`,
-  cup: ({ a, b, k }) => `<path d="M3 8.400h13.400v6.200a5 5 0 0 1-5 5H8a5 5 0 0 1-5-5z" fill="${a}"/><path d="M16.400 9.800h1.600a3.200 3.200 0 0 1 0 6.400h-1.600" fill="none" stroke="${a}" stroke-width="2.400"/><path d="M7 5.600c-1.200-1.400 1.200-2.200 0-3.800M11.600 5.600c-1.200-1.400 1.200-2.200 0-3.800" fill="none" stroke="${b}" stroke-width="1.800" stroke-linecap="round"/><rect x="1.400" y="20.600" width="17" height="2.200" rx="1.100" fill="${k}"/>`,
-  moon: ({ a }) => `<path d="M20.600 14.800A9.200 9.200 0 1 1 9.400 3.200a7.400 7.400 0 0 0 11.200 11.600z" fill="${a}"/>`,
-  check: ({ a, k }) => `<circle cx="12" cy="12" r="10.600" fill="${a}"/><path d="M7 12.600l3.200 3.200L17 8.800" fill="none" stroke="${k}" stroke-width="2.800" stroke-linecap="round" stroke-linejoin="round"/>`,
+   Glyphs (RB_G) are drawn from geometric primitives only (discs, half-discs, bars,
+   stripe cuts) on a 24-unit grid, cap height tall. Strokes and cuts use the stem
+   width derived from the heading weight (rbStem: weight / 800 * 3.4 units), so the
+   pictures carry the letters' own weight. Everything is ink; exactly one glyph per
+   view is primary (the Glaser heart rule): the last headline glyph, or the first
+   lockup glyph when the headline has none.
+
+   The real <h2 aria-label> (def.headline, framework-wrapped) keeps every word for
+   assistive tech. Component pictograms are baked into CSS custom properties as data
+   URIs by tokens() so PNG export and brand recolouring work. */
+(function () {
+'use strict';
+
+// ---- stem width (24-unit grid) from the heading weight ----
+function rbHeadWeight() {
+  const st = typeof state !== 'undefined' ? state : null;
+  const hf = st && st.headingFont;
+  const have = String((hf && hf.weights) || '700').split(';').map(Number).filter(Boolean);
+  const under = have.filter(w => w <= 800);
+  const hw = under.length ? Math.max(...under) : Math.max(...have);
+  // a 400-only display face (Archivo Black, Anton) is heavy by design
+  const heavy = hf && (hf.cls === 'heavy' || hf.cls === 'condensed') && hw < 600;
+  return heavy ? 800 : hw;
+}
+function rbStem(hw) { return Math.max(2, Math.min(4.2, (hw || 700) / 800 * 3.4)); }
+const f1 = n => (Math.round(n * 100) / 100).toString();
+
+// ---- glyphs: inner SVG for a W x 24 box; a = fill, g = cut colour (the ground), s = stem ----
+const RB_G = {
+  eye: { w: 24, say: 'eye', d: (a, g, s) => `<path d="M3 6.6A11 8 0 0 1 21 6.6" fill="none" stroke="${a}" stroke-width="${f1(s * 0.9)}"/>`
+    + `<path d="M1 15C5 9.6 8.4 8 12 8S19 9.6 23 15C19 20.4 15.6 22 12 22S5 20.4 1 15Z" fill="${a}"/>`
+    + `<circle cx="12" cy="15" r="5.3" fill="${g}"/><circle cx="12" cy="15" r="${f1(Math.max(1.6, 5.3 - s * 0.85))}" fill="${a}"/>` },
+  bee: { w: 24, say: 'bee', d: (a, g, s) => `<circle cx="9.7" cy="3.4" r="2.3" fill="${a}"/><circle cx="14.3" cy="3.4" r="2.3" fill="${a}"/>`
+    + `<path d="M7.2 9.6L1.2 12.4A3.5 3.5 0 0 0 4.6 18.4L7.2 17.2ZM16.8 9.6L22.8 12.4A3.5 3.5 0 0 1 19.4 18.4L16.8 17.2Z" fill="${a}"/>`
+    + `<rect x="7.4" y="7" width="9.2" height="17" rx="4.6" fill="${a}"/>`
+    + `<rect x="6" y="${f1(12.4 - s * 0.32)}" width="12" height="${f1(s * 0.64)}" fill="${g}"/><rect x="6" y="${f1(17.4 - s * 0.32)}" width="12" height="${f1(s * 0.64)}" fill="${g}"/>` },
+  wave: { w: 24, say: 'sea', d: (a, g, s) => [7, 13.5, 20].map(y => `<path d="M0.5 ${y}q2.875 -4 5.75 0t5.75 0t5.75 0t5.75 0" fill="none" stroke="${a}" stroke-width="${f1(s)}"/>`).join('') },
+  ewe: { w: 26, say: 'ewe', d: (a, g, s) => `<rect x="${f1(11.2 - s * 0.38)}" y="16" width="${f1(s * 0.76)}" height="8" fill="${a}"/><rect x="${f1(19.6 - s * 0.38)}" y="16" width="${f1(s * 0.76)}" height="8" fill="${a}"/>`
+    + [[11.2, 9.6], [16.6, 8.4], [21.4, 10.6], [10.6, 14.6], [16, 15.6], [21.2, 15]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="4.4" fill="${a}"/>`).join('')
+    + `<ellipse cx="4.2" cy="12.6" rx="3.4" ry="4" fill="${a}"/><rect x="0.6" y="9.2" width="3" height="2" fill="${a}"/><circle cx="3.6" cy="12" r="0.95" fill="${g}"/><rect x="6.6" y="8" width="${f1(Math.max(0.8, s * 0.3))}" height="10" fill="${g}"/>` },
+  cup: { w: 24, say: 'tea', d: (a, g, s) => `<path d="M2.4 9.4H18.6V13A8.1 8.1 0 0 1 2.4 13Z" fill="${a}"/>`
+    + `<circle cx="19" cy="13.4" r="${f1(3.3 - s * 0.15)}" fill="none" stroke="${a}" stroke-width="${f1(s * 0.7)}"/>`
+    + `<rect x="0.6" y="22" width="20" height="2" fill="${a}"/>`
+    + `<rect x="${f1(7.4 - s * 0.3)}" y="1.6" width="${f1(s * 0.6)}" height="5" fill="${a}"/><rect x="${f1(13 - s * 0.3)}" y="1.6" width="${f1(s * 0.6)}" height="5" fill="${a}"/>` },
+  can: { w: 20, say: 'can', d: (a, g, s) => `<rect x="3.4" y="1" width="13.2" height="2" fill="${a}"/><rect x="2" y="3" width="16" height="21" fill="${a}"/>`
+    + `<rect x="2" y="7" width="16" height="${f1(s * 0.42)}" fill="${g}"/><rect x="2" y="${f1(19.6 - s * 0.42)}" width="16" height="${f1(s * 0.42)}" fill="${g}"/>` },
+  knot: { w: 24, say: 'knot', d: (a, g, s) => `<circle cx="12" cy="9.2" r="6.4" fill="none" stroke="${a}" stroke-width="${f1(s)}"/>`
+    + `<path d="M8.4 14.4L3.4 23.6M15.6 14.4L20.6 23.6" fill="none" stroke="${a}" stroke-width="${f1(s)}"/>` },
+  deer: { w: 24, say: 'deer', d: (a, g, s) => `<path d="M6.8 11.6H17.2L13.6 23.4H10.4Z" fill="${a}"/><path d="M6.8 11.6L2 10.4L5.8 15ZM17.2 11.6L22 10.4L18.2 15Z" fill="${a}"/>`
+    + `<path d="M9.6 11.6V1.6M9.6 5.4L5.4 2M9.6 8.6H4.4M14.4 11.6V1.6M14.4 5.4L18.6 2M14.4 8.6H19.6" fill="none" stroke="${a}" stroke-width="${f1(s * 0.66)}"/>`
+    + `<circle cx="10.3" cy="14.6" r="0.95" fill="${g}"/><circle cx="13.7" cy="14.6" r="0.95" fill="${g}"/>` },
+  sun: { w: 24, say: 'sun', d: (a, g, s) => `<circle cx="12" cy="12" r="5.6" fill="${a}"/>`
+    + Array.from({ length: 8 }, (_, i) => { const r = i * Math.PI / 4, c = Math.cos(r), n = Math.sin(r); return `<path d="M${f1(12 + c * 8)} ${f1(12 + n * 8)}L${f1(12 + c * 11.6)} ${f1(12 + n * 11.6)}" stroke="${a}" stroke-width="${f1(s * 0.8)}"/>`; }).join('') },
+  sign: { w: 24, say: 'sign', d: (a, g, s) => `<rect x="${f1(12 - s * 0.42)}" y="1.6" width="${f1(s * 0.84)}" height="22.4" fill="${a}"/>`
+    + `<path d="M2.4 3H18.6L22.6 6.6L18.6 10.2H2.4ZM21.6 13.4H5.4L1.4 17L5.4 20.6H21.6Z" fill="${a}"/>`
+    + `<rect x="2.4" y="${f1(6.6 - s * 0.16)}" width="13" height="${f1(Math.max(0.7, s * 0.32))}" fill="${g}"/><rect x="8.6" y="${f1(17 - s * 0.16)}" width="13" height="${f1(Math.max(0.7, s * 0.32))}" fill="${g}"/>` },
+  gold: { w: 26, say: 'gold', d: (a, g, s) => `<path d="M0.8 23.6L3 16.2H10.8L13 23.6ZM13.4 23.6L15.6 16.2H23.4L25.6 23.6ZM7.1 14.8L9.3 7.4H16.7L18.9 14.8Z" fill="${a}"/>`
+    + `<path d="M3.6 18.6H10.2M16.2 18.6H22.8M9.9 9.8H16.1" stroke="${g}" stroke-width="${f1(Math.max(0.6, s * 0.3))}"/>` },
+  horse: { w: 24, say: 'mare', d: (a, g, s) => `<path d="M9.4 24V17.4L5 16.6L1 15.4V11.2L7.4 5.4L8.4 1.4L11 4.4C17.6 4.8 21.8 10.4 22.6 24Z" fill="${a}"/>`
+    + `<circle cx="8" cy="9.2" r="1.15" fill="${g}"/><circle cx="2.8" cy="13.2" r="0.75" fill="${g}"/>`
+    + `<path d="M12.6 7.4L15.6 4.6M15.4 9.4L18.8 7M17.6 12L21.2 10" stroke="${g}" stroke-width="${f1(Math.max(0.7, s * 0.36))}"/>` },
+  stud: { w: 24, say: 'stud', d: (a, g, s) => `<path d="M3 18.4A9 9 0 0 1 21 18.4Z" fill="${a}"/><rect x="1" y="20" width="22" height="${f1(Math.max(2, s * 0.9))}" fill="${a}"/>`
+    + `<path d="M7.4 15.2A5 5 0 0 1 11.4 11" fill="none" stroke="${g}" stroke-width="${f1(s * 0.4)}"/>` },
+  ant: { w: 26, say: 'ant', d: (a, g, s) => `<ellipse cx="20" cy="15" rx="5.2" ry="4.2" fill="${a}"/><circle cx="12.6" cy="14.2" r="2.7" fill="${a}"/><circle cx="6" cy="12.6" r="3.3" fill="${a}"/>`
+    + `<path d="M11.2 15.6L7.6 22M12.8 16L13 23M14.6 15.6L18.6 22M4.8 9.6L2.2 3.6M7 9.4L8.4 3.4" fill="none" stroke="${a}" stroke-width="${f1(Math.max(1.2, s * 0.46))}"/>` },
+  ear: { w: 20, say: 'ear', d: (a, g, s) => `<path d="M3.6 9.4A6.8 6.8 0 1 1 14.2 15C12.4 16.4 11.8 18 11.4 20.4A3.6 3.6 0 0 1 4.4 20.6" fill="none" stroke="${a}" stroke-width="${f1(s * 1.05)}"/>`
+    + `<path d="M7.6 10A3 3 0 0 1 12.8 10.8" fill="none" stroke="${a}" stroke-width="${f1(s * 0.7)}"/>` },
+  knee: { w: 24, say: 'knee', d: (a, g, s) => `<path d="M0.6 8.6H12.6M16 12V21.4H23" fill="none" stroke="${a}" stroke-width="${f1(s * 1.5)}"/><circle cx="14.4" cy="10.2" r="${f1(s * 0.9 + 1.6)}" fill="${a}"/>` },
+  tie: { w: 16, say: 'tie', d: (a, g, s) => `<path d="M4.6 1.4H11.4L10.2 6.4H5.8Z" fill="${a}"/><path d="M5.8 7.6H10.2L12.8 19.2L8 23.8L3.2 19.2Z" fill="${a}"/>`
+    + `<path d="M2.6 12.6L13.6 9.4M2.6 17.4L13.6 14.2" stroke="${g}" stroke-width="${f1(s * 0.42)}"/>` },
+  pen: { w: 18, say: 'pen', d: (a, g, s) => `<path d="M9 23.6L1.8 13V2.4H16.2V13Z" fill="${a}"/><rect x="1.8" y="0.2" width="14.4" height="1.2" fill="${a}"/>`
+    + `<path d="M9 23.6V12.4" stroke="${g}" stroke-width="${f1(s * 0.42)}"/><circle cx="9" cy="12" r="1.8" fill="${g}"/>` },
+  key: { w: 26, say: 'key', d: (a, g, s) => `<circle cx="6.4" cy="12" r="${f1(5.6 - s / 2)}" fill="none" stroke="${a}" stroke-width="${f1(s)}"/>`
+    + `<rect x="11" y="${f1(12 - s / 2)}" width="14.4" height="${f1(s)}" fill="${a}"/><rect x="18.4" y="12" width="${f1(s * 0.8)}" height="6" fill="${a}"/><rect x="${f1(25.4 - s * 0.8)}" y="12" width="${f1(s * 0.8)}" height="7.4" fill="${a}"/>` },
+  rose: { w: 22, say: 'rose', d: (a, g, s) => `<rect x="${f1(11 - s * 0.35)}" y="14" width="${f1(s * 0.7)}" height="10" fill="${a}"/><path d="M11 20.6Q15 15.2 20 17Q16 22.6 11 20.6Z" fill="${a}"/>`
+    + `<circle cx="11" cy="8.4" r="7.4" fill="${a}"/><path d="M11 4.2A4.2 4.2 0 1 1 6.8 8.4M11 6.6A1.8 1.8 0 1 0 12.8 8.4" fill="none" stroke="${g}" stroke-width="${f1(s * 0.42)}"/>` },
+  saw: { w: 28, say: 'saw', d: (a, g, s) => {
+    let teeth = 'M8 16';
+    for (let x = 8; x < 27; x += 2.4) teeth += `L${f1(x + 1.2)} 18.6L${f1(Math.min(27.4, x + 2.4))} 16`;
+    return `<path d="M8 6.6H27.4V16H8Z" fill="${a}"/><path d="${teeth}Z" fill="${a}"/><rect x="0.6" y="4.6" width="8.6" height="13.4" fill="${a}"/><rect x="3" y="8" width="3.8" height="6.4" fill="${g}"/>`;
+  } },
+  clock: { w: 24, say: 'hour', d: (a, g, s) => `<circle cx="12" cy="13" r="10.6" fill="${a}"/><path d="M12 13.4V5.6M11.6 13H18" fill="none" stroke="${g}" stroke-width="${f1(s * 0.66)}"/>`
+    + `<rect x="9" y="0.2" width="6" height="${f1(Math.max(1.4, s * 0.5))}" fill="${a}"/>` },
+  // control glyphs (icons, not sounds): the CTA arrow and the closed-eye switch knob
+  arrow: { w: 24, say: 'arrow', d: (a, g, s) => `<path d="M1.6 ${f1(12 - s * 0.55)}H13V4.4L22.4 12L13 19.6V${f1(12 + s * 0.55)}H1.6Z" fill="${a}"/>` },
+  lid: { w: 24, say: 'lid', d: (a, g, s) => `<path d="M1 11Q12 22 23 11" fill="none" stroke="${a}" stroke-width="${f1(s)}"/><path d="M5.6 15.6L3.8 19.6M12 17.6V22.4M18.4 15.6L20.2 19.6" fill="none" stroke="${a}" stroke-width="${f1(s * 0.6)}"/>` },
 };
 
-// word -> symbol. Inflections are handled by rbStem; the pairs from the brief come first.
-const RB_DICT = {};
-[
-  ['eye', 'eye eyes i see vision look watch'],
-  ['heart', 'heart love feel feeling care passion kind kindness'],
-  ['sun', 'sun day alive light bright morning shine warm sunny summer'],
-  ['star', 'star good best great top quality premium favorite favourite'],
-  ['arrow', 'arrow go next forward direct move ahead way path'],
-  ['key', 'key access unlock open secret answer'],
-  ['plant', 'plant grow growth fresh green organic natural garden bloom'],
-  ['bolt', 'bolt power fast quick energy electric speed charge instant busy'],
-  ['home', 'home house family stay local shelter'],
-  ['pencil', 'pencil design draw write sketch create craft make'],
-  ['cup', 'coffee tea cup drink brew cafe mug'],
-  ['moon', 'moon night dream sleep evening rest'],
-  ['check', 'check done yes right true trust'],
-].forEach(([sym, words]) => words.split(' ').forEach(w => { RB_DICT[w] = sym; }));
+// ---- the sound table ----
+// Token strings: 'name' = glyph for the rest of the word, 'name:n' = glyph that says the
+// next n letters, '_n' = keep the next n letters as type. Digits 1 2 4 8 are numerals.
+const RB_WHOLE = {};
+const W = (words, tok) => words.split(' ').forEach(w => { RB_WHOLE[w] = tok; });
+W('i eye aye', 'eye'); W('eyes', 'eye:3 _1');
+W('be bee b', 'bee'); W('bees', 'bee:3 _1');
+W('see sea c', 'wave'); W('seas sees', 'wave:3 _1');
+W('you u ewe', 'ewe'); W('your', 'ewe:3 _1'); W('yours', 'ewe:3 _2'); W('yourself', 'ewe:3 _5');
+W('tea tee t', 'cup');
+W('for four fore', '4'); W('to too two', '2'); W('ate eight', '8'); W('won', '1');
+W('can', 'can'); W('cannot', 'can:3 knot'); W('not knot', 'knot');
+W('dear deer', 'deer'); W('son sun', 'sun'); W('sons suns', 'sun:3 _1');
+W('sign', 'sign'); W('signs', 'sign:4 _1'); W('gold', 'gold'); W('mare mayor', 'horse'); W('stud', 'stud');
+W('ant aunt', 'ant'); W('ants aunts', 'ant:3 _1'); W('ear', 'ear'); W('ears', 'ear:3 _1');
+W('knee', 'knee'); W('knees', 'knee:4 _1'); W('tie thai', 'tie'); W('ties', 'tie:3 _1');
+W('pen', 'pen'); W('pens', 'pen:3 _1'); W('key quay', 'key'); W('keys', 'key:3 _1');
+W('rose rows roes', 'rose'); W('saw', 'saw'); W('hour our', 'clock'); W('hours ours', 'clock:-1 _1');
+W('great', '_2 8'); W('wait weight', '_1 8'); W('freight', '_2 8'); W('later', '_1 8:3 _1');
+W('before', 'bee:2 4'); W('therefore', '_5 4'); W('season', 'wave:3 sun'); W('seesaw', 'wave:3 saw');
 
-// which mapped word wins when only one of several can be replaced
-const RB_PRIORITY = { pencil: 6, heart: 6, cup: 5, star: 4, plant: 4, key: 4, bolt: 4, home: 4, moon: 3, eye: 3, arrow: 3, sun: 2, check: 2 };
-// short prefixes searched for inside the brand name (Sunrise, Keystone, Homebase ...)
-const RB_NAME_KEYS = ['heart', 'pencil', 'plant', 'bolt', 'moon', 'star', 'sun', 'key', 'eye', 'home', 'cup'];
-const RB_LEGEND = [['eye', 'I'], ['heart', 'love'], ['sun', 'day'], ['star', 'best'], ['arrow', 'next'], ['key', 'key'], ['plant', 'grow'], ['bolt', 'fast']];
+const L = s => s.split(' ');
+// prefixes: [spelling, token for that spelling, test(word)]; the rest of the word stays type
+const RB_PRE = [
+  ['mari', 'horse:3 eye:1', w => w.length > 5],
+  ['for', '4', w => w.length > 4 && !/^for[aeiouyr]/.test(w) || /^forever/.test(w)],
+  ['fore', '4', w => w.length > 5],
+  ['to', '2', w => L('today together tomorrow tonight toward towards').includes(w)],
+  ['be', 'bee', w => L('become becomes becoming begin begins beginning believe believes belief beyond behind below belong belongs beside besides between beneath because behold beloved bespoke bestow beware').includes(w)],
+  ['bee', 'bee', w => w.length > 4],
+  ['sea', 'wave', w => L('seasons seasonal seaside seafood seal seals seat seats').includes(w)],
+  ['see', 'wave', w => L('seed seeds seek seeks seem seems seen').includes(w)],
+  ['you', 'ewe', w => w.length > 4 && !/^young/.test(w)],
+  ['u', 'ewe', w => L('use used useful user users unique unit units united unity universe universal utility usual usually utopia').includes(w)],
+  ['i', 'eye', w => L('idea ideas ideal ideals icon icons iconic ice icy item items island islands iris identity idle iron ivory').includes(w)],
+  ['eye', 'eye', w => w.length > 4],
+  ['tea', 'cup', w => L('team teams teamwork teach teaches teacher teal tease').includes(w)],
+  ['can', 'can', w => L('candid candle candles canvas candy canopy canyon canteen').includes(w)],
+  ['pen', 'pen', w => w.length > 4 && /^pen[^aeiouy]/.test(w)],
+  ['key', 'key', w => w.length > 4],
+  ['sun', 'sun', w => w.length > 4],
+  ['gold', 'gold', w => w.length > 5],
+  ['rose', 'rose', w => w.length > 5],
+  ['hour', 'clock', w => w.length > 5],
+  ['our', 'clock', w => L('ourselves').includes(w)],
+  ['ant', 'ant', w => L('antler antlers').includes(w)],
+  ['saw', 'saw', w => w.length > 4],
+  ['tie', 'tie', w => w.length > 4],
+  ['knee', 'knee', w => w.length > 5],
+  ['deer', 'deer', w => w.length > 5],
+  ['eight', '8', w => w.length > 5],
+];
+const RB_ATE_IT = L('chocolate private climate senate ultimate intimate delicate accurate fortunate passionate compassionate considerate moderate desperate adequate appropriate immediate separate deliberate certificate graduate corporate affectionate approximate literate pirate palate karate senate delegate advocate associate');
+// suffixes: [spelling, token, test(word)]; the start of the word stays type
+const RB_SUF = [
+  ['sign', 'sign', w => w.length > 4],
+  ['fore', '4', w => w.length > 4],
+  ['eight', '8', w => w.length > 5],
+  ['ate', '8', w => w.length > 4 && !RB_ATE_IT.includes(w)],
+  ['son', 'sun', w => w.length > 4],
+  ['pen', 'pen', w => w.length > 3],
+  ['can', 'can', w => w.length > 4],
+  ['ant', 'ant', w => w.length > 4],
+  ['ear', 'ear', w => w.length > 3 && !/[bpw]ear$/.test(w) && w !== 'tear'],
+  ['key', 'key', w => w.length > 4],
+  ['rose', 'rose', w => w.length > 5],
+  ['deer', 'deer', w => w.length > 5],
+  ['gold', 'gold', w => w.length > 4],
+  ['saw', 'saw', w => w.length > 4],
+  ['bee', 'bee', w => w.length > 4],
+  ['tie', 'tie', w => w.length > 4],
+];
 
-function rbStem(w) {
-  const x = String(w).toLowerCase().replace(/[^a-z]/g, '');
-  if (RB_DICT[x]) return RB_DICT[x];
-  for (const suf of ['ing', 'es', 's', 'ed', 'ly', 'ness']) {
-    if (x.length > suf.length + 2 && x.endsWith(suf)) {
-      const st = x.slice(0, -suf.length);
-      if (RB_DICT[st]) return RB_DICT[st];
-      if (RB_DICT[st + 'e']) return RB_DICT[st + 'e'];
-    }
+// token string -> pieces over a word of length n: [{ g } | { n: digit } | { l: count }]
+function rbTok(tok, n) {
+  const out = [];
+  let used = 0;
+  const parts = tok.split(' ');
+  parts.forEach((p, i) => {
+    const last = i === parts.length - 1;
+    if (p[0] === '_') { const c = +p.slice(1); out.push({ l: c }); used += c; return; }
+    const [name, cnt] = p.split(':');
+    let c = cnt == null ? (last ? n - used : 1) : (+cnt < 0 ? n - used + +cnt : +cnt);
+    if (last && cnt == null) c = n - used;
+    out.push(/^\d$/.test(name) ? { n: name, c } : { g: name, c });
+    used += c;
+  });
+  return used === n ? out : null;
+}
+
+// Sound segmentation of one word (letters only). Returns pieces with letter slices, or null.
+function rbSegment(raw) {
+  if (!/^[A-Za-z]+$/.test(raw)) return null;
+  const w = raw.toLowerCase(), n = w.length;
+  let pieces = null, kind = '';
+  if (RB_WHOLE[w]) { pieces = rbTok(RB_WHOLE[w], n); kind = 'whole'; }
+  if (!pieces) {
+    let best = null;
+    const pre = RB_PRE.filter(([p, , ok]) => w.startsWith(p) && w.length > p.length && ok(w));
+    const suf = RB_SUF.filter(([s, , ok]) => w.endsWith(s) && w.length > s.length && ok(w));
+    const cand = [];
+    pre.forEach(([p, t]) => cand.push({ a: [p, t], b: null }));
+    suf.forEach(([s, t]) => cand.push({ a: null, b: [s, t] }));
+    pre.forEach(([p, t]) => suf.forEach(([s, u]) => { if (p.length + s.length <= n) cand.push({ a: [p, t], b: [s, u] }); }));
+    cand.forEach(c => {
+      const pl = c.a ? c.a[0].length : 0, sl = c.b ? c.b[0].length : 0;
+      const ps = [];
+      if (c.a) { const x = rbTok(c.a[1], pl); if (!x) return; ps.push(...x); }
+      if (n - pl - sl > 0) ps.push({ l: n - pl - sl });
+      if (c.b) { const x = rbTok(c.b[1], sl); if (!x) return; ps.push(...x); }
+      const cover = pl + sl, glyphs = ps.filter(q => !('l' in q)).length;
+      const score = cover * 2 + glyphs;
+      if (!best || score > best.score) best = { ps, score };
+    });
+    if (best) { pieces = best.ps; kind = 'syllable'; }
   }
-  return null;
+  if (!pieces || !pieces.some(q => !('l' in q))) return null;
+  // attach the original letters (case kept) to every piece
+  let i = 0;
+  pieces = pieces.map(q => { const c = 'l' in q ? q.l : q.c; const txt = raw.slice(i, i + c); i += c; return Object.assign({}, q, { txt }); });
+  return { pieces, kind };
 }
 
-function rbSvg(name, colors, cls) {
-  const f = RB_SYM[name] || RB_SYM.star;
-  return `<svg class="${cls || 'rb-sym'}" viewBox="0 0 24 24" focusable="false" aria-hidden="true">${f(colors)}</svg>`;
+// Spelling arithmetic for the brand lockup: [picture] - its extra letters + the rest.
+function rbArith(raw) {
+  if (!/^[A-Za-z]{3,}$/.test(raw)) return null;
+  const w = raw.toLowerCase();
+  let best = null;
+  Object.keys(RB_G).forEach(name => {
+    const say = RB_G[name].say;
+    if (!say || name === 'arrow' || name === 'lid' || /[^a-z]/.test(say)) return;
+    let k = 0;
+    while (k < say.length && k < w.length && say[k] === w[k]) k++;
+    const drop = say.length - k, add = w.length - k;
+    if (k < 2 || drop > 2 || add < 1 || add > 7) return;
+    const score = k * 3 - drop * 2;
+    if (!best || score > best.score) best = { score, g: name, drop: say.slice(k), add: raw.slice(k) };
+  });
+  return best;
 }
 
-// data URI (single-quote safe) for use in a CSS custom property
-function rbUri(name, colors) {
-  const f = RB_SYM[name] || RB_SYM.star;
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">${f(colors)}</svg>`;
+function rbSvg(name, a, g, s, cls, style) {
+  const G = RB_G[name];
+  if (!G) return '';
+  return `<svg class="${cls || 'rb-sym'}" viewBox="0 0 ${G.w} 24" style="width:${f1(G.w / 24 * 0.72)}em${style ? ';' + style : ''}" focusable="false" aria-hidden="true">${G.d(a, g, s)}</svg>`;
+}
+function rbUri(name, a, g, s) {
+  const G = RB_G[name];
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${G.w} 24">${G.d(a, g, s)}</svg>`;
   return `url('data:image/svg+xml,${encodeURIComponent(svg).replace(/'/g, '%27')}')`;
 }
 
-function rbHash(str) {
-  let h = 2166136261;
-  for (const ch of String(str)) { h ^= ch.codePointAt(0); h = Math.imul(h, 16777619); }
-  return h >>> 0;
+// one piece as HTML: a glyph, a numeral or letters
+function rbPiece(q, col, t, s) {
+  const e = escapeHtml;
+  if ('l' in q) return `<span class="rb-l">${e(q.txt)}</span>`;
+  if (q.n) return `<span class="rb-num"${col !== t.ink ? ` style="color:${col}"` : ''}>${q.n}</span>`;
+  return `<span class="rb-g">${rbSvg(q.g, col, t.canvas, s)}</span>`;
 }
 
-// Split the tagline into word records and decide which become symbols.
-function rbPlan(tagline) {
-  const words = String(tagline || '').trim().split(/\s+/).filter(Boolean).map(w => {
-    const m = w.match(/^([\s\S]*?)([.,;:!?…]*)$/);
-    return { raw: m[1], punct: m[2], sym: rbStem(m[1]) };
+// Plan the headline: which words get their sound picture (at most 3 words, 4 pictures).
+function rbPlan(text) {
+  const words = String(text || '').trim().split(/\s+/).filter(Boolean).map(w => {
+    const m = w.match(/^([^A-Za-z0-9]*)([\s\S]*?)([^A-Za-z0-9]*)$/);
+    return { lead: m[1], raw: m[2], punct: m[3], seg: rbSegment(m[2]) };
   });
-  const n = words.length;
+  const cands = words.map((w, i) => ({ i, w })).filter(c => c.w.seg)
+    .sort((x, y) => (y.w.seg.kind === 'whole') - (x.w.seg.kind === 'whole') || x.i - y.i);
   const chosen = new Set();
-  const last = n - 1;
-  if (n && words[last].sym) chosen.add(last);
-  const rest = words.map((w, i) => ({ i, p: w.sym ? RB_PRIORITY[w.sym] || 1 : 0 }))
-    .filter(c => c.p && !chosen.has(c.i))
-    .sort((a, b) => b.p - a.p || b.i - a.i);
-  const slots = chosen.size ? 1 : 2;
-  for (const c of rest) {
-    if (chosen.size >= (chosen.has(last) ? 2 : slots)) break;
-    if ([...chosen].some(j => Math.abs(j - c.i) < 2)) continue;
-    chosen.add(c.i);
+  let pics = 0;
+  for (const c of cands) {
+    const k = c.w.seg.pieces.filter(q => !('l' in q)).length;
+    if (chosen.size >= 3 || pics + k > 4) continue;
+    chosen.add(c.i); pics += k;
   }
-  // no mapped word at all: one symbol between the middle words
-  const sepAfter = chosen.size === 0 && n > 1 ? Math.max(0, Math.ceil(n / 2) - 1) : -1;
-  return { words, chosen, last, sepAfter };
+  return { words, chosen, pics };
 }
 
-function rbHeadline(tagline, t, seed) {
-  const plan = rbPlan(tagline);
-  const body = { primary: t.primary, secondary: t.secondary };
-  let k = 0;
-  const parts = plan.words.map((w, i) => {
-    const hl = i === plan.last;
-    let html;
+function rbHeadline(text, t, s) {
+  const plan = rbPlan(text);
+  const e = escapeHtml;
+  // the last picture in the line is the one primary glyph
+  let lastWord = -1;
+  plan.words.forEach((w, i) => { if (plan.chosen.has(i)) lastWord = i; });
+  return plan.words.map((w, i) => {
+    let inner;
     if (plan.chosen.has(i)) {
-      if (hl) {
-        html = `<span class="rb-w rb-hlsym">${rbSvg(w.sym, { a: t.onAccent, b: t.accent, k: t.onAccent }, 'rb-sym')}</span>`;
-      } else {
-        const a = k++ === 0 ? t.primary : t.secondary;
-        html = `<span class="rb-w rb-s">${rbSvg(w.sym, { a, b: t.secondary === a ? t.primary : t.secondary, k: t.ink }, 'rb-sym')}</span>`;
-      }
+      const ps = w.seg.pieces;
+      let lastPic = -1;
+      ps.forEach((q, j) => { if (!('l' in q)) lastPic = j; });
+      inner = ps.map((q, j) => rbPiece(q, i === lastWord && j === lastPic ? t.primary : t.ink, t, s)).join('');
     } else {
-      html = `<span class="rb-w${hl ? ' rb-hl' : ''}">${escapeHtml(w.raw)}</span>`;
+      inner = e(w.raw);
     }
-    const punct = w.punct ? `<span class="rb-p">${escapeHtml(w.punct)}</span>` : '';
-    let out = html + punct;
-    if (i === plan.sepAfter) {
-      const names = ['star', 'bolt', 'heart', 'arrow', 'sun'];
-      out += ` <span class="rb-w rb-s rb-sep">${rbSvg(names[seed % names.length], { a: t.primary, b: t.secondary, k: t.ink }, 'rb-sym')}</span>`;
-    }
-    return out;
-  });
-  return { html: parts.join(' '), plan, body };
+    return `<span class="rb-w">${e(w.lead)}${inner}${e(w.punct)}</span>`;
+  }).join(' ');
 }
 
-// Brand name equation: [symbol][rest of word] = name, or [initial][symbol] = name.
-function rbEquation(ctx, plan) {
-  const t = ctx.t;
+// The brand-name lockup: sound pictures for every word that has one, else spelling
+// arithmetic on one word, else the rebus sign-off "I see you" next to the name.
+function rbLockup(ctx, primaryFirst, s) {
+  const t = ctx.t, e = escapeHtml;
   const name = String(ctx.brandName || '').trim();
   const words = name.split(/\s+/).filter(Boolean);
-  const lower = (words[0] || '').toLowerCase().replace(/[^a-z]/g, '');
-  let key = null;
-  for (const k of RB_NAME_KEYS) if (lower.startsWith(k) && lower.length >= k.length + 2) { key = k; break; }
-  const e = escapeHtml;
-  const tile = (cls, inner) => `<span class="rb-eq-t ${cls}">${inner}</span>`;
-  const nameTile = tile('rb-eq-name', `<b>${e(name)}</b>`);
-  let a, b, capHtml;
-  if (key) {
-    const rest = words[0].slice(key.length);
-    a = tile('rb-eq-sym', rbSvg(key, { a: t.onSecondary, b: t.secondary, k: t.onSecondary }, 'rb-eq-svg'));
-    b = tile('rb-eq-txt', `<b>${e(rest.toLowerCase())}</b>`);
-    // a true phonetic rebus: the syllable key + the rest of the word really do say the name
-    capHtml = `read it aloud: ${e(key)} + ${e(rest.toLowerCase())} = ${e(name)}`;
+  const segs = words.map(w => rbSegment(w.replace(/[^A-Za-z]/g, '') === w ? w : ''));
+  let usedPrimary = !primaryFirst;
+  const col = () => { if (!usedPrimary) { usedPrimary = true; return t.primary; } return t.ink; };
+  const op = c => `<i class="rb-op">${c}</i>`;
+  let row = '', kind;
+  if (segs.some(Boolean)) {
+    kind = 'sound';
+    row = words.map((w, i) => {
+      if (!segs[i]) return `<span class="rb-eq-w"><span class="rb-l">${e(w)}</span></span>`;
+      return `<span class="rb-eq-w">${segs[i].pieces.map(q => rbPiece(q, 'l' in q ? t.ink : col(), t, s)).join(op('+'))}</span>`;
+    }).join('');
   } else {
-    // the idea of the tagline: its last word's symbol, else the first mapped word's, else a stable pick
-    const hit = plan && ((plan.words[plan.last] && plan.words[plan.last].sym) ? plan.words[plan.last] : plan.words.find(w => w.sym));
-    const sym = (hit && hit.sym) || ['star', 'sun', 'bolt', 'heart'][rbHash(name) % 4];
-    a = tile('rb-eq-init', `<b>${e(ctx.initial)}</b>`);
-    b = tile('rb-eq-sym', rbSvg(sym, { a: t.onSecondary, b: t.secondary, k: t.onSecondary }, 'rb-eq-svg'));
-    // no syllable key: this is a mark (initial + symbol), not a phonetic reading, so the caption does not claim one
-    capHtml = `the mark: ${e(ctx.initial)} + ${e(sym)}`;
+    const ai = words.findIndex(w => rbArith(w));
+    if (ai >= 0) {
+      kind = 'arith';
+      const a = rbArith(words[ai]);
+      row = words.map((w, i) => {
+        if (i !== ai) return `<span class="rb-eq-w"><span class="rb-l">${e(w)}</span></span>`;
+        const pic = rbPiece({ g: a.g }, col(), t, s);
+        const minus = a.drop ? `${op('−')}<span class="rb-l rb-drop">${e(a.drop)}</span>` : '';
+        return `<span class="rb-eq-w">${pic}${minus}${op('+')}<span class="rb-l">${e(a.add)}</span></span>`;
+      }).join('');
+    } else {
+      kind = 'signoff';
+      row = `<span class="rb-eq-w">${['eye', 'wave', 'ewe'].map(g => rbPiece({ g }, col(), t, s)).join('')}</span><span class="rb-eq-w rb-eq-name"><span class="rb-l">${e(name)}</span></span>`;
+    }
   }
-  return `<div class="rb-eq" role="presentation"><div class="rb-eq-row">${a}<i class="rb-op">+</i>${b}<i class="rb-op">=</i>${nameTile}</div><p class="rb-eq-cap">${capHtml}</p></div>`;
+  const answer = kind === 'signoff' ? `I see you, ${name}` : name;
+  return `<div class="rb-eq" data-kind="${kind}"><div class="rb-eq-row">${row}</div>`
+    + `<p class="rb-ans"><span class="rb-ans-k">Read it aloud. Answer</span><span class="rb-ans-flip">${e(answer)}</span></p></div>`;
 }
 
-function rbLegend(t) {
-  const cols = [t.ink, t.primary, t.secondary];
-  const one = (s, i) => {
-    const a = s === 'eye' ? t.primary : cols[i % 3];
-    return rbSvg(s, { a, b: s === 'eye' ? t.canvas : (a === t.secondary ? t.primary : t.secondary), k: t.ink }, 'rb-lg');
-  };
-  return `<ul class="rb-legend">${RB_LEGEND.map(([s, w], i) => `<li>${one(s, i)}<span>${escapeHtml(w)}</span></li>`).join('')}</ul>`;
+// The glyph construction sheet (deck Material slide): one glyph on the 24-unit grid with
+// its stem marked, plus the set the brand uses.
+function rbBuild(ctx, s, hw, lead, set) {
+  const t = ctx.t;
+  const G = RB_G[lead];
+  const grid = Array.from({ length: 25 }, (_, i) => `M${i} 0V24M0 ${i}H${G.w > 24 ? G.w : 24}`).join('');
+  const W = Math.max(24, G.w);
+  const strip = set.map(g => `<span class="rb-g">${rbSvg(g, t.ink, t.canvas, s)}</span>`).join('');
+  return `<div class="rb-build">
+    <figure class="rb-build-fig"><svg viewBox="-1 -1 ${W + 2} 26" focusable="false" aria-hidden="true">
+      <path d="${grid}" fill="none" stroke="${t.ink}" stroke-opacity=".14" stroke-width=".06"/>
+      <path d="M0 0H${W}V24H0Z" fill="none" stroke="${t.ink}" stroke-opacity=".5" stroke-width=".1"/>
+      <g transform="translate(${(W - G.w) / 2} 0)">${G.d(t.primary, t.canvas, s)}</g>
+      <path d="M0 24.6H${f1(s)}M0 24.3V24.9M${f1(s)} 24.3V24.9" stroke="${t.ink}" stroke-width=".12" fill="none"/>
+    </svg>
+    <figcaption class="rb-build-cap"><b>24-unit grid</b><span>stem ${f1(s)} units · from heading weight ${hw}</span></figcaption></figure>
+    <div class="rb-build-set">${strip}</div>
+  </div>`;
+}
+
+// Pictogram wallpaper tile (deck cover band and closing strip): the set in ink on canvas.
+function rbWall(t, s) {
+  const set = ['eye', 'bee', 'wave', 'sign', 'cup', 'ewe'];
+  const cell = 40, cols = 3, rows = 2;
+  const items = set.map((g, i) => {
+    const G = RB_G[g], c = i % cols, r = Math.floor(i / cols);
+    const x = c * cell + (cell - G.w) / 2, y = r * cell + 8;
+    return `<g transform="translate(${f1(x)} ${y})">${G.d(t.ink, t.canvas, s)}</g>`;
+  }).join('');
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${cols * cell}" height="${rows * cell}" viewBox="0 0 ${cols * cell} ${rows * cell}"><rect width="100%" height="100%" fill="${t.canvas}"/>${items}</svg>`;
+  return `url('data:image/svg+xml,${encodeURIComponent(svg).replace(/'/g, '%27')}')`;
 }
 
 registerAesthetic({
   key: 'rebus', order: 26,
   name: 'Rebus',
-  descriptor: 'Playful · Symbolic · Clever',
-  influences: 'Rebus puzzles / Paul Rand\'s IBM eye-bee-M / Nouveau Rebus branding',
-  summary: 'Bold flat pictograms stand in for words, so the headline reads as a picture puzzle.',
-  motto: 'Say it with a picture.',
+  descriptor: 'Phonetic · Graphic · Clever',
+  influences: 'Rand\'s Eye-Bee-M / Glaser / Victorian rebus cards',
+  summary: 'Pictures that sound like the words stand in for them, so the line reads as a puzzle you say out loud.',
+  motto: 'Be seen. Be heard.',
   kicker: 'Read it aloud',
   mode: 'light',
-  slideShape: 'soft',
-  labels: { material: 'Symbols', states: ['Word', 'Mixed', 'Symbol'], statesKind: 'swatch' },
+  slideShape: 'minimal',
+  labels: { material: 'Glyphs', states: ['Word', 'Picture', 'Its name'], statesKind: 'swatch' },
   layout: { hero: 'centered', palette: 'swatches', sections: 'two-col', subcopy: false },
-  // Deck copy (js/brand-deck.js): three principles, three do / don't lines, each short.
   deck: {
-    materialStage: 'pattern',
     principles: [
-      ['Say it with a picture', 'Pictograms replace words in the headline.'],
-      ['Flat, heavy, on a 24-unit grid', 'Drawn at the weight of the heavy sans.'],
-      ['Icons wherever controls need one', 'Tabs, avatars, chips, the CTA arrow and the switch.'],
+      ['Pictures say the sound', 'Eye for I, bee for be, sign for -sign.'],
+      ['Drawn at the letters\' weight', 'Discs, bars and stripe cuts on a 24-unit grid.'],
+      ['One colour, one red', 'Everything in ink; one glyph per view in primary.'],
     ],
     do: [
-      'Replace the last word with its pictogram.',
-      'Draw pictograms flat on a 24-unit grid.',
-      'Use a pictogram wherever a control needs an icon.',
+      'Replace a word or syllable only where the picture says the sound.',
+      'Set glyphs at cap height, kerned like letters.',
+      'Keep one glyph per view in primary.',
     ],
     dont: [
-      'Use emoji, outlined clip-art or gradients.',
-      'Replace more than two words.',
-      'Put text on the accent disc.',
+      'Swap a word for a picture of its meaning.',
+      'Use emoji, outlined icons or tinted tiles.',
+      'Put glyphs on discs, pills or app tiles.',
     ],
   },
   type: { ui: 'body', label: 'body' },
   highlight: 'custom',
-  highlightNote: 'The last word is replaced by its pictogram on a flat accent disc (glyph in the on-accent colour); when it has no symbol it stays a word in the accent (shaded to read as text). The replaced word stays in visually-hidden text.',
-  cardFill: '--ab-tile',
+  highlightNote: 'No highlight band. A word or syllable that has a sound picture (eye = I, bee = be, sign = -sign) is drawn as a flat geometric glyph at cap height inside the line; the last glyph is the one primary mark, every other glyph and word is ink. Words with no sound picture stay type.',
+  cardFill: '--ab-canvas',
 
   roles: {
-    canvas: { use: 'The page, and the quiet ground the symbols sit on', never: 'Text' },
-    ink: { use: 'Headline words, body text, the result tile of the equation and the detail strokes inside symbols', never: 'Large filled fields other than the one result tile' },
-    primary: { use: 'The one CTA, the selected tab, the "on" switch, one symbol in the headline and the initial tile of the equation', never: 'Body text, borders, more than one CTA, whole panels' },
-    secondary: { use: 'Support: status pills, list avatars, the symbol tile of the equation, the second symbol colour', never: 'The main CTA, body text, the page background' },
-    accent: { use: 'One spark: the disc behind the last headline word\'s symbol, and the footer star', never: 'Buttons, body text, borders, large fills' },
+    canvas: { use: 'The page: flat paper the type and glyphs are printed on', never: 'Text' },
+    ink: { use: 'Every word, every glyph but one, the rules, the selected tab and the switch', never: 'Tinted panels or tiles; ink is type, glyphs and 2px rules' },
+    primary: { use: 'Exactly one glyph per view (the last headline glyph), and the one main action', never: 'Body text, a second glyph, tiles, borders' },
+    secondary: { use: 'Progress fills in lists, and nothing else', never: 'Glyphs, the main action, backgrounds' },
+    accent: { use: 'The footer mark only', never: 'Glyphs, discs behind glyphs, buttons, text', coverage: '≤2%' },
   },
 
   tokens(t) {
-    const st = typeof state !== 'undefined' ? state : null;
-    const hf = st && st.headingFont;
-    const vars = {
-      '--ab-type-pick-w': 800,
-      '--ab-tile': t.mix(t.canvas, t.ink, t.isDark ? 0.93 : 0.94),
-      '--ab-tile2': t.secTint,
+    const hw = rbHeadWeight();
+    const s = rbStem(hw);
+    const ic = (name, a, g) => rbUri(name, a, g, s);
+    return {
+      '--ab-type-pick-w': Math.min(hw, 800),
+      '--rb-hw': hw,
+      '--rb-i-cta': ic('arrow', t.onPrimary, t.primary),
+      '--rb-i-eye': ic('eye', t.ink, t.canvas),
+      '--rb-i-lid': ic('lid', t.muted, t.canvas),
+      '--rb-i-sign': ic('sign', t.muted, t.canvas),
+      '--rb-i-bee': ic('bee', t.muted, t.canvas),
+      '--rb-i-arrow': ic('arrow', t.muted, t.canvas),
+      '--rb-i-sign-on': ic('sign', t.canvas, t.ink),
+      '--rb-i-bee-on': ic('bee', t.canvas, t.ink),
+      '--rb-i-arrow-on': ic('arrow', t.canvas, t.ink),
+      '--rb-i-eye-st': ic('eye', t.ink, t.canvas),
+      '--rb-wall': rbWall(t, s),
     };
-    if (hf) {
-      const have = String(hf.weights || '400').split(';').map(Number).filter(Boolean);
-      const under = have.filter(w => w <= 800);
-      vars['--rb-hw'] = under.length ? Math.max(...under) : Math.max(...have);
-    }
-    // icons for components, colours baked in (custom properties hold data URIs)
-    const ic = (name, a, b, k) => rbUri(name, { a, b: b || a, k: k || a });
-    vars['--rb-i-pencil'] = ic('pencil', t.muted, t.muted, t.muted);
-    vars['--rb-i-home'] = ic('home', t.muted, t.muted);
-    vars['--rb-i-arrow'] = ic('arrow', t.muted);
-    vars['--rb-i-pencil-on'] = ic('pencil', t.onPrimary, t.onPrimary, t.onPrimary);
-    vars['--rb-i-home-on'] = ic('home', t.onPrimary, t.onPrimary);
-    vars['--rb-i-arrow-on'] = ic('arrow', t.onPrimary);
-    vars['--rb-i-cta'] = ic('arrow', t.onPrimary);
-    vars['--rb-i-eye'] = ic('eye', t.primary, t.canvas, t.ink);
-    vars['--rb-i-moon'] = ic('moon', t.muted);
-    vars['--rb-i-heart'] = ic('heart', t.primary);
-    vars['--rb-i-star-acc'] = ic('star', t.accentInk);
-    vars['--rb-c-canvas'] = ic('home', t.ink, t.ink);
-    vars['--rb-c-ink'] = ic('pencil', t.canvas, t.canvas, t.canvas);
-    vars['--rb-c-primary'] = ic('arrow', t.onPrimary);
-    vars['--rb-c-secondary'] = ic('heart', t.onSecondary);
-    vars['--rb-c-accent'] = ic('star', t.onAccent);
-    vars['--rb-a-pencil'] = ic('pencil', t.ink, t.secondary, t.ink);
-    vars['--rb-a-arrow'] = ic('arrow', t.ink);
-    vars['--rb-a-plant'] = ic('plant', t.ink, t.secondary, t.ink);
-    vars['--rb-r-pencil'] = ic('pencil', t.primary, t.secondary, t.ink);
-    vars['--rb-r-eye'] = ic('eye', t.secondary, t.canvas, t.ink);
-    vars['--rb-r-bolt'] = ic('bolt', t.secondary);
-    return vars;
   },
 
   // The rebus headline for the real <h2> (the framework wraps it, escapes the label and sizes it).
-  headline(ctx, text) { return rbHeadline(text, ctx.t, rbHash(ctx.brandName)).html; },
+  headline(ctx, text) { return rbHeadline(text, ctx.t, rbStem(rbHeadWeight())); },
 
   art(ctx) {
     const t = ctx.t;
+    const hw = rbHeadWeight();
+    const s = rbStem(hw);
     const plan = rbPlan(ctx.tagline);
-    return `<div class="rb">
-      ${rbEquation(ctx, plan)}
-      ${rbLegend(t)}
-    </div>`;
+    const lock = rbLockup(ctx, plan.chosen.size === 0, s);
+    const e = escapeHtml;
+    const sub = `<p class="rb-sub">A de<span class="rb-g rb-gx">${rbSvg('sign', t.ink, t.canvas, s)}</span> language for ${e(String(ctx.brandName || '').trim())} — type, colour and material in one place.</p>`;
+    // the construction sheet shows the lead glyph of the lockup (else the eye)
+    let lead = 'eye';
+    const segAll = String(ctx.brandName || '').split(/\s+/).map(w => rbSegment(w)).find(Boolean);
+    if (segAll) { const p = segAll.pieces.find(q => q.g); if (p) lead = p.g; }
+    else { const a = String(ctx.brandName || '').split(/\s+/).map(w => rbArith(w)).find(Boolean); if (a) lead = a.g; }
+    const set = [lead, ...['eye', 'bee', 'wave', 'ewe', 'cup', 'sign', 'gold', 'horse'].filter(g => g !== lead)].slice(0, 8);
+    return `<div class="rb">${sub}${lock}${rbBuild(ctx, s, hw, lead, set)}</div>`;
   },
 
   materials: [
-    { name: 'Pictogram', css: 'flat SVG on a 24-unit grid; fill: {primary}, {secondary} or {ink}; detail strokes in {ink}; no outlines, no gradients, no emoji. Height 0.8em, sitting on the baseline of the headline.' },
-    { name: 'Highlight symbol', css: 'background: {accent}; border-radius: 50%; width: 1.05em; height: 1.05em; /* the last word as a pictogram drawn in {onAccent}; the word stays in visually-hidden text */' },
-    { name: 'Symbol tile', css: 'background: {secTint}; border-radius: 22px; box-shadow: none; /* flat colour block; equation tiles use {primary}, {secondary} and {ink} fills */' },
-    { name: 'Primary action', css: 'background: {primary}; color: {onPrimary}; border-radius: 999px; padding: 15px 22px; /* ends in a flat arrow pictogram in {onPrimary} */' },
-    { name: 'Selected tab', css: 'background: {primary}; color: {onPrimary}; border-radius: 999px; /* leads with a pictogram in {onPrimary}; unselected tabs show it in {muted} */' },
-    { name: 'Switch', css: 'track: {line} (off) or {primary} (on); border-radius: 999px; knob: {canvas} circle holding an eye (on) or a moon (off).' },
-    { name: 'List avatar', css: 'background: {secTint}; border-radius: 50%; width: 40px; height: 40px; /* holds a pictogram in {ink} and {secondary} */' },
+    { name: 'Sound glyph', css: 'fill: {ink}; height: 0.72em (cap height); margin: 0 0.01em; /* flat geometric primitives (discs, half-discs, bars, stripe cuts) on a 24-unit grid; stem = heading weight / 800 x 3.4 units; a picture only stands where its name says the sound */' },
+    { name: 'The one primary glyph', css: 'fill: {primary}; /* exactly one per view: the last glyph in the headline (or the first in the brand lockup when the headline has none) */' },
+    { name: 'Lockup', css: 'font: heading weight, display size; glyphs at cap height joined by "+" set in the heading face; the answer printed upside down in small type underneath (transform: rotate(180deg))' },
+    { name: 'Primary action', css: 'background: {primary}; color: {onPrimary}; border-radius: 0; padding: 15px 18px; /* a flat rectangle ending in the arrow glyph in {onPrimary} */' },
+    { name: 'Poster block', css: 'background: {canvas}; border-top: 2px solid {ink}; border-radius: 0; /* cards are ruled blocks, never tinted tiles */' },
+    { name: 'Switch', css: 'track: 2px {ink} outline, square; knob: {ink} square holding the eye (on) or the closed lid (off).' },
   ],
 
   rules: {
     do: [
-      'Replace the last headline word with its pictogram on an accent disc, and one other mapped word with a brand-colour pictogram; keep every replaced word in visually-hidden text.',
-      'Draw pictograms flat on a 24-unit grid at the weight of the heavy sans, sitting on the baseline at about cap height.',
-      'Put a pictogram wherever a control would carry an icon: tab leaders, list avatars, palette chips, the CTA arrow, the switch knob.',
-      'Set the headline in a heavy friendly sans with generous spacing, and read the brand name as an equation.',
+      'Replace a word or a syllable only where the picture says the sound: eye = I, bee = be, sea = see, ewe = you, 4 = for, 8 = ate, "de" + [sign] = design. Keep every replaced word in the aria-label.',
+      'Draw glyphs from discs, half-discs, bars and stripe cuts on a 24-unit grid, with the stem taken from the heading weight, at cap height and kerned like letters.',
+      'Print everything in ink and exactly one glyph per view in primary; colour is the paper and one red mark.',
+      'Set the brand as a lockup of sound pictures joined by "+", with the answer upside down in small type.',
     ],
     dont: [
-      'Use emoji, outlined clip-art or gradients as symbols.',
-      'Replace more than two words, or two neighbouring words, in one headline; it stops reading as a puzzle.',
-      'Fill panels with primary or accent, or put text on the accent disc.',
-      'Use a hairline, didone or pixel face; the words must carry the same weight as the symbols.',
+      'Swap a word for a picture of what it means (a pencil for "design", a sun for "alive"); that is an icon caption, not a rebus.',
+      'Use emoji, outlined icon sets, two-tone glyphs, or glyphs on discs, pills or app-icon tiles.',
+      'Round the shell into pills and pastel tiles; this is a flat poster with hairline rules.',
+      'Force a picture into a word that has no sound match; leave it as type.',
     ],
   },
 });
+})();

@@ -200,7 +200,7 @@ const AESTHETIC_META = {
     fonts: {
       heading: { classes: ['grotesk', 'neo-grotesk'], picks: ['Space Grotesk', 'Inter', 'Archivo'] },
       body: { classes: ['neo-grotesk'], picks: ['Inter', 'IBM Plex Sans'] },
-      mono: { picks: ['Azeret Mono', 'IBM Plex Mono', 'Space Mono'] },
+      mono: { picks: ['Azeret Mono', 'IBM Plex Mono', 'Space Mono', 'Doto'], note: 'Doto for numerals and the display only' },
       avoid: ['serif', 'rounded', 'groovy'],
       why: 'Device panels read as machined with a precise grotesk and monospace labels, never serif or rounded.',
       pairings: [['Space Grotesk', 'Inter'], ['Archivo', 'IBM Plex Sans'], ['Inter', 'Inter']],
@@ -220,11 +220,11 @@ const AESTHETIC_META = {
   'groovy-70s': {
     family: 'graphic',
     fonts: {
-      heading: { classes: ['groovy', 'soft-serif'], picks: ['Shrikhand', 'Bagel Fat One', 'Righteous', 'Fraunces'] },
+      heading: { classes: ['groovy', 'soft-serif'], picks: ['Bagel Fat One', 'Fraunces', 'Shrikhand', 'Righteous'] },
       body: { classes: ['humanist', 'soft-serif'], picks: ['Work Sans', 'Rubik', 'Lora'] },
       avoid: ['techno', 'mono', 'condensed', 'pixel'],
       why: '70s supergraphics need a fat, soft display face and a warm body that feels printed rather than engineered.',
-      pairings: [['Shrikhand', 'Work Sans'], ['Fraunces', 'Rubik'], ['Bagel Fat One', 'Lora']],
+      pairings: [['Bagel Fat One', 'Work Sans'], ['Fraunces', 'Rubik'], ['Shrikhand', 'Lora']],
     },
   },
   'blueprint': {
@@ -253,11 +253,11 @@ const AESTHETIC_META = {
     family: 'print',
     fonts: {
       heading: { classes: ['condensed', 'heavy'], picks: ['Anton', 'Archivo Black', 'Bebas Neue'] },
-      body: { classes: ['typewriter', 'grotesk'], picks: ['Courier Prime', 'Special Elite', 'Work Sans'] },
-      mono: { picks: ['Courier Prime'] },
+      body: { classes: ['typewriter', 'grotesk'], picks: ['Courier Prime', 'IBM Plex Mono', 'Work Sans'] },
+      mono: { picks: ['Courier Prime', 'IBM Plex Mono'] },
       avoid: ['rounded', 'soft-serif', 'deco', 'geometric'],
       why: 'A photocopied flyer needs one blunt, heavy headline face over typewriter or plain grotesk text, because copying turns anything delicate to mush.',
-      pairings: [['Anton', 'Courier Prime'], ['Archivo Black', 'Work Sans'], ['Bebas Neue', 'Special Elite']],
+      pairings: [['Anton', 'Courier Prime'], ['Archivo Black', 'Work Sans'], ['Bebas Neue', 'IBM Plex Mono']],
     },
   },
   'micrographics': {
@@ -296,11 +296,11 @@ const AESTHETIC_META = {
   'rebus': {
     family: 'graphic',
     fonts: {
-      heading: { classes: ['heavy', 'geometric', 'rounded'], picks: ['Bricolage Grotesque', 'Archivo Black', 'Lexend', 'Fredoka'] },
-      body: { classes: ['geometric', 'neo-grotesk'], picks: ['DM Sans', 'Inter'] },
-      avoid: ['didone', 'old-style', 'techno', 'pixel'],
-      why: 'Flat pictograms sit in the line at the weight of the letters, so the headline needs a heavy, friendly sans that matches their bold shapes.',
-      pairings: [['Bricolage Grotesque', 'DM Sans'], ['Archivo Black', 'Inter'], ['Fredoka', 'DM Sans']],
+      heading: { classes: ['slab', 'heavy'], picks: ['Zilla Slab', 'Roboto Slab', 'Arvo', 'Archivo Black'] },
+      body: { classes: ['grotesk', 'neo-grotesk'], picks: ['Work Sans', 'Inter'] },
+      avoid: ['didone', 'old-style', 'techno', 'pixel', 'rounded'],
+      why: 'A slab or hard grotesk gives the pictograms a letter to match, as with Glaser\'s American Typewriter and Rand\'s City.',
+      pairings: [['Zilla Slab', 'Work Sans'], ['Roboto Slab', 'Inter'], ['Archivo Black', 'Work Sans']],
     },
   },
   'corporate-vandalism': {
@@ -317,12 +317,12 @@ const AESTHETIC_META = {
   'religious-futurism': {
     family: 'luminous',
     fonts: {
-      heading: { classes: ['deco', 'old-style', 'didone'], picks: ['Cinzel', 'Cinzel Decorative', 'Cormorant Garamond', 'Italiana'] },
+      heading: { classes: ['wide', 'deco', 'old-style'], picks: ['Unbounded', 'Marcellus', 'Cinzel', 'Cormorant Garamond'] },
       body: { classes: ['old-style', 'neo-grotesk'], picks: ['EB Garamond', 'Inter'] },
       mono: { picks: ['DM Mono'] },
       avoid: ['groovy', 'pixel', 'rounded', 'heavy'],
-      why: 'Monumental inscriptional caps and a quiet text serif give the cathedral its stillness, with tiny mono annotations as the liturgical footnotes.',
-      pairings: [['Cinzel', 'EB Garamond'], ['Cormorant Garamond', 'Inter'], ['Cinzel Decorative', 'Cormorant Garamond']],
+      why: 'A hairline, widely tracked extended face with a quiet text serif gives the cathedral its stillness (the Dune 2021 move), with tiny mono annotations as the liturgical footnotes.',
+      pairings: [['Unbounded', 'EB Garamond'], ['Marcellus', 'EB Garamond'], ['Cinzel', 'EB Garamond']],
     },
   },
   'xerox-punk': {
@@ -350,12 +350,12 @@ const AESTHETIC_META = {
   'cybersigilism': {
     family: 'luminous',
     fonts: {
-      heading: { classes: ['blackletter', 'wide', 'deco'], picks: ['Grenze Gotisch', 'Pirata One', 'Michroma', 'Cinzel'] },
+      heading: { classes: ['blackletter', 'wide', 'deco'], picks: ['Texturina', 'Pirata One', 'Grenze Gotisch', 'Michroma'] },
       body: { classes: ['neo-grotesk'], picks: ['Inter', 'Geist'] },
       mono: { picks: ['Geist Mono'] },
       avoid: ['rounded', 'groovy', 'heavy', 'pixel'],
       why: 'Spiked blackletter is set once as the sigil, and everything people have to read stays in a clean neo-grotesk with mono labels.',
-      pairings: [['Grenze Gotisch', 'Inter'], ['Pirata One', 'Geist'], ['Michroma', 'Inter']],
+      pairings: [['Pirata One', 'Inter'], ['Texturina', 'Geist'], ['Grenze Gotisch', 'Inter']],
     },
   },
   'industrial-hazard': {
@@ -382,12 +382,12 @@ const AESTHETIC_META = {
   'biomechanical-gothic': {
     family: 'luminous',
     fonts: {
-      heading: { classes: ['old-style', 'deco', 'didone'], picks: ['Cormorant Garamond', 'Cinzel', 'Italiana', 'Grenze Gotisch'] },
+      heading: { classes: ['deco', 'old-style', 'didone'], picks: ['Marcellus', 'Cormorant Garamond', 'Cinzel', 'Italiana'] },
       body: { classes: ['text-serif', 'old-style'], picks: ['Spectral', 'EB Garamond'] },
       mono: { picks: ['IBM Plex Mono'] },
       avoid: ['rounded', 'groovy', 'pixel', 'geometric', 'blackletter'],
       why: 'Light inscriptional and high-contrast serifs read as carved relics; blackletter pushes the structure toward costume-store metal, so it stays out.',
-      pairings: [['Cormorant Garamond', 'Spectral'], ['Cinzel', 'EB Garamond'], ['Grenze Gotisch', 'Spectral']],
+      pairings: [['Marcellus', 'Spectral'], ['Cormorant Garamond', 'Spectral'], ['Cinzel', 'EB Garamond']],
     },
   },
   'pirate-broadcast': {

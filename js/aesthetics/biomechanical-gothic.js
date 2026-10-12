@@ -105,76 +105,107 @@ registerAesthetic({
     };
   },
 
-  // "The Nave": nine receding double-rimmed pointed arches (irregular rib ticks between
-  // the rims, tonal ring walls, a vertebral spine along the floor) converging on one dim
-  // lamp. Pure SVG, viewBox 200 x 90, drawn from the vanishing point outwards.
+  // "The Nave": nine receding parabolic ribs, each a chain of shaded vertebrae with spurs and a lit
+  // spinal cord, tonal ring walls lit from above, a vertebral column on the floor, Beksinski fog that
+  // thickens with distance, converging on one dim lamp. Pure SVG, viewBox 200 x 90, drawn far to near.
   art(ctx) {
     const t = ctx.t;
     const P = bgPalette(t);
-    const cx = 100;
-    const vpy = 50;
-    const N = 9;
-    const arch = (a, g, Ht) => ({ a, g, apex: g - Ht, e: g - Ht * 0.42, b: Ht * 0.58 });
+    bgPalette.seq = (bgPalette.seq || 0) + 1;
+    const id = 'bg' + bgPalette.seq;
+    const cx = 100, vpy = 50, N = 9;
+    const f = n => Math.round(n * 100) / 100;
+    const haze = t.mix(P.glow, P.bone, 0.5);
+    // a parabolic (catenary-like) rib: it springs near-vertical from the floor and rounds over the crown,
+    // the Giger ribcage; never an onion or ogee shoulder
+    const left = A => [[cx - A.a, A.g], [cx - A.a * 0.94, A.g - A.Ht * 0.76], [cx - A.a * 0.3, A.apex], [cx, A.apex]];
     const dPath = (A, close) => {
       const x0 = cx - A.a, x1 = cx + A.a;
-      return `M${x0} ${A.g} L${x0} ${A.e} C${x0} ${A.e - A.b * 0.55} ${cx - A.a * 0.3} ${A.apex + A.b * 0.3} ${cx} ${A.apex} C${cx + A.a * 0.3} ${A.apex + A.b * 0.3} ${x1} ${A.e - A.b * 0.55} ${x1} ${A.e} L${x1} ${A.g}${close ? ' Z' : ''}`;
+      return `M${f(x0)} ${f(A.g)} C${f(x0 + A.a * 0.06)} ${f(A.g - A.Ht * 0.76)} ${f(cx - A.a * 0.3)} ${f(A.apex)} ${cx} ${f(A.apex)} C${f(cx + A.a * 0.3)} ${f(A.apex)} ${f(x1 - A.a * 0.06)} ${f(A.g - A.Ht * 0.76)} ${f(x1)} ${f(A.g)}${close ? ' Z' : ''}`;
     };
-    const bez = (p0, p1, p2, p3, u) => {
+    const bez = (p, u) => {
       const k = 1 - u;
-      return [k * k * k * p0[0] + 3 * k * k * u * p1[0] + 3 * k * u * u * p2[0] + u * u * u * p3[0],
-        k * k * k * p0[1] + 3 * k * k * u * p1[1] + 3 * k * u * u * p2[1] + u * u * u * p3[1]];
+      return [k * k * k * p[0][0] + 3 * k * k * u * p[1][0] + 3 * k * u * u * p[2][0] + u * u * u * p[3][0],
+        k * k * k * p[0][1] + 3 * k * k * u * p[1][1] + 3 * k * u * u * p[2][1] + u * u * u * p[3][1]];
     };
-    const left = A => [[cx - A.a, A.e], [cx - A.a, A.e - A.b * 0.55], [cx - A.a * 0.3, A.apex + A.b * 0.3], [cx, A.apex]];
+    const arch = (a, g, Ht) => ({ a, g, Ht, apex: g - Ht });
     const arches = [];
     for (let i = 0; i < N; i++) {
       const s = 1 / (1 + 0.62 * i);
-      arches.push({ s, A: arch(104 * s, vpy + 46 * s, 118 * s) });
+      arches.push({ s, A: arch(88 * s, vpy + 46 * s, 116 * s) });
     }
-    const f = n => Math.round(n * 100) / 100;
-    let rings = '';
-    let rims = '';
+    // one rib: n = round(18 + 14s) vertebrae per side, each a rounded block turned to the tangent and
+    // shaded by one radial gradient (bone highlight, tarnished metal, cast shadow), a gap between them,
+    // a transverse spur on every second one
+    const rib = (A, s) => {
+      const L = left(A), M = 64, pts = [[...L[0]]], cum = [0];
+      for (let j = 1; j <= M; j++) { const p = bez(L, j / M); pts.push(p); cum.push(cum[j - 1] + Math.hypot(p[0] - pts[j - 1][0], p[1] - pts[j - 1][1])); }
+      const tot = cum[M], n = Math.round(18 + 14 * s), pitch = tot / n;
+      const w = pitch - 0.5 * s, h = Math.min(3.6 * s + 0.35, w * 1.15), rx = h * 0.4;
+      let verts = '', spurs = '';
+      let j = 0;
+      for (let k = 0; k < n; k++) {
+        const target = (k + 0.5) * pitch;
+        while (j < M - 1 && cum[j + 1] < target) j++;
+        const u = (target - cum[j]) / ((cum[j + 1] - cum[j]) || 1);
+        const x = pts[j][0] + (pts[j + 1][0] - pts[j][0]) * u, y = pts[j][1] + (pts[j + 1][1] - pts[j][1]) * u;
+        let tx = pts[j + 1][0] - pts[j][0], ty = pts[j + 1][1] - pts[j][1];
+        const tl = Math.hypot(tx, ty) || 1; tx /= tl; ty /= tl;
+        const ang = Math.atan2(ty, tx) * 180 / Math.PI;
+        [[x, ang, tx, ty, 1], [2 * cx - x, 180 - ang, -tx, ty, -1]].forEach(([X, a, TX, TY, m]) => {
+          verts += `<rect x="${f(-w / 2)}" y="${f(-h / 2)}" width="${f(w)}" height="${f(h)}" rx="${f(rx)}" transform="translate(${f(X)} ${f(y)}) rotate(${f(a)})"/>`;
+          if (k % 2 === 1 && k < n - 1) {
+            // outward normal (away from the nave), the spur swept a little toward the crown
+            const nx = m > 0 ? TY : -TY, ny = m > 0 ? -TX : TX;
+            const bx = X + nx * h * 0.45, by = y + ny * h * 0.45, sl = 3 * s;
+            spurs += `M${f(bx - TX * w * 0.28)} ${f(by - TY * w * 0.28)}L${f(bx + nx * sl + TX * s * 0.8)} ${f(by + ny * sl + TY * s * 0.8)}L${f(bx + TX * w * 0.28)} ${f(by + TY * w * 0.28)}Z`;
+          }
+        });
+      }
+      return { verts, spurs, h };
+    };
+    let out = '';
     for (let i = N - 1; i >= 0; i--) {
       const { s, A } = arches[i];
       const next = arches[i + 1];
-      const fill = i === N - 1 ? t.mix(P.glow, t.canvas, 0.3) : t.mix(P.glow, (i % 2 ? P.castLo : P.cast), 0.05 + 0.1 * (i / N));
-      const d = dPath(A, true) + (next ? ' ' + dPath(next.A, true) : '');
-      rings += `<path d="${d}" fill="${fill}" fill-rule="evenodd"/>`;
-      const k = 1 - i / N;
-      const rim = t.mix(P.bone, P.metal, Math.pow(k, 1.4));
-      const A2 = arch(A.a - 5.5 * s, A.g, (118 * s) - 5.5 * s * 1.25);
-      rims += `<path d="${dPath(A, false)}" fill="none" stroke="${rim}" stroke-width="${f(0.5 + 3.4 * s)}" stroke-linejoin="round"/>`
-        + `<path d="${dPath(A2, false)}" fill="none" stroke="${t.mix(P.metalHi, P.metal, k)}" stroke-width="${f(0.25 + 1.1 * s)}"/>`;
-      // irregular transverse ribs between the rims, mirrored
-      const lo = left(A);
-      const li = left(A2);
-      const nTicks = i < 2 ? 8 : i < 5 ? 6 : 4;
-      let ticks = '';
-      for (let j = 1; j < nTicks; j++) {
-        const u = Math.min(0.96, Math.max(0.04, j / nTicks + 0.06 * Math.sin(j * 2.3 + i * 1.7)));
-        const po = bez(lo[0], lo[1], lo[2], lo[3], u);
-        const pi = bez(li[0], li[1], li[2], li[3], u);
-        ticks += `M${f(po[0])} ${f(po[1])} L${f(pi[0])} ${f(pi[1])} M${f(2 * cx - po[0])} ${f(po[1])} L${f(2 * cx - pi[0])} ${f(pi[1])} `;
-      }
-      rims += `<path d="${ticks}" stroke="${t.mix(P.metalHi, P.metal, k)}" stroke-width="${f(0.3 + 1.1 * s)}" stroke-linecap="round" fill="none"/>`;
+      // fog: a veil over everything already drawn (the farther nave) before this arch goes on, so depth
+      // reads as warm haze, not only as scale
+      if (i < N - 1) out += `<path d="${dPath(A, true)}" fill="${haze}" opacity=".075"/>`;
+      const wall = i === N - 1 ? `fill="${t.mix(P.glow, t.canvas, 0.3)}"` : `fill="url(#${id}w)"`;
+      out += `<path d="${dPath(A, true)}${next ? ' ' + dPath(next.A, true) : ''}" ${wall} fill-rule="evenodd"/>`;
+      const r = rib(A, s);
+      // the spinal cord: a lit hairline just inside the chain
+      const cord = arch(A.a - r.h * 0.95, A.g, A.Ht - r.h * 0.95);
+      out += `<path d="${dPath(cord, false)}" fill="none" stroke="${P.glow}" stroke-width="${f(0.25 + 0.5 * s)}" stroke-opacity=".5"/>`;
+      out += `<path d="${r.spurs}" fill="${t.mix(P.metalHi, P.castLo, 0.35)}"/><g fill="url(#${id}v)">${r.verts}</g>`;
     }
-    // vertebral spine along the floor, shrinking toward the lamp
-    let spine = '';
-    for (let i = N - 1; i >= 0; i--) {
+    // vertebral column on the floor: trapezoid bodies with two lateral processes, receding to the lamp;
+    // the nearest stays inside the frame
+    let column = '';
+    for (let i = N - 1; i >= 1; i--) {
       const { s, A } = arches[i];
-      const y = A.g - 5 * s;
-      const w = 14 * s;
-      const h = 3.6 * s;
-      const col = t.mix(P.bone, P.metal, Math.pow(1 - i / N, 1.3));
-      spine += `<ellipse cx="${cx}" cy="${f(y)}" rx="${f(w)}" ry="${f(h)}" fill="${col}"/><ellipse cx="${cx}" cy="${f(y)}" rx="${f(w * 0.34)}" ry="${f(h * 0.4)}" fill="${P.well}"/>`;
+      const y = A.g - 3.4 * s, bt = 8 * s, bb = 10.5 * s, bh = 3.6 * s;
+      column += `<path d="M${f(cx - bt / 2)} ${f(y - bh / 2)}H${f(cx + bt / 2)}L${f(cx + bb / 2)} ${f(y + bh / 2)}H${f(cx - bb / 2)}Z" fill="url(#${id}v)"/>`
+        + `<path d="M${f(cx - bt / 2)} ${f(y - bh * 0.2)}L${f(cx - bt / 2 - 8 * s)} ${f(y - bh * 0.45)}L${f(cx - bb / 2)} ${f(y + bh * 0.15)}ZM${f(cx + bt / 2)} ${f(y - bh * 0.2)}L${f(cx + bt / 2 + 8 * s)} ${f(y - bh * 0.45)}L${f(cx + bb / 2)} ${f(y + bh * 0.15)}Z" fill="${t.mix(P.metalHi, P.castLo, 0.4)}"/>`;
     }
-    const lamp = `<circle cx="${cx}" cy="${vpy}" r="7" fill="${P.glow}" opacity=".16"/><circle cx="${cx}" cy="${vpy}" r="3.6" fill="${P.glow}" opacity=".34"/><circle cx="${cx}" cy="${vpy}" r="1.5" fill="${P.glow}"/><circle cx="${cx - 0.5}" cy="${vpy - 0.5}" r=".45" fill="${t.accent}"/>`;
-    return `<div class="bg-art"><svg viewBox="0 0 200 90" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg" role="presentation">${rings}${rims}${spine}${lamp}</svg>`
+    const lamp = `<circle cx="${cx}" cy="${vpy}" r="24" fill="url(#${id}l)"/><circle cx="${cx}" cy="${vpy}" r="10" fill="${P.glow}" opacity=".25"/><circle cx="${cx}" cy="${vpy}" r="4" fill="${P.glow}" opacity=".7"/><circle cx="${cx}" cy="${vpy}" r="1.6" fill="${t.mix(P.glow, P.bone, 0.45)}"/><circle cx="${cx - 0.6}" cy="${vpy - 0.6}" r=".5" fill="${t.accent}"/>`;
+    return `<div class="bg-art"><svg viewBox="0 0 200 90" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg" role="presentation">
+      <defs>
+        <radialGradient id="${id}v" cx="40%" cy="30%" r="70%"><stop offset="0" stop-color="${P.bone}"/><stop offset=".55" stop-color="${P.metalHi}"/><stop offset="1" stop-color="${P.castLo}"/></radialGradient>
+        <linearGradient id="${id}w" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${P.castHi}"/><stop offset="1" stop-color="${P.castLo}"/></linearGradient>
+        <radialGradient id="${id}h" cx="${cx}" cy="${vpy}" r="120" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="${haze}" stop-opacity=".18"/><stop offset="1" stop-color="${haze}" stop-opacity="0"/></radialGradient>
+        <radialGradient id="${id}l"><stop offset="0" stop-color="${P.glow}" stop-opacity=".1"/><stop offset="1" stop-color="${P.glow}" stop-opacity="0"/></radialGradient>
+        <radialGradient id="${id}fl"><stop offset="0" stop-color="${P.glow}" stop-opacity=".12"/><stop offset="1" stop-color="${P.glow}" stop-opacity="0"/></radialGradient>
+      </defs>
+      ${out}${column}
+      <ellipse cx="${cx}" cy="${vpy + 30}" rx="30" ry="4" fill="url(#${id}fl)"/>
+      <rect width="200" height="90" fill="url(#${id}h)"/>
+      ${lamp}</svg>`
       + `<span class="bg-cap">Plate III &middot; The nave, from the threshold</span><span class="bg-fig">Fig. VII</span></div>`;
   },
-
   materials: [
     { name: 'Cast surface', css: 'background: {biCast}; box-shadow: inset 0 1px 0 {biRim2}, inset 0 -1px 0 {biCastLo}; /* every surface is a tonal step of the charcoal; texture and rim light are the only variation; no pure white */' },
-    { name: 'Arch frame (card)', css: 'background: {biCast}; border-radius: 96px 96px 0 0 / 52px 52px 0 0; box-shadow: inset 0 0 0 6px {canvas}, inset 0 0 0 7px {biRim2}; /* double rim offset 6px, a roman numeral at the keystone, bottom corners squared */' },
+    { name: 'Rib frame (card)', css: 'background: {biCast}; border-radius: 50% 50% 0 0 / 120px 120px 0 0; box-shadow: inset 0 0 0 6px {canvas}, inset 0 0 0 7px {biRim2}; /* a rounded ribcage cap (never an onion or ogee), segmented by a ribbed rim of short bone ticks, a roman numeral at the keystone, bottom corners squared */' },
     { name: 'Tube (divider and progress)', css: 'height: 8px; border-radius: 4px; background: linear-gradient({biCastLo}, {biCastHi} 45%, {biMetal} 62%, {biCastLo}); /* lit portion: {biGlow} */' },
     { name: 'Vertebra (segment)', css: 'background: {biCast}; border-radius: 42% 42% 38% 38% / 55% 55% 45% 45%; box-shadow: inset 0 1px 0 {biRim2}; /* selected: raised, rim in {biGlow}, rotate 3deg; a dark hole in the centre */' },
     { name: 'Main action (bone pill)', css: 'background: {ink}; color: {canvas}; border-radius: 999px; /* ribbed grip lines on the left edge, a seam, and a thin {biGlow} sinew line under the label; primary is never the fill */' },
@@ -200,6 +231,7 @@ registerAesthetic({
 
   // Deck copy (js/brand-deck.js): three principles, three do / don't lines, each short.
   deck: {
+    materialStage: 'pattern',   // the material slide stages the lead pattern (tubing runs); the cover already carries the nave
     principles: [
       ['One cast material', 'Charcoal, bone and tarnished metal share a single surface.'],
       ['Repeat a few modules', 'Ribs, vertebrae, tubes and valves set the rhythm.'],

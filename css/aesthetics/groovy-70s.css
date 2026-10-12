@@ -1,10 +1,12 @@
 /* ---------------------------------------------------------------------
-   19 Groovy 70s — warm cream, a concentric rainbow arch over a centered fat
-   headline, wavy dividers, color-blocked pill and blob cards, a sunburst behind the
-   CTA. Reference: Braniff supergraphics, Mailchimp x Freshbooks, Burger King 2021.
-   Flat and curvy: no outlines, no offset shadows. Variables (--ab-card-a/b/c,
-   --ab-track, --ab-lift, --ab-ray ...) come from js/aesthetics/groovy-70s.js
-   tokens(). Hooks: hero centered, palette strips, type ui/label body, highlight
+   19 Groovy 70s — warm cream, an earth-ramp arch over a centered fat headline echoed
+   in stepped band contours, wavy dividers, SOLID colour blocks and corner-turning
+   stripe frames, a solid sunburst rising behind the CTA, a faint print grain.
+   Reference: Braniff / Sea Ranch supergraphics, Stripes lettering, Burger King 2021.
+   Flat and curvy: no hard black outlines or one-colour drop shadows (Neo-Brutal Pop);
+   the stepped band-colour echo is the period lettering. Variables (--ab-b1..b5 the
+   earth ramp, --ab-on-b1..b5, --gv-disc, --ab-card-a/b/c, --ab-track, --ab-lift ...)
+   come from js/aesthetics/groovy-70s.js tokens(). Hooks: hero centered, palette strips, type ui/label body, highlight
    custom, states button, canvas().
 ------------------------------------------------------------------------ */
 
@@ -13,6 +15,12 @@
   --gv-w: min(760px, calc(100cqw - 2 * var(--ab-pad)));
   --ab-art-ratio: 200 / 112; --ab-art-ratio-narrow: 200 / 112;
   border-radius: 28px;
+  --gv-gap: var(--ab-canvas);
+}
+/* print grain: a faint speckle over everything; plain alpha (no blend mode) so export keeps it */
+.ab[data-ae="groovy-70s"]::after {
+  content: ""; position: absolute; inset: 0; z-index: 2; pointer-events: none; opacity: 0.09;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n' x='0' y='0' width='100%25' height='100%25'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' seed='7'/%3E%3CfeColorMatrix values='0 0 0 0 .25 0 0 0 0 .15 0 0 0 0 .1 0 0 0 1.6 -.55'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)'/%3E%3C/svg%3E") 0 0 / 180px 180px;
 }
 
 /* ---- wavy dividers replace every straight rule: one flat ink-tint wave; only the header and footer stripes carry colour ---- */
@@ -32,7 +40,7 @@
 .ab[data-ae="groovy-70s"] .ab-brand { font-family: var(--ab-font-h); font-weight: var(--ab-hw); letter-spacing: calc(-0.01em * var(--ab-tr, 1)); }
 .ab[data-ae="groovy-70s"] .ab-mark {
   width: 34px; height: 34px; border-radius: 50%; color: var(--ab-on-primary); font-family: var(--ab-font-h); font-weight: var(--ab-hw); font-size: 14px;
-  background: radial-gradient(circle, var(--ab-primary) 0 38%, var(--ab-accent) 38% 52%, var(--ab-secondary) 52% 68%, var(--ab-ink) 68% 100%);
+  background: radial-gradient(circle, var(--ab-b2) 0 38%, var(--ab-b4) 38% 52%, var(--ab-b3) 52% 68%, var(--ab-b1) 68% 100%);
 }
 .ab[data-ae="groovy-70s"] .ab-mark span { position: relative; z-index: 1; }
 .ab[data-ae="groovy-70s"] .ab-tag { padding: 6px 14px; border-radius: 999px; background: var(--ab-card-b); color: var(--ab-ink); font-size: 10.5px; letter-spacing: 0.1em; }
@@ -47,11 +55,16 @@
   display: inline-block; margin-bottom: clamp(10px, 1.6cqw, 16px) !important; padding: 5px 16px; border-radius: 999px; background: var(--ab-accent); color: var(--ab-on-accent);
   font-family: var(--ab-font-h); font-weight: var(--ab-hw); font-size: 12px; letter-spacing: 0.04em; text-transform: none;
 }
+/* the stepped multiline echo (Stripes / Cooper poster lettering): cream gap, accent, cream gap, primary */
 .ab[data-ae="groovy-70s"] .ab-headline {
-  font-weight: var(--ab-hw); line-height: 1.02; letter-spacing: calc(-0.02em * var(--ab-tr, 1)); color: var(--ab-ink); text-wrap: balance;
+  font-weight: var(--ab-hw); font-variation-settings: "SOFT" 100, "WONK" 0, "opsz" 144;
+  line-height: 1.1; letter-spacing: calc(-0.035em * var(--ab-tr, 1)); color: var(--ab-ink); text-wrap: balance;
+  text-shadow: .035em .035em 0 var(--gv-gap), .07em .07em 0 var(--ab-accent), .105em .105em 0 var(--gv-gap), .14em .14em 0 var(--ab-primary);
+  padding-bottom: .16em;
 }
 .ab[data-ae="groovy-70s"] .ab-hl {
-  color: inherit; text-decoration: underline wavy var(--ab-accent); text-decoration-thickness: 0.09em; text-underline-offset: 0.14em; text-decoration-skip-ink: none;
+  color: var(--ab-primary-text); text-decoration: none; margin-left: 0.05em;
+  text-shadow: .035em .035em 0 var(--gv-gap), .07em .07em 0 var(--ab-accent), .105em .105em 0 var(--gv-gap), .14em .14em 0 var(--ab-ink);
 }
 .ab[data-ae="groovy-70s"] .ab-subcopy { margin-left: auto !important; margin-right: auto !important; max-width: 26em; font-size: clamp(14px, 1.7cqw, 17px); color: var(--ab-ink); opacity: 0.78; }
 
@@ -75,11 +88,12 @@
 .ab[data-ae="groovy-70s"] .ab-sw-hex { margin: 0; font-size: 12px; letter-spacing: 0.06em; opacity: 0.9; font-family: var(--ab-font-b); font-weight: 600; }
 
 /* ---- type block: blobs ---- */
-.ab[data-ae="groovy-70s"] .ab-type-col { padding: 20px 22px 18px; border-top: 0; border-radius: 30px; background: var(--ab-card-a); }
-.ab[data-ae="groovy-70s"] .ab-type-col[data-role="body"] { background: var(--ab-kraft); }
-.ab[data-ae="groovy-70s"] .ab-type-col[data-role="mono"] { background: var(--ab-card-c); }
-.ab[data-ae="groovy-70s"] .ab-type-role { color: var(--ab-ink); font-weight: 700; }
-.ab[data-ae="groovy-70s"] .ab-type-class { color: var(--ab-ink); opacity: 0.72; }
+.ab[data-ae="groovy-70s"] .ab-type-col { padding: 20px 22px 18px; border-top: 0; border-radius: 30px; background: var(--ab-b1); color: var(--ab-on-b1); }
+.ab[data-ae="groovy-70s"] .ab-type-col[data-role="body"] { background: var(--ab-kraft); color: var(--ab-ink); }
+.ab[data-ae="groovy-70s"] .ab-type-col[data-role="mono"] { background: var(--ab-b4); color: var(--ab-on-b4); }
+.ab[data-ae="groovy-70s"] .ab-type-role { color: inherit; font-weight: 700; }
+.ab[data-ae="groovy-70s"] .ab-type-class { color: inherit; opacity: 0.8; }
+.ab[data-ae="groovy-70s"] .ab-type-fit, .ab[data-ae="groovy-70s"] .ab-type-cur, .ab[data-ae="groovy-70s"] .ab-type-cur b { color: inherit; }
 .ab[data-ae="groovy-70s"] .ab-type-pick { letter-spacing: calc(-0.01em * var(--ab-tr, 1)); }
 .ab[data-ae="groovy-70s"] .ab-fit { border: 0; background: var(--ab-lift); color: var(--ab-ink); }
 .ab[data-ae="groovy-70s"] .ab-fit[data-fit="avoid"] { background: var(--ab-ink); color: var(--ab-canvas); }
@@ -90,15 +104,21 @@
 .ab[data-ae="groovy-70s"] .ab-type-apply:hover { background: var(--ab-ink); transform: scale(1.04); }
 .ab[data-ae="groovy-70s"] .ab-type-apply:focus-visible { outline: 3px solid var(--ab-primary-text); outline-offset: 3px; }
 
-/* ---- 01 interface: a secondary-tint blob, tabs, fat pill CTA with a sunburst ---- */
-.ab[data-ae="groovy-70s"] .ab-card, .ab[data-ae="groovy-70s"] .ab-panel { border: 0; border-radius: 36px; box-shadow: none; padding: clamp(22px, 3.2cqw, 32px); position: relative; overflow: hidden; isolation: isolate; }
-.ab[data-ae="groovy-70s"] .ab-card { background: var(--ab-card-a); }
-.ab[data-ae="groovy-70s"] .ab-panel { background: var(--ab-kraft); }
-/* the sunburst is centred on the CTA (a disc 0.7x the CTA width), fading out toward the top so it never sits behind the copy */
+/* ---- 01 interface: a cream panel framed by corner-turning stripes, tabs, fat pill CTA on a rising sun ---- */
+.ab[data-ae="groovy-70s"] .ab-card, .ab[data-ae="groovy-70s"] .ab-panel { --gv-cp: clamp(22px, 3.2cqw, 32px); border: 0; border-radius: 36px; box-shadow: none; padding: var(--gv-cp); position: relative; overflow: hidden; isolation: isolate; }
+/* Stauffacher stripes: primary, accent, brown with cream gaps, turning the 36px corners (21px of rings, held inside the margin) */
+.ab[data-ae="groovy-70s"] .ab-card {
+  margin: 22px; background: var(--ab-lift); color: var(--ab-ink); overflow: visible;
+  box-shadow: 0 0 0 5px var(--ab-b2), 0 0 0 8px var(--ab-canvas), 0 0 0 13px var(--ab-b4), 0 0 0 16px var(--ab-canvas), 0 0 0 21px var(--ab-b1);
+}
+/* the 02 panel is a SOLID brown block with cream type */
+.ab[data-ae="groovy-70s"] .ab-panel { margin: 22px; background: var(--ab-b1); color: var(--ab-on-b1); }
+.ab[data-ae="groovy-70s"] .ab-panel .ab-fieldlabel, .ab[data-ae="groovy-70s"] .ab-panel .ab-toggle > span, .ab[data-ae="groovy-70s"] .ab-panel .ab-state, .ab[data-ae="groovy-70s"] .ab-panel .ab-status { color: inherit; }
+.ab[data-ae="groovy-70s"] .ab-panel .ab-input { color: var(--ab-ink); }
+/* the solid sunburst rises from the card's bottom edge behind the CTA: full-strength accent wedges, clipped to the card */
 .ab[data-ae="groovy-70s"] .ab-card::after {
-  content: ""; position: absolute; z-index: -1; left: 50%; bottom: calc(clamp(22px, 3.2cqw, 32px) + 30px); width: calc((100% - 2 * clamp(22px, 3.2cqw, 32px)) * 0.7); aspect-ratio: 1; transform: translate(-50%, 50%); pointer-events: none; border-radius: 50%;
-  opacity: 0.55; background: repeating-conic-gradient(var(--ab-ray) 0 5deg, transparent 5deg 12deg);
-  -webkit-mask-image: linear-gradient(to bottom, transparent 0 50%, #000 78%); mask-image: linear-gradient(to bottom, transparent 0 50%, #000 78%);
+  content: ""; position: absolute; z-index: -1; left: 0; right: 0; bottom: 0; height: calc(var(--gv-cp) + 58px); border-radius: 0 0 36px 36px; pointer-events: none;
+  background: repeating-conic-gradient(from -90deg at 50% 100%, var(--ab-accent) 0 9deg, transparent 9deg 18deg);
 }
 .ab[data-ae="groovy-70s"] .ab-seg { gap: 4px; padding: 5px; border-radius: 999px; background: var(--ab-track); }
 .ab[data-ae="groovy-70s"] .ab-seg-btn { min-height: 38px; border-radius: 999px; font-size: 13px; font-weight: 600; color: var(--ab-ink); opacity: 0.8; transition: background .15s, transform .15s; }
@@ -132,26 +152,25 @@
 .ab[data-ae="groovy-70s"] .ab-states .ab-state-ctl.is-hover { transform: scale(1.06); box-shadow: 0 0 0 5px var(--ab-ring); }
 .ab[data-ae="groovy-70s"] .ab-states .ab-state-ctl.is-pressed { transform: scale(0.93); background: var(--ab-pri-dark); }
 
-/* ---- 03 in use: pill rows in color blocks ---- */
+/* ---- 03 in use: SOLID band-colour rows (primary, accent, brown) with contrast-picked type ---- */
 .ab[data-ae="groovy-70s"] .ab-list { counter-reset: gvrow; display: grid; gap: 10px; }
 .ab[data-ae="groovy-70s"] .ab-row {
-  grid-template-columns: 38px minmax(0, 1fr) auto minmax(60px, 160px) 4.5ch; gap: 4px clamp(10px, 1.8cqw, 18px); padding: 10px 22px 10px 10px; border: 0; border-radius: 999px; background: var(--ab-card-c);
+  --gv-rb: var(--ab-b2); --gv-rt: var(--ab-on-b2);
+  grid-template-columns: 38px minmax(0, 1fr) auto minmax(60px, 160px) 4.5ch; gap: 4px clamp(10px, 1.8cqw, 18px); padding: 10px 22px 10px 10px; border: 0; border-radius: 999px; background: var(--gv-rb); color: var(--gv-rt);
 }
-.ab[data-ae="groovy-70s"] .ab-row:nth-child(2) { background: var(--ab-card-a); }
-.ab[data-ae="groovy-70s"] .ab-row:nth-child(3) { background: var(--ab-kraft); }
+.ab[data-ae="groovy-70s"] .ab-row:nth-child(2) { --gv-rb: var(--ab-b4); --gv-rt: var(--ab-on-b4); }
+.ab[data-ae="groovy-70s"] .ab-row:nth-child(3) { --gv-rb: var(--ab-b1); --gv-rt: var(--ab-on-b1); }
 .ab[data-ae="groovy-70s"] .ab-row-n { display: none; }
-.ab[data-ae="groovy-70s"] .ab-av { display: grid; place-items: center; width: 38px; height: 38px; border-radius: 50%; background: var(--ab-primary); color: var(--ab-on-primary); font: var(--ab-hw) 15px/1 var(--ab-font-h); }
-.ab[data-ae="groovy-70s"] .ab-row:nth-child(2) .ab-av { background: var(--ab-secondary); color: var(--ab-on-secondary); }
-.ab[data-ae="groovy-70s"] .ab-row:nth-child(3) .ab-av { background: var(--ab-accent); color: var(--ab-on-accent); }
-.ab[data-ae="groovy-70s"] .ab-row-name { font-weight: 700; font-size: 14px; }
-.ab[data-ae="groovy-70s"] .ab-row-status { background: var(--ab-lift); font-weight: 600; padding: 4px 12px; }
-.ab[data-ae="groovy-70s"] .ab-row-bar { height: 12px; border-radius: 999px; background: var(--ab-lift); }
-.ab[data-ae="groovy-70s"] .ab-row-bar i { border-radius: 999px; background: var(--ab-primary); }
-.ab[data-ae="groovy-70s"] .ab-row-pct { font-weight: 700; font-size: 13px; }
+.ab[data-ae="groovy-70s"] .ab-av { display: grid; place-items: center; width: 38px; height: 38px; border-radius: 50%; background: var(--ab-lift); color: var(--ab-ink); font: var(--ab-hw) 15px/1 var(--ab-font-h); }
+.ab[data-ae="groovy-70s"] .ab-row-name { font-weight: 700; font-size: 14px; color: inherit; }
+.ab[data-ae="groovy-70s"] .ab-row-status { background: var(--ab-lift); color: var(--ab-ink); font-weight: 600; padding: 4px 12px; }
+.ab[data-ae="groovy-70s"] .ab-row-bar { height: 12px; border-radius: 999px; background: color-mix(in srgb, var(--gv-rt) 24%, transparent); }
+.ab[data-ae="groovy-70s"] .ab-row-bar i { border-radius: 999px; background: var(--gv-rt); }
+.ab[data-ae="groovy-70s"] .ab-row-pct { font-weight: 700; font-size: 13px; color: inherit; }
 
 /* ---- footer ---- */
 .ab[data-ae="groovy-70s"] .ab-motto { font-family: var(--ab-font-h); font-weight: var(--ab-hw); font-size: 13px; color: var(--ab-ink); }
-.ab[data-ae="groovy-70s"] .ab-dot { width: 12px; height: 12px; background: conic-gradient(var(--ab-primary) 0 25%, var(--ab-accent) 0 50%, var(--ab-secondary) 0 75%, var(--ab-ink) 0); }
+.ab[data-ae="groovy-70s"] .ab-dot { width: 12px; height: 12px; background: conic-gradient(var(--ab-b2) 0 25%, var(--ab-b4) 0 50%, var(--ab-b3) 0 75%, var(--ab-b1) 0); }
 
 .ab[data-ae="groovy-70s"] .ab-seg-btn:focus-visible, .ab[data-ae="groovy-70s"] .ab-cta:focus-visible, .ab[data-ae="groovy-70s"] .ab-switch:focus-visible { outline: 3px solid var(--ab-primary-text); outline-offset: 3px; }
 
@@ -168,6 +187,7 @@
   .ab[data-ae="groovy-70s"] .ab-row { grid-template-columns: 38px minmax(0, 1fr) auto 4.5ch; padding-right: 16px; }
   .ab[data-ae="groovy-70s"] .ab-tag { padding: 5px 10px; font-size: 9px; }
   .ab[data-ae="groovy-70s"] .ab-card, .ab[data-ae="groovy-70s"] .ab-panel { border-radius: 30px; }
+  .ab[data-ae="groovy-70s"] .ab-card::after { border-radius: 0 0 30px 30px; }
   .ab[data-ae="groovy-70s"] .ab-type-col { border-radius: 26px; }
 }
 
@@ -178,7 +198,16 @@
 
 /* Deck cover: the board pulls the statement up into the arch's hollow, which only holds
    a short, narrow headline. A wide face or a long tagline spills onto the rings, so on the
-   cover the arch sits above the statement instead of around it. */
+   cover the arch sits beside the statement instead of around it, and it is drawn at supergraphic
+   scale: larger than its column and cropped by the slide edge, the way the 70s bands wrap a wall. */
+.ab[data-ae="groovy-70s"].ab-slide[data-slide="cover"] { --gv-gap: var(--ab-canvas); }
 .ab[data-ae="groovy-70s"].ab-slide[data-slide="cover"] .ab-hero { padding: 0 0 8px; }
-.ab[data-ae="groovy-70s"].ab-slide[data-slide="cover"] .ab-art { max-width: 380px; }
+.ab[data-ae="groovy-70s"].ab-slide[data-slide="cover"] .ab-art { max-width: none; width: 100%; margin-left: calc(var(--ab-pad) * -1); overflow: visible; }
+.ab[data-ae="groovy-70s"].ab-slide[data-slide="cover"] .ab-art svg { transform: translateX(-30%) scale(1.4); transform-origin: 50% 100%; }
 .ab[data-ae="groovy-70s"].ab-slide[data-slide="cover"] .ab-hero-copy { max-width: 82%; margin-top: 14px; }
+
+/* Deck product slide: the CTA card is a cream panel framed by the corner-turning stripes */
+.ab[data-ae="groovy-70s"] .ab-deck-ctacard {
+  margin: 22px; border: 0; border-radius: 36px; background: var(--ab-lift);
+  box-shadow: 0 0 0 5px var(--ab-b2), 0 0 0 8px var(--ab-canvas), 0 0 0 13px var(--ab-b4), 0 0 0 16px var(--ab-canvas), 0 0 0 21px var(--ab-b1);
+}

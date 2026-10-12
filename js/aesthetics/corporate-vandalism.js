@@ -8,10 +8,16 @@
    flat hazard-red warning label, safety-yellow "!!!" chip, a mono receipt. Redaction
    bars are real text set transparent on black, so each bar is exactly as wide as the
    word it hides. No rotation, no tape, no grain (that is Xerox / Xerox Punk).
-   The hero art is "the hijacked notice": a form document with a primary header strip,
-   plausible fine print with three redactions, a red warning label and a receipt strip
-   with an absurd, deadpan total. The headline's last word is wrapped in literal
-   quotation marks and a dagger footnote mark (the footer resolves the footnote). */
+   The hero art is "the hijacked notice": a form document with a classification banner and a
+   primary header strip, plausible fine print with word redactions, one fully blacked-out line
+   and one two-line block with (b)(6) style exemption codes in the margin, a red warning label
+   and a receipt strip with an absurd, deadpan total. The second party is visible: a fixed
+   hazard-red "FOR OFFICIAL USE" tag is physically zip-tied across the notice's top corner,
+   and every UI part carries an Off-White literal label naming it as itself ("BUTTON",
+   "TEXT FIELD", "CHECKBOX", "TABS", "HEADLINE", "PROJECTS"). The "In use" list is an MSCHF
+   mono index (#027 ... #030 ??????). When the client primary sits within 25 degrees of
+   the hazard red, the official shell (button, header strips) goes ink so the wrong thing
+   stays the only red. */
 (function () {
 const HAZARD = '#D40F14';
 const SAFETY = '#FFD500';
@@ -41,7 +47,7 @@ registerAesthetic({
   layout: { hero: 'split', palette: 'swatches', sections: 'two-col' },
   type: { ui: 'body', label: 'mono', display: 1.14 },
   highlight: 'custom',
-  highlightNote: 'The last word keeps the headline ink and is wrapped in literal straight quotation marks followed by a superscript dagger footnote mark; no colour, no band, no underline. The quotes and dagger are part of the style and the footer footnote answers it.',
+  highlightNote: 'The last word keeps the headline ink and plain: no colour, no band, no underline, no quotation marks. The headline is named by a literal quoted mono label above it ("HEADLINE"), the Off-White way: a part labelled as itself.',
 
   roles: {
     canvas: {
@@ -55,17 +61,17 @@ registerAesthetic({
       coverage: '15–20%',
     },
     primary: {
-      use: 'The official shell, kept pristine and boring: the notice header strip, the main button fill and the active index item',
+      use: 'The official shell, kept pristine and boring: the notice header strip, the main button fill and the active index item. Where the primary is within 25 degrees of the hazard red the shell goes ink with a 3px primary underline',
       never: 'The vandal layer (warning labels, redaction, the receipt), body text, a second CTA',
       coverage: '≈8–10%',
     },
     secondary: {
-      use: 'Form-panel fills and the progress track. The receipt is plain white thermal paper (#FFFFFF, ink #1a1a1a), never tinted',
-      never: 'Buttons, warning labels, body text',
+      use: 'The progress track and the pattern second band. The form panel is a neutral grey (ink at 5-10% over the canvas), never a brand tint; the receipt is plain white thermal paper (#FFFFFF, ink #1a1a1a)',
+      never: 'Buttons, warning labels, body text, form-panel tints',
       coverage: '≈8–10%',
     },
     accent: {
-      use: 'The single tiny official notice: the announcement bar above the header, and nothing else',
+      use: 'Not a vandal colour: the announcement bar above the header is fixed safety yellow #FFD500 in every palette; the accent shows only in the palette strip',
       never: 'Buttons, borders, warning labels, headline words; hazard colours are fixed',
       coverage: '≤3%',
     },
@@ -81,6 +87,10 @@ registerAesthetic({
     const hw = le.length ? Math.max(...le) : Math.min(...ws);
     const d = t.isDark;
     const grey = '#84898E';
+    // the hazard red must stay the only red on the page: a primary near it turns the official shell ink
+    const ph = hexToHsl(t.printPrimary || t.primary), hz = hexToHsl(HAZARD);
+    const collide = typeof hueDiff === 'function' && hueDiff(ph.h, hz.h) < 25 && ph.s >= 45 && ph.l > 15 && ph.l < 85;
+    const shell = collide ? t.ink : t.printPrimary || t.primary;
     return {
       '--ab-type-pick-w': hw,
       '--cv-hw': hw,
@@ -91,7 +101,10 @@ registerAesthetic({
       '--cv-rest': t.contrast(grey, t.canvas) >= 4.5 ? grey : t.muted,
       '--cv-receipt': '#FFFFFF', // thermal paper: white in both modes
       '--ab-receipt': '#FFFFFF',
-      '--cv-form': d ? t.mix(t.secondary, t.canvas, 0.16) : t.mix(t.secondary, t.canvas, 0.14),
+      '--cv-form': d ? t.mix(t.ink, t.canvas, 0.1) : t.mix(t.ink, t.canvas, 0.05),
+      '--cv-shell': shell,
+      '--cv-on-shell': collide ? t.canvas : t.onPrimary,
+      '--cv-ul': collide ? (t.printPrimary || t.primary) : 'transparent',
       '--ab-tr': (hf && { condensed: 0.4, heavy: 0.4, wide: 0.3, techno: 0.3 }[hf.cls]) ?? 1,
     };
   },
@@ -103,11 +116,16 @@ registerAesthetic({
     const warn = `<svg viewBox="0 0 16 14" width="13" height="12" aria-hidden="true" focusable="false"><path d="M8 0.8 15.4 13.4H0.6Z" fill="none" stroke="#fff" stroke-width="1.3" stroke-linejoin="miter"/><path d="M8 5v4M8 10.4v1.4" stroke="#fff" stroke-width="1.5"/></svg>`;
     return `<div class="cva">
       <div class="cva-doc">
+        <span class="cva-tag">"FOR OFFICIAL USE"</span>
         <div class="cva-bar"><i>${e(ctx.initial)}</i><b>${name}</b><span>FORM 27-B</span></div>
         <div class="cva-body">
+          <p class="cva-class">UNCLASSIFIED // FOR INTERNAL FEELINGS ONLY</p>
           <p class="cva-title">Notice of Compliance Review</p>
           <p class="cva-ref">Ref. 2291-B · Page 1 of 1 · Please retain</p>
-          <p class="cva-fine">Pursuant to Section 4.2, the Subscriber agrees that all feelings, whether expressed or implied, remain the property of ${R('the Company')} and may be ${R('reassigned')} without notice. Section ${R('4.2(c)')} applies. Any feeling not listed in Schedule 4 shall be deemed alive.</p>
+          <p class="cva-fine">Pursuant to Section 4.2, all feelings remain the property of ${R('the Company')} and may be ${R('reassigned')} without notice.</p>
+          <div class="cva-rr"><div class="cva-rx cva-rx1">Section 4.2(c) applies to every feeling the Subscriber has had.</div><i>(b)(6)</i></div>
+          <div class="cva-rr"><div class="cva-rx">Permitted feelings: mild interest, polite surprise, boredom.</div><i>(b)(7)(C)</i></div>
+          <p class="cva-fine">Unlisted feelings are deemed alive.</p>
           <div class="cva-warn">${warn}<span>Warning: contains 14% opinion</span></div>
           <div class="cva-sign"><span>Initial here</span><i></i></div>
         </div>
@@ -131,39 +149,43 @@ registerAesthetic({
     { name: 'Notice header strip', css: 'background: {primary}; color: {onPrimary}; font: 600 10px ui-monospace, Menlo, monospace; letter-spacing: .1em; text-transform: uppercase; /* the official shell: the only large use of the client primary */' },
     { name: 'Receipt strip', css: 'background: #FFFFFF; color: #1a1a1a; font: 11px ui-monospace, Menlo, monospace; border-top: 1px dashed {ink}; /* zigzag top and bottom edge, dashed rules, TOTAL line, a barcode of 1/2/3px bars */' },
     { name: 'Official button', css: 'background: {primary}; color: {onPrimary}; border-radius: 0; font: 600 12px ui-monospace, Menlo, monospace; letter-spacing: .08em; text-transform: uppercase; /* mundane copy ("Continue"); hover underlines; pressed inverts to {ink} on {canvas} */' },
-    { name: 'Announcement bar', css: 'background: {accent}; color: {onAccent}; font: 600 10px ui-monospace, Menlo, monospace; letter-spacing: .08em; text-transform: uppercase; /* one line above the header, the only use of the client accent */' },
+    { name: 'Announcement bar', css: 'background: {safety}; color: #000000; font: 600 10px ui-monospace, Menlo, monospace; letter-spacing: .08em; text-transform: uppercase; /* one line above the header, fixed safety yellow in every palette */' },
+    { name: 'Literal label', css: 'content: \'"BUTTON"\'; font: 600 9px ui-monospace, Menlo, monospace; letter-spacing: .08em; color: {ink}; /* pinned just above the top-left corner of the part it names ("TEXT FIELD", "CHECKBOX", "TABS", "HEADLINE", "PROJECTS"); the Off-White way: a thing labelled as itself */' },
+    { name: 'Applied tag', css: 'background: {hazard}; color: #ffffff; font: 700 9px ui-monospace, Menlo, monospace; /* "FOR OFFICIAL USE", overlapping the notice card top-right border by 8px with a 24px 1px black tie line running into the card; never rotated */' },
+    { name: 'Mono index', css: 'font: 700 clamp(16px,2.4cqw,22px) ui-monospace, Menlo, monospace; text-transform: uppercase; letter-spacing: 0; /* #027 PROJECT NAME ... and a last row "#030 ??????????????" in the resting grey */' },
   ],
 
   rules: {
     do: [
       'Keep the shell flat, square and tidy: white or #000 page, 1px ink borders, no radius, no shadow, mundane button copy.',
-      'Add exactly one intrusion per screen: a redaction bar of exact word width, a red warning label, or an absurd receipt line.',
+      'Make the second party visible: Off-White literal quoted labels on the interface parts ("BUTTON", "TEXT FIELD"), one hazard-red tag physically overlapping the notice, and bureaucratic redaction (whole lines, (b)(6) codes, a classification banner).',
       'Write fine print that parses as legal prose (sections, schedules, dagger footnotes); the footnotes should be the longest text on the page.',
-      'Set labels and the index in mono caps with no quotation marks; the one quote mark per screen belongs to the headline\'s last word.',
+      'Set the index as MSCHF mono caps (#027, #028 ... then #030 ??????); quotation marks belong only to the literal part labels, never to scare-quote a word.',
     ],
     dont: [
       'Rotate, tape, grain or distress anything; mess belongs to Xerox and Xerox Punk, the shell here must be tidy.',
-      'Recolour the hazard layer with client colours; warning red, safety yellow and black stay fixed.',
+      'Recolour the hazard layer with client colours; warning red, safety yellow (including the notice strip) and black stay fixed.',
       'Use rounded cards, gradients or soft shadows; the register is flat procurement software.',
       'Repeat the gag on every element, or fill it with lorem ipsum or a real company or brand.',
     ],
   },
   // Deck copy (js/brand-deck.js): three principles, three do / don't lines, each short.
   deck: {
+    coverDisplay: 0.78,   // a smaller cover start size keeps the taller notice at its natural width (it re-stacks when its box narrows)
     principles: [
-      ['One intrusion per screen', 'The shell stays sincere; a single element is quietly wrong.'],
+      ['A second party at work', 'The shell stays sincere; literal labels and one red tag are applied on top.'],
       ['Fixed vandal palette', 'Black, white and hazard red never take the client colours.'],
       ['Plausible fine print', 'Deadpan needs real syntax, so every footnote reads as legal.'],
     ],
     do: [
       'Keep the brand shell tidy and flat.',
       'Redact words with exact-width black bars.',
-      'Add one absurd receipt or footnote.',
+      'Label parts as themselves, in quotes.',
     ],
     dont: [
       'Rotate, tape or distress anything.',
       'Use rounded cards or soft shadows.',
-      'Repeat the gag on every screen.',
+      'Scare-quote words or repeat the gag.',
     ],
   },
 });

@@ -8,8 +8,11 @@
 ------------------------------------------------------------------------ */
 
 .ab[data-ae="industrial-device"] {
-  --id-mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --id-mono: "Azeret Mono", "IBM Plex Mono", "Space Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --id-dot: "Doto", "Azeret Mono", ui-monospace, monospace;
   --id-panel: inset 0 1px 0 var(--ab-edge-hi), inset 0 -1px 0 var(--ab-edge-lo);
+  /* machined 1px lower lip instead of a soft shadow */
+  --id-lip: var(--id-panel), 0 1px 0 var(--ab-key-edge);
   --id-keyshadow: inset 0 1px 0 var(--ab-key-hi), 0 2px 0 var(--ab-key-edge);
   border-radius: 18px;
 }
@@ -35,22 +38,27 @@
   content: ""; flex: 1; min-width: 20px; height: 1px; background: var(--ab-hair);
 }
 .ab[data-ae="industrial-device"] .ab-label .ab-n {
-  display: inline-grid; place-items: center; flex: none; width: 21px; height: 21px; border: 1px solid var(--ab-ink); border-radius: 50%;
-  font-size: 8.5px; letter-spacing: 0; color: var(--ab-ink); background: var(--ab-canvas);
+  display: inline-grid; place-items: center; flex: none; width: 24px; height: 24px; border: 1px solid var(--ab-ink); border-radius: 50%;
+  font-size: 8.5px; letter-spacing: 0; line-height: 1; text-indent: 0; color: var(--ab-ink); background: var(--ab-canvas);
 }
 .ab[data-ae="industrial-device"] .ab-n::after { content: none; }
 .ab[data-ae="industrial-device"] .ab-labelrow .ab-label:last-child:not(:first-child) { flex: none; text-align: right; }
 
+/* deck material slide: the numbered ring sits beside its label, never on it */
+.ab[data-ae="industrial-device"] .ab-deck-mat .ab-label { display: flex; align-items: center; gap: 12px; }
+
 /* ---- hero ---- */
-.ab[data-ae="industrial-device"] .ab-hero { grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); align-items: center; gap: clamp(20px, 4cqw, 48px); padding: clamp(32px, 5.4cqw, 66px) 0 clamp(26px, 4cqw, 48px); }
+.ab[data-ae="industrial-device"] .ab-hero { grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr); align-items: center; gap: clamp(20px, 4cqw, 48px); padding: clamp(32px, 5.4cqw, 66px) 0 clamp(26px, 4cqw, 48px); }
 .ab[data-ae="industrial-device"] .ab-kicker { display: inline-flex; align-items: center; gap: 9px; font-size: 10.5px; letter-spacing: 0.14em; color: var(--ab-muted); }
 .ab[data-ae="industrial-device"] .ab-kicker::before {
   content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--ab-led); box-shadow: 0 0 0 1px var(--ab-hair), 0 0 9px var(--ab-led-glow);
 }
-.ab[data-ae="industrial-device"] .ab-headline { font-weight: 600; line-height: 0.98; letter-spacing: calc(-0.035em * var(--ab-tr, 1)); }
+.ab[data-ae="industrial-device"] .ab-headline { font-weight: 400; line-height: 1.02; letter-spacing: calc(-0.02em * var(--ab-tr, 1)); }
+/* the highlighted word: a flat primary plate, square-cornered, no shadow */
+.ab[data-ae="industrial-device"] .ab-hl { background: var(--ab-primary); color: var(--ab-on-primary); padding: 0 0.1em; margin: 0 -0.02em; border-radius: 2px; -webkit-box-decoration-break: clone; box-decoration-break: clone; }
 .ab[data-ae="industrial-device"] .ab-subcopy { max-width: 24em; font-size: clamp(13.5px, 1.5cqw, 16px); }
 .ab[data-ae="industrial-device"] .ab-sub-lead { color: var(--ab-ink); font-weight: 500; }
-.ab[data-ae="industrial-device"] .ab-art { max-width: 500px; justify-self: end; aspect-ratio: 100 / 82; }
+.ab[data-ae="industrial-device"] .ab-art { max-width: 600px; justify-self: end; aspect-ratio: 100 / 82; }
 
 /* ---- the device face ---- */
 .ab[data-ae="industrial-device"] .idv { position: absolute; inset: 0; color: var(--ab-ink); font-family: var(--id-mono); }
@@ -58,7 +66,7 @@
 .ab[data-ae="industrial-device"] .idv i, .ab[data-ae="industrial-device"] .idv em, .ab[data-ae="industrial-device"] .idv b { font-style: normal; }
 .ab[data-ae="industrial-device"] .idv-body {
   border-radius: 3.4cqw; background: var(--ab-face); border: 1px solid var(--ab-hair);
-  box-shadow: var(--id-panel), 0 1px 1px rgba(0,0,0,.08), 0 14px 18px -16px rgba(0,0,0,.45);
+  box-shadow: var(--id-lip);
 }
 /* OLED strip: black, brand name in primary pixels, a few level bars */
 .ab[data-ae="industrial-device"] .idv-oled {
@@ -70,38 +78,24 @@
   content: ""; position: absolute; inset: 0; pointer-events: none;
   background: repeating-linear-gradient(0deg, rgba(0,0,0,.4) 0 1px, transparent 1px 3px), repeating-linear-gradient(90deg, rgba(0,0,0,.28) 0 1px, transparent 1px 3px);
 }
-.ab[data-ae="industrial-device"] .idv-oled b { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 700; letter-spacing: 0.1em; text-shadow: 0 0 0.9em var(--ab-pri-glow); }
+.ab[data-ae="industrial-device"] .idv-oled b { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-family: var(--id-dot); font-weight: 900; font-size: 1.22em; letter-spacing: 0.08em; text-shadow: 0 0 0.9em var(--ab-pri-glow); }
 .ab[data-ae="industrial-device"] .idv-bars { display: flex; align-items: flex-end; gap: 0.35em; height: 56%; }
 .ab[data-ae="industrial-device"] .idv-bars i { width: 0.45em; background: var(--ab-oled-ink); opacity: 0.9; }
 .ab[data-ae="industrial-device"] .idv-bars i:nth-child(even) { background: var(--ab-oled-dim); }
 .ab[data-ae="industrial-device"] .idv-oled em { color: var(--ab-oled-acc); letter-spacing: 0.08em; font-weight: 600; }
 
-/* knob: knurled ring, tick scale with a lit arc, cap with a primary indicator */
-.ab[data-ae="industrial-device"] .idv-ticks, .ab[data-ae="industrial-device"] .idv-arc {
-  border-radius: 50%;
-  -webkit-mask-image: radial-gradient(circle closest-side, transparent 0 82%, #000 83% 100%), conic-gradient(from -135deg, #000 0 270deg, transparent 270deg);
-  mask-image: radial-gradient(circle closest-side, transparent 0 82%, #000 83% 100%), conic-gradient(from -135deg, #000 0 270deg, transparent 270deg);
-  -webkit-mask-composite: source-in; mask-composite: intersect;
-}
-.ab[data-ae="industrial-device"] .idv-ticks { background: repeating-conic-gradient(from -136.6deg, var(--ab-dot) 0 3.2deg, transparent 3.2deg 27deg); }
-.ab[data-ae="industrial-device"] .idv-arc {
-  background: repeating-conic-gradient(from -136.6deg, var(--ab-primary) 0 3.2deg, transparent 3.2deg 27deg);
-  -webkit-mask-image: radial-gradient(circle closest-side, transparent 0 82%, #000 83% 100%), conic-gradient(from -135deg, #000 0 175deg, transparent 175deg);
-  mask-image: radial-gradient(circle closest-side, transparent 0 82%, #000 83% 100%), conic-gradient(from -135deg, #000 0 175deg, transparent 175deg);
-}
+/* encoder: a flat matte cap with a dished inner ring and a primary index; the scale is printed
+   in the marks SVG (11 radial lines over 270 degrees, 0-5 lit) */
 .ab[data-ae="industrial-device"] .idv-knob {
-  border-radius: 50%; border: 1px solid var(--ab-hair); transform: translateY(0);
-  background: repeating-conic-gradient(rgba(0,0,0,.2) 0 2.4deg, rgba(255,255,255,.3) 2.4deg 4.8deg), linear-gradient(150deg, var(--ab-key-hi), var(--ab-key-edge));
-  box-shadow: 0 0 0 0.5cqw var(--ab-face), 0 0 0 calc(0.5cqw + 1px) var(--ab-hair), 0 1cqw 1.4cqw -0.6cqw rgba(0,0,0,.4), inset 0 1px 0 var(--ab-key-hi);
+  border-radius: 50%; border: 1px solid var(--ab-hair); background: var(--ab-key);
+  box-shadow: 0 0 0 0.5cqw var(--ab-face), 0 0 0 calc(0.5cqw + 1px) var(--ab-hair), 0 0.5cqw 0 calc(0.5cqw) var(--ab-key-edge), inset 0 1px 0 var(--ab-key-hi);
 }
 .ab[data-ae="industrial-device"] .idv-knob span {
-  position: absolute; inset: 17%; border-radius: 50%; transform: rotate(48deg);
-  background: radial-gradient(circle at 36% 30%, var(--ab-key-hi), var(--ab-key) 55%, var(--ab-key-edge) 130%);
-  border: 1px solid var(--ab-hair); box-shadow: inset 0 1px 0 var(--ab-key-hi), 0 0.35cqw 0.6cqw -0.2cqw rgba(0,0,0,.4);
+  position: absolute; inset: 14%; border-radius: 50%; background: var(--ab-key); border: 1px solid var(--ab-hair);
+  box-shadow: inset 0 1px 1px var(--ab-edge-lo), 0 1px 0 var(--ab-key-hi);
 }
 .ab[data-ae="industrial-device"] .idv-knob span::after {
-  content: ""; position: absolute; left: 50%; top: 9%; width: 9%; height: 26%; transform: translateX(-50%); border-radius: 2px;
-  background: var(--ab-primary); box-shadow: 0 0 0.9cqw var(--ab-pri-glow);
+  content: ""; position: absolute; left: 50%; top: 7%; width: 7%; height: 26%; transform: translateX(-50%); border-radius: 1px; background: var(--ab-primary);
 }
 /* keys */
 .ab[data-ae="industrial-device"] .idv-keys { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5cqw; align-content: start; }
@@ -109,28 +103,39 @@
   position: relative; aspect-ratio: 1; border-radius: 1cqw; background: var(--ab-key); border: 1px solid var(--ab-hair);
   box-shadow: inset 0 1px 0 var(--ab-key-hi), 0 0.4cqw 0 var(--ab-key-edge);
 }
-.ab[data-ae="industrial-device"] .idv-key::after {
-  content: ""; position: absolute; left: 50%; top: 50%; width: 26%; height: 1px; transform: translate(-50%, -50%); background: var(--ab-dot);
-}
+.ab[data-ae="industrial-device"] .idv-key b { position: absolute; left: 14%; top: 10%; font: 600 clamp(6.5px, 2.2cqw, 12px)/1 var(--id-mono); color: var(--ab-ink); letter-spacing: 0; }
+.ab[data-ae="industrial-device"] .idv-key.ic b { left: 0; top: 0; right: 0; bottom: 0; display: grid; place-items: center; }
+.ab[data-ae="industrial-device"] .idv-key.ic svg { width: 36%; height: 36%; display: block; }
+.ab[data-ae="industrial-device"] .idv-key.g { background: var(--ab-key-dark); border-color: var(--ab-key-dark-edge); box-shadow: inset 0 1px 0 var(--ab-key-dark-hi), 0 0.4cqw 0 var(--ab-key-dark-edge); }
+.ab[data-ae="industrial-device"] .idv-key.g b { color: var(--ab-on-key-dark); }
 .ab[data-ae="industrial-device"] .idv-key.acc { background: var(--ab-accent); border-color: rgba(0,0,0,.12); }
-.ab[data-ae="industrial-device"] .idv-key.acc::after { background: var(--ab-on-accent); opacity: 0.55; }
+.ab[data-ae="industrial-device"] .idv-key.acc b { color: var(--ab-on-accent); }
 .ab[data-ae="industrial-device"] .idv-key.on {
   background: var(--ab-primary); border-color: rgba(0,0,0,.14); transform: translateY(0.4cqw); box-shadow: inset 0 0.3cqw 0.6cqw rgba(0,0,0,.28), 0 0 0 transparent;
 }
-.ab[data-ae="industrial-device"] .idv-key.on::after { background: var(--ab-on-primary); opacity: 0.6; }
+.ab[data-ae="industrial-device"] .idv-key.on b { color: var(--ab-on-primary); }
+/* label plates above the keys: one on ink, one on face, stacked */
+.ab[data-ae="industrial-device"] .idv-plates { display: grid; grid-template-rows: 1fr 1fr; }
+.ab[data-ae="industrial-device"] .idv-plates b { display: flex; align-items: center; padding: 0 1cqw; font: 600 clamp(5px, 1.6cqw, 9px)/1 var(--id-mono); letter-spacing: 0.14em; background: var(--ab-ink); color: var(--ab-canvas); }
+.ab[data-ae="industrial-device"] .idv-plates b.l { background: var(--ab-key); color: var(--ab-ink); border: 1px solid var(--ab-ink); border-top: 0; }
 /* speaker grille and LEDs */
 .ab[data-ae="industrial-device"] .idv-grille { display: grid; grid-template-columns: repeat(18, 1fr); align-content: space-between; }
 .ab[data-ae="industrial-device"] .idv-grille i { width: 62%; aspect-ratio: 1; justify-self: center; border-radius: 50%; background: var(--ab-dot); }
-.ab[data-ae="industrial-device"] .idv-leds { display: flex; align-items: center; gap: 1.5cqw; }
+.ab[data-ae="industrial-device"] .idv-leds { display: flex; align-items: center; gap: 0.9cqw; }
+.ab[data-ae="industrial-device"] .idv-leds small { margin-right: 1.2cqw; font: 600 clamp(5px, 1.6cqw, 9px)/1 var(--id-mono); letter-spacing: 0.1em; color: var(--ab-muted); }
 .ab[data-ae="industrial-device"] .idv-leds i { width: 1.7cqw; height: 1.7cqw; border-radius: 50%; background: var(--ab-slot); box-shadow: 0 0 0 1px var(--ab-hair), inset 0 1px 1px rgba(0,0,0,.3); }
 .ab[data-ae="industrial-device"] .idv-leds i.on { background: var(--ab-led); box-shadow: 0 0 0 1px var(--ab-hair), 0 0 1.4cqw var(--ab-led-glow); }
 .ab[data-ae="industrial-device"] .idv-leds i.p { background: var(--ab-primary); box-shadow: 0 0 0 1px var(--ab-hair), 0 0 1.2cqw var(--ab-pri-glow); }
-.ab[data-ae="industrial-device"] .idv-leds code { margin-left: auto; font: 600 clamp(7px, 1.9cqw, 10px) var(--id-mono); letter-spacing: 0.14em; color: var(--ab-muted); }
+.ab[data-ae="industrial-device"] .idv-leds code { margin-left: auto; font: 600 clamp(5.5px, 1.7cqw, 9px) var(--id-mono); letter-spacing: 0.14em; color: var(--ab-muted); }
 /* numbered callouts with leader lines, and the legend */
 .ab[data-ae="industrial-device"] .idv-marks { inset: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; }
 .ab[data-ae="industrial-device"] .idv-marks line { stroke: var(--ab-ink); stroke-width: 0.28; opacity: 0.7; }
 .ab[data-ae="industrial-device"] .idv-marks .m { fill: var(--ab-canvas); stroke: var(--ab-ink); stroke-width: 0.3; }
 .ab[data-ae="industrial-device"] .idv-marks .d { fill: var(--ab-ink); }
+.ab[data-ae="industrial-device"] .idv-scale line { stroke: var(--ab-dot); stroke-width: 0.34; opacity: 1; }
+.ab[data-ae="industrial-device"] .idv-scale line.lg { stroke-width: 0.5; }
+.ab[data-ae="industrial-device"] .idv-scale line.lit { stroke: var(--ab-primary); }
+.ab[data-ae="industrial-device"] .idv-scale text.sc { fill: var(--ab-muted); font: 600 1.9px var(--id-mono); }
 .ab[data-ae="industrial-device"] .idv-marks text { fill: var(--ab-ink); font: 700 2.6px var(--id-mono); }
 .ab[data-ae="industrial-device"] .idv-legend { left: 0; right: 0; bottom: 0; display: flex; justify-content: space-between; gap: 2cqw; font-size: clamp(7px, 2.1cqw, 10.5px); letter-spacing: 0.1em; text-transform: uppercase; color: var(--ab-muted); white-space: nowrap; }
 .ab[data-ae="industrial-device"] .idv-legend b { display: inline-grid; place-items: center; width: 1.7em; height: 1.7em; margin-right: 0.6em; border: 1px solid var(--ab-ink); border-radius: 50%; font-size: 0.9em; color: var(--ab-ink); }
@@ -140,7 +145,7 @@
 .ab[data-ae="industrial-device"] .ab-swatch { counter-increment: idsw; }
 .ab[data-ae="industrial-device"] .ab-chip { height: clamp(44px, 6.4cqw, 68px); border-radius: 6px; box-shadow: inset 0 0 0 1px rgba(128,128,128,.3), inset 0 1px 0 rgba(255,255,255,.4), 0 2px 0 var(--ab-key-edge); margin-bottom: 14px; }
 .ab[data-ae="industrial-device"] .ab-sw-role { font: 700 10.5px/1.3 var(--id-mono); letter-spacing: 0.1em; text-transform: uppercase; }
-.ab[data-ae="industrial-device"] .ab-sw-role::before { content: counter(idsw, decimal-leading-zero) "  "; white-space: pre; color: var(--ab-muted); font-weight: 500; }
+.ab[data-ae="industrial-device"] .ab-sw-role::before { content: counter(idsw, decimal-leading-zero) "  "; white-space: pre; color: var(--ab-ink); font: 900 13px var(--id-dot); }
 .ab[data-ae="industrial-device"] .ab-sw-job { font-size: 10px; letter-spacing: 0.02em; }
 .ab[data-ae="industrial-device"] .ab-sw-hex { font-size: 10px; }
 
@@ -163,7 +168,7 @@
 
 /* ---- 01 interface: panel, key row, main key ---- */
 .ab[data-ae="industrial-device"] .ab-card, .ab[data-ae="industrial-device"] .ab-panel, .ab[data-ae="industrial-device"] .ab-list {
-  background: var(--ab-face); border: 1px solid var(--ab-hair); border-radius: 14px; box-shadow: var(--id-panel), 0 1px 1px rgba(0,0,0,.05), 0 12px 16px -14px rgba(0,0,0,.35);
+  background: var(--ab-face); border: 1px solid var(--ab-hair); border-radius: 14px; box-shadow: var(--id-lip);
 }
 .ab[data-ae="industrial-device"] .ab-card, .ab[data-ae="industrial-device"] .ab-panel { padding: clamp(18px, 2.8cqw, 24px); }
 .ab[data-ae="industrial-device"] .ab-seg { gap: 8px; padding: 0 0 2px; background: none; border-radius: 0; }
@@ -182,7 +187,7 @@
   box-shadow: inset 0 3px 5px rgba(0,0,0,.28);
 }
 .ab[data-ae="industrial-device"] .ab-seg-btn[aria-pressed="true"]::after { background: var(--ab-led); box-shadow: 0 0 0 1px rgba(0,0,0,.25), 0 0 7px var(--ab-led-glow); }
-.ab[data-ae="industrial-device"] .ab-card-title { margin: 22px 0 8px !important; font-weight: 600; letter-spacing: calc(-0.03em * var(--ab-tr, 1)); }
+.ab[data-ae="industrial-device"] .ab-card-title { margin: 22px 0 8px !important; font-weight: 500; letter-spacing: calc(-0.03em * var(--ab-tr, 1)); }
 .ab[data-ae="industrial-device"] .ab-card-body { font-size: 13.5px; }
 .ab[data-ae="industrial-device"] .ab-cta {
   margin-bottom: 2px; padding: 13px 14px 13px 18px; border: 1px solid rgba(0,0,0,.16); border-radius: 6px; background: var(--ab-primary); color: var(--ab-on-primary);
@@ -248,7 +253,7 @@
   background: var(--ab-ink); border-radius: 0;
   -webkit-mask-image: repeating-linear-gradient(90deg, #000 0 5px, transparent 5px 7px); mask-image: repeating-linear-gradient(90deg, #000 0 5px, transparent 5px 7px);
 }
-.ab[data-ae="industrial-device"] .ab-row-pct { font: 600 11.5px var(--id-mono); letter-spacing: 0.02em; }
+.ab[data-ae="industrial-device"] .ab-row-pct { font: 900 14px var(--id-dot); letter-spacing: 0.02em; color: var(--ab-ink); }
 
 /* ---- footer ---- */
 .ab[data-ae="industrial-device"] .ab-foot { border-top-color: var(--ab-hair); font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; }

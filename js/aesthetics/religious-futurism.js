@@ -69,7 +69,7 @@ registerAesthetic({
   layout: { hero: 'centered', palette: 'swatches', sections: 'two-col' },
   type: { ui: 'body', label: 'mono', display: 1 },
   highlight: 'custom',
-  highlightNote: 'The last word is set in the accent-ink colour (the relic jewel) with a 1px gold rule beneath it that tapers to nothing at both ends; no fill, no glow, no band.',
+  highlightNote: 'The last word is set in oxidised gold light (the gold ramp\'s high step on obsidian, its mid step on bone) with a 1px gold rule beneath it that tapers to nothing at both ends; no fill, no glow, no band, never raw accent yellow.',
 
   roles: {
     canvas: {
@@ -114,6 +114,7 @@ registerAesthetic({
       '--ab-type-pick-w': 400,
       '--ab-gold': line,
       '--ab-gold-hi': gold.hi,
+      '--ab-hl-ink': d ? gold.hi : gold.mid,   // the highlight word: oxidised gold light, never raw accent yellow
       '--ab-gold-mid': gold.mid,
       '--ab-gold-lo': gold.lo,
       '--ab-gold-line': t.alpha(line, d ? 0.55 : 0.7),
@@ -135,39 +136,45 @@ registerAesthetic({
     const rnd = rfRand(rfHash(String(ctx.brandName || 'brand')));
     const gold = rfGold(t.primary);
     const line = d ? gold.hi : gold.mid;
-    const W = 800, H = 340, floor = 296, cell = 14;
+    // 8-unit panes on a global grid (floor and every window edge sit on a multiple of 8, so the per-pane
+    // sheen pattern lines up with every pane); the central window is about 26% of the width
+    const W = 800, H = 420, floor = 368, cell = 8;
     const lead = d ? '#050505' : '#2a251c';
-    // glass palette: weights make the primary and secondary families dominant, the rest rare
-    const g1 = rfGlass(t.primary, d ? 58 : 52), g1d = rfGlass(t.primary, d ? 40 : 38, 40), g1p = rfGlass(t.primary, d ? 76 : 66, 36);
-    const g2 = rfGlass(t.secondary, d ? 58 : 52), g2d = rfGlass(t.secondary, d ? 40 : 38, 40);
-    const gm = rfGlass(t.mix(t.primary, t.secondary, 0.5), d ? 52 : 46, 40);
-    const deep = rfGlass(t.primary, d ? 20 : 28, 35);
-    const base = [g1, g1, g1, g1d, g1d, g2, g2, g2, g2d, g2d, gm, gm, deep, deep, deep, g1p];
-    // each pane gets one of three lightness steps so the glass has depth, not flat tiles
     const step = (hex, dl) => { const c = hexToHsl(hex); return hslToHex(c.h, c.s, RF_CLAMP(c.l + dl, 6, 88)); };
+    // Richter's recipe: about two thirds of the glass is a FIXED cathedral base of cool neutral glass
+    // (blue-grey, smoke, pale amber), each in three blown-glass lightness steps; the client families are
+    // the minority (about 35%), so any palette still reads as a window, never as a textile or a screen.
+    // backlit, so the neutrals are lifted a little and their chroma nudged up (transmitted, not stone)
+    const NEUTRAL = ['#4A5A78', '#5D6E8C', '#3E4A5E', '#7A8296', '#8C7A5E', '#A89270', '#6B5E70', '#2E3646']
+      .map(h => { const c = hexToHsl(h); return hslToHex(c.h, RF_CLAMP(c.s * 1.3, 0, 60), RF_CLAMP(c.l + (d ? 7 : 10), 6, 80)); });
+    const g1 = rfGlass(t.primary, d ? 56 : 52), g1d = rfGlass(t.primary, d ? 42 : 40, 40), g1p = rfGlass(t.primary, d ? 74 : 66, 36);
+    const g2 = rfGlass(t.secondary, d ? 58 : 52), g2d = rfGlass(t.secondary, d ? 42 : 40, 40);
+    const gm = rfGlass(t.mix(t.primary, t.secondary, 0.5), d ? 52 : 46, 40);
     const pool = [];
-    base.forEach(c => { pool.push(step(c, -7), c, step(c, 7)); });
+    NEUTRAL.forEach(c => { pool.push(step(c, -6), c, step(c, 6)); });          // 24 neutral panes
+    const capS = hex => { const c = hexToHsl(hex); return hslToHex(c.h, Math.min(c.s, 72), c.l); };
+    [g1, g1, g1, g2, g2, g2, g1d, g1d, g2d, g2d, gm, gm, g1p].forEach(c => pool.push(capS(c)));   // 13 brand panes
+    const nPick = () => pool[Math.floor(rnd() * 24)];
+    const pick = () => pool[Math.floor(rnd() * pool.length)];
     const jewel = rfGlass(t.accent, d ? 62 : 54, 60);
-    // backlight colour: the glass primary glows in dark mode; in light mode the nimbus and floor light are
-    // accent-on-canvas parchment (bone, not a pink-peach wash)
     const halo = d ? g1 : t.mix(t.accent, t.canvas, 0.85);
 
     // one window: mirrored random lanes, cells grouped into one path per colour
     const paths = {};
     const addCell = (col, x, y, s) => { (paths[col] = paths[col] || []).push(`M${x.toFixed(1)} ${y.toFixed(1)}h${s}v${s}h-${s}z`); };
-    const win = (cx, w, top, label) => {
-      const cols = Math.max(3, Math.round(w / cell));
-      const gw = cols * cell;
-      const x0 = cx - gw / 2;
+    const win = (cx, cols, top, opts) => {
+      const o = opts || {};
+      const gw = cols * cell, x0 = cx - gw / 2;
       const ys = top + Math.sqrt(3) / 2 * gw;
       const rows = Math.ceil((floor - top) / cell);
       const lanes = [];
       for (let c = 0; c < Math.ceil(cols / 2); c++) {
         const lane = [];
-        for (let r = 0; r < rows; r++) lane.push(pool[Math.floor(rnd() * pool.length)]);
+        for (let r = 0; r < rows; r++) lane.push(pick());
         lanes.push(lane);
       }
       const arch = rfOgive(cx, gw, ys, floor);
+      const oc = o.oculus ? { x: cx, y: ys - 0.36 * gw, r: 0.23 * gw } : null;
       const inside = (px, py) => {
         if (py >= ys) return true;
         const dl = Math.hypot(px - arch.x1, py - ys), dr = Math.hypot(px - arch.x0, py - ys);
@@ -179,69 +186,107 @@ registerAesthetic({
           const lc = c < cols / 2 ? c : cols - 1 - c;
           const x = x0 + c * cell;
           if (!inside(x + cell / 2, y + cell / 2)) continue;
-          addCell(lanes[lc][r], x + 0.9, y + 0.9, cell - 1.8);
+          if (oc && Math.hypot(x + cell / 2 - oc.x, y + cell / 2 - oc.y) < oc.r + cell * 0.3) continue;
+          addCell(lanes[lc][r], x + 0.6, y + 0.6, cell - 1.2);
         }
       }
-      return { cx, gw, ys, arch, label };
+      return { cx, gw, x0, ys, top, arch, oc, mullion: !!o.mullion };
     };
-    const wins = [win(400, 154, 30), win(246, 98, 98), win(554, 98, 98), win(126, 56, 164), win(674, 56, 164)];
+    const wins = [
+      win(400, 26, 10, { oculus: true, mullion: true }),
+      win(216, 16, 104, { mullion: true }), win(584, 16, 104, { mullion: true }),
+      win(96, 10, 196), win(704, 10, 196),
+    ];
 
-    // the single jewel: one accent pane two rows below the central apex
-    const jx = 400 - cell / 2 + 0.9, jy = 30 + Math.sqrt(3) / 2 * (11 * cell) + cell * 1.4;
-    const mosaic = Object.keys(paths).map(c => `<path d="${paths[c].join('')}" fill="${c}"/>`).join('')
-      + `<path d="M${jx.toFixed(1)} ${jy.toFixed(1)}h${cell - 1.8}v${cell - 1.8}h-${cell - 1.8}z" fill="${jewel}"/>`;
+    // the oculus: a rose of two leaded rings (9 panes, then 18), mirrored about the axis, mostly neutral glass,
+    // round the single accent jewel
+    const c0 = wins[0].oc;
+    let rosette = `<circle cx="${c0.x}" cy="${c0.y.toFixed(1)}" r="${(c0.r + 0.6).toFixed(1)}" fill="${lead}"/>`;
+    const pt = (r, a) => `${(c0.x + r * Math.cos(a)).toFixed(2)} ${(c0.y + r * Math.sin(a)).toFixed(2)}`;
+    const ringOf = (n, r0, r1) => {
+      const cols = [];
+      for (let i = 0; i <= n / 2; i++) cols.push(rnd() < 0.7 ? nPick() : pick());
+      const gap = 0.6 / ((r0 + r1) / 2);
+      for (let i = 0; i < n; i++) {
+        const a0 = -Math.PI / 2 + (i - 0.5) * (2 * Math.PI / n) + gap, a1 = a0 + 2 * Math.PI / n - 2 * gap;
+        const ra = r1 - 0.6, rb = r0 + 0.6;
+        rosette += `<path d="M${pt(ra, a0)}A${ra.toFixed(2)} ${ra.toFixed(2)} 0 0 1 ${pt(ra, a1)}L${pt(rb, a1)}A${rb.toFixed(2)} ${rb.toFixed(2)} 0 0 0 ${pt(rb, a0)}Z" fill="${cols[Math.min(i, n - i)]}"/>`;
+      }
+    };
+    ringOf(9, c0.r * 0.3, c0.r * 0.64);
+    ringOf(18, c0.r * 0.64, c0.r);
+    rosette += `<circle cx="${c0.x}" cy="${c0.y.toFixed(1)}" r="${(c0.r * 0.3 - 0.6).toFixed(1)}" fill="${jewel}"/>`;
+
+    const mosaic = Object.keys(paths).map(c => `<path d="${paths[c].join('')}" fill="${c}"/>`).join('') + rosette;
+    // armature: iron saddle bars every 7 rows (lead, with a hairline catch-light), a central mullion on the
+    // three large windows; drawn inside the window clip
+    let iron = '', ironHi = '';
+    wins.forEach(w => {
+      for (let k = 1; ; k++) {
+        const y = floor - 7 * k * cell;
+        if (y < w.top + 10) break;
+        if (w.oc && y > w.oc.y - w.oc.r - 3 && y < w.oc.y + w.oc.r + 3) continue;
+        iron += `M${w.x0} ${y - 0.8}h${w.gw}v1.6h-${w.gw}z`;
+        ironHi += `M${w.x0} ${y - 0.9}h${w.gw}`;
+      }
+      if (w.mullion) {
+        const y0 = w.oc ? w.oc.y + w.oc.r : w.ys - 0.2 * w.gw;
+        iron += `M${w.cx - 1} ${y0.toFixed(1)}h2V${floor}h-2z`;
+        ironHi += `M${w.cx - 0.6} ${y0.toFixed(1)}V${floor}`;
+      }
+    });
+    const armature = `<path d="${iron}" fill="${lead}"/><path d="${ironHi}" stroke="${line}" stroke-width=".5" stroke-opacity=".5" fill="none"/>`;
     const clip = wins.map(w => `<path d="${w.arch.d}"/>`).join('');
     const leadFill = wins.map(w => `<path d="${w.arch.d}" fill="${lead}"/>`).join('');
-    const rims = wins.map((w, i) => {
+    const rims = wins.map(w => {
       const o = rfOgive(w.cx, w.gw + 9, w.ys, floor);
       return `<path d="${w.arch.d}" fill="none" stroke="${line}" stroke-width=".9" stroke-opacity=".9"/><path d="${o.d}" fill="none" stroke="${line}" stroke-width=".7" stroke-opacity=".45"/>`;
-    }).join('');
+    }).join('') + `<circle cx="${c0.x}" cy="${c0.y.toFixed(1)}" r="${(c0.r + 0.8).toFixed(1)}" fill="none" stroke="${line}" stroke-width=".8" stroke-opacity=".85"/>`;
 
     // nimbus: two thin rings and 60 ticks behind the central window
-    const nx = 400, ny = 120;
+    const nx = 400, ny = 186;
     let ticks = '';
     for (let i = 0; i < 60; i++) {
       const a = (i / 60) * Math.PI * 2, long = i % 5 === 0;
-      const r0 = 142, r1 = r0 + (long ? 7 : 4);
+      const r0 = 166, r1 = r0 + (long ? 7 : 4);
       ticks += `M${(nx + r0 * Math.cos(a)).toFixed(1)} ${(ny + r0 * Math.sin(a)).toFixed(1)}L${(nx + r1 * Math.cos(a)).toFixed(1)} ${(ny + r1 * Math.sin(a)).toFixed(1)}`;
     }
-    // light falling on the floor: skewed quads under each window
-    const beams = wins.map((w, i) => {
-      const half = w.gw / 2 - 6, spread = 30 + w.gw * 0.55;
-      const sk = (i === 0 ? 0 : (w.cx < 400 ? -1 : 1) * 14);
-      return `<path d="M${w.cx - half} ${floor}H${w.cx + half}L${w.cx + half + spread + sk} ${H}H${w.cx - half - spread + sk}Z" fill="url(#${id}b)" opacity="${i === 0 ? 0.9 : 0.6}"/>`;
-    }).join('');
-    // tiny liturgical annotation
-    const num = ['III', 'II', 'II', 'I', 'I'];   // window order: centre, inner pair, outer pair
+    // the light lands: the mosaic itself, flipped, sheared and squashed onto the stone floor, blurred, fading out
+    const fm = `matrix(1 0 -0.24 -0.34 ${(0.24 * floor).toFixed(1)} ${(1.34 * floor).toFixed(1)})`;
+    const num = ['III', 'II', 'II', 'I', 'I'];
     const ann = wins.map((w, i) => `<text x="${w.cx}" y="${floor + 16}" text-anchor="middle">${num[i]}</text>`).join('');
     const nameCaps = escapeHtml(String(ctx.brandName || '').trim().toUpperCase().slice(0, 22));
     return `<svg viewBox="0 0 ${W} ${H}" width="100%" height="100%" preserveAspectRatio="xMidYMid slice" focusable="false" class="rfa">
       <defs>
-        <linearGradient id="${id}b" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${halo}" stop-opacity="${d ? 0.34 : 0.28}"/><stop offset="1" stop-color="${halo}" stop-opacity="0"/></linearGradient>
         <linearGradient id="${id}f" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="${line}" stop-opacity="0"/><stop offset=".18" stop-color="${line}" stop-opacity=".7"/><stop offset=".82" stop-color="${line}" stop-opacity=".7"/><stop offset="1" stop-color="${line}" stop-opacity="0"/></linearGradient>
-        <radialGradient id="${id}n" cx="50%" cy="35%" r="55%"><stop offset="0" stop-color="${halo}" stop-opacity="${d ? 0.22 : 0.16}"/><stop offset="1" stop-color="${halo}" stop-opacity="0"/></radialGradient>
+        <radialGradient id="${id}n" cx="50%" cy="35%" r="55%"><stop offset="0" stop-color="${halo}" stop-opacity="${d ? 0.2 : 0.16}"/><stop offset="1" stop-color="${halo}" stop-opacity="0"/></radialGradient>
+        <linearGradient id="${id}sg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity="${d ? 0.16 : 0.2}"/><stop offset=".45" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity="${d ? 0.2 : 0.14}"/></linearGradient>
+        <pattern id="${id}p" width="${cell}" height="${cell}" patternUnits="userSpaceOnUse"><rect width="${cell}" height="${cell}" fill="url(#${id}sg)"/></pattern>
+        <linearGradient id="${id}mg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#000"/></linearGradient>
+        <mask id="${id}m" maskUnits="userSpaceOnUse" x="0" y="${floor}" width="${W}" height="${H - floor}"><rect x="0" y="${floor}" width="${W}" height="${H - floor}" fill="url(#${id}mg)"/></mask>
         <clipPath id="${id}c">${clip}</clipPath>
         <filter id="${id}bl" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="${d ? 11 : 8}"/></filter>
+        <filter id="${id}fb" x="-10%" y="-10%" width="120%" height="120%"><feGaussianBlur stdDeviation="2 5"/></filter>
+        <filter id="${id}t" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="2" seed="7"/><feColorMatrix values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 .9 -.35"/></filter>
       </defs>
-      <ellipse cx="400" cy="130" rx="330" ry="200" fill="url(#${id}n)"/>
-      <circle cx="${nx}" cy="${ny}" r="136" fill="none" stroke="${line}" stroke-width=".8" stroke-opacity=".7"/>
-      <circle cx="${nx}" cy="${ny}" r="130" fill="none" stroke="${line}" stroke-width=".5" stroke-opacity=".4"/>
+      <ellipse cx="400" cy="170" rx="340" ry="220" fill="url(#${id}n)"/>
+      <circle cx="${nx}" cy="${ny}" r="160" fill="none" stroke="${line}" stroke-width=".8" stroke-opacity=".7"/>
+      <circle cx="${nx}" cy="${ny}" r="154" fill="none" stroke="${line}" stroke-width=".5" stroke-opacity=".4"/>
       <path d="${ticks}" stroke="${line}" stroke-width=".7" stroke-opacity=".75" fill="none"/>
-      ${beams}
-      <g clip-path="url(#${id}c)" filter="url(#${id}bl)" opacity="${d ? 0.55 : 0.32}">${leadFill}${mosaic}</g>
+      <g mask="url(#${id}m)"><g transform="${fm}" opacity="${d ? 0.55 : 0.38}"><g filter="url(#${id}fb)"><g clip-path="url(#${id}c)">${mosaic}</g></g></g></g>
+      <g clip-path="url(#${id}c)" filter="url(#${id}bl)" opacity="${d ? 0.5 : 0.3}">${leadFill}${mosaic}</g>
       ${leadFill}
-      <g clip-path="url(#${id}c)">${mosaic}</g>
+      <g clip-path="url(#${id}c)">${mosaic}<rect width="${W}" height="${floor}" fill="url(#${id}p)"/><rect width="${W}" height="${floor}" filter="url(#${id}t)" opacity="${d ? 0.12 : 0.1}"/>${armature}</g>
       ${rims}
       <rect x="40" y="${floor}" width="720" height="1" fill="url(#${id}f)"/>
       <g fill="${t.ink}" fill-opacity=".72" style="font-family:var(--ab-font-label,monospace);font-size:8.5px;letter-spacing:.22em" text-anchor="middle">
         ${ann}
-        <text x="52" y="${floor + 34}" text-anchor="start" fill-opacity=".6">MATINS · 03:00</text>
-        <text x="400" y="${floor + 34}" fill-opacity=".6">${nameCaps}</text>
-        <text x="748" y="${floor + 34}" text-anchor="end" fill-opacity=".6">VESPERS · 18:00</text>
+        <text x="52" y="${floor + 36}" text-anchor="start" fill-opacity=".6">MATINS · 03:00</text>
+        <text x="400" y="${floor + 36}" fill-opacity=".6">${nameCaps}</text>
+        <text x="748" y="${floor + 36}" text-anchor="end" fill-opacity=".6">VESPERS · 18:00</text>
       </g>
     </svg>`;
   },
-
   materials: [
     { name: 'Gold rim', css: 'border: 1px solid {goldLine}; /* gold is a 1px line, never a fill: oxidised ramp {goldHi} / {goldMid} / {goldLo}; a second inset hairline 4px inside at {goldFaint} gives the double rule */' },
     { name: 'Obsidian arch panel', css: 'background: {stone}; border: 1px solid {goldLine}; border-top: 0; /* with a pointed (ogive) cap: two 2-centre arcs meeting at an apex, stroked 1px gold; 3% stone grain */' },
@@ -257,7 +302,7 @@ registerAesthetic({
       'Use gold only as a 1px rim, rule or ring; the glass colours carry the brand and glow as transmitted light on obsidian.',
       'Compose on one centre axis with huge silence: ogive arches, halo rings and mandorlas, never more than three forms per view.',
       'Set headlines in monumental caps with wide tracking, small text in bone small caps or mono with Roman numerals and canonical hours.',
-      'Build stained glass as a seeded square mosaic with mirrored lanes and 2px black leading, backlit by a blurred copy.',
+      'Build stained glass as a seeded mosaic of small square panes: about two thirds fixed neutral cathedral glass, the brand colours the minority, mirrored lanes, black leading and iron saddle bars, backlit by a blurred copy and cast onto the floor.',
     ],
     dont: [
       'Fill panels or buttons with gold gradients, add sparkle, or use casino yellow; gold never exceeds a hairline.',
@@ -268,6 +313,7 @@ registerAesthetic({
   },
   // Deck copy (js/brand-deck.js): three principles, three do / don't lines, each short.
   deck: {
+    materialStage: 'pattern',   // the material slide stages the lead pattern; the cover already carries the cathedral
     coverDisplay: 1.3,   // two centred lines at >= 72px; the cathedral beneath takes the lower half of the cover
     principles: [
       ['Gold is a rim, never fill', 'Gold appears only as thin rims, rules and rings.'],

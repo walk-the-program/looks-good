@@ -1,16 +1,21 @@
 /* 21 Blob Tracking — tracked, clinical, live. Reference: the TouchDesigner / After
-   Effects "blob track" look and OpenCV-style detection overlays on footage: thin
-   white bounding boxes around moving regions, ID + confidence labels on solid tabs,
-   crosshair centroids, straight connector lines, frame coordinates, all over dithered
-   high-contrast footage.
-   The hero art is the footage plate. Its luminance field is computed in JS from seven
-   moving "subjects" (gaussian blobs with a motion trail), thresholded against an 8x8
-   Bayer matrix (real ordered dither, two tone levels), over a blurred wash of brand
-   colour and fine grain. The detection overlay is derived from the SAME blob list, so
-   every box really encloses a bright region. The one locked target is drawn in the
-   brand primary; every other box is white ink. Interface elements get the same
-   vocabulary in css/aesthetics/blob-tracking.css: bounding boxes with label tabs,
-   corner ticks, centroid crosshairs, IDs and confidence bars. */
+   Effects "blob track" look (Effect.app's blob tracker), Lozano-Hemmer's Zoom Pavilion,
+   YOLO-style detection: footage of a real subject, 20-40 bounding boxes of every size,
+   overlapping and nested, a coordinate or ID tab on every box, a web of links between
+   centroids, and the box interiors processed differently from the rest of the frame.
+
+   The hero art is the footage plate. Its luminance field is computed in JS from a
+   procedural murmuration: 58 small subjects (rotated ellipses) strung along two flow
+   curves, bunched into lumps like a flock. The field is thresholded against an 8x8
+   Bayer matrix (real ordered dither, two tone levels) on a near-black plate with a
+   12% secondary duotone wash. The detection overlay is derived from the SAME subjects:
+   single-link clustering at two distances gives cluster boxes and 2-3 large group
+   boxes; loose subjects get their own small boxes. Inside the boxes the footage is
+   processed: group boxes reveal it at full strength, every other box shows it
+   inverted, the locked box adds a primary multiply; outside the boxes it drops to
+   55%. Exactly one box is locked in primary. Every box carries a tab (ID and
+   confidence, or X/Y coordinates); centroids are linked to their two nearest
+   neighbours plus three long dashed links. */
 (function () {
 let seq = 0;
 
@@ -30,72 +35,212 @@ function btBayer(n) {
   return m;
 }
 const BT_B = btBayer(8);
-const BT_NX = 200, BT_NY = 92;           // dither grid; one cell = one viewBox unit
-const BT_K = 200 / 122;                   // blobs and overlay are authored in a 122 x 56 space
+const BT_NX = 216, BT_NY = 90;           // dither grid (2.4 : 1); one cell = one viewBox unit
 const BT_HASH = (x, y) => { const v = Math.sin(x * 127.1 + y * 311.7) * 43758.5453; return v - Math.floor(v); };
 
-// The tracked subjects, in cell units. t = trail direction (motion smear).
-const BT_BLOBS = [
-  { id: '07', conf: '0.93', cx: 72, cy: 27, sx: 9, sy: 10.5, amp: 0.95, tr: -1, lock: true, glow: 'primary' },
-  { id: '03', conf: '0.88', cx: 29, cy: 21, sx: 6.5, sy: 8, amp: 0.8, tr: 1, glow: 'secondary' },
-  { id: '12', conf: '0.81', cx: 103, cy: 38, sx: 8, sy: 5.2, amp: 0.75, tr: -1, glow: 'secondary' },
-  { id: '05', conf: '0.76', cx: 45, cy: 43, sx: 5, sy: 6, amp: 0.7, tr: 1, glow: 'ink' },
-  { id: '09', conf: '0.71', cx: 108, cy: 14, sx: 3.8, sy: 4.4, amp: 0.62, tr: -1, glow: 'accent' },
-  { id: '02', conf: '0.67', cx: 11, cy: 38, sx: 4, sy: 4.4, amp: 0.6, tr: 1, glow: 'ink' },
-  { id: '11', conf: '0.58', cx: 49, cy: 10, sx: 3, sy: 2.8, amp: 0.55, tr: -1, glow: 'ink' },
-];
-BT_BLOBS.forEach(b => { b.cy = 7.5 + b.cy * 0.84; b.sy *= 0.84; }); // keep the top band free for the HUD
-// constellation: pairs of blob indices joined by 1px lines
-const BT_LINKS = [[5, 1], [1, 6], [6, 0], [1, 3], [3, 0], [0, 2], [0, 4], [4, 2]];
-const BT_HX = 1.75; // box half-extent in sigmas
-
-function btLum(px, py) {
-  const x = px / BT_K, y = py / BT_K, NYo = BT_NY / BT_K;
-  let v = 0.025 + 0.1 * (y / NYo) + 0.06 * Math.exp(-Math.pow((x - 0.95 * y - 52) / 26, 2));
-  for (const b of BT_BLOBS) {
-    const dx = x - b.cx, dy = y - b.cy;
-    v += b.amp * Math.exp(-(dx * dx / (2 * b.sx * b.sx) + dy * dy / (2 * b.sy * b.sy)));
-    const tx = x - (b.cx + b.tr * b.sx * 1.7);
-    v += b.amp * 0.4 * Math.exp(-(tx * tx / (2 * Math.pow(b.sx * 1.5, 2)) + dy * dy / (2 * b.sy * b.sy * 1.3)));
+// ---- the subject: a procedural murmuration along two flow curves ----
+function btRng(seed) { let a = seed >>> 0; return () => { a = (a + 0x6D2B79F5) >>> 0; let t = a; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
+function btGauss(r) { let u = 0; while (!u) u = r(); return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * r()); }
+const BT_SUBJ = (function () {
+  const r = btRng(7);
+  const curves = [
+    u => [14 + 190 * u, 50 - 20 * Math.sin(Math.PI * (u * 1.15 + 0.05)) + 9 * u],
+    u => [70 + 128 * u, 26 + 12 * Math.sin(Math.PI * 2 * u) + 30 * u],
+  ];
+  const lumps = [[0, 0.12], [0, 0.33], [0, 0.5], [0, 0.71], [0, 0.9], [1, 0.3], [1, 0.68]];
+  const out = [];
+  for (let i = 0; i < 58; i++) {
+    let ci, u;
+    if (r() < 0.8) { const L = lumps[Math.floor(r() * lumps.length)]; ci = L[0]; u = L[1] + btGauss(r) * 0.045; }
+    else { ci = r() < 0.7 ? 0 : 1; u = r(); }
+    u = Math.max(0.01, Math.min(0.99, u));
+    const c = curves[ci];
+    const [x0, y0] = c(u), [x1, y1] = c(u + 0.01);
+    const ang = Math.atan2(y1 - y0, x1 - x0);
+    const off = btGauss(r) * 4.2;
+    const x = x0 - Math.sin(ang) * off, y = Math.max(12, Math.min(80, y0 + Math.cos(ang) * off));
+    const rx = 1.3 + r() * 1.9 + (ci === 0 ? u * 0.9 : 0), ry = rx * (0.5 + r() * 0.3);
+    out.push({ x, y, rx, ry, a: ang + btGauss(r) * 0.5, amp: 0.75 + r() * 0.3 });
   }
-  return v + (BT_HASH(px, py) - 0.5) * 0.07;
-}
+  return out;
+})();
 
-// Two tone levels of ordered dither as run-length path data.
-function btDitherPaths() {
+// Luminance field: dark sky ramp, a faint mass around the flock, bright subjects.
+const BT_LUM = (function () {
+  const L = new Float32Array(BT_NX * BT_NY);
+  for (let y = 0; y < BT_NY; y++) for (let x = 0; x < BT_NX; x++) {
+    L[y * BT_NX + x] = 0.012 + 0.05 * (1 - y / BT_NY) + (BT_HASH(x, y) - 0.5) * 0.04;
+  }
+  BT_SUBJ.forEach(s => {
+    const R = Math.ceil(s.rx * 3.2), c = Math.cos(s.a), n = Math.sin(s.a);
+    for (let y = Math.max(0, Math.floor(s.y - R)); y <= Math.min(BT_NY - 1, Math.ceil(s.y + R)); y++) {
+      for (let x = Math.max(0, Math.floor(s.x - R)); x <= Math.min(BT_NX - 1, Math.ceil(s.x + R)); x++) {
+        const dx = x + 0.5 - s.x, dy = y + 0.5 - s.y;
+        const u = (dx * c + dy * n) / s.rx, v = (-dx * n + dy * c) / s.ry;
+        const d = u * u + v * v;
+        L[y * BT_NX + x] += s.amp * Math.exp(-d * 0.8) + 0.09 * Math.exp(-d * 0.05);
+      }
+    }
+  });
+  return L;
+})();
+
+// Two tone levels of ordered dither as run-length path data (step = cell size, for a coarser copy).
+function btDitherPaths(step) {
   let dim = '', bright = '';
-  for (let y = 0; y < BT_NY; y++) {
+  for (let y = 0; y < BT_NY; y += step) {
     let rd = -1, rb = -1;
-    for (let x = 0; x <= BT_NX; x++) {
+    for (let x = 0; x <= BT_NX; x += step) {
       let od = false, ob = false;
       if (x < BT_NX) {
-        const v = btLum(x, y);
-        const th = (BT_B[y % 8][x % 8] + 0.5) / 64;
+        const v = BT_LUM[y * BT_NX + x];
+        const th = (BT_B[(y / step) % 8][(x / step) % 8] + 0.5) / 64;
         od = v > th; ob = (v - 0.3) * 1.55 > th;
       }
       if (od && rd < 0) rd = x;
-      if (!od && rd >= 0) { dim += `M${rd} ${y}h${x - rd}v1h-${x - rd}z`; rd = -1; }
+      if (!od && rd >= 0) { dim += `M${rd} ${y}h${x - rd}v${step}h-${x - rd}z`; rd = -1; }
       if (ob && rb < 0) rb = x;
-      if (!ob && rb >= 0) { bright += `M${rb} ${y}h${x - rb}v1h-${x - rb}z`; rb = -1; }
+      if (!ob && rb >= 0) { bright += `M${rb} ${y}h${x - rb}v${step}h-${x - rb}z`; rb = -1; }
     }
   }
   return { dim, bright };
 }
-const BT_PATHS = btDitherPaths();
+const BT_PATHS = btDitherPaths(1);
+
+// ---- detection: boxes derived from the subjects ----
+const BT_BOXES = (function () {
+  const S = BT_SUBJ;
+  const clusters = th => {
+    const p = S.map((_, i) => i); const f = i => (p[i] === i ? i : (p[i] = f(p[i])));
+    for (let i = 0; i < S.length; i++) for (let j = i + 1; j < S.length; j++) if (Math.hypot(S[i].x - S[j].x, S[i].y - S[j].y) < th) p[f(i)] = f(j);
+    const m = new Map(); S.forEach((_, i) => { const k = f(i); if (!m.has(k)) m.set(k, []); m.get(k).push(i); });
+    return [...m.values()];
+  };
+  const bb = (ids, pad, k) => {
+    let x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9;
+    ids.forEach(i => { const s = S[i]; x0 = Math.min(x0, s.x - s.rx); x1 = Math.max(x1, s.x + s.rx); y0 = Math.min(y0, s.y - s.rx); y1 = Math.max(y1, s.y + s.rx); });
+    x0 = Math.max(1.5, x0 - pad); y0 = Math.max(2.5, y0 - pad); x1 = Math.min(BT_NX - 1.5, x1 + pad); y1 = Math.min(BT_NY - 2.5, y1 + pad);
+    return { x0, y0, x1, y1, n: ids.length, k, cx: (x0 + x1) / 2, cy: (y0 + y1) / 2 };
+  };
+  const groups = clusters(12).filter(c => c.length >= 6).sort((a, b) => b.length - a.length).slice(0, 3).map(c => bb(c, 3, 'group'));
+  const c1 = clusters(4.5);
+  const cl = c1.filter(c => c.length >= 2).map(c => bb(c, 1.4, 'cluster'));
+  const singles = c1.filter(c => c.length === 1).map(c => bb(c, 1, 'single')).sort((a, b) => (b.x1 - b.x0) - (a.x1 - a.x0)).slice(0, 9);
+  // a few of the biggest subjects inside clusters get their own nested box
+  const nested = c1.filter(c => c.length >= 3).map(c => c.slice().sort((a, b) => S[b].rx - S[a].rx)[0]).slice(0, 4).map(i => bb([i], 0.8, 'single'));
+  const all = groups.concat(cl, singles, nested);
+  // the lock: the mid-size cluster nearest the right-of-centre focus point
+  let lock = null, best = 1e9;
+  cl.forEach(b => { const w = b.x1 - b.x0; if (w < 8 || w > 22) return; const d = Math.hypot(b.cx - BT_NX * 0.62, b.cy - BT_NY * 0.5); if (d < best) { best = d; lock = b; } });
+  if (lock) lock.lock = true;
+  // stable ids and confidences
+  all.forEach((b, i) => { b.id = String(i + 1).padStart(2, '0'); b.conf = (0.58 + BT_HASH(i, 3) * 0.4).toFixed(2); });
+  return all;
+})();
+
+// centroid links: k = 2 nearest neighbours (cluster + single boxes), plus three long dashed links
+const BT_LINKS = (function () {
+  const B = BT_BOXES.filter(b => b.k !== 'group');
+  const seen = new Set(), near = [];
+  B.forEach((b, i) => {
+    B.map((c, j) => ({ j, d: Math.hypot(b.cx - c.cx, b.cy - c.cy) })).filter(o => o.j !== i).sort((p, q) => p.d - q.d).slice(0, 2).forEach(o => {
+      const k = i < o.j ? i + '-' + o.j : o.j + '-' + i;
+      if (!seen.has(k)) { seen.add(k); near.push([b, B[o.j]]); }
+    });
+  });
+  const lock = BT_BOXES.find(b => b.lock) || B[0];
+  const far = B.slice().sort((p, q) => Math.hypot(q.cx - lock.cx, q.cy - lock.cy) - Math.hypot(p.cx - lock.cx, p.cy - lock.cy)).slice(0, 3).map(b => [lock, b]);
+  return { near, far };
+})();
+
+const f1 = n => (Math.round(n * 10) / 10).toString();
+
+function btLockColor(t, plate) {
+  let lock = t.primary;
+  for (let k = 1; k <= 12 && t.contrast(lock, plate) < 3.2; k++) lock = t.mix(t.primary, '#ffffff', k * 0.06);
+  return lock;
+}
+
+// The plate SVG (shared by the hero art and the deck band data URI).
+function btPlateSvg(t, id, opts) {
+  const o = opts || {};
+  const base = t.mix(t.isDark ? t.canvas : t.ink, '#000000', 0.3);
+  const plate = t.mix(t.secondary, base, 0.12);           // a 12% secondary duotone wash
+  const lit = t.isDark ? t.ink : t.canvas;
+  const lock = btLockColor(t, plate);
+  const paths = o.paths || BT_PATHS;
+  const vf = o.ns ? 'vector-effect="non-scaling-stroke"' : '';
+  const sw = o.ns ? 1 : 0.22;
+  const rect = b => `<rect x="${f1(b.x0)}" y="${f1(b.y0)}" width="${f1(b.x1 - b.x0)}" height="${f1(b.y1 - b.y0)}"/>`;
+  // groups and clusters reveal the footage at full strength; single subjects and the lock are inverted
+  const reveal = BT_BOXES.filter(b => (b.k === 'group' || b.k === 'cluster') && !b.lock);
+  const invert = BT_BOXES.filter(b => b.k === 'single' || b.lock);
+  const L = BT_BOXES.find(b => b.lock);
+
+  const near = BT_LINKS.near.map(([p, q]) => `M${f1(p.cx)} ${f1(p.cy)}L${f1(q.cx)} ${f1(q.cy)}`).join('');
+  const far = BT_LINKS.far.map(([p, q]) => { const mx = (p.cx + q.cx) / 2, my = Math.min(p.cy, q.cy) - 16; return `M${f1(p.cx)} ${f1(p.cy)}Q${f1(mx)} ${f1(Math.max(4, my))} ${f1(q.cx)} ${f1(q.cy)}`; }).join('');
+
+  let boxes = '', ticks = '', cross = '';
+  BT_BOXES.forEach(b => {
+    const col = b.lock ? lock : lit;
+    const op = b.lock ? 1 : (b.k === 'group' ? 0.62 : 0.9);
+    boxes += `<rect ${vf} x="${f1(b.x0)}" y="${f1(b.y0)}" width="${f1(b.x1 - b.x0)}" height="${f1(b.y1 - b.y0)}" fill="none" stroke="${col}" stroke-opacity="${op}" stroke-width="${b.lock ? sw * 1.6 : sw}"${b.k === 'group' ? ` stroke-dasharray="${o.ns ? '4 3' : '1.2 0.9'}"` : ''}/>`;
+    if (b.k !== 'single') {
+      const Lt = Math.min(2.6, (b.x1 - b.x0) * 0.25), x0 = b.x0, y0 = b.y0, x1 = b.x1, y1 = b.y1, e = 0.5;
+      ticks += `<path ${vf} fill="none" stroke="${col}" stroke-width="${b.lock ? sw * 2.6 : sw * 1.6}" d="M${f1(x0 - e)} ${f1(y0 + Lt)}V${f1(y0 - e)}H${f1(x0 + Lt)}M${f1(x1 - Lt)} ${f1(y0 - e)}H${f1(x1 + e)}V${f1(y0 + Lt)}M${f1(x1 + e)} ${f1(y1 - Lt)}V${f1(y1 + e)}H${f1(x1 - Lt)}M${f1(x0 + Lt)} ${f1(y1 + e)}H${f1(x0 - e)}V${f1(y1 - Lt)}"/>`;
+    }
+    if (b.k !== 'group') {
+      const r = b.lock ? 2.4 : 1.1;
+      cross += `M${f1(b.cx - r)} ${f1(b.cy)}H${f1(b.cx + r)}M${f1(b.cx)} ${f1(b.cy - r)}V${f1(b.cy + r)}`;
+    }
+  });
+
+  return `<defs>
+      <path id="${id}d" d="${paths.dim}"/><path id="${id}e" d="${paths.bright}"/>
+      <clipPath id="${id}g">${reveal.map(rect).join('')}</clipPath>
+      <clipPath id="${id}i">${invert.map(rect).join('')}</clipPath>
+      ${L ? `<clipPath id="${id}l">${rect(L)}</clipPath>` : ''}
+      ${o.grain ? `<filter id="${id}n" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" seed="4" stitchTiles="stitch"/><feColorMatrix values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 1.4 -0.42"/></filter>` : ''}
+    </defs>
+    <rect width="${BT_NX}" height="${BT_NY}" fill="${plate}"/>
+    <g fill="${lit}" shape-rendering="crispEdges"><use href="#${id}d" fill-opacity=".16"/><use href="#${id}e" fill-opacity=".5"/></g>
+    <g clip-path="url(#${id}g)" shape-rendering="crispEdges"><rect width="${BT_NX}" height="${BT_NY}" fill="${plate}"/><g fill="${lit}"><use href="#${id}d" fill-opacity=".3"/><use href="#${id}e" fill-opacity=".92"/></g></g>
+    <g clip-path="url(#${id}i)" shape-rendering="crispEdges"><rect width="${BT_NX}" height="${BT_NY}" fill="${lit}"/><g fill="${plate}"><use href="#${id}d" fill-opacity=".3"/><use href="#${id}e" fill-opacity=".92"/></g></g>
+    ${L ? `<g clip-path="url(#${id}l)"><rect width="${BT_NX}" height="${BT_NY}" fill="${t.primary}" opacity=".35" style="mix-blend-mode:multiply"/></g>` : ''}
+    ${o.grain ? `<rect width="${BT_NX}" height="${BT_NY}" filter="url(#${id}n)" opacity=".14" style="mix-blend-mode:screen"/>` : ''}
+    <g fill="none" stroke="${lit}">
+      <path ${vf} d="${near}" stroke-opacity=".8" stroke-width="${sw}"/>
+      <path ${vf} d="${far}" stroke-opacity=".7" stroke-width="${sw}" stroke-dasharray="${o.ns ? '3 3' : '0.8 0.8'}"/>
+    </g>
+    ${boxes}${ticks}
+    <path ${vf} d="${cross}" fill="none" stroke="${lit}" stroke-width="${sw}"/>
+    ${L ? `<circle ${vf} cx="${f1(L.cx)}" cy="${f1(L.cy)}" r="3.6" fill="none" stroke="${lock}" stroke-width="${sw}"/><path ${vf} d="M${f1(L.cx - 2.4)} ${f1(L.cy)}H${f1(L.cx + 2.4)}M${f1(L.cx)} ${f1(L.cy - 2.4)}V${f1(L.cy + 2.4)}" stroke="${lock}" stroke-width="${sw}"/>` : ''}`;
+}
+
+// The plate (without tabs) for the deck cover band and closing strip, as a CSS data URI.
+let btBandCache = { k: '', v: '' };
+function btBandUri(t) {
+  const k = [t.canvas, t.ink, t.primary, t.secondary, t.isDark].join('|');
+  if (btBandCache.k === k) return btBandCache.v;
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${BT_NX} ${BT_NY}" preserveAspectRatio="xMidYMid slice">${btPlateSvg(t, 'bd', {})}</svg>`;
+  const v = `url('data:image/svg+xml,${encodeURIComponent(svg).replace(/'/g, '%27')}')`;
+  btBandCache = { k, v };
+  return v;
+}
 
 registerAesthetic({
   key: 'blob-tracking', order: 21,
   name: 'Blob Tracking',
   descriptor: 'Tracked · Clinical · Live',
   influences: 'Computer vision / TouchDesigner visuals / Surveillance UI',
-  summary: 'Thin white detection boxes, ID labels and crosshairs over dithered footage, tracking every element.',
+  summary: 'A flock tracked in dithered footage: dozens of 1px boxes with ID and coordinate tabs, linked centroids, one locked target.',
   motto: 'Everything in frame is accounted for.',
-  kicker: 'Frame 0412 · Tracking 7',
+  kicker: 'Frame 0412 · Tracking 58',
   mode: 'dark',
   slideShape: 'minimal',
   labels: { material: 'Detection', states: ['Searching', 'Locked', 'Lost'], statesKind: 'button' },
   layout: { hero: 'centered', palette: 'swatches', sections: 'two-col' },
-  type: { ui: 'mono', label: 'mono', display: 0.86 },
+  type: { ui: 'mono', label: 'mono', display: 0.7 },
   highlight: 'custom',
   highlightNote: 'The word is set in --accent-ink and enclosed by a 1px white detection box with corner ticks and an "ID 07 · 0.93" label tab hanging under its lower-left corner; no fill, no glow. The whole headline sits in a fainter box with its own tab above it.',
 
@@ -106,18 +251,18 @@ registerAesthetic({
       coverage: '70–75%',
     },
     ink: {
-      use: 'White detection ink: every 1px bounding box, corner tick, crosshair, connector, mono label and the headline',
-      never: 'Large filled fields (a filled ink plane is only ever a label tab)',
+      use: 'White detection ink: every 1px bounding box, tab, crosshair, link, mono label and the headline; the footage itself is ink dither on the plate',
+      never: 'Large filled fields (a filled ink plane is only ever a label tab or an inverted box interior)',
       coverage: '15–20%',
     },
     primary: {
-      use: 'The locked target: its box in the footage, the one solid main action, the selected state and the filled progress mark',
+      use: 'The locked target: its box, tab and interior tint in the footage, the one solid main action and the selected state',
       never: 'More than one locked box per view, body text, decorative fills, glow',
       coverage: '≈6–8%',
     },
     secondary: {
-      use: 'The footage itself: soft colour wash behind the dither, plus status tags and confidence tracks',
-      never: 'The main action, bounding boxes, body text',
+      use: 'A 12% duotone wash over the whole footage plate, and status tags and confidence tracks',
+      never: 'The main action, bounding boxes, glows on subjects, body text',
       coverage: '≈10%',
     },
     accent: {
@@ -140,9 +285,7 @@ registerAesthetic({
     const hf = st && st.headingFont;
     const plate = t.mix(d ? t.canvas : t.ink, '#000000', 0.3);
     const lit = d ? t.ink : t.canvas;
-    // the locked box must read on the dark footage plate
-    let lock = t.primary;
-    for (let k = 1; k <= 12 && t.contrast(lock, plate) < 3.2; k++) lock = t.mix(t.primary, '#ffffff', k * 0.06);
+    const lock = btLockColor(t, plate);
     const ticks = (c, w, l) => [
       `linear-gradient(${c},${c}) 0 0/${l}px ${w}px no-repeat`, `linear-gradient(${c},${c}) 0 0/${w}px ${l}px no-repeat`,
       `linear-gradient(${c},${c}) 100% 0/${l}px ${w}px no-repeat`, `linear-gradient(${c},${c}) 100% 0/${w}px ${l}px no-repeat`,
@@ -153,7 +296,7 @@ registerAesthetic({
     return {
       '--ab-type-pick-w': w(600),
       '--ab-hw': w(600),
-      '--ab-plate': plate,
+      '--ab-plate': t.mix(t.secondary, plate, 0.12),
       '--ab-lit': lit,
       '--ab-lock': lock,
       '--ab-box': t.alpha(t.ink, 0.9),
@@ -164,116 +307,88 @@ registerAesthetic({
       '--ab-ticks': ticks(t.ink, 1.5, 7),
       '--ab-ticks-soft': ticks(t.alpha(t.ink, 0.55), 1, 5),
       '--ab-ticks-lock': ticks(t.primary, 2, 8),
+      '--bt-band': btBandUri(t),
     };
   },
 
   art(ctx) {
     const t = ctx.t;
     const id = 'bt' + (++seq);
-    const plate = t.mix(t.isDark ? t.canvas : t.ink, '#000000', 0.3);
-    const lit = t.isDark ? t.ink : t.canvas;
-    let lock = t.primary;
-    for (let k = 1; k <= 12 && t.contrast(lock, plate) < 3.2; k++) lock = t.mix(t.primary, '#ffffff', k * 0.06);
-    const gcol = { primary: t.primary, secondary: t.secondary, accent: t.accent, ink: lit };
-    const vf = 'vector-effect="non-scaling-stroke"';
-    const NXo = 122, NYo = BT_NY / BT_K;
     const pct = (v, total) => (v / total * 100).toFixed(2);
+    // a tab on every box: ID + confidence and X/Y coordinates alternate; groups count their members
+    let n = 0;
+    const tabs = BT_BOXES.map(b => {
+      const left = pct(b.x0, BT_NX), top = pct(b.y0, BT_NY);
+      const small = (b.x1 - b.x0) < BT_NX * 0.06;
+      const inside = b.y0 < 7 ? ' is-in' : '';
+      let txt;
+      if (b.k === 'group') txt = `<b>GRP ${b.id}</b><i> · ${b.n} OBJ</i>`;
+      else if (b.lock) txt = `<b>ID ${b.id}</b><i> · ${b.conf} · LOCK</i>`;
+      else if ((n++) % 2) txt = `<b>X${String(Math.round(b.cx * 0.74)).padStart(3, '0')}Y${String(Math.round(b.cy * 1.1)).padStart(3, '0')}</b>`;
+      else txt = `<b>ID ${b.id}</b><i> · ${b.conf}</i>`;
+      return `<span class="bta-tab${b.lock ? ' is-lock' : ''}${b.k === 'group' ? ' is-grp' : ''}${small ? ' is-sm' : ''}${inside}" style="left:${left}%;top:${top}%">${txt}</span>`;
+    }).join('');
+    const L = BT_BOXES.find(b => b.lock);
+    const xy = L ? `<span class="bta-xy" style="left:${pct(L.x0, BT_NX)}%;top:${pct(L.y1, BT_NY)}%">X ${String(Math.round(L.cx * 14.2)).padStart(4, '0')}  Y ${String(Math.round(L.cy * 12)).padStart(4, '0')}  A ${Math.round((L.x1 - L.x0) * (L.y1 - L.y0) * 9)}px</span>` : '';
 
-    const glows = BT_BLOBS.map(b => `<ellipse cx="${b.cx}" cy="${b.cy}" rx="${(b.sx * 2.1).toFixed(1)}" ry="${(b.sy * 2.1).toFixed(1)}" fill="${t.mix(plate, gcol[b.glow], b.glow === 'ink' ? 0.3 : 0.62)}" opacity="${b.lock ? 0.95 : 0.8}"/>`).join('');
-
-    const links = BT_LINKS.map(([a, c]) => { const p = BT_BLOBS[a], q = BT_BLOBS[c]; return `M${p.cx} ${p.cy}L${q.cx} ${q.cy}`; }).join('');
-
-    let boxes = '', cross = '', tabs = '';
-    BT_BLOBS.forEach(b => {
-      const hw = b.sx * BT_HX, hh = b.sy * BT_HX;
-      const x0 = b.cx - hw, y0 = b.cy - hh, x1 = b.cx + hw, y1 = b.cy + hh;
-      const col = b.lock ? lock : lit;
-      const sw = b.lock ? 1.6 : 1;
-      const L = Math.min(3, hw * 0.5);
-      boxes += `<rect ${vf} x="${x0.toFixed(1)}" y="${y0.toFixed(1)}" width="${(hw * 2).toFixed(1)}" height="${(hh * 2).toFixed(1)}" fill="${b.lock ? t.alpha(lock, 0.08) : 'none'}" stroke="${col}" stroke-width="${sw}" stroke-opacity="${b.lock ? 1 : 0.88}"/>`
-        + `<path ${vf} fill="none" stroke="${col}" stroke-width="${b.lock ? 2.6 : 1.6}" d="M${x0 - 0.8} ${y0 + L}V${y0 - 0.8}H${x0 + L}M${x1 - L} ${y0 - 0.8}H${x1 + 0.8}V${y0 + L}M${x1 + 0.8} ${y1 - L}V${y1 + 0.8}H${x1 - L}M${x0 + L} ${y1 + 0.8}H${x0 - 0.8}V${y1 - L}"/>`;
-      const r = b.lock ? 2.6 : 1.7;
-      cross += `<path ${vf} fill="none" stroke="${col}" stroke-width="1" d="M${b.cx - r} ${b.cy}H${b.cx + r}M${b.cx} ${b.cy - r}V${b.cy + r}"/>`
-        + (b.lock ? `<circle ${vf} cx="${b.cx}" cy="${b.cy}" r="4.2" fill="none" stroke="${col}" stroke-width="1"/>` : '');
-      const left = pct(x0, NXo), top = pct(y0, NYo);
-      tabs += `<span class="bta-tab${b.lock ? ' is-lock' : ''}" style="left:${left}%;top:${top}%"><b>ID ${b.id}</b><i> · ${b.conf}</i></span>`;
-      if (b.lock) tabs += `<span class="bta-xy" style="left:${left}%;top:${pct(y1, NYo)}%">X ${String(Math.round(b.cx * 15.7)).padStart(4, '0')}  Y ${String(Math.round(b.cy * 19.3)).padStart(4, '0')}  A 2,114px</span>`;
-    });
-
-    // frame furniture: corner brackets and a timecode ruler along the bottom edge
-    const m = 3.6, c = 10;
-    const frame = `M${m} ${m + c}V${m}H${m + c}M${BT_NX - m - c} ${m}H${BT_NX - m}V${m + c}M${BT_NX - m} ${BT_NY - m - c}V${BT_NY - m}H${BT_NX - m - c}M${m + c} ${BT_NY - m}H${m}V${BT_NY - m - c}`;
+    // frame furniture: a timecode ruler along the bottom edge
     let ruler = '';
-    for (let x = 8; x <= BT_NX - 8; x += 3) ruler += `M${x} ${BT_NY}v${(x - 8) % 15 === 0 ? -3.6 : -1.6}`;
-
+    for (let x = 8; x <= BT_NX - 8; x += 3) ruler += `M${x} ${BT_NY}v${(x - 8) % 15 === 0 ? -3 : -1.4}`;
     return `<div class="bta">
-      <svg class="bta-fx" viewBox="0 0 ${BT_NX} ${BT_NY}" preserveAspectRatio="none" focusable="false" shape-rendering="crispEdges">
-        <defs>
-          <filter id="${id}b" x="-10%" y="-10%" width="120%" height="120%"><feGaussianBlur stdDeviation="3.6"/></filter>
-          <filter id="${id}g" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" seed="4" stitchTiles="stitch"/><feColorMatrix values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 1.4 -0.42"/></filter>
-        </defs>
-        <rect width="${BT_NX}" height="${BT_NY}" fill="${plate}"/>
-        <g filter="url(#${id}b)" shape-rendering="geometricPrecision"><g transform="scale(${BT_K.toFixed(4)})">${glows}</g></g>
-        <path d="${BT_PATHS.dim}" fill="${lit}" fill-opacity=".3"/>
-        <path d="${BT_PATHS.bright}" fill="${lit}" fill-opacity=".92"/>
-        <rect width="${BT_NX}" height="${BT_NY}" filter="url(#${id}g)" opacity=".16" style="mix-blend-mode:screen"/>
-        <g shape-rendering="geometricPrecision">
-          <g transform="scale(${BT_K.toFixed(4)})">
-          <path ${vf} d="${links}" fill="none" stroke="${lit}" stroke-opacity=".5" stroke-width="1"/>
-          ${boxes}${cross}
-          </g>
-          <path ${vf} d="${frame}" fill="none" stroke="${lit}" stroke-opacity=".8" stroke-width="1.5"/>
-          <path ${vf} d="${ruler}" fill="none" stroke="${lit}" stroke-opacity=".5" stroke-width="1"/>
-        </g>
-      </svg>
-      ${tabs}
+      <div class="bta-plate">
+        <svg class="bta-fx" viewBox="0 0 ${BT_NX} ${BT_NY}" preserveAspectRatio="none" focusable="false">
+          ${btPlateSvg(t, id, { ns: true, grain: true })}
+          <path vector-effect="non-scaling-stroke" d="${ruler}" fill="none" stroke="${t.isDark ? t.ink : t.canvas}" stroke-opacity=".5" stroke-width="1"/>
+        </svg>
+        ${tabs}${xy}
+      </div>
       <span class="bta-hud bta-tl"><i class="bta-rec"></i>REC · FRAME 0412</span>
-      <span class="bta-hud bta-tr">TRACKING 7 · 30 FPS</span>
+      <span class="bta-hud bta-tr">TRACKING ${BT_SUBJ.length} · ${BT_BOXES.length} BOXES · 30 FPS</span>
       <span class="bta-hud bta-bl">THRESH 0.62 · MIN AREA 240</span>
       <span class="bta-hud bta-br">00:00:13:12</span>
+      <i class="bta-corner" aria-hidden="true"></i>
     </div>`;
   },
 
   materials: [
-    { name: 'Footage plate', css: 'background: {plate}; /* near-black frame; over it a blurred wash of brand colour, a two-tone 8x8 Bayer ordered dither in {lit} (30% and 92%), fine grain; the plate stays dark in light mode too */' },
-    { name: 'Detection box', css: 'border: 1px solid {ink}; background: {boxFill}; /* 1px, never rounded, never glowing; 1.5px corner ticks extend 1px past each corner */' },
-    { name: 'Label tab', css: 'background: {ink}; color: {canvas}; font: 700 9px/1.6 mono; padding: 1px 5px; letter-spacing: .04em; /* solid tab on a box\'s top-left corner: "ID 07 · 0.93" */' },
-    { name: 'Locked target', css: 'border: 1.5px solid {lock}; background: {primary} at 8%; /* the only primary box in a view; its tab is filled {primary} with {onPrimary} text */' },
-    { name: 'Centroid crosshair', css: 'background: linear-gradient({ink},{ink}) center / 100% 1px no-repeat, linear-gradient({ink},{ink}) center / 1px 100% no-repeat; /* 5px to 9px cross at a region\'s centre; locked target adds a ring */' },
-    { name: 'Connector line', css: 'height: 1px; background: {boxSoft}; /* straight, 1px, between centroids; never curved or dashed */' },
+    { name: 'Footage plate', css: 'background: {plate}; /* near-black with a 12% secondary wash; the subject (a flock, a crowd) as a two-tone 8x8 Bayer ordered dither in {lit}; outside the boxes at 55%, fine grain; the plate stays dark in light mode too */' },
+    { name: 'Detection box', css: 'border: 1px solid {ink}; /* 1px, never rounded, never glowing; 20-30 per frame from 3 to 45 cells, overlapping and nested; the interior is the footage inverted */' },
+    { name: 'Label tab', css: 'background: {ink}; color: {canvas}; font: 700 8px/1.6 mono; padding: 0 4px; /* on every box: "ID 07 · 0.93" or "X075Y034"; groups read "GRP 01 · 14 OBJ" */' },
+    { name: 'Locked target', css: 'border: 1.5px solid {lock}; /* the only primary box in a view; its interior gets a primary multiply at 35% and its tab is filled {primary} */' },
+    { name: 'Group box', css: 'border: 1px dashed {boxSoft}; /* 2-3 per frame around dense clusters; the footage inside shows at full strength */' },
+    { name: 'Centroid link', css: 'stroke: {ink} at 80%; 1px; /* each centroid to its two nearest neighbours, plus three long dashed links from the lock */' },
     { name: 'Confidence bar', css: 'background: repeating-linear-gradient(90deg, {boxHair} 0 1px, transparent 1px 5px); /* hairline track with ticks; the fill is a 1px {ink} line ending in a square marker */' },
   ],
 
   rules: {
     do: [
-      'Enclose things in 1px bounding boxes with 1.5px corner ticks and a solid mono label tab ("ID 07 · 0.93") on the top-left corner.',
-      'Lock exactly one target in primary per view (box, tab and main action); every other box is white ink at full or 34% strength.',
-      'Mark centres with crosshairs and join related boxes with straight 1px connector lines; show IDs, confidence and coordinates as mono readouts.',
-      'Keep footage dark, grainy and dithered (ordered Bayer pattern, two tones) with a soft brand-colour wash behind it.',
+      'Track a real subject (a flock, a crowd, traffic) in dark dithered footage, with 20-30 1px boxes of every size that overlap and nest.',
+      'Put a solid mono tab on every box (ID and confidence, or X/Y coordinates) and link centroids to their nearest neighbours.',
+      'Process the inside of the boxes differently from the frame: inverted or revealed, with the rest of the footage dropped to about half.',
+      'Lock exactly one target in primary per view; keep corner ticks and tabs for the footage, interactive controls and the tracked list.',
     ],
     dont: [
-      'Add neon glow, chamfered corners or scanline sweeps; that is Cyber HUD. Boxes are square and 1px.',
+      'Add neon glow, coloured halos, chamfered corners or scanline sweeps; that is Cyber HUD. Boxes are square and 1px.',
       'Round any box or fill a panel with colour; panels are hairline boxes on the near-black frame.',
-      'Use accent for boxes, tabs or fills; it is the live dot and one headline word.',
-      'Box more than the things that matter, or set boxes and labels in a serif or rounded face.',
+      'Tag static content (type specimens, swatches, cards) with IDs; tracking means something only where it is used.',
+      'Space boxes evenly like a layout grid; detection is dense, uneven and overlapping.',
     ],
   },
-  // Deck copy (js/brand-deck.js): three principles, three do / don't lines, each short.
   deck: {
     principles: [
-      ['Everything in frame is tracked', '1px boxes with corner ticks and ID labels.'],
+      ['Everything in frame is tracked', 'Dozens of 1px boxes, a tab on every one.'],
       ['Lock exactly one target', 'One primary box and action; the rest stay white.'],
-      ['Dark, grainy, dithered footage', 'Two tones under a soft brand wash.'],
+      ['Footage inside, noise outside', 'Box interiors inverted; the frame drops to half.'],
     ],
     do: [
-      'Enclose things in 1px bounding boxes.',
+      'Track a real subject in dithered footage.',
       'Lock one target in primary.',
-      'Show IDs and coordinates in mono.',
+      'Tag every box with an ID or coordinates.',
     ],
     dont: [
-      'Add neon glow or chamfered corners.',
+      'Add neon glow or coloured halos.',
       'Round boxes or fill panels.',
-      'Box more than what matters.',
+      'Tag static content with IDs.',
     ],
   },
 });
