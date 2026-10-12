@@ -105,9 +105,8 @@ reports the two exempt shares, oprings and typeterrain, as expected). Families n
 leads with: counterchange, terrain, inkstill, neonspray, prismpix, seafan, snow, satellite, flyposter,
 festival (counterchange, snow, seafan are led only by exempt aesthetics).
 Fixed colourways in suites: tonal (soft-form), spectrum (holo), primaries (bauhaus), earth (groovy),
-brass (neo-deco), broadcast (pirate), safety (hazard tape in industrial-hazard and micrographics).
-Pending in engine.js: `hud` (cyber-hud "Data slabs") and `toner` (all six xerox entries) use `mono`
-until the colourways land. * = lead differs from what a fixer or builder asked for (conflict resolved).
+brass (neo-deco), broadcast (pirate), safety (hazard tape in industrial-hazard and micrographics),
+hud (cyber-hud "Data slabs"), toner (all six xerox entries). * = lead differs from what a fixer or builder asked for (conflict resolved).
 
 | Aesthetic | Lead | Exempt | | Aesthetic | Lead | Exempt |
 |---|---|---|---|---|---|---|

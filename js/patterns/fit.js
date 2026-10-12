@@ -9,8 +9,7 @@
                  engine.js E.COLORWAYS: 'tonal' (soft-form), 'spectrum' (holo-iridescent),
                  'primaries' (bauhaus-poster), 'earth' (groovy-70s), 'brass' (neo-deco),
                  'broadcast' (pirate-broadcast), 'safety' (hazard tape in industrial-hazard
-                 and micrographics); pending: 'hud' (cyber-hud Data slabs) and 'toner' (all of
-                 xerox) are 'mono' here until engine.js lists them
+                 and micrographics), 'hud' (cyber-hud Data slabs), 'toner' (all of xerox)
        params    overrides on top of the family defaults (render() fills the rest);
                  includes params.tone, equal to entry.tone
        tone      number 0..1, default 1. Lower = quieter: ink contrast/saturation moves
@@ -150,7 +149,7 @@
     ],
     'cyber-hud': [
       ['totem', 'HUD strip', 'mono', { px: 1.2, panel: 0.7, band: 4, frame: 1 }, 0.7],
-      ['chevron', 'Data slabs', 'mono', { bands: 10, slope: 30, mirror: 'x', rhythm: 'even', colors: 'three' }, 0.55],
+      ['chevron', 'Data slabs', 'hud', { bands: 10, slope: 30, mirror: 'x', rhythm: 'even', colors: 'three' }, 0.55],
       ['modulargrid', 'Ruler grid', 'mono', { style: 'line', cols: 16, merge: 0.1, gap: 0.4, empty: 0.6 }, 0.7],
       ['signal', 'Data glitch', 'mono', { px: 0.55, bands: 26, noise: 0.75, blank: 0.1 }, 0.7],
       ['glyphgrid', 'Reticle field', 'mono', { glyphs: 'crosses', cell: 4, bands: 3 }, 0.7],
@@ -213,12 +212,12 @@
       ['glyphgrid', 'Crosshairs', 'mono', { glyphs: 'crosses', cell: 3.4, bands: 5, duo: false }],
     ],
     'xerox': [
-      ['thermal', 'Toner heat', 'mono', { bands: 3, cell: 2.2, turb: 0.9, shape: 'round', flat: true }],
-      ['halftone', 'Copied screen', 'mono', { cell: 3.2, levels: 2, shape: 'round', angle: 45, field: 'warp', duo: false, grain: 0.5 }],
-      ['onebit', 'Toner crush', 'mono', { zones: 6, pixel: 1, dither: 'threshold', pair: 'ink1', glitch: 0.05 }],
-      ['signal', 'Drum streaks', 'mono', { px: 0.6, bands: 22, noise: 0.45, blank: 0.3 }],
-      ['stipple', 'Toner stipple', 'mono', { density: 1.2, dot: 1, field: 'ridges', duo: false, grain: 0.3 }],
-      ['glyphgrid', 'Registration marks', 'mono', { glyphs: 'crosses', cell: 3.8, bands: 4, duo: false, grain: 0.3 }],
+      ['thermal', 'Toner heat', 'toner', { bands: 3, cell: 2.2, turb: 0.9, shape: 'round', flat: true }],
+      ['halftone', 'Copied screen', 'toner', { cell: 3.2, levels: 2, shape: 'round', angle: 45, field: 'warp', duo: false, grain: 0.5 }],
+      ['onebit', 'Toner crush', 'toner', { zones: 6, pixel: 1, dither: 'threshold', pair: 'ink1', glitch: 0.05 }],
+      ['signal', 'Drum streaks', 'toner', { px: 0.6, bands: 22, noise: 0.45, blank: 0.3 }],
+      ['stipple', 'Toner stipple', 'toner', { density: 1.2, dot: 1, field: 'ridges', duo: false, grain: 0.3 }],
+      ['glyphgrid', 'Registration marks', 'toner', { glyphs: 'crosses', cell: 3.8, bands: 4, duo: false, grain: 0.3 }],
     ],
     'micrographics': [
       ['parcels', 'Parcel ticks', 'mono', { cell: 1.2, size: 1.2, every: 8, labels: true }, 0.7],
