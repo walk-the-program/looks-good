@@ -41,8 +41,46 @@ function abAccentInk(accent, canvas, ink) {
   return ink;
 }
 
+/* ---------------- safe hook runner ---------------- */
+
+// Every aesthetic hook (art, headline, tokens, canvas, printPrimary, states, panels,
+// deck.*, the deck's pattern and stage hooks) runs through abRun, so one throwing hook
+// costs only its own piece: the caller gets the fallback and the board, deck and brief
+// still render. A failure is reported once per aesthetic and hook (console.warn), not on
+// every render. `this` is the def.
+const AB_WARNED = new Set();
+
+function abRun(def, hook, fn, args, fallback) {
+  if (typeof fn !== 'function') return fallback;
+  try {
+    return fn.apply(def, args);
+  } catch (err) {
+    const id = `${def && def.key}|${hook}`;
+    if (!AB_WARNED.has(id)) {
+      AB_WARNED.add(id);
+      if (typeof console !== 'undefined') console.warn(`hook ${hook} (${def && def.key}) failed:`, err);
+    }
+    return fallback;
+  }
+}
+
+// A hook that returns HTML: fn(ctx, ...rest) -> string. '' when fn is not a function,
+// returns a non-string or '', or throws (the caller then uses its default markup).
+function abHookHtml(def, fn, ctx, hook = 'hook', ...rest) {
+  const html = abRun(def, hook, fn, [ctx, ...rest], '');
+  return typeof html === 'string' ? html : '';
+}
+
+// def.tokens(t, state): the aesthetic's extra CSS variables ({} when absent, broken or not
+// an object). `state` is the view state being rendered (a blend swaps the faces), so
+// weights and copy are read from it, never from the global.
+function abTokens(def, t, state) {
+  const v = abRun(def, 'tokens', def && def.tokens, [t, state], null);
+  return v && typeof v === 'object' && !Array.isArray(v) ? v : {};
+}
+
 // Derived colors are computed here and nowhere else (the AI brief prints
-// these exact hexes). `def.canvas(base)` may return an adjusted canvas hex
+// these exact hexes). `def.canvas(base, state)` may return an adjusted canvas hex
 // (e.g. Soft Form lifts very dark canvases); everything derives from that.
 function boardTokens(state, def) {
   const c = state.colors;
@@ -50,11 +88,11 @@ function boardTokens(state, def) {
   let canvas = isDark ? c.neutralDark : c.neutralLight;
   const ink = isDark ? c.neutralLight : c.neutralDark;
   if (def && typeof def.canvas === 'function') {
-    const adjusted = def.canvas({
+    const adjusted = abRun(def, 'canvas', def.canvas, [{
       canvas, ink, isDark, primary: c.primary, secondary: c.secondary, accent: c.accent,
       mix: slMix, hexToHsl, hslToHex,
-    });
-    if (adjusted) canvas = adjusted;
+    }, state], null);
+    if (adjusted && typeof adjusted === 'string') canvas = adjusted;
   }
   // muted = ink moved 40% toward canvas, then pulled back toward ink until
   // small labels stay readable (>= 4.5:1).
@@ -92,12 +130,12 @@ function boardTokens(state, def) {
     contrast: contrastRatio,
     readable: pickReadableText,
   };
-  // def.printPrimary(t) (optional): the hex the primary is printed as (Xerox Punk
+  // def.printPrimary(t, state) (optional): the hex the primary is printed as (Xerox Punk
   // and Acid Graphics push it to Day-Glo). t.primary stays the brand hex; the
   // printed color replaces it in --ab-primary, and the colors derived from the
   // primary are recomputed from it. A value that is not a #rrggbb hex is ignored.
   if (def && typeof def.printPrimary === 'function') {
-    const hex = def.printPrimary(t);
+    const hex = abRun(def, 'printPrimary', def.printPrimary, [t, state], null);
     if (typeof hex === 'string' && /^#[0-9a-f]{6}$/i.test(hex.trim())) {
       const pp = hex.trim().toLowerCase();
       if (pp !== String(c.primary).toLowerCase()) {
@@ -155,8 +193,8 @@ function abHeadline(tagline) {
 function abHeadlineH2(def, ctx, text, extraClass = '', extraAttrs = '') {
   if (def && typeof def.headline === 'function') {
     const plain = String(text == null ? '' : text).trim();
-    const inner = def.headline(ctx, plain);
-    if (typeof inner === 'string' && inner) {
+    const inner = abHookHtml(def, def.headline, ctx, 'headline', plain);
+    if (inner) {
       return `<h2 class="ab-headline ab-headline--custom${extraClass}" aria-label="${escapeHtml(plain)}"${extraAttrs}><span aria-hidden="true">${inner}</span></h2>`;
     }
   }
@@ -181,6 +219,37 @@ function abSansFace(state) {
   const tries = [[b, 'sans'], [h, 'sans'], [b, 'mono'], [h, 'mono'], [h, 'display'], [b, 'display']];
   for (const [f, cat] of tries) if (f && f.category === cat) return f;
   return h;
+}
+
+/* Weights a face really publishes. FONTS[].weights is a string ("400;700"); the font
+   loader requests exactly those, and font-synthesis is off, so a weight outside the list
+   would render as a neighbour. Tokens and art read weights through these, not by parsing
+   the string. They are plain functions of the face, so they work for any face (the view
+   state's, or a donor's pairing), and they are available wherever aesthetic-board.js is
+   (aesthetic files call them at render time, from tokens(t, state) or art(ctx)). */
+
+// The published weights, ascending, as numbers; [400] when the face lists none.
+function abWeights(face) {
+  const ws = String((face && face.weights) || '400').split(';').map(Number).filter(Boolean).sort((a, b) => a - b);
+  return ws.length ? ws : [400];
+}
+
+// The heaviest published weight <= cap; the lightest when every weight is above it (a
+// single-weight face stays at its one weight).
+function abWeight(face, cap) {
+  const ws = abWeights(face);
+  const le = ws.filter(w => w <= cap);
+  return le.length ? le[le.length - 1] : ws[0];
+}
+
+// The published weight nearest `wanted`: `wanted` itself, else the next one up when it is
+// within 100, else the next one down, else the next one up.
+function abWeightNear(face, wanted) {
+  const ws = abWeights(face);
+  if (ws.includes(wanted)) return wanted;
+  const up = ws.find(w => w > wanted);
+  const down = ws.filter(w => w < wanted).pop();
+  return up && up - wanted <= 100 ? up : (down || up || 400);
 }
 
 // kind: 'body' | 'heading' | 'sans' | 'mono'. Returns { name, expr } where expr
@@ -229,9 +298,9 @@ function boardVars(t, state, def, tagline) {
   vars['--ab-display'] = Number(ty2.display) > 0 ? Number(ty2.display) : 1;
   // Scales an aesthetic's tight headline tracking by the heading face's width:
   // condensed/heavy faces collide when tightened, wide/techno need less. An
-  // aesthetic's tokens() may override it (ASCII Art, Xerox, Editorial, Groovy do).
+  // aesthetic's tokens(t, state) may override it (ASCII Art, Xerox, Editorial, Groovy do).
   vars['--ab-tr'] = { condensed: 0, heavy: 0, wide: 0.4, techno: 0.4 }[state.headingFont && state.headingFont.cls] ?? 1;
-  if (typeof def.tokens === 'function') Object.assign(vars, def.tokens(t));
+  Object.assign(vars, abTokens(def, t, state));
   return vars;
 }
 
@@ -293,13 +362,9 @@ const AB_ROLE_ORDER = ['canvas', 'ink', 'primary', 'secondary', 'accent'];
 const AB_LAYOUT_DEFAULT = { hero: 'split', palette: 'swatches', sections: 'two-col', subcopy: true };
 // Heroes: split (default), centered, poster, scene, plus (round 6)
 //   bleed      the art runs edge to edge across the board above the copy
-//   art-first  a mirrored split: the art leads on the left, the copy follows on the right
-//   type       a type-only poster: no art in the hero, the headline at poster scale
-//              (the art still shows on the deck's Material slide)
-const AB_HEROES = ['split', 'centered', 'poster', 'scene', 'bleed', 'art-first', 'type'];
-// Palettes: swatches (default), strips, chips, plus (round 6) stack (full-width bands,
-// stacked, height by coverage), dots (large circles) and list (a ruled index table).
-const AB_PALETTES = ['swatches', 'strips', 'chips', 'stack', 'dots', 'list'];
+const AB_HEROES = ['split', 'centered', 'poster', 'scene', 'bleed'];
+// Palettes: swatches (default), strips, chips, plus (round 6) list (a ruled index table).
+const AB_PALETTES = ['swatches', 'strips', 'chips', 'list'];
 const AB_SECTIONS = ['two-col', 'stacked', 'asym'];
 const AB_STATE_KINDS = ['swatch', 'button', 'chip'];
 // Board block order (def.layout.order) between the header and the footer, and the
@@ -380,7 +445,7 @@ function abTypeBlockHtml(state, def) {
         <p class="ab-type-role">${label}</p>
         ${block.classes ? `<p class="ab-type-class">${e(fontClassWords(block.classes))}</p>` : (block.note ? `<p class="ab-type-class">${e(block.note)}</p>` : '<p class="ab-type-class">&nbsp;</p>')}
         <ul class="ab-type-picks">${picks(block.picks)}</ul>${cur ? `
-        <p class="ab-type-fit"><span class="ab-type-cur">Your ${role}: <b style="font-family:${e(cur.css)}">${e(cur.name)}</b></span>${abFitPill(fit)}</p>` : ''}
+        <p class="ab-type-fit"><span class="ab-type-cur">Your ${role}: <b style="font-family:${e(cur.css)}${abWeightNear(cur, 600) === 600 ? '' : `;font-weight:${abWeightNear(cur, 600)}`}">${e(cur.name)}</b></span>${abFitPill(fit)}</p>` : ''}
       </div>`;
   const cols = [col('heading', 'Headings', f.heading, state.headingFont, fits.heading),
     col('body', 'Body', f.body, state.bodyFont, fits.body)];
@@ -409,17 +474,51 @@ function abTypeBlockHtml(state, def) {
 
 let abSeq = 0;
 
-// Run an aesthetic hook fn(ctx) that returns HTML. '' when fn is not a function, returns
-// a non-string or '', or throws (a broken hook falls back to the default markup).
-function abHookHtml(def, fn, ctx) {
-  if (typeof fn !== 'function') return '';
-  try {
-    const html = fn.call(def, ctx);
-    return typeof html === 'string' ? html : '';
-  } catch (err) {
-    if (typeof console !== 'undefined') console.warn(`hook failed (${def && def.key}):`, err);
-    return '';
-  }
+const abKebab = name => String(name).replace(/[A-Z]/g, ch => '-' + ch.toLowerCase());
+
+// {placeholder} resolution for def.materials (docs/aesthetics-plan.md "Board anatomy"):
+// t[name] first, else the aesthetic's extra var --ab-<kebab(name)> from tokens(). A name that
+// is neither goes to onMissing(name, whole), whose return value replaces it (the brief keeps
+// the placeholder visible and lists it; a blend's sample paints 'transparent').
+function abResolveMaterial(css, t, extras, onMissing) {
+  return String(css).replace(/\{([A-Za-z][A-Za-z0-9]*)\}/g, (whole, name) => {
+    const own = t[name];
+    if (typeof own === 'string' || typeof own === 'number') return String(own);
+    const extra = extras['--ab-' + abKebab(name)];
+    return extra != null ? String(extra) : onMissing(name, whole);
+  });
+}
+
+// The data attributes of an `.ab[data-ae]` root, written once for the board root
+// (abBoardParts), a blend's donor scope (blScopeOpen) and the blend's probe board
+// (blendProbe), so a new root attribute cannot differ between them. `over` replaces any
+// of hero, palette, sections, highlight, states, subcopy (default: the def's own layout;
+// a donor scope and the probe pin states 'swatch' and subcopy 'on').
+function abRootAttrs(def, t, state, over) {
+  const l = abLayoutOf(def);
+  const a = Object.assign({
+    hero: l.hero, palette: l.palette, sections: l.sections, highlight: abHighlightOf(def),
+    states: 'swatch', subcopy: l.subcopy ? 'on' : 'off',
+  }, over);
+  const hf = (state && state.headingFont) || {};
+  const bf = (state && state.bodyFont) || {};
+  return `data-ae="${def.key}" data-mode="${t.isDark ? 'dark' : 'light'}" data-accent-text="${t.accentLow ? 'low' : 'ok'}" data-hero="${a.hero}" data-palette="${a.palette}" data-sections="${a.sections}" data-highlight="${a.highlight}" data-states="${a.states}" data-subcopy="${a.subcopy}" data-hcls="${escapeHtml(hf.cls || '')}" data-bcls="${escapeHtml(bf.cls || '')}"`;
+}
+
+// An inline style attribute value from { '--var': value }; double quotes become single so
+// a value can never close the attribute.
+function abStyle(vars) {
+  return Object.entries(vars).map(([k, v]) => `${k}:${String(v).replace(/"/g, "'")}`).join(';');
+}
+
+// ctx.labels, one shape in every hook (art, headline, panels, states, deck.*): the three
+// state names as an array (labels[i], labels.map(...)) that also carries .material (the 02
+// section's title), .states and .names (the same array) and .statesKind.
+function abLabelsCtx(labels) {
+  const names = (labels && labels.states) || [];
+  return Object.assign(names.slice(), {
+    material: labels && labels.material, states: names, names, statesKind: labels && labels.statesKind,
+  });
 }
 
 /* The board is assembled from these parts so other surfaces (the brand deck,
@@ -430,43 +529,46 @@ function abHookHtml(def, fn, ctx) {
 function abBoardParts(state, def) {
   const t = boardTokens(state, def);
   const copy = effectiveContent();
+  const labels = def.labels || { material: 'Touch & depth', states: ['One', 'Two', 'Three'] };
   const ctx = {
     t, key: def.key, state,
     brandName: copy.brandName, tagline: copy.tagline,
     initial: abInitial(copy.brandName), logoDataUrl: state.logoDataUrl,
+    labels: abLabelsCtx(labels),
+    // True when the brand's typography is locked (state.locks.typography): the faces in
+    // ctx.state are then the user's own, and a hook that would pick a face of its own must not.
+    typographyLocked: !!(state.locks && state.locks.typography),
   };
   const roles = boardRoles(state, def);
   const vars = boardVars(t, state, def, copy.tagline);
-  const style = Object.entries(vars).map(([k, v]) => `${k}:${String(v).replace(/"/g, "'")}`).join(';');
+  const style = abStyle(vars);
   const uid = 'ab' + (++abSeq);
-  const labels = def.labels || { material: 'Touch & depth', states: ['One', 'Two', 'Three'] };
   const e = escapeHtml;
 
   const brand = state.logoDataUrl
-    ? `<img class="ab-logo" src="${state.logoDataUrl}" alt="${e(copy.brandName)}" />`
+    ? `<img class="ab-logo" src="${e(state.logoDataUrl)}" alt="${e(copy.brandName)}" />`
     : `<span class="ab-mark" aria-hidden="true"><span>${e(ctx.initial)}</span></span><span class="ab-wordmark">${e(copy.brandName)}</span>`;
 
   const layout = abLayoutOf(def);
-  const hlKind = abHighlightOf(def);
   const statesKind = AB_STATE_KINDS.includes(labels.statesKind) ? labels.statesKind : 'swatch';
   // Text colour that reads on each role's own fill (strips put labels inside the band).
   // The primary swatch is filled with the brand hex, so on a printed primary its label
   // colour is chosen for the brand hex, not for the printed one (t.onPrimary).
   const onRole = { canvas: t.ink, ink: t.canvas, primary: t.printed ? pickReadableText(t.primary) : t.onPrimary, secondary: t.onSecondary, accent: t.onAccent };
 
-  const P = { state, def, t, copy, ctx, roles, vars, style, uid, labels, brand, layout, hlKind, statesKind, onRole };
+  const P = { state, def, t, copy, ctx, roles, vars, style, uid, labels, brand, layout, statesKind, onRole };
 
   // The root element's opening tag. `extraClass` / `extraAttrs` let a surface
   // add its own class (e.g. ab-slide) and data attributes; defaults add nothing.
   P.rootOpen = (extraClass = '', extraAttrs = '') =>
-    `<section class="ab${extraClass ? ' ' + extraClass : ''}" data-ae="${def.key}" data-mode="${t.isDark ? 'dark' : 'light'}" data-accent-text="${t.accentLow ? 'low' : 'ok'}" data-hero="${layout.hero}" data-palette="${layout.palette}" data-sections="${layout.sections}" data-highlight="${hlKind}" data-states="${P.statesKind || statesKind}" data-subcopy="${layout.subcopy ? 'on' : 'off'}" data-hcls="${e(state.headingFont.cls || '')}" data-bcls="${e(state.bodyFont.cls || '')}"${extraAttrs} style="${P.style}">`;
+    `<section class="ab${extraClass ? ' ' + extraClass : ''}" ${abRootAttrs(def, t, state, { states: P.statesKind || statesKind })}${extraAttrs} style="${P.style}">`;
 
   P.head = (pre = 'Design language / ', name = def.name) => `<header class="ab-head">
       <div class="ab-brand">${brand}</div>
       <span class="ab-tag"><span class="ab-tag-pre">${pre}</span><b>${e(name)}</b></span>
     </header>`;
 
-  P.art = () => (def.art ? def.art(ctx) : '');
+  P.art = () => abHookHtml(def, def.art, ctx, 'art');
 
   P.hero = () => `<section class="ab-hero">
       <div class="ab-hero-copy">
@@ -550,16 +652,16 @@ function abBoardParts(state, def) {
   // def.panels = { card(ctx), panel(ctx), list(ctx) } (optional): the aesthetic's own
   // markup for the 01 card, the 02 panel or the 03 list, as one element's outer HTML
   // (real text and controls instead of CSS generated content). ctx is the board ctx plus
-  // parts, e, labels, rows (AB_ROWS) and stages (AB_STAGES). The default markup stays on
+  // parts, e, rows (AB_ROWS) and stages (AB_STAGES). The default markup stays on
   // P.cardBase / P.panelBase / P.listBase (the deck takes components from it when the
   // aesthetic's own markup lacks one).
   P.cardBase = P.card; P.panelBase = P.panel; P.listBase = P.list;
   const panels = def.panels && typeof def.panels === 'object' ? def.panels : null;
   if (panels) {
-    const pctx = Object.assign({}, ctx, { parts: P, e, labels, rows: AB_ROWS, stages: AB_STAGES });
+    const pctx = Object.assign({}, ctx, { parts: P, e, rows: AB_ROWS, stages: AB_STAGES });
     [['card', 'cardBase'], ['panel', 'panelBase'], ['list', 'listBase']].forEach(([id, base]) => {
       if (typeof panels[id] !== 'function') return;
-      P[id] = () => abHookHtml(def, panels[id], pctx) || P[base]();
+      P[id] = () => abHookHtml(def, panels[id], pctx, `panels.${id}`) || P[base]();
     });
   }
 
@@ -580,9 +682,9 @@ function abBoardParts(state, def) {
 
   // def.states(ctx) (optional): the aesthetic's own state component, as the inner HTML
   // of <div class="ab-states" data-kind="custom"> (root data-states="custom"). ctx is
-  // the board ctx plus labels (def.labels.states, the three names), parts and e
-  // (escapeHtml). '' / non-string / a throw keeps the statesKind row.
-  const ownStates = abHookHtml(def, def.states, Object.assign({}, ctx, { labels: labels.states || [], parts: P, e }));
+  // the board ctx (ctx.labels: see abLabelsCtx) plus parts and e (escapeHtml).
+  // '' / non-string / a throw keeps the statesKind row.
+  const ownStates = abHookHtml(def, def.states, Object.assign({}, ctx, { parts: P, e }), 'states');
   if (ownStates) {
     P.statesKind = 'custom';
     P.states = () => `<div class="ab-states" data-kind="custom">${ownStates}</div>`;
@@ -637,9 +739,10 @@ function setBoardFonts(el) {
 }
 
 // The state and def the board, deck, patterns and brief render: the base aesthetic,
-// or the blend of base and donor when one is active (js/blend.js).
-function abView() {
-  return typeof aestheticView === 'function' ? aestheticView(state) : { state, def: aestheticByKey(state.aesthetic), blend: null };
+// or the blend of base and donor when one is active (js/blend.js). `st` defaults to the
+// editor state; the brief passes its own copy.
+function abView(st = state) {
+  return typeof aestheticView === 'function' ? aestheticView(st) : { state: st, def: aestheticByKey(st.aesthetic), blend: null };
 }
 
 function renderMainBoard() {
@@ -648,7 +751,10 @@ function renderMainBoard() {
   setBoardFonts(host);
   const v = abView();
   host.innerHTML = boardHtml(v.state, v.def);
-  if (v.def.blend && typeof blendClearArtText === 'function') blendClearArtText(host.firstElementChild);
+  if (v.def.blend && typeof blendClearArtText === 'function') {
+    blendClearArtText(host.firstElementChild);
+    blendLegibility(host.firstElementChild);
+  }
 }
 
 // Each tile previews its aesthetic in its own recommended mode (def.mode), the
@@ -694,7 +800,7 @@ function renderAestheticBoard() {
   if (grid) grid.hidden = !compare;
   if (pview) pview.hidden = !patterns;
   // Only the visible view is built. The hidden ones are emptied (Compare holds
-  // twenty full boards) and rebuilt when their view is shown again. The
+  // one full board per aesthetic, 48 of them) and rebuilt when their view is shown again. The
   // Patterns view (js/patterns-ui.js) keeps its own DOM but draws nothing
   // while hidden.
   if (typeof PatternsUI !== 'undefined') PatternsUI.setVisible(patterns);

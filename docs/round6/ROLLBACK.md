@@ -8,6 +8,8 @@ last tag you are happy with.
 |-----|-------|
 | `r6-0-baseline` | Before round 6: 36 aesthetics incl. the adversarial-review fixes (commit 115b10e). |
 | `r6-2-blend` | Blend engine + scaffold for 12 new aesthetics (new ones partly built at this point; existing 36 unchanged). |
+| `r6-3-new-aesthetics` | The 12 new aesthetics built and all 48 on the framework hooks (commit 2422d9f). |
+| `r6-5-harsh-fixes` | Harsh-review fixes for all 48 plus the shared pattern/font batch (same commit as `r6-3-new-aesthetics`, 2422d9f). |
 
 ## Turning features off without git
 - **Blend:** set `const BLEND_ENABLED = false;` at the top of `js/blend.js`. The control disappears and every
@@ -15,7 +17,7 @@ last tag you are happy with.
 - **One aesthetic:** delete its `<link>` and `<script>` lines in `index.html` (its brands then load with the
   default aesthetic).
 
-(Further tags are added here as each phase lands.)
+Run `git tag` for the full list; every tag must have a line in the table above. Tags added after this table was written are listed by `git tag -n1`.
 
 ## How to roll back
 Everything is local git (no remote). From the project folder:

@@ -121,8 +121,7 @@ function bdWantsPattern(def, key) {
 }
 
 function bdPatternHtml(P, key) {
-  if (typeof deckPatternHook !== 'function') return '';
-  const html = deckPatternHook(P, key);
+  const html = abHookHtml(P.def, deckPatternHook, P, 'deckPatternHook', key);
   return html ? `<div class="ab-deck-pattern" aria-hidden="true">${html}</div>` : '';
 }
 
@@ -200,31 +199,24 @@ function bdPart(html, selector) {
 //   parts   the abBoardParts builders (card(), list(), panel(), states(), art(),
 //           swatches(), head(pre, name), brand, labels, layout, roles, t)
 //   def, slide (slide key), e (escapeHtml), rows (AB_ROWS), stages (AB_STAGES)
+//   labels  (from the board ctx) the same as in every hook: see abLabelsCtx
 // and whatever the slide adds (`extra`).
 function bdHookCtx(P, slideKey, extra) {
   return Object.assign({}, P.ctx, {
     parts: P, def: P.def, slide: slideKey, e: escapeHtml, rows: AB_ROWS, stages: AB_STAGES,
-    layout: P.layout, labels: P.labels,
+    layout: P.layout,
   }, extra || {});
 }
 
-// Call def.deck[name](ctx) (the first of `names` that is a function). Returns its HTML,
-// or '' when the hook is absent, returns a non-string / '', or throws (a broken hook
-// falls back to the default slide instead of blanking the deck).
+// Call def.deck[name](ctx) (the first of `names` that is a function) through the shared
+// safe runner (abHookHtml). Returns its HTML, or '' when the hook is absent, returns a
+// non-string / '', or throws (a broken hook falls back to the default slide instead of
+// blanking the deck).
 function bdCallHook(def, names, ctx) {
   const d = def && def.deck;
   if (!d) return '';
-  for (const name of [].concat(names)) {
-    if (typeof d[name] !== 'function') continue;
-    try {
-      const html = d[name](ctx);
-      return typeof html === 'string' ? html : '';
-    } catch (err) {
-      if (typeof console !== 'undefined') console.warn(`def.deck.${name} (${def.key}) failed:`, err);
-      return '';
-    }
-  }
-  return '';
+  const name = [].concat(names).find(n => typeof d[n] === 'function');
+  return name ? abHookHtml(def, d[name], ctx, `deck.${name}`) : '';
 }
 
 // def.deck.radius: the deck's container radius (a number of px, or a CSS length).
@@ -281,10 +273,8 @@ function bdApplyRadius(grid, def) {
 function bdMark(def, ctx, kind, i) {
   const m = def.deck && def.deck.marks;
   if (typeof m === 'function') {
-    try {
-      const html = m(ctx, kind, i);
-      if (typeof html === 'string' && html) return { html, own: true };
-    } catch (err) { /* fall through to the default */ }
+    const html = abHookHtml(def, m, ctx, 'deck.marks', kind, i);
+    if (html) return { html, own: true };
   } else if (m && typeof m[kind] === 'string' && m[kind]) {
     return { html: escapeHtml(m[kind]), own: true };
   }
@@ -441,8 +431,8 @@ const DECK_SLIDES = [
       const mats = shown.map((m, i) => `<li class="ab-deck-mat">
           <span class="ab-label"><i class="ab-n">${String(i + 1).padStart(2, '0')}</i><span>${e(matNames[i])}</span></span>
         </li>`).join('');
-      const patternStage = (def.deck && def.deck.materialStage === 'pattern' && typeof deckStageHook === 'function')
-        ? deckStageHook(P, state, def, t) : '';
+      const patternStage = def.deck && def.deck.materialStage === 'pattern'
+        ? abHookHtml(def, deckStageHook, P, 'deckStageHook', state, def, t) : '';
       // def.deck.materialArt(ctx): Material-slide art distinct from the board's hero art.
       const ownArt = patternStage ? '' : bdCallHook(def, 'materialArt', bdHookCtx(P, 'material'));
       const stage = patternStage
@@ -510,7 +500,6 @@ const DECK_SLIDES = [
       const e = escapeHtml;
       return `<div class="ab-deck-closing">
         <div class="ab-deck-closemain">
-          <div class="ab-brand ab-deck-wordmark">${P.brand}</div>
           ${abHeadlineH2(def, P.ctx, def.motto, ' ab-deck-h', ` style="--dk-fs:${bdMottoPx(def.motto, 104)}px"`)}
           <p class="ab-deck-desc">${e(def.descriptor)}</p>
         </div>
@@ -529,7 +518,7 @@ function bdSlideHtml(state, def, slide, index, total) {
   const P = abBoardParts(state, def);
   // Container radius for deck panels: the aesthetic's own (def.deck.radius, else its
   // card's radius, measured after render by bdApplyRadius). 12px until measured.
-// Its card border becomes --dk-frame-bd (the In product frame).
+  // Its card border becomes --dk-frame-bd (the In product frame).
   P.style += `;--dk-r:${bdOwnRadius(def) || '12px'}`;
   // def.deck.coverDisplay: the cover headline's start scale (bdFitCover); cover only.
   const cd = Number(def.deck && def.deck.coverDisplay);
@@ -572,10 +561,6 @@ function bdBodyOverflows(root) {
   return !!body && body.scrollHeight > body.clientHeight + 1;
 }
 
-// Principles and Closing headlines scale with the container, so a long tagline
-// or an aesthetic with a big display scale can outgrow 720px. Shrink --ab-hs
-// (every headline size multiplies it) down to a floor, then let bdScaleToFit
-// take over. The cover has its own pass (bdFitCover).
 // True when a word of el's text is split across two lines (overflow-wrap broke it)
 // or runs past el's right edge: a wide, tracked face can do that without the slide
 // body overflowing.
@@ -598,6 +583,10 @@ function bdTextSpills(el, within, brokenOnly) {
   return false;
 }
 
+// Principles and Closing headlines scale with the container, so a long tagline
+// or an aesthetic with a big display scale can outgrow 720px. Shrink --ab-hs
+// (every headline size multiplies it) down to a floor, then let bdScaleToFit
+// take over. The cover has its own pass (bdFitCover).
 function bdFitHeadline(root) {
   if (!root.dataset.hs0) root.dataset.hs0 = root.style.getPropertyValue('--ab-hs') || '1';
   const base = parseFloat(root.dataset.hs0) || 1;
@@ -611,12 +600,6 @@ function bdFitHeadline(root) {
   }
 }
 
-// Cover: the headline is the statement, so set its size first and fit second.
-// Start at min(132px, 11.5cqw) x the aesthetic's display scale (inline
-// !important: the aesthetics size their hero headline with their own rules),
-// shrink in 4% steps only until the hero copy fits, never below 64px. If the
-// slide would still need a scale under 0.85, shrink the art box in 8% steps;
-// bdScaleToFit then scales the cover only as a last resort (floor 0.85).
 // scrollWidth also counts decoration that bleeds on purpose (a highlight band
 // that runs on). True when every line of text sits inside the copy's column,
 // so only the decoration overflows.
@@ -713,6 +696,12 @@ function bdCoverSide(root) {
   if (overlap < 0.2 && art.offsetWidth && art.offsetHeight / art.offsetWidth < 0.6) root.dataset.coverSide = '1';
 }
 
+// Cover: the headline is the statement, so set its size first and fit second.
+// Start at min(132px, 11.5cqw) x the aesthetic's display scale (inline
+// !important: the aesthetics size their hero headline with their own rules),
+// shrink in 4% steps only until the hero copy fits, never below 64px. If the
+// slide would still need a scale under 0.85, shrink the art box in 8% steps;
+// bdScaleToFit then scales the cover only as a last resort (floor 0.85).
 function bdFitCover(root) {
   const hl = root.querySelector('.ab-hero .ab-headline');
   if (!hl) return;
@@ -876,6 +865,24 @@ function bdLegibleHeadings(root) {
   });
 }
 
+// The Do / Don't numbers and marks are 14px labels, so they need 4.5:1 on the slide ground
+// (the default colour is the primary as text, which only has to reach 3:1 as large type).
+// Where a mark's colour falls short it takes ink; marks the aesthetic fills itself
+// (transparent text fill, svg glyphs) are left alone.
+function bdLegibleMarks(root) {
+  const canvas = root.style.getPropertyValue('--ab-canvas').trim();
+  if (!/^#[0-9a-f]{6}$/i.test(canvas)) return;
+  root.querySelectorAll('.ab-deck-mark').forEach(el => {
+    el.style.removeProperty('color');
+    const cs = getComputedStyle(el);
+    if (cs.webkitTextFillColor === 'rgba(0, 0, 0, 0)' || !el.textContent.trim()) return;
+    const m = cs.color.match(/\d+(\.\d+)?/g);
+    if (!m || m.length < 3) return;
+    const hex = '#' + m.slice(0, 3).map(n => Math.round(Number(n)).toString(16).padStart(2, '0')).join('');
+    if (contrastRatio(hex, canvas) < 4.5) el.style.setProperty('color', 'var(--ab-ink)', 'important');
+  });
+}
+
 // Nothing on a slide is smaller than 12px (tracked uppercase labels: 11px). The
 // aesthetics size their labels for a 900px board (micrographics sets 8px mono on
 // purpose); at 1280x720 that is unreadable, so lift any text under the floor.
@@ -915,9 +922,6 @@ function bdFitBrandName(root) {
   });
 }
 
-// In product (default scene): the board parts are drawn at board scale; zoom the frame up
-// (1.3 at most, 6% steps) while the slide body still fits and no row name, CTA label or
-// segment gets cut off.
 // True when some text in `scope` is cut (ellipsis, clipped scroll width) or runs outside
 // its own box by more than 2px: what the board parts do when squeezed below their width.
 function bdTextCut(scope) {
@@ -975,6 +979,7 @@ function bdFitDeck(grid) {
     const key = root.dataset.slide;
     if (root.dataset.blend && typeof blendFitArt === 'function') blendFitArt(root);   // js/blend.js
     bdLegibleHeadings(root);
+    bdLegibleMarks(root);
     bdMinText(root);
     bdFitBrandName(root);
     if (key === 'typography') bdFitSamples(root);
@@ -995,6 +1000,7 @@ function bdFitDeck(grid) {
     bdBleedBands(root);
     // A blend's donor art never runs its captions under the base's copy (js/blend.js).
     if (root.dataset.blend && typeof blendClearArtText === 'function') blendClearArtText(root);
+    if (root.dataset.blend && typeof blendLegibility === 'function') blendLegibility(root);
   });
 }
 
@@ -1024,11 +1030,13 @@ let bdTimer = null;
 let bdObserver = null;
 let bdBuilt = false;
 
+// Reads every card width first, then writes every zoom: one layout, not one per card.
 function bdZoomCards(grid) {
-  grid.querySelectorAll('.deck-card').forEach(card => {
+  const cards = [...grid.querySelectorAll('.deck-card')];
+  const widths = cards.map(card => card.clientWidth);
+  cards.forEach((card, i) => {
     const frame = card.querySelector('.deck-frame');
-    const w = card.clientWidth;
-    if (frame && w) frame.style.zoom = (w / DECK_W).toFixed(4);
+    if (frame && widths[i]) frame.style.zoom = (widths[i] / DECK_W).toFixed(4);
   });
 }
 
@@ -1045,8 +1053,8 @@ function renderBrandDeckNow() {
   const slides = DECK_SLIDES;
   grid.innerHTML = slides.map((slide, i) => bdCardHtml(s, def, slide, i, slides.length)).join('');
   bdBuilt = true;
-  bdApplyRadius(grid, def);
   bdZoomCards(grid);
+  bdApplyRadius(grid, def);
   bdFitDeck(grid);
   const desc = document.getElementById('deckDesc');
   if (desc) desc.textContent = `${numberWord(slides.length)} guideline slides in the ${def.name} language.`;
@@ -1156,6 +1164,7 @@ async function rasterizeDeckSlide(key, scale) {
       try { await Promise.race([document.fonts.ready, new Promise(r => setTimeout(r, 1500))]); } catch (err) { /* proceed */ }
     }
     await new Promise(r => setTimeout(r, 50));
+    await bdPrepareExportClone(clone);
     return await html2canvas(clone, {
       // Opaque slide canvas: a transparent background occasionally left see-through
       // corner pixels, which the PDF's JPEG pages turn black.
@@ -1248,10 +1257,20 @@ function bdLayerFixes(cs) {
 // html2canvas cannot parse calc() inside background-position / -size (it crashes
 // reading the token). Resolve them to px against the element's padding box,
 // following the spec: a percentage position is of (box - image size).
+// Any calc() made of px, % and + - * / works, so an aesthetic can size a background with
+// calc(var(--x) * 2) or calc(100% / 6 - 2px) without an export workaround of its own.
+function bdCalcPx(expr, basis) {
+  const num = expr.replace(/calc\(/g, '(').replace(/(-?[\d.]+)%/g, (m, n) => `(${(parseFloat(n) / 100) * basis})`).replace(/px/g, '');
+  if (!/^[\d.\s+\-*/()eE]+$/.test(num)) return NaN;
+  try { return Number(Function(`"use strict"; return (${num});`)()); } catch (err) { return NaN; }
+}
+
 function bdPx(token, box, img, isPos) {
   const t = token.trim();
-  const m = t.match(/^calc\(\s*(-?[\d.]+)%\s*([+-])\s*([\d.]+)px\s*\)$/);
-  if (m) return (parseFloat(m[1]) / 100) * (isPos ? box - img : box) + (m[2] === '-' ? -1 : 1) * parseFloat(m[3]);
+  if (t.indexOf('calc(') === 0) {
+    const v = bdCalcPx(t, isPos ? box - img : box);
+    return isFinite(v) ? v : (isPos ? 0 : box);
+  }
   if (t.endsWith('%')) return (parseFloat(t) / 100) * (isPos ? box - img : box);
   const px = parseFloat(t);
   return isNaN(px) ? (isPos ? 0 : box) : px;
@@ -1335,6 +1354,146 @@ function bdShadowFixes(cs) {
   return keep.length === layers.length ? [] : [['box-shadow', keep.length ? bdSrgbToRgba(keep.join(', ')) : 'none']];
 }
 
+// html2canvas draws an inline <svg> by serializing it on its own, so a filter, mask or
+// gradient that the art references from ANOTHER svg in the page (Xerox keeps its filters in a
+// hidden `.xr-defs` svg) is gone and the whole art disappears. In the clone, copy every
+// referenced id that the svg does not contain into its own <defs>. Elements inside an svg
+// that are styled by page CSS (a class rule) get their painting properties inlined, since the
+// serialized svg no longer sees the stylesheet.
+const BD_SVG_PAINT = ['fill', 'stroke', 'stroke-width', 'stroke-linecap', 'stroke-linejoin', 'stroke-dasharray', 'opacity', 'fill-opacity',
+  'stroke-opacity', 'filter', 'mix-blend-mode', 'color', 'font-family', 'font-size', 'font-weight', 'letter-spacing', 'text-anchor', 'paint-order'];
+function bdInlineSvg(doc, root) {
+  const win = doc.defaultView;
+  root.querySelectorAll('svg').forEach(svg => {
+    const inside = id => svg.querySelector(`[id="${id.replace(/"/g, '\\"')}"]`);
+    for (let pass = 0; pass < 3; pass++) {
+      const html = svg.outerHTML;
+      const ids = new Set();
+      html.replace(/url\(\s*['"]?#([^)'"\s]+)['"]?\s*\)/g, (m, id) => { ids.add(id); return m; });
+      html.replace(/(?:xlink:)?href="#([^"]+)"/g, (m, id) => { ids.add(id); return m; });
+      let added = 0;
+      ids.forEach(id => {
+        if (inside(id)) return;
+        const src = doc.getElementById(id);
+        if (!src || svg.contains(src)) return;
+        let defs = svg.querySelector('defs');
+        if (!defs) { defs = doc.createElementNS('http://www.w3.org/2000/svg', 'defs'); svg.insertBefore(defs, svg.firstChild); }
+        defs.appendChild(src.cloneNode(true));
+        added++;
+      });
+      if (!added) break;
+    }
+    // The serialized svg must be well-formed and self-contained: drop attributes the HTML parser
+    // made from broken markup (an unescaped quote inside a style attribute leaves attributes
+    // named `courier` or `prime",`), and resolve var(--x) in any attribute, since a standalone
+    // svg has no page custom properties.
+    [svg, ...svg.querySelectorAll('*')].forEach(el => {
+      [...el.attributes].forEach(at => {
+        if (!/^[A-Za-z_][\w:.-]*$/.test(at.name)) { el.removeAttribute(at.name); return; }
+        if (at.value.indexOf('var(') < 0) return;
+        const cs = win.getComputedStyle(el);
+        el.setAttribute(at.name, at.value.replace(/var\(\s*(--[\w-]+)\s*(?:,\s*([^)]*))?\)/g, (m, name, fb) => (cs.getPropertyValue(name).trim() || (fb || '').trim())));
+      });
+    });
+    svg.querySelectorAll('[class]').forEach(el => {
+      const cs = win.getComputedStyle(el);
+      BD_SVG_PAINT.forEach(prop => {
+        const v = cs.getPropertyValue(prop);
+        if (v && v !== 'none' && v !== 'normal' && !el.style.getPropertyValue(prop)) el.style.setProperty(prop, bdSrgbToRgba(v));
+      });
+    });
+  });
+}
+
+// CSS `zoom` (the Interface cells use it to scale a board component up) is not understood by
+// html2canvas: boxes come out zoomed but the text inside is drawn at its unzoomed size and
+// position, and labels were dropped. In the clone, each zoomed element becomes a fixed-size
+// box (its zoomed width and height) holding the element at zoom 1 with `transform: scale(z)`.
+function bdFlattenZoom(root) {
+  const doc = root.ownerDocument;
+  const win = doc.defaultView;
+  [...root.querySelectorAll('*')].forEach(el => {
+    const z = parseFloat(win.getComputedStyle(el).zoom);
+    if (!z || Math.abs(z - 1) < 0.001) return;
+    const r = el.getBoundingClientRect();
+    if (!r.width || !r.height) return;
+    const box = doc.createElement('div');
+    box.style.cssText = `display:block;position:relative;flex:none;width:${r.width}px;height:${r.height}px;`;
+    el.parentNode.insertBefore(box, el);
+    box.appendChild(el);
+    el.style.setProperty('zoom', '1', 'important');
+    el.style.setProperty('width', `${r.width / z}px`, 'important');
+    el.style.setProperty('transform', `scale(${z})`, 'important');
+    el.style.setProperty('transform-origin', '0 0', 'important');
+  });
+}
+
+// html2canvas drops what it cannot draw: a background of many gradient layers (a starfield of
+// seven radial-gradients came out plain black), a picture sized cover / contain (Blob Tracking's
+// strip came out as a few big squares), and object-fit on an <img> (a pattern strip or band
+// stretched to the wrong crop). In the clone both are baked into a bitmap by the
+// browser itself: the background through an SVG foreignObject, the image through a canvas
+// drawn with the same cover / contain crop. Failures (a browser that taints the canvas)
+// leave the element as it was.
+const BD_BAKE_SCALE = 2;
+async function bdBakeBackgrounds(doc, root) {
+  const win = doc.defaultView;
+  const els = [root, ...root.querySelectorAll('*')];
+  for (const el of els) {
+    const cs = win.getComputedStyle(el);
+    const bi = cs.getPropertyValue('background-image');
+    if (!bi || bi === 'none') continue;
+    // many gradient layers, or a picture sized cover / contain (html2canvas ignores both)
+    const sized = /\burl\(/.test(bi) && /\b(cover|contain)\b/.test(cs.getPropertyValue('background-size'));
+    if (!sized && bdSplitList(bi).filter(l => /gradient\(/.test(l)).length < 4) continue;
+    const w = el.clientWidth, h = el.clientHeight;
+    if (!w || !h) continue;
+    try {
+      const style = ['background-image', 'background-size', 'background-position', 'background-repeat', 'background-origin', 'background-clip']
+        .map(p => `${p}:${cs.getPropertyValue(p)}`).join(';');
+      const k = BD_BAKE_SCALE;
+      const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${w * k}" height="${h * k}"><foreignObject width="100%" height="100%">`
+        + `<div xmlns="http://www.w3.org/1999/xhtml" style="width:${w}px;height:${h}px;transform:scale(${k});transform-origin:0 0;${style.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;')}"></div></foreignObject></svg>`;
+      const img = new Image();
+      img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
+      await img.decode();
+      const c = document.createElement('canvas');
+      c.width = w * k; c.height = h * k;
+      c.getContext('2d').drawImage(img, 0, 0);
+      const url = c.toDataURL('image/png');
+      const set = (p, v) => el.style.setProperty(p, v, 'important');
+      set('background-image', `url("${url}")`); set('background-size', '100% 100%'); set('background-position', '0 0');
+      set('background-repeat', 'no-repeat'); set('background-origin', 'padding-box'); set('background-clip', 'padding-box');
+    } catch (err) { /* keep the original layers */ }
+  }
+}
+
+async function bdFlattenImageFit(doc, root) {
+  const win = doc.defaultView;
+  for (const el of root.querySelectorAll('img')) {
+    const cs = win.getComputedStyle(el);
+    const fit = cs.getPropertyValue('object-fit');
+    if (fit !== 'cover' && fit !== 'contain') continue;
+    const box = el.getBoundingClientRect();
+    const w = Math.round(box.width), h = Math.round(box.height);
+    if (!w || !h || !el.getAttribute('src')) continue;
+    try {
+      const src = new Image();
+      src.src = el.getAttribute('src');
+      await src.decode();
+      const k = BD_BAKE_SCALE;
+      const c = document.createElement('canvas');
+      c.width = w * k; c.height = h * k;
+      const s = (fit === 'cover' ? Math.max : Math.min)(c.width / src.naturalWidth, c.height / src.naturalHeight);
+      const dw = src.naturalWidth * s, dh = src.naturalHeight * s;
+      const pos = cs.getPropertyValue('object-position').split(' ').map(v => (v.endsWith('%') ? parseFloat(v) / 100 : 0.5));
+      c.getContext('2d').drawImage(src, (c.width - dw) * (pos[0] ?? 0.5), (c.height - dh) * (pos[1] ?? 0.5), dw, dh);
+      el.setAttribute('src', c.toDataURL('image/png'));
+      el.style.setProperty('object-fit', 'fill', 'important');
+    } catch (err) { /* keep the original image */ }
+  }
+}
+
 function bdSanitizeClone(doc, root) {
   const win = doc.defaultView;
   if (!win) return;
@@ -1369,6 +1528,17 @@ function bdSanitizeClone(doc, root) {
     st.textContent = rules.join('\n');
     doc.head.appendChild(st);
   }
+}
+
+// The asynchronous half of the export clean-up, run on the off-screen clone in the page
+// BEFORE html2canvas clones it again (html2canvas does not wait for an async onclone, and
+// keeps the inline styles, image sources and svg defs this adds).
+async function bdPrepareExportClone(root) {
+  const doc = root.ownerDocument;
+  bdFlattenZoom(root);
+  bdInlineSvg(doc, root);
+  await bdBakeBackgrounds(doc, root);
+  await bdFlattenImageFit(doc, root);
 }
 
 function bdSaveBlob(blob, filename) {

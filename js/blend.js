@@ -31,7 +31,6 @@
 const BLEND_ENABLED = true;
 
 const BLEND_CHANNELS = ['art', 'type', 'color', 'patterns', 'material'];
-const BLEND_STRENGTHS = ['subtle', 'balanced', 'bold', 'custom'];
 const BLEND_PRESETS = {
   subtle: { art: true, type: false, color: false, patterns: true, material: false },
   balanced: { art: true, type: true, color: false, patterns: true, material: false },
@@ -267,10 +266,9 @@ function blendDef(base, donor, b, typeFrom, typeLocked) {
     d.printPrimary = donor.printPrimary;
     // The donor's canvas tint, but base mode and body contrast win: a tint that
     // drops ink below 4.5:1 falls back to the base's own canvas.
-    d.canvas = typeof donor.canvas === 'function' ? (bs => {
-      const own = typeof base.canvas === 'function' ? (base.canvas(bs) || bs.canvas) : bs.canvas;
-      let c = null;
-      try { c = donor.canvas(bs); } catch (err) { c = null; }
+    d.canvas = typeof donor.canvas === 'function' ? ((bs, st) => {
+      const own = typeof base.canvas === 'function' ? (abRun(base, 'canvas', base.canvas, [bs, st], null) || bs.canvas) : bs.canvas;
+      const c = abRun(donor, 'canvas', donor.canvas, [bs, st], null);
       if (typeof c !== 'string' || !/^#[0-9a-f]{6}$/i.test(c)) return own;
       return contrastRatio(bs.ink, c) >= 4.5 ? c : own;
     }) : base.canvas;
@@ -339,44 +337,28 @@ function blendSuite(def) {
   return out;
 }
 
-// The suite for the current state (Patterns view).
-function blendSuiteFor(st) {
-  return blendSuite(aestheticView(st).def);
-}
-
 /* ---------------- nested donor scopes (art, ornament, material samples) ---------------- */
 
-const BL_HERO_RATIO = { split: '1', centered: '16 / 7', poster: '1', scene: '21 / 10' };
+const BL_HERO_RATIO = { split: '1', centered: '16 / 7', poster: '1', scene: '21 / 10', bleed: '21 / 8' };
 
-function blendDonorTokens(donor, t) {
-  if (typeof donor.tokens !== 'function') return {};
-  try { return donor.tokens(t) || {}; } catch (err) { return {}; }
-}
-
-function blStyle(vars) {
-  return Object.entries(vars).map(([k, v]) => `${k}:${String(v).replace(/"/g, "'")}`).join(';');
+// The donor's extra CSS variables for the tokens `t`, read with the view state (so its
+// weights follow the faces on the board). {} when it has none or its tokens() throws.
+function blendDonorTokens(donor, t, state) {
+  return abTokens(donor, t, state);
 }
 
 // Opening tag of a `.ab[data-ae=donor]` scope inside a base board: the donor's CSS
 // matches everything inside it, css/blend.css neutralises the root-level surface.
 function blScopeOpen(donor, t, state, cls, extraStyle) {
-  const dl = abLayoutOf(donor);
-  const vars = blendDonorTokens(donor, t);
-  const hf = (state && state.headingFont) || {};
-  const bf = (state && state.bodyFont) || {};
-  const style = blStyle(vars) + (extraStyle ? ';' + extraStyle : '');
-  return `<div class="ab ${cls}" data-ae="${donor.key}" data-mode="${t.isDark ? 'dark' : 'light'}" data-accent-text="${t.accentLow ? 'low' : 'ok'}" data-hero="${dl.hero}" data-palette="${dl.palette}" data-sections="${dl.sections}" data-highlight="${abHighlightOf(donor)}" data-states="swatch" data-subcopy="on" data-hcls="${escapeHtml(hf.cls || '')}" data-bcls="${escapeHtml(bf.cls || '')}" aria-hidden="true"${style ? ` style="${style}"` : ''}>`;
+  const style = abStyle(blendDonorTokens(donor, t, state)) + (extraStyle ? ';' + extraStyle : '');
+  return `<div class="ab ${cls}" ${abRootAttrs(donor, t, state, { states: 'swatch', subcopy: 'on' })} aria-hidden="true"${style ? ` style="${style}"` : ''}>`;
 }
 
 // The donor's art, filling the base's art box (and cropped by it).
 function blendArtHtml(donor, ctx) {
-  let inner = '';
-  try { inner = donor.art(Object.assign({}, ctx, { key: donor.key })) || ''; } catch (err) {
-    console.error(`blend: ${donor.key} art failed`, err);
-    inner = '';
-  }
+  const inner = abHookHtml(donor, donor.art, Object.assign({}, ctx, { key: donor.key }), 'art');
   const dl = abLayoutOf(donor);
-  const vars = blendDonorTokens(donor, ctx.t);
+  const vars = blendDonorTokens(donor, ctx.t, ctx.state);
   // Only used where the base's art box takes its height from its content (aspect-ratio
   // auto): the donor's own ratio, never squarer than 3:2 on a board or 16:9 on a slide,
   // so a full-width box does not turn into a tall square.
@@ -408,17 +390,9 @@ function blendMatNames(names) {
   return names.map(n => String(n || '').replace(/\s*\([^)]*\)/g, '').trim());
 }
 
-const blKebab = name => name.replace(/[A-Z]/g, m => '-' + m.toLowerCase());
-
-// {placeholder} -> t[name], else the donor's extra var --ab-<kebab(name)> (as its value).
-function blendResolveMaterial(css, t, extras) {
-  return String(css || '').replace(/\{([A-Za-z][A-Za-z0-9]*)\}/g, (whole, name) => {
-    const own = t[name];
-    if (typeof own === 'string' || typeof own === 'number') return String(own);
-    const extra = extras['--ab-' + blKebab(name)];
-    return extra != null ? String(extra) : 'transparent';
-  });
-}
+// {placeholder} -> t[name], else the donor's extra var --ab-<kebab(name)> (as its value),
+// else 'transparent' (abResolveMaterial, js/aesthetic-board.js, shared with the brief).
+const blendResolveMaterial = (css, t, extras) => abResolveMaterial(String(css || ''), t, extras, () => 'transparent');
 
 // A recipe as an inline style for its sample: comments dropped, and url() references
 // that are only descriptive ("url(mottle.svg)") neutralised so nothing is fetched.
@@ -444,14 +418,13 @@ const BL_HL_PROPS = [
 function blendProbe(donor, P) {
   if (typeof document === 'undefined' || !document.body || typeof getComputedStyle !== 'function') return null;
   const t = P.t;
-  const extra = blStyle(blendDonorTokens(donor, t));
+  const extra = abStyle(blendDonorTokens(donor, t, P.state));
   const ck = donor.key + '|' + P.style + '|' + extra;
   if (BL_PROBE_CACHE.has(ck)) return BL_PROBE_CACHE.get(ck);
-  const dl = abLayoutOf(donor);
   const host = document.createElement('div');
   host.setAttribute('aria-hidden', 'true');
   host.style.cssText = 'position:fixed;left:-20000px;top:0;width:1000px;visibility:hidden;pointer-events:none;';
-  host.innerHTML = `<section class="ab" data-ae="${donor.key}" data-mode="${t.isDark ? 'dark' : 'light'}" data-accent-text="${t.accentLow ? 'low' : 'ok'}" data-hero="${dl.hero}" data-palette="${dl.palette}" data-sections="${dl.sections}" data-highlight="${abHighlightOf(donor)}" data-states="swatch" data-subcopy="on" data-hcls="${escapeHtml(P.state.headingFont.cls || '')}" data-bcls="${escapeHtml(P.state.bodyFont.cls || '')}" style="${P.style};${extra}"><div class="ab-in"><section class="ab-hero"><div class="ab-hero-copy"><p class="ab-kicker">Probe</p><h2 class="ab-headline">Good design <span class="ab-hl">alive</span></h2></div></section></div></section>`;
+  host.innerHTML = `<section class="ab" ${abRootAttrs(donor, t, P.state, { states: 'swatch', subcopy: 'on' })} style=""${P.style};${extra}"><div class="ab-in"><section class="ab-hero"><div class="ab-hero-copy"><p class="ab-kicker">Probe</p><h2 class="ab-headline">Good design <span class="ab-hl">alive</span></h2></div></section></div></section>`;
   document.body.appendChild(host);
   let out = null;
   try {
@@ -517,6 +490,7 @@ function blendParts(P) {
   const vars = [];
   const needProbe = ch.type || (ch.color && abHighlightOf(donor) === 'custom');
   const probe = needProbe ? blendProbe(donor, P) : null;
+  if (ch.art) vars.push(`--bl-scrim:${abAlpha(P.t.canvas, 0.86)}`);   // the headline plate (blendLegibility)
   if (ch.type) {
     if (bd.typeFrom) vars.push(`--ab-font-h:${P.state.headingFont.css}`, `--ab-font-b:${P.state.bodyFont.css}`);
     if (probe) {
@@ -539,7 +513,7 @@ function blendParts(P) {
 
   if (ch.material) {
     const mats = blendSampleMaterials(donor);
-    const extras = blendDonorTokens(donor, P.t);
+    const extras = blendDonorTokens(donor, P.t, P.state);
     if (mats.length) {
       const names = P.labels.states || [];
       P.states = () => `<div class="ab-states ab-blend-states" data-kind="blend">${mats.map((m, i) =>
@@ -592,6 +566,101 @@ function blendClearArtText(root) {
       el.style.visibility = 'hidden';
       el.setAttribute('data-bl-hidden', '1');
     }
+  });
+}
+
+// Legibility of a blended hero, after layout. Two cases a blend creates that neither
+// aesthetic had on its own:
+//   scrim      the base lays its headline over its art (a scene hero, a sticker field) and the
+//              donor's art is busier than the base's own: the headline gets a canvas-coloured
+//              plate (data-bl-scrim, css/blend.css) so it never sits straight on the donor art.
+//   highlight  the donor's highlight colour (or the accent) lands on a ground it was not drawn
+//              for (the base's hero plate): when the word falls under 3:1 against the ground
+//              it actually sits on, it takes the headline's own colour, or ink or black/white.
+// Runs after the board renders and after the deck fits, next to blendClearArtText.
+// A wide donor face (or a long donor material name) can make a word wider than the base's
+// headline or state label, and the base's `overflow-wrap: anywhere` then cut it mid-word
+// ("shoul / d", "COMPARTM / ENT"). In a blend the words stay whole (css/blend.css) and any
+// that no longer fits gets the text shrunk a step at a time (headline: --ab-hs, state name:
+// font-size) until every word sits inside its box. Board only: the deck has its own fits.
+function blendFitWords(root) {
+  if (typeof bdTextSpills !== 'function' || root.classList.contains('ab-slide')) return;
+  const hs0 = parseFloat(root.style.getPropertyValue('--ab-hs')) || 1;
+  const heads = [...root.querySelectorAll('.ab-hero .ab-headline')];
+  let hs = hs0;
+  for (let i = 0; i < 14 && hs > hs0 * 0.5 && heads.some(h => bdTextSpills(h)); i++) {
+    hs *= 0.94;
+    root.style.setProperty('--ab-hs', hs.toFixed(3));
+  }
+  root.querySelectorAll('.ab-state-name').forEach(el => {
+    el.style.removeProperty('font-size');
+    let fs = parseFloat(getComputedStyle(el).fontSize) || 12;
+    for (let i = 0; i < 10 && fs > 8 && bdTextSpills(el); i++) {
+      fs *= 0.94;
+      el.style.setProperty('font-size', fs.toFixed(2) + 'px');
+    }
+  });
+}
+
+function blRgb(v) {
+  const n = String(v || '').match(/[\d.]+/g);
+  if (!n || n.length < 3) return null;
+  return { hex: '#' + n.slice(0, 3).map(x => Math.round(Number(x)).toString(16).padStart(2, '0')).join(''), a: n.length > 3 ? Number(n[3]) : 1 };
+}
+
+function blendLegibility(root) {
+  if (!root || !root.querySelectorAll || !root.hasAttribute('data-blend')) return;
+  blendFitWords(root);
+  const rcs = getComputedStyle(root);
+  const canvas = rcs.getPropertyValue('--ab-canvas').trim();
+  const ink = rcs.getPropertyValue('--ab-ink').trim();
+  const heads = [...root.querySelectorAll('.ab-hero .ab-headline')];
+  heads.forEach(h => { h.removeAttribute('data-bl-scrim'); h.querySelectorAll('.ab-hl').forEach(el => {
+    ['color', '-webkit-text-fill-color'].forEach(p => { if (el.hasAttribute('data-bl-hlfix')) el.style.removeProperty(p); });
+    el.removeAttribute('data-bl-hlfix');
+  }); });
+  const art = root.querySelector('.ab-hero .ab-blend-art');
+  if (art) {
+    const a = art.getBoundingClientRect();
+    heads.forEach(h => {
+      const r = h.getBoundingClientRect();
+      const w = Math.min(a.right, r.right) - Math.max(a.left, r.left);
+      const v = Math.min(a.bottom, r.bottom) - Math.max(a.top, r.top);
+      if (!(w > 0 && v > 0 && (w * v) / Math.max(1, r.width * r.height) > 0.2)) return;
+      // the base already seats its copy on a plate (a glass card, a panel): no second plate
+      for (let el = h.parentElement; el && el !== root; el = el.parentElement) {
+        const bg = blRgb(getComputedStyle(el).backgroundColor);
+        if (bg && bg.a >= 0.5) return;
+      }
+      h.setAttribute('data-bl-scrim', '1');
+    });
+  }
+  if (!root.hasAttribute('data-blend-hl') || !/^#[0-9a-f]{6}$/i.test(canvas)) return;
+  heads.forEach(h => {
+    const hl = h.querySelector('.ab-hl');
+    if (!hl) return;
+    const cs = getComputedStyle(hl);
+    if ((cs.backgroundClip || cs.webkitBackgroundClip) === 'text') return;
+    const fill = blRgb(cs.webkitTextFillColor || cs.color);
+    if (!fill || fill.a < 0.5) return;
+    let ground = null;
+    if (h.hasAttribute('data-bl-scrim')) ground = canvas;
+    else {
+      for (let el = hl; el; el = el.parentElement) {
+        const c = getComputedStyle(el);
+        const bg = blRgb(c.backgroundColor);
+        if (bg && bg.a > 0.9) { ground = bg.hex; break; }
+        if (el !== hl && c.backgroundImage !== 'none') break;   // a gradient or picture: unknown ground
+        if (el === root) break;
+      }
+    }
+    if (!ground || contrastRatio(fill.hex, ground) >= 3) return;
+    const own = blRgb(getComputedStyle(h).color);
+    const pick = [own && own.hex, ink, '#000000', '#ffffff'].find(c => c && /^#[0-9a-f]{6}$/i.test(c) && contrastRatio(c, ground) >= 3);
+    if (!pick) return;
+    hl.style.setProperty('color', pick, 'important');
+    hl.style.setProperty('-webkit-text-fill-color', pick, 'important');
+    hl.setAttribute('data-bl-hlfix', '1');
   });
 }
 

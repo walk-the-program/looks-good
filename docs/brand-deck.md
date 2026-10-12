@@ -25,7 +25,7 @@ all", and a new "Download deck PDF" (jsPDF is already loaded; the Mac app vendor
 | 6 | Material & graphics | The signature art large, plus the aesthetic's material names (from `def.materials[].name`) as labelled chips/annotations | `def.art` + new `.ab-deck-materials` |
 | 7 | In product | A product-like composition: the 03 list + card from 01 composed as an app screen / landing section (the most "real-world" slide) | board 03 + 01 card |
 | 8 | Do / Don't | Two columns from `def.rules.do` / `def.rules.dont` (4 each), with ✓ / ✕ marks in the aesthetic's style | new `.ab-deck-dodont` |
-| 9 | Closing | Wordmark, motto, contact line placeholder ("hello@{brand-slug}.com"), aesthetic influences | board footer vocabulary |
+| 9 | Closing | Motto (the slide header carries the wordmark; it is not printed a second time), contact line placeholder ("hello@{brand-slug}.com"), aesthetic influences | board footer vocabulary |
 
 ## Mechanics
 - New `js/brand-deck.js` + `css/brand-deck.css`. Each slide is its own root:
@@ -124,8 +124,8 @@ The deck reused board components inside narrow containers (Bento's `display: con
 ### Text floor
 Nothing on a slide is under 12px (tracked uppercase labels may be 11px). `bdMinText` lifts any text below the floor after the build; a slide that still has to scale (`bdScaleToFit`) lifts its text once more by `12 / scale`. Scales of 0.97 or more are not applied (the body's bottom padding absorbs them and a near-1 transform makes Y2K Chrome's clipped-text headline paint a ghost word). `BD_COVER_MIN_SCALE` is now 0.98.
 
-### `deckGoreReport(slideEl)` (js/brand-deck.js)
-Returns `[{ type, slide, el, text, detail }]` for one built slide (empty = clean); `.stats` holds `{ text, contrastSkipped, whitelisted }`. For every visible text-bearing element it checks:
+### `deckGoreReport(slideEl)` (dev/deck-gore.js)
+The "no UI gore" detector is a test-only file, `dev/deck-gore.js` (load it after `js/brand-deck.js` in a test page); it is not part of the shipped app and `js/brand-deck.js` does not define it. It returns `[{ type, slide, el, text, detail }]` for one built slide (empty = clean); `.stats` holds `{ text, contrastSkipped, whitelisted }`. For every visible text-bearing element it checks:
 1. `overflow`: text runs past its own box, or a clipping box (`overflow` not visible) has `scrollWidth > clientWidth + 1` / ellipsis / `scrollHeight` overflow.
 2. `broken`: one word wrapped across lines (a Range per word; splits on spaces, hyphens, slashes).
 3. `overlap`: text of two unrelated elements intersects by more than 2px both ways (ink boxes, 0.8 x font size tall). Text drawn in the art counts as the second party; a painted label in the art (a floating button) counts as its whole box.
@@ -148,3 +148,14 @@ mesh-gradient (header ink on non-cover slides, payout card hidden on the cover),
 - **`--dk-r`** is the aesthetic's own card radius (probe card, `bdApplyRadius`) or `def.deck.radius`; the user's shape preset no longer reaches the deck.
 - New hooks: `def.deck.materialArt(ctx)`, `def.deck.patternsStage(ctx)`, `def.deck.coverBand: false`, `def.deck.closingStrip: false`, `def.deck.coverMin`, `--dk-min-text: off | <px>`; text at `font-size: 0` is never lifted by the 12px floor. Full contract: docs/aesthetics-plan.md, "Round 6 framework hooks".
 - `font-synthesis: none` on every slide (and board): single-weight faces are never fake-bolded.
+
+### Export sanitizer (round 6 cleanup)
+`bdSanitizeClone` (the html2canvas `onclone` hook) rewrites what html2canvas cannot draw, in the clone only:
+- **Inset rings and outer `0 0 0 Npx` rings**: html2canvas painted them as a solid fill (swatches black, buttons blank) while the export clone sat at `left: -10000px`; with the host on screen but invisible (`.deck-export-host`: `left: 0; opacity: 0; z-index: -1`) it draws them correctly, so no shadow rewriting is needed for them (an earlier `bdInsetFixes` was removed). Keep the host on screen.
+- **calc() in background-size / -position**: `bdCalcPx` resolves any calc() of px, %, + - * / against the padding box, so `calc(var(--x) * 2)` works.
+- **Prepared in the page before html2canvas** (`bdPrepareExportClone`; html2canvas does not wait for an async `onclone`): inline svg gets the filters / masks / gradients it references from other svgs copied into its own `<defs>` (Xerox keeps its filters in a hidden `.xr-defs` svg, so its Material art exported empty), attributes the HTML parser made from broken markup are dropped (an unescaped quote in a style attribute made the serialized svg invalid), and `var()` in attributes is resolved; a background of 4+ gradient layers (Old Web's starfield), a `cover` / `contain` picture background (Blob Tracking's band and strip) and `object-fit` on an `<img>` are baked into a bitmap by the browser (SVG foreignObject / canvas) and set as a single image. If the browser refuses (a tainted canvas) the element is left as it was.
+- The earlier fixes (color(srgb), switches, clipped-text, scene copy, negative-spread shadows, background layer lists) are unchanged.
+Known limits that remain per aesthetic: clip-path shapes and some pseudo-element glyphs (neo-deco "Stepped" frame, dystopian-luxury CTA label) do not export.
+
+### Pattern layering on slides
+`.ab-deck-pattern` (the cover band, the closing strip) sits at `z-index: 1`, below `.ab-in` (also 1, later in the DOM) and above any `z-index: 0` wallpaper pseudo-element an aesthetic puts on the slide root (Aurora Noir's grid-fade `::after` used to paint over the band and leave it flat black).

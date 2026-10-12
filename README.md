@@ -75,16 +75,27 @@ header, hero (kicker, your tagline with the last word in the accent color,
 signature art), a palette row that names each color's job and coverage,
 `01 / Interface`, `02 / <material>` and `03 / In use` sections, and a footer.
 It renders in the brand's own fonts, colors, name and logo. The sidebar's
-**Aesthetic** panel picks one of twenty aesthetics, narrowed by family chips (Tactile, Graphic,
+**Aesthetic** panel picks one of 48 aesthetics, narrowed by family chips (Tactile, Graphic,
 Digital, Print & editorial, Luminous; the choice is remembered, and Shuffle and
 Compare work within it), lockable, with Shuffle aesthetic; choosing one also takes its recommended Light/Dark mode and, unless
-Shape is locked, its slide shape. **Compare all** shows the boards at once
-in the current brand (built only while that view is open); click a tile to select it. The choice is saved with the
+Shape is locked, its slide shape. **Compare all** shows all 48 boards at once
+in the current brand (built only while that view is open; off-screen tiles skip layout with `content-visibility`); click a tile to select it. The choice is saved with the
 brand and is one Undo step. Compare tiles use each aesthetic's recommended
 mode (what selecting it gives you); the main board stays in the brand's current
 mode. Files: `js/aesthetic-board.js`,
 `css/aesthetic-board.css`, `js/aesthetics/<key>.js` and
 `css/aesthetics/<key>.css` (see `docs/aesthetics-plan.md`).
+
+**Blend with.** Under the aesthetic list, **Blend with** mixes a second aesthetic (the
+donor) into the one you chose (the base). The base keeps structure, layout, mode
+and every accessibility rule; the donor supplies up to five channels: art, type,
+color, patterns and material. Subtle, Balanced and Bold are presets; the channel
+chips make any combination. The board, the deck, the pattern suite and the AI
+brief all follow the blend, and it is saved with the brand and carried by Undo.
+Nothing is hand-tuned per pair: any two aesthetics work. Blend, deck and
+patterns all render through one entry point, `aestheticView(state)`
+(`js/blend.js`); details in `docs/blend.md`. A kill switch (`BLEND_ENABLED` in
+`js/blend.js`) turns the feature off without touching saved brands.
 
 The second refinement round gave each aesthetic its own layout, interface
 typeface and headline-highlight treatment, calibrated against real references
@@ -259,7 +270,9 @@ js/suggest.js            suggestion engine (pure functions)
 js/suggest-ui.js         inline suggestion lines
 js/font-picker.js        visual font picker (replaces the selects' look, keeps them as state)
 js/aesthetics/           registry + one file per aesthetic (styles in css/aesthetics/)
-js/aesthetic-board.js    design language board, Compare all, Aesthetic panel, family filter
+js/aesthetic-board.js    design language board, Compare all, Aesthetic panel, family filter,
+                         the safe hook runner and the font-weight helpers aesthetics share
+js/blend.js              blend two aesthetics (aestheticView, channels, merged rules); css/blend.css
 js/aesthetic-meta.js     per-aesthetic family and font recommendations
 js/color-roles.js        the five color roles (use / never / coverage)
 js/color-picker.js       inline HSV picker; js/color-import.js parses pasted colors
@@ -283,4 +296,8 @@ edit the files directly.
 
 ## Tests
 
-`node tests/run.js` checks saving/loading a brand (including old or hand-edited files) and the "Paste brand colors" reader. No dependencies. The deck overlap checker lives in `dev/deck-gore.js` (load it after `js/brand-deck.js` in a test page).
+`node tests/run.js` checks saving/loading a brand (including old or hand-edited files), the "Paste brand colors" reader, pattern colourways and the pattern contrast floor, the board layout contract, hook fallbacks (a throwing aesthetic hook falls back and warns once), the weight helpers, blend rules and pattern suites for every base and donor pair, the font names in `js/aesthetic-meta.js`, and that Undo carries the blend. No dependencies. Checks that need a real DOM (render timing, deck fitting, exports) are run in a browser against `dev/deck-gore.js`, the deck overlap checker (load it after `js/brand-deck.js` in a test page).
+
+## Rolling back round 6
+
+Round 6 (the blend engine, 48 aesthetics, fixed pattern colourways, the deck framework) is tagged phase by phase in git. `docs/round6/ROLLBACK.md` lists every tag, how to return to one, how to restore a single aesthetic, and how to switch the blend feature off without git.

@@ -23,7 +23,9 @@
 .deck-frame .ab { border-radius: 0; }
 
 /* Off-screen host for the 1280x720 export clone (html2canvas). */
-.deck-export-host { position: fixed; left: -10000px; top: 0; width: 1280px; height: 720px; overflow: hidden; pointer-events: none; }
+/* On screen (left 0) but invisible: html2canvas paints box-shadows wrongly (outer ones over the element,
+   inset ones as a tint) when the clone sits far off screen. */
+.deck-export-host { position: fixed; left: 0; top: 0; z-index: -1; opacity: 0; width: 1280px; height: 720px; overflow: hidden; pointer-events: none; }
 
 @media (max-width: 760px) {
   .slides.deck .section-head { flex-wrap: wrap; row-gap: 10px; }
@@ -44,7 +46,9 @@
 .ab-slide-body { flex: 1 1 0; min-height: 0; display: flex; flex-direction: column; padding: 22px 0 16px; }
 .ab-slide-body > * { flex: 1 1 auto; min-height: 0; }
 .ab.ab-slide[data-ae] .ab-slide-foot { flex: none; margin-top: 0; padding-top: 12px; }
-.ab-deck-pattern { position: absolute; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
+/* z-index 1, below .ab-in (z-index 1, later in the DOM): an aesthetic's wallpaper layer on the
+   slide root (a z-index 0 ::before / ::after) must not paint over the pattern band or strip. */
+.ab-deck-pattern { position: absolute; inset: 0; z-index: 1; pointer-events: none; overflow: hidden; }
 
 /* Aesthetics that draw their headline inside the art (Mixed Type, Rebus) hide
    the real .ab-headline with a visually-hidden rule. Deck headings are real text.
@@ -73,6 +77,9 @@
 }
 .ab.ab-slide[data-ae] .ab-deck-sample,
 .ab.ab-slide[data-ae] .ab-deck-aa { display: block; margin: 0; font-size: var(--dk-fs, 32px); line-height: 1.1; overflow-wrap: anywhere; }
+/* The specimen "Aa" keeps air above and below its line box (the rule above would zero it), so a tall
+   or deep face never reaches the label over it or the face name under it. */
+.ab.ab-slide[data-ae] .ab-deck-aa { margin: 20px 0 22px; line-height: 1.12 !important; }
 
 /* 01 Cover: the board hero, centred in the slide */
 .ab-deck-cover { display: flex; flex-direction: column; justify-content: safe center; }
@@ -90,11 +97,10 @@
 .ab.ab-slide[data-slide="cover"][data-cover-flat] .ab-deck-cover .ab-hero > .ab-art { grid-column: auto; }
 .ab.ab-slide[data-slide="cover"][data-cover-flat] .ab-deck-cover .ab-hero > .ab-hero-copy { min-height: 0; }
 .ab-deck-cover-meta { flex: none; margin: 0; padding-top: 6px; }
-/* Round 6 heroes on the cover: bleed and art-first sit side by side (art-first keeps the
-   art on the left, bleed puts it on the right inside the slide margins); type is copy only. */
+/* Round 6 hero on the cover: bleed sits side by side (its art goes to the right, inside the
+   slide margins). */
 .ab.ab-slide[data-slide="cover"][data-hero="bleed"] .ab-deck-cover .ab-hero { grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); align-items: center; }
 .ab.ab-slide[data-slide="cover"][data-hero="bleed"] .ab-deck-cover .ab-hero > .ab-art { order: 0; margin-inline: 0; justify-self: end; width: 100%; aspect-ratio: var(--ab-art-ratio, 4 / 3); }
-.ab.ab-slide[data-slide="cover"][data-hero="art-first"] .ab-deck-cover .ab-hero { align-items: center; }
 
 /* Cover pattern band (D1): full width along the bottom, 132px, a 1px line on its
    top edge. The content sits above it. Without a band the cover is unchanged. */
@@ -237,9 +243,6 @@
 /* 09 Closing */
 .ab-deck-closing { display: flex; flex-direction: column; justify-content: space-between; gap: 24px; }
 .ab-deck-closemain { display: flex; flex-direction: column; justify-content: safe center; flex: 1 1 auto; min-height: 0; }
-.ab-deck-wordmark { margin-bottom: 28px; font-size: 22px !important; }
-.ab-deck-wordmark .ab-logo { max-height: 44px; }
-.ab-deck-wordmark .ab-mark { width: 40px; height: 40px; font-size: 20px; }
 .ab-deck-contact { flex: none; padding-top: 14px; border-top: 1px solid var(--ab-line); display: flex; justify-content: space-between; align-items: baseline; gap: 16px; }
 .ab-deck-contact .ab-label { margin: 0; }
 .ab-deck-mail { margin: 0; font-family: var(--ab-font-label, var(--ab-font-ui, var(--ab-font-b))); font-size: 20px; letter-spacing: 0; }

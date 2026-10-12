@@ -277,8 +277,10 @@ function updateControlsFromState() {
 
 /* ---------------- Rendering ---------------- */
 
+// Null-safe: null and undefined become '' (never the text "null"), so aesthetic files
+// can use it (or ctx.e) for any value instead of a private escape helper.
 function escapeHtml(str) {
-  return String(str).replace(/[&<>"']/g, c => ({
+  return String(str ?? '').replace(/[&<>"']/g, c => ({
     '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;',
   }[c]));
 }
@@ -357,6 +359,8 @@ function copyText(text) {
   return navigator.clipboard.writeText(text);
 }
 
+// Weights are the nearest ones the face really publishes (abWeightNear): a single-weight face such
+// as Anton or VT323 is never asked for 700 (font-synthesis is off, so it would not be bold).
 function brandCssText(s = state) {
   const onPrimary = pickReadableText(s.colors.primary);
   const onAccent = pickReadableText(s.colors.accent);
@@ -372,8 +376,8 @@ function brandCssText(s = state) {
   --font-body: ${s.bodyFont.css};
   --heading-size: ${s.typography.headingSize}px;
   --body-size: ${s.typography.bodySize}px;
-  --heading-weight: ${s.typography.headingWeight};
-  --body-weight: ${s.typography.bodyWeight};
+  --heading-weight: ${abWeightNear(s.headingFont, s.typography.headingWeight)};
+  --body-weight: ${abWeightNear(s.bodyFont, s.typography.bodyWeight)};
   --heading-tracking: ${s.typography.headingTracking}px;
   --body-tracking: ${s.typography.bodyTracking}px;
   --heading-transform: ${s.typography.headingCase};

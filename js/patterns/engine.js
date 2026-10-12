@@ -376,10 +376,13 @@
     } else if (cw === 'duotone') {
       ground = g; ink1 = t.primary; ink2 = mix(t.primary, g, 0.42); deep = mix(t.primary, k, 0.55); spark = deep;
     } else if (cw === 'night') {
-      ground = k; deep = g;
-      ink1 = ensureContrast(t.primary, k, 2.6);
-      ink2 = ensureContrast(t.secondary, k, 2.2);
-      spark = ensureContrast(t.accent, k, 3);
+      // Always a dark ground with light-leaning inks, whatever the canvas is: the darker of
+      // the two neutrals is the ground (on a light canvas that is the ink, as before; on a dark
+      // canvas it is the canvas itself, not the light ink, which used to paint it cream).
+      ground = darkGround ? g : k; deep = darkGround ? k : g;
+      ink1 = ensureContrast(t.primary, ground, 2.6);
+      ink2 = ensureContrast(t.secondary, ground, 2.2);
+      spark = ensureContrast(t.accent, ground, 3);
     } else {
       ground = g; ink1 = t.primary; ink2 = t.secondary; spark = t.accent; deep = k;
     }
@@ -663,28 +666,59 @@
     };
   }
 
+  // Contrast floor. A suite tile must never render blank: after tone, the stronger of
+  // the two drawing inks (ink1, ink2: what the pool draws with) has to reach PT_FLOOR
+  // (1.6:1) against the ground, else all the non-ground inks move toward black (light ground) or white (dark ground) by the same
+  // fraction, the smallest 5% step that gets there, so their hierarchy survives. Pastel
+  // palettes and dark "other" modes are what trip it; palettes that already clear it are
+  // returned untouched, so their output is byte-identical. Not applied to fixed
+  // colourways (their hexes are part of the style); 'tonal' is tone-on-tone by design and
+  // only has to stay faintly visible (1.12:1); a very low Strength (tone < 0.5) scales the
+  // floor down, so an explicit "almost invisible" request is still honoured.
+  const PT_FLOOR = 1.6, PT_FLOOR_TONAL = 1.12;
+  function applyFloor(ink, tone) {
+    if (ink.fixed) return false;
+    const base = ink.colorway === 'tonal' ? PT_FLOOR_TONAL : PT_FLOOR;
+    const need = 1 + (base - 1) * Math.min(1, tone / 0.5);
+    const best = Math.max(contrast(ink.ink1, ink.ground), contrast(ink.ink2, ink.ground));
+    if (best >= need) return false;
+    const toward = lum(ink.ground) < 0.4 ? '#ffffff' : '#000000';
+    const names = ['ink1', 'ink2', 'deep', 't1', 't2', 'mute'];
+    for (let f = 0.05; f <= 1.0001; f += 0.05) {
+      const m = {};
+      names.forEach(n => { m[n] = mix(toward, ink[n], f); });
+      if (Math.max(contrast(m.ink1, ink.ground), contrast(m.ink2, ink.ground)) >= need || f > 0.99) {
+        names.forEach(n => { ink[n] = m[n]; });
+        return true;
+      }
+    }
+    return false;
+  }
+
+  function rebuildPool(ink, tints) {
+    ink.pool = tints ? [ink.ink1, ink.ink2, ink.t1, ink.t2] : [ink.ink1, ink.ink2];
+    const cand = [ink.ground, ink.ink2, ink.ink1, ink.deep].concat(tints ? [ink.t1, ink.t2] : []);
+    const ramp = []; cand.forEach(c => { if (ramp.indexOf(c) < 0) ramp.push(c); });
+    ramp.sort((a, b) => lum(b) - lum(a)); ink.ramp = ramp;
+  }
+
   // The inks a family actually draws with: the "+ tints" toggle honoured even when the
   // caller built inks without it, then quiet tone applied (every non-ground ink moves
-  // toward the ground; spark keeps its colour).
+  // toward the ground; spark keeps its colour), then the contrast floor above.
   function finalizeInks(inks, p) {
     const ink = Object.assign({}, inks);
     if (p.tints !== ink.tints) {
       ink.tints = p.tints;
-      ink.pool = p.tints ? [ink.ink1, ink.ink2, ink.t1, ink.t2] : [ink.ink1, ink.ink2];
-      const cand = [ink.ground, ink.ink2, ink.ink1, ink.deep].concat(p.tints ? [ink.t1, ink.t2] : []);
-      const ramp = []; cand.forEach(c => { if (ramp.indexOf(c) < 0) ramp.push(c); });
-      ramp.sort((a, b) => lum(b) - lum(a)); ink.ramp = ramp;
+      rebuildPool(ink, p.tints);
     }
     const tone = clamp(Number(p.tone), 0, 1);
     if (tone < 1) {
       const q = c => mix(c, ink.ground, tone);
       ink.ink1 = q(ink.ink1); ink.ink2 = q(ink.ink2); ink.deep = q(ink.deep);
       ink.t1 = q(ink.t1); ink.t2 = q(ink.t2); ink.mute = q(ink.mute);
-      ink.pool = p.tints ? [ink.ink1, ink.ink2, ink.t1, ink.t2] : [ink.ink1, ink.ink2];
-      const cand = [ink.ground, ink.ink2, ink.ink1, ink.deep].concat(p.tints ? [ink.t1, ink.t2] : []);
-      const ramp = []; cand.forEach(c => { if (ramp.indexOf(c) < 0) ramp.push(c); });
-      ramp.sort((a, b) => lum(b) - lum(a)); ink.ramp = ramp;
+      rebuildPool(ink, p.tints);
     }
+    if (applyFloor(ink, tone)) rebuildPool(ink, p.tints);
     return { ink, tone };
   }
 

@@ -153,7 +153,7 @@ const PatternsUI = (function () {
   /* ---------------- helpers ---------------- */
 
   // The rendered view (js/blend.js): a blend can tint the canvas (color) and mix the suite (patterns).
-  const view = () => (typeof aestheticView === 'function' ? aestheticView(state) : { state, def: aestheticByKey(state.aesthetic) });
+  const view = () => abView();
   const inksFor = entry => P().inksFor(typeof aestheticView === 'function' ? boardTokens(state, view().def) : state, entry.colorway, { tints: !!(entry.params && entry.params.tints) });
   const suite = () => (typeof blendSuite === 'function' ? blendSuite(view().def) : P().suiteFor(state.aesthetic));
   const famInfo = key => fams.find(f => f.key === key) || P().list().find(f => f.key === key);
@@ -357,7 +357,7 @@ const PatternsUI = (function () {
             <div class="segmented pt-seg" role="radiogroup" aria-label="Colorway">
               ${cws.filter(c => !c.fixed).map(c => `<label><input type="radio" name="ptColorway" value="${c.value}" /> ${escapeHtml(c.label)}</label>`).join('')}
             </div>${cws.some(c => c.fixed) ? `
-            <span class="pt-label pt-label-sub" style="display:block;margin-top:12px">Fixed colours</span>
+            <span class="pt-label pt-label-sub">Fixed colours</span>
             <div class="segmented pt-seg pt-seg-fixed" role="radiogroup" aria-label="Fixed colorway">
               ${cws.filter(c => c.fixed).map(c => `<label title="${escapeHtml(c.note || '')}"><input type="radio" name="ptColorway" value="${c.value}" /> ${escapeHtml(c.label)}</label>`).join('')}
             </div>` : ''}

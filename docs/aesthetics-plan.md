@@ -84,7 +84,7 @@ registerAesthetic({
   slideShape: 'soft',                            // SHAPE_PRESETS key, applied unless shape is locked
   labels: { material: 'Touch & depth', states: ['Flat', 'Raised', 'Recessed'] },
   roles: { primary: { use, never, coverage }, ... },   // partial overrides of DEFAULT_COLOR_ROLES
-  tokens(t) { return { '--ab-shadow': ..., }; },        // optional extra CSS vars from base tokens
+  tokens(t, state) { return { '--ab-shadow': ..., }; }, // optional extra CSS vars from base tokens; `state` = the state being rendered
   art(ctx) { return '<svg …>'; },                       // signature art, decorative, aria-hidden
   materials: [{ name: 'Raised control', css: 'background: {canvas}; box-shadow: …' }],
   rules: { do: ['…'], dont: ['…'] },
@@ -282,7 +282,7 @@ Written by T1 (W1) after building. Source of truth: `js/aesthetic-board.js` (`bo
 
 **Contract additions (rev 1.1, additive):**
 - `def.kicker` (string, hero kicker; falls back to `descriptor`).
-- `def.canvas(base)` optional: returns an adjusted canvas hex before tokens are derived
+- `def.canvas(base, state)` optional: returns an adjusted canvas hex before tokens are derived
   (`base = {canvas, ink, isDark, primary, secondary, accent, mix, hexToHsl, hslToHex}`). Soft Form uses it.
 - `boardTokens` result also has `accentText` / `primaryText` (accent/primary if >= 3:1 on canvas, else fallback)
   and `muted` is pulled toward ink until it reaches 4.5:1 on canvas.
@@ -489,8 +489,8 @@ empty css file; their owners replace `art`, add `tokens`/`canvas` if needed, `ma
 Board structure (`def.layout`, js/aesthetic-board.js):
 - **`layout.order`**: the board's blocks between the header and the footer, any permutation of `['hero', 'palette', 'type', 'sections']` (default that order). Unknown or repeated keys are dropped and missing ones appended, so nothing leaves the board. A hero or palette is followed by an `.ab-rule` unless it is last; the type block carries its own rule. DOM order, so the 390px layout follows it.
 - **`layout.sectionOrder`**: the three numbered sections inside `.ab-sections`, a permutation of `['ui', 'touch', 'use']` (01 Interface, 02 material panel, 03 In use). `.ab-sec-use` still spans both columns in `two-col`/`asym`; restyle `.ab-sections` if the new order wants another grid.
-- **`layout.hero`** adds `bleed` (the art runs edge to edge above the copy; `--ab-art-ratio` default 21/8, narrow `--ab-art-ratio-narrow` 4/3), `art-first` (mirrored split, art on the left, max 400px) and `type` (type-only poster: no art in the hero, headline at `clamp(46px, 13.6cqw, 184px)`; the art still shows on the deck's Material slide). Their rules are `.ab[data-ae][data-hero="…"]` (0,4,0) so they beat an adopter's own split-hero grid; refine with `.ab[data-ae="key"][data-hero="…"]`. Rules go through `.ab-hero > .ab-art`, so a blend donor's art is never hit. Deck cover: `bleed` and `art-first` sit side by side (bleed's art on the right), `type` is copy only.
-- **`layout.palette`** adds `stack` (full-width bands stacked, height `30px + coverage × 1.3px`, role and job left, hex right, `--sw` / `--sw-on`), `dots` (large circles, 5 across; 3 across at 390px) and `list` (a ruled index: 28px chip, role, job, hex; job hidden at 390px). The deck Color slide uses the same markup. The aesthetic's own `.ab-chip` styling still wins over the kind's chip shape.
+- **`layout.hero`** adds `bleed` (the art runs edge to edge above the copy; `--ab-art-ratio` default 21/8, narrow `--ab-art-ratio-narrow` 4/3). Its rule is `.ab[data-ae][data-hero="bleed"]` (0,4,0) so it beats an adopter's own split-hero grid; refine with `.ab[data-ae="key"][data-hero="bleed"]`. Rules go through `.ab-hero > .ab-art`, so a blend donor's art is never hit. Deck cover: bleed's art sits beside the copy, on the right. (`art-first` and `type` were removed in the round 6 cleanup: no aesthetic used them; an unknown hero falls back to `split`.)
+- **`layout.palette`** adds `list` (a ruled index: 28px chip, role, job, hex; job hidden at 390px). The deck Color slide uses the same markup. The aesthetic's own `.ab-chip` styling still wins over the kind's chip shape. (`stack` and `dots` were removed in the round 6 cleanup: unused; an unknown palette falls back to `swatches`.)
 - `layout.sections` (`two-col` / `stacked` / `asym`) is unchanged and honoured on the board at every width (one column under 600px).
 
 Components:
@@ -513,3 +513,41 @@ Deck (`def.deck`, js/brand-deck.js; every function hook gets `ctx` = art ctx + `
 - Footer: the slide footer's 12px size is now `:where(.ab.ab-slide[data-ae]) .ab-slide-foot .ab-motto / .ab-infl` (0,2,0), so an aesthetic's own foot rules win.
 
 Patterns: fixed colourways `spectrum`, `tonal`, `broadcast`, `primaries`, `earth`, `brass`, `safety` (exact inks in docs/patterns.md, "Fixed colourways"). fit.js entries may use them as the colorway value.
+
+## Round 6 cleanup: the framework contract aesthetics can rely on
+
+**Render state as an argument (no more reading the global `state`).** The framework passes the view state it is rendering (a blend swaps the faces, so it is not always the editor's `state`) as the last argument of the hooks that compute values: `tokens(t, state)`, `canvas(base, state)`, `printPrimary(t, state)`. `art(ctx)`, `headline(ctx, text)`, `states(ctx)`, `panels.*(ctx)` and `deck.*(ctx)` get it as `ctx.state`. Read fonts, weights and copy from there. Hooks that ignore the argument keep working, but a blended render then sizes weights for the wrong font (29 aesthetics did this); migrate by replacing `typeof state !== 'undefined' && state && state.headingFont` with `state.headingFont` (the argument) or `ctx.state.headingFont`. Copy comes from `ctx.brandName` / `ctx.tagline`, not `effectiveContent()`.
+
+**Typography lock.** `ctx.state.headingFont` / `bodyFont` are always the faces actually on the board: the user's own when typography is locked (a blend's type channel never overrides a lock), the aesthetic's or donor's pairing otherwise. `ctx.typographyLocked` is true while `state.locks.typography` is on; a hook that would choose a face of its own must not when it is true.
+
+**Weights: use the shared helpers, never parse `font.weights` by hand.** In `js/aesthetic-board.js`, available wherever it is loaded (the browser, and the node harness, which loads it before any aesthetic runs a hook; call them inside `tokens`/`art`, not at file top level):
+- `abWeights(face)` -> ascending numbers, `[400]` when none are listed.
+- `abWeight(face, cap)` -> the heaviest published weight at or under `cap`; the lightest when all are above (a single-weight face stays at its one weight).
+- `abWeightNear(face, wanted)` -> `wanted` if published, else the next one up within 100, else the next down, else the next up.
+`font-synthesis` is off, so a weight the face does not publish would render as a neighbour.
+
+**One safe runner for every hook.** `abRun(def, hook, fn, args, fallback)` (and `abHookHtml` / `abTokens` on top of it) wraps `art`, `headline`, `tokens`, `canvas`, `printPrimary`, `states`, `panels.*`, `deck.*` (including `marks`), and the deck's pattern and stage hooks. A throwing hook falls back (empty art, the default headline, `{}` tokens, the plain canvas, no printed primary, the default slide piece) and `console.warn`s once per aesthetic and hook. `this` is the def. A hook that returns a non-string where HTML is expected counts as empty.
+
+**`ctx.labels` is one shape everywhere**: an array of the three state names that also carries `.material`, `.states` (the same array), `.names` and `.statesKind`. `ctx.labels[i]`, `ctx.labels.map(...)`, `ctx.labels.material` and `ctx.labels.states[i]` all work in `states`, `panels`, `art`, `headline` and every `deck.*` hook. (Before, `states()` got the array and `panels` / `deck.*` got the object; the two aesthetics that read it, cybersigilism and xerox, use the array form and are unchanged.)
+
+**Escaping.** `escapeHtml` is null-safe (`null` / `undefined` give `''`). Use it, or `ctx.e`, instead of a private escape helper. The board escapes the logo URL itself.
+
+**Shared helpers for blends and probes** (`js/aesthetic-board.js`): `abRootAttrs(def, t, state, over)` writes the root's data attributes once (the board, a blend's donor scope and the blend probe all use it), `abStyle(vars)` the inline style, `abResolveMaterial(css, t, extras, onMissing)` the `{placeholder}` resolver (the brief keeps unresolved names visible, a blend sample paints `transparent`), `abView(state = state)` the view (base, or the blend). `blendDonorTokens(donor, t, state)` takes the state too.
+
+**The brief reports what the board draws.** The Typography section's heading and body lines, and the Shape line, come from an off-screen probe board when a DOM exists (`aibProbeBoard`: headline size at a 900px board, weight, case, tracking, and the card, button, field and swatch radii as rendered). Without a DOM the brief names only the editor's baseline settings and omits radii. Inline `data:` URIs in token and material dumps are replaced by `url(<inline SVG, copy it from css/aesthetics/<key>.css ...>)`.
+
+**Board header.** On the board a long brand name wraps (two lines, or breaks inside a long word) and the "Design language / ..." tag drops below it when the row is full; there is no ellipsis and no overlap. Deck slides keep one line (`bdFitBrandName` shrinks it). An aesthetic that fixes its header's height (Mesh Gradient's `--mg-head`) should use `min-height`.
+
+**Blends.** `blendLegibility(root)` (js/blend.js, after layout) adds a canvas plate behind the headline where the base lays it over the donor's art (`data-bl-scrim`, `--bl-scrim`), and gives the highlight word the headline's own colour (or ink, black, white) when the donor's highlight would be under 3:1 on the ground it really sits on. `BL_HERO_RATIO` includes `bleed`.
+
+**Patterns.** `Patterns.finalInks` enforces a contrast floor: the stronger of ink1 / ink2 reaches 1.6:1 against the ground (all non-ground inks move toward black or white together, in 5% steps), so a suite tile never goes blank on a pastel or very dark palette. Palettes that already clear it are untouched; fixed colourways, `tonal` (floor 1.12) and a Strength under 0.5 (floor scales down) are exempt or softened. The cover band and closing strip layer above an aesthetic's `z-index: 0` wallpaper pseudo-element on the slide root.
+
+**Export.** See `docs/brand-deck.md` "Export sanitizer": inset and `0 0 0 Npx` rings export correctly (the export host is on screen, invisible), and any calc() in background-size / -position is resolved for html2canvas, so aesthetics need no workaround for them.
+
+**Focus.** `.ab[data-ae] .ab-input:focus-visible` has a default 2px ink ring (the board's `.ab .ab-input { outline: none }` reset removed the browser's, and nine aesthetics had no focus indicator at all). An aesthetic that styles focus itself with its own `:focus` / `:focus-visible` rule still wins. Check: focus the board's field in every aesthetic and confirm an outline or a changed border / shadow.
+
+**Weights in the brief and the CSS block.** `brandCssText` (the "CSS variables" block in the brief and Copy CSS) and the brief's Typography lines print `abWeightNear(face, weight)`, never the editor's raw 700: a single-weight face (Anton, Tilt Warp, VT323) is given its one real weight.
+
+**Pattern `night` colourway.** The ground is always the darker of canvas and ink (on a dark canvas that is the canvas itself); the primary / secondary / accent are lifted to contrast with it. It used to paint the light ink as the ground on dark canvases.
+
+**Export (PNG / PDF).** Before html2canvas clones a slide, `bdPrepareExportClone` (js/brand-deck.js) makes inline svg self-contained (filters, masks and gradients the art takes from another svg in the page are copied into its own `<defs>`; attributes broken by unescaped quotes are dropped; `var()` in attributes is resolved) and bakes into bitmaps the things html2canvas cannot draw: a background of four or more gradient layers, a `cover` / `contain` picture background, and `object-fit` on an `<img>`. See docs/brand-deck.md "Export sanitizer".

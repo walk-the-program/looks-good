@@ -199,6 +199,46 @@ check('paste: empty text', run(`extractColors('').length`) === 0, 'found colors 
     'nondeterministic');
 }
 
+/* ---- pattern contrast floor (js/patterns/engine.js finalInks) ---- */
+
+{
+  const w = { performance: { now: () => 0 } };
+  const pc = vm.createContext({ window: w, console });
+  for (const f of ['js/patterns/engine.js'].concat(fs.readdirSync(path.join(root, 'js/patterns/families')).filter(f => f.endsWith('.js')).sort().map(f => 'js/patterns/families/' + f))) {
+    vm.runInContext(fs.readFileSync(path.join(root, f), 'utf8'), pc, { filename: f });
+  }
+  const P = w.Patterns, E = P.E;
+  const fin = (tok, cw, params) => P.finalInks('halftone', params || {}, P.inksFor(tok, cw));
+  const best = i => Math.max(E.contrast(i.ink1, i.ground), E.contrast(i.ink2, i.ground));
+  const pastel = { canvas: '#FCFAF6', ink: '#34394A', primary: '#CFE3F5', secondary: '#F6D7E4', accent: '#FBEEC1' };
+  const warm = { canvas: '#F6F5F1', ink: '#2E282A', primary: '#E4572E', secondary: '#17BEBB', accent: '#FFC914' };
+  check('contrast floor: a pastel palette never gets drawing inks under 1.6:1 (brand, duotone, mono)',
+    ['brand', 'duotone', 'mono'].every(cw => best(fin(pastel, cw)) >= 1.59), JSON.stringify(fin(pastel, 'brand')));
+  const raw = P.inksFor(warm, 'brand'), f = fin(warm, 'brand');
+  check('contrast floor: a palette that already clears it is returned untouched (byte-identical)',
+    f.ink1 === raw.ink1 && f.ink2 === raw.ink2 && f.deep === raw.deep && JSON.stringify(f.pool) === JSON.stringify(raw.pool), JSON.stringify([f, raw]));
+  check('contrast floor: fixed colourways are not touched', fin(pastel, 'broadcast').ink1 === P.inksFor(pastel, 'broadcast').ink1, 'fixed');
+  check('contrast floor: tone-on-tone and an explicit very low Strength stay quiet',
+    best(fin(pastel, 'tonal')) < 1.5 && best(fin(pastel, 'brand', { tone: 0.05 })) < 1.2, 'quiet');
+}
+
+/* ---- export and escaping helpers ---- */
+
+{
+  const src = fs.readFileSync(path.join(root, 'js/brand-deck.js'), 'utf8');
+  const ec = vm.createContext({ console });
+  vm.runInContext(src.match(/function bdCalcPx[\s\S]*?\n}\n\nfunction bdPx[\s\S]*?\n}\n/)[0], ec);
+  const px = (t, box, img, pos) => vm.runInContext(`bdPx(${JSON.stringify(t)}, ${box}, ${img}, ${!!pos})`, ec);
+  check('export: calc() in background-size / -position resolves to px (any px, % and + - * / expression)',
+    px('calc(25% - 3px)', 200, 40, true) === 37 && Math.round(px('calc(100% / 6)', 600, 0, false)) === 100 && px('calc(12px * 2)', 50, 10, false) === 24
+    && px('calc(100% - 1px)', 50, 10, true) === 39, 'bdPx');
+  check('export: a calc() that is not plain arithmetic is ignored, not evaluated', px('calc(alert(1))', 50, 10, false) === 50, 'bdPx guard');
+  const ac = vm.createContext({ console });
+  vm.runInContext(fs.readFileSync(path.join(root, 'js/app.js'), 'utf8').match(/function escapeHtml[\s\S]*?\n}\n/)[0], ac);
+  check('escapeHtml: null and undefined become empty text, markup is escaped',
+    vm.runInContext(`[escapeHtml(null), escapeHtml(undefined), escapeHtml('a"<b>&\\'')].join('|')`, ac) === "||a&quot;&lt;b&gt;&amp;&#39;", 'escapeHtml');
+}
+
 /* ---- board layout contract (js/aesthetic-board.js) ---- */
 
 {
@@ -208,13 +248,186 @@ check('paste: empty text', run(`extractColors('').length`) === 0, 'found colors 
   const d0 = lay({});
   check('layout: defaults keep the board order', JSON.stringify(d0.order) === '["hero","palette","type","sections"]'
     && JSON.stringify(d0.sectionOrder) === '["ui","touch","use"]' && d0.hero === 'split' && d0.palette === 'swatches', JSON.stringify(d0));
-  const d1 = lay({ layout: { order: ['palette', 'bogus', 'hero', 'palette'], sectionOrder: ['use'], hero: 'type', palette: 'list' } });
+  const d1 = lay({ layout: { order: ['palette', 'bogus', 'hero', 'palette'], sectionOrder: ['use'], hero: 'bleed', palette: 'list' } });
   check('layout: order is a permutation (unknown and repeats dropped, missing appended)',
     JSON.stringify(d1.order) === '["palette","hero","type","sections"]' && JSON.stringify(d1.sectionOrder) === '["use","ui","touch"]'
-    && d1.hero === 'type' && d1.palette === 'list', JSON.stringify(d1));
-  check('layout: unknown hero / palette fall back', lay({ layout: { hero: 'diagonal', palette: 'rainbow' } }).hero === 'split'
-    && lay({ layout: { palette: 'rainbow' } }).palette === 'swatches', 'no fallback');
+    && d1.hero === 'bleed' && d1.palette === 'list', JSON.stringify(d1));
+  check('layout: unknown hero / palette fall back (including the removed art-first, type, stack, dots)',
+    lay({ layout: { hero: 'diagonal', palette: 'rainbow' } }).hero === 'split'
+    && lay({ layout: { palette: 'rainbow' } }).palette === 'swatches'
+    && ['art-first', 'type'].every(h => lay({ layout: { hero: h } }).hero === 'split')
+    && ['stack', 'dots'].every(p => lay({ layout: { palette: p } }).palette === 'swatches'), 'no fallback');
 }
+
+/* ---- font weights (js/aesthetic-board.js: abWeights / abWeight / abWeightNear) ---- */
+
+{
+  const bc = vm.createContext({ console });
+  vm.runInContext(fs.readFileSync(path.join(root, 'js/aesthetic-board.js'), 'utf8'), bc, { filename: 'aesthetic-board.js' });
+  const w = (fn, face, n) => vm.runInContext(`${fn}(${JSON.stringify(face)}, ${n})`, bc);
+  const two = { weights: '700;400' }, one = { weights: '400' }, many = { weights: '300;400;600;800' };
+  check('weights: abWeights sorts and defaults to 400', JSON.stringify(vm.runInContext('abWeights({ weights: "700;400" })', bc)) === '[400,700]'
+    && JSON.stringify(vm.runInContext('abWeights(null)', bc)) === '[400]', 'abWeights');
+  check('weights: abWeight is the heaviest at or under the cap, else the lightest',
+    w('abWeight', two, 800) === 700 && w('abWeight', two, 600) === 400 && w('abWeight', one, 900) === 400 && w('abWeight', { weights: '600;800' }, 400) === 600, 'abWeight');
+  check('weights: abWeightNear is the exact weight, else the next one up within 100, else the next down',
+    w('abWeightNear', many, 600) === 600 && w('abWeightNear', many, 700) === 800 && w('abWeightNear', many, 500) === 600
+    && w('abWeightNear', many, 900) === 800 && w('abWeightNear', two, 500) === 400 && w('abWeightNear', one, 800) === 400, 'abWeightNear');
+}
+
+/* ---- hook fallbacks (js/aesthetic-board.js abRun / abHookHtml / abTokens, js/brand-deck.js) ---- */
+
+{
+  const warns = [];
+  const hc = vm.createContext({
+    console: { log: console.log, warn: (...a) => warns.push(a.join(' ')), error: console.error },
+    document: { getElementById: () => null, addEventListener() {}, createElement: () => ({}) }, window: {},
+  });
+  for (const f of ['js/data.js', 'js/color.js', 'js/brand-deck.js', 'js/aesthetic-board.js']) {
+    vm.runInContext(fs.readFileSync(path.join(root, f), 'utf8'), hc, { filename: f });
+  }
+  const H = code => vm.runInContext(code, hc);
+  H('var def = { key: "t1" }');
+  check('hooks: a throwing HTML hook gives \'\'', H('abHookHtml(def, () => { throw new Error("x") }, {}, "art")') === '', 'throw');
+  check('hooks: a non-string result gives \'\'', H('abHookHtml(def, () => 42, {})') === '' && H('abHookHtml(def, null, {})') === '', 'non-string');
+  check('hooks: a failing hook warns once per aesthetic and hook, not on every render',
+    (() => { for (let i = 0; i < 5; i++) H('abHookHtml(def, () => { throw 1 }, {}, "art")'); return warns.filter(w => /hook art \(t1\)/.test(w)).length === 1; })(), JSON.stringify(warns));
+  check('hooks: tokens() that throws or returns a non-object gives {}',
+    H('JSON.stringify(abTokens({ key: "t2", tokens() { throw 1 } }, {}, {}))') === '{}'
+    && H('JSON.stringify(abTokens({ key: "t3", tokens() { return "x" } }, {}, {}))') === '{}'
+    && H('abTokens({ key: "t4", tokens(t, st) { return { "--a": st.v } } }, {}, { v: 7 })["--a"]') === 7, 'tokens');
+  const tk = H(`(() => {
+    const st = { colors: { primary: '#2f5bd8', secondary: '#8fb3e8', accent: '#f2a33a', neutralDark: '#14171f', neutralLight: '#f7f8fb' }, bgMode: 'light' };
+    const bad = { key: 't5', canvas() { throw 1 }, printPrimary() { throw 1 } };
+    const t = boardTokens(st, bad);
+    const seen = [];
+    boardTokens(st, { key: 't6', canvas(b, s) { seen.push(s === st); return null; }, printPrimary(t, s) { seen.push(s === st); return null; } });
+    return { canvas: t.canvas, printed: t.printed, seen: seen.join() };
+  })()`);
+  check('hooks: canvas() / printPrimary() that throw leave the plain tokens', tk.canvas === '#f7f8fb' && tk.printed === false, JSON.stringify(tk));
+  check('hooks: canvas(base, state) and printPrimary(t, state) receive the render state', tk.seen === 'true,true', tk.seen);
+  check('hooks: a throwing deck hook gives \'\'', H(`bdCallHook({ key: 'x', deck: { product() { throw 1 } } }, 'product', {})`) === '', 'bdCallHook');
+  check('hooks: bdCallHook takes the first function among its names', H(`bdCallHook({ key: 'y', deck: { productStage() { return 'ok' } } }, ['product', 'productStage'], {})`) === 'ok', 'names');
+  check('hooks: a throwing deck.marks falls back to the number',
+    H(`JSON.stringify(bdMark({ key: 'z', deck: { marks() { throw 1 } } }, {}, 'do', 0))`) === '{"html":"01","own":false}', 'bdMark');
+  check('hooks: ctx.labels is the three names and carries material / states / names',
+    H(`(() => { const l = abLabelsCtx({ material: 'M', states: ['a', 'b', 'c'], statesKind: 'chip' }); return [l[1], l.map(x => x).join(''), l.material, l.states.length, l.names[2], l.statesKind].join('|'); })()`) === 'b|abc|M|3|c|chip', 'labels');
+}
+
+/* ---- bdTextSpills (js/brand-deck.js): a split word, a word past the box, a clean line ---- */
+
+{
+  const mk = (words) => {
+    const node = { nodeValue: Object.keys(words).join(' ') };
+    const el = { getBoundingClientRect: () => ({ left: 0, right: 100, top: 0, bottom: 40, width: 100, height: 40 }) };
+    const sc = vm.createContext({
+      console, NodeFilter: { SHOW_TEXT: 4 },
+      document: {
+        getElementById: () => null, addEventListener() {}, createElement: () => ({}),
+        createTreeWalker: () => { let i = 0; return { nextNode: () => (i++ ? null : node) }; },
+        createRange: () => { const r = { setStart(n, o) { r.o = o; }, setEnd(n, o) { r.e = o; }, getClientRects: () => words[node.nodeValue.slice(r.o, r.e)] }; return r; },
+      },
+      window: {},
+    });
+    for (const f of ['js/data.js', 'js/color.js', 'js/brand-deck.js']) vm.runInContext(fs.readFileSync(path.join(root, f), 'utf8'), sc, { filename: f });
+    sc.__el = el;
+    return () => vm.runInContext('bdTextSpills(__el)', sc) + '/' + vm.runInContext('bdTextSpills(__el, null, true)', sc);
+  };
+  const r = (l, t, w) => ({ left: l, right: l + w, top: t, bottom: t + 12, width: w, height: 12 });
+  check('bdTextSpills: a word split across two lines is a spill', mk({ hello: [r(0, 0, 30), r(0, 14, 20)], world: [r(40, 0, 30)] })() === 'true/true', 'split');
+  check('bdTextSpills: one line inside the box is clean', mk({ hello: [r(0, 0, 30)], world: [r(40, 0, 30)] })() === 'false/false', 'inside');
+  check('bdTextSpills: a word past the box is a spill, but not with brokenOnly', mk({ hello: [r(0, 0, 30)], world: [r(80, 0, 40)] })() === 'true/false', 'past');
+}
+
+/* ---- blend: suite, rules (js/blend.js) ---- */
+
+{
+  const w = { performance: { now: () => 0 } };
+  const bc = vm.createContext({ window: w, console });
+  const famDir = path.join(root, 'js/patterns/families');
+  const files = ['js/data.js', 'js/color.js', 'js/patterns/engine.js']
+    .concat(fs.readdirSync(famDir).filter(f => f.endsWith('.js')).sort().map(f => 'js/patterns/families/' + f), ['js/patterns/fit.js']);
+  for (const f of files) vm.runInContext(fs.readFileSync(path.join(root, f), 'utf8'), bc, { filename: f });
+  bc.Patterns = w.Patterns;
+  vm.runInContext(fs.readFileSync(path.join(root, 'js/blend.js'), 'utf8'), bc, { filename: 'blend.js' });
+  const keys = w.Patterns.suiteKeys();
+  const all = { art: true, type: true, color: true, patterns: true, material: true };
+  let bad = null, n = 0;
+  for (const a of keys) for (const b of keys) {
+    if (a === b) continue;
+    n++;
+    for (const strength of ['bold', 'balanced']) {
+      bc.__def = { key: a, blend: { base: { key: a }, donor: { key: b }, strength, channels: all } };
+      const out = vm.runInContext('blendSuite(__def)', bc).map(s => s.key);
+      const donorLead = w.Patterns.suiteFor(b)[0].key;
+      if (out.length > 6 || new Set(out).size !== out.length || (strength === 'bold' && out[0] !== donorLead)) { bad = bad || `${a} x ${b} ${strength}: ${out.join()}`; }
+    }
+  }
+  check(`blendSuite: every base x donor pair (${n}) has at most 6 entries, no family twice, the donor first when bold`, !bad, bad);
+  bc.__def = { key: 'a', blend: { base: { key: 'a' }, donor: { key: 'b' }, strength: 'subtle', channels: Object.assign({}, all, { patterns: false }) } };
+  check('blendSuite: without the patterns channel it is the base suite',
+    JSON.stringify(vm.runInContext('blendSuite(__def)', bc)) === JSON.stringify(w.Patterns.suiteFor('a')), 'not base suite');
+
+  const rules = (granted) => vm.runInContext(`(() => {
+    const base = { name: 'Base', rules: { do: [], dont: ['No gradients anywhere'] } };
+    const donor = { name: 'Donor', rules: { do: ['Use gradients on every surface'], dont: [] } };
+    const r = blendRules(base, donor, ${JSON.stringify(granted)});
+    return { dont: r.rules.dont, do: r.rules.do, conflicts: r.conflicts.map(c => c.owner + ':' + c.topic), baseDropped: r.baseDropped };
+  })()`, bc);
+  const g1 = rules({ color: true });
+  check('blendRules: a donor that owns color wins the gradients conflict (base rule dropped, owner donor)',
+    g1.dont.length === 0 && g1.do.length === 1 && g1.conflicts.join() === 'donor:gradients' && g1.baseDropped === 1, JSON.stringify(g1));
+  const g2 = rules({ art: true });
+  check('blendRules: without the color channel the donor rule is dropped and the base keeps its own',
+    g2.dont.length === 1 && g2.do.length === 0 && g2.conflicts.length === 0, JSON.stringify(g2));
+}
+
+/* ---- font names in js/aesthetic-meta.js exist in FONTS ---- */
+
+{
+  const mc = vm.createContext({ console });
+  for (const f of ['js/data.js', 'js/color.js', 'js/aesthetic-meta.js']) vm.runInContext(fs.readFileSync(path.join(root, f), 'utf8'), mc, { filename: f });
+  const missing = vm.runInContext(`(() => {
+    const names = new Set(FONTS.map(f => f.name));
+    const out = [];
+    Object.keys(AESTHETIC_META).forEach(k => {
+      const f = AESTHETIC_META[k].fonts || {};
+      ['heading', 'body', 'mono'].forEach(r => ((f[r] && f[r].picks) || []).forEach(n => { if (!names.has(n)) out.push(k + '.' + r + ': ' + n); }));
+      (f.pairings || []).forEach(p => p.forEach(n => { if (!names.has(n)) out.push(k + '.pairing: ' + n); }));
+    });
+    return out;
+  })()`, mc);
+  check('meta: every font named in aesthetic-meta.js exists in FONTS (a typo silently disables Use recommended fonts and the blend type channel)', missing.length === 0, missing.join('; '));
+}
+
+/* ---- undo carries the blend (js/brand-session.js wrappers over js/undo-history.js) ---- */
+
+{
+  const uc = vm.createContext({ console });
+  uc.window = uc;
+  for (const f of ['js/data.js', 'js/color.js', 'js/blend.js', 'js/undo-history.js']) vm.runInContext(fs.readFileSync(path.join(root, f), 'utf8'), uc, { filename: f });
+  const src = fs.readFileSync(path.join(root, 'js/brand-session.js'), 'utf8');
+  const a = src.indexOf('const pushBase = window.pushUndoSnapshot;');
+  const b = src.indexOf("undoBtn.addEventListener('click'");
+  check('undo: the brand-session wrappers are where the test expects them', a > 0 && b > a, 'markers moved');
+  vm.runInContext(`(function () { ${src.slice(a, b)} })();`, uc);
+  const r = vm.runInContext(`(() => {
+    const st = { headingFont: FONTS[0], bodyFont: FONTS[1], scheme: 'analogous', hue: 210, colors: generatePalette('analogous', 210), shapePreset: SHAPE_PRESETS[0],
+      typography: {}, aesthetic: 'soft-form', bgMode: 'light', patterns: [], blend: { with: 'raw-brutalist', strength: 'bold', channels: { art: true, type: true, color: true, patterns: true, material: true } } };
+    pushUndoSnapshot(st);                                  // with a blend
+    st.blend.channels.art = false; st.blend.with = 'clay';
+    applyUndoSnapshot(popUndoSnapshot(), st);
+    const back = JSON.stringify(st.blend);
+    st.blend = null; pushUndoSnapshot(st);                 // without one
+    st.blend = { with: 'raw-brutalist', strength: 'subtle', channels: { art: true } };
+    applyUndoSnapshot(popUndoSnapshot(), st);
+    return { back, none: st.blend };
+  })()`, uc);
+  check('undo: Undo brings the blend back, and null for a snapshot taken without one',
+    r.back === JSON.stringify({ with: 'raw-brutalist', strength: 'bold', channels: { art: true, type: true, color: true, patterns: true, material: true } }) && r.none === null, JSON.stringify(r));
+}
+// Not run here (they need a real DOM): that blended tokens(t, state) see the view's fonts end to end, and the
+// render timings. They are covered by the in-browser sweeps in docs/round6/.
 
 console.log(failed ? `\n${failed} failed` : '\nall passed');
 process.exit(failed ? 1 : 0);

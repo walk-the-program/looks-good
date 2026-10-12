@@ -23,6 +23,12 @@
   pointer-events: none;
 }
 
+/* Words stay whole in a blend (a wide donor face must not cut "should" or a state name in the
+   middle): js/blend.js (blendFitWords) shrinks the text until every word fits instead. */
+.ab[data-blend] .ab-headline, .ab[data-blend] .ab-state-name {
+  overflow-wrap: normal !important; word-break: keep-all !important; hyphens: manual !important;
+}
+
 /* Art: the donor's art fills the base's art box. In flow with height 100%, so a
    base box with a fixed ratio crops it, and a base box sized by its content
    (aspect-ratio: auto) takes the donor's own ratio instead of collapsing. */
@@ -30,6 +36,7 @@
   position: relative !important; inset: auto !important; display: block !important;
   width: 100% !important; height: 100% !important; aspect-ratio: var(--bl-art-ratio, 1);
   border-radius: inherit !important; overflow: hidden !important; background-image: none !important;
+  contain: paint;   /* clips even absolutely or fixed-positioned bits of the donor's art */
 }
 .ab.ab-slide .ab.ab-blend-art { aspect-ratio: var(--bl-art-ratio-deck, 1.778); }
 .ab .ab.ab-blend-art::before,
@@ -78,7 +85,7 @@
   outline: 1px solid var(--ab-line); outline-offset: 0;
 }
 .ab[data-blend-ch~="material"] .ab-blend-state .ab-state-name {
-  display: block; min-width: 0; overflow-wrap: anywhere; text-align: center;
+  display: block; min-width: 0; text-align: center;
 }
 
 /* Color: a printed primary from the donor adds a "prints as" line the base's
@@ -96,6 +103,14 @@
   font-weight: var(--blt-fw, 600) !important;
   font-style: var(--blt-fs, normal) !important;
   line-height: var(--blt-lh, 1) !important;
+}
+
+/* Art: where the base lays its headline over its art, js/blend.js (blendLegibility) marks
+   the headline and it gets a canvas plate, so it never sits straight on the donor's art. */
+.ab[data-blend] .ab-headline[data-bl-scrim] {
+  width: fit-content; max-width: 100%; box-sizing: border-box; padding: 0.06em 0.22em 0.1em !important;
+  background: var(--bl-scrim, var(--ab-canvas)) !important; border-radius: 0.18em;
+  -webkit-box-decoration-break: clone; box-decoration-break: clone;
 }
 
 /* Color: the donor's highlight word replaces the base's. */

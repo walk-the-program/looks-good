@@ -102,6 +102,7 @@
       { key: 'skew', label: 'Slant', type: 'range', min: -1, max: 1, step: 0.05, default: 0.3 },
       { key: 'gap', label: 'Gap', type: 'range', min: 0, max: 1.5, step: 0.05, default: 0.35 },
       { key: 'stripe', label: 'Stripe size', type: 'range', min: 0.5, max: 3, step: 0.1, default: 1.1 },
+      { key: 'spark', label: 'Spark stripe', type: 'toggle', default: true },
     ],
     render(g, W, H, p, inks, rng, noise, env) {
       const u = env.u * p.scale;
@@ -143,7 +144,8 @@
               x += w;
             }
           }
-          if (!sparked && i === Math.floor(n / 2) && env.spark.take(unit * rh)) {
+          // p.spark === false: no accent stripe (the ribbons are then brand inks only)
+          if (!sparked && i === Math.floor(n / 2) && p.spark !== false && env.spark.take(unit * rh)) {
             sparked = true;
             const x = Math.round(rng.range(W * 0.2, W * 0.8));
             const w = Math.max(2, Math.round(unit * 0.8));

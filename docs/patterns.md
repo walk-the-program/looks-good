@@ -31,7 +31,7 @@ Not added to the board UI itself.
   and the engine fills them from the brand roles: ground = canvas (or ink for dark variants),
   ink1 = primary or ink, ink2 = secondary, spark = accent (≤5% area by design). A "Colorway"
   control switches between: Brand (roles), Mono (ink on canvas), Duotone (primary+canvas),
-  Night (canvas↔ink swapped). Optional "+ tints" adds derived tints (pri-tint/sec-tint/muted).
+  Night (always a dark ground: the darker of canvas and ink, brand inks lifted to contrast with it; on a dark canvas it is the canvas itself). Optional "+ tints" adds derived tints (pri-tint/sec-tint/muted).
 - **Fixed colourways (round 6, the documented exceptions to "never invent colours").** Some
   styles fix their pattern colours by rule (a thin-film spectrum, teletext, poster primaries).
   `E.COLORWAYS` entries with `fixed: true` (and a `note`) take their inks from
@@ -56,11 +56,11 @@ Not added to the board UI itself.
   1 Halftone field — noise field banded into levels, printed through ringed or round halftone dots.
   2 Stipple — dot scatter whose density follows noise; lattice or random; optional mirror symmetry.
   3 Zigzag — interlocking teeth: rounded, chevron or staircase, duotone bands.
-  4 Weave — stacked ribbon bands, each with its own vertical stripe rhythm.
+  4 Weave — stacked ribbon bands, each with its own vertical stripe rhythm. Param `spark` (toggle, default on): one accent stripe in the middle ribbon; off gives brand inks only.
   5 Op-art rings — stripes bent around 1–3 hidden centres (rings, eyes, saddles), flat colour.
   6 Counterchange — even bar field with a centred figure (circle/square/arch) phase-flipped.
   7 Pixel quilt — coarse grid of brick, plaid, checker, dithered diagonals, stair ramps.
-  8 Gradient panes — rows of uneven panes, each a two-ink ramp in one of eight directions.
+  8 Gradient panes — rows of uneven panes, each a two-ink ramp in one of eight directions (the one accent pane at the end of a row is at least 10% of the width, never an edge sliver).
   9 Glyph grid — cells take square/diamond/ring/x/dot glyphs by noise band.
   10 Torn bands — ragged two-colour bands of mini-patterns with grain (print collage).
   11 Posterised terrain — noise contours cut into flat colour regions with dithered edges.
@@ -216,3 +216,6 @@ brand unsaved), so brands saved with pins load unchanged. Each entry is
 4. Patterns in the brief persist with the brand (including `use` and `svg`) and undo; exports work (PNG, SVG, CSS tile).
 5. Deck Patterns slide renders and exports.
 6. No console errors; renders within budget; 390px usable.
+
+## Contrast floor (round 6 cleanup)
+`Patterns.finalInks` (and so every render, Source call and brief readout) guarantees that the stronger of ink1 / ink2 reaches 1.6:1 against the ground: when it does not (pastel palettes, dark "other" modes) all the non-ground inks move toward black or white together in 5% steps until it does, so a suite tile is never blank. Palettes that already clear it, fixed colourways, `tonal` (floor 1.12) and a Strength below 0.5 (the floor scales down to none at 0) are untouched or softened. Same input gives the same pixels.

@@ -49,10 +49,6 @@ const AIB_DERIVED_JOB = {
   secTint: 'Quiet secondary wash: selected row, tonal fills, hover on secondary items',
 };
 
-function aibKebab(name) {
-  return String(name).replace(/[A-Z]/g, ch => '-' + ch.toLowerCase());
-}
-
 function aibCell(text) {
   return String(text == null ? '' : text).replace(/\|/g, '\\|').replace(/\s*\n\s*/g, ' ');
 }
@@ -71,20 +67,6 @@ function aibGrade(ratio) {
 
 function aibRatio(a, b) {
   return contrastRatio(a, b).toFixed(2) + ':1';
-}
-
-// {placeholder} resolution for def.materials (documented in
-// docs/aesthetics-plan.md "Board anatomy"): t[name] first, else the
-// aesthetic's extra var --ab-<kebab(name)>. Unresolved names stay visible.
-function aibResolveMaterial(css, t, extras, unresolved) {
-  return String(css).replace(/\{([A-Za-z][A-Za-z0-9]*)\}/g, (whole, name) => {
-    const own = t[name];
-    if (typeof own === 'string' || typeof own === 'number') return String(own);
-    const extra = extras['--ab-' + aibKebab(name)];
-    if (extra != null) return String(extra);
-    unresolved.push(name);
-    return whole;
-  });
 }
 
 const AIB_HEX = /^#[0-9a-f]{6}$/i;
@@ -108,7 +90,7 @@ function aibCardFill(def, t, extras) {
   if (!raw) return '--canvas';
   const name = String(raw);
   if (extras && extras[name] != null && AIB_HEX.test(String(extras[name]).trim())) return name + ' (' + String(extras[name]).trim() + ')';
-  return t[name] != null ? '--' + aibKebab(name) : name;
+  return t[name] != null ? '--' + abKebab(name) : name;
 }
 
 function aibComponentRows(t, def, extras) {
@@ -260,6 +242,83 @@ const AIB_INK_SLOT_JOB = {
 function aibSvgDataUri(svg) {
   const q = svg.replace(/"/g, "'");
   return 'data:image/svg+xml,' + q.replace(/%/g, '%25').replace(/</g, '%3C').replace(/>/g, '%3E').replace(/#/g, '%23').replace(/\{/g, '%7B').replace(/\}/g, '%7D');
+}
+
+// Inline data: URIs (an aesthetic's hand-drawn SVG fills, tens of KB each) are replaced in the
+// token and material dumps by a one-line description: a builder reads the file, not the bytes.
+function aibCompactUri(text, key) {
+  return String(text).replace(/url\(\s*(["']?)data:(image\/[a-z+.-]+)[\s\S]*?\1\s*\)/gi,
+    (m, q, type) => `url(<inline ${type === 'image/svg+xml' ? 'SVG' : type.replace('image/', '').toUpperCase()}, copy it from css/aesthetics/${key}.css or js/aesthetics/${key}.js>)`);
+}
+
+// The board as it is really drawn, for the Typography section: an off-screen board for
+// (state, def) at 900px, read back with getComputedStyle. null without a DOM (a node
+// harness, a worker): the brief then states only what it knows and omits the numbers.
+function aibProbeBoard(state, def) {
+  if (typeof document === 'undefined' || !document.body || typeof getComputedStyle !== 'function' || typeof boardHtml !== 'function') return null;
+  const host = document.createElement('div');
+  host.setAttribute('aria-hidden', 'true');
+  host.style.cssText = 'position:fixed;left:-20000px;top:0;width:900px;visibility:hidden;pointer-events:none;';
+  host.style.setProperty('--font-heading', state.headingFont.css);
+  host.style.setProperty('--font-body', state.bodyFont.css);
+  let out = null;
+  try {
+    host.innerHTML = boardHtml(state, def);
+    document.body.appendChild(host);
+    const h = host.querySelector('.ab-hero .ab-headline');
+    const b = host.querySelector('.ab-card-body') || host.querySelector('.ab-subcopy');
+    if (h && b) {
+      const hs = getComputedStyle(h), bs = getComputedStyle(b);
+      const fs = parseFloat(hs.fontSize) || 0;
+      const em = v => (v === 'normal' ? 0 : (parseFloat(v) || 0) / (fs || 1));
+      const radius = sel => {
+        const el = host.querySelector(sel);
+        if (!el) return null;
+        const cs = getComputedStyle(el);
+        const r = [cs.borderTopLeftRadius, cs.borderTopRightRadius, cs.borderBottomRightRadius, cs.borderBottomLeftRadius].map(v => String(v).split(' ')[0]);
+        return r.every(v => v === r[0]) ? r[0] : r.join(' ');
+      };
+      out = {
+        h: { size: Math.round(fs), weight: hs.fontWeight, tt: hs.textTransform, ls: Math.round(em(hs.letterSpacing) * 1000) / 1000, style: hs.fontStyle },
+        b: { size: Math.round(parseFloat(bs.fontSize) || 0), weight: bs.fontWeight, tt: bs.textTransform },
+        radius: { card: radius('.ab-card'), button: radius('.ab-cta'), field: radius('.ab-input'), swatch: radius('.ab-chip') },
+      };
+    }
+  } catch (err) {
+    out = null;
+  }
+  host.remove();
+  return out;
+}
+
+// The Typography lines for headings and body. With a probe: the sizes, weights, case and
+// tracking the board really renders (they come from the aesthetic's stylesheet and the
+// layout, not from the editor's size / weight settings). Without one: no numbers that
+// would be wrong, only the editor's baseline, named as such.
+function aibTypeScaleLines(state, def, ty, probe) {
+  // Real weights only: a single-weight face (Anton, Tilt Warp, VT323) has no 700 to ask for.
+  const hw = abWeightNear(state.headingFont, ty.headingWeight), bw = abWeightNear(state.bodyFont, ty.bodyWeight);
+  if (!probe) {
+    return [`- Heading and body size, weight, case and letter-spacing come from the aesthetic's own stylesheet (css/aesthetics/${def.key}.css), not from the editor; the board shows them. The editor's baseline settings are headings ${ty.headingSize}px / weight ${hw}, body ${ty.bodySize}px / weight ${bw}.`];
+  }
+  const h = probe.h, b = probe.b;
+  return [
+    `- Headings as the board draws them: ${h.size}px on a 900px-wide board (the headline scales with the board width), weight ${abWeightNear(state.headingFont, +h.weight || 400)}, letter-spacing ${h.ls}em, text-transform ${h.tt}${h.style !== 'normal' ? ', ' + h.style : ''}. The editor's size and weight settings (${ty.headingSize}px, ${hw}) are a baseline the aesthetic restyles.`,
+    `- Body copy as the board draws it: ${b.size}px, weight ${abWeightNear(state.bodyFont, +b.weight || 400)}, text-transform ${b.tt}.`,
+  ];
+}
+
+// The Shape lines: the corner radii the board really draws, else just the editor's preset
+// name (the aesthetic sets its own radii; the preset's numbers are not what the board uses).
+function aibShapeLines(state, probe) {
+  const lines = [];
+  if (probe) {
+    const r = probe.radius;
+    const parts = [['cards', r.card], ['buttons', r.button], ['fields', r.field], ['swatches', r.swatch]].filter(([, v]) => v).map(([k, v]) => `${k} ${v}`);
+    if (parts.length) lines.push(`- Corner radius as the board draws it: ${parts.join(', ')}.`);
+  }
+  lines.push(`- Editor shape preset: ${state.shapePreset.name} (the aesthetic sets its own corners${probe ? '' : '; see the board for the radii'}).`);
+  return lines;
 }
 
 const aibKb = n => (n / 1024 < 10 ? (n / 1024).toFixed(1) : Math.round(n / 1024)) + ' KB';
@@ -442,21 +501,17 @@ function aibBrandName(state) {
 }
 
 // "Copy patterns only": the Patterns section on its own, with a one-line preamble so it
-// can be pasted after an existing brief.
-// The state and def the brief describes: the base aesthetic, or the blend (js/blend.js).
-function aibView(state) {
-  return typeof aestheticView === 'function' ? aestheticView(state) : { state, def: aestheticByKey(state.aesthetic), blend: null };
-}
-
+// can be pasted after an existing brief. The brief describes abView(state): the base
+// aesthetic, or the blend (js/blend.js).
 function buildPatternsBrief(state0) {
-  const { state, def } = aibView(state0);
+  const { state, def } = abView(state0);
   return `Add this Patterns section to the ${aibBrandName(state)} brand brief. Its colors are the CSS custom properties from that brief, and every hex is final.\n\n` +
     aibPatternLines(state, def).join('\n');
 }
 
 // One pattern's block (item i of state.patterns), for the per-item Copy in the cart.
 function buildPatternItemBrief(state0, i) {
-  const { state, def } = aibView(state0);
+  const { state, def } = abView(state0);
   const items = typeof PatternPins !== 'undefined' ? PatternPins.normalizeList(state.patterns) : [];
   if (!items[i]) return '';
   return `Pattern for the ${aibBrandName(state)} brand brief. Its colors are the CSS custom properties from that brief, and every hex is final.\n\n${AIB_PATTERN_PREAMBLE}\n\n` +
@@ -464,10 +519,10 @@ function buildPatternItemBrief(state0, i) {
 }
 
 function buildAiBrief(state0) {
-  const { state, def } = aibView(state0);
+  const { state, def } = abView(state0);
   const t = boardTokens(state, def);
   const roles = colorRolesFor(state);
-  const extras = typeof def.tokens === 'function' ? def.tokens(t) : {};
+  const extras = abTokens(def, t, state);
   const mode = t.isDark ? 'dark' : 'light';
   const content = state.content || {};
   const pick = k => (typeof content[k] === 'string' && content[k].trim()) ? content[k].trim() : AIB_CONTENT_FALLBACK[k];
@@ -584,12 +639,12 @@ function buildAiBrief(state0) {
 
   /* 8. Typography */
   const fontUrl = aibFontUrl([state.headingFont, state.bodyFont]);
+  const probe = aibProbeBoard(state, def);
   push('## Typography', '',
     `- Heading font: ${state.headingFont.name} (${state.headingFont.category}); CSS: \`${state.headingFont.css}\``,
     `- Body font: ${state.bodyFont.name} (${state.bodyFont.category}); CSS: \`${state.bodyFont.css}\``,
     `- Google Fonts: ${fontUrl}`,
-    `- Headings: ${ty.headingSize}px, weight ${ty.headingWeight}, letter-spacing ${ty.headingTracking}px, text-transform ${ty.headingCase}`,
-    `- Body: ${ty.bodySize}px, weight ${ty.bodyWeight}, letter-spacing ${ty.bodyTracking}px, text-transform ${ty.bodyCase}`);
+    ...aibTypeScaleLines(state, def, ty, probe));
   if (def.type && (def.type.ui || def.type.label)) {
     const faceName = k => (typeof abResolveFace === 'function' ? abResolveFace(k, state).name : k);
     if (def.type.ui) push(`- Interface text (tabs, buttons, field values, list cells): ${faceName(def.type.ui)}${def.type.ui === 'body' ? '' : `. The ${state.bodyFont.name} body face is for reading copy only`}.`);
@@ -597,18 +652,18 @@ function buildAiBrief(state0) {
   }
   const notes = def.typeNotes;
   (Array.isArray(notes) ? notes : notes ? [notes] : []).forEach(n => push(`- ${n}`));
-  push(`- Shape: ${state.shapePreset.name}, radius ${state.shapePreset.radius}, large radius ${state.shapePreset.radiusLg}`, '');
+  push(...aibShapeLines(state, probe), '');
   aibTypeRecommendation(state, def).forEach(line => push(line));
 
   /* 9. Materials */
   const unresolved = [];
   // A blend's material channel lists the donor's recipes, filled in from the donor's variables.
   const matDonor = def.blend && def.blend.channels.material ? def.blend.donor : null;
-  const matExtras = matDonor && typeof blendDonorTokens === 'function' ? blendDonorTokens(matDonor, t) : extras;
+  const matExtras = matDonor && typeof blendDonorTokens === 'function' ? blendDonorTokens(matDonor, t, state) : extras;
   push(`## Materials (${def.labels && def.labels.material ? def.labels.material : def.name})`, '',
     'Surface recipes for this aesthetic with real values filled in. Apply them as written.', '');
   (def.materials || []).forEach(m => {
-    push(`- **${m.name}**: ${aibResolveMaterial(m.css, t, matExtras, unresolved)}`);
+    push(`- **${m.name}**: ${aibCompactUri(abResolveMaterial(m.css, t, matExtras, (name, whole) => { unresolved.push(name); return whole; }), matDonor ? matDonor.key : def.key)}`);
   });
   if (!(def.materials || []).length) push('- None defined. Use flat fills from the tokens above.');
   if (unresolved.length) console.warn(`buildAiBrief: unresolved material placeholders for ${def.key}: ${unresolved.join(', ')}`);
@@ -627,13 +682,13 @@ function buildAiBrief(state0) {
     .filter(([name]) => !['--primary', '--secondary', '--accent', '--neutral-dark', '--neutral-light', '--on-primary', '--on-accent'].includes(name))
     .map(([name, field]) => `  ${name}: ${t[field]};`);
   if (t.printed) derived.unshift(`  --primary-print: ${t.printPrimary};`, `  --on-primary-print: ${t.onPrimary};`);
-  const extraLines = Object.keys(extras).map(name => `  ${name}: ${String(extras[name]).replace(/\s*\n\s*/g, ' ').trim()};`);
+  const extraLines = Object.keys(extras).map(name => `  ${name}: ${aibCompactUri(String(extras[name]).replace(/\s*\n\s*/g, ' ').trim(), def.key)};`);
   push('## CSS variables', '', '```css', brandCssText(state), '',
     `/* Derived tokens for the ${mode}-mode ${def.name} aesthetic. Computed, do not edit. */`,
     ':root {', ...derived, '}');
   if (extraLines.length) push('', `/* ${def.name} material variables, referenced by the Materials above. */`, ':root {', ...extraLines, '}');
   if (matDonor) {
-    const donorLines = Object.keys(matExtras).map(name => `  ${name}: ${String(matExtras[name]).replace(/\s*\n\s*/g, ' ').trim()};`);
+    const donorLines = Object.keys(matExtras).map(name => `  ${name}: ${aibCompactUri(String(matExtras[name]).replace(/\s*\n\s*/g, ' ').trim(), matDonor.key)};`);
     if (donorLines.length) push('', `/* ${matDonor.name} material variables (the supporting system). Scope them to the surfaces that use its Materials. */`, `.material-${matDonor.key} {`, ...donorLines, '}');
   }
   push('```', '');

@@ -29,7 +29,7 @@ a donor straight away.
 
 Callers: `renderMainBoard` / `renderAestheticBoard` (via `abView()` in `js/aesthetic-board.js`),
 `renderBrandDeckNow` (`js/brand-deck.js`), `buildAiBrief` / `buildPatternsBrief` / `buildPatternItemBrief`
-(via `aibView()` in `js/ai-brief.js`), and the Patterns view (`js/patterns-ui.js`). Compare all renders
+(via `abView(state)` in `js/aesthetic-board.js`, which `buildAiBrief` calls), and the Patterns view (`js/patterns-ui.js`). Compare all renders
 each aesthetic on its own, unblended.
 
 ## Channels
@@ -109,7 +109,7 @@ loading `js/blend.js` with the constant flipped.
 - `js/brand-deck.js`: the deck renders `abView()`; `bdTextSpills` in the headline, sample and cover
   fits; `blendFitArt` / `blendClearArtText` calls in `bdFitDeck`.
 - `js/patterns-deck.js`, `js/patterns-ui.js`: suite from `blendSuite`, tokens and fonts from the view.
-- `js/ai-brief.js`: `aibView()`, the "## Blend" section, title, donor materials and variables, the
+- `js/ai-brief.js`: `abView(state)`, the "## Blend" section, title, donor materials and variables, the
   blended suite and type recommendation.
 - `js/persistence.js`, `js/brand-session.js`, `js/app.js`: save / load / validate, undo snapshots,
   `state.blend` default, base-equals-donor clears.
@@ -120,9 +120,16 @@ loading `js/blend.js` with the constant flipped.
 1. Delete `js/blend.js`, `css/blend.css`, `docs/blend.md`.
 2. `index.html`: remove the `<!-- Blend with a second aesthetic ... -->` block and the two tags.
 3. Every call site is guarded with `typeof … === 'function'`, so the app already runs without
-   `blend.js`. To clean up: drop `abView`/`aibView` in favour of `aestheticByKey(state.aesthetic)`,
-   the `blendParts` / `blendClearArtText` / `blendFitArt` / `blendSuite` / `blendBriefLines` /
+   `blend.js`. To clean up: drop `abView` in favour of `aestheticByKey(state.aesthetic)`,
+   the `blendParts` / `blendClearArtText` / `blendLegibility` / `blendFitArt` / `blendSuite` / `blendBriefLines` /
    `blendDonorTokens` / `syncBlendUi` / `initBlendUi` lines, the `blend` lines in persistence,
    brand-session and app.js, the `fromBlend` branch in `abTypeBlockHtml`, the `typeFrom` line in
    `aibTypeRecommendation`, the `matDonor` lines in `buildAiBrief`, and the blend block in `tests/run.js`.
    `P.states` / `P.panelPre` and `bdTextSpills` can stay; they are neutral without a blend.
+
+## Round 6 cleanup notes
+- `blendDonorTokens(donor, t, state)`, the donor's `canvas` / `printPrimary` and the base's `canvas` inside a blend all receive the view state, so a donor's weights follow the faces on the board (type channel). Every donor hook runs through the shared safe runner (`abRun`): a throwing donor hook costs only that piece.
+- Root attributes are written once by `abRootAttrs` (board root, donor scope, probe); the style string by `abStyle`; the material placeholder resolver is `abResolveMaterial` (a blend sample paints `transparent` for a missing name).
+- `BL_HERO_RATIO` has a `bleed` entry (21 / 8). `BLEND_STRENGTHS` and `blendSuiteFor` were unused and are gone.
+- `blendLegibility(root)` runs after layout (board, and the deck after its fit): a canvas plate (`data-bl-scrim`, `--bl-scrim`, css/blend.css) behind a headline the base lays over the donor's art, and a contrast check on the highlight word against the ground it actually sits on (3:1, else the headline colour, ink, black or white).
+- Verified: a 24-blend sweep (board at 1100px and 390px, bold and balanced) with overflow, flat-ground text contrast and headline-over-art checks.

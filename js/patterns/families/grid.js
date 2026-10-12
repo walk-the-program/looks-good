@@ -130,8 +130,9 @@
           if (pw <= 1 || ph <= 1) continue;
           let w2 = pw;
           if (!sparked && r === sparkRow && i === k - 1) {
-            // a narrow spark pane at the end of one row
-            w2 = Math.max(u * 1.2, Math.min(pw, W * 0.04));
+            // a spark pane at the end of one row: narrow, but a pane (10% of the width at least),
+            // never a 4-6px sliver of colour along the tile edge
+            w2 = Math.min(pw, Math.max(u * 8, W * 0.1));
             if (env.spark.take(w2 * ph)) { a = inks.spark; b = inks.ground; sparked = true; } else w2 = pw;
           }
           const d = DIRS[rng.int(0, 7)];
