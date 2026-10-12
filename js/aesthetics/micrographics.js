@@ -1,6 +1,12 @@
-/* 23 Micrographics — tiny, technical, precise. Reference: streetwear and tech-
-   editorial layouts (Acronym, Nike ISPA, techwear graphics, modern Swiss posters)
-   where one huge element is ringed by clusters of tiny type: 7-9px mono labels,
+/* 23 Micrographics — tiny, technical, LOUD. Reference: The Designers Republic (Wipeout
+   packaging, label stacks, sticker logic), Teenage Engineering OP-1 silkscreen, Acronym
+   hazard labels, streetwear spec sheets: one huge element ringed by tiny type, 80:1.
+   Round 6: the brand glyph is the one huge element (full plate width, ~78% of its
+   height); the spec table, the QR block and a hazard tape sit OVER the glyph as
+   canvas-backed stickers; leaders are orthogonal (one horizontal run, one vertical drop)
+   and every label knocks out what is behind it; a fixed safety colour (not the brand)
+   marks the caution triangle and the hazard tape. Original notes follow.
+   One huge element is ringed by clusters of tiny type: 7-9px mono labels,
    index numbers, registration marks, crosshairs, tiny barcodes, a QR-like block,
    warning glyphs, coordinate pairs, version strings, arrows and hairline
    rulers. The contrast of scale IS the aesthetic: a giant tight headline and a
@@ -45,9 +51,9 @@ function mgBars(seed, count) {
 registerAesthetic({
   key: 'micrographics', order: 23,
   name: 'Micrographics',
-  descriptor: 'Tiny · Technical · Precise',
-  influences: 'Swiss technical print / Streetwear graphics / Product spec sheets',
-  summary: 'One huge element ringed by clusters of 8px mono labels, marks and coordinates.',
+  descriptor: 'Tiny · Technical · Loud',
+  influences: 'The Designers Republic / Teenage Engineering silkscreen / Techwear spec labels',
+  summary: 'One giant brand glyph with spec stickers on it, ringed by 8px mono labels, orthogonal leaders and one hazard mark.',
   motto: 'Small print, large idea.',
   kicker: 'SPEC 01/26',
   mode: 'light',
@@ -57,10 +63,11 @@ registerAesthetic({
   // Deck copy (js/brand-deck.js): three principles, three do / don't lines, each short.
   deck: {
     materialStage: 'pattern',
+    coverDisplay: 0.7,
     principles: [
-      ['One huge element', 'Everything else is at least ten times smaller.'],
-      ['Rings of tiny mono labels', 'Indexes, codes, coordinates and page marks.'],
-      ['Hairlines on a strict module', 'Ticks, crosshairs and a handful of primary marks.'],
+      ['One huge element', 'The brand glyph, fifty times the microtype.'],
+      ['Stickers on the object', 'Spec table, QR and hazard tape laid over it.'],
+      ['Orthogonal leaders', 'One horizontal run, one vertical drop, knocked out.'],
     ],
     do: [
       'Make one element huge.',
@@ -70,12 +77,12 @@ registerAesthetic({
     dont: [
       'Add glow, gradients or shadows.',
       'Set microtype in a proportional face.',
-      'Use accent for marks or small text.',
+      'Draw leaders at an angle.',
     ],
   },
-  type: { ui: 'mono', label: 'mono', display: 1.28 },
+  type: { ui: 'mono', label: 'mono', display: 1 },
   highlight: 'custom',
-  highlightNote: 'The word is set solid in --accent-ink like the rest of the giant headline, followed by a tiny mono footnote reference "(01)" raised at its top right; no fill, no outline, no underline.',
+  highlightNote: 'The word stays in ink like the rest of the (48px) headline, followed by a tiny mono footnote reference "(01)" raised at its top right; no colour, no fill, no underline. The giant element is the brand glyph, not the headline.',
 
   roles: {
     canvas: {
@@ -94,14 +101,14 @@ registerAesthetic({
       coverage: '≈3–5%',
     },
     secondary: {
-      use: 'Quiet support: confidence bars, one finder square in the QR block, status underlines and the second annotation ring',
+      use: 'Quiet support: one finder square in the QR block and a role square in the spec table',
       never: 'The main action, body text, headline',
       coverage: '≈3–5%',
     },
     accent: {
-      use: 'The single highlighted headline word',
-      never: 'Marks, buttons, borders, fills, microtype',
-      coverage: '≤3%',
+      use: 'Palette only. The highlight word is ink; the one loud mark is the fixed safety colour (#FF4A1C light / #FFE500 dark), which is not a brand role',
+      never: 'Headline words, marks, buttons, borders, fills, microtype',
+      coverage: '≤1%',
     },
   },
 
@@ -118,6 +125,12 @@ registerAesthetic({
       '--ab-hair-soft': t.alpha(t.ink, 0.2),
       '--ab-hair-faint': t.alpha(t.ink, 0.1),
       '--ab-mg-tick': 'repeating-linear-gradient(90deg, currentColor 0 1px, transparent 1px 6px)',
+      // the fixed safety colour: hazard orange on light, TDR yellow on dark; never a brand role
+      '--ab-mg-safe': t.isDark ? '#FFE500' : '#FF4A1C',
+      // real data for the micro line on every section rule
+      '--mg-d-a': `"MG–0412–A · ${t.primary.toUpperCase()} · 8PX GRID · P.03/04"`,
+      '--mg-d-b': `"MG–0412–B · ${t.ink.toUpperCase()} · 1PX HAIR · P.03/04"`,
+      '--mg-d-c': `"MG–0412–C · ${t.canvas.toUpperCase()} · 3 ROWS · P.04/04"`,
     };
   },
 
@@ -132,72 +145,71 @@ registerAesthetic({
     const bName = escapeHtml(((st.bodyFont && st.bodyFont.name) || 'Body').slice(0, 18));
     const hex = c => c.replace('#', '').toUpperCase();
     const vf = 'vector-effect="non-scaling-stroke"';
+    const safe = t.isDark ? '#FFE500' : '#FF4A1C';
 
-    // callouts: label position (x,y %), the marker it points at (tx,ty %), side the label hangs to.
-    // Every marker sits on a drawn metric guide (cap y34, baseline y78, left bearing x21, right bearing x77),
-    // the faint centre line (REG. MARK) or the guide box centre (49,56); the glyph is fitted to the same box in css.
+    // Metric guides (plate %): cap line y10, baseline y88, the glyph's measured ink edges, centre (50,50).
+    // Callouts: label centre (x,y), marker (tx,ty). The leader runs from the label centre
+    // horizontally to tx, then drops vertically to ty; the label's canvas knock-out hides the
+    // part under it, so no line ever crosses text. `ph` = also shown on a phone.
+    // the glyph's ink edges (plate %), measured on a canvas: font-size = 0.797 x plate width
+    // (78% of a 1.36:1 plate = cap height); falls back to a typical bold capital
+    let bl = 18, br = 82;
+    try {
+      const cv = document.createElement('canvas').getContext('2d');
+      cv.font = `${(st.headingFont && /[0-9]/.test(String(st.headingFont.weights || '')) ? Math.min(700, Math.max(...String(st.headingFont.weights).split(';').map(Number).filter(n => n <= 700).concat([400]))) : 700)} 100px ${(st.headingFont && st.headingFont.css) || 'sans-serif'}`;
+      const m = cv.measureText(ctx.initial || 'M');
+      const k = 0.797;   // em in plate widths
+      const adv = m.width / 100 * k * 100;
+      const L = 50 - adv / 2 - (m.actualBoundingBoxLeft || 0) / 100 * k * 100;
+      const R = 50 - adv / 2 + (m.actualBoundingBoxRight || m.width) / 100 * k * 100;
+      if (R - L > 8 && L > 2 && R < 98) { bl = Math.round(L * 10) / 10; br = Math.round(R * 10) / 10; }
+    } catch (err) { /* keep the defaults */ }
+    const span = br - bl;
     const calls = [
-      { i: 'A.01', k: 'CAP HEIGHT', x: 2, y: 5, tx: 30, ty: 34, side: 'l' },
-      { i: 'A.02', k: 'L. BEARING', x: 2, y: 43, tx: 21, ty: 58, side: 'l' },
-      { i: 'A.03', k: 'GRID 10', x: 2, y: 86, tx: 25, ty: 78, side: 'l' },
-      { i: 'A.04', k: 'ADVANCE', x: 98, y: 5, tx: 77, ty: 34, side: 'r' },
-      { i: 'A.05', k: 'OPT. CENTER', x: 98, y: 43, tx: 49, ty: 56, side: 'r', mark: true },
-      { i: 'A.06', k: 'BASELINE', x: 98, y: 86, tx: 77, ty: 78, side: 'r' },
-      { i: 'A.07', k: 'REG. MARK', x: 50, y: 0, tx: 50, ty: 16, side: 'c' },
-      { i: 'A.08', k: 'ORIGIN', x: 50, y: 88, tx: 21, ty: 78, side: 'c', mark: true },
+      { i: 'A.01', k: 'CAP HEIGHT', x: 9, y: 22, tx: +(bl + span * 0.18).toFixed(1), ty: 10, ph: 1 },
+      { i: 'A.02', k: 'L. BEARING', x: Math.max(6, bl - 9), y: 40, tx: bl, ty: 40 },
+      { i: 'A.04', k: 'ADVANCE', x: 58, y: 17, tx: +(br - span * 0.1).toFixed(1), ty: 10, ph: 1 },
+      { i: 'A.05', k: 'OPT. CENTER', x: 89, y: 48, tx: 50, ty: 50, mark: true },
+      { i: 'A.06', k: 'BASELINE', x: 89, y: 81, tx: +(br - span * 0.05).toFixed(1), ty: 88, ph: 1, mark: true },
+      { i: 'A.08', k: 'ORIGIN', x: 38, y: 94, tx: bl, ty: 88, ph: 1 },
     ];
-    const leaders = calls.map(c => {
-      // leader runs from the label edge to the marker, with one right-angle bend
-      const ax = c.side === 'l' ? c.x + 23 : c.side === 'r' ? c.x - 23 : c.x;
-      const ay = c.side === 'c' ? (c.y < 50 ? c.y + 11 : c.y - 1) : c.y + 6.5;
-      return `<path ${vf} d="M${ax} ${ay}L${c.tx} ${c.ty}" stroke-width="1"/>`;
-    }).join('');
-    const markers = calls.map(c => `<i class="mga-mk${c.mark ? ' is-p' : ''}" style="left:${c.tx}%;top:${c.ty}%"></i>`).join('');
+    const leaders = calls.map(c => `<path ${vf} d="M${c.x} ${c.y}H${c.tx}V${c.ty}" stroke-width="1"${c.ph ? '' : ' class="mga-nph"'}/>`).join('');
+    const markers = calls.map(c => `<i class="mga-mk${c.mark ? ' is-p' : ''}${c.ph ? '' : ' mga-nph'}" style="left:${c.tx}%;top:${c.ty}%"></i>`).join('');
     const labels = calls.map(c => {
-      const coord = `X ${String(Math.round(c.tx * 4.2)).padStart(3, '0')}  Y ${String(Math.round(c.ty * 3.4)).padStart(3, '0')}`;
-      return `<span class="mga-call mga-s${c.side}" style="left:${c.x}%;top:${c.y}%"><b>${c.i}</b><br>${c.k}<br><em>${coord}</em></span>`;
+      const coord = `X ${String(Math.round(c.tx * 4.2)).padStart(3, '0')} Y ${String(Math.round(c.ty * 3.4)).padStart(3, '0')}`;
+      return `<span class="mga-call${c.ph ? '' : ' mga-nph'}" style="--x:${c.x}%;--y:${c.y}%"><b>${c.i}</b> ${c.k}<br><em>${coord}</em></span>`;
     }).join('');
-
-    // module grid of tiny plus marks behind the glyph (10-unit pitch in a 130 x 100 box)
-    let grid = '';
-    for (let gx = 10; gx <= 120; gx += 10) for (let gy = 10; gy <= 90; gy += 10) grid += `M${gx - 1.1} ${gy}h2.2M${gx} ${gy - 1.1}v2.2`;
 
     const table = [
       ['01', 'HEAD', hName], ['02', 'BODY', bName], ['03', 'GRID', '8 PX / 10 U'],
       ['04', 'INK', '#' + hex(t.ink)], ['05', 'PRI', '#' + hex(t.primary), 'p'], ['06', 'SEC', '#' + hex(t.secondary), 's'], ['07', 'ACC', '#' + hex(t.accent)],
     ].map(r => `<div class="mga-row"><span>${r[0]}</span><span>${r[1]}</span><span>${r[3] ? `<i class="mga-sq mga-sq-${r[3]}"></i>` : ''}${r[2]}</span></div>`).join('');
+    const spec = `<p class="mga-h"><b>SPEC 01/26</b> · ${escapeHtml(brand)}<br>REV 03 · 2026.10</p><div class="mga-tab">${table}</div>`;
+    const qr = `<div class="mga-qrrow">
+          <svg class="mga-qr" viewBox="0 0 ${qrN} ${qrN}" shape-rendering="crispEdges" focusable="false"><path d="${mgQr(seed, qrN)}" fill="${t.ink}"/><path d="M${qrN - 5} 2h3v3h-3z" fill="${t.secondary}"/></svg>
+          <div class="mga-warn"><svg viewBox="0 0 12 11" focusable="false"><path d="M6 .8L11.2 10H.8Z" fill="${safe}" stroke="${t.ink}" stroke-width=".9" stroke-linejoin="round"/><path d="M6 4.2v3M6 8.2v.9" stroke="${t.ink}" stroke-width="1"/></svg><span><b>CAUTION</b><br>RE-ISSUE</span></div>
+        </div>
+        <p class="mga-h"><b>V 2.6.0</b> / BUILD 0412<br>N 51.5074° / W 0.1278°</p>`;
+    const barsSvg = `<svg class="mga-bar" viewBox="0 0 ${bars.w} 10" preserveAspectRatio="none" focusable="false"><path d="${bars.d}" fill="${t.ink}"/></svg>`;
 
     return `<div class="mga">
       <span class="mga-corner mga-c-tl">A–01</span><span class="mga-corner mga-c-tr">MG–0412</span>
       <span class="mga-corner mga-c-bl">© 2026 ${escapeHtml(brand)}</span><span class="mga-corner mga-c-br">P.01/26</span>
       <span class="mga-ruler mga-r-t"><i>000</i><i>100</i><i>200</i><i>300</i><i>400</i></span>
       <span class="mga-ruler mga-r-b"><i>A</i><i>B</i><i>C</i><i>D</i><i>E</i></span>
-      <div class="mga-col mga-l">
-        <p class="mga-h"><b>SPEC 01/26</b><br>${escapeHtml(brand)}<br>REV 03 · 2026.10</p>
-        <div class="mga-tab">${table}</div>
-        <p class="mga-note">→ 01 · 02 · 03<br>ISSUE 04 / SEE SHEET B</p>
-      </div>
       <div class="mga-glyph">
-        <svg class="mga-g" viewBox="0 0 130 100" focusable="false" preserveAspectRatio="xMidYMid meet">
-          <path ${vf} d="${grid}" fill="none" stroke="${t.ink}" stroke-opacity=".28" stroke-width="1"/>
-        </svg>
         <span class="mga-gl is-o">${escapeHtml(ctx.initial)}</span><span class="mga-gl">${escapeHtml(ctx.initial)}</span>
-        <svg class="mga-lines" viewBox="0 0 100 100" preserveAspectRatio="none" focusable="false" fill="none" stroke="${t.ink}" stroke-opacity=".6">
-          <path ${vf} d="M0 34H100M0 78H100M21 0V100M77 0V100" stroke-opacity=".35" stroke-width="1" stroke-dasharray="3 3"/>
-          <path ${vf} d="M50 0V100" stroke-opacity=".18" stroke-width="1"/>
+        <svg class="mga-lines" viewBox="0 0 100 100" preserveAspectRatio="none" focusable="false" fill="none" stroke="${t.ink}" stroke-opacity=".7">
+          <path ${vf} d="M0 10H100M0 88H100M${bl} 0V100M${br} 0V100" stroke-opacity=".4" stroke-width="1" stroke-dasharray="3 3"/>
+          <path ${vf} d="M50 0V100" stroke-opacity=".2" stroke-width="1"/>
           ${leaders}
         </svg>${markers}${labels}
       </div>
-      <div class="mga-col mga-r">
-        <div class="mga-qrrow">
-          <svg class="mga-qr" viewBox="0 0 ${qrN} ${qrN}" shape-rendering="crispEdges" focusable="false"><path d="${mgQr(seed, qrN)}" fill="${t.ink}"/><rect x="${qrN - 7}" y="0" width="7" height="7" fill="none"/><path d="M${qrN - 5} 2h3v3h-3z" fill="${t.secondary}"/></svg>
-          <div class="mga-warn"><svg viewBox="0 0 12 11" focusable="false"><path d="M6 .8L11.2 10H.8Z" fill="none" stroke="${t.ink}" stroke-width=".9" stroke-linejoin="round"/><path d="M6 4.2v3M6 8.2v.9" stroke="${t.ink}" stroke-width=".9"/></svg><span>CAUTION<br>RE-ISSUE</span></div>
-        </div>
-        <p class="mga-h"><b>V 2.6.0</b> / BUILD 0412<br>N 51.5074° / W 0.1278°<br>↗ ↘ ↓ ← ⌖ 03</p>
-        <svg class="mga-bar" viewBox="0 0 ${bars.w} 10" preserveAspectRatio="none" focusable="false"><path d="${bars.d}" fill="${t.ink}"/></svg>
-        <p class="mga-note">0 41227 06601 5<br>SCALE 1:1 · SHEET 01</p>
-      </div>
-    </div>`;
+      <div class="mga-stk mga-stk-spec">${spec}</div>
+      <div class="mga-stk mga-stk-qr">${qr}</div>
+      <div class="mga-stk mga-stk-hz"><i class="mga-tape"></i>${barsSvg}<p class="mga-note">0 41227 06601 5 · SCALE 1:1 · SHEET 01</p></div>
+    </div>
+    <div class="mga-under">${spec}<div class="mga-under-r">${qr}${barsSvg}</div></div>`;
   },
 
   materials: [
@@ -207,20 +219,22 @@ registerAesthetic({
     { name: 'Crosshair marker', css: 'background: linear-gradient({ink},{ink}) center / 100% 1px no-repeat, linear-gradient({ink},{ink}) center / 1px 100% no-repeat; width: 9px; height: 9px; /* a 3px {primary} square at the centre on at most three markers per view */' },
     { name: 'Tick ruler', css: 'background: repeating-linear-gradient(90deg, {ink} 0 1px, transparent 1px 6px) bottom / 100% 4px no-repeat, repeating-linear-gradient(90deg, {ink} 0 1px, transparent 1px 30px) bottom / 100% 8px no-repeat; /* along the plate edges with a number every fifth long tick */' },
     { name: 'Main action', css: 'background: {primary}; color: {onPrimary}; border-radius: 0; font: 600 9.5px/1 mono; letter-spacing: .22em; text-transform: uppercase; /* the only solid fill on the board */' },
-    { name: 'Giant glyph', css: 'color: {ink}; font-weight: 700; line-height: .8; /* the brand initial or headline at 10x the microtype, with a 1px outline duplicate offset 3 units like a misregistered proof */' },
+    { name: 'Giant glyph', css: 'color: {ink}; font-weight: 700; /* the brand initial at ~78% of the plate height (~60x the microtype), with a 1px outline duplicate offset 3px like a misregistered proof */' },
+    { name: 'Sticker', css: 'background: {canvas}; box-shadow: inset 0 0 0 1px {ink}; padding: 8px; /* spec table, QR block and hazard tape laid OVER the glyph; labels knock out what is behind them */' },
+    { name: 'Safety mark', css: 'background: repeating-linear-gradient(-45deg, {mgSafe} 0 6px, {ink} 6px 12px); /* fixed #FF4A1C light / #FFE500 dark, not a brand role: the caution triangle and one hazard tape only */' },
   ],
 
   rules: {
     do: [
-      'Make one element huge (headline or glyph) and ring it with clusters of 7-9px mono microtype: scale contrast of at least 10x.',
+      'Make one element huge (the brand glyph, across the whole plate) and ring it with 8px mono microtype: scale contrast of 50x or more.',
       'Give every panel three micro labels: index at top-left, code at top-right, page at bottom-right.',
       'Draw with 1px ink hairlines, crosshairs, ticks and registration marks on a strict 8px or 10 unit module; label things with an index and a coordinate.',
-      'Spend primary on a handful of tiny 3-5px marks per view (five at most) plus the one main action.',
+      'Spend primary on a handful of tiny 3-5px marks plus the one main action; the one loud mark is the fixed safety colour on a hazard tape.',
     ],
     dont: [
       'Add glow, gradients, shadows or tinted panel fills; the sheet is flat paper and ink.',
       'Set microtype below 7px or above 9px, or in a proportional face; it is mono, uppercase, widely tracked.',
-      'Use accent for marks or small text; it is the one highlighted headline word.',
+      'Run a leader at an angle or across a label; leaders are one horizontal run and one vertical drop, and labels knock out.',
       'Draw a blueprint field, grid sheet or dark screen (that is Blueprint and Cyber HUD); this is a light printed spec.',
     ],
   },

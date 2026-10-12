@@ -1,9 +1,10 @@
-/* 06 Holo Iridescent — high-end iridescent branding: a near-black canvas, thin
-   chromatic light (a thin-film soap-bubble rim, a spectral ribbon), near-black
-   panels edged with a 1px iridescent hairline, solid primary actions with a
-   thin spectral top edge. Light mode is the same recipe as a quiet pearl. The
-   spectrum is fixed and decorative: it is never a brand color role. Look lives
-   in css/aesthetics/holo-iridescent.css. */
+/* 06 Holo Iridescent — high-end iridescent branding (Cru+, Black & Bone, thin-film
+   physics): a pearl ground, one large foil plane as the hero object (banded
+   interference fringes plus an angle sweep), a soap bubble on its corner, quiet
+   hairline panels with one featured card edged in the spectrum, solid primary
+   actions with a flush spectral top edge. Dark mode is strict black with the
+   same foil object. The spectrum is fixed and decorative: it is never a brand
+   color role. Look lives in css/aesthetics/holo-iridescent.css. */
 (function () {
   let seq = 0;
 
@@ -12,21 +13,23 @@
     name: 'Holo Iridescent',
     descriptor: 'Pearl · Spectral · Precise',
     influences: 'Iridescent branding / Thin-film light / Holographic foil',
-    summary: 'A near-black field lit by thin spectral light: bubble rims, ribbons and hairline edges.',
+    summary: 'A pearl ground and one large foil surface whose color drifts with the angle, like printed holographic foil.',
     motto: 'Catch the light.',
-    kicker: 'Thin-film light',
-    mode: 'dark',
+    kicker: 'Thin-film foil',
+    // Pearl is the default ground (Cru+ prints on pale lilac stock); dark is strict black.
+    mode: 'light',
     slideShape: 'refined',
     labels: { material: 'Finish', states: ['Matte', 'Pearl', 'Foil'], statesKind: 'chip' },
-    layout: { hero: 'centered' },
-    type: { ui: 'sans', label: 'sans' },
+    // split: copy left, the foil plane bleeding off the right edge; strips: the palette as flat planes
+    layout: { hero: 'split', palette: 'strips' },
+    type: { ui: 'sans', label: 'sans', display: 1.1 },
     highlight: 'custom',
     highlightNote: 'The word is filled with the spectral thin-film gradient, clipped to the letters, with no background, band or outline.',
 
     roles: {
       canvas: {
-        use: 'The near-black page (lightness capped at 8% in dark mode) and the base under every panel',
-        never: 'Text, or a lighter flat "card" color; panels are near-black with a hairline edge',
+        use: 'The pearl page under a fixed pastel wash (near-black, lightness capped at 8%, in dark mode) and the base under every panel',
+        never: 'Text, or a saturated card color; panels are canvas-solid with a hairline edge',
         coverage: '70–80%',
       },
       primary: {
@@ -34,7 +37,7 @@
         never: 'Body text, large fills, a second CTA',
       },
       secondary: {
-        use: 'Chips and tags, progress fills, the second data series and the inner reflection arc of the art bubble',
+        use: 'Progress fills, the second data series and selected tags',
         never: 'The main CTA, body text, page background',
       },
       accent: {
@@ -61,8 +64,8 @@
         }
         return t.ink;
       };
-      // The pearl wash is quiet: ~15% in light mode, a barely-there glow in dark.
-      const wash = d ? 0.06 : 0.15;
+      // The pearl wash: ~22% in light mode, a barely-there glow in dark.
+      const wash = d ? 0.06 : 0.22;
       const w = hex => t.alpha(hex, wash);
       const spec = ['#ff9ad5', '#8fe3ff', '#b79cff', '#8bf5c4', '#ffe08f'];
       // Art spectrum: bright light on black, deeper tones on pearl so it still reads.
@@ -92,114 +95,89 @@
         '--ab-hl-fill': `linear-gradient(95deg, ${t.accentInk} 0%, ${t.accentInk} 26%, ${legible('#d6409f')} 52%, ${legible('#7a56e6')} 74%, ${legible('#12a37a')} 100%)`,
         '--ab-lift': d ? '0 24px 40px -26px rgba(0,0,0,0.9)' : `0 14px 34px -16px ${t.alpha(t.ink, 0.2)}`,
         '--ab-cta-glow': t.alpha(t.primary, d ? 0.42 : 0.5),
+        '--ab-type-pick-w': 300,
       };
     },
 
-    // A thin-film soap bubble (transparent centre, spectral color gathered toward
-    // a blurred conic rim bright at the top left, an inner secondary reflection arc)
-    // crossed by one wide foil ribbon that twists once: its left segment is drawn
-    // behind the bubble, its right segment in front. Static, decorative; the stage
-    // and bubble are styled in the css.
+    // The hero object is a foil plane: one large pearl card tilted in perspective,
+    // its surface built from interference fringes (repeating radial bands in the
+    // fixed thin-film order) and an angle term (a conic sweep), so the hue drifts
+    // across the plane the way printed foil does. The brand initial is debossed in
+    // its lower right. A soap bubble overlaps one corner: an SVG ring of spectral
+    // wedges swirled by turbulence (so it exports through html2canvas), with a
+    // thinning "black spot" at the top and a thin white rim. The spectrum is
+    // fixed and decorative, never a brand color.
     art(ctx) {
-      const t = ctx.t;
       const id = 'hoa' + (++seq);
-      const d = t.isDark;
-      const art = d ? ['#ff8fd0', '#7fdcff', '#a98cff', '#7df0bd', '#ffd978'] : ['#e46bb4', '#4fb3e6', '#8f6bef', '#38c08f', '#ecb23e'];
-      // spectrum across the ribbon (userSpaceOnUse, 0..160)
-      const stops = [0.02, 0.2, 0.4, 0.6, 0.8, 0.98]
-        .map((o, i) => `<stop offset="${o}" stop-color="${art[i % 5]}"/>`).join('');
-      const rstops = [0.02, 0.2, 0.4, 0.6, 0.8, 0.98]
-        .map((o, i) => `<stop offset="${o}" stop-color="${art[(5 - i) % 5]}"/>`).join('');
-      // Foil ribbon geometry: a band 22-34 units tall that narrows to ~4 at one twist.
-      const xt = 118;
-      const centre = x => 41 + 13 * Math.sin((x / 160) * Math.PI * 1.7 + 0.5);
-      const thick = x => {
-        const base = 28 + 6 * Math.sin((x / 160) * Math.PI * 2.2 + 1);
-        return Math.max(4, base * (1 - Math.exp(-(((x - xt) / 9) ** 2))));
-      };
-      const top = x => centre(x) - thick(x) / 2, bot = x => centre(x) + thick(x) / 2;
-      const xs = (x0, x1) => { const o = []; for (let x = x0; x < x1; x += 2) o.push(x); o.push(x1); return o; };
-      const f = n => n.toFixed(2);
-      const piece = (x0, x1) => {
-        const p = xs(x0, x1);
-        return 'M' + p.map(x => f(x) + ' ' + f(top(x))).join(' L') + ' L' + p.slice().reverse().map(x => f(x) + ' ' + f(bot(x))).join(' L') + ' Z';
-      };
-      const edge = (x0, x1) => 'M' + xs(x0, x1).map(x => f(x) + ' ' + f(top(x))).join(' L');
-      // each geometry variant (wide / narrow) carries its own gradients: an id resolved into a
-      // display:none svg paints nothing, so variants must not share ids.
-      const seg = (cls, v, parts) => {
-        const gid = id + v;
-        return `<svg class="hoa-ribbon ${cls} hoa-r${v}" viewBox="0 0 160 80" preserveAspectRatio="none" focusable="false"><defs>
-            <linearGradient id="${gid}g" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="160" y2="0">${stops}</linearGradient>
-            <linearGradient id="${gid}h" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="160" y2="0">${rstops}</linearGradient>
-          </defs>
-          ${parts.map(([x0, x1, g]) => `<path d="${piece(x0, x1)}" fill="url(#${gid}${g})"/>`).join('')}
-          ${parts.map(([x0, x1]) => `<path d="${edge(x0, x1)}" fill="none" stroke="#fff" stroke-opacity=".35" stroke-width="1" stroke-linecap="round" vector-effect="non-scaling-stroke"/>`).join('')}
-        </svg>`;
-      };
-      const sec = t.secondary;
-      // The ribbon changes layer where the band crosses the bubble's right rim (centre x
-      // 46% of 160 = 73.6; radius = half the bubble diameter, 17cqw wide / 25cqw narrow),
-      // so no join falls inside the bubble. The back segment runs 1.5 units past the
-      // seam; both use the same userSpaceOnUse gradient so the colours match across it.
-      const seamW = 73.6 + 27.2, seamN = 73.6 + 40;
-      const back = (v, sm) => seg('hoa-ribbon-back', v, [[-4, sm + 1.5, 'g']]);
-      const front = (v, sm) => seg('hoa-ribbon-front', v, [[sm, xt, 'g'], [xt, 164, 'h']]);
+      const initial = ctx.initial && ctx.initial !== '·' ? escapeHtml(ctx.initial) : '';
+      const spec = ['#ff9ad5', '#8fe3ff', '#b79cff', '#8bf5c4', '#ffe08f'];
+      // 40 wedges of 9deg around (45, 28): a repeating conic sweep drawn as paths
+      const cx = 45, cy = 28, R = 90;
+      let wedges = '';
+      for (let i = 0; i < 40; i++) {
+        const a0 = (i * 9 + 10) * Math.PI / 180, a1 = ((i + 1) * 9 + 10.6) * Math.PI / 180;
+        const p = a => `${(cx + R * Math.sin(a)).toFixed(2)} ${(cy - R * Math.cos(a)).toFixed(2)}`;
+        wedges += `<path d="M${cx} ${cy} L${p(a0)} L${p(a1)} Z" fill="${spec[i % 5]}"/>`;
+      }
+      const bubble = `<svg class="hob" viewBox="0 0 100 100" focusable="false" aria-hidden="true"><defs>
+          <filter id="${id}s" x="-10%" y="-10%" width="120%" height="120%"><feTurbulence type="fractalNoise" baseFrequency=".035" numOctaves="2" seed="7"/><feDisplacementMap in="SourceGraphic" scale="14" xChannelSelector="R" yChannelSelector="G"/><feGaussianBlur stdDeviation=".5"/></filter>
+          <radialGradient id="${id}r"><stop offset=".56" stop-color="#fff" stop-opacity="0"/><stop offset=".7" stop-color="#fff"/><stop offset=".95" stop-color="#fff"/><stop offset=".99" stop-color="#fff" stop-opacity="0"/></radialGradient>
+          <mask id="${id}m"><circle cx="50" cy="50" r="50" fill="url(#${id}r)"/></mask>
+          <radialGradient id="${id}k" cx=".5" cy=".12" r=".22"><stop offset="0" stop-color="${ctx.t.canvas}" stop-opacity=".6"/><stop offset="1" stop-color="${ctx.t.canvas}" stop-opacity="0"/></radialGradient>
+        </defs>
+        <circle cx="50" cy="50" r="48.5" fill="rgba(255,255,255,.06)"/>
+        <g mask="url(#${id}m)" opacity=".5"><g filter="url(#${id}s)">${wedges}</g></g>
+        <circle cx="50" cy="50" r="49" fill="url(#${id}k)"/>
+        <circle cx="50" cy="50" r="49.2" fill="none" stroke="#fff" stroke-opacity=".55" stroke-width=".6"/>
+      </svg>`;
       return `<div class="hoa">
-        <i class="hoa-bloom"></i>
-        ${back('w', seamW)}${back('n', seamN)}
-        <div class="hob">
-          <i class="hob-halo"></i><i class="hob-body"></i><i class="hob-thin"></i><i class="hob-film"></i><i class="hob-rim"></i><i class="hob-rim hob-rim-hi"></i>
-          <svg class="hob-arcs" viewBox="0 0 100 100" focusable="false">
-            <path d="M87.2 67.3 A41 41 0 0 1 60.6 89.6" fill="none" stroke="${sec}" stroke-width="3" stroke-linecap="round" opacity=".5" style="filter:blur(2px)"/>
-            <path d="M87.2 67.3 A41 41 0 0 1 60.6 89.6" fill="none" stroke="${sec}" stroke-width="1.3" stroke-linecap="round" opacity=".95"/>
-            <path d="M15.6 33.9 A38 38 0 0 1 33.7 15.5" fill="none" stroke="#fff" stroke-width="1.2" stroke-linecap="round" opacity=".85"/>
-            <circle cx="39" cy="12.6" r="0.9" fill="#fff" opacity=".8"/>
-          </svg>
-        </div>
-        ${front('w', seamW)}${front('n', seamN)}
+        <div class="hof"><i class="hof-fringe"></i><i class="hof-angle"></i><i class="hof-sheen"></i><b class="hof-mark">${initial}</b></div>
+        ${bubble}
       </div>`;
     },
 
     materials: [
-      { name: 'Iridescent panel', css: 'background: linear-gradient({cardSolid}, {cardSolid}) padding-box, {specConic} border-box; border: 1px solid transparent; border-radius: 20px; box-shadow: {lift}; /* near-black panel; the spectrum is only the 1px hairline edge */' },
+      { name: 'Foil plane', css: 'background: #ece8f1; border-radius: 2.4cqw; transform: perspective(900px) rotateX(16deg) rotate(-8deg); /* layer 1: repeating-radial-gradient(circle at 28% 118%, #ff9ad5 0 2.2cqw, #8fe3ff 3.4cqw, #b79cff 4.6cqw, #8bf5c4 5.8cqw, #ffe08f 7cqw, #ff9ad5 8.2cqw) at 62% alpha; layer 2: conic-gradient(from 200deg at 72% 30%, the same five stops) at 40% alpha; the brand initial debossed (transparent text, white 1px highlight below, dark 1px shadow above) */' },
+      { name: 'Featured panel', css: 'background: linear-gradient({cardSolid}, {cardSolid}) padding-box, {specConic} border-box; border: 1px solid transparent; border-radius: 20px; box-shadow: {lift}; /* the ONE featured surface; every other panel is {cardSolid} with a 1px {hair} border */' },
       { name: 'Solid primary with spectral edge', css: 'background: {primary}; color: {onPrimary}; border-radius: 12px; box-shadow: inset 0 1px 0 rgba(255,255,255,.25), 0 12px 24px -12px {ctaGlow}; /* plus a 1.5px {specLinear} line along the top edge; no foil band across the label */' },
       { name: 'Chrome pill', css: 'background: {chrome}; color: {chromeInk}; border-radius: 999px; box-shadow: inset 0 1px 0 #fff, 0 2px 6px rgba(20,20,40,.2); /* selected segment, toggle knob */' },
       { name: 'Spectrum headline word', css: 'background: {hlFill}; -webkit-background-clip: text; background-clip: text; color: transparent; /* starts at {accentInk}, then fades into the spectrum */' },
-      { name: 'Thin-film bubble', css: 'background: transparent; border-radius: 50%; /* a transparent centre with a 1.5px blurred rim in {rimConic}, brighter at the top left, and an inner {secondary} reflection arc */' },
+      { name: 'Thin-film bubble', css: 'border-radius: 50%; /* transparent centre; a ring of spectral fringes (repeating conic sweep from 10deg at 45% 28%) swirled by turbulence, fading in from 56% of the radius; a thinner, darker "black spot" at the top; a thin white rim */' },
       { name: 'Hairline field', css: 'background: {cardSolid}; border: 1px solid {hairStrong}; border-radius: 12px; /* focus: swap the border for {specConic} plus a 3px lilac halo */' },
-      { name: 'Pearl wash', css: 'background: {pearl}, {canvas}; /* fixed pastel spectrum at ~15% in light mode, a faint glow in dark; decorative only */' },
+      { name: 'Pearl wash', css: 'background: {pearl}, {canvas}; /* fixed pastel spectrum at ~22% in light mode, a faint glow in dark; decorative only */' },
     ],
 
     rules: {
       do: [
-        'Keep the canvas near-black and let thin light do the work: a 1px iridescent hairline, one bubble rim, one ribbon, one gradient word.',
-        'Make panels near-black (canvas lightened 3.5%) with an iridescent hairline edge; no pastel wash on panels.',
-        'Use the primary as a solid color with a thin spectral line along its top edge; never a wide foil band across the label.',
-        'Keep the spectrum static and fixed; it is a finish, not a palette. In light mode it becomes a quiet pearl wash at ~15%.',
+        'Make the foil a surface: one large plane whose hue drifts in bands across it, never a 1px border on everything.',
+        'Keep the ground pearl (or strict black) and the type quiet; the foil is the statement.',
+        'Use the primary as a solid color with a flush spectral line along its top edge; never a wide foil band across the label.',
+        'Keep the spectrum static and fixed; it is a finish, not a palette.',
+        'Give exactly one panel the spectral hairline; the rest are solid with a plain hairline.',
       ],
       dont: [
-        'Fill large areas with the rainbow or use it as text outside the headline word.',
+        'Sweep a smooth five-stop rainbow left to right and call it foil; thin film comes in bands.',
+        'Put rainbow borders on every panel, chip and rule.',
         'Animate the foil or follow the pointer with a shimmer.',
         'Treat spectrum colors as brand roles; only the five brand colors have jobs.',
-        'Use a planet, an orb or a sheen band; the art is a thin bubble rim and a ribbon.',
         'Let the gradient word fall under 3:1 on the canvas; it starts at the shaded accent.',
       ],
     },
     // Deck copy (js/brand-deck.js): three principles, three do / don't lines, each short.
     deck: {
+      coverDisplay: 0.78,   // Unbounded is wide; a smaller start keeps the foil plane large
       principles: [
-        ['Near-black, lit by thin light', 'One hairline, one bubble rim, one ribbon.'],
+        ['Foil is a surface', 'One large plane whose color drifts in bands.'],
         ['The primary stays solid', 'With a thin spectral line along its top edge.'],
         ['The spectrum stays still', 'It is a finish, not a palette.'],
       ],
       do: [
-        'Keep the canvas near-black.',
-        'Give panels an iridescent hairline edge.',
+        'Keep the ground pearl or strict black.',
+        'Let one foil plane be the statement.',
         'Use the primary as a solid color.',
       ],
       dont: [
-        'Fill large areas with the rainbow.',
+        'Put rainbow borders on every panel.',
         'Animate the foil.',
         'Treat spectrum colors as brand roles.',
       ],

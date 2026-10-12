@@ -22,7 +22,7 @@ registerAesthetic({
   layout: { hero: 'split', palette: 'swatches', sections: 'two-col' },
   type: { ui: 'body', label: 'body', display: 0.86 },
   highlight: 'custom',
-  highlightNote: 'The accent word is set in accent text (shaded to read on the canvas) with a primary-tint offset sheet one step down and to the right (a coloured text-shadow); never an outline, never a pill.',
+  highlightNote: 'The headline is furniture: each line sits on a paper laminate slab with a Bacterio squiggle edge, and the last word on a solid secondary slab with ink text and a primary-tint offset sheet; never coloured text, never a pill.',
   cardFill: '--ab-m-paper',
 
   roles: {
@@ -81,7 +81,18 @@ registerAesthetic({
       '--ab-m-sec-lo': t.mix(t.secondary, paper, 0.22),
       '--ab-m-pri-lo': t.mix(t.primary, paper, 0.16),
       '--ab-type-pick-w': '400',
+      // text on the solid secondary slab (the headline's last word): black unless the secondary is dark
+      '--ab-m-on-sec': t.contrast(black, t.secondary) >= 4.5 ? black : paper,
     };
+  },
+
+  // The headline as furniture: the lead words on a paper slab (one slab per line,
+  // squiggle edge), the last word on a solid secondary slab. Escaped here.
+  headline(ctx, text) {
+    const m = String(text || '').match(/^([\s\S]*?)([^\s]+?)([.,;:!?…]*)$/);
+    if (!m) return '';
+    const lead = m[1].trim();
+    return `${lead ? `<span class="mm-slab">${escapeHtml(lead)}</span> ` : ''}<span class="ab-hl">${escapeHtml(m[2])}</span>${escapeHtml(m[3])}`;
   },
 
   // The showroom piece: a Carlton-like totem of stacked primitives (spine, two tilted
@@ -117,7 +128,8 @@ registerAesthetic({
     { name: 'Laminate: Checker', css: 'background: conic-gradient({mBlack} 25%, {mPaper} 0 50%, {mBlack} 0 75%, {mPaper} 0) 0 0 / 16px 16px; /* 8px squares; also the footer strip */' },
     { name: 'Laminate: Dots', css: 'background: radial-gradient(circle, {primary} 2.2px, transparent 2.7px) 0 0 / 11px 11px, {mPaper}; /* dot grid in the primary flat on paper */' },
     { name: 'Laminate: Zig-zag', css: 'background: linear-gradient(135deg, {secondary} 25%, transparent 25%) -6px 0 / 12px 12px, linear-gradient(225deg, {secondary} 25%, transparent 25%) -6px 0 / 12px 12px, linear-gradient(315deg, {secondary} 25%, transparent 25%) 0 0 / 12px 12px, linear-gradient(45deg, {secondary} 25%, transparent 25%) 0 0 / 12px 12px, {mPaper};' },
-    { name: 'Main action (circle on a plinth)', css: 'background: {primary}; color: {onPrimary}; border-radius: 999px; box-shadow: 6px 6px 0 {mSheetSec}; transition: transform 220ms cubic-bezier(.34,1.56,.64,1); /* an accent circle holds the arrow; press: scale(.94) with the overshoot curve */' },
+    { name: 'Main action (slab with a semicircle end)', css: 'background: {primary}; color: {onPrimary}; border-radius: 0 999px 999px 0; box-shadow: 6px 6px 0 {mSheetSec}; transition: transform 220ms cubic-bezier(.34,1.56,.64,1); /* a checker block holds the arrow; press: scale(.94) with the overshoot curve */' },
+    { name: 'Headline slab', css: 'background: {mPaper}; color: {mBlack}; padding: 0 .12em 10px; box-decoration-break: clone; /* a squiggle edge along the bottom; the last word on {secondary} with {mBlack} text and a .08em {mSheet} offset sheet */' },
   ],
 
   rules: {
@@ -131,6 +143,7 @@ registerAesthetic({
       'Draw ink outlines, sticker strokes or black offset shadows; that is Neo-Brutal Pop.',
       'Scatter triangles, plus signs and squiggles as confetti, or add lanky flat people (Corporate Memphis).',
       'Place text on a pattern; type sits on flat paper or a flat colour only.',
+      'Round a control into a capsule; controls are slabs, cylinders and semicircle ends.',
       'Use warm earthy rounded type, rainbows or flower shapes (Groovy 70s) or glossy gradients.',
     ],
   },

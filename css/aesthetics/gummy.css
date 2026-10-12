@@ -1,5 +1,271 @@
 /* ---------------------------------------------------------------------
-   47 Gummy — stub (P6 scaffold). Every selector in this file must be
-   scoped under .ab[data-ae="gummy"]. The builder fills it in; see
-   js/aesthetics/gummy.js and docs/research/round6.md.
+   47 Gummy — translucent, squishy, sweet. Every selector is scoped under
+   .ab[data-ae="gummy"]. Candy jellies on a pale tinted ground: transmitted
+   light pooling bottom-right, a denser Fresnel rim, two or three tiny specular
+   dots top-left, a shadow in the jelly's OWN colour with a bright caustic in it,
+   squash-and-stretch on press. Never a grey shadow, never an opaque matte fill
+   (Clay), never a big gloss cap (Frutiger Aero). Vars from tokens():
+   --ab-gm-b / -b-light / -b-deep / -b-rim / -b-sh / --ab-gm-on (the primary as a
+   button jelly), --ab-gm-s* (secondary button jelly), --ab-gm-f1..f4 (flavours),
+   --ab-gm-card, --ab-gm-tray (candy mould), --ab-gm-word (the jelly word),
+   --ab-gm-seal / -seal2 (scalloped seals as SVG data URIs).
 ------------------------------------------------------------------------ */
+
+.ab[data-ae="gummy"] {
+  font-synthesis: none;
+  border-radius: 28px;
+  --gm-dots: radial-gradient(7px 4px at 17px 9px, #fff 58%, rgba(255, 255, 255, 0) 74%), radial-gradient(2.4px 2.4px at 28px 6px, #fff 60%, rgba(255, 255, 255, 0) 78%), radial-gradient(1.6px 1.6px at 13px 16px, rgba(255, 255, 255, 0.85) 60%, rgba(255, 255, 255, 0) 80%);
+  --gm-jelly: radial-gradient(55% 75% at 74% 84%, var(--ab-gm-b-light), rgba(255, 255, 255, 0) 72%), linear-gradient(160deg, var(--ab-gm-b-light) -30%, var(--ab-gm-b) 46%, var(--ab-gm-b-deep) 100%);
+  --gm-jelly-sh: inset 0 0 0 2px color-mix(in srgb, var(--ab-gm-b-rim) 38%, transparent), inset 0 -4px 7px color-mix(in srgb, var(--ab-gm-b-deep) 45%, transparent), inset 3px 4px 7px rgba(255, 255, 255, 0.36), 0 11px 16px -6px var(--ab-gm-b-sh);
+  --gm-sugar-rule: radial-gradient(circle, color-mix(in srgb, var(--ab-ink) 26%, transparent) 1.4px, transparent 1.9px) 0 50% / 11px 6px repeat-x;
+}
+
+/* header */
+.ab[data-ae="gummy"] .ab-brand { font-weight: 400; letter-spacing: -0.01em; }
+.ab[data-ae="gummy"] .ab-mark {
+  position: relative; width: 30px; height: 28px; border-radius: 50% 50% 22% 22% / 62% 62% 24% 24%;
+  background: var(--gm-dots), var(--gm-jelly); color: var(--ab-gm-on); box-shadow: var(--gm-jelly-sh); font-weight: 400;
+}
+.ab[data-ae="gummy"] .ab-tag { letter-spacing: 0.08em; }
+.ab[data-ae="gummy"] .ab-rule { height: 6px; background: var(--gm-sugar-rule); }
+.ab[data-ae="gummy"] .ab-label { font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: lowercase; color: var(--ab-ink); }
+.ab[data-ae="gummy"] .ab-labelrow .ab-label:last-child:not(:first-child) { font-weight: 400; color: var(--ab-muted); text-transform: none; letter-spacing: 0.02em; }
+.ab[data-ae="gummy"] .ab-n { display: inline-block; margin-right: 8px; font-family: var(--ab-font-h); font-size: 13px; letter-spacing: 0; color: var(--ab-ink); }
+.ab[data-ae="gummy"] .ab-n::after { content: none; }
+
+/* hero: a fat lowercase headline with a jelly word, the scalloped seal, then the candy spill */
+.ab[data-ae="gummy"][data-hero="centered"] .ab-hero { justify-items: stretch; gap: clamp(8px, 2cqw, 22px); padding-top: clamp(34px, 5.4cqw, 64px); padding-bottom: clamp(18px, 2.6cqw, 30px); }
+.ab[data-ae="gummy"][data-hero="centered"] .ab-hero-copy {
+  max-width: none; text-align: left; display: grid; grid-template-columns: minmax(0, 1fr) auto; column-gap: clamp(14px, 3cqw, 36px); align-items: start;
+}
+.ab[data-ae="gummy"] .ab-hero-copy > .ab-kicker {
+  grid-column: 2; grid-row: 1 / span 2; justify-self: end; align-self: start; display: grid; place-items: center; text-align: center;
+  width: clamp(86px, 11cqw, 128px); aspect-ratio: 1; margin: 0 !important; padding: 18px; transform: rotate(12deg);
+  background: var(--ab-gm-seal) center / contain no-repeat; color: var(--ab-gm-seal-on);
+  font-family: var(--ab-font-h); font-size: clamp(13px, 1.6cqw, 18px); line-height: 1.02; letter-spacing: 0; text-transform: lowercase;
+  filter: drop-shadow(0 10px 10px color-mix(in srgb, var(--ab-gm-f3-deep) 45%, transparent));
+}
+.ab[data-ae="gummy"] .ab-headline {
+  grid-column: 1; grid-row: 1; font-weight: 400; letter-spacing: -0.02em; line-height: 0.98; text-transform: lowercase; color: var(--ab-ink); text-wrap: balance; overflow-wrap: normal;
+}
+.ab[data-ae="gummy"]:not(.ab-slide)[data-hero="centered"] .ab-headline { font-size: calc(clamp(42px, 8.6cqw, 108px) * var(--ab-hl-scale, 1) * var(--ab-hs, 1) * var(--ab-display, 1)); }
+.ab[data-ae="gummy"] .ab-subcopy { grid-column: 1; grid-row: 2; margin-left: 0 !important; margin-top: clamp(14px, 2cqw, 22px) !important; color: var(--ab-muted); font-size: clamp(14px, 1.5cqw, 16px); }
+.ab[data-ae="gummy"] .ab-sub-lead { color: var(--ab-ink); font-weight: 700; }
+
+/* the jelly word */
+.ab[data-ae="gummy"] .ab-hl { color: var(--ab-gm-word); background: none; padding: 0; }
+.ab[data-ae="gummy"] .gm-jw { position: relative; display: inline-block; transform: scale(1.05, 0.93); transform-origin: 50% 88%; padding: 0 0.04em; }
+.ab[data-ae="gummy"] .gm-jw-t {
+  position: relative; z-index: 1;
+  text-shadow: -0.016em -0.02em 0 rgba(255, 255, 255, 0.78), 0 0.02em 0 color-mix(in srgb, var(--ab-gm-word) 70%, black), 0 0.12em 0.12em color-mix(in srgb, var(--ab-gm-word) 55%, transparent);
+}
+.ab[data-ae="gummy"][data-mode="dark"] .gm-jw-t { text-shadow: -0.016em -0.02em 0 rgba(255, 255, 255, 0.5), 0 0.02em 0 color-mix(in srgb, var(--ab-gm-word) 70%, black), 0 0.1em 0.2em color-mix(in srgb, var(--ab-gm-word) 75%, transparent); }
+.ab[data-ae="gummy"] .gm-jw::after { content: ""; position: absolute; left: 30%; right: 6%; bottom: -0.05em; height: 0.09em; border-radius: 50%; background: radial-gradient(closest-side, color-mix(in srgb, var(--ab-gm-word) 30%, white), transparent); opacity: 0.9; }
+.ab[data-ae="gummy"] .gm-jw i { position: absolute; z-index: 2; border-radius: 50%; background: #fff; }
+.ab[data-ae="gummy"] .gm-dot1 { left: 0.14em; top: 0.3em; width: 0.13em; height: 0.075em; transform: rotate(-30deg); }
+.ab[data-ae="gummy"] .gm-dot2 { left: 0.32em; top: 0.25em; width: 0.045em; height: 0.045em; }
+
+/* the art: the candy spill */
+.ab[data-ae="gummy"][data-hero="centered"] .ab-art { --ab-art-ratio: 1200 / 350; aspect-ratio: var(--ab-art-ratio); }
+.ab[data-ae="gummy"] .gm-spill { display: block; width: 100%; height: 100%; overflow: visible; }
+.ab[data-ae="gummy"] .ab-art > .gm-spill { position: absolute; inset: 0; }
+
+/* palette: every colour is a gumdrop */
+.ab[data-ae="gummy"] .ab-swatch { align-items: center; text-align: center; }
+.ab[data-ae="gummy"] .ab-chip {
+  position: relative; width: clamp(62px, 9cqw, 96px); height: auto; aspect-ratio: 1.08; margin: 4px auto 18px;
+  border-radius: 50% 50% 22% 22% / 64% 64% 24% 24%;
+  background: var(--gm-dots), radial-gradient(55% 75% at 74% 84%, color-mix(in srgb, var(--sw) 55%, white), rgba(255, 255, 255, 0) 72%), linear-gradient(160deg, color-mix(in srgb, var(--sw) 60%, white) -20%, var(--sw) 48%, color-mix(in srgb, var(--sw) 72%, black)) !important;
+  box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--sw) 60%, black 40%), inset 3px 4px 7px rgba(255, 255, 255, 0.36), 0 13px 14px -8px color-mix(in srgb, var(--sw) 70%, transparent) !important;
+  opacity: 0.94;
+}
+.ab[data-ae="gummy"] .ab-swatch[data-role="canvas"] .ab-chip { box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--ab-gm-f1) 22%, transparent), inset 3px 4px 7px #fff, 0 13px 14px -8px var(--ab-gm-shadow) !important; }
+.ab[data-ae="gummy"] .ab-chip::after { content: ""; position: absolute; left: 34%; right: 8%; bottom: -12px; height: 7px; border-radius: 50%; background: radial-gradient(closest-side, color-mix(in srgb, var(--sw) 45%, white), transparent); }
+.ab[data-ae="gummy"] .ab-sw-role { font-family: var(--ab-font-h); font-weight: 400; font-size: 15px; text-transform: lowercase; }
+.ab[data-ae="gummy"] .ab-sw-hex { font-family: var(--ab-font-b); }
+
+/* type: pale candy cards with a shadow in the primary's colour */
+.ab[data-ae="gummy"] .ab-type-grid { gap: clamp(12px, 2.2cqw, 22px); }
+.ab[data-ae="gummy"] .ab-type-col, .ab[data-ae="gummy"] .ab-card, .ab[data-ae="gummy"] .ab-panel, .ab[data-ae="gummy"] .ab-list {
+  position: relative; border: 0; border-radius: 26px; background: var(--ab-gm-card);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.85), 0 0 0 1px color-mix(in srgb, var(--ab-gm-f1) 10%, transparent), 0 22px 36px -22px var(--ab-gm-shadow);
+}
+.ab[data-ae="gummy"][data-mode="dark"] .ab-type-col, .ab[data-ae="gummy"][data-mode="dark"] .ab-card, .ab[data-ae="gummy"][data-mode="dark"] .ab-panel, .ab[data-ae="gummy"][data-mode="dark"] .ab-list { box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 0 0 1px rgba(255, 255, 255, 0.06), 0 22px 40px -22px rgba(0, 0, 0, 0.7); }
+/* the type cards, the 02 panel and the list are candy MOULDS (the tray the jellies set in), not raised
+   cards: a tinted ground with an inset rim. Only the 01 card is raised, with a gumdrop perched on it. */
+.ab[data-ae="gummy"] .ab-type-col, .ab[data-ae="gummy"] .ab-panel, .ab[data-ae="gummy"] .ab-list {
+  background: var(--ab-gm-tray); box-shadow: inset 0 4px 10px rgba(42, 27, 61, 0.1), inset 0 -2px 0 rgba(255, 255, 255, 0.75), inset 0 0 0 1px color-mix(in srgb, var(--ab-gm-f1) 8%, transparent);
+}
+.ab[data-ae="gummy"][data-mode="dark"] .ab-type-col, .ab[data-ae="gummy"][data-mode="dark"] .ab-panel, .ab[data-ae="gummy"][data-mode="dark"] .ab-list { box-shadow: inset 0 4px 12px rgba(0, 0, 0, 0.45), inset 0 -1px 0 rgba(255, 255, 255, 0.07); }
+.ab[data-ae="gummy"] .ab-panel .ab-input, .ab[data-ae="gummy"] .ab-list .ab-row-bar, .ab[data-ae="gummy"] .ab-list .ab-row-status { background: var(--ab-gm-card); }
+.ab[data-ae="gummy"] .ab-type-col { padding: 18px 20px 18px; }
+.ab[data-ae="gummy"] .ab-type-role { font-weight: 700; letter-spacing: 0.06em; text-transform: lowercase; color: var(--ab-ink); font-size: 12px; }
+.ab[data-ae="gummy"] .ab-fit { border: 0; border-radius: 999px; padding: 3px 11px; font-weight: 700; }
+.ab[data-ae="gummy"] .ab-fit[data-fit="match"] { background: var(--ab-gm-f2-pale); color: var(--ab-ink); box-shadow: inset 0 0 0 1.5px color-mix(in srgb, var(--ab-gm-f2) 45%, transparent); }
+.ab[data-ae="gummy"][data-mode="dark"] .ab-fit[data-fit="match"] { background: color-mix(in srgb, var(--ab-gm-f2) 30%, var(--ab-canvas)); }
+.ab[data-ae="gummy"] .ab-type-k { font-weight: 700; letter-spacing: 0.06em; }
+.ab[data-ae="gummy"] .ab-type-apply { border: 0; border-radius: 999px; padding: 10px 20px; background: var(--ab-gm-tray); color: var(--ab-ink); font-weight: 700; box-shadow: inset 0 3px 6px rgba(42, 27, 61, 0.12), inset 0 -2px 0 rgba(255, 255, 255, 0.7); }
+.ab[data-ae="gummy"] .ab-type-apply:hover { background: var(--ab-gm-f1-pale); }
+
+/* 01 card: a gumdrop perched on the top edge spills its colour onto the card */
+.ab[data-ae="gummy"] .ab-card { padding: clamp(22px, 3cqw, 30px); overflow: visible; background: radial-gradient(42% 46% at 88% 0%, color-mix(in srgb, var(--ab-gm-f2-light) 34%, transparent), transparent 70%), var(--ab-gm-card); }
+.ab[data-ae="gummy"] .ab-card::before {
+  content: ""; position: absolute; top: -30px; right: 34px; width: 62px; height: 56px; border-radius: 50% 50% 22% 22% / 64% 64% 24% 24%;
+  background: var(--gm-dots), radial-gradient(55% 75% at 74% 84%, var(--ab-gm-f2-light), rgba(255, 255, 255, 0) 72%), linear-gradient(160deg, var(--ab-gm-f2-light) -20%, var(--ab-gm-f2) 48%, var(--ab-gm-f2-deep));
+  box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--ab-gm-f2-deep) 40%, transparent), inset 3px 4px 7px rgba(255, 255, 255, 0.36), 0 12px 14px -6px color-mix(in srgb, var(--ab-gm-f2-deep) 55%, transparent);
+  transform: rotate(8deg); opacity: 0.93;
+}
+.ab[data-ae="gummy"] .ab-card::after { content: ""; position: absolute; top: 24px; right: 40px; width: 40px; height: 8px; border-radius: 50%; background: radial-gradient(closest-side, color-mix(in srgb, var(--ab-gm-f2-light) 80%, white), transparent); }
+/* segmented: a candy mould; the chosen segment is a jelly bean */
+.ab[data-ae="gummy"] .ab-seg { gap: 4px; padding: 5px; border-radius: 999px; background: var(--ab-gm-tray); box-shadow: inset 0 3px 6px rgba(42, 27, 61, 0.14), inset 0 -2px 0 rgba(255, 255, 255, 0.7); }
+.ab[data-ae="gummy"][data-mode="dark"] .ab-seg { box-shadow: inset 0 3px 6px rgba(0, 0, 0, 0.5), inset 0 -1px 0 rgba(255, 255, 255, 0.08); }
+.ab[data-ae="gummy"] .ab-seg-btn { position: relative; border-radius: 999px; font-size: 13px; font-weight: 700; color: var(--ab-muted); transition: transform 0.14s cubic-bezier(0.3, 1.6, 0.5, 1); }
+.ab[data-ae="gummy"] .ab-seg-btn[aria-pressed="true"] { background: var(--gm-dots), var(--gm-jelly); color: var(--ab-gm-on); box-shadow: var(--gm-jelly-sh); }
+.ab[data-ae="gummy"] .ab-seg-btn:active { transform: scale(1.08, 0.88); transform-origin: 50% 100%; }
+.ab[data-ae="gummy"] .ab-card-title { font-weight: 400; text-transform: lowercase; letter-spacing: -0.01em; font-size: clamp(24px, 3cqw, 32px); }
+.ab[data-ae="gummy"] .ab-card-body { font-size: 14px; color: var(--ab-muted); }
+
+/* the jelly CTA: Set / Wobble / Squish */
+.ab[data-ae="gummy"] .ab-cta {
+  position: relative; justify-content: center; gap: 12px; min-height: 52px; padding: 13px 22px; border-radius: 999px;
+  background: var(--gm-dots), var(--gm-jelly); color: var(--ab-gm-on); box-shadow: var(--gm-jelly-sh);
+  font-size: 15px; font-weight: 700; transition: transform 0.14s cubic-bezier(0.3, 1.6, 0.5, 1), box-shadow 0.14s;
+}
+.ab[data-ae="gummy"] .ab-cta::after { content: ""; position: absolute; left: 44%; right: 14%; bottom: -13px; height: 9px; border-radius: 50%; background: radial-gradient(closest-side, var(--ab-gm-b-light), transparent); pointer-events: none; }
+.ab[data-ae="gummy"] .ab-cta-arrow::before { content: "→"; font-size: 17px; }
+.ab[data-ae="gummy"] .ab-cta:hover, .ab[data-ae="gummy"] .ab-cta.is-hover {
+  transform: scale(1.03) rotate(-1.2deg);
+  background: radial-gradient(7px 4px at 18px 10px, #fff 58%, rgba(255, 255, 255, 0) 74%), radial-gradient(2.4px 2.4px at 29px 7px, #fff 60%, rgba(255, 255, 255, 0) 78%), radial-gradient(1.6px 1.6px at 14px 17px, rgba(255, 255, 255, 0.85) 60%, rgba(255, 255, 255, 0) 80%), var(--gm-jelly);
+}
+.ab[data-ae="gummy"] .ab-cta:active, .ab[data-ae="gummy"] .ab-cta.is-pressed {
+  transform: scale(1.08, 0.86); transform-origin: 50% 100%;
+  box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--ab-gm-b-rim) 38%, transparent), inset 0 -5px 8px color-mix(in srgb, var(--ab-gm-b-deep) 55%, transparent), inset 3px 3px 6px rgba(255, 255, 255, 0.3), 0 5px 10px -4px var(--ab-gm-b-sh), 0 3px 18px -6px var(--ab-gm-b-sh);
+}
+.ab[data-ae="gummy"] .ab-cta:focus-visible, .ab[data-ae="gummy"] .ab-seg-btn:focus-visible, .ab[data-ae="gummy"] .ab-switch:focus-visible, .ab[data-ae="gummy"] .ab-type-apply:focus-visible { outline: 3px solid color-mix(in srgb, var(--ab-gm-b) 70%, transparent); outline-offset: 3px; }
+
+/* 02 jelly: a candy mould field, a translucent tube with a gumdrop knob */
+.ab[data-ae="gummy"] .ab-panel { padding: clamp(22px, 3cqw, 30px); }
+.ab[data-ae="gummy"] .ab-fieldlabel { font-weight: 700; font-size: 13px; color: var(--ab-ink); }
+.ab[data-ae="gummy"] .ab-input {
+  border: 0; border-radius: 16px; padding: 14px 18px; background: var(--ab-gm-tray); color: var(--ab-ink); font-weight: 600;
+  box-shadow: inset 0 3px 6px rgba(42, 27, 61, 0.14), inset 0 -2px 0 rgba(255, 255, 255, 0.7);
+}
+.ab[data-ae="gummy"][data-mode="dark"] .ab-input { box-shadow: inset 0 3px 6px rgba(0, 0, 0, 0.5), inset 0 -1px 0 rgba(255, 255, 255, 0.08); }
+.ab[data-ae="gummy"] .ab-input:focus { box-shadow: inset 0 3px 6px rgba(42, 27, 61, 0.14), 0 0 0 3px color-mix(in srgb, var(--ab-gm-b) 70%, transparent), 0 6px 16px -4px var(--ab-gm-b-sh); }
+.ab[data-ae="gummy"] .ab-toggle { font-weight: 700; font-size: 14px; }
+.ab[data-ae="gummy"] .ab-switch {
+  width: 60px; height: 32px; border-radius: 999px; overflow: visible;
+  background: linear-gradient(180deg, color-mix(in srgb, var(--ab-gm-f2) 18%, transparent), color-mix(in srgb, var(--ab-gm-f2) 34%, transparent));
+  box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--ab-gm-f2) 40%, transparent), inset 0 3px 5px rgba(42, 27, 61, 0.12), inset 0 -6px 6px -3px rgba(255, 255, 255, 0.6);
+}
+.ab[data-ae="gummy"] .ab-switch::before {
+  left: 1px; top: -1px; width: 31px; height: 30px; border-radius: 50% 50% 24% 24% / 64% 64% 26% 26%;
+  background: radial-gradient(5px 3px at 9px 7px, #fff 60%, rgba(255, 255, 255, 0) 76%), radial-gradient(55% 75% at 74% 84%, #fff, rgba(255, 255, 255, 0) 72%), linear-gradient(160deg, #fff, #F3E7EE 50%, #D9C5D2);
+  box-shadow: inset 0 0 0 1.5px rgba(42, 27, 61, 0.12), 0 5px 7px -2px rgba(42, 27, 61, 0.25); transition: transform 0.16s cubic-bezier(0.3, 1.6, 0.5, 1);
+}
+.ab[data-ae="gummy"] .ab-switch:checked { background: linear-gradient(180deg, color-mix(in srgb, var(--ab-gm-b) 22%, transparent), color-mix(in srgb, var(--ab-gm-b) 40%, transparent)); box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--ab-gm-b) 45%, transparent), inset 0 3px 5px rgba(42, 27, 61, 0.12); }
+.ab[data-ae="gummy"] .ab-switch:checked::before { transform: translateX(27px) scale(1.04, 0.96); background: radial-gradient(5px 3px at 9px 7px, #fff 60%, rgba(255, 255, 255, 0) 76%), var(--gm-jelly); box-shadow: inset 0 0 0 1.5px color-mix(in srgb, var(--ab-gm-b-rim) 40%, transparent), 0 6px 8px -2px var(--ab-gm-b-sh); }
+.ab[data-ae="gummy"] .ab-status { color: var(--ab-muted); font-size: 12px; }
+.ab[data-ae="gummy"] .ab-states { margin-top: 24px; gap: 12px; }
+.ab[data-ae="gummy"] .ab-state-ctl { margin-bottom: 16px; min-height: 44px; font-size: 13.5px; }
+.ab[data-ae="gummy"] .ab-states .ab-cta-arrow { display: none; }
+.ab[data-ae="gummy"] .ab-state-name { font-weight: 700; color: var(--ab-ink); text-transform: lowercase; }
+
+/* 03 in use: gumdrop bullets, gummy-worm progress in three flavours */
+.ab[data-ae="gummy"] .ab-list { padding: 8px 20px; }
+.ab[data-ae="gummy"] .ab-row { grid-template-columns: 2.4ch 30px minmax(0, 1fr) auto minmax(70px, 190px) 4.5ch; padding: 14px 2px; border-top: 0; background: var(--gm-sugar-rule); background-position: 0 0; background-size: 11px 3px; }
+.ab[data-ae="gummy"] .ab-row:first-child { background: none; }
+.ab[data-ae="gummy"] .ab-row:last-child { border-bottom: 0; }
+.ab[data-ae="gummy"] .ab-row-n { color: var(--ab-muted); font-weight: 700; }
+.ab[data-ae="gummy"] .ab-av {
+  display: grid; place-items: center; width: 28px; height: 26px; padding-top: 3px; border-radius: 50% 50% 24% 24% / 64% 64% 26% 26%; font-size: 11px; font-weight: 700; color: #fff; text-shadow: 0 1px 1px rgba(0, 0, 0, 0.35);
+  --c: var(--ab-gm-f1); --cl: var(--ab-gm-f1-light); --cd: var(--ab-gm-f1-deep);
+  background: radial-gradient(4px 2.4px at 8px 7px, #fff 60%, rgba(255, 255, 255, 0) 76%), radial-gradient(55% 75% at 74% 84%, var(--cl), rgba(255, 255, 255, 0) 72%), linear-gradient(160deg, var(--cl) -20%, var(--c) 48%, var(--cd));
+  box-shadow: inset 0 -2px 4px color-mix(in srgb, var(--cd) 50%, transparent), 0 6px 8px -3px color-mix(in srgb, var(--cd) 60%, transparent);
+}
+.ab[data-ae="gummy"] .ab-row:nth-child(2) .ab-av, .ab[data-ae="gummy"] .ab-row:nth-child(2) .ab-row-bar { --c: var(--ab-gm-f2); --cl: var(--ab-gm-f2-light); --cd: var(--ab-gm-f2-deep); }
+.ab[data-ae="gummy"] .ab-row:nth-child(3) .ab-av, .ab[data-ae="gummy"] .ab-row:nth-child(3) .ab-row-bar { --c: var(--ab-gm-f3); --cl: var(--ab-gm-f3-light); --cd: var(--ab-gm-f3-deep); }
+.ab[data-ae="gummy"] .ab-row-name { font-weight: 700; font-size: 14px; }
+.ab[data-ae="gummy"] .ab-row-status { padding: 3px 11px; border-radius: 999px; background: var(--ab-gm-tray); color: var(--ab-ink); font-weight: 600; box-shadow: inset 0 2px 3px rgba(42, 27, 61, 0.1); }
+.ab[data-ae="gummy"] .ab-row-bar {
+  --c: var(--ab-gm-f1); --cl: var(--ab-gm-f1-light); --cd: var(--ab-gm-f1-deep);
+  height: 16px; border-radius: 999px; overflow: visible; background: var(--ab-gm-tray); box-shadow: inset 0 2px 4px rgba(42, 27, 61, 0.14), inset 0 -1px 0 rgba(255, 255, 255, 0.7);
+}
+.ab[data-ae="gummy"] .ab-row-bar i {
+  position: relative; min-width: 16px; border-radius: 999px; opacity: 0.94;
+  background: radial-gradient(4px 2.4px at 7px 4px, #fff 60%, rgba(255, 255, 255, 0) 76%), repeating-linear-gradient(90deg, color-mix(in srgb, var(--cd) 45%, transparent) 0 2px, transparent 2px 10px), linear-gradient(180deg, var(--cl), var(--c) 55%, var(--cd));
+  box-shadow: inset 0 0 0 1.5px color-mix(in srgb, var(--cd) 40%, transparent), 0 6px 8px -3px color-mix(in srgb, var(--cd) 60%, transparent);
+}
+.ab[data-ae="gummy"] .ab-row-pct { font-weight: 700; color: var(--ab-ink); }
+
+/* footer */
+.ab[data-ae="gummy"] .ab-foot { border-top: 0; background: var(--gm-sugar-rule); background-position: 0 0; background-size: 11px 3px; padding-top: 20px; font-size: 12px; }
+.ab[data-ae="gummy"] .ab-motto { font-family: var(--ab-font-h); font-size: 15px; text-transform: lowercase; color: var(--ab-ink); display: inline-flex; align-items: center; }
+.ab[data-ae="gummy"] .ab-dot {
+  width: 16px; height: 15px; border-radius: 50% 50% 24% 24% / 64% 64% 26% 26%;
+  background: radial-gradient(3px 2px at 5px 4px, #fff 60%, rgba(255, 255, 255, 0) 76%), linear-gradient(160deg, var(--ab-gm-f3-light), var(--ab-gm-f3) 48%, var(--ab-gm-f3-deep));
+  box-shadow: 0 5px 6px -2px color-mix(in srgb, var(--ab-gm-f3-deep) 60%, transparent);
+}
+
+@container ab (max-width: 600px) {
+  .ab[data-ae="gummy"][data-hero="centered"] .ab-hero-copy { grid-template-columns: minmax(0, 1fr); }
+  .ab[data-ae="gummy"] .ab-hero-copy > .ab-kicker { grid-column: 1; grid-row: 1; justify-self: end; width: 78px; padding: 12px; font-size: 13px; margin: -8px -4px -36px 0 !important; position: relative; z-index: 2; }
+  .ab[data-ae="gummy"] .ab-headline { grid-row: 2; }
+  .ab[data-ae="gummy"] .ab-subcopy { grid-row: 3; }
+  .ab[data-ae="gummy"]:not(.ab-slide)[data-hero="centered"] .ab-headline { font-size: calc(clamp(38px, 12.6cqw, 60px) * var(--ab-hl-scale, 1) * var(--ab-hs, 1) * var(--ab-display, 1)); }
+  .ab[data-ae="gummy"][data-hero="centered"] .ab-art { --ab-art-ratio-narrow: 1.35; aspect-ratio: 1.35; margin: 0 calc(var(--ab-pad) * -0.5); width: calc(100% + var(--ab-pad)); }
+  .ab[data-ae="gummy"] .ab-swatches { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px 12px; }
+  .ab[data-ae="gummy"] .ab-swatch { display: flex; }
+  .ab[data-ae="gummy"] .ab-swatch[data-role="canvas"] { grid-column: 1 / -1; }
+  .ab[data-ae="gummy"] .ab-chip { grid-row: auto; width: 66px; height: auto; margin: 4px auto 16px; }
+  .ab[data-ae="gummy"] .ab-row { grid-template-columns: 2.4ch 30px minmax(0, 1fr) 4.5ch; row-gap: 8px; }
+  .ab[data-ae="gummy"] .ab-row-n { grid-column: 1; grid-row: 1; }
+  .ab[data-ae="gummy"] .ab-av { grid-column: 2; grid-row: 1 / span 2; align-self: start; }
+  .ab[data-ae="gummy"] .ab-row-name { grid-column: 3; grid-row: 1; white-space: normal; }
+  .ab[data-ae="gummy"] .ab-row-pct { grid-column: 4; grid-row: 1; }
+  .ab[data-ae="gummy"] .ab-row-status { grid-column: 3; grid-row: 2; justify-self: start; }
+  .ab[data-ae="gummy"] .ab-row-bar { grid-column: 3 / -1; grid-row: 3; }
+  .ab[data-ae="gummy"] .ab-card::before { width: 50px; height: 46px; top: -24px; right: 22px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ab[data-ae="gummy"] .ab-cta, .ab[data-ae="gummy"] .ab-seg-btn, .ab[data-ae="gummy"] .ab-switch::before { transition: none; }
+  .ab[data-ae="gummy"] .ab-cta:hover, .ab[data-ae="gummy"] .ab-cta:active, .ab[data-ae="gummy"] .ab-seg-btn:active { transform: none; filter: saturate(1.25); }
+}
+
+/* ---------- deck ---------- */
+/* cover: the headline and seal on top, the candy spill across the bottom of the slide (full bleed) */
+.ab.ab[data-ae="gummy"].ab-slide[data-slide="cover"] > .ab-deck-pattern { display: none; }
+.ab.ab[data-ae="gummy"].ab-slide[data-slide="cover"]:has(> .ab-deck-pattern) > .ab-in.ab-slide-in { padding-bottom: 26px; }
+.ab[data-ae="gummy"].ab-slide[data-slide="cover"] .ab-slide-body { overflow: visible; }
+.ab[data-ae="gummy"].ab-slide[data-slide="cover"] .ab-deck-cover { position: relative; height: 100%; justify-content: flex-start; }
+.ab.ab[data-ae="gummy"].ab-slide[data-slide="cover"] .ab-deck-cover .ab-hero { position: static; display: block; flex: none; padding-top: 26px; }
+.ab.ab[data-ae="gummy"].ab-slide[data-slide="cover"] .ab-deck-cover .ab-hero-copy { position: relative; z-index: 2; display: grid; grid-template-columns: minmax(0, 1fr) auto; max-width: none; width: 100%; text-align: left; }
+.ab.ab[data-ae="gummy"].ab-slide[data-slide="cover"] .ab-deck-cover .ab-art {
+  position: absolute !important; z-index: 1; left: -56px !important; right: auto !important; bottom: -30px; width: calc(100% + 112px) !important; max-width: none !important; aspect-ratio: 1200 / 350 !important;
+}
+.ab[data-ae="gummy"].ab-slide[data-slide="cover"] .ab-subcopy { display: none; }
+.ab[data-ae="gummy"].ab-slide[data-slide="cover"] .ab-deck-cover-meta { position: relative; z-index: 2; padding-top: 14px; }
+/* the closing strip: jelly drops in the three flavours, each with a coloured shadow */
+.ab[data-ae="gummy"].ab-slide .pt-deck-strip img, .ab[data-ae="gummy"].ab-slide .pt-deck-band img { display: none; }
+.ab[data-ae="gummy"].ab-slide .pt-deck-strip, .ab[data-ae="gummy"].ab-slide .pt-deck-band {
+  box-shadow: none;
+  background:
+    radial-gradient(7px 4px at 34px 38px, #fff 60%, transparent 75%) 0 0 / 144px 144px,
+    radial-gradient(7px 4px at 106px 110px, #fff 60%, transparent 75%) 0 0 / 144px 144px,
+    radial-gradient(6px 3.6px at 102px 30px, #fff 60%, transparent 75%) 0 0 / 144px 144px,
+    radial-gradient(30px 30px at 52px 54px, var(--ab-gm-f1-light), var(--ab-gm-f1) 55%, var(--ab-gm-f1-deep) 92%, transparent 100%) 0 0 / 144px 144px,
+    radial-gradient(34px 10px at 58px 92px, color-mix(in srgb, var(--ab-gm-f1-deep) 50%, transparent), transparent) 0 0 / 144px 144px,
+    radial-gradient(26px 26px at 120px 124px, var(--ab-gm-f2-light), var(--ab-gm-f2) 55%, var(--ab-gm-f2-deep) 92%, transparent 100%) 0 0 / 144px 144px,
+    radial-gradient(22px 22px at 116px 44px, var(--ab-gm-f3-light), var(--ab-gm-f3) 55%, var(--ab-gm-f3-deep) 92%, transparent 100%) 0 0 / 144px 144px,
+    radial-gradient(26px 8px at 120px 70px, color-mix(in srgb, var(--ab-gm-f3-deep) 50%, transparent), transparent) 0 0 / 144px 144px,
+    var(--ab-gm-tray);
+}
+
+/* the deck's product frame puts the list in a narrow column: the phone row layout */
+.ab[data-ae="gummy"] .ab-deck-prodgrid .ab-row { grid-template-columns: 2.4ch 30px minmax(0, 1fr) 4.5ch; row-gap: 6px; }
+.ab[data-ae="gummy"] .ab-deck-prodgrid .ab-row-n { grid-column: 1; grid-row: 1; }
+.ab[data-ae="gummy"] .ab-deck-prodgrid .ab-av { grid-column: 2; grid-row: 1 / span 2; align-self: start; }
+.ab[data-ae="gummy"] .ab-deck-prodgrid .ab-row-name { grid-column: 3; grid-row: 1; white-space: normal; }
+.ab[data-ae="gummy"] .ab-deck-prodgrid .ab-row-pct { grid-column: 4; grid-row: 1; }
+.ab[data-ae="gummy"] .ab-deck-prodgrid .ab-row-status { grid-column: 3; grid-row: 2; justify-self: start; }
+.ab[data-ae="gummy"] .ab-deck-prodgrid .ab-row-bar { grid-column: 3 / -1; grid-row: 3; }

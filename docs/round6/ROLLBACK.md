@@ -7,6 +7,13 @@ last tag you are happy with.
 | Tag | State |
 |-----|-------|
 | `r6-0-baseline` | Before round 6: 36 aesthetics incl. the adversarial-review fixes (commit 115b10e). |
+| `r6-2-blend` | Blend engine + scaffold for 12 new aesthetics (new ones partly built at this point; existing 36 unchanged). |
+
+## Turning features off without git
+- **Blend:** set `const BLEND_ENABLED = false;` at the top of `js/blend.js`. The control disappears and every
+  surface ignores blends; saved brands keep their blend data. Full removal steps: `docs/blend.md`.
+- **One aesthetic:** delete its `<link>` and `<script>` lines in `index.html` (its brands then load with the
+  default aesthetic).
 
 (Further tags are added here as each phase lands.)
 

@@ -1,20 +1,21 @@
 /* ---------------------------------------------------------------------
-   11 Editorial Serif — a magazine page. Reference: NYT Magazine, Kinfolk,
-   Apartamento. Paper (the canvas, warmed), ink hairlines, a thick-over-thin
-   masthead rule, a cover headline at weight 400 with an italic highlight, a
-   duotone cover plate with a caption, a two-column standfirst, drop cap,
-   and contents lists with dotted leaders. No shadows, no gradients outside the
-   plate, radius 0. Variables --ab-hair, --ab-hair-soft, --ab-hair-strong,
-   --ab-eds-* come from js/aesthetics/editorial-serif.js tokens().
-   Hooks used: hero 'poster' (re-gridded: headline + standfirst beside the
-   plate), palette 'chips', sections 'asym', type ui/label sans, highlight
-   'custom', states 'button'.
+   11 Editorial Serif — a magazine cover, then a page. Reference: The Gentlewoman,
+   Fantastic Man, Apartamento, The Paris Review. Paper (the canvas, warmed), ink
+   hairlines, a thick-over-thin masthead rule; the hero is a full-width 4:5
+   duotone cover (art) with the masthead edge to edge across its top and the
+   headline over its lower third in paper colour at poster scale; the accent
+   word is ink italic. Section 02 is a text page (two columns, the only drop
+   cap, a pull quote, a byline) set as generated copy; the form lives on the
+   deck's Interface slide. No shadows, radius 0. Variables --ab-hair(-soft/
+   -strong), --ab-eds-* come from js/aesthetics/editorial-serif.js tokens().
+   Hooks used: hero 'poster' (re-gridded: copy over the plate), palette
+   'chips', sections 'asym', type ui/label sans, highlight 'custom', states
+   'button', deck.materialStage 'pattern', deck.coverDisplay.
 ------------------------------------------------------------------------ */
 
 .ab[data-ae="editorial-serif"] {
   border-radius: 0;
-  --eds-hl: calc(clamp(44px, 11.5cqw, 160px) * var(--ab-hl-scale, 1) * var(--ab-hs, 1) * var(--ab-display, 1));
-  --eds-plate-w: clamp(190px, 29cqw, 370px);
+  --eds-hl: calc(clamp(64px, 14cqw, 168px) * var(--ab-hl-scale, 1) * var(--ab-hs, 1) * var(--ab-display, 1));
 }
 .ab[data-ae="editorial-serif"] .ab-in { padding-top: clamp(16px, 2.4cqw, 28px); }
 
@@ -40,66 +41,68 @@
     linear-gradient(var(--ab-hair-strong), var(--ab-hair-strong)) 0 100% / 100% 1px no-repeat;
 }
 
-/* ---- hero: coverline headline + two-column standfirst beside the cover plate ---- */
+/* ---- hero: the cover. The plate spans the board; kicker, headline and standfirst sit
+   over its dark lower third in paper colour. ---- */
 .ab[data-ae="editorial-serif"][data-hero="poster"] .ab-hero {
-  display: grid; grid-template-columns: minmax(0, 1fr) var(--eds-plate-w);
-  column-gap: clamp(24px, 4.4cqw, 60px); row-gap: 0; align-items: start;
-  padding: clamp(26px, 4.4cqw, 56px) 0 clamp(30px, 4.6cqw, 58px);
+  display: grid; grid-template-columns: minmax(0, 1fr); align-items: end; gap: 0;
+  padding: clamp(18px, 3cqw, 36px) 0 clamp(26px, 4cqw, 48px);
 }
-.ab[data-ae="editorial-serif"][data-hero="poster"] .ab-hero-copy { display: contents; }
-.ab[data-ae="editorial-serif"] .ab-hero-copy { max-width: 64cqw; }
+.ab[data-ae="editorial-serif"][data-hero="poster"] .ab-hero-copy {
+  grid-area: 1 / 1; position: relative; z-index: 3; align-self: end; max-width: none; width: 100%;
+  padding: 0 6% calc(5% + 34px); color: var(--ab-eds-paperlight);
+}
 .ab[data-ae="editorial-serif"] .ab-kicker {
-  grid-column: 1; grid-row: 1; display: flex; align-items: center; gap: 14px; margin-bottom: clamp(14px, 2.2cqw, 26px) !important;
-  font-size: 11px; font-weight: 500; letter-spacing: 0.22em; color: var(--ab-ink);
+  display: flex; align-items: center; gap: 14px; margin-bottom: clamp(10px, 1.6cqw, 18px) !important;
+  font-size: 10px; font-weight: 500; letter-spacing: 0.22em; color: var(--ab-eds-paperlight);
 }
-.ab[data-ae="editorial-serif"] .ab-kicker::after { content: ""; flex: 1; height: 1px; background: var(--ab-hair); }
-.ab[data-ae="editorial-serif"][data-hero="poster"] .ab-headline {
-  grid-column: 1; grid-row: 2; font-weight: 400; font-size: var(--eds-hl); line-height: 0.94;
-  letter-spacing: calc(-0.028em * var(--ab-tr, 1)); text-wrap: balance; overflow-wrap: normal; hyphens: manual;
+.ab[data-ae="editorial-serif"] .ab-kicker::after { content: ""; flex: 0 0 clamp(40px, 10cqw, 120px); height: 1px; background: currentColor; opacity: .55; }
+.ab[data-ae="editorial-serif"] .ab-headline { font-weight: 400; font-variation-settings: "opsz" 96; }
+.ab[data-ae="editorial-serif"][data-hero="poster"] .ab-hero .ab-headline {
+  font-size: var(--eds-hl); line-height: 0.9; color: var(--ab-eds-paperlight);
+  letter-spacing: calc(-0.03em * var(--ab-tr, 1)); text-wrap: balance; overflow-wrap: normal; hyphens: manual; max-width: 11em;
 }
-.ab[data-ae="editorial-serif"] .ab-hl { font-style: italic; font-weight: 400; color: var(--ab-accent-ink); background: none; padding: 0; margin: 0; }
-.ab[data-ae="editorial-serif"][data-accent-text="low"] .ab-hl { background-image: none; color: var(--ab-accent-ink); }
+/* the accent word: italic, the same ink as the line (contrast, not colour) */
+.ab[data-ae="editorial-serif"] .ab-hl { font-style: italic; font-weight: 400; color: inherit; background: none; padding: 0; margin: 0; }
+.ab[data-ae="editorial-serif"][data-accent-text="low"] .ab-hl { background-image: none; color: inherit; }
 .ab[data-ae="editorial-serif"] .ab-subcopy {
-  grid-column: 1; grid-row: 3; align-self: end; margin: clamp(22px, 3.4cqw, 42px) 0 0 !important; max-width: none;
-  padding-top: clamp(12px, 1.8cqw, 20px); border-top: 1px solid var(--ab-hair);
-  font-size: clamp(16px, 2cqw, 23px); line-height: 1.38; color: var(--ab-ink); max-width: 30em;
+  margin: clamp(14px, 2cqw, 22px) 0 0 !important; max-width: 34em;
+  font-size: clamp(13px, 1.6cqw, 17px); line-height: 1.4; color: var(--ab-eds-paperlight);
 }
-.ab[data-ae="editorial-serif"] .ab-sub-lead { color: var(--ab-ink); }
-.ab[data-ae="editorial-serif"] .ab-sub-rest { color: var(--ab-muted); }
+.ab[data-ae="editorial-serif"] .ab-sub-lead, .ab[data-ae="editorial-serif"] .ab-sub-rest { color: inherit; }
+.ab[data-ae="editorial-serif"] .ab-sub-rest { opacity: .82; }
 
-/* ---- the cover plate: a duotone "photograph", a drop-cap initial, a caption ---- */
+/* ---- the cover plate: 4:5, full width; masthead edge to edge; caption + folio below ---- */
 .ab[data-ae="editorial-serif"][data-hero="poster"] .ab-art {
-  grid-column: 2; grid-row: 1 / span 3; position: relative; right: auto; bottom: auto; justify-self: end; align-self: start;
-  width: 100%; max-width: none; aspect-ratio: 3 / 4.15;
+  grid-area: 1 / 1; position: relative; right: auto; bottom: auto; justify-self: stretch; align-self: start;
+  width: 100%; max-width: none; aspect-ratio: 4 / 5.1;
 }
 .ab[data-ae="editorial-serif"] .eds { position: absolute; inset: 0; margin: 0; display: flex; flex-direction: column; gap: 9px; }
 .ab[data-ae="editorial-serif"] .eds i { display: block; font-style: normal; }
 .ab[data-ae="editorial-serif"] .eds-plate {
   position: relative; flex: 1; min-height: 0; overflow: hidden; isolation: isolate; container-type: size;
-  border: 1px solid var(--ab-hair-strong); background: var(--ab-eds-plate);
+  background: var(--ab-eds-deep);
 }
+.ab[data-ae="editorial-serif"] .eds-still { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
 /* 5% grain, multiplied over the plate */
 .ab[data-ae="editorial-serif"] .eds-grain {
-  position: absolute; inset: 0; z-index: 1; mix-blend-mode: multiply; opacity: 0.05; pointer-events: none;
+  position: absolute; inset: 0; z-index: 1; mix-blend-mode: multiply; opacity: 0.07; pointer-events: none;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .5 0 0 0 0 .5 0 0 0 0 .5 0 0 0 .9 0'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)'/%3E%3C/svg%3E");
 }
+/* the masthead: the brand name across the top of the plate, justified edge to edge */
+.ab[data-ae="editorial-serif"] .eds-mast {
+  position: absolute; z-index: 2; left: 3.5%; right: 3.5%; top: 2.2%; margin: 0;
+  font-family: var(--ab-font-h); font-weight: 400; font-variation-settings: "opsz" 96; line-height: 0.92;
+  font-size: min(19cqw, calc(93cqw / (var(--eds-mn, 12) * 0.5))); letter-spacing: -0.02em;
+  text-align: justify; text-align-last: justify; color: var(--ab-eds-deep); white-space: normal;
+}
 .ab[data-ae="editorial-serif"] .eds-no {
-  position: absolute; z-index: 3; left: 7%; top: 5%; font: 500 clamp(8px, 4.2cqw, 12px)/1 var(--ab-font-ui); letter-spacing: 0.22em; text-transform: uppercase; color: var(--ab-canvas);
+  position: absolute; z-index: 3; right: 4%; top: calc(4% + min(19cqw, calc(93cqw / (var(--eds-mn, 12) * 0.5)))); font: 500 9px/1 var(--ab-font-ui); letter-spacing: 0.2em; text-transform: uppercase; color: var(--ab-eds-deep);
 }
-/* the brand initial: 150% of the plate height, cropped by the bottom and left edges; a tonal letter
-   (plate mixed 28% toward canvas) so the cover type sits on top of it without a halo */
-.ab[data-ae="editorial-serif"] .eds-cap {
-  position: absolute; z-index: 2; left: -8%; bottom: -38%; font-family: var(--ab-font-h); font-weight: 400; font-size: 150cqh; line-height: 1; color: color-mix(in srgb, var(--ab-eds-plate) 72%, var(--ab-canvas) 28%);
-  text-transform: uppercase; text-shadow: none; pointer-events: none;
-}
-.ab[data-ae="editorial-serif"] .eds-cover { position: absolute; z-index: 3; left: 7%; right: 7%; bottom: 5%; display: flex; flex-direction: column; gap: 6px; }
-.ab[data-ae="editorial-serif"] .eds-line { font-family: var(--ab-font-h); font-style: italic; font-weight: 400; font-size: 22px; line-height: 1.1; position: relative; z-index: 2; color: var(--ab-canvas); }
-.ab[data-ae="editorial-serif"] .eds-sub { font: 400 9px/1.3 var(--ab-font-ui); letter-spacing: 0.2em; text-transform: uppercase;  position: relative; z-index: 2; color: var(--ab-canvas); }
 .ab[data-ae="editorial-serif"] .eds-fig {
-  display: flex; justify-content: space-between; gap: 10px; font-family: var(--ab-font-b); font-size: clamp(10.5px, 3.8cqw, 12.5px); line-height: 1.3; color: var(--ab-muted);
+  display: flex; justify-content: space-between; align-items: baseline; gap: 10px; font-family: var(--ab-font-b); font-size: 10px; line-height: 1.3; color: var(--ab-muted);
 }
 .ab[data-ae="editorial-serif"] .eds-fig em { font-style: italic; color: var(--ab-ink); }
-.ab[data-ae="editorial-serif"] .eds-fig span:last-child { font-family: var(--ab-font-ui); font-size: 0.82em; letter-spacing: 0.14em; text-transform: uppercase; white-space: nowrap; }
+.ab[data-ae="editorial-serif"] .eds-folio { font-family: var(--ab-font-ui); font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase; white-space: nowrap; padding-bottom: 3px; border-bottom: 1px solid var(--ab-primary); }
 
 /* ---- section labels: small caps, italic numerals ---- */
 .ab[data-ae="editorial-serif"] .ab-label { font-size: 10.5px; letter-spacing: 0.16em; font-weight: 500; }
@@ -175,16 +178,13 @@
 .ab[data-ae="editorial-serif"] .ab-card-title {
   margin: clamp(20px, 3cqw, 32px) 0 12px !important; font-weight: 400; font-size: clamp(28px, 3.6cqw, 42px); line-height: 1.02; letter-spacing: calc(-0.02em * var(--ab-tr, 1));
 }
-.ab[data-ae="editorial-serif"] .ab-card-body { display: flow-root; font-size: 17px; line-height: 1.4; color: var(--ab-ink); margin-bottom: 24px !important; width: min(100%, 12.5em); }
-.ab[data-ae="editorial-serif"] .ab-card-body::first-letter {
-  float: left; font-family: var(--ab-font-h); font-weight: 400; font-size: 3.15em; line-height: 0.8; padding: 0.05em 0.09em 0 0; color: var(--ab-ink);
-}
+.ab[data-ae="editorial-serif"] .ab-card-body { font-family: var(--ab-font-b); font-style: italic; font-size: 17px; line-height: 1.4; color: var(--ab-ink); margin-bottom: 24px !important; }
 .ab[data-ae="editorial-serif"] .ab-cta {
   border-radius: 0; padding: 15px 18px; font-size: 11.5px; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase;
   background: var(--ab-primary); color: var(--ab-on-primary); box-shadow: none; transition: background 0.15s, color 0.15s, transform 0.1s;
 }
 .ab[data-ae="editorial-serif"] .ab-cta:hover { background: var(--ab-ink); color: var(--ab-canvas); }
-.ab[data-ae="editorial-serif"] .ab-cta:active { background: var(--ab-eds-primary-press); color: var(--ab-eds-on-press); transform: translateY(1px); }
+.ab[data-ae="editorial-serif"] .ab-cta:active { background: var(--ab-ink); color: var(--ab-canvas); box-shadow: inset 0 0 0 1px var(--ab-canvas), inset 0 0 0 2px var(--ab-ink); transform: translateY(1px); }
 .ab[data-ae="editorial-serif"] .ab-cta-arrow::before { content: "→"; font-size: 15px; letter-spacing: 0; }
 
 /* 02: a printed form */
@@ -201,11 +201,44 @@
 .ab[data-ae="editorial-serif"] .ab-switch:checked { background: var(--ab-primary); box-shadow: inset 0 0 0 1px var(--ab-primary); }
 .ab[data-ae="editorial-serif"] .ab-switch:checked::before { transform: translateX(22px); background: var(--ab-on-primary); }
 .ab[data-ae="editorial-serif"] .ab-status { margin-top: 8px; font-family: var(--ab-font-b); font-style: italic; font-size: 13px; }
-.ab[data-ae="editorial-serif"] .ab-states { margin-top: 20px; gap: 0; border-top: 1px solid var(--ab-hair); padding-top: 16px; }
-.ab[data-ae="editorial-serif"] .ab-state { font-family: var(--ab-font-label); font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; }
+.ab[data-ae="editorial-serif"] .ab-states { margin-top: 20px; gap: clamp(14px, 2.4cqw, 26px); border-top: 1px solid var(--ab-hair); padding-top: 16px; }
+.ab[data-ae="editorial-serif"] .ab-state { display: flex; flex-direction: column; align-items: stretch; gap: 0; font-family: var(--ab-font-label); font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase; }
 .ab[data-ae="editorial-serif"] .ab-states .ab-state-ctl { padding: 10px 8px; font-size: 10.5px; letter-spacing: 0.16em; border-radius: 0; background: var(--ab-primary); color: var(--ab-on-primary); }
 .ab[data-ae="editorial-serif"] .ab-states .ab-state-ctl.is-hover { background: var(--ab-ink); color: var(--ab-canvas); }
-.ab[data-ae="editorial-serif"] .ab-states .ab-state-ctl.is-pressed { background: var(--ab-eds-primary-press); color: var(--ab-eds-on-press); transform: translateY(1px); }
+.ab[data-ae="editorial-serif"] .ab-states .ab-state-ctl.is-pressed { background: var(--ab-ink); color: var(--ab-canvas); box-shadow: inset 0 0 0 1px var(--ab-canvas), inset 0 0 0 2px var(--ab-ink); transform: translateY(1px); }
+/* small-caps caption under a hairline tick */
+.ab[data-ae="editorial-serif"] .ab-state-name { position: relative; margin-top: 8px; padding-top: 9px; text-align: center; color: var(--ab-muted); }
+.ab[data-ae="editorial-serif"] .ab-state-name::before { content: ""; position: absolute; left: 50%; top: 0; width: 1px; height: 6px; background: var(--ab-hair-strong); }
+
+/* 02 on the board: a text page instead of a form (the form is on the deck's Interface
+   slide). Generated copy: two justified columns in the body serif at 15/22 with the
+   board's only drop cap, a pull quote between hairlines (the field label's slot), the
+   states, then a byline and folio. Board only; deck slides keep the real controls. */
+.ab[data-ae="editorial-serif"]:not(.ab-slide) .ab-sections { grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); }
+.ab[data-ae="editorial-serif"]:not(.ab-slide) .ab-sec-touch .ab-panel { display: block; }
+.ab[data-ae="editorial-serif"]:not(.ab-slide) .ab-sec-touch .ab-input,
+.ab[data-ae="editorial-serif"]:not(.ab-slide) .ab-sec-touch .ab-toggle,
+.ab[data-ae="editorial-serif"]:not(.ab-slide) .ab-sec-touch .ab-status { display: none; }
+.ab[data-ae="editorial-serif"]:not(.ab-slide) .ab-sec-touch .ab-panel::before {
+  content: "Every page begins with a single decision about scale. The cover gives the image the room and lets one line of type stand against it; inside, the rhythm changes to columns, folios and hairlines, and the reader slows down. A design language works the same way. It holds a few things steady (the paper, the ink, the faces and the measure) so that the stories can change from issue to issue without the page losing its voice. Nothing here is decoration. A rule separates, a caption explains, an italic word marks the turn in a sentence. Set with this much care, a brand does not need to raise its voice to be heard, and the page still feels alive.";
+  display: block; column-count: 2; column-gap: clamp(16px, 2.4cqw, 26px); column-rule: 1px solid var(--ab-hair-soft);
+  font-family: var(--ab-font-b); font-size: 15px; line-height: 22px; text-align: justify; hyphens: auto; color: var(--ab-ink);
+}
+.ab[data-ae="editorial-serif"]:not(.ab-slide) .ab-sec-touch .ab-panel::first-letter {
+  float: left; font-family: var(--ab-font-h); font-weight: 400; font-size: 70px; line-height: 58px; padding: 4px 8px 0 0; color: var(--ab-ink);
+}
+.ab[data-ae="editorial-serif"]:not(.ab-slide) .ab-sec-touch .ab-fieldlabel {
+  display: block; margin: 20px 0 0; padding: 14px 0 15px; border-top: 1px solid var(--ab-hair-strong); border-bottom: 1px solid var(--ab-hair);
+  font-size: 0; letter-spacing: 0; text-transform: none;
+}
+.ab[data-ae="editorial-serif"]:not(.ab-slide) .ab-sec-touch .ab-fieldlabel::before {
+  content: "\201C A brand does not need to raise its voice to be heard.\201D";
+  display: block; font-family: var(--ab-font-h); font-style: italic; font-weight: 400; font-size: 28px; line-height: 1.12; letter-spacing: -0.01em; color: var(--ab-ink);
+}
+.ab[data-ae="editorial-serif"]:not(.ab-slide) .ab-sec-touch .ab-panel::after {
+  content: "Words by the editors \00B7  Photographs by the studio"; display: block; margin-top: 16px; padding-top: 8px; border-top: 1px solid var(--ab-hair-soft);
+  font-family: var(--ab-font-label); font-size: 9px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--ab-muted);
+}
 
 /* 03: a table of contents */
 .ab[data-ae="editorial-serif"] .ab-list { border-top: 1px solid var(--ab-hair-strong); }
@@ -226,26 +259,33 @@
 .ab[data-ae="editorial-serif"] .ab-foot { border-top: 1px solid var(--ab-hair-strong); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; }
 .ab[data-ae="editorial-serif"] .ab-motto { font-family: var(--ab-font-b); font-style: italic; font-size: 14px; letter-spacing: 0; text-transform: none; color: var(--ab-ink); }
 .ab[data-ae="editorial-serif"] .ab-dot { width: auto; height: auto; margin-right: 9px; border-radius: 0; background: none; font-style: normal; }
-.ab[data-ae="editorial-serif"] .ab-dot::before { content: "§"; color: var(--ab-accent-ink); font-family: var(--ab-font-h); font-size: 15px; line-height: 1; }
+.ab[data-ae="editorial-serif"] .ab-dot::before { content: "§"; color: var(--ab-ink); font-family: var(--ab-font-h); font-size: 15px; line-height: 1; }
 
 .ab[data-ae="editorial-serif"] .ab-seg-btn:focus-visible, .ab[data-ae="editorial-serif"] .ab-cta:focus-visible,
 .ab[data-ae="editorial-serif"] .ab-switch:focus-visible, .ab[data-ae="editorial-serif"] .ab-type-apply:focus-visible { outline: 2px solid var(--ab-ink); outline-offset: 3px; }
 
-/* ---- narrow ---- */
+/* ---- narrow: the cover goes full-bleed, the type list collapses to the pair in use ---- */
 @container ab (max-width: 600px) {
   .ab[data-ae="editorial-serif"] .ab-head { display: flex; align-items: center; }
   .ab[data-ae="editorial-serif"] .ab-head::before { display: none; }
   .ab[data-ae="editorial-serif"] .ab-brand { font-size: 16px; }
-  .ab[data-ae="editorial-serif"][data-hero="poster"] .ab-hero { grid-template-columns: minmax(0, 1fr); padding: 22px 0 26px; }
-  .ab[data-ae="editorial-serif"][data-hero="poster"] .ab-headline { font-size: calc(clamp(44px, 17cqw, 78px) * var(--ab-hl-scale, 1) * var(--ab-hs, 1) * var(--ab-display, 1)); }
-  .ab[data-ae="editorial-serif"] .ab-subcopy { border-top: 0; padding-top: 0; margin-top: 18px !important; font-size: 16px; }
-  .ab[data-ae="editorial-serif"][data-hero="poster"] .ab-art { grid-column: 1; grid-row: 4; justify-self: stretch; max-width: none; margin: 26px 0 0; aspect-ratio: 4 / 4.6; }
+  .ab[data-ae="editorial-serif"][data-hero="poster"] .ab-hero { margin-inline: calc(var(--ab-pad) * -1); padding: 14px 0 22px; }
+  .ab[data-ae="editorial-serif"][data-hero="poster"] .ab-art { aspect-ratio: 4 / 5.6; }
+  .ab[data-ae="editorial-serif"] .eds-fig { padding-inline: var(--ab-pad); }
+  .ab[data-ae="editorial-serif"][data-hero="poster"] .ab-hero-copy { padding: 0 var(--ab-pad) calc(4% + 34px); }
+  .ab[data-ae="editorial-serif"] .eds-still { height: 112%; top: -12%; }
+  .ab[data-ae="editorial-serif"][data-hero="poster"] .ab-hero .ab-headline { font-size: calc(clamp(40px, 15cqw, 66px) * var(--ab-hl-scale, 1) * var(--ab-hs, 1) * var(--ab-display, 1)); }
+  .ab[data-ae="editorial-serif"] .ab-subcopy { font-size: 13px; }
   .ab[data-ae="editorial-serif"] .ab-swatches[data-kind="chips"] { grid-template-columns: minmax(0, 1fr); }
   .ab[data-ae="editorial-serif"] .ab-swatches[data-kind="chips"] .ab-swatch { display: grid; padding: 10px 0; border-left: 0; border-top: 1px solid var(--ab-hair-soft); }
   .ab[data-ae="editorial-serif"] .ab-swatches[data-kind="chips"] .ab-swatch:first-child { border-top: 0; }
+  .ab[data-ae="editorial-serif"] .ab-type-picks, .ab[data-ae="editorial-serif"] .ab-type-class { display: none; }
+  .ab[data-ae="editorial-serif"] .ab-type-col[data-role="mono"] { display: none; }
   .ab[data-ae="editorial-serif"] .ab-type-col + .ab-type-col { padding-left: 0; border-left: 0; }
   .ab[data-ae="editorial-serif"] .ab-type-col { padding-right: 0; }
+  .ab[data-ae="editorial-serif"]:not(.ab-slide) .ab-sections { grid-template-columns: minmax(0, 1fr); }
   .ab[data-ae="editorial-serif"] .ab-sec-touch { padding-left: 0; border-left: 0; }
+  .ab[data-ae="editorial-serif"]:not(.ab-slide) .ab-sec-touch .ab-panel::before { column-count: 1; }
   .ab[data-ae="editorial-serif"] .ab-row { grid-template-columns: minmax(0, auto) minmax(14px, 1fr) auto 4.2ch; }
   .ab[data-ae="editorial-serif"] .ab-row-n { display: none; }
   .ab[data-ae="editorial-serif"] .ab-row-name { grid-column: 1; }
@@ -258,5 +298,18 @@
   .ab[data-ae="editorial-serif"] .ab-cta:active, .ab[data-ae="editorial-serif"] .ab-states .ab-state-ctl.is-pressed { transform: none; }
 }
 
-/* Brand deck (CAO-4 A3): a drop cap on a two-line card body reads as an error on the Interface and Product slides. */
-.ab[data-ae="editorial-serif"].ab-slide .ab-card-body::first-letter { float: none; font-size: inherit; line-height: inherit; margin: 0; padding: 0; }
+/* ---- Brand deck ---- */
+/* cover: headline in ink on the paper at left, the plate fills the right 55% with the masthead across its top */
+.ab[data-ae="editorial-serif"].ab-slide[data-slide="cover"] .ab-deck-cover .ab-hero {
+  grid-template-columns: minmax(0, 45fr) minmax(0, 55fr); column-gap: 36px; align-items: stretch; padding: 4px 0 0;
+}
+.ab[data-ae="editorial-serif"].ab-slide[data-slide="cover"] .ab-deck-cover .ab-hero-copy {
+  grid-area: 1 / 1; align-self: end; padding: 0 0 8px; color: var(--ab-ink);
+}
+.ab[data-ae="editorial-serif"].ab-slide[data-slide="cover"] .ab-deck-cover .ab-art { grid-area: 1 / 2; aspect-ratio: auto; align-self: stretch; height: auto; min-height: 372px; max-width: none !important; width: auto !important; }
+.ab[data-ae="editorial-serif"].ab-slide[data-slide="cover"] .ab-deck-cover .ab-headline,
+.ab[data-ae="editorial-serif"].ab-slide[data-slide="cover"] .ab-deck-cover .ab-kicker,
+.ab[data-ae="editorial-serif"].ab-slide[data-slide="cover"] .ab-deck-cover .ab-subcopy { color: var(--ab-ink); }
+.ab[data-ae="editorial-serif"].ab-slide[data-slide="cover"] .ab-deck-cover .ab-headline { max-width: none; }
+/* principles and closing: the motto in ink, the italic word in the same ink */
+.ab[data-ae="editorial-serif"].ab-slide .ab-headline.ab-deck-h { color: var(--ab-ink); line-height: 0.96; }

@@ -515,3 +515,83 @@ Some references wouldn't open, so I didn't count them as viewed. acrnm.com showe
 | Biomechanical Gothic | 5 | Refine | A sparse pearl tunnel instead of a packed vault, plus pills and marbles |
 
 None of these scores goes above 5. None of the six stands next to its references yet. The closest single objects are the Industrial Hazard lockout panel, the Biomechanical Gothic nave and the Industrial Device keybed, and none of those is ready for a portfolio wall.
+
+---
+
+## Fix log (fx66)
+
+Worker fx66, 2026-10-11. Files changed: `js/aesthetics/{industrial-device,industrial-hazard,blueprint,religious-futurism,cybersigilism,biomechanical-gothic}.js` and the matching `css/aesthetics/*.css`. Nothing shared was edited. Font-pairing, font-weight and pattern-suite changes are listed for the coordinator under "Shared changes requested" in the fx66 return. The shots below were taken with those pairings simulated in the page (`scratchpad/adv/fx66/pre.js`). Shots: `scratchpad/adv/fx66/sheet-fx66-<key>.png` (boards), `sheet-deck-fin-<key>.png` and `sheet-deck-fin-<key>-o.png` (decks), `covers.png`.
+
+### Industrial Device
+- **Hero (top 1):** The hero is now product-first, with columns at .55fr / 1.45fr. The device bleeds off the board's right edge and its body has square right corners, so it no longer sits in a card. The headline is lowercase at `clamp(30px, 3.6cqw, 44px)`, weight 400, with no highlight block.
+- **Callouts (top 2):** The ①②③ callouts, leader lines and legend row are deleted. Legends are now printed on the hardware in 6–8px lowercase Azeret Mono: `mode · a.01` over the screen, `vol` and 0/5/10 at the knob, tune/mix/fx/lvl under the encoders, loop/play/rec/stop under the transport keys, seq…shift under the function keys, and `tp-01 · field · <brand>` as the model line. The circled section numbers are also gone, replaced by plain mono.
+- **Colour code (top 3):** The four OP-1 encoder caps are fixed at `#2B7BE4 / #2FB15C / #F2F2EE / primary`. The keys come in white and graphite families with one primary main key, and the knob pointer is primary. The OLED is single-ink pixels, and the secondary no longer appears in the meter. The client accent key, the PWR/REC/PLY lamp row and every LED glow are removed.
+- **Radii:** Cards use 8px and keys 4px. Cards no longer carry the light-edge inset; only the hardware does.
+- **Phone:** The headline is `clamp(30px, 9cqw, 40px)`. The device is full-bleed and cropped to the knob and keys rather than scaled down.
+- **Detail:** The device gains a 16-step keybed, a 48-tick knurled ring, the encoder row, a six-key function block and the model line.
+- **Structure:** The palette uses `strips` and the sections use `asym`. The meter bar's CSS mask is replaced by a gradient so it exports.
+- **Deck:** The cover is product-first (`coverDisplay` 0.6) and the Material slide is a 1.9× crop of the pads and keybed. The CMF chips and lead pattern swap is a shared request.
+
+### Industrial Hazard
+- **Ladder (top 1):** `sig = hex => hex` and the stripe is always `#F2C500`. The client primary paints only the nameplate and the slab key; it no longer paints the numeral.
+- **Yellow field (top 2):** The hero is a full-bleed `#F2C500` field framed top and bottom by 14px tape at 45°. The headline is black at `clamp(52px, 9cqw, 132px)` with one DANGER-red word. The deck cover and the Principles lead carry the same field, and the Principles line is set at about 108px.
+- **Stencil (top 3):** The zone numeral "07" is now 2× its old size, painted safety yellow, cut by drawn stencil bridges, and overlapping the nameplate edge. Section numbers are yellow on black with a stencil bridge. A real stencil webfont is requested as optional.
+- **Lamps:** PWR is white, RUN `#00A651`, ALM `#F2C500` and LCK red-off. No glow appears anywhere, and the client secondary never lights a lamp.
+- **ISO sign:** The Interlocks module header carries a 72px ISO 7010 warning triangle.
+- **Light mode:** The board is 100% `#F2C500` with `#111` steel modules and white legends, carried by `--ab-hz-mod-ink`.
+- **Patterns:** These are a shared request.
+
+### Blueprint
+- **Ground (top 1):** The canvas is a fixed `hsl(218, 62%, 24%)`, nudged by at most ±8° when a brand hue sits in 200–235°. The grid is .08 every 8px and .16 every 40px. Teal or green can no longer reach the ground.
+- **No fills (top 2):** The CTA, tabs, states and switch are 1.5px white outlines. Selected or active states get a double outline over 45° hatching. The primary appears only as the revision cloud and the revision triangle. The CTA corner ticks are removed.
+- **Sheet (top 3):** The art is now a full sheet (480×300): VIEW A front elevation with a dimension chain and cutting plane, SECTION B-B hatched, VIEW C oblique with A/B/C callouts, DETAIL D at 2:1, notes, a third-angle symbol, a revision table and zone marks. Line types are 1.6 / 0.8 / `4 3` / `10 3 2 3`. The headline sits in the sheet's TITLE block, bottom right.
+- **Headline:** Single-stroke mono caps, weight 500, tracking .04em. The pairing change is a shared request.
+- **Light mode:** A patent sheet: white, black line, no grid, FIG. 1–4, reference numerals 10/12/14/16 with curved leaders, and a "U.S. Patent · Sheet 1 of 1" header.
+- **Phone:** The headline is `clamp(30px, 10cqw, 44px)`. The drawing is cropped to VIEW A plus SECTION B-B, with labels at 9px or more.
+- **Deck:** The cover is the sheet with its title block, and the construction-kit band is hidden on the cover. The Material slide is the oblique view plus detail.
+- **Patterns:** These are a shared request.
+
+### Religious Futurism
+- **CTA (top 1):** The lead lines and text halo are gone. The button is deep glass, `mix(primary, #0D0B0B, .55)` darkened until `#F6F1E6` reaches at least 7:1. It has a 1px gold rim, a 2px gold inner rule and a 1px top highlight.
+- **Patterns (top 2):** These are a shared request. With them, the deck Material slide stops using the pattern stage: `materialStage` is removed and the slide is now a 3.6× crop of the centre lancet.
+- **Glass (top 3):** 65% of the panes are fixed cool neutrals (`#3B4A5E #56627A #7A8496 #A7A9AE` and smoke), 25% are the secondary darkened, and the primary and accent together are at most 10%. Each lancet has two mullions, with a 2.2-unit saddle bar every 6 rows. The centre lancet is 2.2× its flanks and its top is cropped by the frame. In light mode the windows are seen from outside: dark glass, with only the oculus lit.
+- **De-arch:** Tabs are a flat row with a gold underline. Cards are rectangular with a 1px gold border and a 2px lead rule 6px inside. Swatches are 36×120 lancet panes with a saddle bar. The states are a leaded pane shown unlit, at dawn and in full light, replacing the orb. The CSS masks are removed.
+- **Type:** Michroma first is a shared request. The deck headings are all weight 400.
+- **Highlight:** The underline is trimmed to the glyphs, which also removes the trailing tracking.
+
+### Cybersigilism
+- **Sigil (top 1):** The sigil is rebuilt from filled needles with a maximum width of 1.6 that taper to 0. A mirrored skeleton (a spine, six wing pairs and almond cells) carries three generations of barbs, each 0.55× the length and 0.6× the width of its parent, at 25–55°. Each side is seeded separately; there are 636 strokes for "Marigold Studio". There is no glow filter (0.3 blur at most) and no guide lines.
+- **Headline (top 2):** Inter Tight is set at weight 300 (falling back to 400), tracking −0.03em, `clamp(40px, 6cqw, 84px)`, left-aligned. A `headline()` hook draws hairline SVG thorns from the last word. Removing Pirata One is a shared request.
+- **CTA (top 3):** The button is black with a 1px `#B9BEC6` line, one chamfered corner drawn as layered 1px gradients (no clip) and a hairline thorn out of the top-right corner that lengthens on hover. There is no gradient fill.
+- **Paper mode:** Bone `#EEEBE4` with `#2A2A2E` hairline, no glow and no silver ramp.
+- **States:** One small sigil drawn three ways (Etched, Inked, Barbed) as data-URI glyphs, replacing the orb and its mask.
+- **Composition:** The sigil takes the right two-thirds and bleeds off the right edge and the top of the hero. The header and divider flourishes are moved to the left.
+- **Deck:** On the cover the sigil fills the right half, clear of the header. The Material slide is a 2.3× crop of the barbs.
+- **Patterns:** These are a shared request.
+
+### Biomechanical Gothic
+- **Vault (top 1):** 22 ribs at an even depth step. Each rib is 12.6·s thick, about 1/12 of the vault width, so neighbours touch. Every vertebra is a centrum plus two tapered processes. Two runs of seven 0.8-unit hoses run along each wall, with a bone collar fusing them into every third rib. The floor column and the fog are kept.
+- **Palette (top 2):** The ground is a fixed `#121412`, with a cast ramp `#1A1C1A / #2A2D2A / #5C605A` and bone `#C9C3B4`. The sinew is `hsl(h, s×0.5, 30%)`, used in a few rib hairlines, the progress fill and the open valve. The tunnel core is pale bone light.
+- **Pills (top 3):** The CTA and tabs are vertebrae, a body plus two tapered processes drawn with clip-path, with the tabs on a spinal line. The fonts button is a text link with a 1px bone underline. The status chips use a 3px radius.
+- **Swatches:** 56×72 rounded-top ossicles with a 3px recessed rim, replacing the marbles.
+- **States:** A five-fold valve shown closed, parting and open on sinew, replacing the orb.
+- **Headline:** Cormorant at weight 300, uppercase, tracking .06em. The picks change is a shared request.
+- **Distinct from Religious Futurism:** Section labels are C1 / T6 / L1 rather than Roman numerals. The divider's CSS mask is replaced by a canvas overlay so it exports.
+- **Patterns:** These are a shared request. Tubing runs stays as the lead and as the Material stage.
+
+### Verification
+- `node tests/run.js`: all passed.
+- `node scratchpad/t5/src-verify-p5.js`: 53 families, 0 failures, map mismatches 0.
+- `node scratchpad/t5/harness.js`: 20 failures, none for these six keys. All 20 are retro-futurist, wabi-sabi, dark-academia and pirate-broadcast, which belong to other workers.
+- **Gore** (4 configs × 6 keys × 10 slides): 0 issues. One Industrial Hazard light-mode state-key contrast issue was found and fixed before the final run.
+- **Board contrast** (deck-gore contrast check on the board, 6 keys × warm/green × both modes): 0 issues.
+- **390px:** 0 document overflow, and nothing outside the board in either mode for all six.
+- **Console:** only the favicon 404.
+
+### Self-score against the references (honest)
+- **Industrial Device: 7.** It now reads as a TE product page: the product is life size and the type is tiny. It still falls short in two ways. The hardware is clean vector rather than anodised photography. The "In use" and "Controls" sections are still generic cards.
+- **Industrial Hazard: 7.** The TDR yellow field, the fixed ladder and the stencil 07 all land. The stencil is drawn rather than a typeface, and the suite still lacks a real tread-plate family.
+- **Blueprint: 7.** It is a real drawing sheet on Prussian blue with a patent light mode. The single-stroke lettering depends on the mono pairing request. The palette row still shows filled colour chips; that is necessary to show the colours.
+- **Religious Futurism: 6.** The CTA is legible, the glass is cool-dominant and the centre lancet is monumental. The type depends on the Michroma request. The windows are still a mosaic rather than Richter-grade glass.
+- **Cybersigilism: 6.** The hairline density, the taper and the paper mode are there. The sprawl still reads partly as branches rather than barbed thorns, and the mirrored skeleton keeps it emblem-like.
+- **Biomechanical Gothic: 7.** The vault is packed, cold and fused with tubes. The UI below it is still fairly conventional apart from the vertebra controls.

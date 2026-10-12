@@ -1,26 +1,27 @@
-/* 27 Corporate Vandalism — official, hijacked, deadpan. MSCHF's numbered index and
-   store pages, Off-White's quotation-mark labelling, Holzer-style redaction bars and
-   the receipt: a sincere, tidy interface with ONE thing quietly wrong per screen.
+/* 27 Corporate Vandalism — official, hijacked, deadpan. Two hands: the corporation's
+   spotless surface (the client palette, a plain grotesk, procurement forms, PO numbers,
+   asset tags, rubber stamps) and, on top of it, the vandal's foreign mark in a different
+   technology and at a different angle. References: Barbara Kruger's red bars over found
+   images, Brandalism's swapped ads in real frames, Holzer's truisms in corporate signage,
+   Off-White's literal labels (used at most twice).
 
-   Mechanism. The shell is pristine procurement software: flat, square, white (or #000),
-   the client's primary as the "official" colour (notice header strip, main button).
-   The vandal layer is FIXED and never takes client colours: black redaction bars, a
-   flat hazard-red warning label, safety-yellow "!!!" chip, a mono receipt. Redaction
-   bars are real text set transparent on black, so each bar is exactly as wide as the
-   word it hides. No rotation, no tape, no grain (that is Xerox / Xerox Punk).
-   The hero art is "the hijacked notice": a form document with a classification banner and a
-   primary header strip, plausible fine print with word redactions, one fully blacked-out line
-   and one two-line block with (b)(6) style exemption codes in the margin, a red warning label
-   and a receipt strip with an absurd, deadpan total. The second party is visible: a fixed
-   hazard-red "FOR OFFICIAL USE" tag is physically zip-tied across the notice's top corner,
-   and every UI part carries an Off-White literal label naming it as itself ("BUTTON",
-   "TEXT FIELD", "CHECKBOX", "TABS", "HEADLINE", "PROJECTS"). The "In use" list is an MSCHF
-   mono index (#027 ... #030 ??????). When the client primary sits within 25 degrees of
-   the hazard red, the official shell (button, header strips) goes ink so the wrong thing
-   stays the only red. */
+   Mechanism. The palette and type split into THEIRS and OURS: the client colours are the
+   corporation's (shell, header bars, CTA); the vandal set is fixed (hazard red #E10600,
+   safety yellow #FFD400, black, white) and a fixed bold-oblique face (Jost, synthetic
+   oblique) that the client cannot select. One foreign mark per view, on top:
+     hero      a Kruger bar over the small, bored official headline (def.headline), at
+               display scale: the hijack is big, the official copy is small
+     notice    a vinyl sticker slapped over the corporation's logo strip, peeled at a corner
+     01 card   a Dymo label-maker strip stuck over the CTA label
+     03 list   a marker strike through one official word, with a handwritten replacement
+   The phrase on the bar is picked by brand from a short pool, so it never changes on
+   re-render. Redaction bars belong to the bureaucracy (the notice), not to the vandal. */
 (function () {
-const HAZARD = '#D40F14';
-const SAFETY = '#FFD500';
+const HAZARD = '#E10600';
+const SAFETY = '#FFD400';
+const CV_BARS_TXT = ['Feelings not included', 'Nobody approved this', 'Alive costs extra', 'Your feelings, our asset'];
+function cvHash(str) { let h = 2166136261; for (let i = 0; i < str.length; i++) { h ^= str.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; }
+function cvVandalFace() { return '"Jost", "Futura", "Century Gothic", sans-serif'; }
 
 // barcode bars: widths 1/2/3 px from a fixed pattern (deterministic, no random)
 const CV_BARS = '2 1 3 1 1 2 3 1 2 2 1 3 1 1 2 1 3 2 1 1 3 1 2 1 1 2 3 1 2 1 1 3 2 1 2 1 3 1 1 2';
@@ -37,8 +38,8 @@ registerAesthetic({
   key: 'corporate-vandalism', order: 27,
   name: 'Corporate Vandalism',
   descriptor: 'Official · Hijacked · Deadpan',
-  influences: 'MSCHF / Procurement software / Off-White labelling',
-  summary: 'A spotless corporate shell with exactly one thing quietly wrong: a redaction bar, a warning label, an absurd receipt.',
+  influences: 'Kruger / Brandalism / Holzer / Off-White',
+  summary: 'A spotless corporate shell, and on top of it one foreign mark per view: a red bar, a label-maker strip, a slapped sticker, a marker strike.',
   motto: 'Everything is fine. Please initial here.',
   kicker: 'Pending review',
   mode: 'light',
@@ -47,38 +48,45 @@ registerAesthetic({
   layout: { hero: 'split', palette: 'swatches', sections: 'two-col' },
   type: { ui: 'body', label: 'mono', display: 1.14 },
   highlight: 'custom',
-  highlightNote: 'The last word keeps the headline ink and plain: no colour, no band, no underline, no quotation marks. The headline is named by a literal quoted mono label above it ("HEADLINE"), the Off-White way: a part labelled as itself.',
+  highlightNote: 'The official headline is small, regular and plain (no highlight). On top of it the vandal applies a Kruger bar: hazard red #E10600, white bold-oblique type at display scale, 2–4 words, tilted about 2 degrees.',
 
   roles: {
     canvas: {
-      use: 'The page: pure white in light mode, #000 in dark mode (never cream or tinted), with flat white "paper" for the notice. The vandal layer is fixed and never takes client colours: black #000, white, hazard red #D40F14, safety yellow #FFD500',
+      use: 'THEIRS. The corporation\'s page: pure white in light mode, #000 in dark mode (never cream), flat white paper for the notice',
       never: 'Text, gradients, soft shadows or rounded cards',
       coverage: '65–75%',
     },
     ink: {
-      use: 'Headlines, body, 1px square borders, the numbered index, and the black redaction bars (exact width of the word hidden)',
+      use: 'THEIRS. Headlines, body, 1px square borders, PO numbers, the redaction bars of the notice (the bureaucracy\'s own censor)',
       never: 'Decoration or large background fields in light mode',
       coverage: '15–20%',
     },
     primary: {
-      use: 'The official shell, kept pristine and boring: the notice header strip, the main button fill and the active index item. Where the primary is within 25 degrees of the hazard red the shell goes ink with a 3px primary underline',
-      never: 'The vandal layer (warning labels, redaction, the receipt), body text, a second CTA',
+      use: 'THEIRS. The official shell, pristine and boring: the announcement bar, the notice header strip, the main button. Where the primary is within 25 degrees of the hazard red the shell goes ink with a 3px primary underline',
+      never: 'The vandal layer (red bar, sticker, label strip, marker), body text, a second CTA',
       coverage: '≈8–10%',
     },
     secondary: {
-      use: 'The progress track and the pattern second band. The form panel is a neutral grey (ink at 5-10% over the canvas), never a brand tint; the receipt is plain white thermal paper (#FFFFFF, ink #1a1a1a)',
-      never: 'Buttons, warning labels, body text, form-panel tints',
+      use: 'THEIRS. The progress track and the pattern second band. The form panel is a neutral grey; the receipt is plain white thermal paper',
+      never: 'Buttons, the vandal layer, body text, form-panel tints',
       coverage: '≈8–10%',
     },
     accent: {
-      use: 'Not a vandal colour: the announcement bar above the header is fixed safety yellow #FFD500 in every palette; the accent shows only in the palette strip',
-      never: 'Buttons, borders, warning labels, headline words; hazard colours are fixed',
+      use: 'THEIRS, held back: it shows in the palette only. OURS (fixed, never client colours): hazard red #E10600, safety yellow #FFD400, black, white, and a bold-oblique vandal face',
+      never: 'Buttons, borders, the vandal layer',
       coverage: '≤3%',
     },
   },
 
   // White page / black page: the shell must be as flat and neutral as a form.
   canvas(b) { return b.isDark ? b.mix('#000000', b.canvas, 0.94) : b.mix('#ffffff', b.canvas, 0.92); },
+
+  // The official headline, small and bored, with the vandal's Kruger bar applied over it.
+  headline(ctx, text) {
+    const e = escapeHtml;
+    const bar = CV_BARS_TXT[cvHash(String(ctx.brandName || '') + '|' + String(text || '')) % CV_BARS_TXT.length];
+    return `<span class="cvh-o">${e(text)}</span><span class="cvh-k"><span>${e(bar)}</span></span>`;
+  },
 
   tokens(t) {
     const hf = typeof state !== 'undefined' && state && state.headingFont;
@@ -105,19 +113,23 @@ registerAesthetic({
       '--cv-shell': shell,
       '--cv-on-shell': collide ? t.canvas : t.onPrimary,
       '--cv-ul': collide ? (t.printPrimary || t.primary) : 'transparent',
+      '--cv-vandal': cvVandalFace(),
+      '--cv-brand': `"PROPERTY OF ${String(typeof effectiveContent === 'function' ? effectiveContent().brandName || '' : '').toUpperCase().replace(/["\\]/g, '').slice(0, 32)} · DO NOT REMOVE"`,
       '--ab-tr': (hf && { condensed: 0.4, heavy: 0.4, wide: 0.3, techno: 0.3 }[hf.cls]) ?? 1,
     };
   },
 
   art(ctx) {
     const e = escapeHtml;
+    // the vandal's fixed face (never client-selectable)
+    if (typeof window !== 'undefined' && window.loadFontFamily && typeof FONTS !== 'undefined') { const j = FONTS.find(f => f.name === 'Jost'); if (j) window.loadFontFamily(j); }
     const name = e(String(ctx.brandName || '').trim());
     const R = s => `<span class="cva-r">${s}</span>`;
     const warn = `<svg viewBox="0 0 16 14" width="13" height="12" aria-hidden="true" focusable="false"><path d="M8 0.8 15.4 13.4H0.6Z" fill="none" stroke="#fff" stroke-width="1.3" stroke-linejoin="miter"/><path d="M8 5v4M8 10.4v1.4" stroke="#fff" stroke-width="1.5"/></svg>`;
     return `<div class="cva">
       <div class="cva-doc">
-        <span class="cva-tag">"FOR OFFICIAL USE"</span>
         <div class="cva-bar"><i>${e(ctx.initial)}</i><b>${name}</b><span>FORM 27-B</span></div>
+        <span class="cva-stk" aria-hidden="true"><b>VOID</b><i>where feelings</i></span>
         <div class="cva-body">
           <p class="cva-class">UNCLASSIFIED // FOR INTERNAL FEELINGS ONLY</p>
           <p class="cva-title">Notice of Compliance Review</p>
@@ -143,49 +155,47 @@ registerAesthetic({
   },
 
   materials: [
-    { name: 'Redaction bar', css: 'background: {ink}; color: transparent; /* real text set transparent, so the bar is exactly the width of the word it hides; height is the cap height plus about 2px; on a paper panel in dark mode. Keep some words unredacted so the sentence still parses. Reveal on select: color {canvas}. */' },
-    { name: 'Warning label', css: 'background: {hazard}; color: #ffffff; box-shadow: inset 0 0 0 2px {hazard}, inset 0 0 0 3px #ffffff; font: 700 10px ui-monospace, Menlo, monospace; text-transform: uppercase; letter-spacing: .06em; /* fixed hazard red, flat, square, never rotated; copy is oddly precise ("contains 14% opinion") */' },
-    { name: 'Safety chip', css: 'background: {safety}; color: #000000; font: 700 10px ui-monospace, Menlo, monospace; padding: 1px 5px; /* the "!!!" chip in the header, fixed yellow */' },
-    { name: 'Notice header strip', css: 'background: {primary}; color: {onPrimary}; font: 600 10px ui-monospace, Menlo, monospace; letter-spacing: .1em; text-transform: uppercase; /* the official shell: the only large use of the client primary */' },
-    { name: 'Receipt strip', css: 'background: #FFFFFF; color: #1a1a1a; font: 11px ui-monospace, Menlo, monospace; border-top: 1px dashed {ink}; /* zigzag top and bottom edge, dashed rules, TOTAL line, a barcode of 1/2/3px bars */' },
-    { name: 'Official button', css: 'background: {primary}; color: {onPrimary}; border-radius: 0; font: 600 12px ui-monospace, Menlo, monospace; letter-spacing: .08em; text-transform: uppercase; /* mundane copy ("Continue"); hover underlines; pressed inverts to {ink} on {canvas} */' },
-    { name: 'Announcement bar', css: 'background: {safety}; color: #000000; font: 600 10px ui-monospace, Menlo, monospace; letter-spacing: .08em; text-transform: uppercase; /* one line above the header, fixed safety yellow in every palette */' },
-    { name: 'Literal label', css: 'content: \'"BUTTON"\'; font: 600 9px ui-monospace, Menlo, monospace; letter-spacing: .08em; color: {ink}; /* pinned just above the top-left corner of the part it names ("TEXT FIELD", "CHECKBOX", "TABS", "HEADLINE", "PROJECTS"); the Off-White way: a thing labelled as itself */' },
-    { name: 'Applied tag', css: 'background: {hazard}; color: #ffffff; font: 700 9px ui-monospace, Menlo, monospace; /* "FOR OFFICIAL USE", overlapping the notice card top-right border by 8px with a 24px 1px black tie line running into the card; never rotated */' },
-    { name: 'Mono index', css: 'font: 700 clamp(16px,2.4cqw,22px) ui-monospace, Menlo, monospace; text-transform: uppercase; letter-spacing: 0; /* #027 PROJECT NAME ... and a last row "#030 ??????????????" in the resting grey */' },
+    { name: 'Kruger bar', css: 'background: #E10600; color: #FFFFFF; font: italic 600 8cqw/1.1 Jost, Futura, sans-serif; text-transform: uppercase; box-decoration-break: clone; transform: rotate(-2deg); /* the vandal\'s mark over the official headline: 2–4 words at display scale; the official headline under it stays small and regular */' },
+    { name: 'Label-maker strip', css: 'background: #111111; color: #FFFFFF; font: 700 11px ui-monospace, Menlo, monospace; letter-spacing: .18em; text-shadow: 0 1px 0 rgba(0,0,0,.6); transform: rotate(-3deg); /* embossed Dymo tape stuck over a button label */' },
+    { name: 'Sticker slap', css: 'background: #FFD400; color: #111111; box-shadow: 0 0 0 1px #FFFFFF; transform: rotate(8deg); /* vinyl sticker over the corporation\'s logo, a hard white keyline, one corner peeled back */' },
+    { name: 'Marker strike', css: 'stroke: #E10600; stroke-width: 3px; /* a line through one official word, with the replacement handwritten above it */' },
+    { name: 'Redaction bar', css: 'background: {ink}; color: transparent; /* the bureaucracy\'s own censor: real text set transparent, so the bar is exactly the width of the word; on the notice only */' },
+    { name: 'Official shell', css: 'background: {primary}; color: {onPrimary}; border-radius: 0; font: 600 12px ui-monospace, Menlo, monospace; text-transform: uppercase; /* THEIRS: header strips, the main button, the announcement bar; flat, square, mundane copy */' },
+    { name: 'Asset tag', css: 'border: 1px solid {ink}; font: 600 9px ui-monospace, Menlo, monospace; /* PROPERTY OF <BRAND> · DO NOT REMOVE, PO numbers (PO-2291-B), SKU tags and approved / rejected stamps: procurement vocabulary */' },
+    { name: 'Receipt strip', css: 'background: #FFFFFF; color: #1a1a1a; font: 11px ui-monospace, Menlo, monospace; /* sawtooth top and bottom edge, dashed rules, TOTAL line, a barcode */' },
   ],
 
   rules: {
     do: [
-      'Keep the shell flat, square and tidy: white or #000 page, 1px ink borders, no radius, no shadow, mundane button copy.',
-      'Make the second party visible: Off-White literal quoted labels on the interface parts ("BUTTON", "TEXT FIELD"), one hazard-red tag physically overlapping the notice, and bureaucratic redaction (whole lines, (b)(6) codes, a classification banner).',
-      'Write fine print that parses as legal prose (sections, schedules, dagger footnotes); the footnotes should be the longest text on the page.',
-      'Set the index as MSCHF mono caps (#027, #028 ... then #030 ??????); quotation marks belong only to the literal part labels, never to scare-quote a word.',
+      'Leave the shell spotless (white or #000, 1px ink borders, no radius, no shadow, mundane copy); apply exactly one foreign mark per view, on top.',
+      'Make the mark a second technology at a second angle: a Kruger bar, a label-maker strip, a slapped sticker or a marker strike.',
+      'Split everything into theirs and ours: the client palette and grotesk are the corporation\'s; hazard red, safety yellow, black, white and a bold oblique are the vandal\'s.',
+      'Reverse the scale: the official headline is small and bored, the hijack is display size.',
     ],
     dont: [
-      'Rotate, tape, grain or distress anything; mess belongs to Xerox and Xerox Punk, the shell here must be tidy.',
-      'Recolour the hazard layer with client colours; warning red, safety yellow (including the notice strip) and black stay fixed.',
-      'Use rounded cards, gradients or soft shadows; the register is flat procurement software.',
-      'Repeat the gag on every element, or fill it with lorem ipsum or a real company or brand.',
+      'Recolour the vandal layer with client colours, or let the client choose the vandal face.',
+      'Quote another studio\'s house marks (numbered drop indexes, "???" rows, "!!!" chips).',
+      'Label more than two parts in quotes; one literal label per object is the joke, six is a tic.',
+      'Use rounded cards, gradients or soft shadows on the shell.',
     ],
   },
   // Deck copy (js/brand-deck.js): three principles, three do / don't lines, each short.
   deck: {
     coverDisplay: 0.78,   // a smaller cover start size keeps the taller notice at its natural width (it re-stacks when its box narrows)
     principles: [
-      ['A second party at work', 'The shell stays sincere; literal labels and one red tag are applied on top.'],
-      ['Fixed vandal palette', 'Black, white and hazard red never take the client colours.'],
-      ['Plausible fine print', 'Deadpan needs real syntax, so every footnote reads as legal.'],
+      ['Two hands', 'Their spotless shell; our mark on top of it.'],
+      ['Theirs and ours', 'Client colours run the shell; hazard red and safety yellow are fixed.'],
+      ['Small official, big hijack', 'The headline is bored; the red bar shouts.'],
     ],
     do: [
-      'Keep the brand shell tidy and flat.',
-      'Redact words with exact-width black bars.',
-      'Label parts as themselves, in quotes.',
+      'Leave the shell spotless.',
+      'Apply exactly one foreign mark per view.',
+      'Keep the vandal colours fixed.',
     ],
     dont: [
-      'Rotate, tape or distress anything.',
-      'Use rounded cards or soft shadows.',
-      'Scare-quote words or repeat the gag.',
+      'Recolour the vandal layer.',
+      'Quote another studio\'s marks.',
+      'Label more than two parts.',
     ],
   },
 });

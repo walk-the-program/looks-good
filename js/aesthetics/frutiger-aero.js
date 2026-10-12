@@ -147,6 +147,9 @@ function faSky(t, id, night) {
   // bubbles rising on the left
   const bubbles = [[150, 520, 30], [228, 448, 16], [118, 404, 11], [300, 380, 22], [208, 330, 9], [380, 300, 13], [96, 272, 18], [262, 236, 7], [470, 250, 10], [520, 470, 12]].map(([x, y, r], i) =>
     `<g transform="translate(${x} ${y})"><circle r="${r}" fill="url(#${id}b)"/><circle r="${r}" fill="none" stroke="#fff" stroke-opacity=".85" stroke-width="${r > 14 ? 1.6 : 1.1}"/><ellipse cx="${(-r * 0.36).toFixed(1)}" cy="${(-r * 0.42).toFixed(1)}" rx="${(r * 0.32).toFixed(1)}" ry="${(r * 0.2).toFixed(1)}" transform="rotate(-32 ${(-r * 0.36).toFixed(1)} ${(-r * 0.42).toFixed(1)})" fill="#fff" fill-opacity=".95"/>${i % 3 === 0 ? `<circle r="${(r * 0.62).toFixed(1)}" cx="${(r * 0.12).toFixed(1)}" cy="${(r * 0.18).toFixed(1)}" fill="${bub}" fill-opacity=".22"/>` : ''}</g>`).join('');
+  // bokeh: soft out-of-focus discs drifting down from the sun
+  const bokeh = [[1130, 210, 26, 0.22], [1190, 260, 14, 0.3], [1060, 170, 10, 0.32], [1340, 240, 34, 0.14], [990, 250, 18, 0.18], [1400, 160, 12, 0.26], [880, 300, 8, 0.3]].map(([x, y, r, o]) =>
+    `<circle cx="${x}" cy="${y}" r="${r}" fill="url(#${id}bk)" opacity="${night ? o * 0.8 : o * 2.2}"/>`).join('');
   const hillFoot = night ? '#06261A' : hill.foot;
   const hillMid = night ? '#0B3A28' : hill.mid;
   const hillCrest = night ? '#1E6A55' : hill.crest;
@@ -157,6 +160,7 @@ function faSky(t, id, night) {
       <radialGradient id="${id}glow" cx="800" cy="640" r="760" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="${night ? '#5FD3E8' : '#ffffff'}" stop-opacity="${night ? 0.35 : 0.8}"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient>
       <linearGradient id="${id}r0" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset=".3" stop-color="#fff"/><stop offset=".62" stop-color="${rib}"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>
       <linearGradient id="${id}r1" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="${rib}" stop-opacity="0"/><stop offset=".4" stop-color="${rib}"/><stop offset=".75" stop-color="#fff"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>
+      <radialGradient id="${id}bk"><stop offset="0" stop-color="${night ? '#9FE8F5' : '#fff'}" stop-opacity=".7"/><stop offset=".8" stop-color="${night ? '#9FE8F5' : '#fff'}" stop-opacity=".45"/><stop offset="1" stop-color="${night ? '#9FE8F5' : '#fff'}" stop-opacity="0"/></radialGradient>
       <radialGradient id="${id}b" cx=".42" cy=".38" r=".7"><stop offset="0" stop-color="#fff" stop-opacity=".04"/><stop offset=".72" stop-color="#fff" stop-opacity=".12"/><stop offset="1" stop-color="#fff" stop-opacity=".55"/></radialGradient>
       <linearGradient id="${id}h" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${hillCrest}"/><stop offset=".45" stop-color="${hillMid}"/><stop offset="1" stop-color="${hillFoot}"/></linearGradient>
       <linearGradient id="${id}f" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${night ? '#12404A' : hill.far}"/><stop offset="1" stop-color="${night ? '#0A2A36' : hill.mid}" stop-opacity="${night ? 1 : 0.8}"/></linearGradient>
@@ -166,6 +170,7 @@ function faSky(t, id, night) {
     ${stars}
     <rect width="1600" height="640" fill="url(#${id}sun)"/>
     <g style="mix-blend-mode:screen">${ribbons}</g>
+    ${bokeh}
     ${clouds}
     ${night ? '' : flare}
     <path d="M820 640C930 560 1040 520 1180 512S1460 540 1640 590V640Z" fill="url(#${id}f)"/>

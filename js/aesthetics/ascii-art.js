@@ -1,34 +1,62 @@
-/* 25 ASCII Art — textual, generative, nerdy. Reference: character-density image
-   renderings (ASCII video art), TUI dashboards (btop, lazygit) and ascii-art landing
-   pages. Everything is built from monospace characters on a grid.
+/* 25 ASCII Art — textual, generative, nerdy. Reference: Andreas Gysin's character-field
+   sites (every pixel a glyph), the 16colo.rs ANSI archive (block glyphs, quantised CGA
+   colour), FIGlet-style block headlines and line ASCII (edges drawn with / \ | _ -).
 
-   The art is generated, not drawn: the brand initial is a 5x7 bitmap placed on a
-   character grid, blurred at two scales (a tight one for the body, a wide one for the
-   halo), and each cell's brightness is looked up in the ramp " .:-=+*#%@". Every cell is
-   coloured along a brand gradient (primary, then secondary, a touch of accent at the far
-   corner), faded toward the canvas with its brightness. A few cells are inverted in the
-   accent like a text selection. The panel is a box-drawing frame in the same <pre>, so
-   the whole hero is real text. Two grids are emitted (wide and narrow) and CSS swaps
-   them at the board's 600px breakpoint. The grid is memoised per initial and size. */
+   Mechanism.
+   - Colour is quantised: the client colours snap to the nearest of the 16 CGA/ANSI colours
+     (only the 7 dark ones on light paper) for every glyph; the exact client hex appears only
+     in readout text. Canvas is pure #000 (dark) or #F4F1E8 paper (light).
+   - The headline is drawn by def.headline(): block letters built from the 5x7 bitmap font
+     (AB_FONT_5X7) at one █ per pixel with a ▒ drop shadow (8 rows), wrapped by words; a
+     4-row half-block version (▀▄█) for narrow boards. The real text is the h2 aria-label.
+   - The hero is rasterised, not drawn: the brand initial is set in the heading face on an
+     offscreen canvas (the brand's first word on wide panels, the initial on narrow ones) at 4 x 7.6 px per cell (cell aspect 0.6 : 1.14 corrected), each cell's
+     luminance picks one of a 70-step ramp, and an edge pass swaps in / \ | _ - by gradient
+     direction (line ASCII). Colour comes from one field (diagonal hard bands of the ANSI
+     primary and secondary), never per-cell random. The empty field carries a sparse dust
+     that drifts 0.2 cells/s (a 5 s ticker; static under reduced motion) and the frame's foot
+     is a live status line. The ticker also re-rasterises once the heading font has loaded. */
 
-const AA_RAMP = ' .:-=+*#%@';
-
-// not in the font: an open ring (the "O" of a radial brand shape)
-const AA_RING = '01110 10001 10001 10001 10001 10001 01110';
+// 70-step ramp, light to dense
+const AA_RAMP = " .'`^\",:;Il!i><~+_-?][}{1)(|\\/tfjrxnuvczXYUJCLQ0OZmwqpdbkhao*#MW&8%B@$";
+const AA_PUNCT = {
+  '.': '00000 00000 00000 00000 00000 01100 01100', ',': '00000 00000 00000 00000 01100 00100 01000',
+  '!': '00100 00100 00100 00100 00100 00000 00100', '?': '01110 10001 00001 00110 00100 00000 00100',
+  "'": '00100 00100 01000 00000 00000 00000 00000', '-': '00000 00000 00000 11111 00000 00000 00000',
+  '&': '01100 10010 10100 01000 10101 10010 01101', ':': '00000 01100 01100 00000 01100 01100 00000',
+};
+const AA_CGA = ['#0000AA', '#00AA00', '#00AAAA', '#AA0000', '#AA00AA', '#AA5500', '#AAAAAA', '#555555', '#5555FF', '#55FF55', '#55FFFF', '#FF5555', '#FF55FF', '#FFFF55', '#FFFFFF'];
+const AA_CGA_DARK = ['#0000AA', '#00AA00', '#00AAAA', '#AA0000', '#AA00AA', '#AA5500', '#555555'];
 
 // Faces whose character advance is 0.6em (the grid maths needs a known advance).
 // Pixel faces count too when they are fixed-width and carry the box-drawing frame (measured: VT323, 0.4em).
-// Silkscreen and Pixelify Sans are proportional and Press Start 2P has no box-drawing glyphs, so those
-// cannot hold the character grid and fall through to the body mono or JetBrains Mono.
 const AA_MONO_ADV = { 'JetBrains Mono': 0.6, 'IBM Plex Mono': 0.6, 'Fira Code': 0.6, 'Geist Mono': 0.6, 'DM Mono': 0.6, 'Azeret Mono': 0.6, 'Space Mono': 0.612, 'VT323': 0.4 };
 const AA_LINE = 1.14;           // pre line-height in em
 const AA_CELL_A = AA_LINE / 0.6; // height of a cell in widths of a cell
 const aaCache = {};
+const aaLive = {};
 
 function aaHash(i, j, s) {
   let h = (i * 374761393 + j * 668265263 + s * 2147483647) | 0;
   h = (h ^ (h >>> 13)) * 1274126177;
   return ((h ^ (h >>> 16)) >>> 0) / 4294967295;
+}
+const aaEsc = s => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+// nearest CGA colour by RGB distance (weighted), from the given set
+function aaCga(hex, set) {
+  const a = hexToRgb(hex);
+  let best = set[0], bd = Infinity;
+  set.forEach(h => { const b = hexToRgb(h); const d = 2 * (a.r - b.r) ** 2 + 4 * (a.g - b.g) ** 2 + 3 * (a.b - b.b) ** 2; if (d < bd) { bd = d; best = h; } });
+  return best;
+}
+function aaQuant(t) {
+  const set = t.isDark ? AA_CGA : AA_CGA_DARK;
+  const p = aaCga(t.primary, set);
+  let sc = aaCga(t.secondary, set.filter(h => h !== p));
+  // the accent may come from the full set on paper too (it is shaded to 3:1 wherever it is text)
+  const ac = aaCga(t.accent, AA_CGA.filter(h => h !== p && h !== sc && h !== '#FFFFFF'));
+  return { p, s: sc, a: ac };
 }
 
 // The art face: the heading face when its class is mono or pixel (and it is fixed-width),
@@ -41,145 +69,215 @@ function aaArtFace(st) {
   return { font: jb, adv: 0.6 };
 }
 
-// Brightness 0..1 for a cols x rows grid of cells.
-function aaField(initial, cols, rows) {
-  const key = initial + cols + 'x' + rows;
-  if (aaCache[key]) return aaCache[key];
-  const rowsBits = (AB_FONT_5X7[initial] || AA_RING).split(' ');
-  const bit = (u, v) => {
-    const c = Math.floor(u), r = Math.floor(v);
-    return c >= 0 && c < 5 && r >= 0 && r < 7 && rowsBits[r][c] === '1' ? 1 : 0;
-  };
-  const W = cols, H = rows * AA_CELL_A;
-  const p = (H * 0.9) / 7;
-  const sx = cols > 60 ? 1.5 : 1;   // the wide panel stretches the glyph so it fills the field
-  const cx = W / 2, cy = H / 2;
-  const mask = (x, y) => bit((x - cx) / (p * sx) + 2.5, (y - cy) / p + 3.5);
-  const blur = (x, y, sigma, step) => {
-    const r = Math.ceil(sigma * 2.4 / step);
-    let sum = 0, wsum = 0;
-    for (let a = -r; a <= r; a++) for (let b = -r; b <= r; b++) {
-      const dx = a * step, dy = b * step;
-      const w = Math.exp(-(dx * dx + dy * dy) / (2 * sigma * sigma));
-      sum += w * mask(x + dx, y + dy); wsum += w;
-    }
-    return sum / wsum;
-  };
-  const out = new Float32Array(cols * rows);
-  for (let j = 0; j < rows; j++) for (let i = 0; i < cols; i++) {
-    const x = i + 0.5, y = (j + 0.5) * AA_CELL_A;
-    const b1 = blur(x, y, 0.8, 0.5);
-    const b2 = blur(x, y, 3.8, 1.1);
-    const inner = Math.min(1, Math.max(0, (b1 - 0.5) / 0.4));
-    // body: dense, brighter along the stroke core; halo: a soft falloff that stays dim
-    let b = inner * (0.66 + 0.34 * Math.min(1, b2 * 1.7)) + (1 - inner) * (b1 * 0.85 + b2 * 1.05);
-    // dust in the empty field
-    if (b < 0.1) {
-      const h = aaHash(i, j, 3);
-      if (h < 0.06) b = 0.12 + 0.18 * aaHash(i, j, 7);
-      else if (h < 0.07) b = 0.34;
-    }
-    out[j * cols + i] = Math.min(1, b);
-  }
-  aaCache[key] = out;
-  return out;
+// ---- block-letter headline -------------------------------------------------------------
+function aaBits(ch) { return (AB_FONT_5X7[ch] || AA_PUNCT[ch] || '').split(' ').filter(Boolean); }
+function aaWrap(words, max) {
+  const lines = []; let cur = [], n = 0;
+  words.forEach(w => { if (cur.length && n + w.length + 1 > max) { lines.push(cur); cur = []; n = 0; } cur.push(w); n += w.length + (cur.length > 1 ? 1 : 0); });
+  if (cur.length) lines.push(cur);
+  return lines;
 }
-
-// Brand gradient as a dither: each cell takes one of the pure brand hues, with the
-// odds shifting across a transition band, so the hues never blend into mud
-// (orange + teal averages to grey). primary -> secondary across 0.36..0.52, then a touch
-// of accent past 0.9.
-function aaCol(t, hexes, h) {
-  const [a, b, c] = hexes;
-  let hex;
-  if (t < 0.36) hex = a;
-  else if (t < 0.52) hex = h < (t - 0.36) / 0.16 ? b : a;
-  else if (t < 0.9) hex = b;
-  else hex = h < (t - 0.9) / 0.1 ? c : b;
-  return hexToRgb(hex);
-}
-const aaRgb = c => '#' + [c.r, c.g, c.b].map(v => Math.max(0, Math.min(255, Math.round(v))).toString(16).padStart(2, '0')).join('');
-const aaEsc = s => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-
-// One <pre> panel (box-drawing frame, density-map field). cols/rows are the inner field.
-function aaPanel(ctx, cols, rows, o) {
-  const t = ctx.t;
-  const field = aaField(ctx.initial, cols, rows);
-  const grad = [t.primary, t.secondary, t.accent];
-  const canvas = hexToRgb(t.canvas);
-  const inkRgb = hexToRgb(t.ink);
-  // inverse "selection" cells: three cells inside the glyph body, picked deterministically
-  const sel = new Set();
-  for (let n = 0, tries = 0; n < 4 && tries < 400; tries++) {
-    const i = Math.floor(aaHash(tries, 11, 5) * cols), j = Math.floor(aaHash(tries, 17, 9) * rows);
-    if (field[j * cols + i] > 0.78 && !sel.has(j * cols + i)) { sel.add(j * cols + i); n++; }
-  }
-  // annotation text laid into the field where it is empty (wide grid only)
-  const notes = {};
-  const put = (row, col, text, cls) => { notes[row] = (notes[row] || []).concat([[col, text, cls]]); };
-  if (o.notes) {
-    put(1, 3, 'density.map', 'k');
-    put(2, 3, 'ramp ' + JSON.stringify(AA_RAMP).slice(1, -1), 'ramp');
-    put(rows - 3, 3, `'${ctx.initial}' 5x7 → ${cols}x${rows}`, 'k');
-    put(1, cols - 15, `cells ${String(cols * rows).padStart(5, ' ')}`, 'k');
-    put(2, cols - 15, `levels   ${AA_RAMP.length}`, 'k');
-  }
-  const span = (txt, color, cls) => `<span${cls ? ` class="${cls}"` : ''} style="color:${color}">${aaEsc(txt)}</span>`;
-  const lines = [];
-  const slug = (ctx.brandName || 'brand').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, Math.max(6, cols - 20)) || 'brand';
-  const fill = (n, ch) => ch.repeat(Math.max(0, n));
-  const title = o.notes ? `┌─[ ${slug}.txt ]` : `┌─[ ${slug} ]`;
-  lines.push(`<span class="aa-bd">${aaEsc(title + fill(cols + 2 - Array.from(title).length - 1, '─') + '┐')}</span>`);
-  for (let j = 0; j < rows; j++) {
-    let html = '<span class="aa-bd">│</span>';
-    // build the row as char list then merge runs of the same style
+// wide: 8 rows (7 + shadow), 7 cols per letter; narrow: 4 rows of half blocks, 6 cols per letter
+function aaFig(words, hlFrom, narrow) {
+  const lines = aaWrap(words, narrow ? 8 : 13);
+  let maxCols = 0;
+  let wi = 0;
+  const out = lines.map(line => {
+    const rows = narrow ? 4 : 8;
     const cells = [];
-    for (let i = 0; i < cols; i++) cells.push({ ch: ' ', style: null, cls: '' });
-    for (let i = 0; i < cols; i++) {
-      const b = field[j * cols + i];
-      const idx = Math.min(9, Math.floor(b * 9.999));
-      const tg = Math.min(1, 0.52 * (i / cols) + 0.5 * (j / rows));
-      const g = aaCol(tg, grad, aaHash(i, j, 21));
-      const fade = 0.4 + 0.6 * Math.min(1, b * 1.3);
-      let rgb = { r: canvas.r + (g.r - canvas.r) * fade, g: canvas.g + (g.g - canvas.g) * fade, b: canvas.b + (g.b - canvas.b) * fade };
-      // light mode: pale orange and teal vanish on cream, so each cell moves 35% toward ink
-      if (!t.isDark) rgb = { r: rgb.r + (inkRgb.r - rgb.r) * 0.35, g: rgb.g + (inkRgb.g - rgb.g) * 0.35, b: rgb.b + (inkRgb.b - rgb.b) * 0.35 };
-      const isSel = sel.has(j * cols + i);
-      cells[i] = { ch: AA_RAMP[idx], style: aaRgb(rgb), cls: isSel ? 'sel' : '' };
-    }
-    (notes[j] || []).forEach(([col, text, cls]) => {
-      Array.from(text).forEach((ch, k) => {
-        const i = col + k;
-        if (i < 0 || i >= cols) return;
-        cells[i] = { ch, style: cls === 'ramp' && k >= 5 ? aaRgb(aaCol(Math.min(1, (k - 5) / 10), grad, aaHash(k, 3, 2))) : null, cls: cls === 'ramp' && k >= 5 ? 'rp' : 'note' };
+    const put = (r, c, ch, cls) => { (cells[r] = cells[r] || [])[c] = { ch, cls }; };
+    let x = 0;
+    line.forEach((w, k) => {
+      const hl = wi >= hlFrom; wi++;
+      if (k) x += narrow ? 2 : 3;
+      Array.from(w.toUpperCase()).forEach(ch => {
+        const b = aaBits(ch);
+        if (b.length) {
+          if (narrow) {
+            for (let r = 0; r < 4; r++) for (let c = 0; c < 5; c++) {
+              const top = b[r * 2] && b[r * 2][c] === '1', bot = b[r * 2 + 1] && b[r * 2 + 1][c] === '1';
+              if (top || bot) put(r, x + c, top && bot ? '█' : top ? '▀' : '▄', hl ? 'h' : 'g');
+            }
+          } else {
+            for (let r = 0; r < 7; r++) for (let c = 0; c < 5; c++) if (b[r][c] === '1') {
+              put(r, x + c, '█', hl ? 'h' : 'g');
+              const sr = r + 1, sc = x + c + 1;
+              const own = sr < 7 && c + 1 < 5 && b[sr][c + 1] === '1';
+              if (!own && !(cells[sr] && cells[sr][sc] && cells[sr][sc].ch === '█')) put(sr, sc, '▒', 'w');
+            }
+          }
+        }
+        x += narrow ? 6 : 7;
       });
     });
-    let k = 0;
+    maxCols = Math.max(maxCols, x);
+    const text = [];
+    for (let r = 0; r < rows; r++) {
+      const row = cells[r] || [];
+      let html = '', k = 0;
+      while (k < x) {
+        const c = row[k] || { ch: ' ', cls: '' };
+        let m = k + 1, txt = c.ch;
+        while (m < x && ((row[m] || { cls: '' }).cls === c.cls)) { txt += (row[m] || { ch: ' ' }).ch; m++; }
+        html += c.cls ? `<span class="aa-${c.cls}">${aaEsc(txt)}</span>` : aaEsc(txt);
+        k = m;
+      }
+      text.push(html);
+    }
+    return `<span class="aah-l">${text.join('\n')}</span>`;
+  }).join('');
+  return { html: out, cols: maxCols };
+}
+
+// ---- rasterised hero ---------------------------------------------------------------------
+function aaFontReady(fam) {
+  try { return !document.fonts || document.fonts.check(`600 40px ${fam}`); } catch (e) { return true; }
+}
+function aaRaster(text, fam, cols, rows) {
+  const ready = aaFontReady(fam);
+  const key = `${text}|${fam}|${cols}x${rows}|${ready}`;
+  if (aaCache[key]) return aaCache[key];
+  const SX = 4, SY = 4 * AA_CELL_A;
+  const W = cols * SX, H = Math.round(rows * SY);
+  const lum = new Float32Array(cols * rows);
+  if (typeof document !== 'undefined' && document.createElement) {
+    const cv = document.createElement('canvas');
+    cv.width = W; cv.height = H;
+    const g = cv.getContext ? cv.getContext('2d') : null;
+    if (g) {
+      g.fillStyle = '#000'; g.fillRect(0, 0, W, H);
+      g.fillStyle = '#fff'; g.textAlign = 'center'; g.textBaseline = 'alphabetic';
+      let size = H * 1.18;
+      g.font = `600 ${size}px ${fam}`;
+      const m = g.measureText(text);
+      const asc = m.actualBoundingBoxAscent || size * 0.72, desc = m.actualBoundingBoxDescent || 0;
+      const k = Math.min((H * 0.86) / (asc + desc), (W * 0.9) / Math.max(1, m.width));
+      size *= k; g.font = `600 ${size}px ${fam}`;
+      const m2 = g.measureText(text);
+      const a2 = m2.actualBoundingBoxAscent || size * 0.72, d2 = m2.actualBoundingBoxDescent || 0;
+      g.fillText(text, W / 2, (H + a2 - d2) / 2);
+      const px = g.getImageData(0, 0, W, H).data;
+      for (let j = 0; j < rows; j++) for (let i = 0; i < cols; i++) {
+        let sum = 0, n = 0;
+        for (let y = Math.floor(j * SY); y < Math.floor((j + 1) * SY); y++) for (let x = i * SX; x < (i + 1) * SX; x++) { sum += px[(y * W + x) * 4]; n++; }
+        lum[j * cols + i] = n ? sum / n / 255 : 0;
+      }
+    }
+  }
+  aaCache[key] = lum;
+  return lum;
+}
+
+// cells for one panel: { ch, cls, col } with the edge pass and a single colour field
+function aaCells(ctx, q, cols, rows, fam) {
+  const L = aaRaster(ctx.word || ctx.initial, fam, cols, rows);
+  const at = (i, j) => (i < 0 || j < 0 || i >= cols || j >= rows ? 0 : L[j * cols + i]);
+  const cells = [];
+  for (let j = 0; j < rows; j++) for (let i = 0; i < cols; i++) {
+    const v = at(i, j);
+    // light falls from the upper left across the glyph, so the interior is shaded, not a flat @@@ slab
+    const shade = 0.62 + 0.38 * (1 - (i / cols) * 0.6 - (j / rows) * 0.4);
+    const gx = at(i + 1, j) - at(i - 1, j), gy = (at(i, j + 1) - at(i, j - 1)) / AA_CELL_A;
+    const mag = Math.hypot(gx, gy);
+    let ch = null;
+    if (mag > 0.32 && v > 0.12 && v < 0.92) {
+      const ang = (Math.atan2(gy, gx) * 180 / Math.PI + 180) % 180;   // gradient direction; the edge runs across it
+      ch = ang < 22.5 || ang >= 157.5 ? '|' : ang < 67.5 ? '/' : ang < 112.5 ? (gy > 0 ? '_' : '-') : '\\';
+    }
+    const tone = v * shade;
+    const idx = Math.min(AA_RAMP.length - 1, Math.floor(tone * (AA_RAMP.length - 1) + 0.5));
+    if (!ch) ch = v > 0.04 ? AA_RAMP[Math.max(1, idx)] : ' ';
+    const band = (i / cols) * 0.62 + (j / rows) * 0.38 < 0.52 ? 'p' : 's';
+    cells.push({ ch, cls: v > 0.04 ? band : '' });
+  }
+  return cells;
+}
+function aaRows(cells, cols, rows, drift) {
+  const lines = [];
+  for (let j = 0; j < rows; j++) {
+    let html = '', k = 0;
+    const row = cells.slice(j * cols, (j + 1) * cols).map((c, i) => {
+      if (c.ch !== ' ') return c;
+      const h = aaHash(i + drift, j, 3);
+      return h < 0.05 ? { ch: h < 0.02 ? '.' : h < 0.035 ? '`' : ':', cls: 'd' } : c;
+    });
     while (k < cols) {
       let m = k + 1;
-      while (m < cols && cells[m].style === cells[k].style && cells[m].cls === cells[k].cls) m++;
-      const c = cells[k];
-      const txt = cells.slice(k, m).map(x => x.ch).join('');
-      if (c.cls === 'sel') html += `<span class="sel" style="background:${t.accent};color:${t.canvas}">${aaEsc(txt)}</span>`;
-      else if (c.cls === 'note') html += `<span class="note">${aaEsc(txt)}</span>`;
-      else if (c.style) html += span(txt, c.style, c.cls === 'rp' ? 'rp' : '');
-      else html += aaEsc(txt);
+      while (m < cols && row[m].cls === row[k].cls) m++;
+      const txt = row.slice(k, m).map(x => x.ch).join('');
+      html += row[k].cls ? `<span class="aa-${row[k].cls}">${aaEsc(txt)}</span>` : aaEsc(txt);
       k = m;
     }
-    html += '<span class="aa-bd">│</span>';
-    lines.push(html);
+    lines.push(`<span class="aa-bd">│</span>${html}<span class="aa-bd">│</span>`);
   }
-  const foot = `└─ ${cols}×${rows} · ${AA_RAMP.length - 1} levels `;
-  lines.push(`<span class="aa-bd">${aaEsc(foot + fill(cols + 2 - Array.from(foot).length - 1, '─') + '┘')}</span>`);
-  return `<pre class="aa-pre ${o.cls}" style="--aa-cols:${cols + 2}">${lines.join('\n')}</pre>`;
+  return lines;
+}
+function aaFrameTop(title, cols) { const t = `┌─[ ${title} ]`; return t + '─'.repeat(Math.max(0, cols + 1 - Array.from(t).length)) + '┐'; }
+function aaFrameFoot(status, cols) { const t = `└─[ ${status} ]`; return t + '─'.repeat(Math.max(0, cols + 1 - Array.from(t).length)) + '┘'; }
+function aaPanelHtml(key, frame) {
+  const e = aaLive[key];
+  if (!e) return '';
+  const rows = aaRows(e.cells, e.cols, e.rows, frame);
+  const status = `${e.slug} · frame ${String(frame).padStart(4, '0')}`;
+  return [`<span class="aa-bd">${aaEsc(aaFrameTop(e.slug + '.txt', e.cols))}</span>`, ...rows, `<span class="aa-bd aa-live">${aaEsc(aaFrameFoot(status, e.cols))}</span>`].join('\n');
+}
+function aaPanel(ctx, q, cols, rows, cls) {
+  const st = ctx.state || (typeof state !== 'undefined' ? state : null);
+  const fam = st && st.headingFont ? (st.headingFont.cls === 'mono' || st.headingFont.cls === 'pixel' ? st.headingFont.css : aaArtFace(st).font.css) : '"JetBrains Mono", monospace';
+  const slug = (ctx.brandName || 'brand').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, Math.max(6, cols - 24)) || 'brand';
+  // the wide panel rasterises the brand's first word (up to 10 letters), the narrow one the initial
+  const first = String(ctx.brandName || '').trim().split(/\s+/)[0] || '';
+  const word = cols > 60 && first.length > 1 && first.length <= 10 ? first.toUpperCase() : ctx.initial;
+  const key = `${word}|${fam}|${cols}x${rows}|${slug}`;
+  aaLive[key] = { cells: aaCells({ initial: ctx.initial, word }, q, cols, rows, fam), cols, rows, slug, fam, ctx: { initial: ctx.initial, word } };
+  aaTick();
+  return `<pre class="aa-pre ${cls}" data-aak="${aaEsc(key).replace(/"/g, '&quot;')}" style="--aa-cols:${cols + 2}">${aaPanelHtml(key, aaFrameNow())}</pre>`;
+}
+function aaFrameNow() {
+  const reduce = typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  return reduce ? 0 : Math.floor(Date.now() / 5000) % 10000;   // 1 cell per 5 s = 0.2 cells/s
+}
+// One shared ticker: every 5 s it shifts the dust one cell and re-rasterises once the heading font has loaded.
+let aaTimer = null;
+function aaTick() {
+  if (aaTimer || typeof setInterval !== 'function' || typeof document === 'undefined') return;
+  aaTimer = setInterval(() => {
+    const els = document.querySelectorAll('.ab[data-ae="ascii-art"] .aa-pre[data-aak]');
+    if (!els.length) { clearInterval(aaTimer); aaTimer = null; return; }
+    const f = aaFrameNow();
+    els.forEach(el => {
+      const k = el.getAttribute('data-aak'), e = aaLive[k];
+      if (!e) return;
+      const ready = aaFontReady(e.fam);
+      if (ready && !e.ready) { e.cells = aaCells(e.ctx, null, e.cols, e.rows, e.fam); e.ready = true; el.dataset.f = ''; }
+      if (el.dataset.f !== String(f)) { el.innerHTML = aaPanelHtml(k, f); el.dataset.f = String(f); }
+    });
+  }, 1000);
+}
+
+// The background character field: sparse light ramp characters on 10px cells, ink at ~8%.
+function aaFieldUri(ink) {
+  const cols = 40, rows = 20, cw = 10, ch = 19;
+  let rowsSvg = '';
+  for (let j = 0; j < rows; j++) {
+    let line = '';
+    for (let i = 0; i < cols; i++) {
+      const f = 0.5 + 0.5 * Math.sin(i * 0.31 + j * 0.47) * Math.cos(i * 0.13 - j * 0.29);
+      const h = aaHash(i, j, 41);
+      line += h < f * 0.55 ? AA_RAMP[1 + Math.floor(aaHash(i, j, 43) * 14 * f)] : ' ';
+    }
+    rowsSvg += `<text x="0" y="${j * ch + 14}" textLength="${cols * cw}" lengthAdjust="spacing" xml:space="preserve">${aaEsc(line).replace(/"/g, '&quot;')}</text>`;
+  }
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${cols * cw}" height="${rows * ch}"><g font-family="ui-monospace,Menlo,monospace" font-size="13" fill="${ink}" fill-opacity=".09">${rowsSvg}</g></svg>`;
+  return `url("data:image/svg+xml,${encodeURIComponent(svg).replace(/'/g, '%27')}")`;
 }
 
 registerAesthetic({
   key: 'ascii-art', order: 25,
   name: 'ASCII Art',
   descriptor: 'Textual · Generative · Nerdy',
-  influences: 'Text-mode art / Terminal UI / Generative ASCII',
-  summary: 'Everything built from monospace characters on a grid, with box-drawing panels and density-map art.',
+  influences: 'Character-field sites / ANSI art / FIGlet',
+  summary: 'Every pixel is a glyph: block-letter headlines, a rasterised character hero, controls written as text, colour quantised to the 16 ANSI colours.',
   motto: 'Everything is a character.',
   kicker: 'cat brand.txt',
   mode: 'dark',
@@ -188,35 +286,50 @@ registerAesthetic({
   layout: { hero: 'centered', palette: 'swatches', sections: 'two-col' },
   type: { ui: 'mono', label: 'mono' },
   highlight: 'custom',
-  highlightNote: 'The last word is set in the accent (shaded to read as text) in the heading face and is followed by a blinking block caret; no fill, no band.',
+  highlightNote: 'The headline is block letters built from characters (█ with a ▒ shadow); the last word is set in the ANSI-quantised accent. No fill, no band.',
   cardFill: '--ab-panel',
 
   roles: {
-    canvas: { use: 'The screen: page and every panel (panels are a 4% ink lift of it, framed by 1px lines)', never: 'Text' },
-    ink: { use: 'Headline, body text, frames and the brightest characters of the density map', never: 'Large filled fields' },
-    primary: { use: 'The one CTA bar, the selected [ segment ], the [■ ON ] switch and the start of the density-map gradient', never: 'Body text, borders, a second CTA' },
-    secondary: { use: 'Prompts ($, >), progress blocks, status brackets and the middle of the density-map gradient', never: 'The main CTA, body text, the page background' },
-    accent: { use: 'One spark: the last headline word, the footer block and a few inverse cells in the art', never: 'Buttons, body text, borders, large fills' },
+    canvas: { use: 'The screen: pure #000 (dark) or #F4F1E8 paper (light), with a faint character field behind the sections, which read as cut-outs', never: 'Text, a tinted dark grey' },
+    ink: { use: 'Block-letter headline, body text, frames, the brightest characters', never: 'Large filled fields' },
+    primary: { use: 'Snapped to the nearest ANSI colour: the hero\'s first colour band, the CTA frame, the selected segment, the [x] switch', never: 'Body text, borders, a second CTA, the raw client hex on a glyph' },
+    secondary: { use: 'Snapped to the nearest ANSI colour: the hero\'s second band, prompts ($, >), progress blocks, status brackets', never: 'The main CTA, body text, the page background' },
+    accent: { use: 'Snapped to the nearest ANSI colour: the last headline word and the footer block', never: 'Buttons, body text, borders, large fills' },
+  },
+
+  canvas(b) { return b.isDark ? '#000000' : '#F4F1E8'; },
+  // Glyph colour is quantised: the primary prints as its nearest ANSI colour (the readouts keep the client hex).
+  printPrimary(t) { return aaQuant(t).p; },
+
+  headline(ctx, text) {
+    const words = String(text || '').trim().split(/\s+/).filter(Boolean);
+    if (!words.length) return '';
+    const w = aaFig(words, words.length - 1, false), n = aaFig(words, words.length - 1, true);
+    return `<span class="aah aah-w" style="--fc:${w.cols}">${w.html}</span><span class="aah aah-n" style="--fc:${n.cols}">${n.html}</span>`;
   },
 
   tokens(t) {
     const st = typeof state !== 'undefined' ? state : null;
+    const q = aaQuant(t);
     const vars = {
       '--ab-type-pick-w': 400,
-      '--ab-panel': t.mix(t.canvas, t.ink, t.isDark ? 0.94 : 0.965),
-      '--ab-frame': t.mix(t.canvas, t.ink, 0.72),
+      '--ab-panel': t.canvas,
+      '--ab-frame': t.mix(t.canvas, t.ink, 0.62),
       '--ab-tr': (st && st.headingFont && { condensed: 0, heavy: 0, wide: 0.4, techno: 0.4, pixel: 0 }[st.headingFont.cls]) ?? 1,
+      '--ab-secondary': q.s, '--ab-accent': q.a, '--ab-on-accent': t.readable(q.a),
+      '--aa-q-p': q.p, '--aa-q-s': q.s, '--aa-q-a': q.a,
+      '--aa-field': aaFieldUri(t.ink),
     };
-    // secondary readable as text (prompts, status): shaded toward ink until it reaches 4.5:1 on the canvas
-    let sec = t.secondary;
-    for (let k = 1; k <= 20 && t.contrast(sec, t.canvas) < 4.5; k++) sec = t.mix(t.secondary, t.ink, 1 - k * 0.05);
-    vars['--aa-sec'] = sec;
+    // text-safe versions (prompts 4.5:1, the highlight word 3:1), shaded toward ink
+    const safe = (hex, min) => { let c = hex; for (let k = 1; k <= 20 && t.contrast(c, t.canvas) < min; k++) c = t.mix(hex, t.ink, 1 - k * 0.05); return c; };
+    vars['--aa-sec'] = safe(q.s, 4.5);
+    vars['--ab-accent-ink'] = safe(q.a, 3);
+    vars['--ab-primary-text'] = safe(q.p, 3);
     if (st && st.headingFont) {
       const f = aaArtFace(st);
       vars['--aa-font'] = f.font.css;
       vars['--aa-adv'] = f.adv;
       vars['--aa-line'] = +(f.adv * AA_CELL_A).toFixed(3); // keeps the cell 1.9 : 1 for every face
-      // interface text in the brand's own mono when it has one, else the art face
       const ui = st.bodyFont && st.bodyFont.category === 'mono' ? 'var(--ab-font-b)' : f.font.css;
       vars['--ab-font-ui'] = ui;
       vars['--ab-font-label'] = ui;
@@ -225,51 +338,49 @@ registerAesthetic({
   },
 
   art(ctx) {
-    const wide = aaPanel(ctx, 88, 17, { cls: 'aa-wide', notes: true });
-    const narrow = aaPanel(ctx, 40, 20, { cls: 'aa-narrow', notes: false });
-    return `<div class="aa">${wide}${narrow}</div>`;
+    const q = aaQuant(ctx.t);
+    return `<div class="aa">${aaPanel(ctx, q, 88, 12, 'aa-wide')}${aaPanel(ctx, q, 40, 20, 'aa-narrow')}</div>`;
   },
 
   materials: [
-    { name: 'Density ramp', css: 'font-family: JetBrains Mono, IBM Plex Mono or Space Mono; /* characters " .:-=+*#%@" chosen by brightness (0 to 9); each cell coloured along {primary}, {secondary}, {accent} and faded toward {canvas} as it dims */' },
-    { name: 'Frame', css: 'border: 1px solid {line}; border-radius: 0; background: {canvas}; /* panels carry their title in the top edge as ┤ TITLE ├; in the art the frame is real ┌─┐│└┘ characters */' },
-    { name: 'Segmented control', css: 'text: "[ Design ]  Build   Launch"; color: {primary}; /* brackets mark the selected item; the others sit at the same width without them */' },
-    { name: 'Primary action', css: 'background: {primary}; color: {onPrimary}; border-radius: 0; /* label "> Save direction" followed by a blinking █ block caret; static under reduced motion */' },
-    { name: 'Switch', css: 'text: "[■ ON ]" in {primary}, "[□ OFF]" in {muted}; no track, no knob.' },
-    { name: 'Progress', css: 'repeating 1ch cells: filled {secondary}, empty {line}; /* █████░░░░░ rendered as 6px cells on a 1ch pitch */' },
-    { name: 'Selection', css: 'background: {accent}; color: {canvas}; /* inverse video, used on a few cells of the art only */' },
+    { name: 'Block letters', css: 'white-space: pre; /* headlines are built from characters: █ per pixel of a 5x7 font with a ▒ shadow (8 rows), or ▀▄█ half blocks (4 rows) on phones */' },
+    { name: 'Rasterised field', css: 'font-family: JetBrains Mono or IBM Plex Mono; /* the image is set in the heading face on a canvas, read per cell (aspect 0.6 : 1.14), mapped to a 70-step ramp, with / \\ | _ - on the edges */' },
+    { name: 'ANSI colour', css: 'color: nearest of the 16 CGA colours to {primary} / {secondary} / {accent}; /* glyphs never carry the raw client hex; readouts print it as 0xE4572E */' },
+    { name: 'Glyph swatch', css: 'content: "████████████\\A██████▓▓▒▒░░\\A▓▓▓▓▒▒▒░░░"; /* 12 x 3 cells of block shades in the quantised colour */' },
+    { name: 'Controls as text', css: 'text: "< Design | Build | Launch >", "[x] Focus mode", "> Save direction █"; /* the selected item in inverse video; frames are 1px lines on the character grid */' },
+    { name: 'Character field', css: 'background: sparse ramp characters on 10px cells, ink at ~8%; /* sections read as cut-outs in it */' },
   ],
 
   rules: {
     do: [
-      'Build every image from the character ramp " .:-=+*#%@" on a monospace grid, choosing the character by brightness and colouring each cell along the brand gradient.',
-      'Frame panels with 1px lines titled in their top edge (┤ TITLE ├) and write controls as text: [ Design ] Build, [■ ON ], > Save direction █.',
-      'Set the headline and every label in a monospace or pixel face, with the highlight word in the accent and prompt characters ($, >, //) in secondary.',
-      'Keep the field mostly empty: sparse dots and a few annotations make the dense glyph read.',
+      'Make every pixel a glyph: headlines in block letters, swatches in block shades, controls written as text, images from a 70-step ramp.',
+      'Rasterise images at the cell aspect and draw their edges with / \\ | _ -, so a letter reads as that letter.',
+      'Quantise colour to the 16 ANSI colours; the exact client hex lives only in readouts.',
+      'Lay a faint character field behind everything and cut the sections out of it.',
     ],
     dont: [
-      'Use sprites, stepped pixel borders, rounded corners, shadows or glows on controls; characters are the medium.',
-      'Mix a proportional face into the interface or the art.',
-      'Fill panels with primary or accent; only the CTA bar, the selected item and the switch carry primary.',
-      'Let the density map run edge to edge with no empty cells, or colour it with more than the three brand hues.',
+      'Set the headline in a mono webfont at display size; build it from characters.',
+      'Use CSS colour bars, rounded corners, shadows or a pixel face.',
+      'Colour cells at random; colour comes from one field.',
+      'Leave debug labels as decoration.',
     ],
   },
   // Deck copy (js/brand-deck.js): three principles, three do / don't lines, each short.
   deck: {
     principles: [
-      ['Everything is a character', 'Every image comes from a brightness ramp.'],
-      ['Panels framed in text', 'Titled top edges and bracketed controls.'],
-      ['A mostly empty field', 'Sparse dots make the dense glyphs read.'],
+      ['Everything is a character', 'Headlines, swatches and images are glyphs.'],
+      ['Sixteen colours', 'Client colours snap to the ANSI palette.'],
+      ['Edges in line ASCII', 'Slashes, bars and underscores draw the outline.'],
     ],
     do: [
-      'Build images from the character ramp.',
+      'Build headlines from block letters.',
       'Write controls as text.',
-      'Set labels in monospace.',
+      'Snap colour to ANSI.',
     ],
     dont: [
-      'Use sprites or rounded corners.',
-      'Mix in a proportional face.',
-      'Fill panels with primary or accent.',
+      'Use a mono webfont as display.',
+      'Use CSS bars or rounded corners.',
+      'Colour cells at random.',
     ],
   },
 });

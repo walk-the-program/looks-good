@@ -8,7 +8,12 @@
    --ab-tile-sec, --ab-tile-pri, --ab-sub, --ab-shadow(-hi), --ab-pri-* come
    from js/aesthetics/bento-grid.js tokens().
    Hooks used: hero 'split' (re-gridded), palette 'chips', sections 'stacked',
-   highlight 'ink', states 'button'. If the framework had a tile layout hook
+   highlight 'ink' (overridden: the word prints in --ab-primary-text), states 'button'.
+   Round 6: ONE radius level (no tile inside a tile: palette swatches and type
+   specimens are their own tiles via display:contents), no soft shadows (flat fills
+   on the darker canvas, Apple style), a 7x2 hero tile beside the phone tile and a
+   full-bleed primary numeral tile (the hero's ::before / ::after, which become grid
+   items because .ab-hero is display:contents). If the framework had a tile layout hook
    the display:contents re-grid below would not be needed.
 ------------------------------------------------------------------------ */
 
@@ -26,17 +31,17 @@
 
 /* ---- every tile: one radius, one soft shadow, a lift on hover ---- */
 .ab[data-ae="bento-grid"] :is(.ab-hero-copy, .ab-art, .ab-palette, .ab-type, .ab-seg, .ab-card-title, .ab-card-body, .ab-input, .ab-toggle, .ab-state, .ab-row) {
-  background: var(--ab-tile); border-radius: var(--bn-r); box-shadow: var(--ab-shadow);
-  transition: transform 0.25s cubic-bezier(0.2, 0.7, 0.2, 1), box-shadow 0.25s;
+  background: var(--ab-tile); border-radius: var(--bn-r); box-shadow: none;
+  transition: transform 0.25s cubic-bezier(0.2, 0.7, 0.2, 1);
 }
-.ab[data-ae="bento-grid"] :is(.ab-hero-copy, .ab-art, .ab-palette, .ab-type, .ab-card-title, .ab-card-body, .ab-state, .ab-row):hover { transform: translateY(-2px); box-shadow: var(--ab-shadow-hi); }
+.ab[data-ae="bento-grid"] :is(.ab-hero-copy, .ab-art, .ab-palette, .ab-type, .ab-card-title, .ab-card-body, .ab-state, .ab-row):hover { transform: scale(1.01); }
 
 /* ---- header ---- */
 .ab[data-ae="bento-grid"] .ab-head { padding: 4px 6px 2px; }
 .ab[data-ae="bento-grid"] .ab-mark { border-radius: 9px; background: var(--ab-primary); color: var(--ab-on-primary); }
 .ab[data-ae="bento-grid"] .ab-brand { letter-spacing: calc(-0.03em * var(--ab-tr, 1)); }
 .ab[data-ae="bento-grid"] .ab-tag {
-  padding: 6px 12px; border-radius: 999px; background: var(--ab-tile); box-shadow: var(--ab-shadow); font-size: 10.5px; letter-spacing: 0.06em;
+  padding: 6px 12px; border-radius: 999px; background: var(--ab-tile); box-shadow: none; font-size: 10.5px; letter-spacing: 0.06em;
 }
 
 /* ---- hero: the statement tile ---- */
@@ -47,13 +52,40 @@
 }
 .ab[data-ae="bento-grid"] .ab-kicker::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--ab-primary); }
 .ab[data-ae="bento-grid"] .ab-headline { margin: auto 0; padding: clamp(18px, 3cqw, 34px) 0; font-weight: 640; line-height: 1; letter-spacing: calc(-0.045em * var(--ab-tr, 1)); }
+/* board hero: the product tile is shorter now (5 x 1), so the phone rises from near the top */
+.ab[data-ae="bento-grid"]:not(.ab-slide) > .ab-in > .ab-hero > .ab-art .bna-phone { bottom: auto; top: 9cqw; }
+.ab[data-ae="bento-grid"]:not(.ab-slide) > .ab-in > .ab-hero > .ab-art .bna-c1 { top: 4cqw; }
+.ab[data-ae="bento-grid"]:not(.ab-slide) > .ab-in > .ab-hero > .ab-art .bna-c2 { top: 40cqw; }
+/* the headline word: the brand primary (never the muddy accent-ink) */
+.ab[data-ae="bento-grid"] .ab-hl { color: var(--ab-primary-text); }
+
+/* hero row (board only): a 7-column x 2-row statement tile, bottom-aligned headline; the
+   phone tile (5 x 1) and a full-bleed primary numeral tile (5 x 1) beside it */
+.ab[data-ae="bento-grid"]:not(.ab-slide) > .ab-in > .ab-hero > .ab-hero-copy { grid-column: 1 / span 7; grid-row: 2 / span 2; }
+.ab[data-ae="bento-grid"]:not(.ab-slide) > .ab-in > .ab-hero > .ab-art { grid-column: 8 / -1; grid-row: 2; min-height: clamp(240px, 30cqw, 340px); }
+.ab[data-ae="bento-grid"]:not(.ab-slide) > .ab-in > .ab-hero .ab-headline {
+  margin: auto 0 0; padding: clamp(18px, 3cqw, 34px) 0 clamp(14px, 2cqw, 22px);
+  font-size: calc(clamp(44px, 7.6cqw, 104px) * var(--ab-hl-scale, 1) * var(--ab-hs, 1));
+}
+.ab[data-ae="bento-grid"]:not(.ab-slide) > .ab-in > .ab-hero > .ab-hero-copy .ab-kicker { margin-bottom: auto !important; }
+.ab[data-ae="bento-grid"]:not(.ab-slide) > .ab-in > .ab-hero::before,
+.ab[data-ae="bento-grid"]:not(.ab-slide) > .ab-in > .ab-hero::after { grid-column: 8 / -1; grid-row: 3; min-width: 0; }
+.ab[data-ae="bento-grid"]:not(.ab-slide) > .ab-in > .ab-hero::before {
+  content: "3"; display: flex; align-items: flex-start; padding: clamp(14px, 2cqw, 22px) clamp(20px, 2.8cqw, 30px);
+  min-height: clamp(150px, 20cqw, 200px); border-radius: var(--bn-r); background: var(--ab-primary); color: var(--ab-on-primary);
+  font: 600 clamp(84px, 13.5cqw, 120px)/1 var(--ab-font-h); letter-spacing: -0.06em; font-variant-numeric: tabular-nums;
+}
+.ab[data-ae="bento-grid"]:not(.ab-slide) > .ab-in > .ab-hero::after {
+  content: "Projects in motion"; z-index: 1; align-self: end; justify-self: start; margin: 0 0 clamp(16px, 2.2cqw, 24px) clamp(20px, 2.8cqw, 30px);
+  color: var(--ab-on-primary); font: 600 15px/1.2 var(--ab-font-ui); letter-spacing: -0.01em;
+}
 .ab[data-ae="bento-grid"] .ab-subcopy { margin: 0 !important; max-width: 24em; font-size: clamp(14px, 1.55cqw, 17px); color: var(--ab-muted); }
 .ab[data-ae="bento-grid"] .ab-sub-lead { color: var(--ab-ink); font-weight: 500; }
 
 /* ---- the product tile: a phone rising from the bottom edge ---- */
 .ab[data-ae="bento-grid"] .ab-art {
   max-width: none; aspect-ratio: auto; justify-self: stretch; align-self: stretch; min-height: clamp(300px, 44cqw, 470px); overflow: hidden;
-  background: linear-gradient(165deg, var(--ab-tile-sec), color-mix(in srgb, var(--ab-tile-sec) 55%, var(--ab-tile)));
+  background: var(--ab-tile-sec);
 }
 .ab[data-ae="bento-grid"] .bna { position: absolute; inset: 0; font-size: clamp(6px, 2.55cqw, 13px); line-height: 1.3; color: var(--ab-ink); }
 .ab[data-ae="bento-grid"] .bna i { display: block; font-style: normal; }
@@ -73,7 +105,6 @@
 .ab[data-ae="bento-grid"] .bna-bell::after { content: ""; position: absolute; right: 0.35em; top: 0.35em; width: 0.6em; height: 0.6em; border-radius: 50%; background: var(--ab-accent); box-shadow: 0 0 0 2px var(--ab-tile); }
 .ab[data-ae="bento-grid"] .bna-card {
   display: flex; align-items: center; justify-content: space-between; gap: 1em; padding: 1.4em 1.5em; border-radius: 2em; background: var(--ab-primary); color: var(--ab-on-primary);
-  box-shadow: 0 14px 22px -14px var(--ab-pri-glow);
 }
 .ab[data-ae="bento-grid"] .bna-card small { display: block; font-size: 0.95em; opacity: 0.82; }
 .ab[data-ae="bento-grid"] .bna-card strong { display: block; margin: 0.15em 0; font: 650 3.1em/1 var(--ab-font-h); letter-spacing: calc(-0.045em * var(--ab-tr, 1)); }
@@ -91,33 +122,54 @@
 .ab[data-ae="bento-grid"] .bna-tabs i.on { background: var(--ab-ink); }
 .ab[data-ae="bento-grid"] .bna-chip {
   position: absolute; display: flex; align-items: center; gap: 0.65em; padding: 0.8em 1.3em 0.8em 1.1em; border-radius: 999px; z-index: 3;
-  background: var(--ab-tile); color: var(--ab-ink); font-size: 1.25em; font-weight: 620; letter-spacing: -0.01em; white-space: nowrap; box-shadow: var(--ab-shadow-hi);
+  background: var(--ab-tile); color: var(--ab-ink); font-size: 1.25em; font-weight: 620; letter-spacing: -0.01em; white-space: nowrap; box-shadow: 0 0 0 1px var(--ab-tile-line);
 }
 .ab[data-ae="bento-grid"] .bna-c1 { left: 6cqw; top: 7cqw; }
 .ab[data-ae="bento-grid"] .bna-c1 i { width: 0.7em; height: 0.7em; border-radius: 50%; background: var(--ab-accent); box-shadow: 0 0 0 0.25em color-mix(in srgb, var(--ab-accent) 30%, transparent); }
 .ab[data-ae="bento-grid"] .bna-c2 { right: 5cqw; top: 24cqw; background: var(--ab-secondary); color: var(--ab-on-secondary); }
 .ab[data-ae="bento-grid"] .bna-c2 b { font-weight: 700; }
 
-/* ---- palette: a wide tile of colour sub-tiles ---- */
+/* ---- palette: one level of tiles. Each swatch IS a tile, filled edge to edge with its
+   colour, the label inside at 13px. On the board the palette and type wrappers dissolve
+   (display: contents) so swatches and specimens sit in the board's own 12-column grid;
+   canvas spans 4 columns (it is the biggest role), the rest 2 each. ---- */
 .ab[data-ae="bento-grid"] .ab-palette, .ab[data-ae="bento-grid"] .ab-type { padding: clamp(18px, 2.8cqw, 32px); }
 .ab[data-ae="bento-grid"] .ab-labelrow { margin-bottom: 14px; }
 .ab[data-ae="bento-grid"] .ab-label { font-size: 12px; letter-spacing: 0.01em; text-transform: none; font-weight: 600; color: var(--ab-muted); }
 .ab[data-ae="bento-grid"] .ab-n { color: var(--ab-ink); }
 .ab[data-ae="bento-grid"] .ab-n::after { content: " · "; color: var(--ab-muted); }
-.ab[data-ae="bento-grid"] .ab-swatches[data-kind="chips"] { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px; }
-.ab[data-ae="bento-grid"] .ab-swatches[data-kind="chips"] .ab-swatch { display: flex; flex-direction: column; align-items: stretch; gap: 0; padding: 10px 10px 13px; border: 0; border-radius: 20px; background: var(--ab-sub); }
-.ab[data-ae="bento-grid"] .ab-swatches[data-kind="chips"] .ab-chip { width: 100%; height: clamp(46px, 7.4cqw, 84px); margin: 0 0 12px; border-radius: 14px; }
-.ab[data-ae="bento-grid"] .ab-swatches[data-kind="chips"] .ab-sw-role { margin: 0 4px; font-size: 13.5px; font-weight: 650; }
-.ab[data-ae="bento-grid"] .ab-swatches[data-kind="chips"] .ab-sw-hex { margin: 2px 4px 0; font-size: 11px; color: var(--ab-muted); }
+.ab[data-ae="bento-grid"] .ab-swatches[data-kind="chips"] { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: var(--bn-gap); }
+.ab[data-ae="bento-grid"] .ab-swatches[data-kind="chips"] .ab-swatch {
+  display: flex; flex-direction: column; justify-content: flex-end; align-items: flex-start; gap: 2px; min-height: clamp(120px, 16cqw, 170px);
+  padding: clamp(14px, 2cqw, 20px); border: 0; border-radius: var(--bn-r); background: var(--sw); color: var(--sw-on);
+}
+.ab[data-ae="bento-grid"] .ab-swatches[data-kind="chips"] .ab-swatch[data-role="canvas"] { box-shadow: inset 0 0 0 1px var(--ab-tile-line); }
+.ab[data-ae="bento-grid"] .ab-swatches[data-kind="chips"] .ab-chip { display: none; }
+.ab[data-ae="bento-grid"] .ab-swatches[data-kind="chips"] .ab-sw-role { margin: 0; font-size: 13px; font-weight: 650; color: inherit; }
+.ab[data-ae="bento-grid"] .ab-swatches[data-kind="chips"] .ab-sw-job { display: none; }
+.ab[data-ae="bento-grid"] .ab-swatches[data-kind="chips"] .ab-sw-hex, .ab[data-ae="bento-grid"] .ab-swatches[data-kind="chips"] .ab-sw-print { margin: 0; font-size: 12px; color: inherit; opacity: 1; }
+.ab[data-ae="bento-grid"]:not(.ab-slide) > .ab-in > .ab-palette,
+.ab[data-ae="bento-grid"]:not(.ab-slide) > .ab-in > .ab-palette > .ab-swatches,
+.ab[data-ae="bento-grid"]:not(.ab-slide) > .ab-in > .ab-type,
+.ab[data-ae="bento-grid"]:not(.ab-slide) > .ab-in > .ab-type > .ab-type-grid { display: contents; }
+.ab[data-ae="bento-grid"]:not(.ab-slide) > .ab-in > :is(.ab-palette, .ab-type) > .ab-labelrow { grid-column: 1 / -1; margin: 12px 6px 0; }
+.ab[data-ae="bento-grid"]:not(.ab-slide) > .ab-in > .ab-palette .ab-swatch { grid-column: span 2; }
+.ab[data-ae="bento-grid"]:not(.ab-slide) > .ab-in > .ab-palette .ab-swatch[data-role="canvas"] { grid-column: span 4; }
 
-/* ---- type recommendations ---- */
-.ab[data-ae="bento-grid"] .ab-type-grid { gap: 10px; }
-.ab[data-ae="bento-grid"] .ab-type-col { padding: 16px 18px 14px; border-top: 0; border-radius: 20px; background: var(--ab-sub); }
+/* ---- type: each specimen is its own tile with a 96px "Aa" in its face ---- */
+.ab[data-ae="bento-grid"] .ab-type-grid { gap: var(--bn-gap); }
+.ab[data-ae="bento-grid"] .ab-type-col { padding: clamp(18px, 2.4cqw, 26px); border-top: 0; border-radius: var(--bn-r); background: var(--ab-tile); }
+.ab[data-ae="bento-grid"]:not(.ab-slide) > .ab-in > .ab-type .ab-type-col { grid-column: span 6; }
+.ab[data-ae="bento-grid"]:not(.ab-slide) > .ab-in > .ab-type[data-cols="3"] .ab-type-col { grid-column: span 4; }
+.ab[data-ae="bento-grid"] .ab-type-col::before { content: "Aa"; display: block; margin: 0 0 14px; font: 600 96px/0.9 var(--ab-font-h); letter-spacing: -0.05em; color: var(--ab-ink); }
+.ab[data-ae="bento-grid"] .ab-type-col[data-role="body"]::before { font-family: var(--ab-font-b); font-weight: 400; }
+.ab[data-ae="bento-grid"] .ab-type-col[data-role="mono"]::before { font-family: ui-monospace, "SF Mono", Menlo, monospace; font-weight: 400; letter-spacing: -0.02em; }
 .ab[data-ae="bento-grid"] .ab-type-role { font-weight: 650; color: var(--ab-ink); letter-spacing: 0.04em; text-transform: none; font-size: 13px; }
 .ab[data-ae="bento-grid"] .ab-type-pick { font-weight: 560; letter-spacing: calc(-0.02em * var(--ab-tr, 1)); }
 .ab[data-ae="bento-grid"] .ab-type-foot { margin-top: 18px; }
+.ab[data-ae="bento-grid"]:not(.ab-slide) > .ab-in > .ab-type > .ab-type-foot { grid-column: 1 / -1; margin: 0; padding: clamp(18px, 2.4cqw, 26px); border-radius: var(--bn-r); background: var(--ab-tile); }
 .ab[data-ae="bento-grid"] .ab-type-k { text-transform: none; letter-spacing: 0; font-weight: 650; font-size: 12px; }
-.ab[data-ae="bento-grid"] .ab-fit { border: 0; background: var(--ab-tile); box-shadow: inset 0 0 0 1px var(--ab-tile-line); }
+.ab[data-ae="bento-grid"] .ab-fit { border: 0; background: var(--ab-sub); box-shadow: none; }
 .ab[data-ae="bento-grid"] .ab-fit[data-fit="match"] { background: var(--ab-tile-pri); box-shadow: none; }
 .ab[data-ae="bento-grid"] .ab-type-apply { padding: 12px 20px; border: 0; border-radius: 999px; background: var(--ab-ink); color: var(--ab-canvas); transition: transform 0.15s; }
 .ab[data-ae="bento-grid"] .ab-type-apply:hover { background: var(--ab-ink); transform: translateY(-1px); }
@@ -129,14 +181,24 @@
 
 /* 01: one tile holds the capsule, title and body; the action is a composed square primary tile beside it */
 .ab[data-ae="bento-grid"] .ab-card {
-  position: relative; display: grid; grid-template-columns: minmax(0, 1fr) clamp(170px, 28cqw, 250px); grid-template-rows: auto auto 1fr; gap: var(--bn-gap);
+  position: relative; display: grid; grid-template-columns: minmax(0, 1fr) clamp(150px, 22cqw, 230px) clamp(170px, 26cqw, 250px); grid-template-rows: auto auto 1fr; gap: var(--bn-gap);
   min-height: clamp(250px, 30cqw, 320px); padding: 0; border-radius: 0; background: none; box-shadow: none;
 }
 .ab[data-ae="bento-grid"] .ab-card::before {
-  content: ""; grid-area: 1 / 1 / 4 / 2; z-index: 0; background: var(--ab-tile); border-radius: var(--bn-r); box-shadow: var(--ab-shadow);
-  transition: transform 0.25s cubic-bezier(0.2, 0.7, 0.2, 1), box-shadow 0.25s;
+  content: ""; grid-area: 1 / 1 / 4 / 2; z-index: 0; background: var(--ab-tile); border-radius: var(--bn-r); box-shadow: none;
+  transition: transform 0.25s cubic-bezier(0.2, 0.7, 0.2, 1);
 }
-.ab[data-ae="bento-grid"] .ab-card:hover::before { transform: translateY(-2px); box-shadow: var(--ab-shadow-hi); }
+.ab[data-ae="bento-grid"] .ab-card:hover::before { transform: scale(1.01); }
+/* the image tile: an abstract product render (a lit primary sphere on its own shadow),
+   so the interface row is not all copy */
+.ab[data-ae="bento-grid"] .ab-card::after {
+  content: ""; grid-area: 1 / 2 / 4 / 3; z-index: 0; border-radius: var(--bn-r); min-height: 100%;
+  background:
+    radial-gradient(circle closest-side, color-mix(in srgb, #ffffff 55%, transparent) 0, transparent 100%) 36% 30% / 28% 28% no-repeat,
+    radial-gradient(circle closest-side at 42% 40%, color-mix(in srgb, #ffffff 22%, var(--ab-primary)) 0, var(--ab-primary) 45%, color-mix(in srgb, #000000 40%, var(--ab-primary)) 96%, transparent 100%) 50% 40% / 74% 74% no-repeat,
+    radial-gradient(ellipse at 50% 50%, color-mix(in srgb, var(--ab-ink) 22%, transparent) 0, transparent 68%) 50% 88% / 70% 16% no-repeat,
+    var(--ab-tile-sec);
+}
 .ab[data-ae="bento-grid"] .ab-card > * { position: relative; z-index: 1; }
 .ab[data-ae="bento-grid"] .ab-card .ab-seg {
   grid-area: 1 / 1; justify-self: start; width: auto; margin: 22px 22px 0; gap: 4px; padding: 5px; border-radius: 999px; background: var(--ab-sub); box-shadow: none;
@@ -155,9 +217,9 @@
   font-size: clamp(13px, 1.5cqw, 16px); line-height: 1.4; color: var(--ab-muted);
 }
 .ab[data-ae="bento-grid"] .ab-card .ab-cta {
-  grid-area: 1 / 2 / 4 / 3; width: auto; min-height: 100%; display: grid; grid-template-rows: auto 1fr; grid-template-columns: minmax(0, 1fr); align-items: start; justify-items: stretch;
+  grid-area: 1 / 3 / 4 / 4; width: auto; min-height: 100%; display: grid; grid-template-rows: auto 1fr; grid-template-columns: minmax(0, 1fr); align-items: start; justify-items: stretch;
   padding: 22px; border-radius: var(--bn-r); text-align: left; background: var(--ab-primary); color: var(--ab-on-primary);
-  box-shadow: 0 16px 28px -16px var(--ab-pri-glow); transition: filter 0.18s, transform 0.2s cubic-bezier(0.2, 0.7, 0.2, 1);
+  box-shadow: none; transition: filter 0.18s, transform 0.2s cubic-bezier(0.2, 0.7, 0.2, 1);
 }
 .ab[data-ae="bento-grid"] .ab-card .ab-cta-arrow { grid-row: 1; justify-self: end; }
 .ab[data-ae="bento-grid"] .ab-card .ab-cta-label { grid-row: 2; align-self: end; justify-self: start; font-size: 22px; font-weight: 600; line-height: 1.1; letter-spacing: -0.02em; }
@@ -173,7 +235,7 @@
 .ab[data-ae="bento-grid"] .ab-panel { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: var(--bn-gap); padding: 0; border-radius: 0; background: none; }
 .ab[data-ae="bento-grid"] .ab-fieldlabel { grid-area: 1 / 1 / 2 / 5; z-index: 1; align-self: start; justify-self: start; margin: 14px 18px 0; font-size: 11px; font-weight: 600; color: var(--ab-muted); pointer-events: none; }
 .ab[data-ae="bento-grid"] .ab-input { grid-area: 1 / 1 / 2 / 5; margin: 0; padding: 30px clamp(18px, 2.6cqw, 28px) clamp(16px, 2.2cqw, 24px); font-size: clamp(17px, 2.1cqw, 23px); font-weight: 560; letter-spacing: -0.02em; outline: none; transition: box-shadow 0.2s; }
-.ab[data-ae="bento-grid"] .ab-input:focus { box-shadow: 0 0 0 2px var(--ab-primary), var(--ab-shadow); }
+.ab[data-ae="bento-grid"] .ab-input:focus { box-shadow: 0 0 0 2px var(--ab-primary); }
 .ab[data-ae="bento-grid"] .ab-toggle { grid-area: 1 / 5 / 2 / 7; min-height: 0; padding: 0 clamp(16px, 2.2cqw, 26px) 26px; font-weight: 560; }
 .ab[data-ae="bento-grid"] .ab-switch { width: 52px; height: 30px; border-radius: 999px; }
 .ab[data-ae="bento-grid"] .ab-switch::before { left: 3px; top: 3px; width: 24px; height: 24px; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.25); }
@@ -182,7 +244,7 @@
 .ab[data-ae="bento-grid"] .ab-states { grid-column: 1 / -1; margin-top: 0; gap: var(--bn-gap); }
 .ab[data-ae="bento-grid"] .ab-state { padding: 16px 14px 14px; font-size: 12px; font-weight: 600; }
 .ab[data-ae="bento-grid"] .ab-states .ab-state-ctl { min-height: 0; padding: 12px 8px; margin-bottom: 12px; letter-spacing: 0; border-radius: 999px; font-size: 13px; font-weight: 600; background: var(--ab-primary); color: var(--ab-on-primary); box-shadow: none; transform: none; filter: none; }
-.ab[data-ae="bento-grid"] .ab-states .ab-state-ctl.is-hover { transform: translateY(-2px); filter: brightness(1.07); box-shadow: 0 12px 18px -10px var(--ab-pri-glow); }
+.ab[data-ae="bento-grid"] .ab-states .ab-state-ctl.is-hover { transform: translateY(-2px); filter: brightness(1.07); box-shadow: none; }
 .ab[data-ae="bento-grid"] .ab-states .ab-state-ctl.is-pressed { transform: scale(0.96); background: var(--ab-pri-press); color: var(--ab-on-pri-press); filter: none; }
 
 /* 03: stat tiles with huge numerals */
@@ -216,12 +278,19 @@
 @container ab (max-width: 600px) {
   .ab[data-ae="bento-grid"] .ab-in { padding: 12px; }
   .ab[data-ae="bento-grid"] .ab-hero-copy, .ab[data-ae="bento-grid"] .ab-art { grid-column: 1 / -1; }
+  .ab[data-ae="bento-grid"]:not(.ab-slide) > .ab-in > .ab-hero > .ab-hero-copy { grid-column: 1 / -1; grid-row: 2; }
+  /* phone: the product tile is square and crops the device; the numeral tile sits 2-up under it */
+  .ab[data-ae="bento-grid"]:not(.ab-slide) > .ab-in > .ab-hero > .ab-art { grid-column: 1 / -1; grid-row: 3; min-height: 0; aspect-ratio: 1; }
+  .ab[data-ae="bento-grid"]:not(.ab-slide) > .ab-in > .ab-hero::before, .ab[data-ae="bento-grid"]:not(.ab-slide) > .ab-in > .ab-hero::after { grid-column: 1 / -1; grid-row: 4; }
+  .ab[data-ae="bento-grid"]:not(.ab-slide) > .ab-in > .ab-palette .ab-swatch { grid-column: span 6; min-height: 110px; }
+  .ab[data-ae="bento-grid"]:not(.ab-slide) > .ab-in > .ab-palette .ab-swatch[data-role="canvas"] { grid-column: 1 / -1; }
+  .ab[data-ae="bento-grid"]:not(.ab-slide) > .ab-in > .ab-type .ab-type-col,
+  .ab[data-ae="bento-grid"]:not(.ab-slide) > .ab-in > .ab-type[data-cols="3"] .ab-type-col { grid-column: 1 / -1; }
+  .ab[data-ae="bento-grid"] .ab-card::after { display: none; }
   .ab[data-ae="bento-grid"] .ab-hero-copy { min-height: 0; padding: 24px 22px 26px; }
-  .ab[data-ae="bento-grid"] .ab-headline { margin: 0; padding: 22px 0 18px; font-size: calc(clamp(34px, 12.4cqw, 54px) * var(--ab-hl-scale, 1) * var(--ab-hs, 1) * var(--ab-display, 1)); }
-  .ab[data-ae="bento-grid"] .ab-art { min-height: 370px; }
+  .ab[data-ae="bento-grid"] .ab-headline, .ab[data-ae="bento-grid"]:not(.ab-slide) > .ab-in > .ab-hero .ab-headline { margin: 0; padding: 22px 0 18px; font-size: calc(clamp(34px, 12.4cqw, 54px) * var(--ab-hl-scale, 1) * var(--ab-hs, 1) * var(--ab-display, 1)); }
+  .ab[data-ae="bento-grid"] .ab-art { min-height: 0; }
   .ab[data-ae="bento-grid"] .ab-swatches[data-kind="chips"] { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .ab[data-ae="bento-grid"] .ab-swatches[data-kind="chips"] .ab-swatch { display: flex; }
-  .ab[data-ae="bento-grid"] .ab-swatches[data-kind="chips"] .ab-chip { grid-row: auto; height: 54px; }
   .ab[data-ae="bento-grid"] .ab-card { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto auto auto auto; min-height: 0; }
   .ab[data-ae="bento-grid"] .ab-card::before { grid-area: 1 / 1 / 4 / 2; }
   .ab[data-ae="bento-grid"] .ab-card .ab-cta { grid-area: 4 / 1 / 5 / 2; min-height: 0; aspect-ratio: 2 / 1; }
@@ -259,3 +328,26 @@
 /* Deck: the floating "Direction saved" chip lands on the phone's brand name once the phone
    sits in a slide-sized tile. The phone shows the brand; the other chip stays. */
 .ab[data-ae="bento-grid"].ab-slide .bna-c1 { display: none; }
+
+/* ----- deck Material slide: the tile system (bento's real material) instead of repeating the phone ----- */
+.ab[data-ae="bento-grid"] .bna-sys { display: none; }
+.ab-slide[data-slide="material"] .ab[data-ae="bento-grid"] .bna > :not(.bna-sys),
+.ab[data-ae="bento-grid"].ab-slide[data-slide="material"] .bna > :not(.bna-sys) { display: none; }
+.ab[data-ae="bento-grid"].ab-slide[data-slide="material"] .ab-deck-stage .ab-art { inset: 0; height: 100%; aspect-ratio: auto; margin: 0; background: none; }
+.ab-slide[data-slide="material"] .ab[data-ae="bento-grid"] .bna-sys,
+.ab[data-ae="bento-grid"].ab-slide[data-slide="material"] .bna-sys {
+  display: grid; position: absolute; inset: 0; grid-template-columns: repeat(4, minmax(0, 1fr)); grid-template-rows: repeat(3, minmax(0, 1fr)); gap: 14px;
+}
+.ab[data-ae="bento-grid"] .bna-t {
+  display: flex; flex-direction: column; justify-content: space-between; padding: 16px 18px; border-radius: 28px; background: var(--ab-tile); color: var(--ab-ink); min-width: 0; min-height: 0;
+}
+.ab[data-ae="bento-grid"] .bna-t b { font: 600 34px/1 var(--ab-font-h); letter-spacing: -0.04em; }
+.ab[data-ae="bento-grid"] .bna-t span { font-size: 14px; font-weight: 600; color: var(--ab-muted); }
+.ab[data-ae="bento-grid"] .bna-t22 { grid-column: 1 / 3; grid-row: 1 / 3; background: var(--ab-tile-sec); }
+.ab[data-ae="bento-grid"] .bna-t22 b { font-size: 72px; }
+.ab[data-ae="bento-grid"] .bna-t21 { grid-column: 3 / 5; grid-row: 1; }
+.ab[data-ae="bento-grid"] .bna-t11 { grid-column: 3; grid-row: 2; }
+.ab[data-ae="bento-grid"] .bna-t12 { grid-column: 4; grid-row: 2 / 4; }
+.ab[data-ae="bento-grid"] .bna-t11b { grid-column: 3; grid-row: 3; background: var(--ab-primary); color: var(--ab-on-primary); }
+.ab[data-ae="bento-grid"] .bna-t11b span { color: var(--ab-on-primary); }
+.ab[data-ae="bento-grid"] .bna-t21b { grid-column: 1 / 3; grid-row: 3; }

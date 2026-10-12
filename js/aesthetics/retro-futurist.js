@@ -1,231 +1,256 @@
-/* 04 Retro-Futurist — a hardware control panel: bezelled panels, inset CRT
-   screens with scanlines, lit keys, glowing lamps, and in the hero a real
-   hardware module (analog dial, amber LCD, LED level meter). Mono interface
-   type. Screens stay dark in both modes; bezels follow the canvas. Look lives
+/* 04 Retro-Futurist — space-age graphic systems (NASA standards manual, 2001,
+   Syd Mead, Space: 1999): a lit white field, bold extended type, one signal
+   colour and an orbital horizon plate. The hero art is a full-bleed planet limb
+   with orbits and one tiny craft; the mission console (dial, LCD, LED ladder)
+   is a secondary material shown only on the deck's Material slide. Look lives
    in css/aesthetics/retro-futurist.css. */
 (function () {
   let seq = 0;
+
+  // Mono face for SVG lettering (self-contained: the art never relies on board css).
+  const MONO = 'font-family="ui-monospace,SF Mono,Menlo,monospace"';
+
+  // The one chromatic colour: the brand primary, nudged until it reads as a mark on
+  // the canvas (3:1). Everything else on the page is ink.
+  function signalOf(t) {
+    if (t.contrast(t.primary, t.canvas) >= 3) return t.primary;
+    for (let a = 0.9; a >= 0; a -= 0.1) {
+      const c = t.mix(t.primary, t.ink, a);
+      if (t.contrast(c, t.canvas) >= 3) return c;
+    }
+    return t.ink;
+  }
+
+  // Orbital horizon plate: black sky into the canvas haze, a planet limb with an
+  // atmosphere rim in the signal colour, three orbits, one craft, a 12-col grid.
+  function horizon(t, id) {
+    // The plate is deep space in both modes: the one dark image on a lit page.
+    const sig = t.primary;
+    const haze = t.mix(sig, '#000000', 0.22);
+    const ground0 = '#050608';
+    const ground1 = t.mix(sig, '#000000', 0.26);
+    const R = 262, CX = 120, CY = 75 + R;   // limb top at y = 75
+    let grid = '';
+    for (let i = 1; i < 12; i++) grid += `<line x1="${i * 20}" y1="0" x2="${i * 20}" y2="100" stroke="#ffffff" stroke-opacity=".05" stroke-width="1" vector-effect="non-scaling-stroke"/>`;
+    const orbits = [[105, 13, ''], [142, 19, ''], [180, 25, '0.9 2.1']].map(o =>
+      `<ellipse cx="${CX}" cy="66" rx="${o[0]}" ry="${o[1]}" fill="none" stroke="#ffffff" stroke-opacity=".38" stroke-width=".9" vector-effect="non-scaling-stroke"${o[2] ? ` stroke-dasharray="${o[2]}"` : ''}/>`).join('');
+    // the craft rides the middle orbit, upper left (258deg on the unrotated ellipse)
+    const at = deg => [CX + 142 * Math.cos(deg * Math.PI / 180), 66 + 19 * Math.sin(deg * Math.PI / 180)];
+    const [px, py] = at(258);
+    // the signal arc: the stretch of the middle orbit the craft has just flown
+    let arcPts = '';
+    for (let g = 203; g <= 258; g += 5) arcPts += at(g).map(v => v.toFixed(2)).join(',') + ' ';
+    return `<svg class="rfa-plate" viewBox="0 0 240 100" preserveAspectRatio="xMidYMax slice" focusable="false" style="position:absolute;inset:0;width:100%;height:100%;display:block">
+      <defs>
+        <linearGradient id="${id}k" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#000000"/><stop offset=".42" stop-color="#030406"/>
+          <stop offset=".64" stop-color="${t.mix(haze, '#000000', 0.25)}"/><stop offset=".75" stop-color="${haze}"/>
+        </linearGradient>
+        <linearGradient id="${id}p" x1="0" y1="${CY - R}" x2="0" y2="100" gradientUnits="userSpaceOnUse">
+          <stop offset="0" stop-color="${ground0}"/><stop offset="1" stop-color="${ground1}"/>
+        </linearGradient>
+        <filter id="${id}b" x="-10%" y="-40%" width="120%" height="180%"><feGaussianBlur stdDeviation="2.2"/></filter>
+      </defs>
+      <rect width="240" height="100" fill="url(#${id}k)"/>
+      <circle cx="31" cy="14" r=".45" fill="#ffffff" opacity=".8"/><circle cx="188" cy="9" r=".35" fill="#ffffff" opacity=".6"/><circle cx="214" cy="31" r=".4" fill="#ffffff" opacity=".7"/>
+      <g transform="rotate(-8 ${CX} 66)">${orbits}</g>
+      <circle cx="${CX}" cy="${CY}" r="${R}" fill="none" stroke="${sig}" stroke-width="6" opacity=".35" filter="url(#${id}b)"/>
+      <circle cx="${CX}" cy="${CY}" r="${R}" fill="url(#${id}p)"/>
+      <circle cx="${CX}" cy="${CY}" r="${R}" fill="none" stroke="${sig}" stroke-width=".8" opacity=".9"/>
+      <g transform="rotate(-8 ${CX} 66)">
+        <polyline points="${arcPts}" fill="none" stroke="${sig}" stroke-width="1.4" vector-effect="non-scaling-stroke" stroke-linecap="round"/>
+        <g transform="translate(${px.toFixed(2)} ${py.toFixed(2)}) rotate(6)">
+          <polygon points="-1.5,-.6 1.5,-.2 1.5,.2 -1.5,.6" fill="#ffffff"/>
+          <line x1="-1.5" y1="0" x2="-4" y2="0" stroke="#ffffff" stroke-width=".2" stroke-opacity=".7"/>
+          <text x="3" y="-2.2" ${MONO} font-size="2.1" fill="#ffffff" letter-spacing=".25">MRG-01 / T+00:41:07</text>
+        </g>
+      </g>
+      ${grid}
+    </svg>
+    <span class="rfa-cap" style="position:absolute;right:clamp(10px,2.2cqw,28px);top:50%;transform:translateY(-50%);writing-mode:vertical-rl;font:500 9px/1 ui-monospace,'SF Mono',Menlo,monospace;letter-spacing:.42em;text-transform:uppercase;color:#ffffff;opacity:.85;white-space:nowrap">A new kind of space</span>`;
+  }
+
+  // Mission console (secondary material, deck 06 only): bezel plate, LCD, analog
+  // dial (31 ticks, value arc, needle with a soft echo), LED ladder. One hue.
+  function consoleArt(t, id) {
+    const screen = '#0b0c0e';
+    const screenInk = '#f2f2ee';
+    const lift = (hex, min) => {
+      for (let a = 1; a >= 0; a -= 0.1) {
+        const c = t.mix(hex, screenInk, a);
+        if (t.contrast(c, screen) >= min) return c;
+      }
+      return screenInk;
+    };
+    const sig = lift(t.primary, 4.5);
+    const metalHi = '#d9dad6', metalLo = '#7c7e80';
+    const cx = 36, cy = 59;
+    const pt = (deg, r) => {
+      const a = (deg - 90) * Math.PI / 180;
+      return [(cx + r * Math.cos(a)).toFixed(2), (cy + r * Math.sin(a)).toFixed(2)];
+    };
+    let ticks = '';
+    for (let i = 0; i <= 30; i++) {
+      const deg = -135 + i * 9;
+      const major = i % 5 === 0;
+      const p1 = pt(deg, major ? 15.6 : 17.2), p2 = pt(deg, 19.4);
+      ticks += `<line x1="${p1[0]}" y1="${p1[1]}" x2="${p2[0]}" y2="${p2[1]}" stroke="${screenInk}" stroke-opacity="${major ? 0.95 : 0.55}" stroke-width="${major ? 0.9 : 0.5}" stroke-linecap="round"/>`;
+    }
+    const needleDeg = 38;
+    const s0 = pt(-135, 13.8), s1 = pt(needleDeg, 13.8);
+    const arc = `M${s0[0]} ${s0[1]} A13.8 13.8 0 1 1 ${s1[0]} ${s1[1]}`;
+    const tip = pt(needleDeg, 15.4), tail = pt(needleDeg + 180, 4.2);
+    let bars = '';
+    for (let i = 0; i < 5; i++) {
+      const y = 38 + i * 9;
+      bars += `<rect x="68" y="${y}" width="20" height="6.4" fill="${i === 0 ? t.alpha(screenInk, 0.14) : sig}"/>`;
+    }
+    const initial = 'M';
+    return `<svg viewBox="0 0 100 100" width="100%" height="100%" focusable="false" style="display:block">
+      <defs>
+        <linearGradient id="${id}m" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${metalHi}"/><stop offset="1" stop-color="${metalLo}"/></linearGradient>
+        <filter id="${id}g" x="-30%" y="-80%" width="160%" height="260%"><feGaussianBlur stdDeviation="1.1"/></filter>
+      </defs>
+      <rect width="100" height="100" fill="#d4d5d1"/>
+      <rect x=".5" y=".5" width="99" height="99" fill="none" stroke="#000" stroke-opacity=".18"/>
+      ${[[6, 6], [94, 6], [6, 94], [94, 94]].map(p => `<circle cx="${p[0]}" cy="${p[1]}" r="1.8" fill="url(#${id}m)"/><line x1="${p[0] - 1.1}" y1="${p[1]}" x2="${p[0] + 1.1}" y2="${p[1]}" stroke="${metalLo}" stroke-width=".45"/>`).join('')}
+      <rect x="9" y="9.5" width="82" height="18" fill="${screen}"/>
+      <text x="14" y="22.6" ${MONO} font-size="10.6" font-weight="700" fill="${sig}" opacity=".14" letter-spacing=".4">8 88.8</text>
+      <text x="14" y="22.6" ${MONO} font-size="10.6" font-weight="700" fill="${sig}" letter-spacing=".4">${initial}  9.5</text>
+      <text x="86" y="15.6" ${MONO} font-size="2.8" fill="${screenInk}" opacity=".7" text-anchor="end" letter-spacing=".5">FREQ</text>
+      <text x="86" y="24.2" ${MONO} font-size="2.8" fill="${screenInk}" opacity=".7" text-anchor="end" letter-spacing=".5">MHZ</text>
+      <circle cx="${cx}" cy="${cy}" r="25.2" fill="#c3c4c0" stroke="#000" stroke-opacity=".25" stroke-width=".5"/>
+      <circle cx="${cx}" cy="${cy}" r="22" fill="${screen}"/>
+      ${ticks}
+      <path d="${arc}" fill="none" stroke="${sig}" stroke-width="1.3" stroke-linecap="round" opacity=".9"/>
+      <line x1="${tail[0]}" y1="${tail[1]}" x2="${tip[0]}" y2="${tip[1]}" stroke="${sig}" stroke-width="3" stroke-linecap="round" opacity=".35" filter="url(#${id}g)"/>
+      <line x1="${tail[0]}" y1="${tail[1]}" x2="${tip[0]}" y2="${tip[1]}" stroke="${sig}" stroke-width="1.5" stroke-linecap="round"/>
+      <circle cx="${cx}" cy="${cy}" r="3.6" fill="url(#${id}m)"/>
+      <circle cx="${cx}" cy="${cy}" r="1.1" fill="${screen}"/>
+      <rect x="64.5" y="33.5" width="27" height="51" fill="${screen}"/>
+      ${bars}
+      <text x="${cx}" y="91.4" ${MONO} font-size="3" fill="#1a1b1d" text-anchor="middle" letter-spacing=".9">GAIN</text>
+      <text x="78" y="91.4" ${MONO} font-size="3" fill="#1a1b1d" text-anchor="middle" letter-spacing=".9">LEVEL</text>
+    </svg>`;
+  }
+
+  // Deck do / don't visuals: a quiet horizon with one signal mark vs. everything glowing.
+  function pairSvg(t, kind) {
+    const sig = t.primary;
+    const svg = kind === 'do'
+      ? `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 80"><rect width="240" height="80" fill="#000"/><circle cx="120" cy="322" r="262" fill="#0b0c0e" stroke="${sig}" stroke-width="1.2"/><ellipse cx="120" cy="52" rx="96" ry="12" fill="none" stroke="#fff" stroke-opacity=".4" stroke-width=".6" transform="rotate(-8 120 52)"/><rect x="56" y="38" width="3.2" height="1.2" fill="#fff"/></svg>`
+      : `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 80"><defs><filter id="g"><feGaussianBlur stdDeviation="4"/></filter></defs><rect width="240" height="80" fill="#000"/><g filter="url(#g)"><circle cx="40" cy="40" r="16" fill="${sig}"/><circle cx="100" cy="40" r="16" fill="${t.secondary}"/><circle cx="160" cy="40" r="16" fill="${t.accent}"/><circle cx="210" cy="40" r="12" fill="#fff"/></g><circle cx="40" cy="40" r="9" fill="${sig}"/><circle cx="100" cy="40" r="9" fill="${t.secondary}"/><circle cx="160" cy="40" r="9" fill="${t.accent}"/><circle cx="210" cy="40" r="7" fill="#fff"/></svg>`;
+    return `url("data:image/svg+xml,${encodeURIComponent(svg)}")`;
+  }
 
   registerAesthetic({
     key: 'retro-futurist', order: 4,
     name: 'Retro-Futurist',
     descriptor: 'Analog · Orbital · Glowing',
-    influences: '1970s space age / Mission control / Hardware consoles',
-    summary: 'A mission-control console that glows: bezels, lamps and readouts.',
+    influences: 'NASA standards / 2001 / Syd Mead / Space: 1999',
+    summary: 'A space-age graphic system: a lit white field, extended type, one signal colour and an orbit.',
     motto: 'All systems nominal.',
     kicker: 'Mission control',
-    mode: 'dark',
-    slideShape: 'refined',
+    mode: 'light',
+    slideShape: 'minimal',
+    layout: { hero: 'centered', palette: 'swatches', sections: 'two-col' },
     labels: { material: 'Console', states: ['Idle', 'Armed', 'Engaged'], statesKind: 'swatch' },
     type: { ui: 'mono', label: 'mono' },
     highlight: 'custom',
-    highlightNote: 'The word is a lit lamp: accent-ink text with a soft accent glow on dark canvases, plain shaded accent-ink with no glow on light ones. No fill or band.',
+    highlightNote: 'One headline word in the flat signal colour (the primary), like the one red mark in a standards manual. No glow, fill or band.',
+    cardFill: '--ab-canvas',
 
     roles: {
       ink: {
-        use: 'Chrome headlines, body text, bezel lettering and screen text',
-        never: 'Large background fields in light mode',
+        use: 'Headlines, body text, hairlines, orbits and every readout',
+        never: 'Tinted or glowing; it stays flat',
       },
       primary: {
-        use: 'The one illuminated action, the lit key, the dial needle and the "engaged" lamp',
-        never: 'Body text, bezel fills, a second CTA',
+        use: 'The signal: the CTA key, the highlight word, the lit lamp, the craft\'s orbit and the atmosphere rim',
+        never: 'Body text, panel fills, a second accent colour',
       },
       secondary: {
-        use: 'Readouts: the LCD digits, LED meter bars, telemetry values and chart lines',
-        never: 'The main CTA, body text, bezels',
+        use: 'Off the board: charts and secondary print pieces only',
+        never: 'Lamps, readouts or anything that competes with the signal',
       },
       accent: {
-        use: 'Status lamps (glowing dots), the peak LED at the top of the level meter and one headline word (lamp glow on dark canvases)',
-        never: 'Buttons, body text, bezel fills, large areas',
+        use: 'Off the board: one spot colour for print pieces',
+        never: 'On screen next to the signal',
       },
     },
 
-    // A very dark canvas lets the glow read. Light canvases are kept as-is
-    // (daylight console); the screens are dark either way.
+    // A lit white field (light) or deep space (dark). Never tinted by the client's
+    // primary; the dark field is a cool neutral black.
     canvas(b) {
-      if (!b.isDark) return b.canvas;
-      const h = b.hexToHsl(b.canvas);
-      return h.l > 18 ? b.hslToHex(h.h, Math.min(h.s, 45), 14) : b.canvas;
+      return b.isDark ? '#08090b' : b.mix('#ffffff', b.canvas, 0.15);
     },
 
     tokens(t) {
-      const d = t.isDark;
-      const screen = d ? t.mix('#000000', t.canvas, 0.5) : t.mix('#000000', t.ink, 0.55);
-      const screenInk = d ? t.ink : t.canvas;
-      // Brand hues, pulled toward the screen text color until they glow on the screen.
-      const lift = (hex, min) => {
-        for (let a = 1; a >= 0; a -= 0.1) {
-          const c = t.mix(hex, screenInk, a);
-          if (t.contrast(c, screen) >= min) return c;
-        }
-        return screenInk;
-      };
-      const readout = lift(t.secondary, 4.5);
-      const lamp = lift(t.accent, 3.5);
-      const priLit = lift(t.primary, 3);
-      const spark = encodeURIComponent(
-        '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 90 18"><polyline fill="none" stroke="' + readout
-        + '" stroke-width="1.6" stroke-linejoin="round" points="0,14 10,10 20,12 31,5 42,9 52,4 63,8 74,3 90,6"/></svg>');
+      const sig = signalOf(t);
       return {
-        '--ab-screen': screen,
-        '--ab-screen-ink': screenInk,
-        '--ab-readout': readout,
-        '--ab-lamp': lamp,
-        '--ab-pri-lit': priLit,
-        '--ab-readout-glow': t.alpha(readout, 0.5),
-        '--ab-lamp-glow': t.alpha(lamp, 0.8),
-        '--ab-pri-glow': t.alpha(t.primary, 0.5),
-        '--ab-lamp-dim': t.mix(lamp, screen, 0.22),
-        '--ab-bezel-top': d ? t.mix('#ffffff', t.canvas, 0.08) : t.mix('#ffffff', t.canvas, 0.6),
-        '--ab-bezel-bot': d ? t.mix('#000000', t.canvas, 0.16) : t.mix('#000000', t.canvas, 0.07),
-        '--ab-bezel-hi': d ? 'rgba(255,255,255,0.16)' : 'rgba(255,255,255,0.95)',
-        '--ab-bezel-edge': d ? 'rgba(0,0,0,0.6)' : 'rgba(0,0,0,0.2)',
-        '--ab-bezel-drop': d ? 'rgba(0,0,0,0.6)' : 'rgba(40,40,70,0.26)',
-        '--ab-key-top': d ? t.mix('#ffffff', t.canvas, 0.14) : t.mix('#ffffff', t.canvas, 0.75),
-        '--ab-key-bot': d ? t.mix('#000000', t.canvas, 0.04) : t.mix('#000000', t.canvas, 0.1),
-        '--ab-key-lip': d ? t.mix('#000000', t.canvas, 0.45) : t.mix('#000000', t.canvas, 0.22),
-        '--ab-chrome': d
-          ? `linear-gradient(180deg, ${t.ink} 0%, ${t.mix(t.ink, t.muted, 0.45)} 32%, ${t.muted} 54.5%, ${t.ink} 55.5%, ${t.mix(t.ink, t.muted, 0.35)} 100%)`
-          // light canvases: the dark-mode chrome washes out to grey on cream, so keep a dark top, a hard horizon and a dark base
-          : `linear-gradient(180deg, ${t.ink} 0%, ${t.mix(t.ink, t.canvas, 0.45)} 54%, ${t.ink} 55%, ${t.mix(t.ink, t.canvas, 0.25)} 100%)`,
-        '--ab-star': t.alpha(screenInk, d ? 0.65 : 0.45),
-        '--ab-spark': `url("data:image/svg+xml,${spark}")`,
+        '--rf-signal': sig,
+        '--rf-signal-raw': t.primary,
+        '--rf-hair': t.alpha(t.ink, 0.18),
+        '--rf-hair-2': t.alpha(t.ink, 0.08),
+        '--rf-off': t.alpha(t.ink, 0.15),
+        '--rf-panel': t.isDark ? t.mix('#ffffff', t.canvas, 0.035) : t.mix('#ffffff', t.canvas, 0.6),
+        // aliases so materials[].css placeholders ({rfSignal} -> --ab-rf-signal) resolve in exports
+        '--ab-rf-signal': sig, '--ab-rf-hair': t.alpha(t.ink, 0.18), '--ab-rf-off': t.alpha(t.ink, 0.15),
+        '--ab-rf-panel': t.isDark ? t.mix('#ffffff', t.canvas, 0.035) : t.mix('#ffffff', t.canvas, 0.6),
+        '--rf-do': pairSvg(t, 'do'),
+        '--rf-dont': pairSvg(t, 'dont'),
+        '--ab-type-pick-w': '700',
       };
     },
 
-    // A hardware module: bezel plate with screws, an amber LCD readout (brand
-    // initial + 88.8) in the secondary color, an analog dial (ticks, value arc,
-    // primary needle) and a 5-bar LED level meter with the accent at the top.
+    // Hero: the orbital horizon plate. The console rides along hidden (inline
+    // display:none) and is shown only on the deck's Material slide.
     art(ctx) {
       const t = ctx.t;
       const id = 'rf' + (++seq);
-      const d = t.isDark;
-      const screen = d ? t.mix('#000000', t.canvas, 0.5) : t.mix('#000000', t.ink, 0.55);
-      const screenInk = d ? t.ink : t.canvas;
-      const lift = (hex, min) => {
-        for (let a = 1; a >= 0; a -= 0.1) {
-          const c = t.mix(hex, screenInk, a);
-          if (t.contrast(c, screen) >= min) return c;
-        }
-        return screenInk;
-      };
-      const readout = lift(t.secondary, 4.5);
-      const lamp = lift(t.accent, 3.5);
-      const priLit = lift(t.primary, 3);
-      const metalHi = d ? t.mix('#ffffff', t.canvas, 0.3) : t.mix('#ffffff', t.canvas, 0.85);
-      const metalLo = d ? t.mix('#000000', t.canvas, 0.25) : t.mix('#000000', t.canvas, 0.2);
-      const cx = 36, cy = 59;
-      const pt = (deg, r) => {
-        const a = (deg - 90) * Math.PI / 180;
-        return [(cx + r * Math.cos(a)).toFixed(2), (cy + r * Math.sin(a)).toFixed(2)];
-      };
-      // 31 ticks across 270 degrees; every fifth is a long major tick
-      let ticks = '';
-      for (let i = 0; i <= 30; i++) {
-        const deg = -135 + i * 9;
-        const major = i % 5 === 0;
-        const p1 = pt(deg, major ? 15.6 : 17.2), p2 = pt(deg, 19.4);
-        ticks += `<line x1="${p1[0]}" y1="${p1[1]}" x2="${p2[0]}" y2="${p2[1]}" stroke="${screenInk}" stroke-opacity="${major ? 0.95 : 0.55}" stroke-width="${major ? 0.9 : 0.5}" stroke-linecap="round"/>`;
-      }
-      // value arc (from the start of the scale to the needle) and the needle
-      const needleDeg = 38;
-      const s0 = pt(-135, 13.8), s1 = pt(needleDeg, 13.8);
-      const arc = `M${s0[0]} ${s0[1]} A13.8 13.8 0 ${needleDeg + 135 > 180 ? 1 : 0} 1 ${s1[0]} ${s1[1]}`;
-      const tip = pt(needleDeg, 15.4), tail = pt(needleDeg + 180, 4.2);
-      // LED level meter: five bars, the peak (top) in the accent, the rest in the readout color
-      let bars = '';
-      for (let i = 0; i < 5; i++) {
-        const y = 38 + i * 9;
-        const col = i === 0 ? lamp : readout;
-        bars += `<rect x="68" y="${y}" width="20" height="6.4" rx="1" fill="${col}" filter="url(#${id}g)" opacity=".55"/>`
-          + `<rect x="68" y="${y}" width="20" height="6.4" rx="1" fill="${col}"/>`
-          + `<rect x="68" y="${y}" width="20" height="2" rx="1" fill="#fff" opacity=".22"/>`;
-      }
-      const screws = [[6, 6], [94, 6], [6, 94], [94, 94]].map((p, i) =>
-        `<g transform="rotate(${i * 47} ${p[0]} ${p[1]})"><circle cx="${p[0]}" cy="${p[1]}" r="2.1" fill="url(#${id}m)" stroke="${metalLo}" stroke-width=".35"/><line x1="${p[0] - 1.3}" y1="${p[1]}" x2="${p[0] + 1.3}" y2="${p[1]}" stroke="${metalLo}" stroke-width=".5"/></g>`).join('');
-      const mono = 'font-family="ui-monospace,SF Mono,Menlo,monospace"';
-      // LCD digits: a faint unlit "8 88.8" sits behind the live value ("M  9.5", its
-      // tens slot left dark) so the unlit segments show. VT323 (a segment-like pixel face) when it is loaded.
-      const hasVT = typeof document !== 'undefined' && document.fonts && [...document.fonts].some(f => String(f.family).replace(/["']/g, '') === 'VT323' && f.status === 'loaded');
-      const lcdFace = hasVT ? 'font-family="VT323,ui-monospace,monospace"' : mono;
-      const lcdSize = hasVT ? 13.4 : 10.6;
-      const lcdY = hasVT ? 22.2 : 22.7;
-      const initial = ctx.initial && ctx.initial !== '·' ? ctx.initial : 'M';
-      return `<svg viewBox="0 0 100 100" width="100%" height="100%" focusable="false">
-        <defs>
-          <linearGradient id="${id}m" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${metalHi}"/><stop offset="1" stop-color="${metalLo}"/></linearGradient>
-          <linearGradient id="${id}r" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${metalHi}"/><stop offset=".5" stop-color="${t.canvas}"/><stop offset="1" stop-color="${metalLo}"/></linearGradient>
-          <radialGradient id="${id}w" cx=".5" cy=".28" r=".8"><stop offset="0" stop-color="${t.mix('#ffffff', screen, 0.1)}"/><stop offset="1" stop-color="${screen}"/></radialGradient>
-          <pattern id="${id}s" width="2" height="1.5" patternUnits="userSpaceOnUse"><rect width="2" height=".6" fill="#000" opacity=".28"/></pattern>
-          <filter id="${id}g" x="-30%" y="-80%" width="160%" height="260%"><feGaussianBlur stdDeviation="1.1"/></filter>
-          <filter id="${id}n" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation=".7"/></filter>
-        </defs>
-        ${screws}
-        <rect x="9" y="9.5" width="82" height="18" rx="2.6" fill="url(#${id}w)" stroke="${t.alpha('#000000', 0.75)}" stroke-width="1"/>
-        <text x="14" y="${lcdY}" ${lcdFace} font-size="${lcdSize}" font-weight="700" fill="${readout}" opacity=".14" letter-spacing=".4">8 88.8</text>
-        <text x="14" y="${lcdY}" ${lcdFace} font-size="${lcdSize}" font-weight="700" fill="${readout}" letter-spacing=".4" filter="url(#${id}n)" opacity=".7">${escapeHtml(initial)} \u00a0${'9.5'}</text>
-        <text x="14" y="${lcdY}" ${lcdFace} font-size="${lcdSize}" font-weight="700" fill="${readout}" letter-spacing=".4">${escapeHtml(initial)} \u00a0${'9.5'}</text>
-        <text x="86" y="15.6" ${mono} font-size="2.8" fill="${readout}" opacity=".8" text-anchor="end" letter-spacing=".5">FREQ</text>
-        <text x="86" y="24.2" ${mono} font-size="2.8" fill="${readout}" opacity=".8" text-anchor="end" letter-spacing=".5">MHZ</text>
-        <rect x="9" y="9.5" width="82" height="18" rx="2.6" fill="url(#${id}s)"/>
-        <circle cx="${cx}" cy="${cy}" r="25.2" fill="url(#${id}r)" stroke="${t.alpha('#000000', 0.55)}" stroke-width=".7"/>
-        <circle cx="${cx}" cy="${cy}" r="22" fill="url(#${id}w)" stroke="${t.alpha('#000000', 0.8)}" stroke-width="1.1"/>
-        ${ticks}
-        <path d="${arc}" fill="none" stroke="${readout}" stroke-width="1.3" stroke-linecap="round" opacity=".9"/>
-        <line x1="${tail[0]}" y1="${tail[1]}" x2="${tip[0]}" y2="${tip[1]}" stroke="${priLit}" stroke-width="3" stroke-linecap="round" opacity=".35" filter="url(#${id}g)"/>
-        <line x1="${tail[0]}" y1="${tail[1]}" x2="${tip[0]}" y2="${tip[1]}" stroke="${priLit}" stroke-width="1.5" stroke-linecap="round"/>
-        <circle cx="${cx}" cy="${cy}" r="3.6" fill="url(#${id}m)" stroke="${metalLo}" stroke-width=".5"/>
-        <circle cx="${cx}" cy="${cy}" r="1.1" fill="${screen}"/>
-        <rect x="64.5" y="33.5" width="27" height="51" rx="2.6" fill="url(#${id}w)" stroke="${t.alpha('#000000', 0.8)}" stroke-width="1.1"/>
-        ${bars}
-        <rect x="64.5" y="33.5" width="27" height="51" rx="2.6" fill="url(#${id}s)"/>
-        <text x="${cx}" y="91.4" ${mono} font-size="3" fill="${t.muted}" text-anchor="middle" letter-spacing=".9">GAIN</text>
-        <text x="78" y="91.4" ${mono} font-size="3" fill="${t.muted}" text-anchor="middle" letter-spacing=".9">LEVEL</text>
-      </svg>`;
+      return `<div class="rfa" style="position:absolute;inset:0;overflow:hidden;background:#000">${horizon(t, id)}</div>`
+        + `<div class="rfa-console" style="display:none">${consoleArt(t, id + 'c')}</div>`;
     },
 
     materials: [
-      { name: 'Bezel panel', css: 'background: linear-gradient(180deg, {bezelTop}, {bezelBot}); border-radius: 18px; box-shadow: inset 0 1px 0 {bezelHi}, 0 0 0 1px {bezelEdge}, 0 18px 36px -10px {bezelDrop};' },
-      { name: 'CRT screen', css: 'background: radial-gradient(120% 90% at 50% 0, rgba(255,255,255,.06), transparent 60%), {screen}; color: {readout}; border-radius: 10px; box-shadow: inset 0 2px 8px rgba(0,0,0,.7), 0 0 0 2px {bezelEdge}; /* plus repeating-linear-gradient scanlines, 2px, black 14% */' },
-      { name: 'Illuminated primary', css: 'background: {primary}; color: {onPrimary}; border-radius: 999px; box-shadow: inset 0 1px 0 rgba(255,255,255,.55), inset 0 -2px 4px rgba(0,0,0,.25), 0 0 24px {priGlow}; font: 700 12.5px ui-monospace, "SF Mono", Menlo, monospace; text-transform: uppercase;' },
-      { name: 'Bevelled key', css: 'background: linear-gradient(180deg, {keyTop}, {keyBot}); border-radius: 8px; box-shadow: inset 0 1px 0 {bezelHi}, 0 3px 0 {keyLip}; /* lit: background {primary}, glow {priGlow} */' },
-      { name: 'Status lamp', css: 'background: radial-gradient(circle at 35% 30%, #fff, {lamp} 35%); border-radius: 50%; box-shadow: 0 0 10px {lampGlow}; /* off: {lampDim} */' },
-      { name: 'Hardware module', css: 'background: linear-gradient(180deg, {bezelTop}, {bezelBot}); border-radius: 20px; box-shadow: inset 0 1px 0 {bezelHi}, 0 0 0 1px {bezelEdge}, 0 18px 36px -10px {bezelDrop}; /* holds an amber LCD in {readout}, an analog dial with a {primary} needle and a 5-bar LED meter: {readout} bars, the top one in {lamp} */' },
-      { name: 'Chrome headline', css: 'background: {chrome}; -webkit-background-clip: text; background-clip: text; color: transparent; text-transform: uppercase; letter-spacing: .02em; /* hard horizon at 55% */' },
+      { name: 'Horizon plate', css: 'background: linear-gradient(180deg, #000 0%, #030406 42%, {canvas} 75%); /* planet limb below: canvas into mix(primary, canvas, .35), rim stroke {primary} .8px, three orbits in white 38%, one craft */' },
+      { name: 'Flat panel', css: 'background: {rfPanel}; border-radius: 2px; box-shadow: inset 0 0 0 1px {rfHair};' },
+      { name: 'Signal key', css: 'background: {rfSignal}; color: {onPrimary}; border-radius: 2px; box-shadow: inset 0 -3px 0 rgba(0,0,0,.25); font: 700 12px ui-monospace, "SF Mono", Menlo, monospace; text-transform: uppercase; letter-spacing: .14em;' },
+      { name: 'Mission dial', css: 'background: #d4d5d1; /* a dark dial face with 31 ticks, a value arc and a needle in {primary}; LCD and LED ladder in the same one hue */' },
+      { name: 'Lamp', css: 'width: 10px; height: 10px; border-radius: 0; background: {rfOff}; /* on: {rfSignal} */' },
     ],
 
     rules: {
       do: [
-        'Build panels as bezels: a vertical gradient, a 1px top highlight and a deep outer shadow.',
-        'Put information on inset dark screens with scanlines, and set readouts in monospace in the secondary color.',
-        'Light things that are active: the primary key, the CTA and the lamps glow; idle ones sit dim.',
-        'Set the headline in uppercase chrome with a hard horizon line, and one headline word in the accent (lamp glow on dark canvases, shaded accent on light ones).',
-        'Set all interface text in monospace: tabs, buttons, labels, readouts and table cells.',
+        'Use one signal colour: the primary marks the action, one headline word, one orbit and the lit lamp; everything else is ink.',
+        'Set headlines in a bold extended grotesk, uppercase, tight, very large; set captions in ultra-wide thin caps.',
+        'Give the hero a vast field and a tiny object: a planet limb, three orbits and one craft.',
+        'Number every section like a standards manual (1.1, 1.2 …) and keep panels flat with 1px hairlines.',
+        'Make light the hero mode: a white, evenly lit field with black type, as in 2001 and the NASA manual.',
       ],
       dont: [
-        'Glow everything; glow means active, so idle controls stay dim.',
-        'Use the accent for anything but lamps and one headline word.',
-        'Put body text on a glowing surface or a scanline screen at low contrast.',
-        'Flatten the bezels: no flat fills, thin hairline cards or soft white shadows.',
-        'Fill the hero with a planet, a landscape or a flat illustration; the hero art is a hardware module (dial, LCD, LED meter).',
+        'Glow, chrome or gloss anything; space-age type is flat white, flat black or flat signal.',
+        'Spread the client palette over lamps and readouts; one hue per screen.',
+        'Fill the hero with a gadget; the console is a secondary material.',
+        'Use pill buttons or candy lamps; keys and lamps are square.',
+        'Use psychedelic swirls or op-art; the system is orbits, grids and horizons.',
       ],
     },
-    // Deck copy (js/brand-deck.js): three principles, three do / don't lines, each short.
     deck: {
       principles: [
-        ['Panels are bezels', 'A gradient edge, a top highlight and a deep shadow.'],
-        ['Glow means active', 'Primary key, CTA and lamps glow; idle ones sit dim.'],
-        ['Readouts on dark screens', 'Monospace text on inset screens with scanlines.'],
+        ['One signal colour', 'The primary marks one thing per screen; the rest is ink.'],
+        ['Horizon and orbit', 'A vast field, a planet limb and one tiny craft.'],
+        ['Extended type', 'Bold, wide, uppercase headlines and thin wide captions.'],
       ],
       do: [
-        'Build panels as bezels with a top highlight.',
-        'Light only what is active.',
-        'Set interface text in monospace.',
+        'Mark one thing per screen in the signal colour.',
+        'Leave a vast field around a tiny object.',
+        'Number sections like a standards manual.',
       ],
       dont: [
-        'Glow everything.',
-        'Flatten the bezels.',
-        'Put body text on glowing surfaces.',
+        'Glow, chrome or gloss anything.',
+        'Light every lamp in a different colour.',
+        'Use pill buttons or candy lamps.',
       ],
     },
   });

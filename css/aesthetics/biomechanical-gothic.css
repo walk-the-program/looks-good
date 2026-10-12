@@ -4,7 +4,9 @@
    frames with a double rim, vertebra tabs, tube dividers, organs for states.
    Variables --ab-bi-* come from js/aesthetics/biomechanical-gothic.js tokens().
    Hooks: hero centered (left-aligned here), type ui body / label mono,
-   highlight custom, states swatch, ctaFill ink, canvas().
+   highlight custom, states swatch (a valve drawn three ways), ctaFill ink, canvas().
+   No pills anywhere: the CTA and tabs are vertebrae (clip-path), the fonts button is a
+   text link. Section labels are spinal (C1 / T6 / L1), not Roman numerals. No CSS masks.
 ------------------------------------------------------------------------ */
 
 .ab[data-ae="biomechanical-gothic"] {
@@ -39,7 +41,7 @@
 .ab[data-ae="biomechanical-gothic"] .ab-tag { font-size: 10px; letter-spacing: 0.18em; color: var(--ab-muted); }
 .ab[data-ae="biomechanical-gothic"] .ab-tag::before {
   content: ""; display: inline-block; width: 6px; height: 6px; margin-right: 9px; vertical-align: 1px; border-radius: 50%;
-  background: var(--ab-bi-glow); box-shadow: 0 0 8px var(--ab-bi-glow-a);
+  background: var(--ab-bi-bone);
 }
 /* dividers are tubing runs: a lit tube with two swollen valve bulges, fading at both ends */
 .ab[data-ae="biomechanical-gothic"] .ab-rule {
@@ -47,7 +49,12 @@
     radial-gradient(ellipse 15px 6.5px at 19% 50%, var(--ab-bi-metal-hi) 0 38%, var(--ab-bi-cast-lo) 82%, transparent 84%),
     radial-gradient(ellipse 15px 6.5px at 81% 50%, var(--ab-bi-metal-hi) 0 38%, var(--ab-bi-cast-lo) 82%, transparent 84%),
     linear-gradient(180deg, var(--ab-bi-cast-lo), var(--ab-bi-cast-hi) 38%, var(--ab-bi-metal) 60%, var(--ab-bi-cast-lo)) 0 50% / 100% 6px no-repeat;
-  -webkit-mask-image: linear-gradient(90deg, transparent, #000 7%, #000 93%, transparent); mask-image: linear-gradient(90deg, transparent, #000 7%, #000 93%, transparent);
+  /* the fade at both ends is a canvas overlay, not a mask (exports) */
+  background-image: linear-gradient(90deg, var(--ab-canvas), transparent 7%, transparent 93%, var(--ab-canvas)),
+    radial-gradient(ellipse 15px 6.5px at 19% 50%, var(--ab-bi-metal-hi) 0 38%, var(--ab-bi-cast-lo) 82%, transparent 84%),
+    radial-gradient(ellipse 15px 6.5px at 81% 50%, var(--ab-bi-metal-hi) 0 38%, var(--ab-bi-cast-lo) 82%, transparent 84%),
+    linear-gradient(180deg, var(--ab-bi-cast-lo), var(--ab-bi-cast-hi) 38%, var(--ab-bi-metal) 60%, var(--ab-bi-cast-lo));
+  background-size: 100% 100%, auto, auto, 100% 6px; background-position: 0 0, 0 0, 0 0, 0 50%; background-repeat: no-repeat;
 }
 
 /* ---- labels: mono, roman numerals ---- */
@@ -55,9 +62,10 @@
 .ab[data-ae="biomechanical-gothic"] .ab-labelrow .ab-label:first-child { color: var(--ab-bi-bone); display: inline-flex; align-items: center; }
 .ab[data-ae="biomechanical-gothic"] .ab-n { font-size: 0; letter-spacing: 0; }
 .ab[data-ae="biomechanical-gothic"] .ab-n::before { font: 500 13px/1 var(--ab-font-b); color: var(--ab-bi-bone); letter-spacing: 0.06em; }
-.ab[data-ae="biomechanical-gothic"] .ab-sec-ui .ab-n::before { content: "I"; }
-.ab[data-ae="biomechanical-gothic"] .ab-sec-touch .ab-n::before { content: "II"; }
-.ab[data-ae="biomechanical-gothic"] .ab-sec-use .ab-n::before { content: "III"; }
+.ab[data-ae="biomechanical-gothic"] .ab-n::before { font: 500 11px/1 var(--bg-mono); letter-spacing: 0.12em; }
+.ab[data-ae="biomechanical-gothic"] .ab-sec-ui .ab-n::before { content: "C1"; }
+.ab[data-ae="biomechanical-gothic"] .ab-sec-touch .ab-n::before { content: "T6"; }
+.ab[data-ae="biomechanical-gothic"] .ab-sec-use .ab-n::before { content: "L1"; }
 .ab[data-ae="biomechanical-gothic"] .ab-n::after { content: ""; display: inline-block; width: 26px; height: 1px; margin: 0 10px 0 12px; vertical-align: 4px; background: linear-gradient(90deg, var(--ab-bi-metal-hi), transparent); font-size: 0; }
 
 /* ---- hero: the statement left-aligned over the nave ---- */
@@ -67,6 +75,8 @@
 .ab[data-ae="biomechanical-gothic"] .ab-kicker::before { content: ""; width: 34px; height: 1px; background: linear-gradient(90deg, transparent, var(--ab-bi-metal-hi)); }
 .ab[data-ae="biomechanical-gothic"] .ab-headline { font-weight: 400; line-height: 1.02; letter-spacing: calc(-0.012em * var(--ab-tr, 1)); color: var(--ab-bi-bone); text-wrap: balance; }
 .ab[data-ae="biomechanical-gothic"][data-hcls="didone"] .ab-headline { text-transform: uppercase; letter-spacing: 0.04em; line-height: 1.08; }
+/* Cormorant (old-style): light caps, tracked, carved rather than costume */
+.ab[data-ae="biomechanical-gothic"][data-hcls="old-style"] .ab-headline { text-transform: uppercase; font-weight: 300; letter-spacing: calc(0.06em * var(--ab-tr, 1)); line-height: 1.04; }
 /* inscriptional caps (Marcellus, class deco): carved, flared, evenly tracked */
 .ab[data-ae="biomechanical-gothic"][data-hcls="deco"] .ab-headline { text-transform: uppercase; font-weight: 400; letter-spacing: calc(0.06em * var(--ab-tr, 1)); line-height: 1.1; }
 .ab[data-ae="biomechanical-gothic"][data-hero="centered"][data-hcls="deco"] .ab-hero .ab-headline { font-size: calc(clamp(40px, 8.4cqw, 104px) * 0.8 * var(--ab-hl-scale, 1) * var(--ab-hs, 1) * var(--ab-display, 1)); }
@@ -85,22 +95,10 @@
 .ab[data-ae="biomechanical-gothic"] .bg-cap { left: 3.4cqw; bottom: 2.6cqw; }
 .ab[data-ae="biomechanical-gothic"] .bg-fig { right: 3.4cqw; top: 2.6cqw; }
 
-/* ---- palette: matte cast discs, flat fill, a tarnished rim ---- */
+/* ---- palette: cast ossicles: rounded-top tiles with a 3px recessed rim, the colour flat inside, never a marble */
 .ab[data-ae="biomechanical-gothic"] .ab-chip {
-  width: clamp(48px, 6.2cqw, 62px); height: clamp(44px, 5.7cqw, 57px); border-radius: var(--bg-organ); margin-bottom: 14px;
-  box-shadow: inset 0 2px 3px rgba(255,255,255,.08), inset 0 -4px 7px rgba(0,0,0,.45), 0 0 0 1px var(--ab-bi-disc-rim);
-}
-/* the brand roles are organ pods: cast bone with the colour only as a glowing core, never a candy marble;
-   canvas and ink stay solid */
-.ab[data-ae="biomechanical-gothic"] .ab-swatch[data-role="primary"] { --bg-core: var(--ab-primary); }
-.ab[data-ae="biomechanical-gothic"] .ab-swatch[data-role="secondary"] { --bg-core: var(--ab-secondary); }
-.ab[data-ae="biomechanical-gothic"] .ab-swatch[data-role="accent"] { --bg-core: var(--ab-accent); }
-.ab[data-ae="biomechanical-gothic"] .ab-swatch:is([data-role="primary"], [data-role="secondary"], [data-role="accent"]) .ab-chip {
-  background:
-    radial-gradient(ellipse 3px 1.6px at 28% 70%, var(--ab-bi-well) 0 70%, transparent 74%),
-    radial-gradient(ellipse 2.4px 1.3px at 72% 32%, var(--ab-bi-well) 0 70%, transparent 74%),
-    radial-gradient(circle at 50% 55%, var(--bg-core) 0 22%, transparent 60%),
-    radial-gradient(ellipse at 36% 28%, var(--ab-bi-cast-hi), var(--ab-bi-cast) 75%) !important;
+  width: 56px; height: 72px; border-radius: 28px 28px 6px 6px; margin-bottom: 14px;
+  box-shadow: inset 0 0 0 3px var(--ab-bi-cast-lo), inset 0 5px 6px rgba(0,0,0,.6), inset 0 -1px 0 rgba(255,255,255,.08), 0 0 0 1px var(--ab-bi-rim2);
 }
 .ab[data-ae="biomechanical-gothic"] .ab-sw-role { font: 500 10.5px/1.3 var(--bg-mono); letter-spacing: 0.16em; text-transform: uppercase; }
 .ab[data-ae="biomechanical-gothic"] .ab-sw-job, .ab[data-ae="biomechanical-gothic"] .ab-sw-hex { font: 400 10px/1.4 var(--bg-mono); letter-spacing: 0.04em; }
@@ -121,12 +119,10 @@
 .ab[data-ae="biomechanical-gothic"] .ab-fit[data-fit="avoid"] { background: var(--ab-bi-tarnish); color: var(--ab-canvas); border-color: transparent; }
 .ab[data-ae="biomechanical-gothic"] .ab-type-k { font: 500 10px var(--bg-mono); letter-spacing: 0.2em; color: var(--ab-bi-bone); }
 .ab[data-ae="biomechanical-gothic"] .ab-type-apply {
-  position: relative; padding: 10px 18px 10px 38px; border: 0; border-radius: 999px; background: var(--ab-bi-bone); color: var(--ab-canvas);
-  font: 600 10.5px var(--bg-mono); letter-spacing: 0.14em; text-transform: uppercase; transition: transform 0.2s ease-in-out;
+  padding: 2px 0; border: 0; border-radius: 0; background: none; color: var(--ab-bi-bone); box-shadow: inset 0 -1px 0 var(--ab-bi-bone);
+  font: 500 10.5px var(--bg-mono); letter-spacing: 0.14em; text-transform: uppercase;
 }
-.ab[data-ae="biomechanical-gothic"] .ab-type-apply::before { content: ""; position: absolute; left: 14px; top: 28%; bottom: 28%; width: 14px; background: repeating-linear-gradient(90deg, rgba(0,0,0,.4) 0 1px, transparent 1px 4px); }
-.ab[data-ae="biomechanical-gothic"] .ab-type-apply:hover { background: var(--ab-bi-bone); filter: brightness(1.06); }
-.ab[data-ae="biomechanical-gothic"] .ab-type-apply:active { transform: scale(0.97); }
+.ab[data-ae="biomechanical-gothic"] .ab-type-apply:hover { background: none; color: var(--ab-bi-bone-lit); box-shadow: inset 0 -2px 0 var(--ab-bi-bone); }
 .ab[data-ae="biomechanical-gothic"] .ab-type-pair { font: 400 10px var(--bg-mono); letter-spacing: 0.08em; }
 
 /* ---- arch frames: card, panel; a ledger for the list ---- */
@@ -137,41 +133,40 @@
 .ab[data-ae="biomechanical-gothic"] .ab-card::before, .ab[data-ae="biomechanical-gothic"] .ab-panel::before {
   position: absolute; left: 50%; top: 20px; transform: translateX(-50%); font: 500 14px/1 var(--ab-font-b); letter-spacing: 0.12em; color: var(--ab-bi-bone);
 }
-.ab[data-ae="biomechanical-gothic"] .ab-card::before { content: "I"; }
+.ab[data-ae="biomechanical-gothic"] .ab-card::before { content: "C1"; font-family: var(--bg-mono); font-size: 11px; }
 /* the ribbed rim: a ring of short bone ticks following the rounded cap (an SVG band, not a CSS mask, so it
    exports) */
 .ab[data-ae="biomechanical-gothic"] .ab-card::after, .ab[data-ae="biomechanical-gothic"] .ab-panel::after {
   content: ""; position: absolute; left: 0; right: 0; top: 0; height: 120px; pointer-events: none;
   background: var(--bg-ribrim) 0 0 / 100% 100% no-repeat;
 }
-.ab[data-ae="biomechanical-gothic"] .ab-panel::before { content: "II"; }
+.ab[data-ae="biomechanical-gothic"] .ab-panel::before { content: "T6"; font-family: var(--bg-mono); font-size: 11px; }
 
-/* 01: a short spine of vertebrae, a title, the bone pill */
-.ab[data-ae="biomechanical-gothic"] .ab-seg { gap: 8px; padding: 0; background: none; border-radius: 0; }
+/* 01: three vertebrae on a spinal line, a title, the vertebra button */
+.ab[data-ae="biomechanical-gothic"] {
+  --bg-vclip: polygon(0 50%, 10px 26%, 10px 4px, 16px 0, calc(100% - 16px) 0, calc(100% - 10px) 4px, calc(100% - 10px) 26%, 100% 50%, calc(100% - 10px) 74%, calc(100% - 10px) calc(100% - 4px), calc(100% - 16px) 100%, 16px 100%, 10px calc(100% - 4px), 10px 74%);
+}
+.ab[data-ae="biomechanical-gothic"] .ab-seg { gap: 6px; padding: 0; border-radius: 0; background: linear-gradient(var(--ab-bi-rim2), var(--ab-bi-rim2)) 0 50% / 100% 2px no-repeat; }
 .ab[data-ae="biomechanical-gothic"] .ab-seg-btn {
-  position: relative; min-height: 42px; padding: 14px 6px 8px; border: 0; border-radius: var(--bg-vert); background: var(--ab-bi-cast-lo); color: var(--ab-muted);
-  font: 500 10.5px var(--bg-mono); letter-spacing: 0.16em; text-transform: uppercase; box-shadow: inset 0 1px 0 var(--ab-bi-rim), 0 0 0 1px var(--ab-bi-rim);
-  transition: transform 0.25s ease-in-out, background 0.25s;
+  position: relative; min-height: 40px; padding: 10px 14px; border: 0; border-radius: 0; clip-path: var(--bg-vclip);
+  background: linear-gradient(180deg, var(--ab-bi-cast-hi), var(--ab-bi-cast) 55%, var(--ab-bi-cast-lo)); color: var(--ab-bi-bone);
+  font: 500 10.5px var(--bg-mono); letter-spacing: 0.16em; text-transform: uppercase; transition: background 0.25s;
 }
-.ab[data-ae="biomechanical-gothic"] .ab-seg-btn::before { content: ""; position: absolute; left: 50%; top: 6px; width: 12px; height: 4px; margin-left: -6px; border-radius: 50%; background: var(--ab-bi-well); box-shadow: inset 0 1px 1px rgba(0,0,0,.5); }
-.ab[data-ae="biomechanical-gothic"] .ab-seg-btn:hover { color: var(--ab-bi-bone); }
-.ab[data-ae="biomechanical-gothic"] .ab-seg-btn[aria-pressed="true"] {
-  color: var(--ab-bi-bone); background: var(--ab-bi-cast-hi); transform: translateY(-2px) rotate(-1.5deg);
-  box-shadow: inset 0 1px 0 var(--ab-bi-rim2), 0 0 0 1px var(--ab-bi-glow), 0 4px 12px -4px var(--ab-bi-glow-a);
-}
-.ab[data-ae="biomechanical-gothic"] .ab-seg-btn[aria-pressed="true"]::before { background: var(--ab-glow); box-shadow: 0 0 6px var(--ab-bi-glow-a); }
+.ab[data-ae="biomechanical-gothic"] .ab-seg-btn:hover { background: linear-gradient(180deg, var(--ab-bi-metal-hi), var(--ab-bi-cast-hi) 55%, var(--ab-bi-cast)); }
+.ab[data-ae="biomechanical-gothic"] .ab-seg-btn[aria-pressed="true"] { background: linear-gradient(180deg, var(--ab-bi-bone-lit), var(--ab-bi-bone) 60%, var(--ab-bi-metal-hi)); color: var(--ab-canvas); }
 .ab[data-ae="biomechanical-gothic"] .ab-card-title { margin: 26px 0 8px !important; font-weight: 400; font-size: clamp(24px, 3.1cqw, 32px); line-height: 1.08; letter-spacing: calc(-0.005em * var(--ab-tr, 1)); }
-.ab[data-ae="biomechanical-gothic"][data-hcls="deco"] .ab-card-title { letter-spacing: 0.03em; font-size: clamp(20px, 2.5cqw, 26px); }
+.ab[data-ae="biomechanical-gothic"][data-hcls="deco"] .ab-card-title, .ab[data-ae="biomechanical-gothic"][data-hcls="old-style"] .ab-card-title { text-transform: uppercase; letter-spacing: 0.05em; font-size: clamp(20px, 2.5cqw, 26px); }
 .ab[data-ae="biomechanical-gothic"] .ab-card-body { font-size: 14px; }
+/* the main action: a vertebra, a centrum with two tapered lateral processes, bone, ink label; never a pill */
 .ab[data-ae="biomechanical-gothic"] .ab-cta {
-  position: relative; padding: 14px 18px 18px 54px; border-radius: 999px; background: var(--ab-bi-bone); color: var(--ab-canvas); box-shadow: inset 0 -3px 0 rgba(0,0,0,.18), 0 0 0 1px var(--ab-bi-rim2);
-  font: 600 11px var(--bg-mono); letter-spacing: 0.16em; text-transform: uppercase; transition: transform 0.2s ease-in-out, filter 0.2s;
+  position: relative; padding: 15px 34px; border: 0; border-radius: 0; clip-path: var(--bg-vclip);
+  background: linear-gradient(180deg, var(--ab-bi-bone-lit), var(--ab-bi-bone) 55%, var(--ab-bi-metal-hi)); color: #121412; box-shadow: none;
+  font: 600 11px var(--bg-mono); letter-spacing: 0.16em; text-transform: uppercase; transition: filter 0.2s;
 }
-.ab[data-ae="biomechanical-gothic"] .ab-cta::before { content: ""; position: absolute; left: 20px; top: 28%; bottom: 28%; width: 20px; background: repeating-linear-gradient(90deg, rgba(0,0,0,.4) 0 1.5px, transparent 1.5px 5px); }
-.ab[data-ae="biomechanical-gothic"] .ab-cta::after { content: ""; position: absolute; left: 54px; right: 54px; bottom: 8px; height: 1px; background: var(--ab-glow); box-shadow: 0 0 6px var(--ab-bi-glow-a); }
+.ab[data-ae="biomechanical-gothic"][data-mode="light"] .ab-cta { background: linear-gradient(180deg, #3A3D38, #2B2D29 55%, #1A1C1A); color: #E2E0D9; }
+.ab[data-ae="biomechanical-gothic"] .ab-cta::after { content: ""; position: absolute; left: 34px; right: 34px; bottom: 7px; height: 1px; background: var(--ab-glow); }
 .ab[data-ae="biomechanical-gothic"] .ab-cta:hover { filter: brightness(1.06); }
-.ab[data-ae="biomechanical-gothic"] .ab-cta:hover::before { background: repeating-linear-gradient(90deg, rgba(0,0,0,.4) 0 1.5px, transparent 1.5px 6px); }
-.ab[data-ae="biomechanical-gothic"] .ab-cta:active { transform: scale(0.97); box-shadow: inset 0 3px 8px rgba(0,0,0,.3), 0 0 0 1px var(--ab-bi-rim2); }
+.ab[data-ae="biomechanical-gothic"] .ab-cta:active { filter: brightness(0.9); }
 .ab[data-ae="biomechanical-gothic"] .ab-cta-arrow::before { content: "⟶"; font-size: 16px; }
 
 /* 02: a cast channel, a ribbed groove with a bone lever, three organs */
@@ -194,26 +189,28 @@
 .ab[data-ae="biomechanical-gothic"] .ab-status { font: 400 10.5px var(--bg-mono); letter-spacing: 0.1em; text-transform: uppercase; }
 .ab[data-ae="biomechanical-gothic"] .ab-states { margin-top: 24px; gap: 14px; }
 .ab[data-ae="biomechanical-gothic"] .ab-state { font: 500 10px var(--bg-mono); letter-spacing: 0.16em; text-transform: uppercase; }
+/* the states: one valve (a sphincter of five cast folds) drawn three ways: closed, parting, open on sinew */
 .ab[data-ae="biomechanical-gothic"] .ab-disc {
-  position: relative; width: 58px; height: 52px; margin: 0 auto 14px; border: 0; border-radius: var(--bg-organ);
+  position: relative; width: 56px; height: 56px; margin: 0 auto 14px; border: 0; border-radius: 50%;
   background:
-    radial-gradient(ellipse 3px 1.6px at 30% 62%, var(--ab-bi-well) 0 70%, transparent 74%),
-    radial-gradient(ellipse 2.6px 1.4px at 66% 36%, var(--ab-bi-well) 0 70%, transparent 74%),
-    radial-gradient(ellipse 2.2px 1.2px at 58% 74%, var(--ab-bi-well) 0 70%, transparent 74%),
-    linear-gradient(98deg, transparent 49%, rgba(0,0,0,.35) 50%, var(--ab-bi-rim) 51%, transparent 52%),
-    radial-gradient(ellipse at 36% 28%, var(--ab-bi-cast-hi), var(--ab-bi-cast) 70%);
-  box-shadow: inset 0 -5px 9px rgba(0,0,0,.4), 0 0 0 1px var(--ab-bi-rim2);
+    radial-gradient(circle, var(--ab-bi-well) 0 3%, transparent 4%),
+    repeating-conic-gradient(from 12deg, var(--ab-bi-cast-hi) 0 6deg, var(--ab-bi-cast) 6deg 40deg, var(--ab-bi-cast-lo) 40deg 72deg),
+    var(--ab-bi-cast);
+  box-shadow: inset 0 0 0 3px var(--ab-bi-cast-lo), inset 0 -4px 8px rgba(0,0,0,.45), 0 0 0 1px var(--ab-bi-rim2);
 }
-.ab[data-ae="biomechanical-gothic"] .ab-disc[data-s="1"] { box-shadow: inset 0 -5px 9px rgba(0,0,0,.4), 0 0 0 1px var(--ab-bi-rim2), 0 0 0 5px var(--ab-bi-glow-b); transform: scale(1.04); }
+.ab[data-ae="biomechanical-gothic"] .ab-disc[data-s="1"] {
+  background:
+    radial-gradient(circle, var(--ab-bi-well) 0 17%, var(--ab-bi-cast-lo) 21%, transparent 24%),
+    repeating-conic-gradient(from 30deg, var(--ab-bi-cast-hi) 0 6deg, var(--ab-bi-cast) 6deg 40deg, var(--ab-bi-cast-lo) 40deg 72deg),
+    var(--ab-bi-cast);
+}
 .ab[data-ae="biomechanical-gothic"] .ab-disc[data-s="2"] {
   background:
-    radial-gradient(ellipse 30% 26% at 50% 50%, var(--ab-glow) 0 55%, transparent 100%),
-    radial-gradient(ellipse 3px 1.6px at 22% 70%, var(--ab-bi-well) 0 70%, transparent 74%),
-    radial-gradient(ellipse 2.6px 1.4px at 78% 30%, var(--ab-bi-well) 0 70%, transparent 74%),
-    radial-gradient(ellipse at 36% 28%, var(--ab-bi-cast-hi), var(--ab-bi-cast) 70%);
-  box-shadow: inset 0 -5px 9px rgba(0,0,0,.4), 0 0 0 1px var(--ab-bi-glow), 0 0 18px var(--ab-bi-glow-a);
+    radial-gradient(circle at 44% 42%, var(--ab-accent) 0 2.5%, transparent 3.5%),
+    radial-gradient(circle, var(--ab-glow) 0 22%, var(--ab-bi-well) 33%, var(--ab-bi-cast-lo) 36%, transparent 39%),
+    repeating-conic-gradient(from 48deg, var(--ab-bi-cast-hi) 0 6deg, var(--ab-bi-cast) 6deg 40deg, var(--ab-bi-cast-lo) 40deg 72deg),
+    var(--ab-bi-cast);
 }
-.ab[data-ae="biomechanical-gothic"] .ab-disc[data-s="2"]::after { content: ""; position: absolute; left: 36%; top: 30%; width: 5px; height: 4px; border-radius: 50%; background: var(--ab-accent); opacity: 0.9; }
 
 /* 03: vertebrae stack, sinew hairlines of varying weight, tube progress */
 .ab[data-ae="biomechanical-gothic"] .ab-list { counter-reset: bgrow; }
@@ -223,18 +220,18 @@
 .ab[data-ae="biomechanical-gothic"] .ab-row:last-child { border-bottom-color: var(--ab-bi-rim); }
 .ab[data-ae="biomechanical-gothic"] .ab-row-n { font-size: 0; }
 .ab[data-ae="biomechanical-gothic"] .ab-row-n::before {
-  content: counter(bgrow, upper-roman); display: grid; place-items: center; width: 30px; height: 26px; border-radius: var(--bg-vert); background: var(--ab-bi-cast-hi);
-  box-shadow: inset 0 1px 0 var(--ab-bi-rim2), 0 0 0 1px var(--ab-bi-rim); font: 500 11.5px/1 var(--ab-font-b); color: var(--ab-bi-bone); letter-spacing: 0.04em;
+  content: "L" counter(bgrow); display: grid; place-items: center; width: 30px; height: 26px; border-radius: var(--bg-vert); background: var(--ab-bi-cast-hi);
+  box-shadow: inset 0 1px 0 var(--ab-bi-rim2), 0 0 0 1px var(--ab-bi-rim); font: 500 10.5px/1 var(--bg-mono); color: var(--ab-bi-bone); letter-spacing: 0.04em;
 }
 .ab[data-ae="biomechanical-gothic"] .ab-row-name { font-weight: 500; letter-spacing: 0.01em; }
 .ab[data-ae="biomechanical-gothic"] .ab-row-status {
-  display: inline-flex; align-items: center; gap: 7px; padding: 3px 11px 3px 9px; border-radius: 999px; background: var(--ab-bi-cast-lo); box-shadow: 0 0 0 1px var(--ab-bi-rim);
+  display: inline-flex; align-items: center; gap: 7px; padding: 3px 11px 3px 9px; border-radius: 3px; background: var(--ab-bi-cast-lo); box-shadow: 0 0 0 1px var(--ab-bi-rim);
   font: 500 10px var(--bg-mono); letter-spacing: 0.1em; text-transform: uppercase; color: var(--ab-bi-bone);
 }
 .ab[data-ae="biomechanical-gothic"] .ab-row-status::before { content: ""; width: 5px; height: 3px; border-radius: 50%; background: var(--ab-bi-metal); }
-.ab[data-ae="biomechanical-gothic"] .ab-row:nth-child(1) .ab-row-status::before, .ab[data-ae="biomechanical-gothic"] .ab-row:nth-child(2) .ab-row-status::before { background: var(--ab-bi-glow); box-shadow: 0 0 5px var(--ab-bi-glow-a); }
+.ab[data-ae="biomechanical-gothic"] .ab-row:nth-child(1) .ab-row-status::before, .ab[data-ae="biomechanical-gothic"] .ab-row:nth-child(2) .ab-row-status::before { background: var(--ab-bi-bone); }
 .ab[data-ae="biomechanical-gothic"] .ab-row-bar { height: 9px; border-radius: 5px; background: linear-gradient(180deg, var(--ab-bi-cast-lo), var(--ab-bi-well)); box-shadow: inset 0 1px 2px rgba(0,0,0,.6), 0 0 0 1px var(--ab-bi-rim); }
-.ab[data-ae="biomechanical-gothic"] .ab-row-bar i { border-radius: 5px; background: linear-gradient(180deg, var(--ab-bi-glow-b), var(--ab-glow) 45%, var(--ab-bi-glow-a)); box-shadow: 0 0 8px var(--ab-bi-glow-a); }
+.ab[data-ae="biomechanical-gothic"] .ab-row-bar i { border-radius: 5px; background: linear-gradient(180deg, var(--ab-bi-metal-hi), var(--ab-bi-bone) 40%, var(--ab-bi-metal) 70%), var(--ab-bi-bone); box-shadow: inset 0 -2px 0 var(--ab-glow); }
 .ab[data-ae="biomechanical-gothic"] .ab-row-pct { font: 500 11.5px var(--bg-mono); letter-spacing: 0.04em; }
 
 /* ---- footer: the base of the columns, a rib band, roman legal ---- */
@@ -242,11 +239,11 @@
   margin-top: clamp(26px, 4cqw, 38px); padding-top: 24px; border-top: 0; font: 500 10px var(--bg-mono); letter-spacing: 0.18em; text-transform: uppercase;
   background: repeating-linear-gradient(90deg, var(--ab-bi-rim2) 0 1px, transparent 1px 9px) 0 0 / 100% 10px no-repeat, linear-gradient(90deg, transparent, var(--ab-bi-rim2), transparent) 0 10px / 100% 1px no-repeat;
 }
-.ab[data-ae="biomechanical-gothic"] .ab-dot { width: 7px; height: 5px; margin-right: 10px; border-radius: 50%; background: var(--ab-bi-glow); box-shadow: 0 0 8px var(--ab-bi-glow-a); }
+.ab[data-ae="biomechanical-gothic"] .ab-dot { width: 7px; height: 5px; margin-right: 10px; border-radius: 50%; background: var(--ab-bi-bone); }
 .ab[data-ae="biomechanical-gothic"] .ab-infl::before { content: "MMXXVI  ·  "; color: var(--ab-bi-bone); }
 
 .ab[data-ae="biomechanical-gothic"] .ab-seg-btn:focus-visible, .ab[data-ae="biomechanical-gothic"] .ab-cta:focus-visible, .ab[data-ae="biomechanical-gothic"] .ab-switch:focus-visible, .ab[data-ae="biomechanical-gothic"] .ab-type-apply:focus-visible {
-  outline: 2px solid var(--ab-bi-glow); outline-offset: 3px;
+  outline: 2px solid var(--ab-bi-bone); outline-offset: 3px;
 }
 
 /* ---- narrow boards ---- */

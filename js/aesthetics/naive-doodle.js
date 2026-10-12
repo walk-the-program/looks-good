@@ -164,6 +164,7 @@ function ndKit(t, ink, c1, c2, c3, canvas, seed) {
   kit['--nd-face-off'] = face(false);
   kit['--nd-tick'] = ndSvg(32, 32, P([[4, 17], [12, 26], [30, 2]], 0.5, 3, ink, 3.2), true);
   kit['--nd-tick-pencil'] = ndSvg(32, 32, P([[4, 17], [12, 26], [30, 2]], 0.5, 3, PENCIL, 3.2), true);
+  kit['--nd-cross'] = ndSvg(30, 30, P([[4, 5], [26, 26]], 0.6, 3, ink, 3) + P([[25, 3], [5, 27]], 0.6, 3, ink, 3), true);
   kit['--nd-box'] = ndSvg(28, 28, ndBoxSides(5, 6, 18, 17, 2.5, rnd).map(s => P(s, 0.35, 3, ink, 2.2)).join(''), true);
   const star = [];
   for (let i = 0; i <= 10; i++) { const a = (-90 + i * 36) * Math.PI / 180, r = i % 2 ? 5.2 : 12; star.push([16 + Math.cos(a) * r, 16.5 + Math.sin(a) * r]); }
@@ -310,8 +311,8 @@ registerAesthetic({
     }
     // the hill: a line with its crayon filled a little below and to the right of it
     const hill = [];
-    for (let i = 0; i <= 24; i++) { const x = -20 + i * 18.5; hill.push([x, 336 - Math.sin((x + 20) / 440 * Math.PI) * 46 + Math.sin(x / 37) * 3]); }
-    const low = ndWobble(hill.map(([x, y]) => [x + 6, y + 64 + Math.sin(x / 23) * 4]).reverse(), rnd, 2.2, 9);
+    for (let i = 0; i <= 24; i++) { const x = -20 + i * 18.5; hill.push([x, 306 - Math.sin((x + 20) / 440 * Math.PI) * 46 + Math.sin(x / 37) * 3]); }
+    const low = ndWobble(hill.map(([x, y]) => [x + 6, y + 50 + Math.sin(x / 23) * 4]).reverse(), rnd, 2.2, 9);
     const hillFill = `<path d="${ndD(hill.map(([x, y]) => [x + 6, y + 9]).concat(low))}Z" fill="url(#${id}b)"/>`;
     // loop flowers on stems
     const flower = (x, y, s, petal) => {
@@ -336,10 +337,10 @@ registerAesthetic({
       + (() => { const [a, h] = ndLoopArrow(84, 88, 166, 132, 11, 1); return P(a, 0.6, 4, 2.4) + P(h, 0.3, 3, 2.4); })();
     return `<svg class="nd-art" viewBox="0 0 400 400" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg" role="presentation" focusable="false" style="display:block;width:100%;height:100%">
       <defs>${hatch('a', c1, 18)}${hatch('b', c2, 18)}</defs>
-      ${cloud(84, 222, 46, 24)}${cloud(330, 296, 40, 20)}
+      ${cloud(84, 206, 46, 24)}${cloud(332, 262, 40, 20)}
       ${sunFill}${rays}${sunLine}${face}
       ${hillFill}${P(hill, 1.4, 7, 3.2)}
-      ${flower(64, 300, 1, c1)}${flower(118, 322, 0.8, c2)}${flower(206, 302, 0.92, c1)}
+      ${flower(64, 272, 1, c1)}${flower(118, 292, 0.8, c2)}${flower(206, 272, 0.92, c1)}
       ${note}
     </svg>`;
   },

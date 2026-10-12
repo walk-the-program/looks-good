@@ -1,37 +1,59 @@
-/* 22 Xerox — toner, raw, copied. Reference: 80s-90s punk and hardcore flyers,
-   Pettibon-era zines, xerox-revival posters, office ephemera. Black toner on white
-   paper: hard threshold contrast, speckle and dropouts, edge burn, dirty-drum
-   streaks, slightly skewed copies, taped paste-up scraps, a black copier-edge band.
-   Colour comes from the paper, not the ink: accent and secondary are coloured paper
-   stocks (one scrap each); primary is the single misregistered overprint pass. Tape
-   copies grey. Black is spent big: a lid-open toner field in the art, a reversed toner
-   band per view, a black copier edge. Dark mode is the lid-open black with white paper
-   scraps pasted on it (a negative copy), never white toner.
-   Mechanism: the generation loss is real SVG filtering, not raster images. art()
-   emits one hidden <svg> that defines the filters (fixed ids, so the css can use
-   filter:url(#xrx-...)):
-     xrx-copy   feTurbulence -> feDisplacementMap (toothed edges) -> feComponentTransfer
-                discrete alpha (threshold) with a high-frequency feTurbulence dropout mask
-     xrx-toner  the same, tighter, with more dropouts (solid black blocks)
-     xrx-edge / xrx-rule  toothed paper and ruled-line edges
-     xrx-g2 / xrx-g5      a smooth gradient pushed through feTurbulence + a steep
-                feComponentTransfer threshold: 2nd and 5th generation of the same image.
-   The hero art is a copied image: a 45-degree dot screen sized by a contrasty tone
-   ramp, blurred and re-thresholded so dots fuse into slabs and drop out (masked by the
-   brand initial), on a skewed sheet whose left 38% is the lid-open black field fading
-   into the paper through the gen-5 threshold, with a taped scrap on coloured stock and
-   a misregistered primary overprint block. */
+/* 22 Xerox — toner, cold, mechanical. The copier, not the person using it (that is
+   Xerox Punk). References: Pati Hill's copier works (objects on the platen in a black
+   void), copy art's generation loss, Munari's moved originals, Sniffin' Glue copied in
+   monochrome. Rules: toner (#111) on ONE paper stock for the whole sheet (a pale copy-paper
+   tint picked from the client primary's hue: canary, goldenrod, salmon, pink, lilac, blue,
+   green, or white), no hand-made props (no tape, sticky notes, highlighter, torn edges or
+   rotations: copies are square to the page; only the IMAGE distorts). The client primary
+   appears only as that stock and as one overprinted rubber stamp in the art.
+   Mechanism: real SVG filtering. art() emits one hidden <svg> with the filters (fixed ids,
+   referenced from the css):
+     xrx-copy / xrx-toner / xrx-edge / xrx-lite / xrx-rule  toothed, thresholded toner
+     xrx-head   the headline copied hard: blur + low threshold, so counters partly fill
+     xrx-gen1 / xrx-gen3 / xrx-gen7 (and -w variants in paper colour for the black field):
+                generation loss. feGaussianBlur 0 / 1.1 / 1.8 + toner noise, then a discrete
+                alpha threshold that drops lower each generation (shapes fatten, hairlines
+                break), flooded with pure toner: no greys at any generation.
+   The hero is the platen with the lid open: a black field with dither fall-off, the brand
+   initial copied as a thresholded dot screen, a ghost double copy 10px off (a sparser screen,
+   still pure toner), the copier's mm edge scale and an enlargement label. */
 (function () {
 let seq = 0;
 const XR_HASH = (x, y) => { const v = Math.sin(x * 12.9898 + y * 78.233) * 43758.5453; return v - Math.floor(v); };
 
+// One generation of loss: blur the alpha, add toner noise, threshold lower each time
+// (shapes fatten, counters fill, hairlines break), flood with pure toner. No greys.
+function xrGen(id, blur, noise, table, color) {
+  const n = noise ? `<feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="1" seed="${id.length * 7}" result="n"/>`
+    + '<feColorMatrix in="n" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  1 0 0 0 0" result="na"/>'
+    + `<feComposite in="b" in2="na" operator="arithmetic" k1="0" k2="1" k3="${noise}" k4="${(-noise / 2).toFixed(2)}" result="m"/>` : '';
+  return `<filter id="${id}" x="-10%" y="-10%" width="120%" height="120%" color-interpolation-filters="sRGB">`
+    + `<feGaussianBlur in="SourceAlpha" stdDeviation="${blur}" result="b"/>${n}`
+    + `<feComponentTransfer in="${noise ? 'm' : 'b'}" result="t"><feFuncA type="discrete" tableValues="${table}"/></feComponentTransfer>`
+    + `<feFlood flood-color="${color}"/><feComposite in2="t" operator="in"/></filter>`;
+}
+
+// The ONE paper stock: a pale copy-paper tint picked from the client primary's hue (L about 90-94%).
+const XR_STOCKS = [
+  { name: 'Pink', h: [330, 360], hex: '#F5D6DC' }, { name: 'Pink', h: [0, 12], hex: '#F5D6DC' },
+  { name: 'Salmon', h: [12, 32], hex: '#F6D9C6' }, { name: 'Goldenrod', h: [32, 48], hex: '#F2DFA6' },
+  { name: 'Canary', h: [48, 72], hex: '#F4EDAF' }, { name: 'Green', h: [72, 170], hex: '#D9EBD2' },
+  { name: 'Blue', h: [170, 255], hex: '#D3E2EE' }, { name: 'Lilac', h: [255, 330], hex: '#E3DBEE' },
+];
+function xrStock(primary) {
+  const c = hexToHsl(primary);
+  if (c.s < 18) return { name: 'White', hex: '#F1EFE9' };
+  return XR_STOCKS.find(s => c.h >= s.h[0] && c.h < s.h[1]) || XR_STOCKS[0];
+}
+const XR_TONER = '#111111';
+
 function xrDefs() {
   const sRGB = 'color-interpolation-filters="sRGB"';
-  const thr = '<feComponentTransfer><feFuncA type="discrete" tableValues="0 0 0 1 1 1"/></feComponentTransfer>';
   const holes = (freq, seed, cut) => `<feTurbulence type="fractalNoise" baseFrequency="${freq}" numOctaves="2" seed="${seed}" result="n"/>`
     + `<feColorMatrix in="n" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  -55 0 0 0 ${(55 * cut + 1).toFixed(1)}" result="h"/>`;
   const noiseGray = seed => `<feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="2" seed="${seed}" result="n"/>`
     + '<feColorMatrix in="n" type="matrix" values="1 0 0 0 0  1 0 0 0 0  1 0 0 0 0  0 0 0 0 1" result="ng"/>';
+  // the lid-open fall-off: a smooth ramp pushed through noise and a steep threshold (the hero's black field)
   const gen = (id, amt, slope, mid) => `<filter id="${id}" x="0" y="0" width="100%" height="100%" ${sRGB}>${noiseGray(5)}
       <feComposite in="SourceGraphic" in2="ng" operator="arithmetic" k1="0" k2="1" k3="${amt}" k4="${(-amt / 2).toFixed(3)}" result="m"/>
       <feComponentTransfer in="m"><feFuncR type="linear" slope="${slope}" intercept="${(0.5 - slope * mid).toFixed(2)}"/><feFuncG type="linear" slope="${slope}" intercept="${(0.5 - slope * mid).toFixed(2)}"/><feFuncB type="linear" slope="${slope}" intercept="${(0.5 - slope * mid).toFixed(2)}"/></feComponentTransfer></filter>`;
@@ -65,59 +87,66 @@ function xrDefs() {
       <feDisplacementMap in="SourceGraphic" in2="w" scale="3" xChannelSelector="R" yChannelSelector="G" result="d"/>
       <feComponentTransfer in="d"><feFuncA type="discrete" tableValues="0 0 0 1 1 1"/></feComponentTransfer>
     </filter>
-    ${gen('xrx-g2', 0.35, 2.4, 0.5)}
+    <filter id="xrx-head" x="-3%" y="-8%" width="106%" height="116%" ${sRGB}>
+      <feGaussianBlur in="SourceGraphic" stdDeviation="1.15" result="b"/>
+      <feTurbulence type="fractalNoise" baseFrequency="0.035" numOctaves="2" seed="8" result="w"/>
+      <feDisplacementMap in="b" in2="w" scale="3.5" xChannelSelector="R" yChannelSelector="G" result="d"/>
+      ${holes('0.015 0.5', 2, 0.8)}
+      <feComposite in="d" in2="h" operator="in" result="e"/>
+      <feComponentTransfer in="e"><feFuncA type="discrete" tableValues="0 0 1 1 1 1 1"/></feComponentTransfer>
+    </filter>
     ${gen('xrx-g5', 0.6, 9, 0.46)}
-    <clipPath id="xrx-torn" clipPathUnits="objectBoundingBox"><path d="M0 0H1V0.3L0.92 0.4L0.84 0.28L0.75 0.43L0.67 0.3L0.58 0.46L0.5 0.29L0.41 0.42L0.33 0.27L0.24 0.4L0.16 0.26L0.08 0.38L0 0.3Z"/></clipPath>
+    ${xrGen('xrx-gen1', 0, 0, '0 1', '#111111')}${xrGen('xrx-gen3', 1.1, 0.4, '0 0 1 1 1 1', '#111111')}${xrGen('xrx-gen7', 1.8, 0.75, '0 0 1 1 1 1 1 1', '#111111')}
+    ${xrGen('xrx-gen1w', 0, 0, '0 1', '#F2F0EA')}${xrGen('xrx-gen3w', 1.1, 0.4, '0 0 1 1 1 1', '#F2F0EA')}${xrGen('xrx-gen7w', 1.8, 0.75, '0 0 1 1 1 1 1 1', '#F2F0EA')}
   </defs></svg>`;
 }
 
 registerAesthetic({
   key: 'xerox', order: 22,
   name: 'Xerox',
-  descriptor: 'Toner · Raw · Copied',
-  influences: 'Photocopy zines / Punk flyers / Office ephemera',
-  summary: 'Black toner on white paper: hard contrast, speckle, edge burn and taped-on scraps.',
+  descriptor: 'Toner · Cold · Copied',
+  influences: 'Pati Hill copier works / Copy art / Generation loss',
+  summary: 'Toner on one paper stock, copied until it degrades: thresholds, filled counters and a lid-open black platen.',
   motto: 'Copy of a copy of a copy.',
-  kicker: 'Copy 02 of 50',
+  kicker: 'Copy 032 / 050',
   mode: 'light',
   slideShape: 'minimal',
-  labels: { material: 'Copy', states: ['Original', '2nd gen', '5th gen'], statesKind: 'swatch' },
+  labels: { material: 'Generations', states: ['Gen 1', 'Gen 3', 'Gen 7'], statesKind: 'swatch' },
   layout: { hero: 'poster', palette: 'swatches', sections: 'two-col' },
   type: { ui: 'body', label: 'body', display: 1 },
   highlight: 'custom',
-  highlightNote: 'The word stays toner (ink) or the readable text colour on a flat primary overprint block, offset and tilted about 1 degree like a second pass that did not register; no outline, no gradient, no accent.',
-  cardFill: '--ab-scrap',
+  highlightNote: 'The word is reversed out of a solid toner slab (paper-coloured type on black), square to the line, copied with the same threshold as the headline; no colour, no rotation.',
+  cardFill: '--xr-paper',
 
   roles: {
     canvas: {
-      use: 'The copy paper (slightly dulled), with clustered dust, a drum streak and edge burn laid over it; in dark mode the lid-open black field',
-      never: 'Text, or a pure-white digital panel; scraps pasted on it are the lighter paper',
+      use: 'ONE coloured copy-paper stock for the whole sheet, picked from the client primary\'s hue at L 90–94% (canary, goldenrod, salmon, pink, lilac, blue, green; white for a grey primary); in dark mode the lid-open black platen with sheets of that stock on it',
+      never: 'A second paper colour, a white digital panel, text',
     },
     ink: {
-      use: 'Black toner, spent big: the headline, a reversed toner band per view, the lid-open field in the art, every rule, the main action block, selected states and status labels',
-      never: 'Soft greys or gradients; toner is solid, dropped-out or absent',
+      use: 'Toner #111, spent big: the headline, the reversed toner bands, the lid-open field, rules, the main action block, selected states and status labels',
+      never: 'Greys or gradients; toner is solid, dropped-out or absent',
       coverage: '30–40%',
     },
     primary: {
-      use: 'The overprint: a flat fluorescent block behind the highlight word, offset under the one main action and the selected switch, and one block over the art',
-      never: 'Smooth fills, body text, a second CTA, more than one block per view area',
-      coverage: '≈8–10%',
+      use: 'Only as the paper stock and as one overprinted rubber stamp in the art',
+      never: 'Fills, buttons, bars, tape, highlighter, text',
+      coverage: '≤2%',
     },
     secondary: {
-      use: 'A second coloured paper stock: one pasted scrap (the 02 panel) copied in toner',
-      never: 'Ink of any kind: tape, fills, bars, buttons or text',
-      coverage: '≈5–8%',
+      use: 'Never printed: it copies as toner density (a dot screen) in the palette only',
+      never: 'Any fill, tape, bar, button or text',
+      coverage: '0%',
     },
     accent: {
-      use: 'Coloured paper stock for one scrap in the art, and a highlighter swipe over one text line',
-      never: 'Buttons, borders, headline text, tape',
-      coverage: '≤5%',
+      use: 'Never printed: it copies as toner density (a dot screen) in the palette only',
+      never: 'Highlighter, stickers, buttons, borders, text',
+      coverage: '0%',
     },
   },
 
-  // Light paper is dulled a little so the lighter scraps and tape read as pasted on. Dark mode is the
-  // copier's own dark: the lid-open black field (88% black), with white paper scraps pasted on it.
-  canvas(b) { return b.isDark ? b.mix('#000000', b.canvas, 0.88) : b.mix('#d6d3cb', b.canvas, 0.18); },
+  // Light: the whole sheet is the one paper stock. Dark: the lid-open black platen.
+  canvas(b) { return b.isDark ? b.mix('#000000', b.canvas, 0.9) : xrStock(b.primary).hex; },
 
   tokens(t) {
     const st = typeof state !== 'undefined' ? state : null;
@@ -126,47 +155,46 @@ registerAesthetic({
     const ws = String((hf && hf.weights) || '400').split(';').map(Number).filter(Boolean);
     const le = ws.filter(x => x <= 900);
     const hw = le.length ? Math.max(...le) : Math.min(...ws);
-    // the highlight word reads on the flat primary block: toner or white, whichever contrasts more
-    const hlInk = t.contrast(t.ink, t.primary) >= t.contrast(t.onPrimary, t.primary) ? t.ink : t.onPrimary;
-    // scraps are always paper with toner type, so in dark mode (a black field) they carry their own ink
-    const paper = d ? t.mix('#ffffff', t.canvas, 0.9) : t.mix('#ffffff', t.canvas, 0.62);
-    const toner = d ? '#141414' : t.ink;
-    const stockA = t.mix(t.accent, paper, 0.5);       // coloured paper stock, not ink
-    const stockB = t.mix(t.secondary, paper, 0.24);
-    const mutedOn = bg => { let m = t.mix(toner, bg, 0.62); for (let k = 0; k < 8 && t.contrast(m, bg) < 4.6; k++) m = t.mix(toner, m, 0.25); return m; };
-    return {
+    const stock = xrStock(t.primary);
+    const paper = stock.hex;                      // sheets are the stock in both modes
+    const ink = d ? t.mix('#ffffff', paper, 0.25) : XR_TONER;   // on the black platen, type is paper-white
+    const mutedOn = (fg, bg) => { let m = t.mix(fg, bg, 0.62); for (let k = 0; k < 8 && t.contrast(m, bg) < 4.6; k++) m = t.mix(fg, m, 0.25); return m; };
+    // each brand colour as the copier sees it: toner density from its luminance (dot radius, % of the 6px cell)
+    const dens = hex => Math.round(Math.max(6, Math.min(94, (1 - relativeLuminance(hex)) * 100)));
+    const brand = typeof effectiveContent === 'function' ? String(effectiveContent().brandName || '') : '';
+    const ini = (typeof abInitial === 'function' ? abInitial(brand) : 'X').replace(/["\\]/g, '');
+    const v = {
       '--ab-tr': (hf && { wide: 0.4, techno: 0.4 }[hf.cls]) ?? 1,
       '--ab-type-pick-w': hw,
       '--ab-hw': hw,
-      '--ab-scrap': paper,
       '--xr-paper': paper,
-      '--xr-toner': toner,
-      '--xr-paper-muted': mutedOn(paper),
-      '--xr-stock-a': stockA,
-      '--xr-stock-a-muted': mutedOn(stockA),
-      '--xr-stock-b': stockB,
-      '--xr-stock-b-muted': mutedOn(stockB),
-      '--ab-hl-ink': hlInk,
-      '--ab-tape': t.alpha(toner, 0.13),
-      '--ab-tape-edge': t.alpha(toner, 0.32),
+      '--xr-toner': XR_TONER,
+      '--xr-paper-muted': mutedOn(XR_TONER, paper),
+      '--xr-ini': `"${ini}"`,
+      '--xr-stock-name': `"${stock.name.toUpperCase()} STOCK"`,
+      '--xr-d2': `"copies as ${dens(t.secondary)}% toner"`,
+      '--xr-d3': `"copies as ${dens(t.accent)}% toner"`,
+      '--xr-r2': `${(dens(t.secondary) / 100 * 2.6 + 0.4).toFixed(2)}px`,
+      '--xr-r3': `${(dens(t.accent) / 100 * 2.6 + 0.4).toFixed(2)}px`,
       '--ab-blend': d ? 'screen' : 'multiply',
-      '--ab-toner-soft': t.alpha(t.ink, 0.5),
-      '--ab-hi': t.contrast(t.ink, t.accent) >= 4.5 ? t.accent : t.mix(t.accent, t.canvas, 0.4),
+      '--xr-gen': d ? 'w' : '',
     };
+    if (!d) Object.assign(v, { '--ab-ink': XR_TONER, '--ab-muted': mutedOn(XR_TONER, t.canvas), '--ab-line': XR_TONER });
+    else Object.assign(v, { '--ab-ink': ink, '--ab-muted': mutedOn(ink, t.canvas) });
+    return v;
   },
 
   art(ctx) {
     const t = ctx.t;
     const id = 'xr' + (++seq);
     const W = 224, H = 200;
-    // the copy is always paper with toner on it (in dark mode a white sheet on the black field)
-    const toner = t.isDark ? '#141414' : t.ink;
-    const paper = t.isDark ? t.mix('#ffffff', t.canvas, 0.9) : t.mix('#ffffff', t.canvas, 0.62);
-    const stock = t.mix(t.accent, paper, 0.5);
-    // A copied photo, not a screen: a 45-degree dot screen sized by a contrasty tone ramp
-    // (0.05-1, gamma 0.6), blurred and re-thresholded so dots fuse into slabs in the shadows
-    // and drop out in the highlights; masked by the initial and fading into the lid-open black.
-    const P = 7, dots = [];
+    const toner = XR_TONER;
+    const paper = xrStock(t.primary).hex;
+    // A copied image, not a screen: a 45-degree dot screen sized by a contrasty tone ramp, blurred and
+    // re-thresholded so dots fuse into slabs in the shadows and drop out in the highlights; masked by the
+    // initial and fading into the lid-open black. A ghost double copy (the original moved during the scan)
+    // sits 10,8 off as a sparser screen: lighter by dot size, never by grey.
+    const P = 7, dots = [], ghost = [];
     for (let j = 0; j * P / 2 < H; j++) {
       for (let i = 0; i * P < W; i++) {
         const x = i * P + (j % 2) * P / 2 + 3, y = j * P / 2 + 2;
@@ -175,91 +203,91 @@ registerAesthetic({
         let d = 0.05 + 0.95 * Math.pow(Math.max(0, Math.min(1, ramp + (XR_HASH(i, j) - 0.5) * 0.3)), 1.7);
         d = Math.max(0.05, Math.min(1, d));
         dots.push(`<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${(3.4 * Math.sqrt(d)).toFixed(2)}"/>`);
+        ghost.push(`<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${(1.5 * Math.sqrt(d)).toFixed(2)}"/>`);
       }
     }
-    // a few stray toner specks, bunched like dust on the glass
+    // stray toner specks, bunched like dust on the glass
     let specks = '';
     for (let k = 0; k < 22; k++) {
       const c = k % 3 === 0 ? [176, 150] : k % 3 === 1 ? [128, 22] : [200, 112];
       const x = c[0] + (XR_HASH(k, 3) - 0.5) * 30, y = c[1] + (XR_HASH(k, 7) - 0.5) * 26, r = 0.35 + XR_HASH(k, 11) * 0.9;
       specks += `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${r.toFixed(2)}"/>`;
     }
-    const font = 'font-family:var(--ab-font-label,var(--ab-font-b),monospace)';
-    // tear-off tab strip (fills the paper left of the art): a solid band, then 7 cut tabs
-    // carrying the brand name rotated -90deg; the third tab has been torn off (xrx-torn stub)
-    const nm = escapeHtml(String(ctx.brandName || '').trim());
-    const tabs = [0, 1, 2, 3, 4, 5, 6].map(i => i === 2 ? '<span class="xrt-tab is-torn"></span>' : `<span class="xrt-tab"><span>${nm}</span></span>`).join('');
-    const strip = `<div class="xrt" aria-hidden="true"><div class="xrt-band"><b>TAKE ONE —</b><i>COPY 02 OF 50</i></div><div class="xrt-tabs">${tabs}</div></div>`;
+    // the copier's edge scale: mm ticks along the top edge (toner on paper, paper on the black field)
+    let ticks = '';
+    for (let mm = 0, x = 2; x < W - 1; mm++, x += 2.2) {
+      const len = mm % 10 === 0 ? 7 : mm % 5 === 0 ? 4.6 : 2.6;
+      ticks += `<path d="M${x.toFixed(1)} 0V${len}" stroke="${x < 86 ? paper : toner}"/>`;
+    }
+    const nums = [10, 20, 30, 40, 50, 60, 70, 80, 90].map(n => {
+      const x = 2 + n * 2.2;
+      return `<text x="${(x + 1.2).toFixed(1)}" y="11.5" fill="${x < 86 ? paper : toner}">${n}</text>`;
+    }).join('');
+    const font = 'font-family:var(--ab-font-b),"Courier Prime","Courier New",monospace';
+    const mask = `<text x="142" y="178" text-anchor="middle" font-size="182" fill="#fff" style="font-family:var(--ab-font-h);font-weight:var(--ab-hw,900)">${escapeHtml(ctx.initial)}</text>`;
     return `${xrDefs()}<div class="xra"><svg viewBox="0 0 ${W} ${H}" width="100%" height="100%" focusable="false" preserveAspectRatio="xMidYMid meet">
       <defs>
-        <mask id="${id}m" maskUnits="userSpaceOnUse" x="0" y="0" width="${W}" height="${H}"><text x="142" y="178" text-anchor="middle" font-size="182" fill="#fff" style="font-family:var(--ab-font-h);font-weight:var(--ab-hw,900)">${ctx.initial}</text></mask>
+        <mask id="${id}m" maskUnits="userSpaceOnUse" x="0" y="0" width="${W}" height="${H}">${mask}</mask>
+        <mask id="${id}g" maskUnits="userSpaceOnUse" x="0" y="0" width="${W}" height="${H}"><g transform="translate(10 8)">${mask}</g></mask>
         <filter id="${id}t" x="0" y="0" width="100%" height="100%" color-interpolation-filters="sRGB"><feGaussianBlur stdDeviation="1.1"/><feComponentTransfer><feFuncA type="discrete" tableValues="0 0 1 1"/></feComponentTransfer></filter>
         <linearGradient id="${id}r" x1="0" x2="1" y1="0" y2="0"><stop offset="0" stop-color="#000"/><stop offset="1" stop-color="#fff"/></linearGradient>
       </defs>
       <g filter="url(#xrx-copy)">
         <rect x="2" y="2" width="220" height="196" fill="${paper}"/>
+        <g mask="url(#${id}g)"><g transform="translate(10 8)" fill="${toner}">${ghost.join('')}</g></g>
         <g mask="url(#${id}m)"><g filter="url(#${id}t)" fill="${toner}">${dots.join('')}</g></g>
-        <g fill="${toner}" opacity=".85">${specks}</g>
+        <g fill="${toner}">${specks}</g>
       </g>
-      <g filter="url(#xrx-rule)" fill="${toner}">
-        <path d="M0 189H224V200H0Z"/><path d="M224 0V13L212 0Z"/>
-      </g>
+      <g filter="url(#xrx-rule)" fill="${toner}"><path d="M0 189H224V200H0Z"/><path d="M224 0V13L212 0Z"/></g>
       <g filter="url(#xrx-g5)" style="mix-blend-mode:multiply"><rect x="0" y="0" width="66" height="200" fill="#000"/><rect x="66" y="0" width="52" height="200" fill="url(#${id}r)"/></g>
-      <rect x="92" y="96" width="104" height="80" fill="${t.primary}" transform="rotate(1.6 144 136)" style="mix-blend-mode:multiply" opacity=".94"/>
-      <g transform="rotate(-90 12 150)" fill="${paper}" style="${font}" font-size="5.4" letter-spacing=".5" font-weight="700"><text x="12" y="152">XEROX · COPY 02/50 · 2ND GEN · LID OPEN</text></g>
-      <g transform="rotate(3.2 180 40)">
-        <g filter="url(#xrx-edge)">
-          <rect x="142" y="17" width="76" height="46" fill="${toner}" transform="translate(1.3 1.8)"/>
-          <rect x="142" y="17" width="76" height="46" fill="${stock}"/>
-        </g>
-        <g fill="${toner}" style="${font}" font-weight="700" font-size="7.4" letter-spacing=".5"><text x="147" y="30">NO. 02 OF 50</text><text x="147" y="42">DO NOT FOLD.</text><text x="147" y="54" font-weight="400" font-size="6.2">COPY THE COPY.</text></g>
-        <rect x="133" y="11" width="26" height="12" fill="${toner}" opacity=".14" stroke="${toner}" stroke-opacity=".3" stroke-width=".6" transform="rotate(-32 146 17)"/>
-        <rect x="204" y="53" width="26" height="12" fill="${toner}" opacity=".14" stroke="${toner}" stroke-opacity=".3" stroke-width=".6" transform="rotate(-32 217 59)"/>
-      </g>
+      <g stroke-width=".5" fill="none">${ticks}</g>
+      <g style="${font}" font-size="4.4">${nums}</g>
+      <g transform="rotate(-90 12 150)" fill="${paper}" style="${font}" font-size="5.6" letter-spacing=".5" font-weight="700"><text x="12" y="152">A4 → A3 · 141% · LID OPEN · COPY 032/050</text></g>
+      <g style="mix-blend-mode:multiply" transform="translate(150 24)"><rect x="0" y="0" width="64" height="22" fill="none" stroke="${t.primary}" stroke-width="2"/><rect x="2.6" y="2.6" width="58.8" height="16.8" fill="none" stroke="${t.primary}" stroke-width=".8"/><text x="32" y="10" text-anchor="middle" fill="${t.primary}" font-size="6.4" font-weight="700" letter-spacing=".8" style="${font}">RECEIVED</text><text x="32" y="16.6" text-anchor="middle" fill="${t.primary}" font-size="4.6" letter-spacing=".5" style="${font}">COPY ROOM · 032</text></g>
       <path d="M176 0V200" stroke="${toner}" stroke-opacity=".1" stroke-width="7" fill="none" filter="url(#xrx-rule)"/>
-    </svg></div>${strip}`;
+    </svg></div>`;
   },
 
   materials: [
-    { name: 'Toner block', css: 'background: {ink}; color: {canvas}; filter: url(#xrx-toner); /* solid black with toothed edges and dropout specks; one reversed band per view and the lid-open field, never a gradient */' },
-    { name: 'Primary overprint', css: 'background: {primary}; transform: translate(5px, 5px) rotate(.6deg); mix-blend-mode: multiply; /* the one second pass, off-register behind the highlight word, the main action and one art block */' },
-    { name: 'Paper stock', css: 'background: color-mix(in srgb, {accent} 50%, {scrap}); /* colour lives in the paper: one scrap on accent stock, one on secondary stock, toner type on both */' },
-    { name: 'Paper scrap + copy shadow', css: 'background: {scrap}; filter: url(#xrx-edge) drop-shadow(1px 2px 0 {ink}); transform: rotate(-.5deg); /* a pasted scrap: lighter paper, toothed cut edge, a 1px toner shadow line */' },
-    { name: 'Tape', css: 'background: {tape}; border: 1px solid {tapeEdge}; width: 38px; height: 16px; transform: rotate(-32deg); /* tape copies grey: toner at 13%, edges at 32% */' },
-    { name: 'Copier noise', css: 'clustered dust (two-octave feTurbulence mask), one vertical drum streak 32px wide at 7% toner with a turbulent edge, horizontal toner-loss streaks through the headline, edge burn' },
-    { name: 'Generation loss', css: 'background: linear-gradient(135deg, {ink}, {canvas}); filter: url(#xrx-g5); /* the same ramp through feTurbulence and a steep threshold: gen 1 smooth, gen 2 grainy, gen 5 blocks and dropouts */' },
+    { name: 'Paper stock', css: 'background: {canvas}; /* ONE coloured copy paper for the whole sheet (from the primary\'s hue, L 90–94%); never a second stock */' },
+    { name: 'Toner block', css: 'background: #111111; color: {canvas}; filter: url(#xrx-toner); /* solid black with toothed edges and dropout specks; one reversed band per view and the lid-open field, never a gradient */' },
+    { name: 'Generation loss', css: 'filter: url(#xrx-gen3); /* blur 0 → 1.1 → 1.8, toner noise, a threshold that drops each generation (gen 1 / 3 / 7): shapes fatten, counters fill, hairlines break; pure toner, no greys */' },
+    { name: 'Copied sheet', css: 'background: {canvas}; border: 1.5px solid #111111; filter: url(#xrx-lite); /* square to the page, a straight edge with a 1px toner fringe; no tape, no torn edge, no rotation */' },
+    { name: 'Ghost copy', css: 'transform: translate(10px, 8px); /* the original moved during the scan: a second, sparser dot screen (smaller dots, never a grey) */' },
+    { name: 'Rubber stamp', css: 'border: 2px solid {primary}; color: {primary}; mix-blend-mode: multiply; /* the ONE use of the client colour as ink: a single overprinted stamp in the art */' },
+    { name: 'Copier noise', css: 'clustered dust (two-octave feTurbulence mask), one vertical drum streak 32px wide, edge burn, a mm edge scale and an enlargement label (A4 → A3 141%)' },
   ],
 
   rules: {
     do: [
-      'Spend on black: one reversed toner band per view, a lid-open black field in the art, a black copier edge; paper and toner only, threshold-crisp.',
-      'Copy an image, not a filter: shadows fuse into slabs, highlights drop out, the edge falls into black.',
-      'Take colour from the paper: one scrap on coloured stock, the primary as one misregistered overprint pass, tape copied grey.',
-      'Degrade with structure: clustered dust, one drum streak down the sheet, horizontal toner-loss streaks; not an even speckle.',
+      'Print toner on one paper stock: the client primary becomes the paper colour, and appears as ink only in one rubber stamp.',
+      'Make generation loss the system: the same image at gen 1, 3 and 7, thresholded harder each time, counters filling.',
+      'Keep copies square to the page; only the image distorts (moved originals, ghost double copies, enlargement grain).',
+      'Use the platen: a lid-open black field, the mm edge scale, enlargement labels and copy counts.',
     ],
     dont: [
-      'Use smooth fills, soft shadows or gradients except the one generation-loss sample; copies have only toner and paper.',
-      'Set the headline as cut-out ransom letters in mixed faces; one heavy face, copied, is the identity.',
-      'Use coloured tape, coloured progress fills or a row of saturated chips; colour is the paper, not the ink.',
-      'Print white toner on dark grey; dark mode is the lid-open black with white paper pasted on.',
+      'Add tape, sticky notes, highlighter, torn edges or rotation; that is the hand, and the hand belongs to Xerox Punk.',
+      'Use greys, smooth gradients or soft shadows; a copy has toner or paper.',
+      'Print a second paper colour or any colour fill, bar or chip.',
+      'Set the headline as cut-out ransom letters; one heavy face, copied, is the identity.',
     ],
   },
   // Deck copy (js/brand-deck.js): three principles, three do / don't lines, each short.
   deck: {
     principles: [
-      ['Spend on black', 'Toner bands, a lid-open field, hard thresholds.'],
-      ['Copy an image', 'Shadows fuse into slabs; highlights drop out.'],
-      ['Colour is the paper', 'Coloured stock and one overprint pass.'],
+      ['The machine, not the hand', 'Square copies; only the image distorts.'],
+      ['Generation loss', 'Gen 1, 3, 7: thresholds harden, counters fill.'],
+      ['Colour is the paper', 'One stock for the sheet; toner for everything else.'],
     ],
     do: [
-      'Set type in one heavy uppercase face.',
+      'Copy one heavy face until it rots.',
       'Reverse one band per view out of toner.',
       'Take colour from the paper stock.',
     ],
     dont: [
-      'Use smooth fills or soft shadows.',
-      'Use coloured tape or coloured bars.',
-      'Print white toner on grey.',
+      'Add tape, notes or highlighter.',
+      'Use greys or gradients.',
+      'Rotate the copies.',
     ],
   },
 });

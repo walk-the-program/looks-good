@@ -510,3 +510,165 @@ Each of my fixes below therefore includes at least one layout move, not only CSS
 - **B. Faux bold.** Several aesthetics ask single-weight faces for 700–800. retro-futurist does it with Michroma at 800. y2k and cyber-hud already have `*Weight()` helpers. Add `font-synthesis: none` on `.ab` globally, or reuse the helper in retro-futurist (`--ab-hw`).
 - **C. Brown-field convergence.** retro-futurist `canvas()` (s ≤ 45, L14) and cyber-hud `canvas()` (3.5% primary into L5) both warm the dark field toward the client primary. Five of six boards end up brown under a warm palette. At most one aesthetic per family should tint the dark field with primary.
 - **D. Patterns default to op-art and glitch.** Four of six suites lean on `oprings`, `warpcheck`, `burst`, `satellite` or `slipgrid` in the brand colourway. These families belong to acid-graphics and groovy-70s; elsewhere, use them only in `mono` or `night`.
+
+---
+
+## Fix log (fx65)
+
+Worker fx65, round 6 harsh fixes. Status: submitted (not self-accepted). Files changed: `js/aesthetics/` and `css/aesthetics/` for retro-futurist, y2k-chrome, cyber-hud, pixel-arcade, pirate-broadcast and blob-tracking. No shared files were edited. Font, meta and pattern changes are listed as shared requests in the return. Board and deck shots used an in-page preview shim (`scratchpad/adv/fx65/shim.js`) that applies those requests, and the boards were also shot without it (`ns-*`) to confirm they hold on today's fonts.
+
+**Grounds.** Each board now sits on its own fixed ground. None is tinted by the client primary or the warm neutral.
+- retro-futurist: white `mix(#fff, canvas, .15)` (recommended), or deep space `#08090b`.
+- y2k-chrome: ultramarine `#0b1233`, or cool silver `#e3e6eb`.
+- cyber-hud: blue-black `#05070A`, or `#E9ECEF` with `#0B0D10` ink.
+- pixel-arcade: violet night `#17102a`, or cartridge paper `#efe9dc`.
+- pirate-broadcast: screen black `#000`, or the client's pale wall with black screens.
+- blob-tracking: graphite `#16181a`, or the client's pale canvas with a dark plate.
+
+`font-synthesis: none` is set in all six scopes.
+
+### retro-futurist
+1. ★ **Orbital horizon plate**, full-bleed (centred hero, negative `--ab-pad` margins, 21:8, 5:4 on phones).
+   - Black sky into the signal-coloured haze, a planet limb with a 0.8 rim and a blurred copy, three orbits (the outer one dashed) and one white craft on the middle orbit.
+   - The craft carries a signal-coloured flown arc and the label `MRG-01 / T+00:41:07`, with three stars, a 12-column hairline grid and the vertical "A NEW KIND OF SPACE" caption.
+   - The viewBox is 240×100 (r 262) rather than 160×100, so the limb stays gentle on a 2.6:1 band.
+   - The plate is deep space in both modes: the one dark image on a lit page.
+   - The console was moved to deck 06 only. It is drawn hidden in `art()` and shown by the material-stage CSS. One hue, flat; the dial is kept.
+2. ★ **Type voice.**
+   - Headline: flat ink, weight 700, `font-synthesis: none`, `.04em`, `.92`, `clamp(48px, 9cqw, 128px)`, balanced, no chrome.
+   - Highlight word: flat signal colour.
+   - Kicker and tag: 9px, `.5em` Mead caps in the heading face at 400. This deviates from Michroma: an unloaded face would fall back.
+   - Syncopate and the pairing are shared requests.
+3. ★ **One system.**
+   - `--rf-signal` (the primary) is the only chromatic colour. Secondary and accent are swatch-only.
+   - `mode: 'light'` is the hero mode.
+4. **SaaS chrome removed.** 2px flat panels with 1px ink 18% hairlines, a square lit key CTA (inset bottom shadow, no glow), flat square lamps, square toggle. The segmented-bar telemetry screen is now a flat "Mission log" spec table.
+5. **NASA structure.** Sections are numbered 1.1–1.5, set statically because the board's size containers scope CSS counters. Grid overlay and vertical caption are in the plate.
+6. Patterns: shared request. `gradpanes` needs rows and cols ≥ 2, so the lead is `{rows:2, cols:2, steps:9, gap:0}` in duotone. Scope rings stay at `freq: 16`: the patterns doc requires it, and freq 6 renders a bullseye.
+7. Starfield removed.
+
+Deck:
+- Principles rewritten: one signal colour, horizon and orbit, extended type.
+- Cover: the plate as a full-height window.
+- 06: the console.
+- 08: `%` set in mono.
+- 09: a drawn visual pair, horizon versus glow-everything.
+
+### y2k-chrome
+1. ★ **Speculars and leak.**
+   - Speculars: no stroke, no mullion. They are now filled ellipses at .85/.7 under a blur of `.9`; at `.35` they still read as tape.
+   - Detached ball: deleted (moving it made a square corner).
+   - Primary radial: down to .45/.15.
+   - Cool environment band: `mix(secondary, #cfe3ff, .6)` at .5 through the same displacement.
+   - The lens-glint sparkle was removed.
+2. ★ **Acid field.**
+   - A hard-edged accent block, `top 8% / bottom 18% / left 52%`, bleeds off the right edge.
+   - The sculpture sits on it and breaks its edge (`margin-left: -12%`).
+   - Vertical 8px techno micro-type on the right edge: `MRG-01™ / 液体金属 / NOT FOR RESALE`. It was shortened to fit the block; LIQUID METAL stays in the kicker.
+3. ★ **De-pilled.** Cards, panels and type columns 6px; rows 4px with a 1px rim; Fits badges 2px; chips, segmented control and field 3–4px. Only the CTA and the switch keep 999px. The kicker is a flat ink label with ™.
+4. Influences set to "tDR / Wipeout / Aqua / Chrome type". The Dela Gothic One lead is a shared request.
+5. Patterns: shared request.
+6. Deck 06 draws a translucent gel swatch.
+
+Also removed the board's brand-colour glows and star dots (replaced by a cool light) and the pink headline halo. The rules now ban pills and outlined speculars, so they no longer contradict the art.
+
+### cyber-hud
+1. ★ **Fixed signal.**
+   - `--ab-neon` `#00F0FF` and `--ab-neon2` `#FF2A6D`; `#007C86` and `#C4124D` on light.
+   - The canvas is fixed. The client primary fills only the CTA and the selected tab.
+2. ★ **Full-bleed 21:9 viewport.**
+   - Top and bottom tick rails: a major tick every 10%, labelled 000/090/180/270/360.
+   - A left altitude ladder, three parallelogram data slabs on the right (LIVE in magenta), and corner readouts.
+   - One thin reticle over the brand initial drawn as a 1px outline.
+   - No globe or floor. The headline sits inside the band, bottom-left, as a slab.
+   - All inline-styled, so the art works as a blend donor.
+3. ★ **Type voice.** Labels read `/// SECTION.NAME`: 9px, `.14em`, with `.ab-n` as "01.". Tektur and Saira Condensed are shared requests.
+4. States are Standby (dashed), Armed (outline plus hatch) and Live (filled slab plus a static scan line). No brackets.
+5. The highlight is a solid magenta slab cut bottom-right. No RGB split.
+6. **Detail density.**
+   - A 6px tick ruler on every panel's top edge and a hatch by the cut corner.
+   - Panel IDs (PNL-0412/3/4) sit on each section's label row, because the panels' pseudo-elements already carry the chamfer layers.
+   - The type block is open columns, not chamfered boxes.
+7. Patterns: shared request.
+
+All CSS masks were removed (export): the grid is plain and the segmented bars are gradients.
+
+### pixel-arcade
+1. ★ The `.ab-art::after` scanlines were deleted. A 1×2-unit pattern inside the SVG keeps scanlines locked to the sprite grid.
+2. ★ **Owned world.** No coins and no "?" blocks.
+   - A 12×16 protagonist: cap and body in the primary, pale face, two eye pixels, a `pDeep` outline, and a 2-frame stride (animated only without reduced motion).
+   - A signboard on posts carrying the brand initial.
+   - A 9×9 two-tone brand gem with a highlight, and three 5px spark pickups.
+3. ★ **One pixel scale.**
+   - `preserveAspectRatio="xMidYMid meet"`; the art is `calc(168px * var(--pxs))` with `--pxs` 4, 3 (601–760px) or 2 (phone).
+   - The step-downs are set on `.ab-in`, because a container query never styles its own container.
+   - Hearts, 1UP and the score are drawn in scene units.
+   - The screen is centred; the RPG dialog overlaps its lower-left and hangs below.
+4. **Logotype.** A pixel heading is set at `--pxs × 8px` with letter-spacing 0 and a two-step extrusion. Jersey 10 is a shared request.
+5. Patterns: shared request.
+6. **Detail density.** A parallax night city with lit windows, 3 clouds, a one-row grass tuft line, 1UP, and a moon and stars kept clear of the HUD. The scene is now 836 rects, about 2× the old scene (estimated from the old code), not the 3× asked.
+7. Deck dots are square, the CTA is a pixel button, and product rows use the board's LV rows.
+
+### pirate-broadcast
+1. ★ **Teletext type, with no font file.**
+   - `def.headline(ctx, text)` builds each word as an inline SVG of double-height Mode 7-style glyphs from `AB_FONT_5X7`, plus a local punctuation table (each pixel 1 wide and 2 tall).
+   - One glyph is 0.6em × 2em, so the h2's font size drives it. The framework keeps the aria-label text.
+   - The last word is an inverse block in the client primary.
+   - Meta lead VT323 (Bebas last) is a shared request.
+2. ★ **Fixed palette.** `PB_TT` R/G/Y/B/M/C/W/K.
+   - Title rows: cyan with black text.
+   - Bars: W Y C G M R B.
+   - CTA: the green Fastext key. Tuned is green; Intrusion is red.
+   - The client colour appears only on the mark, P100 and the inverse block.
+3. ★ **40-column page.** The hero is a black teletext page (`--pb-u` = one cell).
+   - Row 0: `P100  MARIGOLD 100  SAT 11 OCT  23:41/07`.
+   - Kicker on row 1, the double-height headline on rows 2–5 in a 21-column copy area, and Fastext keys on row 24.
+   - 24 columns on phones, with the frame grab dropping below the copy.
+   - The test card moved to the 02 panel (a 4:3 picture under its title row, from a data-URI token) and to deck 06.
+4. **Intrusion as image.**
+   - The brand mark at 24×18 sixels, white on teletext blue, torn into three bands with 1px white tear lines, plus "THIS IS NOT YOUR SIGNAL." in plain mono.
+   - It sits on the hero page and on the test card's lower third, replacing the noise patch.
+   - Offsets were tuned from +6/−4/+9 to +3/−2/+5, so the mark stays recognisable.
+5. The TV bezel and its rounding were removed; castellations run to the edge.
+6. Patterns: shared request. The new `broadcast` colourway is now in the engine, so the request uses it.
+
+Deck cover: one centred 760px teletext page. It is wider than 40 cells because the cover fit pins a 40px headline floor.
+
+### blob-tracking
+1. ★ **A tracked subject.**
+   - The grid is 432×180 (about 2px cells).
+   - 13 walking figures on two crossing paths across a plaza: head disc r 3, torso capsule 5×11, legs at ±15° in two stride frames.
+   - Each figure has a long cast shadow (25%, offset +8/+4). There is a 0.06 paving grid every 24 cells and a lit doorway with spill.
+   - The clustering derives the boxes as before. Most persons are revealed rather than inverted so the figures read; one in four and the lock stay inverted.
+2. ★ **Image separated from overlay.**
+   - Tabs are 9px, with a class and confidence: `PERSON 0.93`, `SHADOW 0.41`, `GROUP 03 · 2 OBJ`, `ZONE 01 · 10 OBJ`, `DOORWAY 0.88`.
+   - De-collision (`BT_TABS`): tabs sorted by y, flipped under the box on a hit, cut to the ID if still hitting, and capped at 18 classed tabs.
+   - The band data URI uses a 2× coarser copy.
+3. ★ **Text stack.** Headline at 600, `-0.02em`. The tag reads "TEXT 0.99 · CLASS: HEADLINE". IBM Plex Mono lead is a shared request.
+4. **CV language down the board.**
+   - Frame counters F0412–F0416 on the section headers.
+   - Swatches are detected regions: a 1px box 4px outside the chip, with tabs like `CANVAS 0.98`. The role label moved into the tab; the span stays for screen readers.
+   - Type specimens have a dashed box with `FONT 0.97`.
+5. Patterns: shared request.
+6. The locked X/Y/A readout sits above the lock's tab on a plate backing, and its space is reserved in the de-collision.
+
+Deck copy now matches the art.
+
+### Verification (actual results)
+- `node tests/run.js`: all passed.
+- `scratchpad/t5/harness.js`: 0 FAIL or THROW for these six. The harness total is 12 fails, all in wabi-sabi, dark-academia and curio-cabinet, which are not mine.
+  - `escapeHtml` and `AB_FONT_5X7` are no longer needed at tokens or def time.
+  - Material placeholders now resolve (`--ab-rf-*` aliases, `--ab-pb-card`).
+- `scratchpad/t5/src-verify-p5.js`: families 53, fails 0, map mismatches 0.
+- Gore: `fx65/gore-final.json` covers 6 keys × 4 configs × 10 slides, 240 slides, with **0 issues**. It was re-run after the framework changed the In product and Do/don't slides mid-task.
+  - Row numbers no longer use `font-size: 0`, because deck slides now pin text sizes inline.
+- Console: 0 errors. The board script's one error also appears in the r6 baseline log.
+- Page overflow at 390px: 0 for every key and mode, with and without the shim.
+
+### Self-score against the references (honest)
+- **retro-futurist (6/10).** It now reads as the CR/NASA spread: lit field, extended type, one red mark, a tiny craft in a vast field. Still short of the reference: the plate is a procedural gradient, not Mead-grade illustration, and the lower board is still the shared section order.
+- **y2k-chrome (6/10).** The tDR acid block and the volume are right. Short of the reference: the sculpture is still a generic metaball, and the lower half is a de-pilled template.
+- **cyber-hud (6.5/10).** The frame-as-HUD composition and the fixed signal finally separate it. Short of the reference: data density is below the HUDS+GUIS work.
+- **pixel-arcade (6/10).** An owned world at one pixel scale. Short of the reference: the scene is far below eBoy or Sea of Stars density, and the protagonist is small.
+- **pirate-broadcast (7/10).** A true teletext page with Mode 7-style headlines and a fixed palette. Short of the reference: the glyphs lack SAA5050 diagonal smoothing.
+- **blob-tracking (6.5/10).** A nameable subject with legible tabs. Short of the reference: the figures are still crude next to photographic YOLO footage.

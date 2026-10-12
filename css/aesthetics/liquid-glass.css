@@ -12,7 +12,6 @@
   border-radius: 32px;
   --ab-art-ratio: 21 / 10;
   --ab-art-ratio-narrow: 4 / 4.2;
-  --lg-glass-fill: rgba(255, 255, 255, 0.12);
   --lg-glass-rim: inset 1px 1px 0 rgba(255, 255, 255, 0.6), inset -1px -1px 0 rgba(255, 255, 255, 0.25), 0 0 0 0.5px rgba(0, 0, 0, 0.35);
   --lg-glass-shadow: 0 10px 28px rgba(0, 0, 0, 0.3);
 }
@@ -34,17 +33,20 @@
 .ab[data-ae="liquid-glass"] .ab-mark span { display: none; }
 .ab[data-ae="liquid-glass"] .ab-rule { background: var(--ab-material-line); }
 
-/* hero: a vivid scene panel; the copy is set directly on its dark lower left (no plate, no blur) */
-.ab[data-ae="liquid-glass"] .ab-headline { font-weight: 600; letter-spacing: calc(-0.03em * var(--ab-tr, 1)); line-height: 1.02; }
+/* hero: a scene of hard-edged content; the copy is set directly on its dark lower left (no plate, no blur).
+   Apple's large-title voice: bold, tight, optical size up. */
+.ab[data-ae="liquid-glass"] .ab-headline { font-weight: 700; letter-spacing: calc(-0.025em * var(--ab-tr, 1)); line-height: 1.02; font-variation-settings: 'opsz' 32; }
 .ab[data-ae="liquid-glass"] .ab-subcopy { margin-top: 12px !important; }
 .ab[data-ae="liquid-glass"] .ab-art {
   background: var(--ab-scene-base);
   box-shadow: 0 0 0 1px var(--ab-material-line), 0 26px 56px -30px rgba(10, 14, 30, 0.55);
 }
+/* light mode: a 1px rim seats the scene inside the board as content */
+.ab[data-ae="liquid-glass"][data-mode="light"] .ab-art { box-shadow: 0 0 0 1px var(--ab-rim), 0 0 0 2px var(--ab-material-line), 0 26px 56px -30px rgba(10, 14, 30, 0.45); }
 .ab[data-ae="liquid-glass"] .ab-hero-copy { background: none; border: 0; box-shadow: none; -webkit-backdrop-filter: none; backdrop-filter: none; }
 @container ab (min-width: 601px) {
   .ab[data-ae="liquid-glass"][data-hero="scene"] .ab-hero-copy {
-    width: auto; max-width: 52cqw; margin: 0 0 5cqw 5cqw; padding: 0; border-radius: 0;
+    width: auto; max-width: 37cqw; margin: 0 0 5cqw 5cqw; padding: 0; border-radius: 0;
     text-shadow: 0 1px 14px rgba(0, 0, 0, 0.28);
   }
   .ab[data-ae="liquid-glass"][data-hero="scene"] .ab-headline { font-size: calc(clamp(28px, 4.5cqw, 62px) * var(--ab-hl-scale, 1) * var(--ab-hs, 1) * var(--ab-display, 1)); color: #fff; }
@@ -54,18 +56,18 @@
   .ab[data-ae="liquid-glass"] .ab-hero-copy .ab-hl { color: var(--ab-hl-scene); }
 }
 
-/* the scene: a three-light field over a dark base, and one crisp element (the initial) to refract */
+/* the scene: hard-edged planes (base, primary, a thin accent bar, secondary) and one crisp element (the
+   initial) to refract; one soft radial highlight at 25% for depth */
 .ab[data-ae="liquid-glass"] .lgs { position: absolute; inset: 0; color: #fff; }
 .ab[data-ae="liquid-glass"] .lgs-scene { position: absolute; inset: 0; }
 .ab[data-ae="liquid-glass"] .lgs i { position: absolute; display: block; font-style: normal; }
 .ab[data-ae="liquid-glass"] .lgs-mesh {
   inset: 0;
   background:
-    radial-gradient(55% 70% at 18% 22%, var(--ab-primary), transparent 70%),
-    radial-gradient(50% 65% at 86% 86%, var(--ab-secondary), transparent 70%),
-    radial-gradient(34% 44% at 68% 24%, var(--ab-accent), transparent 70%),
-    var(--ab-scene-base);
+    radial-gradient(60% 80% at 70% 0%, rgba(255, 255, 255, 0.25), transparent 70%),
+    linear-gradient(100deg, var(--ab-scene-base) 0 50%, var(--ab-primary) 50% 72%, var(--ab-accent) 72% 77%, var(--ab-secondary) 77%);
 }
+.ab[data-ae="liquid-glass"] .lgs-defs { position: absolute; width: 0; height: 0; overflow: hidden; }
 .ab[data-ae="liquid-glass"] .lgs-initial {
   left: 72%; top: 52%; transform: translate(-50%, -50%); white-space: nowrap;
   font-family: var(--ab-font-h); font-weight: 700; font-size: 30cqw; line-height: 1; letter-spacing: 0;
@@ -73,32 +75,32 @@
 }
 
 /* floating glass: fill <= 12% white, blur 14px + saturate 160%, bright rim top-left, softer rim bottom-right, dark hairline outside */
-.ab[data-ae="liquid-glass"] .lgs-tabs, .ab[data-ae="liquid-glass"] .lgs-card {
+.ab[data-ae="liquid-glass"] .lgs-tabs, .ab[data-ae="liquid-glass"] .lgs-slider {
   position: absolute; background: var(--lg-glass-fill);
   -webkit-backdrop-filter: blur(14px) saturate(160%); backdrop-filter: blur(14px) saturate(160%);
   box-shadow: var(--lg-glass-rim), var(--lg-glass-shadow);
 }
-.ab[data-ae="liquid-glass"] .lgs-tabs::before, .ab[data-ae="liquid-glass"] .lgs-card::before {
+.ab[data-ae="liquid-glass"] .lgs-tabs::before {
   content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
   background: linear-gradient(135deg, rgba(255, 255, 255, 0.38), rgba(255, 255, 255, 0) 38%, rgba(255, 255, 255, 0) 70%, rgba(255, 255, 255, 0.14));
 }
-/* the lens: a squircle centered on the initial (1.15x its width). Light blur (so the bend is visible), a
-   magnified and offset duplicate of the scene inside, bright rim, dark hairline, soft specular. */
+/* the lens: a squircle off-centre on the initial, so its rim cuts the strokes and the accent bar. Inside,
+   .lgs-bend holds the 1:1 duplicate of the scene and carries the SVG rim-displacement filter (inline style
+   from art()); bright rim, dark hairline, soft specular on top. No backdrop filter. */
 .ab[data-ae="liquid-glass"] .lgs-lens {
-  border-radius: 28%; border: 0; background: rgba(255, 255, 255, 0.08);
-  -webkit-backdrop-filter: blur(2px) saturate(160%); backdrop-filter: blur(2px) saturate(160%);
-  box-shadow: 0 0 0 0.5px rgba(0, 0, 0, 0.25);
+  border-radius: 28%; border: 0; overflow: hidden;
+  box-shadow: 0 0 0 0.5px rgba(0, 0, 0, 0.3), 0 14px 30px rgba(0, 0, 0, 0.32);
 }
-.ab[data-ae="liquid-glass"] .lgs-lens .ab-lens-scene { filter: saturate(1.15); }
+.ab[data-ae="liquid-glass"] .lgs-bend { position: absolute; inset: 0; overflow: hidden; border-radius: inherit; }
 .ab[data-ae="liquid-glass"] .lgs-lens::after {
   content: ""; position: absolute; inset: 0; z-index: 3; border-radius: inherit; pointer-events: none;
-  background: radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.3), transparent 45%);
-  box-shadow: inset 1px 1px 0 rgba(255, 255, 255, 0.6), inset -1px -1px 0 rgba(255, 255, 255, 0.25);
+  background: radial-gradient(circle at 20% 16%, rgba(255, 255, 255, 0.34), transparent 34%), linear-gradient(160deg, rgba(255, 255, 255, 0.1), transparent 40%);
+  box-shadow: inset 1.5px 1.5px 0 rgba(255, 255, 255, 0.75), inset -1px -1px 0 rgba(255, 255, 255, 0.3), inset 0 0 14px rgba(255, 255, 255, 0.12);
 }
 .ab[data-ae="liquid-glass"] .lgs-lens-n { display: none; }
 
 /* tab bar: capsule, selected tab is a brighter lens */
-.ab[data-ae="liquid-glass"] .lgs-tabs { right: 4.5%; top: 5%; display: flex; gap: 2px; padding: 5px; border-radius: 999px; }
+.ab[data-ae="liquid-glass"] .lgs-tabs { right: 4.5%; bottom: 6%; display: flex; gap: 2px; padding: 5px; border-radius: 999px; }
 .ab[data-ae="liquid-glass"] .lgs-tab {
   position: relative; display: flex; flex-direction: column; align-items: center; gap: 3px; min-width: 6.4cqw;
   padding: 7px clamp(10px, 1.6cqw, 20px) 6px; border-radius: 999px; color: rgba(255, 255, 255, 0.86);
@@ -110,37 +112,38 @@
   color: #fff; background: rgba(255, 255, 255, 0.26);
   box-shadow: inset 1px 1px 0 rgba(255, 255, 255, 0.65), inset -1px -1px 0 rgba(255, 255, 255, 0.28), 0 2px 8px rgba(0, 0, 0, 0.2);
 }
-/* timer: clear glass (white 10%, blur 14px, same rim) with the progress ring in the secondary; top left, clear of the lens */
-.ab[data-ae="liquid-glass"] .lgs-card {
-  left: 4.5%; top: 8%; width: 25%; padding: clamp(10px, 1.6cqw, 18px) clamp(12px, 1.9cqw, 22px);
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: clamp(16px, 2.2cqw, 26px); color: #fff; text-shadow: 0 1px 6px rgba(0, 0, 0, 0.4);
-  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+/* glass slider over the dark base, top left: 4px track, 28px glass thumb */
+.ab[data-ae="liquid-glass"] .lgs-slider { left: 5%; top: 9%; width: 24%; height: clamp(34px, 4.4cqw, 48px); border-radius: 999px; }
+.ab[data-ae="liquid-glass"] .lgs-track { left: 9%; right: 9%; top: calc(50% - 2px); height: 4px; border-radius: 2px; background: rgba(255, 255, 255, 0.28); }
+.ab[data-ae="liquid-glass"] .lgs-fill { left: 0; top: 0; bottom: 0; width: 58%; border-radius: inherit; background: #fff; }
+.ab[data-ae="liquid-glass"] .lgs-thumb {
+  left: calc(9% + 82% * 0.58 - 14px); top: calc(50% - 14px); width: 28px; height: 28px; border-radius: 50%;
+  background: radial-gradient(circle at 35% 28%, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.5) 30%, rgba(255, 255, 255, 0.16) 64%, rgba(255, 255, 255, 0.4));
+  border: 1px solid rgba(255, 255, 255, 0.85);
+  box-shadow: inset -1px -2px 3px rgba(255, 255, 255, 0.35), 0 0 0 0.5px rgba(0, 0, 0, 0.3), 0 4px 10px rgba(0, 0, 0, 0.35);
 }
-.ab[data-ae="liquid-glass"] .lgs-time { position: relative; min-width: 0; }
-.ab[data-ae="liquid-glass"] .lgs-cap { display: block; font-size: clamp(9.5px, 1cqw, 11.5px); font-weight: 500; opacity: 0.85; }
-.ab[data-ae="liquid-glass"] .lgs-card b { display: block; margin: 2px 0 0; font-size: clamp(18px, 2.9cqw, 36px); font-weight: 600; letter-spacing: calc(-0.03em * var(--ab-tr, 1)); line-height: 1.05; font-variant-numeric: tabular-nums; }
-.ab[data-ae="liquid-glass"] .lgs-timer { position: relative; flex: none; width: clamp(30px, 4.6cqw, 52px); height: auto; aspect-ratio: 1; filter: drop-shadow(0 1px 4px rgba(0, 0, 0, 0.3)); }
-.ab[data-ae="liquid-glass"] .lgs-ring { stroke: var(--ab-ring); }
 
 /* narrow boards: the scene stacks above the copy, which then sits on the canvas in ink / muted colors */
 @container ab (max-width: 600px) {
   .ab[data-ae="liquid-glass"] .ab-hero-copy { padding-top: 4px; text-shadow: none; }
   .ab[data-ae="liquid-glass"] .ab-hero-copy .ab-hl { color: var(--ab-accent-ink); }
   .ab[data-ae="liquid-glass"] .lgs-initial { left: 62%; top: 50%; font-size: 50cqw; }
+  .ab[data-ae="liquid-glass"] .lgs-mesh { background: radial-gradient(60% 80% at 70% 0%, rgba(255, 255, 255, 0.25), transparent 70%), linear-gradient(100deg, var(--ab-scene-base) 0 30%, var(--ab-primary) 30% 62%, var(--ab-accent) 62% 70%, var(--ab-secondary) 70%); }
   .ab[data-ae="liquid-glass"] .lgs-lens-w { display: none; }
   .ab[data-ae="liquid-glass"] .lgs-lens-n { display: block; }
-  .ab[data-ae="liquid-glass"] .lgs-tabs { left: 5%; right: 5%; top: 6%; justify-content: space-between; }
+  .ab[data-ae="liquid-glass"] .lgs-tabs { left: 5%; right: 5%; top: 6%; bottom: auto; justify-content: space-between; }
   .ab[data-ae="liquid-glass"] .lgs-tab { flex: 1; min-width: 0; padding: 6px 4px 5px; }
-  .ab[data-ae="liquid-glass"] .lgs-card { left: 5%; right: 5%; top: auto; bottom: 6%; width: auto; padding: 10px 14px; }
-  .ab[data-ae="liquid-glass"] .lgs-card b { font-size: 24px; }
+  .ab[data-ae="liquid-glass"] .lgs-slider { left: 6%; right: auto; top: auto; bottom: 7%; width: 46%; }
 }
 
-/* palette */
-.ab[data-ae="liquid-glass"] .ab-chip {
-  border-radius: 18px; border: 1px solid var(--ab-rim);
-  box-shadow: inset 0 1px 0 var(--ab-spec), 0 6px 18px var(--ab-drop);
+/* palette: compact capsules (chips layout) on regular material */
+.ab[data-ae="liquid-glass"] .ab-swatches[data-kind="chips"] .ab-swatch { padding: 6px 14px 6px 6px; border-color: var(--ab-material-line); background: var(--ab-material); gap: 10px; }
+.ab[data-ae="liquid-glass"] .ab-swatches[data-kind="chips"] .ab-chip {
+  width: 28px; height: 28px; border: 1px solid var(--ab-rim);
+  box-shadow: inset 0 1px 0 var(--ab-spec), 0 2px 6px var(--ab-drop);
 }
+.ab[data-ae="liquid-glass"] .ab-sw-role { font-size: 15px; font-weight: 600; }
+.ab[data-ae="liquid-glass"] .ab-sw-hex { font-size: 13px; }
 
 /* regular material panels: near-opaque, no backdrop blur */
 .ab[data-ae="liquid-glass"] .ab-card, .ab[data-ae="liquid-glass"] .ab-panel, .ab[data-ae="liquid-glass"] .ab-list {
@@ -149,26 +152,50 @@
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7), 0 1px 2px rgba(10, 14, 30, 0.05), 0 14px 32px -18px var(--ab-drop);
 }
 .ab[data-ae="liquid-glass"] .ab-panel { padding: clamp(18px, 2.8cqw, 26px); }
-.ab[data-ae="liquid-glass"] .ab-list { padding: 6px clamp(16px, 2.6cqw, 24px); }
-.ab[data-ae="liquid-glass"] .ab-row { border-top-color: var(--ab-material-line); padding: 13px 2px; }
-.ab[data-ae="liquid-glass"] .ab-row:first-child { border-top: 0; }
-.ab[data-ae="liquid-glass"] .ab-row:last-child { border-bottom: 0; }
-.ab[data-ae="liquid-glass"] .ab-row-status { background: var(--ab-well); border: 0; }
-.ab[data-ae="liquid-glass"] .ab-row-bar { height: 8px; border-radius: 999px; background: var(--ab-well); box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1); }
-.ab[data-ae="liquid-glass"] .ab-row-bar i { border-radius: 999px; background: linear-gradient(180deg, rgba(255, 255, 255, 0.5), transparent 60%), var(--ab-secondary); }
-
-/* segmented: glass capsule track with a clear lens */
-.ab[data-ae="liquid-glass"] .ab-seg {
-  border-radius: 999px; padding: 4px; background: var(--ab-well);
-  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1), inset 0 0 0 1px var(--ab-material-line);
+.ab[data-ae="liquid-glass"] .ab-panel { border-radius: 22px; }
+/* 03: an inset grouped list (iOS voice): 17px rows, separators inset 16px, detail text and a chevron */
+.ab[data-ae="liquid-glass"] .ab-list { padding: 0; border-radius: 22px; overflow: hidden; }
+.ab[data-ae="liquid-glass"] .ab-row {
+  grid-template-columns: minmax(0, 1fr) auto 14px; gap: 12px; padding: 11px 16px; min-height: 48px;
+  font-size: 17px; border: 0; letter-spacing: -0.01em;
 }
+.ab[data-ae="liquid-glass"] .ab-row + .ab-row { background: linear-gradient(var(--ab-material-line), var(--ab-material-line)) 16px 0 / calc(100% - 16px) 1px no-repeat; }
+.ab[data-ae="liquid-glass"] .ab-row:last-child { border-bottom: 0; }
+.ab[data-ae="liquid-glass"] .ab-row-n, .ab[data-ae="liquid-glass"] .ab-row-bar { display: none; }
+.ab[data-ae="liquid-glass"] .ab-row-name { font-weight: 400; }
+.ab[data-ae="liquid-glass"] .ab-row-status { padding: 0; background: none; border: 0; font-size: 17px; color: var(--ab-muted); }
+.ab[data-ae="liquid-glass"] .ab-row-pct { font-size: 0; width: 14px; height: 14px; }
+.ab[data-ae="liquid-glass"] .ab-row-pct::after {
+  content: ""; display: block; width: 8px; height: 8px; margin: 3px 0 0 1px;
+  border-top: 2px solid var(--ab-muted); border-right: 2px solid var(--ab-muted); transform: rotate(45deg); opacity: 0.7;
+}
+
+/* 01 card: a content header (a 96px strip of the scene) with the segmented control floating on it as glass */
+.ab[data-ae="liquid-glass"] .ab-card { position: relative; isolation: isolate; overflow: hidden; padding-top: 26px; }
+.ab[data-ae="liquid-glass"] .ab-card::before {
+  content: ""; position: absolute; z-index: -1; left: 0; right: 0; top: 0; height: 96px;
+  background: linear-gradient(100deg, var(--ab-scene-base) 0 30%, var(--ab-primary) 30% 58%, var(--ab-accent) 58% 64%, var(--ab-secondary) 64%);
+}
+.ab[data-ae="liquid-glass"] .ab-seg {
+  position: relative; border-radius: 999px; padding: 4px; margin-bottom: 30px;
+  /* dark-tinted glass (Apple's adaptive tint over bright content) so white labels hold 4.5:1 on any stripe */
+  background: rgba(14, 16, 26, 0.45);
+  -webkit-backdrop-filter: blur(14px) saturate(160%); backdrop-filter: blur(14px) saturate(160%);
+  box-shadow: var(--lg-glass-rim), 0 8px 20px rgba(0, 0, 0, 0.28);
+}
+.ab[data-ae="liquid-glass"] .ab-seg-btn { color: #fff; text-shadow: 0 1px 3px rgba(0, 0, 0, 0.45); }
+/* deck 05: the segmented control shown alone still floats over content (the scene strip) */
+.ab[data-ae="liquid-glass"].ab-slide .ab-deck-cell:has(.ab-seg) .ab-deck-cellbody {
+  border-radius: 16px; background: linear-gradient(100deg, var(--ab-scene-base) 0 34%, var(--ab-primary) 34% 62%, var(--ab-accent) 62% 68%, var(--ab-secondary) 68%);
+}
+.ab[data-ae="liquid-glass"] .ab-card-title { font-size: 22px; font-weight: 600; }
 .ab[data-ae="liquid-glass"] .ab-seg-btn { border-radius: 999px; transition: background 0.2s, box-shadow 0.2s; }
 .ab[data-ae="liquid-glass"] .ab-seg-btn[aria-pressed="true"] {
-  color: var(--ab-ink); font-weight: 600;
+  color: #10131c; font-weight: 600; text-shadow: none;
   background: linear-gradient(180deg, var(--ab-lens-hi), var(--ab-lens-lo));
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.14), inset 0 1px 0 rgba(255, 255, 255, 0.9);
 }
-.ab[data-ae="liquid-glass"] .ab-card-title { font-weight: 600; letter-spacing: calc(-0.03em * var(--ab-tr, 1)); }
+.ab[data-ae="liquid-glass"] .ab-card-title { letter-spacing: calc(-0.02em * var(--ab-tr, 1)); }
 
 /* primary: tinted glass capsule with a soft specular (not a split gloss) */
 .ab[data-ae="liquid-glass"] .ab-cta {
@@ -190,31 +217,34 @@
   width: 56px; height: 32px; border-radius: 999px; background: var(--ab-well);
   box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.14), inset 0 0 0 1px var(--ab-material-line);
 }
+.ab[data-ae="liquid-glass"] .ab-switch { overflow: visible; }
+/* glass droplet knob: a clear bead (thin fill, bright specular, rim) that lets the track tint show through */
 .ab[data-ae="liquid-glass"] .ab-switch::before {
-  left: 3px; top: 3px; width: 26px; height: 26px;
-  background: radial-gradient(circle at 35% 26%, #fff 0, rgba(255, 255, 255, 0.95) 20%, rgba(255, 255, 255, 0.55) 62%, rgba(255, 255, 255, 0.75));
-  border: 1px solid rgba(255, 255, 255, 0.9); box-shadow: 0 2px 6px rgba(0, 0, 0, 0.22);
+  left: 1px; top: -1px; width: 34px; height: 34px;
+  background: radial-gradient(circle at 34% 26%, #fff 0, rgba(255, 255, 255, 0.9) 14%, rgba(255, 255, 255, 0.28) 46%, rgba(255, 255, 255, 0.14) 70%, rgba(255, 255, 255, 0.55));
+  border: 1px solid rgba(255, 255, 255, 0.92);
+  box-shadow: inset -2px -3px 5px rgba(255, 255, 255, 0.45), inset 1px 1px 0 #fff, 0 0 0 0.5px rgba(0, 0, 0, 0.18), 0 3px 8px rgba(0, 0, 0, 0.22);
 }
 .ab[data-ae="liquid-glass"] .ab-switch:checked { background: var(--ab-primary-a); }
-.ab[data-ae="liquid-glass"] .ab-switch:checked::before { transform: translateX(24px); }
+.ab[data-ae="liquid-glass"] .ab-switch:checked::before { transform: translateX(20px); }
 
-/* optics samples: Clear / Tinted / Frosted capsules over a vivid mini scene strip */
+/* optics samples, scaled up: Clear / Tinted / Frosted capsules over hard stripes and type, so frosting
+   and tint visibly change what is behind them */
 .ab[data-ae="liquid-glass"] .ab-states[data-kind="chip"] {
-  gap: 10px; padding: 18px 14px; border-radius: 22px; align-items: center;
+  position: relative; isolation: isolate; overflow: hidden;
+  gap: 12px; min-height: 132px; padding: 22px 16px; border-radius: 22px; align-items: center;
   background:
-    radial-gradient(ellipse 40% 120% at 8% 30%, var(--ab-primary), transparent 75%),
-    radial-gradient(ellipse 36% 120% at 92% 70%, var(--ab-secondary), transparent 75%),
-    radial-gradient(ellipse 30% 100% at 50% 110%, var(--ab-accent), transparent 75%),
-    var(--ab-scene-base);
+    repeating-linear-gradient(100deg, transparent 0 22px, rgba(255, 255, 255, 0.9) 22px 25px) 100% 0 / 66% 100% no-repeat,
+    linear-gradient(100deg, var(--ab-scene-base) 0 34%, var(--ab-primary) 34% 54%, var(--ab-accent) 54% 60%, var(--ab-secondary) 60%);
   box-shadow: inset 0 0 0 1px var(--ab-material-line);
 }
 .ab[data-ae="liquid-glass"] .ab-state-chip {
-  padding: 11px clamp(10px, 1.6cqw, 18px); border: 0; color: #fff; font-weight: 600; font-size: 12px; text-shadow: 0 1px 4px rgba(0, 0, 0, 0.35);
+  padding: 16px clamp(12px, 2cqw, 24px); border: 0; color: #fff; font-weight: 600; font-size: 14px; text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
   box-shadow: var(--lg-glass-rim), 0 6px 14px rgba(0, 0, 0, 0.25);
 }
-.ab[data-ae="liquid-glass"] .ab-state-chip[data-s="0"] { background: rgba(255, 255, 255, 0.1); -webkit-backdrop-filter: blur(2px) saturate(1.4); backdrop-filter: blur(2px) saturate(1.4); }
+.ab[data-ae="liquid-glass"] .ab-state-chip[data-s="0"] { background: rgba(255, 255, 255, 0.1); -webkit-backdrop-filter: blur(1px) saturate(1.5); backdrop-filter: blur(1px) saturate(1.5); }
 .ab[data-ae="liquid-glass"] .ab-state-chip[data-s="1"] { background: linear-gradient(160deg, rgba(255, 255, 255, 0.45), transparent 55%), var(--ab-primary-a); color: var(--ab-on-primary); text-shadow: none; }
-.ab[data-ae="liquid-glass"] .ab-state-chip[data-s="2"] { background: rgba(255, 255, 255, 0.55); -webkit-backdrop-filter: blur(14px) saturate(1.6); backdrop-filter: blur(14px) saturate(1.6); color: rgba(14, 18, 34, 0.9); text-shadow: none; }
+.ab[data-ae="liquid-glass"] .ab-state-chip[data-s="2"] { background: rgba(255, 255, 255, 0.72); -webkit-backdrop-filter: blur(14px) saturate(1.6); backdrop-filter: blur(14px) saturate(1.6); color: rgba(14, 18, 34, 0.92); text-shadow: none; }
 
 .ab[data-ae="liquid-glass"] .ab-foot { border-top-color: var(--ab-material-line); }
 .ab[data-ae="liquid-glass"] .ab-dot { box-shadow: 0 0 10px var(--ab-accent); }
@@ -226,13 +256,13 @@
   .ab[data-ae="liquid-glass"] .ab-cta:active { transform: none; }
 }
 @media (prefers-reduced-transparency: reduce) {
-  .ab[data-ae="liquid-glass"] .lgs-tabs, .ab[data-ae="liquid-glass"] .lgs-card, .ab[data-ae="liquid-glass"] .lgs-lens,
+  .ab[data-ae="liquid-glass"] .lgs-tabs, .ab[data-ae="liquid-glass"] .lgs-slider, .ab[data-ae="liquid-glass"] .ab-seg,
   .ab[data-ae="liquid-glass"] .ab-state-chip {
     -webkit-backdrop-filter: none; backdrop-filter: none;
   }
   .ab[data-ae="liquid-glass"] .lgs-tabs { background: rgba(16, 20, 36, 0.72); }
-  .ab[data-ae="liquid-glass"] .lgs-card, .ab[data-ae="liquid-glass"] .lgs-lens { background: var(--ab-glass-opaque); }
-  .ab[data-ae="liquid-glass"] .lgs-lens .ab-lens-scene { display: none; }
+  .ab[data-ae="liquid-glass"] .lgs-slider, .ab[data-ae="liquid-glass"] .ab-seg { background: rgba(16, 20, 36, 0.72); }
+  .ab[data-ae="liquid-glass"] .lgs-bend { filter: none !important; }
   .ab[data-ae="liquid-glass"] .ab-state-chip[data-s="0"] { background: rgba(16, 20, 36, 0.6); }
   .ab[data-ae="liquid-glass"] .ab-state-chip[data-s="2"] { background: var(--ab-glass-solid); }
 }
@@ -242,5 +272,15 @@
 
 /* Brand deck cover (CAO-4 A2): keep the copy clear of the lens. */
 .ab[data-ae="liquid-glass"].ab-slide[data-slide="cover"] .ab-hero-copy { max-width: 46%; }
-/* ...and the scene's small timer card sits where the copy goes. */
-.ab[data-ae="liquid-glass"].ab-slide[data-slide="cover"] .lgs-card { display: none; }
+/* ...and the glass slider sits where the copy goes. */
+.ab[data-ae="liquid-glass"].ab-slide[data-slide="cover"] .lgs-slider { display: none; }
+/* deck 05: the optics strip is the slide's centrepiece, full width and tall */
+.ab[data-ae="liquid-glass"].ab-slide .ab-deck-uistates .ab-states[data-kind="chip"] { min-height: 170px; }
+@container ab (max-width: 600px) {
+  .ab[data-ae="liquid-glass"] .ab-row { grid-template-columns: minmax(0, 1fr) auto 14px; row-gap: 0; }
+  .ab[data-ae="liquid-glass"] .ab-row-name { grid-column: 1; grid-row: 1; }
+  .ab[data-ae="liquid-glass"] .ab-row-status { grid-column: 2; grid-row: 1; }
+  .ab[data-ae="liquid-glass"] .ab-row-pct { grid-column: 3; grid-row: 1; }
+  .ab[data-ae="liquid-glass"] .ab-states[data-kind="chip"] { gap: 6px; padding: 18px 10px; }
+  .ab[data-ae="liquid-glass"] .ab-state-chip { padding: 13px 10px; font-size: 13px; }
+}

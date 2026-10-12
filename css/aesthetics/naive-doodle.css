@@ -289,6 +289,13 @@
 .ab[data-ae="naive-doodle"].ab-slide .ab-panel { transform: none; }
 .ab[data-ae="naive-doodle"].ab-slide .ab-sec-ui::after { content: none; }
 
+.ab[data-ae="naive-doodle"].ab-slide .ab-deck-col .ab-labelrow { border-bottom: 0; background: var(--nd-rule) 0 100% / 400px 10px repeat-x; }
+.ab[data-ae="naive-doodle"].ab-slide .ab-deck-rule { border-bottom: 0; background: var(--nd-rule) 0 100% / 400px 10px repeat-x; }
+.ab[data-ae="naive-doodle"].ab-slide .ab-deck-mark { width: 34px; height: 34px; border-radius: 0; font-size: 0; color: transparent; background: var(--nd-tick) center / 30px 30px no-repeat; }
+.ab[data-ae="naive-doodle"].ab-slide .ab-deck-col[data-kind="dont"] .ab-deck-mark { background: var(--nd-cross) center / 26px 26px no-repeat; }
+.ab[data-ae="naive-doodle"].ab-slide .ab-deck-col[data-kind="dont"] .ab-deck-rule p { color: var(--ab-ink); }
+.ab[data-ae="naive-doodle"].ab-slide .ab-deck-col .ab-label { font-size: 26px; }
+
 @media (prefers-reduced-motion: reduce) {
   .ab[data-ae="naive-doodle"] .ab-cta::before,
   .ab[data-ae="naive-doodle"] .ab-switch::before { transition: none; }

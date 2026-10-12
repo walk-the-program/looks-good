@@ -6,7 +6,8 @@
    tokens(): --ab-gold(-hi/-mid/-lo/-line/-faint/-ghost), --ab-glass(-deep, 2),
    --ab-halo, --ab-leading, --ab-stone, --ab-on-glass. The hero art is the SVG pixel
    cathedral in js/aesthetics/religious-futurism.js. Hooks: hero 'centered', highlight
-   'custom', states 'swatch', label face = mono.
+   'custom', states 'swatch' (leaded panes, not orbs), label face = mono. The arch lives only in the
+   hero: cards, tabs and swatches are rectangular panes. No CSS masks (html2canvas exports).
 ------------------------------------------------------------------------ */
 
 .ab[data-ae="religious-futurism"] {
@@ -62,24 +63,27 @@
 .ab[data-ae="religious-futurism"][data-hero="centered"][data-hcls="wide"] .ab-hero .ab-headline { margin-right: -0.32em; }   /* re-centres the line: the trailing tracking after the last letter */   /* fixed tracking: the board's per-font --ab-tr damping would undo the move */
 .ab[data-ae="religious-futurism"][data-hero="centered"][data-hcls="wide"] .ab-hero .ab-headline { font-size: calc(clamp(40px, 8.4cqw, 104px) * 0.62 * var(--ab-hl-scale, 1) * var(--ab-hs, 1) * var(--ab-display, 1)); }
 .ab[data-ae="religious-futurism"] .ab-hl { position: relative; display: inline-block; color: var(--ab-hl-ink); background: none; padding: 0; margin: 0; }
-.ab[data-ae="religious-futurism"] .ab-hl::after { content: ""; position: absolute; left: 4%; right: 4%; bottom: -0.1em; height: 1px; background: linear-gradient(90deg, transparent, var(--ab-gold) 25%, var(--ab-gold) 75%, transparent); }
+.ab[data-ae="religious-futurism"] .ab-hl::after { content: ""; position: absolute; left: 0; right: 0; bottom: -0.1em; height: 1px; background: var(--ab-gold); }
+/* the trailing tracking after the last letter is not part of the word: the rule stops at the glyph */
+.ab[data-ae="religious-futurism"][data-hcls="wide"] .ab-hl::after { right: 0.32em; }
 .ab[data-ae="religious-futurism"] .ab-subcopy { margin-left: auto !important; margin-right: auto !important; max-width: 31em; text-align: center; }
 .ab[data-ae="religious-futurism"] .ab-sub-lead { color: var(--ab-ink); }
 .ab[data-ae="religious-futurism"] .ab-art { --ab-art-ratio: 800 / 420; --ab-art-ratio-narrow: 1 / 1; }
-.ab[data-ae="religious-futurism"] .ab-art svg { display: block; width: 100%; height: 100%; overflow: visible; }
+.ab[data-ae="religious-futurism"] .ab-art svg { display: block; width: 100%; height: 100%; overflow: hidden; }
 
-/* palette: leaded glass panes with a pointed arch (ogive clip), the colour is the real swatch */
+/* palette: tall narrow lancet PANES (rectangles, not arches): the swatch is the glass, a 1px gold rim, one
+   lead saddle bar across it and a soft top-light sheen */
 .ab[data-ae="religious-futurism"] .ab-swatch { align-items: center; text-align: center; }
 .ab[data-ae="religious-futurism"] .ab-chip {
-  position: relative; width: 64px; height: 84px; margin-bottom: 14px; box-shadow: none; border-radius: 0; overflow: hidden;
-  clip-path: polygon(0.0% 100.0%, 0.0% 66.0%, 0.4% 59.3%, 1.5% 52.8%, 3.4% 46.3%, 6.0% 39.9%, 9.4% 33.8%, 13.4% 27.9%, 18.1% 22.3%, 23.4% 17.0%, 29.3% 12.1%, 35.7% 7.6%, 42.6% 3.6%, 50.0% -0.0%, 57.4% 3.6%, 64.3% 7.6%, 70.7% 12.1%, 76.6% 17.0%, 81.9% 22.3%, 86.6% 27.9%, 90.6% 33.8%, 94.0% 39.9%, 96.6% 46.3%, 98.5% 52.8%, 99.6% 59.3%, 100.0% 66.0%, 100.0% 100.0%);
+  position: relative; width: 36px; height: 120px; margin-bottom: 14px; border-radius: 0; overflow: hidden;
+  box-shadow: 0 0 0 1px var(--ab-gold-line), inset 0 0 0 2px var(--ab-leading);
 }
 .ab[data-ae="religious-futurism"] .ab-chip::after {
   content: ""; position: absolute; inset: 0; pointer-events: none;
-  background: linear-gradient(var(--ab-leading) 1.5px, transparent 1.5px) 0 0 / 16px 16px, linear-gradient(90deg, var(--ab-leading) 1.5px, transparent 1.5px) 0 0 / 16px 16px, radial-gradient(ellipse at 50% 28%, rgba(255,255,255,0.22), transparent 62%);
+  background: linear-gradient(var(--ab-leading), var(--ab-leading)) 0 62% / 100% 3px no-repeat, linear-gradient(180deg, rgba(255,255,255,0.2), transparent 40%, rgba(0,0,0,0.18));
 }
 .ab[data-ae="religious-futurism"] .ab-swatch[data-role="canvas"] .ab-chip::after, .ab[data-ae="religious-futurism"] .ab-swatch[data-role="ink"] .ab-chip::after {
-  background: linear-gradient(var(--ab-gold-line) 1px, transparent 1px) 0 0 / 16px 16px, linear-gradient(90deg, var(--ab-gold-line) 1px, transparent 1px) 0 0 / 16px 16px;
+  background: linear-gradient(var(--ab-gold-line), var(--ab-gold-line)) 0 62% / 100% 1px no-repeat;
 }
 .ab[data-ae="religious-futurism"] .ab-sw-role { font-size: 11px; font-weight: 400; letter-spacing: 0.2em; text-transform: uppercase; }
 .ab[data-ae="religious-futurism"] .ab-sw-job { font-size: 11px; }
@@ -100,52 +104,36 @@
 .ab[data-ae="religious-futurism"] .ab-type-apply { border: 1px solid var(--ab-gold-line); border-radius: 0; font-weight: 400; font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; }
 .ab[data-ae="religious-futurism"] .ab-type-apply:hover { background: var(--ab-gold-ghost); box-shadow: 0 0 20px var(--ab-halo); }
 
-/* cards and panels: obsidian arch panels, a pointed ogive cap, double hairline inset */
-.ab[data-ae="religious-futurism"] .ab-sec-ui, .ab[data-ae="religious-futurism"] .ab-sec-touch { padding-top: 46px; }
+/* cards and panels: rectangular stone panes, a 1px gold border and one 2px lead rule 6px inside (no arch:
+   the arch lives only in the hero) */
 .ab[data-ae="religious-futurism"] .ab-card, .ab[data-ae="religious-futurism"] .ab-panel {
-  position: relative; margin-top: 0; padding: 22px clamp(18px, 2.8cqw, 28px) 26px;
-  border: 1px solid var(--ab-gold-line); border-top: 0; border-radius: 0; background: var(--ab-stone);
-  box-shadow: inset 0 0 0 5px var(--ab-stone), inset 0 0 0 6px var(--ab-gold-faint);
-}
-.ab[data-ae="religious-futurism"] .ab-sec-ui .ab-labelrow, .ab[data-ae="religious-futurism"] .ab-sec-touch .ab-labelrow { margin-bottom: 0; position: relative; z-index: 2; }
-.ab[data-ae="religious-futurism"] .ab-card::before, .ab[data-ae="religious-futurism"] .ab-panel::before {
-  content: ""; position: absolute; left: -1px; right: -1px; bottom: 100%; height: 48px; margin-bottom: -1px; background: var(--ab-stone);
-  -webkit-mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 48' preserveAspectRatio='none'><path d='M0 48V30C0 14 34 6 50 0 66 6 100 14 100 30V48Z'/></svg>") 0 0 / 100% 100% no-repeat;
-  mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 48' preserveAspectRatio='none'><path d='M0 48V30C0 14 34 6 50 0 66 6 100 14 100 30V48Z'/></svg>") 0 0 / 100% 100% no-repeat;
-}
-.ab[data-ae="religious-futurism"] .ab-card::after, .ab[data-ae="religious-futurism"] .ab-panel::after {
-  content: ""; position: absolute; left: -1px; right: -1px; bottom: 100%; height: 48px; margin-bottom: -1px; pointer-events: none;
-  background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 48' preserveAspectRatio='none'><path d='M.5 48V30C.5 14 34 6 50 .6 66 6 99.5 14 99.5 30V48' fill='none' stroke='%23B8964B' stroke-opacity='.62' stroke-width='1' vector-effect='non-scaling-stroke'/><path d='M3.5 48V31C3.5 17 35 10 50 5.2 65 10 96.5 17 96.5 31V48' fill='none' stroke='%23B8964B' stroke-opacity='.24' stroke-width='1' vector-effect='non-scaling-stroke'/></svg>") 0 0 / 100% 100% no-repeat;
-}
-.ab[data-ae="religious-futurism"][data-mode="light"] .ab-card::after, .ab[data-ae="religious-futurism"][data-mode="light"] .ab-panel::after {
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 48' preserveAspectRatio='none'><path d='M.5 48V30C.5 14 34 6 50 .6 66 6 99.5 14 99.5 30V48' fill='none' stroke='%238C6D2E' stroke-opacity='.75' stroke-width='1' vector-effect='non-scaling-stroke'/><path d='M3.5 48V31C3.5 17 35 10 50 5.2 65 10 96.5 17 96.5 31V48' fill='none' stroke='%238C6D2E' stroke-opacity='.34' stroke-width='1' vector-effect='non-scaling-stroke'/></svg>");
+  position: relative; margin-top: 0; padding: 26px clamp(18px, 2.8cqw, 30px) 28px;
+  border: 1px solid var(--ab-gold-line); border-radius: 0; background: var(--ab-stone);
+  box-shadow: inset 0 0 0 5px var(--ab-stone), inset 0 0 0 7px var(--ab-gold-lo);
 }
 
-/* arch tabs: the selected tab lights a halo dot above its apex and a gold base line */
-.ab[data-ae="religious-futurism"] .ab-seg { gap: 8px; padding: 0 2px; border-radius: 0; background: none; border-bottom: 1px solid var(--ab-gold-faint); }
+/* tabs: a flat row on a gold hairline; the selected tab carries a 1px gold underline */
+.ab[data-ae="religious-futurism"] .ab-seg { gap: 0; padding: 0; border-radius: 0; background: none; border-bottom: 1px solid var(--ab-gold-faint); }
 .ab[data-ae="religious-futurism"] .ab-seg-btn {
-  position: relative; min-height: 40px; margin: 8px 0 -1px; border: 1px solid var(--ab-gold-faint); border-bottom: 0; border-radius: 50% 50% 0 0 / 100% 100% 0 0;
+  position: relative; min-height: 40px; margin: 0 0 -1px; border: 0; border-radius: 0; background: none;
   color: var(--ab-muted); font-size: 10.5px; letter-spacing: 0.2em; text-transform: uppercase;
 }
 .ab[data-ae="religious-futurism"] .ab-seg-btn:hover { color: var(--ab-ink); }
-.ab[data-ae="religious-futurism"] .ab-seg-btn[aria-pressed="true"] { color: var(--ab-ink); font-weight: 400; border-color: var(--ab-gold-line); background: var(--ab-gold-ghost); }
-.ab[data-ae="religious-futurism"] .ab-seg-btn[aria-pressed="true"]::before { content: ""; position: absolute; left: 50%; top: -9px; width: 5px; height: 5px; margin-left: -2.5px; border-radius: 50%; background: var(--ab-accent); box-shadow: 0 0 8px 2px var(--ab-halo); }
-.ab[data-ae="religious-futurism"] .ab-seg-btn[aria-pressed="true"]::after { content: ""; position: absolute; left: 14%; right: 14%; bottom: 0; height: 1px; background: var(--ab-gold); }
+.ab[data-ae="religious-futurism"] .ab-seg-btn[aria-pressed="true"] { color: var(--ab-ink); font-weight: 400; background: none; box-shadow: inset 0 -1px 0 var(--ab-gold); }
 .ab[data-ae="religious-futurism"] .ab-card-title { margin: 26px 0 8px !important; text-align: center; font-weight: 400; text-transform: uppercase; letter-spacing: calc(0.12em * var(--ab-tr, 1)); font-size: clamp(18px, 2.3cqw, 22px); line-height: 1.2; }
 .ab[data-ae="religious-futurism"] .ab-card-body { text-align: center; margin-bottom: 24px !important; font-size: 14px; }
 
-/* main action: stained glass in the client primary, a gold rim, small-caps letters */
+/* main action: deep glass (the primary 55% into near-black), a bone label at >= 7:1, a 1px gold rim and one
+   2px gold inner rule; the "lit" is a single 1px top highlight, never lines through the letters */
 .ab[data-ae="religious-futurism"] .ab-cta {
-  position: relative; justify-content: center; padding: 13px 18px; border: 1px solid var(--ab-gold-line); border-radius: 0; color: var(--ab-on-glass);
-  /* a lit strip of panes, not paint: leading every 22px over the glass, a soft (half-strength) halo */
-  background: repeating-linear-gradient(90deg, var(--ab-leading) 0 1.5px, transparent 1.5px 22px), linear-gradient(180deg, rgba(255,255,255,0.14), transparent 45%, rgba(0,0,0,0.16)), radial-gradient(120% 150% at 50% 0, var(--ab-glass), var(--ab-glass-deep));
-  box-shadow: 0 0 14px var(--ab-halo), inset 0 0 0 3px var(--ab-leading);
-  font-size: 12px; font-weight: 600; letter-spacing: 0.22em; text-transform: uppercase; transition: filter 0.4s ease, box-shadow 0.4s ease;
-  text-shadow: 0 0 3px var(--ab-glass), 0 0 7px var(--ab-glass);   /* lifts the label off the leading lines */
+  position: relative; justify-content: center; padding: 14px 18px; border: 1px solid var(--ab-gold-line); border-radius: 0;
+  color: var(--rf-cta-ink); background: var(--rf-cta);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.35), inset 0 0 0 3px var(--rf-cta), inset 0 0 0 5px var(--ab-gold-mid);
+  font-size: 12px; font-weight: 500; letter-spacing: 0.22em; text-transform: uppercase; text-shadow: none; transition: filter 0.4s ease;
 }
 .ab[data-ae="religious-futurism"] .ab-cta-arrow { display: none; }
-.ab[data-ae="religious-futurism"] .ab-cta:hover, .ab[data-ae="religious-futurism"] .ab-cta.is-hover { filter: brightness(1.12) saturate(1.05); box-shadow: 0 0 20px var(--ab-halo), inset 0 0 0 3px var(--ab-leading); }
-.ab[data-ae="religious-futurism"] .ab-cta:active, .ab[data-ae="religious-futurism"] .ab-cta.is-pressed { filter: brightness(0.85); box-shadow: 0 0 10px var(--ab-halo), inset 0 0 0 3px var(--ab-leading); }
+.ab[data-ae="religious-futurism"] .ab-cta:hover, .ab[data-ae="religious-futurism"] .ab-cta.is-hover { filter: brightness(1.15); }
+.ab[data-ae="religious-futurism"] .ab-cta:active, .ab[data-ae="religious-futurism"] .ab-cta.is-pressed { filter: brightness(0.85); }
 
 /* 02 relics: an underline field with a vesica, a reliquary switch, three halo rings */
 .ab[data-ae="religious-futurism"] .ab-fieldlabel { letter-spacing: 0.2em; font-size: 10px; text-transform: uppercase; color: var(--ab-muted); }
@@ -162,13 +150,29 @@
 .ab[data-ae="religious-futurism"] .ab-status { font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; }
 .ab[data-ae="religious-futurism"] .ab-states { gap: 14px; margin-top: 26px; }
 .ab[data-ae="religious-futurism"] .ab-state { font-size: 9.5px; letter-spacing: 0.2em; text-transform: uppercase; }
-.ab[data-ae="religious-futurism"] .ab-disc { position: relative; width: 58px; height: 58px; border: 1px solid var(--ab-gold-line); background: none; box-shadow: 0 0 0 4px var(--ab-stone), 0 0 0 5px var(--ab-gold-ghost); }
-.ab[data-ae="religious-futurism"] .ab-disc::before { content: ""; position: absolute; inset: -10px; border-radius: 50%; pointer-events: none; background: repeating-conic-gradient(from -1deg, var(--ab-gold-line) 0 2deg, transparent 2deg 6deg); -webkit-mask: radial-gradient(circle, transparent 72%, #000 73%, #000 76%, transparent 77%); mask: radial-gradient(circle, transparent 72%, #000 73%, #000 76%, transparent 77%); opacity: 0.8; }
-.ab[data-ae="religious-futurism"] .ab-disc::after { content: ""; position: absolute; inset: 14px; border-radius: 50%; border: 1px solid var(--ab-ink); opacity: 0.4; }
-.ab[data-ae="religious-futurism"] .ab-disc[data-s="1"] { background: radial-gradient(circle at 45% 38%, var(--ab-glass), var(--ab-glass-deep) 75%); box-shadow: 0 0 0 4px var(--ab-stone), 0 0 0 5px var(--ab-gold-line), 0 0 24px var(--ab-halo); }
-.ab[data-ae="religious-futurism"] .ab-disc[data-s="1"]::after { opacity: 0; }
-.ab[data-ae="religious-futurism"] .ab-disc[data-s="2"] { background: radial-gradient(circle at 45% 38%, var(--ab-glass), var(--ab-glass-deep) 75%); border-color: var(--ab-gold-hi); box-shadow: 0 0 0 4px var(--ab-stone), 0 0 0 5px var(--ab-gold-line), 0 0 32px var(--ab-halo); }
-.ab[data-ae="religious-futurism"] .ab-disc[data-s="2"]::after { inset: 15px 21px; border-radius: 50% / 50%; border: 1px solid var(--ab-accent); border-radius: 0 100% 0 100%; transform: rotate(45deg) scale(1.05); opacity: 1; box-shadow: 0 0 10px var(--ab-halo); }
+/* the states: one leaded window pane three ways (unlit, dawn light rising, full light), square, a 2x2 lead
+   grid with a gold rim, not a glowing orb */
+.ab[data-ae="religious-futurism"] .ab-disc {
+  position: relative; width: 54px; height: 54px; border: 0; border-radius: 0; box-shadow: 0 0 0 1px var(--ab-gold-line);
+  background:
+    linear-gradient(var(--ab-leading), var(--ab-leading)) 50% 0 / 2px 100% no-repeat,
+    linear-gradient(var(--ab-leading), var(--ab-leading)) 0 50% / 100% 2px no-repeat,
+    var(--rf-pane-dark);
+}
+.ab[data-ae="religious-futurism"] .ab-disc[data-s="1"] {
+  background:
+    linear-gradient(var(--ab-leading), var(--ab-leading)) 50% 0 / 2px 100% no-repeat,
+    linear-gradient(var(--ab-leading), var(--ab-leading)) 0 50% / 100% 2px no-repeat,
+    linear-gradient(0deg, var(--rf-pane-cool) 0 50%, var(--rf-pane-dark) 50%);
+}
+.ab[data-ae="religious-futurism"] .ab-disc[data-s="2"] {
+  box-shadow: 0 0 0 1px var(--ab-gold), 0 0 18px var(--ab-halo);
+  background:
+    linear-gradient(var(--ab-leading), var(--ab-leading)) 50% 0 / 2px 100% no-repeat,
+    linear-gradient(var(--ab-leading), var(--ab-leading)) 0 50% / 100% 2px no-repeat,
+    linear-gradient(180deg, rgba(255,255,255,0.18), transparent 50%),
+    conic-gradient(from 90deg at 50% 50%, var(--rf-pane-cool2) 0 25%, var(--rf-pane-cool) 0 50%, var(--ab-glass) 0 75%, var(--rf-pane-cool2) 0);
+}
 
 /* 03 litany: Roman index, small-caps entries, mono status, rosary progress */
 .ab[data-ae="religious-futurism"] .ab-list { counter-reset: rfr; }
@@ -191,8 +195,6 @@
 .ab[data-ae="religious-futurism"] .ab-dot { width: 7px; height: 7px; margin-right: 12px; border-radius: 0 100% 0 100%; background: var(--ab-glass); transform: rotate(45deg); box-shadow: 0 0 8px var(--ab-halo); }
 .ab[data-ae="religious-futurism"]:not(.ab-slide) .ab-foot::after { content: "Matins · Lauds · Vespers · Compline"; order: 3; font-size: 9px; letter-spacing: 0.34em; opacity: 0.6; }
 
-/* light mode: daylight through glass on bone: less glow, thicker leading */
-.ab[data-ae="religious-futurism"][data-mode="light"] .ab-cta { box-shadow: 0 0 12px var(--ab-halo), inset 0 0 0 3px var(--ab-leading); }
 
 .ab[data-ae="religious-futurism"] .ab-seg-btn:focus-visible, .ab[data-ae="religious-futurism"] .ab-cta:focus-visible, .ab[data-ae="religious-futurism"] .ab-type-apply:focus-visible { outline: 1px solid var(--ab-gold-hi); outline-offset: 3px; }
 
@@ -207,7 +209,7 @@
   .ab[data-ae="religious-futurism"] .ab-tag { letter-spacing: 0.14em; }
   .ab[data-ae="religious-futurism"] .ab-row { grid-template-columns: 4ch minmax(0, 1fr) 4.5ch; }
   .ab[data-ae="religious-futurism"] .ab-swatch { display: grid; text-align: left; justify-items: start; }
-  .ab[data-ae="religious-futurism"] .ab-chip { width: 56px; height: 74px; grid-row: 1 / 4; margin: 0; }
+  .ab[data-ae="religious-futurism"] .ab-chip { width: 28px; height: 92px; grid-row: 1 / 4; margin: 0; }
   .ab[data-ae="religious-futurism"] .ab-states { gap: 6px; }
   .ab[data-ae="religious-futurism"] .ab-seg-btn { letter-spacing: 0.1em; }
 }
@@ -231,3 +233,9 @@
 .ab[data-ae="religious-futurism"].ab-slide[data-slide="cover"] .ab-kicker { display: none; }
 .ab[data-ae="religious-futurism"].ab-slide[data-slide="cover"] .ab-subcopy { display: none; }
 .ab[data-ae="religious-futurism"].ab-slide[data-slide="cover"] .ab-deck-cover-meta, .ab[data-ae="religious-futurism"].ab-slide[data-slide="cover"] .ab-slide-foot { display: none; }
+
+/* deck: one weight for every heading (no bold extended face next to the hairline display) */
+.ab[data-ae="religious-futurism"].ab-slide :is(.ab-deck-ptitle, .ab-card-title, h2, h3) { font-weight: 400; }
+/* deck Material: a crop of the centre lancet at about 4x: the lead, saddle bars and the glass variation */
+.ab[data-ae="religious-futurism"][data-slide="material"] .ab-deck-stage .ab-art, [data-slide="material"] .ab[data-ae="religious-futurism"] .ab-art { overflow: hidden; }
+.ab[data-ae="religious-futurism"][data-slide="material"] .ab-deck-stage .ab-art svg, [data-slide="material"] .ab[data-ae="religious-futurism"] .ab-art svg { transform: scale(3.6); transform-origin: 57% 58%; }

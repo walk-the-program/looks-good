@@ -94,7 +94,15 @@ const RB_G = {
   } },
   clock: { w: 24, say: 'hour', d: (a, g, s) => `<circle cx="12" cy="13" r="10.6" fill="${a}"/><path d="M12 13.4V5.6M11.6 13H18" fill="none" stroke="${g}" stroke-width="${f1(s * 0.66)}"/>`
     + `<rect x="9" y="0.2" width="6" height="${f1(Math.max(1.4, s * 0.5))}" fill="${a}"/>` },
-  // control glyphs (icons, not sounds): the CTA arrow and the closed-eye switch knob
+  eel: { w: 28, say: 'eel', d: (a, g, s) => `<path d="M1.6 16.4C5 8.6 9 8.6 12.4 14.2S20 20 23.4 12.8" fill="none" stroke="${a}" stroke-width="${f1(s * 1.5)}" stroke-linecap="round"/>`
+    + `<ellipse cx="24.4" cy="11.4" rx="3.4" ry="2.9" fill="${a}"/><circle cx="25.2" cy="10.6" r="0.85" fill="${g}"/>` },
+  ink: { w: 20, say: 'ink', d: (a, g, s) => `<rect x="7" y="1.4" width="6" height="4.6" fill="${a}"/><path d="M5.4 6H14.6L17.6 10V24H2.4V10Z" fill="${a}"/>`
+    + `<rect x="2.4" y="13.4" width="15.2" height="${f1(Math.max(2.4, s))}" fill="${g}"/>` },
+  ring: { w: 22, say: 'ring', d: (a, g, s) => `<circle cx="11" cy="15.6" r="${f1(7.6 - s / 2)}" fill="none" stroke="${a}" stroke-width="${f1(s)}"/>`
+    + `<path d="M11 0.8L15.4 4.8L11 8.8L6.6 4.8Z" fill="${a}"/>` },
+  pea: { w: 26, say: 'pea', d: (a, g, s) => `<path d="M0.8 13C5.6 5 20.4 5 25.2 13C20.4 20 5.6 20 0.8 13Z" fill="${a}"/>`
+    + [6.6, 13, 19.4].map(x => `<circle cx="${x}" cy="12.8" r="2.9" fill="${g}"/><circle cx="${x}" cy="12.8" r="${f1(Math.max(1, 2.9 - s * 0.4))}" fill="${a}"/>`).join('') },
+  // control glyphs (icons, not sounds): kept for compatibility, not drawn in the UI
   arrow: { w: 24, say: 'arrow', d: (a, g, s) => `<path d="M1.6 ${f1(12 - s * 0.55)}H13V4.4L22.4 12L13 19.6V${f1(12 + s * 0.55)}H1.6Z" fill="${a}"/>` },
   lid: { w: 24, say: 'lid', d: (a, g, s) => `<path d="M1 11Q12 22 23 11" fill="none" stroke="${a}" stroke-width="${f1(s)}"/><path d="M5.6 15.6L3.8 19.6M12 17.6V22.4M18.4 15.6L20.2 19.6" fill="none" stroke="${a}" stroke-width="${f1(s * 0.6)}"/>` },
 };
@@ -118,6 +126,7 @@ W('knee', 'knee'); W('knees', 'knee:4 _1'); W('tie thai', 'tie'); W('ties', 'tie
 W('pen', 'pen'); W('pens', 'pen:3 _1'); W('key quay', 'key'); W('keys', 'key:3 _1');
 W('rose rows roes', 'rose'); W('saw', 'saw'); W('hour our', 'clock'); W('hours ours', 'clock:-1 _1');
 W('great', '_2 8'); W('wait weight', '_1 8'); W('freight', '_2 8'); W('later', '_1 8:3 _1');
+W('eel', 'eel'); W('ink', 'ink'); W('ring', 'ring'); W('rings', 'ring:4 _1'); W('pea pee p', 'pea'); W('peas', 'pea:3 _1');
 W('before', 'bee:2 4'); W('therefore', '_5 4'); W('season', 'wave:3 sun'); W('seesaw', 'wave:3 saw');
 
 const L = s => s.split(' ');
@@ -150,6 +159,7 @@ const RB_PRE = [
   ['knee', 'knee', w => w.length > 5],
   ['deer', 'deer', w => w.length > 5],
   ['eight', '8', w => w.length > 5],
+  ['pea', 'pea', w => L('peace peaceful peak peaks peach peanut peanuts peacock').includes(w)],
 ];
 const RB_ATE_IT = L('chocolate private climate senate ultimate intimate delicate accurate fortunate passionate compassionate considerate moderate desperate adequate appropriate immediate separate deliberate certificate graduate corporate affectionate approximate literate pirate palate karate senate delegate advocate associate');
 // suffixes: [spelling, token, test(word)]; the start of the word stays type
@@ -170,6 +180,11 @@ const RB_SUF = [
   ['saw', 'saw', w => w.length > 4],
   ['bee', 'bee', w => w.length > 4],
   ['tie', 'tie', w => w.length > 4],
+  // sound extensions (round 6): f + [eel] = feel, th + [ink] = think, b + [ring] = bring, quali + [tea] = quality
+  ['eel', 'eel', w => w.length > 3],
+  ['ink', 'ink', w => w.length > 3],
+  ['ring', 'ring', w => w.length > 4 && !/[aeiou]ring$/.test(w)],
+  ['ty', 'cup', w => w.length > 4],
 ];
 
 // token string -> pieces over a word of length n: [{ g } | { n: digit } | { l: count }]
@@ -229,7 +244,7 @@ function rbArith(raw) {
   let best = null;
   Object.keys(RB_G).forEach(name => {
     const say = RB_G[name].say;
-    if (!say || name === 'arrow' || name === 'lid' || /[^a-z]/.test(say)) return;
+    if (!say || name === 'arrow' || name === 'lid' || /[^a-z]/.test(say) || say.length < 3) return;
     let k = 0;
     while (k < say.length && k < w.length && say[k] === w[k]) k++;
     const drop = say.length - k, add = w.length - k;
@@ -240,14 +255,32 @@ function rbArith(raw) {
   return best;
 }
 
+// Rand's IBM stripe cuts: three horizontal knock-out bars across every glyph, in the ground
+// colour, as thick as the slab's hairline (stem x 0.36). `hot` (optional) is the index of
+// one bar drawn in another colour (the deck's construction sheet puts primary on one).
+const RB_STRIPES = [7.6, 13.2, 18.8];
+let rbMaskSeq = 0;
+function rbDraw(name, a, g, s, hot, hotCol) {
+  const G = RB_G[name];
+  const h = f1(Math.max(0.7, s * 0.36));
+  const bar = (y, fill, extra) => `<rect x="-1" y="${f1(y - Math.max(0.7, s * 0.36) / 2)}" width="${G.w + 2}" height="${h}" fill="${fill}"${extra || ''}/>`;
+  let out = G.d(a, g, s) + RB_STRIPES.map((y, i) => i === hot ? '' : bar(y, g)).join('');
+  if (hot != null) {
+    // the coloured stripe only where the glyph is: masked by the glyph's own silhouette
+    const id = 'rbm' + (++rbMaskSeq);
+    out += `<mask id="${id}" maskUnits="userSpaceOnUse" x="-1" y="-1" width="${G.w + 2}" height="26"><rect x="-1" y="-1" width="${G.w + 2}" height="26" fill="#000"/>${G.d('#fff', '#000', s)}</mask>`
+      + bar(RB_STRIPES[hot], hotCol, ` mask="url(#${id})"`);
+  }
+  return out;
+}
 function rbSvg(name, a, g, s, cls, style) {
   const G = RB_G[name];
   if (!G) return '';
-  return `<svg class="${cls || 'rb-sym'}" viewBox="0 0 ${G.w} 24" style="width:${f1(G.w / 24 * 0.72)}em${style ? ';' + style : ''}" focusable="false" aria-hidden="true">${G.d(a, g, s)}</svg>`;
+  return `<svg class="${cls || 'rb-sym'}" viewBox="0 0 ${G.w} 24" style="width:${f1(G.w / 24 * 0.92)}em${style ? ';' + style : ''}" focusable="false" aria-hidden="true">${rbDraw(name, a, g, s)}</svg>`;
 }
 function rbUri(name, a, g, s) {
   const G = RB_G[name];
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${G.w} 24">${G.d(a, g, s)}</svg>`;
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${G.w} 24">${rbDraw(name, a, g, s)}</svg>`;
   return `url('data:image/svg+xml,${encodeURIComponent(svg).replace(/'/g, '%27')}')`;
 }
 
@@ -306,7 +339,7 @@ function rbLockup(ctx, primaryFirst, s) {
   const segs = words.map(w => rbSegment(w.replace(/[^A-Za-z]/g, '') === w ? w : ''));
   let usedPrimary = !primaryFirst;
   const col = () => { if (!usedPrimary) { usedPrimary = true; return t.primary; } return t.ink; };
-  const op = c => `<i class="rb-op">${c}</i>`;
+  const op = c => `<i class="rb-op" data-op="${c === '+' ? 'plus' : 'minus'}">${c}</i>`;
   let row = '', kind;
   if (segs.some(Boolean)) {
     kind = 'sound';
@@ -347,10 +380,10 @@ function rbBuild(ctx, s, hw, lead, set) {
     <figure class="rb-build-fig"><svg viewBox="-1 -1 ${W + 2} 26" focusable="false" aria-hidden="true">
       <path d="${grid}" fill="none" stroke="${t.ink}" stroke-opacity=".14" stroke-width=".06"/>
       <path d="M0 0H${W}V24H0Z" fill="none" stroke="${t.ink}" stroke-opacity=".5" stroke-width=".1"/>
-      <g transform="translate(${(W - G.w) / 2} 0)">${G.d(t.primary, t.canvas, s)}</g>
+      <g transform="translate(${(W - G.w) / 2} 0)">${rbDraw(lead, t.ink, t.canvas, s, 1, t.primary)}</g>
       <path d="M0 24.6H${f1(s)}M0 24.3V24.9M${f1(s)} 24.3V24.9" stroke="${t.ink}" stroke-width=".12" fill="none"/>
     </svg>
-    <figcaption class="rb-build-cap"><b>24-unit grid</b><span>stem ${f1(s)} units · from heading weight ${hw}</span></figcaption></figure>
+    <figcaption class="rb-build-cap"><b>24-unit grid</b><span>stem ${f1(s)} units · from heading weight ${hw} · three stripe cuts</span></figcaption></figure>
     <div class="rb-build-set">${strip}</div>
   </div>`;
 }
@@ -362,7 +395,7 @@ function rbWall(t, s) {
   const items = set.map((g, i) => {
     const G = RB_G[g], c = i % cols, r = Math.floor(i / cols);
     const x = c * cell + (cell - G.w) / 2, y = r * cell + 8;
-    return `<g transform="translate(${f1(x)} ${y})">${G.d(t.ink, t.canvas, s)}</g>`;
+    return `<g transform="translate(${f1(x)} ${y})">${rbDraw(g, t.ink, t.canvas, s)}</g>`;
   }).join('');
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${cols * cell}" height="${rows * cell}" viewBox="0 0 ${cols * cell} ${rows * cell}"><rect width="100%" height="100%" fill="${t.canvas}"/>${items}</svg>`;
   return `url('data:image/svg+xml,${encodeURIComponent(svg).replace(/'/g, '%27')}')`;
@@ -381,9 +414,10 @@ registerAesthetic({
   labels: { material: 'Glyphs', states: ['Word', 'Picture', 'Its name'], statesKind: 'swatch' },
   layout: { hero: 'centered', palette: 'swatches', sections: 'two-col', subcopy: false },
   deck: {
+    coverDisplay: 1.2,
     principles: [
       ['Pictures say the sound', 'Eye for I, bee for be, sign for -sign.'],
-      ['Drawn at the letters\' weight', 'Discs, bars and stripe cuts on a 24-unit grid.'],
+      ['Drawn at the letters\' weight', 'Discs, bars and three stripe cuts on a 24-unit grid.'],
       ['One colour, one red', 'Everything in ink; one glyph per view in primary.'],
     ],
     do: [
@@ -393,7 +427,7 @@ registerAesthetic({
     ],
     dont: [
       'Swap a word for a picture of its meaning.',
-      'Use emoji, outlined icons or tinted tiles.',
+      'Put an icon beside a word.',
       'Put glyphs on discs, pills or app tiles.',
     ],
   },
@@ -406,8 +440,8 @@ registerAesthetic({
     canvas: { use: 'The page: flat paper the type and glyphs are printed on', never: 'Text' },
     ink: { use: 'Every word, every glyph but one, the rules, the selected tab and the switch', never: 'Tinted panels or tiles; ink is type, glyphs and 2px rules' },
     primary: { use: 'Exactly one glyph per view (the last headline glyph), and the one main action', never: 'Body text, a second glyph, tiles, borders' },
-    secondary: { use: 'Progress fills in lists, and nothing else', never: 'Glyphs, the main action, backgrounds' },
-    accent: { use: 'The footer mark only', never: 'Glyphs, discs behind glyphs, buttons, text', coverage: '≤2%' },
+    secondary: { use: 'Support only: a 20px reference square in the palette', never: 'Glyphs, bars, the main action, backgrounds', coverage: '≤1%' },
+    accent: { use: 'Support only: a 20px reference square in the palette', never: 'Glyphs, the footer mark, buttons, text', coverage: '≤1%' },
   },
 
   tokens(t) {
@@ -417,15 +451,9 @@ registerAesthetic({
     return {
       '--ab-type-pick-w': Math.min(hw, 800),
       '--rb-hw': hw,
-      '--rb-i-cta': ic('arrow', t.onPrimary, t.primary),
-      '--rb-i-eye': ic('eye', t.ink, t.canvas),
-      '--rb-i-lid': ic('lid', t.muted, t.canvas),
+      // the Design tab is spelled De + [sign]: the sign glyph (sound), never an icon beside a word
       '--rb-i-sign': ic('sign', t.muted, t.canvas),
-      '--rb-i-bee': ic('bee', t.muted, t.canvas),
-      '--rb-i-arrow': ic('arrow', t.muted, t.canvas),
       '--rb-i-sign-on': ic('sign', t.canvas, t.ink),
-      '--rb-i-bee-on': ic('bee', t.canvas, t.ink),
-      '--rb-i-arrow-on': ic('arrow', t.canvas, t.ink),
       '--rb-i-eye-st': ic('eye', t.ink, t.canvas),
       '--rb-wall': rbWall(t, s),
     };
@@ -452,12 +480,12 @@ registerAesthetic({
   },
 
   materials: [
-    { name: 'Sound glyph', css: 'fill: {ink}; height: 0.72em (cap height); margin: 0 0.01em; /* flat geometric primitives (discs, half-discs, bars, stripe cuts) on a 24-unit grid; stem = heading weight / 800 x 3.4 units; a picture only stands where its name says the sound */' },
+    { name: 'Sound glyph', css: 'fill: {ink}; height: 0.92em (equal visual weight with the capitals); margin: 0 0.01em; /* flat geometric primitives on a 24-unit grid with three Rand stripe cuts in the paper colour; stem = heading weight / 800 x 3.4 units; a picture only stands where its name says the sound */' },
     { name: 'The one primary glyph', css: 'fill: {primary}; /* exactly one per view: the last glyph in the headline (or the first in the brand lockup when the headline has none) */' },
-    { name: 'Lockup', css: 'font: heading weight, display size; glyphs at cap height joined by "+" set in the heading face; the answer printed upside down in small type underneath (transform: rotate(180deg))' },
-    { name: 'Primary action', css: 'background: {primary}; color: {onPrimary}; border-radius: 0; padding: 15px 18px; /* a flat rectangle ending in the arrow glyph in {onPrimary} */' },
+    { name: 'Lockup', css: 'the board\'s first element, up to 200px: glyphs at equal weight with the letters, joined by hairline "+" operators; the answer printed upside down in small type underneath (transform: rotate(180deg))' },
+    { name: 'Primary action', css: 'background: {primary}; color: {onPrimary}; border-radius: 0; padding: 15px 18px; /* a flat rectangle ending in a typeset "→" in the slab; no icon */' },
     { name: 'Poster block', css: 'background: {canvas}; border-top: 2px solid {ink}; border-radius: 0; /* cards are ruled blocks, never tinted tiles */' },
-    { name: 'Switch', css: 'track: 2px {ink} outline, square; knob: {ink} square holding the eye (on) or the closed lid (off).' },
+    { name: 'Switch', css: 'track: 2px {ink} outline, square; knob: a plain square ({ink} off, {canvas} on); no pictogram, because a knob makes no sound.' },
   ],
 
   rules: {
@@ -469,7 +497,7 @@ registerAesthetic({
     ],
     dont: [
       'Swap a word for a picture of what it means (a pencil for "design", a sun for "alive"); that is an icon caption, not a rebus.',
-      'Use emoji, outlined icon sets, two-tone glyphs, or glyphs on discs, pills or app-icon tiles.',
+      'Put an icon beside a word (a tab, a button, a knob): a rebus replaces a sound, it never decorates a word.',
       'Round the shell into pills and pastel tiles; this is a flat poster with hairline rules.',
       'Force a picture into a word that has no sound match; leave it as type.',
     ],

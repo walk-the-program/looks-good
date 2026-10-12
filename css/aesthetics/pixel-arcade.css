@@ -16,7 +16,8 @@
   --px-pri: 0 -4px 0 0 var(--ab-primary), 0 4px 0 0 var(--ab-primary), -4px 0 0 0 var(--ab-primary), 4px 0 0 0 var(--ab-primary);
   --px-notch: polygon(0 4px, 4px 4px, 4px 0, calc(100% - 4px) 0, calc(100% - 4px) 4px, 100% 4px, 100% calc(100% - 4px), calc(100% - 4px) calc(100% - 4px), calc(100% - 4px) 100%, 4px 100%, 4px calc(100% - 4px), 0 calc(100% - 4px));
   --px-dither: conic-gradient(var(--ab-dither) 25%, transparent 0 50%, var(--ab-dither) 0 75%, transparent 0) 0 0 / 4px 4px;
-  border-radius: 0;
+  --pxs: 4;
+  border-radius: 0; font-synthesis: none;
   -webkit-font-smoothing: var(--ab-smooth, antialiased);
 }
 .ab[data-ae="pixel-arcade"] .ab-in { padding: calc(var(--ab-pad) + 4px); }
@@ -39,26 +40,25 @@
 .ab[data-ae="pixel-arcade"] .ab-tag b { color: var(--ab-accent-ink); font-weight: inherit; }
 .ab[data-ae="pixel-arcade"] .ab-rule { height: 4px; background: repeating-linear-gradient(90deg, var(--ab-bd-dim) 0 4px, transparent 4px 8px); }
 
-/* ---- hero: a title screen ---- */
-.ab[data-ae="pixel-arcade"] .ab-hero { padding: clamp(24px, 4cqw, 44px) 4px clamp(30px, 4.4cqw, 48px); }
+/* ---- hero: a centred title screen at one integer pixel scale (--pxs screen px per scene unit) ---- */
+.ab[data-ae="pixel-arcade"][data-hero="scene"] .ab-hero { padding: clamp(24px, 4cqw, 44px) 4px clamp(30px, 4.4cqw, 48px); justify-items: center; align-items: start; }
 .ab[data-ae="pixel-arcade"][data-hero="scene"] .ab-art {
-  --ab-art-ratio: 21 / 10; --ab-art-ratio-narrow: 21 / 11;
-  border-radius: 0; overflow: hidden; box-shadow: var(--px-bd); background: var(--ab-canvas); image-rendering: pixelated;
-}
-.ab[data-ae="pixel-arcade"] .ab-art::after {
-  content: ""; position: absolute; inset: 0; pointer-events: none;
-  background: repeating-linear-gradient(0deg, rgba(0,0,0,.16) 0 2px, transparent 2px 4px);
+  grid-area: 1 / 1; justify-self: center; align-self: start; width: calc(168px * var(--pxs)); max-width: none; aspect-ratio: 168 / 80;
+  border-radius: 0; overflow: hidden; box-shadow: var(--px-bd); background: #130d24; image-rendering: pixelated;
 }
 .ab[data-ae="pixel-arcade"] .pxa-scene { position: absolute; inset: 0; display: block; image-rendering: pixelated; }
-.ab[data-ae="pixel-arcade"] .pxa-hud { position: absolute; inset: 0; z-index: 2; display: flex; justify-content: space-between; align-items: flex-start; padding: clamp(10px, 1.8cqw, 18px) clamp(12px, 2.2cqw, 22px); pointer-events: none; }
-.ab[data-ae="pixel-arcade"] .pxa-life { display: flex; gap: 6px; }
-.ab[data-ae="pixel-arcade"] .pxa-life svg { display: block; width: clamp(20px, 3.4cqw, 32px); height: auto; filter: drop-shadow(3px 3px 0 rgba(0,0,0,.5)); }
-.ab[data-ae="pixel-arcade"] .pxa-score { color: var(--ab-ink); font: var(--ab-hw) calc(clamp(11px, 1.8cqw, 15px) * var(--ab-uis, 1)) var(--ab-font-label); letter-spacing: 0.08em; text-shadow: 2px 2px 0 rgba(0,0,0,.65); }
-.ab[data-ae="pixel-arcade"] .pxa-score b { color: var(--ab-accent); font-weight: inherit; }
+/* two-frame walk (static under reduced motion and in exports: frame 1) */
+@media (prefers-reduced-motion: no-preference) {
+  .ab[data-ae="pixel-arcade"]:not(.ab-slide) .pxa-f1 { animation: pxa-f1 0.8s steps(1, end) infinite; }
+  .ab[data-ae="pixel-arcade"]:not(.ab-slide) .pxa-f2 { animation: pxa-f2 0.8s steps(1, end) infinite; }
+}
+@keyframes pxa-f1 { 0% { opacity: 1; } 50% { opacity: 0; } }
+@keyframes pxa-f2 { 0% { opacity: 0; } 50% { opacity: 1; } }
 
 /* the RPG dialog box that holds the copy */
 .ab[data-ae="pixel-arcade"][data-hero="scene"] .ab-hero-copy {
-  position: relative; width: min(calc(100% - 8px), 49cqw); margin: clamp(18px, 3.2cqw, 34px); padding: clamp(18px, 2.6cqw, 28px) clamp(18px, 2.8cqw, 30px) clamp(16px, 2.2cqw, 24px);
+  grid-area: 1 / 1; justify-self: center; align-self: start;
+  position: relative; width: calc(168px * var(--pxs) * 0.55); margin: calc(var(--pxs) * 38px) calc(168px * var(--pxs) * 0.45 - 32px) 0 0; padding: clamp(18px, 2.6cqw, 28px) clamp(18px, 2.8cqw, 30px) clamp(16px, 2.2cqw, 24px);
   border-radius: 0; background: var(--px-dither), var(--ab-panel); -webkit-backdrop-filter: none; backdrop-filter: none;
   box-shadow: var(--px-bd), inset -4px -4px 0 0 var(--ab-panel-sh), inset 4px 4px 0 0 var(--ab-panel-hi);
 }
@@ -75,9 +75,14 @@
   font-weight: var(--ab-hw); letter-spacing: 0; line-height: 1.18; text-wrap: balance; color: var(--ab-ink);
   text-shadow: 4px 4px 0 var(--ab-p-deep); -webkit-font-smoothing: var(--ab-smooth, antialiased);
 }
+/* a pixel heading is a logotype: set solid (it is drawn with its own spacing), sized in whole
+   scene pixels, with a two-step hard extrusion */
+.ab[data-ae="pixel-arcade"][data-hcls="pixel"]:not(.ab-slide) .ab-hero .ab-headline { font-size: calc(var(--pxs) * 8px * var(--ab-hs, 1)); line-height: 1.25; }
+.ab[data-ae="pixel-arcade"][data-hcls="pixel"] .ab-headline { letter-spacing: 0; text-shadow: 4px 0 0 var(--ab-p-deep), 4px 4px 0 var(--ab-p-deep), 8px 4px 0 #000; }
 .ab[data-ae="pixel-arcade"] .ab-hl { color: var(--ab-accent-ink); text-shadow: 4px 4px 0 var(--ab-a-deep); }
 /* light mode: the stepped shadows shrink and soften so the type stays crisp */
 .ab[data-ae="pixel-arcade"][data-mode="light"] .ab-headline { text-shadow: 2px 2px 0 var(--ab-hl-soft); }
+.ab[data-ae="pixel-arcade"][data-mode="light"][data-hcls="pixel"] .ab-headline { text-shadow: 4px 0 0 var(--ab-hl-soft), 4px 4px 0 var(--ab-hl-soft); }
 .ab[data-ae="pixel-arcade"][data-mode="light"] .ab-hl { text-shadow: 2px 2px 0 var(--ab-a-deep); }
 .ab[data-ae="pixel-arcade"] .ab-subcopy {
   margin-top: 16px !important; max-width: 30em; font-size: calc(clamp(13px, 1.4cqw, 15px) * var(--ab-uis, 1)); line-height: 1.35; color: var(--ab-muted);
@@ -178,15 +183,15 @@
   font-size: calc(14px * var(--ab-uis, 1));
 }
 .ab[data-ae="pixel-arcade"] .ab-row:last-child { background: none; border-bottom: 0; }
-.ab[data-ae="pixel-arcade"] .ab-row-n { font-size: 0; }
-.ab[data-ae="pixel-arcade"] .ab-row-n::before { content: "LV." counter(pxrow, decimal-leading-zero); font: var(--ab-hw) calc(11px * var(--ab-uis, 1)) var(--ab-font-label); letter-spacing: 0.04em; color: var(--ab-accent-ink); }
+.ab[data-ae="pixel-arcade"] .ab-row-n { font: var(--ab-hw) calc(11px * var(--ab-uis, 1)) var(--ab-font-label); letter-spacing: 0.04em; color: var(--ab-accent-ink); white-space: nowrap; }
+.ab[data-ae="pixel-arcade"] .ab-row-n::before { content: "LV."; }
 .ab[data-ae="pixel-arcade"] .ab-av { display: grid; place-items: center; width: 28px; height: 28px; clip-path: var(--px-notch); background: var(--ab-primary); color: var(--ab-on-primary); font: var(--ab-hw) 12px/1 var(--ab-font-h); text-transform: uppercase; }
 .ab[data-ae="pixel-arcade"] .ab-row:nth-child(2) .ab-av { background: var(--ab-secondary); color: var(--ab-on-secondary); }
 .ab[data-ae="pixel-arcade"] .ab-row:nth-child(3) .ab-av { background: var(--ab-accent); color: var(--ab-on-accent); }
 .ab[data-ae="pixel-arcade"] .ab-row-name { font-weight: var(--ab-hw); letter-spacing: 0.03em; text-transform: uppercase; }
 .ab[data-ae="pixel-arcade"] .ab-row-status { padding: 3px 10px 2px; border-radius: 0; clip-path: var(--px-notch); background: var(--ab-secondary); color: var(--ab-on-secondary); font-size: calc(11px * var(--ab-uis, 1)); letter-spacing: 0.06em; text-transform: uppercase; }
 .ab[data-ae="pixel-arcade"] .ab-row-bar { height: 12px; border-radius: 0; background: repeating-linear-gradient(90deg, var(--ab-bd-dim) 0 8px, transparent 8px 12px); overflow: hidden; }
-.ab[data-ae="pixel-arcade"] .ab-row-bar i { background: var(--ab-primary); -webkit-mask-image: repeating-linear-gradient(90deg, #000 0 8px, transparent 8px 12px); mask-image: repeating-linear-gradient(90deg, #000 0 8px, transparent 8px 12px); }
+.ab[data-ae="pixel-arcade"] .ab-row-bar i { background: repeating-linear-gradient(90deg, transparent 0 8px, var(--ab-panel) 8px 12px), var(--ab-primary); }
 .ab[data-ae="pixel-arcade"] .ab-row-pct { font: var(--ab-hw) calc(13px * var(--ab-uis, 1)) var(--ab-font-label); letter-spacing: 0.04em; }
 
 /* ---- footer ---- */
@@ -197,13 +202,21 @@
   outline: 4px solid var(--ab-accent); outline-offset: 4px;
 }
 
+/* the pixel scale steps down in whole numbers with the board */
+/* (set on .ab-in: a container query never styles the container itself) */
+@container ab (min-width: 601px) and (max-width: 760px) {
+  .ab[data-ae="pixel-arcade"] .ab-in { --pxs: 3; }
+}
+
 /* ---- narrow boards ---- */
 @container ab (max-width: 600px) {
   .ab[data-ae="pixel-arcade"] .ab-in { padding: calc(var(--ab-pad) + 2px); }
   .ab[data-ae="pixel-arcade"][data-hero="scene"] .ab-hero { gap: 22px; padding: 18px 4px 24px; }
-  .ab[data-ae="pixel-arcade"][data-hero="scene"] .ab-hero-copy { order: 2; width: auto; margin: 16px 4px 0; padding: 26px 18px 22px; background: var(--px-dither), var(--ab-panel); box-shadow: var(--px-bd), inset -4px -4px 0 0 var(--ab-panel-sh), inset 4px 4px 0 0 var(--ab-panel-hi); }
-  .ab[data-ae="pixel-arcade"][data-hero="scene"] .ab-art { margin: 4px; width: calc(100% - 8px); }
+  .ab[data-ae="pixel-arcade"] .ab-in { --pxs: 2; }
+  .ab[data-ae="pixel-arcade"][data-hero="scene"] .ab-hero-copy { grid-area: auto; order: 2; width: auto; justify-self: stretch; margin: 16px 4px 0; padding: 26px 18px 22px; background: var(--px-dither), var(--ab-panel); box-shadow: var(--px-bd), inset -4px -4px 0 0 var(--ab-panel-sh), inset 4px 4px 0 0 var(--ab-panel-hi); }
+  .ab[data-ae="pixel-arcade"][data-hero="scene"] .ab-art { grid-area: auto; margin: 4px; aspect-ratio: 168 / 80; }
   .ab[data-ae="pixel-arcade"][data-hero="scene"] .ab-headline { font-size: calc(clamp(24px, 8.2cqw, 40px) * var(--ab-hl-scale, 1) * var(--ab-hs, 1) * var(--ab-display, 1)); }
+  .ab[data-ae="pixel-arcade"][data-hcls="pixel"]:not(.ab-slide) .ab-hero .ab-headline { font-size: 24px; }
   .ab[data-ae="pixel-arcade"] .ab-tag { font-size: calc(9px * var(--ab-uis, 1)); }
   .ab[data-ae="pixel-arcade"] .ab-swatch { padding: 8px 10px 8px 8px; margin: 0 4px; }
   .ab[data-ae="pixel-arcade"] .ab-swatches { gap: 14px; }
@@ -221,7 +234,20 @@
   .ab[data-ae="pixel-arcade"] .ab-card, .ab[data-ae="pixel-arcade"] .ab-panel, .ab[data-ae="pixel-arcade"] .ab-list { margin: 0 4px; }
 }
 
+/* ---- deck ---- */
+.ab[data-ae="pixel-arcade"].ab-slide .ab-deck-dot { border-radius: 0; }
+.ab[data-ae="pixel-arcade"].ab-slide .ab-deck-rpct { font-family: var(--ab-font-label); }
+/* cover and material stage: the screen at 4 or 3 px per unit, centred */
+.ab[data-ae="pixel-arcade"].ab-slide[data-slide="cover"] { --pxs: 3; }
+.ab[data-ae="pixel-arcade"].ab-slide[data-slide="cover"][data-hero="scene"] .ab-deck-cover .ab-hero-copy { margin: calc(var(--pxs) * 26px) calc(168px * var(--pxs) * 0.45 - 32px) 0 0; }
+.ab[data-ae="pixel-arcade"].ab-slide[data-slide="cover"][data-hcls="pixel"] .ab-hero .ab-headline { font-size: calc(var(--pxs) * 8px * var(--ab-hs, 1)); line-height: 1.25; }
+.ab[data-ae="pixel-arcade"] .ab-deck-stage .ab-art { width: calc(168px * 3) !important; aspect-ratio: 168 / 80; box-shadow: var(--px-bd); background: #130d24; }
+
 @media (prefers-reduced-motion: reduce) {
   .ab[data-ae="pixel-arcade"] .ab-hero-copy::after, .ab[data-ae="pixel-arcade"] .ab-dot { animation: none; opacity: 1; }
   .ab[data-ae="pixel-arcade"] .ab-cta:hover, .ab[data-ae="pixel-arcade"] .ab-cta:active, .ab[data-ae="pixel-arcade"] .ab-type-apply:hover, .ab[data-ae="pixel-arcade"] .ab-type-apply:active { transform: none; }
 }
+
+/* in product (the deck renders the board's own rows in a narrower column): no bar, the names keep their room */
+.ab[data-ae="pixel-arcade"].ab-slide .ab-deck-prod .ab-row { grid-template-columns: 4.6ch 28px minmax(0, 1fr) auto 5ch; }
+.ab[data-ae="pixel-arcade"].ab-slide .ab-deck-prod .ab-row-bar { display: none; }

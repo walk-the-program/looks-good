@@ -229,6 +229,13 @@
 .ab[data-ae="mid-century"].ab-slide .ab-card::before,
 .ab[data-ae="mid-century"].ab-slide .ab-card::after { content: none; }
 
+.ab[data-ae="mid-century"].ab-slide .ab-deck-col .ab-labelrow { border-bottom: 2px solid var(--mc-ink); }
+.ab[data-ae="mid-century"].ab-slide .ab-deck-rule { border-bottom: 1px solid var(--ab-line); }
+.ab[data-ae="mid-century"].ab-slide .ab-deck-mark { width: 30px; height: 30px; border-radius: 0; font-size: 0; color: transparent; background: var(--mc-spark-acc) center / 30px 30px no-repeat; }
+.ab[data-ae="mid-century"].ab-slide .ab-deck-col[data-kind="dont"] .ab-deck-mark { position: relative; isolation: isolate; background: none; font-size: 14px; color: var(--mc-on-ink); }
+.ab[data-ae="mid-century"].ab-slide .ab-deck-col[data-kind="dont"] .ab-deck-mark::before { content: ""; position: absolute; z-index: -1; inset: 3px; background: var(--mc-ink); transform: skewX(-12deg); }
+.ab[data-ae="mid-century"].ab-slide .ab-deck-rule p { font-size: 20px; }
+
 @media (prefers-reduced-motion: reduce) {
   .ab[data-ae="mid-century"] .ab-cta::after,
   .ab[data-ae="mid-century"] .ab-switch::before { transition: none; }

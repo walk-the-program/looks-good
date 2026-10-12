@@ -13,6 +13,10 @@
   --mm-sheet: 7px;
   --mm-pad: clamp(18px, 2.8cqw, 26px);
   --mm-bacterio: url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 width=%2764%27 height=%2764%27 viewBox=%270 0 64 64%27 fill=%27none%27 stroke=%27%2314110F%27 stroke-width=%272.4%27 stroke-linecap=%27round%27%3E%3Cpath d=%27M5 14q4-9 8 0t8 0t8 0%27/%3E%3Cpath d=%27M40 7q3-7 6 0t6 0%27/%3E%3Cpath d=%27M9 39q5 7 10 0t10 0%27/%3E%3Cpath d=%27M46 28l8 8M46 36l8-8%27/%3E%3Cpath d=%27M35 54q4-8 8 0t8 0t8 0%27/%3E%3Cpath d=%27M5 57l10-4%27/%3E%3Ccircle cx=%2729%27 cy=%2725%27 r=%272.3%27 fill=%27%2314110F%27 stroke=%27none%27/%3E%3Ccircle cx=%2758%27 cy=%2717%27 r=%272.3%27 fill=%27%2314110F%27 stroke=%27none%27/%3E%3Ccircle cx=%2721%27 cy=%2751%27 r=%272.3%27 fill=%27%2314110F%27 stroke=%27none%27/%3E%3C/svg%3E");
+  /* squiggle strokes as plain background images (no CSS mask: html2canvas exports drop masks) */
+  --mm-squiggle-k: url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 width=%2724%27 height=%2710%27 viewBox=%270 0 24 10%27 fill=%27none%27 stroke=%27%2314110F%27 stroke-opacity=%27.3%27 stroke-width=%272.2%27 stroke-linecap=%27round%27%3E%3Cpath d=%27M1 5q5.5-8 11 0t11 0%27/%3E%3C/svg%3E");
+  --mm-squiggle-w: url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 width=%2724%27 height=%2710%27 viewBox=%270 0 24 10%27 fill=%27none%27 stroke=%27%23FFFFFF%27 stroke-opacity=%27.35%27 stroke-width=%272.2%27 stroke-linecap=%27round%27%3E%3Cpath d=%27M1 5q5.5-8 11 0t11 0%27/%3E%3C/svg%3E");
+  --mm-squiggle-edge: url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 width=%2724%27 height=%2710%27 viewBox=%270 0 24 10%27 fill=%27none%27 stroke=%27%2314110F%27 stroke-width=%272.4%27 stroke-linecap=%27round%27%3E%3Cpath d=%27M1 5q5.5-8 11 0t11 0%27/%3E%3C/svg%3E");
   --mm-squiggle: url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 width=%2724%27 height=%2710%27 viewBox=%270 0 24 10%27 fill=%27none%27 stroke=%27%23000%27 stroke-width=%272.2%27 stroke-linecap=%27round%27%3E%3Cpath d=%27M1 5q5.5-8 11 0t11 0%27/%3E%3C/svg%3E");
   --mm-terrazzo:
     radial-gradient(circle at 12% 18%, var(--ab-primary) 0 4px, transparent 4.6px),
@@ -46,7 +50,8 @@
 }
 .ab[data-ae="radical-memphis"] .ab-tag { display: inline-flex; align-items: center; gap: 8px; font-size: 10.5px; font-weight: 700; letter-spacing: 0.1em; }
 .ab[data-ae="radical-memphis"] .ab-tag::before { content: ""; width: 10px; height: 9px; background: var(--ab-secondary); clip-path: polygon(50% 0, 100% 100%, 0 100%); }
-.ab[data-ae="radical-memphis"] .ab-rule { height: 10px; background: var(--ab-ink); opacity: 0.85; -webkit-mask: var(--mm-squiggle) 0 50% / 24px 10px repeat-x; mask: var(--mm-squiggle) 0 50% / 24px 10px repeat-x; }
+/* section dividers: a 10px black-and-white checker band (the wavy rule is groovy-70s's) */
+.ab[data-ae="radical-memphis"] .ab-rule { height: 10px; background: conic-gradient(var(--ab-ink) 25%, var(--ab-canvas) 0 50%, var(--ab-ink) 0 75%, var(--ab-canvas) 0) 0 0 / 10px 10px; }
 
 /* ---- labels ---- */
 .ab[data-ae="radical-memphis"] .ab-label { font-size: 11px; font-weight: 700; letter-spacing: 0.08em; }
@@ -60,13 +65,22 @@
 .ab[data-ae="radical-memphis"] .ab-labelrow .ab-label:first-child { display: inline-flex; align-items: center; }
 
 /* ---- hero: a slanted statement beside the showroom piece ---- */
-.ab[data-ae="radical-memphis"] .ab-hero { grid-template-columns: minmax(0, 1.36fr) minmax(0, 1fr); gap: clamp(22px, 4cqw, 52px); padding: clamp(34px, 5.4cqw, 64px) 0 clamp(36px, 5cqw, 60px); }
+.ab[data-ae="radical-memphis"] .ab-hero { grid-template-columns: minmax(0, 1.9fr) minmax(0, 1fr); gap: clamp(22px, 4cqw, 52px); padding: clamp(34px, 5.4cqw, 64px) 0 clamp(36px, 5cqw, 60px); }
 .ab[data-ae="radical-memphis"] .ab-kicker {
   display: inline-block; padding: 5px 12px 5px 10px; background: var(--ab-secondary); color: var(--ab-on-secondary); clip-path: polygon(0 0, 100% 0, calc(100% - 9px) 100%, 0 100%);
   font-size: 11px; font-weight: 700; letter-spacing: 0.12em;
 }
-.ab[data-ae="radical-memphis"] .ab-headline { font-weight: 400; line-height: 0.96; letter-spacing: calc(-0.035em * var(--ab-tr, 1)); transform: rotate(-2.5deg); transform-origin: 0 100%; text-wrap: balance; padding-bottom: 0.06em; }
-.ab[data-ae="radical-memphis"] .ab-hl { color: var(--ab-accent-ink); text-shadow: 0.06em 0.06em 0 var(--ab-m-sheet); }
+.ab[data-ae="radical-memphis"] .ab-headline { font-weight: 400; line-height: 1.12; letter-spacing: calc(-0.035em * var(--ab-tr, 1)); transform: rotate(-2.5deg); transform-origin: 0 100%; text-wrap: balance; padding-bottom: 0.1em; }
+.ab[data-ae="radical-memphis"]:not(.ab-slide) > .ab-in > .ab-hero .ab-headline { font-size: calc(clamp(44px, 9.5cqw, 120px) * var(--ab-hl-scale, 1) * var(--ab-hs, 1)); }
+/* the headline is furniture: each line on a paper laminate slab with a squiggle edge,
+   the last word on a solid secondary slab (headline() hook in the js) */
+.ab[data-ae="radical-memphis"] .mm-slab {
+  color: var(--ab-m-black); padding: 0 0.12em 0.16em;
+  background: var(--mm-squiggle-edge) 0 100% / 0.42em 0.18em repeat-x, linear-gradient(var(--ab-m-paper), var(--ab-m-paper)) 0 0 / 100% calc(100% - 0.09em) no-repeat;
+  -webkit-box-decoration-break: clone; box-decoration-break: clone;
+}
+.ab[data-ae="radical-memphis"] .ab-hl { color: var(--ab-m-on-sec); background: var(--ab-secondary); padding: 0 .12em; box-shadow: .08em .08em 0 var(--ab-m-sheet); text-shadow: none; -webkit-box-decoration-break: clone; box-decoration-break: clone; }
+.ab[data-ae="radical-memphis"] .ab-headline--custom > span { display: inline; }
 .ab[data-ae="radical-memphis"] .ab-subcopy { max-width: 25em; margin-top: clamp(22px, 3cqw, 32px) !important; }
 .ab[data-ae="radical-memphis"] .ab-sub-lead { color: var(--ab-ink); font-weight: 600; }
 .ab[data-ae="radical-memphis"] .ab-art { max-width: 400px; aspect-ratio: 1; justify-self: end; }
@@ -103,9 +117,9 @@
 }
 .ab[data-ae="radical-memphis"] .ab-chip::before { content: none; }
 .ab[data-ae="radical-memphis"] .ab-chip::after {
-  content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 30%; background: var(--mm-sq); opacity: 0.25;
-  -webkit-mask: var(--mm-squiggle) 0 0 / 24px 10px repeat; mask: var(--mm-squiggle) 0 0 / 24px 10px repeat;
+  content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 30%; background: var(--mm-squiggle-k) 0 0 / 24px 10px repeat;
 }
+.ab[data-ae="radical-memphis"] .ab-swatch[data-role="ink"] .ab-chip::after { background-image: var(--mm-squiggle-w); }
 .ab[data-ae="radical-memphis"] .ab-swatch:nth-child(1) .ab-chip { --mm-tilt: -5deg; }
 .ab[data-ae="radical-memphis"] .ab-swatch:nth-child(2) .ab-chip { --mm-tilt: 3deg; }
 .ab[data-ae="radical-memphis"] .ab-swatch:nth-child(3) .ab-chip { --mm-tilt: -2deg; }
@@ -127,13 +141,13 @@
 .ab[data-ae="radical-memphis"] .ab-type-class, .ab[data-ae="radical-memphis"] .ab-type-fit { color: var(--ab-m-soft); }
 .ab[data-ae="radical-memphis"] .ab-type-cur b { color: var(--ab-m-black); }
 .ab[data-ae="radical-memphis"] .ab-type-pick { color: var(--ab-m-black); letter-spacing: 0; }
-.ab[data-ae="radical-memphis"] .ab-fit { border: 0; border-radius: 999px; transform: rotate(-3deg); background: var(--ab-m-sec-lo); color: var(--ab-m-black); }
+.ab[data-ae="radical-memphis"] .ab-fit { border: 0; border-radius: 0; transform: rotate(-3deg); background: var(--ab-m-sec-lo); color: var(--ab-m-black); }
 .ab[data-ae="radical-memphis"] .ab-fit[data-fit="match"] { background: var(--ab-m-sec-lo); color: var(--ab-m-black); }
 .ab[data-ae="radical-memphis"] .ab-fit[data-fit="consider"] { background: var(--ab-m-pri-lo); color: var(--ab-m-black); }
 .ab[data-ae="radical-memphis"] .ab-fit[data-fit="avoid"] { background: var(--ab-m-black); color: var(--ab-m-paper); }
 .ab[data-ae="radical-memphis"] .ab-type-k { font-weight: 800; letter-spacing: 0.1em; }
 .ab[data-ae="radical-memphis"] .ab-type-apply {
-  padding: 12px 20px; border: 0; border-radius: 999px; background: var(--ab-m-black); color: var(--ab-m-paper); font-weight: 700; font-size: 13px;
+  padding: 12px 20px; border: 0; border-radius: 0; background: var(--ab-m-black); color: var(--ab-m-paper); font-weight: 700; font-size: 13px;
   box-shadow: 5px 5px 0 var(--ab-m-sheet); transition: transform 220ms var(--mm-spring);
 }
 .ab[data-ae="radical-memphis"] .ab-type-apply:hover { background: var(--ab-m-black); transform: rotate(-2deg); }
@@ -157,10 +171,10 @@
 /* 01 interface: geometric-token tabs, a slab title, the main action */
 .ab[data-ae="radical-memphis"] .ab-seg { gap: 8px; padding: 0; background: none; border-radius: 0; }
 .ab[data-ae="radical-memphis"] .ab-seg-btn {
-  display: inline-flex; align-items: center; justify-content: center; gap: 7px; min-height: 40px; padding: 8px 6px; border-radius: 999px; border: 0;
+  display: inline-flex; align-items: center; justify-content: center; gap: 7px; min-height: 40px; padding: 8px 6px; border-radius: 0; border: 0;
   background: var(--ab-m-sec-lo); color: var(--ab-m-black); font-size: 12px; font-weight: 700; transition: transform 220ms var(--mm-spring), background 120ms;
 }
-.ab[data-ae="radical-memphis"] .ab-seg-btn::before { content: ""; flex: none; width: 12px; height: 12px; background: var(--ab-secondary); transition: transform 220ms var(--mm-spring); }
+.ab[data-ae="radical-memphis"] .ab-seg-btn::before { content: ""; flex: none; width: 14px; height: 14px; background: var(--ab-secondary); transition: transform 220ms var(--mm-spring); }
 .ab[data-ae="radical-memphis"] .ab-seg-btn:nth-child(1)::before { border-radius: 50%; }
 .ab[data-ae="radical-memphis"] .ab-seg-btn:nth-child(2)::before { clip-path: polygon(50% 0, 100% 100%, 0 100%); }
 .ab[data-ae="radical-memphis"] .ab-seg-btn:hover { color: var(--ab-m-black); transform: rotate(-2deg); }
@@ -169,11 +183,12 @@
 .ab[data-ae="radical-memphis"] .ab-card-title { margin: 26px 0 8px !important; font-weight: 400; letter-spacing: calc(-0.03em * var(--ab-tr, 1)); font-size: clamp(24px, 3.2cqw, 34px); line-height: 1; }
 .ab[data-ae="radical-memphis"] .ab-card-body { font-size: 13.5px; }
 .ab[data-ae="radical-memphis"] .ab-cta {
-  padding: 8px 8px 8px 24px; border-radius: 999px; background: var(--ab-primary); color: var(--ab-on-primary); font-size: 14px; font-weight: 700; margin-right: 6px; width: calc(100% - 6px);
+  padding: 8px 8px 8px 24px; border-radius: 0 999px 999px 0; background: var(--ab-primary); color: var(--ab-on-primary); font-size: 14px; font-weight: 700; margin-right: 6px; width: calc(100% - 6px);
   box-shadow: 6px 6px 0 var(--ab-m-sheet-sec); transition: transform 220ms var(--mm-spring), box-shadow 220ms var(--mm-spring);
 }
-.ab[data-ae="radical-memphis"] .ab-cta-arrow { display: grid; place-items: center; width: 40px; height: 40px; border-radius: 50%; background: var(--ab-accent); color: var(--ab-on-accent); }
-.ab[data-ae="radical-memphis"] .ab-cta-arrow::before { content: "→"; font-size: 18px; font-weight: 800; }
+/* the arrow sits on a paper tab in a checker block */
+.ab[data-ae="radical-memphis"] .ab-cta-arrow { display: grid; place-items: center; width: 44px; height: 40px; border-radius: 0 999px 999px 0; background: var(--mm-checker); background-size: 10px 10px; color: var(--ab-m-black); }
+.ab[data-ae="radical-memphis"] .ab-cta-arrow::before { content: "→"; font-size: 16px; font-weight: 800; line-height: 1; padding: 3px 5px; background: var(--ab-m-paper); }
 .ab[data-ae="radical-memphis"] .ab-cta:hover { transform: rotate(-1.2deg); }
 .ab[data-ae="radical-memphis"] .ab-cta:active { transform: scale(0.94, 0.92) translate(3px, 3px); box-shadow: 2px 2px 0 var(--ab-m-sheet-sec); }
 
@@ -199,18 +214,17 @@
 }
 
 /* 03 in use: a swatch primitive, a place-name, beads for progress, alternate primary / secondary tint flats */
+/* 03 in use: each row opens on a 56px laminate swatch (Bacterio, terrazzo, checker); the rest is paper and ink */
 .ab[data-ae="radical-memphis"] .ab-list { overflow: visible; padding-left: 14px; counter-reset: mmrow; }
-.ab[data-ae="radical-memphis"] .ab-row { grid-template-columns: 30px 28px minmax(0, 1fr) auto minmax(60px, 140px) 4.5ch; padding: 14px 18px 14px 14px; gap: 4px clamp(10px, 1.8cqw, 18px); border: 0; counter-increment: mmrow; }
-.ab[data-ae="radical-memphis"] .ab-row:nth-child(odd) { background: var(--ab-m-pri-lo); }
-.ab[data-ae="radical-memphis"] .ab-row:nth-child(even) { background: var(--ab-m-sec-lo); }
-.ab[data-ae="radical-memphis"] .ab-row:nth-child(3) { background: var(--ab-m-pri-lo); }
-.ab[data-ae="radical-memphis"] .ab-row:last-child { border: 0; }
-.ab[data-ae="radical-memphis"] .ab-row-n { font: 400 15px/1 var(--ab-font-h); }
-.ab[data-ae="radical-memphis"] .ab-av { display: block; width: 24px; height: 24px; font-size: 0; background: var(--ab-primary); border-radius: 50%; }
-.ab[data-ae="radical-memphis"] .ab-row:nth-child(2) .ab-av { border-radius: 0; background: var(--ab-secondary); clip-path: polygon(50% 0, 100% 100%, 0 100%); }
-.ab[data-ae="radical-memphis"] .ab-row:nth-child(3) .ab-av { border-radius: 0; background: var(--ab-accent); transform: rotate(12deg); }
+.ab[data-ae="radical-memphis"] .ab-row { grid-template-columns: 56px 30px minmax(0, 1fr) auto minmax(60px, 140px) 4.5ch; padding: 0 18px 0 0; gap: 4px clamp(10px, 1.8cqw, 18px); border: 0; border-top: 2px solid var(--ab-m-black); background: var(--ab-m-paper); counter-increment: mmrow; min-height: 56px; }
+.ab[data-ae="radical-memphis"] .ab-row:first-child { border-top: 0; }
+.ab[data-ae="radical-memphis"] .ab-row:last-child { border-bottom: 0; }
+.ab[data-ae="radical-memphis"] .ab-row-n { font: 400 15px/1 var(--ab-font-h); grid-column: 2; grid-row: 1; }
+.ab[data-ae="radical-memphis"] .ab-av { display: block; grid-column: 1; grid-row: 1; align-self: stretch; width: 56px; height: auto; min-height: 56px; font-size: 0; border-radius: 0; background: var(--mm-bacterio), var(--ab-m-paper); background-size: 34px 34px, auto; }
+.ab[data-ae="radical-memphis"] .ab-row:nth-child(2) .ab-av { background: var(--mm-terrazzo), var(--ab-m-paper); background-size: 70px 56px, auto; }
+.ab[data-ae="radical-memphis"] .ab-row:nth-child(3) .ab-av { background: var(--mm-checker); background-size: 14px 14px; }
 .ab[data-ae="radical-memphis"] .ab-row-name { font-family: var(--ab-font-h); font-weight: 400; font-size: 15.5px; letter-spacing: calc(-0.015em * var(--ab-tr, 1)); }
-.ab[data-ae="radical-memphis"] .ab-row-status { padding: 3px 10px; border-radius: 999px; background: var(--ab-m-paper); color: var(--ab-m-black); font-weight: 700; font-size: 11px; transform: rotate(-4deg); }
+.ab[data-ae="radical-memphis"] .ab-row-status { padding: 3px 10px; border-radius: 0; background: var(--ab-m-sec-lo); color: var(--ab-m-black); font-weight: 700; font-size: 11px; transform: rotate(-4deg); }
 .ab[data-ae="radical-memphis"] .ab-row-bar { height: 12px; border-radius: 0; background: radial-gradient(circle, var(--ab-m-black) 0 3px, transparent 3.5px) 0 0 / 12px 12px repeat-x; opacity: 1; overflow: hidden; }
 .ab[data-ae="radical-memphis"] .ab-row-bar { background: radial-gradient(circle at 6px 6px, color-mix(in srgb, var(--ab-m-black) 28%, transparent) 0 3.6px, transparent 4px) 0 0 / 12px 12px repeat-x; }
 .ab[data-ae="radical-memphis"] .ab-row-bar i { height: 12px; border-radius: 0; background: radial-gradient(circle at 6px 6px, var(--ab-primary) 0 4.6px, transparent 5px) 0 0 / 12px 12px repeat-x; }
@@ -230,15 +244,22 @@
 
 /* ---- narrow boards ---- */
 @container ab (max-width: 600px) {
-  .ab[data-ae="radical-memphis"] .ab-hero { grid-template-columns: minmax(0, 1fr); gap: 34px; padding: 26px 0 34px; }
-  .ab[data-ae="radical-memphis"] .ab-art { max-width: 330px; justify-self: center; }
+  /* phone: the totem first, bleeding 10% off the right edge; the headline on top, overlapping its base slab */
+  .ab[data-ae="radical-memphis"] .ab-hero { grid-template-columns: minmax(0, 1fr); gap: 0; padding: 18px 0 34px; }
+  .ab[data-ae="radical-memphis"] .ab-hero > .ab-art { order: -1; width: 92%; max-width: 360px; justify-self: end; margin-right: calc(-10% - var(--ab-pad) * 0.5); }
+  .ab[data-ae="radical-memphis"] .ab-hero-copy { position: relative; z-index: 2; margin-top: -16cqw; }
   .ab[data-ae="radical-memphis"] .ab-headline { transform: rotate(-2deg); }
+  .ab[data-ae="radical-memphis"]:not(.ab-slide) > .ab-in > .ab-hero .ab-headline { font-size: calc(clamp(36px, 11cqw, 48px) * var(--ab-hl-scale, 1) * var(--ab-hs, 1)); }
   .ab[data-ae="radical-memphis"] .ab-tag { font-size: 8.5px; letter-spacing: 0.06em; }
   .ab[data-ae="radical-memphis"] .ab-tag::before { display: none; }
   .ab[data-ae="radical-memphis"] .ab-wordmark { padding: 6px 12px 7px; }
-  .ab[data-ae="radical-memphis"] .ab-row { grid-template-columns: 28px minmax(0, 1fr) 4.5ch; padding: 12px 14px 12px 10px; }
-  .ab[data-ae="radical-memphis"] .ab-av { display: none; }
-  .ab[data-ae="radical-memphis"] .ab-row-n { grid-column: 1; }
+  .ab[data-ae="radical-memphis"] .ab-row { grid-template-columns: 44px 26px minmax(0, 1fr) 4.5ch; padding: 0 14px 0 0; }
+  .ab[data-ae="radical-memphis"] .ab-av { width: 44px; grid-row: 1 / span 2; }
+  .ab[data-ae="radical-memphis"] .ab-row-n { grid-column: 2; grid-row: 1; }
+  .ab[data-ae="radical-memphis"] .ab-row-name { grid-column: 3; grid-row: 1; }
+  .ab[data-ae="radical-memphis"] .ab-row-status { grid-column: 3; grid-row: 2; margin-bottom: 10px; }
+  .ab[data-ae="radical-memphis"] .ab-row-pct { grid-column: 4; grid-row: 1; }
+  .ab[data-ae="radical-memphis"] .ab-row { padding-top: 10px; }
   .ab[data-ae="radical-memphis"] .ab-card, .ab[data-ae="radical-memphis"] .ab-panel, .ab[data-ae="radical-memphis"] .ab-list { margin-right: 9px; }
   .ab[data-ae="radical-memphis"] .ab-swatch .ab-chip { margin: 0; width: 72px; height: 50px; }
   .ab[data-ae="radical-memphis"] .ab-type-col { margin-right: 7px; }
@@ -248,3 +269,14 @@
   .ab[data-ae="radical-memphis"] .ab-seg-btn, .ab[data-ae="radical-memphis"] .ab-seg-btn::before, .ab[data-ae="radical-memphis"] .ab-cta, .ab[data-ae="radical-memphis"] .ab-switch::before, .ab[data-ae="radical-memphis"] .ab-type-apply { transition: none; }
   .ab[data-ae="radical-memphis"] .ab-cta:active, .ab[data-ae="radical-memphis"] .ab-type-apply:active, .ab[data-ae="radical-memphis"] .ab-cta:hover, .ab[data-ae="radical-memphis"] .ab-seg-btn:hover, .ab[data-ae="radical-memphis"] .ab-type-apply:hover { transform: none; }
 }
+
+/* ----- deck ----- */
+/* interface: the three samples become a showroom vignette on a tilted terrazzo floor slab */
+.ab[data-ae="radical-memphis"].ab-slide[data-slide="interface"] .ab-deck-uistates { position: relative; padding: 18px 0 34px; }
+.ab[data-ae="radical-memphis"].ab-slide[data-slide="interface"] .ab-deck-uistates::before {
+  content: ""; position: absolute; left: 2%; right: 2%; bottom: 0; height: 46px; transform: skewX(-12deg);
+  background: var(--mm-terrazzo), var(--ab-m-paper); background-size: 120px 46px, auto; box-shadow: 8px 8px 0 var(--ab-m-sheet);
+}
+.ab[data-ae="radical-memphis"].ab-slide[data-slide="interface"] .ab-deck-uistates .ab-state { position: relative; z-index: 1; }
+.ab[data-ae="radical-memphis"].ab-slide[data-slide="interface"] .ab-deck-uistates .ab-disc { width: 120px; height: 120px; margin-bottom: 26px; }
+.ab[data-ae="radical-memphis"].ab-slide[data-slide="interface"] .ab-deck-uistates .ab-state-name { display: inline-block; padding: 3px 10px; background: var(--ab-m-paper); color: var(--ab-m-black); }

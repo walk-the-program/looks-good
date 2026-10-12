@@ -375,3 +375,74 @@ The box-drawing panel frames with titled top edges. The cell-based progress bars
 4. ASCII: FIGlet headline, legible hero, glyph-only components.
 5. Acid: system-wide distortion and a font move off Y2K.
 6. Shared deck slide 8 ("In product"): give each aesthetic its own product mock, or at minimum swap round dots and pills for the aesthetic's own markers.
+
+---
+
+## Fix log (fx64)
+
+Worker fx64 (FX6-4, packet rev 2). Files changed: `js/aesthetics/{riso-print,xerox,xerox-punk,corporate-vandalism,acid-graphics,ascii-art}.js` and the matching `css/aesthetics/*.css`. Evidence in `S/adv/sheet-fx64-<key>.png` (A warm rec / B other mode / C green / D 390px) and `S/adv/fx64/sheet-deck-<key>-{rec,oth}.png`. The ruling was applied as the structure: riso owns colour and overprint, xerox owns the machine, xerox-punk owns the hand, and xerox and xerox-punk no longer share any component.
+
+### Riso Print
+- Fix 1 ★ done. Client colours snap to the nearest RISO drum by Lab distance (32-ink library). The primary prints as drum 1 (`printPrimary`), and the secondary and accent are overridden to drums 2 and 3. Each swatch names its drum ("PRIMARY · ORANGE · DRUM 1"), and a sixth `OVERPRINT 1×2` chip shows the multiplied colour. No ink-black is used in the art.
+- Fix 2 ★ done. The new hero is one square sheet with no shadow, a 3mm margin and crop marks. Drum 1 prints an AM halftone mass at 15° (radius driven by the field) that starves toward one edge by dot size. Drum 2 prints the initial at about 72% of the sheet height at 75° (merged dots read as solid and open into a screen where it starves), offset 2.6/1.9 with multiply. Pinholes are added. `.rza-card` is gone.
+- Fix 3 ★ done. Radius is 0 everywhere and no card, chip or plate shadow remains. The switch is a square ink block: outline when off, solid drum 1 with drum 2 offset when on. The CTA's drum-2 misregistration is a second filled layer, not an outline. Rest, drift and registered states are distinct (registered prints the overprint colour).
+- Fix 4 done. The headline comes from `def.headline` with two passes: drum 1 prints the words, and drum 2 multiplies the last word into its neighbour so the overlap shows the third colour. The yellow ring and its CSS mask are deleted. The headline is set at `clamp(56px, 11cqw, 150px)`, and the hero is now `scene`, so the type prints over the sheet.
+- Fix 5 done. The all-page noise is removed. A low-frequency mottle plus pinholes, drawn in paper colour, sits only on inked fills (CTA, chips, active segment, switch). The paper stays flat.
+- Fix 6 done. The kicker reads "Two drums, three colours" and the caption names both drums. The rules, materials and deck copy now describe AM halftone, which is what renders.
+- Fix 7: shared change requested (fit.js), see below.
+
+### Xerox
+- Fix 1 ★ done. Removed card tape, torn `#xrx-edge` card edges (sheets now have a straight edge with a 1.5px toner fringe through `#xrx-lite`), the sticky note, the highlighter, the TAKE ONE strip, and every rotation on components, tag, kicker, hero copy and art.
+- Fix 2 ★ done. The states are now Gen 1, Gen 3 and Gen 7 of the brand initial, run through `#xrx-gen1/3/7`: blur 0 / 1.1 / 1.8, toner noise, and a discrete alpha threshold that drops each generation, flooded with pure toner, with a 1–2% scale drift. One more generation is applied on headline hover (`-w` variants on the black platen).
+- Fix 3 ★ done. Toner is #111 on ONE paper stock picked from the primary's hue (canary, goldenrod, salmon, pink, lilac, blue or green at L≈90–94; white for grey). In dark mode the sheets are that stock on the lid-open black. The orange block and orange ALIVE slab are gone; ALIVE is reversed out of a black slab. The palette shows how each colour copies: the stock, toner, and secondary and accent as dot-screen density ("copies as 59% toner").
+- Fix 4 done. The lid-open slab and dither fall-off are kept. The art adds a thresholded initial, a ghost double copy 10/8 off as a sparser screen (lighter by dot size, never grey), mm edge-scale ticks with numbers, "A4 → A3 · 141% · LID OPEN · COPY 032/050", and the single primary rubber stamp.
+- Fix 5: the headline runs through the stronger `#xrx-head` filter (blur plus low threshold, so counters partly fill) at `clamp(64px, 13cqw, 168px)`. The pairing change is a shared request.
+- Fix 6 done. OFF | ON copier key with an inverted active half. Statuses are unrotated reversed-out labels with a ▮ marker. A copy-count readout (036/050, 023/050, 005/050) replaces the percent. The "No." index stays in xerox only, since xerox-punk now uses handwritten numbers.
+- Fix 7: shared change requested (drop `tornbands`; slot 1 is already the copied halftone).
+
+### Xerox Punk
+- Fix 1 ★ done. Tiles vary 0.72–1.45 in size, ±0.15em on the baseline and up to 6° of tilt, with padding of 0.04–0.18em per side and about 3px overlaps. Every 3rd–5th unit is a whole word cut from a magazine serif. About one tile in five is a one-bit photo crop with the letter knocked out in paper. Brand faces still appear every 4th tile.
+- Fix 2 ★ done. The grey-bar `.xpo` scraps are replaced by torn remnants at 22–32%: a halftone photo, giant cropped brand type (about 30cqw, running off the edge), a typed bill, and a second photo with a torn-away corner over the first.
+- Fix 3 ★ done. Tabs are three cut words in Alfa Slab, Playfair italic and Bebas, with the active one circled in marker. The toggle is a marker tick on a torn scrap. Statuses are rubber stamps (a double rule, tilted by hand). "In use" is a handwritten set list. B mode is a newsprint flyer (#D9D4C4) with black toner and one fluoro. The X box, black rotated tags and "No." index are gone.
+- Fix 4 done (phone bug). The hero grid now switches on `@container ab` (the old unnamed query was the hero querying itself, which cannot work). The strip sits under the headline, the photo and its caption follow, and the subcopy is full width. The "FIG. 1" caption is no longer covered. The headline is `clamp(30px, 10cqw, 52px)`.
+- Fix 5 done. The fluoro snaps to one of five Day-Glo-style inks: Aurora Pink #FF3FA4, Rocket Red #FF3B3B, Blaze Orange #FF6A1A, Saturn Yellow #EAFF00 and Signal Green #39FF14. The green palette now gives Signal Green instead of mint.
+- Fix 6 done. A fluoro marker strike runs through the initial on a halftone photograph, and a staple replaces the paperclip. The second marker ellipse (on the LAUNCH SITE row) is deleted.
+- Fix 7 done. The deck Material slide stages the art, which carries a ransom specimen sheet (tile anatomy, face pool, scale range, photo tiles) shown only there. `materialStage: 'pattern'` is removed.
+
+### Corporate Vandalism
+- Fix 1 ★ done. There is one foreign mark per view, in a second technology at a second angle: a Kruger bar over the headline (`def.headline`, hazard red, white bold oblique, phrase chosen by brand), a safety-yellow sticker slapped over the notice's logo strip with a peeled corner, a Dymo strip over the CTA label (board and deck Interface slide), and a red marker strike through "Spring" with a handwritten "never". The deck rule now reads "Leave the shell spotless; apply exactly one foreign mark per view".
+- Fix 2 ★ done. The `!!!` chip, the `#027…#030 ???` index and the ↗ are deleted. In their place: PO numbers (PO-2291-B), a "PROPERTY OF MARIGOLD STUDIO · DO NOT REMOVE" asset tag, and the (b)(6) stamp on the Redacted state. Influences now read "Kruger / Brandalism / Holzer / Off-White".
+- Fix 3 ★ done in the aesthetic files; the type pairing is a shared request. The palette row is labelled "Theirs (client) · Ours (fixed)", with a sixth OURS cell (hazard #E10600, safety #FFD400, black, white). The vandal face is fixed (Jost, bold oblique) and not client-selectable. Hazard and safety are now used only by the vandal layer: the announcement bar and warning label moved to the shell and ink, and the Flagged state became an ink outline with ⚑.
+- Fix 4 done. The official headline is 24–34px regular; the Kruger bar is `clamp(34px, 7.4cqw, 96px)`.
+- Fix 5 done. Only "BUTTON" and "HEADLINE" labels remain.
+- Fix 6 partly done. The cover, principles and closing carry the Kruger bar, the Interface slide carries the Dymo strip, the Colour slide shows OURS, and the Redacted state is labelled (b)(6). The Typography slide has no mark. The "swapped-poster" cover band is declined: no pattern family draws one, so a fit.js change is requested instead.
+- Export: the receipt's CSS mask is replaced by a sawtooth drawn in canvas colour.
+
+### Acid Graphics
+- Fix 1 ★ done. `def.headline` stacks lines of up to 8 letters. The first line's letters stretch 1.4–2.2 on a wave, one line is compressed to `scaleX(.62)` and stretched, and the last line is an outline with acid and clash echoes. Section titles get the same treatment, smaller. The wrapper fits the longest line to the column, so the size is `min(clamp(64px, 12cqw, 180px), column fit)`.
+- Fix 2 ★ done. Every section header has a field band (ripple, strobe rays, warped check, rings at 16–20%) and a dense info strip (catalogue no., BPM, katakana, invented sponsors, barcode). Type is a line-up bill, biggest first, with "b2b" lines.
+- Fix 3 ★: the chrome word is removed. "MARIGOLD" is an outlined triple echo (acid stroke, clash and white offsets). The font move is a shared request; until it lands the board still uses Unbounded.
+- Fix 4 done. The flyer has 10 sponsor marks at mixed sizes, a 5-pictogram warning row, a vertical katakana strip, a stub with serial "№ 000417" behind a perforation, and a second smaller ripple. The ticket's CSS mask is replaced by radial-gradient notches.
+- Fix 5 done. Ticket tabs are skewed with perforated left edges and no node handles. The toggle is an ON AIR / OFF strobe tab. Progress shows equaliser bars (a data-URI skyline).
+- Fix 6 partly done. The Colour slide shows the vibrating pair with its measured luminance delta (also on the board). Slide titles get the stretched echo treatment. Showing the flyer at half the cover needs the cover layout, which is outside these files.
+
+### ASCII Art
+- Fix 1 ★ done. The headline is block letters built from the 5x7 font, one █ per pixel with a ▒ shadow (8 rows), wrapped by words. A 4-row half-block version is used on phones (4 rows rather than 3, because the 5x7 source cannot compress further). The real text stays in the h2 aria-label.
+- Fix 2 ★ done. The hero is rasterised on a canvas in the heading face: the brand's first word on the wide panel, the initial on the narrow one. Sampling is 4×7.6 px per cell (aspect corrected), mapped to a 70-step ramp, with an edge pass that substitutes `/ \ | _ -` by gradient direction. Colour comes from one diagonal band field. Dust drifts 0.2 cells/s on a shared 5s ticker (static under reduced motion), and the foot is a live status line. The ticker re-rasterises once the font loads. The debug labels are deleted.
+- Fix 3 ★ done. Swatches are 12×3 block-shade cells. Controls: `< Design | Build | Launch >` with the active item in inverse video, `[x] Focus mode`, a framed `> Save direction █` button, and ═ rules.
+- Fix 4 done except the single-phosphor mode. Glyph colours snap to the 16 CGA colours (the 7 dark ones for primary and secondary on paper), and the client hex appears only in readouts. The canvas is #000 or #F4F1E8. Single-phosphor mode is declined because there is no framework variant control to switch it.
+- Fix 5 done. A character field (10px cells, ink at about 9%) sits behind the board, and the sections are cut out of it.
+- Fix 6: shared request (remove VT323).
+
+### Verification (fx64)
+- Board: `KEYS="…6 keys" S=fx64-b TAG=fx64 ./board.sh` gives overflow=0 on all 24 shots. The only console error is the pre-existing favicon 404.
+- Gore: `./gore.sh "<6 keys>"` on the latest build gives 24 configurations, 240 slides, **0 issues**. Mid-task, the framework's new board-row product slide plus the deck min-text pass broke `font-size: 0` replacements; the fix was to hide the original text with `visibility` instead and add deck product row layouts.
+- `node tests/run.js` passes. `harness.js`: 12 FAIL lines, all in other aesthetics (retro-futurist, wabi-sabi, dark-academia placeholders), none in these six. `src-verify-p5.js`: families 53, fails 0, map mismatches 0.
+
+### Honest re-score (fx64's own)
+- Riso 7/10. It now reads as a two-drum print. Still short: the type voice (Big Shoulders) and the cover band are not riso yet (needs the fit.js change).
+- Xerox 7/10. The copier logic is coherent. Still short: Anton stays until the pairing change, and gen 3 vs gen 7 is subtle at deck scale.
+- Xerox Punk 7.5/10. The cut is violent and the wall is real. Still short: the Typography slide is a plain specimen, and the cover band is still the shared torn stripe.
+- Corporate Vandalism 7/10. Two hands are visible. Still short: Inter Tight until the pairing change, and no swapped-poster band.
+- Acid 7/10. The board is a flyer system. Still short: Unbounded remains until the font change, and the deck cover flyer is small.
+- ASCII 7/10. Every surface is a glyph. Still short: the deck pattern suite still has pixel patterns until the fit.js change.

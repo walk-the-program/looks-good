@@ -1,8 +1,10 @@
 /* ---------------------------------------------------------------------
-   23 Micrographics — tiny, technical, precise. Reference: Acronym / Nike ISPA /
-   techwear graphics, modern Swiss posters and product spec sheets. A flat light
-   sheet, 1px ink hairlines and crop marks, one giant tight headline and glyph
-   against 7-9px mono microtype with wide tracking. Every panel carries micro
+   23 Micrographics — tiny, technical, LOUD. Reference: The Designers Republic,
+   Teenage Engineering silkscreen, Acronym hazard labels, spec sheets. A flat
+   light sheet, 1px ink hairlines and crop marks; the brand glyph is the one huge
+   element across the full plate with spec stickers ON it, orthogonal leaders,
+   knocked-out labels, a fixed safety colour (--ab-mg-safe) for the caution
+   triangle and one hazard tape; the headline drops to 48px. Every panel carries micro
    corner labels: index (top-left: the section label), code (top-right: the label
    row's ::after) and page (bottom-right: the card's ::after). Primary is only a
    handful of 3-5px marks and the one main action; accent is the headline word.
@@ -13,7 +15,8 @@
 
 .ab[data-ae="micrographics"] {
   border-radius: 0; font-size: 13px;
-  --ab-art-ratio: 2.3 / 1; --ab-art-ratio-narrow: 1 / 1.52;
+  --mg-ticks: repeating-linear-gradient(180deg, var(--ab-hair) 0 1px, transparent 1px 8px);
+  background: var(--mg-ticks) 3px 0 / 4px 100% no-repeat, var(--mg-ticks) calc(100% - 3px) 0 / 4px 100% no-repeat, var(--ab-canvas);
   --mg-micro: 500 8.5px/1.6 ui-monospace, "SF Mono", Menlo, monospace;
   --mg-crops:
     linear-gradient(var(--ab-ink), var(--ab-ink)) 0 9px / 6px 1px no-repeat, linear-gradient(var(--ab-ink), var(--ab-ink)) 9px 0 / 1px 6px no-repeat,
@@ -46,10 +49,10 @@
 .ab[data-ae="micrographics"] .ab-n { margin-right: 6px; font-weight: 700; letter-spacing: 0.1em; }
 .ab[data-ae="micrographics"] .ab-n::before { content: "["; }
 .ab[data-ae="micrographics"] .ab-n::after { content: "]"; }
-.ab[data-ae="micrographics"] .ab-sec .ab-labelrow::after { font: var(--mg-micro); font-size: 7.5px; letter-spacing: 0.18em; color: var(--ab-muted); }
-.ab[data-ae="micrographics"] .ab-sec-ui .ab-labelrow::after { content: "MG–0412–A"; }
-.ab[data-ae="micrographics"] .ab-sec-touch .ab-labelrow::after { content: "MG–0412–B"; }
-.ab[data-ae="micrographics"] .ab-sec-use .ab-labelrow::after { content: "MG–0412–C"; }
+.ab[data-ae="micrographics"] .ab-sec .ab-labelrow::after { font: var(--mg-micro); font-size: 8px; letter-spacing: 0.14em; color: var(--ab-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+.ab[data-ae="micrographics"] .ab-sec-ui .ab-labelrow::after { content: var(--mg-d-a, "MG–0412–A"); }
+.ab[data-ae="micrographics"] .ab-sec-touch .ab-labelrow::after { content: var(--mg-d-b, "MG–0412–B"); }
+.ab[data-ae="micrographics"] .ab-sec-use .ab-labelrow::after { content: var(--mg-d-c, "MG–0412–C"); }
 
 /* header */
 .ab[data-ae="micrographics"] .ab-head { padding-top: 6px; }
@@ -64,8 +67,9 @@
 .ab[data-ae="micrographics"][data-hero="centered"] .ab-hero-copy { max-width: none; text-align: left; }
 .ab[data-ae="micrographics"] .ab-kicker { display: flex; justify-content: space-between; gap: 12px; margin-bottom: clamp(18px, 2.6cqw, 28px) !important; padding-top: 7px; border-top: 1px solid var(--ab-ink); color: var(--ab-ink); font-weight: 700; }
 .ab[data-ae="micrographics"] .ab-kicker::after { content: "N 51.5074° · W 0.1278° · REV 03"; font-weight: 500; color: var(--ab-muted); }
-.ab[data-ae="micrographics"] .ab-headline { font-weight: var(--ab-hw, 700); letter-spacing: calc(-0.058em * var(--ab-tr, 1)); line-height: 0.88; text-wrap: balance; }
-.ab[data-ae="micrographics"] .ab-hl { position: relative; color: var(--ab-accent-ink); background: none; background-image: none; }
+.ab[data-ae="micrographics"] .ab-headline { font-weight: var(--ab-hw, 700); letter-spacing: calc(-0.04em * var(--ab-tr, 1)); line-height: 0.95; text-wrap: balance; }
+.ab[data-ae="micrographics"] .ab-hero .ab-headline { font-size: calc(48px * var(--ab-display, 1)); max-width: 14em; }
+.ab[data-ae="micrographics"] .ab-hl { position: relative; color: var(--ab-ink); background: none; background-image: none; }
 .ab[data-ae="micrographics"][data-accent-text="low"] .ab-hl { background-image: none; }
 .ab[data-ae="micrographics"] .ab-hl::after { content: "(01)"; position: relative; top: -0.52em; margin-left: 0.28em; font: 500 8.5px/1 ui-monospace, "SF Mono", Menlo, monospace; letter-spacing: 0.14em; color: var(--ab-ink); vertical-align: baseline; }
 .ab[data-ae="micrographics"][data-hero="centered"] .ab-subcopy { margin-left: 0 !important; margin-right: 0 !important; }
@@ -74,56 +78,62 @@
 .ab[data-ae="micrographics"] .ab-sub-lead { font-weight: 600; }
 .ab[data-ae="micrographics"] .ab-sub-rest { color: var(--ab-muted); }
 
-/* ---- the spec plate ---- */
-.ab[data-ae="micrographics"] .ab-art { border: 1px solid var(--ab-ink); }
+/* ---- the spec plate: the glyph across the full plate, stickers on it ---- */
+.ab[data-ae="micrographics"][data-hero="centered"] .ab-art { aspect-ratio: auto; max-width: none; width: auto; justify-self: stretch; margin-inline: calc(var(--ab-pad) * -1 + 10px); border: 1px solid var(--ab-ink); }
 .ab[data-ae="micrographics"] .mga {
-  position: absolute; inset: 0; display: grid; grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.6fr) minmax(0, 0.9fr); gap: 0 clamp(8px, 2cqw, 20px); padding: 34px clamp(12px, 2.2cqw, 20px);
-  font: var(--mg-micro); font-size: clamp(6px, 1.02cqw, 8.4px); letter-spacing: 0.16em; text-transform: uppercase; color: var(--ab-ink);
+  position: relative; aspect-ratio: 1.36 / 1; container-type: size; overflow: hidden;
+  font: var(--mg-micro); font-size: clamp(8px, 1cqw, 8.6px); letter-spacing: 0.14em; text-transform: uppercase; color: var(--ab-ink);
 }
 .ab[data-ae="micrographics"] .mga p { margin: 0; }
-.ab[data-ae="micrographics"] .mga b { font-weight: 700; }
-.ab[data-ae="micrographics"] .mga-corner { position: absolute; font-size: 0.92em; color: var(--ab-muted); }
+.ab[data-ae="micrographics"] .mga b, .ab[data-ae="micrographics"] .mga-under b { font-weight: 700; }
+.ab[data-ae="micrographics"] .mga-corner { position: absolute; z-index: 4; font-size: 0.92em; color: var(--ab-muted); }
 .ab[data-ae="micrographics"] .mga-c-tl { left: 12px; top: 7px; } .ab[data-ae="micrographics"] .mga-c-tr { right: 12px; top: 7px; }
 .ab[data-ae="micrographics"] .mga-c-bl { left: 12px; bottom: 7px; } .ab[data-ae="micrographics"] .mga-c-br { right: 12px; bottom: 7px; color: var(--ab-ink); font-weight: 700; }
-.ab[data-ae="micrographics"] .mga-ruler { position: absolute; left: 12px; right: 12px; height: 12px; display: flex; justify-content: space-between; font-size: 0.82em; color: var(--ab-muted); }
+.ab[data-ae="micrographics"] .mga-ruler { position: absolute; z-index: 4; left: 12px; right: 12px; height: 12px; display: flex; justify-content: space-between; font-size: 0.82em; color: var(--ab-muted); }
 .ab[data-ae="micrographics"] .mga-ruler i { font-style: normal; }
-.ab[data-ae="micrographics"] .mga-r-t { top: 17px; align-items: flex-start; background: repeating-linear-gradient(90deg, var(--ab-hair) 0 1px, transparent 1px 6px) 0 100% / 100% 4px no-repeat, repeating-linear-gradient(90deg, var(--ab-ink) 0 1px, transparent 1px 30px) 0 100% / 100% 7px no-repeat; }
-.ab[data-ae="micrographics"] .mga-r-b { bottom: 17px; align-items: flex-end; background: repeating-linear-gradient(90deg, var(--ab-hair) 0 1px, transparent 1px 6px) 0 0 / 100% 4px no-repeat, repeating-linear-gradient(90deg, var(--ab-ink) 0 1px, transparent 1px 30px) 0 0 / 100% 7px no-repeat; }
-.ab[data-ae="micrographics"] .mga-col { min-width: 0; display: flex; flex-direction: column; gap: 9px; padding-top: 6px; }
-.ab[data-ae="micrographics"] .mga-l { border-right: 1px solid var(--ab-hair-soft); padding-right: clamp(6px, 1.4cqw, 14px); }
-.ab[data-ae="micrographics"] .mga-r { border-left: 1px solid var(--ab-hair-soft); padding-left: clamp(6px, 1.4cqw, 14px); }
-.ab[data-ae="micrographics"] .mga-h { line-height: 1.7; }
-.ab[data-ae="micrographics"] .mga-note { margin-top: auto !important; color: var(--ab-muted); line-height: 1.7; }
-.ab[data-ae="micrographics"] .mga-tab { display: grid; border-top: 1px solid var(--ab-ink); }
-.ab[data-ae="micrographics"] .mga-row { display: grid; grid-template-columns: 2.2ch 4.2ch minmax(0, 1fr); gap: 0 1.3em; padding: 3px 0; border-bottom: 1px solid var(--ab-hair-soft); white-space: nowrap; }
-.ab[data-ae="micrographics"] .mga-row span:nth-child(1) { color: var(--ab-muted); }
-.ab[data-ae="micrographics"] .mga-row span:nth-child(3) { overflow: hidden; text-overflow: ellipsis; letter-spacing: 0.08em; }
-.ab[data-ae="micrographics"] .mga-sq { display: inline-block; width: 4px; height: 4px; margin-right: 0.7em; vertical-align: 0.1em; background: var(--ab-ink); }
-.ab[data-ae="micrographics"] .mga-sq-p { background: var(--ab-primary); }
-.ab[data-ae="micrographics"] .mga-sq-s { background: var(--ab-secondary); }
-.ab[data-ae="micrographics"] .mga-glyph { position: relative; min-width: 0; container-type: size; }
-/* the glyph is fitted to the drawn metric guides: its top is the cap line (34%), its trimmed bottom the baseline (78%); 44% of the box = cap height (0.72em assumed) */
+.ab[data-ae="micrographics"] .mga-r-t { top: 17px; align-items: flex-start; background: repeating-linear-gradient(90deg, var(--ab-hair) 0 1px, transparent 1px 8px) 0 100% / 100% 4px no-repeat, repeating-linear-gradient(90deg, var(--ab-ink) 0 1px, transparent 1px 40px) 0 100% / 100% 7px no-repeat; }
+.ab[data-ae="micrographics"] .mga-r-b { bottom: 17px; align-items: flex-end; background: repeating-linear-gradient(90deg, var(--ab-hair) 0 1px, transparent 1px 8px) 0 0 / 100% 4px no-repeat, repeating-linear-gradient(90deg, var(--ab-ink) 0 1px, transparent 1px 40px) 0 0 / 100% 7px no-repeat; }
+.ab[data-ae="micrographics"] .mga-glyph { position: absolute; inset: 0; }
+/* the glyph: top at the cap line (10%), trimmed bottom at the baseline (88%); 78% of the plate = cap height */
 .ab[data-ae="micrographics"] .mga-gl {
-  position: absolute; left: 49%; top: 34%; transform: translateX(-50%); white-space: nowrap; color: var(--ab-ink);
-  font-family: var(--ab-font-h); font-weight: var(--ab-hw, 700); font-size: calc(44cqh / 0.72); line-height: 1; text-box: trim-both cap alphabetic; letter-spacing: 0; text-transform: none;
+  position: absolute; left: 50%; top: 10%; transform: translateX(-50%); white-space: nowrap; color: var(--ab-ink);
+  font-family: var(--ab-font-h); font-weight: var(--ab-hw, 700); font-size: calc(min(78cqh, 64cqw) / 0.72); line-height: 1; text-box: trim-both cap alphabetic; letter-spacing: 0; text-transform: none;
 }
-.ab[data-ae="micrographics"] .mga-gl.is-o { transform: translate(calc(-50% + 3.5px), 3px); color: transparent; -webkit-text-stroke: 1px var(--ab-hair); }
-.ab[data-ae="micrographics"] .mga-g, .ab[data-ae="micrographics"] .mga-lines { position: absolute; inset: 0; width: 100%; height: 100%; display: block; overflow: visible; }
-.ab[data-ae="micrographics"] .mga-call { position: absolute; line-height: 1.55; white-space: nowrap; font-size: var(--mg-call-fs, inherit); }
-.ab[data-ae="micrographics"] .mga-call em { display: var(--mg-em-display, inline); font-style: normal; color: var(--ab-muted); letter-spacing: 0.1em; }
-.ab[data-ae="micrographics"] .mga-call.mga-sr { transform: translateX(-100%); text-align: right; }
-.ab[data-ae="micrographics"] .mga-call.mga-sc { transform: translateX(-50%); text-align: center; }
-.ab[data-ae="micrographics"] .mga-mk { position: absolute; width: 9px; height: 9px; margin: -4.5px 0 0 -4.5px; }
+.ab[data-ae="micrographics"] .mga-gl.is-o { transform: translate(calc(-50% + 5px), 4px); color: transparent; -webkit-text-stroke: 1px var(--ab-hair); }
+.ab[data-ae="micrographics"] .mga-lines { position: absolute; inset: 0; z-index: 1; width: 100%; height: 100%; display: block; overflow: visible; }
+/* labels knock out what is behind them; y snaps to the 8px baseline */
+.ab[data-ae="micrographics"] .mga-call {
+  position: absolute; z-index: 3; left: var(--x); left: clamp(48px, var(--x), calc(100% - 48px)); top: var(--y); top: round(nearest, var(--y), 8px); transform: translate(-50%, -50%);
+  padding: 1px 3px; background: var(--ab-canvas); line-height: 1.5; white-space: nowrap;
+}
+.ab[data-ae="micrographics"] .mga-call em { font-style: normal; color: var(--ab-muted); letter-spacing: 0.08em; }
+.ab[data-ae="micrographics"] .mga-mk { position: absolute; z-index: 2; width: 9px; height: 9px; margin: -4.5px 0 0 -4.5px; }
 .ab[data-ae="micrographics"] .mga-mk::before {
   content: ""; position: absolute; inset: -4px; border: 1px solid var(--ab-ink); border-radius: 50%; background-color: var(--ab-canvas);
   background-image: linear-gradient(var(--ab-ink), var(--ab-ink)), linear-gradient(var(--ab-ink), var(--ab-ink)); background-position: center; background-size: 100% 1px, 1px 100%; background-repeat: no-repeat;
 }
 .ab[data-ae="micrographics"] .mga-mk.is-p::after { content: ""; position: absolute; left: 3px; top: 3px; width: 3px; height: 3px; background: var(--ab-primary); }
+/* stickers: canvas-backed, 1px ink, laid over the glyph */
+.ab[data-ae="micrographics"] .mga-stk { position: absolute; z-index: 3; display: flex; flex-direction: column; gap: 6px; padding: 8px 9px; background: var(--ab-canvas); box-shadow: inset 0 0 0 1px var(--ab-ink); }
+.ab[data-ae="micrographics"] .mga-stk-spec { left: 4%; top: 54%; width: 29%; }
+.ab[data-ae="micrographics"] .mga-stk-qr { right: 4%; top: 16%; width: 22%; }
+.ab[data-ae="micrographics"] .mga-stk-hz { right: 6%; top: 57%; width: 30%; padding-top: 0; overflow: hidden; }
+.ab[data-ae="micrographics"] .mga-tape { display: block; height: 10px; margin: 0 -9px 2px; background: repeating-linear-gradient(-45deg, var(--ab-mg-safe) 0 6px, var(--ab-ink) 6px 12px); }
+.ab[data-ae="micrographics"] .mga-h { line-height: 1.6; }
+.ab[data-ae="micrographics"] .mga-note { color: var(--ab-muted); line-height: 1.6; }
+.ab[data-ae="micrographics"] .mga-tab { display: grid; border-top: 1px solid var(--ab-ink); }
+.ab[data-ae="micrographics"] .mga-row { display: grid; grid-template-columns: 2.2ch 4.2ch minmax(0, 1fr); gap: 0 1.1em; padding: 2px 0; border-bottom: 1px solid var(--ab-hair-soft); white-space: nowrap; }
+.ab[data-ae="micrographics"] .mga-row span:nth-child(1) { color: var(--ab-muted); }
+.ab[data-ae="micrographics"] .mga-row span:nth-child(3) { overflow: hidden; text-overflow: ellipsis; letter-spacing: 0.06em; }
+.ab[data-ae="micrographics"] .mga-sq { display: inline-block; width: 4px; height: 4px; margin-right: 0.7em; vertical-align: 0.1em; background: var(--ab-ink); }
+.ab[data-ae="micrographics"] .mga-sq-p { background: var(--ab-primary); }
+.ab[data-ae="micrographics"] .mga-sq-s { background: var(--ab-secondary); }
 .ab[data-ae="micrographics"] .mga-qrrow { display: flex; align-items: flex-start; gap: 10px; }
-.ab[data-ae="micrographics"] .mga-qr { flex: none; width: clamp(34px, 6.4cqw, 54px); height: auto; aspect-ratio: 1; }
-.ab[data-ae="micrographics"] .mga-warn { display: flex; flex-direction: column; gap: 4px; line-height: 1.6; }
-.ab[data-ae="micrographics"] .mga-warn svg { width: 12px; height: 11px; }
-.ab[data-ae="micrographics"] .mga-bar { display: block; width: 100%; height: clamp(12px, 2.4cqw, 20px); }
+.ab[data-ae="micrographics"] .mga-qr { flex: none; width: clamp(38px, 6.4cqw, 58px); height: auto; aspect-ratio: 1; }
+.ab[data-ae="micrographics"] .mga-warn { display: flex; flex-direction: column; gap: 4px; line-height: 1.5; }
+.ab[data-ae="micrographics"] .mga-warn svg { width: 16px; height: 15px; }
+.ab[data-ae="micrographics"] .mga-bar { display: block; width: 100%; height: clamp(14px, 2.4cqw, 22px); }
+.ab[data-ae="micrographics"] .mga-under { display: none; }
 
 /* palette: spec swatches */
 .ab[data-ae="micrographics"] .ab-palette { position: relative; padding-bottom: 38px; }
@@ -140,9 +150,9 @@
 .ab[data-ae="micrographics"] .ab-type { position: relative; padding-bottom: 38px; }
 .ab[data-ae="micrographics"] .ab-type::after { content: "P.02/04"; }
 .ab[data-ae="micrographics"] .ab-type-grid { counter-reset: mgtc; }
-.ab[data-ae="micrographics"] .ab-type-col { position: relative; counter-increment: mgtc; padding: 20px 14px 12px; border: 1px solid var(--ab-ink); }
-.ab[data-ae="micrographics"] .ab-type-col::before { content: "T." counter(mgtc, decimal-leading-zero); position: absolute; left: 14px; top: 7px; font: var(--mg-micro); font-size: 7.5px; letter-spacing: 0.18em; color: var(--ab-muted); }
-.ab[data-ae="micrographics"] .ab-type-col::after { content: "MG–T" counter(mgtc); position: absolute; right: 14px; top: 7px; font: var(--mg-micro); font-size: 7.5px; letter-spacing: 0.18em; color: var(--ab-muted); }
+.ab[data-ae="micrographics"] .ab-type-col { position: relative; counter-increment: mgtc; padding: 22px 0 12px; border: 0; border-top: 1px solid var(--ab-ink); }
+.ab[data-ae="micrographics"] .ab-type-col::before { content: "T." counter(mgtc, decimal-leading-zero); position: absolute; left: 0; top: 7px; font: var(--mg-micro); font-size: 7.5px; letter-spacing: 0.18em; color: var(--ab-muted); }
+.ab[data-ae="micrographics"] .ab-type-col::after { content: "MG–T" counter(mgtc); position: absolute; right: 0; top: 7px; font: var(--mg-micro); font-size: 7.5px; letter-spacing: 0.18em; color: var(--ab-muted); }
 .ab[data-ae="micrographics"] .ab-type-role { margin-top: 4px; color: var(--ab-ink); font-weight: 700; }
 .ab[data-ae="micrographics"] .ab-type-class { margin: 2px 0 12px !important; color: var(--ab-muted); }
 .ab[data-ae="micrographics"] .ab-type-pick { font-size: 12.5px; line-height: 1.5; font-weight: var(--ab-type-pick-w, 600); letter-spacing: 0; }
@@ -217,7 +227,7 @@
 .ab[data-ae="micrographics"] .ab-row-status { padding: 0; border-radius: 0; background: none; font: 500 8px/1 ui-monospace, "SF Mono", Menlo, monospace; letter-spacing: 0.18em; text-transform: uppercase; color: var(--ab-ink); }
 .ab[data-ae="micrographics"] .ab-row-status::before { content: "["; } .ab[data-ae="micrographics"] .ab-row-status::after { content: "]"; }
 .ab[data-ae="micrographics"] .ab-row-bar { height: 7px; border-radius: 0; background: linear-gradient(var(--ab-hair), var(--ab-hair)) 0 50% / 100% 1px no-repeat, repeating-linear-gradient(90deg, var(--ab-hair) 0 1px, transparent 1px 10%) 0 100% / 100% 3px no-repeat; }
-.ab[data-ae="micrographics"] .ab-row-bar i { height: 100%; background: linear-gradient(var(--ab-secondary), var(--ab-secondary)) 0 50% / 100% 3px no-repeat; }
+.ab[data-ae="micrographics"] .ab-row-bar i { height: 100%; background: linear-gradient(var(--ab-ink), var(--ab-ink)) 0 50% / 100% 3px no-repeat; }
 .ab[data-ae="micrographics"] .ab-row-pct { font: 600 9px/1 ui-monospace, "SF Mono", Menlo, monospace; letter-spacing: 0.08em; }
 
 /* footer */
@@ -227,17 +237,15 @@
 
 .ab[data-ae="micrographics"] .ab-seg-btn:focus-visible, .ab[data-ae="micrographics"] .ab-cta:focus-visible, .ab[data-ae="micrographics"] .ab-switch:focus-visible, .ab[data-ae="micrographics"] .ab-type-apply:focus-visible { outline: 1px solid var(--ab-ink); outline-offset: 4px; }
 
-/* the plate on a phone: glyph on top, the two clusters side by side under it */
-@container (max-width: 560px) {
-  .ab[data-ae="micrographics"] .mga { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); grid-template-rows: minmax(0, 1.05fr) minmax(0, 1fr); padding: 32px 10px; gap: 8px 10px; }
-  .ab[data-ae="micrographics"] .mga-glyph { grid-column: 1 / -1; grid-row: 1; }
-  .ab[data-ae="micrographics"] .mga-l { grid-column: 1; grid-row: 2; font-size: 6px; }
-  .ab[data-ae="micrographics"] .mga-r { grid-column: 2; grid-row: 2; font-size: 6px; }
-  /* set on .mga: .mga-glyph is itself a size container now, so a query on .mga-call would measure the glyph box, not the plate */
-  .ab[data-ae="micrographics"] .mga { --mg-call-fs: 5.8px; --mg-em-display: none; }
-  .ab[data-ae="micrographics"] .mga-row { grid-template-columns: 2ch 3.6ch minmax(0, 1fr); }
-  .ab[data-ae="micrographics"] .mga-note { display: none; }
-  .ab[data-ae="micrographics"] .mga-ruler { font-size: 0.8em; }
+/* the plate on a phone: crop to the glyph with four callouts; the spec table and QR move under it */
+@container ab (max-width: 600px) {
+  .ab[data-ae="micrographics"][data-hero="centered"] .ab-art { margin-inline: calc(var(--ab-pad) * -1 + 6px); }
+  .ab[data-ae="micrographics"] .mga { aspect-ratio: 1 / 0.8; font-size: 8px; letter-spacing: 0.1em; }
+  .ab[data-ae="micrographics"] .mga-stk, .ab[data-ae="micrographics"] .mga-nph, .ab[data-ae="micrographics"] .mga-call em,
+  .ab[data-ae="micrographics"] .mga-c-bl, .ab[data-ae="micrographics"] .mga-r-b { display: none; }
+  .ab[data-ae="micrographics"] .mga-under { display: grid; gap: 12px; padding: 12px 10px; border-top: 1px solid var(--ab-ink); font: var(--mg-micro); font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ab-ink); }
+  .ab[data-ae="micrographics"] .mga-under p { margin: 0; }
+  .ab[data-ae="micrographics"] .mga-under-r { display: grid; gap: 8px; }
 }
 @container ab (max-width: 600px) {
   .ab[data-ae="micrographics"] .ab-kicker::after { content: "REV 03"; }
@@ -246,7 +254,17 @@
   .ab[data-ae="micrographics"] .ab-row-n { grid-row: 1 / span 2; align-self: start; }
   .ab[data-ae="micrographics"] .ab-states { gap: 8px; }
   .ab[data-ae="micrographics"] .ab-labelrow { margin-bottom: 18px; }
+  .ab[data-ae="micrographics"] .ab-hero .ab-headline { font-size: calc(36px * var(--ab-display, 1)); }
+  .ab[data-ae="micrographics"] .ab-sec .ab-labelrow::after { font-size: 7.5px; letter-spacing: 0.06em; max-width: 55%; }
 }
+
+/* ---- deck ---- */
+/* cover: the plate is the cover (full slide width beside a compact headline) */
+.ab[data-ae="micrographics"].ab-slide[data-slide="cover"] .ab-deck-cover .ab-hero { grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.6fr); align-items: end; gap: 28px; }
+.ab[data-ae="micrographics"].ab-slide[data-slide="cover"] .ab-deck-cover .ab-art { margin: 0; width: 100% !important; max-width: none !important; }
+.ab[data-ae="micrographics"].ab-slide[data-slide="cover"] .mga { aspect-ratio: auto; height: 400px; }
+/* principles: the motto is the one huge element of its slide */
+.ab[data-ae="micrographics"].ab-slide[data-slide="principles"] .ab-headline.ab-deck-h { font-size: calc(var(--dk-fs, 60px) * 1.8 * var(--ab-hs, 1)); line-height: 0.88; }
 @media (prefers-reduced-motion: reduce) {
   .ab[data-ae="micrographics"] .ab-switch::before, .ab[data-ae="micrographics"] .ab-cta { transition: none; }
 }

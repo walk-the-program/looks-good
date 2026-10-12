@@ -1,24 +1,24 @@
 /* ---------------------------------------------------------------------
-   27 Corporate Vandalism — official, hijacked, deadpan. Every selector is scoped
-   under .ab[data-ae="corporate-vandalism"]. A flat, square, tidy procurement-software
-   shell (white or #000, 1px ink borders, no radius, no shadow, no rotation) with a FIXED
-   vandal layer: black redaction bars, a hazard-red warning label, a safety-yellow
-   "!!!" chip, a mono receipt. One intrusion per screen. Vars from tokens():
-   --ab-hazard, --ab-safety, --cv-paper (document paper), --cv-bd (1px border),
-   --cv-rest (resting index grey), --cv-receipt (white thermal paper in both modes), --cv-form (neutral grey form panel),
-   --cv-hw (heading weight), --cv-shell / --cv-on-shell / --cv-ul (the official shell: primary, or ink with a primary underline
-   when the primary sits next to the hazard red). The second party: literal quoted labels on the UI parts, a zip-tied hazard tag
-   on the notice, bureaucratic redaction, an MSCHF mono index.
-   Hooks: hero 'split', highlight 'custom', states 'button', label face = mono.
+   27 Corporate Vandalism — two hands. THEIRS: a flat, square, tidy procurement shell
+   in the client palette (white or #000, 1px ink borders, no radius, no shadow, PO
+   numbers, asset tags, a notice with its own redaction bars). OURS, on top, fixed and
+   never client-coloured: one foreign mark per view in a different technology and angle
+   (a Kruger bar over the headline, a sticker over the logo, a Dymo strip over the CTA,
+   a marker strike in the list), hazard red #E10600, safety yellow #FFD400, black,
+   white and a bold-oblique vandal face (--cv-vandal). Vars from tokens(): --ab-hazard,
+   --ab-safety, --cv-paper, --cv-bd, --cv-rest, --cv-receipt, --cv-form, --cv-hw,
+   --cv-shell / --cv-on-shell / --cv-ul, --cv-vandal, --cv-brand (asset tag text).
+   Hooks: hero 'split', def.headline (official headline + Kruger bar), states 'button'.
+   No CSS masks (export-safe): the receipt edge is a sawtooth drawn in canvas colour.
 ------------------------------------------------------------------------ */
 
 .ab[data-ae="corporate-vandalism"] { border-radius: 0; --cv-mono: ui-monospace, "SF Mono", Menlo, monospace; }
 
-/* the official notice strip: FIXED safety yellow (a vandal colour, never the client accent), one line above the header (board only) */
+/* the corporation's announcement bar, in the official shell colour, one line above the header (board only) */
 .ab[data-ae="corporate-vandalism"]:not(.ab-slide) > .ab-in::before {
   content: "Notice: this document has been reviewed. Please review it again.";
   display: block; margin: calc(var(--ab-pad) * -1) calc(var(--ab-pad) * -1) var(--ab-pad); padding: 6px var(--ab-pad);
-  background: var(--ab-safety); color: #000;
+  background: var(--cv-shell); color: var(--cv-on-shell);
   font: 600 10px/1.5 var(--cv-mono); letter-spacing: 0.08em; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
 
@@ -26,9 +26,6 @@
 .ab[data-ae="corporate-vandalism"] .ab-brand { font-weight: var(--cv-hw, 700); letter-spacing: calc(-0.03em * var(--ab-tr, 1)); }
 .ab[data-ae="corporate-vandalism"] .ab-mark { width: 24px; height: 24px; border-radius: 0; font-size: 13px; font-weight: var(--cv-hw, 700); }
 .ab[data-ae="corporate-vandalism"] .ab-tag { font-size: 10px; letter-spacing: 0.1em; color: var(--ab-muted); }
-.ab[data-ae="corporate-vandalism"] .ab-tag::after {
-  content: "!!!"; display: inline-block; margin-left: 10px; padding: 1px 5px; background: var(--ab-safety); color: #000; font-weight: 700; letter-spacing: 0.04em; vertical-align: 1px;
-}
 .ab[data-ae="corporate-vandalism"] .ab-tag b { color: var(--ab-ink); font-weight: 600; }
 
 /* dividers: a 1px line with a registration tick at each end */
@@ -39,37 +36,30 @@
     linear-gradient(var(--cv-bd), var(--cv-bd)) calc(100% - 5px) 50% / 1px 11px no-repeat;
 }
 
-/* labels: mono caps. Quotation marks are the Off-White literal labels (a part named as itself: "BUTTON", "TEXT FIELD" ...)
-   pinned above the part, plus the deck material slide's list items; nothing is scare-quoted. */
-.ab[data-ae="corporate-vandalism"] .ab-seg::after, .ab[data-ae="corporate-vandalism"] .ab-toggle::after, .ab[data-ae="corporate-vandalism"] .ab-cta:not(.ab-state-ctl)::after, .ab[data-ae="corporate-vandalism"] .ab-fieldlabel::after, .ab[data-ae="corporate-vandalism"] .ab-list::before {
-  font: 600 9px/1 var(--cv-mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--ab-ink); white-space: nowrap; pointer-events: none;
-}
-.ab[data-ae="corporate-vandalism"] .ab-seg { position: relative; margin-top: 14px; }
-.ab[data-ae="corporate-vandalism"] .ab-seg::after { content: '"TABS"'; position: absolute; left: 0; top: -14px; }
+/* labels: mono caps. Exactly two Off-White literal labels per screen: "BUTTON" on the CTA and "HEADLINE" on the headline */
 .ab[data-ae="corporate-vandalism"] .ab-cta:not(.ab-state-ctl) { position: relative; overflow: visible; }
-.ab[data-ae="corporate-vandalism"] .ab-cta:not(.ab-state-ctl)::after { content: '"BUTTON"'; position: absolute; left: -2px; top: -15px; }
-.ab[data-ae="corporate-vandalism"] .ab-fieldlabel { display: flex; justify-content: space-between; gap: 8px; }
-.ab[data-ae="corporate-vandalism"] .ab-fieldlabel::after { content: '"TEXT FIELD"'; }
-.ab[data-ae="corporate-vandalism"] .ab-toggle { position: relative; margin-top: 16px; }
-.ab[data-ae="corporate-vandalism"] .ab-toggle::after { content: '"CHECKBOX"'; position: absolute; left: 0; top: -15px; }
-.ab[data-ae="corporate-vandalism"] .ab-list::before { content: '"PROJECTS"'; display: block; margin-bottom: 8px; }
+.ab[data-ae="corporate-vandalism"] .ab-cta:not(.ab-state-ctl)::after { content: '"BUTTON"'; position: absolute; left: -2px; top: -15px; font: 600 9px/1 var(--cv-mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--ab-ink); white-space: nowrap; pointer-events: none; }
 .ab[data-ae="corporate-vandalism"]:not(.ab-slide) .ab-headline::before, .ab[data-ae="corporate-vandalism"].ab-slide[data-slide="cover"] .ab-headline::before {
-  content: '"HEADLINE"'; display: block; margin-bottom: 14px; font: 600 9px/1 var(--cv-mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--ab-ink); font-weight: 600;
+  content: '"HEADLINE"'; display: block; margin-bottom: 10px; font: 600 9px/1 var(--cv-mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--ab-ink);
 }
 .ab[data-ae="corporate-vandalism"] .ab-label { font-size: 11px; letter-spacing: 0.08em; color: var(--ab-ink); text-transform: uppercase; }
 .ab[data-ae="corporate-vandalism"] .ab-label:last-child:not(:first-child) { color: var(--ab-muted); }
 .ab[data-ae="corporate-vandalism"] .ab-n::after { content: "  "; }
 .ab[data-ae="corporate-vandalism"] .ab-n { color: var(--ab-muted); font-size: 10px; }
-.ab[data-ae="corporate-vandalism"] .ab-deck-mat .ab-label > span:not(.ab-n)::before, .ab[data-ae="corporate-vandalism"] .ab-deck-mat .ab-label > span:not(.ab-n)::after { content: '"'; }
 
 /* hero: giant sentence-case headline against 10px labels, the notice on the right */
 .ab[data-ae="corporate-vandalism"] .ab-hero { grid-template-columns: minmax(0, 1.18fr) minmax(0, 1fr); align-items: start; gap: clamp(18px, 3.4cqw, 38px); padding: clamp(26px, 4.4cqw, 50px) 0; }
 .ab[data-ae="corporate-vandalism"] .ab-kicker { margin-bottom: 18px !important; font-size: 10.5px; letter-spacing: 0.1em; color: var(--ab-muted); }
 .ab[data-ae="corporate-vandalism"] .ab-kicker::before { content: "[ ] "; white-space: pre; color: var(--ab-ink); }
-.ab[data-ae="corporate-vandalism"] .ab-headline {
-  font-weight: var(--cv-hw, 700); letter-spacing: calc(-0.02em * var(--ab-tr, 1)); line-height: 0.98; text-wrap: wrap;
-}
-.ab[data-ae="corporate-vandalism"] .ab-hl { color: var(--ab-ink); background: none; padding: 0; margin: 0; }
+/* the official headline is small and bored (a policy title); the vandal's Kruger bar over it carries display scale */
+.ab[data-ae="corporate-vandalism"] .ab-headline { font-weight: 400; letter-spacing: calc(-0.01em * var(--ab-tr, 1)); line-height: 1.12; text-wrap: wrap; }
+.ab[data-ae="corporate-vandalism"]:not(.ab-slide) .ab-headline { font-size: calc(clamp(24px, 2.7cqw, 34px) * var(--ab-hs, 1)); }
+.ab[data-ae="corporate-vandalism"] .cvh-o { display: block; max-width: 18em; }
+.ab[data-ae="corporate-vandalism"] .cvh-k { position: relative; z-index: 2; display: block; margin: 0.06em 0 0 -0.04em; transform: rotate(-2deg); transform-origin: 0 50%; font: italic 800 2.9em/1.08 var(--cv-vandal); letter-spacing: -0.01em; text-transform: uppercase; }
+.ab[data-ae="corporate-vandalism"]:not(.ab-slide) .cvh-k { font-size: clamp(34px, 7.4cqw, 96px); }
+.ab[data-ae="corporate-vandalism"].ab-slide .cvh-k { font-size: 1.45em; margin-top: -0.12em; }
+.ab[data-ae="corporate-vandalism"].ab-slide .cvh-o { max-width: none; }
+.ab[data-ae="corporate-vandalism"] .cvh-k > span { background: var(--ab-hazard); color: #fff; padding: 0.02em 0.16em 0.06em; -webkit-box-decoration-break: clone; box-decoration-break: clone; }
 .ab[data-ae="corporate-vandalism"] .ab-subcopy { max-width: 28em; font-size: clamp(13px, 1.45cqw, 15px); }
 .ab[data-ae="corporate-vandalism"] .ab-sub-lead { color: var(--ab-ink); font-weight: 600; }
 
@@ -77,9 +67,15 @@
 .ab[data-ae="corporate-vandalism"] .ab-art { max-width: none; aspect-ratio: auto; justify-self: stretch; container-type: inline-size; }
 .ab[data-ae="corporate-vandalism"] .cva { display: grid; grid-template-columns: minmax(0, 1fr) 37%; gap: 12px; align-items: start; font-family: var(--cv-mono); color: #000; }
 .ab[data-ae="corporate-vandalism"] .cva-doc { position: relative; background: var(--cv-paper); border: 1px solid var(--cv-bd); }
-/* the applied second party: a hazard-red zip-tie tag physically overlapping the notice's top corner (no rotation) */
-.ab[data-ae="corporate-vandalism"] .cva-tag { position: absolute; z-index: 3; right: -9px; top: -10px; padding: 3px 7px; background: var(--ab-hazard); color: #fff; font: 700 9px/1.2 var(--cv-mono); letter-spacing: 0.06em; white-space: nowrap; }
-.ab[data-ae="corporate-vandalism"] .cva-tag::before { content: ""; position: absolute; right: 100%; top: 50%; width: 26px; height: 1px; background: #000; }
+/* the vandal's sticker, slapped over the corporation's logo strip: safety yellow vinyl, a hard white keyline, one corner peeled */
+.ab[data-ae="corporate-vandalism"] .cva-stk {
+  position: absolute; z-index: 3; left: -10px; top: -12px; display: grid; place-items: center; width: 62px; height: 62px; border-radius: 50%;
+  background: var(--ab-safety); color: #111; box-shadow: 0 0 0 1.5px #fff, 1px 2px 3px rgba(0, 0, 0, 0.35); transform: rotate(-11deg);
+  clip-path: polygon(0 0, 100% 0, 100% 72%, 72% 100%, 0 100%); text-align: center; line-height: 1;
+}
+.ab[data-ae="corporate-vandalism"] .cva-stk::after { content: ""; position: absolute; right: 0; bottom: 0; width: 28%; height: 28%; background: linear-gradient(135deg, transparent 50%, #e9e6dc 50%); border-radius: 0 0 60% 0; }
+.ab[data-ae="corporate-vandalism"] .cva-stk b { display: block; font: italic 800 19px/0.9 var(--cv-vandal); letter-spacing: -0.02em; }
+.ab[data-ae="corporate-vandalism"] .cva-stk i { display: block; font: 600 6.5px/1.1 var(--cv-mono); font-style: normal; letter-spacing: 0.06em; text-transform: uppercase; }
 .ab[data-ae="corporate-vandalism"] .cva-class { margin: 0 0 9px !important; padding-bottom: 7px; border-bottom: 1px solid #000; text-align: center; font: 700 7.5px/1.3 var(--cv-mono); letter-spacing: 0.1em; text-transform: uppercase; color: #000; }
 .ab[data-ae="corporate-vandalism"] .cva-rr { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 7px; align-items: start; margin: 3px 0; }
 .ab[data-ae="corporate-vandalism"] .cva-rr i { padding-top: 0.2em; font: 8px/1.3 var(--cv-mono); color: #4a4a4a; white-space: nowrap; }
@@ -96,20 +92,22 @@
 .ab[data-ae="corporate-vandalism"] .cva-r { background: #000; color: transparent; position: relative; top: 1px; -webkit-box-decoration-break: clone; box-decoration-break: clone; user-select: none; }
 .ab[data-ae="corporate-vandalism"] .cva-warn {
   display: inline-flex; align-items: center; gap: 7px; margin-top: 13px; padding: 5px 10px;
-  background: var(--ab-hazard); color: #fff; outline: 1px solid #fff; outline-offset: -3px;
+  background: #000; color: #fff; outline: 1px solid #fff; outline-offset: -3px;
   font: 700 9.5px/1.3 var(--cv-mono); letter-spacing: 0.06em; text-transform: uppercase;
 }
 .ab[data-ae="corporate-vandalism"] .cva-warn svg { flex: none; }
 .ab[data-ae="corporate-vandalism"] .cva-sign { display: flex; align-items: flex-end; gap: 8px; margin-top: 14px; font: 9px/1 var(--cv-mono); color: #4a4a4a; text-transform: uppercase; letter-spacing: 0.06em; }
 .ab[data-ae="corporate-vandalism"] .cva-sign i { flex: 1; height: 12px; border-bottom: 1px solid #000; }
 /* receipt: dashed rules, TOTAL, barcode, zigzag edge */
-/* the wrapper carries the hairline shadow: the zigzag tear is a mask, and white paper on a white page needs it to read */
-.ab[data-ae="corporate-vandalism"] .cva-rw { margin-top: 26px; filter: drop-shadow(0 1px 1.5px rgba(0, 0, 0, 0.3)); }
+.ab[data-ae="corporate-vandalism"] .cva-rw { margin-top: 26px; }
 .ab[data-ae="corporate-vandalism"] .cva-rcpt {
-  padding: 16px 11px 18px; background: var(--cv-receipt); font: 9.5px/1.45 var(--cv-mono); color: #1a1a1a; text-transform: uppercase;
-  -webkit-mask: conic-gradient(from 135deg at top, #0000, #000 1deg 89deg, #0000 90deg) 50% 0 / 10px 52% repeat-x, conic-gradient(from -45deg at bottom, #0000, #000 1deg 89deg, #0000 90deg) 50% 100% / 10px 52% repeat-x;
-  mask: conic-gradient(from 135deg at top, #0000, #000 1deg 89deg, #0000 90deg) 50% 0 / 10px 52% repeat-x, conic-gradient(from -45deg at bottom, #0000, #000 1deg 89deg, #0000 90deg) 50% 100% / 10px 52% repeat-x;
+  position: relative; padding: 16px 11px 18px; background: var(--cv-receipt); font: 9.5px/1.45 var(--cv-mono); color: #1a1a1a; text-transform: uppercase;
+  box-shadow: inset 1px 0 0 rgba(0, 0, 0, 0.18), inset -1px 0 0 rgba(0, 0, 0, 0.18);
 }
+/* the torn sawtooth edge, drawn in the page colour over the paper (export-safe: no mask) */
+.ab[data-ae="corporate-vandalism"] .cva-rcpt::before, .ab[data-ae="corporate-vandalism"] .cva-rcpt::after { content: ""; position: absolute; left: 0; right: 0; height: 6px; background-size: 10px 6px; background-repeat: repeat-x; }
+.ab[data-ae="corporate-vandalism"] .cva-rcpt::before { top: 0; background-image: linear-gradient(135deg, var(--ab-canvas) 50%, transparent 50%), linear-gradient(225deg, var(--ab-canvas) 50%, transparent 50%); }
+.ab[data-ae="corporate-vandalism"] .cva-rcpt::after { bottom: 0; background-image: linear-gradient(45deg, var(--ab-canvas) 50%, transparent 50%), linear-gradient(315deg, var(--ab-canvas) 50%, transparent 50%); }
 .ab[data-ae="corporate-vandalism"] .cva-rh { margin-bottom: 4px !important; font-weight: 700; letter-spacing: 0.14em; text-align: center; }
 .ab[data-ae="corporate-vandalism"] .cva-rl { display: flex; justify-content: space-between; gap: 6px; padding: 3px 0; border-top: 1px dashed #1a1a1a; }
 .ab[data-ae="corporate-vandalism"] .cva-rl span { min-width: 0; }
@@ -123,6 +121,21 @@
   .ab[data-ae="corporate-vandalism"] .cva-rw { margin-top: 0; }
 }
 
+/* palette: THEIRS (the five client swatches, the corporation's) and OURS (the fixed vandal set, a sixth cell) */
+.ab[data-ae="corporate-vandalism"] .ab-swatches[data-kind="swatches"] { grid-template-columns: repeat(5, minmax(0, 1fr)) minmax(0, 1.5fr); }
+.ab[data-ae="corporate-vandalism"] .ab-palette > .ab-labelrow .ab-label:first-child { visibility: hidden; position: relative; min-width: 30ch; }
+.ab[data-ae="corporate-vandalism"] .ab-palette > .ab-labelrow .ab-label:first-child::before { content: "Theirs (client) · Ours (fixed)"; visibility: visible; position: absolute; left: 0; top: 0; white-space: nowrap; font-size: 11px; }
+.ab[data-ae="corporate-vandalism"] .ab-swatches[data-kind="swatches"]::after {
+  content: "OURS · FIXED\A Hazard #E10600\A Safety #FFD400\A Black · White"; white-space: pre; overflow: hidden; min-width: 0;
+  padding: calc(clamp(38px, 5.4cqw, 58px) + 11px) 0 0 10px; border-left: 3px solid var(--ab-hazard);
+  font: 600 10px/1.5 var(--cv-mono); letter-spacing: 0.04em; color: var(--ab-ink);
+  background:
+    linear-gradient(#E10600, #E10600) 10px 0 / 26% clamp(38px, 5.4cqw, 58px) no-repeat,
+    linear-gradient(#FFD400, #FFD400) calc(10px + 26%) 0 / 26% clamp(38px, 5.4cqw, 58px) no-repeat,
+    linear-gradient(#000, #000) calc(10px + 52%) 0 / 20% clamp(38px, 5.4cqw, 58px) no-repeat,
+    linear-gradient(#fff, #fff) calc(10px + 72%) 0 / 20% clamp(38px, 5.4cqw, 58px) no-repeat;
+  box-shadow: inset 0 0 0 0 transparent;
+}
 /* palette: square swatches with registration crosses at two corners */
 .ab[data-ae="corporate-vandalism"] .ab-chip { position: relative; border-radius: 0; margin-bottom: 14px; box-shadow: inset 0 0 0 1px var(--cv-bd); }
 .ab[data-ae="corporate-vandalism"] .ab-chip::before {
@@ -145,7 +158,7 @@
 .ab[data-ae="corporate-vandalism"] .ab-fit { padding: 1px 7px; border: 1px solid var(--cv-bd); border-radius: 0; background: none; font-size: 10px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ab-ink); }
 .ab[data-ae="corporate-vandalism"] .ab-fit[data-fit="match"] { background: none; border-color: var(--cv-bd); }
 .ab[data-ae="corporate-vandalism"] .ab-fit[data-fit="consider"] { border-style: dashed; }
-.ab[data-ae="corporate-vandalism"] .ab-fit[data-fit="avoid"] { background: var(--ab-hazard); border-color: var(--ab-hazard); color: #fff; }
+.ab[data-ae="corporate-vandalism"] .ab-fit[data-fit="avoid"] { background: var(--ab-ink); border-color: var(--ab-ink); color: var(--ab-canvas); }
 .ab[data-ae="corporate-vandalism"] .ab-type-k { color: var(--ab-ink); font-weight: 700; letter-spacing: 0.08em; }
 .ab[data-ae="corporate-vandalism"] .ab-type-avoid { font-size: 11px; text-transform: uppercase; letter-spacing: 0.03em; }
 .ab[data-ae="corporate-vandalism"] .ab-type-apply { border: 1px solid var(--cv-bd); border-radius: 0; font-family: var(--cv-mono); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; }
@@ -173,6 +186,12 @@
 .ab[data-ae="corporate-vandalism"] .ab-card-title { margin: 20px 0 6px !important; font-weight: var(--cv-hw, 700); font-size: clamp(18px, 2.3cqw, 22px); letter-spacing: calc(-0.03em * var(--ab-tr, 1)); line-height: 1.1; }
 .ab[data-ae="corporate-vandalism"] .ab-card-body { margin-bottom: 18px !important; color: var(--ab-ink); font-size: 13px; }
 
+/* the vandal's label-maker strip, stuck over the main CTA label (board, interface card only) */
+.ab[data-ae="corporate-vandalism"]:not(.ab-slide) .ab-sec-ui .ab-cta:not(.ab-state-ctl)::before, .ab[data-ae="corporate-vandalism"].ab-slide[data-slide="interface"] .ab-cta:not(.ab-state-ctl)::before {
+  content: "SAVE (SOMEHOW)"; position: absolute; z-index: 2; left: 10px; top: 50%; padding: 4px 9px 3px; background: #111; color: #fff;
+  font: 700 11px/1 var(--cv-mono); letter-spacing: 0.18em; text-shadow: 0 1px 0 rgba(0, 0, 0, 0.7), 0 -1px 0 rgba(255, 255, 255, 0.25);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.18); transform: translateY(-50%) rotate(-3.5deg); pointer-events: none; white-space: nowrap;
+}
 /* the sincere main action: client primary, square, mundane copy; hover underlines, pressed inverts */
 .ab[data-ae="corporate-vandalism"] .ab-cta { border-radius: 0; background: var(--cv-shell); color: var(--cv-on-shell); box-shadow: inset 0 -3px 0 var(--cv-ul); padding: 12px 14px; font-family: var(--cv-mono); font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; transition: none; }
 .ab[data-ae="corporate-vandalism"] .ab-cta-arrow::before { content: "→"; font-size: 15px; }
@@ -196,23 +215,28 @@
 .ab[data-ae="corporate-vandalism"] .ab-state { font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; font-family: var(--cv-mono); color: var(--ab-muted); }
 .ab[data-ae="corporate-vandalism"] .ab-state-ctl { padding: 10px 8px; font-size: 11px; }
 .ab[data-ae="corporate-vandalism"] .ab-state-ctl.is-hover { box-shadow: none; }
-.ab[data-ae="corporate-vandalism"] .ab-state-ctl.is-hover { background: var(--ab-hazard); color: #fff; outline: 1px solid #fff; outline-offset: -3px; }
+.ab[data-ae="corporate-vandalism"] .ab-state-ctl.is-hover { background: var(--ab-canvas); color: var(--ab-ink); box-shadow: inset 0 0 0 2px var(--ab-ink); }
+.ab[data-ae="corporate-vandalism"] .ab-state-ctl.is-hover .ab-cta-label::before { content: "⚑ "; }
 .ab[data-ae="corporate-vandalism"] .ab-state-ctl.is-hover .ab-cta-label { text-decoration: none; }
-.ab[data-ae="corporate-vandalism"] .ab-state-ctl.is-pressed { background: #000; color: transparent; box-shadow: inset 0 0 0 1px var(--cv-bd); }
+.ab[data-ae="corporate-vandalism"] .ab-state-ctl.is-pressed { position: relative; background: #000; color: transparent; box-shadow: inset 0 0 0 1px var(--cv-bd); }
+.ab[data-ae="corporate-vandalism"] .ab-state-ctl.is-pressed::before { content: "(b)(6)"; position: absolute; right: 5px; bottom: 3px; font: 600 8px/1 var(--cv-mono); color: #fff; letter-spacing: 0.04em; }
 
-/* 03 the index: an MSCHF mono-caps index (#027 ... then #030 ??????); every name in ink, hierarchy carried by the status chips */
-.ab[data-ae="corporate-vandalism"] .ab-list { counter-reset: cvr 26; }
-.ab[data-ae="corporate-vandalism"] .ab-row { counter-increment: cvr; grid-template-columns: clamp(46px, 6cqw, 62px) minmax(0, 1fr) auto minmax(60px, 140px) 4.5ch; padding: 10px 0; border-top: 1px dashed var(--cv-bd); color: var(--ab-ink); }
-.ab[data-ae="corporate-vandalism"] .ab-row:last-child { border-bottom: 1px dashed var(--cv-bd); }
-.ab[data-ae="corporate-vandalism"] .ab-row-n { font-size: 0; line-height: 0; align-self: center; color: inherit; }
-.ab[data-ae="corporate-vandalism"] .ab-row-n::before { content: "#0" counter(cvr); font: 700 clamp(16px, 2.4cqw, 22px)/1 var(--cv-mono); letter-spacing: 0; }
-.ab[data-ae="corporate-vandalism"] .ab-row-name { overflow: visible; font-family: var(--cv-mono); font-weight: 700; font-size: clamp(16px, 2.4cqw, 22px); line-height: 1; letter-spacing: 0; text-transform: uppercase; color: inherit; }
-.ab[data-ae="corporate-vandalism"] .ab-row:first-child .ab-row-name::after { content: " ↗"; font-weight: 400; letter-spacing: 0; }
+/* 03 purchase orders: PO numbers, plain shell type, asset tag; one official word struck through by the vandal's marker */
+.ab[data-ae="corporate-vandalism"] .ab-list { counter-reset: cvr; }
+.ab[data-ae="corporate-vandalism"] .ab-row { counter-increment: cvr; grid-template-columns: 9.5ch minmax(0, 1fr) auto minmax(60px, 140px) 4.5ch; padding: 11px 0; border-top: 1px solid var(--cv-bd); color: var(--ab-ink); }
+.ab[data-ae="corporate-vandalism"] .ab-row:last-child { border-bottom: 1px solid var(--cv-bd); }
+.ab[data-ae="corporate-vandalism"] .ab-row-n { visibility: hidden; position: relative; align-self: center; color: inherit; }
+.ab[data-ae="corporate-vandalism"] .ab-row-n::before { visibility: visible; position: absolute; left: 0; top: 50%; transform: translateY(-50%); white-space: nowrap; content: "PO-229" counter(cvr) "-B"; font: 600 10.5px/1 var(--cv-mono); letter-spacing: 0.02em; color: var(--ab-muted); }
+.ab[data-ae="corporate-vandalism"] .ab-row-name { position: relative; overflow: visible; justify-self: start; font-family: var(--ab-font-h); font-weight: 400; font-size: 15px; line-height: 1.2; color: inherit; }
 .ab[data-ae="corporate-vandalism"] .ab-row-status { padding: 1px 6px; border: 1px solid currentColor; border-radius: 0; background: none; font-family: var(--cv-mono); font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: inherit; }
 .ab[data-ae="corporate-vandalism"] .ab-row-bar { height: 2px; border-radius: 0; background: var(--ab-secondary); }
 .ab[data-ae="corporate-vandalism"] .ab-row-bar i { background: var(--ab-ink); }
 .ab[data-ae="corporate-vandalism"] .ab-row-pct { font-family: var(--cv-mono); font-size: 11px; color: inherit; }
-.ab[data-ae="corporate-vandalism"] .ab-list::after { content: "#030  ??????????????"; display: block; padding: 10px 0; border-bottom: 1px dashed var(--cv-bd); font: 700 clamp(16px, 2.4cqw, 22px)/1 var(--cv-mono); letter-spacing: 0; color: var(--cv-rest); }
+/* the asset tag closes the list */
+.ab[data-ae="corporate-vandalism"]:not(.ab-slide) .ab-list::after { content: var(--cv-brand); display: inline-block; margin-top: 12px; padding: 4px 8px; border: 1px solid var(--cv-bd); font: 600 9px/1.3 var(--cv-mono); letter-spacing: 0.08em; color: var(--ab-ink); }
+/* the vandal's marker: one official word struck through, the replacement written above it */
+.ab[data-ae="corporate-vandalism"]:not(.ab-slide) .ab-row:nth-child(3) .ab-row-name::after { content: ""; position: absolute; left: -3px; right: -4px; top: 52%; height: 3px; background: var(--ab-hazard); border-radius: 2px; transform: rotate(-3deg); }
+.ab[data-ae="corporate-vandalism"]:not(.ab-slide) .ab-row:nth-child(3) .ab-row-name::before { content: "never"; position: absolute; left: 30%; bottom: 72%; font: 22px/1 "Permanent Marker", "Marker Felt", cursive; color: var(--ab-hazard); transform: rotate(-6deg); white-space: nowrap; }
 
 /* footer: the footnotes are the longest text on the board */
 .ab[data-ae="corporate-vandalism"] .ab-foot { border-top: 1px solid var(--cv-bd); font-size: 10px; letter-spacing: 0.04em; text-transform: uppercase; color: var(--ab-ink); }
@@ -228,16 +252,20 @@
 @container ab (max-width: 600px) {
   .ab[data-ae="corporate-vandalism"] .ab-hero { grid-template-columns: minmax(0, 1fr); padding: 22px 0 26px; }
   .ab[data-ae="corporate-vandalism"] .ab-art { max-width: none; justify-self: stretch; }
-  .ab[data-ae="corporate-vandalism"] .ab-tag::after { display: none; }
+  .ab[data-ae="corporate-vandalism"] .ab-swatches[data-kind="swatches"] { grid-template-columns: minmax(0, 1fr); }
+  .ab[data-ae="corporate-vandalism"] .ab-swatches[data-kind="swatches"]::after { padding: 52px 0 0 10px; background-size: 22% 44px, 22% 44px, 18% 44px, 18% 44px; }
   .ab[data-ae="corporate-vandalism"]:not(.ab-slide) > .ab-in::before { white-space: normal; }
-  .ab[data-ae="corporate-vandalism"] .ab-row { grid-template-columns: 46px minmax(0, 1fr) 4.5ch; }
-  .ab[data-ae="corporate-vandalism"] .ab-row-name { font-size: 16px; }
+  .ab[data-ae="corporate-vandalism"] .ab-row { grid-template-columns: 9.5ch minmax(0, 1fr) 4.5ch; }
+  .ab[data-ae="corporate-vandalism"] .ab-row-n { grid-row: 1 / span 2; align-self: start; }
   .ab[data-ae="corporate-vandalism"] .ab-seg-btn { padding-right: 10px; font-size: 11px; }
 }
 @media (prefers-reduced-motion: reduce) {
   .ab[data-ae="corporate-vandalism"] .ab-cta, .ab[data-ae="corporate-vandalism"] .ab-switch { transition: none; }
 }
 
-/* deck: room for the literal labels, and the product slide's list named as itself */
+/* deck: room for the literal label above the CTA */
 .ab.ab-slide[data-ae="corporate-vandalism"] .ab-deck-ctacard .ab-cta:not(.ab-state-ctl) { margin-top: 18px; }
-.ab[data-ae="corporate-vandalism"] .ab-deck-rows::before { content: '"PROJECTS"'; display: block; margin-bottom: 8px; font: 600 9px/1 var(--cv-mono); letter-spacing: 0.08em; color: var(--ab-ink); }
+
+/* deck In product: the board rows in a narrower column; the bar drops under the name so names never collide with the status */
+.ab[data-ae="corporate-vandalism"] .ab-deck-prod .ab-row { grid-template-columns: 9.5ch minmax(0, 1fr) auto 4.5ch; row-gap: 6px; }
+.ab[data-ae="corporate-vandalism"] .ab-deck-prod .ab-row-bar { grid-column: 2 / -1; grid-row: 2; }

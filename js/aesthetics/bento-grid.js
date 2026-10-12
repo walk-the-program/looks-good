@@ -33,7 +33,7 @@ registerAesthetic({
       coverage: '15–20%',
     },
     primary: {
-      use: 'The one solid tile (the 01 action tile, a composed square with the label bottom-left and an arrow circle top-right), switch "on" and the product mock; exactly one primary tile per view',
+      use: 'The solid action tile (01), the hero numeral tile, the headline word, the rendered primitive, switch "on" and the product mock',
       never: 'Body text, a second solid tile, tile borders',
       coverage: '≈10–12%',
     },
@@ -43,7 +43,7 @@ registerAesthetic({
       coverage: '≈10–15%',
     },
     accent: {
-      use: 'One spark: the headline word, the "new" dot on the product mock and the footer dot',
+      use: 'One spark: the "new" dot on the product mock and the footer dot',
       never: 'Tile fills, buttons, borders',
       coverage: '≤3%',
     },
@@ -79,14 +79,15 @@ registerAesthetic({
       '--ab-pri-hover': t.mix(t.primary, '#ffffff', 0.88),
       '--ab-pri-press': t.mix(t.primary, '#000000', 0.82),
       '--ab-on-pri-press': t.readable(t.mix(t.primary, '#000000', 0.82)),
-      '--ab-pri-glow': t.alpha(t.primary, 0.4),
     };
   },
 
   // The product tile: a phone showing the brand (a primary health card with a ring,
   // two list rows, a tab bar), rising from the bottom edge and cropped by it, with two
   // floating chips ("new" in accent, status in secondary). Pure HTML, sized in the
-  // art box's own units (css/aesthetics/bento-grid.css).
+  // art box's own units (css/aesthetics/bento-grid.css). .bna-sys is the tile system
+  // (1x1, 2x1, 2x2, 1x2 annotated with spans, gap and radius), shown only on the deck's
+  // Material slide in place of the phone.
   art(ctx) {
     const e = escapeHtml;
     const name = e(ctx.brandName);
@@ -108,29 +109,38 @@ registerAesthetic({
       </div>
       <div class="bna-chip bna-c1"><i></i>Direction saved</div>
       <div class="bna-chip bna-c2"><b>72%</b>on track</div>
+      <div class="bna-sys">
+        <div class="bna-t bna-t22"><b>2×2</b><span>Hero</span></div>
+        <div class="bna-t bna-t21"><b>2×1</b><span>Wide</span></div>
+        <div class="bna-t bna-t11"><b>1×1</b><span>Stat</span></div>
+        <div class="bna-t bna-t12"><b>1×2</b><span>Tall</span></div>
+        <div class="bna-t bna-t11b"><b>1×1</b><span>Action</span></div>
+        <div class="bna-t bna-t21b"><b>2×1</b><span>Gap 14 · radius 28</span></div>
+      </div>
     </div>`;
   },
 
   materials: [
     { name: 'Board', css: 'background: {canvas}; /* a step darker than the tiles; the gaps between tiles are this color */' },
-    { name: 'Tile', css: 'background: {tile}; border: 0; border-radius: 28px; box-shadow: {shadow}; /* no borders; hover lifts 2px with {shadowHi} */' },
+    { name: 'Tile', css: 'background: {tile}; border: 0; border-radius: 28px; box-shadow: none; /* flat on the darker canvas; no borders, no shadow; hover scale(1.01) */' },
+    { name: 'Colour tile', css: 'background: the role colour; color: its readable text colour; border-radius: 28px; /* a palette swatch is a whole tile, filled edge to edge, label inside at 13px */' },
     { name: 'Primary tile (main action)', css: 'background: {primary}; color: {onPrimary}; border-radius: 28px; padding: 22px; /* the 01 action: a square tile beside the title tile, label bottom-left (22px, 600), 40px arrow circle top-right at on-primary 18%; exactly one per view; hover {priHover}, pressed {priPress} */' },
     { name: 'Secondary-tinted tile', css: 'background: {tileSec}; border-radius: 28px; /* the product stage; 20% secondary over the tile white */' },
     { name: 'Secondary-tinted stat tile', css: 'background: {secTint}; border-radius: 28px; /* the 72% tile: huge numeral in ink, tabular, tracking -0.05em; its progress bar is {secondary} */' },
-    { name: 'Sub-tile (inside a tile)', css: 'background: {sub}; border-radius: 18px; /* fields, type columns, state samples */' },
+    { name: 'Numeral tile', css: 'background: {primary}; color: {onPrimary}; border-radius: 28px; font-size: 120px; /* one huge number, one small label */' },
   ],
 
   rules: {
     do: [
-      'Build every block as a rounded tile (radius 28) on a slightly darker canvas; separate tiles with a 14px gap, never a border or rule.',
+      'Build every block as a rounded tile (radius 28) on a slightly darker canvas; separate tiles with a 14px gap, never a border, rule or shadow.',
       'Make each tile say one thing; give stats a huge numeral in the heading face with a small label.',
       'Fill exactly one tile solid primary (the action tile beside the title) and tint the product stage and the lead stat tile with secondary; the rest are plain tile white.',
-      'Vary spans (2x2 hero, 1x1 stats, wide bars) so the grid has rhythm, but keep gaps and radii identical.',
+      'Vary spans (a 2-row hero, 1x1 stats, wide bars) so one tile dominates, and put imagery or a render in most tiles.',
     ],
     dont: [
-      'Add tile borders, heavy shadows or gradients; one very soft shadow is the whole depth.',
+      'Add tile borders, shadows or glow; contrast between tile and canvas is the whole depth.',
       'Fill a tile with ink or accent, or place two solid primary tiles in one view.',
-      'Mix radii; sub-tiles are 18, tiles 28, controls are pills.',
+      'Nest a tile inside a tile; one radius level (28), controls are pills.',
       'Crowd copy: one idea per tile, with generous padding.',
     ],
   },
@@ -138,18 +148,18 @@ registerAesthetic({
   deck: {
     principles: [
       ['One tile, one idea', 'Each block says a single thing, with room around it.'],
-      ['Rounded tiles, no borders', 'Radius 28 on a darker canvas, with 14px gaps.'],
-      ['One solid primary tile', 'The action tile; everything else stays quiet.'],
+      ['Rounded tiles, no borders', 'Radius 28, flat on a darker canvas, 14px gaps.'],
+      ['One tile leads', 'A two-row hero; stats get one huge numeral.'],
     ],
     do: [
       'Build every block as a rounded tile.',
       'Give stats a huge numeral and a small label.',
-      'Fill exactly one tile solid primary.',
+      'Let one tile dominate the grid.',
     ],
     dont: [
       'Add tile borders or heavy shadows.',
       'Fill a tile with ink or accent.',
-      'Mix radii or crowd the copy.',
+      'Nest a tile inside a tile.',
     ],
   },
 });

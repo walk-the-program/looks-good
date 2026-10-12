@@ -7,6 +7,8 @@
    everywhere else. The hero copy is set directly on the scene (never on a
    frosted slab). Two mechanisms on purpose: backdrop blur (frosting) and a
    simulated refraction lens (a clipped, scaled duplicate of the scene). */
+let lgSeq = 0;   // unique SVG filter ids per rendered board (compare grid, deck)
+
 registerAesthetic({
   key: 'liquid-glass', order: 5,
   name: 'Liquid Glass',
@@ -18,7 +20,8 @@ registerAesthetic({
   mode: 'light',
   slideShape: 'soft',
   labels: { material: 'Optics', states: ['Clear', 'Tinted', 'Frosted'], statesKind: 'chip' },
-  layout: { hero: 'scene' },
+  // stacked inset-grouped sections (iOS Settings rhythm) and a compact chip palette
+  layout: { hero: 'scene', palette: 'chips', sections: 'stacked' },
   type: { ui: 'sans' },
   highlight: 'custom',
   highlightNote: 'The word is set as text, no fill or band: the raw accent (lightened toward white if it would fall under 3:1) over the dark scene on wide boards, and plain --accent-ink when the copy sits on the canvas below the scene.',
@@ -42,7 +45,9 @@ registerAesthetic({
     const d = t.isDark;
     // The scene is the dark "content" the glass floats over: half of the ink on a
     // light board; half of the canvas on a dark one (a light ink would make it grey).
-    const sceneBase = t.mix(d ? t.canvas : t.ink, '#000000', 0.5);
+    // In light mode the base is the ink only 20% darker (t.mix(a, b, k) = k of a), so
+    // the scene reads as content inside the board rather than a pasted black slab.
+    const sceneBase = d ? t.mix(t.canvas, '#000000', 0.5) : t.mix(t.ink, '#000000', 0.8);
     const material = t.mix('#ffffff', t.canvas, d ? 0.07 : 0.72);
     // headline word on the scene: the raw accent if it holds 3:1 on the scene base, else lightened toward white
     const hlScene = t.contrast(t.accent, sceneBase) >= 3 ? t.accent : t.mix(t.accent, '#ffffff', 0.35);
@@ -68,49 +73,75 @@ registerAesthetic({
       '--ab-pri-glow': t.alpha(t.primary, 0.35),
       '--ab-pri-glow-strong': t.alpha(t.primary, 0.55),
       '--ab-primary-a': t.alpha(t.primary, 0.88),
+      '--lg-glass-fill': d ? 'rgba(255,255,255,0.12)' : 'rgba(255,255,255,0.18)',
+      '--ab-type-pick-w': 700,
     };
   },
 
   art(ctx) {
-    // The scene: a vivid three-light field plus ONE crisp element (the brand
-    // initial) for the glass to bend. All <i> elements are sized in cqw (the art
-    // box is a size container) so the lens duplicate lines up. Over it float a
-    // glass tab bar, a glass timer and a single squircle lens that refracts the
-    // initial (a clipped, scaled and offset duplicate of the scene: simulated
-    // refraction, not real optics). Two lenses are drawn, one per hero geometry
-    // (wide: 21/10 art box; narrow: 4/4.2); CSS shows one.
+    // The scene is hard-edged content (Apple puts glass over photos, text and
+    // lists, never over blur): a dark base, a primary plane, a thin accent bar and
+    // a secondary plane, plus one crisp element, the brand initial. A squircle
+    // lens sits off-centre so its rim cuts through the letter and the accent bar.
+    // The lens holds a duplicate of the scene that an SVG displacement filter
+    // bends at the rim only (normal map: neutral grey across the middle 56%,
+    // ramps in the outer 22%; scale 40), with a stronger red pass (48) for fringing.
+    // This is an ordinary CSS filter on a duplicate DOM scene, not a backdrop
+    // filter; html2canvas exports the unbent copy, which still reads as glass.
     const initial = ctx.initial && ctx.initial !== '·' ? ctx.initial : 'M';
+    const id = 'lg-refract-' + (++lgSeq);
     const scene = `<i class="lgs-mesh"></i><i class="lgs-initial">${escapeHtml(initial)}</i>`;
-    // Lens centered on the initial (same x/y as .lgs-initial), width 1.15 x the glyph's
-    // advance (estimated per letter in em), height ~ the glyph's cap height + margin,
-    // no offset, so the bend shows only at the rim. cx/cy and fs are the CSS left/top (%)
-    // and font-size (cqw) of .lgs-initial; ar is the art box width/height.
     const adv = { M: 0.9, W: 0.95, I: 0.34, J: 0.5, L: 0.6, F: 0.62, E: 0.64, T: 0.66, Y: 0.7, Z: 0.68, B: 0.7, P: 0.68, S: 0.64, R: 0.7, K: 0.7, X: 0.7, V: 0.72 }[initial.toUpperCase()] || 0.78;
+    // cx/cy: lens centre in % of the art box; fs: the initial's font-size (cqw);
+    // ar: art width / height. The lens is 0.62 of the glyph advance wide, so its
+    // rim crosses the strokes rather than framing the letter.
     const lens = (cx, cy, fs, ar, cls) => {
-      const w = adv * fs * 1.15;
-      const h = Math.max(fs * 0.95 * ar, w * ar * 0.9);
-      return abLens(scene, { x: +(cx - w / 2).toFixed(2), y: +(cy - h / 2).toFixed(2), w: +w.toFixed(2), h: +h.toFixed(2), scale: 1.08, dx: 0, dy: 0, cls });
+      const w = adv * fs * 0.62;
+      const h = Math.max(fs * 0.62 * ar, w * ar * 1.05);
+      const x = +(cx - w / 2).toFixed(2), y = +(cy - h / 2).toFixed(2);
+      const ox = x + w / 2, oy = y + h / 2;
+      const sceneStyle = `left:${(-x / w) * 100}%;top:${(-y / h) * 100}%;width:${(100 / w) * 100}%;height:${(100 / h) * 100}%;transform-origin:${ox}% ${oy}%`;
+      return `<div class="ab-lens ${cls}" style="left:${x}%;top:${y}%;width:${w.toFixed(2)}%;height:${h.toFixed(2)}%">`
+        + `<div class="lgs-bend" style="filter:url(#${id}) saturate(1.15)"><div class="ab-lens-scene" style="${sceneStyle}">${scene}</div></div></div>`;
     };
+    // normal map: R ramps across x, G across y, both neutral (128) between 22% and 78%
+    const ramp = (dir, ch) => {
+      const c = v => (ch === 'r' ? `rgb(${v},0,0)` : `rgb(0,${v},0)`);
+      const g = dir === 'x' ? 'x1="0" y1="0" x2="1" y2="0"' : 'x1="0" y1="0" x2="0" y2="1"';
+      const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 100 100" preserveAspectRatio="none"><defs><linearGradient id="g" ${g}>`
+        + `<stop offset="0" stop-color="${c(255)}"/><stop offset=".09" stop-color="${c(196)}"/><stop offset=".22" stop-color="${c(128)}"/>`
+        + `<stop offset=".78" stop-color="${c(128)}"/><stop offset=".91" stop-color="${c(60)}"/><stop offset="1" stop-color="${c(0)}"/>`
+        + '</linearGradient></defs><rect width="100" height="100" fill="url(#g)"/></svg>';
+      return 'data:image/svg+xml,' + encodeURIComponent(svg);
+    };
+    const filter = `<svg class="lgs-defs" width="0" height="0" aria-hidden="true" focusable="false"><filter id="${id}" x="0" y="0" width="1" height="1" color-interpolation-filters="sRGB">`
+      + `<feImage href="${ramp('x', 'r')}" preserveAspectRatio="none" result="mx"/>`
+      + `<feImage href="${ramp('y', 'g')}" preserveAspectRatio="none" result="my"/>`
+      + '<feComposite in="mx" in2="my" operator="arithmetic" k1="0" k2="1" k3="1" k4="0" result="map"/>'
+      + '<feDisplacementMap in="SourceGraphic" in2="map" scale="40" xChannelSelector="R" yChannelSelector="G" result="d1"/>'
+      + '<feDisplacementMap in="SourceGraphic" in2="map" scale="48" xChannelSelector="R" yChannelSelector="G" result="d2"/>'
+      + '<feColorMatrix in="d2" type="matrix" values="1 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 1 0" result="red"/>'
+      + '<feColorMatrix in="d1" type="matrix" values="0 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 1 0" result="gb"/>'
+      + '<feComposite in="red" in2="gb" operator="arithmetic" k1="0" k2="1" k3="1" k4="0"/>'
+      + '</filter></svg>';
     const icon = d => `<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${d}</svg>`;
     const tabs = [
       ['Home', '<path d="M4 11l8-7 8 7v8a1 1 0 0 1-1 1h-4v-6h-6v6H5a1 1 0 0 1-1-1z"/>'],
       ['Search', '<circle cx="11" cy="11" r="6.5"/><path d="M16 16l4 4"/>'],
       ['Library', '<rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><rect x="13" y="13" width="7" height="7" rx="1.5"/>'],
     ].map(([n, d], i) => `<span class="lgs-tab${i === 0 ? ' on' : ''}">${icon(d)}<em>${n}</em></span>`).join('');
-    return `<div class="lgs"><div class="lgs-scene">${scene}</div>`
-      + lens(72, 52, 30, 21 / 10, 'lgs-lens lgs-lens-w')
-      + lens(62, 50, 50, 4 / 4.2, 'lgs-lens lgs-lens-n')
+    return `<div class="lgs">${filter}<div class="lgs-scene">${scene}</div>`
+      + lens(80, 40, 30, 21 / 10, 'lgs-lens lgs-lens-w')
+      + lens(72, 50, 50, 4 / 4.2, 'lgs-lens lgs-lens-n')
       + `<div class="lgs-tabs">${tabs}</div>`
-      + '<div class="lgs-card"><div class="lgs-time"><span class="lgs-cap">Focus</span><b>18:24</b></div>'
-      + '<svg class="lgs-timer" viewBox="0 0 44 44" aria-hidden="true"><circle cx="22" cy="22" r="17" fill="none" stroke="rgba(255,255,255,.28)" stroke-width="4"/>'
-      + '<circle class="lgs-ring" cx="22" cy="22" r="17" fill="none" stroke-width="4" stroke-linecap="round" pathLength="100" stroke-dasharray="74 100" transform="rotate(-90 22 22)"/>'
-      + '<path d="M18.5 16.5v11M25.5 16.5v11" stroke="#fff" stroke-width="3" stroke-linecap="round"/></svg></div>'
+      // a glass slider over the dark base, where a thin fill actually reads as glass
+      + '<div class="lgs-slider"><i class="lgs-track"><i class="lgs-fill"></i></i><i class="lgs-thumb"></i></div>'
       + '</div>';
   },
 
   materials: [
-    { name: 'Scene', css: 'background: radial-gradient(55% 70% at 18% 22%, {primary}, transparent 70%), radial-gradient(50% 65% at 86% 86%, {secondary}, transparent 70%), radial-gradient(34% 44% at 68% 24%, {accent}, transparent 70%), {sceneBase}; /* the content glass floats over; colors at full saturation. One crisp element sits in it for the glass to bend: the brand initial, white at 92%, set large in the heading face. */' },
-    { name: 'Glass lens', css: 'background: rgba(255,255,255,.08); backdrop-filter: blur(2px) saturate(160%); border-radius: 28%; /* a squircle over the right half of the initial, holding a magnified, offset duplicate of the scene */ box-shadow: inset 1px 1px 0 rgba(255,255,255,.6), inset -1px -1px 0 rgba(255,255,255,.25), 0 0 0 .5px rgba(0,0,0,.25);' },
+    { name: 'Glass lens', css: 'border-radius: 28%; /* a squircle whose rim cuts through hard content; inside, a duplicate of the content with filter: url(#refract), an feDisplacementMap (scale 40, a second red pass at 48 for fringing) driven by a normal map that is neutral in the middle and ramps in the outer 22%, so only the rim bends */ box-shadow: inset 1px 1px 0 rgba(255,255,255,.6), inset -1px -1px 0 rgba(255,255,255,.25), 0 0 0 .5px rgba(0,0,0,.25);' },
+    { name: 'Scene (content under glass)', css: 'background: linear-gradient(100deg, {sceneBase} 0 50%, {primary} 50% 72%, {accent} 72% 77%, {secondary} 77%); /* hard edges for the glass to bend, plus one crisp glyph; never a blur */' },
     { name: 'Floating glass control', css: 'background: rgba(255,255,255,.12); backdrop-filter: blur(14px) saturate(160%); border-radius: 999px; box-shadow: inset 1px 1px 0 rgba(255,255,255,.6), inset -1px -1px 0 rgba(255,255,255,.25), 0 0 0 .5px rgba(0,0,0,.35), 0 8px 24px {drop}; /* glass fill never above 12% white */' },
     { name: 'Regular material (panels)', css: 'background: {material}; border: 1px solid {materialLine}; border-radius: 28px; box-shadow: 0 1px 2px rgba(0,0,0,.05), 0 12px 32px -16px {drop}; /* near-opaque; no backdrop blur */' },
     { name: 'Opaque fallback', css: 'background: {glassSolid}; backdrop-filter: none; /* under prefers-reduced-transparency, keep the rim */' },
@@ -121,9 +152,9 @@ registerAesthetic({
 
   rules: {
     do: [
-      'Float glass only over vivid content (the saturated scene of brand colors) so there is something to refract.',
+      'Float glass only over sharp content (hard color edges, type, photos, lists) so there is something to bend.',
       'Keep glass fill at 12% white or less, with a bright specular rim top-left, a softer rim bottom-right and a 0.5px dark hairline outside.',
-      'Pair backdrop blur with a magnified, clipped duplicate near the edges of lenses; use both mechanisms.',
+      'Bend content at the rim only: the centre of a lens stays 1:1, the outer fifth refracts.',
       'Make every panel a near-opaque regular material on a neutral canvas; reserve glass for floating controls.',
       'Provide an opaque fallback that keeps the rim for reduced transparency.',
     ],
@@ -131,18 +162,19 @@ registerAesthetic({
       'Call a blur-only surface refraction.',
       'Put glass on a flat or pastel background, or nest glass panels inside glass panels.',
       'Put text on strong distortion; keep it on a stable, readable substrate.',
-      'Wash the page in pastel blobs; the only saturated color is the scene.',
+      'Put glass over blurred blobs; refraction of a blur is invisible.',
     ],
   },
   // Deck copy (js/brand-deck.js): three principles, three do / don't lines, each short.
   deck: {
+    materialStage: 'pattern',   // slide 06 stages the lead pattern (lens grid) instead of repeating the cover scene
     principles: [
-      ['Glass floats over vivid color', 'There has to be something to refract.'],
+      ['Glass floats over sharp content', 'Hard edges and type are what the rim bends.'],
       ['Thin fill, bright rim', '12% white fill, a specular rim and a dark hairline.'],
       ['Panels stay solid', 'Near-opaque panels; glass is for floating controls.'],
     ],
     do: [
-      'Float glass only over vivid scenes.',
+      'Float glass only over sharp content.',
       'Keep glass fill at 12% white or less.',
       'Keep panels near-opaque on a neutral canvas.',
     ],

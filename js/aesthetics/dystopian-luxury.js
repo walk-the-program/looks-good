@@ -14,12 +14,14 @@ function dlMark(t) {
   return t.primary;
 }
 
-// The giant word: first word of the brand, uppercase, set so its full width is 103% of the
-// plate (the right edge crops at most half a letter), then cropped VERTICALLY: the top 70%
-// of the cap height shows and the rest hides under the CLASSIFIED strip. A horizontal crop at
-// a letter boundary can spell an accidental word, a vertical one never can.
-function dlWordFit(state, word) {
-  const W = 200 * 1.03;
+// The giant word: first word of the brand, uppercase, set so its full width is 102% of the
+// BOARD (the plate runs edge to edge; the right edge crops at most half a letter), then
+// cropped VERTICALLY: the top 70% of the cap height shows and the rest hides under the
+// CLASSIFIED strip. A horizontal crop at a letter boundary can spell an accidental word, a
+// vertical one never can. Returns the font size in viewBox units, the target width, the
+// lengthAdjust mode and the strip's y (the plate's height follows the word).
+function dlWordFit(state, word, maxFs) {
+  const W = 200 * 1.02;
   let natural = 0;
   try {
     const cv = document.createElement('canvas').getContext('2d');
@@ -27,20 +29,50 @@ function dlWordFit(state, word) {
     natural = cv.measureText(word).width;
   } catch (err) { natural = 0; }
   if (!(natural > 0)) natural = 64 * word.length;
-  // fsFull is the size at which the word is exactly W wide. Past 44 the glyph tops would climb
-  // behind the blank label, so a short word stays at 44 and takes letter-spacing to reach W; a
-  // very short one (under ~55% of W at 44) is allowed to grow, up to 119, before it is tracked out.
   const fsFull = 100 * W / natural;
   let fs = fsFull;
   let mode = 'spacingAndGlyphs';
-  if (fsFull > 44) {
-    fs = Math.min(119, Math.max(44, 100 * 0.55 * W / natural));
-    mode = 'spacing';
-  } else if (fsFull < 18) {
-    fs = 18;
-    mode = 'spacingAndGlyphs';
-  }
-  return { fs, W, mode };
+  const cap = maxFs || 64;
+  if (fsFull > cap) { fs = cap; mode = 'spacing'; }     // a short word: capped, then tracked out to the edge
+  else if (fsFull < 14) { fs = 14; }
+  const strip = 1.5 + 0.7 * 0.72 * fs;                 // 70% of the cap height shows above the strip
+  return { fs, W, mode, strip };
+}
+
+// Split a word in two near its middle: a consonant-consonant boundary that is not a digraph
+// ("STRAW" / "BERRY") when one sits within a quarter of the middle, else the vowel-consonant
+// boundary nearest the middle ("MARI" / "GOLD"), else the middle itself.
+function dlSplit(word) {
+  const w = String(word);
+  if (w.length < 5) return [w];
+  const V = /[AEIOUY]/;
+  const DI = ['CH', 'SH', 'TH', 'PH', 'WH', 'CK', 'NG', 'GH', 'KN', 'QU', 'DG'];
+  const mid = w.length / 2;
+  const near = (test) => {
+    let best = -1;
+    for (let i = 2; i <= w.length - 2; i++) {
+      if (test(i) && (best < 0 || Math.abs(i - mid) < Math.abs(best - mid))) best = i;
+    }
+    return best >= 0 && Math.abs(best - mid) <= w.length / 4 ? best : -1;
+  };
+  let at = near(i => /[A-Z]/.test(w[i - 1]) && /[A-Z]/.test(w[i]) && !V.test(w[i - 1]) && !V.test(w[i]) && !DI.includes(w[i - 1] + w[i]));
+  if (at < 0) at = near(i => V.test(w[i - 1]) && !V.test(w[i]));
+  if (at < 0) at = Math.round(mid);
+  return [w.slice(0, at), w.slice(at)];
+}
+
+// One cropped plate: the word clipped under a black strip, viewBox 200 wide, height from the fit.
+function dlPlate(state, word, ink, label, num, maxFs) {
+  const fit = dlWordFit(state, word, maxFs);
+  const strip = fit.strip;
+  const h = strip + 8.5;
+  const baseline = (strip + 0.3 * 0.72 * fit.fs).toFixed(2);
+  const lab = label ? `<text class="dl-strip" x="5" y="${(strip + 5.6).toFixed(2)}" fill="#F7F7F5">${label}</text>` : '';
+  const no = num ? `<text class="dl-strip" x="195" y="${(strip + 5.6).toFixed(2)}" text-anchor="end" fill="#F7F7F5">${num}</text>` : '';
+  return `<svg class="dl-plate-svg" viewBox="0 0 200 ${h.toFixed(2)}" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg" role="presentation">
+      <svg x="0" y="0" width="200" height="${strip.toFixed(2)}" viewBox="0 0 200 ${strip.toFixed(2)}" overflow="hidden"><text class="dl-word" x="0" y="${baseline}" font-size="${fit.fs.toFixed(2)}" textLength="${fit.W}" lengthAdjust="${fit.mode}" fill="${ink}">${word}</text></svg>
+      <rect x="0" y="${strip.toFixed(2)}" width="200" height="8.5" fill="#0A0A0A"/>${lab}${no}
+    </svg>`;
 }
 
 registerAesthetic({
@@ -55,9 +87,9 @@ registerAesthetic({
   slideShape: 'minimal',
   labels: { material: 'Accession', states: ['Catalogued', 'Restricted', 'Classified'], statesKind: 'button' },
   layout: { hero: 'centered', palette: 'swatches', sections: 'asym' },
-  type: { ui: 'sans', label: 'sans', display: 1.12 },
+  type: { ui: 'sans', label: 'mono', display: 1 },
   highlight: 'custom',
-  highlightNote: 'The highlighted word stays in ink like the rest of the headline and carries one thin underline stripe (about 0.07em) in the single accent mark (always the client primary); no colour on the word itself.',
+  highlightNote: 'No highlight at all: the last word stays in ink, upright, undecorated, like the rest of the 15px caption headline. The board\'s only display type is the cropped brand word.',
   cardFill: '--canvas',
 
   roles: {
@@ -67,23 +99,23 @@ registerAesthetic({
       coverage: '≈90–92%',
     },
     ink: {
-      use: 'Ink black: all type, the 1px rules and hairline boxes, the barcode, the security strip, the giant cropped word and the inverted selected cell',
+      use: 'Ink black: all type, the 1px rules at 12%, the security strip, the giant cropped word, the inverted selected cell and the one action',
       never: 'Large flat fields other than the single security strip, or a soft grey substitute for hairlines',
       coverage: '≈6–7%',
     },
     primary: {
-      use: 'The single disruptive accent: the one main action, one small mark per view (a dot, an end tick or a strike) and the "Classified" dot. It is always the client primary, even a dull one; there is no red fallback',
-      never: 'Body text, borders, backgrounds, a second accent, gradients, or more than 2% of the area',
-      coverage: '≤2%',
+      use: 'One 6px square per view, set before the label of the one action (an ink block). It is always the client primary, even a dull one; there is no red fallback',
+      never: 'A button fill, body text, borders, backgrounds, underlines, a second mark, or more than one mark per view',
+      coverage: '≤0.5%',
     },
     secondary: {
-      use: 'A tint (12% over the canvas) in the label strips and the institutional "wellness" notice; tiny and flat',
+      use: 'Palette only: a 24px reference square. Not used on the page',
       never: 'The main action, text, large fields, or hairlines',
       coverage: '≤1%',
     },
     accent: {
-      use: 'Tiny status marks only: the footer dot and the "viewed by" dot beside a label',
-      never: 'Buttons, headlines, fills, or more than a few pixels per mark',
+      use: 'Palette only: a 24px reference square. Not used on the page',
+      never: 'Buttons, headlines, fills, underlines, dots',
       coverage: '≤0.5%',
     },
   },
@@ -109,54 +141,36 @@ registerAesthetic({
     };
   },
 
-  // "Accession": one enormous word in ink, fitted to 103% of the plate width and cropped vertically (top 70% visible) under the strip;
-  // a blank white label held by four X stitches carrying an accession number, a circled
-  // numeral and a barcode; one dot of the single accent; a black security strip along the
-  // lower edge; crop marks. Pure SVG, viewBox 200 x 80.
+  // "Accession": one enormous word in ink, fitted to 102% of the board's width and cropped
+  // vertically (top 70% visible) under the CLASSIFIED strip; below it, at the right, the
+  // only object: a blank white label held by four X stitches, with an accession number and a
+  // circled numeral (no barcode, no dot). Narrow boards show the word split at its middle
+  // syllable on two cropped plates instead (CSS swaps .dl-wide / .dl-narrow), the label is
+  // hidden and the accession number runs as plain text under the strip.
   art(ctx) {
     const t = ctx.t;
     const e = escapeHtml;
-    const word = e(String(ctx.brandName || 'Archive').trim().split(/\s+/)[0].toUpperCase());
-    const fit = dlWordFit(ctx.state, word);
-    const strip = 69.5;
-    const baseline = (strip + 0.3 * 0.72 * fit.fs).toFixed(2);
-    const mark = dlMark(t);
+    const raw = String(ctx.brandName || 'Archive').trim().split(/\s+/)[0].toUpperCase() || 'ARCHIVE';
+    const word = e(raw);
     const ink = t.isDark ? t.mix('#F7F7F5', t.ink, 0.7) : t.mix('#0A0A0A', t.ink, 0.75);
-    const paper = t.isDark ? '#F2F2EF' : '#FFFFFF';
-    const lab = { x: 132, y: 12, w: 52, h: 36 };
-    const stitch = (x, y) => `<path d="M${x - 1.2} ${y - 1.2} L${x + 1.2} ${y + 1.2} M${x + 1.2} ${y - 1.2} L${x - 1.2} ${y + 1.2}" stroke="#0A0A0A" stroke-width=".5" fill="none"/>`;
-    let bars = '';
-    let bx = lab.x + 5;
-    const pat = [1.2, 0.6, 0.6, 1.6, 0.6, 1.0, 0.6, 0.6, 1.4, 0.6, 1.0, 1.6, 0.6, 0.6, 1.0, 0.6, 1.2, 0.6, 0.6, 1.6];
-    pat.forEach((w, i) => { if (i % 2 === 0) bars += `<rect x="${bx.toFixed(2)}" y="${lab.y + 25}" width="${w}" height="6.6" fill="#0A0A0A"/>`; bx += w + 0.5; });
-    const crop = (x, y, dx, dy) => `<path d="M${x} ${y + dy * 4} V${y} H${x + dx * 4}" stroke="${ink}" stroke-width=".35" fill="none"/>`;
-    return `<div class="dl-art"><svg viewBox="0 0 200 80" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg" role="presentation">
-      <g>
-        <svg x="0" y="0" width="200" height="${strip}" viewBox="0 0 200 ${strip}" overflow="hidden"><text class="dl-word" x="1" y="${baseline}" font-size="${fit.fs.toFixed(2)}" textLength="${fit.W}" lengthAdjust="${fit.mode}" fill="${ink}">${word}</text></svg>
-        <rect x="0" y="69.5" width="200" height="8.5" fill="#0A0A0A"/>
-        <text class="dl-strip" x="6" y="75.2" fill="#F7F7F5">CLASSIFIED / DIVISION 07 / NOT FOR RELEASE</text>
-        <text class="dl-strip" x="194" y="75.2" text-anchor="end" fill="#F7F7F5">2026.114</text>
-        <rect x="${lab.x}" y="${lab.y}" width="${lab.w}" height="${lab.h}" fill="${paper}" stroke="#0A0A0A" stroke-width=".35"/>
-        ${stitch(lab.x + 3.2, lab.y + 3.2)}${stitch(lab.x + lab.w - 3.2, lab.y + 3.2)}${stitch(lab.x + 3.2, lab.y + lab.h - 3.2)}${stitch(lab.x + lab.w - 3.2, lab.y + lab.h - 3.2)}
-        <text class="dl-acc" x="${lab.x + 7}" y="${lab.y + 11}" fill="#0A0A0A">2026.114.3</text>
-        <circle cx="${lab.x + lab.w - 11}" cy="${lab.y + 9.6}" r="3.6" fill="none" stroke="#0A0A0A" stroke-width=".45"/>
-        <text class="dl-num" x="${lab.x + lab.w - 11}" y="${lab.y + 11}" text-anchor="middle" fill="#0A0A0A">7</text>
-        <path d="M${lab.x + 7} ${lab.y + 16.4} H${lab.x + lab.w - 7}" stroke="#0A0A0A" stroke-width=".3"/>
-        <text class="dl-sub" x="${lab.x + 7}" y="${lab.y + 21.4}" fill="#0A0A0A">VIEWED BY / NO ONE</text>
-        ${bars}
-        <circle cx="${lab.x - 7}" cy="${lab.y + 3}" r="2.1" fill="${mark}"/>
-      </g>
-      ${crop(3, 3, 1, 1)}${crop(197, 3, -1, 1)}
-    </svg></div>`;
+    const parts = dlSplit(raw);
+    const narrow = parts.map((p, i) => dlPlate(ctx.state, e(p), ink, i === parts.length - 1 ? 'CLASSIFIED / DIV. 07' : '', i === parts.length - 1 ? '2026.114' : '', 100)).join('');
+    return `<div class="dl-art">
+      <div class="dl-plate dl-wide">${dlPlate(ctx.state, word, ink, 'CLASSIFIED / DIVISION 07 / NOT FOR RELEASE', '2026.114', 64)}</div>
+      <div class="dl-plate dl-narrow">${narrow}<p class="dl-accline">Accession 2026.114.3 · viewed by no one</p></div>
+      <div class="dl-tag"><i class="dl-st"></i><i class="dl-st"></i><i class="dl-st"></i><i class="dl-st"></i>
+        <span class="dl-tag-no">2026.114.3</span><span class="dl-tag-c">7</span>
+        <span class="dl-tag-sub">Viewed by / no one</span>
+      </div>
+    </div>`;
   },
 
   materials: [
     { name: 'Hairline', css: 'border-top: 1px solid {dlInk}; /* the only rule: 1px ink, 0 radius; double rules carry registration ticks; no card chrome, no shadows */' },
-    { name: 'Blank label (accession)', css: 'background: {canvas}; color: {dlInk}; border: 1px solid {dlInk}; font: 500 10px ui-monospace, Menlo, monospace; letter-spacing: .08em; /* a blank white label held by four X stitches at the corners; accession number year.sequence.part, e.g. 2026.114.3, and a circled numeral */' },
+    { name: 'Blank label (accession)', css: 'background: {canvas}; color: {dlInk}; border: 1px solid {dlInk}; font: 400 10px "Courier Prime", Courier, monospace; letter-spacing: .04em; /* the only object: a blank white label held by four X stitches; accession number year.sequence.part (2026.114.3) and a circled numeral; no barcode */' },
     { name: 'Security strip', css: 'background: {dlInk}; color: {canvas}; font: 500 10px ui-monospace, Menlo, monospace; letter-spacing: .1em; text-transform: uppercase; /* CLASSIFIED / DIVISION 07 / NOT FOR RELEASE; the only large flat ink field */' },
-    { name: 'Main action (the single accent)', css: 'background: {dlMark}; color: {dlOnMark}; border-radius: 0; text-transform: uppercase; font: 600 11px sans-serif; letter-spacing: .1em; /* the one per view; hover inverts to ink; no icon, no shadow */' },
+    { name: 'Main action (a mark, not a bar)', css: 'display: inline-flex; width: auto; padding: 10px 14px; background: {dlInk}; color: {canvas}; border-radius: 0; font: 400 12px Arial-class sans; /* a 6px {dlMark} square before the label: the one primary mark per view */' },
     { name: 'Selected cell', css: 'background: {dlInk}; color: {canvas}; border: 1px solid {dlInk}; /* hairline-boxed cells; the selected one is inverted */' },
-    { name: 'Label tint strip', css: 'background: {dlTint}; /* secondary at 12% over the canvas; tiny and flat, for an institutional notice */' },
     { name: 'Footer block', css: 'background: {dlGrey}; color: {muted}; /* a flat grey block with legal labels, an address and a catalogue number */' },
   ],
 
@@ -164,12 +178,13 @@ registerAesthetic({
     do: [
       'Remove first: a tiny wordmark, vast empty space and at most three visible elements per zone.',
       'Crop display type hard under a strip so only about 70 percent of its height shows (crop vertically, never at a letter boundary), and keep the labels small and exact.',
-      'Number everything: accession year.sequence.part (2026.114.3), a circled numeral, a barcode, a security-style label.',
-      'Keep the neutrals near-pure (about 92% neutrals, 7% greys, under 2% accent) and use one mark in the client primary per view.',
+      'One gesture: the brand word, cropped, edge to edge. Everything else is a 15px caption or smaller.',
+      'Number items, not sections: accession year.sequence.part (2026.114.3) on one blank label; set it in a default typewriter face.',
+      'Keep the neutrals near-pure and show the primary once per view, as a 6px square on the one action.',
     ],
     dont: [
       'Use gradients, glows, glass, soft shadows or rounded corners; hard cuts and hairlines only.',
-      'Spread the primary: it is a single dot, tick, strike or button, never a wash or a second accent.',
+      'Spread the primary: no colour bar, no underline, no second mark. No barcodes or grid furniture either.',
       'Add gothic horror tropes (chains, crosses, skulls, gore), concrete textures or warm literary serif layouts.',
       'Set tiny type below 4.5:1 contrast or leave the board with no readable controls; severity is never illegibility.',
     ],
@@ -177,20 +192,21 @@ registerAesthetic({
 
   // Deck copy (js/brand-deck.js): three principles, three do / don't lines, each short.
   deck: {
+    coverDisplay: 0.6,
     principles: [
-      ['Severity by removal', 'A tiny logo and vast white space say it all.'],
-      ['Enormous, severely cropped type', 'Headlines are cropped under a strip; labels stay small.'],
-      ['Label everything clinically', 'Accession numbers and blank tags classify each object.'],
+      ['Severity by removal', 'One cropped word, a 15px caption, white space.'],
+      ['Default type, used without apology', 'An Arial-class sans and a typewriter mono.'],
+      ['Catalogue, never decorate', 'One blank label carries the accession number.'],
     ],
     do: [
       'Crop display type vertically under a strip.',
       'Number items year.sequence.part.',
-      'Keep the brand mark under two percent.',
+      'Show the primary once, as a 6px square.',
     ],
     dont: [
       'Add gradients, glows or glass.',
       'Use gothic tropes like chains or skulls.',
-      'Set tiny low-contrast type.',
+      'Add barcodes, grids or a colour bar.',
     ],
   },
 });

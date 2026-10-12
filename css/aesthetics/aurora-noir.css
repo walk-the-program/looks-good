@@ -16,13 +16,13 @@
   border-radius: 18px;
 }
 
-/* wallpaper: the 48px grid, faded toward the edges (the aurora lives behind the app window) */
+/* wallpaper: the 48px grid at 6% ink, faded toward the bottom by a canvas-colored radial
+   laid over it (no mask-image, so html2canvas exports the same fade) */
 .ab[data-ae="aurora-noir"]::after {
   content: ""; position: absolute; inset: 0; z-index: 0; pointer-events: none;
-  background-image: linear-gradient(var(--ab-grid) 1px, transparent 1px), linear-gradient(90deg, var(--ab-grid) 1px, transparent 1px);
-  background-size: 48px 48px; background-position: -1px -1px;
-  -webkit-mask-image: radial-gradient(ellipse 90% 60% at 50% 0%, #000 22%, transparent 80%);
-  mask-image: radial-gradient(ellipse 90% 60% at 50% 0%, #000 22%, transparent 80%);
+  background-image: radial-gradient(ellipse 120% 80% at 50% 0%, transparent 22%, var(--ab-canvas) 80%),
+    linear-gradient(var(--ab-grid) 1px, transparent 1px), linear-gradient(90deg, var(--ab-grid) 1px, transparent 1px);
+  background-size: 100% 100%, 48px 48px, 48px 48px; background-position: 0 0, -1px -1px, -1px -1px;
 }
 
 /* labels are mono through --ab-font-label; touches here are size and tracking */
@@ -57,7 +57,9 @@
 .ab[data-ae="aurora-noir"] .ab-hero-copy { text-align: left; justify-self: stretch; max-width: 78%; }
 .ab[data-ae="aurora-noir"] .ab-kicker { display: inline-flex; align-items: center; gap: 8px; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; }
 .ab[data-ae="aurora-noir"] .ab-kicker::before { content: "//"; color: var(--ab-primary-text); font-weight: 600; }
-.ab[data-ae="aurora-noir"] .ab-headline { font-weight: 510; letter-spacing: calc(-0.045em * var(--ab-tr, 1)); line-height: 0.98; text-wrap: balance; }
+.ab[data-ae="aurora-noir"] .ab-headline { font-weight: 600; letter-spacing: calc(-0.045em * var(--ab-tr, 1)); line-height: 0.98; text-wrap: balance; }
+/* the editorial option (a serif display face over the Geist UI, as in Linear Method and Resend) */
+.ab[data-ae="aurora-noir"]:is([data-hcls="soft-serif"], [data-hcls="didone"], [data-hcls="text-serif"]) .ab-headline { font-weight: 400; letter-spacing: calc(-0.02em * var(--ab-tr, 1)); line-height: 1; }
 /* the two-tone statement: first clause ink, the rest muted */
 .ab[data-ae="aurora-noir"] .ab-subcopy {
   max-width: 24em; margin-left: 0 !important; font-family: var(--ab-font-ui); font-weight: 500; letter-spacing: calc(-0.022em * var(--ab-tr, 1)); line-height: 1.28;
@@ -66,21 +68,27 @@
 .ab[data-ae="aurora-noir"] .ab-sub-lead { color: var(--ab-ink); }
 .ab[data-ae="aurora-noir"] .ab-sub-rest { color: var(--ab-muted); }
 
-/* art: a product window on a faint aurora */
+/* art: a product window lit by the aurora: a sharp beam from above (behind the window, seen in the gap
+   and along its sides), the same light falling on the window (a screen-blended cone in front of it),
+   and a hairline horizon arc beneath. Conic angles are absolute (0deg = up), so 158-202deg points down. */
 .ab[data-ae="aurora-noir"] .ab-art::before {
-  content: ""; position: absolute; inset: -22% -3% -10%; z-index: -1; pointer-events: none;
-  background:
-    radial-gradient(ellipse 40% 55% at 28% 42%, var(--ab-au1), transparent 100%),
-    radial-gradient(ellipse 38% 50% at 74% 40%, var(--ab-au2), transparent 100%),
-    radial-gradient(ellipse 36% 30% at 50% 66%, var(--ab-au3), transparent 100%);
-  filter: blur(44px);
+  content: ""; position: absolute; inset: -16% -4% -4%; z-index: -1; pointer-events: none;
+  background: conic-gradient(at 50% 3%, transparent 146deg, var(--ab-au1) 166deg, rgba(255, 255, 255, 0.4) 180deg, var(--ab-au2) 194deg, transparent 214deg);
+  filter: blur(10px);
 }
+.ab[data-ae="aurora-noir"] .ab-art::after {
+  content: ""; position: absolute; inset: -16% 5% 0; z-index: 2; pointer-events: none; mix-blend-mode: screen;
+  background: conic-gradient(at 50% 3%, transparent 168deg, var(--ab-au3) 173deg, rgba(255, 255, 255, 0.14) 180deg, var(--ab-au3) 187deg, transparent 192deg);
+  filter: blur(2px);
+}
+.ab[data-ae="aurora-noir"][data-mode="light"] .ab-art::after { display: none; }
+.ab[data-ae="aurora-noir"] .ana-arc { position: absolute; z-index: -1; left: -6%; right: -6%; bottom: 0; width: 112%; height: 34%; overflow: hidden; pointer-events: none; }
 .ab[data-ae="aurora-noir"] .ana { position: absolute; inset: 0; font-size: clamp(9px, 1.3cqw, 15px); line-height: 1.4; color: var(--ab-ink); }
 .ab[data-ae="aurora-noir"] .ana i { display: block; font-style: normal; }
 .ab[data-ae="aurora-noir"] .ana-win {
-  position: absolute; inset: 0; display: grid; grid-template-columns: 26% minmax(0, 1fr); overflow: hidden;
+  position: absolute; inset: 0 5%; display: grid; grid-template-columns: 26% minmax(0, 1fr); overflow: hidden;
   border: 1px solid var(--ab-hair2); border-bottom: 0; border-radius: 12px 12px 0 0; background: var(--ab-solid);
-  box-shadow: inset 0 1px 0 var(--ab-top);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.14), 0 -1px 0 var(--ab-au1);
   -webkit-mask-image: linear-gradient(180deg, #000 72%, transparent 100%); mask-image: linear-gradient(180deg, #000 72%, transparent 100%);
 }
 .ab[data-ae="aurora-noir"] .ana-side { padding: 1.5em 1em; border-right: 1px solid var(--ab-hair); background: var(--ab-fill); min-width: 0; }
@@ -129,13 +137,10 @@
   border: 1px solid var(--ab-hair); border-radius: 14px; position: relative;
   background: linear-gradient(90deg, transparent, var(--ab-top), transparent) top / 100% 1px no-repeat, var(--ab-fill);
 }
-/* the featured card: primary → secondary gradient border */
+/* the featured card: a plain hairline, with the beam colors on its top 1px only */
 .ab[data-ae="aurora-noir"] .ab-card {
-  border-color: transparent;
-  background:
-    linear-gradient(90deg, transparent, var(--ab-top), transparent) top / 100% 1px no-repeat padding-box,
-    linear-gradient(var(--ab-solid), var(--ab-solid)) padding-box,
-    linear-gradient(135deg, var(--ab-primary), var(--ab-secondary)) border-box;
+  border: 1px solid var(--ab-hair2);
+  background: linear-gradient(90deg, transparent, var(--ab-au1), var(--ab-au2), transparent) top / 100% 1px no-repeat, var(--ab-solid);
 }
 .ab[data-ae="aurora-noir"] .ab-panel { padding: clamp(18px, 2.8cqw, 24px); }
 

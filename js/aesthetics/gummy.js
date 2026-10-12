@@ -88,7 +88,11 @@ function gmArt(ctx) {
   const t = ctx.t;
   const night = !!t.isDark;
   const id = `gm${++seq}`;
-  const F = [gmTones(gmCandy(t.primary)), gmTones(gmCandy(t.secondary)), gmTones(gmCandy(t.accent)), gmTones(gmCandy(t.primary, 40)), gmTones(gmCandy(t.primary, -40))];
+  // flavours: primary, secondary, accent, then two computed by rotating the primary hue; the
+  // first rotation turns the other way when it would land on the accent's hue
+  const ph = hexToHsl(t.primary).h, ah = hexToHsl(t.accent).h;
+  const rot = hueDiff(ph + 40, ah) < 30 ? -72 : 40;
+  const F = [gmTones(gmCandy(t.primary)), gmTones(gmCandy(t.secondary)), gmTones(gmCandy(t.accent)), gmTones(gmCandy(t.primary, rot)), gmTones(gmCandy(t.primary, -36))];
   const defs = F.map((tn, i) => gmDefs(`${id}f${i}`, tn)).join('');
   const op = night ? 0.9 : 0.88;
   // sugar speckles for the sugared gumdrop
@@ -107,20 +111,20 @@ function gmArt(ctx) {
     }
     return s;
   };
-  return `<svg class="gm-spill" viewBox="0 0 1200 460" preserveAspectRatio="xMidYMid slice" aria-hidden="true" focusable="false">
+  return `<svg class="gm-spill" viewBox="0 110 1200 350" preserveAspectRatio="xMidYMid slice" aria-hidden="true" focusable="false">
     <defs>${defs}
       <filter id="${id}b" x="-40%" y="-200%" width="180%" height="500%"><feGaussianBlur stdDeviation="11"/></filter>
       <filter id="${id}c" x="-40%" y="-300%" width="180%" height="700%"><feGaussianBlur stdDeviation="4"/></filter>
       <linearGradient id="${id}w" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="${F[2].base}"/><stop offset=".5" stop-color="${F[2].base}"/><stop offset=".5" stop-color="${F[1].base}"/><stop offset="1" stop-color="${F[1].base}"/></linearGradient>
     </defs>
-    <!-- worm: two-tone, ridged, lying across the back -->
-    ${gmShadow(560, 360, 260, F[2], id, night)}
+    <!-- worm: two-tone, ridged, curled across the back -->
+    ${gmShadow(600, 372, 230, F[2], id, night)}
     <g opacity="${op}">
-      <path d="M330 352C420 330 470 360 560 344S720 300 800 330" fill="none" stroke="url(#${id}w)" stroke-width="54" stroke-linecap="round"/>
-      <path d="M330 352C420 330 470 360 560 344S720 300 800 330" fill="none" stroke="${F[1].deep}" stroke-opacity=".28" stroke-width="54" stroke-linecap="round" stroke-dasharray="3 15"/>
-      <path d="M330 338C420 316 470 346 560 330S720 286 800 316" fill="none" stroke="#fff" stroke-opacity=".32" stroke-width="10" stroke-linecap="round"/>
+      <path d="M380 360C440 300 520 380 590 352S700 270 770 300S860 372 830 392" fill="none" stroke="url(#${id}w)" stroke-width="50" stroke-linecap="round"/>
+      <path d="M380 360C440 300 520 380 590 352S700 270 770 300S860 372 830 392" fill="none" stroke="${F[1].rim}" stroke-opacity=".3" stroke-width="50" stroke-linecap="butt" stroke-dasharray="2.5 13"/>
+      <path d="M384 346C444 288 520 366 590 338S700 256 770 286" fill="none" stroke="#fff" stroke-opacity=".38" stroke-width="8" stroke-linecap="round"/>
     </g>
-    ${gmDots(352, 336, 0.9)}
+    ${gmDots(398, 340, 0.85)}
     <!-- ridged ring (secondary) -->
     ${gmShadow(640, 330, 118, F[1], id, night)}
     <g opacity="${op}">
@@ -140,10 +144,10 @@ function gmArt(ctx) {
     ${sugar}
     ${gmDots(238, 262, 1.4)}
     <!-- jelly cube (rotated flavour) overlapping the gumdrop: overlaps multiply like candy glass -->
-    ${gmShadow(452, 404, 70, F[3], id, night)}
+    ${gmShadow(452, 404, 70, F[4], id, night)}
     <g opacity="${op}" style="mix-blend-mode:multiply" transform="rotate(-10 452 350)">
-      <rect x="392" y="292" width="122" height="112" rx="34" fill="url(#${id}f3)"/>
-      <rect x="397" y="297" width="112" height="102" rx="30" fill="none" stroke="${F[3].rim}" stroke-opacity=".4" stroke-width="4"/>
+      <rect x="392" y="292" width="122" height="112" rx="34" fill="url(#${id}f4)"/>
+      <rect x="397" y="297" width="112" height="102" rx="30" fill="none" stroke="${F[4].rim}" stroke-opacity=".4" stroke-width="4"/>
     </g>
     ${gmDots(420, 316, 0.95)}
     <!-- jelly bean (accent), tumbling -->
@@ -154,10 +158,10 @@ function gmArt(ctx) {
     </g>
     ${gmDots(842, 330, 0.9)}
     <!-- gumdrop (other flavour), back right, a little squashed -->
-    ${gmShadow(1040, 372, 92, F[4], id, night)}
+    ${gmShadow(1040, 372, 92, F[3], id, night)}
     <g opacity="${op}">
-      <path d="M952 372C944 290 984 220 1040 220S1136 290 1128 372C1104 384 976 384 952 372Z" fill="url(#${id}f4)"/>
-      <path d="M958 366C952 294 988 228 1040 228" fill="none" stroke="${F[4].rim}" stroke-opacity=".45" stroke-width="5"/>
+      <path d="M952 372C944 290 984 220 1040 220S1136 290 1128 372C1104 384 976 384 952 372Z" fill="url(#${id}f3)"/>
+      <path d="M958 366C952 294 988 228 1040 228" fill="none" stroke="${F[3].rim}" stroke-opacity=".45" stroke-width="5"/>
     </g>
     ${gmDots(1000, 258, 1.1)}
     <!-- small drops -->
@@ -180,7 +184,7 @@ function gmSealUri(tn, n) {
   }
   const enc = s => s.replace(/#/g, '%23');
   const svg = `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><defs><radialGradient id='j' cx='.66' cy='.72' r='.8'><stop offset='0' stop-color='${tn.light}'/><stop offset='.5' stop-color='${tn.base}'/><stop offset='1' stop-color='${tn.deep}'/></radialGradient></defs><g fill='url(%23j)'>${d}<circle cx='50' cy='50' r='${R - r}'/></g><circle cx='50' cy='50' r='${R - r - 4}' fill='none' stroke='${tn.rim}' stroke-opacity='.35' stroke-width='1.5' stroke-dasharray='2 3'/><ellipse cx='28' cy='26' rx='6' ry='3.4' transform='rotate(-35 28 26)' fill='white'/><circle cx='37' cy='21' r='2' fill='white'/></svg>`;
-  return `url("data:image/svg+xml;utf8,${enc(svg)}")`;
+  return `url("data:image/svg+xml;utf8,${enc(svg).replace(/'/g, '%27')}")`;
 }
 
 registerAesthetic({
@@ -307,6 +311,7 @@ registerAesthetic({
   },
 
   deck: {
+    coverDisplay: 0.66,
     principles: [
       ['Light passes through, colour spills', 'Bodies are translucent and shadows carry their colour.'],
       ['Squash on press, never sag', 'Pressed controls flatten outward from the base.'],

@@ -386,3 +386,82 @@ The stepped echo headline (ink with gap, accent, gap, primary) in Bagel Fat One.
 3. Fixed style palettes for bauhaus-poster (primaries) and groovy-70s (earth ramp) on art and patterns.
 4. Hero scale on neo-brutal-pop, radical-memphis, bento-grid and the groovy-70s phone layout.
 5. Raw-brutalist: flatten the shadows and add the default-HTML voice.
+
+---
+
+## Fix log (fx62)
+
+Worker fx62 (FX6-2, packet rev 2). Files changed: `js/aesthetics/{raw-brutalist,neo-brutal-pop,bauhaus-poster,radical-memphis,bento-grid,groovy-70s}.js` and the matching `css/aesthetics/*.css`. No shared files touched. Evidence is in `S/adv/fx62/`: board sheets `sheet-fx62-<key>.png` (A/B/C/D), deck sheets `sheet-deck-<key>-rec.png` / `-oth.png`, and `gore.json`.
+
+**raw-brutalist**
+- Fix 1 (top): done. `--rb-shadow: none`. The card, CTA and states are flat. Hover inverts to ink, pressed takes `outline 2px ink, offset -6px`, and the input focus is a 3px ink outline.
+- Fix 2 (top): done. The sub-line, footer influences, "Use recommended fonts", the pair line and the deck footer page number all render as Times with `#0000EE` underlined links (visited `#551A8B`). On a dark canvas they use `#9EB8FF` / `#C9A2FF`, because `#0000EE` fails contrast there.
+- Fix 3 (top): done. Hero padding-bottom is `clamp(20px,3cqw,40px)`. Mono ticks `01…12` sit on the hero grid. The board headline is sized so "SHOULD" reaches the right edge (961px against a 936px hero, bleeding into the pad). The spec index is now a full-width `ID / ITEM / STATE / UPDATED` table under the headline.
+- Fix 4: done. Status chips are ink outline only.
+- Fix 5: deck material art done. The art carries a wireframe of the board (`DIV.hero 1280×640`, `UL.rows 3`…), shown only on the Material slide, and `materialStage:'pattern'` is removed. The suite is under SHARED.
+- Fix 6: under SHARED (fonts).
+- Fix 7: done. Do/don't marks are mono `[x]` / `[ ]`.
+- Deck: the Save states on 05 are sized to content. The 09 "monochrome" line is replaced with "Color only in the swatch strip and one band."
+
+**neo-brutal-pop**
+- Fix 1 (top): done. The hero is split, with a left-set headline at `clamp(56px,10.2cqw,150px)` across three lines. "alive" is a -4deg yellow sticker block with a 2px ink border and a 6px shadow. The art is a cluster of UI-object stickers: a "$1" price tag on a string, a NEW starburst, a checkbox and a cursor, each 3px ink with a hard shadow. The base is 11.5cqw times the 0.86 length scale; I trimmed it to 10.2 so it holds three lines in the copy column.
+- Fix 2 (top): done. The headline pseudo-stickers are deleted, so nothing sits on text in the board or the deck. Stickers appear only in the art (cover) and as a closing-slide starburst in the gutter. Gore reports 0.
+- Fix 3 (top): done. The Material slide is a die-cut sticker sheet: a paper rectangle, 2px border, 8px shadow, 3×2 objects at 120px with 18px labels. "Get started" is removed.
+- Fix 4: done. The canvas is paper. The type section is a 100% primary field and "In use" is a 100% accent field, with paper cards inside. The 32px grid is removed.
+- Fix 5: done. One rotated (-2deg) paper card holds a 160px "Aa" with the picks as a one-line ramp. The pairings change is under SHARED.
+- Fix 6: under SHARED.
+- Fix 7: done. Status chips are solid secondary with a 2px border and 6px radius. Text uses `--ab-on-secondary` rather than ink, so it stays readable in dark mode.
+
+**bauhaus-poster**
+- Fix 1 (top): done. The art is a constructed poster: a red circle at 0.62W, a black bar at -24deg (0.09W), a yellow square at 0.28W off-axis, a blue half-disc and a thin parallel rule. The art width is `clamp(220px,46cqw,560px)`. It starts at the headline's third line, so it overlaps only the tail of line two and stays under the type.
+- Fix 2 (top): done. A `.ab-hero::after` ink bar crosses at -12deg behind the headline. The kicker is a solid 28px red bar with the label reversed in 12px bold caps. The principle number discs step down a diagonal (red discs) on the deck. The closing slide gets a diagonal bar.
+- Fix 3 (top): done. `BP_INKS` holds the fixed primaries (#D7332A / #F2C230 / #1F4FA2 / #151515 on #F1ECE2) for the art, the highlight word and the kicker. The client primary drives only the CTA, selection and switch; the green palette still prints a red, yellow and blue poster. On a dark canvas the black marks reverse to paper. The `primaries` colorway is under SHARED.
+- Fix 4: done. Status, fit stamp and fonts button are square with no fill.
+- Fix 5: under SHARED.
+- Fix 6: done. The board headline is 16.4cqw times the length scale and spans the measure. "alive" changes to red as a whole word (`--bp-red-text`, contrast-checked). There is a 6px ink rule above the headline.
+- Fix 7: done. On phones the poster is tilted -8deg and bleeds 12% off the right edge.
+- Deck: the cover poster is about 430px (60% of the slide) and replaces the stripe band. Material shows the poster with dimension annotations (Ø 0.62, −24°, 0.28, BAR 0.09).
+
+**radical-memphis**
+- Fix 1 (top): done. The headline is `clamp(44px,9.5cqw,120px)`, tilted -2.5deg. A new `headline()` hook puts each line on a paper slab with a squiggle edge and "alive" on a solid secondary slab with a primary-tint offset sheet. The `.ab-hl` rule is as specified, with the text colour contrast-picked (`--ab-m-on-sec`). It sets in three lines, not two, because the art column takes the rest of the width.
+- Fix 2 (top): done. The segmented control is radius 0 with 14px circle, triangle and square markers. The CTA is a slab with one semicircle end and a checker arrow block. The fonts button is a black slab, the status chip is a tilted rectangle, and the fit stamp is square.
+- Fix 3 (top): done. On phones the totem comes first and bleeds 10% off the right; the headline at `clamp(36px,11cqw,48px)` overlaps its base slab.
+- Fix 4: done. Dividers are a 10px black-and-white checker band. The CSS `mask` on the rule and on the chip squiggles is replaced with background images, which also makes them export-safe.
+- Fix 5: under SHARED. A `glyphgrid` black-and-white entry is impossible because glyphgrid becomes raw's exclusive lead, so I substituted other families.
+- Fix 6: done. Each in-use row opens on a 56px Bacterio, terrazzo or checker swatch; the rows are paper and ink with black rules, and the pastel washes are gone.
+- Fix 7: done. Deck 05 states are 120px objects (about 144px after zoom) on a skewed terrazzo floor slab.
+
+**bento-grid**
+- Fix 1 (top): done. The headline tile spans 7 columns and 2 rows, with the headline at `clamp(44px,7.6cqw,104px)` bottom-aligned. The phone tile is 5×1. A full-bleed primary numeral tile ("3", "Projects in motion") is built from the hero's ::before/::after, which become grid items because the hero is `display:contents`.
+- Fix 2 (top): done. There is one radius level. Palette and type wrappers dissolve into the board grid; each swatch is a filled tile (canvas spans 4 columns, the rest 2) and each specimen is a tile with a 96px "Aa".
+- Fix 3 (top): done. `.ab-hl` uses `--ab-primary-text`, including the deck's "idea.". I did not use a gradient-clip version because html2canvas cannot export `background-clip:text`.
+- Fix 4: done. All soft shadows, `--ab-pri-glow` and the art gradient are gone; hover is `scale(1.01)`.
+- Fix 5: suite under SHARED. The deck Material slide now shows the "Tile system" (2×2, 2×1, 1×1, 1×2, gap 14, radius 28) in place of the repeated phone. Replacing slide 07 itself needs a framework hook.
+- Fix 6: done. The interface row has an image tile: a lit primary sphere render on its own shadow.
+- Fix 7: done. On phones the palette is 2-up (canvas full width), stats stay 2-up, and the phone tile is square and crops the device.
+
+**groovy-70s**
+- Fix 1 (top): done. The arch is six solid bands with no tints and a canvas interior. They come from a fixed earth ramp (`GV_EARTH` #6E3421 / #C8471E / #E38B1F / #F2B62A / #8C8F2A) with the client primary as the single brand band. The echo and the stripes also use the ramp. The `earth` colorway is under SHARED.
+- Fix 2 (top): done. On phones the headline is `clamp(40px,12.5cqw,56px)` with a two-layer echo, and the arch is a cropped half-dome above it.
+- Fix 3 (top): done, using the "move all copy below the arch" option. Nothing straddles the arch.
+- Fix 4: done. "far out" is lettered on an SVG textPath along the inner curve in place of the pill. Status chips are plain lettering on the band. The tabs and fonts button are arch-topped instead of capsules.
+- Fix 5: done. The ~70% wash came from `opacity:.8` on `.ab-state`; it is removed. Pressed uses `--ab-pri-dark`.
+- Fix 6: under SHARED.
+- Fix 7: done. The cover arch is 1000px wide (about 560px tall, ~78% of the slide), centred and rising from behind a cream ground band, with the headline at about 72px (`coverDisplay .55`). The teal ring band is hidden on this cover. The wavy rule's CSS `mask` is replaced with a background-image wave.
+
+**Verification**
+- Board: `board.sh` for all six (24 shots) gives `overflow=0` on every shot.
+- Gore: `gore.sh` on the six keys, 4 configs each (24 combos), reports **0 issues**.
+- `node tests/run.js`: all passed.
+- `harness.js`: 0 failures for these keys. The remaining FAILs are retro-futurist and wabi-sabi placeholders, which belong to other workers.
+- `src-verify-p5.js`: families 53, fails 0, map mismatches 0.
+- Console: the only error is the pre-existing favicon 404.
+- Blend donor smoke test: all six render as donor art on another base with no errors.
+
+**Still short (honest re-score)**
+- raw-brutalist: 6.5. The default-HTML voice and flatness land. The cover and closing still carry the modulargrid band until fit.js changes, and the product slide is still the SaaS dashboard.
+- neo-brutal-pop: 6.5. The hero now reads as Gumroad. The stickers are flat vector, not 3D objects like Gumroad's coins. The cover and closing still show groovy's rainbow until fit.js changes.
+- bauhaus-poster: 7. This is the biggest jump: constructed, diagonal, fixed primaries. The patterns slide is still op-art until fit.js changes.
+- radical-memphis: 6.5. The headline is furniture and the controls are slabs. The totem shrank because the copy column grew. "Speckle top" remains until fit.js changes.
+- bento-grid: 6.5. It has hierarchy, one radius level and a render tile. Imagery is still thin compared with Apple, and slide 07 is still patterns.
+- groovy-70s: 7. The arch is solid earth and the headline is locked below it. The palette strip and the deck colour slide still show the client teal, because the palette must show the client's roles.

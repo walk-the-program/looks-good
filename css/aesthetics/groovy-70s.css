@@ -23,14 +23,14 @@
   background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n' x='0' y='0' width='100%25' height='100%25'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' seed='7'/%3E%3CfeColorMatrix values='0 0 0 0 .25 0 0 0 0 .15 0 0 0 0 .1 0 0 0 1.6 -.55'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)'/%3E%3C/svg%3E") 0 0 / 180px 180px;
 }
 
-/* ---- wavy dividers replace every straight rule: one flat ink-tint wave; only the header and footer stripes carry colour ---- */
+/* ---- wavy dividers replace every straight rule: one flat ink-tint wave (a background image, no mask);
+   only the header and footer stripes carry colour ---- */
 .ab[data-ae="groovy-70s"] .ab-rule, .ab[data-ae="groovy-70s"] .ab-foot::before {
-  height: 12px; background: var(--ab-wave-ink);
-  -webkit-mask: var(--gv-wave) 0 0 / 40px 12px repeat-x; mask: var(--gv-wave) 0 0 / 40px 12px repeat-x;
+  height: 12px; background: var(--gv-wave-ink) 0 0 / 40px 12px repeat-x;
 }
-/* three stacked waves (primary, secondary, accent; 3px strokes, 3px apart) under the header and above the footer */
+/* three stacked waves (primary, burnt orange, harvest gold; 3px strokes, 3px apart) under the header and above the footer */
 .ab[data-ae="groovy-70s"] .ab-head + .ab-rule, .ab[data-ae="groovy-70s"] .ab-foot::before {
-  height: 24px; background: var(--ab-wave3) 0 0 / 40px 24px repeat-x; -webkit-mask: none; mask: none;
+  height: 24px; background: var(--ab-wave3) 0 0 / 40px 24px repeat-x;
 }
 .ab[data-ae="groovy-70s"] .ab-foot { border-top: 0; padding-top: 0; }
 .ab[data-ae="groovy-70s"] .ab-foot::before { content: ""; flex: 0 0 100%; margin-bottom: 10px; }
@@ -46,25 +46,25 @@
 .ab[data-ae="groovy-70s"] .ab-tag { padding: 6px 14px; border-radius: 999px; background: var(--ab-card-b); color: var(--ab-ink); font-size: 10.5px; letter-spacing: 0.1em; }
 .ab[data-ae="groovy-70s"] .ab-tag b { font-weight: 700; }
 
-/* ---- hero: the rainbow arches over the statement ---- */
+/* ---- hero: the supergraphic arch first, the statement BELOW it (never straddling its feet) ---- */
 .ab[data-ae="groovy-70s"] .ab-hero { gap: 0; padding: clamp(18px, 3.4cqw, 40px) 0 clamp(26px, 4cqw, 46px); }
 .ab[data-ae="groovy-70s"] .ab-art { order: -1; width: 100%; max-width: 760px; justify-self: center; overflow: visible; }
 .ab[data-ae="groovy-70s"] .ab-art svg { display: block; overflow: visible; }
-.ab[data-ae="groovy-70s"] .ab-hero-copy { position: relative; z-index: 1; max-width: calc(var(--gv-w) * 0.5); margin-top: calc(var(--gv-w) * -0.285); }
-.ab[data-ae="groovy-70s"] .ab-kicker {
-  display: inline-block; margin-bottom: clamp(10px, 1.6cqw, 16px) !important; padding: 5px 16px; border-radius: 999px; background: var(--ab-accent); color: var(--ab-on-accent);
-  font-family: var(--ab-font-h); font-weight: var(--ab-hw); font-size: 12px; letter-spacing: 0.04em; text-transform: none;
-}
+.ab[data-ae="groovy-70s"] .gva-t { font-family: var(--ab-font-h); font-weight: var(--ab-hw); text-transform: lowercase; }
+.ab[data-ae="groovy-70s"] .ab-hero-copy { position: relative; z-index: 1; max-width: var(--gv-w); margin-top: clamp(18px, 3cqw, 34px); }
+.ab[data-ae="groovy-70s"]:not(.ab-slide) > .ab-in > .ab-hero .ab-headline { font-size: calc(clamp(40px, 9.2cqw, 112px) * var(--ab-hl-scale, 1) * var(--ab-hs, 1)); }
+/* the "far out" kicker is lettered along the arch's inner curve instead of a pill */
+.ab[data-ae="groovy-70s"] .ab-hero .ab-kicker { display: none; }
 /* the stepped multiline echo (Stripes / Cooper poster lettering): cream gap, accent, cream gap, primary */
 .ab[data-ae="groovy-70s"] .ab-headline {
   font-weight: var(--ab-hw); font-variation-settings: "SOFT" 100, "WONK" 0, "opsz" 144;
   line-height: 1.1; letter-spacing: calc(-0.035em * var(--ab-tr, 1)); color: var(--ab-ink); text-wrap: balance;
-  text-shadow: .035em .035em 0 var(--gv-gap), .07em .07em 0 var(--ab-accent), .105em .105em 0 var(--gv-gap), .14em .14em 0 var(--ab-primary);
+  text-shadow: .035em .035em 0 var(--gv-gap), .07em .07em 0 var(--gv-gold), .105em .105em 0 var(--gv-gap), .14em .14em 0 var(--ab-primary);
   padding-bottom: .16em;
 }
 .ab[data-ae="groovy-70s"] .ab-hl {
   color: var(--ab-primary-text); text-decoration: none; margin-left: 0.05em;
-  text-shadow: .035em .035em 0 var(--gv-gap), .07em .07em 0 var(--ab-accent), .105em .105em 0 var(--gv-gap), .14em .14em 0 var(--ab-ink);
+  text-shadow: .035em .035em 0 var(--gv-gap), .07em .07em 0 var(--gv-gold), .105em .105em 0 var(--gv-gap), .14em .14em 0 var(--ab-ink);
 }
 .ab[data-ae="groovy-70s"] .ab-subcopy { margin-left: auto !important; margin-right: auto !important; max-width: 26em; font-size: clamp(14px, 1.7cqw, 17px); color: var(--ab-ink); opacity: 0.78; }
 
@@ -99,9 +99,9 @@
 .ab[data-ae="groovy-70s"] .ab-fit[data-fit="avoid"] { background: var(--ab-ink); color: var(--ab-canvas); }
 .ab[data-ae="groovy-70s"] .ab-type-k { color: var(--ab-ink); font-weight: 700; }
 .ab[data-ae="groovy-70s"] .ab-type-apply {
-  padding: 12px 22px; border: 0; border-radius: 999px; background: var(--ab-ink); color: var(--ab-canvas); font-weight: 700; transition: transform .15s;
+  padding: 14px 24px 11px; border: 0; border-radius: 999px 999px 8px 8px; background: var(--gv-brown); color: #F6EBD9; font-weight: 700; transition: transform .15s;
 }
-.ab[data-ae="groovy-70s"] .ab-type-apply:hover { background: var(--ab-ink); transform: scale(1.04); }
+.ab[data-ae="groovy-70s"] .ab-type-apply:hover { background: var(--gv-brown); transform: scale(1.04); }
 .ab[data-ae="groovy-70s"] .ab-type-apply:focus-visible { outline: 3px solid var(--ab-primary-text); outline-offset: 3px; }
 
 /* ---- 01 interface: a cream panel framed by corner-turning stripes, tabs, fat pill CTA on a rising sun ---- */
@@ -120,8 +120,9 @@
   content: ""; position: absolute; z-index: -1; left: 0; right: 0; bottom: 0; height: calc(var(--gv-cp) + 58px); border-radius: 0 0 36px 36px; pointer-events: none;
   background: repeating-conic-gradient(from -90deg at 50% 100%, var(--ab-accent) 0 9deg, transparent 9deg 18deg);
 }
-.ab[data-ae="groovy-70s"] .ab-seg { gap: 4px; padding: 5px; border-radius: 999px; background: var(--ab-track); }
-.ab[data-ae="groovy-70s"] .ab-seg-btn { min-height: 38px; border-radius: 999px; font-size: 13px; font-weight: 600; color: var(--ab-ink); opacity: 0.8; transition: background .15s, transform .15s; }
+/* tabs are little arches (round tops, flat feet) standing on a wavy-free track, not SaaS capsules */
+.ab[data-ae="groovy-70s"] .ab-seg { gap: 6px; padding: 0 0 0; border-radius: 0; background: none; border-bottom: 4px solid var(--ab-track); }
+.ab[data-ae="groovy-70s"] .ab-seg-btn { min-height: 40px; border-radius: 999px 999px 0 0; background: var(--ab-track); font-size: 13px; font-weight: 600; color: var(--ab-ink); opacity: 0.8; transition: background .15s, transform .15s; }
 .ab[data-ae="groovy-70s"] .ab-seg-btn:hover { opacity: 1; background: var(--ab-lift); }
 .ab[data-ae="groovy-70s"] .ab-seg-btn[aria-pressed="true"] { background: var(--ab-primary); color: var(--ab-on-primary); opacity: 1; font-weight: 700; }
 .ab[data-ae="groovy-70s"] .ab-card-title { margin: 24px 0 8px !important; font-family: var(--ab-font-h); font-weight: var(--ab-hw); letter-spacing: calc(-0.01em * var(--ab-tr, 1)); font-size: clamp(22px, 3cqw, 30px); line-height: 1.1; }
@@ -147,7 +148,8 @@
 .ab[data-ae="groovy-70s"] .ab-switch:checked::before { transform: translateX(24px); }
 .ab[data-ae="groovy-70s"] .ab-status { margin-left: 6px; display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--ab-ink); opacity: 0.75; }
 .ab[data-ae="groovy-70s"] .ab-status::before { content: ""; width: 10px; height: 10px; border-radius: 50%; background: var(--ab-primary); }
-.ab[data-ae="groovy-70s"] .ab-state { font-size: 12px; font-weight: 600; color: var(--ab-ink); opacity: 0.8; }
+/* no opacity on the state wrapper: it washed the Save samples out to ~70% saturation */
+.ab[data-ae="groovy-70s"] .ab-state { font-size: 12px; font-weight: 600; color: var(--ab-ink); }
 .ab[data-ae="groovy-70s"] .ab-states .ab-state-ctl { border-radius: 999px; padding: 12px 10px; background: var(--ab-primary); color: var(--ab-on-primary); font-weight: 700; justify-content: center; box-shadow: none; transition: none; }
 .ab[data-ae="groovy-70s"] .ab-states .ab-state-ctl.is-hover { transform: scale(1.06); box-shadow: 0 0 0 5px var(--ab-ring); }
 .ab[data-ae="groovy-70s"] .ab-states .ab-state-ctl.is-pressed { transform: scale(0.93); background: var(--ab-pri-dark); }
@@ -163,7 +165,8 @@
 .ab[data-ae="groovy-70s"] .ab-row-n { display: none; }
 .ab[data-ae="groovy-70s"] .ab-av { display: grid; place-items: center; width: 38px; height: 38px; border-radius: 50%; background: var(--ab-lift); color: var(--ab-ink); font: var(--ab-hw) 15px/1 var(--ab-font-h); }
 .ab[data-ae="groovy-70s"] .ab-row-name { font-weight: 700; font-size: 14px; color: inherit; }
-.ab[data-ae="groovy-70s"] .ab-row-status { background: var(--ab-lift); color: var(--ab-ink); font-weight: 600; padding: 4px 12px; }
+/* status: plain lettering on the band, no white mini-pill */
+.ab[data-ae="groovy-70s"] .ab-row-status { background: none; color: inherit; font-weight: 700; padding: 0; border-radius: 0; font-size: 12px; letter-spacing: 0.02em; }
 .ab[data-ae="groovy-70s"] .ab-row-bar { height: 12px; border-radius: 999px; background: color-mix(in srgb, var(--gv-rt) 24%, transparent); }
 .ab[data-ae="groovy-70s"] .ab-row-bar i { border-radius: 999px; background: var(--gv-rt); }
 .ab[data-ae="groovy-70s"] .ab-row-pct { font-weight: 700; font-size: 13px; color: inherit; }
@@ -177,9 +180,16 @@
 /* ---- narrow boards ---- */
 @container ab (max-width: 600px) {
   .ab[data-ae="groovy-70s"] .ab-hero { padding: 14px 0 28px; }
-  .ab[data-ae="groovy-70s"] .ab-art { max-width: none; aspect-ratio: 200 / 112; }
-  .ab[data-ae="groovy-70s"] .ab-hero-copy { max-width: 58cqw; margin-inline: auto; margin-top: calc(var(--gv-w) * -0.2); }
-  .ab[data-ae="groovy-70s"] .ab-headline { font-size: calc(clamp(24px, 8.2cqw, 36px) * var(--ab-hl-scale, 1) * var(--ab-hs, 1) * var(--ab-display, 1)); text-align: center; }
+  /* phone: the arch is a cropped half-dome above (wider than the board, cut at the sides),
+     the headline below it at full width, the echo reduced to two layers */
+  .ab[data-ae="groovy-70s"] .ab-hero > .ab-art { max-width: none; width: calc(100% + 2 * var(--ab-pad)); margin-inline: calc(var(--ab-pad) * -1); aspect-ratio: 200 / 84; overflow: hidden; justify-self: stretch; }
+  .ab[data-ae="groovy-70s"] .ab-hero > .ab-art svg { width: 128%; height: auto; margin-left: -14%; }
+  .ab[data-ae="groovy-70s"] .ab-hero-copy { max-width: none; margin-inline: 0; margin-top: 20px; }
+  .ab[data-ae="groovy-70s"] .ab-headline, .ab[data-ae="groovy-70s"]:not(.ab-slide) > .ab-in > .ab-hero .ab-headline {
+    font-size: calc(clamp(40px, 12.5cqw, 56px) * var(--ab-hl-scale, 1) * var(--ab-hs, 1)); text-align: center;
+    text-shadow: .035em .035em 0 var(--gv-gap), .07em .07em 0 var(--ab-primary);
+  }
+  .ab[data-ae="groovy-70s"] .ab-hl { text-shadow: .035em .035em 0 var(--gv-gap), .07em .07em 0 var(--ab-ink); }
   .ab[data-ae="groovy-70s"] .ab-hero-copy { text-align: center; }
   .ab[data-ae="groovy-70s"] .ab-swatches[data-kind="strips"] .ab-swatch { flex-wrap: wrap; gap: 2px 12px; padding: 10px 22px; border-radius: 30px; min-height: 0; }
   .ab[data-ae="groovy-70s"] .ab-sw-role { flex: 1 1 auto; }
@@ -196,15 +206,25 @@
   .ab[data-ae="groovy-70s"] .ab-cta:hover, .ab[data-ae="groovy-70s"] .ab-cta:active, .ab[data-ae="groovy-70s"] .ab-type-apply:hover { transform: none; }
 }
 
-/* Deck cover: the board pulls the statement up into the arch's hollow, which only holds
-   a short, narrow headline. A wide face or a long tagline spills onto the rings, so on the
-   cover the arch sits beside the statement instead of around it, and it is drawn at supergraphic
-   scale: larger than its column and cropped by the slide edge, the way the 70s bands wrap a wall. */
-.ab[data-ae="groovy-70s"].ab-slide[data-slide="cover"] { --gv-gap: var(--ab-canvas); }
-.ab[data-ae="groovy-70s"].ab-slide[data-slide="cover"] .ab-hero { padding: 0 0 8px; }
-.ab[data-ae="groovy-70s"].ab-slide[data-slide="cover"] .ab-art { max-width: none; width: 100%; margin-left: calc(var(--ab-pad) * -1); overflow: visible; }
-.ab[data-ae="groovy-70s"].ab-slide[data-slide="cover"] .ab-art svg { transform: translateX(-30%) scale(1.4); transform-origin: 50% 100%; }
-.ab[data-ae="groovy-70s"].ab-slide[data-slide="cover"] .ab-hero-copy { max-width: 82%; margin-top: 14px; }
+/* Deck cover: the arch at ~85% of the slide height, centred and bleeding off the bottom edge,
+   the statement above it at ~72px (def.deck.coverDisplay 0.55). The pattern band is not used
+   on this cover (the arch is the cover). */
+.ab[data-ae="groovy-70s"].ab-slide[data-slide="cover"] > .ab-deck-pattern { display: none; }
+.ab[data-ae="groovy-70s"].ab-slide[data-slide="cover"] > .ab-in.ab-slide-in { padding-bottom: 26px !important; }
+.ab[data-ae="groovy-70s"].ab-slide[data-slide="cover"] .ab-deck-cover { justify-content: flex-start; }
+.ab[data-ae="groovy-70s"].ab-slide[data-slide="cover"] .ab-hero { position: static; padding: 0; }
+.ab[data-ae="groovy-70s"].ab-slide[data-slide="cover"] .ab-hero > .ab-art {
+  position: absolute; z-index: 0; left: 50%; bottom: -60px; width: 1000px; max-width: none; height: auto; aspect-ratio: 200 / 112; transform: translateX(-50%); margin: 0;
+}
+.ab[data-ae="groovy-70s"].ab-slide[data-slide="cover"] .ab-hero-copy { position: relative; z-index: 1; max-width: 900px; margin: 0 auto; }
+/* the meta row and the footer are a cream ground band the arch rises from behind */
+.ab[data-ae="groovy-70s"].ab-slide[data-slide="cover"] .ab-deck-cover-meta,
+.ab[data-ae="groovy-70s"].ab-slide[data-slide="cover"] .ab-slide-foot {
+  position: relative; z-index: 2; background: var(--ab-canvas); box-shadow: -60px 0 0 var(--ab-canvas), 60px 0 0 var(--ab-canvas);
+}
+.ab[data-ae="groovy-70s"].ab-slide[data-slide="cover"] .ab-deck-cover-meta { margin-top: auto; padding-top: 12px; box-shadow: -60px 0 0 var(--ab-canvas), 60px 0 0 var(--ab-canvas), 0 26px 0 var(--ab-canvas), -60px 26px 0 var(--ab-canvas), 60px 26px 0 var(--ab-canvas); }
+.ab[data-ae="groovy-70s"].ab-slide[data-slide="cover"] .ab-slide-foot { box-shadow: -60px 0 0 var(--ab-canvas), 60px 0 0 var(--ab-canvas), 0 30px 0 var(--ab-canvas); }
+.ab[data-ae="groovy-70s"].ab-slide[data-slide="cover"] .ab-subcopy { display: none; }
 
 /* Deck product slide: the CTA card is a cream panel framed by the corner-turning stripes */
 .ab[data-ae="groovy-70s"] .ab-deck-ctacard {

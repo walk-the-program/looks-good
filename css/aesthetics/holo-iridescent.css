@@ -1,18 +1,22 @@
 /* ---------------------------------------------------------------------
-   06 Holo Iridescent — thin chromatic light on near-black: a thin-film bubble
-   rim and a spectral ribbon, panels with a 1px iridescent hairline, chrome
-   pills, a solid CTA with a spectral top edge. Light mode is a quiet pearl.
-   The spectrum is decorative and fixed; variables (--ab-pearl, --ab-spec-conic,
-   --ab-rim-conic, --ab-card-solid, --ab-chrome ...) come from
-   js/aesthetics/holo-iridescent.js tokens(). Nothing here moves.
-   Layout hooks: hero 'centered', type ui/label 'sans', states 'chip'.
+   06 Holo Iridescent — a pearl ground and one large foil plane: interference
+   fringes in the fixed thin-film order plus an angle sweep, so the hue drifts in
+   bands across the surface (Cru+ / Black & Bone / thin-film physics). A soap
+   bubble (SVG, export-safe) overlaps one corner. Panels are solid with a plain
+   hairline; only the featured 01 card keeps a spectral edge. The spectrum is
+   decorative and fixed; variables (--ab-pearl, --ab-spec-conic, --ab-card-solid,
+   --ab-chrome ...) come from js/aesthetics/holo-iridescent.js tokens().
+   Nothing here moves. Layout hooks: hero 'split', palette 'strips', states 'chip'.
 ------------------------------------------------------------------------ */
 
 .ab[data-ae="holo-iridescent"] {
   --ho-edge: linear-gradient(var(--ab-card-solid), var(--ab-card-solid)) padding-box, var(--ab-spec-conic) border-box;
   --ho-knob: radial-gradient(circle at 35% 28%, #fff 0, #eceef2 32%, #c9ccd4 72%, #f4f4f6);
-  --ab-art-ratio: 2.15 / 1;
-  --ab-art-ratio-narrow: 3 / 2;
+  /* the foil recipe, reused by the hero plane, the Foil sample disc and the mark */
+  /* stops carry their own alpha (normal blending) so html2canvas exports the same foil */
+  --ho-fringe: repeating-radial-gradient(circle at 28% 118%, rgba(255, 154, 213, 0.62) 0 2.2cqw, rgba(143, 227, 255, 0.62) 3.4cqw, rgba(183, 156, 255, 0.62) 4.6cqw, rgba(139, 245, 196, 0.62) 5.8cqw, rgba(255, 224, 143, 0.62) 7cqw, rgba(255, 154, 213, 0.62) 8.2cqw);
+  --ho-angle: conic-gradient(from 200deg at 72% 30%, rgba(255, 154, 213, 0.4), rgba(143, 227, 255, 0.4), rgba(183, 156, 255, 0.4), rgba(139, 245, 196, 0.4), rgba(255, 224, 143, 0.4), rgba(255, 154, 213, 0.4));
+  --ho-fringe-s: repeating-radial-gradient(circle at 20% 120%, #ff9ad5 0 3px, #8fe3ff 5px, #b79cff 7px, #8bf5c4 9px, #ffe08f 11px, #ff9ad5 13px);
   border-radius: 24px;
   background: var(--ab-pearl), var(--ab-canvas);
 }
@@ -25,19 +29,16 @@
   box-shadow: inset -2px -3px 5px rgba(80, 60, 140, 0.22), inset 0 0 0 1px rgba(255, 255, 255, 0.7), 0 5px 12px -4px rgba(120, 90, 200, 0.5);
 }
 .ab[data-ae="holo-iridescent"] .ab-tag { font-size: 10px; letter-spacing: 0.24em; }
-.ab[data-ae="holo-iridescent"] .ab-rule {
-  background: var(--ab-spec-linear); opacity: 0.7;
-  -webkit-mask: linear-gradient(90deg, transparent, #000 14%, #000 86%, transparent);
-  mask: linear-gradient(90deg, transparent, #000 14%, #000 86%, transparent);
-}
+.ab[data-ae="holo-iridescent"] .ab-rule { background: var(--ab-hair); }
 
 /* labels */
 .ab[data-ae="holo-iridescent"] .ab-label { font-size: 10.5px; font-weight: 500; letter-spacing: 0.24em; }
 .ab[data-ae="holo-iridescent"] .ab-n { color: var(--ab-ink); }
 
-/* hero: a centred statement over a stage with a thin-film bubble and a ribbon */
+/* hero: copy left, light and wide; the foil plane bleeds off the right edge */
+.ab[data-ae="holo-iridescent"] .ab-hero { grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); }
 .ab[data-ae="holo-iridescent"] .ab-kicker { letter-spacing: 0.28em; font-size: 10.5px; }
-.ab[data-ae="holo-iridescent"] .ab-headline { font-weight: 500; letter-spacing: calc(-0.045em * var(--ab-tr, 1)); line-height: 1; }
+.ab[data-ae="holo-iridescent"] .ab-headline { font-weight: 300; letter-spacing: calc(-0.02em * var(--ab-tr, 1)); line-height: 1.04; position: relative; z-index: 2; }
 .ab[data-ae="holo-iridescent"] .ab-subcopy { margin-top: clamp(14px, 2cqw, 22px) !important; }
 .ab[data-ae="holo-iridescent"] .ab-hl {
   color: var(--ab-accent-ink);
@@ -47,82 +48,46 @@
   padding-right: 0.06em;
 }
 
-/* art stage: open space; the bubble and ribbon float on the canvas */
-.ab[data-ae="holo-iridescent"] .ab-art { overflow: hidden; border-radius: clamp(18px, 2.6cqw, 26px); }
-.ab[data-ae="holo-iridescent"] .hoa { position: absolute; inset: 0; --hob-d: 34cqw; }
-.ab[data-ae="holo-iridescent"] .hoa i { position: absolute; display: block; }
-.ab[data-ae="holo-iridescent"] .hoa-bloom {
-  inset: 0; background:
-    radial-gradient(34% 70% at 46% 50%, var(--ab-rim-glow), transparent 70%);
-  filter: blur(14px); opacity: 0.9;
+/* art: the foil plane and the bubble */
+.ab[data-ae="holo-iridescent"] .ab-art {
+  max-width: none; aspect-ratio: 1 / 0.92; justify-self: stretch;
+  margin-right: calc(var(--ab-pad) * -1);
+}
+.ab[data-ae="holo-iridescent"] .hoa { position: absolute; inset: 0; }
+.ab[data-ae="holo-iridescent"] .hof {
+  position: absolute; left: 6cqw; top: 8cqw; width: 124cqw; aspect-ratio: 1.6; border-radius: 2.4cqw;
+  overflow: hidden; isolation: isolate; background: #ece8f1;
+  transform: perspective(900px) rotateX(16deg) rotate(-8deg); transform-origin: 0 50%;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9), inset 0 -1px 0 rgba(120, 100, 160, 0.25),
+    0 3cqw 6cqw -2cqw rgba(60, 40, 110, 0.32), 0 1px 2px rgba(60, 40, 110, 0.2);
+}
+.ab[data-ae="holo-iridescent"] .hof > i { position: absolute; inset: 0; display: block; }
+.ab[data-ae="holo-iridescent"] .hof-fringe { background: var(--ho-fringe); }
+.ab[data-ae="holo-iridescent"] .hof-angle { background: var(--ho-angle); }
+/* a soft specular band, fixed to the card (not animated) */
+.ab[data-ae="holo-iridescent"] .hof-sheen { background: linear-gradient(118deg, transparent 30%, rgba(255, 255, 255, 0.45) 42%, transparent 56%); }
+.ab[data-ae="holo-iridescent"] .hof-mark {
+  position: absolute; right: 22%; bottom: 8%; font-family: var(--ab-font-h); font-weight: 600; font-size: 22cqw; line-height: 1;
+  color: transparent; text-shadow: 0 1px 0 rgba(255, 255, 255, 0.7), 0 -1px 0 rgba(0, 0, 0, 0.18);
 }
 .ab[data-ae="holo-iridescent"] .hob {
-  position: absolute; left: 46%; top: 50%; width: var(--hob-d); aspect-ratio: 1; transform: translate(-50%, -50%);
-}
-.ab[data-ae="holo-iridescent"] .hob > i { inset: 0; border-radius: 50%; }
-.ab[data-ae="holo-iridescent"] .hob-halo {
-  inset: -9% !important; background: radial-gradient(circle, transparent 60%, var(--ab-rim-glow) 70%, transparent 76%);
-  filter: blur(9px);
-}
-/* transparent centre: only a faint top-left catch light; the spectral color lives in .hob-thin */
-.ab[data-ae="holo-iridescent"] .hob-body {
-  background: radial-gradient(circle at 34% 28%, rgba(255, 255, 255, 0.1), transparent 34%);
-}
-/* thin film: the decorative spectrum gathered toward the rim, soft and slightly rotated */
-.ab[data-ae="holo-iridescent"] .hob-thin {
-  background: conic-gradient(from 200deg, #ffd6f0, #c9f6ff, #e3d4ff, #d6ffe9, #ffd6f0); opacity: 0.26;
-  -webkit-mask: radial-gradient(circle, transparent 0 46%, #000 100%); mask: radial-gradient(circle, transparent 0 46%, #000 100%);
-  filter: blur(5px); rotate: -20deg;
-}
-/* the thin film: a blurred 1.5px conic ring, plus a fainter inner ring and a hot top-left */
-.ab[data-ae="holo-iridescent"] .hob-rim {
-  background: var(--ab-rim-conic);
-  -webkit-mask: radial-gradient(circle farthest-side, transparent calc(100% - 3px), #000 calc(100% - 1.6px), #000 calc(100% - 0.6px), transparent 100%);
-  mask: radial-gradient(circle farthest-side, transparent calc(100% - 3px), #000 calc(100% - 1.6px), #000 calc(100% - 0.6px), transparent 100%);
-  filter: blur(0.8px);
-}
-.ab[data-ae="holo-iridescent"] .hob-film {
-  inset: 3.6% !important; background: var(--ab-rim-conic-2); opacity: 0.5;
-  -webkit-mask: radial-gradient(circle farthest-side, transparent calc(100% - 2px), #000 calc(100% - 1px), transparent 100%);
-  mask: radial-gradient(circle farthest-side, transparent calc(100% - 2px), #000 calc(100% - 1px), transparent 100%);
-  filter: blur(1.4px);
-}
-.ab[data-ae="holo-iridescent"] .hob-rim-hi {
-  background: conic-gradient(from 238deg, transparent 0deg, rgba(255, 255, 255, 0.95) 38deg, transparent 96deg);
-  -webkit-mask: radial-gradient(circle farthest-side, transparent calc(100% - 4.4px), #000 calc(100% - 2.4px), #000 calc(100% - 1px), transparent 100%);
-  mask: radial-gradient(circle farthest-side, transparent calc(100% - 4.4px), #000 calc(100% - 2.4px), #000 calc(100% - 1px), transparent 100%);
-  filter: blur(1.6px);
-}
-.ab[data-ae="holo-iridescent"] .hob-arcs { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
-.ab[data-ae="holo-iridescent"] .hoa-ribbon {
-  position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible;
-  -webkit-mask: linear-gradient(90deg, transparent, #000 9%, #000 91%, transparent); mask: linear-gradient(90deg, transparent, #000 9%, #000 91%, transparent);
-}
-.ab[data-ae="holo-iridescent"] .hoa-ribbon-back { z-index: 0; }
-.ab[data-ae="holo-iridescent"] .hoa-ribbon-front { z-index: 2; }
-.ab[data-ae="holo-iridescent"] .hob { z-index: 1; }
-.ab[data-ae="holo-iridescent"] .hoa-rn { display: none; }
-@container (max-width: 420px) {
-  .ab[data-ae="holo-iridescent"] .hoa { --hob-d: 50cqw; }
-  .ab[data-ae="holo-iridescent"] .hoa-rw { display: none; }
-  .ab[data-ae="holo-iridescent"] .hoa-rn { display: block; }
+  position: absolute; left: 0; top: 56cqw; width: 34cqw; height: 34cqw; overflow: visible;
+  filter: drop-shadow(0 1.2cqw 2cqw rgba(80, 60, 140, 0.16));
 }
 
-/* palette: chips with the same 1px iridescent hairline as the cards (no sheen streak) */
-.ab[data-ae="holo-iridescent"] .ab-chip {
-  position: relative; border-radius: 14px;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.55), 0 10px 18px -10px var(--ab-hair-strong);
-}
-.ab[data-ae="holo-iridescent"] .ab-chip::after {
-  content: ""; position: absolute; inset: 0; border-radius: inherit; padding: 1px; pointer-events: none;
-  background: var(--ab-spec-conic);
-  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-  -webkit-mask-composite: xor; mask-composite: exclude;
-}
+/* dark mode: strict black; the foil object stays pearl, the bubble reads brighter */
+.ab[data-ae="holo-iridescent"][data-mode="dark"] .hof { box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9), 0 3cqw 7cqw -2cqw rgba(0, 0, 0, 0.8); }
+
+/* palette: flat planes (strips), quiet hairline, no rainbow */
+.ab[data-ae="holo-iridescent"] .ab-swatches[data-kind="strips"] { border-radius: 16px; box-shadow: 0 0 0 1px var(--ab-hair); }
 .ab[data-ae="holo-iridescent"] .ab-sw-role { font-weight: 600; }
 
-/* pearl panels with a holographic hairline edge */
-.ab[data-ae="holo-iridescent"] .ab-card, .ab[data-ae="holo-iridescent"] .ab-panel, .ab[data-ae="holo-iridescent"] .ab-list {
+/* panels: solid with a plain hairline; only the featured 01 card keeps the spectral edge */
+.ab[data-ae="holo-iridescent"] .ab-panel, .ab[data-ae="holo-iridescent"] .ab-list {
+  border: 1px solid var(--ab-hair); border-radius: 20px; background: var(--ab-card-solid);
+  box-shadow: inset 0 1px 0 var(--ab-hl-line);
+}
+.ab[data-ae="holo-iridescent"] .ab-card {
   border: 1px solid transparent; border-radius: 20px; background: var(--ho-edge);
   box-shadow: inset 0 1px 0 var(--ab-hl-line), var(--ab-lift);
 }
@@ -138,13 +103,13 @@
 .ab[data-ae="holo-iridescent"] .ab-card-title { font-weight: 500; letter-spacing: calc(-0.03em * var(--ab-tr, 1)); }
 /* the main action: a solid primary with a thin spectral line along the top edge */
 .ab[data-ae="holo-iridescent"] .ab-cta {
-  position: relative; padding: 14px 18px; border: 0; border-radius: 12px; font-weight: 600; letter-spacing: 0.02em;
+  position: relative; overflow: hidden; padding: 14px 18px; border: 0; border-radius: 12px; font-weight: 600; letter-spacing: 0.02em;
   background: var(--ab-primary);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.22), 0 12px 24px -12px var(--ab-cta-glow);
   transition: filter 0.15s, transform 0.12s;
 }
 .ab[data-ae="holo-iridescent"] .ab-cta::before {
-  content: ""; position: absolute; left: 14px; right: 14px; top: -1px; height: 1.5px; border-radius: 2px;
+  content: ""; position: absolute; left: 0; right: 0; top: 0; height: 1.5px; border-radius: 12px 12px 0 0;
   background: var(--ab-spec-linear); pointer-events: none;
 }
 .ab[data-ae="holo-iridescent"] .ab-cta:hover, .ab[data-ae="holo-iridescent"] .ab-cta.is-hover { filter: brightness(1.08) saturate(1.05); }
@@ -172,24 +137,20 @@
 }
 .ab[data-ae="holo-iridescent"] .ab-switch:checked { background: var(--ab-primary); border-color: transparent; box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.25); }
 .ab[data-ae="holo-iridescent"] .ab-switch:checked::before { transform: translateX(24px); }
-/* states: three finishes shown as chips */
+/* states: three finishes shown as material samples, a 28px disc each (matte, pearl, foil) */
 .ab[data-ae="holo-iridescent"] .ab-states { gap: 10px; margin-top: 22px; }
 .ab[data-ae="holo-iridescent"] .ab-state-chip {
-  padding: 10px 18px; font-size: 12px; font-weight: 500; letter-spacing: 0.04em; color: var(--ab-ink);
-  border: 1px solid var(--ab-hair-strong); background: color-mix(in srgb, var(--ab-ink) 7%, var(--ab-card-solid));
+  gap: 10px; padding: 6px 16px 6px 6px; font-size: 12px; font-weight: 500; letter-spacing: 0.04em; color: var(--ab-ink);
+  border: 1px solid var(--ab-hair); background: var(--ab-card-solid);
 }
-.ab[data-ae="holo-iridescent"] .ab-state-chip[data-s="0"] {
-  border: 0; background: color-mix(in srgb, #ffffff 8%, var(--ab-canvas)); box-shadow: none;
+.ab[data-ae="holo-iridescent"] .ab-state-chip::before {
+  content: ""; flex: none; width: 28px; height: 28px; border-radius: 50%;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.6), 0 1px 3px rgba(40, 30, 80, 0.2);
 }
-.ab[data-ae="holo-iridescent"] .ab-state-chip[data-s="1"] {
-  border-color: rgba(255, 255, 255, 0.85); color: #1a1a1f;
-  background: linear-gradient(135deg, #ffffff, #f1e9ff 40%, #e6fbff 70%, #ffffff);
-  box-shadow: inset 0 -4px 8px rgba(110, 80, 190, 0.1), 0 6px 16px -8px var(--ab-rim-glow);
-}
-.ab[data-ae="holo-iridescent"] .ab-state-chip[data-s="2"] {
-  border-color: transparent; color: #111111; font-weight: 600;
-  background: var(--ab-rim-conic);
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.4);
+.ab[data-ae="holo-iridescent"] .ab-state-chip[data-s="0"]::before { background: color-mix(in srgb, var(--ab-ink) 12%, var(--ab-canvas)); }
+.ab[data-ae="holo-iridescent"] .ab-state-chip[data-s="1"]::before { background: radial-gradient(circle at 34% 28%, #fff, transparent 50%), linear-gradient(135deg, #ffffff, #efe6ff 40%, #e2f8ff 70%, #fff4f9); }
+.ab[data-ae="holo-iridescent"] .ab-state-chip[data-s="2"]::before {
+  background: radial-gradient(circle at 34% 28%, rgba(255, 255, 255, 0.7), transparent 45%), var(--ho-fringe-s);
 }
 
 /* 03 in use: chrome hairlines, tiny spectral dots */
@@ -213,7 +174,7 @@
 .ab[data-ae="holo-iridescent"] .ab-row-name { font-weight: 500; }
 .ab[data-ae="holo-iridescent"] .ab-row-status { border: 1px solid var(--ab-hair-strong); background: transparent; font-size: 10.5px; letter-spacing: 0.04em; }
 .ab[data-ae="holo-iridescent"] .ab-row-bar { height: 4px; background: var(--ab-hair); }
-.ab[data-ae="holo-iridescent"] .ab-row-bar i { background: linear-gradient(180deg, rgba(255, 255, 255, 0.5), transparent), var(--ab-secondary); }
+.ab[data-ae="holo-iridescent"] .ab-row-bar i { background: var(--ab-secondary); }
 
 /* footer */
 .ab[data-ae="holo-iridescent"] .ab-foot { border-top-color: var(--ab-hair); }
@@ -228,6 +189,10 @@
 }
 
 @container ab (max-width: 600px) {
+  .ab[data-ae="holo-iridescent"] .ab-hero { grid-template-columns: minmax(0, 1fr); }
+  .ab[data-ae="holo-iridescent"] .ab-art { max-width: none; aspect-ratio: 1 / 0.78; margin-right: calc(var(--ab-pad) * -1); }
+  .ab[data-ae="holo-iridescent"] .hof { left: 6cqw; top: 8cqw; width: 108cqw; }
+  .ab[data-ae="holo-iridescent"] .hob { top: 40cqw; width: 32cqw; height: 32cqw; }
   .ab[data-ae="holo-iridescent"] .ab-tag { letter-spacing: 0.1em; }
   .ab[data-ae="holo-iridescent"] .ab-label, .ab[data-ae="holo-iridescent"] .ab-kicker { letter-spacing: 0.16em; }
   .ab[data-ae="holo-iridescent"] .ab-row { grid-template-columns: 9px minmax(0, 1fr) auto 4.5ch; }
@@ -236,3 +201,7 @@
 @media (prefers-reduced-motion: reduce) {
   .ab[data-ae="holo-iridescent"] .ab-cta:active, .ab[data-ae="holo-iridescent"] .ab-cta.is-pressed { transform: none; }
 }
+
+/* deck: the foil plane carries the cover; on slide 06 it is shown at full size */
+.ab[data-ae="holo-iridescent"].ab-slide[data-slide="cover"] .ab-art { margin-right: 0; aspect-ratio: 1 / 0.8; }
+.ab[data-ae="holo-iridescent"].ab-slide .ab-deck-stage .ab-art { margin-right: 0; overflow: hidden; border-radius: 18px; }

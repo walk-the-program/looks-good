@@ -20,12 +20,12 @@ registerAesthetic({
   key: 'y2k-chrome', order: 13,
   name: 'Y2K Chrome',
   descriptor: 'Liquid · Metallic · Hyper',
-  influences: 'Y2K web / Chrome type / Acid graphics',
-  summary: 'Heavy liquid chrome and blobby forms on a near-black field.',
+  influences: 'tDR / Wipeout / Aqua / Chrome type',
+  summary: 'Heavy liquid chrome on a deep ultramarine field, cut by one flat acid block with product-label micro-type.',
   motto: 'Shine like it is 2001.',
   kicker: 'Liquid metal  /  MRG-01\u2122',
   mode: 'dark',
-  slideShape: 'soft',
+  slideShape: 'refined',
   labels: { material: 'Chrome', states: ['Gel', 'Polished', 'Liquid'], statesKind: 'swatch' },
   layout: { hero: 'split', palette: 'chips', sections: 'two-col' },
   type: { ui: 'sans', label: 'sans', display: 1 },
@@ -34,7 +34,7 @@ registerAesthetic({
 
   roles: {
     canvas: {
-      use: 'The near-black field (lightness capped at 7%) with a faint primary glow behind the art; metal panels are alphas of white over it',
+      use: 'A fixed deep ultramarine field (pale cool silver in light mode); metal panels are alphas of white over it. Never tinted by the brand',
       never: 'Text, or a bright fill',
       coverage: '65–70%',
     },
@@ -54,18 +54,16 @@ registerAesthetic({
       coverage: '≈6–10%',
     },
     accent: {
-      use: 'The flat acid plate behind the highlighted headline word, and nothing else. A hit of acid, never a button',
+      use: 'The flat acid field behind the hero sculpture (with its micro-type) and the plate behind the highlighted headline word. Hard-edged blocks, never a button',
       never: 'Buttons, body text, borders, large fills',
-      coverage: '≤5%',
+      coverage: '≈8%',
     },
   },
 
-  // near-black with a trace of the primary so the field is not dead neutral
+  // Its own ground, never tinted by the brand: deep ultramarine (the Klein-blue
+  // field the chrome object sits in), or a pale cool silver in light mode.
   canvas(b) {
-    if (!b.isDark) return null;
-    const h = b.hexToHsl(b.canvas);
-    const dark = h.l > 7 ? b.hslToHex(h.h, Math.min(h.s, 30), 7) : b.canvas;
-    return b.mix(b.primary, dark, 0.05);
+    return b.isDark ? '#0b1233' : '#e3e6eb';
   },
 
   tokens(t) {
@@ -109,71 +107,79 @@ registerAesthetic({
       '--ab-pri-hi': t.mix(t.primary, '#ffffff', 0.78),
       '--ab-sec-glow': t.alpha(t.secondary, 0.4),
       '--ab-acc-glow': t.alpha(t.accent, 0.55),
+      '--y2-field': t.accent,
+      '--y2-on-field': t.onAccent,
     };
   },
 
-  // Metaballs: five circles blurred and thresholded (feGaussianBlur + feColorMatrix alpha curve)
+  // Metaballs: four circles blurred and thresholded (feGaussianBlur + feColorMatrix alpha curve)
   // into one liquid silhouette, used as a mask over a chrome gradient. The gradient rect is
-  // bent by a low-frequency displacement map so the horizon curves around the lobes instead of
-  // cutting a ruler-straight line, brand-colored edge-light washes are laid over it, a 1px
-  // bright rim (silhouette minus its eroded copy) runs round every lobe, and one softbox
-  // "window" specular (with a mullion) replaces round cartoon dots. A mirrored, faded copy of
-  // the finished sculpture stands in for the floor. One white lens glint is the only sparkle.
+  // bent by a low-frequency displacement map so the horizon curves around the lobes; a cool
+  // environment band (a second, softer horizon) goes through the same displacement, a faint
+  // brand edge-light sits low left, a 1px bright rim runs round every lobe, and the softbox
+  // speculars are blurred reflected light (no outline, no mullion). A mirrored, faded copy is
+  // the floor. No sparkles. A translucent gel lozenge rides along hidden (inline display:none)
+  // and is shown only on the deck's Material slide.
   art(ctx) {
     const t = ctx.t;
     const n = 'y2k' + (++y2kSeq);
-    const ground = t.mix(t.primary, '#6b7178', 0.3);
+    const ground = t.mix(t.primary, '#6b7178', 0.18);
+    const env = t.mix(t.secondary, '#cfe3ff', 0.6);
     const chromeStops = `<stop offset="0" stop-color="#ffffff"/><stop offset=".14" stop-color="#e3e6ea"/><stop offset=".44" stop-color="#6f777f"/><stop offset=".495" stop-color="#f6f6f6"/><stop offset=".515" stop-color="#23262b"/><stop offset=".74" stop-color="${ground}"/><stop offset="1" stop-color="#eef0f2"/>`;
-    const blobs = '<circle cx="43" cy="58" r="25"/><circle cx="71" cy="35" r="15.5"/><circle cx="68" cy="78" r="10"/><circle cx="22" cy="28" r="6.5"/><circle cx="19" cy="82" r="10.5"/>';
+    const blobs = '<circle cx="43" cy="58" r="25"/><circle cx="71" cy="35" r="15.5"/><circle cx="68" cy="78" r="10"/><circle cx="19" cy="82" r="10.5"/>';
     const thresh = '<feGaussianBlur stdDeviation="3.3"/><feColorMatrix values="1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 0 0 0 30 -13"/>';
-    return `<svg class="y2s" viewBox="0 0 100 100" width="100%" height="100%" focusable="false" overflow="visible">
+    return `<svg class="y2s" viewBox="0 0 100 100" width="100%" height="100%" focusable="false" overflow="visible" style="display:block">
       <defs>
         <linearGradient id="${n}c" gradientUnits="userSpaceOnUse" x1="0" y1="14" x2="0" y2="92">${chromeStops}</linearGradient>
-        <radialGradient id="${n}p" gradientUnits="userSpaceOnUse" cx="14" cy="92" r="46"><stop offset="0" stop-color="${t.primary}" stop-opacity="1"/><stop offset=".55" stop-color="${t.primary}" stop-opacity=".5"/><stop offset="1" stop-color="${t.primary}" stop-opacity="0"/></radialGradient>
-        <radialGradient id="${n}s" gradientUnits="userSpaceOnUse" cx="96" cy="8" r="40"><stop offset="0" stop-color="${t.secondary}" stop-opacity=".9"/><stop offset=".55" stop-color="${t.secondary}" stop-opacity=".4"/><stop offset="1" stop-color="${t.secondary}" stop-opacity="0"/></radialGradient>
+        <linearGradient id="${n}e" gradientUnits="userSpaceOnUse" x1="0" y1="22" x2="0" y2="38"><stop offset="0" stop-color="${env}" stop-opacity="0"/><stop offset=".45" stop-color="${env}" stop-opacity="1"/><stop offset=".55" stop-color="#ffffff" stop-opacity="1"/><stop offset="1" stop-color="${env}" stop-opacity="0"/></linearGradient>
+        <radialGradient id="${n}p" gradientUnits="userSpaceOnUse" cx="14" cy="92" r="46"><stop offset="0" stop-color="${t.primary}" stop-opacity=".45"/><stop offset=".55" stop-color="${t.primary}" stop-opacity=".15"/><stop offset="1" stop-color="${t.primary}" stop-opacity="0"/></radialGradient>
         <linearGradient id="${n}f" gradientUnits="userSpaceOnUse" x1="0" y1="92" x2="0" y2="104"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#000"/></linearGradient>
         <linearGradient id="${n}w" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#fff" stop-opacity=".5"/></linearGradient>
         <mask id="${n}fm" maskUnits="userSpaceOnUse" x="-20" y="90" width="140" height="24"><rect x="-20" y="90" width="140" height="24" fill="url(#${n}f)"/></mask>
         <filter id="${n}g" x="-25%" y="-25%" width="150%" height="150%">${thresh}</filter>
         <filter id="${n}r" x="-25%" y="-25%" width="150%" height="150%" color-interpolation-filters="sRGB">${thresh}<feMorphology operator="erode" radius="1.1" result="in"/><feComposite in="SourceGraphic" in2="in" operator="out"/><feColorMatrix values="0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .7 0"/></filter>
         <filter id="${n}d" filterUnits="userSpaceOnUse" x="-30" y="-30" width="160" height="160"><feTurbulence type="fractalNoise" baseFrequency=".034 .046" numOctaves="1" seed="${(y2kSeq * 7) % 90 + 3}" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="24" xChannelSelector="R" yChannelSelector="G" result="dd"/><feGaussianBlur in="dd" stdDeviation=".5"/></filter>
+        <filter id="${n}h" x="-30%" y="-80%" width="160%" height="260%"><feGaussianBlur stdDeviation=".9"/></filter>
         <mask id="${n}m" maskUnits="userSpaceOnUse" x="-10" y="-10" width="120" height="120"><g filter="url(#${n}g)" fill="#fff">${blobs}</g></mask>
         <g id="${n}b" mask="url(#${n}m)">
           <rect x="-30" y="-30" width="160" height="160" fill="url(#${n}c)" filter="url(#${n}d)"/>
+          <rect x="-30" y="16" width="160" height="28" fill="url(#${n}e)" opacity=".5" filter="url(#${n}d)"/>
           <rect x="-10" y="-10" width="120" height="120" fill="url(#${n}p)"/>
-          <rect x="-10" y="-10" width="120" height="120" fill="url(#${n}s)"/>
           <g filter="url(#${n}r)" fill="#fff">${blobs}</g>
-          <g transform="translate(33 42) rotate(-34)"><path d="M-7.4-2.5L7.4-3.1L7.4 3.1L-7.4 2.5Z" fill="url(#${n}w)" stroke="#fff" stroke-width="1" stroke-linejoin="round" stroke-opacity=".9"/><rect x="-2.7" y="-3.4" width=".5" height="6.8" fill="#1b1e24" opacity=".55"/></g>
-          <g transform="translate(70 30) rotate(-38)"><path d="M-3.8-1.3L3.8-1.7L3.8 1.7L-3.8 1.3Z" fill="url(#${n}w)" stroke="#fff" stroke-width=".6" stroke-linejoin="round" stroke-opacity=".9"/></g>
+          <g filter="url(#${n}h)" fill="#fff">
+            <ellipse transform="translate(35 41) rotate(-34)" rx="8.5" ry="2.1" opacity=".8"/>
+            <ellipse transform="translate(71 29) rotate(-38)" rx="4.2" ry="1.1" opacity=".7"/>
+          </g>
         </g>
       </defs>
       <g mask="url(#${n}fm)" opacity=".13"><g transform="translate(0 184) scale(1 -1)"><use href="#${n}b"/></g></g>
       <use href="#${n}b"/>
-      <g class="y2s-glint" fill="#fff"><path d="M82 21Q82 24 85 24Q82 24 82 27Q82 24 79 24Q82 24 82 21Z"/><rect x="72" y="23.85" width="20" height=".3"/><rect x="81.85" y="14" width=".3" height="20"/></g>
-    </svg>`;
+    </svg><div class="y2g" style="display:none;position:absolute;left:2%;bottom:4%;width:40%;aspect-ratio:2.4/1;border-radius:999px;overflow:hidden;background:radial-gradient(ellipse 62% 40% at 50% 12%,rgba(255,255,255,.85),rgba(255,255,255,0) 70%),radial-gradient(ellipse 66% 50% at 50% 112%,rgba(255,255,255,.6),rgba(255,255,255,0) 70%),linear-gradient(${t.alpha(t.primary, 0.62)},${t.alpha(t.primary, 0.62)}),repeating-linear-gradient(0deg,rgba(255,255,255,.16) 0 1px,transparent 1px 3px),#3a4150;box-shadow:inset 0 0 0 1px rgba(255,255,255,.55),0 10px 22px -8px rgba(0,0,0,.6)"></div>`;
   },
 
   materials: [
     { name: 'Chrome gradient', css: 'background: {chromeFixed}; /* #fff, #c9ced4, #9aa0a6, #f4f4f4 | horizon just off-centre at 44-55% | #5f646b, #7d838a, #e8e8e8; on text: background-clip: text, repeated per line, then filter: url(bevel specular lighting) so every stroke edge catches light */' },
-    { name: 'Metal panel', css: 'background: brushed grain (repeating-linear-gradient(90deg, 4% white 0 1px, transparent 1px 3px)) padding-box, linear-gradient(180deg, {metalHi}, {metalLo}) padding-box, {rim} border-box; border: 1px solid transparent; border-radius: 22px; box-shadow: inset 0 1px 0 rgba(255,255,255,.16); /* opaque, not glass: a bevelled rim of white alphas around a dark gunmetal face */' },
+    { name: 'Metal panel', css: 'background: brushed grain (repeating-linear-gradient(90deg, 4% white 0 1px, transparent 1px 3px)) padding-box, linear-gradient(180deg, {metalHi}, {metalLo}) padding-box, {rim} border-box; border: 1px solid transparent; border-radius: 6px; box-shadow: inset 0 1px 0 rgba(255,255,255,.16); /* opaque, not glass: a bevelled rim of white alphas around a dark gunmetal face */' },
     { name: 'Gel pill action', css: 'background: {gloss} padding-box, radial-gradient(ellipse 70% 60% at 50% 105%, rgba(255,255,255,.42), transparent 70%) padding-box, linear-gradient({primary}, {primary}) padding-box, {chromeFixed} border-box; border: 1.5px solid transparent; border-radius: 999px; color: {onPrimary}; box-shadow: inset 0 -1px 0 rgba(0,0,0,.25), 0 10px 26px -8px {priGlow}; /* Aqua gel: a hard top specular and a bright bottom caustic */' },
     { name: 'Translucent gel', css: 'background: top specular + bottom caustic over the {primary} at 70% alpha over a 1px pinstripe (repeating-linear-gradient(0deg, rgba(255,255,255,.12) 0 1px, transparent 1px 3px)) over the gunmetal; /* candy plastic with the pinstriped body showing through, as on a translucent 1999 shell */' },
     { name: 'Chrome knob', css: 'background: radial-gradient(circle at 34% 26%, #fff, rgba(255,255,255,0) 40%), {chromeFixed}; border-radius: 50%; box-shadow: 0 2px 6px rgba(0,0,0,.5);' },
-    { name: 'Acid plate', css: 'background: {accent}; color: {onAccent}; padding: 0 .12em .04em; border-radius: .05em; transform: none; /* a flat, hard-edged block with a tiny trademark mark; no rotation, no blob radius */' },
+    { name: 'Acid field', css: 'background: {accent}; color: {onAccent}; border-radius: 0; /* a flat, hard-edged block behind the hero object, 8px techno micro-type rotated 90deg along its right edge: MRG-01™ / LIQUID METAL / 液体金属 / NOT FOR RESALE; the same flat block (with ™) sits behind one headline word */' },
   ],
 
   rules: {
     do: [
       'Give every chrome surface a horizon just off-centre: a bright line over a dark ground, so it reads as metal, not a gradient.',
       'Set headlines in the heaviest wide face, chrome-filled with a bevel so the edges catch light; put the one flat acid plate behind a single word.',
-      'Use primary for the gel pill, the selected segment and the colored edge-light on chrome; keep panels opaque gunmetal with a bevelled white rim and a fine brushed grain.',
+      'Use primary for the gel pill, the selected segment and a faint edge-light on chrome; keep panels opaque gunmetal, near-square, with a bevelled white rim and a fine brushed grain.',
       'Set labels in tiny uppercase techno type with product codes and trademark marks.',
+      'Cut the page with one flat, hard-edged acid field (tDR): the chrome object sits on it and breaks its edge.',
     ],
     dont: [
       'Use pastel thin-film color or frosted transparency; this is opaque, saturated metal or candy gel.',
       'Fill text with the accent or primary; headlines are chrome.',
       'Flatten the rim: no panel without its bevelled edge, no pill without its gloss.',
-      'Scatter sparkles, stars or rotated stickers.',
+      'Scatter sparkles, stars or rotated stickers, or outline the speculars (reflections are blurred light).',
+      'Round everything into pills; only the CTA and the switch are gel pills, panels and rows are near-square.',
     ],
   },
   // Deck copy (js/brand-deck.js): three principles, three do / don't lines, each short.
@@ -181,17 +187,17 @@ registerAesthetic({
     principles: [
       ['Chrome with a horizon', 'A bright line just off-centre over a dark ground.'],
       ['The heaviest wide type', 'Chrome-filled and bevelled, with one flat acid plate behind a word.'],
-      ['Opaque, saturated, bevelled', 'Gunmetal panels with a white rim and gel pills.'],
+      ['One flat acid field', 'A hard-edged block with product micro-type; the chrome breaks its edge.'],
     ],
     do: [
       'Give every chrome surface a horizon.',
-      'Keep panels opaque gunmetal with a bevelled rim.',
+      'Cut the page with one flat acid field.',
       'Set labels in tiny techno type.',
     ],
     dont: [
       'Use pastel or frosted transparency.',
       'Fill text with accent or primary.',
-      'Scatter sparkles or stickers.',
+      'Round everything into pills.',
     ],
   },
 });

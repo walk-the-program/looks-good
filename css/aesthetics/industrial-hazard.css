@@ -1,11 +1,11 @@
 /* ---------------------------------------------------------------------
-   32 Industrial Hazard — a heavy grey machine. ISA-101: healthy is grey; colour is
-   rationed and ranked (ANSI Z535 ladder, fixed). Steel-framed modules with
-   screws and nameplates, annunciator tiles, slab keys on a plinth, lamps that
-   glow only when lit, two stripe edges at most. The client primary is machine
-   enamel. Variables --ab-hz-* come from js/aesthetics/industrial-hazard.js
-   tokens(). Hooks: hero split, type ui sans / label mono, highlight ink,
-   states button, canvas().
+   32 Industrial Hazard — physical and printed, never a screen. The hero is a full-bleed
+   safety-yellow field framed by 45deg tape with black signage type and one red word;
+   steel modules with screws and nameplates, an ISO 7010 triangle, slab keys on a plinth,
+   lamps in the fixed ladder colours with no glow. The ANSI Z535 ladder is fixed; the
+   client primary is only enamel. Light mode: a yellow board with #111 modules (module
+   text uses --ab-hz-mod-ink). Variables --ab-hz-* come from tokens(). Hooks: hero split,
+   type ui sans / label mono, highlight custom, states button, canvas().
 ------------------------------------------------------------------------ */
 
 .ab[data-ae="industrial-hazard"] {
@@ -13,6 +13,8 @@
   --hz-pad: clamp(18px, 2.8cqw, 24px);
   --hz-bevel: inset 0 1px 0 var(--ab-hz-hi), inset 0 0 0 1px var(--ab-hz-lo);
   --hz-stripe: repeating-linear-gradient(-45deg, #111111 0 6px, var(--ab-hz-stripe) 6px 12px);
+  --hz-tape: repeating-linear-gradient(-45deg, #111111 0 14px, #F2C500 14px 28px);
+  --hz-iso: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 56'%3E%3Cpath d='M32 2 62 54H2Z' fill='%23111111'/%3E%3Cpath d='M32 10.5 55 50.5H9Z' fill='%23F2C500'/%3E%3Cpath d='M29.4 22h5.2l-1 15.5h-3.2z' fill='%23111111'/%3E%3Ccircle cx='32' cy='43.2' r='2.9' fill='%23111111'/%3E%3C/svg%3E");
   border-radius: 0;
   --ab-art-ratio: 100 / 90;
 }
@@ -26,10 +28,14 @@
   opacity: 0.06;
   background-image: url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 width=%27220%27 height=%27220%27%3E%3Cfilter id=%27n%27%3E%3CfeTurbulence type=%27fractalNoise%27 baseFrequency=%27.85%27 numOctaves=%272%27 stitchTiles=%27stitch%27/%3E%3CfeColorMatrix values=%270 0 0 0 1 0 0 0 0 1 0 0 0 0 1 1.1 0 0 0 -.35%27/%3E%3C/filter%3E%3Crect width=%27220%27 height=%27220%27 filter=%27url(%23n)%27/%3E%3C/svg%3E");
 }
+.ab[data-ae="industrial-hazard"][data-mode="light"]::after { content: none; }
 .ab[data-ae="industrial-hazard"]::after {
   content: ""; position: absolute; inset: 0; z-index: 0; pointer-events: none;
   background: repeating-linear-gradient(90deg, transparent 0 239px, var(--ab-hz-lo) 239px 240px); opacity: 0.55;
 }
+
+/* modules carry their own legend colours: on the yellow light board every module is #111 steel */
+.ab[data-ae="industrial-hazard"] :is(.ab-head, .ab-card, .ab-panel, .ab-list, .ab-type-col, .hz-art) { --ab-ink: var(--ab-hz-mod-ink); --ab-muted: var(--ab-hz-mod-muted); color: var(--ab-ink); }
 
 /* ---- header: a nameplate with a rivet row ---- */
 .ab[data-ae="industrial-hazard"] .ab-head {
@@ -47,7 +53,7 @@
 .ab[data-ae="industrial-hazard"] .ab-tag { font-size: 10px; letter-spacing: 0.1em; color: var(--ab-muted); }
 .ab[data-ae="industrial-hazard"] .ab-tag::before {
   content: ""; display: inline-block; width: 8px; height: 8px; margin-right: 9px; vertical-align: -0.5px; border-radius: 50%;
-  background: var(--ab-hz-lit); box-shadow: 0 0 0 1.5px var(--ab-hz-edge), 0 0 7px var(--ab-hz-glow);
+  background: var(--ab-hz-green); box-shadow: 0 0 0 1.5px var(--ab-hz-edge);
 }
 .ab[data-ae="industrial-hazard"] .ab-rule { height: 4px; background: linear-gradient(var(--ab-hz-lo) 0 1px, transparent 1px 3px, var(--ab-hz-hi) 3px 4px); }
 
@@ -56,20 +62,32 @@
 .ab[data-ae="industrial-hazard"] .ab-labelrow { align-items: center; gap: 12px; }
 .ab[data-ae="industrial-hazard"] .ab-labelrow .ab-label:first-child { color: var(--ab-ink); display: inline-flex; align-items: center; }
 .ab[data-ae="industrial-hazard"] .ab-n {
-  display: inline-grid; place-items: center; min-width: 30px; height: 20px; margin-right: 10px; padding: 0 5px;
-  background: var(--ab-ink); color: var(--ab-canvas); font: 700 11px/1 var(--hz-mono); letter-spacing: 0.04em;
+  position: relative; display: inline-grid; place-items: center; min-width: 34px; height: 24px; margin-right: 10px; padding: 0 6px;
+  background: #111111; color: #F2C500; font: 800 13px/1 var(--ab-font-h); letter-spacing: 0.06em;
 }
+/* a stencil bridge: a horizontal cut through the numerals (painted through a stencil, not printed) */
+.ab[data-ae="industrial-hazard"] .ab-n::before { content: ""; position: absolute; left: 0; right: 0; top: 50%; height: 1.5px; margin-top: -1px; background: #111111; }
 .ab[data-ae="industrial-hazard"] .ab-n::after { content: none; }
 
-/* ---- hero ---- */
-.ab[data-ae="industrial-hazard"] .ab-hero { grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); gap: clamp(20px, 3.6cqw, 44px); padding: clamp(30px, 5cqw, 60px) 0 clamp(26px, 4cqw, 48px); }
-.ab[data-ae="industrial-hazard"] .ab-kicker { display: inline-flex; align-items: center; gap: 10px; font-size: 11px; font-weight: 600; letter-spacing: 0.16em; color: var(--ab-ink); }
-.ab[data-ae="industrial-hazard"] .ab-kicker::before { content: "▲"; font-size: 11px; color: var(--ab-ink); letter-spacing: 0; }
-.ab[data-ae="industrial-hazard"] .ab-headline { text-transform: uppercase; font-weight: 800; line-height: 0.92; letter-spacing: calc(0.012em - 0.03em * var(--ab-tr, 1)); text-wrap: balance; }
-.ab[data-ae="industrial-hazard"][data-hcls="condensed"] .ab-headline { font-size: calc(clamp(40px, 7.4cqw, 96px) * var(--ab-hl-scale, 1) * var(--ab-hs, 1) * var(--ab-display, 1)); }
-.ab[data-ae="industrial-hazard"] .ab-subcopy { max-width: 25em; margin-top: clamp(16px, 2.2cqw, 24px) !important; padding-left: 14px; border-left: 4px solid var(--ab-ink); }
-.ab[data-ae="industrial-hazard"] .ab-sub-lead { color: var(--ab-ink); font-weight: 600; }
-.ab[data-ae="industrial-hazard"] .ab-art { max-width: 460px; justify-self: end; aspect-ratio: 100 / 90; }
+/* ---- hero: a full-bleed safety-yellow field, framed top and bottom by 45 degree tape ---- */
+.ab[data-ae="industrial-hazard"] .ab-hero {
+  position: relative; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); align-items: center; gap: clamp(20px, 3.6cqw, 44px);
+  margin: 0 calc(-1 * var(--ab-pad)); padding: calc(14px + clamp(30px, 4.4cqw, 56px)) var(--ab-pad);
+  background: #F2C500; color: #111111;
+  --ab-ink: #111111; --ab-muted: #2B2A26;
+}
+.ab[data-ae="industrial-hazard"] .ab-hero::before, .ab[data-ae="industrial-hazard"] .ab-hero::after { content: ""; position: absolute; left: 0; right: 0; height: 14px; background: var(--hz-tape); }
+.ab[data-ae="industrial-hazard"] .ab-hero::before { top: 0; }
+.ab[data-ae="industrial-hazard"] .ab-hero::after { bottom: 0; }
+.ab[data-ae="industrial-hazard"] .ab-kicker { display: inline-flex; align-items: center; gap: 10px; font-size: 12px; font-weight: 700; letter-spacing: 0.16em; color: #111111; }
+.ab[data-ae="industrial-hazard"] .ab-kicker::before { content: "▲"; font-size: 12px; color: #111111; letter-spacing: 0; }
+.ab[data-ae="industrial-hazard"] .ab-headline { text-transform: uppercase; font-weight: 800; line-height: 0.88; letter-spacing: calc(0.005em - 0.02em * var(--ab-tr, 1)); text-wrap: balance; color: #111111; }
+.ab[data-ae="industrial-hazard"] .ab-hero .ab-headline { font-size: calc(clamp(52px, 9cqw, 132px) * var(--ab-hl-scale, 1) * var(--ab-hs, 1) * var(--ab-display, 1)); }
+/* one red word (ANSI DANGER red, large text on yellow) */
+.ab[data-ae="industrial-hazard"] .ab-hl, .ab[data-ae="industrial-hazard"][data-accent-text="low"] .ab-hl { color: #C8102E; background: none; padding: 0; }
+.ab[data-ae="industrial-hazard"] .ab-subcopy { max-width: 25em; margin-top: clamp(16px, 2.2cqw, 24px) !important; padding-left: 14px; border-left: 4px solid #111111; color: #2B2A26; }
+.ab[data-ae="industrial-hazard"] .ab-sub-lead { color: #111111; font-weight: 700; }
+.ab[data-ae="industrial-hazard"] .ab-art { max-width: 470px; justify-self: end; aspect-ratio: 100 / 90; filter: drop-shadow(0 4px 0 #111111); }
 
 /* ---- the machine face ---- */
 .ab[data-ae="industrial-hazard"] .hz-art { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; font-family: var(--hz-mono); }
@@ -79,9 +97,10 @@
 .ab[data-ae="industrial-hazard"] .hz-screw path { stroke: var(--ab-hz-edge); stroke-width: 0.5; fill: none; }
 .ab[data-ae="industrial-hazard"] .hz-name { fill: var(--ab-primary); stroke: var(--ab-hz-edge); stroke-width: 0.8; }
 .ab[data-ae="industrial-hazard"] .hz-nt { fill: var(--ab-on-primary); font: 700 2.5px var(--hz-mono); }
-.ab[data-ae="industrial-hazard"] .hz-num { fill: var(--ab-primary-text); font: 800 39px var(--ab-font-h); }
+.ab[data-ae="industrial-hazard"] .hz-num { fill: #F2C500; font: 800 76px var(--ab-font-h); }
+.ab[data-ae="industrial-hazard"] .hz-bridge { fill: var(--ab-hz-panel); }
 .ab[data-ae="industrial-hazard"] .hz-zl { fill: var(--ab-muted); font: 700 2.5px var(--hz-mono); letter-spacing: 0.4px; }
-.ab[data-ae="industrial-hazard"] .hz-zn { fill: var(--ab-ink); font: 800 7.6px var(--ab-font-h); }
+.ab[data-ae="industrial-hazard"] .hz-zn { fill: var(--ab-ink); font: 800 8.6px var(--ab-font-h); }
 .ab[data-ae="industrial-hazard"] .hz-zs { fill: var(--ab-muted); font: 600 2.35px var(--hz-mono); }
 .ab[data-ae="industrial-hazard"] .hz-hair { stroke: var(--ab-ink); stroke-width: 0.35; fill: none; opacity: 0.8; }
 .ab[data-ae="industrial-hazard"] .hz-string { fill: none; stroke: var(--ab-muted); stroke-width: 0.5; }
@@ -98,14 +117,16 @@
 .ab[data-ae="industrial-hazard"] .hz-pipe.live { stroke: var(--ab-primary-text); stroke-width: 1.8; }
 .ab[data-ae="industrial-hazard"] .hz-valve { fill: var(--ab-hz-panel); stroke: var(--ab-ink); stroke-width: 0.8; }
 .ab[data-ae="industrial-hazard"] .hz-pump { fill: var(--ab-hz-well); stroke: var(--ab-ink); stroke-width: 0.8; }
-.ab[data-ae="industrial-hazard"] .hz-lens { fill: var(--ab-hz-off); stroke: var(--ab-hz-edge); stroke-width: 1.4; }
+.ab[data-ae="industrial-hazard"] .hz-bezel { fill: var(--ab-hz-plate); stroke: var(--ab-hz-edge); stroke-width: 0.8; }
+.ab[data-ae="industrial-hazard"] .hz-lens { fill: var(--ab-hz-off); stroke: var(--ab-hz-edge); stroke-width: 0.6; }
 .ab[data-ae="industrial-hazard"] .hz-spec { fill: #ffffff; opacity: 0.22; }
-.ab[data-ae="industrial-hazard"] .hz-lamp.run .hz-lens { fill: var(--ab-hz-lit); }
-.ab[data-ae="industrial-hazard"] .hz-lamp.run .hz-halo { fill: var(--ab-hz-glow); }
-.ab[data-ae="industrial-hazard"] .hz-lamp.alm .hz-lens { fill: var(--ab-hz-yellow); }
-.ab[data-ae="industrial-hazard"] .hz-lamp.alm .hz-halo { fill: none; stroke: var(--ab-hz-yellow); stroke-width: 0.5; }
-.ab[data-ae="industrial-hazard"] .hz-lamp.run .hz-spec, .ab[data-ae="industrial-hazard"] .hz-lamp.alm .hz-spec { opacity: 0.45; }
-.ab[data-ae="industrial-hazard"] .hz-lg { fill: var(--ab-muted); font: 700 2.2px var(--hz-mono); letter-spacing: 0.25px; }
+/* lamps light in the ladder's own colours, never the client's; no glow */
+.ab[data-ae="industrial-hazard"] .hz-lamp.pwr .hz-lens { fill: #F4F2EA; }
+.ab[data-ae="industrial-hazard"] .hz-lamp.run .hz-lens { fill: #00A651; }
+.ab[data-ae="industrial-hazard"] .hz-lamp.alm .hz-lens { fill: #F2C500; }
+.ab[data-ae="industrial-hazard"] .hz-lamp.lck .hz-lens { fill: #5A1A1D; }
+.ab[data-ae="industrial-hazard"] .hz-lamp:is(.pwr, .run, .alm) .hz-spec { opacity: 0.55; }
+.ab[data-ae="industrial-hazard"] .hz-lg { fill: var(--ab-ink); font: 800 2.6px var(--hz-mono); letter-spacing: 0.25px; }
 .ab[data-ae="industrial-hazard"] .hz-rail { fill: var(--ab-hz-stripe); }
 .ab[data-ae="industrial-hazard"] .hz-rail-b { fill: #111111; }
 .ab[data-ae="industrial-hazard"] .hz-rail-o { fill: none; stroke: var(--ab-hz-edge); stroke-width: 0.6; }
@@ -131,7 +152,7 @@
 .ab[data-ae="industrial-hazard"] .ab-fit[data-fit="avoid"] { background: var(--ab-hz-red); color: #ffffff; border-color: var(--ab-hz-edge); }
 .ab[data-ae="industrial-hazard"] .ab-type-k { font: 800 10.5px var(--hz-mono); letter-spacing: 0.12em; }
 .ab[data-ae="industrial-hazard"] .ab-type-apply {
-  padding: 11px 16px; border: 2px solid var(--ab-hz-edge); border-radius: 0; background: var(--ab-hz-plate); color: var(--ab-ink);
+  padding: 11px 16px; border: 2px solid var(--ab-hz-edge); border-radius: 0; background: var(--ab-hz-plate); color: var(--ab-hz-mod-ink);
   font: 800 11px var(--hz-mono); letter-spacing: 0.1em; text-transform: uppercase; box-shadow: inset 0 1px 0 var(--ab-hz-hi), 0 3px 0 var(--ab-hz-edge); margin-bottom: 3px;
 }
 .ab[data-ae="industrial-hazard"] .ab-type-apply:hover { background: var(--ab-hz-panel); }
@@ -150,7 +171,10 @@
   font: 800 9.5px/1.4 var(--hz-mono); letter-spacing: 0.12em; color: var(--ab-ink);
 }
 .ab[data-ae="industrial-hazard"] .ab-card::before { content: "CTRL-01  ·  OPERATOR PANEL"; }
-.ab[data-ae="industrial-hazard"] .ab-panel::before { content: "CTRL-02  ·  INTERLOCK BANK"; }
+.ab[data-ae="industrial-hazard"] .ab-panel::before {
+  content: "CTRL-02  ·  INTERLOCK BANK"; min-height: 84px; padding-right: 96px;
+  background: var(--hz-iso) right 16px center / 72px 63px no-repeat, radial-gradient(circle at 17px 14px, var(--ab-hz-plate) 0 2.4px, var(--ab-hz-edge) 2.7px 3.5px, transparent 4px), var(--ab-hz-plate);
+}
 .ab[data-ae="industrial-hazard"] .ab-list::before { content: "ANN-03  ·  3 POINTS  ·  1 UNACKNOWLEDGED"; margin: 0; }
 
 /* 01 interface: an annunciator bank, a title, the main slab key */
@@ -165,7 +189,7 @@
 }
 .ab[data-ae="industrial-hazard"] .ab-seg-btn:hover { color: var(--ab-ink); }
 .ab[data-ae="industrial-hazard"] .ab-seg-btn[aria-pressed="true"] { color: var(--ab-ink); background: var(--ab-hz-panel); text-shadow: none; box-shadow: inset 0 2px 3px var(--ab-hz-lo); }
-.ab[data-ae="industrial-hazard"] .ab-seg-btn[aria-pressed="true"]::before { background: var(--ab-hz-lit); box-shadow: 0 0 8px var(--ab-hz-glow); }
+.ab[data-ae="industrial-hazard"] .ab-seg-btn[aria-pressed="true"]::before { background: var(--ab-hz-green); box-shadow: none; }
 .ab[data-ae="industrial-hazard"] .ab-card-title { margin: 24px 0 8px !important; font-weight: 800; text-transform: uppercase; letter-spacing: calc(0.02em - 0.03em * var(--ab-tr, 1)); font-size: clamp(24px, 3.1cqw, 32px); line-height: 1; }
 .ab[data-ae="industrial-hazard"] .ab-card-body { font-size: 13.5px; }
 .ab[data-ae="industrial-hazard"] .ab-cta {
@@ -198,12 +222,12 @@
 .ab[data-ae="industrial-hazard"] .ab-switch:checked::after { content: "ON"; right: auto; left: 7px; color: var(--ab-ink); }
 .ab[data-ae="industrial-hazard"] .ab-status { display: flex; align-items: center; gap: 9px; margin-top: 8px; font: 700 10px var(--hz-mono); letter-spacing: 0.12em; text-transform: uppercase; }
 .ab[data-ae="industrial-hazard"] .ab-status::before { content: ""; width: 9px; height: 9px; border-radius: 50%; background: var(--ab-hz-off); box-shadow: 0 0 0 1.5px var(--ab-hz-edge); }
-.ab[data-ae="industrial-hazard"] .ab-panel:has(.ab-switch:checked) .ab-status::before { background: var(--ab-hz-lit); box-shadow: 0 0 0 1.5px var(--ab-hz-edge), 0 0 7px var(--ab-hz-glow); }
+.ab[data-ae="industrial-hazard"] .ab-panel:has(.ab-switch:checked) .ab-status::before { background: var(--ab-hz-green); box-shadow: 0 0 0 1.5px var(--ab-hz-edge); }
 /* the ladder, as the same key at Normal / Caution / Danger (grey, CAUTION, DANGER with a stripe rail) */
 .ab[data-ae="industrial-hazard"] .ab-states { margin-top: 22px; gap: 10px; }
 .ab[data-ae="industrial-hazard"] .ab-state { font: 800 9.5px var(--hz-mono); letter-spacing: 0.12em; text-transform: uppercase; color: var(--ab-ink); }
 .ab[data-ae="industrial-hazard"] .ab-states .ab-state-ctl {
-  position: relative; overflow: hidden; min-height: 46px; padding: 0 6px; justify-content: center; margin-bottom: 12px; background: var(--ab-hz-plate); color: var(--ab-ink); transition: none;
+  position: relative; overflow: hidden; min-height: 46px; padding: 0 6px; justify-content: center; margin-bottom: 12px; background: var(--ab-hz-plate); color: var(--ab-hz-mod-ink); transition: none;
   border: 2px solid var(--ab-hz-edge); box-shadow: inset 0 1px 0 var(--ab-hz-hi), 0 3px 0 var(--ab-hz-edge); filter: none; transform: none;
 }
 .ab[data-ae="industrial-hazard"] .ab-states .ab-state-ctl.is-hover { background: var(--ab-hz-yellow); color: #111111; }
@@ -229,11 +253,10 @@
 }
 .ab[data-ae="industrial-hazard"] .ab-row-status::before { content: ""; flex: none; width: 12px; height: 12px; border-radius: 50%; background: var(--ab-hz-off); box-shadow: 0 0 0 2px var(--ab-hz-edge); }
 .ab[data-ae="industrial-hazard"] .ab-row:nth-child(1) .ab-row-status::before { background: var(--ab-hz-yellow); box-shadow: 0 0 0 2px var(--ab-hz-edge), 0 0 0 3.5px var(--ab-hz-yellow); }
-.ab[data-ae="industrial-hazard"] .ab-row:nth-child(2) .ab-row-status::before { background: var(--ab-hz-lit); box-shadow: 0 0 0 2px var(--ab-hz-edge), 0 0 8px var(--ab-hz-glow); }
+.ab[data-ae="industrial-hazard"] .ab-row:nth-child(2) .ab-row-status::before { background: var(--ab-hz-green); box-shadow: 0 0 0 2px var(--ab-hz-edge); }
 .ab[data-ae="industrial-hazard"] .ab-row-bar { height: 12px; border: 2px solid var(--ab-hz-edge); border-radius: 0; background: repeating-linear-gradient(90deg, var(--ab-hz-well) 0 5px, transparent 5px 7px), var(--ab-hz-well); }
 .ab[data-ae="industrial-hazard"] .ab-row-bar i {
-  background: var(--ab-ink); border-radius: 0;
-  -webkit-mask-image: repeating-linear-gradient(90deg, #000 0 5px, transparent 5px 7px); mask-image: repeating-linear-gradient(90deg, #000 0 5px, transparent 5px 7px);
+  background: repeating-linear-gradient(90deg, var(--ab-ink) 0 5px, transparent 5px 7px); border-radius: 0;
 }
 .ab[data-ae="industrial-hazard"] .ab-row-pct { font: 800 12px var(--hz-mono); }
 
@@ -250,7 +273,8 @@
 @container ab (max-width: 600px) {
   .ab[data-ae="industrial-hazard"] .ab-hero { grid-template-columns: minmax(0, 1fr); gap: 24px; padding: 24px 0 26px; }
   .ab[data-ae="industrial-hazard"] .ab-art { max-width: none; justify-self: stretch; }
-  .ab[data-ae="industrial-hazard"][data-hcls="condensed"] .ab-headline { font-size: calc(clamp(38px, 12.8cqw, 76px) * var(--ab-hl-scale, 1) * var(--ab-hs, 1) * var(--ab-display, 1)); }
+  .ab[data-ae="industrial-hazard"] .ab-hero .ab-headline { font-size: calc(clamp(44px, 14cqw, 76px) * var(--ab-hl-scale, 1) * var(--ab-hs, 1) * var(--ab-display, 1)); }
+  .ab[data-ae="industrial-hazard"] .ab-panel::before { min-height: 70px; padding-right: 76px; background-size: 56px 49px, auto, auto; }
   .ab[data-ae="industrial-hazard"] .ab-head { padding: 10px 12px 14px; }
   .ab[data-ae="industrial-hazard"] .ab-head::after { left: 10px; right: 10px; }
   .ab[data-ae="industrial-hazard"] .ab-tag { font-size: 8.5px; letter-spacing: 0.06em; }
@@ -265,3 +289,12 @@
   .ab[data-ae="industrial-hazard"] .ab-cta, .ab[data-ae="industrial-hazard"] .ab-switch::before { transition: none; }
   .ab[data-ae="industrial-hazard"] .ab-cta:active, .ab[data-ae="industrial-hazard"] .ab-type-apply:active { transform: none; }
 }
+
+/* ---- deck: the principles line is signage on a yellow field, framed by tape ---- */
+.ab[data-ae="industrial-hazard"].ab-slide[data-slide="principles"] .ab-deck-lead {
+  position: relative; padding: 40px 28px; background: #F2C500; color: #111111; --ab-ink: #111111; --ab-muted: #2B2A26;
+}
+.ab[data-ae="industrial-hazard"].ab-slide[data-slide="principles"] .ab-deck-lead::before, .ab[data-ae="industrial-hazard"].ab-slide[data-slide="principles"] .ab-deck-lead::after { content: ""; position: absolute; left: 0; right: 0; height: 12px; background: var(--hz-tape); }
+.ab[data-ae="industrial-hazard"].ab-slide[data-slide="principles"] .ab-deck-lead::before { top: 0; }
+.ab[data-ae="industrial-hazard"].ab-slide[data-slide="principles"] .ab-deck-lead::after { bottom: 0; }
+.ab[data-ae="industrial-hazard"].ab-slide[data-slide="principles"] .ab-deck-lead .ab-headline { color: #111111; font-size: calc(108px * var(--ab-hs, 1)); line-height: 0.86; }

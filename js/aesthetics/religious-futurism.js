@@ -65,7 +65,7 @@ registerAesthetic({
   kicker: 'Vespers',
   mode: 'dark',
   slideShape: 'classic',
-  labels: { material: 'Relics', states: ['Dormant', 'Lit', 'Consecrated'], statesKind: 'swatch' },
+  labels: { material: 'Relics', states: ['Unlit', 'Dawn', 'Full light'], statesKind: 'swatch' },
   layout: { hero: 'centered', palette: 'swatches', sections: 'two-col' },
   type: { ui: 'body', label: 'mono', display: 1 },
   highlight: 'custom',
@@ -110,6 +110,8 @@ registerAesthetic({
     const line = d ? gold.hi : gold.mid;
     const glass1 = rfGlass(t.primary, d ? 58 : 50);
     const glass2 = rfGlass(t.secondary, d ? 58 : 50);
+    let ctaBg = t.mix(t.primary, '#0D0B0B', 0.55);
+    for (let k = 1; k <= 12 && t.contrast('#F6F1E6', ctaBg) < 7; k++) ctaBg = t.mix(t.primary, '#0D0B0B', 0.55 - k * 0.04);
     return {
       '--ab-type-pick-w': 400,
       '--ab-gold': line,
@@ -127,6 +129,13 @@ registerAesthetic({
       '--ab-leading': d ? '#050505' : '#2a251c',
       '--ab-stone': d ? t.mix(t.ink, t.canvas, 0.035) : t.mix('#ffffff', t.canvas, 0.35),
       '--ab-on-glass': t.contrast('#0a0a0c', glass1) >= t.contrast('#f4efe3', glass1) ? '#0a0a0c' : '#f4efe3',
+      // the main action: deep glass (55% primary into near-black) under a bone label at >= 7:1
+      '--rf-cta': ctaBg,
+      '--rf-cta-ink': '#F6F1E6',
+      // the state panes: unlit glass, and the lit pane's glass (the cool neutral key with one primary pane)
+      '--rf-pane-dark': d ? '#14171D' : '#1C1F25',
+      '--rf-pane-cool': d ? '#56627A' : '#3B4A5E',
+      '--rf-pane-cool2': d ? '#7A8496' : '#56627A',
     };
   },
 
@@ -141,23 +150,23 @@ registerAesthetic({
     const W = 800, H = 420, floor = 368, cell = 8;
     const lead = d ? '#050505' : '#2a251c';
     const step = (hex, dl) => { const c = hexToHsl(hex); return hslToHex(c.h, c.s, RF_CLAMP(c.l + dl, 6, 88)); };
-    // Richter's recipe: about two thirds of the glass is a FIXED cathedral base of cool neutral glass
-    // (blue-grey, smoke, pale amber), each in three blown-glass lightness steps; the client families are
-    // the minority (about 35%), so any palette still reads as a window, never as a textile or a screen.
-    // backlit, so the neutrals are lifted a little and their chroma nudged up (transmitted, not stone)
-    const NEUTRAL = ['#4A5A78', '#5D6E8C', '#3E4A5E', '#7A8296', '#8C7A5E', '#A89270', '#6B5E70', '#2E3646']
-      .map(h => { const c = hexToHsl(h); return hslToHex(c.h, RF_CLAMP(c.s * 1.3, 0, 60), RF_CLAMP(c.l + (d ? 7 : 10), 6, 80)); });
-    const g1 = rfGlass(t.primary, d ? 56 : 52), g1d = rfGlass(t.primary, d ? 42 : 40, 40), g1p = rfGlass(t.primary, d ? 74 : 66, 36);
-    const g2 = rfGlass(t.secondary, d ? 58 : 52), g2d = rfGlass(t.secondary, d ? 42 : 40, 40);
-    const gm = rfGlass(t.mix(t.primary, t.secondary, 0.5), d ? 52 : 46, 40);
-    const pool = [];
-    NEUTRAL.forEach(c => { pool.push(step(c, -6), c, step(c, 6)); });          // 24 neutral panes
-    const capS = hex => { const c = hexToHsl(hex); return hslToHex(c.h, Math.min(c.s, 72), c.l); };
-    [g1, g1, g1, g2, g2, g2, g1d, g1d, g2d, g2d, gm, gm, g1p].forEach(c => pool.push(capS(c)));   // 13 brand panes
-    const nPick = () => pool[Math.floor(rnd() * 24)];
-    const pick = () => pool[Math.floor(rnd() * pool.length)];
+    // Richter in tracery, Sainte-Chapelle's dominant key: 65% of the panes are FIXED cool neutral glass
+    // (blue-grey, slate, smoke), 25% the brand secondary darkened, at most 10% the primary and the accent.
+    // Any palette still reads as a cool window with a few warm sparks, never as a textile or a CRT.
+    const NEUTRAL = ['#3B4A5E', '#56627A', '#7A8496', '#A7A9AE', '#6E7279', '#465062'];
+    const nPool = [];
+    NEUTRAL.forEach(c => { nPool.push(step(c, -7), c, step(c, 5)); });
+    const capS = hex => { const c = hexToHsl(hex); return hslToHex(c.h, Math.min(c.s, 70), c.l); };
+    const sPool = [rfGlass(t.secondary, 30, 34), rfGlass(t.secondary, 38, 34), rfGlass(t.secondary, 46, 30)].map(capS);
+    const pPool = [rfGlass(t.primary, 46, 50), rfGlass(t.primary, 56, 50)].map(capS);
+    const aGlass = capS(rfGlass(t.accent, 58, 55));
+    const nPick = () => nPool[Math.floor(rnd() * nPool.length)];
+    const pick = () => { const r = rnd(); return r < 0.65 ? nPick() : r < 0.9 ? sPool[Math.floor(rnd() * 3)] : r < 0.97 ? pPool[Math.floor(rnd() * 2)] : aGlass; };
+    // light mode: the windows seen from OUTSIDE in daylight: dark glass with only a faint hue, no glow;
+    // the lit oculus is the one coloured thing
+    const outside = hex => { const c = hexToHsl(hex); return hslToHex(c.h, Math.min(c.s, 22), RF_CLAMP(c.l * 0.32 + 8, 8, 26)); };
     const jewel = rfGlass(t.accent, d ? 62 : 54, 60);
-    const halo = d ? g1 : t.mix(t.accent, t.canvas, 0.85);
+    const halo = d ? pPool[1] : t.mix(t.accent, t.canvas, 0.85);
 
     // one window: mirrored random lanes, cells grouped into one path per colour
     const paths = {};
@@ -174,7 +183,7 @@ registerAesthetic({
         lanes.push(lane);
       }
       const arch = rfOgive(cx, gw, ys, floor);
-      const oc = o.oculus ? { x: cx, y: ys - 0.36 * gw, r: 0.23 * gw } : null;
+      const oc = o.oculus ? { x: cx, y: ys + 0.1 * gw, r: 0.23 * gw } : null;
       const inside = (px, py) => {
         if (py >= ys) return true;
         const dl = Math.hypot(px - arch.x1, py - ys), dr = Math.hypot(px - arch.x0, py - ys);
@@ -187,15 +196,16 @@ registerAesthetic({
           const x = x0 + c * cell;
           if (!inside(x + cell / 2, y + cell / 2)) continue;
           if (oc && Math.hypot(x + cell / 2 - oc.x, y + cell / 2 - oc.y) < oc.r + cell * 0.3) continue;
-          addCell(lanes[lc][r], x + 0.6, y + 0.6, cell - 1.2);
+          addCell(d ? lanes[lc][r] : outside(lanes[lc][r]), x + 0.6, y + 0.6, cell - 1.2);
         }
       }
-      return { cx, gw, x0, ys, top, arch, oc, mullion: !!o.mullion };
+      return { cx, gw, x0, ys, top, arch, oc, cols };
     };
+    // one monumental centre lancet, cropped by the top of the frame, 2.2x the height of its flanks
     const wins = [
-      win(400, 26, 10, { oculus: true, mullion: true }),
-      win(216, 16, 104, { mullion: true }), win(584, 16, 104, { mullion: true }),
-      win(96, 10, 196), win(704, 10, 196),
+      win(400, 26, -64, { oculus: true }),
+      win(232, 14, 176), win(568, 14, 176),
+      win(120, 8, 256), win(680, 8, 256),
     ];
 
     // the oculus: a rose of two leaded rings (9 panes, then 18), mirrored about the axis, mostly neutral glass,
@@ -218,22 +228,23 @@ registerAesthetic({
     rosette += `<circle cx="${c0.x}" cy="${c0.y.toFixed(1)}" r="${(c0.r * 0.3 - 0.6).toFixed(1)}" fill="${jewel}"/>`;
 
     const mosaic = Object.keys(paths).map(c => `<path d="${paths[c].join('')}" fill="${c}"/>`).join('') + rosette;
-    // armature: iron saddle bars every 7 rows (lead, with a hairline catch-light), a central mullion on the
-    // three large windows; drawn inside the window clip
+    // tracery: two mullions per lancet (at the thirds, on the pane grid) and an iron saddle bar every 6 rows,
+    // all in lead 2.2 units wide with a hairline catch-light; drawn inside the window clip
     let iron = '', ironHi = '';
     wins.forEach(w => {
       for (let k = 1; ; k++) {
-        const y = floor - 7 * k * cell;
-        if (y < w.top + 10) break;
+        const y = floor - 6 * k * cell;
+        if (y < Math.max(w.top, -10) + 6) break;
         if (w.oc && y > w.oc.y - w.oc.r - 3 && y < w.oc.y + w.oc.r + 3) continue;
-        iron += `M${w.x0} ${y - 0.8}h${w.gw}v1.6h-${w.gw}z`;
-        ironHi += `M${w.x0} ${y - 0.9}h${w.gw}`;
+        iron += `M${w.x0} ${y - 1.1}h${w.gw}v2.2h-${w.gw}z`;
+        ironHi += `M${w.x0} ${y - 1.2}h${w.gw}`;
       }
-      if (w.mullion) {
-        const y0 = w.oc ? w.oc.y + w.oc.r : w.ys - 0.2 * w.gw;
-        iron += `M${w.cx - 1} ${y0.toFixed(1)}h2V${floor}h-2z`;
-        ironHi += `M${w.cx - 0.6} ${y0.toFixed(1)}V${floor}`;
-      }
+      const m = Math.round(w.cols / 3);
+      [m, w.cols - m].forEach(c => {
+        const x = w.x0 + c * cell;
+        const segs = w.oc ? [[-80, w.oc.y - w.oc.r - 2], [w.oc.y + w.oc.r + 2, floor]] : [[-80, floor]];
+        segs.forEach(([a, b]) => { iron += `M${x - 1.1} ${a.toFixed(1)}h2.2V${b.toFixed(1)}h-2.2z`; ironHi += `M${x - 0.7} ${a.toFixed(1)}V${b.toFixed(1)}`; });
+      });
     });
     const armature = `<path d="${iron}" fill="${lead}"/><path d="${ironHi}" stroke="${line}" stroke-width=".5" stroke-opacity=".5" fill="none"/>`;
     const clip = wins.map(w => `<path d="${w.arch.d}"/>`).join('');
@@ -273,8 +284,8 @@ registerAesthetic({
       <circle cx="${nx}" cy="${ny}" r="160" fill="none" stroke="${line}" stroke-width=".8" stroke-opacity=".7"/>
       <circle cx="${nx}" cy="${ny}" r="154" fill="none" stroke="${line}" stroke-width=".5" stroke-opacity=".4"/>
       <path d="${ticks}" stroke="${line}" stroke-width=".7" stroke-opacity=".75" fill="none"/>
-      <g mask="url(#${id}m)"><g transform="${fm}" opacity="${d ? 0.55 : 0.38}"><g filter="url(#${id}fb)"><g clip-path="url(#${id}c)">${mosaic}</g></g></g></g>
-      <g clip-path="url(#${id}c)" filter="url(#${id}bl)" opacity="${d ? 0.5 : 0.3}">${leadFill}${mosaic}</g>
+      ${d ? `<g mask="url(#${id}m)"><g transform="${fm}" opacity=".5"><g filter="url(#${id}fb)"><g clip-path="url(#${id}c)">${mosaic}</g></g></g></g>
+      <g clip-path="url(#${id}c)" filter="url(#${id}bl)" opacity=".45">${leadFill}${mosaic}</g>` : ''}
       ${leadFill}
       <g clip-path="url(#${id}c)">${mosaic}<rect width="${W}" height="${floor}" fill="url(#${id}p)"/><rect width="${W}" height="${floor}" filter="url(#${id}t)" opacity="${d ? 0.12 : 0.1}"/>${armature}</g>
       ${rims}
@@ -313,10 +324,9 @@ registerAesthetic({
   },
   // Deck copy (js/brand-deck.js): three principles, three do / don't lines, each short.
   deck: {
-    materialStage: 'pattern',   // the material slide stages the lead pattern; the cover already carries the cathedral
     coverDisplay: 1.3,   // two centred lines at >= 72px; the cathedral beneath takes the lower half of the cover
     principles: [
-      ['Gold is a rim, never fill', 'Gold appears only as thin rims, rules and rings.'],
+      ['Gold is a rim, never a fill', 'Gold appears only as thin rims, rules and rings.'],
       ['Brand colour is the light', 'Client colours glow as stained glass, never as paint.'],
       ['Slow, still, monumental', 'Few large forms, huge silence, tiny liturgical annotation.'],
     ],

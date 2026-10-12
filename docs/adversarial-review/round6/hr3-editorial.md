@@ -382,3 +382,82 @@ The nearest neighbours are **Dystopian Luxury** and **Blueprint** (spec-sheet li
 | Micrographics | 5 | Refine |
 
 None of these reaches 7. Nothing on any of the six boards stands next to a named reference *as a whole*. The parts that come closest are the Rebus engine and upside-down answer (next to Victorian cards), the Dystopian Luxury accession and state model (next to Margiela's numbering), and the Micrographics spec table (next to TDR's label stacks).
+
+---
+
+## Fix log (fx63)
+
+Fixer: FX6-3 (task fx63), packet rev 2. Date: 2026-10-11. Files changed: `js/aesthetics/` and `css/aesthetics/` for editorial-serif, neo-deco, dystopian-luxury, mixed-type, rebus, micrographics. Originals are backed up in `scratchpad/adv/fx63/orig/`. Before: `adv/r6/sheet-r6-<key>.png`. After: `adv/fx63/sheet-fx63-<key>.png` (board A|B|C|D), `adv/fx63/sheet-deck-<key>-rec.png` and `-oth.png` (deck). The after-shots use the requested font defaults, patched in page memory (`adv/fx63/fontov.js`) until the shared change lands.
+
+**Status:** submitted. Gore 24 combos, 0 issues. `tests/run.js` all passed. `harness.js` 16 fails, all in other aesthetics (retro-futurist, wabi-sabi, dark-academia); none in these six. `src-verify-p5.js` 0 fails. No console errors except the existing favicon 404. No overflow at 390px.
+
+### Editorial Serif
+1. **(Top)** The hero is now a magazine cover. A full-width 4:5 plate holds a duotone still life (Morandi bottles drawn in SVG from four tones: the dark neutral and a primary spot tint). The masthead wordmark is justified edge to edge across the top. The headline sits over the dark lower third in paper colour. The Fig. 1 caption is kept, and a 1px primary rule sits under the folio. The logo hangs in the image as a framed print when one is set. The cropped-initial plate is gone.
+2. **(Top)** The headline clamp is now `clamp(64px, 14cqw, 168px)` × display 1.22 (about 130px at 1280), with `opsz 96` set. Captions are 9–10px. The didone default is a shared request (below).
+3. **(Top)** The accent word is ink italic (`color: inherit`), never yellow. The footer § is ink.
+4. Section 02 is now a text page: two justified columns at 15/22 with the only drop cap, a pull quote in heading italic at 28px between hairlines, and a byline. The board hides the form; the deck Interface slide keeps the real controls. This is done with generated content, because no framework hook exists for panel markup.
+5. The states read as one button shown three ways: REST is primary, HOVER is ink, PRESSED is ink with an inset. Small-caps captions sit under hairline ticks. `--ab-eds-primary-press` is removed.
+6. The card-body drop cap is removed.
+7. On a phone the cover goes full bleed (negative pad) with the headline over it, and the type list collapses to the pair in use.
+8. The pattern suite is a shared request. The deck cover is the plate at the right 55%. The Material slide uses `materialStage: 'pattern'` so the plate no longer appears three times.
+
+### Neo Deco
+1. **(Top)** The metal is a fixed brass ramp in `ndBrass()`: dark mode `#C8A24A / #F1D592 / #7A5A1E`, light mode `#9A7425 / #C8A24A / #5B4214`. Small text uses `#D4B061` (dark) or `#6E5118` (light), both 4.5:1 or better. Strokes use a lo-hi-lo gradient. The accent is now only the headline word. Green palettes stay brass.
+2. **(Top)** The headline uses fat display caps at .08em tracking with a gilt inline. The headline hook emits a duplicate copy with a transparent fill, a 1px brass-highlight stroke and a −1.5px offset. The Limelight default is a shared request.
+3. **(Top)** The rays are crisp SVG: 48 rays alternating r96 and r70, 1.6px and 0.8px, starting at r18 on a solid brass half-disc. Three Radio City bands sit at r24, r36 and r48. The conic gradient and its mask are deleted.
+4. The arches are gone. Swatches are stepped ziggurat tiles (`clip-path`) with a brass inner stroke. The states are three frame grades: single rule, double rule and stepped double.
+5. The pattern suite is a shared request; a fixed brass colourway would also need an engine change.
+6. The CTA keeps the primary fill with 6px notched stepped corners. The gilt ring and the diamond arrow are removed.
+7. On a phone the sunburst stays behind the headline and the palette is one row of five stepped tiles.
+- Deck: Principles and Closing are centred. The Material slide shows brass as material: a gradient swatch, reeded flutes and a stepped frame at 1:1. `coverDisplay` is 1.45.
+
+### Dystopian Luxury
+1. **(Top)** There is one gesture. The word plate sits directly under the header and runs the full board width (102%), cropped vertically under the strip. The headline is a 15px caption under it.
+2. **(Top)** Labels use Courier Prime at 10px with .04em tracking (already in FONTS). The `Archivo` / `Arimo` default is a shared request; Arimo is a new font.
+3. **(Top)** The CTA is an inline ink block with a 6px primary square, so primary appears once per view. The underline is removed, and the classified dot, the bar tick and the footer dot no longer use colour.
+4. Swatches are sized by coverage: canvas about 60%, ink about 25%, and the three brand roles as 24px squares.
+5. On a phone the word splits at its middle syllable onto two cropped plates (MARI / GOLD; `dlSplit` also handles STRAW|BERRY and NORTH|WIND). The label is hidden and the accession number runs as plain text.
+6. The circled numerals and the barcode are removed. Rules are 1px at 12% ink with `clamp(48px, 8cqw, 96px)` of air.
+7. The pattern suite is a shared request.
+- Deck: the Material slide shows the single label at 1:1. The cover headline cannot drop below the 64px floor in `bdFitCover` (framework item, below).
+
+### Mixed Type
+1. **(Top)** The headline is poster scale, up to `clamp(64px, 18cqw, 220px)`, with each line fitted by voice width. Each line sits on its own full-bleed band: paper, then ink, then primary. Each band has one voice plus one swap inside the line.
+2. **(Top)** The italic voice is Fraunces Italic, and a fifth voice (Big Shoulders Display) sets numbers. The default pairing is a shared request. The SOFT/WONK and wdth axes need axis support in the font loader (framework).
+3. **(Top)** Cards and pills are gone: transparent fills, a 2px ink top rule, radius 0. Status is italic ink and bars are ink.
+4. The mix carries through the UI: the tabs are Design (italic), Build (heavy) and Launch (mono), and percentages use the condensed voice at 26px.
+5. An inline type-object chip sits at cap height in the middle line: the logo if there is one, else the brand initial in the italic voice on primary.
+6. The pattern suite is a shared request.
+7. The yellow is removed from the headline.
+- The "Aa" state boxes are replaced by Paper / Ink / Spark band chips. Keep items are intact: the cap-height specimen and the asterisk.
+
+### Rebus
+1. **(Top)** The sound dictionary is extended. New: f+[eel] = feel, th+[ink] = think, b+[ring] = bring, -ty = [tea] (beauty, twenty, quality), [pea] = peace/p. Already present: can, knot = not, tea, 2, hour = our, rows = rose. The headline now carries two honest pictures (de[sign], f[eel]), with up to 3 words and 4 pictures as before. Glyphs are 0.92em and the clamp is `clamp(56px, 13cqw, 168px)`. There is still no synonym fallback.
+2. **(Top)** The brand equation is the hero's first element, at `clamp(64px, 16cqw, 200px)`, with hairline "+" and "−" operators.
+3. **(Top)** No UI icons remain. The Design tab is spelled De+[sign] through an overlay, so the word stays its accessible name; Build and Launch are letters. The CTA uses a typeset "→", and the switch knob is a plain square.
+4. One colour, one red: ink and canvas are the large swatches, primary is one, and secondary and accent are 20px "(support)" squares. Bars are ink and the footer square is primary.
+5. Every glyph has three Rand stripe cuts (`rbDraw`).
+6. The pattern suite needs a framework hook (below); `fit.js` can only approximate it.
+7. On deck 06 the horse is ink with primary on one stripe (masked to the glyph) at a maximum of 220px, with the glyph set below at about 48px.
+
+### Micrographics
+1. **(Top)** The glyph is the one huge element. The plate is full board width (1.36:1) and the glyph cap is 78% of its height, about 470px. The spec table, the QR block and a hazard tape are canvas-backed stickers over the glyph. The headline is 48px.
+2. **(Top)** Leaders are orthogonal (`M x y H tx V ty`). Labels knock out on canvas and snap to the 8px baseline (`round()`). The module "+" field is removed. The guides come from the glyph's measured ink edges.
+3. **(Top)** A fixed safety colour (`--ab-mg-safe`: `#FF4A1C` light, `#FFE500` dark) is used only for the caution triangle and the hazard tape. "alive" is ink.
+4. The type cards are now a 1px top rule with T.0x / MG-Tx labels.
+5. On a phone the plate crops to the glyph with 4 callouts at 8px, and the spec table and QR sit under it at 9px.
+6. Every section rule carries a real data line (code · hex · grid · page from tokens), and both board edges have 8px tick rulers.
+7. The pattern suite is a shared request; a fixed safety colourway would need an engine change.
+- Deck: the cover plate sits at full slide height and the principles motto renders at 1.8× size.
+
+### Re-score
+Scores against the references:
+
+| Aesthetic | Score | What still falls short |
+|---|---|---|
+| Editorial Serif | 6.5 | The still life is drawn, not photographed. |
+| Neo Deco | 6 | The ornament is still sparser than the Chrysler or Gatsby references, and the deck cover and patterns stay client-coloured until the `fit.js` change lands. |
+| Dystopian Luxury | 7 | Arial-class type needs Arimo, and the deck cover headline is held at 64px by the framework. |
+| Mixed Type | 6.5 | There are no real photos, and the axes are unavailable. |
+| Rebus | 7 | The pattern slide is still off-concept. |
+| Micrographics | 6.5 | The saturated-field attitude is limited to the hazard tape and the stickers. |

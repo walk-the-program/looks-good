@@ -6,7 +6,8 @@
 ------------------------------------------------------------------------ */
 
 .ab[data-ae="soft-form"] {
-  --sf-raised: 6px 6px 13px var(--ab-lo), -6px -6px 13px var(--ab-hi);
+  /* the 1px inset top rim keeps relief legible on the dark fallback */
+  --sf-raised: 6px 6px 13px var(--ab-lo), -6px -6px 13px var(--ab-hi), inset 0 1px 0 rgba(255, 255, 255, 0.06);
   --sf-raised-s: 3px 3px 7px var(--ab-lo), -3px -3px 7px var(--ab-hi);
   --sf-inset: inset 6px 6px 13px var(--ab-lo), inset -6px -6px 13px var(--ab-hi);
   --sf-inset-s: inset 3px 3px 6px var(--ab-lo), inset -3px -3px 6px var(--ab-hi);
@@ -27,11 +28,13 @@
 }
 .ab[data-ae="soft-form"] .ab-tag { letter-spacing: 0.14em; }
 
-/* hero: large, tight headline (reference proportions: weight 500, -0.05em) */
+/* hero: one big object and micro labels (TE / Braun scale contrast). The headline
+   is large and tight; the well grows and bleeds past the right gutter. */
+.ab[data-ae="soft-form"] .ab-hero { grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); }
 .ab[data-ae="soft-form"] .ab-kicker { letter-spacing: 0.17em; }
-.ab[data-ae="soft-form"] .ab-headline { font-weight: 500; letter-spacing: calc(-0.05em * var(--ab-tr, 1)); line-height: 0.96; word-spacing: 0.06em; }
+.ab[data-ae="soft-form"] .ab-headline { font-weight: 600; letter-spacing: calc(-0.045em * var(--ab-tr, 1)); line-height: 0.95; word-spacing: 0.04em; }
 .ab[data-ae="soft-form"] .ab-subcopy { max-width: 30em; }
-.ab[data-ae="soft-form"] .ab-art { max-width: 310px; }
+.ab[data-ae="soft-form"] .ab-art { max-width: 440px; margin-right: -6%; }
 
 /* signature art: a recessed well, a raised canvas disc off-centre inside it, a
    primary semicircle, and a slim glass bar lens that refracts a duplicate of
@@ -70,7 +73,7 @@
 }
 
 /* palette: each color is a raised pad seated in a recessed socket, the same
-   vocabulary as the materials above; the primary pad carries the gloss */
+   vocabulary as the materials above; only the primary pad carries the gloss */
 .ab[data-ae="soft-form"] .ab-palette { padding: clamp(30px, 4.6cqw, 50px) 0; }
 .ab[data-ae="soft-form"] .ab-swatches { gap: clamp(12px, 2.4cqw, 26px); }
 .ab[data-ae="soft-form"] .ab-chip {
@@ -81,13 +84,28 @@
   content: ""; position: absolute; inset: 5px; border-radius: 9px; background: var(--sw);
   box-shadow: 2px 3px 5px var(--ab-lo), -1px -1px 3px var(--ab-hi), inset 0 1px 1px rgba(255, 255, 255, 0.28);
 }
-.ab[data-ae="soft-form"] .ab-swatch[data-role="primary"] .ab-chip::after,
-.ab[data-ae="soft-form"] .ab-swatch[data-role="secondary"] .ab-chip::after,
-.ab[data-ae="soft-form"] .ab-swatch[data-role="accent"] .ab-chip::after {
+.ab[data-ae="soft-form"] .ab-swatch[data-role="primary"] .ab-chip::after {
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.24), rgba(255, 255, 255, 0) 55%), var(--sw);
 }
 .ab[data-ae="soft-form"] .ab-swatch[data-role="canvas"] .ab-chip::after { box-shadow: var(--sf-raised-s), inset 0 0 0 1px rgba(128, 128, 128, 0.2); }
 .ab[data-ae="soft-form"] .ab-sw-role { font-weight: 600; }
+
+/* type block: the apply button is a raised key, fit tags are muted text with a dot */
+.ab[data-ae="soft-form"] .ab-type-col { border-top-color: transparent; box-shadow: inset 0 1px 0 color-mix(in srgb, var(--ab-line) 70%, transparent); }
+.ab[data-ae="soft-form"] .ab-type-apply {
+  border: 0; border-radius: 10px; background: var(--ab-canvas); box-shadow: var(--sf-raised-s);
+  transition: box-shadow 0.14s;
+}
+.ab[data-ae="soft-form"] .ab-type-apply:hover { background: var(--ab-canvas); }
+.ab[data-ae="soft-form"] .ab-type-apply:active { box-shadow: var(--sf-inset-s); }
+.ab[data-ae="soft-form"] .ab-fit,
+.ab[data-ae="soft-form"] .ab-fit[data-fit] {
+  display: inline-flex; align-items: center; gap: 7px; padding: 0; border: 0; border-radius: 0;
+  background: none; box-shadow: none; color: var(--ab-muted); font-weight: 500;
+}
+.ab[data-ae="soft-form"] .ab-fit::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--ab-primary); }
+.ab[data-ae="soft-form"] .ab-fit[data-fit="avoid"] { color: var(--ab-ink); }
+.ab[data-ae="soft-form"] .ab-fit[data-fit="avoid"]::before { background: var(--ab-ink); }
 
 /* 01 / interface: the one glass panel */
 .ab[data-ae="soft-form"] .ab-card {
@@ -137,29 +155,70 @@
 .ab[data-ae="soft-form"] .ab-switch:checked::before {
   background: linear-gradient(145deg, rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0) 55%), var(--ab-primary);
 }
+/* a recessed slider under the toggle, drawn on the status line: an 8px recessed
+   track, an ink fill and a raised 22px thumb (decorative instrument) */
+.ab[data-ae="soft-form"] .ab-status { position: relative; padding-bottom: 40px; }
+.ab[data-ae="soft-form"] .ab-status::after {
+  content: ""; position: absolute; left: 0; right: 0; bottom: 9px; height: 8px; border-radius: 4px;
+  background: linear-gradient(90deg, color-mix(in srgb, var(--ab-ink) 55%, var(--ab-canvas)) 0 62%, transparent 62%) 0 50% / 100% 4px no-repeat, var(--ab-canvas);
+  box-shadow: var(--sf-inset-s);
+}
+.ab[data-ae="soft-form"] .ab-status::before {
+  content: ""; position: absolute; z-index: 1; left: calc(62% - 11px); bottom: 2px; width: 22px; height: 22px; border-radius: 50%;
+  background: var(--ab-canvas); box-shadow: var(--sf-raised-s);
+}
+/* the three materials themselves: raised, recessed, glass circle (skill recipe) */
 .ab[data-ae="soft-form"] .ab-states {
-  padding: 18px 12px 14px; border-radius: 20px; background: var(--ab-canvas);
+  padding: 22px 12px 16px; border-radius: 22px; background: var(--ab-canvas);
   box-shadow: var(--sf-inset); justify-content: space-around; gap: 8px;
 }
-.ab[data-ae="soft-form"] .ab-disc { border: 0; background: var(--ab-canvas); width: 56px; height: 56px; }
-.ab[data-ae="soft-form"] .ab-disc[data-s="0"] { border: 1px solid var(--ab-line); }
-.ab[data-ae="soft-form"] .ab-disc[data-s="1"] { box-shadow: var(--sf-raised); }
-.ab[data-ae="soft-form"] .ab-disc[data-s="2"] { box-shadow: var(--sf-inset); }
+.ab[data-ae="soft-form"] .ab-disc { position: relative; border: 0; background: var(--ab-canvas); width: 84px; height: 84px; max-width: 100%; aspect-ratio: 1; }
+.ab[data-ae="soft-form"] .ab-disc[data-s="0"] { box-shadow: var(--sf-raised); }
+.ab[data-ae="soft-form"] .ab-disc[data-s="1"] { box-shadow: var(--sf-inset); }
+.ab[data-ae="soft-form"] .ab-disc[data-s="2"] {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.6), rgba(197, 234, 229, 0.18) 30%, rgba(215, 190, 243, 0.34) 62%, rgba(245, 214, 168, 0.35) 83%, rgba(255, 255, 255, 0.53)), var(--ab-canvas);
+  border: 1px solid rgba(255, 255, 255, 0.44);
+  box-shadow: inset 2px 2px 3px rgba(255, 255, 255, 0.75), inset -2px -2px 4px rgba(197, 173, 235, 0.6), 5px 7px 14px var(--ab-lo), -4px -4px 10px var(--ab-hi);
+}
+.ab[data-ae="soft-form"] .ab-disc[data-s="2"]::after {
+  content: ""; position: absolute; inset: 6px; border-radius: 50%;
+  border-top: 1.5px solid rgba(255, 255, 255, 0.75); border-left: 1.5px solid rgba(255, 255, 255, 0.55);
+  border-right: 1px solid rgba(214, 189, 255, 0.35); border-bottom: 1px solid rgba(164, 230, 232, 0.35);
+}
 
-/* 03 / in use: the list sits in one recessed well; progress tracks are recessed
-   channels with a raised, glossy fill */
+/* 03 / in use: the list sits in one recessed well and stays flat inside it; the
+   progress fill is ink in a recessed channel, the status is muted text (one
+   colour, one gloss: only the CTA and the switch knob carry colour) */
 .ab[data-ae="soft-form"] .ab-list {
   padding: 6px clamp(14px, 2.2cqw, 24px); border-radius: 22px; background: var(--ab-canvas); box-shadow: var(--sf-inset);
 }
 .ab[data-ae="soft-form"] .ab-row { border-color: color-mix(in srgb, var(--ab-line) 70%, transparent); }
 .ab[data-ae="soft-form"] .ab-row:first-child { border-top: 0; }
 .ab[data-ae="soft-form"] .ab-row:last-child { border-bottom: 0; }
-.ab[data-ae="soft-form"] .ab-row-status { background: var(--ab-canvas); box-shadow: var(--sf-raised-s); }
-.ab[data-ae="soft-form"] .ab-row-bar { height: 10px; border-radius: 6px; background: var(--ab-canvas); box-shadow: var(--sf-inset-s); overflow: visible; }
-.ab[data-ae="soft-form"] .ab-row-bar i {
-  border-radius: 6px; background: linear-gradient(180deg, rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0) 55%), var(--ab-secondary);
-  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.45), 1px 2px 4px var(--ab-lo);
+.ab[data-ae="soft-form"] .ab-row-status { background: none; box-shadow: none; padding: 0; color: var(--ab-muted); }
+.ab[data-ae="soft-form"] .ab-row-bar {
+  display: flex; align-items: center; height: 10px; padding: 0 2px; border-radius: 6px;
+  background: var(--ab-canvas); box-shadow: var(--sf-inset-s); overflow: hidden;
 }
+.ab[data-ae="soft-form"] .ab-row-bar i { height: 6px; border-radius: 3px; background: var(--ab-ink); opacity: 0.55; box-shadow: none; }
+
+/* narrow: the well stays the hero object and still bleeds off the edge */
+@container ab (max-width: 600px) {
+  .ab[data-ae="soft-form"] .ab-hero { grid-template-columns: minmax(0, 1fr); }
+  .ab[data-ae="soft-form"] .ab-art { justify-self: end; max-width: 320px; margin-right: -10%; }
+  .ab[data-ae="soft-form"] .ab-disc { width: 68px; height: 68px; }
+}
+
+/* deck: the art is the cover's object (big), and the material names are set
+   large on slide 06 instead of tracked micro caps */
+.ab[data-ae="soft-form"].ab-slide[data-slide="cover"] .ab-art { max-width: 470px; margin-right: 0; }
+.ab[data-ae="soft-form"].ab-slide .ab-deck-mat { padding: 16px 0; }
+.ab[data-ae="soft-form"].ab-slide .ab-deck-mat .ab-label {
+  font-family: var(--ab-font-h); font-size: 30px; font-weight: 600; line-height: 1.1;
+  letter-spacing: -0.03em; text-transform: none;
+}
+.ab[data-ae="soft-form"].ab-slide .ab-deck-mat .ab-n { font-family: var(--ab-font-label, var(--ab-font-b)); font-size: 12px; font-weight: 400; letter-spacing: 0.1em; color: var(--ab-muted); margin-right: 14px; }
+.ab[data-ae="soft-form"].ab-slide .ab-deck-mat .ab-n::after { content: ""; }
 
 /* footer */
 .ab[data-ae="soft-form"] .ab-foot { font-size: 11px; letter-spacing: 0.02em; }

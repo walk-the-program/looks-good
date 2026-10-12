@@ -1,10 +1,10 @@
 /* ---------------------------------------------------------------------
    03 Neo-Brutal Pop — near-square radii (6px controls, 10px cards), 2px ink
-   outlines, hard offset shadows, a colored canvas with a 32px line grid,
-   outlined star/flower stickers. Cards, panels and rows are near-white --ab-paper;
-   --ab-card-fill (secondary mix) is for chips only. --ab-card-fill / --ab-paper / --ab-grid come
-   from js/aesthetics/neo-brutal-pop.js tokens().
-   Layout hooks used: hero 'centered', type ui/label 'sans' (weight 700),
+   outlines, hard offset shadows, a paper canvas with 100% accent / primary
+   section fields, UI-object stickers drawn by art() (kept off the text).
+   Cards, panels and rows are near-white --ab-paper. --ab-card-fill / --ab-paper
+   / --np-star-img come from js/aesthetics/neo-brutal-pop.js tokens().
+   Layout hooks used: hero 'split', type ui/label 'sans' (weight 700),
    highlight 'band', states 'button' (rest / lift / squish).
 ------------------------------------------------------------------------ */
 
@@ -13,9 +13,6 @@
   --np-r: 6px;
   --np-rc: 10px;
   border-radius: 14px;
-  background-image: linear-gradient(var(--ab-grid) 1px, transparent 1px), linear-gradient(90deg, var(--ab-grid) 1px, transparent 1px);
-  background-size: 32px 32px;
-  background-position: -1px -1px;
 }
 
 /* header */
@@ -53,70 +50,66 @@
 .ab[data-ae="neo-brutal-pop"] .ab-n::after { content: none; }
 .ab[data-ae="neo-brutal-pop"] .ab-labelrow { margin-bottom: 18px; }
 
-/* hero: a centered statement, stickers either side, one centered CTA */
-.ab[data-ae="neo-brutal-pop"] .ab-hero { padding-bottom: clamp(96px, 13cqw, 132px); }
+/* hero (split): a left-set poster headline, the sticker cluster on the right */
+.ab[data-ae="neo-brutal-pop"] .ab-hero { grid-template-columns: minmax(0, 2.15fr) minmax(0, 1fr); align-items: center; padding: clamp(30px, 5cqw, 60px) 0 clamp(34px, 5.4cqw, 64px); }
 .ab[data-ae="neo-brutal-pop"] .ab-kicker {
   display: inline-block; padding: 4px 12px; margin-bottom: 22px !important;
-  border: var(--np-b) solid var(--ab-ink); border-radius: var(--np-r); background: var(--ab-card-fill);
-  color: var(--ab-ink); font-size: 11px; font-weight: 800; letter-spacing: 0.1em;
+  border: var(--np-b) solid var(--ab-ink); border-radius: var(--np-r); background: var(--ab-secondary);
+  color: var(--ab-on-secondary); font-size: 11px; font-weight: 800; letter-spacing: 0.1em;
   transform: rotate(-1.5deg);
 }
-.ab[data-ae="neo-brutal-pop"] .ab-headline { position: relative; isolation: isolate; z-index: 1; font-weight: 800; letter-spacing: calc(-0.02em * var(--ab-tr, 1)); line-height: 1.04; }
-/* stickers: pseudo-elements anchored to the text so they overlap it. The
-   starburst is an in-flow inline-block with negative margins that net to zero
-   advance, so it sits at the start of the first line (the first letter's
-   top-left, whatever the centering) and the line layout is unchanged; letters
-   after it paint over it. The flower hangs off the highlight pill's bottom-right. */
-.ab[data-ae="neo-brutal-pop"] {
-  --np-star: clamp(84px, 15cqw, 140px);
-  --np-flower: clamp(72px, 12cqw, 120px);
+.ab[data-ae="neo-brutal-pop"] .ab-headline { font-weight: 800; letter-spacing: calc(-0.035em * var(--ab-tr, 1)); line-height: 0.98; text-wrap: balance; overflow-wrap: normal; }
+.ab[data-ae="neo-brutal-pop"]:not(.ab-slide) > .ab-in > .ab-hero .ab-headline {
+  font-size: calc(clamp(56px, 10.2cqw, 150px) * var(--ab-hl-scale, 1) * var(--ab-hs, 1));
 }
-.ab[data-ae="neo-brutal-pop"] .ab-headline::before {
-  content: var(--np-initial); display: inline-block; vertical-align: top; pointer-events: none; position: relative; z-index: -1;
-  box-sizing: border-box; width: var(--np-star); height: var(--np-star); padding-top: calc(var(--np-star) * 0.5 - 0.5em);
-  margin: calc(1.1em - var(--np-star)) calc(-0.9em) calc(-1.1em) calc(0.9em - var(--np-star));
-  background: var(--np-star-img) center / 100% 100% no-repeat; text-align: center;
-  font-family: var(--ab-font-h); font-weight: 800; font-size: 0.4em; line-height: 1; color: var(--ab-on-accent);
-  letter-spacing: 0; text-transform: none; rotate: -12deg;
-}
-.ab[data-ae="neo-brutal-pop"] .ab-hl { position: relative; }
-.ab[data-ae="neo-brutal-pop"] .ab-hl::after {
-  content: ""; position: absolute; z-index: -1; right: 0; bottom: 0; pointer-events: none;
-  width: var(--np-flower); aspect-ratio: 1; background: var(--np-flower-img) center / 100% 100% no-repeat;
-  transform: translate(85%, 85%) rotate(10deg);
-}
-/* the highlight word: a color fill with a 2px ink outline and a hard shadow */
+/* the highlight word: a tilted sticker block, 2px ink outline, 6px hard shadow */
 .ab[data-ae="neo-brutal-pop"] .ab-hl {
-  display: inline-block; max-width: 100%; padding: 0 0.16em 0.06em; margin: 0 0.02em;
+  display: inline-block; max-width: 100%; padding: 0 0.14em 0.06em; margin: 0.08em 0.02em 0;
   background: var(--ab-accent); color: var(--ab-on-accent);
-  border: var(--np-b) solid var(--ab-ink); border-radius: 0.14em;
-  box-shadow: 0.06em 0.06em 0 var(--ab-ink);
+  border: var(--np-b) solid var(--ab-ink); border-radius: 6px;
+  box-shadow: 6px 6px 0 var(--ab-ink); transform: rotate(-4deg); transform-origin: 30% 60%;
   line-height: 1.02;
 }
-.ab[data-ae="neo-brutal-pop"] .ab-subcopy { color: var(--ab-ink); font-size: clamp(14px, 1.6cqw, 17px); max-width: 30em; }
+.ab[data-ae="neo-brutal-pop"] .ab-subcopy { color: var(--ab-ink); font-size: clamp(15px, 1.5cqw, 17px); max-width: 30em; margin-top: clamp(22px, 3cqw, 34px) !important; }
 .ab[data-ae="neo-brutal-pop"] .ab-sub-rest { color: var(--ab-muted); }
 
-/* art: a layer over the whole hero (aria-hidden), under the copy */
-.ab[data-ae="neo-brutal-pop"] .ab-art {
-  position: absolute; inset: 0; z-index: 0; width: auto; max-width: none; aspect-ratio: auto; pointer-events: none;
-}
-.ab[data-ae="neo-brutal-pop"] .ab-hero-copy { position: relative; z-index: 1; }
-/* wide boards: the statement gets 86cqw so it sets in two lines */
-@container ab (min-width: 601px) {
-  .ab[data-ae="neo-brutal-pop"][data-hero="centered"] .ab-hero-copy { max-width: 86cqw; }
-}
+/* art: the UI-object sticker cluster (and the sticker sheet, deck Material only) */
+.ab[data-ae="neo-brutal-pop"] .ab-hero > .ab-art { max-width: 380px; aspect-ratio: 320 / 300; justify-self: end; }
 .ab[data-ae="neo-brutal-pop"] .nba { position: absolute; inset: 0; }
-.ab[data-ae="neo-brutal-pop"] .nba-cta {
-  position: absolute; left: 50%; bottom: clamp(24px, 3.6cqw, 40px); transform: translateX(-50%);
-  display: inline-flex; align-items: center; gap: 12px; white-space: nowrap;
-  padding: 12px 14px 12px 22px; border: var(--np-b) solid var(--ab-ink); border-radius: var(--np-r);
-  background: var(--ab-paper); color: var(--ab-ink); box-shadow: 4px 4px 0 var(--ab-ink);
-  font-family: var(--ab-font-ui); font-size: 15px; font-weight: 700; line-height: 1.2;
+.ab[data-ae="neo-brutal-pop"] .nba-cluster { display: block; width: 100%; height: 100%; overflow: visible; }
+.ab[data-ae="neo-brutal-pop"] .nba-t { font-family: var(--ab-font-h); font-weight: 800; letter-spacing: -0.02em; }
+.ab[data-ae="neo-brutal-pop"] .nba-sheet { display: none; }
+
+/* deck Material slide: the die-cut sticker sheet on a paper rectangle */
+.ab-slide[data-slide="material"] .ab[data-ae="neo-brutal-pop"] .nba-cluster,
+.ab[data-ae="neo-brutal-pop"].ab-slide[data-slide="material"] .nba-cluster { display: none; }
+.ab[data-ae="neo-brutal-pop"].ab-slide[data-slide="material"] .ab-deck-stage .ab-art { inset: 0; height: 100%; aspect-ratio: auto; margin: 0; }
+.ab-slide[data-slide="material"] .ab[data-ae="neo-brutal-pop"] .nba-sheet,
+.ab[data-ae="neo-brutal-pop"].ab-slide[data-slide="material"] .nba-sheet {
+  display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); grid-template-rows: repeat(2, minmax(0, 1fr));
+  position: absolute; inset: 4px 12px 12px 4px; padding: 26px 22px; gap: 18px;
+  background: var(--ab-paper); border: var(--np-b) solid var(--ab-ink); border-radius: var(--np-rc); box-shadow: 8px 8px 0 var(--ab-ink);
 }
-.ab[data-ae="neo-brutal-pop"] .nba-cta i {
-  display: grid; place-items: center; width: 26px; height: 26px; border-radius: var(--np-r);
-  background: var(--ab-ink); color: var(--ab-canvas); font-size: 15px; font-weight: 800; line-height: 1;
+.ab[data-ae="neo-brutal-pop"] .nba-cell { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; min-width: 0; }
+.ab[data-ae="neo-brutal-pop"] .nba-lab { font: 800 18px/1.1 var(--ab-font-ui); color: var(--ab-ink); text-align: center; letter-spacing: -0.01em; }
+.ab[data-ae="neo-brutal-pop"] .nba-obj { width: 120px; height: 120px; display: grid; place-items: center; }
+.ab[data-ae="neo-brutal-pop"] .nba-obj svg { width: 120px; height: 120px; overflow: visible; }
+.ab[data-ae="neo-brutal-pop"] .nba-o-card {
+  width: 112px; height: 92px; align-content: center; justify-items: start; gap: 9px; padding: 0 16px; transform: rotate(-4deg);
+  background: var(--ab-paper); border: var(--np-b) solid var(--ab-ink); border-radius: var(--np-rc); box-shadow: 5px 5px 0 var(--ab-ink);
 }
+.ab[data-ae="neo-brutal-pop"] .nba-o-card i { display: block; height: 9px; width: 100%; border-radius: 3px; background: var(--ab-ink); }
+.ab[data-ae="neo-brutal-pop"] .nba-o-card i:first-child { background: var(--ab-primary); border: 2px solid var(--ab-ink); height: 18px; width: 60%; }
+.ab[data-ae="neo-brutal-pop"] .nba-o-card i:last-child { width: 70%; }
+.ab[data-ae="neo-brutal-pop"] .nba-obj b {
+  display: inline-flex; align-items: center; gap: 10px; padding: 12px 12px 12px 18px; white-space: nowrap;
+  border: var(--np-b) solid var(--ab-ink); border-radius: var(--np-r); box-shadow: 5px 5px 0 var(--ab-ink);
+  background: var(--ab-primary); color: var(--ab-on-primary); font: 800 20px/1 var(--ab-font-ui);
+}
+.ab[data-ae="neo-brutal-pop"] .nba-obj b em { font-style: normal; display: grid; place-items: center; width: 26px; height: 26px; border-radius: var(--np-r); background: var(--ab-ink); color: var(--ab-canvas); font-size: 16px; }
+.ab[data-ae="neo-brutal-pop"] .nba-o-btn b { transform: rotate(3deg); }
+.ab[data-ae="neo-brutal-pop"] .nba-o-paper b { background: var(--ab-paper); color: var(--ab-ink); transform: rotate(-3deg); }
+.ab[data-ae="neo-brutal-pop"] .nba-o-squish b { transform: translate(5px, 5px); box-shadow: 0 0 0 var(--ab-ink); }
 
 /* palette: stickers */
 .ab[data-ae="neo-brutal-pop"] .ab-chip {
@@ -217,8 +210,8 @@
 .ab[data-ae="neo-brutal-pop"] .ab-row:nth-child(3) .ab-av { background: var(--ab-accent); color: var(--ab-on-accent); }
 .ab[data-ae="neo-brutal-pop"] .ab-row-name { font-weight: 800; }
 .ab[data-ae="neo-brutal-pop"] .ab-row-status {
-  padding: 2px 10px; border: 2px solid var(--ab-ink); border-radius: var(--np-r); background: var(--ab-card-fill);
-  font-weight: 700; font-size: 11px;
+  padding: 2px 10px; border: 2px solid var(--ab-ink); border-radius: var(--np-r); background: var(--ab-secondary);
+  color: var(--ab-on-secondary); font-weight: 800; font-size: 11px;
 }
 .ab[data-ae="neo-brutal-pop"] .ab-row-bar { height: 14px; border: 2px solid var(--ab-ink); border-radius: 4px; background: var(--ab-canvas); }
 .ab[data-ae="neo-brutal-pop"] .ab-row-bar i {
@@ -227,17 +220,43 @@
 }
 .ab[data-ae="neo-brutal-pop"] .ab-row-pct { font-weight: 800; }
 
-/* type block: a sticker card per column */
+/* full-strength section fields (Gumroad): the type section on 100% primary, "In use"
+   on 100% accent; the cards inside stay paper. Text on a field uses that field's on-colour. */
+.ab[data-ae="neo-brutal-pop"] .ab-type, .ab[data-ae="neo-brutal-pop"] .ab-sec-use {
+  padding: clamp(18px, 3cqw, 30px); border: var(--np-b) solid var(--ab-ink); border-radius: var(--np-rc); box-shadow: 4px 4px 0 var(--ab-ink);
+  margin-bottom: clamp(20px, 3cqw, 30px);
+}
+.ab[data-ae="neo-brutal-pop"] .ab-type { background: var(--ab-primary); color: var(--ab-on-primary); }
+.ab[data-ae="neo-brutal-pop"] .ab-sec-use { background: var(--ab-accent); color: var(--ab-on-accent); }
+.ab[data-ae="neo-brutal-pop"] .ab-type > .ab-labelrow .ab-label, .ab[data-ae="neo-brutal-pop"] .ab-type .ab-type-foot,
+.ab[data-ae="neo-brutal-pop"] .ab-type .ab-type-foot *:not(.ab-type-apply), .ab[data-ae="neo-brutal-pop"] .ab-type .ab-type-k { color: var(--ab-on-primary); opacity: 1; }
+.ab[data-ae="neo-brutal-pop"] .ab-sec-use > .ab-labelrow .ab-label { color: var(--ab-on-accent); }
+.ab[data-ae="neo-brutal-pop"] .ab-sec-use .ab-list { color: var(--ab-ink); }
+.ab[data-ae="neo-brutal-pop"] .ab-type-grid { align-items: start; }
+.ab[data-ae="neo-brutal-pop"] .ab-sec-use > .ab-labelrow .ab-n { background: var(--ab-on-accent); color: var(--ab-accent); }
+.ab[data-ae="neo-brutal-pop"] .ab-type + .ab-rule { display: none; }
+
+/* type: one oversized "Aa" on a tilted paper sticker card, the picks as a one-line ramp */
 .ab[data-ae="neo-brutal-pop"] .ab-type-col {
-  padding: 18px; background: var(--ab-paper); border: var(--np-b) solid var(--ab-ink); border-radius: var(--np-rc);
+  padding: 18px; background: var(--ab-paper); color: var(--ab-ink); border: var(--np-b) solid var(--ab-ink); border-radius: var(--np-rc);
   box-shadow: 4px 4px 0 var(--ab-ink);
 }
+.ab[data-ae="neo-brutal-pop"] .ab-type-col[data-role="heading"] { transform: rotate(-2deg); }
+.ab[data-ae="neo-brutal-pop"] .ab-type-col[data-role="heading"]::before {
+  content: "Aa"; display: block; font-family: var(--ab-font-h); font-weight: 800; letter-spacing: -0.04em;
+  font-size: clamp(96px, 15cqw, 160px); line-height: 0.9; margin: 4px 0 10px; color: var(--ab-ink);
+}
+.ab[data-ae="neo-brutal-pop"] .ab-type-picks { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 14px; }
+.ab[data-ae="neo-brutal-pop"] .ab-type-pick { font-size: 15px !important; font-weight: 700; }
+.ab[data-ae="neo-brutal-pop"] .ab-type-col[data-role="heading"] .ab-type-pick:first-child { font-size: 26px !important; font-weight: 800; }
+.ab[data-ae="neo-brutal-pop"] .ab-type-col[data-role="heading"] .ab-type-pick:nth-child(2) { font-size: 19px !important; }
 .ab[data-ae="neo-brutal-pop"] .ab-type-apply {
-  background: var(--ab-canvas); color: var(--ab-ink); border: var(--np-b) solid var(--ab-ink); border-radius: var(--np-r);
+  background: var(--ab-paper); color: var(--ab-ink); border: var(--np-b) solid var(--ab-ink); border-radius: var(--np-r);
   box-shadow: 4px 4px 0 var(--ab-ink); font-weight: 700; transition: transform 0.1s, box-shadow 0.1s;
 }
-.ab[data-ae="neo-brutal-pop"] .ab-type-apply:hover { background: var(--ab-canvas); transform: translate(-2px, -2px); box-shadow: 6px 6px 0 var(--ab-ink); }
+.ab[data-ae="neo-brutal-pop"] .ab-type-apply:hover { background: var(--ab-paper); transform: translate(-2px, -2px); box-shadow: 6px 6px 0 var(--ab-ink); }
 .ab[data-ae="neo-brutal-pop"] .ab-type-apply:active { transform: translate(4px, 4px); box-shadow: 0 0 0 var(--ab-ink); }
+.ab[data-ae="neo-brutal-pop"] .ab-fit { border: 2px solid var(--ab-ink); border-radius: var(--np-r); background: var(--ab-secondary); color: var(--ab-on-secondary); font-weight: 800; }
 
 /* footer */
 .ab[data-ae="neo-brutal-pop"] .ab-foot {
@@ -256,32 +275,26 @@
 }
 
 @container ab (max-width: 600px) {
-  .ab[data-ae="neo-brutal-pop"] .ab-hero { padding-top: 84px; padding-bottom: 92px; }
-  .ab[data-ae="neo-brutal-pop"] .ab-hero-copy { text-align: left; }
-  .ab[data-ae="neo-brutal-pop"] .ab-subcopy { margin-left: 0 !important; }
-  .ab[data-ae="neo-brutal-pop"] { --np-star: 64px; --np-flower: 56px; }
-  /* narrow: the starburst is taken out of flow, 56px, hung off the headline's top-left corner so it
-     clears the first glyph (which also paints over it: z-index -1 inside the headline's isolated context) */
-  .ab[data-ae="neo-brutal-pop"] .ab-headline::before {
-    position: absolute; left: -8px; top: -40px; width: 56px; height: 56px; margin: 0; padding: 0;
-    display: grid; place-items: center; font-size: 16px;
-  }
-  .ab[data-ae="neo-brutal-pop"] .ab-kicker { margin-bottom: 52px !important; }
-  .ab[data-ae="neo-brutal-pop"] .ab-hl::after { transform: translate(55%, 80%) rotate(10deg); }
-  .ab[data-ae="neo-brutal-pop"] .ab-subcopy { margin-top: 52px !important; }
-  .ab[data-ae="neo-brutal-pop"] .nba-cta { left: 0; transform: none; font-size: 14px; padding: 10px 12px 10px 18px; }
+  .ab[data-ae="neo-brutal-pop"] .ab-hero { padding: 26px 0 30px; grid-template-columns: minmax(0, 1fr); }
+  .ab[data-ae="neo-brutal-pop"]:not(.ab-slide) > .ab-in > .ab-hero .ab-headline { font-size: calc(clamp(44px, 14cqw, 64px) * var(--ab-hl-scale, 1) * var(--ab-hs, 1)); }
+  .ab[data-ae="neo-brutal-pop"] .ab-hero > .ab-art { width: 78%; max-width: 300px; justify-self: end; margin-right: 6px; }
   .ab[data-ae="neo-brutal-pop"] .ab-row { grid-template-columns: auto minmax(0, 1fr) auto 4.5ch; }
   .ab[data-ae="neo-brutal-pop"] .ab-tag { border-radius: var(--np-r); padding: 5px 12px; }
   .ab[data-ae="neo-brutal-pop"] .ab-swatch { column-gap: 16px; }
   .ab[data-ae="neo-brutal-pop"] .ab-chip { height: 50px; }
   .ab[data-ae="neo-brutal-pop"] .ab-state-ctl { font-size: 12px; padding: 9px 4px; }
   .ab[data-ae="neo-brutal-pop"] .ab-states[data-kind="button"] { gap: 8px; }
+  .ab[data-ae="neo-brutal-pop"] .ab-type-col[data-role="heading"] { transform: rotate(-1.2deg); }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .ab[data-ae="neo-brutal-pop"] .ab-cta:hover, .ab[data-ae="neo-brutal-pop"] .ab-cta:active, .ab[data-ae="neo-brutal-pop"] .ab-input:focus, .ab[data-ae="neo-brutal-pop"] .ab-type-apply:hover, .ab[data-ae="neo-brutal-pop"] .ab-type-apply:active { transform: none; }
 }
 
-/* Deck cover: the art's mock "Get started" button sits at the bottom of the hero, which
-   on the cover is where the subcopy lands. The stickers carry the cover without it. */
-.ab[data-ae="neo-brutal-pop"].ab-slide[data-slide="cover"] .nba-cta { display: none; }
+/* Deck: stickers live only in the art (cover) and on the closing slide, in the gutter. */
+.ab[data-ae="neo-brutal-pop"].ab-slide[data-slide="closing"] .ab-deck-closemain { position: relative; }
+.ab[data-ae="neo-brutal-pop"].ab-slide[data-slide="closing"] .ab-deck-closing { position: relative; }
+.ab[data-ae="neo-brutal-pop"].ab-slide[data-slide="closing"] .ab-deck-closing::after {
+  content: ""; position: absolute; right: 0; top: 0; width: 150px; height: 150px; rotate: 12deg; pointer-events: none;
+  background: var(--np-star-img) center / 100% 100% no-repeat;
+}

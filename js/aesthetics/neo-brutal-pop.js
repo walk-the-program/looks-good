@@ -1,8 +1,23 @@
-/* 03 Neo-Brutal Pop — chunky, playful, loud. Reference: neobrutalism.dev and
-   Gumroad. Near-square radii (6px controls, 10px cards), a colored canvas with a
-   32px line grid, 2px ink outlines, hard offset shadows that lift and squish.
-   Centered hero with outlined star and flower stickers overlapping the
-   statement and one centered CTA. Look lives in css/aesthetics/neo-brutal-pop.css. */
+/* 03 Neo-Brutal Pop — chunky, playful, loud. References: Gumroad (huge black
+   type, sticker objects, flat 100% colour fields), Figma Config sticker sheets,
+   neobrutalism.dev as the baseline to beat. Near-square radii (6px controls,
+   10px cards), a paper canvas, 2px ink outlines, hard offset shadows that lift
+   and squish. Split hero: a left-set three-line headline with "alive" as a
+   tilted sticker block, and a cluster of UI-object stickers (price tag, NEW
+   starburst, checkbox, cursor) on the right. Section fields switch to 100%
+   accent / primary. The deck's Material slide is a die-cut sticker sheet.
+   Look lives in css/aesthetics/neo-brutal-pop.css. */
+// Points of a star polygon centred on (cx, cy): n tips, outer radius r1, inner r2.
+function npStarPoints(cx, cy, r1, r2, n) {
+  const pts = [];
+  for (let i = 0; i < n * 2; i++) {
+    const r = i % 2 ? r2 : r1;
+    const an = (i * Math.PI) / n - Math.PI / 2;
+    pts.push((cx + r * Math.cos(an)).toFixed(2) + ',' + (cy + r * Math.sin(an)).toFixed(2));
+  }
+  return pts.join(' ');
+}
+
 registerAesthetic({
   key: 'neo-brutal-pop', order: 3,
   name: 'Neo-Brutal Pop',
@@ -14,7 +29,7 @@ registerAesthetic({
   mode: 'light',
   slideShape: 'geometric',
   labels: { material: 'Stickers & squish', states: ['Rest', 'Lift', 'Squish'], statesKind: 'button' },
-  layout: { hero: 'centered' },
+  layout: { hero: 'split' },
   type: { ui: 'sans', label: 'sans', display: 1.0 },
   highlight: 'band',
   cardFill: '--ab-paper',
@@ -25,23 +40,22 @@ registerAesthetic({
       never: 'Large background fields in light mode',
     },
     primary: {
-      use: 'The one chunky CTA per view (the card button), the selected segment, the flower sticker and the "on" toggle',
-      never: 'Card fills, body text, a second filled CTA (the hero button is paper)',
+      use: 'The one chunky CTA per view, the selected segment, the price-tag sticker, the "on" toggle and the type section field',
+      never: 'Card fills, body text, a second filled CTA',
     },
     secondary: {
-      use: 'Tags and chips, sticker circles, progress stripes and the second data series',
+      use: 'Solid tags and status chips, the checkbox sticker, progress stripes and the second data series',
       never: 'Card or panel fills (those are paper), the main CTA, body text',
       coverage: '≈12%',
     },
     accent: {
-      use: 'The headline word as a color fill with a 2px ink outline, the starburst sticker and one avatar',
-      never: 'Buttons, body text, outlines, large fills',
+      use: 'The headline sticker word, the NEW starburst, one avatar and the In use section field',
+      never: 'Buttons, body text, outlines',
     },
   },
 
-  // A confident colored field: the secondary mixed ~22% into the light canvas
-  // (16% into a dark one), so the page is never plain white.
-  canvas(b) { return b.mix(b.secondary, b.canvas, b.isDark ? 0.16 : 0.22); },
+  // Paper, not a pastel wash: colour arrives as 100% section fields instead.
+  canvas(b) { return b.isDark ? b.mix(b.ink, b.canvas, 0.1) : b.mix('#ffffff', b.canvas, 0.85); },
 
   tokens(t) {
     // Chip fill (kicker, status pills, hover): secondary pushed into the canvas,
@@ -50,48 +64,69 @@ registerAesthetic({
     const fill = k => t.mix(t.secondary, t.canvas, k);
     let a = 0.5;
     while (a > 0.1 && t.contrast(t.ink, fill(a)) < 7) a -= 0.05;
-    // The stickers are CSS pseudo-elements anchored to the headline text itself
-    // (starburst on the first letter, flower on the highlight pill), so they are
-    // passed to the stylesheet as data-URI images. The starburst's initial is a
-    // pseudo-element `content` string.
+    // The closing slide's starburst sticker (a data-URI image on a pseudo-element).
     const uri = svg => "url('data:image/svg+xml," + encodeURIComponent(svg).replace(/'/g, '%27') + "')";
-    const sk = `stroke="${t.ink}" stroke-width="2" stroke-linejoin="round" vector-effect="non-scaling-stroke"`;
-    const off = 'translate(3.2 3.2)';
-    const pts = [];
-    for (let i = 0; i < 24; i++) {
-      const r = i % 2 ? 33 : 46;
-      const an = (i * Math.PI) / 12 - Math.PI / 2;
-      pts.push((50 + r * Math.cos(an)).toFixed(2) + ',' + (50 + r * Math.sin(an)).toFixed(2));
-    }
-    const star = pts.join(' ');
-    const starSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="-4 -4 108 108"><polygon points="${star}" fill="${t.ink}" transform="${off}"/><polygon points="${star}" fill="${t.accent}" ${sk}/></svg>`;
-    const petals = [];
-    for (let i = 0; i < 8; i++) {
-      const an = (i * Math.PI) / 4;
-      petals.push([(50 + 27 * Math.cos(an)).toFixed(2), (50 + 27 * Math.sin(an)).toFixed(2)]);
-    }
-    const ring = attrs => petals.map(p => `<circle cx="${p[0]}" cy="${p[1]}" r="17" ${attrs}/>`).join('');
-    const flowerSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="-4 -4 108 108"><g transform="${off}">${ring(`fill="${t.ink}"`)}</g>${ring(`fill="${t.ink}" stroke="${t.ink}" stroke-width="4" vector-effect="non-scaling-stroke"`)}${ring(`fill="${t.primary}"`)}<circle cx="50" cy="50" r="13" fill="${t.accent}" ${sk}/></svg>`;
-    let initial = '·';
-    try { initial = abInitial(effectiveContent().brandName); } catch (e) { /* keep the dot */ }
-    if (!/^[\p{L}\p{N}·]$/u.test(initial)) initial = '·';
+    const starSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="-4 -4 108 108"><polygon points="${npStarPoints(50, 50, 46, 33, 24)}" fill="${t.ink}" transform="translate(3.2 3.2)"/><polygon points="${npStarPoints(50, 50, 46, 33, 24)}" fill="${t.accent}" stroke="${t.ink}" stroke-width="2" stroke-linejoin="round" vector-effect="non-scaling-stroke"/></svg>`;
     return {
       '--ab-type-pick-w': 700,
       '--ab-card-fill': fill(a),
       '--ab-paper': t.isDark ? t.mix(t.ink, t.canvas, 0.1) : t.mix('#ffffff', t.canvas, 0.9),
-      '--ab-grid': t.alpha(t.ink, 0.07),
       '--np-star-img': uri(starSvg),
-      '--np-flower-img': uri(flowerSvg),
-      '--np-initial': `'${initial}'`,
     };
   },
 
-  // The stickers (a starburst with the initial, a flower) are drawn in CSS from
-  // the headline's own pseudo-elements, so they overlap the first letter and the
-  // highlight pill (see tokens()). The art layer holds only the decorative paper
-  // CTA centered under the statement (the filled primary CTA lives in the card).
+  // Two compositions, both plain SVG / HTML drawn here (self-contained, so the art
+  // works as a blend donor):
+  //  - .nba-cluster: UI-object stickers for the hero (price tag "$1", NEW
+  //    starburst, checkbox, cursor), each 2px-outlined with a hard offset shadow;
+  //  - .nba-sheet: a die-cut sticker sheet (3 x 2) shown only on the deck's
+  //    Material slide (css hides the cluster there and the sheet everywhere else).
   art(ctx) {
-    return `<div class="nba"><span class="nba-cta">Get started<i>→</i></span></div>`;
+    const t = ctx.t;
+    const ink = t.ink;
+    const paper = typeof t.mix === 'function'
+      ? (t.isDark ? t.mix(t.ink, t.canvas, 0.1) : t.mix('#ffffff', t.canvas, 0.9)) : t.canvas;
+    const on = (k, fb) => t[k] || fb;
+    const sh = 'translate(5 5)';
+    const so = `stroke="${ink}" stroke-width="3" stroke-linejoin="round"`;
+    const tag = '62,104 98,70 232,70 232,204 98,204 62,170';
+    const star = npStarPoints(0, 0, 54, 40, 20);
+    const cursor = '0,0 0,58 14,45 25,68 36,63 25,40 43,40';
+    const cluster = `<svg class="nba-cluster" viewBox="0 0 320 300" xmlns="http://www.w3.org/2000/svg">
+      <path d="M86 137 C52 128 30 84 46 30" fill="none" stroke="${ink}" stroke-width="3" stroke-linecap="round"/>
+      <g transform="rotate(-9 147 137)">
+        <polygon points="${tag}" fill="${ink}" transform="${sh}"/>
+        <polygon points="${tag}" fill="${t.primary}" ${so}/>
+        <circle cx="88" cy="137" r="10" fill="${paper}" ${so}/>
+        <text x="168" y="164" text-anchor="middle" class="nba-t" font-size="76" fill="${on('onPrimary', ink)}">$1</text>
+      </g>
+      <g transform="translate(252 72) rotate(12)">
+        <polygon points="${star}" fill="${ink}" transform="${sh}"/>
+        <polygon points="${star}" fill="${t.accent}" ${so}/>
+        <text x="0" y="9" text-anchor="middle" class="nba-t" font-size="26" fill="${on('onAccent', ink)}">NEW</text>
+      </g>
+      <g transform="rotate(8 240 238)">
+        <rect x="205" y="203" width="70" height="70" rx="8" fill="${ink}" transform="${sh}"/>
+        <rect x="205" y="203" width="70" height="70" rx="8" fill="${t.secondary}" ${so}/>
+        <path d="M222 238 L236 252 L260 222" fill="none" stroke="${on('onSecondary', ink)}" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+      </g>
+      <g transform="translate(150 218) rotate(-14)">
+        <polygon points="${cursor}" fill="${ink}" transform="translate(4 4)"/>
+        <polygon points="${cursor}" fill="${paper}" ${so}/>
+      </g>
+    </svg>`;
+    const tagMini = `<svg viewBox="52 60 192 156" xmlns="http://www.w3.org/2000/svg"><polygon points="${tag}" fill="${ink}" transform="${sh}"/><polygon points="${tag}" fill="${t.primary}" ${so}/><circle cx="88" cy="137" r="10" fill="${paper}" ${so}/><text x="168" y="164" text-anchor="middle" class="nba-t" font-size="76" fill="${on('onPrimary', ink)}">$1</text></svg>`;
+    const starMini = `<svg viewBox="-60 -60 126 126" xmlns="http://www.w3.org/2000/svg"><polygon points="${star}" fill="${ink}" transform="${sh}"/><polygon points="${star}" fill="${t.accent}" ${so}/><text x="0" y="9" text-anchor="middle" class="nba-t" font-size="26" fill="${on('onAccent', ink)}">NEW</text></svg>`;
+    const cell = (cls, obj, label) => `<div class="nba-cell"><div class="nba-obj ${cls}">${obj}</div><span class="nba-lab">${label}</span></div>`;
+    const sheet = `<div class="nba-sheet">
+      ${cell('nba-o-card', '<i></i><i></i><i></i>', 'Sticker card')}
+      ${cell('nba-o-btn', '<b>Go<em>→</em></b>', 'Chunky button')}
+      ${cell('nba-o-paper', '<b>Go<em>→</em></b>', 'Paper button')}
+      ${cell('nba-o-squish', '<b>Go<em>→</em></b>', 'Squish state')}
+      ${cell('nba-o-star', starMini, 'Starburst')}
+      ${cell('nba-o-tag', tagMini, 'Price tag')}
+    </div>`;
+    return `<div class="nba">${cluster}${sheet}</div>`;
   },
 
   materials: [
@@ -101,7 +136,8 @@ registerAesthetic({
     { name: 'Squish state', css: 'transform: translate(4px, 4px); box-shadow: 0 0 0 {ink};' },
     { name: 'Segment track', css: 'background: {paper}; border: 2px solid {ink}; border-radius: 10px; padding: 4px; /* selected segment: {primary} fill, 2px {ink} outline, radius 6 */' },
     { name: 'Highlight fill', css: 'background: {accent}; color: {onAccent}; border: 2px solid {ink}; border-radius: .12em; padding: 0 .18em; box-shadow: 4px 4px 0 {ink}; /* a color fill with a 2px ink outline behind one headline word */' },
-    { name: 'Canvas', css: 'background-color: {canvas}; background-image: linear-gradient({grid} 1px, transparent 1px), linear-gradient(90deg, {grid} 1px, transparent 1px); background-size: 32px 32px; /* the canvas is the secondary mixed into the light neutral; the grid is ink at 7% */' },
+    { name: 'Section field', css: 'background: {accent}; color: {onAccent}; border: 2px solid {ink}; border-radius: 10px; box-shadow: 4px 4px 0 {ink}; /* a whole section at 100% accent (or {primary} with {onPrimary}); the cards inside stay {paper} */' },
+    { name: 'UI-object sticker', css: 'a price tag, cursor, checkbox or starburst: flat {primary} / {accent} / {secondary} fill, 2px {ink} outline, 4-5px hard {ink} offset shadow, rotated 6-12deg, placed in the gutter, never over text' },
     { name: 'Outlined toggle', css: 'track: 64x34, radius 8, background {paper}, border 2px solid {ink}; knob: 23px, radius 5, of {ink}; on = track {primary}.' },
   ],
 
@@ -109,11 +145,13 @@ registerAesthetic({
     do: [
       'Outline every object in ink at 2px and give it a hard 4px offset shadow with no blur; keep corners near-square (6px controls, 10px cards).',
       'Make buttons physical: lift 2px up-left on hover, squish 4px down-right on press.',
-      'Fill cards, panels and list rows with near-white paper, sit them on the colored 32px grid canvas, and keep the headline mixed case at weight 800.',
-      'Put the accent as a color fill with a 2px ink outline behind one headline word and in the starburst sticker.',
+      'Keep cards, panels and list rows near-white paper on a paper canvas; switch whole sections to 100% accent or primary fields.',
+      'Set the headline left, mixed case, weight 800, at poster scale against 16px body; one word becomes a tilted sticker block.',
+      'Make stickers objects: price tags, cursors, checkboxes and starbursts, each outlined in ink with a hard shadow, kept clear of text.',
     ],
     dont: [
       'Blur a shadow or add a gradient; stickers are flat color with a hard edge.',
+      'Wash the page in a pastel tint; color comes as full-strength fields.',
       'Use the accent as text color or as a button fill.',
       'Round corners past 10px or rotate controls; only decorative stickers tilt.',
       'Drop the ink outline from a filled shape, or mix thin and thick outlines.',
@@ -124,12 +162,12 @@ registerAesthetic({
     principles: [
       ['Outline everything in ink', '2px outlines with a hard 4px shadow and no blur.'],
       ['Buttons you can feel', 'They lift on hover and squish when pressed.'],
-      ['Loud, but friendly', 'Bright stickers on a colored grid, with paper-white cards.'],
+      ['Stickers are objects', 'Price tags, cursors and starbursts, never on top of words.'],
     ],
     do: [
       'Outline every object in 2px ink.',
       'Lift on hover, squish on press.',
-      'Set near-white cards on the colored grid.',
+      'Switch whole sections to full-strength color.',
     ],
     dont: [
       'Blur a shadow or add a gradient.',

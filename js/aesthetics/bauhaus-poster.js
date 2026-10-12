@@ -1,11 +1,17 @@
 /* 08 Bauhaus Poster — constructive, flat, rhythmic. No shadows, no gradients,
-   no blur anywhere: geometry only (circles, half and quarter circles,
-   squares), flat fills with no outlines on art shapes, 2px ink borders on UI
-   controls that are either square or fully round. Reference: Bauhaus exhibition
-   posters. Poster hero (a huge tight lowercase headline after Bayer's universal
-   alphabet, vertical kicker), the art is a 3x3 pattern tile, palette as geometric
-   swatches (square, circle, quarter circle, semicircle). Secondary and accent may be
-   large planes in the art only; the UI keeps the universal role rules. */
+   no blur anywhere. References: Joost Schmidt's 1923 Ausstellung poster,
+   Moholy-Nagy's Bauhausbücher covers, Müller-Brockmann's "der Film". The poster
+   runs on a diagonal: a constructed hero (one huge red circle crossed by a black
+   bar at -24deg, an off-axis yellow square, a thin rule), an ink bar at -12deg
+   behind the headline, a solid red kicker bar. The poster inks are FIXED
+   primaries (BP_INKS: red, yellow, blue, black on paper) for art, highlight and
+   kicker; the client primary drives only the CTA, selection and switch. UI
+   controls are square or fully round, 2px ink borders. */
+
+// The fixed Bauhaus poster inks. Art, the highlight word, the kicker bar and the
+// palette-free poster marks use these, never the client palette.
+const BP_INKS = { red: '#D7332A', yellow: '#F2C230', blue: '#1F4FA2', black: '#151515', paper: '#F1ECE2' };
+
 registerAesthetic({
   key: 'bauhaus-poster', order: 8,
   name: 'Bauhaus Poster',
@@ -20,62 +26,68 @@ registerAesthetic({
   layout: { hero: 'poster', palette: 'swatches' },
   type: { ui: 'sans', label: 'sans', display: 1.4 },
   highlight: 'custom',
-  highlightNote: 'The highlight word sits on a flat accent plane covering its lower half; no outline, no full band.',
+  highlightNote: 'The highlight word changes colour as a whole word, to the fixed poster red; no plane, no band.',
 
-  // --ab-tr scales the tight headline tracking: 0 for condensed/heavy faces (they collide when tightened), 1 otherwise
-  tokens() {
-    return { '--ab-type-pick-w': 600 };
+  tokens(t) {
+    // The poster red as text: the fixed red where it reads (>= 3:1 at display size), else a lighter or darker red.
+    const reds = [BP_INKS.red, '#EE4B3F', '#B8231C', '#F26A5E'];
+    const redText = reds.find(c => t.contrast(c, t.canvas) >= 3) || t.ink;
+    return {
+      '--ab-type-pick-w': 600,
+      '--bp-red': BP_INKS.red, '--bp-yellow': BP_INKS.yellow, '--bp-blue': BP_INKS.blue, '--bp-black': BP_INKS.black, '--bp-paper': BP_INKS.paper,
+      '--bp-red-text': redText,
+    };
   },
 
   roles: {
     primary: {
-      use: 'The one flat CTA block, the selected segment, the "on" switch, and the largest planes of the art tile',
+      use: 'The one flat CTA block, the selected segment and the "on" switch (never the poster art, which prints in fixed primaries)',
       never: 'Body text, borders, a second CTA',
     },
     secondary: {
-      use: 'Large planes inside the art tile only (quarter circles and backgrounds), where it may well exceed its 10–15%; in the UI, only small tags and status chips',
-      never: 'The main CTA, body text, page background, large planes in the interface',
+      use: 'Small UI marks only: the palette quarter circle and the status outline; the poster art prints in the fixed primaries',
+      never: 'The main CTA, body text, page background, the poster art',
       coverage: '≈10–15%',
     },
     accent: {
-      use: 'Large planes inside the art tile only (half circles, backgrounds), where it may exceed its 5%; in the UI, one spark: the highlighted headline word (a flat plane under its lower half, no outline, no full band) and the footer dot',
-      never: 'Buttons, body text, borders, large fills in the interface',
+      use: 'One spark in the UI: the footer dot and the palette semicircle (the highlight word prints in the fixed poster red)',
+      never: 'Buttons, body text, borders, large fills, the poster art',
       coverage: '≤5%',
     },
   },
 
-  // The classic Bauhaus pattern tile: a 3x3 grid of 30-unit cells, each a flat
-  // quarter circle, semicircle, circle or plane in primary / secondary / accent /
-  // ink, rotated 0/90/180/270. Flat fills only: no strokes, shadows or blend modes.
+  // A constructed poster in the fixed inks (never the client palette): one big red
+  // circle (diameter 0.62 x width), a black bar crossing it at -24deg (0.09 x width),
+  // an off-axis yellow square (0.28 x width), a small blue half-disc and a thin
+  // rule parallel to the bar. .bpa-note marks (dimension annotations) show only on
+  // the deck's Material slide. Flat fills: no strokes on shapes, no shadows.
   art(ctx) {
-    const t = ctx.t;
-    const P = t.primary, S = t.secondary, A = t.accent, I = t.ink;
-    const shapes = {
-      quarter: 'M0 0 H30 A30 30 0 0 1 0 30 Z',
-      semi: 'M0 30 A15 15 0 0 1 30 30 Z',
-      circle: 'M15 0 A15 15 0 1 1 15 30 A15 15 0 1 1 15 0 Z',
-      square: 'M7 7 H23 V23 H7 Z',
-    };
-    // [background or null, shape, fill, rotation]
-    const cells = [
-      [S, 'quarter', A, 0], [null, 'circle', P, 0], [I, 'semi', S, 90],
-      [null, 'semi', I, 180], [P, 'quarter', I, 270], [A, 'circle', S, 0],
-      [I, 'quarter', P, 90], [S, 'semi', A, 0], [null, 'quarter', S, 180],
-    ];
-    const out = cells.map((c, i) => {
-      const x = (i % 3) * 30;
-      const y = Math.floor(i / 3) * 30;
-      return `<g transform="translate(${x} ${y})">${c[0] ? `<rect width="30" height="30" fill="${c[0]}"/>` : ''}`
-        + `<path d="${shapes[c[1]]}" fill="${c[2]}" transform="rotate(${c[3]} 15 15)"/></g>`;
-    }).join('');
-    return `<svg viewBox="0 0 90 90" width="100%" height="100%" focusable="false" shape-rendering="geometricPrecision">${out}</svg>`;
+    // On a dark canvas the black marks reverse to paper (a reversed print), so the bar still reads.
+    const K = ctx.t && ctx.t.isDark ? Object.assign({}, BP_INKS, { black: BP_INKS.paper }) : BP_INKS;
+    const notes = `<g class="bpa-note" fill="${K.black}" font-size="3.1" font-weight="700" letter-spacing="0.3">
+      <line x1="13" y1="18" x2="75" y2="18" stroke="${K.black}" stroke-width="0.35"/><line x1="13" y1="16.5" x2="13" y2="19.5" stroke="${K.black}" stroke-width="0.35"/><line x1="75" y1="16.5" x2="75" y2="19.5" stroke="${K.black}" stroke-width="0.35"/>
+      <text x="44" y="15.5" text-anchor="middle">Ø 0.62</text>
+      <text x="4" y="73">−24°</text>
+      <text x="66" y="95.5">0.28 □</text>
+      <text x="4" y="96">BAR 0.09</text>
+    </g>`;
+    return `<svg class="bpa" viewBox="0 0 100 100" width="100%" height="100%" focusable="false" shape-rendering="geometricPrecision">
+      <circle cx="44" cy="49" r="31" fill="${K.red}"/>
+      <rect x="62" y="64" width="28" height="28" fill="${K.yellow}"/>
+      <path d="M8 86 A9 9 0 0 1 26 86 Z" fill="${K.blue}"/>
+      <rect x="-12" y="45.5" width="124" height="9" fill="${K.black}" transform="rotate(-24 50 50)"/>
+      <rect x="-12" y="63" width="124" height="0.9" fill="${K.black}" transform="rotate(-24 50 50)"/>
+      ${notes}
+    </svg>`;
   },
 
   materials: [
-    { name: 'Flat form (art)', css: 'background: {primary}; border: 0; border-radius: 0; box-shadow: none; /* art shapes are flat fills with no outlines; or a quarter circle, semicircle or circle in primary, secondary, accent or ink on a flat square plane */' },
+    { name: 'Constructed poster (art)', css: 'fixed inks, never the client palette: red #D7332A circle (0.62 x width), black #151515 bar at -24deg (0.09 x width), yellow #F2C230 square (0.28 x width) off-axis, blue #1F4FA2 half-disc, thin black rule; flat fills, no outlines, on paper #F1ECE2 or the canvas' },
+    { name: 'Diagonal bar', css: 'background: {ink}; height: clamp(10px, 1.6cqw, 20px); width: 120%; transform: rotate(-12deg); /* behind the headline; the board leans on it */' },
     { name: 'Control (UI)', css: 'background: {canvas}; border: 2px solid {ink}; border-radius: 0; color: {ink}; /* or border-radius: 999px; never in between */' },
     { name: 'Primary action', css: 'background: {primary}; color: {onPrimary}; border: 2px solid {ink}; border-radius: 0; /* ends in an ink circle holding the arrow: background {ink}; color {canvas}; border-radius: 50%. Hover: background {ink}, color {canvas}; pressed: background {canvas}, color {ink}, translate(2px, 2px) */' },
-    { name: 'Highlight plane', css: 'background: linear-gradient(to top, {accent} 0 46%, transparent 46%); color: {ink}; border: 0; padding: 0 .04em; /* a flat accent plane (a hard stop, not a gradient) behind the lower half of one headline word; ink text; no outline, no full band */' },
+    { name: 'Highlight word', css: 'color: #D7332A; /* the whole word changes to the fixed poster red; no plane, no band, no outline */' },
+    { name: 'Kicker bar', css: 'background: #D7332A; color: #FFFFFF; width: 28px; writing-mode: vertical-rl; font: 800 12px/1 sans-serif; text-transform: uppercase; letter-spacing: .3em;' },
     { name: 'Palette shapes', css: 'one geometric form per role in a 1:1 box, max 96px, flat fill, no shadow: canvas = square with a 2px {ink} border, ink = circle, primary = circle, secondary = quarter circle (border-radius: 100% 0 0 0), accent = semicircle (half height, bottom aligned).' },
     { name: 'Selected segment', css: 'background: {primary}; color: {onPrimary}; border: 2px solid {ink}; border-radius: 0; /* unselected: background {canvas}; color {ink} */' },
     { name: 'Field', css: 'background: transparent; border: 0; border-bottom: 3px solid {ink}; border-radius: 0; text-transform: uppercase; font-weight: 700;' },
@@ -84,34 +96,36 @@ registerAesthetic({
 
   rules: {
     do: [
-      'Build art from circles, half and quarter circles and squares, tiled on a grid and rotated in 90° steps; flat fills only, with no outlines on art shapes.',
+      'Construct the poster from a few huge primitives (one circle at 60% of the sheet, a bar, a square) set on a diagonal; flat fills, no outlines.',
+      'Print the poster in fixed primaries (red, yellow, blue, black on paper); the client palette is for the interface.',
       'Make every control either square (radius 0) or fully round; nothing in between.',
       'Draw every UI control and panel with a 2px ink border and set headlines in huge, tight lowercase (card titles and list names stay uppercase).',
-      'Let secondary and accent run as large flat planes in the poster art, and keep them small in the interface.',
+      'Emphasise with a bar, a rule or a whole-word colour change; never a highlighter plane.',
     ],
     dont: [
       'Use shadows, gradients, blur, glow or blend modes anywhere; depth comes from overlap only.',
       'Round corners to 4, 8 or 12px; pick square or fully round.',
       'Fill panels, cards or buttons with secondary or accent.',
-      'Place text over the colored art planes without an ink or canvas ground.',
+      'Tile small quarter-circle mosaics or op-art rings; that is print-on-demand Bauhaus, not the canon.',
     ],
   },
   // Deck copy (js/brand-deck.js): three principles, three do / don't lines, each short.
   deck: {
+    coverDisplay: 0.94,
     principles: [
-      ['Flat geometry, hard ink lines', 'Circles, squares and quarter circles tiled on a grid.'],
-      ['Square or fully round', 'Nothing in between, and a 2px ink border on every control.'],
-      ['Loud, tight lowercase headlines', 'Secondary and accent run as flat planes in the art.'],
+      ['Constructed on a diagonal', 'One huge circle, a crossing bar, an off-axis square.'],
+      ['Fixed primaries on paper', 'Red, yellow, blue and black print the poster.'],
+      ['Loud, tight lowercase headlines', 'Emphasis is a bar or a whole word in red.'],
     ],
     do: [
-      'Build art from circles, squares and quarter circles.',
+      'Set the poster on a diagonal.',
+      'Print art in red, yellow, blue and black.',
       'Make every control square or fully round.',
-      'Draw every control with a 2px ink border.',
     ],
     dont: [
       'Use shadows, gradients or blur.',
-      'Round corners to 4, 8 or 12px.',
-      'Fill panels with secondary or accent.',
+      'Tile quarter-circle mosaics or op-art rings.',
+      'Paint the poster in the client palette.',
     ],
   },
 });
