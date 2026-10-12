@@ -11,7 +11,7 @@ last tag you are happy with.
 | `r6-3-new-aesthetics` | The 12 new aesthetics built and all 48 on the framework hooks (commit 2422d9f). |
 | `r6-5-harsh-fixes` | Harsh-review fixes for all 48 plus the shared pattern/font batch (same commit as `r6-3-new-aesthetics`, 2422d9f). |
 | `r6-6-qc` | Severe QC done: framework cleanup (8d7fb49), QC fixes for all 48, shared batch 2, final sweep (10db8ca). |
-| `r6-final` | Final gate passed and Mac app rebuilt (added when the gate passes). |
+| `r6-final` | Final gate passed and Mac app rebuilt (commit bb6f996). |
 
 ## Commit map (round 6, oldest first)
 | Commit | Phase | Undo just this with |
@@ -27,6 +27,7 @@ last tag you are happy with.
 | a840d8d · da11fde · 1476908 · 9b7339b · 7337eeb · 11ef5d1 | QC fixes per aesthetic group | `git revert <hash>` |
 | c269f41 | Shared batch 2 (QC suites, fonts) | `git revert c269f41` |
 | c982416 · 10db8ca | Final sweep + hud/toner colourways | `git revert 10db8ca c982416` |
+| 73b0664 · bb6f996 | Final gate: acid/xerox export, blend deck fit, blend probe fix | `git revert bb6f996 73b0664` |
 
 Later commits depend on earlier ones (e.g. QC fixes use the 8d7fb49 helpers), so reverting an early commit
 alone can conflict; prefer `git reset --hard <tag>` for whole-phase rollback.
