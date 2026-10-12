@@ -101,12 +101,6 @@ function xrDefs() {
   </defs></svg>`;
 }
 
-// The body face's bold and the heading face's heaviest weight, only from weights the face has.
-function xrBold(font, want) {
-  const w = String((font && font.weights) || '400').split(';').map(Number).filter(Boolean);
-  const le = w.filter(x => x <= want);
-  return le.length ? Math.max(...le) : Math.min(...w);
-}
 const xrSheet = (html, n) => html.replace(/^(\s*<div class="ab-(?:card|panel)">)/, `$1<span class="xr-sheet" aria-hidden="true">SHEET ${n} / 2</span>`);
 
 registerAesthetic({
@@ -144,23 +138,23 @@ registerAesthetic({
     secondary: {
       use: 'Never printed: it copies as toner density (a dot screen) in the palette only',
       never: 'Any fill, tape, bar, button or text',
-      coverage: '0%',
+      coverage: 'copies as toner dots',
     },
     accent: {
       use: 'Never printed: it copies as toner density (a dot screen) in the palette only',
       never: 'Highlighter, stickers, buttons, borders, text',
-      coverage: '0%',
+      coverage: 'copies as toner dots',
     },
   },
 
   // Light: the whole sheet is the one paper stock. Dark: the lid-open black platen.
   canvas(b) { return b.isDark ? b.mix('#000000', b.canvas, 0.9) : xrStock(b.primary).hex; },
 
-  tokens(t) {
-    const st = typeof state !== 'undefined' ? state : null;
+  tokens(t, view) {
+    const st = view || (typeof state !== 'undefined' ? state : null);
     const hf = st && st.headingFont;
     const d = t.isDark;
-    const hw = xrBold(hf, 900);
+    const hw = abWeight(hf, 900);
     const stock = xrStock(t.primary);
     const paper = stock.hex;                      // sheets are the stock in both modes
     const ink = d ? t.mix('#ffffff', paper, 0.25) : XR_TONER;   // on the black platen, type is paper-white
@@ -174,14 +168,17 @@ registerAesthetic({
       '--xr-paper': paper,
       '--xr-toner': XR_TONER,
       '--xr-paper-muted': mutedOn(XR_TONER, paper),
-      '--xr-bw': xrBold(st && st.bodyFont, 700),
+      '--xr-bw': abWeight(st && st.bodyFont, 700),
+      // the ink chip shows the ink the board actually prints (toner, or paper-white on the platen)
+      '--xr-ink-note': `"prints as ${(d ? ink : XR_TONER).toUpperCase()}"`,
+      // footer influences sit on the dust and the edge burn: a little more toner than --ab-muted
+      '--xr-foot': d ? t.mix(ink, t.canvas, 0.85) : t.mix(XR_TONER, t.canvas, 0.86),
       '--xr-stock-name': `"${stock.name.toUpperCase()} STOCK"`,
       '--xr-d2': `"copies as ${dens(t.secondary)}% toner"`,
       '--xr-d3': `"copies as ${dens(t.accent)}% toner"`,
       '--xr-r2': `${(dens(t.secondary) / 100 * 2.6 + 0.4).toFixed(2)}px`,
       '--xr-r3': `${(dens(t.accent) / 100 * 2.6 + 0.4).toFixed(2)}px`,
       '--ab-blend': d ? 'screen' : 'multiply',
-      '--xr-gen': d ? 'w' : '',
     };
     if (!d) Object.assign(v, { '--ab-ink': XR_TONER, '--ab-muted': mutedOn(XR_TONER, t.canvas), '--ab-line': XR_TONER });
     else Object.assign(v, { '--ab-ink': ink, '--ab-muted': mutedOn(ink, t.canvas) });
@@ -227,7 +224,7 @@ registerAesthetic({
       const x = 2 + n * 2.2;
       return `<text x="${(x + 1.2).toFixed(1)}" y="11.5" fill="${x < 86 ? paper : toner}">${n}</text>`;
     }).join('');
-    const font = 'font-family:var(--ab-font-b),"Courier Prime","Courier New",monospace';
+    const font = "font-family:var(--ab-font-b),'Courier Prime','Courier New',monospace";
     const mask = `<text x="142" y="178" text-anchor="middle" font-size="182" fill="#fff" style="font-family:var(--ab-font-h);font-weight:var(--ab-hw,900)">${escapeHtml(ctx.initial)}</text>`;
     return `${xrDefs()}<div class="xra"><svg viewBox="0 0 ${W} ${H}" width="100%" height="100%" focusable="false" preserveAspectRatio="xMidYMid meet">
       <defs>
@@ -255,7 +252,8 @@ registerAesthetic({
   // 02 states: three generations of the brand initial (real text, run through #xrx-gen1/3/7)
   states(ctx) {
     const e = ctx.e, ini = e(ctx.initial);
-    return (ctx.labels || []).map((name, i) => `<div class="ab-state" data-s="${i}"><span class="xr-gen" data-s="${i}" aria-hidden="true"><b>${ini}</b></span><span class="ab-state-name">${e(name)}</span></div>`).join('');
+    const names = (ctx.labels && (ctx.labels.names || ctx.labels)) || [];
+    return Array.from(names).map((name, i) => `<div class="ab-state" data-s="${i}"><span class="xr-gen" data-s="${i}" aria-hidden="true"><b>${ini}</b></span><span class="ab-state-name">${e(name)}</span></div>`).join('');
   },
   // Real markup for the parts the board used to draw with CSS content: the sheet count on the
   // copied sheets and the roster's "No." numbers and copy counts (72% of 50 copies = 036/050).

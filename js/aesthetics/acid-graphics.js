@@ -4,7 +4,8 @@
    pairs), rave flyers' who / where / when.
 
    Mechanism. COLOUR THAT VIBRATES: the client primary is pushed to full chroma (the "acid")
-   and paired with a computed CLASH colour 165 degrees away at EQUAL luminance; the palette
+   and paired with a computed CLASH colour 165 degrees away in OKLCH at EQUAL luminance and the most
+   chroma sRGB holds there (never a dull olive or brown; see acClash); the palette
    shows the pair and its measured luminance delta. EVERY display line is distorted (def.headline):
    the first line's letters stretch 1.4-2.2x on a wave, the middle line is compressed to 62%
    width and stretched, the last line is an outline with two offset echoes (acid, clash); the
@@ -26,15 +27,61 @@ function acPush(primary) {
   const l = c.h > 52 && c.h < 170 ? 50 : c.h >= 170 && c.h < 285 ? 58 : 54;
   return hslToHex(c.h, 100, l);
 }
-// hue +165 degrees, full chroma, lightness searched until the relative luminance equals the acid's
+// OKLab / OKLCH (sRGB, D65) for the clash search
+const acLin = v => { v /= 255; return v <= 0.04045 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); };
+function acOk(hex) {
+  const c = hexToRgb(hex), r = acLin(c.r), g = acLin(c.g), b = acLin(c.b);
+  const l = Math.cbrt(0.4122214708 * r + 0.5363325363 * g + 0.0514459929 * b);
+  const m = Math.cbrt(0.2119034982 * r + 0.6806995451 * g + 0.1073969566 * b);
+  const q = Math.cbrt(0.0883024619 * r + 0.2817188376 * g + 0.6299787005 * b);
+  const L = 0.2104542553 * l + 0.7936177850 * m - 0.0040720468 * q;
+  const A = 1.9779984951 * l - 2.4285922050 * m + 0.4505937099 * q, B = 0.0259040371 * l + 0.7827717662 * m - 0.8086757660 * q;
+  return { L, C: Math.hypot(A, B), h: (Math.atan2(B, A) * 180 / Math.PI + 360) % 360 };
+}
+// OKLCH -> linear sRGB (may be out of gamut)
+function acRgb(L, C, h) {
+  const a = C * Math.cos(h * Math.PI / 180), b = C * Math.sin(h * Math.PI / 180);
+  const l = (L + 0.3963377774 * a + 0.2158037573 * b) ** 3, m = (L - 0.1055613458 * a - 0.0638541728 * b) ** 3, q = (L - 0.0894841775 * a - 1.2914855480 * b) ** 3;
+  return [4.0767416621 * l - 3.3077115913 * m + 0.2309699292 * q, -1.2684380046 * l + 2.6097574011 * m - 0.3413193965 * q, -0.0041960863 * l - 0.7034186147 * m + 1.7076147010 * q];
+}
+const acInGamut = c => c.every(v => v >= -1e-4 && v <= 1 + 1e-4);
+const acY = c => 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2];
+const acHex = c => '#' + c.map(v => { v = Math.max(0, Math.min(1, v)); v = v <= 0.0031308 ? 12.92 * v : 1.055 * Math.pow(v, 1 / 2.4) - 0.055; return Math.round(Math.max(0, Math.min(1, v)) * 255).toString(16).padStart(2, '0'); }).join('');
+// the most chroma hue h holds at lightness L inside sRGB
+function acMaxC(L, h) {
+  let lo = 0, hi = 0.4;
+  for (let i = 0; i < 22; i++) { const m = (lo + hi) / 2; if (acInGamut(acRgb(L, m, h))) lo = m; else hi = m; }
+  return lo;
+}
+// The CLASH partner: the hue 165 degrees round (OKLCH) at the most chroma sRGB holds there, with only the
+// lightness moved until its relative luminance equals the acid's. A pair at equal luminance vibrates; a
+// result that comes out dull (chroma < 0.10, or an olive / brown: hue 50-140 at L < 0.7) is rejected and
+// the nearest offset (150, 180, 135, 195 ... 240 degrees) that holds chroma >= 0.12 is taken instead. When
+// no hue can match a very light acid with real chroma (lime, mint), the clash keeps its hue and is set
+// darker, at the first lightness that holds chroma 0.15 (the palette prints the luminance delta).
 function acClash(acid) {
-  const c = hexToHsl(acid), target = relativeLuminance(acid), h = (c.h + 165) % 360;
-  let lo = 8, hi = 92;
-  for (let i = 0; i < 18; i++) {
-    const mid = (lo + hi) / 2;
-    if (relativeLuminance(hslToHex(h, 100, mid)) < target) lo = mid; else hi = mid;
+  const a = acOk(acid), c0 = hexToRgb(acid);
+  const target = acY([acLin(c0.r), acLin(c0.g), acLin(c0.b)]);
+  const at = off => {
+    const h = (a.h + off) % 360;
+    let lo = 0.05, hi = 0.98;
+    for (let i = 0; i < 24; i++) { const m = (lo + hi) / 2; if (acY(acRgb(m, acMaxC(m, h) * 0.98, h)) < target) lo = m; else hi = m; }
+    const L = (lo + hi) / 2;
+    return { h, L, C: acMaxC(L, h) * 0.98 };
+  };
+  const fits = (k, floor) => k.C >= floor && !(k.h >= 50 && k.h <= 140 && k.L < 0.7);
+  let k = at(165);
+  if (!fits(k, 0.10)) {
+    k = null;
+    for (const off of [150, 180, 135, 195, 120, 210, 225, 240]) { const c = at(off); if (fits(c, 0.12)) { k = c; break; } }
   }
-  return hslToHex(h, 100, (lo + hi) / 2);
+  if (!k) {
+    const h = (a.h + 165) % 360;
+    let L = Math.min(0.98, a.L);
+    while (L > 0.3 && acMaxC(L, h) < 0.15) L -= 0.01;
+    k = { h, L, C: acMaxC(L, h) * 0.98 };
+  }
+  return acHex(acRgb(k.L, k.C, k.h));
 }
 
 registerAesthetic({
@@ -89,18 +136,14 @@ registerAesthetic({
   // The primary is printed as the acid (full chroma); the palette still shows the brand hex.
   printPrimary(t) { return acPush(t.primary); },
 
-  tokens(t) {
-    const hf = typeof state !== 'undefined' && state && state.headingFont;
+  tokens(t, view) {
+    const st = view || (typeof state !== 'undefined' ? state : null);
+    const hf = st && st.headingFont;
     const cls = hf && hf.cls;
-    const ws = String((hf && hf.weights) || '400').split(';').map(Number).filter(Boolean);
-    const le = ws.filter(x => x <= 900);
-    const hw = le.length ? Math.max(...le) : Math.min(...ws);
+    const hw = abWeight(hf, 900);
     const acid = t.printPrimary, clash = acClash(acid), d = t.isDark;
-    const brand = typeof effectiveContent === 'function' ? String(effectiveContent().brandName || '') : '';
+    const brand = String((st && st.content && String(st.content.brandName || '').trim()) || (typeof CONTENT_DEFAULTS !== 'undefined' ? CONTENT_DEFAULTS.brandName : '') || '');
     const nm = brand.toUpperCase().replace(/['"\\;{}]/g, '').slice(0, 28);
-    // wide faces keep their natural width, so the type size comes down by this factor and the block is stretched taller instead (--ac-sy)
-    const fs = { wide: 0.7, techno: 0.74, heavy: 0.8, condensed: 1, 'neo-grotesk': 0.86, grotesk: 0.86 }[cls] ?? 0.84;
-    const sy = cls === 'condensed' ? 1.12 : 1.2;
     // a fluorescent accent keeps its colour; a soft one lends its spot to a fixed acid lime (ticket stub and 18+ tab only)
     const ah = hexToHsl(t.accent);
     const spark = ah.s < 70 || ah.l > 78 ? '#B6FF00' : t.accent;
@@ -114,13 +157,11 @@ registerAesthetic({
     return {
       '--ab-type-pick-w': hw,
       '--ac-hw': hw,
-      '--ac-bw': (() => { const bf = typeof state !== 'undefined' && state && state.bodyFont; const w = String((bf && bf.weights) || '400').split(';').map(Number).filter(Boolean); const le = w.filter(x => x <= 700); return le.length ? Math.max(...le) : Math.min(...w); })(),
+      '--ac-bw': abWeight(st && st.bodyFont, 700),
       '--ab-acid': acid,
       '--ab-clash': clash,
       '--ab-on-acid': on(acid),
       '--ab-on-clash': on(clash),
-      '--ac-fs': fs,
-      '--ac-sy': sy,
       '--ac-spark': spark,
       '--ac-on-spark': on(spark),
       '--ac-fg': d ? acid : t.ink,
@@ -132,7 +173,7 @@ registerAesthetic({
       '--ac-brand': `'${nm}'`,
       '--ac-cw': cw,
       '--ac-eq': `url("data:image/svg+xml,${encodeURIComponent(eq)}")`,
-      '--ac-pair': `"VIBRATING PAIR\\A ACID ${acid.toUpperCase()} × CLASH ${clash.toUpperCase()}\\A Δ LUMINANCE ${dY.toFixed(3)}"`,
+      '--ac-pair': `"VIBRATING PAIR\\A ACID ${acid.toUpperCase()}\\A CLASH ${clash.toUpperCase()}\\A Δ LUMINANCE ${dY.toFixed(3)}"`,
       '--ab-tr': (cls && { condensed: 0.4, heavy: 0.5, wide: 0.5, techno: 0.5 }[cls]) ?? 1,
     };
   },
@@ -199,7 +240,7 @@ registerAesthetic({
         <feDisplacementMap in="SourceGraphic" in2="w" scale="18" xChannelSelector="R" yChannelSelector="G"/>
       </filter>
       <filter id="acr" x="-10%" y="-10%" width="120%" height="120%" color-interpolation-filters="sRGB">
-        <feTurbulence type="turbulence" baseFrequency="0.011 0.008" numOctaves="1" seed="${seq + 2}" result="w0"/>
+        <feTurbulence type="turbulence" baseFrequency="0.011 0.008" numOctaves="1" seed="7" result="w0"/>
         <feGaussianBlur in="w0" stdDeviation="4" result="w"/>
         <feDisplacementMap in="SourceGraphic" in2="w" scale="34" xChannelSelector="R" yChannelSelector="B"/>
       </filter>

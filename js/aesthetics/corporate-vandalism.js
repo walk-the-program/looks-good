@@ -88,11 +88,10 @@ registerAesthetic({
     return `<span class="cvh-o">${e(text)}</span><span class="cvh-k"><span>${e(bar)}</span></span>`;
   },
 
-  tokens(t) {
-    const hf = typeof state !== 'undefined' && state && state.headingFont;
-    const ws = String((hf && hf.weights) || '400').split(';').map(Number).filter(Boolean);
-    const le = ws.filter(x => x <= 900);
-    const hw = le.length ? Math.max(...le) : Math.min(...ws);
+  tokens(t, view) {
+    const st = view || (typeof state !== 'undefined' ? state : null);
+    const hf = st && st.headingFont;
+    const hw = abWeight(hf, 900);
     const d = t.isDark;
     const grey = '#84898E';
     // the hazard red must stay the only red on the page: a primary near it turns the official shell ink
@@ -114,7 +113,9 @@ registerAesthetic({
       '--cv-on-shell': collide ? t.canvas : t.onPrimary,
       '--cv-ul': collide ? (t.printPrimary || t.primary) : 'transparent',
       '--cv-vandal': cvVandalFace(),
-      '--cv-bw': (() => { const bf = typeof state !== 'undefined' && state && state.bodyFont; const w = String((bf && bf.weights) || '400').split(';').map(Number).filter(Boolean); const le = w.filter(x => x <= 600); return le.length ? Math.max(...le) : Math.min(...w); })(),
+      '--cv-bw': abWeight(st && st.bodyFont, 600),
+      // small form labels (state names, status line) sit on the form tint: 70% ink, not the 4.5:1-on-canvas muted
+      '--cv-small': t.mix(t.ink, d ? t.mix(t.ink, t.canvas, 0.1) : t.mix(t.ink, t.canvas, 0.05), 0.7),
       '--ab-tr': (hf && { condensed: 0.4, heavy: 0.4, wide: 0.3, techno: 0.3 }[hf.cls]) ?? 1,
     };
   },

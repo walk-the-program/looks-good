@@ -77,17 +77,9 @@ const XP_MAG = ['Playfair Display', 'Libre Caslon Text', 'DM Serif Display', 'Ab
 function xpFace(name) {
   return (typeof FONTS !== 'undefined' && FONTS.find(f => f.name === name)) || null;
 }
-// the body face's bold, only from the weights it has (single-weight typewriters stay 400)
-function xpBold(font) {
-  const w = String((font && font.weights) || '400').split(';').map(Number).filter(Boolean);
-  const le = w.filter(x => x <= 700);
-  return le.length ? Math.max(...le) : Math.min(...w);
-}
-function xpWeight(font) {
-  const w = String(font.weights || '400').split(';').map(Number).filter(Boolean);
-  const le = w.filter(x => x <= 800);
-  return le.length ? Math.max(...le) : w[0] || 400;
-}
+// the body face's bold (<= 700) and a display face's heaviest (<= 800), only from weights the face has
+const xpBold = font => abWeight(font, 700);
+const xpWeight = font => abWeight(font, 800);
 
 // scissor-cut outline: eight points, each pulled in by up to 4%
 function xpCut(rnd) {
@@ -259,18 +251,17 @@ registerAesthetic({
     return xpHeadline(ctx, xpHash(String(ctx.brandName || 'brand') + '|' + String(text || '')), text);
   },
 
-  tokens(t) {
-    const hf = typeof state !== 'undefined' && state && state.headingFont;
-    const ws = String((hf && hf.weights) || '400').split(';').map(Number).filter(Boolean);
-    const le = ws.filter(x => x <= 900);
-    const hw = le.length ? Math.max(...le) : Math.min(...ws);
+  tokens(t, view) {
+    const st = view || (typeof state !== 'undefined' ? state : null);
+    const hf = st && st.headingFont;
+    const hw = abWeight(hf, 900);
     const fl = t.printPrimary;   // the Day-Glo primary from printPrimary(t)
     const d = t.isDark;
     return {
       '--ab-type-pick-w': hw,
       '--ab-hw': hw,
       '--ab-tr': 0,
-      '--xp-bw': xpBold(typeof state !== 'undefined' && state && state.bodyFont),
+      '--xp-bw': xpBold(st && st.bodyFont),
       '--ab-fluoro': fl,
       '--xp-hot': d ? fl : t.ink,
       '--xp-stamp': d ? '#EDE6D3' : t.ink,    // stamps and labels are bone on the wall, never the accent

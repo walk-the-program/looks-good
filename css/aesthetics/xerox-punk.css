@@ -102,7 +102,6 @@
 }
 .ab[data-ae="xerox-punk"] .xpl { display: flex; flex-wrap: wrap; max-width: 100%; row-gap: 0.16em; align-items: center; gap: 0.3em; }
 .ab[data-ae="xerox-punk"] .xpl:nth-child(2) { margin-left: 0.5em; }
-.ab[data-ae="xerox-punk"] .xpl:nth-child(3) { margin-left: 0.15em; }
 .ab[data-ae="xerox-punk"] .xpw { position: relative; display: inline-flex; align-items: center; gap: 0; white-space: nowrap; filter: drop-shadow(1px 2px 0 rgba(0, 0, 0, 0.6)); }
 .ab[data-ae="xerox-punk"] .xpt {
   display: inline-flex; align-items: center; justify-content: center; min-width: 0.6em; padding: 0.08em 0.14em 0.05em; font-style: normal; line-height: 1; text-transform: none; letter-spacing: 0;
@@ -157,6 +156,16 @@
 .ab[data-ae="xerox-punk"] .ab-swatch:nth-child(3) .ab-chip { transform: rotate(-0.6deg); }
 .ab[data-ae="xerox-punk"] .ab-swatch:nth-child(4) .ab-chip { transform: rotate(1.3deg); clip-path: polygon(0 2%, 34% 5%, 68% 0, 100% 4%, 99% 54%, 100% 98%, 52% 94%, 20% 100%, 2% 95%, 0 52%); }
 .ab[data-ae="xerox-punk"] .ab-swatch:nth-child(5) .ab-chip { transform: rotate(-1.5deg); }
+/* the canvas scrap is the wall colour on the wall: a 1px keyline traced along its torn outline keeps it visible
+   (the outline is the chip's own clip polygon, stroked 2px so 1px survives the clip) */
+.ab[data-ae="xerox-punk"] .ab-swatch[data-role="canvas"] .ab-chip {
+  clip-path: polygon(0 4%, 22% 0, 55% 5%, 100% 0, 98% 52%, 100% 100%, 60% 95%, 28% 100%, 0 96%, 2% 50%);
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' preserveAspectRatio='none'><polygon points='0,4 22,0 55,5 100,0 98,52 100,100 60,95 28,100 0,96 2,50' fill='none' stroke='%23111' stroke-width='2' vector-effect='non-scaling-stroke'/></svg>") !important;
+  background-size: 100% 100% !important;
+}
+.ab[data-ae="xerox-punk"][data-mode="dark"] .ab-swatch[data-role="canvas"] .ab-chip {
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' preserveAspectRatio='none'><polygon points='0,4 22,0 55,5 100,0 98,52 100,100 60,95 28,100 0,96 2,50' fill='none' stroke='%23E9E3D0' stroke-width='2' vector-effect='non-scaling-stroke'/></svg>") !important;
+}
 .ab[data-ae="xerox-punk"] .ab-sw-role { font-size: 12px; font-weight: var(--xp-bw, 400); letter-spacing: 0.12em; text-transform: uppercase; }
 .ab[data-ae="xerox-punk"] .ab-sw-hex { color: var(--ab-ink); }
 
@@ -229,6 +238,7 @@
 .ab[data-ae="xerox-punk"] .ab-fieldlabel { font: 15px/1 var(--xp-hand); text-transform: none; letter-spacing: 0; color: #111; transform: rotate(-2deg); transform-origin: 0 100%; }
 .ab[data-ae="xerox-punk"] .ab-input { border: 0; border-bottom: 3px solid #111; border-radius: 0; background: none; padding: 9px 4px; font-family: var(--xp-type); font-weight: var(--xp-bw, 400); letter-spacing: 0.02em; }
 .ab[data-ae="xerox-punk"] .ab-input:focus { background: linear-gradient(transparent 52%, var(--ab-fluoro) 52% 92%, transparent 92%); }
+.ab[data-ae="xerox-punk"] .ab-input:focus-visible { outline: 3px solid #111; outline-offset: 3px; }   /* the field sits on a copy sheet in both modes */
 .ab[data-ae="xerox-punk"] .ab-toggle { font-family: var(--xp-type); font-weight: var(--xp-bw, 400); letter-spacing: 0.08em; text-transform: uppercase; font-size: 12px; }
 /* the toggle is a marker tick on a torn scrap (never a ruled box): empty scrap = off, a tick = on */
 .ab[data-ae="xerox-punk"] .ab-switch { width: 38px; height: 32px; border: 0; border-radius: 0; background: #F6F3EA; box-shadow: none; transition: none; transform: rotate(-3deg); clip-path: polygon(0 6%, 30% 0, 100% 4%, 96% 52%, 100% 100%, 54% 94%, 4% 100%, 2% 46%); }
@@ -323,3 +333,5 @@
 .ab[data-ae="xerox-punk"] b, .ab[data-ae="xerox-punk"] .ab-deck-ptitle, .ab[data-ae="xerox-punk"] .ab-deck-pname, .ab[data-ae="xerox-punk"] .ab-deck-mark { font-weight: var(--xp-bw, 400); }
 .ab[data-ae="xerox-punk"] .ab-deck-pchip, .ab[data-ae="xerox-punk"] .ab-headline { font-weight: var(--ab-hw, 400); }
 .ab.ab-slide[data-ae="xerox-punk"][data-slide] .ab-deck-ptitle { font-weight: var(--xp-bw, 400); }   /* beats the deck's [data-hcls] 600 rule */
+/* cover: the marker ring around the last word needs clear air above the meta row */
+.ab[data-ae="xerox-punk"].ab-slide[data-slide="cover"] .ab-headline { margin-bottom: 16px; }

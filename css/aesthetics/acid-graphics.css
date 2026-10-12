@@ -5,7 +5,7 @@
    a headline stretched tall at the face's natural width (scaleY, with the last word's letters growing taller one by one), op-art ripple, ticket tabs, an event
    strip, dense mono info, over a hidden 12-column grid. Vars from tokens(): --ab-acid,
    --ab-clash, --ab-on-acid, --ab-on-clash, --ac-sx (headline squeeze), --ac-fg,
-   --ac-fg2, --ac-on-canvas, --ac-grid, --ac-brand, --ac-fs (type-size factor for the unsqueezed face), --ac-sy (stretch), --ac-spark. The flyer in the hero is HTML built
+   --ac-fg2, --ac-on-canvas, --ac-grid, --ac-brand, --ac-spark. The flyer in the hero is HTML built
    by art() in js/aesthetics/acid-graphics.js (filters #acw and #acr). Hooks: hero
    'split', palette 'strips', highlight 'custom', states 'button', label face = mono.
 ------------------------------------------------------------------------ */
@@ -48,10 +48,11 @@
   font: 700 9px/1.4 var(--ac-mono); letter-spacing: 0.14em; border-top: 1px solid var(--ab-line);
   background: repeating-linear-gradient(90deg, var(--ab-ink) 0 1px, transparent 1px 3px, var(--ab-ink) 3px 5px, transparent 5px 6px, var(--ab-ink) 6px 7px, transparent 7px 9px) right 4px / 84px 9px no-repeat;
 }
+.ab[data-ae="acid-graphics"] .ab-labelrow > .ab-label:last-child:not(:first-child) { color: var(--ab-ink); }   /* it sits on a field band: muted grey drops under 4.5:1 */
 .ab[data-ae="acid-graphics"] .ab-palette > .ab-labelrow::after { content: "CAT.NO ACG-030/A ✱ 128 BPM ✱ カラー ✱ HYPERFLUX™ ✱ OUTRA ✱ SIDE A"; }
 .ab[data-ae="acid-graphics"] .ab-type > .ab-labelrow::after { content: "CAT.NO ACG-030/B ✱ 132 BPM ✱ タイプ ✱ DEEPLOOP ✱ KVLT.IO ✱ LINE-UP"; }
 .ab[data-ae="acid-graphics"] .ab-sec-ui > .ab-labelrow::after { content: "ACG-030/C ✱ 140 BPM ✱ シグナル ✱ NOVA® ✱ ROOM 1"; }
-.ab[data-ae="acid-graphics"] .ab-sec-touch > .ab-labelrow::after { content: "ACG-030/D ✱ 124 BPM ✱ ルーム ✱ PEAK-9 ✱ ROOM 2"; }
+.ab[data-ae="acid-graphics"] .ab-sec-touch > .ab-labelrow::after { content: "ACG-030/D ✱ 124 BPM ✱ ROOM 2"; }
 .ab[data-ae="acid-graphics"] .ab-sec-use > .ab-labelrow::after { content: "ACG-030/E ✱ 136 BPM ✱ ダンス ✱ SYNTHOS ✱ VECTOR-7 ✱ NULLSET ✱ AFTERS"; }
 /* a field band behind every section header, 12-25%: ripple (palette), strobe rays (type), warped check (interface), rings (in use) */
 .ab[data-ae="acid-graphics"] .ab-labelrow::before { content: ""; position: absolute; z-index: -1; inset: 0 calc(-1 * var(--ab-pad)) 0 auto; width: 55%; opacity: 0.2; pointer-events: none; }
@@ -79,12 +80,14 @@
 .ab[data-ae="acid-graphics"][data-mode="light"] .acl-out { -webkit-text-stroke-color: var(--ab-ink); filter: drop-shadow(0.05em 0.05em 0 var(--ab-clash)) drop-shadow(0.05em 0.05em 0 var(--ab-ink)); }
 .ab[data-ae="acid-graphics"] .ab-hl { color: inherit; background: none; padding: 0; margin: 0; }
 .ab[data-ae="acid-graphics"] .ab-subcopy { max-width: 28em; margin-top: 20px !important; color: var(--ab-muted); }
-.ab[data-ae="acid-graphics"][data-mode="light"] .ab-subcopy, .ab[data-ae="acid-graphics"][data-mode="light"] .ab-sub-rest { color: var(--ab-ink); }
+.ab[data-ae="acid-graphics"][data-mode="light"] .ab-subcopy, .ab[data-ae="acid-graphics"][data-mode="light"] .ab-sub-rest, .ab[data-ae="acid-graphics"][data-mode="light"] .ab-sub-lead { color: var(--ab-on-acid); }   /* light mode: the hero is the acid field */
 .ab[data-ae="acid-graphics"] .ab-sub-lead { color: var(--ab-ink); font-weight: var(--ac-bw, 600); }
 .ab[data-ae="acid-graphics"][data-mode="light"] .ab-kicker { background: var(--ab-ink); color: var(--ab-canvas); }
 
 /* art: the flyer */
 .ab[data-ae="acid-graphics"] .ab-art { max-width: none; aspect-ratio: auto; justify-self: stretch; overflow: visible; }
+/* board: the flyer hangs from the top of the hero copy (a tall stacked headline would otherwise leave a hole above it) */
+.ab[data-ae="acid-graphics"]:not(.ab-slide) .ab-hero > .ab-art { align-self: start; margin-top: 8px; }
 .ab[data-ae="acid-graphics"] .aca {
   position: relative; isolation: isolate; overflow: hidden; display: flex; flex-direction: column; aspect-ratio: 4 / 5; padding: 4.2cqw 4.2cqw 14cqw; background: #050505; color: #f4f4f4;
   border: 2px solid var(--ab-acid); box-shadow: 5px 5px 0 var(--ab-clash); font-family: var(--ac-mono);
@@ -132,7 +135,7 @@
 
 /* palette: edge-to-edge colour strips with the labels inside, then the vibrating pair with its measured luminance delta */
 .ab[data-ae="acid-graphics"] .ab-swatches[data-kind="strips"]::after {
-  content: var(--ac-pair); white-space: pre; flex: 0 0 24%; min-width: 0; padding: 12px 14px; overflow: hidden;
+  content: var(--ac-pair); white-space: pre-line; overflow-wrap: anywhere; flex: 0 0 24%; min-width: 0; padding: 12px 14px;
   font: 700 10px/1.5 var(--ac-mono); letter-spacing: 0.1em; color: var(--ab-on-acid);
   background: linear-gradient(90deg, var(--ab-acid) 0 50%, var(--ab-clash) 50% 100%);
 }
@@ -142,6 +145,8 @@
 /* every strip's text is the readable colour chosen for that strip (the primary strip is filled with the brand hex) */
 .ab[data-ae="acid-graphics"] .ab-swatches[data-kind="strips"] .ab-swatch, .ab[data-ae="acid-graphics"] .ab-swatches[data-kind="strips"] .ab-sw-role, .ab[data-ae="acid-graphics"] .ab-swatches[data-kind="strips"] .ab-sw-job, .ab[data-ae="acid-graphics"] .ab-swatches[data-kind="strips"] .ab-sw-hex, .ab[data-ae="acid-graphics"] .ab-swatches[data-kind="strips"] .ab-sw-print { color: var(--sw-on); }
 .ab[data-ae="acid-graphics"] .ab-swatch[data-role="canvas"], .ab[data-ae="acid-graphics"] .ab-swatch[data-role="ink"] { box-shadow: inset 0 0 0 1px var(--ab-line); }
+/* small mono labels on a saturated strip: full strength (the framework's 0.78 drops them under 4.5:1) */
+.ab[data-ae="acid-graphics"] .ab-swatches[data-kind="strips"] .ab-sw-job, .ab[data-ae="acid-graphics"] .ab-swatches[data-kind="strips"] .ab-sw-hex, .ab[data-ae="acid-graphics"] .ab-swatches[data-kind="strips"] .ab-sw-print { opacity: 1; }
 
 /* type recommendations: a line-up bill. Each column is a stage; its faces are billed like DJs, biggest first */
 .ab[data-ae="acid-graphics"] .ab-type-grid { gap: 0; }
@@ -267,3 +272,14 @@
 .ab[data-ae="acid-graphics"] .ab-type-cur b { font-weight: inherit; }
 .ab[data-ae="acid-graphics"] .ab-deck-pchip { font-weight: var(--ac-hw, 400); }
 .ab[data-ae="acid-graphics"] .ab-deck-ptitle { font-weight: 400; }
+
+/* deck cover: the headline at display scale in ~60% of the stage, the flyer at a fixed ~330px (its 4:5 page
+   fits the cover height); the stacked lines flow two to a row (GOOD DESIGN / SHOULD FEEL / ALIVE) so five
+   stretched lines do not force the headline down to the floor. The compressed line keeps its stretch but
+   not its 62% squeeze, which needs a block of its own. !important: the cover fit pass must not shrink the flyer. */
+.ab[data-ae="acid-graphics"].ab-slide[data-slide="cover"] .ab-deck-cover .ab-hero { grid-template-columns: minmax(0, 1.75fr) minmax(0, 1fr); column-gap: 4%; }
+.ab[data-ae="acid-graphics"].ab-slide[data-slide="cover"] .ab-deck-cover .ab-art { width: 100% !important; max-width: 330px !important; justify-self: end; }
+.ab[data-ae="acid-graphics"].ab-slide[data-slide="cover"] .ach { display: flex; flex-wrap: wrap; align-items: flex-end; column-gap: 0.3em; font-size: 1em; }
+.ab[data-ae="acid-graphics"].ab-slide[data-slide="cover"] .acl-x { transform: none; margin-right: 0; }
+.ab[data-ae="acid-graphics"].ab-slide[data-slide="cover"] .acl-out { flex-basis: 100%; }
+.ab[data-ae="acid-graphics"].ab-slide[data-slide="cover"] .ab-hero-copy { padding-bottom: 14px; }

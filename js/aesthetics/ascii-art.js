@@ -41,21 +41,47 @@ function aaHash(i, j, s) {
   h = (h ^ (h >>> 13)) * 1274126177;
   return ((h ^ (h >>> 16)) >>> 0) / 4294967295;
 }
-const aaEsc = s => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
-// nearest CGA colour by RGB distance (weighted), from the given set
+// OKLCH lightness, chroma and hue of a hex (for the hue-aware ANSI snap)
+function aaOk(hex) {
+  const c = hexToRgb(hex);
+  const lin = v => { v /= 255; return v <= 0.04045 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); };
+  const r = lin(c.r), g = lin(c.g), b = lin(c.b);
+  const l = Math.cbrt(0.4122214708 * r + 0.5363325363 * g + 0.0514459929 * b);
+  const m = Math.cbrt(0.2119034982 * r + 0.6806995451 * g + 0.1073969566 * b);
+  const q = Math.cbrt(0.0883024619 * r + 0.2817188376 * g + 0.6299787005 * b);
+  const A = 1.9779984951 * l - 2.4285922050 * m + 0.4505937099 * q, B = 0.0259040371 * l + 0.7827717662 * m - 0.8086757660 * q;
+  return { L: 0.2104542553 * l + 0.7936177850 * m - 0.0040720468 * q, C: Math.hypot(A, B), h: (Math.atan2(B, A) * 180 / Math.PI + 360) % 360 };
+}
+// Nearest ANSI colour from the given set. A chromatic client colour (OKLCH chroma > 0.035) never snaps
+// to a grey: it takes the chromatic ANSI colour of the nearest hue (lightness only picks between the dark
+// and the bright variant of that hue). A grey or near-grey keeps the plain weighted RGB distance.
 function aaCga(hex, set) {
-  const a = hexToRgb(hex);
+  const a = aaOk(hex);
+  if (a.C > 0.035) {
+    let best = null, bd = Infinity;
+    set.forEach(h => {
+      const b = aaOk(h);
+      if (b.C < 0.05) return;
+      let dh = Math.abs(a.h - b.h); if (dh > 180) dh = 360 - dh;
+      const d = (dh / 30) ** 2 + ((a.L - b.L) / 0.4) ** 2;
+      if (d < bd) { bd = d; best = h; }
+    });
+    if (best) return best;
+  }
+  const c = hexToRgb(hex);
   let best = set[0], bd = Infinity;
-  set.forEach(h => { const b = hexToRgb(h); const d = 2 * (a.r - b.r) ** 2 + 4 * (a.g - b.g) ** 2 + 3 * (a.b - b.b) ** 2; if (d < bd) { bd = d; best = h; } });
+  set.forEach(h => { const b = hexToRgb(h); const d = 2 * (c.r - b.r) ** 2 + 4 * (c.g - b.g) ** 2 + 3 * (c.b - b.b) ** 2; if (d < bd) { bd = d; best = h; } });
   return best;
 }
+// Primary and secondary from the set that holds on the stock (the dark CGA colours on paper); the accent
+// from the same set on paper (so the chip and the 3:1 highlight word are one colour family), from all
+// sixteen on black.
 function aaQuant(t) {
   const set = t.isDark ? AA_CGA : AA_CGA_DARK;
   const p = aaCga(t.primary, set);
-  let sc = aaCga(t.secondary, set.filter(h => h !== p));
-  // the accent may come from the full set on paper too (it is shaded to 3:1 wherever it is text)
-  const ac = aaCga(t.accent, AA_CGA.filter(h => h !== p && h !== sc && h !== '#FFFFFF'));
+  const sc = aaCga(t.secondary, set.filter(h => h !== p));
+  const ac = aaCga(t.accent, (t.isDark ? AA_CGA : AA_CGA_DARK).filter(h => h !== p && h !== sc && h !== '#FFFFFF'));
   return { p, s: sc, a: ac };
 }
 
@@ -119,7 +145,7 @@ function aaFig(words, hlFrom, narrow) {
         const c = row[k] || { ch: ' ', cls: '' };
         let m = k + 1, txt = c.ch;
         while (m < x && ((row[m] || { cls: '' }).cls === c.cls)) { txt += (row[m] || { ch: ' ' }).ch; m++; }
-        html += c.cls ? `<span class="aa-${c.cls}">${aaEsc(txt)}</span>` : aaEsc(txt);
+        html += c.cls ? `<span class="aa-${c.cls}">${escapeHtml(txt)}</span>` : escapeHtml(txt);
         k = m;
       }
       text.push(html);
@@ -205,7 +231,7 @@ function aaRows(cells, cols, rows, drift) {
       let m = k + 1;
       while (m < cols && row[m].cls === row[k].cls) m++;
       const txt = row.slice(k, m).map(x => x.ch).join('');
-      html += row[k].cls ? `<span class="aa-${row[k].cls}">${aaEsc(txt)}</span>` : aaEsc(txt);
+      html += row[k].cls ? `<span class="aa-${row[k].cls}">${escapeHtml(txt)}</span>` : escapeHtml(txt);
       k = m;
     }
     lines.push(`<span class="aa-bd">│</span>${html}<span class="aa-bd">│</span>`);
@@ -219,7 +245,7 @@ function aaPanelHtml(key, frame) {
   if (!e) return '';
   const rows = aaRows(e.cells, e.cols, e.rows, frame);
   const status = `${e.slug} · frame ${String(frame).padStart(4, '0')}`;
-  return [`<span class="aa-bd">${aaEsc(aaFrameTop(e.slug + '.txt', e.cols))}</span>`, ...rows, `<span class="aa-bd aa-live">${aaEsc(aaFrameFoot(status, e.cols))}</span>`].join('\n');
+  return [`<span class="aa-bd">${escapeHtml(aaFrameTop(e.slug + '.txt', e.cols))}</span>`, ...rows, `<span class="aa-bd aa-live">${escapeHtml(aaFrameFoot(status, e.cols))}</span>`].join('\n');
 }
 function aaPanel(ctx, cols, rows, cls) {
   const st = ctx.state || (typeof state !== 'undefined' ? state : null);
@@ -231,7 +257,7 @@ function aaPanel(ctx, cols, rows, cls) {
   const key = `${word}|${fam}|${cols}x${rows}|${slug}`;
   aaLive[key] = { cells: aaCells({ initial: ctx.initial, word }, cols, rows, fam), cols, rows, slug, fam, ctx: { initial: ctx.initial, word } };
   aaTick();
-  return `<pre class="aa-pre ${cls}" data-aak="${aaEsc(key).replace(/"/g, '&quot;')}" style="--aa-cols:${cols + 2}">${aaPanelHtml(key, aaFrameNow())}</pre>`;
+  return `<pre class="aa-pre ${cls}" data-aak="${escapeHtml(key)}" style="--aa-cols:${cols + 2}">${aaPanelHtml(key, aaFrameNow())}</pre>`;
 }
 function aaFrameNow() {
   const reduce = typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -266,7 +292,7 @@ function aaFieldUri(ink) {
       const h = aaHash(i, j, 41);
       line += h < f * 0.55 ? AA_RAMP[1 + Math.floor(aaHash(i, j, 43) * 14 * f)] : ' ';
     }
-    rowsSvg += `<text x="0" y="${j * ch + 14}" textLength="${cols * cw}" lengthAdjust="spacing" xml:space="preserve">${aaEsc(line).replace(/"/g, '&quot;')}</text>`;
+    rowsSvg += `<text x="0" y="${j * ch + 14}" textLength="${cols * cw}" lengthAdjust="spacing" xml:space="preserve">${escapeHtml(line)}</text>`;
   }
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${cols * cw}" height="${rows * ch}"><g font-family="ui-monospace,Menlo,monospace" font-size="13" fill="${ink}" fill-opacity=".09">${rowsSvg}</g></svg>`;
   return `url("data:image/svg+xml,${encodeURIComponent(svg).replace(/'/g, '%27')}")`;
@@ -308,9 +334,10 @@ registerAesthetic({
     return `<span class="aah aah-w" style="--fc:${w.cols}">${w.html}</span><span class="aah aah-n" style="--fc:${n.cols}">${n.html}</span>`;
   },
 
-  tokens(t) {
-    const st = typeof state !== 'undefined' ? state : null;
+  tokens(t, view) {
+    const st = view || (typeof state !== 'undefined' ? state : null);
     const q = aaQuant(t);
+    const hx = h => `"0x${String(h).replace('#', '').toUpperCase()}"`;
     const vars = {
       '--ab-type-pick-w': 400,
       '--ab-panel': t.canvas,
@@ -325,6 +352,10 @@ registerAesthetic({
     vars['--aa-sec'] = safe(q.s, 4.5);
     vars['--ab-accent-ink'] = safe(q.a, 3);
     vars['--ab-primary-text'] = safe(q.p, 3);
+    // on paper the accent chip shows the colour the highlight word actually prints (shaded to 3:1 when needed)
+    if (!t.isDark) { vars['--aa-q-a'] = vars['--ab-accent-ink']; vars['--ab-accent'] = vars['--ab-accent-ink']; vars['--ab-on-accent'] = t.readable(vars['--ab-accent-ink']); }
+    // readouts print the client hex as a register value: 0xE4572E
+    Object.assign(vars, { '--aa-hx-canvas': hx(t.canvas), '--aa-hx-ink': hx(t.ink), '--aa-hx-primary': hx(t.primary), '--aa-hx-secondary': hx(t.secondary), '--aa-hx-accent': hx(t.accent) });
     if (st && st.headingFont) {
       const f = aaArtFace(st);
       vars['--aa-font'] = f.font.css;
@@ -358,7 +389,7 @@ registerAesthetic({
       'Lay a faint character field behind everything and cut the sections out of it.',
     ],
     dont: [
-      'Set the headline in a mono webfont at display size; build it from characters.',
+      'Set the hero headline as plain mono text; build it from block letters.',
       'Use CSS colour bars, rounded corners, shadows or a pixel face.',
       'Colour cells at random; colour comes from one field.',
       'Leave debug labels as decoration.',
@@ -378,7 +409,7 @@ registerAesthetic({
       'Snap colour to ANSI.',
     ],
     dont: [
-      'Use a mono webfont as display.',
+      'Set the hero headline as plain mono text.',
       'Use CSS bars or rounded corners.',
       'Colour cells at random.',
     ],

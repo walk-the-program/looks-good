@@ -123,8 +123,16 @@
 .ab[data-ae="ascii-art"] .ab-sw-role { font-size: 12.5px; font-weight: 600; letter-spacing: 0.02em; text-transform: uppercase; }
 .ab[data-ae="ascii-art"] .ab-sw-role::before { content: "[" counter(aasw, decimal-leading-zero) "] "; font-weight: 400; color: var(--ab-muted); white-space: pre; }
 .ab[data-ae="ascii-art"] .ab-sw-job { font-size: 11px; }
-.ab[data-ae="ascii-art"] .ab-sw-hex { font-size: 11px; color: var(--ab-ink); }
-.ab[data-ae="ascii-art"] .ab-sw-hex::before { content: "0x"; color: var(--ab-muted); }
+.ab[data-ae="ascii-art"] .ab-sw-hex { color: var(--ab-ink); }
+/* the readout is a register value (0xE4572E, from tokens: the '#' cannot be stripped in CSS), so the hex text
+   itself is set at 0 and the token is printed in its place */
+.ab[data-ae="ascii-art"] .ab-sw-hex { font-size: 0; }
+.ab[data-ae="ascii-art"] .ab-sw-hex::before { content: "0x"; font-size: 11px; }
+.ab[data-ae="ascii-art"] .ab-swatch[data-role="canvas"] .ab-sw-hex::before { content: var(--aa-hx-canvas); }
+.ab[data-ae="ascii-art"] .ab-swatch[data-role="ink"] .ab-sw-hex::before { content: var(--aa-hx-ink); }
+.ab[data-ae="ascii-art"] .ab-swatch[data-role="primary"] .ab-sw-hex::before { content: var(--aa-hx-primary); }
+.ab[data-ae="ascii-art"] .ab-swatch[data-role="secondary"] .ab-sw-hex::before { content: var(--aa-hx-secondary); }
+.ab[data-ae="ascii-art"] .ab-swatch[data-role="accent"] .ab-sw-hex::before { content: var(--aa-hx-accent); }
 
 /* ----- Type block: titled panels ----- */
 .ab[data-ae="ascii-art"] .ab-type { padding-top: clamp(14px, 2.4cqw, 22px); }
@@ -137,6 +145,7 @@
 .ab[data-ae="ascii-art"] .ab-type-role::after { content: " ├"; color: var(--ab-frame); letter-spacing: 0; }
 .ab[data-ae="ascii-art"] .ab-type-class { margin: 0 0 12px !important; font-family: var(--ab-font-ui); font-size: 12px; }
 .ab[data-ae="ascii-art"] .ab-type-class::before { content: "// "; color: var(--ab-frame); white-space: pre; }
+.ab[data-ae="ascii-art"] .ab-type-col[data-role="mono"] .ab-type-class::after { content: "fixed width: one advance for every glyph"; }   /* the mono column has no class line of its own */
 .ab[data-ae="ascii-art"] .ab-type-pick { color: var(--ab-ink); letter-spacing: -0.02em; line-height: 1.2; }
 .ab[data-ae="ascii-art"] .ab-type-pick:first-child { font-size: clamp(20px, 2.8cqw, 30px); margin-bottom: 5px; }
 .ab[data-ae="ascii-art"] .ab-type-pick:not(:first-child) { color: var(--ab-muted); }
@@ -190,7 +199,7 @@
 .ab[data-ae="ascii-art"] .ab-cta-label::before { content: "> "; white-space: pre; }
 .ab[data-ae="ascii-art"] .ab-cta-arrow { margin-left: 0.7ch; }
 .ab[data-ae="ascii-art"] .ab-cta-arrow::before { content: "█"; animation: aa-blink 1.1s steps(1) infinite; }
-.ab[data-ae="ascii-art"] .ab-cta:hover, .ab[data-ae="ascii-art"] .ab-cta.is-hover { background: var(--ab-primary); color: var(--ab-on-primary); }
+.ab[data-ae="ascii-art"] .ab-cta:hover { background: var(--ab-primary); color: var(--ab-on-primary); }
 
 /* ----- 02 characters ----- */
 .ab[data-ae="ascii-art"] .ab-fieldlabel { margin-bottom: 6px; font-size: 11px; letter-spacing: 0.04em; text-transform: uppercase; color: var(--ab-muted); }
@@ -259,3 +268,10 @@
 /* only weights the faces have (font-synthesis is off) */
 .ab[data-ae="ascii-art"] .ab-deck-pchip { font-weight: 600; }
 .ab[data-ae="ascii-art"] .ab-deck-mark.is-own { font-family: var(--aa-font, ui-monospace, monospace); font-size: 18px; white-space: pre; }
+
+/* deck cover and Material: the tall 40 x 20 panel, sized to the stage, so glyphs read at 15-20px (the 88 x 12
+   panel in a side column prints them at 3-5px). !important on the cover: the fit pass must not shrink it. */
+.ab[data-ae="ascii-art"].ab-slide[data-slide="cover"] .aa-wide, .ab[data-ae="ascii-art"].ab-slide[data-slide="material"] .aa-wide { display: none; }
+.ab[data-ae="ascii-art"].ab-slide[data-slide="cover"] .aa-narrow, .ab[data-ae="ascii-art"].ab-slide[data-slide="material"] .aa-narrow { display: block; }
+.ab[data-ae="ascii-art"].ab-slide[data-slide="cover"] .ab-deck-cover .ab-hero { grid-template-columns: minmax(0, 1fr) auto; align-items: center; }
+.ab[data-ae="ascii-art"].ab-slide[data-slide="cover"] .ab-deck-cover .ab-art { width: 380px !important; max-width: 100% !important; justify-self: end; }

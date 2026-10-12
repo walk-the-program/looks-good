@@ -1,6 +1,8 @@
 /* 10 Riso Print — inked, overprinted, human. A risograph has drums, not a colour
-   picker: every client colour is snapped to the nearest real RISO ink (by CIE Lab
-   distance) and printed as a named drum. Drum 1 (primary) and drum 2 (secondary)
+   picker: every client colour is snapped to the nearest real RISO ink (Lab distance,
+   hue and chroma weighted over lightness; never a grey for a chromatic colour; drums 1
+   and 2 hold 3:1 on the stock when their hue family has such an ink) and printed as a
+   named drum. Drum 1 (primary) and drum 2 (secondary)
    overprint (multiply on paper, screen on dark stock) and the overlap is the
    third colour, shown as its own swatch. The accent is an optional third drum,
    used tiny. No client hex is printed raw and nothing is printed in a fourth
@@ -47,16 +49,35 @@ function rzLab(hex) {
   const z = f((r * 0.0193 + g * 0.1192 + b * 0.9505) / 1.08883);
   return [116 * y - 16, 500 * (x - y), 200 * (y - z)];
 }
-function rzSnap(hex, avoid) {
+// Nearest ink to a client colour. Hue and chroma count more than lightness (a pale pink
+// should print as a pink drum, not as Light Gray), and a chromatic input never snaps to
+// Light Gray or Black. With `canvas`, a drum that has to carry headline words (drums 1
+// and 2) must also hold 3:1 on the stock: the nearest readable ink of the same hue family
+// (within 45 degrees) wins; when that family has no readable ink (a yellow on paper) the
+// plain nearest ink is kept and the headline falls back to the overprint (see tokens).
+function rzSnap(hex, avoid, canvas, label) {
   const a = rzLab(hex);
-  let best = null, bd = Infinity;
-  RZ_DRUMS.forEach(([name, h]) => {
-    if (avoid && avoid.includes(h)) return;
+  const ca = Math.hypot(a[1], a[2]), ha = Math.atan2(a[2], a[1]);
+  const chromatic = ca > 10;
+  const pool = RZ_DRUMS.map(([name, h]) => {
     const b = rzLab(h);
-    const d = Math.hypot(a[0] - b[0], a[1] - b[1], a[2] - b[2]);
-    if (d < bd) { bd = d; best = { name, hex: h }; }
-  });
-  return best;
+    const cb = Math.hypot(b[1], b[2]);
+    let dh = Math.abs(ha - Math.atan2(b[2], b[1])); if (dh > Math.PI) dh = 2 * Math.PI - dh;
+    const dH = 2 * Math.sqrt(ca * cb) * Math.sin(dh / 2);
+    // a more saturated ink is a small step for a chromatic colour (riso inks print at full strength), a duller one is not
+    const dC = chromatic && cb > ca ? 0.25 * (cb - ca) : ca - cb;
+    return { name, hex: h, c: cb, dh: dh * 180 / Math.PI, d: Math.hypot(0.5 * (a[0] - b[0]), dC, 1.5 * dH) };
+  }).filter(k => !(avoid && avoid.includes(k.hex)) && !(chromatic && k.c < 10));
+  const near = list => list.reduce((m, k) => (!m || k.d < m.d ? k : m), null);
+  let best = near(pool);
+  if (canvas) {
+    // drum 1 also carries the CTA label, so its own text colour must hold 4.5:1 on it
+    const fits = k => contrastRatio(k.hex, canvas) >= 3 && (!chromatic || k.dh <= 45) &&
+      (!label || contrastRatio(pickReadableText(k.hex), k.hex) >= 4.5);
+    const ok = near(pool.filter(fits));
+    if (ok) best = ok;
+  }
+  return { name: best.name, hex: best.hex };
 }
 const rzHex = (r, g, b) => '#' + [r, g, b].map(v => Math.max(0, Math.min(255, Math.round(v))).toString(16).padStart(2, '0')).join('');
 // two drums on paper: multiply (light stock) or screen (dark stock)
@@ -67,16 +88,10 @@ function rzOver(h1, h2, dark) {
 }
 // drum 1 = primary, drum 2 = secondary (never the same drum), drum 3 = accent (optional, tiny)
 function rzDrums(t) {
-  const d1 = rzSnap(t.primary);
-  const d2 = rzSnap(t.secondary, [d1.hex]);
+  const d1 = rzSnap(t.primary, null, t.canvas, true);
+  const d2 = rzSnap(t.secondary, [d1.hex], t.canvas);
   const d3 = rzSnap(t.accent, [d1.hex, d2.hex]);
   return { d1, d2, d3, ov: rzOver(d1.hex, d2.hex, t.isDark) };
-}
-// heaviest weight a face has up to `want` (single-weight faces stay at their one weight)
-function rzW(font, want) {
-  const w = String((font && font.weights) || '400').split(';').map(Number).filter(Boolean);
-  const le = w.filter(x => x <= want);
-  return le.length ? Math.max(...le) : Math.min(...w);
 }
 const rzUri = svg => `url("data:image/svg+xml,${encodeURIComponent(svg)}")`;
 const rzH = (i, j, s) => { const v = Math.sin(i * 127.1 + j * 311.7 + s * 74.7) * 43758.5453; return v - Math.floor(v); };
@@ -144,7 +159,7 @@ registerAesthetic({
   canvas(b) { return b.isDark ? null : b.mix('#f0dfba', b.canvas, 0.14); },
 
   // The primary is printed as drum 1 (the palette still shows the client hex, with "prints as").
-  printPrimary(t) { return rzSnap(t.primary).hex; },
+  printPrimary(t) { return rzDrums(t).d1.hex; },
 
   // Two passes of the headline: drum 1, then drum 2 off-register with multiply.
   headline(ctx, text) {
@@ -157,17 +172,23 @@ registerAesthetic({
     return `<span class="rzh">${pass('rzh-a')}${pass('rzh-b')}</span>`;
   },
 
-  tokens(t) {
+  tokens(t, st) {
+    const S = st || (typeof state !== 'undefined' ? state : null) || {};
     const D = rzDrums(t);
     const d = t.isDark;
     const paper = d ? t.mix(t.ink, t.canvas, 0.05) : t.mix('#ffffff', t.canvas, 0.35);
-    // A pale drum 1 cannot hold the headline on paper alone: pass B then prints the other words too (overprint).
-    const pale = t.contrast(D.d1.hex, t.canvas) < 2.3;
+    // A drum that cannot hold 3:1 on the stock (only when its hue family has no readable ink, e.g. a yellow
+    // on paper) does not print headline words alone: a pale drum 1 gets pass B over its words (they read in
+    // the overprint), a pale drum 2 gets pass A under the last word.
+    const pale = t.contrast(D.d1.hex, t.canvas) < 3;
+    const pale2 = t.contrast(D.d2.hex, t.canvas) < 3;
     const paperRgb = hexToRgb(t.canvas);
     // ink mottle: low-frequency density loss + sparse pinholes, drawn in paper colour (invisible on paper, so it
     // only ever shows inside inked areas)
     const pr = (paperRgb.r / 255).toFixed(3), pg = (paperRgb.g / 255).toFixed(3), pb = (paperRgb.b / 255).toFixed(3);
-    const mottle = rzUri(`<svg xmlns="http://www.w3.org/2000/svg" width="260" height="260"><filter id="m" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency=".045" numOctaves="2" seed="4" stitchTiles="stitch"/><feColorMatrix values="0 0 0 0 ${pr}  0 0 0 0 ${pg}  0 0 0 0 ${pb}  .46 0 0 0 -.17"/></filter><filter id="p" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="1" seed="11" stitchTiles="stitch"/><feColorMatrix values="0 0 0 0 ${pr}  0 0 0 0 ${pg}  0 0 0 0 ${pb}  -40 0 0 0 9.4"/></filter><rect width="100%" height="100%" filter="url(#m)"/><rect width="100%" height="100%" filter="url(#p)"/></svg>`);
+    // `ma`, `mb`: the mottle's alpha slope and offset (a lighter mottle sits under the CTA label)
+    const mot = (ma, mb) => rzUri(`<svg xmlns="http://www.w3.org/2000/svg" width="260" height="260"><filter id="m" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency=".045" numOctaves="2" seed="4" stitchTiles="stitch"/><feColorMatrix values="0 0 0 0 ${pr}  0 0 0 0 ${pg}  0 0 0 0 ${pb}  ${ma} 0 0 0 ${mb}"/></filter><filter id="p" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="1" seed="11" stitchTiles="stitch"/><feColorMatrix values="0 0 0 0 ${pr}  0 0 0 0 ${pg}  0 0 0 0 ${pb}  -40 0 0 0 9.4"/></filter><rect width="100%" height="100%" filter="url(#m)"/><rect width="100%" height="100%" filter="url(#p)"/></svg>`);
+    const mottle = mot('.46', '-.17');
     // AM ramp for progress bars: dots grow from 15% to solid along the bar (drum 1)
     let ramp = '';
     for (let i = 0; i < 40; i++) for (let j = 0; j < 3; j++) {
@@ -177,14 +198,14 @@ registerAesthetic({
     const am1 = rzUri(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 12" preserveAspectRatio="none" width="200" height="12"><g fill="${D.d1.hex}">${ramp}</g></svg>`);
     return {
       '--ab-blend': d ? 'screen' : 'multiply',
-      '--rz-hw': rzW(typeof state !== 'undefined' && state && state.headingFont, 800),
-      '--rz-bw': rzW(typeof state !== 'undefined' && state && state.bodyFont, 700),
+      '--rz-hw': abWeight(S.headingFont, 800),
+      '--rz-bw': abWeight(S.bodyFont, 700),
       '--ab-paper-card': paper,
+      '--rz-sub': t.mix(t.ink, paper, 0.78),
       '--ab-secondary': D.d2.hex, '--ab-on-secondary': t.readable(D.d2.hex),
       '--ab-sec-tint': t.mix(D.d2.hex, t.canvas, 0.16),
       '--ab-accent': D.d3.hex, '--ab-on-accent': t.readable(D.d3.hex),
       '--rz-d1': D.d1.hex, '--rz-d2': D.d2.hex, '--rz-d3': D.d3.hex, '--rz-ov': D.ov,
-      '--rz-on-ov': t.readable(D.ov),
       '--rz-n1': `" · ${D.d1.name.toUpperCase()} · DRUM 1"`,
       '--rz-n2': `" · ${D.d2.name.toUpperCase()} · DRUM 2"`,
       '--rz-n3': `" · ${D.d3.name.toUpperCase()} · DRUM 3"`,
@@ -192,7 +213,9 @@ registerAesthetic({
       '--rz-h3': `"prints as ${D.d3.hex.toUpperCase()}"`,
       '--rz-ovl': `"OVERPRINT 1×2\\A ${D.d1.name.toUpperCase()} × ${D.d2.name.toUpperCase()}\\A ${D.ov.toUpperCase()}"`,
       '--rz-hb': pale ? D.d2.hex : 'transparent',
+      '--rz-wa': pale2 ? D.d1.hex : 'transparent',
       '--rz-mottle': mottle,
+      '--rz-mottle-lt': mot('.3', '-.16'),
       '--rz-am1': am1,
     };
   },
@@ -227,7 +250,7 @@ registerAesthetic({
     const crop = (x, y, sx, sy) => `<path d="M${x} ${y + sy * 2}V${y + sy * 7}M${x + sx * 2} ${y}H${x + sx * 7}" />`;
     const blend = 'style="mix-blend-mode:var(--ab-blend,multiply)"';
     return `<div class="rza"><svg viewBox="0 0 ${W} ${H}" width="100%" height="100%" preserveAspectRatio="xMaxYMid slice" focusable="false">
-      <defs><clipPath id="${id}c"><text x="290" y="${H - M - 6}" text-anchor="middle" font-size="206" style="font-family:var(--ab-font-h);font-weight:var(--rz-hw,700)">${ini}</text></clipPath></defs>
+      <defs><clipPath id="${id}c"><text x="298" y="${H - M - 6}" text-anchor="middle" font-size="206" style="font-family:var(--ab-font-h);font-weight:var(--rz-hw,700)">${ini}</text></clipPath></defs>
       <g fill="${D.d1.hex}" ${blend}>${dots1}</g>
       <g ${blend} transform="translate(2.6 1.9)"><g clip-path="url(#${id}c)" fill="${D.d2.hex}">${dots2}</g></g>
       <g fill="var(--ab-paper-card)">${pins}</g>
@@ -237,7 +260,7 @@ registerAesthetic({
   },
 
   materials: [
-    { name: 'Drum', css: 'background: {primary}; /* a named RISO ink (the client colour snapped to the nearest drum by Lab distance); two drums per job, a third only for a tiny spot */' },
+    { name: 'Drum', css: 'background: {primary}; /* a named RISO ink (the client colour snapped to the nearest drum of the same hue family that holds 3:1 on the stock); two drums per job, a third only for a tiny spot */' },
     { name: 'Overprint', css: 'background: {secondary}; mix-blend-mode: multiply; /* drum 2 printed over drum 1; the overlap is the third colour (shown as the OVERPRINT 1×2 swatch) */' },
     { name: 'Misregistration', css: 'transform: translate(3px, 2px); /* the second drum lands 2–3px off, the same everywhere: a second filled layer, never an outline */' },
     { name: 'AM halftone', css: 'circle r = rmin + (rmax − rmin) × √tone; /* dot size carries the shade on a fixed pitch; drum 1 at 15°, drum 2 at 75° */' },

@@ -96,6 +96,10 @@
 .ab[data-ae="xerox"] .ab-chip::after { content: ""; position: absolute; inset: 0; background: var(--xr-speck) 30% 40% / 320px 320px; mix-blend-mode: var(--ab-blend, multiply); }
 .ab[data-ae="xerox"] .ab-swatch[data-role="canvas"] .ab-chip, .ab[data-ae="xerox"] .ab-swatch[data-role="primary"] .ab-chip { background: var(--xr-paper) !important; }
 .ab[data-ae="xerox"] .ab-swatch[data-role="ink"] .ab-chip { background: var(--xr-toner) !important; }
+/* on the black platen the canvas chip is the platen and the ink chip is the paper-white type the board prints */
+.ab[data-ae="xerox"][data-mode="dark"] .ab-swatch[data-role="canvas"] .ab-chip { background: var(--ab-canvas) !important; box-shadow: inset 0 0 0 2.5px var(--ab-ink); }
+.ab[data-ae="xerox"][data-mode="dark"] .ab-swatch[data-role="ink"] .ab-chip { background: var(--ab-ink) !important; }
+.ab[data-ae="xerox"] .ab-swatch[data-role="ink"] .ab-sw-hex::after { content: var(--xr-ink-note); display: block; margin-top: 2px; }
 .ab[data-ae="xerox"] .ab-swatch[data-role="secondary"] .ab-chip { background: radial-gradient(circle, var(--xr-toner) var(--xr-r2), transparent calc(var(--xr-r2) + 0.5px)) 0 0 / 6px 6px, var(--xr-paper) !important; }
 .ab[data-ae="xerox"] .ab-swatch[data-role="accent"] .ab-chip { background: radial-gradient(circle, var(--xr-toner) var(--xr-r3), transparent calc(var(--xr-r3) + 0.5px)) 0 0 / 6px 6px, var(--xr-paper) !important; }
 .ab[data-ae="xerox"] .ab-swatch[data-role="primary"] .ab-chip::before { content: var(--xr-stock-name); position: absolute; left: 6px; bottom: 5px; font: 700 9px/1 var(--ab-font-b); letter-spacing: 0.12em; color: var(--xr-toner); }
@@ -147,14 +151,15 @@
 }
 .ab[data-ae="xerox"] .ab-cta::before { content: ""; position: absolute; inset: 0; z-index: -1; background: var(--ab-ink); filter: url(#xrx-toner); }
 .ab[data-ae="xerox"] .ab-cta::after { content: ""; position: absolute; inset: 0; z-index: -2; background: radial-gradient(circle, var(--ab-ink) 1.1px, transparent 1.6px) 0 0 / 4px 4px; transform: translate(7px, 6px); transition: transform 0.1s steps(2); }
-.ab[data-ae="xerox"] .ab-cta:hover::after, .ab[data-ae="xerox"] .ab-cta.is-hover::after { transform: translate(11px, 9px); }
-.ab[data-ae="xerox"] .ab-cta:active::after, .ab[data-ae="xerox"] .ab-cta.is-pressed::after { transform: translate(0, 0); }
+.ab[data-ae="xerox"] .ab-cta:hover::after { transform: translate(11px, 9px); }
+.ab[data-ae="xerox"] .ab-cta:active::after { transform: translate(0, 0); }
 .ab[data-ae="xerox"] .ab-cta-arrow::before { content: "→"; font-size: 18px; line-height: 1; }
 
 /* 02 generations: a typewritten field, a copier key, three generations of the same initial */
 .ab[data-ae="xerox"] .ab-fieldlabel { font-size: 10.5px; }
 .ab[data-ae="xerox"] .ab-input { border: 0; border-bottom: 3px solid var(--ab-ink); border-radius: 0; background: none; padding: 9px 4px; font-weight: var(--xr-bw, 700); letter-spacing: 0.02em; }
 .ab[data-ae="xerox"] .ab-input:focus { outline: none; border-bottom-width: 6px; }
+.ab[data-ae="xerox"] .ab-input:focus-visible { outline: 3px solid var(--xr-toner); outline-offset: 2px; }
 .ab[data-ae="xerox"] .ab-toggle { font-weight: var(--xr-bw, 700); letter-spacing: 0.08em; text-transform: uppercase; font-size: 12px; }
 /* the toggle is a copier key: OFF | ON, the active half inverted (toner with paper type) */
 .ab[data-ae="xerox"] .ab-switch {
@@ -177,7 +182,8 @@
 .ab[data-ae="xerox"] .ab-states[data-kind="custom"] { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); }
 .ab[data-ae="xerox"] .ab-states[data-kind="custom"] .ab-state { display: flex; flex-direction: column; align-items: center; gap: 8px; }
 .ab[data-ae="xerox"] .xr-gen {
-  display: grid; place-items: center; width: 62px; height: 62px; overflow: hidden; border: 2px solid var(--ab-ink); background: var(--ab-canvas);
+  /* the copy is always paper with toner on it, whatever the mode */
+  display: grid; place-items: center; width: 62px; height: 62px; overflow: hidden; border: 2px solid var(--xr-toner); background: var(--xr-paper);
   font: var(--ab-hw, 900) 46px/1 var(--ab-font-h); color: #111;
 }
 /* the filter runs on the glyph only (on the box it would flood the paper too) */
@@ -203,7 +209,7 @@
 /* footer */
 .ab[data-ae="xerox"] .ab-foot { border-top: 0; background: var(--xr-dash) 0 0 / 100% 2.5px no-repeat; color: var(--ab-ink); letter-spacing: 0.04em; }
 .ab[data-ae="xerox"] .ab-motto { font-weight: var(--xr-bw, 700); text-transform: uppercase; letter-spacing: 0.12em; }
-.ab[data-ae="xerox"] .ab-foot .ab-infl { color: var(--ab-muted); }
+.ab[data-ae="xerox"] .ab-foot .ab-infl { color: var(--xr-foot, var(--ab-muted)); }
 .ab[data-ae="xerox"] .ab-dot { border-radius: 0; width: 9px; height: 9px; background: var(--ab-ink); }
 .ab[data-ae="xerox"][data-mode="dark"] { --xr-dash: repeating-linear-gradient(90deg, var(--ab-ink) 0 6px, transparent 6px 10px); }
 
