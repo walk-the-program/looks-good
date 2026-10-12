@@ -51,7 +51,12 @@ registerAesthetic({
     const material = t.mix('#ffffff', t.canvas, d ? 0.07 : 0.72);
     // headline word on the scene: the raw accent if it holds 3:1 on the scene base, else lightened toward white
     const hlScene = t.contrast(t.accent, sceneBase) >= 3 ? t.accent : t.mix(t.accent, '#ffffff', 0.35);
+    // muted labels sit on the material panels (a step lighter than a dark canvas), so they
+    // have to hold 4.5:1 there, not only on the canvas: pull them toward the ink until they do
+    let muted = t.muted;
+    for (let k = 0.1; k <= 1 && t.contrast(muted, material) < 4.5; k += 0.1) muted = t.mix(t.ink, t.muted, k);
     return {
+      '--ab-muted': muted,
       '--ab-hl-scene': hlScene,
       '--ab-scene-base': sceneBase,
       // regular material: a near-opaque panel, one step lighter than the canvas
@@ -80,9 +85,12 @@ registerAesthetic({
     // lens sits off-centre so its rim cuts through the letter and the accent bar.
     // The lens holds a duplicate of the scene that an SVG displacement filter
     // bends at the rim only (normal map: neutral grey across the middle 56%,
-    // ramps in the outer 22%; scale 40), with a stronger red pass (48) for fringing.
+    // ramps in the outer 22%, blurred 4px so the bend is smooth; scale
+    // 40). The fringe is a 20% echo of the same full-colour scene bent a little
+    // further (48), so it only ever shows the brand's own colours (no channel split).
     // This is an ordinary CSS filter on a duplicate DOM scene, not a backdrop
-    // filter; html2canvas exports the unbent copy, which still reads as glass.
+    // filter; the PNG export hides the duplicate and keeps the clear lens and rim
+    // (css/aesthetics/liquid-glass.css, .deck-export-host).
     const initial = ctx.initial && ctx.initial !== '·' ? ctx.initial : 'M';
     const id = 'lg-refract-' + (++lgSeq);
     const scene = `<i class="lgs-mesh"></i><i class="lgs-initial">${escapeHtml(initial)}</i>`;
@@ -103,7 +111,7 @@ registerAesthetic({
     const ramp = (dir, ch) => {
       const c = v => (ch === 'r' ? `rgb(${v},0,0)` : `rgb(0,${v},0)`);
       const g = dir === 'x' ? 'x1="0" y1="0" x2="1" y2="0"' : 'x1="0" y1="0" x2="0" y2="1"';
-      const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 100 100" preserveAspectRatio="none"><defs><linearGradient id="g" ${g}>`
+      const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 100 100" preserveAspectRatio="none"><defs><linearGradient id="g" ${g}>`
         + `<stop offset="0" stop-color="${c(255)}"/><stop offset=".09" stop-color="${c(196)}"/><stop offset=".22" stop-color="${c(128)}"/>`
         + `<stop offset=".78" stop-color="${c(128)}"/><stop offset=".91" stop-color="${c(60)}"/><stop offset="1" stop-color="${c(0)}"/>`
         + '</linearGradient></defs><rect width="100" height="100" fill="url(#g)"/></svg>';
@@ -112,12 +120,14 @@ registerAesthetic({
     const filter = `<svg class="lgs-defs" width="0" height="0" aria-hidden="true" focusable="false"><filter id="${id}" x="0" y="0" width="1" height="1" color-interpolation-filters="sRGB">`
       + `<feImage href="${ramp('x', 'r')}" preserveAspectRatio="none" result="mx"/>`
       + `<feImage href="${ramp('y', 'g')}" preserveAspectRatio="none" result="my"/>`
-      + '<feComposite in="mx" in2="my" operator="arithmetic" k1="0" k2="1" k3="1" k4="0" result="map"/>'
+      + '<feComposite in="mx" in2="my" operator="arithmetic" k1="0" k2="1" k3="1" k4="0" result="map0"/>'
+      + '<feGaussianBlur in="map0" stdDeviation="4" result="map"/>'
       + '<feDisplacementMap in="SourceGraphic" in2="map" scale="40" xChannelSelector="R" yChannelSelector="G" result="d1"/>'
       + '<feDisplacementMap in="SourceGraphic" in2="map" scale="48" xChannelSelector="R" yChannelSelector="G" result="d2"/>'
-      + '<feColorMatrix in="d2" type="matrix" values="1 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 1 0" result="red"/>'
-      + '<feColorMatrix in="d1" type="matrix" values="0 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 1 0" result="gb"/>'
-      + '<feComposite in="red" in2="gb" operator="arithmetic" k1="0" k2="1" k3="1" k4="0"/>'
+      + '<feComposite in="d1" in2="d2" operator="arithmetic" k1="0" k2="0.8" k3="0.2" k4="0" result="bent"/>'
+      // Chrome samples the displaced source nearest-neighbour, so the magnified rim shows
+      // pixel steps; a 0.6px blur on the result smooths them without softening the 1:1 centre
+      + '<feGaussianBlur in="bent" stdDeviation="0.6"/>'
       + '</filter></svg>';
     const icon = d => `<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${d}</svg>`;
     const tabs = [
@@ -145,7 +155,7 @@ registerAesthetic({
   },
 
   materials: [
-    { name: 'Glass lens', css: 'border-radius: 28%; /* a squircle whose rim cuts through hard content; inside, a duplicate of the content with filter: url(#refract), an feDisplacementMap (scale 40, a second red pass at 48 for fringing) driven by a normal map that is neutral in the middle and ramps in the outer 22%, so only the rim bends */ box-shadow: inset 1px 1px 0 rgba(255,255,255,.6), inset -1px -1px 0 rgba(255,255,255,.25), 0 0 0 .5px rgba(0,0,0,.25);' },
+    { name: 'Glass lens', css: 'border-radius: 28%; /* a squircle whose rim cuts through hard content; inside, a duplicate of the content with filter: url(#refract), an feDisplacementMap (scale 40, plus a 20% full-colour echo at 48 as the fringe, never a split colour channel) driven by a blurred normal map that is neutral in the middle and ramps in the outer 22%, so only the rim bends */ box-shadow: inset 1px 1px 0 rgba(255,255,255,.6), inset -1px -1px 0 rgba(255,255,255,.25), 0 0 0 .5px rgba(0,0,0,.25);' },
     { name: 'Scene (content under glass)', css: 'background: linear-gradient(100deg, {sceneBase} 0 50%, {primary} 50% 72%, {accent} 72% 77%, {secondary} 77%); /* hard edges for the glass to bend, plus one crisp glyph; never a blur */' },
     { name: 'Floating glass control', css: 'background: rgba(255,255,255,.12); backdrop-filter: blur(14px) saturate(160%); border-radius: 999px; box-shadow: inset 1px 1px 0 rgba(255,255,255,.6), inset -1px -1px 0 rgba(255,255,255,.25), 0 0 0 .5px rgba(0,0,0,.35), 0 8px 24px {drop}; /* glass fill never above 12% white */' },
     { name: 'Regular material (panels)', css: 'background: {material}; border: 1px solid {materialLine}; border-radius: 28px; box-shadow: 0 1px 2px rgba(0,0,0,.05), 0 12px 32px -16px {drop}; /* near-opaque; no backdrop blur */' },
@@ -172,7 +182,10 @@ registerAesthetic({
   },
   // Deck copy (js/brand-deck.js): three principles, three do / don't lines, each short.
   deck: {
-    materialStage: 'pattern',   // slide 06 stages the lead pattern (lens grid) instead of repeating the cover scene
+    // No pattern band on the cover or strip on the closing slide: the scene and its lens are
+    // the cover, and slide 06 shows that same lens material (the hero art), not a pattern.
+    coverBand: false,
+    closingStrip: false,
     principles: [
       ['Glass floats over sharp content', 'Hard edges and type are what the rim bends.'],
       ['Thin fill, bright rim', '12% white fill, a specular rim and a dark hairline.'],

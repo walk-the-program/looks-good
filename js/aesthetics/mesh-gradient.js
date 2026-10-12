@@ -57,17 +57,26 @@ registerAesthetic({
     const codeBgFinal = d ? t.mix(t.canvas, '#000000', 0.55) : t.mix(t.ink, '#04050b', 0.4);
     const lift = hex => { let c = hex; for (let k = 1; k <= 20 && t.contrast(c, codeBgFinal) < 6; k++) c = t.mix('#ffffff', c, k * 0.05); return c; };
     const paper = d ? t.mix(t.ink, t.canvas, 0.07) : '#ffffff';
+    // muted labels sit on paper and on the 4.5-7% ink fills over it (segmented track, list
+    // header): pull them toward ink until they hold 4.6:1 on that fill
+    const fillBg = t.mix(t.ink, paper, d ? 0.07 : 0.045);
+    let muted = t.muted;
+    for (let k = 0.05; k <= 1.001 && (t.contrast(muted, fillBg) < 4.6 || t.contrast(muted, t.canvas) < 4.5); k += 0.05) muted = t.mix(t.ink, t.muted, k);
     // Neutral, layered navy shadows (no brand tint in the lighting).
     const shadow = d
       ? '0 1px 1px rgba(0,0,0,.4), 0 13px 27px -5px rgba(0,0,0,.55), 0 8px 16px -8px rgba(0,0,0,.6)'
       : '0 1px 1px rgba(10,37,64,.06), 0 13px 27px -5px rgba(50,50,93,.25), 0 8px 16px -8px rgba(0,0,0,.3)';
     return {
+      '--ab-muted': muted,
       '--ab-m-p': p, '--ab-m-s': s, '--ab-m-a': a,
       '--ab-m-mid': t.mix('#ffffff', p, 0.22),
       // the band's ground: white with a 12% primary tint (a dark tint in dark mode)
       // (t.mix(a, b, k) = k of a over b)
-      '--ab-m-base': d ? t.mix(p, t.canvas, 0.16) : t.mix(p, '#ffffff', 0.12),
-      '--ab-m-blend': d ? 'screen' : 'multiply',
+      // The band keeps its light-mode luminosity in dark mode too (a luminous band on a dark
+      // page): a dark tint turned the field into a muddy rust slab. No text sits on it; the
+      // cards over it are opaque paper and carry their own contrast.
+      '--ab-m-base': t.mix(p, '#ffffff', 0.12),
+      '--ab-m-blend': 'multiply',
       '--ab-mesh-swash': t.accent,
       '--ab-paper': paper,
       '--ab-shadow': shadow,
@@ -145,8 +154,16 @@ registerAesthetic({
     </div>`;
   },
 
+  // 01: the default card plus a short detail list (owner, due, reviewers) above the action,
+  // the way a fintech dashboard card reads; it also fills the card beside the taller 02 panel.
   // 03: the default rows under a real "Recent projects" header.
   panels: {
+    card(ctx) {
+      const e = ctx.e;
+      const meta = `<dl class="mg-meta"><div><dt>Owner</dt><dd>${e(ctx.brandName)}</dd></div>`
+        + '<div><dt>Due</dt><dd>Thu</dd></div><div><dt>Reviewers</dt><dd>3</dd></div></dl>';
+      return ctx.parts.cardBase().replace('<button type="button" class="ab-cta"', `${meta}\n          <button type="button" class="ab-cta"`);
+    },
     list(ctx) {
       return ctx.parts.listBase().replace('<ul class="ab-list">', '<div class="ab-list"><p class="mg-lhead">Recent projects</p><ul class="mg-rows">').replace(/<\/ul>\s*$/, '</ul></div>');
     },
@@ -154,9 +171,9 @@ registerAesthetic({
 
   materials: [
     { name: 'Striated field', css: 'background: {mBase}; /* 140 fine strokes (0.7px, 55% opacity), each path y = 60 + 70 sin(0.012x + 0.045i) + 0.9i, colored along i from {mP} to {mA} to {mS} to {mMid}, multiplied on the light band, fading in from the left; the band sits top right with a -12deg sheared left edge and a diagonal lower cut */' },
-    { name: 'White card', css: 'background: {paper}; border: 1px solid {hair}; border-radius: 12px; box-shadow: {shadow}; /* layered neutral navy: 1px contact, 13px 27px mid, 8px 16px close */' },
+    { name: 'Opaque card', css: 'background: {paper}; border: 1px solid {hair}; border-radius: 12px; box-shadow: {shadow}; /* layered neutral navy: 1px contact, 13px 27px mid, 8px 16px close */' },
     { name: 'Primary pill', css: 'background: {primary}; color: {onPrimary}; border-radius: 999px; font-weight: 600; box-shadow: {ctaSh}; /* compact, never full width; the arrow nudges 3px right on hover */' },
-    { name: 'Selected segment', css: 'background: {paper}; color: {primaryText}; border-radius: 8px; box-shadow: {shadow}; /* track: {fill}, 1px {hair} */' },
+    { name: 'Selected segment', css: 'background: {paper}; color: {ink}; border-radius: 8px; box-shadow: inset 0 -2px 0 {primary}, {shadow}; /* ink label, a 2px primary underline; track: {fill}, 1px {hair} */' },
     { name: 'Field focus', css: 'background: {paper}; border: 1px solid {primary}; border-radius: 8px; box-shadow: 0 0 0 4px {ring};' },
     { name: 'Spec tile', css: 'background: {codeBg}; color: {codeInk}; border-radius: 12px; font: 12px/1.65 ui-monospace, "SF Mono", Menlo, monospace; /* labels {codeK}, faces {codeS}, numbers {codeN} */' },
   ],

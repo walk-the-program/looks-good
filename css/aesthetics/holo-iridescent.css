@@ -41,7 +41,7 @@
 .ab[data-ae="holo-iridescent"] .ab-headline { font-weight: 300; letter-spacing: calc(-0.02em * var(--ab-tr, 1)); line-height: 1.04; position: relative; z-index: 2; }
 .ab[data-ae="holo-iridescent"] .ab-subcopy { margin-top: clamp(14px, 2cqw, 22px) !important; }
 .ab[data-ae="holo-iridescent"] .ab-hl {
-  color: var(--ab-accent-ink);
+  color: var(--ho-hl-solid);
   background: var(--ab-hl-fill); -webkit-background-clip: text; background-clip: text;
   -webkit-text-fill-color: transparent;
   -webkit-box-decoration-break: clone; box-decoration-break: clone;
@@ -55,7 +55,8 @@
 }
 .ab[data-ae="holo-iridescent"] .hoa { position: absolute; inset: 0; }
 .ab[data-ae="holo-iridescent"] .hof {
-  position: absolute; left: 6cqw; top: 8cqw; width: 124cqw; aspect-ratio: 1.6; border-radius: 2.4cqw;
+  /* 100cqw: the plane still runs to the board edge, but no longer past it (124cqw cut the initial) */
+  position: absolute; left: 6cqw; top: 8cqw; width: 100cqw; aspect-ratio: 1.6; border-radius: 2.4cqw;
   overflow: hidden; isolation: isolate; background: #ece8f1;
   transform: perspective(900px) rotateX(16deg) rotate(-8deg); transform-origin: 0 50%;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9), inset 0 -1px 0 rgba(120, 100, 160, 0.25),
@@ -81,6 +82,9 @@
 /* palette: flat planes (strips), quiet hairline, no rainbow */
 .ab[data-ae="holo-iridescent"] .ab-swatches[data-kind="strips"] { border-radius: 16px; box-shadow: 0 0 0 1px var(--ab-hair); }
 .ab[data-ae="holo-iridescent"] .ab-sw-role { font-weight: 600; }
+/* strip captions: the "·" never ends a line, and they print at 0.92 so 11px holds on a bright primary */
+.ab[data-ae="holo-iridescent"] .ab-swatches[data-kind="strips"] :is(.ab-sw-job, .ab-sw-hex) { opacity: 0.92; }
+.ab[data-ae="holo-iridescent"] .ab-swatches[data-kind="strips"] .ab-sw-job { overflow-wrap: normal; text-wrap: balance; }
 
 /* panels: solid with a plain hairline; only the featured 01 card keeps the spectral edge */
 .ab[data-ae="holo-iridescent"] .ab-panel, .ab[data-ae="holo-iridescent"] .ab-list {
@@ -109,11 +113,12 @@
   transition: filter 0.15s, transform 0.12s;
 }
 .ab[data-ae="holo-iridescent"] .ab-cta::before {
-  content: ""; position: absolute; left: 0; right: 0; top: 0; height: 1.5px; border-radius: 12px 12px 0 0;
+  /* inset by the corner radius so the straight line never pokes past the rounded corners */
+  content: ""; position: absolute; left: 12px; right: 12px; top: 0; height: 1.5px;
   background: var(--ab-spec-linear); pointer-events: none;
 }
-.ab[data-ae="holo-iridescent"] .ab-cta:hover, .ab[data-ae="holo-iridescent"] .ab-cta.is-hover { filter: brightness(1.08) saturate(1.05); }
-.ab[data-ae="holo-iridescent"] .ab-cta:active, .ab[data-ae="holo-iridescent"] .ab-cta.is-pressed { transform: translateY(1px); filter: brightness(0.94); }
+.ab[data-ae="holo-iridescent"] .ab-cta:hover { filter: brightness(1.08) saturate(1.05); }
+.ab[data-ae="holo-iridescent"] .ab-cta:active { transform: translateY(1px); filter: brightness(0.94); }
 
 /* 02 finish */
 .ab[data-ae="holo-iridescent"] .ab-fieldlabel { font-size: 10.5px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--ab-muted); }
@@ -196,12 +201,34 @@
   .ab[data-ae="holo-iridescent"] .ab-tag { letter-spacing: 0.1em; }
   .ab[data-ae="holo-iridescent"] .ab-label, .ab[data-ae="holo-iridescent"] .ab-kicker { letter-spacing: 0.16em; }
   .ab[data-ae="holo-iridescent"] .ab-row { grid-template-columns: 9px minmax(0, 1fr) auto 4.5ch; }
+  .ab[data-ae="holo-iridescent"] .ab-headline { text-wrap: balance; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .ab[data-ae="holo-iridescent"] .ab-cta:active, .ab[data-ae="holo-iridescent"] .ab-cta.is-pressed { transform: none; }
+  .ab[data-ae="holo-iridescent"] .ab-cta:active { transform: none; }
 }
 
 /* deck: the foil plane carries the cover; on slide 06 it is shown at full size */
 .ab[data-ae="holo-iridescent"].ab-slide[data-slide="cover"] .ab-art { margin-right: 0; aspect-ratio: 1 / 0.8; }
 .ab[data-ae="holo-iridescent"].ab-slide .ab-deck-stage .ab-art { margin-right: 0; overflow: hidden; border-radius: 18px; }
+
+/* deck cover: the bubble moves to the plane's top-left corner, clear of the meta row below the art */
+.ab[data-ae="holo-iridescent"].ab-slide[data-slide="cover"] .hob { top: 0; left: 0; width: 28cqw; height: 28cqw; }
+/* deck 05: the Matte / Pearl / Foil chips sit in a fourth panel of their own (they floated unframed) */
+.ab[data-ae="holo-iridescent"].ab-slide .ab-deck-uistates {
+  padding: 16px 20px; border: 1px solid var(--ab-hair); border-radius: 20px; background: var(--ab-card-solid);
+  box-shadow: inset 0 1px 0 var(--ab-hl-line);
+}
+
+/* PNG / PDF export (js/brand-deck.js clones the slide into .deck-export-host for html2canvas). It cannot
+   draw the repeating radial fringes or the conic angle term, so the foil plane exported as a flat lilac
+   card: the export draws the fringes as a banded linear sweep of the same five film colors instead. */
+.deck-export-host .ab[data-ae="holo-iridescent"] .hof-fringe {
+  background: linear-gradient(118deg, rgba(255, 154, 213, 0.62), rgba(143, 227, 255, 0.62) 11%, rgba(183, 156, 255, 0.62) 22%,
+    rgba(139, 245, 196, 0.62) 33%, rgba(255, 224, 143, 0.62) 44%, rgba(255, 154, 213, 0.62) 55%, rgba(143, 227, 255, 0.62) 66%,
+    rgba(183, 156, 255, 0.62) 77%, rgba(139, 245, 196, 0.62) 88%, rgba(255, 224, 143, 0.62));
+}
+.deck-export-host .ab[data-ae="holo-iridescent"] .hof-angle { display: none; }
+/* html2canvas has no 3D transforms and offsets a transformed element's clipped children from its frame:
+   the export lays the plane flat so frame and fill line up */
+.deck-export-host .ab[data-ae="holo-iridescent"] .hof { transform: none; }

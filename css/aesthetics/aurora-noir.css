@@ -79,26 +79,26 @@
 }
 .ab[data-ae="aurora-noir"] .ab-art::after {
   content: ""; position: absolute; inset: -16% 5% 0; z-index: 2; pointer-events: none; mix-blend-mode: screen;
-  background: conic-gradient(at 50% 3%, transparent 168deg, var(--ab-au3) 173deg, rgba(255, 255, 255, 0.14) 180deg, var(--ab-au3) 187deg, transparent 192deg);
+  background: conic-gradient(at 50% 3%, transparent 168deg, var(--ab-au3) 173deg, rgba(255, 255, 255, 0.08) 180deg, var(--ab-au3) 187deg, transparent 192deg);
   filter: blur(2px);
 }
 .ab[data-ae="aurora-noir"][data-mode="light"] .ab-art::after { display: none; }
-.ab[data-ae="aurora-noir"] .ana-arc { position: absolute; z-index: 4; left: -6%; right: -6%; bottom: 0; width: 112%; height: 34%; overflow: hidden; pointer-events: none; }
+.ab[data-ae="aurora-noir"] .ana-arc { position: absolute; z-index: 1; left: 0; right: 0; bottom: 0; width: 100%; height: 18%; overflow: hidden; pointer-events: none; }
 .ab[data-ae="aurora-noir"] .ana { position: absolute; inset: 0; font-size: clamp(9px, 1.3cqw, 15px); line-height: 1.4; color: var(--ab-ink); }
 .ab[data-ae="aurora-noir"] .ana i { display: block; font-style: normal; }
 .ab[data-ae="aurora-noir"] .ana i:is(.ana-wsmark, .ana-av) { display: grid; }
 .ab[data-ae="aurora-noir"] .ana-win {
-  position: absolute; inset: 0 5%; display: grid; grid-template-columns: 26% minmax(0, 1fr); overflow: hidden;
-  border: 1px solid var(--ab-hair2); border-bottom: 0; border-radius: 12px 12px 0 0; background: var(--ab-solid);
+  /* the window ends just above the horizon arc's apex (the arc sits under it, never across a row) */
+  position: absolute; z-index: 2; inset: 0 5% 16%; display: grid; grid-template-columns: 26% minmax(0, 1fr); overflow: hidden;
+  border: 1px solid var(--ab-hair2); border-radius: 12px; background: var(--ab-solid);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.14), 0 -1px 0 var(--ab-au1);
 }
-.ab[data-ae="aurora-noir"] .ana-win::after {
-  content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 30%; z-index: 3; pointer-events: none;
-  background: linear-gradient(180deg, transparent, var(--ab-canvas));
-}
+/* the window is whole (it used to run off the art's bottom edge under a fade, which cut rows in half):
+   two activity rows fit above the horizon arc */
+.ab[data-ae="aurora-noir"] .ana-log:last-child { display: none; }
 .ab[data-ae="aurora-noir"] .ana-side { padding: 1.5em 1em; border-right: 1px solid var(--ab-hair); background: var(--ab-fill); min-width: 0; }
 .ab[data-ae="aurora-noir"] .ana-ws { display: flex; align-items: center; gap: 0.7em; margin-bottom: 1.4em; font-size: 1.05em; min-width: 0; }
-.ab[data-ae="aurora-noir"] .ana-ws b { font-weight: 600; letter-spacing: calc(-0.01em * var(--ab-tr, 1)); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ab[data-ae="aurora-noir"] .ana-ws b { min-width: 0; font-weight: 600; letter-spacing: calc(-0.01em * var(--ab-tr, 1)); line-height: 1.2; overflow-wrap: anywhere; }
 .ab[data-ae="aurora-noir"] .ana-wsmark {
   flex: none; width: 1.7em; height: 1.7em; border-radius: 0.45em; place-items: center;
   background: linear-gradient(135deg, var(--ab-primary), var(--ab-secondary)); color: var(--ab-canvas); font-weight: 600; font-size: 0.9em;
@@ -111,11 +111,11 @@
 .ab[data-ae="aurora-noir"] .ana-nav li span { overflow: hidden; text-overflow: ellipsis; }
 .ab[data-ae="aurora-noir"] .ana-nav li em { margin-left: auto; font: 500 0.85em var(--an-mono); font-style: normal; color: var(--ab-muted); }
 .ab[data-ae="aurora-noir"] .ana-grp { margin: 1.6em 0 0.5em 0.65em; font: 500 0.78em var(--an-mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--ab-muted); }
-.ab[data-ae="aurora-noir"] .ana-main { padding: 1.7em 2.2em; min-width: 0; }
+.ab[data-ae="aurora-noir"] .ana-main { padding: 1.5em 2.2em 0.9em; min-width: 0; }
 .ab[data-ae="aurora-noir"] .ana-crumb { display: flex; align-items: center; gap: 0.7em; color: var(--ab-muted); font-size: 0.95em; }
 .ab[data-ae="aurora-noir"] .ana-sep { opacity: 0.5; }
 .ab[data-ae="aurora-noir"] .ana-crumb code, .ab[data-ae="aurora-noir"] .ana-props code, .ab[data-ae="aurora-noir"] .ana-log code { font: 500 0.92em var(--an-mono); letter-spacing: 0.02em; }
-.ab[data-ae="aurora-noir"] .ana-crumb code { color: var(--ab-ink); padding: 0.15em 0.55em; border: 1px solid var(--ab-hair2); border-radius: 0.4em; background: var(--ab-fill); }
+.ab[data-ae="aurora-noir"] .ana-crumb code { position: relative; z-index: 3; color: var(--ab-ink); padding: 0.15em 0.55em; border: 1px solid var(--ab-hair2); border-radius: 0.4em; background: var(--ab-fill); }
 .ab[data-ae="aurora-noir"] .ana-title { margin: 1.1em 0 0.45em; font-size: 2em; font-weight: 600; letter-spacing: calc(-0.035em * var(--ab-tr, 1)); line-height: 1.1; }
 .ab[data-ae="aurora-noir"] .ana-desc { max-width: 34em; color: var(--ab-muted); }
 .ab[data-ae="aurora-noir"] .ana-props { margin: 1.8em 0 0; display: grid; gap: 0; border-top: 1px solid var(--ab-hair); }
@@ -245,12 +245,22 @@
   .ab[data-ae="aurora-noir"] .ana-side { display: none; }
   .ab[data-ae="aurora-noir"] .ana-main { padding: 14px 14px; }
   .ab[data-ae="aurora-noir"] .ana-props > div { grid-template-columns: 6em minmax(0, 1fr); }
+  .ab[data-ae="aurora-noir"] .ana-log { display: none; }
+  .ab[data-ae="aurora-noir"] .ana-win { bottom: auto; }
+  .ab[data-ae="aurora-noir"] .ana-main { padding-bottom: 6px; }
+  .ab[data-ae="aurora-noir"] .ana-props > div:last-child { border-bottom: 0; }
+  .ab[data-ae="aurora-noir"] .ana-props dd { white-space: nowrap; }
   .ab[data-ae="aurora-noir"] .ab-row { grid-template-columns: 22px minmax(0, 1fr) auto 4.5ch; padding: 9px 12px 9px 14px; }
   .ab[data-ae="aurora-noir"] .ab-row-n { display: none; }
   .ab[data-ae="aurora-noir"] .an-lcap { padding: 8px 12px; }
   .ab[data-ae="aurora-noir"] .ab-tag { font-size: 9px; letter-spacing: 0.06em; }
   .ab[data-ae="aurora-noir"] .ab-tag::before { display: none; }
 }
+
+/* section numbers follow the rendered order (the sections run use, ui, touch), like the FIG captions */
+.ab[data-ae="aurora-noir"] .ab-sec .ab-labelrow .ab-n { font-size: 0; }
+.ab[data-ae="aurora-noir"] .ab-sec .ab-labelrow .ab-n::before { content: counter(an-fig, decimal-leading-zero); font-size: 11px; }
+.ab[data-ae="aurora-noir"] .ab-sec .ab-labelrow .ab-n::after { font-size: 11px; }
 
 /* footer */
 .ab[data-ae="aurora-noir"] .ab-foot { border-top-color: var(--ab-hair); font-size: 10.5px; letter-spacing: 0.04em; }
@@ -269,3 +279,27 @@
   .ab[data-ae="aurora-noir"] .ab-labelrow .ab-label:first-child { white-space: nowrap; }
   .ab[data-ae="aurora-noir"] .ab-labelrow .ab-label:last-child:not(:first-child) { text-align: right; }
 }
+
+/* PNG / PDF export (js/brand-deck.js clones the slide into .deck-export-host for html2canvas).
+   html2canvas paints a conic gradient as a solid fill and ignores filter: blur, so the beam came out
+   wash, and it drops the SVG horizon. The export keeps a static version it
+   can draw: the beam as a narrow vertical fade from above (behind the window), no cone in front of the window,
+   and the horizon as a 1.5px elliptical border in the beam colors' first stop. */
+.deck-export-host .ab[data-ae="aurora-noir"] .ab-art::before {
+  filter: none; inset: -16% 45% 30%;
+  background: linear-gradient(180deg, var(--ab-au1), transparent);
+}
+.deck-export-host .ab[data-ae="aurora-noir"] .ab-art::after { content: none; }
+.deck-export-host .ab[data-ae="aurora-noir"] .ana-arc { display: none; }
+.deck-export-host .ab[data-ae="aurora-noir"] .ana::after {
+  content: ""; position: absolute; z-index: 1; left: 8%; right: 8%; bottom: -60%; height: 74%;
+  border-radius: 50%; border-top: 1.5px solid var(--ab-au1);
+}
+.deck-export-host .ab[data-ae="aurora-noir"] .ab-art { overflow: hidden; }
+/* the wallpaper's radial fade exports as a grey blot on a light canvas: the export drops the faint grid */
+.deck-export-host .ab[data-ae="aurora-noir"]::after { content: none; }
+/* the window's 1px lit top edge is a box-shadow, which html2canvas fills across the whole window */
+.deck-export-host .ab[data-ae="aurora-noir"] .ana-win { box-shadow: none; border-top-color: var(--ab-au1); }
+/* deck cover: the art box is short, so the window shows its first rows only; drop the Teams group so
+   the sidebar ends on a whole item instead of a cut label */
+.ab[data-ae="aurora-noir"].ab-slide[data-slide="cover"] :is(.ana-grp, .ana-nav-sub) { display: none; }

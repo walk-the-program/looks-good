@@ -130,6 +130,7 @@
   background: var(--ab-ink); color: var(--ab-canvas); font-weight: 500; box-shadow: 2px 3px 5px rgba(0, 0, 0, 0.16);
 }
 .ab[data-ae="soft-form"] .ab-card-title { font-weight: 500; letter-spacing: calc(-0.03em * var(--ab-tr, 1)); }
+.ab[data-ae="soft-form"] :is(.ab-card-body, .ab-card .ab-label, .ab-panel .ab-status, .ab-panel .ab-state) { color: var(--sf-muted-strong); }
 .ab[data-ae="soft-form"] .ab-cta {
   border-radius: 10px; border: 1px solid rgba(255, 255, 255, 0.27);
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0) 55%), var(--ab-primary);
@@ -152,6 +153,7 @@
 .ab[data-ae="soft-form"] .ab-switch:checked { background: var(--ab-canvas); }
 .ab[data-ae="soft-form"] .ab-switch:checked::before {
   background: linear-gradient(145deg, rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0) 55%), var(--ab-primary);
+  box-shadow: inset 0 0 0 1.5px var(--sf-on-rim), inset 1px 1px 2px rgba(255, 255, 255, 0.7), 1px 2px 4px rgba(0, 0, 0, 0.25);
 }
 /* the recessed slider under the status line (real markup from def.panels.panel):
    an 8px recessed track, an ink fill and a raised 22px thumb */
@@ -203,6 +205,8 @@
 
 /* narrow: the well stays the hero object and still bleeds off the edge */
 @container ab (max-width: 600px) {
+  /* the progress channel gets its own full-width line under the name and status (it collapsed to a stub) */
+  .ab[data-ae="soft-form"] .ab-row-bar { grid-column: 1 / -1; grid-row: 3; margin-top: 2px; }
   .ab[data-ae="soft-form"] .ab-hero { grid-template-columns: minmax(0, 1fr); }
   .ab[data-ae="soft-form"] .ab-art { justify-self: end; max-width: 320px; margin-right: -10%; }
   .ab[data-ae="soft-form"] .ab-disc { width: 68px; height: 68px; }

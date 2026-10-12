@@ -8,6 +8,17 @@
    the same recipe works if the brand is switched to light mode. */
 let anSeq = 0;   // unique SVG ids per rendered board
 
+// Issue-ID prefix from the brand name: the first letters of the first two words
+// ("Marigold Studio" -> MS, "BallKnowledge Collective International" -> BC), or the
+// first two letters of a one-word name ("Ox" -> OX). Latin letters and digits only;
+// a name with none falls back to the initial (or "ID").
+function anPrefix(name, initial) {
+  const words = String(name || '').split(/\s+/).map(w => w.replace(/[^A-Za-z0-9]/g, '')).filter(Boolean);
+  let p = words.length >= 2 ? words[0][0] + words[1][0] : (words[0] || '').slice(0, 2);
+  if (p.length < 2) p = (p || (initial && /[A-Za-z0-9]/.test(initial) ? initial : 'I')) + (p ? 'X' : 'D');
+  return p.toUpperCase();
+}
+
 registerAesthetic({
   key: 'aurora-noir', order: 7,
   name: 'Aurora Noir',
@@ -15,7 +26,7 @@ registerAesthetic({
   influences: 'Dev-tool UI / Swiss grid / Aurora light',
   summary: 'A near-black, exact interface with hairline surfaces, lit by one sharp beam of aurora light.',
   motto: 'Quiet. Exact. Charged.',
-  kicker: 'Built for the dark',
+  kicker: 'Lit by one beam',   // true in both modes (it was "Built for the dark", wrong on a light board)
   mode: 'dark',
   slideShape: 'minimal',
   labels: { material: 'Surfaces', states: ['Rest', 'Hover', 'Focus'], statesKind: 'button' },
@@ -68,8 +79,22 @@ registerAesthetic({
     // No text sits on them (the window is opaque, the headline is above the beam),
     // so there is no contrast loop to dim them.
     const mid = t.mix(t.primary, t.secondary, 0.5);
-    const a1 = d ? 0.55 : 0.42, a2 = d ? 0.5 : 0.38, a3 = d ? 0.3 : 0.24;
+    const a1 = d ? 0.55 : 0.42, a2 = d ? 0.5 : 0.38, a3 = d ? 0.2 : 0.24;   // a3: the cone on the window, kept under the muted text's 4.5:1
+    // light mode: muted text from 62% ink up, until it holds 4.5:1 on the deepest ink-alpha
+    // fill it sits on (the selected chip, about 12% ink over the canvas)
+    // (dark mode: the framework muted, pulled toward ink only if the same fill needs it, which
+    // happens when a blend lends the board another canvas)
+    const fillBg = t.mix(t.ink, t.canvas, 0.12);
+    let lightMuted = t.muted;
+    if (!d) {
+      for (let k = 0.62; k <= 1.001; k += 0.04) { lightMuted = t.mix(t.ink, t.canvas, k); if (t.contrast(lightMuted, fillBg) >= 4.5) break; }
+    } else {
+      for (let k = 0.05; k <= 1.001 && t.contrast(lightMuted, fillBg) < 4.6; k += 0.05) lightMuted = t.mix(t.ink, t.muted, k);
+    }
     return {
+      // The framework's 4.5:1 floor is measured on the canvas; the small mono labels sit on
+      // 3-12% ink fills, where it fell to 3.9-4.4:1.
+      '--ab-muted': lightMuted,
       '--ab-hair': t.alpha(t.ink, d ? 0.09 : 0.1),
       '--ab-hair2': t.alpha(t.ink, d ? 0.14 : 0.16),
       '--ab-fill': t.alpha(t.ink, d ? 0.035 : 0.035),
@@ -104,7 +129,7 @@ registerAesthetic({
     const e = escapeHtml;
     const name = e(ctx.brandName);
     const id = 'ana' + (++anSeq);
-    const pre = (ctx.initial && /[A-Za-z0-9]/.test(ctx.initial) ? ctx.initial.toUpperCase() : 'B') + 'S';
+    const pre = anPrefix(ctx.brandName, ctx.initial);
     const t = ctx.t;
     const nav = ['Briefs', 'Reviews', 'Assets', 'Releases']
       .map((n, i) => `<li${i === 1 ? ' class="on"' : ''}><i></i><span>${n}</span>${i === 0 ? '<em>3</em>' : ''}</li>`).join('');
@@ -131,17 +156,17 @@ registerAesthetic({
     </div>
     <svg class="ana-arc" viewBox="0 0 1000 120" preserveAspectRatio="none" focusable="false" aria-hidden="true"><defs>
       <linearGradient id="${id}g" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="${t.primary}" stop-opacity="0"/><stop offset=".22" stop-color="${t.primary}"/><stop offset=".5" stop-color="#ffffff"/><stop offset=".78" stop-color="${t.secondary}"/><stop offset="1" stop-color="${t.secondary}" stop-opacity="0"/></linearGradient></defs>
-      <ellipse cx="500" cy="118" rx="520" ry="96" fill="none" stroke="url(#${id}g)" stroke-width="3" opacity=".35" style="filter:blur(3px)"/>
-      <ellipse cx="500" cy="118" rx="520" ry="96" fill="none" stroke="url(#${id}g)" stroke-width="1.2" opacity=".8" vector-effect="non-scaling-stroke"/>
+      <ellipse cx="500" cy="420" rx="620" ry="404" fill="none" stroke="url(#${id}g)" stroke-width="3" opacity=".35" style="filter:blur(3px)"/>
+      <ellipse cx="500" cy="420" rx="620" ry="404" fill="none" stroke="url(#${id}g)" stroke-width="1.2" opacity=".8" vector-effect="non-scaling-stroke"/>
     </svg></div>`;
   },
 
   // 03: the issues table as real markup: a caption row, brand-prefixed mono IDs
-  // (<initial>S-101...) and a footer total computed from the rows.
+  // (anPrefix: MS-101... for Marigold Studio) and a footer total computed from the rows.
   panels: {
     list(ctx) {
       const e = ctx.e;
-      const pre = (ctx.initial && /[A-Za-z0-9]/.test(ctx.initial) ? ctx.initial.toUpperCase() : 'B') + 'S';
+      const pre = anPrefix(ctx.brandName, ctx.initial);
       let i = 0;
       const rows = ctx.parts.listBase().replace(/<ul class="ab-list">|<\/ul>/g, '')
         .replace(/<span class="ab-row-n">\d+<\/span>/g, () => `<span class="ab-row-n">${e(pre)}-${101 + i++}</span>`);
@@ -180,6 +205,10 @@ registerAesthetic({
   },
   // Deck copy (js/brand-deck.js): three principles, three do / don't lines, each short.
   deck: {
+    // No pattern band or strip: the suite is mono hairline work that reads as an empty
+    // black strip at band size; the cover ends on the lit product window instead.
+    coverBand: false,
+    closingStrip: false,
     principles: [
       ['Quiet, exact, charged', 'Hairline surfaces on a near-black field.'],
       ['Surfaces are alphas of ink', 'A 3% fill and an 8% hairline; no second background.'],

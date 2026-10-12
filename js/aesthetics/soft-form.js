@@ -24,6 +24,7 @@ registerAesthetic({
   layout: { hero: 'split', sections: 'asym' },
   type: { ui: 'sans', label: 'sans', display: 1.28 },
   highlight: 'ink',
+  highlightNote: 'Shaded text, no band: the accent, or a darker shade of it at 3:1 on the canvas. A yellow or amber accent that would need shading turns brown or olive when darkened, so the word then takes the primary (shaded to 3:1 the same way) instead.',
 
   roles: {
     ink: {
@@ -45,7 +46,26 @@ registerAesthetic({
     // surfaces get a 1px top rim (css --sf-raised) so relief still reads.
     const hi = t.isDark ? 'rgba(255,255,255,0.11)' : 'rgba(255,255,255,0.79)';
     const lo = t.isDark ? 'rgba(0,0,0,0.53)' : t.alpha(t.mix('#000000', t.canvas, 0.25), 0.6);
+    // Highlight word: the framework shades a low-contrast accent to 3:1 keeping its hue.
+    // Yellows and ambers shaded that far turn mustard, olive or brown (warm #FFC914 ->
+    // #B8800A, pastel #F4EFC2 -> olive), so those fall back to the primary, shaded the same way.
+    let hl = t.accentInk;
+    const ah = hexToHsl(t.accent);
+    if (t.contrast(t.accent, t.canvas) < 3 && ah.h >= 35 && ah.h <= 80) {
+      const ph = hexToHsl(t.primary);
+      if (!(ph.h >= 35 && ph.h <= 80) && ph.s >= 20) hl = abAccentInk(t.primary, t.canvas, t.ink);
+    }
+    let strongMuted = t.muted;
+    const panelBg = t.isDark ? t.mix('#ffffff', t.canvas, 0.1) : t.canvas;
+    for (let k = 0.05; k <= 1.001 && t.contrast(strongMuted, panelBg) < 4.6; k += 0.05) strongMuted = t.mix(t.ink, t.muted, k);
     return {
+      '--ab-accent-ink': hl,
+      // secondary text inside the glass card and the instrument panel: the muted pulled toward
+      // ink until it holds 4.6:1 on the lifted dark-mode panel (the framework muted fell to 3.9-4.0:1)
+      '--sf-muted-strong': strongMuted,
+      // the switch knob's rim when on: the primary pushed 45% toward ink, so on/off differ by
+      // more than the knob position even when the primary is a pastel close to the canvas
+      '--sf-on-rim': t.mix(t.ink, t.primary, 0.45),
       '--ab-hi': hi,
       '--ab-lo': lo,
       '--ab-rim': t.isDark ? 'rgba(255,255,255,0.44)' : 'rgba(255,255,255,0.85)',

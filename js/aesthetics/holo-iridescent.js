@@ -71,7 +71,13 @@
       const hair = a => spec.map(c => t.alpha(c, a));
       const hairA = d ? 0.85 : 1;
       const h = hair(hairA);
+      // muted labels sit on the pearl wash (canvas tinted up to 22%): pull them toward ink until
+      // they hold 4.7:1 on the canvas, which leaves room for the tint
+      let muted = t.muted;
+      for (let k = 0.05; k <= 1.001 && t.contrast(muted, t.canvas) < 4.7; k += 0.05) muted = t.mix(t.ink, t.muted, k);
       return {
+        '--ab-muted': muted,
+        '--ho-hl-solid': legible(t.accentInk),
         '--ab-pearl': [
           `radial-gradient(55% 34% at 6% 0%, ${w('#ffd6f0')}, transparent)`,
           `radial-gradient(48% 30% at 96% 12%, ${w('#c9f6ff')}, transparent)`,
@@ -86,7 +92,8 @@
         '--ab-hl-line': d ? 'rgba(255,255,255,0.05)' : 'rgba(255,255,255,0.9)',
         '--ab-chrome': 'linear-gradient(180deg, #f4f4f6 0%, #d9dbe1 45%, #ffffff 55%, #c9ccd4 100%)',
         '--ab-chrome-ink': '#17171b',
-        '--ab-hl-fill': `linear-gradient(95deg, ${t.accentInk} 0%, ${t.accentInk} 26%, ${legible('#d6409f')} 52%, ${legible('#7a56e6')} 74%, ${legible('#12a37a')} 100%)`,
+        // the word starts on the accent shaded to 3.2:1 (accentInk is 3:1 and measured 2.99 at 390px)
+        '--ab-hl-fill': `linear-gradient(95deg, ${legible(t.accentInk)} 0%, ${legible(t.accentInk)} 26%, ${legible('#d6409f')} 52%, ${legible('#7a56e6')} 74%, ${legible('#12a37a')} 100%)`,
         '--ab-lift': d ? '0 24px 40px -26px rgba(0,0,0,0.9)' : `0 14px 34px -16px ${t.alpha(t.ink, 0.2)}`,
         '--ab-cta-glow': t.alpha(t.primary, d ? 0.42 : 0.5),
         '--ab-type-pick-w': 300,
@@ -105,7 +112,9 @@
       const id = 'hoa' + (++seq);
       const initial = ctx.initial && ctx.initial !== '·' ? escapeHtml(ctx.initial) : '';
       const spec = ['#ff9ad5', '#8fe3ff', '#b79cff', '#8bf5c4', '#ffe08f'];
-      // 40 wedges of 9deg around (45, 28): a repeating conic sweep drawn as paths
+      // 40 wedges of 9deg around (45, 28): a repeating conic sweep drawn as paths. The thinning
+      // "black spot" (a canvas-colored glow at the top) is left out in dark mode, where the
+      // canvas is near-black and the spot read as a muddy blot in the middle of the lens.
       const cx = 45, cy = 28, R = 90;
       let wedges = '';
       for (let i = 0; i < 40; i++) {
@@ -121,7 +130,7 @@
         </defs>
         <circle cx="50" cy="50" r="48.5" fill="rgba(255,255,255,.06)"/>
         <g mask="url(#${id}m)" opacity=".5"><g filter="url(#${id}s)">${wedges}</g></g>
-        <circle cx="50" cy="50" r="49" fill="url(#${id}k)"/>
+        ${ctx.t.isDark ? '' : `<circle cx="50" cy="50" r="49" fill="url(#${id}k)"/>`}
         <circle cx="50" cy="50" r="49.2" fill="none" stroke="#fff" stroke-opacity=".55" stroke-width=".6"/>
       </svg>`;
       return `<div class="hoa">
@@ -159,6 +168,10 @@
     },
     // Deck copy (js/brand-deck.js): three principles, three do / don't lines, each short.
     deck: {
+      // No pattern band or strip: the foil plane is the cover. The fixed spectrum is three
+      // flat inks, so any band of it reads as op-art rings rather than thin film.
+      coverBand: false,
+      closingStrip: false,
       coverDisplay: 0.78,   // Unbounded is wide; a smaller start keeps the foil plane large
       principles: [
         ['Foil is a surface', 'One large plane whose color drifts in bands.'],

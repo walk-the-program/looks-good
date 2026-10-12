@@ -45,7 +45,7 @@
 .ab[data-ae="clay"] .ab-hl {
   padding: 0 0.12em; margin: 0 -0.02em; border-radius: 0.14em; transform: none;
   background: var(--ab-accent); color: var(--ab-on-accent);
-  box-shadow: 0 0.14em 0 -0.02em var(--ab-acc-sh);
+  box-shadow: 0 0.14em 0 -0.02em var(--cl-hl-under);
   -webkit-box-decoration-break: clone; box-decoration-break: clone;
 }
 
@@ -205,10 +205,18 @@
   display: grid; place-items: center; width: 44px; height: 44px; border-radius: 50%;
   font-size: 17px; font-weight: 600; line-height: 1;
 }
-/* avatars step down the primary's tonal ramp: base, lighter, darker */
-.ab[data-ae="clay"] .ab-row:nth-child(1) .ab-av { background: var(--cl-gloss), var(--ab-primary); color: var(--ab-on-primary); box-shadow: 0 9px 14px -6px var(--ab-pri-sh), var(--cl-in-s); }
-.ab[data-ae="clay"] .ab-row:nth-child(2) .ab-av { background: var(--cl-gloss), var(--ab-pri-hi); color: var(--ab-pri-hi-on); box-shadow: 0 9px 14px -6px var(--ab-pri-hi-sh), var(--cl-in-s); }
-.ab[data-ae="clay"] .ab-row:nth-child(3) .ab-av { background: var(--cl-gloss), var(--ab-pri-lo); color: var(--ab-pri-lo-on); box-shadow: 0 9px 14px -6px var(--ab-pri-lo-sh), var(--cl-in-s); }
+/* avatars: flat discs in three tints of the primary with ink initials (the interface is flat; the
+   clay finish stays on the hero objects and the one CTA) */
+.ab[data-ae="clay"] .ab-av { color: var(--cl-av-ink); box-shadow: none; }
+.ab[data-ae="clay"] .ab-row:nth-child(1) .ab-av { background: var(--cl-av1); }
+.ab[data-ae="clay"] .ab-row:nth-child(2) .ab-av { background: var(--cl-av2); }
+.ab[data-ae="clay"] .ab-row:nth-child(3) .ab-av { background: var(--cl-av3); }
+/* section numbers follow the rendered order (Clay, Interface, In use run 01, 02, 03) */
+.ab[data-ae="clay"] :is(.ab-sections, .ab-deck-prodframe) { counter-reset: cl-sec; }
+.ab[data-ae="clay"] .ab-sec { counter-increment: cl-sec; }
+.ab[data-ae="clay"] .ab-sec .ab-labelrow .ab-n { font-size: 0; }
+.ab[data-ae="clay"] .ab-sec .ab-labelrow .ab-n::before { content: counter(cl-sec, decimal-leading-zero); font-size: 13px; }
+.ab[data-ae="clay"] .ab-sec .ab-labelrow .ab-n::after { font-size: 13px; }
 .ab[data-ae="clay"] .ab-row-name { font-weight: 600; }
 .ab[data-ae="clay"] .ab-row-status { padding: 0; background: none; box-shadow: none; color: var(--ab-sec-text); font-weight: 500; font-size: 12px; }
 .ab[data-ae="clay"] .ab-row-bar { height: 6px; border-radius: 99px; background: color-mix(in srgb, var(--ab-ink) 9%, transparent); box-shadow: none; }
@@ -239,3 +247,10 @@
 .ab[data-ae="clay"].ab-slide[data-slide="cover"] .ab-art { width: 100%; max-width: none; justify-self: end; }
 /* deck 06: the material names large, as objects deserve */
 .ab[data-ae="clay"].ab-slide .ab-deck-mat .ab-label { font-size: 22px; font-weight: 600; }
+
+/* PNG / PDF export: html2canvas ignores mix-blend-mode, so the grain overlay printed as a grey veil over
+   every object; the export leaves the grain out */
+.deck-export-host .ab[data-ae="clay"] :is(.cla-tile, .cla-sphere, .cla-cap, .cla-torus)::after { content: none; }
+/* ...and it fills the large soft inset shadows (the top light and the underside) as a pale wash across
+   the whole object; the export keeps the objects' own colors and gradients without them */
+.deck-export-host .ab[data-ae="clay"] :is(.cla-tile, .cla-sphere, .cla-cap, .cla-torus, .cla-hole) { box-shadow: none; }

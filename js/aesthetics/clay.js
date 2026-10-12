@@ -48,7 +48,23 @@ registerAesthetic({
     const sh = hex => t.alpha(t.mix('#000000', hex, 0.45), d ? 0.8 : 0.55);
     const priHi = t.mix('#ffffff', t.primary, 0.34);
     const priLo = t.mix('#000000', t.primary, 0.2);
+    const cardFill = d ? t.mix('#ffffff', t.canvas, 0.07) : t.mix('#ffffff', t.canvas, 0.82);
+    // muted labels (the segmented options sit on the card fill): pull toward ink until 4.6:1 there
+    let muted = t.muted;
+    for (let k = 0.05; k <= 1.001 && (t.contrast(muted, cardFill) < 4.6 || t.contrast(muted, t.canvas) < 4.5); k += 0.05) muted = t.mix(t.ink, t.muted, k);
+    // the highlight band's underside: the accent darkened. A yellow darkened in place turns olive,
+    // so yellows and ambers also turn toward orange (the clay's own warm shadow)
+    const ah = hexToHsl(t.accent);
+    const warm = ah.h >= 38 && ah.h <= 80;
+    const hlUnder = hslToHex(warm ? ah.h - 16 : ah.h, warm ? Math.max(ah.s, 75) : ah.s, Math.round(ah.l * 0.55));
+    // 03 avatars: flat tints of the primary with ink initials (the interface stays flat; clay is
+    // for the objects and the one CTA)
+    const avBg = k => t.mix(t.primary, t.canvas, k);
     return {
+      '--ab-muted': muted,
+      '--cl-hl-under': t.alpha(hlUnder, d ? 0.9 : 0.6),
+      '--cl-av1': avBg(0.26), '--cl-av2': avBg(0.16), '--cl-av3': avBg(0.36),
+      '--cl-av-ink': (() => { let c = t.ink; [0.26, 0.16, 0.36].forEach(k => { if (t.contrast(c, avBg(k)) < 4.5) c = t.readable(avBg(k)); }); return c; })(),
       '--ab-pri-sh': sh(t.primary),
       '--ab-sec-sh': sh(t.secondary),
       '--ab-acc-sh': sh(t.accent),
@@ -62,7 +78,7 @@ registerAesthetic({
       '--ab-clay-hi': d ? 'rgba(255,255,255,0.3)' : 'rgba(255,255,255,0.6)',
       '--ab-clay-lo': d ? 'rgba(0,0,0,0.3)' : 'rgba(0,0,0,0.12)',
       // flat cards: the canvas lightened 82% (7% in dark mode), a hairline, no clay
-      '--ab-card-fill': d ? t.mix('#ffffff', t.canvas, 0.07) : t.mix('#ffffff', t.canvas, 0.82),
+      '--ab-card-fill': cardFill,
       // status text (rows sit on the canvas): the secondary shaded toward ink until it reads (4.5:1)
       '--ab-sec-text': (() => { const bg = t.canvas; for (let a = 0; a <= 1; a += 0.05) { const c = t.mix(t.ink, t.secondary, a); if (t.contrast(c, bg) >= 4.5) return c; } return t.ink; })(),
       '--ab-type-pick-w': 600,
