@@ -67,9 +67,14 @@
 }
 .ab[data-ae="cybersigilism"][data-hcls="blackletter"] .ab-headline { font-weight: 400; letter-spacing: 0; }
 /* the sigil word: same face and colour, hairline thorns (inline SVG from the headline hook) grow out of it */
-.ab[data-ae="cybersigilism"] .ab-hl { position: relative; display: inline-block; color: inherit; background: none; padding: 0; margin: 0; -webkit-text-fill-color: currentColor; }
-.ab[data-ae="cybersigilism"] .ab-hl .cs-thorns { position: absolute; left: -20%; width: 140%; top: -0.32em; height: 1.72em; overflow: visible; pointer-events: none; }
+.ab[data-ae="cybersigilism"] .ab-hl { position: relative; display: inline-block; color: inherit; background: none; padding: 0; margin: 0 1.45em 0 0; -webkit-text-fill-color: currentColor; }   /* the right margin reserves the sprig's room, so wrapping and the deck's fit pass keep it inside the column */
+/* the thorn sprig sits outside the word: a ~0.22em clear zone past the last glyph, inside the word's own line box
+   (never the line above, never the copy below), clipped at its box so no barb turns back into the letters */
+.ab[data-ae="cybersigilism"] .ab-hl .cs-thorns { position: absolute; left: calc(100% + 0.22em); top: 0.12em; width: 1.2em; height: 0.8em; overflow: hidden; pointer-events: none; }
 .ab[data-ae="cybersigilism"] .ab-hl .cs-thorns path { fill: var(--cs-l2); }
+/* a blend donor's highlight replaces the sigil word: no sprig, no reserved room */
+.ab[data-ae="cybersigilism"][data-blend-hl] .ab-hl { margin-right: 0; }
+.ab[data-ae="cybersigilism"][data-blend-hl] .ab-hl .cs-thorns { display: none; }
 .ab[data-ae="cybersigilism"] .ab-subcopy { max-width: 26em; text-align: left; }
 .ab[data-ae="cybersigilism"] .ab-sub-lead { color: var(--ab-ink); }
 
@@ -77,12 +82,13 @@
 .ab[data-ae="cybersigilism"] .ab-chip { border-radius: 0; box-shadow: none; clip-path: polygon(0 0, calc(100% - 9px) 0, 100% 9px, 100% 100%, 9px 100%, 0 calc(100% - 9px)); outline: none; }
 .ab[data-ae="cybersigilism"] .ab-swatch[data-role="canvas"] .ab-chip, .ab[data-ae="cybersigilism"] .ab-swatch[data-role="ink"] .ab-chip { box-shadow: inset 0 0 0 1px var(--cs-line); }
 /* the brand roles are cold light, not paint: a dark slab with a 1px edge and an inner wash in that role's cold
-   value; the raw colour survives only as a 6px lozenge beside the role name */
+   value; the raw colour is shown as a 5px solid stripe across the plate's foot (so the hex reads true) and a 6px
+   lozenge beside the role name */
 .ab[data-ae="cybersigilism"] .ab-swatch[data-role="primary"] { --cs-chip-c: var(--cs-cold-p); --cs-chip-g: var(--cs-cold-p-g); --cs-chip-w: var(--cs-cold-p-w); --cs-chip-raw: var(--ab-primary); }
 .ab[data-ae="cybersigilism"] .ab-swatch[data-role="secondary"] { --cs-chip-c: var(--cs-cold-s); --cs-chip-g: var(--cs-cold-s-g); --cs-chip-w: var(--cs-cold-s-w); --cs-chip-raw: var(--ab-secondary); }
 .ab[data-ae="cybersigilism"] .ab-swatch[data-role="accent"] { --cs-chip-c: var(--cs-cold-a); --cs-chip-g: var(--cs-cold-a-g); --cs-chip-w: var(--cs-cold-a-w); --cs-chip-raw: var(--ab-accent); }
 .ab[data-ae="cybersigilism"] .ab-swatch:is([data-role="primary"], [data-role="secondary"], [data-role="accent"]) .ab-chip {
-  background: radial-gradient(90% 80% at 50% 50%, transparent 40%, var(--cs-chip-w)), var(--cs-chip-ground) !important;
+  background: linear-gradient(var(--cs-chip-raw), var(--cs-chip-raw)) 50% calc(100% - 12px) / calc(100% - 24px) 5px no-repeat, radial-gradient(90% 80% at 50% 50%, transparent 40%, var(--cs-chip-w)), var(--cs-chip-ground) !important;
   box-shadow: inset 0 0 0 1px var(--cs-chip-c), inset 0 0 14px var(--cs-chip-g);
 }
 .ab[data-ae="cybersigilism"] .ab-swatch:is([data-role="primary"], [data-role="secondary"], [data-role="accent"]) .ab-sw-role::before { content: ""; display: inline-block; width: 6px; height: 6px; margin-right: 7px; vertical-align: 1px; background: var(--cs-chip-raw); transform: rotate(45deg); }
@@ -138,7 +144,7 @@
   content: ""; position: absolute; right: -15px; top: -15px; width: 22px; height: 22px; pointer-events: none; transform-origin: 0 100%; transition: transform 0.35s ease;
   background: var(--cs-thorn) left bottom / contain no-repeat;
 }
-.ab[data-ae="cybersigilism"] .ab-cta:hover::after, .ab[data-ae="cybersigilism"] .ab-cta.is-hover::after { transform: scale(1.7); }
+.ab[data-ae="cybersigilism"] .ab-cta:hover::after { transform: scale(1.7); }
 .ab[data-ae="cybersigilism"] .ab-cta:hover { --cs-L: var(--cs-l1); }
 .ab[data-ae="cybersigilism"] .ab-cta:active { --cs-btn: var(--cs-ghost); }
 .ab[data-ae="cybersigilism"] .ab-cta-arrow::before { content: "↗"; font-size: 14px; }
@@ -163,6 +169,10 @@
 .ab[data-ae="cybersigilism"] .ab-state { font-family: var(--cs-mono); font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; }
 .ab[data-ae="cybersigilism"] .ab-states[data-kind="custom"] { display: flex; gap: 22px; }
 .ab[data-ae="cybersigilism"] .ab-states[data-kind="custom"] .ab-state { display: grid; justify-items: center; gap: 8px; }
+/* the three states share the row evenly, so a donor's longer state name wraps between words, never inside one */
+.ab[data-ae="cybersigilism"] .ab-states > .ab-state { flex: 1 1 0; min-width: 0; text-align: center; }
+.ab[data-ae="cybersigilism"] .ab-state-name { overflow-wrap: normal; word-break: normal; }
+.ab[data-ae="cybersigilism"] .ab-blend-state .ab-state-name { letter-spacing: 0.08em; }   /* a donor's one-word name ("Confidence") fits its grid cell */
 .ab[data-ae="cybersigilism"] .cs-st { display: block; width: 56px; height: 56px; }
 
 /* 03 index: mono numerals, grotesk items, a hairline with a node on every row, thorn-tipped progress */
@@ -206,5 +216,7 @@
 .ab[data-ae="cybersigilism"].ab-slide[data-slide="cover"][data-hero] .ab-deck-cover .ab-hero-copy { position: relative; z-index: 2; justify-self: start; max-width: 46%; text-align: left; }
 .ab[data-ae="cybersigilism"].ab-slide[data-slide="cover"] .ab-hero .ab-art { position: absolute; z-index: 1; right: 0; top: 112px; bottom: 44px; left: auto; height: auto; width: 58% !important; max-width: none !important; aspect-ratio: auto; margin: 0; }
 .ab[data-ae="cybersigilism"].ab-slide[data-slide="cover"] .ab-hero .ab-art::after { content: ""; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(90deg, var(--ab-canvas) 0, var(--ab-canvas) 6%, transparent 32%); }
+/* the cover fades the sigil's left edge into the headline column: the plate caption would sit half-faded there */
+.ab[data-ae="cybersigilism"].ab-slide[data-slide="cover"] .csa text { display: none; }
 /* deck Do / Don't: the rule numbers in cold light, never the raw client colour */
 .ab[data-ae="cybersigilism"].ab-slide { --dk-mark-do: var(--cs-cold); }

@@ -33,7 +33,9 @@ function dlWordFit(state, word, maxFs) {
   let fs = fsFull;
   let mode = 'spacingAndGlyphs';
   const cap = maxFs || 64;
-  if (fsFull > cap) { fs = cap; mode = 'spacing'; }     // a short word: capped, then tracked out to the edge
+  // a short word ("OX"): capped and set at its natural width from the left edge; tracking it out
+  // to the far edge left two letters at the two edges with a hole between
+  if (fsFull > cap) { fs = cap; mode = 'none'; }
   else if (fsFull < 14) { fs = 14; }
   const strip = 1.5 + 0.7 * 0.72 * fs;                 // 70% of the cap height shows above the strip
   return { fs, W, mode, strip };
@@ -78,7 +80,7 @@ function dlPlate(state, word, ink, label, num, maxFs) {
   const lab = label ? `<text class="dl-strip" x="5" y="${(strip + 5.6).toFixed(2)}" fill="#F7F7F5">${label}</text>` : '';
   const no = num ? `<text class="dl-strip" x="195" y="${(strip + 5.6).toFixed(2)}" text-anchor="end" fill="#F7F7F5">${num}</text>` : '';
   return `<svg class="dl-plate-svg" viewBox="0 0 200 ${h.toFixed(2)}" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg" role="presentation">
-      <svg x="0" y="0" width="200" height="${strip.toFixed(2)}" viewBox="0 0 200 ${strip.toFixed(2)}" overflow="hidden"><text class="dl-word" x="0" y="${baseline}" font-size="${fit.fs.toFixed(2)}" textLength="${fit.W}" lengthAdjust="${fit.mode}" fill="${ink}">${word}</text></svg>
+      <svg x="0" y="0" width="200" height="${strip.toFixed(2)}" viewBox="0 0 200 ${strip.toFixed(2)}" overflow="hidden"><text class="dl-word" x="0" y="${baseline}" font-size="${fit.fs.toFixed(2)}"${fit.mode === 'none' ? '' : ` textLength="${fit.W}" lengthAdjust="${fit.mode}"`} fill="${ink}">${word}</text></svg>
       <rect x="0" y="${strip.toFixed(2)}" width="200" height="8.5" fill="#0A0A0A"/>${lab}${no}
     </svg>`;
 }
@@ -187,7 +189,7 @@ registerAesthetic({
     ],
     dont: [
       'Use gradients, glows, glass, soft shadows or rounded corners; hard cuts and hairlines only.',
-      'Spread the primary: no colour bar, no underline, no second mark. No barcodes or grid furniture either.',
+      'Spread the primary: no colour stripe, no underline, no second mark. No barcodes, crosshairs or ruled grid furniture on the page either.',
       'Add gothic horror tropes (chains, crosses, skulls, gore), concrete textures or warm literary serif layouts.',
       'Set tiny type below 4.5:1 contrast or leave the board with no readable controls; severity is never illegibility.',
     ],
@@ -198,8 +200,17 @@ registerAesthetic({
     // the cover is the cropped word with a caption-sized statement under it
     coverDisplay: 0.22,
     coverMin: 24,
-    // Material slide: the single label object at 1:1, nothing else
-    materialArt() { return `<div class="dl-obj">${dlTag('dl-tag--lg')}</div>`; },
+    // Material slide: the four listed materials as objects, at scale and nothing else: a ruled
+    // hairline, the blank label held by four stitches, the security strip and the main action
+    // (an ink block carrying the one 6px primary square).
+    materialArt() {
+      return `<div class="dl-obj">
+        <div class="dl-m dl-m-hair"><i></i><span>Hairline · 1px</span></div>
+        ${dlTag('dl-tag--lg')}
+        <div class="dl-m dl-m-strip"><b>Classified / Division 07 / Not for release</b><b>2026.114</b></div>
+        <div class="dl-m dl-m-act"><span class="ab-cta"><span class="ab-cta-label">Request a viewing</span></span><span>Main action · 6px mark</span></div>
+      </div>`;
+    },
     // In product: one product page, one item, its accession number and one action
     product(ctx) {
       const e = ctx.e;
@@ -229,7 +240,7 @@ registerAesthetic({
     dont: [
       'Add gradients, glows or glass.',
       'Use gothic tropes like chains or skulls.',
-      'Add barcodes, grids or a colour bar.',
+      'Add barcodes, crosshairs or a second mark.',
     ],
   },
 });

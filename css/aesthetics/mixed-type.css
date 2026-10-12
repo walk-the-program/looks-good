@@ -19,7 +19,7 @@
 .ab[data-ae="mixed-type"] .ab-brand { font-weight: var(--mt-w-b, 600); letter-spacing: calc(-0.02em * var(--ab-tr, 1)); font-size: clamp(16px, 2.2cqw, 21px); }
 .ab[data-ae="mixed-type"] .ab-mark {
   width: 30px; height: 30px; border-radius: 0; background: var(--ab-ink); color: var(--ab-canvas);
-  font-family: var(--mt-f-i); font-style: italic; font-weight: var(--mt-w-i, 400); font-size: 19px; padding-bottom: 2px;
+  font-family: var(--mt-f-i); font-style: var(--mt-s-i, italic); font-weight: var(--mt-w-i, 400); font-size: 19px; padding-bottom: 2px;
 }
 .ab[data-ae="mixed-type"] .ab-tag { font-size: 10px; letter-spacing: 0.12em; }
 .ab[data-ae="mixed-type"] .ab-rule { background: var(--ab-line); }
@@ -63,13 +63,13 @@
   background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.22) 0 1px, transparent 1.5px) 0 0 / 0.09em 0.09em, var(--ab-primary);
   color: var(--ab-on-primary); box-shadow: inset 0 0 0 0.02em var(--ab-canvas);
 }
-.ab[data-ae="mixed-type"] .mt-chip i { font-family: var(--mt-f-i); font-style: italic; font-weight: 400; font-size: 0.62em; line-height: 1; transform: translateY(0.06em); }
+.ab[data-ae="mixed-type"] .mt-chip i { font-family: var(--mt-f-i); font-style: var(--mt-s-i, italic); font-weight: var(--mt-w-i, 400); font-size: 0.62em; line-height: 1; transform: translateY(0.06em); }
 .ab[data-ae="mixed-type"] .mt-chip--img { background: var(--ab-canvas); }
 .ab[data-ae="mixed-type"] .mt-chip img { max-width: 86%; max-height: 80%; object-fit: contain; }
 .ab[data-ae="mixed-type"] .mt-line[data-band="2"] .mt-chip { background-color: var(--ab-ink); color: var(--ab-canvas); }
 .ab[data-ae="mixed-type"] .mt-w[data-v="b"] { font-family: var(--mt-f-b); font-weight: var(--mt-w-b); font-size: calc(1em * var(--mt-k-b, 1)); }
 .ab[data-ae="mixed-type"] .mt-w[data-v="i"] {
-  font-family: var(--mt-f-i); font-weight: var(--mt-w-i); font-style: italic; font-size: calc(1em * var(--mt-k-i, 1)); letter-spacing: -0.012em;
+  font-family: var(--mt-f-i); font-weight: var(--mt-w-i); font-style: var(--mt-s-i, italic); font-size: calc(1em * var(--mt-k-i, 1)); letter-spacing: -0.012em;
 }
 .ab[data-ae="mixed-type"] .mt-w[data-v="h"] {
   font-family: var(--mt-f-h); font-weight: var(--mt-w-h); font-size: calc(1em * var(--mt-k-h, 1));
@@ -81,7 +81,7 @@
 .ab[data-ae="mixed-type"] .mt-hl { color: inherit; }
 .ab[data-ae="mixed-type"] .mt-ast {
   display: inline-block; position: relative; top: 0.04em; margin-left: 0.06em; vertical-align: top;
-  font-family: var(--mt-f-i); font-style: normal; font-weight: 400; font-size: 0.5em; line-height: 1;
+  font-family: var(--mt-f-i); font-style: normal; font-weight: var(--mt-w-i, 400); font-size: 0.5em; line-height: 1;
 }
 
 .ab[data-ae="mixed-type"] .mt-lead {
@@ -145,7 +145,7 @@
 .ab[data-ae="mixed-type"] .ab-labelrow { align-items: baseline; padding-bottom: 8px; margin-bottom: 18px; border-bottom: 1px solid var(--ab-ink); }
 .ab[data-ae="mixed-type"] .ab-label { font-size: 10.5px; letter-spacing: 0.14em; color: var(--ab-ink); display: inline-flex; align-items: baseline; gap: 10px; }
 .ab[data-ae="mixed-type"] .ab-label:last-child:not(:first-child) { color: var(--ab-muted); }
-.ab[data-ae="mixed-type"] .ab-n { font-family: var(--mt-f-i); font-style: italic; font-weight: var(--mt-w-i, 400); font-size: 22px; line-height: 1; letter-spacing: 0; color: var(--ab-ink); }
+.ab[data-ae="mixed-type"] .ab-n { font-family: var(--mt-f-i); font-style: var(--mt-s-i, italic); font-weight: var(--mt-w-i, 400); font-size: 22px; line-height: 1; letter-spacing: 0; color: var(--ab-ink); }
 .ab[data-ae="mixed-type"] .ab-n::after { content: ""; }
 
 /* ----- palette: italic role names, mono hexes ----- */
@@ -153,7 +153,7 @@
 .ab[data-ae="mixed-type"] .ab-swatch { counter-increment: mtsw; }
 .ab[data-ae="mixed-type"] .ab-chip { height: clamp(46px, 7cqw, 78px); margin-bottom: 12px; border-radius: 0; box-shadow: inset 0 0 0 1px var(--ab-line); }
 .ab[data-ae="mixed-type"] .ab-sw-role {
-  font-family: var(--mt-f-i); font-style: italic; font-weight: var(--mt-w-i, 400); font-size: calc(clamp(18px, 2.4cqw, 23px) * var(--mt-k-i, 1)); line-height: 1.1; letter-spacing: 0;
+  font-family: var(--mt-f-i); font-style: var(--mt-s-i, italic); font-weight: var(--mt-w-i, 400); font-size: calc(clamp(18px, 2.4cqw, 23px) * var(--mt-k-i, 1)); line-height: 1.1; letter-spacing: 0;
 }
 .ab[data-ae="mixed-type"] .ab-sw-role::before {
   content: counter(mtsw, decimal-leading-zero); margin-right: 8px; vertical-align: 0.22em;
@@ -168,7 +168,7 @@
 .ab[data-ae="mixed-type"] .ab-type-col:first-child { padding-left: 0; border-left: 0; }
 .ab[data-ae="mixed-type"] .ab-type-role { font-family: var(--mt-f-m); font-size: 10px; letter-spacing: 0.14em; color: var(--ab-ink); }
 .ab[data-ae="mixed-type"] .ab-type-role::before { content: counter(mtc, decimal-leading-zero) "  "; color: var(--ab-muted); white-space: pre; }
-.ab[data-ae="mixed-type"] .ab-type-class { margin: 4px 0 12px !important; font-family: var(--mt-f-i); font-style: italic; font-weight: var(--mt-w-i, 400); font-size: 16px; line-height: 1.2; }
+.ab[data-ae="mixed-type"] .ab-type-class { margin: 4px 0 12px !important; font-family: var(--mt-f-i); font-style: var(--mt-s-i, italic); font-weight: var(--mt-w-i, 400); font-size: 16px; line-height: 1.2; }
 .ab[data-ae="mixed-type"] .ab-type-picks { gap: 4px; }
 .ab[data-ae="mixed-type"] .ab-type-pick { color: var(--ab-ink); letter-spacing: -0.01em; }
 .ab[data-ae="mixed-type"] .ab-type-pick:first-child { font-size: clamp(26px, 3.9cqw, 42px); line-height: 1.04; margin-bottom: 6px; letter-spacing: -0.02em; }
@@ -183,7 +183,7 @@
 .ab[data-ae="mixed-type"] .ab-type-foot { margin-top: 0; padding-top: 14px; border-top: 1px solid var(--ab-line); }
 .ab[data-ae="mixed-type"] .ab-type-k { font-family: var(--mt-f-m); font-size: 10px; letter-spacing: 0.14em; }
 .ab[data-ae="mixed-type"] .ab-type-avoid { font-family: var(--mt-f-m); font-size: 11px; }
-.ab[data-ae="mixed-type"] .ab-type-why { font-family: var(--mt-f-i); font-style: italic; font-weight: var(--mt-w-i, 400); font-size: 17px; line-height: 1.3; color: var(--ab-ink); }
+.ab[data-ae="mixed-type"] .ab-type-why { font-family: var(--mt-f-i); font-style: var(--mt-s-i, italic); font-weight: var(--mt-w-i, 400); font-size: 17px; line-height: 1.3; color: var(--ab-ink); }
 .ab[data-ae="mixed-type"] .ab-type-apply {
   padding: 11px 16px; border: 1px solid var(--ab-ink); border-radius: 0; background: transparent; color: var(--ab-ink);
   font-family: var(--mt-f-m); font-size: 11px; font-weight: 400; letter-spacing: 0.1em; text-transform: uppercase;
@@ -202,7 +202,7 @@
 }
 .ab[data-ae="mixed-type"] .ab-seg-btn[aria-pressed="true"] { color: var(--ab-ink); }
 /* the mix in the nav: Design (serif italic), Build (heavy), Launch (mono) */
-.ab[data-ae="mixed-type"] .ab-seg-btn:nth-child(1) { font-family: var(--mt-f-i); font-style: italic; font-weight: 400; font-size: 19px; letter-spacing: 0; }
+.ab[data-ae="mixed-type"] .ab-seg-btn:nth-child(1) { font-family: var(--mt-f-i); font-style: var(--mt-s-i, italic); font-weight: var(--mt-w-i, 400); font-size: 19px; letter-spacing: 0; }
 .ab[data-ae="mixed-type"] .ab-seg-btn:nth-child(2) { font-family: var(--mt-f-h); font-weight: var(--mt-w-h); font-size: 14px; text-transform: uppercase; letter-spacing: -0.01em; }
 .ab[data-ae="mixed-type"] .ab-seg-btn:nth-child(3) { font-family: var(--mt-f-m); font-weight: 400; font-size: 13px; letter-spacing: 0.02em; }
 .ab[data-ae="mixed-type"] .ab-seg-btn[aria-pressed="true"]::after { content: ""; position: absolute; left: 0; right: 0; bottom: -1px; height: 3px; background: var(--ab-primary); }
@@ -211,7 +211,7 @@
    in the shared card markup, which also rewrites the title through textContent on a stage change; so the whole
    title stays in the serif italic (weight 400) and no lone bold capital is left. */
 .ab[data-ae="mixed-type"] .ab-card-title {
-  margin: 24px 0 8px !important; font-family: var(--mt-f-i); font-style: italic; font-weight: 400;
+  margin: 24px 0 8px !important; font-family: var(--mt-f-i); font-style: var(--mt-s-i, italic); font-weight: var(--mt-w-i, 400);
   font-size: calc(clamp(26px, 3.4cqw, 34px) * var(--mt-k-i, 1)); line-height: 1.08; letter-spacing: -0.01em;
 }
 .ab[data-ae="mixed-type"] .ab-card-body { color: var(--ab-muted); font-size: 13.5px; }
@@ -243,13 +243,13 @@
 .ab[data-ae="mixed-type"] .ab-state-chip { display: flex; width: 100%; justify-content: flex-start; padding: 12px 10px 10px; border: 0; border-radius: 0; font-size: 22px; line-height: 1; white-space: nowrap; overflow: hidden; }
 .ab[data-ae="mixed-type"] .ab-state-chip[data-s="0"] { background: var(--ab-canvas); color: var(--ab-ink); box-shadow: inset 0 0 0 1px var(--ab-ink); font-family: var(--mt-f-h); font-weight: var(--mt-w-h); text-transform: uppercase; font-size: 17px; letter-spacing: -0.01em; }
 .ab[data-ae="mixed-type"] .ab-state-chip[data-s="1"] { background: var(--ab-ink); color: var(--ab-canvas); font-family: var(--mt-f-b); font-weight: var(--mt-w-b); }
-.ab[data-ae="mixed-type"] .ab-state-chip[data-s="2"] { background: var(--ab-primary); color: var(--ab-on-primary); font-family: var(--mt-f-i); font-style: italic; font-weight: 400; }
+.ab[data-ae="mixed-type"] .ab-state-chip[data-s="2"] { background: var(--ab-primary); color: var(--ab-on-primary); font-family: var(--mt-f-i); font-style: var(--mt-s-i, italic); font-weight: var(--mt-w-i, 400); }
 
 /* ----- 03 in use ----- */
 .ab[data-ae="mixed-type"] .ab-list { border-top: 1px solid var(--ab-ink); }
 .ab[data-ae="mixed-type"] .ab-row { grid-template-columns: 3.4ch minmax(0, 1fr) auto minmax(60px, 150px) 5ch; align-items: center; padding: 14px 2px; font-size: 14px; }
-.ab[data-ae="mixed-type"] .ab-row-n { font-family: var(--mt-f-i); font-style: italic; font-weight: var(--mt-w-i, 400); font-size: 24px; line-height: 1; color: var(--ab-ink); }
-.ab[data-ae="mixed-type"] .ab-row-status { padding: 0; border-radius: 0; background: none; font-family: var(--mt-f-i); font-style: italic; font-weight: 400; font-size: 16px; letter-spacing: 0; text-transform: none; color: var(--ab-ink); }
+.ab[data-ae="mixed-type"] .ab-row-n { font-family: var(--mt-f-i); font-style: var(--mt-s-i, italic); font-weight: var(--mt-w-i, 400); font-size: 24px; line-height: 1; color: var(--ab-ink); }
+.ab[data-ae="mixed-type"] .ab-row-status { padding: 0; border-radius: 0; background: none; font-family: var(--mt-f-i); font-style: var(--mt-s-i, italic); font-weight: var(--mt-w-i, 400); font-size: 16px; letter-spacing: 0; text-transform: none; color: var(--ab-ink); }
 .ab[data-ae="mixed-type"] .ab-row-bar { height: 2px; border-radius: 0; background: var(--ab-line); }
 .ab[data-ae="mixed-type"] .ab-row-bar i { background: var(--ab-ink); border-radius: 0; }
 .ab[data-ae="mixed-type"] .ab-row-pct { font-family: var(--mt-f-n, var(--mt-f-h)); font-weight: var(--mt-w-n, 700); font-size: 26px; line-height: 1; letter-spacing: 0; text-align: right; }
@@ -259,12 +259,11 @@
   .ab[data-ae="mixed-type"] .ab-row { grid-template-columns: 3.4ch minmax(0, 1fr) 5ch; }
   .ab[data-ae="mixed-type"] .ab-brand { font-size: 16px; }
   .ab[data-ae="mixed-type"] .ab-tag { font-size: 9px; letter-spacing: 0.08em; }
-  .ab[data-ae="mixed-type"] .ab-disc { max-width: 72px; }
 }
 
 /* ----- footer ----- */
 .ab[data-ae="mixed-type"] .ab-foot { align-items: baseline; border-top: 1px solid var(--ab-ink); color: var(--ab-muted); font-size: 10.5px; }
-.ab[data-ae="mixed-type"] .ab-motto { font-family: var(--mt-f-i); font-style: italic; font-weight: var(--mt-w-i, 400); font-size: 19px; letter-spacing: 0; color: var(--ab-ink); }
+.ab[data-ae="mixed-type"] .ab-motto { font-family: var(--mt-f-i); font-style: var(--mt-s-i, italic); font-weight: var(--mt-w-i, 400); font-size: 19px; letter-spacing: 0; color: var(--ab-ink); }
 .ab[data-ae="mixed-type"] .ab-dot { width: 8px; height: 8px; margin-right: 10px; border-radius: 0; background: var(--ab-primary); }
 .ab[data-ae="mixed-type"] .ab-infl { font-family: var(--mt-f-m); letter-spacing: 0.04em; }
 

@@ -10,14 +10,6 @@
   // Mono face for SVG lettering (self-contained: the art never relies on board css).
   const MONO = 'font-family="ui-monospace,SF Mono,Menlo,monospace"';
 
-  // Largest published weight <= target: a single-weight face (Michroma) is asked for its 400.
-  function rfWeight(target) {
-    const f = typeof state !== 'undefined' && state && state.headingFont;
-    const ws = String((f && f.weights) || '400').split(';').map(Number).filter(Boolean);
-    const le = ws.filter(w => w <= target);
-    return le.length ? Math.max(...le) : Math.min(...ws);
-  }
-
   // The one chromatic colour: the brand primary, nudged until it reads as a mark on
   // the canvas (3:1). Everything else on the page is ink.
   function signalOf(t) {
@@ -146,8 +138,8 @@
   function pairSvg(t, kind) {
     const sig = t.primary;
     const svg = kind === 'do'
-      ? `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 80"><rect width="240" height="80" fill="#000"/><circle cx="120" cy="322" r="262" fill="#0b0c0e" stroke="${sig}" stroke-width="1.2"/><ellipse cx="120" cy="52" rx="96" ry="12" fill="none" stroke="#fff" stroke-opacity=".4" stroke-width=".6" transform="rotate(-8 120 52)"/><rect x="56" y="38" width="3.2" height="1.2" fill="#fff"/></svg>`
-      : `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 80"><defs><filter id="g"><feGaussianBlur stdDeviation="4"/></filter></defs><rect width="240" height="80" fill="#000"/><g filter="url(#g)"><circle cx="40" cy="40" r="16" fill="${sig}"/><circle cx="100" cy="40" r="16" fill="${t.secondary}"/><circle cx="160" cy="40" r="16" fill="${t.accent}"/><circle cx="210" cy="40" r="12" fill="#fff"/></g><circle cx="40" cy="40" r="9" fill="${sig}"/><circle cx="100" cy="40" r="9" fill="${t.secondary}"/><circle cx="160" cy="40" r="9" fill="${t.accent}"/><circle cx="210" cy="40" r="7" fill="#fff"/></svg>`;
+      ? `<svg xmlns="http://www.w3.org/2000/svg" width="240" height="80" viewBox="0 0 240 80"><rect width="240" height="80" fill="#000"/><circle cx="120" cy="322" r="262" fill="#0b0c0e" stroke="${sig}" stroke-width="1.2"/><ellipse cx="120" cy="52" rx="96" ry="12" fill="none" stroke="#fff" stroke-opacity=".4" stroke-width=".6" transform="rotate(-8 120 52)"/><rect x="56" y="38" width="3.2" height="1.2" fill="#fff"/></svg>`
+      : `<svg xmlns="http://www.w3.org/2000/svg" width="240" height="80" viewBox="0 0 240 80"><defs><filter id="g"><feGaussianBlur stdDeviation="4"/></filter></defs><rect width="240" height="80" fill="#000"/><g filter="url(#g)"><circle cx="40" cy="40" r="16" fill="${sig}"/><circle cx="100" cy="40" r="16" fill="${t.secondary}"/><circle cx="160" cy="40" r="16" fill="${t.accent}"/><circle cx="210" cy="40" r="12" fill="#fff"/></g><circle cx="40" cy="40" r="9" fill="${sig}"/><circle cx="100" cy="40" r="9" fill="${t.secondary}"/><circle cx="160" cy="40" r="9" fill="${t.accent}"/><circle cx="210" cy="40" r="7" fill="#fff"/></svg>`;
     return `url("data:image/svg+xml,${encodeURIComponent(svg)}")`;
   }
 
@@ -193,7 +185,8 @@
       return b.isDark ? '#08090b' : b.mix('#ffffff', b.canvas, 0.15);
     },
 
-    tokens(t) {
+    tokens(t, st) {
+      const S = st || (typeof state !== 'undefined' ? state : null) || {};
       const sig = signalOf(t);
       return {
         '--rf-hair-2': t.alpha(t.ink, 0.08),
@@ -202,7 +195,8 @@
         '--ab-rf-panel': t.isDark ? t.mix('#ffffff', t.canvas, 0.035) : t.mix('#ffffff', t.canvas, 0.6),
         '--rf-do': pairSvg(t, 'do'),
         '--rf-dont': pairSvg(t, 'dont'),
-        '--rf-hw': rfWeight(700),
+        // largest published weight <= 700: a single-weight face (Michroma) is asked for its 400
+        '--rf-hw': abWeight(S.headingFont, 700),
       };
     },
 

@@ -62,8 +62,18 @@ registerAesthetic({
   layout: { hero: 'centered', palette: 'swatches', sections: 'two-col' },
   // Deck copy (js/brand-deck.js): three principles, three do / don't lines, each short.
   deck: {
-    materialStage: 'pattern',
     coverDisplay: 0.7,
+    // Material slide: the four listed materials drawn at scale, each in a hairline cell that
+    // carries its own three micro corner labels; one giant crosshair is the slide's huge element.
+    materialArt(ctx) {
+      const t = ctx.t;
+      const cell = (n, k, code, body) => `<div class="mgm-cell mgm-${k}"><span class="mgm-i">A.0${n}</span><span class="mgm-c">${code}</span>${body}<span class="mgm-p">P.0${n}/04</span></div>`;
+      const hair = `<div class="mgm-rules"><i class="is-1"></i><i class="is-2"></i><i class="is-3"></i></div><p class="mgm-cap"><b>HAIRLINE</b> 1PX ${t.ink.toUpperCase()} · 100 / 50 / 20%</p>`;
+      const micro = `<p class="mgm-spec">ABCDEFGHIJKLM<br>NOPQRSTUVWXYZ<br>0123456789 →↑×</p><p class="mgm-cap"><b>MICROTYPE</b> 8PX MONO · .16EM · CAPS</p>`;
+      const corner = `<div class="mgm-box"><span>A.01</span><span>MG–0412–C</span><span>P.02/04</span></div><p class="mgm-cap"><b>CORNER LABELS</b> INDEX · CODE · PAGE</p>`;
+      const cross = `<div class="mgm-xs"><i class="mgm-x is-big is-p"></i><i class="mgm-x"></i><i class="mgm-x is-p"></i></div><p class="mgm-cap"><b>CROSSHAIR</b> 9PX · ${t.primary.toUpperCase()} 3PX CORE</p>`;
+      return `<div class="mgm">${cell(1, 'hair', 'MG–0412–A', hair)}${cell(2, 'micro', 'MG–0412–B', micro)}${cell(3, 'corner', 'MG–0412–C', corner)}${cell(4, 'cross', 'MG–0412–D', cross)}</div>`;
+    },
     principles: [
       ['One huge element', 'The brand glyph, fifty times the microtype.'],
       ['Stickers on the object', 'Spec table, QR and hazard tape laid over it.'],
@@ -112,15 +122,12 @@ registerAesthetic({
     },
   },
 
-  tokens(t) {
-    const st = typeof state !== 'undefined' ? state : null;
-    const hf = st && st.headingFont;
-    const ws = String((hf && hf.weights) || '400').split(';').map(Number).filter(Boolean);
-    const le = ws.filter(x => x <= 700);
-    const hw = le.length ? Math.max(...le) : Math.min(...ws);
+  tokens(t, st) {
+    const v = st || (typeof state !== 'undefined' ? state : null);
     return {
       '--ab-type-pick-w': 400,
-      '--ab-hw': hw,
+      // the heading face's heaviest weight up to 700 (Archivo Black: its one 400)
+      '--ab-hw': abWeight(v && v.headingFont, 700),
       '--ab-hair': t.alpha(t.ink, 0.5),
       '--ab-hair-soft': t.alpha(t.ink, 0.2),
       '--ab-hair-faint': t.alpha(t.ink, 0.1),
@@ -149,13 +156,14 @@ registerAesthetic({
     // Metric guides (plate %): cap line y10, baseline y88, the glyph's measured ink edges, centre (50,50).
     // Callouts: label centre (x,y), marker (tx,ty). The leader runs from the label centre
     // horizontally to tx, then drops vertically to ty; the label's canvas knock-out hides the
-    // part under it, so no line ever crosses text. `ph` = also shown on a phone.
+    // part under it, so no line ever crosses text. `ph` = also shown on a phone; `cv` = also
+    // shown on the deck cover's smaller plate (the others would collide with the stickers there).
     // the glyph's ink edges (plate %), measured on a canvas: font-size = 0.797 x plate width
     // (78% of a 1.36:1 plate = cap height); falls back to a typical bold capital
     let bl = 18, br = 82;
     try {
       const cv = document.createElement('canvas').getContext('2d');
-      cv.font = `${(st.headingFont && /[0-9]/.test(String(st.headingFont.weights || '')) ? Math.min(700, Math.max(...String(st.headingFont.weights).split(';').map(Number).filter(n => n <= 700).concat([400]))) : 700)} 100px ${(st.headingFont && st.headingFont.css) || 'sans-serif'}`;
+      cv.font = `${st.headingFont ? abWeight(st.headingFont, 700) : 700} 100px ${(st.headingFont && st.headingFont.css) || 'sans-serif'}`;
       const m = cv.measureText(ctx.initial || 'M');
       const k = 0.797;   // em in plate widths
       const adv = m.width / 100 * k * 100;
@@ -165,18 +173,20 @@ registerAesthetic({
     } catch (err) { /* keep the defaults */ }
     const span = br - bl;
     const calls = [
-      { i: 'A.01', k: 'CAP HEIGHT', x: 9, y: 22, tx: +(bl + span * 0.18).toFixed(1), ty: 10, ph: 1 },
+      { i: 'A.01', k: 'CAP HEIGHT', x: 9, y: 22, tx: +(bl + span * 0.18).toFixed(1), ty: 10, ph: 1, cv: 1 },
       { i: 'A.02', k: 'L. BEARING', x: Math.max(6, bl - 9), y: 40, tx: bl, ty: 40 },
-      { i: 'A.04', k: 'ADVANCE', x: 58, y: 17, tx: +(br - span * 0.1).toFixed(1), ty: 10, ph: 1 },
+      // above the cap line, so its knock-out never bites the glyph
+      { i: 'A.04', k: 'ADVANCE', x: 58, y: 7, tx: +(br - span * 0.1).toFixed(1), ty: 10 },
       { i: 'A.05', k: 'OPT. CENTER', x: 89, y: 48, tx: 50, ty: 50, mark: true },
-      { i: 'A.06', k: 'BASELINE', x: 89, y: 81, tx: +(br - span * 0.05).toFixed(1), ty: 88, ph: 1, mark: true },
-      { i: 'A.08', k: 'ORIGIN', x: 38, y: 94, tx: bl, ty: 88, ph: 1 },
+      { i: 'A.06', k: 'BASELINE', x: 89, y: 81, tx: +(br - span * 0.05).toFixed(1), ty: 88, ph: 1, cv: 1, mark: true },
+      { i: 'A.08', k: 'ORIGIN', x: 38, y: 94, tx: bl, ty: 88, ph: 1, cv: 1 },
     ];
-    const leaders = calls.map(c => `<path ${vf} d="M${c.x} ${c.y}H${c.tx}V${c.ty}" stroke-width="1"${c.ph ? '' : ' class="mga-nph"'}/>`).join('');
+    const cls = c => [c.ph ? '' : 'mga-nph', c.cv ? '' : 'mga-ncv'].filter(Boolean).join(' ');
+    const leaders = calls.map(c => `<path ${vf} d="M${c.x} ${c.y}H${c.tx}V${c.ty}" stroke-width="1"${cls(c) ? ` class="${cls(c)}"` : ''}/>`).join('');
     const markers = calls.map(c => `<i class="mga-mk${c.mark ? ' is-p' : ''}${c.ph ? '' : ' mga-nph'}" style="left:${c.tx}%;top:${c.ty}%"></i>`).join('');
     const labels = calls.map(c => {
       const coord = `X ${String(Math.round(c.tx * 4.2)).padStart(3, '0')} Y ${String(Math.round(c.ty * 3.4)).padStart(3, '0')}`;
-      return `<span class="mga-call${c.ph ? '' : ' mga-nph'}" style="--x:${c.x}%;--y:${c.y}%"><b>${c.i}</b> ${c.k}<br><em>${coord}</em></span>`;
+      return `<span class="mga-call${cls(c) ? ' ' + cls(c) : ''}" style="--x:${c.x}%;--y:${c.y}%"><b>${c.i}</b> ${c.k}<br><em>${coord}</em></span>`;
     }).join('');
 
     const table = [

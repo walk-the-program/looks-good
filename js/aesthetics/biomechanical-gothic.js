@@ -82,10 +82,18 @@ registerAesthetic({
     return b.isDark ? '#121412' : '#D6D4CC';
   },
 
-  tokens(t) {
+  tokens(t, st) {
     const p = bgPalette(t);
     const d = t.isDark;
+    const view = st || (typeof state !== 'undefined' ? state : {}) || {};
+    // light mode: small grey text sits on the cast plates (#C8C6BE), not only on the bone ground, so muted is
+    // pulled toward ink until it holds 4.6:1 on both
+    let muted = t.muted;
+    if (!d) for (let w = 0.6; w <= 1.001 && Math.min(t.contrast(muted, p.cast), t.contrast(muted, t.canvas)) < 4.6; w += 0.04) muted = t.mix(t.ink, t.canvas, w);
     return {
+      '--ab-muted': muted,
+      // the medium body weight the face actually has (font-synthesis is off)
+      '--bg-body-mid': abWeight(view.bodyFont || view.headingFont, 500),
       '--ab-bi-glow': p.glow,
       '--ab-glow': p.glow,
       '--ab-bi-hl': p.boneLit,

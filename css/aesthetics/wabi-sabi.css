@@ -96,8 +96,14 @@
 .ab[data-ae="wabi-sabi"] .ab-swatch[data-role="accent"] .ab-chip { background: var(--ab-ws-fired-accent) !important; }
 .ab[data-ae="wabi-sabi"][data-mode="dark"] .ab-swatch[data-role="canvas"] .ab-chip { box-shadow: inset 0 0 0 1px rgba(236, 229, 214, 0.3); }
 /* the tile shows the fired glaze; the raw pigment (the brand hex) is the dot beside the code */
-.ab[data-ae="wabi-sabi"] .ab-sw-hex::before { content: ""; display: inline-block; width: 7px; height: 7px; margin-right: 7px; border-radius: 50%; vertical-align: -0.5px; background: var(--sw); box-shadow: 0 0 0 0.5px rgba(128, 128, 128, 0.5); }
+.ab[data-ae="wabi-sabi"] .ab-sw-hex::before { content: ""; display: inline-block; width: 7px; height: 7px; margin-right: 7px; border-radius: 50%; vertical-align: -0.5px; background: var(--sw); box-shadow: 0 0 0 1px rgba(128, 128, 128, 0.3); }
 .ab[data-ae="wabi-sabi"] .ab-sw-hex { margin-top: 6px; font-family: var(--ab-font-b); font-size: 10.5px; letter-spacing: 0.1em; }
+/* the accent tile is the seal, so its code and dot name the seal (and the fallback reason) instead of the raw
+   client accent the tile no longer shows */
+.ab[data-ae="wabi-sabi"] .ab-swatch[data-role="accent"] .ab-sw-hex { font-size: 0; letter-spacing: 0; }
+.ab[data-ae="wabi-sabi"] .ab-swatch[data-role="accent"] .ab-sw-hex::before { background: var(--ab-ws-seal); }
+.ab[data-ae="wabi-sabi"] .ab-swatch[data-role="accent"] .ab-sw-hex::after { content: var(--ws-accent-hex); font-size: 10.5px; letter-spacing: 0.1em; }
+.ab[data-ae="wabi-sabi"] .ab-swatch[data-role="accent"] .ab-sw-job::after { content: var(--ws-accent-note); display: block; margin-top: 2px; font-size: 10.5px; line-height: 1.4; color: var(--ab-muted); }
 
 /* type: quiet columns under short hairlines */
 .ab[data-ae="wabi-sabi"] .ab-type { padding: clamp(28px, 4.4cqw, 48px) 0; }
@@ -130,7 +136,7 @@
 .ab[data-ae="wabi-sabi"] .ab-seg-btn:first-child { padding-left: 0; }
 .ab[data-ae="wabi-sabi"] .ab-seg-btn + .ab-seg-btn { background: linear-gradient(var(--ab-line), var(--ab-line)) 0 5px / 1px 17px no-repeat; }
 .ab[data-ae="wabi-sabi"] .ab-seg-btn:hover { color: var(--ab-ink); }
-.ab[data-ae="wabi-sabi"] .ab-seg-btn[aria-pressed="true"] { color: var(--ab-ink); font-weight: 400; }
+.ab[data-ae="wabi-sabi"] .ab-seg-btn[aria-pressed="true"] { color: var(--ab-ink); font-weight: var(--ws-ui-mid, 400); }
 .ab[data-ae="wabi-sabi"] .ab-seg-btn[aria-pressed="true"]::after { content: ""; position: absolute; left: calc(50% - 6px); bottom: 1px; width: 12px; height: 8px; background: var(--ws-dot) center / contain no-repeat; }
 .ab[data-ae="wabi-sabi"] .ab-seg-btn[aria-pressed="true"]:first-child::after { left: calc(50% - 15px); }
 .ab[data-ae="wabi-sabi"] .ab-card-title { margin: 32px 0 10px !important; font-weight: 400; font-size: clamp(20px, 2.6cqw, 26px); line-height: 1.3; letter-spacing: 0.01em; }
@@ -141,9 +147,9 @@
   font-size: 11.5px; font-weight: 400; letter-spacing: 0.2em; text-transform: uppercase; transition: background-color 0.6s ease;
 }
 .ab[data-ae="wabi-sabi"] .ab-cta-arrow::before { content: ""; display: inline-block; width: 22px; height: 1px; vertical-align: middle; background: currentColor; opacity: 0.8; }
-.ab[data-ae="wabi-sabi"] .ab-cta:hover, .ab[data-ae="wabi-sabi"] .ab-cta.is-hover { background-color: color-mix(in srgb, var(--ab-ws-glaze) 84%, #000); }
+.ab[data-ae="wabi-sabi"] .ab-cta:hover { background-color: color-mix(in srgb, var(--ab-ws-glaze) 84%, #000); }
 .ab[data-ae="wabi-sabi"][data-mode="dark"] .ab-cta:hover { background-color: color-mix(in srgb, var(--ab-ws-glaze) 86%, #fff); }
-.ab[data-ae="wabi-sabi"] .ab-cta:active, .ab[data-ae="wabi-sabi"] .ab-cta.is-pressed { box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.32); }
+.ab[data-ae="wabi-sabi"] .ab-cta:active { box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.32); }
 
 /* 02 Glaze: no card at all, only space; a bottom-hairline field, a pebble in a groove, three sherds */
 .ab[data-ae="wabi-sabi"] .ab-panel { padding: 2px 0 0; }
@@ -180,7 +186,7 @@
 .ab[data-ae="wabi-sabi"] .ab-row:last-child { border-bottom: 0; }
 .ab[data-ae="wabi-sabi"] .ab-row:last-child::after { content: ""; position: absolute; left: 0; right: 30%; bottom: 0; height: 1px; background: var(--ab-line); }
 .ab[data-ae="wabi-sabi"] .ab-row-n { font: 400 14px/1 var(--ab-font-h); color: var(--ab-muted); }
-.ab[data-ae="wabi-sabi"] .ab-row-name { font: 400 16px/1.3 var(--ab-font-h); letter-spacing: 0.01em; }
+.ab[data-ae="wabi-sabi"] .ab-row-name { font: 400 16px/1.5 var(--ab-font-h); letter-spacing: 0.01em; }
 .ab[data-ae="wabi-sabi"] .ab-row-status { padding: 0; border-radius: 0; background: none; font-size: 10.5px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--ab-muted); }
 .ab[data-ae="wabi-sabi"] .ab-row-bar { position: relative; height: 1px; border-radius: 0; background: var(--ab-line); overflow: visible; }
 .ab[data-ae="wabi-sabi"] .ab-row-bar i { position: relative; height: 1px; background: color-mix(in srgb, var(--ab-ink) 60%, transparent); }
@@ -256,7 +262,6 @@
 .ab[data-ae="wabi-sabi"].ab-slide .ws-mk[data-k="dont"]::before { content: ""; position: absolute; left: 7px; top: -3px; width: 1.5px; height: 18px; background: var(--ab-muted); transform: rotate(32deg); }
 .ab[data-ae="wabi-sabi"].ab-slide .ab-deck-rule { border-top: 0; background: linear-gradient(90deg, var(--ab-line) 0 78%, transparent 78%) 0 0 / 100% 1px no-repeat; }
 /* closing */
-.ab[data-ae="wabi-sabi"].ab-slide .ab-deck-closemain .ab-brand { font-weight: 400; }
 
 .ab[data-ae="wabi-sabi"].ab-slide .ab-deck-prod .ab-row { grid-template-columns: 3ch minmax(0, 1fr) auto minmax(50px, 90px) 4.5ch; column-gap: 14px; }
 .ab[data-ae="wabi-sabi"].ab-slide .ab-deck-prod .ab-row-name { font-size: 15px; }

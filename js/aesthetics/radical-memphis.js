@@ -8,12 +8,6 @@
    of the brand's other hue: the secondary behind primary objects, the primary behind
    everything else. Cards are always paper, so the board
    also works in dark mode. No Corporate-Memphis people, no confetti. */
-// Heaviest real weight (FONTS `weights`) of the heading face, up to `cap`.
-function mmHeavy(cap) {
-  const f = typeof state !== 'undefined' && state && state.headingFont;
-  const ws = String((f && f.weights) || '400').split(';').map(Number).filter(n => n > 0 && n <= cap);
-  return ws.length ? Math.max(...ws) : 400;
-}
 
 registerAesthetic({
   key: 'radical-memphis', order: 33,
@@ -65,7 +59,8 @@ registerAesthetic({
     return b.isDark ? b.canvas : b.mix('#F6F1E7', b.canvas, 0.62);
   },
 
-  tokens(t) {
+  tokens(t, vs) {
+    const st = vs || (typeof state !== 'undefined' ? state : null);
     const d = t.isDark;
     const lightBrand = d ? t.ink : t.canvas;
     const darkBrand = d ? t.canvas : t.ink;
@@ -89,7 +84,7 @@ registerAesthetic({
       '--ab-m-pri-lo': t.mix(t.primary, paper, 0.16),
       '--ab-type-pick-w': '400',
       // the heading face's heaviest real weight up to 700 (Archivo Black has only 400; font-synthesis is off)
-      '--mm-hw': mmHeavy(700),
+      '--mm-hw': abWeight(st && st.headingFont, 700),
       // text on the solid secondary slab (the headline's last word): black unless the secondary is dark
       '--ab-m-on-sec': t.contrast(black, t.secondary) >= 4.5 ? black : paper,
     };

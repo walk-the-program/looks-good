@@ -30,7 +30,7 @@
 .ab[data-ae="blueprint"] .ab-in { padding: calc(var(--ab-pad) + 12px); }
 
 /* ---- header and rules ---- */
-.ab[data-ae="blueprint"] .ab-brand { font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; font-size: clamp(13px, 1.7cqw, 16px); }
+.ab[data-ae="blueprint"] .ab-brand { font-weight: var(--bp-hw, 600); letter-spacing: 0.08em; text-transform: uppercase; font-size: clamp(13px, 1.7cqw, 16px); }
 .ab[data-ae="blueprint"] .ab-mark { width: 28px; height: 28px; border-radius: 0; background: transparent; border: 1.5px solid var(--ab-l1); color: var(--ab-ink); font: 600 13px/1 var(--bp-mono); }
 .ab[data-ae="blueprint"] .ab-tag { font-size: 10px; letter-spacing: 0.14em; }
 .ab[data-ae="blueprint"] .ab-rule { height: 1px; background: var(--ab-l2); }
@@ -170,7 +170,8 @@
 .ab[data-ae="blueprint"] .ab-seg-btn { min-height: 36px; border-radius: 0; border-left: 1px solid var(--ab-l2); background: transparent; font: 500 11px var(--bp-mono); letter-spacing: 0.12em; text-transform: uppercase; color: var(--ab-muted); }
 .ab[data-ae="blueprint"] .ab-seg-btn:first-child { border-left: 0; }
 .ab[data-ae="blueprint"] .ab-seg-btn:hover { color: var(--ab-ink); }
-.ab[data-ae="blueprint"] .ab-seg-btn[aria-pressed="true"] { background: var(--bp-hatch); box-shadow: var(--bp-sel); color: var(--ab-ink); font-weight: 700; }
+/* selected: hatch inside a double outline; the label sits on a clear field plate, so no hatch line runs through it */
+.ab[data-ae="blueprint"] .ab-seg-btn[aria-pressed="true"] { background: linear-gradient(var(--ab-canvas), var(--ab-canvas)) center / calc(100% - 16px) 1.7em no-repeat, var(--bp-hatch); box-shadow: var(--bp-sel); color: var(--ab-ink); font-weight: 700; }
 .ab[data-ae="blueprint"] .ab-card-title { margin: 24px 0 8px !important; font-weight: 400; text-transform: uppercase; letter-spacing: calc(0.04em * var(--ab-tr, 1)); font-size: clamp(18px, 2.3cqw, 22px); }
 .ab[data-ae="blueprint"] .ab-card-body { font-size: 13.5px; }
 .ab[data-ae="blueprint"] .ab-cta, .ab[data-ae="blueprint"] .ab-states .ab-state-ctl {
@@ -272,3 +273,13 @@
 }
 /* deck Do / Don't: the rule numbers are line work, not the brand colour (the primary is the revision cloud only) */
 .ab[data-ae="blueprint"].ab-slide { --dk-mark-do: var(--ab-ink); }
+
+/* 09 do / don't: the line-type set against a filled, rounded, shaded part (data-URI pair from tokens) */
+.ab[data-ae="blueprint"].ab-slide .ab-deck-col::before {
+  content: ""; display: block; aspect-ratio: 3 / 1; margin-bottom: 18px; background: var(--bp-do) center / 100% 100% no-repeat; box-shadow: inset 0 0 0 1px var(--ab-l3);
+}
+.ab[data-ae="blueprint"].ab-slide .ab-deck-col[data-kind="dont"]::before { background-image: var(--bp-dont); }
+/* the heading face's own weight for its name on the type card (Share Tech Mono has only 400) */
+.ab[data-ae="blueprint"] :is(.ab-type-col[data-role="heading"] .ab-type-cur b, .ab-deck-ptitle, .ab-deck-pchip) { font-weight: var(--bp-hw, 600); }
+/* at 400 the 3:1 highlight chip needs large-text size */
+.ab[data-ae="blueprint"].ab-slide .ab-deck-pchip { font-size: 24px; }

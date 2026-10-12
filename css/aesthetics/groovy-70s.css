@@ -83,8 +83,8 @@
 }
 .ab[data-ae="groovy-70s"] .ab-swatch[data-role="canvas"] { box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--ab-ink) 16%, transparent); }
 .ab[data-ae="groovy-70s"] .ab-sw-role { margin: 0; flex: 0 0 7em; font-family: var(--ab-font-h); font-weight: var(--ab-hw); font-size: 15px; letter-spacing: 0; }
-.ab[data-ae="groovy-70s"] .ab-sw-job { margin: 0; flex: 1; min-width: 0; font-size: 12px; opacity: 0.85; }
-.ab[data-ae="groovy-70s"] .ab-sw-hex { margin: 0; font-size: 12px; letter-spacing: 0.06em; opacity: 0.9; font-family: var(--ab-font-b); font-weight: 600; }
+.ab[data-ae="groovy-70s"] .ab-sw-job { margin: 0; flex: 1; min-width: 0; font-size: 12px; opacity: 1; }
+.ab[data-ae="groovy-70s"] .ab-sw-hex { margin: 0; font-size: 12px; letter-spacing: 0.06em; opacity: 1; font-family: var(--ab-font-b); font-weight: 600; }
 
 /* ---- type block: blobs ---- */
 .ab[data-ae="groovy-70s"] .ab-type-col { padding: 20px 22px 18px; border-top: 0; border-radius: 30px; background: var(--ab-b1); color: var(--ab-on-b1); }
@@ -131,7 +131,7 @@
   transition: transform .18s cubic-bezier(.3,1.4,.5,1), box-shadow .15s, background .15s;
 }
 .ab[data-ae="groovy-70s"] .ab-cta:hover { transform: scale(1.03); box-shadow: 0 0 0 5px var(--ab-ring); }
-.ab[data-ae="groovy-70s"] .ab-cta:active { transform: scale(0.96); background: var(--ab-pri-dark); box-shadow: none; }
+.ab[data-ae="groovy-70s"] .ab-cta:active { transform: scale(0.96); background: var(--ab-pri-dark); color: var(--gv-on-pri-dark); box-shadow: none; }
 .ab[data-ae="groovy-70s"] .ab-cta-arrow { display: grid; place-items: center; width: 30px; height: 30px; border-radius: 50%; background: color-mix(in srgb, var(--ab-on-primary) 24%, transparent); }
 .ab[data-ae="groovy-70s"] .ab-cta-arrow::before { content: "→"; font-size: 16px; line-height: 1; }
 
@@ -151,7 +151,7 @@
 .ab[data-ae="groovy-70s"] .ab-state { font-size: 12px; font-weight: 600; color: var(--ab-ink); }
 .ab[data-ae="groovy-70s"] .ab-states .ab-state-ctl { border-radius: 999px; padding: 12px 10px; background: var(--ab-primary); color: var(--ab-on-primary); font-weight: 600; justify-content: center; box-shadow: none; transition: none; }
 .ab[data-ae="groovy-70s"] .ab-states .ab-state-ctl.is-hover { transform: scale(1.06); box-shadow: 0 0 0 5px var(--ab-ring); }
-.ab[data-ae="groovy-70s"] .ab-states .ab-state-ctl.is-pressed { transform: scale(0.93); background: var(--ab-pri-dark); }
+.ab[data-ae="groovy-70s"] .ab-states .ab-state-ctl.is-pressed { transform: scale(0.93); background: var(--ab-pri-dark); color: var(--gv-on-pri-dark); }
 
 /* ---- 03 in use: SOLID band-colour rows (primary, accent, brown) with contrast-picked type ---- */
 .ab[data-ae="groovy-70s"] .ab-list { counter-reset: gvrow; display: grid; gap: 10px; }
@@ -205,13 +205,14 @@
   .ab[data-ae="groovy-70s"] .ab-cta:hover, .ab[data-ae="groovy-70s"] .ab-cta:active, .ab[data-ae="groovy-70s"] .ab-type-apply:hover { transform: none; }
 }
 
-/* Deck cover: the arch at ~85% of the slide height, centred and bleeding off the bottom edge,
+/* Deck cover: the whole arch, straight legs included, standing on the meta row (its top stays
+   just under the statement), centred;
    the statement above it at ~72px (def.deck.coverDisplay 0.55). def.deck.coverBand: false drops
    the pattern band (the arch is the cover). */
 .ab[data-ae="groovy-70s"].ab-slide[data-slide="cover"] .ab-deck-cover { justify-content: flex-start; }
 .ab[data-ae="groovy-70s"].ab-slide[data-slide="cover"] .ab-hero { position: static; padding: 0; }
 .ab[data-ae="groovy-70s"].ab-slide[data-slide="cover"] .ab-hero > .ab-art {
-  position: absolute; z-index: 0; left: 50%; bottom: -60px; width: 1000px; max-width: none; height: auto; aspect-ratio: 200 / 112; transform: translateX(-50%); margin: 0;
+  position: absolute; z-index: 0; left: 50%; bottom: 146px; width: auto; max-width: none; height: 352px; aspect-ratio: 200 / 112; transform: translateX(-50%); margin: 0;
 }
 .ab[data-ae="groovy-70s"].ab-slide[data-slide="cover"] .ab-hero-copy { position: relative; z-index: 1; max-width: 900px; margin: 0 auto; }
 /* the meta row and the footer are a cream ground band the arch rises from behind */

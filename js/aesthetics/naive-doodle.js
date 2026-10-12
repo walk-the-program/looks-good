@@ -9,7 +9,7 @@
    neatly: a loop overshoots its start, a square's sides run past the corners. The colour is
    a separate CRAYON fill, offset a few pixels from its outline ("coloured in a bit outside"),
    textured with 45-degree hatch strokes (the one crayon method on this board).
-   - tokens(t) draws every UI outline (card, button, segmented row, underline, toggle oval,
+   - tokens(t, state) draws every UI outline (card, button, segmented row, underline, toggle oval,
      toggle faces, ring, tick, star, wavy rule, checkbox, bar, flag, arrows) as small SVG data
      URIs in the line colour, seeded per brand, so the CSS only positions them. Stroke width
      is non-scaling, so a stretched outline keeps a 2.6px pen.
@@ -18,7 +18,7 @@
    - headline(ctx, text): each word its own tiny tilt (±1.5°, display only) and the last word
      coloured in with an accent crayon scribble that overshoots the word, plus a squiggle.
    - art(ctx): one big drawing on wide paper: a hand-drawn smiley sun bleeding off the
-     right edge, dash rays, two clouds, a hill coloured outside its line, three loop flowers,
+     right edge, dash rays, two clouds, a hill mound coloured outside its line, three loop flowers,
      and a handwritten note with a loop arrow. Pure SVG with inline attributes, so it draws
      the same inside another aesthetic's hero box (blend donor). */
 (function () {
@@ -164,7 +164,6 @@ function ndKit(t, ink, c1, c3, seed) {
   kit['--nd-face-on'] = face(true);
   kit['--nd-face-off'] = face(false);
   kit['--nd-tick'] = ndSvg(32, 32, P([[4, 17], [12, 26], [30, 2]], 0.5, 3, ink, 3.2), true);
-  kit['--nd-tick-pencil'] = ndSvg(32, 32, P([[4, 17], [12, 26], [30, 2]], 0.5, 3, PENCIL, 3.2), true);
   kit['--nd-cross'] = ndSvg(30, 30, P([[4, 5], [26, 26]], 0.6, 3, ink, 3) + P([[25, 3], [5, 27]], 0.6, 3, ink, 3), true);
   kit['--nd-box'] = ndSvg(28, 28, ndBoxSides(5, 6, 18, 17, 2.5, rnd).map(s => P(s, 0.35, 3, ink, 2.2)).join(''), true);
   const star = [];
@@ -257,14 +256,17 @@ registerAesthetic({
 
   headline(ctx, text) { return ndHeadline(ctx, text); },
 
-  tokens(t) {
+  tokens(t, vs) {
+    const st = vs || (typeof state !== 'undefined' ? state : null);
     const d = t.isDark;
     const ink = d ? '#F4EEDF' : PENCIL;
     let toward = 0.36, muted = t.mix(t.canvas, ink, toward);
     while (toward > 0.05 && t.contrast(muted, t.canvas) < 4.6) { toward -= 0.04; muted = t.mix(t.canvas, ink, toward); }
     const c1 = ndCrayon(t.primary), c2 = ndCrayon(t.secondary), c3 = ndCrayon(t.accent);
-    const hatch = (c, k) => `repeating-linear-gradient(-45deg, ${ndShade(c, k)} 0 1.5px, transparent 1.5px 3.6px)`;
-    const brand = typeof state !== 'undefined' && state && state.content ? String(state.content.brandName || '') : '';
+    // UI crayon grain: paper showing through the wax (lighter streaks), so a pencil label on a
+    // crayon fill keeps its 4.6:1 across the streaks; the hero drawing keeps darker strokes
+    const hatch = c => `repeating-linear-gradient(-45deg, ${t.mix(c, '#FFFBF2', 0.62)} 0 1.5px, transparent 1.5px 3.6px)`;
+    const brand = st && st.content ? String(st.content.brandName || '') : '';
     const kit = ndKit(t, ink, c1, c3, ndHash(brand + (d ? '|d' : '|l')));
     return Object.assign({
       '--ab-ink': ink,
@@ -275,7 +277,7 @@ registerAesthetic({
       '--nd-paper': '#FFFBF2',
       '--nd-grid': d ? 'rgba(244, 238, 223, 0.05)' : '#ECEEE2',
       '--nd-c1': c1, '--nd-c2': c2, '--nd-c3': c3,
-      '--nd-h1': hatch(c1, 16), '--nd-h2': hatch(c2, 16), '--nd-h3': hatch(c3, 14),
+      '--nd-h1': hatch(c1), '--nd-h2': hatch(c2), '--nd-h3': hatch(c3),
       '--nd-wash': t.mix(c2, t.canvas, d ? 0.15 : 0.16),
       '--nd-hand': '"Caveat", "Patrick Hand", "Marker Felt", cursive',
       '--ab-crayon': c1,
@@ -310,10 +312,11 @@ registerAesthetic({
       const a = (i * 30 + 6 + (rnd() - 0.5) * 8) * Math.PI / 180, r0 = R + 16 + rnd() * 5, r1 = r0 + 18 + rnd() * 14;
       rays += P([[cx + Math.cos(a) * r0, cy + Math.sin(a) * r0], [cx + Math.cos(a) * r1, cy + Math.sin(a) * r1]], 0.8, 5, 3.4);
     }
-    // the hill: a line with its crayon filled a little below and to the right of it
-    const hill = [];
-    for (let i = 0; i <= 24; i++) { const x = -20 + i * 18.5; hill.push([x, 306 - Math.sin((x + 20) / 440 * Math.PI) * 46 + Math.sin(x / 37) * 3]); }
-    const low = ndWobble(hill.map(([x, y]) => [x + 6, y + 50 + Math.sin(x / 23) * 4]).reverse(), rnd, 2.2, 9);
+    // the hill: a drawn mound that starts and ends on the paper (never cut by the box edge),
+    // its crayon filled a little below and to the right of the line, thinning to the ends
+    const hill = [], arch = x => Math.sin((x - 14) / 372 * Math.PI);
+    for (let i = 0; i <= 24; i++) { const x = 14 + i * 15.5; hill.push([x, 306 - arch(x) * 46 + Math.sin(x / 37) * 3]); }
+    const low = ndWobble(hill.map(([x, y]) => [x + 6, y + 9 + 10 + arch(x) * 32 + Math.sin(x / 23) * 3]).reverse(), rnd, 2.2, 9);
     const hillFill = `<path d="${ndD(hill.map(([x, y]) => [x + 6, y + 9]).concat(low))}Z" fill="url(#${id}b)"/>`;
     // loop flowers on stems
     const flower = (x, y, s, petal) => {
@@ -372,6 +375,9 @@ registerAesthetic({
   },
 
   deck: {
+    // cover start size below type.display (1.22): the cover fit then gives the drawing a real
+    // share of the slide instead of shrinking it to a thumbnail beside a three-line headline
+    coverDisplay: 0.92,
     marks: (ctx, kind) => `<i class="nd-mk" data-k="${kind === 'do' ? 'do' : 'dont'}"></i>`,
     principles: [
       ['Proof a human drew it', 'The line wobbles; the drawing stays confident.'],

@@ -60,7 +60,8 @@ registerAesthetic({
     return b.isDark ? b.hslToHex(h.h, Math.min(h.s, 3), Math.min(19, Math.max(13, h.l))) : '#F2C500';
   },
 
-  tokens(t) {
+  tokens(t, st) {
+    const S = st || (typeof state !== 'undefined' ? state : {}) || {};
     const d = t.isDark;
     const W = '#ffffff';
     const B = '#000000';
@@ -68,16 +69,23 @@ registerAesthetic({
     const sig = hex => hex;
     // light mode: the board is safety yellow and every module is #111 steel with white legends
     const steel = '#161616';
+    const plate = d ? t.mix(W, t.canvas, 0.16) : '#262626';
+    // muted legends sit on the plate (header tag, idle annunciator keys): lift them toward the ink
+    // until they hold 4.5:1 there (the plain muted is about 3.4:1 on the dark plate)
+    let modMuted = d ? t.muted : '#BDBBB3';
+    for (let k = 0.1; d && k <= 1 && t.contrast(modMuted, plate) < 4.6; k += 0.1) modMuted = t.mix(t.ink, t.muted, k);
     return {
+      '--ab-hz-hw': abWeight(S.headingFont, 800),
+      '--ab-hz-bw': abWeight(S.bodyFont, 700),
       '--ab-hz-panel': d ? t.mix(W, t.canvas, 0.06) : steel,
-      '--ab-hz-plate': d ? t.mix(W, t.canvas, 0.16) : '#262626',
+      '--ab-hz-plate': plate,
       '--ab-hz-well': d ? t.mix(B, t.canvas, 0.5) : '#0A0A0A',
       '--ab-hz-edge': '#0d0e0f',
       '--ab-hz-hi': t.alpha(W, d ? 0.17 : 0.14),
       '--ab-hz-lo': t.alpha(B, 0.5),
       '--ab-hz-off': d ? t.mix(W, t.canvas, 0.1) : '#333333',
       '--ab-hz-mod-ink': d ? t.ink : '#F2F0E8',
-      '--ab-hz-mod-muted': d ? t.muted : '#BDBBB3',
+      '--ab-hz-mod-muted': modMuted,
       '--ab-hz-yellow': sig('#F2C500'),
       '--ab-hz-orange': sig('#FF6A13'),
       '--ab-hz-red': sig('#D3202A'),
@@ -90,13 +98,12 @@ registerAesthetic({
     };
   },
 
-  // The machine face: a steel plate with an enamel nameplate (model / serial / rating), a stencil-cut zone
-  // numeral at double size that overlaps the nameplate, the zone legend, a lockout tag on a hasp, a 2D mimic
-  // line (tank, valve, pump; one live segment), five lamps in the ladder's own colours (PWR white, RUN green,
+  // The machine face: a steel plate with an enamel nameplate (model / serial / rating) riveted over a
+  // stencil-cut zone numeral at double size (the plate sits on top, so its legend is never crossed), the zone
+  // legend, a lockout tag on a hasp hanging clear of the mimic line (tank, valve, pump; one live segment), five lamps in the ladder's own colours (PWR white, RUN green,
   // ALM yellow lit; LCK red and TST dark) and a 45 degree stripe rail on the lower edge. Pure SVG.
   art(ctx) {
-    const e = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-    const ini = e(ctx.initial);
+    const ini = escapeHtml(ctx.initial);
     const screw = (x, y) => `<g class="hz-screw"><circle cx="${x}" cy="${y}" r="1.7"/><path d="M${x - 1} ${y - 1} L${x + 1} ${y + 1}"/></g>`;
     const lamps = [['PWR', 'pwr'], ['RUN', 'run'], ['ALM', 'alm'], ['LCK', 'lck'], ['TST', '']];
     const lampSvg = lamps.map(([lb, st], i) => {
@@ -111,21 +118,21 @@ registerAesthetic({
       bands += `M${cl(x + slant)} ${ry0} H${cl(x + slant + pitch / 2)} L${cl(x + pitch / 2)} ${ry1} H${cl(x)} Z `;
     }
     // the stencil bridges: plate-coloured cuts through the numeral (two in the 0, one in the 7)
-    const bridges = '<path class="hz-bridge" d="M16.3 8 h2.4 v17 h-2.4z M16.3 50 h2.4 v16 h-2.4z M33 20.6 h19 v2.4 h-19z"/>';
+    const bridges = '<path class="hz-bridge" d="M16.3 14.6 h2.4 v14.9 h-2.4z M16.3 51.6 h2.4 v14.2 h-2.4z M33 25.1 h19 v2.1 h-19z"/>';
     return `<svg class="hz-art" viewBox="0 0 100 90" xmlns="http://www.w3.org/2000/svg" role="presentation" preserveAspectRatio="xMidYMid meet">
       <rect class="hz-body" x="1" y="1" width="98" height="88"/>
       <rect class="hz-bevel" x="2.7" y="2.7" width="94.6" height="84.6"/>
       ${screw(6, 6)}${screw(94, 6)}${screw(6, 84)}${screw(94, 84)}
+      <text class="hz-num" x="5.5" y="64.5" textLength="48" lengthAdjust="spacingAndGlyphs">07</text>${bridges}
       <rect class="hz-name" x="11" y="6.4" width="78" height="8.4"/>
       <text class="hz-nt" x="13.4" y="11.9" textLength="73.2" lengthAdjust="spacingAndGlyphs">MODEL ${ini}R-7 / S/N 004-1187-B / 24 V DC / MFD 03-26</text>
-      <text class="hz-num" x="5.5" y="64.5" textLength="48" lengthAdjust="spacingAndGlyphs">07</text>${bridges}
       <text class="hz-zl" x="57" y="22">ZONE</text>
       <text class="hz-zn" x="57" y="30.5" textLength="15.5" lengthAdjust="spacingAndGlyphs">PRESS</text>
       <path class="hz-hair" d="M57 33 H72.5"/>
       <text class="hz-zs" x="57" y="37.4">MAIN DRIVE</text>
       <text class="hz-zs" x="57" y="41.4">4.2 kW</text>
-      <g class="hz-tag" transform="rotate(5 84 36)">
-        <path class="hz-string" d="M80.4 14.8 C 75 22, 93 20, 84.5 27.2"/>
+      <g class="hz-tag" transform="translate(0 -5) rotate(5 84 36)">
+        <path class="hz-string" d="M80.1 19.9 C 77 23.6, 89.5 23.2, 84.5 27.2"/>
         <rect class="hz-tagbody" x="75" y="26" width="19" height="29"/>
         <rect class="hz-tagband" x="75" y="26" width="19" height="8.6"/>
         <path class="hz-warn" d="M76.8 33.4 L78.6 29.8 L80.4 33.4 Z"/>

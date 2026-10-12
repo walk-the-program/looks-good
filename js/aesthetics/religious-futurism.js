@@ -55,8 +55,6 @@ function rfOgive(cx, w, ys, yb) {
   return { d: `M${x0} ${yb}V${ys}A${w} ${w} 0 0 1 ${cx} ${ya.toFixed(2)}A${w} ${w} 0 0 1 ${x1} ${ys}V${yb}Z`, ya, x0, x1 };
 }
 
-const rfEsc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-
 // The cathedral (board hero, deck cover) and, with a viewBox crop, the Material slide's close-up of the
 // centre lancet (lead, saddle bars, glass variation).
 function rfArt(ctx, vb) {
@@ -82,9 +80,8 @@ function rfArt(ctx, vb) {
   const aGlass = capS(rfGlass(t.accent, 58, 55));
   const nPick = () => nPool[Math.floor(rnd() * nPool.length)];
   const pick = () => { const r = rnd(); return r < 0.65 ? nPick() : r < 0.9 ? sPool[Math.floor(rnd() * 3)] : r < 0.97 ? pPool[Math.floor(rnd() * 2)] : aGlass; };
-  // light mode: the windows seen from OUTSIDE in daylight: dark glass with only a faint hue, no glow;
-  // the lit oculus is the one coloured thing
-  const outside = hex => { const c = hexToHsl(hex); return hslToHex(c.h, Math.min(c.s, 22), RF_CLAMP(c.l * 0.32 + 8, 8, 26)); };
+  // the glass is the same lit glass in both modes ("brand colour is the light"); only the leading, the
+  // halo and the backlight/floor cast change with the mode
   const jewel = rfGlass(t.accent, d ? 62 : 54, 60);
   const halo = d ? pPool[1] : t.mix(t.accent, t.canvas, 0.85);
 
@@ -116,7 +113,7 @@ function rfArt(ctx, vb) {
         const x = x0 + c * cell;
         if (!inside(x + cell / 2, y + cell / 2)) continue;
         if (oc && Math.hypot(x + cell / 2 - oc.x, y + cell / 2 - oc.y) < oc.r + cell * 0.3) continue;
-        addCell(d ? lanes[lc][r] : outside(lanes[lc][r]), x + 0.6, y + 0.6, cell - 1.2);
+        addCell(lanes[lc][r], x + 0.6, y + 0.6, cell - 1.2);
       }
     }
     return { cx, gw, x0, ys, top, arch, oc, cols };
@@ -186,7 +183,7 @@ function rfArt(ctx, vb) {
   const fm = `matrix(1 0 -0.24 -0.34 ${(0.24 * floor).toFixed(1)} ${(1.34 * floor).toFixed(1)})`;
   const num = ['III', 'II', 'II', 'I', 'I'];
   const ann = wins.map((w, i) => `<text x="${w.cx}" y="${floor + 16}" text-anchor="middle">${num[i]}</text>`).join('');
-  const nameCaps = rfEsc(String(ctx.brandName || '').trim().toUpperCase().slice(0, 22));
+  const nameCaps = escapeHtml(String(ctx.brandName || '').trim().toUpperCase().slice(0, 22));
   return `<svg viewBox="${vb || `0 0 ${W} ${H}`}" width="100%" height="100%" preserveAspectRatio="xMidYMid slice" focusable="false" class="rfa">
     <defs>
       <linearGradient id="${id}f" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="${line}" stop-opacity="0"/><stop offset=".18" stop-color="${line}" stop-opacity=".7"/><stop offset=".82" stop-color="${line}" stop-opacity=".7"/><stop offset="1" stop-color="${line}" stop-opacity="0"/></linearGradient>
@@ -268,8 +265,12 @@ registerAesthetic({
     return b.mix('#EDE6D6', b.canvas, 0.82);
   },
 
-  tokens(t) {
+  tokens(t, st) {
     const d = t.isDark;
+    const view = st || (typeof state !== 'undefined' ? state : {}) || {};
+    // weights the loader actually requested (font-synthesis is off): the hairline display takes the face's
+    // lightest weight at or under 300 (else its one weight), the main action its heaviest at or under 500
+    const hw = abWeights(view.headingFont)[0];
     const gold = rfGold(t.primary);
     const line = d ? gold.hi : gold.mid;
     const glass1 = rfGlass(t.primary, d ? 58 : 50);
@@ -277,6 +278,8 @@ registerAesthetic({
     for (let k = 1; k <= 12 && t.contrast('#F6F1E6', ctaBg) < 7; k++) ctaBg = t.mix(t.primary, '#0D0B0B', 0.55 - k * 0.04);
     return {
       '--ab-type-pick-w': 400,
+      '--rf-hl-w': hw <= 300 ? hw : abWeight(view.headingFont, 400),
+      '--rf-cta-w': abWeight(view.bodyFont || view.headingFont, 500),
       '--ab-gold': line,
       '--ab-gold-hi': gold.hi,
       '--ab-hl-ink': d ? gold.hi : gold.mid,   // the highlight word: oxidised gold light, never raw accent yellow
@@ -294,10 +297,12 @@ registerAesthetic({
       // the main action: deep glass (55% primary into near-black) under a bone label at >= 7:1
       '--rf-cta': ctaBg,
       '--rf-cta-ink': '#F6F1E6',
-      // the state panes: unlit glass, and the lit pane's glass (the cool neutral key with one primary pane)
+      // the state panes: unlit glass (near-black), then lit glass: Dawn lights one pane in the primary glass,
+      // Full light all four (primary, the cool neutral key and the secondary glass)
       '--rf-pane-dark': d ? '#14171D' : '#1C1F25',
       '--rf-pane-cool': d ? '#56627A' : '#3B4A5E',
       '--rf-pane-cool2': d ? '#7A8496' : '#56627A',
+      '--rf-pane-sec': rfGlass(t.secondary, d ? 50 : 44, 40),
     };
   },
 

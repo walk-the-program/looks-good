@@ -32,10 +32,11 @@ function mtFace(name) {
   return (typeof FONTS !== 'undefined' && FONTS.find(f => f.name === name)) || null;
 }
 
+// The first preferred weight the face publishes, else its lightest.
 function mtWeight(font, prefer) {
-  const have = String(font.weights || '400').split(';').map(Number);
+  const have = abWeights(font);
   for (const w of prefer) if (have.includes(w)) return w;
-  return have[0] || 400;
+  return have[0];
 }
 
 // [cap, x] for a font, preferring the table, then a canvas measurement of the
@@ -67,10 +68,14 @@ function mtPick(names, avoid) {
 }
 
 // The four voices for a state. Each: { key, font, weight, style, k, cap, x, label }.
+// With the typography lock on, the mix is played on the brand's own two faces only: the
+// heading face carries the heading and italic voices, the body face the heavy and mono voices
+// (and the condensed one), so no contrast face the owner did not choose appears anywhere.
 function mtVoices(st) {
   const brand = st.headingFont;
   const bw = brand.cls === 'didone' || brand.cls === 'soft-serif' || brand.cls === 'old-style' || brand.cls === 'text-serif' || brand.cls === 'deco'
     ? mtWeight(brand, [400, 500, 600]) : mtWeight(brand, [600, 700, 500, 400]);
+  if (st.locks && st.locks.typography) return mtLockedVoices(st, brand, bw);
   const defs = [
     { key: 'b', font: brand, weight: bw, style: 'normal', label: 'Heading' },
     // the italic may share the brand's family (Fraunces roman + Fraunces italic are two voices)
@@ -87,6 +92,27 @@ function mtVoices(st) {
     v.cap = cap; v.x = x; v.k = Math.round((capB / cap) * 1000) / 1000;
   });
   defs.narrow = nar ? { font: nar, weight: mtWeight(nar, [700, 400]) } : null;
+  return defs;
+}
+
+function mtLockedVoices(st, brand, bw) {
+  const body = st.bodyFont || brand;
+  // an italic only where a face publishes one (font-synthesis is off): heading, else body, else upright
+  const itFace = brand.ital ? brand : body.ital ? body : brand;
+  const itW = itFace.ital ? (abWeights({ weights: itFace.ital }).includes(400) ? 400 : abWeights({ weights: itFace.ital })[0]) : mtWeight(itFace, [400]);
+  const defs = [
+    { key: 'b', font: brand, weight: bw, style: 'normal', label: 'Heading' },
+    { key: 'i', font: itFace, weight: itW, style: itFace.ital ? 'italic' : 'normal', label: 'Italic' },
+    { key: 'h', font: body, weight: abWeight(body, 900), style: 'normal', label: 'Heavy' },
+    { key: 'm', font: body, weight: mtWeight(body, [400, 500, 300]), style: 'normal', label: 'Mono' },
+  ];
+  const capB = mtMetrics(brand, bw, 'normal')[0];
+  defs.forEach(v => {
+    const [cap, x] = mtMetrics(v.font, v.weight, v.style);
+    v.cap = cap; v.x = x; v.k = Math.round((capB / cap) * 1000) / 1000;
+  });
+  defs.narrow = { font: body, weight: abWeight(body, 700) };
+  defs.locked = true;
   return defs;
 }
 
@@ -202,21 +228,23 @@ registerAesthetic({
   // The mixed headline for the real <h2> (the framework wraps it, escapes the label and sizes it).
   headline(ctx, text) { return mtHeadlineHtml(text, ctx); },
 
-  tokens(t) {
-    const st = typeof state !== 'undefined' ? state : null;
+  tokens(t, view) {
+    const st = view || (typeof state !== 'undefined' ? state : null);
     const vars = {
       '--ab-type-pick-w': 400,
       '--ab-font-label': 'var(--mt-f-m, ui-monospace), ui-monospace, Menlo, monospace',
       '--ab-guide': t.alpha(t.ink, 0.28),
     };
     if (st && st.headingFont) {
-      mtVoices(st).forEach(v => {
+      const voices = mtVoices(st);
+      voices.forEach(v => {
         vars[`--mt-f-${v.key}`] = v.font.css;
         vars[`--mt-w-${v.key}`] = v.weight;
         vars[`--mt-k-${v.key}`] = v.k;
       });
-      const nv = mtVoices(st).narrow;
-      if (nv) { vars['--mt-f-n'] = nv.font.css; vars['--mt-w-n'] = nv.weight; }
+      // the italic voice's style (upright when the locked faces publish no italic)
+      vars['--mt-s-i'] = voices.find(v => v.key === 'i').style;
+      if (voices.narrow) { vars['--mt-f-n'] = voices.narrow.font.css; vars['--mt-w-n'] = voices.narrow.weight; }
     }
     return vars;
   },
@@ -225,11 +253,12 @@ registerAesthetic({
     const voices = mtVoices(ctx.state);
     const e = escapeHtml;
     // warm the contrast faces so they are ready by the next paint (cap sizes do not depend on it)
-    if (typeof window !== 'undefined' && window.loadFontFamily) voices.forEach(v => { if (v.key !== 'b') window.loadFontFamily(v.font); });
+    if (!voices.locked && typeof window !== 'undefined' && window.loadFontFamily) voices.forEach(v => { if (v.key !== 'b') window.loadFontFamily(v.font); });
     const cells = voices.map((v, i) => mtCell(v, i + 1)).join('');
     const glyphs = MT_GLYPHS.map(([key, lab, str]) => {
       const v = voices.find(x => x.key === key);
-      return `<div class="mt-grow" data-v="${key}"><span class="mt-grow-k">${lab}</span><span class="mt-grow-s" style="font-family:var(--mt-f-${key});font-weight:var(--mt-w-${key});font-style:${v.style}">${e(str)}</span></div>`;
+      const set = /^[a-z]+$/i.test(str) ? `${e(str.slice(0, 13))}<wbr>${e(str.slice(13))}` : e(str);
+      return `<div class="mt-grow" data-v="${key}"><span class="mt-grow-k">${lab}</span><span class="mt-grow-s" style="font-family:var(--mt-f-${key});font-weight:var(--mt-w-${key});font-style:${v.style}">${set}</span></div>`;
     }).join('');
     const scale = [11, 16, 24, 36, 54].map(n => `<span class="mt-sc" style="font-size:${n}px"><i>Aa</i><b>${n}</b></span>`).join('');
     const ks = voices.map(v => v.k.toFixed(2)).join(' / ');

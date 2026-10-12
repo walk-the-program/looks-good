@@ -48,6 +48,8 @@
 .ab[data-ae="curio-cabinet"] .ab-kicker { margin-bottom: 14px !important; padding-bottom: 8px; border-bottom: 1px dashed rgba(42, 37, 32, 0.45); font-family: var(--cc-type); font-size: 11px; letter-spacing: 0.04em; text-transform: none; color: var(--ab-cc-label-ink); }
 .ab[data-ae="curio-cabinet"] .ab-kicker::before { content: "No. 0417 \2014  "; }
 .ab[data-ae="curio-cabinet"] .ab-headline { font-weight: 400; line-height: 1.08; letter-spacing: -0.005em; color: var(--ab-cc-label-ink); text-wrap: balance; overflow-wrap: normal; }
+/* on the label the accent ink is the one re-checked against the cream paper (a blend's colour channel reads it) */
+.ab[data-ae="curio-cabinet"] .ab-hero-copy { --ab-accent-ink: var(--ab-cc-label-hl); }
 .ab[data-ae="curio-cabinet"] .ab-hl, .ab[data-ae="curio-cabinet"][data-accent-text="low"] .ab-hl { font-style: italic; color: inherit; background: none; padding: 0; margin: 0; }
 .ab[data-ae="curio-cabinet"] .cc-fig { margin-left: 0.2em; font: 400 0.24em/1 var(--cc-type); letter-spacing: 0.02em; vertical-align: 1.7em; color: #5A5042; white-space: nowrap; }
 .ab[data-ae="curio-cabinet"] .ab-subcopy { max-width: none; margin-top: 14px !important; padding-top: 10px; border-top: 1px solid rgba(42, 37, 32, 0.3); font-size: 13.5px; line-height: 1.5; color: #4A4236; }
@@ -115,7 +117,7 @@
 .ab[data-ae="curio-cabinet"] .ab-cta-label { padding: 5px 12px; border-radius: 1px; background: var(--ab-cc-paper); color: var(--ab-cc-label-ink); font: 400 12px/1.2 var(--cc-type); letter-spacing: 0.1em; text-transform: uppercase; box-shadow: 0 0 0 2px var(--ab-cc-brass), 0 0 0 3px var(--ab-cc-brass-lo), inset 0 1px 2px rgba(0, 0, 0, 0.2); }
 .ab[data-ae="curio-cabinet"] .ab-cta-arrow::before { content: ""; display: block; width: 13px; height: 13px; border-radius: 50%; background: radial-gradient(circle at 36% 32%, var(--ab-cc-brass-hi), var(--ab-cc-brass) 55%, var(--ab-cc-brass-lo)); box-shadow: 1px 2px 2px rgba(0, 0, 0, 0.5); }
 .ab[data-ae="curio-cabinet"] .ab-cta:hover { transform: translateY(-1px); }
-.ab[data-ae="curio-cabinet"] .ab-cta:active, .ab[data-ae="curio-cabinet"] .ab-cta.is-pressed { transform: translateY(1px); box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.5), 0 1px 1px rgba(0, 0, 0, 0.4); }
+.ab[data-ae="curio-cabinet"] .ab-cta:active { transform: translateY(1px); box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.5), 0 1px 1px rgba(0, 0, 0, 0.4); }
 
 /* 02 Specimens: a second compartment; a paper label field, a pin-head toggle, three specimens */
 .ab[data-ae="curio-cabinet"] .ab-panel { margin: 6px; padding: clamp(18px, 2.8cqw, 26px); border-radius: 1px; background: var(--ab-cc-felt); box-shadow: var(--cc-recess), var(--cc-wall); }
@@ -132,14 +134,26 @@
 .ab[data-ae="curio-cabinet"] .ab-state { padding: 14px 4px 10px; background: color-mix(in srgb, var(--ab-cc-felt) 88%, #000); box-shadow: var(--cc-recess); font-family: var(--cc-type); font-size: 10.5px; color: var(--ab-cc-text); }
 .ab[data-ae="curio-cabinet"] .ab-disc { position: relative; width: 34px; height: 34px; margin: 0 auto 12px; border: 0; background: radial-gradient(circle at 36% 32%, var(--ab-cc-glass-hi), var(--ab-cc-glass) 58%, var(--ab-cc-glass-lo)); box-shadow: 2px 3px 4px rgba(0, 0, 0, 0.55); }
 .ab[data-ae="curio-cabinet"] .ab-disc::before { content: ""; position: absolute; left: 7px; top: 6px; width: 9px; height: 5px; border-radius: 50%; background: rgba(255, 255, 255, 0.7); transform: rotate(-35deg); }
-.ab[data-ae="curio-cabinet"] .ab-disc[data-s="1"]::after, .ab[data-ae="curio-cabinet"] .ab-disc[data-s="2"]::after { content: ""; position: absolute; right: -3px; top: -3px; width: 10px; height: 10px; border-radius: 50%; background: radial-gradient(circle at 36% 32%, var(--ab-cc-pin-hi), var(--ab-cc-pin) 58%, var(--ab-cc-pin-lo)); box-shadow: 1px 2px 2px rgba(0, 0, 0, 0.55); }
+.ab[data-ae="curio-cabinet"] .ab-state { position: relative; }
+/* the three states tell one story: Found = a loose marble rolled to the corner of its compartment (dusty, a long
+   shadow, nothing attached); Pinned = centred, a paper tag pinned to it with a brass pin; Treasured = set in a gilt
+   ring with a small brass name plate beneath */
+.ab[data-ae="curio-cabinet"] .ab-disc[data-s="0"] { transform: translate(-9px, 3px); filter: saturate(0.7) brightness(0.88); box-shadow: 5px 4px 6px rgba(0, 0, 0, 0.6); }
+.ab[data-ae="curio-cabinet"] .ab-state:has(> .ab-disc[data-s="1"])::before {
+  content: ""; position: absolute; left: calc(50% + 9px); top: 10px; width: 26px; height: 14px; pointer-events: none; transform: rotate(-16deg); transform-origin: 0 50%;
+  background: radial-gradient(circle at 6px 50%, color-mix(in srgb, var(--ab-cc-felt) 88%, #000) 1.6px, transparent 2.2px), var(--ab-cc-paper);
+  clip-path: polygon(5px 0, 100% 0, 100% 100%, 5px 100%, 0 50%); box-shadow: 1px 2px 2px rgba(0, 0, 0, 0.4);
+}
+.ab[data-ae="curio-cabinet"] .ab-disc[data-s="1"]::after { content: ""; position: absolute; right: -6px; top: 1px; z-index: 1; width: 9px; height: 9px; border-radius: 50%; background: radial-gradient(circle at 36% 32%, var(--ab-cc-brass-hi), var(--ab-cc-brass) 58%, var(--ab-cc-brass-lo)); box-shadow: 1px 2px 2px rgba(0, 0, 0, 0.55); }
 .ab[data-ae="curio-cabinet"] .ab-disc[data-s="2"] { box-shadow: 0 0 0 2.5px var(--ab-cc-brass), 0 0 0 3.4px var(--ab-cc-brass-lo), 2px 3px 5px rgba(0, 0, 0, 0.55), 0 0 22px 4px var(--ab-cc-glow); }
+.ab[data-ae="curio-cabinet"] .ab-disc[data-s="2"]::after { content: ""; position: absolute; left: 50%; top: calc(100% + 7px); width: 28px; height: 6px; margin-left: -14px; border-radius: 1px; background: var(--ab-cc-brass); box-shadow: inset 0 1.5px 0 var(--ab-cc-brass-hi), inset 0 -1.5px 0 var(--ab-cc-brass-lo), 0 1px 1px rgba(0, 0, 0, 0.5); }   /* flat fill + inset bevel: a gradient on this out-of-box pseudo exports as a 0-size pattern (html2canvas) */
+.ab[data-ae="curio-cabinet"] .ab-disc[data-s="2"] + .ab-state-name { margin-top: 10px; }
 
 /* 03 In use: the legend; figure numbers, italic names, string-tied tags, compartments filling */
-.ab[data-ae="curio-cabinet"] .ab-row { grid-template-columns: 3ch minmax(0, 1fr) auto minmax(80px, 160px) 4.5ch; padding: 12px 2px; border-top: 1px solid var(--ab-line); }
+.ab[data-ae="curio-cabinet"] .ab-row { grid-template-columns: minmax(3ch, max-content) minmax(0, 1fr) auto minmax(80px, 160px) 4.5ch; padding: 12px 2px; border-top: 1px solid var(--ab-line); }
 .ab[data-ae="curio-cabinet"] .ab-row:last-child { border-bottom: 1px solid var(--ab-line); }
 .ab[data-ae="curio-cabinet"] .ab-row-n { font: 400 17px/1 var(--ab-font-h); color: var(--ab-cc-text); font-variant-numeric: oldstyle-nums; }
-.ab[data-ae="curio-cabinet"] .ab-row-name { font: italic 400 17px/1.3 var(--ab-font-h); color: var(--ab-cc-text); }
+.ab[data-ae="curio-cabinet"] .ab-row-name { font: italic 400 17px/1.5 var(--ab-font-h); color: var(--ab-cc-text); }
 .ab[data-ae="curio-cabinet"] .ab-row-status { position: relative; padding: 3px 10px 3px 17px; border-radius: 0; background: var(--ab-cc-paper); color: var(--ab-cc-label-ink); font: 400 11px/1.2 var(--cc-type); clip-path: polygon(7px 0, 100% 0, 100% 100%, 7px 100%, 0 50%); }
 .ab[data-ae="curio-cabinet"] .ab-row-status::before { content: ""; position: absolute; left: 6px; top: 50%; width: 5px; height: 5px; margin-top: -2.5px; border-radius: 50%; background: var(--ab-cc-felt); }
 .ab[data-ae="curio-cabinet"] .ab-row-bar { position: relative; height: 14px; border-radius: 0; background: var(--ab-cc-felt); box-shadow: 0 0 0 2px var(--ab-cc-oak), inset 1px 2px 3px rgba(0, 0, 0, 0.55); overflow: hidden; }
@@ -170,7 +184,7 @@
   .ab[data-ae="curio-cabinet"] .ab-swatches { grid-template-columns: minmax(0, 1fr); }
   .ab[data-ae="curio-cabinet"] .ab-swatch { display: grid; grid-template-columns: 58px minmax(0, 1fr); column-gap: 14px; align-items: center; padding: 10px 12px; }
   .ab[data-ae="curio-cabinet"] .ab-chip { grid-row: 1 / span 3; width: 52px; height: 40px; margin: 0; }
-  .ab[data-ae="curio-cabinet"] .ab-row { grid-template-columns: 3ch minmax(0, 1fr) 4.5ch; }
+  .ab[data-ae="curio-cabinet"] .ab-row { grid-template-columns: minmax(3ch, max-content) minmax(0, 1fr) 4.5ch; }
   .ab[data-ae="curio-cabinet"] .ab-seg-btn { font-size: 10px; letter-spacing: 0.04em; }
   .ab[data-ae="curio-cabinet"] .ab-foot { justify-content: flex-start; }
 }
@@ -211,7 +225,7 @@
 
 /* deck cells are zoomed: the drawer labels need their full width */
 .ab[data-ae="curio-cabinet"].ab-slide .ab-deck-cell .ab-seg-btn { min-width: 64px; padding: 0 10px; font-size: 10px; letter-spacing: 0.02em; background-size: calc(100% - 12px) 20px, calc(100% - 7px) 26px, auto; }
-.ab[data-ae="curio-cabinet"].ab-slide .ab-deck-prod .ab-row { grid-template-columns: 3ch minmax(0, 1fr) auto minmax(70px, 110px) 4.5ch; }
+.ab[data-ae="curio-cabinet"].ab-slide .ab-deck-prod .ab-row { grid-template-columns: minmax(3ch, max-content) minmax(0, 1fr) auto minmax(70px, 110px) 4.5ch; }
 /* Do / Don't: a pin head for do, a typed cross for don't (def.deck.marks) */
 .ab[data-ae="curio-cabinet"].ab-slide .cc-mk { display: inline-block; width: 14px; height: 14px; border-radius: 50%; vertical-align: middle; background: radial-gradient(circle at 36% 32%, var(--ab-cc-pin-hi), var(--ab-cc-pin) 58%, var(--ab-cc-pin-lo)); box-shadow: 2px 3px 3px rgba(0, 0, 0, 0.5); }
 .ab[data-ae="curio-cabinet"].ab-slide [data-kind="dont"] .ab-deck-mark { font-family: var(--cc-type); color: var(--ab-cc-dim); }

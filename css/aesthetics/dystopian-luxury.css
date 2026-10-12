@@ -32,7 +32,8 @@
 .ab[data-ae="dystopian-luxury"] .ab-head + .ab-rule { display: none; }
 .ab[data-ae="dystopian-luxury"]:not(.ab-slide) .ab-palette,
 .ab[data-ae="dystopian-luxury"]:not(.ab-slide) .ab-type { padding: var(--dl-gap) 0; }
-.ab[data-ae="dystopian-luxury"]:not(.ab-slide) .ab-sections { margin-top: var(--dl-gap); row-gap: var(--dl-gap); }
+/* the same air on both sides of every rule (it was doubled above 01/02: margin + padding) */
+.ab[data-ae="dystopian-luxury"]:not(.ab-slide) .ab-sections { margin-top: 0; padding-top: var(--dl-gap); row-gap: var(--dl-gap); }
 
 /* ---- labels: small, uppercase, circled numerals ---- */
 .ab[data-ae="dystopian-luxury"] .ab-label { font: 400 10px var(--dl-mono); letter-spacing: 0.04em; }
@@ -117,10 +118,11 @@
 .ab[data-ae="dystopian-luxury"] .ab-card-title { margin: 30px 0 8px !important; font-family: var(--ab-font-b); font-weight: 400; font-size: 15px; line-height: 1.3; letter-spacing: 0; }
 .ab[data-ae="dystopian-luxury"] .ab-card-body { font-size: 13px; max-width: 28em; }
 .ab[data-ae="dystopian-luxury"] .ab-cta {
-  display: inline-flex; align-items: center; gap: 10px; width: auto; justify-content: flex-start; padding: 10px 14px; border: 0; border-radius: 0;
+  /* inline-block, not inline-flex: html2canvas drops the label of an inline-flex button (PNG/PDF export) */
+  display: inline-block; width: auto; padding: 10px 14px; border: 0; border-radius: 0; white-space: nowrap;
   background: var(--ab-dl-ink); color: var(--ab-canvas); font: 400 12px var(--ab-font-ui); letter-spacing: 0; text-transform: none; box-shadow: none; transition: none;
 }
-.ab[data-ae="dystopian-luxury"] .ab-cta::before { content: ""; flex: none; width: 6px; height: 6px; background: var(--ab-dl-mark); }
+.ab[data-ae="dystopian-luxury"] .ab-cta::before { content: ""; display: inline-block; width: 6px; height: 6px; margin-right: 10px; vertical-align: 0.12em; background: var(--ab-dl-mark); }
 .ab[data-ae="dystopian-luxury"] .ab-cta:hover { background: var(--ab-canvas); color: var(--ab-dl-ink); box-shadow: inset 0 0 0 1px var(--ab-dl-ink); }
 .ab[data-ae="dystopian-luxury"] .ab-cta-arrow { display: none; }
 
@@ -133,8 +135,10 @@
   inset: 0; left: 0; top: 0; width: auto; height: auto; border-radius: 0; opacity: 0; transition: none; transform: none; background:
     linear-gradient(45deg, transparent 46%, var(--ab-dl-ink) 46% 54%, transparent 54%), linear-gradient(-45deg, transparent 46%, var(--ab-dl-ink) 46% 54%, transparent 54%);
 }
-.ab[data-ae="dystopian-luxury"] .ab-switch:checked { background: none; }
-.ab[data-ae="dystopian-luxury"] .ab-switch:checked::before { opacity: 1; transform: none; }
+.ab[data-ae="dystopian-luxury"] .ab-switch:checked {
+  background: linear-gradient(45deg, transparent 46%, var(--ab-dl-ink) 46% 54%, transparent 54%), linear-gradient(-45deg, transparent 46%, var(--ab-dl-ink) 46% 54%, transparent 54%);
+}
+.ab[data-ae="dystopian-luxury"] .ab-switch:checked::before { opacity: 0; }
 .ab[data-ae="dystopian-luxury"] .ab-status { font: 400 10px var(--dl-mono); letter-spacing: 0.04em; text-transform: uppercase; }
 .ab[data-ae="dystopian-luxury"] .ab-states { margin-top: 26px; gap: 8px; }
 .ab[data-ae="dystopian-luxury"] .ab-state { font: 400 9.5px var(--dl-mono); letter-spacing: 0.04em; text-transform: uppercase; color: var(--ab-muted); }
@@ -164,9 +168,14 @@
 
 /* ---- footer: a flat grey block of legal labels ---- */
 .ab[data-ae="dystopian-luxury"] .ab-foot {
-  margin: clamp(40px, 6cqw, 70px) calc(var(--ab-pad) * -1) calc(var(--ab-pad) * -1); padding: 18px var(--ab-pad); border-top: 0; background: var(--ab-dl-grey); color: var(--ab-muted);
+  margin: clamp(40px, 6cqw, 70px) calc(var(--ab-pad) * -1) calc(var(--ab-pad) * -1); padding: 18px var(--ab-pad); border-top: 0; background: var(--ab-dl-grey); color: var(--ab-dl-ink);
   font: 400 10px var(--dl-mono); letter-spacing: 0.04em; text-transform: uppercase;
 }
+/* slides: the grey block bleeds to the slide's own padding (56px sides, 26px bottom), so it
+   ends flush with the slide edge instead of 18px past it */
+.ab[data-ae="dystopian-luxury"].ab-slide .ab-slide-foot { margin: 0 -56px -26px; padding: 12px 56px 13px; }
+.ab[data-ae="dystopian-luxury"].ab-slide[data-slide="closing"] .ab-slide-foot { margin-left: -24px; padding-left: 24px; }
+.ab[data-ae="dystopian-luxury"].ab-slide[data-slide="cover"]:has(> .ab-deck-pattern > .pt-deck-band) .ab-slide-foot { margin-bottom: 0; }
 .ab[data-ae="dystopian-luxury"] .ab-dot { display: none; }
 .ab[data-ae="dystopian-luxury"] .ab-infl::before { content: "ARCHIVE REF. 2026.114  /  "; }
 
@@ -199,7 +208,16 @@
 /* ---- deck ---- */
 .ab[data-ae="dystopian-luxury"].ab-slide[data-slide="cover"] .ab-deck-cover .ab-hero { padding: 0; }
 /* material (def.deck.materialArt): the single label at 1:1 */
-.ab[data-ae="dystopian-luxury"] .dl-obj { position: absolute; inset: 0; display: grid; place-items: center; }
+.ab[data-ae="dystopian-luxury"].ab-slide .ab-deck-stage[data-stage="own"] .ab-art { inset: 0; margin: 0; width: 100%; height: 100%; }
+.ab[data-ae="dystopian-luxury"] .dl-obj { position: absolute; inset: 0; display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-rows: auto 1fr auto; align-items: center; gap: 36px 40px; padding: 8px 0; }
+.ab[data-ae="dystopian-luxury"] .dl-obj > .dl-tag { grid-column: 1; grid-row: 2; justify-self: start; }
+.ab[data-ae="dystopian-luxury"] .dl-m { font: 400 11px var(--dl-mono); letter-spacing: 0.04em; text-transform: uppercase; color: var(--ab-dl-ink); }
+.ab[data-ae="dystopian-luxury"] .dl-m-hair { grid-column: 1 / -1; grid-row: 1; display: grid; gap: 10px; }
+.ab[data-ae="dystopian-luxury"] .dl-m-hair i { display: block; height: 1px; background: var(--ab-dl-ink); }
+.ab[data-ae="dystopian-luxury"] .dl-m-act { grid-column: 2; grid-row: 2; display: grid; justify-items: start; gap: 12px; }
+.ab[data-ae="dystopian-luxury"] .dl-m-act .ab-cta { font-size: 14px; padding: 12px 16px; }
+.ab[data-ae="dystopian-luxury"] .dl-m-strip { grid-column: 1 / -1; grid-row: 3; display: flex; justify-content: space-between; gap: 20px; padding: 12px 16px; background: var(--ab-dl-ink); color: var(--ab-canvas); }
+.ab[data-ae="dystopian-luxury"] .dl-m-strip b { font-weight: 400; white-space: nowrap; }
 .ab[data-ae="dystopian-luxury"] .dl-tag--lg { width: 300px; padding: 30px 30px 28px; }
 .ab[data-ae="dystopian-luxury"] .dl-tag--lg .dl-tag-no { font-size: 22px; }
 .ab[data-ae="dystopian-luxury"] .dl-tag--lg .dl-tag-c { width: 30px; height: 30px; font-size: 14px; }

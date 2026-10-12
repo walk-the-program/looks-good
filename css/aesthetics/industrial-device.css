@@ -58,16 +58,16 @@
 /* no highlight block: the product carries the scale */
 .ab[data-ae="industrial-device"] .ab-hl { background: none; color: inherit; padding: 0; margin: 0; }
 .ab[data-ae="industrial-device"] .ab-subcopy { max-width: 22em; font-size: clamp(12.5px, 1.3cqw, 14px); }
-.ab[data-ae="industrial-device"] .ab-sub-lead { color: var(--ab-ink); font-weight: 500; }
+.ab[data-ae="industrial-device"] .ab-sub-lead { color: var(--ab-ink); font-weight: var(--id-bw5, 500); }
 .ab[data-ae="industrial-device"] .ab-art { max-width: none; justify-self: stretch; aspect-ratio: 100 / 64; margin-right: calc(-1 * var(--ab-pad)); }
 
 /* ---- the device ---- */
 .ab[data-ae="industrial-device"] .idv { position: absolute; inset: 0; color: var(--ab-ink); font-family: var(--id-mono); }
 .ab[data-ae="industrial-device"] .idv > * { position: absolute; }
-.ab[data-ae="industrial-device"] .idv i, .ab[data-ae="industrial-device"] .idv em, .ab[data-ae="industrial-device"] .idv b, .ab[data-ae="industrial-device"] .idv small { font-style: normal; }
+.ab[data-ae="industrial-device"] .idv i, .ab[data-ae="industrial-device"] .idv b, .ab[data-ae="industrial-device"] .idv small { font-style: normal; }
 .ab[data-ae="industrial-device"] .idv-body { border-radius: 2.4cqw 0 0 2.4cqw; background: var(--ab-face); border: 1px solid var(--ab-hair); border-right: 0; box-shadow: var(--id-lip); }
-/* printed legends: lowercase mono at 6-7px, on the hardware */
-.ab[data-ae="industrial-device"] .idv-pr, .ab[data-ae="industrial-device"] .idv small { font: 500 clamp(6px, 0.95cqw, 8px)/1 var(--id-mono); letter-spacing: 0.06em; color: var(--ab-muted); text-transform: lowercase; white-space: nowrap; }
+/* printed legends: lowercase mono at 6-7px, on the hardware (Azeret Mono publishes 400 and 600; 400 here) */
+.ab[data-ae="industrial-device"] .idv-pr, .ab[data-ae="industrial-device"] .idv small { font: 400 clamp(6px, 0.95cqw, 8px)/1 var(--id-mono); letter-spacing: 0.06em; color: var(--ab-muted); text-transform: lowercase; white-space: nowrap; }
 .ab[data-ae="industrial-device"] .idv-tr { display: grid; grid-template-columns: repeat(4, 1fr); text-align: center; }
 .ab[data-ae="industrial-device"] .idv-model { color: var(--ab-ink); opacity: 0.7; }
 /* OLED strip: black, the brand in single-ink pixels and a single-ink meter */
@@ -80,7 +80,7 @@
   content: ""; position: absolute; inset: 0; pointer-events: none;
   background: repeating-linear-gradient(0deg, rgba(0,0,0,.4) 0 1px, transparent 1px 3px), repeating-linear-gradient(90deg, rgba(0,0,0,.28) 0 1px, transparent 1px 3px);
 }
-.ab[data-ae="industrial-device"] .idv-oled b { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-family: var(--id-dot); font-weight: 900; font-size: 1.1em; letter-spacing: 0.06em; }
+.ab[data-ae="industrial-device"] .idv-oled b { flex: 1; min-width: 0; overflow: hidden; white-space: nowrap; line-height: 1.4; font-family: var(--id-dot); font-weight: 900; font-size: calc(1.1em * var(--idv-oled-k, 1)); letter-spacing: 0.06em; }
 .ab[data-ae="industrial-device"] .idv-bars { display: flex; align-items: flex-end; gap: 0.3em; height: 56%; }
 .ab[data-ae="industrial-device"] .idv-bars i { width: 0.4em; background: repeating-linear-gradient(0deg, var(--ab-oled-ink) 0 2px, transparent 2px 3px); }
 /* four encoder caps: the fixed OP-1 colour code, the client only on the fourth */
@@ -103,7 +103,7 @@
 .ab[data-ae="industrial-device"] .idv-scale line { stroke: var(--ab-ink); stroke-width: 0.22; opacity: 0.6; }
 .ab[data-ae="industrial-device"] .idv-scale line.lg { stroke-width: 0.36; opacity: 0.85; }
 .ab[data-ae="industrial-device"] .idv-scale .knurl { fill: none; stroke: var(--ab-key-edge); stroke-width: 0.9; stroke-dasharray: 1 1; }
-.ab[data-ae="industrial-device"] .idv-marks text { fill: var(--ab-muted); font: 500 1.3px var(--id-mono); letter-spacing: 0.04em; }
+.ab[data-ae="industrial-device"] .idv-marks text { fill: var(--ab-muted); font: 400 1.3px var(--id-mono); letter-spacing: 0.04em; }
 .ab[data-ae="industrial-device"] .idv-marks text.pr { font-size: 1.15px; }
 /* keys */
 .ab[data-ae="industrial-device"] .idv-keys { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.4cqw; align-content: start; }
@@ -136,8 +136,9 @@
 .ab[data-ae="industrial-device"] .ab-swatch { counter-increment: idsw; }
 .ab[data-ae="industrial-device"] .ab-chip { height: clamp(44px, 6.4cqw, 68px); border-radius: 4px; box-shadow: inset 0 0 0 1px rgba(128,128,128,.3), inset 0 1px 0 rgba(255,255,255,.4), 0 2px 0 var(--ab-key-edge); margin-bottom: 14px; }
 .ab[data-ae="industrial-device"] .ab-sw-role { font: 600 10.5px/1.3 var(--id-mono); letter-spacing: 0.1em; text-transform: uppercase; }
-.ab[data-ae="industrial-device"] .ab-sw-role::before { content: counter(idsw, decimal-leading-zero) "  "; white-space: pre; color: var(--ab-ink); font: 900 13px var(--id-dot); }
-.ab[data-ae="industrial-device"] .ab-sw-job { font-size: 10px; letter-spacing: 0.02em; }
+.ab[data-ae="industrial-device"] .ab-sw-role::before { content: counter(idsw, decimal-leading-zero) "  "; white-space: pre; color: var(--sw-on, var(--ab-ink)); font: 900 13px var(--id-dot); }
+/* a narrow strip wraps the job line at a word, never inside a value ("15–/20%") */
+.ab[data-ae="industrial-device"] .ab-sw-job { font-size: 10px; letter-spacing: 0.02em; text-wrap: balance; }
 .ab[data-ae="industrial-device"] .ab-sw-hex { font-size: 10px; }
 
 /* ---- type block: spec plates ---- */
@@ -178,7 +179,7 @@
   box-shadow: inset 0 3px 5px rgba(0,0,0,.28);
 }
 .ab[data-ae="industrial-device"] .ab-seg-btn[aria-pressed="true"]::after { background: var(--ab-on-primary); box-shadow: none; }
-.ab[data-ae="industrial-device"] .ab-card-title { margin: 22px 0 8px !important; font-weight: 500; letter-spacing: calc(-0.03em * var(--ab-tr, 1)); }
+.ab[data-ae="industrial-device"] .ab-card-title { margin: 22px 0 8px !important; font-weight: var(--id-hw5, 500); letter-spacing: calc(-0.03em * var(--ab-tr, 1)); }
 .ab[data-ae="industrial-device"] .ab-card-body { font-size: 13.5px; }
 .ab[data-ae="industrial-device"] .ab-cta {
   margin-bottom: 2px; padding: 13px 14px 13px 18px; border: 1px solid rgba(0,0,0,.16); border-radius: 4px; background: var(--ab-primary); color: var(--ab-on-primary);
@@ -193,7 +194,7 @@
 .ab[data-ae="industrial-device"] .ab-fieldlabel { font: 600 10px var(--id-mono); letter-spacing: 0.12em; text-transform: uppercase; }
 .ab[data-ae="industrial-device"] .ab-input {
   padding: 12px 14px; border: 1px solid var(--ab-hair); border-radius: 4px; background: var(--ab-slot); box-shadow: var(--ab-slot-sh);
-  font: 500 14px var(--id-mono); letter-spacing: 0.03em; caret-color: var(--ab-primary-text);
+  font: 400 14px var(--id-mono); letter-spacing: 0.03em; caret-color: var(--ab-primary-text);
 }
 .ab[data-ae="industrial-device"] .ab-input:focus { border-color: var(--ab-primary); box-shadow: var(--ab-slot-sh), 0 0 0 3px var(--ab-ring); }
 .ab[data-ae="industrial-device"] .ab-toggle > span { font: 600 10.5px var(--id-mono); letter-spacing: 0.1em; text-transform: uppercase; }
@@ -206,7 +207,7 @@
 }
 .ab[data-ae="industrial-device"] .ab-switch:checked { background: var(--ab-slot); }
 .ab[data-ae="industrial-device"] .ab-switch:checked::before { transform: translateX(24px); background: repeating-linear-gradient(90deg, rgba(255,255,255,.4) 0 1px, transparent 1px 4px) center / 12px 10px no-repeat, var(--ab-primary); }
-.ab[data-ae="industrial-device"] .ab-status { display: flex; align-items: center; gap: 9px; margin-top: 10px; font: 500 10px var(--id-mono); letter-spacing: 0.1em; text-transform: uppercase; }
+.ab[data-ae="industrial-device"] .ab-status { display: flex; align-items: center; gap: 9px; margin-top: 10px; font: 400 10px var(--id-mono); letter-spacing: 0.1em; text-transform: uppercase; }
 .ab[data-ae="industrial-device"] .ab-status::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--ab-slot); box-shadow: 0 0 0 1px var(--ab-hair), inset 0 1px 1px rgba(0,0,0,.3); }
 .ab[data-ae="industrial-device"] .ab-panel:has(.ab-switch:checked) .ab-status::before { background: var(--ab-primary); box-shadow: 0 0 0 1px var(--ab-hair); }
 /* states: the same key Up / Hover / Down */
@@ -278,7 +279,13 @@
 
 /* ---- deck: the cover is product first too; the Material slide (deck.materialArt) zooms on the keybed and pads ---- */
 .ab[data-ae="industrial-device"].ab-slide[data-slide="cover"][data-hero] .ab-deck-cover .ab-hero { grid-template-columns: minmax(0, 0.62fr) minmax(0, 1.38fr); align-items: end; }
-.ab[data-ae="industrial-device"].ab-slide[data-slide="cover"][data-hero] .ab-deck-cover .ab-art { width: 100%; max-width: none; justify-self: stretch; margin-right: calc(-1 * var(--ab-pad)); }
+/* end-aligned, so a box the cover fit narrows still bleeds off the right edge (principle 01) */
+.ab[data-ae="industrial-device"].ab-slide[data-slide="cover"][data-hero] .ab-deck-cover .ab-art { width: 100%; max-width: none; justify-self: end; margin-right: calc(-1 * var(--ab-pad)); }
 .ab[data-ae="industrial-device"] .ab-deck-stage[data-stage="own"] .ab-art { margin-right: 0; overflow: hidden; }
 .ab[data-ae="industrial-device"] .idv-zoom { position: absolute; inset: 0; overflow: hidden; }
-.ab[data-ae="industrial-device"] .idv-zoom > .idv { transform: scale(1.9); transform-origin: 46% 86%; }
+/* scale 1.5 about (97.8%, 93.75%): the view runs x 32.6-99.3 and y 20-62.7 of the 100 x 64 device, so it starts in the
+   gap above the top key row and between keybed keys 5 and 6, and keeps the transport row, the function keys and the bed */
+.ab[data-ae="industrial-device"] .idv-zoom > .idv { transform: scale(1.5); transform-origin: 97.8% 93.75%; }
+/* deck colour slide: the "Aa" chips at a weight the heading face publishes, and at 24px so the 3:1 highlight
+   chip is large text at any weight */
+.ab[data-ae="industrial-device"].ab-slide .ab-deck-pchip { font-weight: var(--id-hw7, 700); font-size: 24px; }

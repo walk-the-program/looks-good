@@ -43,7 +43,7 @@
 .ab[data-ae="micrographics"] :is(.ab-label, .ab-tag, .ab-kicker, .ab-fieldlabel, .ab-state, .ab-foot, .ab-sw-job, .ab-sw-hex, .ab-status, .ab-type-role, .ab-type-class, .ab-type-avoid, .ab-type-pair, .ab-type-k) {
   font: var(--mg-micro); letter-spacing: 0.18em; text-transform: uppercase;
 }
-.ab[data-ae="micrographics"] .ab-label { color: var(--ab-ink); font-size: 9px; }
+.ab[data-ae="micrographics"] .ab-label { color: var(--ab-ink); font-size: 9px; white-space: nowrap; }
 .ab[data-ae="micrographics"] .ab-label:last-child:not(:first-child) { color: var(--ab-muted); }
 .ab[data-ae="micrographics"] .ab-labelrow { margin-bottom: 22px; padding-top: 7px; border-top: 1px solid var(--ab-hair); }
 .ab[data-ae="micrographics"] .ab-n { margin-right: 6px; font-weight: 700; letter-spacing: 0.1em; }
@@ -139,7 +139,12 @@
 .ab[data-ae="micrographics"] .ab-palette { position: relative; padding-bottom: 38px; }
 .ab[data-ae="micrographics"] .ab-palette::after, .ab[data-ae="micrographics"] .ab-type::after { position: absolute; right: 0; bottom: 14px; font: var(--mg-micro); font-size: 7.5px; letter-spacing: 0.18em; color: var(--ab-ink); font-weight: 700; }
 .ab[data-ae="micrographics"] .ab-palette::after { content: "P.01/04"; }
-.ab[data-ae="micrographics"] .ab-chip { position: relative; height: clamp(34px, 4.6cqw, 50px); margin-bottom: 10px; border-radius: 0; box-shadow: inset 0 0 0 1px var(--ab-ink); }
+.ab[data-ae="micrographics"] .ab-chip { position: relative; height: clamp(64px, 9.4cqw, 108px); margin-bottom: 10px; border-radius: 0; box-shadow: inset 0 0 0 1px var(--ab-ink); overflow: hidden; }
+/* each chip carries its index at display size in the role's own readable ink: 01..05 */
+.ab[data-ae="micrographics"] .ab-chip::after {
+  content: counter(mgsw, decimal-leading-zero); position: absolute; left: 7px; bottom: 5px;
+  font-family: var(--ab-font-h); font-weight: var(--ab-hw, 700); font-size: clamp(30px, 5.4cqw, 62px); line-height: 0.74; letter-spacing: -0.05em; color: var(--sw-on);
+}
 .ab[data-ae="micrographics"] .ab-swatches { counter-reset: mgsw; }
 .ab[data-ae="micrographics"] .ab-swatch { counter-increment: mgsw; }
 .ab[data-ae="micrographics"] .ab-sw-role { font: 700 9px/1.4 ui-monospace, "SF Mono", Menlo, monospace; letter-spacing: 0.16em; text-transform: uppercase; }
@@ -179,26 +184,30 @@
 .ab[data-ae="micrographics"] .ab-seg { gap: 0; padding: 0; border: 1px solid var(--ab-ink); border-radius: 0; background: none; }
 .ab[data-ae="micrographics"] .ab-seg-btn { min-height: 34px; border-radius: 0; color: var(--ab-ink); font: 600 9px/1 ui-monospace, "SF Mono", Menlo, monospace; letter-spacing: 0.2em; text-transform: uppercase; }
 .ab[data-ae="micrographics"] .ab-seg-btn + .ab-seg-btn { box-shadow: inset 1px 0 0 var(--ab-ink); }
-.ab[data-ae="micrographics"] .ab-seg-btn:hover { background: var(--ab-hair-faint); }
+.ab[data-ae="micrographics"] .ab-seg-btn:not([aria-pressed="true"]):hover { background: var(--ab-hair-soft); }
 .ab[data-ae="micrographics"] .ab-seg-btn[aria-pressed="true"] { background: var(--ab-ink); color: var(--ab-canvas); box-shadow: none; font-weight: 700; }
 .ab[data-ae="micrographics"] .ab-seg-btn[aria-pressed="true"]::before { content: ""; display: inline-block; width: 4px; height: 4px; margin-right: 8px; vertical-align: 1px; background: var(--ab-primary); }
 .ab[data-ae="micrographics"] .ab-card-title { margin: 22px 0 6px !important; font-weight: var(--ab-hw, 700); letter-spacing: calc(-0.045em * var(--ab-tr, 1)); font-size: clamp(26px, 3.4cqw, 34px); line-height: 0.98; }
 .ab[data-ae="micrographics"] .ab-card-body { font-size: 13px; color: var(--ab-muted); }
-.ab[data-ae="micrographics"] .ab-cta { position: relative; border-radius: 0; padding: 14px 16px; font: 700 9.5px/1 ui-monospace, "SF Mono", Menlo, monospace; letter-spacing: 0.24em; text-transform: uppercase; transition: filter 0.1s; }
+.ab[data-ae="micrographics"] .ab-cta { position: relative; border-radius: 0; padding: 14px 16px; font: 700 9.5px/1 ui-monospace, "SF Mono", Menlo, monospace; letter-spacing: 0.24em; text-transform: uppercase; transition: background-color 0.1s, color 0.1s; }
 .ab[data-ae="micrographics"] .ab-cta::before { content: ""; position: absolute; inset: -9px; pointer-events: none; background: var(--mg-crops); }
-.ab[data-ae="micrographics"] .ab-cta:hover { filter: brightness(1.08); }
-.ab[data-ae="micrographics"] .ab-cta:active { filter: brightness(0.9); }
+.ab[data-ae="micrographics"] .ab-cta:hover { background: var(--ab-ink); color: var(--ab-canvas); }
+.ab[data-ae="micrographics"] .ab-cta:active { background: var(--ab-ink); color: var(--ab-canvas); outline: 1px solid var(--ab-ink); outline-offset: 3px; }
 .ab[data-ae="micrographics"] .ab-cta-arrow::before { content: "→"; font-size: 14px; font-weight: 400; letter-spacing: 0; }
 
 .ab[data-ae="micrographics"] .ab-fieldlabel { color: var(--ab-ink); font-weight: 700; }
 .ab[data-ae="micrographics"] .ab-input { padding: 9px 0; border: 0; border-bottom: 1px solid var(--ab-ink); border-radius: 0; font-size: 14px; letter-spacing: 0.02em; transition: border-color 0.1s; }
 .ab[data-ae="micrographics"] .ab-input:focus { box-shadow: 0 1px 0 var(--ab-ink); }
 .ab[data-ae="micrographics"] .ab-toggle { font: 600 9px/1 ui-monospace, "SF Mono", Menlo, monospace; letter-spacing: 0.2em; text-transform: uppercase; }
-.ab[data-ae="micrographics"] .ab-switch { width: 48px; height: 20px; border-radius: 0; background: none; box-shadow: inset 0 0 0 1px var(--ab-ink); transition: none; }
-.ab[data-ae="micrographics"] .ab-switch::before { left: 3px; top: 3px; width: 14px; height: 14px; border-radius: 0; background: none; box-shadow: inset 0 0 0 1px var(--ab-ink); transition: transform 0.12s; }
+/* the knob is drawn on the input itself (an outlined square, filled with primary when on):
+   html2canvas does not paint an input's ::before, so the PNG/PDF export keeps it */
+.ab[data-ae="micrographics"] .ab-switch {
+  width: 48px; height: 20px; border-radius: 0; box-shadow: inset 0 0 0 1px var(--ab-ink); transition: none;
+  background: linear-gradient(var(--ab-canvas), var(--ab-canvas)) 4px 4px / 12px 12px no-repeat, linear-gradient(var(--ab-ink), var(--ab-ink)) 3px 3px / 14px 14px no-repeat;
+}
+.ab[data-ae="micrographics"] .ab-switch::before { display: none; }
 .ab[data-ae="micrographics"] .ab-switch::after { content: "OFF"; position: absolute; right: 5px; top: 50%; transform: translateY(-50%); font: 700 6.5px/1 ui-monospace, "SF Mono", Menlo, monospace; letter-spacing: 0.14em; color: var(--ab-ink); }
-.ab[data-ae="micrographics"] .ab-switch:checked { background: none; }
-.ab[data-ae="micrographics"] .ab-switch:checked::before { transform: translateX(28px); background: var(--ab-primary); box-shadow: inset 0 0 0 1px var(--ab-ink); }
+.ab[data-ae="micrographics"] .ab-switch:checked { background: linear-gradient(var(--ab-primary), var(--ab-primary)) 32px 4px / 12px 12px no-repeat, linear-gradient(var(--ab-ink), var(--ab-ink)) 31px 3px / 14px 14px no-repeat; }
 .ab[data-ae="micrographics"] .ab-switch:checked::after { content: "ON"; right: auto; left: 6px; }
 .ab[data-ae="micrographics"] .ab-status { color: var(--ab-muted); font-size: 8px; }
 .ab[data-ae="micrographics"] .ab-status::before { content: "› "; }
@@ -228,11 +237,18 @@
 .ab[data-ae="micrographics"] .ab-row-status::before { content: "["; } .ab[data-ae="micrographics"] .ab-row-status::after { content: "]"; }
 .ab[data-ae="micrographics"] .ab-row-bar { height: 7px; border-radius: 0; background: linear-gradient(var(--ab-hair), var(--ab-hair)) 0 50% / 100% 1px no-repeat, repeating-linear-gradient(90deg, var(--ab-hair) 0 1px, transparent 1px 10%) 0 100% / 100% 3px no-repeat; }
 .ab[data-ae="micrographics"] .ab-row-bar i { height: 100%; background: linear-gradient(var(--ab-ink), var(--ab-ink)) 0 50% / 100% 3px no-repeat; }
-.ab[data-ae="micrographics"] .ab-row-pct { font: 600 9px/1 ui-monospace, "SF Mono", Menlo, monospace; letter-spacing: 0.08em; }
+.ab[data-ae="micrographics"] .ab-row { grid-template-columns: 2.6ch minmax(0, 1fr) auto minmax(60px, 150px) minmax(4.5ch, auto); }
+.ab[data-ae="micrographics"] .ab-row-pct { justify-self: end; font-family: var(--ab-font-h); font-weight: var(--ab-hw, 700); font-size: clamp(22px, 3.6cqw, 40px); line-height: 0.9; letter-spacing: -0.05em; }
 
 /* footer */
 .ab[data-ae="micrographics"] .ab-foot { border-top: 1px solid var(--ab-ink); padding-top: 8px; font-size: 8px; letter-spacing: 0.2em; color: var(--ab-muted); }
 .ab[data-ae="micrographics"] .ab-motto { color: var(--ab-ink); font-weight: 700; }
+.ab[data-ae="micrographics"]:not(.ab-slide) .ab-foot { align-items: flex-end; }
+.ab[data-ae="micrographics"]:not(.ab-slide) .ab-motto {
+  flex: 1 1 100%; font-family: var(--ab-font-h); font-weight: var(--ab-hw, 700); font-size: clamp(30px, 7.4cqw, 84px); line-height: 0.88;
+  letter-spacing: -0.05em; text-transform: none;
+}
+.ab[data-ae="micrographics"]:not(.ab-slide) .ab-motto .ab-dot { width: 0.14em; height: 0.14em; margin-right: 0.12em; vertical-align: 0.05em; background: var(--ab-ink); }
 .ab[data-ae="micrographics"] .ab-dot { width: 5px; height: 5px; margin-right: 8px; border-radius: 0; background: var(--ab-ink); vertical-align: 1px; }
 
 .ab[data-ae="micrographics"] .ab-seg-btn:focus-visible, .ab[data-ae="micrographics"] .ab-cta:focus-visible, .ab[data-ae="micrographics"] .ab-switch:focus-visible, .ab[data-ae="micrographics"] .ab-type-apply:focus-visible { outline: 1px solid var(--ab-ink); outline-offset: 4px; }
@@ -250,23 +266,60 @@
 @container ab (max-width: 600px) {
   .ab[data-ae="micrographics"] .ab-kicker::after { content: "REV 03"; }
   .ab[data-ae="micrographics"] .ab-tag { font-size: 7.5px; letter-spacing: 0.12em; }
-  .ab[data-ae="micrographics"] .ab-row { grid-template-columns: 4.2ch minmax(0, 1fr) 4.5ch; }
+  .ab[data-ae="micrographics"] .ab-row { grid-template-columns: 4.2ch minmax(0, 1fr) auto; }
   .ab[data-ae="micrographics"] .ab-row-n { grid-row: 1 / span 2; align-self: start; }
   .ab[data-ae="micrographics"] .ab-states { gap: 8px; }
   .ab[data-ae="micrographics"] .ab-labelrow { margin-bottom: 18px; }
   .ab[data-ae="micrographics"] .ab-hero .ab-headline { font-size: calc(36px * var(--ab-display, 1)); }
   .ab[data-ae="micrographics"] .ab-sec .ab-labelrow::after { font-size: 7.5px; letter-spacing: 0.06em; max-width: 55%; }
+  .ab[data-ae="micrographics"] .ab-sec-ui .ab-labelrow::after { content: "MG–0412–A"; }
+  .ab[data-ae="micrographics"] .ab-sec-touch .ab-labelrow::after { content: "MG–0412–B"; }
+  .ab[data-ae="micrographics"] .ab-sec-use .ab-labelrow::after { content: "MG–0412–C"; }
 }
 
 /* ---- deck ---- */
 /* cover: the plate is the cover (full slide width beside a compact headline) */
-.ab[data-ae="micrographics"].ab-slide[data-slide="cover"] .ab-deck-cover .ab-hero { grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.6fr); align-items: end; gap: 28px; }
-.ab[data-ae="micrographics"].ab-slide[data-slide="cover"] .ab-deck-cover .ab-art { margin: 0; width: 100% !important; max-width: none !important; }
-.ab[data-ae="micrographics"].ab-slide[data-slide="cover"] .mga { aspect-ratio: auto; height: 400px; }
+.ab[data-ae="micrographics"].ab-slide[data-slide="cover"][data-cover-side] .ab-deck-cover .ab-hero { grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.08fr); align-items: stretch; gap: 32px; }
+.ab[data-ae="micrographics"].ab-slide[data-slide="cover"] .ab-deck-cover .ab-hero-copy { align-self: center; }
+.ab[data-ae="micrographics"].ab-slide[data-slide="cover"] .ab-deck-cover .ab-art { align-self: stretch; margin: 0; width: 100% !important; max-width: none !important; height: auto; min-height: 0; }
+.ab[data-ae="micrographics"].ab-slide[data-slide="cover"] .mga { aspect-ratio: auto; height: 100%; min-height: 300px; }
+.ab[data-ae="micrographics"].ab-slide[data-slide="cover"] :is(.mga-stk-spec, .mga-ncv, .mga-r-b) { display: none; }
+.ab[data-ae="micrographics"].ab-slide[data-slide="cover"] .mga-stk-qr { top: 13%; width: 24%; }
+.ab[data-ae="micrographics"].ab-slide[data-slide="cover"] .mga-stk-hz { top: 54%; width: 32%; right: 4%; }
+/* in product: the section codes, short (the long data strings ellipsised in its narrow columns) */
+.ab[data-ae="micrographics"].ab-slide[data-slide="product"] .ab-sec-ui .ab-labelrow::after { content: "MG–0412–A"; }
+.ab[data-ae="micrographics"].ab-slide[data-slide="product"] .ab-sec-use .ab-labelrow::after { content: "MG–0412–C"; }
+/* material (def.deck.materialArt): the four materials at scale, each cell with its own corner labels */
+.ab[data-ae="micrographics"].ab-slide .ab-deck-stage[data-stage="own"] .ab-art { inset: 0; margin: 0; width: 100%; height: 100%; border: 0; }
+.ab[data-ae="micrographics"] .mgm { display: grid; grid-template: repeat(2, minmax(0, 1fr)) / repeat(2, minmax(0, 1fr)); gap: 22px; width: 100%; height: 100%; font: var(--mg-micro); letter-spacing: 0.16em; text-transform: uppercase; color: var(--ab-ink); }
+.ab[data-ae="micrographics"] .mgm p { margin: 0; }
+.ab[data-ae="micrographics"] .mgm-cell { position: relative; display: flex; flex-direction: column; justify-content: flex-end; gap: 12px; min-height: 0; padding: 26px 16px 22px; border: 1px solid var(--ab-ink); }
+.ab[data-ae="micrographics"] .mgm-cell::before { content: ""; position: absolute; inset: -9px; pointer-events: none; background: var(--mg-crops); }
+.ab[data-ae="micrographics"] :is(.mgm-i, .mgm-c, .mgm-p) { position: absolute; font-size: 7.5px; letter-spacing: 0.18em; }
+.ab[data-ae="micrographics"] .mgm-i { left: 10px; top: 8px; font-weight: 700; }
+.ab[data-ae="micrographics"] .mgm-c { right: 10px; top: 8px; color: var(--ab-muted); }
+.ab[data-ae="micrographics"] .mgm-p { right: 10px; bottom: 7px; font-weight: 700; }
+.ab[data-ae="micrographics"] .mgm-cap { padding-top: 6px; border-top: 1px solid var(--ab-hair-soft); color: var(--ab-muted); }
+.ab[data-ae="micrographics"] .mgm-cap b { color: var(--ab-ink); margin-right: 0.6em; }
+.ab[data-ae="micrographics"] .mgm-rules { flex: 1; display: flex; flex-direction: column; justify-content: center; gap: 18px; }
+.ab[data-ae="micrographics"] .mgm-rules i { display: block; height: 1px; background: var(--ab-ink); }
+.ab[data-ae="micrographics"] .mgm-rules i.is-2 { background: var(--ab-hair); }
+.ab[data-ae="micrographics"] .mgm-rules i.is-3 { background: repeating-linear-gradient(90deg, var(--ab-hair) 0 3px, transparent 3px 6px); }
+.ab[data-ae="micrographics"] .mgm-spec { flex: 1; display: flex; flex-direction: column; justify-content: center; font-size: 8px; line-height: 1.9; letter-spacing: 0.16em; }
+.ab[data-ae="micrographics"] .mgm-box { position: relative; flex: 1; margin: 0 6px; border: 1px solid var(--ab-hair); }
+.ab[data-ae="micrographics"] .mgm-box span { position: absolute; font-size: 7.5px; letter-spacing: 0.18em; }
+.ab[data-ae="micrographics"] .mgm-box span:nth-child(1) { left: 6px; top: 6px; font-weight: 700; }
+.ab[data-ae="micrographics"] .mgm-box span:nth-child(2) { right: 6px; top: 6px; color: var(--ab-muted); }
+.ab[data-ae="micrographics"] .mgm-box span:nth-child(3) { right: 6px; bottom: 6px; font-weight: 700; }
+.ab[data-ae="micrographics"] .mgm-xs { flex: 1; display: flex; align-items: center; justify-content: space-around; }
+.ab[data-ae="micrographics"] .mgm-x { position: relative; width: 17px; height: 17px; border: 1px solid var(--ab-ink); border-radius: 50%; background: linear-gradient(var(--ab-ink), var(--ab-ink)) center / 100% 1px no-repeat, linear-gradient(var(--ab-ink), var(--ab-ink)) center / 1px 100% no-repeat; }
+.ab[data-ae="micrographics"] .mgm-x.is-big { width: min(132px, 60%); height: auto; aspect-ratio: 1; }
+.ab[data-ae="micrographics"] .mgm-x.is-p::after { content: ""; position: absolute; left: 50%; top: 50%; width: 3px; height: 3px; margin: -1px 0 0 -1px; background: var(--ab-primary); }
+.ab[data-ae="micrographics"] .mgm-x.is-big.is-p::after { width: 9px; height: 9px; margin: -4px 0 0 -4px; }
 /* principles: the motto is the one huge element of its slide */
 .ab[data-ae="micrographics"].ab-slide[data-slide="principles"] .ab-headline.ab-deck-h { font-size: calc(var(--dk-fs, 60px) * 1.8 * var(--ab-hs, 1)); line-height: 0.88; }
 @media (prefers-reduced-motion: reduce) {
-  .ab[data-ae="micrographics"] .ab-switch::before, .ab[data-ae="micrographics"] .ab-cta { transition: none; }
+  .ab[data-ae="micrographics"] .ab-cta { transition: none; }
 }
 /* weights the faces have (font-synthesis: none) */
 .ab[data-ae="micrographics"] .ab-type-cur b { font-weight: var(--ab-hw, 400); }

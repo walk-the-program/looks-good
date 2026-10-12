@@ -84,7 +84,7 @@
 .ab[data-ae="biomechanical-gothic"][data-hero="bleed"][data-hcls="deco"] .ab-hero .ab-headline { font-size: calc(clamp(40px, 8.4cqw, 104px) * 0.8 * var(--ab-hl-scale, 1) * var(--ab-hs, 1) * var(--ab-display, 1)); }
 .ab[data-ae="biomechanical-gothic"] .ab-hl { color: var(--ab-bi-hl); text-shadow: 0 0 16px var(--ab-bi-hl-glow); }
 .ab[data-ae="biomechanical-gothic"] .ab-subcopy { max-width: 31em; margin-left: 0 !important; margin-top: clamp(16px, 2.2cqw, 24px) !important; }
-.ab[data-ae="biomechanical-gothic"] .ab-sub-lead { color: var(--ab-bi-bone); font-weight: 500; }
+.ab[data-ae="biomechanical-gothic"] .ab-sub-lead { color: var(--ab-bi-bone); font-weight: var(--bg-body-mid, 400); }
 
 /* ---- the nave: a double-rimmed plate ---- */
 .ab[data-ae="biomechanical-gothic"] .ab-art { border: 1px solid var(--ab-bi-rim2); background: var(--ab-bi-well); overflow: hidden; border-radius: 3px; }
@@ -92,7 +92,9 @@
 .ab[data-ae="biomechanical-gothic"] .bg-art { position: absolute; inset: 0; }
 .ab[data-ae="biomechanical-gothic"] .bg-art svg { display: block; width: 100%; height: 100%; }
 .ab[data-ae="biomechanical-gothic"] .bg-cap, .ab[data-ae="biomechanical-gothic"] .bg-fig {
-  position: absolute; z-index: 4; font: 500 clamp(7.5px, 1.1cqw, 10px)/1.3 var(--bg-mono); letter-spacing: 0.2em; text-transform: uppercase; color: var(--ab-bi-bone); opacity: 0.75;
+  position: absolute; z-index: 4; font: 500 clamp(9px, 1.1cqw, 10px)/1.3 var(--bg-mono); letter-spacing: 0.2em; text-transform: uppercase; color: var(--ab-ink);
+  /* a small canvas plate under the label so it never reads grey on grey over the ribs */
+  padding: 3px 7px 2px; background: var(--ab-canvas); box-shadow: 0 0 0 1px var(--ab-bi-rim);
 }
 .ab[data-ae="biomechanical-gothic"] .bg-cap { left: 3.4cqw; bottom: 2.6cqw; }
 .ab[data-ae="biomechanical-gothic"] .bg-fig { right: 3.4cqw; top: 2.6cqw; }
@@ -113,7 +115,11 @@
 .ab[data-ae="biomechanical-gothic"] .ab-type-col { padding-left: 22px; padding-right: 22px; }
 .ab[data-ae="biomechanical-gothic"] .ab-type-role { font: 500 10px var(--bg-mono); letter-spacing: 0.22em; color: var(--ab-bi-bone); text-align: center; }
 .ab[data-ae="biomechanical-gothic"] .ab-type-class { text-align: center; font-size: 12px; font-style: italic; margin-bottom: 14px !important; }
-.ab[data-ae="biomechanical-gothic"] .ab-type-pick { color: var(--ab-bi-bone); letter-spacing: 0; }
+.ab[data-ae="biomechanical-gothic"] .ab-type-pick { color: var(--ab-bi-bone); letter-spacing: 0; overflow-wrap: normal; }
+/* a pick never breaks inside its name: under the arch the column's text box is about 28.8cqw - 44px, so every pick
+   is capped to fit a one-word name 8.2em long (Syncopate, the widest face in the list, is 7.8em) */
+.ab[data-ae="biomechanical-gothic"] .ab-type-pick { font-size: min(clamp(16px, 2.2cqw, 22px), calc((28.8cqw - 44px) / 8.2)); }
+.ab[data-ae="biomechanical-gothic"] .ab-type-pick:first-child { font-size: min(clamp(22px, 3.1cqw, 32px), calc((28.8cqw - 44px) / 8.2)); }
 .ab[data-ae="biomechanical-gothic"] .ab-type-fit { justify-items: start; }
 .ab[data-ae="biomechanical-gothic"] .ab-type-cur b { color: var(--ab-bi-bone); }
 .ab[data-ae="biomechanical-gothic"] .ab-fit { padding: 2px 11px; border: 1px solid var(--ab-bi-rim2); background: var(--ab-bi-cast-lo); color: var(--ab-bi-bone); font: 500 10px var(--bg-mono); letter-spacing: 0.1em; text-transform: uppercase; }
@@ -225,7 +231,7 @@
   content: "L" counter(bgrow); display: grid; place-items: center; width: 30px; height: 26px; border-radius: var(--bg-vert); background: var(--ab-bi-cast-hi);
   box-shadow: inset 0 1px 0 var(--ab-bi-rim2), 0 0 0 1px var(--ab-bi-rim); font: 500 10.5px/1 var(--bg-mono); color: var(--ab-bi-bone); letter-spacing: 0.04em;
 }
-.ab[data-ae="biomechanical-gothic"] .ab-row-name { font-weight: 500; letter-spacing: 0.01em; }
+.ab[data-ae="biomechanical-gothic"] .ab-row-name { font-weight: var(--bg-body-mid, 400); letter-spacing: 0.01em; }
 .ab[data-ae="biomechanical-gothic"] .ab-row-status {
   display: inline-flex; align-items: center; gap: 7px; padding: 3px 11px 3px 9px; border-radius: 3px; background: var(--ab-bi-cast-lo); box-shadow: 0 0 0 1px var(--ab-bi-rim);
   font: 500 10px var(--bg-mono); letter-spacing: 0.1em; text-transform: uppercase; color: var(--ab-bi-bone);
@@ -250,6 +256,8 @@
 
 /* ---- narrow boards ---- */
 @container ab (max-width: 600px) {
+  .ab[data-ae="biomechanical-gothic"] .ab-type-pick { font-size: clamp(16px, 2.2cqw, 22px); }
+  .ab[data-ae="biomechanical-gothic"] .ab-type-pick:first-child { font-size: min(clamp(22px, 3.1cqw, 32px), calc((100cqw - 2 * var(--ab-pad) - 44px) / 8.2)); }
   .ab[data-ae="biomechanical-gothic"][data-hero="bleed"] .ab-hero { padding: 0 0 22px; gap: 22px; }
   .ab[data-ae="biomechanical-gothic"][data-hero="bleed"] .ab-hero-copy { max-width: none; }
   .ab[data-ae="biomechanical-gothic"] .ab-tag { font-size: 8.5px; letter-spacing: 0.1em; }
@@ -258,7 +266,7 @@
   .ab[data-ae="biomechanical-gothic"] .ab-card::after, .ab[data-ae="biomechanical-gothic"] .ab-panel::after { height: 90px; }
   .ab[data-ae="biomechanical-gothic"] .ab-row { grid-template-columns: 36px minmax(0, 1fr) 4.5ch; padding: 13px 4px; }
   .ab[data-ae="biomechanical-gothic"] .ab-swatch .ab-chip { margin-bottom: 0; }
-  .ab[data-ae="biomechanical-gothic"] .bg-cap { font-size: 7px; letter-spacing: 0.12em; }
+  .ab[data-ae="biomechanical-gothic"] .bg-cap { font-size: 9px; letter-spacing: 0.1em; }
   .ab[data-ae="biomechanical-gothic"] .ab-foot { letter-spacing: 0.1em; }
 }
 

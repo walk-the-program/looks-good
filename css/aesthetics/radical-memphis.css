@@ -75,10 +75,15 @@
 /* the headline is furniture: each line on a paper laminate slab with a squiggle edge,
    the last word on a solid secondary slab (headline() hook in the js) */
 .ab[data-ae="radical-memphis"] .mm-slab {
-  color: var(--ab-m-black); padding: 0 0.12em 0.16em;
+  /* padding in em above and below the glyph box, so the slab covers the cap tops of any face
+     (a condensed donor face has a shorter content box than Archivo Black) */
+  color: var(--ab-m-black); padding: 0.06em 0.12em 0.16em;
   background: var(--mm-squiggle-edge) 0 100% / 0.42em 0.18em repeat-x, linear-gradient(var(--ab-m-paper), var(--ab-m-paper)) 0 0 / 100% calc(100% - 0.09em) no-repeat;
   -webkit-box-decoration-break: clone; box-decoration-break: clone;
 }
+/* a blend's donor face sets its own (often tight) line-height; the slabs need room for their
+   padding, or each line's paper covers the line above */
+.ab[data-ae="radical-memphis"][data-blend-type] .ab-headline--custom { line-height: max(var(--blt-lh, 1), 1.1) !important; }
 .ab[data-ae="radical-memphis"] .ab-hl { color: var(--ab-m-on-sec); background: var(--ab-secondary); padding: 0 .12em; box-shadow: .08em .08em 0 var(--ab-m-sheet); text-shadow: none; -webkit-box-decoration-break: clone; box-decoration-break: clone; }
 .ab[data-ae="radical-memphis"] .ab-headline--custom > span { display: inline; }
 .ab[data-ae="radical-memphis"] .ab-subcopy { max-width: 25em; margin-top: clamp(22px, 3cqw, 32px) !important; }
@@ -183,21 +188,35 @@
 .ab[data-ae="radical-memphis"] .ab-card-title { margin: 26px 0 8px !important; font-weight: 400; letter-spacing: calc(-0.03em * var(--ab-tr, 1)); font-size: clamp(24px, 3.2cqw, 34px); line-height: 1; }
 .ab[data-ae="radical-memphis"] .ab-card-body { font-size: 13.5px; }
 .ab[data-ae="radical-memphis"] .ab-cta {
-  padding: 8px 8px 8px 24px; border-radius: 0 999px 999px 0; background: var(--ab-primary); color: var(--ab-on-primary); font-size: 14px; font-weight: 700; margin-right: 6px; width: calc(100% - 6px);
-  box-shadow: 6px 6px 0 var(--ab-m-sheet-sec); transition: transform 220ms var(--mm-spring), box-shadow 220ms var(--mm-spring);
+  position: relative;
+  padding: 8px 8px 8px 24px; border-radius: 0 26px 26px 0; background: var(--ab-primary); color: var(--ab-on-primary); font-size: 14px; font-weight: 700; margin-right: 6px; width: calc(100% - 6px);
+  box-shadow: none;
+}
+/* the offset sheet is a plain shape behind the pill (in the card's own stacking context), not a
+   box-shadow: html2canvas paints a box-shadow on a rounded box as a wedge across the label in
+   the deck PNG/PDF export. Offset by inset, not transform (html2canvas lifts transformed boxes). */
+.ab[data-ae="radical-memphis"] .ab-card,
+.ab[data-ae="radical-memphis"] .ab-deck-cellzoom { isolation: isolate; }
+.ab[data-ae="radical-memphis"] .ab-cta::before {
+  content: ""; position: absolute; z-index: -1; inset: 6px -6px -6px 6px; border-radius: inherit; pointer-events: none;
+  background: var(--ab-m-sheet-sec); transition: inset 220ms var(--mm-spring);
 }
 /* the arrow sits on a paper tab in a checker block */
-.ab[data-ae="radical-memphis"] .ab-cta-arrow { display: grid; place-items: center; width: 44px; height: 40px; border-radius: 0 999px 999px 0; background: var(--mm-checker); background-size: 10px 10px; color: var(--ab-m-black); }
+.ab[data-ae="radical-memphis"] .ab-cta-arrow { display: grid; place-items: center; width: 44px; height: 40px; border-radius: 0 18px 18px 0; background: var(--mm-checker); background-size: 10px 10px; color: var(--ab-m-black); }
 .ab[data-ae="radical-memphis"] .ab-cta-arrow::before { content: "→"; font-size: 16px; font-weight: 700; line-height: 1; padding: 3px 5px; background: var(--ab-m-paper); }
-.ab[data-ae="radical-memphis"] .ab-cta:hover { transform: rotate(-1.2deg); }
-.ab[data-ae="radical-memphis"] .ab-cta:active { transform: scale(0.94, 0.92) translate(3px, 3px); box-shadow: 2px 2px 0 var(--ab-m-sheet-sec); }
+/* no transform on the pill (a transform would lift the sheet above it): hover lifts the pill off
+   its sheet, press pushes it down onto it */
+.ab[data-ae="radical-memphis"] .ab-cta:hover { top: -3px; left: -3px; }
+.ab[data-ae="radical-memphis"] .ab-cta:hover::before { inset: 10px -10px -10px 10px; }
+.ab[data-ae="radical-memphis"] .ab-cta:active { top: 3px; left: 3px; }
+.ab[data-ae="radical-memphis"] .ab-cta:active::before { inset: 2px -2px -2px 2px; }
 
 /* 02 laminates: a slab field, a laminate switch, three samples */
 .ab[data-ae="radical-memphis"] .ab-fieldlabel { font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; }
 .ab[data-ae="radical-memphis"] .ab-input {
   padding: 13px 14px 11px; border: 0; border-bottom: 6px solid var(--ab-accent); border-radius: 0; background: var(--ab-m-sec-lo); color: var(--ab-m-black); font-size: 15px; font-weight: 700; caret-color: var(--ab-m-black);
 }
-.ab[data-ae="radical-memphis"] .ab-input:focus { border-bottom-color: var(--ab-primary); -webkit-mask: none; }
+.ab[data-ae="radical-memphis"] .ab-input:focus { border-bottom-color: var(--ab-primary); }
 .ab[data-ae="radical-memphis"] .ab-toggle > span { font-weight: 700; font-size: 13px; }
 .ab[data-ae="radical-memphis"] .ab-switch { width: 62px; height: 32px; border-radius: 999px; background: var(--mm-zig); background-size: 9px 9px, 9px 9px, 9px 9px, 9px 9px, auto; box-shadow: 4px 4px 0 var(--ab-m-sheet); transition: none; }
 .ab[data-ae="radical-memphis"] .ab-switch::before { left: 3px; top: 3px; width: 26px; height: 26px; background: var(--ab-m-black); transition: transform 240ms var(--mm-spring); }
@@ -266,7 +285,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .ab[data-ae="radical-memphis"] .ab-seg-btn, .ab[data-ae="radical-memphis"] .ab-seg-btn::before, .ab[data-ae="radical-memphis"] .ab-cta, .ab[data-ae="radical-memphis"] .ab-switch::before, .ab[data-ae="radical-memphis"] .ab-type-apply { transition: none; }
+  .ab[data-ae="radical-memphis"] .ab-seg-btn, .ab[data-ae="radical-memphis"] .ab-seg-btn::before, .ab[data-ae="radical-memphis"] .ab-cta::before, .ab[data-ae="radical-memphis"] .ab-switch::before, .ab[data-ae="radical-memphis"] .ab-type-apply { transition: none; }
   .ab[data-ae="radical-memphis"] .ab-cta:active, .ab[data-ae="radical-memphis"] .ab-type-apply:active, .ab[data-ae="radical-memphis"] .ab-cta:hover, .ab[data-ae="radical-memphis"] .ab-seg-btn:hover, .ab[data-ae="radical-memphis"] .ab-type-apply:hover { transform: none; }
 }
 

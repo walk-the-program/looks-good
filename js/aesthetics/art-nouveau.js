@@ -208,7 +208,6 @@ registerAesthetic({
       '--an-card': card, '--an-sec': sec, '--an-acc': acc, '--an-stem': stem, '--an-hl': hl,
       '--an-halo': t.mix(acc, t.canvas, 0.4),
       '--an-cap-l': cap(pp, false), '--an-cap-r': cap(pp, true),
-      '--an-capc-l': cap(card, false), '--an-capc-r': cap(card, true),
       '--an-capk-l': cap(t.canvas, false), '--an-capk-r': cap(t.canvas, true),
       '--an-frame-l': outer(false), '--an-frame-r': outer(true),
       '--an-curl': curl, '--an-divider': divider, '--an-ornament': ornament, '--an-ring': ring,

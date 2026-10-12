@@ -14,7 +14,8 @@
 
 .ab[data-ae="neo-deco"] {
   border-radius: 0;
-  background: radial-gradient(ellipse 70% 30% at 50% 0, var(--ab-gilt-c), transparent 72%), var(--ab-canvas);
+  /* a flat field: deco light is hard-edged (rays and bands), never a soft glow */
+  background: var(--ab-canvas);
   /* line - diamond - line, reused by rules, titles and list separators */
   --nd-orn:
     linear-gradient(90deg, transparent, var(--ab-gilt-b) 30%, var(--ab-gilt-a)) left center / calc(50% - 11px) 1px no-repeat,
@@ -33,6 +34,8 @@
   border: 1px solid var(--ab-gilt-b); box-shadow: inset 0 0 0 3px var(--ab-canvas), inset 0 0 0 4px var(--ab-gilt-c);
 }
 .ab[data-ae="neo-deco"] .ab-in { padding: calc(var(--ab-pad) + 8px) calc(var(--ab-pad) + 6px); }
+/* muted text readable on the panels as well as the canvas (--ab-nd-muted, tokens()) */
+.ab[data-ae="neo-deco"] > .ab-in { --ab-muted: var(--ab-nd-muted); }
 
 /* ---- ornamental rules, labels and header ---- */
 .ab[data-ae="neo-deco"] .ab-rule { height: 11px; background: var(--nd-orn); margin: 2px 0; }
@@ -51,7 +54,7 @@
   transform: rotate(45deg); box-shadow: 0 0 0 3px var(--ab-canvas), 0 0 0 4px var(--ab-gilt-b); margin: 6px 0 4px;
 }
 .ab[data-ae="neo-deco"] .ab-mark span { transform: rotate(-45deg); font-weight: 400; font-size: 13px; }
-.ab[data-ae="neo-deco"] .ab-tag { text-align: center; font-size: 10px; letter-spacing: 0.3em; }
+.ab[data-ae="neo-deco"] .ab-tag { text-align: center; font-size: 10px; letter-spacing: 0.3em; color: var(--ab-gilt-text); }
 
 /* ---- hero: the title card sits on the sunburst ---- */
 .ab[data-ae="neo-deco"][data-hero="centered"] .ab-hero {
@@ -176,7 +179,7 @@
 .ab[data-ae="neo-deco"] .ab-disc { width: 58px; height: 46px; margin: 4px auto 14px; border-radius: 0; background: var(--ab-canvas); box-sizing: border-box; }
 .ab[data-ae="neo-deco"] .ab-disc[data-s="0"] { border: 1px solid var(--ab-gilt); }
 .ab[data-ae="neo-deco"] .ab-disc[data-s="1"] { border: 1px solid var(--ab-gilt); box-shadow: inset 0 0 0 3px var(--ab-canvas), inset 0 0 0 4px var(--ab-gilt-a); }
-.ab[data-ae="neo-deco"] .ab-disc[data-s="2"] { border: 14px solid transparent; border-image: var(--ab-nd-frame-s) 20 / 14px stretch; background-clip: padding-box; }
+.ab[data-ae="neo-deco"] .ab-disc[data-s="2"] { border: 0; background: var(--ab-nd-step) center / 100% 100% no-repeat, var(--ab-canvas); }
 
 /* 03: roman numerals, ornamental separators, a brass hairline for progress */
 .ab[data-ae="neo-deco"] .ab-list { counter-reset: ndr; }
@@ -246,6 +249,9 @@
   .ab[data-ae="neo-deco"] .ab-sections { grid-template-columns: minmax(0, 1fr); }
   .ab[data-ae="neo-deco"] .ab-row { grid-template-columns: 3ch minmax(0, 1fr) auto 4.5ch; padding: 16px 2px; }
   .ab[data-ae="neo-deco"] .ab-tag { max-width: none; font-size: 9px; }
+  /* a long name wraps to centred lines instead of being cropped at both sides */
+  .ab[data-ae="neo-deco"] .ab-brand { max-width: 100%; }
+  .ab[data-ae="neo-deco"] .ab-wordmark { max-width: 100%; white-space: normal; overflow: visible; text-overflow: clip; overflow-wrap: normal; text-wrap: balance; letter-spacing: calc(0.2em * var(--ab-tr, 1)); }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -253,9 +259,10 @@
 }
 
 /* ----- deck slides. Deck-scoped; the board is unchanged. ----- */
-.ab[data-ae="neo-deco"].ab-slide .ab-head { gap: 4px; padding-bottom: 12px; }
+.ab[data-ae="neo-deco"].ab-slide .ab-head { gap: 14px; padding-bottom: 12px; }
 .ab[data-ae="neo-deco"].ab-slide .ab-brand { flex-direction: row; align-items: center; gap: 16px; }
-.ab[data-ae="neo-deco"].ab-slide .ab-mark { margin: 0 4px 0 2px; }
+/* the rotated square's corners reach 6px past its box: keep them off the tag line below */
+.ab[data-ae="neo-deco"].ab-slide .ab-mark { margin: 6px; }
 .ab[data-ae="neo-deco"].ab-slide .ab-foot { flex-direction: row; justify-content: center; gap: 28px; padding-top: 16px; }
 /* cover: the title card on the full-width sunburst */
 .ab[data-ae="neo-deco"].ab-slide[data-slide="cover"][data-hero="centered"] .ab-deck-cover .ab-hero { grid-template-rows: auto; padding: 6px 0 0; }

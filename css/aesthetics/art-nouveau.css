@@ -5,7 +5,7 @@
    --an-ink (text), --an-line (contour), --an-olive (text on litho fills), --an-gold (thin
    halo rings only), --an-card, --an-sec / --an-acc (litho secondary / accent), --an-stem
    (secondary deepened to read as a line), --an-hl (highlight word), --an-halo, and SVG
-   data URIs: cartouche ends --an-cap-l/-r (primary), --an-capc-* (card), --an-capk-*
+   data URIs: cartouche ends --an-cap-l/-r (primary), --an-capk-*
    (paper), outer frame --an-frame-l/-r, --an-curl, --an-divider, --an-ornament, --an-ring,
    --an-vine, --an-leaf-off/-on, --an-stem-tile, --an-bud, --an-cta-bud, --an-side-l/-r,
    --an-mosaic. --ab-primary is the printed litho primary (def.printPrimary).
@@ -123,6 +123,7 @@
   border-radius: 999px 999px 0 0 / 20px 20px 0 0; font-size: 13px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ab-ink);
 }
 .ab[data-ae="art-nouveau"] .ab-seg-btn[aria-pressed="true"] { background: var(--ab-primary); color: var(--an-olive); font-weight: 400; }
+.ab[data-ae="art-nouveau"] .ab-seg-btn:not([aria-pressed="true"]):hover { background: linear-gradient(var(--an-gold), var(--an-gold)) 50% 100% / 60% 2px no-repeat, var(--an-halo); }
 .ab[data-ae="art-nouveau"] .ab-card-title {
   margin: 26px 0 8px !important; font-family: var(--ab-font-h); font-weight: 400; letter-spacing: 0.02em;
   font-size: clamp(23px, 3cqw, 30px); line-height: 1.1;
@@ -134,17 +135,18 @@
   background: var(--an-cap-l) 0 0 / 24px 100% no-repeat, var(--an-cap-r) 100% 0 / 24px 100% no-repeat,
     linear-gradient(var(--an-line), var(--an-line)) 24px 1.5px / calc(100% - 48px) 1.5px no-repeat,
     linear-gradient(var(--an-line), var(--an-line)) 24px calc(100% - 1.5px) / calc(100% - 48px) 1.5px no-repeat,
-    linear-gradient(var(--ab-primary), var(--ab-primary)) 23px 0 / calc(100% - 46px) 100% no-repeat;
+    linear-gradient(var(--ab-primary), var(--ab-primary)) 23px 1.5px / calc(100% - 46px) calc(100% - 3px) no-repeat;
 }
-.ab[data-ae="art-nouveau"] .ab-cta:hover { filter: brightness(1.04); }
-.ab[data-ae="art-nouveau"] .ab-cta:active { filter: brightness(0.96); }
+.ab[data-ae="art-nouveau"] .ab-cta:hover { filter: brightness(0.84); }
+.ab[data-ae="art-nouveau"] .ab-cta:active { filter: brightness(0.76); }
 .ab[data-ae="art-nouveau"] .ab-cta:focus-visible { outline: 1.5px solid var(--an-line); outline-offset: 4px; }
 .ab[data-ae="art-nouveau"] .ab-cta-arrow { width: 30px; height: 16px; background: var(--an-cta-bud) center / contain no-repeat; }
 .ab[data-ae="art-nouveau"] .ab-cta-arrow::before { content: none; }
 
 /* 02 Frames: curl field, vine toggle, three cartouche states */
-.ab[data-ae="art-nouveau"] .ab-fieldlabel { position: relative; font-size: 12px; letter-spacing: 0.2em; text-transform: uppercase; margin-bottom: 12px; }
-.ab[data-ae="art-nouveau"] .ab-fieldlabel::after { content: ""; position: absolute; left: -4px; bottom: -15px; width: 20px; height: 20px; background: var(--an-curl) center / contain no-repeat; }
+.ab[data-ae="art-nouveau"] .ab-fieldlabel { position: relative; font-size: 12px; letter-spacing: 0.2em; text-transform: uppercase; margin-bottom: 12px; padding-left: 26px; }
+/* the curl leads into the label from the left, clear of the letters and of the field below */
+.ab[data-ae="art-nouveau"] .ab-fieldlabel::after { content: ""; position: absolute; left: 0; top: 50%; width: 20px; height: 20px; margin-top: -10px; background: var(--an-curl) center / contain no-repeat; }
 .ab[data-ae="art-nouveau"].ab .ab-input { border: 1.5px solid var(--an-line); border-radius: 2px; background: var(--ab-canvas); padding: 12px 16px; font-size: 16px; }
 .ab[data-ae="art-nouveau"].ab .ab-input:focus { box-shadow: 0 0 0 3px var(--an-card), 0 0 0 4px var(--an-gold); }
 .ab[data-ae="art-nouveau"] .ab-toggle { font-size: 15px; font-style: italic; }
@@ -157,16 +159,16 @@
 .ab[data-ae="art-nouveau"] .ab-switch:checked::before { background-image: var(--an-leaf-on); transform: translateX(42px) rotate(90deg); }
 .ab[data-ae="art-nouveau"] .ab-switch:focus-visible { outline: 1.5px solid var(--an-line); outline-offset: 3px; }
 .ab[data-ae="art-nouveau"] .ab-status { font-style: italic; font-size: 13px; }
-.ab[data-ae="art-nouveau"] .ab-states { margin-top: 28px; gap: 8px; }
+.ab[data-ae="art-nouveau"] .ab-states { margin-top: 28px; gap: 12px; }
 .ab[data-ae="art-nouveau"] .ab-disc {
-  position: relative; width: 78px; height: 40px; margin: 10px auto 18px; border: 0; border-radius: 0;
+  position: relative; width: 62px; height: 40px; margin: 10px auto 18px; border: 0; border-radius: 0;
   background: var(--an-cap-l) 0 0 / 20px 100% no-repeat, var(--an-cap-r) 100% 0 / 20px 100% no-repeat,
     linear-gradient(var(--an-line), var(--an-line)) 20px 1px / calc(100% - 40px) 1.5px no-repeat,
     linear-gradient(var(--an-line), var(--an-line)) 20px calc(100% - 1px) / calc(100% - 40px) 1.5px no-repeat,
-    linear-gradient(var(--ab-primary), var(--ab-primary)) 19px 0 / calc(100% - 38px) 100% no-repeat;
+    linear-gradient(var(--ab-primary), var(--ab-primary)) 19px 1px / calc(100% - 38px) calc(100% - 2px) no-repeat;
 }
 .ab[data-ae="art-nouveau"] .ab-disc[data-s="1"]::after {
-  content: ""; position: absolute; inset: -9px -13px;
+  content: ""; position: absolute; inset: -9px -11px;
   background: var(--an-frame-l) 0 0 / 22px 100% no-repeat, var(--an-frame-r) 100% 0 / 22px 100% no-repeat,
     linear-gradient(var(--an-line), var(--an-line)) 22px 1px / calc(100% - 44px) 1px no-repeat,
     linear-gradient(var(--an-line), var(--an-line)) 22px calc(100% - 1px) / calc(100% - 44px) 1px no-repeat;
@@ -176,7 +178,7 @@
   background: var(--an-cap-l) 0 16px / 20px 40px no-repeat, var(--an-cap-r) 100% 16px / 20px 40px no-repeat,
     linear-gradient(var(--an-line), var(--an-line)) 20px 17px / calc(100% - 40px) 1.5px no-repeat,
     linear-gradient(var(--an-line), var(--an-line)) 20px 54px / calc(100% - 40px) 1.5px no-repeat,
-    linear-gradient(var(--ab-primary), var(--ab-primary)) 19px 16px / calc(100% - 38px) 40px no-repeat,
+    linear-gradient(var(--ab-primary), var(--ab-primary)) 19px 17px / calc(100% - 38px) 38.5px no-repeat,
     radial-gradient(circle at 50% 50%, var(--an-halo) 0 31px, var(--an-gold) 31px 32px, transparent 32px 34.5px, var(--an-gold) 34.5px 35.5px, transparent 35.5px) center / 72px 72px no-repeat;
 }
 .ab[data-ae="art-nouveau"] .ab-state-name { font-family: var(--ab-font-h); font-size: 15px; letter-spacing: 0.06em; color: var(--ab-ink); }
@@ -217,6 +219,9 @@
   .ab[data-ae="art-nouveau"] .ab-row { grid-template-columns: 34px minmax(0, 1fr) 4.5ch; }
   .ab[data-ae="art-nouveau"] .ab-seg-btn { font-size: 11px; letter-spacing: 0.08em; }
   .ab[data-ae="art-nouveau"] .ab-cta { padding: 0 24px; letter-spacing: 0.08em; white-space: nowrap; }
+  /* three cartouches in a ~250px panel: narrower plates, a tighter frame, clear gaps */
+  .ab[data-ae="art-nouveau"] .ab-disc { width: 54px; }
+  .ab[data-ae="art-nouveau"] .ab-disc[data-s="1"]::after { inset: -8px -9px; }
 }
 
 /* deck */
@@ -234,10 +239,8 @@
 .ab[data-ae="art-nouveau"].ab-slide .ab-deck-pname,
 .ab[data-ae="art-nouveau"].ab-slide .ab-deck-pratio b { font-weight: 600; }
 .ab[data-ae="art-nouveau"].ab-slide .ab-deck-pchip { font-weight: 400; }
-.ab[data-ae="art-nouveau"].ab-slide .ab-card,
-.ab[data-ae="art-nouveau"].ab-slide .ab-panel { margin: 0; }
-.ab[data-ae="art-nouveau"].ab-slide .ab-card::after,
-.ab[data-ae="art-nouveau"].ab-slide .ab-panel::after { content: none; }
+.ab[data-ae="art-nouveau"].ab-slide .ab-card { margin: 0; }
+.ab[data-ae="art-nouveau"].ab-slide .ab-card::after { content: none; }
 .ab[data-ae="art-nouveau"].ab-slide.ab-slide .ab-deck-cell .ab-cta { height: 48px; padding: 0 30px; }
 /* Do / Don't: roman numerals in dot-ring medallions (def.deck.marks), a whiplash between columns */
 .ab[data-ae="art-nouveau"].ab-slide .ab-deck-col[data-kind="dont"] { border-left: 1px solid var(--an-line); }

@@ -396,7 +396,8 @@ registerAesthetic({
 
   // Baize by night, cream felt by day; never clinical white.
   canvas(b) {
-    return b.isDark ? b.mix(CC.baize, b.canvas, 0.8) : b.mix('#E3D9C4', b.canvas, 0.78);
+    // light mode keeps the cabinet's baize, faded to a pale sage felt (never Dark Academia's cream paper)
+    return b.isDark ? b.mix(CC.baize, b.canvas, 0.8) : b.mix('#CDD5C2', b.canvas, 0.84);
   },
 
   tokens(t) {
@@ -410,6 +411,10 @@ registerAesthetic({
       '--ab-cc-felt': d ? t.mix('#000000', t.canvas, 0.28) : t.mix('#000000', t.canvas, 0.08),
       '--ab-cc-oak': CC.oak, '--ab-cc-oak-top': CC.oakTop, '--ab-cc-oak-lo': CC.oakLo,
       '--ab-cc-paper': CC.paper, '--ab-cc-label-ink': CC.ink,
+      // a highlight set in the client accent (a blend's colour channel) lands on the cream label, not the dark
+      // canvas the framework checked it against: re-checked on the label paper, the accent, else the primary,
+      // else the label ink (>= 3:1 for display text)
+      '--ab-cc-label-hl': [t.accent, t.primary].find(c => t.contrast(c, CC.paper) >= 3) || CC.ink,
       '--ab-cc-brass': CC.brass, '--ab-cc-brass-hi': CC.brassHi, '--ab-cc-brass-lo': CC.brassLo,
       '--ab-cc-drawer': dr.mid, '--ab-cc-drawer-hi': dr.hi, '--ab-cc-drawer-lo': dr.lo,
       '--ab-cc-glass': sec.mid, '--ab-cc-glass-hi': sec.hi, '--ab-cc-glass-lo': sec.lo,

@@ -8,13 +8,6 @@
    palette as full-width strips, the real CTA shown at rest / hover / pressed.
    The deck's Material slide shows a wireframe of the board itself (deck.materialArt),
    In product is an unstyled HTML directory index (deck.product). */
-// Heaviest weight the current heading face really has (FONTS `weights`), capped at 900.
-function rbHeavy() {
-  const f = typeof state !== 'undefined' && state && state.headingFont;
-  const ws = String((f && f.weights) || '400').split(';').map(Number).filter(n => n > 0);
-  return Math.min(900, Math.max(400, ...ws));
-}
-
 registerAesthetic({
   key: 'raw-brutalist', order: 2,
   name: 'Raw Brutalist',
@@ -71,7 +64,7 @@ registerAesthetic({
     principles: [
       ['Hard edges, thick borders', 'Zero radius and 2px ink borders on every control.'],
       ['Flat: invert, never lift', 'Hover inverts to ink; pressed takes an inset outline.'],
-      ['Mono, uppercase, numbered like [01]', 'Every label, tab and button is set in monospace caps.'],
+      ['Mono caps, numbered [01]', 'Every label, tab and button is set in monospace caps.'],
     ],
     do: [
       'Use zero radius and 2px ink borders.',
@@ -103,12 +96,14 @@ registerAesthetic({
   },
 
   // --ab-tr scales the tight headline tracking: 0 for condensed/heavy faces (they collide when tightened), 1 otherwise
-  tokens(t) {
+  tokens(t, st) {
+    const v = st || (typeof state !== 'undefined' ? state : null);
     return {
       '--ab-type-pick-w': 400,
-      // the heading face's heaviest real weight (Archivo Black has only 400; font-synthesis is off)
-      '--rb-hw': rbHeavy(),
-       '--ab-grid': t.alpha(t.ink, t.isDark ? 0.1 : 0.06) };
+      // the heading face's heaviest real weight, capped at 900 (Archivo Black has only 400;
+      // font-synthesis is off). Read from the rendered state, so a blend's face counts.
+      '--rb-hw': abWeight(v && v.headingFont, 900),
+      '--ab-grid': t.alpha(t.ink, t.isDark ? 0.1 : 0.06) };
   },
 
   // Exposed structure, all plain markup (no drawing):

@@ -10,7 +10,7 @@
    -strong), --ab-eds-* come from js/aesthetics/editorial-serif.js tokens().
    Hooks used: hero 'poster' (re-gridded: copy over the plate), palette
    'chips', sections 'asym', type ui/label sans, highlight 'custom', states
-   'button', deck.materialStage 'pattern', deck.coverDisplay.
+   'button', deck.materialArt (paper, rules and the still life), deck.coverDisplay.
 ------------------------------------------------------------------------ */
 
 .ab[data-ae="editorial-serif"] {
@@ -21,19 +21,22 @@
 
 /* ---- masthead: dateline | wordmark | tag, then a thick-over-thin rule ---- */
 .ab[data-ae="editorial-serif"] .ab-head {
-  display: grid; grid-template-columns: 1fr auto 1fr; align-items: end; gap: 16px;
+  display: grid; grid-template-columns: minmax(max-content, 1fr) minmax(0, auto) minmax(max-content, 1fr); align-items: end; gap: 16px;
   padding-bottom: clamp(10px, 1.6cqw, 16px);
 }
 .ab[data-ae="editorial-serif"] .ab-head::before {
-  content: "Vol. 01 · No. 1"; font-size: 10.5px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--ab-muted);
+  content: "Vol. 01 · No. 1"; white-space: nowrap; font-size: 10.5px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--ab-muted);
 }
 .ab[data-ae="editorial-serif"] .ab-brand {
-  justify-self: center; font-weight: 400; text-transform: uppercase; letter-spacing: calc(0.05em * var(--ab-tr, 1));
+  justify-self: center; min-width: 0; text-align: center; font-weight: 400; text-transform: uppercase; letter-spacing: calc(0.05em * var(--ab-tr, 1));
   font-size: clamp(20px, 3cqw, 34px); line-height: 1;
 }
+.ab[data-ae="editorial-serif"] .ab-brand .ab-wordmark { min-width: 0; }
+/* slides: a name too long for the middle column ends in an ellipsis instead of running over the metas */
+.ab[data-ae="editorial-serif"].ab-slide .ab-brand { max-width: 100%; overflow: hidden; }
 .ab[data-ae="editorial-serif"] .ab-mark { display: none; }
 .ab[data-ae="editorial-serif"] .ab-logo { max-height: 38px; }
-.ab[data-ae="editorial-serif"] .ab-tag { font-size: 10.5px; letter-spacing: 0.16em; }
+.ab[data-ae="editorial-serif"] .ab-tag { justify-self: end; white-space: nowrap; font-size: 10.5px; letter-spacing: 0.16em; }
 .ab[data-ae="editorial-serif"] .ab-rule { background: var(--ab-hair); }
 .ab[data-ae="editorial-serif"] .ab-head + .ab-rule {
   height: 7px; background:
@@ -95,8 +98,14 @@
   font-size: min(19cqw, calc(93cqw / (var(--eds-mn, 12) * 0.5))); letter-spacing: -0.02em;
   text-align: justify; text-align-last: justify; color: var(--ab-eds-deep); white-space: normal;
 }
+.ab[data-ae="editorial-serif"] .eds-mast.is-multi { text-align: left; text-align-last: left; }
 .ab[data-ae="editorial-serif"] .eds-no {
-  position: absolute; z-index: 3; right: 4%; top: calc(4% + min(19cqw, calc(93cqw / (var(--eds-mn, 12) * 0.5)))); font: 500 9px/1 var(--ab-font-ui); letter-spacing: 0.2em; text-transform: uppercase; color: var(--ab-eds-deep);
+  position: absolute; z-index: 3; right: 4%; top: calc(4% + min(19cqw, calc(93cqw / (var(--eds-mn, 12) * 0.5)))); font: 500 9px/1 var(--ab-font-ui); letter-spacing: 0.2em; text-transform: uppercase; color: var(--ab-eds-dark);
+}
+/* the lower-third scrim the kicker, headline and standfirst sit on */
+.ab[data-ae="editorial-serif"] .eds-plate::after {
+  content: ""; position: absolute; inset: 0; z-index: 1; pointer-events: none;
+  background: linear-gradient(to top, var(--ab-eds-scrim) 0%, var(--ab-eds-scrim) 46%, transparent 66%);
 }
 .ab[data-ae="editorial-serif"] .eds-fig {
   display: flex; justify-content: space-between; align-items: baseline; gap: 10px; font-family: var(--ab-font-b); font-size: 10px; line-height: 1.3; color: var(--ab-muted);
@@ -184,28 +193,20 @@
   background: var(--ab-primary); color: var(--ab-on-primary); box-shadow: none; transition: background 0.15s, color 0.15s, transform 0.1s;
 }
 .ab[data-ae="editorial-serif"] .ab-cta:hover { background: var(--ab-ink); color: var(--ab-canvas); }
-.ab[data-ae="editorial-serif"] .ab-cta:active { background: var(--ab-ink); color: var(--ab-canvas); box-shadow: inset 0 0 0 1px var(--ab-canvas), inset 0 0 0 2px var(--ab-ink); transform: translateY(1px); }
+.ab[data-ae="editorial-serif"] .ab-cta:active { background: transparent; color: var(--ab-ink); outline: 1px solid var(--ab-ink); outline-offset: -1px; text-decoration: underline; text-underline-offset: 0.3em; transform: translateY(1px); }
 .ab[data-ae="editorial-serif"] .ab-cta-arrow::before { content: "→"; font-size: 15px; letter-spacing: 0; }
 
-/* 02: a printed form */
-.ab[data-ae="editorial-serif"] .ab-fieldlabel { font-family: var(--ab-font-label); font-size: 10.5px; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; color: var(--ab-ink); margin-bottom: 4px; }
-.ab[data-ae="editorial-serif"] .ab-input {
-  padding: 8px 0 9px; border: 0; border-bottom: 1px solid var(--ab-hair-strong); border-radius: 0; background: none;
-  font-family: var(--ab-font-h); font-style: italic; font-size: 24px; line-height: 1.2; margin-bottom: 20px;
-  transition: border-color 0.15s, box-shadow 0.15s;
-}
-.ab[data-ae="editorial-serif"] .ab-input:focus { border-bottom-color: var(--ab-primary); box-shadow: 0 1px 0 var(--ab-primary); }
+/* the deck Interface slide's toggle (the board's 02 is the text page below) */
 .ab[data-ae="editorial-serif"] .ab-toggle { padding: 10px 0; border-top: 1px solid var(--ab-hair-soft); border-bottom: 1px solid var(--ab-hair-soft); font-size: 11px; font-weight: 500; letter-spacing: 0.16em; text-transform: uppercase; }
 .ab[data-ae="editorial-serif"] .ab-switch { width: 40px; height: 18px; border-radius: 0; background: none; box-shadow: inset 0 0 0 1px var(--ab-hair-strong); transition: background 0.15s; }
 .ab[data-ae="editorial-serif"] .ab-switch::before { left: 3px; top: 3px; width: 12px; height: 12px; border-radius: 0; background: var(--ab-ink); transition: transform 0.15s, background 0.15s; }
 .ab[data-ae="editorial-serif"] .ab-switch:checked { background: var(--ab-primary); box-shadow: inset 0 0 0 1px var(--ab-primary); }
 .ab[data-ae="editorial-serif"] .ab-switch:checked::before { transform: translateX(22px); background: var(--ab-on-primary); }
-.ab[data-ae="editorial-serif"] .ab-status { margin-top: 8px; font-family: var(--ab-font-b); font-style: italic; font-size: 13px; }
 .ab[data-ae="editorial-serif"] .ab-states { margin-top: 20px; gap: clamp(14px, 2.4cqw, 26px); border-top: 1px solid var(--ab-hair); padding-top: 16px; }
 .ab[data-ae="editorial-serif"] .ab-state { display: flex; flex-direction: column; align-items: stretch; gap: 0; font-family: var(--ab-font-label); font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase; }
 .ab[data-ae="editorial-serif"] .ab-states .ab-state-ctl { padding: 10px 8px; font-size: 10.5px; letter-spacing: 0.16em; border-radius: 0; background: var(--ab-primary); color: var(--ab-on-primary); }
 .ab[data-ae="editorial-serif"] .ab-states .ab-state-ctl.is-hover { background: var(--ab-ink); color: var(--ab-canvas); }
-.ab[data-ae="editorial-serif"] .ab-states .ab-state-ctl.is-pressed { background: var(--ab-ink); color: var(--ab-canvas); box-shadow: inset 0 0 0 1px var(--ab-canvas), inset 0 0 0 2px var(--ab-ink); transform: translateY(1px); }
+.ab[data-ae="editorial-serif"] .ab-states .ab-state-ctl.is-pressed { background: transparent; color: var(--ab-ink); border: 1px solid var(--ab-ink); padding: 9px 7px; text-decoration: underline; text-underline-offset: 0.3em; transform: translateY(1px); }
 /* small-caps caption under a hairline tick */
 .ab[data-ae="editorial-serif"] .ab-state-name { position: relative; margin-top: 8px; padding-top: 9px; text-align: center; color: var(--ab-muted); }
 .ab[data-ae="editorial-serif"] .ab-state-name::before { content: ""; position: absolute; left: 50%; top: 0; width: 1px; height: 6px; background: var(--ab-hair-strong); }
@@ -227,6 +228,7 @@
   display: flex; justify-content: space-between; gap: 12px; margin: 16px 0 0; padding-top: 8px; border-top: 1px solid var(--ab-hair-soft);
   font-family: var(--ab-font-label); font-size: 9px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--ab-muted);
 }
+.ab[data-ae="editorial-serif"] .eds-by span:last-child { flex: none; white-space: nowrap; }
 
 /* 03: a table of contents */
 .ab[data-ae="editorial-serif"] .ab-list { border-top: 1px solid var(--ab-hair-strong); }
@@ -289,19 +291,33 @@
 /* ---- Brand deck ---- */
 /* cover: headline in ink on the paper at left, the plate fills the right 55% with the masthead across its top */
 .ab[data-ae="editorial-serif"].ab-slide[data-slide="cover"] .ab-deck-cover .ab-hero {
-  grid-template-columns: minmax(0, 45fr) minmax(0, 55fr); column-gap: 36px; align-items: stretch; padding: 4px 0 0;
+  grid-template-columns: minmax(0, 56fr) minmax(0, 44fr); column-gap: 36px; align-items: stretch; padding: 4px 0 0;
 }
 .ab[data-ae="editorial-serif"].ab-slide[data-slide="cover"] .ab-deck-cover .ab-hero-copy {
   grid-area: 1 / 1; align-self: end; padding: 0 0 8px; color: var(--ab-ink);
 }
-.ab[data-ae="editorial-serif"].ab-slide[data-slide="cover"] .ab-deck-cover .ab-art { grid-area: 1 / 2; aspect-ratio: auto; align-self: stretch; height: auto; min-height: 372px; max-width: none !important; width: auto !important; }
+.ab[data-ae="editorial-serif"].ab-slide[data-slide="cover"] .ab-deck-cover .ab-art { grid-area: 1 / 2; aspect-ratio: auto; align-self: stretch; height: auto; min-height: 340px; max-width: none !important; width: auto !important; }
 .ab[data-ae="editorial-serif"].ab-slide[data-slide="cover"] .ab-deck-cover .ab-headline,
 .ab[data-ae="editorial-serif"].ab-slide[data-slide="cover"] .ab-deck-cover .ab-kicker,
 .ab[data-ae="editorial-serif"].ab-slide[data-slide="cover"] .ab-deck-cover .ab-subcopy { color: var(--ab-ink); }
 .ab[data-ae="editorial-serif"].ab-slide[data-slide="cover"] .ab-deck-cover .ab-headline { max-width: none; }
+/* the headline sits beside the plate on the cover, so the plate needs no lower-third scrim */
+.ab[data-ae="editorial-serif"].ab-slide[data-slide="cover"] .eds-plate::after { content: none; }
 /* principles and closing: the motto in ink, the italic word in the same ink */
 .ab[data-ae="editorial-serif"].ab-slide .ab-headline.ab-deck-h { color: var(--ab-ink); line-height: 0.96; }
 /* do / don't: the rule numbers set as italic folios in the heading face */
 .ab[data-ae="editorial-serif"].ab-slide { --dk-mark-do: var(--ab-ink); }
 .ab[data-ae="editorial-serif"].ab-slide .ab-deck-mark { font-family: var(--ab-font-h); font-style: italic; font-weight: 400; font-size: 22px; letter-spacing: 0; }
 .ab[data-ae="editorial-serif"].ab-slide .ab-deck-ptitle, .ab[data-ae="editorial-serif"].ab-slide .ab-deck-pchip { font-weight: 400; }
+/* material (def.deck.materialArt): a sheet of the paper with the two rules, beside the duotone print */
+.ab[data-ae="editorial-serif"].ab-slide .ab-deck-stage[data-stage="own"] .ab-art { inset: 0; margin: 0; width: 100%; height: 100%; aspect-ratio: auto; }
+.ab[data-ae="editorial-serif"] .eds-mat { position: absolute; inset: 0; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 28px; }
+.ab[data-ae="editorial-serif"] .eds-mat-sheet { display: flex; flex-direction: column; justify-content: flex-end; gap: 10px; padding: 26px 24px; background: var(--ab-canvas); border: 1px solid var(--ab-hair); }
+.ab[data-ae="editorial-serif"] .eds-mat-sheet > .eds-mat-k:first-child { margin-bottom: auto; }
+.ab[data-ae="editorial-serif"] .eds-mat-k { margin: 0 0 18px; font: 500 10.5px/1.3 var(--ab-font-label); letter-spacing: 0.16em; text-transform: uppercase; color: var(--ab-muted); }
+.ab[data-ae="editorial-serif"] .eds-mat-mast { display: block; height: 7px; border-top: 3px solid var(--ab-hair-strong); border-bottom: 1px solid var(--ab-hair-strong); }
+.ab[data-ae="editorial-serif"] .eds-mat-hair { display: block; height: 0; border-top: 1px solid var(--ab-hair); }
+.ab[data-ae="editorial-serif"] .eds-mat-print { display: flex; flex-direction: column; gap: 9px; margin: 0; min-height: 0; }
+.ab[data-ae="editorial-serif"] .eds-mat-img { position: relative; flex: 1; min-height: 0; overflow: hidden; background: var(--ab-eds-deep); }
+.ab[data-ae="editorial-serif"] .eds-mat-print figcaption { font-family: var(--ab-font-b); font-size: 12px; color: var(--ab-muted); }
+.ab[data-ae="editorial-serif"] .eds-mat-print em { color: var(--ab-ink); }

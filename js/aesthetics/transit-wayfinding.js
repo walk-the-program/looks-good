@@ -44,17 +44,30 @@ function twLetters(name) {
   ['X', 'Y', 'Z'].forEach(ch => { if (out.length < 3 && !out.includes(ch)) out.push(ch); });
   return out;
 }
-function twBrandName() {
+// The brand name of the rendered state (the tokens hook's second argument); the content
+// default when it is blank.
+function twBrandName(st) {
+  const v = st && st.content && st.content.brandName;
+  if (typeof v === 'string' && v.trim()) return v;
   try { if (typeof effectiveContent === 'function') return effectiveContent().brandName; } catch (err) { /* fall through */ }
-  return (typeof state !== 'undefined' && state && state.brandName) || 'Brand';
+  return 'Brand';
 }
 
-// The heaviest weight of the heading face up to `cap` (no fake bold).
-function twWeight(cap) {
-  const hf = typeof state !== 'undefined' && state && state.headingFont;
-  const ws = String((hf && hf.weights) || '700').split(';').map(Number).filter(Boolean);
-  const le = ws.filter(x => x <= cap);
-  return le.length ? Math.max(...le) : Math.min(...ws);
+// A middle dot set in a neutral sans: the heading face's own U+00B7 (Overpass) has a wide left
+// and no right side-bearing, so "A · B" reads "A ·B".
+const TW_SEP = '<span class="tw-sep" aria-hidden="true">·</span>';
+const TW_SEP_SVG = '<tspan font-family="Arial, Helvetica, sans-serif">·</tspan>';
+
+// The brand name cut to whole words that fit `units` of map width at `px` (estimated at 0.6em a
+// character, bold); a single word that is still too long is cut with an ellipsis.
+function twFitName(name, units, px) {
+  const max = Math.max(4, Math.floor(units / (px * 0.6)));
+  const s = String(name || '').trim();
+  if (s.length <= max) return s;
+  const words = s.split(/\s+/);
+  let out = '';
+  for (const w of words) { const next = out ? out + ' ' + w : w; if (next.length > max) break; out = next; }
+  return out || s.slice(0, max - 1) + '…';
 }
 
 // Route colours for a token object: b = on black (signs, bullets), g = on the map paper / ground.
@@ -162,14 +175,14 @@ registerAesthetic({
   // The concourse is fixed: colour is rationed to routes.
   canvas(b) { return b.isDark ? '#16181A' : '#E8E8E4'; },
 
-  tokens(t) {
+  tokens(t, st) {
+    const S = st || (typeof state !== 'undefined' ? state : null) || {};
     const R = twRoutes(t);
-    const L = twLetters(twBrandName());
-    const hw = twWeight(800);
+    const L = twLetters(twBrandName(S));
     const vars = {
       '--ab-type-pick-w': 400,   // secondary picks; the lead pick is set at 800 in the css (every lead pick has 800)
-      '--tw-hw': hw,
-      '--tw-mw': twWeight(600),
+      '--tw-hw': abWeight(S.headingFont, 800),
+      '--tw-mw': abWeight(S.headingFont, 600),
       '--ab-sign': TW_SIGN,
       '--ab-alert': TW_ALERT,
       '--ab-rail': TW_GREY,
@@ -216,12 +229,12 @@ registerAesthetic({
     const W = 10; // line width
     // lines (0/45/90 only), interchange H at (360,170)
     const lines = [
-      { r: R[0], pts: [[-20, 170], [560, 170], [620, 230], [690, 230]], dash: [[690, 230], [740, 230]] },
+      { r: R[0], pts: [[-600, 170], [560, 170], [620, 230], [690, 230]], dash: [[690, 230], [740, 230]] },
       { r: R[1], pts: [[64, 40], [230, 40], [360, 170], [360, 266]] },
       { r: R[2], pts: [[64, 266], [270, 266], [360, 176], [450, 86], [652, 86]] },
     ];
     const stroke = lines.map(l => `<path d="${twPath(l.pts, 30)}" stroke="${l.r.g}"/>`).join('');
-    const ext = `<path d="M690 230H760" stroke="${TW_GREY}" stroke-dasharray="2 9" stroke-width="${W - 4}"/>`;
+    const ext = `<path d="M690 230H1400" stroke="${TW_GREY}" stroke-dasharray="2 9" stroke-width="${W - 4}"/>`;
     // stations: [x, y, line, tick dir (dx,dy), label, anchor, lx, ly]
     const st = [
       [96, 170, 0, [0, -1], 'Mill Lane', 'middle', 96, 148],
@@ -230,9 +243,9 @@ registerAesthetic({
       [600, 210, 0, [1, -1], 'Harbour', 'start', 618, 205],
       [150, 40, 1, [0, 1], 'North Gate', 'middle', 150, 69],
       [296, 106, 1, [1, -1], 'Library', 'start', 312, 101],
-      [360, 226, 1, [-1, 0], 'Studio', 'end', 344, 230],
+      [360, 240, 1, [1, 0], 'Studio', 'start', 376, 245],
       [168, 266, 2, [0, -1], 'Old Quay', 'middle', 168, 244],
-      [405, 131, 2, [1, 1], 'Gallery', 'start', 420, 144],
+      [405, 131, 2, [1, 1], 'Gallery', 'start', 419, 159],
       [560, 86, 2, [0, -1], 'Lookout', 'middle', 560, 64],
     ];
     const ticks = st.map(s => {
@@ -241,7 +254,13 @@ registerAesthetic({
       const ux = dx / n, uy = dy / n;
       return `<path d="M${x} ${y}L${(x + ux * 11).toFixed(1)} ${(y + uy * 11).toFixed(1)}" stroke="${lines[li].r.g}" stroke-width="5" stroke-linecap="butt"/>`;
     }).join('');
-    const labels = st.map(s => `<text x="${s[6]}" y="${s[7]}" text-anchor="${s[5]}" class="twa-st" font-size="12.5" font-weight="600">${s[4]}</text>`).join('');
+    // A label is drawn only where it fits whole inside the variant's view box (x0..x1): with
+    // preserveAspectRatio meet the whole box is always shown, so no label is ever cut to a fragment.
+    const span = s => { const w = s[4].length * 7.4; return s[5] === 'middle' ? [s[6] - w / 2, s[6] + w / 2] : s[5] === 'end' ? [s[6] - w, s[6]] : [s[6], s[6] + w]; };
+    const labels = (x0, x1) => st.filter(s => { const [a, b] = span(s); return a >= x0 + 2 && b <= x1 - 2; })
+      .map(s => `<text x="${s[6]}" y="${s[7]}" text-anchor="${s[5]}" class="twa-st" font-size="12.5" font-weight="600">${s[4]}</text>`).join('');
+    const hub = x1 => `<text x="384" y="200" class="twa-hub" font-size="16" font-weight="800" fill="${lbl}">${e(twFitName(name, Math.min(x1, 570) - 384 - 6, 16))}</text>
+      <text x="384" y="216" class="twa-hubs" font-size="11" fill="${sub}">Interchange ${TW_SEP_SVG} all routes</text>`;
     // terminus bullets (route 3 is the express: diamond)
     const term = [[lines[1].pts[0], 1], [lines[2].pts[0], 2], [[690, 230], 0], [lines[2].pts[4], 2], [lines[1].pts[3], 1]];
     const bul = term.map(([[x, y], i]) => {
@@ -251,26 +270,29 @@ registerAesthetic({
         : `<circle cx="${x}" cy="${y}" r="16" fill="${r.b}" stroke="${paper}" stroke-width="3"/>`;
       return `${shape}<text x="${x}" y="${y + 6}" text-anchor="middle" class="twa-bl" font-size="16" font-weight="800" fill="${r.ob}">${e(L[i])}</text>`;
     }).join('');
-    const map = `<svg class="twa-map twa-map--w" viewBox="0 0 720 300" preserveAspectRatio="xMidYMid slice" aria-hidden="true" focusable="false"><g id="${id}-m">
-      <rect x="-200" y="-100" width="1120" height="500" fill="${paper}"/>
+    // wide view box 0..720, narrow 182..546 (the interchange and its five nearest stations); the hub
+    // name stops before route 1's diagonal (x 570)
+    const map = `<svg class="twa-map twa-map--w" viewBox="0 0 720 300" preserveAspectRatio="xMidYMid meet" aria-hidden="true" focusable="false"><g id="${id}-m">
+      <rect x="-2000" y="-1000" width="4720" height="2300" fill="${paper}"/>
       <rect x="58" y="84" width="150" height="40" rx="10" fill="${park}"/><text x="133" y="108" text-anchor="middle" class="twa-wt" font-size="10.5" letter-spacing="1.4" fill="${dark ? '#4F6656' : '#5E7A63'}">PARK</text>
-      <path d="${twPath([[500, 330], [556, 274], [760, 274]], 40)}" fill="none" stroke="${water}" stroke-width="30"/>
-      <text x="700" y="279" text-anchor="end" class="twa-wt" font-size="10.5" letter-spacing="1.4" fill="${dark ? '#5C7584' : '#5B7A8C'}">RIVER</text>
+      <path d="${twPath([[500, 330], [556, 274], [1400, 274]], 40)}" fill="none" stroke="${water}" stroke-width="30"/>
       <g fill="none" stroke-width="${W}" stroke-linecap="round" stroke-linejoin="round">${ext}${stroke}</g>
       <g>${ticks}</g>
       <circle cx="360" cy="171" r="19" fill="#FFFFFF" stroke="${dark ? '#FFFFFF' : '#111111'}" stroke-width="2"/>
       <circle cx="360" cy="171" r="13.5" fill="none" stroke="#111111" stroke-width="4.5"/>
-      <g fill="${lbl}" class="twa-lb">${labels}</g>
-      <text x="384" y="200" class="twa-hub" font-size="16" font-weight="800" fill="${lbl}">${e(name)}</text>
-      <text x="384" y="216" class="twa-hubs" font-size="11" fill="${sub}">Interchange · all routes</text>
       ${bul}
-    </g></svg><svg class="twa-map twa-map--n" viewBox="176 4 372 296" preserveAspectRatio="xMidYMid slice" aria-hidden="true" focusable="false"><use href="#${id}-m"/></svg>`;
+    </g>
+      <text x="700" y="279" text-anchor="end" class="twa-wt" font-size="10.5" letter-spacing="1.4" fill="${dark ? '#5C7584' : '#5B7A8C'}">RIVER</text>
+      <g fill="${lbl}" class="twa-lb">${labels(0, 720)}</g>${hub(720)}
+    </svg><svg class="twa-map twa-map--n" viewBox="182 4 364 296" preserveAspectRatio="xMidYMid meet" aria-hidden="true" focusable="false"><use href="#${id}-m"/>
+      <g fill="${lbl}" class="twa-lb">${labels(182, 546)}</g>${hub(546)}
+    </svg>`;
     const legend = [['stepfree', 'Step-free'], ['lift', 'Lift'], ['stairs', 'Stairs'], ['exit', 'Exit'], ['info', 'Info'], ['plus', 'First aid']]
       .map(([k, l]) => `<span class="twa-lg">${twPicto(k)}<b>${l}</b></span>`).join('');
     return `<div class="twa" data-dark="${dark ? 1 : 0}">
       <div class="twa-sign">
         <span class="twa-buls">${L.map((l, i) => twBullet(l, R[i], i)).join('')}</span>
-        <span class="twa-dest"><b>${e(name)} network</b><small>Routes ${e(L.join(' · '))} · step-free throughout</small></span>
+        <span class="twa-dest"><b>${e(twFitName(name, 211, 22))} network</b><small>Routes ${L.map(e).join(` ${TW_SEP} `)} ${TW_SEP} step-free throughout</small></span>
         <span class="twa-dir">${twArrow(0, 'tw-arrow')}<b>All lines</b></span>
       </div>
       <div class="twa-mapbox">${map}</div>
@@ -288,7 +310,7 @@ registerAesthetic({
       const rows = (ctx.rows || []).slice(0, 3).map((r, i) => `<li class="ab-row" style="--tw-c:${R[i].b};--tw-o:${R[i].ob}">
           <span class="ab-row-n tw-rn${i === 2 ? ' tw-rn--x' : ''}"><i>${e(L[i])}</i></span>
           <span class="ab-row-name">${e(r[0])}</span>
-          <span class="ab-row-status"><b>Plat ${i + 1}</b> · ${e(r[1])}</span>
+          <span class="ab-row-status"><b>Plat ${i + 1}</b> ${TW_SEP} ${e(r[1])}</span>
           <span class="ab-row-bar" aria-hidden="true"><i style="width:${Number(r[2]) || 0}%"></i></span>
           <span class="ab-row-pct">${Number(r[2]) || 0}%</span>
         </li>`).join('');

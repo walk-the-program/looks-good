@@ -8,8 +8,9 @@
    Hero: fat display caps with a gilt inline (a stroked duplicate offset up-left, built by
    the headline hook) inside a stepped nine-slice frame, over a crisp SVG sunburst: 48
    two-length rays that end on a solid brass half-disc, with three Radio City bands.
-   No arches anywhere (that is Religious Futurism): swatches are stepped ziggurat tiles,
-   states are three frame grades. */
+   No arched frames or windows (round-topped openings are Religious Futurism) and no soft
+   light: the rays and bands are hard-edged; swatches are stepped ziggurat tiles, states are
+   three frame grades. */
 
 // url(data:...) for an SVG string; percent-encoded so it survives the inline style attribute.
 function ndUri(svg) {
@@ -25,9 +26,6 @@ function ndBrass(isDark) {
 }
 
 let ndSeq = 0;
-function ndEsc(s) {
-  return typeof escapeHtml === 'function' ? escapeHtml(s) : String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-}
 
 registerAesthetic({
   key: 'neo-deco', order: 12,
@@ -79,15 +77,18 @@ registerAesthetic({
     return h.l > 11 ? b.hslToHex(h.h, Math.min(h.s, 42), 11) : b.canvas;
   },
 
-  tokens(t) {
+  tokens(t, view) {
     const d = t.isDark;
     const B = ndBrass(d);
     // interface face: the brand's own sans if it has one, else Jost-class system sans (never a display face at 11px)
-    const stU = typeof state !== 'undefined' ? state : null;
+    const stU = view || (typeof state !== 'undefined' ? state : null);
     const sansF = stU && [stU.bodyFont, stU.headingFont].find(f => f && f.category === 'sans');
     const uiFace = sansF ? (sansF === stU.bodyFont ? 'var(--ab-font-b)' : 'var(--ab-font-h)') : '"Jost", "Futura", "Century Gothic", "Helvetica Neue", Arial, sans-serif';
     // t.mix(a, b, x) keeps x of a and 1 - x of b
     const panel = d ? t.mix(t.canvas, '#ffffff', 0.94) : t.mix(t.canvas, '#000000', 0.97);
+    // muted text that stays >= 4.6:1 on the panels too (the shared muted is tuned for the canvas only)
+    let ndMuted = t.muted;
+    for (let f = 0.05; f <= 1 && Math.min(t.contrast(ndMuted, panel), t.contrast(ndMuted, t.canvas)) < 4.6; f += 0.05) ndMuted = t.mix(t.ink, t.muted, f);
     const grad = `<defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${B.lo}"/><stop offset=".5" stop-color="${B.hi}"/><stop offset="1" stop-color="${B.lo}"/></linearGradient></defs>`;
     // 84x84 nine-slice frame: three nested 1px stepped-corner outlines (outer full, then 60% and 32%), in brass
     const line = (e, o) => `<path d="M${e} 56V${20 + e}H${10 + e}V${10 + e}H${20 + e}V${e}H56" fill="none" stroke="${B.base}" stroke-opacity="${o}" stroke-width="1" shape-rendering="crispEdges"/>`;
@@ -99,6 +100,10 @@ registerAesthetic({
     const st = (e, o) => `<path d="M${e} 21V${8 + e}H${4 + e}V${4 + e}H${8 + e}V${e}H21" fill="none" stroke="${B.base}" stroke-opacity="${o}" stroke-width="1" shape-rendering="crispEdges"/>`;
     const smallFrame = '<svg xmlns="http://www.w3.org/2000/svg" width="42" height="42" viewBox="0 0 42 42">'
       + mirror.map(m => `<g${m ? ` transform="${m.trim().replace('84 0', '42 0').replace('0 84', '0 42').replace('84 84', '42 42')}"` : ''}><g transform="translate(.5 .5)">${st(0, 1)}${st(4, 0.7)}</g></g>`).join('') + '</svg>';
+    // the third frame grade at its exact 58x46 size (a stepped double rule), as a background:
+    // html2canvas does not paint border-image, so the PNG/PDF export keeps it
+    const stepRect = (w, h, e, o) => `<path d="M${e + 8} ${e}H${w - e - 8}V${e + 4}H${w - e - 4}V${e + 8}H${w - e}V${h - e - 8}H${w - e - 4}V${h - e - 4}H${w - e - 8}V${h - e}H${e + 8}V${h - e - 4}H${e + 4}V${h - e - 8}H${e}V${e + 8}H${e + 4}V${e + 4}H${e + 8}Z" fill="none" stroke="${B.base}" stroke-opacity="${o}" stroke-width="1" shape-rendering="crispEdges"/>`;
+    const stepSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="58" height="46" viewBox="0 0 58 46"><g transform="translate(.5 .5)">${stepRect(57, 45, 0, 1)}${stepRect(57, 45, 4, 0.7)}</g></svg>`;
     const diaSvg = (fill, stroke) => `<svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 11 11">${grad}<path d="M5.5.5 10.5 5.5 5.5 10.5.5 5.5Z" fill="${fill}" stroke="${stroke}"/></svg>`;
     // stepped ziggurat outline for the palette tiles (100x100 stretched; 1px non-scaling stroke 3px inside the edge)
     const zigPts = '0,100 0,30 15,30 15,15 30,15 30,0 70,0 70,15 85,15 85,30 100,30 100,100';
@@ -118,12 +123,15 @@ registerAesthetic({
       '--ab-gilt-c': t.alpha(B.base, 0.16),
       '--ab-brass': `linear-gradient(135deg, ${B.lo}, ${B.hi} 48%, ${B.base} 62%, ${B.lo})`,
       '--ab-panel': panel,
-      '--ab-veil': t.alpha(t.canvas, 0.9),
+      '--ab-nd-muted': ndMuted,
+      // the title card's fill: opaque, so the rays and bands stop cleanly at its outer setback line
+      '--ab-veil': t.canvas,
       '--ab-pri-hover': t.mix(t.primary, '#ffffff', 0.86),
       '--ab-pri-press': t.mix(t.primary, '#000000', 0.8),
       '--ab-on-pri-press': t.readable(t.mix(t.primary, '#000000', 0.8)),
       '--ab-nd-frame': ndUri(frameSvg),
       '--ab-nd-frame-s': ndUri(smallFrame),
+      '--ab-nd-step': ndUri(stepSvg),
       '--ab-nd-dia': ndUri(diaSvg(panel, B.base)),
       '--ab-nd-dia-f': ndUri(diaSvg('url(#g)', B.base)),
       '--ab-nd-zig': ndUri(zigSvg),
@@ -138,7 +146,7 @@ registerAesthetic({
     const s = String(text || '').trim();
     if (!s) return '';
     const m = s.match(/^([\s\S]*?)([^\s]+?)([.,;:!?…]*)$/);
-    const inner = m ? `${ndEsc(m[1])}<span class="ab-hl">${ndEsc(m[2])}</span>${ndEsc(m[3])}` : ndEsc(s);
+    const inner = m ? `${escapeHtml(m[1])}<span class="ab-hl">${escapeHtml(m[2])}</span>${escapeHtml(m[3])}` : escapeHtml(s);
     return `<span class="ndh"><span class="ndh-b">${inner}</span><span class="ndh-i">${inner}</span></span>`;
   },
 
@@ -190,7 +198,7 @@ registerAesthetic({
     ],
     dont: [
       'Turn the accent or any brand colour into gold lines, rays or ornament fills.',
-      'Use arches, soft glows, blurred rays or glassy gradients; deco geometry is hard-edged.',
+      'Blur a ray, airbrush a glow, use a glassy gradient or frame anything in a round arch; deco light is hard-edged rays, bands and stepped setbacks.',
       'Round controls or use pill shapes.',
       'Set the headline in thin, widely tracked caps; that is a candle label, not 1930.',
     ],
@@ -215,7 +223,7 @@ registerAesthetic({
     ],
     dont: [
       'Turn a brand colour into the metal.',
-      'Use arches, glows or blurred rays.',
+      'Blur the rays or airbrush a glow.',
       'Round controls or use pill shapes.',
     ],
   },

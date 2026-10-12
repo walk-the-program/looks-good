@@ -13,7 +13,7 @@
    - Colour: cream #F3EAD7 and charcoal #2B2622 are fixed, plus ONE period ink, mustard
      #E0A526 or teal #1F7A7A, whichever is farther in hue from the client primary (≤15%).
      Client colours are warmed 6° toward yellow and lose ~15% chroma (the 1950s register);
-     printPrimary(t) prints the primary that way.
+     printPrimary(t) prints the primary that way, shifted in lightness until its label reads at 4.5:1.
    - headline(ctx, text): tracked geometric caps with the last word swapped for ONE slanted
      brush-script word (Yellowtail) in the primary, on a cut-paper swoosh.
    - Interface: skewed paper planes for the action and segments (the plane is skewed, the
@@ -55,6 +55,21 @@ function mcPeriod(primary) {
 }
 // text that reads on a fill: cream or charcoal
 const mcOn = fill => (contrastRatio(CREAM, fill) >= contrastRatio(CHAR, fill) ? CREAM : CHAR);
+// The printed primary: warmed (mcWarm), then moved in lightness only as far as it takes for
+// its label (cream or charcoal) to reach 4.8:1 (4.5 with headroom for anti-aliasing), so the
+// 12px CTA label stays readable.
+function mcPrint(hex) {
+  const w = mcWarm(hex);
+  if (contrastRatio(mcOn(w), w) >= 4.8) return w;
+  const c = hexToHsl(w);
+  const dark = mcOn(w) === CREAM;
+  for (let i = 1; i <= 40; i++) {
+    const l = Math.max(0, Math.min(100, c.l + (dark ? -i : i)));
+    const h = hslToHex(c.h, c.s, l);
+    if (contrastRatio(dark ? CREAM : CHAR, h) >= 4.8) return h;
+  }
+  return w;
+}
 
 // cut-paper edge: resample a closed outline every `step` units, nudge each vertex 0.5-1px
 function mcCut(pts, rnd, step = 6, j = 0.9) {
@@ -147,7 +162,7 @@ registerAesthetic({
       coverage: '15%',
     },
     primary: {
-      use: 'The biggest cut plane (the boomerang), the skewed main action, the one script word, the dial ring when on. Printed warmed 6 degrees toward yellow with 15% less chroma',
+      use: 'The biggest cut plane (the boomerang), the skewed main action, the one script word, the dial ring when on. Printed warmed 6 degrees toward yellow with 15% less chroma, then darkened (or lightened) just enough for its label to read at 4.5:1',
       never: 'Body text, outlines, more than one big plane per view',
       coverage: '≈15%',
     },
@@ -169,20 +184,22 @@ registerAesthetic({
     return b.hslToHex(h.h, Math.min(h.s, 16), Math.max(10, Math.min(h.l, 13)));
   },
 
-  printPrimary(t) { return mcWarm(t.primary); },
+  printPrimary(t) { return mcPrint(t.primary); },
 
   headline(ctx, text) { return mcHeadline(ctx, text); },
 
   tokens(t) {
     const d = t.isDark;
     const ink = d ? CREAM : CHAR;
-    const pp = t.printPrimary || mcWarm(t.primary);
+    const pp = t.printPrimary || mcPrint(t.primary);
     const sec = mcWarm(t.secondary), acc = mcWarm(t.accent), per = mcPeriod(t.primary);
     const card = d ? t.mix('#FFFFFF', t.canvas, 0.06) : '#FBF6EA';
     let toward = 0.4, muted = t.mix(t.canvas, ink, toward);
     while (toward > 0.05 && t.contrast(muted, t.canvas) < 4.6) { toward -= 0.04; muted = t.mix(t.canvas, ink, toward); }
     // script word: the primary when it reads (3:1) on the paper, else charcoal/cream
     const script = t.contrast(pp, t.canvas) >= 3 ? pp : (t.contrast(sec, t.canvas) >= 3 ? sec : ink);
+    // small list numerals (11px) keep the script colour only when it reaches 4.5:1
+    const num = t.contrast(script, t.canvas) >= 4.5 ? script : ink;
     const plane = t.mix(ink, card, d ? 0.12 : 0.09);
     const spark = (fill, s = 14) => uri(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${s} ${s}" width="${s}" height="${s}">${sparkle(s / 2, s / 2, s * 0.42, fill, false)}</svg>`);
     const sp8 = (fill) => uri(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30 30" width="30" height="30">${sparkle(15, 15, 13.5, fill, true)}</svg>`);
@@ -204,10 +221,10 @@ registerAesthetic({
       '--mc-plane': plane,
       '--mc-sec': sec, '--mc-acc': acc, '--mc-period': per,
       '--mc-on-pri': mcOn(pp), '--mc-on-sec': mcOn(sec), '--mc-on-ink': d ? CHAR : CREAM,
-      '--mc-script': script,
-      '--mc-spark': spark(ink), '--mc-spark-dim': spark(t.mix(t.canvas, ink, 0.8)), '--mc-spark-pri': spark(pp), '--mc-spark-acc': sp8(acc),
+      '--mc-script': script, '--mc-num': num,
+      '--mc-spark-dim': spark(t.mix(t.canvas, ink, 0.8)), '--mc-spark-pri': spark(pp), '--mc-spark-acc': sp8(acc),
       '--mc-spark-on': spark(mcOn(pp), 16), '--mc-spark-per': sp8(per),
-      '--mc-burst': burst(per), '--mc-burst-ink': burst(ink),
+      '--mc-burst-ink': burst(ink),
       '--mc-atom1': atomU(pp, ink), '--mc-atom2': atomU(sec, ink), '--mc-atom3': atomU(d ? acc : t.mix(acc, CHAR, 0.75), ink),
       '--mc-dial': uri(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="48" height="48">${dialTicks}</svg>`),
       '--mc-swoosh': swoosh,
@@ -220,7 +237,7 @@ registerAesthetic({
     const d = t.isDark;
     const ink = d ? CREAM : CHAR;
     const paper = t.canvas;
-    const pp = t.printPrimary || mcWarm(t.primary);
+    const pp = t.printPrimary || mcPrint(t.primary);
     const sec = mcWarm(t.secondary), acc = mcWarm(t.accent), per = mcPeriod(t.primary);
     const rnd = mcRand(mcHash(String(ctx.brandName || 'brand') + '|mc'));
     const id = 'mcs' + (++seq);

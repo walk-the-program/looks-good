@@ -8,10 +8,14 @@
    OLED is single-ink pixels. UI radius 8 for panels, 4 for keys; only hardware has an edge. */
 // The device (board hero, deck cover); deck.materialArt wraps it in a zoom on the pads and the keybed.
 function idvArt(ctx) {
-  const e = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const e = escapeHtml;
   const Y = 64;
   const at = (x, y, w, h) => `left:${x}%;top:${(y / Y) * 100}%;width:${w}%;${h != null ? `height:${(h / Y) * 100}%` : ''}`;
   const name = e(String(ctx.brandName || '').toLowerCase());
+  // The OLED shows the first word only, in pixels sized so it never runs past the screen (about nine
+  // Doto characters fit at the full size).
+  const word = String(ctx.brandName || '').trim().split(/\s+/)[0].toLowerCase() || 'tp-01';
+  const oledFs = Math.min(1, 9 / Math.max(1, word.length));
   const ico = {
     loop: '<svg viewBox="0 0 10 10" aria-hidden="true"><path d="M2.4 5.4a2.9 2.9 0 1 0 .9-2.5" fill="none" stroke="currentColor" stroke-width="1.15"/><path d="M1 .9v2.9h2.9z" fill="currentColor"/></svg>',
     play: '<svg viewBox="0 0 10 10" aria-hidden="true"><path d="M2.6 1.4 8.4 5 2.6 8.6z" fill="currentColor"/></svg>',
@@ -52,7 +56,7 @@ function idvArt(ctx) {
     <div class="idv-body" style="${at(0, 0, 100, 64)}"></div>
     <div class="idv-grille" style="${at(4, 5, 11, 11)}">${dots}</div>
     <small class="idv-pr" style="${at(19, 2.4, 20)}">mode &middot; a.01</small>
-    <div class="idv-oled" style="${at(19, 5, 37, 11)}"><b>${name}</b><span class="idv-bars">${bars}</span></div>
+    <div class="idv-oled" style="${at(19, 5, 37, 11)}"><b style="--idv-oled-k:${oledFs.toFixed(3)}">${e(word)}</b><span class="idv-bars">${bars}</span></div>
     <div class="idv-encs" style="${at(60, 5, 36, 13)}">${encs}</div>
     <div class="idv-knob" style="${at(KX - 9.6, KY - 9.6 * 100 / 64 * 64 / 100, 19.2)}"><span></span></div>
     <svg class="idv-marks" viewBox="0 0 100 ${Y}" focusable="false"><g class="idv-scale">${knurl}${scale}</g><text class="pr" x="${KX}" y="${KY + 15.2}" text-anchor="middle">vol</text></svg>
@@ -106,7 +110,8 @@ registerAesthetic({
     return b.isDark ? b.mix(b.canvas, '#1d1e21', 0.55) : b.mix(b.canvas, '#d9d9d6', 0.42);
   },
 
-  tokens(t) {
+  tokens(t, st) {
+    const S = st || (typeof state !== 'undefined' ? state : null) || {};
     const d = t.isDark;
     const face = d ? t.mix('#ffffff', t.canvas, 0.05) : t.mix('#ffffff', t.canvas, 0.46);
     const key = d ? t.mix('#ffffff', t.canvas, 0.1) : t.mix('#ffffff', t.canvas, 0.72);
@@ -136,6 +141,10 @@ registerAesthetic({
       '--ab-oled-ink': lift(t.primary, oled, 7),
       '--ab-led': t.accent,
       '--ab-ring': t.alpha(t.primary, 0.32),
+      // published weights for the "medium" settings (Space Grotesk and Geist have no 500)
+      '--id-hw5': abWeight(S.headingFont, 500),
+      '--id-bw5': abWeight(S.bodyFont, 500),
+      '--id-hw7': abWeight(S.headingFont, 700),
     };
   },
 
@@ -154,7 +163,7 @@ registerAesthetic({
     { name: 'Encoder caps', css: 'background: #2B7BE4 | #2FB15C | #F2F2EE | {primary}; border-radius: 50%; /* a fixed function code (the OP-1 move); the client changes only the fourth cap */' },
     { name: 'Main action key', css: 'background: {primary}; color: {onPrimary}; border-radius: 4px; box-shadow: inset 0 1px 0 rgba(255,255,255,.3), 0 2px 0 {keyEdge}; font: 600 12px "Azeret Mono", ui-monospace, monospace; /* the only primary key */' },
     { name: 'OLED strip', css: 'background: {oled}; color: {oledInk}; border-radius: 4px; font: 700 11px "Doto", "Azeret Mono", ui-monospace, monospace; /* single-ink pixels: name and meter in one colour */' },
-    { name: 'Printed legend', css: 'font: 500 7px "Azeret Mono", ui-monospace, monospace; text-transform: lowercase; letter-spacing: .06em; color: {muted}; /* printed on the hardware under or over its control; never a callout */' },
+    { name: 'Printed legend', css: 'font: 400 7px "Azeret Mono", ui-monospace, monospace; text-transform: lowercase; letter-spacing: .06em; color: {muted}; /* printed on the hardware under or over its control; never a callout */' },
     { name: 'Key pressed', css: 'transform: translateY(2px); box-shadow: inset 0 1px 2px {edgeLo}, 0 0 0 {keyEdge}; /* the 2px underside compresses */' },
   ],
 
@@ -174,8 +183,11 @@ registerAesthetic({
   },
   // Deck copy (js/brand-deck.js): three principles, three do / don't lines, each short.
   deck: {
-    coverDisplay: 0.6,
-    // Material slide: a close-up of the pads and the keybed (the same drawing at 1.9x)
+    // a small cover line (about 55px, two or three lines) so the device, not the sentence, carries the slide
+    coverDisplay: 0.42,
+    coverMin: 50,
+    // Material slide: a close-up of the pads, the function keys and the keybed (the same drawing at 1.5x,
+    // cropped on the gaps between keys)
     materialArt: ctx => `<div class="idv-zoom">${idvArt(ctx)}</div>`,
     principles: [
       ['The product is the page', 'Life size, bleeding off the edge, tiny type beside it.'],

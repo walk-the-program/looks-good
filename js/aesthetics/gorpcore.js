@@ -34,11 +34,14 @@ function gcDye(hex) {
   const c = hexToHsl(hex);
   return hslToHex(c.h, Math.max(0, c.s * 0.9), c.l);
 }
-function gcWeight(cap) {
-  const hf = typeof state !== 'undefined' && state && state.headingFont;
-  const ws = String((hf && hf.weights) || '700').split(';').map(Number).filter(Boolean);
-  const le = ws.filter(x => x <= cap);
-  return le.length ? Math.max(...le) : Math.min(...ws);
+// The hang tag's brand line: whole words up to 16 characters (about the tag's width in condensed
+// caps); a single longer word is set smaller instead of being cut.
+function gcTagName(name) {
+  const words = String(name || '').trim().split(/\s+/).filter(Boolean);
+  let out = '';
+  for (const w of words) { const next = out ? out + ' ' + w : w; if (next.length > 16) break; out = next; }
+  out = out || words[0] || '';
+  return { text: out, k: Math.min(1, 16 / Math.max(1, out.length)) };
 }
 function gcFace(name) { return typeof FONTS !== 'undefined' ? FONTS.find(f => f.name === name) : null; }
 
@@ -185,15 +188,15 @@ registerAesthetic({
 
   canvas(b) { return b.isDark ? '#1A1C1B' : GC_STONE; },
 
-  tokens(t) {
+  tokens(t, st) {
+    const S = st || (typeof state !== 'undefined' ? state : null) || {};
     const d = t.isDark;
     const shell = gcDye(t.printPrimary || t.primary);
     const shell2 = gcDye(t.secondary);
-    const hw = gcWeight(800);
     return {
       '--ab-type-pick-w': 400,   // secondary picks; each column's lead pick gets its own real weight in the css
-      '--gc-hw': hw,
-      '--gc-bw': gcWeight(700),
+      '--gc-hw': abWeight(S.headingFont, 800),
+      '--gc-bw': abWeight(S.headingFont, 700),
       '--ab-carbon': GC_CARBON,
       '--ab-blaze': GC_BLAZE,
       '--ab-silver': GC_SILVER,
@@ -223,6 +226,7 @@ registerAesthetic({
       ['Saira Stencil', 'JetBrains Mono'].forEach(n => { const f = gcFace(n); if (f) window.loadFontFamily(f); });
     }
     const name = String(ctx.brandName || '').trim();
+    const tagName = gcTagName(name);
     const seed = gcHash(name || 'brand');
     const rnd = gcRand(seed ^ 0x51ed27);
     const W = 100, H = 106, NX = 70, NY = 74;
@@ -304,7 +308,7 @@ registerAesthetic({
       <span class="gca-biner" aria-hidden="true"></span>
       <div class="gca-tag">
         <i class="gca-grom"></i>
-        <div class="gca-th"><b>${e(name)}</b><span>GC—044</span></div>
+        <div class="gca-th"><b style="--gc-tag-k:${tagName.k.toFixed(3)}">${e(tagName.text)}</b><span>GC—044</span></div>
         <p class="gca-model">Alpine shell <em>M</em></p>
         <dl class="gca-spec">${rows}</dl>
         <div class="gca-cw"><span style="background:${shell}"></span><span style="background:${shell2}"></span><span style="background:${GC_CARBON}"></span><small>Colourway 01</small></div>

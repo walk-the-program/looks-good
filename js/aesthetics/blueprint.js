@@ -8,6 +8,27 @@
 
 let bprSeq = 0;
 
+// Do / don't pair for the deck (a data-URI background on each column, like retro-futurist's): DO is the
+// line-type set on the field (a part drawn with visible, hidden, centre and dimension lines, and a legend
+// of the four); DON'T is the same part filled in the brand colour, rounded, shaded and traced with a squiggle.
+function bpPairSvg(t, kind, line) {
+  const f = t.canvas;
+  const m = 'font-family="ui-monospace,Menlo,monospace" font-size="5.2" letter-spacing=".6"';
+  const part = 'M30 22H112V58H30Z';
+  const svg = kind === 'do'
+    ? `<svg xmlns="http://www.w3.org/2000/svg" width="240" height="80" viewBox="0 0 240 80"><rect width="240" height="80" fill="${f}"/>`
+      + `<g fill="none" stroke="${line}"><path d="${part}" stroke-width="1.6"/><path d="M30 33H112M30 47H112" stroke-width=".8" stroke-dasharray="4 3"/>`
+      + `<path d="M22 40H120" stroke-width=".6" stroke-dasharray="10 3 2 3"/><path d="M30 9V19M112 9V19M30 13H62M80 13H112" stroke-width=".6"/></g>`
+      + `<path d="M30 13l4 -1.4v2.8zM112 13l-4 -1.4v2.8z" fill="${line}"/><text x="71" y="15" text-anchor="middle" fill="${line}" ${m}>82</text>`
+      + `<g fill="none" stroke="${line}"><path d="M144 20H176" stroke-width="1.6"/><path d="M144 34H176" stroke-width=".8" stroke-dasharray="4 3"/><path d="M144 48H176" stroke-width=".6" stroke-dasharray="10 3 2 3"/><path d="M144 62H176M144 59V65M176 59V65" stroke-width=".6"/></g>`
+      + `<g fill="${line}" ${m}><text x="184" y="22">VISIBLE</text><text x="184" y="36">HIDDEN</text><text x="184" y="50">CENTRE</text><text x="184" y="64">DIM</text></g></svg>`
+    : `<svg xmlns="http://www.w3.org/2000/svg" width="240" height="80" viewBox="0 0 240 80"><defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff" stop-opacity=".45"/><stop offset="1" stop-color="#ffffff" stop-opacity="0"/></linearGradient><filter id="s" x="-20%" y="-20%" width="140%" height="160%"><feGaussianBlur stdDeviation="3"/></filter></defs>`
+      + `<rect width="240" height="80" fill="${f}"/><rect x="34" y="28" width="82" height="36" rx="12" fill="#000" opacity=".45" filter="url(#s)"/>`
+      + `<rect x="30" y="22" width="82" height="36" rx="12" fill="${t.primary}"/><rect x="30" y="22" width="82" height="18" rx="9" fill="url(#g)"/>`
+      + `<path d="M140 52C150 30 160 62 172 40S192 22 202 46 216 56 224 34" fill="none" stroke="${t.secondary}" stroke-width="2.4" stroke-linecap="round"/></svg>`;
+  return `url("data:image/svg+xml,${encodeURIComponent(svg)}")`;
+}
+
 // The drawing, shared by art() (board and cover: the sheet, and the phone crop) and deck.materialArt()
 // (the oblique view and the 2:1 detail). Returns svg(cls, viewBox, idSuffix).
 function bpDrawing(ctx) {
@@ -17,7 +38,7 @@ function bpDrawing(ctx) {
   const rows = (AB_FONT_5X7[String(ctx.initial).toUpperCase()] || AB_FONT_5X7['?']).split(' ');
   const W = 5, H = 7, MM = 64;
   const f = (x, y) => x >= 0 && y >= 0 && x < W && y < H && rows[y][x] === '1';
-  const e = s => String(s).replace(/[&<>"]/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[ch]));
+  const e = escapeHtml;
   // boundary edges of the union of filled cells, merged along straight runs (cell units)
   const raw = [];
   for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) if (f(x, y)) {
@@ -260,7 +281,8 @@ registerAesthetic({
     return b.hslToHex(218 + nudge, 62, 24);
   },
 
-  tokens(t) {
+  tokens(t, st) {
+    const S = st || (typeof state !== 'undefined' ? state : null) || {};
     const d = t.isDark;
     // legible-on-canvas versions of the markers (lifted toward white on the blue field, shaded on paper)
     const toward = d ? '#ffffff' : '#000000';
@@ -268,7 +290,8 @@ registerAesthetic({
     const priUi = ui(t.primary, 3.2);
     const accUi = t.contrast(t.accent, t.canvas) >= 3 ? t.accent : ui(t.accent, 3);
     const secUi = t.contrast(t.secondary, t.canvas) >= 3 ? t.secondary : ui(t.secondary, 3);
-    const brand = typeof effectiveContent === 'function' ? String(effectiveContent().brandName || '') : '';
+    const own = S.content && typeof S.content.brandName === 'string' && S.content.brandName.trim();
+    const brand = own ? S.content.brandName : (typeof effectiveContent === 'function' ? String(effectiveContent().brandName || '') : '');
     // Any letter or digit survives (Café, 東京); only characters that would break the CSS string go.
     const clean = s => s.replace(/[^\p{L}\p{N} .&\-]/gu, '').toUpperCase().slice(0, 24) || 'PROJECT';
     const line = d ? t.ink : '#111111';
@@ -286,6 +309,9 @@ registerAesthetic({
       '--ab-proj': `'${clean(brand)}'`,
       '--ab-date': `'${(dd => `${dd.getFullYear()}-${String(dd.getMonth() + 1).padStart(2, '0')}-${String(dd.getDate()).padStart(2, '0')}`)(new Date())}'`,   // local date, not UTC
       '--ab-type-pick-w': '400',
+      '--bp-hw': abWeight(S.headingFont, 600),
+      '--bp-do': bpPairSvg(t, 'do', line),
+      '--bp-dont': bpPairSvg(t, 'dont', line),
     };
   },
 
@@ -329,7 +355,9 @@ registerAesthetic({
   },
   // Deck copy (js/brand-deck.js): three principles, three do / don't lines, each short.
   deck: {
-    coverDisplay: 0.5,
+    // the title block is narrow: start the cover title near 44px so it sets in two or three lines, as on the board
+    coverDisplay: 0.34,
+    coverMin: 40,
     coverBand: false,
     // Material slide: the oblique view and DETAIL D at 2:1, cropped from the same drawing
     materialArt: ctx => bpDrawing(ctx)('bpa-det', '200 18 266 150', 'd'),

@@ -31,7 +31,8 @@
 .ab[data-ae="gorpcore"] .ab-brand { gap: 12px; font-weight: var(--gc-hw, 800); text-transform: uppercase; letter-spacing: 0.01em; font-size: clamp(17px, 2.3cqw, 24px); }
 .ab[data-ae="gorpcore"] .ab-head .ab-brand { color: #F2F0EA; }
 .ab[data-ae="gorpcore"] .ab-deck-wordmark .ab-wordmark::after { color: var(--ab-muted); }
-.ab[data-ae="gorpcore"] .ab-mark { width: 30px; height: 30px; border-radius: 6px; background: var(--ab-shell); color: var(--ab-on-shell); font: var(--gc-hw, 800) 16px/1 var(--ab-font-h); box-shadow: inset 0 0 0 1.5px rgba(0,0,0,0.25); }
+/* the mark is a grommet: a round shell-fabric eyelet with a silver rim (the hang tag's hardware), never a square plate */
+.ab[data-ae="gorpcore"] .ab-mark { box-sizing: border-box; width: 30px; height: 30px; border-radius: 50%; border: 2.5px solid var(--ab-silver); background: var(--ab-shell); color: var(--ab-on-shell); font: var(--gc-hw, 800) 14px/1 var(--ab-font-h); box-shadow: none; }
 .ab[data-ae="gorpcore"] .ab-wordmark::after { content: "  N 46°32′ E 7°57′"; white-space: pre; font: 400 11px/1 var(--gc-mono); letter-spacing: 0.04em; color: #A9ABA8; text-transform: none; }
 .ab[data-ae="gorpcore"] .ab-tag { color: #A9ABA8; font-size: 10.5px; letter-spacing: 0.1em; }
 .ab[data-ae="gorpcore"] .ab-tag b { color: #F2F0EA; font-weight: 600; }
@@ -91,7 +92,7 @@
 }
 .ab[data-ae="gorpcore"] .gca-grom { position: absolute; left: 6%; top: 2.2cqw; width: 4.2cqw; height: 4.2cqw; border-radius: 50%; background: var(--ab-canvas); box-shadow: 0 0 0 0.9cqw #9A9EA1, 0 0 0 calc(0.9cqw + 1px) #5E6265, inset 0 1px 2px rgba(0,0,0,.4); }
 .ab[data-ae="gorpcore"] .gca-th { display: flex; justify-content: space-between; align-items: baseline; gap: 6px; margin: 0 -3.2cqw 2cqw; padding: 1.6cqw 3.2cqw; background: #1B1D1C; color: #F2F0EA; }
-.ab[data-ae="gorpcore"] .gca-th b { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: var(--gc-hw, 800) clamp(11px, 3.6cqw, 18px)/1.05 var(--ab-font-h); text-transform: uppercase; letter-spacing: 0.01em; }
+.ab[data-ae="gorpcore"] .gca-th b { min-width: 0; overflow: hidden; white-space: nowrap; font: var(--gc-hw, 800) calc(clamp(11px, 3.6cqw, 18px) * var(--gc-tag-k, 1))/1.25 var(--ab-font-h); text-transform: uppercase; letter-spacing: 0.01em; }
 .ab[data-ae="gorpcore"] .gca-th span { flex: none; font-size: clamp(7px, 1.9cqw, 9.5px); letter-spacing: 0.04em; color: #A9ABA8; }
 .ab[data-ae="gorpcore"] .gca-model { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.6cqw !important; font: var(--gc-hw, 800) clamp(11px, 3.3cqw, 16px)/1.05 var(--ab-font-h); text-transform: uppercase; }
 .ab[data-ae="gorpcore"] .gca-model em { font-style: normal; display: grid; place-items: center; width: 1.45em; height: 1.45em; border: 1.5px solid #1B1D1C; border-radius: 3px; font-size: 0.86em; }
@@ -116,7 +117,7 @@
 }
 .ab[data-ae="gorpcore"] .ab-chip::before { content: ""; position: absolute; z-index: 1; left: 8px; top: 8px; width: 9px; height: 9px; border-radius: 50%; background: var(--ab-canvas); box-shadow: 0 0 0 2px #9A9EA1, 0 0 0 3px #5E6265; }
 .ab[data-ae="gorpcore"] .ab-sw-role { font-family: var(--ab-font-h); font-weight: var(--gc-hw, 800); font-size: 16px; text-transform: uppercase; letter-spacing: 0.01em; }
-.ab[data-ae="gorpcore"] .ab-sw-job { font-size: 10.5px; letter-spacing: 0.02em; }
+.ab[data-ae="gorpcore"] .ab-sw-job { font-size: 10.5px; letter-spacing: 0.02em; text-wrap: balance; }   /* wraps at a word, never inside "8–12%" */
 .ab[data-ae="gorpcore"] .ab-sw-hex { font-family: var(--gc-mono); color: var(--ab-ink); font-size: 10.5px; }
 
 /* ---- type: a spec sheet ---- */
@@ -275,7 +276,6 @@
 
 /* deck "In product": trail log in a half-width column */
 .ab.ab-slide[data-ae="gorpcore"] .ab-deck-prodframe { border-radius: 8px; border-color: var(--gc-hair); }
-.ab.ab-slide[data-ae="gorpcore"] .ab-deck-prodframe > .ab-head { margin: -18px -30px 0; border-radius: 8px 8px 0 0; }
 .ab.ab-slide[data-ae="gorpcore"] .ab-deck-prod .ab-row { grid-template-columns: 26px minmax(0, 1fr) minmax(70px, 0.7fr) 11ch; }
 .ab.ab-slide[data-ae="gorpcore"] .ab-deck-prod .ab-row-status { grid-column: 2; grid-row: 2; justify-self: start; }
 .ab.ab-slide[data-ae="gorpcore"] .ab-deck-prod .ab-row-n { grid-row: 1 / span 2; }

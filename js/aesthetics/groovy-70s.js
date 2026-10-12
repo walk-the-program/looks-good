@@ -59,11 +59,12 @@ registerAesthetic({
     return b.isDark ? b.mix(b.canvas, '#2a1a15', 0.5) : b.mix(b.canvas, '#f3e6cf', 0.55);
   },
 
-  tokens(t) {
+  tokens(t, vs) {
     const d = t.isDark;
+    const priDark = t.mix('#000000', t.primary, 0.22);
     // b1..b5: brown, the brand primary, burnt orange, harvest gold, avocado (fixed earth + one brand band)
     const ramp = [GV_EARTH.brown, t.primary, GV_EARTH.burnt, GV_EARTH.gold, GV_EARTH.avocado];
-    const st = typeof state !== 'undefined' ? state : null;
+    const st = vs || (typeof state !== 'undefined' ? state : null);
     const cls = st && st.headingFont ? st.headingFont.cls : '';
     // three stacked waves (3px strokes, 3px apart) in the brand colours, as an SVG tile for the header and footer stripes
     const wave = (y, c) => `<path d="M0 ${y} Q10 ${y - 7} 20 ${y} T40 ${y}" fill="none" stroke="${c}" stroke-width="3" stroke-linecap="round"/>`;
@@ -75,7 +76,8 @@ registerAesthetic({
       // the single ink wave as a plain background image (no CSS mask: exports drop masks)
       '--gv-wave-ink': 'url(data:image/svg+xml,' + encodeURIComponent(inkWave).replace(/\(/g, '%28').replace(/\)/g, '%29').replace(/'/g, '%27') + ')',
       '--ab-kraft': d ? t.mix('#5a4426', t.canvas, 0.45) : t.mix('#e9d6ae', t.canvas, 0.35),
-      '--ab-hw': cls === 'groovy' ? 400 : (st && st.headingFont && st.headingFont.name === 'Fraunces' ? 900 : 800),
+      // the heading face's heaviest real weight up to 800 (900 for Fraunces); the 'groovy' display faces stay at 400
+      '--ab-hw': cls === 'groovy' ? 400 : abWeight(st && st.headingFont, st && st.headingFont && st.headingFont.name === 'Fraunces' ? 900 : 800),
       '--gv-gold': GV_EARTH.gold, '--gv-brown': GV_EARTH.brown,
       '--ab-card-a': t.mix(GV_EARTH.brown, t.canvas, d ? 0.3 : 0.18),   // deck card fill: an earth tint
       '--ab-card-b': t.mix(t.accent, t.canvas, d ? 0.2 : 0.32),   // accent tint: small pills only (the tag), never a panel
@@ -87,7 +89,9 @@ registerAesthetic({
       '--ab-sun': t.mix(t.accent, t.canvas, d ? 0.12 : 0.2),
       '--ab-ray': t.alpha(t.accent, d ? 0.5 : 0.8),
       '--ab-ring': t.alpha(t.primary, 0.3),
-      '--ab-pri-dark': t.mix('#000000', t.primary, 0.22),
+      '--ab-pri-dark': priDark,
+      // label on the pressed (darker) pill: whichever of the readable picks, white or near-black reads best
+      '--gv-on-pri-dark': [t.readable(priDark), '#ffffff', '#141414'].sort((a, b) => t.contrast(b, priDark) - t.contrast(a, priDark))[0],
     };
   },
 

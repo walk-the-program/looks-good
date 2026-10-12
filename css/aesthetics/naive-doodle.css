@@ -137,9 +137,9 @@
   background: var(--nd-star) center / contain no-repeat; transform: rotate(12deg);
 }
 /* one annotation: a note with a loop arrow pointing back at the main action */
-.ab[data-ae="naive-doodle"] .ab-sec-ui { padding-bottom: 54px; }
+.ab[data-ae="naive-doodle"] .ab-sec-ui { padding-bottom: 42px; }
 .ab[data-ae="naive-doodle"] .ab-sec-ui::after {
-  content: "this one!"; position: absolute; right: 4px; bottom: 0; padding: 18px 0 0 62px;
+  content: "this one!"; position: absolute; right: 4px; bottom: 2px; padding: 18px 0 0 62px;
   font: 700 25px/1 var(--nd-hand); color: var(--ab-ink); transform: rotate(-4deg);
   background: var(--nd-note-arrow) 0 0 / 58px 36px no-repeat;
 }
@@ -153,6 +153,12 @@
   font-family: var(--ab-font-h); font-size: 17px; line-height: 1; color: var(--ab-ink);
 }
 .ab[data-ae="naive-doodle"] .ab-seg-btn[aria-pressed="true"] { color: var(--nd-pencil); font-weight: 400; }
+/* hover on an unselected box: the crayon starts colouring it in (streaks only; the selected box gets the full crayon) */
+.ab[data-ae="naive-doodle"] .ab-seg-btn:not([aria-pressed="true"]):hover::before {
+  content: ""; position: absolute; z-index: -1; inset: 4px 3px 2px 6px;
+  border-radius: 12px 6px 14px 8px / 8px 14px 6px 12px; background: var(--nd-h2);
+  transform: rotate(1deg);
+}
 .ab[data-ae="naive-doodle"] .ab-seg-btn[aria-pressed="true"]::before {
   content: ""; position: absolute; z-index: -1; inset: 4px 3px 2px 6px;
   border-radius: 12px 6px 14px 8px / 8px 14px 6px 12px; background: var(--nd-h2), var(--nd-c2);
@@ -166,7 +172,7 @@
   margin: 26px 0 8px !important; font-family: var(--ab-font-h); font-weight: 400; letter-spacing: 0;
   font-size: clamp(25px, 3.2cqw, 32px); line-height: 1.05;
 }
-.ab[data-ae="naive-doodle"] .ab-card-body { color: var(--ab-muted); font-size: 14px; }
+.ab[data-ae="naive-doodle"] .ab-card-body { color: var(--ab-ink); font-size: 14px; }
 
 /* main action: outline on top, the crayon fill offset beneath it */
 .ab[data-ae="naive-doodle"] .ab-cta {
@@ -262,15 +268,16 @@
   .ab[data-ae="naive-doodle"] .ab-headline { font-size: calc(clamp(40px, 15cqw, 64px) * var(--ab-hl-scale, 1) * var(--ab-hs, 1)); }
   .ab[data-ae="naive-doodle"] .ab-swatch { grid-template-columns: 80px minmax(0, 1fr); }
   .ab[data-ae="naive-doodle"] .ab-chip { height: 46px; margin: 2px 10px 6px 0; }
-  .ab[data-ae="naive-doodle"] .ab-sec-ui::after { right: 0; font-size: 22px; }
+  /* the note tucks up under the card so its arrow lands on the main action, and keeps clear of the edge */
+  .ab[data-ae="naive-doodle"] .ab-sec-ui { padding-bottom: 36px; }
+  .ab[data-ae="naive-doodle"] .ab-sec-ui::after { right: 12px; bottom: 2px; font-size: 22px; }
   .ab[data-ae="naive-doodle"] .ab-sec-ui .ab-labelrow::after { right: -6px; width: 34px; height: 34px; }
   .ab[data-ae="naive-doodle"] .ab-row-bar i::after { display: none; }
 }
 
 /* deck */
 .ab[data-ae="naive-doodle"].ab-slide .ab-deck-cell,
-.ab[data-ae="naive-doodle"].ab-slide .ab-deck-prodframe,
-.ab[data-ae="naive-doodle"].ab-slide .ab-deck-stage[data-stage="pattern"] {
+.ab[data-ae="naive-doodle"].ab-slide .ab-deck-prodframe {
   border: 0; border-radius: 0; background: var(--nd-card) 0 0 / 100% 100% no-repeat; overflow: visible;
 }
 .ab[data-ae="naive-doodle"].ab-slide .ab-deck-principle,
@@ -284,9 +291,12 @@
 .ab[data-ae="naive-doodle"].ab-slide .ab-deck-pname,
 .ab[data-ae="naive-doodle"].ab-slide .ab-deck-pratio b { font-weight: 700; }
 .ab[data-ae="naive-doodle"].ab-slide .ab-deck-pchip { font-weight: 400; }
-.ab[data-ae="naive-doodle"].ab-slide .ab-card,
-.ab[data-ae="naive-doodle"].ab-slide .ab-panel { transform: none; }
+.ab[data-ae="naive-doodle"].ab-slide .ab-card { transform: none; }
 .ab[data-ae="naive-doodle"].ab-slide .ab-sec-ui::after { content: none; }
+/* cover: a wider drawing box, so the cover fit keeps the drawing big next to the headline */
+.ab[data-ae="naive-doodle"].ab-slide[data-slide="cover"] .ab-hero > .ab-art { aspect-ratio: 1.15 / 1; }
+/* Material: the numeral tab and its name sit apart, like the board's section labels */
+.ab[data-ae="naive-doodle"].ab-slide .ab-deck-mat .ab-label { display: inline-flex; align-items: center; gap: 10px; }
 /* Do / Don't: a hand tick and a scribbled cross (def.deck.marks), wavy rules, no straight divider */
 .ab[data-ae="naive-doodle"].ab-slide .ab-deck-col[data-kind="dont"] { border-left: 0; background: var(--nd-vrule) 0 0 / 10px 400px repeat-y; }
 .ab[data-ae="naive-doodle"].ab-slide .nd-mk { display: inline-block; width: 32px; height: 32px; vertical-align: -6px; background: var(--nd-tick) center / contain no-repeat; }

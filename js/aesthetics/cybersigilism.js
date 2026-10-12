@@ -116,8 +116,6 @@ function csStateGlyph(stage, ink) {
   return s;
 }
 
-const csEsc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-
 // The sigil (board hero, deck cover) and, with a viewBox crop, the Material slide's 2.3x close-up of the barbs.
 function csSigil(ctx, vb) {
   const t = ctx.t, d = t.isDark;
@@ -168,8 +166,8 @@ function csSigil(ctx, vb) {
     ${nodes}
     <path d="M${cx} 232 ${cx + 5} 244 ${cx} 256 ${cx - 5} 244Z" fill="none" stroke="${ink1}" stroke-width=".8"/>
     <circle cx="${cx}" cy="244" r="1.6" fill="${cold}"/>
-    <g fill="${ink3}" style="font-family:var(--ab-font-label,monospace);font-size:8px;letter-spacing:.18em">
-      <text x="24" y="${H - 18}">SIGIL N° 031 · ${count} LINES</text>
+    <g fill="${ink3}" style="font-family:var(--ab-font-label,monospace);font-size:15px;letter-spacing:.14em">
+      <text x="126" y="${H - 16}">N° 031 · ${count} LINES</text>
     </g>
   </svg>`;
 }
@@ -188,7 +186,7 @@ registerAesthetic({
   layout: { hero: 'split', palette: 'swatches', sections: 'asym', subcopy: true },
   type: { ui: 'body', label: 'mono', display: 1 },
   highlight: 'custom',
-  highlightNote: 'The last word keeps the headline face and colour; hand-drawn hairline thorns (filled, tapering needles) grow out of its first and last letters. No glow, no gradient, no fill.',
+  highlightNote: 'The last word keeps the headline face and colour; one sprig of hand-drawn hairline thorns (filled, tapering needles) grows out to the right of it, a clear zone of about a quarter em past the last letter and inside its own line, never through the letters. No glow, no gradient, no fill.',
   ctaFill: 'ink',
   deck: {
     coverDisplay: 0.8,
@@ -274,19 +272,20 @@ registerAesthetic({
   // The headline as text with hand-drawn hairline thorns growing out of the last word (aria-label carries the
   // plain text; the framework wraps this in the h2).
   headline(ctx, text) {
-    const e = csEsc;
+    const e = escapeHtml;
     const words = String(text || '').split(/\s+/).filter(Boolean);
     if (!words.length) return '';
     const last = words.pop();
     const r = csRand(csHash(last + '|thorn'));
-    // thorns in a 100 x 40 box around the word (the word sits in y 8..32): two from the first letter, two from
-    // the last, each with barbs. Coordinates are stretched to the word box (preserveAspectRatio none), so the
-    // needles stay needles at any word width.
+    // "Ornament keeps its distance": one thorn sprig grows out to the RIGHT of the word, in a 60 x 40 box that
+    // starts a clear zone (~0.22em, 16-24px at display size) past the last glyph and stays inside the word's own
+    // line box, so it never touches a letter, the line above or the copy below. The box clips (overflow hidden),
+    // so a barb that turns back toward the root stops at the clear-zone edge.
     const parts = [];
-    const grow = (x, y, a, L) => { const nd = csNeedle([x, y], a, L, (r() - 0.5) * 0.4, 0.9, 10); parts.push(nd); const out = [[], [], [], []]; csBarbs(nd, 2, r, out, 1); out[2].concat(out[3]).forEach(o => parts.push(o)); };
-    grow(4, 30, Math.PI * 0.86, 24); grow(6, 12, -Math.PI * 0.74, 22);
-    grow(96, 31, Math.PI * 0.1, 26); grow(94, 10, -Math.PI * 0.22, 24);
-    const thorns = `<svg class="cs-thorns" viewBox="-20 -6 140 52" preserveAspectRatio="none" aria-hidden="true" focusable="false"><path d="${parts.map(csPoly).join('')}"/></svg>`;
+    const grow = (x, y, a, L, bend) => { const nd = csNeedle([x, y], a, L, bend, 0.9, 10); parts.push(nd); const out = [[], [], [], []]; csBarbs(nd, 2, r, out, 1); out[2].concat(out[3]).forEach(o => parts.push(o)); };
+    grow(6, 34, -0.62, 52, -0.16 + (r() - 0.5) * 0.12);
+    grow(10, 30, 0.08, 30, 0.12 + (r() - 0.5) * 0.12);
+    const thorns = `<svg class="cs-thorns" viewBox="0 0 60 40" aria-hidden="true" focusable="false"><path d="${parts.map(csPoly).join('')}"/></svg>`;
     return `${words.length ? e(words.join(' ')) + ' ' : ''}<span class="ab-hl">${e(last)}${thorns}</span>`;
   },
 
@@ -295,7 +294,7 @@ registerAesthetic({
   // The states: one small sigil drawn three ways (outline, inked, barbed) as real SVG, not three orbs.
   states(ctx) {
     const ink = ctx.t.isDark ? '#B9BEC6' : '#2A2A2E';
-    return [0, 1, 2].map(i => `<div class="ab-state" data-s="${i}"><svg class="cs-st" viewBox="0 0 64 64" aria-hidden="true" focusable="false">${csStateGlyph(i, ink)}</svg><span class="ab-state-name">${csEsc((ctx.labels || [])[i] || '')}</span></div>`).join('');
+    return [0, 1, 2].map(i => `<div class="ab-state" data-s="${i}"><svg class="cs-st" viewBox="0 0 64 64" aria-hidden="true" focusable="false">${csStateGlyph(i, ink)}</svg><span class="ab-state-name">${escapeHtml((ctx.labels || [])[i] || '')}</span></div>`).join('');
   },
 
   materials: [

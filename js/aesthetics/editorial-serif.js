@@ -23,6 +23,42 @@ function edsTones(t) {
   };
 }
 
+// The duotone still life (Morandi bottles on a table, lit from the left) drawn from the four
+// tones; the logo, when there is one, hangs as a framed print on the wall right of the bottles,
+// below the masthead band. Used by the cover plate and the deck's Material slide.
+function edsStill(t, logo) {
+  const id = 'eds' + (++edsSeq);
+  const T = edsTones(t);
+  const print = logo
+    ? `<rect x="250" y="160" width="92" height="92" fill="${T.lite}" stroke="${T.deep}" stroke-width="3"/><image href="${escapeHtml(logo)}" x="262" y="172" width="68" height="68" preserveAspectRatio="xMidYMid meet"/>` : '';
+  return `<svg class="eds-still" viewBox="0 0 400 500" preserveAspectRatio="xMidYMin slice" focusable="false">
+          <defs>
+            <radialGradient id="${id}w" cx=".22" cy=".18" r=".95"><stop offset="0" stop-color="${T.lite}"/><stop offset=".55" stop-color="${T.spot}"/><stop offset="1" stop-color="${T.mid}"/></radialGradient>
+            <linearGradient id="${id}b" x1="0" x2="1"><stop offset="0" stop-color="${T.lite}"/><stop offset=".35" stop-color="${T.spot}"/><stop offset=".8" stop-color="${T.mid}"/><stop offset="1" stop-color="${T.deep}"/></linearGradient>
+            <linearGradient id="${id}t" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${T.spot}"/><stop offset="1" stop-color="${T.mid}"/></linearGradient>
+            <linearGradient id="${id}f" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${T.mid}"/><stop offset=".18" stop-color="${T.deep}"/><stop offset="1" stop-color="${T.deep}"/></linearGradient>
+            <radialGradient id="${id}s" cx=".36" cy=".34" r=".7"><stop offset="0" stop-color="${T.lite}"/><stop offset=".5" stop-color="${T.spot}"/><stop offset="1" stop-color="${T.deep}"/></radialGradient>
+          </defs>
+          <rect width="400" height="500" fill="url(#${id}w)"/>
+          <path d="M0 0H400V500H0Z" fill="${T.deep}" opacity=".06"/>
+          <g transform="translate(0 -46)">
+          ${print}
+          <path d="M0 262H400V300H0Z" fill="url(#${id}t)"/>
+          <path d="M0 300H400V500H0Z" fill="url(#${id}f)"/>
+          <path d="M150 288 C 210 286 290 290 330 300 L 170 300Z" fill="${T.deep}" opacity=".38"/>
+          <path d="M226 294 C 270 292 330 294 380 300 L 236 300Z" fill="${T.deep}" opacity=".32"/>
+          <path d="M120 290V150C120 138 128 132 134 122V96H152V122C158 132 166 138 166 150V290Z" fill="url(#${id}b)"/>
+          <path d="M131 96H155V90H131Z" fill="${T.mid}"/>
+          <path d="M176 292V206C176 196 186 192 206 192C226 192 236 196 236 206V292Z" fill="url(#${id}b)"/>
+          <ellipse cx="206" cy="206" rx="30" ry="5" fill="${T.deep}" opacity=".35"/>
+          <path d="M98 292V232C98 224 104 220 113 220C122 220 128 224 128 232V292Z" fill="url(#${id}b)" opacity=".92"/>
+          <circle cx="270" cy="276" r="18" fill="url(#${id}s)"/>
+          <path d="M0 300H400" stroke="${T.lite}" stroke-opacity=".35" stroke-width="1"/>
+          </g>
+          <rect y="440" width="400" height="60" fill="${T.deep}"/>
+        </svg>`;
+}
+
 registerAesthetic({
   key: 'editorial-serif', order: 11,
   name: 'Editorial Serif',
@@ -72,10 +108,10 @@ registerAesthetic({
     return b.isDark ? null : b.mix(b.canvas, '#f3ead9', 0.74);
   },
 
-  tokens(t) {
-    const st = typeof state !== 'undefined' ? state : null;
-    const h = st && st.headingFont;
-    const b = st && st.bodyFont;
+  tokens(t, st) {
+    const v = st || (typeof state !== 'undefined' ? state : null);
+    const h = v && v.headingFont;
+    const b = v && v.bodyFont;
     // tracking: wide / techno / heavy faces must not take the tight serif tracking
     const tr = (h && { condensed: 0, heavy: 0, wide: 0.4, techno: 0.4 }[h.cls]) ?? 1;
     // interface sans: the brand's own sans if it has one, else Inter (captions are always sans)
@@ -83,7 +119,7 @@ registerAesthetic({
     const ui = brandSans ? (brandSans === b ? 'var(--ab-font-b)' : 'var(--ab-font-h)')
       : '"Inter", "Helvetica Neue", Helvetica, Arial, sans-serif';
     const d = t.isDark;
-    const { deep, spot, lite, lightN } = edsTones(t);
+    const { deep, spot, lite, lightN, darkN } = edsTones(t);
     return {
       '--ab-tr': tr,
       '--ab-font-ui': ui,
@@ -97,6 +133,10 @@ registerAesthetic({
       '--ab-eds-spot': spot,
       '--ab-eds-lite': lite,
       '--ab-eds-paperlight': lightN,
+      // the darkest neutral (small type on the light upper plate) and the lower-third scrim
+      // that keeps the paper-coloured kicker and headline readable over any duotone
+      '--ab-eds-dark': darkN,
+      '--ab-eds-scrim': t.alpha(deep, 0.78),
     };
   },
 
@@ -108,47 +148,19 @@ registerAesthetic({
   art(ctx) {
     const e = escapeHtml;
     const name = String(ctx.brandName || 'Studio').trim() || 'Studio';
-    const n = Math.max(4, Math.min(28, name.length));
-    const id = 'eds' + (++edsSeq);
-    const T = edsTones(ctx.t);
-    const print = ctx.logoDataUrl
-      ? `<rect x="226" y="52" width="108" height="108" fill="${T.lite}" stroke="${T.deep}" stroke-width="3"/><image href="${e(ctx.logoDataUrl)}" x="240" y="66" width="80" height="80" preserveAspectRatio="xMidYMid meet"/>` : '';
+    // one justified line up to 40 characters (a longer name wraps, left-aligned: see .is-multi)
+    const n = Math.max(4, Math.min(40, name.length));
+    const multi = name.length > 40;
     return `<figure class="eds">
       <div class="eds-plate">
-        <svg class="eds-still" viewBox="0 0 400 500" preserveAspectRatio="xMidYMin slice" focusable="false">
-          <defs>
-            <radialGradient id="${id}w" cx=".22" cy=".18" r=".95"><stop offset="0" stop-color="${T.lite}"/><stop offset=".55" stop-color="${T.spot}"/><stop offset="1" stop-color="${T.mid}"/></radialGradient>
-            <linearGradient id="${id}b" x1="0" x2="1"><stop offset="0" stop-color="${T.lite}"/><stop offset=".35" stop-color="${T.spot}"/><stop offset=".8" stop-color="${T.mid}"/><stop offset="1" stop-color="${T.deep}"/></linearGradient>
-            <linearGradient id="${id}t" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${T.spot}"/><stop offset="1" stop-color="${T.mid}"/></linearGradient>
-            <linearGradient id="${id}f" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${T.mid}"/><stop offset=".18" stop-color="${T.deep}"/><stop offset="1" stop-color="${T.deep}"/></linearGradient>
-            <radialGradient id="${id}s" cx=".36" cy=".34" r=".7"><stop offset="0" stop-color="${T.lite}"/><stop offset=".5" stop-color="${T.spot}"/><stop offset="1" stop-color="${T.deep}"/></radialGradient>
-          </defs>
-          <rect width="400" height="500" fill="url(#${id}w)"/>
-          <path d="M0 0H400V500H0Z" fill="${T.deep}" opacity=".06"/>
-          <g transform="translate(0 -46)">
-          ${print}
-          <path d="M0 262H400V300H0Z" fill="url(#${id}t)"/>
-          <path d="M0 300H400V500H0Z" fill="url(#${id}f)"/>
-          <path d="M150 288 C 210 286 290 290 330 300 L 170 300Z" fill="${T.deep}" opacity=".38"/>
-          <path d="M226 294 C 270 292 330 294 380 300 L 236 300Z" fill="${T.deep}" opacity=".32"/>
-          <path d="M120 290V150C120 138 128 132 134 122V96H152V122C158 132 166 138 166 150V290Z" fill="url(#${id}b)"/>
-          <path d="M131 96H155V90H131Z" fill="${T.mid}"/>
-          <path d="M176 292V206C176 196 186 192 206 192C226 192 236 196 236 206V292Z" fill="url(#${id}b)"/>
-          <ellipse cx="206" cy="206" rx="30" ry="5" fill="${T.deep}" opacity=".35"/>
-          <path d="M98 292V232C98 224 104 220 113 220C122 220 128 224 128 232V292Z" fill="url(#${id}b)" opacity=".92"/>
-          <circle cx="270" cy="276" r="18" fill="url(#${id}s)"/>
-          <path d="M0 300H400" stroke="${T.lite}" stroke-opacity=".35" stroke-width="1"/>
-          </g>
-          <rect y="440" width="400" height="60" fill="${T.deep}"/>
-        </svg>
+        ${edsStill(ctx.t, ctx.logoDataUrl)}
         <i class="eds-grain"></i>
-        <p class="eds-mast" style="--eds-mn:${n}">${e(name)}</p>
+        <p class="eds-mast${multi ? ' is-multi' : ''}" style="--eds-mn:${n}">${e(name)}</p>
         <span class="eds-no">No. 01 · Spring</span>
       </div>
       <figcaption class="eds-fig"><span><em>Fig. 1</em> — Still life, the studio table</span><span class="eds-folio">p. 01</span></figcaption>
     </figure>`;
   },
-
   // 02 on the board is a text page, in real markup: two justified columns of body serif
   // (the board's only drop cap), a pull quote between hairlines, the states, and a byline
   // with a folio. The deck's Interface slide still takes the field and toggle from the
@@ -172,7 +184,7 @@ registerAesthetic({
     { name: 'Masthead rule', css: 'border-top: 3px solid {hairStrong}; border-bottom: 1px solid {hairStrong}; height: 7px; /* thick over thin, under the masthead only */' },
     { name: 'Hairline', css: 'border-top: 1px solid {hair}; /* every divider, every panel edge; never a shadow */' },
     { name: 'Duotone cover', css: 'a full-width 4:5 image: black {edsDeep} + spot {edsSpot} (primary 42% into paper), highlights {edsLite}; 5% grain; masthead wordmark edge to edge across the top; headline over the lower third in {edsPaperlight}; caption "Fig. 1" and folio below' },
-    { name: 'Primary action', css: 'background: {primary}; color: {onPrimary}; border-radius: 0; text-transform: uppercase; letter-spacing: .14em; font-size: 12px; /* hover: background {ink}, color {canvas}; pressed: {ink} with a 1px paper inset; ink on paper only */' },
+    { name: 'Primary action', css: 'background: {primary}; color: {onPrimary}; border-radius: 0; text-transform: uppercase; letter-spacing: .14em; font-size: 12px; /* hover: background {ink}, color {canvas}; pressed: transparent with a 1px {ink} outline and the label underlined; ink on paper only */' },
     { name: 'Text page', css: 'body serif 15/22 in two columns, a 3-line drop cap on the first paragraph only, a pull quote in heading italic 28px between hairlines, byline and folio in 9px small caps' },
     { name: 'Contents row', css: 'border-top: 1px solid {hairSoft}; /* name, dotted leader (1px dotted {hair}), status in small caps, page number right */' },
   ],
@@ -194,8 +206,19 @@ registerAesthetic({
   },
   // Deck copy (js/brand-deck.js): three principles, three do / don't lines, each short.
   deck: {
-    materialStage: 'pattern',
     coverDisplay: 1.1,
+    // Material slide: the four listed materials themselves: a sheet of the paper carrying the
+    // thick-over-thin masthead rule, a hairline, and the duotone cover still life as a print.
+    materialArt(ctx) {
+      return `<div class="eds-mat">
+        <div class="eds-mat-sheet">
+          <p class="eds-mat-k">Paper</p>
+          <i class="eds-mat-mast"></i><p class="eds-mat-k">Masthead rule · 3 over 1</p>
+          <i class="eds-mat-hair"></i><p class="eds-mat-k">Hairline · 1px</p>
+        </div>
+        <figure class="eds-mat-print"><div class="eds-mat-img">${edsStill(ctx.t, ctx.logoDataUrl)}</div><figcaption><em>Fig. 2</em> — Duotone cover, black and one spot</figcaption></figure>
+      </div>`;
+    },
     principles: [
       ['One image carries the cover', 'A full-bleed duotone, the masthead edge to edge.'],
       ['Scale, not weight', 'A didone at 120px over 9px captions.'],

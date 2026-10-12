@@ -316,7 +316,8 @@ registerAesthetic({
     return b.isDark ? b.mix(WS.night, b.canvas, 0.78) : b.mix(WS.paper, b.canvas, 0.8);
   },
 
-  tokens(t) {
+  tokens(t, st) {
+    const view = st || (typeof state !== 'undefined' ? state : {}) || {};
     const d = t.isDark;
     const ink = wsInk(t);
     const paperText = d ? WS.sumi : WS.paper;
@@ -338,9 +339,14 @@ registerAesthetic({
       '--ab-ws-sheet': sheet,
       '--ab-ws-clay': WS.clay,
       '--ab-ws-fired-accent': seal,
+      // the accent swatch names the seal it shows: its hex, and why, when the client accent fell back to shu
+      '--ws-accent-hex': JSON.stringify(seal.toUpperCase()),
+      '--ws-accent-note': seal === t.accent ? '""' : JSON.stringify('Shu seal · client accent ' + String(t.accent).toUpperCase() + ' is under 3:1 on paper'),
       '--ab-ws-ash': WS.ash,
       '--ab-ws-blot': ink,
       '--ab-type-pick-w': '400',
+      // the selected tab's medium weight, from the weights the UI face really has (font-synthesis is off)
+      '--ws-ui-mid': abWeight(view.bodyFont || view.headingFont, 500),
     };
   },
 

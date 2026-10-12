@@ -42,6 +42,13 @@
   content: ""; position: absolute; left: 6px; right: 6px; top: 6px; height: 1px; background: var(--tw-white); pointer-events: none;
 }
 
+/* ---- middle dots: the heading face's U+00B7 (Overpass) has a wide left and no right side-bearing ("A ·B").
+   Our own separators are a span in a neutral sans; framework copy gets the dot from a one-glyph local face. ---- */
+@font-face { font-family: "tw-dot"; src: local("Arial"), local("Helvetica"), local("Helvetica Neue"), local("Liberation Sans"); unicode-range: U+00B7; font-weight: 100 900; }
+.ab[data-ae="transit-wayfinding"] .tw-sep { font-family: "tw-dot", Arial, Helvetica, sans-serif; font-weight: 400; }
+.ab[data-ae="transit-wayfinding"] :is(.ab-label, .ab-sw-job, .ab-type-pair, .ab-type-fit, .ab-status, .ab-state) { font-family: "tw-dot", var(--ab-font-label, var(--ab-font-ui, var(--ab-font-b))); }
+.ab[data-ae="transit-wayfinding"] :is(.ab-deck-desc, .ab-type-class, .ab-type-why, .ab-subcopy) { font-family: "tw-dot", var(--ab-font-b); }
+
 /* ---- the route bullet (shared): a circle in the route colour, a letter from the brand name ---- */
 .ab[data-ae="transit-wayfinding"] .tw-bul {
   display: inline-grid; place-items: center; flex: none; width: 1.9em; height: 1.9em; border-radius: 50%;
@@ -114,7 +121,7 @@
 .ab[data-ae="transit-wayfinding"] .twa-sign { flex: none; display: flex; align-items: center; gap: clamp(10px, 2cqw, 22px); padding: 16px clamp(12px, 2.4cqw, 22px) 12px; border-bottom: 1px solid #2A2C2F; }
 .ab[data-ae="transit-wayfinding"] .twa-buls { display: flex; align-items: center; gap: 6px; font-size: clamp(13px, 2.2cqw, 17px); }
 .ab[data-ae="transit-wayfinding"] .twa-dest { min-width: 0; flex: 1; display: grid; }
-.ab[data-ae="transit-wayfinding"] .twa-dest b { font-weight: var(--tw-hw, 800); font-size: clamp(15px, 2.7cqw, 22px); line-height: 1.1; letter-spacing: -0.01em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ab[data-ae="transit-wayfinding"] .twa-dest b { font-weight: var(--tw-hw, 800); font-size: clamp(15px, 2.7cqw, 22px); line-height: 1.3; letter-spacing: -0.01em; overflow-wrap: anywhere; }   /* a long destination wraps, never cut */
 .ab[data-ae="transit-wayfinding"] .twa-dest small { font-size: clamp(10.5px, 1.5cqw, 12.5px); color: var(--tw-dim); letter-spacing: 0.02em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .ab[data-ae="transit-wayfinding"] .twa-dir { flex: none; display: flex; align-items: center; gap: 8px; font-weight: var(--tw-mw, 600); font-size: clamp(12px, 1.7cqw, 14px); }
 .ab[data-ae="transit-wayfinding"] .twa-dir .tw-arrow { width: 22px; height: 22px; }
@@ -320,6 +327,10 @@
   .ab[data-ae="transit-wayfinding"] .ab-states[data-kind="button"] .ab-state-ctl { padding: 10px 6px; font-size: 12px; }
   .ab[data-ae="transit-wayfinding"] .ab-states .ab-cta-arrow { display: none; }
 }
+/* a phone-width footer sign carries the motto and the route dots only; the reference list would wrap to three lines */
+@container ab (max-width: 480px) {
+  .ab[data-ae="transit-wayfinding"] .ab-foot .ab-infl { display: none; }
+}
 @media (prefers-reduced-motion: reduce) {
   .ab[data-ae="transit-wayfinding"] .ab-cta, .ab[data-ae="transit-wayfinding"] .ab-cta-arrow, .ab[data-ae="transit-wayfinding"] .ab-switch::before { transition: none; }
 }
@@ -350,6 +361,10 @@
 .ab.ab-slide[data-ae="transit-wayfinding"] .ab-deck-cell { background: var(--ab-sign); border-radius: var(--tw-r); border: 0; color: var(--tw-white); position: relative; }
 .ab.ab-slide[data-ae="transit-wayfinding"] .ab-deck-cell::before { content: ""; position: absolute; left: 6px; right: 6px; top: 6px; height: 1px; background: var(--tw-white); }
 .ab.ab-slide[data-ae="transit-wayfinding"] .ab-deck-cell .ab-label { color: var(--tw-white); }
+/* the platform tabs fit a third-width sign: smaller tabs and gaps, never wider than the cell */
+.ab.ab-slide[data-ae="transit-wayfinding"] .ab-deck-cell .ab-seg { max-width: 100%; gap: 4px 12px; flex-wrap: wrap; justify-content: center; }
+.ab.ab-slide[data-ae="transit-wayfinding"] .ab-deck-cell .ab-seg-btn { gap: 7px; font-size: 13px; padding-right: 2px; }
+.ab.ab-slide[data-ae="transit-wayfinding"] .ab-deck-cell .ab-seg-btn::before { width: 24px; height: 24px; font-size: 13px; }
 .ab.ab-slide[data-ae="transit-wayfinding"] .ab-deck-uistates { background: var(--ab-sign); border-radius: var(--tw-r); padding: 16px 18px 8px; }
 
 /* deck "In product": the departures board in a half-width column */

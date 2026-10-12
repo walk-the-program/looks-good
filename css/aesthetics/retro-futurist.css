@@ -141,7 +141,8 @@
 .ab[data-ae="retro-futurist"] .ab-row-name { font-weight: 600; color: var(--ab-ink); }
 .ab[data-ae="retro-futurist"] .ab-row-status { padding: 0; border: 0; border-radius: 0; background: transparent; color: var(--ab-muted); font-size: 9.5px; letter-spacing: 0.12em; }
 .ab[data-ae="retro-futurist"] .ab-row-status::before { content: ""; display: inline-block; width: 7px; height: 7px; margin-right: 7px; vertical-align: 0; background: var(--ab-rf-off); }
-.ab[data-ae="retro-futurist"] .ab-row:first-child .ab-row-status::before { background: var(--ab-rf-signal); }
+/* the first log row's lamp is the lit one (the list opens with the .rf-loghead row, so not :first-child) */
+.ab[data-ae="retro-futurist"] .rf-loghead + .ab-row .ab-row-status::before { background: var(--ab-rf-signal); }
 .ab[data-ae="retro-futurist"] .ab-row-bar { height: 2px; border-radius: 0; background: var(--rf-hair-2); }
 .ab[data-ae="retro-futurist"] .ab-row-bar i { background: var(--ab-ink); border-radius: 0; }
 .ab[data-ae="retro-futurist"] .ab-row-pct { color: var(--ab-ink); font-weight: 700; }
@@ -194,3 +195,8 @@
 
 /* weights the faces actually have (font-synthesis: none shows 400 for a missing weight) */
 .ab[data-ae="retro-futurist"] :is(.ab-type-col[data-role="heading"] .ab-type-cur b, .ab-deck-ptitle) { font-weight: var(--rf-hw, 700); }
+/* heading-face samples are set in caps ("uppercase, tight"): Syncopate's lowercase is unicase, so sentence case
+   reads as a broken mix of small caps and capitals */
+.ab[data-ae="retro-futurist"] :is(.ab-type-col[data-role="heading"] .ab-type-cur b, .ab-type-col[data-role="heading"] .ab-type-pick, .ab-deck-ptitle, .ab-deck-face[data-face="h"] .ab-deck-fname) { text-transform: uppercase; }
+/* slide headers: a long brand name wraps under itself (the wide caps would otherwise run under the tag) */
+.ab[data-ae="retro-futurist"].ab-slide .ab-head .ab-wordmark { white-space: normal; overflow: visible; overflow-wrap: anywhere; line-height: 1.2; }
