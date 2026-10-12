@@ -424,7 +424,7 @@ function blendProbe(donor, P) {
   const host = document.createElement('div');
   host.setAttribute('aria-hidden', 'true');
   host.style.cssText = 'position:fixed;left:-20000px;top:0;width:1000px;visibility:hidden;pointer-events:none;';
-  host.innerHTML = `<section class="ab" ${abRootAttrs(donor, t, P.state, { states: 'swatch', subcopy: 'on' })} style=""${P.style};${extra}"><div class="ab-in"><section class="ab-hero"><div class="ab-hero-copy"><p class="ab-kicker">Probe</p><h2 class="ab-headline">Good design <span class="ab-hl">alive</span></h2></div></section></div></section>`;
+  host.innerHTML = `<section class="ab" ${abRootAttrs(donor, t, P.state, { states: 'swatch', subcopy: 'on' })} style="${P.style};${extra}"><div class="ab-in"><section class="ab-hero"><div class="ab-hero-copy"><p class="ab-kicker">Probe</p><h2 class="ab-headline">Good design <span class="ab-hl">alive</span></h2></div></section></div></section>`;
   document.body.appendChild(host);
   let out = null;
   try {
@@ -627,6 +627,7 @@ function blendLegibility(root) {
   root.querySelectorAll('.ab-blend-art').forEach(box => {
     box.style.removeProperty('--bl-art-fit');
     box.removeAttribute('data-bl-fit');
+    box.querySelectorAll('[data-bl-cut]').forEach(el => { el.style.removeProperty('visibility'); el.removeAttribute('data-bl-cut'); });
     box.querySelectorAll('svg[data-bl-ov]').forEach(svg => { svg.style.removeProperty('overflow'); svg.removeAttribute('data-bl-ov'); });
     const b = box.getBoundingClientRect();
     if (!b.height) return;
@@ -649,6 +650,19 @@ function blendLegibility(root) {
       box.style.setProperty('--bl-art-fit', (b.height / (b.height + cut + 3)).toFixed(4));
       box.setAttribute('data-bl-fit', '1');
     }
+    // The box crops the donor's art (its own board gave it a taller box). A line of the art's
+    // text that the crop cuts through (Corporate Vandalism's receipt header) reads as a broken
+    // half-line under the base's folio: hide those captions (visibility, nothing moves).
+    const bb = box.getBoundingClientRect();
+    box.querySelectorAll('.ab-blend-inner *').forEach(el => {
+      if (el.closest('svg') || ![...el.childNodes].some(n => n.nodeType === 3 && n.nodeValue.trim())) return;
+      const r = el.getBoundingClientRect();
+      if (!r.width || !r.height) return;
+      if (r.bottom > bb.bottom + 1 || r.top < bb.top - 1 || r.right > bb.right + 1 || r.left < bb.left - 1) {
+        el.style.setProperty('visibility', 'hidden');
+        el.setAttribute('data-bl-cut', '1');
+      }
+    });
   });
   const hero = root.querySelector('.ab-hero');
   if (hero) hero.removeAttribute('data-bl-reflow');

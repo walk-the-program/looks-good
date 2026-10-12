@@ -707,7 +707,7 @@ function bdFitCover(root) {
   if (!hl) return;
   hl.style.removeProperty('font-size');
   const art0 = root.querySelector('.ab-hero .ab-art');
-  if (art0) { art0.style.maxWidth = ''; art0.style.width = ''; }
+  if (art0) { art0.style.maxWidth = ''; art0.style.width = ''; art0.style.removeProperty('justify-self'); }
   delete root.dataset.coverFlat;
   const hero0 = root.querySelector('.ab-hero');
   if (hero0 && getComputedStyle(hero0).display === 'contents') root.dataset.coverFlat = '1';
@@ -752,7 +752,10 @@ function bdFitCover(root) {
       const minW = Math.max(96, w * 0.4);
       for (let i = 0; i < 16 && w * 0.92 >= minW && bdCoverNeed(root) < BD_COVER_MIN_SCALE; i++) {
         w *= 0.92;
-        art.style.maxWidth = Math.round(w) + 'px';
+        // A blend's donor art keeps its own 16:9 box, which some covers pin to full width with
+        // !important (Neo Deco's centered hero): there the cap must be !important too.
+        art.style.setProperty('max-width', Math.round(w) + 'px', root.dataset.blend ? 'important' : '');
+        if (root.dataset.blend && root.dataset.hero === 'centered') art.style.setProperty('justify-self', 'center');
         if (root.dataset.hero === 'poster') art.style.width = Math.round(w) + 'px';
       }
     }
@@ -915,7 +918,11 @@ function bdMinText(root, floor) {
     const min = floor && wrap && wrap.contains(el) ? floor : BD_MIN_TEXT;
     if (el.closest('[aria-hidden="true"], .ab-deck-pattern, svg') || el.tagName === 'INPUT') return;
     if (![...el.childNodes].some(n => n.nodeType === 3 && n.nodeValue.trim())) return;
-    el.style.removeProperty('font-size');
+    // The first pass starts clean. The second (after a scale) undoes only its own lifts: a size
+    // a fit set in between (the cover headline, a long brand name) stays. Wiping it sent a
+    // blended cover's headline back to full size, so the slide scaled down again and the
+    // lifted labels fell under 12px.
+    if (!floor || el.hasAttribute('data-bd-min')) { el.style.removeProperty('font-size'); el.removeAttribute('data-bd-min'); }
     const cs = getComputedStyle(el);
     if (cs.display === 'none' || cs.visibility === 'hidden') return;
     // Opt-out: an aesthetic sets --dk-min-text (inherited) to `off` to keep its own sizes
@@ -925,7 +932,7 @@ function bdMinText(root, floor) {
     const own = cs.getPropertyValue('--dk-min-text').trim();
     if (own === 'off' || own === 'none') return;
     const floorPx = own && isFinite(parseFloat(own)) ? parseFloat(own) * (min / BD_MIN_TEXT) : min;
-    if (parseFloat(cs.fontSize) < floorPx) el.style.setProperty('font-size', floorPx.toFixed(2) + 'px', 'important');
+    if (parseFloat(cs.fontSize) < floorPx) { el.style.setProperty('font-size', floorPx.toFixed(2) + 'px', 'important'); el.setAttribute('data-bd-min', ''); }
   });
 }
 
@@ -1237,6 +1244,8 @@ function bdFlattenSwitches(doc, root) {
       const kid = doc.createElement('span');
       copy(kid, cs);
       kid.style.content = 'none';
+      const text = cs.content.match(/^"(.*)"$/);   // a text label (Xerox OFF / ON, Acid ON AIR), not only a knob
+      if (text) kid.textContent = text[1].replace(/\\(.)/g, '$1');
       span.appendChild(kid);
     });
     input.replaceWith(span);

@@ -15,7 +15,7 @@
 .ab[data-ae="xerox"] {
   border-radius: 0;
   --xr-aw: 47; --ab-poster-art-w: calc(var(--xr-aw) * 1cqw); --ab-art-ratio: 1.12 / 1;
-  --xr-dash: repeating-linear-gradient(90deg, var(--xr-toner) 0 6px, transparent 6px 10px);
+  --xr-dash: repeating-linear-gradient(90deg, var(--xr-toner) 0 6px, transparent 6px 10px); --xr-dash-c: var(--xr-toner);
   /* clustered dust: fine specks kept only inside a few low-frequency patches (two-octave mask) */
   --xr-speck: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='640' height='640'><filter id='s' x='0' y='0' width='100%25' height='100%25'><feTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='2' seed='11' stitchTiles='stitch' result='a'/><feColorMatrix in='a' type='matrix' values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  28 0 0 0 -20.1' result='sp'/><feTurbulence type='fractalNoise' baseFrequency='.008' numOctaves='2' seed='4' stitchTiles='stitch' result='b'/><feColorMatrix in='b' type='matrix' values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  18 0 0 0 -10.5' result='mk'/><feComposite in='sp' in2='mk' operator='in'/></filter><rect width='100%25' height='100%25' filter='url(%23s)'/></svg>");
   /* one drum streak down the sheet, 30px at 7.5% toner, turbulent edge */
@@ -211,7 +211,7 @@
 .ab[data-ae="xerox"] .ab-motto { font-weight: var(--xr-bw, 700); text-transform: uppercase; letter-spacing: 0.12em; }
 .ab[data-ae="xerox"] .ab-foot .ab-infl { color: var(--xr-foot, var(--ab-muted)); }
 .ab[data-ae="xerox"] .ab-dot { border-radius: 0; width: 9px; height: 9px; background: var(--ab-ink); }
-.ab[data-ae="xerox"][data-mode="dark"] { --xr-dash: repeating-linear-gradient(90deg, var(--ab-ink) 0 6px, transparent 6px 10px); }
+.ab[data-ae="xerox"][data-mode="dark"] { --xr-dash: repeating-linear-gradient(90deg, var(--ab-ink) 0 6px, transparent 6px 10px); --xr-dash-c: var(--ab-ink); }
 
 .ab[data-ae="xerox"] .ab-seg-btn:focus-visible, .ab[data-ae="xerox"] .ab-cta:focus-visible, .ab[data-ae="xerox"] .ab-switch:focus-visible, .ab[data-ae="xerox"] .ab-type-apply:focus-visible { outline: 3px solid var(--ab-ink); outline-offset: 3px; }
 
@@ -244,3 +244,19 @@
 .ab[data-ae="xerox"] .ab-type-col[data-role="heading"] .ab-type-pick:first-child { font-weight: var(--ab-hw, 400); }
 .ab[data-ae="xerox"] .ab-type-cur b { font-weight: inherit; }
 .ab[data-ae="xerox"] .ab-deck-pchip { font-weight: var(--ab-hw, 400); }
+
+/* PNG / PDF export (js/brand-deck.js clones the slide into .deck-export-host for html2canvas). html2canvas does
+   not repeat repeating-*-gradient and does not draw an inset box-shadow inside a baked (filtered) box, so here
+   the dashed rules and the progress stripes are tiled plain gradients and the card's toner edge is a border.
+   The screen keeps the rules above. */
+.deck-export-host .ab[data-ae="xerox"] .ab-row:not(:last-child) { background: linear-gradient(90deg, var(--xr-dash-c) 6px, transparent 6px) 0 100% / 10px 2px repeat-x; }
+.deck-export-host .ab[data-ae="xerox"] .ab-foot { background: linear-gradient(90deg, var(--xr-dash-c) 6px, transparent 6px) 0 0 / 10px 2.5px repeat-x; }
+.deck-export-host .ab[data-ae="xerox"] .ab-row-bar i { background: linear-gradient(45deg, var(--ab-ink) 20%, transparent 20% 50%, var(--ab-ink) 50% 70%, transparent 70%) 0 0 / 7.07px 7.07px; }
+.deck-export-host .ab[data-ae="xerox"] .ab-card::after, .deck-export-host .ab[data-ae="xerox"] .ab-panel::after { box-shadow: none; border: 1.5px solid var(--xr-toner); }
+/* the CTA's ghost copy: html2canvas draws no radial-gradient dots in a 4px tile, so the export uses 2px ink
+   squares on the same 4px grid (two paper-coloured linear layers over an ink fill), offset by inset, not translate() */
+.deck-export-host .ab[data-ae="xerox"] .ab-cta::after {
+  background: linear-gradient(90deg, var(--ab-canvas) 1px, transparent 1px 3px, var(--ab-canvas) 3px) 0 0 / 4px 4px,
+    linear-gradient(var(--ab-canvas) 1px, transparent 1px 3px, var(--ab-canvas) 3px) 0 0 / 4px 4px, var(--ab-ink);
+  transform: none; transition: none; inset: 6px -7px -6px 7px;   /* html2canvas over-shifted the translate() */
+}
