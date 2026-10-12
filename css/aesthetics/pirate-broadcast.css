@@ -114,6 +114,23 @@
 /* the test card: a 4:3 picture at the top of the 02 panel */
 .ab[data-ae="pirate-broadcast"] .pb-card { aspect-ratio: 4 / 3; margin-bottom: var(--pb-pad); background: #000; }
 .ab[data-ae="pirate-broadcast"] .pb-card svg, .ab[data-ae="pirate-broadcast"] .pba-card svg { display: block; width: 100%; height: 100%; }
+/* the hero art (js art): a black teletext page; row 0 and Fastext row 24, the torn frame grab with its
+   plain mono message on the right, static scanlines over everything (colours stay inline: teletext only) */
+.ab[data-ae="pirate-broadcast"] .pba { position: absolute; inset: 0; overflow: hidden; background: #000; }
+.ab[data-ae="pirate-broadcast"] .pba-row {
+  position: absolute; left: 2.4%; right: 2.4%; display: flex; justify-content: space-between; white-space: nowrap;
+  font: 700 clamp(8px, 2.15cqw, 19px)/1.2 var(--pb-mono);
+}
+.ab[data-ae="pirate-broadcast"] .pba-r0 { top: 1.6%; }
+.ab[data-ae="pirate-broadcast"] .pba-r24 { bottom: 2%; }
+.ab[data-ae="pirate-broadcast"] .pba-gfx { position: absolute; left: 58%; right: 2.4%; top: 14%; bottom: 20%; }
+.ab[data-ae="pirate-broadcast"] .pba-grab { position: absolute; inset: 0 0 18% 0; }
+.ab[data-ae="pirate-broadcast"] .pba-msg {
+  position: absolute; left: 0; right: 0; bottom: 0; height: 14%; display: flex; align-items: center; overflow: hidden;
+  background: #000; color: #fff; font: 400 clamp(7px, 1.6cqw, 14px)/1 var(--pb-mono); letter-spacing: 0.04em; white-space: nowrap;
+}
+.ab[data-ae="pirate-broadcast"] .pba-scan { position: absolute; inset: 0; pointer-events: none; background: repeating-linear-gradient(0deg, rgba(0,0,0,.28) 0 1px, transparent 1px 3px); }
+.ab[data-ae="pirate-broadcast"] .pba-card { position: absolute; inset: 0; }
 .ab[data-ae="pirate-broadcast"] .ab-card-body, .ab[data-ae="pirate-broadcast"] .ab-status, .ab[data-ae="pirate-broadcast"] .ab-state, .ab[data-ae="pirate-broadcast"] .ab-fieldlabel { color: var(--ab-tt-dim); }
 
 /* 01: channel keys, a title, the Fastext key */
@@ -169,7 +186,9 @@
 .ab[data-ae="pirate-broadcast"] .ab-states .ab-state-ctl.is-hover { background: var(--ab-tt-green); color: #000; box-shadow: none; }
 .ab[data-ae="pirate-broadcast"] .ab-states .ab-state-ctl.is-hover::before { background: linear-gradient(currentColor, currentColor) 0 100% / 2px 30% no-repeat, linear-gradient(currentColor, currentColor) 4px 100% / 2px 50% no-repeat, linear-gradient(currentColor, currentColor) 8px 100% / 2px 75% no-repeat, linear-gradient(currentColor, currentColor) 12px 100% / 2px 100% no-repeat; }
 .ab[data-ae="pirate-broadcast"] .ab-states .ab-state-ctl.is-pressed {
-  background: repeating-linear-gradient(0deg, transparent 0 5px, rgba(0,0,0,.28) 5px 6px), var(--ab-tt-red); color: #000; box-shadow: none; text-shadow: 1.5px 0 var(--ab-tt-blue), -1.5px 0 var(--ab-tt-cyan);
+  background: repeating-linear-gradient(0deg, transparent 0 5px, rgba(0,0,0,.28) 5px 6px), var(--ab-tt-red); color: #000; text-shadow: none;
+  /* the RGB split sits on the control's edges, never on the label (black on red holds 5.2:1) */
+  box-shadow: 2px 0 0 var(--ab-tt-blue), -2px 0 0 var(--ab-tt-cyan);
 }
 .ab[data-ae="pirate-broadcast"] .ab-states .ab-state-ctl.is-pressed::before { background: linear-gradient(currentColor, currentColor) 0 100% / 2px 100% no-repeat, linear-gradient(currentColor, currentColor) 4px 100% / 2px 20% no-repeat, linear-gradient(currentColor, currentColor) 8px 100% / 2px 90% no-repeat, linear-gradient(currentColor, currentColor) 12px 100% / 2px 10% no-repeat; }
 
@@ -215,7 +234,7 @@
 }
 /* the art box is a size container: on a narrow page the frame grab sits low, full width */
 @container (max-width: 520px) {
-  .ab[data-ae="pirate-broadcast"] .pba-gfx { left: 4% !important; right: 4% !important; top: auto !important; bottom: 9% !important; height: 34%; }
+  .ab[data-ae="pirate-broadcast"] .pba-gfx { left: 4%; right: 4%; top: auto; bottom: 9%; height: 34%; }
   .ab[data-ae="pirate-broadcast"] .pba-r24 > span:nth-child(4) { display: none; }
 }
 
@@ -225,10 +244,15 @@
 /* cover: the page is the whole slide body; 40 columns of the slide width */
 /* cover: one 40-column page, centred like a screen (760px wide) */
 .ab[data-ae="pirate-broadcast"].ab-slide[data-slide="cover"] .ab-deck-cover .ab-subcopy { font-size: 14px; }
+/* 05 interface: the channel keys share the cell's width (the deck zooms the cell 1.45x, so the natural
+   row would run past the screen frame) */
+.ab.ab-slide[data-ae="pirate-broadcast"] .ab-deck-cellzoom:has(> .ab-seg) { flex: 1 1 auto; }
+.ab.ab-slide[data-ae="pirate-broadcast"][data-slide] .ab-deck-cell .ab-seg { display: flex; width: 100%; box-sizing: border-box; gap: 4px; }
+.ab.ab-slide[data-ae="pirate-broadcast"][data-slide] .ab-deck-cell .ab-seg-btn { flex: 1 1 0; min-width: 0; gap: 5px; padding: 6px 2px; letter-spacing: 0.02em; }
 /* the deck's cover fit keeps a 40px headline floor, so the cover page is wider and its copy
    column holds "GOOD DESIGN SHOULD" on one double-height row; the frame grab moves right */
 .ab[data-ae="pirate-broadcast"].ab-slide[data-slide="cover"][data-hero="centered"] .ab-deck-cover .ab-hero-copy { width: calc(var(--pb-u) * 26); padding: 1.8em 0 2.6em; }
-.ab[data-ae="pirate-broadcast"].ab-slide[data-slide="cover"] .pba-gfx { left: 67% !important; }
+.ab[data-ae="pirate-broadcast"].ab-slide[data-slide="cover"] .pba-gfx { left: 67%; }
 .ab[data-ae="pirate-broadcast"].ab-slide[data-slide="cover"] .ab-deck-cover .ab-hero .ab-art { width: 100% !important; max-width: none !important; height: 100% !important; justify-self: stretch; }
 .ab[data-ae="pirate-broadcast"].ab-slide[data-slide="cover"][data-hero="centered"] .ab-deck-cover .ab-hero {
   flex: 0 0 auto; width: 760px; max-width: 100%; margin: 0 auto; padding: 0; --pb-u: calc(760px / 42);
@@ -244,3 +268,9 @@
 
 /* weights the faces actually have (font-synthesis: none shows 400 for a missing weight) */
 .ab[data-ae="pirate-broadcast"] :is(.ab-type-cur b, .ab-deck-pchip, .ab-headline) { font-weight: 400; }
+
+/* as a blend base: the headline and copy sit on the teletext page's left column, so a donor's art takes
+   the right of the screen only (where the frame grab sits) and never runs under the text column */
+@container ab (min-width: 601px) {
+  .ab[data-ae="pirate-broadcast"][data-blend] .ab-hero > .ab-art > .ab.ab-blend-art { margin-left: 54% !important; width: 46% !important; }
+}

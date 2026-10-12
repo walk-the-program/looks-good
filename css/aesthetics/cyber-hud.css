@@ -166,7 +166,7 @@
 .ab[data-ae="cyber-hud"] .ab-states .ab-state-ctl.is-hover { background: repeating-linear-gradient(-45deg, var(--ab-hud-line-soft) 0 1px, transparent 1px 5px), var(--ab-hud-fill); box-shadow: inset 0 0 0 1px var(--ab-neon); color: var(--ab-ink); }
 /* Live: a filled signal slab with a 1px scan line (static) */
 .ab[data-ae="cyber-hud"] .ab-states .ab-state-ctl.is-pressed {
-  background: linear-gradient(180deg, transparent 58%, rgba(255,255,255,0.55) 58% calc(58% + 1px), transparent calc(58% + 1px)), var(--ab-neon2); color: var(--ab-on-neon2); box-shadow: none;
+  background: linear-gradient(180deg, transparent calc(50% + 0.5em + 4px), rgba(255,255,255,0.55) calc(50% + 0.5em + 4px) calc(50% + 0.5em + 5px), transparent calc(50% + 0.5em + 5px)), var(--ab-neon2); color: var(--ab-on-neon2); box-shadow: none;
 }
 
 /* 03: roster table with segmented bars (gradient segments over the panel fill, no masks) */
@@ -200,20 +200,80 @@
   .ab[data-ae="cyber-hud"] .ab-swatch::after { display: none; }
   .ab[data-ae="cyber-hud"] .ab-type-col { box-shadow: none; padding-left: 0; border-top: 1px solid var(--ab-hud-line-soft); }
 }
-/* the art box is a size container: thin the viewport furniture on small art boxes */
+/* the viewport furniture placed by js art: the reticle right of centre, three data slabs on the
+   right edge, two corner readouts under the top rail */
+.ab[data-ae="cyber-hud"] .chv-ret { position: absolute; left: 66%; top: 50%; width: 34%; height: 62%; transform: translate(-50%, -50%); overflow: visible; }
+.ab[data-ae="cyber-hud"] .chv-slabs { position: absolute; right: 16px; top: 50%; transform: translateY(-50%); display: grid; gap: 6px; width: clamp(120px, 22%, 190px); }
+.ab[data-ae="cyber-hud"] .chv-ro { position: absolute; top: 46px; font: 500 8.5px/1.5 var(--ch-mono); letter-spacing: 0.12em; }
+.ab[data-ae="cyber-hud"] .chv-ro-l { left: 62px; }
+.ab[data-ae="cyber-hud"] .chv-ro-r { right: 62px; text-align: right; }
+/* squarer boxes (the deck's 4:3 stage, the phone hero): the reticle moves left of the slab stack so
+   the crosshair arms and the magenta arrow never cross a readout */
+.ab[data-ae="cyber-hud"] .ab-deck-stage .chv-ret { left: 46%; }
+/* the art box is a size container: thin the viewport furniture on small art boxes; the slabs drop to
+   the bottom right and the reticle shifts left so the two never meet */
 @container (max-width: 520px) {
   .ab[data-ae="cyber-hud"] .chv > span { display: none; }
-  .ab[data-ae="cyber-hud"] .chv-slabs { top: auto !important; bottom: 44px; transform: none !important; width: 112px !important; }
+  .ab[data-ae="cyber-hud"] .chv-slabs { top: auto; bottom: 44px; transform: none; width: 112px; }
+  .ab[data-ae="cyber-hud"] .chv-ret { left: 40%; }
 }
 
 /* ---- deck ---- */
 /* cover: the viewport fills the slide body, the statement slab bottom left */
 .ab[data-ae="cyber-hud"].ab-slide[data-slide="cover"] .ab-deck-cover .ab-hero { flex: 1 1 auto; }
 .ab[data-ae="cyber-hud"].ab-slide[data-slide="cover"] .ab-deck-cover .ab-art { aspect-ratio: auto; height: 100%; min-height: 360px; width: 100%; max-width: none; }
-.ab[data-ae="cyber-hud"].ab-slide[data-slide="cover"] .ab-deck-cover .ab-hero-copy { margin: 0 0 54px 66px; max-width: 54%; }
+.ab[data-ae="cyber-hud"].ab-slide[data-slide="cover"] .ab-deck-cover .ab-hero-copy { margin: 44px 0 54px 66px; max-width: 54%; }
+/* the magenta slab hangs below its line box: the subcopy keeps clear of it */
+.ab[data-ae="cyber-hud"].ab-slide .ab-subcopy { margin-top: 16px !important; }
 .ab[data-ae="cyber-hud"] .ab-deck-stage .ab-art { aspect-ratio: 4 / 3; }
 /* the cover's statement slab is tall: the top corner readouts give it room */
 .ab[data-ae="cyber-hud"].ab-slide[data-slide="cover"] .chv > span { display: none; }
+
+/* cover band and closing strip: a HUD rail drawn in the fixed signal colours (tick rails with major
+   ticks every 10%, a soft centre line, hatched data blocks, one magenta slab, two readouts), not a
+   pattern tile: the brand-mapped suites print this style grey (the signal is fixed, never the brand) */
+.ab[data-ae="cyber-hud"].ab-slide .pt-deck-band img, .ab[data-ae="cyber-hud"].ab-slide .pt-deck-strip img { display: none; }
+.ab[data-ae="cyber-hud"].ab-slide .pt-deck-band {
+  border-top: 1px solid var(--ab-hud-line-soft);
+  background:
+    linear-gradient(var(--ab-hud-line), var(--ab-hud-line)) 0 14px / 100% 1px no-repeat,
+    repeating-linear-gradient(90deg, var(--ab-neon) 0 1px, transparent 1px 10%) 0 15px / 100% 9px no-repeat,
+    repeating-linear-gradient(90deg, var(--ab-hud-hatch) 0 1px, transparent 1px 1%) 0 15px / 100% 4px no-repeat,
+    linear-gradient(var(--ab-hud-line), var(--ab-hud-line)) left 0 bottom 14px / 100% 1px no-repeat,
+    repeating-linear-gradient(90deg, var(--ab-neon) 0 1px, transparent 1px 10%) left 0 bottom 15px / 100% 9px no-repeat,
+    repeating-linear-gradient(90deg, var(--ab-hud-hatch) 0 1px, transparent 1px 1%) left 0 bottom 15px / 100% 4px no-repeat,
+    linear-gradient(var(--ab-neon2), var(--ab-neon2)) 47% 50% / 58px 16px no-repeat,
+    repeating-linear-gradient(-45deg, var(--ab-hud-hatch) 0 1px, transparent 1px 5px) 30% 50% / 14% 22px no-repeat,
+    repeating-linear-gradient(-45deg, var(--ab-hud-hatch) 0 1px, transparent 1px 5px) 64% 50% / 10% 22px no-repeat,
+    linear-gradient(var(--ab-hud-line-soft), var(--ab-hud-line-soft)) 0 50% / 100% 1px no-repeat,
+    linear-gradient(var(--ab-hud-grid) 1px, transparent 1px) 0 0 / 32px 32px,
+    linear-gradient(90deg, var(--ab-hud-grid) 1px, transparent 1px) 0 0 / 32px 32px,
+    var(--ab-canvas);
+}
+.ab[data-ae="cyber-hud"].ab-slide .pt-deck-strip {
+  background:
+    linear-gradient(var(--ab-hud-line), var(--ab-hud-line)) right 14px top 0 / 1px 100% no-repeat,
+    repeating-linear-gradient(180deg, var(--ab-neon) 0 1px, transparent 1px 10%) right 15px top 0 / 9px 100% no-repeat,
+    repeating-linear-gradient(180deg, var(--ab-hud-hatch) 0 1px, transparent 1px 1%) right 15px top 0 / 4px 100% no-repeat,
+    linear-gradient(var(--ab-hud-line), var(--ab-hud-line)) left 14px top 0 / 1px 100% no-repeat,
+    repeating-linear-gradient(180deg, var(--ab-neon) 0 1px, transparent 1px 10%) left 15px top 0 / 9px 100% no-repeat,
+    linear-gradient(var(--ab-neon2), var(--ab-neon2)) 50% 46% / 16px 58px no-repeat,
+    repeating-linear-gradient(-45deg, var(--ab-hud-hatch) 0 1px, transparent 1px 5px) 50% 26% / 22px 14% no-repeat,
+    repeating-linear-gradient(-45deg, var(--ab-hud-hatch) 0 1px, transparent 1px 5px) 50% 70% / 22px 10% no-repeat,
+    linear-gradient(var(--ab-hud-line-soft), var(--ab-hud-line-soft)) 50% 0 / 1px 100% no-repeat,
+    linear-gradient(var(--ab-hud-grid) 1px, transparent 1px) 0 0 / 32px 32px,
+    linear-gradient(90deg, var(--ab-hud-grid) 1px, transparent 1px) 0 0 / 32px 32px,
+    var(--ab-canvas);
+}
+.ab[data-ae="cyber-hud"].ab-slide :is(.pt-deck-band, .pt-deck-strip)::before,
+.ab[data-ae="cyber-hud"].ab-slide :is(.pt-deck-band, .pt-deck-strip)::after {
+  position: absolute; font: 500 9px/1.6 var(--ch-mono); letter-spacing: 0.14em; text-transform: uppercase; white-space: pre; pointer-events: none;
+  color: var(--ab-neon); background: var(--ab-canvas); padding: 0 6px;
+}
+.ab[data-ae="cyber-hud"].ab-slide .pt-deck-band::before { content: "/// TRK.0412_A\A SYNC 98.2%"; left: 28px; top: 50%; transform: translateY(-50%); }
+.ab[data-ae="cyber-hud"].ab-slide .pt-deck-band::after { content: "X 012.4 / Y 087.1\A FRM 00:41:07"; right: 28px; top: 50%; transform: translateY(-50%); text-align: right; }
+.ab[data-ae="cyber-hud"].ab-slide .pt-deck-strip::before { content: "/// TRK.0412_A\A SYNC 98.2%"; left: 34px; top: 34px; }
+.ab[data-ae="cyber-hud"].ab-slide .pt-deck-strip::after { content: "FRM 00:41:07\A LIVE"; left: 34px; bottom: 34px; }
 
 @media (prefers-reduced-motion: reduce) {
   .ab[data-ae="cyber-hud"] .ab-switch::before { transition: none; }

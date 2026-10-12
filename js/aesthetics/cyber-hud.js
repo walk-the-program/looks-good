@@ -8,19 +8,12 @@
    the selected tab. Cut-corner panels with 1px neon edges, tick rulers and
    panel IDs, slashed /// labels. */
 
-// largest published weight <= target (a single-weight face must stay at 400)
-function hudWeight(font, target) {
-  const ws = String((font && font.weights) || '400').split(';').map(Number).filter(Boolean);
-  const le = ws.filter(w => w <= target);
-  return le.length ? Math.max(...le) : Math.min(...ws);
-}
-
 // The fixed signal palette (never the client's): cyan and magenta on blue-black, or
-// darkened for the light field.
+// darkened for the light field (cyan #006F78 holds 5:1 on #E9ECEF, so 8-9px readouts pass).
 function hudSignal(isDark) {
   return isDark
     ? { canvas: '#05070a', ink: null, neon: '#00f0ff', neon2: '#ff2a6d', dim: 'rgba(0,240,255,' }
-    : { canvas: '#e9ecef', ink: '#0b0d10', neon: '#007c86', neon2: '#c4124d', dim: 'rgba(0,124,134,' };
+    : { canvas: '#e9ecef', ink: '#0b0d10', neon: '#006f78', neon2: '#c4124d', dim: 'rgba(0,111,120,' };
 }
 
 registerAesthetic({
@@ -73,13 +66,14 @@ registerAesthetic({
     return hudSignal(b.isDark).canvas;
   },
 
-  tokens(t) {
+  tokens(t, view) {
     const d = t.isDark;
     const S = hudSignal(d);
-    const hf = typeof state !== 'undefined' && state.headingFont;
+    const st = view || (typeof state !== 'undefined' ? state : null);
+    const hf = st && st.headingFont;
     const neon = S.neon, neon2 = S.neon2;
     const out = {
-      '--ab-hw': hudWeight(hf, 800),
+      '--ab-hw': abWeight(hf, 800),
       '--ab-neon': neon,
       '--ab-neon2': neon2,
       '--ab-hud-line': t.alpha(neon, 0.62),
@@ -93,14 +87,23 @@ registerAesthetic({
       '--ab-on-neon2': d ? '#05070a' : '#ffffff',
     };
     if (S.ink) out['--ab-ink'] = S.ink;
+    // muted labels sit on the panel fills too (up to the 20% neon fill), but the framework
+    // measures muted on the canvas only: pull it toward the ink until it holds 4.5:1 there
+    const ink = S.ink || t.ink;
+    const fill3 = out['--ab-hud-fill3'];
+    let muted = t.muted;
+    for (let k = 0.06; k <= 1 && (t.contrast(muted, fill3) < 4.6 || t.contrast(muted, t.canvas) < 4.6); k += 0.06) muted = t.mix(ink, t.muted, k);
+    if (muted !== t.muted) out['--ab-muted'] = muted;
     return out;
   },
 
   // The viewport: a full-bleed 21:9 frame. Top and bottom tick rails (major tick every
   // 10%, labelled 000 / 090 / 180 / 270 / 360), a left altitude ladder, three angled
   // data slabs on the right, corner readouts, and one thin reticle over the brand
-  // mark (1px outline) right of centre. Everything is inline-styled so the art stands
-  // on its own (blend donor); fixed signal colours only.
+  // mark (1px outline) right of centre. Colours are inline (fixed signal colours only);
+  // the reticle, slab stack and corner readouts are placed by css/aesthetics/cyber-hud.css
+  // (.chv-ret / .chv-slabs / .chv-ro), which also styles the art inside a blend (the donor
+  // art is drawn in a nested .ab[data-ae="cyber-hud"] scope).
   art(ctx) {
     const t = ctx.t;
     const S = hudSignal(t.isDark);
@@ -122,9 +125,9 @@ registerAesthetic({
     for (let i = 0; i <= 10; i++) {
       const major = i % 5 === 0;
       ladder += `<div style="position:absolute;left:0;top:${i * 10}%;width:${major ? 14 : 8}px;height:1px;background:${major ? neon : a(0.5)}"></div>`;
-      if (major) ladder += `<span style="position:absolute;left:18px;top:${i * 10}%;transform:translateY(-50%);font:500 8px/1 ${mono};color:${a(0.85)}">${String(60 - i * 3).padStart(3, '0')}</span>`;
+      if (major) ladder += `<span style="position:absolute;left:18px;top:${i * 10}%;transform:translateY(-50%);font:500 8px/1 ${mono};color:${neon}">${String(60 - i * 3).padStart(3, '0')}</span>`;
     }
-    const slab = (k, v, live) => `<div style="height:20px;display:flex;align-items:center;justify-content:space-between;gap:14px;padding:0 14px 0 12px;clip-path:polygon(8px 0,100% 0,calc(100% - 8px) 100%,0 100%);background:${live ? neon2 : a(0.14)};${live ? '' : `box-shadow:inset 0 0 0 1px ${a(0.5)};`}font:700 8.5px/1 ${mono};letter-spacing:.12em;color:${live ? S.canvas : neon}"><span>${k}</span><span style="color:${live ? S.canvas : ink}">${v}</span></div>`;
+    const slab = (k, v, live) => `<div style="height:20px;display:flex;align-items:center;justify-content:space-between;gap:14px;padding:0 14px 0 12px;clip-path:polygon(8px 0,100% 0,calc(100% - 8px) 100%,0 100%);background:${live ? neon2 : a(t.isDark ? 0.14 : 0.07)};${live ? '' : `box-shadow:inset 0 0 0 1px ${a(0.5)};`}font:700 8.5px/1 ${mono};letter-spacing:.12em;color:${live ? S.canvas : neon}"><span>${k}</span><span style="color:${live ? S.canvas : ink}">${v}</span></div>`;
     const initial = String(ctx.initial && ctx.initial !== '·' ? ctx.initial : 'M').replace(/[&<>"']/g, '');
     const vf = 'vector-effect="non-scaling-stroke"';
     return `<div class="chv" style="position:absolute;inset:0;overflow:hidden;background:${bg};color:${neon};background-image:linear-gradient(${a(0.05)} 1px,transparent 1px),linear-gradient(90deg,${a(0.05)} 1px,transparent 1px);background-size:32px 32px">
@@ -133,12 +136,12 @@ registerAesthetic({
         <div style="position:absolute;left:0;top:0;bottom:0;width:1px;background:${a(0.5)}"></div>${ladder}
         <div style="position:absolute;left:-2px;top:38%;width:0;height:0;border-left:7px solid ${neon2};border-top:5px solid transparent;border-bottom:5px solid transparent;transform:translateY(-50%)"></div>
       </div>
-      <div class="chv-slabs" style="position:absolute;right:16px;top:50%;transform:translateY(-50%);display:grid;gap:6px;width:clamp(120px,22%,190px)">
+      <div class="chv-slabs">
         ${slab('TGT', 'M-01', false)}${slab('VEL', '0.82', false)}${slab('LIVE', 'REC', true)}
       </div>
-      <span style="position:absolute;left:62px;top:46px;font:500 8.5px/1.5 ${mono};letter-spacing:.12em;color:${neon}">/// TRK.0412_A<br><span style="color:${ink}">SYNC 98.2%</span></span>
-      <span style="position:absolute;right:62px;top:46px;text-align:right;font:500 8.5px/1.5 ${mono};letter-spacing:.12em;color:${neon}">X 012.4 / Y 087.1<br><span style="color:${ink}">FRM 00:41:07</span></span>
-      <svg viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet" focusable="false" style="position:absolute;left:66%;top:50%;width:34%;height:62%;transform:translate(-50%,-50%);overflow:visible">
+      <span class="chv-ro chv-ro-l" style="color:${neon}">/// TRK.0412_A<br><span style="color:${ink}">SYNC 98.2%</span></span>
+      <span class="chv-ro chv-ro-r" style="color:${neon}">X 012.4 / Y 087.1<br><span style="color:${ink}">FRM 00:41:07</span></span>
+      <svg class="chv-ret" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet" focusable="false">
         <text x="50" y="50" text-anchor="middle" dominant-baseline="central" font-family="${mono}" font-weight="700" font-size="30" fill="none" stroke="${neon}" stroke-width="1" ${vf} opacity=".75">${initial}</text>
         <g fill="none" stroke="${neon}" stroke-width="1">
           <circle cx="50" cy="50" r="32" ${vf} stroke-opacity=".85"/>
@@ -174,6 +177,9 @@ registerAesthetic({
   },
   // Deck copy (js/brand-deck.js): three principles, three do / don't lines, each short.
   deck: {
+    // the cover statement slab sits inside the viewport, under the top tick rail: a smaller start
+    // size keeps the slab clear of the rail and its 000 / 090 labels
+    coverDisplay: 0.5,
     principles: [
       ['The frame is the HUD', 'Data on the four edges, the centre open for one reticle.'],
       ['Fixed signal colour', 'Cyan and magenta on blue-black; the brand is one channel.'],

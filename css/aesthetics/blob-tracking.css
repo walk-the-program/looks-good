@@ -102,19 +102,29 @@
 /* the plate is always 2.4:1; a taller box (phone 4:3, the deck stage) crops its sides */
 .ab[data-ae="blob-tracking"] .bta-plate { position: absolute; top: 0; bottom: 0; left: 50%; height: 100%; width: auto; min-width: 100%; aspect-ratio: 2.4 / 1; transform: translateX(-50%); }
 .ab[data-ae="blob-tracking"] .bta-fx { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.ab[data-ae="blob-tracking"] .bta-frame { position: absolute; inset: 0; overflow: hidden; container-type: size; }
+/* tabs and the lock readout are placed on the plate (--x / --x1 = the box's left / right edge in % of the
+   plate) but held 6px inside the visible frame when the plate is cropped (phone, deck stage); a tab whose
+   box is wholly outside the frame is moved out of it (no half label pokes in). --pw = plate width, --c = the
+   crop on each side (the plate is 2.4:1, full height, centred). */
+.ab[data-ae="blob-tracking"] :is(.bta-tab, .bta-xy) {
+  --pw: max(100cqw, 240cqh); --c: calc((var(--pw) - 100cqw) / 2);
+  --xl: calc(var(--x, 0) * var(--pw) / 100); --xr: calc(var(--x1, 0) * var(--pw) / 100);
+  left: min(max(calc(var(--c) + 6px), var(--xl)), calc(var(--xl) - 9999px + max(0px, var(--xr) - var(--c)) * 1000000));
+  transform: translate(max(min(0px, calc(var(--c) + 100cqw - 6px - var(--xl) - 100%)), calc(min(0px, var(--xl) - var(--c) - 100cqw) * 1000000 + 9999px)), var(--ty, -100%));
+}
 .ab[data-ae="blob-tracking"] .bta-tab {
-  position: absolute; transform: translateY(-100%); padding: 0 0.4em; background: var(--ab-lit); color: var(--ab-plate);
+  position: absolute; padding: 0 0.4em; background: var(--ab-lit); color: var(--ab-plate);
   font-size: 9px; font-weight: 700; line-height: 1.55; letter-spacing: 0.03em; white-space: nowrap;
 }
-.ab[data-ae="blob-tracking"] .bta-tab.is-below { transform: none; }
+.ab[data-ae="blob-tracking"] .bta-tab.is-below { --ty: 0%; }
 .ab[data-ae="blob-tracking"] .bta-tab.is-sh { background: color-mix(in srgb, var(--ab-lit) 62%, var(--ab-plate)); }
 .ab[data-ae="blob-tracking"] .bta-tab i { font-style: normal; font-weight: 500; }
-.ab[data-ae="blob-tracking"] .bta-tab.is-in { transform: translate(1px, 1px); }
-.ab[data-ae="blob-tracking"] .bta-tab.is-lock { background: var(--ab-lock); color: var(--ab-plate); font-size: 9px; }
+.ab[data-ae="blob-tracking"] .bta-tab.is-lock { background: var(--ab-lock); color: var(--ab-on-lock); font-size: 9px; }
 .ab[data-ae="blob-tracking"] .bta-tab.is-grp { background: var(--ab-plate); color: var(--ab-lit); box-shadow: inset 0 0 0 1px var(--ab-lit); }
 .ab[data-ae="blob-tracking"] .bta-xy {
-  position: absolute; z-index: 2; transform: translateY(calc(-100% - 16px)); padding: 1px 5px; font-size: 9px; line-height: 1.5; letter-spacing: 0.06em; white-space: pre;
-  color: var(--ab-lock); font-weight: 700; background: var(--ab-plate); box-shadow: inset 0 0 0 1px var(--ab-lock);
+  position: absolute; z-index: 2; --ty: calc(-100% - 16px); padding: 1px 5px; font-size: 9px; line-height: 1.5; letter-spacing: 0.06em; white-space: pre;
+  color: var(--ab-lock-text); font-weight: 700; background: var(--ab-plate); box-shadow: inset 0 0 0 1px var(--ab-lock);
 }
 .ab[data-ae="blob-tracking"] .bta-hud { position: absolute; z-index: 2; font-size: clamp(7px, 0.82cqw, 9.5px); font-weight: 600; letter-spacing: 0.12em; white-space: nowrap; padding: 1px 4px; background: var(--ab-plate); }
 .ab[data-ae="blob-tracking"] .bta-tl { left: clamp(14px, 2.4cqw, 34px); top: clamp(12px, 2.2cqw, 26px); }
@@ -310,7 +320,16 @@
 /* ----- deck slides: the swatch tick frames reach 4px past the right edge of the
    colour slide; a gutter keeps them inside it. Deck-scoped; the board is unchanged. ----- */
 .ab[data-ae="blob-tracking"].ab-slide .ab-deck-color { padding-right: 6px; }
-.ab[data-ae="blob-tracking"].ab-slide .ab-headline::before { right: 0; }
+.ab[data-ae="blob-tracking"].ab-slide .ab-headline::before { right: 0; bottom: -22px; }
+/* the headline box (and the ID tab hanging under the highlight word) clears the next line: cover meta row,
+   principles / closing description */
+.ab[data-ae="blob-tracking"].ab-slide:is([data-slide="cover"], [data-slide="principles"], [data-slide="closing"]) .ab-headline.ab-headline { margin-bottom: 26px; }
+/* principles: the lead column clips (fit); give the box's left edge and its tab room inside the clip */
+.ab[data-ae="blob-tracking"].ab-slide .ab-deck-lead { padding-left: 18px; margin-left: -18px; }
+/* typography specimens and the Do / Don't titles are labels, not detected regions: no box, no tab (the tab
+   would print over the DISPLAY / HEADING labels and the header rule) */
+.ab[data-ae="blob-tracking"].ab-slide:is([data-slide="typography"], [data-slide="dodont"]) .ab-headline::before,
+.ab[data-ae="blob-tracking"].ab-slide:is([data-slide="typography"], [data-slide="dodont"]) .ab-headline::after { content: none; }
 
 /* principles (and closing) slides: the headline's ID tab sits above the box; keep the kicker clear of it */
 .ab[data-ae="blob-tracking"].ab-slide .ab-kicker, .ab[data-ae="blob-tracking"].ab-slide .ab-deck-kick { margin-bottom: 34px !important; }

@@ -37,7 +37,7 @@
   box-shadow: none;
 }
 .ab[data-ae="pixel-arcade"] .ab-tag { color: var(--ab-muted); letter-spacing: 0.1em; }
-.ab[data-ae="pixel-arcade"] .ab-tag b { color: var(--ab-accent-ink); font-weight: inherit; }
+.ab[data-ae="pixel-arcade"] .ab-tag b { color: var(--pa-a-label); font-weight: inherit; }
 .ab[data-ae="pixel-arcade"] .ab-rule { height: 4px; background: repeating-linear-gradient(90deg, var(--ab-bd-dim) 0 4px, transparent 4px 8px); }
 
 /* ---- hero: a centred title screen at one integer pixel scale (--pxs screen px per scene unit) ---- */
@@ -109,13 +109,13 @@
 .ab[data-ae="pixel-arcade"] .ab-type { padding-left: 4px; padding-right: 4px; }
 .ab[data-ae="pixel-arcade"] .ab-type-grid { gap: 20px; }
 .ab[data-ae="pixel-arcade"] .ab-type-col { padding: 14px 16px; border-top: 0; background: var(--px-dither), var(--ab-panel); box-shadow: var(--px-dim), inset -4px -4px 0 0 var(--ab-panel-sh); }
-.ab[data-ae="pixel-arcade"] .ab-type-role { color: var(--ab-accent-ink); }
+.ab[data-ae="pixel-arcade"] .ab-type-role { color: var(--pa-a-label); }
 .ab[data-ae="pixel-arcade"] .ab-type-pick { font-size: clamp(15px, 2cqw, 20px); line-height: 1.3; }
 .ab[data-ae="pixel-arcade"] .ab-type-cur b { font-weight: inherit; }
 .ab[data-ae="pixel-arcade"] .ab-fit { border: 0; border-radius: 0; clip-path: var(--px-notch); padding: 3px 10px 2px; background: var(--ab-slot); color: var(--ab-ink); text-transform: uppercase; letter-spacing: 0.06em; font-weight: inherit; }
 .ab[data-ae="pixel-arcade"] .ab-fit[data-fit="match"] { background: var(--ab-secondary); color: var(--ab-on-secondary); }
 .ab[data-ae="pixel-arcade"] .ab-fit[data-fit="avoid"] { background: var(--ab-ink); color: var(--ab-canvas); }
-.ab[data-ae="pixel-arcade"] .ab-type-k { color: var(--ab-accent-ink); letter-spacing: 0.1em; }
+.ab[data-ae="pixel-arcade"] .ab-type-k { color: var(--pa-a-label); letter-spacing: 0.1em; }
 .ab[data-ae="pixel-arcade"] .ab-type-why { font-size: calc(13.5px * var(--ab-uis, 1)); line-height: 1.35; }
 .ab[data-ae="pixel-arcade"] .ab-type-apply {
   margin: 4px 4px 10px; padding: 10px 16px; border: 0; border-radius: 0; background: var(--ab-slot); color: var(--ab-ink); font: var(--ab-hw) calc(13px * var(--ab-uis, 1)) var(--ab-font-h); letter-spacing: 0.04em; text-transform: uppercase;
@@ -183,7 +183,7 @@
   font-size: calc(14px * var(--ab-uis, 1));
 }
 .ab[data-ae="pixel-arcade"] .ab-row:last-child { background: none; border-bottom: 0; }
-.ab[data-ae="pixel-arcade"] .ab-row-n { font: var(--ab-hw) calc(11px * var(--ab-uis, 1)) var(--ab-font-label); letter-spacing: 0.04em; color: var(--ab-accent-ink); white-space: nowrap; }
+.ab[data-ae="pixel-arcade"] .ab-row-n { font: var(--ab-hw) calc(11px * var(--ab-uis, 1)) var(--ab-font-label); letter-spacing: 0.04em; color: var(--pa-a-label); white-space: nowrap; }
 .ab[data-ae="pixel-arcade"] .ab-row-n::before { content: "LV."; }
 .ab[data-ae="pixel-arcade"] .ab-av { display: grid; place-items: center; width: 28px; height: 28px; clip-path: var(--px-notch); background: var(--ab-primary); color: var(--ab-on-primary); font: var(--ab-hw) 12px/1 var(--ab-font-h); text-transform: uppercase; }
 .ab[data-ae="pixel-arcade"] .ab-row:nth-child(2) .ab-av { background: var(--ab-secondary); color: var(--ab-on-secondary); }
@@ -237,7 +237,7 @@
 /* ---- deck ---- */
 /* cover and material stage: the screen at 4 or 3 px per unit, centred */
 .ab[data-ae="pixel-arcade"].ab-slide[data-slide="cover"] { --pxs: 3; }
-.ab[data-ae="pixel-arcade"].ab-slide[data-slide="cover"][data-hero="scene"] .ab-deck-cover .ab-hero-copy { margin: calc(var(--pxs) * 26px) calc(168px * var(--pxs) * 0.45 - 32px) 0 0; }
+.ab[data-ae="pixel-arcade"].ab-slide[data-slide="cover"][data-hero="scene"] .ab-deck-cover .ab-hero-copy { margin: calc(var(--pxs) * 26px) calc(168px * var(--pxs) * 0.45 - 8px) 0 0; } /* the card stops short of the gem sprite (it used to cut it in half) */
 .ab[data-ae="pixel-arcade"].ab-slide[data-slide="cover"][data-hcls="pixel"] .ab-hero .ab-headline { font-size: calc(var(--pxs) * 8px * var(--ab-hs, 1)); line-height: 1.25; }
 .ab[data-ae="pixel-arcade"] .ab-deck-stage .ab-art { --dk-art-w: calc(168px * 3); aspect-ratio: 168 / 80; box-shadow: var(--px-bd); background: #130d24; }
 

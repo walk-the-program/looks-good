@@ -25,12 +25,14 @@
 'use strict';
 
 // ---- stem width (24-unit grid) from the heading weight ----
-function rbHeadWeight() {
-  const st = typeof state !== 'undefined' ? state : null;
+// `view` is the rendered state (tokens(t, state) passes it; a blend swaps the faces);
+// the art and headline hooks get none and fall back to the global.
+function rbHeadWeight(view) {
+  const st = view || (typeof state !== 'undefined' ? state : null);
   const hf = st && st.headingFont;
-  const have = String((hf && hf.weights) || '700').split(';').map(Number).filter(Boolean);
-  const under = have.filter(w => w <= 800);
-  const hw = under.length ? Math.max(...under) : Math.max(...have);
+  const face = hf && hf.weights ? hf : { weights: '700' };
+  const ws = abWeights(face);
+  const hw = ws[0] <= 800 ? abWeight(face, 800) : ws[ws.length - 1];
   // a 400-only display face (Archivo Black, Anton) is heavy by design
   const heavy = hf && (hf.cls === 'heavy' || hf.cls === 'condensed') && hw < 600;
   return heavy ? 800 : hw;
@@ -255,19 +257,21 @@ function rbArith(raw) {
 // Rand's IBM stripe cuts: three horizontal knock-out bars across every glyph, in the ground
 // colour, as thick as the slab's hairline (stem x 0.36). `hot` (optional) is the index of
 // one bar drawn in another colour (the deck's construction sheet puts primary on one).
+// `clip` keeps every cut inside the glyph's silhouette (the construction sheet, where a
+// full-width paper bar would cut the grid lines behind the glyph and read as a seam).
 const RB_STRIPES = [7.6, 13.2, 18.8];
 let rbMaskSeq = 0;
-function rbDraw(name, a, g, s, hot, hotCol) {
+function rbDraw(name, a, g, s, hot, hotCol, clip) {
   const G = RB_G[name];
   const h = f1(Math.max(0.7, s * 0.36));
   const bar = (y, fill, extra) => `<rect x="-1" y="${f1(y - Math.max(0.7, s * 0.36) / 2)}" width="${G.w + 2}" height="${h}" fill="${fill}"${extra || ''}/>`;
-  let out = G.d(a, g, s) + RB_STRIPES.map((y, i) => i === hot ? '' : bar(y, g)).join('');
-  if (hot != null) {
-    // the coloured stripe only where the glyph is: masked by the glyph's own silhouette
-    const id = 'rbm' + (++rbMaskSeq);
-    out += `<mask id="${id}" maskUnits="userSpaceOnUse" x="-1" y="-1" width="${G.w + 2}" height="26"><rect x="-1" y="-1" width="${G.w + 2}" height="26" fill="#000"/>${G.d('#fff', '#000', s)}</mask>`
-      + bar(RB_STRIPES[hot], hotCol, ` mask="url(#${id})"`);
-  }
+  const cuts = RB_STRIPES.map((y, i) => i === hot ? '' : bar(y, g)).join('');
+  if (hot == null && !clip) return G.d(a, g, s) + cuts;
+  // the glyph's own silhouette as a mask: the coloured stripe (and, with clip, the cuts) only where the glyph is
+  const id = 'rbm' + (++rbMaskSeq);
+  let out = `<mask id="${id}" maskUnits="userSpaceOnUse" x="-1" y="-1" width="${G.w + 2}" height="26"><rect x="-1" y="-1" width="${G.w + 2}" height="26" fill="#000"/>${G.d('#fff', '#000', s)}</mask>`
+    + G.d(a, g, s) + (clip ? `<g mask="url(#${id})">${cuts}</g>` : cuts);
+  if (hot != null) out += bar(RB_STRIPES[hot], hotCol, ` mask="url(#${id})"`);
   return out;
 }
 function rbSvg(name, a, g, s, cls, style) {
@@ -377,7 +381,7 @@ function rbBuild(ctx, s, hw, lead, set) {
     <figure class="rb-build-fig"><svg viewBox="-1 -1 ${W + 2} 26" focusable="false" aria-hidden="true">
       <path d="${grid}" fill="none" stroke="${t.ink}" stroke-opacity=".14" stroke-width=".06"/>
       <path d="M0 0H${W}V24H0Z" fill="none" stroke="${t.ink}" stroke-opacity=".5" stroke-width=".1"/>
-      <g transform="translate(${(W - G.w) / 2} 0)">${rbDraw(lead, t.ink, t.canvas, s, 1, t.primary)}</g>
+      <g transform="translate(${(W - G.w) / 2} 0)">${rbDraw(lead, t.ink, t.canvas, s, 1, t.primary, true)}</g>
       <path d="M0 24.6H${f1(s)}M0 24.3V24.9M${f1(s)} 24.3V24.9" stroke="${t.ink}" stroke-width=".12" fill="none"/>
     </svg>
     <figcaption class="rb-build-cap"><b>24-unit grid</b><span>stem ${f1(s)} units · from heading weight ${hw} · three stripe cuts</span></figcaption></figure>
@@ -423,7 +427,7 @@ registerAesthetic({
     coverDisplay: 1.2,
     // Material slide: the glyph construction sheet (lead glyph on the 24-unit grid, the set below)
     materialArt(ctx) {
-      const hw = rbHeadWeight();
+      const hw = rbHeadWeight(ctx.state);
       const { lead, set } = rbLeadSet(ctx);
       return `<div class="rb rb--mat">${rbBuild(ctx, rbStem(hw), hw, lead, set)}</div>`;
     },
@@ -432,12 +436,12 @@ registerAesthetic({
     patternsStage(ctx) {
       if (ctx.pinned) return '';
       const t = ctx.t, e = ctx.e;
-      const s = rbStem(rbHeadWeight());
+      const s = rbStem(rbHeadWeight(ctx.state));
       const inkT = Object.assign({}, t, { primary: t.ink });
       const lines = [ctx.tagline, 'Be seen. Be heard.', 'I see you', 'Good design should feel alive', 'Think before you sign', 'For you, for ever']
         .filter(Boolean).map(l => `<p class="rb-wall-l">${rbHeadline(l, inkT, s)}</p>`).join('');
       const { lead } = rbLeadSet(ctx);
-      const hw = rbHeadWeight();
+      const hw = rbHeadWeight(ctx.state);
       const fig = (cls, name, inner) => `<figure class="ab-deck-pt rb-pt ${cls}"><div class="rb-pt-box">${inner}</div><figcaption><span class="ab-label">${e(name)}</span><span class="ab-label ab-deck-ptcw">Ink</span></figcaption></figure>`;
       return `<div class="ab-labelrow"><span class="ab-label">Pattern suite</span><span class="ab-label">${e('Rebus')}</span></div>
         <div class="ab-deck-ptgrid" data-n="3">
@@ -475,8 +479,8 @@ registerAesthetic({
     accent: { use: 'Support only: a 20px reference square in the palette', never: 'Glyphs, the footer mark, buttons, text', coverage: '≤1%' },
   },
 
-  tokens(t) {
-    const hw = rbHeadWeight();
+  tokens(t, view) {
+    const hw = rbHeadWeight(view);
     const s = rbStem(hw);
     const ic = (name, a, g) => rbUri(name, a, g, s);
     return {
@@ -491,11 +495,11 @@ registerAesthetic({
   },
 
   // The rebus headline for the real <h2> (the framework wraps it, escapes the label and sizes it).
-  headline(ctx, text) { return rbHeadline(text, ctx.t, rbStem(rbHeadWeight())); },
+  headline(ctx, text) { return rbHeadline(text, ctx.t, rbStem(rbHeadWeight(ctx.state))); },
 
   art(ctx) {
     const t = ctx.t;
-    const s = rbStem(rbHeadWeight());
+    const s = rbStem(rbHeadWeight(ctx.state));
     const plan = rbPlan(ctx.tagline);
     const lock = rbLockup(ctx, plan.chosen.size === 0, s);
     const e = escapeHtml;

@@ -78,9 +78,9 @@ registerAesthetic({
     return b.isDark ? '#17102a' : '#efe9dc';
   },
 
-  tokens(t) {
+  tokens(t, view) {
     const d = t.isDark;
-    const st = typeof state !== 'undefined' ? state : null;
+    const st = view || (typeof state !== 'undefined' ? state : null);
     const hName = st && st.headingFont ? st.headingFont.name : '';
     const hPixel = !!(st && st.headingFont && st.headingFont.cls === 'pixel');
     // Press Start 2P is very wide: shrink the display scale. Non-pixel headings get a hard shadow and no smoothing.
@@ -89,17 +89,32 @@ registerAesthetic({
     // VT323 has a tiny x-height: scale interface text up
     const uiScale = uiFace && uiFace.name === 'VT323' ? 1.36 : 1;
     const dim = (hex, f) => t.mix('#000000', hex, f);
+    const panel = d ? t.mix(t.ink, t.canvas, 0.07) : t.mix('#ffffff', t.canvas, 0.6);
+    const slot = d ? dim(t.canvas, 0.55) : t.mix(t.ink, t.canvas, 0.1);
+    // small accent labels (type roles, row IDs, the tag) need 4.5:1 on the canvas, the panels
+    // and the slots; --ab-accent-ink only guarantees 3:1 (large text), so shade it on paper
+    // (the panels carry an 8% ink dither on top, so the dithered panel is checked too)
+    const grounds = [t.canvas, panel, t.mix(t.ink, panel, 0.08), slot];
+    const holds = c => grounds.every(b => t.contrast(c, b) >= 4.6);
+    let aLabel = t.accentInk;
+    for (let k = 0.06; k <= 1 && !holds(aLabel); k += 0.06) aLabel = t.mix(d ? '#ffffff' : '#000000', t.accentInk, k);
+    // muted labels sit on panels and slots too, but the framework measures muted on the canvas
+    // only: pull it toward the ink until it holds 4.5:1 on all of them (tab labels, swatch jobs)
+    let muted = t.muted;
+    for (let k = 0.06; k <= 1 && !holds(muted); k += 0.06) muted = t.mix(t.ink, t.muted, k);
     return {
+      '--ab-muted': muted,
       '--ab-display': display,
       '--ab-uis': uiScale,
       '--ab-smooth': hPixel ? 'antialiased' : 'none',
       '--ab-hw': hPixel ? 400 : 800,
       '--ab-bd': d ? t.mix(t.ink, t.canvas, 0.82) : t.ink,
       '--ab-bd-dim': t.mix(t.ink, t.canvas, d ? 0.3 : 0.45),
-      '--ab-panel': d ? t.mix(t.ink, t.canvas, 0.07) : t.mix('#ffffff', t.canvas, 0.6),
+      '--ab-panel': panel,
+      '--pa-a-label': aLabel,
       '--ab-panel-hi': d ? t.mix(t.ink, t.canvas, 0.12) : '#ffffff',
       '--ab-panel-sh': d ? dim(t.canvas, 0.35) : t.mix(t.ink, t.canvas, 0.12),
-      '--ab-slot': d ? dim(t.canvas, 0.55) : t.mix(t.ink, t.canvas, 0.1),
+      '--ab-slot': slot,
       '--ab-p-deep': dim(t.primary, 0.58),
       '--ab-p-hi': t.mix('#ffffff', t.primary, 0.3),
       '--ab-a-deep': dim(t.accent, 0.5),

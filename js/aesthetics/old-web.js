@@ -36,15 +36,27 @@ function owHold(hex, bg, min) {
   for (let k = 0.08; k <= 1 && owCR(c, bg) < min; k += 0.08) c = owMix(to, hex, k);
   return c;
 }
-// WordArt bands (light, mid, deep) for a page colour: every band holds 3:1 on the page
-// (large display text), so a pale primary darkens on white and a deep one lifts on black.
-// Yellows on white go amber first (abAccentInk), never olive.
+// WordArt bands (light, mid, deep) and the extrusion colour for a page colour: every band
+// holds 3:1 on the page (large display text), so a pale primary darkens on white and a deep
+// one lifts on black. Yellows on white cannot stay yellow at 3:1; mixing them toward black
+// turns them olive / brown, so they run a saturated sunset ramp instead (amber, orange,
+// red-orange at full saturation, a deep red-brown extrusion), the classic WordArt preset.
+function owSat(h, page, min) {
+  for (let l = 70; l >= 0; l--) { const x = hslToHex(h, 100, l); if (owCR(x, page) >= min) return x; }
+  return '#000000';
+}
 function owBands(hex, page) {
   const onWhite = page === '#FFFFFF';
+  if (onWhite && typeof hexToHsl === 'function' && typeof hslToHex === 'function') {
+    const hsl = hexToHsl(hex);
+    if (hsl.s >= 35 && hsl.h >= 38 && hsl.h <= 80 && owCR(hex, page) < 3) {
+      return [owSat(Math.min(42, hsl.h - 4), page, 3), owSat(30, page, 3.6), owSat(18, page, 4.5), hslToHex(16, 100, 17)];
+    }
+  }
   let mid = hex;
   if (onWhite && typeof abAccentInk === 'function') mid = abAccentInk(hex, page, '#000000');
   mid = owHold(mid, page, 3);
-  return [owHold(owMix('#ffffff', mid, 0.5), page, 3), mid, owHold(owMix('#000000', mid, 0.3), page, 3)];
+  return [owHold(owMix('#ffffff', mid, 0.5), page, 3), mid, owHold(owMix('#000000', mid, 0.3), page, 3), owMix('#000000', hex, 0.62)];
 }
 
 // One WordArt word: base copy (extruded) + two clipped band copies.
@@ -137,9 +149,9 @@ registerAesthetic({
       '--ow-link': d ? '#9DB4FF' : '#0000EE',
       '--ow-visited': d ? '#C9A0FF' : '#551A8B',
       '--ow-wa1': wa[0], '--ow-wa2': wa[1], '--ow-wa3': wa[2],
-      '--ow-wx': owMix('#000000', pri, 0.62),
+      '--ow-wx': wa[3],
       '--ow-ha1': ha[0], '--ow-ha2': ha[1], '--ow-ha3': ha[2],
-      '--ow-hx': owMix('#000000', t.accent, 0.62),
+      '--ow-hx': ha[3],
       '--ow-led': led,
       '--ow-new': t.accent,
       '--ow-on-new': t.readable(t.accent),

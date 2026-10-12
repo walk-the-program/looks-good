@@ -226,10 +226,19 @@
 /* patterns slide (def.deck.patternsStage): rebus-native fields, ink on paper */
 .ab[data-ae="rebus"] .rb-pt-box { position: relative; flex: 1 1 auto; min-height: 0; overflow: hidden; background: var(--ab-canvas); box-shadow: inset 0 0 0 2px var(--ab-ink); }
 .ab[data-ae="rebus"] .rb-pt-field .rb-pt-box { background: var(--ab-canvas) var(--rb-wall) 0 0 / 120px 80px repeat; }
-.ab[data-ae="rebus"] .rb-wall { padding: 12px 14px; font-family: var(--ab-font-h); font-weight: var(--rb-hw, 600); font-size: 21px; line-height: 1.2; color: var(--ab-ink); }
-.ab[data-ae="rebus"] .rb-wall-l { margin: 0 0 4px; }
+/* the sentence wall fills its tile: the lines are spread top to bottom like a 1592 sheet */
+.ab[data-ae="rebus"] .rb-wall {
+  position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: space-evenly; padding: 12px 14px;
+  font-family: var(--ab-font-h); font-weight: var(--rb-hw, 600); font-size: 21px; line-height: 1.2; color: var(--ab-ink);
+}
+.ab[data-ae="rebus"] .rb-wall-l { margin: 0; }
 .ab[data-ae="rebus"] .rb-wall-l:nth-child(even) { padding-left: 1.4em; }
 .ab[data-ae="rebus"] .rb-pt-build .rb-build { position: absolute; inset: 0; grid-template-rows: minmax(0, 1fr) auto; padding: 14px; }
 .ab[data-ae="rebus"] .rb-pt-build .rb-build-set { display: none; }
 /* weights the faces have (font-synthesis: none) */
 .ab[data-ae="rebus"].ab-slide .ab-deck-pchip { font-weight: var(--rb-hw, 600); }
+/* Do / Don't: the numerals stay ink (one primary mark per view, and primary numerals at 14px fall under 4.5:1) */
+.ab[data-ae="rebus"].ab-slide { --dk-mark-do: var(--ab-ink); }
+/* as a blend donor (art drawn in the base's art box): the base owns the subcopy, so the lockup's own
+   sub-line would print it twice */
+.ab.ab-blend-art[data-ae="rebus"] .rb-sub { display: none; }

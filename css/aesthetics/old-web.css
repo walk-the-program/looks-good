@@ -67,16 +67,32 @@
 
 /* ---- header: a browser toolbar with the address field ---- */
 .ab[data-ae="old-web"] .ab-head { padding: 6px 8px; background: #C0C0C0; box-shadow: var(--ow-raised); color: #000; gap: 12px; }
-.ab[data-ae="old-web"] .ab-brand { gap: 8px; font: 700 13px/1.2 var(--ow-sys); letter-spacing: 0; color: #000; }
+.ab[data-ae="old-web"] .ab-brand { gap: 8px; font: 700 13px/1.2 var(--ow-sys); letter-spacing: 0; color: var(--ab-ink); }
+/* black only inside the silver toolbar; a lockup anywhere else sits on the page (the black starfield in dark mode) */
+.ab[data-ae="old-web"] .ab-head .ab-brand { color: #000; }
 .ab[data-ae="old-web"] .ab-mark { width: 24px; height: 24px; border-radius: 0; background: var(--ow-sec); color: var(--ow-on-sec); box-shadow: var(--ow-raised); font: 400 14px/1 var(--ab-font-h); }
 .ab[data-ae="old-web"] .ab-tag {
   display: flex; align-items: center; gap: 0; min-width: 0; padding: 4px 6px 4px 8px; background: #fff; box-shadow: var(--ow-sunken);
-  font: 400 12px/1.2 var(--ow-sys); letter-spacing: 0; text-transform: none; color: #000; text-align: left;
+  font: 400 0/1.2 var(--ow-sys); letter-spacing: 0; text-transform: none; color: #000; text-align: left;
 }
-.ab[data-ae="old-web"] .ab-tag::before { content: "http://"; color: #000; }
-.ab[data-ae="old-web"] .ab-tag-pre { color: #000; }
-.ab[data-ae="old-web"] .ab-tag b { color: #000; font-weight: 400; }
-.ab[data-ae="old-web"] .ab-tag::after { content: "Go"; margin-left: 10px; padding: 1px 9px; background: #C0C0C0; box-shadow: var(--ow-raised); font-weight: 700; }
+/* the address field reads as a real URL (lowercase, hyphenated, a .htm page): the tag's own words
+   ("Design language / Old Web", "Brand guidelines / Cover") stay in the DOM for assistive tech but are set
+   at 0px; the URL is drawn per page */
+.ab[data-ae="old-web"] .ab-tag::before {
+  content: "http://design-language/old-web.htm"; min-width: 0; margin-right: 8px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: #000; font-size: 12px;
+}
+.ab.ab-slide[data-ae="old-web"] .ab-head :is(.ab-tag, .ab-tag-pre, .ab-tag b) { font-size: 0; }
+.ab[data-ae="old-web"].ab-slide[data-slide="cover"] .ab-tag::before { content: "http://brand-guidelines/cover.htm"; }
+.ab[data-ae="old-web"].ab-slide[data-slide="principles"] .ab-tag::before { content: "http://brand-guidelines/principles.htm"; }
+.ab[data-ae="old-web"].ab-slide[data-slide="color"] .ab-tag::before { content: "http://brand-guidelines/color-system.htm"; }
+.ab[data-ae="old-web"].ab-slide[data-slide="typography"] .ab-tag::before { content: "http://brand-guidelines/typography.htm"; }
+.ab[data-ae="old-web"].ab-slide[data-slide="interface"] .ab-tag::before { content: "http://brand-guidelines/interface.htm"; }
+.ab[data-ae="old-web"].ab-slide[data-slide="material"] .ab-tag::before { content: "http://brand-guidelines/material.htm"; }
+.ab[data-ae="old-web"].ab-slide[data-slide="patterns"] .ab-tag::before { content: "http://brand-guidelines/patterns.htm"; }
+.ab[data-ae="old-web"].ab-slide[data-slide="product"] .ab-tag::before { content: "http://brand-guidelines/in-product.htm"; }
+.ab[data-ae="old-web"].ab-slide[data-slide="dodont"] .ab-tag::before { content: "http://brand-guidelines/do-and-dont.htm"; }
+.ab[data-ae="old-web"].ab-slide[data-slide="closing"] .ab-tag::before { content: "http://brand-guidelines/closing.htm"; }
+.ab[data-ae="old-web"] .ab-tag::after { content: "Go"; flex: none; margin-left: auto; padding: 1px 9px; background: #C0C0C0; box-shadow: var(--ow-raised); font-size: 12px; font-weight: 700; }
 
 /* the grooved <hr> */
 .ab[data-ae="old-web"] .ab-rule { height: 2px; margin: 4px 0; background: linear-gradient(#808080 50%, #DFDFDF 50%); }
@@ -121,6 +137,11 @@
 .ab[data-ae="old-web"] .ow-hlw .ow-b2 { color: var(--ow-ha2); }
 .ab[data-ae="old-web"] .ow-hlw .ow-b1 { color: var(--ow-ha1); }
 .ab[data-ae="old-web"] .ab-subcopy { margin-top: 18px !important; color: var(--ab-ink); font: 400 clamp(15px, 1.7cqw, 18px)/1.45 var(--ab-font-b); }
+/* text on the starfield sits on its own patch of page, so no star lands inside a line */
+.ab[data-ae="old-web"] .ab-subcopy > span, .ab[data-ae="old-web"] .ab-foot > *,
+.ab[data-ae="old-web"] .ab-foot::before, .ab[data-ae="old-web"] .ab-foot::after {
+  background-color: var(--ab-canvas); box-shadow: 0 -2px 0 var(--ab-canvas), 0 2px 0 var(--ab-canvas); -webkit-box-decoration-break: clone; box-decoration-break: clone;
+}
 .ab[data-ae="old-web"] .ab-sub-lead { color: var(--ow-link); text-decoration: underline; text-underline-offset: 2px; }
 
 /* ---- art: the homepage window ---- */
@@ -154,7 +175,7 @@
 .ab[data-ae="old-web"] .owa-uc small { grid-column: 2; font: italic 400 clamp(11px, 1.6cqw, 13px)/1.2 var(--ab-font-b); color: #444; }
 .ab[data-ae="old-web"] .owa-sign { grid-row: 1 / span 2; display: grid; place-items: center; width: 30px; height: 30px; background: #FFD400; border: 2px solid #000; transform: rotate(45deg) scale(0.82); }
 .ab[data-ae="old-web"] .owa-sign i { transform: rotate(-45deg); font: 700 16px/1 var(--ab-font-b); }
-.ab[data-ae="old-web"] .owa-marq { overflow: hidden; white-space: nowrap; padding: 3px 0; background: #000080; color: #FFFF66; font: 700 clamp(11px, 1.7cqw, 13px)/1.3 var(--ow-sys); }
+.ab[data-ae="old-web"] .owa-marq { overflow: hidden; white-space: nowrap; padding: 3px 0; min-height: calc(1.3em + 6px); background: #000080; color: #FFFF66; font: 700 clamp(11px, 1.7cqw, 13px)/1.3 var(--ow-sys); }
 .ab[data-ae="old-web"] .owa-marq span { display: inline-block; transform: translateX(-18%); }
 .ab[data-ae="old-web"] .owa-row { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 16px; }
 .ab[data-ae="old-web"] .owa-count { display: flex; align-items: center; gap: 8px; font-size: clamp(12px, 1.8cqw, 15px); }
@@ -176,7 +197,8 @@
 .ab[data-ae="old-web"] .ow-bd1 { background: #1E1E84 linear-gradient(#3A3AC8, #000040); color: #FFFF66; }
 .ab[data-ae="old-web"] .ow-bd2 { background: linear-gradient(#FFFFFF, #B8B8B8); color: #000; }
 .ab[data-ae="old-web"] .ow-bd2 i:last-child { color: #B00000; }
-.ab[data-ae="old-web"] .ow-bd3 { background: linear-gradient(180deg, var(--ow-sec), color-mix(in srgb, var(--ow-sec) 55%, #000)); color: var(--ow-on-sec); }
+/* flat secondary (a gradient badge put one of its two 8px lines under 4.5:1 whichever text colour it took) */
+.ab[data-ae="old-web"] .ow-bd3 { background: var(--ow-sec); color: var(--ow-on-sec); }
 .ab[data-ae="old-web"] .owa-status { flex: none; display: grid; grid-template-columns: 70px minmax(0, 1fr); gap: 3px; font: 400 11px/1 var(--ow-sys); }
 .ab[data-ae="old-web"] .owa-status span { padding: 3px 5px; box-shadow: inset -1px -1px #fff, inset 1px 1px #808080; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
 @container (max-width: 560px) {
@@ -248,6 +270,8 @@
 .ab[data-ae="old-web"] .ab-fieldlabel::first-letter { text-decoration: underline; }
 .ab[data-ae="old-web"][data-ae] .ab-input { border: 0; border-radius: 0; background: #fff; color: #000; box-shadow: var(--ow-sunken); padding: 7px 8px 6px; font: 400 15px/1.2 var(--ab-font-b); margin-bottom: 14px; }
 .ab[data-ae="old-web"][data-ae] .ab-input:focus { box-shadow: var(--ow-sunken); background: #fff; }
+/* the Win98 focus rectangle: dotted, drawn inside the sunken field */
+.ab[data-ae="old-web"][data-ae] .ab-input:focus-visible { outline: 1px dotted #000; outline-offset: -4px; }
 .ab[data-ae="old-web"] .ab-toggle { flex-direction: row-reverse; justify-content: flex-end; gap: 8px; min-height: 28px; color: var(--ab-ink); font: 400 13px/1.2 var(--ow-sys); }
 .ab[data-ae="old-web"] .ab-panel .ab-toggle, .ab[data-ae="old-web"] .ab-deck-cell .ab-toggle { color: #000; }
 .ab[data-ae="old-web"] .ab-switch { width: 15px; height: 15px; border-radius: 0; background: #fff; box-shadow: var(--ow-sunken); transition: none; }
@@ -271,7 +295,6 @@
 
 .ab[data-ae="old-web"] .ab-row:last-child { border: 0; box-shadow: inset 1px 0 0 #808080, inset -1px -1px 0 #808080; }
 .ab[data-ae="old-web"] .ab-row > * { padding: 8px 10px; border-right: 1px solid #C0C0C0; align-self: stretch; display: flex; align-items: center; }
-.ab[data-ae="old-web"] .ab-row > .ab-av { display: none; }
 .ab[data-ae="old-web"] .ab-row > :last-child { border-right: 0; justify-content: flex-end; }
 .ab[data-ae="old-web"] .ab-row-n { justify-content: center; }
 .ab[data-ae="old-web"] .ab-row-n .owi { width: 16px; height: 16px; }
@@ -344,8 +367,17 @@
 .ab.ab-slide[data-ae="old-web"] .ab-infl { color: var(--ab-muted); text-decoration: none; }
 
 /* deck: Do / Don't headings inside their windows; "In product" list in a half-width column */
-.ab.ab-slide[data-ae="old-web"] .ab-deck-col .ab-headline.ab-deck-ddhead { color: #1F6F1F; transform: none; font-family: var(--ab-font-b); font-weight: 700; }
-.ab.ab-slide[data-ae="old-web"][data-slide="dodont"] .ab-deck-col[data-kind="dont"] .ab-headline.ab-deck-ddhead { color: #9933CC; }
+/* inside a silver window, so the window link colours (#0000EE / visited #551A8B, the brief's link tokens;
+   5.7:1 / 7.1:1 on #C0C0C0). !important: the deck's bdLegibleHeadings measures heading colours against the
+   slide canvas (black), not the silver window they sit in, and would otherwise force the cream ink here (1.67:1) */
+.ab.ab-slide[data-ae="old-web"] .ab-deck-col .ab-headline.ab-deck-ddhead { color: #0000EE !important; transform: none; font-family: var(--ab-font-b); font-weight: 700; }
+.ab.ab-slide[data-ae="old-web"][data-slide="dodont"] .ab-deck-col[data-kind="dont"] .ab-headline.ab-deck-ddhead { color: #551A8B !important; }
+/* typography: the heading face is never shown flat; the specimens get the WordArt face colour (the primary
+   band) and the stacked 1px extrusion (export-safe: text-shadow only) */
+.ab.ab-slide[data-ae="old-web"][data-slide="typography"] .ab-headline {
+  color: var(--ow-wa2); -webkit-text-stroke: max(1px, 0.012em) rgba(0, 0, 0, 0.5);
+  text-shadow: 0.011em 0.011em 0 var(--ow-wx), 0.022em 0.022em 0 var(--ow-wx), 0.033em 0.033em 0 var(--ow-wx), 0.044em 0.044em 0 var(--ow-wx), 0.055em 0.055em 0 #000;
+}
 .ab.ab-slide[data-ae="old-web"] .ab-deck-prodframe { background: transparent; border: 0; }
 .ab.ab-slide[data-ae="old-web"] .ab-deck-prod .ab-row { grid-template-columns: 4ch minmax(0, 1fr) 6ch; }
 .ab.ab-slide[data-ae="old-web"] .ab-deck-prod .ab-row-n, .ab.ab-slide[data-ae="old-web"] .ab-deck-prod .ab-row-pct { grid-row: 1 / span 2; }

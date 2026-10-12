@@ -21,8 +21,7 @@ const PB_PUNCT = {
   '+': '00000 00100 00100 11111 00100 00100 00000', '#': '01010 01010 11111 01010 11111 01010 01010',
 };
 let pbSeq = 0;
-// Local escape and glyph table guards: tokens() also runs where only the aesthetic files are loaded.
-const pbEsc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+// Glyph table guard: tokens() also runs where only the aesthetic files are loaded.
 const pbFont = () => (typeof AB_FONT_5X7 !== 'undefined' ? AB_FONT_5X7 : {});
 // The token object the card / intrusion drawers read, with the brand initial (M when the
 // 5x7 table has no glyph for it).
@@ -193,24 +192,27 @@ registerAesthetic({
   // The hero IS a teletext page: a black screen with the Ceefax row 0 (page, service, date,
   // time), the torn frame-grab intrusion on the right, and the Fastext row 24. The headline
   // and copy sit over it on the character grid (css). The test card is the 02 panel's picture
-  // and the deck's Material art. Inline styles keep it whole as a blend donor.
+  // and the deck's Material art. Layout lives in css/aesthetics/pirate-broadcast.css (.pba-*),
+  // which also styles it as a blend donor (drawn in a nested .ab[data-ae] scope); only the
+  // teletext colours are inline.
   art(ctx) {
     const t = ctx.t;
     const T = PB_TT;
-    const e = pbEsc;
+    const e = escapeHtml;
     const svc = e(String(ctx.brandName || 'Station').trim().split(/\s+/)[0].toUpperCase().slice(0, 12));
     const ti = pbCardCtx(ctx);
-    const mono = "ui-monospace,'SF Mono',Menlo,monospace";
-    const row = 'position:absolute;left:2.4%;right:2.4%;display:flex;justify-content:space-between;white-space:nowrap;font:700 clamp(8px,2.15cqw,19px)/1.2 ' + mono;
     const keys = [['INDEX', T.r], ['BRAND', T.g], ['TYPE', T.y], ['SIGNAL', T.c]];
-    return `<div class="pba" style="position:absolute;inset:0;overflow:hidden;background:#000">
-      <div class="pba-r0" style="${row};top:1.6%"><span><span style="color:${t.primary}">P100</span>&nbsp;&nbsp;<span style="color:${T.y}">${svc} 100</span></span><span style="color:${T.w}">SAT 11 OCT&nbsp;&nbsp;<span style="color:${T.y}">23:41/07</span></span></div>
-      <div class="pba-gfx" style="position:absolute;left:58%;right:2.4%;top:14%;bottom:20%">
-        <div style="position:absolute;inset:0 0 18% 0">${pbIntrusion(ti)}</div>
-        <div style="position:absolute;left:0;right:0;bottom:0;height:14%;display:flex;align-items:center;background:${T.k};color:${T.w};font:400 clamp(7px,1.6cqw,14px)/1 ${mono};letter-spacing:.04em;white-space:nowrap;overflow:hidden">THIS IS NOT YOUR SIGNAL.</div>
+    // the station ident (client primary) on the black page, lifted until the 17px label holds 4.5:1
+    let ident = t.primary;
+    for (let k = 0.06; k <= 1 && t.contrast(ident, '#000000') < 4.6; k += 0.06) ident = t.mix('#ffffff', t.primary, k);
+    return `<div class="pba">
+      <div class="pba-row pba-r0"><span><span style="color:${ident}">P100</span>&nbsp;&nbsp;<span style="color:${T.y}">${svc} 100</span></span><span style="color:${T.w}">SAT 11 OCT&nbsp;&nbsp;<span style="color:${T.y}">23:41/07</span></span></div>
+      <div class="pba-gfx">
+        <div class="pba-grab">${pbIntrusion(ti)}</div>
+        <div class="pba-msg">THIS IS NOT YOUR SIGNAL.</div>
       </div>
-      <div class="pba-r24" style="${row};bottom:2%">${keys.map(k => `<span style="color:${k[1]}">${k[0]}</span>`).join('')}</div>
-      <div style="position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(0deg,rgba(0,0,0,.28) 0 1px,transparent 1px 3px)"></div>
+      <div class="pba-row pba-r24">${keys.map(k => `<span style="color:${k[1]}">${k[0]}</span>`).join('')}</div>
+      <div class="pba-scan"></div>
     </div>`;
   },
 
@@ -246,7 +248,7 @@ registerAesthetic({
       return ctx.parts.cardBase().replace('<div class="ab-card">', '<div class="ab-card"><p class="pb-row0">P101&nbsp; CHANNEL SELECT</p>');
     },
     panel(ctx) {
-      const card = pbTestCard(pbCardCtx(ctx), pbEsc(String(ctx.brandName || 'Station').toUpperCase().slice(0, 22)));
+      const card = pbTestCard(pbCardCtx(ctx), escapeHtml(String(ctx.brandName || 'Station').toUpperCase().slice(0, 22)));
       return ctx.parts.panelBase().replace('<div class="ab-panel">', `<div class="ab-panel"><p class="pb-row0">P102&nbsp; TEST CARD / TUNING</p><div class="pb-card" aria-hidden="true">${card}</div>`);
     },
     list(ctx) {
@@ -258,7 +260,7 @@ registerAesthetic({
   deck: {
     // Material slide: the test card with the torn frame grab on its lower third.
     materialArt(ctx) {
-      return `<div class="pba-card" style="position:absolute;inset:0">${pbTestCard(pbCardCtx(ctx), pbEsc(String(ctx.brandName || 'Station').toUpperCase().slice(0, 22)))}</div>`;
+      return `<div class="pba-card">${pbTestCard(pbCardCtx(ctx), escapeHtml(String(ctx.brandName || 'Station').toUpperCase().slice(0, 22)))}</div>`;
     },
     principles: [
       ['A forty-column page', 'Row 0 header, double-height headline, Fastext row 24.'],

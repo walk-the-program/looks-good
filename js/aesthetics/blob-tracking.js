@@ -333,8 +333,8 @@ registerAesthetic({
     return b.isDark ? '#16181a' : null;
   },
 
-  tokens(t) {
-    const st = typeof state !== 'undefined' ? state : null;
+  tokens(t, view) {
+    const st = view || (typeof state !== 'undefined' ? state : null);
     const d = t.isDark;
     const hf = st && st.headingFont;
     const plate = t.mix(d ? t.canvas : t.ink, '#000000', 0.3);
@@ -346,11 +346,24 @@ registerAesthetic({
       `linear-gradient(${c},${c}) 0 100%/${l}px ${w}px no-repeat`, `linear-gradient(${c},${c}) 0 100%/${w}px ${l}px no-repeat`,
       `linear-gradient(${c},${c}) 100% 100%/${l}px ${w}px no-repeat`, `linear-gradient(${c},${c}) 100% 100%/${w}px ${l}px no-repeat`,
     ].join(',');
-    const w = n => { const ws = String((hf && hf.weights) || '400').split(';').map(Number).filter(Boolean); const le = ws.filter(x => x <= n); return le.length ? Math.max(...le) : Math.min(...ws); };
+    const w = n => abWeight(hf, n);
+    const plateC = t.mix(t.secondary, plate, 0.12);
+    // 9px text on and beside the lock: the tab label is whichever of plate / white / black reads
+    // best on the lock fill; the X / Y readout is the lock colour lifted to 4.5:1 on the plate
+    const onLock = [plateC, '#ffffff', '#000000'].sort((a, b) => t.contrast(b, lock) - t.contrast(a, lock))[0];
+    let lockText = lock;
+    for (let k = 0.06; k <= 1 && t.contrast(lockText, plateC) < 4.6; k += 0.06) lockText = t.mix('#ffffff', lock, k);
+    // muted labels sit on the flat panels (--ab-flat) too; the framework measures muted on the canvas only
+    const flat = t.mix(t.canvas, t.ink, 0.96);
+    let muted = t.muted;
+    for (let k = 0.06; k <= 1 && (t.contrast(muted, flat) < 4.6 || t.contrast(muted, t.canvas) < 4.6); k += 0.06) muted = t.mix(t.ink, t.muted, k);
     return {
+      '--ab-muted': muted,
+      '--ab-on-lock': onLock,
+      '--ab-lock-text': lockText,
       '--ab-type-pick-w': w(600),
       '--ab-hw': w(600),
-      '--ab-plate': t.mix(t.secondary, plate, 0.12),
+      '--ab-plate': plateC,
       '--ab-lit': lit,
       '--ab-lock': lock,
       '--ab-box': t.alpha(t.ink, 0.9),
@@ -376,23 +389,23 @@ registerAesthetic({
       const left = pct(b.x0, BT_NX), top = pct(T.pos === 'below' ? b.y1 : b.y0, BT_NY);
       const small = (b.x1 - b.x0) < BT_NX * 0.03 && !b.lock;
       const cls = `bta-tab${b.lock ? ' is-lock' : ''}${b.k === 'group' ? ' is-grp' : ''}${b.k === 'shadow' ? ' is-sh' : ''}${small ? ' is-sm' : ''}${T.pos === 'below' ? ' is-below' : ''}`;
-      return `<span class="${cls}" style="left:${left}%;top:${top}%">${b.lock ? `<b>${T.txt}</b><i> · LOCK</i>` : `<b>${T.txt}</b>`}</span>`;
+      return `<span class="${cls}" style="--x:${left};--x1:${pct(b.x1, BT_NX)};top:${top}%">${b.lock ? `<b>${T.txt}</b><i> · LOCK</i>` : `<b>${T.txt}</b>`}</span>`;
     }).join('');
     const L = BT_BOXES.find(b => b.lock);
     // the locked readout sits above the locked box's tab on a backing, so it always reads
-    const xy = L ? `<span class="bta-xy" style="left:${pct(L.x0, BT_NX)}%;top:${pct(L.y0, BT_NY)}%">X ${String(Math.round(L.cx * 7.1)).padStart(4, '0')}  Y ${String(Math.round(L.cy * 6)).padStart(4, '0')}  A ${Math.round((L.x1 - L.x0) * (L.y1 - L.y0) * 2.2)}px</span>` : '';
+    const xy = L ? `<span class="bta-xy" style="--x:${pct(L.x0, BT_NX)};--x1:${pct(L.x1, BT_NX)};top:${pct(L.y0, BT_NY)}%">X ${String(Math.round(L.cx * 7.1)).padStart(4, '0')}  Y ${String(Math.round(L.cy * 6)).padStart(4, '0')}  A ${Math.round((L.x1 - L.x0) * (L.y1 - L.y0) * 2.2)}px</span>` : '';
 
     // frame furniture: a timecode ruler along the bottom edge
     let ruler = '';
     for (let x = 16; x <= BT_NX - 16; x += 6) ruler += `M${x} ${BT_NY}v${(x - 16) % 30 === 0 ? -6 : -2.8}`;
     return `<div class="bta">
-      <div class="bta-plate">
+      <div class="bta-frame"><div class="bta-plate">
         <svg class="bta-fx" viewBox="0 0 ${BT_NX} ${BT_NY}" preserveAspectRatio="none" focusable="false">
           ${btPlateSvg(t, id, { ns: true, grain: true })}
           <path vector-effect="non-scaling-stroke" d="${ruler}" fill="none" stroke="${t.isDark ? t.ink : t.canvas}" stroke-opacity=".5" stroke-width="1"/>
         </svg>
         ${tabs}${xy}
-      </div>
+      </div></div>
       <span class="bta-hud bta-tl"><i class="bta-rec"></i>REC · FRAME 0412</span>
       <span class="bta-hud bta-tr">TRACKING ${BT_SUBJ.length} PERSONS · ${BT_BOXES.length} BOXES · 30 FPS</span>
       <span class="bta-hud bta-bl">THRESH 0.62 · MIN AREA 240</span>
