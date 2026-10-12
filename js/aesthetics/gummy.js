@@ -42,7 +42,10 @@ function gmTones(f) {
     pale: gmHex(f.h, Math.min(f.s, 80), 93),
   };
 }
-// the flavour as a button: candy, then shaded only as far as a white label needs; else plum label
+// the flavour as a button: candy, then shaded only as far as a white label needs; else plum label.
+// The target is 4.8, not 4.5: the label sits partly on the jelly's lighter top-left (the
+// 160deg ramp and the transmitted-light pool), which reads about 0.3 lower than the base.
+const GM_LABEL = 4.8;
 function gmButton(hex) {
   const f = gmCandy(hex);
   const W = l => contrastRatio('#ffffff', gmHex(f.h, f.s, l));
@@ -50,11 +53,11 @@ function gmButton(hex) {
   const yellow = f.h >= 38 && f.h <= 80;
   if (!yellow) {
     let l = f.l;
-    while (l > 38 && W(l) < 4.5) l--;
-    if (W(l) >= 4.5) return { f: { h: f.h, s: f.s, l }, label: '#ffffff' };
+    while (l > 34 && W(l) < GM_LABEL) l--;
+    if (W(l) >= GM_LABEL) return { f: { h: f.h, s: f.s, l }, label: '#ffffff' };
   }
   let l = f.l;
-  while (l < 86 && P(l) < 4.5) l++;
+  while (l < 88 && P(l) < GM_LABEL) l++;
   return { f: { h: f.h, s: f.s, l }, label: GM_PLUM };
 }
 // the jelly word: candy, shaded until it reads at 3:1 on the ground
@@ -66,20 +69,11 @@ function gmWordColour(hex, ground, dark) {
   return c;
 }
 
-function gmEsc(s) { return escapeHtml(String(s == null ? '' : s)); }
-
-// The nearest weight a face really has (font-synthesis is off): `want`, else the next one up
-// within 100, else the next one down. Fonts come from the global app state.
-function gmWeight(font, want) {
-  const ws = String((font && font.weights) || '400').split(';').map(Number).filter(Boolean);
-  if (ws.includes(want)) return want;
-  const up = ws.filter(w => w > want).sort((x, y) => x - y)[0];
-  const down = ws.filter(w => w < want).sort((x, y) => y - x)[0];
-  return up && up - want <= 100 ? up : (down || up || 400);
-}
-function gmFonts() {
-  const st = typeof state !== 'undefined' ? state : null;
-  return { h: st && st.headingFont, b: st && st.bodyFont };
+// The faces being rendered: the view state passed to the hook (a blend swaps them), else the
+// app state. Weights are read with the shared abWeightNear.
+function gmFonts(st) {
+  const v = st || (typeof state !== 'undefined' ? state : null);
+  return { h: v && v.headingFont, b: v && v.bodyFont };
 }
 
 // Material slide: one big gumdrop dissected like a confectioner's spec sheet.
@@ -90,7 +84,7 @@ function gmAnatomy(ctx) {
   const tn = gmTones(gmCandy(t.primary));
   const sq = gmTones(gmCandy(t.secondary));
   const ink = night ? GM_SUGAR : GM_PLUM;
-  const bw = gmWeight(gmFonts().b, 700);
+  const bw = abWeightNear(gmFonts(ctx.state).b, 700);
   const call = (x1, y1, x2, y2, tx, ty, anchor, a, b) => `<path d="M${x1} ${y1}L${x2} ${y2}" stroke="${ink}" stroke-opacity=".5" stroke-width="1.4" fill="none"/><circle cx="${x1}" cy="${y1}" r="4" fill="${ink}"/>
     <text x="${tx}" y="${ty}" text-anchor="${anchor}" font-family="var(--ab-font-b, sans-serif)" fill="${ink}"><tspan font-size="17" font-weight="${bw}">${a}</tspan><tspan x="${tx}" dy="21" font-size="15" fill-opacity=".78">${b}</tspan></text>`;
   const dome = 'M208 372C190 236 254 120 340 120S490 236 472 372C432 392 248 392 208 372Z';
@@ -231,7 +225,7 @@ function gmSealUri(tn, n) {
     d += `<circle cx='${(50 + Math.cos(an) * (R - r + 1)).toFixed(2)}' cy='${(50 + Math.sin(an) * (R - r + 1)).toFixed(2)}' r='${r}'/>`;
   }
   const enc = s => s.replace(/#/g, '%23');
-  const svg = `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><defs><radialGradient id='j' cx='.66' cy='.72' r='.8'><stop offset='0' stop-color='${tn.light}'/><stop offset='.5' stop-color='${tn.base}'/><stop offset='1' stop-color='${tn.deep}'/></radialGradient></defs><g fill='url(%23j)'>${d}<circle cx='50' cy='50' r='${R - r}'/></g><circle cx='50' cy='50' r='${R - r - 4}' fill='none' stroke='${tn.rim}' stroke-opacity='.35' stroke-width='1.5' stroke-dasharray='2 3'/><ellipse cx='28' cy='26' rx='6' ry='3.4' transform='rotate(-35 28 26)' fill='white'/><circle cx='37' cy='21' r='2' fill='white'/></svg>`;
+  const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'><defs><radialGradient id='j' cx='.66' cy='.72' r='.8'><stop offset='0' stop-color='${tn.light}'/><stop offset='.5' stop-color='${tn.base}'/><stop offset='1' stop-color='${tn.deep}'/></radialGradient></defs><g fill='url(%23j)'>${d}<circle cx='50' cy='50' r='${R - r}'/></g><circle cx='50' cy='50' r='${R - r - 4}' fill='none' stroke='${tn.rim}' stroke-opacity='.35' stroke-width='1.5' stroke-dasharray='2 3'/><ellipse cx='28' cy='26' rx='6' ry='3.4' transform='rotate(-35 28 26)' fill='white'/><circle cx='37' cy='21' r='2' fill='white'/></svg>`;
   return `url("data:image/svg+xml;utf8,${enc(svg).replace(/'/g, '%27')}")`;
 }
 
@@ -287,30 +281,45 @@ registerAesthetic({
   headline(ctx, text) {
     const s = String(text || '').trim();
     const m = s.match(/^([\s\S]*?)([^\s]+?)([.,;:!?…]*)$/);
-    if (!m) return gmEsc(s);
-    return `${gmEsc(m[1])}<span class="ab-hl gm-jw"><span class="gm-jw-t">${gmEsc(m[2])}</span><i class="gm-dot1"></i><i class="gm-dot2"></i></span>${gmEsc(m[3])}`;
+    if (!m) return escapeHtml(s);
+    return `${escapeHtml(m[1])}<span class="ab-hl gm-jw"><span class="gm-jw-t">${escapeHtml(m[2])}</span><i class="gm-dot1"></i><i class="gm-dot2"></i></span>${escapeHtml(m[3])}`;
   },
 
-  tokens(t) {
+  tokens(t, view) {
     const night = t.isDark;
     const f1 = gmTones(gmCandy(t.primary));
     const f2 = gmTones(gmCandy(t.secondary));
     const f3 = gmTones(gmCandy(t.accent));
-    const f4 = gmTones(gmCandy(t.primary, 40));
+    // the seal: the accent flavour, lifted until its type (plum or white, the better one) reads at
+    // 5.4:1 on the base (the seal's own gradient runs darker under part of the type)
+    const sf = gmCandy(t.accent);
+    const sealRead = l => Math.max(contrastRatio(GM_PLUM, gmHex(sf.h, sf.s, l)), contrastRatio('#ffffff', gmHex(sf.h, sf.s, l)));
+    while (sealRead(sf.l) < 5.4 && sf.l < 86) sf.l += 1;
+    const seal = gmTones(sf);
     const btn = gmButton(t.primary);
     const bt = gmTones(btn.f);
-    const sb = gmButton(t.secondary);
-    const st = gmTones(sb.f);
     const ink = night ? GM_SUGAR : GM_PLUM;
     let muted = night ? '#D5C6DE' : '#5E4B70';
     if (contrastRatio(muted, t.canvas) < 4.5) muted = night ? '#E8DDEF' : '#4A385B';
     const word = gmWordColour(t.primary, t.canvas, night);
     const a = (hex, k) => t.alpha(hex, k);
-    const fonts = gmFonts();
+    const fonts = gmFonts(view);
+    // the palette swatches show the client's hexes; the board prints them as candy. Say so under
+    // each hue swatch ('none' when the candy push left the colour as it was).
+    const printsAs = hex => {
+      const c = gmTones(gmCandy(hex)).base;
+      const d = [1, 3, 5].map(i => Math.abs(parseInt(c.substr(i, 2), 16) - parseInt(String(hex).substr(i, 2), 16)));
+      return Math.max(...d) <= 6 ? 'none' : `'prints as ${c.toUpperCase()}'`;
+    };
+    // closing strip: three jelly drops on a 144px tile, as one SVG (radial-gradient tiles do not
+    // repeat in the deck's PNG export); every drop sits inside the tile, so none is cut at an edge
+    const drop = (cx, cy, r, tn, k) => `<radialGradient id='d${k}' cx='.66' cy='.72' r='.8'><stop offset='0' stop-color='${tn.light}'/><stop offset='.55' stop-color='${tn.base}'/><stop offset='1' stop-color='${tn.deep}'/></radialGradient><ellipse cx='${cx + r * 0.2}' cy='${cy + r * 1.05}' rx='${r * 1.05}' ry='${r * 0.28}' fill='${tn.deep}' fill-opacity='.35'/><circle cx='${cx}' cy='${cy}' r='${r}' fill='url(%23d${k})'/><ellipse cx='${cx - r * 0.42}' cy='${cy - r * 0.5}' rx='${r * 0.24}' ry='${r * 0.14}' transform='rotate(-30 ${cx - r * 0.42} ${cy - r * 0.5})' fill='white'/><circle cx='${cx - r * 0.12}' cy='${cy - r * 0.66}' r='${r * 0.07}' fill='white'/>`;
+    const dropsSvg = `<svg xmlns='http://www.w3.org/2000/svg' width='144' height='144'>${drop(46, 44, 26, f1, 1)}${drop(110, 100, 22, f2, 2)}${drop(108, 30, 16, f3, 3)}</svg>`;
+    const drops = `url("data:image/svg+xml;utf8,${dropsSvg.replace(/#/g, '%23').replace(/'/g, '%27')}")`;
     return {
       '--ab-type-pick-w': 400,
-      '--gm-hw': gmWeight(fonts.h, 400),
-      '--gm-bw': gmWeight(fonts.b, 700),
+      '--gm-hw': abWeightNear(fonts.h, 400),
+      '--gm-bw': abWeightNear(fonts.b, 700),
       '--ab-ink': ink,
       '--ab-muted': muted,
       '--ab-line': night ? 'rgba(255, 240, 250, 0.16)' : a(GM_PLUM, 0.12),
@@ -320,15 +329,17 @@ registerAesthetic({
       '--ab-gm-on': btn.label,
       '--ab-gm-b': bt.base, '--ab-gm-b-light': bt.light, '--ab-gm-b-deep': bt.deep, '--ab-gm-b-rim': bt.rim,
       '--ab-gm-b-sh': a(bt.deep, night ? 0.6 : 0.42),
-      '--ab-gm-s-on': sb.label, '--ab-gm-s': st.base, '--ab-gm-s-light': st.light, '--ab-gm-s-deep': st.deep, '--ab-gm-s-rim': st.rim,
       '--ab-gm-f1': f1.base, '--ab-gm-f1-light': f1.light, '--ab-gm-f1-deep': f1.deep, '--ab-gm-f1-pale': f1.pale,
       '--ab-gm-f2': f2.base, '--ab-gm-f2-light': f2.light, '--ab-gm-f2-deep': f2.deep, '--ab-gm-f2-pale': f2.pale,
-      '--ab-gm-f3': f3.base, '--ab-gm-f3-light': f3.light, '--ab-gm-f3-deep': f3.deep, '--ab-gm-f3-pale': f3.pale,
-      '--ab-gm-f4': f4.base, '--ab-gm-f4-light': f4.light, '--ab-gm-f4-deep': f4.deep,
+      '--ab-gm-f3': f3.base, '--ab-gm-f3-light': f3.light, '--ab-gm-f3-deep': f3.deep,
       '--ab-gm-shadow': a(f1.deep, night ? 0.5 : 0.2),
-      '--ab-gm-seal': gmSealUri(f3),
-      '--ab-gm-seal2': gmSealUri(f2, 14),
-      '--ab-gm-seal-on': contrastRatio(GM_PLUM, f3.base) >= 4.5 ? GM_PLUM : '#ffffff',
+      '--ab-gm-seal': gmSealUri(seal),
+      // seal type: plum or white, whichever reads better on the accent flavour
+      '--ab-gm-seal-on': contrastRatio(GM_PLUM, seal.base) >= contrastRatio('#ffffff', seal.base) ? GM_PLUM : '#ffffff',
+      '--ab-gm-print-primary': printsAs(t.primary),
+      '--ab-gm-print-secondary': printsAs(t.secondary),
+      '--ab-gm-print-accent': printsAs(t.accent),
+      '--ab-gm-drops': drops,
     };
   },
 

@@ -40,21 +40,6 @@ function btShade(hex, against, ratio) {
   return out;
 }
 
-function btEsc(s) { return escapeHtml(String(s == null ? '' : s)); }
-
-// The nearest weight a face really has (font-synthesis is off): `want`, else the next one up
-// within 100, else the next one down. Fonts come from the global app state.
-function btWeight(font, want) {
-  const ws = String((font && font.weights) || '400').split(';').map(Number).filter(Boolean);
-  if (ws.includes(want)) return want;
-  const up = ws.filter(w => w > want).sort((x, y) => x - y)[0];
-  const down = ws.filter(w => w < want).sort((x, y) => y - x)[0];
-  return up && up - want <= 100 ? up : (down || up || 400);
-}
-function btFonts() {
-  const st = typeof state !== 'undefined' ? state : null;
-  return { h: st && st.headingFont, b: st && st.bodyFont };
-}
 function btUri(svg) { return `url("data:image/svg+xml;utf8,${svg.replace(/#/g, '%23').replace(/'/g, '%27').replace(/"/g, '%27')}")`; }
 
 // measured advance widths (em) of a string in a CSS font (falls back to a wood-type estimate)
@@ -87,7 +72,7 @@ function btArc(text, fontCss) {
     const x = R * Math.sin(phi);
     const y = R * (1 - Math.cos(phi));
     if (ch === ' ') return '';
-    return `<i style="left:calc(50% + ${x.toFixed(3)}em);top:${y.toFixed(3)}em;transform:translateX(-50%) rotate(${(phi * 180 / Math.PI).toFixed(2)}deg)">${btEsc(ch)}</i>`;
+    return `<i style="left:calc(50% + ${x.toFixed(3)}em);top:${y.toFixed(3)}em;transform:translateX(-50%) rotate(${(phi * 180 / Math.PI).toFixed(2)}deg)">${escapeHtml(ch)}</i>`;
   }).join('');
   const width = 2 * R * Math.sin(half) + 0.9;
   const height = R * (1 - Math.cos(half)) + 1.02;
@@ -108,15 +93,15 @@ function btBill(ctx, text) {
   const mid = rest.slice(nArc).join(' ');
   // a long first line is split again so the arch stays a showbill arch
   const arc = arcText.length > 14 && nArc > 1
-    ? btArc(rest.slice(0, nArc - 1).join(' '), fontCss) + `<span class="bt-mid"><b>★</b>${btEsc(rest[nArc - 1] + (mid ? ' ' + mid : ''))}<b>★</b></span>`
-    : btArc(arcText, fontCss) + (mid ? `<span class="bt-mid"><b>★</b>${btEsc(mid)}<b>★</b></span>` : '');
-  return `<span class="bt-bill">${arc}<span class="ab-hl bt-ribbon"><span class="bt-rib-t">${btEsc(lastRaw)}</span></span></span>`;
+    ? btArc(rest.slice(0, nArc - 1).join(' '), fontCss) + `<span class="bt-mid"><b>★</b>${escapeHtml(rest[nArc - 1] + (mid ? ' ' + mid : ''))}<b>★</b></span>`
+    : btArc(arcText, fontCss) + (mid ? `<span class="bt-mid"><b>★</b>${escapeHtml(mid)}<b>★</b></span>` : '');
+  return `<span class="bt-bill">${arc}<span class="ab-hl bt-ribbon"><span class="bt-rib-t">${escapeHtml(lastRaw)}</span></span></span>`;
 }
 
 // Deck In product (slide 08): the box office. A showbill poster for the brand on the left; on the
 // right the bulb-lit box-office sign, tonight's programme (the board's own list) and two tickets.
 function btProduct(ctx) {
-  const e = ctx.e || btEsc;
+  const e = ctx.e || escapeHtml;
   const tix = label => `<span class="ab-cta bt-tix"><span class="ab-cta-label">${e(label)}</span><span class="ab-cta-arrow" aria-hidden="true"></span></span>`;
   const list = ctx.parts && typeof ctx.parts.list === 'function' ? ctx.parts.list() : '';
   return `<div class="bt-prod">
@@ -127,7 +112,7 @@ function btProduct(ctx) {
       <div class="bt-p-foot"><span>Matinée &amp; evening</span><span>No. 0472</span></div>
     </div>
     <div class="bt-booth">
-      <div class="bt-sign"><span>Box office</span></div>
+      <div class="bt-sign"><span class="bt-sign-o"><span class="bt-sign-i">Box office</span></span></div>
       <section class="ab-sec ab-sec-use bt-prog" aria-label="Programme">
         <div class="ab-labelrow"><span class="ab-label"><i class="ab-n">01</i><span>Tonight's programme</span></span><span class="ab-label">3 acts</span></div>
         ${list}
@@ -150,10 +135,12 @@ function btMarquee(ctx) {
   const name = String(ctx.brandName || '').toUpperCase();
   const fs = Math.max(26, Math.min(64, 380 / Math.max(4, name.length * 0.68)));
   const fontH = (ctx.state && ctx.state.headingFont && ctx.state.headingFont.css) || '"Rye", Georgia, serif';
-  const bw = btWeight(btFonts().b, 600);
+  const bw = abWeightNear(ctx.state && ctx.state.bodyFont, 600);
   let bulbs = '';
-  const ring = (x0, y0, x1, y1, n) => { for (let i = 0; i <= n; i++) { const x = x0 + ((x1 - x0) * i) / n, y = y0 + ((y1 - y0) * i) / n; bulbs += `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="9" fill="url(#${id}gl)"/><circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="4.4" fill="${BT_BULB}" stroke="${navy}" stroke-width="1"/>`; } };
-  ring(64, 118, 536, 118, 16); ring(64, 342, 536, 342, 16); ring(64, 132, 64, 328, 6); ring(536, 132, 536, 328, 6);
+  // a row of bulbs from (x0,y0) to (x1,y1); the side rows skip their ends (the corners are
+  // already lit by the top and bottom rows)
+  const ring = (x0, y0, x1, y1, n, ends = true) => { for (let i = ends ? 0 : 1; i <= (ends ? n : n - 1); i++) { const x = x0 + ((x1 - x0) * i) / n, y = y0 + ((y1 - y0) * i) / n; bulbs += `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="9" fill="url(#${id}gl)"/><circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="4.4" fill="${BT_BULB}" stroke="${navy}" stroke-width="1"/>`; } };
+  ring(64, 118, 536, 118, 16); ring(64, 342, 536, 342, 16); ring(64, 118, 64, 342, 7, false); ring(536, 118, 536, 342, 7, false);
   let val = '';
   for (let i = 0; i < 16; i++) {
     const x = 72 + i * 28.5;
@@ -169,8 +156,8 @@ function btMarquee(ctx) {
     <rect x="96" y="150" width="408" height="166" rx="2" fill="none" stroke="${navy}" stroke-width="1"/>
     ${bulbs}
     <text x="300" y="184" text-anchor="middle" font-family="var(--ab-font-b, sans-serif)" font-size="15" font-weight="${bw}" letter-spacing="5" fill="${navy}">★ PRESENTING ★</text>
-    <text x="303" y="${250 + fs * 0.05}" text-anchor="middle" font-family='${fontH.replace(/'/g, '"')}' font-size="${fs.toFixed(0)}" fill="${navy}">${btEsc(name)}</text>
-    <text x="300" y="250" text-anchor="middle" font-family='${fontH.replace(/'/g, '"')}' font-size="${fs.toFixed(0)}" fill="${stripe}">${btEsc(name)}</text>
+    <text x="303" y="${250 + fs * 0.05}" text-anchor="middle" font-family='${fontH.replace(/'/g, '"')}' font-size="${fs.toFixed(0)}" fill="${navy}">${escapeHtml(name)}</text>
+    <text x="300" y="250" text-anchor="middle" font-family='${fontH.replace(/'/g, '"')}' font-size="${fs.toFixed(0)}" fill="${stripe}">${escapeHtml(name)}</text>
     <g transform="translate(300 290)"><path d="M-120 -16H120V16H-120Z" fill="${ribbon}"/><path d="M-120 -10l-28 0 12 13-12 13h28z M120 -10l28 0-12 13 12 13h-28z" fill="${t.mix('#000000', ribbon, 0.28)}"/>
       <text x="0" y="6" text-anchor="middle" font-family='${fontH.replace(/'/g, '"')}' font-size="20" letter-spacing="2" fill="${cream}">ONE NIGHT ONLY</text></g>
     <g transform="translate(330 412) rotate(-6)">
@@ -178,7 +165,8 @@ function btMarquee(ctx) {
       <path d="M70 -34V34" stroke="${cream}" stroke-opacity=".65" stroke-width="2" stroke-dasharray="5 5"/>
       <text x="-124" y="-8" font-family="var(--ab-font-b, sans-serif)" font-size="11" letter-spacing="4" fill="${cream}" fill-opacity=".85">ADMIT ONE</text>
       <text x="-124" y="16" font-family="var(--ab-font-b, sans-serif)" font-size="17" font-weight="${bw}" letter-spacing="3" fill="${cream}">BIG TOP · ROW C</text>
-      <text x="110" y="5" text-anchor="middle" font-family='${fontH.replace(/'/g, '"')}' font-size="12.5" fill="${cream}">No. 0472</text>
+      <text x="104" y="-7" text-anchor="middle" font-family="var(--ab-font-b, sans-serif)" font-size="9" letter-spacing="2" fill="${cream}" fill-opacity=".85">NO.</text>
+      <text x="104" y="15" text-anchor="middle" font-family='${fontH.replace(/'/g, '"')}' font-size="16" fill="${cream}">0472</text>
     </g>
   </svg>`;
 }
@@ -360,7 +348,8 @@ registerAesthetic({
     return btBill(ctx, text);
   },
 
-  tokens(t) {
+  tokens(t, st) {
+    const view = st || (typeof state !== 'undefined' ? state : null);
     const night = t.isDark;
     const cream = BT_CREAM;
     const stripe = btShade(t.primary, cream, 3);
@@ -378,15 +367,17 @@ registerAesthetic({
       const x = (50 + Math.cos(a) * 43).toFixed(1), y = (50 + Math.sin(a) * 43).toFixed(1);
       bulbs += `<circle cx='${x}' cy='${y}' r='6.5' fill='${acc}' fill-opacity='.35'/><circle cx='${x}' cy='${y}' r='3.3' fill='${BT_BULB}' stroke='${BT_NAVY}' stroke-width='.8'/>`;
     }
-    const spot = btUri(`<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'>${bulbs}</svg>`);
+    // the whole Spotlit disc in one tile (glow, the stripe-colour disc, the ring of bulbs): a
+    // CSS radial stack sized in px exports at the wrong size through html2canvas
+    const spot = btUri(`<svg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'><defs><radialGradient id='g'><stop offset='0' stop-color='${acc}' stop-opacity='.55'/><stop offset='.72' stop-color='${acc}' stop-opacity='0'/></radialGradient></defs><circle cx='50' cy='50' r='50' fill='url(%23g)'/><circle cx='50' cy='50' r='37.9' fill='${stripe}'/>${bulbs}</svg>`);
     // the toggle knob: a five-point star with a navy keyline
     let star = '';
     for (let i = 0; i < 10; i++) {
       const rr = i % 2 ? 19 : 46, a = (Math.PI * i) / 5 - Math.PI / 2;
       star += `${(50 + rr * Math.cos(a)).toFixed(1)},${(53 + rr * Math.sin(a)).toFixed(1)} `;
     }
-    const knob = btUri(`<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><polygon points='${star.trim()}' fill='${acc}' stroke='${BT_NAVY}' stroke-width='6' stroke-linejoin='round'/></svg>`);
-    const knobOff = btUri(`<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><polygon points='${star.trim()}' fill='${cream}' stroke='${BT_NAVY}' stroke-width='6' stroke-linejoin='round'/></svg>`);
+    const knob = btUri(`<svg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'><polygon points='${star.trim()}' fill='${acc}' stroke='${BT_NAVY}' stroke-width='6' stroke-linejoin='round'/></svg>`);
+    const knobOff = btUri(`<svg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'><polygon points='${star.trim()}' fill='${cream}' stroke='${BT_NAVY}' stroke-width='6' stroke-linejoin='round'/></svg>`);
     // bunting divider for the footer and the deck
     let pen = '';
     for (let i = 0; i < 12; i++) {
@@ -395,11 +386,25 @@ registerAesthetic({
       pen += `<path d='M${x} ${y.toFixed(1)}L${x + 16} ${y.toFixed(1)}L${x + 8} ${(y + 16).toFixed(1)}Z' fill='${[ribbon, cream, stripe][i % 3]}' stroke='${BT_NAVY}' stroke-width='1.2' stroke-linejoin='round'/>`;
     }
     const bunting = btUri(`<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 240 26' preserveAspectRatio='none'><path d='M0 3Q120 15 240 3' fill='none' stroke='${night ? '#C9BFA6' : BT_NAVY}' stroke-width='1.4'/>${pen}</svg>`);
-    const fonts = btFonts();
+    // Repeating edges as SVG tiles, not radial/repeating gradients: html2canvas (the deck's
+    // PNG/PDF export) draws a radial gradient once instead of tiling it and drops
+    // repeating-linear-gradient, so gradient scallops and bulbs vanished from the export.
+    const key = night ? `stroke='${cream}' stroke-opacity='.55'` : `stroke='${BT_NAVY}'`;
+    const keyFill = night ? `fill='${cream}' fill-opacity='.55'` : `fill='${BT_NAVY}'`;
+    // the valance: equal stripes over a keyline, a row of half-circle scallops under it
+    const valance = sw => btUri(`<svg xmlns='http://www.w3.org/2000/svg' width='${2 * sw}' height='40'><rect width='${sw}' height='23' fill='${stripe}'/><rect x='${sw}' width='${sw}' height='23' fill='${cream}'/><rect y='22' width='${2 * sw}' height='2' ${keyFill}/><clipPath id='c'><rect y='24' width='${2 * sw}' height='16'/></clipPath><g clip-path='url(%23c)' stroke-width='2'><circle cx='${1.5 * sw}' cy='24' r='13.9' fill='${cream}' ${key}/><circle cx='${0.5 * sw}' cy='24' r='13.9' fill='${stripe}' ${key}/></g></svg>`);
+    // swatch hems: a scallop row in each role's own colour
+    const hem = hex => btUri(`<svg xmlns='http://www.w3.org/2000/svg' width='20' height='12'><circle cx='10' cy='0' r='9.9' fill='${hex}' ${key} stroke-width='2'/></svg>`);
+    const flap = hex => btUri(`<svg xmlns='http://www.w3.org/2000/svg' width='16' height='8'><circle cx='8' cy='0' r='7.7' fill='${hex}'/></svg>`);
+    const lit = (w, h, r, inner, extra) => btUri(`<svg xmlns='http://www.w3.org/2000/svg' width='${w}' height='${h}'><defs><radialGradient id='g'><stop offset='0' stop-color='${BT_BULB}'/><stop offset='${(inner / r).toFixed(3)}' stop-color='${BT_BULB}'/>${extra}<stop offset='1' stop-color='${acc}' stop-opacity='0'/></radialGradient></defs><circle cx='${w / 2}' cy='${h / 2}' r='${r}' fill='url(%23g)'/></svg>`);
+    const glowStop = o => `<stop offset='${o}' stop-color='${acc}' stop-opacity='.55'/>`;
+    const inkLine = night ? cream : BT_NAVY;
+    const candy = btUri(`<svg xmlns='http://www.w3.org/2000/svg' width='19.8' height='19.8'><rect width='19.8' height='19.8' fill='${cream}'/><path d='M-5 5L5-5M0 19.8L19.8 0M14.8 24.8L24.8 14.8' stroke='${stripe}' stroke-width='7'/></svg>`);
+    const rope = btUri(`<svg xmlns='http://www.w3.org/2000/svg' width='7.9' height='6' viewBox='0 0 7.9 6'><path d='M-1.6 6L1.6 0M6.3 6L9.5 0' stroke='${inkLine}' stroke-width='2.2'/></svg>`);
     return {
       '--ab-type-pick-w': 400,
-      '--bt-bw': btWeight(fonts.b, 600),
-      '--bt-hw': btWeight(fonts.h, 400),
+      '--bt-bw': abWeightNear(view && view.bodyFont, 600),
+      '--bt-hw': abWeightNear(view && view.headingFont, 400),
       '--ab-ink': ink,
       '--ab-muted': muted,
       '--ab-line': night ? 'rgba(246, 236, 214, 0.28)' : 'rgba(31, 42, 68, 0.3)',
@@ -416,12 +421,26 @@ registerAesthetic({
       '--ab-bt-txt': (() => { let c = night ? t.mix('#ffffff', stripe, 0.25) : tix; for (let k = 0.3; k <= 1 && contrastRatio(c, t.canvas) < 4.5; k += 0.1) c = t.mix(night ? '#ffffff' : '#000000', stripe, k); return c; })(),
       '--ab-bt-bulb': BT_BULB,
       '--ab-bt-glow': sh(acc, 0.55),
-      '--ab-bt-star': acc,
       '--ab-bt-shade': night ? '#000000' : BT_NAVY,
       '--ab-bt-spot': spot,
       '--ab-bt-knob': knob,
       '--ab-bt-knob-off': knobOff,
       '--ab-bt-bunting': bunting,
+      '--ab-bt-val': valance(28),
+      '--ab-bt-val-n': valance(22),
+      '--ab-bt-hem-canvas': hem(t.canvas),
+      '--ab-bt-hem-ink': hem(t.ink),
+      '--ab-bt-hem-primary': hem(t.primary),
+      '--ab-bt-hem-secondary': hem(t.secondary),
+      '--ab-bt-hem-accent': hem(t.accent),
+      '--ab-bt-flap': flap(night ? '#28324F' : '#EBDDBC'),
+      '--ab-bt-flap-on': flap(tix),
+      '--ab-bt-bulbs-off': btUri(`<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16'><circle cx='8' cy='8' r='3.3' fill='${inkLine}' fill-opacity='.22'/></svg>`),
+      '--ab-bt-bulbs-on': lit(16, 16, 7.6, 2.8, `<stop offset='.42' stop-color='${BT_NAVY}'/><stop offset='.5' stop-color='${BT_NAVY}'/>${glowStop('.553')}`),
+      '--ab-bt-bulbs-in': lit(16, 12, 6, 2.6, glowStop('.6')),
+      '--ab-bt-bulbs-sign': lit(22, 16, 7.5, 3, glowStop('.56')),
+      '--ab-bt-candy': candy,
+      '--ab-bt-rope': rope,
     };
   },
 

@@ -8,14 +8,6 @@
    a faint primary glow. The one acid accent is a flat, hard-edged plate. */
 let y2kSeq = 0;
 
-// Largest published weight <= target (or the lightest if none): faces with a
-// single weight must not be asked for 800 (the browser would fake it).
-function y2kWeight(font, target) {
-  const ws = String((font && font.weights) || '400').split(';').map(Number).filter(Boolean);
-  const le = ws.filter(w => w <= target);
-  return le.length ? Math.max(...le) : Math.min(...ws);
-}
-
 registerAesthetic({
   key: 'y2k-chrome', order: 13,
   name: 'Y2K Chrome',
@@ -66,10 +58,11 @@ registerAesthetic({
     return b.isDark ? '#0b1233' : '#e3e6eb';
   },
 
-  tokens(t) {
+  tokens(t, view) {
     const d = t.isDark;
-    // interface face: the brand's own sans if it has one, else Inter (never a display face at 11px)
-    const st = typeof state !== 'undefined' ? state : null;
+    // interface face: the brand's own sans if it has one, else Inter (never a display face at 11px).
+    // The faces come from the view state being rendered (a blend swaps them).
+    const st = view || (typeof state !== 'undefined' ? state : null);
     const sansF = st && [st.bodyFont, st.headingFont].find(f => f && f.category === 'sans');
     const uiFace = sansF ? (sansF === st.bodyFont ? 'var(--ab-font-b)' : 'var(--ab-font-h)') : '"Inter", "Helvetica Neue", Helvetica, Arial, sans-serif';
     const hf = st && st.headingFont;
@@ -82,7 +75,7 @@ registerAesthetic({
     return {
       // techno micro-type (Microgramma-like) for labels, tags and state names; falls back to the UI face
       '--ab-font-ui': uiFace, '--ab-font-label': uiFace, '--y2-techno': `"Michroma", ${uiFace}`,
-      '--ab-hw': y2kWeight(hf, 800),
+      '--ab-hw': abWeight(hf, 800),
       '--ab-chrome': chrome,
       // flat stand-in for the chrome fill: the PNG/PDF export flattens clipped text to this colour
       '--ab-chrome-flat': d ? '#dfe5ee' : '#2a2e34',
@@ -152,7 +145,7 @@ registerAesthetic({
     { name: 'Gel pill action', css: 'background: {gloss} padding-box, radial-gradient(ellipse 70% 60% at 50% 105%, rgba(255,255,255,.42), transparent 70%) padding-box, linear-gradient({primary}, {primary}) padding-box, {chromeFixed} border-box; border: 1.5px solid transparent; border-radius: 999px; color: {onPrimary}; box-shadow: inset 0 -1px 0 rgba(0,0,0,.25), 0 10px 26px -8px {priGlow}; /* Aqua gel: a hard top specular and a bright bottom caustic */' },
     { name: 'Translucent gel', css: 'background: top specular + bottom caustic over the {primary} at 70% alpha over a 1px pinstripe (repeating-linear-gradient(0deg, rgba(255,255,255,.12) 0 1px, transparent 1px 3px)) over the gunmetal; /* candy plastic with the pinstriped body showing through, as on a translucent 1999 shell */' },
     { name: 'Chrome knob', css: 'background: radial-gradient(circle at 34% 26%, #fff, rgba(255,255,255,0) 40%), {chromeFixed}; border-radius: 50%; box-shadow: 0 2px 6px rgba(0,0,0,.5);' },
-    { name: 'Acid field', css: 'background: {accent}; color: {onAccent}; border-radius: 0; /* a flat, hard-edged block behind the hero object, 8px techno micro-type rotated 90deg along its right edge: MRG-01™ / LIQUID METAL / 液体金属 / NOT FOR RESALE; the same flat block (with ™) sits behind one headline word */' },
+    { name: 'Acid field', css: 'background: {accent}; color: {onAccent}; border-radius: 0; /* a flat, hard-edged block behind the hero object, 8px techno micro-type rotated 90deg along its right edge: MRG-01 / LIQUID METAL / NOT FOR RESALE (Latin only, no ™ in vertical type); the same flat block (with ™) sits behind one headline word */' },
   ],
 
   rules: {
@@ -179,7 +172,7 @@ registerAesthetic({
       return ctx.parts.art() + `<div class="y2g" style="position:absolute;left:2%;bottom:4%;width:40%;aspect-ratio:2.4/1;border-radius:999px;overflow:hidden;background:radial-gradient(ellipse 62% 40% at 50% 12%,rgba(255,255,255,.85),rgba(255,255,255,0) 70%),radial-gradient(ellipse 66% 50% at 50% 112%,rgba(255,255,255,.6),rgba(255,255,255,0) 70%),linear-gradient(${t.alpha(t.primary, 0.62)},${t.alpha(t.primary, 0.62)}),repeating-linear-gradient(0deg,rgba(255,255,255,.16) 0 1px,transparent 1px 3px),#3a4150;box-shadow:inset 0 0 0 1px rgba(255,255,255,.55),0 10px 22px -8px rgba(0,0,0,.6)"></div>`;
     },
     principles: [
-      ['Chrome with a horizon', 'A bright line just off-centre over a dark ground.'],
+      ['Chrome with a horizon', 'Every metal surface: a bright line just off-centre, dark metal under it.'],
       ['The heaviest wide type', 'Chrome-filled and bevelled, with one flat acid plate behind a word.'],
       ['One flat acid field', 'A hard-edged block with product micro-type; the chrome breaks its edge.'],
     ],

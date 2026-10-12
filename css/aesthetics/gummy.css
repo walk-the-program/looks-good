@@ -6,9 +6,9 @@
    squash-and-stretch on press. Never a grey shadow, never an opaque matte fill
    (Clay), never a big gloss cap (Frutiger Aero). Vars from tokens():
    --ab-gm-b / -b-light / -b-deep / -b-rim / -b-sh / --ab-gm-on (the primary as a
-   button jelly), --ab-gm-s* (secondary button jelly), --ab-gm-f1..f4 (flavours),
-   --ab-gm-card, --ab-gm-tray (candy mould), --ab-gm-word (the jelly word),
-   --ab-gm-seal / -seal2 (scalloped seals as SVG data URIs).
+   button jelly), --ab-gm-f1..f3 (flavours), --ab-gm-card, --ab-gm-tray (candy mould),
+   --ab-gm-word (the jelly word), --ab-gm-seal (the scalloped seal) and --ab-gm-drops (the
+   closing strip tile) as SVG data URIs, --ab-gm-print-* ("prints as" notes on the swatches).
 ------------------------------------------------------------------------ */
 
 .ab[data-ae="gummy"] {
@@ -24,7 +24,9 @@
 .ab[data-ae="gummy"] .ab-brand { font-weight: 400; letter-spacing: -0.01em; }
 .ab[data-ae="gummy"] .ab-mark {
   position: relative; width: 30px; height: 28px; border-radius: 50% 50% 22% 22% / 62% 62% 24% 24%;
-  background: var(--gm-dots), var(--gm-jelly); color: var(--ab-gm-on); box-shadow: var(--gm-jelly-sh); font-weight: 400;
+  /* specular dots on the top-left rim, clear of the initial (they merged with a white glyph) */
+  background: radial-gradient(4px 2.4px at 7px 5px, #fff 58%, rgba(255, 255, 255, 0) 74%), radial-gradient(1.3px 1.3px at 12.5px 3.2px, #fff 60%, rgba(255, 255, 255, 0) 80%), var(--gm-jelly);
+  color: var(--ab-gm-on); box-shadow: var(--gm-jelly-sh); font-weight: 400;
 }
 .ab[data-ae="gummy"] .ab-tag { letter-spacing: 0.08em; }
 .ab[data-ae="gummy"] .ab-rule { height: 6px; background: var(--gm-sugar-rule); }
@@ -83,6 +85,11 @@
 .ab[data-ae="gummy"] .ab-chip::after { content: ""; position: absolute; left: 34%; right: 8%; bottom: -12px; height: 7px; border-radius: 50%; background: radial-gradient(closest-side, color-mix(in srgb, var(--sw) 45%, white), transparent); }
 .ab[data-ae="gummy"] .ab-sw-role { font-family: var(--ab-font-h); font-weight: 400; font-size: 15px; text-transform: lowercase; }
 .ab[data-ae="gummy"] .ab-sw-hex { font-family: var(--ab-font-b); }
+/* the board prints the client's hues as candy: say so under each hue swatch */
+.ab[data-ae="gummy"] .ab-swatch[data-role="primary"] .ab-sw-hex::after { content: var(--ab-gm-print-primary, none); }
+.ab[data-ae="gummy"] .ab-swatch[data-role="secondary"] .ab-sw-hex::after { content: var(--ab-gm-print-secondary, none); }
+.ab[data-ae="gummy"] .ab-swatch[data-role="accent"] .ab-sw-hex::after { content: var(--ab-gm-print-accent, none); }
+.ab[data-ae="gummy"] .ab-sw-hex::after { display: block; margin-top: 2px; font-size: 11px; color: var(--ab-muted); }
 
 /* type: pale candy cards with a shadow in the primary's colour */
 .ab[data-ae="gummy"] .ab-type-grid { gap: clamp(12px, 2.2cqw, 22px); }
@@ -213,7 +220,7 @@
   .ab[data-ae="gummy"] .ab-headline { grid-row: 2; }
   .ab[data-ae="gummy"] .ab-subcopy { grid-row: 3; }
   .ab[data-ae="gummy"]:not(.ab-slide)[data-hero="centered"] .ab-headline { font-size: calc(clamp(38px, 12.6cqw, 60px) * var(--ab-hl-scale, 1) * var(--ab-hs, 1) * var(--ab-display, 1)); }
-  .ab[data-ae="gummy"][data-hero="centered"] .ab-art { --ab-art-ratio-narrow: 1.35; aspect-ratio: 1.35; margin: 0 calc(var(--ab-pad) * -0.5); width: calc(100% + var(--ab-pad)); }
+  .ab[data-ae="gummy"][data-hero="centered"] .ab-art { --ab-art-ratio-narrow: 1200 / 350; aspect-ratio: 1200 / 350; margin: 0; width: 100%; } /* the whole spill, scaled to the card: no candy cut by the edges */
   .ab[data-ae="gummy"] .ab-swatches { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px 12px; }
   .ab[data-ae="gummy"] .ab-swatch { display: flex; }
   .ab[data-ae="gummy"] .ab-swatch[data-role="canvas"] { grid-column: 1 / -1; }
@@ -248,21 +255,10 @@
 }
 .ab[data-ae="gummy"].ab-slide[data-slide="cover"] .ab-subcopy { display: none; }
 .ab[data-ae="gummy"].ab-slide[data-slide="cover"] .ab-deck-cover-meta { position: relative; z-index: 2; padding-top: 14px; }
-/* the closing strip: jelly drops in the three flavours, each with a coloured shadow */
-.ab[data-ae="gummy"].ab-slide .pt-deck-strip img, .ab[data-ae="gummy"].ab-slide .pt-deck-band img { display: none; }
-.ab[data-ae="gummy"].ab-slide .pt-deck-strip, .ab[data-ae="gummy"].ab-slide .pt-deck-band {
-  box-shadow: none;
-  background:
-    radial-gradient(7px 4px at 34px 38px, #fff 60%, transparent 75%) 0 0 / 144px 144px,
-    radial-gradient(7px 4px at 106px 110px, #fff 60%, transparent 75%) 0 0 / 144px 144px,
-    radial-gradient(6px 3.6px at 102px 30px, #fff 60%, transparent 75%) 0 0 / 144px 144px,
-    radial-gradient(30px 30px at 52px 54px, var(--ab-gm-f1-light), var(--ab-gm-f1) 55%, var(--ab-gm-f1-deep) 92%, transparent 100%) 0 0 / 144px 144px,
-    radial-gradient(34px 10px at 58px 92px, color-mix(in srgb, var(--ab-gm-f1-deep) 50%, transparent), transparent) 0 0 / 144px 144px,
-    radial-gradient(26px 26px at 120px 124px, var(--ab-gm-f2-light), var(--ab-gm-f2) 55%, var(--ab-gm-f2-deep) 92%, transparent 100%) 0 0 / 144px 144px,
-    radial-gradient(22px 22px at 116px 44px, var(--ab-gm-f3-light), var(--ab-gm-f3) 55%, var(--ab-gm-f3-deep) 92%, transparent 100%) 0 0 / 144px 144px,
-    radial-gradient(26px 8px at 120px 70px, color-mix(in srgb, var(--ab-gm-f3-deep) 50%, transparent), transparent) 0 0 / 144px 144px,
-    var(--ab-gm-tray);
-}
+/* the closing strip: jelly drops in the three flavours, each with a coloured shadow (one SVG tile
+   from tokens(): --ab-gm-drops, every drop inside its tile) on the candy mould */
+.ab[data-ae="gummy"].ab-slide .pt-deck-strip img { display: none; }
+.ab[data-ae="gummy"].ab-slide .pt-deck-strip { box-shadow: none; background: var(--ab-gm-drops) 0 0 / 144px 144px repeat, var(--ab-gm-tray); }
 
 /* the deck's product frame puts the list in a narrow column: the phone row layout */
 .ab[data-ae="gummy"] .ab-deck-prodgrid .ab-row { grid-template-columns: 2.4ch 30px minmax(0, 1fr) 4.5ch; row-gap: 6px; }

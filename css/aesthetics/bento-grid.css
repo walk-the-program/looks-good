@@ -87,7 +87,10 @@
   max-width: none; aspect-ratio: auto; justify-self: stretch; align-self: stretch; min-height: clamp(300px, 44cqw, 470px); overflow: hidden;
   background: var(--ab-tile-sec);
 }
-.ab[data-ae="bento-grid"] .bna { position: absolute; inset: 0; font-size: clamp(6px, 2.55cqw, 13px); line-height: 1.3; color: var(--ab-ink); }
+/* The product render is sized to its own box (.bna is the container its cqw units read), and that
+   box is never wider than 1.45 x its height: in its own tile it fills the tile, while in a wide
+   art box (a blend) the phone stays phone-sized instead of growing with the box's width. */
+.ab[data-ae="bento-grid"] .bna { position: absolute; top: 0; bottom: 0; left: 50%; height: 100%; width: auto; max-width: 100%; aspect-ratio: 1.45; transform: translateX(-50%); container-type: inline-size; font-size: clamp(6px, 2.55cqw, 13px); line-height: 1.3; color: var(--ab-ink); }
 .ab[data-ae="bento-grid"] .bna i { display: block; font-style: normal; }
 .ab[data-ae="bento-grid"] .bna-phone {
   position: absolute; left: 50%; bottom: -33cqw; width: 60cqw; aspect-ratio: 9 / 19; transform: translateX(-50%); padding: 1.7cqw; border-radius: 10cqw;
@@ -106,7 +109,7 @@
 .ab[data-ae="bento-grid"] .bna-card {
   display: flex; align-items: center; justify-content: space-between; gap: 1em; padding: 1.4em 1.5em; border-radius: 2em; background: var(--ab-primary); color: var(--ab-on-primary);
 }
-.ab[data-ae="bento-grid"] .bna-card small { display: block; font-size: 0.95em; opacity: 0.82; }
+.ab[data-ae="bento-grid"] .bna-card small { display: block; font-size: 0.95em; }
 .ab[data-ae="bento-grid"] .bna-card strong { display: block; margin: 0.15em 0; font: 600 3.1em/1 var(--ab-font-h); letter-spacing: calc(-0.045em * var(--ab-tr, 1)); }
 .ab[data-ae="bento-grid"] .bna-card em { font-style: normal; font-size: 0.95em; opacity: 0.9; }
 .ab[data-ae="bento-grid"] .bna-card svg { flex: none; width: 4.8em; height: 4.8em; }
@@ -179,20 +182,21 @@
 .ab[data-ae="bento-grid"] .ab-sec-use { grid-column: auto; }
 .ab[data-ae="bento-grid"] .ab-sec .ab-labelrow { margin: 4px 6px 12px; }
 
-/* 01: one tile holds the capsule, title and body; the action is a composed square primary tile beside it */
+/* 01: one tile holds the capsule (top) and the title with its caption right under it (bottom);
+   the action is a composed square primary tile beside it */
 .ab[data-ae="bento-grid"] .ab-card {
-  position: relative; display: grid; grid-template-columns: minmax(0, 1fr) clamp(150px, 22cqw, 230px) clamp(170px, 26cqw, 250px); grid-template-rows: auto auto 1fr; gap: var(--bn-gap);
+  position: relative; display: grid; grid-template-columns: minmax(0, 1fr) clamp(150px, 22cqw, 230px) clamp(170px, 26cqw, 250px); grid-template-rows: auto minmax(0, 1fr) auto auto; gap: var(--bn-gap);
   min-height: clamp(250px, 30cqw, 320px); padding: 0; border-radius: 0; background: none; box-shadow: none;
 }
 .ab[data-ae="bento-grid"] .ab-card::before {
-  content: ""; grid-area: 1 / 1 / 4 / 2; z-index: 0; background: var(--ab-tile); border-radius: var(--bn-r); box-shadow: none;
+  content: ""; grid-area: 1 / 1 / 5 / 2; z-index: 0; background: var(--ab-tile); border-radius: var(--bn-r); box-shadow: none;
   transition: transform 0.25s cubic-bezier(0.2, 0.7, 0.2, 1);
 }
 .ab[data-ae="bento-grid"] .ab-card:hover::before { transform: scale(1.01); }
 /* the image tile: an abstract product render (a lit primary sphere on its own shadow),
    so the interface row is not all copy */
 .ab[data-ae="bento-grid"] .ab-card::after {
-  content: ""; grid-area: 1 / 2 / 4 / 3; z-index: 0; border-radius: var(--bn-r); min-height: 100%;
+  content: ""; grid-area: 1 / 2 / 5 / 3; z-index: 0; border-radius: var(--bn-r); min-height: 100%;
   background:
     radial-gradient(circle closest-side, color-mix(in srgb, #ffffff 55%, transparent) 0, transparent 100%) 36% 30% / 28% 28% no-repeat,
     radial-gradient(circle closest-side at 42% 40%, color-mix(in srgb, #ffffff 22%, var(--ab-primary)) 0, var(--ab-primary) 45%, color-mix(in srgb, #000000 40%, var(--ab-primary)) 96%, transparent 100%) 50% 40% / 74% 74% no-repeat,
@@ -208,16 +212,16 @@
 .ab[data-ae="bento-grid"] .ab-seg-btn[aria-pressed="true"] { background: var(--ab-ink); color: var(--ab-canvas); font-weight: 600; }
 .ab[data-ae="bento-grid"] .ab-card .ab-card-title,
 .ab[data-ae="bento-grid"] .ab-card .ab-card-title:hover {
-  grid-area: 2 / 1; margin: 0 !important; padding: 18px 22px 0; background: none; box-shadow: none; transform: none;
+  grid-area: 3 / 1; margin: 0 !important; padding: 18px 22px 0; background: none; box-shadow: none; transform: none;
   font-size: clamp(32px, 3.6cqw, 40px); font-weight: 600; line-height: 1; letter-spacing: calc(-0.045em * var(--ab-tr, 1));
 }
 .ab[data-ae="bento-grid"] .ab-card .ab-card-body,
 .ab[data-ae="bento-grid"] .ab-card .ab-card-body:hover {
-  grid-area: 3 / 1; align-self: end; margin: 0 !important; padding: 6px 22px 22px; background: none; box-shadow: none; transform: none;
+  grid-area: 4 / 1; align-self: start; margin: 0 !important; padding: 6px 22px 22px; background: none; box-shadow: none; transform: none;
   font-size: clamp(13px, 1.5cqw, 16px); line-height: 1.4; color: var(--ab-muted);
 }
 .ab[data-ae="bento-grid"] .ab-card .ab-cta {
-  grid-area: 1 / 3 / 4 / 4; width: auto; min-height: 100%; display: grid; grid-template-rows: auto 1fr; grid-template-columns: minmax(0, 1fr); align-items: start; justify-items: stretch;
+  grid-area: 1 / 3 / 5 / 4; width: auto; min-height: 100%; display: grid; grid-template-rows: auto 1fr; grid-template-columns: minmax(0, 1fr); align-items: start; justify-items: stretch;
   padding: 22px; border-radius: var(--bn-r); text-align: left; background: var(--ab-primary); color: var(--ab-on-primary);
   box-shadow: none; transition: filter 0.18s, transform 0.2s cubic-bezier(0.2, 0.7, 0.2, 1);
 }
@@ -295,6 +299,8 @@
   .ab[data-ae="bento-grid"] .ab-card::before { grid-area: 1 / 1 / 4 / 2; }
   .ab[data-ae="bento-grid"] .ab-card .ab-cta { grid-area: 4 / 1 / 5 / 2; min-height: 0; aspect-ratio: 2 / 1; }
   .ab[data-ae="bento-grid"] .ab-card .ab-card-title { padding-top: 22px; }
+  .ab[data-ae="bento-grid"] .ab-card .ab-card-title, .ab[data-ae="bento-grid"] .ab-card .ab-card-title:hover { grid-area: 2 / 1; }
+  .ab[data-ae="bento-grid"] .ab-card .ab-card-body, .ab[data-ae="bento-grid"] .ab-card .ab-card-body:hover { grid-area: 3 / 1; }
   .ab[data-ae="bento-grid"] .ab-fieldlabel, .ab[data-ae="bento-grid"] .ab-input { grid-area: 1 / 1 / 2 / -1; }
   .ab[data-ae="bento-grid"] .ab-toggle, .ab[data-ae="bento-grid"] .ab-status { grid-area: 2 / 1 / 3 / -1; }
   .ab[data-ae="bento-grid"] .ab-toggle { min-height: 72px; }
@@ -324,27 +330,59 @@
 .ab[data-ae="bento-grid"].ab-slide[data-slide="cover"] .ab-deck-cover .ab-hero-copy { min-height: 0; padding: 30px 36px 32px; }
 .ab[data-ae="bento-grid"].ab-slide[data-slide="cover"] .ab-deck-cover .ab-headline { margin: auto 0; padding: 18px 0 16px; }
 .ab[data-ae="bento-grid"].ab-slide[data-slide="cover"] .ab-deck-cover .ab-art { max-width: none !important; width: 100% !important; min-height: 0; height: 100%; }
+/* the meta row belongs to the footer, not the tiles */
+.ab[data-ae="bento-grid"].ab-slide[data-slide="cover"] .ab-deck-cover-meta { margin-top: 28px; }
 
 /* Deck: the floating "Direction saved" chip lands on the phone's brand name once the phone
    sits in a slide-sized tile. The phone shows the brand; the other chip stays. */
 .ab[data-ae="bento-grid"].ab-slide .bna-c1 { display: none; }
 
-/* ----- deck Patterns slide (def.deck.patternsStage): the tile system, bento's real material ----- */
-.ab[data-ae="bento-grid"] .bns { display: grid; height: 100%; min-height: 500px; grid-template-columns: repeat(4, minmax(0, 1fr)); grid-template-rows: repeat(3, minmax(0, 1fr)); gap: 14px; }
-.ab[data-ae="bento-grid"] .bns-t {
-  display: flex; flex-direction: column; justify-content: space-between; padding: 18px 22px; border-radius: 28px; background: var(--ab-tile); color: var(--ab-ink); min-width: 0; min-height: 0;
+/* ----- deck Patterns slide (def.deck.patternsStage): the suite as a bento, one pattern per tile ----- */
+.ab[data-ae="bento-grid"] .bns-wrap { display: flex; flex-direction: column; gap: 12px; height: 100%; min-height: 0; }
+.ab[data-ae="bento-grid"] .bns-wrap > .ab-labelrow { flex: none; margin: 0; }
+.ab[data-ae="bento-grid"] .bns { flex: 1 1 auto; display: grid; min-height: 0; grid-template-columns: repeat(4, minmax(0, 1fr)); grid-template-rows: repeat(3, minmax(0, 1fr)); gap: 14px; }
+.ab[data-ae="bento-grid"] .bns-t { position: relative; margin: 0; overflow: hidden; border-radius: 28px; background: var(--ab-tile); min-width: 0; min-height: 0; }
+.ab[data-ae="bento-grid"] .bns-p img { position: absolute; inset: 0; display: block; width: 100%; height: 100%; object-fit: cover; }
+.ab[data-ae="bento-grid"] .bns-p figcaption {
+  position: absolute; left: 12px; bottom: 12px; display: inline-flex; align-items: baseline; gap: 8px; max-width: calc(100% - 24px);
+  padding: 6px 12px; border-radius: 999px; background: var(--ab-tile); color: var(--ab-ink); white-space: nowrap; overflow: hidden;
 }
-.ab[data-ae="bento-grid"] .bns-t b { font: 600 40px/1 var(--ab-font-h); letter-spacing: -0.04em; }
-.ab[data-ae="bento-grid"] .bns-t span { font-size: 16px; font-weight: 600; color: var(--ab-muted); }
-.ab[data-ae="bento-grid"] .bns-22 { grid-column: 1 / 3; grid-row: 1 / 3; background: var(--ab-tile-sec); }
-.ab[data-ae="bento-grid"] .bns-22 b { font-size: 96px; }
-.ab[data-ae="bento-grid"] .bns-22 span { color: var(--ab-ink); }
+.ab[data-ae="bento-grid"] .bns-p figcaption b { font-size: 13px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; }
+.ab[data-ae="bento-grid"] .bns-p figcaption span { font-size: 11px; color: var(--ab-muted); }
+.ab[data-ae="bento-grid"] .bns-22 { grid-column: 1 / 3; grid-row: 1 / 3; }
+.ab[data-ae="bento-grid"] .bns-22 figcaption { left: 16px; bottom: 16px; padding: 8px 16px; }
+.ab[data-ae="bento-grid"] .bns-22 figcaption b { font-size: 16px; }
 .ab[data-ae="bento-grid"] .bns-21 { grid-column: 3 / 5; grid-row: 1; }
 .ab[data-ae="bento-grid"] .bns-11 { grid-column: 3; grid-row: 2; }
 .ab[data-ae="bento-grid"] .bns-12 { grid-column: 4; grid-row: 2 / 4; }
-.ab[data-ae="bento-grid"] .bns-11b { grid-column: 3; grid-row: 3; background: var(--ab-primary); color: var(--ab-on-primary); }
-.ab[data-ae="bento-grid"] .bns-11b span { color: var(--ab-on-primary); }
+.ab[data-ae="bento-grid"] .bns-11b { grid-column: 3; grid-row: 3; }
 .ab[data-ae="bento-grid"] .bns-21b { grid-column: 1 / 3; grid-row: 3; }
+.ab[data-ae="bento-grid"] .bns-empty { background: var(--ab-tile-sec); }
+
+/* ----- deck In product (def.deck.product): a product bento at slide scale ----- */
+.ab[data-ae="bento-grid"] .ab-deck-prod[data-prod="custom"] { justify-content: stretch; }
+.ab[data-ae="bento-grid"] .bnp { flex: 1 1 auto; display: grid; min-height: 0; grid-template-columns: repeat(4, minmax(0, 1fr)); grid-template-rows: repeat(2, minmax(0, 1fr)); gap: 14px; }
+.ab[data-ae="bento-grid"] .bnp-t { position: relative; display: flex; flex-direction: column; align-items: flex-start; min-width: 0; min-height: 0; padding: 24px 26px; border-radius: 28px; background: var(--ab-tile); color: var(--ab-ink); overflow: hidden; }
+.ab[data-ae="bento-grid"] .bnp-hero { grid-column: 1 / 3; grid-row: 1; background: var(--ab-tile-sec); }
+.ab[data-ae="bento-grid"] .bnp-s1 { grid-column: 3; grid-row: 1; }
+.ab[data-ae="bento-grid"] .bnp-act { grid-column: 4; grid-row: 1 / 3; background: var(--ab-primary); color: var(--ab-on-primary); justify-content: flex-end; }
+.ab[data-ae="bento-grid"] .bnp-card { grid-column: 1 / 3; grid-row: 2; justify-content: space-between; }
+.ab[data-ae="bento-grid"] .bnp-s2 { grid-column: 3; grid-row: 2; }
+.ab[data-ae="bento-grid"] .bnp-num { font: 600 72px/0.95 var(--ab-font-h); letter-spacing: -0.05em; font-variant-numeric: tabular-nums; }
+.ab[data-ae="bento-grid"] .bnp-hero .bnp-num { font-size: 112px; }
+.ab[data-ae="bento-grid"] .bnp-name { margin-top: auto; font-size: 17px; font-weight: 600; }
+.ab[data-ae="bento-grid"] .bnp-chip { margin-top: 8px; padding: 4px 11px; border-radius: 999px; background: var(--ab-sub); font-size: 13px; font-weight: 600; color: var(--ab-ink); }
+.ab[data-ae="bento-grid"] .bnp-hero .bnp-chip { position: absolute; top: 24px; right: 26px; margin: 0; background: var(--ab-tile); }
+.ab[data-ae="bento-grid"] .bnp-bar { display: block; align-self: stretch; height: 8px; margin-top: 16px; border-radius: 999px; background: var(--ab-tile-line); overflow: hidden; }
+.ab[data-ae="bento-grid"] .bnp-bar > i { display: block; height: 100%; border-radius: 999px; background: var(--ab-secondary); }
+.ab[data-ae="bento-grid"] .bnp-act b { font: 600 28px/1.1 var(--ab-font-h); letter-spacing: -0.02em; }
+.ab[data-ae="bento-grid"] .bnp-act span { margin-top: 8px; font-size: 15px; font-weight: 600; opacity: 0.85; }
+.ab[data-ae="bento-grid"] .bnp-arrow { position: absolute; top: 22px; right: 22px; width: 48px; height: 48px; border-radius: 50%; background: color-mix(in srgb, var(--ab-on-primary) 18%, transparent); }
+.ab[data-ae="bento-grid"] .bnp-arrow::before { content: "\2197"; position: absolute; inset: 0; display: grid; place-items: center; font-size: 22px; font-style: normal; color: var(--ab-on-primary); }
+.ab[data-ae="bento-grid"] .bnp-card .ab-seg { display: inline-flex; flex: none; width: auto; margin: 0; }
+.ab[data-ae="bento-grid"] .bnp-card .ab-seg-btn { font-size: 15px; padding: 8px 16px; min-height: 0; }
+.ab[data-ae="bento-grid"] .bnp-title { font: 600 40px/1.05 var(--ab-font-h); letter-spacing: -0.03em; }
+.ab[data-ae="bento-grid"] .bnp-sub { font-size: 16px; color: var(--ab-muted); }
 
 /* ----- deck Material slide (def.deck.materialArt): the tile materials as a small bento ----- */
 .ab[data-ae="bento-grid"].ab-slide[data-slide="material"] .ab-deck-stage[data-stage="own"] .ab-art { inset: 0; height: 100%; aspect-ratio: auto; margin: 0; background: none; }

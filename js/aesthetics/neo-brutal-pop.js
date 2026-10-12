@@ -7,11 +7,10 @@
    starburst, checkbox, cursor) on the right. Section fields switch to 100%
    accent / primary. The deck's Material slide is a die-cut sticker sheet.
    Look lives in css/aesthetics/neo-brutal-pop.css. */
-// Heaviest real weight (FONTS `weights`) of state[which], capped.
-function npHeavy(which, cap) {
-  const f = typeof state !== 'undefined' && state && state[which];
-  const ws = String((f && f.weights) || '400').split(';').map(Number).filter(n => n > 0 && n <= cap);
-  return ws.length ? Math.max(...ws) : 400;
+// Heaviest real weight of a face, capped (400 when it has none at or under the cap). The face
+// comes from the view state being rendered (a blend swaps them).
+function npHeavy(face, cap) {
+  return abWeights(face).filter(w => w <= cap).pop() || 400;
 }
 
 // Points of a star polygon centred on (cx, cy): n tips, outer radius r1, inner r2.
@@ -32,12 +31,14 @@ function npKit(t) {
     ? (t.isDark ? t.mix(t.ink, t.canvas, 0.1) : t.mix('#ffffff', t.canvas, 0.9)) : t.canvas;
   const on = (k, fb) => t[k] || fb;
   const sh = 'translate(5 5)';
+  // the hard offset shadow: ink on a light page; black in dark mode, where ink is the light colour
+  const shc = t.isDark ? '#000000' : ink;
   const so = `stroke="${ink}" stroke-width="3" stroke-linejoin="round"`;
   const tag = '62,104 98,70 232,70 232,204 98,204 62,170';
   const star = npStarPoints(0, 0, 54, 40, 20);
-  const tagSvg = `<svg viewBox="52 60 192 156" xmlns="http://www.w3.org/2000/svg"><polygon points="${tag}" fill="${ink}" transform="${sh}"/><polygon points="${tag}" fill="${t.primary}" ${so}/><circle cx="88" cy="137" r="10" fill="${paper}" ${so}/><text x="168" y="164" text-anchor="middle" class="nba-t" font-size="76" fill="${on('onPrimary', ink)}">$1</text></svg>`;
-  const starSvg = (word = 'NEW') => `<svg viewBox="-60 -60 126 126" xmlns="http://www.w3.org/2000/svg"><polygon points="${star}" fill="${ink}" transform="${sh}"/><polygon points="${star}" fill="${t.accent}" ${so}/><text x="0" y="9" text-anchor="middle" class="nba-t" font-size="26" fill="${on('onAccent', ink)}">${word}</text></svg>`;
-  return { ink, paper, on, sh, so, tag, star, tagSvg, starSvg };
+  const tagSvg = `<svg viewBox="52 60 192 156" xmlns="http://www.w3.org/2000/svg"><polygon points="${tag}" fill="${shc}" transform="${sh}"/><polygon points="${tag}" fill="${t.primary}" ${so}/><circle cx="88" cy="137" r="10" fill="${paper}" ${so}/><text x="168" y="164" text-anchor="middle" class="nba-t" font-size="76" fill="${on('onPrimary', ink)}" color="${on('onPrimary', ink)}">$1</text></svg>`;
+  const starSvg = (word = 'NEW') => `<svg viewBox="-60 -60 126 126" xmlns="http://www.w3.org/2000/svg"><polygon points="${star}" fill="${shc}" transform="${sh}"/><polygon points="${star}" fill="${t.accent}" ${so}/><text x="0" y="9" text-anchor="middle" class="nba-t" font-size="26" fill="${on('onAccent', ink)}" color="${on('onAccent', ink)}">${word}</text></svg>`;
+  return { ink, shc, paper, on, sh, so, tag, star, tagSvg, starSvg };
 }
 
 registerAesthetic({
@@ -79,7 +80,8 @@ registerAesthetic({
   // Paper, not a pastel wash: colour arrives as 100% section fields instead.
   canvas(b) { return b.isDark ? b.mix(b.ink, b.canvas, 0.1) : b.mix('#ffffff', b.canvas, 0.85); },
 
-  tokens(t) {
+  tokens(t, view) {
+    const st = view || (typeof state !== 'undefined' ? state : null);
     // Chip fill (kicker, status pills, hover): secondary pushed into the canvas,
     // but never so strong that ink text drops under ~7:1. Cards, panels and rows
     // use --ab-paper instead (near-white, the neobrutalism.dev composition).
@@ -95,37 +97,41 @@ registerAesthetic({
       '--ab-paper': t.isDark ? t.mix(t.ink, t.canvas, 0.1) : t.mix('#ffffff', t.canvas, 0.9),
       '--np-star-img': uri(starSvg),
       // real weights only (font-synthesis is off): the heading face's heaviest up to 800, the UI face's
-      '--np-hw': npHeavy('headingFont', 800),
-      '--np-uw': npHeavy('bodyFont', 800),
+      '--np-hw': npHeavy(st && st.headingFont, 800),
+      '--np-uw': npHeavy(st && st.bodyFont, 800),
+      // hard shadows: ink in light mode, black in dark mode (cream offsets read as a halo)
+      '--np-shc': t.isDark ? '#000000' : t.ink,
+      // muted labels on the paper cards (the type cards): pulled toward ink until 4.5:1 on paper
+      '--np-muted-paper': (() => { const paper = t.isDark ? t.mix(t.ink, t.canvas, 0.1) : t.mix('#ffffff', t.canvas, 0.9); let m = t.muted; for (let k = 0.1; k <= 1.001 && t.contrast(m, paper) < 4.6; k += 0.1) m = t.mix(t.ink, t.muted, k); return m; })(),
     };
   },
 
   // The hero art: UI-object stickers (price tag "$1", NEW starburst, checkbox, cursor),
   // each 2px-outlined with a hard offset shadow; plain SVG, self-contained (blend donor).
   art(ctx) {
-    const { ink, paper, on, sh, so, tag, star } = npKit(ctx.t);
+    const { ink, shc, paper, on, sh, so, tag, star } = npKit(ctx.t);
     const t = ctx.t;
     const cursor = '0,0 0,58 14,45 25,68 36,63 25,40 43,40';
     const cluster = `<svg class="nba-cluster" viewBox="0 0 320 300" xmlns="http://www.w3.org/2000/svg">
       <path d="M86 137 C52 128 30 84 46 30" fill="none" stroke="${ink}" stroke-width="3" stroke-linecap="round"/>
       <g transform="rotate(-9 147 137)">
-        <polygon points="${tag}" fill="${ink}" transform="${sh}"/>
+        <polygon points="${tag}" fill="${shc}" transform="${sh}"/>
         <polygon points="${tag}" fill="${t.primary}" ${so}/>
         <circle cx="88" cy="137" r="10" fill="${paper}" ${so}/>
-        <text x="168" y="164" text-anchor="middle" class="nba-t" font-size="76" fill="${on('onPrimary', ink)}">$1</text>
+        <text x="168" y="164" text-anchor="middle" class="nba-t" font-size="76" fill="${on('onPrimary', ink)}" color="${on('onPrimary', ink)}">$1</text>
       </g>
       <g transform="translate(252 72) rotate(12)">
-        <polygon points="${star}" fill="${ink}" transform="${sh}"/>
+        <polygon points="${star}" fill="${shc}" transform="${sh}"/>
         <polygon points="${star}" fill="${t.accent}" ${so}/>
-        <text x="0" y="9" text-anchor="middle" class="nba-t" font-size="26" fill="${on('onAccent', ink)}">NEW</text>
+        <text x="0" y="9" text-anchor="middle" class="nba-t" font-size="26" fill="${on('onAccent', ink)}" color="${on('onAccent', ink)}">NEW</text>
       </g>
       <g transform="rotate(8 240 238)">
-        <rect x="205" y="203" width="70" height="70" rx="8" fill="${ink}" transform="${sh}"/>
+        <rect x="205" y="203" width="70" height="70" rx="8" fill="${shc}" transform="${sh}"/>
         <rect x="205" y="203" width="70" height="70" rx="8" fill="${t.secondary}" ${so}/>
         <path d="M222 238 L236 252 L260 222" fill="none" stroke="${on('onSecondary', ink)}" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
       </g>
       <g transform="translate(150 218) rotate(-14)">
-        <polygon points="${cursor}" fill="${ink}" transform="translate(4 4)"/>
+        <polygon points="${cursor}" fill="${shc}" transform="translate(4 4)"/>
         <polygon points="${cursor}" fill="${paper}" ${so}/>
       </g>
     </svg>`;
@@ -179,10 +185,10 @@ registerAesthetic({
     // with stickers, then the title, a price-tag sticker, the chunky buy button.
     product(ctx) {
       const e = ctx.e;
-      const { tagSvg, starSvg } = npKit(ctx.t);
+      const { starSvg } = npKit(ctx.t);
       const name = e(ctx.brandName || 'Studio');
       return `<div class="npp">
-        <div class="npp-cover"><span class="npp-init">${e(ctx.initial)}</span><span class="npp-star">${starSvg('NEW')}</span><span class="npp-tag">${tagSvg}</span></div>
+        <div class="npp-cover"><span class="npp-init">${e(ctx.initial)}</span><span class="npp-star">${starSvg('NEW')}</span></div>
         <div class="npp-info">
           <p class="npp-by"><span class="npp-av">${e(ctx.initial)}</span>${name}</p>
           <h3 class="npp-title ab-headline">The starter kit</h3>

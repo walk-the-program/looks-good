@@ -93,28 +93,30 @@ function faRibbon(t) {
   return faHex(c.h, Math.max(c.s, 50), Math.min(72, Math.max(52, c.l)));
 }
 
-function faEsc(s) { return escapeHtml(String(s == null ? '' : s)); }
-
-// The nearest weight a face really has (font-synthesis is off): `want`, else the next one up
-// within 100, else the next one down. Fonts come from the global app state.
-function faWeight(font, want) {
-  const ws = String((font && font.weights) || '400').split(';').map(Number).filter(Boolean);
-  if (ws.includes(want)) return want;
-  const up = ws.filter(w => w > want).sort((x, y) => x - y)[0];
-  const down = ws.filter(w => w < want).sort((x, y) => y - x)[0];
-  return up && up - want <= 100 ? up : (down || up || 400);
-}
-function faFonts() {
-  const st = typeof state !== 'undefined' ? state : null;
-  return { h: st && st.headingFont, b: st && st.bodyFont };
+// The faces being rendered: the view state passed to the hook (a blend swaps them), else the
+// app state. Weights are then read with the shared abWeightNear.
+function faFonts(st) {
+  const v = st || (typeof state !== 'undefined' ? state : null);
+  return { h: v && v.headingFont, b: v && v.bodyFont };
 }
 
 // Last word of the headline as .ab-hl (same split as the framework's abHeadline).
 function faHlHtml(text) {
   const s = String(text || '').trim();
   const m = s.match(/^([\s\S]*?)([^\s]+?)([.,;:!?…]*)$/);
-  if (!m) return faEsc(s);
-  return `${faEsc(m[1])}<span class="ab-hl">${faEsc(m[2])}</span>${faEsc(m[3])}`;
+  if (!m) return escapeHtml(s);
+  return `${escapeHtml(m[1])}<span class="ab-hl">${escapeHtml(m[2])}</span>${escapeHtml(m[3])}`;
+}
+
+// The same split for the wet-floor copies, as generated content (data-t + ::before): the
+// reflection is decoration, so it carries no text nodes (no duplicate headline for screen
+// readers, copy/paste or text audits), only painted glyphs.
+function faHlRefl(text) {
+  const s = String(text || '').trim();
+  const m = s.match(/^([\s\S]*?)([^\s]+?)([.,;:!?…]*)$/);
+  const part = (t, cls) => (t ? `<span class="fa-rt${cls ? ' ' + cls : ''}" data-t="${escapeHtml(t)}"></span>` : '');
+  if (!m) return part(s);
+  return part(m[1]) + part(m[2], 'ab-hl') + part(m[3]);
 }
 
 /* ---------------- art: the sky, the hill, the water, the orb ---------------- */
@@ -211,14 +213,14 @@ function faWater(t, id, night) {
 }
 
 // The primary gel orb and its wet-floor reflection (one svg, the horizon at its middle).
-function faOrb(t, id, initial, night) {
+function faOrb(t, id, initial, night, fonts) {
   const g = faGelBase(t.primary);
   const st = faGelStops(g);
-  const ini = faEsc(initial);
+  const ini = escapeHtml(initial);
   const body = `<circle cx="60" cy="60" r="54" fill="url(#${id}o)"/>
       <circle cx="60" cy="60" r="54" fill="url(#${id}c)"/>
       <circle cx="60" cy="60" r="53.2" fill="none" stroke="${st.rim}" stroke-width="1.6"/>
-      <text x="60" y="76" text-anchor="middle" font-family="var(--ab-font-h, sans-serif)" font-size="46" font-weight="${faWeight(faFonts().h, 600)}" fill="${g.label}" fill-opacity=".92">${ini}</text>
+      <text x="60" y="76" text-anchor="middle" font-family="var(--ab-font-h, sans-serif)" font-size="46" font-weight="${abWeightNear(fonts.h, 600)}" fill="${g.label}" fill-opacity=".92">${ini}</text>
       <path d="M17 50C17 25 37 12 60 12S103 25 103 50C103 58 84 61 60 61S17 58 17 50Z" fill="url(#${id}k)"/>`;
   return `<svg class="fa-orb" viewBox="0 0 120 240" aria-hidden="true" focusable="false">
     <defs>
@@ -238,18 +240,19 @@ function faOrb(t, id, initial, night) {
 
 function faScene(ctx) {
   const t = ctx.t;
+  const fonts = faFonts(ctx.state);
   const id = `fa${++seq}`;
   const night = !!t.isDark;
   return `<div class="fa-scene" data-night="${night ? 1 : 0}">
     ${faSky(t, id, night)}
     <div class="fa-water">${faWater(t, id, night)}</div>
-    <div class="fa-orb-wrap">${faOrb(t, id, ctx.initial, night)}</div>
-    ${faSeal(t, id)}
+    <div class="fa-orb-wrap">${faOrb(t, id, ctx.initial, night, fonts)}</div>
+    ${faSeal(t, id, fonts)}
   </div>`;
 }
 
 // the "new" starburst: a 12-point star in the accent gel with a cap, lowercase label
-function faSeal(t, id) {
+function faSeal(t, id, fonts) {
   const a = faCandy(t.accent);
   const st = faGelStops(a);
   const lab = contrastRatio('#ffffff', faHex(a.h, a.s, a.l)) >= 4.5 ? '#ffffff' : '#0E2233';
@@ -262,13 +265,57 @@ function faSeal(t, id) {
     <defs><linearGradient id="${id}a" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${st.top}"/><stop offset=".55" stop-color="${st.mid}"/><stop offset="1" stop-color="${st.bot}"/></linearGradient></defs>
     <polygon points="${pts.trim()}" fill="url(#${id}a)" stroke="${st.rim}" stroke-width="1.5" stroke-linejoin="round"/>
     <path d="M17 44C20 26 34 15 50 15S80 26 83 44C72 49 62 50 50 50S28 49 17 44Z" fill="#fff" fill-opacity=".6"/>
-    <text x="50" y="60" text-anchor="middle" font-family="var(--ab-font-b, sans-serif)" font-size="24" font-weight="${faWeight(faFonts().b, 600)}" fill="${lab}">new</text>
+    <text x="50" y="60" text-anchor="middle" font-family="var(--ab-font-b, sans-serif)" font-size="24" font-weight="${abWeightNear(fonts.b, 600)}" fill="${lab}" color="${lab}">new</text>
   </svg>`;
+}
+
+// The closing slide's side strip (288 x 720 on the slide): the hero world in a column — sky,
+// sun, an aurora ribbon, clouds, the hill with its white rim, the water and a few bubbles (night:
+// stars, aurora, a dark hill). One SVG data URI, so it exports as drawn (no CSS gradient stack).
+function faStripUri(t, night) {
+  const hill = faHill(t);
+  const rib = faRibbon(t);
+  const sky = night
+    ? `<stop offset='0' stop-color='#010812'/><stop offset='.42' stop-color='#05203A'/><stop offset='.78' stop-color='#0C4566'/><stop offset='1' stop-color='#2A86A3'/>`
+    : `<stop offset='0' stop-color='#1A98F2'/><stop offset='.34' stop-color='#55BAFB'/><stop offset='.68' stop-color='#B4E3FF'/><stop offset='1' stop-color='#F1FAFF'/>`;
+  const water = night ? ['#0E3E5A', '#082D46', '#041A2C'] : ['#CDEEFF', '#8DD0F2', '#4FA9DC'];
+  const hc = night ? ['#1E6A55', '#0B3A28', '#06261A'] : [hill.crest, hill.mid, hill.foot];
+  let stars = '';
+  if (night) {
+    let a = 11;
+    const r = () => { a = (a * 9301 + 49297) % 233280; return a / 233280; };
+    for (let i = 0; i < 26; i++) stars += `<circle cx='${(r() * 288).toFixed(0)}' cy='${(r() * 380).toFixed(0)}' r='${(0.7 + r() * 1.4).toFixed(1)}' fill='#fff' opacity='${(0.3 + r() * 0.6).toFixed(2)}'/>`;
+  }
+  const clouds = night ? '' : faCloud(96, 170, 62, '#ffffff', 'rgba(70,140,200,.14)') + faCloud(226, 310, 40, 'rgba(255,255,255,.92)', 'rgba(70,140,200,.1)');
+  const bubbles = [[58, 604, 16], [104, 572, 9], [210, 640, 12], [246, 590, 7]].map(([x, y, r]) =>
+    `<circle cx='${x}' cy='${y}' r='${r}' fill='#fff' fill-opacity='.12' stroke='#fff' stroke-opacity='.85' stroke-width='1.3'/><ellipse cx='${(x - r * 0.36).toFixed(1)}' cy='${(y - r * 0.42).toFixed(1)}' rx='${(r * 0.32).toFixed(1)}' ry='${(r * 0.2).toFixed(1)}' fill='#fff' fill-opacity='.95'/>`).join('');
+  const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='288' height='720' viewBox='0 0 288 720'>
+    <defs>
+      <linearGradient id='s' x1='0' y1='0' x2='0' y2='1'>${sky}</linearGradient>
+      <radialGradient id='sun' cx='236' cy='92' r='${night ? 150 : 230}' gradientUnits='userSpaceOnUse'><stop offset='0' stop-color='#fff' stop-opacity='${night ? 0.4 : 0.95}'/><stop offset='.3' stop-color='#fff' stop-opacity='${night ? 0.12 : 0.4}'/><stop offset='1' stop-color='#fff' stop-opacity='0'/></radialGradient>
+      <linearGradient id='r' x1='0' y1='0' x2='1' y2='0'><stop offset='0' stop-color='#fff' stop-opacity='0'/><stop offset='.45' stop-color='${rib}'/><stop offset='1' stop-color='#fff' stop-opacity='.2'/></linearGradient>
+      <linearGradient id='h' x1='0' y1='0' x2='0' y2='1'><stop offset='0' stop-color='${hc[0]}'/><stop offset='.45' stop-color='${hc[1]}'/><stop offset='1' stop-color='${hc[2]}'/></linearGradient>
+      <linearGradient id='w' x1='0' y1='0' x2='0' y2='1'><stop offset='0' stop-color='${water[0]}'/><stop offset='.45' stop-color='${water[1]}'/><stop offset='1' stop-color='${water[2]}'/></linearGradient>
+    </defs>
+    <rect width='288' height='540' fill='url(#s)'/>
+    ${stars}
+    <rect width='288' height='540' fill='url(#sun)'/>
+    <path d='M-20 330C60 250 150 360 310 250L310 286C170 380 70 290 -20 370Z' fill='url(#r)' opacity='${night ? 0.6 : 0.45}'/>
+    ${clouds}
+    <path d='M150 540C190 492 236 470 300 468V540Z' fill='${night ? '#12404A' : hill.far}' opacity='.9'/>
+    <path d='M-20 540C10 470 70 430 140 426S250 470 300 540Z' fill='url(#h)'/>
+    <path d='M-20 540C10 470 70 430 140 426S250 470 300 540' fill='none' stroke='#fff' stroke-opacity='${night ? 0.28 : 0.55}' stroke-width='3'/>
+    <rect y='540' width='288' height='180' fill='url(#w)'/>
+    <rect y='540' width='288' height='3' fill='#fff' fill-opacity='${night ? 0.25 : 0.9}'/>
+    <g stroke='#fff' stroke-opacity='${night ? 0.16 : 0.45}' stroke-width='2' stroke-linecap='round'><path d='M20 572h96M150 584h110M40 618h70M140 648h120M30 686h90'/></g>
+    ${bubbles}
+  </svg>`;
+  return `url("data:image/svg+xml;utf8,${svg.replace(/\s*\n\s*/g, '').replace(/"/g, "'").replace(/'/g, '%27').replace(/#/g, '%23')}")`;
 }
 
 // Puts an Aero title bar (label + caption buttons) at the top of a default card / panel markup.
 function faWindow(html, cls, title, buttons) {
-  const bar = `<div class="fa-titlebar" aria-hidden="true"><span>${faEsc(title)}</span><i class="fa-caption" data-b="${buttons}"></i></div>`;
+  const bar = `<div class="fa-titlebar" aria-hidden="true"><span>${escapeHtml(title)}</span><i class="fa-caption" data-b="${buttons}"></i></div>`;
   const open = `<div class="${cls}">`;
   return html.includes(open) ? html.replace(open, `<div class="${cls} fa-window">${bar}`) : '';
 }
@@ -282,7 +329,7 @@ function faAnatomy(ctx) {
   const g = faGelBase(t.primary);
   const st = faGelStops(g);
   const ink = night ? FA_TEXT_NIGHT : FA_TEXT;
-  const bw = faWeight(faFonts().b, 600);
+  const bw = abWeightNear(faFonts(ctx.state).b, 600);
   const pill = `<rect x="80" y="196" width="400" height="96" rx="48" fill="url(#${id}g)"/>
       <ellipse cx="280" cy="286" rx="150" ry="22" fill="url(#${id}c)"/>
       <rect x="80.8" y="196.8" width="398.4" height="94.4" rx="47.2" fill="none" stroke="${st.rim}" stroke-width="1.6"/>
@@ -374,11 +421,12 @@ registerAesthetic({
     const inner = faHlHtml(text);
     // the wet floor: the headline flipped under its baseline, cut into five horizontal slices that
     // fade and drift a hair sideways (ripples). Plain opacity, so it exports without a mask.
-    const slices = [0, 1, 2, 3, 4].map(i => `<span class="fa-rs" style="--i:${i}"><span>${inner}</span></span>`).join('');
+    const refl = faHlRefl(text);
+    const slices = [0, 1, 2, 3, 4].map(i => `<span class="fa-rs" style="--i:${i}"><span>${refl}</span></span>`).join('');
     return `<span class="fa-hl"><span class="fa-hl-txt">${inner}</span><span class="fa-hl-refl" aria-hidden="true">${slices}</span></span>`;
   },
 
-  tokens(t) {
+  tokens(t, st) {
     const night = t.isDark;
     const g = faGelBase(t.primary);
     const gs = faGelStops(g);
@@ -394,20 +442,18 @@ registerAesthetic({
     const horizon = night ? '#1C6684' : '#E3F5FF';
     let hl = faHex(g.h, g.s, g.l);
     for (let l = g.l; l >= 18 && l <= 90 && contrastRatio(hl, horizon) < 3.2; l += night ? 2 : -2) hl = faHex(g.h, g.s, l);
-    let hlCard = faHex(g.h, g.s, g.l);
-    for (let l = g.l; l >= 18 && l <= 90 && contrastRatio(hlCard, canvas) < 3.2; l += night ? 2 : -2) hlCard = faHex(g.h, g.s, l);
-    const fonts = faFonts();
+    const fonts = faFonts(st);
     return {
       '--ab-type-pick-w': 400,
-      '--fa-lw': faWeight(fonts.h, 300),
-      '--fa-hbw': faWeight(fonts.h, 600),
-      '--fa-bw': faWeight(fonts.b, 600),
+      '--fa-lw': abWeightNear(fonts.h, 300),
+      '--fa-hbw': abWeightNear(fonts.h, 600),
+      '--fa-bw': abWeightNear(fonts.b, 600),
+      '--fa-nbw': abWeightNear(fonts.b, 700),
       '--ab-ink': ink,
       '--ab-muted': muted,
       '--ab-line': night ? 'rgba(170, 210, 240, 0.22)' : 'rgba(35, 65, 90, 0.16)',
       '--ab-glass': night ? 'rgba(14, 34, 54, 0.72)' : 'rgba(255, 255, 255, 0.78)',
       '--ab-fa-glass': night ? 'rgba(14, 34, 54, 0.72)' : 'rgba(255, 255, 255, 0.78)',
-      '--ab-fa-glass-hi': night ? 'rgba(255, 255, 255, 0.14)' : 'rgba(255, 255, 255, 0.95)',
       '--ab-fa-rim-out': night ? 'rgba(0, 0, 0, 0.55)' : 'rgba(35, 65, 90, 0.24)',
       '--ab-fa-rim-in': night ? 'rgba(255, 255, 255, 0.16)' : 'rgba(255, 255, 255, 0.9)',
       '--ab-fa-streak': night ? 'rgba(255, 255, 255, 0.10)' : 'rgba(255, 255, 255, 0.62)',
@@ -415,15 +461,16 @@ registerAesthetic({
       '--ab-fa-bar-b': night ? '#0B1F33' : '#C9E3F5',
       '--ab-fa-gel-top': gs.top, '--ab-fa-gel': gs.mid, '--ab-fa-gel-bot': gs.bot, '--ab-fa-gel-rim': gs.rim, '--ab-fa-gel-glow': gs.glow,
       '--ab-fa-gel-on': g.label,
+      // a one-pixel drop under gel labels: dark under white type, light under dark type
+      '--ab-fa-gel-on-sh': g.label === '#ffffff' ? 'rgba(0, 0, 0, 0.35)' : 'rgba(255, 255, 255, 0.45)',
       '--ab-fa-gel-shadow': t.alpha(gs.mid, 0.38),
       '--ab-fa-acc-top': as.top, '--ab-fa-acc': as.mid, '--ab-fa-acc-bot': as.bot, '--ab-fa-acc-rim': as.rim, '--ab-fa-acc-on': aLabel,
-      '--ab-fa-sec': faHex(s.h, s.s, s.l), '--ab-fa-sec-tint': faHex(s.h, Math.min(s.s, 70), night ? 26 : 90),
+      '--ab-fa-sec': faHex(s.h, s.s, s.l),
       '--ab-fa-close-top': '#F6A390', '--ab-fa-close': FA_CLOSE, '--ab-fa-close-bot': '#A92A16',
-      '--ab-fa-hl': hl, '--ab-fa-hl-card': hlCard,
+      '--ab-fa-hl': hl,
       '--ab-fa-sel-a': night ? '#1E4A6E' : '#E8F4FF', '--ab-fa-sel-b': night ? '#163B5A' : '#CDE6FF', '--ab-fa-sel-rim': night ? '#3D7DB0' : '#7DA2CE',
       '--ab-fa-field-b': night ? '#4C7393' : '#9DB7CC',
-      '--ab-fa-water-top': night ? '#0E3E5A' : '#CDEEFF',
-      '--ab-fa-floor': night ? '#071A2B' : '#F2F7FB',
+      '--ab-fa-strip': faStripUri(t, night),
       '--ab-fa-text-glow': night ? 'rgba(0, 20, 40, 0.75)' : 'rgba(255, 255, 255, 0.9)',
     };
   },
@@ -492,7 +539,7 @@ registerAesthetic({
       'Mirror the hero object on a wet floor.',
     ],
     dont: [
-      'Use dark backgrounds or muddy gels.',
+      'Let the sky or a gel turn muddy or grey.',
       'Trace real wallpapers or OS logos.',
       'Use clear refractive glass; that\'s Liquid Glass.',
     ],

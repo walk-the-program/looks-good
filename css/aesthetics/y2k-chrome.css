@@ -49,7 +49,7 @@
 .ab[data-ae="y2k-chrome"] .ab-rule { height: 2px; background: var(--ab-rim); opacity: 0.5; border-radius: 2px; }
 
 /* ---- hero: chrome headline beside a liquid chrome sculpture ---- */
-.ab[data-ae="y2k-chrome"] .ab-hero { grid-template-columns: minmax(0, 1.45fr) minmax(0, 1fr); gap: clamp(14px, 3cqw, 40px); padding: clamp(30px, 5cqw, 64px) 0 clamp(26px, 4.4cqw, 54px); }
+.ab[data-ae="y2k-chrome"] .ab-hero { grid-template-columns: minmax(0, 1.45fr) minmax(0, 1fr); gap: clamp(32px, 4cqw, 48px); padding: clamp(30px, 5cqw, 64px) 0 clamp(26px, 4.4cqw, 54px); }
 /* the kicker is a flat product label: ink type, a hairline above, no pill */
 .ab[data-ae="y2k-chrome"] .ab-kicker {
   display: inline-block; padding: 6px 0 0; margin-bottom: clamp(14px, 2cqw, 22px) !important;
@@ -84,11 +84,18 @@
   background: var(--y2-field);
 }
 .ab[data-ae="y2k-chrome"] .ab-hero::after {
-  content: "MRG-01\2122  /  \6DB2\4F53\91D1\5C5E  /  NOT FOR RESALE"; position: absolute; z-index: 1;
-  top: 8%; bottom: 18%; right: calc(-1 * var(--ab-pad) + 10px); writing-mode: vertical-rl; display: flex; align-items: center;
+  /* Latin only, no trademark sign (set sideways in vertical type it reads as a stray superscript, and
+     the CJK line fell back to a system face): the brand's techno face, upright-mixed */
+  content: "MRG-01  /  LIQUID METAL  /  NOT FOR RESALE"; position: absolute; z-index: 1;
+  top: 8%; bottom: 18%; right: calc(-1 * var(--ab-pad) + 10px); writing-mode: vertical-rl; text-orientation: mixed; display: flex; align-items: center;
   font: 400 8px/1 var(--y2-techno); letter-spacing: 0.16em; color: var(--y2-on-field); white-space: nowrap; overflow: hidden; pointer-events: none;
 }
 .ab[data-ae="y2k-chrome"] .ab-hero-copy { position: relative; z-index: 2; }
+/* the acid field starts 32px after the copy column (1.45fr of the hero, after the column gap), so the
+   headline never runs into it; the sculpture (112% wide, pulled 12% left) still breaks its edge */
+@container ab (min-width: 601px) {
+  .ab[data-ae="y2k-chrome"]:not(.ab-slide) .ab-hero::before { left: calc((100% - clamp(32px, 4cqw, 48px)) * 0.5918 + 32px); }
+}
 .ab[data-ae="y2k-chrome"] .ab-art { max-width: 540px; justify-self: center; z-index: 1; }
 @container ab (min-width: 601px) {
   .ab[data-ae="y2k-chrome"] .ab-art { justify-self: end; width: 112%; max-width: 580px; margin-left: -12%; }
@@ -240,7 +247,7 @@
   .ab[data-ae="y2k-chrome"] .ab-hero { grid-template-columns: minmax(0, 1fr); gap: 18px; padding: 24px 0 26px; }
   .ab[data-ae="y2k-chrome"] .ab-art { max-width: 300px; justify-self: center; }
   .ab[data-ae="y2k-chrome"] .ab-hero::before { top: 52%; bottom: 6%; left: 34%; }
-  .ab[data-ae="y2k-chrome"] .ab-hero::after { top: 52%; bottom: 6%; }
+  .ab[data-ae="y2k-chrome"] .ab-hero::after { top: 52%; bottom: 6%; content: "MRG-01  /  LIQUID METAL"; overflow: visible; }
   .ab[data-ae="y2k-chrome"] .ab-swatches[data-kind="chips"] .ab-swatch { display: flex; padding: 6px 14px 6px 7px; }
   .ab[data-ae="y2k-chrome"] .ab-row { border-radius: 4px; padding: 10px 16px; }
 }
@@ -251,7 +258,14 @@
 
 /* ---- deck ---- */
 /* cover: the sculpture at cover scale (!important: the cover fit sets inline sizes on the art) */
-.ab[data-ae="y2k-chrome"].ab-slide[data-slide="cover"] .ab-art { width: 132% !important; max-width: 560px !important; margin-left: -32%; justify-self: end; }
+/* cover: the hero spans the slide's content box (56 -> 1224) at its natural scale. The copy gets
+   the wider column so the chrome headline sets large; the sculpture is sized to the space
+   between the header and the band, so the deck fit never has to scale the whole cover down. */
+.ab.ab[data-ae="y2k-chrome"].ab-slide[data-slide="cover"] .ab-deck-cover .ab-hero { grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr); gap: 40px; padding: 8px 0 26px; }
+.ab[data-ae="y2k-chrome"].ab-slide[data-slide="cover"] .ab-art { width: 100% !important; max-width: 360px !important; margin-left: 0; justify-self: start; }
+/* the acid field starts 32px after the copy column (1.7fr of the hero), the sculpture breaks its edge */
+.ab[data-ae="y2k-chrome"].ab-slide[data-slide="cover"] .ab-deck-cover-meta { margin-top: 12px; }
+.ab[data-ae="y2k-chrome"].ab-slide[data-slide="cover"] .ab-hero::before { left: calc((100% - 40px) * 0.6296 + 32px); }
 
 /* weights the faces actually have (font-synthesis: none shows 400 for a missing weight) */
 .ab[data-ae="y2k-chrome"] :is(.ab-type-col[data-role="heading"] .ab-type-cur b, .ab-deck-ptitle, .ab-deck-pchip) { font-weight: var(--ab-hw, 400); }

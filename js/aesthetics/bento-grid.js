@@ -54,19 +54,30 @@ registerAesthetic({
     return b.isDark ? null : b.mix(b.canvas, b.ink, 0.95);
   },
 
-  tokens(t) {
+  tokens(t, view) {
     const d = t.isDark;
-    // interface face: the brand's own sans if it has one, else Inter (never a display face at 11px)
-    const stU = typeof state !== 'undefined' ? state : null;
+    // interface face: the brand's own sans if it has one, else Inter (never a display face at 11px).
+    // The faces come from the view state being rendered (a blend swaps them).
+    const stU = view || (typeof state !== 'undefined' ? state : null);
     const sansF = stU && [stU.bodyFont, stU.headingFont].find(f => f && f.category === 'sans');
     const uiFace = sansF ? (sansF === stU.bodyFont ? 'var(--ab-font-b)' : 'var(--ab-font-h)') : '"Inter", "Helvetica Neue", Helvetica, Arial, sans-serif';
     const tile = d ? t.mix('#ffffff', t.canvas, 0.065) : t.mix('#ffffff', t.canvas, 0.8);
-    const hf = typeof state !== 'undefined' && state.headingFont;
+    // muted text sits on the tiles, which are lighter than the canvas in dark mode: pull it
+    // toward ink until it reads at 4.5:1 on the tile and on the tinted tile
+    const tileSec = t.mix(t.secondary, tile, d ? 0.24 : 0.2);
+    let muted = t.muted;
+    for (let k = 0.1; k <= 1.001 && (t.contrast(muted, tile) < 4.6 || t.contrast(muted, tileSec) < 4.6); k += 0.1) muted = t.mix(t.ink, t.muted, k);
+    // the headline word sits on the hero tile (lighter than the canvas in dark mode): the primary,
+    // pulled toward ink until it holds 3:1 on the tile
+    let priText = t.primary;
+    for (let k = 0.1; k <= 1.001 && t.contrast(priText, tile) < 3; k += 0.1) priText = t.mix(t.ink, t.primary, k);
     return {
+      '--ab-muted': muted,
+      '--ab-primary-text': priText,
       '--ab-font-ui': uiFace, '--ab-font-label': uiFace,
       '--ab-type-pick-w': 600,
       '--ab-tile': tile,
-      '--ab-tile-sec': t.mix(t.secondary, tile, d ? 0.24 : 0.2),
+      '--ab-tile-sec': tileSec,
       '--ab-tile-pri': t.mix(t.primary, tile, d ? 0.2 : 0.14),
       '--ab-tile-line': t.alpha(t.ink, d ? 0.1 : 0.08),
       '--ab-sub': d ? t.mix('#000000', tile, 0.2) : t.mix(t.ink, tile, 0.045),
@@ -136,17 +147,47 @@ registerAesthetic({
   },
   // Deck copy (js/brand-deck.js): three principles, three do / don't lines, each short.
   deck: {
-    // Patterns slide: bento has no pattern culture; its material is the tile system itself
-    // (2x2, 2x1, 1x1, 1x2, annotated with spans, gap 14 and radius 28).
+    // Patterns slide: the suite (or the patterns in the brief) laid out as a bento — the lead
+    // pattern in the 2x2 hero tile, the others in 2x1 / 1x1 / 1x2 tiles, each filled edge to
+    // edge with its pattern and named on a tile-white chip. The tile anatomy itself is on the
+    // Material slide. Tile sizes are the slide's 4 x 3 grid (1168 x 494, gap 14).
     patternsStage(ctx) {
-      const tile = (cls, span, name) => `<div class="bns-t ${cls}"><b>${span}</b><span>${name}</span></div>`;
-      return `<div class="bns">
-        ${tile('bns-22', '2×2', 'Hero tile')}
-        ${tile('bns-21', '2×1', 'Wide tile')}
-        ${tile('bns-11', '1×1', 'Stat tile')}
-        ${tile('bns-12', '1×2', 'Tall tile')}
-        ${tile('bns-11b', '1×1', 'Action tile')}
-        ${tile('bns-21b', '2×1', 'Gap 14 · radius 28 · no borders')}
+      const e = ctx.e || escapeHtml;
+      const list = (ctx.entries || []).slice(0, 6);
+      const slots = [['bns-22', 577, 322], ['bns-21', 577, 154], ['bns-11', 282, 154], ['bns-12', 282, 322], ['bns-11b', 282, 154], ['bns-21b', 577, 154]];
+      const tiles = slots.map(([cls, w, h], i) => {
+        const en = list[i];
+        if (!en || typeof ctx.patternImg !== 'function') return `<div class="bns-t ${cls} bns-empty"></div>`;
+        const name = ctx.nameOf ? ctx.nameOf(en) : en.key;
+        const cw = ctx.colorwayLabel ? ctx.colorwayLabel(en.colorway) : '';
+        return `<figure class="bns-t ${cls} bns-p"><img src="${ctx.patternImg(en, w, h)}" alt="${e(name)} pattern" />
+          <figcaption><b>${e(name)}</b>${cw ? `<span>${e(cw)}</span>` : ''}</figcaption></figure>`;
+      }).join('');
+      return `<div class="bns-wrap">
+        <div class="ab-labelrow"><span class="ab-label">${ctx.pinned ? 'Patterns in the brief' : 'Pattern suite'}</span><span class="ab-label">${e(ctx.def ? ctx.def.name : 'Bento Grid')}</span></div>
+        <div class="bns">${tiles}</div>
+      </div>`;
+    },
+    // In product: the board's projects and next step as a product bento at slide scale (the
+    // default frame scaled the whole 03 row to ~60%, leaving 6-7px labels): the lead project as
+    // the tinted hero tile, two stat tiles, the next-step tile with the segmented control and the
+    // one solid primary action tile.
+    product(ctx) {
+      const e = ctx.e || escapeHtml;
+      const rows = ctx.rows || [['Brand refresh', 'In review', 72], ['Launch site', 'Building', 45], ['Spring campaign', 'Planned', 10]];
+      const stat = (cls, [name, status, pct]) => `<div class="bnp-t ${cls}">
+          <b class="bnp-num">${pct}%</b>
+          <span class="bnp-name">${e(name)}</span>
+          <span class="bnp-chip">${e(status)}</span>
+          <i class="bnp-bar"><i style="width:${pct}%"></i></i>
+        </div>`;
+      const segs = ['Design', 'Build', 'Launch'].map((s, i) => `<span class="ab-seg-btn" aria-pressed="${i === 0}">${s}</span>`).join('');
+      return `<div class="bnp">
+        ${stat('bnp-hero', rows[0])}
+        ${stat('bnp-s1', rows[1])}
+        <div class="bnp-t bnp-act"><i class="bnp-arrow" aria-hidden="true"></i><b>Save direction</b><span>The one action</span></div>
+        <div class="bnp-t bnp-card"><div class="ab-seg">${segs}</div><b class="bnp-title">Your next good idea.</b><span class="bnp-sub">A little structure. Room to play.</span></div>
+        ${stat('bnp-s2', rows[2])}
       </div>`;
     },
     // Material slide: the tile materials as a small bento (flat tile, colour tile, numeral
