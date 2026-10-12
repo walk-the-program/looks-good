@@ -29,6 +29,7 @@ const state = {
   logoDataUrl: null,
   content: {},
   aesthetic: 'soft-form',   // key into AESTHETICS (js/aesthetics/registry.js)
+  blend: null,     // { with, strength, channels } — second aesthetic blended in (js/blend.js)
   locks: { typography: false, color: false, shape: false, aesthetic: false },
   dismissed: [],   // suggestion ids dismissed for this brand
   patterns: [],    // patterns in the brief (the cart): [{ key, params, colorway, seed, use, svg }] (js/patterns-ui.js)
@@ -103,6 +104,8 @@ function randomizeShape() {
 function applyAesthetic(key) {
   const def = aestheticByKey(key);
   state.aesthetic = def.key;
+  // A blend cannot use the base as its own donor: choosing the donor clears the blend.
+  if (state.blend && state.blend.with === def.key) state.blend = null;
   state.bgMode = def.mode;
   if (!state.locks.shape) {
     const preset = SHAPE_PRESETS.find(p => p.key === def.slideShape);

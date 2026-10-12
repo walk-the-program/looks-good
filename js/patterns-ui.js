@@ -152,8 +152,10 @@ const PatternsUI = (function () {
 
   /* ---------------- helpers ---------------- */
 
-  const inksFor = entry => P().inksFor(state, entry.colorway, { tints: !!(entry.params && entry.params.tints) });
-  const suite = () => P().suiteFor(state.aesthetic);
+  // The rendered view (js/blend.js): a blend can tint the canvas (color) and mix the suite (patterns).
+  const view = () => (typeof aestheticView === 'function' ? aestheticView(state) : { state, def: aestheticByKey(state.aesthetic) });
+  const inksFor = entry => P().inksFor(typeof aestheticView === 'function' ? boardTokens(state, view().def) : state, entry.colorway, { tints: !!(entry.params && entry.params.tints) });
+  const suite = () => (typeof blendSuite === 'function' ? blendSuite(view().def) : P().suiteFor(state.aesthetic));
   const famInfo = key => fams.find(f => f.key === key) || P().list().find(f => f.key === key);
   const colorwayLabel = v => (P().E.COLORWAYS.find(c => c.value === v) || {}).label || v;
   const entryOf = (key, params, colorway, seed) => PatternPins.normalize({ key, params, colorway, seed });
@@ -161,9 +163,15 @@ const PatternsUI = (function () {
   const pins = () => (Array.isArray(state.patterns) ? state.patterns : []);
   const curTone = () => (cur && cur.params && cur.params.tone != null ? cur.params.tone : 1);
 
+  // The aesthetic, plus the blend's donor and channels when one is active.
+  function aeSig() {
+    const d = view().def;
+    return d.blend ? d.key + '>' + d.blend.donor.key + ':' + Object.keys(d.blend.channels).filter(c => d.blend.channels[c]).join(',') : d.key;
+  }
+
   function brandSig() {
-    const k = P().inksFor(state, 'brand');
-    return [state.aesthetic, k.ground, k.ink1, k.ink2, k.spark, k.deep].join('|');
+    const k = P().inksFor(typeof aestheticView === 'function' ? boardTokens(state, view().def) : state, 'brand');
+    return [aeSig(), k.ground, k.ink1, k.ink2, k.spark, k.deep].join('|');
   }
 
   /* ---------------- thumbnails (lazy, cached) ---------------- */
@@ -402,7 +410,7 @@ const PatternsUI = (function () {
 
   function buildSuite() {
     const list = suite();
-    const def = aestheticByKey(state.aesthetic);
+    const def = view().def;
     $('ptSuiteFor').textContent = def.name;
     const host = $('ptSuite');
     host.innerHTML = list.map((s, i) => tileHtml('suite', i, s.name, famInfo(s.key).name, colorwayLabel(s.colorway))).join('');
@@ -557,14 +565,15 @@ const PatternsUI = (function () {
   // Brand tokens, fonts and copy for the previews and the colorway chips. Cheap DOM
   // writes only, so it runs on every refresh.
   function applyBrand() {
-    const def = aestheticByKey(state.aesthetic);
+    const def = view().def;
     const t = boardTokens(state, def);
     const copy = effectiveContent();
     const set = (k, v) => root.style.setProperty(k, v);
     set('--pt-canvas', t.canvas); set('--pt-ink', t.ink); set('--pt-muted', t.muted); set('--pt-line', t.line);
     set('--pt-primary', t.primary); set('--pt-on-primary', t.onPrimary);
     set('--pt-accent', t.accent); set('--pt-on-accent', t.onAccent);
-    set('--font-heading', state.headingFont.css); set('--font-body', state.bodyFont.css);
+    const vs = view().state;
+    set('--font-heading', vs.headingFont.css); set('--font-body', vs.bodyFont.css);
     const name = copy.brandName || 'Brand';
     const mark = $('ptIuMark');
     if (state.logoDataUrl) mark.innerHTML = `<img src="${state.logoDataUrl}" alt="" />`;
@@ -634,11 +643,11 @@ const PatternsUI = (function () {
     if (!root) return;
     if (!built) build();
     applyBrand();
-    const aestheticChanged = lastAesthetic !== state.aesthetic;
+    const aestheticChanged = lastAesthetic !== aeSig();
     const sig = brandSig();
     const pinSig = pins().map(PatternPins.fullSig).join('\n');
     if (aestheticChanged) {
-      lastAesthetic = state.aesthetic;
+      lastAesthetic = aeSig();
       buildSuite();
       const keep = cur && !pristine;
       if (!cur) { const s = suite()[0]; setCurrent(entryOf(s.key, Object.assign(P().defaults(s.key), s.params), s.colorway, SUITE_SEED), 0); }

@@ -36,6 +36,9 @@ const FONTS = [
   { name: 'Literata', css: '"Literata", Georgia, serif', category: 'serif', weights: '400;600', ital: '400', cls: 'text-serif' },
   { name: 'Gloock', css: '"Gloock", Georgia, serif', category: 'serif', weights: '400', cls: 'soft-serif' },
   { name: 'Fraunces', css: '"Fraunces", Georgia, serif', category: 'serif', weights: '400;600;900', ital: '400', cls: 'soft-serif' },
+  { name: 'Shippori Mincho', css: '"Shippori Mincho", Georgia, serif', category: 'serif', weights: '400;600', cls: 'text-serif' },
+  { name: 'IM Fell English', css: '"IM Fell English", Georgia, serif', category: 'serif', weights: '400', ital: '400', cls: 'old-style' },
+  { name: 'Tinos', css: '"Tinos", "Times New Roman", serif', category: 'serif', weights: '400;700', ital: '400', cls: 'text-serif' },
 
   /* ---- Sans-serif ---- */
   { name: 'Inter', css: '"Inter", -apple-system, sans-serif', category: 'sans', weights: '400;500;700', cls: 'neo-grotesk' },
@@ -70,6 +73,10 @@ const FONTS = [
   { name: 'Bricolage Grotesque', css: '"Bricolage Grotesque", -apple-system, sans-serif', category: 'sans', weights: '400;600;800', cls: 'grotesk' },
   { name: 'Fredoka', css: '"Fredoka", -apple-system, sans-serif', category: 'sans', weights: '400;500;600;700', cls: 'rounded' },
   { name: 'Baloo 2', css: '"Baloo 2", -apple-system, sans-serif', category: 'sans', weights: '400;600;800', cls: 'rounded' },
+  { name: 'Source Sans 3', css: '"Source Sans 3", -apple-system, sans-serif', category: 'sans', weights: '300;400;600', cls: 'humanist' },
+  { name: 'Zen Kaku Gothic New', css: '"Zen Kaku Gothic New", -apple-system, sans-serif', category: 'sans', weights: '300;400;500', cls: 'humanist' },
+  { name: 'Overpass', css: '"Overpass", -apple-system, sans-serif', category: 'sans', weights: '400;600;800', cls: 'neo-grotesk' },
+  { name: 'Barlow', css: '"Barlow", -apple-system, sans-serif', category: 'sans', weights: '400;600;700', cls: 'grotesk' },
 
   /* ---- Display ---- */
   { name: 'Bebas Neue', css: '"Bebas Neue", -apple-system, sans-serif', category: 'display', weights: '400', cls: 'condensed' },
@@ -103,6 +110,13 @@ const FONTS = [
   { name: 'Cinzel Decorative', css: '"Cinzel Decorative", Georgia, serif', category: 'display', weights: '400;700', cls: 'deco' },
   { name: 'Barlow Condensed', css: '"Barlow Condensed", -apple-system, sans-serif', category: 'display', weights: '400;600;800', cls: 'condensed' },
   { name: 'Permanent Marker', css: '"Permanent Marker", "Marker Felt", cursive', category: 'display', weights: '400', cls: 'groovy' },
+  { name: 'Patrick Hand', css: '"Patrick Hand", "Marker Felt", cursive', category: 'display', weights: '400', cls: 'hand' },
+  { name: 'Caveat', css: '"Caveat", "Marker Felt", cursive', category: 'display', weights: '400;700', cls: 'hand' },
+  { name: 'Comic Neue', css: '"Comic Neue", "Comic Sans MS", cursive', category: 'display', weights: '400;700', cls: 'hand' },
+  { name: 'Yellowtail', css: '"Yellowtail", cursive', category: 'display', weights: '400', cls: 'script' },
+  { name: 'Federant', css: '"Federant", Georgia, serif', category: 'display', weights: '400', cls: 'deco' },
+  { name: 'Saira Stencil', css: '"Saira Stencil", -apple-system, sans-serif', category: 'display', weights: '400;700', cls: 'techno' },
+  { name: 'Rye', css: '"Rye", Georgia, serif', category: 'display', weights: '400', cls: 'woodtype' },
 
   /* ---- Slab serif ---- */
   { name: 'Roboto Slab', css: '"Roboto Slab", Georgia, serif', category: 'slab', weights: '400;700', cls: 'slab' },
@@ -162,6 +176,9 @@ const FONT_CLASSES = {
   'mono': { label: 'monospace', blurb: 'fixed-width faces' },
   'typewriter': { label: 'typewriter', blurb: 'strike-on typewriter and photocopied-office faces' },
   'blackletter': { label: 'Blackletter', blurb: 'broken-stroke gothic letters with spiked, angular forms' },
+  'hand': { label: 'handwritten', blurb: 'casual hand-lettered and marker faces' },
+  'script': { label: 'script', blurb: 'connected brush and pen scripts' },
+  'woodtype': { label: 'wood type', blurb: 'Tuscan, Western and circus poster wood types' },
 };
 
 // Hand-picked [heading, body] combinations that are known to work. A

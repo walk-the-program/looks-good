@@ -182,10 +182,12 @@ function aibFontUrl(fonts) {
 // picks, avoid list and why (js/aesthetic-meta.js), plus how the brand's current
 // faces fit. Returns [] when the aesthetic has no recommendation.
 function aibTypeRecommendation(state, def) {
-  const meta = typeof aestheticMeta === 'function' ? aestheticMeta(def.key) : null;
+  // A blend whose donor supplies the type recommends the donor's faces (js/blend.js).
+  const metaKey = def.blend && def.blend.typeFrom ? def.blend.typeFrom : def.key;
+  const meta = typeof aestheticMeta === 'function' ? aestheticMeta(metaKey) : null;
   if (!meta || !meta.fonts) return [];
   const f = meta.fonts;
-  const fits = fontFitFor(def.key, state);
+  const fits = fontFitFor(metaKey, state);
   const cls = font => (FONT_CLASSES[font.cls] ? FONT_CLASSES[font.cls].label : font.cls);
   const fitText = (font, fit) => fit === 'match' ? 'fits this aesthetic'
     : fit === 'avoid' ? `is on this aesthetic's avoid list (${cls(font)})`
@@ -402,7 +404,7 @@ function aibPatternLines(state, def) {
     '- Colorways: Brand (the roles above), Mono (ink on canvas), Duotone (primary on canvas), Night (canvas and ink swapped). "+ tints" adds lighter mixes of primary and secondary toward the canvas.',
     '- Never introduce a color a pattern does not get from these roles.', '',
     `### Families that fit ${def.name}`, '');
-  Patterns.suiteFor(def.key).forEach(s => {
+  (typeof blendSuite === 'function' ? blendSuite(def) : Patterns.suiteFor(def.key)).forEach(s => {
     const f = infoOf(s.key);
     if (!f) return;
     const file = typeof Patterns.fileOf === 'function' ? Patterns.fileOf(s.key) : null;
@@ -427,23 +429,28 @@ function aibBrandName(state) {
 
 // "Copy patterns only": the Patterns section on its own, with a one-line preamble so it
 // can be pasted after an existing brief.
-function buildPatternsBrief(state) {
-  const def = aestheticByKey(state.aesthetic);
+// The state and def the brief describes: the base aesthetic, or the blend (js/blend.js).
+function aibView(state) {
+  return typeof aestheticView === 'function' ? aestheticView(state) : { state, def: aestheticByKey(state.aesthetic), blend: null };
+}
+
+function buildPatternsBrief(state0) {
+  const { state, def } = aibView(state0);
   return `Add this Patterns section to the ${aibBrandName(state)} brand brief. Its colors are the CSS custom properties from that brief, and every hex is final.\n\n` +
     aibPatternLines(state, def).join('\n');
 }
 
 // One pattern's block (item i of state.patterns), for the per-item Copy in the cart.
-function buildPatternItemBrief(state, i) {
-  const def = aestheticByKey(state.aesthetic);
+function buildPatternItemBrief(state0, i) {
+  const { state, def } = aibView(state0);
   const items = typeof PatternPins !== 'undefined' ? PatternPins.normalizeList(state.patterns) : [];
   if (!items[i]) return '';
   return `Pattern for the ${aibBrandName(state)} brand brief. Its colors are the CSS custom properties from that brief, and every hex is final.\n\n${AIB_PATTERN_PREAMBLE}\n\n` +
     aibPatternItemLines(state, def, items[i], null, '###').join('\n');
 }
 
-function buildAiBrief(state) {
-  const def = aestheticByKey(state.aesthetic);
+function buildAiBrief(state0) {
+  const { state, def } = aibView(state0);
   const t = boardTokens(state, def);
   const roles = colorRolesFor(state);
   const extras = typeof def.tokens === 'function' ? def.tokens(t) : {};
@@ -459,7 +466,7 @@ function buildAiBrief(state) {
   const cov = k => roles[k].coverage;
 
   /* 1. Title + instruction */
-  push(`# ${brandName} — brand brief for AI builders`, '',
+  push(`# ${brandName} — brand brief for AI builders${def.blend ? ` (${def.name})` : ''}`, '',
     '**Use only the colors, fonts and rules below. Do not introduce new colors, tints, gradients or fonts unless listed here.**',
     '', 'Every color value in this brief is final. If a design needs a color that is not listed, use the nearest listed token instead of inventing one.', '');
 
@@ -473,6 +480,7 @@ function buildAiBrief(state) {
     `- Summary: ${def.summary || ''}`,
     `- Motto: ${def.motto || ''}`,
     `- Mode: ${mode} (canvas is the ${mode} neutral, ink is the ${t.isDark ? 'light' : 'dark'} neutral)`, '');
+  if (def.blend && typeof blendBriefLines === 'function') push(...blendBriefLines(state, def, t));
 
   /* 4. Color tokens */
   push('## Color tokens', '',
@@ -580,10 +588,13 @@ function buildAiBrief(state) {
 
   /* 9. Materials */
   const unresolved = [];
+  // A blend's material channel lists the donor's recipes, filled in from the donor's variables.
+  const matDonor = def.blend && def.blend.channels.material ? def.blend.donor : null;
+  const matExtras = matDonor && typeof blendDonorTokens === 'function' ? blendDonorTokens(matDonor, t) : extras;
   push(`## Materials (${def.labels && def.labels.material ? def.labels.material : def.name})`, '',
     'Surface recipes for this aesthetic with real values filled in. Apply them as written.', '');
   (def.materials || []).forEach(m => {
-    push(`- **${m.name}**: ${aibResolveMaterial(m.css, t, extras, unresolved)}`);
+    push(`- **${m.name}**: ${aibResolveMaterial(m.css, t, matExtras, unresolved)}`);
   });
   if (!(def.materials || []).length) push('- None defined. Use flat fills from the tokens above.');
   if (unresolved.length) console.warn(`buildAiBrief: unresolved material placeholders for ${def.key}: ${unresolved.join(', ')}`);
@@ -607,6 +618,10 @@ function buildAiBrief(state) {
     `/* Derived tokens for the ${mode}-mode ${def.name} aesthetic. Computed, do not edit. */`,
     ':root {', ...derived, '}');
   if (extraLines.length) push('', `/* ${def.name} material variables, referenced by the Materials above. */`, ':root {', ...extraLines, '}');
+  if (matDonor) {
+    const donorLines = Object.keys(matExtras).map(name => `  ${name}: ${String(matExtras[name]).replace(/\s*\n\s*/g, ' ').trim()};`);
+    if (donorLines.length) push('', `/* ${matDonor.name} material variables (the supporting system). Scope them to the surfaces that use its Materials. */`, `.material-${matDonor.key} {`, ...donorLines, '}');
+  }
   push('```', '');
 
   return out.join('\n');

@@ -1,0 +1,295 @@
+/* ---------------------------------------------------------------------
+   38 Naive Doodle — every selector is scoped under .ab[data-ae="naive-doodle"].
+   Cream graph paper, a warm-black wobble line drawn round everything (SVG data URIs
+   built per brand by tokens() in js/aesthetics/naive-doodle.js: --nd-card, --nd-btn,
+   --nd-seg, --nd-line, --nd-squig, --nd-rule, --nd-oval(-fill), --nd-face-on/off,
+   --nd-ring, --nd-tick, --nd-box, --nd-star, --nd-bar, --nd-flag, --nd-ellipse,
+   --nd-arrow, --nd-note-arrow, --nd-sun, --nd-tab), and crayon fills (--nd-c1..3 with
+   hatch --nd-h1..3) sitting a few pixels OFF their outlines. Handwriting (the brand
+   heading face, Patrick Hand by default; Caveat for notes) for headlines, buttons and
+   tabs only; body, values and numbers stay in the tidy sans. Never rotate body text.
+------------------------------------------------------------------------ */
+
+.ab[data-ae="naive-doodle"] {
+  border-radius: 6px;
+  font-synthesis: none;
+  background:
+    linear-gradient(var(--nd-grid) 1px, transparent 1px) 0 0 / 26px 26px,
+    linear-gradient(90deg, var(--nd-grid) 1px, transparent 1px) 0 0 / 26px 26px,
+    var(--ab-canvas);
+  --nd-tilt: 1;
+}
+.ab[data-ae="naive-doodle"] * { font-synthesis: none; }
+
+/* header */
+.ab[data-ae="naive-doodle"] .ab-brand { font-family: var(--ab-font-h); font-weight: 400; letter-spacing: 0; font-size: clamp(18px, 2.3cqw, 23px); }
+.ab[data-ae="naive-doodle"] .ab-mark {
+  width: 36px; height: 36px; border-radius: 0; background: var(--nd-sun) center / 36px 36px no-repeat;
+  color: var(--nd-pencil); font: 400 13px/1 var(--ab-font-h); padding: 1px 0 0 2px;
+}
+.ab[data-ae="naive-doodle"] .ab-tag { letter-spacing: 0.1em; }
+.ab[data-ae="naive-doodle"] .ab-tag b { font-family: var(--ab-font-h); font-size: 1.5em; letter-spacing: 0; text-transform: none; }
+.ab[data-ae="naive-doodle"] .ab-rule { height: 10px; background: var(--nd-rule) 0 50% / 400px 10px repeat-x; }
+
+/* hero: words lettered by hand, one big drawing bleeding off the right edge */
+.ab[data-ae="naive-doodle"] .ab-hero {
+  grid-template-columns: minmax(0, 1.12fr) minmax(0, 1fr); align-items: center;
+  padding: clamp(14px, 2.4cqw, 28px) 0 clamp(20px, 3cqw, 34px);
+}
+.ab[data-ae="naive-doodle"] .ab-kicker {
+  display: inline-block; margin-bottom: 6px !important; font-family: var(--nd-hand); font-weight: 700;
+  font-size: clamp(20px, 2.5cqw, 26px); line-height: 1.1; letter-spacing: 0; text-transform: none;
+  color: var(--ab-ink); transform: rotate(-3deg); transform-origin: left center;
+}
+.ab[data-ae="naive-doodle"] .ab-headline {
+  font-family: var(--ab-font-h); font-weight: 400; letter-spacing: 0; line-height: 1.02;
+  text-wrap: balance; overflow-wrap: normal; word-spacing: 0.04em;
+}
+.ab[data-ae="naive-doodle"] .ndw { display: inline-block; transform: rotate(var(--r, 0deg)); transform-origin: 50% 60%; }
+.ab[data-ae="naive-doodle"] .nd-hl { position: relative; z-index: 0; margin: 0 0.06em; }
+.ab[data-ae="naive-doodle"] .nd-hl::before {
+  content: ""; position: absolute; z-index: -1; left: -0.16em; right: -0.2em; top: 0.12em; bottom: 0.02em;
+  background: var(--nd-h3), var(--nd-c3);
+  border-radius: 0.5em 0.2em 0.45em 0.25em / 0.3em 0.5em 0.25em 0.55em;
+  transform: translate(0.07em, 0.06em) skewX(var(--sk, -3deg)) rotate(-1.5deg);
+}
+.ab[data-ae="naive-doodle"] .nd-hl::after {
+  content: ""; position: absolute; left: -0.05em; right: -0.12em; bottom: -0.2em; height: 0.2em;
+  background: var(--nd-squig) 0 50% / 0.95em 100% repeat-x;
+}
+.ab[data-ae="naive-doodle"] .nd-hl-w { color: var(--nd-pencil); }
+.ab[data-ae="naive-doodle"] .ab-subcopy { margin-top: clamp(18px, 2.4cqw, 26px) !important; max-width: 30em; }
+.ab[data-ae="naive-doodle"] .ab-sub-lead { color: var(--ab-ink); }
+.ab[data-ae="naive-doodle"] .ab-art {
+  justify-self: stretch; max-width: none; aspect-ratio: 1 / 0.94;
+  margin-right: calc(var(--ab-pad) * -1); margin-top: calc(clamp(14px, 2.4cqw, 28px) * -0.5);
+}
+.ab[data-ae="naive-doodle"] .ab-art > svg { display: block; width: 100%; height: 100%; }
+
+/* palette: five crayon scribbles, each coloured in a little outside its own outline */
+.ab[data-ae="naive-doodle"] .ab-palette { padding-top: clamp(22px, 3cqw, 30px); }
+.ab[data-ae="naive-doodle"] .ab-label { font-family: var(--ab-font-h); font-size: 18px; letter-spacing: 0; text-transform: none; color: var(--ab-ink); }
+.ab[data-ae="naive-doodle"] .ab-labelrow > .ab-label:last-child:not(:first-child) { font-family: var(--nd-hand); font-size: 20px; font-weight: 700; color: var(--ab-muted); }
+.ab[data-ae="naive-doodle"] .ab-swatches { gap: clamp(12px, 2.4cqw, 24px); }
+.ab[data-ae="naive-doodle"] .ab-chip {
+  position: relative; height: clamp(46px, 6.4cqw, 64px); margin: 4px 6px 14px 0; box-shadow: none;
+  background: var(--sw) !important;
+  background-image: repeating-linear-gradient(-45deg, rgba(31, 27, 22, 0.13) 0 1.5px, transparent 1.5px 3.6px) !important;
+  border-radius: 22px 12px 26px 14px / 14px 24px 12px 22px;
+  transform: translate(5px, 4px) rotate(-1deg);
+}
+.ab[data-ae="naive-doodle"] .ab-swatch:nth-child(2n) .ab-chip { border-radius: 12px 26px 14px 22px / 22px 12px 24px 14px; transform: translate(-3px, 5px) rotate(1.2deg); }
+.ab[data-ae="naive-doodle"] .ab-chip::after {
+  content: ""; position: absolute; inset: -4px -2px -2px -4px; transform: translate(-6px, -5px) rotate(1deg);
+  background: var(--nd-btn) 0 0 / 100% 100% no-repeat;
+}
+.ab[data-ae="naive-doodle"] .ab-swatch[data-role="canvas"] .ab-chip { background-image: none !important; }
+.ab[data-ae="naive-doodle"] .ab-sw-role { font-family: var(--ab-font-h); font-weight: 400; font-size: 19px; }
+
+/* type block */
+.ab[data-ae="naive-doodle"] .ab-type-col { border-top: 0; background: var(--nd-rule) 0 0 / 400px 10px repeat-x; padding-top: 18px; }
+.ab[data-ae="naive-doodle"] .ab-type-role { font-family: var(--ab-font-h); font-size: 17px; letter-spacing: 0; text-transform: none; color: var(--ab-ink); }
+.ab[data-ae="naive-doodle"] .ab-fit {
+  border: 0; border-radius: 0; padding: 4px 12px; background: var(--nd-ellipse) center / 100% 100% no-repeat;
+  font-family: var(--ab-font-h); font-weight: 400; font-size: 15px; color: var(--ab-ink);
+}
+.ab[data-ae="naive-doodle"] .ab-fit[data-fit="avoid"] { background: var(--nd-ellipse) center / 100% 100% no-repeat; color: var(--ab-ink); text-decoration: line-through 2px; }
+.ab[data-ae="naive-doodle"] .ab-type-k { font-family: var(--ab-font-h); font-size: 16px; letter-spacing: 0; text-transform: none; }
+.ab[data-ae="naive-doodle"] .ab-type-apply {
+  border: 0; border-radius: 0; padding: 11px 20px; background: var(--nd-btn) 0 0 / 100% 100% no-repeat;
+  font-family: var(--ab-font-h); font-weight: 400; font-size: 17px;
+}
+.ab[data-ae="naive-doodle"] .ab-type-apply:hover { background: var(--nd-btn) 0 0 / 100% 100% no-repeat, linear-gradient(var(--nd-wash), var(--nd-wash)) 6px 6px / calc(100% - 10px) calc(100% - 10px) no-repeat; }
+
+/* sections: tabs lettered by hand, cards a touch askew */
+.ab[data-ae="naive-doodle"] .ab-sections { gap: clamp(34px, 5cqw, 52px) clamp(28px, 5cqw, 52px); }
+.ab[data-ae="naive-doodle"] .ab-sec { position: relative; }
+.ab[data-ae="naive-doodle"] .ab-sec .ab-labelrow { margin-bottom: 18px; }
+.ab[data-ae="naive-doodle"] .ab-sec .ab-label { font-size: 21px; display: inline-flex; align-items: center; gap: 8px; }
+.ab[data-ae="naive-doodle"] .ab-n {
+  display: inline-grid; place-items: center; width: 38px; height: 30px; font-size: 16px; color: var(--ab-ink);
+  background: var(--nd-tab) center / 100% 100% no-repeat;
+}
+.ab[data-ae="naive-doodle"] .ab-n::after { content: none; }
+
+.ab[data-ae="naive-doodle"] .ab-card,
+.ab[data-ae="naive-doodle"] .ab-panel {
+  position: relative; isolation: isolate; border-radius: 0; background: transparent;
+  padding: clamp(20px, 3cqw, 30px) clamp(20px, 3cqw, 30px) clamp(22px, 3.2cqw, 32px);
+}
+.ab[data-ae="naive-doodle"] .ab-card { transform: rotate(calc(-0.6deg * var(--nd-tilt))); }
+.ab[data-ae="naive-doodle"] .ab-panel { transform: rotate(calc(0.45deg * var(--nd-tilt))); }
+.ab[data-ae="naive-doodle"] .ab-card::before,
+.ab[data-ae="naive-doodle"] .ab-panel::before {
+  content: ""; position: absolute; z-index: -2; inset: 9px -8px -9px 10px;
+  border-radius: 26px 16px 30px 18px / 18px 28px 16px 26px; background: var(--nd-wash);
+}
+.ab[data-ae="naive-doodle"] .ab-panel::before { inset: 10px 9px -10px -9px; background: transparent; }
+.ab[data-ae="naive-doodle"] .ab-card::after,
+.ab[data-ae="naive-doodle"] .ab-panel::after {
+  content: ""; position: absolute; z-index: -1; inset: 0; pointer-events: none;
+  background: var(--nd-card) 0 0 / 100% 100% no-repeat;
+}
+/* corner doodle: a star breaking the card's top-right edge */
+.ab[data-ae="naive-doodle"] .ab-sec-ui .ab-labelrow::after {
+  content: ""; position: absolute; right: -14px; top: 34px; width: 42px; height: 42px; z-index: 3;
+  background: var(--nd-star) center / contain no-repeat; transform: rotate(12deg);
+}
+/* one annotation: a note with a loop arrow pointing back at the main action */
+.ab[data-ae="naive-doodle"] .ab-sec-ui { padding-bottom: 54px; }
+.ab[data-ae="naive-doodle"] .ab-sec-ui::after {
+  content: "this one!"; position: absolute; right: 4px; bottom: 0; padding: 18px 0 0 62px;
+  font: 700 25px/1 var(--nd-hand); color: var(--ab-ink); transform: rotate(-4deg);
+  background: var(--nd-note-arrow) 0 0 / 58px 36px no-repeat;
+}
+
+/* segmented control: a row of boxes sharing crooked walls */
+.ab[data-ae="naive-doodle"] .ab-seg {
+  gap: 0; padding: 4px 3px; border-radius: 0; background: var(--nd-seg) 0 0 / 100% 100% no-repeat;
+}
+.ab[data-ae="naive-doodle"] .ab-seg-btn {
+  position: relative; isolation: isolate; min-height: 40px; border-radius: 0;
+  font-family: var(--ab-font-h); font-size: 17px; line-height: 1; color: var(--ab-ink);
+}
+.ab[data-ae="naive-doodle"] .ab-seg-btn[aria-pressed="true"] { color: var(--nd-pencil); font-weight: 400; }
+.ab[data-ae="naive-doodle"] .ab-seg-btn[aria-pressed="true"]::before {
+  content: ""; position: absolute; z-index: -1; inset: 4px 3px 2px 6px;
+  border-radius: 12px 6px 14px 8px / 8px 14px 6px 12px; background: var(--nd-h2), var(--nd-c2);
+  transform: rotate(-1.2deg);
+}
+.ab[data-ae="naive-doodle"] .ab-seg-btn[aria-pressed="true"]::after {
+  content: ""; position: absolute; right: -4px; top: -10px; width: 20px; height: 20px;
+  background: var(--nd-star) center / contain no-repeat;
+}
+.ab[data-ae="naive-doodle"] .ab-card-title {
+  margin: 26px 0 8px !important; font-family: var(--ab-font-h); font-weight: 400; letter-spacing: 0;
+  font-size: clamp(25px, 3.2cqw, 32px); line-height: 1.05;
+}
+.ab[data-ae="naive-doodle"] .ab-card-body { color: var(--ab-muted); font-size: 14px; }
+
+/* main action: outline on top, the crayon fill offset beneath it */
+.ab[data-ae="naive-doodle"] .ab-cta {
+  position: relative; isolation: isolate; min-height: 50px; padding: 13px 22px 13px 20px; border-radius: 0;
+  background: transparent; color: var(--nd-pencil);
+  font-family: var(--ab-font-h); font-weight: 400; font-size: 19px; line-height: 1;
+}
+.ab[data-ae="naive-doodle"] .ab-cta::before {
+  content: ""; position: absolute; z-index: -1; inset: 4px -6px -6px 5px;
+  border-radius: 20px 14px 22px 12px / 14px 22px 12px 20px; background: var(--nd-h1), var(--nd-c1);
+  transition: inset 0.16s ease-out;
+}
+.ab[data-ae="naive-doodle"] .ab-cta::after {
+  content: ""; position: absolute; z-index: 1; inset: -11px -13px; pointer-events: none;
+  background: var(--nd-btn) center / calc(100% - 26px) calc(100% - 22px) no-repeat;
+}
+.ab[data-ae="naive-doodle"] .ab-cta:hover::before,
+.ab[data-ae="naive-doodle"] .ab-cta.is-hover::before { inset: 3px 2px 2px 3px; }
+.ab[data-ae="naive-doodle"] .ab-cta:active::before,
+.ab[data-ae="naive-doodle"] .ab-cta.is-pressed::before { inset: 3px 2px 2px 3px; }
+.ab[data-ae="naive-doodle"] .ab-cta:active::after,
+.ab[data-ae="naive-doodle"] .ab-cta.is-pressed::after {
+  background: var(--nd-btn) center / calc(100% - 26px) calc(100% - 22px) no-repeat, var(--nd-ring) 0 0 / 100% 100% no-repeat;
+}
+.ab[data-ae="naive-doodle"] .ab-cta:focus-visible { outline: none; }
+.ab[data-ae="naive-doodle"] .ab-cta:focus-visible::after { background: var(--nd-btn) center / calc(100% - 26px) calc(100% - 22px) no-repeat, var(--nd-squig) 50% 100% / 120px 12px no-repeat; }
+.ab[data-ae="naive-doodle"] .ab-cta-arrow { flex: none; width: 34px; height: 16px; background: var(--nd-arrow) center / contain no-repeat; }
+.ab[data-ae="naive-doodle"] .ab-cta-arrow::before { content: none; }
+
+/* 02 Crayon: underline field, oval toggle with a face, the three button states */
+.ab[data-ae="naive-doodle"] .ab-fieldlabel { font-family: var(--ab-font-h); font-size: 18px; margin-bottom: 2px; color: var(--ab-ink); }
+.ab[data-ae="naive-doodle"] .ab-input,
+.ab[data-ae="naive-doodle"].ab .ab-input {
+  border: 0; border-radius: 0; padding: 8px 2px 12px; margin-bottom: 18px;
+  background: var(--nd-line) 0 100% / 100% 10px no-repeat; font-size: 16px; color: var(--ab-ink);
+}
+.ab[data-ae="naive-doodle"].ab .ab-input:focus { background: var(--nd-squig) 0 100% / 60px 12px repeat-x; }
+.ab[data-ae="naive-doodle"] .ab-toggle { font-family: var(--ab-font-h); font-size: 18px; }
+.ab[data-ae="naive-doodle"] .ab-switch {
+  width: 74px; height: 40px; border-radius: 0; background: var(--nd-oval) 0 0 / 100% 100% no-repeat;
+  transition: none;
+}
+.ab[data-ae="naive-doodle"] .ab-switch:checked { background: var(--nd-oval) 0 0 / 100% 100% no-repeat, var(--nd-oval-fill) 0 0 / 100% 100% no-repeat; }
+.ab[data-ae="naive-doodle"] .ab-switch::before {
+  left: 4px; top: 3px; width: 34px; height: 34px; border-radius: 0; background: var(--nd-face-off) center / 34px 34px no-repeat;
+  transition: transform 0.18s ease-out;
+}
+.ab[data-ae="naive-doodle"] .ab-switch:checked::before { transform: translateX(32px) rotate(8deg); background-image: var(--nd-face-on); }
+.ab[data-ae="naive-doodle"] .ab-switch:focus-visible { outline: none; background: var(--nd-oval) 0 0 / 100% 100% no-repeat, var(--nd-squig) 50% 100% / 60px 8px no-repeat; }
+.ab[data-ae="naive-doodle"] .ab-status { font-family: var(--nd-hand); font-size: 20px; font-weight: 700; color: var(--ab-muted); }
+.ab[data-ae="naive-doodle"] .ab-states[data-kind="button"] { gap: 18px; margin-top: 26px; }
+.ab[data-ae="naive-doodle"] .ab-state-ctl { min-height: 44px; padding: 10px 8px; font-size: 17px; justify-content: center; }
+.ab[data-ae="naive-doodle"] .ab-state { position: relative; }
+.ab[data-ae="naive-doodle"] .ab-state-name { display: block; margin-top: 8px; font-family: var(--ab-font-h); font-size: 16px; color: var(--ab-ink); }
+
+/* 03 In use: hand checkboxes, circled status, a bar being coloured in, a flag at the end */
+.ab[data-ae="naive-doodle"] .ab-row { border-top: 0; padding: 16px 2px 14px; background: var(--nd-rule) 0 0 / 400px 10px repeat-x; font-size: 14px; }
+.ab[data-ae="naive-doodle"] .ab-row:last-child { border-bottom: 0; box-shadow: none; }
+.ab[data-ae="naive-doodle"] .ab-list { padding-bottom: 10px; background: var(--nd-rule) 0 100% / 400px 10px repeat-x; }
+.ab[data-ae="naive-doodle"] .ab-row-n {
+  width: 28px; height: 28px; font-size: 0; color: transparent; background: var(--nd-box) center / 28px 28px no-repeat;
+}
+.ab[data-ae="naive-doodle"] .ab-row:first-child .ab-row-n { background: var(--nd-tick) 8px 0 / 24px 24px no-repeat, var(--nd-box) center / 28px 28px no-repeat; }
+.ab[data-ae="naive-doodle"] .ab-row-name { font-weight: 500; font-size: 15px; }
+.ab[data-ae="naive-doodle"] .ab-row-status {
+  padding: 6px 16px 7px; border-radius: 0; background: var(--nd-ellipse) center / 100% 100% no-repeat;
+  font-family: var(--ab-font-h); font-size: 16px; line-height: 1; color: var(--ab-ink);
+}
+.ab[data-ae="naive-doodle"] .ab-row-bar {
+  position: relative; height: 18px; border-radius: 0; overflow: visible; background: var(--nd-bar) 0 0 / 100% 100% no-repeat;
+}
+.ab[data-ae="naive-doodle"] .ab-row-bar i {
+  position: relative; height: 10px; margin: 4px 0 0 4px; max-width: calc(100% - 8px);
+  border-radius: 6px 3px 7px 3px; background: var(--nd-h2), var(--nd-c2); transform: translate(2px, 1px) rotate(-0.6deg);
+}
+.ab[data-ae="naive-doodle"] .ab-row-bar i::after {
+  content: ""; position: absolute; right: -9px; top: -22px; width: 17px; height: 24px;
+  background: var(--nd-flag) center / contain no-repeat;
+}
+.ab[data-ae="naive-doodle"] .ab-row-pct { font-family: var(--ab-font-h); font-size: 18px; }
+
+/* footer */
+.ab[data-ae="naive-doodle"] .ab-foot { border-top: 0; padding-top: 22px; background: var(--nd-rule) 0 0 / 400px 10px repeat-x; font-size: 12px; }
+.ab[data-ae="naive-doodle"] .ab-motto { display: inline-flex; align-items: center; font-family: var(--ab-font-h); font-size: 19px; color: var(--ab-ink); letter-spacing: 0; text-transform: none; }
+.ab[data-ae="naive-doodle"] .ab-dot { width: 26px; height: 26px; border-radius: 0; background: var(--nd-sun) center / contain no-repeat; }
+.ab[data-ae="naive-doodle"] .ab-infl { align-self: center; }
+
+/* narrow: the drawing first full-width above the words, cards straight */
+@container ab (max-width: 600px) {
+  .ab[data-ae="naive-doodle"] { --nd-tilt: 0.5; }
+  .ab[data-ae="naive-doodle"] .ab-hero { grid-template-columns: minmax(0, 1fr); gap: 4px; padding-top: 6px; }
+  .ab[data-ae="naive-doodle"] .ab-art { order: -1; justify-self: stretch; max-width: none; aspect-ratio: 1 / 0.86; margin: 0 calc(var(--ab-pad) * -1) 0 0; }
+  .ab[data-ae="naive-doodle"] .ab-headline { font-size: calc(clamp(40px, 15cqw, 64px) * var(--ab-hl-scale, 1) * var(--ab-hs, 1)); }
+  .ab[data-ae="naive-doodle"] .ab-swatch { grid-template-columns: 80px minmax(0, 1fr); }
+  .ab[data-ae="naive-doodle"] .ab-chip { height: 46px; margin: 2px 10px 6px 0; }
+  .ab[data-ae="naive-doodle"] .ab-sec-ui::after { right: 0; font-size: 22px; }
+  .ab[data-ae="naive-doodle"] .ab-sec-ui .ab-labelrow::after { right: -6px; width: 34px; height: 34px; }
+  .ab[data-ae="naive-doodle"] .ab-row-bar i::after { display: none; }
+}
+
+/* deck */
+.ab[data-ae="naive-doodle"].ab-slide .ab-deck-cell,
+.ab[data-ae="naive-doodle"].ab-slide .ab-deck-app,
+.ab[data-ae="naive-doodle"].ab-slide .ab-deck-ctacard,
+.ab[data-ae="naive-doodle"].ab-slide .ab-deck-stage[data-stage="pattern"] {
+  border: 0; border-radius: 0; background: var(--nd-card) 0 0 / 100% 100% no-repeat; overflow: visible;
+}
+.ab[data-ae="naive-doodle"].ab-slide .ab-deck-side { border-right: 0; background: var(--nd-wash); border-radius: 26px 10px 18px 30px / 18px 30px 10px 26px; margin: 10px 0 10px 10px; }
+.ab[data-ae="naive-doodle"].ab-slide .ab-deck-nav.is-on { background: transparent; box-shadow: none; background: var(--nd-ellipse) center / 100% 100% no-repeat; }
+.ab[data-ae="naive-doodle"].ab-slide .ab-deck-principle,
+.ab[data-ae="naive-doodle"].ab-slide .ab-deck-scale,
+.ab[data-ae="naive-doodle"].ab-slide .ab-deck-face,
+.ab[data-ae="naive-doodle"].ab-slide .ab-deck-mat,
+.ab[data-ae="naive-doodle"].ab-slide .ab-deck-row { border-top: 0; background: var(--nd-rule) 0 0 / 400px 10px repeat-x; }
+.ab[data-ae="naive-doodle"].ab-slide .ab-deck-principle:last-child,
+.ab[data-ae="naive-doodle"].ab-slide .ab-deck-mat:last-child,
+.ab[data-ae="naive-doodle"].ab-slide .ab-deck-row:last-child { border-bottom: 0; }
+.ab[data-ae="naive-doodle"].ab-slide .ab-deck-ptitle { font-family: var(--ab-font-h); font-weight: 400; font-size: 31px; letter-spacing: 0; }
+.ab[data-ae="naive-doodle"].ab-slide .ab-deck-rpct { font-weight: 400; }
+.ab[data-ae="naive-doodle"].ab-slide .ab-card,
+.ab[data-ae="naive-doodle"].ab-slide .ab-panel { transform: none; }
+.ab[data-ae="naive-doodle"].ab-slide .ab-sec-ui::after { content: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  .ab[data-ae="naive-doodle"] .ab-cta::before,
+  .ab[data-ae="naive-doodle"] .ab-switch::before { transition: none; }
+}

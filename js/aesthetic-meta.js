@@ -24,9 +24,9 @@ const AESTHETIC_FAMILIES = [
   { key: 'luminous', label: 'Luminous' },
 ];
 
-// Avoid lists may use two pseudo classes that are not a FONTS `cls`:
-// 'serif' (every serif-ish class below) and 'script' (the library has none yet).
-const AESTHETIC_SERIF_CLASSES = ['didone', 'old-style', 'text-serif', 'soft-serif', 'deco', 'slab', 'blackletter'];
+// Avoid lists may use one pseudo class that is not a FONTS `cls`:
+// 'serif' (every serif-ish class below). 'script' is a real class since round 6.
+const AESTHETIC_SERIF_CLASSES = ['didone', 'old-style', 'text-serif', 'soft-serif', 'deco', 'slab', 'blackletter', 'woodtype'];
 
 const AESTHETIC_META = {
   'soft-form': {
@@ -412,6 +412,130 @@ const AESTHETIC_META = {
       pairings: [['Inter Tight', 'Inter'], ['Bodoni Moda', 'Inter'], ['Archivo', 'Public Sans']],
     },
   },
+  'frutiger-aero': {
+    family: 'luminous',
+    fonts: {
+      heading: { classes: ['humanist', 'geometric'], picks: ['Source Sans 3', 'Nunito Sans', 'Figtree'] },
+      body: { classes: ['humanist'], picks: ['Source Sans 3', 'Nunito Sans'] },
+      avoid: ['serif', 'condensed', 'heavy', 'pixel', 'typewriter', 'hand'],
+      why: 'A friendly humanist sans in light weights is the face of 2000s tech optimism, and it lets the gloss do the talking.',
+      pairings: [['Source Sans 3', 'Source Sans 3'], ['Figtree', 'Nunito Sans'], ['Nunito Sans', 'Source Sans 3']],
+    },
+  },
+  'naive-doodle': {
+    family: 'graphic',
+    fonts: {
+      heading: { classes: ['hand', 'rounded'], picks: ['Patrick Hand', 'Caveat', 'Fredoka', 'Baloo 2'] },
+      body: { classes: ['geometric', 'humanist'], picks: ['DM Sans', 'Nunito Sans'] },
+      avoid: ['didone', 'deco', 'techno', 'blackletter', 'condensed', 'mono'],
+      why: 'A readable hand for headlines and a tidy sans for everything else keep the charm without hurting legibility.',
+      pairings: [['Patrick Hand', 'DM Sans'], ['Fredoka', 'Nunito Sans'], ['Caveat', 'DM Sans']],
+    },
+  },
+  'wabi-sabi': {
+    family: 'tactile',
+    fonts: {
+      heading: { classes: ['text-serif', 'old-style'], picks: ['Shippori Mincho', 'Cormorant Garamond', 'EB Garamond'] },
+      body: { classes: ['humanist'], picks: ['Zen Kaku Gothic New', 'Figtree'] },
+      avoid: ['heavy', 'condensed', 'groovy', 'pixel', 'techno', 'rounded', 'hand'],
+      why: 'A sharp mincho serif with a light gothic sans reads calm and crafted, and neither ever raises its voice.',
+      pairings: [['Shippori Mincho', 'Zen Kaku Gothic New'], ['Cormorant Garamond', 'Zen Kaku Gothic New'], ['EB Garamond', 'Figtree']],
+    },
+  },
+  'dark-academia': {
+    family: 'print',
+    fonts: {
+      heading: { classes: ['old-style', 'didone'], picks: ['IM Fell English', 'Cormorant Garamond', 'Libre Caslon Text', 'Playfair Display'] },
+      body: { classes: ['old-style'], picks: ['EB Garamond', 'Crimson Pro', 'Libre Caslon Text'] },
+      mono: { picks: ['Courier Prime'] },
+      avoid: ['geometric', 'rounded', 'techno', 'pixel', 'groovy', 'wide', 'blackletter'],
+      why: 'Old-style book faces with a little printing irregularity make every screen feel like a page from the stacks.',
+      pairings: [['IM Fell English', 'EB Garamond'], ['Cormorant Garamond', 'Crimson Pro'], ['Playfair Display', 'Libre Caslon Text']],
+    },
+  },
+  'mid-century': {
+    family: 'graphic',
+    fonts: {
+      heading: { classes: ['geometric', 'script', 'slab'], picks: ['Jost', 'Josefin Sans', 'Yellowtail', 'Alfa Slab One'] },
+      body: { classes: ['geometric'], picks: ['Jost', 'DM Sans'] },
+      avoid: ['techno', 'pixel', 'blackletter', 'mono', 'condensed', 'didone'],
+      why: 'A Futura-style geometric with one brush-script word is the signature 1950s pairing.',
+      pairings: [['Jost', 'DM Sans'], ['Yellowtail', 'Jost'], ['Josefin Sans', 'Karla']],
+    },
+  },
+  'art-nouveau': {
+    family: 'print',
+    fonts: {
+      heading: { classes: ['deco', 'soft-serif', 'old-style'], picks: ['Federant', 'Fraunces', 'Marcellus', 'Cormorant Garamond'] },
+      body: { classes: ['old-style'], picks: ['EB Garamond', 'Spectral'] },
+      avoid: ['techno', 'pixel', 'heavy', 'condensed', 'mono', 'geometric'],
+      why: 'Period sign lettering for display and a classic Garamond for text keep ornament in the headings and clarity in the body.',
+      pairings: [['Federant', 'EB Garamond'], ['Fraunces', 'Spectral'], ['Marcellus', 'Cormorant Garamond']],
+    },
+  },
+  'transit-wayfinding': {
+    family: 'graphic',
+    fonts: {
+      heading: { classes: ['neo-grotesk', 'grotesk'], picks: ['Overpass', 'Inter Tight', 'Public Sans', 'Barlow'] },
+      body: { classes: ['neo-grotesk'], picks: ['Overpass', 'Public Sans', 'Inter'] },
+      avoid: ['serif', 'groovy', 'hand', 'script', 'pixel', 'deco'],
+      why: 'Highway-sign and Swiss-descended grotesks are built to be read at a glance from a distance.',
+      pairings: [['Overpass', 'Overpass'], ['Inter Tight', 'Public Sans'], ['Barlow', 'Inter']],
+    },
+  },
+  'gorpcore': {
+    family: 'tactile',
+    fonts: {
+      heading: { classes: ['condensed', 'techno'], picks: ['Barlow Condensed', 'Saira Stencil', 'Big Shoulders Display'] },
+      body: { classes: ['grotesk', 'neo-grotesk'], picks: ['Barlow', 'Inter', 'IBM Plex Sans'] },
+      mono: { picks: ['JetBrains Mono', 'IBM Plex Mono'] },
+      avoid: ['serif', 'groovy', 'script', 'hand', 'deco', 'rounded'],
+      why: 'Condensed and stencil faces with a plain DIN-like body read like gear labels and spec sheets.',
+      pairings: [['Barlow Condensed', 'Barlow'], ['Saira Stencil', 'Inter'], ['Big Shoulders Display', 'IBM Plex Sans']],
+    },
+  },
+  'old-web': {
+    family: 'digital',
+    fonts: {
+      heading: { classes: ['text-serif', 'condensed', 'hand'], picks: ['Tinos', 'Anton', 'Comic Neue'] },
+      body: { classes: ['text-serif'], picks: ['Tinos'] },
+      mono: { picks: ['Courier Prime'] },
+      avoid: ['deco', 'soft-serif', 'didone', 'geometric', 'script', 'blackletter'],
+      why: 'Times body text, an Impact-style headline and one Comic Sans moment are the honest defaults of the 1990s web.',
+      pairings: [['Anton', 'Tinos'], ['Tinos', 'Tinos'], ['Comic Neue', 'Tinos']],
+    },
+  },
+  'big-top': {
+    family: 'graphic',
+    fonts: {
+      heading: { classes: ['woodtype', 'slab', 'didone'], picks: ['Rye', 'Alfa Slab One', 'Abril Fatface'] },
+      body: { classes: ['grotesk', 'slab'], picks: ['Karla', 'Bitter'] },
+      avoid: ['techno', 'pixel', 'mono', 'blackletter', 'hand', 'wide'],
+      why: 'Wood-type display faces carry the showbill, and a plain sans keeps the programme readable.',
+      pairings: [['Rye', 'Karla'], ['Alfa Slab One', 'Bitter'], ['Abril Fatface', 'Karla']],
+    },
+  },
+  'gummy': {
+    family: 'tactile',
+    fonts: {
+      heading: { classes: ['groovy', 'rounded'], picks: ['Bagel Fat One', 'Fredoka', 'Baloo 2'] },
+      body: { classes: ['humanist', 'geometric', 'rounded'], picks: ['Nunito Sans', 'DM Sans', 'Fredoka'] },
+      avoid: ['serif', 'condensed', 'techno', 'blackletter', 'mono', 'typewriter'],
+      why: 'Fat rounded display faces look as soft and squishy as the jelly they sit on.',
+      pairings: [['Bagel Fat One', 'Nunito Sans'], ['Fredoka', 'Fredoka'], ['Baloo 2', 'DM Sans']],
+    },
+  },
+  'curio-cabinet': {
+    family: 'print',
+    fonts: {
+      heading: { classes: ['old-style', 'didone'], picks: ['Libre Caslon Text', 'Bodoni Moda', 'Cormorant Garamond'] },
+      body: { classes: ['text-serif'], picks: ['Newsreader', 'Literata'] },
+      mono: { picks: ['Courier Prime', 'DM Mono'] },
+      avoid: ['heavy', 'techno', 'pixel', 'groovy', 'rounded', 'hand'],
+      why: 'Caslon and typewritten labels make every item look catalogued by hand.',
+      pairings: [['Libre Caslon Text', 'Newsreader'], ['Bodoni Moda', 'Literata'], ['Cormorant Garamond', 'Newsreader']],
+    },
+  },
 };
 
 /* ---------------- helpers ---------------- */
@@ -484,7 +608,7 @@ function fontFitFor(key, state) {
     ['heading', 'body'].forEach(role => {
       (f[role].classes || []).forEach(c => { if (!classes.has(c)) problems.push(`${key}.${role}: unknown class "${c}"`); });
     });
-    (f.avoid || []).forEach(c => { if (!classes.has(c) && c !== 'serif' && c !== 'script') problems.push(`${key}.avoid: unknown class "${c}"`); });
+    (f.avoid || []).forEach(c => { if (!classes.has(c) && c !== 'serif') problems.push(`${key}.avoid: unknown class "${c}"`); });
     [].concat(f.heading.picks, f.body.picks, f.mono ? f.mono.picks : [], ...(f.pairings || []))
       .forEach(n => { if (!names.has(n)) problems.push(`${key}: font "${n}" is not in FONTS`); });
     if (!f.pairings || !f.pairings.length) problems.push(`${key}: no pairings`);

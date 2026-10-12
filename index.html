@@ -45,9 +45,22 @@
 <link rel="stylesheet" href="css/aesthetics/biomechanical-gothic.css" />
 <link rel="stylesheet" href="css/aesthetics/pirate-broadcast.css" />
 <link rel="stylesheet" href="css/aesthetics/dystopian-luxury.css" />
+<link rel="stylesheet" href="css/aesthetics/frutiger-aero.css" />
+<link rel="stylesheet" href="css/aesthetics/naive-doodle.css" />
+<link rel="stylesheet" href="css/aesthetics/wabi-sabi.css" />
+<link rel="stylesheet" href="css/aesthetics/dark-academia.css" />
+<link rel="stylesheet" href="css/aesthetics/mid-century.css" />
+<link rel="stylesheet" href="css/aesthetics/art-nouveau.css" />
+<link rel="stylesheet" href="css/aesthetics/transit-wayfinding.css" />
+<link rel="stylesheet" href="css/aesthetics/gorpcore.css" />
+<link rel="stylesheet" href="css/aesthetics/old-web.css" />
+<link rel="stylesheet" href="css/aesthetics/big-top.css" />
+<link rel="stylesheet" href="css/aesthetics/gummy.css" />
+<link rel="stylesheet" href="css/aesthetics/curio-cabinet.css" />
 <link rel="stylesheet" href="css/brand-deck.css" />
 <link rel="stylesheet" href="css/patterns.css" />
 <link rel="stylesheet" href="css/color-picker.css" />
+<link rel="stylesheet" href="css/blend.css" />
 </head>
 <body data-view="library">
 
@@ -148,6 +161,37 @@
       <div class="panel-body">
         <label class="lock">Lock<input type="checkbox" id="lockAesthetic" /></label>
         <div class="ae-families" id="aeFamilies" role="group" aria-label="Filter aesthetics by family"></div>
+        <!-- Blend with a second aesthetic (js/blend.js, css/blend.css). Hidden when BLEND_ENABLED is false. -->
+        <div class="blend" id="blendCtl" hidden>
+          <div class="blend-head">
+            <span class="blend-title" id="blendTitle">Blend with</span>
+            <button type="button" class="blend-pick" id="blendPick" aria-expanded="false" aria-controls="blendPop" aria-describedby="blendTitle">
+              <span id="blendPickName">None</span>
+              <svg class="ico" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+            </button>
+          </div>
+          <div class="blend-pop" id="blendPop" hidden>
+            <input type="search" id="blendSearch" class="blend-search" placeholder="Search aesthetics" aria-label="Search aesthetics to blend with" autocomplete="off" />
+            <div class="blend-opts" id="blendOpts" role="group" aria-label="Aesthetic to blend with"></div>
+          </div>
+          <div class="blend-body" id="blendBody" hidden>
+            <div class="segmented blend-strength" role="radiogroup" aria-label="Blend strength">
+              <label><input type="radio" name="blendStrength" value="subtle" /> Subtle</label>
+              <label><input type="radio" name="blendStrength" value="balanced" /> Balanced</label>
+              <label><input type="radio" name="blendStrength" value="bold" /> Bold</label>
+            </div>
+            <fieldset class="blend-channels" id="blendChannels">
+              <legend>Donor supplies <span id="blendCustom" class="blend-custom" hidden>· custom</span></legend>
+              <label><input type="checkbox" value="art" /> Art</label>
+              <label><input type="checkbox" value="type" /> Type</label>
+              <label><input type="checkbox" value="color" /> Color</label>
+              <label><input type="checkbox" value="patterns" /> Patterns</label>
+              <label><input type="checkbox" value="material" /> Material</label>
+            </fieldset>
+            <p class="blend-note" id="blendNote" aria-live="polite"></p>
+          </div>
+          <button type="button" id="surpriseBlend" class="btn btn-ghost btn-block">Surprise blend</button>
+        </div>
         <div class="ae-list" id="aeList" role="group" aria-label="Aesthetic"></div>
         <button id="shuffleAesthetic" class="btn btn-ghost btn-block">Shuffle aesthetic</button>
       </div>
@@ -492,8 +536,21 @@
 <script src="js/aesthetics/biomechanical-gothic.js"></script>
 <script src="js/aesthetics/pirate-broadcast.js"></script>
 <script src="js/aesthetics/dystopian-luxury.js"></script>
+<script src="js/aesthetics/frutiger-aero.js"></script>
+<script src="js/aesthetics/naive-doodle.js"></script>
+<script src="js/aesthetics/wabi-sabi.js"></script>
+<script src="js/aesthetics/dark-academia.js"></script>
+<script src="js/aesthetics/mid-century.js"></script>
+<script src="js/aesthetics/art-nouveau.js"></script>
+<script src="js/aesthetics/transit-wayfinding.js"></script>
+<script src="js/aesthetics/gorpcore.js"></script>
+<script src="js/aesthetics/old-web.js"></script>
+<script src="js/aesthetics/big-top.js"></script>
+<script src="js/aesthetics/gummy.js"></script>
+<script src="js/aesthetics/curio-cabinet.js"></script>
 <script src="js/aesthetic-meta.js"></script>
 <script src="js/aesthetic-board.js"></script>
+<script src="js/blend.js"></script>
 <script src="js/patterns/engine.js"></script>
 <script src="js/patterns/families/field.js"></script>
 <script src="js/patterns/families/stripe.js"></script>

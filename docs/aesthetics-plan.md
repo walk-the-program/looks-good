@@ -474,3 +474,10 @@ empty css file; their owners replace `art`, add `tokens`/`canvas` if needed, `ma
 - **Deck "In product" card** (X0-R5.6): `.ab-deck-ctacard` is `color-mix(in srgb, var(--ab-ink) 4%, var(--ab-canvas))`, not the primary tint.
 - **Deck Color slide** (X0-R5.7): renders the board's own `<div class="ab-swatches" data-kind="${layout.palette}">${P.swatches()}</div>` (inside `.ab-deck-sws`), so an aesthetic's `.ab-swatches` / `.ab-swatch` / `.ab-chip` css applies unchanged; the proportion bar and contrast pairs stay below. The old `.ab-deck-sw*` classes are gone.
 - **Deck Interface slide** (X0-R5.8): each component cell holds `.ab-deck-cellbody > .ab-deck-cellzoom` (the part), `zoom: 1.45`; the states row `.ab-deck-uistates` is `zoom: 1.2`; cell min-height 170px; segmented buttons min-width 60px, CTA min-width 150px, toggle gap 16px so the zoomed parts fit a cell. Aesthetics that style the cell body (Pirate Broadcast) keep working: the zoom sits on the inner wrapper.
+
+**Blend hooks (BL, round 6; spec in docs/blend.md):**
+
+- `aestheticView(state)` (js/blend.js) is what the board, deck, Patterns view and brief render: the base def, or a blended copy of it (`def.blend` set, `def.key` still the base). `abView()` / `aibView()` wrap it.
+- `abBoardParts` exposes `P.states()` (the 02 states row) and `P.panelPre()` (empty; markup laid first inside `.ab-panel`), and calls `blendParts(P)` for a blended def. Unblended output is unchanged.
+- Nested donor scopes inside a blended board: `.ab.ab-blend-art` (hero art), `.ab.ab-blend-orn` (02 ornament layer), `.ab.ab-blend-scope` (material samples), each `data-ae="<donor>"`. Aesthetic CSS needs no changes; a donor's `.ab[data-ae] .ab-art ...` rules style its art inside the base's box. Avoid generic descendant rules such as `.ab[data-ae="key"] .ab-art svg { width: 100% }` where a class would do: they also reach a donor's art when this aesthetic is the base.
+- Blended roots carry `data-blend`, `data-blend-ch`, and when used `data-blend-type` / `data-blend-hl`.

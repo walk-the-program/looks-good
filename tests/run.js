@@ -8,7 +8,7 @@ const path = require('path');
 
 const root = path.join(__dirname, '..');
 const ctx = vm.createContext({ console, AESTHETICS: [{ key: 'soft-form' }, { key: 'raw-brutalist' }] });
-for (const f of ['js/data.js', 'js/color.js', 'js/persistence.js', 'js/color-import.js']) {
+for (const f of ['js/data.js', 'js/color.js', 'js/blend.js', 'js/persistence.js', 'js/color-import.js']) {
   vm.runInContext(fs.readFileSync(path.join(root, f), 'utf8'), ctx, { filename: f });
 }
 const run = code => vm.runInContext(code, ctx);
@@ -75,6 +75,67 @@ for (const [name, rec] of Object.entries(partials)) {
     return { colorsOk, paletteOk, font: !!s.headingFont };
   })()`);
   check(`load ${name}: valid palette, scheme and font`, r.colorsOk && r.paletteOk && r.font, JSON.stringify(r));
+}
+
+/* ---- blending two aesthetics (js/blend.js) ---- */
+
+{
+  const r = run(`(() => {
+    const s = freshState();
+    s.blend = { with: 'raw-brutalist', strength: 'balanced', channels: { art: true, type: true, color: false, patterns: true, material: false } };
+    const saved = serializeState(s);
+    const before = JSON.stringify(saved.blend);
+    s.blend.channels.color = true; s.blend.with = 'x';
+    const t = freshState();
+    applySavedSessionToState(JSON.parse(JSON.stringify(saved)), t);
+    return { before, after: JSON.stringify(saved.blend), loaded: JSON.stringify(t.blend) };
+  })()`);
+  check('blend: serialize copies the blend (later edits do not reach the saved copy)', r.before === r.after, r.after);
+  check('blend: a saved blend loads back unchanged', r.loaded === r.before, r.loaded);
+}
+check('blend: brands saved before blends load with null', run(`(() => { const s = freshState(); s.blend = { with: 'raw-brutalist', strength: 'bold' }; applySavedSessionToState({ aestheticKey: 'soft-form' }, s); return s.blend; })()`) === null, 'not null');
+check('blend: unblended state serializes blend: null', run(`serializeState(freshState()).blend`) === null, 'not null');
+const blendCases = {
+  'unknown donor': `{ with: 'no-such-aesthetic', strength: 'bold' }`,
+  'donor equals base': `{ with: 'soft-form', strength: 'bold' }`,
+  'non-boolean channel': `{ with: 'raw-brutalist', strength: 'custom', channels: { art: 'yes' } }`,
+  'channels not an object': `{ with: 'raw-brutalist', channels: [true] }`,
+  'no channel on': `{ with: 'raw-brutalist', channels: { art: false } }`,
+  'no channels, custom strength': `{ with: 'raw-brutalist', strength: 'custom' }`,
+  'a string': `'raw-brutalist'`,
+};
+for (const [name, rec] of Object.entries(blendCases)) {
+  const v = run(`(() => { const s = freshState(); applySavedSessionToState({ aestheticKey: 'soft-form', blend: ${rec} }, s); return s.blend; })()`);
+  check(`blend: invalid (${name}) loads as null`, v === null, JSON.stringify(v));
+}
+{
+  const r = run(`JSON.stringify(normalizeBlend({ with: 'raw-brutalist', strength: 'subtle' }, 'soft-form'))`);
+  check('blend: a named strength without channels takes its preset', r === JSON.stringify({ with: 'raw-brutalist', strength: 'subtle', channels: { art: true, type: false, color: false, patterns: true, material: false } }), r);
+  const c = run(`normalizeBlend({ with: 'raw-brutalist', strength: 'bold', channels: { art: true, material: true } }, 'soft-form').strength`);
+  check('blend: strength is re-derived from the channels (custom)', c === 'custom', c);
+  const b = run(`normalizeBlend({ with: 'raw-brutalist', strength: 'custom', channels: { art: true, type: true, color: true, patterns: true, material: true } }, 'soft-form').strength`);
+  check('blend: channels matching a preset name it', b === 'bold', b);
+}
+// Kill switch: BLEND_ENABLED = false ignores the blend everywhere but keeps saved blends.
+{
+  const off = vm.createContext({ console, AESTHETICS: [{ key: 'soft-form', name: 'Soft Form' }, { key: 'raw-brutalist', name: 'Raw' }], aestheticByKey: k => off.AESTHETICS.find(a => a.key === k) || off.AESTHETICS[0] });
+  for (const f of ['js/data.js', 'js/color.js', 'js/blend.js', 'js/persistence.js']) {
+    let src = fs.readFileSync(path.join(root, f), 'utf8');
+    if (f === 'js/blend.js') {
+      if (!/const BLEND_ENABLED = true;/.test(src)) check('kill switch constant present', false, 'const BLEND_ENABLED = true; not found');
+      src = src.replace('const BLEND_ENABLED = true;', 'const BLEND_ENABLED = false;');
+    }
+    vm.runInContext(src, off, { filename: f });
+  }
+  const r = vm.runInContext(`(() => {
+    const s = { headingFont: FONTS[0], bodyFont: FONTS[1], typography: {}, scheme: 'analogous', hue: 210, colors: generatePalette('analogous', 210),
+      shapePreset: SHAPE_PRESETS[0], bgMode: 'light', logoDataUrl: null, content: {}, aesthetic: 'soft-form', locks: {}, dismissed: [], patterns: [] };
+    applySavedSessionToState({ aestheticKey: 'soft-form', blend: { with: 'raw-brutalist', strength: 'bold' } }, s);
+    const v = aestheticView(s);
+    return { kept: !!s.blend, saved: !!serializeState(s).blend, active: blendActive(s), same: v.def === aestheticByKey('soft-form') && v.state === s };
+  })()`, off);
+  check('kill switch: saved blend loads and saves untouched', r.kept && r.saved, JSON.stringify(r));
+  check('kill switch: blend ignored by the renderers', r.active === null && r.same, JSON.stringify(r));
 }
 
 /* ---- pasting brand colors ---- */

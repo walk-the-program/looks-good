@@ -453,13 +453,36 @@ function bdBodyOverflows(root) {
 // or an aesthetic with a big display scale can outgrow 720px. Shrink --ab-hs
 // (every headline size multiplies it) down to a floor, then let bdScaleToFit
 // take over. The cover has its own pass (bdFitCover).
+// True when a word of el's text is split across two lines (overflow-wrap broke it)
+// or runs past el's right edge: a wide, tracked face can do that without the slide
+// body overflowing.
+function bdTextSpills(el, within, brokenOnly) {
+  if (!el) return false;
+  const box = (within || el).getBoundingClientRect();
+  const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
+  const r = document.createRange();
+  for (let n = walker.nextNode(); n; n = walker.nextNode()) {
+    const re = /\S+/g;
+    let m;
+    while ((m = re.exec(n.nodeValue))) {
+      r.setStart(n, m.index);
+      r.setEnd(n, m.index + m[0].length);
+      const rects = [...r.getClientRects()].filter(q => q.width > 0.5 && q.height > 0.5);
+      if (new Set(rects.map(q => Math.round(q.top))).size > 1) return true;
+      if (!brokenOnly && rects.some(q => q.right > box.right + 2)) return true;
+    }
+  }
+  return false;
+}
+
 function bdFitHeadline(root) {
   if (!root.dataset.hs0) root.dataset.hs0 = root.style.getPropertyValue('--ab-hs') || '1';
   const base = parseFloat(root.dataset.hs0) || 1;
   let hs = base;
   root.style.setProperty('--ab-hs', String(hs));
   const floor = base * 0.5;
-  for (let i = 0; i < 30 && hs > floor && bdBodyOverflows(root); i++) {
+  const h2 = root.querySelector('.ab-deck-h');
+  for (let i = 0; i < 30 && hs > floor && (bdBodyOverflows(root) || bdTextSpills(h2)); i++) {
     hs *= 0.94;
     root.style.setProperty('--ab-hs', hs.toFixed(3));
   }
@@ -488,6 +511,8 @@ function bdCoverCopyFits(root) {
   const copy = root.querySelector('.ab-hero-copy');
   if (!copy) return true;
   if (copy.scrollWidth > copy.clientWidth + 1 && !bdCopyTextInside(copy)) return false;
+  // A word broken across lines (a wide or tracked face) does not fit either.
+  if (bdTextSpills(copy.querySelector('.ab-headline'), null, true)) return false;
   // Scene hero: the copy is laid over the art, so it has to stay inside it.
   const art = root.querySelector('.ab-hero .ab-art');
   if (root.dataset.hero === 'scene' && art) {
@@ -593,6 +618,12 @@ function bdFitCover(root) {
     fs = Math.max(BD_COVER_MIN_PX, fs * 0.96);
     setFs(fs);
   }
+  // 1b. a word still broken at the 64px floor (a very wide or tracked face): give
+  //     up the floor before breaking a word, never below 40px.
+  for (let i = 0; i < 20 && fs > BD_COVER_EMERGENCY_PX && bdTextSpills(hl, null, true); i++) {
+    fs = Math.max(BD_COVER_EMERGENCY_PX, fs * 0.96);
+    setFs(fs);
+  }
   // 2. too tall for the 0.85 floor: shrink the headline, but only down to a
   //    statement size, then the art box in 8% steps (the scene hero's copy
   //    sits inside the art, so there it is left alone), then the headline on to 64px.
@@ -683,9 +714,16 @@ function bdFitSamples(root) {
   root.querySelectorAll('.ab-deck-scale[data-face="h"] .ab-deck-sample').forEach(el => {
     const fs0 = parseFloat(el.style.getPropertyValue('--dk-fs')) || 32;
     let fs = fs0;
-    for (let i = 0; i < 12 && el.scrollWidth > el.clientWidth + 1; i++) {
+    el.style.removeProperty('font-size');
+    // An aesthetic's own .ab-headline size can outrank --dk-fs; then shrink from the
+    // size actually shown, inline.
+    const shown = parseFloat(getComputedStyle(el).fontSize) || fs0;
+    const pinned = Math.abs(shown - fs0) > 0.5;
+    if (pinned) fs = shown;
+    for (let i = 0; i < 12 && (el.scrollWidth > el.clientWidth + 1 || bdTextSpills(el, el.closest('.ab-deck-scale'))); i++) {
       fs *= 0.93;
       el.style.setProperty('--dk-fs', fs.toFixed(1) + 'px');
+      if (pinned) el.style.setProperty('font-size', fs.toFixed(1) + 'px', 'important');
     }
     // The label states the size that is actually shown.
     const note = fs < fs0 && el.closest('.ab-deck-scale').querySelector('.ab-label i');
@@ -747,6 +785,7 @@ function bdFitBrandName(root) {
 function bdFitDeck(grid) {
   grid.querySelectorAll('.ab-slide').forEach(root => {
     const key = root.dataset.slide;
+    if (root.dataset.blend && typeof blendFitArt === 'function') blendFitArt(root);   // js/blend.js
     bdLegibleHeadings(root);
     bdMinText(root);
     bdFitBrandName(root);
@@ -764,6 +803,8 @@ function bdFitDeck(grid) {
       bdScaleToFit(root);
     }
     bdBleedBands(root);
+    // A blend's donor art never runs its captions under the base's copy (js/blend.js).
+    if (root.dataset.blend && typeof blendClearArtText === 'function') blendClearArtText(root);
   });
 }
 
@@ -806,9 +847,11 @@ function renderBrandDeckNow() {
   const grid = document.getElementById('deckGrid');
   if (!grid) return;
   bdDirty = false;
-  const def = aestheticByKey(state.aesthetic);
+  // The base aesthetic, or the blend of base and donor (js/blend.js, via abView).
+  const view = abView();
+  const def = view.def;
   setBoardFonts(grid);
-  const s = Object.assign({}, state, { content: effectiveContent() });
+  const s = Object.assign({}, view.state, { content: effectiveContent() });
   const slides = DECK_SLIDES;
   grid.innerHTML = slides.map((slide, i) => bdCardHtml(s, def, slide, i, slides.length)).join('');
   bdBuilt = true;

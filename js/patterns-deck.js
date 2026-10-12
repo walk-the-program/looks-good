@@ -41,7 +41,8 @@
   };
 
   function suiteEntries(def) {
-    return P.suiteFor(def.key).map(s => {
+    // A blended def (js/blend.js) interleaves the base and donor suites.
+    return (typeof blendSuite === 'function' ? blendSuite(def) : P.suiteFor(def.key)).map(s => {
       const en = PatternPins.normalize({
         key: s.key, params: Object.assign(P.defaults(s.key), s.params), colorway: s.colorway, seed: PatternPins.SUITE_SEED,
       });

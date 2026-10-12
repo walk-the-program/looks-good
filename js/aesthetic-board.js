@@ -340,11 +340,15 @@ function abUsingRecommended(state, meta) {
 // rule) when the aesthetic has no entry in js/aesthetic-meta.js. Restyle it per
 // aesthetic with the .ab-type* classes; the block holds no aesthetic logic.
 function abTypeBlockHtml(state, def) {
-  const meta = typeof aestheticMeta === 'function' ? aestheticMeta(def.key) : null;
+  // A blend whose donor supplies the type (js/blend.js) shows the donor's recommendation;
+  // its fonts are already in use, so there is nothing to apply.
+  const fromBlend = !!(def.blend && def.blend.typeFrom);
+  const metaKey = fromBlend ? def.blend.typeFrom : def.key;
+  const meta = typeof aestheticMeta === 'function' ? aestheticMeta(metaKey) : null;
   if (!meta || !meta.fonts) return '';
   const f = meta.fonts;
   const e = escapeHtml;
-  const fits = fontFitFor(def.key, state);
+  const fits = fontFitFor(metaKey, state);
   const picks = names => names.slice(0, 3).map(n => {
     const font = FONTS.find(x => x.name === n);
     return `<li class="ab-type-pick" style="font-family:${font ? e(font.css) : 'inherit'}">${e(n)}</li>`;
@@ -371,9 +375,9 @@ function abTypeBlockHtml(state, def) {
       <div class="ab-type-foot">
         <p class="ab-type-avoid"><span class="ab-type-k">Avoid</span> ${e(abAvoidWords(f.avoid))}</p>
         <p class="ab-type-why">${e(f.why)}</p>
-        <div class="ab-type-act">
-          <button type="button" class="ab-type-apply">Use recommended fonts</button>
-          <span class="ab-type-pair">${e(pair[0])} / ${e(pair[1])}${used ? ' · in use' : ''}</span>
+        <div class="ab-type-act">${fromBlend ? '' : `
+          <button type="button" class="ab-type-apply">Use recommended fonts</button>`}
+          <span class="ab-type-pair">${e(pair[0])} / ${e(pair[1])}${used ? (fromBlend ? ' · from the blend' : ' · in use') : ''}</span>
         </div>
       </div>
     </section>
@@ -493,13 +497,16 @@ function abBoardParts(state, def) {
           <button type="button" class="ab-cta"><span class="ab-cta-label">Save direction</span><span class="ab-cta-arrow" aria-hidden="true"></span></button>
         </div>`;
 
-  // 02 panel: field, toggle, status line, the three states.
-  P.panel = () => `<div class="ab-panel">
+  // 02 panel: field, toggle, status line, the three states. P.panelPre (empty by
+  // default) and P.states are separate so a blend (js/blend.js) can swap them.
+  P.states = () => `<div class="ab-states" data-kind="${statesKind}">${states}</div>`;
+  P.panelPre = () => '';
+  P.panel = () => `<div class="ab-panel">${P.panelPre()}
           <label class="ab-fieldlabel" for="${uid}-f">Project name</label>
           <input class="ab-input" id="${uid}-f" type="text" value="Something good" maxlength="48" autocomplete="off" />
           <label class="ab-toggle" for="${uid}-t"><span>Focus mode</span><input class="ab-switch" id="${uid}-t" type="checkbox" checked /></label>
           <div class="ab-status" aria-live="polite">Focus mode on</div>
-          <div class="ab-states" data-kind="${statesKind}">${states}</div>
+          ${P.states()}
         </div>`;
 
   // 03 list rows.
@@ -520,6 +527,8 @@ function abBoardParts(state, def) {
 
   P.foot = () => `<footer class="ab-foot"><span class="ab-motto"><i class="ab-dot" aria-hidden="true"></i>${e(def.motto)}</span><span class="ab-infl">${e(def.influences)}</span></footer>`;
 
+  // A blended def (js/blend.js) rewires the root attributes and the 02 states.
+  if (def.blend && typeof blendParts === 'function') blendParts(P);
   return P;
 }
 
@@ -554,11 +563,19 @@ function setBoardFonts(el) {
   el.style.setProperty('--font-body', state.bodyFont.css);
 }
 
+// The state and def the board, deck, patterns and brief render: the base aesthetic,
+// or the blend of base and donor when one is active (js/blend.js).
+function abView() {
+  return typeof aestheticView === 'function' ? aestheticView(state) : { state, def: aestheticByKey(state.aesthetic), blend: null };
+}
+
 function renderMainBoard() {
   const host = document.getElementById('previewCard');
   if (!host) return;
   setBoardFonts(host);
-  host.innerHTML = boardHtml(state, aestheticByKey(state.aesthetic));
+  const v = abView();
+  host.innerHTML = boardHtml(v.state, v.def);
+  if (v.def.blend && typeof blendClearArtText === 'function') blendClearArtText(host.firstElementChild);
 }
 
 // Each tile previews its aesthetic in its own recommended mode (def.mode), the
@@ -594,7 +611,7 @@ function fitCompareGrid() {
 }
 
 function renderAestheticBoard() {
-  const def = aestheticByKey(state.aesthetic);
+  const def = abView().def;
   const compare = boardView === 'compare';
   const patterns = boardView === 'patterns';
   const host = document.getElementById('previewCard');
@@ -683,7 +700,8 @@ function syncAestheticChrome(def) {
   const shuffle = document.getElementById('shuffleAesthetic');
   if (shuffle) shuffle.textContent = aeFamily === 'all' ? 'Shuffle aesthetic' : `Shuffle in ${aestheticFamilyLabel(aeFamily)}`;
   document.querySelectorAll('input[name="boardView"]').forEach(r => { r.checked = r.value === boardView; });
-  renderFontRec(def);
+  renderFontRec(def.blend ? def.blend.base : def);
+  if (typeof syncBlendUi === 'function') syncBlendUi();
 }
 
 // Typography panel: one line naming the recommendation and how the current
@@ -766,6 +784,7 @@ function initAestheticUi() {
     if (chip) setAeFamily(chip.dataset.family);
   });
   wireBoardInteractions(document.getElementById('previewCard'));
+  if (typeof initBlendUi === 'function') initBlendUi();
 
   document.getElementById('aeList').addEventListener('click', e => {
     const tile = e.target.closest('.ae-tile');

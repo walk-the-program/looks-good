@@ -16,6 +16,10 @@ function serializeState(state) {
     shapePresetKey: state.shapePreset.key,
     bgMode: state.bgMode,
     aestheticKey: state.aesthetic,
+    // Blend with a second aesthetic (js/blend.js): null or a copy of
+    // { with, strength, channels }. Saved as is even when BLEND_ENABLED is false.
+    blend: state.blend && typeof state.blend === 'object'
+      ? { with: state.blend.with, strength: state.blend.strength, channels: { ...state.blend.channels } } : null,
     logoDataUrl: state.logoDataUrl,
     content: { ...state.content },
     locks: { ...state.locks },
@@ -97,6 +101,10 @@ function applySavedSessionToState(saved, state) {
   if (typeof saved.aestheticKey === 'string' && AESTHETICS.some(a => a.key === saved.aestheticKey)) {
     state.aesthetic = saved.aestheticKey;
   }
+
+  // Restore the blend after the aesthetic: unknown donor, a donor equal to the base,
+  // or malformed channels load as no blend. Brands saved before blends load with null.
+  state.blend = typeof normalizeBlend === 'function' ? normalizeBlend(saved.blend, state.aesthetic) : null;
 
   // Restore locks. Merged onto the defaults so a brand saved before a lock
   // existed (e.g. aesthetic) still has every key.
