@@ -90,7 +90,6 @@ registerAesthetic({
     const uiScale = uiFace && uiFace.name === 'VT323' ? 1.36 : 1;
     const dim = (hex, f) => t.mix('#000000', hex, f);
     return {
-      '--ab-px': '4px',
       '--ab-display': display,
       '--ab-uis': uiScale,
       '--ab-smooth': hPixel ? 'antialiased' : 'none',
@@ -103,10 +102,8 @@ registerAesthetic({
       '--ab-slot': d ? dim(t.canvas, 0.55) : t.mix(t.ink, t.canvas, 0.1),
       '--ab-p-deep': dim(t.primary, 0.58),
       '--ab-p-hi': t.mix('#ffffff', t.primary, 0.3),
-      '--ab-s-deep': dim(t.secondary, 0.58),
       '--ab-a-deep': dim(t.accent, 0.5),
       '--ab-dither': t.alpha(t.ink, d ? 0.07 : 0.08),
-      '--ab-glow': t.alpha(t.primary, 0.5),
       '--ab-hl-soft': t.mix(t.ink, t.canvas, 0.7),
     };
   },

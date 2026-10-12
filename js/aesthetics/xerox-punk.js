@@ -16,9 +16,8 @@
    rubber-stamped statuses, a handwritten set list. The fluoro is one of five Day-Glo inks
    snapped from the client primary (def.printPrimary). The hidden <svg> in art() defines the
    filters the css uses: xpn-torn (fibrous torn edge) and xpn-copy (photocopy threshold). The
-   art also carries a ransom specimen sheet (.xpsp) that only the deck Material slide shows. */
+   deck Material slide gets a ransom specimen sheet via def.deck.materialArt. */
 (function () {
-let seq = 0;
 
 function xpRand(seed) {
   let a = seed >>> 0;
@@ -78,6 +77,12 @@ const XP_MAG = ['Playfair Display', 'Libre Caslon Text', 'DM Serif Display', 'Ab
 function xpFace(name) {
   return (typeof FONTS !== 'undefined' && FONTS.find(f => f.name === name)) || null;
 }
+// the body face's bold, only from the weights it has (single-weight typewriters stay 400)
+function xpBold(font) {
+  const w = String((font && font.weights) || '400').split(';').map(Number).filter(Boolean);
+  const le = w.filter(x => x <= 700);
+  return le.length ? Math.max(...le) : Math.min(...w);
+}
 function xpWeight(font) {
   const w = String(font.weights || '400').split(';').map(Number).filter(Boolean);
   const le = w.filter(x => x <= 800);
@@ -108,7 +113,7 @@ function xpHeadline(ctx, seed, text) {
   const hf = ctx.state && ctx.state.headingFont, bf = ctx.state && ctx.state.bodyFont;
   const faces = [];
   if (hf) faces.push({ css: 'var(--ab-font-h)', weight: 'var(--ab-hw, 700)', up: true, name: hf.name });
-  if (bf && bf.name !== (hf && hf.name)) faces.push({ css: 'var(--ab-font-b)', weight: 700, up: false, name: bf.name });
+  if (bf && bf.name !== (hf && hf.name)) faces.push({ css: 'var(--ab-font-b)', weight: xpBold(bf), up: false, name: bf.name });
   const pool = XP_POOL.map(xpFace).filter(f => f && !faces.some(x => x.name === f.name));
   const pick = [];
   pool.forEach(f => pick.push({ css: f.css, weight: xpWeight(f), up: ['condensed', 'heavy', 'slab'].includes(f.cls) || f.category === 'display', name: f.name }));
@@ -143,7 +148,8 @@ function xpHeadline(ctx, seed, text) {
       let g; { let r = rnd() * wsum; g = XP_GROUNDS.find(x => (r -= x.w) < 0) || XP_GROUNDS[0]; }
       const sz = 0.72 + rnd() * 0.3;
       const rot = (rnd() < 0.5 ? -1 : 1) * (1 + rnd() * 3.5);
-      const style = `font-family:${mag.css};font-weight:${xpWeight(mag)};font-style:${rnd() < 0.5 ? 'italic' : 'normal'};font-size:${sz.toFixed(2)}em;--r:${rot.toFixed(1)}deg;--dy:${((rnd() - 0.5) * 0.3).toFixed(3)}em;padding:${pads()};clip-path:${xpCut(rnd)}`;
+      const ital = !!mag.ital && rnd() < 0.5;   // italics exist at 400 only
+      const style = `font-family:${mag.css};font-weight:${ital ? 400 : xpWeight(mag)};font-style:${ital ? 'italic' : 'normal'};font-size:${sz.toFixed(2)}em;--r:${rot.toFixed(1)}deg;--dy:${((rnd() - 0.5) * 0.3).toFixed(3)}em;padding:${pads()};clip-path:${xpCut(rnd)}`;
       return `<span class="xpw"><i class="xpt xpt-word" data-g="${g.c}" style="${style}">${escapeHtml(w)}</i></span>`;
     }
     const tiles = Array.from(w).map(ch => {
@@ -156,13 +162,14 @@ function xpHeadline(ctx, seed, text) {
       if (warm && f.name && xpFace(f.name)) window.loadFontFamily(xpFace(f.name));
       const fluoro = idx % 5 === 2 && rnd() < 0.9 && letterNo !== accentAt;
       const accent = letterNo === accentAt;
-      const isPhoto = !fluoro && !accent && rnd() < 0.2;
+      // the circled last word stays legible: no photo tiles, less shrink and tilt
+      const isPhoto = !isLast && !fluoro && !accent && rnd() < 0.2;
       let g = null;
       if (!fluoro && !accent && !isPhoto) { let r = rnd() * wsum; g = XP_GROUNDS.find(x => (r -= x.w) < 0) || XP_GROUNDS[0]; }
       const kind = accent ? 'acc' : fluoro ? 'hot' : isPhoto ? 'photo' : g.c;
       const lower = !f.up && rnd() < 0.3;
-      const sz = 0.72 + rnd() * 0.73;
-      const rot = (rnd() < 0.5 ? -1 : 1) * (1.5 + rnd() * 4.5);
+      const sz = isLast ? 0.98 + rnd() * 0.3 : 0.72 + rnd() * 0.73;
+      const rot = (rnd() < 0.5 ? -1 : 1) * (isLast ? 1 + rnd() * 2.5 : 1.5 + rnd() * 4.5);
       const dy = (rnd() - 0.5) * 0.3;
       idx++; since++; letterNo++;
       const bp = isPhoto ? `;background-position:${Math.round(rnd() * 100)}% ${Math.round(rnd() * 100)}%` : '';
@@ -173,6 +180,23 @@ function xpHeadline(ctx, seed, text) {
     return `<span class="xpw${isLast ? ' is-circled' : ''}">${tiles}${circle}</span>`;
   }).join('')}</span>`).join('');
   return `<span class="xph" style="--xp-ph:${photo}">${html}</span>`;
+}
+
+// The deck Material slide's own art (def.deck.materialArt): a ransom specimen sheet. Tile anatomy, the face
+// pool, the scale range and photo tiles, built from the same tile grounds as the headline.
+function xpSpecimen(ctx) {
+  const seed = xpHash(String(ctx.brandName || 'brand') + '|' + String(ctx.tagline || ''));
+  const ini = escapeHtml(ctx.initial);
+  const ph2 = xpPhoto(seed ^ 0x77, 90, 110, 3.4);
+    const sp = (ch, face, g, extra) => `<i class="xpt" data-g="${g}" style="font-family:${face};${extra || ''}">${ch}</i>`;
+    const mag = "'Playfair Display', Georgia, serif", slab = "'Alfa Slab One', Georgia, serif", cond = "'Bebas Neue', Impact, sans-serif", typ = "'Special Elite', 'Courier New', monospace";
+    const spec = `<div class="xpsp">
+        <div class="xpsp-a"><span class="xpsp-k">Tile anatomy</span>${sp(ini, 'var(--ab-font-h)', 'news', 'font-size:3.2em;--r:-4deg;padding:.06em .16em .1em .08em')}<ul><li>own face</li><li>own ground</li><li>tilt ±6°</li><li>scissor edge</li></ul></div>
+        <div class="xpsp-b"><span class="xpsp-k">Face pool</span><span class="xpsp-row">${sp('A', slab, 'paper')}${sp('a', mag, 'ink')}${sp('A', cond, 'grey')}${sp('a', typ, 'news')}${sp('A', 'var(--ab-font-h)', 'hot')}</span></div>
+        <div class="xpsp-b"><span class="xpsp-k">Scale 0.72 – 1.45</span><span class="xpsp-row">${sp('S', slab, 'news', 'font-size:.72em')}${sp('S', slab, 'news')}${sp('S', slab, 'news', 'font-size:1.45em')}</span></div>
+        <div class="xpsp-b"><span class="xpsp-k">Photo tiles</span><span class="xpsp-row xph" style="--xp-ph:${ph2}">${sp('N', slab, 'photo', 'background-position:20% 30%')}${sp('O', cond, 'photo', 'background-position:70% 40%')}${sp('word', mag, 'paper', 'font-style:italic')}</span></div>
+      </div>`;
+  return spec;
 }
 
 registerAesthetic({
@@ -246,6 +270,7 @@ registerAesthetic({
       '--ab-type-pick-w': hw,
       '--ab-hw': hw,
       '--ab-tr': 0,
+      '--xp-bw': xpBold(typeof state !== 'undefined' && state && state.bodyFont),
       '--ab-fluoro': fl,
       '--xp-hot': d ? fl : t.ink,
       '--xp-stamp': d ? '#EDE6D3' : t.ink,    // stamps and labels are bone on the wall, never the accent
@@ -282,15 +307,6 @@ registerAesthetic({
       </div>`;
     const staple = '<svg class="xps" viewBox="0 0 40 10" width="40" height="10" aria-hidden="true" focusable="false"><path d="M3 7V3h34v4" fill="none" stroke="#9a9a96" stroke-width="2.2" stroke-linejoin="round"/><path d="M3 7V3h34v4" fill="none" stroke="#e8e8e4" stroke-width=".8"/></svg>';
     const strike = '<svg class="xpa-x" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true" focusable="false"><path d="M8 14C30 38 58 66 92 90" fill="none" stroke="currentColor" stroke-width="7" stroke-linecap="round"/><path d="M90 10C64 34 38 62 12 92" fill="none" stroke="currentColor" stroke-width="5.5" stroke-linecap="round"/></svg>';
-    // deck Material slide: a ransom specimen sheet (hidden on the board, shown in the deck stage by css)
-    const sp = (ch, face, g, extra) => `<i class="xpt" data-g="${g}" style="font-family:${face};${extra || ''}">${ch}</i>`;
-    const mag = '"Playfair Display", Georgia, serif', slab = '"Alfa Slab One", Georgia, serif', cond = '"Bebas Neue", Impact, sans-serif', typ = '"Special Elite", "Courier New", monospace';
-    const spec = `<div class="xpsp">
-        <div class="xpsp-a"><span class="xpsp-k">Tile anatomy</span>${sp(ini, 'var(--ab-font-h)', 'news', 'font-size:3.2em;--r:-4deg;padding:.06em .16em .1em .08em')}<ul><li>own face</li><li>own ground</li><li>tilt ±6°</li><li>scissor edge</li></ul></div>
-        <div class="xpsp-b"><span class="xpsp-k">Face pool</span><span class="xpsp-row">${sp('A', slab, 'paper')}${sp('a', mag, 'ink')}${sp('A', cond, 'grey')}${sp('a', typ, 'news')}${sp('A', 'var(--ab-font-h)', 'hot')}</span></div>
-        <div class="xpsp-b"><span class="xpsp-k">Scale 0.72 – 1.45</span><span class="xpsp-row">${sp('S', slab, 'news', 'font-size:.72em')}${sp('S', slab, 'news')}${sp('S', slab, 'news', 'font-size:1.45em')}</span></div>
-        <div class="xpsp-b"><span class="xpsp-k">Photo tiles</span><span class="xpsp-row xph" style="--xp-ph:${ph2}">${sp('N', slab, 'photo', 'background-position:20% 30%')}${sp('O', cond, 'photo', 'background-position:70% 40%')}${sp('word', mag, 'paper', 'font-style:italic')}</span></div>
-      </div>`;
     return `<svg class="xpd" width="0" height="0" aria-hidden="true" focusable="false" style="position:absolute;width:0;height:0;overflow:hidden"><defs>
       <filter id="xpn-torn" x="-6%" y="-6%" width="112%" height="112%" color-interpolation-filters="sRGB">
         <feTurbulence type="fractalNoise" baseFrequency="0.028 0.05" numOctaves="2" seed="7" result="w"/>
@@ -318,7 +334,22 @@ registerAesthetic({
         <div class="xpa-img" style="background-image:${ph2}"><b>${ini}</b>${strike}</div>
         <p class="xpa-cap">fig. 1 — no comment.</p>
       </div>
-    </div>${spec}`;
+    </div>`;
+  },
+
+  // 03 is a handwritten set list on a pasted scrap: real markup for the title and the numbers.
+  panels: {
+    list(ctx) {
+      const e = ctx.e;
+      return `<div class="ab-list xp-sl"><p class="xp-sl-h" aria-hidden="true">set list</p><ul class="xp-sl-rows">${ctx.rows.map((r, i) => `<li class="ab-row">
+      <span class="ab-row-n">${i + 1}.</span>
+      <span class="ab-av" aria-hidden="true">${e(r[0][0])}</span>
+      <span class="ab-row-name">${e(r[0])}</span>
+      <span class="ab-row-status">${e(r[1])}</span>
+      <span class="ab-row-bar" aria-hidden="true"><i style="width:${r[2]}%"></i></span>
+      <span class="ab-row-pct">${r[2]}%</span>
+    </li>`).join('')}</ul></div>`;
+    },
   },
 
   materials: [
@@ -349,7 +380,9 @@ registerAesthetic({
   },
   // Deck copy (js/brand-deck.js): three principles, three do / don't lines, each short.
   deck: {
-    // the Material slide stages the art, whose hidden .xpsp ransom specimen sheet is shown there by css
+    // the Material slide shows a ransom specimen sheet instead of repeating the hero wall
+    materialArt: ctx => xpSpecimen(ctx),
+    marks: { do: '✓', dont: '✕' },
     principles: [
       ['A wall, not a page', 'Many sources overlap on a dark ground; nothing sits neatly.'],
       ['Every tile is its own face', 'Ransom headlines vary font, size, ground and tilt.'],

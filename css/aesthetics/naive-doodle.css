@@ -87,6 +87,7 @@
 .ab[data-ae="naive-doodle"] .ab-sw-role { font-family: var(--ab-font-h); font-weight: 400; font-size: 19px; }
 
 /* type block */
+.ab[data-ae="naive-doodle"] .ab-type-cur b { font-weight: 400; }
 .ab[data-ae="naive-doodle"] .ab-type-col { border-top: 0; background: var(--nd-rule) 0 0 / 400px 10px repeat-x; padding-top: 18px; }
 .ab[data-ae="naive-doodle"] .ab-type-role { font-family: var(--ab-font-h); font-size: 17px; letter-spacing: 0; text-transform: none; color: var(--ab-ink); }
 .ab[data-ae="naive-doodle"] .ab-fit {
@@ -229,7 +230,7 @@
   width: 28px; height: 28px; font-size: 0; color: transparent; background: var(--nd-box) center / 28px 28px no-repeat;
 }
 .ab[data-ae="naive-doodle"] .ab-row:first-child .ab-row-n { background: var(--nd-tick) 8px 0 / 24px 24px no-repeat, var(--nd-box) center / 28px 28px no-repeat; }
-.ab[data-ae="naive-doodle"] .ab-row-name { font-weight: 500; font-size: 15px; }
+.ab[data-ae="naive-doodle"] .ab-row-name { font-weight: 400; font-size: 15px; }
 .ab[data-ae="naive-doodle"] .ab-row-status {
   padding: 6px 16px 7px; border-radius: 0; background: var(--nd-ellipse) center / 100% 100% no-repeat;
   font-family: var(--ab-font-h); font-size: 16px; line-height: 1; color: var(--ab-ink);
@@ -268,33 +269,29 @@
 
 /* deck */
 .ab[data-ae="naive-doodle"].ab-slide .ab-deck-cell,
-.ab[data-ae="naive-doodle"].ab-slide .ab-deck-app,
-.ab[data-ae="naive-doodle"].ab-slide .ab-deck-ctacard,
+.ab[data-ae="naive-doodle"].ab-slide .ab-deck-prodframe,
 .ab[data-ae="naive-doodle"].ab-slide .ab-deck-stage[data-stage="pattern"] {
   border: 0; border-radius: 0; background: var(--nd-card) 0 0 / 100% 100% no-repeat; overflow: visible;
 }
-.ab[data-ae="naive-doodle"].ab-slide .ab-deck-side { border-right: 0; background: var(--nd-wash); border-radius: 26px 10px 18px 30px / 18px 30px 10px 26px; margin: 10px 0 10px 10px; }
-.ab[data-ae="naive-doodle"].ab-slide .ab-deck-nav.is-on { background: transparent; box-shadow: none; background: var(--nd-ellipse) center / 100% 100% no-repeat; }
 .ab[data-ae="naive-doodle"].ab-slide .ab-deck-principle,
 .ab[data-ae="naive-doodle"].ab-slide .ab-deck-scale,
 .ab[data-ae="naive-doodle"].ab-slide .ab-deck-face,
 .ab[data-ae="naive-doodle"].ab-slide .ab-deck-mat,
-.ab[data-ae="naive-doodle"].ab-slide .ab-deck-row { border-top: 0; background: var(--nd-rule) 0 0 / 400px 10px repeat-x; }
+.ab[data-ae="naive-doodle"].ab-slide .ab-deck-rule { border-top: 0; background: var(--nd-rule) 0 0 / 400px 10px repeat-x; }
 .ab[data-ae="naive-doodle"].ab-slide .ab-deck-principle:last-child,
-.ab[data-ae="naive-doodle"].ab-slide .ab-deck-mat:last-child,
-.ab[data-ae="naive-doodle"].ab-slide .ab-deck-row:last-child { border-bottom: 0; }
+.ab[data-ae="naive-doodle"].ab-slide .ab-deck-mat:last-child { border-bottom: 0; }
 .ab[data-ae="naive-doodle"].ab-slide .ab-deck-ptitle { font-family: var(--ab-font-h); font-weight: 400; font-size: 31px; letter-spacing: 0; }
-.ab[data-ae="naive-doodle"].ab-slide .ab-deck-rpct { font-weight: 400; }
+.ab[data-ae="naive-doodle"].ab-slide .ab-deck-pname,
+.ab[data-ae="naive-doodle"].ab-slide .ab-deck-pratio b { font-weight: 700; }
+.ab[data-ae="naive-doodle"].ab-slide .ab-deck-pchip { font-weight: 400; }
 .ab[data-ae="naive-doodle"].ab-slide .ab-card,
 .ab[data-ae="naive-doodle"].ab-slide .ab-panel { transform: none; }
 .ab[data-ae="naive-doodle"].ab-slide .ab-sec-ui::after { content: none; }
-
-.ab[data-ae="naive-doodle"].ab-slide .ab-deck-col .ab-labelrow { border-bottom: 0; background: var(--nd-rule) 0 100% / 400px 10px repeat-x; }
-.ab[data-ae="naive-doodle"].ab-slide .ab-deck-rule { border-bottom: 0; background: var(--nd-rule) 0 100% / 400px 10px repeat-x; }
-.ab[data-ae="naive-doodle"].ab-slide .ab-deck-mark { width: 34px; height: 34px; border-radius: 0; font-size: 0; color: transparent; background: var(--nd-tick) center / 30px 30px no-repeat; }
-.ab[data-ae="naive-doodle"].ab-slide .ab-deck-col[data-kind="dont"] .ab-deck-mark { background: var(--nd-cross) center / 26px 26px no-repeat; }
+/* Do / Don't: a hand tick and a scribbled cross (def.deck.marks), wavy rules, no straight divider */
+.ab[data-ae="naive-doodle"].ab-slide .ab-deck-col[data-kind="dont"] { border-left: 0; background: var(--nd-vrule) 0 0 / 10px 400px repeat-y; }
+.ab[data-ae="naive-doodle"].ab-slide .nd-mk { display: inline-block; width: 32px; height: 32px; vertical-align: -6px; background: var(--nd-tick) center / contain no-repeat; }
+.ab[data-ae="naive-doodle"].ab-slide .nd-mk[data-k="dont"] { width: 26px; height: 26px; background-image: var(--nd-cross); }
 .ab[data-ae="naive-doodle"].ab-slide .ab-deck-col[data-kind="dont"] .ab-deck-rule p { color: var(--ab-ink); }
-.ab[data-ae="naive-doodle"].ab-slide .ab-deck-col .ab-label { font-size: 26px; }
 
 @media (prefers-reduced-motion: reduce) {
   .ab[data-ae="naive-doodle"] .ab-cta::before,

@@ -7,7 +7,8 @@
    a marker strike in the list), hazard red #E10600, safety yellow #FFD400, black,
    white and a bold-oblique vandal face (--cv-vandal). Vars from tokens(): --ab-hazard,
    --ab-safety, --cv-paper, --cv-bd, --cv-rest, --cv-receipt, --cv-form, --cv-hw,
-   --cv-shell / --cv-on-shell / --cv-ul, --cv-vandal, --cv-brand (asset tag text).
+   --cv-shell / --cv-on-shell / --cv-ul, --cv-vandal, --cv-bw (body bold). Form strips, fine print, PO list and
+   asset tag are real markup from def.panels.
    Hooks: hero 'split', def.headline (official headline + Kruger bar), states 'button'.
    No CSS masks (export-safe): the receipt edge is a sawtooth drawn in canvas colour.
 ------------------------------------------------------------------------ */
@@ -61,7 +62,7 @@
 .ab[data-ae="corporate-vandalism"].ab-slide .cvh-o { max-width: none; }
 .ab[data-ae="corporate-vandalism"] .cvh-k > span { background: var(--ab-hazard); color: #fff; padding: 0.02em 0.16em 0.06em; -webkit-box-decoration-break: clone; box-decoration-break: clone; }
 .ab[data-ae="corporate-vandalism"] .ab-subcopy { max-width: 28em; font-size: clamp(13px, 1.45cqw, 15px); }
-.ab[data-ae="corporate-vandalism"] .ab-sub-lead { color: var(--ab-ink); font-weight: 600; }
+.ab[data-ae="corporate-vandalism"] .ab-sub-lead { color: var(--ab-ink); font-weight: var(--cv-bw, 500); }
 
 /* art: the hijacked notice */
 .ab[data-ae="corporate-vandalism"] .ab-art { max-width: none; aspect-ratio: auto; justify-self: stretch; container-type: inline-size; }
@@ -82,7 +83,7 @@
 .ab[data-ae="corporate-vandalism"] .cva-rx { background: #000; color: transparent; font: 10.5px/1.5 var(--cv-mono); user-select: none; padding: 1px 0; }
 .ab[data-ae="corporate-vandalism"] .cva-rx1 { white-space: nowrap; overflow: hidden; }
 .ab[data-ae="corporate-vandalism"] .cva-bar { display: flex; align-items: center; gap: 8px; padding: 7px 10px; background: var(--cv-shell); color: var(--cv-on-shell); font: 600 9.5px/1.2 var(--cv-mono); letter-spacing: 0.1em; text-transform: uppercase; }
-.ab[data-ae="corporate-vandalism"] .cva-bar i { flex: none; width: 16px; height: 16px; display: grid; place-items: center; background: var(--cv-on-shell); color: var(--cv-shell); font: 700 10px/1 var(--ab-font-h); }
+.ab[data-ae="corporate-vandalism"] .cva-bar i { flex: none; width: 16px; height: 16px; display: grid; place-items: center; background: var(--cv-on-shell); color: var(--cv-shell); font: var(--cv-hw, 400) 10px/1 var(--ab-font-h); }
 .ab[data-ae="corporate-vandalism"] .cva-bar b { flex: 1; min-width: 0; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .ab[data-ae="corporate-vandalism"] .cva-bar span { flex: none; opacity: 0.85; }
 .ab[data-ae="corporate-vandalism"] .cva-body { padding: 14px 14px 14px; }
@@ -108,12 +109,12 @@
 .ab[data-ae="corporate-vandalism"] .cva-rcpt::before, .ab[data-ae="corporate-vandalism"] .cva-rcpt::after { content: ""; position: absolute; left: 0; right: 0; height: 6px; background-size: 10px 6px; background-repeat: repeat-x; }
 .ab[data-ae="corporate-vandalism"] .cva-rcpt::before { top: 0; background-image: linear-gradient(135deg, var(--ab-canvas) 50%, transparent 50%), linear-gradient(225deg, var(--ab-canvas) 50%, transparent 50%); }
 .ab[data-ae="corporate-vandalism"] .cva-rcpt::after { bottom: 0; background-image: linear-gradient(45deg, var(--ab-canvas) 50%, transparent 50%), linear-gradient(315deg, var(--ab-canvas) 50%, transparent 50%); }
-.ab[data-ae="corporate-vandalism"] .cva-rh { margin-bottom: 4px !important; font-weight: 700; letter-spacing: 0.14em; text-align: center; }
+.ab[data-ae="corporate-vandalism"] .cva-rh { margin-bottom: 4px !important; font-weight: var(--cv-bw, 600); letter-spacing: 0.14em; text-align: center; }
 .ab[data-ae="corporate-vandalism"] .cva-rl { display: flex; justify-content: space-between; gap: 6px; padding: 3px 0; border-top: 1px dashed #1a1a1a; }
 .ab[data-ae="corporate-vandalism"] .cva-rl span { min-width: 0; }
 .ab[data-ae="corporate-vandalism"] .cva-rl b { font-weight: 400; flex: none; }
-.ab[data-ae="corporate-vandalism"] .cva-rt { border-top: 1px solid #1a1a1a; font-weight: 700; }
-.ab[data-ae="corporate-vandalism"] .cva-rt b { font-weight: 700; }
+.ab[data-ae="corporate-vandalism"] .cva-rt { border-top: 1px solid #1a1a1a; font-weight: var(--cv-bw, 600); }
+.ab[data-ae="corporate-vandalism"] .cva-rt b { font-weight: var(--cv-bw, 600); }
 .ab[data-ae="corporate-vandalism"] .cva-rn { margin-top: 6px !important; padding-top: 5px; border-top: 1px dashed #1a1a1a; font-size: 8.5px; letter-spacing: 0.04em; }
 .ab[data-ae="corporate-vandalism"] .cva-bc { display: block; width: 100%; height: 22px; margin-top: 10px; }
 @container (max-width: 420px) {
@@ -123,8 +124,8 @@
 
 /* palette: THEIRS (the five client swatches, the corporation's) and OURS (the fixed vandal set, a sixth cell) */
 .ab[data-ae="corporate-vandalism"] .ab-swatches[data-kind="swatches"] { grid-template-columns: repeat(5, minmax(0, 1fr)) minmax(0, 1.5fr); }
-.ab[data-ae="corporate-vandalism"] .ab-palette > .ab-labelrow .ab-label:first-child { visibility: hidden; position: relative; min-width: 30ch; }
-.ab[data-ae="corporate-vandalism"] .ab-palette > .ab-labelrow .ab-label:first-child::before { content: "Theirs (client) · Ours (fixed)"; visibility: visible; position: absolute; left: 0; top: 0; white-space: nowrap; font-size: 11px; }
+.ab[data-ae="corporate-vandalism"] .ab-palette > .ab-labelrow .ab-label:first-child { font-size: 0; }
+.ab[data-ae="corporate-vandalism"] .ab-palette > .ab-labelrow .ab-label:first-child::before { content: "Theirs (client) · Ours (fixed)"; font-size: 11px; }
 .ab[data-ae="corporate-vandalism"] .ab-swatches[data-kind="swatches"]::after {
   content: "OURS · FIXED\A Hazard #E10600\A Safety #FFD400\A Black · White"; white-space: pre; overflow: hidden; min-width: 0;
   padding: calc(clamp(38px, 5.4cqw, 58px) + 11px) 0 0 10px; border-left: 3px solid var(--ab-hazard);
@@ -144,7 +145,7 @@
     linear-gradient(var(--cv-bd), var(--cv-bd)) 100% calc(100% - 6px) / 13px 1px no-repeat, linear-gradient(var(--cv-bd), var(--cv-bd)) calc(100% - 6px) 100% / 1px 13px no-repeat;
   opacity: 0.7;
 }
-.ab[data-ae="corporate-vandalism"] .ab-sw-role { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; }
+.ab[data-ae="corporate-vandalism"] .ab-sw-role { font-size: 12px; font-weight: var(--cv-bw, 600); text-transform: uppercase; letter-spacing: 0.04em; }
 .ab[data-ae="corporate-vandalism"] .ab-sw-job { font-size: 10.5px; letter-spacing: 0.02em; }
 .ab[data-ae="corporate-vandalism"] .ab-sw-hex { font-size: 10.5px; color: var(--ab-ink); }
 
@@ -159,7 +160,7 @@
 .ab[data-ae="corporate-vandalism"] .ab-fit[data-fit="match"] { background: none; border-color: var(--cv-bd); }
 .ab[data-ae="corporate-vandalism"] .ab-fit[data-fit="consider"] { border-style: dashed; }
 .ab[data-ae="corporate-vandalism"] .ab-fit[data-fit="avoid"] { background: var(--ab-ink); border-color: var(--ab-ink); color: var(--ab-canvas); }
-.ab[data-ae="corporate-vandalism"] .ab-type-k { color: var(--ab-ink); font-weight: 700; letter-spacing: 0.08em; }
+.ab[data-ae="corporate-vandalism"] .ab-type-k { color: var(--ab-ink); font-weight: var(--cv-bw, 600); letter-spacing: 0.08em; }
 .ab[data-ae="corporate-vandalism"] .ab-type-avoid { font-size: 11px; text-transform: uppercase; letter-spacing: 0.03em; }
 .ab[data-ae="corporate-vandalism"] .ab-type-apply { border: 1px solid var(--cv-bd); border-radius: 0; font-family: var(--cv-mono); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; }
 .ab[data-ae="corporate-vandalism"] .ab-type-apply:hover { background: var(--ab-ink); color: var(--ab-canvas); }
@@ -167,21 +168,22 @@
 
 /* 01 notice card: 1px border, primary header strip, 9px footnote */
 .ab[data-ae="corporate-vandalism"] .ab-card, .ab[data-ae="corporate-vandalism"] .ab-panel { --cv-cp: clamp(16px, 2.5cqw, 22px); padding: var(--cv-cp); border: 1px solid var(--cv-bd); border-radius: 0; background: var(--ab-canvas); }
-.ab[data-ae="corporate-vandalism"] .ab-card::before, .ab[data-ae="corporate-vandalism"] .ab-panel::before {
-  display: block; margin: calc(var(--cv-cp) * -1) calc(var(--cv-cp) * -1) var(--cv-cp); padding: 7px 14px;
-  font: 600 10px/1.4 var(--cv-mono); letter-spacing: 0.1em; text-transform: uppercase;
+/* the form's header strip and fine print are real markup (def.panels) */
+.ab[data-ae="corporate-vandalism"] .cv-strip {
+  display: block; margin: calc(var(--cv-cp) * -1) calc(var(--cv-cp) * -1) var(--cv-cp) !important; padding: 7px 14px;
+  font: 600 10px/1.4 var(--cv-mono); letter-spacing: 0.1em; text-transform: uppercase; word-spacing: 0.3em;
 }
-.ab[data-ae="corporate-vandalism"] .ab-card::before { content: "Notice 2291-B  ·  Form 7"; background: var(--cv-shell); color: var(--cv-on-shell); }
+.ab[data-ae="corporate-vandalism"] .ab-card > .cv-strip { background: var(--cv-shell); color: var(--cv-on-shell); }
 .ab[data-ae="corporate-vandalism"] .ab-panel { background: var(--cv-form); }
-.ab[data-ae="corporate-vandalism"] .ab-panel::before { content: "Form 7  ·  Part 2"; background: var(--ab-ink); color: var(--ab-canvas); }
-.ab[data-ae="corporate-vandalism"] .ab-card::after { content: "† Terms apply. Terms are subject to change, including this sentence."; display: block; margin-top: 14px; font: 9px/1.5 var(--cv-mono); letter-spacing: 0.04em; text-transform: uppercase; color: var(--ab-muted); }
+.ab[data-ae="corporate-vandalism"] .ab-panel > .cv-strip { background: var(--ab-ink); color: var(--ab-canvas); }
+.ab[data-ae="corporate-vandalism"] .cv-fine { display: block; margin-top: 14px !important; font: 9px/1.5 var(--cv-mono); letter-spacing: 0.04em; text-transform: uppercase; color: var(--ab-muted); }
 
 /* tabs: a numbered index row; the active item is ink and underlined, no quotes */
 .ab[data-ae="corporate-vandalism"] .ab-seg { counter-reset: cvs; gap: 0; padding: 0; border-radius: 0; border-bottom: 1px solid var(--cv-bd); background: none; }
 .ab[data-ae="corporate-vandalism"] .ab-seg-btn { counter-increment: cvs; flex: 0 1 auto; padding: 8px 14px 8px 0; min-height: 34px; border-radius: 0; color: var(--cv-rest); font-family: var(--cv-mono); font-size: 11.5px; letter-spacing: 0.04em; text-transform: uppercase; text-align: left; white-space: nowrap; }
 .ab[data-ae="corporate-vandalism"] .ab-seg-btn::before { content: counter(cvs, decimal-leading-zero) " "; color: var(--ab-muted); font-size: 9.5px; vertical-align: 1px; }
 .ab[data-ae="corporate-vandalism"] .ab-seg-btn:hover { color: var(--ab-ink); text-decoration: underline; text-underline-offset: 3px; }
-.ab[data-ae="corporate-vandalism"] .ab-seg-btn[aria-pressed="true"] { color: var(--ab-ink); font-weight: 700; margin-bottom: -1px; border-bottom: 2px solid var(--ab-primary-text, var(--ab-ink)); }
+.ab[data-ae="corporate-vandalism"] .ab-seg-btn[aria-pressed="true"] { color: var(--ab-ink); font-weight: var(--cv-bw, 600); margin-bottom: -1px; border-bottom: 2px solid var(--ab-primary-text, var(--ab-ink)); }
 .ab[data-ae="corporate-vandalism"] .ab-seg-btn[aria-pressed="true"]::before { content: counter(cvs, decimal-leading-zero) " "; color: var(--ab-ink); }
 .ab[data-ae="corporate-vandalism"] .ab-card-title { margin: 20px 0 6px !important; font-weight: var(--cv-hw, 700); font-size: clamp(18px, 2.3cqw, 22px); letter-spacing: calc(-0.03em * var(--ab-tr, 1)); line-height: 1.1; }
 .ab[data-ae="corporate-vandalism"] .ab-card-body { margin-bottom: 18px !important; color: var(--ab-ink); font-size: 13px; }
@@ -222,21 +224,21 @@
 .ab[data-ae="corporate-vandalism"] .ab-state-ctl.is-pressed::before { content: "(b)(6)"; position: absolute; right: 5px; bottom: 3px; font: 600 8px/1 var(--cv-mono); color: #fff; letter-spacing: 0.04em; }
 
 /* 03 purchase orders: PO numbers, plain shell type, asset tag; one official word struck through by the vandal's marker */
-.ab[data-ae="corporate-vandalism"] .ab-list { counter-reset: cvr; }
-.ab[data-ae="corporate-vandalism"] .ab-row { counter-increment: cvr; grid-template-columns: 9.5ch minmax(0, 1fr) auto minmax(60px, 140px) 4.5ch; padding: 11px 0; border-top: 1px solid var(--cv-bd); color: var(--ab-ink); }
+.ab[data-ae="corporate-vandalism"] .cv-rows { margin: 0; padding: 0; list-style: none; }
+.ab[data-ae="corporate-vandalism"] .ab-row { grid-template-columns: 9.5ch minmax(0, 1fr) auto minmax(60px, 140px) 4.5ch; padding: 11px 0; border-top: 1px solid var(--cv-bd); color: var(--ab-ink); }
 .ab[data-ae="corporate-vandalism"] .ab-row:last-child { border-bottom: 1px solid var(--cv-bd); }
-.ab[data-ae="corporate-vandalism"] .ab-row-n { visibility: hidden; position: relative; align-self: center; color: inherit; }
-.ab[data-ae="corporate-vandalism"] .ab-row-n::before { visibility: visible; position: absolute; left: 0; top: 50%; transform: translateY(-50%); white-space: nowrap; content: "PO-229" counter(cvr) "-B"; font: 600 10.5px/1 var(--cv-mono); letter-spacing: 0.02em; color: var(--ab-muted); }
+.ab[data-ae="corporate-vandalism"] .ab-row-n { align-self: center; white-space: nowrap; font: 600 10.5px/1 var(--cv-mono); letter-spacing: 0.02em; color: var(--ab-muted); }
 .ab[data-ae="corporate-vandalism"] .ab-row-name { position: relative; overflow: visible; justify-self: start; font-family: var(--ab-font-h); font-weight: 400; font-size: 15px; line-height: 1.2; color: inherit; }
 .ab[data-ae="corporate-vandalism"] .ab-row-status { padding: 1px 6px; border: 1px solid currentColor; border-radius: 0; background: none; font-family: var(--cv-mono); font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: inherit; }
 .ab[data-ae="corporate-vandalism"] .ab-row-bar { height: 2px; border-radius: 0; background: var(--ab-secondary); }
 .ab[data-ae="corporate-vandalism"] .ab-row-bar i { background: var(--ab-ink); }
 .ab[data-ae="corporate-vandalism"] .ab-row-pct { font-family: var(--cv-mono); font-size: 11px; color: inherit; }
-/* the asset tag closes the list */
-.ab[data-ae="corporate-vandalism"]:not(.ab-slide) .ab-list::after { content: var(--cv-brand); display: inline-block; margin-top: 12px; padding: 4px 8px; border: 1px solid var(--cv-bd); font: 600 9px/1.3 var(--cv-mono); letter-spacing: 0.08em; color: var(--ab-ink); }
+/* the asset tag closes the list (real markup) */
+.ab[data-ae="corporate-vandalism"] .cv-asset { display: inline-block; margin-top: 12px !important; padding: 4px 8px; border: 1px solid var(--cv-bd); font: 600 9px/1.3 var(--cv-mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--ab-ink); }
 /* the vandal's marker: one official word struck through, the replacement written above it */
-.ab[data-ae="corporate-vandalism"]:not(.ab-slide) .ab-row:nth-child(3) .ab-row-name::after { content: ""; position: absolute; left: -3px; right: -4px; top: 52%; height: 3px; background: var(--ab-hazard); border-radius: 2px; transform: rotate(-3deg); }
-.ab[data-ae="corporate-vandalism"]:not(.ab-slide) .ab-row:nth-child(3) .ab-row-name::before { content: "never"; position: absolute; left: 30%; bottom: 72%; font: 22px/1 "Permanent Marker", "Marker Felt", cursive; color: var(--ab-hazard); transform: rotate(-6deg); white-space: nowrap; }
+.ab[data-ae="corporate-vandalism"] .ab-row-name s { position: relative; text-decoration: none; }
+.ab[data-ae="corporate-vandalism"] .ab-row-name s::after { content: ""; position: absolute; left: -3px; right: -4px; top: 52%; height: 3px; background: var(--ab-hazard); border-radius: 2px; transform: rotate(-3deg); }
+.ab[data-ae="corporate-vandalism"] .cv-never { position: absolute; left: 0.4em; bottom: 78%; font: 22px/1 "Permanent Marker", "Marker Felt", cursive; color: var(--ab-hazard); transform: rotate(-6deg); white-space: nowrap; }
 
 /* footer: the footnotes are the longest text on the board */
 .ab[data-ae="corporate-vandalism"] .ab-foot { border-top: 1px solid var(--cv-bd); font-size: 10px; letter-spacing: 0.04em; text-transform: uppercase; color: var(--ab-ink); }
@@ -263,9 +265,15 @@
   .ab[data-ae="corporate-vandalism"] .ab-cta, .ab[data-ae="corporate-vandalism"] .ab-switch { transition: none; }
 }
 
-/* deck: room for the literal label above the CTA */
-.ab.ab-slide[data-ae="corporate-vandalism"] .ab-deck-ctacard .ab-cta:not(.ab-state-ctl) { margin-top: 18px; }
 
 /* deck In product: the board rows in a narrower column; the bar drops under the name so names never collide with the status */
 .ab[data-ae="corporate-vandalism"] .ab-deck-prod .ab-row { grid-template-columns: 9.5ch minmax(0, 1fr) auto 4.5ch; row-gap: 6px; }
 .ab[data-ae="corporate-vandalism"] .ab-deck-prod .ab-row-bar { grid-column: 2 / -1; grid-row: 2; }
+
+/* deck parts the framework sets in bold: only weights the faces have */
+.ab[data-ae="corporate-vandalism"] .ab-deck-pname, .ab[data-ae="corporate-vandalism"] .ab-deck-ptitle { font-weight: var(--cv-bw, 500); }
+.ab[data-ae="corporate-vandalism"] .ab-type-cur b, .ab[data-ae="corporate-vandalism"] .ab-type-pick { font-weight: inherit; }
+/* deck Do/Don't: the marks are rubber stamps */
+.ab[data-ae="corporate-vandalism"] .cv-stamp { display: inline-block; padding: 2px 6px; border: 1.5px solid currentColor; font: 600 10px/1.2 var(--cv-mono); letter-spacing: 0.1em; text-transform: uppercase; color: var(--ab-ink); transform: rotate(-4deg); }
+.ab[data-ae="corporate-vandalism"] .cv-stamp[data-kind="dont"] { color: var(--ab-muted); border-style: dashed; }
+.ab[data-ae="corporate-vandalism"] .ab-deck-pchip, .ab[data-ae="corporate-vandalism"] .ab-n { font-weight: var(--cv-bw, 600); }

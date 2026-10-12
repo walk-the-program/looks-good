@@ -6,7 +6,7 @@
    the right. Eight fixed teletext colours (--ab-tt-*); the client colour is only
    the station ident (mark, P100, the inverse highlight block). Cards are black
    "screens", so a light board is a pale wall with screens. The test card lives
-   in the 02 panel (--ab-pb-card data URI) and on the deck's Material slide.
+   in the 02 panel (def.panels.panel) and on the deck's Material slide (deck.materialArt).
    Variables come from js/aesthetics/pirate-broadcast.js tokens(). No CSS masks.
 ------------------------------------------------------------------------ */
 
@@ -95,7 +95,7 @@
 .ab[data-ae="pirate-broadcast"] .ab-fit { padding: 1px 8px; border: 0; border-radius: 0; background: var(--ab-tt-green); color: #000; font: 700 10.5px/1.5 var(--pb-mono); letter-spacing: 0.1em; text-transform: uppercase; }
 .ab[data-ae="pirate-broadcast"] .ab-fit[data-fit="consider"] { background: transparent; color: var(--ab-tt-fg); box-shadow: inset 0 0 0 1px var(--ab-tt-dim); }
 .ab[data-ae="pirate-broadcast"] .ab-fit[data-fit="avoid"] { background: var(--ab-tt-red); color: #000; }
-.ab[data-ae="pirate-broadcast"] .ab-type-k { font-weight: 700; letter-spacing: 0.14em; }
+.ab[data-ae="pirate-broadcast"] .ab-type-k { font-weight: 600; letter-spacing: 0.14em; }
 .ab[data-ae="pirate-broadcast"] .ab-type-apply {
   padding: 11px 16px; border: 0; border-radius: 0; background: var(--ab-ink); color: var(--ab-canvas); font: 700 12px var(--pb-mono); letter-spacing: 0.1em; text-transform: uppercase;
 }
@@ -105,18 +105,15 @@
 .ab[data-ae="pirate-broadcast"] .ab-type-pair { font-size: 11px; letter-spacing: 0.04em; }
 
 .ab[data-ae="pirate-broadcast"] .ab-card, .ab[data-ae="pirate-broadcast"] .ab-panel { padding: 0 var(--pb-pad) var(--pb-pad); }
-.ab[data-ae="pirate-broadcast"] .ab-card::before, .ab[data-ae="pirate-broadcast"] .ab-panel::before, .ab[data-ae="pirate-broadcast"] .ab-list::before {
-  display: block; margin: 0 calc(var(--pb-pad) * -1) var(--pb-pad); padding: 4px 14px; white-space: nowrap; overflow: hidden;
+/* title rows: real text from def.panels (P101 / P102 / P103) */
+.ab[data-ae="pirate-broadcast"] .pb-row0 {
+  display: block; margin: 0 calc(var(--pb-pad) * -1) var(--pb-pad); padding: 4px 14px; white-space: nowrap; overflow: hidden; list-style: none;
   background: var(--ab-tt-cyan); color: #000; font: 700 11px/1.5 var(--pb-mono); letter-spacing: 0.1em; text-transform: uppercase;
 }
-.ab[data-ae="pirate-broadcast"] .ab-card::before { content: "P101  CHANNEL SELECT"; }
-.ab[data-ae="pirate-broadcast"] .ab-panel::before { content: "P102  TEST CARD / TUNING"; }
-.ab[data-ae="pirate-broadcast"] .ab-list::before { content: "P103  INDEX  \00B7  3 PAGES"; margin: 0; }
-/* the test card lives at the top of the 02 panel (a 4:3 picture under its title row) */
-.ab[data-ae="pirate-broadcast"] .ab-sec-touch .ab-panel {
-  background: var(--ab-pb-card) var(--pb-pad) calc(24.5px + var(--pb-pad)) / calc(100% - 2 * var(--pb-pad)) auto no-repeat, var(--pb-scan), var(--ab-tt-screen);
-}
-.ab[data-ae="pirate-broadcast"] .ab-sec-touch .ab-panel::before { margin-bottom: calc(75% + 2 * var(--pb-pad)); }
+.ab[data-ae="pirate-broadcast"] .ab-list > .pb-row0 { margin: 0; }
+/* the test card: a 4:3 picture at the top of the 02 panel */
+.ab[data-ae="pirate-broadcast"] .pb-card { aspect-ratio: 4 / 3; margin-bottom: var(--pb-pad); background: #000; }
+.ab[data-ae="pirate-broadcast"] .pb-card svg, .ab[data-ae="pirate-broadcast"] .pba-card svg { display: block; width: 100%; height: 100%; }
 .ab[data-ae="pirate-broadcast"] .ab-card-body, .ab[data-ae="pirate-broadcast"] .ab-status, .ab[data-ae="pirate-broadcast"] .ab-state, .ab[data-ae="pirate-broadcast"] .ab-fieldlabel { color: var(--ab-tt-dim); }
 
 /* 01: channel keys, a title, the Fastext key */
@@ -225,11 +222,6 @@
 /* ---- deck ---- */
 /* controls sit directly on the slide, so give them a screen to live on */
 .ab[data-ae="pirate-broadcast"].ab-slide .ab-deck-cellbody, .ab[data-ae="pirate-broadcast"].ab-slide .ab-deck-uistates { padding: 14px; background: var(--pb-scan), var(--ab-tt-screen); color: var(--ab-tt-fg); box-shadow: 0 0 0 2px var(--ab-tt-line); }
-.ab[data-ae="pirate-broadcast"].ab-slide .ab-deck-rpct { font-family: var(--pb-mono); }
-.ab[data-ae="pirate-broadcast"].ab-slide .ab-deck-dot { border-radius: 0; }
-.ab[data-ae="pirate-broadcast"].ab-slide .ab-deck-rows { counter-reset: pbdr; }
-.ab[data-ae="pirate-broadcast"].ab-slide .ab-deck-row { counter-increment: pbdr; }
-.ab[data-ae="pirate-broadcast"].ab-slide .ab-deck-rname::before { content: "P10" counter(pbdr) "  "; white-space: pre; font-family: var(--pb-mono); font-weight: 700; color: var(--ab-muted); }
 /* cover: the page is the whole slide body; 40 columns of the slide width */
 /* cover: one 40-column page, centred like a screen (760px wide) */
 .ab[data-ae="pirate-broadcast"].ab-slide[data-slide="cover"] .ab-deck-cover .ab-subcopy { font-size: 14px; }
@@ -238,18 +230,17 @@
 .ab[data-ae="pirate-broadcast"].ab-slide[data-slide="cover"][data-hero="centered"] .ab-deck-cover .ab-hero-copy { width: calc(var(--pb-u) * 26); padding: 1.8em 0 2.6em; }
 .ab[data-ae="pirate-broadcast"].ab-slide[data-slide="cover"] .pba-gfx { left: 67% !important; }
 .ab[data-ae="pirate-broadcast"].ab-slide[data-slide="cover"] .ab-deck-cover .ab-hero .ab-art { width: 100% !important; max-width: none !important; height: 100% !important; justify-self: stretch; }
-.ab[data-ae="pirate-broadcast"][data-mode="light"] .ab-deck-side .ab-brand { color: var(--ab-ink); }
 .ab[data-ae="pirate-broadcast"].ab-slide[data-slide="cover"][data-hero="centered"] .ab-deck-cover .ab-hero {
   flex: 0 0 auto; width: 760px; max-width: 100%; margin: 0 auto; padding: 0; --pb-u: calc(760px / 42);
 }
 /* 06 material: the test card, 4:3, square-cornered, castellations to the edge */
-.ab[data-ae="pirate-broadcast"] .ab-deck-stage .ab-art { aspect-ratio: 4 / 3 !important; height: auto !important; background: #000; box-shadow: none; }
-.ab[data-ae="pirate-broadcast"] .ab-deck-stage .pba { display: none; }
-.ab[data-ae="pirate-broadcast"] .ab-deck-stage .pba-card { display: block !important; }
-.ab[data-ae="pirate-broadcast"] .pba-card svg { display: block; width: 100%; height: 100%; }
+.ab[data-ae="pirate-broadcast"] .ab-deck-stage[data-stage="own"] .ab-art { aspect-ratio: 4 / 3; height: auto; background: #000; box-shadow: none; }
 
 @media (prefers-reduced-motion: reduce) {
   .ab[data-ae="pirate-broadcast"] .ab-seg-btn, .ab[data-ae="pirate-broadcast"] .ab-cta { transition: none; }
 }
 
 .ab[data-ae="pirate-broadcast"][data-mode="light"] .ab-deck-prodtools .ab-toggle > span { color: var(--ab-ink); }
+
+/* weights the faces actually have (font-synthesis: none shows 400 for a missing weight) */
+.ab[data-ae="pirate-broadcast"] :is(.ab-type-cur b, .ab-deck-pchip, .ab-headline) { font-weight: 400; }

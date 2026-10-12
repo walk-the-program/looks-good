@@ -198,7 +198,7 @@ registerAesthetic({
       '--ab-ink': ink,
       '--ab-muted': muted,
       '--ab-line': t.mix(t.canvas, ink, 0.82),
-      '--ab-type-pick-w': 600,
+      '--ab-type-pick-w': 400,
       '--mc-ink': ink,
       '--mc-card': card,
       '--mc-plane': plane,
@@ -290,6 +290,7 @@ registerAesthetic({
   },
 
   deck: {
+    marks: (ctx, kind) => `<i class="mc-mk" data-k="${kind === 'do' ? 'do' : 'dont'}"></i>`,
     principles: [
       ['Cut it from coloured paper', 'Every image is flat, slightly rough-cut shapes.'],
       ['Sparkles, orbits, boomerangs', 'A small set of atomic motifs repeats with intent.'],

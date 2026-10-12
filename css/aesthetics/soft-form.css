@@ -110,8 +110,12 @@
 /* 01 / interface: the one glass panel */
 .ab[data-ae="soft-form"] .ab-card {
   position: relative; isolation: isolate; border-radius: 24px;
-  background: linear-gradient(135deg, var(--ab-gloss), transparent 48%), var(--ab-canvas);
-  border: 1px solid var(--ab-rim);
+  /* the iridescent ring is the border-box layer under the padding-box fill (no mask, so it exports) */
+  border: 1.5px solid transparent;
+  background:
+    linear-gradient(135deg, var(--ab-gloss), transparent 48%) padding-box,
+    linear-gradient(var(--ab-canvas), var(--ab-canvas)) padding-box,
+    linear-gradient(125deg, #ffffffdd 0%, #ffffff55 28%, #b6dce7aa 45%, #d6b9edcc 64%, #efcfbbcc 79%, #ffffffaa) border-box;
   box-shadow: inset 1px 1px 2px rgba(255, 255, 255, 0.5), inset -1px -1px 2px rgba(255, 255, 255, 0.15),
     6px 9px 20px var(--ab-lo), -4px -4px 12px var(--ab-hi);
 }
@@ -119,12 +123,6 @@
   content: ""; position: absolute; inset: 0; z-index: -1; border-radius: inherit; pointer-events: none;
   background: radial-gradient(ellipse at 100% 0%, rgba(214, 189, 255, 0.24), transparent 45%),
     radial-gradient(ellipse at 0% 100%, rgba(164, 230, 232, 0.24), transparent 48%);
-}
-.ab[data-ae="soft-form"] .ab-card::after {
-  content: ""; position: absolute; inset: -1px; border-radius: inherit; padding: 1.5px; pointer-events: none;
-  background: linear-gradient(125deg, #ffffffdd 0%, #ffffff55 28%, #b6dce7aa 45%, #d6b9edcc 64%, #efcfbbcc 79%, #ffffffaa);
-  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-  -webkit-mask-composite: xor; mask-composite: exclude;
 }
 .ab[data-ae="soft-form"] .ab-seg { border-radius: 12px; background: var(--ab-canvas); box-shadow: var(--sf-inset-s); }
 .ab[data-ae="soft-form"] .ab-seg-btn { border-radius: 9px; transition: background 0.18s, color 0.18s; }
@@ -155,16 +153,17 @@
 .ab[data-ae="soft-form"] .ab-switch:checked::before {
   background: linear-gradient(145deg, rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0) 55%), var(--ab-primary);
 }
-/* a recessed slider under the toggle, drawn on the status line: an 8px recessed
-   track, an ink fill and a raised 22px thumb (decorative instrument) */
-.ab[data-ae="soft-form"] .ab-status { position: relative; padding-bottom: 40px; }
-.ab[data-ae="soft-form"] .ab-status::after {
-  content: ""; position: absolute; left: 0; right: 0; bottom: 9px; height: 8px; border-radius: 4px;
-  background: linear-gradient(90deg, color-mix(in srgb, var(--ab-ink) 55%, var(--ab-canvas)) 0 62%, transparent 62%) 0 50% / 100% 4px no-repeat, var(--ab-canvas);
-  box-shadow: var(--sf-inset-s);
+/* the recessed slider under the status line (real markup from def.panels.panel):
+   an 8px recessed track, an ink fill and a raised 22px thumb */
+.ab[data-ae="soft-form"] .sf-slider { position: relative; height: 24px; margin: 12px 0 2px; }
+.ab[data-ae="soft-form"] .sf-slider::before {
+  content: ""; position: absolute; left: 0; right: 0; top: 8px; height: 8px; border-radius: 4px;
+  background: var(--ab-canvas); box-shadow: var(--sf-inset-s);
 }
-.ab[data-ae="soft-form"] .ab-status::before {
-  content: ""; position: absolute; z-index: 1; left: calc(62% - 11px); bottom: 2px; width: 22px; height: 22px; border-radius: 50%;
+.ab[data-ae="soft-form"] .sf-slider i { position: absolute; display: block; }
+.ab[data-ae="soft-form"] .sf-slider-fill { left: 2px; top: 10px; width: 62%; height: 4px; border-radius: 2px; background: color-mix(in srgb, var(--ab-ink) 55%, var(--ab-canvas)); }
+.ab[data-ae="soft-form"] .sf-slider-thumb {
+  left: calc(62% - 11px); top: 1px; width: 22px; height: 22px; border-radius: 50%;
   background: var(--ab-canvas); box-shadow: var(--sf-raised-s);
 }
 /* the three materials themselves: raised, recessed, glass circle (skill recipe) */

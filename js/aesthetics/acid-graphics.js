@@ -18,7 +18,6 @@
    masks (the ticket notches are radial-gradient backgrounds). */
 (function () {
 let seq = 0;
-const AC_CLAMP = (v, a, b) => Math.max(a, Math.min(b, v));
 
 // primary pushed to full chroma; a muted primary falls back to the fixed acid green
 function acPush(primary) {
@@ -115,6 +114,7 @@ registerAesthetic({
     return {
       '--ab-type-pick-w': hw,
       '--ac-hw': hw,
+      '--ac-bw': (() => { const bf = typeof state !== 'undefined' && state && state.bodyFont; const w = String((bf && bf.weights) || '400').split(';').map(Number).filter(Boolean); const le = w.filter(x => x <= 700); return le.length ? Math.max(...le) : Math.min(...w); })(),
       '--ab-acid': acid,
       '--ab-clash': clash,
       '--ab-on-acid': on(acid),
@@ -254,6 +254,7 @@ registerAesthetic({
   },
   // Deck copy (js/brand-deck.js): three principles, three do / don't lines, each short.
   deck: {
+    marks: { do: '✱', dont: '✕' },
     principles: [
       ['Colour that vibrates', 'Two near-equal-luminance hues meet edge to edge.'],
       ['Warp every line', 'Stretch, compress, echo: each display line differently.'],

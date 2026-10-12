@@ -107,7 +107,7 @@
 /* ---- section labels: small caps, italic numerals ---- */
 .ab[data-ae="editorial-serif"] .ab-label { font-size: 10.5px; letter-spacing: 0.16em; font-weight: 500; }
 .ab[data-ae="editorial-serif"] .ab-labelrow { padding-bottom: 9px; margin-bottom: 18px; border-bottom: 1px solid var(--ab-hair); align-items: baseline; }
-.ab[data-ae="editorial-serif"] .ab-n { font-family: var(--ab-font-h); font-style: italic; font-size: 17px; letter-spacing: 0; text-transform: none; color: var(--ab-ink); }
+.ab[data-ae="editorial-serif"] .ab-n { font-family: var(--ab-font-h); font-style: italic; font-weight: 400; font-size: 17px; letter-spacing: 0; text-transform: none; color: var(--ab-ink); }
 .ab[data-ae="editorial-serif"] .ab-n::after { content: " — "; color: var(--ab-muted); font-style: normal; }
 .ab[data-ae="editorial-serif"] .ab-sec-ui .ab-label > span:not(.ab-n),
 .ab[data-ae="editorial-serif"] .ab-sec-touch .ab-label > span:not(.ab-n),
@@ -210,33 +210,21 @@
 .ab[data-ae="editorial-serif"] .ab-state-name { position: relative; margin-top: 8px; padding-top: 9px; text-align: center; color: var(--ab-muted); }
 .ab[data-ae="editorial-serif"] .ab-state-name::before { content: ""; position: absolute; left: 50%; top: 0; width: 1px; height: 6px; background: var(--ab-hair-strong); }
 
-/* 02 on the board: a text page instead of a form (the form is on the deck's Interface
-   slide). Generated copy: two justified columns in the body serif at 15/22 with the
-   board's only drop cap, a pull quote between hairlines (the field label's slot), the
-   states, then a byline and folio. Board only; deck slides keep the real controls. */
+/* 02: a text page in real markup (def.panels.panel): two justified columns of body serif with
+   the board's only drop cap, a pull quote between hairlines, the states, a byline and folio. */
 .ab[data-ae="editorial-serif"]:not(.ab-slide) .ab-sections { grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); }
-.ab[data-ae="editorial-serif"]:not(.ab-slide) .ab-sec-touch .ab-panel { display: block; }
-.ab[data-ae="editorial-serif"]:not(.ab-slide) .ab-sec-touch .ab-input,
-.ab[data-ae="editorial-serif"]:not(.ab-slide) .ab-sec-touch .ab-toggle,
-.ab[data-ae="editorial-serif"]:not(.ab-slide) .ab-sec-touch .ab-status { display: none; }
-.ab[data-ae="editorial-serif"]:not(.ab-slide) .ab-sec-touch .ab-panel::before {
-  content: "Every page begins with a single decision about scale. The cover gives the image the room and lets one line of type stand against it; inside, the rhythm changes to columns, folios and hairlines, and the reader slows down. A design language works the same way. It holds a few things steady (the paper, the ink, the faces and the measure) so that the stories can change from issue to issue without the page losing its voice. Nothing here is decoration. A rule separates, a caption explains, an italic word marks the turn in a sentence. Set with this much care, a brand does not need to raise its voice to be heard, and the page still feels alive.";
-  display: block; column-count: 2; column-gap: clamp(16px, 2.4cqw, 26px); column-rule: 1px solid var(--ab-hair-soft);
-  font-family: var(--ab-font-b); font-size: 15px; line-height: 22px; text-align: justify; hyphens: auto; color: var(--ab-ink);
+.ab[data-ae="editorial-serif"] .eds-page { display: block; }
+.ab[data-ae="editorial-serif"] .eds-cols { column-count: 2; column-gap: clamp(16px, 2.4cqw, 26px); column-rule: 1px solid var(--ab-hair-soft); }
+.ab[data-ae="editorial-serif"] .eds-p {
+  margin: 0 0 10px; font-family: var(--ab-font-b); font-size: 15px; line-height: 22px; text-align: justify; hyphens: auto; color: var(--ab-ink);
 }
-.ab[data-ae="editorial-serif"]:not(.ab-slide) .ab-sec-touch .ab-panel::first-letter {
+.ab[data-ae="editorial-serif"] .eds-p:first-child::first-letter {
   float: left; font-family: var(--ab-font-h); font-weight: 400; font-size: 70px; line-height: 58px; padding: 4px 8px 0 0; color: var(--ab-ink);
 }
-.ab[data-ae="editorial-serif"]:not(.ab-slide) .ab-sec-touch .ab-fieldlabel {
-  display: block; margin: 20px 0 0; padding: 14px 0 15px; border-top: 1px solid var(--ab-hair-strong); border-bottom: 1px solid var(--ab-hair);
-  font-size: 0; letter-spacing: 0; text-transform: none;
-}
-.ab[data-ae="editorial-serif"]:not(.ab-slide) .ab-sec-touch .ab-fieldlabel::before {
-  content: "\201C A brand does not need to raise its voice to be heard.\201D";
-  display: block; font-family: var(--ab-font-h); font-style: italic; font-weight: 400; font-size: 28px; line-height: 1.12; letter-spacing: -0.01em; color: var(--ab-ink);
-}
-.ab[data-ae="editorial-serif"]:not(.ab-slide) .ab-sec-touch .ab-panel::after {
-  content: "Words by the editors \00B7  Photographs by the studio"; display: block; margin-top: 16px; padding-top: 8px; border-top: 1px solid var(--ab-hair-soft);
+.ab[data-ae="editorial-serif"] .eds-pull { margin: 12px 0 0; padding: 14px 0 15px; border-top: 1px solid var(--ab-hair-strong); border-bottom: 1px solid var(--ab-hair); }
+.ab[data-ae="editorial-serif"] .eds-pull p { margin: 0; font-family: var(--ab-font-h); font-style: italic; font-weight: 400; font-size: 28px; line-height: 1.12; letter-spacing: -0.01em; color: var(--ab-ink); }
+.ab[data-ae="editorial-serif"] .eds-by {
+  display: flex; justify-content: space-between; gap: 12px; margin: 16px 0 0; padding-top: 8px; border-top: 1px solid var(--ab-hair-soft);
   font-family: var(--ab-font-label); font-size: 9px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--ab-muted);
 }
 
@@ -285,7 +273,7 @@
   .ab[data-ae="editorial-serif"] .ab-type-col { padding-right: 0; }
   .ab[data-ae="editorial-serif"]:not(.ab-slide) .ab-sections { grid-template-columns: minmax(0, 1fr); }
   .ab[data-ae="editorial-serif"] .ab-sec-touch { padding-left: 0; border-left: 0; }
-  .ab[data-ae="editorial-serif"]:not(.ab-slide) .ab-sec-touch .ab-panel::before { column-count: 1; }
+  .ab[data-ae="editorial-serif"] .eds-cols { column-count: 1; }
   .ab[data-ae="editorial-serif"] .ab-row { grid-template-columns: minmax(0, auto) minmax(14px, 1fr) auto 4.2ch; }
   .ab[data-ae="editorial-serif"] .ab-row-n { display: none; }
   .ab[data-ae="editorial-serif"] .ab-row-name { grid-column: 1; }
@@ -313,3 +301,7 @@
 .ab[data-ae="editorial-serif"].ab-slide[data-slide="cover"] .ab-deck-cover .ab-headline { max-width: none; }
 /* principles and closing: the motto in ink, the italic word in the same ink */
 .ab[data-ae="editorial-serif"].ab-slide .ab-headline.ab-deck-h { color: var(--ab-ink); line-height: 0.96; }
+/* do / don't: the rule numbers set as italic folios in the heading face */
+.ab[data-ae="editorial-serif"].ab-slide { --dk-mark-do: var(--ab-ink); }
+.ab[data-ae="editorial-serif"].ab-slide .ab-deck-mark { font-family: var(--ab-font-h); font-style: italic; font-weight: 400; font-size: 22px; letter-spacing: 0; }
+.ab[data-ae="editorial-serif"].ab-slide .ab-deck-ptitle, .ab[data-ae="editorial-serif"].ab-slide .ab-deck-pchip { font-weight: 400; }

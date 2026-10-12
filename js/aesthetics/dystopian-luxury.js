@@ -61,6 +61,14 @@ function dlSplit(word) {
   return [w.slice(0, at), w.slice(at)];
 }
 
+// The blank label held by four X stitches: accession number, circled numeral, a sub-line.
+function dlTag(cls) {
+  return `<div class="dl-tag${cls ? ' ' + cls : ''}"><i class="dl-st"></i><i class="dl-st"></i><i class="dl-st"></i><i class="dl-st"></i>
+        <span class="dl-tag-no">2026.114.3</span><span class="dl-tag-c">7</span>
+        <span class="dl-tag-sub">Viewed by / no one</span>
+      </div>`;
+}
+
 // One cropped plate: the word clipped under a black strip, viewBox 200 wide, height from the fit.
 function dlPlate(state, word, ink, label, num, maxFs) {
   const fit = dlWordFit(state, word, maxFs);
@@ -133,11 +141,9 @@ registerAesthetic({
     return {
       '--ab-dl-ink': ink,
       '--ab-dl-mark': mark,
-      '--ab-dl-on-mark': t.readable(mark),
       '--ab-dl-grey': d ? t.mix('#ffffff', t.canvas, 0.08) : t.mix('#000000', t.canvas, 0.06),
-      '--ab-dl-tint': t.mix(t.secondary, t.canvas, 0.12),
       '--ab-dl-hair': t.alpha(ink, 0.16),
-      '--ab-type-pick-w': '500',
+      '--ab-type-pick-w': '400',
     };
   },
 
@@ -158,10 +164,7 @@ registerAesthetic({
     return `<div class="dl-art">
       <div class="dl-plate dl-wide">${dlPlate(ctx.state, word, ink, 'CLASSIFIED / DIVISION 07 / NOT FOR RELEASE', '2026.114', 64)}</div>
       <div class="dl-plate dl-narrow">${narrow}<p class="dl-accline">Accession 2026.114.3 · viewed by no one</p></div>
-      <div class="dl-tag"><i class="dl-st"></i><i class="dl-st"></i><i class="dl-st"></i><i class="dl-st"></i>
-        <span class="dl-tag-no">2026.114.3</span><span class="dl-tag-c">7</span>
-        <span class="dl-tag-sub">Viewed by / no one</span>
-      </div>
+      ${dlTag('')}
     </div>`;
   },
 
@@ -192,7 +195,27 @@ registerAesthetic({
 
   // Deck copy (js/brand-deck.js): three principles, three do / don't lines, each short.
   deck: {
-    coverDisplay: 0.6,
+    // the cover is the cropped word with a caption-sized statement under it
+    coverDisplay: 0.22,
+    coverMin: 24,
+    // Material slide: the single label object at 1:1, nothing else
+    materialArt() { return `<div class="dl-obj">${dlTag('dl-tag--lg')}</div>`; },
+    // In product: one product page, one item, its accession number and one action
+    product(ctx) {
+      const e = ctx.e;
+      const name = e(String(ctx.brandName || 'Archive').trim());
+      return `<div class="dl-pp">
+        <div class="dl-pp-img">${dlTag('dl-tag--lg')}</div>
+        <div class="dl-pp-info">
+          <p class="dl-pp-acc">2026.114.3</p>
+          <h3 class="dl-pp-name">${name}, object 7</h3>
+          <p class="dl-pp-line">Wool, unlined. One of one. Made to order.</p>
+          <p class="dl-pp-price">Price on request</p>
+          <span class="ab-cta"><span class="ab-cta-label">Request a viewing</span></span>
+          <p class="dl-pp-foot">Catalogued \u00B7 Restricted \u00B7 Classified</p>
+        </div>
+      </div>`;
+    },
     principles: [
       ['Severity by removal', 'One cropped word, a 15px caption, white space.'],
       ['Default type, used without apology', 'An Arial-class sans and a typewriter mono.'],

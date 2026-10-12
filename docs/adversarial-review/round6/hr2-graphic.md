@@ -465,3 +465,61 @@ Worker fx62 (FX6-2, packet rev 2). Files changed: `js/aesthetics/{raw-brutalist,
 - radical-memphis: 6.5. The headline is furniture and the controls are slabs. The totem shrank because the copy column grew. "Speckle top" remains until fit.js changes.
 - bento-grid: 6.5. It has hierarchy, one radius level and a render tile. Imagery is still thin compared with Apple, and slide 07 is still patterns.
 - groovy-70s: 7. The arch is solid earth and the headline is locked below it. The palette strip and the deck colour slide still show the client teal, because the palette must show the client's roles.
+
+## Adoption log (fx62)
+
+This is the adopt pass, packet rev 3. It was shot after the SH shared-changes worker had landed the fit.js suites, the meta fonts and the `primaries` / `earth` colourways. Only my six aesthetics' js/css files changed. Diff line counts are against HEAD, so they include the fx62 fix round.
+
+**raw-brutalist** (+82 / -39)
+- `def.deck.materialArt` now draws the board wireframe. It was removed from `art()`, along with the 9 `.ab-slide[data-slide="material"]` toggle rules.
+- `def.deck.marks = { do: '[x]', dont: '[ ]' }` replaces the `font-size:0` / `::before` mark hack (6 lines deleted).
+- New `def.deck.product`: an unstyled Apache "Index of /…/projects" page. It has Times type, default blue and visited links, `<hr>` rules, grey browser buttons and an italic server signature.
+- Deleted the redundant slide-footer 16px rule; the framework's (0,2,0) footer rule lets the board rule apply.
+- Weights: the heading face is now `var(--rb-hw)`, the heaviest real weight from FONTS. That is 400 for Archivo Black, so no more 600/700/900 requests on it.
+
+**neo-brutal-pop** (+133 / -71)
+- `def.deck.materialArt` draws the sticker sheet. The sheet is removed from `art()`, and the shared SVG pieces moved into an `npKit()` helper.
+- The 4 Material toggle rules are deleted.
+- New `def.deck.product`: a Gumroad-style product page. An accent cover holds an initial disc, a NEW starburst and a $1 tag, beside a title, description, price sticker, rating and an "I want this!" chunky CTA.
+- Weights: `--np-hw` for the heading face (Bricolage, 800) and `--np-uw` for the UI face (DM Sans, 700) replace every 600/800 request.
+- `--ab-type-pick-w` is now 400, and 3 stray `!important`s on the type picks are removed.
+
+**bauhaus-poster** (+96 / -48)
+- `coverBand: false` replaces the `.ab-deck-pattern` hiding and the `padding-bottom … !important`.
+- `materialArt` returns the poster with its dimension notes, through a new `bpPoster(ctx, notes)`. The `.bpa-note` CSS toggles are deleted.
+- New `def.deck.product`: an exhibition wall with three posters (A1, A2, A4) on an ink rail, printed in the fixed inks, with captions.
+- Weights: Jost only has 400 and 600, so every 700/800 became 600 and every 500 became 400. Deck pchip, pname, ptitle and mark are at 600.
+
+**radical-memphis** (+57 / -8)
+- New `def.deck.product`: a showroom room-set. It has a framed Bacterio laminate, the Tahiti totem on a skewed terrazzo floor slab, a semicircle-and-checker side table and a paper plaque.
+- Weights: DM Sans 600/800 requests became 700. Heading-face labels use `var(--mm-hw)`, which resolves to 400 for Archivo Black.
+
+**bento-grid** (+75 / -48)
+- `def.deck.patternsStage` now holds the "Tile system": 2×2, 2×1, 1×1, 1×2 and an action tile, annotated "gap 14 · radius 28 · no borders".
+- `def.deck.materialArt` is a small bento of the tile materials: a render tile (sphere), a numeral tile, a colour tile and a flat tile.
+- Removed `.bna-sys` from `art()` and its 7 Material toggle rules.
+- Fractional weights (550, 560, 580, 620, 640, 650) are snapped to 600.
+- The default In product slide is already native here (tiles), so no product hook.
+
+**groovy-70s** (+72 / -23)
+- `coverBand: false` replaces the `.ab-deck-pattern` hiding and the `!important` padding.
+- New `def.deck.product`: an LP sleeve. The sleeve carries the solid earth arch with the brand lettered along the outer curve; the record slides out to the right, and an A-side track list sits beside it as solid band pills.
+- Deleted the dead `.ab-deck-ctacard` rule and the unused `--gv-wave` mask variable.
+- Weights: Work Sans 700 became 600 and 500 became 400. Bagel labels use `var(--ab-hw)`, which is 400.
+
+**Not adopted, deliberately**
+- `def.states` / `def.panels`: no board fakes panel markup with CSS generated content, and no review asked for a different states component.
+- `layout.order` / new hero and palette kinds: each board's structure was already made distinct in the fx62 round. Bento re-grids into tiles, and Bauhaus, Groovy and Memphis have their own heroes. More would be churn.
+
+**Checks**
+- Board shots: 24 at `overflow=0`, no console errors.
+- Gore: 4 configs × 6 keys = 24 combos, 0 issues.
+- Missing-weight scan on board plus all deck slides: 0 for all six keys.
+- `node tests/run.js`: all passed.
+- `harness.js`: 0 FAIL, briefs 192 fails 0.
+- `src-verify-p5.js`: families 53, fails 0, map mismatches 0.
+
+Sheets are in `S/adv/fx62/ad/`:
+- Boards: `sheet-ad-<key>.png`
+- Decks: `sheet-deck-ad-<key>.png` (recommended mode) and `sheet-deck-ado-<key>.png` (other mode)
+- Gore: `gore2.json`

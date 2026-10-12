@@ -142,6 +142,38 @@ registerAesthetic({
   // Deck copy (js/brand-deck.js): three principles, three do / don't lines, each short.
   deck: {
     coverDisplay: 0.55,
+    coverBand: false,
+    // In product: an LP sleeve. A square sleeve with the solid arch and the brand lettered
+    // along the curve, the record sliding out, and a printed track list beside it.
+    product(ctx) {
+      const e = ctx.e;
+      const bands = gvBands(ctx.t);
+      const w = 4.6, gap = 1;
+      const arcs = bands.map((c, i) => {
+        const r = 40 - w / 2 - i * (w + gap);
+        return `<path d="M${50 - r} 94 V74 A${r} ${r} 0 0 1 ${50 + r} 74 V94" fill="none" stroke="${c}" stroke-width="${w}"/>`;
+      }).join('');
+      const id = `gvp-${++gvSeq}`;
+      const name = e(String(ctx.brandName || 'Studio'));
+      const tracks = (ctx.rows || []).map((r, i) => `<li><b>A${i + 1}</b><span>${e(r[0])}</span><em>${e(String(r[2]))}%</em></li>`).join('');
+      return `<div class="gvp">
+        <div class="gvp-pack" aria-hidden="true">
+          <svg class="gvp-disc" viewBox="0 0 100 100" focusable="false"><circle cx="50" cy="50" r="49" fill="#1d1612"/><circle cx="50" cy="50" r="40" fill="none" stroke="#3a2e27" stroke-width="0.6"/><circle cx="50" cy="50" r="32" fill="none" stroke="#3a2e27" stroke-width="0.6"/><circle cx="50" cy="50" r="17" fill="${ctx.t.primary}"/><circle cx="50" cy="50" r="2" fill="#1d1612"/></svg>
+          <svg class="gvp-sleeve" viewBox="0 0 100 100" focusable="false">
+            <rect width="100" height="100" fill="${ctx.t.isDark ? '#F3E6CF' : ctx.t.canvas}"/>
+            <defs><path id="${id}" d="M7 74 A43 43 0 0 1 93 74"/></defs>
+            ${arcs}
+            <text class="gvp-t" font-size="7.4" fill="#2a1a15" text-anchor="middle"><textPath href="#${id}" startOffset="50%">${name}</textPath></text>
+            <text class="gvp-t" x="7" y="10" font-size="3.8" fill="#2a1a15">good vibes, printed.</text><text class="gvp-t" x="93" y="10" font-size="3.8" fill="#2a1a15" text-anchor="end">LP · 33⅓</text>
+          </svg>
+        </div>
+        <div class="gvp-back">
+          <p class="gvp-label">Side A · 33⅓ rpm</p>
+          <h3 class="gvp-title ab-headline">Good vibes, printed.</h3>
+          <ol class="gvp-tracks">${tracks}</ol>
+        </div>
+      </div>`;
+    },
     principles: [
       ['Warm, wavy, joyful', 'Cream canvas, fat soft type, a solid earth-ramp arch.'],
       ['Echoed type, solid blocks', 'Stepped band contours on the headline; solid colour, never pastel tint.'],

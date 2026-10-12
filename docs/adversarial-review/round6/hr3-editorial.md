@@ -461,3 +461,75 @@ Scores against the references:
 | Mixed Type | 6.5 | There are no real photos, and the axes are unavailable. |
 | Rebus | 7 | The pattern slide is still off-concept. |
 | Micrographics | 6.5 | The saturated-field attitude is limited to the hazard tape and the stickers. |
+
+---
+
+## Adoption log (fx63)
+
+Adoption pass, packet rev 3, on the hooks from commit 96438f8. The shared changes (fonts, meta, suites, colourways) landed while I worked, uncommitted, and every shot below uses the real defaults. The in-memory font override is gone. Files changed: the six `js/aesthetics/*.js` and six `css/aesthetics/*.css` for my keys only; 201 lines added and 115 deleted (git diff stat).
+
+| Check | Result |
+|---|---|
+| Gore, 6 keys × 4 configs | 0 issues across 24 combos |
+| Weight audit (`fx63/wfind.js`, board and every slide) | 0 requests for weights a face lacks |
+| `tests/run.js` | all passed |
+| `harness.js` | 0 FAIL / 0 THROW (192 briefs, 0 warnings) |
+| `src-verify-p5.js` | 0 fails, 0 map mismatches |
+| Console errors | none except the favicon 404 |
+| Overflow at 390px | 0 |
+
+Sheets are in `adv/fx63/`. Boards: `sheet-a3-<key>.png`. Decks: `sheet-deck-<key>-a3r.png` (recommended mode) and `sheet-deck-<key>-a3o.png` (other mode). Key slide grids: `grid-a3r.png` and `grid-a3o.png`.
+
+None of the six CSS files targeted the removed deck classes, so there was nothing to delete there.
+
+### Editorial Serif
+- Adopted `def.panels.panel` (QC note). The text page is real markup: two `.eds-p` paragraphs in `.eds-cols`, a `blockquote.eds-pull`, the states and `p.eds-by`. The CSS generated-content block is gone (the `::before` text, the `::first-letter` on `.ab-panel`, the field-label quote and the `::after` byline). The deck Interface slide takes the field and toggle from the default panel.
+- On Do/Don't, the numbers are italic folios in the heading face, in ink.
+- Weights: `.ab-n` and the deck `ptitle` and `pchip` are set to 400 for Bodoni Moda.
+- Removed the unused tokens `--ab-eds-mid` and `--ab-eds-ink-hover`.
+- The still life now aligns to the top (`xMidYMin slice`), so the wide deck cover keeps the bottles in frame.
+
+### Neo Deco
+- Adopted `def.deck.materialArt`, which draws the brass specimen. Removed `.nds-mat` from `art()` and the `.ab-deck-stage` hide/show rules.
+- Do/Don't markers are `def.deck.marks` ◆ / ◇ in brass.
+- Weights: Josefin Sans 500 → 600; Limelight's mark, wordmark, `type-cur`, `pchip` and `ptitle` → 400.
+- Patterns now render in the brass colourway, so the cover band and the patterns slide are brass.
+
+### Dystopian Luxury
+- The cover is a caption cover: `coverDisplay: 0.22` with `coverMin: 24` (QC note). Removed the dead `font-size: 15px !important` rule.
+- Adopted `def.deck.materialArt`: the single label at 1:1 (`dlTag()` helper, shared with the hero). Removed six `.ab-deck-stage` override rules.
+- Added `def.deck.product`: one product page with one item, its accession number and one ink action with the 6px mark.
+- Weights for Arimo (400/700) and Archivo (400/600/800/900): 500 → 400 and 600 → 700 on Arimo, the wordmark at 600, `type-cur` at 400, and `--ab-type-pick-w` at 400.
+- Removed the unused tokens `--ab-dl-on-mark` and `--ab-dl-tint`, and replaced two new `!important` rules with specific selectors.
+
+### Mixed Type
+- The default In-product and Do/Don't slides are native enough as they stand.
+- Weights: the Fraunces `pchip` → 600 and the DM Mono deck mark → 500.
+- Removed the unused `--ab-paper` token.
+
+### Rebus
+- Adopted `def.deck.patternsStage`. The rebus-native fields are a glyph field, a sentence wall typeset by the engine in ink, and a stripe study of the lead glyph on the 24-unit grid. A brief with pinned patterns still gets its own wall.
+- Adopted `def.deck.materialArt` for the construction sheet (`rbLeadSet()` helper). Removed `rbBuild` from `art()`, the `.rb-build { display: none }` rule and the material-slide hide rules.
+- Removed the unused `arrow` and `lid` control glyphs and their exclusion in `rbArith`.
+- Weights: Work Sans 700 → 600 and 500 → 400; the Zilla `pchip` uses `--rb-hw`; `--ab-type-pick-w` is 400.
+- The Design tab overlay (De + [sign]) needs neither `font-size: 0` nor `!important`.
+
+### Micrographics
+- Weights: `type-cur`, `ptitle` and `pchip` use `--ab-hw`; `--ab-type-pick-w` is 400.
+- Removed the unused `--ab-mg-tick` token.
+- `materialStage: 'pattern'` is kept, and the hazard tape renders in the safety colourway.
+
+### Kept on purpose
+- The `!important` margins that remain match base `!important` margins (kicker, subcopy, card title, type-class).
+- The cover-art `max-width: none !important` and `width` rules override the inline sizes `bdFitCover` sets.
+
+### Not adopted
+- I made no layout-order changes; none looked like a clear improvement.
+- `def.states` is not used; the existing state rows work.
+
+### Shared-file deviations (I didn't edit these files)
+- The micrographics default pairing landed as `IBM Plex Sans / IBM Plex Mono`, not the `Archivo Black` I requested. The board is less loud than intended.
+- The mixed-type suite leads with `cutup` 'Specimen collage' in the brand colourway and keeps `flyposter` in brand colours. The deck cover band and patterns slide still show client orange and teal.
+- The DL suite leads with `slipgrid` 'Cold cells', not `stipple`.
+- The ES suite leads with `stipple` and keeps `marble` 'Endpaper'.
+- The rebus suite is not used on the deck, because `patternsStage` replaces the slide.

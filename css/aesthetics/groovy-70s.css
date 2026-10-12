@@ -11,7 +11,6 @@
 ------------------------------------------------------------------------ */
 
 .ab[data-ae="groovy-70s"] {
-  --gv-wave: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='12' viewBox='0 0 40 12'%3E%3Cpath d='M0 6 Q10 -1 20 6 T40 6' fill='none' stroke='black' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E");
   --gv-w: min(760px, calc(100cqw - 2 * var(--ab-pad)));
   --ab-art-ratio: 200 / 112; --ab-art-ratio-narrow: 200 / 112;
   border-radius: 28px;
@@ -44,7 +43,7 @@
 }
 .ab[data-ae="groovy-70s"] .ab-mark span { position: relative; z-index: 1; }
 .ab[data-ae="groovy-70s"] .ab-tag { padding: 6px 14px; border-radius: 999px; background: var(--ab-card-b); color: var(--ab-ink); font-size: 10.5px; letter-spacing: 0.1em; }
-.ab[data-ae="groovy-70s"] .ab-tag b { font-weight: 700; }
+.ab[data-ae="groovy-70s"] .ab-tag b { font-weight: 600; }
 
 /* ---- hero: the supergraphic arch first, the statement BELOW it (never straddling its feet) ---- */
 .ab[data-ae="groovy-70s"] .ab-hero { gap: 0; padding: clamp(18px, 3.4cqw, 40px) 0 clamp(26px, 4cqw, 46px); }
@@ -70,7 +69,7 @@
 
 /* ---- section labels ---- */
 .ab[data-ae="groovy-70s"] .ab-label { color: var(--ab-ink); font-weight: 600; letter-spacing: 0.12em; }
-.ab[data-ae="groovy-70s"] .ab-labelrow .ab-label:last-child:not(:first-child) { color: var(--ab-muted); font-weight: 500; }
+.ab[data-ae="groovy-70s"] .ab-labelrow .ab-label:last-child:not(:first-child) { color: var(--ab-muted); font-weight: 400; }
 .ab[data-ae="groovy-70s"] .ab-n { display: inline-grid; place-items: center; min-width: 26px; height: 26px; margin-right: 10px; padding: 0 6px; border-radius: 999px; background: var(--ab-primary); color: var(--ab-on-primary); letter-spacing: 0.02em; font-size: 10.5px; }
 .ab[data-ae="groovy-70s"] .ab-n::after { content: none; }
 .ab[data-ae="groovy-70s"] .ab-sec-touch .ab-n { background: var(--ab-secondary); color: var(--ab-on-secondary); }
@@ -91,15 +90,15 @@
 .ab[data-ae="groovy-70s"] .ab-type-col { padding: 20px 22px 18px; border-top: 0; border-radius: 30px; background: var(--ab-b1); color: var(--ab-on-b1); }
 .ab[data-ae="groovy-70s"] .ab-type-col[data-role="body"] { background: var(--ab-kraft); color: var(--ab-ink); }
 .ab[data-ae="groovy-70s"] .ab-type-col[data-role="mono"] { background: var(--ab-b4); color: var(--ab-on-b4); }
-.ab[data-ae="groovy-70s"] .ab-type-role { color: inherit; font-weight: 700; }
+.ab[data-ae="groovy-70s"] .ab-type-role { color: inherit; font-weight: 600; }
 .ab[data-ae="groovy-70s"] .ab-type-class { color: inherit; opacity: 0.8; }
 .ab[data-ae="groovy-70s"] .ab-type-fit, .ab[data-ae="groovy-70s"] .ab-type-cur, .ab[data-ae="groovy-70s"] .ab-type-cur b { color: inherit; }
 .ab[data-ae="groovy-70s"] .ab-type-pick { letter-spacing: calc(-0.01em * var(--ab-tr, 1)); }
 .ab[data-ae="groovy-70s"] .ab-fit { border: 0; background: var(--ab-lift); color: var(--ab-ink); }
 .ab[data-ae="groovy-70s"] .ab-fit[data-fit="avoid"] { background: var(--ab-ink); color: var(--ab-canvas); }
-.ab[data-ae="groovy-70s"] .ab-type-k { color: var(--ab-ink); font-weight: 700; }
+.ab[data-ae="groovy-70s"] .ab-type-k { color: var(--ab-ink); font-weight: 600; }
 .ab[data-ae="groovy-70s"] .ab-type-apply {
-  padding: 14px 24px 11px; border: 0; border-radius: 999px 999px 8px 8px; background: var(--gv-brown); color: #F6EBD9; font-weight: 700; transition: transform .15s;
+  padding: 14px 24px 11px; border: 0; border-radius: 999px 999px 8px 8px; background: var(--gv-brown); color: #F6EBD9; font-weight: 600; transition: transform .15s;
 }
 .ab[data-ae="groovy-70s"] .ab-type-apply:hover { background: var(--gv-brown); transform: scale(1.04); }
 .ab[data-ae="groovy-70s"] .ab-type-apply:focus-visible { outline: 3px solid var(--ab-primary-text); outline-offset: 3px; }
@@ -124,11 +123,11 @@
 .ab[data-ae="groovy-70s"] .ab-seg { gap: 6px; padding: 0 0 0; border-radius: 0; background: none; border-bottom: 4px solid var(--ab-track); }
 .ab[data-ae="groovy-70s"] .ab-seg-btn { min-height: 40px; border-radius: 999px 999px 0 0; background: var(--ab-track); font-size: 13px; font-weight: 600; color: var(--ab-ink); opacity: 0.8; transition: background .15s, transform .15s; }
 .ab[data-ae="groovy-70s"] .ab-seg-btn:hover { opacity: 1; background: var(--ab-lift); }
-.ab[data-ae="groovy-70s"] .ab-seg-btn[aria-pressed="true"] { background: var(--ab-primary); color: var(--ab-on-primary); opacity: 1; font-weight: 700; }
+.ab[data-ae="groovy-70s"] .ab-seg-btn[aria-pressed="true"] { background: var(--ab-primary); color: var(--ab-on-primary); opacity: 1; font-weight: 600; }
 .ab[data-ae="groovy-70s"] .ab-card-title { margin: 24px 0 8px !important; font-family: var(--ab-font-h); font-weight: var(--ab-hw); letter-spacing: calc(-0.01em * var(--ab-tr, 1)); font-size: clamp(22px, 3cqw, 30px); line-height: 1.1; }
 .ab[data-ae="groovy-70s"] .ab-card-body { color: var(--ab-ink); opacity: 0.78; font-size: 14px; }
 .ab[data-ae="groovy-70s"] .ab-cta {
-  border-radius: 999px; padding: 15px 14px 15px 28px; background: var(--ab-primary); color: var(--ab-on-primary); font-weight: 700; font-size: 15px; box-shadow: none;
+  border-radius: 999px; padding: 15px 14px 15px 28px; background: var(--ab-primary); color: var(--ab-on-primary); font-weight: 600; font-size: 15px; box-shadow: none;
   transition: transform .18s cubic-bezier(.3,1.4,.5,1), box-shadow .15s, background .15s;
 }
 .ab[data-ae="groovy-70s"] .ab-cta:hover { transform: scale(1.03); box-shadow: 0 0 0 5px var(--ab-ring); }
@@ -137,8 +136,8 @@
 .ab[data-ae="groovy-70s"] .ab-cta-arrow::before { content: "→"; font-size: 16px; line-height: 1; }
 
 /* ---- 02 waves: field, switch, states ---- */
-.ab[data-ae="groovy-70s"] .ab-fieldlabel { font-size: 12px; font-weight: 700; letter-spacing: 0.04em; margin-left: 6px; }
-.ab[data-ae="groovy-70s"] .ab-input { border: 0; border-radius: 999px; padding: 14px 22px; background: var(--ab-lift); font-size: 15px; font-weight: 500; transition: box-shadow .15s; }
+.ab[data-ae="groovy-70s"] .ab-fieldlabel { font-size: 12px; font-weight: 600; letter-spacing: 0.04em; margin-left: 6px; }
+.ab[data-ae="groovy-70s"] .ab-input { border: 0; border-radius: 999px; padding: 14px 22px; background: var(--ab-lift); font-size: 15px; font-weight: 400; transition: box-shadow .15s; }
 .ab[data-ae="groovy-70s"] .ab-input:focus { box-shadow: 0 0 0 4px var(--ab-ring); }
 .ab[data-ae="groovy-70s"] .ab-toggle { padding-left: 6px; }
 .ab[data-ae="groovy-70s"] .ab-toggle > span { font-weight: 600; }
@@ -150,7 +149,7 @@
 .ab[data-ae="groovy-70s"] .ab-status::before { content: ""; width: 10px; height: 10px; border-radius: 50%; background: var(--ab-primary); }
 /* no opacity on the state wrapper: it washed the Save samples out to ~70% saturation */
 .ab[data-ae="groovy-70s"] .ab-state { font-size: 12px; font-weight: 600; color: var(--ab-ink); }
-.ab[data-ae="groovy-70s"] .ab-states .ab-state-ctl { border-radius: 999px; padding: 12px 10px; background: var(--ab-primary); color: var(--ab-on-primary); font-weight: 700; justify-content: center; box-shadow: none; transition: none; }
+.ab[data-ae="groovy-70s"] .ab-states .ab-state-ctl { border-radius: 999px; padding: 12px 10px; background: var(--ab-primary); color: var(--ab-on-primary); font-weight: 600; justify-content: center; box-shadow: none; transition: none; }
 .ab[data-ae="groovy-70s"] .ab-states .ab-state-ctl.is-hover { transform: scale(1.06); box-shadow: 0 0 0 5px var(--ab-ring); }
 .ab[data-ae="groovy-70s"] .ab-states .ab-state-ctl.is-pressed { transform: scale(0.93); background: var(--ab-pri-dark); }
 
@@ -164,12 +163,12 @@
 .ab[data-ae="groovy-70s"] .ab-row:nth-child(3) { --gv-rb: var(--ab-b1); --gv-rt: var(--ab-on-b1); }
 .ab[data-ae="groovy-70s"] .ab-row-n { display: none; }
 .ab[data-ae="groovy-70s"] .ab-av { display: grid; place-items: center; width: 38px; height: 38px; border-radius: 50%; background: var(--ab-lift); color: var(--ab-ink); font: var(--ab-hw) 15px/1 var(--ab-font-h); }
-.ab[data-ae="groovy-70s"] .ab-row-name { font-weight: 700; font-size: 14px; color: inherit; }
+.ab[data-ae="groovy-70s"] .ab-row-name { font-weight: 600; font-size: 14px; color: inherit; }
 /* status: plain lettering on the band, no white mini-pill */
-.ab[data-ae="groovy-70s"] .ab-row-status { background: none; color: inherit; font-weight: 700; padding: 0; border-radius: 0; font-size: 12px; letter-spacing: 0.02em; }
+.ab[data-ae="groovy-70s"] .ab-row-status { background: none; color: inherit; font-weight: 600; padding: 0; border-radius: 0; font-size: 12px; letter-spacing: 0.02em; }
 .ab[data-ae="groovy-70s"] .ab-row-bar { height: 12px; border-radius: 999px; background: color-mix(in srgb, var(--gv-rt) 24%, transparent); }
 .ab[data-ae="groovy-70s"] .ab-row-bar i { border-radius: 999px; background: var(--gv-rt); }
-.ab[data-ae="groovy-70s"] .ab-row-pct { font-weight: 700; font-size: 13px; color: inherit; }
+.ab[data-ae="groovy-70s"] .ab-row-pct { font-weight: 600; font-size: 13px; color: inherit; }
 
 /* ---- footer ---- */
 .ab[data-ae="groovy-70s"] .ab-motto { font-family: var(--ab-font-h); font-weight: var(--ab-hw); font-size: 13px; color: var(--ab-ink); }
@@ -207,10 +206,8 @@
 }
 
 /* Deck cover: the arch at ~85% of the slide height, centred and bleeding off the bottom edge,
-   the statement above it at ~72px (def.deck.coverDisplay 0.55). The pattern band is not used
-   on this cover (the arch is the cover). */
-.ab[data-ae="groovy-70s"].ab-slide[data-slide="cover"] > .ab-deck-pattern { display: none; }
-.ab[data-ae="groovy-70s"].ab-slide[data-slide="cover"] > .ab-in.ab-slide-in { padding-bottom: 26px !important; }
+   the statement above it at ~72px (def.deck.coverDisplay 0.55). def.deck.coverBand: false drops
+   the pattern band (the arch is the cover). */
 .ab[data-ae="groovy-70s"].ab-slide[data-slide="cover"] .ab-deck-cover { justify-content: flex-start; }
 .ab[data-ae="groovy-70s"].ab-slide[data-slide="cover"] .ab-hero { position: static; padding: 0; }
 .ab[data-ae="groovy-70s"].ab-slide[data-slide="cover"] .ab-hero > .ab-art {
@@ -226,8 +223,28 @@
 .ab[data-ae="groovy-70s"].ab-slide[data-slide="cover"] .ab-slide-foot { box-shadow: -60px 0 0 var(--ab-canvas), 60px 0 0 var(--ab-canvas), 0 30px 0 var(--ab-canvas); }
 .ab[data-ae="groovy-70s"].ab-slide[data-slide="cover"] .ab-subcopy { display: none; }
 
-/* Deck product slide: the CTA card is a cream panel framed by the corner-turning stripes */
-.ab[data-ae="groovy-70s"] .ab-deck-ctacard {
-  margin: 22px; border: 0; border-radius: 36px; background: var(--ab-lift);
-  box-shadow: 0 0 0 5px var(--ab-b2), 0 0 0 8px var(--ab-canvas), 0 0 0 13px var(--ab-b4), 0 0 0 16px var(--ab-canvas), 0 0 0 21px var(--ab-b1);
+
+/* deck labels in the heading face at its own weight (font-synthesis is off) */
+.ab[data-ae="groovy-70s"] :is(.ab-deck-ptitle, .ab-deck-pchip, .ab-deck-ddhead) { font-weight: var(--ab-hw); }
+.ab[data-ae="groovy-70s"] :is(.ab-deck-pname, .ab-deck-mark) { font-weight: 600; }
+
+/* In product (def.deck.product): an LP sleeve with the record sliding out, and the track list */
+.ab[data-ae="groovy-70s"] .gvp { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: center; gap: 70px; height: 100%; padding: 0 20px; }
+.ab[data-ae="groovy-70s"] .gvp-pack { position: relative; width: 440px; height: 440px; margin-right: 150px; }
+.ab[data-ae="groovy-70s"] .gvp-sleeve { position: absolute; inset: 0; width: 100%; height: 100%; border-radius: 6px; box-shadow: 0 0 0 1px var(--ab-line); }
+.ab[data-ae="groovy-70s"] .gvp-disc { position: absolute; top: 12px; left: 150px; width: 416px; height: 416px; }
+.ab[data-ae="groovy-70s"] .gvp-t { font-family: var(--ab-font-h); font-weight: var(--ab-hw); letter-spacing: 0.02em; }
+.ab[data-ae="groovy-70s"] .gvp-back { min-width: 0; }
+.ab[data-ae="groovy-70s"] .gvp-label { margin: 0 0 10px; font: 600 14px/1.2 var(--ab-font-b); letter-spacing: 0.12em; text-transform: uppercase; color: var(--ab-ink); }
+.ab[data-ae="groovy-70s"] .gvp-title { margin: 0 0 22px; font-size: 52px; }
+.ab[data-ae="groovy-70s"] .gvp-tracks { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.ab[data-ae="groovy-70s"] .gvp-tracks li {
+  display: grid; grid-template-columns: 40px minmax(0, 1fr) auto; align-items: center; gap: 12px; padding: 12px 20px 12px 12px; border-radius: 999px;
+  background: var(--ab-b2); color: var(--ab-on-b2); font: 600 18px/1.2 var(--ab-font-b);
 }
+.ab[data-ae="groovy-70s"] .gvp-tracks li:nth-child(2) { background: var(--ab-b4); color: var(--ab-on-b4); }
+.ab[data-ae="groovy-70s"] .gvp-tracks li:nth-child(3) { background: var(--ab-b1); color: var(--ab-on-b1); }
+.ab[data-ae="groovy-70s"] .gvp-tracks b { display: grid; place-items: center; width: 40px; height: 40px; border-radius: 50%; background: var(--ab-lift); color: var(--ab-ink); font: var(--ab-hw) 14px/1 var(--ab-font-h); }
+.ab[data-ae="groovy-70s"] .gvp-tracks em { font-style: normal; }
+.ab[data-ae="groovy-70s"] .ab-type-col[data-role="heading"] .ab-type-cur b { font-weight: var(--ab-hw); }
+.ab[data-ae="groovy-70s"] :is(.ab-type-col[data-role="body"] .ab-type-cur b, .ab-deck-pratio b) { font-weight: 600; }

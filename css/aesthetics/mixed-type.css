@@ -300,3 +300,6 @@
 .ab[data-ae="mixed-type"].ab-slide[data-slide="cover"] .mt-spec { display: none; }
 .ab[data-ae="mixed-type"].ab-slide[data-slide="cover"] .mt-lead { display: none; }
 .ab[data-ae="mixed-type"].ab-slide[data-slide="principles"] .ab-deck-lead { min-width: 0; }
+/* weights the faces have (font-synthesis: none) */
+.ab[data-ae="mixed-type"].ab-slide .ab-deck-pchip { font-weight: 600; }
+.ab[data-ae="mixed-type"].ab-slide .ab-deck-mark { font-weight: 500; }

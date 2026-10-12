@@ -22,8 +22,8 @@
    - Colour: oak, paper, ink, gilt (lines only) and pencil are fixed. Primary and secondary are
      cloths; the accent is the wax (any colour of wax is real) and the rubric when it holds 3:1 on
      paper, else oxblood. No blackletter, no skulls, no quills.
-   The deck's Material stage shows a second art variant (an ex libris bookplate with a laurel and
-   the monogram), so the cover's shelf is not repeated. */
+   The deck's Material slide shows an ex libris bookplate (def.deck.materialArt), so the cover's
+   shelf is not repeated. */
 
 const DA = {
   oak: '#1E1712', paper: '#EFE6D2', ink: '#2A2018', gilt: '#B08D57', giltLite: '#D9BC86', pencil: '#5E5448',
@@ -240,7 +240,8 @@ registerAesthetic({
   mode: 'dark',
   slideShape: 'classic',
   labels: { material: 'Binding', states: ['Cloth', 'Gilt', 'Sealed'], statesKind: 'swatch' },
-  layout: { hero: 'split', palette: 'swatches', sections: 'two-col' },
+  // the catalogue card leads the sections (a library is found through its catalogue), then the spines and the binding
+  layout: { hero: 'split', palette: 'swatches', sections: 'two-col', sectionOrder: ['use', 'ui', 'touch'] },
   type: { ui: 'body', label: 'body', display: 0.86 },
   highlight: 'custom',
   highlightNote: 'The highlighted (last) word is set in the heading face\'s true italic in the rubric colour, and the headline opens with a raised rubricated initial; the rubric is the accent when it holds 3:1 on paper, else oxblood. Always on a paper leaf, never on the dark wood.',
@@ -317,7 +318,7 @@ registerAesthetic({
     }
     const id = `da${++daSeq}`;
     const rnd = daRand(daHash(String(ctx.brandName || 'brand') + '|da'));
-    return `<div class="da-art">${daShelf(ctx, id, rnd)}${daPlate(ctx, id + 'p')}</div>`;
+    return `<div class="da-art">${daShelf(ctx, id, rnd)}</div>`;
   },
 
   materials: [
@@ -360,6 +361,9 @@ registerAesthetic({
       'Use blackletter; this is a library.',
       'Sepia-tint everything into mud.',
     ],
+    // the Material slide shows an ex libris bookplate, not the cover's shelf again
+    materialArt: ctx => `<div class="da-art">${daPlate(ctx, `da${++daSeq}p`)}</div>`,
+    marks: { do: '☞', dont: '§' },
     coverDisplay: 0.8,
   },
 });

@@ -437,3 +437,49 @@ Skeletons now differ: soft-form split hero with a bleeding well and asym 7/5 sec
 **clay.** Fix 1: the segmented control, field, switch, status, bars, tag, badges and kicker are flat; the cards are hairline cards. Only the CTA, avatars, art, palette blobs and the three state objects keep the clay formula. Fix 2: the clay is matte (broad top light, -14px underside, 8% feTurbulence grain) with imperfect radii and tighter contact shadows. Fix 3: the deck cover uses a 1.2fr / 1fr grid and `coverDisplay` 0.85. Fix 4: the highlight is a flat accent band with no tilt, and `highlightNote` is updated. Fix 5: the headline is 600 / -0.03em; the font is a shared request. Fix 6: the canvas is 3% primary. Fix 7 is a shared request. The states are three clay objects (Rest, Pressed, Lifted), not Save rows.
 
 Verification: gore on 6 keys × 4 configs gives 0 issues. `tests/run.js` passes. The `t5/harness.js` failures belong only to dark-academia, retro-futurist and wabi-sabi (other owners, mid-edit), with none for these keys. `src-verify-p5.js` reports 0 fails and 0 mismatches. Every board has 0 overflow at 390px, and the only console error is the existing favicon 404.
+
+## Adoption log (fx61)
+
+This is packet rev 3: the hook adoption and cleanup pass, run on 2026-10-11 against HEAD `aeaa69a`, which includes the shared batch with fonts, meta, suites and colourways. My files contain no rules for removed deck classes. The default In-product and Do/Don't slides read native in all six styles, so none of them needs `deck.product` or `deck.marks`. My files used no Material-slide hacks and no `!important` band hiding.
+
+**soft-form** (+26 / −18 lines)
+- The slider is now real markup from `def.panels.panel` (`.sf-slider`), replacing the `.ab-status::before/::after` drawing.
+- The 01 card's iridescent ring is a border-box gradient instead of a `-webkit-mask` and `mask-composite` ring, so it now exports.
+
+**liquid-glass** (+29 / −29 lines)
+- 03 is real markup from `def.panels.list`: title, detail and an SVG chevron. The `font-size: 0` and `::after` chevron, plus the hidden number and bar rules, are gone.
+- The refraction filter now runs through `--lg-refract`, set inline by `art()`. That removed the `filter: none !important` override for reduced transparency.
+- Removed the unused `--ab-glass-opaque`, `--ab-ring` and ring helper. Updated the header comments and the secondary role text.
+
+**holo-iridescent** (−6 lines)
+- Removed the dead `--ab-rim-conic`, `--ab-rim-conic-2` and `--ab-rim-glow` tokens and their helpers.
+
+**mesh-gradient** (+15 / −6 lines)
+- 03 is real markup from `def.panels.list`, with a "Recent projects" header that was CSS `content` before.
+- Dropped the margin `!important` on the state pills and moved heading-face weights from 700 to 600, which Plus Jakarta Sans has.
+- `layout.order` is now hero, sections, palette, type, so the interface follows the hero (product-first, as Ramp and Stripe do).
+
+**aurora-noir** (+42 / −26 lines)
+- 03 is real markup from `def.panels.list`: a caption row, brand-prefixed IDs (`<initial>S-101…`) and a footer average computed from the rows. This replaces the `::before/::after` content strings, the `AN-1` counter and the `font-size: 0` row numbers.
+- The window fade is a canvas overlay instead of `mask-image`. The horizon arc now sits above the fade.
+- Dropped two `display: grid !important` declarations; a higher-specificity selector does the job.
+- FIG captions are numbered by a counter in the order they appear.
+- `layout.sectionOrder` is use, ui, touch, so the issues table leads. Removed the unused `--ab-glow` token. Weight 700 is now 600 (Geist).
+
+**clay** (+9 / −17 lines)
+- Removed the unused `--ab-obj`, `--ab-pearl`, `--ab-pearl-ink`, `--ab-card-sh/hi/lo` and `--cl-card`.
+- Weights 700 and 800 are now 600, which Rubik and Figtree have.
+- `layout.sectionOrder` is touch, ui, use, so the clay objects lead.
+
+None of my faces is single-weight and asked for 600 to 900. The only single-weight face, Instrument Serif, is set at 400 where it heads.
+
+**Checks**
+- Gore, 6 keys × 4 configs: 0 issues.
+- `node tests/run.js`: all passed.
+- `node scratchpad/t5/harness.js`: briefs 192, 0 fails, 0 warns.
+- `node scratchpad/t5/src-verify-p5.js`: 0 fails, 0 mismatches.
+- No console errors. Overflow at 390px: 0 on all 24 shots.
+
+**Sheets** (scratch `adv/fx61/`): `sheet-ad2-<key>.png` for boards, `sheet-deck-ad2-<key>.png` and `sheet-deck-ad2o-<key>.png` for decks.
+
+**Flag:** the shared batch made liquid-glass lead with `neonspray` "Light leaks", a pattern this review's kill list names and fix 7 drops. Aurora now leads with `prismpix` "Aurora stream". The coordinator should confirm or swap both.

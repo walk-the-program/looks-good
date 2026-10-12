@@ -1,11 +1,11 @@
 /* ---------------------------------------------------------------------
    05 Liquid Glass — clear glass controls with bright specular rims floating
-   over a vivid scene of the brand colors; everything else is near-opaque
-   "regular material" on a neutral canvas. Blur (frosting) and a
-   simulated-refraction ring lens are separate mechanisms. Variables
-   --ab-scene-base, --ab-material, --ab-rim, --ab-spec ... come from
-   js/aesthetics/liquid-glass.js tokens().
-   Layout hooks used: hero 'scene', type ui 'sans', states 'chip'.
+   over hard-edged content; everything else is near-opaque "regular material"
+   on a neutral canvas. Blur (frosting) and rim refraction (an SVG
+   displacement filter, --lg-refract, set per board by art()) are separate
+   mechanisms. Variables --ab-scene-base, --ab-material, --ab-rim, --ab-spec ...
+   come from js/aesthetics/liquid-glass.js tokens(). Hooks: hero 'scene',
+   palette 'chips', sections 'stacked', states 'chip', panels.list.
 ------------------------------------------------------------------------ */
 
 .ab[data-ae="liquid-glass"] {
@@ -91,7 +91,7 @@
   border-radius: 28%; border: 0; overflow: hidden;
   box-shadow: 0 0 0 0.5px rgba(0, 0, 0, 0.3), 0 14px 30px rgba(0, 0, 0, 0.32);
 }
-.ab[data-ae="liquid-glass"] .lgs-bend { position: absolute; inset: 0; overflow: hidden; border-radius: inherit; }
+.ab[data-ae="liquid-glass"] .lgs-bend { position: absolute; inset: 0; overflow: hidden; border-radius: inherit; filter: var(--lg-refract) saturate(1.15); }
 .ab[data-ae="liquid-glass"] .lgs-lens::after {
   content: ""; position: absolute; inset: 0; z-index: 3; border-radius: inherit; pointer-events: none;
   background: radial-gradient(circle at 20% 16%, rgba(255, 255, 255, 0.34), transparent 34%), linear-gradient(160deg, rgba(255, 255, 255, 0.1), transparent 40%);
@@ -161,14 +161,9 @@
 }
 .ab[data-ae="liquid-glass"] .ab-row + .ab-row { background: linear-gradient(var(--ab-material-line), var(--ab-material-line)) 16px 0 / calc(100% - 16px) 1px no-repeat; }
 .ab[data-ae="liquid-glass"] .ab-row:last-child { border-bottom: 0; }
-.ab[data-ae="liquid-glass"] .ab-row-n, .ab[data-ae="liquid-glass"] .ab-row-bar { display: none; }
 .ab[data-ae="liquid-glass"] .ab-row-name { font-weight: 400; }
 .ab[data-ae="liquid-glass"] .ab-row-status { padding: 0; background: none; border: 0; font-size: 17px; color: var(--ab-muted); }
-.ab[data-ae="liquid-glass"] .ab-row-pct { font-size: 0; width: 14px; height: 14px; }
-.ab[data-ae="liquid-glass"] .ab-row-pct::after {
-  content: ""; display: block; width: 8px; height: 8px; margin: 3px 0 0 1px;
-  border-top: 2px solid var(--ab-muted); border-right: 2px solid var(--ab-muted); transform: rotate(45deg); opacity: 0.7;
-}
+.ab[data-ae="liquid-glass"] .lg-chev { display: block; justify-self: end; color: var(--ab-muted); opacity: 0.7; }
 
 /* 01 card: a content header (a 96px strip of the scene) with the segmented control floating on it as glass */
 .ab[data-ae="liquid-glass"] .ab-card { position: relative; isolation: isolate; overflow: hidden; padding-top: 26px; }
@@ -262,7 +257,7 @@
   }
   .ab[data-ae="liquid-glass"] .lgs-tabs { background: rgba(16, 20, 36, 0.72); }
   .ab[data-ae="liquid-glass"] .lgs-slider, .ab[data-ae="liquid-glass"] .ab-seg { background: rgba(16, 20, 36, 0.72); }
-  .ab[data-ae="liquid-glass"] .lgs-bend { filter: none !important; }
+  .ab[data-ae="liquid-glass"] .lgs-bend { filter: none; }
   .ab[data-ae="liquid-glass"] .ab-state-chip[data-s="0"] { background: rgba(16, 20, 36, 0.6); }
   .ab[data-ae="liquid-glass"] .ab-state-chip[data-s="2"] { background: var(--ab-glass-solid); }
 }
@@ -280,7 +275,7 @@
   .ab[data-ae="liquid-glass"] .ab-row { grid-template-columns: minmax(0, 1fr) auto 14px; row-gap: 0; }
   .ab[data-ae="liquid-glass"] .ab-row-name { grid-column: 1; grid-row: 1; }
   .ab[data-ae="liquid-glass"] .ab-row-status { grid-column: 2; grid-row: 1; }
-  .ab[data-ae="liquid-glass"] .ab-row-pct { grid-column: 3; grid-row: 1; }
+  .ab[data-ae="liquid-glass"] .lg-chev { grid-column: 3; grid-row: 1; }
   .ab[data-ae="liquid-glass"] .ab-states[data-kind="chip"] { gap: 6px; padding: 18px 10px; }
   .ab[data-ae="liquid-glass"] .ab-state-chip { padding: 13px 10px; font-size: 13px; }
 }

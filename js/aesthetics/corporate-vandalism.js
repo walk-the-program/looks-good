@@ -114,7 +114,7 @@ registerAesthetic({
       '--cv-on-shell': collide ? t.canvas : t.onPrimary,
       '--cv-ul': collide ? (t.printPrimary || t.primary) : 'transparent',
       '--cv-vandal': cvVandalFace(),
-      '--cv-brand': `"PROPERTY OF ${String(typeof effectiveContent === 'function' ? effectiveContent().brandName || '' : '').toUpperCase().replace(/["\\]/g, '').slice(0, 32)} · DO NOT REMOVE"`,
+      '--cv-bw': (() => { const bf = typeof state !== 'undefined' && state && state.bodyFont; const w = String((bf && bf.weights) || '400').split(';').map(Number).filter(Boolean); const le = w.filter(x => x <= 600); return le.length ? Math.max(...le) : Math.min(...w); })(),
       '--ab-tr': (hf && { condensed: 0.4, heavy: 0.4, wide: 0.3, techno: 0.3 }[hf.cls]) ?? 1,
     };
   },
@@ -154,6 +154,33 @@ registerAesthetic({
     </div>`;
   },
 
+  // Real markup for the corporation's form furniture (header strips, the card's footnote), the PO
+  // list with its asset tag, and the vandal's marker strike through one official word.
+  panels: {
+    card: ctx => ctx.parts.cardBase()
+      .replace(/^(\s*<div class="ab-card">)/, '$1<p class="cv-strip">Notice 2291-B · Form 7</p>')
+      .replace(/<\/div>\s*$/, '<p class="cv-fine">† Terms apply. Terms are subject to change, including this sentence.</p></div>'),
+    panel: ctx => ctx.parts.panelBase().replace(/^(\s*<div class="ab-panel">)/, '$1<p class="cv-strip">Form 7 · Part 2</p>'),
+    list(ctx) {
+      const e = ctx.e;
+      const name = String(ctx.brandName || '').trim().toUpperCase();
+      return `<div class="ab-list cv-po"><ul class="cv-rows">${ctx.rows.map((r, i) => {
+        const w = String(r[0]).split(' ');
+        const label = i === 2 && w.length > 1
+          ? `<s>${e(w[0])}</s> ${e(w.slice(1).join(' '))}<span class="cv-never" aria-hidden="true">never</span>`
+          : e(r[0]);
+        return `<li class="ab-row">
+      <span class="ab-row-n">PO-229${i + 1}-B</span>
+      <span class="ab-av" aria-hidden="true">${e(r[0][0])}</span>
+      <span class="ab-row-name">${label}</span>
+      <span class="ab-row-status">${e(r[1])}</span>
+      <span class="ab-row-bar" aria-hidden="true"><i style="width:${r[2]}%"></i></span>
+      <span class="ab-row-pct">${r[2]}%</span>
+    </li>`;
+      }).join('')}</ul><p class="cv-asset">Property of ${e(name)} · Do not remove</p></div>`;
+    },
+  },
+
   materials: [
     { name: 'Kruger bar', css: 'background: #E10600; color: #FFFFFF; font: italic 600 8cqw/1.1 Jost, Futura, sans-serif; text-transform: uppercase; box-decoration-break: clone; transform: rotate(-2deg); /* the vandal\'s mark over the official headline: 2–4 words at display scale; the official headline under it stays small and regular */' },
     { name: 'Label-maker strip', css: 'background: #111111; color: #FFFFFF; font: 700 11px ui-monospace, Menlo, monospace; letter-spacing: .18em; text-shadow: 0 1px 0 rgba(0,0,0,.6); transform: rotate(-3deg); /* embossed Dymo tape stuck over a button label */' },
@@ -182,6 +209,8 @@ registerAesthetic({
   // Deck copy (js/brand-deck.js): three principles, three do / don't lines, each short.
   deck: {
     coverDisplay: 0.78,   // a smaller cover start size keeps the taller notice at its natural width (it re-stacks when its box narrows)
+    // Do / Don't marks are the corporation's own rubber stamps
+    marks: (ctx, kind) => `<span class="cv-stamp" data-kind="${kind}">${kind === 'do' ? 'Approved' : 'Rejected'}</span>`,
     principles: [
       ['Two hands', 'Their spotless shell; our mark on top of it.'],
       ['Theirs and ours', 'Client colours run the shell; hazard red and safety yellow are fixed.'],

@@ -595,3 +595,66 @@ Worker fx66, 2026-10-11. Files changed: `js/aesthetics/{industrial-device,indust
 - **Religious Futurism: 6.** The CTA is legible, the glass is cool-dominant and the centre lancet is monumental. The type depends on the Michroma request. The windows are still a mosaic rather than Richter-grade glass.
 - **Cybersigilism: 6.** The hairline density, the taper and the paper mode are there. The sprawl still reads partly as branches rather than barbed thorns, and the mirrored skeleton keeps it emblem-like.
 - **Biomechanical Gothic: 7.** The vault is packed, cold and fused with tubes. The UI below it is still fairly conventional apart from the vertebra controls.
+
+## Adoption log (fx66)
+
+Packet rev 3 (round 6 hooks, commit 96438f8). The changes stay inside the six keys' js and css files. The final shots use the shared meta, fit.js and data.js as they landed: Industrial Device still leads with Space Grotesk, and Blueprint leads with Share Tech Mono.
+
+**Dead deck classes.** None of the six targeted the removed `.ab-deck-app/-side/-nav/-screen*/-chip/-dot/-row/-rname/-rpct/-ctacard/-ctatitle` classes. Every remaining `.ab-deck-*` selector still matches markup.
+
+**New In product and Do/Don't slides.** The defaults read natively in all six, because they are built from each board's own parts, so none needed `deck.product`.
+- Religious Futurism: the product slide now numbers the list I and the card II, since the list comes first there.
+- Do/Don't marks are recoloured: Blueprint uses ink (the primary stays the revision cloud), Biomechanical Gothic uses bone (the primary stays sinew), and Cybersigilism uses cold light.
+
+**Hook adoption**
+- **Blueprint**
+  - The drawing moved into `bpDrawing(ctx)`.
+  - `art()` now returns the sheet and the phone crop.
+  - `deck.materialArt` returns the oblique-plus-detail crop. This replaces the third hidden SVG and the `[data-slide="material"]` show/hide rules; the stage aspect is now keyed on `[data-stage="own"]`.
+  - `deck.coverBand: false` replaces the `.ab-deck-pattern{display:none}` rule and the `padding-bottom: 0 !important` rule.
+  - Structure: `layout.palette: 'list'` turns the palette into a lettered legend (a ruled index with framed specimens), and `layout.order: hero, sections, palette, type` makes the board read as a drawing set.
+  - Headline, card title and type-pick weights are 400, because Share Tech Mono is single-weight and Plex Mono has 400 and 600.
+- **Cybersigilism**
+  - `def.states` renders one sigil drawn three ways as real inline SVG. It replaces the swatch discs and the three data-URI glyph tokens that sat in the root's inline style.
+  - The sigil moved into `csSigil(ctx, vb)`.
+  - `deck.materialArt` is a viewBox crop at 2.3×, replacing the CSS transform toggled on the Material slide.
+  - `deck.coverBand: false` replaces the `!important` hiding.
+  - Local `csEsc` replaces the global `escapeHtml`.
+  - Deleted: the unused `--cs-swash-l/r` data URIs (both modes), `--cs-chamfer`, `--cs-glow` and `--cs-l3`.
+  - **QC (cover-header overlap):** the cover sigil now starts at 112px, clear of "BRAND GUIDELINES / COVER", and stops 44px above the foot.
+- **Religious Futurism**
+  - The cathedral moved into `rfArt(ctx, vb)`.
+  - `deck.materialArt` is a viewBox crop of the centre lancet at about 3.6×, replacing the CSS transform on the Material slide.
+  - `deck.coverBand: false` replaces the `!important` hiding.
+  - Local `rfEsc` added.
+  - The unused `--ab-glass2` token and `glass2` variable are deleted.
+- **Biomechanical Gothic**
+  - `layout.hero: 'bleed'`: the packed nave now runs edge to edge under the header, keeping only its top and bottom rims, and the cast-caps headline sits below it.
+  - `deck.coverBand: false` replaces the `!important` hiding.
+  - The cover art is sized against the deck's bleed rule, so the nave fills the right half again.
+  - Deleted: the unused `--ab-bi-disc-rim` and `--bg-organ`.
+- **Industrial Device**
+  - The device moved into `idvArt(ctx)`.
+  - `deck.materialArt` wraps it in `.idv-zoom` (keybed and pads at 1.9×), replacing the `[data-slide="material"]` transform rules.
+  - Local escape added.
+  - Azeret Mono 700 requests are now 600 (the face has 400 and 600), on 8 rules.
+  - Deleted: the unused `--ab-led-glow`, `--ab-pri-glow` and `--ab-oled-dim`.
+- **Industrial Hazard**
+  - No Material or cover hacks to replace.
+  - Local escape added.
+  - Unused `--ab-hz-ring` deleted.
+
+**Kept on purpose**
+- **`!important` card-title, kicker and subcopy margins:** the base CSS sets those margins with `!important`.
+- **`font-size: 0` on `.ab-n` and `.ab-row-n`:** these draw counters with `::before`; they are not there to dodge the text floor.
+- **Short CSS legends:** Blueprint's "Detail E/F" and Industrial Hazard's nameplates are short decorative legends, not faked panel content.
+- **Religious Futurism and Biomechanical Gothic state discs:** they stay as CSS-drawn panes and a CSS-drawn valve. Both are already distinct, with no mask and no orb.
+
+**Checks**
+- `node tests/run.js`: all passed.
+- `scratchpad/t5/harness.js`: briefs 192, 0 failures, 0 warnings.
+- `scratchpad/t5/src-verify-p5.js`: 0 failures, map mismatches 0.
+- **Gore** (6 keys × 4 configs × 10 slides): 0.
+- **Console:** 0 errors on the deck session; the board session shows only the favicon 404.
+- **390px:** overflow 0 for all six.
+- **Shots:** `scratchpad/adv/fx66/sheet-adf-<key>.png` (boards), `sheet-deck-adf-<key>.png` and `-o.png` (decks), `adf-covers.png`, `ad-product.png`, `ad-dodont.png`, `ad-material.png`.

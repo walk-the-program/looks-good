@@ -41,6 +41,20 @@ function btShade(hex, against, ratio) {
 }
 
 function btEsc(s) { return escapeHtml(String(s == null ? '' : s)); }
+
+// The nearest weight a face really has (font-synthesis is off): `want`, else the next one up
+// within 100, else the next one down. Fonts come from the global app state.
+function btWeight(font, want) {
+  const ws = String((font && font.weights) || '400').split(';').map(Number).filter(Boolean);
+  if (ws.includes(want)) return want;
+  const up = ws.filter(w => w > want).sort((x, y) => x - y)[0];
+  const down = ws.filter(w => w < want).sort((x, y) => y - x)[0];
+  return up && up - want <= 100 ? up : (down || up || 400);
+}
+function btFonts() {
+  const st = typeof state !== 'undefined' ? state : null;
+  return { h: st && st.headingFont, b: st && st.bodyFont };
+}
 function btUri(svg) { return `url("data:image/svg+xml;utf8,${svg.replace(/#/g, '%23').replace(/'/g, '%27').replace(/"/g, '%27')}")`; }
 
 // measured advance widths (em) of a string in a CSS font (falls back to a wood-type estimate)
@@ -78,6 +92,95 @@ function btArc(text, fontCss) {
   const width = 2 * R * Math.sin(half) + 0.9;
   const height = R * (1 - Math.cos(half)) + 1.02;
   return `<span class="bt-arc" style="width:${width.toFixed(3)}em;height:${height.toFixed(3)}em;--bt-aw:${width.toFixed(3)}">${spans}</span>`;
+}
+
+// The showbill: the first line arched, the middle line straight between stars, the last word in a
+// swallowtail ribbon. Used by def.headline and by the deck's box-office poster.
+function btBill(ctx, text) {
+  const words = String(text || '').trim().split(/\s+/).filter(Boolean);
+  if (!words.length) return '';
+  const fontCss = (ctx.state && ctx.state.headingFont && ctx.state.headingFont.css) || '"Rye", Georgia, serif';
+  if (words.length === 1) return `<span class="bt-bill">${btArc(words[0], fontCss)}</span>`;
+  const lastRaw = words[words.length - 1];
+  const rest = words.slice(0, -1);
+  const nArc = rest.length >= 3 ? Math.ceil(rest.length / 2) : rest.length === 2 ? 2 : 1;
+  const arcText = rest.slice(0, nArc).join(' ');
+  const mid = rest.slice(nArc).join(' ');
+  // a long first line is split again so the arch stays a showbill arch
+  const arc = arcText.length > 14 && nArc > 1
+    ? btArc(rest.slice(0, nArc - 1).join(' '), fontCss) + `<span class="bt-mid"><b>★</b>${btEsc(rest[nArc - 1] + (mid ? ' ' + mid : ''))}<b>★</b></span>`
+    : btArc(arcText, fontCss) + (mid ? `<span class="bt-mid"><b>★</b>${btEsc(mid)}<b>★</b></span>` : '');
+  return `<span class="bt-bill">${arc}<span class="ab-hl bt-ribbon"><span class="bt-rib-t">${btEsc(lastRaw)}</span></span></span>`;
+}
+
+// Deck In product (slide 08): the box office. A showbill poster for the brand on the left; on the
+// right the bulb-lit box-office sign, tonight's programme (the board's own list) and two tickets.
+function btProduct(ctx) {
+  const e = ctx.e || btEsc;
+  const tix = label => `<span class="ab-cta bt-tix"><span class="ab-cta-label">${e(label)}</span><span class="ab-cta-arrow" aria-hidden="true"></span></span>`;
+  const list = ctx.parts && typeof ctx.parts.list === 'function' ? ctx.parts.list() : '';
+  return `<div class="bt-prod">
+    <div class="bt-poster">
+      <p class="bt-p-kick"><b>★</b>${e(ctx.brandName)} presents<b>★</b></p>
+      <div class="bt-p-bill" role="img" aria-label="${e(ctx.tagline)}"><span aria-hidden="true">${btBill(ctx, ctx.tagline)}</span></div>
+      <p class="bt-p-sub">Under the big top · Doors at seven · Admit one</p>
+      <div class="bt-p-foot"><span>Matinée &amp; evening</span><span>No. 0472</span></div>
+    </div>
+    <div class="bt-booth">
+      <div class="bt-sign"><span>Box office</span></div>
+      <section class="ab-sec ab-sec-use bt-prog" aria-label="Programme">
+        <div class="ab-labelrow"><span class="ab-label"><i class="ab-n">01</i><span>Tonight's programme</span></span><span class="ab-label">3 acts</span></div>
+        ${list}
+      </section>
+      <div class="bt-tickets">${tix('Save direction')}${tix('Book a seat')}</div>
+    </div>
+  </div>`;
+}
+
+// Deck Material slide: the marquee sign (a bulb-bordered board with the brand name in wood type and a
+// drop shade, a valance on top, a ticket tucked in front). The tent is already on the cover.
+function btMarquee(ctx) {
+  const t = ctx.t;
+  const night = !!t.isDark;
+  const id = `bt${++seq}`;
+  const cream = BT_CREAM, navy = BT_NAVY;
+  const stripe = btShade(t.primary, cream, 3);
+  const tixC = btShade(t.primary, cream, 4.5);
+  const ribbon = btShade(t.secondary, cream, 3.2);
+  const name = String(ctx.brandName || '').toUpperCase();
+  const fs = Math.max(26, Math.min(64, 380 / Math.max(4, name.length * 0.68)));
+  const fontH = (ctx.state && ctx.state.headingFont && ctx.state.headingFont.css) || '"Rye", Georgia, serif';
+  const bw = btWeight(btFonts().b, 600);
+  let bulbs = '';
+  const ring = (x0, y0, x1, y1, n) => { for (let i = 0; i <= n; i++) { const x = x0 + ((x1 - x0) * i) / n, y = y0 + ((y1 - y0) * i) / n; bulbs += `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="9" fill="url(#${id}gl)"/><circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="4.4" fill="${BT_BULB}" stroke="${navy}" stroke-width="1"/>`; } };
+  ring(64, 118, 536, 118, 16); ring(64, 342, 536, 342, 16); ring(64, 132, 64, 328, 6); ring(536, 132, 536, 328, 6);
+  let val = '';
+  for (let i = 0; i < 16; i++) {
+    const x = 72 + i * 28.5;
+    val += `<rect x="${x.toFixed(1)}" y="72" width="28.6" height="26" fill="${i % 2 ? cream : stripe}"/><circle cx="${(x + 14.25).toFixed(1)}" cy="98" r="14.2" fill="${i % 2 ? cream : stripe}" stroke="${navy}" stroke-width="1.6"/>`;
+  }
+  return `<svg class="bt-marquee" viewBox="0 0 600 520" aria-hidden="true" focusable="false">
+    <defs><radialGradient id="${id}gl"><stop offset="0" stop-color="${t.accent}" stop-opacity=".9"/><stop offset=".55" stop-color="${t.accent}" stop-opacity=".3"/><stop offset="1" stop-color="${t.accent}" stop-opacity="0"/></radialGradient></defs>
+    <path d="M300 10V72" stroke="${night ? '#C9BFA6' : navy}" stroke-width="3"/><path d="M301.5 14l46 10-46 11z" fill="${ribbon}" stroke="${navy}" stroke-width="1.6" stroke-linejoin="round"/>
+    <rect x="44" y="104" width="512" height="258" rx="10" fill="${navy}"/>
+    ${val}
+    <path d="M72 98H528" stroke="${navy}" stroke-width="2.4"/>
+    <rect x="88" y="142" width="424" height="182" rx="4" fill="${cream}" stroke="${navy}" stroke-width="2"/>
+    <rect x="96" y="150" width="408" height="166" rx="2" fill="none" stroke="${navy}" stroke-width="1"/>
+    ${bulbs}
+    <text x="300" y="184" text-anchor="middle" font-family="var(--ab-font-b, sans-serif)" font-size="15" font-weight="${bw}" letter-spacing="5" fill="${navy}">★ PRESENTING ★</text>
+    <text x="303" y="${250 + fs * 0.05}" text-anchor="middle" font-family='${fontH.replace(/'/g, '"')}' font-size="${fs.toFixed(0)}" fill="${navy}">${btEsc(name)}</text>
+    <text x="300" y="250" text-anchor="middle" font-family='${fontH.replace(/'/g, '"')}' font-size="${fs.toFixed(0)}" fill="${stripe}">${btEsc(name)}</text>
+    <g transform="translate(300 290)"><path d="M-120 -16H120V16H-120Z" fill="${ribbon}"/><path d="M-120 -10l-28 0 12 13-12 13h28z M120 -10l28 0-12 13 12 13h-28z" fill="${t.mix('#000000', ribbon, 0.28)}"/>
+      <text x="0" y="6" text-anchor="middle" font-family='${fontH.replace(/'/g, '"')}' font-size="20" letter-spacing="2" fill="${cream}">ONE NIGHT ONLY</text></g>
+    <g transform="translate(330 412) rotate(-6)">
+      <path d="M-150 -40H150V-12A12 12 0 0 0 150 12V40H-150V12A12 12 0 0 0 -150 -12Z" fill="${tixC}"/>
+      <path d="M70 -34V34" stroke="${cream}" stroke-opacity=".65" stroke-width="2" stroke-dasharray="5 5"/>
+      <text x="-124" y="-8" font-family="var(--ab-font-b, sans-serif)" font-size="11" letter-spacing="4" fill="${cream}" fill-opacity=".85">ADMIT ONE</text>
+      <text x="-124" y="16" font-family="var(--ab-font-b, sans-serif)" font-size="17" font-weight="${bw}" letter-spacing="3" fill="${cream}">BIG TOP · ROW C</text>
+      <text x="110" y="5" text-anchor="middle" font-family='${fontH.replace(/'/g, '"')}' font-size="12.5" fill="${cream}">No. 0472</text>
+    </g>
+  </svg>`;
 }
 
 function btStar(cx, cy, r, fill, stroke) {
@@ -254,20 +357,7 @@ registerAesthetic({
   },
 
   headline(ctx, text) {
-    const words = String(text || '').trim().split(/\s+/).filter(Boolean);
-    if (!words.length) return '';
-    const fontCss = (ctx.state && ctx.state.headingFont && ctx.state.headingFont.css) || '"Rye", Georgia, serif';
-    if (words.length === 1) return `<span class="bt-bill">${btArc(words[0], fontCss)}</span>`;
-    const lastRaw = words[words.length - 1];
-    const rest = words.slice(0, -1);
-    const nArc = rest.length >= 3 ? Math.ceil(rest.length / 2) : rest.length === 2 ? 2 : 1;
-    const arcText = rest.slice(0, nArc).join(' ');
-    const mid = rest.slice(nArc).join(' ');
-    // a long first line is split again so the arch stays a showbill arch
-    const arc = arcText.length > 14 && nArc > 1
-      ? btArc(rest.slice(0, nArc - 1).join(' '), fontCss) + `<span class="bt-mid"><b>★</b>${btEsc(rest[nArc - 1] + (mid ? ' ' + mid : ''))}<b>★</b></span>`
-      : btArc(arcText, fontCss) + (mid ? `<span class="bt-mid"><b>★</b>${btEsc(mid)}<b>★</b></span>` : '');
-    return `<span class="bt-bill">${arc}<span class="ab-hl bt-ribbon"><span class="bt-rib-t">${btEsc(lastRaw)}</span></span></span>`;
+    return btBill(ctx, text);
   },
 
   tokens(t) {
@@ -305,8 +395,11 @@ registerAesthetic({
       pen += `<path d='M${x} ${y.toFixed(1)}L${x + 16} ${y.toFixed(1)}L${x + 8} ${(y + 16).toFixed(1)}Z' fill='${[ribbon, cream, stripe][i % 3]}' stroke='${BT_NAVY}' stroke-width='1.2' stroke-linejoin='round'/>`;
     }
     const bunting = btUri(`<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 240 26' preserveAspectRatio='none'><path d='M0 3Q120 15 240 3' fill='none' stroke='${night ? '#C9BFA6' : BT_NAVY}' stroke-width='1.4'/>${pen}</svg>`);
+    const fonts = btFonts();
     return {
       '--ab-type-pick-w': 400,
+      '--bt-bw': btWeight(fonts.b, 600),
+      '--bt-hw': btWeight(fonts.h, 400),
       '--ab-ink': ink,
       '--ab-muted': muted,
       '--ab-line': night ? 'rgba(246, 236, 214, 0.28)' : 'rgba(31, 42, 68, 0.3)',
@@ -363,6 +456,15 @@ registerAesthetic({
 
   deck: {
     coverDisplay: 0.9,
+    marks: { do: '★', dont: '✕' },
+    // In product: the box office (a showbill poster, the bulb-lit sign, the programme, tickets)
+    product(ctx) {
+      return btProduct(ctx);
+    },
+    // Material slide: the marquee sign (the tent is already on the cover)
+    materialArt(ctx) {
+      return btMarquee(ctx);
+    },
     principles: [
       ['Stripes, scallops, showbill symmetry', 'Everything centres and mirrors like a poster.'],
       ['Every button is a ticket', 'Controls borrow the shape of a ticket stub.'],

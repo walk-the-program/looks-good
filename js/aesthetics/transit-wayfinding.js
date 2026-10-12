@@ -119,7 +119,8 @@ registerAesthetic({
   mode: 'dark',
   slideShape: 'minimal',
   labels: { material: 'Lines', states: ['Scheduled', 'Approaching', 'Diverted'], statesKind: 'button' },
-  layout: { hero: 'centered', palette: 'swatches', sections: 'two-col' },
+  // a concourse leads with the departures board: 03 In use first, then the components
+  layout: { hero: 'centered', palette: 'swatches', sections: 'two-col', sectionOrder: ['use', 'ui', 'touch'] },
   type: { ui: 'heading', label: 'heading', display: 0.78 },
   highlight: 'custom',
   highlightNote: 'The destination word stays white on the black sign and gets a route line under it (route 1 colour, 0.09em thick, square ends), never a colour change or a highlighter band; an arrow drawn on a 10-unit grid always stands in front of the headline.',
@@ -166,7 +167,7 @@ registerAesthetic({
     const L = twLetters(twBrandName());
     const hw = twWeight(800);
     const vars = {
-      '--ab-type-pick-w': hw,
+      '--ab-type-pick-w': 400,   // secondary picks; the lead pick is set at 800 in the css (every lead pick has 800)
       '--tw-hw': hw,
       '--tw-mw': twWeight(600),
       '--ab-sign': TW_SIGN,
@@ -275,6 +276,24 @@ registerAesthetic({
       <div class="twa-mapbox">${map}</div>
       <div class="twa-legend">${legend}</div>
     </div>`;
+  },
+
+  // 03 as a real departures board: route bullet (a letter from the brand name), destination,
+  // platform + status, line progress with the current station as a ring, percent.
+  panels: {
+    list(ctx) {
+      const e = ctx.e;
+      const R = twRoutes(ctx.t);
+      const L = twLetters(ctx.brandName);
+      const rows = (ctx.rows || []).slice(0, 3).map((r, i) => `<li class="ab-row" style="--tw-c:${R[i].b};--tw-o:${R[i].ob}">
+          <span class="ab-row-n tw-rn${i === 2 ? ' tw-rn--x' : ''}"><i>${e(L[i])}</i></span>
+          <span class="ab-row-name">${e(r[0])}</span>
+          <span class="ab-row-status"><b>Plat ${i + 1}</b> · ${e(r[1])}</span>
+          <span class="ab-row-bar" aria-hidden="true"><i style="width:${Number(r[2]) || 0}%"></i></span>
+          <span class="ab-row-pct">${Number(r[2]) || 0}%</span>
+        </li>`).join('');
+      return `<ul class="ab-list tw-dep">${rows}<li class="tw-dfoot">Departures · updated every 30 s</li></ul>`;
+    },
   },
 
   materials: [

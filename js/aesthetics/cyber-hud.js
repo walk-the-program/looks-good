@@ -34,7 +34,8 @@ registerAesthetic({
   mode: 'dark',
   slideShape: 'minimal',
   labels: { material: 'Systems', states: ['Standby', 'Armed', 'Live'], statesKind: 'button' },
-  layout: { hero: 'centered', palette: 'swatches', sections: 'two-col' },
+  // the viewport, then the system panels, then palette and type
+  layout: { hero: 'centered', palette: 'swatches', sections: 'two-col', order: ['hero', 'sections', 'palette', 'type'] },
   type: { ui: 'mono', label: 'mono', display: 0.66 },
   highlight: 'custom',
   highlightNote: 'The word sits on a solid magenta signal slab (#FF2A6D, darkened on light fields) cut at the bottom right, set in the field colour: a tag, never a glow or an RGB split.',
@@ -83,7 +84,6 @@ registerAesthetic({
       '--ab-neon2': neon2,
       '--ab-hud-line': t.alpha(neon, 0.62),
       '--ab-hud-line-soft': t.alpha(neon, 0.28),
-      '--ab-hud-glow': t.alpha(neon, d ? 0.38 : 0.18),
       '--ab-hud-fill': t.mix(neon, t.canvas, 0.05),
       '--ab-hud-fill2': t.mix(neon, t.canvas, 0.11),
       '--ab-hud-fill3': t.mix(neon, t.canvas, 0.2),
@@ -91,7 +91,6 @@ registerAesthetic({
       '--ab-hud-tick': t.alpha(neon, 0.3),
       '--ab-hud-hatch': t.alpha(neon, 0.45),
       '--ab-on-neon2': d ? '#05070a' : '#ffffff',
-      '--ab-type-pick-w': '600',
     };
     if (S.ink) out['--ab-ink'] = S.ink;
     return out;

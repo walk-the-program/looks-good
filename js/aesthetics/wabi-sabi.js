@@ -22,8 +22,7 @@
      travels along a hairline for progress, a tiny ensō as the brand mark.
    - Colour: paper, sumi and ash are fixed; primary and secondary become muted glazes; the accent
      is the hanko seal when it holds 3:1 on paper, else fixed shu vermilion; gold is the seam only.
-   Art for the deck's Material slide is a second variant in the same output (three vessels: raw,
-   glazed, mended); the css shows it only inside .ab-deck-stage. */
+   The deck's Material slide draws three vessels (raw, glazed, mended) via def.deck.materialArt. */
 
 const WS = {
   paper: '#F2EDE4', sumi: '#2E2B27', ash: '#8C857A', clay: '#D3C3A4', clayDeep: '#B9A27C', iron: '#6E4A30',
@@ -196,7 +195,7 @@ function wsVessel(o) {
   return s;
 }
 
-function wsDefs(id, ink) {
+function wsDefs(id) {
   return `<filter id="${id}blur" x="-30%" y="-200%" width="160%" height="500%"><feGaussianBlur stdDeviation="1.6"/></filter>
     <filter id="${id}mot" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency=".07 .035" numOctaves="3" seed="5" result="n"/><feColorMatrix in="n" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 2.2 -0.9" result="a"/><feComposite in="SourceGraphic" in2="a" operator="in"/></filter>
     <filter id="${id}mot2" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency=".5" numOctaves="2" seed="11" result="n"/><feColorMatrix in="n" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 3 -1.9" result="a"/><feComposite in="SourceGraphic" in2="a" operator="in"/></filter>
@@ -214,6 +213,35 @@ function wsSealSvg(id, x, y, size, color, initial, face, rot) {
       <rect x="${wsF(x + size * 0.1)}" y="${wsF(y + size * 0.1)}" width="${wsF(size * 0.8)}" height="${wsF(size * 0.8)}" fill="none" stroke="${WS.paper}" stroke-width="${wsF(size * 0.045)}" opacity=".9"/>
       <text x="${wsF(x + size / 2)}" y="${wsF(y + size * 0.71)}" text-anchor="middle" font-family='${face}' font-size="${wsF(size * 0.58)}" fill="${WS.paper}">${initial}</text>${holes}
     </g>`;
+}
+
+function wsFaces(ctx) {
+  const st = ctx.state || {};
+  return {
+    h: String((st.headingFont && st.headingFont.css) || 'Georgia, serif').replace(/'/g, '"'),
+    b: String((st.bodyFont && st.bodyFont.css) || 'sans-serif').replace(/'/g, '"'),
+  };
+}
+
+// The deck's Material slide (def.deck.materialArt): three vessels, a tall cup (raw), a bowl
+// (glazed) and a wide dish (mended), so the cover's bowl is not repeated.
+function wsVesselSet(ctx) {
+  const t = ctx.t;
+  const id = `ws${++wsSeq}`;
+  const ink = wsInk(t);
+  const f = wsFaces(ctx);
+  const glaze = wsGlaze(t.primary), glaze2 = wsGlaze(t.secondary);
+  const r2 = wsRand(wsHash(String(ctx.brandName || 'brand') + '|ws3'));
+  const cup = wsVessel({ id: id + 'c', rnd: r2, cx: 52, top: 52, R: 24, H: 52, FW: 14, FH: 5, ry: 4.6, kind: 'raw', glaze, glaze2: null, ink });
+  const mid = wsVessel({ id: id + 'd', rnd: r2, cx: 146, top: 64, R: 40, H: 40, FW: 16, FH: 5, ry: 6, kind: 'glazed', glaze, glaze2, ink });
+  const dish = wsVessel({ id: id + 'e', rnd: r2, cx: 246, top: 86, R: 44, H: 18, FW: 20, FH: 4, ry: 7, kind: 'mended', glaze: glaze2, glaze2: null, ink });
+  const cap = (x, s, n) => `<text x="${x}" y="134" text-anchor="middle" font-family='${f.b}' font-size="6.4" letter-spacing="1.3" fill="${ink}">${s}</text><text x="${x}" y="143" text-anchor="middle" font-family='${f.h}' font-size="6" fill="${ink}" opacity=".6">${n}</text>`;
+  return `<div class="ws-art"><svg class="ws-set" viewBox="0 0 300 150" xmlns="http://www.w3.org/2000/svg" role="presentation">
+      <defs>${wsDefs(id + 'c')}${wsDefs(id + 'd')}${wsDefs(id + 'e')}</defs>
+      <path d="M14 109.5 H232" stroke="${t.alpha(ink, 0.34)}" stroke-width=".5"/>
+      ${cup}${mid}${dish}
+      ${cap(52, 'RAW', 'unglazed clay')}${cap(146, 'GLAZED', 'one pour, one drip')}${cap(246, 'MENDED', 'gold in the crack')}
+    </svg></div>`;
 }
 
 function wsHeadlineHtml(text) {
@@ -318,42 +346,21 @@ registerAesthetic({
 
   headline(ctx, text) { return wsHeadlineHtml(text); },
 
-  // One glazed chawan with a gold seam, a seal and a ground line that stops short; plus the
-  // deck's Material variant (three vessels: raw, glazed, mended), shown only on that slide.
+  // One glazed chawan with a gold seam, a seal and a ground line that stops short.
   art(ctx) {
     const t = ctx.t;
     const id = `ws${++wsSeq}`;
     const rnd = wsRand(wsHash(String(ctx.brandName || 'brand') + '|ws'));
     const ink = wsInk(t);
-    const glaze = wsGlaze(t.primary);
-    const glaze2 = wsGlaze(t.secondary);
-    const seal = wsSeal(t);
-    const st = ctx.state || {};
-    const hFace = String((st.headingFont && st.headingFont.css) || 'Georgia, serif').replace(/'/g, '"');
-    const bFace = String((st.bodyFont && st.bodyFont.css) || 'sans-serif').replace(/'/g, '"');
-    const ini = escapeHtml(ctx.initial || '·');
-    const ground = t.alpha(ink, 0.34);
-    const bowl = wsVessel({ id: id + 'a', rnd, cx: 110, top: 70, R: 61, H: 68, FW: 23, FH: 7, ry: 9.5, kind: 'mended', glaze, glaze2, ink });
-    const main = `<svg class="ws-scene" viewBox="0 0 200 176" xmlns="http://www.w3.org/2000/svg" role="presentation">
-      <defs>${wsDefs(id + 'a', ink)}${wsDefs(id, ink)}</defs>
-      <path d="M20 145.6 H178" stroke="${ground}" stroke-width=".5"/>
+    const f = wsFaces(ctx);
+    const bowl = wsVessel({ id: id + 'a', rnd, cx: 110, top: 70, R: 61, H: 68, FW: 23, FH: 7, ry: 9.5, kind: 'mended', glaze: wsGlaze(t.primary), glaze2: wsGlaze(t.secondary), ink });
+    return `<div class="ws-art"><svg class="ws-scene" viewBox="0 0 200 176" xmlns="http://www.w3.org/2000/svg" role="presentation">
+      <defs>${wsDefs(id + 'a')}${wsDefs(id)}</defs>
+      <path d="M20 145.6 H178" stroke="${t.alpha(ink, 0.34)}" stroke-width=".5"/>
       ${bowl}
-      ${wsSealSvg(id, 22, 116, 15, seal, ini, hFace, -3)}
-      <text x="188" y="22" font-family='${bFace}' font-size="5.4" letter-spacing=".9" fill="${ink}" opacity=".62" transform="rotate(90 188 22)">MENDED BOWL · NO. 7</text>
-    </svg>`;
-    // three vessels for the Material slide: a tall cup (raw), a bowl (glazed), a wide dish (mended)
-    const r2 = wsRand(wsHash(String(ctx.brandName || 'brand') + '|ws3'));
-    const cup = wsVessel({ id: id + 'c', rnd: r2, cx: 52, top: 52, R: 24, H: 52, FW: 14, FH: 5, ry: 4.6, kind: 'raw', glaze, glaze2: null, ink });
-    const mid = wsVessel({ id: id + 'd', rnd: r2, cx: 146, top: 64, R: 40, H: 40, FW: 16, FH: 5, ry: 6, kind: 'glazed', glaze, glaze2, ink });
-    const dish = wsVessel({ id: id + 'e', rnd: r2, cx: 246, top: 86, R: 44, H: 18, FW: 20, FH: 4, ry: 7, kind: 'mended', glaze: glaze2, glaze2: null, ink });
-    const cap = (x, s, n) => `<text x="${x}" y="134" text-anchor="middle" font-family='${bFace}' font-size="6.4" letter-spacing="1.3" fill="${ink}">${s}</text><text x="${x}" y="143" text-anchor="middle" font-family='${hFace}' font-size="6" fill="${ink}" opacity=".6">${n}</text>`;
-    const set = `<svg class="ws-set" viewBox="0 0 300 150" xmlns="http://www.w3.org/2000/svg" role="presentation">
-      <defs>${wsDefs(id + 'c', ink)}${wsDefs(id + 'd', ink)}${wsDefs(id + 'e', ink)}</defs>
-      <path d="M14 109.5 H232" stroke="${ground}" stroke-width=".5"/>
-      ${cup}${mid}${dish}
-      ${cap(52, 'RAW', 'unglazed clay')}${cap(146, 'GLAZED', 'one pour, one drip')}${cap(246, 'MENDED', 'gold in the crack')}
-    </svg>`;
-    return `<div class="ws-art">${main}${set}</div>`;
+      ${wsSealSvg(id, 22, 116, 15, wsSeal(t), escapeHtml(ctx.initial || '·'), f.h, -3)}
+      <text x="188" y="22" font-family='${f.b}' font-size="5.4" letter-spacing=".9" fill="${ink}" opacity=".62" transform="rotate(90 188 22)">MENDED BOWL · NO. 7</text>
+    </svg></div>`;
   },
 
   materials: [
@@ -396,6 +403,8 @@ registerAesthetic({
       'Centre everything or fill the grid.',
       'Use saturated brand colour at full strength.',
     ],
+    materialArt: ctx => wsVesselSet(ctx),
+    marks: (ctx, kind) => `<i class="ws-mk" data-k="${kind === 'do' ? 'do' : 'dont'}"></i>`,
     coverDisplay: 0.62,
     coverBand: false,      // emptiness: no pattern band under the cover
     closingStrip: false,

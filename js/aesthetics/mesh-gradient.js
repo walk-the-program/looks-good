@@ -21,7 +21,8 @@ registerAesthetic({
   mode: 'light',
   slideShape: 'refined',
   labels: { material: 'Surfaces', states: ['Rest', 'Hover', 'Pressed'], statesKind: 'button' },
-  layout: { hero: 'split', palette: 'swatches', sections: 'two-col' },
+  // product-first (Ramp, Stripe): the interface sections follow the hero, the palette and type come after
+  layout: { hero: 'split', palette: 'swatches', sections: 'two-col', order: ['hero', 'sections', 'palette', 'type'] },
   type: { ui: 'sans', label: 'sans', display: 1.2 },
   highlight: 'custom',
   highlightNote: 'The word stays ink and carries a thick accent underline swash beneath its lower half; no fill, no color change.',
@@ -142,6 +143,13 @@ registerAesthetic({
         <span class="mga-amt">v3</span>
       </div>
     </div>`;
+  },
+
+  // 03: the default rows under a real "Recent projects" header.
+  panels: {
+    list(ctx) {
+      return ctx.parts.listBase().replace('<ul class="ab-list">', '<div class="ab-list"><p class="mg-lhead">Recent projects</p><ul class="mg-rows">').replace(/<\/ul>\s*$/, '</ul></div>');
+    },
   },
 
   materials: [

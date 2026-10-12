@@ -89,3 +89,52 @@ S/adv/sheet-b6d-wk-<key>.png (WebKit).
 - old-web: lead `kaleidopix` reads as an Aztec tile and its family is shared with Pixel Arcade. Move
   `['marble', 'Marble GIF', 'brand', { bands: 5, warp: 1.6, cover: 0.9, stars: 0, outline: true }]` to the
   first position (S/adv/b6d/ptest-ow2.png: reads as the GeoCities marble background).
+
+## Adoption log (b6d)
+
+Packet: ADOPT-BRIEF rev 3 (framework hooks from 96438f8). Files: the three js + three css files of my keys only.
+Diff vs HEAD (+/−): transit css +20/−36, js +21/−2; gorpcore css +26/−30, js +22/−1; old-web css +27/−28, js +19/−0.
+
+- **Dead deck CSS removed** (old In-product classes `.ab-deck-app/-side/-nav/-screen*/-chip/-dot/-row/-rname/-rpct/-ctacard/-ctatitle`):
+  transit 11 rules, gorpcore 12 rules, old-web 15 rules (old-web's shared window selector list also dropped `.ab-deck-app`).
+- **Real markup instead of CSS-generated content (`def.panels.list`)**:
+  - transit: a departures board with real route bullets (brand letters as text, route colour via `--tw-c`), "Plat N · status"
+    and a real "Departures · updated every 30 s" footer row. Removed the counter/`::before` "Plat" text, the list `::after`,
+    the `font-size:0` bullet letters and the per-row `nth-child` colour rules.
+  - gorpcore: a trail log with a real header row ("Trail log · 3 routes · 21.4 km · +1,860 m"), blaze-shape markers
+    (`data-shape` circle/square/diamond, no hidden text), and percent plus distance/elevation gain in real text
+    (the `::after " done"` is gone).
+  - old-web: a list-view table with raised column headers (Name / Status / Progress / Done), real folder icons, real
+    links (the second one visited) and a real NEW! badge (the `::before` icon and `::after` badge are gone).
+- **Structure**: transit `layout.sectionOrder: ['use', 'ui', 'touch']`, so the departures board leads the sections the way a
+  concourse leads with departures. Gorpcore and old-web keep their order; their skeletons already differ (Unigrid band,
+  homepage windows).
+- **Do / Don't marks (`def.deck.marks`)**: gorpcore shows the three trail-blaze shapes for Do and a crossed-out blaze for
+  Don't; old-web shows classic sunken checkboxes (ticked / crossed). Transit keeps the numbers, restyled as platform
+  squares (white for Do, alert yellow for Don't).
+- **Old-web `!important` removed**: the Do/Don't headings now use colours that hold 3:1 on both the black page (what
+  `bdLegibleHeadings` measures) and the silver window (what gore measures): Do #1F6F1F, Don't #9933CC.
+  One `padding-top: 0 !important` in the narrow table rule was replaced by a more specific selector. The remaining
+  `!important` flags are margin overrides that match the base rules' own `!important`.
+- **Font weights (fw/weights.txt) now 0 for all three keys**:
+  - transit: `.twa-dir b` no longer goes "bolder" to 900; secondary type picks drop to 400, the lead pick stays at 800;
+    the deck pair chip uses 800.
+  - gorpcore: map elevation labels 500 → 400 and the north letter 700 → 600 (JetBrains Mono); type picks 400 with each
+    column's lead at the face's real weight (800 / 700 / 600); the deck pair chip uses 800.
+  - old-web: the type block's current-font name is set at 400 (Anton has only 400); the deck principle titles, contrast
+    names and ratios are set at 700 (Tinos); the deck pair chip at 400.
+- **Not needed**: no Material-slide hacks, no cover-band `!important`, and no slide `font-size:0` text left to convert to
+  `--dk-min-text`. `def.states` was not used; the button-state rows are each aesthetic's own idiom already.
+- **SH changes landed**: fit.js now leads gorpcore with `sonar` "Lake map" (brand, 0.45) and old-web with `pixelquilt`,
+  then `marble`. Decks were re-shot after the change.
+
+Verification after adoption:
+- Gore: 4 configs × 3 keys × 10 slides = 120 slides, 0 issues.
+- Weight audit: 0 mismatches.
+- Boards: 12 shots, page overflow 0 (WebKit: 12 shots, overflow 0). Console: favicon 404 only.
+- `node tests/run.js`: all passed. `t5/harness.js`: briefs 192, 0 fails. `t5/src-verify-p5.js`: 53 families, 0 fails, 0 map mismatches.
+- Contrast audit: one known false positive. Transit's express-bullet letter sits on a rotated pseudo-element, which a
+  background-colour walk cannot see; gore reports 0 for it.
+
+Sheets: S/adv/sheet-b6d-<key>.png, S/adv/sheet-b6d-wk-<key>.png, S/adv/b6d/sheet-deck-<key>-{rec,oth}.png,
+S/adv/b6d/adopt-chk.png (product + do/don't), S/adv/b6d/adopt-boards.png.

@@ -116,6 +116,64 @@ function csStateGlyph(stage, ink) {
   return s;
 }
 
+const csEsc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+// The sigil (board hero, deck cover) and, with a viewBox crop, the Material slide's 2.3x close-up of the barbs.
+function csSigil(ctx, vb) {
+  const t = ctx.t, d = t.isDark;
+  const id = 'cs' + (++seq);
+  const seed = csHash(String(ctx.brandName || 'sigil'));
+  const rs = csRand(seed), rl = csRand(seed ^ 0x5bd1e995), rr = csRand(seed ^ 0x27d4eb2f);
+  const W = 800, H = 560, cx = 452;
+  const ink1 = d ? '#E3E6EA' : '#1E1E22', ink2 = d ? '#B9BEC6' : '#2A2A2E', ink3 = d ? '#868C95' : '#4A4F57';
+  // the skeleton (right half), mirrored about x = cx: a long spine and four wing pairs that sweep out and bleed
+  // past the top and right edges; reach is nudged by the brand seed (+-10%)
+  const nudge = () => 0.9 + rs() * 0.2;
+  const wingsR = [
+    [cx + 2, 64, -1.05, 210, -0.46],
+    [cx + 2, 128, -0.6, 300, -0.44],
+    [cx + 2, 200, -0.18, 330, -0.4],
+    [cx + 2, 270, 0.16, 280, 0.42],
+    [cx + 2, 340, 0.52, 290, 0.44],
+    [cx + 2, 420, 0.92, 210, 0.48],
+  ].map(([x, y, a, L, b]) => csNeedle([x, y], a, L * nudge(), b, 1.6, CS_STEPS[0]));
+  const mirror = nd => ({ pts: nd.pts.map(([x, y]) => [2 * cx - x, y]), w: nd.w, L: nd.L, n: nd.n });
+  const wingsL = wingsR.map(mirror);
+  const spine = csNeedle([cx, H - 30], -Math.PI / 2, H - 40, 0.015, 1.6, 24);
+  // almond cells round the spine: C-blades that leave it and return (right side; mirrored below)
+  const cellsR = [[150, 70, 0.42, 1.1], [228, 64, 0.5, 1.2], [300, 56, 0.42, 1]].map(([y, h, b, w]) => csNeedle([cx + 1, y], Math.PI / 2, h, -b, w, 14));
+  const crown = [csNeedle([cx, 40], -Math.PI / 2 - 0.5, 90, -0.2, 1.2, 12), csNeedle([cx, 40], -Math.PI / 2 + 0.5, 90, 0.2, 1.2, 12)];
+  // barbs, seeded per side
+  const gens = [[], [], [], []];
+  wingsR.forEach(w => csBarbs(w, 1, rr, gens, 1));
+  wingsL.forEach(w => csBarbs(w, 1, rl, gens, -1));
+  csBarbs(spine, 2, rs, gens, 1);
+  crown.forEach((c, i) => csBarbs(c, 2, i ? rr : rl, gens, i ? 1 : -1));
+  const cellsL = cellsR.map(mirror);
+  cellsR.forEach(c => csBarbs(c, 3, rr, gens, 1));
+  cellsL.forEach(c => csBarbs(c, 3, rl, gens, -1));
+  const prim = [spine, ...crown, ...wingsR, ...wingsL, ...cellsR, ...cellsL];
+  const count = prim.length + gens[1].length + gens[2].length + gens[3].length;
+  // a handful of nodes where wings leave the spine, and the one cold node
+  const nodes = wingsR.map(w => w.pts[0]).map(([x, y]) => `<circle cx="${csNum(x - 2)}" cy="${csNum(y)}" r="2.2" fill="none" stroke="${ink2}" stroke-width=".7"/>`).join('');
+  const cold = csCold(t.accent, !d);
+  return `<svg viewBox="${vb || `0 0 ${W} ${H}`}" width="100%" height="100%" preserveAspectRatio="xMidYMid slice" focusable="false" class="csa${vb ? ' csa-crop' : ''}" data-strokes="${count}">
+    <defs><filter id="${id}s" x="-2%" y="-2%" width="104%" height="104%"><feGaussianBlur stdDeviation=".3"/></filter></defs>
+    <g filter="url(#${id}s)">
+      <path d="${gens[3].map(csPoly).join('')}" fill="${ink3}"/>
+      <path d="${gens[2].map(csPoly).join('')}" fill="${ink3}"/>
+      <path d="${gens[1].map(csPoly).join('')}" fill="${ink2}"/>
+      <path d="${prim.map(csPoly).join('')}" fill="${ink1}"/>
+    </g>
+    ${nodes}
+    <path d="M${cx} 232 ${cx + 5} 244 ${cx} 256 ${cx - 5} 244Z" fill="none" stroke="${ink1}" stroke-width=".8"/>
+    <circle cx="${cx}" cy="244" r="1.6" fill="${cold}"/>
+    <g fill="${ink3}" style="font-family:var(--ab-font-label,monospace);font-size:8px;letter-spacing:.18em">
+      <text x="24" y="${H - 18}">SIGIL N° 031 · ${count} LINES</text>
+    </g>
+  </svg>`;
+}
+
 registerAesthetic({
   key: 'cybersigilism', order: 31,
   name: 'Cybersigilism',
@@ -134,6 +192,9 @@ registerAesthetic({
   ctaFill: 'ink',
   deck: {
     coverDisplay: 0.8,
+    coverBand: false,
+    // Material slide: a 2.3x crop of the barbs (the right wing near the spine), cut from the same seeded sigil
+    materialArt: ctx => csSigil(ctx, '298 114 348 244'),
     principles: [
       ['Hundreds of needles', 'Every line tapers to nothing; density is the ornament.'],
       ['Silver is an ink', 'Grey hairline on obsidian or bone paper, never chrome.'],
@@ -187,13 +248,10 @@ registerAesthetic({
   tokens(t) {
     const d = t.isDark;
     const cold = csCold(t.primary, !d);
-    const l1 = d ? '#E3E6EA' : '#1E1E22', l2 = d ? '#B9BEC6' : '#2A2A2E', l3 = d ? '#6E747D' : '#6B6860';
-    // double quotes only inside the SVG: encodeURIComponent turns them into %22 (it leaves ' alone, which would
-    // break the inline style attribute once the framework swaps " for ')
-    const glyph = s => `url("data:image/svg+xml,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">${csStateGlyph(s, l2)}</svg>`)}")`;
+    const l1 = d ? '#E3E6EA' : '#1E1E22', l2 = d ? '#B9BEC6' : '#2A2A2E';
     return {
       '--ab-type-pick-w': 400,
-      '--cs-l1': l1, '--cs-l2': l2, '--cs-l3': l3,
+      '--cs-l1': l1, '--cs-l2': l2,
       '--cs-line': t.alpha(l2, d ? 0.55 : 0.7),
       '--cs-faint': t.alpha(l2, d ? 0.22 : 0.28),
       '--cs-ghost': t.alpha(l2, d ? 0.08 : 0.1),
@@ -202,13 +260,11 @@ registerAesthetic({
       '--cs-cold-p-g': t.alpha(cold, 0.55), '--cs-cold-s-g': t.alpha(csCold(t.secondary, !d), 0.55), '--cs-cold-a-g': t.alpha(csCold(t.accent, !d), 0.55),
       '--cs-cold-p-w': t.alpha(cold, 0.3), '--cs-cold-s-w': t.alpha(csCold(t.secondary, !d), 0.3), '--cs-cold-a-w': t.alpha(csCold(t.accent, !d), 0.3),
       '--cs-chip-ground': d ? '#050507' : '#E4E0D7',
-      '--cs-glow': t.alpha(cold, d ? 0.42 : 0.5),
       '--cs-panel': d ? t.alpha('#0A0B0F', 0.7) : t.alpha('#F6F4EF', 0.7),
       '--cs-wash': t.mix(t.secondary, t.canvas, d ? 0.07 : 0.06),
       '--cs-btn': d ? '#000000' : '#18181B',
       '--cs-btn-ink': d ? '#E3E6EA' : '#EEEBE4',
       '--cs-btn-line': d ? '#B9BEC6' : '#18181B',
-      '--cs-st0': glyph(0), '--cs-st1': glyph(1), '--cs-st2': glyph(2),
       // the same values under --ab-* names, so the AI brief's {l1} {cold} {glow} {panel} {faint} placeholders resolve
       '--ab-l1': l1, '--ab-l2': l2, '--ab-cold': cold, '--ab-glow': t.alpha(cold, d ? 0.42 : 0.5), '--ab-panel': d ? t.alpha('#0A0B0F', 0.7) : t.alpha('#F6F4EF', 0.7),
       '--ab-faint': t.alpha(l2, d ? 0.22 : 0.28),
@@ -218,7 +274,7 @@ registerAesthetic({
   // The headline as text with hand-drawn hairline thorns growing out of the last word (aria-label carries the
   // plain text; the framework wraps this in the h2).
   headline(ctx, text) {
-    const e = escapeHtml;
+    const e = csEsc;
     const words = String(text || '').split(/\s+/).filter(Boolean);
     if (!words.length) return '';
     const last = words.pop();
@@ -234,59 +290,12 @@ registerAesthetic({
     return `${words.length ? e(words.join(' ')) + ' ' : ''}<span class="ab-hl">${e(last)}${thorns}</span>`;
   },
 
-  art(ctx) {
-    const t = ctx.t, d = t.isDark;
-    const id = 'cs' + (++seq);
-    const seed = csHash(String(ctx.brandName || 'sigil'));
-    const rs = csRand(seed), rl = csRand(seed ^ 0x5bd1e995), rr = csRand(seed ^ 0x27d4eb2f);
-    const W = 800, H = 560, cx = 452;
-    const ink1 = d ? '#E3E6EA' : '#1E1E22', ink2 = d ? '#B9BEC6' : '#2A2A2E', ink3 = d ? '#868C95' : '#4A4F57';
-    // the skeleton (right half), mirrored about x = cx: a long spine and four wing pairs that sweep out and bleed
-    // past the top and right edges; reach is nudged by the brand seed (+-10%)
-    const nudge = () => 0.9 + rs() * 0.2;
-    const wingsR = [
-      [cx + 2, 64, -1.05, 210, -0.46],
-      [cx + 2, 128, -0.6, 300, -0.44],
-      [cx + 2, 200, -0.18, 330, -0.4],
-      [cx + 2, 270, 0.16, 280, 0.42],
-      [cx + 2, 340, 0.52, 290, 0.44],
-      [cx + 2, 420, 0.92, 210, 0.48],
-    ].map(([x, y, a, L, b]) => csNeedle([x, y], a, L * nudge(), b, 1.6, CS_STEPS[0]));
-    const mirror = nd => ({ pts: nd.pts.map(([x, y]) => [2 * cx - x, y]), w: nd.w, L: nd.L, n: nd.n });
-    const wingsL = wingsR.map(mirror);
-    const spine = csNeedle([cx, H - 30], -Math.PI / 2, H - 40, 0.015, 1.6, 24);
-    // almond cells round the spine: C-blades that leave it and return (right side; mirrored below)
-    const cellsR = [[150, 70, 0.42, 1.1], [228, 64, 0.5, 1.2], [300, 56, 0.42, 1]].map(([y, h, b, w]) => csNeedle([cx + 1, y], Math.PI / 2, h, -b, w, 14));
-    const crown = [csNeedle([cx, 40], -Math.PI / 2 - 0.5, 90, -0.2, 1.2, 12), csNeedle([cx, 40], -Math.PI / 2 + 0.5, 90, 0.2, 1.2, 12)];
-    // barbs, seeded per side
-    const gens = [[], [], [], []];
-    wingsR.forEach(w => csBarbs(w, 1, rr, gens, 1));
-    wingsL.forEach(w => csBarbs(w, 1, rl, gens, -1));
-    csBarbs(spine, 2, rs, gens, 1);
-    crown.forEach((c, i) => csBarbs(c, 2, i ? rr : rl, gens, i ? 1 : -1));
-    const cellsL = cellsR.map(mirror);
-    cellsR.forEach(c => csBarbs(c, 3, rr, gens, 1));
-    cellsL.forEach(c => csBarbs(c, 3, rl, gens, -1));
-    const prim = [spine, ...crown, ...wingsR, ...wingsL, ...cellsR, ...cellsL];
-    const count = prim.length + gens[1].length + gens[2].length + gens[3].length;
-    // a handful of nodes where wings leave the spine, and the one cold node
-    const nodes = wingsR.map(w => w.pts[0]).map(([x, y]) => `<circle cx="${csNum(x - 2)}" cy="${csNum(y)}" r="2.2" fill="none" stroke="${ink2}" stroke-width=".7"/>`).join('');
-    const cold = csCold(t.accent, !d);
-    return `<svg viewBox="0 0 ${W} ${H}" width="100%" height="100%" preserveAspectRatio="xMidYMid slice" focusable="false" class="csa" data-strokes="${count}">
-      <defs><filter id="${id}s" x="-2%" y="-2%" width="104%" height="104%"><feGaussianBlur stdDeviation=".3"/></filter></defs>
-      <g filter="url(#${id}s)">
-        <path d="${gens[3].map(csPoly).join('')}" fill="${ink3}"/>
-        <path d="${gens[2].map(csPoly).join('')}" fill="${ink3}"/>
-        <path d="${gens[1].map(csPoly).join('')}" fill="${ink2}"/>
-        <path d="${prim.map(csPoly).join('')}" fill="${ink1}"/>
-      </g>
-      ${nodes}
-      <path d="M${cx} 232 ${cx + 5} 244 ${cx} 256 ${cx - 5} 244Z" fill="none" stroke="${ink1}" stroke-width=".8"/>
-      <circle cx="${cx}" cy="244" r="1.6" fill="${cold}"/>
-      <g fill="${ink3}" style="font-family:var(--ab-font-label,monospace);font-size:8px;letter-spacing:.18em">
-        <text x="24" y="${H - 18}">SIGIL N° 031 · ${count} LINES</text>
-      </g>
-    </svg>`;
+  art(ctx) { return csSigil(ctx, ''); },
+
+  // The states: one small sigil drawn three ways (outline, inked, barbed) as real SVG, not three orbs.
+  states(ctx) {
+    const ink = ctx.t.isDark ? '#B9BEC6' : '#2A2A2E';
+    return [0, 1, 2].map(i => `<div class="ab-state" data-s="${i}"><svg class="cs-st" viewBox="0 0 64 64" aria-hidden="true" focusable="false">${csStateGlyph(i, ink)}</svg><span class="ab-state-name">${csEsc((ctx.labels || [])[i] || '')}</span></div>`).join('');
   },
 
   materials: [

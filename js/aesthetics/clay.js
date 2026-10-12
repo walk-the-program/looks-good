@@ -17,7 +17,8 @@ registerAesthetic({
   slideShape: 'soft',
   // the states are three clay objects (a ball at rest, pressed flat, lifted), not button rows
   labels: { material: 'Clay', states: ['Rest', 'Pressed', 'Lifted'], statesKind: 'swatch' },
-  layout: { hero: 'split', sections: 'stacked' },
+  // the clay objects (02) lead the sections; the flat interface follows
+  layout: { hero: 'split', sections: 'stacked', sectionOrder: ['touch', 'ui', 'use'] },
   type: { ui: 'sans', label: 'sans', display: 1.08 },
   highlight: 'custom',
   highlightNote: 'The word sits on a flat accent band (no tilt, no gloss) with on-accent text and one soft accent-colored drop beneath it.',
@@ -47,7 +48,6 @@ registerAesthetic({
     const sh = hex => t.alpha(t.mix('#000000', hex, 0.45), d ? 0.8 : 0.55);
     const priHi = t.mix('#ffffff', t.primary, 0.34);
     const priLo = t.mix('#000000', t.primary, 0.2);
-    const pearl = t.mix('#ffffff', t.canvas, 0.9);
     return {
       '--ab-pri-sh': sh(t.primary),
       '--ab-sec-sh': sh(t.secondary),
@@ -61,15 +61,8 @@ registerAesthetic({
       '--ab-pri-lo-sh': sh(priLo),
       '--ab-clay-hi': d ? 'rgba(255,255,255,0.3)' : 'rgba(255,255,255,0.6)',
       '--ab-clay-lo': d ? 'rgba(0,0,0,0.3)' : 'rgba(0,0,0,0.12)',
-      // Cards are near-white (canvas lightened 82%), lit from above, with a soft
-      // shadow in the primary's tone.
+      // flat cards: the canvas lightened 82% (7% in dark mode), a hairline, no clay
       '--ab-card-fill': d ? t.mix('#ffffff', t.canvas, 0.07) : t.mix('#ffffff', t.canvas, 0.82),
-      '--ab-card-sh': d ? 'rgba(0,0,0,0.55)' : t.alpha(t.mix('#000000', t.primary, 0.12), 0.26),
-      '--ab-card-hi': d ? 'rgba(255,255,255,0.07)' : 'rgba(255,255,255,0.95)',
-      '--ab-card-lo': d ? 'rgba(0,0,0,0.3)' : 'rgba(60,50,70,0.05)',
-      '--ab-obj': d ? t.mix('#ffffff', t.canvas, 0.09) : t.mix('#ffffff', t.canvas, 0.8),
-      '--ab-pearl': pearl,
-      '--ab-pearl-ink': t.readable(pearl),
       // status text (rows sit on the canvas): the secondary shaded toward ink until it reads (4.5:1)
       '--ab-sec-text': (() => { const bg = t.canvas; for (let a = 0; a <= 1; a += 0.05) { const c = t.mix(t.ink, t.secondary, a); if (t.contrast(c, bg) >= 4.5) return c; } return t.ink; })(),
       '--ab-type-pick-w': 600,

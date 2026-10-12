@@ -69,3 +69,30 @@ Nothing else in the repo was edited.
 - Decks: scratchpad/adv/b6c/sheet-deck-{ws,da,cc}.png (rec) and -{wsB,daB,ccB}.png (other mode).
 - Blend donor: each key's art renders full-size inside raw-brutalist's art box (nested scope present).
 - `node tests/run.js` all passed; `t5/harness.js` briefs 192 fails 0 warns 0; `t5/src-verify-p5.js` families 53 fails 0.
+
+## Adoption log (b6c)
+Packet: scratchpad/adv/ADOPT-BRIEF.md (rev 3), against framework commit 96438f8. The SH shared-files commit had not
+landed when this pass finished (HEAD 83573af), so the shots use the current fit.js/meta.
+
+- **Dead deck CSS removed** (old product mock and disc marks): wabi-sabi 18 rules, dark-academia 22, curio-cabinet 20.
+  That covers `.ab-deck-side/-nav/-screen/-screentitle/-chip/-row/-rname/-rpct/-dot/-ctacard/-ctatitle/-ctaline/-mark`,
+  the `.ab-deck-app` selector in curio's compartment rule, the in-art Material toggles, and wabi's old pattern-band
+  dimming (the band is off via `coverBand:false`).
+- **Material slide**: `def.deck.materialArt(ctx)` on all three keys: wabi = three vessels (raw / glazed / mended),
+  DA = ex libris bookplate, curio = Haeckel plate. The variants left `art()`, so hero and donor art are lighter.
+- **Do / Don't**: `def.deck.marks`: wabi = glaze pebble / ash slash (spans), DA = ☞ / § in rubric, curio = pin head /
+  typed ✕. The new native In-product slide reads correctly with the board parts in all three, so no
+  `deck.product` hook is needed.
+- **Structure**: dark-academia `layout.sectionOrder: ['use','ui','touch']` (the catalogue card leads);
+  curio-cabinet `layout.order: ['hero','palette','sections','type']` (the specimen card for type closes the board).
+  Wabi-sabi keeps its own recomposed split hero.
+- **Weights** (font-synthesis none): every fake weight is now fixed. Shippori 700 became 400/600, Zen Kaku 600 became 500,
+  IM Fell 600/700 became 400, Libre Caslon 600 became 700, Newsreader 700 became 600, Courier Prime 600 became 400.
+  A probe on board + deck in both modes reports clean.
+- **Catalogue copy number**: DA's "c.01" call numbers stay as visible text, so no `--dk-min-text` opt-out is needed.
+- **curio-cabinet × y2k-chrome blend**: the donor's state names sat on curio's oak strip (1.33:1). The strip is
+  dropped when the row holds blend states (`.ab-states:has(.ab-blend-state)`), and a contrast scan of the
+  interface slide finds 0 state names under 3:1 (both directions, both modes).
+- **Checks**: gore 12 configs, 0 issues (b6c/gore5.json). `tests/run.js` all passed. Harness briefs 192, fails 0.
+  src-verify families 53, fails 0. Boards A–D at 1280/390 overflow 0 (Chromium and WebKit, 12/12). The only
+  console error is the favicon 404.

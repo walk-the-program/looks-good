@@ -207,8 +207,6 @@
 }
 
 /* ---- deck ---- */
-.ab[data-ae="cyber-hud"].ab-slide .ab-deck-dot { border-radius: 0; }
-.ab[data-ae="cyber-hud"].ab-slide .ab-deck-rpct { font-family: var(--ch-mono); }
 /* cover: the viewport fills the slide body, the statement slab bottom left */
 .ab[data-ae="cyber-hud"].ab-slide[data-slide="cover"] .ab-deck-cover .ab-hero { flex: 1 1 auto; }
 .ab[data-ae="cyber-hud"].ab-slide[data-slide="cover"] .ab-deck-cover .ab-art { aspect-ratio: auto; height: 100%; min-height: 360px; width: 100%; max-width: none; }

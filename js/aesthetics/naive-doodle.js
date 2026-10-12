@@ -136,7 +136,7 @@ function ndHeadlineFonts() {
 }
 
 // the shape kit for one brand + mode, as CSS custom properties
-function ndKit(t, ink, c1, c2, c3, canvas, seed) {
+function ndKit(t, ink, c1, c3, seed) {
   const rnd = ndRand(seed);
   const P = (pts, amp, step, col = ink, w = 2.6) => `<path d="${ndD(ndWobble(pts, rnd, amp, step))}" ${ndPen(col, w)}/>`;
   const kit = {};
@@ -148,6 +148,7 @@ function ndKit(t, ink, c1, c2, c3, canvas, seed) {
     + P([[200 + (rnd() - 0.5) * 3, 3], [200 + (rnd() - 0.5) * 3, 46]], 0.8, 6));
   kit['--nd-line'] = ndSvg(300, 10, P([[-2, 5], [302, 5.5]], 1.3, 6));
   kit['--nd-squig'] = ndSvg(120, 14, P(Array.from({ length: 25 }, (_, i) => [i * 5, 7 + Math.sin(i * 1.25) * 4.2]), 0.4, 3, t.accentInk, 2.8));
+  kit['--nd-vrule'] = ndSvg(10, 400, `<path d="${ndD(Array.from({ length: 81 }, (_, i) => [5 + Math.sin(i * 5 / 400 * Math.PI * 6) * 1.6, i * 5]))}" ${ndPen(ink, 1.6)}/>`);
   kit['--nd-rule'] = ndSvg(400, 10, `<path d="${ndD(Array.from({ length: 81 }, (_, i) => [i * 5, 5 + Math.sin(i * 5 / 400 * Math.PI * 6) * 1.6 + Math.sin(i * 5 / 400 * Math.PI * 14) * 0.6]))}" ${ndPen(ink, 1.6)}/>`);
   kit['--nd-oval'] = ndSvg(64, 34, P(ndArc(32, 17, 28.5, 13.5, 170, 378, -0.04), 0.7, 4));
   kit['--nd-oval-fill'] = ndSvg(64, 34, `<clipPath id="o"><ellipse cx="34" cy="18.6" rx="27.5" ry="13"/></clipPath><g clip-path="url(#o)"><rect width="64" height="34" fill="${c1}"/><g stroke="${ndShade(c1, 14)}" stroke-width="1.5" opacity=".6">${Array.from({ length: 16 }, (_, i) => `<path d="M${i * 5 - 14} 36L${i * 5 + 12} 0"/>`).join('')}</g></g>`);
@@ -264,7 +265,7 @@ registerAesthetic({
     const c1 = ndCrayon(t.primary), c2 = ndCrayon(t.secondary), c3 = ndCrayon(t.accent);
     const hatch = (c, k) => `repeating-linear-gradient(-45deg, ${ndShade(c, k)} 0 1.5px, transparent 1.5px 3.6px)`;
     const brand = typeof state !== 'undefined' && state && state.content ? String(state.content.brandName || '') : '';
-    const kit = ndKit(t, ink, c1, c2, c3, t.canvas, ndHash(brand + (d ? '|d' : '|l')));
+    const kit = ndKit(t, ink, c1, c3, ndHash(brand + (d ? '|d' : '|l')));
     return Object.assign({
       '--ab-ink': ink,
       '--ab-muted': muted,
@@ -371,6 +372,7 @@ registerAesthetic({
   },
 
   deck: {
+    marks: (ctx, kind) => `<i class="nd-mk" data-k="${kind === 'do' ? 'do' : 'dont'}"></i>`,
     principles: [
       ['Proof a human drew it', 'The line wobbles; the drawing stays confident.'],
       ['Wobble the line, not text', 'Body copy and labels stay straight and readable.'],

@@ -72,6 +72,12 @@ function rzDrums(t) {
   const d3 = rzSnap(t.accent, [d1.hex, d2.hex]);
   return { d1, d2, d3, ov: rzOver(d1.hex, d2.hex, t.isDark) };
 }
+// heaviest weight a face has up to `want` (single-weight faces stay at their one weight)
+function rzW(font, want) {
+  const w = String((font && font.weights) || '400').split(';').map(Number).filter(Boolean);
+  const le = w.filter(x => x <= want);
+  return le.length ? Math.max(...le) : Math.min(...w);
+}
 const rzUri = svg => `url("data:image/svg+xml,${encodeURIComponent(svg)}")`;
 const rzH = (i, j, s) => { const v = Math.sin(i * 127.1 + j * 311.7 + s * 74.7) * 43758.5453; return v - Math.floor(v); };
 
@@ -171,6 +177,8 @@ registerAesthetic({
     const am1 = rzUri(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 12" preserveAspectRatio="none" width="200" height="12"><g fill="${D.d1.hex}">${ramp}</g></svg>`);
     return {
       '--ab-blend': d ? 'screen' : 'multiply',
+      '--rz-hw': rzW(typeof state !== 'undefined' && state && state.headingFont, 800),
+      '--rz-bw': rzW(typeof state !== 'undefined' && state && state.bodyFont, 700),
       '--ab-paper-card': paper,
       '--ab-secondary': D.d2.hex, '--ab-on-secondary': t.readable(D.d2.hex),
       '--ab-sec-tint': t.mix(D.d2.hex, t.canvas, 0.16),
@@ -219,7 +227,7 @@ registerAesthetic({
     const crop = (x, y, sx, sy) => `<path d="M${x} ${y + sy * 2}V${y + sy * 7}M${x + sx * 2} ${y}H${x + sx * 7}" />`;
     const blend = 'style="mix-blend-mode:var(--ab-blend,multiply)"';
     return `<div class="rza"><svg viewBox="0 0 ${W} ${H}" width="100%" height="100%" preserveAspectRatio="xMaxYMid slice" focusable="false">
-      <defs><clipPath id="${id}c"><text x="290" y="${H - M - 6}" text-anchor="middle" font-size="206" style="font-family:var(--ab-font-h);font-weight:800">${ini}</text></clipPath></defs>
+      <defs><clipPath id="${id}c"><text x="290" y="${H - M - 6}" text-anchor="middle" font-size="206" style="font-family:var(--ab-font-h);font-weight:var(--rz-hw,700)">${ini}</text></clipPath></defs>
       <g fill="${D.d1.hex}" ${blend}>${dots1}</g>
       <g ${blend} transform="translate(2.6 1.9)"><g clip-path="url(#${id}c)" fill="${D.d2.hex}">${dots2}</g></g>
       <g fill="var(--ab-paper-card)">${pins}</g>

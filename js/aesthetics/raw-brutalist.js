@@ -6,7 +6,15 @@
    hero (an enormous uppercase headline bleeding off the right edge over a
    numbered 12-column grid), the spec index as a full-width table under it,
    palette as full-width strips, the real CTA shown at rest / hover / pressed.
-   The deck's Material slide shows a wireframe of the board itself. */
+   The deck's Material slide shows a wireframe of the board itself (deck.materialArt),
+   In product is an unstyled HTML directory index (deck.product). */
+// Heaviest weight the current heading face really has (FONTS `weights`), capped at 900.
+function rbHeavy() {
+  const f = typeof state !== 'undefined' && state && state.headingFont;
+  const ws = String((f && f.weights) || '400').split(';').map(Number).filter(n => n > 0);
+  return Math.min(900, Math.max(400, ...ws));
+}
+
 registerAesthetic({
   key: 'raw-brutalist', order: 2,
   name: 'Raw Brutalist',
@@ -21,6 +29,45 @@ registerAesthetic({
   layout: { hero: 'poster', palette: 'strips' },
   // Deck copy (js/brand-deck.js): three principles, three do / don't lines, each short.
   deck: {
+    // Do / Don't markers: plain-text checkboxes, not discs.
+    marks: { do: '[x]', dont: '[ ]' },
+    // Material slide: a wireframe of the board itself, boxes labelled with tag, class and size.
+    materialArt() {
+      const box = (cls, tag, size) => `<div class="rba-box ${cls}"><b>${tag}</b><span>${size}</span></div>`;
+      return `<div class="rba-wire">
+        ${box('rba-w-head', 'HEADER.head', '1280×56')}
+        ${box('rba-w-hero', 'SECTION.hero', '1280×640')}
+        ${box('rba-w-pal', 'DIV.palette', '5 STRIPS')}
+        ${box('rba-w-type', 'SECTION.type', '3 COLS')}
+        ${box('rba-w-ui', 'DIV.card', '[01]')}
+        ${box('rba-w-panel', 'DIV.panel', '[02]')}
+        ${box('rba-w-rows', 'UL.rows', '3')}
+        ${box('rba-w-foot', 'FOOTER', '1280×40')}
+      </div>`;
+    },
+    // In product: the brand as an unstyled web server directory listing (Times, default
+    // blue links, a <pre>-style table, an <hr>, the server signature).
+    product(ctx) {
+      const e = ctx.e;
+      const slug = String(ctx.brandName || 'brand').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'brand';
+      const day = new Date().toISOString().slice(0, 10);
+      const rows = (ctx.rows || []).map(r => {
+        const dir = String(r[0]).toLowerCase().replace(/[^a-z0-9]+/g, '-') + '/';
+        return `<tr><td><span class="rbp-a">${e(dir)}</span></td><td>${day} 09:41</td><td>${e(String(r[2]))}%</td><td>${e(r[1])}</td></tr>`;
+      }).join('');
+      return `<div class="rbp">
+        <h1 class="rbp-h">Index of /${e(slug)}/projects</h1>
+        <table class="rbp-t">
+          <tr><th>Name</th><th>Last modified</th><th>Done</th><th>Description</th></tr>
+          <tr><td colspan="4"><hr></td></tr>
+          <tr><td><span class="rbp-a">Parent Directory</span></td><td></td><td>-</td><td></td></tr>
+          ${rows}
+          <tr><td colspan="4"><hr></td></tr>
+        </table>
+        <p class="rbp-btns"><span class="rbp-btn">Save direction</span> <span class="rbp-btn">Cancel</span></p>
+        <address class="rbp-sig">Apache/2.4.62 Server at ${e(slug)}.com Port 443</address>
+      </div>`;
+    },
     principles: [
       ['Hard edges, thick borders', 'Zero radius and 2px ink borders on every control.'],
       ['Flat: invert, never lift', 'Hover inverts to ink; pressed takes an inset outline.'],
@@ -59,6 +106,8 @@ registerAesthetic({
   tokens(t) {
     return {
       '--ab-type-pick-w': 400,
+      // the heading face's heaviest real weight (Archivo Black has only 400; font-synthesis is off)
+      '--rb-hw': rbHeavy(),
        '--ab-grid': t.alpha(t.ink, t.isDark ? 0.1 : 0.06) };
   },
 
@@ -67,8 +116,6 @@ registerAesthetic({
   //    along the top of the hero's column grid; hidden elsewhere),
   //  - .rba-spec: the spec index as a full-width four-column mono table
   //    (ID / ITEM / STATE / UPDATED) that sits under the headline,
-  //  - .rba-wire: a wireframe of the board itself (ink boxes labelled with tag,
-  //    class and size), shown only on the deck's Material slide.
   art(ctx) {
     const e = escapeHtml;
     const subject = String(ctx.brandName || '').toUpperCase().slice(0, 24);
@@ -81,18 +128,7 @@ registerAesthetic({
     ];
     const head = ['ID', 'ITEM', 'STATE', 'UPDATED'].map(h => `<span>${h}</span>`).join('');
     const body = rows.map(r => `<div class="rba-row">${r.map(c => `<span>${e(c)}</span>`).join('')}</div>`).join('');
-    const box = (cls, tag, size) => `<div class="rba-box ${cls}"><b>${tag}</b><span>${size}</span></div>`;
-    const wire = `<div class="rba-wire">
-      ${box('rba-w-head', 'HEADER.head', '1280×56')}
-      ${box('rba-w-hero', 'SECTION.hero', '1280×640')}
-      ${box('rba-w-pal', 'DIV.palette', '5 STRIPS')}
-      ${box('rba-w-type', 'SECTION.type', '3 COLS')}
-      ${box('rba-w-ui', 'DIV.card', '[01]')}
-      ${box('rba-w-panel', 'DIV.panel', '[02]')}
-      ${box('rba-w-rows', 'UL.rows', '3')}
-      ${box('rba-w-foot', 'FOOTER', '1280×40')}
-    </div>`;
-    return `<div class="rba"><div class="rba-ticks">${ticks}</div><div class="rba-spec"><div class="rba-row rba-th">${head}</div>${body}</div>${wire}</div>`;
+    return `<div class="rba"><div class="rba-ticks">${ticks}</div><div class="rba-spec"><div class="rba-row rba-th">${head}</div>${body}</div></div>`;
   },
 
   materials: [

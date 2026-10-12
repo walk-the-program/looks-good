@@ -24,6 +24,12 @@ let pbSeq = 0;
 // Local escape and glyph table guards: tokens() also runs where only the aesthetic files are loaded.
 const pbEsc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const pbFont = () => (typeof AB_FONT_5X7 !== 'undefined' ? AB_FONT_5X7 : {});
+// The token object the card / intrusion drawers read, with the brand initial (M when the
+// 5x7 table has no glyph for it).
+const pbCardCtx = ctx => {
+  const initial = String(ctx.initial || 'M').toUpperCase();
+  return Object.assign({}, ctx.t, { __initial: pbFont()[initial] ? initial : 'M' });
+};
 const pbGlyph = ch => pbFont()[ch] || PB_PUNCT[ch] || null;
 
 // One word as a double-height Mode 7 style SVG: each glyph pixel is 1 unit wide and 2 tall
@@ -115,7 +121,8 @@ registerAesthetic({
   mode: 'dark',
   slideShape: 'minimal',
   labels: { material: 'Signal', states: ['Carrier', 'Tuned', 'Intrusion'], statesKind: 'button' },
-  layout: { hero: 'centered', palette: 'swatches', sections: 'two-col' },
+  // the teletext page, then its index screens, then the palette and type pages
+  layout: { hero: 'centered', palette: 'swatches', sections: 'two-col', order: ['hero', 'sections', 'palette', 'type'] },
   type: { ui: 'body', label: 'body' },
   highlight: 'custom',
   highlightNote: 'The last word is an inverse-video block: the station ident colour (the client primary) behind teletext glyphs in black, like a Ceefax inverse header.',
@@ -157,7 +164,6 @@ registerAesthetic({
 
   tokens(t) {
     const T = PB_TT;
-    const name = pbEsc(String((typeof effectiveContent === 'function' && effectiveContent().brandName) || 'STATION').toUpperCase().slice(0, 22));
     return {
       '--ab-tt-screen': '#000000',
       '--ab-tt-fg': T.w,
@@ -167,7 +173,6 @@ registerAesthetic({
       '--ab-tt-yellow': T.y, '--ab-tt-green': T.g, '--ab-tt-magenta': T.m, '--ab-tt-red': T.r, '--ab-tt-blue': T.b, '--ab-tt-cyan': T.c, '--ab-tt-white': T.w,
       '--ab-tt-line': 'rgba(255,255,255,0.22)',
       '--ab-tt-scan': 'rgba(0,0,0,0.3)',
-      '--ab-pb-card': `url("data:image/svg+xml,${encodeURIComponent(pbTestCard(Object.assign({}, t, { __initial: 'M' }), name))}")`,
       '--ab-type-pick-w': '400',
     };
   },
@@ -187,16 +192,14 @@ registerAesthetic({
 
   // The hero IS a teletext page: a black screen with the Ceefax row 0 (page, service, date,
   // time), the torn frame-grab intrusion on the right, and the Fastext row 24. The headline
-  // and copy sit over it on the character grid (css). The test card rides along hidden and is
-  // shown on the deck's Material slide. Inline styles keep it whole as a blend donor.
+  // and copy sit over it on the character grid (css). The test card is the 02 panel's picture
+  // and the deck's Material art. Inline styles keep it whole as a blend donor.
   art(ctx) {
     const t = ctx.t;
     const T = PB_TT;
     const e = pbEsc;
     const svc = e(String(ctx.brandName || 'Station').trim().split(/\s+/)[0].toUpperCase().slice(0, 12));
-    const name = e(String(ctx.brandName || 'Station').toUpperCase().slice(0, 22));
-    const initial = String(ctx.initial || 'M').toUpperCase();
-    const ti = Object.assign({}, t, { __initial: pbFont()[initial] ? initial : 'M' });
+    const ti = pbCardCtx(ctx);
     const mono = "ui-monospace,'SF Mono',Menlo,monospace";
     const row = 'position:absolute;left:2.4%;right:2.4%;display:flex;justify-content:space-between;white-space:nowrap;font:700 clamp(8px,2.15cqw,19px)/1.2 ' + mono;
     const keys = [['INDEX', T.r], ['BRAND', T.g], ['TYPE', T.y], ['SIGNAL', T.c]];
@@ -208,13 +211,13 @@ registerAesthetic({
       </div>
       <div class="pba-r24" style="${row};bottom:2%">${keys.map(k => `<span style="color:${k[1]}">${k[0]}</span>`).join('')}</div>
       <div style="position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(0deg,rgba(0,0,0,.28) 0 1px,transparent 1px 3px)"></div>
-    </div><div class="pba-card" style="display:none;position:absolute;inset:0">${pbTestCard(ti, name)}</div>`;
+    </div>`;
   },
 
   materials: [
     { name: 'Teletext page', css: 'background: #000; color: #fff; font: 700 1em ui-monospace, Menlo, monospace; /* a 40-column character grid: row 0 P100 / service / date / time, double-height headline on rows 2-5, Fastext keys on row 24; eight fixed colours only */' },
     { name: 'Double-height headline', css: 'color: #FFFF00; /* Mode 7 style glyphs built from a 5x7 grid, each pixel 1 wide and 2 tall; the last word in inverse video on {primary} */' },
-    { name: 'Test card', css: 'background: {pbCard} center / cover; /* fixed bars W Y C G M R B, castellations to the edge, grey ramp, grating, a fictional ident, the torn frame grab on its lower third */' },
+    { name: 'Test card', css: 'aspect-ratio: 4 / 3; background: #000; /* an inline SVG card: fixed bars W Y C G M R B, castellations to the edge, grey ramp, grating, a fictional ident, the torn frame grab on its lower third */' },
     { name: 'Intrusion frame grab', css: 'background: #0000FF; /* the brand mark at 24 x 18 sixels in white, torn into three bands offset +6 / -4 / +9 with 1px white tear lines; "THIS IS NOT YOUR SIGNAL." in plain mono */' },
     { name: 'Title row', css: 'background: #00FFFF; color: #000; font: 700 11px ui-monospace, Menlo, monospace; letter-spacing: .08em; text-transform: uppercase; /* page number first: P101 */' },
     { name: 'Fastext keys', css: 'color: #FF0000 | #00FF00 | #FFFF00 | #00FFFF on #000; /* four colour-coded keys on row 24; the footer strip is R G Y B */' },
@@ -236,8 +239,27 @@ registerAesthetic({
     ],
   },
 
+  // Real title rows on every screen (P101 / P102 / P103) and the test card as the 02 panel's
+  // picture, instead of CSS generated content.
+  panels: {
+    card(ctx) {
+      return ctx.parts.cardBase().replace('<div class="ab-card">', '<div class="ab-card"><p class="pb-row0">P101&nbsp; CHANNEL SELECT</p>');
+    },
+    panel(ctx) {
+      const card = pbTestCard(pbCardCtx(ctx), pbEsc(String(ctx.brandName || 'Station').toUpperCase().slice(0, 22)));
+      return ctx.parts.panelBase().replace('<div class="ab-panel">', `<div class="ab-panel"><p class="pb-row0">P102&nbsp; TEST CARD / TUNING</p><div class="pb-card" aria-hidden="true">${card}</div>`);
+    },
+    list(ctx) {
+      return ctx.parts.listBase().replace('<ul class="ab-list">', '<ul class="ab-list"><li class="pb-row0">P103&nbsp; INDEX &middot; 3 PAGES</li>');
+    },
+  },
+
   // Deck copy (js/brand-deck.js): three principles, three do / don't lines, each short.
   deck: {
+    // Material slide: the test card with the torn frame grab on its lower third.
+    materialArt(ctx) {
+      return `<div class="pba-card" style="position:absolute;inset:0">${pbTestCard(pbCardCtx(ctx), pbEsc(String(ctx.brandName || 'Station').toUpperCase().slice(0, 22)))}</div>`;
+    },
     principles: [
       ['A forty-column page', 'Row 0 header, double-height headline, Fastext row 24.'],
       ['Eight fixed colours', 'Teletext R G Y B M C W on black; the brand is the ident.'],

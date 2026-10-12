@@ -105,3 +105,59 @@ only three keys keep it), and the leads are weak in the deck.
 - Gummy 6.5–7 — jelly materials, coloured shadows and squash are right and it no longer reads as Clay; short:
   the spill is a centred row rather than a tumbling pile with depth, and the jelly word cannot carry an internal
   transmitted-light gradient without background-clip:text (not export-safe).
+
+## Adoption log (b6a)
+Packet rev 3 (ADOPT-BRIEF). Same files only. The SH suite changes for frutiger-aero and gummy were already on disk in
+js/patterns/fit.js when the re-shoots ran.
+
+All three keys
+- Weights (scratchpad/adv/fw/weights.txt): every 300/600/700 request now resolves to a weight the face really has.
+  Each def computes the nearest real weight in `tokens()` from the brand faces (`--fa-lw/--fa-bw/--fa-hbw`,
+  `--gm-hw/--gm-bw`, `--bt-hw/--bt-bw`) and the CSS uses those vars. The framework parts that asked for missing
+  weights (`b`, `.ab-deck-ptitle`, `-pchip`, `-pname`, `-ddhead`, `.ab-type-cur b`, the marks) are pinned too.
+  Re-check with a per-element variant of weights.js (S/adv/b6a/wcheck.js): 0 mismatches, both modes, all 3 keys.
+  Big Top's two italic requests (Karla has no italic) became letter-spaced caps.
+- Removed CSS for markup that no longer exists: the old `.ab-deck-prodframe > .ab-head` rules (Aero, Big Top) and
+  `.ab-deck-prodframe::before`. The live `.ab-deck-prodgrid` phone-row rules stay for Aero and Gummy (default
+  product), and were deleted from Big Top (which now has its own product).
+- `def.deck.marks` on all three: gel orb ✓ / glass orb ✕ (Aero), jelly drop ✓ / sugar mould ✕ (Gummy), ★ / ✕ in
+  the wood-type face with `--dk-mark-do` = the stripe text colour (Big Top).
+- `def.deck.materialArt` on all three, so the Material slide no longer repeats the cover art: a gel dissected
+  (pill, cap, caustic, wet floor and an orb, with callouts), a gumdrop dissected (dots, Fresnel rim, transmitted
+  light, coloured shadow, and Set vs Squish pills), and the Big Top marquee sign (bulb border, valance, brand name
+  in wood type with drop shade, ribbon, ticket).
+- Structure hooks (`layout.order` / palette kinds / hero kinds): not adopted. Each board already has its own
+  skeleton signals (window chrome / candy moulds / showbill), and changing them would only be churn.
+
+Frutiger Aero
+- `def.deck.coverBand: false` replaces the `.ab.ab … > .ab-deck-pattern { display: none }` hack and the padding
+  override. The remaining `.ab.ab` cover rules exist only to outrank the base cover-hero rule (0,7,0). The
+  `!important`s on the cover art stay because `bdFitCover` writes inline sizes.
+- `def.panels`: the window chrome is real markup now. `.fa-window > .fa-titlebar` holds the title text and caption
+  buttons on the 01 card ("Project — Untitled") and the 02 panel ("Settings"). `.fa-explorer` holds a real header
+  row (Name / Status / Progress) and the list. This replaced three CSS generated-content labels (about 20 lines).
+- Comments corrected: no backdrop-filter is used anywhere.
+
+Gummy
+- `def.deck.coverBand: false` replaces the hiding hack. The cover now clips its spill to the slide body instead of
+  hanging it 30px below; that hang had made `bdFitCover` shrink the headline to the 64px floor. The headline is back
+  to 87px with fit 1. The aesthetic name is dropped from the cover meta row (it is in the footer) because it sat on
+  the ring.
+
+Big Top
+- `def.deck.product(ctx)` replaces the shared product frame with a box office: a showbill poster for the brand
+  (valance, arched tagline via the same `btBill()` the headline hook uses, ribbon, programme line, foot) beside a
+  bulb-lit "Box office" sign, tonight's programme (the board's own list in a one-line row layout) and two tickets.
+  The poster bill is `role="img"` with the text as `aria-label` and the drawn letters `aria-hidden`, like the
+  framework's headline hook.
+- The `.ab-row-n { font-size: 0 !important }` became a plain `font-size: 0` (the deck no longer lifts 0px text).
+
+Verification (actual)
+- Boards (A–D, Chromium): 12/12 overflow=0. The only console error is the app's favicon 404. WebKit: 12/12 overflow=0,
+  0 errors.
+- Gore (4 configs × 3 keys): 120 slides, 0 issues (S/adv/b6a/gore8.json). The first pass found the box-office arc
+  letters and programme names; both were fixed.
+- `node tests/run.js` all passed. `node S/t5/harness.js`: briefs 192, fails 0, warns 0. `node S/t5/src-verify-p5.js`:
+  families 53, fails 0, map mismatches 0.
+- Sheets: S/adv/sheet-b6a-<key>.png, S/adv/sheet-b6awk-<key>.png, S/adv/b6a/sheet-deck-<key>.png and
+  `-<key>-other.png`, slides in S/adv/b6a/dk/.

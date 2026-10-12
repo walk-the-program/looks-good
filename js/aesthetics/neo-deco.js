@@ -145,8 +145,8 @@ registerAesthetic({
   // The sunburst: 48 crisp rays alternating long (r 96) and short (r 70), starting at r 18
   // so they end on a solid brass half-disc; three Radio City bands at r 24 / 36 / 48; a
   // stepped baseline. Every stroke is the brass gradient (userSpaceOnUse, so horizontal and
-  // radial lines both take it). In the deck's Material slide a brass specimen (gradient
-  // swatch, reeded flutes, stepped frame at 1:1) replaces the fan (CSS shows .nds-mat there).
+  // radial lines both take it). The deck's Material slide shows a brass specimen instead
+  // (def.deck.materialArt).
   art(ctx) {
     const B = ndBrass(ctx.t.isDark);
     const id = 'ndg' + (++ndSeq);
@@ -168,7 +168,6 @@ registerAesthetic({
         <path d="M84 100A16 16 0 0 1 116 100Z" fill="url(#${id})"/>
         <path vector-effect="non-scaling-stroke" d="${steps}" stroke="url(#${id})" stroke-width="1.2"/>
       </svg>
-      <div class="nds-mat"><i class="nds-swatch"></i><i class="nds-reed"></i><i class="nds-frame"></i></div>
     </div>`;
   },
 
@@ -199,6 +198,11 @@ registerAesthetic({
   // Deck copy (js/brand-deck.js): three principles, three do / don't lines, each short.
   deck: {
     coverDisplay: 1.45,
+    // Material slide: brass as material at 1:1 (a gradient swatch, reeded flutes, a stepped frame)
+    materialArt() {
+      return '<div class="nds-mat"><i class="nds-swatch"></i><i class="nds-reed"></i><i class="nds-frame"></i></div>';
+    },
+    marks: { do: '\u25C6', dont: '\u25C7' },
     principles: [
       ['Symmetry, polished', 'A centred headline, centred ornaments, equal columns.'],
       ['Brass is a material', 'A fixed brass ramp draws every line and ray.'],

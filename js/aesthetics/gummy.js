@@ -68,6 +68,54 @@ function gmWordColour(hex, ground, dark) {
 
 function gmEsc(s) { return escapeHtml(String(s == null ? '' : s)); }
 
+// The nearest weight a face really has (font-synthesis is off): `want`, else the next one up
+// within 100, else the next one down. Fonts come from the global app state.
+function gmWeight(font, want) {
+  const ws = String((font && font.weights) || '400').split(';').map(Number).filter(Boolean);
+  if (ws.includes(want)) return want;
+  const up = ws.filter(w => w > want).sort((x, y) => x - y)[0];
+  const down = ws.filter(w => w < want).sort((x, y) => y - x)[0];
+  return up && up - want <= 100 ? up : (down || up || 400);
+}
+function gmFonts() {
+  const st = typeof state !== 'undefined' ? state : null;
+  return { h: st && st.headingFont, b: st && st.bodyFont };
+}
+
+// Material slide: one big gumdrop dissected like a confectioner's spec sheet.
+function gmAnatomy(ctx) {
+  const t = ctx.t;
+  const night = !!t.isDark;
+  const id = `gm${++seq}`;
+  const tn = gmTones(gmCandy(t.primary));
+  const sq = gmTones(gmCandy(t.secondary));
+  const ink = night ? GM_SUGAR : GM_PLUM;
+  const bw = gmWeight(gmFonts().b, 700);
+  const call = (x1, y1, x2, y2, tx, ty, anchor, a, b) => `<path d="M${x1} ${y1}L${x2} ${y2}" stroke="${ink}" stroke-opacity=".5" stroke-width="1.4" fill="none"/><circle cx="${x1}" cy="${y1}" r="4" fill="${ink}"/>
+    <text x="${tx}" y="${ty}" text-anchor="${anchor}" font-family="var(--ab-font-b, sans-serif)" fill="${ink}"><tspan font-size="17" font-weight="${bw}">${a}</tspan><tspan x="${tx}" dy="21" font-size="15" fill-opacity=".78">${b}</tspan></text>`;
+  const dome = 'M208 372C190 236 254 120 340 120S490 236 472 372C432 392 248 392 208 372Z';
+  return `<svg class="gm-anatomy" viewBox="0 0 600 520" aria-hidden="true" focusable="false">
+    <defs>${gmDefs(`${id}p`, tn)}${gmDefs(`${id}s`, sq)}
+      <filter id="${id}b" x="-40%" y="-200%" width="180%" height="500%"><feGaussianBlur stdDeviation="13"/></filter>
+      <filter id="${id}c" x="-40%" y="-300%" width="180%" height="700%"><feGaussianBlur stdDeviation="5"/></filter>
+    </defs>
+    <g filter="url(#${id}b)"><ellipse cx="362" cy="388" rx="168" ry="30" fill="${tn.deep}" fill-opacity="${night ? 0.6 : 0.45}"/></g>
+    <g filter="url(#${id}c)"><ellipse cx="386" cy="392" rx="58" ry="10" fill="${tn.light}"/></g>
+    <g opacity=".9"><path d="${dome}" fill="url(#${id}p)"/><path d="${dome}" fill="url(#${id}pg)"/></g>
+    <path d="M216 366C200 240 260 130 340 130S480 240 464 366" fill="none" stroke="${tn.rim}" stroke-opacity=".45" stroke-width="7"/>
+    ${gmDots(272, 176, 2)}
+    <g opacity=".88"><rect x="452" y="430" width="104" height="44" rx="22" fill="url(#${id}s)" transform="translate(504 474) scale(1.08 .86) translate(-504 -474)"/></g>
+    <g opacity=".88"><rect x="330" y="426" width="96" height="48" rx="24" fill="url(#${id}s)"/></g>
+    ${gmDots(346, 438, 0.5)}${gmDots(470, 440, 0.5)}
+    <text x="378" y="500" text-anchor="middle" font-family="var(--ab-font-b, sans-serif)" font-size="14" fill="${ink}" fill-opacity=".8">set</text>
+    <text x="504" y="500" text-anchor="middle" font-family="var(--ab-font-b, sans-serif)" font-size="14" fill="${ink}" fill-opacity=".8">squish</text>
+    ${call(254, 168, 150, 96, 26, 62, 'start', 'Specular dots', 'two or three, never a cap')}
+    ${call(214, 320, 150, 290, 20, 262, 'start', 'Fresnel rim', 'denser at the edge')}
+    ${call(400, 330, 520, 150, 590, 112, 'end', 'Transmitted light', 'pools bottom-right')}
+    ${call(280, 398, 170, 446, 20, 470, 'start', 'Coloured shadow', 'its own colour, plus a caustic')}
+  </svg>`;
+}
+
 /* ---------------- art: the candy spill ---------------- */
 
 // gradient defs for one flavour: body (transmitted light bottom-right), rim, shadow
@@ -258,8 +306,11 @@ registerAesthetic({
     if (contrastRatio(muted, t.canvas) < 4.5) muted = night ? '#E8DDEF' : '#4A385B';
     const word = gmWordColour(t.primary, t.canvas, night);
     const a = (hex, k) => t.alpha(hex, k);
+    const fonts = gmFonts();
     return {
       '--ab-type-pick-w': 400,
+      '--gm-hw': gmWeight(fonts.h, 400),
+      '--gm-bw': gmWeight(fonts.b, 700),
       '--ab-ink': ink,
       '--ab-muted': muted,
       '--ab-line': night ? 'rgba(255, 240, 250, 0.16)' : a(GM_PLUM, 0.12),
@@ -312,6 +363,14 @@ registerAesthetic({
 
   deck: {
     coverDisplay: 0.66,
+    coverBand: false,   // the candy spill runs across the cover's foot instead of a pattern band
+    marks(ctx, kind) {
+      return `<span class="gm-mark" data-k="${kind}">${kind === 'do' ? '✓' : '✕'}</span>`;
+    },
+    // Material slide: one gumdrop dissected (the spill is already on the cover)
+    materialArt(ctx) {
+      return gmAnatomy(ctx);
+    },
     principles: [
       ['Light passes through, colour spills', 'Bodies are translucent and shadows carry their colour.'],
       ['Squash on press, never sag', 'Pressed controls flatten outward from the base.'],

@@ -7,7 +7,7 @@
    secondary a tarnish tint, the accent one wet gloss spot. No gore, no skulls, no copied
    imagery; titles in a light high-contrast serif (Cormorant caps), reading in plain serif.
    Distinct from Religious Futurism: spinal labels (C1 / T6 / L1), not Roman numerals; a
-   valve for states, not panes; vertebra-shaped controls, no pills. Hooks: hero centered,
+   valve for states, not panes; vertebra-shaped controls, no pills. Hooks: hero bleed,
    states swatch (the valve drawn three ways). */
 
 // The cast palette, shared by tokens() and art(). `t` is the base token object. Cold and fixed: a green-grey
@@ -42,7 +42,7 @@ registerAesthetic({
   mode: 'dark',
   slideShape: 'classic',
   labels: { material: 'Organs', states: ['Closed', 'Parting', 'Open'], statesKind: 'swatch' },
-  layout: { hero: 'centered', palette: 'swatches', sections: 'two-col' },
+  layout: { hero: 'bleed', palette: 'swatches', sections: 'two-col' },
   type: { ui: 'body', label: 'mono' },
   highlight: 'custom',
   highlightNote: 'The highlighted word is set in lit bone (a step lighter than the headline) with a soft bone halo behind it (a 16px text-shadow at 25%); no client colour, no dot, no underline, no fill.',
@@ -91,7 +91,6 @@ registerAesthetic({
       '--ab-bi-hl': p.boneLit,
       '--ab-bi-hl-glow': t.alpha(p.bone, 0.25),
       '--ab-bi-bone-lit': p.boneLit,
-      '--ab-bi-disc-rim': t.mix(t.ink, t.canvas, 0.7),
       '--ab-bi-bone': p.bone,
       '--ab-bi-metal': p.metal,
       '--ab-bi-metal-hi': p.metalHi,
@@ -254,6 +253,7 @@ registerAesthetic({
   // Deck copy (js/brand-deck.js): three principles, three do / don't lines, each short.
   deck: {
     materialStage: 'pattern',   // the material slide stages the lead pattern (tubing runs); the cover already carries the nave
+    coverBand: false,
     principles: [
       ['One cast material', 'Charcoal, bone and tarnished metal share a single surface.'],
       ['Repeat a few modules', 'Ribs, vertebrae, tubes and valves set the rhythm.'],

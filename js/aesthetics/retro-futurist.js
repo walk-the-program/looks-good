@@ -10,6 +10,14 @@
   // Mono face for SVG lettering (self-contained: the art never relies on board css).
   const MONO = 'font-family="ui-monospace,SF Mono,Menlo,monospace"';
 
+  // Largest published weight <= target: a single-weight face (Michroma) is asked for its 400.
+  function rfWeight(target) {
+    const f = typeof state !== 'undefined' && state && state.headingFont;
+    const ws = String((f && f.weights) || '400').split(';').map(Number).filter(Boolean);
+    const le = ws.filter(w => w <= target);
+    return le.length ? Math.max(...le) : Math.min(...ws);
+  }
+
   // The one chromatic colour: the brand primary, nudged until it reads as a mark on
   // the canvas (3:1). Everything else on the page is ink.
   function signalOf(t) {
@@ -188,28 +196,21 @@
     tokens(t) {
       const sig = signalOf(t);
       return {
-        '--rf-signal': sig,
-        '--rf-signal-raw': t.primary,
-        '--rf-hair': t.alpha(t.ink, 0.18),
         '--rf-hair-2': t.alpha(t.ink, 0.08),
-        '--rf-off': t.alpha(t.ink, 0.15),
-        '--rf-panel': t.isDark ? t.mix('#ffffff', t.canvas, 0.035) : t.mix('#ffffff', t.canvas, 0.6),
-        // aliases so materials[].css placeholders ({rfSignal} -> --ab-rf-signal) resolve in exports
+        // --ab-rf-* (not --rf-*) so materials[].css placeholders ({rfSignal} -> --ab-rf-signal) resolve
         '--ab-rf-signal': sig, '--ab-rf-hair': t.alpha(t.ink, 0.18), '--ab-rf-off': t.alpha(t.ink, 0.15),
         '--ab-rf-panel': t.isDark ? t.mix('#ffffff', t.canvas, 0.035) : t.mix('#ffffff', t.canvas, 0.6),
         '--rf-do': pairSvg(t, 'do'),
         '--rf-dont': pairSvg(t, 'dont'),
-        '--ab-type-pick-w': '700',
+        '--rf-hw': rfWeight(700),
       };
     },
 
-    // Hero: the orbital horizon plate. The console rides along hidden (inline
-    // display:none) and is shown only on the deck's Material slide.
+    // Hero: the orbital horizon plate (the console is the deck's Material art).
     art(ctx) {
       const t = ctx.t;
       const id = 'rf' + (++seq);
-      return `<div class="rfa" style="position:absolute;inset:0;overflow:hidden;background:#000">${horizon(t, id)}</div>`
-        + `<div class="rfa-console" style="display:none">${consoleArt(t, id + 'c')}</div>`;
+      return `<div class="rfa" style="position:absolute;inset:0;overflow:hidden;background:#000">${horizon(t, id)}</div>`;
     },
 
     materials: [
@@ -236,7 +237,17 @@
         'Use psychedelic swirls or op-art; the system is orbits, grids and horizons.',
       ],
     },
+    // The 03 list carries its own header row as real text (was CSS generated content).
+    panels: {
+      list(ctx) {
+        return ctx.parts.listBase().replace('<ul class="ab-list">', '<ul class="ab-list"><li class="rf-loghead">Mission log &nbsp;/&nbsp; T+00:41:07</li>');
+      },
+    },
     deck: {
+      // Material slide: the mission console (dial, LCD, LED ladder), the deck's second idea.
+      materialArt(ctx) {
+        return `<div class="rfa-console" style="position:absolute;inset:0">${consoleArt(ctx.t, 'rfc' + (++seq))}</div>`;
+      },
       principles: [
         ['One signal colour', 'The primary marks one thing per screen; the rest is ink.'],
         ['Horizon and orbit', 'A vast field, a planet limb and one tiny craft.'],

@@ -22,7 +22,7 @@
 .ab[data-ae="rebus"] .ab-brand { font-family: var(--ab-font-h); font-weight: var(--rb-hw, 700); letter-spacing: calc(-0.01em * var(--ab-tr, 1)); font-size: clamp(16px, 2.2cqw, 21px); }
 .ab[data-ae="rebus"] .ab-mark { width: 32px; height: 32px; border-radius: 0; background: var(--ab-ink); color: var(--ab-canvas); font-family: var(--ab-font-h); font-weight: var(--rb-hw, 700); font-size: 16px; }
 .ab[data-ae="rebus"] .ab-tag { padding: 0; border-radius: 0; background: none; font-size: 11px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ab-ink); }
-.ab[data-ae="rebus"] .ab-tag-pre { color: var(--ab-muted); font-weight: 500; }
+.ab[data-ae="rebus"] .ab-tag-pre { color: var(--ab-muted); font-weight: 400; }
 .ab[data-ae="rebus"] .ab-rule { height: 2px; background: var(--ab-ink); }
 
 /* ----- hero: kicker, the rebus headline, the sub-line, the brand lockup ----- */
@@ -34,7 +34,7 @@
 .ab[data-ae="rebus"]:not(.ab-slide) .ab-hero { container-type: inline-size; }
 .ab[data-ae="rebus"] .ab-kicker {
   display: block; margin: 0 0 clamp(10px, 1.6cqw, 16px) !important; padding: 0; background: none;
-  font-size: 11.5px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: var(--ab-ink);
+  font-size: 11.5px; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; color: var(--ab-ink);
 }
 .ab[data-ae="rebus"][data-hero] .ab-art { aspect-ratio: auto; max-width: none; width: 100%; justify-self: stretch; }
 
@@ -43,7 +43,6 @@
 .ab[data-ae="rebus"] .ab-hero .ab-art, .ab[data-ae="rebus"] .ab-hero .rb { display: contents; }
 .ab[data-ae="rebus"] .ab-hero .rb-eq { order: -1; }
 .ab[data-ae="rebus"] .ab-hero .rb-sub { order: 2; }
-.ab[data-ae="rebus"] .ab-hero .rb-build { order: 3; }
 .ab[data-ae="rebus"] .ab-headline--custom {
   margin: 0; font-family: var(--ab-font-h); font-weight: var(--rb-hw, 700); line-height: 1.04;
   letter-spacing: calc(-0.01em * var(--ab-tr, 1)); text-wrap: balance; overflow-wrap: normal; color: var(--ab-ink);
@@ -78,8 +77,6 @@
 .ab[data-ae="rebus"] .rb-ans-k { text-transform: uppercase; letter-spacing: 0.14em; font-weight: 600; }
 .ab[data-ae="rebus"] .rb-ans-flip { display: inline-block; transform: rotate(180deg); color: var(--ab-ink); font-weight: 600; }
 
-/* the construction sheet only shows on the deck's Material slide */
-.ab[data-ae="rebus"] .rb-build { display: none; }
 
 @container ab (max-width: 600px) {
   .ab[data-ae="rebus"]:not(.ab-slide) .ab-headline--custom { font-size: calc(clamp(40px, 15cqw, 76px) * var(--ab-hl-scale, 1) * var(--ab-hs, 1) * var(--ab-display, 1)); }
@@ -89,8 +86,8 @@
 
 /* ----- section labels ----- */
 .ab[data-ae="rebus"] .ab-labelrow { margin-bottom: 18px; }
-.ab[data-ae="rebus"] .ab-label { display: inline-flex; align-items: center; font-size: 11px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: var(--ab-ink); }
-.ab[data-ae="rebus"] .ab-label:last-child:not(:first-child) { font-weight: 500; color: var(--ab-muted); }
+.ab[data-ae="rebus"] .ab-label { display: inline-flex; align-items: center; font-size: 11px; font-weight: 600; letter-spacing: 0.16em; text-transform: uppercase; color: var(--ab-ink); }
+.ab[data-ae="rebus"] .ab-label:last-child:not(:first-child) { font-weight: 400; color: var(--ab-muted); }
 .ab[data-ae="rebus"] .ab-n { display: inline-block; margin-right: 10px; padding: 0; background: none; font-family: var(--ab-font-h); font-weight: var(--rb-hw, 700); font-size: 15px; letter-spacing: 0; color: var(--ab-ink); }
 .ab[data-ae="rebus"] .ab-n::after { content: none; }
 
@@ -101,7 +98,7 @@
 /* one colour, one red: secondary and accent are 20px support squares */
 .ab[data-ae="rebus"] .ab-swatch[data-role="secondary"] .ab-chip, .ab[data-ae="rebus"] .ab-swatch[data-role="accent"] .ab-chip { width: 20px; height: 20px; }
 .ab[data-ae="rebus"] .ab-swatch[data-role="secondary"] .ab-sw-job, .ab[data-ae="rebus"] .ab-swatch[data-role="accent"] .ab-sw-job { display: none; }
-.ab[data-ae="rebus"] .ab-swatch[data-role="secondary"] .ab-sw-role::after, .ab[data-ae="rebus"] .ab-swatch[data-role="accent"] .ab-sw-role::after { content: " (support)"; font-family: var(--ab-font-b); font-weight: 500; font-size: 11px; color: var(--ab-muted); }
+.ab[data-ae="rebus"] .ab-swatch[data-role="secondary"] .ab-sw-role::after, .ab[data-ae="rebus"] .ab-swatch[data-role="accent"] .ab-sw-role::after { content: " (support)"; font-family: var(--ab-font-b); font-weight: 400; font-size: 11px; color: var(--ab-muted); }
 .ab[data-ae="rebus"] .ab-swatch[data-role="canvas"] .ab-chip { box-shadow: inset 0 0 0 2px var(--ab-ink); }
 .ab[data-ae="rebus"] .ab-sw-role { font-family: var(--ab-font-h); font-size: 15px; font-weight: var(--rb-hw, 700); }
 .ab[data-ae="rebus"] .ab-sw-job { font-size: 11.5px; }
@@ -110,22 +107,22 @@
 /* ----- Type block: ruled poster columns ----- */
 .ab[data-ae="rebus"] .ab-type-grid { gap: clamp(14px, 2.4cqw, 28px); }
 .ab[data-ae="rebus"] .ab-type-col { padding: 14px 0 0; border: 0; border-top: 2px solid var(--ab-ink); border-radius: 0; background: none; }
-.ab[data-ae="rebus"] .ab-type-role { font-size: 11.5px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ab-ink); }
+.ab[data-ae="rebus"] .ab-type-role { font-size: 11.5px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ab-ink); }
 .ab[data-ae="rebus"] .ab-type-class { margin: 8px 0 12px !important; }
 .ab[data-ae="rebus"] .ab-type-pick { color: var(--ab-ink); }
 .ab[data-ae="rebus"] .ab-type-pick:not(:first-child) { color: var(--ab-muted); }
-.ab[data-ae="rebus"] .ab-fit { padding: 2px 9px; border: 2px solid var(--ab-ink); border-radius: 0; background: none; color: var(--ab-ink); font-weight: 700; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; }
+.ab[data-ae="rebus"] .ab-fit { padding: 2px 9px; border: 2px solid var(--ab-ink); border-radius: 0; background: none; color: var(--ab-ink); font-weight: 600; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; }
 .ab[data-ae="rebus"] .ab-fit[data-fit="consider"] { border-style: dashed; }
 .ab[data-ae="rebus"] .ab-fit[data-fit="avoid"] { background: var(--ab-ink); color: var(--ab-canvas); }
-.ab[data-ae="rebus"] .ab-type-k { font-weight: 700; letter-spacing: 0.14em; }
-.ab[data-ae="rebus"] .ab-type-apply { padding: 12px 18px; border: 2px solid var(--ab-ink); border-radius: 0; background: none; color: var(--ab-ink); font-weight: 700; letter-spacing: 0.04em; }
+.ab[data-ae="rebus"] .ab-type-k { font-weight: 600; letter-spacing: 0.14em; }
+.ab[data-ae="rebus"] .ab-type-apply { padding: 12px 18px; border: 2px solid var(--ab-ink); border-radius: 0; background: none; color: var(--ab-ink); font-weight: 600; letter-spacing: 0.04em; }
 .ab[data-ae="rebus"] .ab-type-apply:hover { background: var(--ab-ink); color: var(--ab-canvas); }
 .ab[data-ae="rebus"] .ab-type[data-applied="true"] .ab-type-apply { border-style: dashed; }
 
 /* ----- 01 interface: a ruled poster block, square tabs, a flat CTA ----- */
 .ab[data-ae="rebus"] .ab-card, .ab[data-ae="rebus"] .ab-panel { padding: clamp(16px, 2.4cqw, 22px) 0 0; border: 0; border-top: 2px solid var(--ab-ink); border-radius: 0; background: none; box-shadow: none; }
 .ab[data-ae="rebus"] .ab-seg { gap: 0; padding: 0; border: 2px solid var(--ab-ink); border-radius: 0; background: none; }
-.ab[data-ae="rebus"] .ab-seg-btn { display: inline-flex; align-items: center; justify-content: center; gap: 7px; min-height: 40px; padding: 8px 6px; border-radius: 0; font-size: 12.5px; font-weight: 700; color: var(--ab-muted); transition: background-color 0.12s; }
+.ab[data-ae="rebus"] .ab-seg-btn { display: inline-flex; align-items: center; justify-content: center; gap: 7px; min-height: 40px; padding: 8px 6px; border-radius: 0; font-size: 12.5px; font-weight: 600; color: var(--ab-muted); transition: background-color 0.12s; }
 .ab[data-ae="rebus"] .ab-seg-btn + .ab-seg-btn { box-shadow: inset 2px 0 0 var(--ab-ink); }
 .ab[data-ae="rebus"] .ab-seg-btn[aria-pressed="true"] { background: var(--ab-ink); color: var(--ab-canvas); }
 /* the Design tab is spelled as a rebus: "De" + [sign] (the word stays the accessible name) */
@@ -137,15 +134,15 @@
 .ab[data-ae="rebus"] .ab-seg-btn[aria-pressed="true"]:nth-child(1)::before { color: var(--ab-canvas); background-image: var(--rb-i-sign-on); }
 .ab[data-ae="rebus"] .ab-card-title { margin: 22px 0 8px !important; font-family: var(--ab-font-h); font-weight: var(--rb-hw, 700); font-size: clamp(24px, 3.2cqw, 34px); line-height: 1.05; letter-spacing: calc(-0.01em * var(--ab-tr, 1)); }
 .ab[data-ae="rebus"] .ab-card-body { color: var(--ab-muted); font-size: 14px; }
-.ab[data-ae="rebus"] .ab-cta { min-height: 52px; padding: 14px 16px 14px 20px; border-radius: 0; font-size: 14px; font-weight: 700; letter-spacing: 0.02em; transition: background-color 0.12s; }
+.ab[data-ae="rebus"] .ab-cta { min-height: 52px; padding: 14px 16px 14px 20px; border-radius: 0; font-size: 14px; font-weight: 600; letter-spacing: 0.02em; transition: background-color 0.12s; }
 .ab[data-ae="rebus"] .ab-cta-arrow::before { content: "\2192"; font-family: var(--ab-font-h); font-weight: var(--rb-hw, 700); font-size: 20px; line-height: 1; }
 .ab[data-ae="rebus"] .ab-cta:hover { background: color-mix(in srgb, var(--ab-primary) 88%, var(--ab-ink)); }
 
 /* ----- 02 glyphs: field, eye switch, the sound swap I / [eye] / eye ----- */
-.ab[data-ae="rebus"] .ab-fieldlabel { font-size: 11px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ab-ink); }
+.ab[data-ae="rebus"] .ab-fieldlabel { font-size: 11px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ab-ink); }
 .ab[data-ae="rebus"] .ab-input { padding: 12px 14px; border: 2px solid var(--ab-ink); border-radius: 2px; background: var(--ab-canvas); font-weight: 600; }
 .ab[data-ae="rebus"] .ab-input:focus { box-shadow: inset 0 -4px 0 var(--ab-primary-text); }
-.ab[data-ae="rebus"] .ab-toggle { font-weight: 700; }
+.ab[data-ae="rebus"] .ab-toggle { font-weight: 600; }
 .ab[data-ae="rebus"] .ab-switch { width: 58px; height: 32px; border-radius: 0; background: none; box-shadow: inset 0 0 0 2px var(--ab-ink); }
 .ab[data-ae="rebus"] .ab-switch::before {
   left: 4px; top: 4px; width: 24px; height: 24px; border-radius: 0; background: var(--ab-ink); transition: transform 0.15s;
@@ -162,18 +159,18 @@
 .ab[data-ae="rebus"] .ab-disc::before { content: "I"; }
 .ab[data-ae="rebus"] .ab-disc[data-s="1"]::before { content: ""; width: 50%; height: 60%; background: var(--rb-i-eye-st) center / contain no-repeat; }
 .ab[data-ae="rebus"] .ab-disc[data-s="2"]::before { content: "eye"; font-size: 26px; }
-.ab[data-ae="rebus"] .ab-state { font-weight: 700; color: var(--ab-ink); }
+.ab[data-ae="rebus"] .ab-state { font-weight: 600; color: var(--ab-ink); }
 
 /* ----- 03 in use: ruled roster ----- */
 .ab[data-ae="rebus"] .ab-list { border-top: 2px solid var(--ab-ink); }
 .ab[data-ae="rebus"] .ab-row { grid-template-columns: 3ch minmax(0, 1fr) auto minmax(60px, 150px) 5ch; padding: 14px 2px; border-top: 0; border-bottom: 1px solid var(--ab-line); font-size: 14px; }
 .ab[data-ae="rebus"] .ab-row:last-child { border-bottom: 2px solid var(--ab-ink); }
 .ab[data-ae="rebus"] .ab-row-n { font-family: var(--ab-font-h); font-weight: var(--rb-hw, 700); font-size: 15px; color: var(--ab-ink); }
-.ab[data-ae="rebus"] .ab-row-name { font-weight: 700; }
-.ab[data-ae="rebus"] .ab-row-status { padding: 2px 8px; border: 1.5px solid var(--ab-ink); border-radius: 0; background: none; font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; }
+.ab[data-ae="rebus"] .ab-row-name { font-weight: 600; }
+.ab[data-ae="rebus"] .ab-row-status { padding: 2px 8px; border: 1.5px solid var(--ab-ink); border-radius: 0; background: none; font-size: 11px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; }
 .ab[data-ae="rebus"] .ab-row-bar { height: 8px; border-radius: 0; background: var(--ab-line); }
 .ab[data-ae="rebus"] .ab-row-bar i { border-radius: 0; background: var(--ab-ink); }
-.ab[data-ae="rebus"] .ab-row-pct { font-weight: 700; }
+.ab[data-ae="rebus"] .ab-row-pct { font-weight: 600; }
 @container ab (max-width: 600px) {
   .ab[data-ae="rebus"] .ab-swatches { grid-template-columns: repeat(3, minmax(0, 1fr)); align-items: start; }
   .ab[data-ae="rebus"] .ab-swatch { display: block; }
@@ -218,14 +215,21 @@
 .ab[data-ae="rebus"].ab-slide .pt-deck-band { border-top: 2px solid var(--ab-ink); }
 .ab[data-ae="rebus"].ab-slide .pt-deck-strip[data-side="left"] { box-shadow: inset -2px 0 0 var(--ab-ink); }
 .ab[data-ae="rebus"].ab-slide .pt-deck-band img, .ab[data-ae="rebus"].ab-slide .pt-deck-strip img { display: none; }
-/* material slide: the glyph construction sheet instead of the hero lockup */
-.ab[data-ae="rebus"].ab-slide[data-slide="material"] .rb-sub,
-.ab[data-ae="rebus"].ab-slide[data-slide="material"] .rb-eq { display: none; }
-.ab[data-ae="rebus"].ab-slide[data-slide="material"] .ab-deck-stage .ab-art { position: absolute; inset: 0; display: grid; }
-.ab[data-ae="rebus"].ab-slide[data-slide="material"] .rb { height: 100%; }
-.ab[data-ae="rebus"].ab-slide[data-slide="material"] .rb-build { display: grid; grid-template-rows: minmax(0, 1fr) auto; gap: 16px; height: 100%; padding: 18px; box-sizing: border-box; }
+/* material slide (def.deck.materialArt): the glyph construction sheet */
+.ab[data-ae="rebus"] .rb--mat { position: absolute; inset: 0; }
+.ab[data-ae="rebus"] .rb-build { display: grid; grid-template-rows: minmax(0, 1fr) auto; gap: 16px; height: 100%; padding: 18px; box-sizing: border-box; }
 .ab[data-ae="rebus"] .rb-build-fig { display: grid; grid-template-rows: minmax(0, 1fr) auto; gap: 10px; min-height: 0; margin: 0; }
 .ab[data-ae="rebus"] .rb-build-fig svg { width: 100%; height: 100%; max-height: 220px; min-height: 0; }
 .ab[data-ae="rebus"] .rb-build-cap { display: flex; flex-wrap: wrap; gap: 4px 14px; font-family: var(--ab-font-b); font-size: 12px; color: var(--ab-muted); }
-.ab[data-ae="rebus"] .rb-build-cap b { color: var(--ab-ink); text-transform: uppercase; letter-spacing: 0.12em; }
+.ab[data-ae="rebus"] .rb-build-cap b { font-weight: 600; color: var(--ab-ink); text-transform: uppercase; letter-spacing: 0.12em; }
 .ab[data-ae="rebus"] .rb-build-set { display: flex; justify-content: space-between; align-items: baseline; padding-top: 14px; border-top: 2px solid var(--ab-ink); font-size: 52px; line-height: 1; }
+/* patterns slide (def.deck.patternsStage): rebus-native fields, ink on paper */
+.ab[data-ae="rebus"] .rb-pt-box { position: relative; flex: 1 1 auto; min-height: 0; overflow: hidden; background: var(--ab-canvas); box-shadow: inset 0 0 0 2px var(--ab-ink); }
+.ab[data-ae="rebus"] .rb-pt-field .rb-pt-box { background: var(--ab-canvas) var(--rb-wall) 0 0 / 120px 80px repeat; }
+.ab[data-ae="rebus"] .rb-wall { padding: 12px 14px; font-family: var(--ab-font-h); font-weight: var(--rb-hw, 600); font-size: 21px; line-height: 1.2; color: var(--ab-ink); }
+.ab[data-ae="rebus"] .rb-wall-l { margin: 0 0 4px; }
+.ab[data-ae="rebus"] .rb-wall-l:nth-child(even) { padding-left: 1.4em; }
+.ab[data-ae="rebus"] .rb-pt-build .rb-build { position: absolute; inset: 0; grid-template-rows: minmax(0, 1fr) auto; padding: 14px; }
+.ab[data-ae="rebus"] .rb-pt-build .rb-build-set { display: none; }
+/* weights the faces have (font-synthesis: none) */
+.ab[data-ae="rebus"].ab-slide .ab-deck-pchip { font-weight: var(--rb-hw, 600); }

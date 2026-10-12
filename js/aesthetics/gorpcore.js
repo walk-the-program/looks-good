@@ -191,7 +191,7 @@ registerAesthetic({
     const shell2 = gcDye(t.secondary);
     const hw = gcWeight(800);
     return {
-      '--ab-type-pick-w': hw,
+      '--ab-type-pick-w': 400,   // secondary picks; each column's lead pick gets its own real weight in the css
       '--gc-hw': hw,
       '--gc-bw': gcWeight(700),
       '--ab-carbon': GC_CARBON,
@@ -312,6 +312,23 @@ registerAesthetic({
     </div>`;
   },
 
+  // 03 as a real trail log: blaze marker, trail, status chip, elevation profile, percent + distance.
+  panels: {
+    list(ctx) {
+      const e = ctx.e;
+      const shapes = ['circle', 'square', 'diamond'];
+      const dist = ['7.2 km · +640 m', '5.8 km · +410 m', '8.4 km · +810 m'];
+      const rows = (ctx.rows || []).slice(0, 3).map((r, i) => `<li class="ab-row">
+          <span class="ab-row-n gc-blaze" data-shape="${shapes[i]}" aria-hidden="true"></span>
+          <span class="ab-row-name">${e(r[0])}</span>
+          <span class="ab-row-status">${e(r[1])}</span>
+          <span class="ab-row-bar" aria-hidden="true"><i style="width:${Number(r[2]) || 0}%"></i></span>
+          <span class="ab-row-pct"><b>${Number(r[2]) || 0}%</b><small>${dist[i]}</small></span>
+        </li>`).join('');
+      return `<ul class="ab-list gc-log"><li class="gc-loghead">Trail log · 3 routes · 21.4 km · +1,860 m</li>${rows}</ul>`;
+    },
+  },
+
   materials: [
     { name: 'Ripstop ground', css: 'background: linear-gradient(90deg, {rip5} 1px, transparent 1px) 0 0 / 25px 25px, linear-gradient({rip5} 1px, transparent 1px) 0 0 / 25px 25px, linear-gradient(90deg, {rip} 1px, transparent 1px) 0 0 / 5px 5px, linear-gradient({rip} 1px, transparent 1px) 0 0 / 5px 5px, {canvas}; /* 5px grid, every 5th line heavier, about 3% contrast */' },
     { name: 'Shell fabric', css: 'background: {shell}; color: {onShell}; border-radius: 6px; /* the client primary dyed 10% flatter; main action and woven labels */' },
@@ -339,6 +356,10 @@ registerAesthetic({
   // Deck copy (js/brand-deck.js): three principles, three do / don't lines, each short.
   deck: {
     coverDisplay: 0.9,
+    // Do: the three trail-blaze difficulty marks; Don't: a crossed-out blaze.
+    marks(ctx, kind, i) {
+      return kind === 'do' ? `<i class="gc-mk" data-shape="${['circle', 'square', 'diamond'][i] || 'circle'}"></i>` : '<i class="gc-mk gc-mk--x"></i>';
+    },
     principles: [
       ['Gear specs are the story', 'Spec tables carry the product, not slogans.'],
       ['Map lines, not decoration', 'Contours and grids do the ornamenting.'],

@@ -22,7 +22,7 @@
    - Wet-floor headline: def.headline returns the light humanist headline plus its reflection
      (flipped, faded by a gradient overlay, never a CSS mask), so the headline sits on the horizon
      and is mirrored in the water. Dark mode is the Aero night: black glass, aurora, stars.
-   Export-safe: no mask-image; backdrop-filter is decoration only (glass has an opaque-enough fill). */
+   Export-safe: no mask-image and no backdrop-filter (glass is a near-opaque fill). */
 (function () {
 let seq = 0;
 
@@ -94,6 +94,20 @@ function faRibbon(t) {
 }
 
 function faEsc(s) { return escapeHtml(String(s == null ? '' : s)); }
+
+// The nearest weight a face really has (font-synthesis is off): `want`, else the next one up
+// within 100, else the next one down. Fonts come from the global app state.
+function faWeight(font, want) {
+  const ws = String((font && font.weights) || '400').split(';').map(Number).filter(Boolean);
+  if (ws.includes(want)) return want;
+  const up = ws.filter(w => w > want).sort((x, y) => x - y)[0];
+  const down = ws.filter(w => w < want).sort((x, y) => y - x)[0];
+  return up && up - want <= 100 ? up : (down || up || 400);
+}
+function faFonts() {
+  const st = typeof state !== 'undefined' ? state : null;
+  return { h: st && st.headingFont, b: st && st.bodyFont };
+}
 
 // Last word of the headline as .ab-hl (same split as the framework's abHeadline).
 function faHlHtml(text) {
@@ -204,7 +218,7 @@ function faOrb(t, id, initial, night) {
   const body = `<circle cx="60" cy="60" r="54" fill="url(#${id}o)"/>
       <circle cx="60" cy="60" r="54" fill="url(#${id}c)"/>
       <circle cx="60" cy="60" r="53.2" fill="none" stroke="${st.rim}" stroke-width="1.6"/>
-      <text x="60" y="76" text-anchor="middle" font-family="var(--ab-font-h, sans-serif)" font-size="46" font-weight="600" fill="${g.label}" fill-opacity=".92">${ini}</text>
+      <text x="60" y="76" text-anchor="middle" font-family="var(--ab-font-h, sans-serif)" font-size="46" font-weight="${faWeight(faFonts().h, 600)}" fill="${g.label}" fill-opacity=".92">${ini}</text>
       <path d="M17 50C17 25 37 12 60 12S103 25 103 50C103 58 84 61 60 61S17 58 17 50Z" fill="url(#${id}k)"/>`;
   return `<svg class="fa-orb" viewBox="0 0 120 240" aria-hidden="true" focusable="false">
     <defs>
@@ -248,7 +262,56 @@ function faSeal(t, id) {
     <defs><linearGradient id="${id}a" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${st.top}"/><stop offset=".55" stop-color="${st.mid}"/><stop offset="1" stop-color="${st.bot}"/></linearGradient></defs>
     <polygon points="${pts.trim()}" fill="url(#${id}a)" stroke="${st.rim}" stroke-width="1.5" stroke-linejoin="round"/>
     <path d="M17 44C20 26 34 15 50 15S80 26 83 44C72 49 62 50 50 50S28 49 17 44Z" fill="#fff" fill-opacity=".6"/>
-    <text x="50" y="60" text-anchor="middle" font-family="var(--ab-font-b, sans-serif)" font-size="24" font-weight="600" fill="${lab}">new</text>
+    <text x="50" y="60" text-anchor="middle" font-family="var(--ab-font-b, sans-serif)" font-size="24" font-weight="${faWeight(faFonts().b, 600)}" fill="${lab}">new</text>
+  </svg>`;
+}
+
+// Puts an Aero title bar (label + caption buttons) at the top of a default card / panel markup.
+function faWindow(html, cls, title, buttons) {
+  const bar = `<div class="fa-titlebar" aria-hidden="true"><span>${faEsc(title)}</span><i class="fa-caption" data-b="${buttons}"></i></div>`;
+  const open = `<div class="${cls}">`;
+  return html.includes(open) ? html.replace(open, `<div class="${cls} fa-window">${bar}`) : '';
+}
+
+// Material slide: one gel button and one orb, labelled like a spec sheet, over a pale sky with a
+// wet floor. Plain SVG (export-safe); the labels use the brand body face.
+function faAnatomy(ctx) {
+  const t = ctx.t;
+  const night = !!t.isDark;
+  const id = `fa${++seq}`;
+  const g = faGelBase(t.primary);
+  const st = faGelStops(g);
+  const ink = night ? FA_TEXT_NIGHT : FA_TEXT;
+  const bw = faWeight(faFonts().b, 600);
+  const pill = `<rect x="80" y="196" width="400" height="96" rx="48" fill="url(#${id}g)"/>
+      <ellipse cx="280" cy="286" rx="150" ry="22" fill="url(#${id}c)"/>
+      <rect x="80.8" y="196.8" width="398.4" height="94.4" rx="47.2" fill="none" stroke="${st.rim}" stroke-width="1.6"/>
+      <path d="M104 236C104 214 122 202 146 202H414C438 202 456 214 456 236C456 242 444 244 420 244H140C116 244 104 242 104 236Z" fill="url(#${id}k)"/>`;
+  const label = `<text x="280" y="256" text-anchor="middle" font-family="var(--ab-font-b, sans-serif)" font-size="25" font-weight="${bw}" fill="${g.label}">Save direction</text>`;
+  const call = (x1, y1, x2, y2, tx, ty, anchor, a, b) => `<path d="M${x1} ${y1}L${x2} ${y2}" stroke="${ink}" stroke-opacity=".55" stroke-width="1.4" fill="none"/><circle cx="${x1}" cy="${y1}" r="4" fill="${ink}"/>
+      <text x="${tx}" y="${ty}" text-anchor="${anchor}" font-family="var(--ab-font-b, sans-serif)" fill="${ink}"><tspan font-size="17" font-weight="${bw}">${a}</tspan><tspan x="${tx}" dy="21" font-size="15" fill-opacity=".8">${b}</tspan></text>`;
+  return `<svg class="fa-anatomy" viewBox="0 0 600 520" aria-hidden="true" focusable="false">
+    <defs>
+      <linearGradient id="${id}s" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${night ? '#0B2A44' : '#D9F0FF'}"/><stop offset=".62" stop-color="${night ? '#0E3E5A' : '#F4FBFF'}"/><stop offset=".62" stop-color="${night ? '#0A3049' : '#D2EEFC'}"/><stop offset="1" stop-color="${night ? '#061C2E' : '#A9DBF4'}"/></linearGradient>
+      <linearGradient id="${id}g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${st.top}"/><stop offset=".55" stop-color="${st.mid}"/><stop offset="1" stop-color="${st.bot}"/></linearGradient>
+      <radialGradient id="${id}c" cx="280" cy="292" r="150" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="${st.glow}" stop-opacity=".9"/><stop offset="1" stop-color="${st.glow}" stop-opacity="0"/></radialGradient>
+      <linearGradient id="${id}k" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".95"/><stop offset="1" stop-color="#fff" stop-opacity=".22"/></linearGradient>
+      <linearGradient id="${id}m" x1="0" y1="322" x2="0" y2="400" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#fff" stop-opacity=".45"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>
+      <mask id="${id}mk" maskUnits="userSpaceOnUse" x="0" y="300" width="600" height="120"><rect x="0" y="300" width="600" height="120" fill="url(#${id}m)"/></mask>
+      <radialGradient id="${id}sh" cx="290" cy="300" r="190" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="${st.mid}" stop-opacity=".45"/><stop offset="1" stop-color="${st.mid}" stop-opacity="0"/></radialGradient>
+      <radialGradient id="${id}o" cx=".5" cy=".85" r=".7"><stop offset="0" stop-color="${st.glow}"/><stop offset=".6" stop-color="${st.mid}"/><stop offset="1" stop-color="${st.bot}"/></radialGradient>
+    </defs>
+    <rect x="1" y="1" width="598" height="518" rx="22" fill="url(#${id}s)"/>
+    <ellipse cx="290" cy="304" rx="200" ry="14" fill="url(#${id}sh)"/>
+    ${pill}${label}
+    <g mask="url(#${id}mk)"><g transform="translate(0 610) scale(1 -1)">${pill}</g></g>
+    <g stroke="#fff" stroke-opacity=".55" stroke-width="1.6" stroke-linecap="round"><path d="M120 344h90M250 352h120M410 342h60M160 372h70"/></g>
+    <circle cx="500" cy="104" r="44" fill="url(#${id}o)"/><circle cx="500" cy="104" r="43.2" fill="none" stroke="${st.rim}" stroke-width="1.5"/>
+    <path d="M467 96C467 78 482 66 500 66S533 78 533 96C533 102 518 104 500 104S467 102 467 96Z" fill="url(#${id}k)"/>
+    ${call(150, 214, 150, 138, 40, 104, 'start', 'Specular cap', 'a crisp lower lip, no blur')}
+    ${call(456, 104, 380, 60, 372, 40, 'end', 'Every icon in a gel orb', 'one sphere per icon')}
+    ${call(330, 280, 420, 420, 590, 446, 'end', 'Caustic', 'light pools at the base')}
+    ${call(150, 338, 110, 440, 30, 470, 'start', 'Wet floor', 'flipped, faded into the water')}
   </svg>`;
 }
 
@@ -333,8 +396,12 @@ registerAesthetic({
     for (let l = g.l; l >= 18 && l <= 90 && contrastRatio(hl, horizon) < 3.2; l += night ? 2 : -2) hl = faHex(g.h, g.s, l);
     let hlCard = faHex(g.h, g.s, g.l);
     for (let l = g.l; l >= 18 && l <= 90 && contrastRatio(hlCard, canvas) < 3.2; l += night ? 2 : -2) hlCard = faHex(g.h, g.s, l);
+    const fonts = faFonts();
     return {
-      '--ab-type-pick-w': 300,
+      '--ab-type-pick-w': 400,
+      '--fa-lw': faWeight(fonts.h, 300),
+      '--fa-hbw': faWeight(fonts.h, 600),
+      '--fa-bw': faWeight(fonts.b, 600),
       '--ab-ink': ink,
       '--ab-muted': muted,
       '--ab-line': night ? 'rgba(170, 210, 240, 0.22)' : 'rgba(35, 65, 90, 0.16)',
@@ -365,6 +432,20 @@ registerAesthetic({
     return faScene(ctx);
   },
 
+  // Real window chrome for the 01 card, the 02 panel and the 03 list (title bars with their text
+  // and caption buttons), instead of CSS generated content.
+  panels: {
+    card(ctx) {
+      return faWindow(ctx.parts.cardBase(), 'ab-card', 'Project — Untitled', 'all');
+    },
+    panel(ctx) {
+      return faWindow(ctx.parts.panelBase(), 'ab-panel', 'Settings', 'close');
+    },
+    list(ctx) {
+      return `<div class="fa-explorer"><div class="fa-lhead" aria-hidden="true"><span>Name</span><span>Status</span><span>Progress</span></div>${ctx.parts.listBase()}</div>`;
+    },
+  },
+
   materials: [
     { name: 'Gel', css: 'background: linear-gradient(180deg, {faGelTop} 0%, {faGel} 55%, {faGelBot} 100%); color: {faGelOn}; border-radius: 999px; box-shadow: inset 0 0 0 1px {faGelRim}, inset 0 -6px 10px -4px {faGelGlow}, 0 2px 4px {faGelShadow}; /* + the specular cap: a white ellipse over the top 48%, inset 4% each side, linear-gradient(rgba(255,255,255,.9), rgba(255,255,255,.18)) with a CRISP lower edge (no blur) */' },
     { name: 'Aero glass', css: 'background: linear-gradient(115deg, {faStreak} 0 38%, transparent 38.5%), {faGlass}; border: 1px solid {faRimOut}; box-shadow: inset 0 0 0 1px {faRimIn}; border-radius: 14px; /* tinted glass with the HARD diagonal streak (not refraction: that is Liquid Glass) */' },
@@ -391,6 +472,15 @@ registerAesthetic({
   },
 
   deck: {
+    coverBand: false,   // the cover is the full-bleed sky; no pattern band under it
+    // Do / Don't markers: a small gel orb (do) or a glass orb (don't) with a tick or a cross
+    marks(ctx, kind) {
+      return `<span class="fa-mark" data-k="${kind}">${kind === 'do' ? '✓' : '✕'}</span>`;
+    },
+    // Material slide: the gel itself, dissected (the hero scene is already on the cover)
+    materialArt(ctx) {
+      return faAnatomy(ctx);
+    },
     principles: [
       ['Sky first, then gloss', 'Sky, water and white air stay dominant.'],
       ['Every control looks wet', 'A crisp highlight cap sits on each primary control.'],

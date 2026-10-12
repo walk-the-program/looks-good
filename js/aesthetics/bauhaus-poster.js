@@ -12,6 +12,57 @@
 // palette-free poster marks use these, never the client palette.
 const BP_INKS = { red: '#D7332A', yellow: '#F2C230', blue: '#1F4FA2', black: '#151515', paper: '#F1ECE2' };
 
+// The constructed poster SVG; `notes` adds the dimension annotations (deck Material slide).
+// On a dark canvas the black marks reverse to paper (a reversed print), so the bar still reads.
+function bpPoster(ctx, notes) {
+  const K = ctx.t && ctx.t.isDark ? Object.assign({}, BP_INKS, { black: BP_INKS.paper }) : BP_INKS;
+  const ann = notes ? `<g fill="${K.black}" font-size="3.1" font-weight="600" letter-spacing="0.3" class="bpa-note">
+      <line x1="13" y1="18" x2="75" y2="18" stroke="${K.black}" stroke-width="0.35"/><line x1="13" y1="16.5" x2="13" y2="19.5" stroke="${K.black}" stroke-width="0.35"/><line x1="75" y1="16.5" x2="75" y2="19.5" stroke="${K.black}" stroke-width="0.35"/>
+      <text x="44" y="15.5" text-anchor="middle">Ø 0.62</text>
+      <text x="4" y="73">−24°</text>
+      <text x="66" y="95.5">0.28 □</text>
+      <text x="4" y="96">BAR 0.09</text>
+    </g>` : '';
+  return `<svg class="bpa" viewBox="0 0 100 100" width="100%" height="100%" focusable="false" shape-rendering="geometricPrecision">
+      <circle cx="44" cy="49" r="31" fill="${K.red}"/>
+      <rect x="62" y="64" width="28" height="28" fill="${K.yellow}"/>
+      <path d="M8 86 A9 9 0 0 1 26 86 Z" fill="${K.blue}"/>
+      <rect x="-12" y="45.5" width="124" height="9" fill="${K.black}" transform="rotate(-24 50 50)"/>
+      <rect x="-12" y="63" width="124" height="0.9" fill="${K.black}" transform="rotate(-24 50 50)"/>
+      ${ann}
+    </svg>`;
+}
+
+// In product: an exhibition wall. Three posters at different scales hung on one rail,
+// each printed in the fixed inks on paper, with a caption under it.
+function bpWall(ctx) {
+  const K = BP_INKS;
+  const e = ctx.e;
+  const name = e(String(ctx.brandName || 'studio').toLowerCase());
+  const y = new Date().getFullYear();
+  const p1 = `<svg viewBox="0 0 100 141" focusable="false"><rect width="100" height="141" fill="${K.paper}"/>
+      <circle cx="46" cy="58" r="31" fill="${K.red}"/><rect x="62" y="74" width="28" height="28" fill="${K.yellow}"/>
+      <rect x="-14" y="54" width="128" height="9" fill="${K.black}" transform="rotate(-24 50 58)"/>
+      <rect x="8" y="112" width="84" height="1.4" fill="${K.black}"/>
+      <text x="8" y="126" font-size="9.5" font-weight="600" fill="${K.black}" class="bpw-t">${name}</text>
+      <text x="8" y="135" font-size="4.2" font-weight="600" letter-spacing="0.6" fill="${K.black}" class="bpw-t">AUSSTELLUNG ${y}</text></svg>`;
+  const p2 = `<svg viewBox="0 0 100 141" focusable="false"><rect width="100" height="141" fill="${K.paper}"/>
+      <rect x="0" y="0" width="22" height="141" fill="${K.red}"/>
+      <circle cx="62" cy="52" r="26" fill="${K.black}"/><rect x="40" y="86" width="44" height="44" fill="${K.blue}" transform="rotate(12 62 108)"/>
+      <text x="16" y="132" font-size="8" font-weight="600" fill="#FFFFFF" transform="rotate(-90 16 132)" class="bpw-t">form follows rhythm</text></svg>`;
+  const p3 = `<svg viewBox="0 0 100 141" focusable="false"><rect width="100" height="141" fill="${K.paper}"/>
+      <path d="M10 70 A40 40 0 0 1 90 70 Z" fill="${K.yellow}"/><rect x="10" y="70" width="80" height="10" fill="${K.black}"/>
+      <rect x="44" y="84" width="12" height="48" fill="${K.red}"/>
+      <text x="10" y="30" font-size="22" font-weight="600" fill="${K.black}" class="bpw-t">${e(ctx.initial)}</text></svg>`;
+  const cap = (n, t) => `<p class="bpw-cap"><b>${n}</b> ${t}</p>`;
+  return `<div class="bpw">
+      <figure class="bpw-p bpw-p1">${p1}${cap('01', 'Exhibition poster · A1')}</figure>
+      <figure class="bpw-p bpw-p2">${p2}${cap('02', 'Lecture series · A2')}</figure>
+      <figure class="bpw-p bpw-p3">${p3}${cap('03', 'Workshop card · A4')}</figure>
+      <i class="bpw-rail" aria-hidden="true"></i>
+    </div>`;
+}
+
 registerAesthetic({
   key: 'bauhaus-poster', order: 8,
   name: 'Bauhaus Poster',
@@ -59,26 +110,9 @@ registerAesthetic({
   // A constructed poster in the fixed inks (never the client palette): one big red
   // circle (diameter 0.62 x width), a black bar crossing it at -24deg (0.09 x width),
   // an off-axis yellow square (0.28 x width), a small blue half-disc and a thin
-  // rule parallel to the bar. .bpa-note marks (dimension annotations) show only on
-  // the deck's Material slide. Flat fills: no strokes on shapes, no shadows.
+  // rule parallel to the bar. Flat fills: no strokes on shapes, no shadows.
   art(ctx) {
-    // On a dark canvas the black marks reverse to paper (a reversed print), so the bar still reads.
-    const K = ctx.t && ctx.t.isDark ? Object.assign({}, BP_INKS, { black: BP_INKS.paper }) : BP_INKS;
-    const notes = `<g class="bpa-note" fill="${K.black}" font-size="3.1" font-weight="700" letter-spacing="0.3">
-      <line x1="13" y1="18" x2="75" y2="18" stroke="${K.black}" stroke-width="0.35"/><line x1="13" y1="16.5" x2="13" y2="19.5" stroke="${K.black}" stroke-width="0.35"/><line x1="75" y1="16.5" x2="75" y2="19.5" stroke="${K.black}" stroke-width="0.35"/>
-      <text x="44" y="15.5" text-anchor="middle">Ø 0.62</text>
-      <text x="4" y="73">−24°</text>
-      <text x="66" y="95.5">0.28 □</text>
-      <text x="4" y="96">BAR 0.09</text>
-    </g>`;
-    return `<svg class="bpa" viewBox="0 0 100 100" width="100%" height="100%" focusable="false" shape-rendering="geometricPrecision">
-      <circle cx="44" cy="49" r="31" fill="${K.red}"/>
-      <rect x="62" y="64" width="28" height="28" fill="${K.yellow}"/>
-      <path d="M8 86 A9 9 0 0 1 26 86 Z" fill="${K.blue}"/>
-      <rect x="-12" y="45.5" width="124" height="9" fill="${K.black}" transform="rotate(-24 50 50)"/>
-      <rect x="-12" y="63" width="124" height="0.9" fill="${K.black}" transform="rotate(-24 50 50)"/>
-      ${notes}
-    </svg>`;
+    return bpPoster(ctx, false);
   },
 
   materials: [
@@ -112,6 +146,9 @@ registerAesthetic({
   // Deck copy (js/brand-deck.js): three principles, three do / don't lines, each short.
   deck: {
     coverDisplay: 0.94,
+    coverBand: false,
+    materialArt(ctx) { return bpPoster(ctx, true); },
+    product(ctx) { return bpWall(ctx); },
     principles: [
       ['Constructed on a diagonal', 'One huge circle, a crossing bar, an off-axis square.'],
       ['Fixed primaries on paper', 'Red, yellow, blue and black print the poster.'],

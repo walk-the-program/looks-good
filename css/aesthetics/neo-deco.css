@@ -50,7 +50,7 @@
   width: 30px; height: 30px; border-radius: 0; background: var(--ab-brass); color: var(--ab-canvas); border: 0;
   transform: rotate(45deg); box-shadow: 0 0 0 3px var(--ab-canvas), 0 0 0 4px var(--ab-gilt-b); margin: 6px 0 4px;
 }
-.ab[data-ae="neo-deco"] .ab-mark span { transform: rotate(-45deg); font-weight: 600; font-size: 13px; }
+.ab[data-ae="neo-deco"] .ab-mark span { transform: rotate(-45deg); font-weight: 400; font-size: 13px; }
 .ab[data-ae="neo-deco"] .ab-tag { text-align: center; font-size: 10px; letter-spacing: 0.3em; }
 
 /* ---- hero: the title card sits on the sunburst ---- */
@@ -107,7 +107,6 @@
 /* art: crisp SVG sunburst (no conic glow, no mask) */
 .ab[data-ae="neo-deco"] .nds { position: absolute; inset: 0; overflow: hidden; }
 .ab[data-ae="neo-deco"] .nds-svg { position: absolute; inset: 0; width: 100%; height: 100%; }
-.ab[data-ae="neo-deco"] .nds-mat { display: none; }
 
 /* ---- palette: stepped ziggurat tiles with a brass inner stroke ---- */
 .ab[data-ae="neo-deco"] .ab-swatches { gap: clamp(8px, 2cqw, 22px); }
@@ -138,7 +137,7 @@
   transition: border-color 0.15s, color 0.15s;
 }
 .ab[data-ae="neo-deco"] .ab-seg-btn:hover { color: var(--ab-ink); border-color: var(--ab-gilt-a); }
-.ab[data-ae="neo-deco"] .ab-seg-btn[aria-pressed="true"] { color: var(--ab-ink); font-weight: 500; border-color: var(--ab-gilt); }
+.ab[data-ae="neo-deco"] .ab-seg-btn[aria-pressed="true"] { color: var(--ab-ink); font-weight: 600; border-color: var(--ab-gilt); }
 .ab[data-ae="neo-deco"] .ab-seg-btn[aria-pressed="true"]::after {
   content: ""; position: absolute; left: 50%; bottom: -5px; width: 7px; height: 7px; background: var(--ab-brass); transform: translateX(-50%) rotate(45deg);
 }
@@ -147,7 +146,7 @@
 .ab[data-ae="neo-deco"] .ab-card-body { color: var(--ab-muted); margin-bottom: 26px !important; }
 /* the one action: primary fill, stepped ends (6px notched corners), no ring */
 .ab[data-ae="neo-deco"] .ab-cta {
-  justify-content: center; gap: 16px; padding: 15px 22px; border-radius: 0; font-size: 11.5px; font-weight: 500; letter-spacing: 0.24em; text-transform: uppercase;
+  justify-content: center; gap: 16px; padding: 15px 22px; border-radius: 0; font-size: 11.5px; font-weight: 600; letter-spacing: 0.24em; text-transform: uppercase;
   background: var(--ab-primary); color: var(--ab-on-primary); box-shadow: none;
   clip-path: polygon(0 6px, 6px 6px, 6px 0, calc(100% - 6px) 0, calc(100% - 6px) 6px, 100% 6px, 100% calc(100% - 6px), calc(100% - 6px) calc(100% - 6px), calc(100% - 6px) 100%, 6px 100%, 6px calc(100% - 6px), 0 calc(100% - 6px));
   transition: background 0.15s;
@@ -188,7 +187,7 @@
 .ab[data-ae="neo-deco"] .ab-row:first-child::before { display: none; }
 .ab[data-ae="neo-deco"] .ab-row-n { font-size: 0; }
 .ab[data-ae="neo-deco"] .ab-row-n::before { content: counter(ndr, upper-roman); font-size: 12px; letter-spacing: 0.14em; color: var(--ab-gilt-text); }
-.ab[data-ae="neo-deco"] .ab-row-name { font-family: var(--ab-font-b); font-weight: 500; font-size: 12.5px; letter-spacing: .18em; text-transform: uppercase; }
+.ab[data-ae="neo-deco"] .ab-row-name { font-family: var(--ab-font-b); font-weight: 600; font-size: 12.5px; letter-spacing: .18em; text-transform: uppercase; }
 .ab[data-ae="neo-deco"] .ab-row-status { background: none; border: 1px solid var(--ab-gilt-b); border-radius: 0; padding: 3px 10px; font-size: 9.5px; letter-spacing: 0.2em; text-transform: uppercase; }
 .ab[data-ae="neo-deco"] .ab-row-bar { height: 1px; border-radius: 0; background: var(--ab-gilt-c); overflow: visible; position: relative; }
 .ab[data-ae="neo-deco"] .ab-row-bar i { position: relative; height: 1px; background: var(--ab-gilt); }
@@ -211,7 +210,7 @@
 .ab[data-ae="neo-deco"] .ab-type-act { grid-column: 1; grid-row: auto; align-items: center; }
 .ab[data-ae="neo-deco"] .ab-type-k { color: var(--ab-gilt-text); letter-spacing: 0.26em; }
 .ab[data-ae="neo-deco"] .ab-type-apply {
-  padding: 12px 22px; border: 1px solid var(--ab-gilt-a); border-radius: 0; font-size: 10.5px; font-weight: 500; letter-spacing: 0.22em; text-transform: uppercase; color: var(--ab-ink);
+  padding: 12px 22px; border: 1px solid var(--ab-gilt-a); border-radius: 0; font-size: 10.5px; font-weight: 600; letter-spacing: 0.22em; text-transform: uppercase; color: var(--ab-ink);
   box-shadow: inset 0 0 0 3px var(--ab-canvas), inset 0 0 0 4px var(--ab-gilt-c); transition: border-color 0.15s;
 }
 .ab[data-ae="neo-deco"] .ab-type-apply:hover { background: none; border-color: var(--ab-gilt); }
@@ -274,12 +273,17 @@
 .ab[data-ae="neo-deco"].ab-slide[data-slide="principles"] .ab-deck-lead > * { margin-inline: auto; }
 /* closing: centred */
 .ab[data-ae="neo-deco"].ab-slide[data-slide="closing"] .ab-deck-closemain { text-align: center; align-items: center; }
-/* material: brass shown as material — gradient swatch, reeded flutes, stepped frame at 1:1 */
-.ab[data-ae="neo-deco"] .ab-deck-stage .nds-svg { display: none; }
-.ab[data-ae="neo-deco"] .ab-deck-stage .nds-mat {
+/* material (def.deck.materialArt): brass shown as material — gradient swatch, reeded flutes, stepped frame at 1:1 */
+.ab[data-ae="neo-deco"] .nds-mat {
   position: absolute; inset: 0; display: grid; grid-template-columns: 1.1fr 1fr; grid-template-rows: 1fr 1fr; gap: 18px; padding: 8px;
 }
 .ab[data-ae="neo-deco"] .nds-mat > i { display: block; min-height: 0; }
 .ab[data-ae="neo-deco"] .nds-swatch { grid-row: 1 / 3; background: var(--ab-brass); box-shadow: 0 0 0 3px var(--ab-canvas), 0 0 0 4px var(--ab-gilt-a); }
 .ab[data-ae="neo-deco"] .nds-reed { background: var(--ab-nd-reed) 0 0 / 12px 100% repeat-x, var(--ab-gilt-lo); box-shadow: 0 0 0 3px var(--ab-canvas), 0 0 0 4px var(--ab-gilt-b); }
 .ab[data-ae="neo-deco"] .nds-frame { border: 36px solid transparent; border-image: var(--ab-nd-frame) 36 / 36px stretch; background: var(--nd-orn) center / 70% 11px no-repeat; }
+/* do / don't: brass diamonds as the marks */
+.ab[data-ae="neo-deco"].ab-slide { --dk-mark-do: var(--ab-gilt-text); --dk-mark-dont: var(--ab-gilt-a); }
+.ab[data-ae="neo-deco"].ab-slide .ab-deck-mark { font-weight: 400; }
+/* weights the faces have (font-synthesis: none): display faces are single-weight */
+.ab[data-ae="neo-deco"] .ab-type-cur b, .ab[data-ae="neo-deco"] .ab-wordmark { font-weight: 400; }
+.ab[data-ae="neo-deco"].ab-slide .ab-deck-pchip, .ab[data-ae="neo-deco"].ab-slide .ab-deck-ptitle { font-weight: 400; }

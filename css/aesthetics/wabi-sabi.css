@@ -71,12 +71,9 @@
 .ab[data-ae="wabi-sabi"] .ab-subcopy { max-width: 25em; margin-top: clamp(20px, 2.8cqw, 30px) !important; font-size: 13px; line-height: 1.85; letter-spacing: 0.02em; }
 .ab[data-ae="wabi-sabi"] .ab-sub-lead { color: var(--ab-ink); }
 
-/* art: the bowl; the three-vessel set shows only on the deck's Material stage */
+/* art: the bowl (the deck's Material slide draws three vessels via def.deck.materialArt) */
 .ab[data-ae="wabi-sabi"] .ws-art { position: relative; width: 100%; height: 100%; }
 .ab[data-ae="wabi-sabi"] .ws-art svg { display: block; width: 100%; height: 100%; overflow: visible; }
-.ab[data-ae="wabi-sabi"] .ws-art .ws-set { display: none; }
-.ab[data-ae="wabi-sabi"] .ab-deck-stage .ws-art .ws-scene { display: none; }
-.ab[data-ae="wabi-sabi"] .ab-deck-stage .ws-art .ws-set { display: block; }
 
 /* palette: glaze test tiles, glazed top with drips over a raw clay foot, a hanging hole; set unevenly */
 .ab[data-ae="wabi-sabi"] .ab-palette { padding: clamp(30px, 5cqw, 54px) 0 clamp(26px, 4cqw, 46px); }
@@ -253,27 +250,18 @@
 .ab[data-ae="wabi-sabi"].ab-slide .ab-deck-stage { border: 0; border-radius: 0; background: none; }
 .ab[data-ae="wabi-sabi"].ab-slide .ab-deck-stage .ab-art { max-width: none; width: 100%; aspect-ratio: 300 / 150; }
 .ab[data-ae="wabi-sabi"].ab-slide .ab-deck-mat { border-top: 0; background: linear-gradient(90deg, var(--ab-line) 0 72%, transparent 72%) 0 0 / 100% 1px no-repeat; }
-/* product: a washi sheet for the screen, words for navigation with a blot under the current one */
-.ab[data-ae="wabi-sabi"].ab-slide .ab-deck-side { border: 0; background: none; }
-.ab[data-ae="wabi-sabi"].ab-slide .ab-deck-nav { position: relative; border-radius: 0; background: none; }
-.ab[data-ae="wabi-sabi"].ab-slide .ab-deck-nav.is-on .ab-label { color: var(--ab-ink); }
-.ab[data-ae="wabi-sabi"].ab-slide .ab-deck-nav.is-on::after { content: ""; position: absolute; left: 0; bottom: 0; width: 12px; height: 8px; background: var(--ws-dot) center / contain no-repeat; }
-.ab[data-ae="wabi-sabi"].ab-slide .ab-deck-screen { border: 0; border-radius: 0; background: var(--ab-ws-sheet); box-shadow: inset 0 -1px 0 rgba(46, 43, 39, 0.08); }
-.ab[data-ae="wabi-sabi"].ab-slide .ab-deck-screentitle { font-weight: 400; }
-.ab[data-ae="wabi-sabi"].ab-slide .ab-deck-chip { border: 0; border-radius: 0; background: none; padding: 0; font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--ab-muted); }
-.ab[data-ae="wabi-sabi"].ab-slide .ab-deck-row { border-top: 0; background: linear-gradient(90deg, var(--ab-line) 0 86%, transparent 86%) 0 0 / 100% 1px no-repeat; }
-.ab[data-ae="wabi-sabi"].ab-slide .ab-deck-dot { width: 9px; height: 7px; border-radius: 50% 40% 55% 45%; }
-.ab[data-ae="wabi-sabi"].ab-slide .ab-deck-ctacard { border: 0; border-radius: 0; background: none; box-shadow: none; }
-.ab[data-ae="wabi-sabi"].ab-slide .ab-deck-ctatitle { font-family: var(--ab-font-h); font-weight: 400; }
-/* do / don't: a glaze dot for do, an ash slash for don't */
+/* do / don't (def.deck.marks): a glaze pebble for do, an ash slash for don't */
+.ab[data-ae="wabi-sabi"].ab-slide .ws-mk { display: inline-block; position: relative; width: 16px; height: 12px; vertical-align: middle; }
+.ab[data-ae="wabi-sabi"].ab-slide .ws-mk[data-k="do"] { border-radius: 47% 53% 44% 56% / 56% 50% 50% 44%; background: var(--ab-ws-glaze-soft); }
+.ab[data-ae="wabi-sabi"].ab-slide .ws-mk[data-k="dont"]::before { content: ""; position: absolute; left: 7px; top: -3px; width: 1.5px; height: 18px; background: var(--ab-muted); transform: rotate(32deg); }
 .ab[data-ae="wabi-sabi"].ab-slide .ab-deck-rule { border-top: 0; background: linear-gradient(90deg, var(--ab-line) 0 78%, transparent 78%) 0 0 / 100% 1px no-repeat; }
-.ab[data-ae="wabi-sabi"].ab-slide .ab-deck-mark { width: 22px; height: 22px; border: 0; border-radius: 0; background: none; color: transparent; font-size: 0; position: relative; }
-.ab[data-ae="wabi-sabi"].ab-slide [data-kind="do"] .ab-deck-mark::before { content: ""; position: absolute; left: 3px; top: 6px; width: 14px; height: 10px; border-radius: 47% 53% 44% 56% / 56% 50% 50% 44%; background: var(--ab-ws-glaze-soft); }
-.ab[data-ae="wabi-sabi"].ab-slide [data-kind="dont"] .ab-deck-mark::before { content: ""; position: absolute; left: 10px; top: 2px; width: 1.5px; height: 18px; background: var(--ab-muted); transform: rotate(32deg); }
 /* closing */
 .ab[data-ae="wabi-sabi"].ab-slide .ab-deck-closemain .ab-brand { font-weight: 400; }
 
-/* the brand pattern is quieter here than anywhere else: the band and strip are a whisper on the paper */
-.ab[data-ae="wabi-sabi"].ab-slide .pt-deck-band, .ab[data-ae="wabi-sabi"].ab-slide .pt-deck-strip { opacity: 0.42; border-top: 0; }
 .ab[data-ae="wabi-sabi"].ab-slide .ab-deck-prod .ab-row { grid-template-columns: 3ch minmax(0, 1fr) auto minmax(50px, 90px) 4.5ch; column-gap: 14px; }
 .ab[data-ae="wabi-sabi"].ab-slide .ab-deck-prod .ab-row-name { font-size: 15px; }
+/* weights the faces have: Zen Kaku Gothic New 300/400/500, Shippori Mincho 400/600 */
+.ab[data-ae="wabi-sabi"] .ab-type-cur b { font-weight: 500; }
+.ab[data-ae="wabi-sabi"] .ab-type-col[data-role="heading"] .ab-type-cur b { font-weight: 600; }
+.ab[data-ae="wabi-sabi"].ab-slide .ab-deck-pchip { font-weight: 400; }
+.ab[data-ae="wabi-sabi"].ab-slide .ab-deck-pname, .ab[data-ae="wabi-sabi"].ab-slide .ab-deck-pratio b { font-weight: 500; }

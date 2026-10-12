@@ -8,6 +8,13 @@
    of the brand's other hue: the secondary behind primary objects, the primary behind
    everything else. Cards are always paper, so the board
    also works in dark mode. No Corporate-Memphis people, no confetti. */
+// Heaviest real weight (FONTS `weights`) of the heading face, up to `cap`.
+function mmHeavy(cap) {
+  const f = typeof state !== 'undefined' && state && state.headingFont;
+  const ws = String((f && f.weights) || '400').split(';').map(Number).filter(n => n > 0 && n <= cap);
+  return ws.length ? Math.max(...ws) : 400;
+}
+
 registerAesthetic({
   key: 'radical-memphis', order: 33,
   name: 'Radical Memphis',
@@ -81,6 +88,8 @@ registerAesthetic({
       '--ab-m-sec-lo': t.mix(t.secondary, paper, 0.22),
       '--ab-m-pri-lo': t.mix(t.primary, paper, 0.16),
       '--ab-type-pick-w': '400',
+      // the heading face's heaviest real weight up to 700 (Archivo Black has only 400; font-synthesis is off)
+      '--mm-hw': mmHeavy(700),
       // text on the solid secondary slab (the headline's last word): black unless the secondary is dark
       '--ab-m-on-sec': t.contrast(black, t.secondary) >= 4.5 ? black : paper,
     };
@@ -150,6 +159,19 @@ registerAesthetic({
 
   // Deck copy (js/brand-deck.js): three principles, three do / don't lines, each short.
   deck: {
+    // In product: a showroom room-set (framed laminate, the totem on a floor slab, a side table).
+    product(ctx) {
+      const e = ctx.e;
+      const def = typeof aestheticByKey === 'function' ? aestheticByKey('radical-memphis') : null;
+      const totem = def && def.art ? def.art(ctx) : '';
+      return `<div class="mmr">
+        <div class="mmr-frame" aria-hidden="true"><i></i></div>
+        <div class="mmr-floor" aria-hidden="true"></div>
+        <div class="mmr-totem" aria-hidden="true">${totem}</div>
+        <div class="mmr-table" aria-hidden="true"><i class="mmr-top"></i><i class="mmr-leg"></i></div>
+        <p class="mmr-plaque">Tahiti, No. 07<span>${e(ctx.brandName || '')} showroom, ${new Date().getFullYear()}</span></p>
+      </div>`;
+    },
     principles: [
       ['Pattern binds the colour', 'Laminate fills hold saturated hues together.'],
       ['Objects stand on a diagonal', 'Primitives stack and tilt like showroom furniture.'],

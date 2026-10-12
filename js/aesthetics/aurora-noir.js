@@ -19,7 +19,8 @@ registerAesthetic({
   mode: 'dark',
   slideShape: 'minimal',
   labels: { material: 'Surfaces', states: ['Rest', 'Hover', 'Focus'], statesKind: 'button' },
-  layout: { hero: 'centered', sections: 'asym' },
+  // the issues table leads the sections, the way a dev tool opens on its list
+  layout: { hero: 'centered', sections: 'asym', sectionOrder: ['use', 'ui', 'touch'] },
   type: { ui: 'sans', label: 'mono' },
   highlight: 'ink',
   // The main action is filled with ink (near-white on the dark canvas), the
@@ -77,7 +78,6 @@ registerAesthetic({
       '--ab-grid': t.alpha(t.ink, 0.06),
       '--ab-top': t.alpha(t.ink, d ? 0.32 : 0.2),
       '--ab-solid': t.mix(t.ink, t.canvas, d ? 0.045 : 0.04),
-      '--ab-glow': t.alpha(t.primary, 0.35),
       '--ab-ring': t.alpha(t.primary, 0.4),
       // neutral lifted chip (Linear-style): ink at 9-10%, never primary
       '--ab-sel': t.alpha(t.ink, d ? 0.1 : 0.08),
@@ -134,6 +134,21 @@ registerAesthetic({
       <ellipse cx="500" cy="118" rx="520" ry="96" fill="none" stroke="url(#${id}g)" stroke-width="3" opacity=".35" style="filter:blur(3px)"/>
       <ellipse cx="500" cy="118" rx="520" ry="96" fill="none" stroke="url(#${id}g)" stroke-width="1.2" opacity=".8" vector-effect="non-scaling-stroke"/>
     </svg></div>`;
+  },
+
+  // 03: the issues table as real markup: a caption row, brand-prefixed mono IDs
+  // (<initial>S-101...) and a footer total computed from the rows.
+  panels: {
+    list(ctx) {
+      const e = ctx.e;
+      const pre = (ctx.initial && /[A-Za-z0-9]/.test(ctx.initial) ? ctx.initial.toUpperCase() : 'B') + 'S';
+      let i = 0;
+      const rows = ctx.parts.listBase().replace(/<ul class="ab-list">|<\/ul>/g, '')
+        .replace(/<span class="ab-row-n">\d+<\/span>/g, () => `<span class="ab-row-n">${e(pre)}-${101 + i++}</span>`);
+      const avg = ctx.rows.reduce((a, r) => a + r[2], 0) / Math.max(1, ctx.rows.length);
+      return `<div class="ab-list"><p class="an-lcap">Issues · ${ctx.rows.length} open · sorted by updated</p>`
+        + `<ul class="an-rows">${rows}</ul><p class="an-lfoot">Σ ${avg.toFixed(1)}% avg · updated 2m ago</p></div>`;
+    },
   },
 
   materials: [

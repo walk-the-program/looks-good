@@ -67,6 +67,15 @@ registerAesthetic({
       + '</div>';
   },
 
+  // 02 panel: the default field, toggle and states, plus a real recessed slider
+  // (an 8px track, an ink fill, a raised 22px thumb) under the status line.
+  panels: {
+    panel(ctx) {
+      const slider = '<div class="sf-slider" aria-hidden="true"><i class="sf-slider-fill"></i><i class="sf-slider-thumb"></i></div>';
+      return ctx.parts.panelBase().replace(/(<div class="ab-status"[^>]*>[^<]*<\/div>)/, `$1\n          ${slider}`);
+    },
+  },
+
   materials: [
     { name: 'Recessed well', css: 'background: {canvas}; border-radius: 50%; box-shadow: inset 9px 9px 20px {lo}, inset -9px -9px 20px {hi};' },
     { name: 'Raised control', css: 'background: {canvas}; box-shadow: 6px 6px 13px {lo}, -6px -6px 13px {hi};' },

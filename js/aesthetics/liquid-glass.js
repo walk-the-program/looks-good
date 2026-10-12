@@ -1,12 +1,12 @@
 /* 05 Liquid Glass — fluid, luminous, layered. Reference: Apple Liquid Glass
    (iOS / macOS 26). Real Liquid Glass is a control layer of clear glass with
-   bright specular rims floating over vivid content, so: a full-width scene of
-   saturated brand-color light over a dark base holding one crisp element (the
-   brand initial) for the glass to bend, a single glass lens refracting it, a
-   glass tab bar and a glass timer, and near-opaque "regular material" panels
-   everywhere else. The hero copy is set directly on the scene (never on a
-   frosted slab). Two mechanisms on purpose: backdrop blur (frosting) and a
-   simulated refraction lens (a clipped, scaled duplicate of the scene). */
+   bright specular rims floating over sharp content, so: a full-width scene of
+   hard-edged brand-color planes and one crisp glyph (the brand initial), a
+   squircle lens whose rim bends them (an SVG displacement filter on a 1:1
+   duplicate), a glass tab bar and a glass slider, glass controls in the
+   interface (the segmented control floats on a scene strip) and near-opaque
+   "regular material" panels everywhere else. The hero copy is set directly on
+   the scene's dark base (never on a frosted slab). */
 let lgSeq = 0;   // unique SVG filter ids per rendered board (compare grid, deck)
 
 registerAesthetic({
@@ -32,7 +32,7 @@ registerAesthetic({
       never: 'Body text, large solid fills, a second CTA',
     },
     secondary: {
-      use: 'The second light in the scene, the timer progress ring, status chips and the second data series',
+      use: 'The last plane of the scene and the optics strip, and the second data series',
       never: 'The main CTA, body text',
     },
     accent: {
@@ -51,19 +51,14 @@ registerAesthetic({
     const material = t.mix('#ffffff', t.canvas, d ? 0.07 : 0.72);
     // headline word on the scene: the raw accent if it holds 3:1 on the scene base, else lightened toward white
     const hlScene = t.contrast(t.accent, sceneBase) >= 3 ? t.accent : t.mix(t.accent, '#ffffff', 0.35);
-    // timer progress ring: the secondary, lightened if it would fall under 3:1 on the scene
-    const ring = t.contrast(t.secondary, sceneBase) >= 3 ? t.secondary : t.mix(t.secondary, '#ffffff', 0.35);
     return {
       '--ab-hl-scene': hlScene,
-      '--ab-ring': ring,
       '--ab-scene-base': sceneBase,
       // regular material: a near-opaque panel, one step lighter than the canvas
       '--ab-material': material,
       '--ab-material-line': t.alpha(t.ink, d ? 0.14 : 0.09),
       '--ab-glass': t.alpha(t.canvas, d ? 0.35 : 0.45),
       '--ab-glass-solid': t.mix('#ffffff', t.canvas, d ? 0.1 : 0.6),
-      // opaque stand-in for glass under prefers-reduced-transparency (lens and timer)
-      '--ab-glass-opaque': t.mix(t.canvas, t.ink, 0.1),
       '--ab-rim': d ? 'rgba(255,255,255,0.3)' : 'rgba(255,255,255,0.6)',
       '--ab-spec': d ? 'rgba(255,255,255,0.28)' : 'rgba(255,255,255,0.8)',
       '--ab-drop': d ? 'rgba(0,0,0,0.4)' : 'rgba(10,14,30,0.16)',
@@ -102,7 +97,7 @@ registerAesthetic({
       const ox = x + w / 2, oy = y + h / 2;
       const sceneStyle = `left:${(-x / w) * 100}%;top:${(-y / h) * 100}%;width:${(100 / w) * 100}%;height:${(100 / h) * 100}%;transform-origin:${ox}% ${oy}%`;
       return `<div class="ab-lens ${cls}" style="left:${x}%;top:${y}%;width:${w.toFixed(2)}%;height:${h.toFixed(2)}%">`
-        + `<div class="lgs-bend" style="filter:url(#${id}) saturate(1.15)"><div class="ab-lens-scene" style="${sceneStyle}">${scene}</div></div></div>`;
+        + `<div class="lgs-bend" style="--lg-refract:url(#${id})"><div class="ab-lens-scene" style="${sceneStyle}">${scene}</div></div></div>`;
     };
     // normal map: R ramps across x, G across y, both neutral (128) between 22% and 78%
     const ramp = (dir, ch) => {
@@ -137,6 +132,16 @@ registerAesthetic({
       // a glass slider over the dark base, where a thin fill actually reads as glass
       + '<div class="lgs-slider"><i class="lgs-track"><i class="lgs-fill"></i></i><i class="lgs-thumb"></i></div>'
       + '</div>';
+  },
+
+  // 03: an inset grouped list in Apple's voice: title, detail text and a chevron per
+  // row (real markup, no numbers or progress bars).
+  panels: {
+    list(ctx) {
+      const e = ctx.e;
+      const chev = '<svg class="lg-chev" viewBox="0 0 8 14" width="8" height="14" aria-hidden="true" focusable="false"><path d="M1.5 1.5 7 7l-5.5 5.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+      return `<ul class="ab-list">${ctx.rows.map(r => `<li class="ab-row"><span class="ab-row-name">${e(r[0])}</span><span class="ab-row-status">${e(r[1])}</span>${chev}</li>`).join('')}</ul>`;
+    },
   },
 
   materials: [

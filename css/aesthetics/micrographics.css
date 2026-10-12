@@ -268,3 +268,6 @@
 @media (prefers-reduced-motion: reduce) {
   .ab[data-ae="micrographics"] .ab-switch::before, .ab[data-ae="micrographics"] .ab-cta { transition: none; }
 }
+/* weights the faces have (font-synthesis: none) */
+.ab[data-ae="micrographics"] .ab-type-cur b { font-weight: var(--ab-hw, 400); }
+.ab[data-ae="micrographics"].ab-slide .ab-deck-ptitle, .ab[data-ae="micrographics"].ab-slide .ab-deck-pchip { font-weight: var(--ab-hw, 400); }

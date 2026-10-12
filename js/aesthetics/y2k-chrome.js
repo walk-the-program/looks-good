@@ -69,20 +69,16 @@ registerAesthetic({
   tokens(t) {
     const d = t.isDark;
     // interface face: the brand's own sans if it has one, else Inter (never a display face at 11px)
-    const stU = typeof state !== 'undefined' ? state : null;
-    const sansF = stU && [stU.bodyFont, stU.headingFont].find(f => f && f.category === 'sans');
-    const uiFace = sansF ? (sansF === stU.bodyFont ? 'var(--ab-font-b)' : 'var(--ab-font-h)') : '"Inter", "Helvetica Neue", Helvetica, Arial, sans-serif';
     const st = typeof state !== 'undefined' ? state : null;
+    const sansF = st && [st.bodyFont, st.headingFont].find(f => f && f.category === 'sans');
+    const uiFace = sansF ? (sansF === st.bodyFont ? 'var(--ab-font-b)' : 'var(--ab-font-h)') : '"Inter", "Helvetica Neue", Helvetica, Arial, sans-serif';
     const hf = st && st.headingFont;
-    const brightAccent = t.contrast(t.accent, '#000000') >= t.contrast(t.accent, '#ffffff');
     // the signature: silver with a hard horizon (light sky, bright line, dark ground, bounce light)
     // sky is cooled by the secondary and the dark ground warmed by the primary, so the metal reflects the brand
     const sky = t.mix(t.secondary, '#dfe9f7', 0.14), gnd = t.mix(t.primary, '#4a505b', 0.22), bounce = t.mix(t.primary, '#c9ced6', 0.12);
     const chrome = d
       ? `linear-gradient(180deg,#ffffff 0%,${sky} 22%,#8e9aab 44%,#1b1e24 49%,${gnd} 55%,${bounce} 72%,#ffffff 88%,#aab2bd 100%)`
       : 'linear-gradient(180deg,#14171c 0%,#454b53 28%,#8a9199 44%,#e9edf0 48%,#2a2e34 50.5%,#5f666e 74%,#0c0e12 100%)';
-    const chromeDark = 'linear-gradient(180deg,#4a4f56 0%,#16181c 45%,#8e949b 49%,#0e1013 50.5%,#2a2d32 100%)';
-    const chromeLight = 'linear-gradient(180deg,#ffffff 0%,#d6dadf 40%,#9aa0a6 49%,#f4f4f4 50.5%,#c4c9cf 100%)';
     return {
       // techno micro-type (Microgramma-like) for labels, tags and state names; falls back to the UI face
       '--ab-font-ui': uiFace, '--ab-font-label': uiFace, '--y2-techno': `"Michroma", ${uiFace}`,
@@ -91,7 +87,6 @@ registerAesthetic({
       // flat stand-in for the chrome fill: the PNG/PDF export flattens clipped text to this colour
       '--ab-chrome-flat': d ? '#dfe5ee' : '#2a2e34',
       '--ab-pri-70': t.alpha(t.primary, 0.7),
-      '--ab-chrome-hl': brightAccent ? chromeDark : chromeLight,
       '--ab-chrome-fixed': 'linear-gradient(180deg,#ffffff 0%,#c9ced4 22%,#9aa0a6 44%,#f4f4f4 49%,#5f646b 50.5%,#7d838a 70%,#e8e8e8 100%)',
       '--ab-rim': d
         ? 'linear-gradient(155deg,rgba(255,255,255,.85),rgba(255,255,255,.16) 28%,rgba(255,255,255,.5) 52%,rgba(255,255,255,.1) 76%,rgba(255,255,255,.6))'
@@ -102,11 +97,6 @@ registerAesthetic({
       '--ab-well': d ? 'rgba(0,0,0,0.55)' : 'rgba(0,0,0,0.08)',
       '--ab-gloss': 'linear-gradient(180deg,rgba(255,255,255,.62) 0,rgba(255,255,255,.14) 49%,rgba(255,255,255,0) 51%)',
       '--ab-pri-glow': t.alpha(t.primary, d ? 0.5 : 0.36),
-      '--ab-pri-glow-35': t.alpha(t.primary, 0.35),
-      '--ab-pri-deep': t.mix(t.primary, '#000000', 0.62),
-      '--ab-pri-hi': t.mix(t.primary, '#ffffff', 0.78),
-      '--ab-sec-glow': t.alpha(t.secondary, 0.4),
-      '--ab-acc-glow': t.alpha(t.accent, 0.55),
       '--y2-field': t.accent,
       '--y2-on-field': t.onAccent,
     };
@@ -118,8 +108,7 @@ registerAesthetic({
   // environment band (a second, softer horizon) goes through the same displacement, a faint
   // brand edge-light sits low left, a 1px bright rim runs round every lobe, and the softbox
   // speculars are blurred reflected light (no outline, no mullion). A mirrored, faded copy is
-  // the floor. No sparkles. A translucent gel lozenge rides along hidden (inline display:none)
-  // and is shown only on the deck's Material slide.
+  // the floor. No sparkles. (The deck's Material slide adds a translucent gel swatch: deck.materialArt.)
   art(ctx) {
     const t = ctx.t;
     const n = 'y2k' + (++y2kSeq);
@@ -154,7 +143,7 @@ registerAesthetic({
       </defs>
       <g mask="url(#${n}fm)" opacity=".13"><g transform="translate(0 184) scale(1 -1)"><use href="#${n}b"/></g></g>
       <use href="#${n}b"/>
-    </svg><div class="y2g" style="display:none;position:absolute;left:2%;bottom:4%;width:40%;aspect-ratio:2.4/1;border-radius:999px;overflow:hidden;background:radial-gradient(ellipse 62% 40% at 50% 12%,rgba(255,255,255,.85),rgba(255,255,255,0) 70%),radial-gradient(ellipse 66% 50% at 50% 112%,rgba(255,255,255,.6),rgba(255,255,255,0) 70%),linear-gradient(${t.alpha(t.primary, 0.62)},${t.alpha(t.primary, 0.62)}),repeating-linear-gradient(0deg,rgba(255,255,255,.16) 0 1px,transparent 1px 3px),#3a4150;box-shadow:inset 0 0 0 1px rgba(255,255,255,.55),0 10px 22px -8px rgba(0,0,0,.6)"></div>`;
+    </svg>`;
   },
 
   materials: [
@@ -184,6 +173,11 @@ registerAesthetic({
   },
   // Deck copy (js/brand-deck.js): three principles, three do / don't lines, each short.
   deck: {
+    // Material slide: the sculpture plus a drawn translucent-gel swatch (the 04 material).
+    materialArt(ctx) {
+      const t = ctx.t;
+      return ctx.parts.art() + `<div class="y2g" style="position:absolute;left:2%;bottom:4%;width:40%;aspect-ratio:2.4/1;border-radius:999px;overflow:hidden;background:radial-gradient(ellipse 62% 40% at 50% 12%,rgba(255,255,255,.85),rgba(255,255,255,0) 70%),radial-gradient(ellipse 66% 50% at 50% 112%,rgba(255,255,255,.6),rgba(255,255,255,0) 70%),linear-gradient(${t.alpha(t.primary, 0.62)},${t.alpha(t.primary, 0.62)}),repeating-linear-gradient(0deg,rgba(255,255,255,.16) 0 1px,transparent 1px 3px),#3a4150;box-shadow:inset 0 0 0 1px rgba(255,255,255,.55),0 10px 22px -8px rgba(0,0,0,.6)"></div>`;
+    },
     principles: [
       ['Chrome with a horizon', 'A bright line just off-centre over a dark ground.'],
       ['The heaviest wide type', 'Chrome-filled and bevelled, with one flat acid plate behind a word.'],

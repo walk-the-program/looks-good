@@ -169,7 +169,7 @@ function aaRaster(text, fam, cols, rows) {
 }
 
 // cells for one panel: { ch, cls, col } with the edge pass and a single colour field
-function aaCells(ctx, q, cols, rows, fam) {
+function aaCells(ctx, cols, rows, fam) {
   const L = aaRaster(ctx.word || ctx.initial, fam, cols, rows);
   const at = (i, j) => (i < 0 || j < 0 || i >= cols || j >= rows ? 0 : L[j * cols + i]);
   const cells = [];
@@ -221,7 +221,7 @@ function aaPanelHtml(key, frame) {
   const status = `${e.slug} · frame ${String(frame).padStart(4, '0')}`;
   return [`<span class="aa-bd">${aaEsc(aaFrameTop(e.slug + '.txt', e.cols))}</span>`, ...rows, `<span class="aa-bd aa-live">${aaEsc(aaFrameFoot(status, e.cols))}</span>`].join('\n');
 }
-function aaPanel(ctx, q, cols, rows, cls) {
+function aaPanel(ctx, cols, rows, cls) {
   const st = ctx.state || (typeof state !== 'undefined' ? state : null);
   const fam = st && st.headingFont ? (st.headingFont.cls === 'mono' || st.headingFont.cls === 'pixel' ? st.headingFont.css : aaArtFace(st).font.css) : '"JetBrains Mono", monospace';
   const slug = (ctx.brandName || 'brand').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, Math.max(6, cols - 24)) || 'brand';
@@ -229,7 +229,7 @@ function aaPanel(ctx, q, cols, rows, cls) {
   const first = String(ctx.brandName || '').trim().split(/\s+/)[0] || '';
   const word = cols > 60 && first.length > 1 && first.length <= 10 ? first.toUpperCase() : ctx.initial;
   const key = `${word}|${fam}|${cols}x${rows}|${slug}`;
-  aaLive[key] = { cells: aaCells({ initial: ctx.initial, word }, q, cols, rows, fam), cols, rows, slug, fam, ctx: { initial: ctx.initial, word } };
+  aaLive[key] = { cells: aaCells({ initial: ctx.initial, word }, cols, rows, fam), cols, rows, slug, fam, ctx: { initial: ctx.initial, word } };
   aaTick();
   return `<pre class="aa-pre ${cls}" data-aak="${aaEsc(key).replace(/"/g, '&quot;')}" style="--aa-cols:${cols + 2}">${aaPanelHtml(key, aaFrameNow())}</pre>`;
 }
@@ -249,7 +249,7 @@ function aaTick() {
       const k = el.getAttribute('data-aak'), e = aaLive[k];
       if (!e) return;
       const ready = aaFontReady(e.fam);
-      if (ready && !e.ready) { e.cells = aaCells(e.ctx, null, e.cols, e.rows, e.fam); e.ready = true; el.dataset.f = ''; }
+      if (ready && !e.ready) { e.cells = aaCells(e.ctx, e.cols, e.rows, e.fam); e.ready = true; el.dataset.f = ''; }
       if (el.dataset.f !== String(f)) { el.innerHTML = aaPanelHtml(k, f); el.dataset.f = String(f); }
     });
   }, 1000);
@@ -338,8 +338,7 @@ registerAesthetic({
   },
 
   art(ctx) {
-    const q = aaQuant(ctx.t);
-    return `<div class="aa">${aaPanel(ctx, q, 88, 12, 'aa-wide')}${aaPanel(ctx, q, 40, 20, 'aa-narrow')}</div>`;
+    return `<div class="aa">${aaPanel(ctx, 88, 12, 'aa-wide')}${aaPanel(ctx, 40, 20, 'aa-narrow')}</div>`;
   },
 
   materials: [
@@ -367,6 +366,7 @@ registerAesthetic({
   },
   // Deck copy (js/brand-deck.js): three principles, three do / don't lines, each short.
   deck: {
+    marks: { do: '[x]', dont: '[ ]' },
     principles: [
       ['Everything is a character', 'Headlines, swatches and images are glyphs.'],
       ['Sixteen colours', 'Client colours snap to the ANSI palette.'],

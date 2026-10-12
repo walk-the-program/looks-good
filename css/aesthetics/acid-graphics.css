@@ -80,7 +80,7 @@
 .ab[data-ae="acid-graphics"] .ab-hl { color: inherit; background: none; padding: 0; margin: 0; }
 .ab[data-ae="acid-graphics"] .ab-subcopy { max-width: 28em; margin-top: 20px !important; color: var(--ab-muted); }
 .ab[data-ae="acid-graphics"][data-mode="light"] .ab-subcopy, .ab[data-ae="acid-graphics"][data-mode="light"] .ab-sub-rest { color: var(--ab-ink); }
-.ab[data-ae="acid-graphics"] .ab-sub-lead { color: var(--ab-ink); font-weight: 700; }
+.ab[data-ae="acid-graphics"] .ab-sub-lead { color: var(--ab-ink); font-weight: var(--ac-bw, 600); }
 .ab[data-ae="acid-graphics"][data-mode="light"] .ab-kicker { background: var(--ab-ink); color: var(--ab-canvas); }
 
 /* art: the flyer */
@@ -255,18 +255,15 @@
   .ab[data-ae="acid-graphics"] .ab-cta, .ab[data-ae="acid-graphics"] .ab-switch, .ab[data-ae="acid-graphics"] .ab-switch::before { transition: none; }
 }
 
-/* ---- deck: the board's stretched headline, given room (deck headings carry margin: 0 in brand-deck.css) ---- */
-.ab[data-ae="acid-graphics"].ab-slide.ab-slide .ab-headline.ab-deck-h { margin-bottom: 0.6em; }
-.ab[data-ae="acid-graphics"].ab-slide.ab-slide .ab-headline.ab-deck-aa { margin-bottom: 0.32em; }
-.ab[data-ae="acid-graphics"].ab-slide.ab-slide .ab-headline.ab-deck-sample, .ab[data-ae="acid-graphics"].ab-slide.ab-slide .ab-headline.ab-deck-screentitle { transform: none; }
-/* deck product slide: the CTA card gets the pair edge (2px clash, 5px acid offset) and the nav a ticket tab */
-.ab[data-ae="acid-graphics"] .ab-deck-ctacard { border: 2px solid var(--ab-clash); border-radius: 0; box-shadow: 5px 5px 0 var(--ab-acid); background: var(--ab-canvas); margin: 0 6px 6px 0; }
-.ab[data-ae="acid-graphics"] .ab-deck-nav.is-on, .ab[data-ae="acid-graphics"] .ab-deck-nav.is-on .ab-label { color: var(--ac-on-spark); }
-.ab[data-ae="acid-graphics"] .ab-deck-nav.is-on { border-radius: 0; background: var(--ac-spark); color: var(--ac-on-spark); font-weight: 700; letter-spacing: 0.12em; }
-.ab[data-ae="acid-graphics"] .ab-deck-nav.is-on::before { content: "✱ "; }
-
 /* deck In product: the board rows in a narrower column; the bar drops under the name so the name never truncates */
 .ab[data-ae="acid-graphics"] .ab-deck-prod .ab-row { grid-template-columns: 66px minmax(0, 1fr) auto 4.5ch; row-gap: 6px; }
 .ab[data-ae="acid-graphics"] .ab-deck-prod .ab-row:first-child .ab-row-name { font-size: 19px; }
 .ab[data-ae="acid-graphics"] .ab-deck-prod .ab-row-bar { grid-column: 2 / -1; grid-row: 2; }
 .ab[data-ae="acid-graphics"] .ab-row-n, .ab[data-ae="acid-graphics"] .ab-row:first-child .ab-row-name { line-height: 1.2; }
+
+/* only weights the faces have (font-synthesis is off): the line-up's support acts at 400, the headliner at the heading weight */
+.ab[data-ae="acid-graphics"] .ab-type-pick { font-weight: 400; }
+.ab[data-ae="acid-graphics"] .ab-type-col[data-role="heading"] .ab-type-pick:first-child { font-weight: var(--ac-hw, 400); }
+.ab[data-ae="acid-graphics"] .ab-type-cur b { font-weight: inherit; }
+.ab[data-ae="acid-graphics"] .ab-deck-pchip { font-weight: var(--ac-hw, 400); }
+.ab[data-ae="acid-graphics"] .ab-deck-ptitle { font-weight: 400; }

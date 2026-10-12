@@ -119,12 +119,11 @@ registerAesthetic({
     const le = ws.filter(x => x <= 700);
     const hw = le.length ? Math.max(...le) : Math.min(...ws);
     return {
-      '--ab-type-pick-w': hw,
+      '--ab-type-pick-w': 400,
       '--ab-hw': hw,
       '--ab-hair': t.alpha(t.ink, 0.5),
       '--ab-hair-soft': t.alpha(t.ink, 0.2),
       '--ab-hair-faint': t.alpha(t.ink, 0.1),
-      '--ab-mg-tick': 'repeating-linear-gradient(90deg, currentColor 0 1px, transparent 1px 6px)',
       // the fixed safety colour: hazard orange on light, TDR yellow on dark; never a brand role
       '--ab-mg-safe': t.isDark ? '#FFE500' : '#FF4A1C',
       // real data for the micro line on every section rule

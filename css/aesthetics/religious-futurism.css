@@ -218,12 +218,10 @@
 }
 
 /* deck cover: the statement on the axis, the cathedral monumental beneath it. No pattern band on the cover
-   ("never more than three forms per view"): the band and the bottom padding it reserves are dropped, and the
+   ("never more than three forms per view": deck.coverBand false), and the
    art stands on the slide's bottom edge, taking its lower ~58%. The art is out of the flow; the hero's bottom
    padding reserves its height so the fit pass sizes the headline into the silence above it. The cover meta
    row, the slide foot and the kicker are dropped on this slide. */
-.ab[data-ae="religious-futurism"].ab-slide[data-slide="cover"] > .ab-deck-pattern { display: none; }
-.ab[data-ae="religious-futurism"].ab-slide[data-slide="cover"] > .ab-in.ab-slide-in { padding-bottom: 0 !important; }
 .ab[data-ae="religious-futurism"].ab-slide[data-slide="cover"][data-hero] .ab-deck-cover .ab-hero { grid-template-columns: minmax(0, 1fr); justify-items: center; gap: 14px; }
 .ab[data-ae="religious-futurism"].ab-slide[data-slide="cover"][data-hero] .ab-deck-cover .ab-hero-copy { max-width: none; width: 100%; text-align: center; }
 .ab[data-ae="religious-futurism"].ab-slide[data-slide="cover"] .ab-hero { position: static; align-content: start; align-items: start; padding-bottom: 410px !important; }
@@ -236,6 +234,6 @@
 
 /* deck: one weight for every heading (no bold extended face next to the hairline display) */
 .ab[data-ae="religious-futurism"].ab-slide :is(.ab-deck-ptitle, .ab-card-title, h2, h3) { font-weight: 400; }
-/* deck Material: a crop of the centre lancet at about 4x: the lead, saddle bars and the glass variation */
-.ab[data-ae="religious-futurism"][data-slide="material"] .ab-deck-stage .ab-art, [data-slide="material"] .ab[data-ae="religious-futurism"] .ab-art { overflow: hidden; }
-.ab[data-ae="religious-futurism"][data-slide="material"] .ab-deck-stage .ab-art svg, [data-slide="material"] .ab[data-ae="religious-futurism"] .ab-art svg { transform: scale(3.6); transform-origin: 57% 58%; }
+/* deck In product: the list comes first there, so it takes I and the card II */
+.ab[data-ae="religious-futurism"] .ab-deck-prod .ab-sec-use .ab-n::before { content: "I"; }
+.ab[data-ae="religious-futurism"] .ab-deck-prod .ab-sec-ui .ab-n::before { content: "II"; }

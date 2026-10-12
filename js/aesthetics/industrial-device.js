@@ -6,6 +6,64 @@
    four encoder caps (#2B7BE4 blue, #2FB15C green, #F2F2EE white, and the brand primary),
    white and graphite key families, ONE primary main-action key and the knob pointer; the
    OLED is single-ink pixels. UI radius 8 for panels, 4 for keys; only hardware has an edge. */
+// The device (board hero, deck cover); deck.materialArt wraps it in a zoom on the pads and the keybed.
+function idvArt(ctx) {
+  const e = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const Y = 64;
+  const at = (x, y, w, h) => `left:${x}%;top:${(y / Y) * 100}%;width:${w}%;${h != null ? `height:${(h / Y) * 100}%` : ''}`;
+  const name = e(String(ctx.brandName || '').toLowerCase());
+  const ico = {
+    loop: '<svg viewBox="0 0 10 10" aria-hidden="true"><path d="M2.4 5.4a2.9 2.9 0 1 0 .9-2.5" fill="none" stroke="currentColor" stroke-width="1.15"/><path d="M1 .9v2.9h2.9z" fill="currentColor"/></svg>',
+    play: '<svg viewBox="0 0 10 10" aria-hidden="true"><path d="M2.6 1.4 8.4 5 2.6 8.6z" fill="currentColor"/></svg>',
+    rec: '<svg viewBox="0 0 10 10" aria-hidden="true"><circle cx="5" cy="5" r="3.1" fill="currentColor"/></svg>',
+    stop: '<svg viewBox="0 0 10 10" aria-hidden="true"><rect x="2.2" y="2.2" width="5.6" height="5.6" fill="currentColor"/></svg>',
+  };
+  // 4 x 4 pads: white, the graphite function column (col 3) with the one primary key on top, a graphite
+  // transport row with icons
+  const L = ['1', '2', '3', '', '4', '5', '6', 'B', '7', '8', '9', 'C', ico.loop, ico.play, ico.rec, ico.stop];
+  let keys = '';
+  for (let r = 0; r < 4; r++) for (let c = 0; c < 4; c++) {
+    const main = r === 0 && c === 3;
+    const dark = !main && (c === 3 || r === 3);
+    const lab = L[r * 4 + c];
+    keys += `<i class="idv-key${main ? ' main' : dark ? ' g' : ''}${lab.startsWith('<svg') ? ' ic' : ''}"><b>${lab}</b></i>`;
+  }
+  const fn = ['seq', 'synth', 'drum', 'tape', 'mix', 'shift'].map((k, i) => `<span><i class="idv-key g${i === 5 ? ' sh' : ''}"></i><small>${k}</small></span>`).join('');
+  const encs = [['b', 'tune'], ['g', 'mix'], ['w', 'fx'], ['p', 'lvl']].map(([c, k]) => `<span><i class="idv-enc ${c}"></i><small>${k}</small></span>`).join('');
+  const bed = Array.from({ length: 16 }, (_, i) => `<i${i % 4 === 0 ? ` data-n="${i + 1}"` : ''}></i>`).join('');
+  const dots = Array.from({ length: 48 }, () => '<i></i>').join('');
+  // OLED: single-ink pixel meter
+  const bars = [40, 70, 55, 90, 35, 75, 60, 45, 80].map(h => `<i style="height:${h}%"></i>`).join('');
+  // encoder scale and knurl: 11 printed ticks over 270 degrees, 0 / 5 / 10, and a 48-tick knurled ring
+  const KX = 15, KY = 35;
+  const pt = (r, deg) => [(KX + r * Math.sin(deg * Math.PI / 180)).toFixed(2), (KY - r * Math.cos(deg * Math.PI / 180)).toFixed(2)];
+  let scale = '';
+  for (let i = 0; i <= 10; i++) {
+    const deg = -135 + i * 27, long = i % 5 === 0;
+    const [x1, y1] = pt(12.2, deg), [x2, y2] = pt(long ? 14.2 : 13.3, deg);
+    scale += `<line class="${long ? 'lg' : ''}" x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}"/>`;
+  }
+  [[0, '0'], [5, '5'], [10, '10']].forEach(([i, txt]) => {
+    const [x, y] = pt(15.9, -135 + i * 27);
+    scale += `<text class="sc" x="${x}" y="${(+y + 0.5).toFixed(2)}" text-anchor="middle">${txt}</text>`;
+  });
+  const knurl = `<circle class="knurl" cx="${KX}" cy="${KY}" r="10.6" pathLength="96"/>`;
+  return `<div class="idv">
+    <div class="idv-body" style="${at(0, 0, 100, 64)}"></div>
+    <div class="idv-grille" style="${at(4, 5, 11, 11)}">${dots}</div>
+    <small class="idv-pr" style="${at(19, 2.4, 20)}">mode &middot; a.01</small>
+    <div class="idv-oled" style="${at(19, 5, 37, 11)}"><b>${name}</b><span class="idv-bars">${bars}</span></div>
+    <div class="idv-encs" style="${at(60, 5, 36, 13)}">${encs}</div>
+    <div class="idv-knob" style="${at(KX - 9.6, KY - 9.6 * 100 / 64 * 64 / 100, 19.2)}"><span></span></div>
+    <svg class="idv-marks" viewBox="0 0 100 ${Y}" focusable="false"><g class="idv-scale">${knurl}${scale}</g><text class="pr" x="${KX}" y="${KY + 15.2}" text-anchor="middle">vol</text></svg>
+    <div class="idv-keys" style="${at(33, 21, 29)}">${keys}</div>
+    <small class="idv-pr idv-tr" style="${at(33, 50.6, 29)}"><span>loop</span><span>play</span><span>rec</span><span>stop</span></small>
+    <div class="idv-fn" style="${at(66, 21, 30, 26)}">${fn}</div>
+    <div class="idv-bed" style="${at(4, 54, 92, 6)}">${bed}</div>
+    <small class="idv-pr idv-model" style="${at(4, 61, 60)}">tp-01 &middot; field &middot; ${name}</small>
+  </div>`;
+}
+
 registerAesthetic({
   key: 'industrial-device', order: 17,
   name: 'Industrial Device',
@@ -76,11 +134,8 @@ registerAesthetic({
       '--ab-dot': t.alpha(t.ink, d ? 0.42 : 0.34),
       '--ab-oled': oled,
       '--ab-oled-ink': lift(t.primary, oled, 7),
-      '--ab-oled-dim': t.alpha(lift(t.primary, oled, 7), 0.45),
       '--ab-led': t.accent,
-      '--ab-led-glow': t.alpha(t.accent, 0.7),
       '--ab-ring': t.alpha(t.primary, 0.32),
-      '--ab-pri-glow': t.alpha(t.primary, 0.55),
     };
   },
 
@@ -89,62 +144,7 @@ registerAesthetic({
   // lowercase Azeret Mono legends under the knob, under the encoders, over the screen and under the keys.
   // Colour is a fixed function code: four encoder caps (blue, green, white, and the brand primary), white and
   // graphite key families, ONE primary main-action key; the OLED is single-ink pixels.
-  art(ctx) {
-    const e = escapeHtml;
-    const Y = 64;
-    const at = (x, y, w, h) => `left:${x}%;top:${(y / Y) * 100}%;width:${w}%;${h != null ? `height:${(h / Y) * 100}%` : ''}`;
-    const name = e(String(ctx.brandName || '').toLowerCase());
-    const ico = {
-      loop: '<svg viewBox="0 0 10 10" aria-hidden="true"><path d="M2.4 5.4a2.9 2.9 0 1 0 .9-2.5" fill="none" stroke="currentColor" stroke-width="1.15"/><path d="M1 .9v2.9h2.9z" fill="currentColor"/></svg>',
-      play: '<svg viewBox="0 0 10 10" aria-hidden="true"><path d="M2.6 1.4 8.4 5 2.6 8.6z" fill="currentColor"/></svg>',
-      rec: '<svg viewBox="0 0 10 10" aria-hidden="true"><circle cx="5" cy="5" r="3.1" fill="currentColor"/></svg>',
-      stop: '<svg viewBox="0 0 10 10" aria-hidden="true"><rect x="2.2" y="2.2" width="5.6" height="5.6" fill="currentColor"/></svg>',
-    };
-    // 4 x 4 pads: white, the graphite function column (col 3) with the one primary key on top, a graphite
-    // transport row with icons
-    const L = ['1', '2', '3', '', '4', '5', '6', 'B', '7', '8', '9', 'C', ico.loop, ico.play, ico.rec, ico.stop];
-    let keys = '';
-    for (let r = 0; r < 4; r++) for (let c = 0; c < 4; c++) {
-      const main = r === 0 && c === 3;
-      const dark = !main && (c === 3 || r === 3);
-      const lab = L[r * 4 + c];
-      keys += `<i class="idv-key${main ? ' main' : dark ? ' g' : ''}${lab.startsWith('<svg') ? ' ic' : ''}"><b>${lab}</b></i>`;
-    }
-    const fn = ['seq', 'synth', 'drum', 'tape', 'mix', 'shift'].map((k, i) => `<span><i class="idv-key g${i === 5 ? ' sh' : ''}"></i><small>${k}</small></span>`).join('');
-    const encs = [['b', 'tune'], ['g', 'mix'], ['w', 'fx'], ['p', 'lvl']].map(([c, k]) => `<span><i class="idv-enc ${c}"></i><small>${k}</small></span>`).join('');
-    const bed = Array.from({ length: 16 }, (_, i) => `<i${i % 4 === 0 ? ` data-n="${i + 1}"` : ''}></i>`).join('');
-    const dots = Array.from({ length: 48 }, () => '<i></i>').join('');
-    // OLED: single-ink pixel meter
-    const bars = [40, 70, 55, 90, 35, 75, 60, 45, 80].map(h => `<i style="height:${h}%"></i>`).join('');
-    // encoder scale and knurl: 11 printed ticks over 270 degrees, 0 / 5 / 10, and a 48-tick knurled ring
-    const KX = 15, KY = 35;
-    const pt = (r, deg) => [(KX + r * Math.sin(deg * Math.PI / 180)).toFixed(2), (KY - r * Math.cos(deg * Math.PI / 180)).toFixed(2)];
-    let scale = '';
-    for (let i = 0; i <= 10; i++) {
-      const deg = -135 + i * 27, long = i % 5 === 0;
-      const [x1, y1] = pt(12.2, deg), [x2, y2] = pt(long ? 14.2 : 13.3, deg);
-      scale += `<line class="${long ? 'lg' : ''}" x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}"/>`;
-    }
-    [[0, '0'], [5, '5'], [10, '10']].forEach(([i, txt]) => {
-      const [x, y] = pt(15.9, -135 + i * 27);
-      scale += `<text class="sc" x="${x}" y="${(+y + 0.5).toFixed(2)}" text-anchor="middle">${txt}</text>`;
-    });
-    const knurl = `<circle class="knurl" cx="${KX}" cy="${KY}" r="10.6" pathLength="96"/>`;
-    return `<div class="idv">
-      <div class="idv-body" style="${at(0, 0, 100, 64)}"></div>
-      <div class="idv-grille" style="${at(4, 5, 11, 11)}">${dots}</div>
-      <small class="idv-pr" style="${at(19, 2.4, 20)}">mode &middot; a.01</small>
-      <div class="idv-oled" style="${at(19, 5, 37, 11)}"><b>${name}</b><span class="idv-bars">${bars}</span></div>
-      <div class="idv-encs" style="${at(60, 5, 36, 13)}">${encs}</div>
-      <div class="idv-knob" style="${at(KX - 9.6, KY - 9.6 * 100 / 64 * 64 / 100, 19.2)}"><span></span></div>
-      <svg class="idv-marks" viewBox="0 0 100 ${Y}" focusable="false"><g class="idv-scale">${knurl}${scale}</g><text class="pr" x="${KX}" y="${KY + 15.2}" text-anchor="middle">vol</text></svg>
-      <div class="idv-keys" style="${at(33, 21, 29)}">${keys}</div>
-      <small class="idv-pr idv-tr" style="${at(33, 50.6, 29)}"><span>loop</span><span>play</span><span>rec</span><span>stop</span></small>
-      <div class="idv-fn" style="${at(66, 21, 30, 26)}">${fn}</div>
-      <div class="idv-bed" style="${at(4, 54, 92, 6)}">${bed}</div>
-      <small class="idv-pr idv-model" style="${at(4, 61, 60)}">tp-01 &middot; field &middot; ${name}</small>
-    </div>`;
-  },
+  art(ctx) { return idvArt(ctx); },
 
   materials: [
     { name: 'Device body', css: 'background: {face}; border: 1px solid {hair}; border-radius: 14px 0 0 14px; box-shadow: inset 0 1px 0 {edgeHi}, inset 0 -1px 0 {edgeLo}; /* the hardware is the panel: anodised flat, bleeding off the right edge; only hardware has an edge */' },
@@ -175,6 +175,8 @@ registerAesthetic({
   // Deck copy (js/brand-deck.js): three principles, three do / don't lines, each short.
   deck: {
     coverDisplay: 0.6,
+    // Material slide: a close-up of the pads and the keybed (the same drawing at 1.9x)
+    materialArt: ctx => `<div class="idv-zoom">${idvArt(ctx)}</div>`,
     principles: [
       ['The product is the page', 'Life size, bleeding off the edge, tiny type beside it.'],
       ['Printed, not annotated', 'Legends sit on the hardware, never in callouts.'],

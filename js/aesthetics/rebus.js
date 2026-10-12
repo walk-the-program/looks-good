@@ -102,9 +102,6 @@ const RB_G = {
     + `<path d="M11 0.8L15.4 4.8L11 8.8L6.6 4.8Z" fill="${a}"/>` },
   pea: { w: 26, say: 'pea', d: (a, g, s) => `<path d="M0.8 13C5.6 5 20.4 5 25.2 13C20.4 20 5.6 20 0.8 13Z" fill="${a}"/>`
     + [6.6, 13, 19.4].map(x => `<circle cx="${x}" cy="12.8" r="2.9" fill="${g}"/><circle cx="${x}" cy="12.8" r="${f1(Math.max(1, 2.9 - s * 0.4))}" fill="${a}"/>`).join('') },
-  // control glyphs (icons, not sounds): kept for compatibility, not drawn in the UI
-  arrow: { w: 24, say: 'arrow', d: (a, g, s) => `<path d="M1.6 ${f1(12 - s * 0.55)}H13V4.4L22.4 12L13 19.6V${f1(12 + s * 0.55)}H1.6Z" fill="${a}"/>` },
-  lid: { w: 24, say: 'lid', d: (a, g, s) => `<path d="M1 11Q12 22 23 11" fill="none" stroke="${a}" stroke-width="${f1(s)}"/><path d="M5.6 15.6L3.8 19.6M12 17.6V22.4M18.4 15.6L20.2 19.6" fill="none" stroke="${a}" stroke-width="${f1(s * 0.6)}"/>` },
 };
 
 // ---- the sound table ----
@@ -244,7 +241,7 @@ function rbArith(raw) {
   let best = null;
   Object.keys(RB_G).forEach(name => {
     const say = RB_G[name].say;
-    if (!say || name === 'arrow' || name === 'lid' || /[^a-z]/.test(say) || say.length < 3) return;
+    if (!say || /[^a-z]/.test(say) || say.length < 3) return;
     let k = 0;
     while (k < say.length && k < w.length && say[k] === w[k]) k++;
     const drop = say.length - k, add = w.length - k;
@@ -401,6 +398,15 @@ function rbWall(t, s) {
   return `url('data:image/svg+xml,${encodeURIComponent(svg).replace(/'/g, '%27')}')`;
 }
 
+// The construction sheet's lead glyph (the lockup's first picture, else the eye) and the set.
+function rbLeadSet(ctx) {
+  let lead = 'eye';
+  const segAll = String(ctx.brandName || '').split(/\s+/).map(w => rbSegment(w)).find(Boolean);
+  if (segAll) { const p = segAll.pieces.find(q => q.g); if (p) lead = p.g; }
+  else { const a = String(ctx.brandName || '').split(/\s+/).map(w => rbArith(w)).find(Boolean); if (a) lead = a.g; }
+  return { lead, set: [lead, ...['eye', 'bee', 'wave', 'ewe', 'cup', 'sign', 'gold', 'horse'].filter(g => g !== lead)].slice(0, 8) };
+}
+
 registerAesthetic({
   key: 'rebus', order: 26,
   name: 'Rebus',
@@ -415,6 +421,31 @@ registerAesthetic({
   layout: { hero: 'centered', palette: 'swatches', sections: 'two-col', subcopy: false },
   deck: {
     coverDisplay: 1.2,
+    // Material slide: the glyph construction sheet (lead glyph on the 24-unit grid, the set below)
+    materialArt(ctx) {
+      const hw = rbHeadWeight();
+      const { lead, set } = rbLeadSet(ctx);
+      return `<div class="rb rb--mat">${rbBuild(ctx, rbStem(hw), hw, lead, set)}</div>`;
+    },
+    // Patterns slide: rebus-native fields (unless the brief pins its own patterns): a glyph
+    // field, a 1592-style sentence wall typeset with the engine, and the striped glyph at 1:1.
+    patternsStage(ctx) {
+      if (ctx.pinned) return '';
+      const t = ctx.t, e = ctx.e;
+      const s = rbStem(rbHeadWeight());
+      const inkT = Object.assign({}, t, { primary: t.ink });
+      const lines = [ctx.tagline, 'Be seen. Be heard.', 'I see you', 'Good design should feel alive', 'Think before you sign', 'For you, for ever']
+        .filter(Boolean).map(l => `<p class="rb-wall-l">${rbHeadline(l, inkT, s)}</p>`).join('');
+      const { lead } = rbLeadSet(ctx);
+      const hw = rbHeadWeight();
+      const fig = (cls, name, inner) => `<figure class="ab-deck-pt rb-pt ${cls}"><div class="rb-pt-box">${inner}</div><figcaption><span class="ab-label">${e(name)}</span><span class="ab-label ab-deck-ptcw">Ink</span></figcaption></figure>`;
+      return `<div class="ab-labelrow"><span class="ab-label">Pattern suite</span><span class="ab-label">${e('Rebus')}</span></div>
+        <div class="ab-deck-ptgrid" data-n="3">
+          ${fig('rb-pt-field', 'Glyph field', '')}
+          ${fig('rb-pt-wall', 'Sentence wall', `<div class="rb-wall">${lines}</div>`)}
+          ${fig('rb-pt-build', 'Stripe study', rbBuild(ctx, s, hw, lead, []))}
+        </div>`;
+    },
     principles: [
       ['Pictures say the sound', 'Eye for I, bee for be, sign for -sign.'],
       ['Drawn at the letters\' weight', 'Discs, bars and three stripe cuts on a 24-unit grid.'],
@@ -449,7 +480,7 @@ registerAesthetic({
     const s = rbStem(hw);
     const ic = (name, a, g) => rbUri(name, a, g, s);
     return {
-      '--ab-type-pick-w': Math.min(hw, 800),
+      '--ab-type-pick-w': 400,
       '--rb-hw': hw,
       // the Design tab is spelled De + [sign]: the sign glyph (sound), never an icon beside a word
       '--rb-i-sign': ic('sign', t.muted, t.canvas),
@@ -464,19 +495,12 @@ registerAesthetic({
 
   art(ctx) {
     const t = ctx.t;
-    const hw = rbHeadWeight();
-    const s = rbStem(hw);
+    const s = rbStem(rbHeadWeight());
     const plan = rbPlan(ctx.tagline);
     const lock = rbLockup(ctx, plan.chosen.size === 0, s);
     const e = escapeHtml;
     const sub = `<p class="rb-sub">A de<span class="rb-g rb-gx">${rbSvg('sign', t.ink, t.canvas, s)}</span> language for ${e(String(ctx.brandName || '').trim())} — type, colour and material in one place.</p>`;
-    // the construction sheet shows the lead glyph of the lockup (else the eye)
-    let lead = 'eye';
-    const segAll = String(ctx.brandName || '').split(/\s+/).map(w => rbSegment(w)).find(Boolean);
-    if (segAll) { const p = segAll.pieces.find(q => q.g); if (p) lead = p.g; }
-    else { const a = String(ctx.brandName || '').split(/\s+/).map(w => rbArith(w)).find(Boolean); if (a) lead = a.g; }
-    const set = [lead, ...['eye', 'bee', 'wave', 'ewe', 'cup', 'sign', 'gold', 'horse'].filter(g => g !== lead)].slice(0, 8);
-    return `<div class="rb">${sub}${lock}${rbBuild(ctx, s, hw, lead, set)}</div>`;
+    return `<div class="rb">${sub}${lock}</div>`;
   },
 
   materials: [

@@ -446,3 +446,76 @@ Worker fx64 (FX6-4, packet rev 2). Files changed: `js/aesthetics/{riso-print,xer
 - Corporate Vandalism 7/10. Two hands are visible. Still short: Inter Tight until the pairing change, and no swapped-poster band.
 - Acid 7/10. The board is a flyer system. Still short: Unbounded remains until the font change, and the deck cover flyer is small.
 - ASCII 7/10. Every surface is a glyph. Still short: the deck pattern suite still has pixel patterns until the fit.js change.
+
+---
+
+## Adoption log (fx64)
+
+Packet rev 3 (ADOPT-BRIEF). Same six keys, same files. This pass adopts the round 6 framework hooks (commit 96438f8) and re-shoots against the SH shared changes now on disk:
+- data.js: Jost 800 italic, Syncopate, Tilt Warp and Kode Mono added.
+- aesthetic-meta.js: new pairings. xerox is now Arimo/IBM Plex Mono, corporate-vandalism Public Sans/Public Sans, and acid Tilt Warp/Inter.
+- fit.js: new suites, for example xerox-punk "Ransom patches".
+
+### Riso Print
+- Added `--rz-hw` and `--rz-bw` (heaviest weight each face has, up to 800 and 700). Ten hard-coded 800/700 weights now use them, plus the SVG clip text. Big Shoulders no longer asks for 800, and Work Sans no longer asks for 700.
+- `.ab-type-cur b` now inherits its weight. The deck "Aa" contrast chips (`.ab-deck-pchip`) use the heading weight.
+- No dead deck CSS. The default In-product and Do/Don't slides read natively, so no custom hook was needed.
+
+### Xerox
+- New `def.states(ctx)`: the Gen 1/3/7 samples are real text (the initial in a `<b>` that carries the filter). The CSS `content: var(--xr-ini)` hack and the `--xr-ini` token are gone.
+- New `def.panels` hooks give real markup in three places:
+  - card and panel: a "SHEET n / 2" stamp, replacing two `::before` content rules.
+  - list: "No.01" numbers and copy counts (036/050), replacing the `font-size: 0` counter and the nth-child `content` rules (−8 lines).
+- Weights come from `--xr-bw` (body face, up to 700). `--ab-type-pick-w` is 400, and only the lead heading pick uses the heading weight. Deck principle titles are 400; principle names and Do/Don't marks use the body bold.
+
+### Xerox Punk
+- The Material slide's specimen sheet moved from hidden markup in `art()` plus `.ab-deck-stage` show/hide CSS to `def.deck.materialArt(ctx)` (`xpSpecimen`).
+- Fixed a quoting bug: double-quoted font stacks inside `style="…"` were cutting the specimen tiles' style attribute off.
+- Do/Don't marks are `{ do: '✓', dont: '✕' }`, written in marker.
+- New `def.panels.list` makes the set list real markup (title and numbers). Removed the `::before` "set list" content, the `font-size: 0` numbers and three nth-child content rules.
+- **"ALIVE" legibility (QC note):** the circled last word no longer gets photo tiles and is less shrunk and tilted (0.98–1.28x, at most 3.5°). The marker circle now runs around the word (inset −30%/−13%) with margin, instead of through it.
+- Weights:
+  - `--xp-bw` (body bold) replaces 18 `font-weight: 700` and 3 `font: 700` declarations; Special Elite stays 400.
+  - Magazine-word tiles are italic only at 400.
+  - The cut-word tab now uses Playfair italic 400.
+  - The deck principle-title weight beats the deck's `[data-hcls]` 600 rule.
+- Removed the unused `seq`.
+
+### Corporate Vandalism
+- New `def.panels` hooks give real markup in place of CSS content:
+  - card: the "Notice 2291-B · Form 7" strip and the "† Terms apply…" fine print.
+  - panel: the "Form 7 · Part 2" strip.
+  - list: PO numbers, the struck "Spring" with a handwritten "never", and the asset tag.
+- Removed with them: 4 `::before`/`::after` content rules, the `cvr` counter, the `font-size: 0` PO trick, the `--cv-brand` token and the board-only `:not(.ab-slide)` strike rules.
+- Do/Don't marks are rubber stamps ("Approved" / dashed "Rejected").
+- Dead deck CSS removed: the `.ab-deck-ctacard` rule (2 lines).
+- Weights:
+  - `--cv-bw` (body bold, up to 600) replaces 6 × 700 plus the sub-lead's 600.
+  - The logo chip uses `--cv-hw`.
+  - Type picks inherit their weight.
+- The vandal face is now Jost italic 800, which exists.
+
+### Acid Graphics
+- Dead deck CSS removed: the `.ab-deck-ctacard` and `.ab-deck-nav` rules and the old scaleY-era headline, Aa and sample rules (9 lines).
+- Do/Don't marks: ✱ / ✕.
+- Weights:
+  - `--ac-bw` drives the sub-lead.
+  - Line-up support acts are set at 400; only the lead heading pick uses the heading weight.
+  - Deck principle titles are 400 and the pchip uses the heading weight. Tilt Warp is a single weight.
+- Removed the unused `AC_CLAMP`.
+
+### ASCII Art
+- Do/Don't marks are `[x]` / `[ ]` in the art face.
+- The deck pchip is now 600 (JetBrains Mono has no 700).
+- Removed the unused `q` parameter and local.
+
+### Not adopted (structure hooks)
+- `layout.order`, `layout.sectionOrder`, the new hero kinds and the new palette kinds were considered and left alone. Each board already has its own structure (riso's scene-print hero, xerox's poster platen, punk's wall, acid's flyer, ascii's character field), and swapping layouts would have been churn.
+- `coverBand: false` and `closingStrip: false` were not needed: none of these keys hid the band with `!important`.
+
+### Verification (actual numbers)
+- Board: `KEYS=<6> S=fx64-b TAG=fx64 ./board.sh`. 390px overflow is 0 for all six keys in both modes (separate eval). The only console error is the existing favicon 404.
+- Deck: rec and other sheets for all six are in `S/adv/fx64/sheet-deck-<key>-{rec,oth}.png`.
+- Gore: 24 configurations, 240 slides, **0 issues**. The first pass reported 8 "small" issues on the corporate-vandalism In-product slide, caused by my `--dk-min-text: off` on the fine print and asset tag; I removed the opt-out.
+- Weight audit (`fx64/wdetail.js`, which reports text set in a weight its face lacks): **0** across the six keys, board and deck, both modes.
+- `node tests/run.js`: all passed. `harness.js`: 0 FAIL lines, briefs 192 fails 0 warns 0. `src-verify-p5.js`: families 53, fails 0, map mismatches 0.

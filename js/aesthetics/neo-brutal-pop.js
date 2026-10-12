@@ -7,6 +7,13 @@
    starburst, checkbox, cursor) on the right. Section fields switch to 100%
    accent / primary. The deck's Material slide is a die-cut sticker sheet.
    Look lives in css/aesthetics/neo-brutal-pop.css. */
+// Heaviest real weight (FONTS `weights`) of state[which], capped.
+function npHeavy(which, cap) {
+  const f = typeof state !== 'undefined' && state && state[which];
+  const ws = String((f && f.weights) || '400').split(';').map(Number).filter(n => n > 0 && n <= cap);
+  return ws.length ? Math.max(...ws) : 400;
+}
+
 // Points of a star polygon centred on (cx, cy): n tips, outer radius r1, inner r2.
 function npStarPoints(cx, cy, r1, r2, n) {
   const pts = [];
@@ -16,6 +23,21 @@ function npStarPoints(cx, cy, r1, r2, n) {
     pts.push((cx + r * Math.cos(an)).toFixed(2) + ',' + (cy + r * Math.sin(an)).toFixed(2));
   }
   return pts.join(' ');
+}
+
+// Shared drawing bits for the sticker art (hero cluster, Material sheet, In product).
+function npKit(t) {
+  const ink = t.ink;
+  const paper = typeof t.mix === 'function'
+    ? (t.isDark ? t.mix(t.ink, t.canvas, 0.1) : t.mix('#ffffff', t.canvas, 0.9)) : t.canvas;
+  const on = (k, fb) => t[k] || fb;
+  const sh = 'translate(5 5)';
+  const so = `stroke="${ink}" stroke-width="3" stroke-linejoin="round"`;
+  const tag = '62,104 98,70 232,70 232,204 98,204 62,170';
+  const star = npStarPoints(0, 0, 54, 40, 20);
+  const tagSvg = `<svg viewBox="52 60 192 156" xmlns="http://www.w3.org/2000/svg"><polygon points="${tag}" fill="${ink}" transform="${sh}"/><polygon points="${tag}" fill="${t.primary}" ${so}/><circle cx="88" cy="137" r="10" fill="${paper}" ${so}/><text x="168" y="164" text-anchor="middle" class="nba-t" font-size="76" fill="${on('onPrimary', ink)}">$1</text></svg>`;
+  const starSvg = (word = 'NEW') => `<svg viewBox="-60 -60 126 126" xmlns="http://www.w3.org/2000/svg"><polygon points="${star}" fill="${ink}" transform="${sh}"/><polygon points="${star}" fill="${t.accent}" ${so}/><text x="0" y="9" text-anchor="middle" class="nba-t" font-size="26" fill="${on('onAccent', ink)}">${word}</text></svg>`;
+  return { ink, paper, on, sh, so, tag, star, tagSvg, starSvg };
 }
 
 registerAesthetic({
@@ -68,29 +90,21 @@ registerAesthetic({
     const uri = svg => "url('data:image/svg+xml," + encodeURIComponent(svg).replace(/'/g, '%27') + "')";
     const starSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="-4 -4 108 108"><polygon points="${npStarPoints(50, 50, 46, 33, 24)}" fill="${t.ink}" transform="translate(3.2 3.2)"/><polygon points="${npStarPoints(50, 50, 46, 33, 24)}" fill="${t.accent}" stroke="${t.ink}" stroke-width="2" stroke-linejoin="round" vector-effect="non-scaling-stroke"/></svg>`;
     return {
-      '--ab-type-pick-w': 700,
+      '--ab-type-pick-w': 400,
       '--ab-card-fill': fill(a),
       '--ab-paper': t.isDark ? t.mix(t.ink, t.canvas, 0.1) : t.mix('#ffffff', t.canvas, 0.9),
       '--np-star-img': uri(starSvg),
+      // real weights only (font-synthesis is off): the heading face's heaviest up to 800, the UI face's
+      '--np-hw': npHeavy('headingFont', 800),
+      '--np-uw': npHeavy('bodyFont', 800),
     };
   },
 
-  // Two compositions, both plain SVG / HTML drawn here (self-contained, so the art
-  // works as a blend donor):
-  //  - .nba-cluster: UI-object stickers for the hero (price tag "$1", NEW
-  //    starburst, checkbox, cursor), each 2px-outlined with a hard offset shadow;
-  //  - .nba-sheet: a die-cut sticker sheet (3 x 2) shown only on the deck's
-  //    Material slide (css hides the cluster there and the sheet everywhere else).
+  // The hero art: UI-object stickers (price tag "$1", NEW starburst, checkbox, cursor),
+  // each 2px-outlined with a hard offset shadow; plain SVG, self-contained (blend donor).
   art(ctx) {
+    const { ink, paper, on, sh, so, tag, star } = npKit(ctx.t);
     const t = ctx.t;
-    const ink = t.ink;
-    const paper = typeof t.mix === 'function'
-      ? (t.isDark ? t.mix(t.ink, t.canvas, 0.1) : t.mix('#ffffff', t.canvas, 0.9)) : t.canvas;
-    const on = (k, fb) => t[k] || fb;
-    const sh = 'translate(5 5)';
-    const so = `stroke="${ink}" stroke-width="3" stroke-linejoin="round"`;
-    const tag = '62,104 98,70 232,70 232,204 98,204 62,170';
-    const star = npStarPoints(0, 0, 54, 40, 20);
     const cursor = '0,0 0,58 14,45 25,68 36,63 25,40 43,40';
     const cluster = `<svg class="nba-cluster" viewBox="0 0 320 300" xmlns="http://www.w3.org/2000/svg">
       <path d="M86 137 C52 128 30 84 46 30" fill="none" stroke="${ink}" stroke-width="3" stroke-linecap="round"/>
@@ -115,18 +129,7 @@ registerAesthetic({
         <polygon points="${cursor}" fill="${paper}" ${so}/>
       </g>
     </svg>`;
-    const tagMini = `<svg viewBox="52 60 192 156" xmlns="http://www.w3.org/2000/svg"><polygon points="${tag}" fill="${ink}" transform="${sh}"/><polygon points="${tag}" fill="${t.primary}" ${so}/><circle cx="88" cy="137" r="10" fill="${paper}" ${so}/><text x="168" y="164" text-anchor="middle" class="nba-t" font-size="76" fill="${on('onPrimary', ink)}">$1</text></svg>`;
-    const starMini = `<svg viewBox="-60 -60 126 126" xmlns="http://www.w3.org/2000/svg"><polygon points="${star}" fill="${ink}" transform="${sh}"/><polygon points="${star}" fill="${t.accent}" ${so}/><text x="0" y="9" text-anchor="middle" class="nba-t" font-size="26" fill="${on('onAccent', ink)}">NEW</text></svg>`;
-    const cell = (cls, obj, label) => `<div class="nba-cell"><div class="nba-obj ${cls}">${obj}</div><span class="nba-lab">${label}</span></div>`;
-    const sheet = `<div class="nba-sheet">
-      ${cell('nba-o-card', '<i></i><i></i><i></i>', 'Sticker card')}
-      ${cell('nba-o-btn', '<b>Go<em>→</em></b>', 'Chunky button')}
-      ${cell('nba-o-paper', '<b>Go<em>→</em></b>', 'Paper button')}
-      ${cell('nba-o-squish', '<b>Go<em>→</em></b>', 'Squish state')}
-      ${cell('nba-o-star', starMini, 'Starburst')}
-      ${cell('nba-o-tag', tagMini, 'Price tag')}
-    </div>`;
-    return `<div class="nba">${cluster}${sheet}</div>`;
+    return `<div class="nba">${cluster}</div>`;
   },
 
   materials: [
@@ -159,6 +162,36 @@ registerAesthetic({
   },
   // Deck copy (js/brand-deck.js): three principles, three do / don't lines, each short.
   deck: {
+    // Material slide: a die-cut sticker sheet (3 x 2) on a paper rectangle.
+    materialArt(ctx) {
+      const { tagSvg, starSvg } = npKit(ctx.t);
+      const cell = (cls, obj, label) => `<div class="nba-cell"><div class="nba-obj ${cls}">${obj}</div><span class="nba-lab">${label}</span></div>`;
+      return `<div class="nba-sheet">
+        ${cell('nba-o-card', '<i></i><i></i><i></i>', 'Sticker card')}
+        ${cell('nba-o-btn', '<b>Go<em>→</em></b>', 'Chunky button')}
+        ${cell('nba-o-paper', '<b>Go<em>→</em></b>', 'Paper button')}
+        ${cell('nba-o-squish', '<b>Go<em>→</em></b>', 'Squish state')}
+        ${cell('nba-o-star', starSvg(), 'Starburst')}
+        ${cell('nba-o-tag', tagSvg, 'Price tag')}
+      </div>`;
+    },
+    // In product: a Gumroad-style product page. A cover tile in a full accent field
+    // with stickers, then the title, a price-tag sticker, the chunky buy button.
+    product(ctx) {
+      const e = ctx.e;
+      const { tagSvg, starSvg } = npKit(ctx.t);
+      const name = e(ctx.brandName || 'Studio');
+      return `<div class="npp">
+        <div class="npp-cover"><span class="npp-init">${e(ctx.initial)}</span><span class="npp-star">${starSvg('NEW')}</span><span class="npp-tag">${tagSvg}</span></div>
+        <div class="npp-info">
+          <p class="npp-by"><span class="npp-av">${e(ctx.initial)}</span>${name}</p>
+          <h3 class="npp-title ab-headline">The starter kit</h3>
+          <p class="npp-desc">Type, colour and material for ${name}, in one download. Loud, but friendly.</p>
+          <p class="npp-meta"><span class="npp-price">$1+</span><span class="npp-rate">★★★★★ 72 ratings</span></p>
+          <span class="ab-cta npp-buy"><span class="ab-cta-label">I want this!</span><span class="ab-cta-arrow" aria-hidden="true"></span></span>
+        </div>
+      </div>`;
+    },
     principles: [
       ['Outline everything in ink', '2px outlines with a hard 4px shadow and no blur.'],
       ['Buttons you can feel', 'They lift on hover and squish when pressed.'],

@@ -207,7 +207,6 @@ registerAesthetic({
     const vars = {
       '--ab-type-pick-w': 400,
       '--ab-font-label': 'var(--mt-f-m, ui-monospace), ui-monospace, Menlo, monospace',
-      '--ab-paper': t.mix(t.canvas, t.ink, 0.955),
       '--ab-guide': t.alpha(t.ink, 0.28),
     };
     if (st && st.headingFont) {

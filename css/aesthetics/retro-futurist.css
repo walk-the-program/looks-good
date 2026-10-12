@@ -1,7 +1,7 @@
 /* ---------------------------------------------------------------------
    04 Retro-Futurist — a space-age graphic system: a lit white field (deep
    space in dark mode), bold extended headlines, ultra-wide thin captions,
-   one signal colour (--rf-signal = the primary), flat panels with 1px
+   one signal colour (--ab-rf-signal = the primary), flat panels with 1px
    hairlines, square keys and lamps, sections numbered like a standards
    manual, and a full-bleed orbital horizon plate. Variables come from
    js/aesthetics/retro-futurist.js tokens().
@@ -26,16 +26,16 @@
 }
 
 /* header */
-.ab[data-ae="retro-futurist"] .ab-brand { font-family: var(--ab-font-h); font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; }
+.ab[data-ae="retro-futurist"] .ab-brand { font-family: var(--ab-font-h); font-weight: var(--rf-hw, 700); text-transform: uppercase; letter-spacing: 0.08em; }
 .ab[data-ae="retro-futurist"] .ab-mark {
   width: 30px; height: 30px; border-radius: 50%; background: var(--ab-ink); color: var(--ab-canvas);
-  font-family: var(--ab-font-h); font-weight: 700; box-shadow: none; border: 0;
+  font-family: var(--ab-font-h); font-weight: var(--rf-hw, 700); box-shadow: none; border: 0;
 }
-.ab[data-ae="retro-futurist"] .ab-rule { height: 1px; background: var(--rf-hair); border: 0; }
+.ab[data-ae="retro-futurist"] .ab-rule { height: 1px; background: var(--ab-rf-hair); border: 0; }
 
 /* labels: numbered like a standards manual */
 .ab[data-ae="retro-futurist"] .ab-label { font-size: 10px; letter-spacing: 0.18em; color: var(--ab-ink); }
-.ab[data-ae="retro-futurist"] .ab-labelrow { margin-bottom: 18px; padding-bottom: 8px; border-bottom: 1px solid var(--rf-hair); }
+.ab[data-ae="retro-futurist"] .ab-labelrow { margin-bottom: 18px; padding-bottom: 8px; border-bottom: 1px solid var(--ab-rf-hair); }
 /* (no CSS counters: the board's size containers scope them, so each number is set here) */
 .ab[data-ae="retro-futurist"]:not(.ab-slide) :is(.ab-palette, .ab-type, .ab-sec) > .ab-labelrow > .ab-label:first-child::before {
   content: "1.1"; display: inline-block; min-width: 3.4em; margin-right: 6px; font-weight: 700; color: var(--ab-ink); letter-spacing: 0.04em;
@@ -54,14 +54,14 @@
 .ab[data-ae="retro-futurist"] .ab-kicker { margin-bottom: clamp(16px, 2.4cqw, 28px) !important; }
 .ab[data-ae="retro-futurist"] .ab-headline,
 .ab[data-ae="retro-futurist"][data-hero="centered"] .ab-headline {
-  font-family: var(--ab-font-h); font-weight: 700; text-transform: uppercase; color: var(--ab-ink);
+  font-family: var(--ab-font-h); font-weight: var(--rf-hw, 700); text-transform: uppercase; color: var(--ab-ink);
   letter-spacing: 0.04em; line-height: 0.92; text-wrap: balance;
 }
 .ab[data-ae="retro-futurist"] .ab-hero .ab-headline { max-width: 15ch; }
 .ab[data-ae="retro-futurist"]:not(.ab-slide) .ab-hero .ab-headline { font-size: calc(clamp(48px, 9cqw, 128px) * var(--ab-hl-scale, 1) * var(--ab-display, 1)); }
 /* the one red mark: the highlight word in the flat signal colour */
 .ab[data-ae="retro-futurist"] .ab-hl,
-.ab[data-ae="retro-futurist"][data-accent-text="low"] .ab-hl { color: var(--rf-signal); background: none; background-image: none; padding: 0; margin: 0; text-shadow: none; -webkit-text-fill-color: currentColor; }
+.ab[data-ae="retro-futurist"][data-accent-text="low"] .ab-hl { color: var(--ab-rf-signal); background: none; background-image: none; padding: 0; margin: 0; text-shadow: none; -webkit-text-fill-color: currentColor; }
 .ab[data-ae="retro-futurist"] .ab-subcopy {
   font-family: var(--ab-font-ui); font-size: clamp(11px, 1.2cqw, 13px); letter-spacing: 0.04em; line-height: 1.6; max-width: 40em;
   margin-left: 0 !important; color: var(--ab-muted);
@@ -75,30 +75,30 @@
 }
 
 /* palette: flat chips, hairline frame */
-.ab[data-ae="retro-futurist"] .ab-chip { border-radius: 0; box-shadow: inset 0 0 0 1px var(--rf-hair); }
+.ab[data-ae="retro-futurist"] .ab-chip { border-radius: 0; box-shadow: inset 0 0 0 1px var(--ab-rf-hair); }
 .ab[data-ae="retro-futurist"] .ab-sw-role { font-size: 10.5px; letter-spacing: 0.12em; font-weight: 700; }
 .ab[data-ae="retro-futurist"] .ab-sw-job { font-size: 9.5px; letter-spacing: 0.06em; }
 .ab[data-ae="retro-futurist"] .ab-sw-hex { font-size: 10px; letter-spacing: 0.08em; color: var(--ab-ink); }
 
 /* flat panels */
 .ab[data-ae="retro-futurist"] .ab-card, .ab[data-ae="retro-futurist"] .ab-panel {
-  border-radius: 2px; background: var(--rf-panel); box-shadow: inset 0 0 0 1px var(--rf-hair); border: 0;
+  border-radius: 2px; background: var(--ab-rf-panel); box-shadow: inset 0 0 0 1px var(--ab-rf-hair); border: 0;
   padding: clamp(22px, 3.2cqw, 30px) clamp(20px, 3cqw, 28px);
 }
 
 /* 01 interface: square keys */
-.ab[data-ae="retro-futurist"] .ab-seg { gap: 0; padding: 0; border-radius: 0; background: none; box-shadow: inset 0 0 0 1px var(--rf-hair); }
+.ab[data-ae="retro-futurist"] .ab-seg { gap: 0; padding: 0; border-radius: 0; background: none; box-shadow: inset 0 0 0 1px var(--ab-rf-hair); }
 .ab[data-ae="retro-futurist"] .ab-seg-btn {
-  min-height: 38px; border: 0; border-radius: 0; background: transparent; color: var(--ab-ink); box-shadow: inset -1px 0 0 var(--rf-hair);
+  min-height: 38px; border: 0; border-radius: 0; background: transparent; color: var(--ab-ink); box-shadow: inset -1px 0 0 var(--ab-rf-hair);
   font-size: 10.5px; font-weight: 700; letter-spacing: 0.14em;
 }
 .ab[data-ae="retro-futurist"] .ab-seg-btn:last-child { box-shadow: none; }
 .ab[data-ae="retro-futurist"] .ab-seg-btn[aria-pressed="true"] { background: var(--ab-ink); color: var(--ab-canvas); }
-.ab[data-ae="retro-futurist"] .ab-card-title { font-family: var(--ab-font-h); font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; font-size: clamp(17px, 2.1cqw, 22px); line-height: 1.05; }
+.ab[data-ae="retro-futurist"] .ab-card-title { font-family: var(--ab-font-h); font-weight: var(--rf-hw, 700); text-transform: uppercase; letter-spacing: 0.04em; font-size: clamp(17px, 2.1cqw, 22px); line-height: 1.05; }
 .ab[data-ae="retro-futurist"] .ab-card-body { color: var(--ab-muted); }
 .ab[data-ae="retro-futurist"] .ab-cta {
   padding: 15px 22px; border: 0; border-radius: 2px; font-size: 12px; font-weight: 700; letter-spacing: 0.16em;
-  background: var(--rf-signal); color: var(--ab-on-primary); box-shadow: inset 0 -3px 0 rgba(0, 0, 0, 0.25);
+  background: var(--ab-rf-signal); color: var(--ab-on-primary); box-shadow: inset 0 -3px 0 rgba(0, 0, 0, 0.25);
   transition: transform 0.08s, box-shadow 0.08s;
 }
 .ab[data-ae="retro-futurist"] .ab-cta-arrow::before { content: "\2192"; font-size: 15px; line-height: 1; }
@@ -108,49 +108,48 @@
 .ab[data-ae="retro-futurist"] .ab-fieldlabel { font-size: 10px; letter-spacing: 0.16em; color: var(--ab-muted); }
 .ab[data-ae="retro-futurist"] .ab-input {
   padding: 12px 14px; border: 0; border-radius: 0; font-family: var(--rf-mono); font-size: 14px; letter-spacing: 0.04em;
-  color: var(--ab-ink); background: var(--ab-canvas); box-shadow: inset 0 0 0 1px var(--rf-hair); caret-color: var(--rf-signal);
+  color: var(--ab-ink); background: var(--ab-canvas); box-shadow: inset 0 0 0 1px var(--ab-rf-hair); caret-color: var(--ab-rf-signal);
 }
-.ab[data-ae="retro-futurist"] .ab-input:focus { outline: none; box-shadow: inset 0 0 0 1px var(--ab-ink), 0 0 0 2px var(--rf-signal); }
+.ab[data-ae="retro-futurist"] .ab-input:focus { outline: none; box-shadow: inset 0 0 0 1px var(--ab-ink), 0 0 0 2px var(--ab-rf-signal); }
 .ab[data-ae="retro-futurist"] .ab-toggle > span { font-size: 10.5px; letter-spacing: 0.16em; font-weight: 700; }
 .ab[data-ae="retro-futurist"] .ab-switch {
-  width: 52px; height: 24px; border: 0; border-radius: 2px; background: var(--rf-off); box-shadow: inset 0 0 0 1px var(--rf-hair);
+  width: 52px; height: 24px; border: 0; border-radius: 2px; background: var(--ab-rf-off); box-shadow: inset 0 0 0 1px var(--ab-rf-hair);
   transition: background-color 0.15s;
 }
-.ab[data-ae="retro-futurist"] .ab-switch::before { left: 4px; top: 4px; width: 16px; height: 16px; border-radius: 1px; background: var(--ab-canvas); box-shadow: 0 0 0 1px var(--rf-hair); transition: transform 0.15s; }
-.ab[data-ae="retro-futurist"] .ab-switch:checked { background: var(--rf-signal); }
+.ab[data-ae="retro-futurist"] .ab-switch::before { left: 4px; top: 4px; width: 16px; height: 16px; border-radius: 1px; background: var(--ab-canvas); box-shadow: 0 0 0 1px var(--ab-rf-hair); transition: transform 0.15s; }
+.ab[data-ae="retro-futurist"] .ab-switch:checked { background: var(--ab-rf-signal); }
 .ab[data-ae="retro-futurist"] .ab-switch:checked::before { transform: translateX(28px); }
 .ab[data-ae="retro-futurist"] .ab-status { font-size: 10px; letter-spacing: 0.14em; }
 .ab[data-ae="retro-futurist"] .ab-states { gap: 12px; margin-top: 24px; }
-.ab[data-ae="retro-futurist"] .ab-disc { width: 12px; height: 12px; margin-bottom: 12px; border: 0; border-radius: 0; background: var(--rf-off); box-shadow: none; }
+.ab[data-ae="retro-futurist"] .ab-disc { width: 12px; height: 12px; margin-bottom: 12px; border: 0; border-radius: 0; background: var(--ab-rf-off); box-shadow: none; }
 .ab[data-ae="retro-futurist"] .ab-disc[data-s="1"] { background: transparent; box-shadow: inset 0 0 0 2px var(--ab-ink); }
-.ab[data-ae="retro-futurist"] .ab-disc[data-s="2"] { background: var(--rf-signal); }
+.ab[data-ae="retro-futurist"] .ab-disc[data-s="2"] { background: var(--ab-rf-signal); }
 .ab[data-ae="retro-futurist"] .ab-state { font-size: 10px; letter-spacing: 0.14em; }
 
 /* 03 mission log: a spec table, hairlines and figures, no screen */
 .ab[data-ae="retro-futurist"] .ab-list { position: relative; padding: 0; border-radius: 0; background: none; box-shadow: none; border-top: 2px solid var(--ab-ink); }
-.ab[data-ae="retro-futurist"] .ab-list::before {
-  content: "Mission log \00a0/\00a0 T+00:41:07"; display: block; padding: 8px 0 10px; font: 700 10px/16px var(--rf-mono);
-  letter-spacing: 0.18em; text-transform: uppercase; color: var(--ab-ink);
+.ab[data-ae="retro-futurist"] .rf-loghead {
+  list-style: none; padding: 8px 0 10px; font: 700 10px/16px var(--rf-mono); letter-spacing: 0.18em; text-transform: uppercase; color: var(--ab-ink);
 }
 .ab[data-ae="retro-futurist"] .ab-row {
   grid-template-columns: 7ch minmax(0, 1fr) auto minmax(60px, 160px) 5ch;
-  padding: 11px 0; font-size: 12px; letter-spacing: 0.06em; border-top: 1px solid var(--rf-hair); border-bottom: 0;
+  padding: 11px 0; font-size: 12px; letter-spacing: 0.06em; border-top: 1px solid var(--ab-rf-hair); border-bottom: 0;
 }
-.ab[data-ae="retro-futurist"] .ab-row:last-child { border-bottom: 1px solid var(--rf-hair); }
+.ab[data-ae="retro-futurist"] .ab-row:last-child { border-bottom: 1px solid var(--ab-rf-hair); }
 .ab[data-ae="retro-futurist"] .ab-row-n { color: var(--ab-muted); }
 .ab[data-ae="retro-futurist"] .ab-row-n::before { content: "1.5."; opacity: 0.7; }
 .ab[data-ae="retro-futurist"] .ab-row-name { font-weight: 600; color: var(--ab-ink); }
 .ab[data-ae="retro-futurist"] .ab-row-status { padding: 0; border: 0; border-radius: 0; background: transparent; color: var(--ab-muted); font-size: 9.5px; letter-spacing: 0.12em; }
-.ab[data-ae="retro-futurist"] .ab-row-status::before { content: ""; display: inline-block; width: 7px; height: 7px; margin-right: 7px; vertical-align: 0; background: var(--rf-off); }
-.ab[data-ae="retro-futurist"] .ab-row:first-child .ab-row-status::before { background: var(--rf-signal); }
+.ab[data-ae="retro-futurist"] .ab-row-status::before { content: ""; display: inline-block; width: 7px; height: 7px; margin-right: 7px; vertical-align: 0; background: var(--ab-rf-off); }
+.ab[data-ae="retro-futurist"] .ab-row:first-child .ab-row-status::before { background: var(--ab-rf-signal); }
 .ab[data-ae="retro-futurist"] .ab-row-bar { height: 2px; border-radius: 0; background: var(--rf-hair-2); }
 .ab[data-ae="retro-futurist"] .ab-row-bar i { background: var(--ab-ink); border-radius: 0; }
 .ab[data-ae="retro-futurist"] .ab-row-pct { color: var(--ab-ink); font-weight: 700; }
 
 /* footer */
-.ab[data-ae="retro-futurist"] .ab-foot { font-size: 10px; letter-spacing: 0.16em; border-top: 1px solid var(--rf-hair); padding-top: 16px; }
+.ab[data-ae="retro-futurist"] .ab-foot { font-size: 10px; letter-spacing: 0.16em; border-top: 1px solid var(--ab-rf-hair); padding-top: 16px; }
 .ab[data-ae="retro-futurist"] .ab-motto { color: var(--ab-ink); font-weight: 700; }
-.ab[data-ae="retro-futurist"] .ab-dot { background: var(--rf-signal); border-radius: 0; box-shadow: none; }
+.ab[data-ae="retro-futurist"] .ab-dot { background: var(--ab-rf-signal); border-radius: 0; box-shadow: none; }
 
 .ab[data-ae="retro-futurist"] .ab-seg-btn:focus-visible, .ab[data-ae="retro-futurist"] .ab-cta:focus-visible, .ab[data-ae="retro-futurist"] .ab-switch:focus-visible {
   outline: 2px solid var(--ab-ink); outline-offset: 3px;
@@ -172,8 +171,6 @@
 }
 
 /* ---- deck ---- */
-.ab[data-ae="retro-futurist"].ab-slide .ab-deck-rpct { font-family: var(--rf-mono); }
-.ab[data-ae="retro-futurist"].ab-slide .ab-deck-dot { border-radius: 0; }
 /* cover: the plate is a tall window down the right side of the slide body, the
    statement holds the left (absolute art, so the fit pass never shrinks it to a sticker) */
 .ab[data-ae="retro-futurist"].ab-slide[data-slide="cover"] .ab-deck-cover { position: relative; }
@@ -183,12 +180,10 @@
   position: absolute; top: 0; bottom: 34px; right: 0; left: auto; width: 38% !important; max-width: none !important; height: auto; aspect-ratio: auto; margin: 0;
 }
 /* 06 material: the console is the second idea; the plate stays on the cover */
-.ab[data-ae="retro-futurist"] .ab-deck-stage .ab-art { background: none; aspect-ratio: 1; --dk-art-w: min(100%, 470px); }
-.ab[data-ae="retro-futurist"] .ab-deck-stage .rfa { display: none; }
-.ab[data-ae="retro-futurist"] .ab-deck-stage .rfa-console { display: block !important; position: absolute; inset: 0; }
+.ab[data-ae="retro-futurist"] .ab-deck-stage[data-stage="own"] .ab-art { background: none; aspect-ratio: 1; --dk-art-w: min(100%, 470px); }
 /* 09 do / don't: one visual pair (horizon vs. glow-everything) */
 .ab[data-ae="retro-futurist"].ab-slide .ab-deck-col::before {
-  content: ""; display: block; aspect-ratio: 3 / 1; margin-bottom: 18px; background: var(--rf-do) center / cover no-repeat; box-shadow: inset 0 0 0 1px var(--rf-hair);
+  content: ""; display: block; aspect-ratio: 3 / 1; margin-bottom: 18px; background: var(--rf-do) center / cover no-repeat; box-shadow: inset 0 0 0 1px var(--ab-rf-hair);
 }
 .ab[data-ae="retro-futurist"].ab-slide .ab-deck-col[data-kind="dont"]::before { background-image: var(--rf-dont); }
 
@@ -196,3 +191,6 @@
   .ab[data-ae="retro-futurist"] .ab-cta:active { transform: none; }
   .ab[data-ae="retro-futurist"] .ab-switch, .ab[data-ae="retro-futurist"] .ab-switch::before { transition: none; }
 }
+
+/* weights the faces actually have (font-synthesis: none shows 400 for a missing weight) */
+.ab[data-ae="retro-futurist"] :is(.ab-type-col[data-role="heading"] .ab-type-cur b, .ab-deck-ptitle) { font-weight: var(--rf-hw, 700); }

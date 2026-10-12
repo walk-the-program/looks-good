@@ -85,9 +85,7 @@ registerAesthetic({
   // The product tile: a phone showing the brand (a primary health card with a ring,
   // two list rows, a tab bar), rising from the bottom edge and cropped by it, with two
   // floating chips ("new" in accent, status in secondary). Pure HTML, sized in the
-  // art box's own units (css/aesthetics/bento-grid.css). .bna-sys is the tile system
-  // (1x1, 2x1, 2x2, 1x2 annotated with spans, gap and radius), shown only on the deck's
-  // Material slide in place of the phone.
+  // art box's own units (css/aesthetics/bento-grid.css).
   art(ctx) {
     const e = escapeHtml;
     const name = e(ctx.brandName);
@@ -109,14 +107,6 @@ registerAesthetic({
       </div>
       <div class="bna-chip bna-c1"><i></i>Direction saved</div>
       <div class="bna-chip bna-c2"><b>72%</b>on track</div>
-      <div class="bna-sys">
-        <div class="bna-t bna-t22"><b>2×2</b><span>Hero</span></div>
-        <div class="bna-t bna-t21"><b>2×1</b><span>Wide</span></div>
-        <div class="bna-t bna-t11"><b>1×1</b><span>Stat</span></div>
-        <div class="bna-t bna-t12"><b>1×2</b><span>Tall</span></div>
-        <div class="bna-t bna-t11b"><b>1×1</b><span>Action</span></div>
-        <div class="bna-t bna-t21b"><b>2×1</b><span>Gap 14 · radius 28</span></div>
-      </div>
     </div>`;
   },
 
@@ -146,6 +136,29 @@ registerAesthetic({
   },
   // Deck copy (js/brand-deck.js): three principles, three do / don't lines, each short.
   deck: {
+    // Patterns slide: bento has no pattern culture; its material is the tile system itself
+    // (2x2, 2x1, 1x1, 1x2, annotated with spans, gap 14 and radius 28).
+    patternsStage(ctx) {
+      const tile = (cls, span, name) => `<div class="bns-t ${cls}"><b>${span}</b><span>${name}</span></div>`;
+      return `<div class="bns">
+        ${tile('bns-22', '2×2', 'Hero tile')}
+        ${tile('bns-21', '2×1', 'Wide tile')}
+        ${tile('bns-11', '1×1', 'Stat tile')}
+        ${tile('bns-12', '1×2', 'Tall tile')}
+        ${tile('bns-11b', '1×1', 'Action tile')}
+        ${tile('bns-21b', '2×1', 'Gap 14 · radius 28 · no borders')}
+      </div>`;
+    },
+    // Material slide: the tile materials as a small bento (flat tile, colour tile, numeral
+    // tile, render tile), instead of repeating the hero phone.
+    materialArt(ctx) {
+      return `<div class="bnm">
+        <div class="bnm-t bnm-render"><span>Render tile</span></div>
+        <div class="bnm-t bnm-num"><b>72%</b><span>Numeral tile</span></div>
+        <div class="bnm-t bnm-colour"><span>Colour tile</span></div>
+        <div class="bnm-t bnm-flat"><b>One idea.</b><span>Flat tile</span></div>
+      </div>`;
+    },
     principles: [
       ['One tile, one idea', 'Each block says a single thing, with room around it.'],
       ['Rounded tiles, no borders', 'Radius 28, flat on a darker canvas, 14px gaps.'],

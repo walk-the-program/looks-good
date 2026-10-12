@@ -179,7 +179,6 @@ registerAesthetic({
     const cap = (fill, mirror) => sv(24, 48, `<g${mirror ? ' transform="translate(24 0) scale(-1 1)"' : ''}><path d="${capFill}" fill="${fill}"/><path d="${capLine}" fill="none" stroke="${line}" stroke-width="1.5" ${ns}/></g>`);
     const outer = (mirror) => sv(30, 60, `<g${mirror ? ' transform="translate(30 0) scale(-1 1)"' : ''}><path d="M30 2H16C16 7 12 11 8 11C4 11 2 19 2 30C2 41 4 49 8 49C12 49 16 53 16 58H30" fill="none" stroke="${line}" stroke-width="1" ${ns}/><path d="M8 11C3 9 2 4 6 3C9 2.5 10 6 7.5 7" fill="none" stroke="${line}" stroke-width="1" ${ns}/><path d="M8 49C3 51 2 56 6 57C9 57.5 10 54 7.5 53" fill="none" stroke="${line}" stroke-width="1" ${ns}/></g>`);
     const curl = sv(26, 26, `<path d="M25 25C10 25 2 18 2 10C2 4 6 1.5 10 1.5C14 1.5 16 4.5 15.5 7.5C15 10 12.5 11 10.5 10C9 9.2 9 7 10.5 6.6" fill="none" stroke="${line}" stroke-width="1.5" stroke-linecap="round"/>`, true);
-    const rnd = anRand(11);
     const divPts = whiplash([2, 8], [30, 2], [50, 14], [66, 8], 4.2, -1, 1.1);
     const divider = sv(140, 16, `<path d="${ribbon(divPts, 0.6, 1.8, 0.6)}" fill="${line}"/><g transform="translate(140 0) scale(-1 1)"><path d="${ribbon(divPts, 0.6, 1.8, 0.6)}" fill="${line}"/></g><circle cx="70" cy="8" r="2.4" fill="${acc}" stroke="${line}" stroke-width="1"/>`, true);
     const ornament = sv(120, 20, `<path d="M0 10H38" stroke="${line}" stroke-width="1"/><path d="M82 10H120" stroke="${line}" stroke-width="1"/><path d="${ribbon(whiplash([38, 10], [46, 10], [52, 3], [58, 6], 3.4, 1, 1), 0.6, 2, 0.6)}" fill="${line}"/><g transform="translate(120 0) scale(-1 1)"><path d="${ribbon(whiplash([38, 10], [46, 10], [52, 3], [58, 6], 3.4, 1, 1), 0.6, 2, 0.6)}" fill="${line}"/></g>${bud(60, 15, 0, 0.75, acc, line)}`, true);
@@ -314,6 +313,7 @@ registerAesthetic({
   },
 
   deck: {
+    marks: (ctx, kind, i) => `<i class="an-mk" data-k="${kind === 'do' ? 'do' : 'dont'}">${['I', 'II', 'III'][i] || ''}</i>`,
     principles: [
       ['Every line grows like a stem', 'Stems end in curls, buds and spirals.'],
       ['Frame it, then let it flow', 'Content sits in an arch; ornament curves around it.'],

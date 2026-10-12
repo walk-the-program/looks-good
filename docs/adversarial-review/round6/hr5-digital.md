@@ -672,3 +672,53 @@ Deck copy now matches the art.
 - **pixel-arcade (6/10).** An owned world at one pixel scale. Short of the reference: the scene is far below eBoy or Sea of Stars density, and the protagonist is small.
 - **pirate-broadcast (7/10).** A true teletext page with Mode 7-style headlines and a fixed palette. Short of the reference: the glyphs lack SAA5050 diagonal smoothing.
 - **blob-tracking (6.5/10).** A nameable subject with legible tabs. Short of the reference: the figures are still crude next to photographic YOLO footage.
+
+## Adoption log (fx65)
+
+ADOPT pass, packet rev 3. Status: submitted. Only my 12 files changed (diff: 11 files, +132 / −120).
+
+**Hooks adopted and hacks removed**
+- **retro-futurist**
+  - The console moved out of `art()`, where it sat hidden behind `display:none` and slide CSS, into `deck.materialArt`.
+  - "Mission log" is now a real `<li>` through `panels.list`. It used to be `.ab-list::before` generated text.
+  - Added an `rfWeight()` helper (`--rf-hw`), so Michroma gets its 400 and Syncopate its 700.
+  - CSS vars renamed to `--ab-rf-*`, so material placeholders resolve and the old aliases are gone.
+  - Deleted the dead `.ab-deck-rpct` / `.ab-deck-dot` rules, the unused `--rf-signal-raw`, and the duplicate hair/off/panel tokens.
+- **y2k-chrome**
+  - The gel swatch moved out of the hidden `art()` markup and its `!important` stage rule into `deck.materialArt`, which draws the sculpture plus the gel.
+  - Deleted `.ab-deck-dot`; dropped 6 unused tokens (acc-glow, chrome-hl, pri-deep, pri-glow-35, pri-hi, sec-glow) and the dead chrome helpers; merged a duplicated `state` lookup.
+  - Weights: 9× `700` set in Sora now ask for `600` (Sora has 400;600).
+- **cyber-hud**
+  - `layout.order: ['hero','sections','palette','type']`: the viewport, then the system panels.
+  - Deleted `.ab-deck-dot` / `.ab-deck-rpct`, the unused `--ab-hud-glow` and the type-pick weight override (picks now render at their real 400).
+- **pixel-arcade**
+  - Deleted `.ab-deck-dot` / `.ab-deck-rpct`.
+  - The material stage width uses `--dk-art-w` instead of `!important`.
+  - Dropped unused `--ab-glow`, `--ab-px` and `--ab-s-deep`.
+  - VT323 deck elements (titles, pair names, marks) pinned to 400.
+- **pirate-broadcast**
+  - `panels.card` / `panel` / `list` now give real P101/P102/P103 title rows. They were `::before` generated text.
+  - The test card is inline SVG in the 02 panel, replacing a ~10 KB data-URI token on the root style and the 75% margin trick.
+  - `deck.materialArt` draws the test card; the hidden `.pba-card` and its `!important` stage rules are gone.
+  - `layout.order: ['hero','sections','palette','type']`: the teletext page, then its index screens.
+  - Deleted all dead `.ab-deck-row/-rows/-rname/-rpct/-dot/-side` rules. Headlines and chips pinned to VT323 400; `.ab-type-k` set to 600.
+- **blob-tracking**
+  - Deleted `.ab-deck-dot` / `.ab-deck-rpct`. The deck pair chips use `--ab-hw`.
+  - The material-stage sizing rule stays: it is styling, not a hack.
+
+**Re-checked, no change needed**
+- In product (default) is native in all six: board rows, LV badges, P-numbers, ID tabs, brackets.
+- Do/Don't uses the default number marks. retro-futurist's horizon versus glow visual pair still sits above the headings.
+- No `font-size: 0` or mask tricks are left. Section reorders were not used, because they would scramble the 01/02/03 numbering.
+- Panel IDs (cyber-hud) and frame counters (blob-tracking) stay as decorative CSS labels.
+
+**curio-cabinet × y2k-chrome blend.** I could not reproduce the 1.33:1 state-name contrast. I tested both directions, both modes, subtle, balanced and bold, and four custom channel sets; the interface slide was clean in all of them. The one remaining item is curio-cabinet's product row "03", 1px over its box whenever y2k type is on. That is the base's row layout, so it belongs to curio-cabinet.
+
+**Checks (after the shared changes landed, no shim)**
+- Boards A–D: 390px overflow 0 for all six.
+- Gore, 4 configs: 240 slides, 0 issues. It was also 0 with the shim before the shared changes landed.
+- Weight audit (`fw/weights.js` limited to my keys): 0 mismatches.
+- `node tests/run.js`: all passed.
+- `harness.js`: briefs 192, fails 0.
+- `src-verify-p5.js`: fails 0, map mismatches 0.
+- Console: 0 errors.

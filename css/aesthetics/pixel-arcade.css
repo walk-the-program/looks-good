@@ -235,13 +235,11 @@
 }
 
 /* ---- deck ---- */
-.ab[data-ae="pixel-arcade"].ab-slide .ab-deck-dot { border-radius: 0; }
-.ab[data-ae="pixel-arcade"].ab-slide .ab-deck-rpct { font-family: var(--ab-font-label); }
 /* cover and material stage: the screen at 4 or 3 px per unit, centred */
 .ab[data-ae="pixel-arcade"].ab-slide[data-slide="cover"] { --pxs: 3; }
 .ab[data-ae="pixel-arcade"].ab-slide[data-slide="cover"][data-hero="scene"] .ab-deck-cover .ab-hero-copy { margin: calc(var(--pxs) * 26px) calc(168px * var(--pxs) * 0.45 - 32px) 0 0; }
 .ab[data-ae="pixel-arcade"].ab-slide[data-slide="cover"][data-hcls="pixel"] .ab-hero .ab-headline { font-size: calc(var(--pxs) * 8px * var(--ab-hs, 1)); line-height: 1.25; }
-.ab[data-ae="pixel-arcade"] .ab-deck-stage .ab-art { width: calc(168px * 3) !important; aspect-ratio: 168 / 80; box-shadow: var(--px-bd); background: #130d24; }
+.ab[data-ae="pixel-arcade"] .ab-deck-stage .ab-art { --dk-art-w: calc(168px * 3); aspect-ratio: 168 / 80; box-shadow: var(--px-bd); background: #130d24; }
 
 @media (prefers-reduced-motion: reduce) {
   .ab[data-ae="pixel-arcade"] .ab-hero-copy::after, .ab[data-ae="pixel-arcade"] .ab-dot { animation: none; opacity: 1; }
@@ -251,3 +249,6 @@
 /* in product (the deck renders the board's own rows in a narrower column): no bar, the names keep their room */
 .ab[data-ae="pixel-arcade"].ab-slide .ab-deck-prod .ab-row { grid-template-columns: 4.6ch 28px minmax(0, 1fr) auto 5ch; }
 .ab[data-ae="pixel-arcade"].ab-slide .ab-deck-prod .ab-row-bar { display: none; }
+
+/* weights the faces actually have (font-synthesis: none shows 400 for a missing weight) */
+.ab[data-ae="pixel-arcade"].ab-slide :is(.ab-deck-ptitle, .ab-deck-pname, .ab-deck-pairs b, .ab-deck-mark) { font-weight: 400; }

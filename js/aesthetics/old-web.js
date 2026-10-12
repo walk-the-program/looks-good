@@ -206,6 +206,23 @@ registerAesthetic({
     </div>`;
   },
 
+  // 03 as a real grid-lined table: raised column headers (list-view style), folder icons,
+  // link names (the second one visited), a NEW! badge, segmented navy progress.
+  panels: {
+    list(ctx) {
+      const e = ctx.e;
+      const sec = ctx.t.secondary;
+      const rows = (ctx.rows || []).slice(0, 3).map((r, i) => `<li class="ab-row">
+          <span class="ab-row-n" aria-hidden="true">${OW_ICONS.folder(sec)}</span>
+          <span class="ab-row-name"><a class="${i === 1 ? 'ow-vis' : ''}">${e(r[0])}</a></span>
+          <span class="ab-row-status">${e(r[1])}${i === 0 ? ' <i class="ow-new">NEW!</i>' : ''}</span>
+          <span class="ab-row-bar" aria-hidden="true"><i style="width:${Number(r[2]) || 0}%"></i></span>
+          <span class="ab-row-pct">${Number(r[2]) || 0}%</span>
+        </li>`).join('');
+      return `<ul class="ab-list ow-table"><li class="ab-row ow-th" aria-hidden="true"><span></span><span>Name</span><span>Status</span><span>Progress</span><span>Done</span></li>${rows}</ul>`;
+    },
+  },
+
   materials: [
     { name: 'Raised bevel', css: 'background: #C0C0C0; box-shadow: {raised}; border-radius: 0; color: #000000; font: 11px Tahoma, Verdana, sans-serif; /* the exact four-tone bevel: white and #DFDFDF top-left, #808080 and #0A0A0A bottom-right; the default button gets an extra 1px black frame */' },
     { name: 'Sunken field', css: 'background: #FFFFFF; box-shadow: {sunken}; border-radius: 0; color: #000000; /* the raised pairs swapped; text fields, the counter, progress tracks */' },
@@ -232,6 +249,8 @@ registerAesthetic({
   // Deck copy (js/brand-deck.js): three principles, three do / don't lines, each short.
   deck: {
     coverDisplay: 0.86,
+    // Do / Don't marks are classic sunken checkboxes: ticked for do, crossed for don't.
+    marks: (ctx, kind) => `<i class="ow-chk ${kind === 'do' ? 'is-on' : 'is-x'}"></i>`,
     principles: [
       ['Default HTML, made with love', 'Plain markup, earnestly decorated.'],
       ['Bevel, link, badge, repeat', 'The same few parts, used everywhere.'],

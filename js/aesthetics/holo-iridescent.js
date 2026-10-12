@@ -68,12 +68,9 @@
       const wash = d ? 0.06 : 0.22;
       const w = hex => t.alpha(hex, wash);
       const spec = ['#ff9ad5', '#8fe3ff', '#b79cff', '#8bf5c4', '#ffe08f'];
-      // Art spectrum: bright light on black, deeper tones on pearl so it still reads.
-      const art = d ? ['#ff8fd0', '#7fdcff', '#a98cff', '#7df0bd', '#ffd978'] : ['#e46bb4', '#4fb3e6', '#8f6bef', '#38c08f', '#ecb23e'];
       const hair = a => spec.map(c => t.alpha(c, a));
       const hairA = d ? 0.85 : 1;
       const h = hair(hairA);
-      const rim = i => art[i];
       return {
         '--ab-pearl': [
           `radial-gradient(55% 34% at 6% 0%, ${w('#ffd6f0')}, transparent)`,
@@ -83,9 +80,6 @@
         ].join(','),
         '--ab-spec-conic': `conic-gradient(from 210deg, ${h[0]}, ${h[1]}, ${h[2]}, ${h[3]}, ${h[4]}, ${h[0]})`,
         '--ab-spec-linear': `linear-gradient(115deg, ${h[0]}, ${h[1]} 28%, ${h[2]} 52%, ${h[3]} 76%, ${h[4]})`,
-        '--ab-rim-conic': `conic-gradient(from 200deg, ${rim(0)}, ${rim(1)}, ${rim(2)}, ${rim(3)}, ${rim(4)}, ${rim(0)})`,
-        '--ab-rim-conic-2': `conic-gradient(from 20deg, ${rim(2)}, ${rim(3)}, ${rim(4)}, ${rim(0)}, ${rim(1)}, ${rim(2)})`,
-        '--ab-rim-glow': t.alpha(art[2], d ? 0.3 : 0.16),
         '--ab-card-solid': d ? t.mix('#ffffff', t.canvas, 0.035) : t.mix('#ffffff', t.canvas, 0.7),
         '--ab-hair': t.alpha(t.ink, d ? 0.16 : 0.14),
         '--ab-hair-strong': t.alpha(t.ink, d ? 0.34 : 0.28),

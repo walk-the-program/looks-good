@@ -86,7 +86,6 @@ registerAesthetic({
       '--ab-hz-stripe': '#F2C500',
       '--ab-hz-tag': '#EFEDE6',
       '--ab-hz-lit': '#00A651',
-      '--ab-hz-ring': t.alpha(t.primary, 0.5),
       '--ab-type-pick-w': '700',
     };
   },
@@ -96,7 +95,7 @@ registerAesthetic({
   // line (tank, valve, pump; one live segment), five lamps in the ladder's own colours (PWR white, RUN green,
   // ALM yellow lit; LCK red and TST dark) and a 45 degree stripe rail on the lower edge. Pure SVG.
   art(ctx) {
-    const e = escapeHtml;
+    const e = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
     const ini = e(ctx.initial);
     const screw = (x, y) => `<g class="hz-screw"><circle cx="${x}" cy="${y}" r="1.7"/><path d="M${x - 1} ${y - 1} L${x + 1} ${y + 1}"/></g>`;
     const lamps = [['PWR', 'pwr'], ['RUN', 'run'], ['ALM', 'alm'], ['LCK', 'lck'], ['TST', '']];

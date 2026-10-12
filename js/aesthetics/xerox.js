@@ -101,6 +101,14 @@ function xrDefs() {
   </defs></svg>`;
 }
 
+// The body face's bold and the heading face's heaviest weight, only from weights the face has.
+function xrBold(font, want) {
+  const w = String((font && font.weights) || '400').split(';').map(Number).filter(Boolean);
+  const le = w.filter(x => x <= want);
+  return le.length ? Math.max(...le) : Math.min(...w);
+}
+const xrSheet = (html, n) => html.replace(/^(\s*<div class="ab-(?:card|panel)">)/, `$1<span class="xr-sheet" aria-hidden="true">SHEET ${n} / 2</span>`);
+
 registerAesthetic({
   key: 'xerox', order: 22,
   name: 'Xerox',
@@ -152,25 +160,21 @@ registerAesthetic({
     const st = typeof state !== 'undefined' ? state : null;
     const hf = st && st.headingFont;
     const d = t.isDark;
-    const ws = String((hf && hf.weights) || '400').split(';').map(Number).filter(Boolean);
-    const le = ws.filter(x => x <= 900);
-    const hw = le.length ? Math.max(...le) : Math.min(...ws);
+    const hw = xrBold(hf, 900);
     const stock = xrStock(t.primary);
     const paper = stock.hex;                      // sheets are the stock in both modes
     const ink = d ? t.mix('#ffffff', paper, 0.25) : XR_TONER;   // on the black platen, type is paper-white
     const mutedOn = (fg, bg) => { let m = t.mix(fg, bg, 0.62); for (let k = 0; k < 8 && t.contrast(m, bg) < 4.6; k++) m = t.mix(fg, m, 0.25); return m; };
     // each brand colour as the copier sees it: toner density from its luminance (dot radius, % of the 6px cell)
     const dens = hex => Math.round(Math.max(6, Math.min(94, (1 - relativeLuminance(hex)) * 100)));
-    const brand = typeof effectiveContent === 'function' ? String(effectiveContent().brandName || '') : '';
-    const ini = (typeof abInitial === 'function' ? abInitial(brand) : 'X').replace(/["\\]/g, '');
     const v = {
       '--ab-tr': (hf && { wide: 0.4, techno: 0.4 }[hf.cls]) ?? 1,
-      '--ab-type-pick-w': hw,
+      '--ab-type-pick-w': 400,   // each pick is set in its own face: only the lead heading pick gets the heading weight
       '--ab-hw': hw,
       '--xr-paper': paper,
       '--xr-toner': XR_TONER,
       '--xr-paper-muted': mutedOn(XR_TONER, paper),
-      '--xr-ini': `"${ini}"`,
+      '--xr-bw': xrBold(st && st.bodyFont, 700),
       '--xr-stock-name': `"${stock.name.toUpperCase()} STOCK"`,
       '--xr-d2': `"copies as ${dens(t.secondary)}% toner"`,
       '--xr-d3': `"copies as ${dens(t.accent)}% toner"`,
@@ -242,10 +246,33 @@ registerAesthetic({
       <g filter="url(#xrx-g5)" style="mix-blend-mode:multiply"><rect x="0" y="0" width="66" height="200" fill="#000"/><rect x="66" y="0" width="52" height="200" fill="url(#${id}r)"/></g>
       <g stroke-width=".5" fill="none">${ticks}</g>
       <g style="${font}" font-size="4.4">${nums}</g>
-      <g transform="rotate(-90 12 150)" fill="${paper}" style="${font}" font-size="5.6" letter-spacing=".5" font-weight="700"><text x="12" y="152">A4 → A3 · 141% · LID OPEN · COPY 032/050</text></g>
-      <g style="mix-blend-mode:multiply" transform="translate(150 24)"><rect x="0" y="0" width="64" height="22" fill="none" stroke="${t.primary}" stroke-width="2"/><rect x="2.6" y="2.6" width="58.8" height="16.8" fill="none" stroke="${t.primary}" stroke-width=".8"/><text x="32" y="10" text-anchor="middle" fill="${t.primary}" font-size="6.4" font-weight="700" letter-spacing=".8" style="${font}">RECEIVED</text><text x="32" y="16.6" text-anchor="middle" fill="${t.primary}" font-size="4.6" letter-spacing=".5" style="${font}">COPY ROOM · 032</text></g>
+      <g transform="rotate(-90 12 150)" fill="${paper}" style="${font};font-weight:var(--xr-bw,700)" font-size="5.6" letter-spacing=".5"><text x="12" y="152">A4 → A3 · 141% · LID OPEN · COPY 032/050</text></g>
+      <g style="mix-blend-mode:multiply" transform="translate(150 24)"><rect x="0" y="0" width="64" height="22" fill="none" stroke="${t.primary}" stroke-width="2"/><rect x="2.6" y="2.6" width="58.8" height="16.8" fill="none" stroke="${t.primary}" stroke-width=".8"/><text x="32" y="10" text-anchor="middle" fill="${t.primary}" font-size="6.4" letter-spacing=".8" style="${font};font-weight:var(--xr-bw,700)">RECEIVED</text><text x="32" y="16.6" text-anchor="middle" fill="${t.primary}" font-size="4.6" letter-spacing=".5" style="${font}">COPY ROOM · 032</text></g>
       <path d="M176 0V200" stroke="${toner}" stroke-opacity=".1" stroke-width="7" fill="none" filter="url(#xrx-rule)"/>
     </svg></div>`;
+  },
+
+  // 02 states: three generations of the brand initial (real text, run through #xrx-gen1/3/7)
+  states(ctx) {
+    const e = ctx.e, ini = e(ctx.initial);
+    return (ctx.labels || []).map((name, i) => `<div class="ab-state" data-s="${i}"><span class="xr-gen" data-s="${i}" aria-hidden="true"><b>${ini}</b></span><span class="ab-state-name">${e(name)}</span></div>`).join('');
+  },
+  // Real markup for the parts the board used to draw with CSS content: the sheet count on the
+  // copied sheets and the roster's "No." numbers and copy counts (72% of 50 copies = 036/050).
+  panels: {
+    card: ctx => xrSheet(ctx.parts.cardBase(), 1),
+    panel: ctx => xrSheet(ctx.parts.panelBase(), 2),
+    list(ctx) {
+      const e = ctx.e;
+      return `<ul class="ab-list">${ctx.rows.map((r, i) => `<li class="ab-row">
+      <span class="ab-row-n">No.${String(i + 1).padStart(2, '0')}</span>
+      <span class="ab-av" aria-hidden="true">${e(r[0][0])}</span>
+      <span class="ab-row-name">${e(r[0])}</span>
+      <span class="ab-row-status">${e(r[1])}</span>
+      <span class="ab-row-bar" aria-hidden="true"><i style="width:${r[2]}%"></i></span>
+      <span class="ab-row-pct" title="${r[2]}%">${String(Math.round(r[2] / 2)).padStart(3, '0')}/050</span>
+    </li>`).join('')}</ul>`;
+    },
   },
 
   materials: [

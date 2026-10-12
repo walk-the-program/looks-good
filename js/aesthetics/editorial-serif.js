@@ -83,7 +83,7 @@ registerAesthetic({
     const ui = brandSans ? (brandSans === b ? 'var(--ab-font-b)' : 'var(--ab-font-h)')
       : '"Inter", "Helvetica Neue", Helvetica, Arial, sans-serif';
     const d = t.isDark;
-    const { deep, mid, spot, lite, lightN } = edsTones(t);
+    const { deep, spot, lite, lightN } = edsTones(t);
     return {
       '--ab-tr': tr,
       '--ab-font-ui': ui,
@@ -94,11 +94,9 @@ registerAesthetic({
       // duotone plate: black (the dark neutral, nudged toward the primary) plus one spot
       // tint (the primary into the light neutral). Paper = the light neutral in both modes.
       '--ab-eds-deep': deep,
-      '--ab-eds-mid': mid,
       '--ab-eds-spot': spot,
       '--ab-eds-lite': lite,
       '--ab-eds-paperlight': lightN,
-      '--ab-eds-ink-hover': t.mix(t.ink, t.primary, 0.88),
     };
   },
 
@@ -149,6 +147,24 @@ registerAesthetic({
       </div>
       <figcaption class="eds-fig"><span><em>Fig. 1</em> — Still life, the studio table</span><span class="eds-folio">p. 01</span></figcaption>
     </figure>`;
+  },
+
+  // 02 on the board is a text page, in real markup: two justified columns of body serif
+  // (the board's only drop cap), a pull quote between hairlines, the states, and a byline
+  // with a folio. The deck's Interface slide still takes the field and toggle from the
+  // default panel (the framework falls back to it when this markup lacks them).
+  panels: {
+    panel(ctx) {
+      return `<div class="ab-panel eds-page">
+          <div class="eds-cols">
+            <p class="eds-p">Every page begins with a single decision about scale. The cover gives the image the room and lets one line of type stand against it; inside, the rhythm changes to columns, folios and hairlines, and the reader slows down.</p>
+            <p class="eds-p">A design language works the same way. It holds a few things steady (the paper, the ink, the faces and the measure) so that the stories can change from issue to issue without the page losing its voice. Nothing here is decoration: a rule separates, a caption explains, an italic word marks the turn in a sentence.</p>
+          </div>
+          <blockquote class="eds-pull"><p>\u201CA brand does not need to raise its voice to be heard.\u201D</p></blockquote>
+          ${ctx.parts.states()}
+          <p class="eds-by"><span>Words by the editors \u00B7 Photographs by the studio</span><span>p. 14</span></p>
+        </div>`;
+    },
   },
 
   materials: [

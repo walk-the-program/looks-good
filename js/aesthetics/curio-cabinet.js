@@ -24,7 +24,7 @@
      progress is compartments filling, string-tied tags for status, a brass plaque footer.
    - Colour: baize, oak, label paper, label ink and brass are fixed; primary = drawer fronts,
      secondary = object materials (glass, enamel, beads), accent = pin heads and the treasured glow.
-   The deck's Material stage shows a second art variant: a Haeckel-style plate of nine numbered
+   The deck's Material slide (def.deck.materialArt) shows a Haeckel-style plate of nine numbered
    procedural rosettes on cream, so the cover's tray is not repeated. */
 
 const CC = {
@@ -359,7 +359,8 @@ registerAesthetic({
   mode: 'dark',
   slideShape: 'classic',
   labels: { material: 'Specimens', states: ['Found', 'Pinned', 'Treasured'], statesKind: 'swatch' },
-  layout: { hero: 'split', palette: 'swatches', sections: 'two-col' },
+  // the cabinet first, its drawers next, the specimen card for type last (the legend of the board)
+  layout: { hero: 'split', palette: 'swatches', sections: 'two-col', order: ['hero', 'palette', 'sections', 'type'] },
   type: { ui: 'body', label: 'body', display: 0.74 },
   highlight: 'custom',
   highlightNote: 'The headline is a museum label (cream card, ink type); the highlighted last word is set in the heading face\'s italic like a Latin name, followed by a small typed figure reference (fig. 7). No colour on the word; the accent belongs to pin heads and the treasured object.',
@@ -429,7 +430,7 @@ registerAesthetic({
     const id = `cc${++ccSeq}`;
     const rnd = ccRand(ccHash(String(ctx.brandName || 'brand') + '|cc'));
     const legend = CC_ITEMS.map((it, i) => `<li><b>${i + 1}</b><span>${escapeHtml(it[0])}</span><i>${escapeHtml(it[1])}</i></li>`).join('');
-    return `<div class="cc-art"><div class="cc-trayw">${ccTray(ctx, id, rnd)}</div>${ccPlate(ctx, id + 'p')}<ol class="cc-legend">${legend}</ol></div>`;
+    return `<div class="cc-art"><div class="cc-trayw">${ccTray(ctx, id, rnd)}</div><ol class="cc-legend">${legend}</ol></div>`;
   },
 
   materials: [
@@ -472,6 +473,9 @@ registerAesthetic({
       'Fill every compartment; leave some empty.',
       'Use clinical white; that\'s Dystopian Luxury.',
     ],
+    // the Material slide shows a Haeckel-style plate, not the cover's tray again
+    materialArt: ctx => `<div class="cc-art">${ccPlate(ctx, `cc${++ccSeq}p`)}</div>`,
+    marks: (ctx, kind) => (kind === 'do' ? '<i class="cc-mk"></i>' : '✕'),
     coverDisplay: 0.6,
     coverBand: false,
     closingStrip: false,
