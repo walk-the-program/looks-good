@@ -8,7 +8,7 @@
      Patterns.get(key) / defaults(key) / schema(key)
      Patterns.inksFor(stateOrTokens, colorway, {tints})
          colorway: brand | mono | duotone | night (brand roles), or a FIXED colourway
-         (spectrum | tonal | broadcast | primaries | earth | brass | safety: E.COLORWAYS
+         (spectrum | tonal | broadcast | primaries | earth | brass | safety | hud | toner: E.COLORWAYS
          entries with fixed: true, hexes in E.FIXED_INKS; docs/patterns.md)
      Patterns.render(canvas, key, params, inks, seed, opts)   -> {ms,w,h}
      Patterns.renderSVG(key, params, inks, seed, opts)        -> string|null
@@ -303,6 +303,8 @@
     { value: 'earth', label: 'Earth', fixed: true, note: 'a fixed 1970s earth ramp (brown, burnt orange, orange, harvest gold, avocado) on the canvas, with the brand primary as one band' },
     { value: 'brass', label: 'Brass', fixed: true, note: 'fixed brass (gold, pale gold, dark bronze; deeper on a light canvas) on the canvas' },
     { value: 'safety', label: 'Safety', fixed: true, note: 'one fixed safety colour (orange #FF4A1C on a light canvas, yellow #FFE500 on a dark one) with the ink' },
+    { value: 'hud', label: 'HUD', fixed: true, note: 'fixed head-up-display phosphor: cyan lines and a teal second ink on a near-black ground (deep teal on pale grey when the canvas is light), one hot-pink spark' },
+    { value: 'toner', label: 'Toner', fixed: true, note: 'one ink (the ink neutral) on the canvas, no tints: toner or paper' },
   ];
   // The fixed hexes of each fixed colourway (light and dark ground where they differ).
   E.FIXED_INKS = {
@@ -318,6 +320,10 @@
       dark: { ink1: '#c8a24a', ink2: '#f1d592', deep: '#7a5a1e', spark: '#f1d592' },
     },
     safety: { light: '#ff4a1c', dark: '#ffe500' },
+    hud: {
+      dark: { ground: '#05070a', ink1: '#00f0ff', ink2: '#0a6f7a', deep: '#5ff6ff', spark: '#ff2a6d' },
+      light: { ground: '#e9ecef', ink1: '#007c86', ink2: '#7fb6bb', deep: '#0b0d10', spark: '#c4124d' },
+    },
   };
   E.isFixedColorway = v => !!(E.COLORWAYS.find(c => c.value === v) || {}).fixed;
 
@@ -371,6 +377,12 @@
     } else if (cw === 'safety') {
       const sc = E.FIXED_INKS.safety[darkGround ? 'dark' : 'light'];
       ground = g; ink1 = sc; ink2 = k; deep = k; spark = sc;
+    } else if (cw === 'hud') {
+      const s = E.FIXED_INKS.hud[darkGround ? 'dark' : 'light'];
+      ground = s.ground; ink1 = s.ink1; ink2 = s.ink2; deep = s.deep; spark = s.spark;
+    } else if (cw === 'toner') {
+      ground = g; ink1 = k; ink2 = k; spark = k; deep = k;
+      fx = { t1: k, t2: k, mute: k };
     } else if (cw === 'mono') {
       ground = g; ink1 = k; ink2 = mix(k, g, 0.5); spark = k; deep = k;
     } else if (cw === 'duotone') {
@@ -395,8 +407,30 @@
     ramp.sort((a, b) => lum(b) - lum(a));
     const out = { ground, ink1, ink2, spark, deep, t1, t2, mute, pool, ramp, colorway: cw, tints, dark: lum(ground) < 0.3 };
     if (E.isFixedColorway(cw)) out.fixed = true;   // only on fixed colourways, so brand-mapped inks keep their exact shape
+    if (cw === 'spectrum') {
+      // The thin-film order (pink, violet, cyan, mint, gold, back to pink) with a midpoint
+      // between each pair: ten stops a family can blend through (E.spectrumAt) instead of
+      // banding three flat inks. sparkStops: the cool stops a spark uses under spectrum, so
+      // no lone warm speck lands in a pearl suite (weave, stipple).
+      const s = E.FIXED_INKS.spectrum[darkGround ? 'dark' : 'light'];
+      const hues = [s.ink1, s.deep, s.ink2, s.t1, s.spark];
+      out.stops = [];
+      hues.forEach((c, i) => { out.stops.push(c, mix(c, hues[(i + 1) % hues.length], 0.5)); });
+      out.sparkStops = [s.t1, s.deep, s.ink2];
+    }
     return out;
   };
+
+  // A colour on the spectrum colourway's cyclic stop ramp, blended (t in turns, any real
+  // number; 0 and 1 are the first stop). Returns [r,g,b]. Callers check inks.stops first.
+  E.spectrumAt = function (inks, t) {
+    const st = inks.stops, n = st.length;
+    const x = mod(t, 1) * n, i = Math.floor(x) % n, f = smooth(x - Math.floor(x));
+    const a = E.rgb(st[i]), b = E.rgb(st[(i + 1) % n]);
+    return [a[0] + (b[0] - a[0]) * f, a[1] + (b[1] - a[1]) * f, a[2] + (b[2] - a[2]) * f];
+  };
+  // The spark ink for the k-th spark mark: inks.spark, or a cool spectrum stop under spectrum.
+  E.sparkInk = (inks, k) => (inks.sparkStops ? inks.sparkStops[(k || 0) % inks.sparkStops.length] : inks.spark);
 
   // Spark budget: spark ink may cover at most `frac` of the area.
   E.budget = function (total) {
@@ -716,6 +750,7 @@
       const q = c => mix(c, ink.ground, tone);
       ink.ink1 = q(ink.ink1); ink.ink2 = q(ink.ink2); ink.deep = q(ink.deep);
       ink.t1 = q(ink.t1); ink.t2 = q(ink.t2); ink.mute = q(ink.mute);
+      if (ink.stops) ink.stops = ink.stops.map(q);
       rebuildPool(ink, p.tints);
     }
     if (applyFloor(ink, tone)) rebuildPool(ink, p.tints);

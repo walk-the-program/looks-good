@@ -95,11 +95,11 @@ function boardTokens(state, def) {
     if (adjusted && typeof adjusted === 'string') canvas = adjusted;
   }
   // muted = ink moved 40% toward canvas, then pulled back toward ink until
-  // small labels stay readable (>= 4.5:1).
+  // small labels clear 4.5:1 with a margin (>= 4.6:1; a 4.49 rounds to a fail).
   let toward = 0.4;
   let muted = slMix(canvas, ink, toward);
-  while (toward > 0.05 && contrastRatio(muted, canvas) < 4.5) {
-    toward -= 0.05;
+  while (toward > 0 && contrastRatio(muted, canvas) < 4.6) {
+    toward = Math.max(0, toward - 0.025);
     muted = slMix(canvas, ink, toward);
   }
   const t = {

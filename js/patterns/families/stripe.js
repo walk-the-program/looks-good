@@ -149,8 +149,9 @@
             sparked = true;
             const x = Math.round(rng.range(W * 0.2, W * 0.8));
             const w = Math.max(2, Math.round(unit * 0.8));
-            if (dx === 0) g.rect(x, y0, w, rh, inks.spark);
-            else g.poly([x, y0, x + w, y0, x + w + dx, y0 + rh, x + dx, y0 + rh], inks.spark);
+            const sc = E.sparkInk(inks, 0);   // a cool spectrum stop under spectrum
+            if (dx === 0) g.rect(x, y0, w, rh, sc);
+            else g.poly([x, y0, x + w, y0, x + w + dx, y0 + rh, x + dx, y0 + rh], sc);
           }
         });
       }
@@ -215,11 +216,26 @@
         return (v + wv) * freq;
       };
       const img = ctx.createImageData(W, H), data = img.data;
+      // spectrum colourway: the stripes blend through the ten spectrum stops (one stop per
+      // stripe, smoothstepped between neighbours) instead of cycling three flat inks
+      const spec = inks.stops ? inks.stops.map(E.rgb) : null;
+      const sn = spec ? spec.length : 0;
+      const savg = spec ? [0, 1, 2].map(k => spec.reduce((s, c) => s + c[k], 0) / sn) : null;
       for (let y = 0; y < H; y++) {
         for (let x = 0; x < W; x++) {
           const v = f(x + 0.5, y + 0.5);
           let fw = Math.abs(f(x + 1.5, y + 0.5) - v) + Math.abs(f(x + 0.5, y + 1.5) - v);
           if (fw < 1e-4) fw = 1e-4;
+          if (spec) {
+            const o = (y * W + x) * 4;
+            if (fw > 1.2) { data[o] = savg[0]; data[o + 1] = savg[1]; data[o + 2] = savg[2]; } else {
+              const q = v - Math.floor(v / sn) * sn, i0 = Math.floor(q) % sn, sf = E.smooth(q - Math.floor(q));
+              const a0 = spec[i0], a1 = spec[(i0 + 1) % sn];
+              data[o] = a0[0] + (a1[0] - a0[0]) * sf; data[o + 1] = a0[1] + (a1[1] - a0[1]) * sf; data[o + 2] = a0[2] + (a1[2] - a0[2]) * sf;
+            }
+            data[o + 3] = 255;
+            continue;
+          }
           let pos = v - Math.floor(v / cycle) * cycle;
           let idx = Math.floor(pos); const fr = pos - idx;
           let c = cols[idx % cycle];

@@ -47,6 +47,13 @@ Not added to the board UI itself.
   | `earth` | canvas | brand primary (the one brand band) `#c8471e` `#6e3421` `#f2b62a` | `#e38b1f` `#8c8f2a` `#6e3421` |
   | `brass` | canvas | light `#9a7425` `#c8a24a` `#5b4214` `#c8a24a`; dark `#c8a24a` `#f1d592` `#7a5a1e` `#f1d592` | the usual mixes |
   | `safety` | canvas | `#ff4a1c` (yellow `#ffe500` on a dark ground), ink, ink, the safety colour | the usual mixes |
+  | `hud` | dark `#05070a`; light `#e9ecef` | dark `#00f0ff` `#0a6f7a` `#5ff6ff` `#ff2a6d`; light `#007c86` `#7fb6bb` `#0b0d10` `#c4124d` | the usual mixes (cyber-hud) |
+  | `toner` | canvas | the ink neutral, four times | the ink neutral (no tints: toner or paper) |
+  `spectrum` also carries `stops` (ten: pink, violet, cyan, mint, gold, each followed by its
+  midpoint to the next, cyclic) and `sparkStops` (mint, violet, cyan). `E.spectrumAt(inks, t)`
+  blends the stops; `oprings` uses it so its stripes melt through the spectrum instead of three
+  flat inks, and `weave` / `stipple` draw their spark with `E.sparkInk(inks, k)` (a cool stop
+  under spectrum, `inks.spark` otherwise). Tone moves the stops toward the ground like the inks.
   Tone still applies (inks move toward the ground). fit.js entries may name any of these values;
   saved pins with them load (PatternPins whitelists `E.COLORWAYS`). The Patterns view shows them
   as a second "Fixed colours" row under Colorway. The AI brief adds one line per fixed colourway
@@ -67,7 +74,8 @@ Not added to the board UI itself.
   12 Aura wash — soft blurred colour fields (radial blobs + blur + grain).
   13 Chevron mirror — banded diagonals mirrored into quadrants.
   14 Modular grid — seeded grid of blocks, dot matrices, line grids and ramps.
-  15 Flow filaments — streamlines traced through a noise flow field, bundled.
+  15 Flow filaments — streamlines traced through a noise flow field, bundled. At Line weight
+     below 1 each bundle is one solid round-capped strand (thin hairlines aliased into a hatch).
   16 Signal mosaic — glitch bands: pixel confetti, block mosaics, smears, scanlines.
   17 Type terrain — noise terraces typed out in characters on a monospace grid.
   18 Arc rise — giant concentric colour bands rising from an edge over a bar field.

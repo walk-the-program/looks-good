@@ -155,7 +155,7 @@
         const x = pts[i * 2], y = pts[i * 2 + 1];
         let r = Math.max(dotR * (0.85 + 0.3 * fold(x, y)), 0.7 * env.dpr);
         let col = colorAt(x, y);
-        if (spark.has(i) && env.spark.take(Math.PI * r * r * 4)) { col = inks.spark; r *= 1.7; }
+        if (spark.has(i) && env.spark.take(Math.PI * r * r * 4)) { col = E.sparkInk(inks, i); r *= 1.7; }
         E.wrapDraw(env, W, H, x, y, r, (X, Y) => g.circle(X, Y, r, col));
       }
     },

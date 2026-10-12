@@ -426,6 +426,29 @@ check('paste: empty text', run(`extractColors('').length`) === 0, 'found colors 
   check('undo: Undo brings the blend back, and null for a snapshot taken without one',
     r.back === JSON.stringify({ with: 'raw-brutalist', strength: 'bold', channels: { art: true, type: true, color: true, patterns: true, material: true } }) && r.none === null, JSON.stringify(r));
 }
+// Pattern colourways: the fixed ones carry their documented hexes, toner is the ink alone, the spectrum
+// carries its ten blendable stops, and a stop blend is a pure function (same input, same colour).
+{
+  const pc = vm.createContext({ window: { performance: { now: () => 0 } }, console });
+  vm.runInContext(fs.readFileSync(path.join(root, 'js/patterns/engine.js'), 'utf8'), pc, { filename: 'engine.js' });
+  const P = pc.window.Patterns;
+  const light = { canvas: '#f6f5f1', ink: '#2e282a', primary: '#e4572e', secondary: '#17bebb', accent: '#ffc914' };
+  const dark = { canvas: '#2e282a', ink: '#f6f5f1', primary: '#e4572e', secondary: '#17bebb', accent: '#ffc914' };
+  const hd = P.inksFor(dark, 'hud'), hl = P.inksFor(light, 'hud');
+  check('colourway hud: fixed dark and light hexes',
+    hd.fixed && hd.ground === '#05070a' && hd.ink1 === '#00f0ff' && hd.ink2 === '#0a6f7a' && hd.deep === '#5ff6ff' && hd.spark === '#ff2a6d'
+    && hl.ground === '#e9ecef' && hl.ink1 === '#007c86' && hl.ink2 === '#7fb6bb' && hl.deep === '#0b0d10' && hl.spark === '#c4124d', JSON.stringify([hd, hl]));
+  const tn = P.inksFor(light, 'toner');
+  check('colourway toner: one ink on the canvas, no tints',
+    tn.fixed && tn.ground === light.canvas && ['ink1', 'ink2', 'spark', 'deep', 't1', 't2', 'mute'].every(k => tn[k] === light.ink), JSON.stringify(tn));
+  const sp = P.inksFor(light, 'spectrum');
+  const a = P.E.spectrumAt(sp, 0.37), b = P.E.spectrumAt(sp, 0.37);
+  check('colourway spectrum: ten stops, a cool spark stop, deterministic blend',
+    sp.stops.length === 10 && sp.sparkStops.indexOf(P.E.sparkInk(sp, 0)) === 0 && JSON.stringify(a) === JSON.stringify(b)
+    && !P.inksFor(light, 'brand').stops && P.E.sparkInk(P.inksFor(light, 'brand'), 3) === light.accent, JSON.stringify(sp.stops));
+  check('colourways listed once each', ['hud', 'toner'].every(v => P.E.COLORWAYS.filter(c => c.value === v && c.fixed).length === 1), '');
+}
+
 // Not run here (they need a real DOM): that blended tokens(t, state) see the view's fonts end to end, and the
 // render timings. They are covered by the in-browser sweeps in docs/round6/.
 

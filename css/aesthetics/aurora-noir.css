@@ -17,7 +17,9 @@
 }
 
 /* wallpaper: the 48px grid at 6% ink, faded toward the bottom by a canvas-colored radial
-   laid over it (no mask-image, so html2canvas exports the same fade) */
+   laid over it (no mask-image, so html2canvas exports the same fade). z-index 0 is deliberate:
+   it paints above the root's own background but under the content (.ab-in, the content wrapper of
+   the board and of every deck slide, is z-index 1 in css/aesthetic-board.css), and it carries no text, so it can never cover content. */
 .ab[data-ae="aurora-noir"]::after {
   content: ""; position: absolute; inset: 0; z-index: 0; pointer-events: none;
   background-image: radial-gradient(ellipse 120% 80% at 50% 0%, transparent 22%, var(--ab-canvas) 80%),

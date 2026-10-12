@@ -30,7 +30,6 @@
 }
 .ab[data-ae="gorpcore"] .ab-brand { gap: 12px; font-weight: var(--gc-hw, 800); text-transform: uppercase; letter-spacing: 0.01em; font-size: clamp(17px, 2.3cqw, 24px); }
 .ab[data-ae="gorpcore"] .ab-head .ab-brand { color: #F2F0EA; }
-.ab[data-ae="gorpcore"] .ab-deck-wordmark .ab-wordmark::after { color: var(--ab-muted); }
 /* the mark is a grommet: a round shell-fabric eyelet with a silver rim (the hang tag's hardware), never a square plate */
 .ab[data-ae="gorpcore"] .ab-mark { box-sizing: border-box; width: 30px; height: 30px; border-radius: 50%; border: 2.5px solid var(--ab-silver); background: var(--ab-shell); color: var(--ab-on-shell); font: var(--gc-hw, 800) 14px/1 var(--ab-font-h); box-shadow: none; }
 .ab[data-ae="gorpcore"] .ab-wordmark::after { content: "  N 46°32′ E 7°57′"; white-space: pre; font: 400 11px/1 var(--gc-mono); letter-spacing: 0.04em; color: #A9ABA8; text-transform: none; }

@@ -853,15 +853,34 @@ function bdFitSamples(root) {
 function bdLegibleHeadings(root) {
   const canvas = root.style.getPropertyValue('--ab-canvas').trim();
   if (!/^#[0-9a-f]{6}$/i.test(canvas)) return;
+  const ink = root.style.getPropertyValue('--ab-ink').trim();
+  const hexOf = v => {
+    const m = String(v || '').match(/\d+(\.\d+)?/g);
+    if (!m || m.length < 3) return null;
+    return { hex: '#' + m.slice(0, 3).map(n => Math.round(Number(n)).toString(16).padStart(2, '0')).join(''), a: m.length > 3 ? Number(m[3]) : 1 };
+  };
+  // The ground a heading actually sits on: the nearest ancestor with an opaque fill (a silver
+  // window, a dark panel), else the slide canvas. A picture or gradient on the way leaves the
+  // canvas as the best guess.
+  const groundOf = el => {
+    for (let a = el.parentElement; a && a !== root; a = a.parentElement) {
+      const c = getComputedStyle(a);
+      const bg = hexOf(c.backgroundColor);
+      if (bg && bg.a > 0.9) return bg.hex;
+      if (c.backgroundImage !== 'none') return canvas;
+    }
+    return canvas;
+  };
   root.querySelectorAll('.ab-deck-h, .ab-deck-aa.ab-headline, .ab-deck-sample.ab-headline, .ab-deck-screentitle').forEach(el => {
     el.style.color = '';
     const cs = getComputedStyle(el);
     if (cs.webkitTextFillColor === 'rgba(0, 0, 0, 0)') return;
-    const m = cs.color.match(/\d+(\.\d+)?/g);
-    if (!m || m.length < 3) return;
-    const hex = '#' + m.slice(0, 3).map(n => Math.round(Number(n)).toString(16).padStart(2, '0')).join('');
-    const alpha = m.length > 3 ? Number(m[3]) : 1;
-    if (alpha < 0.5 || contrastRatio(hex, canvas) < 3) el.style.color = 'var(--ab-ink)';
+    const c = hexOf(cs.color);
+    if (!c) return;
+    const ground = groundOf(el);
+    if (c.a >= 0.5 && contrastRatio(c.hex, ground) >= 3) return;
+    const pick = [ink, canvas, '#000000', '#ffffff'].find(x => /^#[0-9a-f]{6}$/i.test(x) && contrastRatio(x, ground) >= 3);
+    el.style.color = pick === ink ? 'var(--ab-ink)' : pick === canvas ? 'var(--ab-canvas)' : (pick || 'var(--ab-ink)');
   });
 }
 
@@ -1036,7 +1055,11 @@ function bdZoomCards(grid) {
   const widths = cards.map(card => card.clientWidth);
   cards.forEach((card, i) => {
     const frame = card.querySelector('.deck-frame');
-    if (frame && widths[i]) frame.style.zoom = (widths[i] / DECK_W).toFixed(4);
+    if (!frame || !widths[i]) return;
+    // A zoom a hair under 1 (0.9984 for a 1278px card) snaps 2px borders to 1px at DPR 1:
+    // within 0.5% of 1 draw the slide at 1 (the card clips the last pixel or two).
+    const z = widths[i] / DECK_W;
+    frame.style.zoom = Math.abs(z - 1) < 0.005 ? '1' : z.toFixed(4);
   });
 }
 
@@ -1197,6 +1220,8 @@ function bdSrgbToRgba(value) {
 // .ab-switch::before). In the clone, swap each checkbox for a plain span that
 // carries the input's computed styles, with its ::before / ::after as real child
 // spans, so the knob is drawn and the parser never sees an input pseudo.
+// Runs in the in-page prepare step: inside html2canvas's own clone the pseudo-elements
+// are already display:none (it hides them to draw its own copies), so the knob was lost.
 function bdFlattenSwitches(doc, root) {
   const win = doc.defaultView;
   const copy = (target, cs) => {
@@ -1340,18 +1365,70 @@ function bdLiftSceneCopy(doc, root) {
   });
 }
 
-// html2canvas draws a blurred box-shadow with a negative spread (the soft "lifted tile"
-// shadows) as a grey rectangle that ignores the border radius. In the clone, drop those
-// layers: a flat tile exports cleanly, a square grey halo does not.
-function bdShadowFixes(cs) {
+// html2canvas 1.4.1 clips a box-shadow to the outside of its element only when the element is
+// square: on a rounded element (border-radius) the mask fails and every layer is painted OVER the
+// element as a dark band (a ring came out as a 10px slab, a lift shadow as a grey frame). It also
+// draws a blurred shadow with a negative spread as a grey rectangle. In the clone:
+//  - square elements keep their shadows (html2canvas draws those right), minus negative-spread blurs;
+//  - on rounded elements a plain ring (0 0 0 Npx, outer or inset, no blur) becomes a border of the
+//    same colour, sized so the element's outer box and content box do not move; every other layer
+//    (blurred lifts, hard offsets) is dropped: a flat tile exports cleanly, a slab over it does not.
+function bdShadowLayers(value) {
+  return bdSplitList(value).map(layer => {
+    const color = (layer.match(/(?:rgba?|hsla?|color)\([^)]*\)|#[0-9a-f]{3,8}\b/i) || [''])[0];
+    const nums = layer.replace(color, ' ').match(/-?[\d.]+px|\b0\b/g) || [];
+    const n = nums.map(v => parseFloat(v) || 0);
+    return { layer, color, inset: /\binset\b/.test(layer), x: n[0] || 0, y: n[1] || 0, blur: n[2] || 0, spread: n[3] || 0 };
+  });
+}
+
+function bdRounded(cs) {
+  return ['border-top-left-radius', 'border-top-right-radius', 'border-bottom-right-radius', 'border-bottom-left-radius']
+    .some(p => parseFloat(cs.getPropertyValue(p)) > 1);
+}
+
+function bdShadowFixes(cs, isPseudo, turned) {
   const bs = cs.getPropertyValue('box-shadow');
   if (!bs || bs === 'none') return [];
-  const layers = bdSplitList(bs);
-  const keep = layers.filter(layer => {
-    const nums = layer.replace(/(?:rgba?|color)\([^)]*\)/g, ' ').match(/-?[\d.]+px/g) || [];
-    return !(nums.length >= 4 && parseFloat(nums[3]) < 0 && parseFloat(nums[2]) > 0);
-  });
-  return keep.length === layers.length ? [] : [['box-shadow', keep.length ? bdSrgbToRgba(keep.join(', ')) : 'none']];
+  const layers = bdShadowLayers(bs);
+  const fixes = [];
+  let keep;
+  // a rotated or skewed element (Curio Cabinet's pinned card) fails the same way as a rounded one
+  if (!bdRounded(cs) && !turned) {
+    keep = layers.filter(s => !(s.spread < 0 && s.blur > 0));
+  } else {
+    keep = [];
+    const ring = (s, inset) => s.inset === inset && !s.x && !s.y && !s.blur && s.spread > 0 && s.color && !/,\s*0\)$|\/\s*0\)$/.test(s.color);
+    const side = ['top', 'right', 'bottom', 'left'];
+    const outer = layers.filter(s => ring(s, false)).sort((p, q) => q.spread - p.spread)[0];
+    const inner = layers.filter(s => ring(s, true)).sort((p, q) => q.spread - p.spread)[0];
+    const bw = side.map(k => parseFloat(cs.getPropertyValue(`border-${k}-width`)) || 0);
+    if (!isPseudo && outer) {
+      // the ring sits outside the border box: grow the border outward, pull the margin in by as much,
+      // and grow the radius with it, so neither the layout nor the content moves
+      const s = outer.spread;
+      side.forEach((k, i) => {
+        fixes.push([`border-${k}-width`, `${bw[i] + s}px`], [`border-${k}-style`, 'solid'], [`border-${k}-color`, outer.color]);
+        fixes.push([`margin-${k}`, `${(parseFloat(cs.getPropertyValue(`margin-${k}`)) || 0) - s}px`]);
+      });
+      ['top-left', 'top-right', 'bottom-right', 'bottom-left'].forEach(c => {
+        const r = parseFloat(cs.getPropertyValue(`border-${c}-radius`)) || 0;
+        if (r) fixes.push([`border-${c}-radius`, `${r + s}px`]);
+      });
+      if (cs.boxSizing === 'border-box') {
+        fixes.push(['width', `${parseFloat(cs.width) + 2 * s}px`], ['height', `${parseFloat(cs.height) + 2 * s}px`]);
+      }
+    } else if (!isPseudo && inner && bw.every(w => !w)) {
+      // the ring sits just inside the edge: it becomes the border, taken out of the padding
+      const s = inner.spread;
+      side.forEach(k => {
+        fixes.push([`border-${k}-width`, `${s}px`], [`border-${k}-style`, 'solid'], [`border-${k}-color`, inner.color]);
+        fixes.push([`padding-${k}`, `${Math.max(0, (parseFloat(cs.getPropertyValue(`padding-${k}`)) || 0) - s)}px`]);
+      });
+    }
+  }
+  if (keep.length === layers.length) return fixes;
+  return [...fixes.map(([p, v]) => [p, bdSrgbToRgba(v)]), ['box-shadow', keep.length ? bdSrgbToRgba(keep.map(s => s.layer).join(', ')) : 'none']];
 }
 
 // html2canvas draws an inline <svg> by serializing it on its own, so a filter, mask or
@@ -1395,7 +1472,7 @@ function bdInlineSvg(doc, root) {
         el.setAttribute(at.name, at.value.replace(/var\(\s*(--[\w-]+)\s*(?:,\s*([^)]*))?\)/g, (m, name, fb) => (cs.getPropertyValue(name).trim() || (fb || '').trim())));
       });
     });
-    svg.querySelectorAll('[class]').forEach(el => {
+    svg.querySelectorAll('[class], text, tspan').forEach(el => {
       const cs = win.getComputedStyle(el);
       BD_SVG_PAINT.forEach(prop => {
         const v = cs.getPropertyValue(prop);
@@ -1425,6 +1502,291 @@ function bdFlattenZoom(root) {
     el.style.setProperty('width', `${r.width / z}px`, 'important');
     el.style.setProperty('transform', `scale(${z})`, 'important');
     el.style.setProperty('transform-origin', '0 0', 'important');
+  });
+}
+
+// html2canvas draws an inline <svg> as a standalone image, and an svg image cannot see the page's
+// web fonts: svg <text> (Dystopian Luxury's cover wordmark, set in Archivo) came out in a fallback
+// face, wider and taller than on screen. In the clone, each svg that sets text gets the @font-face
+// rules of the Google Fonts it uses (latin and latin-ext subsets) with the font files inlined as
+// data URLs. Both the stylesheet and the font files allow cross-origin reads; anything that fails
+// leaves the svg as it was.
+const bdFontCss = new Map();
+const bdFontData = new Map();
+function bdFetchText(url, map, how) {
+  if (!map.has(url)) map.set(url, fetch(url).then(r => (r.ok ? r[how]() : null)).catch(() => null));
+  return map.get(url);
+}
+async function bdFontDataUrl(url) {
+  if (!bdFontData.has(url)) {
+    bdFontData.set(url, fetch(url).then(r => (r.ok ? r.blob() : null)).then(blob => blob && new Promise(res => {
+      const fr = new FileReader();
+      fr.onload = () => res(fr.result);
+      fr.onerror = () => res(null);
+      fr.readAsDataURL(blob);
+    })).catch(() => null));
+  }
+  return bdFontData.get(url);
+}
+async function bdEmbedSvgFonts(doc, root) {
+  const win = doc.defaultView;
+  const svgs = [...root.querySelectorAll('svg')].filter(svg => svg.querySelector('text'));
+  if (!svgs.length) return;
+  const links = [...document.querySelectorAll('link[href*="fonts.googleapis.com/css"]')].map(l => l.href);
+  const sheets = (await Promise.all(links.map(u => bdFetchText(u, bdFontCss, 'text')))).filter(Boolean).join('\n');
+  if (!sheets) return;
+  const faces = [];
+  sheets.replace(/\/\*\s*([\w-]+)\s*\*\/\s*@font-face\s*\{([^}]*)\}/g, (m, subset, body) => {
+    const fam = (body.match(/font-family:\s*['"]?([^;'"]+)/) || [])[1];
+    const src = (body.match(/url\(([^)]+)\)/) || [])[1];
+    if (fam && src && (subset === 'latin' || subset === 'latin-ext')) faces.push({ fam: fam.trim().toLowerCase(), src: src.replace(/['"]/g, ''), body });
+    return m;
+  });
+  for (const svg of svgs) {
+    const fams = new Set();
+    svg.querySelectorAll('text, tspan').forEach(el => {
+      fams.add(win.getComputedStyle(el).fontFamily.split(',')[0].replace(/['"]/g, '').trim().toLowerCase());
+    });
+    const rules = [];
+    for (const f of faces.filter(x => fams.has(x.fam))) {
+      const data = await bdFontDataUrl(f.src);
+      if (data) rules.push(`@font-face{${f.body.replace(/url\([^)]+\)/, `url(${data})`)}}`);
+    }
+    if (!rules.length) continue;
+    const style = doc.createElementNS('http://www.w3.org/2000/svg', 'style');
+    style.textContent = rules.join('\n');
+    svg.insertBefore(style, svg.firstChild);
+  }
+}
+
+// html2canvas paints none of border-image, clip-path or an svg filter (`filter: url(#id)`): Neo
+// Deco's stepped nine-slice frames vanished, its notched blocks came out square, and Acid Graphics'
+// ripple (a gradient bent by an svg displacement filter) came out flat. In the clone, the box of
+// each such element (its background, border, border-image, radius, clip-path and filter; not its
+// children) is drawn by the browser into a bitmap through an SVG foreignObject, with the filter
+// defs it references copied in, and becomes the element's only background. Pseudo-elements that
+// need it are first made real spans. A browser that refuses the bitmap leaves the box as it was.
+const BD_BOX_PROPS = ['box-sizing', 'border-top-width', 'border-right-width', 'border-bottom-width', 'border-left-width',
+  'border-top-style', 'border-right-style', 'border-bottom-style', 'border-left-style', 'border-top-color', 'border-right-color',
+  'border-bottom-color', 'border-left-color', 'border-top-left-radius', 'border-top-right-radius', 'border-bottom-right-radius',
+  'border-bottom-left-radius', 'border-image-source', 'border-image-slice', 'border-image-width', 'border-image-outset',
+  'border-image-repeat', 'background-color', 'background-image', 'background-size', 'background-position', 'background-repeat',
+  'background-origin', 'background-clip', 'clip-path', 'filter'];
+function bdNeedsBake(cs) {
+  const bis = cs.getPropertyValue('border-image-source');
+  const painted = (bis && bis !== 'none') || cs.getPropertyValue('background-image') !== 'none'
+    || !/rgba\(0, 0, 0, 0\)|transparent/.test(cs.getPropertyValue('background-color'));
+  if (!painted) return false;
+  return (bis && bis !== 'none') || cs.getPropertyValue('clip-path') !== 'none' || /url\(/.test(cs.getPropertyValue('filter'));
+}
+function bdMaterializePseudos(doc, root) {
+  const win = doc.defaultView;
+  const rules = [];
+  let n = 0;
+  [root, ...root.querySelectorAll('*')].forEach(el => {
+    if (el.closest('svg') || /^(INPUT|IMG|TEXTAREA|SELECT)$/.test(el.tagName)) return;
+    ['::before', '::after'].forEach(pseudo => {
+      const cs = win.getComputedStyle(el, pseudo);
+      if (!cs.content || cs.content === 'none' || cs.content === 'normal' || cs.display === 'none' || !bdNeedsBake(cs)) return;
+      const span = doc.createElement('span');
+      for (let i = 0; i < cs.length; i++) span.style.setProperty(cs[i], cs.getPropertyValue(cs[i]));
+      span.style.removeProperty('content');
+      const m = cs.content.match(/^"(.*)"$/);
+      if (m) span.textContent = m[1].replace(/\\(.)/g, '$1');
+      span.setAttribute('aria-hidden', 'true');
+      const id = 'p' + (++n);
+      el.setAttribute('data-bdp-' + pseudo.slice(2), id);
+      rules.push(`[data-bdp-${pseudo.slice(2)}="${id}"]${pseudo}{content:none !important;display:none !important}`);
+      if (pseudo === '::before') el.insertBefore(span, el.firstChild); else el.appendChild(span);
+    });
+  });
+  if (rules.length) {
+    const st = doc.createElement('style');
+    st.textContent = rules.join('\n');
+    root.appendChild(st);
+  }
+}
+async function bdBakeBoxes(doc, root) {
+  const win = doc.defaultView;
+  bdMaterializePseudos(doc, root);
+  for (const el of [root, ...root.querySelectorAll('*')]) {
+    if (el.closest('svg')) continue;
+    const cs = win.getComputedStyle(el);
+    if (!bdNeedsBake(cs)) continue;
+    const w = el.offsetWidth, h = el.offsetHeight;
+    if (!w || !h) continue;
+    try {
+      const k = BD_BAKE_SCALE;
+      const ser = new XMLSerializer();
+      let defs = '';
+      (cs.getPropertyValue('filter').match(/url\(\s*['"]?#([^)'"\s]+)/g) || []).forEach(m => {
+        const src = doc.getElementById(m.replace(/^url\(\s*['"]?#/, ''));
+        if (src) defs += ser.serializeToString(src.cloneNode(true));
+      });
+      const box = doc.createElement('div');
+      box.setAttribute('style', BD_BOX_PROPS.map(p => `${p}:${bdSrgbToRgba(cs.getPropertyValue(p))}`).join(';')
+        + `;width:${w}px;height:${h}px;box-sizing:border-box;margin:0;`);
+      const html = `<div xmlns="http://www.w3.org/1999/xhtml" style="width:${w}px;height:${h}px;transform:scale(${k});transform-origin:0 0;">`
+        + (defs ? `<svg xmlns="http://www.w3.org/2000/svg" width="0" height="0" style="position:absolute"><defs>${defs}</defs></svg>` : '')
+        + ser.serializeToString(box).replace(' xmlns="http://www.w3.org/1999/xhtml"', '') + '</div>';
+      const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${w * k}" height="${h * k}"><foreignObject width="100%" height="100%">${html}</foreignObject></svg>`;
+      const img = new Image();
+      img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
+      await img.decode();
+      const c = document.createElement('canvas');
+      c.width = w * k; c.height = h * k;
+      c.getContext('2d').drawImage(img, 0, 0);
+      const url = c.toDataURL('image/png');
+      const set = (p, v) => el.style.setProperty(p, v, 'important');
+      set('background-image', `url("${url}")`); set('background-size', '100% 100%'); set('background-position', '0 0');
+      set('background-repeat', 'no-repeat'); set('background-origin', 'border-box'); set('background-clip', 'border-box');
+      set('background-color', 'transparent'); set('border-image', 'none'); set('border-color', 'transparent');
+      set('clip-path', 'none'); set('filter', 'none'); set('box-shadow', 'none');
+    } catch (err) { /* keep the box as it was */ }
+  }
+}
+
+// html2canvas ignores writing-mode: vertical text (Dark Academia's book spines, wabi-sabi and Y2K
+// side labels) was drawn horizontally in its narrow box and wrapped letter by letter. In the
+// clone, the element's children move into one inner box laid out horizontally, as long as the
+// element's content box is tall and as wide as it is wide, and turned 90deg (-90deg for sideways-lr)
+// into place. The element keeps its own box, background and transform.
+function bdFlattenVerticalText(root) {
+  const doc = root.ownerDocument, win = doc.defaultView;
+  [...root.querySelectorAll('*')].forEach(el => {
+    if (el.closest('svg')) return;
+    const cs = win.getComputedStyle(el);
+    const wm = cs.writingMode;
+    if (!/^(vertical|sideways)/.test(wm) || cs.textOrientation === 'upright') return;
+    const parentWm = el.parentElement ? win.getComputedStyle(el.parentElement).writingMode : 'horizontal-tb';
+    if (parentWm !== 'horizontal-tb' || !el.textContent.trim()) return;
+    const px = p => parseFloat(cs.getPropertyValue(p)) || 0;
+    const cw = el.clientWidth - px('padding-left') - px('padding-right');
+    const ch = el.clientHeight - px('padding-top') - px('padding-bottom');
+    if (cw <= 0 || ch <= 0) return;
+    const ow = el.offsetWidth, oh = el.offsetHeight;
+    const inner = doc.createElement('span');
+    const flex = /flex/.test(cs.display);
+    inner.style.cssText = `position:absolute;left:${px('padding-left') + px('border-left-width')}px;top:${px('padding-top') + px('border-top-width')}px;`
+      + `width:${ch}px;height:${cw}px;writing-mode:horizontal-tb;transform-origin:0 0;margin:0;padding:0;box-sizing:border-box;`
+      + `display:${flex ? 'flex' : 'block'};text-align:${cs.textAlign};white-space:${cs.whiteSpace};line-height:${cs.lineHeight};`
+      + (flex ? `justify-content:${cs.justifyContent};align-items:${cs.alignItems};gap:${cs.gap};` : `line-height:${cw}px;`)
+      + (wm === 'sideways-lr' ? `transform:translateY(${ch}px) rotate(-90deg);` : `transform:translateX(${cw}px) rotate(90deg);`);
+    while (el.firstChild) inner.appendChild(el.firstChild);
+    el.appendChild(inner);
+    if (cs.position === 'static') el.style.setProperty('position', 'relative', 'important');
+    el.style.setProperty('width', `${ow}px`, 'important');
+    el.style.setProperty('height', `${oh}px`, 'important');
+    el.style.setProperty('box-sizing', 'border-box', 'important');
+    el.style.setProperty('writing-mode', 'horizontal-tb', 'important');
+  });
+}
+
+// html2canvas does not treat `isolation: isolate` as a stacking context, so a z-index:-1 child
+// (Acid Graphics' flyer ripple) was drawn under its parent's background and vanished. In the
+// clone, a positioned isolated element with z-index auto gets z-index 0: the same stacking
+// context, in a form html2canvas understands.
+function bdIsolate(root) {
+  const win = root.ownerDocument.defaultView;
+  [root, ...root.querySelectorAll('*')].forEach(el => {
+    const cs = win.getComputedStyle(el);
+    if (cs.isolation === 'isolate' && cs.zIndex === 'auto' && cs.position !== 'static') el.style.setProperty('z-index', '0', 'important');
+  });
+}
+
+// WebKit (Safari and the Mac app's WKWebView) marks a canvas insecure as soon as a pattern is made
+// from an SVG image, and html2canvas paints every repeating background through a pattern: one
+// tiled svg background (Neo Deco's card ornament) made the whole PNG/PDF export throw. There,
+// each svg layer of a background is drawn once into a PNG (drawImage of an svg is allowed) at
+// its own size, before html2canvas sees it. Other engines keep the svg.
+const BD_WEBKIT = typeof navigator !== 'undefined' && /AppleWebKit/.test(navigator.userAgent) && !/Chrome|Chromium|Edg|OPR/.test(navigator.userAgent);
+const bdSvgPng = new Map();
+async function bdSvgLayerPng(url) {
+  if (!bdSvgPng.has(url)) {
+    bdSvgPng.set(url, (async () => {
+      const img = new Image();
+      img.src = url;
+      await img.decode();
+      const w = img.naturalWidth, h = img.naturalHeight;
+      if (!w || !h) return null;
+      const k = BD_BAKE_SCALE;
+      const c = document.createElement('canvas');
+      c.width = Math.ceil(w * k); c.height = Math.ceil(h * k);
+      c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+      return { png: c.toDataURL('image/png'), w, h };
+    })().catch(() => null));
+  }
+  return bdSvgPng.get(url);
+}
+async function bdRasterSvgBackgrounds(doc, root) {
+  if (!BD_WEBKIT) return;
+  const win = doc.defaultView;
+  const rules = [];
+  let n = 0;
+  for (const el of [root, ...root.querySelectorAll('*')]) {
+    for (const pseudo of [null, '::before', '::after']) {
+      const cs = win.getComputedStyle(el, pseudo);
+      if (pseudo && (!cs.content || cs.content === 'none')) continue;
+      const bi = cs.getPropertyValue('background-image');
+      if (!bi || bi.indexOf('data:image/svg+xml') < 0) continue;
+      const layers = bdSplitList(bi);
+      const given = bdSplitList(cs.getPropertyValue('background-size'));
+      const sizes = layers.map((_, i) => given[i % Math.max(1, given.length)] || 'auto');
+      let changed = false;
+      for (let i = 0; i < layers.length; i++) {
+        const m = layers[i].match(/^url\(\s*["']?(data:image\/svg\+xml[^"')]*(?:\)[^"')]*)*)["']?\s*\)$/);
+        if (!m) continue;
+        const r = await bdSvgLayerPng(m[1]);
+        if (!r) continue;
+        layers[i] = `url("${r.png}")`;
+        if (/^auto( auto)?$/.test(sizes[i].trim())) sizes[i] = `${r.w}px ${r.h}px`;   // the PNG is drawn at 2x
+        changed = true;
+      }
+      if (!changed) continue;
+      const decl = [['background-image', layers.join(', ')], ['background-size', sizes.join(', ')]];
+      if (!pseudo) decl.forEach(([p, v]) => el.style.setProperty(p, v, 'important'));
+      else {
+        const id = el.getAttribute('data-bds') || 's' + (++n);
+        el.setAttribute('data-bds', id);
+        rules.push(`[data-bds="${id}"]${pseudo}{${decl.map(([p, v]) => `${p}:${v} !important`).join(';')}}`);
+      }
+    }
+  }
+  if (rules.length) {
+    const st = doc.createElement('style');
+    st.textContent = rules.join('\n');
+    root.appendChild(st);
+  }
+}
+
+// html2canvas 1.4.1 lays an `inline-flex` / `inline-grid` box out as inline text and drops its
+// children (the Curio Cabinet and Dystopian Luxury CTA labels and knobs vanished). In the clone,
+// a box whose parent is a flex or grid container is blockified anyway, so it simply becomes
+// `flex` / `grid`; elsewhere it becomes a block-level flex/grid inside an inline-block wrapper of
+// its own size, so the line it sits in does not change.
+function bdFlattenInlineFlex(root) {
+  const win = root.ownerDocument.defaultView;
+  [...root.querySelectorAll('*')].forEach(el => {
+    const d = win.getComputedStyle(el).display;
+    if (d !== 'inline-flex' && d !== 'inline-grid') return;
+    const block = d === 'inline-flex' ? 'flex' : 'grid';
+    const pd = el.parentElement ? win.getComputedStyle(el.parentElement).display : '';
+    if (/flex|grid/.test(pd)) { el.style.setProperty('display', block, 'important'); return; }
+    const cs = win.getComputedStyle(el);
+    // the exact layout width (offsetWidth rounds 211.14 down to 211 and the label wrapped), plus
+    // half a pixel of slack so the text never re-wraps
+    const extra = cs.boxSizing === 'border-box' ? 0 : ['padding-left', 'padding-right', 'border-left-width', 'border-right-width']
+      .reduce((s, p) => s + (parseFloat(cs.getPropertyValue(p)) || 0), 0);
+    const w = (parseFloat(cs.width) || el.offsetWidth) + extra + 0.5;
+    const box = el.ownerDocument.createElement('span');
+    box.style.cssText = `display:inline-block;vertical-align:${cs.verticalAlign};width:${w}px;`
+      + `margin:${cs.marginTop} ${cs.marginRight} ${cs.marginBottom} ${cs.marginLeft};`;
+    el.parentNode.insertBefore(box, el);
+    box.appendChild(el);
+    el.style.setProperty('display', block, 'important');
+    el.style.setProperty('margin', '0', 'important');
+    el.style.setProperty('width', '100%', 'important');
+    el.style.setProperty('box-sizing', 'border-box', 'important');
   });
 }
 
@@ -1498,10 +1860,21 @@ function bdSanitizeClone(doc, root) {
   const win = doc.defaultView;
   if (!win) return;
   bdLiftSceneCopy(doc, root);
-  bdFlattenSwitches(doc, root);
   bdFlattenClippedText(doc, root);
   const rules = [];
   let n = 0;
+  // transformed (other than a plain translate) itself or inside a transformed ancestor
+  const turnedMemo = new Map();
+  const turned = el => {
+    if (!el || el === root.parentElement) return false;
+    if (turnedMemo.has(el)) return turnedMemo.get(el);
+    const tf = win.getComputedStyle(el).transform;
+    const m = tf && tf !== 'none' ? tf.match(/matrix\(([^)]+)\)/) : null;
+    const own = !!(tf && tf !== 'none') && !(m && (() => { const v = m[1].split(',').map(Number); return Math.abs(v[1]) < 1e-6 && Math.abs(v[2]) < 1e-6; })());
+    const r = own || (el !== root && turned(el.parentElement));
+    turnedMemo.set(el, r);
+    return r;
+  };
   [root, ...root.querySelectorAll('*')].forEach(el => {
     [null, '::before', '::after'].forEach(pseudo => {
       const cs = win.getComputedStyle(el, pseudo);
@@ -1510,7 +1883,7 @@ function bdSanitizeClone(doc, root) {
         const v = cs.getPropertyValue(prop);
         if (v && v.indexOf('color(') >= 0) fixes.push([prop, bdSrgbToRgba(v)]);
       });
-      bdShadowFixes(cs).forEach(f => { const at = fixes.findIndex(x => x[0] === f[0]); if (at >= 0) fixes.splice(at, 1); fixes.push(f); });
+      bdShadowFixes(cs, !!pseudo, turned(el)).forEach(f => { const at = fixes.findIndex(x => x[0] === f[0]); if (at >= 0) fixes.splice(at, 1); fixes.push(f); });
       bdLayerFixes(cs).forEach(f => fixes.push(f));
       bdCalcFixes(cs).forEach(f => fixes.push(f));
       if (!fixes.length) return;
@@ -1536,8 +1909,15 @@ function bdSanitizeClone(doc, root) {
 async function bdPrepareExportClone(root) {
   const doc = root.ownerDocument;
   bdFlattenZoom(root);
+  bdFlattenSwitches(doc, root);
+  bdFlattenVerticalText(root);
+  bdFlattenInlineFlex(root);
+  bdIsolate(root);
   bdInlineSvg(doc, root);
+  await bdEmbedSvgFonts(doc, root);
+  await bdBakeBoxes(doc, root);
   await bdBakeBackgrounds(doc, root);
+  await bdRasterSvgBackgrounds(doc, root);
   await bdFlattenImageFit(doc, root);
 }
 

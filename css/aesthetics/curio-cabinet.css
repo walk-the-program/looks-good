@@ -183,7 +183,7 @@
   .ab[data-ae="curio-cabinet"] .cc-legend { grid-template-columns: repeat(2, minmax(0, 1fr)); margin-bottom: 30px; }
   .ab[data-ae="curio-cabinet"] .ab-swatches { grid-template-columns: minmax(0, 1fr); }
   .ab[data-ae="curio-cabinet"] .ab-swatch { display: grid; grid-template-columns: 58px minmax(0, 1fr); column-gap: 14px; align-items: center; padding: 10px 12px; }
-  .ab[data-ae="curio-cabinet"] .ab-chip { grid-row: 1 / span 3; width: 52px; height: 40px; margin: 0; }
+  .ab[data-ae="curio-cabinet"] .ab-chip { grid-row: 1 / span 4; width: 52px; height: 40px; margin: 0; }
   .ab[data-ae="curio-cabinet"] .ab-row { grid-template-columns: minmax(3ch, max-content) minmax(0, 1fr) 4.5ch; }
   .ab[data-ae="curio-cabinet"] .ab-seg-btn { font-size: 10px; letter-spacing: 0.04em; }
   .ab[data-ae="curio-cabinet"] .ab-foot { justify-content: flex-start; }

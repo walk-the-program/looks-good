@@ -189,7 +189,7 @@ registerAesthetic({
   canvas(b) { return b.isDark ? '#1A1C1B' : GC_STONE; },
 
   tokens(t, st) {
-    const S = st || (typeof state !== 'undefined' ? state : null) || {};
+    const S = st || {};   // the view state boardTokens passes (never the global)
     const d = t.isDark;
     const shell = gcDye(t.printPrimary || t.primary);
     const shell2 = gcDye(t.secondary);

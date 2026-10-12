@@ -81,7 +81,7 @@ registerAesthetic({
     const d = t.isDark;
     const B = ndBrass(d);
     // interface face: the brand's own sans if it has one, else Jost-class system sans (never a display face at 11px)
-    const stU = view || (typeof state !== 'undefined' ? state : null);
+    const stU = view;   // the view state boardTokens passes (never the global)
     const sansF = stU && [stU.bodyFont, stU.headingFont].find(f => f && f.category === 'sans');
     const uiFace = sansF ? (sansF === stU.bodyFont ? 'var(--ab-font-b)' : 'var(--ab-font-h)') : '"Jost", "Futura", "Century Gothic", "Helvetica Neue", Arial, sans-serif';
     // t.mix(a, b, x) keeps x of a and 1 - x of b

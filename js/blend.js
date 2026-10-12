@@ -615,26 +615,126 @@ function blendLegibility(root) {
   const canvas = rcs.getPropertyValue('--ab-canvas').trim();
   const ink = rcs.getPropertyValue('--ab-ink').trim();
   const heads = [...root.querySelectorAll('.ab-hero .ab-headline')];
-  heads.forEach(h => { h.removeAttribute('data-bl-scrim'); h.querySelectorAll('.ab-hl').forEach(el => {
+  root.querySelectorAll('.ab-hero-copy[data-bl-plate]').forEach(c => { c.removeAttribute('data-bl-plate'); c.style.removeProperty('--bl-scrim'); });
+  heads.forEach(h => { h.removeAttribute('data-bl-scrim'); h.style.removeProperty('--bl-scrim'); if (h.hasAttribute('data-bl-ink')) { h.style.removeProperty('color'); h.removeAttribute('data-bl-ink'); } h.querySelectorAll('.ab-hl').forEach(el => {
     ['color', '-webkit-text-fill-color'].forEach(p => { if (el.hasAttribute('data-bl-hlfix')) el.style.removeProperty(p); });
     el.removeAttribute('data-bl-hlfix');
   }); });
-  const art = root.querySelector('.ab-hero .ab-blend-art');
-  if (art) {
+  // Donor art that its own board lets run above the art box (Naive Doodle's "made by hand!" note
+  // sits above its svg's viewBox; its own taller box shows it, the blend's wider one cut it). An
+  // svg whose text runs above its top may overflow, and the art is scaled down about its bottom
+  // edge until everything that shows fits under the box's top.
+  root.querySelectorAll('.ab-blend-art').forEach(box => {
+    box.style.removeProperty('--bl-art-fit');
+    box.removeAttribute('data-bl-fit');
+    box.querySelectorAll('svg[data-bl-ov]').forEach(svg => { svg.style.removeProperty('overflow'); svg.removeAttribute('data-bl-ov'); });
+    const b = box.getBoundingClientRect();
+    if (!b.height) return;
+    const parts = [...box.querySelectorAll('.ab-blend-inner *')].filter(e => !e.closest('svg'));
+    box.querySelectorAll('.ab-blend-inner svg').forEach(svg => {
+      const sr = svg.getBoundingClientRect();
+      const texts = [...svg.querySelectorAll('text')].filter(tx => { const r = tx.getBoundingClientRect(); return r.width > 0 && r.top < sr.top - 1; });
+      if (!texts.length) return;
+      svg.style.setProperty('overflow', 'visible', 'important');
+      svg.setAttribute('data-bl-ov', '1');
+      parts.push(...texts);
+    });
+    let top = b.top;
+    parts.forEach(e => {
+      const r = e.getBoundingClientRect();
+      if (r.width > 0 && r.height > 0 && r.top < top) top = r.top;
+    });
+    const cut = b.top - top;
+    if (cut > 1 && cut < b.height * 0.6) {
+      box.style.setProperty('--bl-art-fit', (b.height / (b.height + cut + 3)).toFixed(4));
+      box.setAttribute('data-bl-fit', '1');
+    }
+  });
+  const hero = root.querySelector('.ab-hero');
+  if (hero) hero.removeAttribute('data-bl-reflow');
+  let art = root.querySelector('.ab-hero .ab-blend-art');
+  const over = (a, r) => {
+    const w = Math.min(a.right, r.right) - Math.max(a.left, r.left);
+    const v = Math.min(a.bottom, r.bottom) - Math.max(a.top, r.top);
+    return w > 2 && v > 2 ? w * v : 0;
+  };
+  // a pseudo-element counts as a plate only when it is at least as big as what it must seat
+  // (a framed veil does; Bauhaus' top rule, also a ::before, does not)
+  const opaque = (el, pseudo, need) => {
+    const c = getComputedStyle(el, pseudo);
+    if (pseudo && (!c.content || c.content === 'none' || c.display === 'none')) return false;
+    if (pseudo && !(parseFloat(c.width) >= need.width * 0.9 && parseFloat(c.height) >= need.height * 0.9)) return false;
+    const bg = blRgb(c.backgroundColor);
+    return !!(bg && bg.a >= 0.5) || (c.borderImageSource && c.borderImageSource !== 'none');
+  };
+  // the base seats its copy on a plate (a glass card, a panel, a framed veil drawn by a pseudo)
+  const plated = (from, stop, target) => {
+    const need = target.getBoundingClientRect();
+    for (let el = from; el && el !== stop && el !== root; el = el.parentElement) {
+      if (opaque(el, null, need) || opaque(el, '::before', need) || opaque(el, '::after', need)) return true;
+    }
+    return false;
+  };
+  if (art && hero) {
+    // A base that layers its copy over its art (one grid cell, a framed plate on top) would hide
+    // most of the donor's art behind that plate and crop its top: on the board the art moves into
+    // the flow below the copy, at the donor's own ratio (css/blend.css [data-bl-reflow]).
+    const copy = hero.querySelector('.ab-hero-copy');
     const a = art.getBoundingClientRect();
+    if (copy && !root.classList.contains('ab-slide') && plated(copy, hero, copy)
+      && over(a, copy.getBoundingClientRect()) > 0.15 * Math.max(1, a.width * a.height)) {
+      hero.setAttribute('data-bl-reflow', '1');
+      art = root.querySelector('.ab-hero .ab-blend-art');
+    }
+  }
+  if (art) {
+    // Any headline that touches the donor art and has no plate of its own gets one, however small
+    // the overlap (a 59px overlap left "ALIVE" on Riso Print's halftone).
+    // The plate is the canvas, or the ink when the base sets its copy light for its own dark
+    // scene (Liquid Glass' white headline, Editorial Serif's canvas-coloured copy): a canvas
+    // plate under those read 1.19:1 and 1.00:1.
+    const a = art.getBoundingClientRect();
+    const hex6 = v => /^#[0-9a-f]{6}$/i.test(v);
+    const textHex = el => { const c = getComputedStyle(el); const f = blRgb(c.webkitTextFillColor && !/rgba\(0, 0, 0, 0\)/.test(c.webkitTextFillColor) ? c.webkitTextFillColor : c.color); return f && f.a >= 0.5 ? f.hex : null; };
+    const plateFor = hexes => {
+      const ok = c => hex6(c) && hexes.every(x => !x || contrastRatio(x, c) >= 3);
+      return [canvas, ink].find(ok) || null;
+    };
     heads.forEach(h => {
-      const r = h.getBoundingClientRect();
-      const w = Math.min(a.right, r.right) - Math.max(a.left, r.left);
-      const v = Math.min(a.bottom, r.bottom) - Math.max(a.top, r.top);
-      if (!(w > 0 && v > 0 && (w * v) / Math.max(1, r.width * r.height) > 0.2)) return;
-      // the base already seats its copy on a plate (a glass card, a panel): no second plate
-      for (let el = h.parentElement; el && el !== root; el = el.parentElement) {
-        const bg = blRgb(getComputedStyle(el).backgroundColor);
-        if (bg && bg.a >= 0.5) return;
-      }
+      if (!over(a, h.getBoundingClientRect())) return;
+      if (plated(h.parentElement, root, h)) return;
       h.setAttribute('data-bl-scrim', '1');
+      const copy = h.closest('.ab-hero-copy');
+      // the rest of the copy (kicker, subcopy) over the art too, in a colour the canvas cannot
+      // carry: the whole copy block goes on one plate
+      const others = copy ? [...copy.querySelectorAll('.ab-kicker, .ab-subcopy')].filter(el => over(a, el.getBoundingClientRect())) : [];
+      const light = others.filter(el => { const x = textHex(el); return x && hex6(canvas) && contrastRatio(x, canvas) < 4.5; });
+      if (copy && light.length) {
+        const plate = plateFor([textHex(h), ...light.map(textHex)]) || ink;
+        copy.setAttribute('data-bl-plate', '1');
+        copy.style.setProperty('--bl-scrim', plate);
+        return;
+      }
+      const plate = plateFor([textHex(h)]);
+      if (plate && plate !== canvas) h.style.setProperty('--bl-scrim', plate);
+      else if (!plate) { h.style.setProperty('color', 'var(--ab-ink)', 'important'); h.setAttribute('data-bl-ink', '1'); }
     });
   }
+  // A control the blend fills with another colour (Art Nouveau's pressed segment takes the full
+  // primary under Retro Futurist, its ink label read 3.72:1) gets the neutral that reads best on it.
+  root.querySelectorAll('.ab-seg-btn, .ab-cta').forEach(el => {
+    if (el.hasAttribute('data-bl-onfix')) { el.style.removeProperty('color'); el.removeAttribute('data-bl-onfix'); }
+    const c = getComputedStyle(el);
+    const bg = blRgb(c.backgroundColor);
+    const fg = blRgb(c.color);
+    if (!bg || bg.a < 0.9 || c.backgroundImage !== 'none' || !fg || fg.a < 0.5 || !el.textContent.trim()) return;
+    if (contrastRatio(fg.hex, bg.hex) >= 4.5) return;
+    const opts = [ink, canvas, '#000000', '#ffffff'].filter(x => /^#[0-9a-f]{6}$/i.test(x));
+    const pick = opts.find(x => contrastRatio(x, bg.hex) >= 4.5) || opts.sort((p, q) => contrastRatio(q, bg.hex) - contrastRatio(p, bg.hex))[0];
+    if (!pick || contrastRatio(pick, bg.hex) <= contrastRatio(fg.hex, bg.hex)) return;
+    el.style.setProperty('color', pick, 'important');
+    el.setAttribute('data-bl-onfix', '1');
+  });
   if (!root.hasAttribute('data-blend-hl') || !/^#[0-9a-f]{6}$/i.test(canvas)) return;
   heads.forEach(h => {
     const hl = h.querySelector('.ab-hl');
@@ -644,7 +744,10 @@ function blendLegibility(root) {
     const fill = blRgb(cs.webkitTextFillColor || cs.color);
     if (!fill || fill.a < 0.5) return;
     let ground = null;
-    if (h.hasAttribute('data-bl-scrim')) ground = canvas;
+    if (h.hasAttribute('data-bl-scrim')) {
+      const pc = h.closest('.ab-hero-copy[data-bl-plate]');
+      ground = (pc ? pc.style.getPropertyValue('--bl-scrim') : h.style.getPropertyValue('--bl-scrim')).trim() || canvas;
+    }
     else {
       for (let el = hl; el; el = el.parentElement) {
         const c = getComputedStyle(el);
@@ -654,9 +757,12 @@ function blendLegibility(root) {
         if (el === root) break;
       }
     }
-    if (!ground || contrastRatio(fill.hex, ground) >= 3) return;
+    // large text needs 3:1; a headline a wide donor face shrank under 24px (18.66px bold) needs 4.5:1
+    const fs = parseFloat(cs.fontSize) || 0;
+    const need = fs >= 24 || (fs >= 18.66 && Number(cs.fontWeight) >= 700) ? 3 : 4.5;
+    if (!ground || contrastRatio(fill.hex, ground) >= need) return;
     const own = blRgb(getComputedStyle(h).color);
-    const pick = [own && own.hex, ink, '#000000', '#ffffff'].find(c => c && /^#[0-9a-f]{6}$/i.test(c) && contrastRatio(c, ground) >= 3);
+    const pick = [own && own.hex, ink, '#000000', '#ffffff'].find(c => c && /^#[0-9a-f]{6}$/i.test(c) && contrastRatio(c, ground) >= need);
     if (!pick) return;
     hl.style.setProperty('color', pick, 'important');
     hl.style.setProperty('-webkit-text-fill-color', pick, 'important');

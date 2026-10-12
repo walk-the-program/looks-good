@@ -137,7 +137,7 @@ registerAesthetic({
   printPrimary(t) { return acPush(t.primary); },
 
   tokens(t, view) {
-    const st = view || (typeof state !== 'undefined' ? state : null);
+    const st = view;   // the view state boardTokens passes (never the global)
     const hf = st && st.headingFont;
     const cls = hf && hf.cls;
     const hw = abWeight(hf, 900);

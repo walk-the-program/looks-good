@@ -45,11 +45,15 @@
   position: absolute !important; inset: 0 !important; display: block !important;
   width: 100% !important; height: 100% !important; max-width: none !important; max-height: none !important;
   min-width: 0 !important; min-height: 0 !important; margin: 0 !important; padding: 0 !important;
-  aspect-ratio: auto !important; transform: none !important; grid-area: auto !important; order: 0 !important;
+  /* --bl-art-fit: js/blend.js (blendLegibility) shrinks art that runs above its box, so its top is never cut */
+  aspect-ratio: auto !important; transform: scale(var(--bl-art-fit, 1)) !important; transform-origin: 50% 100% !important;
+  grid-area: auto !important; order: 0 !important;
   justify-self: stretch !important; align-self: stretch !important;
   background: none !important; border: 0 !important; box-shadow: none !important; border-radius: inherit !important;
   overflow: hidden !important; z-index: auto !important;
 }
+/* the scaled art may show what runs above its own top: the art box still clips at its edge */
+.ab .ab.ab-blend-art[data-bl-fit] > .ab-art.ab-blend-inner { overflow: visible !important; }
 .ab .ab.ab-blend-art > .ab-art.ab-blend-inner::before,
 .ab .ab.ab-blend-art > .ab-art.ab-blend-inner::after { content: none !important; }
 
@@ -94,6 +98,11 @@
   white-space: normal !important; overflow-wrap: normal !important; word-break: normal !important;
   grid-column: 1 / -1 !important; min-width: max-content; max-width: 100%;
 }
+/* narrow boards lay the swatch out as a chip column and a text column (css/aesthetic-board.css):
+   the line stays in the text column, beside the chip, not under it */
+@container ab (max-width: 600px) {
+  .ab[data-blend-ch~="color"] .ab-swatch .ab-sw-print { grid-column: 2 / -1 !important; min-width: 0; }
+}
 
 /* Type: the donor's headline casing, tracking, weight and style (probed from the
    donor's own CSS) on every headline of the base. */
@@ -112,6 +121,13 @@
   background: var(--bl-scrim, var(--ab-canvas)) !important; border-radius: 0.18em;
   -webkit-box-decoration-break: clone; box-decoration-break: clone;
 }
+/* the whole copy block on one plate when its kicker and subcopy also sit on the art in a colour
+   meant for the base's own (dark) scene; --bl-scrim is the canvas or the ink, whichever they read on */
+.ab[data-blend] .ab-hero-copy[data-bl-plate] {
+  background: var(--bl-scrim) !important; border-radius: 10px; padding: clamp(10px, 1.6cqw, 18px) clamp(12px, 2cqw, 22px) !important;
+  text-shadow: none !important;
+}
+.ab[data-blend] .ab-hero-copy[data-bl-plate] .ab-headline[data-bl-scrim] { background: none !important; padding: 0 !important; }
 
 /* Color: the donor's highlight word replaces the base's. */
 .ab[data-blend-hl] .ab-hl::before,
@@ -194,3 +210,18 @@
 .blend-channels label:has(input:focus-visible) { outline: 2px solid rgba(17, 17, 17, 0.25); outline-offset: 2px; }
 .blend-note { margin: 0; font-size: 11.5px; line-height: 1.45; color: var(--muted); }
 .blend #surpriseBlend { margin-top: 10px; }
+
+/* Art: a base that layers its copy over its art (Neo Deco's framed headline over the sunburst)
+   would hide a donor's art behind the plate and crop its top. js/blend.js (blendLegibility)
+   marks the hero and the art moves into the flow under the copy, at the donor's own ratio. */
+.ab[data-blend] .ab-hero[data-bl-reflow] {
+  display: grid !important; grid-template-columns: minmax(0, 1fr) !important; grid-template-rows: none !important;
+  grid-template-areas: none !important; grid-auto-rows: auto !important;
+}
+.ab[data-blend] .ab-hero[data-bl-reflow] > * { grid-area: auto !important; }
+.ab[data-blend] .ab-hero[data-bl-reflow] > .ab-hero-copy { order: 0 !important; margin-bottom: clamp(18px, 3cqw, 34px) !important; }
+.ab[data-blend] .ab-hero[data-bl-reflow] > .ab-art {
+  order: 1 !important; position: relative !important; inset: auto !important; transform: none !important;
+  width: min(100%, 560px) !important; max-width: 100% !important; height: auto !important; max-height: none !important;
+  min-height: 0 !important; aspect-ratio: auto !important; justify-self: center !important; align-self: start !important; margin: 0 !important;
+}

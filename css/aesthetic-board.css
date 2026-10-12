@@ -364,7 +364,8 @@
   .ab-state-ctl { padding: 10px 6px; font-size: 11.5px; }
   .ab[data-sections="asym"] .ab-sections { grid-template-columns: minmax(0, 1fr); }
   .ab-swatch { display: grid; grid-template-columns: 72px minmax(0, 1fr); column-gap: 14px; align-items: center; }
-  .ab-chip { grid-row: 1 / 4; margin: 0; height: 48px; }
+  /* chip spans the role, job, hex and (on a printed primary) the "prints as" line */
+  .ab-chip { grid-row: 1 / span 4; margin: 0; height: 48px; }
   .ab-sections { grid-template-columns: minmax(0, 1fr); }
   .ab-tag-pre { display: none; }
   .ab-tag { max-width: none; white-space: nowrap; font-size: 9.5px; }

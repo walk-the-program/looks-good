@@ -305,6 +305,9 @@
           let len = 0; for (let i = 2; i < pts.length; i += 2) len += Math.hypot(pts[i] - pts[i - 2], pts[i + 1] - pts[i - 1]);
           if (env.spark.take(len * lw * S)) col = inks.spark;
         }
+        // weight < 1: hairlines this thin alias into a hatched moire inside each bundle, so the
+        // bundle is drawn as one solid round-capped strand of the bundle's width instead
+        if (p.weight < 1) { g.polyline(pts, col, bundleW + lw, 1, 'round'); return; }
         for (let s = 0; s < S; s++) {
           const o = (s - (S - 1) / 2) * sp, out = new Array(pts.length);
           for (let i = 0; i < m; i++) { out[i * 2] = pts[i * 2] + nrm[i * 2] * o; out[i * 2 + 1] = pts[i * 2 + 1] + nrm[i * 2 + 1] * o; }

@@ -332,7 +332,11 @@
         }
       });
       const N = 72;
-      const cols = [inks.ink1, inks.ink2, inks.deep, mix(inks.ink1, inks.ink2, 0.5), inks.ink1, inks.ink2];
+      // under the brand colourway every pebble is one of the client's own inks: the
+      // ink1/ink2 midpoint (a sage or mud no one chose) is only used by the derived colourways
+      const cols = (inks.colorway || 'brand') === 'brand'
+        ? [inks.ink1, inks.ink2, inks.deep, inks.ink1, inks.ink2]
+        : [inks.ink1, inks.ink2, inks.deep, mix(inks.ink1, inks.ink2, 0.5), inks.ink1, inks.ink2];
       const modeFor = () => (p.mode === 'mixed' ? (rng.next() < 0.5 ? 0 : 1) : p.mode === 'halftone' ? 1 : 0);
       const lx = -0.62, ly = -0.78;
       const hp = Math.max(1.6, 0.78 * u) / sc;      // halftone pitch (internal px)
