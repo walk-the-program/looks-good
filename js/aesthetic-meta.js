@@ -32,74 +32,74 @@ const AESTHETIC_META = {
   'soft-form': {
     family: 'tactile',
     fonts: {
-      heading: { classes: ['neo-grotesk', 'geometric'], picks: ['Inter Tight', 'Instrument Sans', 'Manrope'] },
+      heading: { classes: ['geometric', 'neo-grotesk'], picks: ['Manrope', 'Inter Tight', 'Instrument Sans'] },
       body: { classes: ['neo-grotesk'], picks: ['Inter', 'Instrument Sans'] },
       avoid: ['didone', 'condensed', 'pixel', 'groovy'],
-      why: 'Soft, tactile surfaces need a quiet face, so a neutral grotesk lets the shadows and materials carry the personality.',
-      pairings: [['Inter Tight', 'Inter'], ['Manrope', 'Inter'], ['Instrument Sans', 'Instrument Sans']],
+      why: 'Bauhaus with feeling: a geometric sans with soft terminals at a tight 600, so the shadows and materials carry the rest.',
+      pairings: [['Manrope', 'Inter'], ['Inter Tight', 'Inter'], ['Instrument Sans', 'Instrument Sans']],
     },
   },
   'raw-brutalist': {
     family: 'graphic',
     fonts: {
-      heading: { classes: ['heavy', 'neo-grotesk', 'condensed'], picks: ['Archivo Black', 'Inter Tight', 'Anton'] },
-      body: { classes: ['neo-grotesk'], picks: ['Inter', 'Archivo', 'IBM Plex Sans'] },
+      heading: { classes: ['heavy', 'neo-grotesk', 'condensed'], picks: ['Archivo Black', 'Archivo'] },
+      body: { classes: ['mono', 'neo-grotesk'], picks: ['IBM Plex Mono', 'Archivo'] },
       mono: { picks: ['JetBrains Mono', 'IBM Plex Mono', 'Space Mono'] },
       avoid: ['soft-serif', 'rounded', 'deco', 'groovy'],
       why: 'Severe, honest layouts want a black-weight headline or a plain grotesk, because anything decorative softens the point.',
-      pairings: [['Archivo Black', 'Archivo'], ['Inter Tight', 'Inter'], ['Anton', 'IBM Plex Sans']],
+      pairings: [['Archivo Black', 'IBM Plex Mono'], ['Archivo Black', 'Archivo'], ['Archivo', 'IBM Plex Mono']],
     },
   },
   'neo-brutal-pop': {
     family: 'graphic',
     fonts: {
-      heading: { classes: ['grotesk', 'geometric', 'heavy'], picks: ['Space Grotesk', 'Bricolage Grotesque', 'Lexend'] },
-      body: { classes: ['grotesk', 'geometric'], picks: ['Space Grotesk', 'DM Sans', 'Rubik'] },
+      heading: { classes: ['grotesk', 'geometric', 'heavy'], picks: ['Bricolage Grotesque', 'Syne', 'Unbounded'] },
+      body: { classes: ['grotesk', 'geometric'], picks: ['DM Sans', 'Rubik', 'Work Sans'] },
       avoid: ['text-serif', 'old-style', 'deco', 'didone'],
       why: 'Chunky outlines and stickers pair with grotesks that have attitude and weight, never delicate or thin-stroked serifs.',
-      pairings: [['Bricolage Grotesque', 'DM Sans'], ['Space Grotesk', 'Space Grotesk'], ['Lexend', 'Rubik']],
+      pairings: [['Bricolage Grotesque', 'DM Sans'], ['Syne', 'DM Sans'], ['Unbounded', 'Rubik']],
     },
   },
   'retro-futurist': {
     family: 'luminous',
     fonts: {
-      heading: { classes: ['wide', 'techno', 'condensed'], picks: ['Michroma', 'Orbitron', 'Unbounded', 'Big Shoulders Display'] },
+      heading: { classes: ['wide', 'techno', 'condensed'], picks: ['Syncopate', 'Michroma', 'Unbounded', 'Big Shoulders Display'] },
       body: { classes: ['neo-grotesk'], picks: ['IBM Plex Sans', 'Inter'] },
       mono: { picks: ['Space Mono', 'IBM Plex Mono', 'VT323'], note: 'VT323 for readouts' },
       avoid: ['old-style', 'rounded', 'groovy'],
       why: 'Mission-control panels read as engineered when headlines are wide or techno and the body stays a plain grotesk, with mono for readouts.',
-      pairings: [['Michroma', 'IBM Plex Sans'], ['Unbounded', 'Inter'], ['Orbitron', 'IBM Plex Sans']],
+      pairings: [['Syncopate', 'IBM Plex Sans'], ['Michroma', 'IBM Plex Sans'], ['Unbounded', 'Inter']],
     },
   },
   'liquid-glass': {
     family: 'tactile',
     fonts: {
-      heading: { classes: ['neo-grotesk'], picks: ['Inter Tight', 'Geist', 'Onest'] },
+      heading: { classes: ['neo-grotesk'], picks: ['Inter', 'Geist', 'Onest'] },
       body: { classes: ['neo-grotesk'], picks: ['Inter', 'Geist'] },
       avoid: ['slab', 'didone', 'condensed', 'pixel'],
-      why: 'Translucent layers are busy enough, so the type stays a clean neo-grotesk that holds its shape over blur.',
-      pairings: [['Inter Tight', 'Inter'], ['Geist', 'Geist'], ['Onest', 'Inter']],
+      why: 'Apple\'s voice is SF Pro, so its closest open proxy, Inter set large and bold over a 17px body, reads native under glass.',
+      pairings: [['Inter', 'Inter'], ['Geist', 'Geist'], ['Onest', 'Inter']],
     },
   },
   'holo-iridescent': {
     family: 'luminous',
     fonts: {
-      heading: { classes: ['wide', 'soft-serif', 'geometric'], picks: ['Unbounded', 'Syne', 'Instrument Serif', 'Sora'] },
+      heading: { classes: ['wide', 'soft-serif', 'geometric'], picks: ['Unbounded', 'Instrument Serif', 'Syne', 'Sora'] },
       body: { classes: ['neo-grotesk'], picks: ['Inter', 'Geist'] },
       avoid: ['slab', 'condensed', 'old-style'],
-      why: 'Foil and spectrum do the decorating, so an extended or soft-serif headline adds luxury-packaging polish over a neutral body.',
-      pairings: [['Syne', 'Inter'], ['Instrument Serif', 'Geist'], ['Unbounded', 'Inter']],
+      why: 'Light, wide and large is the luxury-packaging voice: an extended face at a light weight lets the foil be the statement.',
+      pairings: [['Unbounded', 'Inter'], ['Instrument Serif', 'Geist'], ['Syne', 'Inter']],
     },
   },
   'aurora-noir': {
     family: 'digital',
     fonts: {
-      heading: { classes: ['neo-grotesk'], picks: ['Inter Tight', 'Geist', 'Inter'] },
+      heading: { classes: ['neo-grotesk'], picks: ['Geist', 'Inter Tight', 'Instrument Serif'] },
       body: { classes: ['neo-grotesk'], picks: ['Inter', 'Geist'] },
       mono: { picks: ['Geist Mono', 'JetBrains Mono'] },
-      avoid: ['soft-serif', 'rounded', 'groovy', 'deco'],
-      why: 'Dev-tool interfaces read as precise because the face disappears; a neutral neo-grotesk at tight tracking is the whole voice.',
-      pairings: [['Inter Tight', 'Inter'], ['Geist', 'Geist'], ['Inter', 'Inter']],
+      avoid: ['rounded', 'groovy', 'deco'],
+      why: 'Dev-tool interfaces read as precise in Geist with Geist Mono labels; for an editorial headline, a serif display face over the same UI.',
+      pairings: [['Geist', 'Geist'], ['Instrument Serif', 'Geist'], ['Inter Tight', 'Inter']],
     },
   },
   'bauhaus-poster': {
@@ -115,11 +115,11 @@ const AESTHETIC_META = {
   'clay': {
     family: 'tactile',
     fonts: {
-      heading: { classes: ['rounded', 'geometric'], picks: ['Fredoka', 'Baloo 2', 'Lexend', 'Rubik'] },
-      body: { classes: ['rounded', 'humanist'], picks: ['Rubik', 'Nunito Sans', 'Figtree'] },
+      heading: { classes: ['rounded', 'geometric'], picks: ['Rubik', 'Lexend', 'Baloo 2'] },
+      body: { classes: ['rounded', 'humanist'], picks: ['Figtree', 'Nunito Sans', 'Rubik'] },
       avoid: ['condensed', 'didone', 'mono', 'techno'],
-      why: 'Puffy, toy-like objects call for rounded terminals and friendly shapes that look as soft as the material.',
-      pairings: [['Fredoka', 'Nunito Sans'], ['Baloo 2', 'Rubik'], ['Lexend', 'Figtree']],
+      why: 'Dimensional objects want a grown-up frame: softened corners at 600 stay friendly without reading as a children\'s app.',
+      pairings: [['Rubik', 'Figtree'], ['Lexend', 'Figtree'], ['Fredoka', 'Nunito Sans']],
     },
   },
   'riso-print': {
@@ -136,43 +136,43 @@ const AESTHETIC_META = {
   'editorial-serif': {
     family: 'print',
     fonts: {
-      heading: { classes: ['didone', 'soft-serif'], picks: ['Playfair Display', 'Bodoni Moda', 'Instrument Serif', 'Gloock'] },
+      heading: { classes: ['didone', 'soft-serif'], picks: ['Bodoni Moda', 'Playfair Display', 'Instrument Serif', 'Gloock'] },
       body: { classes: ['text-serif', 'old-style'], picks: ['Newsreader', 'Source Serif 4', 'Libre Caslon Text', 'EB Garamond'] },
       mono: { picks: ['Inter'], note: 'sans for captions' },
       avoid: ['rounded', 'techno', 'pixel', 'groovy'],
       why: 'A magazine page is carried by high-contrast serif display over a book-quality text serif, with weight coming from contrast rather than boldness.',
-      pairings: [['Instrument Serif', 'Newsreader'], ['Bodoni Moda', 'Source Serif 4'], ['Playfair Display', 'Libre Caslon Text']],
+      pairings: [['Bodoni Moda', 'Newsreader'], ['Playfair Display', 'Source Serif 4'], ['Instrument Serif', 'Newsreader']],
     },
   },
   'neo-deco': {
     family: 'luminous',
     fonts: {
-      heading: { classes: ['deco', 'didone'], picks: ['Poiret One', 'Limelight', 'Italiana', 'Cinzel', 'Bodoni Moda'] },
+      heading: { classes: ['deco', 'didone'], picks: ['Limelight', 'Poiret One', 'Bodoni Moda', 'Italiana'] },
       body: { classes: ['geometric'], picks: ['Jost', 'Josefin Sans', 'Raleway'], note: 'light weights' },
       avoid: ['heavy', 'pixel', 'rounded', 'grotesk'],
-      why: 'Gilded symmetry wants inscriptional or high-contrast display caps, set wide, over a light geometric sans.',
-      pairings: [['Italiana', 'Jost'], ['Limelight', 'Josefin Sans'], ['Cinzel', 'Raleway']],
+      why: 'Brass deco wants fat display caps (Broadway / Cassandre class) with a gilt inline, or a high-contrast didone, over a light geometric sans.',
+      pairings: [['Limelight', 'Josefin Sans'], ['Bodoni Moda', 'Jost'], ['Italiana', 'Jost']],
     },
   },
   'y2k-chrome': {
     family: 'luminous',
     fonts: {
-      heading: { classes: ['wide', 'heavy'], picks: ['Unbounded', 'Syne', 'Dela Gothic One', 'Michroma'] },
+      heading: { classes: ['wide', 'heavy'], picks: ['Dela Gothic One', 'Unbounded', 'Michroma', 'Syne'] },
       body: { classes: ['geometric'], picks: ['Sora', 'Outfit', 'Plus Jakarta Sans'] },
       avoid: ['old-style', 'slab', 'text-serif'],
       why: 'Chrome lettering needs heavy, wide forms to hold the metallic gradient, with a clean geometric sans for the copy.',
-      pairings: [['Unbounded', 'Sora'], ['Dela Gothic One', 'Outfit'], ['Syne', 'Plus Jakarta Sans']],
+      pairings: [['Dela Gothic One', 'Sora'], ['Unbounded', 'Sora'], ['Syne', 'Plus Jakarta Sans']],
     },
   },
   'cyber-hud': {
     family: 'digital',
     fonts: {
-      heading: { classes: ['techno', 'wide'], picks: ['Orbitron', 'Chakra Petch', 'Rajdhani', 'Michroma'] },
-      body: { classes: ['techno', 'neo-grotesk'], picks: ['Rajdhani', 'Chakra Petch', 'IBM Plex Sans'] },
+      heading: { classes: ['techno', 'condensed'], picks: ['Tektur', 'Saira Condensed', 'Chakra Petch', 'Orbitron'] },
+      body: { classes: ['condensed', 'neo-grotesk'], picks: ['Saira Condensed', 'IBM Plex Sans', 'Chakra Petch'] },
       mono: { picks: ['JetBrains Mono', 'Space Mono'] },
       avoid: ['serif', 'rounded', 'groovy'],
       why: 'Angular panels and live readouts call for squared techno faces, with mono for data and no serifs or soft curves.',
-      pairings: [['Orbitron', 'Rajdhani'], ['Chakra Petch', 'IBM Plex Sans'], ['Michroma', 'Chakra Petch']],
+      pairings: [['Tektur', 'Saira Condensed'], ['Chakra Petch', 'IBM Plex Sans'], ['Orbitron', 'Rajdhani']],
     },
   },
   'bento-grid': {
@@ -188,33 +188,33 @@ const AESTHETIC_META = {
   'mesh-gradient': {
     family: 'digital',
     fonts: {
-      heading: { classes: ['geometric', 'neo-grotesk'], picks: ['Sora', 'Plus Jakarta Sans', 'Inter Tight', 'Manrope'] },
+      heading: { classes: ['geometric', 'neo-grotesk'], picks: ['Plus Jakarta Sans', 'Inter Tight', 'Manrope', 'Sora'] },
       body: { classes: ['neo-grotesk'], picks: ['Inter', 'Public Sans'] },
       avoid: ['slab', 'condensed', 'pixel'],
-      why: 'Fintech marketing reads confident in a geometric or neo-grotesk headline at tight tracking, over crisp, quiet cards.',
-      pairings: [['Sora', 'Inter'], ['Plus Jakarta Sans', 'Inter'], ['Inter Tight', 'Public Sans']],
+      why: 'Fintech marketing signals precision with a large, light headline at tight tracking over crisp, quiet cards.',
+      pairings: [['Plus Jakarta Sans', 'Inter'], ['Inter Tight', 'Public Sans'], ['Sora', 'Inter']],
     },
   },
   'industrial-device': {
     family: 'tactile',
     fonts: {
-      heading: { classes: ['grotesk', 'neo-grotesk'], picks: ['Space Grotesk', 'Inter', 'Archivo'] },
-      body: { classes: ['neo-grotesk'], picks: ['Inter', 'IBM Plex Sans'] },
+      heading: { classes: ['grotesk', 'neo-grotesk'], picks: ['Geist', 'Inter Tight', 'Space Grotesk'] },
+      body: { classes: ['neo-grotesk'], picks: ['Geist', 'Inter'] },
       mono: { picks: ['Azeret Mono', 'IBM Plex Mono', 'Space Mono', 'Doto'], note: 'Doto for numerals and the display only' },
       avoid: ['serif', 'rounded', 'groovy'],
       why: 'Device panels read as machined with a precise grotesk and monospace labels, never serif or rounded.',
-      pairings: [['Space Grotesk', 'Inter'], ['Archivo', 'IBM Plex Sans'], ['Inter', 'Inter']],
+      pairings: [['Space Grotesk', 'Inter'], ['Geist', 'Geist'], ['Inter Tight', 'Inter']],
     },
   },
   'pixel-arcade': {
     family: 'digital',
     fonts: {
-      heading: { classes: ['pixel'], picks: ['Press Start 2P', 'Silkscreen', 'Pixelify Sans'] },
+      heading: { classes: ['pixel'], picks: ['Silkscreen', 'Jersey 10', 'Press Start 2P', 'Pixelify Sans'] },
       body: { classes: ['pixel', 'mono'], picks: ['VT323', 'Space Mono', 'JetBrains Mono'] },
       mono: { picks: ['VT323'] },
       avoid: ['serif', 'geometric', 'script'],
       why: 'Everything sits on a pixel grid, so bitmap faces keep edges crisp while VT323 or a mono handles longer text.',
-      pairings: [['Silkscreen', 'VT323'], ['Press Start 2P', 'Space Mono'], ['Pixelify Sans', 'JetBrains Mono']],
+      pairings: [['Silkscreen', 'VT323'], ['Jersey 10', 'VT323'], ['Press Start 2P', 'Space Mono']],
     },
   },
   'groovy-70s': {
@@ -230,67 +230,67 @@ const AESTHETIC_META = {
   'blueprint': {
     family: 'print',
     fonts: {
-      heading: { classes: ['neo-grotesk', 'condensed'], picks: ['Archivo', 'IBM Plex Sans', 'Big Shoulders Display'] },
-      body: { classes: ['mono'], picks: ['IBM Plex Mono', 'JetBrains Mono'] },
-      mono: { picks: ['IBM Plex Mono', 'Space Mono'] },
+      heading: { classes: ['mono'], picks: ['IBM Plex Mono', 'Share Tech Mono', 'Space Mono'] },
+      body: { classes: ['neo-grotesk'], picks: ['IBM Plex Sans', 'Inter'] },
+      mono: { picks: ['IBM Plex Mono', 'JetBrains Mono'] },
       avoid: ['groovy', 'deco', 'soft-serif', 'rounded'],
-      why: 'Technical drawings use plain engineering lettering: a neutral or condensed sans for titles and monospace for annotations.',
-      pairings: [['IBM Plex Sans', 'IBM Plex Mono'], ['Archivo', 'JetBrains Mono'], ['Big Shoulders Display', 'IBM Plex Mono']],
+      why: 'Technical drawings use single-stroke template lettering: mono capitals for titles and annotations, a plain sans for reading.',
+      pairings: [['Share Tech Mono', 'IBM Plex Sans'], ['IBM Plex Mono', 'IBM Plex Sans'], ['IBM Plex Mono', 'Inter']],
     },
   },
   'blob-tracking': {
     family: 'digital',
     fonts: {
-      heading: { classes: ['neo-grotesk'], picks: ['Inter Tight', 'Geist', 'Archivo'] },
+      heading: { classes: ['mono', 'neo-grotesk'], picks: ['IBM Plex Mono', 'Inter Tight', 'Geist', 'Archivo'] },
       body: { classes: ['neo-grotesk'], picks: ['Inter', 'Geist'] },
       mono: { picks: ['Geist Mono', 'JetBrains Mono', 'IBM Plex Mono'] },
       avoid: ['serif', 'rounded', 'groovy', 'deco'],
       why: 'Detection overlays read as clinical when the headline is a neutral grotesk and every ID, coordinate and confidence label is mono.',
-      pairings: [['Inter Tight', 'Inter'], ['Geist', 'Geist'], ['Archivo', 'Inter']],
+      pairings: [['IBM Plex Mono', 'Inter'], ['Inter Tight', 'Inter'], ['Geist', 'Geist']],
     },
   },
   'xerox': {
     family: 'print',
     fonts: {
-      heading: { classes: ['condensed', 'heavy'], picks: ['Anton', 'Archivo Black', 'Bebas Neue'] },
-      body: { classes: ['typewriter', 'grotesk'], picks: ['Courier Prime', 'IBM Plex Mono', 'Work Sans'] },
-      mono: { picks: ['Courier Prime', 'IBM Plex Mono'] },
+      heading: { classes: ['heavy', 'neo-grotesk'], picks: ['Arimo', 'Archivo Black', 'Archivo', 'Public Sans'] },
+      body: { classes: ['typewriter', 'grotesk'], picks: ['IBM Plex Mono', 'Courier Prime', 'Work Sans'] },
+      mono: { picks: ['IBM Plex Mono', 'Courier Prime'] },
       avoid: ['rounded', 'soft-serif', 'deco', 'geometric'],
-      why: 'A photocopied flyer needs one blunt, heavy headline face over typewriter or plain grotesk text, because copying turns anything delicate to mush.',
-      pairings: [['Anton', 'Courier Prime'], ['Archivo Black', 'Work Sans'], ['Bebas Neue', 'IBM Plex Mono']],
+      why: 'A photocopied flyer needs one blunt headline face, the office Arial-class bold or a black grotesk, over typewriter or plain grotesk text, because copying turns anything delicate to mush.',
+      pairings: [['Arimo', 'IBM Plex Mono'], ['Archivo Black', 'IBM Plex Mono'], ['Archivo Black', 'Courier Prime'], ['Archivo', 'IBM Plex Mono']],
     },
   },
   'micrographics': {
     family: 'graphic',
     fonts: {
-      heading: { classes: ['neo-grotesk', 'heavy'], picks: ['Inter Tight', 'Archivo Black', 'Geist'] },
+      heading: { classes: ['neo-grotesk', 'heavy'], picks: ['IBM Plex Sans', 'Archivo Black', 'Inter Tight', 'Geist'] },
       body: { classes: ['neo-grotesk'], picks: ['Inter', 'IBM Plex Sans'] },
       mono: { picks: ['Geist Mono', 'Azeret Mono', 'IBM Plex Mono'] },
       avoid: ['serif', 'groovy', 'rounded', 'deco'],
       why: 'One huge neutral headline against 8px mono microtype is the whole contrast, so both faces must stay precise and stay out of each other\'s way.',
-      pairings: [['Inter Tight', 'Inter'], ['Archivo Black', 'IBM Plex Sans'], ['Geist', 'Geist']],
+      pairings: [['IBM Plex Sans', 'IBM Plex Mono'], ['Archivo Black', 'IBM Plex Sans'], ['Inter Tight', 'Inter']],
     },
   },
   'mixed-type': {
     family: 'graphic',
     fonts: {
-      heading: { classes: ['soft-serif', 'didone', 'grotesk'], picks: ['Instrument Serif', 'Playfair Display', 'Bricolage Grotesque', 'Fraunces'] },
+      heading: { classes: ['soft-serif', 'didone', 'grotesk'], picks: ['Fraunces', 'Bricolage Grotesque', 'Instrument Serif', 'Gloock'] },
       body: { classes: ['neo-grotesk'], picks: ['Inter', 'Instrument Sans'] },
       mono: { picks: ['DM Mono', 'Space Mono'] },
       avoid: ['pixel', 'techno', 'groovy'],
       why: 'Switching between a serif italic, a heavy grotesk and a mono inside one headline works only when the rest of the page stays on one quiet face.',
-      pairings: [['Instrument Serif', 'Instrument Sans'], ['Bricolage Grotesque', 'Inter'], ['Playfair Display', 'Inter']],
+      pairings: [['Fraunces', 'Instrument Sans'], ['Bricolage Grotesque', 'Inter'], ['Gloock', 'Instrument Sans']],
     },
   },
   'ascii-art': {
     family: 'digital',
     fonts: {
-      heading: { classes: ['mono', 'pixel'], picks: ['JetBrains Mono', 'IBM Plex Mono', 'VT323', 'Space Mono'] },
+      heading: { classes: ['mono'], picks: ['JetBrains Mono', 'IBM Plex Mono', 'Space Mono'] },
       body: { classes: ['mono'], picks: ['IBM Plex Mono', 'JetBrains Mono'] },
-      mono: { picks: ['VT323', 'Space Mono'], note: 'VT323 for readouts' },
+      mono: { picks: ['Space Mono'] },
       avoid: ['serif', 'rounded', 'groovy', 'deco'],
       why: 'Characters on a grid are the medium, so every face is fixed-width and the headline is a mono or a pixel font.',
-      pairings: [['JetBrains Mono', 'IBM Plex Mono'], ['VT323', 'JetBrains Mono'], ['Space Mono', 'IBM Plex Mono']],
+      pairings: [['JetBrains Mono', 'IBM Plex Mono'], ['IBM Plex Mono', 'JetBrains Mono'], ['Space Mono', 'IBM Plex Mono']],
     },
   },
   'rebus': {
@@ -306,56 +306,56 @@ const AESTHETIC_META = {
   'corporate-vandalism': {
     family: 'graphic',
     fonts: {
-      heading: { classes: ['neo-grotesk', 'heavy'], picks: ['Inter Tight', 'Archivo Black', 'Archivo'] },
-      body: { classes: ['neo-grotesk'], picks: ['Inter', 'Public Sans'] },
+      heading: { classes: ['neo-grotesk', 'heavy'], picks: ['Archivo', 'Archivo Black', 'Public Sans'] },
+      body: { classes: ['neo-grotesk'], picks: ['Public Sans', 'IBM Plex Sans'] },
       mono: { picks: ['IBM Plex Mono', 'Space Mono'] },
       avoid: ['soft-serif', 'groovy', 'deco', 'rounded'],
       why: 'The joke only lands inside a flawless, bored shell, so the type is plain procurement-software grotesk with mono for receipts and fine print.',
-      pairings: [['Inter Tight', 'Inter'], ['Archivo Black', 'IBM Plex Sans'], ['Archivo', 'Public Sans']],
+      pairings: [['Public Sans', 'Public Sans'], ['Archivo', 'Public Sans'], ['Archivo Black', 'IBM Plex Sans']],
     },
   },
   'religious-futurism': {
     family: 'luminous',
     fonts: {
-      heading: { classes: ['wide', 'deco', 'old-style'], picks: ['Unbounded', 'Marcellus', 'Cinzel', 'Cormorant Garamond'] },
+      heading: { classes: ['wide', 'old-style'], picks: ['Michroma', 'Unbounded', 'Cormorant Garamond'] },
       body: { classes: ['old-style', 'neo-grotesk'], picks: ['EB Garamond', 'Inter'] },
       mono: { picks: ['DM Mono'] },
       avoid: ['groovy', 'pixel', 'rounded', 'heavy'],
       why: 'A hairline, widely tracked extended face with a quiet text serif gives the cathedral its stillness (the Dune 2021 move), with tiny mono annotations as the liturgical footnotes.',
-      pairings: [['Unbounded', 'EB Garamond'], ['Marcellus', 'EB Garamond'], ['Cinzel', 'EB Garamond']],
+      pairings: [['Michroma', 'EB Garamond'], ['Unbounded', 'EB Garamond'], ['Cormorant Garamond', 'EB Garamond']],
     },
   },
   'xerox-punk': {
     family: 'print',
     fonts: {
-      heading: { classes: ['heavy', 'condensed'], picks: ['Archivo Black', 'Anton', 'Bebas Neue'] },
+      heading: { classes: ['condensed', 'heavy', 'slab'], picks: ['Anton', 'Bebas Neue', 'Alfa Slab One'] },
       body: { classes: ['typewriter'], picks: ['Special Elite', 'Courier Prime'] },
       mono: { picks: ['Courier Prime'] },
       avoid: ['soft-serif', 'geometric', 'deco', 'rounded'],
       why: 'A pasted wall wants cut-out headline tiles in blunt condensed and heavy faces, with typewriter text as the scrap of paper underneath.',
-      pairings: [['Anton', 'Special Elite'], ['Archivo Black', 'Courier Prime'], ['Bebas Neue', 'Courier Prime']],
+      pairings: [['Anton', 'Special Elite'], ['Bebas Neue', 'Courier Prime'], ['Alfa Slab One', 'Special Elite']],
     },
   },
   'acid-graphics': {
     family: 'luminous',
     fonts: {
-      heading: { classes: ['wide', 'heavy', 'techno'], picks: ['Unbounded', 'Dela Gothic One', 'Syne', 'Michroma'] },
+      heading: { classes: ['wide', 'heavy', 'techno'], picks: ['Tilt Warp', 'Syncopate', 'Michroma'] },
       body: { classes: ['grotesk', 'neo-grotesk'], picks: ['Space Grotesk', 'Inter'] },
-      mono: { picks: ['Space Mono'] },
+      mono: { picks: ['Kode Mono', 'Space Mono'] },
       avoid: ['serif', 'rounded', 'deco'],
       why: 'Warped, stretched headlines need an extended or heavy face that survives distortion, while the dense info layer stays in a plain grotesk and mono.',
-      pairings: [['Unbounded', 'Space Grotesk'], ['Dela Gothic One', 'Inter'], ['Syne', 'Space Mono']],
+      pairings: [['Tilt Warp', 'Inter'], ['Syncopate', 'Space Grotesk'], ['Michroma', 'Kode Mono']],
     },
   },
   'cybersigilism': {
     family: 'luminous',
     fonts: {
-      heading: { classes: ['blackletter', 'wide', 'deco'], picks: ['Texturina', 'Pirata One', 'Grenze Gotisch', 'Michroma'] },
+      heading: { classes: ['neo-grotesk', 'blackletter'], picks: ['Inter Tight', 'Grenze Gotisch', 'Texturina'] },
       body: { classes: ['neo-grotesk'], picks: ['Inter', 'Geist'] },
       mono: { picks: ['Geist Mono'] },
       avoid: ['rounded', 'groovy', 'heavy', 'pixel'],
-      why: 'Spiked blackletter is set once as the sigil, and everything people have to read stays in a clean neo-grotesk with mono labels.',
-      pairings: [['Pirata One', 'Inter'], ['Texturina', 'Geist'], ['Grenze Gotisch', 'Inter']],
+      why: 'A thin, tight grotesk sits beside hairline art; a spiky blackletter is the only alternative, and stock fat blackletter (Pirata One) stays out.',
+      pairings: [['Inter Tight', 'Inter'], ['Grenze Gotisch', 'Inter'], ['Texturina', 'Geist']],
     },
   },
   'industrial-hazard': {
@@ -382,34 +382,34 @@ const AESTHETIC_META = {
   'biomechanical-gothic': {
     family: 'luminous',
     fonts: {
-      heading: { classes: ['deco', 'old-style', 'didone'], picks: ['Marcellus', 'Cormorant Garamond', 'Cinzel', 'Italiana'] },
+      heading: { classes: ['old-style', 'didone'], picks: ['Cormorant Garamond', 'Italiana'] },
       body: { classes: ['text-serif', 'old-style'], picks: ['Spectral', 'EB Garamond'] },
       mono: { picks: ['IBM Plex Mono'] },
       avoid: ['rounded', 'groovy', 'pixel', 'geometric', 'blackletter'],
       why: 'Light inscriptional and high-contrast serifs read as carved relics; blackletter pushes the structure toward costume-store metal, so it stays out.',
-      pairings: [['Marcellus', 'Spectral'], ['Cormorant Garamond', 'Spectral'], ['Cinzel', 'EB Garamond']],
+      pairings: [['Cormorant Garamond', 'Spectral'], ['Italiana', 'Spectral'], ['Cormorant Garamond', 'EB Garamond']],
     },
   },
   'pirate-broadcast': {
     family: 'digital',
     fonts: {
-      heading: { classes: ['condensed', 'pixel', 'mono'], picks: ['Bebas Neue', 'VT323', 'Share Tech Mono', 'Oswald'] },
+      heading: { classes: ['pixel', 'mono', 'condensed'], picks: ['VT323', 'Share Tech Mono', 'Doto', 'Bebas Neue'] },
       body: { classes: ['mono'], picks: ['IBM Plex Mono', 'Share Tech Mono'] },
       mono: { picks: ['VT323'], note: 'VT323 for teletext readouts' },
       avoid: ['serif', 'rounded', 'groovy'],
       why: 'Teletext pages and chyrons are fixed-width or tall condensed caps on a character grid, so the type behaves like broadcast hardware.',
-      pairings: [['Bebas Neue', 'IBM Plex Mono'], ['VT323', 'Share Tech Mono'], ['Oswald', 'IBM Plex Mono']],
+      pairings: [['VT323', 'IBM Plex Mono'], ['Share Tech Mono', 'IBM Plex Mono'], ['Bebas Neue', 'IBM Plex Mono']],
     },
   },
   'dystopian-luxury': {
     family: 'print',
     fonts: {
-      heading: { classes: ['neo-grotesk', 'didone'], picks: ['Inter Tight', 'Archivo', 'Bodoni Moda', 'Instrument Serif'] },
-      body: { classes: ['neo-grotesk'], picks: ['Inter', 'Public Sans'] },
-      mono: { picks: ['IBM Plex Mono'] },
+      heading: { classes: ['neo-grotesk', 'didone'], picks: ['Archivo', 'Inter Tight', 'Bodoni Moda'] },
+      body: { classes: ['neo-grotesk'], picks: ['Arimo', 'Inter', 'Public Sans'] },
+      mono: { picks: ['Courier Prime', 'IBM Plex Mono'] },
       avoid: ['groovy', 'rounded', 'pixel', 'techno', 'deco'],
       why: 'Severity comes from removal, so a huge cropped grotesk or a single didone masthead sits over small clinical labels in a neutral sans.',
-      pairings: [['Inter Tight', 'Inter'], ['Bodoni Moda', 'Inter'], ['Archivo', 'Public Sans']],
+      pairings: [['Archivo', 'Arimo'], ['Inter Tight', 'Inter'], ['Bodoni Moda', 'Arimo']],
     },
   },
   'frutiger-aero': {
@@ -610,7 +610,11 @@ function fontFitFor(key, state) {
     });
     (f.avoid || []).forEach(c => { if (!classes.has(c) && c !== 'serif') problems.push(`${key}.avoid: unknown class "${c}"`); });
     [].concat(f.heading.picks, f.body.picks, f.mono ? f.mono.picks : [], ...(f.pairings || []))
-      .forEach(n => { if (!names.has(n)) problems.push(`${key}: font "${n}" is not in FONTS`); });
+      .forEach(n => {
+        if (!names.has(n)) { problems.push(`${key}: font "${n}" is not in FONTS`); return; }
+        const cls = FONTS.find(x => x.name === n).cls;
+        if (fontClassIn(cls, f.avoid)) problems.push(`${key}: font "${n}" (${cls}) is on its own avoid list`);
+      });
     if (!f.pairings || !f.pairings.length) problems.push(`${key}: no pairings`);
   });
   if (typeof AESTHETICS !== 'undefined') {

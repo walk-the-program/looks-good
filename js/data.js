@@ -25,28 +25,28 @@ const FONTS = [
   { name: 'Merriweather', css: '"Merriweather", Georgia, serif', category: 'serif', weights: '400;700', cls: 'text-serif' },
   { name: 'Source Serif 4', css: '"Source Serif 4", Georgia, serif', category: 'serif', weights: '400;600', ital: '400', cls: 'text-serif' },
   { name: 'Libre Baskerville', css: '"Libre Baskerville", Georgia, serif', category: 'serif', weights: '400;700', cls: 'text-serif' },
-  { name: 'Cormorant Garamond', css: '"Cormorant Garamond", Georgia, serif', category: 'serif', weights: '400;600', ital: '400', cls: 'old-style' },
+  { name: 'Cormorant Garamond', css: '"Cormorant Garamond", Georgia, serif', category: 'serif', weights: '300;400;600', ital: '400', cls: 'old-style' },
   { name: 'EB Garamond', css: '"EB Garamond", Georgia, serif', category: 'serif', weights: '400;600', ital: '400', cls: 'old-style' },
   { name: 'Crimson Pro', css: '"Crimson Pro", Georgia, serif', category: 'serif', weights: '400;600', cls: 'old-style' },
-  { name: 'Newsreader', css: '"Newsreader", Georgia, serif', category: 'serif', weights: '400;600', ital: '400', cls: 'text-serif' },
+  { name: 'Newsreader', css: '"Newsreader", Georgia, serif', category: 'serif', weights: '400;600', ital: '400', axes: { opsz: '6..72' }, cls: 'text-serif' },
   { name: 'Instrument Serif', css: '"Instrument Serif", Georgia, serif', category: 'serif', weights: '400', ital: '400', cls: 'soft-serif' },
   { name: 'DM Serif Display', css: '"DM Serif Display", Georgia, serif', category: 'serif', weights: '400', cls: 'didone' },
   { name: 'Libre Caslon Text', css: '"Libre Caslon Text", Georgia, serif', category: 'serif', weights: '400;700', ital: '400', cls: 'old-style' },
   { name: 'Spectral', css: '"Spectral", Georgia, serif', category: 'serif', weights: '400;600', ital: '400', cls: 'old-style' },
   { name: 'Literata', css: '"Literata", Georgia, serif', category: 'serif', weights: '400;600', ital: '400', cls: 'text-serif' },
   { name: 'Gloock', css: '"Gloock", Georgia, serif', category: 'serif', weights: '400', cls: 'soft-serif' },
-  { name: 'Fraunces', css: '"Fraunces", Georgia, serif', category: 'serif', weights: '400;600;900', ital: '400', cls: 'soft-serif' },
+  { name: 'Fraunces', css: '"Fraunces", Georgia, serif', category: 'serif', weights: '400;600;900', ital: '400', axes: { opsz: '9..144', SOFT: '0..100', WONK: '0..1' }, cls: 'soft-serif' },
   { name: 'Shippori Mincho', css: '"Shippori Mincho", Georgia, serif', category: 'serif', weights: '400;600', cls: 'text-serif' },
   { name: 'IM Fell English', css: '"IM Fell English", Georgia, serif', category: 'serif', weights: '400', ital: '400', cls: 'old-style' },
   { name: 'Tinos', css: '"Tinos", "Times New Roman", serif', category: 'serif', weights: '400;700', ital: '400', cls: 'text-serif' },
 
   /* ---- Sans-serif ---- */
-  { name: 'Inter', css: '"Inter", -apple-system, sans-serif', category: 'sans', weights: '400;500;700', cls: 'neo-grotesk' },
+  { name: 'Inter', css: '"Inter", -apple-system, sans-serif', category: 'sans', weights: '400;500;600;700', axes: { opsz: '14..32' }, cls: 'neo-grotesk' },
   { name: 'Poppins', css: '"Poppins", -apple-system, sans-serif', category: 'sans', weights: '400;600', cls: 'geometric' },
   { name: 'Work Sans', css: '"Work Sans", -apple-system, sans-serif', category: 'sans', weights: '400;600', cls: 'grotesk' },
   { name: 'DM Sans', css: '"DM Sans", -apple-system, sans-serif', category: 'sans', weights: '400;700', cls: 'geometric' },
-  { name: 'Manrope', css: '"Manrope", -apple-system, sans-serif', category: 'sans', weights: '400;700', cls: 'geometric' },
-  { name: 'Plus Jakarta Sans', css: '"Plus Jakarta Sans", -apple-system, sans-serif', category: 'sans', weights: '400;600', cls: 'geometric' },
+  { name: 'Manrope', css: '"Manrope", -apple-system, sans-serif', category: 'sans', weights: '400;600;700', cls: 'geometric' },
+  { name: 'Plus Jakarta Sans', css: '"Plus Jakarta Sans", -apple-system, sans-serif', category: 'sans', weights: '300;400;600', cls: 'geometric' },
   { name: 'Outfit', css: '"Outfit", -apple-system, sans-serif', category: 'sans', weights: '400;600', cls: 'geometric' },
   { name: 'Sora', css: '"Sora", -apple-system, sans-serif', category: 'sans', weights: '400;600', cls: 'geometric' },
   { name: 'Urbanist', css: '"Urbanist", -apple-system, sans-serif', category: 'sans', weights: '400;600', cls: 'geometric' },
@@ -55,6 +55,7 @@ const FONTS = [
   { name: 'Geist', css: '"Geist", -apple-system, sans-serif', category: 'sans', weights: '400;600', cls: 'neo-grotesk' },
   { name: 'Instrument Sans', css: '"Instrument Sans", -apple-system, sans-serif', category: 'sans', weights: '400;600', cls: 'neo-grotesk' },
   { name: 'Public Sans', css: '"Public Sans", -apple-system, sans-serif', category: 'sans', weights: '400;600', cls: 'neo-grotesk' },
+  { name: 'Arimo', css: '"Arimo", Arial, Helvetica, sans-serif', category: 'sans', weights: '400;700', cls: 'neo-grotesk' },
   { name: 'Karla', css: '"Karla", -apple-system, sans-serif', category: 'sans', weights: '400;600', cls: 'grotesk' },
   { name: 'Rubik', css: '"Rubik", -apple-system, sans-serif', category: 'sans', weights: '400;600', cls: 'rounded' },
   { name: 'Nunito Sans', css: '"Nunito Sans", -apple-system, sans-serif', category: 'sans', weights: '400;700', cls: 'humanist' },
@@ -62,14 +63,14 @@ const FONTS = [
   { name: 'Montserrat', css: '"Montserrat", -apple-system, sans-serif', category: 'sans', weights: '400;700', cls: 'geometric' },
   { name: 'Lato', css: '"Lato", -apple-system, sans-serif', category: 'sans', weights: '400;700', cls: 'humanist' },
   { name: 'Josefin Sans', css: '"Josefin Sans", -apple-system, sans-serif', category: 'sans', weights: '400;600', cls: 'geometric' },
-  { name: 'Archivo', css: '"Archivo", -apple-system, sans-serif', category: 'sans', weights: '400;600', cls: 'neo-grotesk' },
+  { name: 'Archivo', css: '"Archivo", -apple-system, sans-serif', category: 'sans', weights: '400;600;800;900', cls: 'neo-grotesk' },
   { name: 'Red Hat Display', css: '"Red Hat Display", -apple-system, sans-serif', category: 'sans', weights: '400;700', cls: 'geometric' },
   { name: 'Lexend', css: '"Lexend", -apple-system, sans-serif', category: 'sans', weights: '400;600', cls: 'geometric' },
-  { name: 'Jost', css: '"Jost", -apple-system, sans-serif', category: 'sans', weights: '400;600', cls: 'geometric' },
+  { name: 'Jost', css: '"Jost", -apple-system, sans-serif', category: 'sans', weights: '400;600;800', ital: '800', cls: 'geometric' },
   { name: 'IBM Plex Sans', css: '"IBM Plex Sans", -apple-system, sans-serif', category: 'sans', weights: '400;600', cls: 'neo-grotesk' },
   { name: 'Space Grotesk', css: '"Space Grotesk", -apple-system, sans-serif', category: 'sans', weights: '400;600', cls: 'grotesk' },
   { name: 'Syne', css: '"Syne", -apple-system, sans-serif', category: 'sans', weights: '400;700', cls: 'grotesk' },
-  { name: 'Inter Tight', css: '"Inter Tight", -apple-system, sans-serif', category: 'sans', weights: '400;500;600;700;800', cls: 'neo-grotesk' },
+  { name: 'Inter Tight', css: '"Inter Tight", -apple-system, sans-serif', category: 'sans', weights: '300;400;500;600;700;800', cls: 'neo-grotesk' },
   { name: 'Bricolage Grotesque', css: '"Bricolage Grotesque", -apple-system, sans-serif', category: 'sans', weights: '400;600;800', cls: 'grotesk' },
   { name: 'Fredoka', css: '"Fredoka", -apple-system, sans-serif', category: 'sans', weights: '400;500;600;700', cls: 'rounded' },
   { name: 'Baloo 2', css: '"Baloo 2", -apple-system, sans-serif', category: 'sans', weights: '400;600;800', cls: 'rounded' },
@@ -87,16 +88,20 @@ const FONTS = [
   { name: 'Big Shoulders Display', css: '"Big Shoulders Display", -apple-system, sans-serif', category: 'display', weights: '400;700', cls: 'condensed' },
   { name: 'Archivo Black', css: '"Archivo Black", -apple-system, sans-serif', category: 'display', weights: '400', cls: 'heavy' },
   { name: 'Dela Gothic One', css: '"Dela Gothic One", -apple-system, sans-serif', category: 'display', weights: '400', cls: 'heavy' },
-  { name: 'Bodoni Moda', css: '"Bodoni Moda", Georgia, serif', category: 'display', weights: '400;700', ital: '400', cls: 'didone' },
+  { name: 'Bodoni Moda', css: '"Bodoni Moda", Georgia, serif', category: 'display', weights: '400;700', ital: '400', axes: { opsz: '6..96' }, cls: 'didone' },
   { name: 'Italiana', css: '"Italiana", Georgia, serif', category: 'display', weights: '400', cls: 'deco' },
   { name: 'Cinzel', css: '"Cinzel", Georgia, serif', category: 'display', weights: '400;700', cls: 'deco' },
   { name: 'Marcellus', css: '"Marcellus", Georgia, serif', category: 'display', weights: '400', cls: 'deco' },
   { name: 'Yeseva One', css: '"Yeseva One", Georgia, serif', category: 'display', weights: '400', cls: 'didone' },
-  { name: 'Unbounded', css: '"Unbounded", -apple-system, sans-serif', category: 'display', weights: '200;400;600', cls: 'wide' },
+  { name: 'Unbounded', css: '"Unbounded", -apple-system, sans-serif', category: 'display', weights: '200;300;400;600', cls: 'wide' },
   { name: 'Michroma', css: '"Michroma", -apple-system, sans-serif', category: 'display', weights: '400', cls: 'wide' },
+  { name: 'Syncopate', css: '"Syncopate", -apple-system, sans-serif', category: 'display', weights: '400;700', cls: 'wide' },
+  { name: 'Tilt Warp', css: '"Tilt Warp", -apple-system, sans-serif', category: 'display', weights: '400', cls: 'heavy' },
   { name: 'Orbitron', css: '"Orbitron", -apple-system, sans-serif', category: 'display', weights: '400;600;800', cls: 'techno' },
   { name: 'Chakra Petch', css: '"Chakra Petch", -apple-system, sans-serif', category: 'display', weights: '400;500;700', cls: 'techno' },
   { name: 'Rajdhani', css: '"Rajdhani", -apple-system, sans-serif', category: 'display', weights: '400;600;700', cls: 'techno' },
+  { name: 'Tektur', css: '"Tektur", -apple-system, sans-serif', category: 'display', weights: '400;500;600;700;800;900', cls: 'techno' },
+  { name: 'Saira Condensed', css: '"Saira Condensed", -apple-system, sans-serif', category: 'display', weights: '400;600;700;800', cls: 'condensed' },
   { name: 'Poiret One', css: '"Poiret One", -apple-system, sans-serif', category: 'display', weights: '400', cls: 'deco' },
   { name: 'Limelight', css: '"Limelight", Georgia, serif', category: 'display', weights: '400', cls: 'deco' },
   { name: 'Shrikhand', css: '"Shrikhand", Georgia, serif', category: 'display', weights: '400', cls: 'groovy' },
@@ -104,6 +109,7 @@ const FONTS = [
   { name: 'Press Start 2P', css: '"Press Start 2P", monospace', category: 'display', weights: '400', cls: 'pixel' },
   { name: 'Silkscreen', css: '"Silkscreen", monospace', category: 'display', weights: '400;700', cls: 'pixel' },
   { name: 'Pixelify Sans', css: '"Pixelify Sans", -apple-system, sans-serif', category: 'display', weights: '400;600', cls: 'pixel' },
+  { name: 'Jersey 10', css: '"Jersey 10", monospace', category: 'display', weights: '400', cls: 'pixel' },
   { name: 'Grenze Gotisch', css: '"Grenze Gotisch", Georgia, serif', category: 'display', weights: '400;700', cls: 'blackletter' },
   { name: 'Pirata One', css: '"Pirata One", Georgia, serif', category: 'display', weights: '400', cls: 'blackletter' },
   { name: 'Texturina', css: '"Texturina", Georgia, serif', category: 'display', weights: '400;700', cls: 'blackletter' },
@@ -139,17 +145,28 @@ const FONTS = [
   { name: 'Special Elite', css: '"Special Elite", "Courier New", monospace', category: 'mono', weights: '400', cls: 'typewriter' },
   { name: 'Courier Prime', css: '"Courier Prime", "Courier New", monospace', category: 'mono', weights: '400;700', ital: '400;700', cls: 'typewriter' },
   { name: 'Share Tech Mono', css: '"Share Tech Mono", monospace', category: 'mono', weights: '400', cls: 'mono' },
+  { name: 'Kode Mono', css: '"Kode Mono", monospace', category: 'mono', weights: '400;700', cls: 'mono' },
 ];
 
 // Google Fonts css2 family parameter for a FONTS entry. Entries with
 // `ital: '400'` also request the true italic (tuples sorted: all `0,` before
 // all `1,`, weights ascending); others use the plain `:wght@` form.
+// Optional `axes: { opsz: '9..144', SOFT: '0..100' }` requests extra variable
+// axes as full ranges, so CSS font-variation-settings / font-optical-sizing
+// work. css2 wants axis tags alphabetical, lowercase before uppercase
+// (ital, opsz, wght, SOFT, WONK), and every tuple carries a value for each.
 function googleFamilyParam(font, weights) {
   const name = encodeURIComponent(font.name).replace(/%20/g, '+');
   const w = String(weights || font.weights || '400;700').split(';').map(Number).filter(Boolean).sort((a, b) => a - b);
-  if (!font.ital) return `family=${name}:wght@${w.join(';')}`;
-  const tuples = w.map(n => `0,${n}`).concat(String(font.ital).split(';').map(Number).filter(Boolean).sort((a, b) => a - b).map(n => `1,${n}`));
-  return `family=${name}:ital,wght@${tuples.join(';')}`;
+  const extra = font.axes ? Object.keys(font.axes) : [];
+  if (!font.ital && !extra.length) return `family=${name}:wght@${w.join(';')}`;
+  const order = (font.ital ? ['ital'] : [])
+    .concat(extra.filter(t => t === t.toLowerCase()).concat('wght').sort())
+    .concat(extra.filter(t => t !== t.toLowerCase()).sort());
+  const tuple = (ital, wght) => order.map(t => (t === 'ital' ? ital : t === 'wght' ? wght : font.axes[t])).join(',');
+  const italW = font.ital ? String(font.ital).split(';').map(Number).filter(Boolean).sort((a, b) => a - b) : [];
+  const tuples = w.map(n => tuple(0, n)).concat(italW.map(n => tuple(1, n)));
+  return `family=${name}:${order.join(',')}@${tuples.join(';')}`;
 }
 
 // Font class taxonomy. Every FONTS entry carries exactly one `cls` key from

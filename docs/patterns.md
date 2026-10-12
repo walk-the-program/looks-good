@@ -86,6 +86,50 @@ Bauhaus Poster → counterchange, arc rise, modular grid; Liquid Glass → aura 
 ASCII Art → type terrain; Xerox → halftone (threshold), stipple, signal mosaic in mono; Blueprint
 → modular grid lines, flow filaments in line ink …). The Brand suite shows these six.
 
+### Round 6 suite ownership
+Every suite's FIRST family (the deck cover band and closing strip) is unique across the 48
+aesthetics; a suite never repeats a family and has exactly 6 entries with valid params
+(check: `S/adv/sh/fitcheck2.js`). Free leads: chevron, bloomgrid, snow, satellite, festival.
+Fixed colourways in suites: tonal (soft-form), spectrum (holo), primaries (bauhaus), earth
+(groovy), brass (neo-deco), broadcast (pirate), safety (hazard tape in industrial-hazard and
+micrographics). * = lead differs from the requesting fixer/builder (conflict resolved).
+
+| Aesthetic | Lead | | Aesthetic | Lead |
+|---|---|---|---|---|
+| soft-form | counterchange | | blob-tracking | onebit |
+| raw-brutalist | glyphgrid | | xerox | thermal * |
+| neo-brutal-pop | flyposter | | micrographics | parcels * |
+| retro-futurist | gradpanes | | mixed-type | cutup * |
+| liquid-glass | neonspray * | | ascii-art | typeterrain |
+| holo-iridescent | oprings | | rebus | kaleidopix * |
+| aurora-noir | prismpix * | | corporate-vandalism | signal |
+| bauhaus-poster | specimens | | religious-futurism | tissue * |
+| clay | pebbles | | xerox-punk | tornbands |
+| riso-print | halftone | | acid-graphics | warpcheck |
+| editorial-serif | stipple * | | cybersigilism | rods |
+| neo-deco | burst | | industrial-hazard | panels |
+| y2k-chrome | thermalstreak * | | radical-memphis | patchwork |
+| cyber-hud | totem * | | biomechanical-gothic | waves |
+| bento-grid | modulargrid | | pirate-broadcast | pixelgrid |
+| mesh-gradient | flow | | dystopian-luxury | slipgrid * |
+| industrial-device | relief * | | frutiger-aero | aura |
+| pixel-arcade | terrain | | naive-doodle | sprigs |
+| groovy-70s | arcrise | | wabi-sabi | inkstill * |
+| blueprint | weave | | dark-academia | marble |
+| mid-century | tokens * | | art-nouveau | blades |
+| transit-wayfinding | ribbonrise | | gorpcore | sonar |
+| old-web | pixelquilt * | | big-top | zigzag * |
+| gummy | colony | | curio-cabinet | seafan * |
+
+Tie-breaks: warpcheck to acid-graphics (the warped checker is its signature; liquid-glass keeps it
+second); modulargrid to bento-grid (the family is a bento); weave to blueprint (section hatch); halftone
+to riso-print (xerox leads with thermal toner); specimens to bauhaus-poster; glyphgrid to raw-brutalist;
+signal to corporate-vandalism; burst to neo-deco (mid-century leads with atomic tokens); marble to
+dark-academia (old-web keeps Marble GIF second); pebbles to clay; gradpanes to retro-futurist
+(religious-futurism leads with tissue stained glass). Aesthetics whose deck hides the band image
+(big-top, gummy, frutiger-aero, blob-tracking, rebus) or drops it (wabi-sabi, curio-cabinet) took the
+leftover families.
+
 ## Patterns view UI
 - Big canvas (16:9, fills the workspace width), "New variation" (reseed), family picker (visual
   tiles with a search field and category chips, see below), auto-generated controls from the schema, Colorway control, Grain, Scale, Seed field.
