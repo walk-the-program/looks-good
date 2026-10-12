@@ -25,17 +25,15 @@
 'use strict';
 
 // ---- stem width (24-unit grid) from the heading weight ----
-// `view` is the rendered state (tokens(t, state) passes it; a blend swaps the faces);
-// the art and headline hooks get none and fall back to the global.
+// The weight is the shared abWeight(face, 800) (heaviest published weight <= 800; 700 when the
+// face lists none); the only rebus rule on top: a 400-only display face (Archivo Black, Anton)
+// is heavy by design, so its glyph stems are drawn at 800. `view` is the rendered state
+// (tokens(t, state) and ctx.state pass it; a blend swaps the faces); the global is a fallback.
 function rbHeadWeight(view) {
   const st = view || (typeof state !== 'undefined' ? state : null);
   const hf = st && st.headingFont;
-  const face = hf && hf.weights ? hf : { weights: '700' };
-  const ws = abWeights(face);
-  const hw = ws[0] <= 800 ? abWeight(face, 800) : ws[ws.length - 1];
-  // a 400-only display face (Archivo Black, Anton) is heavy by design
-  const heavy = hf && (hf.cls === 'heavy' || hf.cls === 'condensed') && hw < 600;
-  return heavy ? 800 : hw;
+  const hw = abWeight(hf && hf.weights ? hf : { weights: '700' }, 800);
+  return hf && (hf.cls === 'heavy' || hf.cls === 'condensed') && hw < 600 ? 800 : hw;
 }
 function rbStem(hw) { return Math.max(2, Math.min(4.2, (hw || 700) / 800 * 3.4)); }
 const f1 = n => (Math.round(n * 100) / 100).toString();
