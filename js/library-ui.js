@@ -137,15 +137,89 @@ const LibraryUI = (function () {
 
   /* ---------- tiles ---------- */
 
-  const tileFontObserver = 'IntersectionObserver' in window
+  /* A tile's art is a live miniature of the brand's own board: its header and hero, drawn
+     by the same boardHtml the Compare view uses, from a throwaway state built from the saved
+     brand (the open brand's `state` is never touched). Tiles draw when they scroll near the
+     viewport; any failure leaves the flat tile that tileHtml always renders underneath. */
+  const MINI_W = 520;                // design width of a miniature board, shrunk with CSS zoom
+  const miniCache = new Map();       // rec.id -> { stamp, mini }
+  const miniStamp = rec => `${rec.updatedAt}|${rec.name}|${rec.draftState ? 1 : 0}`;
+
+  function buildMini(rec) {
+    const saved = rec.draftState || rec.savedState;
+    if (!saved || typeof boardHtml !== 'function' || typeof abView !== 'function') return null;
+    const hit = miniCache.get(rec.id);
+    const stamp = miniStamp(rec);
+    if (hit && hit.stamp === stamp) return hit.mini;
+    const st = freshState();
+    st.headingFont = fontByName('Inter') || FONTS[0];
+    st.bodyFont = st.headingFont;
+    st.colors = generatePalette('analogous', 210);
+    // The loader decodes the logo asynchronously; the board only needs the data URL.
+    const { logoDataUrl, ...rest } = saved;
+    applySavedSessionToState(rest, st);
+    if (typeof logoDataUrl === 'string' && logoDataUrl.startsWith('data:image/')) st.logoDataUrl = logoDataUrl;
+    const mini = withContentOf(st.content, () => {
+      const v = abView(st);
+      return {
+        html: boardHtml(v.state, v.def, true),
+        blended: !!v.def.blend,
+        fonts: [v.state.headingFont, v.state.bodyFont],
+        vars: `--font-heading:${v.state.headingFont.css.replace(/"/g, "'")};--font-body:${v.state.bodyFont.css.replace(/"/g, "'")}`,
+      };
+    });
+    miniCache.set(rec.id, { stamp, mini });
+    return mini;
+  }
+
+  function fitTiles() {
+    const grid = $('libGrid');
+    const art = grid && grid.querySelector('.tile:not(.tile-new) .tile-art');
+    const w = art && art.clientWidth;
+    if (w) grid.style.setProperty('--tile-zoom', (w / MINI_W).toFixed(4));
+  }
+
+  function paintTile(art) {
+    const tile = art.closest('.tile[data-id]');
+    const rec = tile && records.find(r => r.id === tile.dataset.id);
+    const done = () => art.classList.remove('is-loading');
+    if (!rec) return done();
+    let mini = null;
+    try { mini = buildMini(rec); } catch (e) { mini = null; }
+    if (!mini) {
+      const font = FONTS.find(f => f.name === art.dataset.font);
+      return font && window.loadFontFamily ? window.loadFontFamily(font).then(done, done) : done();
+    }
+    // Reveal only once both faces are ready, so the miniature never flashes a fallback font.
+    const ready = window.loadFontFamily
+      ? Promise.all(mini.fonts.map(f => window.loadFontFamily(f)))
+      : Promise.resolve();
+    ready.catch(() => {}).then(() => {
+      if (!art.isConnected) return;
+      try {
+        const live = document.createElement('div');
+        live.className = 'tile-live';
+        live.setAttribute('aria-hidden', 'true');
+        live.inert = true;
+        live.innerHTML = `<div class="tile-board" style="${escapeHtml(mini.vars)}">${mini.html}</div>`;
+        if (mini.blended && typeof blendClearArtText === 'function') {
+          const root = live.querySelector('.ab');
+          blendClearArtText(root);
+          if (typeof blendLegibility === 'function') blendLegibility(root);
+        }
+        art.prepend(live);
+        art.classList.add('has-live');
+      } catch (e) { /* keep the flat tile */ }
+      done();
+    });
+  }
+
+  const tileObserver = 'IntersectionObserver' in window
     ? new IntersectionObserver(entries => {
         entries.forEach(en => {
           if (!en.isIntersecting) return;
-          const art = en.target;
-          tileFontObserver.unobserve(art);
-          const font = FONTS.find(f => f.name === art.dataset.font);
-          const done = () => art.classList.remove('is-loading');
-          if (font && window.loadFontFamily) window.loadFontFamily(font).then(done, done); else done();
+          tileObserver.unobserve(en.target);
+          paintTile(en.target);
         });
       }, { rootMargin: '200px' })
     : null;
@@ -164,7 +238,7 @@ const LibraryUI = (function () {
       : 'Aa';
     const band = ['primary', 'secondary', 'accent', 'neutralDark', 'neutralLight']
       .map(k => `<i style="background:${escapeHtml(colors[k] || '#cccccc')}"></i>`).join('');
-    const nameSize = slFit(rec.name, { max: 12, min: 6, widthPct: 78, lines: 2, glyph: 0.6 });
+    const nameSize = slFit(rec.name, { max: 12, min: 3, widthPct: 78, lines: 2, glyph: 0.6 });
     return `
       <article class="tile" tabindex="0" data-id="${rec.id}" aria-label="${escapeHtml(rec.name)}">
         <div class="tile-art is-loading" data-font="${escapeHtml(font.name)}"
@@ -199,8 +273,11 @@ const LibraryUI = (function () {
         <div class="tile-meta"><div class="tile-text"><div class="tile-title">New brand</div><div class="tile-sub">Start from a fresh combination</div></div></div>
       </button>`;
     grid.innerHTML = plus + records.map(tileHtml).join('');
+    const ids = new Set(records.map(r => r.id));
+    miniCache.forEach((_, id) => { if (!ids.has(id)) miniCache.delete(id); });
+    fitTiles();
     grid.querySelectorAll('.tile-art[data-font]').forEach(a => {
-      if (tileFontObserver) tileFontObserver.observe(a); else a.classList.remove('is-loading');
+      if (tileObserver) tileObserver.observe(a); else paintTile(a);
     });
   }
 
@@ -327,6 +404,8 @@ const LibraryUI = (function () {
     });
     document.addEventListener('mousedown', e => { if (menuEl && !menuEl.contains(e.target)) closeMenu(); });
     window.addEventListener('blur', closeMenu);
+    window.addEventListener('resize', fitTiles);
+    if ('ResizeObserver' in window) new ResizeObserver(fitTiles).observe(grid);
   }
 
   async function init() {

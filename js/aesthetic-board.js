@@ -707,7 +707,10 @@ function abBoardParts(state, def) {
 // numbered sections in def.layout.sectionOrder (ui, touch, use). A hero or palette is
 // followed by a rule unless it is the last block; the type block carries its own. The
 // default order produces exactly the markup the board always had.
-function boardHtml(state, def) {
+//
+// `top` (the Brands library tile) stops after the hero block: the same root, header and
+// hero markup as the full board, without the rest of it or the footer.
+function boardHtml(state, def, top) {
   const P = abBoardParts(state, def);
   const L = P.layout;
   const sec = { ui: P.secUi, touch: P.secTouch, use: P.secUse };
@@ -721,8 +724,10 @@ function boardHtml(state, def) {
   };
   const ruled = { hero: true, palette: true };
   let body = '';
-  L.order.forEach((k, i) => {
-    const last = i === L.order.length - 1;
+  const order = top ? L.order.slice(0, L.order.indexOf('hero') + 1) : L.order;
+  order.forEach((k, i) => {
+    if (top) { body += block[k](); return; }
+    const last = i === order.length - 1;
     // `type` ends with its own rule + newline indent; every other block gets one here.
     body += block[k]() + (ruled[k] && !last ? '\n    <div class="ab-rule"></div>\n    ' : (k === 'type' ? '' : '\n    '));
   });
@@ -730,7 +735,7 @@ function boardHtml(state, def) {
   <div class="ab-in">
     ${P.head()}
     <div class="ab-rule"></div>
-    ${body}${P.foot()}
+    ${body}${top ? '' : P.foot()}
   </div>
 </section>`;
 }

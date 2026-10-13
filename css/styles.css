@@ -1166,11 +1166,24 @@ html.is-mac-app .lib-inner { padding-top: 52px; }
   font-weight: 700;
   line-height: 1.05;
   letter-spacing: -0.02em;
-  overflow-wrap: anywhere;
+  overflow-wrap: normal;
+  word-break: keep-all;
+  hyphens: none;
   transition: opacity 240ms var(--ease);
 }
 .tile-art.is-loading .tile-mark,
 .tile-art.is-loading .tile-name { opacity: 0.15; }
+/* Live miniature of the brand's own board (js/library-ui.js): the top of the board at a
+   fixed design width, shrunk with CSS zoom like the Compare tiles, cropped by the art box.
+   Decorative: the tile itself is the control. */
+.tile-live { position: absolute; inset: 0; overflow: hidden; pointer-events: none; z-index: 1; animation: tile-in 260ms var(--ease) both; }
+.tile-board { width: 520px; zoom: var(--tile-zoom, 0.4); pointer-events: none; }
+.tile-board .ab { border-radius: 0; }
+.tile-art.has-live { background: transparent; }
+.tile-art.has-live .tile-mark, .tile-art.has-live .tile-name { visibility: hidden; }
+.tile-art.has-live .tile-band { z-index: 2; }
+@keyframes tile-in { from { opacity: 0; } to { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .tile-live { animation: none; } }
 .tile-band {
   position: absolute;
   left: 0; right: 0; bottom: 0;

@@ -16,25 +16,30 @@ function defaultTypography() {
   };
 }
 
-const state = {
-  headingFont: FONTS[0],
-  bodyFont: FONTS[0],
-  typography: defaultTypography(),
-  scheme: 'analogous',
-  hue: 210,
-  colors: null,
-  shapePreset: SHAPE_PRESETS[0],
-  bgMode: 'light',
-  pureBg: false,   // true: canvas is pure #FFFFFF (light) / #000000 (dark), not the style's tint (js/aesthetic-board.js)
-  logoImg: null,
-  logoDataUrl: null,
-  content: {},
-  aesthetic: 'soft-form',   // key into AESTHETICS (js/aesthetics/registry.js)
-  blend: null,     // { with, strength, channels } — second aesthetic blended in (js/blend.js)
-  locks: { typography: false, color: false, shape: false, aesthetic: false },
-  dismissed: [],   // suggestion ids dismissed for this brand
-  patterns: [],    // patterns in the brief (the cart): [{ key, params, colorway, seed, use, svg }] (js/patterns-ui.js)
-};
+// A fresh editor state with the same shape as `state`; the Brands library builds one per
+// tile to render a saved brand without touching the open one.
+function freshState() {
+  return {
+    headingFont: FONTS[0],
+    bodyFont: FONTS[0],
+    typography: defaultTypography(),
+    scheme: 'analogous',
+    hue: 210,
+    colors: null,
+    shapePreset: SHAPE_PRESETS[0],
+    bgMode: 'light',
+    pureBg: false,   // true: canvas is pure #FFFFFF (light) / #000000 (dark), not the style's tint (js/aesthetic-board.js)
+    logoImg: null,
+    logoDataUrl: null,
+    content: {},
+    aesthetic: 'soft-form',   // key into AESTHETICS (js/aesthetics/registry.js)
+    blend: null,     // { with, strength, channels } — second aesthetic blended in (js/blend.js)
+    locks: { typography: false, color: false, shape: false, aesthetic: false },
+    dismissed: [],   // suggestion ids dismissed for this brand
+    patterns: [],    // patterns in the brief (the cart): [{ key, params, colorway, seed, use, svg }] (js/patterns-ui.js)
+  };
+}
+const state = freshState();
 
 function pickRandom(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
 
@@ -230,10 +235,19 @@ const CONTENT_FIELDS = Object.keys(CONTENT_DEFAULTS);
 
 // state.content holds exactly what the user typed (possibly ''); this is the
 // version everything renders from.
+// A surface that renders a brand other than the open one (the Brands library tiles) wraps
+// the render in withContentOf(content, fn); the override lasts for that synchronous call.
+let contentOverride = null;
+function withContentOf(content, fn) {
+  const prev = contentOverride;
+  contentOverride = content || {};
+  try { return fn(); } finally { contentOverride = prev; }
+}
 function effectiveContent() {
   const out = {};
+  const src = contentOverride || state.content;
   CONTENT_FIELDS.forEach(key => {
-    const value = state.content[key];
+    const value = src[key];
     out[key] = (typeof value === 'string' && value.trim()) ? value : CONTENT_DEFAULTS[key];
   });
   return out;
