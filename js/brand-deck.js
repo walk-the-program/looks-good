@@ -1655,8 +1655,7 @@ async function bdBakeBoxes(doc, root) {
   }
 }
 
-// html2canvas ignores writing-mode: vertical text (Dark Academia's book spines, wabi-sabi and Y2K
-// side labels) was drawn horizontally in its narrow box and wrapped letter by letter. In the
+// html2canvas ignores writing-mode: vertical text (book spines and side labels) was drawn horizontally in its narrow box and wrapped letter by letter. In the
 // clone, the element's children move into one inner box laid out horizontally, as long as the
 // element's content box is tall and as wide as it is wide, and turned 90deg (-90deg for sideways-lr)
 // into place. The element keeps its own box, background and transform.

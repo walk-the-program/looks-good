@@ -86,13 +86,21 @@ function boardTokens(state, def) {
   const c = state.colors;
   const isDark = state.bgMode === 'dark';
   let canvas = isDark ? c.neutralDark : c.neutralLight;
-  const ink = isDark ? c.neutralLight : c.neutralDark;
+  let ink = isDark ? c.neutralLight : c.neutralDark;
   if (def && typeof def.canvas === 'function') {
     const adjusted = abRun(def, 'canvas', def.canvas, [{
       canvas, ink, isDark, primary: c.primary, secondary: c.secondary, accent: c.accent,
       mix: slMix, hexToHsl, hslToHex,
     }, state], null);
     if (adjusted && typeof adjusted === 'string') canvas = adjusted;
+  }
+  // Pure ground (state.pureBg, the quick button by the mode control): the canvas is
+  // #FFFFFF in light and #000000 in dark, replacing whatever def.canvas returned. The ink
+  // stays unless it fails 4.5:1 on that ground; then the readable helper picks black or white.
+  // Everything below derives from this canvas, so the board, deck, compare tiles and brief follow.
+  if (state.pureBg) {
+    canvas = isDark ? '#000000' : '#ffffff';
+    if (contrastRatio(ink, canvas) < 4.5) ink = pickReadableText(canvas);
   }
   // muted = ink moved 40% toward canvas, then pulled back toward ink until
   // small labels clear 4.5:1 with a margin (>= 4.6:1; a 4.49 rounds to a fail).
@@ -184,7 +192,7 @@ function abHeadline(tagline) {
 // The headline's h2 for the board hero and the deck's cover, principles and closing
 // slides. Normal case: `<h2 class="ab-headline[ extra]">` with the last word wrapped in
 // .ab-hl. When the def has a `headline(ctx, text)` hook (an aesthetic that draws its own
-// headline: ransom tiles, rebus, mixed type) the h2 is still the headline, so the deck's
+// headline: ransom tiles, mixed type) the h2 is still the headline, so the deck's
 // fit code (bdFitHeadline, bdFitCover) can measure it:
 //   <h2 class="ab-headline ab-headline--custom[ extra]" aria-label="text"><span aria-hidden="true">HOOK HTML</span></h2>
 // `text` is the plain (unescaped, trimmed) headline string and the hook returns inner HTML

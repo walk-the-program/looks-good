@@ -3,9 +3,11 @@
    neobrutalism.dev as the baseline to beat. Near-square radii (6px controls,
    10px cards), a paper canvas, 2px ink outlines, hard offset shadows that lift
    and squish. Split hero: a left-set three-line headline with "alive" as a
-   tilted sticker block, and a cluster of UI-object stickers (price tag, NEW
-   starburst, checkbox, cursor) on the right. Section fields switch to 100%
-   accent / primary. The deck's Material slide is a die-cut sticker sheet.
+   tilted sticker block with a flower sticker off its corner, and a cluster of
+   UI-object stickers (price tag, NEW starburst, checkbox, cursor, flower, squiggle)
+   on the right. Section label rows carry a small flower or starburst in the gutter.
+   Section fields switch to 100% accent / primary. The deck's Material slide is a
+   die-cut sticker sheet.
    Look lives in css/aesthetics/neo-brutal-pop.css. */
 // Heaviest real weight of a face, capped (400 when it has none at or under the cap). The face
 // comes from the view state being rendered (a blend swaps them).
@@ -39,6 +41,21 @@ function npKit(t) {
   const tagSvg = `<svg viewBox="52 60 192 156" xmlns="http://www.w3.org/2000/svg"><polygon points="${tag}" fill="${shc}" transform="${sh}"/><polygon points="${tag}" fill="${t.primary}" ${so}/><circle cx="88" cy="137" r="10" fill="${paper}" ${so}/><text x="168" y="164" text-anchor="middle" class="nba-t" font-size="76" fill="${on('onPrimary', ink)}" color="${on('onPrimary', ink)}">$1</text></svg>`;
   const starSvg = (word = 'NEW') => `<svg viewBox="-60 -60 126 126" xmlns="http://www.w3.org/2000/svg"><polygon points="${star}" fill="${shc}" transform="${sh}"/><polygon points="${star}" fill="${t.accent}" ${so}/><text x="0" y="9" text-anchor="middle" class="nba-t" font-size="26" fill="${on('onAccent', ink)}" color="${on('onAccent', ink)}">${word}</text></svg>`;
   return { ink, shc, paper, on, sh, so, tag, star, tagSvg, starSvg };
+}
+
+// The old board's flower sticker: eight round primary petals on a 3-unit ink outline,
+// a hard offset shadow and an accent centre. Drawn around (0,0); petal reach about 46.
+function npFlowerG(t, kit) {
+  const petals = [];
+  for (let i = 0; i < 8; i++) {
+    const an = (i * Math.PI) / 4;
+    petals.push([(27 * Math.cos(an)).toFixed(2), (27 * Math.sin(an)).toFixed(2)]);
+  }
+  const ring = attrs => petals.map(p => `<circle cx="${p[0]}" cy="${p[1]}" r="17" ${attrs}/>`).join('');
+  return `<g transform="translate(5 5)">${ring(`fill="${kit.shc}"`)}</g>`
+    + ring(`fill="${kit.ink}" stroke="${kit.ink}" stroke-width="3" stroke-linejoin="round"`)
+    + ring(`fill="${t.primary}"`)
+    + `<circle cx="0" cy="0" r="13" fill="${t.accent}" ${kit.so}/>`;
 }
 
 registerAesthetic({
@@ -96,6 +113,8 @@ registerAesthetic({
       '--ab-card-fill': fill(a),
       '--ab-paper': t.isDark ? t.mix(t.ink, t.canvas, 0.1) : t.mix('#ffffff', t.canvas, 0.9),
       '--np-star-img': uri(starSvg),
+      // the flower sticker for the highlight word and the section label rows (CSS only)
+      '--np-flower-img': uri(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="-50 -50 106 106">${npFlowerG(t, npKit(t))}</svg>`),
       // real weights only (font-synthesis is off): the heading face's heaviest up to 800, the UI face's
       '--np-hw': npHeavy(st && st.headingFont, 800),
       '--np-uw': npHeavy(st && st.bodyFont, 800),
@@ -130,6 +149,8 @@ registerAesthetic({
         <rect x="205" y="203" width="70" height="70" rx="8" fill="${t.secondary}" ${so}/>
         <path d="M222 238 L236 252 L260 222" fill="none" stroke="${on('onSecondary', ink)}" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
       </g>
+      <g transform="translate(54 238) rotate(10) scale(0.82)">${npFlowerG(t, npKit(t))}</g>
+      <path d="M104 30 q10 -12 20 0 t20 0 t20 0 t20 0" fill="none" stroke="${ink}" stroke-width="3" stroke-linecap="round"/>
       <g transform="translate(150 218) rotate(-14)">
         <polygon points="${cursor}" fill="${shc}" transform="translate(4 4)"/>
         <polygon points="${cursor}" fill="${paper}" ${so}/>
@@ -146,7 +167,8 @@ registerAesthetic({
     { name: 'Segment track', css: 'background: {paper}; border: 2px solid {ink}; border-radius: 10px; padding: 4px; /* selected segment: {primary} fill, 2px {ink} outline, radius 6 */' },
     { name: 'Highlight fill', css: 'background: {accent}; color: {onAccent}; border: 2px solid {ink}; border-radius: .12em; padding: 0 .18em; box-shadow: 4px 4px 0 {ink}; /* a color fill with a 2px ink outline behind one headline word */' },
     { name: 'Section field', css: 'background: {accent}; color: {onAccent}; border: 2px solid {ink}; border-radius: 10px; box-shadow: 4px 4px 0 {ink}; /* a whole section at 100% accent (or {primary} with {onPrimary}); the cards inside stay {paper} */' },
-    { name: 'UI-object sticker', css: 'a price tag, cursor, checkbox or starburst: flat {primary} / {accent} / {secondary} fill, 2px {ink} outline, 4-5px hard {ink} offset shadow, rotated 6-12deg, placed in the gutter, never over text' },
+    { name: 'UI-object sticker', css: 'a price tag, cursor, checkbox, starburst or flower: flat {primary} / {accent} / {secondary} fill, 2px {ink} outline, 4-5px hard {ink} offset shadow, rotated 6-12deg, placed in the gutter, never over text' },
+    { name: 'Squiggle', css: '2-3px {ink} round-capped wave line, unfilled; a decorative accent in the hero gutter, never under text' },
     { name: 'Outlined toggle', css: 'track: 64x34, radius 8, background {paper}, border 2px solid {ink}; knob: 23px, radius 5, of {ink}; on = track {primary}.' },
   ],
 

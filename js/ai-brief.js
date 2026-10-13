@@ -572,6 +572,7 @@ function buildAiBrief(state0) {
   });
   push(aibTable(['Token', 'Hex', 'Role', 'Job'], tokenRows), '');
   push(`Canvas is derived from ${t.isDark ? 'Neutral dark' : 'Neutral light'}${def.canvas ? ` and then adjusted by the ${def.name} aesthetic` : ''}. Use \`--canvas\`, not the raw neutral, for page and panel backgrounds.`, '');
+  if (state.pureBg) push('Background: pure #FFFFFF (light) / #000000 (dark), overriding the style\'s tint.', '');
   if (t.printed) {
     push(`The brand primary is \`${t.primary}\` (\`--primary\`), but ${def.name} prints it as \`${t.printPrimary}\` (\`--primary-print\`). Every primary fill, rule and mark in this aesthetic uses \`--primary-print\`, with \`--on-primary-print\` text on it and \`--pri-tint\` for quiet washes (both are derived from \`--primary-print\`). Show \`--primary\` only where the palette names the brand color.`, '');
   }

@@ -1,20 +1,18 @@
-/* 43 Transit Wayfinding — Directional, Coded, Calm. The interface behaves like a station
-   (NYCTA standards manual, INAT metro maps, Kinneir & Calvert, Tokyo Metro numbering).
+/* 43 Transit Wayfinding — Directional, Coded, Calm, minimal. The interface behaves like a station
+   (Vignelli's NYC subway signage, SBB and Swiss rail, Heathrow wayfinding, Kinneir & Calvert).
 
-   Mechanism. Everything that speaks is a SIGN: a #000 panel with white mixed-case type and a
-   1px white rule inset 6px from its top edge, on a concourse ground (#16181A dark, a pale
-   tiled grey light). Colour is rationed to meaning: the three client colours are ROUTES and
-   appear only as line strokes and route bullets (circles carrying a letter taken from the
-   brand name, M / A / R for "Marigold"; the accent route is the express, so its bullet is a
-   diamond). Each route colour is tinted until it holds 3:1 on black (bullets, sign lines) and,
-   in light mode, shaded until it holds 3:1 on the white map paper. One fixed alert yellow
-   (#FFC72C, black text) is the only other colour and only means "Diverted".
-   Headline: def.headline draws an arrow on a 10-unit grid (1-unit shaft, 45-degree head) in
-   front of the words: arrow first, then words. The destination word carries a route line
-   under it in route 1's colour. Hero art: the brand network, an octilinear map (0/45/90
-   degrees only, rounded 45-degree turns, ticks for stations, one white interchange disc named
-   after the brand, a pale river), under a sign strip with the three route bullets and over a
-   pictogram legend drawn on a 6x6 grid. */
+   Mechanism. Everything that speaks is a SIGN: a #000 panel with white mixed-case type and 4px
+   corners, on a plain concourse ground (#16181A dark, a pale grey light). The hero is one sign
+   band; the map is a second sign with a single strip on top. Colour is rationed to meaning: the
+   three client colours are ROUTES and appear only as line strokes and route bullets (circles
+   carrying a letter taken from the brand name, M / A / R for "Marigold"; the express route is a
+   diamond). Each route colour is tinted until it holds 3:1 on black (bullets, lines) and, in
+   light mode, shaded until it holds 3:1 on the white map paper. One fixed alert yellow (#FFC72C,
+   black text) is the only other colour and only means "Diverted". One arrow: straight, 0 degrees.
+   Headline: def.headline puts that arrow in front of the words, arrow first, and the destination
+   word carries a route line under it in route 1's colour. Hero art: a two-route octilinear map
+   (0/45/90 degrees, rounded turns, a few station ticks, one white interchange disc named after the
+   brand), under a sign strip with the three route bullets. No river, park, legend or decoration. */
 (function () {
 const TW_SIGN = '#000000';
 const TW_ALERT = '#FFC72C';
@@ -56,7 +54,6 @@ function twBrandName(st) {
 // A middle dot set in a neutral sans: the heading face's own U+00B7 (Overpass) has a wide left
 // and no right side-bearing, so "A · B" reads "A ·B".
 const TW_SEP = '<span class="tw-sep" aria-hidden="true">·</span>';
-const TW_SEP_SVG = '<tspan font-family="Arial, Helvetica, sans-serif">·</tspan>';
 
 // The brand name cut to whole words that fit `units` of map width at `px` (estimated at 0.6em a
 // character, bold); a single word that is still too long is cut with an ellipsis.
@@ -96,22 +93,9 @@ function twPath(pts, r) {
   return d + ` L${z[0]} ${z[1]}`;
 }
 
-// The arrow on a 10-unit grid: 1.6-unit shaft, 45-degree head. dir = rotation in degrees (0 = east).
+// The one arrow, on a 10-unit grid: 1.6-unit shaft, 45-degree head. dir = rotation in degrees (0 = east).
 function twArrow(dir, cls) {
   return `<svg class="${cls || 'tw-arrow'}" viewBox="0 0 10 10" aria-hidden="true" focusable="false"><g transform="rotate(${dir} 5 5)" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="square" stroke-linejoin="miter"><path d="M1.2 5H8.2M5.2 1.8 8.4 5 5.2 8.2"/></g></svg>`;
-}
-
-// Pictograms on a 6x6 grid (24 units, 4 per cell), drawn in currentColor.
-const TW_PICTOS = {
-  info: '<circle cx="12" cy="12" r="10.5" fill="currentColor"/><g style="fill:var(--tw-picto-bg, #000)"><circle cx="12" cy="7" r="1.9"/><path d="M10 10.4h3.6v7.2h1.4v1.8H9v-1.8h1.4v-5.4H10z"/></g>',
-  stairs: '<path d="M2 21h5v-4.5h5V12h5V7.5h5V3" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linejoin="miter"/>',
-  lift: '<rect x="4" y="2.5" width="16" height="19" fill="none" stroke="currentColor" stroke-width="2.2"/><path d="M12 5.8 15.4 10H8.6zM12 18.2 8.6 14h6.8z" fill="currentColor"/>',
-  exit: '<path d="M3 3h10v18H3z" fill="none" stroke="currentColor" stroke-width="2.2"/><path d="M9 12h11M16 8l4 4-4 4" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="square"/>',
-  stepfree: '<circle cx="10" cy="3.6" r="2.2" fill="currentColor"/><path d="M9.6 7.5v6.2h6.2l2.6 6.4" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linejoin="miter"/><path d="M6.6 11.2a6 6 0 1 0 8.6 7.3" fill="none" stroke="currentColor" stroke-width="2.2"/>',
-  plus: '<path d="M9 3h6v6h6v6h-6v6H9v-6H3V9h6z" fill="currentColor"/>',
-};
-function twPicto(name) {
-  return `<svg class="tw-picto" viewBox="0 0 24 24" aria-hidden="true" focusable="false">${TW_PICTOS[name] || ''}</svg>`;
 }
 
 function twBullet(letter, r, i, extra) {
@@ -125,24 +109,24 @@ registerAesthetic({
   key: 'transit-wayfinding', order: 43,
   name: 'Transit Wayfinding',
   descriptor: 'Directional · Coded · Calm',
-  influences: 'NYCTA standards / INAT metro maps / Kinneir & Calvert / Tokyo Metro numbering',
+  influences: 'Vignelli NYC subway / SBB Swiss rail / Heathrow wayfinding / Kinneir & Calvert',
   summary: 'Black sign panels and white type where every brand colour is a route and one yellow means alert.',
   motto: 'Colour means a route.',
   kicker: 'Next stop',
   mode: 'dark',
   slideShape: 'minimal',
   labels: { material: 'Lines', states: ['Scheduled', 'Approaching', 'Diverted'], statesKind: 'button' },
-  // a concourse leads with the departures board: 03 In use first, then the components
+  // a concourse leads with the departures list: 03 In use first, then the components
   layout: { hero: 'centered', palette: 'swatches', sections: 'two-col', sectionOrder: ['use', 'ui', 'touch'] },
   type: { ui: 'heading', label: 'heading', display: 0.78 },
   highlight: 'custom',
-  highlightNote: 'The destination word stays white on the black sign and gets a route line under it (route 1 colour, 0.09em thick, square ends), never a colour change or a highlighter band; an arrow drawn on a 10-unit grid always stands in front of the headline.',
+  highlightNote: 'The destination word stays white on the black sign and gets a route line under it (route 1 colour, 0.09em thick, square ends), never a colour change or a highlighter band; the straight arrow always stands in front of the headline.',
   cardFill: '--ab-sign',
 
   roles: {
     canvas: {
       job: 'Concourse',
-      use: 'The concourse ground the signs hang on: #16181A in dark mode, a pale tiled grey in light mode. Fixed, never a client tint. Sign panels are always #000 with white type and a 1px white rule 6px inside the top edge',
+      use: 'The plain ground the signs hang on: #16181A in dark mode, a pale grey in light mode. Fixed, never a client tint',
       never: 'Text, decoration, coloured panels',
       coverage: '45–55%',
     },
@@ -187,9 +171,8 @@ registerAesthetic({
       '--ab-alert': TW_ALERT,
       '--ab-rail': TW_GREY,
       '--tw-paper': t.isDark ? TW_SIGN : '#FFFFFF',
-      '--tw-tile': t.isDark ? 'rgba(255,255,255,0.035)' : 'rgba(0,0,0,0.05)',
-      '--ab-art-ratio': '16 / 8.4',
-      '--ab-art-ratio-narrow': '10 / 12',
+      '--ab-art-ratio': '16 / 7.4',
+      '--ab-art-ratio-narrow': '10 / 11',
       '--tw-cta': R[0].b,
       '--tw-on-cta': R[0].ob,
       '--ab-tr': 1,
@@ -210,7 +193,7 @@ registerAesthetic({
     if (!words.length) return '';
     const last = words.pop();
     const body = (words.length ? e(words.join(' ')) + ' ' : '') + `<span class="ab-hl tw-dest">${e(last)}</span>`;
-    return `<span class="tw-h">${twArrow(-45, 'tw-arw')}<span class="tw-t">${body}</span></span>`;
+    return `<span class="tw-h">${twArrow(0, 'tw-arw')}<span class="tw-t">${body}</span></span>`;
   },
 
   art(ctx) {
@@ -221,32 +204,22 @@ registerAesthetic({
     const dark = t.isDark;
     const paper = dark ? TW_SIGN : '#FFFFFF';
     const lbl = dark ? '#FFFFFF' : '#111111';
-    const sub = dark ? '#B9BBBE' : '#4B4C4F';
-    const water = dark ? '#16242D' : '#D3E3EC';
-    const park = dark ? '#121B15' : '#E2EDE0';
     const name = String(ctx.brandName || '').trim();
     const id = 'tw' + (++twSeq);
     const W = 10; // line width
-    // lines (0/45/90 only), interchange H at (360,170)
+    // Two routes on a 0/45/90 grid, meeting at one interchange (360, 150).
     const lines = [
-      { r: R[0], pts: [[-600, 170], [560, 170], [620, 230], [690, 230]], dash: [[690, 230], [740, 230]] },
-      { r: R[1], pts: [[64, 40], [230, 40], [360, 170], [360, 266]] },
-      { r: R[2], pts: [[64, 266], [270, 266], [360, 176], [450, 86], [652, 86]] },
+      { r: R[0], pts: [[70, 150], [560, 150], [650, 240]] },
+      { r: R[1], pts: [[360, 40], [360, 150], [260, 250]] },
     ];
     const stroke = lines.map(l => `<path d="${twPath(l.pts, 30)}" stroke="${l.r.g}"/>`).join('');
-    const ext = `<path d="M690 230H1400" stroke="${TW_GREY}" stroke-dasharray="2 9" stroke-width="${W - 4}"/>`;
     // stations: [x, y, line, tick dir (dx,dy), label, anchor, lx, ly]
     const st = [
-      [96, 170, 0, [0, -1], 'Mill Lane', 'middle', 96, 148],
-      [210, 170, 0, [0, -1], 'Market', 'middle', 210, 148],
-      [500, 170, 0, [0, -1], 'Archive', 'middle', 500, 148],
-      [600, 210, 0, [1, -1], 'Harbour', 'start', 618, 205],
-      [150, 40, 1, [0, 1], 'North Gate', 'middle', 150, 69],
-      [296, 106, 1, [1, -1], 'Library', 'start', 312, 101],
-      [360, 240, 1, [1, 0], 'Studio', 'start', 376, 245],
-      [168, 266, 2, [0, -1], 'Old Quay', 'middle', 168, 244],
-      [405, 131, 2, [1, 1], 'Gallery', 'start', 419, 159],
-      [560, 86, 2, [0, -1], 'Lookout', 'middle', 560, 64],
+      [150, 150, 0, [0, -1], 'Mill Lane', 'middle', 150, 126],
+      [250, 150, 0, [0, -1], 'Market', 'middle', 250, 126],
+      [470, 150, 0, [0, -1], 'Archive', 'middle', 470, 126],
+      [360, 92, 1, [1, 0], 'Library', 'start', 378, 97],
+      [300, 210, 1, [-1, -1], 'Old Quay', 'end', 284, 196],
     ];
     const ticks = st.map(s => {
       const [x, y, li, [dx, dy]] = s;
@@ -259,48 +232,36 @@ registerAesthetic({
     const span = s => { const w = s[4].length * 7.4; return s[5] === 'middle' ? [s[6] - w / 2, s[6] + w / 2] : s[5] === 'end' ? [s[6] - w, s[6]] : [s[6], s[6] + w]; };
     const labels = (x0, x1) => st.filter(s => { const [a, b] = span(s); return a >= x0 + 2 && b <= x1 - 2; })
       .map(s => `<text x="${s[6]}" y="${s[7]}" text-anchor="${s[5]}" class="twa-st" font-size="12.5" font-weight="600">${s[4]}</text>`).join('');
-    const hub = x1 => `<text x="384" y="200" class="twa-hub" font-size="16" font-weight="800" fill="${lbl}">${e(twFitName(name, Math.min(x1, 570) - 384 - 6, 16))}</text>
-      <text x="384" y="216" class="twa-hubs" font-size="11" fill="${sub}">Interchange ${TW_SEP_SVG} all routes</text>`;
-    // terminus bullets (route 3 is the express: diamond)
-    const term = [[lines[1].pts[0], 1], [lines[2].pts[0], 2], [[690, 230], 0], [lines[2].pts[4], 2], [lines[1].pts[3], 1]];
+    const hub = x1 => `<text x="386" y="184" class="twa-hub" font-size="16" font-weight="800" fill="${lbl}">${e(twFitName(name, Math.min(x1, 600) - 386 - 6, 16))}</text>`;
+    // terminus bullets: route 1 at both ends of its line, route 2 at both ends of its branch
+    const term = [[lines[0].pts[0], 0], [lines[0].pts[2], 0], [lines[1].pts[0], 1], [lines[1].pts[2], 1]];
     const bul = term.map(([[x, y], i]) => {
       const r = R[i];
-      const shape = i === 2
-        ? `<rect x="${x - 13}" y="${y - 13}" width="26" height="26" transform="rotate(45 ${x} ${y})" fill="${r.b}" stroke="${paper}" stroke-width="3"/>`
-        : `<circle cx="${x}" cy="${y}" r="16" fill="${r.b}" stroke="${paper}" stroke-width="3"/>`;
-      return `${shape}<text x="${x}" y="${y + 6}" text-anchor="middle" class="twa-bl" font-size="16" font-weight="800" fill="${r.ob}">${e(L[i])}</text>`;
+      return `<circle cx="${x}" cy="${y}" r="16" fill="${r.b}" stroke="${paper}" stroke-width="3"/><text x="${x}" y="${y + 6}" text-anchor="middle" class="twa-bl" font-size="16" font-weight="800" fill="${r.ob}">${e(L[i])}</text>`;
     }).join('');
-    // wide view box 0..720, narrow 182..546 (the interchange and its five nearest stations); the hub
-    // name stops before route 1's diagonal (x 570)
+    // wide view box 0..720, narrow 200..540 (the interchange and its nearest stations)
     const map = `<svg class="twa-map twa-map--w" viewBox="0 0 720 300" preserveAspectRatio="xMidYMid meet" aria-hidden="true" focusable="false"><g id="${id}-m">
       <rect x="-2000" y="-1000" width="4720" height="2300" fill="${paper}"/>
-      <rect x="58" y="84" width="150" height="40" rx="10" fill="${park}"/><text x="133" y="108" text-anchor="middle" class="twa-wt" font-size="10.5" letter-spacing="1.4" fill="${dark ? '#4F6656' : '#5E7A63'}">PARK</text>
-      <path d="${twPath([[500, 330], [556, 274], [1400, 274]], 40)}" fill="none" stroke="${water}" stroke-width="30"/>
-      <g fill="none" stroke-width="${W}" stroke-linecap="round" stroke-linejoin="round">${ext}${stroke}</g>
+      <g fill="none" stroke-width="${W}" stroke-linecap="round" stroke-linejoin="round">${stroke}</g>
       <g>${ticks}</g>
-      <circle cx="360" cy="171" r="19" fill="#FFFFFF" stroke="${dark ? '#FFFFFF' : '#111111'}" stroke-width="2"/>
-      <circle cx="360" cy="171" r="13.5" fill="none" stroke="#111111" stroke-width="4.5"/>
+      <circle cx="360" cy="150" r="16" fill="#FFFFFF" stroke="#111111" stroke-width="5"/>
       ${bul}
     </g>
-      <text x="700" y="279" text-anchor="end" class="twa-wt" font-size="10.5" letter-spacing="1.4" fill="${dark ? '#5C7584' : '#5B7A8C'}">RIVER</text>
       <g fill="${lbl}" class="twa-lb">${labels(0, 720)}</g>${hub(720)}
-    </svg><svg class="twa-map twa-map--n" viewBox="182 4 364 296" preserveAspectRatio="xMidYMid meet" aria-hidden="true" focusable="false"><use href="#${id}-m"/>
-      <g fill="${lbl}" class="twa-lb">${labels(182, 546)}</g>${hub(546)}
+    </svg><svg class="twa-map twa-map--n" viewBox="200 20 340 260" preserveAspectRatio="xMidYMid meet" aria-hidden="true" focusable="false"><use href="#${id}-m"/>
+      <g fill="${lbl}" class="twa-lb">${labels(200, 540)}</g>${hub(540)}
     </svg>`;
-    const legend = [['stepfree', 'Step-free'], ['lift', 'Lift'], ['stairs', 'Stairs'], ['exit', 'Exit'], ['info', 'Info'], ['plus', 'First aid']]
-      .map(([k, l]) => `<span class="twa-lg">${twPicto(k)}<b>${l}</b></span>`).join('');
     return `<div class="twa" data-dark="${dark ? 1 : 0}">
       <div class="twa-sign">
         <span class="twa-buls">${L.map((l, i) => twBullet(l, R[i], i)).join('')}</span>
-        <span class="twa-dest"><b>${e(twFitName(name, 211, 22))} network</b><small>Routes ${L.map(e).join(` ${TW_SEP} `)} ${TW_SEP} step-free throughout</small></span>
+        <span class="twa-dest"><b>${e(twFitName(name, 211, 22))} network</b></span>
         <span class="twa-dir">${twArrow(0, 'tw-arrow')}<b>All lines</b></span>
       </div>
       <div class="twa-mapbox">${map}</div>
-      <div class="twa-legend">${legend}</div>
     </div>`;
   },
 
-  // 03 as a real departures board: route bullet (a letter from the brand name), destination,
+  // 03 as a departures list: route bullet (a letter from the brand name), destination,
   // platform + status, line progress with the current station as a ring, percent.
   panels: {
     list(ctx) {
@@ -319,27 +280,27 @@ registerAesthetic({
   },
 
   materials: [
-    { name: 'Sign panel', css: 'background: {sign}; color: #FFFFFF; border-radius: 4px; box-shadow: inset 0 6px 0 {sign}, inset 0 7px 0 #FFFFFF; /* black panel, white mixed-case type at 600-800, a 1px white rule 6px inside the top edge; never a client colour */' },
-    { name: 'Route line', css: 'stroke: {route1}; stroke-width: 8px; stroke-linecap: round; stroke-linejoin: round; /* 0, 45 and 90 degrees only; 45-degree turns rounded at 3x the line width; stations are line-colour ticks, interchanges a white disc with a black ring; max three or four routes */' },
+    { name: 'Sign panel', css: 'background: {sign}; color: #FFFFFF; border-radius: 4px; /* black panel, white mixed-case type at 600-800; never a client colour */' },
+    { name: 'Route line', css: 'stroke: {route1}; stroke-width: 10px; stroke-linecap: round; stroke-linejoin: round; /* 0, 45 and 90 degrees only; 45-degree turns rounded; stations are line-colour ticks, the interchange a white disc; two or three routes */' },
     { name: 'Route bullet', css: 'background: {route1}; color: {onPrimary}; border-radius: 50%; width: 28px; height: 28px; font-weight: 800; /* a letter from the brand name (M, A, R); the express route (route 3) is a diamond; text white when it holds 4.5:1, else black */' },
-    { name: 'Alert panel', css: 'background: {alert}; color: #000000; border-radius: 4px; font-weight: 800; /* the ONE alert colour, fixed yellow #FFC72C with a warning pictogram; only for Diverted / delayed, never decoration */' },
-    { name: 'Platform tab', css: 'border: 2px solid #FFFFFF; color: #FFFFFF; width: 26px; height: 26px; font-weight: 800; font-variant-numeric: tabular-nums; /* numbers in squares; the selected platform is a white square with a black number */' },
-    { name: 'Rail toggle', css: 'background: linear-gradient({rail}, {rail}) center / 100% 4px no-repeat; /* a short line between two station dots; the knob is a route bullet that travels; on = the line in the route colour */' },
-    { name: 'Concourse', css: 'background: {canvas}; /* #16181A dark or pale tiled grey light; the signs hang on it, nothing coloured sits on it directly */' },
+    { name: 'Alert panel', css: 'background: {alert}; color: #000000; border-radius: 4px; font-weight: 800; /* the ONE alert colour, fixed yellow #FFC72C; only for Diverted / delayed, never decoration */' },
+    { name: 'Platform tab', css: 'border: 2px solid #FFFFFF; color: #FFFFFF; width: 28px; height: 28px; font-weight: 800; font-variant-numeric: tabular-nums; /* numbers in squares; the selected platform is a white square with a black number */' },
+    { name: 'Rail toggle', css: 'background: linear-gradient({rail}, {rail}) center / 100% 3px no-repeat; /* a single line; the knob is a round dot that travels; on = the line and knob in the route colour */' },
+    { name: 'Concourse', css: 'background: {canvas}; /* #16181A dark or pale grey light; the signs hang on it, nothing coloured sits on it directly */' },
   ],
 
   rules: {
     do: [
-      'Put every message on a sign: a #000 panel, white mixed-case type at 600-800 weight, a 1px white rule 6px inside the top edge, 0-4px corners.',
+      'Put every message on a sign: a #000 panel, white mixed-case type at 600-800 weight, 4px corners.',
       'Give each brand colour a route: a line and a bullet carrying a letter from the brand name; the third route is the express with a diamond bullet.',
-      'Draw diagrams at 0, 45 and 90 degrees only, with rounded 45-degree turns, line-colour ticks for stations and a white disc for the interchange.',
-      'Pair every arrow with a plain-language label, arrow first; set times and platforms in tabular figures.',
+      'Draw diagrams at 0, 45 and 90 degrees only, with rounded turns, line-colour ticks for stations and a white disc for the interchange.',
+      'Use one straight arrow and pair it with a plain-language label; set times and platforms in tabular figures.',
     ],
     dont: [
       'Use a brand colour as decoration, text or a background; colour means a route.',
       'Copy real transit marks: roundels, real line letters with their real colours, real maps.',
       'Use the alert yellow for anything but a diverted or delayed state; never hazard stripes or alarm language.',
-      'Set tiny type or expressive Swiss-poster headlines; signs are mid-size and read at fifty feet.',
+      'Set tiny type or add extra rules, badges and ornament; signs are mid-size and read at fifty feet.',
     ],
   },
   // Deck copy (js/brand-deck.js): three principles, three do / don't lines, each short.
@@ -348,7 +309,7 @@ registerAesthetic({
     coverMin: 50,
     principles: [
       ['Colour means a route', 'Each brand colour owns a line and a bullet.'],
-      ['Arrow first, then words', 'Every arrow comes with a plain label.'],
+      ['One arrow, plain words', 'Every arrow comes with a plain label.'],
       ['Readable from fifty feet', 'Type is large, contrast is high, angles are 0, 45 and 90.'],
     ],
     do: [

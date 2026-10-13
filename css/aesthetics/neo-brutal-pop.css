@@ -72,6 +72,15 @@
 }
 .ab[data-ae="neo-brutal-pop"] .ab-subcopy { color: var(--ab-ink); font-size: clamp(15px, 1.5cqw, 17px); max-width: 30em; margin-top: clamp(22px, 3cqw, 34px) !important; }
 .ab[data-ae="neo-brutal-pop"] .ab-sub-rest { color: var(--ab-muted); }
+/* the old board's flower, stuck on the highlight word's right edge, centred on the pill: the
+   centre sits about 0.34 of the flower past the pill, so the petals clear the last glyph and
+   the headline lines above and below */
+.ab[data-ae="neo-brutal-pop"] { --np-fl: clamp(64px, 9cqw, 96px); }
+.ab[data-ae="neo-brutal-pop"] .ab-hl { position: relative; }
+.ab[data-ae="neo-brutal-pop"] .ab-hl::after {
+  content: ""; position: absolute; width: var(--np-fl); aspect-ratio: 1; top: calc(50% - var(--np-fl) / 2); right: calc(var(--np-fl) * -0.84);
+  transform: rotate(10deg); pointer-events: none; background: var(--np-flower-img) center / 100% 100% no-repeat;
+}
 
 /* art: the UI-object sticker cluster (and the sticker sheet, deck Material only) */
 .ab[data-ae="neo-brutal-pop"] .ab-hero > .ab-art { max-width: 380px; aspect-ratio: 320 / 300; justify-self: end; }
@@ -282,6 +291,7 @@
   .ab[data-ae="neo-brutal-pop"] .ab-state-ctl { font-size: 12px; padding: 9px 4px; }
   .ab[data-ae="neo-brutal-pop"] .ab-states[data-kind="button"] { gap: 8px; }
   .ab[data-ae="neo-brutal-pop"] .ab-type-col[data-role="heading"] { transform: rotate(-1.2deg); }
+  .ab[data-ae="neo-brutal-pop"] .ab-hl { --np-fl: 46px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -295,6 +305,16 @@
   content: ""; position: absolute; right: 0; top: 0; width: 150px; height: 150px; rotate: 12deg; pointer-events: none;
   background: var(--np-star-img) center / 100% 100% no-repeat;
 }
+
+/* board accents: a flower in the In use label row and a starburst in the Stickers & squish label
+   row, both at the right end of the row (the labels sit at the left) */
+.ab[data-ae="neo-brutal-pop"] .ab-sec-use > .ab-labelrow::after,
+.ab[data-ae="neo-brutal-pop"] .ab-sec-touch > .ab-labelrow::after {
+  content: ""; flex: none; align-self: center; width: 40px; height: 40px; pointer-events: none;
+  background: center / 100% 100% no-repeat;
+}
+.ab[data-ae="neo-brutal-pop"] .ab-sec-use > .ab-labelrow::after { background-image: var(--np-flower-img); transform: rotate(8deg); }
+.ab[data-ae="neo-brutal-pop"] .ab-sec-touch > .ab-labelrow::after { background-image: var(--np-star-img); transform: rotate(-10deg); }
 
 /* deck: base deck labels in the UI face at a real weight */
 .ab[data-ae="neo-brutal-pop"] :is(.ab-deck-pname, .ab-deck-mark) { font-weight: var(--np-uw, 700); }

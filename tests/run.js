@@ -449,6 +449,27 @@ check('paste: empty text', run(`extractColors('').length`) === 0, 'found colors 
   check('colourways listed once each', ['hud', 'toner'].every(v => P.E.COLORWAYS.filter(c => c.value === v && c.fixed).length === 1), '');
 }
 
+/* ---- the pure white / black ground (pureBg) ---- */
+
+// pureBg survives a save and reload; a brand that never had the flag comes back off.
+{
+  const r = run(`(() => {
+    const s = freshState(); s.pureBg = true;
+    const saved = JSON.parse(JSON.stringify(serializeState(s)));
+    const t = freshState();
+    applySavedSessionToState(saved, t);
+    const off = freshState();
+    applySavedSessionToState(JSON.parse(JSON.stringify(serializeState(freshState()))), off);
+    return [saved.pureBg, t.pureBg, off.pureBg];
+  })()`);
+  check('pureBg: serialize/apply round-trip, and off by default', r.join() === 'true,true,false', JSON.stringify(r));
+}
+// Brands saved before pureBg existed have no field and must load with it off.
+{
+  const r = run(`(() => { const s = freshState(); s.pureBg = true; applySavedSessionToState({ aestheticKey: 'soft-form', bgMode: 'light' }, s); return s.pureBg; })()`);
+  check('pureBg: an old brand without the field loads off', r === false, String(r));
+}
+
 // Not run here (they need a real DOM): that blended tokens(t, state) see the view's fonts end to end, and the
 // render timings. They are covered by the in-browser sweeps in docs/round6/.
 

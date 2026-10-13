@@ -1,45 +1,17 @@
 /* ---------------------------------------------------------------------
-   43 Transit Wayfinding — directional, coded, calm. Every selector is scoped under
-   .ab[data-ae="transit-wayfinding"]. The board is a concourse (--ab-canvas, fixed) hung
-   with SIGNS: #000 panels, white mixed-case type, a 1px white rule 6px inside the top
-   edge, 4px corners. Colour = information: the three client colours are routes
-   (--ab-route1..3 tinted to 3:1 on black, --tw-g1..3 on the map paper, bullet text
-   --tw-o1..3, route letters --tw-l1..3 from the brand name) and appear only as lines and
-   bullets; --ab-alert (#FFC72C) is the one alert; --ab-rail is the inactive line grey.
-   Hooks: hero 'centered' (re-set flush-left as an overhead sign over the network map),
-   headline hook (grid arrow + destination line), highlight 'custom', states 'button'
-   (Scheduled / Approaching / Diverted), UI and label face = heading face.
+   43 Transit Wayfinding — minimal sign system (Vignelli NYC subway, SBB, Heathrow).
+   Every selector is scoped under .ab[data-ae="transit-wayfinding"].
+   One clear sign band (the hero), black sign panels with white mixed-case type and 4px
+   corners, generous spacing, few rules. Colour = information: the three client colours are
+   routes (--ab-route1..3 tinted to 3:1 on black, --tw-g1..3 on the map paper, bullet text
+   --tw-o1..3, route letters --tw-l1..3) and appear only as lines and bullets. --ab-alert
+   (#FFC72C) is the one alert, for Diverted only. One arrow (straight, 0 degrees) and one
+   bullet per route (circle; the express is a diamond).
 ------------------------------------------------------------------------ */
 
 .ab[data-ae="transit-wayfinding"] {
-  font-synthesis: none; border-radius: 4px;
+  font-synthesis: none; border-radius: 4px; background: var(--ab-canvas);
   --tw-white: #FFFFFF; --tw-dim: #B9BBBE; --tw-r: 4px;
-  background:
-    linear-gradient(var(--tw-tile) 1px, transparent 1px) 0 0 / 100% 48px,
-    linear-gradient(90deg, var(--tw-tile) 1px, transparent 1px) 0 0 / 48px 100%,
-    var(--ab-canvas);
-}
-
-/* ---- the sign panel: black, white type, 1px white rule 6px inside the top edge ---- */
-.ab[data-ae="transit-wayfinding"] .ab-head,
-.ab[data-ae="transit-wayfinding"] .ab-hero-copy,
-.ab[data-ae="transit-wayfinding"] .ab-type-col,
-.ab[data-ae="transit-wayfinding"] .ab-card,
-.ab[data-ae="transit-wayfinding"] .ab-panel,
-.ab[data-ae="transit-wayfinding"] .ab-list,
-.ab[data-ae="transit-wayfinding"] .ab-foot,
-.ab[data-ae="transit-wayfinding"] .twa {
-  position: relative; background: var(--ab-sign); color: var(--tw-white); border-radius: var(--tw-r);
-}
-.ab[data-ae="transit-wayfinding"] .ab-head::before,
-.ab[data-ae="transit-wayfinding"] .ab-hero-copy::before,
-.ab[data-ae="transit-wayfinding"] .ab-type-col::before,
-.ab[data-ae="transit-wayfinding"] .ab-card::before,
-.ab[data-ae="transit-wayfinding"] .ab-panel::before,
-.ab[data-ae="transit-wayfinding"] .ab-list::before,
-.ab[data-ae="transit-wayfinding"] .ab-foot::before,
-.ab[data-ae="transit-wayfinding"] .twa::before {
-  content: ""; position: absolute; left: 6px; right: 6px; top: 6px; height: 1px; background: var(--tw-white); pointer-events: none;
 }
 
 /* ---- middle dots: the heading face's U+00B7 (Overpass) has a wide left and no right side-bearing ("A ·B").
@@ -59,128 +31,94 @@
 .ab[data-ae="transit-wayfinding"] .tw-bul--x i { transform: rotate(-45deg) translateY(0.04em); }
 .ab[data-ae="transit-wayfinding"] .tw-arrow, .ab[data-ae="transit-wayfinding"] .tw-arw { display: block; overflow: visible; }
 
-/* ---- header: the overhead sign band ---- */
-.ab[data-ae="transit-wayfinding"] .ab-head { padding: 22px clamp(16px, 2.4cqw, 26px) 16px; gap: 18px; }
-.ab[data-ae="transit-wayfinding"] .ab-brand { gap: 12px; color: var(--tw-white); font-weight: var(--tw-hw, 800); letter-spacing: -0.01em; font-size: clamp(16px, 2.1cqw, 21px); }
-.ab[data-ae="transit-wayfinding"] .ab-mark { width: 32px; height: 32px; border-radius: 50%; background: var(--ab-route1); color: var(--tw-o1); font: var(--tw-hw, 800) 16px/1 var(--ab-font-h); }
+/* ---- header: plain text on the concourse, no panel ---- */
+.ab[data-ae="transit-wayfinding"] .ab-head { padding: 0 0 4px; gap: 18px; color: var(--ab-ink); }
+.ab[data-ae="transit-wayfinding"] .ab-brand { gap: 12px; color: var(--ab-ink); font-weight: var(--tw-hw, 800); letter-spacing: -0.01em; font-size: clamp(16px, 2.1cqw, 20px); }
+.ab[data-ae="transit-wayfinding"] .ab-mark { width: 30px; height: 30px; border-radius: 50%; background: var(--ab-route1); color: var(--tw-o1); font: var(--tw-hw, 800) 15px/1 var(--ab-font-h); }
 .ab[data-ae="transit-wayfinding"] .ab-mark span { transform: translateY(0.05em); }
-.ab[data-ae="transit-wayfinding"] .ab-tag { display: inline-flex; align-items: center; gap: 10px; color: var(--tw-white); font-size: 12px; letter-spacing: 0.06em; font-weight: var(--tw-mw, 600); }
-.ab[data-ae="transit-wayfinding"] .ab-tag-pre { color: var(--tw-dim); }
-.ab[data-ae="transit-wayfinding"] .ab-tag b { color: var(--tw-white); font-weight: var(--tw-hw, 800); letter-spacing: 0.02em; text-transform: none; font-size: 14px; }
-.ab[data-ae="transit-wayfinding"] .ab-tag::after {
-  content: ""; flex: none; width: 26px; height: 26px; border-radius: 2px; background:
-    linear-gradient(var(--tw-white), var(--tw-white)) 6px 12px / 12px 2.4px no-repeat,
-    linear-gradient(45deg, transparent 46%, var(--tw-white) 46% 60%, transparent 60%) 11px 6px / 9px 9px no-repeat,
-    linear-gradient(-45deg, transparent 46%, var(--tw-white) 46% 60%, transparent 60%) 11px 11px / 9px 9px no-repeat;
-  box-shadow: inset 0 0 0 2px var(--tw-white);
-}
-.ab[data-ae="transit-wayfinding"] .ab-rule { height: 0; background: none; }
+.ab[data-ae="transit-wayfinding"] .ab-tag { display: inline-flex; align-items: center; gap: 8px; color: var(--ab-muted); font-size: 12.5px; font-weight: var(--tw-mw, 600); }
+.ab[data-ae="transit-wayfinding"] .ab-tag-pre { color: var(--ab-muted); }
+.ab[data-ae="transit-wayfinding"] .ab-tag b { color: var(--ab-ink); font-weight: var(--tw-hw, 800); font-size: 14px; }
+.ab[data-ae="transit-wayfinding"] .ab-rule { display: none; }
 
-/* ---- hero: the overhead sign over the brand network map ---- */
-.ab[data-ae="transit-wayfinding"] .ab-hero { justify-items: stretch; gap: 10px; padding: 14px 0 34px; }
+/* ---- hero: the one sign band (black, white type, the signature 1px rule inset at its top edge) ---- */
+.ab[data-ae="transit-wayfinding"] .ab-hero { justify-items: stretch; gap: 14px; padding: 0 0 36px; }
 .ab[data-ae="transit-wayfinding"] .ab-hero-copy {
-  max-width: none; width: 100%; text-align: left; display: grid; grid-template-columns: minmax(0, 1fr) auto; column-gap: clamp(16px, 3cqw, 40px);
-  padding: clamp(24px, 3cqw, 34px) clamp(18px, 3cqw, 36px) clamp(20px, 2.8cqw, 32px);
+  position: relative; display: block; max-width: none; width: 100%; text-align: left; border-radius: var(--tw-r);
+  background: var(--ab-sign); color: var(--tw-white); padding: clamp(26px, 3.4cqw, 42px) clamp(22px, 3.2cqw, 40px) clamp(28px, 3.2cqw, 40px);
 }
-.ab[data-ae="transit-wayfinding"] .ab-hero-copy > * { grid-column: 1; }
-/* platform module at the right of the sign */
-.ab[data-ae="transit-wayfinding"] .ab-hero-copy::after {
-  content: "2"; grid-column: 2; grid-row: 1 / span 3; align-self: start; display: grid; place-items: center;
-  width: clamp(54px, 7.4cqw, 84px); height: clamp(54px, 7.4cqw, 84px); margin-top: 2px; border-radius: 2px;
-  background: var(--tw-white); color: #000; font: var(--tw-hw, 800) clamp(34px, 5cqw, 58px)/1 var(--ab-font-h); font-variant-numeric: tabular-nums;
+.ab[data-ae="transit-wayfinding"] .ab-hero-copy::before {
+  content: ""; position: absolute; left: 6px; right: 6px; top: 6px; height: 1px; background: var(--tw-white); pointer-events: none;
 }
 .ab[data-ae="transit-wayfinding"] .ab-kicker {
-  display: flex; align-items: center; gap: 10px; margin-bottom: clamp(12px, 1.8cqw, 18px) !important;
-  color: var(--tw-white); font-size: 13px; letter-spacing: 0.08em; font-weight: var(--tw-mw, 600);
+  margin: 0 0 clamp(14px, 1.8cqw, 20px) !important; color: var(--tw-dim); font-size: 12.5px; letter-spacing: 0.08em; text-transform: uppercase; font-weight: var(--tw-mw, 600);
 }
-.ab[data-ae="transit-wayfinding"] .ab-kicker::before {
-  content: var(--tw-l1); flex: none; display: grid; place-items: center; width: 26px; height: 26px; border-radius: 50%;
-  background: var(--ab-route1); color: var(--tw-o1); font: var(--tw-hw, 800) 13.5px/1 var(--ab-font-h); letter-spacing: 0; padding-top: 1px;
-}
-.ab[data-ae="transit-wayfinding"] .ab-kicker::after { content: "Platform 2  ·  every 4 min"; white-space: pre; color: var(--tw-dim); letter-spacing: 0.04em; text-transform: none; font-weight: 400; }
 .ab[data-ae="transit-wayfinding"] .ab-headline {
-  color: var(--tw-white); font-weight: var(--tw-hw, 800); letter-spacing: -0.012em; line-height: 1.04; text-wrap: balance;
-  font-size: calc(clamp(34px, 7.4cqw, 92px) * var(--ab-hl-scale, 1) * var(--ab-hs, 1) * var(--ab-display, 1));
+  color: var(--tw-white); font-weight: var(--tw-hw, 800); letter-spacing: -0.012em; line-height: 1.06; text-wrap: balance;
+  font-size: calc(clamp(34px, 7cqw, 88px) * var(--ab-hl-scale, 1) * var(--ab-hs, 1) * var(--ab-display, 1));
 }
-.ab[data-ae="transit-wayfinding"] .tw-h { display: grid; grid-template-columns: auto minmax(0, 1fr); column-gap: 0.26em; align-items: start; }
-.ab[data-ae="transit-wayfinding"] .tw-arw { width: 0.74em; height: 0.74em; margin-top: 0.14em; color: var(--tw-white); }
+.ab[data-ae="transit-wayfinding"] .tw-h { display: grid; grid-template-columns: auto minmax(0, 1fr); column-gap: 0.28em; align-items: start; }
+.ab[data-ae="transit-wayfinding"] .tw-arw { width: 0.7em; height: 0.7em; margin-top: 0.16em; color: var(--tw-white); }
 .ab[data-ae="transit-wayfinding"] .tw-t { min-width: 0; }
 .ab[data-ae="transit-wayfinding"] .ab-hl, .ab[data-ae="transit-wayfinding"][data-accent-text="low"] .ab-hl {
   color: inherit; padding: 0 0 0.07em; margin: 0; background: linear-gradient(var(--ab-route1), var(--ab-route1)) 0 100% / 100% 0.09em no-repeat;
   -webkit-box-decoration-break: clone; box-decoration-break: clone;
 }
-.ab[data-ae="transit-wayfinding"] .ab-subcopy { margin-left: 0 !important; margin-right: 0 !important; margin-top: clamp(14px, 1.8cqw, 20px) !important; max-width: 46em; color: var(--tw-dim); font-size: clamp(13.5px, 1.45cqw, 16px); }
+.ab[data-ae="transit-wayfinding"] .ab-subcopy { margin-left: 0 !important; margin-right: 0 !important; margin-top: clamp(14px, 1.8cqw, 20px) !important; max-width: 46em; color: var(--tw-dim); font-size: clamp(14px, 1.45cqw, 16px); }
 .ab[data-ae="transit-wayfinding"] .ab-sub-lead { color: var(--tw-white); font-weight: var(--tw-mw, 600); }
 
-/* ---- art: the network map panel ---- */
-.ab[data-ae="transit-wayfinding"] .ab-art { justify-self: stretch; max-width: none; aspect-ratio: var(--ab-art-ratio, 16 / 6.6); }
+/* ---- art: the network map on its own black panel, with one sign strip on top ---- */
+.ab[data-ae="transit-wayfinding"] .ab-art { position: relative; justify-self: stretch; max-width: none; aspect-ratio: var(--ab-art-ratio, 16 / 7.4); }
 .ab[data-ae="transit-wayfinding"] .twa {
   position: absolute; inset: 0; display: flex; flex-direction: column; overflow: hidden; font-family: var(--ab-font-h);
-  container-type: inline-size;
+  background: var(--ab-sign); color: var(--tw-white); border-radius: var(--tw-r); container-type: inline-size;
 }
-.ab[data-ae="transit-wayfinding"] .twa-sign { flex: none; display: flex; align-items: center; gap: clamp(10px, 2cqw, 22px); padding: 16px clamp(12px, 2.4cqw, 22px) 12px; border-bottom: 1px solid #2A2C2F; }
-.ab[data-ae="transit-wayfinding"] .twa-buls { display: flex; align-items: center; gap: 6px; font-size: clamp(13px, 2.2cqw, 17px); }
+.ab[data-ae="transit-wayfinding"] .twa-sign { flex: none; display: flex; align-items: center; gap: clamp(12px, 2.2cqw, 22px); padding: 18px clamp(16px, 2.6cqw, 26px) 16px; }
+.ab[data-ae="transit-wayfinding"] .twa-buls { display: flex; align-items: center; gap: 6px; font-size: clamp(13px, 2cqw, 16px); }
 .ab[data-ae="transit-wayfinding"] .twa-dest { min-width: 0; flex: 1; display: grid; }
-.ab[data-ae="transit-wayfinding"] .twa-dest b { font-weight: var(--tw-hw, 800); font-size: clamp(15px, 2.7cqw, 22px); line-height: 1.3; letter-spacing: -0.01em; overflow-wrap: anywhere; }   /* a long destination wraps, never cut */
-.ab[data-ae="transit-wayfinding"] .twa-dest small { font-size: clamp(10.5px, 1.5cqw, 12.5px); color: var(--tw-dim); letter-spacing: 0.02em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.ab[data-ae="transit-wayfinding"] .twa-dir { flex: none; display: flex; align-items: center; gap: 8px; font-weight: var(--tw-mw, 600); font-size: clamp(12px, 1.7cqw, 14px); }
-.ab[data-ae="transit-wayfinding"] .twa-dir .tw-arrow { width: 22px; height: 22px; }
+.ab[data-ae="transit-wayfinding"] .twa-dest b { font-weight: var(--tw-hw, 800); font-size: clamp(15px, 2.6cqw, 21px); line-height: 1.25; letter-spacing: -0.01em; overflow-wrap: anywhere; }
+.ab[data-ae="transit-wayfinding"] .twa-dir { flex: none; display: flex; align-items: center; gap: 8px; font-weight: var(--tw-mw, 600); font-size: clamp(12.5px, 1.6cqw, 14px); }
+.ab[data-ae="transit-wayfinding"] .twa-dir .tw-arrow { width: 18px; height: 18px; }
 .ab[data-ae="transit-wayfinding"] .twa-dir b { font-weight: inherit; }
 .ab[data-ae="transit-wayfinding"] .twa-mapbox { position: relative; flex: 1 1 auto; min-height: 0; }
 .ab[data-ae="transit-wayfinding"] .twa-map { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
-.ab[data-ae="transit-wayfinding"] .twa[data-dark="0"] .twa-mapbox { box-shadow: inset 0 0 0 6px #000; }
 .ab[data-ae="transit-wayfinding"] .twa-map text { font-family: var(--ab-font-h), "Helvetica Neue", Arial, sans-serif; }
 .ab[data-ae="transit-wayfinding"] .twa-st { font-size: 12.5px; font-weight: var(--tw-mw, 600); }
 .ab[data-ae="transit-wayfinding"] .twa-hub { font-size: 16px; font-weight: var(--tw-hw, 800); letter-spacing: -0.01em; }
-.ab[data-ae="transit-wayfinding"] .twa-hubs { font-size: 11px; font-weight: 400; }
 .ab[data-ae="transit-wayfinding"] .twa-bl { font-size: 16px; font-weight: var(--tw-hw, 800); }
-.ab[data-ae="transit-wayfinding"] .twa-wt { font-size: 11px; font-style: normal; letter-spacing: 0.12em; text-transform: uppercase; }
-.ab[data-ae="transit-wayfinding"] .twa-legend {
-  flex: none; display: flex; flex-wrap: wrap; gap: 6px clamp(10px, 2.4cqw, 26px); padding: 10px clamp(12px, 2.4cqw, 22px) 11px; border-top: 1px solid #2A2C2F;
-  --tw-picto-bg: #000;
-}
-.ab[data-ae="transit-wayfinding"] .twa-lg { display: inline-flex; align-items: center; gap: 7px; font-size: 12px; font-weight: var(--tw-mw, 600); color: var(--tw-white); }
-.ab[data-ae="transit-wayfinding"] .twa-lg b { font-weight: inherit; }
-.ab[data-ae="transit-wayfinding"] .tw-picto { width: 20px; height: 20px; flex: none; color: var(--tw-white); }
 .ab[data-ae="transit-wayfinding"] .twa-map--n { display: none; }
 @container (max-width: 520px) {
   .ab[data-ae="transit-wayfinding"] .twa-map--w { display: none; }
   .ab[data-ae="transit-wayfinding"] .twa-map--n { display: block; }
   .ab[data-ae="transit-wayfinding"] .twa-dir { display: none; }
-  .ab[data-ae="transit-wayfinding"] .twa-lg:nth-child(n+5) { display: none; }
-  .ab[data-ae="transit-wayfinding"] .twa-sign { padding-top: 15px; }
 }
 
-/* ---- palette: canvas and ink as panels; the three routes as line + bullet ---- */
-.ab[data-ae="transit-wayfinding"] .ab-palette { padding: 30px 0 26px; }
+/* ---- palette: canvas and ink as chips; the three routes as a line with a bullet ---- */
+.ab[data-ae="transit-wayfinding"] .ab-palette { padding: 34px 0 6px; }
 .ab[data-ae="transit-wayfinding"] .ab-label { color: var(--ab-ink); font-weight: var(--tw-mw, 600); font-size: 12px; letter-spacing: 0.08em; }
-.ab[data-ae="transit-wayfinding"] .ab-labelrow > .ab-label:last-child:not(:first-child) { color: var(--ab-muted); font-weight: 400; letter-spacing: 0.04em; text-transform: none; font-size: 12.5px; }
-.ab[data-ae="transit-wayfinding"] .ab-n { display: inline-grid; place-items: center; width: 22px; height: 22px; margin-right: 9px; border: 2px solid currentColor; border-radius: 2px; font-size: 11px; font-weight: var(--tw-hw, 800); letter-spacing: 0; font-variant-numeric: tabular-nums; vertical-align: 1px; }
+.ab[data-ae="transit-wayfinding"] .ab-labelrow > .ab-label:last-child:not(:first-child) { color: var(--ab-muted); font-weight: 400; letter-spacing: 0.02em; text-transform: none; font-size: 12.5px; }
+.ab[data-ae="transit-wayfinding"] .ab-n { display: inline-block; margin-right: 10px; color: var(--ab-ink); font-size: 12px; font-weight: var(--tw-hw, 800); letter-spacing: 0; font-variant-numeric: tabular-nums; }
 .ab[data-ae="transit-wayfinding"] .ab-n::after { content: none; }
-.ab[data-ae="transit-wayfinding"] .ab-chip { position: relative; height: 54px; border-radius: var(--tw-r); box-shadow: inset 0 0 0 1px rgba(128, 128, 128, 0.35); margin-bottom: 12px; }
-.ab[data-ae="transit-wayfinding"] .ab-swatch[data-role="ink"] .ab-chip { box-shadow: inset 0 0 0 1px rgba(128, 128, 128, 0.35), inset 0 6px 0 var(--sw), inset 0 7px 0 var(--sw-on); }
+.ab[data-ae="transit-wayfinding"] .ab-chip { position: relative; height: 54px; border-radius: var(--tw-r); margin-bottom: 12px; box-shadow: inset 0 0 0 1px rgba(128, 128, 128, 0.35); }
+.ab[data-ae="transit-wayfinding"] .ab-swatch[data-role="ink"] .ab-chip { box-shadow: inset 0 0 0 1px rgba(128, 128, 128, 0.35); }
 .ab[data-ae="transit-wayfinding"] .ab-swatch:is([data-role="primary"], [data-role="secondary"], [data-role="accent"]) .ab-chip {
-  height: 10px; margin: 22px 0 34px 0; border-radius: 5px; box-shadow: none;
+  height: 8px; margin: 24px 0 30px 0; border-radius: 4px; box-shadow: none;
 }
 .ab[data-ae="transit-wayfinding"] .ab-swatch:is([data-role="primary"], [data-role="secondary"], [data-role="accent"]) .ab-chip::before {
-  position: absolute; left: -1px; top: 50%; display: grid; place-items: center; width: 34px; height: 34px; margin-top: -17px; border-radius: 50%;
-  background: var(--sw); color: var(--sw-on); box-shadow: 0 0 0 3px var(--ab-canvas); font: var(--tw-hw, 800) 15px/1 var(--ab-font-h); padding-top: 2px;
+  content: ""; position: absolute; left: 0; top: 50%; width: 28px; height: 28px; margin-top: -14px; border-radius: 50%;
+  background: var(--sw); color: var(--sw-on); font: var(--tw-hw, 800) 14px/28px var(--ab-font-h); text-align: center;
 }
 .ab[data-ae="transit-wayfinding"] .ab-swatch[data-role="primary"] .ab-chip::before { content: var(--tw-l1); }
 .ab[data-ae="transit-wayfinding"] .ab-swatch[data-role="secondary"] .ab-chip::before { content: var(--tw-l2); }
-.ab[data-ae="transit-wayfinding"] .ab-swatch[data-role="accent"] .ab-chip::before { content: var(--tw-l3); border-radius: 0; width: 38px; height: 38px; margin-top: -19px; left: -3px; box-shadow: none; clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%); }
-/* station ticks along each route chip */
-.ab[data-ae="transit-wayfinding"] .ab-swatch:is([data-role="primary"], [data-role="secondary"], [data-role="accent"]) .ab-chip::after {
-  content: ""; position: absolute; left: 44px; right: 8px; top: -7px; height: 7px; background: repeating-linear-gradient(90deg, var(--sw) 0 4px, transparent 4px 28px);
-}
+.ab[data-ae="transit-wayfinding"] .ab-swatch[data-role="accent"] .ab-chip::before { content: var(--tw-l3); border-radius: 0; width: 32px; height: 32px; margin-top: -16px; clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%); }
 .ab[data-ae="transit-wayfinding"] .ab-sw-role { font-weight: var(--tw-hw, 800); font-size: 14px; letter-spacing: -0.005em; }
 .ab[data-ae="transit-wayfinding"] .ab-sw-job { font-size: 12px; color: var(--ab-muted); }
 .ab[data-ae="transit-wayfinding"] .ab-sw-hex { font-family: var(--ab-font-h); font-variant-numeric: tabular-nums; font-size: 12px; color: var(--ab-ink); letter-spacing: 0.03em; }
 
-/* ---- type: three sign modules ---- */
-.ab[data-ae="transit-wayfinding"] .ab-type { padding: 8px 0 30px; }
-.ab[data-ae="transit-wayfinding"] .ab-type-grid { gap: 10px; }
-.ab[data-ae="transit-wayfinding"] .ab-type-col { padding: 22px 18px 18px; border-top: 0; }
+/* ---- type: three plain sign panels ---- */
+.ab[data-ae="transit-wayfinding"] .ab-type { padding: 14px 0 30px; }
+.ab[data-ae="transit-wayfinding"] .ab-type-grid { gap: 12px; }
+.ab[data-ae="transit-wayfinding"] .ab-type-col { background: var(--ab-sign); color: var(--tw-white); border-radius: var(--tw-r); padding: 24px 22px 22px; border-top: 0; }
 .ab[data-ae="transit-wayfinding"] .ab-type-role { color: var(--tw-white); font-weight: var(--tw-mw, 600); font-size: 12px; letter-spacing: 0.08em; }
 .ab[data-ae="transit-wayfinding"] .ab-type-class { color: var(--tw-dim); }
 .ab[data-ae="transit-wayfinding"] .ab-type-pick { color: var(--tw-white); }
@@ -188,146 +126,123 @@
 .ab[data-ae="transit-wayfinding"] .ab-type-pick:not(:first-child) { color: var(--tw-dim); }
 .ab[data-ae="transit-wayfinding"] .ab-type-fit { color: var(--tw-dim); }
 .ab[data-ae="transit-wayfinding"] .ab-type-cur b { color: var(--tw-white); }
-.ab[data-ae="transit-wayfinding"] .ab-fit { border-radius: 2px; border: 2px solid var(--tw-white); background: none; color: var(--tw-white); font-family: var(--ab-font-h); font-weight: var(--tw-hw, 800); font-size: 11px; letter-spacing: 0.04em; padding: 1px 7px; }
-.ab[data-ae="transit-wayfinding"] .ab-fit[data-fit="match"] { background: var(--tw-white); color: #000; border-color: var(--tw-white); }
-.ab[data-ae="transit-wayfinding"] .ab-fit[data-fit="avoid"] { background: var(--ab-alert); border-color: var(--ab-alert); color: #000; }
+.ab[data-ae="transit-wayfinding"] .ab-fit { border: 0; border-radius: 0; background: none; color: var(--tw-white); font-family: var(--ab-font-h); font-weight: var(--tw-hw, 800); font-size: 12px; padding: 0; }
+.ab[data-ae="transit-wayfinding"] .ab-fit[data-fit="avoid"] { color: var(--tw-dim); font-weight: 600; }
 .ab[data-ae="transit-wayfinding"] .ab-type-avoid, .ab[data-ae="transit-wayfinding"] .ab-type-why { color: var(--ab-muted); }
 .ab[data-ae="transit-wayfinding"] .ab-type-k { color: var(--ab-ink); font-weight: var(--tw-hw, 800); letter-spacing: 0.06em; }
-.ab[data-ae="transit-wayfinding"] .ab-type-apply { border: 0; border-radius: var(--tw-r); background: var(--ab-sign); color: var(--tw-white); font-weight: var(--tw-hw, 800); padding: 11px 16px; display: inline-flex; gap: 10px; align-items: center; }
+.ab[data-ae="transit-wayfinding"] .ab-type-apply { border: 0; border-radius: var(--tw-r); background: var(--ab-sign); color: var(--tw-white); font-weight: var(--tw-hw, 800); padding: 12px 18px; display: inline-flex; gap: 10px; align-items: center; }
 .ab[data-ae="transit-wayfinding"] .ab-type-apply::after { content: "→"; font-weight: 400; }
-.ab[data-ae="transit-wayfinding"] .ab-type-apply:hover { background: var(--ab-sign); box-shadow: inset 0 0 0 2px var(--tw-white); }
 .ab[data-ae="transit-wayfinding"] .ab-type-pair { color: var(--ab-muted); }
 
-/* ---- 01: sign module with platform tabs and the route-1 action ---- */
-.ab[data-ae="transit-wayfinding"] .ab-sections { gap: 30px 14px; padding-top: 4px; }
-.ab[data-ae="transit-wayfinding"] .ab-card, .ab[data-ae="transit-wayfinding"] .ab-panel { padding: 28px clamp(18px, 2.6cqw, 26px) 24px; }
-.ab[data-ae="transit-wayfinding"] .ab-seg { counter-reset: twp; gap: 4px clamp(8px, 1.6cqw, 16px); padding: 0; background: none; border-radius: 0; flex-wrap: wrap; }
+/* ---- sections: the three numbered sections, spaced, no boxes around the numbers ---- */
+.ab[data-ae="transit-wayfinding"] .ab-sections { gap: 34px 16px; padding-top: 10px; }
+.ab[data-ae="transit-wayfinding"] .ab-card, .ab[data-ae="transit-wayfinding"] .ab-panel {
+  position: relative; background: var(--ab-sign); color: var(--tw-white); border-radius: var(--tw-r); padding: 30px clamp(20px, 2.6cqw, 28px) 28px;
+}
+.ab[data-ae="transit-wayfinding"] .ab-seg { counter-reset: twp; gap: 8px clamp(12px, 1.8cqw, 18px); padding: 0; background: none; border-radius: 0; flex-wrap: wrap; }
 .ab[data-ae="transit-wayfinding"] .ab-seg-btn {
-  counter-increment: twp; flex: none; display: inline-flex; align-items: center; gap: 9px; min-height: 34px; padding: 4px 4px 4px 0;
+  counter-increment: twp; flex: none; display: inline-flex; align-items: center; gap: 9px; min-height: 32px; padding: 0;
   border-radius: 0; color: var(--tw-dim); font-weight: var(--tw-mw, 600); font-size: 14px;
 }
 .ab[data-ae="transit-wayfinding"] .ab-seg-btn::before {
-  content: counter(twp); display: grid; place-items: center; width: 28px; height: 28px; border: 2px solid currentColor; border-radius: 2px;
-  font-weight: var(--tw-hw, 800); font-size: 14px; font-variant-numeric: tabular-nums;
+  content: counter(twp); display: grid; place-items: center; box-sizing: border-box; width: 28px; height: 28px; border: 2px solid currentColor; border-radius: 2px;
+  background: #000; font-weight: var(--tw-hw, 800); font-size: 14px; line-height: 1; font-variant-numeric: tabular-nums;
 }
+.ab[data-ae="transit-wayfinding"] .ab-seg-btn::after { content: none; }
 .ab[data-ae="transit-wayfinding"] .ab-seg-btn:hover { color: var(--tw-white); }
 .ab[data-ae="transit-wayfinding"] .ab-seg-btn[aria-pressed="true"] { color: var(--tw-white); font-weight: var(--tw-hw, 800); }
 .ab[data-ae="transit-wayfinding"] .ab-seg-btn[aria-pressed="true"]::before { background: var(--tw-white); border-color: var(--tw-white); color: #000; }
-.ab[data-ae="transit-wayfinding"] .ab-card-title { margin: 22px 0 6px !important; color: var(--tw-white); font-weight: var(--tw-hw, 800); letter-spacing: -0.01em; font-size: clamp(22px, 3cqw, 30px); line-height: 1.1; }
-.ab[data-ae="transit-wayfinding"] .ab-card-body { color: var(--tw-dim); font-size: 14px; margin-bottom: 22px !important; }
+.ab[data-ae="transit-wayfinding"] .ab-card-title { margin: 28px 0 8px !important; color: var(--tw-white); font-weight: var(--tw-hw, 800); letter-spacing: -0.01em; font-size: clamp(22px, 3cqw, 30px); line-height: 1.1; }
+.ab[data-ae="transit-wayfinding"] .ab-card-body { color: var(--tw-dim); font-size: 14px; margin-bottom: 26px !important; }
 
 .ab[data-ae="transit-wayfinding"] .ab-cta {
-  border-radius: var(--tw-r); background: var(--tw-cta); color: var(--tw-on-cta); padding: 14px 16px; min-height: 50px;
-  font-weight: var(--tw-hw, 800); font-size: 15px; letter-spacing: 0; transition: box-shadow 0.12s;
+  display: flex; justify-content: space-between; align-items: center; border: 0; border-radius: var(--tw-r); background: var(--tw-cta); color: var(--tw-on-cta);
+  padding: 14px 18px; min-height: 50px; font-weight: var(--tw-hw, 800); font-size: 15px; letter-spacing: 0; transition: box-shadow 0.12s;
 }
-.ab[data-ae="transit-wayfinding"] .ab-cta-arrow { position: relative; flex: none; width: 22px; height: 16px; transition: transform 0.12s; }
-.ab[data-ae="transit-wayfinding"] .ab-cta-arrow::before { content: ""; position: absolute; left: 1px; right: 3px; top: 7px; height: 2.6px; background: currentColor; }
-.ab[data-ae="transit-wayfinding"] .ab-cta-arrow::after { content: ""; position: absolute; right: 2px; top: 2.6px; width: 10px; height: 10px; border-top: 2.6px solid currentColor; border-right: 2.6px solid currentColor; transform: rotate(45deg); }
-.ab[data-ae="transit-wayfinding"] .ab-cta:hover, .ab[data-ae="transit-wayfinding"] .ab-cta.is-hover { box-shadow: inset 0 0 0 2px #000, inset 0 0 0 4px var(--tw-white); }
+.ab[data-ae="transit-wayfinding"] .ab-cta-arrow { flex: none; display: inline-block; font: 800 18px/1 var(--ab-font-h); transition: transform 0.12s; }
+.ab[data-ae="transit-wayfinding"] .ab-cta-arrow::before { content: "→"; }
+.ab[data-ae="transit-wayfinding"] .ab-cta-arrow::after { content: none; }
+.ab[data-ae="transit-wayfinding"] .ab-cta:hover, .ab[data-ae="transit-wayfinding"] .ab-cta.is-hover { box-shadow: inset 0 0 0 2px var(--tw-white); }
 .ab[data-ae="transit-wayfinding"] .ab-cta:hover .ab-cta-arrow, .ab[data-ae="transit-wayfinding"] .ab-cta.is-hover .ab-cta-arrow { transform: translateX(2px); }
 .ab[data-ae="transit-wayfinding"] .ab-cta:active { background: var(--tw-white); color: #000; box-shadow: none; }
-.ab[data-ae="transit-wayfinding"] .ab-cta:focus-visible { outline: 3px solid var(--tw-white); outline-offset: 3px; }
+.ab[data-ae="transit-wayfinding"] .ab-cta:focus-visible { outline: 2px solid var(--tw-white); outline-offset: 3px; }
 
-/* ---- 02 lines: "where to?" field, rail toggle, the three service states ---- */
-.ab[data-ae="transit-wayfinding"] .ab-fieldlabel { color: var(--tw-white); font-weight: var(--tw-mw, 600); font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; }
-.ab[data-ae="transit-wayfinding"] .ab-fieldlabel::after { content: "  ·  Where to?"; white-space: pre; text-transform: none; letter-spacing: 0.02em; color: var(--tw-dim); font-weight: 400; }
+/* ---- 02 input: "where to?" field, toggle, the three service states ---- */
+.ab[data-ae="transit-wayfinding"] .ab-fieldlabel { display: block; color: var(--tw-white); font-weight: var(--tw-mw, 600); font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; }
 .ab[data-ae="transit-wayfinding"][data-ae] .ab-input {
-  border: 0; border-bottom: 2px solid var(--tw-white); border-radius: 0; background-color: #111214; color: var(--tw-white);
-  padding: 13px 14px 12px 46px; font-weight: var(--tw-mw, 600); font-size: 16px;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 2.5a7 7 0 0 0-7 7c0 5.3 7 12 7 12s7-6.7 7-12a7 7 0 0 0-7-7z' fill='%23fff'/%3E%3Ccircle cx='12' cy='9.5' r='2.6' fill='%23000'/%3E%3C/svg%3E");
-  background-repeat: no-repeat; background-position: 14px 50%; background-size: 20px 20px;
+  display: block; width: 100%; margin-top: 12px; border: 0; border-bottom: 2px solid var(--tw-white); border-radius: 0; background: none; color: var(--tw-white);
+  padding: 10px 0 12px; font-weight: var(--tw-mw, 600); font-size: 16px; font-family: inherit;
 }
-.ab[data-ae="transit-wayfinding"][data-ae] .ab-input:focus { border-bottom-color: var(--ab-route1); box-shadow: 0 2px 0 var(--ab-route1); }
-.ab[data-ae="transit-wayfinding"] .ab-toggle { color: var(--tw-white); font-weight: var(--tw-mw, 600); font-size: 14px; }
+.ab[data-ae="transit-wayfinding"][data-ae] .ab-input:focus { outline: none; border-bottom-color: var(--ab-route1); }
+.ab[data-ae="transit-wayfinding"] .ab-toggle { display: flex; justify-content: space-between; align-items: center; margin-top: 22px; color: var(--tw-white); font-weight: var(--tw-mw, 600); font-size: 14px; }
 .ab[data-ae="transit-wayfinding"] .ab-switch {
-  width: 70px; height: 28px; border-radius: 0; transition: none;
-  background:
-    radial-gradient(circle at 7px 50%, var(--tw-white) 0 4.5px, transparent 5px),
-    radial-gradient(circle at calc(100% - 7px) 50%, var(--tw-white) 0 4.5px, transparent 5px),
-    linear-gradient(var(--ab-rail), var(--ab-rail)) 50% 50% / calc(100% - 14px) 5px no-repeat;
+  appearance: none; -webkit-appearance: none; position: relative; flex: none; margin: 0; border: 0; width: 56px; height: 24px; border-radius: 0; transition: none; cursor: pointer;
+  background: linear-gradient(var(--ab-rail), var(--ab-rail)) 50% 50% / 100% 3px no-repeat;
 }
-.ab[data-ae="transit-wayfinding"] .ab-switch:checked {
-  background:
-    radial-gradient(circle at 7px 50%, var(--tw-white) 0 4.5px, transparent 5px),
-    radial-gradient(circle at calc(100% - 7px) 50%, var(--tw-white) 0 4.5px, transparent 5px),
-    linear-gradient(var(--ab-route1), var(--ab-route1)) 50% 50% / calc(100% - 14px) 5px no-repeat;
-}
+.ab[data-ae="transit-wayfinding"] .ab-switch:checked { background: linear-gradient(var(--ab-route1), var(--ab-route1)) 50% 50% / 100% 3px no-repeat; }
 .ab[data-ae="transit-wayfinding"] .ab-switch::before {
-  left: 0; top: 1px; width: 26px; height: 26px; border-radius: 50%; background: var(--ab-rail); box-shadow: 0 0 0 3px #000; transition: transform 0.16s;
+  content: ""; position: absolute; left: 0; top: 1px; width: 22px; height: 22px; border-radius: 50%; background: var(--ab-rail); transition: transform 0.16s;
 }
-.ab[data-ae="transit-wayfinding"] .ab-switch:checked::before { transform: translateX(44px); background: var(--ab-route1); }
+.ab[data-ae="transit-wayfinding"] .ab-switch:checked::before { transform: translateX(34px); background: var(--ab-route1); }
 .ab[data-ae="transit-wayfinding"] .ab-switch:focus-visible { outline: 2px solid var(--tw-white); outline-offset: 4px; }
-.ab[data-ae="transit-wayfinding"] .ab-status { color: var(--tw-dim); font-size: 12px; }
-.ab[data-ae="transit-wayfinding"] .ab-states { gap: 8px; margin-top: 20px; }
-.ab[data-ae="transit-wayfinding"] .ab-state { color: var(--tw-dim); font-size: 11.5px; letter-spacing: 0.04em; font-weight: var(--tw-mw, 600); }
+.ab[data-ae="transit-wayfinding"] .ab-status { margin-top: 10px; color: var(--tw-dim); font-size: 12px; }
+.ab[data-ae="transit-wayfinding"] .ab-states { gap: 8px; margin-top: 22px; }
+.ab[data-ae="transit-wayfinding"] .ab-state { color: var(--tw-dim); font-size: 11.5px; letter-spacing: 0.02em; font-weight: var(--tw-mw, 600); }
 .ab[data-ae="transit-wayfinding"] .ab-states[data-kind="button"] .ab-state-ctl { justify-content: space-between; padding: 11px 10px; font-size: 13.5px; min-height: 0; }
-.ab[data-ae="transit-wayfinding"] .ab-states .ab-cta-arrow { display: block; width: 16px; transform: scale(0.8); }
-.ab[data-ae="transit-wayfinding"] .ab-states .ab-cta.is-hover .ab-cta-arrow { transform: scale(0.8) translateX(3px); }
-/* Diverted: the one alert colour, black label, warning pictogram */
-.ab[data-ae="transit-wayfinding"] .ab-state-ctl.is-pressed { background: var(--ab-alert); color: #000; box-shadow: none; justify-content: flex-start; gap: 8px; }
-.ab[data-ae="transit-wayfinding"] .ab-state-ctl.is-pressed::before {
-  content: "!"; flex: none; display: grid; place-items: end center; width: 18px; height: 16px; padding-bottom: 0; background: #000; color: var(--ab-alert);
-  clip-path: polygon(50% 0, 100% 100%, 0 100%); font: var(--tw-hw, 800) 11px/1 var(--ab-font-h);
-}
+.ab[data-ae="transit-wayfinding"] .ab-states .ab-cta-arrow { display: block; width: 14px; transform: scale(0.85); }
+.ab[data-ae="transit-wayfinding"] .ab-states .ab-cta.is-hover .ab-cta-arrow { transform: scale(0.85) translateX(3px); }
+/* Diverted: the one alert colour, black label */
+.ab[data-ae="transit-wayfinding"] .ab-state-ctl.is-pressed { background: var(--ab-alert); color: #000; box-shadow: none; }
 .ab[data-ae="transit-wayfinding"] .ab-state-ctl.is-pressed .ab-cta-arrow { display: none; }
 
-/* ---- 03 in use: the departures board ---- */
-.ab[data-ae="transit-wayfinding"] .ab-list { padding: 22px clamp(14px, 2.4cqw, 24px) 0; }
-.ab[data-ae="transit-wayfinding"] .tw-dfoot { display: block; padding: 10px 0 12px; border-top: 1px solid #2A2C2F; color: var(--tw-dim); font-size: 12px; letter-spacing: 0.04em; }
+/* ---- 03 in use: the departures list ---- */
+.ab[data-ae="transit-wayfinding"] .ab-list { position: relative; background: var(--ab-sign); color: var(--tw-white); border-radius: var(--tw-r); padding: 26px clamp(18px, 2.6cqw, 28px) 20px; }
+.ab[data-ae="transit-wayfinding"] .tw-dfoot { display: block; padding: 18px 0 0; color: var(--tw-dim); font-size: 12px; letter-spacing: 0.02em; }
 .ab[data-ae="transit-wayfinding"] .ab-row {
-  grid-template-columns: 34px minmax(0, 1.4fr) auto minmax(90px, 1fr) 5ch; gap: 4px clamp(12px, 2.2cqw, 22px);
-  padding: 13px 0; border-top: 1px solid #2A2C2F; border-bottom: 0; color: var(--tw-white); font-size: 14px;
+  display: grid; align-items: center; grid-template-columns: 32px minmax(0, 1.4fr) auto minmax(90px, 1fr) 5ch; gap: 6px clamp(14px, 2.2cqw, 22px);
+  padding: 14px 0; color: var(--tw-white); font-size: 14px;
 }
-.ab[data-ae="transit-wayfinding"] .ab-row:first-child { border-top: 0; }
+.ab[data-ae="transit-wayfinding"] .ab-row { border-top: 0; border-bottom: 0; }
 /* route bullet: a letter from the brand name on the route colour; route 3 (express) is a diamond */
 .ab[data-ae="transit-wayfinding"] .ab-row-n {
-  position: relative; isolation: isolate; display: grid; place-items: center; width: 32px; height: 32px; border-radius: 50%;
-  background: var(--tw-c, var(--ab-rail)); color: var(--tw-o, #fff); font: var(--tw-hw, 800) 15px/1 var(--ab-font-h);
+  position: relative; isolation: isolate; display: grid; place-items: center; width: 30px; height: 30px; border-radius: 50%;
+  background: var(--tw-c, var(--ab-rail)); color: var(--tw-o, #fff); font: var(--tw-hw, 800) 14px/1 var(--ab-font-h);
 }
 .ab[data-ae="transit-wayfinding"] .ab-row-n i { transform: translateY(1px); }
-.ab[data-ae="transit-wayfinding"] .ab-row-n.tw-rn--x { background: none; }
-.ab[data-ae="transit-wayfinding"] .ab-row-n.tw-rn--x::after { content: ""; position: absolute; z-index: -1; left: 4px; top: 4px; width: 24px; height: 24px; border-radius: 3px; background: var(--tw-c); transform: rotate(45deg); }
-.ab[data-ae="transit-wayfinding"] .ab-row-name { font-weight: var(--tw-hw, 800); font-size: clamp(16px, 2.1cqw, 20px); letter-spacing: -0.01em; color: var(--tw-white); }
+.ab[data-ae="transit-wayfinding"] .ab-row-n.tw-rn--x { border-radius: 0; clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%); }
+.ab[data-ae="transit-wayfinding"] .ab-row-name { font-weight: var(--tw-hw, 800); font-size: clamp(16px, 2cqw, 19px); letter-spacing: -0.01em; color: var(--tw-white); }
 .ab[data-ae="transit-wayfinding"] .ab-row-status { padding: 0; border-radius: 0; background: none; color: var(--tw-dim); font-size: 13px; font-weight: var(--tw-mw, 600); white-space: nowrap; }
 .ab[data-ae="transit-wayfinding"] .ab-row-status b { color: var(--tw-white); font-weight: inherit; font-variant-numeric: tabular-nums; }
-/* progress = the line diagram coloured up to the current station (a larger ring) */
+/* progress = a single line in the route colour with a ring at the current station */
 .ab[data-ae="transit-wayfinding"] .ab-row-bar {
-  position: relative; overflow: visible; height: 5px; border-radius: 3px;
-  background: linear-gradient(90deg, var(--ab-rail) 0 0) 0 50% / 100% 5px no-repeat;
+  position: relative; overflow: visible; height: 4px; border-radius: 2px; background: var(--ab-rail);
 }
-.ab[data-ae="transit-wayfinding"] .ab-row-bar::before { content: ""; position: absolute; left: 0; right: 0; top: -6px; height: 6px; background: repeating-linear-gradient(90deg, var(--ab-rail) 0 3px, transparent 3px 25%); }
-.ab[data-ae="transit-wayfinding"] .ab-row-bar i { position: relative; border-radius: 3px; background: var(--tw-c, var(--ab-route1)); }
+.ab[data-ae="transit-wayfinding"] .ab-row-bar i { position: relative; display: block; height: 100%; border-radius: 2px; background: var(--tw-c, var(--ab-route1)); }
 .ab[data-ae="transit-wayfinding"] .ab-row-bar i::after {
-  content: ""; position: absolute; right: -8px; top: 50%; width: 16px; height: 16px; margin-top: -8px; border-radius: 50%;
-  background: var(--tw-white); box-shadow: inset 0 0 0 4px var(--tw-c, var(--ab-route1));
+  content: ""; position: absolute; right: -7px; top: 50%; width: 14px; height: 14px; margin-top: -7px; border-radius: 50%;
+  background: var(--tw-white); box-shadow: inset 0 0 0 3px var(--tw-c, var(--ab-route1));
 }
-.ab[data-ae="transit-wayfinding"] .ab-row-pct { color: var(--tw-white); font-weight: var(--tw-hw, 800); font-size: 15px; }
+.ab[data-ae="transit-wayfinding"] .ab-row-pct { color: var(--tw-white); font-weight: var(--tw-hw, 800); font-size: 15px; text-align: right; }
 
-/* ---- footer: a low sign band ---- */
-.ab[data-ae="transit-wayfinding"] .ab-foot { margin-top: 30px; padding: 20px clamp(16px, 2.4cqw, 24px) 14px; border-top: 0; color: var(--tw-dim); font-size: 12.5px; align-items: center; }
-.ab[data-ae="transit-wayfinding"] .ab-motto { display: inline-flex; align-items: center; color: var(--tw-white); font-weight: var(--tw-hw, 800); font-size: 15px; }
-.ab[data-ae="transit-wayfinding"] .ab-dot { width: 18px; height: 18px; margin-right: 10px; border-radius: 50%; background: var(--ab-route1); box-shadow: 22px 0 0 var(--ab-route2), 44px 0 0 var(--ab-route3); margin-right: 56px; }
+/* ---- footer: a plain line on the concourse ---- */
+.ab[data-ae="transit-wayfinding"] .ab-foot { margin-top: 34px; padding: 0; border: 0; color: var(--ab-muted); font-size: 12.5px; align-items: center; background: none; }
+.ab[data-ae="transit-wayfinding"] .ab-motto { display: inline-flex; align-items: center; color: var(--ab-ink); font-weight: var(--tw-hw, 800); font-size: 15px; }
+.ab[data-ae="transit-wayfinding"] .ab-dot { display: none; }
 
 @container ab (max-width: 600px) {
-  .ab[data-ae="transit-wayfinding"] .ab-head { flex-wrap: wrap; row-gap: 10px; margin: 0; }
-  .ab[data-ae="transit-wayfinding"] .ab-tag::after { width: 22px; height: 22px; background-position: 4px 10px, 9px 4px, 9px 9px; }
-  .ab[data-ae="transit-wayfinding"] .ab-hero { padding: 12px 0 26px; }
-  .ab[data-ae="transit-wayfinding"] .ab-hero-copy { grid-template-columns: minmax(0, 1fr); padding: 26px 18px 20px; }
-  .ab[data-ae="transit-wayfinding"] .ab-hero-copy::after { position: absolute; right: 14px; top: 18px; width: 40px; height: 40px; font-size: 26px; }
-  .ab[data-ae="transit-wayfinding"] .ab-kicker { padding-right: 54px; flex-wrap: wrap; row-gap: 4px; }
-  .ab[data-ae="transit-wayfinding"] .ab-kicker::after { content: "Platform 2"; }
-  .ab[data-ae="transit-wayfinding"] .ab-headline { font-size: calc(clamp(30px, 10cqw, 44px) * var(--ab-hl-scale, 1) * var(--ab-hs, 1)); }
+  .ab[data-ae="transit-wayfinding"] .ab-head { flex-wrap: wrap; row-gap: 8px; }
+  .ab[data-ae="transit-wayfinding"] .ab-hero { padding: 0 0 26px; }
+  .ab[data-ae="transit-wayfinding"] .ab-hero-copy { padding: 26px 20px 24px; }
+  .ab[data-ae="transit-wayfinding"] .ab-headline { font-size: calc(clamp(30px, 10cqw, 42px) * var(--ab-hl-scale, 1) * var(--ab-hs, 1)); }
   .ab[data-ae="transit-wayfinding"] .ab-art { aspect-ratio: var(--ab-art-ratio-narrow, 10 / 11); max-width: none; }
-  .ab[data-ae="transit-wayfinding"] .ab-swatch:is([data-role="primary"], [data-role="secondary"], [data-role="accent"]) .ab-chip { grid-row: 1 / 4; height: 10px; margin: 0; }
-  .ab[data-ae="transit-wayfinding"] .ab-swatch:is([data-role="primary"], [data-role="secondary"], [data-role="accent"]) .ab-chip::after { left: 40px; }
-  .ab[data-ae="transit-wayfinding"] .ab-row { grid-template-columns: 34px minmax(0, 1fr) 5ch; }
+  .ab[data-ae="transit-wayfinding"] .ab-swatch:is([data-role="primary"], [data-role="secondary"], [data-role="accent"]) .ab-chip { grid-row: 1 / 4; height: 8px; margin: 0; }
+  .ab[data-ae="transit-wayfinding"] .ab-row { grid-template-columns: 32px minmax(0, 1fr) 5ch; }
   .ab[data-ae="transit-wayfinding"] .ab-row-n { grid-row: 1 / span 2; align-self: center; }
   .ab[data-ae="transit-wayfinding"] .ab-row-name { font-size: 17px; }
-  .ab[data-ae="transit-wayfinding"] .ab-foot { flex-direction: column; align-items: flex-start; }
+  .ab[data-ae="transit-wayfinding"] .ab-foot { flex-direction: column; align-items: flex-start; gap: 6px; }
   .ab[data-ae="transit-wayfinding"] .ab-states[data-kind="button"] .ab-state-ctl { padding: 10px 6px; font-size: 12px; }
   .ab[data-ae="transit-wayfinding"] .ab-states .ab-cta-arrow { display: none; }
 }
-/* a phone-width footer sign carries the motto and the route dots only; the reference list would wrap to three lines */
 @container ab (max-width: 480px) {
   .ab[data-ae="transit-wayfinding"] .ab-foot .ab-infl { display: none; }
 }
@@ -336,40 +251,36 @@
 }
 
 /* ---- deck ---- */
-.ab.ab-slide[data-ae="transit-wayfinding"] .ab-deck-cover .ab-hero { padding: 6px 0 14px; gap: 10px; }
-.ab.ab-slide[data-ae="transit-wayfinding"] .ab-deck-cover .ab-hero-copy { padding: 24px 30px 22px; }
+.ab.ab-slide[data-ae="transit-wayfinding"] .ab-deck-cover .ab-hero { padding: 0 0 12px; gap: 12px; }
+.ab.ab-slide[data-ae="transit-wayfinding"] .ab-deck-cover .ab-hero-copy { padding: 26px 30px 24px; }
 .ab.ab-slide[data-ae="transit-wayfinding"] .ab-deck-cover .ab-art { aspect-ratio: 16 / 5.4; }
 /* side-by-side cover: the sign on the left, the network map as a square panel on the right */
 .ab.ab-slide[data-ae="transit-wayfinding"][data-slide="cover"][data-cover-side] .ab-deck-cover .ab-hero { grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr); align-items: stretch; gap: 14px; }
 .ab.ab-slide[data-ae="transit-wayfinding"][data-slide="cover"][data-cover-side] .ab-deck-cover .ab-art { aspect-ratio: 4 / 2.7; align-self: center; }
-.ab.ab-slide[data-ae="transit-wayfinding"][data-slide="cover"] .twa-legend { display: none; }
 .ab.ab-slide[data-ae="transit-wayfinding"][data-slide="cover"][data-cover-side] .ab-deck-cover .ab-hero-copy { align-content: center; }
 .ab.ab-slide[data-ae="transit-wayfinding"] .ab-deck-stage .ab-art { width: 100%; max-width: none; aspect-ratio: 1 / 0.9; }
-.ab.ab-slide[data-ae="transit-wayfinding"] .ab-deck-h .tw-arw { width: 0.7em; height: 0.7em; color: currentColor; }
+.ab.ab-slide[data-ae="transit-wayfinding"] .ab-deck-h .tw-arw { width: 0.66em; height: 0.66em; color: currentColor; }
 .ab.ab-slide[data-ae="transit-wayfinding"] .ab-deck-principle, .ab.ab-slide[data-ae="transit-wayfinding"] .ab-deck-rule {
-  position: relative; background: var(--ab-sign); color: var(--tw-white); border-radius: var(--tw-r); padding: 22px 20px 16px;
-}
-.ab.ab-slide[data-ae="transit-wayfinding"] .ab-deck-principle::before, .ab.ab-slide[data-ae="transit-wayfinding"] .ab-deck-rule::before {
-  content: ""; position: absolute; left: 6px; right: 6px; top: 6px; height: 1px; background: var(--tw-white);
+  position: relative; background: var(--ab-sign); color: var(--tw-white); border-radius: var(--tw-r); padding: 22px 20px 18px;
 }
 .ab.ab-slide[data-ae="transit-wayfinding"] .ab-deck-principle .ab-label, .ab.ab-slide[data-ae="transit-wayfinding"] .ab-deck-ptitle { color: var(--tw-white); }
+.ab.ab-slide[data-ae="transit-wayfinding"] .ab-deck-principle .ab-n { color: var(--tw-white); }
 .ab.ab-slide[data-ae="transit-wayfinding"] .ab-deck-pline { color: var(--tw-dim); }
 .ab.ab-slide[data-ae="transit-wayfinding"] .ab-deck-ptitle { font-weight: var(--tw-hw, 800); }
 .ab.ab-slide[data-ae="transit-wayfinding"] .ab-deck-rule p { color: var(--tw-white); font-weight: var(--tw-mw, 600); }
-.ab.ab-slide[data-ae="transit-wayfinding"] .ab-deck-mark { display: grid; place-items: center; width: 30px; height: 30px; border-radius: 2px; letter-spacing: 0; font-variant-numeric: tabular-nums; background: var(--tw-white); color: #000; font-weight: var(--tw-hw, 800); }
-.ab.ab-slide[data-ae="transit-wayfinding"] .ab-deck-col[data-kind="dont"] .ab-deck-mark { border-radius: 2px; background: var(--ab-alert); color: #000; }
+.ab.ab-slide[data-ae="transit-wayfinding"] .ab-deck-mark { display: grid; place-items: center; width: 28px; height: 28px; border-radius: 2px; letter-spacing: 0; font-variant-numeric: tabular-nums; background: var(--tw-white); color: #000; font-weight: var(--tw-hw, 800); }
+.ab.ab-slide[data-ae="transit-wayfinding"] .ab-deck-col[data-kind="dont"] .ab-deck-mark { background: var(--ab-alert); color: #000; }
 .ab.ab-slide[data-ae="transit-wayfinding"] .ab-deck-cell { background: var(--ab-sign); border-radius: var(--tw-r); border: 0; color: var(--tw-white); position: relative; }
-.ab.ab-slide[data-ae="transit-wayfinding"] .ab-deck-cell::before { content: ""; position: absolute; left: 6px; right: 6px; top: 6px; height: 1px; background: var(--tw-white); }
 .ab.ab-slide[data-ae="transit-wayfinding"] .ab-deck-cell .ab-label { color: var(--tw-white); }
 /* the platform tabs fit a third-width sign: smaller tabs and gaps, never wider than the cell */
-.ab.ab-slide[data-ae="transit-wayfinding"] .ab-deck-cell .ab-seg { max-width: 100%; gap: 4px 12px; flex-wrap: wrap; justify-content: center; }
+.ab.ab-slide[data-ae="transit-wayfinding"] .ab-deck-cell .ab-seg { max-width: 100%; gap: 6px 12px; flex-wrap: wrap; justify-content: center; }
 .ab.ab-slide[data-ae="transit-wayfinding"] .ab-deck-cell .ab-seg-btn { gap: 7px; font-size: 13px; padding-right: 2px; }
 .ab.ab-slide[data-ae="transit-wayfinding"] .ab-deck-cell .ab-seg-btn::before { width: 24px; height: 24px; font-size: 13px; }
 .ab.ab-slide[data-ae="transit-wayfinding"] .ab-deck-uistates { background: var(--ab-sign); border-radius: var(--tw-r); padding: 16px 18px 8px; }
 
-/* deck "In product": the departures board in a half-width column */
+/* deck "In product": the departures list in a half-width column */
 .ab.ab-slide[data-ae="transit-wayfinding"] .ab-deck-prodframe { background: transparent; border: 0; padding: 0; }
-.ab.ab-slide[data-ae="transit-wayfinding"] .ab-deck-prod .ab-row { grid-template-columns: 34px minmax(0, 1fr) 5ch; }
+.ab.ab-slide[data-ae="transit-wayfinding"] .ab-deck-prod .ab-row { grid-template-columns: 32px minmax(0, 1fr) 5ch; }
 .ab.ab-slide[data-ae="transit-wayfinding"] .ab-deck-prod .ab-row-n { grid-row: 1 / span 2; align-self: center; }
 .ab.ab-slide[data-ae="transit-wayfinding"] .ab-deck-prod .ab-row-status { grid-column: 2; grid-row: 2; justify-self: start; }
 .ab.ab-slide[data-ae="transit-wayfinding"] .ab-deck-prod .ab-row-pct { grid-column: 3; grid-row: 1 / span 2; align-self: center; }

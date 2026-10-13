@@ -20,43 +20,30 @@
 <link rel="stylesheet" href="css/aesthetics/clay.css" />
 <link rel="stylesheet" href="css/aesthetics/riso-print.css" />
 <link rel="stylesheet" href="css/aesthetics/editorial-serif.css" />
-<link rel="stylesheet" href="css/aesthetics/neo-deco.css" />
-<link rel="stylesheet" href="css/aesthetics/y2k-chrome.css" />
 <link rel="stylesheet" href="css/aesthetics/cyber-hud.css" />
 <link rel="stylesheet" href="css/aesthetics/bento-grid.css" />
 <link rel="stylesheet" href="css/aesthetics/mesh-gradient.css" />
 <link rel="stylesheet" href="css/aesthetics/industrial-device.css" />
 <link rel="stylesheet" href="css/aesthetics/pixel-arcade.css" />
-<link rel="stylesheet" href="css/aesthetics/groovy-70s.css" />
 <link rel="stylesheet" href="css/aesthetics/blueprint.css" />
 <link rel="stylesheet" href="css/aesthetics/blob-tracking.css" />
 <link rel="stylesheet" href="css/aesthetics/xerox.css" />
 <link rel="stylesheet" href="css/aesthetics/micrographics.css" />
 <link rel="stylesheet" href="css/aesthetics/mixed-type.css" />
 <link rel="stylesheet" href="css/aesthetics/ascii-art.css" />
-<link rel="stylesheet" href="css/aesthetics/rebus.css" />
 <link rel="stylesheet" href="css/aesthetics/corporate-vandalism.css" />
-<link rel="stylesheet" href="css/aesthetics/religious-futurism.css" />
 <link rel="stylesheet" href="css/aesthetics/xerox-punk.css" />
 <link rel="stylesheet" href="css/aesthetics/acid-graphics.css" />
-<link rel="stylesheet" href="css/aesthetics/cybersigilism.css" />
-<link rel="stylesheet" href="css/aesthetics/industrial-hazard.css" />
 <link rel="stylesheet" href="css/aesthetics/radical-memphis.css" />
-<link rel="stylesheet" href="css/aesthetics/biomechanical-gothic.css" />
 <link rel="stylesheet" href="css/aesthetics/pirate-broadcast.css" />
 <link rel="stylesheet" href="css/aesthetics/dystopian-luxury.css" />
 <link rel="stylesheet" href="css/aesthetics/frutiger-aero.css" />
 <link rel="stylesheet" href="css/aesthetics/naive-doodle.css" />
-<link rel="stylesheet" href="css/aesthetics/wabi-sabi.css" />
-<link rel="stylesheet" href="css/aesthetics/dark-academia.css" />
+<link rel="stylesheet" href="css/aesthetics/japanese-minimal.css" />
 <link rel="stylesheet" href="css/aesthetics/mid-century.css" />
-<link rel="stylesheet" href="css/aesthetics/art-nouveau.css" />
 <link rel="stylesheet" href="css/aesthetics/transit-wayfinding.css" />
 <link rel="stylesheet" href="css/aesthetics/gorpcore.css" />
 <link rel="stylesheet" href="css/aesthetics/old-web.css" />
-<link rel="stylesheet" href="css/aesthetics/big-top.css" />
-<link rel="stylesheet" href="css/aesthetics/gummy.css" />
-<link rel="stylesheet" href="css/aesthetics/curio-cabinet.css" />
 <link rel="stylesheet" href="css/brand-deck.css" />
 <link rel="stylesheet" href="css/patterns.css" />
 <link rel="stylesheet" href="css/color-picker.css" />
@@ -360,9 +347,12 @@
     <details class="panel">
       <summary class="panel-head"><h2>Background &amp; logo</h2></summary>
       <div class="panel-body">
-        <div class="segmented">
-          <label><input type="radio" name="bgMode" value="light" checked /> Light</label>
-          <label><input type="radio" name="bgMode" value="dark" /> Dark</label>
+        <div class="bg-mode-row">
+          <div class="segmented">
+            <label><input type="radio" name="bgMode" value="light" checked /> Light</label>
+            <label><input type="radio" name="bgMode" value="dark" /> Dark</label>
+          </div>
+          <button type="button" id="pureBgToggle" class="pure-bg-btn" aria-pressed="false" aria-label="Pure white/black background" title="Pure white / black"><i aria-hidden="true"></i></button>
         </div>
         <input type="file" id="logoInput" accept="image/*" aria-label="Upload logo image" />
         <div class="logo-row" id="logoPreviewRow" hidden>
@@ -511,43 +501,30 @@
 <script src="js/aesthetics/clay.js"></script>
 <script src="js/aesthetics/riso-print.js"></script>
 <script src="js/aesthetics/editorial-serif.js"></script>
-<script src="js/aesthetics/neo-deco.js"></script>
-<script src="js/aesthetics/y2k-chrome.js"></script>
 <script src="js/aesthetics/cyber-hud.js"></script>
 <script src="js/aesthetics/bento-grid.js"></script>
 <script src="js/aesthetics/mesh-gradient.js"></script>
 <script src="js/aesthetics/industrial-device.js"></script>
 <script src="js/aesthetics/pixel-arcade.js"></script>
-<script src="js/aesthetics/groovy-70s.js"></script>
 <script src="js/aesthetics/blueprint.js"></script>
 <script src="js/aesthetics/blob-tracking.js"></script>
 <script src="js/aesthetics/xerox.js"></script>
 <script src="js/aesthetics/micrographics.js"></script>
 <script src="js/aesthetics/mixed-type.js"></script>
 <script src="js/aesthetics/ascii-art.js"></script>
-<script src="js/aesthetics/rebus.js"></script>
 <script src="js/aesthetics/corporate-vandalism.js"></script>
-<script src="js/aesthetics/religious-futurism.js"></script>
 <script src="js/aesthetics/xerox-punk.js"></script>
 <script src="js/aesthetics/acid-graphics.js"></script>
-<script src="js/aesthetics/cybersigilism.js"></script>
-<script src="js/aesthetics/industrial-hazard.js"></script>
 <script src="js/aesthetics/radical-memphis.js"></script>
-<script src="js/aesthetics/biomechanical-gothic.js"></script>
 <script src="js/aesthetics/pirate-broadcast.js"></script>
 <script src="js/aesthetics/dystopian-luxury.js"></script>
 <script src="js/aesthetics/frutiger-aero.js"></script>
 <script src="js/aesthetics/naive-doodle.js"></script>
-<script src="js/aesthetics/wabi-sabi.js"></script>
-<script src="js/aesthetics/dark-academia.js"></script>
+<script src="js/aesthetics/japanese-minimal.js"></script>
 <script src="js/aesthetics/mid-century.js"></script>
-<script src="js/aesthetics/art-nouveau.js"></script>
 <script src="js/aesthetics/transit-wayfinding.js"></script>
 <script src="js/aesthetics/gorpcore.js"></script>
 <script src="js/aesthetics/old-web.js"></script>
-<script src="js/aesthetics/big-top.js"></script>
-<script src="js/aesthetics/gummy.js"></script>
-<script src="js/aesthetics/curio-cabinet.js"></script>
 <script src="js/aesthetic-meta.js"></script>
 <script src="js/aesthetic-board.js"></script>
 <script src="js/blend.js"></script>

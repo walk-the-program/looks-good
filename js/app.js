@@ -25,6 +25,7 @@ const state = {
   colors: null,
   shapePreset: SHAPE_PRESETS[0],
   bgMode: 'light',
+  pureBg: false,   // true: canvas is pure #FFFFFF (light) / #000000 (dark), not the style's tint (js/aesthetic-board.js)
   logoImg: null,
   logoDataUrl: null,
   content: {},
@@ -267,6 +268,9 @@ function updateControlsFromState() {
   // Role rows, wheel, brightness, hex and guidance (js/color-picker.js).
   if (window.ColorPicker) ColorPicker.sync();
   document.querySelectorAll('input[name="bgMode"]').forEach(r => { r.checked = r.value === state.bgMode; });
+  const pureBtn = document.getElementById('pureBgToggle');
+  pureBtn.setAttribute('aria-pressed', String(!!state.pureBg));
+  pureBtn.dataset.mode = state.bgMode === 'dark' ? 'dark' : 'light';
   // Lock toggles must mirror state too — a restored session can arrive with a
   // lock already on, and a lock the UI doesn't show is a lock nobody can find.
   document.getElementById('lockTypography').checked = !!state.locks.typography;
@@ -556,6 +560,14 @@ function wireEvents() {
 
   document.querySelectorAll('input[name="bgMode"]').forEach(r => {
     r.addEventListener('change', e => { if (e.target.checked) { state.bgMode = e.target.value; render(); } });
+  });
+
+  // Quick pure white / black ground, one undo step. Unsaved state comes from the snapshot
+  // comparison in brand-session.js, so the re-render marks the brand dirty by itself.
+  document.getElementById('pureBgToggle').addEventListener('click', () => {
+    pushUndoSnapshot(state);
+    state.pureBg = !state.pureBg;
+    render();
   });
 
   document.getElementById('logoInput').addEventListener('change', e => {

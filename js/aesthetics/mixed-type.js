@@ -1,10 +1,7 @@
-/* 24 Mixed Type — loud, editorial, witty. Reference: Commercial Type's banded homepage,
-   Collins' Mailchimp system (Cooper against Graphik), It's Nice That section heads, Dinamo,
-   the Songtrust / Upwork billboards (Eye on Design): the mixed headline IS the image.
-   Poster scale (up to 220px), one full-bleed colour band per line (paper, ink, primary),
-   one voice per line plus one swap inside it, an inline type-object chip at cap height,
-   cap heights aligned (not font sizes). Below the headline the mix carries into the UI:
-   tabs, numerals and percentages each take a voice; no cards, no pills.
+/* 24 Mixed Type — eclectic, editorial, witty. Reference: the current type-mixing
+   trend in identities and editorial covers, and specimen posters (Pangram Pangram,
+   Displaay, Commercial Type): one headline set word by word in contrasting faces,
+   cap heights aligned (not font sizes), on a strict grid.
 
    Mechanism. The headline is drawn by def.headline(ctx, text): the framework puts it in
    the real, visible <h2 aria-label> (board hero, deck cover, Principles, Closing) and the
@@ -23,7 +20,7 @@ const MT_METRICS = {
   'Instrument Serif': [0.720, 0.510], 'Playfair Display': [0.708, 0.525], 'Fraunces': [0.700, 0.470],
   'Bricolage Grotesque': [0.660, 0.528], 'Archivo Black': [0.688, 0.528], 'Inter Tight': [0.728, 0.546],
   'Inter': [0.728, 0.546], 'DM Mono': [0.700, 0.496], 'Space Mono': [0.700, 0.496], 'DM Sans': [0.700, 0.504],
-  'Lexend': [0.700, 0.529], 'Instrument Sans': [0.720, 0.510], 'Gloock': [0.700, 0.480],
+  'Lexend': [0.700, 0.529], 'Instrument Sans': [0.720, 0.510],
 };
 const MT_CAT_METRICS = { serif: [0.70, 0.48], sans: [0.71, 0.52], display: [0.70, 0.52], mono: [0.70, 0.50], slab: [0.70, 0.50] };
 const mtMeasured = {};
@@ -32,11 +29,10 @@ function mtFace(name) {
   return (typeof FONTS !== 'undefined' && FONTS.find(f => f.name === name)) || null;
 }
 
-// The first preferred weight the face publishes, else its lightest.
 function mtWeight(font, prefer) {
-  const have = abWeights(font);
+  const have = String(font.weights || '400').split(';').map(Number);
   for (const w of prefer) if (have.includes(w)) return w;
-  return have[0];
+  return have[0] || 400;
 }
 
 // [cap, x] for a font, preferring the table, then a canvas measurement of the
@@ -68,112 +64,52 @@ function mtPick(names, avoid) {
 }
 
 // The four voices for a state. Each: { key, font, weight, style, k, cap, x, label }.
-// With the typography lock on, the mix is played on the brand's own two faces only: the
-// heading face carries the heading and italic voices, the body face the heavy and mono voices
-// (and the condensed one), so no contrast face the owner did not choose appears anywhere.
 function mtVoices(st) {
   const brand = st.headingFont;
   const bw = brand.cls === 'didone' || brand.cls === 'soft-serif' || brand.cls === 'old-style' || brand.cls === 'text-serif' || brand.cls === 'deco'
     ? mtWeight(brand, [400, 500, 600]) : mtWeight(brand, [600, 700, 500, 400]);
-  if (st.locks && st.locks.typography) return mtLockedVoices(st, brand, bw);
   const defs = [
     { key: 'b', font: brand, weight: bw, style: 'normal', label: 'Heading' },
-    // the italic may share the brand's family (Fraunces roman + Fraunces italic are two voices)
-    { key: 'i', font: mtFace('Fraunces') || mtPick(['Instrument Serif', 'Gloock'], ''), weight: 400, style: 'italic', label: 'Italic' },
+    { key: 'i', font: mtPick(['Instrument Serif', 'Playfair Display', 'Fraunces'], brand.name), weight: 400, style: 'italic', label: 'Italic' },
     { key: 'h', font: mtPick(['Bricolage Grotesque', 'Inter Tight', 'Archivo Black'], brand.name), weight: 0, style: 'normal', label: 'Heavy' },
     { key: 'm', font: mtPick(['DM Mono', 'Space Mono'], brand.name), weight: 400, style: 'normal', label: 'Mono' },
   ];
-  // the fifth voice: a condensed grotesk for numbers and navigation (not part of the specimen's four)
-  const nar = mtPick(['Big Shoulders Display', 'Anton'], brand.name);
   defs[2].weight = mtWeight(defs[2].font, [800, 700, 400]);
   const capB = mtMetrics(brand, bw, 'normal')[0];
   defs.forEach(v => {
     const [cap, x] = mtMetrics(v.font, v.weight, v.style);
     v.cap = cap; v.x = x; v.k = Math.round((capB / cap) * 1000) / 1000;
   });
-  defs.narrow = nar ? { font: nar, weight: mtWeight(nar, [700, 400]) } : null;
-  return defs;
-}
-
-function mtLockedVoices(st, brand, bw) {
-  const body = st.bodyFont || brand;
-  // an italic only where a face publishes one (font-synthesis is off): heading, else body, else upright
-  const itFace = brand.ital ? brand : body.ital ? body : brand;
-  const itW = itFace.ital ? (abWeights({ weights: itFace.ital }).includes(400) ? 400 : abWeights({ weights: itFace.ital })[0]) : mtWeight(itFace, [400]);
-  const defs = [
-    { key: 'b', font: brand, weight: bw, style: 'normal', label: 'Heading' },
-    { key: 'i', font: itFace, weight: itW, style: itFace.ital ? 'italic' : 'normal', label: 'Italic' },
-    { key: 'h', font: body, weight: abWeight(body, 900), style: 'normal', label: 'Heavy' },
-    { key: 'm', font: body, weight: mtWeight(body, [400, 500, 300]), style: 'normal', label: 'Mono' },
-  ];
-  const capB = mtMetrics(brand, bw, 'normal')[0];
-  defs.forEach(v => {
-    const [cap, x] = mtMetrics(v.font, v.weight, v.style);
-    v.cap = cap; v.x = x; v.k = Math.round((capB / cap) * 1000) / 1000;
-  });
-  defs.narrow = { font: body, weight: abWeight(body, 700) };
-  defs.locked = true;
   return defs;
 }
 
 const MT_STOP = new Set(('a an the and or but nor for of to in on at by with from as is are be was were should would could can will do does did your our my their it its this that these those not no so up out into over than then more most').split(' '));
 
-// Break the words into at most three lines with the most even character counts.
-function mtLines(words) {
+// One voice key per word: function words go to the mono, content words alternate
+// heavy / brand, and the last word (the highlight) is always the italic serif.
+function mtAssign(words) {
   const n = words.length;
-  if (n <= 3) return words.map(w => [w]);
-  const len = a => a.join(' ').length;
-  let best = null;
-  for (let i = 1; i < n - 1; i++) {
-    for (let j = i + 1; j < n; j++) {
-      const L = [words.slice(0, i), words.slice(i, j), words.slice(j)];
-      const score = Math.max(...L.map(len));
-      if (!best || score < best.score) best = { L, score };
-    }
-  }
-  return best.L;
+  let flip = 0;
+  return words.map((w, i) => {
+    if (i === n - 1) return 'i';
+    const bare = w.toLowerCase().replace(/[^a-z']/g, '');
+    if (MT_STOP.has(bare) && n > 2) return 'm';
+    const v = flip % 2 === 0 ? 'h' : 'b';
+    flip += 1;
+    return v;
+  });
 }
 
-// One voice per line (heavy, brand, italic: the last line holds the highlight word in the
-// italic), plus one swap inside each line of two or more words: a function word goes to
-// the mono, else the first word takes the next voice in the cycle.
-const MT_LINE_VOICE = ['h', 'b', 'i'];
-const MT_SWAP = { h: 'i', b: 'm', i: 'm' };
-function mtHeadlineHtml(tagline, ctx) {
+function mtHeadlineHtml(tagline) {
   const words = String(tagline || '').trim().split(/\s+/).filter(Boolean);
   if (!words.length) return '';
-  const lines = mtLines(words);
-  const nL = lines.length;
-  let chipDone = false;
-  return lines.map((ws, li) => {
-    const lv = nL === 1 ? 'i' : MT_LINE_VOICE[Math.min(li, 2) + (nL === 2 && li === 1 ? 1 : 0)];
-    let swapAt = -1;
-    if (ws.length > 1) {
-      swapAt = ws.findIndex(w => MT_STOP.has(w.toLowerCase().replace(/[^a-z']/g, '')));
-      if (swapAt < 0) swapAt = li === nL - 1 ? 0 : ws.length - 1;
-      if (li === nL - 1 && swapAt === ws.length - 1) swapAt = 0;   // the highlight stays in the line's italic
-    }
-    // effective width in "average characters": heavy caps run wide, the italic narrow
-    const W = { h: 1.28, b: 1, i: 0.88, m: 1.12 };
-    const eff = ws.reduce((n, w, wi) => n + w.length * W[wi === swapAt ? MT_SWAP[lv] : lv], 0) + (ws.length - 1) * 0.5
-      + (ctx && nL >= 2 && li === Math.floor(nL / 2) ? 1.6 : 0);
-    const fit = Math.min(1, 9.4 / Math.max(1, eff));
-    const body = ws.map((w, wi) => {
-      const m = w.match(/^([\s\S]*?)([.,;:!?…]*)$/);
-      const last = li === nL - 1 && wi === ws.length - 1;
-      const v = wi === swapAt ? MT_SWAP[lv] : lv;
-      return `<span class="mt-w${last ? ' mt-hl' : ''}" data-v="${v}">${escapeHtml(m[1])}${last ? '<i class="mt-ast" aria-hidden="true">*</i>' : ''}${escapeHtml(m[2])}</span>`;
-    });
-    // an inline type-object chip at cap height after the first word of the middle line
-    if (!chipDone && ctx && nL >= 2 && li === Math.floor(nL / 2) && body.length) {
-      chipDone = true;
-      const chip = ctx.logoDataUrl
-        ? `<span class="mt-chip mt-chip--img"><img src="${escapeHtml(ctx.logoDataUrl)}" alt="" /></span>`
-        : `<span class="mt-chip"><i>${escapeHtml(ctx.initial || 'A')}</i></span>`;
-      body.splice(1, 0, chip);
-    }
-    return `<span class="mt-line" data-band="${nL === 1 ? 0 : li}" data-v="${lv}" style="--mt-fit:${fit.toFixed(3)}">${body.join(' ')}</span>`;
-  }).join('');
+  const keys = mtAssign(words);
+  return words.map((w, i) => {
+    const m = w.match(/^([\s\S]*?)([.,;:!?…]*)$/);
+    const last = i === words.length - 1;
+    const body = escapeHtml(m[1]);
+    return `<span class="mt-w${last ? ' mt-hl' : ''}" data-v="${keys[i]}">${body}${last ? '<i class="mt-ast" aria-hidden="true">*</i>' : ''}${escapeHtml(m[2])}</span>`;
+  }).join(' ');
 }
 
 const MT_GLYPHS = [
@@ -203,48 +139,45 @@ function mtCell(v, n) {
 registerAesthetic({
   key: 'mixed-type', order: 24,
   name: 'Mixed Type',
-  descriptor: 'Loud · Banded · Witty',
-  influences: 'Commercial Type / Collins for Mailchimp / Eye on Design billboards',
-  summary: 'A poster-scale headline in colour bands, one voice per line, with the mix carried into the interface.',
+  descriptor: 'Eclectic · Editorial · Witty',
+  influences: 'Contemporary type mixing / Editorial covers / Specimen posters',
+  summary: 'Headlines that switch between serif italic, heavy grotesk and mono within one line.',
   motto: 'Many voices, one page.',
   kicker: 'Specimen No. 4',
   mode: 'light',
   slideShape: 'refined',
-  labels: { material: 'Bands', states: ['Paper', 'Ink', 'Spark'], statesKind: 'chip' },
+  labels: { material: 'Voice', states: ['Roman', 'Italic', 'Mono'], statesKind: 'swatch' },
   layout: { hero: 'centered', palette: 'swatches', sections: 'two-col', subcopy: false },
   type: { ui: 'body' },
   highlight: 'custom',
-  highlightNote: 'The last word is set in the serif italic voice in the band\'s own text colour (no accent colour) and ends in a small asterisk; colour comes from the primary band behind its line.',
-  cardFill: '--canvas',
+  highlightNote: 'The last word is set in the serif italic voice in the accent (shaded to read as text) and ends in a small asterisk; no fill, no underline, no band.',
+  cardFill: '--ab-paper',
 
   roles: {
-    canvas: { use: 'Paper: the page and the first headline band; sections sit straight on it under 2px ink rules', never: 'Text', coverage: '55–65%' },
-    ink: { use: 'Type, 2px section rules, list bars, and the second headline band (with paper type)', never: 'Tinted cards', coverage: '20–28%' },
-    primary: { use: 'The third headline band (the highlight line), the type-object chip, the one CTA and the selected tab', never: 'Body text, a second CTA, specimen decoration', coverage: '≈10–14%' },
-    secondary: { use: 'Reserved: a chart\'s second series. Not used on the board', never: 'Status pills, bars, headline words, backgrounds', coverage: '≤2%' },
-    accent: { use: 'Reserved: one sticker at most. The highlight word is italic in the band\'s text colour, not accent', never: 'Headline words, buttons, body text, borders', coverage: '≤1%' },
+    canvas: { use: 'Paper: the page, and the one quiet surface every panel sits on (cards are a 4% ink tint of it with a hairline)', never: 'Text' },
+    ink: { use: 'Headline words, body text, hairlines, the type-specimen guide lines and the "Aa" glyphs', never: 'Large filled fields' },
+    primary: { use: 'The one CTA and the selected segment; nothing in the type specimen', never: 'Headline words, body text, a second CTA, specimen decoration' },
+    secondary: { use: 'Status pills, the list bars and the "fits" tag; the second voice of the data', never: 'The main CTA, headline words, the page background' },
+    accent: { use: 'One spark: the last headline word (serif italic) with its asterisk, and the footer dot', never: 'Buttons, body text, borders, specimen fills' },
   },
 
   // The mixed headline for the real <h2> (the framework wraps it, escapes the label and sizes it).
-  headline(ctx, text) { return mtHeadlineHtml(text, ctx); },
+  headline(ctx, text) { return mtHeadlineHtml(text); },
 
-  tokens(t, view) {
-    const st = view || (typeof state !== 'undefined' ? state : null);
+  tokens(t) {
+    const st = typeof state !== 'undefined' ? state : null;
     const vars = {
       '--ab-type-pick-w': 400,
       '--ab-font-label': 'var(--mt-f-m, ui-monospace), ui-monospace, Menlo, monospace',
+      '--ab-paper': t.mix(t.canvas, t.ink, 0.955),
       '--ab-guide': t.alpha(t.ink, 0.28),
     };
     if (st && st.headingFont) {
-      const voices = mtVoices(st);
-      voices.forEach(v => {
+      mtVoices(st).forEach(v => {
         vars[`--mt-f-${v.key}`] = v.font.css;
         vars[`--mt-w-${v.key}`] = v.weight;
         vars[`--mt-k-${v.key}`] = v.k;
       });
-      // the italic voice's style (upright when the locked faces publish no italic)
-      vars['--mt-s-i'] = voices.find(v => v.key === 'i').style;
-      if (voices.narrow) { vars['--mt-f-n'] = voices.narrow.font.css; vars['--mt-w-n'] = voices.narrow.weight; }
     }
     return vars;
   },
@@ -253,12 +186,11 @@ registerAesthetic({
     const voices = mtVoices(ctx.state);
     const e = escapeHtml;
     // warm the contrast faces so they are ready by the next paint (cap sizes do not depend on it)
-    if (!voices.locked && typeof window !== 'undefined' && window.loadFontFamily) voices.forEach(v => { if (v.key !== 'b') window.loadFontFamily(v.font); });
+    if (typeof window !== 'undefined' && window.loadFontFamily) voices.forEach(v => { if (v.key !== 'b') window.loadFontFamily(v.font); });
     const cells = voices.map((v, i) => mtCell(v, i + 1)).join('');
     const glyphs = MT_GLYPHS.map(([key, lab, str]) => {
       const v = voices.find(x => x.key === key);
-      const set = /^[a-z]+$/i.test(str) ? `${e(str.slice(0, 13))}<wbr>${e(str.slice(13))}` : e(str);
-      return `<div class="mt-grow" data-v="${key}"><span class="mt-grow-k">${lab}</span><span class="mt-grow-s" style="font-family:var(--mt-f-${key});font-weight:var(--mt-w-${key});font-style:${v.style}">${set}</span></div>`;
+      return `<div class="mt-grow" data-v="${key}"><span class="mt-grow-k">${lab}</span><span class="mt-grow-s" style="font-family:var(--mt-f-${key});font-weight:var(--mt-w-${key});font-style:${v.style}">${e(str)}</span></div>`;
     }).join('');
     const scale = [11, 16, 24, 36, 54].map(n => `<span class="mt-sc" style="font-size:${n}px"><i>Aa</i><b>${n}</b></span>`).join('');
     const ks = voices.map(v => v.k.toFixed(2)).join(' / ');
@@ -276,47 +208,44 @@ registerAesthetic({
 
   materials: [
     { name: 'Heading voice', css: 'font-family: the brand heading face; /* content words alternate between it and the heavy voice; sized 1x, the other voices are scaled to its cap height */' },
-    { name: 'Italic voice', css: 'font-family: Fraunces; font-style: italic; font-weight: 400; /* the highlight line (on the primary band) and swapped words; scaled so its capitals match the heading voice */' },
-    { name: 'Headline bands', css: 'each line on its own full-bleed band: line 1 {canvas} with {ink} type, line 2 {ink} with {canvas} type, line 3 {primary} with {onPrimary} type; up to 220px; one voice per line plus one swap' },
-    { name: 'Condensed voice', css: 'font-family: Big Shoulders Display 700; /* the fifth voice: numbers, percentages and the nav */' },
+    { name: 'Italic voice', css: 'font-family: Instrument Serif, Playfair Display or Fraunces; font-style: italic; font-weight: 400; color: {accentInk}; /* the last headline word only, scaled so its capitals match the heading voice */' },
     { name: 'Heavy voice', css: 'font-family: Bricolage Grotesque 800, Inter Tight 800 or Archivo Black; text-transform: uppercase; letter-spacing: -0.02em; /* content words, scaled to match cap height */' },
     { name: 'Mono voice', css: 'font-family: DM Mono or Space Mono; font-weight: 400; letter-spacing: -0.04em; /* function words (for, the, should) and all small labels */' },
-    { name: 'Section rule', css: 'border-top: 2px solid {ink}; background: transparent; border-radius: 0; padding-inline: 0; /* no cards, no tinted panels */' },
+    { name: 'Paper panel', css: 'background: color-mix(in srgb, {ink} 4.5%, {canvas}); border: 1px solid {line}; border-radius: 2px; box-shadow: none;' },
     { name: 'Specimen guide', css: 'stroke: {ink} at 28%; stroke-width: 0.5; /* baseline solid, cap line dashed, x-height dotted behind each "Aa" */' },
-    { name: 'Primary action', css: 'background: {primary}; color: {onPrimary}; border: 0; border-radius: 0; padding: 14px 18px;' },
+    { name: 'Primary action', css: 'background: {primary}; color: {onPrimary}; border: 0; border-radius: 2px; padding: 14px 18px;' },
   ],
 
   rules: {
     do: [
-      'Set the headline at poster scale, one line per full-bleed band (paper, ink, primary), one voice per line plus one swap.',
-      'Match capital heights across voices, not font sizes.',
-      'Carry the mix into the interface: tabs, numerals and percentages each take one voice; a control never mixes inside itself.',
-      'Put one inline image or type object at cap height inside the headline.',
+      'Set the headline word by word in three or four faces (heading, serif italic, heavy grotesk, mono), sizing each so the capitals share one cap height rather than one font size.',
+      'Keep the last word in the serif italic and the accent, ending in a small asterisk; it is the only coloured word in the line.',
+      'Keep every interface control in the one quiet body face; the mixing lives in headlines, palette labels and the specimen.',
+      'Lay everything on a strict grid with hairline rules, mono captions and generous whitespace so four voices read as composed rather than chaotic.',
     ],
     dont: [
       'Use more than four faces, or mix faces inside a button, a field or a list row.',
       'Match the voices by font size; compare capital heights and adjust.',
-      'Shrink the headline to a modest H1; at small sizes the face changes look like a loading glitch.',
-      'Use tinted cards, pills or a yellow highlight word.',
+      'Colour more than the one highlight word, or underline, outline or fill the words.',
+      'Use primary as decoration in the type specimen or the headline.',
     ],
   },
   // Deck copy (js/brand-deck.js): three principles, three do / don't lines, each short.
   deck: {
-    coverDisplay: 1.3,
     principles: [
-      ['Many voices, one page', 'One voice per line, one swap inside it.'],
-      ['Poster scale, in bands', 'Paper, ink and primary bands behind the lines.'],
+      ['Many voices, one page', 'Serif italic, heavy grotesk and mono in one line.'],
       ['Match cap heights', 'Compare capitals, not font sizes.'],
+      ['Controls stay quiet', 'One body face; the mixing lives in headlines.'],
     ],
     do: [
-      'Set the headline in bands at poster scale.',
-      'Give tabs and numbers their own voices.',
-      'Match cap heights, not font sizes.',
+      'Set headlines word by word in several faces.',
+      'Keep every control in one body face.',
+      'Lay everything on a strict grid.',
     ],
     dont: [
       'Use more than four faces.',
       'Mix faces inside a button or field.',
-      'Use tinted cards or pills.',
+      'Color more than one highlight word.',
     ],
   },
 });

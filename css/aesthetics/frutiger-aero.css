@@ -7,8 +7,10 @@
    specular cap with a crisp lower lip, a caustic pooling at the base, a 1px rim
    and a small coloured shadow. Vars from tokens(): --ab-fa-gel-top / -gel /
    -gel-bot / -gel-rim / -gel-glow / -gel-on (the primary gel), --ab-fa-acc-*
-   (the accent gel), --ab-fa-glass / -streak / -rim-out / -rim-in / -bar-a / -bar-b
-   (glass chrome), --ab-fa-sel-* (Vista selection), --ab-fa-hl (headline word).
+   (the first companion gel), --ab-fa-c1-* / c2-* / c3-* (companion gels: triad +120, +240 and
+   the complement +180), --ab-fa-tint-1..3 (pale tab tints), --ab-fa-rainbow (title-bar foot line),
+   --ab-fa-glass / -streak / -rim-out / -rim-in / -bar-a / -bar-b (glass chrome),
+   --ab-fa-sel-* (Vista selection), --ab-fa-hl (headline word).
    Export-safe: no mask-image, no backdrop-filter (glass is a near-opaque fill).
    Window chrome is real markup (def.panels: .fa-window > .fa-titlebar, .fa-explorer).
 ------------------------------------------------------------------------ */
@@ -25,7 +27,7 @@
   --fa-gel-lab-bg: radial-gradient(70% 40% at 50% 100%, var(--ab-fa-gel-glow), transparent 70%), linear-gradient(180deg, var(--ab-fa-gel-top) 0%, var(--ab-fa-gel) 36%, var(--ab-fa-gel-bot) 100%);
   --fa-gel-sh: inset 0 0 0 1px var(--ab-fa-gel-rim), 0 2px 4px var(--ab-fa-gel-shadow), 0 6px 14px -6px var(--ab-fa-gel-shadow);
   --fa-glass-bg: linear-gradient(115deg, var(--ab-fa-streak) 0 34%, transparent 34.4%), var(--ab-fa-glass);
-  --fa-bar-bg: linear-gradient(115deg, var(--ab-fa-streak) 0 30%, transparent 30.3%), linear-gradient(180deg, var(--ab-fa-bar-a), var(--ab-fa-bar-b));
+  --fa-bar-bg: var(--ab-fa-rainbow) left bottom / 100% 3px no-repeat, linear-gradient(115deg, var(--ab-fa-streak) 0 30%, transparent 30.3%), linear-gradient(180deg, var(--ab-fa-bar-a), var(--ab-fa-bar-b));
   --fa-caption: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='96' height='22' viewBox='0 0 96 22'><defs><linearGradient id='g' x1='0' y1='0' x2='0' y2='1'><stop offset='0' stop-color='%23FFFFFF'/><stop offset='.5' stop-color='%23E6F2FB'/><stop offset='.52' stop-color='%23CFE3F3'/><stop offset='1' stop-color='%23E3F1FB'/></linearGradient><linearGradient id='r' x1='0' y1='0' x2='0' y2='1'><stop offset='0' stop-color='%23F6A390'/><stop offset='.5' stop-color='%23E0573C'/><stop offset='.52' stop-color='%23C93A1F'/><stop offset='1' stop-color='%23E9765C'/></linearGradient></defs><path d='M4.5 .5h22v21h-22a4 4 0 0 1-4-4v-13a4 4 0 0 1 4-4z' fill='url(%23g)' stroke='%237896B0'/><rect x='26.5' y='.5' width='26' height='21' fill='url(%23g)' stroke='%237896B0'/><path d='M52.5 .5h39a4 4 0 0 1 4 4v13a4 4 0 0 1-4 4h-39z' fill='url(%23r)' stroke='%238A2010'/><rect x='9' y='13' width='10' height='2.6' rx='1' fill='%2336536E'/><rect x='34' y='6' width='11' height='9' fill='none' stroke='%2336536E' stroke-width='2'/><path d='M68.5 6.5l9 9M77.5 6.5l-9 9' stroke='%23fff' stroke-width='2.6' stroke-linecap='round'/></svg>");
   --fa-close: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='34' height='20' viewBox='0 0 34 20'><defs><linearGradient id='r' x1='0' y1='0' x2='0' y2='1'><stop offset='0' stop-color='%23F6A390'/><stop offset='.5' stop-color='%23E0573C'/><stop offset='.52' stop-color='%23C93A1F'/><stop offset='1' stop-color='%23E9765C'/></linearGradient></defs><rect x='.5' y='.5' width='33' height='19' rx='4' fill='url(%23r)' stroke='%238A2010'/><path d='M13 6l8 8M21 6l-8 8' stroke='%23fff' stroke-width='2.4' stroke-linecap='round'/></svg>");
 }
@@ -152,7 +154,7 @@
 .ab[data-ae="frutiger-aero"] .ab-seg { position: relative; }
 .ab[data-ae="frutiger-aero"] .ab-type-apply {
   padding: 8px 18px; border-radius: 999px; border: 0; color: var(--ab-ink); font-weight: var(--fa-bw, 600);
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(234, 244, 252, 0.95) 50%, rgba(208, 228, 244, 0.95) 51%, rgba(232, 244, 253, 0.98)); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.9), 0 0 0 1px #7896B0, 0 2px 4px rgba(0, 50, 100, 0.15);
+  background: var(--ab-fa-tint-1); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.9), 0 0 0 1px var(--ab-fa-c3-rim), 0 2px 4px rgba(0, 50, 100, 0.15);
 }
 .ab[data-ae="frutiger-aero"][data-mode="dark"] .ab-type-apply { background: linear-gradient(180deg, #4F7898, #24445F 50%, #163550 51%, #2A5272); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.2), 0 0 0 1px #000; }
 .ab[data-ae="frutiger-aero"] .ab-type-apply:hover { box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.9), 0 0 0 1px #4E8FC4, 0 0 10px rgba(60, 170, 255, 0.55); }
@@ -177,7 +179,12 @@
 .ab[data-ae="frutiger-aero"] .ab-seg-btn + .ab-seg-btn { box-shadow: -1px 0 0 rgba(255, 255, 255, 0.85), -2px 0 0 rgba(35, 65, 90, 0.16); }
 .ab[data-ae="frutiger-aero"] .ab-seg-btn[aria-pressed="true"] { background: var(--fa-gel-lab-bg); color: var(--ab-fa-gel-on); box-shadow: var(--fa-gel-sh); font-weight: var(--fa-bw, 600); text-shadow: 0 1px 1px var(--ab-fa-gel-on-sh); }
 .ab[data-ae="frutiger-aero"] .ab-seg-btn[aria-pressed="true"]::before { content: ""; position: absolute; left: 6%; right: 6%; top: 2px; height: 30%; border-radius: 999px 999px 40% 40% / 999px 999px 30% 30%; background: var(--fa-cap); pointer-events: none; }
-.ab[data-ae="frutiger-aero"] .ab-seg-btn:hover:not([aria-pressed="true"]) { background: rgba(255, 255, 255, 0.55); }
+/* unselected tabs: a glossy pill each in its own companion tint (multi-hue), with the same cap */
+.ab[data-ae="frutiger-aero"] .ab-seg-btn:not([aria-pressed="true"]) { background: var(--ab-fa-tint-1); }
+.ab[data-ae="frutiger-aero"] .ab-seg-btn:not([aria-pressed="true"]):nth-child(2) { background: var(--ab-fa-tint-2); }
+.ab[data-ae="frutiger-aero"] .ab-seg-btn:not([aria-pressed="true"]):nth-child(3) { background: var(--ab-fa-tint-3); }
+.ab[data-ae="frutiger-aero"] .ab-seg-btn:not([aria-pressed="true"])::before { content: ""; position: absolute; left: 8%; right: 8%; top: 2px; height: 40%; border-radius: 999px 999px 40% 40% / 999px 999px 30% 30%; background: linear-gradient(180deg, rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0.12)); pointer-events: none; }
+.ab[data-ae="frutiger-aero"] .ab-seg-btn:hover:not([aria-pressed="true"]) { filter: brightness(1.05) saturate(1.12); }
 .ab[data-ae="frutiger-aero"] .ab-card-title { font-weight: var(--fa-lw, 300); font-size: clamp(23px, 2.9cqw, 30px); letter-spacing: -0.015em; }
 .ab[data-ae="frutiger-aero"] .ab-card-body { color: var(--ab-muted); font-size: 14px; }
 
@@ -249,8 +256,8 @@
   position: relative; display: grid; place-items: center; width: 26px; height: 26px; border-radius: 50%; overflow: hidden; font-size: 12px; font-weight: var(--fa-bw, 600);
   background: var(--fa-gel-bg); color: var(--ab-fa-gel-on); box-shadow: var(--fa-gel-sh);
 }
-.ab[data-ae="frutiger-aero"] .ab-row:nth-child(2) .ab-av { background: radial-gradient(70% 55% at 50% 100%, rgba(255, 255, 255, 0.4), transparent 70%), linear-gradient(180deg, color-mix(in srgb, var(--ab-fa-sec) 55%, white), var(--ab-fa-sec) 55%, color-mix(in srgb, var(--ab-fa-sec) 80%, black)); color: #0E2233; box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--ab-fa-sec) 60%, black), 0 2px 4px rgba(0, 40, 80, 0.2); }
-.ab[data-ae="frutiger-aero"] .ab-row:nth-child(3) .ab-av { background: radial-gradient(70% 55% at 50% 100%, rgba(255, 255, 255, 0.4), transparent 70%), linear-gradient(180deg, var(--ab-fa-acc-top), var(--ab-fa-acc) 55%, var(--ab-fa-acc-bot)); color: var(--ab-fa-acc-on); box-shadow: inset 0 0 0 1px var(--ab-fa-acc-rim), 0 2px 4px rgba(0, 40, 80, 0.2); }
+.ab[data-ae="frutiger-aero"] .ab-row:nth-child(2) .ab-av { background: var(--ab-fa-c1-bg); color: var(--ab-fa-c1-on); box-shadow: inset 0 0 0 1px var(--ab-fa-c1-rim), 0 2px 4px var(--ab-fa-c1-sh); }
+.ab[data-ae="frutiger-aero"] .ab-row:nth-child(3) .ab-av { background: var(--ab-fa-c2-bg); color: var(--ab-fa-c2-on); box-shadow: inset 0 0 0 1px var(--ab-fa-c2-rim), 0 2px 4px var(--ab-fa-c2-sh); }
 .ab[data-ae="frutiger-aero"] .ab-av::before { content: ""; position: absolute; left: 12%; right: 12%; top: 5%; height: 46%; border-radius: 50% 50% 40% 40% / 70% 70% 30% 30%; background: var(--fa-cap); }
 .ab[data-ae="frutiger-aero"] .ab-row-n { color: var(--ab-muted); }
 .ab[data-ae="frutiger-aero"] .ab-row-name { font-weight: var(--fa-bw, 600); font-size: 14px; }
@@ -263,10 +270,15 @@
 }
 .ab[data-ae="frutiger-aero"][data-mode="dark"] .ab-row-bar { background: linear-gradient(180deg, #02080F, #12283C); box-shadow: inset 0 1px 3px #000, 0 0 0 1px rgba(0, 0, 0, 0.6); }
 .ab[data-ae="frutiger-aero"] .ab-row-bar i {
+  --fa-fill: linear-gradient(180deg, var(--ab-fa-gel-top), var(--ab-fa-gel) 55%, var(--ab-fa-gel-bot));
+  --fa-fill-rim: var(--ab-fa-gel-rim);
   position: relative; border-radius: 999px;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.85) 0, rgba(255, 255, 255, 0.25) 46%, transparent 47%), repeating-linear-gradient(-55deg, rgba(255, 255, 255, 0.22) 0 7px, transparent 7px 18px), linear-gradient(180deg, var(--ab-fa-gel-top), var(--ab-fa-gel) 55%, var(--ab-fa-gel-bot));
-  box-shadow: inset 0 0 0 1px var(--ab-fa-gel-rim);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.85) 0, rgba(255, 255, 255, 0.25) 46%, transparent 47%), repeating-linear-gradient(-55deg, rgba(255, 255, 255, 0.22) 0 7px, transparent 7px 18px), var(--fa-fill);
+  box-shadow: inset 0 0 0 1px var(--fa-fill-rim);
 }
+/* each list row's progress fill in its own hue: primary, then the triad's first and second companions */
+.ab[data-ae="frutiger-aero"] .ab-row:nth-child(2) .ab-row-bar i { --fa-fill: linear-gradient(180deg, var(--ab-fa-c1-top), var(--ab-fa-c1) 55%, var(--ab-fa-c1-bot)); --fa-fill-rim: var(--ab-fa-c1-rim); }
+.ab[data-ae="frutiger-aero"] .ab-row:nth-child(3) .ab-row-bar i { --fa-fill: linear-gradient(180deg, var(--ab-fa-c2-top), var(--ab-fa-c2) 55%, var(--ab-fa-c2-bot)); --fa-fill-rim: var(--ab-fa-c2-rim); }
 .ab[data-ae="frutiger-aero"] .ab-row-pct { color: var(--ab-ink); font-weight: var(--fa-bw, 600); }
 
 /* ---------- footer: a glass taskbar with a start orb ---------- */

@@ -50,7 +50,7 @@
 }
 .ab[data-ae="radical-memphis"] .ab-tag { display: inline-flex; align-items: center; gap: 8px; font-size: 10.5px; font-weight: 700; letter-spacing: 0.1em; }
 .ab[data-ae="radical-memphis"] .ab-tag::before { content: ""; width: 10px; height: 9px; background: var(--ab-secondary); clip-path: polygon(50% 0, 100% 100%, 0 100%); }
-/* section dividers: a 10px black-and-white checker band (the wavy rule is groovy-70s's) */
+/* section dividers: a 10px black-and-white checker band */
 .ab[data-ae="radical-memphis"] .ab-rule { height: 10px; background: conic-gradient(var(--ab-ink) 25%, var(--ab-canvas) 0 50%, var(--ab-ink) 0 75%, var(--ab-canvas) 0) 0 0 / 10px 10px; }
 
 /* ---- labels ---- */

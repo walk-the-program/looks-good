@@ -1,41 +1,37 @@
-/* 14 Cyber HUD — angular, neon, live. References: cyberpunk.net, Arknights, the
-   HUDS+GUIS screen-graphics canon. The frame IS the HUD: a full-bleed 21:9
-   viewport with data anchored to its four edges (tick rails, an altitude ladder,
-   angled data slabs), the centre left open for one thin reticle over the brand
-   mark, and the headline set inside the band as a slab. A fixed signal palette
-   (cyan #00F0FF + magenta #FF2A6D on a cool blue-black) that never takes the
-   client's colours; the client primary is one channel: the main action fill and
-   the selected tab. Cut-corner panels with 1px neon edges, tick rulers and
-   panel IDs, slashed /// labels. */
+/* 14 Cyber HUD — angular, neon, live. Reference: Cyberpunk 2077 UI, Destiny /
+   Apex HUDs, F1 TV graphics. Cut-corner (chamfered) panels with 1px neon edges
+   and a small glow, a near-black field with a 24px grid and a static scanline
+   sweep, mono readouts everywhere, a targeting reticle over a wireframe sphere
+   and floor grid, and a chromatic-split highlight word. Neon is the brand
+   primary (shifted to stay visible on the canvas); the sphere wire is the
+   secondary; the target blip is the accent. */
 
-// The fixed signal palette (never the client's): cyan and magenta on blue-black, or
-// darkened for the light field (cyan #006F78 holds 5:1 on #E9ECEF, so 8-9px readouts pass).
-function hudSignal(isDark) {
-  return isDark
-    ? { canvas: '#05070a', ink: null, neon: '#00f0ff', neon2: '#ff2a6d', dim: 'rgba(0,240,255,' }
-    : { canvas: '#e9ecef', ink: '#0b0d10', neon: '#006f78', neon2: '#c4124d', dim: 'rgba(0,111,120,' };
+// largest published weight <= target (a single-weight face must stay at 400)
+function hudWeight(font, target) {
+  const ws = String((font && font.weights) || '400').split(';').map(Number).filter(Boolean);
+  const le = ws.filter(w => w <= target);
+  return le.length ? Math.max(...le) : Math.min(...ws);
 }
 
 registerAesthetic({
   key: 'cyber-hud', order: 14,
   name: 'Cyber HUD',
   descriptor: 'Angular · Neon · Live',
-  influences: 'cyberpunk.net / Arknights / Film screen graphics',
-  summary: 'A full-frame HUD: data on the edges, one reticle in an open centre, fixed cyan and magenta signal.',
+  influences: 'Sci-fi HUD / Cyberpunk UI / Esports overlays',
+  summary: 'Cut-corner panels, neon edges and live readouts.',
   motto: 'Target acquired.',
   kicker: 'Sync 98.2%',
   mode: 'dark',
   slideShape: 'minimal',
-  labels: { material: 'Systems', states: ['Standby', 'Armed', 'Live'], statesKind: 'button' },
-  // the viewport, then the system panels, then palette and type
-  layout: { hero: 'centered', palette: 'swatches', sections: 'two-col', order: ['hero', 'sections', 'palette', 'type'] },
-  type: { ui: 'mono', label: 'mono', display: 0.66 },
+  labels: { material: 'Systems', states: ['Idle', 'Target', 'Locked'], statesKind: 'button' },
+  layout: { hero: 'split', palette: 'swatches', sections: 'two-col' },
+  type: { ui: 'mono', label: 'mono', display: 0.84 },
   highlight: 'custom',
-  highlightNote: 'The word sits on a solid magenta signal slab (#FF2A6D, darkened on light fields) cut at the bottom right, set in the field colour: a tag, never a glow or an RGB split.',
+  highlightNote: 'The word is set in --accent-ink with a 2px chromatic split behind it: a primary copy offset -2px and a secondary copy offset +2px (text-shadow), no fill or band.',
 
   roles: {
     canvas: {
-      use: 'A fixed cool blue-black field (#05070A; #E9ECEF in light mode) under a faint grid. Never tinted by the brand',
+      use: 'The near-black field (lightness capped at 5%) under the 24px grid; panels are 6% primary over it',
       never: 'Text, or a lighter background card',
       coverage: '70–75%',
     },
@@ -45,155 +41,140 @@ registerAesthetic({
       coverage: '12–18%',
     },
     primary: {
-      use: 'One channel only: the main action fill and the selected tab. The HUD signal itself is fixed cyan and magenta',
-      never: 'Panel edges, rulers, readouts, the reticle (those are the fixed signal)',
-      coverage: '≈4%',
+      use: 'Neon: every 1px panel edge, the main action fill, the selected tab, progress segments and the reticle',
+      never: 'Body text, page background, a second solid CTA',
+      coverage: '≈10–12%',
     },
     secondary: {
-      use: 'Off the HUD: charts and print pieces',
-      never: 'Edges, readouts or the reticle',
-      coverage: '≈2%',
+      use: 'The second signal: sphere wireframe, the right-hand chromatic split, secondary data series and idle-state outlines',
+      never: 'The main action, body text, panel edges',
+      coverage: '≈6–10%',
     },
     accent: {
-      use: 'Off the HUD: one status lamp at most',
+      use: 'The target blip and status lamps, plus the highlighted headline word',
       never: 'Buttons, body text, panel borders, large fills',
-      coverage: '≤2%',
+      coverage: '≤3%',
     },
   },
 
-  // Its own ground: a cool blue-black (never a primary mix), or a cool light grey.
   canvas(b) {
-    return hudSignal(b.isDark).canvas;
+    if (!b.isDark) return null;
+    const h = b.hexToHsl(b.canvas);
+    const dark = h.l > 5 ? b.hslToHex(h.h, Math.min(h.s, 30), 5) : b.canvas;
+    return b.mix(b.primary, dark, 0.035);
   },
 
-  tokens(t, view) {
+  tokens(t) {
     const d = t.isDark;
-    const S = hudSignal(d);
-    const st = view || (typeof state !== 'undefined' ? state : null);
-    const hf = st && st.headingFont;
-    const neon = S.neon, neon2 = S.neon2;
-    const out = {
-      '--ab-hw': abWeight(hf, 800),
+    const hf = typeof state !== 'undefined' && state.headingFont;
+    // the neon must read on the canvas; secondary likewise (lifted toward white if not)
+    const neon = t.primaryText;
+    const neon2 = t.contrast(t.secondary, t.canvas) >= 3 ? t.secondary : t.mix(t.secondary, d ? '#ffffff' : '#000000', 0.5);
+    const bracket = (c, w, l) => [
+      `linear-gradient(${c},${c}) 0 0/${l}px ${w}px no-repeat`, `linear-gradient(${c},${c}) 0 0/${w}px ${l}px no-repeat`,
+      `linear-gradient(${c},${c}) 100% 0/${l}px ${w}px no-repeat`, `linear-gradient(${c},${c}) 100% 0/${w}px ${l}px no-repeat`,
+      `linear-gradient(${c},${c}) 0 100%/${l}px ${w}px no-repeat`, `linear-gradient(${c},${c}) 0 100%/${w}px ${l}px no-repeat`,
+      `linear-gradient(${c},${c}) 100% 100%/${l}px ${w}px no-repeat`, `linear-gradient(${c},${c}) 100% 100%/${w}px ${l}px no-repeat`,
+    ].join(',');
+    return {
+      '--ab-hw': hudWeight(hf, 700),
       '--ab-neon': neon,
       '--ab-neon2': neon2,
       '--ab-hud-line': t.alpha(neon, 0.62),
       '--ab-hud-line-soft': t.alpha(neon, 0.28),
-      '--ab-hud-fill': t.mix(neon, t.canvas, 0.05),
-      '--ab-hud-fill2': t.mix(neon, t.canvas, 0.11),
-      '--ab-hud-fill3': t.mix(neon, t.canvas, 0.2),
-      '--ab-hud-grid': t.alpha(neon, d ? 0.055 : 0.07),
-      '--ab-hud-tick': t.alpha(neon, 0.3),
-      '--ab-hud-hatch': t.alpha(neon, 0.45),
-      '--ab-on-neon2': d ? '#05070a' : '#ffffff',
+      '--ab-hud-glow': t.alpha(neon, d ? 0.42 : 0.3),
+      '--ab-hud-fill': t.mix(neon, t.canvas, 0.06),
+      '--ab-hud-fill2': t.mix(neon, t.canvas, 0.13),
+      '--ab-hud-fill3': t.mix(neon, t.canvas, 0.24),
+      '--ab-hud-grid': t.alpha(neon, d ? 0.06 : 0.07),
+      '--ab-hud-sweep': t.alpha(neon, d ? 0.09 : 0.06),
+      '--ab-hud-hi': t.mix(t.primary, '#ffffff', 0.78),
+      '--ab-brackets': bracket(neon, 2, 9),
+      '--ab-brackets-dim': bracket(t.alpha(neon, 0.55), 1.5, 7),
+      '--ab-split-a': t.alpha(neon, 0.95),
+      '--ab-split-b': t.alpha(neon2, 0.95),
     };
-    if (S.ink) out['--ab-ink'] = S.ink;
-    // muted labels sit on the panel fills too (up to the 20% neon fill), but the framework
-    // measures muted on the canvas only: pull it toward the ink until it holds 4.5:1 there
-    const ink = S.ink || t.ink;
-    const fill3 = out['--ab-hud-fill3'];
-    let muted = t.muted;
-    for (let k = 0.06; k <= 1 && (t.contrast(muted, fill3) < 4.6 || t.contrast(muted, t.canvas) < 4.6); k += 0.06) muted = t.mix(ink, t.muted, k);
-    if (muted !== t.muted) out['--ab-muted'] = muted;
-    return out;
   },
 
-  // The viewport: a full-bleed 21:9 frame. Top and bottom tick rails (major tick every
-  // 10%, labelled 000 / 090 / 180 / 270 / 360), a left altitude ladder, three angled
-  // data slabs on the right, corner readouts, and one thin reticle over the brand
-  // mark (1px outline) right of centre. Colours are inline (fixed signal colours only);
-  // the reticle, slab stack and corner readouts are placed by css/aesthetics/cyber-hud.css
-  // (.chv-ret / .chv-slabs / .chv-ro), which also styles the art inside a blend (the donor
-  // art is drawn in a nested .ab[data-ae="cyber-hud"] scope).
+  // A targeting reticle over a wireframe sphere (secondary) and a perspective floor
+  // grid (neon), lock-on brackets around the target, a blip (accent), and HTML
+  // readouts: coordinates, a segmented bar and a radial gauge. SVG strokes are
+  // non-scaling so the line weight is constant.
   art(ctx) {
     const t = ctx.t;
-    const S = hudSignal(t.isDark);
-    const neon = S.neon, neon2 = S.neon2, bg = t.canvas;
-    const ink = S.ink || t.ink;
-    const mono = "ui-monospace,'SF Mono',Menlo,monospace";
-    const a = (x) => t.alpha(neon, x);
-    const ruler = (pos) => {
-      const edge = pos === 'top' ? 'top:10px' : 'bottom:10px';
-      const labels = ['000', '090', '180', '270', '360'].map((l, i) =>
-        `<span style="position:absolute;${pos === 'top' ? 'top:13px' : 'bottom:13px'};left:${i * 25}%;transform:translateX(${i === 0 ? '0' : i === 4 ? '-100%' : '-50%'});font:500 8px/1 ${mono};letter-spacing:.1em;color:${neon}">${l}</span>`).join('');
-      return `<div style="position:absolute;left:52px;right:52px;${edge};height:24px">
-        <div style="position:absolute;left:0;right:0;${pos === 'top' ? 'top:0' : 'bottom:0'};height:1px;background:${a(0.5)}"></div>
-        <div style="position:absolute;left:0;right:0;${pos === 'top' ? 'top:1px' : 'bottom:1px'};height:4px;background:repeating-linear-gradient(90deg,${a(0.45)} 0 1px,transparent 1px 2%)"></div>
-        <div style="position:absolute;left:0;right:-1px;${pos === 'top' ? 'top:1px' : 'bottom:1px'};height:9px;background:repeating-linear-gradient(90deg,${neon} 0 1px,transparent 1px 10%)"></div>
-        ${labels}</div>`;
-    };
-    let ladder = '';
-    for (let i = 0; i <= 10; i++) {
-      const major = i % 5 === 0;
-      ladder += `<div style="position:absolute;left:0;top:${i * 10}%;width:${major ? 14 : 8}px;height:1px;background:${major ? neon : a(0.5)}"></div>`;
-      if (major) ladder += `<span style="position:absolute;left:18px;top:${i * 10}%;transform:translateY(-50%);font:500 8px/1 ${mono};color:${neon}">${String(60 - i * 3).padStart(3, '0')}</span>`;
-    }
-    const slab = (k, v, live) => `<div style="height:20px;display:flex;align-items:center;justify-content:space-between;gap:14px;padding:0 14px 0 12px;clip-path:polygon(8px 0,100% 0,calc(100% - 8px) 100%,0 100%);background:${live ? neon2 : a(t.isDark ? 0.14 : 0.07)};${live ? '' : `box-shadow:inset 0 0 0 1px ${a(0.5)};`}font:700 8.5px/1 ${mono};letter-spacing:.12em;color:${live ? S.canvas : neon}"><span>${k}</span><span style="color:${live ? S.canvas : ink}">${v}</span></div>`;
-    const initial = String(ctx.initial && ctx.initial !== '·' ? ctx.initial : 'M').replace(/[&<>"']/g, '');
+    const neon = t.primaryText;
+    const neon2 = t.contrast(t.secondary, t.canvas) >= 3 ? t.secondary : t.mix(t.secondary, t.isDark ? '#ffffff' : '#000000', 0.5);
     const vf = 'vector-effect="non-scaling-stroke"';
-    return `<div class="chv" style="position:absolute;inset:0;overflow:hidden;background:${bg};color:${neon};background-image:linear-gradient(${a(0.05)} 1px,transparent 1px),linear-gradient(90deg,${a(0.05)} 1px,transparent 1px);background-size:32px 32px">
-      ${ruler('top')}${ruler('bottom')}
-      <div style="position:absolute;left:14px;top:48px;bottom:48px;width:40px">
-        <div style="position:absolute;left:0;top:0;bottom:0;width:1px;background:${a(0.5)}"></div>${ladder}
-        <div style="position:absolute;left:-2px;top:38%;width:0;height:0;border-left:7px solid ${neon2};border-top:5px solid transparent;border-bottom:5px solid transparent;transform:translateY(-50%)"></div>
-      </div>
-      <div class="chv-slabs">
-        ${slab('TGT', 'M-01', false)}${slab('VEL', '0.82', false)}${slab('LIVE', 'REC', true)}
-      </div>
-      <span class="chv-ro chv-ro-l" style="color:${neon}">/// TRK.0412_A<br><span style="color:${ink}">SYNC 98.2%</span></span>
-      <span class="chv-ro chv-ro-r" style="color:${neon}">X 012.4 / Y 087.1<br><span style="color:${ink}">FRM 00:41:07</span></span>
-      <svg class="chv-ret" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet" focusable="false">
-        <text x="50" y="50" text-anchor="middle" dominant-baseline="central" font-family="${mono}" font-weight="700" font-size="30" fill="none" stroke="${neon}" stroke-width="1" ${vf} opacity=".75">${initial}</text>
-        <g fill="none" stroke="${neon}" stroke-width="1">
-          <circle cx="50" cy="50" r="32" ${vf} stroke-opacity=".85"/>
-          <circle cx="50" cy="50" r="40" ${vf} stroke-opacity=".35" stroke-dasharray="2 3"/>
-          <path d="M50 4V22M50 78V96M4 50H22M78 50H96" ${vf}/>
-        </g>
-        <path d="M86 47l4 3-4 3z" fill="${neon2}"/>
+    const floor = [66, 71, 78, 87, 98].map((y, i) => `<path ${vf} d="M${50 - (y - 56) * 1.9} ${y}H${50 + (y - 56) * 1.9}" stroke="${neon}" stroke-opacity="${(0.16 + i * 0.07).toFixed(2)}"/>`).join('')
+      + [-60, -42, -26, -12, 0, 12, 26, 42, 60].map(dx => `<path ${vf} d="M50 56L${50 + dx * 1.95} 100" stroke="${neon}" stroke-opacity=".3"/>`).join('');
+    const lats = [-16, -9, 0, 9, 16].map(dy => {
+      const rx = Math.sqrt(28 * 28 - dy * dy);
+      return `<ellipse ${vf} cx="50" cy="${40 + dy}" rx="${rx.toFixed(1)}" ry="${(rx * 0.26).toFixed(1)}"/>`;
+    }).join('');
+    const sphere = `<g fill="none" stroke="${neon2}" stroke-opacity=".7"><circle ${vf} cx="50" cy="40" r="28"/>${lats}`
+      + `<ellipse ${vf} cx="50" cy="40" rx="11" ry="28"/><ellipse ${vf} cx="50" cy="40" rx="21" ry="28"/><path ${vf} d="M50 12V68"/></g>`;
+    const ticks = [0, 90, 180, 270].map(a => `<path ${vf} d="M50 1.5V7" transform="rotate(${a} 50 40)" stroke-width="2"/>`).join('');
+    const reticle = `<g fill="none" stroke="${neon}">
+        <circle ${vf} cx="50" cy="40" r="38.5" stroke-opacity=".8" stroke-dasharray="1.2 2.1"/>
+        <circle ${vf} cx="50" cy="40" r="33" stroke-opacity=".35"/>${ticks}
+        <path ${vf} d="M4 40H31M69 40H96M50 -3V13M50 67V83" stroke-opacity=".9"/>
+        <path ${vf} d="M47 40H53M50 37V43" stroke-width="1.5"/></g>`;
+    const brackets = `<g fill="none" stroke="${neon}" stroke-width="2"><path ${vf} d="M60 24V18H66M80 18H86V24M86 40V46H80M66 46H60V40" transform="translate(-4 10)"/></g>`;
+    return `<div class="chs"><svg viewBox="0 0 100 100" width="100%" height="100%" focusable="false" preserveAspectRatio="xMidYMid meet" stroke-width="1">
+        ${floor}${sphere}${reticle}${brackets}
+        <path ${vf} d="M63.5 35.2l3 3-3 3-3-3z" fill="${t.accent}" stroke="${t.accent}"/>
+        <circle ${vf} cx="63.5" cy="38.2" r="6" fill="none" stroke="${t.accent}" stroke-opacity=".6"/>
       </svg>
+      <span class="chs-r chs-tl">SYNC 98.2%<br><i>SIG ▮▮▮▮▯</i></span>
+      <span class="chs-r chs-tr">X 012.4<br>Y 087.1</span>
+      <span class="chs-tag">LOCK 0.82s</span>
+      <span class="chs-bar" aria-hidden="true"><b></b></span>
+      <svg class="chs-gauge" viewBox="0 0 44 44" focusable="false"><circle cx="22" cy="22" r="17" fill="none" stroke="${neon}" stroke-opacity=".22" stroke-width="3" pathLength="100" stroke-dasharray="1.6 1.4"/>
+        <circle cx="22" cy="22" r="17" fill="none" stroke="${neon}" stroke-width="3" pathLength="100" stroke-dasharray="72 28" transform="rotate(-90 22 22)" opacity=".9"/></svg>
+      <span class="chs-g">72</span>
     </div>`;
   },
 
   materials: [
-    { name: 'Chamfered panel', css: 'background: {hudFill}; clip-path: polygon(12px 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%, 0 12px); /* two opposite corners cut at 45deg; 1px {neon} edge layer behind a 1px-inset fill; a 6px tick ruler on the top edge (1px every 8px, {hudTick}); panel ID PNL-0412 at its top right */' },
-    { name: 'Viewport frame', css: 'background: {canvas}; /* full-bleed 21:9; tick rails top and bottom (major every 10%, 000 / 090 / 180 / 270 / 360), altitude ladder left, three angled data slabs right, centre open for one reticle */' },
-    { name: 'Data slab', css: 'clip-path: polygon(8px 0, 100% 0, calc(100% - 8px) 100%, 0 100%); background: {neon2}; color: {canvas}; font: 700 9px mono, uppercase, .12em; /* idle slabs: 14% {neon} with a 1px {neon} edge */' },
-    { name: 'Main action', css: 'background: {primary}; color: {onPrimary}; clip-path: chamfer 11px (top-left, bottom-right); font: mono, uppercase, .1em; /* the one place the client colour lights up */' },
-    { name: 'Signal slab (highlight)', css: 'background: {neon2}; color: {canvas}; clip-path: polygon(0 0, 100% 0, calc(100% - .3em) 100%, 0 100%);' },
+    { name: 'Chamfered panel', css: 'background: {hudFill}; clip-path: polygon(12px 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%, 0 12px); /* two opposite corners cut at 45deg; the 1px edge is a {neon} layer behind a 1px-inset fill, since borders do not follow clip-path */' },
+    { name: 'Neon edge + glow', css: 'background: {neon}; filter: drop-shadow(0 0 6px {hudGlow}); /* the glow goes on a parent of the clipped layers */' },
+    { name: 'Main action', css: 'background: linear-gradient(180deg, rgba(255,255,255,.22), transparent 42%), {primary}; color: {onPrimary}; clip-path: chamfer 10px (top-left, bottom-right); font: mono, uppercase, .08em; /* label ends with a ▶ glyph */' },
+    { name: 'Selected tab', css: 'background: {hudFill3}; box-shadow: inset 0 0 0 1px {neon}, inset 0 -2px 0 {neon}; clip-path: chamfer 7px; color: {ink};' },
+    { name: 'Corner brackets (target / focus)', css: 'background: 8 gradient strokes of {neon}, 2px by 9px, one per corner; shown on Target, Locked and focused fields' },
+    { name: 'Segmented progress', css: 'track: repeating-linear-gradient(90deg, {hudLineSoft} 0 5px, transparent 5px 7px); fill: {neon} through the same 5px/2px mask' },
+    { name: 'Chromatic split (highlight)', css: 'color: {accentText}; text-shadow: -2px 0 {splitA}, 2px 0 {splitB}; /* primary left, secondary right, accent word on top */' },
   ],
 
   rules: {
     do: [
-      'Make the frame the HUD: anchor data to the four edges (tick rails, a ladder, angled slabs) and leave the centre open for one reticle.',
-      'Use the fixed signal palette: cyan #00F0FF and magenta #FF2A6D on a blue-black field; the client primary is only the main action and the selected tab.',
-      'Cut two opposite corners at 45 degrees on every panel; add a tick ruler and a panel ID to each.',
-      'Label everything in mono caps with slashes: /// SECTION.NAME_01.',
+      'Cut two opposite corners at 45 degrees (8-14px) on every panel and button; keep the other two square.',
+      'Draw 1px neon edges in primary with a small glow, and show corner brackets only for target, locked and focus states.',
+      'Fill the page with live data: mono readouts, segmented bars and a gauge; set all labels and values in mono uppercase.',
+      'Keep the field near-black with a faint 24px grid and one static diagonal sweep; neon is the only light.',
     ],
     dont: [
-      'Draw a wireframe globe or a perspective floor grid; that is synthwave, not a HUD.',
-      'Tint the field or the neon with the client palette, or warm the dark field toward brown.',
-      'Use an RGB split or glow behind text; highlights are solid signal slabs.',
-      'Use corner brackets or lock-on states; those belong to blob tracking.',
+      'Round anything or add soft shadows; glow is a 6px neon edge, never a halo behind text.',
+      'Use accent as a fill or border; it is the blip, the lamps and one split headline word.',
+      'Fill panels with solid neon; only the single main action is solid primary.',
+      'Mix in serif or script faces, or warm analog bezels (that is a different aesthetic).',
     ],
   },
   // Deck copy (js/brand-deck.js): three principles, three do / don't lines, each short.
   deck: {
-    // the cover statement slab sits inside the viewport, under the top tick rail: a smaller start
-    // size keeps the slab clear of the rail and its 000 / 090 labels
-    coverDisplay: 0.5,
     principles: [
-      ['The frame is the HUD', 'Data on the four edges, the centre open for one reticle.'],
-      ['Fixed signal colour', 'Cyan and magenta on blue-black; the brand is one channel.'],
-      ['Slashed labels', 'Mono caps, /// SECTION.NAME_01, tick rulers and panel IDs.'],
+      ['Cut corners, neon edges', 'Two opposite corners cut at 45 degrees, 1px neon lines.'],
+      ['Live data everywhere', 'Mono readouts, segmented bars and a gauge.'],
+      ['Neon is the only light', 'A near-black field with a faint grid.'],
     ],
     do: [
-      'Anchor data to the edges of the frame.',
-      'Keep the signal cyan and magenta.',
       'Cut two opposite corners on every panel.',
+      'Draw 1px neon edges in primary.',
+      'Set labels and values in mono caps.',
     ],
     dont: [
-      'Draw a wireframe globe or floor grid.',
-      'Warm the field with the client colour.',
-      'Use RGB splits or glow behind text.',
+      'Round anything or add soft shadows.',
+      'Use accent as a fill or border.',
+      'Fill panels with solid neon.',
     ],
   },
 });

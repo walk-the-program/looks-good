@@ -1,5 +1,5 @@
 /* ---------------------------------------------------------------------
-   patterns/fit.js — aesthetic fit: six tuned patterns for each of the 48
+   patterns/fit.js — aesthetic fit: six tuned patterns for each of the 35
    aesthetics (keys match js/aesthetics/*.js).
 
      Patterns.suiteFor(aestheticKey) -> [{ key, name, colorway, params, tone }]
@@ -7,20 +7,18 @@
        name      short display name for the suite wall
        colorway  'brand' | 'mono' | 'duotone' | 'night', or a FIXED colourway from
                  engine.js E.COLORWAYS: 'tonal' (soft-form), 'spectrum' (holo-iridescent),
-                 'primaries' (bauhaus-poster), 'earth' (groovy-70s), 'brass' (neo-deco),
-                 'broadcast' (pirate-broadcast), 'safety' (hazard tape in industrial-hazard
-                 and micrographics), 'hud' (cyber-hud Data slabs), 'toner' (all of xerox)
+                 'primaries' (bauhaus-poster), 'broadcast' (pirate-broadcast),
+                 'safety' (hazard tape in micrographics), 'hud' (cyber-hud Data slabs), 'toner' (all of xerox)
        params    overrides on top of the family defaults (render() fills the rest);
                  includes params.tone, equal to entry.tone
        tone      number 0..1, default 1. Lower = quieter: ink contrast/saturation moves
                  toward the ground and the spark shrinks (see engine.js, "Tone"). Quiet
                  suites: aurora-noir 0.35-0.5, liquid-glass 0.5-0.6 (Glass light 1), blueprint
-                 0.55 (all mono), religious-futurism 0.4-0.55, cybersigilism 0.5-0.6,
-                 biomechanical-gothic 0.3-0.45, dystopian-luxury 0.3-0.45, wabi-sabi 0.35-0.5,
-                 dark-academia 0.5-0.6, retro-futurist 0.6-0.8, cyber-hud 0.55-0.7; soft-form is
+                 0.55 (all mono), dystopian-luxury 0.3-0.45, japanese-minimal 0.3-0.4,
+                 retro-futurist 0.6-0.8, cyber-hud 0.55-0.7; soft-form is
                  tonal at full tone with two quiet mono entries (0.2); single entries are softened
                  in clay (0.85), editorial-serif (0.6-0.75), frutiger-aero (0.55-0.8),
-                 micrographics (0.7), gummy (0.6-0.9), curio-cabinet (0.6-0.7) and a few others. Pass entry.params
+                 micrographics (0.7), and a few others. Pass entry.params
                  (or params + { tone }) to Patterns.render / renderSVG / tileCSS.
      Patterns.suiteKeys()            -> every aesthetic key that has a suite
 
@@ -31,9 +29,8 @@
    GLOBAL LEAD OWNERSHIP (round 6): no two suites that render a deck cover band or closing strip
    share a first family, so every deck cover reads as its own aesthetic. Exempt (both deck.coverBand
    and deck.closingStrip false, lead seen only on the Patterns slide): liquid-glass, holo-iridescent,
-   aurora-noir, wabi-sabi, curio-cabinet. The ownership table is in docs/patterns.md, "Round 6 suite
-   ownership"; change a lead only by taking a family no band/strip aesthetic leads with (terrain,
-   counterchange, inkstill, neonspray, prismpix, seafan, snow, satellite, flyposter, festival) or by
+   aurora-noir. The ownership table is in docs/patterns.md, "Round 6 suite
+   ownership"; change a lead only by taking a family no band/strip aesthetic leads with (halftone, terrain, arcrise, cutup, burst, neonspray, bloomgrid, kaleidopix, prismpix, totem, colony, seafan, marble, thermalstreak, waves, snow, panels, flyposter, festival, blades, rods) or by
    swapping with its owner. Nothing here invents a colour except the fixed
    colourways above, which are documented exceptions: otherwise the colorway only chooses how the
    brand roles map to inks.
@@ -53,11 +50,11 @@
     ],
     'raw-brutalist': [
       ['glyphgrid', 'Block field', 'mono', { glyphs: 'blocks', cell: 4.2, bands: 5, duo: false }],
+      ['modulargrid', 'Slab grid', 'mono', { cols: 7, merge: 0.8, gap: 0, empty: 0.12 }],
+      ['counterchange', 'Hard counter', 'mono', { figure: 'square', bar: 5, dir: 'v', size: 0.6, nest: 2, second: false }],
+      ['zigzag', 'Stair teeth', 'mono', { style: 'stair', colors: 'two', band: 8, amp: 4, period: 11, phase: 'parallel', grain: 0.2 }],
       ['onebit', 'Hard crush', 'mono', { zones: 5, pixel: 1.4, dither: 'threshold', pair: 'ink1', glitch: 0.3 }],
-      ['slipgrid', 'Slipped columns', 'mono', { cell: 2.6, slip: 0.35, streak: 1, gutter: 0.16, scatter: 0.2 }],
-      ['satellite', 'Raw feed', 'mono', { mosaic: 0.5, block: 1.8, bars: 0.6, slices: 2, tear: 0.4 }],
-      ['terrain', 'Dither strata', 'mono', { levels: 4, pix: 1, dither: 0.8, style: 'ridges' }],
-      ['pixelgrid', 'Perforated index', 'mono', { cell: 3.2, mode: 'dots', zones: 3, density: 0.55, phase: 0 }],
+      ['panels', 'Slab panels', 'mono', { depth: 4, gutter: 0.3, pitch: 1.1, flat: 0.45, frame: true }],
     ],
     'neo-brutal-pop': [
       ['tokens', 'Chunky capsules', 'brand', { cell: 10, link: 0.3, density: 1, fill: 'mixed', grain: 0 }],
@@ -100,60 +97,44 @@
       ['relief', 'Traces', 'mono', { cols: 4, traces: 9, blocks: 2, trace: 0.6 }, 0.35],
     ],
     'bauhaus-poster': [
-      ['specimens', 'Construction studies', 'primaries', { cols: 3, gap: 1.4, round: 0, study: 'fans', line: 1.4 }],
-      ['panels', 'Flat planes', 'primaries', { depth: 4, gutter: 0.5, pitch: 1, flat: 0.7, frame: false }],
-      ['chevron', 'Diagonal thrust', 'primaries', { bands: 6, slope: 30, mirror: 'x', rhythm: 'even', colors: 'four' }],
-      ['rods', 'Constructed rods', 'primaries', { density: 0.9, thick: 1.8, length: 5.5, fork: 0.3, slip: 0.3, second: 'ink2' }],
-      ['weave', 'Weaving workshop', 'primaries', { bands: 7, rhythm: 'mixed', skew: 0, gap: 0.4, stripe: 1.4 }],
-      ['inkstill', 'Print workshop', 'primaries', { px: 0.9, masses: 3, vessels: 1, dither: 1, marks: true }],
+      ['counterchange', 'Counterchange', 'brand', { figure: 'circle', bar: 3.6, dir: 'v', size: 0.66, nest: 2, second: true }],
+      ['ribbonrise', 'Banded rise', 'brand', { edge: 'bottom', bar: 2, bands: 4, shift: 0.12, ring: true }],
+      ['panels', 'Panel study', 'brand', { depth: 5, gutter: 0.5, pitch: 1, flat: 0.3, frame: false }],
+      ['specimens', 'Colour studies', 'brand', { cols: 4, gap: 1.1, round: 0, study: 'rings', line: 1 }],
+      ['chevron', 'Chevron', 'brand', { bands: 7, slope: 45, mirror: 'quad', rhythm: 'even', colors: 'four' }],
+      ['oprings', 'Target', 'brand', { mode: 'rings', centres: 1, freq: 16, warp: 0, bands: 'two' }],
     ],
     'clay': [
-      ['pebbles', 'Pebbles', 'duotone', { size: 1.6, gap: 0.8, erode: 0.2, mode: 'crumble', lit: 0.4 }],
-      ['tissue', 'Pressed tiles', 'duotone', { cell: 20, loose: 0.3, levels: 3, veins: 0, wall: 0.5 }, 0.85],
-      ['rods', 'Coils', 'brand', { density: 0.7, thick: 2, length: 4, fork: 0.2, slip: 0.4, second: 'deep' }, 0.85],
-      ['colony', 'Clay beads', 'brand', { cells: 10, rings: 2, fuse: 1.1, finish: 'stipple', nuclei: false }, 0.85],
-      ['specimens', 'Glazed tiles', 'brand', { cols: 3, gap: 1.6, round: 3, study: 'rings', line: 1.2 }, 0.85],
-      ['blades', 'Petals', 'brand', { count: 60, size: 1.8, curve: 0.5, take: 1, ink: 'ink1' }, 0.85],
+      ['zigzag', 'Wave ribbons', 'brand', { style: 'rounded', colors: 'four', band: 8, amp: 4, period: 12, phase: 'parallel' }],
+      ['aura', 'Soft lumps', 'brand', { layout: 'scatter', blobs: 5, strength: 0.85, soft: 0.8, grain: 0.14 }],
+      ['gradpanes', 'Pillow panes', 'brand', { rows: 3, cols: 3, gap: 1.6, radius: 4, steps: 0, grain: 0.1 }],
+      ['specimens', 'Glazed tiles', 'brand', { cols: 3, gap: 1.6, round: 3, study: 'marbling', line: 1.2 }, 0.85],
+      ['pebbles', 'Pebbles', 'brand', { size: 1.3, gap: 0.6, erode: 0.3, mode: 'halftone', lit: 0.6 }, 0.85],
+      ['stipple', 'Fingerprints', 'brand', { density: 1.1, dot: 1.2, field: 'warp', duo: true }],
     ],
     'riso-print': [
+      ['inkstill', 'Riso still life', 'brand', { px: 0.8, masses: 4, vessels: 2, dither: 2, marks: true }],
+      ['tornbands', 'Torn collage', 'brand', { bands: 7, tear: 1.1, tilt: -2.5, minis: 'mixed', shadow: 0.5 }],
+      ['cutup', 'Cut-up hills', 'brand', { pieces: 5, cell: 1.5, hills: 1, slip: 0.55 }],
+      ['sonar', 'Coastline', 'brand', { land: 0.45, size: 1, speckle: 0.7, contours: true }],
       ['halftone', 'Riso halftone', 'brand', { cell: 1.9, levels: 5, shape: 'round', angle: 15, field: 'clouds', duo: true, grain: 0.3 }],
-      ['stipple', 'Two-drum stipple', 'brand', { density: 1.1, dot: 1.2, field: 'clouds', duo: true }],
-      ['inkstill', 'Riso still life', 'duotone', { px: 0.8, masses: 4, vessels: 2, dither: 2, marks: true }],
-      ['sonar', 'Coastline', 'duotone', { land: 0.45, size: 1, speckle: 0.7, contours: true }],
       ['blades', 'Inked blades', 'brand', { count: 260, size: 1, curve: 0.6, take: 0.6, ink: 'ink1' }],
-      ['glyphgrid', 'Registration studies', 'brand', { glyphs: 'shapes', cell: 4.2, bands: 4, duo: true }],
     ],
     'editorial-serif': [
       ['stipple', 'Engraved stipple', 'mono', { density: 1.1, dot: 0.9, field: 'clouds', duo: false }],
-      ['weave', 'Column rule', 'mono', { rhythm: 'even', skew: 0, bands: 12, gap: 1.5, stripe: 0.5 }, 0.6],
-      ['halftone', 'Newsprint', 'mono', { cell: 0.9, levels: 5, shape: 'round', angle: 45, field: 'clouds', duo: false, grain: 0.22 }],
-      ['typeterrain', 'Set column', 'mono', { charset: 'dots', style: 'hills', size: 0.8, levels: 5 }, 0.6],
+      ['weave', 'Pinstripe', 'mono', { rhythm: 'pinstripe', skew: 0, bands: 9, gap: 0.3, stripe: 0.9 }],
       ['flow', 'Engraved lines', 'mono', { field: 'waves', strands: 5, gap: 2, bend: 0.8, weight: 0.8 }],
+      ['halftone', 'Newsprint', 'mono', { cell: 1.2, levels: 5, shape: 'round', angle: 45, field: 'clouds', duo: false, grain: 0.22 }],
+      ['specimens', 'Plate studies', 'mono', { cols: 4, gap: 1.4, round: 0, study: 'mixed', line: 0.8 }, 0.75],
       ['marble', 'Endpaper', 'mono', { bands: 4, warp: 0.9, cover: 0.55, stars: 0.3, outline: true }, 0.75],
     ],
-    'neo-deco': [
-      ['burst', 'Brass rays', 'brass', { rays: 96, layers: 1, bend: 0, beads: 0, origin: 'low' }],
-      ['arcrise', 'Radio City bands', 'brass', { origin: 'bottom', bands: 7, bars: false, suns: 1, bar: 3 }],
-      ['weave', 'Reeded glass', 'brass', { rhythm: 'pinstripe', skew: 0, bands: 14, gap: 0.2, stripe: 0.7 }],
-      ['counterchange', 'Stepped inlay', 'brass', { figure: 'square', bar: 2.6, dir: 'v', size: 0.7, nest: 3, second: false }],
-      ['chevron', 'Gilt chevrons', 'brass', { bands: 8, slope: 52, mirror: 'quad', rhythm: 'even', colors: 'four' }],
-      ['zigzag', 'Stepped frieze', 'brass', { style: 'stair', colors: 'four', band: 6, amp: 4, period: 8, phase: 'interlock' }],
-    ],
-    'y2k-chrome': [
-      ['thermalstreak', 'Chrome streaks', 'mono', { bands: 7, smear: 30, slides: 1, rough: 0, flip: 'bright' }],
-      ['gradpanes', 'Chrome bars', 'night', { rows: 2, cols: 2, gap: 0.5, steps: 0, radius: 0 }],
-      ['oprings', 'Chrome target', 'mono', { mode: 'rings', centres: 1, freq: 16, warp: 0.18, bands: 'three' }],
-      ['chevron', 'Speed chevrons', 'night', { bands: 10, slope: 38, mirror: 'quad', rhythm: 'varied', colors: 'three' }],
-      ['glyphgrid', 'Icon sheet', 'night', { glyphs: 'geometric', cell: 3.5, bands: 3 }],
-      ['halftone', 'Bubble screen', 'brand', { cell: 2.2, levels: 5, shape: 'ring', field: 'warp', duo: true }],
-    ],
     'cyber-hud': [
-      ['totem', 'HUD strip', 'mono', { px: 1.2, panel: 0.7, band: 4, frame: 1 }, 0.7],
-      ['chevron', 'Data slabs', 'hud', { bands: 10, slope: 30, mirror: 'x', rhythm: 'even', colors: 'three' }, 0.55],
-      ['modulargrid', 'Ruler grid', 'mono', { style: 'line', cols: 16, merge: 0.1, gap: 0.4, empty: 0.6 }, 0.7],
-      ['signal', 'Data glitch', 'mono', { px: 0.55, bands: 26, noise: 0.75, blank: 0.1 }, 0.7],
-      ['glyphgrid', 'Reticle field', 'mono', { glyphs: 'crosses', cell: 4, bands: 3 }, 0.7],
-      ['typeterrain', 'Binary field', 'mono', { charset: 'binary', style: 'ridges', size: 1.3, levels: 6 }, 0.7],
+      ['satellite', 'Corrupt feed', 'brand', { mosaic: 0.8, block: 1.5, bars: 0.5, slices: 3, tear: 0.5 }],
+      ['signal', 'Data glitch', 'brand', { px: 0.55, bands: 26, noise: 0.75, blank: 0.1 }],
+      ['modulargrid', 'HUD grid', 'brand', { cols: 10, style: 'line', merge: 0.6, gap: 0.8, empty: 0.25 }],
+      ['slipgrid', 'Slipped feed', 'brand', { cell: 2.5, slip: 0.6, streak: 1.2, gutter: 0.12, scatter: 0.4 }],
+      ['onebit', 'One-bit scan', 'brand', { zones: 6, pixel: 0.9, dither: 'bayer', pair: 'ink1', glitch: 0.5 }],
+      ['typeterrain', 'Binary field', 'brand', { charset: 'binary', style: 'ridges', size: 1.3, levels: 6 }],
     ],
     'bento-grid': [
       ['modulargrid', 'Tile grid', 'brand', { cols: 8, merge: 1, gap: 1.6, empty: 0 }],
@@ -180,20 +161,12 @@
       ['specimens', 'CMF chips', 'brand', { cols: 4, gap: 1, round: 0.4, study: 'mixed', line: 0.8 }],
     ],
     'pixel-arcade': [
-      ['pixelquilt', 'Tile sheet', 'brand', { px: 1.4, block: 8, motifs: 'geometric', big: 0.3, grain: 0 }],
+      ['pixelquilt', 'Pixel quilt', 'brand', { px: 1, block: 8, motifs: 'all', big: 0.16 }],
+      ['prismpix', 'Pixel aurora', 'brand', { px: 1.7, streams: 4, glow: 1, dots: true }],
+      ['totem', 'Pixel totem', 'brand', { px: 1.4, panel: 0.56, band: 5, frame: 2 }],
       ['bloomgrid', 'Pixel bloom', 'brand', { px: 3, levels: 4, rings: 4, calm: 0.5, dither: false }],
-      ['pixelgrid', 'Tile map', 'brand', { mode: 'blocks', cell: 2, zones: 3 }],
-      ['prismpix', 'Pixel aurora', 'brand', { px: 1.7, streams: 4, glow: 0.5, dots: true }],
-      ['glyphgrid', 'Item sheet', 'night', { glyphs: 'blocks', cell: 4, bands: 3 }],
-      ['parcels', 'Level map', 'brand', { cell: 2, size: 1, every: 6, labels: false }],
-    ],
-    'groovy-70s': [
-      ['arcrise', 'Rainbow rise', 'earth', { origin: 'bottom', bands: 9, bars: false, suns: 2 }],
-      ['zigzag', 'Wavy stripes', 'earth', { style: 'rounded', colors: 'four', band: 7, amp: 5, period: 14, phase: 'parallel' }],
-      ['ribbonrise', 'Corner stripes', 'earth', { edge: 'bottom', bar: 1.7, bands: 5, shift: 0.12, ring: true }],
-      ['burst', 'Solid sunburst', 'earth', { rays: 24, layers: 1, bend: 0, beads: 0, origin: 'centre' }],
-      ['waves', 'Soft waves', 'earth', { rows: 4, crests: 2, curl: 0.8, strands: 4, drops: 0 }],
-      ['oprings', 'Concentric rings', 'earth', { mode: 'rings', centres: 1, freq: 12, warp: 0, bands: 'four' }],
+      ['kaleidopix', 'Kaleidoscope', 'brand', { px: 1.8, patches: 1, fold: 'quad' }],
+      ['terrain', 'Pixel terrain', 'brand', { levels: 6, pix: 0.7, dither: 0.7, style: 'islands' }],
     ],
     'blueprint': [
       ['weave', 'Section hatch', 'mono', { bands: 3, rhythm: 'pinstripe', skew: 1, gap: 0, stripe: 0.6, spark: false }, 0.55],
@@ -228,12 +201,12 @@
       ['chevron', 'Hazard tape', 'safety', { bands: 10, slope: 45, mirror: 'x', rhythm: 'even', colors: 'two' }],
     ],
     'mixed-type': [
-      ['cutup', 'Specimen collage', 'mono', { pieces: 6, cell: 1.6, hills: 1.2, slip: 0.7 }],
-      ['specimens', 'Type wall', 'mono', { cols: 4, gap: 1.1, round: 0, study: 'mixed', line: 1 }],
-      ['typeterrain', 'Letter field', 'mono', { charset: 'ascii', style: 'warp', size: 1.6, levels: 6 }],
-      ['tornbands', 'Cut-ups', 'mono', { bands: 6, tear: 0.9, tilt: 1.5, minis: 'stripes', shadow: 0.4 }],
-      ['flyposter', 'Fly-poster', 'mono', { stripe: 1.3, harden: 0.65, blocks: 5, marks: 2, angle: 18 }],
-      ['glyphgrid', 'Glyphs', 'mono', { glyphs: 'shapes', cell: 4, bands: 5, duo: true }],
+      ['specimens', 'Type specimens', 'brand', { cols: 4, gap: 1.1, round: 0, study: 'mixed', line: 1 }],
+      ['typeterrain', 'Mixed type', 'brand', { charset: 'dots', style: 'warp', size: 1.6 }],
+      ['flyposter', 'Fly-poster', 'brand', { stripe: 1.3, harden: 0.65, blocks: 5, marks: 2, angle: 18 }],
+      ['tornbands', 'Cut-ups', 'brand', { bands: 6, tear: 0.9, tilt: 1.5, minis: 'mixed', shadow: 0.4 }],
+      ['zigzag', 'Zig bands', 'brand', { style: 'chevron', colors: 'three', band: 8, amp: 4.5, period: 10, phase: 'parallel' }],
+      ['glyphgrid', 'Glyphs', 'brand', { glyphs: 'shapes', cell: 4, bands: 5, duo: true }],
     ],
     'ascii-art': [
       ['typeterrain', 'ASCII terrain', 'brand', { charset: 'ascii', style: 'warp', size: 1.9, levels: 8 }],
@@ -243,14 +216,6 @@
       ['terrain', 'Dither map', 'mono', { levels: 5, pix: 0.6, dither: 0.8, style: 'hills' }],
       ['pixelgrid', 'Cell field', 'duotone', { cell: 2.7, mode: 'crosses', zones: 5, density: 0.65, phase: 0 }],
     ],
-    'rebus': [
-      ['kaleidopix', 'Mirrored pictograms', 'mono', { px: 2.4, patches: 0.6, fold: 'quad' }],
-      ['glyphgrid', 'Pictogram field', 'mono', { glyphs: 'geometric', cell: 5, bands: 4, duo: false }],
-      ['counterchange', 'Eye', 'brand', { figure: 'circle', bar: 4.4, dir: 'h', size: 0.6, nest: 2, second: true }],
-      ['weave', 'Logotype stripes', 'brand', { bands: 9, rhythm: 'even', skew: 0, gap: 0.2, stripe: 1.2 }],
-      ['modulargrid', 'Construction grid', 'mono', { cols: 12, style: 'line', merge: 0.25, gap: 0.3, empty: 0.4 }],
-      ['specimens', 'Pictogram sheet', 'brand', { cols: 4, gap: 0.8, round: 0, study: 'rings', line: 1 }],
-    ],
     'corporate-vandalism': [
       ['signal', 'Redaction run', 'mono', { px: 0.9, bands: 14, noise: 0.25, blank: 0.35 }],
       ['warpcheck', 'Envelope tint', 'mono', { pattern: 'slash', warp: 'wave', cells: 40, amp: 0.1, waves: 1, second: false }, 0.5],
@@ -258,14 +223,6 @@
       ['pixelgrid', 'Perforation', 'mono', { cell: 3.6, mode: 'dots', zones: 2, density: 0.5, phase: 0 }],
       ['modulargrid', 'Form grid', 'mono', { cols: 8, style: 'line', merge: 0.2, gap: 0.5, empty: 0.2 }],
       ['parcels', 'Parcel labels', 'mono', { cell: 1.6, size: 1, every: 8, labels: true }],
-    ],
-    'religious-futurism': [
-      ['bloomgrid', 'Pixel rose', 'brand', { px: 1.4, levels: 5, rings: 4, calm: 0.5, dither: true }, 0.5],
-      ['gradpanes', 'Clerestory glass', 'brand', { rows: 6, cols: 7, gap: 0.6, steps: 0, grain: 0.35 }, 0.45],
-      ['specimens', 'Rose windows', 'brand', { cols: 4, gap: 1, round: 1.2, study: 'fans', line: 0.8 }, 0.55],
-      ['burst', 'Radiant mandorla', 'brand', { rays: 48, layers: 2, bend: 0.1, beads: 0.3, origin: 'centre' }, 0.4],
-      ['flow', 'Caustics', 'brand', { field: 'waves', strands: 2, gap: 4, weight: 0.4 }, 0.45],
-      ['marble', 'Veined stone', 'mono', { bands: 6, warp: 1, cover: 0.6, stars: 0.1, outline: false }, 0.5],
     ],
     'xerox-punk': [
       ['tornbands', 'Wheatpaste layers', 'brand', { bands: 7, tear: 1.4, tilt: 2.5, minis: 'mixed', shadow: 0.6 }],
@@ -283,22 +240,6 @@
       ['ribbonrise', 'Ticket tabs', 'brand', { edge: 'bottom', bar: 1.8, bands: 5, shift: 0.2, ring: true }],
       ['weave', 'Stretch ramp', 'brand', { bands: 12, rhythm: 'mixed', skew: 1, gap: 0.2, stripe: 1.5 }],
     ],
-    'cybersigilism': [
-      ['rods', 'Thorn rods', 'mono', { density: 1.1, thick: 0.5, length: 3, fork: 0.9, slip: 0.4, second: 'ink2' }, 0.6],
-      ['flow', 'Hairline field', 'mono', { field: 'flow', strands: 7, gap: 1.1, weight: 0.4 }, 0.55],
-      ['stipple', 'Ash dust', 'mono', { density: 0.5, dot: 0.5, layout: 'random', mirror: 'none', field: 'clouds', duo: false }, 0.5],
-      ['specimens', 'Thorn sigils', 'mono', { cols: 3, gap: 1.2, round: 0, study: 'spikes', line: 0.8 }, 0.55],
-      ['glyphgrid', 'Etched marks', 'mono', { glyphs: 'crosses', cell: 5, bands: 3, duo: false }, 0.5],
-      ['blades', 'Shed thorns', 'mono', { count: 120, size: 1, curve: 0.8, take: 0.3, ink: 'ink1' }, 0.5],
-    ],
-    'industrial-hazard': [
-      ['panels', 'Steel plates', 'mono', { depth: 4, gutter: 0.4, pitch: 1, flat: 0.5, frame: true }, 0.6],
-      ['weave', 'Hazard tape', 'safety', { bands: 3, rhythm: 'even', skew: 1, gap: 0.4, stripe: 2.4, spark: false }],
-      ['relief', 'Panel traces', 'mono', { cols: 3, traces: 8, blocks: 4, trace: 1.1 }],
-      ['glyphgrid', 'Bolt heads', 'mono', { glyphs: 'crosses', cell: 4, bands: 3, duo: false }],
-      ['zigzag', 'Tread plate', 'mono', { style: 'stair', band: 6, amp: 3, period: 9, phase: 'parallel', colors: 'two' }],
-      ['chevron', 'Hazard stripes', 'safety', { bands: 14, slope: 45, mirror: 'x', rhythm: 'even', colors: 'two' }],
-    ],
     'radical-memphis': [
       ['patchwork', 'Terrazzo', 'brand', { cell: 7, layers: 56, ragged: 0.6, motif: 'mixed', dotgrid: false }],
       ['festival', 'Bacterio', 'mono', { patches: 2, loops: 1, weight: 0.9, stars: 0, echo: false }],
@@ -306,14 +247,6 @@
       ['snow', 'Checker lenses', 'brand', { cols: 5, static: 0.2, stairs: 0.6, lenses: 0.7, marks: 0.7 }],
       ['blades', 'Shard terrazzo', 'brand', { count: 300, size: 0.8, curve: 0.4, take: 0.9, ink: 'ink1' }],
       ['sprigs', 'Du Pasquier sprigs', 'brand', { size: 1.1, line: 1.4, mix: 0.5, fills: 0.9, slip: 0.3 }],
-    ],
-    'biomechanical-gothic': [
-      ['waves', 'Tubing runs', 'mono', { rows: 6, crests: 3, curl: 1.4, strands: 10, drops: 0 }, 0.45],
-      ['rods', 'Ribcage', 'mono', { density: 1.6, thick: 1.4, length: 6, fork: 0.2, slip: 0.1, second: 'ground' }, 0.45],
-      ['tissue', 'Cast lattice', 'mono', { cell: 12, loose: 0.2, levels: 4, veins: 0.9, wall: 0.8 }, 0.45],
-      ['colony', 'Spore colony', 'mono', { cells: 30, rings: 2, fuse: 1, finish: 'film', nuclei: false }, 0.3],
-      ['halftone', 'Trabecula', 'mono', { cell: 1.1, levels: 5, shape: 'round', angle: 45, field: 'ridges', duo: false }, 0.35],
-      ['marble', 'Bone grain', 'mono', { bands: 7, warp: 1.4, cover: 0.7, stars: 0, outline: false }, 0.45],
     ],
     'pirate-broadcast': [
       ['pixelgrid', 'Sixel mosaic', 'broadcast', { mode: 'blocks', cell: 2, zones: 6 }],
@@ -348,21 +281,13 @@
       ['tokens', 'Stickers', 'brand', { cell: 6, link: 0.2, density: 0.5, fill: 'mixed' }],
       ['patchwork', 'Doodle quilt', 'brand', { cell: 9, layers: 24, ragged: 0.9, motif: 'circles', dotgrid: false }],
     ],
-    'wabi-sabi': [
-      ['snow', 'Washi leaves', 'mono', { cols: 3, static: 0.1, stairs: 0, lenses: 0, marks: 0 }, 0.35],
-      ['weave', 'Tatami', 'mono', { bands: 6, rhythm: 'even', gap: 0.2, stripe: 0.8 }, 0.45],
-      ['marble', 'Suminagashi', 'mono', { bands: 6, warp: 1.4, cover: 0.5, stars: 0, outline: false }, 0.5],
-      ['stipple', 'Washi fibre', 'mono', { density: 0.5, dot: 0.6, layout: 'random', mirror: 'none', field: 'clouds', duo: false }, 0.4],
-      ['pebbles', 'Stepping stones', 'mono', { size: 1.5, gap: 1.8, erode: 0.6, mode: 'crumble', lit: 0.3 }, 0.4],
-      ['terrain', 'Ink-wash ridges', 'mono', { levels: 3, pix: 0.6, dither: 0.15, style: 'ridges' }, 0.4],
-    ],
-    'dark-academia': [
-      ['marble', 'Endpapers', 'duotone', { bands: 7, warp: 2, cover: 0.85, stars: 0, outline: false }, 0.5],
-      ['weave', 'Tweed', 'duotone', { bands: 10, rhythm: 'pinstripe', gap: 0.1, stripe: 0.7 }, 0.5],
-      ['halftone', 'Steel engraving', 'mono', { cell: 1.1, levels: 5, shape: 'round', angle: 45, field: 'ridges', duo: false }, 0.6],
-      ['sprigs', 'Pressed flowers', 'night', { size: 0.8, line: 0.7, mix: 0.3, fills: 0.4, slip: 0.2 }, 0.6],
-      ['counterchange', 'Library arches', 'duotone', { figure: 'arch', bar: 2.4, dir: 'v', size: 0.7, nest: 2, second: false }, 0.5],
-      ['modulargrid', 'Ledger', 'mono', { cols: 12, style: 'line', merge: 0.2, gap: 0.6, empty: 0.3 }, 0.5],
+    'japanese-minimal': [
+      ['pebbles', 'Stepping stones', 'mono', { size: 1.5, gap: 1.8, erode: 0.6, mode: 'crumble', lit: 0.3 }, 0.35],
+      ['counterchange', 'Shoji bars', 'mono', { figure: 'square', bar: 1.6, dir: 'v', size: 0.5, nest: 1, second: false }, 0.4],
+      ['weave', 'Hairline weave', 'mono', { bands: 12, rhythm: 'pinstripe', skew: 0, gap: 0.6, stripe: 0.5, spark: false }, 0.35],
+      ['stipple', 'Washi fibre', 'mono', { density: 0.5, dot: 0.5, layout: 'random', mirror: 'none', field: 'clouds', duo: false }, 0.35],
+      ['modulargrid', 'Tatami rule', 'mono', { cols: 8, style: 'line' }, 0.3],
+      ['gradpanes', 'Paper panes', 'tonal', { rows: 2, cols: 3, gap: 2.2, radius: 0, steps: 0, grain: 0.05 }, 0.3],
     ],
     'mid-century': [
       ['chevron', 'Girard chevrons', 'brand', { bands: 12, slope: 25, mirror: 'x', rhythm: 'varied', colors: 'three', grain: 0 }],
@@ -371,14 +296,6 @@
       ['counterchange', 'Girard diamonds', 'brand', { figure: 'diamond', bar: 3, dir: 'v', size: 0.6, nest: 2, second: true, grain: 0 }],
       ['zigzag', 'Rickrack', 'brand', { style: 'chevron', colors: 'three', band: 6, amp: 3, period: 10, phase: 'interlock', grain: 0 }],
       ['panels', 'Cut planes', 'brand', { depth: 3, gutter: 0.8, pitch: 1.3, flat: 0.6, frame: false, grain: 0 }],
-    ],
-    'art-nouveau': [
-      ['blades', 'Iris stems', 'brand', { count: 110, size: 1.9, curve: 0.9, take: 0, ink: 'ink2', grain: 0 }],
-      ['sprigs', 'Botanical frieze', 'brand', { size: 1.1, line: 1, mix: 0.5, fills: 0.8, slip: 0.15, grain: 0 }],
-      ['flow', 'Whiplash', 'brand', { field: 'swirl', strands: 4, gap: 2, bend: 2.2, weight: 1.4 }],
-      ['rods', 'Tendril chains', 'brand', { density: 1, thick: 0.8, length: 5, fork: 0.6, slip: 0.3, second: 'ink2' }],
-      ['zigzag', 'Japonisme waves', 'brand', { style: 'rounded', colors: 'three', band: 5, amp: 5, period: 18, phase: 'parallel', grain: 0 }],
-      ['specimens', 'Tendril studies', 'brand', { cols: 3, gap: 1, round: 3, study: 'tendrils', line: 1 }],
     ],
     'transit-wayfinding': [
       ['ribbonrise', 'Line bands', 'brand', { edge: 'left', bar: 2.4, bands: 5, ring: false }],
@@ -403,30 +320,6 @@
       ['stipple', 'Starfield', 'night', { density: 0.6, dot: 0.8, layout: 'random', mirror: 'none', field: 'clouds', duo: true }],
       ['gradpanes', 'WordArt bands', 'brand', { rows: 2, cols: 7, gap: 0.4, steps: 8, radius: 0 }],
       ['pixelgrid', 'Construction tape', 'brand', { cell: 2.5, mode: 'diagonals', zones: 2, density: 1, phase: 0 }],
-    ],
-    'big-top': [
-      ['zigzag', 'Bunting', 'brand', { style: 'chevron', band: 10, amp: 6, period: 8, phase: 'interlock', colors: 'two' }],
-      ['weave', 'Awning stripes', 'duotone', { bands: 8, rhythm: 'even', gap: 0, stripe: 2.5 }],
-      ['burst', 'Tent canopy', 'brand', { rays: 28, layers: 1, bend: 0, beads: 0.8, origin: 'low' }],
-      ['arcrise', 'Circus ring', 'duotone', { origin: 'bottom', bands: 5, suns: 1, bars: true, bar: 3 }],
-      ['stipple', 'Confetti', 'brand', { density: 0.5, dot: 1.6, layout: 'random', mirror: 'none', field: 'clouds', duo: true }],
-      ['halftone', 'Lithograph dots', 'brand', { cell: 2.2, levels: 4, shape: 'round', angle: 15, field: 'clouds', duo: true }],
-    ],
-    'gummy': [
-      ['colony', 'Jelly cells', 'duotone', { cells: 18, rings: 2, fuse: 1.1, finish: 'film', nuclei: false }],
-      ['zigzag', 'Gummy worms', 'brand', { style: 'rounded', colors: 'four', band: 8, amp: 5, period: 10, phase: 'interlock' }],
-      ['tokens', 'Gummy drops', 'brand', { cell: 7, link: 0, density: 0.95, fill: 'tint' }],
-      ['warpcheck', 'Wobble check', 'brand', { pattern: 'check', warp: 'bulge', cells: 10, amp: 0.5, waves: 1, second: false }, 0.9],
-      ['patchwork', 'Candy buttons', 'duotone', { cell: 10, layers: 22, ragged: 0.2, motif: 'circles', dotgrid: false }],
-      ['halftone', 'Sugar dust', 'brand', { cell: 1.2, levels: 3, shape: 'round', field: 'clouds', duo: true, tints: true }, 0.6],
-    ],
-    'curio-cabinet': [
-      ['seafan', 'Coral specimen', 'night', { fans: 1, branch: 1.2, ribs: false, screen: 0.3, lobes: 2 }, 0.7],
-      ['pebbles', 'Mineral drawer', 'brand', { size: 1, gap: 1.2, erode: 0.4, mode: 'mixed', lit: 0.8 }],
-      ['specimens', 'Specimen trays', 'duotone', { cols: 5, gap: 0.6, round: 0, study: 'mixed', line: 0.8 }, 0.6],
-      ['inkstill', 'Still life', 'duotone', { px: 0.8, masses: 4, vessels: 3, dither: 1, marks: false }, 0.6],
-      ['modulargrid', 'Type case', 'mono', { cols: 10, style: 'line', merge: 0.7, gap: 0.4, empty: 0 }, 0.6],
-      ['parcels', 'Tags', 'mono', { cell: 1.4, size: 1, every: 6, labels: true }, 0.6],
     ],
   };
 

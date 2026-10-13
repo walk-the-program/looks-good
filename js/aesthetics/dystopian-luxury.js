@@ -4,9 +4,10 @@
    stitches and its circled numerals 0-23, museum accession numbers (year.sequence.part),
    Lumon's benevolent-institution register. Severity by removal and labelling: near-pure
    white and ink, a tiny wordmark, vast empty space, one enormous word cropped vertically under a strip,
-   hairlines, security-style labels and a single mark in the client primary under 2% of the area.
+   hairlines, catalogue labels and a single mark in the client primary under 2% of the area.
    Metal only on hardware (not drawn here). No gothic horror, no gradients, no glow,
-   no real brand names. The classifying labels never warn; they catalogue. */
+   no real brand names. Nothing sits on or beside the brand name as a classification: no
+   "classified", "restricted", division, or archive-reference text. The labels catalogue. */
 
 // The single disruptive mark is always the client's primary (a dull primary is still the
 // brand; there is no fixed fallback colour). Shared by tokens() and art().
@@ -17,7 +18,7 @@ function dlMark(t) {
 // The giant word: first word of the brand, uppercase, set so its full width is 102% of the
 // BOARD (the plate runs edge to edge; the right edge crops at most half a letter), then
 // cropped VERTICALLY: the top 70% of the cap height shows and the rest hides under the
-// CLASSIFIED strip. A horizontal crop at a letter boundary can spell an accidental word, a
+// plain ink strip. A horizontal crop at a letter boundary can spell an accidental word, a
 // vertical one never can. Returns the font size in viewBox units, the target width, the
 // lengthAdjust mode and the strip's y (the plate's height follows the word).
 function dlWordFit(state, word, maxFs) {
@@ -92,7 +93,6 @@ registerAesthetic({
   influences: 'Balenciaga web / Maison Margiela labels / Museum accession',
   summary: 'Severity through removal: a tiny logo, vast white space, enormous cropped type and blank labels.',
   motto: 'Access is a privilege.',
-  kicker: 'Restricted viewing',
   mode: 'light',
   slideShape: 'minimal',
   labels: { material: 'Accession', states: ['Catalogued', 'Restricted', 'Classified'], statesKind: 'button' },
@@ -109,8 +109,8 @@ registerAesthetic({
       coverage: '≈90–92%',
     },
     ink: {
-      use: 'Ink black: all type, the 1px rules at 12%, the security strip, the giant cropped word, the inverted selected cell and the one action',
-      never: 'Large flat fields other than the single security strip, or a soft grey substitute for hairlines',
+      use: 'Ink black: all type, the 1px rules at 12%, the crop strip, the giant cropped word, the inverted selected cell and the one action',
+      never: 'Large flat fields other than the single crop strip, or a soft grey substitute for hairlines',
       coverage: '≈6–7%',
     },
     primary: {
@@ -150,11 +150,11 @@ registerAesthetic({
   },
 
   // "Accession": one enormous word in ink, fitted to 102% of the board's width and cropped
-  // vertically (top 70% visible) under the CLASSIFIED strip; below it, at the right, the
-  // only object: a blank white label held by four X stitches, with an accession number and a
-  // circled numeral (no barcode, no dot). Narrow boards show the word split at its middle
-  // syllable on two cropped plates instead (CSS swaps .dl-wide / .dl-narrow), the label is
-  // hidden and the accession number runs as plain text under the strip.
+  // vertically (top 70% visible) above a plain ink strip with no text; below it, at the right,
+  // the only object: a blank white label held by four X stitches (no barcode, no dot).
+  // Narrow boards show the word split at its middle syllable on two cropped plates instead
+  // (CSS swaps .dl-wide / .dl-narrow) and the label is hidden. No classification or archive
+  // text sits on or beside the word.
   art(ctx) {
     const t = ctx.t;
     const e = escapeHtml;
@@ -162,10 +162,10 @@ registerAesthetic({
     const word = e(raw);
     const ink = t.isDark ? t.mix('#F7F7F5', t.ink, 0.7) : t.mix('#0A0A0A', t.ink, 0.75);
     const parts = dlSplit(raw);
-    const narrow = parts.map((p, i) => dlPlate(ctx.state, e(p), ink, i === parts.length - 1 ? 'CLASSIFIED / DIV. 07' : '', i === parts.length - 1 ? '2026.114' : '', 100)).join('');
+    const narrow = parts.map(p => dlPlate(ctx.state, e(p), ink, '', '', 100)).join('');
     return `<div class="dl-art">
-      <div class="dl-plate dl-wide">${dlPlate(ctx.state, word, ink, 'CLASSIFIED / DIVISION 07 / NOT FOR RELEASE', '2026.114', 64)}</div>
-      <div class="dl-plate dl-narrow">${narrow}<p class="dl-accline">Accession 2026.114.3 · viewed by no one</p></div>
+      <div class="dl-plate dl-wide">${dlPlate(ctx.state, word, ink, '', '', 64)}</div>
+      <div class="dl-plate dl-narrow">${narrow}</div>
       ${dlTag('')}
     </div>`;
   },
@@ -173,7 +173,7 @@ registerAesthetic({
   materials: [
     { name: 'Hairline', css: 'border-top: 1px solid {dlInk}; /* the only rule: 1px ink, 0 radius; double rules carry registration ticks; no card chrome, no shadows */' },
     { name: 'Blank label (accession)', css: 'background: {canvas}; color: {dlInk}; border: 1px solid {dlInk}; font: 400 10px "Courier Prime", Courier, monospace; letter-spacing: .04em; /* the only object: a blank white label held by four X stitches; accession number year.sequence.part (2026.114.3) and a circled numeral; no barcode */' },
-    { name: 'Security strip', css: 'background: {dlInk}; color: {canvas}; font: 500 10px ui-monospace, Menlo, monospace; letter-spacing: .1em; text-transform: uppercase; /* CLASSIFIED / DIVISION 07 / NOT FOR RELEASE; the only large flat ink field */' },
+    { name: 'Crop strip', css: 'background: {dlInk}; /* a plain ink bar with no text or label: it crops the giant word under it; the only large flat ink field */' },
     { name: 'Main action (a mark, not a bar)', css: 'display: inline-flex; width: auto; padding: 10px 14px; background: {dlInk}; color: {canvas}; border-radius: 0; font: 400 12px Arial-class sans; /* a 6px {dlMark} square before the label: the one primary mark per view */' },
     { name: 'Selected cell', css: 'background: {dlInk}; color: {canvas}; border: 1px solid {dlInk}; /* hairline-boxed cells; the selected one is inverted */' },
     { name: 'Footer block', css: 'background: {dlGrey}; color: {muted}; /* a flat grey block with legal labels, an address and a catalogue number */' },
@@ -191,6 +191,7 @@ registerAesthetic({
       'Use gradients, glows, glass, soft shadows or rounded corners; hard cuts and hairlines only.',
       'Spread the primary: no colour stripe, no underline, no second mark. No barcodes, crosshairs or ruled grid furniture on the page either.',
       'Add gothic horror tropes (chains, crosses, skulls, gore), concrete textures or warm literary serif layouts.',
+      'Put "classified", "restricted", division numbers, "not for release" or archive references on or beside the product or brand name, its wordmark or its header.',
       'Set tiny type below 4.5:1 contrast or leave the board with no readable controls; severity is never illegibility.',
     ],
   },
@@ -201,25 +202,24 @@ registerAesthetic({
     coverDisplay: 0.22,
     coverMin: 24,
     // Material slide: the four listed materials as objects, at scale and nothing else: a ruled
-    // hairline, the blank label held by four stitches, the security strip and the main action
+    // hairline, the blank label held by four stitches, the plain crop strip and the main action
     // (an ink block carrying the one 6px primary square).
     materialArt() {
       return `<div class="dl-obj">
         <div class="dl-m dl-m-hair"><i></i><span>Hairline · 1px</span></div>
         ${dlTag('dl-tag--lg')}
-        <div class="dl-m dl-m-strip"><b>Classified / Division 07 / Not for release</b><b>2026.114</b></div>
+        <div class="dl-m dl-m-strip" aria-hidden="true"></div>
         <div class="dl-m dl-m-act"><span class="ab-cta"><span class="ab-cta-label">Request a viewing</span></span><span>Main action · 6px mark</span></div>
       </div>`;
     },
-    // In product: one product page, one item, its accession number and one action
+    // In product: one product page, one item named by the brand, its blank label and one action
     product(ctx) {
       const e = ctx.e;
       const name = e(String(ctx.brandName || 'Archive').trim());
       return `<div class="dl-pp">
         <div class="dl-pp-img">${dlTag('dl-tag--lg')}</div>
         <div class="dl-pp-info">
-          <p class="dl-pp-acc">2026.114.3</p>
-          <h3 class="dl-pp-name">${name}, object 7</h3>
+          <h3 class="dl-pp-name">${name}</h3>
           <p class="dl-pp-line">Wool, unlined. One of one. Made to order.</p>
           <p class="dl-pp-price">Price on request</p>
           <span class="ab-cta"><span class="ab-cta-label">Request a viewing</span></span>

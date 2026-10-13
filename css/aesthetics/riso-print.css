@@ -1,174 +1,173 @@
 /* ---------------------------------------------------------------------
-   10 Riso Print — two named drums on warm uncoated paper. The paper stays
-   flat; texture (mottle + pinholes, --rz-mottle) lives only on inked areas.
-   Every edge is square: no radius, no shadow. Misregistration is a second
-   FILLED layer in drum 2, 2-3px off, never an outline. Vars from tokens()
-   in js/aesthetics/riso-print.js: --rz-d1/--rz-d2/--rz-d3 (drum hexes),
-   --rz-ov (overprint 1x2), --rz-n1..3 / --rz-h2..3 / --rz-ovl (swatch
-   labels), --rz-hb (headline pass B colour), --rz-mottle, --rz-am1,
-   --ab-blend (multiply on paper, screen on dark stock), --ab-paper-card.
-   Hooks: hero 'scene' (the art is the printed sheet, the headline is
-   printed over it), def.headline (two passes), states 'button'.
+   10 Riso Print — warm paper with feTurbulence grain, two inks that
+   overprint (multiply) and sit slightly off-register, halftone shading.
+   --ab-blend / --ab-speck / --ab-plate / --ab-paper-card come from
+   js/aesthetics/riso-print.js tokens(). Dark mode screens instead of
+   multiplies (ink on black paper).
 ------------------------------------------------------------------------ */
 
-.ab[data-ae="riso-print"] { --rz-line: 1.5px solid var(--ab-ink); --rz-off-x: 3px; --rz-off-y: 2px; border-radius: 0; }
+.ab[data-ae="riso-print"] {
+  --rz-ink-dot: radial-gradient(circle, var(--ab-speck) 0.9px, transparent 1.2px) 0 0 / 4px 4px;
+  --rz-line: 1.5px solid var(--ab-ink);
+  border-radius: 6px;
+}
 
-/* labels: tracked mono caps, like zine captions; square to the page */
-.ab[data-ae="riso-print"] .ab-label, .ab[data-ae="riso-print"] .ab-tag, .ab[data-ae="riso-print"] .ab-kicker, .ab[data-ae="riso-print"] .ab-sw-role, .ab[data-ae="riso-print"] .ab-fieldlabel, .ab[data-ae="riso-print"] .ab-state { text-transform: uppercase; font-weight: 600; letter-spacing: 0.1em; }
+/* paper grain: inline SVG noise. Behind the page content (z 0) so the headline stays
+   crisp; cards and art carry their own grain on top (--rz-grain). */
+.ab[data-ae="riso-print"] {
+  --rz-grain: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><filter id='n' x='0' y='0' width='100%25' height='100%25'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch' seed='7'/><feColorMatrix values='0 0 0 0 .25  0 0 0 0 .17  0 0 0 0 .1  2.4 0 0 0 -.85'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+  --rz-grain-op: 0.42;
+}
+.ab[data-ae="riso-print"][data-mode="dark"] {
+  --rz-grain: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><filter id='n' x='0' y='0' width='100%25' height='100%25'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch' seed='7'/><feColorMatrix values='0 0 0 0 .96  0 0 0 0 .92  0 0 0 0 .84  2.4 0 0 0 -.85'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+  --rz-grain-op: 0.28;
+}
+.ab[data-ae="riso-print"]::after {
+  content: ""; position: absolute; inset: 0; z-index: 0; pointer-events: none; opacity: calc(var(--rz-grain-op) * 0.6);
+  mix-blend-mode: var(--ab-blend); background-size: 240px 240px; background-image: var(--rz-grain);
+}
+/* grain on cards, art cards and swatches (they paint over the page grain) */
+.ab[data-ae="riso-print"] .ab-card::after, .ab[data-ae="riso-print"] .rza-card::after {
+  content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none; z-index: 3;
+  mix-blend-mode: var(--ab-blend); background-size: 240px 240px; background-image: var(--rz-grain); opacity: var(--rz-grain-op);
+}
+
+/* labels: tracked caps, like zine captions */
+.ab[data-ae="riso-print"] .ab-label, .ab[data-ae="riso-print"] .ab-tag, .ab[data-ae="riso-print"] .ab-kicker, .ab[data-ae="riso-print"] .ab-sw-role, .ab[data-ae="riso-print"] .ab-fieldlabel, .ab[data-ae="riso-print"] .ab-state { text-transform: uppercase; font-weight: 700; letter-spacing: 0.15em; }
+.ab[data-ae="riso-print"] .ab-label, .ab[data-ae="riso-print"] .ab-tag, .ab[data-ae="riso-print"] .ab-kicker, .ab[data-ae="riso-print"] .ab-fieldlabel, .ab[data-ae="riso-print"] .ab-state { font-weight: 600; letter-spacing: 0.1em; }
 .ab[data-ae="riso-print"] .ab-label { color: var(--ab-ink); font-size: 10.5px; display: inline-flex; align-items: center; }
-.ab[data-ae="riso-print"] .ab-label:last-child:not(:first-child) { color: var(--ab-muted); }
-.ab[data-ae="riso-print"] .ab-labelrow { align-items: center; padding-bottom: 9px; border-bottom: 1.5px solid var(--ab-ink); }
+.ab[data-ae="riso-print"] .ab-label:last-child:not(:first-child) { color: var(--ab-muted); font-weight: 600; }
+.ab[data-ae="riso-print"] .ab-labelrow { align-items: center; padding-bottom: 9px; border-bottom: 1.5px dashed var(--ab-ink); }
 .ab[data-ae="riso-print"] .ab-n {
-  display: inline-grid; place-items: center; min-width: 25px; height: 21px; margin-right: 9px; padding: 0 4px;
-  background: var(--rz-d2); color: var(--ab-on-secondary); font-size: 10px; font-weight: var(--rz-bw, 600); letter-spacing: 0;
+  display: inline-grid; place-items: center; width: 25px; height: 25px; margin-right: 9px; border: var(--rz-line); border-radius: 50%;
+  background: var(--ab-sec-tint); font-size: 10px; font-weight: 700; letter-spacing: 0; transform: rotate(-4deg);
 }
 .ab[data-ae="riso-print"] .ab-n::after { content: none; }
 
 /* header */
-.ab[data-ae="riso-print"] .ab-brand { font-weight: var(--rz-hw, 700); letter-spacing: calc(-0.02em * var(--ab-tr, 1)); }
-.ab[data-ae="riso-print"] .ab-mark { position: relative; isolation: isolate; width: 30px; height: 30px; border-radius: 50%; background: var(--rz-d1); color: var(--ab-on-primary); font-weight: var(--rz-hw, 700); }
-.ab[data-ae="riso-print"] .ab-mark::after { content: ""; position: absolute; inset: 0; z-index: -1; border-radius: 50%; background: var(--rz-d2); transform: translate(var(--rz-off-x), var(--rz-off-y)); }
-.ab[data-ae="riso-print"] .ab-tag { padding: 3px 8px; border: var(--rz-line); color: var(--ab-ink); font-size: 10px; }
-.ab[data-ae="riso-print"] .ab-rule { height: 0; background: none; border-top: 1.5px solid var(--ab-ink); opacity: 0.85; }
+.ab[data-ae="riso-print"] .ab-brand { font-weight: 800; letter-spacing: calc(-0.02em * var(--ab-tr, 1)); }
+.ab[data-ae="riso-print"] .ab-mark { position: relative; width: 30px; height: 30px; border-radius: 50%; background: var(--ab-primary); color: var(--ab-on-primary); font-weight: 800; }
+.ab[data-ae="riso-print"] .ab-mark::after { content: ""; position: absolute; inset: 0; border: 1.5px solid var(--ab-secondary); border-radius: 50%; transform: translate(3px, 2px); mix-blend-mode: var(--ab-blend); }
+.ab[data-ae="riso-print"] .ab-tag { padding: 3px 8px; border: var(--rz-line); color: var(--ab-ink); font-size: 10px; transform: rotate(-1.5deg); }
+.ab[data-ae="riso-print"] .ab-rule { height: 0; background: none; border-top: 1.5px dashed var(--ab-ink); opacity: 0.55; }
 
-/* hero: the art is the printed sheet; the copy is printed over its lower left (no substrate, no blur) */
-.ab[data-ae="riso-print"][data-hero="scene"] .ab-hero { padding: clamp(18px, 3cqw, 34px) 0 clamp(22px, 3.4cqw, 38px); }
-.ab[data-ae="riso-print"][data-hero="scene"] .ab-art {
-  border-radius: 0; aspect-ratio: var(--ab-art-ratio, 2 / 1); background: var(--ab-paper-card); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--ab-ink) 22%, transparent);
-}
-.ab[data-ae="riso-print"][data-hero="scene"] .ab-hero-copy {
-  /* the copy column ends before the drum-2 initial (it starts at ~57% of the sheet), so the drum-2 last
-     word never lands on the same-coloured letter */
-  width: min(100%, 50cqw); margin: 0; padding: clamp(18px, 3.2cqw, 40px) clamp(18px, 3.4cqw, 42px);
-  border-radius: 0; background: none; -webkit-backdrop-filter: none; backdrop-filter: none; mix-blend-mode: var(--ab-blend, multiply);
-}
+/* hero */
 .ab[data-ae="riso-print"] .ab-kicker {
-  display: inline-block; margin-bottom: 14px !important; padding: 3px 9px; border: var(--rz-line); color: var(--ab-ink); font-size: 11px;
+  display: inline-block; margin-bottom: 20px !important; padding: 4px 10px; border: var(--rz-line); color: var(--ab-ink);
+  font-size: 11px; transform: rotate(-2deg); background: var(--ab-pri-tint);
 }
+/* one crisp ink: no text-shadow, no misregistration on type */
 .ab[data-ae="riso-print"] .ab-headline {
-  font-weight: var(--rz-hw, 700); letter-spacing: calc(-0.03em * var(--ab-tr, 1)); line-height: 0.86; text-transform: uppercase; text-wrap: wrap;
+  font-weight: 800; letter-spacing: calc(-0.035em * var(--ab-tr, 1)); line-height: 0.88; color: var(--ab-primary-text); text-transform: uppercase;
+  text-wrap: wrap; /* greedy: the column width sets the break (GOOD DESIGN / SHOULD FEEL / ALIVE), not balancing */
 }
-.ab[data-ae="riso-print"][data-hero="scene"]:not(.ab-slide) .ab-headline {
-  font-size: calc(clamp(56px, 11cqw, 150px) * var(--ab-hl-scale, 1) * var(--ab-hs, 1) * var(--ab-display, 1));
+.ab[data-ae="riso-print"] .ab-subcopy { color: var(--ab-ink); font-size: clamp(13.5px, 1.5cqw, 16px); }
+.ab[data-ae="riso-print"] .ab-sub-rest { color: var(--ab-muted); }
+/* the accent word is circled in fluorescent ink, drawn by hand: a stroke only, never a fill. The ring is the
+   raw accent (fluoro ink multiplied over paper), 3.5px, standing 0.18em clear of the word on every side so it
+   never crosses a letter; a second, fainter pass sits a hair off-register. */
+.ab[data-ae="riso-print"] .ab-hl { position: relative; display: inline-block; color: inherit; padding: 0 0.04em; }
+.ab[data-ae="riso-print"] .ab-hl::before, .ab[data-ae="riso-print"] .ab-hl::after {
+  content: ""; position: absolute; z-index: -1; left: -0.18em; right: -0.18em; top: -0.18em; bottom: -0.18em; pointer-events: none;
+  background: var(--ab-accent); mix-blend-mode: var(--ab-blend); transform: rotate(-4deg);
+  -webkit-mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 70' preserveAspectRatio='none'><path d='M172 13 C145 2 75 0 32 13 C5 22 2 48 34 59 C75 71 152 68 182 52 C201 41 196 20 158 8' fill='none' stroke='black' stroke-width='3.5' stroke-linecap='round' vector-effect='non-scaling-stroke'/></svg>") center / 100% 100% no-repeat;
+  mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 70' preserveAspectRatio='none'><path d='M172 13 C145 2 75 0 32 13 C5 22 2 48 34 59 C75 71 152 68 182 52 C201 41 196 20 158 8' fill='none' stroke='black' stroke-width='3.5' stroke-linecap='round' vector-effect='non-scaling-stroke'/></svg>") center / 100% 100% no-repeat;
 }
-/* two passes: A prints drum 1; B (multiply, off-register) prints the last word in drum 2 overlapping its neighbour */
-.ab[data-ae="riso-print"] .rzh { position: relative; display: block; isolation: isolate; }
-.ab[data-ae="riso-print"] .rzh-a { display: block; color: var(--rz-d1); }
-.ab[data-ae="riso-print"] .rzh-b { position: absolute; inset: 0; display: block; color: var(--rz-hb); transform: translate(0.03em, 0.022em); mix-blend-mode: var(--ab-blend, multiply); pointer-events: none; }
-.ab[data-ae="riso-print"] .rzh-w { display: inline-block; transform: translate(-0.08em, -0.06em); }
-.ab[data-ae="riso-print"] .rzh-a .rzh-w { color: var(--rz-wa, transparent); }
-.ab[data-ae="riso-print"] .rzh-b .rzh-w { color: var(--rz-d2); }
-.ab[data-ae="riso-print"] .ab-subcopy { margin-top: 16px !important; color: var(--ab-ink); font-size: clamp(13.5px, 1.5cqw, 16px); max-width: 30em; }
-.ab[data-ae="riso-print"] .ab-sub-rest { color: var(--rz-sub, var(--ab-muted)); }
+.ab[data-ae="riso-print"] .ab-hl::before { transform: translate(2px, 1px) rotate(-1deg); opacity: 0.6; }
+@container ab (min-width: 601px) {
+  .ab[data-ae="riso-print"] .ab-hero { grid-template-columns: 1.15fr 1fr; }
+}
+/* art: a zine spread of three riso cards, each a flat ink with a second-ink shape on it */
+.ab[data-ae="riso-print"] .ab-art { max-width: 330px; aspect-ratio: 1.22 / 1; }
 .ab[data-ae="riso-print"] .rza { position: absolute; inset: 0; }
-.ab[data-ae="riso-print"] .rza svg { display: block; }
+.ab[data-ae="riso-print"] .rza-card {
+  position: absolute; width: 42%; aspect-ratio: 3 / 4; border-radius: 6px; overflow: hidden;
+  box-shadow: 0.8cqw 0.6cqw 0 color-mix(in srgb, var(--ab-ink) 16%, transparent);
+}
+.ab[data-ae="riso-print"] .rza-card svg { position: absolute; inset: 0; display: block; }
+.ab[data-ae="riso-print"] .rza-1 { left: 0; top: 14%; transform: rotate(-4deg); z-index: 1; }
+.ab[data-ae="riso-print"] .rza-2 { left: 29%; top: 0; transform: rotate(2deg); z-index: 2; }
+.ab[data-ae="riso-print"] .rza-3 { left: 58%; top: 19%; transform: rotate(-2.5deg); z-index: 3; }
+.ab[data-ae="riso-print"] .rza-cap { position: absolute; left: 1%; bottom: 0; font: 600 2.7cqw/1 ui-monospace, Menlo, monospace; letter-spacing: 0.1em; color: var(--ab-ink); }
 
-/* palette: drum chips (the client colour snapped to a RISO ink), plus a sixth chip for the overprint */
-.ab[data-ae="riso-print"] .ab-swatches[data-kind="swatches"] { grid-template-columns: repeat(6, minmax(0, 1fr)); }
-.ab[data-ae="riso-print"] .ab-chip { position: relative; overflow: hidden; border-radius: 0; box-shadow: none; }
-.ab[data-ae="riso-print"] .ab-swatch[data-role="canvas"] .ab-chip, .ab[data-ae="riso-print"] .ab-swatch[data-role="ink"] .ab-chip { box-shadow: inset 0 0 0 1.5px var(--ab-ink); }
-.ab[data-ae="riso-print"] .ab-swatch[data-role="primary"] .ab-chip { background: var(--rz-mottle), var(--rz-d1) !important; }
-.ab[data-ae="riso-print"] .ab-swatch[data-role="secondary"] .ab-chip { background: var(--rz-mottle), var(--rz-d2) !important; }
-.ab[data-ae="riso-print"] .ab-swatch[data-role="accent"] .ab-chip { background: var(--rz-mottle), var(--rz-d3) !important; }
-.ab[data-ae="riso-print"] .ab-swatch[data-role="primary"] .ab-sw-role::after { content: var(--rz-n1); }
-.ab[data-ae="riso-print"] .ab-swatch[data-role="secondary"] .ab-sw-role::after { content: var(--rz-n2); }
-.ab[data-ae="riso-print"] .ab-swatch[data-role="accent"] .ab-sw-role::after { content: var(--rz-n3); }
-.ab[data-ae="riso-print"] .ab-swatch[data-role="secondary"] .ab-sw-hex::after { content: var(--rz-h2); display: block; margin-top: 2px; color: var(--ab-muted); }
-.ab[data-ae="riso-print"] .ab-swatch[data-role="accent"] .ab-sw-hex::after { content: var(--rz-h3); display: block; margin-top: 2px; color: var(--ab-muted); }
-.ab[data-ae="riso-print"] .ab-sw-role { font-size: 11px; letter-spacing: 0.08em; line-height: 1.35; }
+/* palette: inked chips with a dot grain */
+.ab[data-ae="riso-print"] .ab-chip { position: relative; overflow: hidden; border: var(--rz-line); border-radius: 3px; box-shadow: 2px 1.5px 0 var(--ab-plate); }
+.ab[data-ae="riso-print"] .ab-chip::after { content: ""; position: absolute; inset: 0; background: var(--rz-ink-dot); opacity: 0.8; }
+.ab[data-ae="riso-print"] .ab-sw-role { font-size: 11px; letter-spacing: 0.12em; }
 .ab[data-ae="riso-print"] .ab-sw-hex { color: var(--ab-ink); }
-/* OVERPRINT 1x2: drum 1 and drum 2 overlapping, the middle third is the overprint colour */
-.ab[data-ae="riso-print"] .ab-swatches[data-kind="swatches"]::after {
-  content: var(--rz-ovl); white-space: pre-line; overflow-wrap: anywhere; min-width: 0;
-  padding-top: calc(clamp(38px, 5.4cqw, 58px) + 11px); color: var(--ab-ink);
-  font: 600 11px/1.45 var(--ab-font-label, ui-monospace, monospace); letter-spacing: 0.06em;
-  background:
-    linear-gradient(var(--rz-ov), var(--rz-ov)) 50% 0 / 24% clamp(38px, 5.4cqw, 58px) no-repeat,
-    linear-gradient(var(--rz-d1), var(--rz-d1)) 0 0 / 62% clamp(38px, 5.4cqw, 58px) no-repeat,
-    linear-gradient(var(--rz-d2), var(--rz-d2)) 100% 0 / 62% clamp(38px, 5.4cqw, 58px) no-repeat;
-}
 
-/* type block: square, ruled */
-.ab[data-ae="riso-print"] .ab-type-col { border-top: 1.5px solid var(--ab-ink); }
-.ab[data-ae="riso-print"] .ab-fit { border-radius: 0; background: var(--ab-sec-tint); color: var(--ab-ink); }
-.ab[data-ae="riso-print"] .ab-type-apply { border: var(--rz-line); border-radius: 0; background: none; color: var(--ab-ink); }
-.ab[data-ae="riso-print"] .ab-type-apply:hover { background: var(--rz-mottle), var(--rz-d1); color: var(--ab-on-primary); }
-
-/* 01 interface: a square paper card with a 1.5px ink rule; no shadow, no plate */
-.ab[data-ae="riso-print"] .ab-card { position: relative; border: var(--rz-line); border-radius: 0; background: var(--ab-paper-card); box-shadow: none; }
-.ab[data-ae="riso-print"] .ab-seg { gap: 0; padding: 0; background: none; border: var(--rz-line); border-radius: 0; }
+/* 01 interface: a paper card with the second ink printed off-register behind it */
+.ab[data-ae="riso-print"] .ab-card { position: relative; border: var(--rz-line); border-radius: 4px; background: var(--ab-paper-card); box-shadow: 4px 3px 0 var(--ab-plate); }
+.ab[data-ae="riso-print"] .ab-seg { gap: 6px; padding: 0; background: none; border-radius: 0; }
 .ab[data-ae="riso-print"] .ab-seg-btn {
-  min-height: 38px; border: 0; border-left: var(--rz-line); border-radius: 0; color: var(--ab-ink); font-size: 11.5px; font-weight: 600; letter-spacing: 0.06em;
+  min-height: 38px; border: var(--rz-line); border-radius: 4px; color: var(--ab-ink); font-size: 11.5px; font-weight: 600; letter-spacing: 0.06em;
 }
-.ab[data-ae="riso-print"] .ab-seg-btn:first-child { border-left: 0; }
-.ab[data-ae="riso-print"] .ab-seg-btn[aria-pressed="true"] { background: var(--rz-mottle), var(--rz-d1); color: var(--ab-on-primary); font-weight: var(--rz-bw, 600); }
-.ab[data-ae="riso-print"] .ab-card-title { font-weight: var(--rz-hw, 700); letter-spacing: calc(-0.025em * var(--ab-tr, 1)); }
+.ab[data-ae="riso-print"] .ab-seg-btn[aria-pressed="true"] { background: var(--rz-ink-dot), var(--ab-primary); color: var(--ab-on-primary); font-weight: 700; }
+.ab[data-ae="riso-print"] .ab-card-title { font-weight: 800; letter-spacing: calc(-0.025em * var(--ab-tr, 1)); }
 .ab[data-ae="riso-print"] .ab-card-body { color: var(--ab-ink); font-size: 13px; }
-/* the CTA: drum 1, with drum 2 printed as a second filled layer 3,2px off, behind it */
 .ab[data-ae="riso-print"] .ab-cta {
-  position: relative; isolation: isolate; border-radius: 0; padding: 14px 16px; background: none; color: var(--ab-on-primary);
-  font-weight: var(--rz-bw, 600); letter-spacing: 0.02em; box-shadow: none;
+  --rz-ox: 3px; --rz-oy: 2px;
+  position: relative; border-radius: 2px; padding: 14px 16px; background: var(--rz-ink-dot), var(--ab-primary); color: var(--ab-on-primary);
+  font-weight: 700; letter-spacing: 0.02em; transition: transform 0.12s;
 }
-.ab[data-ae="riso-print"] .ab-cta::before { content: ""; position: absolute; inset: 0; z-index: -1; background: var(--rz-mottle-lt, var(--rz-mottle)), var(--rz-d1); pointer-events: none; }
 .ab[data-ae="riso-print"] .ab-cta::after {
-  content: ""; position: absolute; inset: 0; z-index: -2; background: var(--rz-d2); pointer-events: none;
-  transform: translate(var(--rz-off-x), var(--rz-off-y)); transition: transform 0.12s;
+  content: ""; position: absolute; inset: 0; border: 1.5px solid var(--ab-secondary); border-radius: 2px; pointer-events: none;
+  transform: translate(var(--rz-ox), var(--rz-oy)); mix-blend-mode: var(--ab-blend); transition: transform 0.12s;
 }
-/* rest: drum 2 lands 3,2 off; drift: it slides further; registered: drum 2 lands exactly under drum 1 (only drum 1 shows) */
-.ab[data-ae="riso-print"] .ab-cta:hover, .ab[data-ae="riso-print"] .ab-cta.is-hover { --rz-off-x: 6px; --rz-off-y: 5px; }
-.ab[data-ae="riso-print"] .ab-cta:active, .ab[data-ae="riso-print"] .ab-cta.is-pressed { --rz-off-x: 0px; --rz-off-y: 0px; }
+/* rest: second ink 3,2 off-register; hover: it drifts further; pressed: the inks register */
+.ab[data-ae="riso-print"] .ab-cta:hover, .ab[data-ae="riso-print"] .ab-cta.is-hover { --rz-ox: 5px; --rz-oy: 4px; transform: translate(-1px, -1px); }
+.ab[data-ae="riso-print"] .ab-cta:active, .ab[data-ae="riso-print"] .ab-cta.is-pressed { --rz-ox: 0px; --rz-oy: 0px; transform: translate(2px, 1px); }
 .ab[data-ae="riso-print"] .ab-cta-arrow::before { content: "→"; font-size: 17px; line-height: 1; }
 
 /* 02 ink */
-.ab[data-ae="riso-print"] .ab-panel { padding: clamp(16px, 2.4cqw, 22px); border: var(--rz-line); border-radius: 0; background: none; }
+.ab[data-ae="riso-print"] .ab-panel { padding: clamp(16px, 2.4cqw, 22px); border: 1.5px dashed var(--ab-ink); border-radius: 4px; }
 .ab[data-ae="riso-print"] .ab-fieldlabel { font-size: 10.5px; }
-.ab[data-ae="riso-print"] .ab-input { border: var(--rz-line); border-radius: 0; background: transparent; padding: 11px 13px; font-weight: 600; }
-.ab[data-ae="riso-print"] .ab-input:focus { outline: 2px solid var(--ab-ink); outline-offset: 2px; }
-.ab[data-ae="riso-print"] .ab-toggle > span { font-size: 13px; font-weight: 600; }
-/* switch: a square two-state ink block. Off = a drum-1 outline; on = drum 1 solid with drum 2 printed 3,2 off behind it */
-.ab[data-ae="riso-print"] .ab-switch {
-  width: 46px; height: 26px; border: 2px solid var(--rz-d1); border-radius: 0; background: transparent; box-shadow: none; transition: none;
+.ab[data-ae="riso-print"] .ab-input {
+  border: var(--rz-line); border-radius: 2px; background: transparent; padding: 11px 13px; font-weight: 600;
+  transition: box-shadow 0.12s;
 }
-.ab[data-ae="riso-print"] .ab-switch::before { content: none; }
-.ab[data-ae="riso-print"] .ab-switch:checked { background: var(--rz-mottle), var(--rz-d1); box-shadow: var(--rz-off-x) var(--rz-off-y) 0 0 var(--rz-d2); }
-.ab[data-ae="riso-print"] .ab-status { font-size: 11px; color: var(--ab-ink); }
+.ab[data-ae="riso-print"] .ab-input:focus { box-shadow: 3px 2px 0 var(--ab-secondary); }
+.ab[data-ae="riso-print"] .ab-toggle > span { font-size: 13px; font-weight: 600; }
+.ab[data-ae="riso-print"] .ab-switch { width: 54px; height: 30px; border: var(--rz-line); border-radius: 999px; background: transparent; transition: background 0.12s; }
+.ab[data-ae="riso-print"] .ab-switch::before {
+  left: 3px; top: 3px; width: 21px; height: 21px; border: var(--rz-line);
+  background: radial-gradient(circle, var(--ab-ink) 1.1px, transparent 1.5px) 0 0 / 4px 4px, var(--ab-canvas); transition: transform 0.12s;
+}
+.ab[data-ae="riso-print"] .ab-switch:checked { background: var(--ab-primary); }
+.ab[data-ae="riso-print"] .ab-switch:checked::before { transform: translateX(24px); }
+.ab[data-ae="riso-print"] .ab-status { font-size: 11px; color: var(--ab-ink); font-style: italic; }
 .ab[data-ae="riso-print"] .ab-states { margin-top: 24px; }
-.ab[data-ae="riso-print"] .ab-states[data-kind="button"] { gap: 16px; }
+.ab[data-ae="riso-print"] .ab-states[data-kind="button"] { gap: 14px; }
 .ab[data-ae="riso-print"] .ab-states .ab-state-ctl { padding: 12px 8px; margin-bottom: 14px; }
 .ab[data-ae="riso-print"] .ab-state { color: var(--ab-ink); font-size: 10px; letter-spacing: 0.12em; }
 
-/* 03 in use: solid rules, drum-2 status blocks, AM-ramp bars */
-.ab[data-ae="riso-print"] .ab-row { padding: 12px 2px; border-top: 1px solid var(--ab-ink); font-size: 13.5px; }
+/* 03 in use: dashed rules, stamped statuses, halftone bars */
+.ab[data-ae="riso-print"] .ab-row { padding: 12px 2px; border-top: 1.5px dashed var(--ab-ink); font-size: 13.5px; }
 .ab[data-ae="riso-print"] .ab-row:first-child { border-top: 0; }
-.ab[data-ae="riso-print"] .ab-row:last-child { border-bottom: 1px solid var(--ab-ink); }
-.ab[data-ae="riso-print"] .ab-row-n { font: var(--rz-hw, 700) 13px var(--ab-font-h); color: var(--ab-ink); }
-.ab[data-ae="riso-print"] .ab-row-name { font-family: var(--ab-font-h); font-weight: var(--rz-hw, 700); font-size: 15px; letter-spacing: calc(-0.01em * var(--ab-tr, 1)); }
+.ab[data-ae="riso-print"] .ab-row:last-child { border-bottom: 1.5px dashed var(--ab-ink); }
+.ab[data-ae="riso-print"] .ab-row-n { font: 800 13px var(--ab-font-h); color: var(--ab-primary-text); }
+.ab[data-ae="riso-print"] .ab-row-name { font-family: var(--ab-font-h); font-weight: 700; font-size: 15px; letter-spacing: calc(-0.01em * var(--ab-tr, 1)); }
 .ab[data-ae="riso-print"] .ab-row-status {
-  padding: 2px 8px; border: 0; border-radius: 0; background: var(--ab-sec-tint); color: var(--ab-ink);
-  font-size: 9.5px; font-weight: var(--rz-bw, 600); letter-spacing: 0.14em; text-transform: uppercase; box-shadow: inset 3px 0 0 var(--rz-d2);
+  padding: 2px 9px; border: var(--rz-line); border-radius: 3px; background: var(--ab-sec-tint); color: var(--ab-ink);
+  font-size: 9.5px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; transform: rotate(-2deg);
 }
-.ab[data-ae="riso-print"] .ab-row-bar { height: 12px; border: 1.5px solid var(--ab-ink); border-radius: 0; background: none; }
-.ab[data-ae="riso-print"] .ab-row-bar i { border-radius: 0; background: var(--rz-am1) 0 0 / 100% 100% no-repeat; mix-blend-mode: var(--ab-blend); }
-.ab[data-ae="riso-print"] .ab-row-pct { font-weight: var(--rz-bw, 600); }
+.ab[data-ae="riso-print"] .ab-row:nth-child(2) .ab-row-status { transform: rotate(1.5deg); }
+.ab[data-ae="riso-print"] .ab-row-bar { height: 11px; border: var(--rz-line); border-radius: 2px; background: var(--ab-pri-tint); }
+.ab[data-ae="riso-print"] .ab-row-bar i { background: radial-gradient(circle, var(--ab-primary) 1.25px, transparent 1.65px) 0 0 / 4px 4px; border-right: 1.5px solid var(--ab-ink); }
+.ab[data-ae="riso-print"] .ab-row-pct { font-weight: 700; }
 
 @container ab (max-width: 600px) {
+  .ab[data-ae="riso-print"] .ab-art { max-width: 280px; }
   .ab[data-ae="riso-print"] .ab-tag { font-size: 9px; letter-spacing: 0.1em; padding: 2px 6px; }
-  .ab[data-ae="riso-print"][data-hero="scene"] .ab-hero-copy { width: 100%; padding: 0; mix-blend-mode: normal; }
-  .ab[data-ae="riso-print"][data-hero="scene"]:not(.ab-slide) .ab-headline { font-size: calc(clamp(40px, 13.5cqw, 64px) * var(--ab-hl-scale, 1) * var(--ab-hs, 1) * var(--ab-display, 1)); }
-  .ab[data-ae="riso-print"] .ab-swatches[data-kind="swatches"] { grid-template-columns: minmax(0, 1fr); }
-  .ab[data-ae="riso-print"] .ab-swatches[data-kind="swatches"]::after { padding-top: 0; padding-left: 72px; min-height: 52px; background-size: 24px 46px, 34px 46px, 34px 46px; background-position: 13px 0, 0 0, 26px 0; }
 }
 
 /* footer */
-.ab[data-ae="riso-print"] .ab-foot { border-top: 1.5px solid var(--ab-ink); color: var(--ab-ink); }
+.ab[data-ae="riso-print"] .ab-foot { border-top: 1.5px dashed var(--ab-ink); color: var(--ab-ink); }
 .ab[data-ae="riso-print"] .ab-foot .ab-infl { color: var(--ab-muted); font-style: italic; }
-.ab[data-ae="riso-print"] .ab-dot { width: 12px; height: 12px; border-radius: 0; background: var(--rz-d3); }
+.ab[data-ae="riso-print"] .ab-dot { width: 12px; height: 12px; border: var(--rz-line); background: var(--ab-accent); }
 
 .ab[data-ae="riso-print"] .ab-seg-btn:focus-visible, .ab[data-ae="riso-print"] .ab-cta:focus-visible, .ab[data-ae="riso-print"] .ab-switch:focus-visible { outline: 2px solid var(--ab-ink); outline-offset: 3px; }
 @media (prefers-reduced-motion: reduce) {
-  .ab[data-ae="riso-print"] .ab-cta::after { transition: none; }
+  .ab[data-ae="riso-print"] .ab-cta:hover, .ab[data-ae="riso-print"] .ab-cta:active, .ab[data-ae="riso-print"] .ab-cta.is-hover, .ab[data-ae="riso-print"] .ab-cta.is-pressed { transform: none; }
+  .ab[data-ae="riso-print"] .ab-cta, .ab[data-ae="riso-print"] .ab-cta::after { transition: none; }
 }
-
-/* only weights the faces have (font-synthesis is off) */
-.ab[data-ae="riso-print"] .ab-type-cur b { font-weight: inherit; }
-.ab[data-ae="riso-print"] .ab-deck-pchip { font-weight: var(--rz-hw, 700); }

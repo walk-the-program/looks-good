@@ -248,4 +248,3 @@
 .ab-deck-mail { margin: 0; font-family: var(--ab-font-label, var(--ab-font-ui, var(--ab-font-b))); font-size: 20px; letter-spacing: 0; }
 
 /* ---- deck compat: decorations that assume the board's height ---- */
-.ab.ab-slide[data-ae="y2k-chrome"]::before { height: 100%; }

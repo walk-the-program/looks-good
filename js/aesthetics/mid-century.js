@@ -1,27 +1,24 @@
-/* 41 Atomic Mid-Century — optimistic, cut-paper, atomic. References: Charley Harper's
-   "minimal realism" (animals reduced to circles, half-circles and triangles, one striped
-   shape, flat colour, no outlines), Saul Bass's hand-cut paper symbols, Alexander Girard's
-   folk-modern repeats, Paul Rand's cut collage, Mary Blair's flat colour, Jim Flora's atomic
-   figures, Alvin Lustig's covers, Googie boomerangs and starbursts, the Atomic Age kit.
+/* 41 Atomic Age — 1950s civil-defence and atomic-age propaganda, worn on paper, with a
+   green phosphor terminal for the interface. References: public-domain civil-defence posters
+   and shelter signs (the yellow and black trefoil), atomic-age advertising, Googie starbursts
+   and boomerangs, and green-on-black CRT terminals of the period.
 
-   Mechanism. Everything is CUT PAPER: flat planes with no outlines, their edges sampled
-   every few units and each vertex nudged 0.5-1px (a scissor cut, not a pen line), stacked
-   on cream so paper shows between them. The kit is small and repeats with intent:
-   concave 4- and 8-point sparkles, an atom (three thin orbit bands round a nucleus),
-   boomerangs, kidney panels, a starburst seal, ball-and-stick molecules, a Harper-style
-   bird built only from circles, a half-circle wing with stripes and triangles.
-   - Colour: cream #F3EAD7 and charcoal #2B2622 are fixed, plus ONE period ink, mustard
-     #E0A526 or teal #1F7A7A, whichever is farther in hue from the client primary (≤15%).
-     Client colours are warmed 6° toward yellow and lose ~15% chroma (the 1950s register);
-     printPrimary(t) prints the primary that way, shifted in lightness until its label reads at 4.5:1.
-   - headline(ctx, text): tracked geometric caps with the last word swapped for ONE slanted
-     brush-script word (Yellowtail) in the primary, on a cut-paper swoosh.
-   - Interface: skewed paper planes for the action and segments (the plane is skewed, the
-     label is not), a TV-dial toggle, a cream field with a charcoal bar, sparkles as progress,
-     atom bullets, starburst seals. art(ctx) is pure SVG with inline fills (blend donor safe). */
+   Mechanism. The hero is ONE weathered poster on kraft paper: a sunburst in the client
+   primary (the poster's main ink), a shelter-yellow sun with a charcoal atom over it, a
+   starburst seal with the initial, a trefoil shelter plate and a boomerang in the secondary.
+   Paper wear is flat SVG only (mottling, creases, scuffs, specks, edge stroke): no CSS masks,
+   filters or gradients on the poster.
+   - Colour: kraft #EADBB8, charcoal #2B2622 and the shelter yellow #F2C41B are fixed (the
+     yellow is the one period ink). The client primary prints as the poster ink; printPrimary
+     keeps its label readable. Secondary and accent are warmed 6 degrees toward yellow with
+     15% less chroma.
+   - Interface: the 01 card, 02 panel and 03 list are phosphor screens, #18FF62 on #031A0A in
+     both modes. They never take client colours. Bracketed menu items, scanlines, a chunky mono.
+   - headline(ctx, text): tracked caps with the last word in heavy slab sign lettering, in the
+     primary. art(ctx) is pure SVG with inline fills (blend donor safe). */
 (function () {
-let seq = 0;
-const CREAM = '#F3EAD7', CHAR = '#2B2622', MUSTARD = '#E0A526', TEAL = '#1F7A7A';
+const CREAM = '#F3EAD7', CHAR = '#2B2622', KRAFT = '#EADBB8', SHELTER = '#F2C41B';
+const CRT_BG = '#031A0A', CRT_INK = '#18FF62', CRT_DIM = '#2BD873';
 
 function mcRand(seed) {
   let a = seed >>> 0;
@@ -40,7 +37,7 @@ function mcHash(str) {
   return h >>> 0;
 }
 const f1 = n => String(Math.round(n * 10) / 10);
-const hueDist = (a, b) => { const d = Math.abs(a - b) % 360; return d > 180 ? 360 - d : d; };
+const f2 = n => String(Math.round(n * 100) / 100);
 
 // 1950s register: hue 6 degrees toward yellow (60), chroma -15%
 function mcWarm(hex) {
@@ -49,15 +46,10 @@ function mcWarm(hex) {
   const h = (c.h + Math.max(-6, Math.min(6, d)) + 360) % 360;
   return hslToHex(h, c.s * 0.85, c.l);
 }
-function mcPeriod(primary) {
-  const h = hexToHsl(primary).h;
-  return hueDist(h, hexToHsl(MUSTARD).h) >= hueDist(h, hexToHsl(TEAL).h) ? MUSTARD : TEAL;
-}
 // text that reads on a fill: cream or charcoal
 const mcOn = fill => (contrastRatio(CREAM, fill) >= contrastRatio(CHAR, fill) ? CREAM : CHAR);
 // The printed primary: warmed (mcWarm), then moved in lightness only as far as it takes for
-// its label (cream or charcoal) to reach 4.8:1 (4.5 with headroom for anti-aliasing), so the
-// 12px CTA label stays readable.
+// its label (cream or charcoal) to reach 4.8:1, so the poster ink and its script word read.
 function mcPrint(hex) {
   const w = mcWarm(hex);
   if (contrastRatio(mcOn(w), w) >= 4.8) return w;
@@ -71,7 +63,7 @@ function mcPrint(hex) {
   return w;
 }
 
-// cut-paper edge: resample a closed outline every `step` units, nudge each vertex 0.5-1px
+// printed edge: resample a closed outline every `step` units, nudge each vertex by ±j
 function mcCut(pts, rnd, step = 6, j = 0.9) {
   const out = [];
   for (let i = 0; i < pts.length; i++) {
@@ -114,12 +106,48 @@ function atom(x, y, r, ring, nuc, w) {
   });
   return g + `<circle cx="${x}" cy="${y}" r="${f1(r * 0.17)}" fill="${nuc}"/>`;
 }
+// an electron on an atom orbit: parameter th on an ellipse rotated by deg
+function orbitDot(x, y, rx, ry, deg, th, r, fill) {
+  const px = Math.cos(th) * rx, py = Math.sin(th) * ry, a = deg * Math.PI / 180;
+  return `<circle cx="${f1(x + px * Math.cos(a) - py * Math.sin(a))}" cy="${f1(y + px * Math.sin(a) + py * Math.cos(a))}" r="${r}" fill="${fill}"/>`;
+}
+// trefoil shelter sign: three annular sectors (±30 degrees each) at -90, 30 and 150 degrees
+function trefoil(x, y, ro, ri, fill) {
+  const h = Math.PI / 6;
+  const p = (r, b) => [x + Math.cos(b) * r, y + Math.sin(b) * r];
+  const blade = a => {
+    const o0 = p(ro, a - h), o1 = p(ro, a + h), i1 = p(ri, a + h), i0 = p(ri, a - h);
+    return `<path d="M${f1(o0[0])} ${f1(o0[1])}A${ro} ${ro} 0 0 1 ${f1(o1[0])} ${f1(o1[1])}L${f1(i1[0])} ${f1(i1[1])}A${ri} ${ri} 0 0 0 ${f1(i0[0])} ${f1(i0[1])}Z" fill="${fill}"/>`;
+  };
+  return [-Math.PI / 2, Math.PI / 6, Math.PI * 5 / 6].map(blade).join('');
+}
+// worn paper, flat SVG only: mottling, two folds, scratches, scuffs, ink specks, edge wear
+function wear(rnd) {
+  let g = '';
+  for (let i = 0; i < 14; i++) {
+    g += `<ellipse cx="${f1(rnd() * 400)}" cy="${f1(rnd() * 400)}" rx="${f1(16 + rnd() * 54)}" ry="${f1(10 + rnd() * 30)}" fill="${rnd() < 0.5 ? '#7A5A2E' : '#FFF8E6'}" opacity="${f2(0.04 + rnd() * 0.06)}"/>`;
+  }
+  g += '<path d="M133 0V400M267 0V400" stroke="#FFF8E6" stroke-width="1.6" opacity=".5"/>'
+    + '<path d="M135 0V400M269 0V400" stroke="#5A4524" stroke-width=".8" opacity=".16"/>';
+  for (let i = 0; i < 6; i++) {
+    g += `<path d="M${f1(rnd() * 380)} ${f1(rnd() * 380)}l${f1(20 + rnd() * 40)} ${f1(rnd() * 14 - 7)}" stroke="#FFF8E6" stroke-width="1" opacity=".5"/>`;
+  }
+  for (let i = 0; i < 40; i++) {
+    g += `<circle cx="${f1(rnd() * 400)}" cy="${f1(rnd() * 400)}" r="${f1(0.6 + rnd() * 1.6)}" fill="${KRAFT}" opacity="${f2(0.6 + rnd() * 0.4)}"/>`;
+  }
+  for (let i = 0; i < 22; i++) {
+    g += `<circle cx="${f1(rnd() * 400)}" cy="${f1(rnd() * 400)}" r="${f1(0.5 + rnd() * 1.2)}" fill="${CHAR}" opacity="${f2(0.15 + rnd() * 0.15)}"/>`;
+  }
+  return g + '<rect x="3" y="3" width="394" height="394" fill="none" stroke="#6B4E24" stroke-width="8" opacity=".16"/>';
+}
 const uri = svg => `url("data:image/svg+xml,${encodeURIComponent(svg)}")`;
 
 function mcFonts() {
   if (typeof window === 'undefined' || !window.loadFontFamily || typeof FONTS === 'undefined') return;
-  const f = FONTS.find(x => x.name === 'Yellowtail');
-  if (f) window.loadFontFamily(f);
+  ['Alfa Slab One', 'JetBrains Mono'].forEach(n => {
+    const f = FONTS.find(x => x.name === n);
+    if (f) window.loadFontFamily(f);
+  });
 }
 
 function mcHeadline(ctx, text) {
@@ -135,46 +163,46 @@ function mcHeadline(ctx, text) {
 
 registerAesthetic({
   key: 'mid-century', order: 41,
-  name: 'Atomic Mid-Century',
-  descriptor: 'Optimistic · Cut-paper · Atomic',
-  influences: 'Charley Harper / Saul Bass / Girard / Googie',
-  summary: '1950s optimism from flat, slightly rough-cut coloured paper shapes: starbursts, orbits and boomerangs.',
-  motto: 'Cut it from coloured paper.',
-  kicker: 'Tomorrow, 1956 edition',
+  name: 'Atomic Age',
+  descriptor: 'Cheerful · Irradiated · Retro-future',
+  influences: 'Civil-defence posters / Googie / atomic-age ads / CRT terminals',
+  summary: '1950s shelter-sign optimism on worn kraft paper: a sunburst, an atom and a trefoil, with a green phosphor terminal for the interface.',
+  motto: 'Duck, cover, carry on.',
+  kicker: 'Shelter ready, 1956 edition',
   mode: 'light',
   slideShape: 'classic',
-  labels: { material: 'Cut paper', states: ['Cut', 'Layered', 'Printed'], statesKind: 'swatch' },
+  labels: { material: 'Terminal', states: ['Rest', 'Hover', 'Pressed'], statesKind: 'chip' },
   layout: { hero: 'split', palette: 'swatches', sections: 'asym', subcopy: true },
   type: { ui: 'body', label: 'heading', display: 1 },
   highlight: 'custom',
-  highlightNote: 'The headline is tracked geometric capitals; its last word is swapped for one slanted brush-script word (Yellowtail) in the primary, riding a cut-paper swoosh in the accent. One script word per view, never more.',
+  highlightNote: 'The headline is tracked geometric caps with its last word set in heavy slab sign lettering, in the primary. One slab word per view, never more.',
   cardFill: '--mc-card',
 
   roles: {
     canvas: {
-      use: 'Cream paper #F3EAD7, fixed; it must show between every pair of planes. Dark mode is deep charcoal-brown paper from the client dark',
-      never: 'White, gradients, grain or texture of any kind',
+      use: 'Aged cream paper #F3EAD7 behind the poster. Dark mode is deep charcoal-brown paper from the client dark',
+      never: 'Gradients, grain or texture on the canvas itself',
       coverage: '50–60%',
     },
     ink: {
-      use: 'Charcoal #2B2622 (cream on the dark paper): type, the 2px field bar, the TV dial, small cut details (an eye, a beak, molecule sticks). Never a drawn outline round a shape',
-      never: 'Outlines, hairline frames, drop shadows',
+      use: 'Charcoal #2B2622 (cream on dark): headlines, rules, the poster linework and type. Terminal screens never use it',
+      never: 'Outlines round shapes, drop shadows',
       coverage: '15%',
     },
     primary: {
-      use: 'The biggest cut plane (the boomerang), the skewed main action, the one script word, the dial ring when on. Printed warmed 6 degrees toward yellow with 15% less chroma, then darkened (or lightened) just enough for its label to read at 4.5:1',
-      never: 'Body text, outlines, more than one big plane per view',
+      use: 'The poster main ink: the sunburst rays and the headline script word. Printed warmed 6 degrees toward yellow, then moved in lightness until its label reads at 4.5:1. Never on a terminal screen',
+      never: 'Terminal screens, body text, more than one big fill per view',
       coverage: '≈15%',
     },
     secondary: {
-      use: 'The second plane: the kidney panel behind the content card, the layered sheet under a swatch, the second molecule ball. Warmed like the primary',
-      never: 'The main action, text, outlines',
-      coverage: '≈10–12%',
+      use: 'The boomerang on the poster and the second electron on the atom. Warmed like the primary',
+      never: 'Terminal text, the main action',
+      coverage: '≈10%',
     },
     accent: {
-      use: 'Sparkles and atoms only: the atom orbits, the progress sparkles, the swoosh under the script word. Plus the one period ink (mustard or teal, whichever is farther from the primary) for the bird and the starburst seal, at most 15%',
-      never: 'Buttons, body text, large fills, a fifth ink',
-      coverage: '≤5% (+ period ≤15%)',
+      use: 'Sparkles and the starburst seal on the poster, and the rule sparkle. Warmed like the primary. The shelter yellow is fixed and sits on the sun and the trefoil plate',
+      never: 'Buttons, body text, large fills',
+      coverage: '≤5% (+ shelter yellow ≈10%)',
     },
   },
 
@@ -192,136 +220,115 @@ registerAesthetic({
     const d = t.isDark;
     const ink = d ? CREAM : CHAR;
     const pp = t.printPrimary || mcPrint(t.primary);
-    const sec = mcWarm(t.secondary), acc = mcWarm(t.accent), per = mcPeriod(t.primary);
+    const sec = mcWarm(t.secondary), acc = mcWarm(t.accent);
     const card = d ? t.mix('#FFFFFF', t.canvas, 0.06) : '#FBF6EA';
     let toward = 0.4, muted = t.mix(t.canvas, ink, toward);
     while (toward > 0.05 && t.contrast(muted, t.canvas) < 4.6) { toward -= 0.04; muted = t.mix(t.canvas, ink, toward); }
-    // script word: the primary when it reads (3:1) on the paper, else charcoal/cream
+    // script word: the primary when it reads (3:1) on the paper, else secondary or ink
     const script = t.contrast(pp, t.canvas) >= 3 ? pp : (t.contrast(sec, t.canvas) >= 3 ? sec : ink);
     // small list numerals (11px) keep the script colour only when it reaches 4.5:1
     const num = t.contrast(script, t.canvas) >= 4.5 ? script : ink;
     const plane = t.mix(ink, card, d ? 0.12 : 0.09);
     const spark = (fill, s = 14) => uri(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${s} ${s}" width="${s}" height="${s}">${sparkle(s / 2, s / 2, s * 0.42, fill, false)}</svg>`);
-    const sp8 = (fill) => uri(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30 30" width="30" height="30">${sparkle(15, 15, 13.5, fill, true)}</svg>`);
-    const rnd = mcRand(7);
-    const burst = (fill) => uri(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40" width="40" height="40">${starburst(20, 20, 14.5, 19.5, 12, fill, rnd)}</svg>`);
-    const atomU = (ring, nuc) => uri(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">${atom(12, 12, 10.5, ring, nuc, 1.6)}</svg>`);
-    const dialTicks = Array.from({ length: 9 }, (_, i) => {
-      const a = (-135 + i * 33.75) * Math.PI / 180;
-      return `<path d="M${f1(24 + Math.cos(a - Math.PI / 2) * 19)} ${f1(24 + Math.sin(a - Math.PI / 2) * 19)}L${f1(24 + Math.cos(a - Math.PI / 2) * 23)} ${f1(24 + Math.sin(a - Math.PI / 2) * 23)}" stroke="${ink}" stroke-width="${i % 4 === 0 ? 2.2 : 1.2}" stroke-linecap="butt"/>`;
-    }).join('');
-    const swoosh = uri(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 30" preserveAspectRatio="none" width="200" height="30"><path d="${mcCut(bez([2, 26], [90, 2], [198, 10], 14).concat(bez([198, 10], [100, 12], [2, 26], 14).slice(1, -1).map(([x, y]) => [x, y + 5])), rnd, 8, 0.5)}" fill="${acc}"/></svg>`);
+    const burst = (fill) => uri(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40" width="40" height="40">${starburst(20, 20, 14.5, 19.5, 12, fill, mcRand(7))}</svg>`);
     return {
       '--ab-ink': ink,
       '--ab-muted': muted,
       '--ab-line': t.mix(t.canvas, ink, 0.82),
       '--ab-type-pick-w': 400,
+      '--ab-period': SHELTER,
       '--mc-ink': ink,
       '--mc-card': card,
       '--mc-plane': plane,
-      '--mc-sec': sec, '--mc-acc': acc, '--mc-period': per,
-      '--mc-on-pri': mcOn(pp), '--mc-on-sec': mcOn(sec), '--mc-on-ink': d ? CHAR : CREAM,
+      '--mc-sec': sec, '--mc-acc': acc, '--mc-period': SHELTER,
+      '--mc-on-pri': mcOn(pp), '--mc-on-sec': mcOn(sec), '--mc-on-ink': d ? CHAR : CREAM, '--mc-on-period': CHAR,
       '--mc-script': script, '--mc-num': num,
-      '--mc-spark-dim': spark(t.mix(t.canvas, ink, 0.8)), '--mc-spark-pri': spark(pp), '--mc-spark-acc': sp8(acc),
-      '--mc-spark-on': spark(mcOn(pp), 16), '--mc-spark-per': sp8(per),
+      '--mc-spark-acc': spark(acc),
       '--mc-burst-ink': burst(ink),
-      '--mc-atom1': atomU(pp, ink), '--mc-atom2': atomU(sec, ink), '--mc-atom3': atomU(d ? acc : t.mix(acc, CHAR, 0.75), ink),
-      '--mc-dial': uri(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="48" height="48">${dialTicks}</svg>`),
-      '--mc-swoosh': swoosh,
-      '--ab-period': per,
+      '--mc-crt-bg': CRT_BG, '--mc-crt-ink': CRT_INK, '--mc-crt-dim': CRT_DIM,
+      '--mc-crt-bezel': d ? '#CFC3A6' : CHAR,
     };
   },
 
   art(ctx) {
     const t = ctx.t;
-    const d = t.isDark;
-    const ink = d ? CREAM : CHAR;
-    const paper = t.canvas;
     const pp = t.printPrimary || mcPrint(t.primary);
-    const sec = mcWarm(t.secondary), acc = mcWarm(t.accent), per = mcPeriod(t.primary);
-    const rnd = mcRand(mcHash(String(ctx.brandName || 'brand') + '|mc'));
-    const id = 'mcs' + (++seq);
-    // the boomerang: outer and inner quadratic curves, rounded tips
+    const sec = mcWarm(t.secondary), acc = mcWarm(t.accent);
+    const rnd = mcRand(mcHash(String(ctx.brandName || 'brand') + '|aa'));
+    const cx = 200, cy = 196;
+    // sunburst: twelve wedges of the primary alternate with kraft, radiating past the edges
+    let rays = '';
+    for (let i = 0; i < 24; i += 2) {
+      const a0 = -Math.PI / 2 + i * Math.PI / 12, a1 = a0 + Math.PI / 12;
+      const pts = [[cx, cy], [cx + Math.cos(a0) * 420, cy + Math.sin(a0) * 420], [cx + Math.cos(a1) * 420, cy + Math.sin(a1) * 420]];
+      rays += `<path d="${mcCut(pts, rnd, 60, 0.8)}" fill="${pp}"/>`;
+    }
+    const sun = `<circle cx="${cx}" cy="${cy}" r="96" fill="${SHELTER}"/>`;
+    // atom over the sun: charcoal orbits and nucleus, electrons in the secondary, primary and accent
+    const R = 132;
+    const atomArt = atom(cx, cy, R, CHAR, CHAR, 5.5)
+      + orbitDot(cx, cy, R, R * 0.36, 0, 1.1, 9, sec)
+      + orbitDot(cx, cy, R, R * 0.36, 60, 2.6, 9, pp)
+      + orbitDot(cx, cy, R, R * 0.36, 120, 4.0, 9, acc);
+    // starburst seal with the initial (Googie)
+    const seal = starburst(70, 66, 30, 40, 14, CHAR, rnd)
+      + `<text x="70" y="77" text-anchor="middle" font-family="var(--ab-font-h, Jost, sans-serif)" font-weight="700" font-size="28" fill="${KRAFT}">${escapeHtml(ctx.initial || '')}</text>`;
+    // shelter-sign plate: yellow field, charcoal frame, black trefoil, SHELTER lettering
+    const plate = `<rect x="30" y="270" width="96" height="96" rx="4" fill="${SHELTER}" stroke="${CHAR}" stroke-width="4"/>`
+      + trefoil(78, 312, 30, 8, CHAR)
+      + `<text x="78" y="356" text-anchor="middle" font-family="var(--ab-font-h, Jost, sans-serif)" font-weight="700" font-size="11" letter-spacing="1.5" fill="${CHAR}">SHELTER</text>`;
+    // boomerang in the secondary, bleeding off the bottom right
     const outer = bez([92, 122], [330, -40], [470, 300], 30);
     const inner = bez([470, 300], [330, 150], [112, 158], 30).slice(1, -1);
-    const tip = [[100, 160], [86, 146]];
-    const boomer = `<path d="${mcCut(outer.concat(inner, tip), rnd, 7, 0.9)}" fill="${pp}"/>`;
-    // kidney plane (bean) under the boomerang, bleeding off the bottom
-    const kid = Array.from({ length: 60 }, (_, i) => {
-      const a = Math.PI * 2 * i / 60;
-      const r = 1 + 0.22 * Math.cos(2 * a) - 0.16 * Math.cos(a - 0.6);
-      return [214 + Math.cos(a) * 168 * r, 352 + Math.sin(a) * 86 * r];
-    });
-    const kidney = `<path d="${mcCut(kid, rnd, 8, 0.9)}" fill="${sec}" transform="rotate(-13 214 352)"/>`;
-    // half-circle sun, striped (Harper: pattern inside one shape)
-    const half = Array.from({ length: 25 }, (_, i) => { const a = Math.PI + Math.PI * i / 24; return [292 + Math.cos(a) * 62, 300 + Math.sin(a) * 62]; });
-    const sun = `<clipPath id="${id}h"><path d="${mcCut(half, rnd, 7, 0.7)}"/></clipPath><g clip-path="url(#${id}h)"><rect x="220" y="230" width="150" height="80" fill="${per}"/>${Array.from({ length: 8 }, (_, i) => `<rect x="${f1(236 + i * 16)}" y="230" width="6.5" height="80" fill="${paper}"/>`).join('')}</g>`;
-    // Harper-style bird perched on the boomerang: circles, a half-circle wing, triangles
-    const bx = 214, by = 76;
-    const body = `<path d="${mcCut(ellipsePts(bx, by, 30, 30, 0, 40), rnd, 6, 0.6)}" fill="${per}"/>`;
-    const head = `<path d="${mcCut(ellipsePts(bx + 26, by - 30, 15, 15, 0, 30), rnd, 5, 0.5)}" fill="${per}"/>`;
-    const tail = `<path d="${mcCut([[bx - 22, by + 6], [bx - 74, by - 22], [bx - 62, by + 18]], rnd, 6, 0.6)}" fill="${ink}"/>`;
-    const wingPts = Array.from({ length: 17 }, (_, i) => { const a = Math.PI * i / 16; return [bx - 4 + Math.cos(a) * 26, by + 2 + Math.sin(a) * 26]; });
-    const wing = `<clipPath id="${id}w"><path d="${mcCut(wingPts, rnd, 6, 0.5)}"/></clipPath><g clip-path="url(#${id}w)" transform="rotate(-24 ${bx} ${by})"><rect x="${bx - 32}" y="${by}" width="60" height="30" fill="${paper}"/>${Array.from({ length: 5 }, (_, i) => `<rect x="${bx - 30}" y="${f1(by + 3 + i * 5.6)}" width="60" height="2.8" fill="${ink}"/>`).join('')}</g>`;
-    const beak = `<path d="${mcCut([[bx + 39, by - 34], [bx + 58, by - 29], [bx + 40, by - 25]], rnd, 4, 0.3)}" fill="${ink}"/>`;
-    const eye = `<circle cx="${bx + 30}" cy="${by - 32}" r="4.4" fill="${paper}"/><circle cx="${bx + 31}" cy="${by - 32}" r="2.2" fill="${ink}"/>`;
-    const legs = `<path d="M${bx - 4} ${by + 26}l-3 13M${bx + 8} ${by + 25}l2 12" stroke="${ink}" stroke-width="3" stroke-linecap="square"/>`;
-    // molecule
-    const mol = `<path d="M36 44L66 64M66 64L100 50M66 64L62 98" stroke="${ink}" stroke-width="3.2"/>`
-      + `<circle cx="36" cy="44" r="10" fill="${acc}"/><circle cx="100" cy="50" r="8" fill="${sec}"/><circle cx="66" cy="64" r="13" fill="${ink}"/><circle cx="62" cy="98" r="7" fill="${pp}"/>`;
-    // seal with the initial
-    const seal = starburst(84, 236, 34, 45, 16, ink, rnd)
-      + `<text x="84" y="247" text-anchor="middle" font-family="var(--ab-font-h, Jost, sans-serif)" font-weight="600" font-size="31" letter-spacing="1" fill="${paper}">${escapeHtml(ctx.initial || '')}</text>`;
-    const sparks = sparkle(372, 180, 20, acc, true, 8) + sparkle(160, 32, 11, ink, false) + sparkle(168, 222, 12, acc, false, 15)
-      + sparkle(392, 40, 14, per, true) + sparkle(250, 186, 7, paper, false);
+    const boomer = `<path transform="translate(190 300) scale(0.5)" d="${mcCut(outer.concat(inner, [[100, 160], [86, 146]]), rnd, 7, 0.9)}" fill="${sec}"/>`;
+    const sparks = sparkle(352, 58, 18, acc, true, 8) + sparkle(118, 362, 10, CHAR, false);
     return `<svg class="mc-art" viewBox="0 0 400 400" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg" role="presentation" focusable="false" style="display:block;width:100%;height:100%">
-      ${kidney}${sun}${boomer}
-      ${atom(300, 128, 46, acc, ink, 3.4)}
-      ${mol}${seal}${tail}${body}${wing}${head}${beak}${eye}${legs}${sparks}
+      <rect width="400" height="400" fill="${KRAFT}"/>
+      ${rays}${sun}${atomArt}${seal}${plate}${boomer}${sparks}${wear(rnd)}
     </svg>`;
   },
 
   materials: [
-    { name: 'Cut plane', css: 'background: {primary}; border-radius: 58% 42% 55% 45% / 46% 60% 40% 54%; /* flat paper, no outline, no shadow, no grain; edges sampled every 6-8px and each vertex nudged 0.5-1px like a scissor cut */' },
-    { name: 'Layered', css: 'background: {primary}; box-shadow: -8px 7px 0 {secondary}; /* a second-colour plane stacked under the first, cream showing round both */' },
-    { name: 'Printed', css: 'background: {primary}; /* plus one concave 4-point sparkle in the accent pinned at a corner */' },
-    { name: 'Skewed action', css: 'background: {primary}; color: #F3EAD7; transform: skewX(-10deg); text-transform: uppercase; letter-spacing: .14em; /* skew the paper plane, never the label */' },
-    { name: 'Kidney panel', css: 'background: {secondary}; border-radius: 62% 38% 46% 54% / 58% 44% 56% 42%; transform: rotate(-6deg); /* an asymmetric plane behind rectangular content, bleeding past it */' },
-    { name: 'Period ink', css: 'background: {period}; /* mustard #E0A526 or teal #1F7A7A, whichever is farther from the primary; at most 15% of a view */' },
+    { name: 'Poster ink', css: 'background: {primary}; /* flat printed ink on kraft #EADBB8, worn by flat specks and creases; no gradient */' },
+    { name: 'Shelter plate', css: 'background: #F2C41B; border: 4px solid #2B2622; /* the one period yellow, black trefoil, no shadow */' },
+    { name: 'Phosphor screen', css: 'background: #031A0A; color: #18FF62; box-shadow: inset 0 0 36px rgba(24,255,98,.14); /* scanlines every 3px; the same in both modes */' },
+    { name: 'Bracket menu', css: 'color: #18FF62; text-transform: uppercase; /* items wrapped in [ and ], chunky mono; the pressed item is inverted */' },
+    { name: 'Inverse block', css: 'background: #18FF62; color: #031A0A; /* the primary terminal action and the pressed item */' },
+    { name: 'Scan progress', css: 'background: repeating-linear-gradient(90deg, #18FF62 0 8px, transparent 8px 10px); /* a row of blocks, like an ASCII bar */' },
   ],
 
   rules: {
     do: [
-      'Build every image from flat, slightly rough-cut shapes: circles, half-circles, triangles, boomerangs and kidneys; put one stripe or dot pattern inside one shape.',
-      'Pair tracked geometric capitals with exactly one slanted brush-script word per view.',
-      'Keep cream paper showing between stacked planes, and tilt secondary elements on a 12-15 degree diagonal.',
-      'Use the atomic kit as punctuation: concave sparkles, an atom, a starburst seal, a molecule; never as wallpaper.',
-      'Skew the paper plane of a button, never its label.',
+      'Build the poster from flat printed shapes: sunbursts, atoms, shelter trefoils, starbursts and boomerangs on worn kraft paper.',
+      'Set every interface component as a green phosphor terminal: green on black, scanlines, chunky mono, bracketed items.',
+      'Pair tracked geometric caps with one heavy slab word in the primary per view.',
+      'Let the shelter yellow appear only on the sun and the trefoil plate.',
+      'Keep the terminal green fixed; the client colour belongs to the poster.',
     ],
     dont: [
-      'Add diner, rocket, jukebox, poodle or Mad Men clip-art.',
-      'Draw outlines, add grain, misregistration or multiply overprint (that is Riso), or console bezels (Retro-futurist).',
-      'Use more than four inks, a rainbow, or Memphis squiggles.',
-      'Copy Saul Bass title sequences or Harper\'s animals; build new ones from the same primitives.',
+      'Put the client primary or accent on a terminal screen.',
+      'Copy the characters, mascots or logos of any game; build new marks from public 1950s sources.',
+      'Use CSS masks, gradients or grain for paper wear; the wear is flat SVG.',
+      'Use more than four inks on the poster, or a rainbow.',
     ],
   },
 
   deck: {
     marks: (ctx, kind) => `<i class="mc-mk" data-k="${kind === 'do' ? 'do' : 'dont'}"></i>`,
     principles: [
-      ['Cut it from coloured paper', 'Every image is flat, slightly rough-cut shapes.'],
-      ['Sparkles, orbits, boomerangs', 'A small set of atomic motifs repeats with intent.'],
-      ['Optimism with restraint', 'Cream paper shows between the planes.'],
+      ['Worn atomic-age poster', 'Flat printed shapes on kraft paper, weathered by hand.'],
+      ['Terminal for the interface', 'Green phosphor on black, bracketed menu items.'],
+      ['Cheerful, irradiated, retro-future', 'Optimism with a faint background hum.'],
     ],
     do: [
-      'Build every image from flat, slightly rough-cut shapes.',
-      'Pair tracked geometric caps with one script word.',
-      'Keep cream paper showing between the planes.',
+      'Build posters from flat printed shapes on kraft paper.',
+      'Set every interface component as a bracketed green terminal item.',
+      'Keep the terminal green fixed; put the client colour on the poster.',
     ],
     dont: [
-      'Add diner, rocket or jukebox clip-art.',
-      'Use outlines, grain or misregistration.',
-      'Use more than four inks.',
+      'Add characters, mascots or logos from any game.',
+      'Add masks, gradients or grain to the paper.',
+      'Use more than four inks on a poster.',
     ],
   },
 });

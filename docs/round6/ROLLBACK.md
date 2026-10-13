@@ -66,3 +66,11 @@ After any rollback, rebuild the Mac app so /Applications matches:
 ```bash
 cd mac && ./build.sh
 ```
+
+## Round 7 trim (owner feedback, 2026-10-12)
+| Tag | State |
+|-----|-------|
+| `r7-0-before-trim` | Same as `r6-final`: 48 aesthetics, before the trim. |
+| `r7-trim` | 35 aesthetics. Deleted: neo-deco, y2k-chrome, groovy-70s, rebus, religious-futurism, cybersigilism, industrial-hazard, biomechanical-gothic, dark-academia, art-nouveau, big-top, gummy, curio-cabinet, wabi-sabi (replaced by japanese-minimal). Reverted to their pre-round-6 versions: raw-brutalist, bauhaus-poster, clay, riso-print, editorial-serif, cyber-hud, pixel-arcade, mixed-type. Reworked: neo-brutal-pop (old fun shapes back), frutiger-aero (more colour), mid-century → "Atomic Age", transit-wayfinding (minimal), dystopian-luxury (no "classified" line by the name). New: pure white/black background button. |
+
+Bring a deleted aesthetic back: `git checkout r7-0-before-trim -- js/aesthetics/<key>.js css/aesthetics/<key>.css`, then restore its index.html tags, meta entry and fit.js suite from the same tag (`git show r7-0-before-trim:index.html` etc.).

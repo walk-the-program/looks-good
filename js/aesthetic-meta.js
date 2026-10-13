@@ -42,12 +42,12 @@ const AESTHETIC_META = {
   'raw-brutalist': {
     family: 'graphic',
     fonts: {
-      heading: { classes: ['heavy', 'neo-grotesk', 'condensed'], picks: ['Archivo Black', 'Archivo'] },
-      body: { classes: ['mono', 'neo-grotesk'], picks: ['IBM Plex Mono', 'Archivo'] },
+      heading: { classes: ['heavy', 'neo-grotesk', 'condensed'], picks: ['Archivo Black', 'Inter Tight', 'Anton'] },
+      body: { classes: ['neo-grotesk'], picks: ['Inter', 'Archivo', 'IBM Plex Sans'] },
       mono: { picks: ['JetBrains Mono', 'IBM Plex Mono', 'Space Mono'] },
       avoid: ['soft-serif', 'rounded', 'deco', 'groovy'],
       why: 'Severe, honest layouts want a black-weight headline or a plain grotesk, because anything decorative softens the point.',
-      pairings: [['Archivo Black', 'IBM Plex Mono'], ['Archivo Black', 'Archivo'], ['Archivo', 'IBM Plex Mono']],
+      pairings: [['Archivo Black', 'Archivo'], ['Inter Tight', 'Inter'], ['Anton', 'IBM Plex Sans']],
     },
   },
   'neo-brutal-pop': {
@@ -115,11 +115,11 @@ const AESTHETIC_META = {
   'clay': {
     family: 'tactile',
     fonts: {
-      heading: { classes: ['rounded', 'geometric'], picks: ['Rubik', 'Lexend', 'Baloo 2'] },
-      body: { classes: ['rounded', 'humanist'], picks: ['Figtree', 'Nunito Sans', 'Rubik'] },
+      heading: { classes: ['rounded', 'geometric'], picks: ['Fredoka', 'Baloo 2', 'Lexend', 'Rubik'] },
+      body: { classes: ['rounded', 'humanist'], picks: ['Rubik', 'Nunito Sans', 'Figtree'] },
       avoid: ['condensed', 'didone', 'mono', 'techno'],
-      why: 'Dimensional objects want a grown-up frame: softened corners at 600 stay friendly without reading as a children\'s app.',
-      pairings: [['Rubik', 'Figtree'], ['Lexend', 'Figtree'], ['Fredoka', 'Nunito Sans']],
+      why: 'Puffy, toy-like objects call for rounded terminals and friendly shapes that look as soft as the material.',
+      pairings: [['Fredoka', 'Nunito Sans'], ['Baloo 2', 'Rubik'], ['Lexend', 'Figtree']],
     },
   },
   'riso-print': {
@@ -136,43 +136,23 @@ const AESTHETIC_META = {
   'editorial-serif': {
     family: 'print',
     fonts: {
-      heading: { classes: ['didone', 'soft-serif'], picks: ['Bodoni Moda', 'Playfair Display', 'Instrument Serif', 'Gloock'] },
+      heading: { classes: ['didone', 'soft-serif'], picks: ['Playfair Display', 'Bodoni Moda', 'Instrument Serif', 'Gloock'] },
       body: { classes: ['text-serif', 'old-style'], picks: ['Newsreader', 'Source Serif 4', 'Libre Caslon Text', 'EB Garamond'] },
       mono: { picks: ['Inter'], note: 'sans for captions' },
       avoid: ['rounded', 'techno', 'pixel', 'groovy'],
       why: 'A magazine page is carried by high-contrast serif display over a book-quality text serif, with weight coming from contrast rather than boldness.',
-      pairings: [['Bodoni Moda', 'Newsreader'], ['Playfair Display', 'Source Serif 4'], ['Instrument Serif', 'Newsreader']],
-    },
-  },
-  'neo-deco': {
-    family: 'luminous',
-    fonts: {
-      heading: { classes: ['deco', 'didone'], picks: ['Limelight', 'Poiret One', 'Bodoni Moda', 'Italiana'] },
-      body: { classes: ['geometric'], picks: ['Jost', 'Josefin Sans', 'Raleway'], note: 'light weights' },
-      avoid: ['heavy', 'pixel', 'rounded', 'grotesk'],
-      why: 'Brass deco wants fat display caps (Broadway / Cassandre class) with a gilt inline, or a high-contrast didone, over a light geometric sans.',
-      pairings: [['Limelight', 'Josefin Sans'], ['Bodoni Moda', 'Jost'], ['Italiana', 'Jost']],
-    },
-  },
-  'y2k-chrome': {
-    family: 'luminous',
-    fonts: {
-      heading: { classes: ['wide', 'heavy'], picks: ['Dela Gothic One', 'Unbounded', 'Michroma', 'Syne'] },
-      body: { classes: ['geometric'], picks: ['Sora', 'Outfit', 'Plus Jakarta Sans'] },
-      avoid: ['old-style', 'slab', 'text-serif'],
-      why: 'Chrome lettering needs heavy, wide forms to hold the metallic gradient, with a clean geometric sans for the copy.',
-      pairings: [['Dela Gothic One', 'Sora'], ['Unbounded', 'Sora'], ['Syne', 'Plus Jakarta Sans']],
+      pairings: [['Instrument Serif', 'Newsreader'], ['Bodoni Moda', 'Source Serif 4'], ['Playfair Display', 'Libre Caslon Text']],
     },
   },
   'cyber-hud': {
     family: 'digital',
     fonts: {
-      heading: { classes: ['techno', 'condensed'], picks: ['Tektur', 'Saira Condensed', 'Chakra Petch', 'Orbitron'] },
-      body: { classes: ['condensed', 'neo-grotesk'], picks: ['Saira Condensed', 'IBM Plex Sans', 'Chakra Petch'] },
+      heading: { classes: ['techno', 'wide'], picks: ['Orbitron', 'Chakra Petch', 'Rajdhani', 'Michroma'] },
+      body: { classes: ['techno', 'neo-grotesk'], picks: ['Rajdhani', 'Chakra Petch', 'IBM Plex Sans'] },
       mono: { picks: ['JetBrains Mono', 'Space Mono'] },
       avoid: ['serif', 'rounded', 'groovy'],
       why: 'Angular panels and live readouts call for squared techno faces, with mono for data and no serifs or soft curves.',
-      pairings: [['Tektur', 'Saira Condensed'], ['Chakra Petch', 'IBM Plex Sans'], ['Orbitron', 'Rajdhani']],
+      pairings: [['Orbitron', 'Rajdhani'], ['Chakra Petch', 'IBM Plex Sans'], ['Michroma', 'Chakra Petch']],
     },
   },
   'bento-grid': {
@@ -209,22 +189,12 @@ const AESTHETIC_META = {
   'pixel-arcade': {
     family: 'digital',
     fonts: {
-      heading: { classes: ['pixel'], picks: ['Silkscreen', 'Jersey 10', 'Press Start 2P', 'Pixelify Sans'] },
+      heading: { classes: ['pixel'], picks: ['Press Start 2P', 'Silkscreen', 'Pixelify Sans'] },
       body: { classes: ['pixel', 'mono'], picks: ['VT323', 'Space Mono', 'JetBrains Mono'] },
       mono: { picks: ['VT323'] },
       avoid: ['serif', 'geometric', 'script'],
       why: 'Everything sits on a pixel grid, so bitmap faces keep edges crisp while VT323 or a mono handles longer text.',
-      pairings: [['Silkscreen', 'VT323'], ['Jersey 10', 'VT323'], ['Press Start 2P', 'Space Mono']],
-    },
-  },
-  'groovy-70s': {
-    family: 'graphic',
-    fonts: {
-      heading: { classes: ['groovy', 'soft-serif'], picks: ['Bagel Fat One', 'Fraunces', 'Shrikhand', 'Righteous'] },
-      body: { classes: ['humanist', 'soft-serif'], picks: ['Work Sans', 'Rubik', 'Lora'] },
-      avoid: ['techno', 'mono', 'condensed', 'pixel'],
-      why: '70s supergraphics need a fat, soft display face and a warm body that feels printed rather than engineered.',
-      pairings: [['Bagel Fat One', 'Work Sans'], ['Fraunces', 'Rubik'], ['Shrikhand', 'Lora']],
+      pairings: [['Silkscreen', 'VT323'], ['Press Start 2P', 'Space Mono'], ['Pixelify Sans', 'JetBrains Mono']],
     },
   },
   'blueprint': {
@@ -274,12 +244,12 @@ const AESTHETIC_META = {
   'mixed-type': {
     family: 'graphic',
     fonts: {
-      heading: { classes: ['soft-serif', 'didone', 'grotesk'], picks: ['Fraunces', 'Bricolage Grotesque', 'Instrument Serif', 'Gloock'] },
+      heading: { classes: ['soft-serif', 'didone', 'grotesk'], picks: ['Instrument Serif', 'Playfair Display', 'Bricolage Grotesque', 'Fraunces'] },
       body: { classes: ['neo-grotesk'], picks: ['Inter', 'Instrument Sans'] },
       mono: { picks: ['DM Mono', 'Space Mono'] },
       avoid: ['pixel', 'techno', 'groovy'],
       why: 'Switching between a serif italic, a heavy grotesk and a mono inside one headline works only when the rest of the page stays on one quiet face.',
-      pairings: [['Fraunces', 'Instrument Sans'], ['Bricolage Grotesque', 'Inter'], ['Gloock', 'Instrument Sans']],
+      pairings: [['Instrument Serif', 'Instrument Sans'], ['Bricolage Grotesque', 'Inter'], ['Playfair Display', 'Inter']],
     },
   },
   'ascii-art': {
@@ -293,16 +263,6 @@ const AESTHETIC_META = {
       pairings: [['JetBrains Mono', 'IBM Plex Mono'], ['IBM Plex Mono', 'JetBrains Mono'], ['Space Mono', 'IBM Plex Mono']],
     },
   },
-  'rebus': {
-    family: 'graphic',
-    fonts: {
-      heading: { classes: ['slab', 'heavy'], picks: ['Zilla Slab', 'Roboto Slab', 'Arvo', 'Archivo Black'] },
-      body: { classes: ['grotesk', 'neo-grotesk'], picks: ['Work Sans', 'Inter'] },
-      avoid: ['didone', 'old-style', 'techno', 'pixel', 'rounded'],
-      why: 'A slab or hard grotesk gives the pictograms a letter to match, as with Glaser\'s American Typewriter and Rand\'s City.',
-      pairings: [['Zilla Slab', 'Work Sans'], ['Roboto Slab', 'Inter'], ['Archivo Black', 'Work Sans']],
-    },
-  },
   'corporate-vandalism': {
     family: 'graphic',
     fonts: {
@@ -312,17 +272,6 @@ const AESTHETIC_META = {
       avoid: ['soft-serif', 'groovy', 'deco', 'rounded'],
       why: 'The joke only lands inside a flawless, bored shell, so the type is plain procurement-software grotesk with mono for receipts and fine print.',
       pairings: [['Public Sans', 'Public Sans'], ['Archivo', 'Public Sans'], ['Archivo Black', 'IBM Plex Sans']],
-    },
-  },
-  'religious-futurism': {
-    family: 'luminous',
-    fonts: {
-      heading: { classes: ['wide', 'old-style'], picks: ['Michroma', 'Unbounded', 'Cormorant Garamond'] },
-      body: { classes: ['old-style', 'neo-grotesk'], picks: ['EB Garamond', 'Inter'] },
-      mono: { picks: ['DM Mono'] },
-      avoid: ['groovy', 'pixel', 'rounded', 'heavy'],
-      why: 'A hairline, widely tracked extended face with a quiet text serif gives the cathedral its stillness (the Dune 2021 move), with tiny mono annotations as the liturgical footnotes.',
-      pairings: [['Michroma', 'EB Garamond'], ['Unbounded', 'EB Garamond'], ['Cormorant Garamond', 'EB Garamond']],
     },
   },
   'xerox-punk': {
@@ -347,28 +296,6 @@ const AESTHETIC_META = {
       pairings: [['Tilt Warp', 'Inter'], ['Syncopate', 'Space Grotesk'], ['Michroma', 'Kode Mono']],
     },
   },
-  'cybersigilism': {
-    family: 'luminous',
-    fonts: {
-      heading: { classes: ['neo-grotesk', 'blackletter'], picks: ['Inter Tight', 'Grenze Gotisch', 'Texturina'] },
-      body: { classes: ['neo-grotesk'], picks: ['Inter', 'Geist'] },
-      mono: { picks: ['Geist Mono'] },
-      avoid: ['rounded', 'groovy', 'heavy', 'pixel'],
-      why: 'A thin, tight grotesk sits beside hairline art; a spiky blackletter is the only alternative, and stock fat blackletter (Pirata One) stays out.',
-      pairings: [['Inter Tight', 'Inter'], ['Grenze Gotisch', 'Inter'], ['Texturina', 'Geist']],
-    },
-  },
-  'industrial-hazard': {
-    family: 'tactile',
-    fonts: {
-      heading: { classes: ['condensed'], picks: ['Big Shoulders Display', 'Barlow Condensed', 'Oswald', 'Anton'] },
-      body: { classes: ['neo-grotesk'], picks: ['IBM Plex Sans', 'Inter'] },
-      mono: { picks: ['IBM Plex Mono', 'Azeret Mono'] },
-      avoid: ['serif', 'rounded', 'groovy', 'deco'],
-      why: 'Stamped signage and panel legends are condensed, uppercase and blunt, with a plain grotesk for instructions and mono for serial numbers.',
-      pairings: [['Big Shoulders Display', 'IBM Plex Sans'], ['Barlow Condensed', 'IBM Plex Sans'], ['Oswald', 'Inter']],
-    },
-  },
   'radical-memphis': {
     family: 'graphic',
     fonts: {
@@ -377,17 +304,6 @@ const AESTHETIC_META = {
       avoid: ['text-serif', 'old-style', 'techno', 'pixel', 'mono'],
       why: 'Laminate patterns and clashing colours already shout, so the type is a heavy or geometric sans that stays flat and confident beside them.',
       pairings: [['Archivo Black', 'DM Sans'], ['Jost', 'Jost'], ['Righteous', 'DM Sans']],
-    },
-  },
-  'biomechanical-gothic': {
-    family: 'luminous',
-    fonts: {
-      heading: { classes: ['old-style', 'didone'], picks: ['Cormorant Garamond', 'Italiana'] },
-      body: { classes: ['text-serif', 'old-style'], picks: ['Spectral', 'EB Garamond'] },
-      mono: { picks: ['IBM Plex Mono'] },
-      avoid: ['rounded', 'groovy', 'pixel', 'geometric', 'blackletter'],
-      why: 'Light inscriptional and high-contrast serifs read as carved relics; blackletter pushes the structure toward costume-store metal, so it stays out.',
-      pairings: [['Cormorant Garamond', 'Spectral'], ['Italiana', 'Spectral'], ['Cormorant Garamond', 'EB Garamond']],
     },
   },
   'pirate-broadcast': {
@@ -432,45 +348,26 @@ const AESTHETIC_META = {
       pairings: [['Patrick Hand', 'DM Sans'], ['Fredoka', 'Nunito Sans'], ['Caveat', 'DM Sans']],
     },
   },
-  'wabi-sabi': {
-    family: 'tactile',
-    fonts: {
-      heading: { classes: ['text-serif', 'old-style'], picks: ['Shippori Mincho', 'Cormorant Garamond', 'EB Garamond'] },
-      body: { classes: ['humanist'], picks: ['Zen Kaku Gothic New', 'Figtree'] },
-      avoid: ['heavy', 'condensed', 'groovy', 'pixel', 'techno', 'rounded', 'hand'],
-      why: 'A sharp mincho serif with a light gothic sans reads calm and crafted, and neither ever raises its voice.',
-      pairings: [['Shippori Mincho', 'Zen Kaku Gothic New'], ['Cormorant Garamond', 'Zen Kaku Gothic New'], ['EB Garamond', 'Figtree']],
-    },
-  },
-  'dark-academia': {
+  'japanese-minimal': {
     family: 'print',
     fonts: {
-      heading: { classes: ['old-style', 'didone'], picks: ['IM Fell English', 'Cormorant Garamond', 'Playfair Display'] },
-      body: { classes: ['old-style'], picks: ['EB Garamond', 'Crimson Pro', 'Spectral'] },
-      mono: { picks: ['Courier Prime'] },
-      avoid: ['geometric', 'rounded', 'techno', 'pixel', 'groovy', 'wide', 'blackletter'],
-      why: 'Old-style book faces with a little printing irregularity make every screen feel like a page from the stacks.',
-      pairings: [['IM Fell English', 'EB Garamond'], ['Cormorant Garamond', 'Crimson Pro'], ['Playfair Display', 'Spectral']],
+      heading: { classes: ['neo-grotesk', 'text-serif'], picks: ['Zen Kaku Gothic New', 'Shippori Mincho', 'Inter'] },
+      body: { classes: ['neo-grotesk', 'humanist'], picks: ['Zen Kaku Gothic New', 'Inter'] },
+      mono: { picks: ['IBM Plex Mono'] },
+      avoid: ['groovy', 'heavy', 'pixel', 'hand', 'script', 'woodtype', 'blackletter', 'deco'],
+      why: 'Modern Japanese minimalism reads through quiet, even gothic type and generous space, with a mincho only for rare emphasis.',
+      pairings: [['Zen Kaku Gothic New', 'Zen Kaku Gothic New'], ['Shippori Mincho', 'Zen Kaku Gothic New'], ['Inter', 'Inter']],
     },
   },
   'mid-century': {
     family: 'graphic',
     fonts: {
-      heading: { classes: ['geometric', 'script', 'slab'], picks: ['Jost', 'Josefin Sans', 'Yellowtail', 'Alfa Slab One'] },
+      heading: { classes: ['geometric', 'slab'], picks: ['Jost', 'Alfa Slab One', 'Josefin Sans'] },
       body: { classes: ['geometric'], picks: ['Jost', 'DM Sans'] },
-      avoid: ['techno', 'pixel', 'blackletter', 'mono', 'condensed', 'didone'],
-      why: 'A Futura-style geometric with one brush-script word is the signature 1950s pairing.',
-      pairings: [['Jost', 'DM Sans'], ['Yellowtail', 'Jost'], ['Josefin Sans', 'Karla']],
-    },
-  },
-  'art-nouveau': {
-    family: 'print',
-    fonts: {
-      heading: { classes: ['deco', 'soft-serif', 'old-style'], picks: ['Federant', 'Fraunces', 'Marcellus', 'Cormorant Garamond'] },
-      body: { classes: ['old-style'], picks: ['EB Garamond', 'Spectral'] },
-      avoid: ['techno', 'pixel', 'heavy', 'condensed', 'mono', 'geometric'],
-      why: 'Period sign lettering for display and a classic Garamond for text keep ornament in the headings and clarity in the body.',
-      pairings: [['Federant', 'EB Garamond'], ['Fraunces', 'Spectral'], ['Marcellus', 'Cormorant Garamond']],
+      mono: { picks: ['JetBrains Mono', 'IBM Plex Mono'] },
+      avoid: ['pixel', 'blackletter', 'script', 'didone', 'groovy'],
+      why: 'Tracked geometric caps with one slab word read as 1950s civil-defence print, and a plain mono runs the green terminal UI.',
+      pairings: [['Jost', 'DM Sans'], ['Alfa Slab One', 'Jost'], ['Josefin Sans', 'DM Sans']],
     },
   },
   'transit-wayfinding': {
@@ -503,37 +400,6 @@ const AESTHETIC_META = {
       avoid: ['deco', 'soft-serif', 'didone', 'geometric', 'script', 'blackletter'],
       why: 'Times body text, an Impact-style headline and one Comic Sans moment are the honest defaults of the 1990s web.',
       pairings: [['Anton', 'Tinos'], ['Tinos', 'Tinos'], ['Comic Neue', 'Tinos']],
-    },
-  },
-  'big-top': {
-    family: 'graphic',
-    fonts: {
-      heading: { classes: ['woodtype', 'slab', 'didone'], picks: ['Rye', 'Alfa Slab One', 'Abril Fatface'] },
-      body: { classes: ['grotesk', 'slab'], picks: ['Karla', 'Bitter'] },
-      avoid: ['techno', 'pixel', 'mono', 'blackletter', 'hand', 'wide'],
-      why: 'Wood-type display faces carry the showbill, and a plain sans keeps the programme readable.',
-      pairings: [['Rye', 'Karla'], ['Alfa Slab One', 'Bitter'], ['Abril Fatface', 'Karla']],
-    },
-  },
-  'gummy': {
-    family: 'tactile',
-    fonts: {
-      heading: { classes: ['groovy', 'rounded'], picks: ['Bagel Fat One', 'Fredoka', 'Baloo 2'] },
-      body: { classes: ['humanist', 'geometric', 'rounded'], picks: ['Nunito Sans', 'DM Sans', 'Fredoka'] },
-      avoid: ['serif', 'condensed', 'techno', 'blackletter', 'mono', 'typewriter'],
-      why: 'Fat rounded display faces look as soft and squishy as the jelly they sit on.',
-      pairings: [['Bagel Fat One', 'Nunito Sans'], ['Fredoka', 'Fredoka'], ['Baloo 2', 'DM Sans']],
-    },
-  },
-  'curio-cabinet': {
-    family: 'print',
-    fonts: {
-      heading: { classes: ['old-style', 'didone'], picks: ['Libre Caslon Text', 'Bodoni Moda', 'Cormorant Garamond'] },
-      body: { classes: ['text-serif'], picks: ['Newsreader', 'Literata'] },
-      mono: { picks: ['Courier Prime', 'DM Mono'] },
-      avoid: ['heavy', 'techno', 'pixel', 'groovy', 'rounded', 'hand'],
-      why: 'Caslon and typewritten labels make every item look catalogued by hand.',
-      pairings: [['Libre Caslon Text', 'Newsreader'], ['Bodoni Moda', 'Literata'], ['Cormorant Garamond', 'Newsreader']],
     },
   },
 };

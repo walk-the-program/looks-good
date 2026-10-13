@@ -87,7 +87,7 @@ Round 2: the library is now 53 families (see docs/patterns-round2.md) and every 
 e.g. Xerox -> thermal and onebit, Blueprint -> relief, tokens and rods in mono at tone 0.55, Pixel
 Arcade -> prismpix, totem, bloomgrid, kaleidopix, Riso -> cutup, inkstill, sonar, Neo-Brutal Pop ->
 panels, patchwork, festival. A suite never repeats a family. Original description:
-`js/patterns/fit.js`: for each of the 48 aesthetics, an ordered list of 6 fitting families with
+`js/patterns/fit.js`: for each of the 35 aesthetics, an ordered list of 6 fitting families with
 preset params (e.g. Riso Print → torn bands, halftone, stipple; Pixel Arcade → pixel quilt,
 signal mosaic, type terrain; Aurora Noir → flow filaments, aura wash (subtle), modular grid;
 Bauhaus Poster → counterchange, arc rise, modular grid; Liquid Glass → aura wash, op-art rings;
@@ -95,45 +95,45 @@ ASCII Art → type terrain; Xerox → halftone (threshold), stipple, signal mosa
 → modular grid lines, flow filaments in line ink …). The Brand suite shows these six.
 
 ### Round 6 suite ownership
+
+Round 7 trim (35 aesthetics): 14 removed (neo-deco, y2k-chrome, groovy-70s, rebus, religious-futurism,
+cybersigilism, industrial-hazard, biomechanical-gothic, dark-academia, art-nouveau, big-top, gummy,
+curio-cabinet, wabi-sabi); japanese-minimal added with lead pebbles "Stepping stones". Eight aesthetics
+(raw-brutalist, bauhaus-poster, clay, riso-print, editorial-serif, cyber-hud, pixel-arcade, mixed-type)
+took their r6-0-baseline suites. Where a restored lead collided with another band aesthetic, the suite
+was reordered so a free entry leads: raw-brutalist glyphgrid, clay zigzag, riso-print inkstill, cyber-hud
+satellite, mixed-type specimens (all marked *). The notes below are round 6 history and still name the
+removed aesthetics.
 Every suite has exactly 6 entries, never repeats a family, and uses valid params. Its FIRST family
 drives the deck cover band and closing strip, so it is unique among the aesthetics that render a band
-or a strip (43 of 48). Exempt: an aesthetic whose def sets BOTH `deck.coverBand: false` and
+or a strip (32 of 35). Exempt: an aesthetic whose def sets BOTH `deck.coverBand: false` and
 `deck.closingStrip: false` shows its lead only on the Patterns slide, so it may share a lead family.
-Exempt now: liquid-glass, holo-iridescent, aurora-noir, wabi-sabi, curio-cabinet (re-check the defs when
+Exempt now: liquid-glass, holo-iridescent, aurora-noir (re-check the defs when
 a deck flag changes). Check: `S/adv/sh2/fitcheck3.js` (fitcheck2 plus the exemption; fitcheck2 alone
-reports the two exempt shares, oprings and typeterrain, as expected). Families no band/strip aesthetic
-leads with: counterchange, terrain, inkstill, neonspray, prismpix, seafan, snow, satellite, flyposter,
-festival (counterchange, snow, seafan are led only by exempt aesthetics).
-Fixed colourways in suites: tonal (soft-form), spectrum (holo), primaries (bauhaus), earth (groovy),
-brass (neo-deco), broadcast (pirate), safety (hazard tape in industrial-hazard and micrographics),
+reports the two exempt shares, oprings and typeterrain, as expected). Families no band/strip aesthetic leads with (free for a new lead): halftone, terrain, arcrise, cutup, burst, neonspray, bloomgrid, kaleidopix, prismpix, totem, colony, seafan, marble, thermalstreak, waves, snow, panels, flyposter, festival, blades, rods.
+Fixed colourways in suites: tonal (soft-form), spectrum (holo), primaries (bauhaus), broadcast (pirate), safety (hazard tape in micrographics),
 hud (cyber-hud "Data slabs"), toner (all six xerox entries). * = lead differs from what a fixer or builder asked for (conflict resolved).
 
 | Aesthetic | Lead | Exempt | | Aesthetic | Lead | Exempt |
 |---|---|---|---|---|---|---|
-| soft-form | tissue * | | | blob-tracking | onebit | |
-| raw-brutalist | glyphgrid | | | xerox | thermal * | |
-| neo-brutal-pop | tokens * | | | micrographics | parcels * | |
-| retro-futurist | gradpanes | | | mixed-type | cutup * | |
-| liquid-glass | counterchange | yes | | ascii-art | typeterrain | |
-| holo-iridescent | oprings | yes | | rebus | kaleidopix * | |
-| aurora-noir | typeterrain | yes | | corporate-vandalism | signal | |
-| bauhaus-poster | specimens | | | religious-futurism | bloomgrid | |
-| clay | pebbles | | | xerox-punk | tornbands | |
-| riso-print | halftone | | | acid-graphics | warpcheck | |
-| editorial-serif | stipple * | | | cybersigilism | rods | |
-| neo-deco | burst | | | industrial-hazard | panels | |
-| y2k-chrome | thermalstreak * | | | radical-memphis | patchwork | |
-| cyber-hud | totem * | | | biomechanical-gothic | waves | |
-| bento-grid | modulargrid | | | pirate-broadcast | pixelgrid | |
-| mesh-gradient | flow | | | dystopian-luxury | slipgrid | |
-| industrial-device | relief * | | | frutiger-aero | aura | |
-| pixel-arcade | pixelquilt * | | | naive-doodle | sprigs | |
-| groovy-70s | arcrise | | | wabi-sabi | snow | yes |
-| blueprint | weave | | | dark-academia | marble | |
-| mid-century | chevron | | | art-nouveau | blades * | |
-| transit-wayfinding | ribbonrise | | | gorpcore | sonar | |
-| old-web | oprings * | | | big-top | zigzag * | |
-| gummy | colony | | | curio-cabinet | seafan * | yes |
+| soft-form | tissue * |  | | xerox | thermal * |  |
+| raw-brutalist | glyphgrid * |  | | micrographics | parcels * |  |
+| neo-brutal-pop | tokens * |  | | mixed-type | specimens * |  |
+| retro-futurist | gradpanes |  | | ascii-art | typeterrain |  |
+| liquid-glass | counterchange | yes | | corporate-vandalism | signal |  |
+| holo-iridescent | oprings | yes | | xerox-punk | tornbands |  |
+| aurora-noir | typeterrain | yes | | acid-graphics | warpcheck |  |
+| bauhaus-poster | counterchange |  | | radical-memphis | patchwork |  |
+| clay | zigzag * |  | | pirate-broadcast | pixelgrid |  |
+| riso-print | inkstill * |  | | dystopian-luxury | slipgrid |  |
+| editorial-serif | stipple * |  | | frutiger-aero | aura |  |
+| cyber-hud | satellite * |  | | naive-doodle | sprigs |  |
+| bento-grid | modulargrid |  | | japanese-minimal | pebbles |  |
+| mesh-gradient | flow |  | | mid-century | chevron |  |
+| industrial-device | relief * |  | | transit-wayfinding | ribbonrise |  |
+| pixel-arcade | pixelquilt * |  | | gorpcore | sonar |  |
+| blueprint | weave |  | | old-web | oprings * |  |
+| blob-tracking | onebit |  | |  |  |  |
 
 Tie-breaks (batch 1): warpcheck to acid-graphics; modulargrid to bento-grid; weave to blueprint;
 halftone to riso-print (xerox leads with thermal toner); specimens to bauhaus-poster (mixed-type keeps

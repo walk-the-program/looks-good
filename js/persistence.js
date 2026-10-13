@@ -15,6 +15,8 @@ function serializeState(state) {
     colors: { ...state.colors },
     shapePresetKey: state.shapePreset.key,
     bgMode: state.bgMode,
+    // Pure #FFFFFF / #000000 ground instead of the style's canvas tint (js/aesthetic-board.js).
+    pureBg: state.pureBg === true,
     aestheticKey: state.aesthetic,
     // Blend with a second aesthetic (js/blend.js): null or a copy of
     // { with, strength, channels }. Saved as is even when BLEND_ENABLED is false.
@@ -90,6 +92,9 @@ function applySavedSessionToState(saved, state) {
   if (typeof saved.bgMode === 'string') {
     state.bgMode = saved.bgMode;
   }
+
+  // Restore the pure ground. Brands saved before it existed have no field and load off.
+  state.pureBg = saved.pureBg === true;
 
   // Restore content
   if (saved.content && typeof saved.content === 'object') {
