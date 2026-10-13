@@ -235,17 +235,9 @@ const CONTENT_FIELDS = Object.keys(CONTENT_DEFAULTS);
 
 // state.content holds exactly what the user typed (possibly ''); this is the
 // version everything renders from.
-// A surface that renders a brand other than the open one (the Brands library tiles) wraps
-// the render in withContentOf(content, fn); the override lasts for that synchronous call.
-let contentOverride = null;
-function withContentOf(content, fn) {
-  const prev = contentOverride;
-  contentOverride = content || {};
-  try { return fn(); } finally { contentOverride = prev; }
-}
 function effectiveContent() {
   const out = {};
-  const src = contentOverride || state.content;
+  const src = state.content;
   CONTENT_FIELDS.forEach(key => {
     const value = src[key];
     out[key] = (typeof value === 'string' && value.trim()) ? value : CONTENT_DEFAULTS[key];

@@ -137,81 +137,56 @@ const LibraryUI = (function () {
 
   /* ---------- tiles ---------- */
 
-  /* A tile's art is a live miniature of the brand's own board: its header and hero, drawn
-     by the same boardHtml the Compare view uses, from a throwaway state built from the saved
-     brand (the open brand's `state` is never touched). Tiles draw when they scroll near the
-     viewport; any failure leaves the flat tile that tileHtml always renders underneath. */
-  const MINI_W = 520;                // design width of a miniature board, shrunk with CSS zoom
-  const miniCache = new Map();       // rec.id -> { stamp, mini }
-  const miniStamp = rec => `${rec.updatedAt}|${rec.name}|${rec.draftState ? 1 : 0}`;
-
-  function buildMini(rec) {
-    const saved = rec.draftState || rec.savedState;
-    if (!saved || typeof boardHtml !== 'function' || typeof abView !== 'function') return null;
-    const hit = miniCache.get(rec.id);
-    const stamp = miniStamp(rec);
-    if (hit && hit.stamp === stamp) return hit.mini;
-    const st = freshState();
-    st.headingFont = fontByName('Inter') || FONTS[0];
-    st.bodyFont = st.headingFont;
-    st.colors = generatePalette('analogous', 210);
-    // The loader decodes the logo asynchronously; the board only needs the data URL.
-    const { logoDataUrl, ...rest } = saved;
-    applySavedSessionToState(rest, st);
-    if (typeof logoDataUrl === 'string' && logoDataUrl.startsWith('data:image/')) st.logoDataUrl = logoDataUrl;
-    const mini = withContentOf(st.content, () => {
+  /* A tile is a flat card on the brand's own canvas: logo or initial, the name in the
+     brand's heading font, the aesthetic's name, and the palette strip. The canvas, ink and
+     faces come from the same view the board renders (blend and pure ground included), built
+     from a throwaway state so the open brand's `state` is never touched. Any failure falls
+     back to the brand's light/dark neutral, then to the page's own colours. */
+  function tileLook(rec) {
+    const saved = rec.draftState || rec.savedState || {};
+    const colors = (rec.savedState && rec.savedState.colors) || saved.colors || {};
+    const out = {
+      canvas: saved.bgMode === 'dark' ? colors.neutralDark : colors.neutralLight,
+      ink: saved.bgMode === 'dark' ? colors.neutralLight : colors.neutralDark,
+      font: FONTS.find(f => f.name === saved.headingFontName) || FONTS[0],
+      aesthetic: '',
+    };
+    try {
+      const st = freshState();
+      st.colors = generatePalette('analogous', 210);
+      const { logoDataUrl, ...rest } = saved;
+      applySavedSessionToState(rest, st);
       const v = abView(st);
-      return {
-        html: boardHtml(v.state, v.def, true),
-        blended: !!v.def.blend,
-        fonts: [v.state.headingFont, v.state.bodyFont],
-        vars: `--font-heading:${v.state.headingFont.css.replace(/"/g, "'")};--font-body:${v.state.bodyFont.css.replace(/"/g, "'")}`,
-      };
-    });
-    miniCache.set(rec.id, { stamp, mini });
-    return mini;
+      const t = boardTokens(v.state, v.def);
+      out.canvas = t.canvas; out.ink = t.ink; out.muted = t.muted;
+      out.font = v.state.headingFont;
+      out.aesthetic = aestheticByKey(st.aesthetic).name || '';
+    } catch (e) { /* keep the neutrals */ }
+    return out;
   }
 
-  function fitTiles() {
-    const grid = $('libGrid');
-    const art = grid && grid.querySelector('.tile:not(.tile-new) .tile-art');
-    const w = art && art.clientWidth;
-    if (w) grid.style.setProperty('--tile-zoom', (w / MINI_W).toFixed(4));
-  }
-
-  function paintTile(art) {
-    const tile = art.closest('.tile[data-id]');
-    const rec = tile && records.find(r => r.id === tile.dataset.id);
-    const done = () => art.classList.remove('is-loading');
-    if (!rec) return done();
-    let mini = null;
-    try { mini = buildMini(rec); } catch (e) { mini = null; }
-    if (!mini) {
-      const font = FONTS.find(f => f.name === art.dataset.font);
-      return font && window.loadFontFamily ? window.loadFontFamily(font).then(done, done) : done();
+  // The name's size is estimated from its length in tileHtml; once the face is loaded, shrink
+  // it until no word overflows the column and the name takes at most 3 lines (wide faces such
+  // as pixel fonts run past any per-character estimate).
+  function fitName(art) {
+    const el = art.querySelector('.tile-name');
+    if (!el) return;
+    let size = parseFloat(el.style.fontSize) || 10;
+    const fits = () => {
+      const px = parseFloat(getComputedStyle(el).fontSize) || 1;
+      return el.scrollWidth <= el.clientWidth + 1 && el.getBoundingClientRect().height <= px * 1.04 * 3 + 2;
+    };
+    while (size > 3.5 && !fits()) {
+      size = Math.max(3.5, size * 0.93);
+      el.style.fontSize = size.toFixed(2) + 'cqw';
     }
-    // Reveal only once both faces are ready, so the miniature never flashes a fallback font.
-    const ready = window.loadFontFamily
-      ? Promise.all(mini.fonts.map(f => window.loadFontFamily(f)))
-      : Promise.resolve();
-    ready.catch(() => {}).then(() => {
-      if (!art.isConnected) return;
-      try {
-        const live = document.createElement('div');
-        live.className = 'tile-live';
-        live.setAttribute('aria-hidden', 'true');
-        live.inert = true;
-        live.innerHTML = `<div class="tile-board" style="${escapeHtml(mini.vars)}">${mini.html}</div>`;
-        if (mini.blended && typeof blendClearArtText === 'function') {
-          const root = live.querySelector('.ab');
-          blendClearArtText(root);
-          if (typeof blendLegibility === 'function') blendLegibility(root);
-        }
-        art.prepend(live);
-        art.classList.add('has-live');
-      } catch (e) { /* keep the flat tile */ }
-      done();
-    });
+  }
+
+  // Loads the tile's heading face once the tile nears the viewport, then reveals the type.
+  function paintTile(art) {
+    const done = () => { fitName(art); art.classList.remove('is-loading'); };
+    const font = FONTS.find(f => f.name === art.dataset.font);
+    return font && window.loadFontFamily ? window.loadFontFamily(font).then(done, done) : done();
   }
 
   const tileObserver = 'IntersectionObserver' in window
@@ -227,24 +202,30 @@ const LibraryUI = (function () {
   function tileHtml(rec) {
     const s = rec.savedState || {};
     const colors = s.colors || {};
-    const font = FONTS.find(f => f.name === s.headingFontName) || FONTS[0];
-    const preset = SHAPE_PRESETS.find(p => p.key === s.shapePresetKey) || SHAPE_PRESETS[0];
+    const look = tileLook(rec);
     const primary = colors.primary || '#444444';
-    const ink = pickReadableText(primary);
-    const radius = slRadius(preset.radiusLg, '8px');
-    const fontCss = font.css.replace(/"/g, "'");
+    const canvas = look.canvas || '#f4f4f4';
+    const ink = look.ink || pickReadableText(canvas);
+    const muted = look.muted || slMix(canvas, ink, 0.4);
+    const fontCss = look.font.css.replace(/"/g, "'");
+    const initial = ([...(rec.name || '').trim()][0] || '?').toUpperCase();
     const mark = s.logoDataUrl
-      ? `<img src="${s.logoDataUrl}" alt="" />`
-      : 'Aa';
+      ? `<span class="tile-mark has-logo"><img src="${escapeHtml(s.logoDataUrl)}" alt="" /></span>`
+      : `<span class="tile-mark" style="background:${escapeHtml(primary)};color:${pickReadableText(primary)}">${escapeHtml(initial)}</span>`;
     const band = ['primary', 'secondary', 'accent', 'neutralDark', 'neutralLight']
       .map(k => `<i style="background:${escapeHtml(colors[k] || '#cccccc')}"></i>`).join('');
-    const nameSize = slFit(rec.name, { max: 12, min: 3, widthPct: 78, lines: 2, glyph: 0.6 });
+    // Wrap only between words (max 3 lines); a lone word gets one line sized to fit.
+    const words = String(rec.name || '').trim().split(/\s+/).filter(Boolean);
+    const nameSize = slFit(rec.name, { max: 15, min: 5, widthPct: 80, lines: words.length > 1 ? 3 : 1, glyph: 0.6 });
     return `
       <article class="tile" tabindex="0" data-id="${rec.id}" aria-label="${escapeHtml(rec.name)}">
-        <div class="tile-art is-loading" data-font="${escapeHtml(font.name)}"
-             style="--t-bg:${escapeHtml(primary)};--t-ink:${ink};--t-radius:${radius};--t-font:${fontCss}">
-          <span class="tile-mark">${mark}</span>
-          <span class="tile-name" style="font-size:${nameSize}cqw">${escapeHtml(rec.name)}</span>
+        <div class="tile-art is-loading" data-font="${escapeHtml(look.font.name)}"
+             style="--t-bg:${escapeHtml(canvas)};--t-ink:${escapeHtml(ink)};--t-muted:${escapeHtml(muted)};--t-font:${fontCss}">
+          ${mark}
+          <span class="tile-body">
+            <span class="tile-name" style="font-size:${nameSize}cqw">${escapeHtml(rec.name)}</span>
+            ${look.aesthetic ? `<span class="tile-kind">${escapeHtml(look.aesthetic)}</span>` : ''}
+          </span>
           <span class="tile-band">${band}</span>
         </div>
         <div class="tile-meta">
@@ -273,9 +254,6 @@ const LibraryUI = (function () {
         <div class="tile-meta"><div class="tile-text"><div class="tile-title">New brand</div><div class="tile-sub">Start from a fresh combination</div></div></div>
       </button>`;
     grid.innerHTML = plus + records.map(tileHtml).join('');
-    const ids = new Set(records.map(r => r.id));
-    miniCache.forEach((_, id) => { if (!ids.has(id)) miniCache.delete(id); });
-    fitTiles();
     grid.querySelectorAll('.tile-art[data-font]').forEach(a => {
       if (tileObserver) tileObserver.observe(a); else paintTile(a);
     });
@@ -404,8 +382,6 @@ const LibraryUI = (function () {
     });
     document.addEventListener('mousedown', e => { if (menuEl && !menuEl.contains(e.target)) closeMenu(); });
     window.addEventListener('blur', closeMenu);
-    window.addEventListener('resize', fitTiles);
-    if ('ResizeObserver' in window) new ResizeObserver(fitTiles).observe(grid);
   }
 
   async function init() {

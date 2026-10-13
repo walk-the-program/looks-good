@@ -1086,8 +1086,6 @@ body[data-view="editor"] .library { display: none; }
 html.is-mac-app .lib-top { height: 28px; padding: 0 48px 0 78px; line-height: 32px; }
 html.is-mac-app.is-fullscreen .lib-top { padding-left: 48px; height: 46px; }
 .lib-inner {
-  max-width: 1400px;
-  margin: 0;
   padding: 44px 48px 96px;
 }
 html.is-mac-app .lib-inner { padding-top: 52px; }
@@ -1110,8 +1108,8 @@ html.is-mac-app .lib-inner { padding-top: 52px; }
 
 .lib-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(232px, 1fr));
-  gap: 36px 28px;
+  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+  gap: 28px 22px;
 }
 .lib-grid[hidden], .lib-empty[hidden] { display: none; }
 
@@ -1147,41 +1145,55 @@ html.is-mac-app .lib-inner { padding-top: 52px; }
 }
 .tile-mark {
   position: absolute;
-  left: 9cqw;
+  left: 8cqw;
   top: 8cqw;
+  width: 15cqw;
+  height: 15cqw;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border-radius: 22%;
   font-family: var(--t-font, sans-serif);
-  font-size: 26cqw;
+  font-size: 8.5cqw;
   font-weight: 700;
   line-height: 1;
-  letter-spacing: -0.03em;
   transition: opacity 240ms var(--ease);
 }
-.tile-mark img { display: block; max-height: 22cqw; max-width: 50cqw; object-fit: contain; }
-.tile-name {
+.tile-mark.has-logo { background: #fff; box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.1); }
+.tile-mark img { display: block; width: 100%; height: 100%; padding: 12%; object-fit: contain; box-sizing: border-box; }
+/* The name sits bottom-left above the palette strip; it wraps only between words. */
+.tile-body {
   position: absolute;
-  left: 9cqw;
-  right: 9cqw;
-  bottom: 22cqw;
+  left: 8cqw;
+  right: 8cqw;
+  bottom: 18cqw;
+  display: flex;
+  flex-direction: column;
+  gap: 2.4cqw;
+}
+.tile-name {
   font-family: var(--t-font, sans-serif);
   font-weight: 700;
-  line-height: 1.05;
+  line-height: 1.04;
   letter-spacing: -0.02em;
   overflow-wrap: normal;
   word-break: keep-all;
   hyphens: none;
   transition: opacity 240ms var(--ease);
 }
-.tile-art.is-loading .tile-mark,
+.tile-kind {
+  font-size: 5.2cqw;
+  font-weight: 500;
+  line-height: 1.2;
+  letter-spacing: 0.01em;
+  color: var(--t-muted, currentColor);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 .tile-art.is-loading .tile-name { opacity: 0.15; }
-/* Live miniature of the brand's own board (js/library-ui.js): the top of the board at a
-   fixed design width, shrunk with CSS zoom like the Compare tiles, cropped by the art box.
-   Decorative: the tile itself is the control. */
-.tile-live { position: absolute; inset: 0; overflow: hidden; pointer-events: none; z-index: 1; animation: tile-in 260ms var(--ease) both; }
-.tile-board { width: 520px; zoom: var(--tile-zoom, 0.4); pointer-events: none; }
-.tile-board .ab { border-radius: 0; }
-.tile-art.has-live { background: transparent; }
-.tile-art.has-live .tile-mark, .tile-art.has-live .tile-name { visibility: hidden; }
-.tile-art.has-live .tile-band { z-index: 2; }
+.tile-band { z-index: 2; }
 @keyframes tile-in { from { opacity: 0; } to { opacity: 1; } }
 @media (prefers-reduced-motion: reduce) { .tile-live { animation: none; } }
 .tile-band {
@@ -1352,7 +1364,7 @@ html.is-mac-app .lib-inner { padding-top: 52px; }
   .lib-inner { padding: 32px 20px 72px; }
   html.is-mac-app .lib-inner { padding-top: 44px; }
   .lib-head h1 { font-size: 26px; }
-  .lib-grid { grid-template-columns: repeat(auto-fill, minmax(156px, 1fr)); gap: 28px 18px; }
+  .lib-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 24px 14px; }
 }
 
 /* ---------- Inline suggestions (js/suggest-ui.js) ---------- */
