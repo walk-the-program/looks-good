@@ -750,7 +750,7 @@ function setBoardFonts(el) {
 // or the blend of base and donor when one is active (js/blend.js). `st` defaults to the
 // editor state; the brief passes its own copy.
 function abView(st = state) {
-  return typeof aestheticView === 'function' ? aestheticView(st) : { state: st, def: aestheticByKey(st.aesthetic), blend: null };
+  return typeof aestheticView === 'function' ? aestheticView(st) : { state: st, def: resolveAestheticDef(st), blend: null };
 }
 
 function renderMainBoard() {
@@ -775,12 +775,17 @@ function renderCompareGrid() {
   setBoardFonts(grid);
   const defs = visibleAesthetics();
   const note = aeFamily === 'all' ? '' : `<p class="cmp-note">${escapeHtml(aestheticFamilyLabel(aeFamily))}: ${defs.length} of ${AESTHETICS.length} aesthetics. Choose All in the sidebar to see every one.</p>`;
-  grid.innerHTML = note + defs.map(def => `
+  // The tile of the selected aesthetic follows the Classic | Current choice.
+  const shown = d => (d.key === state.aesthetic ? resolveAestheticDef(state) : d);
+  grid.innerHTML = note + defs.map(def => {
+    const drawn = shown(def);
+    return `
     <div class="cmp-tile${def.key === state.aesthetic ? ' is-current' : ''}" role="button" tabindex="0"
          data-key="${def.key}" aria-label="Use ${escapeHtml(def.name)}" aria-pressed="${def.key === state.aesthetic}">
       <div class="cmp-label"><span class="cmp-num">${String(def.order).padStart(2, '0')}</span><span class="cmp-name">${escapeHtml(def.name)}</span><span class="cmp-desc">${escapeHtml(def.descriptor)}</span></div>
-      <div class="cmp-frame"><div class="cmp-board" inert>${boardHtml(Object.assign({}, state, { bgMode: def.mode }), def)}</div></div>
-    </div>`).join('');
+      <div class="cmp-frame"><div class="cmp-board" inert>${boardHtml(Object.assign({}, state, { bgMode: drawn.mode }), drawn)}</div></div>
+    </div>`;
+  }).join('');
   fitCompareGrid();
 }
 
@@ -879,8 +884,9 @@ function syncAestheticChrome(def) {
   const sum = document.getElementById('aeSummary');
   if (sum) sum.textContent = def.summary || '';
   document.querySelectorAll('#aeList .ae-tile').forEach(b => {
-    b.setAttribute('aria-pressed', String(b.dataset.key === def.key));
+    b.setAttribute('aria-pressed', String(b.dataset.key === (def.classicOf || def.key)));
   });
+  syncAestheticVersionUi();
   document.querySelectorAll('#aeFamilies .ae-fam').forEach(b => {
     b.setAttribute('aria-pressed', String(b.dataset.family === aeFamily));
   });
@@ -889,6 +895,17 @@ function syncAestheticChrome(def) {
   document.querySelectorAll('input[name="boardView"]').forEach(r => { r.checked = r.value === boardView; });
   renderFontRec(def.blend ? def.blend.base : def);
   if (typeof syncBlendUi === 'function') syncBlendUi();
+}
+
+// The Classic | Current switch: only for an aesthetic that has a classic copy.
+function syncAestheticVersionUi() {
+  const host = document.getElementById('aeVersion');
+  if (!host) return;
+  host.hidden = !hasClassicAesthetic(state.aesthetic);
+  const classic = state.aestheticVersion === 'classic';
+  host.querySelectorAll('button[data-version]').forEach(b => {
+    b.setAttribute('aria-pressed', String((b.dataset.version === 'classic') === classic));
+  });
 }
 
 // Typography panel: one line naming the recommendation and how the current

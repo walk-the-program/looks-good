@@ -1,0 +1,250 @@
+/* ---------------------------------------------------------------------
+   33 Radical Memphis — laminate logic. Paper cabinets with a patterned side strip,
+   five laminates (Bacterio, terrazzo, checker, dots, zig-zag) as fills, primitives
+   on a diagonal, a second-hue offset sheet instead of outlines, springy presses.
+   Variables --ab-m-* come from js/aesthetics/radical-memphis.js tokens(). Cards
+   are always paper, so text inside them uses --ab-m-black / --ab-m-soft (the board
+   also works in dark mode). Hooks: hero split, type ui/label body, highlight custom,
+   states swatch, canvas().
+------------------------------------------------------------------------ */
+
+.ab[data-ae="radical-memphis--classic"] {
+  --mm-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --mm-sheet: 7px;
+  --mm-pad: clamp(18px, 2.8cqw, 26px);
+  --mm-bacterio: url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 width=%2764%27 height=%2764%27 viewBox=%270 0 64 64%27 fill=%27none%27 stroke=%27%2314110F%27 stroke-width=%272.4%27 stroke-linecap=%27round%27%3E%3Cpath d=%27M5 14q4-9 8 0t8 0t8 0%27/%3E%3Cpath d=%27M40 7q3-7 6 0t6 0%27/%3E%3Cpath d=%27M9 39q5 7 10 0t10 0%27/%3E%3Cpath d=%27M46 28l8 8M46 36l8-8%27/%3E%3Cpath d=%27M35 54q4-8 8 0t8 0t8 0%27/%3E%3Cpath d=%27M5 57l10-4%27/%3E%3Ccircle cx=%2729%27 cy=%2725%27 r=%272.3%27 fill=%27%2314110F%27 stroke=%27none%27/%3E%3Ccircle cx=%2758%27 cy=%2717%27 r=%272.3%27 fill=%27%2314110F%27 stroke=%27none%27/%3E%3Ccircle cx=%2721%27 cy=%2751%27 r=%272.3%27 fill=%27%2314110F%27 stroke=%27none%27/%3E%3C/svg%3E");
+  --mm-squiggle: url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 width=%2724%27 height=%2710%27 viewBox=%270 0 24 10%27 fill=%27none%27 stroke=%27%23000%27 stroke-width=%272.2%27 stroke-linecap=%27round%27%3E%3Cpath d=%27M1 5q5.5-8 11 0t11 0%27/%3E%3C/svg%3E");
+  --mm-terrazzo:
+    radial-gradient(circle at 12% 18%, var(--ab-primary) 0 4px, transparent 4.6px),
+    radial-gradient(circle at 70% 12%, var(--ab-secondary) 0 3.4px, transparent 4px),
+    radial-gradient(circle at 38% 40%, var(--ab-m-black) 0 2.6px, transparent 3.2px),
+    radial-gradient(circle at 88% 44%, var(--ab-accent) 0 3.6px, transparent 4.2px),
+    radial-gradient(circle at 24% 70%, var(--ab-m-sheet) 0 5px, transparent 5.6px),
+    radial-gradient(circle at 62% 66%, var(--ab-primary) 0 2.4px, transparent 3px),
+    radial-gradient(circle at 92% 86%, var(--ab-m-black) 0 3px, transparent 3.6px),
+    radial-gradient(circle at 8% 92%, var(--ab-secondary) 0 3px, transparent 3.6px),
+    radial-gradient(circle at 50% 92%, var(--ab-accent) 0 2.2px, transparent 2.8px),
+    radial-gradient(circle at 76% 32%, var(--ab-m-sheet) 0 3px, transparent 3.6px);
+  --mm-checker: conic-gradient(var(--ab-m-black) 25%, var(--ab-m-paper) 0 50%, var(--ab-m-black) 0 75%, var(--ab-m-paper) 0) 0 0 / 16px 16px;
+  --mm-dots: radial-gradient(circle, var(--ab-primary) 2.2px, transparent 2.7px) 0 0 / 11px 11px, var(--ab-m-paper);
+  --mm-zig:
+    linear-gradient(135deg, var(--ab-secondary) 25%, transparent 25%) -6px 0 / 12px 12px,
+    linear-gradient(225deg, var(--ab-secondary) 25%, transparent 25%) -6px 0 / 12px 12px,
+    linear-gradient(315deg, var(--ab-secondary) 25%, transparent 25%) 0 0 / 12px 12px,
+    linear-gradient(45deg, var(--ab-secondary) 25%, transparent 25%) 0 0 / 12px 12px,
+    var(--ab-m-paper);
+  border-radius: 28px;
+}
+
+/* ---- header: a wordmark on a colour block, a primitive for a mark ---- */
+.ab[data-ae="radical-memphis--classic"] .ab-head { padding-bottom: clamp(10px, 1.6cqw, 16px); }
+.ab[data-ae="radical-memphis--classic"] .ab-brand { gap: 12px; }
+.ab[data-ae="radical-memphis--classic"] .ab-mark { width: 34px; height: 34px; border-radius: 50%; background: var(--ab-accent); color: var(--ab-on-accent); box-shadow: 4px 4px 0 var(--ab-m-sheet); font: 400 16px/1 var(--ab-font-h); }
+.ab[data-ae="radical-memphis--classic"] .ab-wordmark {
+  padding: 7px 14px 8px; background: var(--ab-primary); color: var(--ab-on-primary); transform: rotate(-2.5deg); box-shadow: 5px 5px 0 var(--ab-m-sheet-sec);
+  font-family: var(--ab-font-h); font-weight: 400; letter-spacing: calc(-0.01em * var(--ab-tr, 1)); text-transform: none; border-radius: 0 14px 0 0; overflow: visible; text-overflow: clip;
+}
+.ab[data-ae="radical-memphis--classic"] .ab-tag { display: inline-flex; align-items: center; gap: 8px; font-size: 10.5px; font-weight: 700; letter-spacing: 0.1em; }
+.ab[data-ae="radical-memphis--classic"] .ab-tag::before { content: ""; width: 10px; height: 9px; background: var(--ab-secondary); clip-path: polygon(50% 0, 100% 100%, 0 100%); }
+.ab[data-ae="radical-memphis--classic"] .ab-rule { height: 10px; background: var(--ab-ink); opacity: 0.85; -webkit-mask: var(--mm-squiggle) 0 50% / 24px 10px repeat-x; mask: var(--mm-squiggle) 0 50% / 24px 10px repeat-x; }
+
+/* ---- labels ---- */
+.ab[data-ae="radical-memphis--classic"] .ab-label { font-size: 11px; font-weight: 700; letter-spacing: 0.08em; }
+.ab[data-ae="radical-memphis--classic"] .ab-labelrow .ab-label:first-child { color: var(--ab-ink); }
+.ab[data-ae="radical-memphis--classic"] .ab-n {
+  display: inline-grid; place-items: center; min-width: 30px; height: 30px; margin-right: 10px; padding: 0 4px;
+  border-radius: 50%; background: var(--ab-secondary); color: var(--ab-on-secondary); font: 400 12px/1 var(--ab-font-h); letter-spacing: 0;
+  transform: rotate(-6deg); box-shadow: 3px 3px 0 var(--ab-m-sheet);
+}
+.ab[data-ae="radical-memphis--classic"] .ab-n::after { content: none; }
+.ab[data-ae="radical-memphis--classic"] .ab-labelrow .ab-label:first-child { display: inline-flex; align-items: center; }
+
+/* ---- hero: a slanted statement beside the showroom piece ---- */
+.ab[data-ae="radical-memphis--classic"] .ab-hero { grid-template-columns: minmax(0, 1.36fr) minmax(0, 1fr); gap: clamp(22px, 4cqw, 52px); padding: clamp(34px, 5.4cqw, 64px) 0 clamp(36px, 5cqw, 60px); }
+.ab[data-ae="radical-memphis--classic"] .ab-kicker {
+  display: inline-block; padding: 5px 12px 5px 10px; background: var(--ab-secondary); color: var(--ab-on-secondary); clip-path: polygon(0 0, 100% 0, calc(100% - 9px) 100%, 0 100%);
+  font-size: 11px; font-weight: 700; letter-spacing: 0.12em;
+}
+.ab[data-ae="radical-memphis--classic"] .ab-headline { font-weight: 400; line-height: 0.96; letter-spacing: calc(-0.035em * var(--ab-tr, 1)); transform: rotate(-2.5deg); transform-origin: 0 100%; text-wrap: balance; padding-bottom: 0.06em; }
+.ab[data-ae="radical-memphis--classic"] .ab-hl { color: var(--ab-accent-ink); text-shadow: 0.06em 0.06em 0 var(--ab-m-sheet); }
+.ab[data-ae="radical-memphis--classic"] .ab-subcopy { max-width: 25em; margin-top: clamp(22px, 3cqw, 32px) !important; }
+.ab[data-ae="radical-memphis--classic"] .ab-sub-lead { color: var(--ab-ink); font-weight: 600; }
+.ab[data-ae="radical-memphis--classic"] .ab-art { max-width: 400px; aspect-ratio: 1; justify-self: end; }
+
+/* ---- the showroom piece ---- */
+.ab[data-ae="radical-memphis--classic"] .mm-art { position: absolute; inset: 0; }
+.ab[data-ae="radical-memphis--classic"] .mm-s { position: absolute; display: block; }
+.ab[data-ae="radical-memphis--classic"] .mm-sh { background: var(--ab-m-sheet); }
+.ab[data-ae="radical-memphis--classic"] .mm-sh.mm-f-primary { background: var(--ab-m-sheet-sec); }
+.ab[data-ae="radical-memphis--classic"] .mm-rect, .ab[data-ae="radical-memphis--classic"] .mm-bar { border-radius: 0; }
+.ab[data-ae="radical-memphis--classic"] .mm-circle { border-radius: 50%; }
+.ab[data-ae="radical-memphis--classic"] .mm-tri { clip-path: polygon(50% 0, 100% 100%, 0 100%); }
+.ab[data-ae="radical-memphis--classic"] .mm-semi { border-radius: 999px 999px 0 0 / 100% 100% 0 0; }
+.ab[data-ae="radical-memphis--classic"] .mm-trap { clip-path: polygon(13% 0, 87% 0, 100% 100%, 0 100%); }
+.ab[data-ae="radical-memphis--classic"] .mm-para { clip-path: polygon(9% 0, 100% 0, 91% 100%, 0 100%); }
+.ab[data-ae="radical-memphis--classic"] .mm-f-primary { background: var(--ab-primary); }
+.ab[data-ae="radical-memphis--classic"] .mm-f-secondary { background: var(--ab-secondary); }
+.ab[data-ae="radical-memphis--classic"] .mm-f-accent { background: var(--ab-accent); color: var(--ab-on-accent); display: grid; place-items: center; }
+.ab[data-ae="radical-memphis--classic"] .mm-f-ink { background: var(--ab-m-black); }
+.ab[data-ae="radical-memphis--classic"] .mm-f-bacterio { background: var(--mm-bacterio), var(--ab-m-paper); background-size: 40px 40px, auto; }
+.ab[data-ae="radical-memphis--classic"] .mm-f-terrazzo { background: var(--mm-terrazzo), var(--ab-m-paper); background-size: 120px 90px; }
+.ab[data-ae="radical-memphis--classic"] .mm-f-checker { background: var(--mm-checker); background-size: 10px 10px; }
+.ab[data-ae="radical-memphis--classic"] .mm-f-dots { background: var(--mm-dots); background-size: 9px 9px, auto; }
+.ab[data-ae="radical-memphis--classic"] .mm-f-zig { background: var(--mm-zig); background-size: 9px 9px, 9px 9px, 9px 9px, 9px 9px, auto; }
+.ab[data-ae="radical-memphis--classic"] .mm-f-accent b { font: 400 clamp(26px, 9cqw, 64px) var(--ab-font-h); line-height: 1; transform: rotate(8deg); }
+.ab[data-ae="radical-memphis--classic"] .mm-cap {
+  position: absolute; left: 3%; top: 3%; z-index: 2; font: 700 clamp(8px, 2.4cqw, 11px)/1.3 var(--ab-font-b); letter-spacing: 0.1em; text-transform: uppercase; color: var(--ab-ink);
+}
+
+/* ---- palette: laminate sample chips (92x64, radius 6, tilted), the lower 30% printed with the squiggle at 25% ink, a second-hue sheet behind ---- */
+.ab[data-ae="radical-memphis--classic"] .ab-chip {
+  position: relative; width: 92px; height: 64px; margin: 6px 0 20px; border-radius: 6px; overflow: hidden;
+  box-shadow: 5px 5px 0 var(--ab-m-sheet); --mm-sq: var(--ab-m-black); transform: rotate(var(--mm-tilt, -5deg)); transform-origin: 30% 50%;
+}
+.ab[data-ae="radical-memphis--classic"] .ab-chip::before { content: none; }
+.ab[data-ae="radical-memphis--classic"] .ab-chip::after {
+  content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 30%; background: var(--mm-sq); opacity: 0.25;
+  -webkit-mask: var(--mm-squiggle) 0 0 / 24px 10px repeat; mask: var(--mm-squiggle) 0 0 / 24px 10px repeat;
+}
+.ab[data-ae="radical-memphis--classic"] .ab-swatch:nth-child(1) .ab-chip { --mm-tilt: -5deg; }
+.ab[data-ae="radical-memphis--classic"] .ab-swatch:nth-child(2) .ab-chip { --mm-tilt: 3deg; }
+.ab[data-ae="radical-memphis--classic"] .ab-swatch:nth-child(3) .ab-chip { --mm-tilt: -2deg; }
+.ab[data-ae="radical-memphis--classic"] .ab-swatch:nth-child(4) .ab-chip { --mm-tilt: 4deg; }
+.ab[data-ae="radical-memphis--classic"] .ab-swatch:nth-child(5) .ab-chip { --mm-tilt: -3deg; }
+.ab[data-ae="radical-memphis--classic"] .ab-swatch[data-role="canvas"] .ab-chip { box-shadow: 5px 5px 0 var(--ab-m-sheet), inset 0 0 0 1px var(--ab-line); }
+.ab[data-ae="radical-memphis--classic"] .ab-swatch[data-role="ink"] .ab-chip { --mm-sq: var(--ab-m-paper); }
+.ab[data-ae="radical-memphis--classic"] .ab-swatch[data-role="primary"] .ab-chip { box-shadow: 5px 5px 0 var(--ab-m-sheet-sec); }
+.ab[data-ae="radical-memphis--classic"] .ab-sw-role { font-family: var(--ab-font-h); font-weight: 400; font-size: 15px; letter-spacing: 0; }
+.ab[data-ae="radical-memphis--classic"] .ab-sw-job { font-size: 11px; }
+.ab[data-ae="radical-memphis--classic"] .ab-sw-hex { font-size: 10.5px; font-weight: 700; letter-spacing: 0.08em; }
+
+/* ---- type block: cabinets on paper ---- */
+.ab[data-ae="radical-memphis--classic"] .ab-type-col {
+  position: relative; padding: 18px 18px 18px 30px; background: var(--ab-m-paper); color: var(--ab-m-black); border: 0; border-radius: 0 28px 0 0; box-shadow: 7px 7px 0 var(--ab-m-sheet);
+}
+.ab[data-ae="radical-memphis--classic"] .ab-type-col::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 12px; background: var(--mm-bacterio), var(--ab-m-paper); background-size: 38px 38px, auto; }
+.ab[data-ae="radical-memphis--classic"] .ab-type-role { color: var(--ab-m-black); font-weight: 700; font-size: 11px; letter-spacing: 0.1em; }
+.ab[data-ae="radical-memphis--classic"] .ab-type-class, .ab[data-ae="radical-memphis--classic"] .ab-type-fit { color: var(--ab-m-soft); }
+.ab[data-ae="radical-memphis--classic"] .ab-type-cur b { color: var(--ab-m-black); }
+.ab[data-ae="radical-memphis--classic"] .ab-type-pick { color: var(--ab-m-black); letter-spacing: 0; }
+.ab[data-ae="radical-memphis--classic"] .ab-fit { border: 0; border-radius: 999px; transform: rotate(-3deg); background: var(--ab-m-sec-lo); color: var(--ab-m-black); }
+.ab[data-ae="radical-memphis--classic"] .ab-fit[data-fit="match"] { background: var(--ab-m-sec-lo); color: var(--ab-m-black); }
+.ab[data-ae="radical-memphis--classic"] .ab-fit[data-fit="consider"] { background: var(--ab-m-pri-lo); color: var(--ab-m-black); }
+.ab[data-ae="radical-memphis--classic"] .ab-fit[data-fit="avoid"] { background: var(--ab-m-black); color: var(--ab-m-paper); }
+.ab[data-ae="radical-memphis--classic"] .ab-type-k { font-weight: 800; letter-spacing: 0.1em; }
+.ab[data-ae="radical-memphis--classic"] .ab-type-apply {
+  padding: 12px 20px; border: 0; border-radius: 999px; background: var(--ab-m-black); color: var(--ab-m-paper); font-weight: 700; font-size: 13px;
+  box-shadow: 5px 5px 0 var(--ab-m-sheet); transition: transform 220ms var(--mm-spring);
+}
+.ab[data-ae="radical-memphis--classic"] .ab-type-apply:hover { background: var(--ab-m-black); transform: rotate(-2deg); }
+.ab[data-ae="radical-memphis--classic"] .ab-type-apply:active { transform: scale(0.94); }
+
+/* ---- cabinets (card, panel, list): paper, one big quarter-round corner, a laminate strip down the side, an offset sheet ---- */
+.ab[data-ae="radical-memphis--classic"] .ab-card, .ab[data-ae="radical-memphis--classic"] .ab-panel, .ab[data-ae="radical-memphis--classic"] .ab-list {
+  position: relative; background: var(--ab-m-paper); color: var(--ab-m-black); border: 0; border-radius: 0 40px 0 0; box-shadow: 9px 9px 0 var(--ab-m-sheet);
+}
+.ab[data-ae="radical-memphis--classic"] .ab-card::before, .ab[data-ae="radical-memphis--classic"] .ab-panel::before, .ab[data-ae="radical-memphis--classic"] .ab-list::before {
+  content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 14px; background: var(--mm-bacterio), var(--ab-m-paper); background-size: 40px 40px, auto;
+}
+.ab[data-ae="radical-memphis--classic"] .ab-panel::before { background: var(--mm-checker); background-size: 14px 14px; }
+.ab[data-ae="radical-memphis--classic"] .ab-list::before { background: var(--mm-zig); background-size: 10px 10px, 10px 10px, 10px 10px, 10px 10px, auto; }
+.ab[data-ae="radical-memphis--classic"] .ab-card, .ab[data-ae="radical-memphis--classic"] .ab-panel { padding: var(--mm-pad) var(--mm-pad) var(--mm-pad) calc(var(--mm-pad) + 14px); }
+.ab[data-ae="radical-memphis--classic"] .ab-card .ab-card-body, .ab[data-ae="radical-memphis--classic"] .ab-panel .ab-status, .ab[data-ae="radical-memphis--classic"] .ab-panel .ab-state, .ab[data-ae="radical-memphis--classic"] .ab-list .ab-row-n { color: var(--ab-m-soft); }
+.ab[data-ae="radical-memphis--classic"] .ab-list .ab-row-n { color: var(--ab-m-black); }
+/* brand deck: the slide is not a paper cabinet; no slant on slide headlines (the lead column would clip it) */
+.ab[data-ae="radical-memphis--classic"].ab-slide .ab-headline { transform: none; }
+
+/* 01 interface: geometric-token tabs, a slab title, the main action */
+.ab[data-ae="radical-memphis--classic"] .ab-seg { gap: 8px; padding: 0; background: none; border-radius: 0; }
+.ab[data-ae="radical-memphis--classic"] .ab-seg-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 7px; min-height: 40px; padding: 8px 6px; border-radius: 999px; border: 0;
+  background: var(--ab-m-sec-lo); color: var(--ab-m-black); font-size: 12px; font-weight: 700; transition: transform 220ms var(--mm-spring), background 120ms;
+}
+.ab[data-ae="radical-memphis--classic"] .ab-seg-btn::before { content: ""; flex: none; width: 12px; height: 12px; background: var(--ab-secondary); transition: transform 220ms var(--mm-spring); }
+.ab[data-ae="radical-memphis--classic"] .ab-seg-btn:nth-child(1)::before { border-radius: 50%; }
+.ab[data-ae="radical-memphis--classic"] .ab-seg-btn:nth-child(2)::before { clip-path: polygon(50% 0, 100% 100%, 0 100%); }
+.ab[data-ae="radical-memphis--classic"] .ab-seg-btn:hover { color: var(--ab-m-black); transform: rotate(-2deg); }
+.ab[data-ae="radical-memphis--classic"] .ab-seg-btn[aria-pressed="true"] { background: var(--ab-primary); color: var(--ab-on-primary); font-weight: 800; transform: scale(1.04) rotate(-1.5deg); box-shadow: 4px 4px 0 var(--ab-m-sheet-sec); }
+.ab[data-ae="radical-memphis--classic"] .ab-seg-btn[aria-pressed="true"]::before { background: var(--ab-accent); transform: scale(1.3); }
+.ab[data-ae="radical-memphis--classic"] .ab-card-title { margin: 26px 0 8px !important; font-weight: 400; letter-spacing: calc(-0.03em * var(--ab-tr, 1)); font-size: clamp(24px, 3.2cqw, 34px); line-height: 1; }
+.ab[data-ae="radical-memphis--classic"] .ab-card-body { font-size: 13.5px; }
+.ab[data-ae="radical-memphis--classic"] .ab-cta {
+  padding: 8px 8px 8px 24px; border-radius: 999px; background: var(--ab-primary); color: var(--ab-on-primary); font-size: 14px; font-weight: 700; margin-right: 6px; width: calc(100% - 6px);
+  box-shadow: 6px 6px 0 var(--ab-m-sheet-sec); transition: transform 220ms var(--mm-spring), box-shadow 220ms var(--mm-spring);
+}
+.ab[data-ae="radical-memphis--classic"] .ab-cta-arrow { display: grid; place-items: center; width: 40px; height: 40px; border-radius: 50%; background: var(--ab-accent); color: var(--ab-on-accent); }
+.ab[data-ae="radical-memphis--classic"] .ab-cta-arrow::before { content: "→"; font-size: 18px; font-weight: 800; }
+.ab[data-ae="radical-memphis--classic"] .ab-cta:hover { transform: rotate(-1.2deg); }
+.ab[data-ae="radical-memphis--classic"] .ab-cta:active { transform: scale(0.94, 0.92) translate(3px, 3px); box-shadow: 2px 2px 0 var(--ab-m-sheet-sec); }
+
+/* 02 laminates: a slab field, a laminate switch, three samples */
+.ab[data-ae="radical-memphis--classic"] .ab-fieldlabel { font-size: 11px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; }
+.ab[data-ae="radical-memphis--classic"] .ab-input {
+  padding: 13px 14px 11px; border: 0; border-bottom: 6px solid var(--ab-accent); border-radius: 0; background: var(--ab-m-sec-lo); color: var(--ab-m-black); font-size: 15px; font-weight: 600; caret-color: var(--ab-m-black);
+}
+.ab[data-ae="radical-memphis--classic"] .ab-input:focus { border-bottom-color: var(--ab-primary); -webkit-mask: none; }
+.ab[data-ae="radical-memphis--classic"] .ab-toggle > span { font-weight: 700; font-size: 13px; }
+.ab[data-ae="radical-memphis--classic"] .ab-switch { width: 62px; height: 32px; border-radius: 999px; background: var(--mm-zig); background-size: 9px 9px, 9px 9px, 9px 9px, 9px 9px, auto; box-shadow: 4px 4px 0 var(--ab-m-sheet); transition: none; }
+.ab[data-ae="radical-memphis--classic"] .ab-switch::before { left: 3px; top: 3px; width: 26px; height: 26px; background: var(--ab-m-black); transition: transform 240ms var(--mm-spring); }
+.ab[data-ae="radical-memphis--classic"] .ab-switch:checked { background: var(--mm-dots); background-size: 9px 9px, auto; }
+.ab[data-ae="radical-memphis--classic"] .ab-switch:checked::before { transform: translateX(30px); background: var(--ab-accent); }
+.ab[data-ae="radical-memphis--classic"] .ab-status { font-size: 11.5px; font-weight: 600; }
+.ab[data-ae="radical-memphis--classic"] .ab-states { margin-top: 26px; gap: 16px; }
+.ab[data-ae="radical-memphis--classic"] .ab-state { font-size: 11.5px; font-weight: 700; }
+.ab[data-ae="radical-memphis--classic"] .ab-disc { position: relative; width: 58px; height: 58px; margin: 0 auto 16px; border: 0; background: var(--ab-primary); border-radius: 50%; box-shadow: 5px 5px 0 var(--ab-m-sheet-sec); }
+.ab[data-ae="radical-memphis--classic"] .ab-disc[data-s="1"] { box-shadow: 5px 5px 0 var(--ab-m-sheet); background: var(--mm-bacterio), var(--ab-m-paper); background-size: 36px 36px, auto; transform: rotate(8deg); border-radius: 0 22px 0 22px; }
+.ab[data-ae="radical-memphis--classic"] .ab-disc[data-s="2"] {
+  border-radius: 0; box-shadow: none; transform: rotate(-6deg);
+  background: radial-gradient(circle at 50% 28%, var(--ab-accent) 0 20%, transparent 21%), linear-gradient(var(--ab-secondary), var(--ab-secondary)) 50% 100% / 100% 52% no-repeat, linear-gradient(var(--ab-primary), var(--ab-primary)) 50% 48% / 66% 22% no-repeat;
+}
+
+/* 03 in use: a swatch primitive, a place-name, beads for progress, alternate primary / secondary tint flats */
+.ab[data-ae="radical-memphis--classic"] .ab-list { overflow: visible; padding-left: 14px; counter-reset: mmrow; }
+.ab[data-ae="radical-memphis--classic"] .ab-row { grid-template-columns: 30px 28px minmax(0, 1fr) auto minmax(60px, 140px) 4.5ch; padding: 14px 18px 14px 14px; gap: 4px clamp(10px, 1.8cqw, 18px); border: 0; counter-increment: mmrow; }
+.ab[data-ae="radical-memphis--classic"] .ab-row:nth-child(odd) { background: var(--ab-m-pri-lo); }
+.ab[data-ae="radical-memphis--classic"] .ab-row:nth-child(even) { background: var(--ab-m-sec-lo); }
+.ab[data-ae="radical-memphis--classic"] .ab-row:nth-child(3) { background: var(--ab-m-pri-lo); }
+.ab[data-ae="radical-memphis--classic"] .ab-row:last-child { border: 0; }
+.ab[data-ae="radical-memphis--classic"] .ab-row-n { font: 400 15px/1 var(--ab-font-h); }
+.ab[data-ae="radical-memphis--classic"] .ab-av { display: block; width: 24px; height: 24px; font-size: 0; background: var(--ab-primary); border-radius: 50%; }
+.ab[data-ae="radical-memphis--classic"] .ab-row:nth-child(2) .ab-av { border-radius: 0; background: var(--ab-secondary); clip-path: polygon(50% 0, 100% 100%, 0 100%); }
+.ab[data-ae="radical-memphis--classic"] .ab-row:nth-child(3) .ab-av { border-radius: 0; background: var(--ab-accent); transform: rotate(12deg); }
+.ab[data-ae="radical-memphis--classic"] .ab-row-name { font-family: var(--ab-font-h); font-weight: 400; font-size: 15.5px; letter-spacing: calc(-0.015em * var(--ab-tr, 1)); }
+.ab[data-ae="radical-memphis--classic"] .ab-row-status { padding: 3px 10px; border-radius: 999px; background: var(--ab-m-paper); color: var(--ab-m-black); font-weight: 700; font-size: 11px; transform: rotate(-4deg); }
+.ab[data-ae="radical-memphis--classic"] .ab-row-bar { height: 12px; border-radius: 0; background: radial-gradient(circle, var(--ab-m-black) 0 3px, transparent 3.5px) 0 0 / 12px 12px repeat-x; opacity: 1; overflow: hidden; }
+.ab[data-ae="radical-memphis--classic"] .ab-row-bar { background: radial-gradient(circle at 6px 6px, color-mix(in srgb, var(--ab-m-black) 28%, transparent) 0 3.6px, transparent 4px) 0 0 / 12px 12px repeat-x; }
+.ab[data-ae="radical-memphis--classic"] .ab-row-bar i { height: 12px; border-radius: 0; background: radial-gradient(circle at 6px 6px, var(--ab-primary) 0 4.6px, transparent 5px) 0 0 / 12px 12px repeat-x; }
+.ab[data-ae="radical-memphis--classic"] .ab-row-pct { font: 400 15px var(--ab-font-h); }
+
+/* ---- footer: a checker strip, then the plinth ---- */
+.ab[data-ae="radical-memphis--classic"] .ab-foot {
+  margin-top: clamp(30px, 4cqw, 44px); padding-top: 30px; border-top: 0; font-size: 11.5px; font-weight: 600; color: var(--ab-ink);
+  background: var(--mm-checker); background-size: 12px 12px; background-repeat: repeat-x; background-position: 0 0;
+}
+.ab[data-ae="radical-memphis--classic"] .ab-foot { background-image: conic-gradient(var(--ab-ink) 25%, transparent 0 50%, var(--ab-ink) 0 75%, transparent 0); background-size: 12px 12px; }
+.ab[data-ae="radical-memphis--classic"] .ab-dot { width: 12px; height: 12px; margin-right: 9px; background: var(--ab-accent); border-radius: 50%; box-shadow: 3px 3px 0 var(--ab-m-sheet); }
+
+.ab[data-ae="radical-memphis--classic"] .ab-seg-btn:focus-visible, .ab[data-ae="radical-memphis--classic"] .ab-cta:focus-visible, .ab[data-ae="radical-memphis--classic"] .ab-switch:focus-visible, .ab[data-ae="radical-memphis--classic"] .ab-type-apply:focus-visible {
+  outline: 3px solid var(--ab-ink); outline-offset: 3px;
+}
+
+/* ---- narrow boards ---- */
+@container ab (max-width: 600px) {
+  .ab[data-ae="radical-memphis--classic"] .ab-hero { grid-template-columns: minmax(0, 1fr); gap: 34px; padding: 26px 0 34px; }
+  .ab[data-ae="radical-memphis--classic"] .ab-art { max-width: 330px; justify-self: center; }
+  .ab[data-ae="radical-memphis--classic"] .ab-headline { transform: rotate(-2deg); }
+  .ab[data-ae="radical-memphis--classic"] .ab-tag { font-size: 8.5px; letter-spacing: 0.06em; }
+  .ab[data-ae="radical-memphis--classic"] .ab-tag::before { display: none; }
+  .ab[data-ae="radical-memphis--classic"] .ab-wordmark { padding: 6px 12px 7px; }
+  .ab[data-ae="radical-memphis--classic"] .ab-row { grid-template-columns: 28px minmax(0, 1fr) 4.5ch; padding: 12px 14px 12px 10px; }
+  .ab[data-ae="radical-memphis--classic"] .ab-av { display: none; }
+  .ab[data-ae="radical-memphis--classic"] .ab-row-n { grid-column: 1; }
+  .ab[data-ae="radical-memphis--classic"] .ab-card, .ab[data-ae="radical-memphis--classic"] .ab-panel, .ab[data-ae="radical-memphis--classic"] .ab-list { margin-right: 9px; }
+  .ab[data-ae="radical-memphis--classic"] .ab-swatch .ab-chip { margin: 0; width: 72px; height: 50px; }
+  .ab[data-ae="radical-memphis--classic"] .ab-type-col { margin-right: 7px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ab[data-ae="radical-memphis--classic"] .ab-seg-btn, .ab[data-ae="radical-memphis--classic"] .ab-seg-btn::before, .ab[data-ae="radical-memphis--classic"] .ab-cta, .ab[data-ae="radical-memphis--classic"] .ab-switch::before, .ab[data-ae="radical-memphis--classic"] .ab-type-apply { transition: none; }
+  .ab[data-ae="radical-memphis--classic"] .ab-cta:active, .ab[data-ae="radical-memphis--classic"] .ab-type-apply:active, .ab[data-ae="radical-memphis--classic"] .ab-cta:hover, .ab[data-ae="radical-memphis--classic"] .ab-seg-btn:hover, .ab[data-ae="radical-memphis--classic"] .ab-type-apply:hover { transform: none; }
+}

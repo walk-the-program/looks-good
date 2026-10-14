@@ -1,0 +1,247 @@
+/* ---------------------------------------------------------------------
+   22 Xerox — toner, raw, copied. Reference: 80s-90s punk / hardcore flyers,
+   Pettibon-era zines, xerox-revival posters, office ephemera. Black toner on
+   dulled copy paper, hard threshold edges, speckle, edge burn, two drum streaks;
+   components are pasted-up scraps with tape. Colour is a second pass only:
+   primary = flat overprint block, accent = highlighter swipe, secondary = tape.
+   The SVG filters (#xrx-copy, #xrx-toner, #xrx-edge, #xrx-rule, #xrx-lite,
+   #xrx-g2, #xrx-g5) are defined by art() in js/aesthetics/xerox.js; the css only
+   references them. Vars --ab-scrap, --ab-hl-ink, --ab-tape(-edge), --ab-hi,
+   --ab-toner-soft come from tokens(). Hooks: hero 'poster', highlight 'custom',
+   states 'swatch', ui/label face = the body (typewriter) face.
+------------------------------------------------------------------------ */
+
+.ab[data-ae="xerox--classic"] {
+  border-radius: 0;
+  --xr-aw: 37; --ab-poster-art-w: calc(var(--xr-aw) * 1cqw); --ab-art-ratio: 1.12 / 1;
+  /* clustered dust: fine specks kept only inside a few low-frequency patches (two-octave mask) */
+  --xr-speck: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='640' height='640'><filter id='s' x='0' y='0' width='100%25' height='100%25'><feTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='2' seed='11' stitchTiles='stitch' result='a'/><feColorMatrix in='a' type='matrix' values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  28 0 0 0 -20.1' result='sp'/><feTurbulence type='fractalNoise' baseFrequency='.008' numOctaves='2' seed='4' stitchTiles='stitch' result='b'/><feColorMatrix in='b' type='matrix' values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  18 0 0 0 -10.5' result='mk'/><feComposite in='sp' in2='mk' operator='in'/></filter><rect width='100%25' height='100%25' filter='url(%23s)'/></svg>");
+  /* one drum streak down the sheet, 30px at 7.5% toner, turbulent edge */
+  --xr-streak: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='48' height='800'><filter id='d' x='-30%25' y='0' width='160%25' height='100%25'><feTurbulence type='fractalNoise' baseFrequency='.08 .005' numOctaves='2' seed='3' stitchTiles='stitch' result='w'/><feDisplacementMap in='SourceGraphic' in2='w' scale='16' xChannelSelector='R' yChannelSelector='G'/></filter><rect x='9' y='-30' width='30' height='860' fill='%23000' fill-opacity='.075' filter='url(%23d)'/></svg>");
+  --xr-burn: rgba(0, 0, 0, 0.3);
+}
+.ab[data-ae="xerox--classic"][data-mode="dark"] {
+  --xr-speck: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='640' height='640'><filter id='s' x='0' y='0' width='100%25' height='100%25'><feTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='2' seed='11' stitchTiles='stitch' result='a'/><feColorMatrix in='a' type='matrix' values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  28 0 0 0 -20.1' result='sp'/><feTurbulence type='fractalNoise' baseFrequency='.008' numOctaves='2' seed='4' stitchTiles='stitch' result='b'/><feColorMatrix in='b' type='matrix' values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  18 0 0 0 -10.5' result='mk'/><feComposite in='sp' in2='mk' operator='in'/></filter><rect width='100%25' height='100%25' filter='url(%23s)'/></svg>");
+  --xr-streak: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='48' height='800'><filter id='d' x='-30%25' y='0' width='160%25' height='100%25'><feTurbulence type='fractalNoise' baseFrequency='.08 .005' numOctaves='2' seed='3' stitchTiles='stitch' result='w'/><feDisplacementMap in='SourceGraphic' in2='w' scale='16' xChannelSelector='R' yChannelSelector='G'/></filter><rect x='9' y='-30' width='30' height='860' fill='%23fff' fill-opacity='.05' filter='url(%23d)'/></svg>");
+  --xr-burn: rgba(0, 0, 0, 0.55);
+}
+
+/* the copy itself: clustered dust, then edge burn and one drum streak over everything */
+.ab[data-ae="xerox--classic"]::after {
+  content: ""; position: absolute; inset: 0; z-index: 5; pointer-events: none; opacity: 0.7;
+  background: var(--xr-speck) 0 0 / 640px 640px; mix-blend-mode: var(--ab-blend, multiply);
+}
+.ab[data-ae="xerox--classic"]::before {
+  content: ""; position: absolute; inset: 0; z-index: 6; pointer-events: none; mix-blend-mode: var(--ab-blend, multiply);
+  background:
+    var(--xr-streak) 66% 0 / 48px 800px repeat-y,
+    linear-gradient(90deg, var(--xr-burn), transparent 7%, transparent 92%, var(--xr-burn)),
+    linear-gradient(180deg, rgba(0,0,0,0.16), transparent 4%, transparent 96%, rgba(0,0,0,0.22));
+}
+.ab[data-ae="xerox--classic"] .xr-defs { position: absolute; }
+
+/* labels: typewriter caps */
+.ab[data-ae="xerox--classic"] .ab-label, .ab[data-ae="xerox--classic"] .ab-tag, .ab[data-ae="xerox--classic"] .ab-kicker, .ab[data-ae="xerox--classic"] .ab-fieldlabel, .ab[data-ae="xerox--classic"] .ab-state, .ab[data-ae="xerox--classic"] .ab-sw-role {
+  text-transform: uppercase; font-weight: 700; letter-spacing: 0.14em;
+}
+.ab[data-ae="xerox--classic"] .ab-label { color: var(--ab-ink); font-size: 11.5px; }
+.ab[data-ae="xerox--classic"] .ab-label:last-child:not(:first-child) { color: var(--ab-muted); font-weight: 400; }
+.ab[data-ae="xerox--classic"] .ab-labelrow { margin-bottom: 20px; }
+/* black is spent: the palette header is a full-width toner band, type reversed out of it */
+.ab[data-ae="xerox--classic"] .ab-palette > .ab-labelrow { position: relative; isolation: isolate; margin: 0 calc(-1 * var(--ab-pad)) 24px; padding: clamp(12px, 2cqw, 20px) var(--ab-pad); }
+.ab[data-ae="xerox--classic"] .ab-palette > .ab-labelrow::before { content: ""; position: absolute; inset: 0; z-index: -1; background: var(--ab-ink); filter: url(#xrx-toner); }
+.ab[data-ae="xerox--classic"] .ab-palette > .ab-labelrow .ab-label { color: var(--ab-canvas); }
+.ab[data-ae="xerox--classic"] .ab-palette > .ab-labelrow .ab-label:first-child { font-family: var(--ab-font-h); font-weight: var(--ab-hw, 900); font-size: clamp(22px, 3.4cqw, 38px); letter-spacing: calc(0.03em * var(--ab-tr, 1)); line-height: 1; }
+.ab[data-ae="xerox--classic"] .ab-n {
+  display: inline-block; margin-right: 10px; padding: 0 7px; background: var(--ab-ink); color: var(--ab-canvas); font-size: 11px; letter-spacing: 0.06em; transform: rotate(-3deg);
+}
+.ab[data-ae="xerox--classic"] .ab-n::after { content: none; }
+
+/* header */
+.ab[data-ae="xerox--classic"] .ab-brand { font-weight: var(--ab-hw, 900); text-transform: uppercase; letter-spacing: calc(0.03em * var(--ab-tr, 1)); }
+.ab[data-ae="xerox--classic"] .ab-mark { position: relative; isolation: isolate; border-radius: 0; background: none; color: var(--ab-canvas); font-weight: var(--ab-hw, 900); }
+.ab[data-ae="xerox--classic"] .ab-mark::before { content: ""; position: absolute; inset: 0; z-index: -1; background: var(--ab-ink); transform: rotate(-5deg); filter: url(#xrx-toner); }
+/* the tag is a label-maker strip */
+.ab[data-ae="xerox--classic"] .ab-tag { padding: 3px 10px; background: var(--ab-ink); color: var(--ab-canvas); font-size: 10px; letter-spacing: 0.16em; transform: rotate(1.4deg); }
+.ab[data-ae="xerox--classic"] .ab-tag b { color: inherit; font-weight: 700; }
+.ab[data-ae="xerox--classic"] .ab-rule { height: 3px; background: var(--ab-ink); filter: url(#xrx-rule); }
+
+/* hero: a skewed copy, a full-width headline, the art taped under it */
+.ab[data-ae="xerox--classic"][data-hero="poster"] .ab-hero { padding: clamp(28px, 4.4cqw, 52px) 0 calc(var(--ab-poster-art-w) * 0.8 - 2cqw); }
+.ab[data-ae="xerox--classic"] .ab-hero-copy { transform: rotate(-0.7deg); transform-origin: 0 0; }
+.ab[data-ae="xerox--classic"] .ab-kicker {
+  display: inline-block; margin-bottom: 20px !important; padding: 3px 10px; border: 2.5px solid var(--ab-ink); color: var(--ab-ink); font-size: 11.5px; transform: rotate(-1.6deg);
+}
+.ab[data-ae="xerox--classic"] .ab-headline {
+  font-weight: var(--ab-hw, 900); text-transform: uppercase; letter-spacing: calc(0.012em * var(--ab-tr, 1)); line-height: 0.92; text-wrap: balance;
+  filter: url(#xrx-copy);
+}
+.ab[data-ae="xerox--classic"] .ab-hl { position: relative; isolation: isolate; display: inline-block; color: var(--ab-hl-ink); background: none; background-image: none; padding: 0 0.02em; margin: 0 0.04em; }
+.ab[data-ae="xerox--classic"][data-accent-text="low"] .ab-hl { background-image: none; }
+.ab[data-ae="xerox--classic"] .ab-hl::before {
+  content: ""; position: absolute; inset: 0.05em -0.12em 0 -0.1em; z-index: -1; background: var(--ab-primary); transform: translate(0.05em, 0.05em) rotate(-1.2deg);
+}
+.ab[data-ae="xerox--classic"] .ab-subcopy { max-width: 26em; color: var(--ab-ink); font-size: clamp(14px, 1.75cqw, 18px); }
+.ab[data-ae="xerox--classic"] .ab-sub-lead { background: linear-gradient(transparent 12%, var(--ab-hi) 12% 90%, transparent 90%); -webkit-box-decoration-break: clone; box-decoration-break: clone; padding: 0 3px; margin: 0 -3px; font-weight: 700; }
+.ab[data-ae="xerox--classic"] .ab-sub-rest { color: var(--ab-muted); }
+
+/* art: the skewed copy with a black copier edge and a taped scrap */
+.ab[data-ae="xerox--classic"] .ab-art { overflow: visible; }
+.ab[data-ae="xerox--classic"] .xra { position: absolute; inset: 0; transform: rotate(1.8deg); }
+.ab[data-ae="xerox--classic"] .xra svg { display: block; overflow: visible; }
+
+/* tear-off tab strip: fills the paper left of the art, from the hero's left edge to 16px before the art.
+   Width/pad are written in the art's own cqw (art = --xr-aw % of the board): the board's pad is clamp(20px, 4.4B, 44px), B = art/--xr-aw. */
+.ab[data-ae="xerox--classic"] .xrt {
+  position: absolute; right: calc(100% + 16px); bottom: calc(clamp(18px, 8.1cqw, 32px) + 10px); height: 38%; display: flex; flex-direction: column;
+  width: calc(100cqw * (100 - var(--xr-aw)) / var(--xr-aw) - clamp(20px, 11.89cqw, 44px) - 16px);
+  transform: rotate(-0.8deg); transform-origin: 100% 100%; filter: drop-shadow(1px 2px 0 var(--ab-ink));
+}
+.ab[data-ae="xerox--classic"] .xrt-band {
+  position: relative; isolation: isolate; flex: none; display: flex; align-items: baseline; justify-content: space-between; gap: 10px; padding: 4px 12px 3px; color: var(--ab-canvas); white-space: nowrap; overflow: hidden;
+}
+.ab[data-ae="xerox--classic"] .xrt-band::before { content: ""; position: absolute; inset: 0; z-index: -1; background: var(--ab-ink); filter: url(#xrx-toner); }
+.ab[data-ae="xerox--classic"] .xrt-band b { font: var(--ab-hw, 900) 22px/1 var(--ab-font-h); text-transform: uppercase; letter-spacing: calc(0.03em * var(--ab-tr, 1)); }
+.ab[data-ae="xerox--classic"] .xrt-band i { font: 400 10px/1 var(--ab-font-b); font-style: normal; text-transform: uppercase; letter-spacing: 0.08em; }
+.ab[data-ae="xerox--classic"] .xrt-tabs { flex: 1; min-height: 0; display: flex; }
+.ab[data-ae="xerox--classic"] .xrt-tab { flex: 1 1 0; min-width: 0; display: flex; align-items: center; justify-content: center; padding: 4px 0; background: var(--ab-scrap); border-left: 1px dashed var(--ab-ink); overflow: hidden; }
+.ab[data-ae="xerox--classic"] .xrt-tab:first-child { border-left: 0; }
+.ab[data-ae="xerox--classic"] .xrt-tab span {
+  display: block; max-height: 100%; writing-mode: vertical-rl; transform: rotate(180deg); overflow: hidden;
+  font: 400 10px/1.25 var(--ab-font-b); text-transform: uppercase; letter-spacing: 0.08em; color: var(--ab-ink); text-align: center;
+}
+/* the third tab is gone: only a stub with a torn zigzag edge is left under the band */
+.ab[data-ae="xerox--classic"] .xrt-tab.is-torn { border-left: 0; background: var(--ab-scrap); clip-path: url(#xrx-torn); }
+
+/* palette: toner patches */
+.ab[data-ae="xerox--classic"] .ab-chip { position: relative; overflow: hidden; border-radius: 0; box-shadow: inset 0 0 0 2.5px var(--ab-ink); filter: url(#xrx-copy); margin-bottom: 14px; transform: rotate(-1deg); }
+/* the chips are copied too: the same clustered dust, denser */
+.ab[data-ae="xerox--classic"] .ab-chip::after { content: ""; position: absolute; inset: 0; background: var(--xr-speck) 30% 40% / 320px 320px; mix-blend-mode: var(--ab-blend, multiply); }
+.ab[data-ae="xerox--classic"] .ab-swatch:nth-child(2) .ab-chip { transform: rotate(0.8deg); }
+.ab[data-ae="xerox--classic"] .ab-swatch:nth-child(3) .ab-chip { transform: rotate(-0.5deg); }
+.ab[data-ae="xerox--classic"] .ab-swatch:nth-child(4) .ab-chip { transform: rotate(1.1deg); }
+.ab[data-ae="xerox--classic"] .ab-swatch:nth-child(5) .ab-chip { transform: rotate(-0.9deg); }
+.ab[data-ae="xerox--classic"] .ab-sw-role { font-size: 12px; letter-spacing: 0.1em; }
+.ab[data-ae="xerox--classic"] .ab-sw-job, .ab[data-ae="xerox--classic"] .ab-sw-hex { color: var(--ab-ink); }
+.ab[data-ae="xerox--classic"] .ab-sw-job { color: var(--ab-muted); }
+
+/* type recommendations: specimen sheets under a heavy toner rule */
+.ab[data-ae="xerox--classic"] .ab-type-col { position: relative; padding-top: 16px; border-top: 0; }
+.ab[data-ae="xerox--classic"] .ab-type-col::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 4px; background: var(--ab-ink); filter: url(#xrx-rule); }
+.ab[data-ae="xerox--classic"] .ab-type-role { color: var(--ab-ink); font-weight: 700; letter-spacing: 0.16em; }
+.ab[data-ae="xerox--classic"] .ab-type-class { color: var(--ab-muted); }
+.ab[data-ae="xerox--classic"] .ab-fit { padding: 0 7px; border: 2px solid var(--ab-ink); border-radius: 0; background: none; color: var(--ab-ink); font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; transform: rotate(-2.5deg); }
+.ab[data-ae="xerox--classic"] .ab-fit[data-fit="match"] { background: none; border-color: var(--ab-ink); color: var(--ab-ink); }
+.ab[data-ae="xerox--classic"] .ab-fit[data-fit="consider"] { border-style: dashed; }
+.ab[data-ae="xerox--classic"] .ab-fit[data-fit="avoid"] { background: var(--ab-ink); color: var(--ab-canvas); }
+.ab[data-ae="xerox--classic"] .ab-type-avoid { text-decoration: line-through; text-decoration-thickness: 2px; text-decoration-color: var(--ab-toner-soft); }
+.ab[data-ae="xerox--classic"] .ab-type-k { display: inline-block; text-decoration: none; font-weight: 700; letter-spacing: 0.16em; }
+.ab[data-ae="xerox--classic"] .ab-type-why { color: var(--ab-ink); }
+.ab[data-ae="xerox--classic"] .ab-type-apply {
+  border: 2.5px dashed var(--ab-ink); border-radius: 0; background: none; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; transform: rotate(0.6deg);
+}
+.ab[data-ae="xerox--classic"] .ab-type-apply:hover { background: var(--ab-hi); }
+
+/* cards: lighter paper scraps, a 1px toner shadow line, tape */
+.ab[data-ae="xerox--classic"] .ab-card, .ab[data-ae="xerox--classic"] .ab-panel {
+  position: relative; isolation: isolate; border: 0; border-radius: 0; background: none;
+  padding: clamp(22px, 3cqw, 30px) clamp(18px, 2.8cqw, 26px) clamp(22px, 3cqw, 30px);
+}
+.ab[data-ae="xerox--classic"] .ab-card { transform: rotate(-0.5deg); }
+.ab[data-ae="xerox--classic"] .ab-panel { transform: rotate(0.45deg); }
+.ab[data-ae="xerox--classic"] .ab-card::after, .ab[data-ae="xerox--classic"] .ab-panel::after {
+  content: ""; position: absolute; inset: 0; z-index: -1; background: var(--ab-scrap); filter: url(#xrx-edge) drop-shadow(1px 2px 0 var(--xr-toner));
+}
+/* scraps are paper with toner type in both modes (dark mode pastes white paper on the black field);
+   the 02 panel is copied onto a second, coloured paper stock */
+.ab[data-ae="xerox--classic"] .ab-card, .ab[data-ae="xerox--classic"] .xrt { --ab-ink: var(--xr-toner); --ab-canvas: var(--xr-paper); --ab-muted: var(--xr-paper-muted); --ab-toner-soft: color-mix(in srgb, var(--xr-toner) 50%, transparent); color: var(--xr-toner); }
+.ab[data-ae="xerox--classic"] .ab-panel { --ab-ink: var(--xr-toner); --ab-canvas: var(--xr-stock-b); --ab-muted: var(--xr-stock-b-muted); --ab-toner-soft: color-mix(in srgb, var(--xr-toner) 50%, transparent); color: var(--xr-toner); }
+.ab[data-ae="xerox--classic"] .ab-panel::after { background: var(--xr-stock-b); }
+.ab[data-ae="xerox--classic"] .ab-card::before, .ab[data-ae="xerox--classic"] .ab-panel::before {
+  content: ""; position: absolute; z-index: 2; top: -9px; width: 50px; height: 18px; pointer-events: none;
+  background: var(--ab-tape); box-shadow: inset 0 0 0 1px var(--ab-tape-edge);
+}
+.ab[data-ae="xerox--classic"] .ab-card::before { left: -16px; transform: rotate(-33deg); }
+.ab[data-ae="xerox--classic"] .ab-panel::before { right: -16px; transform: rotate(31deg); }
+
+.ab[data-ae="xerox--classic"] .ab-seg { gap: 8px; padding: 0; border-radius: 0; background: none; }
+.ab[data-ae="xerox--classic"] .ab-seg-btn {
+  min-height: 38px; border: 2px dashed var(--ab-toner-soft); border-radius: 0; color: var(--ab-ink); font-weight: 700; font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase;
+}
+.ab[data-ae="xerox--classic"] .ab-seg-btn[aria-pressed="true"] { border: 2px solid var(--ab-ink); background: var(--ab-ink); color: var(--ab-canvas); box-shadow: 4px 4px 0 var(--ab-primary); transform: rotate(-1deg); }
+.ab[data-ae="xerox--classic"] .ab-card-title { font-weight: var(--ab-hw, 900); text-transform: uppercase; letter-spacing: calc(0.02em * var(--ab-tr, 1)); font-size: clamp(24px, 3.1cqw, 32px); line-height: 1; filter: url(#xrx-lite); }
+.ab[data-ae="xerox--classic"] .ab-card-body { color: var(--ab-ink); font-size: 13.5px; }
+/* the main action: a black toner block with the primary printed off-register behind it */
+.ab[data-ae="xerox--classic"] .ab-cta {
+  position: relative; isolation: isolate; width: calc(100% - 7px); margin: 0 7px 7px 0; padding: 14px 16px; border-radius: 0; background: none; color: var(--ab-canvas);
+  font-weight: 700; font-size: 13px; letter-spacing: 0.16em; text-transform: uppercase;
+}
+.ab[data-ae="xerox--classic"] .ab-cta::before { content: ""; position: absolute; inset: 0; z-index: -1; background: var(--ab-ink); filter: url(#xrx-toner); transition: transform 0.1s; }
+.ab[data-ae="xerox--classic"] .ab-cta::after { content: ""; position: absolute; inset: 0; z-index: -2; background: var(--ab-primary); transform: translate(7px, 7px) rotate(0.6deg); transition: transform 0.1s; }
+.ab[data-ae="xerox--classic"] .ab-cta:hover::after, .ab[data-ae="xerox--classic"] .ab-cta.is-hover::after { transform: translate(10px, 10px) rotate(0.9deg); }
+.ab[data-ae="xerox--classic"] .ab-cta:active::after, .ab[data-ae="xerox--classic"] .ab-cta.is-pressed::after { transform: translate(2px, 2px); }
+.ab[data-ae="xerox--classic"] .ab-cta:active::before, .ab[data-ae="xerox--classic"] .ab-cta.is-pressed::before { transform: translate(3px, 3px); }
+.ab[data-ae="xerox--classic"] .ab-cta-arrow::before { content: "→"; font-size: 18px; line-height: 1; }
+
+/* 02 copy: a typewritten form field, a ticked checkbox, three generations of the same image */
+.ab[data-ae="xerox--classic"] .ab-fieldlabel { font-size: 10.5px; }
+.ab[data-ae="xerox--classic"] .ab-input { border: 0; border-bottom: 3px solid var(--ab-ink); border-radius: 0; padding: 9px 4px; font-weight: 700; letter-spacing: 0.02em; transition: background 0.1s; }
+.ab[data-ae="xerox--classic"] .ab-input:focus { background: var(--ab-hi); }
+.ab[data-ae="xerox--classic"] .ab-toggle { font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; font-size: 12px; }
+.ab[data-ae="xerox--classic"] .ab-switch { width: 30px; height: 30px; border: 3px solid var(--ab-ink); border-radius: 0; background: none; transition: background 0.1s; }
+.ab[data-ae="xerox--classic"] .ab-switch::before {
+  left: 2px; top: 2px; width: 20px; height: 20px; border-radius: 0; transform: none; transition: none; opacity: 0;
+  background: linear-gradient(45deg, transparent 40%, var(--ab-ink) 40% 60%, transparent 60%), linear-gradient(-45deg, transparent 40%, var(--ab-ink) 40% 60%, transparent 60%);
+}
+.ab[data-ae="xerox--classic"] .ab-switch:checked { background: var(--ab-primary); }
+.ab[data-ae="xerox--classic"] .ab-switch:checked::before { opacity: 1; transform: none; }
+.ab[data-ae="xerox--classic"] .ab-status { color: var(--ab-ink); font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; }
+.ab[data-ae="xerox--classic"] .ab-status::before { content: "▸ "; }
+.ab[data-ae="xerox--classic"] .ab-states { margin-top: 26px; gap: 18px; }
+.ab[data-ae="xerox--classic"] .ab-disc { width: 62px; height: 62px; border: 2.5px solid var(--ab-ink); border-radius: 0; background: linear-gradient(135deg, var(--ab-ink) 0%, var(--ab-canvas) 100%); transform: rotate(-1deg); }
+.ab[data-ae="xerox--classic"] .ab-disc[data-s="1"] { filter: url(#xrx-g2); transform: rotate(0.9deg); }
+.ab[data-ae="xerox--classic"] .ab-disc[data-s="2"] { filter: url(#xrx-g5); transform: rotate(-1.6deg); }
+.ab[data-ae="xerox--classic"] .ab-state { color: var(--ab-ink); font-size: 10px; letter-spacing: 0.12em; }
+
+/* 03 in use: typed roster, label-maker statuses, hatched bars */
+.ab[data-ae="xerox--classic"] .ab-list { position: relative; padding-top: 4px; }
+.ab[data-ae="xerox--classic"] .ab-list::before { content: ""; position: absolute; left: 0; right: 0; top: -2px; height: 4px; background: var(--ab-ink); filter: url(#xrx-rule); }
+.ab[data-ae="xerox--classic"] .ab-row { grid-template-columns: 7ch minmax(0, 1fr) auto minmax(60px, 150px) 4.5ch; counter-increment: xrr; padding: 13px 4px; border-top: 0; border-bottom: 2px dashed var(--ab-toner-soft); }
+.ab[data-ae="xerox--classic"] .ab-list { counter-reset: xrr; }
+.ab[data-ae="xerox--classic"] .ab-row:last-child { border-bottom: 0; }
+.ab[data-ae="xerox--classic"] .ab-row-n { font-size: 0; white-space: nowrap; }
+.ab[data-ae="xerox--classic"] .ab-row-n::before { content: "No." counter(xrr, decimal-leading-zero); font-size: 11px; font-weight: 700; color: var(--ab-ink); }
+.ab[data-ae="xerox--classic"] .ab-row-name { font-family: var(--ab-font-h); font-weight: var(--ab-hw, 900); font-size: 17px; letter-spacing: calc(0.03em * var(--ab-tr, 1)); text-transform: uppercase; }
+.ab[data-ae="xerox--classic"] .ab-row-status { padding: 2px 9px; border-radius: 0; background: var(--ab-ink); color: var(--ab-canvas); font-size: 10px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; transform: rotate(-1.5deg); }
+.ab[data-ae="xerox--classic"] .ab-row:nth-child(2) .ab-row-status { transform: rotate(1.2deg); }
+.ab[data-ae="xerox--classic"] .ab-row-bar { height: 12px; border: 2px solid var(--ab-ink); border-radius: 0; background: var(--xr-paper); }
+.ab[data-ae="xerox--classic"] .ab-row-bar i { background: repeating-linear-gradient(45deg, var(--xr-toner) 0 2px, transparent 2px 5px); border-right: 3px solid var(--xr-toner); border-radius: 0; }
+.ab[data-ae="xerox--classic"] .ab-row-pct { font-weight: 700; }
+
+/* footer */
+.ab[data-ae="xerox--classic"] .ab-foot { border-top: 2.5px dashed var(--ab-ink); color: var(--ab-ink); letter-spacing: 0.04em; }
+.ab[data-ae="xerox--classic"] .ab-motto { font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; }
+.ab[data-ae="xerox--classic"] .ab-foot .ab-infl { color: var(--ab-muted); }
+.ab[data-ae="xerox--classic"] .ab-dot { border-radius: 0; width: 9px; height: 9px; background: var(--ab-hi); box-shadow: 0 0 0 2px var(--ab-ink); }
+
+.ab[data-ae="xerox--classic"] .ab-seg-btn:focus-visible, .ab[data-ae="xerox--classic"] .ab-cta:focus-visible, .ab[data-ae="xerox--classic"] .ab-switch:focus-visible, .ab[data-ae="xerox--classic"] .ab-type-apply:focus-visible { outline: 3px solid var(--ab-ink); outline-offset: 3px; }
+
+@container ab (max-width: 600px) {
+  .ab[data-ae="xerox--classic"][data-hero="poster"] .ab-hero { padding: 26px 0 26px; gap: 30px; }
+  .ab[data-ae="xerox--classic"][data-hero="poster"] .ab-art { position: relative; right: auto; bottom: auto; width: 100%; max-width: 330px; justify-self: center; margin-right: 0; }
+  .ab[data-ae="xerox--classic"] .ab-subcopy { max-width: none; }
+  .ab[data-ae="xerox--classic"] .xrt { display: none; }
+  .ab[data-ae="xerox--classic"] .ab-tag { font-size: 9px; padding: 3px 7px; letter-spacing: 0.08em; }
+  .ab[data-ae="xerox--classic"] .ab-row { grid-template-columns: 6ch minmax(0, 1fr) 4.5ch; }
+  .ab[data-ae="xerox--classic"] .ab-row-n { grid-row: 1 / span 2; align-self: start; }
+  .ab[data-ae="xerox--classic"] .ab-row-name { font-size: 16px; }
+  .ab[data-ae="xerox--classic"] .ab-states { gap: 10px; }
+  .ab[data-ae="xerox--classic"] .ab-disc { width: 52px; height: 52px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ab[data-ae="xerox--classic"] .ab-cta::before, .ab[data-ae="xerox--classic"] .ab-cta::after, .ab[data-ae="xerox--classic"] .ab-input { transition: none; }
+}
+
+/* Brand deck cover (CAO-4 A1): the headline needs the room; the art plate sits lower and narrower, and the tear-off strip stays on the board. */
+.ab[data-ae="xerox--classic"].ab-slide[data-slide="cover"] .ab-art { margin-top: clamp(150px, 22cqw, 230px); max-width: 38%; }
+.ab[data-ae="xerox--classic"].ab-slide .xrt { display: none; }

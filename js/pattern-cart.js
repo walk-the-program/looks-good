@@ -119,7 +119,7 @@ const PatternCart = (function () {
     syncLabels();
     if (!isOpen) return;
     const c = state.colors || {};
-    const sig = items().map(PatternPins.fullSig).join('\n') + '|' + [c.primary, c.secondary, c.accent, c.neutralDark, c.neutralLight, state.aesthetic, state.bgMode].join(',');
+    const sig = items().map(PatternPins.fullSig).join('\n') + '|' + [c.primary, c.secondary, c.accent, c.neutralDark, c.neutralLight, state.aesthetic, state.aestheticVersion, state.bgMode].join(',');
     if (sig === lastSig) return;
     lastSig = sig;
     renderTray();

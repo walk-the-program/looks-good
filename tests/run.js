@@ -118,7 +118,9 @@ for (const [name, rec] of Object.entries(blendCases)) {
 }
 // Kill switch: BLEND_ENABLED = false ignores the blend everywhere but keeps saved blends.
 {
-  const off = vm.createContext({ console, AESTHETICS: [{ key: 'soft-form', name: 'Soft Form' }, { key: 'raw-brutalist', name: 'Raw' }], aestheticByKey: k => off.AESTHETICS.find(a => a.key === k) || off.AESTHETICS[0] });
+  const off = vm.createContext({ console });
+  vm.runInContext(fs.readFileSync(path.join(root, 'js/aesthetics/registry.js'), 'utf8')
+    + `\nregisterAesthetic({ key: 'soft-form', name: 'Soft Form', order: 1 }); registerAesthetic({ key: 'raw-brutalist', name: 'Raw', order: 2 });`, off, { filename: 'js/aesthetics/registry.js' });
   for (const f of ['js/data.js', 'js/color.js', 'js/blend.js', 'js/persistence.js']) {
     let src = fs.readFileSync(path.join(root, f), 'utf8');
     if (f === 'js/blend.js') {
@@ -468,6 +470,62 @@ check('paste: empty text', run(`extractColors('').length`) === 0, 'found colors 
 {
   const r = run(`(() => { const s = freshState(); s.pureBg = true; applySavedSessionToState({ aestheticKey: 'soft-form', bgMode: 'light' }, s); return s.pureBg; })()`);
   check('pureBg: an old brand without the field loads off', r === false, String(r));
+}
+
+/* ---- Classic | Current (aestheticVersion) ---- */
+
+// serialize/apply: default current, classic survives a save and reload, anything else loads current.
+{
+  const r = run(`(() => {
+    const d = freshState();                                     // no aestheticVersion at all
+    const s = freshState(); s.aestheticVersion = 'classic';
+    const saved = JSON.parse(JSON.stringify(serializeState(s)));
+    const t = freshState(); t.aestheticVersion = 'current';
+    applySavedSessionToState(saved, t);
+    const junk = freshState(); junk.aestheticVersion = 'classic';
+    applySavedSessionToState({ aestheticKey: 'soft-form', bgMode: 'light', aestheticVersion: 'ancient' }, junk);
+    const old = freshState(); old.aestheticVersion = 'classic';
+    applySavedSessionToState({ aestheticKey: 'soft-form', bgMode: 'light' }, old);
+    const obj = freshState(); obj.aestheticVersion = 'classic';
+    applySavedSessionToState({ aestheticKey: 'soft-form', bgMode: 'light', aestheticVersion: { classic: true } }, obj);
+    return [serializeState(d).aestheticVersion, saved.aestheticVersion, t.aestheticVersion, junk.aestheticVersion, old.aestheticVersion, obj.aestheticVersion];
+  })()`);
+  check('aestheticVersion: default current; classic round-trips; invalid and missing load current',
+    r.join() === 'current,classic,classic,current,current,current', JSON.stringify(r));
+}
+// The resolver: classic defs stay out of AESTHETICS, resolve only when asked for and available.
+{
+  const reg = vm.createContext({ console });
+  vm.runInContext(fs.readFileSync(path.join(root, 'js/aesthetics/registry.js'), 'utf8'), reg, { filename: 'js/aesthetics/registry.js' });
+  const r = vm.runInContext(`(() => {
+    registerAesthetic({ key: 'a', name: 'A', order: 1 });
+    registerAesthetic({ key: 'b', name: 'B', order: 2 });
+    registerClassicAesthetic('a', { key: 'a', name: 'A old', order: 1 });
+    const st = v => ({ aesthetic: 'a', aestheticVersion: v });
+    return {
+      listed: AESTHETICS.map(x => x.key).join(),
+      classic: resolveAestheticDef(st('classic')).key,
+      classicOf: resolveAestheticDef(st('classic')).classicOf,
+      current: resolveAestheticDef(st('current')).key,
+      unset: resolveAestheticDef({ aesthetic: 'a' }).key,
+      noClassic: resolveAestheticDef({ aesthetic: 'b', aestheticVersion: 'classic' }).key,
+      byKey: aestheticByKey('a--classic').name,
+      unknown: aestheticByKey('zzz--classic').key,
+      has: hasClassicAesthetic('a') && !hasClassicAesthetic('b'),
+      base: aestheticBaseKey('a--classic') + aestheticBaseKey('b'),
+    };
+  })()`, reg);
+  check('classic: registered outside AESTHETICS (picker never lists it)', r.listed === 'a,b', JSON.stringify(r));
+  check('classic: resolves only when asked for and available',
+    r.classic === 'a--classic' && r.classicOf === 'a' && r.current === 'a' && r.unset === 'a' && r.noClassic === 'b' && r.has, JSON.stringify(r));
+  check('classic: aestheticByKey finds it; unknown falls back; base key strips the suffix',
+    r.byKey === 'A old' && r.unknown === 'a' && r.base === 'ab', JSON.stringify(r));
+}
+// Every generated classic file is current with the tag (re-run dev/make-classic.js when this fails).
+{
+  const { spawnSync } = require('child_process');
+  const gen = spawnSync(process.execPath, [path.join(root, 'dev/make-classic.js'), '--check'], { cwd: root, encoding: 'utf8', env: Object.assign({}, process.env, { ELECTRON_RUN_AS_NODE: '1' }) });
+  check('classic: generated files match r6-0-baseline and index.html lists them', gen.status === 0, (gen.stdout + gen.stderr).trim().slice(0, 300));
 }
 
 // Not run here (they need a real DOM): that blended tokens(t, state) see the view's fonts end to end, and the

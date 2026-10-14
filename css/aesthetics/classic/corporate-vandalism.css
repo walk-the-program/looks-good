@@ -1,0 +1,243 @@
+/* ---------------------------------------------------------------------
+   27 Corporate Vandalism — official, hijacked, deadpan. Every selector is scoped
+   under .ab[data-ae="corporate-vandalism--classic"]. A flat, square, tidy procurement-software
+   shell (white or #000, 1px ink borders, no radius, no shadow, no rotation) with a FIXED
+   vandal layer: black redaction bars, a hazard-red warning label, a safety-yellow
+   "!!!" chip, a mono receipt. One intrusion per screen. Vars from tokens():
+   --ab-hazard, --ab-safety, --cv-paper (document paper), --cv-bd (1px border),
+   --cv-rest (resting index grey), --cv-receipt (white thermal paper in both modes), --cv-form (neutral grey form panel),
+   --cv-hw (heading weight), --cv-shell / --cv-on-shell / --cv-ul (the official shell: primary, or ink with a primary underline
+   when the primary sits next to the hazard red). The second party: literal quoted labels on the UI parts, a zip-tied hazard tag
+   on the notice, bureaucratic redaction, an MSCHF mono index.
+   Hooks: hero 'split', highlight 'custom', states 'button', label face = mono.
+------------------------------------------------------------------------ */
+
+.ab[data-ae="corporate-vandalism--classic"] { border-radius: 0; --cv-mono: ui-monospace, "SF Mono", Menlo, monospace; }
+
+/* the official notice strip: FIXED safety yellow (a vandal colour, never the client accent), one line above the header (board only) */
+.ab[data-ae="corporate-vandalism--classic"]:not(.ab-slide) > .ab-in::before {
+  content: "Notice: this document has been reviewed. Please review it again.";
+  display: block; margin: calc(var(--ab-pad) * -1) calc(var(--ab-pad) * -1) var(--ab-pad); padding: 6px var(--ab-pad);
+  background: var(--ab-safety); color: #000;
+  font: 600 10px/1.5 var(--cv-mono); letter-spacing: 0.08em; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+
+/* header: wordmark, mono tag, safety chip */
+.ab[data-ae="corporate-vandalism--classic"] .ab-brand { font-weight: var(--cv-hw, 700); letter-spacing: calc(-0.03em * var(--ab-tr, 1)); }
+.ab[data-ae="corporate-vandalism--classic"] .ab-mark { width: 24px; height: 24px; border-radius: 0; font-size: 13px; font-weight: var(--cv-hw, 700); }
+.ab[data-ae="corporate-vandalism--classic"] .ab-tag { font-size: 10px; letter-spacing: 0.1em; color: var(--ab-muted); }
+.ab[data-ae="corporate-vandalism--classic"] .ab-tag::after {
+  content: "!!!"; display: inline-block; margin-left: 10px; padding: 1px 5px; background: var(--ab-safety); color: #000; font-weight: 700; letter-spacing: 0.04em; vertical-align: 1px;
+}
+.ab[data-ae="corporate-vandalism--classic"] .ab-tag b { color: var(--ab-ink); font-weight: 600; }
+
+/* dividers: a 1px line with a registration tick at each end */
+.ab[data-ae="corporate-vandalism--classic"] .ab-rule {
+  height: 11px; background:
+    linear-gradient(var(--cv-bd), var(--cv-bd)) 0 50% / 100% 1px no-repeat,
+    linear-gradient(var(--cv-bd), var(--cv-bd)) 5px 50% / 1px 11px no-repeat,
+    linear-gradient(var(--cv-bd), var(--cv-bd)) calc(100% - 5px) 50% / 1px 11px no-repeat;
+}
+
+/* labels: mono caps. Quotation marks are the Off-White literal labels (a part named as itself: "BUTTON", "TEXT FIELD" ...)
+   pinned above the part, plus the deck material slide's list items; nothing is scare-quoted. */
+.ab[data-ae="corporate-vandalism--classic"] .ab-seg::after, .ab[data-ae="corporate-vandalism--classic"] .ab-toggle::after, .ab[data-ae="corporate-vandalism--classic"] .ab-cta:not(.ab-state-ctl)::after, .ab[data-ae="corporate-vandalism--classic"] .ab-fieldlabel::after, .ab[data-ae="corporate-vandalism--classic"] .ab-list::before {
+  font: 600 9px/1 var(--cv-mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--ab-ink); white-space: nowrap; pointer-events: none;
+}
+.ab[data-ae="corporate-vandalism--classic"] .ab-seg { position: relative; margin-top: 14px; }
+.ab[data-ae="corporate-vandalism--classic"] .ab-seg::after { content: '"TABS"'; position: absolute; left: 0; top: -14px; }
+.ab[data-ae="corporate-vandalism--classic"] .ab-cta:not(.ab-state-ctl) { position: relative; overflow: visible; }
+.ab[data-ae="corporate-vandalism--classic"] .ab-cta:not(.ab-state-ctl)::after { content: '"BUTTON"'; position: absolute; left: -2px; top: -15px; }
+.ab[data-ae="corporate-vandalism--classic"] .ab-fieldlabel { display: flex; justify-content: space-between; gap: 8px; }
+.ab[data-ae="corporate-vandalism--classic"] .ab-fieldlabel::after { content: '"TEXT FIELD"'; }
+.ab[data-ae="corporate-vandalism--classic"] .ab-toggle { position: relative; margin-top: 16px; }
+.ab[data-ae="corporate-vandalism--classic"] .ab-toggle::after { content: '"CHECKBOX"'; position: absolute; left: 0; top: -15px; }
+.ab[data-ae="corporate-vandalism--classic"] .ab-list::before { content: '"PROJECTS"'; display: block; margin-bottom: 8px; }
+.ab[data-ae="corporate-vandalism--classic"]:not(.ab-slide) .ab-headline::before, .ab[data-ae="corporate-vandalism--classic"].ab-slide[data-slide="cover"] .ab-headline::before {
+  content: '"HEADLINE"'; display: block; margin-bottom: 14px; font: 600 9px/1 var(--cv-mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--ab-ink); font-weight: 600;
+}
+.ab[data-ae="corporate-vandalism--classic"] .ab-label { font-size: 11px; letter-spacing: 0.08em; color: var(--ab-ink); text-transform: uppercase; }
+.ab[data-ae="corporate-vandalism--classic"] .ab-label:last-child:not(:first-child) { color: var(--ab-muted); }
+.ab[data-ae="corporate-vandalism--classic"] .ab-n::after { content: "  "; }
+.ab[data-ae="corporate-vandalism--classic"] .ab-n { color: var(--ab-muted); font-size: 10px; }
+.ab[data-ae="corporate-vandalism--classic"] .ab-deck-mat .ab-label > span:not(.ab-n)::before, .ab[data-ae="corporate-vandalism--classic"] .ab-deck-mat .ab-label > span:not(.ab-n)::after { content: '"'; }
+
+/* hero: giant sentence-case headline against 10px labels, the notice on the right */
+.ab[data-ae="corporate-vandalism--classic"] .ab-hero { grid-template-columns: minmax(0, 1.18fr) minmax(0, 1fr); align-items: start; gap: clamp(18px, 3.4cqw, 38px); padding: clamp(26px, 4.4cqw, 50px) 0; }
+.ab[data-ae="corporate-vandalism--classic"] .ab-kicker { margin-bottom: 18px !important; font-size: 10.5px; letter-spacing: 0.1em; color: var(--ab-muted); }
+.ab[data-ae="corporate-vandalism--classic"] .ab-kicker::before { content: "[ ] "; white-space: pre; color: var(--ab-ink); }
+.ab[data-ae="corporate-vandalism--classic"] .ab-headline {
+  font-weight: var(--cv-hw, 700); letter-spacing: calc(-0.02em * var(--ab-tr, 1)); line-height: 0.98; text-wrap: wrap;
+}
+.ab[data-ae="corporate-vandalism--classic"] .ab-hl { color: var(--ab-ink); background: none; padding: 0; margin: 0; }
+.ab[data-ae="corporate-vandalism--classic"] .ab-subcopy { max-width: 28em; font-size: clamp(13px, 1.45cqw, 15px); }
+.ab[data-ae="corporate-vandalism--classic"] .ab-sub-lead { color: var(--ab-ink); font-weight: 600; }
+
+/* art: the hijacked notice */
+.ab[data-ae="corporate-vandalism--classic"] .ab-art { max-width: none; aspect-ratio: auto; justify-self: stretch; container-type: inline-size; }
+.ab[data-ae="corporate-vandalism--classic"] .cva { display: grid; grid-template-columns: minmax(0, 1fr) 37%; gap: 12px; align-items: start; font-family: var(--cv-mono); color: #000; }
+.ab[data-ae="corporate-vandalism--classic"] .cva-doc { position: relative; background: var(--cv-paper); border: 1px solid var(--cv-bd); }
+/* the applied second party: a hazard-red zip-tie tag physically overlapping the notice's top corner (no rotation) */
+.ab[data-ae="corporate-vandalism--classic"] .cva-tag { position: absolute; z-index: 3; right: -9px; top: -10px; padding: 3px 7px; background: var(--ab-hazard); color: #fff; font: 700 9px/1.2 var(--cv-mono); letter-spacing: 0.06em; white-space: nowrap; }
+.ab[data-ae="corporate-vandalism--classic"] .cva-tag::before { content: ""; position: absolute; right: 100%; top: 50%; width: 26px; height: 1px; background: #000; }
+.ab[data-ae="corporate-vandalism--classic"] .cva-class { margin: 0 0 9px !important; padding-bottom: 7px; border-bottom: 1px solid #000; text-align: center; font: 700 7.5px/1.3 var(--cv-mono); letter-spacing: 0.1em; text-transform: uppercase; color: #000; }
+.ab[data-ae="corporate-vandalism--classic"] .cva-rr { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 7px; align-items: start; margin: 3px 0; }
+.ab[data-ae="corporate-vandalism--classic"] .cva-rr i { padding-top: 0.2em; font: 8px/1.3 var(--cv-mono); color: #4a4a4a; white-space: nowrap; }
+.ab[data-ae="corporate-vandalism--classic"] .cva-rx { background: #000; color: transparent; font: 10.5px/1.5 var(--cv-mono); user-select: none; padding: 1px 0; }
+.ab[data-ae="corporate-vandalism--classic"] .cva-rx1 { white-space: nowrap; overflow: hidden; }
+.ab[data-ae="corporate-vandalism--classic"] .cva-bar { display: flex; align-items: center; gap: 8px; padding: 7px 10px; background: var(--cv-shell); color: var(--cv-on-shell); font: 600 9.5px/1.2 var(--cv-mono); letter-spacing: 0.1em; text-transform: uppercase; }
+.ab[data-ae="corporate-vandalism--classic"] .cva-bar i { flex: none; width: 16px; height: 16px; display: grid; place-items: center; background: var(--cv-on-shell); color: var(--cv-shell); font: 700 10px/1 var(--ab-font-h); }
+.ab[data-ae="corporate-vandalism--classic"] .cva-bar b { flex: 1; min-width: 0; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ab[data-ae="corporate-vandalism--classic"] .cva-bar span { flex: none; opacity: 0.85; }
+.ab[data-ae="corporate-vandalism--classic"] .cva-body { padding: 14px 14px 14px; }
+.ab[data-ae="corporate-vandalism--classic"] .cva-title { font: var(--cv-hw, 700) 17px/1.15 var(--ab-font-h); letter-spacing: calc(-0.03em * var(--ab-tr, 1)); margin-bottom: 3px; }
+.ab[data-ae="corporate-vandalism--classic"] .cva-ref { font: 9px/1.4 var(--cv-mono); color: #4a4a4a; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 12px; }
+.ab[data-ae="corporate-vandalism--classic"] .cva-fine { font: 10.5px/1.8 var(--cv-mono); color: #000; }
+.ab[data-ae="corporate-vandalism--classic"] .cva-r { background: #000; color: transparent; position: relative; top: 1px; -webkit-box-decoration-break: clone; box-decoration-break: clone; user-select: none; }
+.ab[data-ae="corporate-vandalism--classic"] .cva-warn {
+  display: inline-flex; align-items: center; gap: 7px; margin-top: 13px; padding: 5px 10px;
+  background: var(--ab-hazard); color: #fff; outline: 1px solid #fff; outline-offset: -3px;
+  font: 700 9.5px/1.3 var(--cv-mono); letter-spacing: 0.06em; text-transform: uppercase;
+}
+.ab[data-ae="corporate-vandalism--classic"] .cva-warn svg { flex: none; }
+.ab[data-ae="corporate-vandalism--classic"] .cva-sign { display: flex; align-items: flex-end; gap: 8px; margin-top: 14px; font: 9px/1 var(--cv-mono); color: #4a4a4a; text-transform: uppercase; letter-spacing: 0.06em; }
+.ab[data-ae="corporate-vandalism--classic"] .cva-sign i { flex: 1; height: 12px; border-bottom: 1px solid #000; }
+/* receipt: dashed rules, TOTAL, barcode, zigzag edge */
+/* the wrapper carries the hairline shadow: the zigzag tear is a mask, and white paper on a white page needs it to read */
+.ab[data-ae="corporate-vandalism--classic"] .cva-rw { margin-top: 26px; filter: drop-shadow(0 1px 1.5px rgba(0, 0, 0, 0.3)); }
+.ab[data-ae="corporate-vandalism--classic"] .cva-rcpt {
+  padding: 16px 11px 18px; background: var(--cv-receipt); font: 9.5px/1.45 var(--cv-mono); color: #1a1a1a; text-transform: uppercase;
+  -webkit-mask: conic-gradient(from 135deg at top, #0000, #000 1deg 89deg, #0000 90deg) 50% 0 / 10px 52% repeat-x, conic-gradient(from -45deg at bottom, #0000, #000 1deg 89deg, #0000 90deg) 50% 100% / 10px 52% repeat-x;
+  mask: conic-gradient(from 135deg at top, #0000, #000 1deg 89deg, #0000 90deg) 50% 0 / 10px 52% repeat-x, conic-gradient(from -45deg at bottom, #0000, #000 1deg 89deg, #0000 90deg) 50% 100% / 10px 52% repeat-x;
+}
+.ab[data-ae="corporate-vandalism--classic"] .cva-rh { margin-bottom: 4px !important; font-weight: 700; letter-spacing: 0.14em; text-align: center; }
+.ab[data-ae="corporate-vandalism--classic"] .cva-rl { display: flex; justify-content: space-between; gap: 6px; padding: 3px 0; border-top: 1px dashed #1a1a1a; }
+.ab[data-ae="corporate-vandalism--classic"] .cva-rl span { min-width: 0; }
+.ab[data-ae="corporate-vandalism--classic"] .cva-rl b { font-weight: 400; flex: none; }
+.ab[data-ae="corporate-vandalism--classic"] .cva-rt { border-top: 1px solid #1a1a1a; font-weight: 700; }
+.ab[data-ae="corporate-vandalism--classic"] .cva-rt b { font-weight: 700; }
+.ab[data-ae="corporate-vandalism--classic"] .cva-rn { margin-top: 6px !important; padding-top: 5px; border-top: 1px dashed #1a1a1a; font-size: 8.5px; letter-spacing: 0.04em; }
+.ab[data-ae="corporate-vandalism--classic"] .cva-bc { display: block; width: 100%; height: 22px; margin-top: 10px; }
+@container (max-width: 420px) {
+  .ab[data-ae="corporate-vandalism--classic"] .cva { grid-template-columns: minmax(0, 1fr); gap: 10px; }
+  .ab[data-ae="corporate-vandalism--classic"] .cva-rw { margin-top: 0; }
+}
+
+/* palette: square swatches with registration crosses at two corners */
+.ab[data-ae="corporate-vandalism--classic"] .ab-chip { position: relative; border-radius: 0; margin-bottom: 14px; box-shadow: inset 0 0 0 1px var(--cv-bd); }
+.ab[data-ae="corporate-vandalism--classic"] .ab-chip::before {
+  content: ""; position: absolute; inset: -6px; pointer-events: none; background:
+    linear-gradient(var(--cv-bd), var(--cv-bd)) 0 6px / 13px 1px no-repeat, linear-gradient(var(--cv-bd), var(--cv-bd)) 6px 0 / 1px 13px no-repeat,
+    linear-gradient(var(--cv-bd), var(--cv-bd)) 100% calc(100% - 6px) / 13px 1px no-repeat, linear-gradient(var(--cv-bd), var(--cv-bd)) calc(100% - 6px) 100% / 1px 13px no-repeat;
+  opacity: 0.7;
+}
+.ab[data-ae="corporate-vandalism--classic"] .ab-sw-role { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; }
+.ab[data-ae="corporate-vandalism--classic"] .ab-sw-job { font-size: 10.5px; letter-spacing: 0.02em; }
+.ab[data-ae="corporate-vandalism--classic"] .ab-sw-hex { font-size: 10.5px; color: var(--ab-ink); }
+
+/* type recommendations: picks numbered like an index */
+.ab[data-ae="corporate-vandalism--classic"] .ab-type-col { counter-reset: cvp; border-top: 1px solid var(--cv-bd); }
+.ab[data-ae="corporate-vandalism--classic"] .ab-type-role { color: var(--ab-ink); font-size: 10.5px; letter-spacing: 0.08em; }
+.ab[data-ae="corporate-vandalism--classic"] .ab-type-class { font-size: 12px; }
+.ab[data-ae="corporate-vandalism--classic"] .ab-type-pick { counter-increment: cvp; display: flex; align-items: baseline; gap: 10px; }
+.ab[data-ae="corporate-vandalism--classic"] .ab-type-pick::before { content: counter(cvp, decimal-leading-zero); flex: none; font: 400 10px/1 var(--cv-mono); color: var(--ab-muted); transform: translateY(-0.2em); }
+.ab[data-ae="corporate-vandalism--classic"] .ab-type-pick:first-child { letter-spacing: -0.02em; }
+.ab[data-ae="corporate-vandalism--classic"] .ab-fit { padding: 1px 7px; border: 1px solid var(--cv-bd); border-radius: 0; background: none; font-size: 10px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ab-ink); }
+.ab[data-ae="corporate-vandalism--classic"] .ab-fit[data-fit="match"] { background: none; border-color: var(--cv-bd); }
+.ab[data-ae="corporate-vandalism--classic"] .ab-fit[data-fit="consider"] { border-style: dashed; }
+.ab[data-ae="corporate-vandalism--classic"] .ab-fit[data-fit="avoid"] { background: var(--ab-hazard); border-color: var(--ab-hazard); color: #fff; }
+.ab[data-ae="corporate-vandalism--classic"] .ab-type-k { color: var(--ab-ink); font-weight: 700; letter-spacing: 0.08em; }
+.ab[data-ae="corporate-vandalism--classic"] .ab-type-avoid { font-size: 11px; text-transform: uppercase; letter-spacing: 0.03em; }
+.ab[data-ae="corporate-vandalism--classic"] .ab-type-apply { border: 1px solid var(--cv-bd); border-radius: 0; font-family: var(--cv-mono); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; }
+.ab[data-ae="corporate-vandalism--classic"] .ab-type-apply:hover { background: var(--ab-ink); color: var(--ab-canvas); }
+.ab[data-ae="corporate-vandalism--classic"] .ab-type-pair { font-size: 10px; letter-spacing: 0.04em; }
+
+/* 01 notice card: 1px border, primary header strip, 9px footnote */
+.ab[data-ae="corporate-vandalism--classic"] .ab-card, .ab[data-ae="corporate-vandalism--classic"] .ab-panel { --cv-cp: clamp(16px, 2.5cqw, 22px); padding: var(--cv-cp); border: 1px solid var(--cv-bd); border-radius: 0; background: var(--ab-canvas); }
+.ab[data-ae="corporate-vandalism--classic"] .ab-card::before, .ab[data-ae="corporate-vandalism--classic"] .ab-panel::before {
+  display: block; margin: calc(var(--cv-cp) * -1) calc(var(--cv-cp) * -1) var(--cv-cp); padding: 7px 14px;
+  font: 600 10px/1.4 var(--cv-mono); letter-spacing: 0.1em; text-transform: uppercase;
+}
+.ab[data-ae="corporate-vandalism--classic"] .ab-card::before { content: "Notice 2291-B  ·  Form 7"; background: var(--cv-shell); color: var(--cv-on-shell); }
+.ab[data-ae="corporate-vandalism--classic"] .ab-panel { background: var(--cv-form); }
+.ab[data-ae="corporate-vandalism--classic"] .ab-panel::before { content: "Form 7  ·  Part 2"; background: var(--ab-ink); color: var(--ab-canvas); }
+.ab[data-ae="corporate-vandalism--classic"] .ab-card::after { content: "† Terms apply. Terms are subject to change, including this sentence."; display: block; margin-top: 14px; font: 9px/1.5 var(--cv-mono); letter-spacing: 0.04em; text-transform: uppercase; color: var(--ab-muted); }
+
+/* tabs: a numbered index row; the active item is ink and underlined, no quotes */
+.ab[data-ae="corporate-vandalism--classic"] .ab-seg { counter-reset: cvs; gap: 0; padding: 0; border-radius: 0; border-bottom: 1px solid var(--cv-bd); background: none; }
+.ab[data-ae="corporate-vandalism--classic"] .ab-seg-btn { counter-increment: cvs; flex: 0 1 auto; padding: 8px 14px 8px 0; min-height: 34px; border-radius: 0; color: var(--cv-rest); font-family: var(--cv-mono); font-size: 11.5px; letter-spacing: 0.04em; text-transform: uppercase; text-align: left; white-space: nowrap; }
+.ab[data-ae="corporate-vandalism--classic"] .ab-seg-btn::before { content: counter(cvs, decimal-leading-zero) " "; color: var(--ab-muted); font-size: 9.5px; vertical-align: 1px; }
+.ab[data-ae="corporate-vandalism--classic"] .ab-seg-btn:hover { color: var(--ab-ink); text-decoration: underline; text-underline-offset: 3px; }
+.ab[data-ae="corporate-vandalism--classic"] .ab-seg-btn[aria-pressed="true"] { color: var(--ab-ink); font-weight: 700; margin-bottom: -1px; border-bottom: 2px solid var(--ab-primary-text, var(--ab-ink)); }
+.ab[data-ae="corporate-vandalism--classic"] .ab-seg-btn[aria-pressed="true"]::before { content: counter(cvs, decimal-leading-zero) " "; color: var(--ab-ink); }
+.ab[data-ae="corporate-vandalism--classic"] .ab-card-title { margin: 20px 0 6px !important; font-weight: var(--cv-hw, 700); font-size: clamp(18px, 2.3cqw, 22px); letter-spacing: calc(-0.03em * var(--ab-tr, 1)); line-height: 1.1; }
+.ab[data-ae="corporate-vandalism--classic"] .ab-card-body { margin-bottom: 18px !important; color: var(--ab-ink); font-size: 13px; }
+
+/* the sincere main action: client primary, square, mundane copy; hover underlines, pressed inverts */
+.ab[data-ae="corporate-vandalism--classic"] .ab-cta { border-radius: 0; background: var(--cv-shell); color: var(--cv-on-shell); box-shadow: inset 0 -3px 0 var(--cv-ul); padding: 12px 14px; font-family: var(--cv-mono); font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; transition: none; }
+.ab[data-ae="corporate-vandalism--classic"] .ab-cta-arrow::before { content: "→"; font-size: 15px; }
+.ab[data-ae="corporate-vandalism--classic"] .ab-cta:hover .ab-cta-label, .ab[data-ae="corporate-vandalism--classic"] .ab-cta.is-hover .ab-cta-label { text-decoration: underline; text-underline-offset: 3px; }
+.ab[data-ae="corporate-vandalism--classic"] .ab-cta:active, .ab[data-ae="corporate-vandalism--classic"] .ab-cta.is-pressed { background: var(--ab-ink); color: var(--ab-canvas); }
+
+/* 02 compliance: form field, native-looking checkbox, three states (approved / flagged / redacted) */
+.ab[data-ae="corporate-vandalism--classic"] .ab-fieldlabel { font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ab-ink); }
+.ab[data-ae="corporate-vandalism--classic"] .ab-input { border: 1px solid var(--cv-bd); border-radius: 0; background: var(--ab-canvas); padding: 11px 12px; font-size: 14px; font-weight: 500; }
+.ab[data-ae="corporate-vandalism--classic"] .ab-input:focus { box-shadow: 0 0 0 2px var(--ab-canvas), 0 0 0 3px var(--ab-ink); }
+.ab[data-ae="corporate-vandalism--classic"] .ab-toggle { font-size: 12px; font-family: var(--cv-mono); letter-spacing: 0.04em; text-transform: uppercase; }
+.ab[data-ae="corporate-vandalism--classic"] .ab-toggle > span::after { content: "‡"; font-size: 0.7em; vertical-align: 0.5em; margin-left: 2px; }
+.ab[data-ae="corporate-vandalism--classic"] .ab-switch { width: 18px; height: 18px; border: 1px solid var(--cv-bd); border-radius: 0; background: var(--ab-canvas); transition: none; }
+.ab[data-ae="corporate-vandalism--classic"] .ab-switch::before { left: 2px; top: 2px; width: 12px; height: 12px; border-radius: 0; background: var(--ab-canvas); transition: none; opacity: 0; transform: none; clip-path: polygon(0 55%, 14% 40%, 38% 62%, 86% 8%, 100% 22%, 38% 94%); }
+.ab[data-ae="corporate-vandalism--classic"] .ab-switch:checked { background: var(--ab-ink); }
+.ab[data-ae="corporate-vandalism--classic"] .ab-switch:checked::before { opacity: 1; transform: none; }
+.ab[data-ae="corporate-vandalism--classic"] .ab-switch:focus-visible { outline: 2px solid var(--ab-ink); outline-offset: 2px; }
+.ab[data-ae="corporate-vandalism--classic"] .ab-status { font-family: var(--cv-mono); font-size: 10px; letter-spacing: 0.04em; text-transform: uppercase; }
+.ab[data-ae="corporate-vandalism--classic"] .ab-status::before { content: "OK 200 · "; color: var(--ab-ink); }
+.ab[data-ae="corporate-vandalism--classic"] .ab-states { margin-top: 18px; }
+.ab[data-ae="corporate-vandalism--classic"] .ab-state { font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; font-family: var(--cv-mono); color: var(--ab-muted); }
+.ab[data-ae="corporate-vandalism--classic"] .ab-state-ctl { padding: 10px 8px; font-size: 11px; }
+.ab[data-ae="corporate-vandalism--classic"] .ab-state-ctl.is-hover { box-shadow: none; }
+.ab[data-ae="corporate-vandalism--classic"] .ab-state-ctl.is-hover { background: var(--ab-hazard); color: #fff; outline: 1px solid #fff; outline-offset: -3px; }
+.ab[data-ae="corporate-vandalism--classic"] .ab-state-ctl.is-hover .ab-cta-label { text-decoration: none; }
+.ab[data-ae="corporate-vandalism--classic"] .ab-state-ctl.is-pressed { background: #000; color: transparent; box-shadow: inset 0 0 0 1px var(--cv-bd); }
+
+/* 03 the index: an MSCHF mono-caps index (#027 ... then #030 ??????); every name in ink, hierarchy carried by the status chips */
+.ab[data-ae="corporate-vandalism--classic"] .ab-list { counter-reset: cvr 26; }
+.ab[data-ae="corporate-vandalism--classic"] .ab-row { counter-increment: cvr; grid-template-columns: clamp(46px, 6cqw, 62px) minmax(0, 1fr) auto minmax(60px, 140px) 4.5ch; padding: 10px 0; border-top: 1px dashed var(--cv-bd); color: var(--ab-ink); }
+.ab[data-ae="corporate-vandalism--classic"] .ab-row:last-child { border-bottom: 1px dashed var(--cv-bd); }
+.ab[data-ae="corporate-vandalism--classic"] .ab-row-n { font-size: 0; line-height: 0; align-self: center; color: inherit; }
+.ab[data-ae="corporate-vandalism--classic"] .ab-row-n::before { content: "#0" counter(cvr); font: 700 clamp(16px, 2.4cqw, 22px)/1 var(--cv-mono); letter-spacing: 0; }
+.ab[data-ae="corporate-vandalism--classic"] .ab-row-name { overflow: visible; font-family: var(--cv-mono); font-weight: 700; font-size: clamp(16px, 2.4cqw, 22px); line-height: 1; letter-spacing: 0; text-transform: uppercase; color: inherit; }
+.ab[data-ae="corporate-vandalism--classic"] .ab-row:first-child .ab-row-name::after { content: " ↗"; font-weight: 400; letter-spacing: 0; }
+.ab[data-ae="corporate-vandalism--classic"] .ab-row-status { padding: 1px 6px; border: 1px solid currentColor; border-radius: 0; background: none; font-family: var(--cv-mono); font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: inherit; }
+.ab[data-ae="corporate-vandalism--classic"] .ab-row-bar { height: 2px; border-radius: 0; background: var(--ab-secondary); }
+.ab[data-ae="corporate-vandalism--classic"] .ab-row-bar i { background: var(--ab-ink); }
+.ab[data-ae="corporate-vandalism--classic"] .ab-row-pct { font-family: var(--cv-mono); font-size: 11px; color: inherit; }
+.ab[data-ae="corporate-vandalism--classic"] .ab-list::after { content: "#030  ??????????????"; display: block; padding: 10px 0; border-bottom: 1px dashed var(--cv-bd); font: 700 clamp(16px, 2.4cqw, 22px)/1 var(--cv-mono); letter-spacing: 0; color: var(--cv-rest); }
+
+/* footer: the footnotes are the longest text on the board */
+.ab[data-ae="corporate-vandalism--classic"] .ab-foot { border-top: 1px solid var(--cv-bd); font-size: 10px; letter-spacing: 0.04em; text-transform: uppercase; color: var(--ab-ink); }
+.ab[data-ae="corporate-vandalism--classic"] .ab-foot .ab-infl { color: var(--ab-muted); }
+.ab[data-ae="corporate-vandalism--classic"] .ab-dot { width: 8px; height: 8px; border-radius: 0; background: var(--ab-ink); }
+.ab[data-ae="corporate-vandalism--classic"]:not(.ab-slide) .ab-foot::after {
+  content: "† “Alive” means exhibiting, to a reasonable observer, one or more signs of life, as defined in Schedule 4.  ‡ Focus mode is provided as is and does not constitute a warranty of focus.  § Good design is subject to availability. By reading this footer you acknowledge that you have read it. No refunds on sarcasm.";
+  order: 3; flex: 1 1 100%; margin-top: 4px; font: 9px/1.55 var(--cv-mono); letter-spacing: 0.02em; text-transform: none; color: var(--ab-muted);
+}
+
+.ab[data-ae="corporate-vandalism--classic"] .ab-seg-btn:focus-visible, .ab[data-ae="corporate-vandalism--classic"] .ab-cta:focus-visible, .ab[data-ae="corporate-vandalism--classic"] .ab-type-apply:focus-visible { outline: 2px solid var(--ab-ink); outline-offset: 2px; }
+
+@container ab (max-width: 600px) {
+  .ab[data-ae="corporate-vandalism--classic"] .ab-hero { grid-template-columns: minmax(0, 1fr); padding: 22px 0 26px; }
+  .ab[data-ae="corporate-vandalism--classic"] .ab-art { max-width: none; justify-self: stretch; }
+  .ab[data-ae="corporate-vandalism--classic"] .ab-tag::after { display: none; }
+  .ab[data-ae="corporate-vandalism--classic"]:not(.ab-slide) > .ab-in::before { white-space: normal; }
+  .ab[data-ae="corporate-vandalism--classic"] .ab-row { grid-template-columns: 46px minmax(0, 1fr) 4.5ch; }
+  .ab[data-ae="corporate-vandalism--classic"] .ab-row-name { font-size: 16px; }
+  .ab[data-ae="corporate-vandalism--classic"] .ab-seg-btn { padding-right: 10px; font-size: 11px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ab[data-ae="corporate-vandalism--classic"] .ab-cta, .ab[data-ae="corporate-vandalism--classic"] .ab-switch { transition: none; }
+}
+
+/* deck: room for the literal labels, and the product slide's list named as itself */
+.ab.ab-slide[data-ae="corporate-vandalism--classic"] .ab-deck-ctacard .ab-cta:not(.ab-state-ctl) { margin-top: 18px; }
+.ab[data-ae="corporate-vandalism--classic"] .ab-deck-rows::before { content: '"PROJECTS"'; display: block; margin-bottom: 8px; font: 600 9px/1 var(--cv-mono); letter-spacing: 0.08em; color: var(--ab-ink); }

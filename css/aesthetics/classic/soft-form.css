@@ -1,0 +1,180 @@
+/* ---------------------------------------------------------------------
+   01 Soft Form — same-color raised and recessed surfaces, one iridescent
+   glass panel, a glossy primary, a strong ink-filled selected segment.
+   Fixed top-left light. Variables --ab-hi / --ab-lo / --ab-rim / --ab-gloss
+   come from js/aesthetics/soft-form.js tokens().
+------------------------------------------------------------------------ */
+
+.ab[data-ae="soft-form--classic"] {
+  --sf-raised: 6px 6px 13px var(--ab-lo), -6px -6px 13px var(--ab-hi);
+  --sf-raised-s: 3px 3px 7px var(--ab-lo), -3px -3px 7px var(--ab-hi);
+  --sf-inset: inset 6px 6px 13px var(--ab-lo), inset -6px -6px 13px var(--ab-hi);
+  --sf-inset-s: inset 3px 3px 6px var(--ab-lo), inset -3px -3px 6px var(--ab-hi);
+  border-radius: 24px;
+}
+
+/* header */
+.ab[data-ae="soft-form--classic"] .ab-brand { font-weight: 600; letter-spacing: calc(-0.03em * var(--ab-tr, 1)); }
+.ab[data-ae="soft-form--classic"] .ab-mark {
+  position: relative; width: 30px; height: 30px; border-radius: 10px;
+  background: var(--ab-canvas); box-shadow: var(--sf-raised-s);
+}
+.ab[data-ae="soft-form--classic"] .ab-mark span { display: none; }
+.ab[data-ae="soft-form--classic"] .ab-mark::after {
+  content: ""; position: absolute; left: 8px; top: 8px; width: 14px; height: 14px; border-radius: 50%;
+  background: radial-gradient(circle at 30% 27%, rgba(255, 255, 255, 0.4), transparent 45%), var(--ab-primary);
+  box-shadow: 2px 3px 4px rgba(0, 0, 0, 0.2);
+}
+.ab[data-ae="soft-form--classic"] .ab-tag { letter-spacing: 0.14em; }
+
+/* hero: large, tight headline (reference proportions: weight 500, -0.05em) */
+.ab[data-ae="soft-form--classic"] .ab-kicker { letter-spacing: 0.17em; }
+.ab[data-ae="soft-form--classic"] .ab-headline { font-weight: 500; letter-spacing: calc(-0.05em * var(--ab-tr, 1)); line-height: 0.96; word-spacing: 0.06em; }
+.ab[data-ae="soft-form--classic"] .ab-subcopy { max-width: 30em; }
+.ab[data-ae="soft-form--classic"] .ab-art { max-width: 310px; }
+
+/* signature art: a recessed well, a raised canvas disc off-centre inside it, a
+   primary semicircle, and a slim glass bar lens that refracts a duplicate of
+   the scene while crossing the semicircle and the well rim */
+.ab[data-ae="soft-form--classic"] .sfa { position: absolute; inset: 0; }
+.ab[data-ae="soft-form--classic"] .sfa-scene { position: absolute; inset: 0; }
+.ab[data-ae="soft-form--classic"] .sfa i { position: absolute; display: block; }
+.ab[data-ae="soft-form--classic"] .sfa-well {
+  left: 5%; top: 5%; width: 90%; height: 90%; border-radius: 50%; background: var(--ab-canvas);
+  box-shadow: inset 4cqw 4cqw 8.5cqw var(--ab-lo), inset -4cqw -4cqw 8.5cqw var(--ab-hi);
+}
+.ab[data-ae="soft-form--classic"] .sfa-disc {
+  left: 15%; top: 16%; width: 37%; height: 37%; border-radius: 50%; background: var(--ab-canvas);
+  box-shadow: 3.8cqw 4.4cqw 7.5cqw var(--ab-lo), -3cqw -3cqw 6.5cqw var(--ab-hi);
+}
+.ab[data-ae="soft-form--classic"] .sfa-semi {
+  left: 44%; top: 53%; width: 40%; height: 20%; border-radius: 50% 50% 0 0 / 100% 100% 0 0; background: var(--ab-primary);
+  box-shadow: 2cqw 2.6cqw 4.5cqw rgba(0, 0, 0, 0.2), inset 0.8cqw 0.8cqw 2cqw rgba(255, 255, 255, 0.22);
+}
+/* the lens is tilted; its duplicate scene is counter-rotated about the same
+   centre so the refracted copy stays upright (individual rotate property) */
+.ab[data-ae="soft-form--classic"] .sfa-lens {
+  rotate: 18deg; border-radius: 999px; border: 1px solid var(--ab-rim); background: var(--ab-canvas-a);
+  box-shadow: inset 3px 2px 4px rgba(255, 255, 255, 0.7), inset -3px -2px 5px rgba(203, 187, 242, 0.7),
+    inset 8px 0 14px rgba(178, 238, 227, 0.2), 2.4cqw 3cqw 5.5cqw rgba(0, 0, 0, 0.16);
+}
+.ab[data-ae="soft-form--classic"] .sfa-lens .ab-lens-scene { rotate: -18deg; filter: saturate(1.3); }
+.ab[data-ae="soft-form--classic"] .sfa-lens::before {
+  content: ""; position: absolute; inset: 0; z-index: 2; pointer-events: none;
+  background: linear-gradient(105deg, rgba(255, 255, 255, 0.6) 0%, rgba(255, 255, 255, 0.04) 22%, rgba(155, 231, 230, 0.16) 40%,
+    rgba(183, 188, 250, 0.3) 54%, rgba(239, 175, 211, 0.24) 68%, rgba(244, 228, 165, 0.3) 82%, rgba(255, 255, 255, 0.34) 100%);
+}
+.ab[data-ae="soft-form--classic"] .sfa-lens::after {
+  content: ""; position: absolute; inset: 3px; z-index: 2; border-radius: inherit; pointer-events: none;
+  border-left: 2px solid rgba(255, 255, 255, 0.55); border-right: 2px solid rgba(236, 212, 242, 0.4);
+}
+
+/* palette: each color is a raised pad seated in a recessed socket, the same
+   vocabulary as the materials above; the primary pad carries the gloss */
+.ab[data-ae="soft-form--classic"] .ab-palette { padding: clamp(30px, 4.6cqw, 50px) 0; }
+.ab[data-ae="soft-form--classic"] .ab-swatches { gap: clamp(12px, 2.4cqw, 26px); }
+.ab[data-ae="soft-form--classic"] .ab-chip {
+  position: relative; border-radius: 14px; height: clamp(46px, 6cqw, 62px);
+  background: var(--ab-canvas) !important; box-shadow: var(--sf-inset-s);   /* !important: the board sets the chip color inline */
+}
+.ab[data-ae="soft-form--classic"] .ab-chip::after {
+  content: ""; position: absolute; inset: 5px; border-radius: 9px; background: var(--sw);
+  box-shadow: 2px 3px 5px var(--ab-lo), -1px -1px 3px var(--ab-hi), inset 0 1px 1px rgba(255, 255, 255, 0.28);
+}
+.ab[data-ae="soft-form--classic"] .ab-swatch[data-role="primary"] .ab-chip::after,
+.ab[data-ae="soft-form--classic"] .ab-swatch[data-role="secondary"] .ab-chip::after,
+.ab[data-ae="soft-form--classic"] .ab-swatch[data-role="accent"] .ab-chip::after {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.24), rgba(255, 255, 255, 0) 55%), var(--sw);
+}
+.ab[data-ae="soft-form--classic"] .ab-swatch[data-role="canvas"] .ab-chip::after { box-shadow: var(--sf-raised-s), inset 0 0 0 1px rgba(128, 128, 128, 0.2); }
+.ab[data-ae="soft-form--classic"] .ab-sw-role { font-weight: 600; }
+
+/* 01 / interface: the one glass panel */
+.ab[data-ae="soft-form--classic"] .ab-card {
+  position: relative; isolation: isolate; border-radius: 24px;
+  background: linear-gradient(135deg, var(--ab-gloss), transparent 48%), var(--ab-canvas);
+  border: 1px solid var(--ab-rim);
+  box-shadow: inset 1px 1px 2px rgba(255, 255, 255, 0.5), inset -1px -1px 2px rgba(255, 255, 255, 0.15),
+    6px 9px 20px var(--ab-lo), -4px -4px 12px var(--ab-hi);
+}
+.ab[data-ae="soft-form--classic"] .ab-card::before {
+  content: ""; position: absolute; inset: 0; z-index: -1; border-radius: inherit; pointer-events: none;
+  background: radial-gradient(ellipse at 100% 0%, rgba(214, 189, 255, 0.24), transparent 45%),
+    radial-gradient(ellipse at 0% 100%, rgba(164, 230, 232, 0.24), transparent 48%);
+}
+.ab[data-ae="soft-form--classic"] .ab-card::after {
+  content: ""; position: absolute; inset: -1px; border-radius: inherit; padding: 1.5px; pointer-events: none;
+  background: linear-gradient(125deg, #ffffffdd 0%, #ffffff55 28%, #b6dce7aa 45%, #d6b9edcc 64%, #efcfbbcc 79%, #ffffffaa);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor; mask-composite: exclude;
+}
+.ab[data-ae="soft-form--classic"] .ab-seg { border-radius: 12px; background: var(--ab-canvas); box-shadow: var(--sf-inset-s); }
+.ab[data-ae="soft-form--classic"] .ab-seg-btn { border-radius: 9px; transition: background 0.18s, color 0.18s; }
+.ab[data-ae="soft-form--classic"] .ab-seg-btn[aria-pressed="true"] {
+  background: var(--ab-ink); color: var(--ab-canvas); font-weight: 500; box-shadow: 2px 3px 5px rgba(0, 0, 0, 0.16);
+}
+.ab[data-ae="soft-form--classic"] .ab-card-title { font-weight: 500; letter-spacing: calc(-0.03em * var(--ab-tr, 1)); }
+.ab[data-ae="soft-form--classic"] .ab-cta {
+  border-radius: 10px; border: 1px solid rgba(255, 255, 255, 0.27);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0) 55%), var(--ab-primary);
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.44), 3px 5px 9px rgba(0, 0, 0, 0.16);
+  transition: transform 0.14s, box-shadow 0.14s;
+}
+.ab[data-ae="soft-form--classic"] .ab-cta:active { transform: translateY(1px) scale(0.99); box-shadow: inset 1px 2px 4px rgba(0, 0, 0, 0.25); }
+
+/* 02 / touch & depth */
+.ab[data-ae="soft-form--classic"] .ab-input {
+  border: 1px solid transparent; border-radius: 12px; padding: 15px; background: var(--ab-canvas); box-shadow: var(--sf-inset);
+  transition: border-color 0.18s;
+}
+.ab[data-ae="soft-form--classic"] .ab-input:focus { border-color: var(--ab-primary-text); }
+.ab[data-ae="soft-form--classic"] .ab-switch { background: var(--ab-canvas); box-shadow: var(--sf-inset-s); }
+.ab[data-ae="soft-form--classic"] .ab-switch::before {
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0) 55%), var(--ab-muted);
+  box-shadow: inset 1px 1px 2px rgba(255, 255, 255, 0.7), 1px 2px 4px rgba(0, 0, 0, 0.25);
+}
+.ab[data-ae="soft-form--classic"] .ab-switch:checked { background: var(--ab-canvas); }
+.ab[data-ae="soft-form--classic"] .ab-switch:checked::before {
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0) 55%), var(--ab-primary);
+}
+.ab[data-ae="soft-form--classic"] .ab-states {
+  padding: 18px 12px 14px; border-radius: 20px; background: var(--ab-canvas);
+  box-shadow: var(--sf-inset); justify-content: space-around; gap: 8px;
+}
+.ab[data-ae="soft-form--classic"] .ab-disc { border: 0; background: var(--ab-canvas); width: 56px; height: 56px; }
+.ab[data-ae="soft-form--classic"] .ab-disc[data-s="0"] { border: 1px solid var(--ab-line); }
+.ab[data-ae="soft-form--classic"] .ab-disc[data-s="1"] { box-shadow: var(--sf-raised); }
+.ab[data-ae="soft-form--classic"] .ab-disc[data-s="2"] { box-shadow: var(--sf-inset); }
+
+/* 03 / in use: the list sits in one recessed well; progress tracks are recessed
+   channels with a raised, glossy fill */
+.ab[data-ae="soft-form--classic"] .ab-list {
+  padding: 6px clamp(14px, 2.2cqw, 24px); border-radius: 22px; background: var(--ab-canvas); box-shadow: var(--sf-inset);
+}
+.ab[data-ae="soft-form--classic"] .ab-row { border-color: color-mix(in srgb, var(--ab-line) 70%, transparent); }
+.ab[data-ae="soft-form--classic"] .ab-row:first-child { border-top: 0; }
+.ab[data-ae="soft-form--classic"] .ab-row:last-child { border-bottom: 0; }
+.ab[data-ae="soft-form--classic"] .ab-row-status { background: var(--ab-canvas); box-shadow: var(--sf-raised-s); }
+.ab[data-ae="soft-form--classic"] .ab-row-bar { height: 10px; border-radius: 6px; background: var(--ab-canvas); box-shadow: var(--sf-inset-s); overflow: visible; }
+.ab[data-ae="soft-form--classic"] .ab-row-bar i {
+  border-radius: 6px; background: linear-gradient(180deg, rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0) 55%), var(--ab-secondary);
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.45), 1px 2px 4px var(--ab-lo);
+}
+
+/* footer */
+.ab[data-ae="soft-form--classic"] .ab-foot { font-size: 11px; letter-spacing: 0.02em; }
+
+/* focus and motion */
+.ab[data-ae="soft-form--classic"] .ab-seg-btn:focus-visible, .ab[data-ae="soft-form--classic"] .ab-cta:focus-visible, .ab[data-ae="soft-form--classic"] .ab-switch:focus-visible {
+  outline: 2px solid var(--ab-primary-text); outline-offset: 3px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .ab[data-ae="soft-form--classic"] .ab-cta:active { transform: none; }
+}
+@media (prefers-reduced-transparency: reduce) {
+  .ab[data-ae="soft-form--classic"] .ab-card::before { display: none; }
+}
+@media (prefers-contrast: more) {
+  .ab[data-ae="soft-form--classic"] .ab-card { border-color: var(--ab-ink); }
+  .ab[data-ae="soft-form--classic"] .ab-seg-btn[aria-pressed="false"] { color: var(--ab-ink); }
+}

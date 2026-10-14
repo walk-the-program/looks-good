@@ -350,7 +350,7 @@
   P.fit = FIT;
   P.suiteKeys = () => Object.keys(FIT);
   P.suiteFor = function (aestheticKey) {
-    const rows = FIT[aestheticKey] || FIT['bauhaus-poster'];
+    const rows = FIT[String(aestheticKey).replace(/--classic$/, '')] || FIT['bauhaus-poster'];
     return rows.map(r => {
       const tone = r[4] == null ? 1 : r[4];
       return { key: r[0], name: r[1], colorway: r[2], params: Object.assign({}, r[3], { tone }), tone };

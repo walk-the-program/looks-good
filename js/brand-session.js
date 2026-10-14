@@ -46,6 +46,7 @@ const BrandSession = (function () {
     state.typography = defaultTypography();
     state.locks = { typography: false, color: false, shape: false, aesthetic: false };
     state.aesthetic = 'soft-form';
+    state.aestheticVersion = 'current';
     state.blend = null;
     state.logoImg = null;
     state.logoDataUrl = null;
@@ -260,7 +261,7 @@ const BrandSession = (function () {
       pushBase(st, withTypography);
       const snap = undoStack[undoStack.length - 1];
       if (snap) {
-        snap.aesthetic = st.aesthetic; snap.bgMode = st.bgMode; snap.pureBg = st.pureBg === true; snap.patterns = (st.patterns || []).slice();
+        snap.aesthetic = st.aesthetic; snap.aestheticVersion = st.aestheticVersion === 'classic' ? 'classic' : 'current'; snap.bgMode = st.bgMode; snap.pureBg = st.pureBg === true; snap.patterns = (st.patterns || []).slice();
         snap.blend = typeof blendCopy === 'function' ? blendCopy(st.blend) : null;   // js/blend.js
       }
     };
@@ -269,6 +270,7 @@ const BrandSession = (function () {
       applyBase(snap, st);
       if (!snap) return;
       if (snap.aesthetic) st.aesthetic = snap.aesthetic;
+      if (snap.aestheticVersion) st.aestheticVersion = snap.aestheticVersion === 'classic' ? 'classic' : 'current';
       if (snap.bgMode) st.bgMode = snap.bgMode;
       if (typeof snap.pureBg === 'boolean') st.pureBg = snap.pureBg;
       if (snap.patterns) st.patterns = snap.patterns.slice();

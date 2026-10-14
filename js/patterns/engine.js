@@ -335,7 +335,7 @@
     const colors = st.colors || st;
     if (typeof global.boardTokens === 'function' && st.colors && st.aesthetic) {
       let def = null;
-      try { def = typeof global.aestheticByKey === 'function' ? global.aestheticByKey(st.aesthetic) : null; } catch (e) { def = null; }
+      try { def = typeof global.resolveAestheticDef === 'function' ? global.resolveAestheticDef(st) : (typeof global.aestheticByKey === 'function' ? global.aestheticByKey(st.aesthetic) : null); } catch (e) { def = null; }
       return global.boardTokens(st, def);
     }
     const dark = (st.bgMode || (src && src.isDark ? 'dark' : 'light')) === 'dark';

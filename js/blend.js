@@ -21,7 +21,7 @@
 
    One entry point for render surfaces: aestheticView(state) -> { state, def,
    blend }. Without an active blend it returns the very same state object and
-   aestheticByKey(state.aesthetic), so unblended output is byte-identical.
+   resolveAestheticDef(state), so unblended output is byte-identical.
 
    Kill switch: BLEND_ENABLED. false = no UI, state.blend ignored by the board,
    deck, patterns and brief; saved blends still load and save unchanged.
@@ -292,11 +292,11 @@ function blendList(words) {
 
 // The single entry point for render surfaces (board, deck, patterns, brief).
 function aestheticView(st) {
-  const base = aestheticByKey(st.aesthetic);
+  const base = resolveAestheticDef(st);     // the classic copy when the brand asks for it
   const b = blendActive(st);
   if (!b) return { state: st, def: base, blend: null };
   const donor = aestheticByKey(b.with);
-  if (!donor || donor.key === base.key) return { state: st, def: base, blend: null };
+  if (!donor || donor.key === (base.classicOf || base.key)) return { state: st, def: base, blend: null };
   let vs = st;
   let typeFrom = null;
   const locked = !!(st.locks && st.locks.typography);

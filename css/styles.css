@@ -297,6 +297,38 @@ output,
 .lock input[type="checkbox"]:checked::after { transform: translateX(11px); }
 .lock:has(input:checked) { color: var(--ink); }
 
+/* The Classic | Current switch sits left of the aesthetic lock. */
+.ae-lockrow { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin: -2px 0 -2px; }
+.ae-lockrow .lock { margin: 0; align-self: center; }
+.ae-version {
+  display: inline-grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1px;
+  padding: 1px;
+  border: 1px solid var(--line-strong);
+  border-radius: 6px;
+  background: var(--canvas);
+}
+.ae-version[hidden] { display: none; }
+.ae-version button {
+  height: 18px;
+  padding: 0 8px;
+  border: 0;
+  border-radius: 5px;
+  background: transparent;
+  font: inherit;
+  font-size: 10.5px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+  cursor: pointer;
+  transition: background-color var(--dur) var(--ease), color var(--dur) var(--ease);
+}
+.ae-version button:hover { color: var(--ink); }
+.ae-version button[aria-pressed="true"] { background: var(--surface); color: var(--ink); box-shadow: var(--shadow-1); }
+.ae-version button:focus-visible { outline: 2px solid rgba(17, 17, 17, 0.2); outline-offset: 1px; }
+
 /* ---------- Fields ---------- */
 
 .field {

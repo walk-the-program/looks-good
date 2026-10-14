@@ -408,7 +408,7 @@ const AESTHETIC_META = {
 
 // The meta entry for an aesthetic key, or null (callers must tolerate null).
 function aestheticMeta(key) {
-  return AESTHETIC_META[key] || null;
+  return AESTHETIC_META[typeof aestheticBaseKey === 'function' ? aestheticBaseKey(key) : key] || null;
 }
 
 function aestheticFamilyOf(key) {

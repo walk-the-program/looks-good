@@ -610,7 +610,7 @@ function renderBrandGuideHTML(state) {
 
   /* ---------- 03 Color roles ---------- */
 
-  const aeDef = aestheticByKey(state.aesthetic);
+  const aeDef = resolveAestheticDef(state);
   const rt = boardTokens(state, aeDef);
   const roleDefs = colorRolesFor(state);
   const roleRows = ['canvas', 'ink', 'primary', 'secondary', 'accent'].map(k => {

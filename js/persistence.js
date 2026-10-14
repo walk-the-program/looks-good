@@ -18,6 +18,8 @@ function serializeState(state) {
     // Pure #FFFFFF / #000000 ground instead of the style's canvas tint (js/aesthetic-board.js).
     pureBg: state.pureBg === true,
     aestheticKey: state.aesthetic,
+    // 'current' | 'classic': which version of the aesthetic renders (js/aesthetics/registry.js).
+    aestheticVersion: state.aestheticVersion === 'classic' ? 'classic' : 'current',
     // Blend with a second aesthetic (js/blend.js): null or a copy of
     // { with, strength, channels }. Saved as is even when BLEND_ENABLED is false.
     blend: state.blend && typeof state.blend === 'object'
@@ -106,6 +108,9 @@ function applySavedSessionToState(saved, state) {
   if (typeof saved.aestheticKey === 'string' && AESTHETICS.some(a => a.key === saved.aestheticKey)) {
     state.aesthetic = saved.aestheticKey;
   }
+
+  // Restore the version. Brands saved before it existed, or with any other value, load current.
+  state.aestheticVersion = saved.aestheticVersion === 'classic' ? 'classic' : 'current';
 
   // Restore the blend after the aesthetic: unknown donor, a donor equal to the base,
   // or malformed channels load as no blend. Brands saved before blends load with null.

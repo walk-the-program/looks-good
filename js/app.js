@@ -33,6 +33,7 @@ function freshState() {
     logoDataUrl: null,
     content: {},
     aesthetic: 'soft-form',   // key into AESTHETICS (js/aesthetics/registry.js)
+    aestheticVersion: 'current',   // 'current' | 'classic' (the r6-0-baseline copy; registry.js)
     blend: null,     // { with, strength, channels } — second aesthetic blended in (js/blend.js)
     locks: { typography: false, color: false, shape: false, aesthetic: false },
     dismissed: [],   // suggestion ids dismissed for this brand
@@ -112,6 +113,11 @@ function applyAesthetic(key) {
   state.aesthetic = def.key;
   // A blend cannot use the base as its own donor: choosing the donor clears the blend.
   if (state.blend && state.blend.with === def.key) state.blend = null;
+  applyAestheticLook(resolveAestheticDef(state));
+}
+// The recommended background mode and (unless shape is locked) slide shape of the version
+// that renders: the classic copy can recommend something else than the current one.
+function applyAestheticLook(def) {
   state.bgMode = def.mode;
   if (!state.locks.shape) {
     const preset = SHAPE_PRESETS.find(p => p.key === def.slideShape);
@@ -124,6 +130,16 @@ function chooseAesthetic(key) {
   if (key === state.aesthetic) return;
   pushUndoSnapshot(state);
   applyAesthetic(key);
+  render();
+}
+// Classic | Current (the switch next to the aesthetic lock). One undo step; the
+// preference stays when another aesthetic is chosen, and applies to any that has a classic.
+function setAestheticVersion(version) {
+  const next = version === 'classic' ? 'classic' : 'current';
+  if (next === state.aestheticVersion || !hasClassicAesthetic(state.aesthetic)) return;
+  pushUndoSnapshot(state);
+  state.aestheticVersion = next;
+  applyAestheticLook(resolveAestheticDef(state));
   render();
 }
 // Picks among the aesthetics visible under the sidebar family filter (all of
@@ -483,6 +499,10 @@ function wireEvents() {
   });
 
   document.getElementById('lockAesthetic').addEventListener('change', e => state.locks.aesthetic = e.target.checked);
+  document.getElementById('aeVersion').addEventListener('click', e => {
+    const btn = e.target.closest('button[data-version]');
+    if (btn) setAestheticVersion(btn.dataset.version);
+  });
   document.getElementById('lockTypography').addEventListener('change', e => state.locks.typography = e.target.checked);
   document.getElementById('lockColor').addEventListener('change', e => state.locks.color = e.target.checked);
   document.getElementById('lockShape').addEventListener('change', e => state.locks.shape = e.target.checked);

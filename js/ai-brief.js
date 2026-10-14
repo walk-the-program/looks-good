@@ -94,7 +94,7 @@ function aibCardFill(def, t, extras) {
 }
 
 function aibComponentRows(t, def, extras) {
-  const key = def.key;
+  const key = def.classicOf || def.key;     // a classic def keeps its aesthetic's component notes
   // Where the aesthetic prints the primary as another color (def.printPrimary), the board's
   // primary fills, rules and marks use --primary-print; --primary is the brand hex only.
   const PRI = t.printed ? '--primary-print' : '--primary';
@@ -246,9 +246,15 @@ function aibSvgDataUri(svg) {
 
 // Inline data: URIs (an aesthetic's hand-drawn SVG fills, tens of KB each) are replaced in the
 // token and material dumps by a one-line description: a builder reads the file, not the bytes.
+// Where an aesthetic's files live: classic copies sit in a classic/ subfolder.
+function aibAeFile(key) {
+  const base = typeof aestheticBaseKey === 'function' ? aestheticBaseKey(key) : key;
+  return base === key ? key : 'classic/' + base;
+}
+
 function aibCompactUri(text, key) {
   return String(text).replace(/url\(\s*(["']?)data:(image\/[a-z+.-]+)[\s\S]*?\1\s*\)/gi,
-    (m, q, type) => `url(<inline ${type === 'image/svg+xml' ? 'SVG' : type.replace('image/', '').toUpperCase()}, copy it from css/aesthetics/${key}.css or js/aesthetics/${key}.js>)`);
+    (m, q, type) => `url(<inline ${type === 'image/svg+xml' ? 'SVG' : type.replace('image/', '').toUpperCase()}, copy it from css/aesthetics/${aibAeFile(key)}.css or js/aesthetics/${aibAeFile(key)}.js>)`);
 }
 
 // The board as it is really drawn, for the Typography section: an off-screen board for
@@ -299,7 +305,7 @@ function aibTypeScaleLines(state, def, ty, probe) {
   // Real weights only: a single-weight face (Anton, Tilt Warp, VT323) has no 700 to ask for.
   const hw = abWeightNear(state.headingFont, ty.headingWeight), bw = abWeightNear(state.bodyFont, ty.bodyWeight);
   if (!probe) {
-    return [`- Heading and body size, weight, case and letter-spacing come from the aesthetic's own stylesheet (css/aesthetics/${def.key}.css), not from the editor; the board shows them. The editor's baseline settings are headings ${ty.headingSize}px / weight ${hw}, body ${ty.bodySize}px / weight ${bw}.`];
+    return [`- Heading and body size, weight, case and letter-spacing come from the aesthetic's own stylesheet (css/aesthetics/${aibAeFile(def.key)}.css), not from the editor; the board shows them. The editor's baseline settings are headings ${ty.headingSize}px / weight ${hw}, body ${ty.bodySize}px / weight ${bw}.`];
   }
   const h = probe.h, b = probe.b;
   return [
@@ -548,7 +554,8 @@ function buildAiBrief(state0) {
     `- Influences: ${def.influences}`,
     `- Summary: ${def.summary || ''}`,
     `- Motto: ${def.motto || ''}`,
-    `- Mode: ${mode} (canvas is the ${mode} neutral, ink is the ${t.isDark ? 'light' : 'dark'} neutral)`, '');
+    `- Mode: ${mode} (canvas is the ${mode} neutral, ink is the ${t.isDark ? 'light' : 'dark'} neutral)`,
+    ...(def.classicOf ? ['- Version: Classic, the earlier version of this aesthetic (git tag r6-0-baseline). Its source is the classic copy under css/aesthetics/classic/ and js/aesthetics/classic/.'] : []), '');
   if (def.blend && typeof blendBriefLines === 'function') push(...blendBriefLines(state, def, t));
 
   /* 4. Color tokens */
