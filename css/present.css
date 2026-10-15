@@ -7,8 +7,10 @@
 
 /* ======================= Present mode ======================= */
 
-/* The page keeps its scrollbar under the show (hiding it re-flows the deck grid); the
-   overlay swallows wheel and touch scrolling instead (js/present.js). */
+/* The page's scrollbar is hidden under the show; padding of the scrollbar's width
+   (--pr-sbw, measured by js/present.js) takes its place, so the page keeps its layout width
+   and the deck grid does not re-flow. The overlay swallows wheel and touch scrolling. */
+html.is-presenting { overflow-y: hidden; padding-right: var(--pr-sbw, 0px); }
 
 .pr {
   position: fixed; inset: 0; z-index: 1000;

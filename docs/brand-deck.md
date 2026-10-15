@@ -36,8 +36,8 @@ all", and a new "Download deck PDF" (jsPDF is already loaded; the Mac app vendor
   sections 01/02/03, footer) and the root-attribute/vars builder as functions instead of
   duplicating markup. Keep boardHtml output byte-identical for the board (verify by diffing the
   rendered HTML for all 26 aesthetics before/after the refactor).
-- Each slide's outer card scales the 1280×720 slide to its grid cell with CSS `zoom` (already used
-  by Compare) and keeps 16:9.
+- Each slide's outer card scales the 1280×720 slide to its grid cell with a transform
+  (`--deck-z`, set by `bdZoomCards`; see "WebKit: no CSS zoom on slides" below) and keeps 16:9.
 - Slide chrome: a small header (brand + "Brand guidelines" + slide title) and footer (page n/9,
   aesthetic name) using `.ab-label` so aesthetics style them. Neutral base styles in
   css/brand-deck.css using board tokens only; aesthetics may add `.ab[data-ae="key"].ab-slide …`
@@ -180,3 +180,20 @@ Measured on 8 aesthetics x all slides (curio-cabinet, dark-academia, dystopian-l
 
 ### Pattern layering on slides
 `.ab-deck-pattern` (the cover band, the closing strip) sits at `z-index: 1`, below `.ab-in` (also 1, later in the DOM) and above any `z-index: 0` wallpaper pseudo-element an aesthetic puts on the slide root (Aurora Noir's grid-fade `::after` used to paint over the band and leave it flat black).
+
+## WebKit: no CSS zoom on slides (show build, DECK)
+- The Mac app's engine (WebKit) never lets CSS `zoom` take text of 9px or more below 9px. With the
+  deck cards zoomed to 0.36 (a 464px card), every 12-24px label was drawn at 9px and outgrew its
+  box: 1,067 gore issues over 35 aesthetics x 4 configs, none in Chromium. Deck cards
+  (`.deck-frame`, css/brand-deck.css) and present mode (`.pr-stage`, js/present.js `layout()`) now
+  scale with `transform: scale()`; the frame's negative margins give it the scaled size in the card.
+  Present mode also used zoom above 1x, where WebKit zooms container-query units twice (ASCII Art's
+  cover art ran over the footer at 1.5x).
+- Present mode fits its slides with all of them shown and without `aria-hidden` for that one pass
+  (`fitSlides`): the fits skip hidden and aria-hidden text, so the 12px floor never reached slides
+  that were off screen.
+- A type-scale sample ignores the aesthetic's headline `max-width` (Frutiger Aero's 11.2em shrank
+  with the font, so a wide face could never fit).
+- Gore run: 35 aesthetics x {recommended mode, other mode, "BallKnowledge Collective International",
+  Unbounded headings}, recommended font pairing, seeded colours; deck grid at 1000, 1360 and 1920
+  wide and present mode at 900, 1100, 1360 and 1920 wide: 0 issues.

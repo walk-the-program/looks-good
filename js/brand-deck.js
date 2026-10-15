@@ -6,7 +6,8 @@
    1280x720, built from the same parts as the board (abBoardParts in
    js/aesthetic-board.js), so each aesthetic's scoped CSS applies unchanged and
    switching aesthetic restyles the deck exactly like the board. A slide card
-   shrinks the 1280x720 slide to its grid cell with CSS zoom (as Compare does).
+   shrinks the 1280x720 slide to its grid cell with a transform (as Compare does): CSS
+   zoom would trip WebKit's minimum font size and draw every small label at 9px.
    css/brand-deck.css holds the neutral slide styles.
 
    Extension points (for other scripts loaded after this one):
@@ -1056,17 +1057,23 @@ let bdTimer = null;
 let bdObserver = null;
 let bdBuilt = false;
 
-// Reads every card width first, then writes every zoom: one layout, not one per card.
+// Reads every card width first, then writes every scale: one layout, not one per card.
+// The frame is scaled with a transform (--deck-z, css/brand-deck.css), not CSS zoom:
+// WebKit (the Mac app) never zooms text that is 9px or more below 9px, so in a 464px
+// card every label of 12-24px was drawn at 9px and ran out of its box. The card's width
+// is set by the grid (container-type: inline-size), never by the frame, so writing the
+// scale cannot feed back into the ResizeObserver that calls this.
 function bdZoomCards(grid) {
   const cards = [...grid.querySelectorAll('.deck-card')];
   const widths = cards.map(card => card.clientWidth);
   cards.forEach((card, i) => {
     const frame = card.querySelector('.deck-frame');
     if (!frame || !widths[i]) return;
-    // A zoom a hair under 1 (0.9984 for a 1278px card) snaps 2px borders to 1px at DPR 1:
+    // A scale a hair under 1 (0.9984 for a 1278px card) snaps 2px borders to 1px at DPR 1:
     // within 0.5% of 1 draw the slide at 1 (the card clips the last pixel or two).
     const z = widths[i] / DECK_W;
-    frame.style.zoom = Math.abs(z - 1) < 0.005 ? '1' : z.toFixed(4);
+    const v = Math.abs(z - 1) < 0.005 ? '1' : z.toFixed(4);
+    if (frame.style.getPropertyValue('--deck-z') !== v) frame.style.setProperty('--deck-z', v);
   });
 }
 

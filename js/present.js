@@ -5,7 +5,7 @@
    Show.present(startIndex, opts)  Full-window (and real full screen where the
        engine allows it) presentation of the brand deck. Slides are built with
        the deck's own renderer (bdSlideHtml + bdFitDeck, js/brand-deck.js) at
-       1280x720 and scaled to the screen with CSS zoom, so text stays crisp.
+       1280x720 and scaled to the screen with a transform (see layout()).
        Keys: → ↓ Space PageDown Enter next; ← ↑ PageUp Backspace back; Home/End;
        1-9, 0 jump to a slide; N notes; F full screen; Esc exit. Click: left
        third goes back, the rest goes forward.
@@ -180,12 +180,16 @@ window.Show = window.Show || {};
       `<div class="pr-slide" data-i="${i}" aria-hidden="true">${bdSlideHtml(st, def, sl, i, slides.length)}</div>`).join('');
 
     document.body.appendChild(root);
-    document.documentElement.classList.add('is-presenting');
+    // Hide the page's scrollbar under the show (with always-visible scrollbars it showed as a
+    // strip at the right edge) without re-flowing the page: padding takes the scrollbar's
+    // place (css/present.css), so the deck grid keeps its width and nothing re-fits.
+    const html = document.documentElement;
+    html.style.setProperty('--pr-sbw', Math.max(0, window.innerWidth - html.clientWidth) + 'px');
+    html.classList.add('is-presenting');
     // Fit at 1:1 (the deck's fitting measures layout), then scale.
-    stage.style.zoom = '1';
     try {
       if (typeof bdApplyRadius === 'function') bdApplyRadius(stage, def);
-      if (typeof bdFitDeck === 'function') bdFitDeck(stage);
+      fitSlides(stage);
     } catch (err) { /* an unfitted slide still shows */ }
 
     const roots = [...stage.querySelectorAll('.pr-slide')];
@@ -233,13 +237,33 @@ window.Show = window.Show || {};
     const H = window.innerHeight - nh;
     // Whole device pixels across: the slide edge lands on a pixel, not between two.
     const z = Math.max(0.1, Math.floor(Math.min(W / DW, H / DH) * DW) / DW);
-    PR.stage.style.zoom = String(z);
+    // A transform, not CSS zoom: in WebKit (the Mac app) zoom never takes text of 9px or more
+    // under 9px (labels outgrew their boxes on a small window), and container-query units are
+    // zoomed twice above 1x (ASCII Art's cover art ran over the footer at 1.5x). The slide is
+    // laid out at 1280x720 exactly as fitted and scaled as drawn (centred by .pr-view).
+    PR.stage.style.transform = `scale(${z})`;
     PR.root.style.setProperty('--pr-notes-h', nh + 'px');
+  }
+
+  // The deck's fits skip text that is hidden or aria-hidden (art), and slides off screen are
+  // both: fit with every slide shown for the one synchronous pass (nothing paints in between),
+  // or the 12px floor and the fits never reach the slides.
+  function fitSlides(stage) {
+    if (typeof bdFitDeck !== 'function') return;
+    const slides = [...stage.querySelectorAll('.pr-slide')];
+    const was = slides.map(el => [el.getAttribute('aria-hidden'), el.style.visibility]);
+    slides.forEach(el => { el.removeAttribute('aria-hidden'); el.style.visibility = 'visible'; });
+    try { bdFitDeck(stage); } finally {
+      slides.forEach((el, i) => {
+        if (was[i][0] != null) el.setAttribute('aria-hidden', was[i][0]);
+        el.style.visibility = was[i][1];
+      });
+    }
   }
 
   function refit() {
     if (!PR) return;
-    try { if (typeof bdFitDeck === 'function') bdFitDeck(PR.stage); } catch (err) { /* keep the last fit */ }
+    try { fitSlides(PR.stage); } catch (err) { /* keep the last fit */ }
   }
 
   function go(n, dir) {
@@ -350,6 +374,7 @@ window.Show = window.Show || {};
     if (fsElement()) exitFullscreen();
     p.root.remove();
     document.documentElement.classList.remove('is-presenting');
+    document.documentElement.style.removeProperty('--pr-sbw');
     const back = p.returnFocus;
     if (back && document.contains(back) && typeof back.focus === 'function') back.focus({ preventScroll: true });
   }

@@ -1,7 +1,7 @@
 /* ---------------------------------------------------------------------
    brand-deck.css — the Brand deck (js/brand-deck.js).
 
-   Part 1: the grid of slide cards in the app (zoomed 1280x720 frames).
+   Part 1: the grid of slide cards in the app (scaled 1280x720 frames).
    Part 2: neutral slide styles. Every slide is a `.ab.ab-slide[data-ae]` root,
    so the aesthetic's own css/aesthetics/<key>.css already styles the shared
    `.ab-*` classes inside it. These rules use board tokens only (--ab-*) plus
@@ -19,7 +19,15 @@
 .deck-grid:empty { min-height: 50vh; }
 .deck-card[data-slide="cover"] { grid-column: 1 / -1; }
 .deck-card:hover { transform: none; }
-.deck-frame { width: 1280px; zoom: 0.4; pointer-events: none; user-select: none; }
+/* Scaled with a transform (bdZoomCards sets --deck-z), not CSS zoom: WebKit's minimum font
+   size would draw zoomed labels at 9px. The negative margins give the frame the scaled size in
+   the card's layout. */
+.deck-frame {
+  --deck-z: 0.4;
+  width: 1280px; height: 720px; transform: scale(var(--deck-z)); transform-origin: 0 0;
+  margin: 0 calc(1280px * (var(--deck-z) - 1)) calc(720px * (var(--deck-z) - 1)) 0;
+  pointer-events: none; user-select: none;
+}
 .deck-frame .ab { border-radius: 0; }
 
 /* Off-screen host for the 1280x720 export clone (html2canvas). */
@@ -61,7 +69,9 @@
   position: relative; width: auto; height: auto; padding: 0; overflow: visible; clip: auto; clip-path: none;
   white-space: normal; display: block;
 }
-.ab.ab-slide[data-ae] .ab-deck-scale[data-face="h"] .ab-deck-sample { white-space: nowrap; }
+/* A scale sample is one line as wide as its row: an aesthetic's headline max-width in em
+   (Frutiger Aero's 11.2em) shrinks with the font, so bdFitSamples could never fit a wide face. */
+.ab.ab-slide[data-ae] .ab-deck-scale[data-face="h"] .ab-deck-sample { white-space: nowrap; max-width: none; }
 /* An aesthetic may place its hero headline on a grid line (Editorial: column 1, row 2).
    Deck headings sit in their own grids and flows: never inherit that placement. */
 .ab.ab-slide[data-ae] .ab-headline.ab-deck-h,
