@@ -165,8 +165,12 @@ window.Show = window.Show || {};
     </section>`;
   }
 
+  // Font stacks carry double quotes ("Fraunces", Georgia, serif); inside a double-quoted
+  // style="" attribute they would end it, so they are written with single quotes.
+  const ff = f => String((f && f.css) || 'inherit').replace(/"/g, "'");
+
   function plateStyle(t, state, font) {
-    return `background:${t.canvas};color:${t.ink};--bv-line:${t.line};--bv-muted:${t.muted};${font ? `font-family:${(font === 'h' ? state.headingFont : state.bodyFont).css};` : ''}`;
+    return `background:${t.canvas};color:${t.ink};--bv-line:${t.line};--bv-muted:${t.muted};${font ? `font-family:${ff(font === 'h' ? state.headingFont : state.bodyFont)};` : ''}`;
   }
 
   function coverHtml(ctx) {
@@ -198,7 +202,7 @@ window.Show = window.Show || {};
       </div>
       <figure class="bv-plate bv-cover-plate" style="${plateStyle(t, state, 'b')}" aria-label="The brand, set in its own colours and fonts">
         <div class="bv-plate-top">${logo}<span class="bv-plate-kicker" style="color:${t.muted}">${esc(def.name)}</span></div>
-        <div class="bv-plate-name" style="font-family:${hf.css};font-weight:${hw};${hStyle}">${esc(brandName)}</div>
+        <div class="bv-plate-name" style="font-family:${ff(hf)};font-weight:${hw};${hStyle}">${esc(brandName)}</div>
         <p class="bv-plate-tag" style="color:${t.muted}">${esc(tagline)}</p>
         <div class="bv-plate-row">
           <span class="bv-plate-btn" style="background:${ctaBg};color:${ctaFg}">Get started</span>
@@ -275,20 +279,20 @@ window.Show = window.Show || {};
     const bSize = probe ? Math.max(14, Math.min(19, probe.b.size)) : 16;
     const upper = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', lower = 'abcdefghijklmnopqrstuvwxyz', nums = '0123456789 &!?%$@';
     const hWeights = [400, 500, 600, 700].filter(w => abWeightNear(hf, w) === w);
-    const weightsRow = w => w.length > 1 ? `<div class="bv-weights" style="font-family:${hf.css}">${w.map(x => `<span style="font-weight:${x}">${x}</span>`).join('')}</div>` : '';
+    const weightsRow = w => w.length > 1 ? `<div class="bv-weights" style="font-family:${ff(hf)}">${w.map(x => `<span style="font-weight:${x}">${x}</span>`).join('')}</div>` : '';
     const heading = `<figure class="bv-plate bv-spec" style="${plateStyle(t, state)}">
       <figcaption><span>Heading</span><b style="color:${t.ink}">${esc(hf.name)}</b><em>${esc(hf.category)}, weight ${hw}</em></figcaption>
-      <div class="bv-spec-aa" style="font-family:${hf.css};font-weight:${hw};${hStyle}">Aa</div>
-      <div class="bv-spec-line" style="font-family:${hf.css};font-weight:${hw};${hStyle}">${esc(brandName)}</div>
-      <div class="bv-spec-glyphs" style="font-family:${hf.css};font-weight:${hw};${hStyle}">${upper}<br>${lower}<br>${nums}</div>
+      <div class="bv-spec-aa" style="font-family:${ff(hf)};font-weight:${hw};${hStyle}">Aa</div>
+      <div class="bv-spec-line" style="font-family:${ff(hf)};font-weight:${hw};${hStyle}">${esc(brandName)}</div>
+      <div class="bv-spec-glyphs" style="font-family:${ff(hf)};font-weight:${hw};${hStyle}">${upper}<br>${lower}<br>${nums}</div>
       ${weightsRow(hWeights)}
     </figure>`;
     const body = `<figure class="bv-plate bv-spec" style="${plateStyle(t, state)}">
       <figcaption><span>Body</span><b style="color:${t.ink}">${esc(bf.name)}</b><em>${esc(bf.category)}, weight ${bw}</em></figcaption>
-      <div class="bv-spec-aa" style="font-family:${bf.css};font-weight:${bw}">Aa</div>
-      <p class="bv-spec-copy" style="font-family:${bf.css};font-weight:${bw};font-size:${bSize}px;color:${t.ink}">${esc(/[.!?]$/.test(tagline) ? tagline : tagline + '.')} Every page starts from a quiet canvas, so the one thing that matters is easy to find and easy to read.</p>
-      <p class="bv-spec-copy is-muted" style="font-family:${bf.css};font-weight:${bw};font-size:${Math.max(12, bSize - 3)}px;color:${t.muted}">Captions, hints and placeholder text step back to the muted tone.</p>
-      <div class="bv-spec-glyphs" style="font-family:${bf.css};font-weight:${bw}">${lower}<br>${nums}</div>
+      <div class="bv-spec-aa" style="font-family:${ff(bf)};font-weight:${bw}">Aa</div>
+      <p class="bv-spec-copy" style="font-family:${ff(bf)};font-weight:${bw};font-size:${bSize}px;color:${t.ink}">${esc(/[.!?]$/.test(tagline) ? tagline : tagline + '.')} Every page starts from a quiet canvas, so the one thing that matters is easy to find and easy to read.</p>
+      <p class="bv-spec-copy is-muted" style="font-family:${ff(bf)};font-weight:${bw};font-size:${Math.max(12, bSize - 3)}px;color:${t.muted}">Captions, hints and placeholder text step back to the muted tone.</p>
+      <div class="bv-spec-glyphs" style="font-family:${ff(bf)};font-weight:${bw}">${lower}<br>${nums}</div>
     </figure>`;
     const typ = findSection(sections, 'Typography');
     let facts = '', rec = '';
@@ -323,7 +327,7 @@ window.Show = window.Show || {};
       ${demo('Input, focus', `<span class="bv-c-input" style="${rf}border-color:${PRI};color:${t.ink};box-shadow:0 0 0 3px ${t.mix(PRI, t.canvas, 0.6)}">hello@brand</span>`)}
       ${demo('Tag', `<span class="bv-c-tag" style="background:${t.secondary};color:${t.onSecondary}">Seasonal</span>`)}
       ${demo('Badge', `<span class="bv-c-tag" style="background:${t.accent};color:${t.onAccent}">New</span>`, 'accent, sparingly')}
-      ${demo('Highlight word', `<span class="bv-c-hl" style="font-family:${state.headingFont.css};color:${t.ink}">Made for ${hlWord}</span>`, 'one per view')}
+      ${demo('Highlight word', `<span class="bv-c-hl" style="font-family:${ff(state.headingFont)};color:${t.ink}">Made for ${hlWord}</span>`, 'one per view')}
       ${demo('Toggle, on', `<span class="bv-c-toggle" style="background:${PRI}"><i style="background:${t.onPrimary}"></i></span>`)}
       ${demo('Selected row', `<span class="bv-c-row" style="${rf}background:${t.secTint};border-left:2px solid ${PRI};color:${t.ink}">Studio plan</span>`)}
       ${demo('Progress', `<span class="bv-c-bar" style="background:${t.line}"><i style="background:${PRI}"></i><i class="is-2" style="background:${t.secondary}"></i></span>`, 'second series: secondary')}
@@ -455,7 +459,7 @@ window.Show = window.Show || {};
       roles: colorRolesFor(st),
       extras: abTokens(def, t, st),
       brandName: aibBrandName(st),
-      tagline: (st.content && typeof st.content.tagline === 'string' && st.content.tagline.trim()) || AIB_CONTENT_FALLBACK.tagline,
+      tagline: String(aibContent(st).tagline).trim(),
       probe: aibProbeBoard(st, def),
     };
     docEl.innerHTML = [coverHtml(ctx), colourHtml(ctx), typeHtml(ctx), componentsHtml(ctx), patternsHtml(ctx), shapeHtml(ctx), textHtml(ctx)].join('') +

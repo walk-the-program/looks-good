@@ -114,6 +114,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, WKNavigationDelegate, 
     var batchFolder: URL?
     var batchCancelled = false
     var batchSaved: [URL] = []
+    var batchWhat = "the slide pictures"
 
     // MARK: launch
 
@@ -430,7 +431,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, WKNavigationDelegate, 
                 panel.canCreateDirectories = true
                 panel.allowsMultipleSelection = false
                 panel.prompt = "Save Here"
-                panel.message = "Choose a folder for all the slide PNGs."
+                panel.message = "Choose a folder for \(batchWhat)."
                 panel.directoryURL = FileManager.default.urls(for: .downloadsDirectory, in: .userDomainMask).first
                 if panel.runModal() == .OK, let url = panel.url { batchFolder = url } else { batchCancelled = true }
             }
@@ -480,9 +481,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate, WKNavigationDelegate, 
                 pb.setString(text, forType: .string)
             }
         case "batch":
-            if (message.body as? String) == "start" {
+            // 'start' / 'end', or { op: 'start', what: 'the video frames' } so the folder
+            // panel can say what is being saved.
+            let dict = message.body as? [String: Any]
+            let op = (message.body as? String) ?? (dict?["op"] as? String) ?? ""
+            if op == "start" {
                 batchActive = true; batchFolder = nil; batchCancelled = false; batchSaved = []
-            } else if (message.body as? String) == "end" {
+                let what = (dict?["what"] as? String)?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+                batchWhat = what.isEmpty || what.count > 60 ? "the slide pictures" : what
+            } else if op == "end" {
                 // Downloads finish asynchronously; give the last one a moment.
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) { [self] in
                     let files = batchSaved

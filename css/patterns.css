@@ -10,9 +10,6 @@
 
 /* ======================= Part 1: Patterns view ======================= */
 
-/* Board | Compare all | Patterns */
-.view-toggle { width: 258px; grid-template-columns: repeat(3, 1fr); }
-
 .pt-view { min-width: 0; }
 .pt-grid { display: grid; grid-template-columns: minmax(0, 1fr) 280px; gap: 24px; align-items: start; }
 .pt-main { min-width: 0; display: flex; flex-direction: column; gap: 28px; }
@@ -156,9 +153,6 @@
   .pt-picker { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   .pt-exports .btn { flex: 1 1 auto; }
   .pt-side { padding: 14px; }
-}
-@media (max-width: 900px) {
-  .view-toggle { width: 258px; max-width: 100%; }
 }
 
 /* colorway chip: a small canvas-coloured pill in the thumbnail's bottom-left corner */

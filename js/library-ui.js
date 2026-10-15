@@ -199,6 +199,41 @@ const LibraryUI = (function () {
       }, { rootMargin: '200px' })
     : null;
 
+  // Relative luminance of a CSS rgb() colour, and the average of a logo's opaque pixels.
+  const relLum = (r, g, b) => {
+    const f = v => { v /= 255; return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); };
+    return 0.2126 * f(r) + 0.7152 * f(g) + 0.0722 * f(b);
+  };
+  function tileLum(css) {
+    const m = String(css || '').match(/[\d.]+/g);
+    if (!m || m.length < 3 || (m.length > 3 && Number(m[3]) < 0.5)) return null;
+    return relLum(+m[0], +m[1], +m[2]);
+  }
+  // The share of a wide logo's opaque wordmark pixels within 1.6:1 of the canvas luminance.
+  function logoLostShare(img, bg) {
+    if (bg == null) return null;
+    try {
+      const c = document.createElement('canvas');
+      c.width = 120; c.height = 40;
+      const x = c.getContext('2d');
+      x.drawImage(img, 0, 0, c.width, c.height);
+      const d = x.getImageData(0, 0, c.width, c.height).data;
+      // A logo drawn on its own filled background already carries its contrast.
+      const at = (px, py) => d[(py * c.width + px) * 4 + 3];
+      if ([at(1, 1), at(c.width - 2, 1), at(1, c.height - 2), at(c.width - 2, c.height - 2)].every(a => a > 200)) return 0;
+      // Only the right two thirds: in a wide lockup that is the wordmark, which is what
+      // goes missing; a mark often uses the canvas colour on purpose.
+      let lost = 0, n = 0;
+      for (let i = 0; i < d.length; i += 4) {
+        if (d[i + 3] <= 128 || (i / 4) % c.width < c.width / 3) continue;
+        const l = relLum(d[i], d[i + 1], d[i + 2]);
+        n++;
+        if ((Math.max(l, bg) + 0.05) / (Math.min(l, bg) + 0.05) < 1.6) lost++;
+      }
+      return n ? lost / n : null;
+    } catch (err) { return null; }
+  }
+
   function tileHtml(rec) {
     const s = rec.savedState || {};
     const colors = s.colors || {};
@@ -254,6 +289,21 @@ const LibraryUI = (function () {
         <div class="tile-meta"><div class="tile-text"><div class="tile-title">New brand</div><div class="tile-sub">Start from a fresh combination</div></div></div>
       </button>`;
     grid.innerHTML = plus + records.map(tileHtml).join('');
+    // A wide logo (mark plus wordmark) gets a wider plate (css .tile-mark.is-wide).
+    // If its ink would vanish on the tile's canvas, it sits on a small light or dark plate.
+    grid.querySelectorAll('.tile-mark.has-logo img').forEach(img => {
+      const wide = () => {
+        if (!(img.naturalWidth > img.naturalHeight * 1.6)) return;
+        const mark = img.parentNode;
+        mark.classList.add('is-wide');
+        const art = mark.closest('.tile-art') || mark.parentNode;
+        const bg = tileLum(getComputedStyle(art).backgroundColor), lost = logoLostShare(img, bg);
+        // Much of the logo (usually its wordmark) close to the canvas: a plate that is the
+        // opposite of the canvas, which is what those pixels contrast with.
+        if (lost != null && lost > 0.35) mark.classList.add(bg < 0.2 ? 'on-light' : 'on-dark');
+      };
+      if (img.complete) wide(); else img.addEventListener('load', wide, { once: true });
+    });
     grid.querySelectorAll('.tile-art[data-font]').forEach(a => {
       if (tileObserver) tileObserver.observe(a); else paintTile(a);
     });

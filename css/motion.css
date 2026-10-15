@@ -266,10 +266,7 @@ body.m-worlds-open { overflow: hidden; }
 .m-worlds.is-closing .m-world.is-picked .m-world-frame { border-radius: 0; box-shadow: none; translate: none; }
 .m-worlds.is-done { animation: m-fade-out var(--m-dur-base) var(--m-ease-out) both; }
 
-/* ---------- toolbar buttons ---------- */
-
-.m-tools { display: inline-flex; gap: 2px; }
-.m-tools .btn { width: 28px; padding: 0; justify-content: center; }
+/* Reveal and Worlds are items of the toolbar's Show menu (css/aesthetic-board.css). */
 
 /* Reduced motion: JS replaces the sequences with cross-fades; this is the backstop. */
 @media (prefers-reduced-motion: reduce) {

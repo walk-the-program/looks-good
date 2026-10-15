@@ -12,9 +12,7 @@
 
 /* ======================= Part 1: chrome ======================= */
 
-/* Board | Compare all | Patterns | Built */
-.view-toggle { width: 330px; grid-template-columns: repeat(4, 1fr); }
-@media (max-width: 900px) { .view-toggle { width: 330px; max-width: 100%; } }
+/* The Board | Compare | Patterns | Built toggle lives in css/aesthetic-board.css (header toolbar). */
 
 .sb-view { min-width: 0; }
 .sb-bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px 14px; margin-bottom: 14px; }
@@ -96,6 +94,9 @@
   display: grid; grid-template-columns: 212px minmax(0, 1fr); align-items: stretch; gap: 0; padding: 0; min-height: 660px;
 }
 :is(.ab.sb-ab, .sb-gen) .ab-in.sb-app > * { grid-column: auto; }
+/* A board's running banner (.ab-in::before: Acid Graphics' ticker, Corporate Vandalism's
+   notice) runs along the app's top edge instead of taking the sidebar's grid cell. */
+.ab.sb-ab > .ab-in.sb-app::before { grid-column: 1 / -1; margin: 0 !important; }
 .sb-side {
   display: flex; flex-direction: column; gap: 22px; min-width: 0; padding: 22px 14px 18px;
   border-right: 1px solid var(--ab-line); background: color-mix(in srgb, var(--ab-ink) 3.5%, transparent);
@@ -517,6 +518,28 @@
 .ab.sb-ab[data-ae="mid-century"] .ab-card-title.sb-num { font-size: clamp(18px, 2.1cqw, 24px); }
 /* Old Web's own list has no avatar column */
 .ab.sb-ab[data-ae="old-web"] .ab-row .ab-av { display: none; }
+/* Old Web draws each card as a window: each one gets its own title (js/see-built.js data-win). */
+.ab.sb-ab[data-ae="old-web"] :is(.ab-card, .ab-panel)[data-win]::before { content: attr(data-win); }
 /* Xerox Punk pins its kicker label to the board's top-left corner; in app screens it stays in the flow */
 .ab.sb-ab[data-ae="xerox-punk"] :is(.sb-top, .sb-home-top, .sb-ob-copy) .ab-kicker { position: relative; inset: auto; left: auto; top: auto; display: inline-block; margin-bottom: 10px !important; }
 .ab.sb-ab[data-ae="dystopian-luxury"] .sb-feat-n { display: none; }
+
+/* ---------- per-aesthetic fixes from the all-aesthetics sweep (dashboard + landing, 1360) ---------- */
+/* A ::after flourish on card titles ("New" chips) has no room beside a stat number. */
+:is(.ab.sb-ab) .ab-card-title.sb-num::after { content: none !important; }
+/* Liquid Glass: the 96px scene strip at the top of each card sat under the stat numbers and
+   feature copy; in app screens it is a slim brand cap instead. */
+.ab.sb-ab[data-ae="liquid-glass"] .ab-card::before { height: 8px; }
+.ab.sb-ab[data-ae="liquid-glass"] .ab-card .ab-seg { margin-bottom: 18px; }
+/* Gorpcore: the stat cards keep the room the spec-tag rivet and code need at the top. */
+.ab.sb-ab[data-ae="gorpcore"] .ab-card.sb-stat { padding-top: 38px; }
+/* Pirate Broadcast's wordmark grows to fill a header row; in the sidebar it stays its own size. */
+.ab.sb-ab[data-ae="pirate-broadcast"] .ab-brand.sb-side-brand { flex: none; }
+/* Retro Futurist's wide, tracked type: stat numbers and the sidebar wordmark fit their boxes. */
+.ab.sb-ab[data-ae="retro-futurist"] .ab-card-title.sb-num { font-size: clamp(17px, 1.9cqw, 21px); letter-spacing: 0; }
+.ab.sb-ab[data-ae="retro-futurist"] .sb-side-brand .ab-wordmark { font-size: 12.5px; letter-spacing: 0.04em; }
+/* Pixel Arcade's pixel caps: plan buttons wrap inside their cards instead of spilling out. */
+.ab.sb-ab[data-ae="pixel-arcade"] .sb-plan :is(.sb-wide, .ab-cta) { white-space: normal; height: auto; min-height: 44px; letter-spacing: 0.04em; line-height: 1.3; text-align: center; }
+/* Xerox Punk's hand-written "← this one." points at one thing: the featured plan. */
+.ab.sb-ab[data-ae="xerox-punk"] .ab-card-body::after { content: none; }
+.ab.sb-ab[data-ae="xerox-punk"] .sb-plan.is-featured .ab-card-body::after { content: "  ← this one."; }

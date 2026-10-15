@@ -1194,6 +1194,15 @@ html.is-mac-app .lib-inner { padding-top: 52px; }
 }
 .tile-mark.has-logo { background: #fff; box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.1); }
 .tile-mark img { display: block; width: 100%; height: 100%; padding: 12%; object-fit: contain; box-sizing: border-box; }
+/* A wide logo (a mark with its wordmark) sits straight on the tile, which is the brand's
+   own canvas it was drawn for, as wide as it needs so the words stay readable instead
+   of shrinking into a square white chip (js/library-ui.js marks it). */
+.tile-mark.has-logo.is-wide { width: auto; max-width: 70cqw; height: 9cqw; background: none; box-shadow: none; border-radius: 0; justify-content: flex-start; }
+.tile-mark.has-logo.is-wide img { width: auto; height: 100%; max-width: 100%; padding: 0; object-position: left center; }
+.tile-mark.has-logo.is-wide.on-light, .tile-mark.has-logo.is-wide.on-dark { height: 12cqw; padding: 0 2.6cqw; border-radius: 2.6cqw; }
+.tile-mark.has-logo.is-wide.on-light { background: #fff; box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.1); }
+.tile-mark.has-logo.is-wide.on-dark { background: #111; }
+.tile-mark.has-logo.is-wide:is(.on-light, .on-dark) img { height: 62%; }
 /* The name sits bottom-left above the palette strip; it wraps only between words. */
 .tile-body {
   position: absolute;

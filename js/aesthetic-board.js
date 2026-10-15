@@ -782,11 +782,12 @@ function renderCompareGrid() {
     return `
     <div class="cmp-tile${def.key === state.aesthetic ? ' is-current' : ''}" role="button" tabindex="0"
          data-key="${def.key}" aria-label="Use ${escapeHtml(def.name)}" aria-pressed="${def.key === state.aesthetic}">
-      <div class="cmp-label"><span class="cmp-num">${String(def.order).padStart(2, '0')}</span><span class="cmp-name">${escapeHtml(def.name)}</span><span class="cmp-desc">${escapeHtml(def.descriptor)}</span></div>
+      <div class="cmp-label"><span class="cmp-num">${aestheticNumber(def.key)}</span><span class="cmp-name">${escapeHtml(def.name)}</span><span class="cmp-desc">${escapeHtml(def.descriptor)}</span></div>
       <div class="cmp-frame"><div class="cmp-board" inert>${boardHtml(Object.assign({}, state, { bgMode: drawn.mode }), drawn)}</div></div>
     </div>`;
   }).join('');
   fitCompareGrid();
+  observeCompareBoards(grid);
 }
 
 // Tiles show the real board at a fixed design width, shrunk with CSS zoom so
@@ -798,8 +799,43 @@ function fitCompareGrid() {
   const w = first.clientWidth;
   if (!w) return;
   const design = w >= 380 ? CMP_WIDE : CMP_NARROW;
+  const zoom = w / design;
   grid.style.setProperty('--cmp-w', design + 'px');
-  grid.style.setProperty('--cmp-zoom', (w / design).toFixed(4));
+  const z = zoom.toFixed(4);
+  if (grid.style.getPropertyValue('--cmp-zoom') === z) return;
+  grid.style.setProperty('--cmp-zoom', z);
+  // Frames already measured follow the new scale (next frame: this runs from the grid's
+  // own ResizeObserver, and resizing the grid inside it would loop the observer).
+  requestAnimationFrame(() => {
+    grid.querySelectorAll('.cmp-board[data-h]').forEach(b => { b.parentElement.style.height = Math.ceil(b.dataset.h * zoom) + 'px'; });
+  });
+}
+
+// Tile boards are scaled with a transform, not CSS zoom: WebKit's minimum font size
+// would blow zoomed small text (labels, swatch codes) back up to 9px. A transform keeps
+// the board's full height in the layout, so each frame is sized to the scaled height
+// once its board has been laid out (off-screen frames skip layout until they are seen).
+let cmpSizer = null;
+function observeCompareBoards(grid) {
+  if (typeof ResizeObserver !== 'function') return;
+  if (!cmpSizer) {
+    // Heights are written on the next frame: shrinking frames brings more of them on
+    // screen, and sizing those inside the same callback loops ResizeObserver.
+    cmpSizer = new ResizeObserver(entries => {
+      const sized = entries.filter(en => en.contentRect.height).map(en => [en.target, en.contentRect.height]);
+      requestAnimationFrame(() => {
+        const g = document.getElementById('compareGrid');
+        const zoom = parseFloat(g && g.style.getPropertyValue('--cmp-zoom')) || 0.5;
+        sized.forEach(([b, h]) => {
+          if (!b.isConnected) return;
+          b.dataset.h = Math.round(h);
+          b.parentElement.style.height = Math.ceil(h * zoom) + 'px';
+        });
+      });
+    });
+  }
+  cmpSizer.disconnect();
+  grid.querySelectorAll('.cmp-board').forEach(b => cmpSizer.observe(b));
 }
 
 function renderAestheticBoard() {
@@ -942,7 +978,7 @@ function buildAestheticList() {
   list.innerHTML = visibleAesthetics().map(def => `
     <button type="button" class="ae-tile" data-key="${def.key}" aria-pressed="false" title="${escapeHtml(def.summary || def.name)}">
       <span class="ae-motif" data-motif="${def.key}" aria-hidden="true"></span>
-      <span class="ae-num">${String(def.order).padStart(2, '0')}</span>
+      <span class="ae-num">${aestheticNumber(def.key)}</span>
       <span class="ae-name">${escapeHtml(def.name)}</span>
       <span class="ae-desc">${escapeHtml(def.descriptor)}</span>
     </button>`).join('');

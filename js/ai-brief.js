@@ -8,7 +8,14 @@
    (color-roles.js, aesthetic overrides applied). Plain <script>, no modules.
 ------------------------------------------------------------------------ */
 
-const AIB_CONTENT_FALLBACK = { brandName: 'Brand Name', tagline: 'A short tagline that captures the brand.' };
+// The copy the brief uses: the brand's own words, with untouched fields resolved to the
+// believable defaults the board shows (effectiveContent in app.js), never a placeholder.
+function aibContent(state) {
+  const c = (state && state.content) || {};
+  if (typeof effectiveContent === 'function') return effectiveContent(c);
+  const own = k => (typeof c[k] === 'string' && c[k].trim()) ? c[k].trim() : '';
+  return { brandName: own('brandName') || 'Aster & Co.', tagline: own('tagline') || 'Made with care, built to last.' };
+}
 
 const AIB_ROLE_ORDER = ['canvas', 'ink', 'primary', 'secondary', 'accent'];
 
@@ -502,8 +509,7 @@ function aibPatternLines(state, def) {
 }
 
 function aibBrandName(state) {
-  const c = state.content || {};
-  return (typeof c.brandName === 'string' && c.brandName.trim()) ? c.brandName.trim() : AIB_CONTENT_FALLBACK.brandName;
+  return String(aibContent(state).brandName).trim();
 }
 
 // "Copy patterns only": the Patterns section on its own, with a one-line preamble so it
@@ -530,10 +536,9 @@ function buildAiBrief(state0) {
   const roles = colorRolesFor(state);
   const extras = abTokens(def, t, state);
   const mode = t.isDark ? 'dark' : 'light';
-  const content = state.content || {};
-  const pick = k => (typeof content[k] === 'string' && content[k].trim()) ? content[k].trim() : AIB_CONTENT_FALLBACK[k];
-  const brandName = pick('brandName');
-  const tagline = pick('tagline');
+  const content = aibContent(state);
+  const brandName = String(content.brandName).trim();
+  const tagline = String(content.tagline).trim();
   const ty = state.typography;
   const out = [];
   const push = (...lines) => out.push(...lines);

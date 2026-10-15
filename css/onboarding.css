@@ -157,3 +157,10 @@
 @media (prefers-reduced-motion: reduce) {
   .ob-coach { transform: none; transition: opacity 120ms linear; }
 }
+
+/* Never in a picture or a show: native captures (deck veil, share rasters), the demo
+   loop, present mode and presenter view (js/onboarding.js also closes the tip). */
+body:has(.deck-native-veil, .sh-raster) .ob-coach,
+body.is-demo .ob-coach,
+body.is-presenter .ob-coach,
+html.is-presenting .ob-coach { visibility: hidden !important; }

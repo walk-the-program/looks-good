@@ -596,7 +596,7 @@
       tile.dataset.key = def.key;
       tile.setAttribute('aria-label', `Use ${def.name}`);
       tile.innerHTML = `<div class="m-world-frame" style="height:${L.h}px"><div class="m-world-board" inert style="width:${W}px;transform:scale(${zoom.toFixed(4)})"></div></div>
-        <span class="m-world-name"><i>${String(def.order).padStart(2, '0')}</i>${e(def.name)}</span>`;
+        <span class="m-world-name"><i>${aestheticNumber(def.key)}</i>${e(def.name)}</span>`;
       grid.appendChild(tile);
       const box = tile.querySelector('.m-world-board');
       if (isCur) curTile = tile;
@@ -619,14 +619,22 @@
       dist.set(t, Math.hypot(dr, dc));
       t.style.setProperty('--m-delay', Math.round(dist.get(t) * 55 + 120) + 'ms');
     });
+    // Drawing all 34 boards in one go is a ~0.4 s task (measured in WebKit) right in the
+    // middle of the zoom. Instead they are drawn nearest first in ~12 ms slices, one
+    // slice per task, so frames keep coming while the wall fills in from the centre out.
+    const queue = tiles.filter(t => t._def).sort((a, b) => dist.get(a) - dist.get(b));
     const fill = () => {
       if (!ov.isConnected) return;
-      tiles.filter(t => t._def).forEach(t => {
+      const t0 = performance.now();
+      do {
+        const t = queue.shift();
+        if (!t) return;
         const box = t.querySelector('.m-world-board');
         setBoardFonts(box);
         box.appendChild(tileBoard(t._def));
         t.classList.add('is-filled');
-      });
+      } while (performance.now() - t0 < 12);
+      setTimeout(fill, 0);
     };
     setTimeout(fill, still ? 0 : 60);
 
@@ -723,16 +731,8 @@
     return finished;
   }
 
-  /* ---------------- toolbar ---------------- */
-
-  function wireButtons() {
-    const r = document.getElementById('showReveal');
-    const w = document.getElementById('showWorlds');
-    if (r) r.addEventListener('click', () => reveal());
-    if (w) w.addEventListener('click', () => worlds());
-  }
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', wireButtons);
-  else wireButtons();
+  // The toolbar's Show menu (index.html, wired in js/present.js) calls Show.reveal and
+  // Show.worlds.
 
   // Closes the reveal or the worlds wall if one is open (the demo loop calls it
   // between beats). Resolves once the overlay is gone.

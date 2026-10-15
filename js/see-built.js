@@ -300,6 +300,10 @@
   /* ---------------- small helpers ---------------- */
 
   const e = s => escapeHtml(String(s == null ? '' : s));
+  // A window title for aesthetics that draw cards as windows (Old Web shows it in each
+  // card's title bar): 'Revenue this month' -> 'revenue-this.htm'.
+  const win = s => ` data-win="${e(String(s).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').split('-').slice(0, 2).join('-') + '.htm')}"`;
+  const winPanel = s => ` data-win="${e(String(s) + ' Properties')}"`;
 
   function hashStr(s) {
     let h = 2166136261;
@@ -491,7 +495,7 @@
     const today = new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
     const series = seriesFor(X.name, '30d', D.chart[2]);
     const total = series.now.reduce((a, b) => a + b, 0);
-    const stats = D.stats.map(([label, value, delta, good]) => `<div class="ab-card sb-stat">
+    const stats = D.stats.map(([label, value, delta, good]) => `<div class="ab-card sb-stat"${win(label)}>
           <p class="ab-label">${e(label)}</p>
           <p class="ab-card-title sb-num">${e(value)}</p>
           <span class="ab-fit sb-delta" data-fit="${good ? 'match' : 'consider'}">${e(delta)}</span>
@@ -511,7 +515,7 @@
         <div class="ab-rule"></div>
         <div class="sb-stats">${stats}</div>
         <div class="sb-mid">
-          <div class="ab-card sb-chart" data-sb-chart data-base="${D.chart[2]}" data-unit="${e(D.chart[1])}">
+          <div class="ab-card sb-chart"${win(D.chart[0] + ' chart')} data-sb-chart data-base="${D.chart[2]}" data-unit="${e(D.chart[1])}">
             <div class="sb-chart-head">
               <div><p class="ab-label">${e(D.chart[0])}</p><p class="ab-card-title sb-num sb-chart-total" data-sb-total>${e(fmt(total, D.chart[1]))}</p><p class="ab-card-body sb-readout" data-sb-readout>${e(series.labels[series.labels.length - 1])} · ${e(fmt(series.now[series.now.length - 1], D.chart[1]))}</p></div>
               ${seg([['7d', '7 days'], ['30d', '30 days'], ['12m', '12 months']], 1, 'range', 'Chart range')}
@@ -520,7 +524,7 @@
             <div class="sb-chart-x" data-sb-x>${xLabels(series.labels)}</div>
             <p class="sb-legend"><span class="sb-lg-now"></span>This period<span class="sb-lg-prev"></span>Previous period</p>
           </div>
-          <div class="ab-panel sb-quick">
+          <div class="ab-panel sb-quick"${winPanel(p.title)}>
             <p class="ab-label sb-quick-h">${e(p.title)}</p>
             <label class="ab-fieldlabel" for="${X.uid}-q">${e(p.field[0])}</label>
             <input class="ab-input" id="${X.uid}-q" type="text" value="${e(p.field[1])}" autocomplete="off" />
@@ -570,7 +574,7 @@
           <div><p class="ab-kicker">${e(M.hello)}</p><h2 class="ab-card-title sb-home-h">Hi, ${e(X.me.split(' ')[0])}</h2></div>
           <button type="button" class="ab-type-apply sb-icon-btn" aria-label="Notifications">${icon('bell', 17)}<i class="sb-badge" aria-hidden="true"></i></button>
         </div>
-        <div class="ab-card sb-home-card">
+        <div class="ab-card sb-home-card"${win(M.card[0])}>
           ${seg(M.seg.map((s, i) => [String(i), s]), 0, 'mseg', 'Show')}
           <h3 class="ab-card-title">${e(M.card[0])}</h3>
           <p class="ab-card-body">${e(M.card[1])}</p>
@@ -597,7 +601,7 @@
         if (!price) return '$0';
         return money(yearly ? Math.round(price * 0.8) : price);
       };
-      return `<div class="ab-card sb-plan${featured ? ' is-featured' : ''}">
+      return `<div class="ab-card sb-plan${featured ? ' is-featured' : ''}"${win(name)}>
           <div class="sb-plan-top"><p class="ab-label">${e(name)}</p>${featured ? '<span class="ab-fit" data-fit="match">Most popular</span>' : ''}</div>
           <p class="ab-card-title sb-price"><span data-sb-price data-m="${e(priceTxt(false))}" data-y="${e(priceTxt(true))}">${priceTxt(false)}</span>${L.per === 'from' ? '' : `<small> / ${e(L.per)}</small>`}</p>
           <p class="ab-card-body">${e(blurb)}</p>
@@ -626,7 +630,7 @@
       <div class="ab-rule"></div>
       <section class="sb-features" aria-label="Features">
         ${labelRow(num(1, 'Why ' + X.name), '')}
-        <div class="sb-feat-grid">${L.features.map(([t, b], i) => `<div class="ab-card sb-feat">
+        <div class="sb-feat-grid">${L.features.map(([t, b], i) => `<div class="ab-card sb-feat"${win(t)}>
             <span class="sb-feat-n" aria-hidden="true">${String(i + 1).padStart(2, '0')}</span>
             <h3 class="ab-card-title">${e(t)}</h3>
             <p class="ab-card-body">${e(b)}</p>
@@ -663,7 +667,7 @@
         <div class="sb-set-grid">
           <section class="sb-set-sec" aria-label="Profile">
             <div class="sb-set-intro">${labelRow(num(1, 'Profile'), '')}<p class="ab-card-body">How ${e(X.name)} appears to customers and in emails.</p></div>
-            <div class="ab-panel sb-set-panel">
+            <div class="ab-panel sb-set-panel"${winPanel('Profile')}>
               ${field(X, 'Workspace name', X.name)}
               <div class="sb-field-row">${field(X, 'Website', slug + '.com')}${field(X, 'Support email', 'hello@' + slug + '.com')}</div>
               ${field(X, 'Tagline', X.tagline)}
@@ -671,14 +675,14 @@
           </section>
           <section class="sb-set-sec" aria-label="Notifications">
             <div class="sb-set-intro">${labelRow(num(2, 'Notifications'), '')}<p class="ab-card-body">Choose what is worth interrupting you for.</p></div>
-            <div class="ab-panel sb-set-panel">
+            <div class="ab-panel sb-set-panel"${winPanel('Notifications')}>
               ${D.notify.map(([l, h, on]) => toggle(X, l, on, h)).join('')}
               <div class="ab-status" aria-live="polite">${D.notify.filter(n => n[2]).length} of ${D.notify.length} on</div>
             </div>
           </section>
           <section class="sb-set-sec" aria-label="Appearance">
             <div class="sb-set-intro">${labelRow(num(3, 'Appearance'), '')}<p class="ab-card-body">Applies to everyone in the workspace.</p></div>
-            <div class="ab-panel sb-set-panel">
+            <div class="ab-panel sb-set-panel"${winPanel('Appearance')}>
               <p class="ab-fieldlabel">Theme</p>
               ${seg([['light', 'Light'], ['dark', 'Dark'], ['auto', 'Automatic']], 2, 'theme', 'Theme')}
               <p class="ab-fieldlabel sb-gap">Density</p>
@@ -687,7 +691,7 @@
           </section>
           <section class="sb-set-sec" aria-label="Plan">
             <div class="sb-set-intro">${labelRow(num(4, 'Plan'), '')}<p class="ab-card-body">Billed monthly. Change or cancel any time.</p></div>
-            <div class="ab-card sb-planbox">
+            <div class="ab-card sb-planbox"${win('plan')}>
               <div class="sb-plan-top"><h3 class="ab-card-title">${e(plan[0])}</h3><span class="ab-fit" data-fit="match">Current plan</span></div>
               <p class="ab-card-body">${e(plan[2])} · renews on the 1st</p>
               <div class="sb-usage"><span class="ab-row-bar" aria-hidden="true"><i style="width:68%"></i></span><span class="ab-label">68% of ${e(D.planNote)}</span></div>

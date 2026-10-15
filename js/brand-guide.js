@@ -496,10 +496,10 @@ function bgGuideVisible(surface, candidates, minRatio, fallback) {
 function renderBrandGuideHTML(state) {
   // Untouched fields resolve to the brand's own believable copy (app.js), never a placeholder.
   const c = typeof effectiveContent === 'function' ? effectiveContent(state.content || {}) : (state.content || {});
-  const brandName = escapeHtml(c.brandName || 'Brand Name');
-  const tagline = escapeHtml(c.tagline || 'A short tagline that captures the brand.');
-  const quoteText = escapeHtml(c.quoteText || 'Design is the silent ambassador of your brand.');
-  const quoteAuthor = escapeHtml(c.quoteAuthor || 'Author Name');
+  const brandName = escapeHtml(c.brandName || 'Aster & Co.');
+  const tagline = escapeHtml(c.tagline || 'Made with care, built to last.');
+  const quoteText = escapeHtml(c.quoteText || 'We would rather do one thing well than ten things nearly.');
+  const quoteAuthor = escapeHtml(c.quoteAuthor || 'The founding team');
 
   // Font stacks carry real double quotes, which would close the
   // double-quoted style="..." attributes below — single quotes are equally

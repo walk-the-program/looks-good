@@ -40,6 +40,17 @@ function hasClassicAesthetic(key) {
   return Object.prototype.hasOwnProperty.call(AESTHETICS_CLASSIC, key);
 }
 
+// The two-digit number shown beside an aesthetic's name (picker, Compare all, Mix in,
+// Worlds): its place in the list the person can see, so the numbers run 01, 02, 03...
+// with no gaps (the curated showcase list included). Plain counting, never the def's
+// internal order value.
+function aestheticNumber(key) {
+  const base = aestheticBaseKey(key);
+  const list = typeof showcaseFilter === 'function' ? showcaseFilter(AESTHETICS) : AESTHETICS;
+  const i = list.findIndex(a => a.key === base);
+  return i < 0 ? '' : String(i + 1).padStart(2, '0');
+}
+
 // Unknown or missing keys fall back to the first aesthetic, so a saved brand
 // that references a retired aesthetic still renders.
 function aestheticByKey(key) {

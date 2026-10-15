@@ -724,7 +724,7 @@ window.Show = window.Show || {};
   function syncMenu() {
     const item = document.querySelector('[data-show="presenter"]');
     if (item) item.setAttribute('aria-checked', String(presenterOn));
-    const demo = document.querySelector('[data-show="demo"] span');
+    const demo = document.querySelector('[data-show="demo"] .tb-label');
     if (demo) demo.textContent = D ? 'Stop the demo loop' : 'Run the demo loop';
   }
 
@@ -737,28 +737,34 @@ window.Show = window.Show || {};
       btn.setAttribute('aria-expanded', String(on));
       if (on) { syncMenu(); const first = menu.querySelector('[role^="menuitem"]'); if (first) first.focus(); }
     };
-    btn.addEventListener('click', e => { e.stopPropagation(); open(menu.hidden); });
-    document.addEventListener('click', e => { if (!menu.hidden && !menu.contains(e.target)) open(false); });
+    // No stopPropagation: a click here must still close the Share menu (and the reverse).
+    btn.addEventListener('click', () => open(menu.hidden));
+    document.addEventListener('click', e => { if (!menu.hidden && !menu.contains(e.target) && !btn.contains(e.target)) open(false); });
     menu.addEventListener('keydown', e => {
       const items = [...menu.querySelectorAll('[role^="menuitem"]')];
       const i = items.indexOf(document.activeElement);
-      if (e.key === 'Escape') { e.stopPropagation(); open(false); btn.focus(); }
+      if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); open(false); btn.focus(); }
       else if (e.key === 'ArrowDown') { e.preventDefault(); items[(i + 1) % items.length].focus(); }
       else if (e.key === 'ArrowUp') { e.preventDefault(); items[(i - 1 + items.length) % items.length].focus(); }
+      else if (e.key === 'Home') { e.preventDefault(); items[0].focus(); }
+      else if (e.key === 'End') { e.preventDefault(); items[items.length - 1].focus(); }
+      else if (e.key === 'Tab') open(false);
     });
     menu.addEventListener('click', e => {
       const item = e.target.closest('[data-show]');
       if (!item) return;
       open(false);
       const what = item.dataset.show;
-      if (what === 'present') present(0);
+      if (what === 'reveal') { if (typeof Show.reveal === 'function') Show.reveal(); }
+      else if (what === 'worlds') { if (typeof Show.worlds === 'function') Show.worlds(); }
+      else if (what === 'present') present(0);
       else if (what === 'presenter') presenter();
       else if (what === 'demo') { if (D) stopDemo(); else startDemo(); }
     });
   }
 
-  // ?demo=1: open the most recent brand (or a sample one when the library is
-  // empty) and start the loop.
+  // ?demo=1: open the most recent brand and start the loop. An empty library gets the
+  // showcase brands (the same set its empty state offers) rather than a made-up one.
   async function demoFromUrl() {
     let flag = null;
     try { flag = new URLSearchParams(location.search).get('demo'); } catch (err) { return; }
@@ -767,13 +773,15 @@ window.Show = window.Show || {};
     await new Promise(r => setTimeout(r, 600));
     if (!inEditor() && typeof BrandSession !== 'undefined' && typeof LibraryStore !== 'undefined') {
       try {
-        const rows = await LibraryStore.list();
-        if (rows && rows.length) {
-          rows.sort((a, b) => (b.updatedAt || 0) - (a.updatedAt || 0));
-          await BrandSession.openBrand(rows[0].id);
-        } else {
-          await BrandSession.createBrand('Northwind Provisions', 'Good food, simply sourced');
+        let rows = await LibraryStore.list();
+        if ((!rows || !rows.length) && window.ShowcaseBrands && typeof ShowcaseBrands.load === 'function') {
+          await ShowcaseBrands.load();
+          if (typeof LibraryUI !== 'undefined' && typeof LibraryUI.refresh === 'function') await LibraryUI.refresh();
+          rows = await LibraryStore.list();
         }
+        if (!rows || !rows.length) return;
+        rows.sort((a, b) => (b.updatedAt || 0) - (a.updatedAt || 0));
+        await BrandSession.openBrand(rows[0].id);
       } catch (err) { return; }
     }
     if (!await until(inEditor, 4000)) return;
@@ -784,9 +792,8 @@ window.Show = window.Show || {};
   function init() {
     window.addEventListener('keydown', onKeydown, true);
     window.addEventListener('keyup', onKeyup, true);
-    const p1 = document.getElementById('showPresent');
-    const p2 = document.getElementById('presentDeck');
-    [p1, p2].forEach(b => b && b.addEventListener('click', () => present(0)));
+    const deckBtn = document.getElementById('presentDeck');
+    if (deckBtn) deckBtn.addEventListener('click', () => present(0));
     wireMenu();
     demoFromUrl();
   }

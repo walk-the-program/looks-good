@@ -54,13 +54,11 @@ body[data-showcase="on"] .sc-refine { display: block; }
 .sc-refine-note { margin: 0; font-size: 12px; line-height: 1.45; color: var(--muted); }
 
 /* Always hidden in showcase mode: the version history switch, the heuristic
-   recommendations and suggestion boxes, aesthetic numbers (the set has gaps once
-   it is curated) and the pattern engine's timing readout. */
+   recommendations and suggestion boxes and the pattern engine's timing readout.
+   (Aesthetic numbers stay: aestheticNumber() counts the curated list 01-20.) */
 body[data-showcase="on"] #aeVersion,
 body[data-showcase="on"] .recommendations,
 body[data-showcase="on"] .suggest,
-body[data-showcase="on"] .ae-num,
-body[data-showcase="on"] .cmp-num,
 body[data-showcase="on"] #ptTiming { display: none !important; }
 
 /* Folded under Refine until it is opened. */

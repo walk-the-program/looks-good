@@ -437,20 +437,12 @@
             </button>
           </div>
           <div class="segmented view-toggle" role="radiogroup" aria-label="Board view">
-            <label><input type="radio" name="boardView" value="board" checked /> Board</label>
-            <label><input type="radio" name="boardView" value="compare" /> Compare all</label>
-            <label><input type="radio" name="boardView" value="patterns" /> Patterns</label>
-            <label><input type="radio" name="boardView" value="built" /> Built</label>
+            <label title="The brand board"><input type="radio" name="boardView" value="board" checked /> Board</label>
+            <label title="Every aesthetic side by side"><input type="radio" name="boardView" value="compare" /> Compare</label>
+            <label title="Patterns made from the brand"><input type="radio" name="boardView" value="patterns" /> Patterns</label>
+            <label title="The brand on real product screens"><input type="radio" name="boardView" value="built" /> Built</label>
           </div>
-          <!-- Brand reveal and the worlds zoom (js/reveal.js, css/motion.css). -->
-          <div class="m-tools">
-            <button type="button" id="showReveal" class="btn btn-ghost btn-small" aria-label="Reveal the brand" title="Reveal: watch the board assemble itself">
-              <svg class="ico" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3.5l1.9 5.2 5.1 1.9-5.1 1.9L12 17.7l-1.9-5.2L5 10.6l5.1-1.9z"/><path d="M18.5 16.5l.7 1.8 1.8.7-1.8.7-.7 1.8-.7-1.8-1.8-.7 1.8-.7z"/></svg>
-            </button>
-            <button type="button" id="showWorlds" class="btn btn-ghost btn-small" aria-label="See every world" title="Worlds: this brand in every aesthetic">
-              <svg class="ico" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="3.5" width="7" height="7" rx="1"/><rect x="13.5" y="3.5" width="7" height="7" rx="1"/><rect x="3.5" y="13.5" width="7" height="7" rx="1"/><rect x="13.5" y="13.5" width="7" height="7" rx="1"/></svg>
-            </button>
-          </div>
+          <span class="ws-sep" aria-hidden="true"></span>
           <button type="button" id="briefCart" class="btn btn-ghost btn-small cart-btn is-empty" aria-haspopup="dialog" aria-expanded="false" aria-controls="briefTray" title="Patterns in your AI brief">
             <svg class="ico" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 3h7l4 4v14H7z"/><path d="M14 3v4h4"/><path d="M10 12h5M10 16h5"/></svg>
             In brief · <span id="briefCartCount">0</span>
@@ -460,8 +452,9 @@
             <button type="button" id="shareBtn" class="btn btn-ghost btn-small" aria-haspopup="menu" aria-expanded="false" aria-controls="shareMenu" title="Save the brand to share it">
               <svg class="ico" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V3"/><path d="m7 8 5-5 5 5"/><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/></svg>
               Share
+              <svg class="ico ico-caret" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
             </button>
-            <div class="share-menu" id="shareMenu" role="menu" aria-label="Share the brand" hidden>
+            <div class="share-menu tb-menu" id="shareMenu" role="menu" aria-label="Share the brand" hidden>
               <p class="share-group" aria-hidden="true">Page</p>
               <button type="button" role="menuitem" data-share="site"><svg class="ico" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18"/></svg><span>Mini-site<small>One file that opens in any browser</small></span></button>
               <p class="share-group" aria-hidden="true">Video, 15 seconds</p>
@@ -478,19 +471,22 @@
               <button type="button" role="menuitem" id="exportPalettePng" class="btn"><svg class="ico" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="8" cy="12" r="3"/><circle cx="16" cy="12" r="3"/></svg><span>Colour palette</span></button>
             </div>
           </div>
-          <!-- The scripted show (js/present.js, css/present.css). -->
+          <!-- The show: reveal and worlds (js/reveal.js), present, presenter view and the
+               demo loop (js/present.js, which wires every item of this menu). -->
           <div class="show-tools">
-            <button type="button" id="showPresent" class="btn btn-ghost btn-small" title="Present the brand deck full screen">
+            <button type="button" id="showMenuBtn" class="btn btn-ghost btn-small" aria-haspopup="menu" aria-expanded="false" aria-controls="showMenu" title="Show the brand: reveal, every world, present">
               <svg class="ico" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 4.5v15l12-7.5z"/></svg>
-              Present
+              Show
+              <svg class="ico ico-caret" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
             </button>
-            <button type="button" id="showMenuBtn" class="btn btn-ghost btn-small btn-icon" aria-haspopup="menu" aria-expanded="false" aria-controls="showMenu" aria-label="More ways to show the brand" title="More ways to show the brand">
-              <svg class="ico" width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg>
-            </button>
-            <div class="show-menu" id="showMenu" role="menu" aria-label="Show the brand" hidden>
-              <button type="button" role="menuitem" data-show="present"><span>Present the deck</span></button>
-              <button type="button" role="menuitemcheckbox" aria-checked="false" data-show="presenter"><span>Presenter view</span><kbd>P</kbd></button>
-              <button type="button" role="menuitem" data-show="demo"><span>Run the demo loop</span></button>
+            <div class="show-menu tb-menu" id="showMenu" role="menu" aria-label="Show the brand" hidden>
+              <p class="tb-group" aria-hidden="true">Watch</p>
+              <button type="button" role="menuitem" data-show="reveal"><svg class="ico" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3.5l1.9 5.2 5.1 1.9-5.1 1.9L12 17.7l-1.9-5.2L5 10.6l5.1-1.9z"/><path d="M18.5 16.5l.7 1.8 1.8.7-1.8.7-.7 1.8-.7-1.8-1.8-.7 1.8-.7z"/></svg><span>Reveal the brand<small>The board builds itself</small></span></button>
+              <button type="button" role="menuitem" data-show="worlds"><svg class="ico" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="3.5" width="7" height="7" rx="1"/><rect x="13.5" y="3.5" width="7" height="7" rx="1"/><rect x="3.5" y="13.5" width="7" height="7" rx="1"/><rect x="13.5" y="13.5" width="7" height="7" rx="1"/></svg><span>Every world<small>This brand in every aesthetic</small></span></button>
+              <p class="tb-group" aria-hidden="true">Present</p>
+              <button type="button" role="menuitem" data-show="present"><svg class="ico" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2.5" y="4" width="19" height="13" rx="1.5"/><path d="m10.5 8 4 2.5-4 2.5z"/><path d="M12 17v3.5M8.5 20.5h7"/></svg><span>Present the deck<small>Full screen, arrow keys to move</small></span></button>
+              <button type="button" role="menuitemcheckbox" aria-checked="false" data-show="presenter"><svg class="ico" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3.5" width="18" height="17" rx="2"/><path d="M3 8h18"/><path d="M8 13h8M8 16.5h5"/></svg><span>Presenter view<small>Big board; keys 1 to 5 play each part</small></span><kbd>P</kbd></button>
+              <button type="button" role="menuitem" data-show="demo"><svg class="ico" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12a8 8 0 0 1 13.7-5.6L20 8.5"/><path d="M20 3.5v5h-5"/><path d="M20 12a8 8 0 0 1-13.7 5.6L4 15.5"/><path d="M4 20.5v-5h5"/></svg><span><b class="tb-label">Run the demo loop</b><small>Plays on its own; any key stops it</small></span></button>
             </div>
           </div>
         </div>

@@ -21,8 +21,7 @@
                                saves every one.
 
    Files are saved the way every export in the app is (a download link, which
-   the Mac app turns into a save panel). Share.saveHook(blob, name) replaces
-   that, for tests. Boards are rasterised with the Mac app's native capture
+   the Mac app turns into a save panel). Boards are rasterised with the Mac app's native capture
    when it is there (window.webkit.messageHandlers.capture), else with
    html2canvas and the deck export's clean-up helpers (js/brand-deck.js).
 
@@ -46,12 +45,11 @@ window.Show = window.Show || {};
   const easeIO = t => { t = clamp(t, 0, 1); return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2; };
   const CANCEL = new Error('cancelled');
 
-  const Share = { saveHook: null, busy: false, last: null };
+  const Share = { busy: false, last: null };
 
   /* ---------------- saving ---------------- */
 
   function saveBlob(blob, name) {
-    if (typeof Share.saveHook === 'function') return Share.saveHook(blob, name);
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
@@ -65,7 +63,6 @@ window.Show = window.Show || {};
 
   // Several files at once: the Mac app asks for one folder instead of a save panel per file.
   function batch(msg) {
-    if (typeof Share.saveHook === 'function') return;
     const mh = window.webkit && window.webkit.messageHandlers;
     if (mh && mh.batch && typeof mh.batch.postMessage === 'function') {
       try { mh.batch.postMessage(msg); } catch (err) { /* plain downloads still work */ }
@@ -1151,7 +1148,7 @@ if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeT
       } else {
         // No recorder in this engine: a numbered frame sequence and a note on joining it.
         const fps = 12, count = Math.round(REEL_MS / 1000 * fps);
-        batch('start');
+        batch({ op: 'start', what: 'the video frames' });
         try {
           for (let f = 0; f < count; f++) {
             J.check();
@@ -1520,7 +1517,7 @@ if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeT
         J.set(to);
       }
       J.set(1, 'Saving');
-      if (outs.length > 1) batch('start');
+      if (outs.length > 1) batch({ op: 'start', what: 'the pictures' });
       try {
         for (const o of outs) {
           const blob = await canvasBlob(o.cv);
@@ -1562,8 +1559,8 @@ if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeT
       btn.setAttribute('aria-expanded', 'false');
       if (refocus) btn.focus({ preventScroll: true });
     };
-    btn.addEventListener('click', e => { e.stopPropagation(); if (menu.hidden) open(); else close(false); });
-    document.addEventListener('click', e => { if (!menu.hidden && !menu.contains(e.target) && e.target !== btn) close(false); });
+    btn.addEventListener('click', () => { if (menu.hidden) open(); else close(false); });
+    document.addEventListener('click', e => { if (!menu.hidden && !menu.contains(e.target) && !btn.contains(e.target)) close(false); });
     menu.addEventListener('keydown', e => {
       const list = items();
       const at = list.indexOf(document.activeElement);
@@ -1591,7 +1588,6 @@ if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeT
   Share.site = makeSite;
   Share.reel = makeReel;
   Share.picture = makePictures;
-  Share._draw = { drawReel, reelAssets, rasterBoard, pickAesthetics };
   window.Show.share = { site: makeSite, reel: makeReel, picture: makePictures };
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', wireMenu);

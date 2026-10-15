@@ -724,6 +724,21 @@ const Onboarding = (function () {
   let coachEl = null;
   let coachBusy = false;
 
+  // Tips stand aside while the brand is being shown or saved: the demo loop, present
+  // mode, presenter view, and a native picture or slide capture (the deck veil or a
+  // share raster on screen). A tip open when one starts closes and comes back next time.
+  function coachBlocked() {
+    const b = document.body;
+    if (!b || b.classList.contains('is-demo') || b.classList.contains('is-presenter')) return true;
+    if (document.documentElement.classList.contains('is-presenting')) return true;
+    const S = window.Show || {};
+    if ((typeof S.isDemo === 'function' && S.isDemo()) || (typeof S.isPresenting === 'function' && S.isPresenting())) return true;
+    return !!document.querySelector('.deck-native-veil, .sh-raster');
+  }
+  function coachUnmark(id) {
+    try { const s = coachSeen(); delete s[id]; localStorage.setItem(COACH_KEY, JSON.stringify(s)); } catch (e) { /* ignore */ }
+  }
+
   function closeCoach() {
     if (coachEl) { coachEl.remove(); coachEl = null; }
   }
@@ -756,7 +771,10 @@ const Onboarding = (function () {
       place();
       requestAnimationFrame(() => { place(); el.classList.add('is-in'); });
       target.classList.add('ob-coach-target');
+      // Closed by a show starting (not by the person): the tip is not used up.
+      const watch = setInterval(() => { if (coachBlocked()) { coachUnmark(tip.id); done(); } }, 250);
       const done = () => {
+        clearInterval(watch);
         target.classList.remove('ob-coach-target');
         window.removeEventListener('resize', place);
         document.removeEventListener('keydown', onKey, true);
@@ -764,7 +782,14 @@ const Onboarding = (function () {
         closeCoach();
         resolve();
       };
-      const onKey = e => { if (e.key === 'Escape') { e.stopPropagation(); done(); } };
+      const onKey = e => {
+        if (e.key !== 'Escape') return;
+        if (coachBlocked()) { coachUnmark(tip.id); done(); return; }   // the show's Esc goes through
+        // Esc inside an open menu or dialog belongs to it; the tip stays.
+        const t = e.target;
+        if (t && t.closest && !el.contains(t) && t.closest('[role="menu"], [role="dialog"], [role="listbox"], dialog')) return;
+        e.stopPropagation(); done();
+      };
       window.addEventListener('resize', place);
       document.addEventListener('keydown', onKey, true);
       target.addEventListener('click', done, { once: true });
@@ -779,11 +804,12 @@ const Onboarding = (function () {
       await new Promise(r => setTimeout(r, 1700));      // let the board settle
       // A running reveal or worlds view owns the screen: wait it out (at most 10 seconds).
       for (let n = 0; n < 33 && document.querySelector('.m-reveal, .m-worlds'); n++) await new Promise(r => setTimeout(r, 300));
+      if (coachBlocked()) return;
       await new Promise(r => setTimeout(r, 400));
       for (const tip of TIPS) {
         if (document.body.dataset.view !== 'editor' || isShowcase()) break;
         if (document.body.classList.contains('has-dialog')) break;
-        if (document.querySelector('.m-reveal, .m-worlds')) break;
+        if (document.querySelector('.m-reveal, .m-worlds') || coachBlocked()) break;
         if (coachSeen()[tip.id]) continue;
         const target = tip.find();
         if (!visible(target)) continue;                 // not on screen in this build: skip it

@@ -887,7 +887,7 @@ function blendOptionsHtml() {
   if (!opts.length) return none + '<p class="blend-empty">No aesthetic matches.</p>';
   return none + opts.map(a => `<button type="button" class="ae-tile blend-opt" data-key="${a.key}" aria-pressed="${!!cur && cur.with === a.key}">
       <span class="ae-motif" data-motif="${a.key}" aria-hidden="true"></span>
-      <span class="ae-num">${String(a.order).padStart(2, '0')}</span>
+      <span class="ae-num">${aestheticNumber(a.key)}</span>
       <span class="ae-name">${escapeHtml(a.name)}</span>
       <span class="ae-desc">${escapeHtml(a.descriptor)}</span>
     </button>`).join('');
