@@ -1,0 +1,70 @@
+/* ---------------------------------------------------------------------
+   share.css — the Share menu, the export progress card, and the off-screen
+   hosts js/share.js draws boards in.
+------------------------------------------------------------------------ */
+
+.share-tools { position: relative; display: inline-flex; }
+.share-menu {
+  position: absolute; right: 0; top: calc(100% + 6px); z-index: 60;
+  width: 288px; padding: 6px;
+  background: var(--surface); border: 1px solid var(--line-strong); border-radius: 12px;
+  box-shadow: var(--shadow-3), 0 2px 6px rgba(0, 0, 0, 0.04);
+  display: flex; flex-direction: column;
+}
+.share-menu[hidden] { display: none; }
+.share-menu .share-group {
+  margin: 8px 10px 4px; font-size: 11px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted);
+}
+.share-menu .share-group:first-child { margin-top: 4px; }
+.share-menu hr { width: 100%; height: 1px; margin: 6px 0; border: 0; background: var(--line-strong); }
+.share-menu button {
+  display: grid; grid-template-columns: 18px 1fr; align-items: start; column-gap: 10px;
+  width: 100%; margin: 0; padding: 7px 10px; border: 0; border-radius: 7px;
+  background: none; color: var(--ink); font: inherit; font-size: 13px; line-height: 1.35; text-align: left; cursor: pointer;
+}
+.share-menu button:hover, .share-menu button:focus-visible { background: var(--hover); outline: none; }
+.share-menu button .ico { margin-top: 1px; color: var(--ink-2); }
+.share-menu button span { display: flex; flex-direction: column; min-width: 0; }
+.share-menu button small { color: var(--muted); font-size: 12px; }
+/* #exportPalettePng keeps its old .btn classes for app.js; inside the menu it is a plain item. */
+.share-menu button.btn { height: auto; justify-content: initial; box-shadow: none; border: 0; }
+
+/* ---------- progress veil ---------- */
+
+.sh-veil {
+  position: fixed; inset: 0; z-index: 2147483600;
+  display: flex; align-items: flex-end; justify-content: center;
+  padding: 24px;
+  background: rgba(14, 13, 16, 0.55);
+  opacity: 0; transition: opacity 180ms ease;
+}
+.sh-veil.is-in { opacity: 1; }
+@media (prefers-reduced-motion: reduce) { .sh-veil { transition: opacity 80ms linear; } }
+.sh-prog {
+  width: min(380px, 100%);
+  padding: 16px 16px 12px;
+  background: var(--surface); color: var(--ink);
+  border-radius: 14px; box-shadow: var(--shadow-modal);
+  font-family: var(--font-ui); font-size: 13px;
+}
+.sh-veil.is-capturing .sh-prog { visibility: hidden; }
+.sh-prog-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+.sh-prog-title { font-size: 14px; font-weight: 600; }
+.sh-prog-pct { font-family: var(--font-mono); font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.sh-prog-bar { height: 4px; margin: 12px 0 8px; border-radius: 2px; background: var(--hover); overflow: hidden; }
+.sh-prog-bar i { display: block; height: 100%; width: 0; background: var(--ink); border-radius: 2px; transition: width 160ms linear; }
+.sh-prog-detail { margin: 0; color: var(--muted); min-height: 1.4em; }
+.sh-prog-preview { margin-top: 12px; display: flex; justify-content: center; background: #0d0d0f; border-radius: 8px; overflow: hidden; }
+.sh-prog-preview[hidden] { display: none; }
+.sh-prog-preview canvas { display: block; max-width: 100%; max-height: 240px; width: auto; height: auto; }
+.sh-prog-foot { display: flex; justify-content: flex-end; margin-top: 10px; }
+.sh-prog-foot:empty { display: none; }
+
+/* ---------- off-screen hosts ---------- */
+
+/* Boards drawn by html2canvas: laid out at their full size, invisible. */
+.sh-raster-off { position: fixed; left: 0; top: 0; z-index: -1; opacity: 0; overflow: hidden; pointer-events: none; }
+/* Everything a mini-site holds, laid out (so the deck can be fitted) but off screen. */
+.sh-stage { position: absolute; left: -40000px; top: 0; width: 1240px; pointer-events: none; }
+.sh-stage .ms-slide-src { width: 1280px; height: 720px; position: relative; overflow: hidden; }
+.sh-stage .bv.ms-bv { position: static; inset: auto; display: block; }

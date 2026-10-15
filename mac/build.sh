@@ -19,9 +19,17 @@ echo "==> Cleaning"
 rm -rf "$BUILD_DIR"
 mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources/web"
 
-echo "==> Compiling Swift (arm64, macOS 13+)"
-swiftc -O -target arm64-apple-macos13.0 ${SWIFT_FLAGS:-} \
-  -o "$APP/Contents/MacOS/BrandingDesigner" "$MAC_DIR/main.swift"
+echo "==> Compiling Swift (universal: arm64 + x86_64, macOS 13+)"
+ARCH_DIR="$BUILD_DIR/arch"
+mkdir -p "$ARCH_DIR"
+for arch in arm64 x86_64; do
+  swiftc -O -target "$arch-apple-macos13.0" ${SWIFT_FLAGS:-} \
+    -o "$ARCH_DIR/BrandingDesigner-$arch" "$MAC_DIR/main.swift"
+done
+lipo -create "$ARCH_DIR/BrandingDesigner-arm64" "$ARCH_DIR/BrandingDesigner-x86_64" \
+  -output "$APP/Contents/MacOS/BrandingDesigner"
+rm -rf "$ARCH_DIR"
+lipo -info "$APP/Contents/MacOS/BrandingDesigner"
 
 echo "==> Info.plist"
 sed -e "s/@BUNDLE_ID@/$BUNDLE_ID/" -e "s/@BUILD@/$(date +%Y%m%d%H%M)/" \
@@ -41,15 +49,13 @@ iconutil -c icns "$ICON_TMP/AppIcon.iconset" -o "$APP/Contents/Resources/AppIcon
 echo "==> Copying web files"
 WEB="$APP/Contents/Resources/web"
 cp "$ROOT/index.html" "$WEB/"
-cp -R "$ROOT/css" "$ROOT/js" "$WEB/"
-mkdir -p "$WEB/vendor"
-cp "$MAC_DIR/vendor/"*.js "$WEB/vendor/"
-# Point the CDN script tags at the vendored copies so export works offline.
-sed -i '' \
-  -e 's#https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js#vendor/html2canvas.min.js#' \
-  -e 's#https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js#vendor/jspdf.umd.min.js#' \
-  "$WEB/index.html"
-if grep -q cdnjs "$WEB/index.html"; then echo "CDN reference left in index.html" >&2; exit 1; fi
+# fonts/ and vendor/ make the app work fully offline: every Google Font the app uses
+# (dev/vendor-fonts.py) and the export libraries (html2canvas, jsPDF). The page loads
+# these local copies first; the CDN / Google Fonts are only a fallback.
+cp -R "$ROOT/css" "$ROOT/js" "$ROOT/fonts" "$ROOT/vendor" "$WEB/"
+for f in fonts/fonts.css fonts/CREDITS.txt vendor/html2canvas.min.js vendor/jspdf.umd.min.js; do
+  [ -s "$WEB/$f" ] || { echo "missing $f (offline copy)" >&2; exit 1; }
+done
 
 echo "==> Codesign (ad-hoc)"
 codesign --force --deep -s - "$APP"
@@ -61,14 +67,16 @@ if [ ! -w "$DEST_DIR" ]; then
   DEST_DIR="$HOME/Applications"
   mkdir -p "$DEST_DIR"
 fi
-if pgrep -x BrandingDesigner >/dev/null 2>&1; then
+# Quit only the copy being replaced (a test build elsewhere leaves the installed app running).
+RUNNING="$DEST_DIR/$APP_NAME.app/Contents/MacOS/BrandingDesigner"
+if pgrep -f "$RUNNING" >/dev/null 2>&1; then
   echo "    quitting running instance"
   osascript -e "tell application id \"$BUNDLE_ID\" to quit" >/dev/null 2>&1 || true
   for _ in $(seq 1 20); do
-    pgrep -x BrandingDesigner >/dev/null 2>&1 || break
+    pgrep -f "$RUNNING" >/dev/null 2>&1 || break
     sleep 0.25
   done
-  pkill -x BrandingDesigner >/dev/null 2>&1 || true
+  pkill -f "$RUNNING" >/dev/null 2>&1 || true
 fi
 rm -rf "$DEST_DIR/$APP_NAME.app"
 cp -R "$APP" "$DEST_DIR/$APP_NAME.app"

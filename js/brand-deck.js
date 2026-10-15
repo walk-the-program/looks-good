@@ -1541,16 +1541,17 @@ async function bdEmbedSvgFonts(doc, root) {
   const win = doc.defaultView;
   const svgs = [...root.querySelectorAll('svg')].filter(svg => svg.querySelector('text'));
   if (!svgs.length) return;
-  const links = [...document.querySelectorAll('link[href*="fonts.googleapis.com/css"]')].map(l => l.href);
-  const sheets = (await Promise.all(links.map(u => bdFetchText(u, bdFontCss, 'text')))).filter(Boolean).join('\n');
-  if (!sheets) return;
+  // The bundled fonts/fonts.css (latin only, relative urls) and any Google Fonts fallback sheets.
+  const links = [...document.querySelectorAll('#localFonts, link[href*="fonts.googleapis.com/css"]')].map(l => l.href);
+  const sheets = (await Promise.all(links.map(u => bdFetchText(u, bdFontCss, 'text').then(t => t && { u, t })))).filter(Boolean);
+  if (!sheets.length) return;
   const faces = [];
-  sheets.replace(/\/\*\s*([\w-]+)\s*\*\/\s*@font-face\s*\{([^}]*)\}/g, (m, subset, body) => {
+  sheets.forEach(({ u, t }) => t.replace(/(?:\/\*\s*([\w-]+)\s*\*\/\s*)?@font-face\s*\{([^}]*)\}/g, (m, subset, body) => {
     const fam = (body.match(/font-family:\s*['"]?([^;'"]+)/) || [])[1];
     const src = (body.match(/url\(([^)]+)\)/) || [])[1];
-    if (fam && src && (subset === 'latin' || subset === 'latin-ext')) faces.push({ fam: fam.trim().toLowerCase(), src: src.replace(/['"]/g, ''), body });
+    if (fam && src && (!subset || subset === 'latin' || subset === 'latin-ext')) faces.push({ fam: fam.trim().toLowerCase(), src: new URL(src.replace(/['"]/g, ''), u).href, body });
     return m;
-  });
+  }));
   for (const svg of svgs) {
     const fams = new Set();
     svg.querySelectorAll('text, tspan').forEach(el => {
@@ -1940,10 +1941,96 @@ function bdSaveBlob(blob, filename) {
   URL.revokeObjectURL(url);
 }
 
+/* ---------------- native export (Mac app) ---------------- */
+
+// Inside the Mac app (mac/main.swift adds the `capture` message handler) WebKit itself
+// paints the slide, so an export looks exactly like the screen: glass, blend modes,
+// filters and gradients included. Elsewhere html2canvas (above) stays the fallback.
+function bdNativeCapture() {
+  const mh = window.webkit && window.webkit.messageHandlers;
+  return mh && mh.capture && typeof mh.capture.postMessage === 'function' ? mh.capture : null;
+}
+
+// The slide is shown, at its full 1280x720 layout, centred over a dim veil while it is
+// captured (WebKit only paints what is in the viewport). The veil lingers briefly so
+// "Download all" and the PDF show one steady overlay instead of ten flashes.
+let bdVeil = null;
+let bdVeilTimer = 0;
+function bdVeilShow() {
+  clearTimeout(bdVeilTimer);
+  if (bdVeil && bdVeil.isConnected) return bdVeil;
+  bdVeil = document.createElement('div');
+  bdVeil.className = 'deck-native-veil';
+  bdVeil.setAttribute('aria-hidden', 'true');
+  bdVeil.style.cssText = 'position:fixed;inset:0;z-index:2147483646;background:rgba(14,13,16,.82);pointer-events:auto;';
+  const still = document.createElement('style');
+  // The slide's resting look: no entrance animation caught half-way, nothing mid-transition.
+  still.textContent = '.deck-native-host *,.deck-native-host *::before,.deck-native-host *::after{animation:none!important;transition:none!important}';
+  bdVeil.appendChild(still);
+  document.body.appendChild(bdVeil);
+  return bdVeil;
+}
+function bdVeilHide() {
+  clearTimeout(bdVeilTimer);
+  bdVeilTimer = setTimeout(() => { if (bdVeil) bdVeil.remove(); bdVeil = null; }, 450);
+}
+const bdFrame = () => new Promise(r => requestAnimationFrame(() => r()));
+
+// opts: { scale (output px per slide px, default 2), format: 'png' | 'jpeg', quality }.
+// Resolves to a data: URL.
+async function captureDeckSlideNative(key, opts) {
+  const o = Object.assign({ scale: 2, format: 'png', quality: 0.92 }, opts);
+  const cap = bdNativeCapture();
+  if (!cap) throw new Error('No native capture');
+  if (bdDirty || !bdBuilt) renderBrandDeckNow();
+  const live = document.querySelector(`#deckGrid .ab-slide[data-slide="${key}"]`);
+  if (!live) throw new Error('Slide not found: ' + key);
+  const veil = bdVeilShow();
+  const vw = document.documentElement.clientWidth, vh = document.documentElement.clientHeight;
+  const fit = Math.min(1, (vw - 48) / DECK_W, (vh - 48) / DECK_H);
+  const host = document.createElement('div');
+  host.className = 'deck-native-host';
+  host.style.cssText = `position:fixed;left:${Math.round((vw - DECK_W * fit) / 2)}px;top:${Math.round((vh - DECK_H * fit) / 2)}px;`
+    + `width:${DECK_W}px;height:${DECK_H}px;overflow:hidden;transform:scale(${fit});transform-origin:0 0;z-index:2147483647;`;
+  host.appendChild(live.cloneNode(true));
+  veil.appendChild(host);
+  try {
+    if (document.fonts && document.fonts.ready) {
+      try { await Promise.race([document.fonts.ready, new Promise(r => setTimeout(r, 1500))]); } catch (err) { /* proceed */ }
+    }
+    // Images in the clone (logo, pattern tiles) decode before the paint.
+    await Promise.all([...host.querySelectorAll('img')].map(img => (img.decode ? img.decode().catch(() => {}) : null)));
+    await bdFrame(); await bdFrame();
+    await new Promise(r => setTimeout(r, 60));
+    const r = host.getBoundingClientRect();
+    return await cap.postMessage({
+      op: 'snapshot', rect: [r.left, r.top, r.width, r.height],
+      pixelWidth: Math.round(DECK_W * o.scale), format: o.format, quality: o.quality,
+    });
+  } finally {
+    host.remove();
+    bdVeilHide();
+  }
+}
+
+function bdDataUrlBlob(dataUrl) {
+  const [head, b64] = dataUrl.split(',');
+  const bin = atob(b64);
+  const bytes = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+  return new Blob([bytes], { type: (head.match(/data:([^;]+)/) || [])[1] || 'application/octet-stream' });
+}
+
 async function downloadDeckSlidePng(key) {
   const idx = DECK_SLIDES.findIndex(s => s.key === key);
-  const canvas = await rasterizeDeckSlide(key, 2);
   const name = `${brandFileSlug()}-${String(idx + 1).padStart(2, '0')}-${key}.png`;
+  if (bdNativeCapture()) {
+    try {
+      bdSaveBlob(bdDataUrlBlob(await captureDeckSlideNative(key, { scale: 2, format: 'png' })), name);
+      return;
+    } catch (err) { /* fall back to html2canvas */ }
+  }
+  const canvas = await rasterizeDeckSlide(key, 2);
   return new Promise((resolve, reject) => {
     canvas.toBlob(blob => {
       if (!blob) return reject(new Error('toBlob failed'));
@@ -1954,14 +2041,21 @@ async function downloadDeckSlidePng(key) {
 }
 
 // jsPDF document, landscape 1280x720 px pages, one JPEG per slide. Returned
-// unsaved so callers can inspect it; the Download PDF button saves it.
+// unsaved so callers can inspect it; the Download PDF button saves it. In the Mac
+// app each page is a native WebKit capture; elsewhere an html2canvas render.
 async function buildBrandDeckPdf(scale) {
   const { jsPDF } = window.jspdf;
   const pdf = new jsPDF({ orientation: 'landscape', unit: 'px', format: [DECK_W, DECK_H], hotfixes: ['px_scaling'] });
+  let native = !!bdNativeCapture();
   for (let i = 0; i < DECK_SLIDES.length; i++) {
-    const canvas = await rasterizeDeckSlide(DECK_SLIDES[i].key, scale || 2);
+    const key = DECK_SLIDES[i].key;
+    let jpeg = null;
+    if (native) {
+      try { jpeg = await captureDeckSlideNative(key, { scale: scale || 2, format: 'jpeg', quality: 0.92 }); } catch (err) { native = false; }
+    }
+    if (!jpeg) jpeg = (await rasterizeDeckSlide(key, scale || 2)).toDataURL('image/jpeg', 0.92);
     if (i > 0) pdf.addPage([DECK_W, DECK_H], 'landscape');
-    pdf.addImage(canvas.toDataURL('image/jpeg', 0.92), 'JPEG', 0, 0, DECK_W, DECK_H);
+    pdf.addImage(jpeg, 'JPEG', 0, 0, DECK_W, DECK_H);
   }
   return pdf;
 }

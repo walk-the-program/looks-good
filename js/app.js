@@ -177,8 +177,8 @@ function applyRecommendedFonts() {
 // <link> tags keeps the blast radius to one chunk.
 const GOOGLE_FONT_CHUNK_SIZE = 12;
 
-function googleFontChunkUrls() {
-  const sorted = FONTS.slice().sort((a, b) => a.name.localeCompare(b.name));
+function googleFontChunkUrls(fonts) {
+  const sorted = (fonts || FONTS).slice().sort((a, b) => a.name.localeCompare(b.name));
   const urls = [];
   for (let i = 0; i < sorted.length; i += GOOGLE_FONT_CHUNK_SIZE) {
     const families = sorted.slice(i, i + GOOGLE_FONT_CHUNK_SIZE)
@@ -189,13 +189,35 @@ function googleFontChunkUrls() {
   return urls;
 }
 
+// Family names in the bundled fonts/fonts.css (<link id="localFonts"> in index.html).
+function localFontFamilies() {
+  const names = new Set();
+  const link = document.getElementById('localFonts');
+  try {
+    Array.from((link && link.sheet && link.sheet.cssRules) || []).forEach(r => {
+      if (r.type === CSSRule.FONT_FACE_RULE) names.add(r.style.getPropertyValue('font-family').trim().replace(/^["']|["']$/g, ''));
+    });
+  } catch (err) { /* unreadable sheet: treat it as empty */ }
+  return names;
+}
+
+// Fonts load from the bundled copies first, so the app looks right offline. Google
+// Fonts is only the fallback, for families fonts.css does not have: a font added to
+// FONTS before dev/vendor-fonts.py was re-run, or a copy of the app served without fonts/.
 function injectGoogleFonts() {
-  googleFontChunkUrls().forEach(href => {
+  const addLink = href => {
     const link = document.createElement('link');
     link.rel = 'stylesheet';
     link.href = href;
     document.head.appendChild(link);
-  });
+  };
+  const fallback = () => {
+    const have = localFontFamilies();
+    googleFontChunkUrls(FONTS.filter(f => !have.has(f.name))).forEach(addLink);
+    if (!have.has('Geist')) addLink('https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap');
+  };
+  // The <link> is in <head>, so it has loaded (or failed) before this script runs.
+  fallback();
 }
 
 /* ---------------- Populate controls ---------------- */
@@ -237,38 +259,97 @@ function populateShapeSelect() {
 
 /* ---------------- Brand copy ---------------- */
 
-// Every piece of user-editable copy, its input id, and the fallback used
-// whenever the field is left empty — so the preview, slide mockups and
-// brand guide never render a blank line.
+// Every piece of user-editable copy, its input id, and the copy used while a
+// field is untouched or empty. These read like a real brand, never like "your
+// tagline here": no board, slide or guide may show placeholder copy. Untouched
+// fields follow the brand name (contentDefaultsFor), so a new brand reads as itself.
 const CONTENT_DEFAULTS = {
   brandName: 'Aster & Co.',
-  tagline: 'A short tagline that captures the brand.',
-  sectionTitle: 'Our Approach',
-  quoteText: 'Design is the silent ambassador of your brand.',
-  quoteAuthor: 'Paul Rand',
+  tagline: 'Made with care, built to last.',
+  sectionTitle: 'How we work',
+  quoteText: 'We would rather do one thing well than ten things nearly.',
+  quoteAuthor: 'The founding team',
 };
 const CONTENT_FIELDS = Object.keys(CONTENT_DEFAULTS);
+// Placeholder copy earlier versions stored in brands; it counts as untouched.
+const CONTENT_OLD_PLACEHOLDERS = {
+  brandName: ['Brand Name'],
+  tagline: ['A short tagline that captures the brand.'],
+  sectionTitle: ['Our Approach'],
+  quoteText: ['Design is the silent ambassador of your brand.'],
+  quoteAuthor: ['Paul Rand', 'Author Name'],
+};
+// A word in the brand name hints at what it is: [pattern, taglines, section titles].
+const CONTENT_HINTS = [
+  [/coffee|roast|espresso|cafe|café|brew|tea\b/i, ['Coffee worth getting up for.', 'Roasted slowly, poured with care.'], ['From bean to cup', 'How we roast']],
+  [/bake|bakery|bread|kitchen|food|provision|pantry|market|farm|grocer|deli|table/i, ['Good food, simply sourced.', 'Honest food, made the slow way.'], ['Where it comes from', 'How we cook']],
+  [/bank|pay|capital|fund|money|finance|ledger|wallet|invest/i, ['Money, made simple.', 'Clear numbers, calm decisions.'], ['How it works', 'Built on trust']],
+  [/lab|labs|tech|soft|cloud|data|ai\b|app|systems|digital|code|stack|logic/i, ['Software that gets out of your way.', 'Tools that make hard work feel light.'], ['How it works', 'What we build']],
+  [/studio|design|creative|agency|works|atelier|make|craft/i, ['Ideas, made real.', 'Careful work for curious people.'], ['How we work', 'What we make']],
+  [/sound|audio|synth|music|record|radio|wave/i, ['Sound, shaped by hand.', 'Instruments for the curious ear.'], ['Signal path', 'How we build']],
+  [/climb|gym|fit|sport|run|cycle|bike|surf|trail|outdoor|peak|summit/i, ['Stronger every session.', 'Made for the long way round.'], ['How we train', 'Out there']],
+  [/book|press|journal|paper|letter|ink|story|stories|print/i, ['Stories worth keeping.', 'Words, well made.'], ['What we publish', 'Our readers']],
+  [/home|house|living|interior|furniture|nest/i, ['Rooms you want to stay in.', 'Made for everyday living.'], ['How we make', 'At home']],
+  [/health|care|clinic|dental|well|skin|bloom|calm/i, ['Care that feels personal.', 'Feel better, simply.'], ['How we care', 'Our promise']],
+  [/travel|hotel|stay|trip|voyage|air|journey/i, ['Go further, rest easier.', 'Places worth the trip.'], ['Where we go', 'How we host']],
+];
+const CONTENT_TAGLINES = ['Made with care, built to last.', 'Good work, done properly.', 'Simple things, done well.',
+  'Thoughtful by design.', 'Made for the long run.', 'Small details, real difference.'];
+const CONTENT_SECTIONS = ['How we work', 'What we believe', 'Why it matters', 'What we stand for'];
+const CONTENT_QUOTES = ['We would rather do one thing well than ten things nearly.',
+  'Every detail is a promise we intend to keep.', 'Make it simple, make it honest, make it last.',
+  'Good design is the quiet part of good service.'];
+
+function contentHash(text) {
+  let h = 2166136261;
+  for (let i = 0; i < text.length; i++) h = Math.imul(h ^ text.charCodeAt(i), 16777619);
+  return h >>> 0;
+}
+
+// Believable copy for a brand of this name, the same every time for the same name.
+function contentDefaultsFor(name) {
+  const brandName = String(name || '').trim() || CONTENT_DEFAULTS.brandName;
+  const h = contentHash(brandName.toLowerCase());
+  const hint = CONTENT_HINTS.find(([rx]) => rx.test(brandName));
+  const taglines = hint ? hint[1] : CONTENT_TAGLINES;
+  const sections = hint ? hint[2] : CONTENT_SECTIONS;
+  return {
+    brandName,
+    tagline: taglines[h % taglines.length],
+    sectionTitle: sections[(h >>> 4) % sections.length],
+    quoteText: CONTENT_QUOTES[(h >>> 8) % CONTENT_QUOTES.length],
+    quoteAuthor: `Founder, ${brandName}`,
+  };
+}
+
+// True while a field holds no copy of the user's own.
+function contentIsDefault(key, value) {
+  if (typeof value !== 'string' || !value.trim()) return true;
+  return value === CONTENT_DEFAULTS[key] || (CONTENT_OLD_PLACEHOLDERS[key] || []).includes(value.trim());
+}
 
 // state.content holds exactly what the user typed (possibly ''); this is the
-// version everything renders from.
-function effectiveContent() {
+// version everything renders from. Pass another brand's content to resolve that.
+function effectiveContent(content) {
+  const src = content || state.content || {};
+  const derived = contentDefaultsFor(contentIsDefault('brandName', src.brandName) ? '' : src.brandName);
   const out = {};
-  const src = state.content;
   CONTENT_FIELDS.forEach(key => {
-    const value = src[key];
-    out[key] = (typeof value === 'string' && value.trim()) ? value : CONTENT_DEFAULTS[key];
+    out[key] = contentIsDefault(key, src[key]) ? derived[key] : src[key];
   });
   return out;
 }
 
 function updateControlsFromState() {
   // Session restore and "Start fresh" both need the inputs re-seeded from
-  // state — but never the field the user is currently typing in.
+  // state — but never the field the user is currently typing in. An untouched
+  // field shows the copy the board is actually using.
+  const shown = effectiveContent();
   CONTENT_FIELDS.forEach(id => {
     const el = document.getElementById(id);
     if (!el || el === document.activeElement) return;
     const value = state.content[id];
-    el.value = typeof value === 'string' ? value : CONTENT_DEFAULTS[id];
+    el.value = contentIsDefault(id, value) ? shown[id] : value;
   });
 
   document.getElementById('headingFont').value = String(FONTS.indexOf(state.headingFont));
@@ -354,7 +435,9 @@ function renderFindings() {
 
 function render() {
   updateControlsFromState();
-  renderAestheticBoard();
+  // An aesthetic switch morphs instead of snapping (js/reveal.js); anything else renders at once.
+  if (window.Show && typeof Show.morphBoard === 'function') Show.morphBoard(renderAestheticBoard);
+  else renderAestheticBoard();
   renderFontSpecimen();
   if (window.syncFontPickers) syncFontPickers();
   renderFindings();
@@ -699,7 +782,10 @@ function wireEvents() {
     if (e.code !== 'Space') return;
     if (spaceShortcutBlocked(e)) return;
     e.preventDefault();
-    document.getElementById('shuffleAll').click();
+    const shuffle = () => document.getElementById('shuffleAll').click();
+    // Tap shuffles as before; holding Space spins the aesthetic reel (js/reveal.js).
+    if (window.Show && typeof Show.spaceDown === 'function') Show.spaceDown(shuffle);
+    else shuffle();
   });
 }
 

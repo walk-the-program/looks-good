@@ -207,6 +207,8 @@ const BrandSession = (function () {
     };
     await LibraryStore.put(rec);
     await openBrand(rec.id);
+    // A new brand arrives with the staged reveal (js/reveal.js); not awaited.
+    if (window.Show && typeof Show.reveal === 'function') Show.reveal();
   }
 
   async function backToLibrary() {

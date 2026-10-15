@@ -36,13 +36,62 @@ To build and install it:
 ./mac/build.sh
 ```
 
-This compiles the Swift wrapper, generates the icon, copies the current
-`index.html`, `css/` and `js/` into the bundle, vendors html2canvas and
-jsPDF (from `mac/vendor/`) so PNG/PDF export works offline, ad-hoc signs
-it, and installs **Branding Designer.app** to `/Applications` (or
-`~/Applications` if that isn't writable). Re-run it after any web change;
-it quits a running copy first. Your session autosave persists between
+This compiles the Swift wrapper as one universal binary (Apple silicon and
+Intel, macOS 13 or later), generates the icon, copies `index.html`, `css/`,
+`js/`, `fonts/` and `vendor/` into the bundle, ad-hoc signs it, and installs
+**Branding Designer.app** to `/Applications` (or `~/Applications` if that
+isn't writable). Re-run it after any web change; it quits the installed copy
+first. Your session autosave and window size and position persist between
 launches. The browser version (`python3 -m http.server`) is unchanged.
+
+**Works offline.** Every Google Font the app uses is bundled in `fonts/`
+(118 families, latin subset, about 4 MB) and html2canvas and jsPDF are in
+`vendor/`. The page loads these local copies first; Google Fonts and the CDN
+are only a fallback for anything missing. After adding a font to `FONTS` in
+`js/data.js`, refresh the copies and the credits:
+
+```bash
+python3 dev/vendor-fonts.py          # fetches from fonts.googleapis.com / fonts.gstatic.com
+swift dev/font-credits.swift         # rewrites fonts/CREDITS.txt (shown in About)
+python3 dev/vendor-fonts.py --check  # exit 1 if a FONTS family has no local copy
+```
+
+**Exports in the app** (slide PNGs, Download all, Download PDF) are painted
+by WebKit itself through a native bridge (`capture` in `mac/main.swift`), so
+they match the screen, glass, blend modes and filters included, and take
+about a quarter of a second per slide. In a browser, html2canvas is used.
+
+**Showcase mode** (the switch in the library header, or View > Showcase Mode,
+Shift-Cmd-D) offers only the 20 favourite aesthetics and hides the owner
+tools (Classic/Current, the recommendations panel); locks, type fine-tuning
+and pattern settings fold under **Refine** in the sidebar.
+
+### Signing and notarizing (needs a paid Apple Developer account)
+
+The build is ad-hoc signed, so on another Mac Gatekeeper warns the first time
+(right-click > Open, or System Settings > Privacy & Security > Open Anyway).
+With a Developer ID, sign and notarize the installed app like this, replacing
+`TEAMID` and the Apple ID details:
+
+```bash
+APP="/Applications/Branding Designer.app"
+# 1. Sign with the Developer ID certificate and the hardened runtime.
+codesign --force --deep --options runtime --timestamp \
+  --sign "Developer ID Application: Your Name (TEAMID)" "$APP"
+codesign --verify --deep --strict --verbose=2 "$APP"
+# 2. Zip, submit to Apple's notary service and wait for the result.
+#    (Once: xcrun notarytool store-credentials bd-notary --apple-id you@example.com \
+#            --team-id TEAMID --password <app-specific password>)
+ditto -c -k --keepParent "$APP" "Branding Designer.zip"
+xcrun notarytool submit "Branding Designer.zip" --keychain-profile bd-notary --wait
+# 3. Staple the ticket so the app opens without a network check, then re-zip to share.
+xcrun stapler staple "$APP"
+spctl --assess --type execute --verbose "$APP"     # should say: source=Notarized Developer ID
+ditto -c -k --keepParent "$APP" "Branding Designer.zip"
+```
+
+The app needs no entitlements beyond the hardened runtime (WKWebView,
+file panels and the clipboard work under it).
 
 ## Brand library
 
@@ -288,8 +337,9 @@ js/app.js                state, rendering, event wiring
 js/brand-guide-ui.js     brand guide modal open/close/export wiring
 ```
 
-html2canvas and jsPDF are loaded via CDN `<script>` tags in `index.html`
-(same pattern as the Google Fonts `<link>`) — no bundler, no npm install.
+html2canvas and jsPDF load from `vendor/` and every font from `fonts/`
+(`fonts/fonts.css`), with the CDN and Google Fonts only as a fallback — no
+bundler, no npm install.
 
 No framework, no bundler — open `index.html` through a static server and
 edit the files directly.

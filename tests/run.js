@@ -528,6 +528,105 @@ check('paste: empty text', run(`extractColors('').length`) === 0, 'found colors 
   check('classic: generated files match r6-0-baseline and index.html lists them', gen.status === 0, (gen.stdout + gen.stderr).trim().slice(0, 300));
 }
 
+/* ---- start from your logo, and the showcase brands (js/logo-start.js, js/showcase-brands.js) ---- */
+{
+  // A context with the colour helpers, fonts and font recommendations; AESTHETICS stays empty
+  // (no aesthetic files are loaded), which the logo code reads as "every key is allowed".
+  const lctx = vm.createContext({ console, AESTHETICS: [] });
+  for (const f of ['js/data.js', 'js/color.js', 'js/aesthetics/registry.js', 'js/aesthetic-meta.js', 'js/logo-start.js', 'js/showcase-brands.js']) {
+    vm.runInContext(fs.readFileSync(path.join(root, f), 'utf8'), lctx, { filename: f });
+  }
+  // Raw RGBA canvases to draw synthetic logos on.
+  lctx.canvasOf = (w, h, draw) => {
+    const d = new Uint8ClampedArray(w * h * 4);
+    const put = (x, y, r, g, b, a = 255) => { if (x >= 0 && y >= 0 && x < w && y < h) { const i = (y * w + x) * 4; d[i] = r; d[i + 1] = g; d[i + 2] = b; d[i + 3] = a; } };
+    const api = {
+      rect(x0, y0, x1, y1, c) { for (let y = y0; y < y1; y++) for (let x = x0; x < x1; x++) put(x, y, c[0], c[1], c[2]); },
+      circle(cx, cy, rad, c) { for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) { const dd = Math.hypot(x - cx, y - cy); if (dd <= rad) put(x, y, c[0], c[1], c[2], dd > rad - 1 ? Math.round(255 * (rad - dd)) : 255); } },
+      put,
+    };
+    draw(api, w, h);
+    return { data: d, w, h };
+  };
+  const logos = {
+    black: 'canvasOf(192,192,a=>{a.rect(30,60,162,100,[0,0,0]);a.circle(96,130,22,[0,0,0])})',
+    redblue: 'canvasOf(192,192,a=>{a.circle(70,96,50,[220,40,50]);a.circle(120,96,50,[30,70,200])})',
+    pastel: 'canvasOf(192,192,(a,w)=>{for(let y=40;y<150;y++)for(let x=20;x<172;x++){const t=x/w;a.put(x,y,Math.round(255*(0.95-0.1*t)),Math.round(190+40*t),Math.round(215+20*(1-t)))}})',
+    neon: 'canvasOf(192,192,a=>{a.circle(96,96,60,[57,255,20]);a.rect(60,90,130,102,[255,0,200])})',
+    muddy: 'canvasOf(192,192,a=>{a.rect(30,30,162,100,[110,90,60]);a.rect(30,100,162,160,[100,105,60])})',
+    white: 'canvasOf(192,192,a=>{a.circle(96,96,60,[250,250,250])})',
+  };
+  const analyse = k => run2(`(() => { const c = ${logos[k]}; const ex = LogoStart.extract(c.data, c.w, c.h); return { ex, an: LogoStart.analyse(ex) }; })()`);
+  function run2(code) { return vm.runInContext(code, lctx); }
+  const HEXC = /^#[0-9a-f]{6}$/;
+  for (const k of Object.keys(logos)) {
+    const { an } = analyse(k);
+    const c = an.palette.colors, ck = an.palette.checks;
+    check(`logo ${k}: a complete palette of valid hex colours`, ['primary', 'secondary', 'accent', 'neutralDark', 'neutralLight'].every(r => HEXC.test(c[r])), JSON.stringify(c));
+    check(`logo ${k}: body text >= 4.5:1 and text on every brand fill >= 4.5:1`,
+      ck.body >= 4.5 && ck.onPrimary >= 4.5 && ck.onSecondary >= 4.5 && ck.onAccent >= 4.5, JSON.stringify(ck));
+    check(`logo ${k}: gets an aesthetic, a font pairing and a mode`, !!an.aesthetic && !!an.fonts.heading && !!an.fonts.body && (an.bgMode === 'light' || an.bgMode === 'dark'), JSON.stringify([an.aesthetic, an.fonts, an.bgMode]));
+    const fonts = run2(`[FONTS.some(f => f.name === ${JSON.stringify(an.fonts.heading)}), FONTS.some(f => f.name === ${JSON.stringify(an.fonts.body)})]`);
+    check(`logo ${k}: suggested fonts exist in the library`, fonts[0] && fonts[1], JSON.stringify(an.fonts));
+  }
+  {
+    // Two-colour logo: the palette is the logo's own red and blue, not a purple in between.
+    const { ex, an } = analyse('redblue');
+    const hues = run2(`(${JSON.stringify(an.palette.colors)}, [hexToHsl(${JSON.stringify(an.palette.colors.primary)}).h, hexToHsl(${JSON.stringify(an.palette.colors.secondary)}).h])`);
+    const near = (h, t) => Math.min(Math.abs(h - t), 360 - Math.abs(h - t)) < 25;
+    check('logo redblue: primary and secondary are the logo blue and red (no blended purple)',
+      (near(hues[0], 225) && near(hues[1], 357)) || (near(hues[0], 357) && near(hues[1], 225)), JSON.stringify(hues));
+    check('logo redblue: three clearly different brand hues (accent added)', run2(`(() => { const c = ${JSON.stringify(an.palette.colors)}; const h = ['primary','secondary','accent'].map(k => hexToHsl(c[k]).h); return hueDiff(h[0],h[1]) > 60 && hueDiff(h[0],h[2]) > 30 && hueDiff(h[1],h[2]) > 30; })()`), JSON.stringify(an.palette.colors));
+  }
+  {
+    // One-colour logos: a secondary and accent are derived; neutrals are tinted, not grey.
+    const k = analyse('black').an;
+    check('logo black: one-colour mark still gets a distinct secondary and accent',
+      run2(`(() => { const c = ${JSON.stringify(k.palette.colors)}; return c.primary !== c.secondary && c.secondary !== c.accent && c.primary !== c.accent; })()`), JSON.stringify(k.palette.colors));
+    check('logo black: light and dark neutrals exist, far apart', run2(`contrastRatio(${JSON.stringify(k.palette.colors.neutralLight)}, ${JSON.stringify(k.palette.colors.neutralDark)})`) >= 10, 'neutral contrast');
+    const w = analyse('white').an;
+    check('logo white: a white mark goes on a dark canvas', w.palette.tone === 'light' && w.bgMode === 'dark', `${w.palette.tone} ${w.bgMode}`);
+    const nl = run2(`hexToHsl(${JSON.stringify(k.palette.colors.neutralLight)})`);
+    check('logo black: the light neutral is tinted (not pure grey)', nl.s >= 8, JSON.stringify(nl));
+  }
+  {
+    // Anti-alias fringe: a hard red/blue edge with a purple seam must not make purple the lead colour.
+    const r = run2(`(() => { const c = canvasOf(192,192,a=>{a.rect(20,20,96,172,[220,40,50]);a.rect(97,20,172,172,[30,70,200]);a.rect(96,20,97,172,[125,55,125])}); const ex = LogoStart.extract(c.data, c.w, c.h); return ex.chromatic.map(x => Math.round(x.h)); })()`);
+    check('extract: one-pixel colour seam between two colours is ignored', r.length === 2, JSON.stringify(r));
+  }
+  {
+    // A JPG-style white box is knocked out; a logo that fills its frame is left alone.
+    const r = run2(`(() => {
+      const w = 80, h = 60, d = new Uint8ClampedArray(w*h*4).fill(255);
+      for (let y = 20; y < 40; y++) for (let x = 30; x < 50; x++) { const i = (y*w+x)*4; d[i]=200; d[i+1]=30; d[i+2]=30; }
+      const changed = LogoStart.knockOutWhite(d, w, h);
+      const corner = d[3], mid = d[((30*w)+40)*4+3];
+      const full = new Uint8ClampedArray(w*h*4); for (let i = 0; i < w*h; i++) { full[i*4]=20; full[i*4+1]=60; full[i*4+2]=160; full[i*4+3]=255; }
+      return { changed, corner, mid, fullChanged: LogoStart.knockOutWhite(full, w, h) };
+    })()`);
+    check('knockOutWhite: white box becomes transparent, the mark stays', r.changed && r.corner === 0 && r.mid === 255, JSON.stringify(r));
+    check('knockOutWhite: a full-bleed coloured logo is not touched', r.fullChanged === false, JSON.stringify(r));
+  }
+  check('nameFromFile: tidies a file name into a brand name',
+    run2(`[LogoStart.nameFromFile('acme-logo_FINAL (2).png'), LogoStart.nameFromFile('IMG_4432.jpg'), LogoStart.nameFromFile('north star.svg')]`).join('|') === 'Acme||North Star', 'got ' + run2(`[LogoStart.nameFromFile('acme-logo_FINAL (2).png'), LogoStart.nameFromFile('IMG_4432.jpg'), LogoStart.nameFromFile('north star.svg')]`).join('|'));
+
+  /* the showcase brands */
+  const sb = run2('ShowcaseBrands.brands.map(b => ({ name: b.name, aesthetic: b.aesthetic, colors: b.colors, h: b.headingFont, bd: b.bodyFont, mode: b.bgMode, tagline: b.tagline, logo: b.logo.mark }))');
+  check('showcase: twelve brands with unique names', sb.length === 12 && new Set(sb.map(b => b.name.toLowerCase())).size === 12, `${sb.length}`);
+  const fav = ['soft-form', 'bento-grid', 'dystopian-luxury', 'old-web', 'pirate-broadcast', 'xerox-punk', 'gorpcore', 'naive-doodle', 'acid-graphics', 'mesh-gradient', 'radical-memphis', 'corporate-vandalism'];
+  check('showcase: every brand uses one of the favourite aesthetics, and every aesthetic file exists',
+    sb.every(b => fav.includes(b.aesthetic) && fs.existsSync(path.join(root, 'js/aesthetics', b.aesthetic + '.js'))), sb.map(b => b.aesthetic).join(','));
+  check('showcase: every font exists in the font library', run2(`ShowcaseBrands.brands.every(b => FONTS.some(f => f.name === b.headingFont) && FONTS.some(f => f.name === b.bodyFont))`), 'missing font');
+  const weak = run2(`ShowcaseBrands.brands.map(b => {
+    const c = b.colors, dark = b.bgMode === 'dark';
+    const canvas = dark ? c.neutralDark : c.neutralLight, ink = dark ? c.neutralLight : c.neutralDark;
+    return { n: b.name, body: contrastRatio(ink, canvas), p: contrastRatio(c.primary, pickReadableText(c.primary)), s: contrastRatio(c.secondary, pickReadableText(c.secondary)), a: contrastRatio(c.accent, pickReadableText(c.accent)) };
+  }).filter(x => x.body < 7 || x.p < 4.5 || x.s < 4.5 || x.a < 4.5).map(x => x.n + ' ' + [x.body, x.p, x.s, x.a].map(v => v.toFixed(1)).join('/'))`);
+  check('showcase: body text >= 7:1 and text on primary, secondary and accent >= 4.5:1 in every brand', weak.length === 0, weak.join('; '));
+  const marks = run2('ShowcaseBrands.brands.every(b => /^<svg[\\s\\S]*<\\/svg>$/.test(ShowcaseBrands.logoSvg(b)) && ShowcaseBrands.logoSvg(b).length < 4000)');
+  check('showcase: each brand has a small SVG logo', marks, 'logo svg');
+}
+
 // Not run here (they need a real DOM): that blended tokens(t, state) see the view's fonts end to end, and the
 // render timings. They are covered by the in-browser sweeps in docs/round6/.
 

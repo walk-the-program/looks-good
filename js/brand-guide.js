@@ -494,7 +494,8 @@ function bgGuideVisible(surface, candidates, minRatio, fallback) {
 }
 
 function renderBrandGuideHTML(state) {
-  const c = state.content || {};
+  // Untouched fields resolve to the brand's own believable copy (app.js), never a placeholder.
+  const c = typeof effectiveContent === 'function' ? effectiveContent(state.content || {}) : (state.content || {});
   const brandName = escapeHtml(c.brandName || 'Brand Name');
   const tagline = escapeHtml(c.tagline || 'A short tagline that captures the brand.');
   const quoteText = escapeHtml(c.quoteText || 'Design is the silent ambassador of your brand.');

@@ -737,7 +737,7 @@ function boardHtml(state, def) {
 
 /* ---------------- main board + compare grid ---------------- */
 
-let boardView = 'board';          // 'board' | 'compare' | 'patterns' (UI only, never saved)
+let boardView = 'board';          // 'board' | 'compare' | 'patterns' | 'built' (UI only, never saved)
 const CMP_WIDE = 900;             // design width of a tile board on a wide grid
 const CMP_NARROW = 500;           // ...and on a one-column grid
 
@@ -774,7 +774,7 @@ function renderCompareGrid() {
   if (!grid) return;
   setBoardFonts(grid);
   const defs = visibleAesthetics();
-  const note = aeFamily === 'all' ? '' : `<p class="cmp-note">${escapeHtml(aestheticFamilyLabel(aeFamily))}: ${defs.length} of ${AESTHETICS.length} aesthetics. Choose All in the sidebar to see every one.</p>`;
+  const note = aeFamily === 'all' ? '' : `<p class="cmp-note">${escapeHtml(aestheticFamilyLabel(aeFamily))}: ${defs.length} of ${aePool().length} aesthetics. Choose All in the sidebar to see every one.</p>`;
   // The tile of the selected aesthetic follows the Classic | Current choice.
   const shown = d => (d.key === state.aesthetic ? resolveAestheticDef(state) : d);
   grid.innerHTML = note + defs.map(def => {
@@ -806,20 +806,25 @@ function renderAestheticBoard() {
   const def = abView().def;
   const compare = boardView === 'compare';
   const patterns = boardView === 'patterns';
+  const built = boardView === 'built';   // product screens, js/see-built.js
   const host = document.getElementById('previewCard');
   const grid = document.getElementById('compareGrid');
   const pview = document.getElementById('patternsView');
-  if (host) host.hidden = compare || patterns;
+  const bview = document.getElementById('builtView');
+  if (host) host.hidden = compare || patterns || built;
   if (grid) grid.hidden = !compare;
   if (pview) pview.hidden = !patterns;
+  if (bview) bview.hidden = !built;
+  if (!built && bview && bview.firstChild) bview.innerHTML = '';
   // Only the visible view is built. The hidden ones are emptied (Compare holds
   // one full board per aesthetic, 48 of them) and rebuilt when their view is shown again. The
   // Patterns view (js/patterns-ui.js) keeps its own DOM but draws nothing
   // while hidden.
   if (typeof PatternsUI !== 'undefined') PatternsUI.setVisible(patterns);
-  if (patterns) {
+  if (patterns || built) {
     if (host && host.firstChild) host.innerHTML = '';
     if (grid && grid.firstChild) grid.innerHTML = '';
+    if (built && typeof SeeBuilt !== 'undefined') SeeBuilt.render();
   } else if (compare) {
     renderCompareGrid();
     if (host && host.firstChild) host.innerHTML = '';
@@ -851,10 +856,15 @@ function saveAeFamily() {
 }
 
 // The aesthetics the sidebar, step buttons, shuffle and Compare work over.
+// In showcase mode (js/showcase.js) only the curated favourites are offered.
+function aePool() {
+  return typeof showcaseFilter === 'function' ? showcaseFilter(AESTHETICS) : AESTHETICS;
+}
 function visibleAesthetics() {
-  if (aeFamily === 'all' || !aeFamiliesAvailable()) return AESTHETICS;
-  const list = AESTHETICS.filter(a => aestheticFamilyOf(a.key) === aeFamily);
-  return list.length ? list : AESTHETICS;
+  const pool = aePool();
+  if (aeFamily === 'all' || !aeFamiliesAvailable()) return pool;
+  const list = pool.filter(a => aestheticFamilyOf(a.key) === aeFamily);
+  return list.length ? list : pool;
 }
 
 function buildAestheticFamilies() {
@@ -863,8 +873,10 @@ function buildAestheticFamilies() {
   if (!aeFamiliesAvailable()) { host.hidden = true; return; }
   const chip = (key, label, n) =>
     `<button type="button" class="ae-fam" data-family="${key}" aria-pressed="false">${escapeHtml(label)}<i>${n}</i></button>`;
-  host.innerHTML = chip('all', 'All', AESTHETICS.length)
-    + AESTHETIC_FAMILIES.map(f => chip(f.key, f.label, AESTHETICS.filter(a => aestheticFamilyOf(a.key) === f.key).length)).join('');
+  const pool = aePool();
+  host.innerHTML = chip('all', 'All', pool.length)
+    + AESTHETIC_FAMILIES.map(f => [f, pool.filter(a => aestheticFamilyOf(a.key) === f.key).length])
+      .filter(([, n]) => n).map(([f, n]) => chip(f.key, f.label, n)).join('');
 }
 
 function setAeFamily(key) {
@@ -946,7 +958,7 @@ function stepAesthetic(dir) {
 }
 
 function setBoardView(view) {
-  boardView = view === 'compare' || view === 'patterns' ? view : 'board';
+  boardView = ['compare', 'patterns', 'built'].includes(view) ? view : 'board';
   renderAestheticBoard();
 }
 

@@ -129,12 +129,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate, WKNavigationDelegate, 
     func buildWindow() {
         let config = WKWebViewConfiguration()
         config.websiteDataStore = WKWebsiteDataStore.default()   // persistent localStorage
+        // Element full screen (requestFullscreen) so the deck's present mode fills the screen.
+        if #available(macOS 12.3, *) { config.preferences.isElementFullscreenEnabled = true }
         let webRoot = Bundle.main.resourceURL!.appendingPathComponent("web")
         config.setURLSchemeHandler(WebSchemeHandler(root: webRoot), forURLScheme: scheme)
         let ucc = config.userContentController
         ucc.add(self, name: "clipboard")
         ucc.add(self, name: "batch")
         ucc.addScriptMessageHandler(self, contentWorld: .page, name: "library")
+        ucc.addScriptMessageHandler(self, contentWorld: .page, name: "capture")
         ucc.addUserScript(WKUserScript(source: macClassUserScript, injectionTime: .atDocumentStart, forMainFrameOnly: true))
         ucc.addUserScript(WKUserScript(source: batchUserScript, injectionTime: .atDocumentEnd, forMainFrameOnly: true))
 
@@ -220,7 +223,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, WKNavigationDelegate, 
         }
 
         let app = top(appName)
-        add(app, "About \(appName)", #selector(NSApplication.orderFrontStandardAboutPanel(_:)))
+        add(app, "About \(appName)", #selector(showAbout), target: self)
         app.addItem(.separator())
         add(app, "Hide \(appName)", #selector(NSApplication.hide(_:)), "h")
         add(app, "Hide Others", #selector(NSApplication.hideOtherApplications(_:)), "h", [.command, .option])
@@ -264,6 +267,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, WKNavigationDelegate, 
         let alt = view.addItem(withTitle: "Zoom In", action: #selector(zoomIn), keyEquivalent: "=")
         alt.target = self; alt.isHidden = true
         view.addItem(.separator())
+        add(view, "Showcase Mode", #selector(toggleShowcase), "d", [.command, .shift], target: self)
+        view.addItem(.separator())
         add(view, "Enter Full Screen", #selector(NSWindow.toggleFullScreen(_:)), "f", [.command, .control])
 
         let win = top("Window")
@@ -277,6 +282,53 @@ final class AppDelegate: NSObject, NSApplicationDelegate, WKNavigationDelegate, 
     }
 
     @objc func reload() { webView.reload() }
+    /// Showcase mode (js/showcase.js): only the curated aesthetics, owner-only tools hidden.
+    @objc func toggleShowcase() {
+        webView.evaluateJavaScript("window.toggleShowcase && window.toggleShowcase()")
+    }
+
+    // MARK: About box
+
+    /// The standard About panel, with credits for the bundled fonts (fonts/CREDITS.txt,
+    /// written by dev/font-credits.swift) and the export libraries.
+    @objc func showAbout() {
+        let base = NSFont.systemFont(ofSize: NSFont.smallSystemFontSize)
+        let bold = NSFont.boldSystemFont(ofSize: NSFont.smallSystemFontSize)
+        let para = NSMutableParagraphStyle()
+        para.alignment = .center
+        para.paragraphSpacing = 6
+        let credits = NSMutableAttributedString()
+        func add(_ text: String, _ font: NSFont, _ color: NSColor = .labelColor) {
+            credits.append(NSAttributedString(string: text, attributes: [
+                .font: font, .foregroundColor: color, .paragraphStyle: para]))
+        }
+        // fonts/CREDITS.txt: "Family\n  Licence\n  Copyright\n\n" blocks after a header.
+        var byLicence: [String: [String]] = [:]
+        let creditsFile = Bundle.main.resourceURL!.appendingPathComponent("web/fonts/CREDITS.txt")
+        if let text = try? String(contentsOf: creditsFile, encoding: .utf8) {
+            for block in text.components(separatedBy: "\n\n") {
+                let lines = block.components(separatedBy: "\n")
+                guard lines.count >= 2, !lines[0].hasPrefix(" "), lines[1].hasPrefix("  "),
+                      !lines[0].contains("=") else { continue }
+                byLicence[lines[1].trimmingCharacters(in: .whitespaces), default: []].append(lines[0])
+            }
+        }
+        add("Design a brand, see it in many design languages, and brief an AI coding tool to build it.\n\n", base)
+        add("Libraries\n", bold)
+        add("html2canvas 1.4.1 by Niklas von Hertzen, MIT License\njsPDF 2.5.1 by James Hall and yWorks, MIT License\n\n", base)
+        let total = byLicence.values.reduce(0) { $0 + $1.count }
+        add("Fonts\n", bold)
+        add("\(total) typefaces from Google Fonts, bundled so the app works offline. Thank you to their designers.\n\n", base)
+        for licence in byLicence.keys.sorted() {
+            add("\(licence)\n", bold, .secondaryLabelColor)
+            add(byLicence[licence]!.sorted().joined(separator: ", ") + "\n\n", base, .secondaryLabelColor)
+        }
+        add("Full copyright notices: Branding Designer.app/Contents/Resources/web/fonts/CREDITS.txt", base, .tertiaryLabelColor)
+        NSApp.orderFrontStandardAboutPanel(options: [
+            .applicationName: appName,
+            .credits: credits,
+        ])
+    }
     @objc func zoomIn() { setZoom(zoom + 0.1) }
     @objc func zoomOut() { setZoom(zoom - 0.1) }
     @objc func zoomReset() { setZoom(1) }
@@ -466,6 +518,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, WKNavigationDelegate, 
     func userContentController(_ ucc: WKUserContentController, didReceive message: WKScriptMessage,
                                replyHandler: @escaping (Any?, String?) -> Void) {
         guard message.frameInfo.request.url?.scheme == scheme else { replyHandler(nil, "denied"); return }
+        if message.name == "capture" { capture(message.body, replyHandler); return }
         guard message.name == "library", let body = message.body as? [String: Any],
               let op = body["op"] as? String else { replyHandler(nil, "bad request"); return }
         let fm = FileManager.default
@@ -495,6 +548,55 @@ final class AppDelegate: NSObject, NSApplicationDelegate, WKNavigationDelegate, 
             replyHandler(true, nil)
         default:
             replyHandler(nil, "unknown op")
+        }
+    }
+
+    // MARK: native capture (exports that look exactly like the screen)
+
+    /// js/brand-deck.js asks for a picture of part of the page through
+    /// window.webkit.messageHandlers.capture.postMessage({ op: 'snapshot', rect: [x, y, w, h],
+    /// pixelWidth, format: 'png' | 'jpeg', quality }). rect is in CSS px relative to the
+    /// viewport (getBoundingClientRect). WebKit paints the rect afresh at the requested size,
+    /// so glass, blend modes, filters and gradients come out as on screen. Replies with a
+    /// data: URL. op 'info' answers { scale } so the page can tell the bridge is there.
+    func capture(_ raw: Any, _ reply: @escaping (Any?, String?) -> Void) {
+        guard let body = raw as? [String: Any], let op = body["op"] as? String else { reply(nil, "bad request"); return }
+        if op == "info" { reply(["scale": Double(window.backingScaleFactor), "zoom": Double(zoom)], nil); return }
+        guard op == "snapshot", let r = body["rect"] as? [Double], r.count == 4, r[2] >= 1, r[3] >= 1 else {
+            reply(nil, "bad request"); return
+        }
+        // CSS px -> view points (View > Zoom changes the page zoom).
+        let rect = CGRect(x: r[0] * Double(zoom), y: r[1] * Double(zoom), width: r[2] * Double(zoom), height: r[3] * Double(zoom))
+        let pixelWidth = max(1, min(8192, (body["pixelWidth"] as? Double) ?? r[2] * 2))
+        let pixelHeight = (pixelWidth * r[3] / r[2]).rounded()
+        let jpeg = (body["format"] as? String) == "jpeg"
+        let quality = (body["quality"] as? Double) ?? 0.92
+        let config = WKSnapshotConfiguration()
+        config.rect = rect
+        // snapshotWidth is in points; the image comes back at the screen's scale.
+        config.snapshotWidth = NSNumber(value: pixelWidth / Double(window.backingScaleFactor))
+        config.afterScreenUpdates = true
+        webView.takeSnapshot(with: config) { image, error in
+            guard let image = image,
+                  let cg = image.cgImage(forProposedRect: nil, context: nil, hints: nil) else {
+                reply(nil, "snapshot failed: \(error?.localizedDescription ?? "no image")"); return
+            }
+            // Exact output size whatever the screen scale was, in sRGB like the web exports.
+            let W = Int(pixelWidth), H = Int(pixelHeight)
+            guard let ctx = CGContext(data: nil, width: W, height: H, bitsPerComponent: 8, bytesPerRow: 0,
+                                      space: CGColorSpace(name: CGColorSpace.sRGB)!,
+                                      bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue) else {
+                reply(nil, "bitmap failed"); return
+            }
+            ctx.interpolationQuality = .high
+            ctx.draw(cg, in: CGRect(x: 0, y: 0, width: W, height: H))
+            guard let flat = ctx.makeImage() else { reply(nil, "bitmap failed"); return }
+            let out = NSBitmapImageRep(cgImage: flat)
+            let data = jpeg
+                ? out.representation(using: .jpeg, properties: [.compressionFactor: quality])
+                : out.representation(using: .png, properties: [:])
+            guard let data = data else { reply(nil, "encode failed"); return }
+            reply("data:image/\(jpeg ? "jpeg" : "png");base64," + data.base64EncodedString(), nil)
         }
     }
 
@@ -591,6 +693,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, WKNavigationDelegate, 
         let infoReq = URL(fileURLWithPath: dir).appendingPathComponent("info.req")
         let snapReq = URL(fileURLWithPath: dir).appendingPathComponent("snap.req")
         let menuReq = URL(fileURLWithPath: dir).appendingPathComponent("menu.req")
+        let aboutReq = URL(fileURLWithPath: dir).appendingPathComponent("about.req")
         hookTimer = Timer.scheduledTimer(withTimeInterval: 0.3, repeats: true) { [weak self] _ in
             if let self = self, (try? String(contentsOf: infoReq, encoding: .utf8)) != nil {
                 try? FileManager.default.removeItem(at: infoReq)
@@ -616,6 +719,19 @@ final class AppDelegate: NSObject, NSApplicationDelegate, WKNavigationDelegate, 
                 let item = NSMenuItem()
                 item.representedObject = cmd.trimmingCharacters(in: .whitespacesAndNewlines)
                 self.menuCommand(item)   // same path a File menu click takes
+            }
+            // about.req holds a PNG path: open About and save a picture of its panel.
+            if let self = self, let path = try? String(contentsOf: aboutReq, encoding: .utf8) {
+                try? FileManager.default.removeItem(at: aboutReq)
+                self.showAbout()
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
+                    guard let panel = NSApp.windows.first(where: { $0 !== self.window && $0.isVisible }),
+                          let view = panel.contentView?.superview ?? panel.contentView,
+                          let rep = view.bitmapImageRepForCachingDisplay(in: view.bounds) else { return }
+                    view.cacheDisplay(in: view.bounds, to: rep)
+                    try? rep.representation(using: .png, properties: [:])?
+                        .write(to: URL(fileURLWithPath: path.trimmingCharacters(in: .whitespacesAndNewlines)))
+                }
             }
             if let self = self, let path = try? String(contentsOf: snapReq, encoding: .utf8) {
                 try? FileManager.default.removeItem(at: snapReq)

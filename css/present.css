@@ -1,0 +1,210 @@
+/* ---------------------------------------------------------------------
+   present.css — the scripted show (js/present.js): deck present mode,
+   presenter view, the demo loop's hint and the toolbar's Show menu.
+------------------------------------------------------------------------ */
+
+/* ======================= Toolbar: Present + Show menu ======================= */
+
+.show-tools { position: relative; display: inline-flex; align-items: center; gap: 2px; }
+.show-tools .btn-icon { padding-left: 7px; padding-right: 7px; }
+.show-menu {
+  position: absolute; right: 0; top: calc(100% + 6px); z-index: 60;
+  min-width: 228px; padding: 5px;
+  background: var(--surface); border: 1px solid var(--line-strong); border-radius: 10px;
+  box-shadow: var(--shadow-3);
+  display: flex; flex-direction: column;
+}
+.show-menu button {
+  display: flex; align-items: center; justify-content: space-between; gap: 16px;
+  width: 100%; padding: 7px 10px; border: 0; border-radius: 6px;
+  background: none; color: var(--ink); font: inherit; font-size: 13px; text-align: left; cursor: pointer;
+}
+.show-menu button:hover, .show-menu button:focus-visible { background: var(--hover); outline: none; }
+.show-menu kbd { color: var(--muted); font-size: 11px; }
+.show-menu [aria-checked="true"] span::after { content: "  ·  on"; color: var(--muted); }
+
+/* ======================= Present mode ======================= */
+
+/* The page keeps its scrollbar under the show (hiding it re-flows the deck grid); the
+   overlay swallows wheel and touch scrolling instead (js/present.js). */
+
+.pr {
+  position: fixed; inset: 0; z-index: 1000;
+  background: #0a0a0a; color: #f4f4f2;
+  display: flex; flex-direction: column;
+  outline: none; cursor: default;
+  font-family: var(--font-ui);
+}
+.pr:fullscreen { width: 100vw; height: 100vh; }
+.pr:not(.is-awake) { cursor: none; }
+.pr.is-auto { cursor: none; }
+
+.pr-view { flex: 1 1 auto; min-height: 0; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+.pr-stage {
+  position: relative; flex: none;
+  width: 1280px; height: 720px;
+  overflow: hidden;
+  background: #0a0a0a;
+}
+.pr-slide { position: absolute; inset: 0; visibility: hidden; }
+.pr-slide.is-on, .pr-slide.is-out { visibility: visible; }
+.pr-slide.is-on { z-index: 2; }
+.pr-slide.is-out { z-index: 1; }
+.pr-slide > .ab.ab-slide { border-radius: 0; }
+
+/* Progress: a hairline at the foot of the screen. */
+.pr-progress { position: absolute; left: 0; right: 0; bottom: var(--pr-notes-h, 0px); height: 3px; background: rgba(255, 255, 255, 0.08); z-index: 3; }
+.pr-progress i { display: block; height: 100%; background: rgba(255, 255, 255, 0.78); transform-origin: 0 50%; transform: scaleX(0); transition: transform 420ms var(--ease); }
+.pr.is-auto .pr-progress { opacity: 0.6; }
+
+/* Notes strip (N): one plain line per slide. */
+.pr-notes {
+  flex: none; z-index: 3;
+  display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 20px;
+  padding: 14px 24px 16px;
+  background: #141414; border-top: 1px solid rgba(255, 255, 255, 0.08);
+  font-size: 15px; line-height: 1.45;
+}
+.pr-notes-n, .pr-notes-next { font-family: var(--font-mono); font-size: 12px; color: rgba(255, 255, 255, 0.5); white-space: nowrap; }
+.pr-notes-text { margin: 0; color: #f4f4f2; }
+
+.pr-exit {
+  position: absolute; top: 16px; right: 16px; z-index: 4;
+  width: 34px; height: 34px; display: grid; place-items: center;
+  border: 1px solid rgba(255, 255, 255, 0.16); border-radius: 50%;
+  background: rgba(10, 10, 10, 0.55); color: #fff; cursor: pointer;
+  opacity: 0; transition: opacity 240ms var(--ease);
+  -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
+}
+.pr.is-awake .pr-exit, .pr-exit:focus-visible { opacity: 1; }
+.pr.is-auto .pr-exit { display: none; }
+
+.pr-hint {
+  position: absolute; left: 50%; bottom: calc(var(--pr-notes-h, 0px) + 22px); z-index: 4;
+  transform: translateX(-50%);
+  display: flex; gap: 18px; margin: 0; padding: 8px 16px;
+  border-radius: 999px; background: rgba(10, 10, 10, 0.72); color: rgba(255, 255, 255, 0.82);
+  font-size: 12px; white-space: nowrap; pointer-events: none;
+  -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
+  opacity: 0; transition: opacity 600ms var(--ease);
+}
+.pr.show-hint .pr-hint { opacity: 1; }
+.pr-hint kbd, .show-legend kbd {
+  display: inline-block; min-width: 18px; margin-right: 5px; padding: 0 5px;
+  border: 1px solid rgba(255, 255, 255, 0.22); border-radius: 4px;
+  background: rgba(255, 255, 255, 0.1); box-shadow: none;
+  font-family: var(--font-mono); font-size: 11px; line-height: 17px; text-align: center; color: #fff;
+}
+.pr-hint kbd + kbd { margin-left: -2px; }
+.pr-live { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); margin: 0; }
+
+/* Slide transitions, by the aesthetic's family (js/present.js transitionFor). */
+@keyframes prFadeIn { from { opacity: 0; } }
+@keyframes prFadeOut { to { opacity: 0; } }
+@keyframes prRiseIn { from { opacity: 0; transform: scale(0.975); } }
+@keyframes prPushIn { from { opacity: 0; transform: translateX(var(--pr-push, 6%)); } }
+@keyframes prPushOut { to { opacity: 0; transform: translateX(calc(var(--pr-push, 6%) * -1)); } }
+@keyframes prWipeIn { from { clip-path: inset(0 100% 0 0); } to { clip-path: inset(0 0 0 0); } }
+@keyframes prWipeBack { from { clip-path: inset(0 0 0 100%); } to { clip-path: inset(0 0 0 0); } }
+@keyframes prGlowIn { from { opacity: 0; filter: blur(14px) brightness(1.15); } }
+
+.pr[data-dir="back"] { --pr-push: -6%; }
+
+.pr[data-trans="quick"] .pr-slide.is-in { animation: prFadeIn 160ms linear both; }
+.pr[data-trans="quick"] .pr-slide.is-out { animation: prFadeOut 160ms linear both; }
+
+@media (prefers-reduced-motion: no-preference) {
+  .pr[data-trans="fade"] .pr-slide.is-in { animation: prFadeIn 620ms cubic-bezier(0.4, 0, 0.2, 1) both; }
+  .pr[data-trans="fade"] .pr-slide.is-out { animation: prFadeOut 620ms cubic-bezier(0.4, 0, 0.2, 1) both; }
+  .pr[data-trans="rise"] .pr-slide.is-in { animation: prRiseIn 560ms var(--ease) both; }
+  .pr[data-trans="rise"] .pr-slide.is-out { animation: prFadeOut 380ms ease-out both; }
+  .pr[data-trans="push"] .pr-slide.is-in { animation: prPushIn 460ms var(--ease) both; }
+  .pr[data-trans="push"] .pr-slide.is-out { animation: prPushOut 460ms var(--ease) both; }
+  .pr[data-trans="wipe"] .pr-slide.is-in { animation: prWipeIn 440ms cubic-bezier(0.7, 0, 0.2, 1) both; }
+  .pr[data-trans="wipe"][data-dir="back"] .pr-slide.is-in { animation-name: prWipeBack; }
+  .pr[data-trans="glow"] .pr-slide.is-in { animation: prGlowIn 680ms var(--ease) both; }
+  .pr[data-trans="glow"] .pr-slide.is-out { animation: prFadeOut 520ms ease-out both; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .pr .pr-slide.is-in { animation: prFadeIn 160ms linear both; }
+  .pr .pr-slide.is-out { animation: prFadeOut 160ms linear both; }
+  .pr-progress i { transition: none; }
+}
+
+/* ======================= Presenter view ======================= */
+
+body.is-presenter .app { grid-template-columns: minmax(0, 1fr); }
+body.is-presenter .sidebar,
+body.is-presenter .workspace-header h1,
+body.is-presenter .ae-summary,
+body.is-presenter .ws-tools,
+body.is-presenter .recommendations,
+body.is-presenter .deck { display: none !important; }
+body.is-presenter .workspace { max-width: min(1680px, 100%); padding: 28px 40px 56px; }
+html.is-mac-app body.is-presenter .workspace { padding-top: 44px; }
+body.is-presenter .workspace-header { margin-bottom: 18px; }
+body.is-presenter .ae-current { font-size: 15px; margin: 0; }
+
+.show-chrome { position: fixed; inset: auto 0 0 0; z-index: 900; pointer-events: none; }
+.show-chrome > * { pointer-events: auto; }
+
+.show-legend {
+  position: fixed; left: 50%; bottom: 22px; transform: translate(-50%, 8px);
+  display: flex; gap: 16px; align-items: center; padding: 9px 16px;
+  border-radius: 999px; background: rgba(17, 17, 17, 0.86); color: rgba(255, 255, 255, 0.86);
+  font-size: 12.5px; white-space: nowrap; pointer-events: none;
+  -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.18);
+  opacity: 0; visibility: hidden;
+  transition: opacity 500ms var(--ease), transform 500ms var(--ease), visibility 0s linear 500ms;
+}
+.show-legend-sep { padding-left: 16px; border-left: 1px solid rgba(255, 255, 255, 0.18); }
+body.is-presenter .show-chrome.show-legend-on .show-legend { opacity: 1; visibility: visible; transform: translate(-50%, 0); transition-delay: 0s; }
+
+.show-pill {
+  position: fixed; left: 50%; top: 22px; transform: translate(-50%, -6px);
+  margin: 0; padding: 7px 14px; border-radius: 999px;
+  background: rgba(17, 17, 17, 0.86); color: #fff; font-size: 13px; font-weight: 500;
+  -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px);
+  opacity: 0; pointer-events: none;
+  transition: opacity 300ms var(--ease), transform 300ms var(--ease);
+}
+.show-pill.is-on { opacity: 1; transform: translate(-50%, 0); }
+html.is-presenting .show-pill { display: none; }
+
+.show-exit {
+  display: none;
+  position: fixed; right: 18px; bottom: 18px;
+  padding: 6px 12px; border: 1px solid var(--line-strong); border-radius: 999px;
+  background: var(--surface); color: var(--muted); font: inherit; font-size: 12px; cursor: pointer;
+  opacity: 0.35; transition: opacity 200ms var(--ease);
+}
+.show-exit:hover, .show-exit:focus-visible { opacity: 1; color: var(--ink); }
+body.is-presenter:not(.is-demo) .show-exit { display: block; }
+
+.show-demo-hint {
+  display: none;
+  position: fixed; right: 18px; bottom: 16px; margin: 0;
+  padding: 6px 12px; border-radius: 999px;
+  background: rgba(17, 17, 17, 0.7); color: rgba(255, 255, 255, 0.82); font-size: 12px;
+  pointer-events: none;
+}
+body.is-demo .show-demo-hint { display: block; }
+body.is-demo { cursor: none; }
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes showHintBreathe { 0%, 100% { opacity: 0.45; } 50% { opacity: 0.9; } }
+  body.is-demo .show-demo-hint { animation: showHintBreathe 3.6s ease-in-out infinite; }
+}
+
+/* Reveal fallback (no reveal beat loaded): the board fades up. */
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes showFadeUp { from { opacity: 0; transform: translateY(14px) scale(0.99); } }
+  #previewCard.show-fadeup { animation: showFadeUp 700ms var(--ease) both; }
+}
+
+@media (max-width: 760px) {
+  body.is-presenter .workspace { padding: 20px 16px 48px; }
+  .show-legend { gap: 10px; font-size: 11.5px; }
+  .show-legend-sep { display: none; }
+  .pr-hint { gap: 12px; }
+}

@@ -257,11 +257,19 @@ const LibraryUI = (function () {
     grid.querySelectorAll('.tile-art[data-font]').forEach(a => {
       if (tileObserver) tileObserver.observe(a); else paintTile(a);
     });
+    if (window.Onboarding) Onboarding.libraryChanged(records);   // empty-state example, showcase button
   }
 
   /* ---------- actions ---------- */
 
   async function newBrandFlow() {
+    // The three-way dialog (your logo / three questions / a name) lives in js/onboarding.js;
+    // the plain form below is what remains if that file is not loaded.
+    if (window.Onboarding && Onboarding.newBrand) return Onboarding.newBrand(plainNewBrandFlow);
+    return plainNewBrandFlow();
+  }
+
+  async function plainNewBrandFlow() {
     const v = await Dialogs.form({
       title: 'New brand',
       fields: [

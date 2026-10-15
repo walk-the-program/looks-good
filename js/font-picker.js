@@ -26,10 +26,11 @@
   const esc = s => escapeHtml(s);   // app.js
   function primaryFamily(font) { return font.name; }
 
-  /* ---- font loading: css2 <link>s are injected by app.js; wait for them,
-     then ask the browser to fetch the actual face when a card is seen. ---- */
+  /* ---- font loading: the bundled fonts/fonts.css (#localFonts) plus any Google
+     Fonts fallback <link>s app.js injected; wait for them, then ask the browser to
+     fetch the actual face when a card is seen. ---- */
   function stylesheetsReady() {
-    const links = Array.from(document.querySelectorAll('link[href*="fonts.googleapis.com/css2"]'));
+    const links = Array.from(document.querySelectorAll('#localFonts, link[href*="fonts.googleapis.com/css2"]'));
     return Promise.all(links.map(l => new Promise(resolve => {
       if (l.sheet) return resolve();
       l.addEventListener('load', resolve, { once: true });

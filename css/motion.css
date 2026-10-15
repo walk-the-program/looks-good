@@ -1,0 +1,278 @@
+/* ---------------------------------------------------------------------
+   motion.css — one motion system for the show features in js/reveal.js:
+   the brand reveal, morphing aesthetic switches, the hold-Space reel and
+   the worlds zoom. Every duration and easing below comes from these
+   tokens; js/reveal.js reads the same tokens for its timers.
+   prefers-reduced-motion swaps all of it for short cross-fades (in JS).
+------------------------------------------------------------------------ */
+
+:root {
+  --m-ease-out: cubic-bezier(0.16, 1, 0.3, 1);       /* arrivals: fast in, long settle */
+  --m-ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);   /* camera moves */
+  --m-ease-in: cubic-bezier(0.55, 0, 0.75, 0.2);     /* exits */
+  --m-ease-drop: cubic-bezier(0.3, 1.45, 0.5, 1);    /* a small overshoot when something lands */
+
+  --m-dur-tick: 85ms;      /* one step of the reel */
+  --m-dur-fast: 180ms;
+  --m-dur-base: 320ms;
+  --m-dur-morph: 450ms;    /* aesthetic switch */
+  --m-dur-settle: 680ms;   /* a part of the board arriving */
+  --m-dur-draw: 1100ms;    /* hero art drawing in */
+  --m-dur-camera: 1050ms;  /* reveal / worlds camera moves */
+
+  --m-stage: #0f0e0d;      /* the dark stage behind the reveal and the worlds wall */
+  --m-stage-ink: #f4f2ee;
+  --m-stage-muted: rgba(244, 242, 238, 0.56);
+}
+
+/* ---------- shared keyframes ---------- */
+
+@keyframes m-fade { from { opacity: 0; } }
+@keyframes m-fade-out { to { opacity: 0; } }
+@keyframes m-rise { from { opacity: 0; translate: 0 22px; } }
+@keyframes m-settle { from { opacity: 0; translate: 0 26px; scale: 0.965; } }
+@keyframes m-drop { from { opacity: 0; translate: 0 -90px; scale: 0.9 1.08; } 55% { opacity: 1; } }
+@keyframes m-letter { from { opacity: 0; translate: 0 0.32em; filter: blur(6px); } }
+@keyframes m-rule { from { scale: 0 1; } }
+@keyframes m-surface { from { opacity: 0; scale: 1.045; filter: blur(14px); } }
+@keyframes m-art {
+  from { opacity: 0; scale: 0.9; filter: blur(12px); clip-path: circle(0% at 50% 50%); }
+  60% { opacity: 1; }
+  to { clip-path: circle(75% at 50% 50%); }
+}
+@keyframes m-stroke { from { stroke-dasharray: 1 1; stroke-dashoffset: 1; } to { stroke-dasharray: 1 1; stroke-dashoffset: 0; } }
+@keyframes m-wipe { from { clip-path: inset(-10% 100% -10% 0); } to { clip-path: inset(-10% -2% -10% 0); } }
+
+/* ---------- 1. brand reveal ---------- */
+
+body.m-revealing #previewCard { visibility: hidden; }
+
+.m-reveal {
+  position: fixed;
+  inset: 0;
+  z-index: 900;
+  overflow: hidden;
+  cursor: pointer;
+}
+.m-reveal-bg {
+  position: absolute;
+  inset: 0;
+  background: var(--m-stage);
+  animation: m-fade var(--m-dur-base) var(--m-ease-out) both;
+}
+.m-reveal.is-landing .m-reveal-bg { animation: m-fade-out var(--m-dur-camera) var(--m-ease-in-out) both; }
+.m-reveal.is-landing.is-fast .m-reveal-bg { animation-duration: var(--m-dur-base); }
+.m-reveal-cam {
+  position: absolute;
+  left: 0;
+  top: 0;
+  transform-origin: 0 0;
+  transition: transform var(--m-dur-camera) var(--m-ease-in-out);
+  will-change: transform;
+}
+.m-reveal.is-fast .m-reveal-cam { transition-duration: var(--m-dur-base); }
+.m-reveal-board { pointer-events: none; }
+.m-reveal-hint {
+  position: absolute;
+  right: 18px;
+  bottom: 16px;
+  margin: 0;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: rgba(15, 14, 13, 0.78);
+  color: var(--m-stage-muted);
+  font: 500 11.5px/1 var(--font-ui);
+  letter-spacing: 0.01em;
+  opacity: 0;
+  animation: m-hint calc(var(--m-dur-camera) * 3.5) var(--m-ease-out) var(--m-dur-settle) both;
+}
+@keyframes m-hint { 0% { opacity: 0; } 12%, 80% { opacity: 1; } 100% { opacity: 0; } }
+.m-reveal.is-landing .m-reveal-hint { display: none; }
+
+/* Each staged part carries data-m (its move) and --m-delay. `backwards` fill keeps
+   it hidden until its moment and hands it back to its own styles when done. The
+   individual translate / scale properties compose with an aesthetic's own transform. */
+.m-reveal [data-m] {
+  animation-duration: var(--m-dur-settle) !important;
+  animation-timing-function: var(--m-ease-out) !important;
+  animation-delay: var(--m-delay, 0ms) !important;
+  animation-fill-mode: backwards !important;
+  animation-iteration-count: 1 !important;
+}
+.m-reveal [data-m="fade"] { animation-name: m-fade !important; }
+.m-reveal [data-m="rise"] { animation-name: m-rise !important; }
+.m-reveal [data-m="settle"] { animation-name: m-settle !important; }
+.m-reveal [data-m="drop"] { animation-name: m-drop !important; animation-timing-function: var(--m-ease-drop) !important; }
+.m-reveal [data-m="rule"] { animation-name: m-rule !important; transform-origin: 0 50%; }
+.m-reveal [data-m="surface"] { animation-name: m-surface !important; animation-duration: var(--m-dur-camera) !important; }
+.m-reveal [data-m="art"] { animation-name: m-art !important; animation-duration: var(--m-dur-draw) !important; }
+.m-reveal [data-m="stroke"] { animation-name: m-stroke !important; animation-duration: var(--m-dur-draw) !important; animation-timing-function: var(--m-ease-in-out) !important; }
+.m-reveal [data-m="wipe"] { animation-name: m-wipe !important; animation-duration: var(--m-dur-draw) !important; }
+.m-reveal [data-m="letter"] { animation-name: m-letter !important; animation-duration: var(--m-dur-base) !important; }
+.m-reveal .m-word { display: inline-block; white-space: nowrap; }
+.m-reveal .m-ch { display: inline-block; }
+
+/* ---------- 2. morphing aesthetic switch (View Transitions) ---------- */
+
+/* The new look floods out in a circle from where the switch came from (the
+   click, or the middle of the board), over the old one. Unchanged chrome is
+   identical in both, so only what changed visibly moves. */
+html.m-morphing::view-transition-old(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+html.m-morphing::view-transition-new(root) {
+  animation: m-vt-flood var(--m-dur-morph) var(--m-ease-in-out) both;
+  mix-blend-mode: normal;
+}
+@keyframes m-vt-flood {
+  from { clip-path: circle(0 at var(--m-vt-x, 50%) var(--m-vt-y, 50%)); }
+  to { clip-path: circle(var(--m-vt-r, 150vmax) at var(--m-vt-x, 50%) var(--m-vt-y, 50%)); }
+}
+
+/* ---------- 3. hold-Space reel ---------- */
+
+.m-reel {
+  position: fixed;
+  z-index: 800;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 40px;
+  padding: 0 16px 0 12px;
+  border-radius: 999px;
+  background: var(--ink, #111);
+  color: #fff;
+  font: 500 14px/1 var(--font-ui);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.18);
+  pointer-events: none;
+  animation: m-rise var(--m-dur-base) var(--m-ease-out) both;
+}
+.m-reel.is-out { animation: m-fade-out var(--m-dur-base) var(--m-ease-in) both; }
+.m-reel-k {
+  font: 500 10.5px/1 var(--font-mono);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.55);
+}
+.m-reel-window { position: relative; height: 18px; overflow: hidden; width: 170px; }
+.m-reel-name { display: block; line-height: 18px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; animation: m-reel-in var(--m-dur-tick) linear both; }
+.m-reel.is-landed .m-reel-name { animation: m-reel-land var(--m-dur-settle) var(--m-ease-drop) both; }
+.m-reel.is-landed .m-reel-k { color: #fff; }
+@keyframes m-reel-in { from { translate: 0 100%; } }
+@keyframes m-reel-land { from { translate: 0 100%; } }
+
+#previewCard.m-tick { animation: m-tick var(--m-dur-tick) linear both; }
+#previewCard.m-landed { animation: m-landed var(--m-dur-settle) var(--m-ease-drop) both; }
+@keyframes m-tick { from { translate: 0 -14px; filter: blur(3px); } }
+@keyframes m-landed { from { translate: 0 -18px; } }
+
+/* ---------- 4. worlds zoom ---------- */
+
+body.m-worlds-open { overflow: hidden; }
+.m-worlds {
+  position: fixed;
+  inset: 0;
+  z-index: 900;
+  overflow: hidden;
+  color: var(--m-stage-ink);
+}
+.m-worlds-bg {
+  position: absolute;
+  inset: 0;
+  background: var(--m-stage);
+  animation: m-fade var(--m-dur-base) var(--m-ease-out) both;
+}
+.m-worlds.is-closing .m-worlds-bg { animation: m-fade-out var(--m-dur-camera) var(--m-ease-in-out) both; }
+.m-worlds-head {
+  position: absolute;
+  left: var(--m-pad, 32px);
+  right: var(--m-pad, 32px);
+  top: 0;
+  height: var(--m-head, 72px);
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  animation: m-fade var(--m-dur-settle) var(--m-ease-out) var(--m-dur-base) both;
+}
+.m-worlds.is-closing .m-worlds-head { animation: m-fade-out var(--m-dur-fast) var(--m-ease-in) both; }
+.m-worlds-title { margin: 0; font: 600 17px/1.2 var(--font-ui); letter-spacing: -0.01em; }
+.m-worlds-sub { margin: 0; font: 400 13px/1.2 var(--font-ui); color: var(--m-stage-muted); }
+.m-worlds-close {
+  margin-left: auto;
+  height: 30px;
+  padding: 0 12px;
+  border: 1px solid rgba(244, 242, 238, 0.22);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--m-stage-ink);
+  font: 500 12.5px/1 var(--font-ui);
+  cursor: pointer;
+}
+.m-worlds-close:hover { background: rgba(244, 242, 238, 0.08); }
+.m-worlds-close:focus-visible { outline: 2px solid var(--m-stage-ink); outline-offset: 2px; }
+.m-worlds-cam {
+  position: absolute;
+  left: 0;
+  top: 0;
+  transform-origin: 0 0;
+  transition: transform var(--m-dur-camera) var(--m-ease-in-out);
+  will-change: transform;
+}
+.m-worlds-grid { position: absolute; display: grid; }
+.m-world {
+  position: relative;
+  display: block;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+  animation: m-settle var(--m-dur-settle) var(--m-ease-out) var(--m-delay, 0ms) backwards;
+}
+.m-world.is-current { animation: none; }
+.m-world-frame {
+  position: relative;
+  overflow: hidden;
+  border-radius: 6px;
+  box-shadow: 0 0 0 1px rgba(244, 242, 238, 0.1);
+  transition: box-shadow var(--m-dur-fast) var(--m-ease-out), translate var(--m-dur-fast) var(--m-ease-out);
+}
+.m-worlds.is-zooming .m-world.is-current .m-world-frame { border-radius: 0; box-shadow: none; }
+.m-world:hover .m-world-frame { box-shadow: 0 0 0 2px var(--m-stage-ink), 0 12px 30px rgba(0, 0, 0, 0.4); translate: 0 -2px; }
+.m-world:focus-visible { outline: none; }
+.m-world:focus-visible .m-world-frame { box-shadow: 0 0 0 2px var(--m-stage-ink); }
+.m-world.is-current .m-world-frame { box-shadow: 0 0 0 2px var(--m-stage-ink); }
+.m-world-frame { background: rgba(244, 242, 238, 0.05); }
+.m-world.is-filled .m-world-board { animation: m-fade var(--m-dur-base) var(--m-ease-out) both; }
+.m-world-board { position: absolute; left: 0; top: 0; transform-origin: 0 0; pointer-events: none; }
+.m-world-board .ab { border-radius: 0; }
+.m-world-name {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  padding-top: 7px;
+  font: 500 12px/1.2 var(--font-ui);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  animation: m-fade var(--m-dur-settle) var(--m-ease-out) calc(var(--m-dur-camera) * 0.6) both;
+}
+.m-world-name i { font: 400 10.5px/1 var(--font-mono); font-style: normal; color: var(--m-stage-muted); }
+.m-worlds.is-closing .m-world:not(.is-picked) { animation: m-fade-out var(--m-dur-base) var(--m-ease-in) both; }
+.m-worlds.is-closing .m-world-name { animation: m-fade-out var(--m-dur-fast) var(--m-ease-in) both; }
+.m-worlds.is-closing .m-world.is-picked .m-world-frame { border-radius: 0; box-shadow: none; translate: none; }
+.m-worlds.is-done { animation: m-fade-out var(--m-dur-base) var(--m-ease-out) both; }
+
+/* ---------- toolbar buttons ---------- */
+
+.m-tools { display: inline-flex; gap: 2px; }
+.m-tools .btn { width: 28px; padding: 0; justify-content: center; }
+
+/* Reduced motion: JS replaces the sequences with cross-fades; this is the backstop. */
+@media (prefers-reduced-motion: reduce) {
+  .m-reveal-cam, .m-worlds-cam { transition: none; }
+  #previewCard.m-tick, #previewCard.m-landed { animation: none; }
+}

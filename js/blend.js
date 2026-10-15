@@ -37,6 +37,8 @@ const BLEND_PRESETS = {
   bold: { art: true, type: true, color: true, patterns: true, material: true },
 };
 const BLEND_CHANNEL_LABEL = { art: 'Art', type: 'Type', color: 'Color', patterns: 'Patterns', material: 'Material' };
+// What the "Mix in" control calls each channel on screen (the brief keeps the names above).
+const BLEND_MIX_LABEL = { art: 'art', type: 'type', color: 'color', patterns: 'texture', material: 'finish' };
 const BLEND_STRENGTH_LABEL = { subtle: 'Subtle', balanced: 'Balanced', bold: 'Bold', custom: 'Custom' };
 
 /* ---------------- state (pure: also used by persistence.js and tests) ---------------- */
@@ -251,7 +253,7 @@ function blendDef(base, donor, b, typeFrom, typeLocked) {
   d.descriptor = blendDescriptor(base.descriptor, donor.descriptor);
   d.influences = blendInfluences(base.influences, donor.influences);
   d.kicker = blendKicker(base, donor);
-  d.summary = `${base.summary ? base.summary.trim() + ' ' : ''}Blended with ${donor.name}, which supplies the ${blendList(granted.map(c => BLEND_CHANNEL_LABEL[c].toLowerCase()))}.`;
+  d.summary = `${base.summary ? base.summary.trim() + ' ' : ''}Mixed with ${donor.name}, borrowing its ${blendList(granted.map(c => BLEND_MIX_LABEL[c]))}.`;
   d.rules = merged.rules;
   d.deck = blendDeck(base, donor, merged);
 
@@ -843,7 +845,7 @@ function blendBriefLines(state, def, t) {
   return out;
 }
 
-/* ---------------- UI: "Blend with…" in the Aesthetic panel ---------------- */
+/* ---------------- UI: "Mix in…" in the Aesthetic panel ---------------- */
 
 let blendQuery = '';
 
@@ -867,8 +869,9 @@ function blendChooseDonor(key) {
 
 // Surprise blend: a random donor and strength. Respects the aesthetic lock; one undo step.
 function surpriseBlend() {
-  if (state.locks && state.locks.aesthetic) { showToast('Unlock aesthetic to shuffle the blend'); return; }
-  const pool = AESTHETICS.filter(a => a.key !== state.aesthetic && !(state.blend && a.key === state.blend.with));
+  if (state.locks && state.locks.aesthetic) { showToast('Unlock aesthetic to shuffle the mix'); return; }
+  const all = typeof showcaseFilter === 'function' ? showcaseFilter(AESTHETICS) : AESTHETICS;
+  const pool = all.filter(a => a.key !== state.aesthetic && !(state.blend && a.key === state.blend.with));
   if (!pool.length) return;
   const donor = pool[Math.floor(Math.random() * pool.length)];
   const strength = ['subtle', 'balanced', 'bold'][Math.floor(Math.random() * 3)];
@@ -878,7 +881,7 @@ function surpriseBlend() {
 function blendOptionsHtml() {
   const q = blendQuery.trim().toLowerCase();
   const cur = normalizeBlend(state.blend, state.aesthetic);
-  const opts = AESTHETICS.filter(a => a.key !== state.aesthetic)
+  const opts = (typeof showcaseFilter === 'function' ? showcaseFilter(AESTHETICS) : AESTHETICS).filter(a => a.key !== state.aesthetic)
     .filter(a => !q || `${a.name} ${a.descriptor} ${a.influences || ''}`.toLowerCase().includes(q));
   const none = !q ? `<button type="button" class="blend-opt blend-none" data-key="" aria-pressed="${!cur}"><span class="ae-name">None</span><span class="ae-desc">${escapeHtml(aestheticByKey(state.aesthetic).name)} on its own</span></button>` : '';
   if (!opts.length) return none + '<p class="blend-empty">No aesthetic matches.</p>';
@@ -925,7 +928,7 @@ function syncBlendUi() {
     if (custom) custom.hidden = cur.strength !== 'custom';
     const note = document.getElementById('blendNote');
     const base = aestheticByKey(state.aesthetic);
-    const lines = [`${base.name} keeps structure and layout; ${donor.name} supplies ${blendList(BLEND_CHANNELS.filter(c => cur.channels[c]).map(c => BLEND_CHANNEL_LABEL[c].toLowerCase()))}.`];
+    const lines = [`${base.name} keeps its layout and structure, and borrows ${donor.name}'s ${blendList(BLEND_CHANNELS.filter(c => cur.channels[c]).map(c => BLEND_MIX_LABEL[c]))}.`];
     if (cur.channels.type && state.locks.typography) lines.push(`Typography is locked, so your fonts stay; ${donor.name}'s casing and tracking still apply.`);
     else if (cur.channels.type && !blendTypePair(donor.key)) lines.push(`${donor.name} has no font pairing, so your fonts stay.`);
     note.textContent = lines.join(' ');
@@ -982,7 +985,7 @@ function initBlendUi() {
     const channels = Object.assign({}, cur.channels, { [c.value]: c.checked });
     if (!BLEND_CHANNELS.some(k => channels[k])) {
       c.checked = true;
-      showToast('Keep one channel on, or choose None');
+      showToast('Borrow at least one thing, or choose None');
       return;
     }
     blendSetState({ with: cur.with, strength: 'custom', channels });

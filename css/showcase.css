@@ -1,0 +1,74 @@
+/* showcase.css — Showcase mode (js/showcase.js). body[data-showcase="on"] hides the
+   owner-only tools; body[data-refine="open"] (the sidebar "Refine" disclosure) brings
+   the fine-tuning controls back in place. */
+
+/* Library header switch: the same switch as the panel locks, a size up. */
+.sc-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+  align-self: center;
+  cursor: pointer;
+  user-select: none;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--muted);
+}
+.sc-toggle:hover, .sc-toggle:has(input:checked) { color: var(--ink); }
+.sc-toggle input {
+  appearance: none;
+  -webkit-appearance: none;
+  position: relative;
+  flex: none;
+  margin: 0;
+  width: 30px;
+  height: 17px;
+  border-radius: 999px;
+  background: #e6e5e1;
+  border: 1px solid var(--line);
+  cursor: pointer;
+  transition: background-color var(--dur, .18s) var(--ease, ease);
+}
+.sc-toggle input::after {
+  content: '';
+  position: absolute;
+  top: 1px;
+  left: 1px;
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  background: var(--surface, #fff);
+  box-shadow: var(--shadow-1, 0 1px 2px rgba(0, 0, 0, .2));
+  transition: transform var(--dur, .18s) var(--ease, ease);
+}
+.sc-toggle input:checked { background: var(--ink); border-color: var(--ink); }
+.sc-toggle input:checked::after { transform: translateX(13px); }
+.sc-toggle input:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.lib-head:has(.sc-toggle) { align-items: center; }
+.lib-head:has(.sc-toggle) > .btn { margin-left: 4px; }
+
+/* The Refine disclosure only exists in showcase mode. */
+.sc-refine { display: none; }
+body[data-showcase="on"] .sc-refine { display: block; }
+.sc-refine-note { margin: 0; font-size: 12px; line-height: 1.45; color: var(--muted); }
+
+/* Always hidden in showcase mode: the version history switch, the heuristic
+   recommendations and suggestion boxes, aesthetic numbers (the set has gaps once
+   it is curated) and the pattern engine's timing readout. */
+body[data-showcase="on"] #aeVersion,
+body[data-showcase="on"] .recommendations,
+body[data-showcase="on"] .suggest,
+body[data-showcase="on"] .ae-num,
+body[data-showcase="on"] .cmp-num,
+body[data-showcase="on"] #ptTiming { display: none !important; }
+
+/* Folded under Refine until it is opened. */
+body[data-showcase="on"]:not([data-refine="open"]) .sidebar .lock,
+body[data-showcase="on"]:not([data-refine="open"]) .sidebar .subpanel:has(#headingSize),
+body[data-showcase="on"]:not([data-refine="open"]) #cpImport,
+body[data-showcase="on"]:not([data-refine="open"]) #ptAdjust .pt-group:has(#ptSeed, #ptControls, #ptCommon),
+body[data-showcase="on"]:not([data-refine="open"]) #ptReset { display: none !important; }
+
+/* With the lock gone, the Aesthetic panel's lock row would be empty. */
+body[data-showcase="on"]:not([data-refine="open"]) .ae-lockrow:not(:has(> :not(#aeVersion):not(.lock))) { display: none; }

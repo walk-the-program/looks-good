@@ -1,0 +1,479 @@
+Fonts bundled with Branding Designer
+====================================
+Copied unmodified from Google Fonts (fonts.google.com) by dev/vendor-fonts.py (latin subset).
+Each font is free software under the licence named with it:
+  SIL Open Font License 1.1  https://openfontlicense.org
+  Apache License 2.0         https://www.apache.org/licenses/LICENSE-2.0
+
+Abril Fatface
+  SIL Open Font License 1.1
+  Copyright (c) 2011, Copyright (c) 2011, TypeTogether (www.type-together.com), with Reserved Font Names "Abril" and "Abril Fatface"
+
+Alfa Slab One
+  SIL Open Font License 1.1
+  Copyright 2016 The Alfa Slab One Project Authors (http://www.jmsole.cl | info@jmsole.cl), with Reserved Font Name "Alfa Slab".
+
+Anton
+  SIL Open Font License 1.1
+  Copyright 2020 The Anton Project Authors (https://github.com/googlefonts/AntonFont.git)
+
+Archivo
+  SIL Open Font License 1.1
+  Copyright 2020 The Archivo Project Authors (https://github.com/Omnibus-Type/Archivo)
+
+Archivo Black
+  SIL Open Font License 1.1
+  Copyright 2017 The Archivo Black Project Authors (https://github.com/Omnibus-Type/ArchivoBlack)
+
+Arimo
+  Apache License 2.0
+  Copyright 2020 The Arimo Project Authors (https://github.com/googlefonts/arimo)
+
+Arvo
+  SIL Open Font License 1.1
+  Copyright (c) 2010 Anton Koovit.
+
+Azeret Mono
+  SIL Open Font License 1.1
+  Copyright 2021 The Azeret Project Authors (https://github.com/displaay/azeret)
+
+Bagel Fat One
+  SIL Open Font License 1.1
+  Copyright 2022 The Bagel Fat Project Authors (https://github.com/JAMO-TYPEFACE/BagelFat)
+
+Baloo 2
+  SIL Open Font License 1.1
+  Copyright 2019 The Baloo 2 Project Authors (https://github.com/EkType/Baloo2)
+
+Barlow
+  SIL Open Font License 1.1
+  Copyright 2017 The Barlow Project Authors (https://github.com/jpt/barlow)
+
+Barlow Condensed
+  SIL Open Font License 1.1
+  Copyright 2017 The Barlow Project Authors (https://github.com/jpt/barlow)
+
+Bebas Neue
+  SIL Open Font License 1.1
+  Copyright 2019 The Bebas Neue Project Authors (https://github.com/dharmatype/Bebas-Neue)
+
+Big Shoulders Display
+  SIL Open Font License 1.1
+  Copyright 2019 The Big Shoulders Project Authors (https://github.com/xotypeco/big_shoulders)
+
+Bitter
+  SIL Open Font License 1.1
+  Copyright 2011 The Bitter Project Authors (https://github.com/solmatas/BitterPro)
+
+Bodoni Moda
+  SIL Open Font License 1.1
+  Copyright 2020 The Bodoni Moda Project Authors (https://github.com/indestructible-type/Bodoni)
+
+Bricolage Grotesque
+  SIL Open Font License 1.1
+  Copyright 2022 The Bricolage Grotesque Project Authors (https://github.com/ateliertriay/bricolage)
+
+Caveat
+  SIL Open Font License 1.1
+  Copyright 2014 The Caveat Project Authors (https://github.com/googlefonts/caveat)
+
+Chakra Petch
+  SIL Open Font License 1.1
+  Copyright 2018 The Chakra Petch Project Authors (https://github.com/m4rc1e/Chakra-Petch.git)
+
+Cinzel
+  SIL Open Font License 1.1
+  Copyright 2020 The Cinzel Project Authors (https://github.com/NDISCOVER/Cinzel)
+
+Cinzel Decorative
+  SIL Open Font License 1.1
+  Copyright © 2012 Natanael Gama (info@ndiscovered.com), with Reserved Font Name 'Cinzel'
+
+Comic Neue
+  SIL Open Font License 1.1
+  Copyright 2014 The Comic Neue Project Authors (https://github.com/crozynski/comicneue)
+
+Cormorant Garamond
+  SIL Open Font License 1.1
+  Copyright 2015 The Cormorant Project Authors (github.com/CatharsisFonts/Cormorant)
+
+Courier Prime
+  SIL Open Font License 1.1
+  Copyright 2015 The Courier Prime Project Authors (https://github.com/quoteunquoteapps/CourierPrime).
+
+Crimson Pro
+  SIL Open Font License 1.1
+  Copyright 2018 The Crimson Pro Project Authors (https://github.com/Fonthausen/CrimsonPro)
+
+DM Mono
+  SIL Open Font License 1.1
+  Copyright 2020 The DM Mono Project Authors (https://www.github.com/googlefonts/dm-mono)
+
+DM Sans
+  SIL Open Font License 1.1
+  Copyright 2014 The DM Sans Project Authors (https://github.com/googlefonts/dm-fonts)
+
+DM Serif Display
+  SIL Open Font License 1.1
+  Copyright 2014 - 2017 Adobe Systems Incorporated (http://www.adobe.com/), with Reserved Font Name 'Source'. Copyright 2019 Google LLC.
+
+Dela Gothic One
+  SIL Open Font License 1.1
+  Copyright 2020 The Dela Gothic Project Authors (https://github.com/syakuzen/DelaGothic)
+
+Domine
+  SIL Open Font License 1.1
+  Copyright 2020 The Domine Project Authors (https://github.com/googlefonts/domine)
+
+Doto
+  SIL Open Font License 1.1
+  Copyright 2024-2024 The Doto Project Authors (https://github.com/oliverlalan/Doto)
+
+EB Garamond
+  SIL Open Font License 1.1
+  Copyright 2017 The EB Garamond Project Authors (https://github.com/octaviopardo/EBGaramond12)
+
+Federant
+  SIL Open Font License 1.1
+  Copyright (c) 2011, Cyreal (www.cyreal.org) with Reserved Font Name 'Federant'
+
+Figtree
+  SIL Open Font License 1.1
+  Copyright 2022 The Figtree Project Authors (https://github.com/erikdkennedy/figtree)
+
+Fira Code
+  SIL Open Font License 1.1
+  Copyright 2014-2020 The Fira Code Project Authors (https://github.com/tonsky/FiraCode)
+
+Fraunces
+  SIL Open Font License 1.1
+  Copyright 2020 The Fraunces Project Authors (github.com/undercasetype/Fraunces)
+
+Fredoka
+  SIL Open Font License 1.1
+  Copyright 2016 The Fredoka Project Authors (https://github.com/hafontia/Fredoka-One)
+
+Geist
+  SIL Open Font License 1.1
+  Copyright 2024 The Geist Project Authors (https://github.com/vercel/geist-font)
+
+Geist Mono
+  SIL Open Font License 1.1
+  Copyright 2024 The Geist Project Authors (https://github.com/vercel/geist-font.git)
+
+Gloock
+  SIL Open Font License 1.1
+  Copyright 2022 The Gloock Project Authors (https://github.com/duartp/gloock)
+
+Grenze Gotisch
+  SIL Open Font License 1.1
+  Copyright 2020 The Grenze Gotisch Project Authors (https://github.com/Omnibus-Type/Grenze-Gotisch)
+
+IBM Plex Mono
+  SIL Open Font License 1.1
+  Copyright 2017 IBM Corp. All rights reserved.
+
+IBM Plex Sans
+  SIL Open Font License 1.1
+  Copyright 2019 IBM Corp. All rights reserved.
+
+IM Fell English
+  SIL Open Font License 1.1
+  © 2007 Igino Marini (www.iginomarini.com) With Reserved Font Name IM FELL English Italic
+
+Instrument Sans
+  SIL Open Font License 1.1
+  Copyright 2022 The Instrument Sans Project Authors (https://github.com/Instrument/instrument-sans)
+
+Instrument Serif
+  SIL Open Font License 1.1
+  Copyright 2022 The Instrument Serif Project Authors (https://github.com/Instrument/instrument-serif)
+
+Inter
+  SIL Open Font License 1.1
+  Copyright 2016 The Inter Project Authors (https://github.com/rsms/inter)
+
+Inter Tight
+  SIL Open Font License 1.1
+  Copyright 2022 The Inter Project Authors (https://github.com/rsms/inter-tight)
+
+Italiana
+  SIL Open Font License 1.1
+  Copyright (c) 2011 by Santiago Orozco (hi@typemade.mx) with reserved name Italiana
+
+Jersey 10
+  SIL Open Font License 1.1
+  Copyright 2023 The Soft Type Project Authors (https://github.com/scfried/soft-type-jersey)
+
+JetBrains Mono
+  SIL Open Font License 1.1
+  Copyright 2020 The JetBrains Mono Project Authors (https://github.com/JetBrains/JetBrainsMono)
+
+Josefin Sans
+  SIL Open Font License 1.1
+  Copyright 2010 The Josefin Sans Project Authors (https://github.com/ThomasJockin/JosefinSansFont-master), with Reserved Font Name "Josefin Sans".
+
+Jost
+  SIL Open Font License 1.1
+  Copyright 2020 The Jost Project Authors (https://github.com/indestructible-type/Jost)
+
+Karla
+  SIL Open Font License 1.1
+  Copyright 2019 The Karla Project Authors (https://github.com/googlefonts/karla)
+
+Kode Mono
+  SIL Open Font License 1.1
+  Copyright 2023 The Kode Mono Project Authors (https://github.com/isaozler/kode-mono)
+
+Lato
+  SIL Open Font License 1.1
+  Copyright (c) 2010-2011 by tyPoland Lukasz Dziedzic with Reserved Font Name "Lato". Licensed under the SIL Open Font License, Version 1.1.
+
+Lexend
+  SIL Open Font License 1.1
+  Copyright 2019 The Lexend Project Authors (https://github.com/googlefonts/lexend)
+
+Libre Baskerville
+  SIL Open Font License 1.1
+  Copyright 2012 The Libre Baskerville Project Authors (https://github.com/impallari/Libre-Baskerville)
+
+Libre Caslon Text
+  SIL Open Font License 1.1
+  Copyright 2012 The Libre Caslon Text Project Authors (https://github.com/impallari/Libre-Caslon-Text)
+
+Limelight
+  SIL Open Font License 1.1
+  Copyright (c) 2010 by Sorkin Type Co with Reserved Font Name Limelight.
+
+Literata
+  SIL Open Font License 1.1
+  Copyright 2017 The Literata Project Authors (https://github.com/googlefonts/literata)
+
+Lora
+  SIL Open Font License 1.1
+  Copyright 2011 The Lora Project Authors (https://github.com/cyrealtype/Lora-Cyrillic), with Reserved Font Name "Lora".
+
+Manrope
+  SIL Open Font License 1.1
+  Copyright 2019 The Manrope Project Authors (https://github.com/sharanda/manrope)
+
+Marcellus
+  SIL Open Font License 1.1
+  Copyright (c) 2012 by Brian J. Bonislawsky DBA Astigmatic (AOETI) (astigma@astigmatic.com), with ReservedFont Name "Marcellus"
+
+Merriweather
+  SIL Open Font License 1.1
+  Copyright 2024 The Merriweather Project Authors (https://github.com/EbenSorkin/Merriweather4) with Reserved Font Name "Merriweather".
+
+Michroma
+  SIL Open Font License 1.1
+  Copyright 2011 The Michroma Project Authors (https://github.com/googlefonts/Michroma-font)
+
+Montserrat
+  SIL Open Font License 1.1
+  Copyright 2011 The Montserrat Project Authors (https://github.com/JulietaUla/Montserrat)
+
+Newsreader
+  SIL Open Font License 1.1
+  Copyright 2020 The Newsreader Project Authors (http://github.com/productiontype/Newsreader)
+
+Nunito Sans
+  SIL Open Font License 1.1
+  Copyright 2016 The Nunito Sans Project Authors (https://github.com/Fonthausen/NunitoSans)
+
+Onest
+  SIL Open Font License 1.1
+  Copyright 2021 The Onest Project Authors (https://github.com/simpals/onest)
+
+Orbitron
+  SIL Open Font License 1.1
+  Copyright 2018 The Orbitron Project Authors (https://github.com/theleagueof/orbitron), with Reserved Font Name: "Orbitron".
+
+Oswald
+  SIL Open Font License 1.1
+  Copyright 2016 The Oswald Project Authors (https://github.com/googlefonts/OswaldFont)
+
+Outfit
+  SIL Open Font License 1.1
+  Copyright 2021 The Outfit Project Authors (https://github.com/Outfitio/Outfit-Fonts)
+
+Overpass
+  SIL Open Font License 1.1
+  Copyright 2021 The Overpass Project Authors (https://github.com/RedHatOfficial/Overpass)
+
+Patrick Hand
+  SIL Open Font License 1.1
+  Copyright (c) 2012 Patrick Wagesreiter (mail@patrickwagesreiter.at)
+
+Permanent Marker
+  Apache License 2.0
+  Copyright (c) 2010 by Font Diner, Inc. All rights reserved.
+
+Pirata One
+  SIL Open Font License 1.1
+  Copyright (c) 2012, Rodrigo Fuenzalida, Nicolas Massi (www.taip.com.ar / abc.taip.com.ar), with Reserved Font Name 'Pirata'
+
+Pixelify Sans
+  SIL Open Font License 1.1
+  Copyright 2021 The Pixelify Sans Project Authors (https://github.com/eifetx/Pixelify-Sans)
+
+Playfair Display
+  SIL Open Font License 1.1
+  Copyright 2017 The Playfair Display Project Authors (https://github.com/clauseggers/Playfair-Display), with Reserved Font Name "Playfair Display".
+
+Plus Jakarta Sans
+  SIL Open Font License 1.1
+  Copyright 2020 The Plus Jakarta Sans Project Authors (https://github.com/tokotype/PlusJakartaSans)
+
+Poiret One
+  SIL Open Font License 1.1
+  Copyright (c) 2011, Denis Masharov (denis.masharov@gmail.com)
+
+Poppins
+  SIL Open Font License 1.1
+  Copyright 2020 The Poppins Project Authors (https://github.com/itfoundry/Poppins)
+
+Press Start 2P
+  SIL Open Font License 1.1
+  Copyright 2012 The Press Start 2P Project Authors (cody@zone38.net), with Reserved Font Name "Press Start 2P"
+
+Public Sans
+  SIL Open Font License 1.1
+  Copyright 2015 The Public Sans Project Authors (https://github.com/uswds/public-sans)
+
+Rajdhani
+  SIL Open Font License 1.1
+  Copyright (c) 2014 Indian Type Foundry (info@indiantypefoundry.com)
+
+Raleway
+  SIL Open Font License 1.1
+  Copyright 2010 The Raleway Project Authors (impallari@gmail.com), with Reserved Font Name "Raleway".
+
+Red Hat Display
+  SIL Open Font License 1.1
+  Copyright 2024 The Red Hat Project Authors (https://github.com/RedHatOfficial/RedHatFont)
+
+Righteous
+  SIL Open Font License 1.1
+  Copyright (c) 2011 by Brian J. Bonislawsky DBA Astigmatic (AOETI) (astigma@astigmatic.com), with ReservedFont Name "Righteous"
+
+Roboto Slab
+  Apache License 2.0
+  Copyright 2018 The Roboto Slab Project Authors (https://github.com/googlefonts/robotoslab)
+
+Rubik
+  SIL Open Font License 1.1
+  Copyright 2015 The Rubik Project Authors (https://github.com/googlefonts/rubik)
+
+Rye
+  SIL Open Font License 1.1
+  Copyright (c) 2010 by Sorkin Type Co with Reserved Font Name Rye.
+
+Saira Condensed
+  SIL Open Font License 1.1
+  Copyright 2016 The Saira Project Authors (omnibus.type@gmail.com), with reserved font name "Saira".
+
+Saira Stencil
+  SIL Open Font License 1.1
+  Copyright 2020 The Saira Project Authors (https://github.com/Omnibus-Type/Saira)
+
+Share Tech Mono
+  SIL Open Font License 1.1
+  Copyright (c) 2012, Carrois Type Design, Ralph du Carrois (post@carrois.com www.carrois.com), with Reserved Font Name 'Share'
+
+Shippori Mincho
+  SIL Open Font License 1.1
+  Copyright 2021 The Shippori Mincho Project Authors (https://github.com/fontdasu/ShipporiMincho)
+
+Shrikhand
+  SIL Open Font License 1.1
+  Copyright (c) 2015 Jonny Pinhorn (jonpinhorn.typedesign@gmail.com)
+
+Silkscreen
+  SIL Open Font License 1.1
+  Copyright 2001 The Silkscreen Project Authors (https://github.com/googlefonts/silkscreen)
+
+Sora
+  SIL Open Font License 1.1
+  Copyright 2019 The Sora Project Authors (https://github.com/sora-xor/sora-font)
+
+Source Sans 3
+  SIL Open Font License 1.1
+  © 2023 Adobe (http://www.adobe.com/), with Reserved Font Name ‘Source’
+
+Source Serif 4
+  SIL Open Font License 1.1
+  © 2014 - 2021 Adobe Systems Incorporated (http://www.adobe.com/), with Reserved Font Name ‘Source’.
+
+Space Grotesk
+  SIL Open Font License 1.1
+  Copyright 2020 The Space Grotesk Project Authors (https://github.com/floriankarsten/space-grotesk)
+
+Space Mono
+  SIL Open Font License 1.1
+  Copyright 2016 The Space Mono Project Authors (https://github.com/googlefonts/spacemono)
+
+Special Elite
+  Apache License 2.0
+  Copyright (c) 2010 by Brian J. Bonislawsky DBA Astigmatic (AOETI). All rights reserved. Available under the Apache 2.0 licence.http://www.apache.org/licenses/LICENSE-2.0.html
+
+Spectral
+  SIL Open Font License 1.1
+  Copyright 2017 The Spectral Project Authors (https://github.com/productiontype/Spectral)
+
+Syncopate
+  Apache License 2.0
+  Copyright (c) 2010 by Brian J. Bonislawsky DBA Astigmatic (AOETI). All rights reserved. Available under the Apache 2.0 licence.http://www.apache.org/licenses/LICENSE-2.0.html
+
+Syne
+  SIL Open Font License 1.1
+  Copyright 2019 The Syne Project Authors (https://gitlab.com/bonjour-monde/fonderie/syne-typeface)
+
+Tektur
+  SIL Open Font License 1.1
+  Copyright 2023 The Tektur Project Authors (https://www.github.com/hyvyys/Tektur)
+
+Texturina
+  SIL Open Font License 1.1
+  Copyright 2020 The Texturina Project Authors (https://github.com/Omnibus-Type/Texturina)
+
+Tilt Warp
+  SIL Open Font License 1.1
+  Copyright 2019 The Tilt Project Authors (https://github.com/googlefonts/Tilt-Fonts)
+
+Tinos
+  Apache License 2.0
+  Copyright 2026 The Tinos Project Authors (https://github.com/googlefonts/tinos)
+
+Unbounded
+  SIL Open Font License 1.1
+  Copyright 2022 The Unbounded Project Authors (https://github.com/googlefonts/unbounded)
+
+Urbanist
+  SIL Open Font License 1.1
+  Copyright 2021 The Urbanist Project Authors (https://github.com/coreyhu/Urbanist)
+
+VT323
+  SIL Open Font License 1.1
+  Copyright 2011, The VT323 Project Authors (peter.hull@oikoi.com)
+
+Work Sans
+  SIL Open Font License 1.1
+  Copyright 2019 The Work Sans Project Authors (https://github.com/weiweihuanghuang/Work-Sans)
+
+Yellowtail
+  Apache License 2.0
+  Copyright (c) 2011 by Brian J. Bonislawsky DBA Astigmatic (AOETI). All rights reserved. Available under the Apache 2.0 licence. http://www.apache.org/licenses/LICENSE-2.0.html
+
+Yeseva One
+  SIL Open Font License 1.1
+  Copyright 2012 The Yeseva One Project Authors (lemonad@jovanny.ru), with Reserved Font Name "Yeseva".
+
+Zen Kaku Gothic New
+  SIL Open Font License 1.1
+  Copyright 2022 The Zen Project Authors (https://github.com/googlefonts/zen-kakugothic)
+
+Zilla Slab
+  SIL Open Font License 1.1
+  Copyright 2017, The Mozilla Foundation
+
