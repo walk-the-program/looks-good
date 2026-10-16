@@ -1,5 +1,5 @@
 /* showcase.css — Showcase mode (js/showcase.js). body[data-showcase="on"] hides the
-   owner-only tools; body[data-refine="open"] (the sidebar "Refine" disclosure) brings
+   owner-only tools; body[data-refine="open"] (the sidebar rail's "Refine" switch) brings
    the fine-tuning controls back in place. */
 
 /* Library header switch: the same switch as the panel locks, a size up. */
@@ -48,10 +48,9 @@
 .lib-head:has(.sc-toggle) { align-items: center; }
 .lib-head:has(.sc-toggle) > .btn { margin-left: 4px; }
 
-/* The Refine disclosure only exists in showcase mode. */
-.sc-refine { display: none; }
-body[data-showcase="on"] .sc-refine { display: block; }
-.sc-refine-note { margin: 0; font-size: 12px; line-height: 1.45; color: var(--muted); }
+/* The Refine switch (sidebar rail) only exists in showcase mode. */
+.sc-refine { display: none !important; }
+body[data-showcase="on"] .sc-refine { display: flex !important; }
 
 /* Always hidden in showcase mode: the version history switch, the heuristic
    recommendations and suggestion boxes and the pattern engine's timing readout.
@@ -63,10 +62,10 @@ body[data-showcase="on"] #ptTiming { display: none !important; }
 
 /* Folded under Refine until it is opened. */
 body[data-showcase="on"]:not([data-refine="open"]) .sidebar .lock,
-body[data-showcase="on"]:not([data-refine="open"]) .sidebar .subpanel:has(#headingSize),
+body[data-showcase="on"]:not([data-refine="open"]) #typeAdvanced,
 body[data-showcase="on"]:not([data-refine="open"]) #cpImport,
 body[data-showcase="on"]:not([data-refine="open"]) #ptAdjust .pt-group:has(#ptSeed, #ptControls, #ptCommon),
 body[data-showcase="on"]:not([data-refine="open"]) #ptReset { display: none !important; }
 
-/* With the lock gone, the Aesthetic panel's lock row would be empty. */
-body[data-showcase="on"]:not([data-refine="open"]) .ae-lockrow:not(:has(> :not(#aeVersion):not(.lock))) { display: none; }
+/* The Style panel's version row holds only the Classic | Current switch. */
+body[data-showcase="on"] .sd-version { display: none !important; }

@@ -709,7 +709,8 @@ const Onboarding = (function () {
   const COACH_KEY = 'bd.coach.v1';
   const TIPS = [
     { id: 'shuffle', find: () => $('shuffleAll'), side: 'right', title: 'Shuffle everything', text: 'Press Space, or click here. Every press is a fresh combination of colour, type, shape and style.' },
-    { id: 'mix', find: () => $('blendPick'), side: 'right', title: 'Mix in a second style', text: 'Borrow another style’s art, type, colour or finish and blend it into this one.' },
+    // The Mix in control lives in the sidebar's Style tab; when another tab is open the tip points at that tab.
+    { id: 'mix', find: () => { const b = $('blendPick'); return b && b.getClientRects().length ? b : $('sdTab-style'); }, side: 'right', title: 'Mix in a second style', text: 'Borrow another style’s art, type, colour or finish and blend it into this one.' },
     { id: 'built', find: () => { const r = document.querySelector('input[name="boardView"][value="built"]'); return r && (r.closest('label') || r); }, side: 'bottom', title: 'See it built', text: 'Put your brand on a real product screen and compare it with a plain version.' },
   ];
 

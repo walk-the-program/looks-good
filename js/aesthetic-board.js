@@ -774,7 +774,7 @@ function renderCompareGrid() {
   if (!grid) return;
   setBoardFonts(grid);
   const defs = visibleAesthetics();
-  const note = aeFamily === 'all' ? '' : `<p class="cmp-note">${escapeHtml(aestheticFamilyLabel(aeFamily))}: ${defs.length} of ${aePool().length} aesthetics. Choose All in the sidebar to see every one.</p>`;
+  const note = aeFamily === 'all' ? '' : `<p class="cmp-note">${escapeHtml(aestheticFamilyLabel(aeFamily))}: ${defs.length} of ${aePool().length} aesthetics. Choose All in the style gallery to see every one.</p>`;
   // The tile of the selected aesthetic follows the Classic | Current choice.
   const shown = d => (d.key === state.aesthetic ? resolveAestheticDef(state) : d);
   grid.innerHTML = note + defs.map(def => {
@@ -931,18 +931,21 @@ function syncAestheticChrome(def) {
   if (desc) desc.textContent = def.descriptor;
   const sum = document.getElementById('aeSummary');
   if (sum) sum.textContent = def.summary || '';
-  document.querySelectorAll('#aeList .ae-tile').forEach(b => {
-    b.setAttribute('aria-pressed', String(b.dataset.key === (def.classicOf || def.key)));
+  document.querySelectorAll('#aeList .gal-tile').forEach(b => {
+    const on = b.dataset.key === state.aesthetic;
+    b.setAttribute('aria-pressed', String(on));
+    b.classList.toggle('is-current', on);
   });
   syncAestheticVersionUi();
   document.querySelectorAll('#aeFamilies .ae-fam').forEach(b => {
     b.setAttribute('aria-pressed', String(b.dataset.family === aeFamily));
   });
   const shuffle = document.getElementById('shuffleAesthetic');
-  if (shuffle) shuffle.textContent = aeFamily === 'all' ? 'Shuffle aesthetic' : `Shuffle in ${aestheticFamilyLabel(aeFamily)}`;
+  if (shuffle) shuffle.textContent = aeFamily === 'all' ? 'Shuffle style' : `Shuffle ${aestheticFamilyLabel(aeFamily)}`;
   document.querySelectorAll('input[name="boardView"]').forEach(r => { r.checked = r.value === boardView; });
   renderFontRec(def.blend ? def.blend.base : def);
   if (typeof syncBlendUi === 'function') syncBlendUi();
+  if (window.SidebarUI && typeof SidebarUI.syncStyle === 'function') SidebarUI.syncStyle();
 }
 
 // The Classic | Current switch: only for an aesthetic that has a classic copy.
@@ -972,16 +975,19 @@ function renderFontRec(def) {
     `Heading <b data-fit="${fits.heading}">${AB_FIT_PLAIN[fits.heading]}</b>, body <b data-fit="${fits.body}">${AB_FIT_PLAIN[fits.body]}</b>.`;
 }
 
+// The style gallery's tiles (js/style-gallery.js draws a live board into each frame
+// while the gallery is open). A div, not a <button>: the board inside holds controls.
 function buildAestheticList() {
   const list = document.getElementById('aeList');
   if (!list) return;
   list.innerHTML = visibleAesthetics().map(def => `
-    <button type="button" class="ae-tile" data-key="${def.key}" aria-pressed="false" title="${escapeHtml(def.summary || def.name)}">
-      <span class="ae-motif" data-motif="${def.key}" aria-hidden="true"></span>
-      <span class="ae-num">${aestheticNumber(def.key)}</span>
-      <span class="ae-name">${escapeHtml(def.name)}</span>
-      <span class="ae-desc">${escapeHtml(def.descriptor)}</span>
-    </button>`).join('');
+    <div class="gal-tile" role="button" tabindex="-1" data-key="${def.key}" aria-pressed="false"
+         aria-label="${escapeHtml(def.name)}: ${escapeHtml(def.descriptor)}" title="${escapeHtml(def.summary || def.name)}"
+         data-search="${escapeHtml(`${def.name} ${def.descriptor} ${def.influences || ''} ${def.summary || ''}`.toLowerCase())}">
+      <div class="gal-frame"><div class="gal-board" inert></div></div>
+      <div class="gal-meta"><span class="gal-num">${aestheticNumber(def.key)}</span><span class="gal-name">${escapeHtml(def.name)}</span><span class="gal-badge">Current</span><span class="gal-desc">${escapeHtml(def.descriptor)}</span></div>
+    </div>`).join('');
+  if (window.StyleGallery && typeof StyleGallery.listBuilt === 'function') StyleGallery.listBuilt();
 }
 
 // Prev / next walk the visible (filtered) list; from an aesthetic outside the
@@ -1039,7 +1045,7 @@ function initAestheticUi() {
   if (typeof initBlendUi === 'function') initBlendUi();
 
   document.getElementById('aeList').addEventListener('click', e => {
-    const tile = e.target.closest('.ae-tile');
+    const tile = e.target.closest('.gal-tile');
     if (tile) chooseAesthetic(tile.dataset.key);
   });
   document.getElementById('aePrev').addEventListener('click', () => stepAesthetic(-1));

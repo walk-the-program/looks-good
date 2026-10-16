@@ -91,7 +91,7 @@ html, body {
 
 .app {
   display: grid;
-  grid-template-columns: 300px minmax(0, 1fr);
+  grid-template-columns: var(--sd-w, 400px) minmax(0, 1fr);
   min-height: 100vh;
   min-width: 0;
 }
@@ -109,26 +109,7 @@ output,
   font-feature-settings: "tnum" 1;
 }
 
-/* ---------- Sidebar ---------- */
-
-.sidebar {
-  background: var(--surface);
-  border-right: 1px solid var(--line);
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 0;
-  overflow-y: auto;
-  overflow-x: hidden;
-  max-height: 100vh;
-  min-width: 0;
-  position: sticky;
-  top: 0;
-}
-/* The sidebar is a flex column that scrolls. Its children default to
-   flex-shrink:1, so on a short viewport every section gets squeezed and
-   its contents clipped instead of the column simply scrolling. */
-.sidebar > * { flex-shrink: 0; }
+/* ---------- Sidebar (layout: css/sidebar.css) ---------- */
 
 .sidebar-brand {
   position: sticky;
@@ -149,102 +130,6 @@ output,
   color: var(--ink);
 }
 .logo-mark svg { display: block; }
-
-.sidebar-actions {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  padding: 16px 20px;
-  border-bottom: 1px solid var(--line);
-}
-
-.sidebar-foot {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  padding: 18px 20px 28px;
-}
-
-/* Sidebar sections are native <details> — free collapse/expand, no JS.
-   They're separated by a hairline only: no card, no fill, no shadow, so
-   the eye reads a single quiet column instead of a stack of boxes. */
-.panel {
-  border-bottom: 1px solid var(--line);
-}
-
-.panel-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  padding: 14px 20px;
-  cursor: pointer;
-  user-select: none;
-  list-style: none;
-  transition: background-color var(--dur) var(--ease);
-}
-.panel-head:hover { background: var(--hover); }
-.panel-head::-webkit-details-marker { display: none; }
-.panel-head::after {
-  content: '+';
-  font-family: var(--font-mono);
-  font-size: 14px;
-  line-height: 1;
-  color: var(--muted);
-  flex: none;
-}
-.panel[open] > .panel-head::after { content: '\2212'; }
-.panel-head h2 {
-  font-size: 11px;
-  font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: var(--muted);
-  margin: 0;
-}
-
-.panel-body {
-  padding: 2px 20px 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.subpanel {
-  border-top: 1px solid var(--line);
-  padding-top: 10px;
-  margin-top: 2px;
-}
-.subpanel > summary {
-  cursor: pointer;
-  user-select: none;
-  list-style: none;
-  font-size: 11px;
-  font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: var(--muted);
-  padding: 3px 0;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  transition: color var(--dur) var(--ease);
-}
-.subpanel > summary:hover { color: var(--ink); }
-.subpanel > summary::-webkit-details-marker { display: none; }
-.subpanel > summary::after {
-  content: '+';
-  font-family: var(--font-mono);
-  font-size: 13px;
-  line-height: 1;
-}
-.subpanel[open] > summary::after { content: '\2212'; }
-.subpanel-body {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  padding-top: 12px;
-}
 
 /* ---------- Lock toggle ---------- */
 
@@ -297,9 +182,7 @@ output,
 .lock input[type="checkbox"]:checked::after { transform: translateX(11px); }
 .lock:has(input:checked) { color: var(--ink); }
 
-/* The Classic | Current switch sits left of the aesthetic lock. */
-.ae-lockrow { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin: -2px 0 -2px; }
-.ae-lockrow .lock { margin: 0; align-self: center; }
+/* The Classic | Current switch (Style panel). */
 .ae-version {
   display: inline-grid;
   grid-template-columns: 1fr 1fr;
@@ -913,13 +796,6 @@ kbd {
 
 @media (max-width: 900px) {
   .app { grid-template-columns: minmax(0, 1fr); }
-  .sidebar {
-    position: static;
-    max-height: none;
-    border-right: none;
-    border-bottom: 1px solid var(--line);
-  }
-  .sidebar-brand { position: static; }
   .workspace { padding: 28px 20px 64px; }
   .workspace-header-top { flex-direction: column; align-items: flex-start; gap: 14px; }
   .font-specimen { max-width: 520px; }
@@ -1399,7 +1275,6 @@ html.is-mac-app .lib-inner { padding-top: 52px; }
   padding: 0; border: 0; background: none; font: inherit; color: var(--ink);
   text-decoration: underline; text-underline-offset: 2px; cursor: pointer;
 }
-.sidebar-foot .btn + .btn { margin-top: 8px; }
 
 @media (max-width: 720px) {
   .lib-inner { padding: 32px 20px 72px; }

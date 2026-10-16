@@ -44,7 +44,7 @@ function showcaseFilter(list) {
     else delete document.body.dataset.showcase;
     if (!on) delete document.body.dataset.refine;
     const refine = document.getElementById('scRefine');
-    if (refine && !on) refine.open = false;
+    if (refine && !on) refine.setAttribute('aria-pressed', 'false');
     const sw = document.getElementById('scToggle');
     if (sw) sw.checked = on;
   }
@@ -83,19 +83,23 @@ function showcaseFilter(list) {
     label.querySelector('input').addEventListener('change', e => setShowcase(e.target.checked));
   }
 
-  // Sidebar: one "Refine" disclosure, shown only in showcase mode. Opening it brings the
-  // locks, type fine-tuning, pattern settings and paste-colors back, each in its place.
+  // Sidebar rail: one "Refine" switch, shown only in showcase mode. Turning it on brings the
+  // locks, type fine-tuning, pasted colors and pattern settings back, each in its place.
   function buildRefine() {
-    const foot = document.querySelector('.sidebar-foot');
-    if (!foot || document.getElementById('scRefine')) return;
-    const d = document.createElement('details');
-    d.className = 'panel sc-refine';
-    d.id = 'scRefine';
-    d.innerHTML = '<summary class="panel-head"><h2>Refine</h2></summary>'
-      + '<div class="panel-body"><p class="sc-refine-note">Locks, type fine-tuning, pasted colors and pattern settings are back in their panels.</p></div>';
-    foot.parentNode.insertBefore(d, foot);
-    d.addEventListener('toggle', () => {
-      if (d.open) document.body.dataset.refine = 'open';
+    const rail = document.querySelector('.sd-rail');
+    if (!rail || document.getElementById('scRefine')) return;
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'sd-tab sc-refine';
+    b.id = 'scRefine';
+    b.setAttribute('aria-pressed', 'false');
+    b.title = 'Refine: show the locks and fine-tuning controls';
+    b.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/></svg><span>Refine</span>';
+    rail.appendChild(b);
+    b.addEventListener('click', () => {
+      const on = b.getAttribute('aria-pressed') !== 'true';
+      b.setAttribute('aria-pressed', String(on));
+      if (on) document.body.dataset.refine = 'open';
       else delete document.body.dataset.refine;
     });
   }

@@ -29,7 +29,7 @@ const BrandSession = (function () {
   function setView(view) {
     document.body.dataset.view = view;
     window.scrollTo(0, 0);
-    const side = document.querySelector('.sidebar');
+    const side = document.getElementById('sdPanels');
     if (side) side.scrollTop = 0;
   }
 
