@@ -5,10 +5,11 @@
    - Header button "Brief · N" (#briefCart) and a line under "Copy AI brief"
      (#aibNote, "Includes N patterns") both open the tray (#briefTray).
    - The tray lists state.patterns (PatternPins, js/patterns-ui.js): thumbnail,
-     name, colorway, a "use" select, an include-SVG toggle (vector families), a
-     per-item Copy, and remove. Footer: "Copy full AI brief" and "Copy patterns
-     only" (buildAiBrief / buildPatternsBrief / buildPatternItemBrief,
-     js/ai-brief.js).
+     name, colorway, a "use" select, the file it becomes (SVG for vector families,
+     PNG for raster ones), a per-item Copy, and remove. Footer: "Copy full AI
+     brief" and "Copy patterns only" (buildAiBrief / buildPatternsBrief /
+     buildPatternItemBrief, js/ai-brief.js). The pattern files themselves ship with
+     "Save brief + files" (js/brief-view.js, AiBriefCopy); the brief names them.
    - Every change goes through PatternPins (undoable, marks the brand unsaved).
      app.js render() calls PatternCart.refresh() after each state change.
    - Wide screens: a popover next to its opener. <= 720px: a bottom sheet with a
@@ -61,9 +62,7 @@ const PatternCart = (function () {
     const name = famName(p.key);
     const kind = f.vector ? (f.seamless ? 'Vector, seamless' : 'Vector') : 'Raster';
     const uses = PatternPins.USES.map(u => `<option value="${u.value}"${u.value === p.use ? ' selected' : ''}>${esc(u.label)}</option>`).join('');
-    const svg = f.vector
-      ? `<label class="cart-svg"><input type="checkbox" data-act="svg"${p.svg ? ' checked' : ''} /> Include SVG</label>`
-      : '<span class="cart-note">Raster: attach PNG</span>';
+    const svg = `<span class="cart-note">${f.vector ? 'Saved as SVG' : 'Saved as PNG'}</span>`;
     return `<li class="cart-item" data-i="${i}">
       <span class="cart-thumb"><canvas width="${THUMB_W}" height="${THUMB_H}" aria-hidden="true"></canvas></span>
       <div class="cart-meta">
@@ -222,11 +221,12 @@ const PatternCart = (function () {
     if (e.target.closest('#briefTrayClose')) return close(true);
     if (e.target.closest('#briefCopyFull')) {
       const n = items().length;
-      return copy(buildAiBrief(state), n ? `AI brief copied, with ${n} ${n === 1 ? 'pattern' : 'patterns'}` : 'AI brief copied');
+      const note = window.AiBriefCopy ? window.AiBriefCopy.pendingNote() : '';
+      return copy(buildAiBrief(state), (n ? `AI brief copied, with ${n} ${n === 1 ? 'pattern' : 'patterns'}` : 'AI brief copied') + note);
     }
     if (e.target.closest('#briefCopyPatterns')) {
       const n = items().length;
-      if (n) copy(buildPatternsBrief(state), `Copied ${n} ${n === 1 ? 'pattern' : 'patterns'} (Patterns section only)`);
+      if (n) copy(buildPatternsBrief(state), `Copied ${n} ${n === 1 ? 'pattern' : 'patterns'} (Patterns section only; the files come with Save brief + files)`);
     }
   }
 

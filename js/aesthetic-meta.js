@@ -488,3 +488,226 @@ function fontFitFor(key, state) {
   }
   if (problems.length) console.warn('aesthetic-meta: ' + problems.join('; '));
 })();
+
+/* ---------------- build recipes (the AI brief's States, Motion, Accessibility, Icons, App icon) ----------------
+   Deterministic rules, no AI: every aesthetic belongs to one material class (BUILD_CLASSES) and may
+   override any field of it in AESTHETIC_BUILD. aestheticBuild(key) returns the merged record; an
+   aesthetic with no entry here is classed from its materials by aibDeriveClass (js/ai-brief.js).
+
+   Text uses token names (`--ink`, `--error`); the brief rewrites them to Palette.ink for SwiftUI.
+   Numbers are CSS px = SwiftUI pt. `sh` is the rest shadow: a hard offset (x, y, blur 0), a soft
+   pair (d = offset, blur, ds/blurS for small controls), or a glow (r, a). SwiftUI radius = CSS blur / 2.
+   `states[k]` is [colour role, visual]; the focus row's colour is computed from the palette.
+   `sw` picks the SwiftUI recipe (hard | soft | glass | glow | flat | stepped).
+------------------------------------------------------------------------ */
+
+const BUILD_EASE = {
+  out: 'cubic-bezier(0.2, 0.8, 0.2, 1)',
+  inout: 'cubic-bezier(0.4, 0, 0.2, 1)',
+  spring: 'cubic-bezier(0.3, 1.6, 0.5, 1)',
+  steps: 'steps(4, end)',
+};
+
+const BUILD_CLASSES = {
+  hard: {
+    sw: 'hard', name: 'hard-shadow', line: 2,
+    sh: { x: 4, y: 4, blur: 0 }, lift: { x: 6, y: 6 }, press: { dx: 4, dy: 4, ms: 100 },
+    motion: { fast: 100, base: 160, slow: 240, ease: 'out' },
+    surface: 'Flat fills with a solid outline and a hard offset shadow (no blur).',
+    pressText: 'The surface travels 4pt right and down while its hard shadow goes to 0, so it lands flat on the page; release returns it. 100 ms, ease-out.',
+    states: {
+      pressed: ['No colour change', 'Travels (4,4) as the hard shadow goes to 0, 100 ms ease-out, landing flat on the page.'],
+      disabled: ['`--line` fill, `--muted` label and outline', 'No shadow and no press response: a flat, empty slab.'],
+      empty: ['`--ink` outline and icon, `--muted` copy', 'Dashed 2pt outline on `--canvas` with one icon, a headline, one line of copy and one primary action.'],
+      loading: ['`--ink` blocks on `--line`', 'Three solid squares stepping in turn, or a bar with a 2pt `--ink` outline; no blur, no easing.'],
+      error: ['`--error`', '2pt `--error` outline and hard shadow on the field; an alert icon and the message in `--error` below. Never colour alone.'],
+    },
+    reduceMotion: 'Swap rest and pressed instantly with no travel animation; toggles jump to their end state, no spring.',
+    reduceTransparency: 'Nothing is translucent; no change.',
+    increaseContrast: 'Outlines go to 3pt, `--muted` text becomes `--ink`, the shadow stays solid.',
+    icons: 'Stroke 2.5pt, round caps and joins, 2pt corners on boxy glyphs. Outline at rest; selected fills solid with a 2pt `--ink` outline.',
+    iconWeight: 'semibold',
+    appIcon: 'Full-bleed `{primary}` tile with one chunky glyph or sticker shape in `{accent}`, a 3pt `{ink}` outline and a hard `{ink}` offset shadow (6pt, 6pt) inside the tile; flat, no gradients, no text.',
+  },
+  soft: {
+    sw: 'soft', name: 'soft raised and recessed', line: 0,
+    sh: { d: 6, blur: 13, ds: 3, blurS: 7 }, press: { ms: 140 },
+    motion: { fast: 120, base: 180, slow: 320, ease: 'inout' },
+    surface: 'Surfaces share the canvas colour; paired highlight and shadow make them raised or recessed.',
+    pressText: 'A raised control becomes recessed: the paired shadows swap to inset over 140 ms; a glossy action also sinks 1pt and scales to 0.99.',
+    states: {
+      pressed: ['No colour change', 'Raised becomes recessed (paired shadows swap to inset, 140 ms ease-in-out); the glossy action also sinks 1pt and scales to 0.99.'],
+      disabled: ['`--muted` label on `--canvas`', 'Flat: no shadows, no gloss, printed onto the surface; ignores presses.'],
+      empty: ['`--ink` headline, `--muted` copy', 'A recessed well holding one outline icon, a headline, one line of copy and one raised or glossy action.'],
+      loading: ['`--line` track, `--primary` fill', 'Recessed track filling left to right, or a raised disc easing between raised and recessed every 1.2 s; never a shimmer sweep.'],
+      error: ['`--error`', 'The field keeps its recessed well and gains a 1.5pt `--error` rim; alert icon and message below. Shadows stay neutral.'],
+    },
+    reduceMotion: 'Swap raised and recessed instantly; no scale, no shadow morph, no idle shimmer.',
+    reduceTransparency: 'Glass panels become opaque `--canvas` with a 1pt `--line` rim; raised shadows stay.',
+    increaseContrast: 'Add a 1pt `--muted` outline to raised and recessed surfaces (relief alone is low contrast), set `--muted` text to `--ink`, thicken the focus ring to 4pt.',
+    icons: 'Stroke 1.75pt, round caps and joins, 2pt corners on geometric forms. Outline at rest; selected sits on a chip filled with `--ink`, glyph in `--canvas`. No gradients inside glyphs.',
+    iconWeight: 'regular',
+    appIcon: '`{canvas}` tile with one raised disc, a recessed ring and a `{primary}` semicircle, lit from the top left by a soft highlight and shadow pair; no text, no other colour.',
+  },
+  glass: {
+    sw: 'glass', name: 'glass and luminous', line: 1,
+    sh: { d: 0, blur: 24 }, press: { scale: 0.97, ms: 150 },
+    motion: { fast: 150, base: 250, slow: 400, ease: 'spring' },
+    surface: 'Translucent material over the scene with a 1pt light rim.',
+    pressText: 'Scale to 0.97 with a spring (response 0.3 s) and a brighter rim.',
+    states: {
+      pressed: ['`--ink` at 12% over the material', 'Scales to 0.97 with a spring (0.3 s) and a brighter rim.'],
+      disabled: ['`--muted` label', 'Material at 40% opacity, no rim highlight, no press response.'],
+      empty: ['`--ink` headline, `--muted` copy', 'A glass panel holding one icon, a headline, one line of copy and one action.'],
+      loading: ['`--primary` on the material', 'A progress arc or lens sweep inside the panel; never a spinner on bare canvas.'],
+      error: ['`--error`', 'Rim and caret in `--error`; alert icon and message below the field; the material itself stays neutral.'],
+    },
+    reduceMotion: 'No parallax, shimmer or morphing lenses; press is an instant 12% `--ink` wash.',
+    reduceTransparency: 'Replace every material with opaque `--canvas` (selected: `--pri-tint`) and keep the rim as `--line`.',
+    increaseContrast: 'Rim becomes 1.5pt `--ink` at 60%, panel fill opaque `--canvas`, `--muted` text becomes `--ink`.',
+    icons: 'Stroke 1.5pt, round caps, monochrome, outline at rest and the filled variant when selected; the glyph sits on its material in `--ink`.',
+    iconWeight: 'regular',
+    appIcon: '`{canvas}` tile with one translucent rounded lens (white at 25%, 1pt white rim at 50%) over a `{primary}` shape; no text.',
+  },
+  glow: {
+    sw: 'glow', name: 'neon and glow', line: 1,
+    sh: { r: 8, a: 0.5 }, press: { scale: 0.98, ms: 120 },
+    motion: { fast: 120, base: 200, slow: 320, ease: 'out' },
+    surface: 'Near-black panels with a 1pt coloured edge and a soft glow of the same colour.',
+    pressText: 'Glow radius grows from 8 to 14 and the control scales to 0.98 over 120 ms.',
+    states: {
+      pressed: ['Glow colour at full strength', 'Glow radius 8 to 14 and scale 0.98 in 120 ms.'],
+      disabled: ['`--muted` at 50%', 'No glow; a 1pt `--line` edge; ignores presses.'],
+      empty: ['`--muted` copy, `--primary` icon', 'A 1pt edge frame with corner brackets, a headline, one line of copy and one action.'],
+      loading: ['`--primary` on `--line`', 'A segmented bar filling block by block, or a blinking cursor block at 1 s.'],
+      error: ['`--error`', 'Edge and glow switch to `--error`; message in caps with an alert icon.'],
+    },
+    reduceMotion: 'Freeze pulses, scanlines, flicker and glow breathing at their rest state; press is an instant glow change.',
+    reduceTransparency: 'Replace glow halos with a solid 1pt edge in the same colour; panel fills opaque.',
+    increaseContrast: 'Edges go to 2pt at full strength, glow halos are dropped, body text is `--ink`.',
+    icons: 'Stroke 1.5pt, square caps, chamfered or 0pt corners, in the glow colour; fills only for status dots.',
+    iconWeight: 'regular',
+    appIcon: '`{canvas}` tile with one monoline glyph in `{primary}` and a soft `{primary}` glow at 40%; no text.',
+  },
+  flat: {
+    sw: 'flat', name: 'flat colour and hairlines', line: 1,
+    sh: {}, press: { opacity: 0.85, ms: 120 },
+    motion: { fast: 120, base: 180, slow: 280, ease: 'out' },
+    surface: 'Flat fills divided by hairlines; no shadows.',
+    pressText: 'Colour change only, no movement: a filled button drops to 85% opacity, a secondary or ghost control takes a `--pri-tint` wash. 120 ms, ease-out.',
+    states: {
+      pressed: ['`--pri-tint` wash (secondary, ghost) or the fill at 85% (primary)', 'Colour change only, 120 ms ease-out; no movement.'],
+      disabled: ['`--line` fill, `--muted` label', 'No hover or press response.'],
+      empty: ['`--ink` headline, `--muted` copy', 'One outline icon, a headline, one line of copy and one action on the plain canvas; no box or illustration.'],
+      loading: ['`--line` track, `--primary` fill', 'Indeterminate bar, or skeleton blocks in `--line` easing between 100% and 60% opacity every 1.2 s.'],
+      error: ['`--error`', '1.5pt `--error` edge on the field; alert icon and message below in `--error`.'],
+    },
+    reduceMotion: 'Replace slides and fades with an instant state swap; colour changes stay.',
+    reduceTransparency: 'Nothing is translucent; scrims become opaque `--canvas`.',
+    increaseContrast: 'Hairlines become 2pt `--ink`, `--muted` text becomes `--ink`, tints get a 1pt `--ink` edge.',
+    icons: 'Stroke 1.5pt, round caps and joins, 0 to 2pt corners, outline at rest and filled in `--ink` when selected.',
+    iconWeight: 'regular',
+    appIcon: 'Full-bleed `{primary}` tile with one simple glyph (or the brand initial in the heading face) in `{onPrimary}`; flat, no shadow, no gradient.',
+  },
+  stepped: {
+    sw: 'stepped', name: 'pixel, bevel and stepped', line: 2,
+    sh: {}, press: { ms: 0 },
+    motion: { fast: 0, base: 120, slow: 200, ease: 'steps' },
+    surface: 'Square 2pt-edged blocks; depth, where any, is a hard bevel; nothing is smoothed.',
+    pressText: 'Fill and label swap instantly (`--ink` and `--canvas`); bevelled controls flip their highlight and shadow edges. No easing.',
+    states: {
+      pressed: ['Fill and label swap (`--ink` and `--canvas`)', 'Instant inversion with no easing; bevels flip highlight and shadow edges.'],
+      disabled: ['`--muted` label, dotted `--muted` edge', 'No fill; ignores presses.'],
+      empty: ['`--ink` headline, `--muted` copy', 'A boxed message with one pixel icon, one line of copy and one action.'],
+      loading: ['`--primary` on `--line`', 'Blocks filling one at a time in 4 steps, or a blinking cursor; no smooth motion.'],
+      error: ['`--error`', '2pt `--error` border and an inverted label bar carrying the message with a pixel alert icon.'],
+    },
+    reduceMotion: 'Stop blinking cursors, marquees and stepped animations on their first frame.',
+    reduceTransparency: 'Nothing is translucent; no change.',
+    increaseContrast: 'Borders go to 3pt `--ink`, bevels use `--ink` and `--canvas`, `--muted` text becomes `--ink`.',
+    icons: 'Pixel-grid glyphs on a 16pt grid, 2pt square strokes, no curves smoothed, solid fills.',
+    iconWeight: 'bold',
+    appIcon: 'A 16x16 pixel-grid glyph in `{primary}` on a `{canvas}` tile, scaled up with nearest-neighbour; no smoothing, no text.',
+  },
+};
+
+// key -> { cls, ...overrides }. Hand-tuned: soft-form and neo-brutal-pop (shipped); the rest take their
+// class and only the fields that differ. modes: { only, because } marks a dark-only or light-only look.
+const AESTHETIC_BUILD = {
+  'soft-form': {
+    cls: 'soft',
+    press: { ms: 140 },
+    motion: { fast: 120, base: 180, slow: 320, ease: 'inout' },
+    pressText: 'A raised control becomes recessed: the paired shadows swap to inset over 140 ms (ease-in-out). The glossy primary action also sinks 1pt and scales to 0.99 with an inset 1,2,4 shadow. The light never moves: top left, always.',
+    icons: 'Stroke 1.75pt, round caps and joins, 2pt corners on geometric forms (circle, square, semicircle). Outline at rest; selected sits on a chip filled with `--ink`, glyph in `--canvas`. No gradients inside glyphs.',
+    appIcon: '`{canvas}` tile carrying one raised disc off-centre inside a recessed well, with a `{primary}` semicircle crossing the well rim, lit from the top left by the same highlight and shadow pair as the UI; no text, no other colour.',
+  },
+  'neo-brutal-pop': {
+    cls: 'hard',
+    line: 2,
+    sh: { x: 4, y: 4, blur: 0 }, lift: { x: 6, y: 6 }, press: { dx: 4, dy: 4, ms: 100 },
+    motion: { fast: 100, base: 160, slow: 240, ease: 'out' },
+    pressText: 'The "squish": at rest a 4pt hard shadow; pointer hover lifts (-2,-2) with the shadow at 6pt; pressed translates (4,4) and the shadow goes to 0. 100 ms. Toggles settle with a springy overshoot (cubic-bezier(0.3, 1.6, 0.5, 1), 160 ms).',
+    icons: 'Stroke 2.5pt, round caps and joins, chunky; stickers are solid fills with a 2pt `--ink` outline and a 4pt hard shadow. Outline icons at rest, solid when selected.',
+    appIcon: 'Full-bleed `{primary}` tile with one sticker shape (starburst or flower) in `{accent}`, a 3pt `{ink}` outline and a hard `{ink}` offset shadow (6pt, 6pt) inside the tile; flat, no gradients, no text.',
+  },
+  'raw-brutalist': {
+    cls: 'hard', shadowInk: true,
+    sh: { x: 6, y: 6, blur: 0 }, lift: { x: 6, y: 6 }, press: { dx: 6, dy: 6, ms: 80 },
+    motion: { fast: 80, base: 120, slow: 200, ease: 'out' },
+    pressText: 'The surface travels 6pt right and down while its hard shadow is removed; 80 ms, ease-out; toggles do not animate.',
+    states: { pressed: ['No colour change', 'Travels (6,6) as the hard shadow goes to 0, 80 ms ease-out.'] },
+    icons: 'Stroke 2pt, square caps and miter joins, 0pt corners; outline only, solid `--ink` fill when selected.',
+    iconWeight: 'medium',
+    appIcon: '`{canvas}` tile with a 6pt `{ink}` frame and one heavy block glyph in `{ink}`, a hard `{ink}` offset shadow (8pt, 8pt); no gradients, no text beyond a single letter.',
+  },
+  'liquid-glass': {
+    cls: 'glass',
+    surface: 'Regular material panels and floating glass controls over the scene; on iOS 26 or later use the system glass effect (`glassEffect`), otherwise the regular material.',
+  },
+  'cyber-hud': { cls: 'glow', modes: { only: 'dark', because: 'neon edges and glow only read against a near-black ground' } },
+  'retro-futurist': { cls: 'glow' },
+  'blob-tracking': { cls: 'glow', modes: { only: 'dark', because: 'detection overlays sit on dark footage plates' } },
+  'acid-graphics': { cls: 'glow' },
+  'aurora-noir': { cls: 'glass', modes: { only: 'dark', because: 'its aurora beams and hairlines only read as light on a near-black ground' } },
+  'holo-iridescent': { cls: 'glass' },
+  'frutiger-aero': { cls: 'glass' },
+  'clay': { cls: 'soft', sh: { d: 8, blur: 18, ds: 4, blurS: 9 } },
+  'industrial-device': { cls: 'soft' },
+  'radical-memphis': { cls: 'hard' },
+  'riso-print': { cls: 'hard', sh: { x: 3, y: 3, blur: 0 }, modes: { only: 'light', because: 'it imitates ink on uncoated paper; there is no dark paper' } },
+  'pixel-arcade': { cls: 'stepped', modes: { only: 'dark', because: 'sprites and dither are tuned for a CRT-black ground' } },
+  'ascii-art': { cls: 'stepped', modes: { only: 'dark', because: 'it is a phosphor terminal; light characters on black are the medium' } },
+  'pirate-broadcast': { cls: 'stepped', modes: { only: 'dark', because: 'teletext is bright text on a black screen' } },
+  'old-web': { cls: 'stepped' },
+  'mid-century': { cls: 'stepped' },
+  'blueprint': { cls: 'flat', modes: { only: 'dark', because: 'pale linework on blueprint blue is the medium' } },
+  'xerox': { cls: 'flat', modes: { only: 'light', because: 'it imitates toner on white paper; there is no dark paper' } },
+  'bauhaus-poster': { cls: 'flat' }, 'editorial-serif': { cls: 'flat' }, 'bento-grid': { cls: 'flat' },
+  'mesh-gradient': { cls: 'flat' }, 'micrographics': { cls: 'flat' }, 'mixed-type': { cls: 'flat' },
+  'dystopian-luxury': { cls: 'flat' }, 'naive-doodle': { cls: 'flat' }, 'japanese-minimal': { cls: 'flat' },
+  'transit-wayfinding': { cls: 'flat' }, 'gorpcore': { cls: 'flat' }, 'xerox-punk': { cls: 'flat' },
+  'corporate-vandalism': { cls: 'flat' },
+};
+
+// Merged build record for an aesthetic key, or null when the key has no entry (the brief then
+// derives a class from the materials). Overrides replace whole fields, except states, which
+// merge per state.
+function aestheticBuild(key) {
+  const base = typeof aestheticBaseKey === 'function' ? aestheticBaseKey(key) : key;
+  const o = AESTHETIC_BUILD[base];
+  if (!o) return null;
+  const cls = BUILD_CLASSES[o.cls];
+  const out = Object.assign({}, cls, o, { cls: o.cls });
+  out.states = Object.assign({}, cls.states, o.states || {});
+  return out;
+}
+
+(function validateBuild() {
+  const problems = [];
+  Object.keys(AESTHETIC_BUILD).forEach(k => {
+    if (!BUILD_CLASSES[AESTHETIC_BUILD[k].cls]) problems.push(`${k}: unknown build class "${AESTHETIC_BUILD[k].cls}"`);
+  });
+  if (typeof AESTHETICS !== 'undefined') AESTHETICS.forEach(a => { if (!AESTHETIC_BUILD[a.key]) problems.push(`${a.key}: no entry in AESTHETIC_BUILD (derived from materials)`); });
+  if (problems.length) console.warn('aesthetic-meta build: ' + problems.join('; '));
+})();

@@ -12,7 +12,11 @@
 
    Top bar: Copy for Claude Code / Cursor / v0 (the same Markdown, with a
    one-line preface for that tool; clipboard only, nothing is sent anywhere),
-   Download .md, Close. Esc closes.
+   Download .md, Save + files (.zip), Close. Esc closes.
+
+   The second half of this file is the sidebar's "Copy AI brief" front end
+   (AiBriefCopy): the Web | SwiftUI | Both picker, the resolve-before-copy
+   panel (aibCheck in ai-brief.js) and "Save brief + files".
 
    Needs ai-brief.js, aesthetic-board.js, color-roles.js, patterns, app.js
    (state, copyText, showToast, escapeHtml, brandFileSlug). Plain script.
@@ -294,15 +298,9 @@ window.Show = window.Show || {};
       <p class="bv-spec-copy is-muted" style="font-family:${ff(bf)};font-weight:${bw};font-size:${Math.max(12, bSize - 3)}px;color:${t.muted}">Captions, hints and placeholder text step back to the muted tone.</p>
       <div class="bv-spec-glyphs" style="font-family:${ff(bf)};font-weight:${bw}">${lower}<br>${nums}</div>
     </figure>`;
-    const typ = findSection(sections, 'Typography');
-    let facts = '', rec = '';
-    if (typ) {
-      const sb = subBlock(typ.lines, 'Recommended type');
-      const main = sb ? sb.before : typ.lines;
-      // the Google Fonts URL line is useful to copy but noisy on the page
-      facts = mdBlocks(main.filter(l => l.indexOf('- Google Fonts:') !== 0));
-      if (sb) rec = `<details class="bv-more"><summary>Recommended pairings and how this brand's faces fit</summary><div class="bv-md">${mdBlocks(sb.body)}</div></details>`;
-    }
+    const typ = findSection(sections, 'Type');
+    const facts = typ ? mdBlocks(typ.lines) : '';
+    const rec = '';
     return sectionShell('type', '02', 'Type', 'The two faces, set the way the board sets them.',
       `<div class="bv-specs">${heading}${body}</div><div class="bv-md bv-facts-md">${facts}</div>${rec}`);
   }
@@ -340,13 +338,13 @@ window.Show = window.Show || {};
     const dos = (rules.do || []).map(x => card(x, 'do')).join('');
     const donts = (rules.dont || []).map(x => card(x, 'dont')).join('');
 
-    const where = findSection(sections, 'Where each color goes');
+    const where = findSection(sections, 'Colors');
     let hard = '';
     if (where) {
-      const sb = subBlock(where.lines, 'Hard rules');
-      if (sb) hard = `<h3 class="bv-sub">Hard rules</h3><div class="bv-md bv-hard">${mdBlocks(sb.body)}</div>`;
+      const bullets = where.lines.filter(l => /^- /.test(l));
+      if (bullets.length) hard = `<h3 class="bv-sub">Colour rules</h3><div class="bv-md bv-hard">${mdBlocks(bullets)}</div>`;
     }
-    const map = findSection(sections, 'Component color map');
+    const map = findSection(sections, 'Components');
     const mapHtml = map ? `<details class="bv-more"><summary>Component colour map, every element and its tokens</summary><div class="bv-md">${mdBlocks(map.lines)}</div></details>` : '';
 
     return sectionShell('components', '03', 'Components', 'How the colours land on real controls, and the rules that keep them honest. Shown flat, in the brand colours.',
@@ -416,7 +414,7 @@ window.Show = window.Show || {};
       </div>`;
     }
     const modeLine = `<p class="bv-shape-note">Mode: ${t.isDark ? 'dark' : 'light'}. Canvas is the ${t.isDark ? 'dark' : 'light'} neutral and ink is the ${t.isDark ? 'light' : 'dark'} neutral.${state.pureBg ? ' Pure ' + (t.isDark ? 'black' : 'white') + ' background.' : ''} Editor shape preset: ${esc(state.shapePreset ? state.shapePreset.name : 'default')}, which the aesthetic restyles with its own corners.</p>`;
-    const mat = findSection(sections, 'Materials');
+    const mat = findSection(sections, 'Shape and materials');
     let cards = '';
     if (mat) {
       const items = mat.lines.map(l => /^- \*\*(.+?)\*\*:\s*(.*)$/.exec(l)).filter(Boolean);
@@ -430,11 +428,11 @@ window.Show = window.Show || {};
   }
 
   function textHtml(ctx) {
-    const skip = ['Brand', 'Aesthetic', 'Where each color goes', 'Component color map', 'Materials', 'Do', "Don't", 'Typography'];
-    const keep = ctx.sections.filter(s => !skip.some(k => s.title === k || s.title.indexOf('Aesthetic') === 0 || s.title.indexOf('Materials') === 0));
-    // Typography's facts are on the page already; keep the section order of the brief otherwise.
+    // Sections already drawn above (colour, type, components, shape, do and don't) are skipped here.
+    const skip = ['Colors', 'Components', 'Type', 'Shape and materials', "Do and don't"];
+    const keep = ctx.sections.filter(s => !skip.includes(s.title));
     const html = keep.map(s => {
-      const long = /^(Patterns|CSS variables)$/.test(s.title);
+      const long = /^(Patterns|Tokens \(CSS\)|Theme\.swift)$/.test(s.title);
       return `<details class="bv-acc"${long ? '' : ' open'}><summary><span>${esc(s.title)}</span></summary><div class="bv-md">${mdBlocks(s.lines)}</div></details>`;
     }).join('');
     const head = `<div class="bv-md bv-lede-md">${mdBlocks(ctx.leadLines)}</div>`;
@@ -504,6 +502,7 @@ window.Show = window.Show || {};
         <div class="bv-bar-title"><b>Brand brief</b><span class="bv-bar-brand"></span></div>
         <div class="bv-bar-actions" role="group" aria-label="Copy the brief">${copyBtns}
           <button type="button" class="bv-btn is-quiet" data-bv-act="download" title="Download the brief as a Markdown file">Download .md</button>
+          <button type="button" class="bv-btn is-quiet" data-bv-act="zip" title="Download BRIEF.md, the token files and the pattern files as one .zip">Save + files</button>
         </div>
         <button type="button" class="bv-close" data-bv-act="close" aria-label="Close brief" title="Close (Esc)">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>
@@ -535,7 +534,7 @@ window.Show = window.Show || {};
     if (!tool) return;
     const text = tool.preface + '\n\n' + buildAiBrief(state);
     copyText(text)
-      .then(() => { showToast('Brief copied for ' + tool.label); flash(btn, 'Copied'); })
+      .then(() => { showToast('Brief copied for ' + tool.label + (window.AiBriefCopy ? window.AiBriefCopy.pendingNote() : '')); flash(btn, 'Copied'); })
       .catch(() => showToast('Clipboard blocked. Try again from the app window'));
   }
 
@@ -571,6 +570,7 @@ window.Show = window.Show || {};
     const a = act.dataset.bvAct;
     if (a === 'close') close(true);
     else if (a === 'download') download();
+    else if (a === 'zip') { if (window.AiBriefCopy) window.AiBriefCopy.save({ skipCheck: true }); }
     else if (a === 'expand' || a === 'collapse') docEl.querySelectorAll('.bv-acc').forEach(d => { d.open = a === 'expand'; });
   }
 
@@ -629,4 +629,202 @@ window.Show = window.Show || {};
   window.Show.brief.close = () => close(false);
   window.Show.brief.isOpen = () => isOpen;
   window.Show.brief.text = () => buildAiBrief(state);
+})();
+
+/* ---------------------------------------------------------------------
+   AiBriefCopy — the sidebar's "Copy AI brief", in front of app.js's own handler.
+
+   - Injects, around #copyAiBrief: the Web | SwiftUI | Both picker (stored per brand
+     name in localStorage, see aibSetTarget), the resolve panel, and "Save brief + files".
+   - A capture-phase click listener takes the Copy click first (stopImmediatePropagation),
+     runs aibCheck(state) and either copies (buildAiBrief) or lists each problem with
+     one-click fixes and a "Copy anyway".
+   - "Save brief + files" writes BRIEF.md, tokens.css / Theme.swift and patterns/* as a
+     store-only .zip (aibFiles + aibZip in ai-brief.js).
+------------------------------------------------------------------------ */
+
+window.AiBriefCopy = (function () {
+  const $ = id => document.getElementById(id);
+  const esc = s => escapeHtml(s);
+  const toast = m => { if (typeof showToast === 'function') showToast(m); };
+  let panel = null, targetBox = null, saveBtn = null;
+  let pendingKind = null;
+  let lastCount = 0;
+
+  const targetLabel = () => (AIB_TARGETS.find(x => x.value === aibGetTarget(state)) || AIB_TARGETS[0]).label;
+
+  /* ---------------- injected UI ---------------- */
+
+  function build() {
+    const copy = $('copyAiBrief');
+    if (!copy || $('aibTarget')) return;
+    const foot = copy.parentNode;
+    panel = document.createElement('div');
+    panel.id = 'aibResolve';
+    panel.className = 'aibc-panel';
+    panel.hidden = true;
+    panel.setAttribute('role', 'region');
+    panel.setAttribute('aria-label', 'Fix before copying the brief');
+    panel.setAttribute('aria-live', 'polite');
+    targetBox = document.createElement('div');
+    targetBox.id = 'aibTarget';
+    targetBox.className = 'aibc-row';
+    targetBox.innerHTML = `<span class="aibc-label" id="aibTargetLabel">Build for</span>
+      <div class="segmented aibc-seg" role="radiogroup" aria-labelledby="aibTargetLabel">${AIB_TARGETS.map(t =>
+        `<label title="${t.value === 'web' ? 'CSS variables' : t.value === 'swiftui' ? 'A Swift theme: Color, Font, shadows, button styles' : 'Both blocks in one brief'}"><input type="radio" name="aibTargetSel" value="${t.value}" /> ${esc(t.label)}</label>`).join('')}</div>`;
+    saveBtn = document.createElement('button');
+    saveBtn.type = 'button';
+    saveBtn.id = 'saveAiBriefFiles';
+    saveBtn.className = 'btn btn-ghost btn-block aibc-save';
+    saveBtn.title = 'Download BRIEF.md, the token files and the brief\'s pattern files as one .zip';
+    saveBtn.innerHTML = '<svg class="ico" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M21 21H3"/></svg>Save brief + files';
+    foot.insertBefore(panel, copy);
+    foot.insertBefore(targetBox, copy);
+    foot.insertBefore(saveBtn, copy.nextSibling);
+    targetBox.addEventListener('change', e => {
+      if (e.target && e.target.name === 'aibTargetSel' && e.target.checked) { aibSetTarget(state, e.target.value); hidePanel(); }
+    });
+    saveBtn.addEventListener('click', () => run('save'));
+    panel.addEventListener('click', onPanelClick);
+    panel.addEventListener('keydown', e => { if (e.key === 'Escape') { e.stopPropagation(); hidePanel(); copy.focus(); } });
+    syncTarget();
+  }
+
+  function syncTarget() {
+    if (!targetBox) return;
+    const v = aibGetTarget(state);
+    targetBox.querySelectorAll('input[name="aibTargetSel"]').forEach(r => { r.checked = r.value === v; });
+  }
+
+  /* ---------------- resolve panel ---------------- */
+
+  let shown = [];
+
+  function showPanel(issues, kind) {
+    shown = issues;
+    pendingKind = kind;
+    const verb = kind === 'save' ? 'save' : 'copy';
+    panel.innerHTML = `<div class="aibc-head"><b>Fix before you ${verb}</b><button type="button" class="aibc-x" data-aibc="close" aria-label="Close">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div>
+      <p class="aibc-lede">${issues.length === 1 ? 'The brief would contradict itself here.' : 'The brief would contradict itself in ' + issues.length + ' places.'}</p>
+      <ul class="aibc-list">${issues.map((it, i) => `<li class="aibc-issue">
+        <span class="aibc-text">${esc(it.text)}</span>
+        <span class="aibc-fixes">${it.fixes.map((f, j) => f.hint
+          ? `<span class="aibc-hint">${esc(f.hint)}</span>`
+          : `<button type="button" class="btn btn-small aibc-fix" data-aibc="fix" data-i="${i}" data-j="${j}">${esc(f.label)}</button>`).join('')}</span>
+      </li>`).join('')}</ul>
+      <button type="button" class="btn btn-ghost btn-small aibc-any" data-aibc="any">${kind === 'save' ? 'Save anyway' : 'Copy anyway'}</button>`;
+    panel.hidden = false;
+    const first = panel.querySelector('.aibc-fix') || panel.querySelector('.aibc-any');
+    if (first) first.focus({ preventScroll: true });
+    panel.scrollIntoView({ block: 'nearest' });
+  }
+
+  function hidePanel() {
+    if (!panel) return;
+    panel.hidden = true;
+    panel.innerHTML = '';
+    shown = [];
+    pendingKind = null;
+  }
+
+  function onPanelClick(e) {
+    const b = e.target.closest('[data-aibc]');
+    if (!b) return;
+    const act = b.dataset.aibc;
+    if (act === 'close') return hidePanel();
+    if (act === 'any') { const k = pendingKind; hidePanel(); return act2(k); }
+    if (act === 'fix') {
+      const it = shown[Number(b.dataset.i)];
+      const fix = it && it.fixes[Number(b.dataset.j)];
+      if (!fix) return;
+      const kind = pendingKind;
+      try { fix.run(); } catch (err) { console.warn('brief fix failed', err); }
+      run(kind);   // check again; if nothing is left, this copies
+    }
+  }
+
+  /* ---------------- actions ---------------- */
+
+  function check() {
+    try { return aibCheck(state); } catch (err) { console.warn('brief check failed', err); return []; }
+  }
+
+  function patternNote() {
+    const n = typeof PatternPins !== 'undefined' ? PatternPins.list().length : 0;
+    return n ? `, with ${n} ${n === 1 ? 'pattern' : 'patterns'}` : '';
+  }
+
+  function doCopy() {
+    const text = buildAiBrief(state);
+    return copyText(text)
+      .then(() => toast(`AI brief copied for ${targetLabel()}${patternNote()}`))
+      .catch(() => toast('Clipboard blocked. Try again from the app window'));
+  }
+
+  function bytesToBlob(bytes) { return new Blob([bytes], { type: 'application/zip' }); }
+
+  async function doSave() {
+    saveBtn.disabled = true;
+    try {
+      const files = await aibFiles(state);
+      const blob = bytesToBlob(aibZip(files));
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${typeof brandFileSlug === 'function' ? brandFileSlug() : 'brand'}-brief.zip`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 20000);
+      toast(`Saved the brief and ${files.length - 1} ${files.length === 2 ? 'file' : 'files'} for ${targetLabel()}`);
+      return files;
+    } catch (err) {
+      console.error('save brief + files failed', err);
+      toast('Could not save the files');
+      return null;
+    } finally {
+      saveBtn.disabled = false;
+    }
+  }
+
+  function act2(kind) { return kind === 'save' ? doSave() : doCopy(); }
+
+  // opts.skipCheck: go straight to the action (the brief page's own button).
+  function run(kind, opts) {
+    syncTarget();
+    const issues = opts && opts.skipCheck ? [] : check();
+    lastCount = issues.length;
+    if (issues.length) { showPanel(issues, kind); return null; }
+    hidePanel();
+    return act2(kind);
+  }
+
+  // For callers with no panel (the pattern tray, the brief page's copy buttons): copy as is and
+  // say, in the toast, when the checks found something.
+  function pendingNote() {
+    const n = check().length;
+    return n ? ` (${n} unresolved ${n === 1 ? 'check' : 'checks'}: use Copy AI brief in the sidebar to review)` : '';
+  }
+
+  function wire() {
+    build();
+    document.addEventListener('click', e => {
+      const b = e.target.closest && e.target.closest('#copyAiBrief');
+      if (!b) return;
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      run('copy');
+    }, true);
+    setInterval(syncTarget, 1500);
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', wire); else wire();
+
+  return {
+    copy: opts => run('copy', opts),
+    save: opts => run('save', opts),
+    check, pendingNote,
+    lastCount: () => lastCount,
+    isPanelOpen: () => !!(panel && !panel.hidden),
+  };
 })();
