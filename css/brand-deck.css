@@ -106,7 +106,6 @@
 .ab.ab-slide[data-slide="cover"][data-cover-flat] .ab-deck-cover .ab-hero > .ab-hero-copy,
 .ab.ab-slide[data-slide="cover"][data-cover-flat] .ab-deck-cover .ab-hero > .ab-art { grid-column: auto; }
 .ab.ab-slide[data-slide="cover"][data-cover-flat] .ab-deck-cover .ab-hero > .ab-hero-copy { min-height: 0; }
-.ab-deck-cover-meta { flex: none; margin: 0; padding-top: 6px; }
 /* Round 6 hero on the cover: bleed sits side by side (its art goes to the right, inside the
    slide margins). */
 .ab.ab-slide[data-slide="cover"][data-hero="bleed"] .ab-deck-cover .ab-hero { grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); align-items: center; }

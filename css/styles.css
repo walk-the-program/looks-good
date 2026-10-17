@@ -611,6 +611,9 @@ kbd {
 }
 
 .recommendations { margin-top: 56px; }
+/* the score pill never clips: the head wraps and the pill may wrap its own text */
+.recommendations .section-head { flex-wrap: wrap; row-gap: 8px; }
+.recommendations .score-pill { max-width: 100%; white-space: normal; }
 .slides { margin-top: 64px; }
 
 .score-pill {
@@ -792,6 +795,19 @@ kbd {
 
 @media (max-width: 1180px) {
   .workspace { padding: 36px 32px 72px; }
+}
+
+/* Header toolbar (prev/next, view tabs, In brief, Share, Show): one line from 1000px up. Below
+   1360px the three buttons drop their words and keep their icons; below 1000px it wraps. */
+@media (min-width: 1000px) {
+  .workspace-header .ws-tools { flex-wrap: nowrap; gap: 6px; }
+  .workspace-header .ws-sep { margin: 0 2px; }
+}
+@media (min-width: 1000px) and (max-width: 1359px) {
+  .workspace-header .ws-tools .tb-text { display: none; }
+  .workspace-header .ws-tools .view-toggle label { padding: 0 9px; }
+  .workspace-header .ws-tools #briefCart { gap: 5px; padding: 0 9px; }
+  .workspace-header .ws-tools #shareBtn, .workspace-header .ws-tools #showMenuBtn { gap: 4px; padding: 0 9px; }
 }
 
 @media (max-width: 900px) {

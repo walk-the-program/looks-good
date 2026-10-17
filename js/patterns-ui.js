@@ -258,7 +258,7 @@ const PatternsUI = (function () {
     });
     $('ptFamCount').textContent = shown === fams.length ? `${fams.length} generators` : `${shown} of ${fams.length} generators`;
     $('ptFamEmpty').hidden = shown > 0;
-    $('ptSearchX').hidden = !famFilter.q;
+    $('ptFamSearchX').hidden = !famFilter.q;
   }
 
   function setFilter(change) {
@@ -281,11 +281,11 @@ const PatternsUI = (function () {
   function build() {
     const cws = P().E.COLORWAYS;
     root.innerHTML = `
-      <div class="pt-grid">
+      <div class="pt-layout">
         <div class="pt-main">
           <div class="pt-stage">
             <div class="pt-canvas-wrap"><canvas id="ptCanvas" aria-label="Pattern preview"></canvas></div>
-            <div class="pt-bar">
+            <div class="pt-namebar">
               <div class="pt-bar-name"><strong id="ptName"></strong><span id="ptTiming"></span></div>
             </div>
             <div class="pt-exports" role="group" aria-label="Add to brief and export">
@@ -337,9 +337,9 @@ const PatternsUI = (function () {
           <section class="pt-block pt-block-fams" aria-label="All families">
             <div class="pt-block-head"><h3>All families</h3><span id="ptFamCount" aria-live="polite"></span></div>
             <div class="pt-famtools">
-              <div class="pt-search">
-                <input type="text" id="ptSearch" placeholder="Search families" aria-label="Search families by name, look or category" autocomplete="off" spellcheck="false" inputmode="search" enterkeyhint="search" maxlength="40" />
-                <button type="button" class="pt-search-x" id="ptSearchX" aria-label="Clear search" hidden>${ICO('<path d="M6 6l12 12M18 6 6 18"/>')}</button>
+              <div class="pt-famsearch">
+                <input type="text" id="ptFamSearch" placeholder="Search families" aria-label="Search families by name, look or category" autocomplete="off" spellcheck="false" inputmode="search" enterkeyhint="search" maxlength="40" />
+                <button type="button" class="pt-famsearch-x" id="ptFamSearchX" aria-label="Clear search" hidden>${ICO('<path d="M6 6l12 12M18 6 6 18"/>')}</button>
               </div>
               <div class="pt-cats" id="ptCats" role="group" aria-label="Category"></div>
             </div>
@@ -417,10 +417,16 @@ const PatternsUI = (function () {
     const def = view().def;
     $('ptSuiteFor').textContent = def.name;
     const host = $('ptSuite');
+    const before = Array.from(host.querySelectorAll('canvas'));   // keep the old thumbnails on screen until the new ones are drawn
     host.innerHTML = list.map((s, i) => tileHtml('suite', i, s.name, famInfo(s.key).name, colorwayLabel(s.colorway))).join('');
     host.querySelectorAll('.pt-tile').forEach((tile, i) => {
       const s = list[i];
-      tile.querySelector('canvas')._mk = () => entryOf(s.key, Object.assign(P().defaults(s.key), s.params), s.colorway, SUITE_SEED);
+      const cv = tile.querySelector('canvas');
+      cv._mk = () => entryOf(s.key, Object.assign(P().defaults(s.key), s.params), s.colorway, SUITE_SEED);
+      if (before[i] && before[i].width && before[i].height) {
+        cv.width = before[i].width; cv.height = before[i].height;
+        cv.getContext('2d').drawImage(before[i], 0, 0);
+      }
       tile.insertAdjacentHTML('beforeend', addButton(false, s.name));
     });
   }
@@ -670,7 +676,11 @@ const PatternsUI = (function () {
     on = !!on;
     if (on === visible) { if (on) refresh(); return; }
     visible = on;
-    if (on) { lastBrandSig = ''; lastRenderSig = ''; lastUseSig = ''; refresh(); }
+    if (on) {
+      lastBrandSig = ''; lastRenderSig = ''; lastUseSig = '';
+      clearTimeout(refreshTimer);
+      doRefresh();   // draw straight away: opening the view never shows an empty canvas for a beat
+    }
     else {
       clearTimeout(refreshTimer); clearTimeout(fastTimer); clearTimeout(settleTimer);
       queue = []; pumping = false;
@@ -760,10 +770,10 @@ const PatternsUI = (function () {
       }
       const catBtn = e.target.closest('.pt-cat');
       if (catBtn) return setFilter({ cat: catBtn.dataset.cat });
-      if (e.target.closest('#ptSearchX')) {
-        $('ptSearch').value = '';
+      if (e.target.closest('#ptFamSearchX')) {
+        $('ptFamSearch').value = '';
         setFilter({ q: '' });
-        return $('ptSearch').focus();
+        return $('ptFamSearch').focus();
       }
       const fam = e.target.closest('.pt-fam');
       if (fam) {
@@ -788,7 +798,7 @@ const PatternsUI = (function () {
 
     root.addEventListener('input', e => {
       const el = e.target;
-      if (el.id === 'ptSearch') return setFilter({ q: el.value });
+      if (el.id === 'ptFamSearch') return setFilter({ q: el.value });
       if (el.id === 'ptTone') {
         cur.params.tone = Number(el.value) / 100;
         $('ptTone-o').textContent = el.value + '%';
@@ -806,7 +816,7 @@ const PatternsUI = (function () {
     });
 
     root.addEventListener('keydown', e => {
-      if (e.key === 'Escape' && e.target.id === 'ptSearch' && e.target.value) {
+      if (e.key === 'Escape' && e.target.id === 'ptFamSearch' && e.target.value) {
         e.target.value = '';
         setFilter({ q: '' });
         e.preventDefault();

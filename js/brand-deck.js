@@ -297,12 +297,11 @@ function bdGrade(ratio) {
 const DECK_SLIDES = [
   {
     key: 'cover', title: 'Cover', pattern: true,
-    build(P, state, def) {
-      const year = new Date().getFullYear();
-      return `<div class="ab-deck-cover">
-        ${P.hero()}
-        <div class="ab-labelrow ab-deck-cover-meta"><span class="ab-label">Brand guidelines</span><span class="ab-label">${escapeHtml(def.name)}</span><span class="ab-label">${year}</span></div>
-      </div>`;
+    // No meta row (Brand guidelines / name / year) under the hero: the header already says
+    // "Brand guidelines", and the footer carries the aesthetic name, so the row read as a
+    // second footer stacked on the first. The year moved into the footer (bdSlideHtml).
+    build(P) {
+      return `<div class="ab-deck-cover">${P.hero()}</div>`;
     },
   },
   {
@@ -531,7 +530,7 @@ function bdSlideHtml(state, def, slide, index, total) {
   const n = String(index + 1).padStart(2, '0');
   const count = String(total).padStart(2, '0');
   const body = slide.build(P, state, def, P.t);
-  const foot = `<footer class="ab-foot ab-slide-foot"><span class="ab-motto"><i class="ab-dot" aria-hidden="true"></i>${escapeHtml(def.name)}</span><span class="ab-infl">${slide.foot === 'closing' ? escapeHtml(def.influences) : `${n} / ${count}`}</span></footer>`;
+  const foot = `<footer class="ab-foot ab-slide-foot"><span class="ab-motto"><i class="ab-dot" aria-hidden="true"></i>${escapeHtml(def.name)}</span><span class="ab-infl">${slide.foot === 'closing' ? escapeHtml(def.influences) : `${slide.key === 'cover' ? `${new Date().getFullYear()} · ` : ''}${n} / ${count}`}</span></footer>`;
   return `${P.rootOpen('ab-slide', ` data-slide="${slide.key}"`)}
   ${slide.pattern && bdWantsPattern(def, slide.key) ? bdPatternHtml(P, slide.key) : ''}
   <div class="ab-in ab-slide-in">
@@ -1077,7 +1076,20 @@ function bdZoomCards(grid) {
   });
 }
 
-// Build every slide now (synchronously). Normally called from the idle callback.
+// The markup each slide card was last built from, by slide key. A rebuild compares the new
+// markup with this and only swaps the cards that changed; the others keep their DOM (and their
+// decoded pattern images), so an edit that touches two slides repaints two slides.
+const bdCardSigs = new Map();
+
+// bdFitDeck / bdApplyRadius / bdZoomCards take the grid and read its .ab-slide / .deck-card
+// descendants. For a partial rebuild, hand them this stand-in that only lists the new cards.
+function bdSubset(cards) {
+  return { querySelectorAll: sel => cards.flatMap(card => [...card.querySelectorAll(sel)].concat(card.matches(sel) ? [card] : [])) };
+}
+
+// Build the deck now (synchronously). Normally called from bdSchedule. The grid is never
+// cleared: new cards are built off-screen from markup, swapped in one by one, fitted in the
+// same task (so no frame shows an unfitted slide), and cards whose markup is unchanged stay.
 function renderBrandDeckNow() {
   const grid = document.getElementById('deckGrid');
   if (!grid) return;
@@ -1088,11 +1100,33 @@ function renderBrandDeckNow() {
   setBoardFonts(grid);
   const s = Object.assign({}, view.state, { content: effectiveContent() });
   const slides = DECK_SLIDES;
-  grid.innerHTML = slides.map((slide, i) => bdCardHtml(s, def, slide, i, slides.length)).join('');
+  const have = new Map();
+  [...grid.children].forEach(el => { if (el.classList && el.classList.contains('deck-card')) have.set(el.dataset.slide, el); });
+  const fresh = [];
+  const order = slides.map((slide, i) => {
+    const html = bdCardHtml(s, def, slide, i, slides.length);
+    const old = have.get(slide.key);
+    if (old && bdCardSigs.get(slide.key) === html) return old;
+    const t = document.createElement('template');
+    t.innerHTML = html;
+    const card = t.content.firstElementChild;
+    bdCardSigs.set(slide.key, html);
+    fresh.push(card);
+    if (old) old.replaceWith(card);
+    return card;
+  });
+  // Slides that are gone, then any card out of order (a slide registered after the first build).
+  const keep = new Set(order);
+  have.forEach(el => { if (!keep.has(el)) el.remove(); });
+  [...bdCardSigs.keys()].forEach(k => { if (!slides.some(sl => sl.key === k)) bdCardSigs.delete(k); });
+  order.forEach((card, i) => { if (grid.children[i] !== card) grid.insertBefore(card, grid.children[i] || null); });
   bdBuilt = true;
-  bdZoomCards(grid);
-  bdApplyRadius(grid, def);
-  bdFitDeck(grid);
+  if (fresh.length) {
+    bdZoomCards(grid);
+    const part = fresh.length === order.length ? grid : bdSubset(fresh);
+    bdApplyRadius(part, def);
+    bdFitDeck(part);
+  }
   const desc = document.getElementById('deckDesc');
   if (desc) desc.textContent = `${numberWord(slides.length)} guideline slides in the ${def.name} language.`;
 }
@@ -1101,22 +1135,38 @@ function numberWord(n) {
   return ['Zero', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten', 'Eleven', 'Twelve'][n] || String(n);
 }
 
-// Trailing delay before a rebuild. A color drag fires render() every few ms and
-// each rebuild re-renders ~9 pattern images, so wait until the edit settles.
-const BD_REBUILD_DELAY_MS = 400;
-function bdSchedule() {
+// When the deck rebuilds after an edit.
+// - A discrete edit (aesthetic switch, font pick, toggle, a text commit) rebuilds on the next
+//   frame: requestAnimationFrame lets the board paint first, the setTimeout(0) inside it runs
+//   the rebuild after that paint, so the deck follows the edit within a frame or two.
+// - A continuous drag (colour picker, sliders) calls render() every few ms, so calls closer
+//   together than BD_DRAG_GAP_MS count as one gesture: each one pushes a trailing rebuild
+//   BD_DRAG_SETTLE_MS out, and nothing rebuilds per pointer event.
+const BD_DRAG_GAP_MS = 120;
+const BD_DRAG_SETTLE_MS = 200;
+let bdLastCall = 0;
+let bdRaf = 0;
+function bdRun() {
+  bdTimer = null;
+  bdRaf = 0;
+  if (bdDirty && bdVisible) renderBrandDeckNow();
+}
+function bdSchedule(continuous) {
   clearTimeout(bdTimer);
-  bdTimer = setTimeout(() => {
-    const run = () => { if (bdDirty && bdVisible) renderBrandDeckNow(); };
-    if (window.requestIdleCallback) requestIdleCallback(run, { timeout: 400 }); else run();
-  }, BD_REBUILD_DELAY_MS);
+  if (bdRaf) cancelAnimationFrame(bdRaf);
+  bdRaf = 0;
+  if (continuous) { bdTimer = setTimeout(bdRun, BD_DRAG_SETTLE_MS); return; }
+  bdRaf = requestAnimationFrame(() => { bdRaf = 0; bdTimer = setTimeout(bdRun, 0); });
 }
 
 // Called from render(): marks the deck stale and rebuilds it when the Brand deck
 // section is near the viewport (or on the next visibility change). Cheap when off-screen.
 function renderBrandDeck() {
+  const now = performance.now();
+  const continuous = now - bdLastCall < BD_DRAG_GAP_MS;
+  bdLastCall = now;
   bdDirty = true;
-  if (bdVisible) bdSchedule();
+  if (bdVisible) bdSchedule(continuous);
 }
 
 function initBrandDeck() {
@@ -1126,12 +1176,12 @@ function initBrandDeck() {
   if ('IntersectionObserver' in window) {
     bdObserver = new IntersectionObserver(entries => {
       bdVisible = entries.some(en => en.isIntersecting);
-      if (bdVisible && bdDirty) bdSchedule();
+      if (bdVisible && bdDirty) bdSchedule(false);
     }, { rootMargin: '600px 0px' });
     bdObserver.observe(section);
   } else {
     bdVisible = true;
-    bdSchedule();
+    bdSchedule(false);
   }
   if (window.ResizeObserver) new ResizeObserver(() => bdZoomCards(grid)).observe(grid);
   // Webfonts arrive after the first build: re-fit once they have.

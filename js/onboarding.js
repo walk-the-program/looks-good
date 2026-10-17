@@ -6,7 +6,7 @@
      - Onboarding.newBrand(): the "New brand" dialog with three ways in: your logo,
        three questions, or just a name.
      - The empty-library state: one animated example cycling through three styles.
-     - Coach marks: at most three one-time tips, remembered in localStorage.
+     - Coach marks: three one-time tips, at most one per session, remembered in localStorage; "Turn off tips" in a tip stops them for good.
 
    A preset is:
      { name, tagline, colors:{primary,secondary,accent,neutralDark,neutralLight},
@@ -709,9 +709,9 @@ const Onboarding = (function () {
 
   const COACH_KEY = 'bd.coach.v1';
   const TIPS = [
-    { id: 'shuffle', find: () => $('shuffleAll'), side: 'right', title: 'Shuffle everything', text: 'Press Space, or click here. Every press is a fresh combination of colour, type, shape and style.' },
+    { id: 'shuffle', find: () => $('shuffleAll'), side: 'bottom', title: 'Shuffle everything', text: 'Press Space, or click here. Every press is a fresh combination of colour, type, shape and style.' },
     // The Mix in control lives in the sidebar's Style tab; when another tab is open the tip points at that tab.
-    { id: 'mix', find: () => { const b = $('blendPick'); return b && b.getClientRects().length ? b : $('sdTab-style'); }, side: 'right', title: 'Mix in a second style', text: 'Borrow another style’s art, type, colour or finish and blend it into this one.' },
+    { id: 'mix', find: () => { const b = $('blendPick'); return b && b.getClientRects().length ? b : $('sdTab-style'); }, side: 'bottom', title: 'Mix in a second style', text: 'Borrow another style’s art, type, colour or finish and blend it into this one.' },
     { id: 'built', find: () => { const r = document.querySelector('input[name="boardView"][value="built"]'); return r && (r.closest('label') || r); }, side: 'bottom', title: 'See it built', text: 'Put your brand on a real product screen and compare it with a plain version.' },
   ];
 
@@ -721,10 +721,25 @@ const Onboarding = (function () {
   function coachMark(id) {
     try { const s = coachSeen(); s[id] = 1; localStorage.setItem(COACH_KEY, JSON.stringify(s)); } catch (e) { /* tips may repeat without storage */ }
   }
+  const COACH_OFF_KEY = 'bd.coach.off';
+  let coachOff = false;       // kept in memory too, so "Turn off tips" holds this session even when storage is blocked
+  function tipsOff() {
+    if (coachOff) return true;
+    try { return localStorage.getItem(COACH_OFF_KEY) === '1'; } catch (e) { return false; }
+  }
+  function turnTipsOff() {
+    coachOff = true;
+    try { localStorage.setItem(COACH_OFF_KEY, '1'); } catch (e) { /* off for this session only */ }
+  }
   const visible = el => !!el && el.getClientRects().length > 0 && getComputedStyle(el).visibility !== 'hidden';
 
   let coachEl = null;
   let coachBusy = false;
+  let coachShown = false;     // one tip per session: set the first time any tip opens
+
+  // A tip never sits on the header toolbar or on a button that rewrites the brand.
+  const COACH_KEEP_CLEAR = '.workspace-header .ws-tools, #shuffleAll, #undoShuffle, #shuffleAesthetic, #shuffleFonts, #resetTypography, #shuffleColors, #shuffleShape, #removeLogo';
+  const overlaps = (a, b, pad) => a.left < b.right + pad && a.right > b.left - pad && a.top < b.bottom + pad && a.bottom > b.top - pad;
 
   // Tips stand aside while the brand is being shown or saved: the demo loop, present
   // mode, presenter view, and a native picture or slide capture (the deck veil or a
@@ -748,6 +763,7 @@ const Onboarding = (function () {
   function showTip(tip, target) {
     return new Promise(resolve => {
       closeCoach();
+      coachShown = true;       // one tip per session
       coachMark(tip.id);       // shown once, whatever happens next
       try { target.scrollIntoView({ block: 'nearest', inline: 'nearest' }); } catch (e) { /* ignore */ }
       const el = document.createElement('div');
@@ -755,18 +771,33 @@ const Onboarding = (function () {
       el.setAttribute('role', 'dialog');
       el.setAttribute('aria-label', tip.title);
       el.dataset.side = tip.side;
-      el.innerHTML = `<strong>${esc(tip.title)}</strong><p>${esc(tip.text)}</p><button type="button" class="btn btn-primary btn-small">Got it</button>`;
+      el.innerHTML = `<strong>${esc(tip.title)}</strong><p>${esc(tip.text)}</p><div class="ob-coach-actions"><button type="button" class="btn btn-primary btn-small" data-coach="ok">Got it</button><button type="button" class="ob-coach-off" data-coach="off">Turn off tips</button></div>`;
       document.body.appendChild(el);
       coachEl = el;
+      // Try the preferred side, then the others; take the first spot that fits on screen without
+      // covering the target, the header toolbar or a shuffle/reset button. Falls back to below.
       const place = () => {
         const r = target.getBoundingClientRect(), c = el.getBoundingClientRect();
-        let left, top;
-        if (tip.side === 'bottom') { left = r.left + r.width / 2 - c.width / 2; top = r.bottom + 12; }
-        else { left = r.right + 14; top = r.top + r.height / 2 - c.height / 2; }
-        if (left + c.width > window.innerWidth - 12) { left = Math.max(12, r.left - c.width - 14); el.dataset.side = 'left'; }
-        el.style.left = Math.max(12, Math.min(left, window.innerWidth - c.width - 12)) + 'px';
-        el.style.top = Math.max(12, Math.min(top, window.innerHeight - c.height - 12)) + 'px';
-        const ax = r.left + r.width / 2 - parseFloat(el.style.left), ay = r.top + r.height / 2 - parseFloat(el.style.top);
+        const vw = window.innerWidth, vh = window.innerHeight, M = 12, GAP = 14;
+        const clear = Array.from(document.querySelectorAll(COACH_KEEP_CLEAR)).filter(visible).map(n => n.getBoundingClientRect());
+        const clamp = (v, lo, hi) => Math.max(lo, Math.min(v, Math.max(lo, hi)));
+        const spot = side => {
+          let left, top;
+          if (side === 'bottom') { left = r.left + r.width / 2 - c.width / 2; top = r.bottom + GAP; }
+          else if (side === 'top') { left = r.left + r.width / 2 - c.width / 2; top = r.top - c.height - GAP; }
+          else if (side === 'left') { left = r.left - c.width - GAP; top = r.top + r.height / 2 - c.height / 2; }
+          else { left = r.right + GAP; top = r.top + r.height / 2 - c.height / 2; }
+          const L = clamp(left, M, vw - c.width - M), T = clamp(top, M, vh - c.height - M);
+          const box = { left: L, top: T, right: L + c.width, bottom: T + c.height };
+          const shifted = (side === 'bottom' || side === 'top') ? Math.abs(T - top) > 2 : Math.abs(L - left) > 2;
+          return { side, L, T, box, ok: !shifted && !overlaps(box, r, 2) && !clear.some(k => k !== r && overlaps(box, k, 0)) };
+        };
+        const order = [tip.side, 'bottom', 'right', 'top', 'left'].filter((x, i, a) => a.indexOf(x) === i);
+        const pick = order.map(spot).find(x => x.ok) || spot('bottom');
+        el.dataset.side = pick.side;
+        el.style.left = pick.L + 'px';
+        el.style.top = pick.T + 'px';
+        const ax = r.left + r.width / 2 - pick.L, ay = r.top + r.height / 2 - pick.T;
         el.style.setProperty('--ob-ax', Math.max(18, Math.min(ax, c.width - 18)) + 'px');
         el.style.setProperty('--ob-ay', Math.max(18, Math.min(ay, c.height - 18)) + 'px');
       };
@@ -781,6 +812,7 @@ const Onboarding = (function () {
         window.removeEventListener('resize', place);
         document.removeEventListener('keydown', onKey, true);
         target.removeEventListener('click', done);
+        target.removeEventListener('click', guard, true);
         closeCoach();
         resolve();
       };
@@ -794,13 +826,19 @@ const Onboarding = (function () {
       };
       window.addEventListener('resize', place);
       document.addEventListener('keydown', onKey, true);
+      // A click aimed at the tip must never fall through to the control it points at: for the
+      // first moments the tip is open, a click on the target only closes the tip.
+      const shownAt = performance.now();
+      const guard = e => { if (performance.now() - shownAt < 800) { e.preventDefault(); e.stopImmediatePropagation(); done(); } };
+      target.addEventListener('click', guard, true);
       target.addEventListener('click', done, { once: true });
-      el.querySelector('button').addEventListener('click', done);
+      el.querySelector('[data-coach="ok"]').addEventListener('click', done);
+      el.querySelector('[data-coach="off"]').addEventListener('click', () => { turnTipsOff(); done(); });
     });
   }
 
   async function runCoach() {
-    if (coachBusy || isShowcase()) return;
+    if (coachBusy || coachShown || tipsOff() || isShowcase()) return;
     coachBusy = true;
     try {
       await new Promise(r => setTimeout(r, 1700));      // let the board settle
@@ -816,7 +854,7 @@ const Onboarding = (function () {
         const target = tip.find();
         if (!visible(target)) continue;                 // not on screen in this build: skip it
         await showTip(tip, target);
-        await new Promise(r => setTimeout(r, 500));
+        break;                                          // at most one tip per session
       }
     } finally { coachBusy = false; }
   }
@@ -838,7 +876,7 @@ const Onboarding = (function () {
   return {
     createFromPreset, buildSavedState, newBrand, libraryChanged, questionPresets,
     miniBoardEl, loadShowcase, taglineFromAudience, analyzeLogo, fitLogo, logoContrast,
-    resetCoach() { try { localStorage.removeItem(COACH_KEY); } catch (e) { /* none */ } },
+    resetCoach() { coachOff = false; coachShown = false; try { localStorage.removeItem(COACH_KEY); localStorage.removeItem(COACH_OFF_KEY); } catch (e) { /* none */ } },
   };
 })();
 

@@ -71,7 +71,7 @@
       url = c.toDataURL('image/png');
       if (url.length > 450000) url = c.toDataURL('image/jpeg', 0.92);   // grainy fields: PNG gets huge
       cache.set(key, url);
-      if (cache.size > 40) cache.delete(cache.keys().next().value);
+      if (cache.size > 80) cache.delete(cache.keys().next().value);
     }
     return url;
   }

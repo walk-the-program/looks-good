@@ -589,15 +589,15 @@
             <label title="The brand on real product screens"><input type="radio" name="boardView" value="built" /> Built</label>
           </div>
           <span class="ws-sep" aria-hidden="true"></span>
-          <button type="button" id="briefCart" class="btn btn-ghost btn-small cart-btn is-empty" aria-haspopup="dialog" aria-expanded="false" aria-controls="briefTray" title="Patterns in your AI brief">
+          <button type="button" id="briefCart" class="btn btn-ghost btn-small cart-btn is-empty" aria-label="Patterns in your AI brief: 0. Open the list" aria-haspopup="dialog" aria-expanded="false" aria-controls="briefTray" title="Patterns in your AI brief">
             <svg class="ico" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 3h7l4 4v14H7z"/><path d="M14 3v4h4"/><path d="M10 12h5M10 16h5"/></svg>
-            In brief · <span id="briefCartCount">0</span>
+            <span class="tb-text">In brief ·</span> <span id="briefCartCount">0</span>
           </button>
           <!-- Export & share: mini-site, video, pictures, palette (js/share.js, css/share.css). -->
           <div class="share-tools">
-            <button type="button" id="shareBtn" class="btn btn-ghost btn-small" aria-haspopup="menu" aria-expanded="false" aria-controls="shareMenu" title="Save the brand to share it">
+            <button type="button" id="shareBtn" class="btn btn-ghost btn-small" aria-label="Share" aria-haspopup="menu" aria-expanded="false" aria-controls="shareMenu" title="Save the brand to share it">
               <svg class="ico" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V3"/><path d="m7 8 5-5 5 5"/><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/></svg>
-              Share
+              <span class="tb-text">Share</span>
               <svg class="ico ico-caret" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
             </button>
             <div class="share-menu tb-menu" id="shareMenu" role="menu" aria-label="Share the brand" hidden>
@@ -620,9 +620,9 @@
           <!-- The show: reveal and worlds (js/reveal.js), present, presenter view and the
                demo loop (js/present.js, which wires every item of this menu). -->
           <div class="show-tools">
-            <button type="button" id="showMenuBtn" class="btn btn-ghost btn-small" aria-haspopup="menu" aria-expanded="false" aria-controls="showMenu" title="Show the brand: reveal, every world, present">
+            <button type="button" id="showMenuBtn" class="btn btn-ghost btn-small" aria-label="Show" aria-haspopup="menu" aria-expanded="false" aria-controls="showMenu" title="Show the brand: reveal, every world, present">
               <svg class="ico" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 4.5v15l12-7.5z"/></svg>
-              Show
+              <span class="tb-text">Show</span>
               <svg class="ico ico-caret" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
             </button>
             <div class="show-menu tb-menu" id="showMenu" role="menu" aria-label="Show the brand" hidden>
