@@ -47,7 +47,9 @@ body:not([data-view="patterns"]) .patterns { display: none; }
   outline-offset: 1px;
 }
 .lib-top .mode-switch { margin-left: 18px; }
-html.is-mac-app .lib-top .mode-switch { margin-top: -3px; }
+/* Mac app: the top 28px belongs to the native drag strip (it swallows clicks), so the switch sits just below it. */
+html.is-mac-app .lib-top .mode-switch { position: absolute; top: 38px; left: 48px; margin: 0; line-height: normal; }
+html.is-mac-app.is-fullscreen .lib-top .mode-switch { position: static; margin: -3px 0 0 18px; }
 
 /* ---------- Toolbar ---------- */
 .pt-bar {
@@ -173,8 +175,8 @@ html.is-mac-app .lib-top .mode-switch { margin-top: -3px; }
   border-bottom: 1px solid var(--line-strong);
   background: var(--surface);
 }
-html.is-mac-app .pt-tool-bar { height: 40px; padding-left: 78px; }
-html.is-mac-app.is-fullscreen .pt-tool-bar { padding-left: 16px; }
+html.is-mac-app .pt-tool-bar { height: 72px; padding: 28px 16px 0 78px; box-sizing: border-box; }
+html.is-mac-app.is-fullscreen .pt-tool-bar { height: 46px; padding: 0 16px; }
 .pt-tool-name { flex: 1; min-width: 0; display: flex; align-items: baseline; gap: 10px; font-size: 13px; }
 .pt-tool-name strong { font-weight: 600; letter-spacing: -0.01em; white-space: nowrap; }
 .pt-tool-name span { color: var(--muted); font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -193,6 +195,8 @@ html.is-mac-app.is-fullscreen .pt-tool-bar { padding-left: 16px; }
 
 @media (max-width: 720px) {
   .lib-top .mode-switch { margin-left: 10px; }
+  html.is-mac-app .lib-top .mode-switch { left: 20px; margin-left: 0; }
+  html.is-mac-app.is-fullscreen .lib-top .mode-switch { margin-left: 10px; }
   .pt-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 24px 14px; }
   .pt-search { width: 100%; }
   #ptSurprise { margin-left: 0; }

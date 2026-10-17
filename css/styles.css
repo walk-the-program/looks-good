@@ -991,12 +991,13 @@ body[data-view="editor"] .library { display: none; }
   font-weight: 600;
   letter-spacing: -0.01em;
 }
-html.is-mac-app .lib-top { height: 28px; padding: 0 48px 0 78px; line-height: 32px; }
+html.is-mac-app .lib-top { height: 28px; padding: 0 48px 0 78px; line-height: 32px; position: relative; }
 html.is-mac-app.is-fullscreen .lib-top { padding-left: 48px; height: 46px; }
 .lib-inner {
   padding: 44px 48px 96px;
 }
-html.is-mac-app .lib-inner { padding-top: 52px; }
+html.is-mac-app .lib-inner { padding-top: 84px; }
+html.is-mac-app.is-fullscreen .lib-inner { padding-top: 52px; }
 .lib-head {
   display: flex;
   align-items: flex-end;
@@ -1278,7 +1279,8 @@ html.is-mac-app .lib-inner { padding-top: 52px; }
 
 @media (max-width: 720px) {
   .lib-inner { padding: 32px 20px 72px; }
-  html.is-mac-app .lib-inner { padding-top: 44px; }
+  html.is-mac-app .lib-inner { padding-top: 76px; }
+  html.is-mac-app.is-fullscreen .lib-inner { padding-top: 44px; }
   .lib-head h1 { font-size: 26px; }
   .lib-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 24px 14px; }
 }

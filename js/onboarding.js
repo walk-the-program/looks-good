@@ -67,6 +67,7 @@ const Onboarding = (function () {
       id: LibraryStore.newId(), name: preset.name, createdAt: now, updatedAt: now,
       savedState: buildSavedState(preset), draftState: null,
     };
+    if (preset.source) rec.source = preset.source;
     await LibraryStore.put(rec);
     if (open) await BrandSession.openBrand(rec.id);
     return rec;

@@ -55,6 +55,7 @@ function showcaseFilter(list) {
     if (typeof buildAestheticList === 'function') buildAestheticList();
     if (document.body.dataset.view === 'editor' && typeof render === 'function') render();
     if (typeof blendRenderOptions === 'function') blendRenderOptions();
+    if (document.body.dataset.view === 'library' && typeof LibraryUI !== 'undefined' && LibraryUI.refresh) LibraryUI.refresh();
   }
 
   function setShowcase(on) {

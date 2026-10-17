@@ -280,15 +280,27 @@ const LibraryUI = (function () {
     const grid = $('libGrid');
     const empty = $('libEmpty');
     const has = records.length > 0;
+    // Showcase on: only the showcase brands are shown (if any are loaded); the rest stay saved.
+    const sc = typeof window.isShowcase === 'function' && window.isShowcase();
+    const scBrands = records.filter(r => r.source === 'showcase' ||
+      (typeof ShowcaseBrands !== 'undefined' && ShowcaseBrands.names().some(nm => nm.toLowerCase() === String(r.name || '').trim().toLowerCase())));
+    const shown = sc && scBrands.length ? scBrands : records;
     empty.hidden = has;
     grid.hidden = !has;
-    $('libCount').textContent = has ? `${records.length} ${records.length === 1 ? 'brand' : 'brands'}, most recently edited first` : '';
+    const n = n => `${n} ${n === 1 ? 'brand' : 'brands'}`;
+    let count = '';
+    if (has && sc && scBrands.length) {
+      const hidden = records.length - scBrands.length;
+      count = `${scBrands.length} showcase ${scBrands.length === 1 ? 'brand' : 'brands'}` + (hidden ? ` · ${hidden} of your own hidden while Showcase is on` : '');
+    } else if (has && sc) count = 'Showcase is on: load the showcase brands to show them off';
+    else if (has) count = `${n(records.length)}, most recently edited first`;
+    $('libCount').textContent = count;
     const plus = `
       <button type="button" class="tile tile-new" id="libPlus" aria-label="New brand">
         <div class="tile-art"><span class="tile-plus">+</span></div>
         <div class="tile-meta"><div class="tile-text"><div class="tile-title">New brand</div><div class="tile-sub">Start from a fresh combination</div></div></div>
       </button>`;
-    grid.innerHTML = plus + records.map(tileHtml).join('');
+    grid.innerHTML = plus + shown.map(tileHtml).join('');
     // A wide logo (mark plus wordmark) gets a wider plate (css .tile-mark.is-wide).
     // If its ink would vanish on the tile's canvas, it sits on a small light or dark plate.
     grid.querySelectorAll('.tile-mark.has-logo img').forEach(img => {
