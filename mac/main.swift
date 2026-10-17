@@ -139,6 +139,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, WKNavigationDelegate, 
         ucc.add(self, name: "batch")
         ucc.addScriptMessageHandler(self, contentWorld: .page, name: "library")
         ucc.addScriptMessageHandler(self, contentWorld: .page, name: "capture")
+        ucc.addScriptMessageHandler(self, contentWorld: .page, name: "wallpaper")
         ucc.addUserScript(WKUserScript(source: macClassUserScript, injectionTime: .atDocumentStart, forMainFrameOnly: true))
         ucc.addUserScript(WKUserScript(source: batchUserScript, injectionTime: .atDocumentEnd, forMainFrameOnly: true))
 
@@ -526,6 +527,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, WKNavigationDelegate, 
                                replyHandler: @escaping (Any?, String?) -> Void) {
         guard message.frameInfo.request.url?.scheme == scheme else { replyHandler(nil, "denied"); return }
         if message.name == "capture" { capture(message.body, replyHandler); return }
+        if message.name == "wallpaper" { wallpaper(message.body, replyHandler); return }
         guard message.name == "library", let body = message.body as? [String: Any],
               let op = body["op"] as? String else { replyHandler(nil, "bad request"); return }
         let fm = FileManager.default
@@ -555,6 +557,73 @@ final class AppDelegate: NSObject, NSApplicationDelegate, WKNavigationDelegate, 
             replyHandler(true, nil)
         default:
             replyHandler(nil, "unknown op")
+        }
+    }
+
+    // MARK: desktop picture (Patterns > "Set as desktop picture")
+
+    /// ~/Library/Application Support/Branding Designer/Wallpapers (the newest few are kept)
+    lazy var wallpapersDir: URL = {
+        #if TESTHOOK
+        let folder = "Branding Designer Test"
+        #else
+        let folder = "Branding Designer"
+        #endif
+        let base = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
+        let dir = base.appendingPathComponent(folder).appendingPathComponent("Wallpapers")
+        try? FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
+        return dir
+    }()
+    static let wallpapersKept = 10
+
+    /// js/patterns-ui.js talks to this through window.webkit.messageHandlers.wallpaper.postMessage:
+    ///   { op: 'screen' }                 -> { w, h, scale }  the main screen in real pixels
+    ///   { op: 'set', name, png }         -> true             png is base64; written to Wallpapers/<name>-<time>.png
+    ///                                                        and set as the desktop picture on every screen
+    func wallpaper(_ raw: Any, _ reply: @escaping (Any?, String?) -> Void) {
+        guard let body = raw as? [String: Any], let op = body["op"] as? String else { reply(nil, "bad request"); return }
+        if op == "screen" {
+            guard let screen = window.screen ?? NSScreen.main ?? NSScreen.screens.first else { reply(nil, "no screen"); return }
+            let k = screen.backingScaleFactor
+            reply(["w": Int((screen.frame.width * k).rounded()), "h": Int((screen.frame.height * k).rounded()), "scale": Double(k)], nil)
+            return
+        }
+        guard op == "set", let b64 = body["png"] as? String, let data = Data(base64Encoded: b64),
+              data.count > 8, data.count < 120_000_000,
+              data.prefix(4) == Data([0x89, 0x50, 0x4E, 0x47]) else { reply(false, "bad picture"); return }
+        // file name: letters, digits, dash only, so nothing can leave the folder
+        let rawName = (body["name"] as? String) ?? "pattern"
+        var slug = String(rawName.unicodeScalars.map { CharacterSet.alphanumerics.contains($0) && $0.isASCII ? Character($0) : "-" }).lowercased()
+        while slug.contains("--") { slug = slug.replacingOccurrences(of: "--", with: "-") }
+        slug = String(slug.trimmingCharacters(in: CharacterSet(charactersIn: "-")).prefix(60))
+        if slug.isEmpty { slug = "pattern" }
+        let stamp = Int(Date().timeIntervalSince1970 * 1000)
+        let url = wallpapersDir.appendingPathComponent("\(slug)-\(stamp).png")
+        let fm = FileManager.default
+        do {
+            try data.write(to: url, options: .atomic)
+            var failed: String?
+            // fill the screen (crop the overflow) rather than letterbox
+            let options: [NSWorkspace.DesktopImageOptionKey: Any] = [
+                .imageScaling: NSImageScaling.scaleProportionallyUpOrDown.rawValue,
+                .allowClipping: true,
+            ]
+            for screen in NSScreen.screens {
+                do { try NSWorkspace.shared.setDesktopImageURL(url, for: screen, options: options) }
+                catch { failed = error.localizedDescription }
+            }
+            // keep the newest few pictures
+            let files = ((try? fm.contentsOfDirectory(at: wallpapersDir, includingPropertiesForKeys: [.contentModificationDateKey])) ?? [])
+                .filter { $0.pathExtension.lowercased() == "png" }
+                .sorted { a, b in
+                    let da = (try? a.resourceValues(forKeys: [.contentModificationDateKey]).contentModificationDate) ?? .distantPast
+                    let db = (try? b.resourceValues(forKeys: [.contentModificationDateKey]).contentModificationDate) ?? .distantPast
+                    return da > db
+                }
+            for old in files.dropFirst(Self.wallpapersKept) where old != url { try? fm.removeItem(at: old) }
+            if let failed = failed { reply(false, failed) } else { reply(true, nil) }
+        } catch {
+            reply(false, error.localizedDescription)
         }
     }
 

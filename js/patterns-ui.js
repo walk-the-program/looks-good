@@ -123,7 +123,29 @@ const PatternsUI = (function () {
   const SUITE_SEED = PatternPins.SUITE_SEED;
   const THUMB_W = 240;
   const THUMB_H = 135;
-  const EXPORTS = { png1: [1280, 720, '1x'], png2: [2560, 1440, '2x'], png4k: [3840, 2160, '4k'] };
+  // Where a pattern can be sent. `frame` is the preview that goes with it; `calm` says the
+  // "Calm area for text" option applies (a title or icons sit on that surface); size is the exact
+  // export size in pixels (the desktop is this screen's, see screenSize()).
+  const DESTS = [
+    { id: 'desktop', label: "This Mac's desktop", frame: 'desktop', calm: true, slug: 'desktop' },
+    { id: 'iphone', label: 'iPhone wallpaper', w: 1290, h: 2796, frame: 'phone', slug: 'iphone' },
+    { id: 'slide', label: 'Slide 16:9', w: 1920, h: 1080, frame: 'slide', calm: true, slug: 'slide' },
+    { id: 'slide4k', label: 'Slide 16:9 4K', w: 3840, h: 2160, frame: 'slide', calm: true, slug: 'slide-4k' },
+    { id: 'square', label: 'Square', w: 2160, h: 2160, frame: 'plain', slug: 'square' },
+    { id: 'portrait', label: 'Portrait 4:5', w: 2160, h: 2700, frame: 'plain', slug: 'portrait' },
+    { id: 'tile', label: 'Seamless tile', w: 512, h: 512, frame: 'plain', slug: 'tile', tile: true },
+    { id: 'custom', label: 'Custom\u2026', frame: 'plain', slug: 'custom' },
+  ];
+  const FRAMES = [
+    { id: 'plain', label: 'Plain' },
+    { id: 'desktop', label: 'Desktop', dest: 'desktop' },
+    { id: 'phone', label: 'Phone lock screen', dest: 'iphone' },
+    { id: 'slide', label: 'Slide', dest: 'slide' },
+  ];
+  const CUSTOM_MAX = 8192, CUSTOM_MIN = 16, MAX_PIXELS = 36e6;
+  const SEND_KEY = 'bd-patterns-send';
+  const LEGACY_EXPORTS = { png1: [1280, 720, '1x'], png2: [2560, 1440, '2x'], png4k: [3840, 2160, '4k'] };   // makeExport() callers from before destinations
+  const CALM_STOPS = [[0, 0.92], [0.28, 0.92], [0.38, 0.84], [0.48, 0.56], [0.58, 0.24], [0.66, 0.07], [0.72, 0]];   // alpha of the ground colour, left to right
 
   const $ = id => document.getElementById(id);
   const P = () => window.Patterns;
@@ -144,6 +166,9 @@ const PatternsUI = (function () {
   let settleTimer = null;
   let queue = [];
   let pumping = false;
+  // where the pattern is going (remembered): destination, preview frame, calm area, custom size
+  const send = { dest: 'desktop', frame: 'desktop', calm: false, cw: 1920, ch: 1080 };
+  let macScreen = null;       // { w, h } in pixels, from the Mac app (NSScreen.main x backingScaleFactor)
   const thumbCache = new Map();
 
   const ICO = d => `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${d}</svg>`;
@@ -284,47 +309,56 @@ const PatternsUI = (function () {
       <div class="pt-layout">
         <div class="pt-main">
           <div class="pt-stage">
-            <div class="pt-canvas-wrap"><canvas id="ptCanvas" aria-label="Pattern preview"></canvas></div>
-            <div class="pt-namebar">
-              <div class="pt-bar-name"><strong id="ptName"></strong><span id="ptTiming"></span></div>
+            <div class="pt-send" role="group" aria-label="Send the pattern">
+              <span class="pt-label">Send to</span>
+              <div class="pt-pills" id="ptDests" role="radiogroup" aria-label="Destination">
+                ${DESTS.map(d => `<button type="button" class="pt-pill" role="radio" data-dest="${d.id}" aria-checked="false">${escapeHtml(d.label)}</button>`).join('')}
+              </div>
+              <div class="pt-custom" id="ptCustom" hidden>
+                <label class="pt-label" for="ptCW">Width</label><input type="number" id="ptCW" min="${CUSTOM_MIN}" max="${CUSTOM_MAX}" step="1" inputmode="numeric" />
+                <span aria-hidden="true">\u00d7</span>
+                <label class="pt-label" for="ptCH">Height</label><input type="number" id="ptCH" min="${CUSTOM_MIN}" max="${CUSTOM_MAX}" step="1" inputmode="numeric" />
+                <span class="pt-size-unit">px</span>
+              </div>
             </div>
             <div class="pt-exports" role="group" aria-label="Add to brief and export">
               <button type="button" class="btn btn-small pt-pin" id="ptPin" aria-pressed="false"></button>
-              <button type="button" class="btn btn-ghost btn-small" data-export="png1">PNG 1x</button>
-              <button type="button" class="btn btn-ghost btn-small" data-export="png2">PNG 2x</button>
-              <button type="button" class="btn btn-ghost btn-small" data-export="png4k">PNG 4K</button>
-              <button type="button" class="btn btn-ghost btn-small" data-export="svg">SVG</button>
-              <button type="button" class="btn btn-ghost btn-small" data-export="css">Copy CSS tile</button>
+              <button type="button" class="btn btn-small pt-export" id="ptExport" data-export="dest">Export PNG</button>
+              <button type="button" class="btn btn-small pt-setdesk" id="ptSetDesk" data-export="wallpaper" hidden>Set as desktop picture</button>
+              <span class="pt-size" id="ptSize" aria-live="polite"></span>
+              <span class="pt-exports-more">
+                <button type="button" class="btn btn-ghost btn-small" data-export="svg">SVG</button>
+                <button type="button" class="btn btn-ghost btn-small" data-export="css">Copy CSS tile</button>
+              </span>
+            </div>
+            <div class="pt-canvas-wrap" id="ptWrap" data-frame="plain">
+              <canvas id="ptCanvas" aria-label="Pattern preview"></canvas>
+              <div class="pt-fr pt-fr-desktop" aria-hidden="true">
+                <div class="pt-fr-menubar"><b class="pt-fr-apple"></b><b class="pt-fr-app" id="ptFrApp"></b><i></i><i></i><i></i><span class="pt-fr-clock">Tue 9:41</span></div>
+                <div class="pt-fr-icons"><div><u></u><em>Brand files</em></div><div><u></u><em>Exports</em></div><div><u></u><em>Notes</em></div></div>
+                <div class="pt-fr-dock"><u></u><u></u><u></u><u></u><u></u><u></u></div>
+              </div>
+              <div class="pt-fr pt-fr-phone" aria-hidden="true">
+                <span class="pt-fr-notch"></span>
+                <div class="pt-fr-lock"><span class="pt-fr-date" id="ptFrDate"></span><b class="pt-fr-time">9:41</b></div>
+                <span class="pt-fr-btn pt-fr-btn-l"></span><span class="pt-fr-btn pt-fr-btn-r"></span>
+                <span class="pt-fr-home"></span>
+              </div>
+              <div class="pt-fr pt-fr-slide" aria-hidden="true">
+                <div class="pt-fr-copy"><small id="ptFrKick"></small><h4>Title goes here</h4><span class="pt-fr-rule"></span><p id="ptFrSub"></p></div>
+              </div>
+            </div>
+            <div class="pt-namebar">
+              <div class="pt-bar-name"><strong id="ptName"></strong><span id="ptTiming"></span></div>
+              <div class="pt-frames">
+                <div class="pt-pills" id="ptFrames" role="radiogroup" aria-label="Preview in">
+                  <span class="pt-label">Preview</span>
+                  ${FRAMES.map(f => `<button type="button" class="pt-pill" role="radio" data-frame="${f.id}" aria-checked="false">${escapeHtml(f.label)}</button>`).join('')}
+                </div>
+                <button type="button" class="pt-pill pt-calm" id="ptCalm" aria-pressed="false" title="Fade the pattern behind the left half so a title or icons stay readable. Applies to the preview and the export">Calm area for text</button>
+              </div>
             </div>
           </div>
-          <section class="pt-block pt-inuse" id="ptInuse" aria-label="In use">
-            <div class="pt-block-head"><h3>In use</h3><span>Updates with the canvas</span></div>
-            <div class="pt-iu-stage">
-              <figure class="pt-iu pt-iu-card">
-                <div class="pt-iu-face">
-                  <canvas data-iu="card" aria-hidden="true"></canvas>
-                  <div class="pt-iu-plate"><span class="pt-iu-mark" id="ptIuMark"></span><b id="ptIuName"></b></div>
-                </div>
-                <figcaption>Card</figcaption>
-              </figure>
-              <figure class="pt-iu pt-iu-phone">
-                <div class="pt-iu-face">
-                  <canvas data-iu="phone" aria-hidden="true"></canvas>
-                  <span class="pt-iu-notch"></span>
-                  <div class="pt-iu-lock"><b class="pt-iu-time">9:41</b><span class="pt-iu-date" id="ptIuDate"></span></div>
-                  <span class="pt-iu-home"></span>
-                </div>
-                <figcaption>Phone wallpaper</figcaption>
-              </figure>
-              <figure class="pt-iu pt-iu-poster">
-                <div class="pt-iu-face">
-                  <div class="pt-iu-art"><canvas data-iu="poster" aria-hidden="true"></canvas></div>
-                  <div class="pt-iu-copy"><small id="ptIuKick"></small><h4 id="ptIuTag"></h4><span class="pt-iu-rule"></span></div>
-                </div>
-                <figcaption>Poster</figcaption>
-              </figure>
-            </div>
-          </section>
           <section class="pt-block pt-block-suite" aria-label="Brand suite">
             <div class="pt-block-head"><h3>Brand suite</h3><span id="ptSuiteFor"></span></div>
             <div class="pt-strip" id="ptSuite"></div>
@@ -384,6 +418,12 @@ const PatternsUI = (function () {
     buildPicker();
     wire();
     built = true;
+    const nw = nativeWall();
+    if (nw) {
+      nw.postMessage({ op: 'screen' }).then(r => {
+        if (r && r.w > 0 && r.h > 0) { macScreen = { w: Math.round(r.w), h: Math.round(r.h) }; lastRenderSig = ''; syncSend(); renderMain(false); }
+      }).catch(() => { /* older app build without the wallpaper bridge: window.screen is used */ });
+    }
   }
 
   function buildPicker() {
@@ -523,6 +563,9 @@ const PatternsUI = (function () {
     root.querySelector('[data-export="svg"]').title = info.vector ? 'Download as SVG' : 'This family is raster only';
     root.querySelector('[data-export="css"]').title = info.seamless ? 'Copy a seamless 128px CSS background tile' : 'This family does not tile seamlessly';
     setPinButton($('ptPin'), isPinned(cur));
+    // the seamless tile needs a family that tiles: fall back to a slide if the picked one cannot
+    if (destOf(send.dest).tile && !info.seamless) { send.dest = 'slide'; send.frame = 'slide'; saveSend(); }
+    syncSend();
     const reset = $('ptReset');
     reset.disabled = pristine;
     root.querySelectorAll('#ptSuite .pt-tile').forEach((t, i) => t.classList.toggle('is-on', pristine && origin === i));
@@ -552,6 +595,130 @@ const PatternsUI = (function () {
     syncPickerAdds();
   }
 
+  /* ---------------- destinations, frames and the calm area ---------------- */
+
+  const destOf = id => DESTS.find(d => d.id === id) || DESTS[0];
+  const nativeWall = () => {
+    const mh = window.webkit && window.webkit.messageHandlers;
+    return mh && mh.wallpaper && typeof mh.wallpaper.postMessage === 'function' ? mh.wallpaper : null;
+  };
+
+  // This screen in real pixels: the Mac app asks AppKit (NSScreen x backingScaleFactor), a browser uses window.screen.
+  function screenSize() {
+    if (macScreen) return macScreen;
+    const k = window.devicePixelRatio || 1;
+    const s = window.screen || {};
+    return { w: Math.round((s.width || 1440) * k), h: Math.round((s.height || 900) * k) };
+  }
+
+  function clampDim(v, fallback) {
+    const n = Math.round(Number(v));
+    return Number.isFinite(n) && n > 0 ? Math.min(CUSTOM_MAX, Math.max(CUSTOM_MIN, n)) : fallback;
+  }
+
+  // Exact export size of a destination.
+  function sizeOf(id) {
+    const d = destOf(id);
+    if (d.id === 'desktop') return screenSize();
+    if (d.id === 'custom') return { w: send.cw, h: send.ch };
+    return { w: d.w, h: d.h };
+  }
+
+  function loadSend() {
+    try {
+      const j = JSON.parse(localStorage.getItem(SEND_KEY) || 'null');
+      if (!j || typeof j !== 'object') return;
+      if (DESTS.some(d => d.id === j.dest)) send.dest = j.dest;
+      if (FRAMES.some(f => f.id === j.frame)) send.frame = j.frame;
+      send.calm = !!j.calm;
+      send.cw = clampDim(j.cw, send.cw);
+      send.ch = clampDim(j.ch, send.ch);
+    } catch (err) { /* private mode or bad JSON: keep the defaults */ }
+  }
+  function saveSend() {
+    try { localStorage.setItem(SEND_KEY, JSON.stringify(send)); } catch (err) { /* ignore */ }
+  }
+
+  // The calm area only exists on surfaces that carry text or icons (desktop, slides).
+  const calmOn = () => !!send.calm && !!destOf(send.dest).calm;
+
+  // Soften the pattern behind the left half: the ground colour at ~90% fading to nothing, so a
+  // title or icons stay readable. The same function runs for the preview and for every export.
+  function applyCalm(cv, ground) {
+    const W = cv.width, H = cv.height;
+    const m = document.createElement('canvas');
+    m.width = W; m.height = H;
+    const g = m.getContext('2d');
+    g.fillStyle = ground;
+    g.fillRect(0, 0, W, H);
+    g.globalCompositeOperation = 'destination-in';
+    const gr = g.createLinearGradient(0, 0, W, 0);
+    CALM_STOPS.forEach(st => gr.addColorStop(st[0], `rgba(0,0,0,${st[1]})`));
+    g.fillStyle = gr;
+    g.fillRect(0, 0, W, H);
+    cv.getContext('2d').drawImage(m, 0, 0);
+  }
+
+  // One drawing path for preview and exports. opt: { tile, calm, maxPixels }
+  function drawPattern(cv, e, w, h, dpr, opt) {
+    opt = opt || {};
+    const inks = inksFor(e);
+    const params = opt.tile ? Object.assign({}, e.params, { grain: 0 }) : e.params;   // grain does not tile
+    const r = P().render(cv, e.key, params, inks, e.seed, { width: w, height: h, dpr, setStyle: false, tile: !!opt.tile, maxPixels: opt.maxPixels });
+    if (opt.calm) applyCalm(cv, inks.ground);
+    return r;
+  }
+
+  // Everything that follows the destination / frame choice: pills, preview aspect, size readout, buttons.
+  function syncSend() {
+    if (!root || !built) return;
+    const d = destOf(send.dest);
+    const sz = sizeOf(send.dest);
+    const fam = cur ? famInfo(cur.key) : null;
+    const wrap = $('ptWrap');
+    wrap.dataset.frame = send.frame;
+    wrap.style.setProperty('--pt-arn', String(sz.w / sz.h));
+    root.querySelectorAll('#ptFrames [data-frame]').forEach(b => b.setAttribute('aria-checked', String(b.dataset.frame === send.frame)));
+    root.querySelectorAll('#ptDests [data-dest]').forEach(b => {
+      const on = b.dataset.dest === send.dest;
+      b.setAttribute('aria-checked', String(on));
+      const dd = destOf(b.dataset.dest);
+      b.disabled = !!(dd.tile && fam && !fam.seamless);
+      b.title = b.disabled ? 'This family does not tile seamlessly' : (dd.id === 'desktop' ? 'This screen, in real pixels' : '');
+    });
+    $('ptCustom').hidden = d.id !== 'custom';
+    if (document.activeElement !== $('ptCW')) $('ptCW').value = send.cw;
+    if (document.activeElement !== $('ptCH')) $('ptCH').value = send.ch;
+    const calmBtn = $('ptCalm');
+    calmBtn.disabled = !d.calm;
+    calmBtn.setAttribute('aria-pressed', String(calmOn()));
+    $('ptSize').textContent = `${sz.w} \u00d7 ${sz.h} px${d.tile ? ' \u00b7 PNG + SVG' : ''}`;
+    $('ptExport').textContent = d.tile ? 'Export tile' : 'Export PNG';
+    const ds = screenSize();
+    $('ptSetDesk').hidden = !nativeWall();
+    $('ptSetDesk').title = `Render at this Mac's desktop size (${ds.w} \u00d7 ${ds.h}) and set it as the desktop picture on every screen`;
+  }
+
+  function setDest(id) {
+    const d = destOf(id);
+    send.dest = d.id;
+    send.frame = d.frame;
+    saveSend();
+    syncSend();
+    renderMain(false);
+  }
+
+  function setFrame(id) {
+    const f = FRAMES.find(x => x.id === id);
+    if (!f) return;
+    send.frame = f.id;
+    // a device frame needs a destination of that shape; plain works with any
+    if (f.dest && destOf(send.dest).frame !== f.id) send.dest = f.dest;
+    saveSend();
+    syncSend();
+    renderMain(false);
+  }
+
   /* ---------------- main canvas ---------------- */
 
   function renderMain(fast) {
@@ -559,20 +726,20 @@ const PatternsUI = (function () {
     const wrap = canvas.parentElement;
     const w = wrap.clientWidth;
     if (!w) return;
-    const h = Math.round(w * 9 / 16);
+    const sz = sizeOf(send.dest);
+    const d = destOf(send.dest);
+    const h = Math.max(1, Math.round(w * sz.h / sz.w));
     const dpr = fast ? 1 : Math.min(window.devicePixelRatio || 1, 2);
     const inks = inksFor(cur);
-    const sig = [cur.key, JSON.stringify(cur.params), cur.colorway, cur.seed, inks.ground, inks.ink1, inks.ink2, inks.spark, inks.deep, inks.t1, inks.t2, w, dpr].join('|');
-    if (sig === lastRenderSig) { renderInUse(inks, dpr); return; }   // previews can resize on their own
+    const calm = calmOn();
+    const sig = [cur.key, JSON.stringify(cur.params), cur.colorway, cur.seed, inks.ground, inks.ink1, inks.ink2, inks.spark, inks.deep, inks.t1, inks.t2, w, h, dpr, calm, !!d.tile].join('|');
+    if (sig === lastRenderSig) return;
     lastRenderSig = sig;
-    const r = P().render(canvas, cur.key, cur.params, inks, cur.seed, { width: w, height: h, dpr, setStyle: false });
-    $('ptTiming').textContent = `${Math.round(r.ms)} ms · ${r.w}×${r.h}`;
-    renderInUse(inks, dpr);
+    const r = drawPattern(canvas, cur, w, h, dpr, { calm, tile: !!d.tile });
+    $('ptTiming').textContent = `${Math.round(r.ms)} ms \u00b7 ${r.w}\u00d7${r.h}`;
   }
 
-  /* ---------------- "In use" previews: card, phone wallpaper, poster ---------------- */
-
-  // Brand tokens, fonts and copy for the previews and the colorway chips. Cheap DOM
+  // Brand tokens, fonts and copy for the frames and the colorway chips. Cheap DOM
   // writes only, so it runs on every refresh.
   function applyBrand() {
     const def = view().def;
@@ -585,29 +752,10 @@ const PatternsUI = (function () {
     const vs = view().state;
     set('--font-heading', vs.headingFont.css); set('--font-body', vs.bodyFont.css);
     const name = copy.brandName || 'Brand';
-    const mark = $('ptIuMark');
-    if (state.logoDataUrl) mark.innerHTML = `<img src="${state.logoDataUrl}" alt="" />`;
-    else mark.textContent = typeof abInitial === 'function' ? abInitial(name) : name.charAt(0).toUpperCase();
-    mark.classList.toggle('is-logo', !!state.logoDataUrl);
-    $('ptIuName').textContent = name;
-    $('ptIuKick').textContent = name;
-    $('ptIuTag').textContent = copy.tagline || '';
-    $('ptIuDate').textContent = new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
-  }
-
-  // Each preview is the pattern rendered at its own aspect ratio (the engine composes to the
-  // box it is given), so scale and colorway decisions read as they would on the real asset.
-  let lastUseSig = '';
-  function renderInUse(inks, dpr) {
-    const cvs = Array.from(root.querySelectorAll('canvas[data-iu]'));
-    const dims = cvs.map(c => [c.clientWidth, c.clientHeight]);
-    if (dims.some(d => !d[0] || !d[1])) return;
-    const sig = [cur.key, JSON.stringify(cur.params), cur.colorway, cur.seed, inks.ground, inks.ink1, inks.ink2, inks.spark, inks.deep, inks.t1, inks.t2, dpr, dims.join(',')].join('|');
-    if (sig === lastUseSig) return;
-    lastUseSig = sig;
-    cvs.forEach((c, i) => {
-      P().render(c, cur.key, cur.params, inks, cur.seed, { width: dims[i][0], height: dims[i][1], dpr, setStyle: false });
-    });
+    $('ptFrApp').textContent = name;
+    $('ptFrKick').textContent = name;
+    $('ptFrSub').textContent = copy.tagline || '';
+    $('ptFrDate').textContent = new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
   }
 
   // While a control is being dragged: a quick 1x pass, then a full-resolution one once it settles.
@@ -624,7 +772,7 @@ const PatternsUI = (function () {
   }
 
   /* ---------------- narrow layout (<= 760px) ----------------
-     Order: canvas, exports, "Adjust pattern" (a <details>, closed), In use, brand suite,
+     Order: destinations and exports, canvas, name and preview frames, "Adjust pattern" (a <details>, closed), brand suite,
      in your brief, all families. The CSS does the ordering off .is-narrow; wide layouts keep the
      sidebar, so the <details> is forced open and its summary is hidden there. */
   const NARROW_MAX = 760;
@@ -677,7 +825,7 @@ const PatternsUI = (function () {
     if (on === visible) { if (on) refresh(); return; }
     visible = on;
     if (on) {
-      lastBrandSig = ''; lastRenderSig = ''; lastUseSig = '';
+      lastBrandSig = ''; lastRenderSig = '';
       clearTimeout(refreshTimer);
       doRefresh();   // draw straight away: opening the view never shows an empty canvas for a beat
     }
@@ -696,11 +844,17 @@ const PatternsUI = (function () {
 
   function nextFrame() { return new Promise(r => requestAnimationFrame(() => setTimeout(r, 0))); }
 
-  // Builds the export without saving it, so it can be inspected. kind: png1 | png2 | png4k | svg | css
-  async function makeExport(kind, entry) {
+  const slugOf = e => `${brandFileSlug()}-pattern-${e.key}`;
+  const toBlob = (cv, type) => new Promise((resolve, reject) => cv.toBlob(b => (b ? resolve(b) : reject(new Error('toBlob failed'))), type || 'image/png'));
+
+  // Builds an export without saving it, so it can be inspected.
+  // kind: a destination id (desktop | iphone | slide | slide4k | square | portrait | tile | custom), svg, or css.
+  // A PNG result is { blob, name, w, h }; the tile also carries { svg: { blob, name, text } } for vector families.
+  // opts.size = { w, h } overrides the size (custom, or the desktop picture).
+  async function makeExport(kind, entry, opts) {
     const e = entry || cur;
     const inks = inksFor(e);
-    const base = `${brandFileSlug()}-pattern-${e.key}`;
+    const base = slugOf(e);
     if (kind === 'svg') {
       const text = P().renderSVG(e.key, e.params, inks, e.seed, { width: 1600, height: 900 });
       if (!text) throw new Error('This family has no SVG output');
@@ -711,28 +865,85 @@ const PatternsUI = (function () {
       if (!text) throw new Error('This family does not tile');
       return { text, name: `${base}.css` };
     }
-    const spec = EXPORTS[kind];
-    if (!spec) throw new Error('Unknown export: ' + kind);
+    const legacy = LEGACY_EXPORTS[kind];
+    const d = legacy ? null : DESTS.find(x => x.id === kind);
+    if (!legacy && !d) throw new Error('Unknown export: ' + kind);
+    const sz = (opts && opts.size) || (legacy ? { w: legacy[0], h: legacy[1] } : sizeOf(d.id));
+    const tile = !!(d && d.tile);
+    if (tile && !famInfo(e.key).seamless) throw new Error('This family does not tile seamlessly');
+    const calm = !!(opts && opts.calm != null ? opts.calm : calmOn()) && !!(d && d.calm);
     const c = document.createElement('canvas');
-    P().render(c, e.key, e.params, inks, e.seed, { width: spec[0], height: spec[1], dpr: 1, setStyle: false });
-    const blob = await new Promise((resolve, reject) => c.toBlob(b => (b ? resolve(b) : reject(new Error('toBlob failed'))), 'image/png'));
-    return { blob, name: `${base}-${spec[2]}.png`, w: c.width, h: c.height };
+    drawPattern(c, e, sz.w, sz.h, 1, { calm, tile, maxPixels: 4e8 });
+    const blob = await toBlob(c);
+    const tag = legacy ? legacy[2] : `${d.slug}-${c.width}x${c.height}`;
+    const out = { blob, name: `${base}-${tag}.png`, w: c.width, h: c.height, calm };
+    if (tile && famInfo(e.key).vector) {
+      const text = P().tileSVG(e.key, e.params, inks, e.seed, sz.w);
+      if (text) out.svg = { blob: new Blob([text], { type: 'image/svg+xml' }), name: `${base}-tile.svg`, text };
+    }
+    return out;
+  }
+
+  // Save one or more files. In the Mac app several files share one folder prompt (the batch bridge
+  // the slide "Download all" uses); elsewhere they are plain downloads.
+  async function saveFiles(files) {
+    const mh = window.webkit && window.webkit.messageHandlers;
+    const batch = files.length > 1 && mh && mh.batch ? mh.batch : null;
+    if (batch) batch.postMessage({ op: 'start', what: 'the pattern tile' });
+    try {
+      for (const f of files) { bdSaveBlob(f.blob, f.name); if (files.length > 1) await new Promise(r => setTimeout(r, 250)); }
+    } finally {
+      if (batch) batch.postMessage('end');
+    }
+  }
+
+  function blobToBase64(blob) {
+    return new Promise((resolve, reject) => {
+      const fr = new FileReader();
+      fr.onload = () => resolve(String(fr.result).replace(/^data:[^,]*,/, ''));
+      fr.onerror = () => reject(fr.error || new Error('read failed'));
+      fr.readAsDataURL(blob);
+    });
+  }
+
+  // Mac app only: render at this Mac's desktop size and hand the PNG to AppKit to set on every screen.
+  async function setDesktopPicture() {
+    const nw = nativeWall();
+    if (!nw) throw new Error('Not available outside the Mac app');
+    const out = await makeExport('desktop', cur, { size: screenSize(), calm: send.calm });
+    const png = await blobToBase64(out.blob);
+    const res = await nw.postMessage({ op: 'set', name: slugOf(cur), png });
+    if (res !== true) throw new Error('The desktop picture was not set');
+    return out;
   }
 
   async function runExport(kind, btn) {
     if (btn) btn.disabled = true;
     try {
-      if (kind === 'png4k' || kind === 'png2') { showToast('Rendering ' + (kind === 'png4k' ? '4K' : '2x') + '...'); await nextFrame(); }
-      const out = await makeExport(kind);
       if (kind === 'css') {
+        const out = await makeExport('css');
         await copyText(out.text);
         showToast('Copied CSS tile (128px, seamless)');
+      } else if (kind === 'svg') {
+        const out = await makeExport('svg');
+        await saveFiles([out]);
+        showToast('SVG downloaded');
+      } else if (kind === 'wallpaper') {
+        showToast('Setting desktop picture...');
+        await nextFrame();
+        const out = await setDesktopPicture();
+        showToast(`Desktop picture set (${out.w} \u00d7 ${out.h})`);
       } else {
-        bdSaveBlob(out.blob, out.name);
-        showToast(kind === 'svg' ? 'SVG downloaded' : 'PNG downloaded');
+        const id = kind === 'dest' ? send.dest : kind;
+        const sz = sizeOf(id);
+        if (sz.w * sz.h > 8e6) { showToast(`Rendering ${sz.w} \u00d7 ${sz.h}...`); await nextFrame(); }
+        const out = await makeExport(id);
+        const files = [out].concat(out.svg ? [out.svg] : []);
+        await saveFiles(files);
+        showToast(out.svg ? 'Tile downloaded (PNG and SVG)' : `PNG downloaded (${out.w} \u00d7 ${out.h})`);
       }
     } catch (err) {
-      showToast(kind === 'css' ? 'Clipboard blocked. Try again from the app window' : 'Export failed');
+      showToast(kind === 'css' ? 'Clipboard blocked. Try again from the app window' : kind === 'wallpaper' ? 'Could not set the desktop picture' : 'Export failed');
     } finally {
       if (btn) { btn.disabled = false; syncChrome(); }
     }
@@ -779,6 +990,16 @@ const PatternsUI = (function () {
       if (fam) {
         const f = famInfo(fam.dataset.key);
         return setCurrent(entryOf(f.key, Object.assign({}, f.defaults, { tone: curTone() }), cur.colorway, cur.seed), null);
+      }
+      const dst = e.target.closest('[data-dest]');
+      if (dst) return dst.disabled ? undefined : setDest(dst.dataset.dest);
+      const frm = e.target.closest('[data-frame]');
+      if (frm) return setFrame(frm.dataset.frame);
+      if (e.target.closest('#ptCalm')) {
+        send.calm = !send.calm;
+        saveSend();
+        syncSend();
+        return renderMain(false);
       }
       const ex = e.target.closest('[data-export]');
       if (ex) return runExport(ex.dataset.export, ex);
@@ -838,6 +1059,16 @@ const PatternsUI = (function () {
         queuePicker();   // picker follows the strength
         return renderNow();
       }
+      if (el.id === 'ptCW' || el.id === 'ptCH') {
+        const w = el.id === 'ptCW' ? clampDim(el.value, send.cw) : send.cw;
+        const h = el.id === 'ptCH' ? clampDim(el.value, send.ch) : send.ch;
+        const k = w * h > MAX_PIXELS ? Math.sqrt(MAX_PIXELS / (w * h)) : 1;   // keep the canvas inside what the browser can draw
+        send.cw = Math.floor(w * k); send.ch = Math.floor(h * k);
+        el.value = el.id === 'ptCW' ? send.cw : send.ch;
+        saveSend();
+        syncSend();
+        return renderMain(false);
+      }
       if (el.name === 'ptColorway' && el.checked) {
         cur.colorway = el.value;
         edited();
@@ -861,6 +1092,7 @@ const PatternsUI = (function () {
 
   function init() {
     root = $('patternsView');
+    loadSend();
   }
 
   document.addEventListener('DOMContentLoaded', init);
