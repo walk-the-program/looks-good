@@ -197,6 +197,18 @@ families that tile. Files: `js/patterns/` (engine, families, aesthetic fit),
 `docs/patterns.md`. `dev/patterns-lab.html` is a developer test bench only and
 is not part of the app or the Mac build's runtime.
 
+## Patterns mode (Ptrn tools)
+
+The **Brands | Patterns** switch at the top of the opening screen toggles between your brand library and a browsable grid of 105 pattern tools: 52 mirrored Ptrn tools and 53 of my own pattern families. Open one to use it full-window inside Branding Designer's own top bar (`Esc` goes back, `[` and `]` step through the list). The last mode and the open tool are remembered, and `css/ptrn-theme.css` restyles the tools in Branding Designer's look.
+
+The tools live in `ptrn/`, which is **git-ignored on purpose**: it is a private mirror of `~/Desktop/Ptrn/site`, and the mirrored tools are not for publishing. Only the integration code is committed. To create or refresh the mirror:
+
+```
+python3 dev/sync-ptrn.py            # or: --source /path/to/Ptrn/site
+```
+
+It copies the site, rewrites asset paths to `/ptrn/...`, turns off the "framed means embed" auto-detect so tools show their full controls, and writes `ptrn/catalog.json`. Without `ptrn/`, Patterns mode shows a "not installed yet" message. `mac/build.sh` bundles `ptrn/` when it exists.
+
 ## Color roles, picker and paste import
 
 Every color has one job, a "never" rule and a coverage target (canvas, ink,

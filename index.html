@@ -78,11 +78,12 @@
 <link rel="stylesheet" href="css/share.css" />
 <link rel="stylesheet" href="css/sidebar.css" />
 <link rel="stylesheet" href="css/style-gallery.css" />
+<link rel="stylesheet" href="css/patterns-home.css" />
 </head>
 <body data-view="library">
 
 <section class="library" id="library" aria-label="Brand library">
-  <div class="lib-top"><span class="logo-mark" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0 16 8 8 16 0 8Z"/></svg></span><span>Branding Designer</span></div>
+  <div class="lib-top"><span class="logo-mark" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0 16 8 8 16 0 8Z"/></svg></span><span>Branding Designer</span><div class="mode-switch" role="group" aria-label="Home mode"><button type="button" data-mode="brands" aria-pressed="true">Brands</button><button type="button" data-mode="patterns" aria-pressed="false">Patterns</button></div></div>
   <div class="lib-inner">
     <header class="lib-head">
       <div>
@@ -98,6 +99,47 @@
       <button type="button" class="btn btn-primary" id="libEmptyNew">New brand</button>
     </div>
     <div class="lib-grid" id="libGrid" hidden></div>
+  </div>
+</section>
+
+<section class="patterns" id="patterns" aria-label="Patterns">
+  <div class="lib-top" id="ptTop"><span class="logo-mark" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0 16 8 8 16 0 8Z"/></svg></span><span>Branding Designer</span><div class="mode-switch" role="group" aria-label="Home mode"><button type="button" data-mode="brands" aria-pressed="false">Brands</button><button type="button" data-mode="patterns" aria-pressed="true">Patterns</button></div></div>
+  <div class="lib-inner" id="ptHome">
+    <header class="lib-head">
+      <div>
+        <h1>Patterns</h1>
+        <p class="lib-count" id="ptCount"></p>
+      </div>
+    </header>
+    <div class="pt-bar" id="ptBar" hidden>
+      <input type="search" class="pt-search" id="ptSearch" placeholder="Search patterns" aria-label="Search patterns" autocomplete="off" spellcheck="false" />
+      <div class="seg" id="ptSource" role="group" aria-label="Source"><button type="button" data-source="all" aria-pressed="true">All</button><button type="button" data-source="mine" aria-pressed="false">Mine</button><button type="button" data-source="ptrn" aria-pressed="false">Ptrn</button></div>
+      <select class="pt-select" id="ptCat" aria-label="Category"></select>
+      <button type="button" class="btn btn-ghost" id="ptSurprise">Surprise me</button>
+    </div>
+    <div class="lib-empty" id="ptMissing" hidden>
+      <div class="lib-empty-mark" aria-hidden="true">Aa</div>
+      <h2>Pattern tools aren't installed yet</h2>
+      <p>Run this in the project folder to copy them in from Ptrn.</p>
+      <code class="pt-cmd">python3 dev/sync-ptrn.py</code>
+    </div>
+    <div class="lib-empty" id="ptNone" hidden>
+      <h2>No patterns match</h2>
+      <p>Try a different search or clear the filters.</p>
+      <button type="button" class="btn btn-ghost" id="ptClear">Clear filters</button>
+    </div>
+    <div class="pt-grid" id="ptGrid" hidden></div>
+  </div>
+  <div class="pt-tool" id="ptTool" hidden>
+    <div class="pt-tool-bar">
+      <button type="button" class="btn btn-ghost btn-small" id="ptBack"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>Patterns</button>
+      <div class="pt-tool-name"><strong id="ptToolName"></strong><span id="ptToolCat"></span></div>
+      <div class="pt-tool-nav">
+        <button type="button" class="btn btn-ghost btn-small" id="ptPrev" aria-label="Previous pattern" title="Previous ( [ )"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg></button>
+        <button type="button" class="btn btn-ghost btn-small" id="ptNext" aria-label="Next pattern" title="Next ( ] )"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></button>
+      </div>
+    </div>
+    <iframe class="pt-frame" id="ptFrame" title="Pattern tool" allow="clipboard-write; fullscreen"></iframe>
   </div>
 </section>
 
@@ -811,5 +853,6 @@
 <script src="js/share.js"></script>
 <script src="js/sidebar.js"></script>
 <script src="js/style-gallery.js"></script>
+<script src="js/patterns-home.js"></script>
 </body>
 </html>

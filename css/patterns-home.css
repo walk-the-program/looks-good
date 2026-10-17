@@ -1,0 +1,199 @@
+/* ---------------------------------------------------------------------
+   patterns-home.css — Patterns mode: the Brands | Patterns switch, the
+   pattern grid, and the tool view (js/patterns-home.js). Mirrors the
+   Library page (.lib-top / .lib-inner / .lib-head) so the two feel like one app.
+------------------------------------------------------------------------ */
+
+/* ---------- Views ---------- */
+body[data-view="patterns"] .app,
+body[data-view="patterns"] .library { display: none; }
+body:not([data-view="patterns"]) .patterns { display: none; }
+
+.patterns { min-height: 100vh; background: var(--canvas); }
+.patterns[data-tool="open"] { height: 100vh; overflow: hidden; }
+.patterns [hidden] { display: none !important; }
+
+/* ---------- Segmented switch (mode + source filter) ---------- */
+.mode-switch, .seg {
+  display: inline-flex;
+  gap: 2px;
+  padding: 2px;
+  border: 1px solid var(--line-strong);
+  border-radius: 8px;
+  background: var(--canvas);
+}
+.mode-switch button, .seg button {
+  height: 28px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: var(--r-ui);
+  background: none;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0;
+  color: var(--muted);
+  cursor: pointer;
+  transition: background-color var(--dur) var(--ease), color var(--dur) var(--ease);
+}
+.mode-switch button:hover, .seg button:hover { color: var(--ink); }
+.mode-switch button[aria-pressed="true"], .seg button[aria-pressed="true"] {
+  background: var(--surface);
+  color: var(--ink);
+  box-shadow: var(--shadow-1);
+}
+.mode-switch button:focus-visible, .seg button:focus-visible {
+  outline: 2px solid rgba(17, 17, 17, 0.2);
+  outline-offset: 1px;
+}
+.lib-top .mode-switch { margin-left: 18px; }
+html.is-mac-app .lib-top .mode-switch { margin-top: -3px; }
+
+/* ---------- Toolbar ---------- */
+.pt-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin: -12px 0 32px;
+}
+.pt-search, .pt-select {
+  width: auto;
+  min-width: 200px;
+  height: 34px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-ui);
+  background: var(--surface);
+  color: var(--ink);
+  font: inherit;
+  font-size: 13px;
+}
+.pt-search {
+  width: 260px;
+  max-width: 100%;
+  padding: 0 12px;
+}
+.pt-search::placeholder { color: var(--muted); }
+.pt-select {
+  padding: 0 28px 0 11px;
+  appearance: none;
+  -webkit-appearance: none;
+  cursor: pointer;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 10'%3E%3Cpath d='M1.5 3.5 5 7l3.5-3.5' fill='none' stroke='%23787774' stroke-width='1.3'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-size: 9px;
+}
+.pt-search:focus-visible, .pt-select:focus-visible {
+  outline: 2px solid rgba(17, 17, 17, 0.2);
+  outline-offset: 1px;
+}
+.pt-bar .seg { height: 34px; }
+.pt-bar .seg button { height: 28px; }
+#ptSurprise { margin-left: auto; }
+
+.pt-cmd {
+  display: inline-block;
+  padding: 8px 12px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-ui);
+  background: var(--surface);
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  user-select: all;
+}
+
+/* ---------- Grid ---------- */
+.pt-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 28px 22px;
+}
+.pt-card {
+  display: block;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.pt-card:focus-visible { outline: 2px solid var(--ink); outline-offset: 6px; border-radius: var(--r-card); }
+.pt-art {
+  display: block;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  background: var(--hover);
+  border-radius: var(--r-card);
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.05);
+  transition: transform 260ms var(--ease), box-shadow 260ms var(--ease);
+}
+.pt-art img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.pt-card:hover .pt-art,
+.pt-card:focus-visible .pt-art {
+  transform: translateY(-3px);
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.06), 0 12px 28px rgba(40, 30, 20, 0.14);
+}
+.pt-name {
+  display: block;
+  margin-top: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.pt-meta {
+  display: block;
+  margin-top: 2px;
+  font-size: 12px;
+  color: var(--muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ---------- Tool view ---------- */
+.pt-tool {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background: var(--canvas);
+}
+.pt-tool-bar {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  height: 46px;
+  padding: 0 16px;
+  border-bottom: 1px solid var(--line-strong);
+  background: var(--surface);
+}
+html.is-mac-app .pt-tool-bar { height: 40px; padding-left: 78px; }
+html.is-mac-app.is-fullscreen .pt-tool-bar { padding-left: 16px; }
+.pt-tool-name { flex: 1; min-width: 0; display: flex; align-items: baseline; gap: 10px; font-size: 13px; }
+.pt-tool-name strong { font-weight: 600; letter-spacing: -0.01em; white-space: nowrap; }
+.pt-tool-name span { color: var(--muted); font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pt-tool-nav { display: flex; gap: 6px; }
+.pt-tool-nav .btn-small { width: 28px; padding: 0; }
+.pt-frame {
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  border: 0;
+  background: var(--canvas);
+  opacity: 0;
+  transition: opacity 160ms var(--ease);
+}
+.pt-frame.is-ready { opacity: 1; }
+
+@media (max-width: 720px) {
+  .lib-top .mode-switch { margin-left: 10px; }
+  .pt-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 24px 14px; }
+  .pt-search { width: 100%; }
+  #ptSurprise { margin-left: 0; }
+}

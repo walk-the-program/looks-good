@@ -448,6 +448,7 @@ const LibraryUI = (function () {
     try { await migrate(); } catch (e) { /* a failed import must not block the app */ }
     await refresh();
     document.body.dataset.view = 'library';
+    if (typeof PatternsHome !== 'undefined') PatternsHome.start();   // may switch to the remembered Patterns mode
   }
 
   return { init, refresh, newBrandFlow };

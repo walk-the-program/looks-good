@@ -3,3 +3,4 @@
 /brief-*.md
 .claude/scheduled_tasks.lock
 mac/build/
+/ptrn/

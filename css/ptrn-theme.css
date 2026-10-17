@@ -1,0 +1,147 @@
+/* ---------------------------------------------------------------------
+   ptrn-theme.css — restyles the Ptrn instrument chassis in Branding Designer's
+   language. Injected into each tool's <head> by js/patterns-home.js after the
+   tool's own stylesheets, so the mirrored files under ptrn/ stay untouched.
+   Ground, ink, hairlines and buttons follow the tokens in css/styles.css.
+------------------------------------------------------------------------ */
+
+:root {
+  --gnd: #f7f6f3;
+  --ink: #111111;
+  --hair: #d9d8d4;
+  --hair2: rgba(0, 0, 0, 0.12);
+  --key: #787774;
+  --mono: "Geist", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --pad: 24px;
+  --bd-line: #eaeaea;
+  --bd-surface: #ffffff;
+  --bd-hover: #f1f0ec;
+}
+
+body {
+  background: var(--gnd);
+  background-attachment: scroll;
+  font-family: var(--mono);
+  letter-spacing: 0;
+}
+
+/* Branding Designer's bar already says where you are. */
+.mark, .idline, .lnk.back, .firstrun, .ring, .xh, .corner { display: none !important; }
+
+@media (min-width: 1181px) {
+  .rig { padding: var(--pad) 40px; column-gap: 32px; }
+}
+
+/* ---------- type: Geist, sentence case, readable sizes ---------- */
+.h, .sec-h, .grp > summary, .tog-grp > .pillbtn, .mycsw {
+  font-size: 12.5px;
+  letter-spacing: 0;
+  text-transform: none;
+  font-weight: 600;
+}
+.tog-grp > .pillbtn { font-size: 12.5px; letter-spacing: 0; text-transform: none; font-weight: 600; }
+.k, .lab, .pair .lab { font-size: 12px; letter-spacing: 0; text-transform: none; color: var(--key); }
+.v, .val { font-size: 12px; letter-spacing: 0; text-transform: none; font-variant-numeric: tabular-nums; }
+.seed { font-size: 12px; letter-spacing: 0; }
+.vidhint, .myc-hint { font-size: 11.5px; letter-spacing: 0; text-transform: none; line-height: 1.55; }
+.hint { font-size: 11.5px; }
+.mycsw { color: var(--key); }
+.mycsw[aria-pressed="true"] { color: var(--ink); }
+.grp > summary { padding: 13px 0 11px; }
+.ratio .t { font-size: 10.5px; letter-spacing: 0; }
+.capnav { font-size: 12px; }
+.chip { font-size: 12px; letter-spacing: 0; text-transform: none; font-weight: 500; }
+.pbtn { font-size: 11.5px; letter-spacing: 0; text-transform: none; font-weight: 500; }
+.mval input[type="text"], .myc-ta, .cpick .cphex { font-size: 12px; letter-spacing: 0; }
+
+/* ---------- buttons: BD's .btn ---------- */
+.lnk, .pillbtn {
+  height: 30px;
+  padding: 0 12px;
+  border: 1px solid var(--bd-line);
+  border-radius: 6px;
+  background: var(--bd-surface);
+  color: var(--ink);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0;
+  text-transform: none;
+  transition: background-color 0.2s, border-color 0.2s;
+}
+.lnk:hover, .pillbtn:hover { background: var(--bd-hover); }
+.lnk[aria-pressed="true"], .lnk.on, .pillbtn[aria-pressed="true"] {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: #fff;
+}
+.lnk[aria-pressed="true"]:hover, .lnk.on:hover, .pillbtn[aria-pressed="true"]:hover { background: #333; opacity: 1; }
+.lnk[disabled]:hover { background: var(--bd-surface); }
+/* switch-headed sections stay plain headings */
+.tog-grp > .pillbtn { height: auto; padding: 13px 0 11px; border: 0; border-radius: 0; background: none; color: var(--ink); }
+.tog-grp > .pillbtn:hover, .tog-grp > .pillbtn[aria-pressed="true"]:hover { background: none; }
+.tog-grp .sw, .mycsw .sw { border-color: #b9b8b4; }
+.tog-grp > .pillbtn[aria-pressed="true"] .sw, .mycsw[aria-pressed="true"] .sw { background: var(--ink); border-color: var(--ink); }
+.tog-grp > .pillbtn[aria-pressed="true"] .sw::after, .mycsw[aria-pressed="true"] .sw::after { background: #fff; }
+.switch { border-color: #b9b8b4; }
+.switch[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); }
+.switch[aria-pressed="true"]::after { background: #fff; }
+
+/* New variation: BD's primary button */
+.newbtn {
+  background: var(--ink);
+  color: #fff;
+  border: 1px solid var(--ink);
+  border-radius: 6px;
+  padding: 10px 14px;
+  font-family: var(--mono);
+}
+.newbtn:hover { opacity: 1; background: #333; border-color: #333; }
+.newbtn .t { font-size: 13px; font-weight: 500; letter-spacing: 0; text-transform: none; }
+.newbtn .sub { font-size: 11.5px; letter-spacing: 0; opacity: 0.65; margin-top: 2px; }
+.newbtn .ico { font-size: 18px; }
+.newblk { margin-top: 4px; }
+.newlab { margin-bottom: 8px; }
+
+/* pickers and menus */
+.pick-btn {
+  border: 1px solid var(--bd-line);
+  border-radius: 6px;
+  background: var(--bd-surface);
+  padding: 8px 10px 8px 12px;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0;
+  text-transform: none;
+}
+.pick-btn:hover { background: var(--bd-hover); }
+.pick-btn:focus-visible { outline: 2px solid rgba(17, 17, 17, 0.2); outline-offset: 1px; }
+.pick-btn .chev { background-color: transparent; }
+.pick-menu, .group.pop, .cpick {
+  background: var(--bd-surface);
+  border: 1px solid var(--bd-line);
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+}
+.pick-menu li { font-size: 12px; font-weight: 500; letter-spacing: 0; text-transform: none; }
+.pick-menu li:hover, .pick-menu li.hi { background: var(--bd-hover); }
+.cpick .cpok { border-radius: 6px; font-size: 12px; font-weight: 500; letter-spacing: 0; text-transform: none; color: #fff; }
+.cpick .sv, .cpick .hue { border-radius: 4px; }
+.myc-ta { border-radius: 6px; background: var(--bd-surface); border-color: var(--bd-line); }
+
+.toast {
+  border-radius: 6px;
+  padding: 9px 14px;
+  font-size: 12px;
+  letter-spacing: 0;
+  text-transform: none;
+  color: #fff;
+}
+
+/* ---------- stage ---------- */
+#art { box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.06), 0 12px 32px rgba(0, 0, 0, 0.08); }
+.ratio .box { border-color: #bdbcb8; }
+
+@media (max-width: 1180px) {
+  .z-stage { background: var(--gnd); }
+  .l-top { padding-top: 16px; }
+}

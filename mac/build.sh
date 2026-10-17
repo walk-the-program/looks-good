@@ -53,6 +53,12 @@ cp "$ROOT/index.html" "$WEB/"
 # (dev/vendor-fonts.py) and the export libraries (html2canvas, jsPDF). The page loads
 # these local copies first; the CDN / Google Fonts are only a fallback.
 cp -R "$ROOT/css" "$ROOT/js" "$ROOT/fonts" "$ROOT/vendor" "$WEB/"
+# Patterns mode: the private Ptrn mirror (git-ignored; dev/sync-ptrn.py builds it).
+if [ -d "$ROOT/ptrn" ]; then
+  cp -R "$ROOT/ptrn" "$WEB/"
+else
+  echo "warning: ptrn/ not found, so Patterns mode will show 'not installed' (run python3 dev/sync-ptrn.py)" >&2
+fi
 for f in fonts/fonts.css fonts/CREDITS.txt vendor/html2canvas.min.js vendor/jspdf.umd.min.js; do
   [ -s "$WEB/$f" ] || { echo "missing $f (offline copy)" >&2; exit 1; }
 done
