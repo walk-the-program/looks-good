@@ -54,6 +54,8 @@ body[data-showcase="on"] .sc-refine { display: flex !important; }
 
 /* Always hidden in showcase mode: the version history switch, the heuristic
    recommendations and suggestion boxes and the pattern engine's timing readout.
+   (The switch, recommendations and timing readout are hidden for everyone unless
+   developer mode is on, css/styles.css; showcase also hides the suggestion boxes.)
    (Aesthetic numbers stay: aestheticNumber() counts the curated list 01-20.) */
 body[data-showcase="on"] #aeVersion,
 body[data-showcase="on"] .recommendations,

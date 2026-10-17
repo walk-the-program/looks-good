@@ -409,7 +409,7 @@ const PatternsUI = (function () {
           </div>
           <div class="pt-group"><span class="pt-label">Parameters</span><div id="ptControls" class="pt-controls"></div></div>
           <div class="pt-group"><span class="pt-label">Finish</span><div id="ptCommon" class="pt-controls"></div></div>
-          <button type="button" class="btn btn-ghost btn-small btn-block" id="ptReset">Reset to suite preset</button>
+          <button type="button" class="btn btn-ghost btn-small btn-block" id="ptReset">Reset pattern</button>
             </div>
           </details>
         </aside>

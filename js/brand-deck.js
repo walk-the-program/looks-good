@@ -1055,6 +1055,7 @@ let bdVisible = false;
 let bdTimer = null;
 let bdObserver = null;
 let bdBuilt = false;
+let bdActive = false;
 
 // Reads every card width first, then writes every scale: one layout, not one per card.
 // The frame is scaled with a transform (--deck-z, css/brand-deck.css), not CSS zoom:
@@ -1169,13 +1170,36 @@ function renderBrandDeck() {
   if (bdVisible) bdSchedule(continuous);
 }
 
+// Deck view (js/aesthetic-board.js): the deck is built only while its view is open. Opening
+// builds it; leaving empties the grid so the other views carry none of its nodes.
+function setBrandDeckActive(on) {
+  bdActive = !!on;
+  if (on) {
+    bdVisible = true;
+    if (bdDirty || !bdBuilt) bdSchedule(false);
+    return;
+  }
+  bdVisible = false;
+  clearTimeout(bdTimer);
+  if (bdRaf) cancelAnimationFrame(bdRaf);
+  bdRaf = 0;
+  const grid = document.getElementById('deckGrid');
+  if (grid && grid.firstChild) {
+    grid.textContent = '';
+    bdCardSigs.clear();
+    bdBuilt = false;
+    bdDirty = true;
+  }
+}
+
 function initBrandDeck() {
   const section = document.getElementById('deckSection');
   const grid = document.getElementById('deckGrid');
   if (!section || !grid) return;
   if ('IntersectionObserver' in window) {
     bdObserver = new IntersectionObserver(entries => {
-      bdVisible = entries.some(en => en.isIntersecting);
+      const intersecting = entries.some(en => en.isIntersecting);
+      bdVisible = bdActive || intersecting;
       if (bdVisible && bdDirty) bdSchedule(false);
     }, { rootMargin: '600px 0px' });
     bdObserver.observe(section);

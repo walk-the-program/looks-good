@@ -412,7 +412,25 @@ function renderFontSpecimen() {
   bodyEl.textContent = copy.tagline;
 }
 
+// Developer mode shows the owner tools: the recommendations panel and the Classic | Current switch.
+// Off for everyone by default. Turn it on with localStorage 'bd.dev' = '1', or open the app with
+// ?dev=1 (?dev=0 turns it off again).
+const DEV_STORE = 'bd.dev';
+function devMode() {
+  try { return localStorage.getItem(DEV_STORE) === '1'; } catch (err) { return false; }
+}
+function setDevMode(on) {
+  try { if (on) localStorage.setItem(DEV_STORE, '1'); else localStorage.removeItem(DEV_STORE); } catch (err) { /* this session only */ }
+  applyDevMode();
+  if (on) renderFindings();
+}
+function applyDevMode() {
+  if (devMode()) document.body.dataset.dev = 'on';
+  else delete document.body.dataset.dev;
+}
+
 function renderFindings() {
+  if (!devMode()) return;   // the panel is hidden, so there is nothing to draw
   const findings = evaluateBrand(state);
   const wrap = document.getElementById('findings');
   wrap.innerHTML = findings.map(f => {
@@ -813,6 +831,11 @@ function init() {
   randomizeColor();
   randomizeShape();
 
+  try {
+    const q = new URLSearchParams(location.search).get('dev');
+    if (q === '1' || q === '0') { if (q === '1') localStorage.setItem(DEV_STORE, '1'); else localStorage.removeItem(DEV_STORE); }
+  } catch (err) { /* no storage: developer mode stays off */ }
+  applyDevMode();
   initAestheticUi();
   wireEvents();
   render();

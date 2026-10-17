@@ -168,3 +168,42 @@ The question behind this plan is "what information are we giving people?" Here i
 **Parked:** website import, logo-start colour extraction, the mini-site export and the self-running demo loop. These are all impressive, but none of them serves Job A or Job B.
 
 **Separate run, owner's call:** faithfulness of each aesthetic. Phase 2 depends on it for the metadata that drives states and motion. Phase 1 and Phase 3 don't.
+
+---
+
+## 9. Status, 2026-10-17
+
+All four phases were built in one run.
+
+- **Phase 1:** done.
+  - An edit reaches the deck in about 100–130 ms. Before, it took about 470 ms.
+  - The deck only replaces slides that changed, and the cover has a single footer.
+  - The Patterns view fills the window. The cause was a `.pt-grid` class clash with `css/patterns-home.css`.
+  - Family tiles are readable and the colour chips wrap.
+  - The toolbar stays on one line from 1000 px.
+  - Only one tip shows per session, it stays clear of the toolbar, and it has a Turn off tips link.
+- **Phase 2:** done.
+  - There's a Web / SwiftUI / Both target. Theme.swift typechecks for all 35 aesthetics in both modes against the macOS and iOS SDKs.
+  - Light and dark palettes are in one colour table.
+  - The brief now covers states, motion, accessibility, icons, the app icon and fonts to bundle (`AESTHETIC_BUILD` in `js/aesthetic-meta.js`).
+  - A resolve-before-copy panel offers one-click fixes.
+  - Save brief + files exports a zip.
+  - Web briefs run 108–121 lines.
+- **Phase 3:** done.
+  - Exports are chosen by destination.
+  - Preview frames match the export.
+  - Slides and desktops have a calm area for text.
+  - The Mac app has Set as desktop picture. The native side typechecks and builds, but hasn't been run on a real desktop yet.
+- **Phase 4:** done.
+  - There are four views: Board (with UI / Built / Compare inside it), Patterns, Deck and Brief.
+  - Each view renders only itself.
+  - Recommendations and Classic/Current only appear in developer mode (`?dev=1`, or `localStorage bd.dev = '1'`).
+  - The ⌘K command palette is in.
+  - Keys 1–4 switch views.
+  - Internal vocabulary is gone from the UI.
+
+Not done or not verified:
+
+- `node tests/run.js`: there is no node on this machine.
+- The Mac-only paths (the wallpaper handler, ⌘K inside the app) haven't been driven by hand.
+- `docs/patterns.md` and `docs/aesthetics-plan.md` still describe the old brief functions.

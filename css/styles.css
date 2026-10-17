@@ -610,11 +610,19 @@ kbd {
   letter-spacing: -0.01em;
 }
 
+/* Owner tools: the recommendations panel, the Classic | Current switch and the pattern timing
+   readout show only in developer mode (body[data-dev="on"], js/app.js: localStorage 'bd.dev' = '1').
+   The version row stays while a classic look is on, so there is always a way back to Current. */
+body:not([data-dev="on"]) .recommendations,
+body:not([data-dev="on"]) #ptTiming,
+body:not([data-dev="on"]):not([data-classic="on"]) .sd-version { display: none !important; }
+
 .recommendations { margin-top: 56px; }
 /* the score pill never clips: the head wraps and the pill may wrap its own text */
 .recommendations .section-head { flex-wrap: wrap; row-gap: 8px; }
 .recommendations .score-pill { max-width: 100%; white-space: normal; }
 .slides { margin-top: 64px; }
+.ab-stage > .slides { margin-top: 0; }
 
 .score-pill {
   font-size: 11px;

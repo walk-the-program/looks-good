@@ -737,7 +737,12 @@ function boardHtml(state, def) {
 
 /* ---------------- main board + compare grid ---------------- */
 
-let boardView = 'board';          // 'board' | 'compare' | 'patterns' | 'built' (UI only, never saved)
+// What the stage shows (UI only, never saved). The four tabs in the toolbar are Board, Patterns,
+// Deck and Brief; the Board tab has three modes inside the stage: 'board' (the UI), 'built' and 'compare'.
+let boardView = 'board';          // 'board' | 'compare' | 'built' | 'patterns' | 'deck' | 'brief'
+const BOARD_VIEWS = ['board', 'compare', 'built', 'patterns', 'deck', 'brief'];
+const BOARD_MODES = ['board', 'built', 'compare'];
+let boardMode = 'board';          // the mode the Board tab returns to
 const CMP_WIDE = 900;             // design width of a tile board on a wide grid
 const CMP_NARROW = 500;           // ...and on a one-column grid
 
@@ -843,24 +848,34 @@ function renderAestheticBoard() {
   const compare = boardView === 'compare';
   const patterns = boardView === 'patterns';
   const built = boardView === 'built';   // product screens, js/see-built.js
+  const deck = boardView === 'deck';
+  const brief = boardView === 'brief';
   const host = document.getElementById('previewCard');
   const grid = document.getElementById('compareGrid');
   const pview = document.getElementById('patternsView');
   const bview = document.getElementById('builtView');
-  if (host) host.hidden = compare || patterns || built;
+  const dsec = document.getElementById('deckSection');
+  const brv = document.getElementById('briefView');
+  const modes = document.getElementById('boardMode');
+  if (host) host.hidden = compare || patterns || built || deck || brief;
   if (grid) grid.hidden = !compare;
   if (pview) pview.hidden = !patterns;
   if (bview) bview.hidden = !built;
+  if (dsec) dsec.hidden = !deck;
+  if (brv) brv.hidden = !brief;
+  if (modes) modes.hidden = !BOARD_MODES.includes(boardView);
   if (!built && bview && bview.firstChild) bview.innerHTML = '';
-  // Only the visible view is built. The hidden ones are emptied (Compare holds
-  // one full board per aesthetic, 48 of them) and rebuilt when their view is shown again. The
-  // Patterns view (js/patterns-ui.js) keeps its own DOM but draws nothing
-  // while hidden.
+  if (!brief && brv && brv.firstChild) brv.innerHTML = '';
+  // Each view draws only itself. The others are emptied (Compare holds one full board per
+  // aesthetic, 48 of them; the deck holds ten slides) and rebuilt when their view is shown
+  // again. The Patterns view (js/patterns-ui.js) keeps its own DOM but draws nothing while hidden.
   if (typeof PatternsUI !== 'undefined') PatternsUI.setVisible(patterns);
-  if (patterns || built) {
+  if (typeof setBrandDeckActive === 'function') setBrandDeckActive(deck);
+  if (patterns || built || deck || brief) {
     if (host && host.firstChild) host.innerHTML = '';
     if (grid && grid.firstChild) grid.innerHTML = '';
     if (built && typeof SeeBuilt !== 'undefined') SeeBuilt.render();
+    if (brief) renderBriefView();
   } else if (compare) {
     renderCompareGrid();
     if (host && host.firstChild) host.innerHTML = '';
@@ -869,6 +884,60 @@ function renderAestheticBoard() {
     if (grid && grid.firstChild) grid.innerHTML = '';
   }
   syncAestheticChrome(def);
+}
+
+/* ---------------- Brief view ---------------- */
+
+// The brief an AI builds from, as the Brief tab: the text itself, with Copy, the designed page
+// (js/brief-view.js) and a Markdown download. The text is the same buildAiBrief(state) the
+// sidebar's Copy AI brief copies.
+function briefText() {
+  if (window.Show && typeof Show.brief === 'function' && typeof Show.brief.text === 'function') return Show.brief.text();
+  return typeof buildAiBrief === 'function' ? buildAiBrief(state) : '';
+}
+
+function renderBriefView() {
+  const el = document.getElementById('briefView');
+  if (!el) return;
+  const text = briefText();
+  if (!el.firstChild) {
+    el.innerHTML = `
+      <div class="section-head">
+        <div class="deck-title">
+          <h2>Brief</h2>
+          <p class="deck-desc">What an AI coding tool reads to build with this brand. Paste it into the tool.</p>
+        </div>
+        <div class="deck-actions">
+          <button type="button" class="btn btn-primary btn-small" data-brief="copy">Copy AI brief</button>
+          <button type="button" class="btn btn-ghost btn-small" data-brief="page">View as a page</button>
+          <button type="button" class="btn btn-ghost btn-small btn-ico-download" data-brief="download">Download .md</button>
+        </div>
+      </div>
+      <pre class="bp-text" tabindex="0" aria-label="The brief, as Markdown"></pre>`;
+    el.addEventListener('click', e => {
+      const b = e.target.closest('[data-brief]');
+      if (!b) return;
+      if (b.dataset.brief === 'copy') {
+        const src = document.getElementById('copyAiBrief');
+        if (src) src.click();
+      } else if (b.dataset.brief === 'page') {
+        if (window.Show && typeof Show.brief === 'function') Show.brief(b);
+      } else if (b.dataset.brief === 'download') {
+        const blob = new Blob([briefText()], { type: 'text/markdown;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${typeof brandFileSlug === 'function' ? brandFileSlug() : 'brand'}-brand-brief.md`;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
+        if (typeof showToast === 'function') showToast('Brief downloaded');
+      }
+    });
+  }
+  const pre = el.querySelector('.bp-text');
+  if (pre.textContent !== text) pre.textContent = text;
 }
 
 /* ---------------- family filter (sidebar + Compare) ---------------- */
@@ -942,7 +1011,8 @@ function syncAestheticChrome(def) {
   });
   const shuffle = document.getElementById('shuffleAesthetic');
   if (shuffle) shuffle.textContent = aeFamily === 'all' ? 'Shuffle style' : `Shuffle ${aestheticFamilyLabel(aeFamily)}`;
-  document.querySelectorAll('input[name="boardView"]').forEach(r => { r.checked = r.value === boardView; });
+  document.querySelectorAll('input[name="workView"]').forEach(r => { r.checked = r.value === (BOARD_MODES.includes(boardView) ? 'board' : boardView); });
+  document.querySelectorAll('input[name="boardMode"]').forEach(r => { r.checked = r.value === boardMode; });
   renderFontRec(def.blend ? def.blend.base : def);
   if (typeof syncBlendUi === 'function') syncBlendUi();
   if (window.SidebarUI && typeof SidebarUI.syncStyle === 'function') SidebarUI.syncStyle();
@@ -954,6 +1024,8 @@ function syncAestheticVersionUi() {
   if (!host) return;
   host.hidden = !hasClassicAesthetic(state.aesthetic);
   const classic = state.aestheticVersion === 'classic';
+  // The switch stays hidden unless developer mode is on (css/styles.css), except to leave a classic look.
+  if (classic) document.body.dataset.classic = 'on'; else delete document.body.dataset.classic;
   host.querySelectorAll('button[data-version]').forEach(b => {
     b.setAttribute('aria-pressed', String((b.dataset.version === 'classic') === classic));
   });
@@ -1000,8 +1072,14 @@ function stepAesthetic(dir) {
 }
 
 function setBoardView(view) {
-  boardView = ['compare', 'patterns', 'built'].includes(view) ? view : 'board';
+  boardView = BOARD_VIEWS.includes(view) ? view : 'board';
+  if (BOARD_MODES.includes(boardView)) boardMode = boardView;
   renderAestheticBoard();
+}
+
+// The toolbar tabs: Board returns to the mode it was last in.
+function setWorkView(tab) {
+  setBoardView(tab === 'board' ? boardMode : tab);
 }
 
 /* ---------------- local interactions ---------------- */
@@ -1050,7 +1128,10 @@ function initAestheticUi() {
   });
   document.getElementById('aePrev').addEventListener('click', () => stepAesthetic(-1));
   document.getElementById('aeNext').addEventListener('click', () => stepAesthetic(1));
-  document.querySelectorAll('input[name="boardView"]').forEach(r => {
+  document.querySelectorAll('input[name="workView"]').forEach(r => {
+    r.addEventListener('change', e => { if (e.target.checked) setWorkView(e.target.value); });
+  });
+  document.querySelectorAll('input[name="boardMode"]').forEach(r => {
     r.addEventListener('change', e => { if (e.target.checked) setBoardView(e.target.value); });
   });
 
@@ -1058,6 +1139,7 @@ function initAestheticUi() {
   const pick = tile => {
     if (!tile) return;
     boardView = 'board';
+    boardMode = 'board';
     if (tile.dataset.key === state.aesthetic) renderAestheticBoard();
     else chooseAesthetic(tile.dataset.key);
   };

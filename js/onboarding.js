@@ -712,7 +712,7 @@ const Onboarding = (function () {
     { id: 'shuffle', find: () => $('shuffleAll'), side: 'bottom', title: 'Shuffle everything', text: 'Press Space, or click here. Every press is a fresh combination of colour, type, shape and style.' },
     // The Mix in control lives in the sidebar's Style tab; when another tab is open the tip points at that tab.
     { id: 'mix', find: () => { const b = $('blendPick'); return b && b.getClientRects().length ? b : $('sdTab-style'); }, side: 'bottom', title: 'Mix in a second style', text: 'Borrow another style’s art, type, colour or finish and blend it into this one.' },
-    { id: 'built', find: () => { const r = document.querySelector('input[name="boardView"][value="built"]'); return r && (r.closest('label') || r); }, side: 'bottom', title: 'See it built', text: 'Put your brand on a real product screen and compare it with a plain version.' },
+    { id: 'built', find: () => { const r = document.querySelector('input[name="boardMode"][value="built"]'); return r && (r.closest('label') || r); }, side: 'bottom', title: 'See it built', text: 'Put your brand on a real product screen and compare it with a plain version.' },
   ];
 
   function coachSeen() {

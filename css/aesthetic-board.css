@@ -399,7 +399,7 @@
 
 /* workspace header: the title on the left, one toolbar on the right. When both do not
    fit on one line the toolbar moves under the title (wrap) instead of squeezing it.
-   Toolbar: ‹ › | Board Compare Patterns Built | In brief · Share ▾ · Show ▾. Every
+   Toolbar: ‹ › | Board Patterns Deck Brief | In brief · Share ▾ · Show ▾ · search. Every
    control is 32px tall; the two menus share one look (.tb-menu). */
 /* The header is its own stacking layer above the stage. Without it the Share and Show menus
    painted under the board: the load-in animation (.workspace > *, styles.css) gives the header
@@ -472,6 +472,20 @@ body.is-presenter .ae-name-btn .ico { display: none; }
 /* stage: board or Compare all, under the header */
 .ab-stage { min-width: 0; container-type: inline-size; container-name: cmp; }
 #previewCard { min-width: 0; }
+/* Board | Built | Compare: a small switch above the board, inside the Board tab. */
+.ab-mode { display: inline-flex; width: auto; margin: 0 0 14px; }
+.ab-mode label { height: 26px; padding: 0 12px; white-space: nowrap; font-size: 12.5px; }
+body.is-presenter .ab-mode { display: none; }
+
+/* Brief tab: the brief's text under the same head the deck uses. */
+.brief-page .section-head { flex-wrap: wrap; row-gap: 10px; }
+.bp-text {
+  margin: 0; padding: 20px 22px; max-width: 100%; overflow-x: auto;
+  background: var(--surface); border: 1px solid var(--line-strong); border-radius: var(--r-card);
+  font: 12.5px/1.65 var(--font-mono); color: var(--ink-2);
+  white-space: pre-wrap; overflow-wrap: anywhere; tab-size: 2;
+}
+.bp-text:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
 
 /* Blend picker options (js/blend.js) reuse these small tiles. */
 .ae-tile {

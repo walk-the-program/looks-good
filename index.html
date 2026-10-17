@@ -79,6 +79,7 @@
 <link rel="stylesheet" href="css/sidebar.css" />
 <link rel="stylesheet" href="css/style-gallery.css" />
 <link rel="stylesheet" href="css/patterns-home.css" />
+<link rel="stylesheet" href="css/command-palette.css" />
 </head>
 <body data-view="library">
 
@@ -304,7 +305,7 @@
                   <label><input type="radio" name="blendStrength" value="bold" /> Bold</label>
                 </div>
                 <fieldset class="blend-channels" id="blendChannels">
-                  <legend>Borrow its <span id="blendCustom" class="blend-custom" hidden>· custom</span></legend>
+                  <legend>Take from the second style <span id="blendCustom" class="blend-custom" hidden>· custom</span></legend>
                   <label><input type="checkbox" value="art" /> Art</label>
                   <label><input type="checkbox" value="type" /> Type</label>
                   <label><input type="checkbox" value="color" /> Color</label>
@@ -582,11 +583,11 @@
               <svg class="ico" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
             </button>
           </div>
-          <div class="segmented view-toggle" role="radiogroup" aria-label="Board view">
-            <label title="The brand board"><input type="radio" name="boardView" value="board" checked /> Board</label>
-            <label title="Every aesthetic side by side"><input type="radio" name="boardView" value="compare" /> Compare</label>
-            <label title="Patterns made from the brand"><input type="radio" name="boardView" value="patterns" /> Patterns</label>
-            <label title="The brand on real product screens"><input type="radio" name="boardView" value="built" /> Built</label>
+          <div class="segmented view-toggle" id="workTabs" role="radiogroup" aria-label="View">
+            <label title="The brand board (1)"><input type="radio" name="workView" value="board" checked /> Board</label>
+            <label title="Patterns made from the brand (2)"><input type="radio" name="workView" value="patterns" /> Patterns</label>
+            <label title="The ten-slide brand deck (3)"><input type="radio" name="workView" value="deck" /> Deck</label>
+            <label title="The brief an AI builds from (4)"><input type="radio" name="workView" value="brief" /> Brief</label>
           </div>
           <span class="ws-sep" aria-hidden="true"></span>
           <button type="button" id="briefCart" class="btn btn-ghost btn-small cart-btn is-empty" aria-label="Patterns in your AI brief: 0. Open the list" aria-haspopup="dialog" aria-expanded="false" aria-controls="briefTray" title="Patterns in your AI brief">
@@ -640,10 +641,39 @@
     </header>
 
     <section class="ab-stage" aria-label="Design language board">
+      <!-- Inside the Board tab: the brand's UI, on real product screens, or across every style. -->
+      <div class="segmented ab-mode" id="boardMode" role="radiogroup" aria-label="Board view">
+        <label title="The brand board"><input type="radio" name="boardMode" value="board" checked /> UI</label>
+        <label title="The brand on real product screens"><input type="radio" name="boardMode" value="built" /> Built</label>
+        <label title="This brand in every style, side by side"><input type="radio" name="boardMode" value="compare" /> Compare</label>
+      </div>
       <div id="previewCard"></div>
       <div class="cmp-grid" id="compareGrid" hidden></div>
       <div class="pt-view" id="patternsView" hidden></div>
       <div class="sb-view" id="builtView" hidden></div>
+      <!-- Deck: the ten slides. js/brand-deck.js builds them only while this view is open. -->
+      <section class="slides deck" id="deckSection" hidden>
+        <div class="section-head">
+          <div class="deck-title">
+            <h2>Brand deck</h2>
+            <p class="deck-desc" id="deckDesc">Ten guideline slides in the selected aesthetic language.</p>
+          </div>
+          <!-- Icon is a CSS ::before rather than an inline <svg>: brand-deck.js
+               swaps these buttons' textContent while exporting, which would wipe
+               a real child element out of the DOM for good. -->
+          <div class="deck-actions">
+            <button id="downloadAllSlides" class="btn btn-ghost btn-small btn-ico-download">Download all</button>
+            <button id="downloadDeckPdf" class="btn btn-ghost btn-small btn-ico-download">Download PDF</button>
+            <button type="button" id="presentDeck" class="btn btn-ghost btn-small" title="Present the deck full screen">
+              <svg class="ico" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 4.5v15l12-7.5z"/></svg>
+              Present
+            </button>
+          </div>
+        </div>
+        <!-- Slides are built by renderBrandDeck() (js/brand-deck.js) once this section is near the viewport. -->
+        <div class="slide-grid deck-grid" id="deckGrid"></div>
+          </section>
+      <div class="brief-page" id="briefView" hidden></div>
     </section>
 
     <section class="recommendations">
@@ -654,27 +684,6 @@
       <div class="findings" id="findings"></div>
     </section>
 
-    <section class="slides deck" id="deckSection">
-      <div class="section-head">
-        <div class="deck-title">
-          <h2>Brand deck</h2>
-          <p class="deck-desc" id="deckDesc">Ten guideline slides in the selected aesthetic language.</p>
-        </div>
-        <!-- Icon is a CSS ::before rather than an inline <svg>: brand-deck.js
-             swaps these buttons' textContent while exporting, which would wipe
-             a real child element out of the DOM for good. -->
-        <div class="deck-actions">
-          <button id="downloadAllSlides" class="btn btn-ghost btn-small btn-ico-download">Download all</button>
-          <button id="downloadDeckPdf" class="btn btn-ghost btn-small btn-ico-download">Download PDF</button>
-          <button type="button" id="presentDeck" class="btn btn-ghost btn-small" title="Present the deck full screen">
-            <svg class="ico" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 4.5v15l12-7.5z"/></svg>
-            Present
-          </button>
-        </div>
-      </div>
-      <!-- Slides are built by renderBrandDeck() (js/brand-deck.js) once this section is near the viewport. -->
-      <div class="slide-grid deck-grid" id="deckGrid"></div>
-    </section>
   </main>
 
   <div class="modal-overlay" id="brandGuideModal" hidden>
@@ -854,5 +863,6 @@
 <script src="js/sidebar.js"></script>
 <script src="js/style-gallery.js"></script>
 <script src="js/patterns-home.js"></script>
+<script src="js/command-palette.js"></script>
 </body>
 </html>
