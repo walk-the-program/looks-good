@@ -7,7 +7,11 @@
    striations in the brand colors. Below, everything is opaque and crisp: white
    cards with neutral navy layered shadows. The hero art is the brand's own
    product fragment (a project card, a type-spec tile, an approval chip)
-   straddling the cut. Distinct from Liquid Glass: no glass, no blur, no blobs. */
+   straddling the cut. Under the striations lies a soft multi-point mesh of the brand
+   colours with a fine grain over it (css hero::before / ::after), and the gradient is carried
+   into the product UI (a header glow, a gradient primary action, chart fill and progress
+   bars). Distinct from Liquid Glass: no glass, no blur on cards, and the mesh is a band of
+   colour behind the work, never behind translucent panels. */
 let mgSeq = 0;   // unique SVG ids per rendered board
 
 registerAesthetic({
@@ -15,7 +19,7 @@ registerAesthetic({
   name: 'Mesh Gradient',
   descriptor: 'Fluid · Optimistic · Precise',
   influences: 'Stripe / Fintech marketing / Gradient mesh',
-  summary: 'A luminous field of fine color striations beside dark ink on white, over crisp, layered white cards.',
+  summary: 'A soft mesh of luminous brand colour with fine striations and grain beside dark ink on white, carried into the product as gradient actions, charts and bars, over crisp, layered white cards.',
   motto: 'Fluid on top, exact underneath.',
   kicker: 'Fluid on top, exact underneath',
   mode: 'light',
@@ -66,8 +70,17 @@ registerAesthetic({
     const shadow = d
       ? '0 1px 1px rgba(0,0,0,.4), 0 13px 27px -5px rgba(0,0,0,.55), 0 8px 16px -8px rgba(0,0,0,.6)'
       : '0 1px 1px rgba(10,37,64,.06), 0 13px 27px -5px rgba(50,50,93,.25), 0 8px 16px -8px rgba(0,0,0,.3)';
+    // the second stop of every gradient in the product: the primary turned 28 degrees along the
+    // wheel, held at a lightness where the primary's own label still reads at 4.5:1
+    const ph = hexToHsl(t.printPrimary || t.primary), onP = t.onPrimary;
+    let hue = hslToHex((ph.h + 28) % 360, Math.min(100, ph.s + 6), ph.l);
+    for (let k = 1; k <= 30 && t.contrast(onP, hue) < 4.5; k++) {
+      const lum = ph.l + (onP === '#ffffff' || onP === '#FFFFFF' ? -k : k);
+      hue = hslToHex((ph.h + 28) % 360, Math.min(100, ph.s + 6), Math.max(0, Math.min(100, lum)));
+    }
     return {
       '--ab-muted': muted,
+      '--ab-m-hue': hue,
       '--ab-m-p': p, '--ab-m-s': s, '--ab-m-a': a,
       '--ab-m-mid': t.mix('#ffffff', p, 0.22),
       // the band's ground: white with a 12% primary tint (a dark tint in dark mode)
@@ -184,11 +197,12 @@ registerAesthetic({
       'Build the field from fine striations that follow one direction; detail comes from hundreds of hairlines.',
       'Keep everything below the band opaque: white cards, 1px hairline, radius 12, neutral navy layered shadows.',
       'Show the brand\'s own product on the band edge (a project card, a type spec) so the gradient reads as a product.',
+      'Lay a soft mesh of the brand colours under the striations, with 4-6% grain over it, and carry the gradient into the product: a glow behind the page title, a 135deg two-stop primary action, chart fills and progress bars.',
     ],
     dont: [
       'Add glass, backdrop blur or translucent panels; that is Liquid Glass.',
       'Darken the gradient to make white type legible; move the type off it instead.',
-      'Use blurred radial blobs; the field is directional.',
+      'Put the soft mesh behind cards as a translucent or blurred layer; it is a band behind the work, and cards stay opaque.',
       'Tint shadows with the brand color, or use pill badges for labels.',
     ],
   },
@@ -196,7 +210,7 @@ registerAesthetic({
   deck: {
     principles: [
       ['Luminous color, ink type', 'The field stays bright; the words sit on white.'],
-      ['Hairlines, not blobs', 'Hundreds of fine striations in one direction.'],
+      ['Soft mesh, fine lines', 'A blended field under hundreds of hairlines, with grain.'],
       ['Exact underneath', 'Opaque cards, a hairline, neutral layered shadows.'],
     ],
     do: [
@@ -206,7 +220,7 @@ registerAesthetic({
     ],
     dont: [
       'Darken the gradient behind white type.',
-      'Use blurred blobs.',
+      'Put blurred colour behind cards.',
       'Tint shadows with the brand color.',
     ],
   },
