@@ -1,14 +1,25 @@
-/* 02 Raw Brutalist — exposed, severe, honest. Zero radius, 2px ink borders,
-   hard offset shadows, monospace UI, color only where a role says so.
-   Reference: brutalistwebsites.com / Swiss editorial brutalism. Poster hero
-   (an enormous uppercase headline bleeding off the right edge), palette as
-   full-width strips, the real CTA shown at rest / hover / pressed. */
+/* 02 Raw Brutalist — exposed, severe, honest: the web with the stylesheet half-written.
+   Zero radius, plain 2px black borders and no shadows (so it stays apart from Neo-Brutal
+   Pop), pure white ground, monospace UI, underlined blue links,
+   bracketed labels, controls that invert on hover and press, color only where a role says so.
+   Reference: brutalistwebsites.com. Poster hero (an enormous uppercase headline bleeding off
+   the right edge, the spec table parked bottom right), palette as full-width strips, the real
+   CTA shown at rest / hover / pressed. */
+// Arimo draws the decorative index numeral (not brand type); the headline and body follow the brand faces.
+function rbFonts() {
+  if (typeof window === 'undefined' || !window.loadFontFamily || typeof FONTS === 'undefined') return;
+  ['Arimo'].forEach(n => {
+    const f = FONTS.find(x => x.name === n);
+    if (f) window.loadFontFamily(f);
+  });
+}
+
 registerAesthetic({
   key: 'raw-brutalist', order: 2,
   name: 'Raw Brutalist',
   descriptor: 'Exposed · Severe · Honest',
   influences: 'Swiss print / Brutalist web / Terminal',
-  summary: 'Hard edges, thick borders and plain mechanics, with nothing hidden or softened.',
+  summary: 'The web with the stylesheet half written: white ground, black borders, blue underlined links and controls that invert when you touch them.',
   motto: 'Nothing hidden. Nothing soft.',
   kicker: 'Index of hard surfaces',
   mode: 'light',
@@ -20,16 +31,16 @@ registerAesthetic({
     materialStage: 'pattern',
     principles: [
       ['Hard edges, thick borders', 'Zero radius and 2px ink borders on every control.'],
-      ['Hard shadow lifts, press flattens', 'A 6px offset shadow raises things; pressing removes it.'],
+      ['Flat blocks that invert', 'No shadows: a control turns black on hover and flips back on press.'],
       ['Mono, uppercase, numbered like [01]', 'Every label, tab and button is set in monospace caps.'],
     ],
     do: [
       'Use zero radius and 2px ink borders.',
-      'Number everything like [01].',
-      'Keep the page monochrome.',
+      'Number everything like [01] and bracket links.',
+      'Keep the page white and monochrome.',
     ],
     dont: [
-      'Round a corner or blur a shadow.',
+      'Round a corner or cast a shadow.',
       'Set the accent as text color.',
       'Soften the headline.',
     ],
@@ -53,8 +64,20 @@ registerAesthetic({
   },
 
   // --ab-tr scales the tight headline tracking: 0 for condensed/heavy faces (they collide when tightened), 1 otherwise
+  // The ground is plain white (near-black in dark mode): a hard black rule on white is the look.
+  canvas(b) {
+    return b.isDark ? '#0a0a0a' : '#ffffff';
+  },
+
   tokens(t) {
+    rbFonts();
+    // muted text also sits on the settings danger box (a 4% red tint): hold 4.6:1 there
+    const tint = t.mix(t.isDark ? '#ff7b72' : '#c62f2f', t.canvas, 0.08);
+    let muted = t.muted;
+    for (let k = 0.05; k <= 1.001 && Math.min(t.contrast(muted, tint), t.contrast(muted, t.canvas)) < 4.6; k += 0.05) muted = t.mix(t.ink, t.muted, k);
     return {
+      '--ab-muted': muted,
+      '--ab-link': t.isDark ? '#8DB4FF' : '#0000EE',
       '--ab-type-pick-w': 400,
        '--ab-grid': t.alpha(t.ink, t.isDark ? 0.1 : 0.06) };
   },
@@ -62,15 +85,17 @@ registerAesthetic({
   // A mono spec index (exposed metadata) at the top right of the hero: four
   // key / value rows, ruled like a data sheet.
   art(ctx) {
+    rbFonts();
     const subject = String(ctx.brandName || '').toUpperCase().slice(0, 24);
     const rows = [['SUBJECT', subject], ['SYSTEM', '5 COLORS / 2 FACES'], ['SURFACE', ctx.t.isDark ? 'DARK' : 'LIGHT'], ['FIG.', '01']];
     return `<dl class="rba-spec">${rows.map(([k, v]) => `<div class="rba-row"><dt>${escapeHtml(k)}</dt><dd>${escapeHtml(v)}</dd></div>`).join('')}</dl>`;
   },
 
   materials: [
-    { name: 'Hard surface', css: 'background: {canvas}; border: 2px solid {ink}; border-radius: 0; box-shadow: 6px 6px 0 {ink};' },
-    { name: 'Pressed state', css: 'transform: translate(6px, 6px); box-shadow: none;' },
-    { name: 'Primary action block', css: 'background: {primary}; color: {onPrimary}; border: 2px solid {ink}; border-radius: 0; box-shadow: 6px 6px 0 {ink}; font: 600 13px ui-monospace, "SF Mono", Menlo, monospace; text-transform: uppercase; /* hover: translate(-2px, -2px) with 8px 8px 0 {ink}; pressed: translate(6px, 6px) with no shadow */' },
+    { name: 'Hard surface', css: 'background: {canvas}; border: 2px solid {ink}; border-radius: 0; box-shadow: none; /* plain box, no shadow */' },
+    { name: 'Inverted state', css: 'background: {ink}; color: {canvas}; /* hover on a control; pressed flips back to {canvas} on {ink} */' },
+    { name: 'Primary action block', css: 'background: {primary}; color: {onPrimary}; border: 2px solid {ink}; border-radius: 0; box-shadow: none; font: 600 13px ui-monospace, "SF Mono", Menlo, monospace; text-transform: uppercase; /* label in [brackets]; hover: background {ink}, color {canvas}; pressed: background {canvas}, color {ink}, translate(1px, 1px) */' },
+    { name: 'Link', css: 'color: #0000EE; text-decoration: underline; /* the default blue, underlined, in [brackets] where it is an action */' },
     { name: 'Palette strips', css: 'one full-width row, border: 2px solid {ink}; each color is a flat band sized by its coverage, the label inside it; strips are separated by 2px {ink} rules.' },
     { name: 'Selected segment', css: 'background: {ink}; color: {canvas}; /* joined boxes share 2px {ink} borders */' },
     { name: 'Field', css: 'background: {canvas}; border: 2px solid {ink}; border-radius: 0; font: 15px ui-monospace, "SF Mono", Menlo, monospace; caret-color: {ink};' },
@@ -80,12 +105,12 @@ registerAesthetic({
   rules: {
     do: [
       'Use zero radius and 2px ink borders on every control and panel.',
-      'Cast a hard offset shadow (6px 6px 0 ink) for raised things, and remove it entirely when pressed.',
-      'Set every label, tab, button and table cell in monospace, uppercase, numbered like [01], with plain arrows.',
-      'Keep the page monochrome: color appears only where a color role says so.',
+      'Use no shadows: a control inverts (black block, white text) on hover and flips back on press.',
+      'Set every label, tab, button and table cell in monospace, uppercase, numbered like [01], with plain arrows; set links in default blue, underlined; the recommended pairing is Arial-style (Arimo) headlines over Times-style (Tinos) body copy.',
+      'Keep the page white and monochrome: color appears only where a color role says so.',
     ],
     dont: [
-      'Round any corner, blur any shadow or add a gradient.',
+      'Round any corner, cast any shadow (that is Neo-Brutal Pop) or add a gradient.',
       'Set the accent as text color; it is only ever the highlighter band behind a word.',
       'Soften the headline: it stays enormous, uppercase and tight, and may be cropped by the board edge.',
       'Spend primary on anything but the single main action and active states.',
