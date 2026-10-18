@@ -5,9 +5,9 @@
    scope, default mode) and wins every conflict on structure and accessibility.
    state.blend = null | { with: <donor key>, strength, channels } names a DONOR
    and the channels it supplies:
-     art       the donor's hero art, inside the base's art box (board hero, deck
-               cover and Material slide), drawn in a nested `.ab[data-ae=donor]`
-               scope so the donor's own CSS styles it
+     art       the donor's hero art as a contained figure at its own proportions
+               (board hero, deck cover and Material slide, Built screens), drawn in
+               a nested `.ab[data-ae=donor]` scope so the donor's own CSS styles it
      type      the donor's first recommended pairing (unless typography is
                locked) plus its headline casing / tracking / weight / style and
                its interface-face choices
@@ -112,7 +112,12 @@ function blendInfluences(a, b) {
 function blendKicker(base, donor) {
   const a = base.kicker || blSplit(base.descriptor, '·')[0] || base.name;
   const b = donor.kicker || donor.name;
-  return (a + b).length <= 40 ? `${a} × ${b}` : `${a} × ${donor.name}`;
+  // Short, so a base that stands its kicker on end (Bauhaus' vertical rule) or keeps it to one
+  // line does not grow taller than its own cover can hold (the deck then shrinks the headline).
+  const full = `${a} × ${b}`;
+  if (full.length <= 26) return full;
+  const short = `${a} × ${donor.name}`;
+  return short.length <= 26 ? short : a;
 }
 
 /* ---------------- merged rules ---------------- */
@@ -257,7 +262,11 @@ function blendDef(base, donor, b, typeFrom, typeLocked) {
   d.rules = merged.rules;
   d.deck = blendDeck(base, donor, merged);
 
-  if (ch.art && typeof donor.art === 'function') d.art = ctx => blendArtHtml(donor, ctx);
+  if (ch.art && typeof donor.art === 'function') {
+    // A base whose art is its brand word set huge keeps that plate; the donor's art joins it as a figure.
+    const plate = BL_PLATE_BASES.has(base.key) && typeof base.art === 'function';
+    d.art = ctx => (plate ? abHookHtml(base, base.art, Object.assign({}, ctx, { key: base.key }), 'art') : '') + blendArtHtml(donor, ctx);
+  }
   if (ch.type) {
     d.type = Object.assign({ ui: 'body', label: null, display: 1 }, donor.type);
     if (donor.typeNotes) d.typeNotes = donor.typeNotes; else delete d.typeNotes;
@@ -356,19 +365,20 @@ function blScopeOpen(donor, t, state, cls, extraStyle) {
   return `<div class="ab ${cls}" ${abRootAttrs(donor, t, state, { states: 'swatch', subcopy: 'on' })} aria-hidden="true"${style ? ` style="${style}"` : ''}>`;
 }
 
-// The donor's art, filling the base's art box (and cropped by it).
+// The donor's art as a contained figure: its own proportions (the donor's --ab-art-ratio, else the
+// ratio of its hero kind), never stretched to the base's art box and never cropped by it. The box
+// is centred in the base's art slot and capped relative to the board (blendFitFigure, css/blend.css);
+// the donor's floating pieces (chips, badges) are positioned against this box, so they stay
+// beside the art. The base's headline keeps its own size: the art never takes the hero over.
 function blendArtHtml(donor, ctx) {
   const inner = abHookHtml(donor, donor.art, Object.assign({}, ctx, { key: donor.key }), 'art');
   const dl = abLayoutOf(donor);
   const vars = blendDonorTokens(donor, ctx.t, ctx.state);
-  // Only used where the base's art box takes its height from its content (aspect-ratio
-  // auto): the donor's own ratio, never squarer than 3:2 on a board or 16:9 on a slide,
-  // so a full-width box does not turn into a tall square.
   const raw = String(vars['--ab-art-ratio'] || BL_HERO_RATIO[dl.hero] || '1');
   const m = raw.match(/^\s*([\d.]+)\s*(?:\/\s*([\d.]+))?\s*$/);
   const num = m ? Number(m[1]) / (Number(m[2]) || 1) : 1;
-  const r = n => (Math.max(num || 1, n)).toFixed(3);
-  return `${blScopeOpen(donor, ctx.t, ctx.state, 'ab-blend-art', `--bl-art-ratio:${r(1.5)};--bl-art-ratio-deck:${r(16 / 9)}`)}<div class="ab-art ab-blend-inner">${inner}</div></div>`;
+  const ratio = Math.min(3, Math.max(0.5, num || 1)).toFixed(3);
+  return `${blScopeOpen(donor, ctx.t, ctx.state, 'ab-blend-art', `--bl-art-ratio:${ratio}`)}<div class="ab-art ab-blend-inner">${inner}</div></div>`;
 }
 
 // Materials that can be shown as a sample: recipes that paint a background. Recipes
@@ -528,19 +538,200 @@ function blendParts(P) {
 
 /* ---------------- after layout ---------------- */
 
-// A base that dissolves its art box (`display: contents`, so its own art pieces join
-// the hero grid) leaves the donor's art as a bare grid item at full width. On a slide,
-// cap that at a stage height so the cover does not have to scale down. Runs before
-// the deck fit.
-function blendFitArt(root) {
-  if (!root || !root.querySelectorAll) return;
-  root.querySelectorAll('.ab-blend-art').forEach(w => {
-    w.style.removeProperty('max-height');
-    const box = w.parentElement;
-    if (box && getComputedStyle(box).display === 'contents' && root.classList.contains('ab-slide')) {
-      w.style.setProperty('max-height', '300px', 'important');
+// Bases whose own hero art is the brand word set huge (a typographic plate, not an illustration).
+// Their plate stays when the art channel is on, and the donor's art joins it as a figure beside
+// the caption (below it on a narrow board): css/blend.css [data-bl-place="aside"].
+const BL_PLATE_BASES = new Set(['dystopian-luxury']);
+
+// Where the donor figure goes, by what the base's hero offers (the base's `layout.hero` decides which
+// of these its CSS gives it, so the table is by structure, not by name):
+//   art slot with a box of its own (split, centered, poster, scene)  the figure is contained in the slot,
+//        centred, at the donor's own ratio (never cropped by the slot's ratio).
+//   art slot dissolved (`display: contents`) on a board, plate base      aside: beside the caption.
+//   art slot dissolved on a board, any other base                       stack: slot becomes a block under
+//        the copy, centred (css/blend.css [data-bl-stack]).
+//   art slot dissolved on a slide                                       the same containment, capped to the stage.
+// The figure's height is capped by the board width (<= 40%, 200-460px) and, on a slide, by 60% of its height.
+// Sizes are set in px as --bl-fw / --bl-fh / --bl-fm (css/blend.css clamps them to the slot, so a later
+// resize can only make the figure smaller, never stretch it). Runs after layout, before anything that
+// reads the art's rect; safe to run again.
+function blendFitFigure(root) {
+  if (!root || !root.querySelectorAll || typeof getComputedStyle !== 'function') return;
+  const boxes = [...root.querySelectorAll('.ab-blend-art')];
+  if (!boxes.length) return;
+  const slide = root.classList.contains('ab-slide');
+  const hero = slide ? null : root.querySelector('.ab-hero');
+  if (hero) {
+    hero.removeAttribute('data-bl-stack');
+    hero.removeAttribute('data-bl-place');
+    const hs = hero.querySelector(':scope > .ab-art');
+    if (hs && hs.querySelector('.ab-blend-art') && getComputedStyle(hs).display === 'contents') {
+      if (BL_PLATE_BASES.has(root.getAttribute('data-ae'))) hero.setAttribute('data-bl-place', 'aside');
+      else hero.setAttribute('data-bl-stack', '1');
+    }
+  }
+  const rootW = root.clientWidth || 0;
+  const rootH = root.clientHeight || 0;
+  if (!rootW) return;
+  // A Built screen sizes its text (and so its art band) right after the blend fix-ups: fit once more then.
+  if (root.classList.contains('sb-ab') && !root.hasAttribute('data-bl-refit')) {
+    root.setAttribute('data-bl-refit', '');
+    setTimeout(() => { if (root.isConnected) blendFitFigure(root); }, 150);
+  }
+  const k0 = root.getBoundingClientRect().width / rootW || 1;   // a scaled slide: rects are scaled, layout sizes are not
+  boxes.forEach(box => {
+    const slot = box.parentElement;
+    if (!slot) return;
+    const size = () => {
+    const R = parseFloat(box.style.getPropertyValue('--bl-art-ratio')) || 1;
+    const aside = !!hero && hero.getAttribute('data-bl-place') === 'aside';
+    let cap = Math.max(200, Math.min(rootW * 0.4, 460));
+    if (slide && rootH) cap = Math.min(cap, rootH * 0.6);
+    if (aside) cap = Math.min(cap, rootW * (rootW <= 600 ? 0.5 : 0.3), 340);   // narrow: it sits under the caption
+    // what the slot offers with the figure taken out of its flow (a slot with no height of its own
+    // is sized by the figure, so only the cap limits it); only the part of it inside the board counts
+    // In the Built phone screens the slot is a content-sized box (or dissolved) inside a flexible
+    // frame that clips it (the onboarding screen's art band): that frame is what the figure has to fit.
+    const frame = o => {
+      if (isFinite(o.ah) || !root.classList.contains('sb-ab')) return o;
+      for (let el = slot.parentElement; el && el !== root; el = el.parentElement) {
+        const c = getComputedStyle(el);
+        if (c.overflowY === 'visible') continue;
+        const fh = el.clientHeight - (parseFloat(c.paddingTop) || 0) - (parseFloat(c.paddingBottom) || 0);
+        const fw = el.clientWidth - (parseFloat(c.paddingLeft) || 0) - (parseFloat(c.paddingRight) || 0);
+        if (fh >= 48) { o.ah = fh; o.raw = fh; if (fw > 0) o.aw = Math.min(o.aw, fw); }
+        break;
+      }
+      return o;
+    };
+    const offer = () => {
+      ['--bl-fw', '--bl-fh', '--bl-fm', '--bl-fx'].forEach(k => box.style.removeProperty(k));
+      const o = { aw: Infinity, ah: Infinity, mx: null, my: null };
+      if (getComputedStyle(slot).display === 'contents') return frame(o);
+      box.setAttribute('data-bl-measure', '');
+      const cs = getComputedStyle(slot);
+      const pl = (parseFloat(cs.paddingLeft) || 0) + (parseFloat(cs.borderLeftWidth) || 0);
+      const pt = (parseFloat(cs.paddingTop) || 0) + (parseFloat(cs.borderTopWidth) || 0);
+      let aw = slot.clientWidth - (parseFloat(cs.paddingLeft) || 0) - (parseFloat(cs.paddingRight) || 0);
+      let ah = slot.clientHeight - (parseFloat(cs.paddingTop) || 0) - (parseFloat(cs.paddingBottom) || 0);
+      const sr = slot.getBoundingClientRect();
+      const rr = root.getBoundingClientRect();
+      box.removeAttribute('data-bl-measure');
+      const k = rr.width / rootW || 1;   // a scaled slide: rects are scaled, layout sizes are not
+      // a slot that bleeds off the board (a poster's corner art) offers only what shows
+      const vl = Math.max(0, (rr.left - sr.left) / k - pl);
+      const vr = Math.max(0, (sr.right - rr.right) / k);
+      if (vl > 1 || vr > 1) { aw = aw - vl - vr; o.mx = vl; }
+      const vt = Math.max(0, (rr.top - sr.top) / k - pt);
+      const vb = Math.max(0, (sr.bottom - rr.bottom) / k);
+      if (vt > 1 || vb > 1) { ah = ah - vt - vb; o.my = vt; }
+      o.aw = aw > 0 ? aw : Infinity;
+      o.ah = ah >= 48 ? ah : Infinity;
+      o.raw = ah;
+      return frame(o);
+    };
+    let o = offer();
+    // A slot too small to show a donor's art (a poster's corner stamp, a one-line strip) is not used:
+    // the figure goes into the flow under the copy instead (the stack above).
+    if (hero && !aside && !hero.hasAttribute('data-bl-stack') && (o.aw < 200 || (o.raw !== undefined && o.raw < 150))) {
+      hero.setAttribute('data-bl-stack', '1');
+      o = offer();
+    }
+    // a slide's cover and Material stage are set to the statement: a slot with no height of its own
+    // (so no frame to fill) gets a figure about a quarter of the slide tall, not the board's cap
+    const lim = slide && rootH && !isFinite(o.ah) ? Math.min(cap, rootH * 0.27) : cap;
+    let h = Math.min(lim, o.ah, o.aw / R);
+    let w = h * R;
+    if (w > o.aw) { w = o.aw; h = w / R; }
+    box.style.setProperty('--bl-fw', w.toFixed(1) + 'px');
+    box.style.setProperty('--bl-fh', h.toFixed(1) + 'px');
+    if (isFinite(o.ah) && o.ah > h + 2) box.style.setProperty('--bl-fm', (((o.my || 0) + (o.ah - h) / 2)).toFixed(1) + 'px');
+    if (o.mx !== null && isFinite(o.aw)) box.style.setProperty('--bl-fx', (o.mx + Math.max(0, (o.aw - w) / 2)).toFixed(1) + 'px');
+    // A base that sets its copy over its art slot (a scene hero's panel): the figure moves to the
+    // largest part of the slot the words leave free, so the headline never runs over the donor's art.
+    if (isFinite(o.ah) && getComputedStyle(slot).display !== 'contents') {
+      const t = blTextBoxes(root);
+      const q = box.getBoundingClientRect();
+      if (t.some(b => blOver(q, b, 4))) {
+        const S = slot.getBoundingClientRect();
+        const hit = t.filter(b => blOver(S, b, 4));
+        const gap = 12 * k0;
+        // a copy plate (a framed panel under the words) counts as words: the figure keeps clear of its edge
+        const cp = root.querySelector('.ab-hero-copy, .sb-ob-copy');
+        if (cp && blOver(S, cp.getBoundingClientRect(), 4)) hit.push(cp.getBoundingClientRect());
+        const reg = [
+          { l: Math.max(...hit.map(b => b.right)) + gap, r: S.right, t: S.top, b: S.bottom },
+          { l: S.left, r: Math.min(...hit.map(b => b.left)) - gap, t: S.top, b: S.bottom },
+          { l: S.left, r: S.right, t: S.top, b: Math.min(...hit.map(b => b.top)) - gap },
+          { l: S.left, r: S.right, t: Math.max(...hit.map(b => b.bottom)) + gap, b: S.bottom },
+        ].map(g => {
+          const rw = (g.r - g.l) / k0, rh = (g.b - g.t) / k0;
+          const fh = Math.min(lim, rh, rw / R);
+          return { g, rw, rh, fh };
+        }).sort((a, b) => b.fh - a.fh);
+        const best = reg[0];
+        if (best && best.fh >= 120) {
+          h = best.fh; w = h * R;
+          box.style.setProperty('--bl-fw', w.toFixed(1) + 'px');
+          box.style.setProperty('--bl-fh', h.toFixed(1) + 'px');
+          box.style.setProperty('--bl-fm', (((best.g.t - S.top) / k0 + (best.rh - h) / 2)).toFixed(1) + 'px');
+          box.style.setProperty('--bl-fx', (((best.g.l - S.left) / k0 + (best.rw - w) / 2)).toFixed(1) + 'px');
+        }
+      }
+    }
+    return { w, h };
+    };
+    let fig = size();
+    // Art the donor lays out in the box's flow (ASCII panels, a record card, a text block) is as tall
+    // as its width makes it, whatever ratio the donor's hero kind suggests: when it runs past the box
+    // the ratio follows the content (once), so nothing is cut. Pieces the donor positions (a phone
+    // rising from the bottom edge, floating chips) are not content: they stay cropped by their own box.
+    const inner = box.querySelector(':scope > .ab-blend-inner');
+    if (inner && fig && fig.h > 0) {
+      const over = (blFlowBottom(inner) - inner.getBoundingClientRect().bottom) / k0;
+      if (over > 3 && over < fig.h * 1.5) {
+        box.style.setProperty('--bl-art-ratio', Math.max(0.5, Math.min(3.4, fig.w / (fig.h + over + 2))).toFixed(3));
+        fig = size();
+      }
     }
   });
+}
+
+// The boxes of the words in a hero or cover's copy (headline, kicker, sub-copy), in screen px.
+function blTextBoxes(root) {
+  const out = [];
+  root.querySelectorAll('.ab-hero-copy .ab-headline, .ab-hero-copy .ab-kicker, .ab-hero-copy .ab-subcopy, .sb-ob-copy .ab-headline, .sb-ob-copy .ab-kicker, .sb-ob-copy .ab-subcopy').forEach(el => {
+    const r = document.createRange();
+    r.selectNodeContents(el);
+    [...r.getClientRects()].forEach(q => { if (q.width > 1 && q.height > 1) out.push(q); });
+  });
+  return out;
+}
+
+function blOver(a, b, min) {
+  return Math.min(a.right, b.right) - Math.max(a.left, b.left) > min && Math.min(a.bottom, b.bottom) - Math.max(a.top, b.top) > min;
+}
+
+// The bottom edge of what a donor lays out in its art box's flow, not counting what it positions
+// absolutely (pieces placed against the box) or the insides of an svg.
+function blFlowBottom(inner) {
+  let bottom = -Infinity;
+  const walk = el => {
+    for (const c of el.children) {
+      const cs = getComputedStyle(c);
+      if (cs.position === 'absolute' || cs.position === 'fixed' || cs.display === 'none' || cs.visibility === 'hidden') continue;
+      const r = c.getBoundingClientRect();
+      if (r.height > 0 && r.width > 0) bottom = Math.max(bottom, r.bottom);
+      if (c.tagName.toLowerCase() !== 'svg') walk(c);
+    }
+  };
+  walk(inner);
+  return bottom;
+}
+
+// Deck slides: the figure is fitted before the slide's own fits (js/brand-deck.js) measure it.
+function blendFitArt(root) {
+  blendFitFigure(root);
 }
 
 // Where the base lays its copy over the art (a sticker field behind the headline, a
@@ -549,6 +740,7 @@ function blendFitArt(root) {
 // Called after the board renders and after the deck fits.
 function blendClearArtText(root) {
   if (!root || !root.querySelector) return;
+  blendFitFigure(root);
   const inner = root.querySelector('.ab-hero .ab-blend-inner');
   const copies = [...root.querySelectorAll('.ab-hero .ab-hero-copy, .ab-deck-cover-meta')];
   if (!inner || !copies.length) return;
@@ -613,6 +805,7 @@ function blRgb(v) {
 function blendLegibility(root) {
   if (!root || !root.querySelectorAll || !root.hasAttribute('data-blend')) return;
   blendFitWords(root);
+  blendFitFigure(root);
   const rcs = getComputedStyle(root);
   const canvas = rcs.getPropertyValue('--ab-canvas').trim();
   const ink = rcs.getPropertyValue('--ab-ink').trim();
@@ -667,7 +860,7 @@ function blendLegibility(root) {
     });
   });
   const hero = root.querySelector('.ab-hero');
-  if (hero) hero.removeAttribute('data-bl-reflow');
+  if (hero && hero.hasAttribute('data-bl-reflow')) { hero.removeAttribute('data-bl-reflow'); blendFitFigure(root); }
   let art = root.querySelector('.ab-hero .ab-blend-art');
   const over = (a, r) => {
     const w = Math.min(a.right, r.right) - Math.max(a.left, r.left);
@@ -700,6 +893,7 @@ function blendLegibility(root) {
     if (copy && !root.classList.contains('ab-slide') && plated(copy, hero, copy)
       && over(a, copy.getBoundingClientRect()) > 0.15 * Math.max(1, a.width * a.height)) {
       hero.setAttribute('data-bl-reflow', '1');
+      blendFitFigure(root);
       art = root.querySelector('.ab-hero .ab-blend-art');
     }
   }
@@ -800,7 +994,7 @@ function blendBriefLines(state, def, t) {
   const cell = s => String(s).replace(/\|/g, '\\|').replace(/\s+/g, ' ').trim();
   const rows = [];
   rows.push(['Art', src('art'), ch.art
-    ? `${donor.name}'s hero illustration, drawn in the brand tokens and framed and cropped by ${base.name}'s art box (board hero, deck cover, Material slide).`
+    ? `${donor.name}'s hero illustration, drawn in the brand tokens as a contained figure at its own proportions, never stretched or cropped to ${base.name}'s art box (board hero, deck cover, Material slide, Built screens). ${base.name} keeps its own headline size${BL_PLATE_BASES.has(base.key) ? ` and its cropped brand-word plate; the figure sits beside the caption` : ''}.`
     : `${base.name}'s own hero illustration.`]);
   let typeText;
   if (!ch.type) typeText = `${base.name}'s type treatment and the brand's own fonts.`;

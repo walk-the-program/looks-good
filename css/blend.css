@@ -29,19 +29,26 @@
   overflow-wrap: normal !important; word-break: keep-all !important; hyphens: manual !important;
 }
 
-/* Art: the donor's art fills the base's art box. In flow with height 100%, so a
-   base box with a fixed ratio crops it, and a base box sized by its content
-   (aspect-ratio: auto) takes the donor's own ratio instead of collapsing. */
+/* Art: the donor's art is a contained figure at its own proportions (--bl-art-ratio, the donor's
+   --ab-art-ratio), centred in the base's art slot and never cropped by the slot's own ratio.
+   js/blend.js (blendFitFigure) sizes it: --bl-fw / --bl-fh cap it by the board and the slot, --bl-fm
+   centres it in a taller slot. Without them (first paint) it takes the slot's width at its own ratio.
+   The donor's floating chips and badges are placed against this box (its inner art is the size
+   container their cqw read), so they stay beside the art. */
 .ab .ab.ab-blend-art {
   position: relative !important; inset: auto !important; display: block !important;
-  width: 100% !important; height: 100% !important; aspect-ratio: var(--bl-art-ratio, 1);
+  width: min(100%, var(--bl-fw, 100%)) !important; height: auto !important; aspect-ratio: var(--bl-art-ratio, 1);
+  margin: var(--bl-fm, 0px) auto 0 var(--bl-fx, auto) !important;
+  max-height: 100% !important;   /* a slot with a height of its own that shrank after the fit (a Built screen's art band) */
   border-radius: inherit !important; overflow: hidden !important; background-image: none !important;
   contain: paint;   /* clips even absolutely or fixed-positioned bits of the donor's art */
 }
-.ab.ab-slide .ab.ab-blend-art { aspect-ratio: var(--bl-art-ratio-deck, 1.778); }
+/* blendFitFigure reads what the slot offers with the figure out of its flow */
+.ab .ab.ab-blend-art[data-bl-measure] { position: absolute !important; width: 0 !important; height: 0 !important; margin: 0 !important; }
 .ab .ab.ab-blend-art::before,
 .ab .ab.ab-blend-art::after { content: none !important; }
-.ab .ab.ab-blend-art > .ab-art.ab-blend-inner {
+/* :not(#bl) lifts it above any base rule that sizes `.ab-art` with !important (Retro-Futurist's cover: width 38%) */
+.ab .ab.ab-blend-art > .ab-art.ab-blend-inner:not(#bl) {
   position: absolute !important; inset: 0 !important; display: block !important;
   width: 100% !important; height: 100% !important; max-width: none !important; max-height: none !important;
   min-width: 0 !important; min-height: 0 !important; margin: 0 !important; padding: 0 !important;
@@ -53,7 +60,7 @@
   overflow: hidden !important; z-index: auto !important;
 }
 /* the scaled art may show what runs above its own top: the art box still clips at its edge */
-.ab .ab.ab-blend-art[data-bl-fit] > .ab-art.ab-blend-inner { overflow: visible !important; }
+.ab .ab.ab-blend-art[data-bl-fit] > .ab-art.ab-blend-inner:not(#bl) { overflow: visible !important; }
 .ab .ab.ab-blend-art > .ab-art.ab-blend-inner::before,
 .ab .ab.ab-blend-art > .ab-art.ab-blend-inner::after { content: none !important; }
 
@@ -213,15 +220,37 @@
 
 /* Art: a base that layers its copy over its art (Neo Deco's framed headline over the sunburst)
    would hide a donor's art behind the plate and crop its top. js/blend.js (blendLegibility)
-   marks the hero and the art moves into the flow under the copy, at the donor's own ratio. */
-.ab[data-blend] .ab-hero[data-bl-reflow] {
+   marks the hero [data-bl-reflow] and the art moves into the flow under the copy, at the donor's own
+   ratio. A base that dissolves its art slot (display: contents) gets [data-bl-stack] (blendFitFigure):
+   the same single column, the slot a block under the copy. */
+.ab[data-blend] .ab-hero:is([data-bl-reflow], [data-bl-stack]) {
   display: grid !important; grid-template-columns: minmax(0, 1fr) !important; grid-template-rows: none !important;
-  grid-template-areas: none !important; grid-auto-rows: auto !important;
+  grid-template-areas: none !important; grid-auto-rows: auto !important; justify-items: stretch !important; align-items: start !important;
 }
-.ab[data-blend] .ab-hero[data-bl-reflow] > * { grid-area: auto !important; }
-.ab[data-blend] .ab-hero[data-bl-reflow] > .ab-hero-copy { order: 0 !important; margin-bottom: clamp(18px, 3cqw, 34px) !important; }
-.ab[data-blend] .ab-hero[data-bl-reflow] > .ab-art {
-  order: 1 !important; position: relative !important; inset: auto !important; transform: none !important;
+.ab[data-blend] .ab-hero:is([data-bl-reflow], [data-bl-stack]) > * { grid-area: auto !important; grid-column: 1 !important; grid-row: auto !important; }
+.ab[data-blend] .ab-hero[data-bl-stack] > .ab-hero-copy > * { grid-area: auto !important; grid-column: 1 !important; grid-row: auto !important; }
+.ab[data-blend] .ab-hero:is([data-bl-reflow], [data-bl-stack]) > .ab-hero-copy { order: 0 !important; margin-bottom: clamp(18px, 3cqw, 34px) !important; }
+.ab[data-blend] .ab-hero:is([data-bl-reflow], [data-bl-stack]) > .ab-art {
+  order: 1 !important; position: relative !important; inset: auto !important; transform: none !important; display: block !important;
   width: min(100%, 560px) !important; max-width: 100% !important; height: auto !important; max-height: none !important;
   min-height: 0 !important; aspect-ratio: auto !important; justify-self: center !important; align-self: start !important; margin: 0 !important;
 }
+/* a poster hero reserves its bottom padding for corner art: the stacked figure needs only a normal one */
+.ab[data-blend] .ab-hero[data-bl-stack] { padding-bottom: clamp(28px, 4.4cqw, 48px) !important; }
+
+/* Art on a base whose art is its brand word set huge (Dystopian Luxury's cropped plate): the plate stays,
+   its blank label (the base's one object) gives way, and the donor's figure sits beside the caption, in the
+   label's column; below the caption on a narrow board. */
+.ab[data-blend] .ab-hero[data-bl-place="aside"] .dl-tag { display: none !important; }
+.ab[data-blend] .ab-hero[data-bl-place="aside"] > .ab-blend-art,
+.ab[data-blend] .ab-hero[data-bl-place="aside"] .ab-art > .ab-blend-art {
+  grid-column: 2 !important; grid-row: 2 !important; align-self: start; justify-self: end; margin: 0 !important;
+  width: var(--bl-fw, 240px) !important;   /* the column is auto: a percentage width would size it to nothing */
+}
+@container ab (max-width: 600px) {
+  .ab[data-blend] .ab-hero[data-bl-place="aside"] .ab-art > .ab-blend-art { grid-column: 1 !important; grid-row: 3 !important; justify-self: center; width: min(100%, var(--bl-fw, 240px)) !important; }
+}
+
+/* A poster hero draws its own bars and rules over the hero; the donor's figure sits above them
+   (the matrix checks it clears the headline), so a rule never cuts across the art. */
+.ab[data-blend][data-hero="poster"] .ab-hero > .ab-art { z-index: 3 !important; }
