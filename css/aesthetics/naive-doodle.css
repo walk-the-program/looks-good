@@ -312,7 +312,5 @@
   .ab[data-ae="naive-doodle"] .ab-switch::before { transition: none; }
 }
 
-/* Built screens: the handwriting face reads small at the shared sizes (13px nav, 10.5px tab labels, 11px chart axis) */
+/* Built screens: the handwriting face reads small at the shared nav size */
 .ab.sb-ab[data-ae="naive-doodle"] .sb-navi { font-size: 16px; }
-.ab.sb-ab[data-ae="naive-doodle"] .sb-tab span { font-size: 13px; }
-.ab.sb-ab[data-ae="naive-doodle"] .sb-tab { padding-inline: 2px; }

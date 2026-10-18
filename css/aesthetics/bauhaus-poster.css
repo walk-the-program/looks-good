@@ -227,6 +227,5 @@
 .ab.sb-ab[data-ae="bauhaus-poster"] .sb-top { position: relative; }
 .ab.sb-ab[data-ae="bauhaus-poster"] .sb-main > .ab-rule { height: 6px; }
 .ab.sb-ab[data-ae="bauhaus-poster"] .sb-danger-row p { color: var(--ab-ink); }
-.ab.sb-ab[data-ae="bauhaus-poster"] .sb-ob-art .bau-x { display: none; }
 /* Built landing: the actions and the proof line span the whole hero copy instead of widening the kicker column */
 .ab[data-ae="bauhaus-poster"] .ab-hero-copy > :is(.sb-hero-act, .sb-proof) { grid-column: 1 / -1; }

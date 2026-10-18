@@ -1305,8 +1305,16 @@ function abFitLogo(img) {
     // Plate: the canvas colour first, then the ink colour, then plain white / black.
     const cands = [abHexRgb(rs.getPropertyValue('--ab-canvas')), abHexRgb(rs.getPropertyValue('--ab-ink')),
       { r: 255, g: 255, b: 255 }, { r: 0, g: 0, b: 0 }].filter(Boolean);
-    const plate = cands.find(c => !abLogoLost(tones, c))
-      || cands.reduce((a, c) => (abLogoLoss(tones, c).under3 < abLogoLoss(tones, a).under3 ? c : a));
+    let plate = cands.find(c => !abLogoLost(tones, c));
+    if (!plate) {
+      // No plate fully rescues the mark. Logos are drawn for white: if the mark's darkest
+      // heavy ink (usually the wordmark) already reads on the surface, leave it bare;
+      // otherwise sit it on white.
+      const heavy = tones.filter(t => t.w >= 0.2);
+      const dark = (heavy.length ? heavy : tones).reduce((a, t) => (abRgbLum(t) < abRgbLum(a) ? t : a));
+      if (abRgbContrast(dark, bg) >= AB_LOGO_MIN) return;
+      plate = { r: 255, g: 255, b: 255 };
+    }
     const card = root.querySelector('.ab-card, .ab-cta');
     const rad = card ? parseFloat(getComputedStyle(card).borderTopLeftRadius) || 0 : 6;
     img.setAttribute('data-logo-fit', 'plate');

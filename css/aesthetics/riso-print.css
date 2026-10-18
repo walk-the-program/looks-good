@@ -75,9 +75,6 @@
   mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 70' preserveAspectRatio='none'><path d='M172 13 C145 2 75 0 32 13 C5 22 2 48 34 59 C75 71 152 68 182 52 C201 41 196 20 158 8' fill='none' stroke='black' stroke-width='3.5' stroke-linecap='round' vector-effect='non-scaling-stroke'/></svg>") center / 100% 100% no-repeat;
 }
 .ab[data-ae="riso-print"] .ab-hl::before { transform: translate(2px, 1px) rotate(-1deg); opacity: 0.6; }
-/* onboarding headline is set tighter (line-height 1.04 at ~27px): the ring hugs the word so it does not cut the line above */
-.ab[data-ae="riso-print"] .sb-ob-h { line-height: 1.1; }
-.ab[data-ae="riso-print"] .sb-ob-h .ab-hl::before, .ab[data-ae="riso-print"] .sb-ob-h .ab-hl::after { top: -0.08em; bottom: -0.08em; }
 @container ab (min-width: 601px) {
   .ab[data-ae="riso-print"] .ab-hero { grid-template-columns: 1.15fr 1fr; }
 }

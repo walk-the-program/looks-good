@@ -424,9 +424,7 @@
 .ab.sb-ab[data-ae="frutiger-aero"][data-mode="dark"] .sb-side { background: rgba(10, 30, 50, 0.55); }
 .ab.sb-ab[data-ae="frutiger-aero"] .sb-chart-head .ab-seg-btn { flex: 1 0 auto; padding-inline: 12px; font-size: 12.5px; }
 
-/* Built screens: the wet-floor reflection under a headline needs its own room (it ran into the paragraph card on the phone),
-   the landing headline stops short of the "new" starburst, and the proof line sits on a frosted pill above the hero's edge */
-.ab.sb-ab[data-ae="frutiger-aero"] .sb-ob-h { margin-bottom: 0.82em; }
+/* Built screens: the landing headline stops short of the "new" starburst, and the proof line sits on a frosted pill above the hero's edge */
 .ab.sb-ab[data-ae="frutiger-aero"] .sb-lhero { padding-bottom: 26px; }
 .ab.sb-ab[data-ae="frutiger-aero"] .sb-lhero .ab-headline { max-width: calc(100% - 40cqw); }
 .ab.sb-ab[data-ae="frutiger-aero"] .sb-lhero .sb-proof { width: fit-content; margin-inline: auto; padding: 3px 14px; border-radius: 999px; background: rgba(255, 255, 255, 0.82); color: var(--ab-ink); box-shadow: 0 0 0 1px rgba(35, 90, 140, 0.2); }

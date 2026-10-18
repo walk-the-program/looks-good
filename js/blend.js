@@ -6,7 +6,8 @@
    state.blend = null | { with: <donor key>, strength, channels } names a DONOR
    and the channels it supplies:
      art       the donor's hero art as a contained figure at its own proportions
-               (board hero, deck cover and Material slide, Built screens), drawn in
+               (board hero, deck cover, Material slide and landing page hero; never in
+               app screens), drawn in
                a nested `.ab[data-ae=donor]` scope so the donor's own CSS styles it
      type      the donor's first recommended pairing (unless typography is
                locked) plus its headline casing / tracking / weight / style and
@@ -994,7 +995,7 @@ function blendBriefLines(state, def, t) {
   const cell = s => String(s).replace(/\|/g, '\\|').replace(/\s+/g, ' ').trim();
   const rows = [];
   rows.push(['Art', src('art'), ch.art
-    ? `${donor.name}'s hero illustration, drawn in the brand tokens as a contained figure at its own proportions, never stretched or cropped to ${base.name}'s art box (board hero, deck cover, Material slide, Built screens). ${base.name} keeps its own headline size${BL_PLATE_BASES.has(base.key) ? ` and its cropped brand-word plate; the figure sits beside the caption` : ''}.`
+    ? `${donor.name}'s hero illustration, drawn in the brand tokens as a contained figure at its own proportions, never stretched or cropped to ${base.name}'s art box (board hero, deck cover, Material slide and landing page hero; never in app screens). ${base.name} keeps its own headline size${BL_PLATE_BASES.has(base.key) ? ` and its cropped brand-word plate; the figure sits beside the caption` : ''}.`
     : `${base.name}'s own hero illustration.`]);
   let typeText;
   if (!ch.type) typeText = `${base.name}'s type treatment and the brand's own fonts.`;

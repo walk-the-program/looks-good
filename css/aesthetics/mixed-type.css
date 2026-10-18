@@ -305,13 +305,3 @@
 /* ---- Built view fixes (S5 sweep) ---- */
 /* Stat labels: "MEDIAN RESPONSE" broke mid-word (RESPONS / E) in the narrow fourth stat; tighter tracking, break only at spaces. */
 .ab.sb-ab[data-ae="mixed-type"] .sb-stat .ab-label { letter-spacing: 0.08em; overflow-wrap: break-word; }
-/* Phone onboarding: the full specimen sheet (four cells, glyph set, scale) is taller than the plate, so the "Aa" cells
-   were cut and ran into the WELCOME kicker. The phone shows the figure line (two lines) and one row of two voices. */
-.ab.sb-ab[data-ae="mixed-type"] .ab-art.sb-ob-artbox { height: auto; max-height: none; aspect-ratio: auto; width: 100%; align-self: center; }
-.ab.sb-ab[data-ae="mixed-type"] .sb-ob-artbox .mt-lead { margin-top: 0; }
-.ab.sb-ab[data-ae="mixed-type"] .sb-ob-artbox .mt-lead-t { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; font-size: 12.5px; line-height: 1.4; }
-.ab.sb-ab[data-ae="mixed-type"] .sb-ob-artbox .mt-spec { margin-top: 10px; }
-.ab.sb-ab[data-ae="mixed-type"] .sb-ob-artbox .mt-cell:nth-child(n + 3), .ab.sb-ab[data-ae="mixed-type"] .sb-ob-artbox .mt-lower { display: none; }
-.ab.sb-ab[data-ae="mixed-type"] .sb-ob-artbox .mt-cell { padding-bottom: 6px; }
-.ab.sb-ab[data-ae="mixed-type"] .sb-ob-artbox .mt-cell svg { max-height: 46px; margin: 4px 0; }
-.ab.sb-ab[data-ae="mixed-type"] .sb-ob-artbox .mt-cell-m { display: none; }

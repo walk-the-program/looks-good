@@ -405,8 +405,6 @@
 .ab[data-ae="bento-grid"] .bnm-flat b { font-size: 34px; }
 
 /* ---- Built screens: collisions found in the visual sweep ---- */
-/* the mobile welcome art box is ~150px, so the second floating chip would sit on the ring and repeat its 72%; keep the first only */
-.ab.sb-ab[data-ae="bento-grid"] .sb-ob-artbox .bna-c2 { display: none; }
 /* settings: the section blurb is bare text, not a tile (the tile fill left a ragged white pill behind it) */
 .ab.sb-ab[data-ae="bento-grid"] .sb-set-intro .ab-card-body { background: none; padding: 0; border-radius: 0; }
 /* settings: website and email share a row; long names end in an ellipsis instead of being cut mid-letter */

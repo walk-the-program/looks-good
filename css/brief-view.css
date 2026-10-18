@@ -304,7 +304,7 @@
 /* ---------- sidebar: Build for picker, resolve panel, Save brief + files (js/brief-view.js, AiBriefCopy) ---------- */
 
 .aibc-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
-.aibc-label { flex: none; font-size: 12px; font-weight: 500; color: var(--muted); }
+.aibc-label { flex: none; min-width: 56px; font-size: 12px; font-weight: 500; color: var(--muted); }
 .aibc-seg { flex: 1; min-width: 0; grid-template-columns: repeat(3, 1fr); }
 .aibc-seg label { height: 26px; font-size: 12px; }
 .aibc-save { margin-top: 6px; }

@@ -349,13 +349,11 @@
 .ab[data-ae="neo-brutal-pop"] :is(.ab-type-col[data-role="body"] .ab-type-cur b, .ab-deck-pratio b) { font-weight: var(--np-uw, 700); }
 
 /* ---- Built > Mobile app ---- */
-/* welcome headline is 27px, not the 44-64px board headline the flower was sized for: a smaller flower, and the
-   pill gets right-hand room so the petals never cover the last letter */
-.ab.sb-ab[data-ae="neo-brutal-pop"] .sb-ob-h .ab-hl { --np-fl: 34px; padding-right: 0.32em; }
-/* home: the first row is the tallest object under the card (tile, name, status); one full row fits above the tab
-   bar, a second would show as a stub cut by it */
-.ab.sb-ab[data-ae="neo-brutal-pop"] .sb-home-list .ab-row:nth-child(n+2) { display: none; }
-.ab.sb-ab[data-ae="neo-brutal-pop"] .sb-home-list .ab-row:nth-child(1) { border-bottom: var(--np-b) solid var(--ab-ink); }
+/* welcome headline is 34px (UI_KIT_PHONE large title), not the 44-64px board headline: the flower keeps the
+   board's proportion to the type (about 1.26em), the pill gets right-hand room so the petals never cover the
+   last letter, and a right margin as wide as the petals' overhang keeps the flower inside the line it ends,
+   so the headline wraps before the flower could run off the screen */
+.ab.sb-ab[data-ae="neo-brutal-pop"] .sb-ob-h .ab-hl { --np-fl: 43px; padding-right: 0.32em; margin-right: calc(var(--np-fl) * 0.84); }
 
 /* ---- Built (product screens): colour fields, ink borders, hard shadows and a few stickers ---- */
 .ab.sb-ab[data-ae="neo-brutal-pop"] .sb-side {

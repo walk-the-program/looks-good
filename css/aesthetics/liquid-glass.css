@@ -389,9 +389,6 @@
 .ab.sb-ab[data-ae="liquid-glass"] .ab-card .ab-seg { margin-bottom: 18px; }
 .ab.sb-ab[data-ae="liquid-glass"] .ab-card.sb-stat { padding-top: 16px; }
 .ab.sb-ab[data-ae="liquid-glass"] .ab-list { border-radius: 28px; }
-/* Built > Mobile app home: the grouped list ends above the tab bar with its rounded corners showing; a third row
-   would be cut through by the bar */
-.ab.sb-ab[data-ae="liquid-glass"] .sb-home-list .ab-row:nth-child(n+3) { display: none; }
 .ab.sb-ab[data-ae="liquid-glass"] .ab-row + .ab-row { background: linear-gradient(rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0.5)) 16px 0 / calc(100% - 16px) 1px no-repeat; }
 .ab.sb-ab[data-ae="liquid-glass"] .ab-seg { background: var(--lgb-glass-hi); }
 .ab.sb-ab[data-ae="liquid-glass"] .ab-seg-btn:not([aria-pressed="true"]) { color: var(--ab-ink); }

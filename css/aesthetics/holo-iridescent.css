@@ -210,9 +210,6 @@
 
 /* Built product screens: the same restrained foil on the nav pill, the avatar and the stat card rims; text stays on solid pearl */
 .ab.sb-ab[data-ae="holo-iridescent"] .sb-navi[aria-current] { background: var(--ho-foil-s), var(--ab-pri-tint); box-shadow: inset 3px 0 0 var(--ab-primary), inset 0 0 0 1px rgba(255, 255, 255, 0.6); color: var(--ab-ink); }
-/* Built > Mobile app home: two rows (no status pills) fit above the tab bar; a third would be cut through by it */
-.ab.sb-ab[data-ae="holo-iridescent"] .sb-home-list .ab-row:nth-child(n+3) { display: none; }
-.ab.sb-ab[data-ae="holo-iridescent"] .sb-home-list .ab-row-status { display: none; }
 .ab.sb-ab[data-ae="holo-iridescent"] .sb-me-av { background: var(--ho-foil-s), var(--ab-chrome); color: var(--ab-chrome-ink); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.7); }
 
 @media (prefers-reduced-motion: reduce) {

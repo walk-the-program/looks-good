@@ -413,5 +413,3 @@
   .ab[data-ae="old-web"] .owa-uc small { display: none; }
   .ab[data-ae="old-web"] .owa-main > :nth-child(n + 2) { display: none; }
 }
-/* phone home: a list row cut by the tab bar fades out instead of being sliced mid-line */
-.ab.sb-ab[data-ae="old-web"] .sb-home-list { -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 26px), transparent); mask-image: linear-gradient(to bottom, #000 calc(100% - 26px), transparent); }

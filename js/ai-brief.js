@@ -289,6 +289,33 @@ function aibSetTarget(state, value) {
   } catch (err) { /* storage blocked: the choice lasts until reload */ }
 }
 
+/* ---------------- surface (App | Website | Both) ---------------- */
+
+// What is being built. An app gets the UI kit and no board art; a website gets the kit plus the
+// hero art and patterns. Stored per brand like the target, default App.
+const AIB_SURFACES = [
+  { value: 'app', label: 'App' },
+  { value: 'web', label: 'Website' },
+  { value: 'both', label: 'Both' },
+];
+const AIB_SURFACE_KEY = 'brandingDesigner.briefSurface';
+
+function aibGetSurface(state) {
+  try {
+    const v = localStorage.getItem(AIB_SURFACE_KEY + '.' + aibSlug(state)) || localStorage.getItem(AIB_SURFACE_KEY + '.default');
+    if (AIB_SURFACES.some(x => x.value === v)) return v;
+  } catch (err) { /* storage blocked: App */ }
+  return 'app';
+}
+
+function aibSetSurface(state, value) {
+  if (!AIB_SURFACES.some(x => x.value === value)) return;
+  try {
+    localStorage.setItem(AIB_SURFACE_KEY + '.' + aibSlug(state), value);
+    localStorage.setItem(AIB_SURFACE_KEY + '.default', value);
+  } catch (err) { /* storage blocked: the choice lasts until reload */ }
+}
+
 /* ---------------- context: everything the sections read ---------------- */
 
 // A material class derived from the aesthetic's own recipes, for any aesthetic that has no
@@ -416,6 +443,7 @@ function aibContext(state0, opts) {
   const view = abView(state0);
   const { state, def } = view;
   const target = AIB_TARGETS.some(x => x.value === opts.target) ? opts.target : aibGetTarget(state0);
+  const surface = AIB_SURFACES.some(x => x.value === opts.surface) ? opts.surface : aibGetSurface(state0);
   const build = aestheticBuild(def.key) || aibDeriveBuild(def);
   const only = build.modes && build.modes.only ? build.modes.only : null;
   const mode = only || (state.bgMode === 'dark' ? 'dark' : 'light');
@@ -435,13 +463,15 @@ function aibContext(state0, opts) {
     card: aibNum(rad.card) != null ? aibNum(rad.card) : rec.card,
   };
   const ctx = {
-    state0, state, def, view, target, build, only, mode, L, D, modes, cur, probe, ty, radius,
+    state0, state, def, view, target, surface, app: surface !== 'web', site: surface !== 'app', build, only, mode, L, D, modes, cur, probe, ty, radius,
     web: target !== 'swiftui', swift: target !== 'web', swiftOnly: target === 'swiftui',
     roles: colorRolesFor(state),
     content: aibContent(state),
     key: def.classicOf || def.key,
-    assets: opts.assets || aibPatternAssets(state0),
+    assets: surface === 'app' ? [] : (opts.assets || aibPatternAssets(state0)),
   };
+  // The phone layout and type section: every app, and any SwiftUI build.
+  ctx.phone = ctx.app || ctx.swift;
   ctx.brandName = String(ctx.content.brandName).replace(/\s+/g, ' ').trim();
   ctx.tagline = String(ctx.content.tagline).replace(/\s+/g, ' ').trim();
   ctx.rows = aibPaletteRows(ctx);
@@ -469,7 +499,12 @@ function aibPaletteRows(ctx) {
   const { roles, build, def, modes } = ctx;
   const rows = [];
   const add = (token, get, job, on) => rows.push({ token, get, job, on: on || [] });
-  const roleJob = k => `${roles[k].job}. Use: ${aibStrip(roles[k].use)}. Never: ${aibStrip(roles[k].never)}. Share ${roles[k].coverage}.`;
+  const plainUse = { canvas: 'The screen background', ink: 'Text and icons', primary: 'The main action', secondary: 'Supporting controls', accent: 'The one spark' };
+  const roleJob = k => {
+    const use = aibStrip(aibAppText(ctx, roles[k].use, plainUse[k]));
+    const never = aibStrip(aibAppText(ctx, roles[k].never, ''));
+    return `${roles[k].job}. Use: ${use}.${never ? ` Never: ${never}.` : ''} Share ${roles[k].coverage}.`;
+  };
   const printedNote = modes.some(m => m.t.printed)
     ? ` The brand primary is ${modes[0].t.primary}; ${def.name} prints it as this value, so use this one everywhere.` : '';
   add('--canvas', m => m.t.canvas, roleJob('canvas'), [['--ink', m => m.t.ink]]);
@@ -488,7 +523,7 @@ function aibPaletteRows(ctx) {
   add('--accent-ink', m => m.t.accentInk, 'The accent as text, shaded or tinted to 3:1 on the canvas. The highlight word only; never plain accent as text.', []);
   (build.fixedInks || []).forEach(ink => {
     if (!modes.every(m => aibInkValue(ink, m))) return;
-    const job = ink.decorativeOnly ? `Decorative only, never text or controls. ${ink.job}` : ink.job;
+    const job = ink.decorativeOnly ? `Decorative only, never text or controls. ${aibAppText(ctx, ink.job, '')}`.trim() : aibAppText(ctx, ink.job, 'A fixed colour of this look.');
     add(ink.token, m => aibInkValue(ink, m), job, ink.on ? [['--on-' + ink.token.replace(/^--/, ''), m => aibInkValue(ink, m, 'on')]] : []);
   });
   add('--pri-tint', m => m.t.priTint, 'Quiet primary wash: selected background, hover on primary-linked items.', [['--ink', m => m.t.ink]]);
@@ -576,17 +611,53 @@ function aibTypeScale(ctx) {
   ];
   rows.forEach(r => { r.ps = r.face ? aibPostScript(r.face, r.weight, r.italic) : null; });
   // Which family at which weights, for "Fonts to bundle".
-  const fams = [];
+  const fams = aibFamsOf(rows, []);
+  return { rows, fams, hw, bw, wantH, wantB, uiFace };
+}
+
+// Adds the rows' faces and weights to `fams` (a list of { face, weights, roles }); returns it.
+function aibFamsOf(rows, fams) {
   rows.forEach(r => {
     if (!r.face) return;
     let f = fams.find(x => x.face.name === r.face.name);
     if (!f) fams.push(f = { face: r.face, weights: [], italic: false, roles: {} });
     const wk = r.weight + (r.italic ? 'i' : '');
     if (!f.weights.some(x => x.key === wk)) f.weights.push({ key: wk, weight: r.weight, italic: r.italic, ps: r.ps });
-    (f.roles[wk] = f.roles[wk] || []).push(r.role);
+    const rl = (f.roles[wk] = f.roles[wk] || []);
+    if (rl.indexOf(r.role) < 0) rl.push(r.role);
   });
   fams.forEach(f => f.weights.sort((a, b) => a.weight - b.weight));
-  return { rows, fams, hw, bw, wantH, wantB, uiFace };
+  return fams;
+}
+
+const AIB_PHONE_STYLE = {
+  'Large title': 'largeTitle', 'Title': 'title', 'Title 2': 'title2', 'Headline': 'headline', 'Body': 'body',
+  'Callout': 'callout', 'Subhead': 'subheadline', 'Footnote': 'footnote', 'Caption': 'caption', 'Tab label': 'caption2',
+};
+
+// UI_KIT_PHONE's type rows with the brand's real display and body faces. Weights are ones the face
+// publishes (abWeightNear); an italic display treatment carries through to the display roles.
+function aibPhoneRows(ctx) {
+  if (ctx._phone) return ctx._phone;
+  if (typeof UI_KIT_PHONE === 'undefined' || !UI_KIT_PHONE || !Array.isArray(UI_KIT_PHONE.type)) return (ctx._phone = []);
+  const { state, scale } = ctx;
+  const italicDisplay = !!(scale.rows[0] && scale.rows[0].italic);
+  ctx._phone = UI_KIT_PHONE.type.map(r => {
+    const face = r.face === 'display' ? state.headingFont : state.bodyFont;
+    const weight = abWeightNear(face, r.weight);
+    const italic = r.face === 'display' && italicDisplay;
+    return { role: r.role, name: r.role.replace(/\s+/g, ''), face, size: r.size, line: r.line, weight, italic, display: r.face === 'display',
+      style: AIB_PHONE_STYLE[r.role] || 'body', ps: aibPostScript(face, weight, italic) };
+  });
+  return ctx._phone;
+}
+
+// The families to bundle: the measured scale's, plus the phone roles' when the brief has the phone section.
+// An app built in SwiftUI only (Theme.swift fonts are the phone roles) bundles the phone roles alone.
+function aibFamsFor(ctx) {
+  if (!ctx.phone || !aibPhoneRows(ctx).length) return ctx.scale.fams;
+  const base = ctx.app && ctx.swiftOnly ? [] : ctx.scale.fams.map(f => ({ face: f.face, italic: f.italic, weights: f.weights.map(w => Object.assign({}, w)), roles: Object.keys(f.roles).reduce((o, k) => (o[k] = f.roles[k].slice(), o), {}) }));
+  return aibFamsOf(aibPhoneRows(ctx), base);
 }
 
 function aibFontsUrl(fams) {
@@ -599,6 +670,54 @@ function aibFontsUrl(fams) {
 }
 
 
+/* ---------------- App text filter ---------------- */
+
+// Board-derived prose (summaries, token jobs, notes) talks about the brand board: bands, heroes, art, patterns.
+// An App-only brief drops those sentences and clauses; Website and Both keep the original text.
+const AIB_APP_ART = /\bbands?\b|hero|illustration|pattern|striation|texture|plate|\bdeck\b|poster|glow behind|art box|\bart\b/i;
+
+// Splits at commas and semicolons outside parentheses, keeping the separator in front of each clause.
+function aibClauses(s) {
+  const out = [];
+  let depth = 0, start = 0, sep = '';
+  for (let i = 0; i < s.length; i++) {
+    const c = s[i];
+    if (c === '(') depth++;
+    else if (c === ')') depth = Math.max(0, depth - 1);
+    else if (!depth && (c === ',' || c === ';') && s[i + 1] === ' ') {
+      out.push({ sep, text: s.slice(start, i) });
+      sep = c + ' ';
+      start = i + 2;
+      i++;
+    }
+  }
+  out.push({ sep, text: s.slice(start) });
+  return out;
+}
+
+// opts.subject: when the first clause of a sentence is art, the whole sentence goes (it is the subject).
+function aibAppText(ctx, text, fallback, opts) {
+  const src = String(text == null ? '' : text);
+  if (!ctx.app || ctx.site || !AIB_APP_ART.test(src)) return src;
+  const keepSentences = [];
+  src.replace(/([.!?])\s+/g, '$1\u0001').split('\u0001').forEach(sent => {
+    if (!AIB_APP_ART.test(sent)) { keepSentences.push(sent); return; }
+    const m = /[.!?]$/.exec(sent), end = m ? m[0] : '';
+    const clauses = aibClauses(m ? sent.slice(0, -1) : sent);
+    if (opts && opts.subject && AIB_APP_ART.test(clauses[0].text)) return;
+    const kept = [];
+    clauses.forEach(c => {
+      if (!AIB_APP_ART.test(c.text)) { kept.push(c); return; }
+      const parts = c.text.split(/\s+and\s+/).filter(x => !AIB_APP_ART.test(x));
+      if (parts.length) kept.push({ sep: c.sep, text: parts.join(' and ') });
+    });
+    if (!kept.length) return;
+    keepSentences.push(kept.map((c, i) => (i ? c.sep : '') + c.text).join('') + end);
+  });
+  const out = keepSentences.join(' ').trim();
+  return out || fallback || '';
+}
+
 /* ---------------- sections (each returns lines) ---------------- */
 
 const aibUnit = ctx => (ctx.swiftOnly ? 'pt' : ctx.web && ctx.swift ? 'px (pt in SwiftUI)' : 'px');
@@ -606,12 +725,23 @@ const aibCap = s => String(s).charAt(0).toUpperCase() + String(s).slice(1);
 
 function aibBrandLine(ctx) {
   const { def } = ctx;
-  return `${ctx.brandName}: ${ctx.tagline} Aesthetic: ${def.name} (${def.descriptor}; ${def.influences}). ${def.summary || ''}${def.motto ? ' ' + def.motto : ''}`;
+  const plain = `${def.name}'s look, carried through the product's controls, surfaces and type.`;
+  let summary = aibAppText(ctx, def.summary || '', plain, { subject: true });
+  // When the leading sentence was art, the plain line stands in for it (blends add "Mixed with X." after it).
+  if (summary !== (def.summary || '') && summary !== plain && !String(def.summary).startsWith(summary.split('. ')[0])) summary = plain + ' ' + summary;
+  return `${ctx.brandName}: ${ctx.tagline} Aesthetic: ${def.name} (${def.descriptor}; ${def.influences}). ${summary}${def.motto ? ' ' + def.motto : ''}`;
 }
 
 function aibSecBlend(ctx) {
   const { def, state } = ctx;
-  return def.blend && typeof blendBriefLines === 'function' ? blendBriefLines(state, def, ctx.cur.t) : [];
+  const lines = def.blend && typeof blendBriefLines === 'function' ? blendBriefLines(state, def, ctx.cur.t) : [];
+  if (!ctx.app) return lines;
+  // Art and Patterns are board, deck and landing-page channels: not used in the app.
+  return lines.map(l => {
+    const m = /^\| (Art|Patterns) \|/.exec(l);
+    if (!m) return l;
+    return ctx.site ? l.replace(/ \|$/, ' Website only. |') : `| ${m[1]} | — | Not used in the app (website and brand board only). |`;
+  });
 }
 
 function aibSecColors(ctx) {
@@ -632,8 +762,9 @@ function aibSecColors(ctx) {
 function aibHighlightRule(ctx) {
   const { def } = ctx;
   const kind = aibHighlightKind(def);
-  if (kind === 'band') return '- Headline highlight word, once per view: a band of `--accent` behind it with `--on-accent` text. Never accent-colored text.';
-  if (kind === 'custom') {
+  const appOnly = ctx.app && !ctx.site;
+  if (kind === 'band') return `- Headline highlight word, once per view: a ${appOnly ? 'block' : 'band'} of \`--accent\` behind it with \`--on-accent\` text. Never accent-colored text.`;
+  if (kind === 'custom' && !(appOnly && AIB_APP_ART.test(def.highlightNote || ''))) {
     return def.highlightNote
       ? '- Headline highlight word, once per view: ' + def.highlightNote.replace(/\s*Use it once per view\.?$/, '') + ' Never plain `--accent` as text.'
       : '- Headline highlight word, once per view: set in `--accent-ink`; never plain `--accent` as text.';
@@ -654,9 +785,104 @@ function aibSecComponents(ctx) {
   return ['## Components', aibTable(['Element', 'Fill', 'Text', 'Edge'], rows)];
 }
 
+/* ---- App UI rules, the UI kit, phone layout and type ---- */
+
+function aibSecAppRules(ctx) {
+  if (!ctx.app || typeof UI_KIT_SURFACES === 'undefined') return [];
+  const out = ['## App UI rules', UI_KIT_SURFACES.app.rule,
+    'The brand board, deck and landing page show art for the brand\'s identity and marketing; none of it belongs in the app.',
+    'Screens are composed from the UI kit and the phone layout below: pick the component for the need, set text in the type scale, and leave the rest to the tokens.'];
+  if (ctx.site) out.push(`Website (the other surface of this brief): ${UI_KIT_SURFACES.web.rule}`);
+  return out;
+}
+
+// One row of the UI kit table per UI_KIT item, from the same data as the Components table where a row exists.
+function aibKitRowData(ctx) {
+  const { def, cur } = ctx;
+  const P = (typeof UI_KIT_PHONE !== 'undefined' && UI_KIT_PHONE) || {};
+  const all = aibComponentRows(cur.t, def, cur.extras).map(r => r.map(c => String(c).replace(/--[a-z-]+ \(#[0-9a-f]{6}\)/i, ctx.rows.some(x => x.token === '--card') ? '--card' : '--canvas')));
+  const by = p => all.find(r => r[0].indexOf(p) === 0) || [p, '--canvas', '--ink', 'none'];
+  const card = by('Card'), prim = by('Primary button') && all.find(r => /^(Primary|Main) button/.test(r[0])) || by('Primary button');
+  const sec = by('Secondary button'), ghost = by('Ghost'), rest = by('Input field, rest'), foc = by('Input field, focus');
+  const segOn = by('Segmented control, selected'), tog = by('Toggle, on'), tag = by('Tag'), badge = by('Badge');
+  const prog = by('Progress'), listSel = by('List row, selected');
+  const edgeTok = card[3] === '--ink' ? '--ink' : '--line';
+  const r = ctx.radius, u = 'pt';
+  const cn = n => (n >= 999 ? 'pill' : n + u);
+  const corner = n => `corners ${cn(n)}`;
+  const hl = n => `${n}${u} high`;
+  const pill = corner(r.control);
+  const tap = P.tapTarget || 44;
+  
+  const edge = (e, c) => `${e === 'none' ? 'no edge' : e}; ${c}`;
+  return {
+    'btn-primary': [prim[1], prim[2], edge(prim[3], pill), `${hl(P.buttonHeight || 52)}, full width, min ${tap}pt wide`],
+    'btn-secondary': [sec[1], sec[2], edge(sec[3], pill), `${hl(P.buttonHeight || 52)}, full width`],
+    'btn-text': ['none', ghost[2], 'no edge', `label only, ${tap}pt hit area`],
+    'btn-destructive': ['none (pressed: --error at 12% over --canvas)', '--error', edge('1px --error', pill), `${hl(P.buttonHeight || 52)}`],
+    'btn-icon': ['none (pressed: `--sec-tint`)', '--ink (icon)', 'no edge', `24pt icon in a ${tap}x${tap}pt hit area`],
+    'field': [rest[1], rest[2], edge(`rest ${rest[3]}; focus ${foc[3]}; error 1px --error plus the message below in --error`, corner(r.field)), `${hl(P.fieldHeight || 48)}; label above in Footnote, --muted`],
+    'search': [rest[1], '--ink (placeholder: --muted); leading icon --muted', edge(`rest ${rest[3]}; focus ${foc[3]}`, corner(r.field)), hl(P.fieldHeight || 48)],
+    'select': [rest[1], '--ink (value); chevron --muted', edge(`rest ${rest[3]}; open ${foc[3]}`, corner(r.field)), hl(P.fieldHeight || 48)],
+    'checkbox': [`off: ${rest[1]}; on: ${segOn[1]}`, `check mark ${segOn[2]}`, edge(`off ${rest[3]}; on ${segOn[3]}`, `corners ${Math.min(r.control, 6)}${u}`), `24pt box, ${tap}pt hit area`],
+    'radio': [`off: ${rest[1]}; on: ${segOn[1]}`, `dot ${segOn[2]}`, edge(`off ${rest[3]}; on ${segOn[3]}`, 'circle'), `24pt, ${tap}pt hit area`],
+    'toggle': [`on: ${tog[1]}; off: ${by('Toggle, off')[1]}`, '--ink (label beside it)', 'no edge; pill', `51x31pt, ${tap}pt hit area`],
+    'segmented': [`selected: ${segOn[1]}; unselected: transparent`, `selected ${segOn[2]}; unselected --muted`, edge(`selected ${segOn[3]}`, corner(r.control)), `${hl(tap)}, equal-width segments`],
+    'slider': [`track --line; filled part ${'--primary'}`, 'n/a', edge('thumb --primary', 'pill track'), `4pt track, 28pt thumb, ${tap}pt hit area`],
+    'card': [card[1], card[2], edge(card[3] === 'none' ? 'none' : '1px ' + card[3], corner(r.card)), `padding ${P.cardPadding || 20}pt`],
+    'list': [`${card[1]}; selected: ${listSel[1]}`, '--ink (meta and chevron: --muted)', edge(`bottom 1px --line between rows; selected: ${listSel[3]}`, 'rows share the list\'s ' + corner(r.card)), `${hl(P.rowHeight || 52)}, full width`],
+    'callout': ['info --pri-tint; success --sec-tint; warning --accent at 15% over --canvas; error --error at 12% over --canvas', '--ink (message), with an icon and a label word so status is never colour alone', edge(`1px ${edgeTok} (error: 1px --error)`, corner(r.card)), 'padding 16pt, full width'],
+    'sheet': [card[1], card[2], edge(card[3] === 'none' ? 'none' : '1px ' + card[3], `${corner(r.card)} on the top corners`), `padding ${P.cardPadding || 20}pt; grabber 36x5pt in --line; scrim --ink at 40%`],
+    'divider': ['--line', 'section label: --muted (Caption)', 'n/a', `1px; ${P.sectionGap || 28}pt above a section label`],
+    'topbar': ['--canvas', '--ink (title, icons)', 'bottom 1px --line once content scrolls under it', `${tap}pt bar under the status area; one Large title below it`],
+    'tabbar': ['--canvas', 'selected --ink with a small --primary pill under the label; unselected --muted', 'top 1px --line', `${P.tabBarHeight || 83}pt including the home indicator`],
+    'tabs': ['none', 'selected --ink; unselected --muted', 'selected: 2px --primary under the label', hl(tap)],
+    'badge': [`neutral: ${tag[1]}; accent: ${badge[1]}`, `neutral ${tag[2]}; accent ${badge[2]}`, edge('none', 'pill'), '20pt high, Caption text'],
+    'progress': [prog[1], 'n/a', edge(prog[3], 'pill'), '6pt high, full width'],
+    'toast': ['--ink', '--canvas', edge('none', corner(r.card)), `min 48pt high, ${P.margin || 20}pt from the side edges, gone after 3 s`],
+    'empty': ['none', 'title --ink (Title 2); message --muted (Subhead); icon --muted', 'n/a', 'centred; one primary button; ' + (ctx.site ? 'an icon, never an illustration' : 'an icon only')],
+    'avatar': ['--secondary', '--on-secondary (initials)', edge('none', 'circle'), '32, 40 or 56pt'],
+  };
+}
+
+function aibSecKit(ctx) {
+  if (typeof UI_KIT === 'undefined' || !Array.isArray(UI_KIT)) return aibSecComponents(ctx);
+  const data = aibKitRowData(ctx);
+  const out = ['## UI kit',
+    'Every control and container in the product is one of these components, drawn exactly as below. Fill, text and edge are tokens from Colors; corners and shadows come from Shape and materials; text sizes come from Phone layout and type. Sizes are points at the 390 x 844 reference screen (1pt = 1 CSS px). Every state follows the States table.'];
+  UI_KIT.forEach(g => {
+    const rows = g.items.map(it => {
+      const d = data[it.id] || ['--canvas', '--ink', 'none', ' '];
+      return [it.name, it.use, ...d.map(c => ctx.tok(c)), it.states.join(', ')];
+    });
+    out.push('', `### ${g.group}`, aibTable(['Element', 'Use', 'Fill', 'Text', 'Edge/Corner', 'Size', 'States'], rows));
+  });
+  return out;
+}
+
+function aibSecPhone(ctx) {
+  const rows = aibPhoneRows(ctx);
+  const P = (typeof UI_KIT_PHONE !== 'undefined' && UI_KIT_PHONE) || null;
+  if (!P || !rows.length) return [];
+  const out = ['## Phone layout and type'];
+  const head = ['Role', 'Face', 'Size pt', 'Line', 'Weight'].concat(ctx.swift ? ['SwiftUI style'] : []);
+  const body = rows.map(r => [r.role, r.face.name + (ctx.swift ? ` (\`${r.ps}\`)` : '') + (r.display ? ' (display)' : ' (body)'), r.size, r.line, r.weight + (r.italic ? ' italic' : '')].concat(ctx.swift ? ['.' + r.style] : []));
+  out.push(aibTable(head, body));
+  const note = ctx.scale.rows[0] && ctx.scale.rows[0].note;
+  if (note) out.push(`- Display roles (Large title, Title, Title 2): ${ctx.tok(note)}.`);
+  if (ctx.swift) out.push(ctx.app
+    ? '- Each role is a `Font.brand<Role>` in Theme.swift (for example `Font.brandLargeTitle`), a custom font that scales with Dynamic Type through its text style.'
+    : '- Build each role as `Font.custom(<PostScript name>, size: <Size>, relativeTo: <style>)` so it scales with Dynamic Type.');
+  out.push(`- Layout: ${P.margin}pt side margins on every screen. Spacing comes from ${P.spacing.join(', ')}pt only; ${P.sectionGap}pt between sections. Sizes: buttons ${P.buttonHeight}pt, fields ${P.fieldHeight}pt, list rows ${P.rowHeight}pt, card padding ${P.cardPadding}pt, tab bar ${P.tabBarHeight}pt, nothing tappable under ${P.tapTarget}pt.`);
+  out.push('- Support Dynamic Type; never let a word split or a label truncate; one Large title per screen.');
+  (Array.isArray(ctx.def.typeNotes) ? ctx.def.typeNotes : ctx.def.typeNotes ? [ctx.def.typeNotes] : []).forEach(n => out.push(`- ${aibFixWeights(ctx, n)}`));
+  return out;
+}
+
 function aibSecType(ctx) {
   const { def, scale } = ctx;
-  const out = ['## Type'];
+  if (ctx.app && !ctx.site && aibPhoneRows(ctx).length) return [];
+  const out = [ctx.app && aibPhoneRows(ctx).length ? '## Website type' : '## Type'];
   const head = ['Role', 'Face', 'Size', 'Weight', 'Notes'].concat(ctx.swift ? ['SwiftUI style'] : []);
   const rows = scale.rows.map(r => {
     const f = r.face ? r.face.name : 'System monospace (`ui-monospace`)';
@@ -722,9 +948,18 @@ function aibSecShape(ctx) {
   const u = aibUnit(ctx);
   const mat = aibMaterials(ctx);
   const out = ['## Shape and materials',
-    `${build.surface} Corners: controls ${radius.control}${u}, fields ${radius.field}${u}, cards ${radius.card}${u}${build.line ? `; outline ${build.line}${u}` : ''}${ctx.swift ? '; use `style: .continuous` on SwiftUI rounded shapes' : ''}.${mat.lines.length ? ' Recipes are CSS values; ' + (ctx.swiftOnly ? 'names are the tokens and values in this brief' : '`var()` names are the tokens and variables in this brief') + '.' : ''}`];
-  if (mat.lines.length) out.push(...mat.lines);
+    `${aibAppText(ctx, build.surface, '')} Corners: controls ${radius.control}${u}, fields ${radius.field}${u}, cards ${radius.card}${u}${build.line ? `; outline ${build.line}${u}` : ''}${ctx.swift ? '; use `style: .continuous` on SwiftUI rounded shapes' : ''}.${mat.lines.length ? ' Recipes are CSS values; ' + (ctx.swiftOnly ? 'names are the tokens and values in this brief' : '`var()` names are the tokens and variables in this brief') + '.' : ''}`];
+  // App screens take no art: recipes named for a hero, plate, band, pattern, texture, glow or illustration are
+  // website-only (listed apart for Both, left out for App).
+  const artLine = l => AIB_ART_RULE.test(((/^- \*\*([^*]*)\*\*/.exec(l)) || [])[1] || '') || /\bart\b/i.test(((/^- \*\*([^*]*)\*\*/.exec(l)) || [])[1] || '')
+    || /hero|illustration|striation|pattern|\bband\b/i.test(l.replace(/\/\*[\s\S]*?\*\//g, '').replace(/^- \*\*[^*]*\*\*/, ''));
+  // The CSS comment after a recipe describes the board; for App-only it goes through the same filter as other prose.
+  const appComment = l => (ctx.site ? l : l.replace(/\s*\/\*([\s\S]*?)\*\//g, (m, c) => { const t = aibAppText(ctx, c.trim(), ''); return t ? ` /* ${t} */` : ''; }));
+  const keepLines = ctx.app ? mat.lines.filter(l => !artLine(l)).map(appComment) : mat.lines;
+  const artLines = ctx.app ? mat.lines.filter(artLine) : [];
+  if (keepLines.length) out.push(...keepLines);
   else out.push('No special materials: flat fills from the tokens.');
+  if (ctx.site && artLines.length) out.push('', 'Website only (never in app screens):', ...artLines);
   if (ctx.swift) out.push('CSS to SwiftUI: a box-shadow blur B is `.shadow(radius: B/2)`; `inset` shadows use the `Recessed` modifier in Theme.swift; `linear-gradient(135deg, ...)` is `LinearGradient(startPoint: .topLeading, endPoint: .bottomTrailing)`; `rgba()` is `Color(.sRGB, red:, green:, blue:, opacity:)`; `backdrop-filter` is a SwiftUI `Material`.');
   return out;
 }
@@ -752,12 +987,12 @@ function aibSecStates(ctx) {
   const row = (name, colour, visual) => [name, ctx.tok(colour), ctx.tok(visual)];
   return ['## States',
     aibTable(['State', 'Colour', 'Visual'], [
-      row('Pressed', S.pressed[0], S.pressed[1]),
-      row('Disabled', S.disabled[0], S.disabled[1]),
+      row('Pressed', S.pressed[0], aibAppText(ctx, S.pressed[1], S.pressed[1])),
+      row('Disabled', S.disabled[0], aibAppText(ctx, S.disabled[1], S.disabled[1])),
       row('Focus', aibFocusColor(ctx), '3pt ring, 2pt gap, visible for keyboard, switch control and VoiceOver focus; never removed.'),
-      row('Empty', S.empty[0], S.empty[1]),
-      row('Loading', S.loading[0], S.loading[1] + ' Show it after 300 ms of waiting, with a text label for screen readers.'),
-      row('Error', S.error[0], S.error[1]),
+      row('Empty', S.empty[0], aibAppText(ctx, S.empty[1], 'One outline icon, a headline, one line of copy and one action on the plain canvas.')),
+      row('Loading', S.loading[0], aibAppText(ctx, S.loading[1], 'A progress indicator.') + ' Show it after 300 ms of waiting, with a text label for screen readers.'),
+      row('Error', S.error[0], aibAppText(ctx, S.error[1], S.error[1])),
     ])];
 }
 
@@ -826,29 +1061,36 @@ function aibSecAppIcon(ctx) {
 }
 
 function aibSecFonts(ctx) {
-  const { scale } = ctx;
+  const fams = aibFamsFor(ctx);
   const out = ['## Fonts to bundle'];
-  scale.fams.forEach(f => {
+  fams.forEach(f => {
     const ws = f.weights.map(w => `${w.weight}${w.italic ? ' italic' : ''} (${f.roles[w.key].join(', ')})${ctx.swift ? ' as `' + w.ps + '`' : ''}`).join(', ');
     out.push(`- ${f.face.name}: ${ws}.`);
   });
-  if (!scale.fams.length) out.push('- None: the system fonts only.');
-  if (ctx.web) out.push(`- Bundle exactly these weights and no others; the type scale uses no more. Web: ${aibFontsUrl(scale.fams)}`);
+  if (!fams.length) out.push('- None: the system fonts only.');
+  if (ctx.web) out.push(`- Bundle exactly these weights and no others; the type scale uses no more. Web: ${aibFontsUrl(fams)}`);
   if (ctx.swift) out.push((ctx.web ? '- SwiftUI' : '- Bundle exactly these weights and no others; the type scale uses no more. SwiftUI') + ': use static TTFs (the Google Fonts download, `static/` folder), add them to the target and list them under `UIAppFonts` (iOS) or `ATSApplicationFontsPath` (macOS). The names above are PostScript names.');
   return out;
 }
 
+const AIB_ART_RULE = /band|hero|pattern|texture|glow|illustration|plate|striation/i;
+
 function aibSecRules(ctx) {
   const r = ctx.def.rules || {};
-  return ['## Do and don\'t',
-    ...(r.do || []).map(x => `- Do: ${aibFixWeights(ctx, x)}`),
-    ...(r.dont || []).map(x => `- Don't: ${aibFixWeights(ctx, x)}`)];
+  const lines = [...(r.do || []).map(x => ['Do', x]), ...(r.dont || []).map(x => ['Don\'t', x])];
+  const fmt = l => `- ${l[0]}: ${aibFixWeights(ctx, l[1])}`;
+  if (!ctx.app) return ['## Do and don\'t', ...lines.map(fmt)];
+  const keep = lines.filter(l => !AIB_ART_RULE.test(l[1])), art = lines.filter(l => AIB_ART_RULE.test(l[1]));
+  const out = ['## Do and don\'t', ...keep.map(fmt)];
+  if (ctx.site && art.length) out.push('', 'Website only (never in app screens):', ...art.map(fmt));
+  return out;
 }
 
 function aibSecPatterns(ctx) {
   const items = ctx.assets;
   if (!items.length) return [];
   const out = ['## Patterns',
+    ...(ctx.app ? ['**Website only — never in app screens.**'] : []),
     'Files in `patterns/` (written by "Save brief + files"). Backgrounds and textures only: keep copy on a solid `--canvas` plate (4.5:1 or better), never on the pattern. Do not recolor or redraw them.'.replace(/`--canvas`/g, ctx.tok('`--canvas`'))];
   items.forEach(a => out.push(aibPatternLine(ctx, a)));
   return out;
@@ -881,7 +1123,9 @@ function aibCssLines(ctx, full) {
   const mv = aibMaterials(ctx).vars;
   for (let i = 0; i < mv.length; i += 2) lines.push('  ' + mv.slice(i, i + 2).map(([k, v]) => `${k}: ${v.length > 1 && v[0] !== v[1] ? `light-dark(${v[0]}, ${v[1]})` : v[0]};`).join(' '));
   lines.push(`  --font-heading: ${ctx.state.headingFont.css}; --font-body: ${ctx.state.bodyFont.css};`);
-  lines.push('  ' + scale.rows.map(r => `--text-${r.name.toLowerCase()}: ${r.size}px;`).join(' ') + ' --space: 4px 8px 12px 16px 24px 32px;');
+  const phoneRows = ctx.app ? aibPhoneRows(ctx) : [];
+  if (phoneRows.length) lines.push('  ' + phoneRows.map(r => `--text-${r.role.toLowerCase().replace(/\s+/g, '-')}: ${r.size}px;`).join(' ') + ' --space: ' + UI_KIT_PHONE.spacing.map(n => n + 'px').join(' ') + ';');
+  else lines.push('  ' + scale.rows.map(r => `--text-${r.name.toLowerCase()}: ${r.size}px;`).join(' ') + ' --space: 4px 8px 12px 16px 24px 32px;');
   lines.push(`  --radius-control: ${radius.control}px; --radius-field: ${radius.field}px; --radius-card: ${radius.card}px; --hit: 44px; --outline: ${build.line}px;`);
   if (sw === 'hard') lines.push(`  --shadow-rest: ${sh.x}px ${sh.y}px 0 var(--shadow); --shadow-pressed: 0 0 0 var(--shadow); --press: translate(${build.press.dx}px, ${build.press.dy}px);`);
   else if (sw === 'soft') lines.push(`  --shadow-rest: ${sh.d}px ${sh.d}px ${sh.blur}px var(--shadow-lo), -${sh.d}px -${sh.d}px ${sh.blur}px var(--shadow-hi); --shadow-pressed: inset ${sh.d}px ${sh.d}px ${sh.blur}px var(--shadow-lo), inset -${sh.d}px -${sh.d}px ${sh.blur}px var(--shadow-hi);`);
@@ -945,7 +1189,7 @@ function aibSwiftLines(ctx) {
   rowsAll.forEach(r => addColour(r.token, r.get, aibStrip(r.job).split('. ')[0].slice(0, 70)));
   rowsAll.forEach(r => r.on.forEach(([tk, g]) => addColour(tk, g, 'text or icon on the fill')));
   P('}', '', 'extension Font {');
-  scale.rows.forEach(r => {
+  (ctx.app && aibPhoneRows(ctx).length ? aibPhoneRows(ctx) : scale.rows).forEach(r => {
     const name = 'brand' + r.name;
     if (r.face) P(`    static let ${name} = Font.custom("${r.ps}", size: ${r.size}, relativeTo: .${r.style})`);
     else P(`    static let ${name} = Font.system(.${r.style}, design: .monospaced).weight(${AIB_SWIFT_WEIGHT[r.weight] || '.regular'})`);
@@ -958,9 +1202,13 @@ function aibSwiftLines(ctx) {
     `    static let radiusCard: CGFloat = ${radius.card}`,
     `    static let outline: CGFloat = ${build.line}`,
     '    static let hit: CGFloat = 44   // minimum tappable size',
+    ...(ctx.app && typeof UI_KIT_PHONE !== 'undefined' ? [
+      `    static let margin: CGFloat = ${UI_KIT_PHONE.margin}   // side margin of every screen`,
+      `    static let buttonHeight: CGFloat = ${UI_KIT_PHONE.buttonHeight}, fieldHeight: CGFloat = ${UI_KIT_PHONE.fieldHeight}, rowHeight: CGFloat = ${UI_KIT_PHONE.rowHeight}, cardPadding: CGFloat = ${UI_KIT_PHONE.cardPadding}`] : []),
     '}', '',
     'enum Spacing {',
     '    static let xs: CGFloat = 4, s: CGFloat = 8, m: CGFloat = 16, l: CGFloat = 24, xl: CGFloat = 32',
+    ...(ctx.app ? ['    static let sm: CGFloat = 12, ml: CGFloat = 20, xxl: CGFloat = 40, xxxl: CGFloat = 48'] : []),
     '}', '');
   const ease = n => AIB_SWIFT_EASE[mo.ease](n);
   P('enum Motion {',
@@ -1133,7 +1381,7 @@ function aibPatternLine(ctx, a) {
 
 // "Copy patterns only": the Patterns section on its own, to paste after an existing brief.
 function buildPatternsBrief(state0, opts) {
-  const ctx = aibContext(state0, Object.assign({ noProbe: true }, opts));
+  const ctx = aibContext(state0, Object.assign({ noProbe: true }, opts, { surface: 'web' }));
   const lines = aibSecPatterns(ctx);
   if (!lines.length) return '';
   return `Add this Patterns section to the ${ctx.brandName} build brief. Its colors are the tokens from that brief and every hex is final.\n\n` + lines.join('\n');
@@ -1141,7 +1389,7 @@ function buildPatternsBrief(state0, opts) {
 
 // One pattern's block (item i of state.patterns), for the per-item Copy in the cart.
 function buildPatternItemBrief(state0, i, opts) {
-  const ctx = aibContext(state0, Object.assign({ noProbe: true }, opts));
+  const ctx = aibContext(state0, Object.assign({ noProbe: true }, opts, { surface: 'web' }));
   const a = ctx.assets[i];
   if (!a) return '';
   return `Pattern for the ${ctx.brandName} build brief. Use the file as is, backgrounds and textures only, with copy on a solid ${ctx.tok('`--canvas`')} plate (4.5:1 or better).\n\n` + aibPatternLine(ctx, a);
@@ -1153,11 +1401,15 @@ function aibBuild(ctx) {
   const label = AIB_TARGETS.find(x => x.value === ctx.target).label;
   const blocks = [
     [`# ${ctx.brandName} — build brief`,
-      `Build the real product from this brief, not a mock-up. Every value is final: use only these colors, fonts, shapes and motion, and invent nothing; where something is missing, use the nearest listed token. Target: ${label}${ctx.target === 'web' ? ' (CSS)' : ctx.target === 'swiftui' ? ' (iOS 17 and macOS 14 or later)' : ' (CSS and SwiftUI)'}.`,
+      (ctx.app
+        ? 'Build the real product from this brief, not a mock-up. Every value is final: use only these colors, fonts, shapes and motion; where something is missing, use the nearest listed token. Screens are composed from the UI kit below, one component for each need; do not invent new component styles, and do not copy the brand board\'s layout. '
+        : 'Build the real product from this brief, not a mock-up. Every value is final: use only these colors, fonts, shapes and motion, and invent nothing; where something is missing, use the nearest listed token. ') + `Target: ${label}${ctx.target === 'web' ? ' (CSS)' : ctx.target === 'swiftui' ? ' (iOS 17 and macOS 14 or later)' : ' (CSS and SwiftUI)'}.`,
       aibBrandLine(ctx)],
+    aibSecAppRules(ctx),
     aibSecBlend(ctx),
     aibSecColors(ctx),
-    aibSecComponents(ctx),
+    ctx.app ? aibSecKit(ctx) : aibSecComponents(ctx),
+    ctx.phone ? aibSecPhone(ctx) : [],
     aibSecType(ctx),
     aibSecShape(ctx),
     aibSecModes(ctx),
@@ -1422,7 +1674,8 @@ async function aibPatternBytes(a) {
 
 // The files of "Save brief + files": BRIEF.md, tokens.css and/or Theme.swift, patterns/*.
 async function aibFiles(state0, opts) {
-  const assets = aibPatternAssets(state0);
+  const surf = AIB_SURFACES.some(x => x.value === (opts && opts.surface)) ? opts.surface : aibGetSurface(state0);
+  const assets = surf === 'app' ? [] : aibPatternAssets(state0);
   const files = [];
   for (const a of assets) {
     try { files.push({ name: null, a, data: await aibPatternBytes(a) }); } catch (err) { console.warn('brief files: pattern failed', a.entry.key, err); }

@@ -634,7 +634,8 @@ window.Show = window.Show || {};
 /* ---------------------------------------------------------------------
    AiBriefCopy — the sidebar's "Copy AI brief", in front of app.js's own handler.
 
-   - Injects, around #copyAiBrief: the Web | SwiftUI | Both picker (stored per brand
+   - Injects, around #copyAiBrief: the Building picker (App | Website | Both, see
+     aibSetSurface) and the Web | SwiftUI | Both picker (each stored per brand
      name in localStorage, see aibSetTarget), the resolve panel, and "Save brief + files".
    - A capture-phase click listener takes the Copy click first (stopImmediatePropagation),
      runs aibCheck(state) and either copies (buildAiBrief) or lists each problem with
@@ -647,7 +648,7 @@ window.AiBriefCopy = (function () {
   const $ = id => document.getElementById(id);
   const esc = s => escapeHtml(s);
   const toast = m => { if (typeof showToast === 'function') showToast(m); };
-  let panel = null, targetBox = null, saveBtn = null;
+  let panel = null, targetBox = null, surfaceBox = null, saveBtn = null;
   let pendingKind = null;
   let lastCount = 0;
 
@@ -672,6 +673,12 @@ window.AiBriefCopy = (function () {
     targetBox.innerHTML = `<span class="aibc-label" id="aibTargetLabel">Build for</span>
       <div class="segmented aibc-seg" role="radiogroup" aria-labelledby="aibTargetLabel">${AIB_TARGETS.map(t =>
         `<label title="${t.value === 'web' ? 'CSS variables' : t.value === 'swiftui' ? 'A Swift theme: Color, Font, shadows, button styles' : 'Both blocks in one brief'}"><input type="radio" name="aibTargetSel" value="${t.value}" /> ${esc(t.label)}</label>`).join('')}</div>`;
+    surfaceBox = document.createElement('div');
+    surfaceBox.id = 'aibSurface';
+    surfaceBox.className = 'aibc-row';
+    surfaceBox.innerHTML = `<span class="aibc-label" id="aibSurfaceLabel">Building</span>
+      <div class="segmented aibc-seg" role="radiogroup" aria-labelledby="aibSurfaceLabel">${(typeof AIB_SURFACES !== 'undefined' ? AIB_SURFACES : []).map(t =>
+        `<label title="${t.value === 'app' ? 'A phone app: the UI kit only, no board art or patterns' : t.value === 'web' ? 'A website: the UI kit plus hero art and patterns' : 'An app and its website: the kit, with art and patterns marked website-only'}"><input type="radio" name="aibSurfaceSel" value="${t.value}" /> ${esc(t.label)}</label>`).join('')}</div>`;
     saveBtn = document.createElement('button');
     saveBtn.type = 'button';
     saveBtn.id = 'saveAiBriefFiles';
@@ -679,10 +686,14 @@ window.AiBriefCopy = (function () {
     saveBtn.title = 'Download BRIEF.md, the token files and the brief\'s pattern files as one .zip';
     saveBtn.innerHTML = '<svg class="ico" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M21 21H3"/></svg>Save brief + files';
     foot.insertBefore(panel, copy);
+    foot.insertBefore(surfaceBox, copy);
     foot.insertBefore(targetBox, copy);
     foot.insertBefore(saveBtn, copy.nextSibling);
     targetBox.addEventListener('change', e => {
       if (e.target && e.target.name === 'aibTargetSel' && e.target.checked) { aibSetTarget(state, e.target.value); hidePanel(); }
+    });
+    surfaceBox.addEventListener('change', e => {
+      if (e.target && e.target.name === 'aibSurfaceSel' && e.target.checked) { aibSetSurface(state, e.target.value); hidePanel(); }
     });
     saveBtn.addEventListener('click', () => run('save'));
     panel.addEventListener('click', onPanelClick);
@@ -691,6 +702,10 @@ window.AiBriefCopy = (function () {
   }
 
   function syncTarget() {
+    if (surfaceBox && typeof aibGetSurface === 'function') {
+      const sv = aibGetSurface(state);
+      surfaceBox.querySelectorAll('input[name="aibSurfaceSel"]').forEach(r => { r.checked = r.value === sv; });
+    }
     if (!targetBox) return;
     const v = aibGetTarget(state);
     targetBox.querySelectorAll('input[name="aibTargetSel"]').forEach(r => { r.checked = r.value === v; });
@@ -751,7 +766,8 @@ window.AiBriefCopy = (function () {
   }
 
   function patternNote() {
-    const n = typeof PatternPins !== 'undefined' ? PatternPins.list().length : 0;
+    const app = typeof aibGetSurface === 'function' && aibGetSurface(state) === 'app';
+    const n = typeof PatternPins !== 'undefined' && !app ? PatternPins.list().length : 0;
     return n ? `, with ${n} ${n === 1 ? 'pattern' : 'patterns'}` : '';
   }
 

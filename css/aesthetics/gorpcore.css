@@ -306,5 +306,3 @@
   .ab[data-ae="gorpcore"] .gca-th b { font-size: calc(max(9px, 4.4cqw) * var(--gc-tag-k, 1)); }
   .ab[data-ae="gorpcore"] .gca-coord { max-width: 44%; white-space: normal; line-height: 1.25; }
 }
-/* phone home: a list row cut by the tab bar fades out instead of being sliced mid-line */
-.ab.sb-ab[data-ae="gorpcore"] .sb-home-list { -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 26px), transparent); mask-image: linear-gradient(to bottom, #000 calc(100% - 26px), transparent); }

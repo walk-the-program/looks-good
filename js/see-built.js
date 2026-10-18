@@ -3,8 +3,11 @@
 
    Renders the current brand (abView(): aesthetic, blend, classic version,
    pure ground, fonts, colours, logo) as realistic, clickable product screens:
-   a SaaS dashboard, a mobile app (onboarding + home), a landing page and a
-   settings page. Every branded screen sits in the board's own
+   the UI kit (every UI_KIT component and state, js/ui-kit.js), a SaaS
+   dashboard, a mobile app (welcome + home), a landing page and a settings
+   page. App screens (kit, dashboard, mobile, settings) are built from the kit
+   only and never draw board art; only the landing page uses art(). Phones are
+   laid out at UI_KIT_PHONE's 390 x 844 and scaled down as a whole device. Every branded screen sits in the board's own
    `.ab[data-ae]` root (abBoardParts(...).rootOpen) and uses the board's
    component classes (.ab-card, .ab-panel, .ab-seg, .ab-cta, .ab-input,
    .ab-toggle/.ab-switch, .ab-list/.ab-row, .ab-art, .ab-headline ...), so
@@ -19,6 +22,7 @@
 
 (function () {
   const KINDS = [
+    ['kit', 'UI kit'],
     ['dashboard', 'Dashboard'],
     ['mobile', 'Mobile app'],
     ['landing', 'Landing page'],
@@ -418,6 +422,16 @@
     heart: '<path d="M12 20s-7.5-4.6-7.5-10A4.3 4.3 0 0 1 12 7.4 4.3 4.3 0 0 1 19.5 10c0 5.4-7.5 10-7.5 10z"/>',
     user: '<circle cx="12" cy="8" r="4"/><path d="M4 21c1-4 4.2-6 8-6s7 2 8 6"/>',
     check: '<path d="m5 12.5 4.5 4.5L19 7.5"/>',
+    chev: '<path d="m9.5 6 6 6-6 6"/>',
+    back: '<path d="m14.5 6-6 6 6 6"/>',
+    down: '<path d="m6 9.5 6 6 6-6"/>',
+    more: '<circle cx="5.5" cy="12" r="1.2"/><circle cx="12" cy="12" r="1.2"/><circle cx="18.5" cy="12" r="1.2"/>',
+    plus: '<path d="M12 5v14M5 12h14"/>',
+    info: '<circle cx="12" cy="12" r="9"/><path d="M12 11v5.5M12 7.6v.2"/>',
+    ok: '<circle cx="12" cy="12" r="9"/><path d="m8 12.3 2.8 2.8L16.2 9.5"/>',
+    warn: '<path d="M12 3.5 21.5 20h-19z"/><path d="M12 10v4.5M12 17.2v.2"/>',
+    err: '<circle cx="12" cy="12" r="9"/><path d="m9 9 6 6M15 9l-6 6"/>',
+    inbox: '<path d="M3.5 13.5 6 5h12l2.5 8.5V19h-17z"/><path d="M3.5 13.5H9a3 3 0 0 0 6 0h5.5"/>',
   };
   const icon = (k, size = 18) => `<svg class="sb-ico" width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">${ICO[k] || ''}</svg>`;
   const NAV_ICONS = ['home', 'list', 'users', 'box', 'chart'];
@@ -542,25 +556,50 @@
 
   /* ---------------- 2. mobile app ---------------- */
 
+  // App screens are built from the UI kit only (js/ui-kit.js): no board art, patterns or
+  // plates. Each phone screen is laid out at the 390 x 844 reference in UI_KIT_PHONE points;
+  // css/see-built.css scales the whole device down to fit.
+
   function statusBar() {
     return `<div class="sb-statusbar" aria-hidden="true"><span>9:41</span><span class="sb-sb-r"><i class="sb-sig"></i><i class="sb-wifi"></i><i class="sb-bat"></i></span></div>`;
   }
 
+  // One kit list row: lead (icon tile or avatar), title and optional detail, trailing value.
+  function kRow(r) {
+    return `<li class="ab-row sb-k-row${r.picked ? ' is-picked' : ''}" tabindex="0">
+        <span class="sb-k-lead">${r.lead}</span>
+        <span class="sb-k-text"><span class="sb-k-title">${e(r.title)}</span>${r.sub ? `<span class="sb-k-sub">${e(r.sub)}</span>` : ''}</span>
+        ${r.trail != null ? `<span class="sb-k-trail">${r.trail}</span>` : ''}
+      </li>`;
+  }
+  const kList = rows => `<ul class="ab-list sb-k-list">${rows.map(kRow).join('')}</ul>`;
+  const kIco = k => `<span class="sb-k-ico">${icon(k, 18)}</span>`;
+  const kAv = (t, size = '') => `<span class="sb-k-av${size ? ' sb-k-av-' + size : ''}" aria-hidden="true">${e(t)}</span>`;
+  const chev = () => `<span class="sb-k-chev">${icon('chev', 16)}</span>`;
+  // A section label; `action` (e.g. 'See all') is a text button at its right end, `note` a plain label.
+  const kSection = (left, action, note) => `<div class="ab-labelrow sb-k-section"><span class="ab-label">${e(left)}</span>${action ? `<button type="button" class="sb-k-textbtn sb-k-see">${e(action)}</button>` : note ? `<span class="ab-label">${e(note)}</span>` : ''}</div>`;
+  const tabBar = (tabs) => `<nav class="sb-tabs" aria-label="App">${tabs.map((t, i) =>
+    `<button type="button" class="sb-tab"${i === 0 ? ' aria-current="page"' : ''}>${icon(TAB_ICONS[i], 24)}<span>${e(t)}</span></button>`).join('')}</nav>`;
+
   function mobileOnboard(X) {
     const M = X.D.mobile;
+    const feats = X.D.landing.features.slice(0, 3);
+    const ICONS = ['check', 'bell', 'heart'];
     return `<div class="sb-phone-in sb-onboard">
         ${statusBar()}
-        <div class="sb-ob-top"><div class="ab-brand">${brandMark(X)}</div><button type="button" class="sb-link">Skip</button></div>
-        <div class="sb-ob-art">${art(X, 'sb-ob-artbox')}</div>
-        <div class="sb-ob-copy">
-          <p class="ab-kicker">Welcome</p>
-          ${headline(X, M.welcome, ' sb-ob-h')}
-          <p class="ab-subcopy sb-ob-body">${e(M.body)}</p>
+        <div class="sb-ob-top"><div class="ab-brand">${brandMark(X)}</div><button type="button" class="sb-k-textbtn">Skip</button></div>
+        <div class="sb-ob-main">
+          <div class="sb-ob-copy">
+            <p class="ab-kicker">Welcome</p>
+            ${headline(X, M.welcome, ' sb-ob-h')}
+            <p class="ab-subcopy sb-ob-body">${e(M.body)}</p>
+          </div>
+          <div class="sb-ob-list">${kList(feats.map(([t], i) => ({ lead: kIco(ICONS[i]), title: t })))}</div>
         </div>
         <div class="sb-dots" aria-hidden="true"><i class="is-on"></i><i></i><i></i></div>
         <div class="sb-ob-actions">
-          ${cta('Get started', 'Setting things up')}
-          <button type="button" class="ab-type-apply sb-wide">I have an account</button>
+          ${cta('Get started', 'Setting things up', 'sb-k-btn')}
+          <button type="button" class="ab-type-apply sb-k-btn2">I have an account</button>
         </div>
         <div class="sb-homebar" aria-hidden="true"></div>
       </div>`;
@@ -571,21 +610,20 @@
     return `<div class="sb-phone-in sb-home">
         ${statusBar()}
         <div class="sb-home-top">
-          <div><p class="ab-kicker">${e(M.hello)}</p><h2 class="ab-card-title sb-home-h">Hi, ${e(X.me.split(' ')[0])}</h2></div>
-          <button type="button" class="ab-type-apply sb-icon-btn" aria-label="Notifications">${icon('bell', 17)}<i class="sb-badge" aria-hidden="true"></i></button>
+          <div class="sb-home-t"><p class="ab-kicker">${e(M.hello)}</p><h2 class="ab-card-title sb-home-h">Hi, ${e(X.me.split(' ')[0])}</h2></div>
+          <button type="button" class="ab-type-apply sb-icon-btn sb-k-iconbtn" aria-label="Notifications">${icon('bell', 20)}<i class="sb-badge" aria-hidden="true"></i></button>
         </div>
-        <div class="ab-card sb-home-card"${win(M.card[0])}>
+        <div class="ab-card sb-home-card sb-k-card"${win(M.card[0])}>
           ${seg(M.seg.map((s, i) => [String(i), s]), 0, 'mseg', 'Show')}
           <h3 class="ab-card-title">${e(M.card[0])}</h3>
           <p class="ab-card-body">${e(M.card[1])}</p>
-          ${cta(M.cta[0], M.cta[1])}
+          ${cta(M.cta[0], M.cta[1], 'sb-k-btn')}
         </div>
         <section class="sb-home-list" aria-label="${e(M.listTitle)}">
-          ${labelRow(num(1, M.listTitle), '')}
-          ${rowsHtml(M.rows)}
+          ${kSection(M.listTitle, 'See all')}
+          ${kList(M.rows.map(r => ({ lead: kAv(r[0][0], 's'), title: r[0], sub: r[1], trail: `${r[2]}%${chev()}` })))}
         </section>
-        <nav class="sb-tabs" aria-label="App">${M.tabs.map((t, i) =>
-          `<button type="button" class="sb-tab"${i === 0 ? ' aria-current="page"' : ''}>${icon(TAB_ICONS[i], 20)}<span>${e(t)}</span></button>`).join('')}</nav>
+        ${tabBar(M.tabs)}
         <div class="sb-homebar" aria-hidden="true"></div>
       </div>`;
   }
@@ -711,9 +749,122 @@
     </div>`;
   }
 
+  /* ---------------- 5. UI kit ---------------- */
+
+  // Every UI_KIT component (js/ui-kit.js) in every listed state, drawn from the board's own
+  // component classes plus the sb-k-* pieces in css/see-built.css, so the aesthetic styles it.
+  // Sizes come from UI_KIT_PHONE (custom properties set on #builtView by render()).
+  const kBtn = (cls, label, st) => `<button type="button" class="${cls}${st === 'pressed' ? ' is-pressed sb-k-pressed' : ''}"${st === 'disabled' ? ' disabled' : ''}>${label}</button>`;
+  const ctaInner = label => `<span class="ab-cta-label">${e(label)}</span><span class="ab-cta-arrow" aria-hidden="true"></span>`;
+
+  const KIT_SPEC = {
+    'btn-primary': (X, st) => kBtn('ab-cta sb-k-btn', ctaInner('Continue'), st),
+    'btn-secondary': (X, st) => kBtn('ab-type-apply sb-k-btn2', 'Not now', st),
+    'btn-text': (X, st) => kBtn('sb-k-textbtn', 'See all', st),
+    'btn-destructive': (X, st) => kBtn('sb-k-danger', 'Delete', st),
+    'btn-icon': (X, st) => kBtn('ab-type-apply sb-icon-btn sb-k-iconbtn', icon('bell', 20), st).replace('<button', '<button aria-label="Notifications"'),
+    field: (X, st) => {
+      const id = `${X.uid}-kf${++seq}`;
+      const val = st === 'error' ? 'hello@' : st === 'rest' ? '' : 'maya@' + slugOf(X.name) + '.com';
+      return `<div class="sb-field sb-k-field is-${st}"><label class="ab-fieldlabel" for="${id}">Email</label><input class="ab-input" id="${id}" type="text" value="${e(val)}" placeholder="you@example.com" autocomplete="off" spellcheck="false"${st === 'disabled' ? ' disabled' : ''}${st === 'error' ? ' aria-invalid="true"' : ''} />${st === 'error' ? '<p class="sb-k-help is-error">Enter a full email address.</p>' : ''}</div>`;
+    },
+    search: (X, st) => `<div class="sb-search sb-k-search is-${st}">${icon('search', 18)}<input class="ab-input" type="text" placeholder="${e(X.D.search)}" value="${st === 'focus' ? e(X.D.rows[0][0].split(' ')[0]) : ''}" aria-label="${e(X.D.search)}" autocomplete="off" /></div>`,
+    select: (X, st) => {
+      const opts = X.D.mobile.seg.concat(['Everything']);
+      return `<div class="sb-k-selectwrap"><p class="ab-fieldlabel">Show</p><button type="button" class="ab-input sb-k-select" aria-haspopup="listbox" aria-expanded="${st === 'open'}"><span>${e(opts[0])}</span>${icon('down', 18)}</button>${st === 'open' ? `<ul class="sb-k-menu" role="listbox">${opts.map((o, i) => `<li role="option" aria-selected="${i === 0}"><span>${e(o)}</span>${i === 0 ? icon('check', 18) : ''}</li>`).join('')}</ul>` : ''}</div>`;
+    },
+    checkbox: (X, st) => `<label class="sb-k-check"><input class="sb-k-box" type="checkbox"${st === 'on' ? ' checked' : ''} /><span>Email me receipts</span></label>`,
+    radio: (X, st) => `<label class="sb-k-check"><input class="sb-k-box" type="radio" name="${X.uid}-kr${++seq}"${st === 'on' ? ' checked' : ''} /><span>${st === 'on' ? 'Weekly' : 'Daily'}</span></label>`,
+    toggle: (X, st) => toggle(X, 'Push notifications', st === 'on'),
+    segmented: (X) => seg(X.D.mobile.seg.concat(['All']).map((s, i) => [String(i), s]), 0, 'kseg', 'Show'),
+    slider: () => `<div class="sb-k-slider"><div class="sb-k-slider-h"><span>Volume</span><span data-sb-range-out>60%</span></div><input class="sb-k-range" type="range" min="0" max="100" value="60" style="--v:60%" aria-label="Volume" /></div>`,
+    card: (X) => {
+      const M = X.D.mobile;
+      return `<div class="ab-card sb-k-card"${win(M.card[0])}>${seg(M.seg.map((s, i) => [String(i), s]), 0, 'kcseg', 'Show')}<h3 class="ab-card-title">${e(M.card[0])}</h3><p class="ab-card-body">${e(M.card[1])}</p>${cta(M.cta[0], M.cta[1], 'sb-k-btn')}</div>`;
+    },
+    list: (X, st) => {
+      const rows = X.D.mobile.rows.map((r, i) => ({ lead: kAv(r[0][0], 's'), title: r[0], sub: r[1], trail: `${r[2]}%${icon('chev', 16)}`, picked: st === 'pressed' && i === 1 }));
+      return kList(st === 'pressed' ? rows.slice(1, 2) : rows);
+    },
+    callout: (X, st) => {
+      const C = {
+        info: ['info', 'Heads up', 'Prices change on the first of next month.'],
+        success: ['ok', 'Saved', 'Your changes are live for everyone.'],
+        warning: ['warn', 'Almost full', 'You have used 90% of your storage.'],
+        error: ['err', 'Payment failed', 'Update your card to keep your plan.'],
+      }[st];
+      return `<div class="sb-k-callout" data-tone="${st}" role="${st === 'error' ? 'alert' : 'status'}">${icon(C[0], 20)}<div><b>${C[1]}</b><span>${C[2]}</span></div></div>`;
+    },
+    sheet: (X) => `<div class="sb-k-sheetbox"><div class="sb-k-sheet" role="dialog" aria-label="Leave without saving?"><span class="sb-k-grab" aria-hidden="true"></span><h3 class="ab-card-title sb-k-sheet-t">Leave without saving?</h3><p class="sb-k-sheet-b">Your changes to this ${e(X.D.listTitle.split(' ')[0].toLowerCase())} will be lost.</p><div class="sb-k-sheet-a">${kBtn('ab-cta sb-k-btn', ctaInner('Keep editing'))}${kBtn('ab-type-apply sb-k-btn2', 'Discard')}</div></div></div>`,
+    divider: (X) => `<div class="sb-k-divider">${kSection(X.D.mobile.listTitle, '', '3 items')}<p class="sb-k-para">Rows in a group sit under one section label.</p><div class="ab-rule"></div><p class="sb-k-para">A rule separates groups.</p></div>`,
+    topbar: () => `<div class="sb-k-topbar"><button type="button" class="sb-k-plain" aria-label="Back">${icon('back', 22)}</button><span class="sb-k-tb-title">Settings</span><button type="button" class="sb-k-plain" aria-label="More">${icon('more', 22)}</button></div>`,
+    tabbar: (X) => `<div class="sb-k-tabbarbox">${tabBar(X.D.mobile.tabs)}</div>`,
+    tabs: (X) => `<div class="sb-k-tabs" role="tablist">${['Overview', 'Activity', 'Members'].map((t, i) => `<button type="button" role="tab" aria-selected="${i === 0}">${t}</button>`).join('')}</div>`,
+    badge: (X, st) => st === 'accent'
+      ? `<div class="sb-k-row-inline"><span class="sb-k-badge">New</span><span class="sb-k-count is-accent">3</span><span class="sb-k-dotwrap">${icon('bell', 22)}<i class="sb-badge" aria-hidden="true"></i></span></div>`
+      : `<div class="sb-k-row-inline"><span class="ab-fit">Draft</span><span class="ab-fit" data-fit="match">${e(X.D.mobile.rows[0][1])}</span><span class="sb-k-count">12</span></div>`,
+    progress: () => `<div class="sb-k-progress"><div class="sb-k-slider-h"><span>Uploading 3 files</span><span>62%</span></div><span class="ab-row-bar sb-k-bar" role="progressbar" aria-valuenow="62" aria-valuemin="0" aria-valuemax="100"><i style="width:62%"></i></span></div>`,
+    toast: (X) => `<div class="sb-k-toast" role="status">${icon('check', 20)}<span>${e(X.D.mobile.cta[1])}</span><button type="button">Undo</button></div>`,
+    empty: (X) => `<div class="sb-k-empty"><span class="sb-k-emptyico" aria-hidden="true">${icon('inbox', 26)}</span><h3 class="ab-card-title sb-k-empty-t">Nothing here yet</h3><p class="sb-k-empty-b">When you add your first one, it shows up here.</p>${kBtn('ab-type-apply sb-k-btn2 sb-k-auto', icon('plus', 18) + '<span>' + e(X.D.action[0]) + '</span>')}</div>`,
+    avatar: (X) => {
+      const ppl = ['Maya Ortiz', 'Sam Okafor', 'Lena Fischer', 'Jonah Reyes'];
+      const ini = n => n.split(' ').map(w => w[0]).join('');
+      return `<div class="sb-k-row-inline">${kAv(ini(ppl[0]), 's')}${kAv(ini(ppl[1]))}${kAv(ini(ppl[2]), 'l')}<span class="sb-k-avs">${ppl.map(p => kAv(ini(p), 's')).join('')}</span></div>`;
+    },
+  };
+  // Components that read better across two grid columns.
+  const KIT_WIDE = new Set(['field', 'callout', 'list', 'sheet', 'tabbar', 'select']);
+  const KIT_ROLES = [
+    ['canvas', 'Canvas', 'Screen background'], ['ink', 'Ink', 'Text and icons'],
+    ['primary', 'Primary', 'The one main action, selected states'], ['secondary', 'Secondary', 'Supporting fills, avatars, tags'],
+    ['accent', 'Accent', 'Badges and highlights'],
+  ];
+
+  function kit(X) {
+    const groups = (typeof UI_KIT !== 'undefined' ? UI_KIT : []).map((g, gi) => `<section class="sb-k-group" aria-label="${e(g.group)}">
+        ${labelRow(num(gi + 1, g.group), `${g.items.length} components`)}
+        <div class="sb-k-grid">${g.items.map(it => {
+          const draw = KIT_SPEC[it.id];
+          const states = it.states.map(st => `<div class="sb-k-state"><div class="sb-k-spec">${draw ? draw(X, st) : ''}</div><span class="sb-k-slabel">${e(st)}</span></div>`).join('');
+          return `<article class="sb-k-cell${KIT_WIDE.has(it.id) ? ' is-wide' : ''}" data-k="${e(it.id)}">
+            <header class="sb-k-cell-h"><h3 class="sb-k-name">${e(it.name)}</h3><p class="sb-k-use">${e(it.use)}</p></header>
+            <div class="sb-k-states" data-n="${it.states.length}">${states}</div>
+          </article>`;
+        }).join('')}</div>
+      </section>`).join('');
+    const K = typeof UI_KIT_PHONE !== 'undefined' ? UI_KIT_PHONE : { type: [] };
+    const sample = r => r.face === 'display' ? X.D.mobile.welcome : r.size >= 16 ? X.D.mobile.card[1] : X.D.mobile.body;
+    const typeRows = K.type.map(r => `<div class="sb-k-type-row">
+        <div class="sb-k-type-meta"><b>${e(r.role)}</b><span>${r.size} / ${r.line} · ${r.face} face · ${r.weight}</span></div>
+        <p class="sb-k-type-sample" style="font-family:var(${r.face === 'display' ? '--ab-font-h' : '--ab-font-b'});font-size:${r.size}px;line-height:${r.line}px;font-weight:${r.weight}">${e(sample(r))}</p>
+      </div>`).join('');
+    const hexOf = k => X.mode === 'brand' ? (X.P.t && X.P.t[k]) || '' : (GENERIC_VARS['--ab-' + k] || '');
+    const swatches = KIT_ROLES.map(([k, name, job]) => `<div class="sb-k-swatch"><span class="sb-k-chip" style="background:var(--ab-${k})"></span><b>${name}</b><span>${job}</span><code>${e(String(hexOf(k)).toUpperCase())}</code></div>`).join('');
+    const sizes = K.margin ? `Screen ${K.screen.w} × ${K.screen.h} · margin ${K.margin} · button ${K.buttonHeight} · field ${K.fieldHeight} · row ${K.rowHeight} · card padding ${K.cardPadding} · section gap ${K.sectionGap} · tab bar ${K.tabBarHeight} · tap target ${K.tapTarget}` : '';
+    const rule = typeof UI_KIT_SURFACES !== 'undefined' ? UI_KIT_SURFACES.app.rule : '';
+    return `<div class="ab-in sb-kitpage" data-sb-kind="kit">
+      <header class="sb-k-head">
+        <p class="ab-kicker">${e(X.name)} · ${e(X.mode === 'brand' ? X.def.name : 'Generic')}</p>
+        <h2 class="ab-card-title sb-k-pagetitle">UI kit</h2>
+        <p class="sb-k-intro">${e(rule)}</p>
+      </header>
+      <div class="ab-rule"></div>
+      ${groups}
+      <section class="sb-k-group" aria-label="Phone type scale">
+        ${labelRow(num(6, 'Phone type scale'), 'points at 390 × 844')}
+        <div class="sb-k-typescale">${typeRows}</div>
+        <p class="sb-k-sizes">${e(sizes)}</p>
+      </section>
+      <section class="sb-k-group" aria-label="Colour roles">
+        ${labelRow(num(7, 'Colour roles'), '')}
+        <div class="sb-k-swatches">${swatches}</div>
+      </section>
+    </div>`;
+  }
+
   /* ---------------- assembly ---------------- */
 
-  const BUILDERS = { dashboard, landing, settings };
+  const BUILDERS = { dashboard, landing, settings, kit };
 
   // Generic look: system UI type, indigo action, white cards, soft grey borders.
   const GENERIC_VARS = {
@@ -732,13 +883,15 @@
   function screens(X, kind) {
     const open = X.mode === 'brand' ? cls => X.P.rootOpen('sb-ab ' + cls) : genericOpen;
     if (kind === 'mobile') {
-      const phone = (body, cap) => `<figure class="sb-phone"><div class="sb-phone-frame"><span class="sb-island" aria-hidden="true"></span>${open('sb-screen')}${body}</section></div><figcaption>${cap}</figcaption></figure>`;
+      // The screen is laid out at the true 390 x 844 reference and the whole device is scaled
+      // down (css --sb-phone-scale), so type, spacing and the frame keep real iPhone proportions.
+      const phone = (body, cap) => `<figure class="sb-phone"><div class="sb-dev"><div class="sb-phone-frame"><span class="sb-island" aria-hidden="true"></span>${open('sb-screen sb-kit')}${body}</section></div></div><figcaption>${cap}</figcaption></figure>`;
       // Under the before / after divider a pair of phones would put a different screen on each
       // side, so the comparison shows one phone (the home screen) split down the middle.
       if (SB.before) return `<div class="sb-phones">${phone(mobileHome(X), 'Home')}</div>`;
       return `<div class="sb-phones">${phone(mobileOnboard(X), 'Welcome')}${phone(mobileHome(X), 'Home')}</div>`;
     }
-    return `${open('sb-window')}${BUILDERS[kind](X)}</section>`;
+    return `${open(kind === 'kit' ? 'sb-window sb-kit' : 'sb-window')}${BUILDERS[kind](X)}</section>`;
   }
 
   function contextFor(mode) {
@@ -766,10 +919,29 @@
       </div>`;
   }
 
+  // UI_KIT_PHONE as custom properties (--k-margin, --k-btn, --k-body, --k-body-lh ...), so the
+  // contract in js/ui-kit.js is the one source of the phone and kit sizes in css/see-built.css.
+  function kitVars() {
+    if (typeof UI_KIT_PHONE === 'undefined') return {};
+    const K = UI_KIT_PHONE;
+    const v = {
+      '--k-margin': K.margin + 'px', '--k-btn': K.buttonHeight + 'px', '--k-field': K.fieldHeight + 'px',
+      '--k-row': K.rowHeight + 'px', '--k-cardpad': K.cardPadding + 'px', '--k-gap': K.sectionGap + 'px',
+      '--k-tab': K.tabBarHeight + 'px', '--k-tap': K.tapTarget + 'px',
+    };
+    K.type.forEach(r => {
+      const k = r.role.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+      v[`--k-${k}`] = r.size + 'px';
+      v[`--k-${k}-lh`] = r.line + 'px';
+    });
+    return v;
+  }
+
   function render() {
     const host = document.getElementById('builtView');
     if (!host) return;
     if (typeof setBoardFonts === 'function') setBoardFonts(host);
+    Object.entries(kitVars()).forEach(([k, val]) => host.style.setProperty(k, val));
     const brand = contextFor('brand');
     const brandHtml = screens(brand, SB.kind);
     let stage;
@@ -811,9 +983,26 @@
     if (document.fonts && document.fonts.ready) document.fonts.ready.then(fitStatsSoon);
   }
 
+  // A phone list ends on a whole row above the tab bar: rows that would run past the
+  // list's own box are left out instead of being cut mid-row.
+  function fitPhoneLists(host) {
+    host.querySelectorAll('.sb-home-list').forEach(sec => {
+      const rows = [...sec.querySelectorAll('.sb-k-row')];
+      rows.forEach(r => r.classList.remove('sb-k-cut'));
+      const box = sec.getBoundingClientRect();
+      if (!box.height) return;
+      const scale = sec.offsetHeight ? box.height / sec.offsetHeight : 1;
+      rows.forEach(r => {
+        const rb = r.getBoundingClientRect();
+        if ((rb.bottom - box.top) / scale > sec.clientHeight + 0.5) r.classList.add('sb-k-cut');
+      });
+    });
+  }
+
   // Stat values (and the chart total) never truncate: each one is scaled down until it
   // fits its card, in whatever case, tracking and face the aesthetic gives it.
   function fitStats(host) {
+    fitPhoneLists(host);
     host.querySelectorAll('.sb-num').forEach(el => {
       el.style.removeProperty('font-size');
       if (!el.clientWidth) return;
@@ -906,6 +1095,11 @@
         if (title) title.textContent = nav.dataset.title;
         return;
       }
+      const ktab = t.closest('.sb-k-tabs [role="tab"]');
+      if (ktab) {
+        ktab.parentElement.querySelectorAll('[role="tab"]').forEach(b => b.setAttribute('aria-selected', String(b === ktab)));
+        return;
+      }
       const tab = t.closest('.sb-tab');
       if (tab) {
         tab.parentElement.querySelectorAll('.sb-tab').forEach(b => { if (b === tab) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current'); });
@@ -964,6 +1158,13 @@
       ev.preventDefault();
       ev.stopPropagation();
       setSplit(next, host);
+    });
+    host.addEventListener('input', ev => {
+      const r = ev.target;
+      if (!r.classList || !r.classList.contains('sb-k-range')) return;
+      r.style.setProperty('--v', r.value + '%');
+      const out = r.parentElement.querySelector('[data-sb-range-out]');
+      if (out) out.textContent = r.value + '%';
     });
     host.addEventListener('change', ev => {
       const sw = ev.target;
@@ -1036,7 +1237,7 @@
 
   window.SeeBuilt = { render, kinds: KINDS.map(k => k[0]), domainFor };
   window.Show = window.Show || {};
-  // Show.built(kind): open the Built view, optionally at 'dashboard' | 'mobile' | 'landing' | 'settings'.
+  // Show.built(kind): open the Built view, optionally at 'kit' | 'dashboard' | 'mobile' | 'landing' | 'settings'.
   window.Show.built = function (kind) {
     if (kind && KINDS.some(k => k[0] === kind)) SB.kind = kind;
     if (typeof boardView !== 'undefined' && boardView === 'built') render();

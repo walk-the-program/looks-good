@@ -220,7 +220,8 @@ const PatternCart = (function () {
     }
     if (e.target.closest('#briefTrayClose')) return close(true);
     if (e.target.closest('#briefCopyFull')) {
-      const n = items().length;
+      const app = typeof aibGetSurface === 'function' && aibGetSurface(state) === 'app';
+      const n = app ? 0 : items().length;
       const note = window.AiBriefCopy ? window.AiBriefCopy.pendingNote() : '';
       return copy(buildAiBrief(state), (n ? `AI brief copied, with ${n} ${n === 1 ? 'pattern' : 'patterns'}` : 'AI brief copied') + note);
     }

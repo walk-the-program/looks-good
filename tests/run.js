@@ -640,6 +640,64 @@ check('paste: empty text', run(`extractColors('').length`) === 0, 'found colors 
   check('showcase: each brand has a small SVG logo', marks, 'logo svg');
 }
 
+/* ---- AI brief: Building choice and the UI kit section (js/ai-brief.js, js/ui-kit.js) ---- */
+
+{
+  const store = {};
+  const bc = vm.createContext({ console, localStorage: { getItem: k => (k in store ? store[k] : null), setItem: (k, v) => { store[k] = String(v); } } });
+  for (const f of ['js/ui-kit.js', 'js/ai-brief.js']) vm.runInContext(fs.readFileSync(path.join(root, f), 'utf8'), bc, { filename: f });
+  const B = code => vm.runInContext(code, bc);
+  const acme = '{ content: { brandName: "Acme" } }', zed = '{ content: { brandName: "Zed" } }';
+  check('brief: Building defaults to App', B(`aibGetSurface(${acme})`) === 'app', 'default');
+  B(`aibSetSurface(${acme}, 'both'); aibSetSurface(${zed}, 'bogus')`);
+  check('brief: Building is stored per brand and ignores unknown values', B(`aibGetSurface(${acme})`) === 'both' && B(`aibGetSurface(${zed})`) === 'both', 'surface');
+  B(`aibSetSurface(${zed}, 'web')`);
+  check('brief: another brand keeps its own Building choice', B(`aibGetSurface(${acme})`) === 'both' && B(`aibGetSurface(${zed})`) === 'web', 'per brand');
+  const items = B('UI_KIT.reduce((n, g) => n + g.items.length, 0)');
+  const miss = B(`(() => {
+    aibComponentRows = () => ['Card', 'Primary button', 'Secondary button', 'Ghost / tertiary link', 'Input field, rest', 'Input field, focus', 'Segmented control, selected',
+      'Toggle, on', 'Toggle, off', 'Tag / chip', 'Badge ("New", notification)', 'Progress / data bar', 'List row, selected'].map(n => [n, '--canvas', '--ink', 'none']);
+    const ctx = { def: {}, cur: { t: {}, extras: {} }, rows: [], radius: { control: 8, field: 8, card: 12 } };
+    const d = aibKitRowData(ctx);
+    return UI_KIT.reduce((a, g) => a.concat(g.items), []).filter(i => !d[i.id] || d[i.id].length !== 4).map(i => i.id).join();
+  })()`);
+  check(`brief: the kit table has a row for all ${items} UI_KIT items`, miss === '', 'missing: ' + miss);
+  const rule = B(`(() => { const out = aibSecAppRules({ app: true, site: false }); return out[0] + '|' + (out[1] === UI_KIT_SURFACES.app.rule) + '|' + /none of it belongs in the app/.test(out.join('\\n')); })()`);
+  check('brief: App UI rules carry the surface rule and the no-art line', rule === '## App UI rules|true|true', rule);
+  check('brief: a website-only brief has no App UI rules', B('aibSecAppRules({ app: false, site: true }).length') === 0, 'web');
+  const rules = B(`(() => {
+    const fx = (app, site) => aibSecRules({ app, site, def: { rules: { do: ['Use one hero band', 'Keep corners square'], dont: ['Add a glow behind titles'] } }, scale: { wantH: 0, wantB: 0 } }).join('\\n');
+    return [fx(true, false), fx(true, true), fx(false, true)];
+  })()`);
+  check('brief: App drops hero, band and glow rules', !/hero|glow/.test(rules[0]) && /square/.test(rules[0]), rules[0]);
+  check('brief: Both lists them under Website only', /Website only[\s\S]*hero band[\s\S]*glow/.test(rules[1]), rules[1]);
+  check('brief: Website keeps every rule where it was', /hero band[\s\S]*square[\s\S]*glow/.test(rules[2]) && !/Website only/.test(rules[2]), rules[2]);
+  // Board prose in an App-only brief: art sentences and clauses go, Website and Both keep the text.
+  const prose = B(`(() => {
+    const app = { app: true, site: false }, both = { app: true, site: true }, web = { app: false, site: true };
+    const use = 'The page: the headline sits on it in ink beside the band; white cards sit on it and carry the layered shadows.';
+    const list = 'The one solid pill CTA, switch "on", focus ring, progress bars and the first color of the striations.';
+    const sum = 'A soft mesh of luminous brand colour with fine striations and grain beside dark ink, carried into the product as gradient actions.';
+    return [aibAppText(app, use, 'x'), aibAppText(app, list, 'x'), aibAppText(app, 'The hero illustration over a pattern.', 'Screen background.'),
+      aibAppText(app, sum, 'fallback', { subject: true }), aibAppText(both, use, 'x') === use, aibAppText(web, use, 'x') === use,
+      aibAppText(app, 'Plain text with 4.5:1 contrast. Second sentence.', 'x')];
+  })()`);
+  check('brief: App text drops the clause about the band and keeps the rest', prose[0] === 'white cards sit on it and carry the layered shadows.', prose[0]);
+  check('brief: App text drops one item from a list', prose[1] === 'The one solid pill CTA, switch "on", focus ring, progress bars.', prose[1]);
+  check('brief: App text falls back to a plain description when nothing is left', prose[2] === 'Screen background.', prose[2]);
+  check('brief: App summary whose subject is art falls back whole', prose[3] === 'fallback', prose[3]);
+  check('brief: Both and Website keep the original text; clean text is untouched', prose[4] === true && prose[5] === true && prose[6] === 'Plain text with 4.5:1 contrast. Second sentence.', JSON.stringify(prose));
+  const blendRows = B(`(() => {
+    blendBriefLines = () => ['## Blend: X', '| Channel | Source | What it controls |', '| Art | B | hero art. |', '| Type | A | faces. |', '| Patterns | A + B | Suite. |'];
+    return [aibSecBlend({ app: true, site: false, def: { blend: {} }, state: {}, cur: { t: {} } }).join('\\n'),
+      aibSecBlend({ app: true, site: true, def: { blend: {} }, state: {}, cur: { t: {} } }).join('\\n'),
+      aibSecBlend({ app: false, site: true, def: { blend: {} }, state: {}, cur: { t: {} } }).join('\\n')];
+  })()`);
+  check('brief: App blend table marks Art and Patterns as not used in the app', /\| Art \| — \| Not used in the app \(website and brand board only\)\. \|/.test(blendRows[0]) && /\| Patterns \| — \| Not used in the app/.test(blendRows[0]) && /\| Type \| A \| faces\. \|/.test(blendRows[0]), blendRows[0]);
+  check('brief: Both appends Website only to the Art and Patterns rows', /hero art\. Website only\. \|/.test(blendRows[1]) && /Suite\. Website only\. \|/.test(blendRows[1]) && !/faces\. Website only/.test(blendRows[1]), blendRows[1]);
+  check('brief: Website blend table is unchanged', /\| Art \| B \| hero art\. \|/.test(blendRows[2]) && !/Website only|Not used/.test(blendRows[2]), blendRows[2]);
+}
+
 // Not run here (they need a real DOM): that blended tokens(t, state) see the view's fonts end to end, and the
 // render timings. They are covered by the in-browser sweeps in docs/round6/.
 

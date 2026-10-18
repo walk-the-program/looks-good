@@ -266,10 +266,7 @@
   background-image: linear-gradient(90deg, color-mix(in srgb, var(--ab-acid) 13%, transparent) 1px, transparent 1px), linear-gradient(0deg, color-mix(in srgb, var(--ab-clash) 8%, transparent) 1px, transparent 1px);
   background-size: calc((100% - 56px) / 12) 100%, 100% 44px; background-position: 28px 0, 0 0;
 }
-/* phone welcome: the stretched words share lines so the flyer keeps a readable height (it was squeezed to a stamp by a long name) */
-.ab.sb-ab[data-ae="acid-graphics"] .sb-ob-artbox :is(.aca-grid, .aca-spons) { display: none; }
-.ab.sb-ab[data-ae="acid-graphics"] .sb-ob-artbox .aca { padding-bottom: 4.2cqw; }
-.ab.sb-ab[data-ae="acid-graphics"] .ab-art.sb-ob-artbox { height: calc(100% - 8px); }
+/* phone welcome headline: the stretched words share lines */
 .ab.sb-ab[data-ae="acid-graphics"] .sb-ob-h .ach { display: block; }
 .ab.sb-ab[data-ae="acid-graphics"] .sb-ob-h .acl { display: inline-block; vertical-align: bottom; margin-right: 0.22em; }
 .ab.sb-ab[data-ae="acid-graphics"] .sb-top { position: relative; isolation: isolate; padding-top: 6px; }

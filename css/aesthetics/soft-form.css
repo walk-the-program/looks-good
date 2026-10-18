@@ -204,12 +204,6 @@
 }
 .ab[data-ae="soft-form"] .ab-row-bar i { height: 6px; border-radius: 3px; background: var(--ab-ink); opacity: 0.55; box-shadow: none; }
 
-/* Built > Mobile app home: the well must close above the tab bar. Two rows fit (name, number, percent and
-   progress channel; the status text goes), a third would be sliced by the bar. */
-.ab[data-ae="soft-form"] .sb-home-list .ab-row:nth-child(n+3) { display: none; }
-.ab[data-ae="soft-form"] .sb-home-list .ab-row-status { display: none; }
-.ab[data-ae="soft-form"] .sb-home-list .ab-row-bar { grid-row: 2; }
-
 /* narrow: the well stays the hero object and still bleeds off the edge */
 @container ab (max-width: 600px) {
   /* the progress channel gets its own full-width line under the name and status (it collapsed to a stub) */

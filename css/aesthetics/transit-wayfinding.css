@@ -338,13 +338,6 @@
 .ab.sb-ab[data-ae="transit-wayfinding"] .sb-lg-prev { border-top-color: var(--ab-route2); }
 /* the round bell button is an icon, not an "apply →" button: no arrow beside the bell */
 .ab.sb-ab[data-ae="transit-wayfinding"] .ab-type-apply.sb-icon-btn::after { content: none; }
-/* phone: the seg tabs and the list rows fit the 240px screen; a list row cut by the tab bar fades out */
-.ab.sb-ab[data-ae="transit-wayfinding"] .sb-home-card .ab-seg { gap: 8px 12px; }
-.ab.sb-ab[data-ae="transit-wayfinding"] .sb-home-card .ab-seg-btn { gap: 7px; font-size: 13px; }
-.ab.sb-ab[data-ae="transit-wayfinding"] .sb-home-card .ab-seg-btn::before { width: 24px; height: 24px; font-size: 12px; }
-.ab.sb-ab[data-ae="transit-wayfinding"] .sb-home-list .ab-row { padding: 9px 0; }
-.ab.sb-ab[data-ae="transit-wayfinding"] .sb-home-list .ab-row-name { font-size: 15px; }
-.ab.sb-ab[data-ae="transit-wayfinding"] .sb-home-list { -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 26px), transparent); mask-image: linear-gradient(to bottom, #000 calc(100% - 26px), transparent); }
 /* phone onboarding sign: the bullets sit on one line and the destination under them, wrapping only between words */
 @container (max-width: 260px) {
   .ab[data-ae="transit-wayfinding"] .twa-sign { flex-wrap: wrap; gap: 6px 12px; padding: 12px 14px 10px; }

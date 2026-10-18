@@ -336,11 +336,3 @@
 .ab[data-ae="micrographics"] .ab-type-cur b { font-weight: var(--ab-hw, 400); }
 .ab[data-ae="micrographics"].ab-slide .ab-deck-ptitle, .ab[data-ae="micrographics"].ab-slide .ab-deck-pchip { font-weight: var(--ab-hw, 400); }
 
-/* ---- Built view fixes (S5 sweep) ----
-   Phone onboarding plate: the spec caption under the glyph is clipped by the plate when the brand name is long
-   (it wraps to a third line), so keep each caption line on one line and ellipsise it; the QR/bars row has no room
-   here; the P.01/26 corner stamp collides with the BASELINE callout and the page marker. */
-.ab.sb-ab[data-ae="micrographics"] .sb-ob-artbox .mga-under { padding: 8px 10px; gap: 0; }
-.ab.sb-ab[data-ae="micrographics"] .sb-ob-artbox :is(.mga-under-r, .mga-under .mga-tab) { display: none; }
-.ab.sb-ab[data-ae="micrographics"] .sb-ob-artbox .mga-under .mga-h { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.5; }
-.ab.sb-ab[data-ae="micrographics"] .sb-ob-artbox .mga-c-br { display: none; }

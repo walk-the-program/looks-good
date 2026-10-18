@@ -290,11 +290,8 @@
 .ab.sb-ab.ab[data-ae="mid-century"] .sb-listsec .ab-labelrow .ab-label { color: var(--ab-ink); }
 /* the card header band sits above a card's own seg control */
 .ab.sb-ab.ab[data-ae="mid-century"] .sb-chart-head .ab-seg { margin-top: 0; }
-/* phone home: air between the greeting and the card's dotted band, and between the card and the
-   list label; the seg pill fits two long labels; a list row cut by the tab bar fades out */
-.ab.sb-ab.ab[data-ae="mid-century"] .ab-card.sb-home-card { margin: 22px 2px 24px; }
-.ab.sb-ab.ab[data-ae="mid-century"] .sb-home-card .ab-seg-btn { padding: 7px 10px; letter-spacing: 0.06em; }
-.ab.sb-ab.ab[data-ae="mid-century"] .sb-home-list { -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 26px), transparent); mask-image: linear-gradient(to bottom, #000 calc(100% - 26px), transparent); }
+/* phone home: the seg pill sets its long labels with a little tracking */
+.ab.sb-ab.ab[data-ae="mid-century"] .sb-home-card .ab-seg-btn { letter-spacing: 0.06em; }
 
 /* deck */
 .ab[data-ae="mid-century"].ab-slide .ab-deck-cell { border: 2px solid var(--mc-ink); border-radius: 18px 18px 18px 4px; background: var(--mc-card); }

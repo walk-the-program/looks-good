@@ -355,7 +355,3 @@
 /* ---- Built view fixes (S5 sweep) ----
    Sign in is a small ghost button: the crosshair glyph sits in the left padding, not over the S. */
 .ab.sb-ab[data-ae="blob-tracking"] .ab-type-apply.sb-signin { padding: 8px 14px 8px 36px; }
-/* Phone onboarding: the headline's class tab hangs above the box and the ID tab under the highlight word; the
-   kicker and body copy leave room for both instead of printing under them. */
-.ab.sb-ab[data-ae="blob-tracking"] .sb-ob-copy .ab-kicker { margin-bottom: 30px !important; }
-.ab.sb-ab[data-ae="blob-tracking"] .ab-subcopy.sb-ob-body { margin-top: 34px !important; }

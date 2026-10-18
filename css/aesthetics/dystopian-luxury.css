@@ -203,18 +203,7 @@
   .ab[data-ae="dystopian-luxury"] .ab-foot { letter-spacing: 0.02em; }
 }
 
-/* ---- Built > Mobile app, welcome screen: the art slot is 240px wide and about 290px tall. The plate(s)
-   and the label stack in flow, never overlapping, and the plate stays inside the screen's margins
-   so no letter is cropped at the sides. ---- */
-.ab[data-ae="dystopian-luxury"] .sb-ob-art .dl-art { display: flex; flex-direction: column; justify-content: center; gap: 14px; width: 100%; }
-.ab[data-ae="dystopian-luxury"] .sb-ob-art .dl-plate { margin-inline: 0; }
-.ab[data-ae="dystopian-luxury"] .sb-ob-art .dl-tag { display: grid; justify-self: start; width: 190px; padding: 14px 16px 12px; gap: 6px 10px; }
-.ab[data-ae="dystopian-luxury"] .sb-ob-art .dl-tag-sub { padding-top: 6px; }
 
-/* ---- Built > Mobile app, home screen: the ledger rows are two lines tall here (name, then status), so
-   only the first two fit above the tab bar; a third would be cut in half against it. ---- */
-.ab[data-ae="dystopian-luxury"] .sb-home-list .ab-row:nth-child(n+3) { display: none; }
-.ab[data-ae="dystopian-luxury"] .sb-home-list .ab-row:nth-child(2) { border-bottom: 1px solid var(--ab-dl-hair); }
 
 /* ---- deck ---- */
 .ab[data-ae="dystopian-luxury"].ab-slide[data-slide="cover"] .ab-deck-cover .ab-hero { padding: 0; }

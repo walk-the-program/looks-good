@@ -219,13 +219,6 @@
   content: "T+00:41:07"; margin-left: 14px; padding: 3px 8px 2px; border-radius: 4px; background: #0b0c0e; color: #f2f2ee; letter-spacing: 0.18em; font: 500 9px/1 var(--rf-mono);
 }
 .ab.sb-ab.ab[data-ae="retro-futurist"] .ab-type-apply.sb-icon-btn { border-radius: 50%; }
-/* Built > Mobile app. Welcome: the art slot is as short as 130px when the headline takes four lines, so the vertical
-   caption is set smaller and tighter (it was cut at both ends). Home: two rows fit above the tab bar without their
-   status line, so no row is sliced through by it. */
-.ab.sb-ab.ab[data-ae="retro-futurist"] .sb-ob-art .rfa-cap { font-size: 7px !important; letter-spacing: 0.16em !important; }
-.ab.sb-ab.ab[data-ae="retro-futurist"] .sb-home-list .ab-row:nth-child(n+3) { display: none; }
-.ab.sb-ab.ab[data-ae="retro-futurist"] .sb-home-list .ab-row-status { display: none; }
-.ab.sb-ab.ab[data-ae="retro-futurist"] .sb-home-list .ab-row:nth-child(2) { border-bottom: 1px solid var(--ab-rf-hair); }
 /* stats: a mono readout and a small dial per card */
 .ab.sb-ab.ab[data-ae="retro-futurist"] .ab-card.sb-stat { --dial: 72; }
 .ab.sb-ab.ab[data-ae="retro-futurist"] .sb-stats > .ab-card:nth-child(2) { --dial: 55; }
