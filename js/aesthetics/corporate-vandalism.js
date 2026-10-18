@@ -132,7 +132,7 @@ registerAesthetic({
         <div class="cva-bar"><i>${e(ctx.initial)}</i><b>${name}</b><span>FORM 27-B</span></div>
         <span class="cva-stk" aria-hidden="true"><b>VOID</b><i>where feelings</i></span>
         <div class="cva-body">
-          <p class="cva-class">UNCLASSIFIED // FOR INTERNAL FEELINGS ONLY</p>
+          <p class="cva-class">MEMO // FOR INTERNAL FEELINGS ONLY</p>
           <p class="cva-title">Notice of Compliance Review</p>
           <p class="cva-ref">Ref. 2291-B · Page 1 of 1 · Please retain</p>
           <p class="cva-fine">Pursuant to Section 4.2, all feelings remain the property of ${R('the Company')} and may be ${R('reassigned')} without notice.</p>

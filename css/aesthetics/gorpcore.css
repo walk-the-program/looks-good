@@ -132,6 +132,8 @@
 .ab[data-ae="gorpcore"] .ab-type-avoid { font-family: var(--gc-mono); font-size: 11px; }
 .ab[data-ae="gorpcore"] .ab-type-k { color: var(--ab-ink); }
 .ab[data-ae="gorpcore"] .ab-type-apply { border-radius: 6px; font-family: var(--ab-font-h); font-weight: var(--gc-hw, 800); text-transform: uppercase; letter-spacing: 0.04em; font-size: 14px; }
+/* the Built landing nav sits on the black Unigrid band: its secondary button reads paper-on-black (it was ink on black, 1.07:1) */
+.ab[data-ae="gorpcore"] .ab-head .ab-type-apply { color: #F2F0EA; border-color: #F2F0EA; }
 .ab[data-ae="gorpcore"] .ab-type-pair { font-family: var(--gc-mono); }
 
 /* ---- gear cards (01, 02): grommet, card label, 8px radius ---- */
@@ -180,8 +182,10 @@
 .ab[data-ae="gorpcore"] .ab-cta:focus-visible { outline: 2px dashed var(--ab-ink); outline-offset: 3px; }
 
 /* ---- 02 fabric: stencil label, unit suffix, side-release buckle, fabric swatches ---- */
-.ab[data-ae="gorpcore"] .ab-fieldlabel { display: flex; justify-content: space-between; font-family: var(--gc-stencil); font-size: 13px; letter-spacing: 0.08em; text-transform: uppercase; }
+.ab[data-ae="gorpcore"] .ab-fieldlabel { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 14px; justify-content: space-between; font-family: var(--gc-stencil); font-size: 13px; letter-spacing: 0.08em; text-transform: uppercase; }
 .ab[data-ae="gorpcore"] .ab-fieldlabel::after { content: "MAX 48 CHR"; font: 400 10px/1.5 var(--gc-mono); letter-spacing: 0.06em; color: var(--ab-muted); }
+/* two fields side by side are too narrow for the unit hint: it would wrap and push one input down */
+.ab[data-ae="gorpcore"] .sb-field-row .ab-fieldlabel::after { display: none; }
 .ab[data-ae="gorpcore"][data-ae] .ab-input { border: 1px solid var(--ab-ink); border-radius: 6px; background: var(--ab-canvas); padding: 12px 14px; font-size: 15px; font-weight: 500; }
 .ab[data-ae="gorpcore"][data-ae] .ab-input:focus { box-shadow: 0 0 0 3px color-mix(in srgb, var(--ab-shell) 45%, transparent); border-color: var(--ab-ink); }
 .ab[data-ae="gorpcore"] .ab-toggle { font-family: var(--ab-font-h); font-weight: var(--gc-bw, 700); text-transform: uppercase; letter-spacing: 0.05em; font-size: 14px; }

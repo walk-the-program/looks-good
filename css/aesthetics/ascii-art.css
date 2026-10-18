@@ -288,3 +288,4 @@
 .ab.sb-ab[data-ae="ascii-art"] .ab-card-title.sb-num { font-size: 22px; line-height: 1.2; }
 .ab.sb-ab[data-ae="ascii-art"] .sb-navi { padding-left: 2ch; padding-right: 2ch; }
 .ab.sb-ab[data-ae="ascii-art"] .ab-row { column-gap: 2ch; }
+.ab.sb-ab[data-ae="ascii-art"] .sb-me-av { color: var(--ab-canvas); }   /* the avatar initial on the quantised ANSI fill: canvas on #AA00AA is 5.7:1 (was ink at 2.9:1) */

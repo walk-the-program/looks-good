@@ -97,7 +97,7 @@ registerAesthetic({
   motto: 'Access is a privilege.',
   mode: 'light',
   slideShape: 'minimal',
-  labels: { material: 'Accession', states: ['Catalogued', 'Restricted', 'Classified'], statesKind: 'button' },
+  labels: { material: 'Accession', states: ['Catalogued', 'Private', 'Reserved'], statesKind: 'button' },
   layout: { hero: 'centered', palette: 'swatches', sections: 'asym' },
   type: { ui: 'sans', label: 'mono', display: 1 },
   highlight: 'custom',
@@ -225,7 +225,7 @@ registerAesthetic({
           <p class="dl-pp-line">Wool, unlined. One of one. Made to order.</p>
           <p class="dl-pp-price">Price on request</p>
           <span class="ab-cta"><span class="ab-cta-label">Request a viewing</span></span>
-          <p class="dl-pp-foot">Catalogued \u00B7 Restricted \u00B7 Classified</p>
+          <p class="dl-pp-foot">Catalogued \u00B7 Private \u00B7 Reserved</p>
         </div>
       </div>`;
     },
