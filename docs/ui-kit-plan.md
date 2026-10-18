@@ -29,4 +29,6 @@ Integration and verification: coordinator, in the browser preview (port 8090), a
 ## Status — shipped 2026-10-18
 All acceptance criteria verified in the browser (fresh cache) across all 35 aesthetics, two blends and a classic version: no art in phones or the UI kit tab, no text past the screen, landing keeps its art, logo stays readable (bare, or on white when its dark ink would vanish), Building App/Website/Both persists per brand, App briefs carry App UI rules + 26-item kit + phone type and no band/hero/pattern language, Website briefs unchanged. tests/run.js: 134 pass under a jsc shim; the classic-baseline check needs node (not installed) and did not run.
 
-Open follow-ups: native iOS controls vs custom in the brief; standard screen layouts (onboarding, list, detail, form, settings); dark-mode kit spec; rebuild Signl from a fresh App brief.
+Round 2 (same day): every UI_KIT item marked native (SwiftUI view, tint only) or custom; UI_KIT_SCREENS defines five layouts (onboarding, list, detail, form, settings) shown as kit-only phone mockups in the UI kit tab and as a "Screen layouts" section in App briefs; kit tables carry light/dark values.
+
+Open follow-up: rebuild Signl from a fresh App brief.

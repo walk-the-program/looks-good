@@ -565,9 +565,10 @@
   }
 
   // One kit list row: lead (icon tile or avatar), title and optional detail, trailing value.
+  // A row without a lead (label / value rows) drops the lead column.
   function kRow(r) {
-    return `<li class="ab-row sb-k-row${r.picked ? ' is-picked' : ''}" tabindex="0">
-        <span class="sb-k-lead">${r.lead}</span>
+    return `<li class="ab-row sb-k-row${r.picked ? ' is-picked' : ''}${r.lead ? '' : ' is-nolead'}" tabindex="0">
+        ${r.lead ? `<span class="sb-k-lead">${r.lead}</span>` : ''}
         <span class="sb-k-text"><span class="sb-k-title">${e(r.title)}</span>${r.sub ? `<span class="sb-k-sub">${e(r.sub)}</span>` : ''}</span>
         ${r.trail != null ? `<span class="sb-k-trail">${r.trail}</span>` : ''}
       </li>`;
@@ -757,6 +758,10 @@
   const kBtn = (cls, label, st) => `<button type="button" class="${cls}${st === 'pressed' ? ' is-pressed sb-k-pressed' : ''}"${st === 'disabled' ? ' disabled' : ''}>${label}</button>`;
   const ctaInner = label => `<span class="ab-cta-label">${e(label)}</span><span class="ab-cta-arrow" aria-hidden="true"></span>`;
 
+  // Top bar: leading control, centred title, trailing control; an empty side keeps its 44pt slot.
+  const kPlain = (k, label) => `<button type="button" class="sb-k-plain" aria-label="${e(label)}">${icon(k, 22)}</button>`;
+  const kTopbar = (lead, title, trail) => `<div class="sb-k-topbar">${lead || '<span></span>'}<span class="sb-k-tb-title">${title || ''}</span>${trail || '<span></span>'}</div>`;
+
   const KIT_SPEC = {
     'btn-primary': (X, st) => kBtn('ab-cta sb-k-btn', ctaInner('Continue'), st),
     'btn-secondary': (X, st) => kBtn('ab-type-apply sb-k-btn2', 'Not now', st),
@@ -797,7 +802,7 @@
     },
     sheet: (X) => `<div class="sb-k-sheetbox"><div class="sb-k-sheet" role="dialog" aria-label="Leave without saving?"><span class="sb-k-grab" aria-hidden="true"></span><h3 class="ab-card-title sb-k-sheet-t">Leave without saving?</h3><p class="sb-k-sheet-b">Your changes to this ${e(X.D.listTitle.split(' ')[0].toLowerCase())} will be lost.</p><div class="sb-k-sheet-a">${kBtn('ab-cta sb-k-btn', ctaInner('Keep editing'))}${kBtn('ab-type-apply sb-k-btn2', 'Discard')}</div></div></div>`,
     divider: (X) => `<div class="sb-k-divider">${kSection(X.D.mobile.listTitle, '', '3 items')}<p class="sb-k-para">Rows in a group sit under one section label.</p><div class="ab-rule"></div><p class="sb-k-para">A rule separates groups.</p></div>`,
-    topbar: () => `<div class="sb-k-topbar"><button type="button" class="sb-k-plain" aria-label="Back">${icon('back', 22)}</button><span class="sb-k-tb-title">Settings</span><button type="button" class="sb-k-plain" aria-label="More">${icon('more', 22)}</button></div>`,
+    topbar: () => kTopbar(kPlain('back', 'Back'), e('Settings'), kPlain('more', 'More')),
     tabbar: (X) => `<div class="sb-k-tabbarbox">${tabBar(X.D.mobile.tabs)}</div>`,
     tabs: (X) => `<div class="sb-k-tabs" role="tablist">${['Overview', 'Activity', 'Members'].map((t, i) => `<button type="button" role="tab" aria-selected="${i === 0}">${t}</button>`).join('')}</div>`,
     badge: (X, st) => st === 'accent'
@@ -820,6 +825,78 @@
     ['accent', 'Accent', 'Badges and highlights'],
   ];
 
+  // item.ios: 'native:<SwiftUI view>' (the system control, tinted) or 'custom' (drawn from tokens).
+  function iosTag(ios) {
+    if (!ios) return '';
+    const native = /^native:/.test(ios);
+    const view = native ? ios.slice(7).trim() : '';
+    return `<p class="sb-k-ios" data-ios="${native ? 'native' : 'custom'}"><span class="sb-k-ios-tag">${native ? 'Native' : 'Custom'}</span>${native ? `<code>${e(view)}</code>` : '<span>Drawn from the brand tokens</span>'}</p>`;
+  }
+
+  /* Screen layouts: one small phone per UI_KIT_SCREENS pattern, built strictly from its blocks
+     (UI_KIT ids, or 'title' / 'body' / 'section' type roles) with the same kit markup as the
+     Mobile app tab, at the 390 x 844 reference, scaled down as a whole device. No art. */
+  function screenBlocks(X, scr) {
+    const M = X.D.mobile;
+    const r0 = M.rows[0];
+    const lv = rows => kList(rows.map(([t, v]) => ({ title: t, trail: `${e(v)}${chev()}` })));
+    const sections = { settings: ['General', 'About'], list: [M.seg[0]], detail: ['Details'] }[scr.id] || ['Section'];
+    let nSec = 0, nList = 0, nField = 0;
+    const B = {
+      topbar: () => ({
+        onboarding: kTopbar('', `<span class="ab-brand sb-k-tb-brand">${brandMark(X)}</span>`, ''),
+        list: kTopbar('', '', kPlain('plus', X.D.action[0])),
+        detail: kTopbar(kPlain('back', 'Back'), '', kPlain('more', 'More')),
+        form: kTopbar(kPlain('back', 'Back'), '', ''),
+        settings: kTopbar(kPlain('back', 'Back'), '', ''),
+      }[scr.id] || kTopbar(kPlain('back', 'Back'), '', '')),
+      title: () => scr.id === 'onboarding' ? headline(X, M.welcome, ' sb-ob-h')
+        : `<h2 class="ab-card-title sb-k-ltitle">${e({ list: M.listTitle, detail: r0[0], form: X.D.action[0], settings: 'Settings' }[scr.id] || scr.name)}</h2>`,
+      body: () => `<p class="ab-subcopy sb-ob-body">${e(M.body)}</p>`,
+      section: () => kSection(sections[Math.min(nSec++, sections.length - 1)], '', scr.id === 'list' ? `${M.rows.length + X.D.rows.length} items` : ''),
+      list: () => {
+        const n = nList++;
+        if (scr.id === 'onboarding') return kList(X.D.landing.features.slice(0, 3).map(([t], i) => ({ lead: kIco(['check', 'bell', 'heart'][i]), title: t })));
+        if (scr.id === 'list') return kList(M.rows.concat(X.D.rows).map(r => ({ lead: kAv(r[0][0], 's'), title: r[0], sub: r[1], trail: `${r[2]}%${chev()}` })));
+        if (scr.id === 'detail') return lv([['Status', r0[1]], ['Owner', X.me], ['Updated', 'Today'], ['Progress', `${r0[2]}%`], [X.D.panel.field[0], X.D.panel.field[1]]]);
+        if (scr.id === 'settings') return n === 0 ? lv([['Name', X.me], ['Language', 'English']]) : lv([['Help', ''], ['Privacy', ''], ['Version', '2.4']]);
+        return kList(M.rows.map(r => ({ title: r[0], trail: chev() })));
+      },
+      'btn-primary': () => scr.id === 'onboarding' ? cta('Get started', 'Setting things up', 'sb-k-btn')
+        : scr.id === 'form' ? cta('Save', 'Saved', 'sb-k-btn') : cta(M.cta[0], M.cta[1], 'sb-k-btn'),
+      'btn-text': () => `<button type="button" class="sb-k-textbtn sb-k-center">I have an account</button>`,
+      'btn-destructive': () => kBtn('sb-k-danger', 'Sign out'),
+      search: () => KIT_SPEC.search(X, 'rest'),
+      segmented: () => KIT_SPEC.segmented(X),
+      badge: () => `<div class="sb-k-row-inline"><span class="ab-fit">${e(r0[1])}</span></div>`,
+      card: () => `<div class="ab-card sb-k-card"${win(r0[0])}><h3 class="ab-card-title">${r0[2]}% done</h3><p class="ab-card-body">${e(M.card[1])}</p></div>`,
+      field: () => nField++ === 0 ? field(X, 'Name', M.card[0], 'sb-k-field is-rest') : field(X, 'Details', M.card[1], 'sb-k-field is-rest'),
+      select: () => KIT_SPEC.select(X, 'rest'),
+      toggle: () => scr.id === 'settings' ? toggle(X, 'Notifications', true) : toggle(X, X.D.notify[0][0], true),
+      callout: () => KIT_SPEC.callout(X, 'info'),
+      tabbar: () => tabBar(M.tabs),
+    };
+    return scr.blocks.map(id => {
+      const draw = B[id] || (KIT_SPEC[id] ? () => KIT_SPEC[id](X, 'rest') : () => '');
+      const fill = id === 'list' && (scr.id === 'list' || scr.id === 'detail');
+      return `<div class="sb-k-blk${fill ? ' sb-k-fill' : ''}" data-blk="${e(id)}">${draw()}</div>`;
+    }).join('');
+  }
+
+  function kitScreens(X) {
+    const list = typeof UI_KIT_SCREENS !== 'undefined' ? UI_KIT_SCREENS : [];
+    return list.map(scr => `<figure class="sb-k-layout" data-scr="${e(scr.id)}">
+        <div class="sb-dev"><div class="sb-phone-frame"><span class="sb-island" aria-hidden="true"></span>
+          <div class="sb-k-scr" data-scr="${e(scr.id)}"><div class="sb-phone-in sb-k-scr-in">${statusBar()}${screenBlocks(X, scr)}<div class="sb-homebar" aria-hidden="true"></div></div></div>
+        </div></div>
+        <figcaption class="sb-k-layout-cap">
+          <h3 class="sb-k-name">${e(scr.name)}</h3>
+          <p class="sb-k-use">${e(scr.use)}</p>
+          <ul class="sb-k-rules">${scr.rules.map(r => `<li>${e(r)}</li>`).join('')}</ul>
+        </figcaption>
+      </figure>`).join('');
+  }
+
   function kit(X) {
     const groups = (typeof UI_KIT !== 'undefined' ? UI_KIT : []).map((g, gi) => `<section class="sb-k-group" aria-label="${e(g.group)}">
         ${labelRow(num(gi + 1, g.group), `${g.items.length} components`)}
@@ -827,7 +904,7 @@
           const draw = KIT_SPEC[it.id];
           const states = it.states.map(st => `<div class="sb-k-state"><div class="sb-k-spec">${draw ? draw(X, st) : ''}</div><span class="sb-k-slabel">${e(st)}</span></div>`).join('');
           return `<article class="sb-k-cell${KIT_WIDE.has(it.id) ? ' is-wide' : ''}" data-k="${e(it.id)}">
-            <header class="sb-k-cell-h"><h3 class="sb-k-name">${e(it.name)}</h3><p class="sb-k-use">${e(it.use)}</p></header>
+            <header class="sb-k-cell-h"><h3 class="sb-k-name">${e(it.name)}</h3><p class="sb-k-use">${e(it.use)}</p>${iosTag(it.ios)}</header>
             <div class="sb-k-states" data-n="${it.states.length}">${states}</div>
           </article>`;
         }).join('')}</div>
@@ -850,13 +927,17 @@
       </header>
       <div class="ab-rule"></div>
       ${groups}
+      <section class="sb-k-group" aria-label="Screen layouts">
+        ${labelRow(num(6, 'Screen layouts'), `${typeof UI_KIT_SCREENS !== 'undefined' ? UI_KIT_SCREENS.length : 0} patterns · 390 × 844`)}
+        <div class="sb-k-layouts">${kitScreens(X)}</div>
+      </section>
       <section class="sb-k-group" aria-label="Phone type scale">
-        ${labelRow(num(6, 'Phone type scale'), 'points at 390 × 844')}
+        ${labelRow(num(7, 'Phone type scale'), 'points at 390 × 844')}
         <div class="sb-k-typescale">${typeRows}</div>
         <p class="sb-k-sizes">${e(sizes)}</p>
       </section>
       <section class="sb-k-group" aria-label="Colour roles">
-        ${labelRow(num(7, 'Colour roles'), '')}
+        ${labelRow(num(8, 'Colour roles'), '')}
         <div class="sb-k-swatches">${swatches}</div>
       </section>
     </div>`;
@@ -986,7 +1067,7 @@
   // A phone list ends on a whole row above the tab bar: rows that would run past the
   // list's own box are left out instead of being cut mid-row.
   function fitPhoneLists(host) {
-    host.querySelectorAll('.sb-home-list').forEach(sec => {
+    host.querySelectorAll('.sb-home-list, .sb-k-fill').forEach(sec => {
       const rows = [...sec.querySelectorAll('.sb-k-row')];
       rows.forEach(r => r.classList.remove('sb-k-cut'));
       const box = sec.getBoundingClientRect();

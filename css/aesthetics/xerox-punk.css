@@ -345,3 +345,6 @@
    wall's ink (on a paper card it stays black) and every state keeps a visible edge. */
 .ab.sb-ab[data-ae="xerox-punk"].sb-kit .ab-input { border-bottom-color: var(--ab-ink); }
 .ab.sb-ab[data-ae="xerox-punk"].sb-kit .ab-card .ab-input { border-bottom-color: #111; }
+/* Kit screen layouts: labels and status tags on the wall take the wall's ink (on a paper card they stay black). */
+.ab.sb-ab[data-ae="xerox-punk"].sb-kit .sb-k-scr .sb-k-blk > :is(.sb-field, .sb-k-selectwrap) .ab-fieldlabel,
+.ab.sb-ab[data-ae="xerox-punk"].sb-kit .sb-k-scr .sb-k-blk > .sb-k-row-inline .ab-fit { color: var(--ab-ink); border-color: var(--ab-ink); }

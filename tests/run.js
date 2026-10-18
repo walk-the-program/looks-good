@@ -662,6 +662,22 @@ check('paste: empty text', run(`extractColors('').length`) === 0, 'found colors 
     return UI_KIT.reduce((a, g) => a.concat(g.items), []).filter(i => !d[i.id] || d[i.id].length !== 4).map(i => i.id).join();
   })()`);
   check(`brief: the kit table has a row for all ${items} UI_KIT items`, miss === '', 'missing: ' + miss);
+  // iOS column, screen layouts and dark pairs, from a stub context (aibComponentRows is already stubbed above).
+  const kitOut = B(`(() => {
+    const rows = [['--canvas', '#fff', '#111'], ['--ink', '#000', '#eee'], ['--line', '#ccc', '#ccc']].map(([token, l, d]) => ({ token, get: m => (m === 'dark' ? d : l) }));
+    const mk = (swift, modes) => ({ def: {}, cur: { t: {} , extras: {} }, rows, modes, swift, swiftOnly: false, app: true, radius: { control: 8, field: 8, card: 12 }, tok: s => String(s) });
+    const kit = c => aibSecKit(c).join('\\n');
+    return [kit(mk(true, ['light', 'dark'])), kit(mk(false, ['light', 'dark'])), kit(mk(true, ['light'])), aibSecScreens({ app: true }).join('\\n'), aibSecScreens({ app: false }).length];
+  })()`);
+  const nItems = +items, nNative = +B("UI_KIT.reduce((a, g) => a.concat(g.items), []).filter(i => /^native:/.test(i.ios)).length");
+  check('brief: SwiftUI target adds an iOS column with a row per kit item and the native/custom line',
+    /\| Element \| Use \| iOS \| Fill/.test(kitOut[0]) && (kitOut[0].match(/\| (Native `[^`]+`, tinted|Custom) \|/g) || []).length === nItems && (kitOut[0].match(/\| Native `/g) || []).length === nNative && /Native rows: use the system control/.test(kitOut[0]) && /\| Toggle \|[^\n]*Native `Toggle`, tinted/.test(kitOut[0]), kitOut[0].slice(0, 700));
+  check('brief: a Web-only target has no iOS column and no native/custom line', !/\| iOS \|/.test(kitOut[1]) && !/Native rows/.test(kitOut[1]), kitOut[1].slice(0, 400));
+  check('brief: kit Fill/Text show light and dark values where a dark palette exists', /--canvas \(#fff \/ #111\)/.test(kitOut[0]) && /--ink \(#000 \/ #eee\)/.test(kitOut[0]) && !/--line \(#/.test(kitOut[0]), kitOut[0].slice(0, 800));
+  check('brief: a single-palette brief keeps the kit cells without dark pairs', !/--canvas \(#/.test(kitOut[2]), kitOut[2].slice(0, 300));
+  check('brief: App briefs list all five screen layouts with numbered components and the closing line',
+    (kitOut[3].match(/^### /gm) || []).length === 5 && /^## Screen layouts/.test(kitOut[3]) && /### Onboarding[\s\S]*1\. Top bar\n2\. Large title\n3\. Body text/.test(kitOut[3]) && /Section label/.test(kitOut[3]) && /do not invent layouts with hero areas or decorative headers\.$/.test(kitOut[3]), kitOut[3].slice(0, 400));
+  check('brief: a Website-only brief has no screen layouts', kitOut[4] === 0, 'web');
   const rule = B(`(() => { const out = aibSecAppRules({ app: true, site: false }); return out[0] + '|' + (out[1] === UI_KIT_SURFACES.app.rule) + '|' + /none of it belongs in the app/.test(out.join('\\n')); })()`);
   check('brief: App UI rules carry the surface rule and the no-art line', rule === '## App UI rules|true|true', rule);
   check('brief: a website-only brief has no App UI rules', B('aibSecAppRules({ app: false, site: true }).length') === 0, 'web');

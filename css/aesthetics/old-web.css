@@ -413,3 +413,6 @@
   .ab[data-ae="old-web"] .owa-uc small { display: none; }
   .ab[data-ae="old-web"] .owa-main > :nth-child(n + 2) { display: none; }
 }
+/* Kit screen layouts (UI kit tab): titles and field labels sit on the dark desktop, not a grey window. */
+.ab.sb-ab[data-ae="old-web"].sb-kit .sb-k-scr .ab-card-title.sb-k-ltitle,
+.ab.sb-ab[data-ae="old-web"].sb-kit .sb-k-scr .ab-fieldlabel { color: var(--ab-ink); }

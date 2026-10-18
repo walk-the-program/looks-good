@@ -845,18 +845,48 @@ function aibKitRowData(ctx) {
   };
 }
 
+// Where a kit cell names a colour token and the brand ships two palettes, the first mention of each token
+// carries its light and dark values: `--card` (#fff / #1c1b1f). Same token-to-value map as the Colors table.
+function aibKitDark(ctx, cell) {
+  if (!ctx.modes || ctx.modes.length < 2 || !ctx.rows) return cell;
+  const seen = {};
+  return String(cell).replace(/--[a-z]+(?:-[a-z]+)*/g, tk => {
+    const r = ctx.rows.find(x => x.token === tk);
+    if (!r || seen[tk]) return tk;
+    seen[tk] = 1;
+    const v = ctx.modes.map(m => r.get(m));
+    return v[0] === v[1] ? tk : `${tk} (${v[0]} / ${v[1]})`;
+  });
+}
+
 function aibSecKit(ctx) {
   if (typeof UI_KIT === 'undefined' || !Array.isArray(UI_KIT)) return aibSecComponents(ctx);
   const data = aibKitRowData(ctx);
   const out = ['## UI kit',
     'Every control and container in the product is one of these components, drawn exactly as below. Fill, text and edge are tokens from Colors; corners and shadows come from Shape and materials; text sizes come from Phone layout and type. Sizes are points at the 390 x 844 reference screen (1pt = 1 CSS px). Every state follows the States table.'];
+  if (ctx.swift) out.push('Native rows: use the system control and only tint it (accent, track, label font); keep its size, motion and behaviour. Custom rows: draw them exactly as described.');
   UI_KIT.forEach(g => {
     const rows = g.items.map(it => {
       const d = data[it.id] || ['--canvas', '--ink', 'none', ' '];
-      return [it.name, it.use, ...d.map(c => ctx.tok(c)), it.states.join(', ')];
+      const cells = d.map((c, i) => ctx.tok(i < 3 ? aibKitDark(ctx, c) : c));
+      const ios = /^native:/.test(it.ios || '') ? `Native \`${it.ios.slice(7)}\`, tinted` : 'Custom';
+      return [it.name, it.use, ...(ctx.swift ? [ios] : []), ...cells, it.states.join(', ')];
     });
-    out.push('', `### ${g.group}`, aibTable(['Element', 'Use', 'Fill', 'Text', 'Edge/Corner', 'Size', 'States'], rows));
+    out.push('', `### ${g.group}`, aibTable(['Element', 'Use'].concat(ctx.swift ? ['iOS'] : [], ['Fill', 'Text', 'Edge/Corner', 'Size', 'States']), rows));
   });
+  return out;
+}
+
+// The five standard screen layouts from UI_KIT_SCREENS, blocks named by their UI_KIT component.
+function aibSecScreens(ctx) {
+  if (!ctx.app || typeof UI_KIT === 'undefined' || typeof UI_KIT_SCREENS === 'undefined' || !Array.isArray(UI_KIT_SCREENS)) return [];
+  const names = { title: 'Large title', body: 'Body text', section: 'Section label' };
+  UI_KIT.forEach(g => g.items.forEach(it => { names[it.id] = it.name; }));
+  const out = ['## Screen layouts'];
+  UI_KIT_SCREENS.forEach(sc => {
+    out.push('', `### ${sc.name}`, sc.use, '', ...sc.blocks.map((b, i) => `${i + 1}. ${names[b] || b}`), '', ...sc.rules.map(r => `- ${r}`));
+  });
+  out.push('', 'Every app screen is one of these five or a combination; do not invent layouts with hero areas or decorative headers.');
   return out;
 }
 
@@ -1409,6 +1439,7 @@ function aibBuild(ctx) {
     aibSecBlend(ctx),
     aibSecColors(ctx),
     ctx.app ? aibSecKit(ctx) : aibSecComponents(ctx),
+    aibSecScreens(ctx),
     ctx.phone ? aibSecPhone(ctx) : [],
     aibSecType(ctx),
     aibSecShape(ctx),

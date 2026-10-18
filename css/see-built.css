@@ -542,6 +542,56 @@
 .sb-k-swatch span { color: var(--k-muted); font-size: 12px; line-height: 1.4; }
 .sb-k-swatch code { font-size: 12px; color: var(--ab-ink); }
 
+/* Native / Custom tag on each component (UI_KIT item.ios). */
+.sb-k-ios { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; margin: 6px 0 0 !important; font-family: var(--ab-font-ui); font-size: 12px; line-height: 16px; color: var(--k-muted); text-transform: none; letter-spacing: 0; }
+.sb-k-ios-tag { display: inline-block; padding: 2px 8px; border: 1px solid var(--ab-line); border-radius: 999px; font-size: 11px; font-weight: 600; letter-spacing: 0.04em; color: var(--ab-ink); background: transparent; }
+.sb-k-ios[data-ios="native"] .sb-k-ios-tag { border-color: transparent; background: var(--ab-pri-tint); color: var(--ab-primary-text, var(--ab-ink)); }
+.sb-k-ios code { font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 12px; color: var(--ab-ink); overflow-wrap: anywhere; }
+
+/* Screen layouts: kit-only phones at 390 x 844, scaled down as a whole device. */
+.sb-k-layouts { --sb-phone-scale: 0.5; display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 16px; }
+.sb-k-layout { display: grid; align-content: start; justify-items: center; gap: 16px; min-width: 0; margin: 0; padding: 20px; border: 1px solid var(--ab-line); border-radius: min(var(--sb-r, 12px), 14px); background: color-mix(in srgb, var(--ab-ink) 2%, transparent); }
+.sb-k-layout-cap { display: grid; gap: 4px; justify-self: stretch; }
+.sb-k-rules { margin: 6px 0 0 !important; padding: 0 0 0 16px !important; list-style: disc; display: grid; gap: 4px; font-family: var(--ab-font-b); font-size: var(--k-footnote, 13px); line-height: var(--k-footnote-lh, 18px); color: var(--k-muted); text-transform: none; letter-spacing: 0; }
+.sb-k-rules li { margin: 0; padding: 0; }
+.sb-k-rules li::before { content: none; }
+/* The screen is its own size container, so cqw and @container ab rules resolve against the
+   390pt screen as they do on the Mobile app tab. */
+.sb-k-scr {
+  position: relative; width: 390px; height: 844px; border-radius: 54px; overflow: hidden;
+  container: ab / inline-size; background: var(--ab-canvas); color: var(--ab-ink); text-align: left;
+}
+.sb-k-scr-in { padding-bottom: 34px; }
+.sb-k-scr[data-scr="list"] .sb-k-scr-in { padding-bottom: 0; }
+.sb-k-blk { flex-shrink: 0; min-width: 0; }
+.sb-k-blk + .sb-k-blk { margin-top: 16px; }
+.sb-k-blk[data-blk="topbar"] + .sb-k-blk { margin-top: 12px; }
+.sb-k-blk[data-blk="section"] { margin-top: var(--k-gap, 28px); }
+.sb-k-blk[data-blk="section"] + .sb-k-blk { margin-top: 0; }
+.sb-k-blk[data-blk="title"] + .sb-k-blk[data-blk="body"] { margin-top: 12px; }
+.sb-k-blk[data-blk="btn-primary"] + .sb-k-blk[data-blk="btn-text"] { margin-top: 8px; display: grid; justify-items: center; }
+.sb-k-blk[data-blk="toggle"] { margin-top: 0; padding: 4px; border-bottom: 1px solid var(--ab-line); }
+.sb-k-scr[data-scr="form"] .sb-k-blk[data-blk="toggle"] { margin-top: 16px; }
+/* Onboarding: the content block centred between the top bar and the pinned actions. */
+.sb-k-scr[data-scr="onboarding"] .sb-k-blk[data-blk="title"] { margin-top: auto; }
+.sb-k-scr[data-scr="onboarding"] .sb-k-blk[data-blk="list"] { margin-top: var(--k-gap, 28px); margin-bottom: auto; }
+.sb-k-scr[data-scr="onboarding"] .sb-k-blk[data-blk="btn-primary"],
+.sb-k-scr[data-scr="form"] .sb-k-blk[data-blk="btn-primary"] { margin-top: auto; padding-top: 16px; }
+.sb-k-scr[data-scr="settings"] .sb-k-blk[data-blk="btn-destructive"] { margin-top: var(--k-gap, 28px); }
+/* A list that fills the space left ends on a whole row (fitPhoneLists) above what follows. */
+.sb-k-blk.sb-k-fill { flex: 1 1 auto; min-height: 0; overflow: hidden; padding-bottom: 12px; }
+.sb-k-blk.sb-k-fill + .sb-k-blk { margin-top: 0; }
+.sb-k-blk[data-blk="tabbar"] { margin: auto calc(-1 * var(--k-margin, 20px)) 0 !important; }
+.sb-k-blk[data-blk="tabbar"] .sb-tabs { margin: 0; }
+:is(.ab.sb-ab, .sb-gen).sb-kit .ab-card-title.sb-k-ltitle { margin: 0 !important; font-size: var(--k-large-title, 34px) !important; line-height: var(--k-large-title-lh, 41px) !important; overflow-wrap: normal; text-wrap: balance; }
+:is(.ab.sb-ab, .sb-gen).sb-kit .sb-k-scr .ab-card.sb-k-card .ab-card-title { margin-top: 0 !important; font-size: var(--k-title, 28px) !important; line-height: var(--k-title-lh, 34px) !important; }
+:is(.ab.sb-ab, .sb-gen).sb-kit .sb-k-scr .ab-card.sb-k-card { padding-top: var(--k-cardpad, 20px) !important; }
+:is(.ab.sb-ab, .sb-gen).sb-kit .sb-k-scr .sb-k-card .ab-card-body { margin-bottom: 0 !important; }
+:is(.ab.sb-ab, .sb-gen).sb-kit .sb-k-tb-brand { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-width: 0; max-width: 100%; font-size: var(--k-headline, 17px) !important; line-height: var(--k-headline-lh, 22px); }
+:is(.ab.sb-ab, .sb-gen).sb-kit .sb-k-tb-brand .ab-mark { width: 28px; height: 28px; }
+:is(.ab.sb-ab, .sb-gen).sb-kit .sb-k-tb-brand .ab-logo { max-height: 28px; max-width: 160px; }
+:is(.ab.sb-ab, .sb-gen).sb-kit .ab-row.sb-k-row.is-nolead { grid-template-columns: minmax(0, 1fr) auto !important; }
+
 /* ======================= Part 3: the generic twin ======================= */
 
 .sb-gen {
@@ -765,3 +815,5 @@
 /* Xerox Punk's hand-written "← this one." points at one thing: the featured plan. */
 .ab.sb-ab[data-ae="xerox-punk"] .ab-card-body::after { content: none; }
 .ab.sb-ab[data-ae="xerox-punk"] .sb-plan.is-featured .ab-card-body::after { content: "  ← this one."; }
+/* A board that turns its hero subcopy off still gets the body block on a kit screen. */
+:is(.ab.sb-ab, .sb-gen).sb-kit .sb-k-scr .ab-subcopy.sb-ob-body { display: block !important; }
