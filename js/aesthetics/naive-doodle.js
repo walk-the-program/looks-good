@@ -143,9 +143,9 @@ function ndKit(t, ink, c1, c3, seed) {
   kit['--nd-card'] = ndSvg(400, 300, P(ndLoopRect(5, 5, 390, 290, 18, 14), 1.7, 7));
   kit['--nd-btn'] = ndSvg(300, 52, P(ndLoopRect(4, 4, 292, 44, 16, 10), 1.1, 6));
   kit['--nd-ring'] = ndSvg(300, 80, P(ndArc(150, 41, 143, 35, 196, 392, -0.05), 1.4, 7) + P(ndArc(150, 39, 147, 37, 200, 120, 0.02), 1.1, 7, ink, 1.6));
-  kit['--nd-seg'] = ndSvg(300, 48, ndBoxSides(3, 4, 294, 40, 4, rnd).map(s => P(s, 0.9, 6)).join('')
-    + P([[100 + (rnd() - 0.5) * 3, 2], [100 + (rnd() - 0.5) * 3, 46]], 0.8, 6)
-    + P([[200 + (rnd() - 0.5) * 3, 3], [200 + (rnd() - 0.5) * 3, 46]], 0.8, 6));
+  // the outer box only; the walls between the options are drawn per button in the css (a fixed pair of walls at
+  // thirds cut through the labels of any two-option control and of unequal buttons)
+  kit['--nd-seg'] = ndSvg(300, 48, ndBoxSides(3, 4, 294, 40, 4, rnd).map(s => P(s, 0.9, 6)).join(''));
   kit['--nd-line'] = ndSvg(300, 10, P([[-2, 5], [302, 5.5]], 1.3, 6));
   kit['--nd-squig'] = ndSvg(120, 14, P(Array.from({ length: 25 }, (_, i) => [i * 5, 7 + Math.sin(i * 1.25) * 4.2]), 0.4, 3, t.accentInk, 2.8));
   kit['--nd-vrule'] = ndSvg(10, 400, `<path d="${ndD(Array.from({ length: 81 }, (_, i) => [5 + Math.sin(i * 5 / 400 * Math.PI * 6) * 1.6, i * 5]))}" ${ndPen(ink, 1.6)}/>`);

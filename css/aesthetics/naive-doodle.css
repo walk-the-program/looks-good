@@ -154,6 +154,9 @@
   font-family: var(--ab-font-h); font-size: 17px; line-height: 1; color: var(--ab-ink);
 }
 .ab[data-ae="naive-doodle"] .ab-seg-btn[aria-pressed="true"] { color: var(--nd-pencil); font-weight: 400; }
+/* a hand-drawn wall between neighbouring options, set in the gap so it never crosses a label */
+.ab[data-ae="naive-doodle"] .ab-seg-btn + .ab-seg-btn { background: linear-gradient(var(--nd-pencil), var(--nd-pencil)) 0 50% / 2.4px 74% no-repeat; padding-left: 14px; }
+.ab[data-ae="naive-doodle"] .ab-seg-btn { padding-right: 12px; white-space: nowrap; }
 /* hover on an unselected box: the crayon starts colouring it in (streaks only; the selected box gets the full crayon) */
 .ab[data-ae="naive-doodle"] .ab-seg-btn:not([aria-pressed="true"]):hover::before {
   content: ""; position: absolute; z-index: -1; inset: 4px 3px 2px 6px;
@@ -308,3 +311,8 @@
   .ab[data-ae="naive-doodle"] .ab-cta::before,
   .ab[data-ae="naive-doodle"] .ab-switch::before { transition: none; }
 }
+
+/* Built screens: the handwriting face reads small at the shared sizes (13px nav, 10.5px tab labels, 11px chart axis) */
+.ab.sb-ab[data-ae="naive-doodle"] .sb-navi { font-size: 16px; }
+.ab.sb-ab[data-ae="naive-doodle"] .sb-tab span { font-size: 13px; }
+.ab.sb-ab[data-ae="naive-doodle"] .sb-tab { padding-inline: 2px; }

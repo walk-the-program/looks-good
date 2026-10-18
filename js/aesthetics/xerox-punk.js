@@ -292,7 +292,7 @@ registerAesthetic({
     // the wall: torn poster remnants pasted over each other, at low contrast on the black
     const wall = `<div class="xpa-wall" aria-hidden="true">
         <span class="xpr xpr-1" style="background-image:${ph1}"></span>
-        <span class="xpr xpr-2"><b>${big}</b></span>
+        <span class="xpr xpr-2" style="--xpn-l:${big.length}"><b>${big}</b></span>
         <span class="xpr xpr-3"><i>Sat · doors 8pm · no fun</i><i>bring a friend · bring a copy</i><i>all ages · no gods</i></span>
         <span class="xpr xpr-4" style="background-image:${ph2}"></span>
       </div>`;

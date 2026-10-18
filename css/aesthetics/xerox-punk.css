@@ -88,10 +88,11 @@
 .ab[data-ae="xerox-punk"] .xpr { position: absolute; display: block; background: #D9D4C4 center / cover no-repeat; opacity: 0.22; }
 .ab[data-ae="xerox-punk"][data-mode="light"] .xpr { opacity: 0.32; mix-blend-mode: multiply; }
 .ab[data-ae="xerox-punk"] .xpr-1 { left: -3%; top: 4%; width: 30%; height: 92%; transform: rotate(-2deg); clip-path: polygon(0 3%, 18% 0, 41% 4%, 66% 1%, 100% 5%, 97% 38%, 100% 71%, 96% 100%, 61% 97%, 27% 100%, 0 96%, 3% 52%); }
-.ab[data-ae="xerox-punk"] .xpr-2 { left: 52%; top: -2%; width: 70%; height: 60%; display: flex; align-items: center; overflow: hidden; background: #E9E3D0; transform: rotate(1.4deg); clip-path: polygon(0 6%, 22% 0, 48% 5%, 100% 0, 100% 100%, 64% 94%, 33% 100%, 2% 93%); }
-.ab[data-ae="xerox-punk"] .xpr-2 b { display: block; margin-left: -2%; font: 400 30cqw/0.8 var(--ab-font-h); letter-spacing: -0.02em; color: #111; white-space: nowrap; text-transform: uppercase; }
+.ab[data-ae="xerox-punk"] .xpr-2 { left: 85.5%; top: 61.5%; width: 14.5%; height: 11%; display: flex; align-items: center; justify-content: center; overflow: hidden; background: #E9E3D0; transform: rotate(1.4deg); clip-path: polygon(0 6%, 22% 0, 48% 5%, 100% 0, 100% 100%, 64% 94%, 33% 100%, 2% 93%); }
+/* the giant name sits whole on its own scrap in the clear corner under the photo, sized to its length, never behind the photo */
+.ab[data-ae="xerox-punk"] .xpr-2 b { display: block; font: 400 min(9cqw, calc(23cqw / var(--xpn-l, 6)))/0.9 var(--ab-font-h); letter-spacing: -0.02em; color: #111; white-space: nowrap; text-transform: uppercase; }
 .ab[data-ae="xerox-punk"] .xpr-3 { left: 60%; bottom: -5%; width: 34%; height: 30%; display: flex; flex-direction: column; justify-content: center; gap: 0.5em; padding: 2% 3%; background: #E9E3D0; transform: rotate(-1.2deg); clip-path: polygon(0 0, 100% 4%, 98% 60%, 100% 100%, 0 97%, 2% 48%); }
-.ab[data-ae="xerox-punk"] .xpr-3 i { font: var(--xp-bw, 400) clamp(12px, 2.2cqw, 24px)/1 var(--xp-type); font-style: normal; text-transform: uppercase; letter-spacing: 0.04em; color: #111; white-space: nowrap; }
+.ab[data-ae="xerox-punk"] .xpr-3 i { font: var(--xp-bw, 400) clamp(10px, 1.7cqw, 18px)/1 var(--xp-type); font-style: normal; text-transform: uppercase; letter-spacing: 0.02em; color: #111; white-space: nowrap; }
 .ab[data-ae="xerox-punk"] .xpr-4 { left: 19%; top: 10%; width: 22%; height: 52%; opacity: 0.3; transform: rotate(3deg); clip-path: polygon(0 0, 62% 2%, 100% 34%, 98% 100%, 0 98%, 2% 50%); }
 .ab[data-ae="xerox-punk"] .xpa-main { position: relative; z-index: 2; min-width: 0; }
 .ab[data-ae="xerox-punk"] .ab-headline--custom { position: relative; z-index: 2; margin: 0; line-height: 1; text-transform: none; letter-spacing: 0; text-wrap: nowrap; overflow-wrap: normal; }
@@ -141,9 +142,27 @@
   .ab[data-ae="xerox-punk"] .xpa-cap { margin-bottom: 14px !important; }
   .ab[data-ae="xerox-punk"] .xpa-img b { font-size: 30cqw; }
   .ab[data-ae="xerox-punk"] .xpa-strip { position: relative; z-index: 1; margin: 0.8em 0 0; }
-  .ab[data-ae="xerox-punk"] .xpr-2 b { font-size: 42cqw; }
   .ab[data-ae="xerox-punk"] .xpr-3 { display: none; }
 }
+
+/* mobile welcome: the collage lives inside the phone's art box (whole name on its scrap, photo beside it, the strip below),
+   so no scrap lands on the kicker or the headline and the name never splits */
+.ab.sb-ab[data-ae="xerox-punk"] .sb-ob-artbox { width: 100%; max-width: 100%; max-height: none; aspect-ratio: auto; }
+.ab.sb-ab[data-ae="xerox-punk"] .sb-ob-artbox .xpa { display: block; position: relative; width: 100%; height: 100%; padding: 0; overflow: hidden; }
+.ab.sb-ab[data-ae="xerox-punk"] .sb-ob-artbox .xpa-wall { inset: 0; }
+.ab.sb-ab[data-ae="xerox-punk"] .sb-ob-artbox .xpr-1 { left: 0; top: 0; width: 24%; height: 100%; }
+.ab.sb-ab[data-ae="xerox-punk"] .sb-ob-artbox .xpr-4 { display: none; }
+.ab.sb-ab[data-ae="xerox-punk"] .sb-ob-artbox .xpr-2 { left: 10%; top: 0; width: 56%; height: 100%; }
+.ab.sb-ab[data-ae="xerox-punk"] .sb-ob-artbox .xpr-2 b { font-size: min(64px, calc(130px / var(--xpn-l, 6))); }
+.ab.sb-ab[data-ae="xerox-punk"] .sb-ob-artbox .xpa-main { display: none; }
+.ab.sb-ab[data-ae="xerox-punk"] .sb-ob-artbox .xpa-photo { position: absolute; right: 2%; top: 2px; bottom: 4px; width: 33%; margin: 0; z-index: 1; }
+.ab.sb-ab[data-ae="xerox-punk"] .sb-ob-artbox .xpa-img { height: 100%; aspect-ratio: auto; }
+.ab.sb-ab[data-ae="xerox-punk"] .sb-ob-artbox .xpa-img b { font-size: 36px; }
+.ab.sb-ab[data-ae="xerox-punk"] .sb-ob-artbox .xpa-cap { display: none; }
+
+/* the proof line sits on a pasted label, not straight on the halftone wall */
+.ab.sb-ab[data-ae="xerox-punk"] .sb-lhero .sb-proof { width: fit-content; padding: 3px 10px; background: #E9E3D0; color: #111; box-shadow: 1px 2px 0 rgba(0, 0, 0, 0.35); }
+.ab.sb-ab[data-ae="xerox-punk"] .sb-lhero .sb-proof * { color: #111; }
 
 /* palette: torn scraps held by tape */
 .ab[data-ae="xerox-punk"] .ab-swatch { position: relative; }
@@ -277,7 +296,8 @@
 
 @container ab (max-width: 600px) {
   .ab[data-ae="xerox-punk"][data-hero="centered"] .ab-hero { padding: 44px 0 24px; }
-  .ab[data-ae="xerox-punk"] .ab-row { grid-template-columns: 6ch minmax(0, 1fr) 4.5ch; }
+  .ab[data-ae="xerox-punk"] .ab-row { grid-template-columns: 4ch minmax(0, 1fr) 5ch; }
+  .ab[data-ae="xerox-punk"] .ab-row-name { max-width: 100%; font-size: 17px; overflow-wrap: anywhere; }
   .ab[data-ae="xerox-punk"] .ab-row-n { grid-row: 1 / span 2; align-self: start; }
   .ab[data-ae="xerox-punk"] .ab-tag { font-size: 9px; padding: 3px 6px; letter-spacing: 0.06em; }
   .ab[data-ae="xerox-punk"] .ab-foot::after { margin-left: 0; }

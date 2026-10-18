@@ -277,3 +277,10 @@
 
 /* Built mobile tab bar: the current tab is teletext cyan (the framework's primary text fell to 3:1 on black) */
 .ab.sb-ab[data-ae="pirate-broadcast"] .sb-tab[aria-current] { color: var(--ab-tt-cyan); }
+
+/* Built screens: panels carry no header row, so give the first line some air under the frame; the phone's welcome art is a
+   ~100px square, too small for the page header, Fastext row and message bar, which collided (frame grab only) */
+.ab.sb-ab[data-ae="pirate-broadcast"] :is(.sb-chart, .sb-quick) { padding-top: 16px; }
+.ab.sb-ab[data-ae="pirate-broadcast"] .sb-ob-artbox :is(.pba-row, .pba-msg) { display: none; }
+.ab.sb-ab[data-ae="pirate-broadcast"] .sb-ob-artbox .pba-gfx { inset: 6%; height: auto; }
+.ab.sb-ab[data-ae="pirate-broadcast"] .sb-ob-artbox .pba-grab { inset: 0; }
