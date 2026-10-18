@@ -17,10 +17,12 @@ function dlMark(t) {
 
 // The giant word: first word of the brand, uppercase, set so its full width is 102% of the
 // BOARD (the plate runs edge to edge; the right edge crops at most half a letter), then
-// cropped VERTICALLY: the top 70% of the cap height shows and the rest hides under the
-// plain ink strip. A horizontal crop at a letter boundary can spell an accidental word, a
-// vertical one never can. Returns the font size in viewBox units, the target width, the
+// cropped VERTICALLY: the top 88% of the cap height shows and the rest hides under the
+// plain ink strip. A deeper crop turns E into F and L into I (a name like TESSEL read
+// "TESSFI"); at 88% every bottom arm and foot keeps a visible stub, so any brand name still spells itself. Returns the font size in viewBox units, the target width, the
 // lengthAdjust mode and the strip's y (the plate's height follows the word).
+// share of the cap height that stays visible above the crop strip (see dlWordFit)
+const DL_SHOW = 0.88;
 function dlWordFit(state, word, maxFs) {
   const W = 200 * 1.02;
   let natural = 0;
@@ -38,7 +40,7 @@ function dlWordFit(state, word, maxFs) {
   // to the far edge left two letters at the two edges with a hole between
   if (fsFull > cap) { fs = cap; mode = 'none'; }
   else if (fsFull < 14) { fs = 14; }
-  const strip = 1.5 + 0.7 * 0.72 * fs;                 // 70% of the cap height shows above the strip
+  const strip = 1.5 + DL_SHOW * 0.72 * fs;             // 88% of the cap height shows above the strip
   return { fs, W, mode, strip };
 }
 
@@ -77,7 +79,7 @@ function dlPlate(state, word, ink, label, num, maxFs) {
   const fit = dlWordFit(state, word, maxFs);
   const strip = fit.strip;
   const h = strip + 8.5;
-  const baseline = (strip + 0.3 * 0.72 * fit.fs).toFixed(2);
+  const baseline = (strip + (1 - DL_SHOW) * 0.72 * fit.fs).toFixed(2);
   const lab = label ? `<text class="dl-strip" x="5" y="${(strip + 5.6).toFixed(2)}" fill="#F7F7F5">${label}</text>` : '';
   const no = num ? `<text class="dl-strip" x="195" y="${(strip + 5.6).toFixed(2)}" text-anchor="end" fill="#F7F7F5">${num}</text>` : '';
   return `<svg class="dl-plate-svg" viewBox="0 0 200 ${h.toFixed(2)}" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg" role="presentation">
@@ -150,7 +152,7 @@ registerAesthetic({
   },
 
   // "Accession": one enormous word in ink, fitted to 102% of the board's width and cropped
-  // vertically (top 70% visible) above a plain ink strip with no text; below it, at the right,
+  // vertically (top 88% visible) above a plain ink strip with no text; below it, at the right,
   // the only object: a blank white label held by four X stitches (no barcode, no dot).
   // Narrow boards show the word split at its middle syllable on two cropped plates instead
   // (CSS swaps .dl-wide / .dl-narrow) and the label is hidden. No classification or archive
@@ -182,7 +184,7 @@ registerAesthetic({
   rules: {
     do: [
       'Remove first: a tiny wordmark, vast empty space and at most three visible elements per zone.',
-      'Crop display type hard under a strip so only about 70 percent of its height shows (crop vertically, never at a letter boundary), and keep the labels small and exact.',
+      'Crop display type hard under a strip so about 88 percent of its height shows (never deeper: E turns into F and L into I), and keep the labels small and exact.',
       'One gesture: the brand word, cropped, edge to edge. Everything else is a 15px caption or smaller.',
       'Number items, not sections: accession year.sequence.part (2026.114.3) on one blank label; set it in a default typewriter face.',
       'Keep the neutrals near-pure and show the primary once per view, as a 6px square on the one action.',
