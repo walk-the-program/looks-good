@@ -3,7 +3,7 @@
    ranked suggestions out. Nothing here touches the DOM or mutates state.
 
    A suggestion is
-     { id, section: 'fonts'|'colors'|'shape'|'type', score,
+     { id, section: 'fonts'|'colors'|'type', score,
        text  (one short, specific sentence naming the real font or color),
        why   (one short clause),
        apply (a state patch) }
@@ -11,7 +11,7 @@
    A patch is plain data, applied by suggest-ui.js through the normal
    state path (so Undo works and the brand is marked unsaved):
      { headingFont?: name, bodyFont?: name, scheme?, colors?: {...},
-       shapePreset?: key, typography?: {...partial} }
+       typography?: {...partial} }
 
    Locked sections are never suggested for, dismissed ids are skipped, and
    anything that wouldn't change the current state is dropped.
@@ -25,8 +25,6 @@ const Suggest = (function () {
     'Righteous', 'Unbounded', 'Archivo Black', 'Dela Gothic One']);
   const NEUTRAL = new Set(['Inter', 'Geist', 'Archivo', 'IBM Plex Sans', 'DM Sans', 'Onest', 'Instrument Sans', 'Public Sans']);
   const HUMANIST = new Set(['Nunito Sans', 'Karla', 'Lato', 'Work Sans', 'Rubik', 'Figtree', 'Onest', 'Instrument Sans', 'Public Sans']);
-  const HIGH_CONTRAST_SERIF = new Set(['Playfair Display', 'Bodoni Moda', 'DM Serif Display', 'Cormorant Garamond',
-    'Abril Fatface', 'Italiana', 'Gloock', 'Yeseva One', 'Marcellus']);
   // Faces whose hairlines get thin at modest sizes.
   const THIN_DISPLAY = new Set(['Italiana', 'Cormorant Garamond', 'Bodoni Moda', 'Marcellus', 'Cinzel']);
 
@@ -248,26 +246,10 @@ const Suggest = (function () {
     return out;
   }
 
-  function shapeSuggestions(st) {
-    const H = st.headingFont;
-    const out = [];
-    const push = (key, text, why, score) => {
-      const p = SHAPE_PRESETS.find(x => x.key === key);
-      if (p) out.push({ id: `shape:${key}`, section: 'shape', score, text: text.replace('{p}', p.name), why, apply: { shapePreset: key } });
-    };
-    if (GEOMETRIC.has(H.name)) push('geometric', `${H.name} is geometric: try {p}`, 'Hard edges echo its circles and straight strokes.', 70);
-    else if (HIGH_CONTRAST_SERIF.has(H.name)) push('refined', `${H.name} is high contrast: try {p}`, 'Medium radii and light shadows stay out of its way.', 70);
-    else if (HUMANIST.has(H.name) || H.name === 'Righteous' || H.name === 'Rubik') push('soft', `${H.name} is rounded: try {p}`, 'Large radii match its soft terminals.', 70);
-    else if (H.category === 'mono') push('minimal', `${H.name} is technical: try {p}`, 'Sharp, flat shapes match a monospace voice.', 66);
-    else if (H.category === 'slab') push('classic', `${H.name} is sturdy: try {p}`, 'Small radii and subtle depth suit its weight.', 64);
-    return out;
-  }
-
   // The state a patch would produce, used to drop no-op suggestions.
   function alreadyApplied(st, patch) {
     if (patch.headingFont && patch.headingFont !== st.headingFont.name) return false;
     if (patch.bodyFont && patch.bodyFont !== st.bodyFont.name) return false;
-    if (patch.shapePreset && patch.shapePreset !== st.shapePreset.key) return false;
     if (patch.scheme && patch.scheme !== st.scheme) return false;
     if (patch.colors && JSON.stringify(patch.colors).toLowerCase() !== JSON.stringify(st.colors).toLowerCase()) return false;
     if (patch.typography && Object.keys(patch.typography).some(k => (st.typography || {})[k] !== patch.typography[k])) return false;
@@ -281,7 +263,6 @@ const Suggest = (function () {
     let all = [];
     if (!locks.typography) all = all.concat(fontSuggestions(st, ctx), typeSuggestions(st));
     if (!locks.color) all = all.concat(colorSuggestions(st));
-    if (!locks.shape) all = all.concat(shapeSuggestions(st));
     const seen = new Set();
     return all
       .filter(s => !dismissed.has(s.id) && !alreadyApplied(st, s.apply))

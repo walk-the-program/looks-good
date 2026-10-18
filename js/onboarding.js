@@ -10,7 +10,7 @@
 
    A preset is:
      { name, tagline, colors:{primary,secondary,accent,neutralDark,neutralLight},
-       headingFont, bodyFont, aesthetic, bgMode?, shape?, logoDataUrl?,
+       headingFont, bodyFont, aesthetic, bgMode?, logoDataUrl?,
        content?:{sectionTitle,quoteText,quoteAuthor} }
 
    Depends on app.js (freshState, defaultTypography, CONTENT_DEFAULTS), persistence.js,
@@ -49,10 +49,8 @@ const Onboarding = (function () {
     st.headingFont = fontByName(preset.headingFont) || fontByName('Inter') || FONTS[0];
     st.bodyFont = fontByName(preset.bodyFont) || fontByName('Inter') || FONTS[0];
     st.aesthetic = aesthetic.key;
-    // The aesthetic's own recommended mode and shape, unless the preset says otherwise.
+    // The aesthetic's own recommended mode, unless the preset says otherwise.
     st.bgMode = preset.bgMode === 'dark' || preset.bgMode === 'light' ? preset.bgMode : aesthetic.mode;
-    const shape = SHAPE_PRESETS.find(p => p.key === (preset.shape || aesthetic.slideShape));
-    if (shape) st.shapePreset = shape;
     st.content = Object.assign({}, CONTENT_DEFAULTS, preset.content || {}, { brandName: preset.name, tagline: preset.tagline });
     st.logoDataUrl = preset.logoDataUrl || null;
     st.typography = defaultTypography();
@@ -606,7 +604,7 @@ const Onboarding = (function () {
       </div>
       <div class="ob-empty-copy">
         <h2>One brand, any number of worlds</h2>
-        <p>Give it a logo, or just a name, and watch it take on a whole style: colour, type, shape, and a board to brief anyone who builds with it.</p>
+        <p>Give it a logo, or just a name, and watch it take on a whole style: colour, type, and a board to brief anyone who builds with it.</p>
         <div class="ob-empty-actions">
           <button type="button" class="btn btn-primary" id="obMakeYours">Make yours</button>
           ${showcaseReady ? '<button type="button" class="btn btn-ghost" id="obEmptyShowcase">Load showcase brands</button>' : ''}
@@ -709,7 +707,7 @@ const Onboarding = (function () {
 
   const COACH_KEY = 'bd.coach.v1';
   const TIPS = [
-    { id: 'shuffle', find: () => $('shuffleAll'), side: 'bottom', title: 'Shuffle everything', text: 'Press Space, or click here. Every press is a fresh combination of colour, type, shape and style.' },
+    { id: 'shuffle', find: () => $('shuffleAll'), side: 'bottom', title: 'Shuffle everything', text: 'Press Space, or click here. Every press is a fresh combination of colour, type and style.' },
     // The Mix in control lives in the sidebar's Style tab; when another tab is open the tip points at that tab.
     { id: 'mix', find: () => { const b = $('blendPick'); return b && b.getClientRects().length ? b : $('sdTab-style'); }, side: 'bottom', title: 'Mix in a second style', text: 'Borrow another style’s art, type, colour or finish and blend it into this one.' },
     { id: 'built', find: () => { const r = document.querySelector('input[name="boardMode"][value="built"]'); return r && (r.closest('label') || r); }, side: 'bottom', title: 'See it built', text: 'Put your brand on a real product screen and compare it with a plain version.' },
@@ -738,7 +736,7 @@ const Onboarding = (function () {
   let coachShown = false;     // one tip per session: set the first time any tip opens
 
   // A tip never sits on the header toolbar or on a button that rewrites the brand.
-  const COACH_KEEP_CLEAR = '.workspace-header .ws-tools, #shuffleAll, #undoShuffle, #shuffleAesthetic, #shuffleFonts, #resetTypography, #shuffleColors, #shuffleShape, #removeLogo';
+  const COACH_KEEP_CLEAR = '.workspace-header .ws-tools, #shuffleAll, #undoShuffle, #shuffleAesthetic, #shuffleFonts, #resetTypography, #shuffleColors, #removeLogo';
   const overlaps = (a, b, pad) => a.left < b.right + pad && a.right > b.left - pad && a.top < b.bottom + pad && a.bottom > b.top - pad;
 
   // Tips stand aside while the brand is being shown or saved: the demo loop, present

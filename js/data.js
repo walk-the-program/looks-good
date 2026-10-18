@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
-   data.js — static reference data: fonts, curated pairings, shape/style
-   presets, color scheme definitions. No logic here, just the raw palette
+   data.js — static reference data: fonts, curated pairings and color
+   scheme definitions. No logic here, just the raw palette
    of choices the rest of the app randomizes over.
 ------------------------------------------------------------------------ */
 
@@ -234,47 +234,6 @@ const PAIRINGS = [
   ['Chakra Petch', 'IBM Plex Sans'],
   ['Shrikhand', 'Work Sans'],
   ['Michroma', 'IBM Plex Sans'],
-];
-
-// Shape/style archetypes. These drive border-radius, shadow, border
-// weight and a small decorative motif in the preview + slides.
-// `decorative` keys in use across the app: square, circle, triangle, bar, ring.
-const SHAPE_PRESETS = [
-  {
-    key: 'minimal', name: 'Minimal & Sharp',
-    radius: '4px', radiusLg: '6px',
-    shadow: 'none', shadowLg: '0 1px 3px rgba(0,0,0,.08)',
-    borderWidth: '1px', decorative: 'square',
-    personality: 'Restrained corners, no shadow, thin hairline borders. Reads as engineering-grade, precise, trustworthy — good for technical or B2B products.',
-  },
-  {
-    key: 'refined', name: 'Modern & Refined',
-    radius: '12px', radiusLg: '16px',
-    shadow: '0 2px 8px rgba(0,0,0,.05)', shadowLg: '0 12px 32px rgba(0,0,0,.06)',
-    borderWidth: '1px', decorative: 'ring',
-    personality: 'Medium corners with shadows light enough to read as depth rather than decoration. The current default for SaaS dashboards and product marketing sites.',
-  },
-  {
-    key: 'soft', name: 'Soft & Friendly',
-    radius: '20px', radiusLg: '28px',
-    shadow: '0 6px 16px rgba(0,0,0,.10)', shadowLg: '0 16px 40px rgba(0,0,0,.14)',
-    borderWidth: '0px', decorative: 'circle',
-    personality: 'Large rounded corners and soft diffuse shadows feel approachable and low-friction — common in consumer apps, wellness and education brands.',
-  },
-  {
-    key: 'classic', name: 'Corporate Classic',
-    radius: '8px', radiusLg: '10px',
-    shadow: '0 2px 6px rgba(0,0,0,.08)', shadowLg: '0 10px 24px rgba(0,0,0,.10)',
-    borderWidth: '1px', decorative: 'bar',
-    personality: 'Small consistent radius, subtle elevation. Dependable and professional — the safest default for finance, enterprise, or legal brands.',
-  },
-  {
-    key: 'geometric', name: 'Bold & Geometric',
-    radius: '0px', radiusLg: '0px',
-    shadow: '6px 6px 0 var(--accent)', shadowLg: '10px 10px 0 var(--accent)',
-    borderWidth: '3px', decorative: 'triangle',
-    personality: 'Hard edges with an offset "sticker" shadow in the accent color. Confident and energetic — fits creative, youth or event brands.',
-  },
 ];
 
 // Hue-offset recipes for the 3 accent colors relative to a random base

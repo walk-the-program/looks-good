@@ -41,10 +41,9 @@ const BrandSession = (function () {
     state.scheme = 'analogous';
     state.hue = 210;
     state.colors = generatePalette('analogous', 210);
-    state.shapePreset = SHAPE_PRESETS[0];
     state.content = {};
     state.typography = defaultTypography();
-    state.locks = { typography: false, color: false, shape: false, aesthetic: false };
+    state.locks = { typography: false, color: false, aesthetic: false };
     state.aesthetic = 'soft-form';
     state.aestheticVersion = 'current';
     state.blend = null;
@@ -197,7 +196,6 @@ const BrandSession = (function () {
     resetState();
     randomizeTypography();
     randomizeColor();
-    randomizeShape();
     state.content = Object.assign({}, CONTENT_DEFAULTS, { brandName: name, tagline });
     syncLogoUi();
     const now = Date.now();
@@ -254,7 +252,7 @@ const BrandSession = (function () {
       undoBtn.disabled = !canUndo();
     };
 
-    // undo-history.js only snapshots fonts, colors, shape and typography.
+    // undo-history.js only snapshots fonts, colors and typography.
     // Selecting an aesthetic also changes the aesthetic itself and bgMode, so
     // both ride along on every snapshot and come back on Undo. So do the
     // patterns in the brief (add / remove / change use is one undo step).

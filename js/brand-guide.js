@@ -400,9 +400,10 @@ const BRAND_GUIDE_CSS = `
     align-items: start;
   }
 
-  .brand-guide-doc .shape-tiles { display: flex; gap: 14px; margin-top: 4px; }
+  .brand-guide-doc .corner-tiles { display: flex; gap: 14px; margin-top: 4px; }
+  .brand-guide-doc .corner-tilebox { display: flex; flex-direction: column; gap: 8px; }
 
-  .brand-guide-doc .shape-tile {
+  .brand-guide-doc .corner-tile {
     width: 78px;
     height: 78px;
     box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.08);
@@ -707,10 +708,19 @@ function renderBrandGuideHTML(state) {
     ? `<img src="${state.logoDataUrl}" alt="Logo">`
     : `<span class="logo-placeholder">No logo uploaded</span>`;
 
-  const tileRadius = state.shapePreset.radius;
-  const tiles = [colors.primary, colors.accent, colors.secondary]
-    .map(hex => `<div class="shape-tile" style="background: ${hex}; border-radius: ${tileRadius};"></div>`)
-    .join('');
+  // The style's own corners, read off the board it really draws (js/ai-brief.js probe).
+  // Without a DOM the page keeps the style name and drops the tiles.
+  let look = null, corners = null;
+  try {
+    look = typeof abView === 'function' ? abView(state) : null;
+    const probe = look && typeof aibProbeBoard === 'function' ? aibProbeBoard(look.state, look.def) : null;
+    corners = probe && probe.radius && probe.radius.card && probe.radius.button && probe.radius.field ? probe.radius : null;
+  } catch (err) { corners = null; }
+  const lookName = look && look.def ? look.def.name : '';
+  const lookNote = look && look.def && look.def.descriptor ? look.def.descriptor : '';
+  const tiles = corners ? [[colors.primary, 'Cards', corners.card], [colors.accent, 'Buttons', corners.button], [colors.secondary, 'Fields', corners.field]]
+    .map(([hex, label, r]) => `<div class="corner-tilebox"><div class="corner-tile" style="background: ${hex}; border-radius: ${escapeHtml(r)};"></div><div class="bg-note-label">${label}</div></div>`)
+    .join('') : '';
 
   const logoPage = `
     <section class="bg-page" style="font-family: ${bodyFontCss}; --bg-hair: ${paperHair}; --bg-figure: ${paperFigure}; --bg-tint: ${colors.neutralLight};">
@@ -720,14 +730,14 @@ function renderBrandGuideHTML(state) {
         <div class="logo-frame">${logoContent}</div>
         <div class="style-row">
           <div>
-            <h3 style="font-family: ${headingFontCss};">${escapeHtml(state.shapePreset.name)}</h3>
-            <p>${escapeHtml(state.shapePreset.personality)}</p>
+            <h3 style="font-family: ${headingFontCss};">${escapeHtml(lookName)}</h3>
+            <p>${escapeHtml(lookNote)}</p>
           </div>
-          <div>
+          ${tiles ? `<div>
             <div class="bg-note-label">Corner language</div>
-            <div class="shape-tiles">${tiles}</div>
-            <p class="bg-note-copy" style="margin-top: 14px;">Radius ${escapeHtml(state.shapePreset.radius)} for controls and cards, ${escapeHtml(state.shapePreset.radiusLg)} for panels and full-bleed blocks.</p>
-          </div>
+            <div class="corner-tiles">${tiles}</div>
+            <p class="bg-note-copy" style="margin-top: 14px;">Radius ${escapeHtml(corners.button)} on buttons, ${escapeHtml(corners.field)} on fields and ${escapeHtml(corners.card)} on cards: the style draws its own corners, borders and shadows.</p>
+          </div>` : ''}
         </div>
       </div>
       ${foot('05')}

@@ -1,7 +1,7 @@
 # Branding Designer
 
 A local, no-build-step tool for rapidly auditioning brand combinations —
-fonts, color palettes, and shape/style language — with live heuristic
+fonts and color palettes, set in an aesthetic that draws its own corners, borders and shadows — with live heuristic
 design feedback and a ten-slide brand deck rendered in the selected aesthetic. The
 app chrome is a light warm-grey workspace so the only colors on screen
 are the brand's own.
@@ -98,7 +98,7 @@ file panels and the clipboard work under it).
 The app opens on a **Library**: a grid of tiles, one per saved brand, most
 recently edited first. Each tile is a live rendering of the brand (primary
 field, logo or "Aa", name in its heading font, a palette band, corners from
-its shape preset). **New brand** asks for a name and tagline, then opens the
+its style). **New brand** asks for a name and tagline, then opens the
 editor on a fresh random combination. The tile's "..." menu (or right-click)
 has Open, Rename, Duplicate and Delete.
 
@@ -126,8 +126,7 @@ signature art), a palette row that names each color's job and coverage,
 It renders in the brand's own fonts, colors, name and logo. The sidebar's
 **Aesthetic** panel picks one of 35 aesthetics, narrowed by family chips (Tactile, Graphic,
 Digital, Print & editorial, Luminous; the choice is remembered, and Shuffle and
-Compare work within it), lockable, with Shuffle aesthetic; choosing one also takes its recommended Light/Dark mode and, unless
-Shape is locked, its slide shape. **Compare all** shows all 35 boards at once
+Compare work within it), lockable, with Shuffle aesthetic; choosing one also takes its recommended Light/Dark mode. **Compare all** shows all 35 boards at once
 in the current brand (built only while that view is open; off-screen tiles skip layout with `content-visibility`); click a tile to select it. The choice is saved with the
 brand and is one Undo step. Compare tiles use each aesthetic's recommended
 mode (what selecting it gives you); the main board stays in the brand's current
@@ -238,7 +237,7 @@ describes the current brand in its current mode and aesthetic. File:
 
 ## Suggestions
 
-Under Typography, Color palette and Shape the editor can show one quiet
+Under Typography and Color palette the editor can show one quiet
 suggestion line (`js/suggest.js` is a pure engine, `js/suggest-ui.js` the
 display). Apply previews on hover, goes through the normal state path (so Undo
 works and the brand becomes unsaved), the refresh arrow shows the next one and
@@ -255,15 +254,14 @@ x dismisses it for that brand. Locked sections get none.
 - **Combination engine** — pick heading/body fonts from 85+ Google Fonts
   grouped by category (serif, sans, display, slab, mono), a color scheme
   (monochromatic / analogous / complementary / split-complementary /
-  triadic / custom) with editable swatches, and a shape/style preset
-  (Minimal & Sharp, Modern & Refined, Soft & Friendly, Corporate Classic,
-  Bold & Geometric). Most shuffles draw from a list of hand-picked
+  triadic / custom) with editable swatches. Corners, borders and shadows
+  come from the chosen aesthetic. Most shuffles draw from a list of hand-picked
   heading/body pairings so results stay usable; **Swap** flips the two
   faces, and a live specimen under the pickers shows what the current pair
   actually looks like. "Shuffle everything" (or hit **space**) rerolls
   anything not locked; per-section lock toggles and shuffle buttons let
   you pin down the parts you like while rerolling the rest. **Undo** steps
-  back one combo at a time, and your whole session (fonts, colors, shape,
+  back one combo at a time, and your whole session (fonts, colors,
   typography, text, logo) autosaves to `localStorage` and restores itself
   next time you open the page — **Start fresh** clears it.
 - **Typography fine-tuning** — independent size, weight, and letter-spacing
@@ -316,7 +314,7 @@ css/styles.css           app chrome — the light workspace, the sidebar's
 css/patterns.css         Patterns view and pattern deck styles
 css/brand-deck.css       the brand deck: slide cards + neutral slide styles
                          (`.ab-slide`, `.ab-deck-*`)
-js/data.js               font list, curated pairings, shape presets,
+js/data.js               font list, curated pairings,
                          color-scheme recipes
 js/color.js              HSL/hex conversion, WCAG contrast math, palette generation
 js/rules.js              the recommendation/heuristics engine

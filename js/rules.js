@@ -166,7 +166,7 @@ function paletteFindings(colors) {
 }
 
 function evaluateBrand(state) {
-  const { headingFont, bodyFont, colors, shapePreset, bgMode } = state;
+  const { headingFont, bodyFont, colors, bgMode } = state;
   const bg = bgMode === 'dark' ? colors.neutralDark : colors.neutralLight;
   const findings = [];
 
@@ -181,13 +181,6 @@ function evaluateBrand(state) {
 
   findings.push(...typographyFindings(headingFont, bodyFont));
   findings.push(...paletteFindings(colors));
-
-  findings.push({
-    category: 'Shape & Style',
-    level: 'good',
-    title: shapePreset.name,
-    detail: shapePreset.personality,
-  });
 
   return findings;
 }

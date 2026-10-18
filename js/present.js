@@ -573,7 +573,7 @@ window.Show = window.Show || {};
   function saveLook() {
     return {
       aesthetic: state.aesthetic, aestheticVersion: state.aestheticVersion, blend: state.blend ? JSON.parse(JSON.stringify(state.blend)) : null,
-      bgMode: state.bgMode, shapePreset: state.shapePreset,
+      bgMode: state.bgMode,
     };
   }
   // quiet: put the values back without a render (the caller renders next).

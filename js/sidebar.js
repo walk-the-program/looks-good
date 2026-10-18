@@ -1,14 +1,13 @@
 /* ---------------------------------------------------------------------
    sidebar.js — the editor sidebar's tabs (css/sidebar.css, index.html).
 
-   A vertical rail of tabs (Brand, Style, Type, Color, Shape, Logo,
+   A vertical rail of tabs (Brand, Style, Type, Color, Logo,
    Export) shows one settings panel at a time. The last open tab is
    remembered per viewer. Under 900px the rail is a tab bar and the panel
    opens and closes from it.
 
-   It also draws the Style panel's preview of the current style, the
-   Shape panel's preset cards (the hidden #shapeSelect stays the source
-   of truth for app.js), and the logo drop zone.
+   It also draws the Style panel's preview of the current style and the
+   logo drop zone.
 
    Every control in the panels keeps the id app.js and the feature
    modules bind to; nothing here re-implements their behaviour.
@@ -18,7 +17,7 @@
 
 (function () {
   const TAB_STORE = 'bd.sidebarTab';
-  const TABS = ['brand', 'style', 'type', 'color', 'shape', 'logo', 'export'];
+  const TABS = ['brand', 'style', 'type', 'color', 'logo', 'export'];
   const BOARD_W = 900;                       // design width the preview board is drawn at
   const $ = id => document.getElementById(id);
   const narrowMq = window.matchMedia ? window.matchMedia('(max-width: 900px)') : { matches: false };
@@ -171,69 +170,6 @@
     else styleTimer = setTimeout(drawStylePreview, 140);   // typing in a field re-renders per key
   }
 
-  /* ---------------- Shape panel: preset cards ---------------- */
-
-  // One short line per preset for its card (the full personality text is in the brief).
-  const SHAPE_LINES = {
-    minimal: 'Small corners, hairline borders, no shadow.',
-    refined: 'Medium corners and light, quiet shadows.',
-    soft: 'Large round corners and soft shadows.',
-    classic: 'Small, even corners with a subtle lift.',
-    geometric: 'Square edges and an offset accent shadow.',
-  };
-  function firstSentence(s) {
-    const m = String(s || '').match(/^.*?[.!?](\s|$)/);
-    return (m ? m[0] : String(s || '')).trim();
-  }
-
-  function buildShapes() {
-    const host = $('sdShapes');
-    if (!host || typeof SHAPE_PRESETS === 'undefined') return;
-    host.innerHTML = SHAPE_PRESETS.map(p => {
-      const shadow = String(p.shadow || 'none').replace(/var\(--accent\)/g, 'var(--sd-accent, #111)');
-      const art = `border-width:${p.borderWidth || '0px'};border-radius:${p.radius};box-shadow:${shadow}`;
-      return `<button type="button" class="sd-shape" role="radio" aria-checked="false" data-key="${p.key}" tabindex="-1">
-        <span class="sd-shape-art" aria-hidden="true"><i style="${art}"></i></span>
-        <span class="sd-shape-text"><b>${escapeHtml(p.name)}</b><small>${escapeHtml(SHAPE_LINES[p.key] || firstSentence(p.personality))}</small></span>
-      </button>`;
-    }).join('');
-    host.addEventListener('click', e => {
-      const b = e.target.closest('.sd-shape');
-      if (b) chooseShape(b.dataset.key);
-    });
-    host.addEventListener('keydown', e => {
-      const all = Array.from(host.querySelectorAll('.sd-shape'));
-      const i = all.indexOf(document.activeElement);
-      if (i < 0) return;
-      let n = -1;
-      if (e.key === 'ArrowDown' || e.key === 'ArrowRight') n = (i + 1) % all.length;
-      if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') n = (i - 1 + all.length) % all.length;
-      if (n < 0) return;
-      e.preventDefault();
-      chooseShape(all[n].dataset.key);
-      all[n].focus();
-    });
-  }
-
-  function chooseShape(key) {
-    const sel = $('shapeSelect');
-    if (!sel || sel.value === key) return;
-    sel.value = key;
-    sel.dispatchEvent(new Event('change', { bubbles: true }));
-  }
-
-  function syncShapes() {
-    const sel = $('shapeSelect');
-    const host = $('sdShapes');
-    if (!sel || !host) return;
-    if (typeof state !== 'undefined' && state.colors) host.style.setProperty('--sd-accent', state.colors.accent);
-    host.querySelectorAll('.sd-shape').forEach(b => {
-      const on = b.dataset.key === sel.value;
-      b.setAttribute('aria-checked', String(on));
-      b.tabIndex = on ? 0 : -1;
-    });
-  }
-
   /* ---------------- Logo drop zone ---------------- */
 
   function wireLogoDrop() {
@@ -260,19 +196,7 @@
     if (!$('sdRail')) return;
     wireTabs();
     select(stored() || 'brand', { keep: true });
-    buildShapes();
-    syncShapes();
     wireLogoDrop();
-
-    // Keep the cards and the preview in step with every render (app.js reassigns
-    // `render` for the save state too; this wraps whatever is current).
-    if (typeof render === 'function') {
-      const prev = render;
-      render = function () {
-        prev.apply(this, arguments);
-        syncShapes();
-      };
-    }
 
     const open = from => { if (window.StyleGallery) StyleGallery.open(from); };
     ['openStyleGallery', 'sdStyleShot'].forEach(id => {

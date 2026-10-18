@@ -2,8 +2,8 @@
    undo-history.js — Simple bounded undo stack for shuffleable design fields.
 ------------------------------------------------------------------------ */
 
-// A small undo stack that remembers the design state (typography, colors,
-// shapes) before each shuffle. This allows users to "undo" back to the combo
+// A small undo stack that remembers the design state (fonts, colors,
+// typography) before each shuffle. This allows users to "undo" back to the combo
 // they had right before their last randomize action. The stack is capped at
 // UNDO_STACK_LIMIT entries to prevent unbounded memory growth.
 
@@ -17,7 +17,6 @@ function pushUndoSnapshot(state, withTypography) {
     scheme: state.scheme,
     hue: state.hue,
     colors: { ...state.colors },
-    shapePreset: state.shapePreset,
     typography: withTypography ? { ...state.typography } : null,
   });
 
@@ -45,6 +44,5 @@ function applyUndoSnapshot(snapshot, state) {
   state.scheme = snapshot.scheme;
   state.hue = snapshot.hue;
   state.colors = { ...snapshot.colors };
-  state.shapePreset = snapshot.shapePreset;
   if (snapshot.typography) state.typography = { ...snapshot.typography };
 }

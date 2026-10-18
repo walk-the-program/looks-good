@@ -26,7 +26,6 @@ function freshState() {
     scheme: 'analogous',
     hue: 210,
     colors: null,
-    shapePreset: SHAPE_PRESETS[0],
     bgMode: 'light',
     pureBg: false,   // true: canvas is pure #FFFFFF (light) / #000000 (dark), not the style's tint (js/aesthetic-board.js)
     logoImg: null,
@@ -35,7 +34,7 @@ function freshState() {
     aesthetic: 'soft-form',   // key into AESTHETICS (js/aesthetics/registry.js)
     aestheticVersion: 'current',   // 'current' | 'classic' (the r6-0-baseline copy; registry.js)
     blend: null,     // { with, strength, channels } — second aesthetic blended in (js/blend.js)
-    locks: { typography: false, color: false, shape: false, aesthetic: false },
+    locks: { typography: false, color: false, aesthetic: false },
     dismissed: [],   // suggestion ids dismissed for this brand
     patterns: [],    // patterns in the brief (the cart): [{ key, params, colorway, seed, use, svg }] (js/patterns-ui.js)
   };
@@ -102,12 +101,8 @@ function applyBrandColors(colors) {
   state.scheme = 'custom';
   render();
 }
-function randomizeShape() {
-  state.shapePreset = pickRandom(SHAPE_PRESETS);
-}
 
-// Selecting an aesthetic also takes its recommended background mode and (unless
-// shape is locked) its slide shape preset.
+// Selecting an aesthetic also takes its recommended background mode.
 function applyAesthetic(key) {
   const def = aestheticByKey(key);
   state.aesthetic = def.key;
@@ -115,14 +110,10 @@ function applyAesthetic(key) {
   if (state.blend && state.blend.with === def.key) state.blend = null;
   applyAestheticLook(resolveAestheticDef(state));
 }
-// The recommended background mode and (unless shape is locked) slide shape of the version
-// that renders: the classic copy can recommend something else than the current one.
+// The recommended background mode of the version that renders: the classic copy can
+// recommend something else than the current one.
 function applyAestheticLook(def) {
   state.bgMode = def.mode;
-  if (!state.locks.shape) {
-    const preset = SHAPE_PRESETS.find(p => p.key === def.slideShape);
-    if (preset) state.shapePreset = preset;
-  }
 }
 // Panel tiles, prev/next and Compare tiles: one undo step, then a normal render
 // (which also marks the brand unsaved via the serialized state).
@@ -276,10 +267,6 @@ function populateSchemeSelect() {
   sel.innerHTML = Object.entries(COLOR_SCHEMES)
     .map(([key, v]) => `<option value="${key}">${v.label}</option>`).join('');
 }
-function populateShapeSelect() {
-  const sel = document.getElementById('shapeSelect');
-  sel.innerHTML = SHAPE_PRESETS.map(p => `<option value="${p.key}">${p.name}</option>`).join('');
-}
 
 /* ---------------- Brand copy ---------------- */
 
@@ -391,7 +378,6 @@ function updateControlsFromState() {
   document.getElementById('bodyTrackingVal').textContent = state.typography.bodyTracking + 'px';
   document.getElementById('bodyCase').value = state.typography.bodyCase;
   document.getElementById('schemeSelect').value = state.scheme;
-  document.getElementById('shapeSelect').value = state.shapePreset.key;
   // Role rows, wheel, brightness, hex and guidance (js/color-picker.js).
   if (window.ColorPicker) ColorPicker.sync();
   document.querySelectorAll('input[name="bgMode"]').forEach(r => { r.checked = r.value === state.bgMode; });
@@ -402,7 +388,6 @@ function updateControlsFromState() {
   // lock already on, and a lock the UI doesn't show is a lock nobody can find.
   document.getElementById('lockTypography').checked = !!state.locks.typography;
   document.getElementById('lockColor').checked = !!state.locks.color;
-  document.getElementById('lockShape').checked = !!state.locks.shape;
   document.getElementById('lockAesthetic').checked = !!state.locks.aesthetic;
 }
 
@@ -533,8 +518,6 @@ function brandCssText(s = state) {
   --body-tracking: ${s.typography.bodyTracking}px;
   --heading-transform: ${s.typography.headingCase};
   --body-transform: ${s.typography.bodyCase};
-  --radius: ${s.shapePreset.radius};
-  --radius-lg: ${s.shapePreset.radiusLg};
 }`;
 }
 
@@ -599,8 +582,6 @@ function wireEvents() {
     beginShuffle();
     if (!state.locks.typography) randomizeTypography();
     if (!state.locks.color) randomizeColor();
-    if (!state.locks.shape) randomizeShape();
-    // Last, so an unlocked aesthetic's slide shape wins over the random one.
     if (!state.locks.aesthetic) {
       randomizeAesthetic();
       // Faithful to the new style: a random one of its pairings (no-op when Type is locked).
@@ -616,10 +597,6 @@ function wireEvents() {
   document.getElementById('shuffleColors').addEventListener('click', () => {
     if (state.locks.color) return showToast('Unlock color to shuffle');
     beginShuffle(); randomizeColor(); render();
-  });
-  document.getElementById('shuffleShape').addEventListener('click', () => {
-    if (state.locks.shape) return showToast('Unlock shape to shuffle');
-    beginShuffle(); randomizeShape(); render();
   });
 
   document.getElementById('shuffleAesthetic').addEventListener('click', () => {
@@ -637,7 +614,6 @@ function wireEvents() {
   });
   document.getElementById('lockTypography').addEventListener('change', e => state.locks.typography = e.target.checked);
   document.getElementById('lockColor').addEventListener('change', e => state.locks.color = e.target.checked);
-  document.getElementById('lockShape').addEventListener('change', e => state.locks.shape = e.target.checked);
 
   document.getElementById('headingFont').addEventListener('change', e => {
     state.headingFont = FONTS[Number(e.target.value)]; render();
@@ -668,10 +644,6 @@ function wireEvents() {
   // Palette colors are edited by the inline picker (js/color-picker.js), which
   // goes through setBrandColor() / applyBrandColors() above.
   if (window.ColorPicker) ColorPicker.init();
-
-  document.getElementById('shapeSelect').addEventListener('change', e => {
-    state.shapePreset = SHAPE_PRESETS.find(p => p.key === e.target.value); render();
-  });
 
   document.getElementById('headingSize').addEventListener('input', e => {
     state.typography.headingSize = Number(e.target.value);
@@ -847,7 +819,6 @@ function init() {
   populateFontSelect(document.getElementById('bodyFont'));
   if (window.initFontPickers) initFontPickers();
   populateSchemeSelect();
-  populateShapeSelect();
 
   // All brand copy is seeded from the Brand panel's inputs, which are the
   // single source of truth — the preview and slides just render from state.
@@ -860,7 +831,6 @@ function init() {
 
   randomizeTypography();
   randomizeColor();
-  randomizeShape();
 
   try {
     const q = new URLSearchParams(location.search).get('dev');

@@ -1,6 +1,6 @@
 /* ---------------------------------------------------------------------
    suggest-ui.js — shows at most one quiet suggestion line under the
-   Typography, Color palette and Shape sections. Never applies anything on
+   Typography and Color palette sections. Never applies anything on
    its own: Apply goes through the normal state path (Undo works, the brand
    is marked unsaved); hovering Apply previews the change and restores on
    leave; x dismisses it for this brand.
@@ -11,7 +11,6 @@
   const SLOTS = [
     { slot: 'typography', sections: ['fonts', 'type'] },
     { slot: 'colors', sections: ['colors'] },
-    { slot: 'shape', sections: ['shape'] },
   ];
   const ICON = '<svg class="sg-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18h6"/><path d="M10 21h4"/><path d="M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2.1h5c0-.9.4-1.6 1-2.1A6 6 0 0 0 12 3Z"/></svg>';
 
@@ -35,21 +34,20 @@
     if (patch.bodyFont) state.bodyFont = fontByName(patch.bodyFont);
     if (patch.scheme) state.scheme = patch.scheme;
     if (patch.colors) state.colors = Object.assign({}, patch.colors);
-    if (patch.shapePreset) state.shapePreset = SHAPE_PRESETS.find(p => p.key === patch.shapePreset) || state.shapePreset;
     if (patch.typography) state.typography = Object.assign({}, state.typography, patch.typography);
   }
   function startPreview(patch) {
     endPreview();
     previewing = {
       headingFont: state.headingFont, bodyFont: state.bodyFont, scheme: state.scheme,
-      colors: state.colors, shapePreset: state.shapePreset, typography: state.typography,
+      colors: state.colors, typography: state.typography,
     };
     patchFields(patch);
     paintPreview();
   }
   // Anything that persists or compares state (draft autosave, quit flush, the
   // "Unsaved changes" check) must see what is committed, never a hover preview.
-  const PREVIEW_FIELDS = ['headingFont', 'bodyFont', 'scheme', 'colors', 'shapePreset', 'typography'];
+  const PREVIEW_FIELDS = ['headingFont', 'bodyFont', 'scheme', 'colors', 'typography'];
   window.withCommittedState = function (fn) {
     if (!previewing) return fn();
     const live = {};

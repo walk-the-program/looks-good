@@ -26,9 +26,9 @@ run(`function freshState() {
     typography: { headingSize: 44, bodySize: 16, headingWeight: 700, bodyWeight: 400,
                   headingTracking: 0, bodyTracking: 0, headingCase: 'none', bodyCase: 'none' },
     scheme: 'analogous', hue: 210, colors: generatePalette('analogous', 210),
-    shapePreset: SHAPE_PRESETS[0], bgMode: 'light', logoDataUrl: null,
+    bgMode: 'light', logoDataUrl: null,
     content: { brandName: 'Acme' }, aesthetic: 'soft-form',
-    locks: { typography: false, color: false, shape: false, aesthetic: false },
+    locks: { typography: false, color: false, aesthetic: false },
     dismissed: [], patterns: [],
   };
 }`);
@@ -75,6 +75,19 @@ for (const [name, rec] of Object.entries(partials)) {
     return { colorsOk, paletteOk, font: !!s.headingFont };
   })()`);
   check(`load ${name}: valid palette, scheme and font`, r.colorsOk && r.paletteOk && r.font, JSON.stringify(r));
+}
+
+// Brands saved while the editor still had Shape presets carry shapePresetKey and locks.shape:
+// they load (both ignored), and new saves no longer write either.
+{
+  const r = run(`(() => {
+    const s = freshState();
+    applySavedSessionToState({ headingFontName: FONTS[2].name, shapePresetKey: 'geometric', locks: { typography: true, color: false, shape: true, aesthetic: false } }, s);
+    const out = serializeState(s);
+    return { font: s.headingFont.name === FONTS[2].name, lockT: s.locks.typography === true, noShapeLock: !('shape' in s.locks),
+      noPreset: !('shapePreset' in s) && !('shapePresetKey' in out), outLocks: Object.keys(out.locks).join() };
+  })()`);
+  check('load: an old brand with shapePresetKey and locks.shape still loads, fields ignored', r.font && r.lockT && r.noShapeLock && r.noPreset, JSON.stringify(r));
 }
 
 /* ---- blending two aesthetics (js/blend.js) ---- */
@@ -131,7 +144,7 @@ for (const [name, rec] of Object.entries(blendCases)) {
   }
   const r = vm.runInContext(`(() => {
     const s = { headingFont: FONTS[0], bodyFont: FONTS[1], typography: {}, scheme: 'analogous', hue: 210, colors: generatePalette('analogous', 210),
-      shapePreset: SHAPE_PRESETS[0], bgMode: 'light', logoDataUrl: null, content: {}, aesthetic: 'soft-form', locks: {}, dismissed: [], patterns: [] };
+      bgMode: 'light', logoDataUrl: null, content: {}, aesthetic: 'soft-form', locks: {}, dismissed: [], patterns: [] };
     applySavedSessionToState({ aestheticKey: 'soft-form', blend: { with: 'raw-brutalist', strength: 'bold' } }, s);
     const v = aestheticView(s);
     return { kept: !!s.blend, saved: !!serializeState(s).blend, active: blendActive(s), same: v.def === aestheticByKey('soft-form') && v.state === s };
@@ -414,7 +427,7 @@ check('paste: empty text', run(`extractColors('').length`) === 0, 'found colors 
   check('undo: the brand-session wrappers are where the test expects them', a > 0 && b > a, 'markers moved');
   vm.runInContext(`(function () { ${src.slice(a, b)} })();`, uc);
   const r = vm.runInContext(`(() => {
-    const st = { headingFont: FONTS[0], bodyFont: FONTS[1], scheme: 'analogous', hue: 210, colors: generatePalette('analogous', 210), shapePreset: SHAPE_PRESETS[0],
+    const st = { headingFont: FONTS[0], bodyFont: FONTS[1], scheme: 'analogous', hue: 210, colors: generatePalette('analogous', 210),
       typography: {}, aesthetic: 'soft-form', bgMode: 'light', patterns: [], blend: { with: 'raw-brutalist', strength: 'bold', channels: { art: true, type: true, color: true, patterns: true, material: true } } };
     pushUndoSnapshot(st);                                  // with a blend
     st.blend.channels.art = false; st.blend.with = 'clay';

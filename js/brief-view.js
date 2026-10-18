@@ -413,7 +413,7 @@ window.Show = window.Show || {};
         ${box('Swatches', r.swatch, `background:${t.accent}`)}
       </div>`;
     }
-    const modeLine = `<p class="bv-shape-note">Mode: ${t.isDark ? 'dark' : 'light'}. Canvas is the ${t.isDark ? 'dark' : 'light'} neutral and ink is the ${t.isDark ? 'light' : 'dark'} neutral.${state.pureBg ? ' Pure ' + (t.isDark ? 'black' : 'white') + ' background.' : ''} Editor shape preset: ${esc(state.shapePreset ? state.shapePreset.name : 'default')}, which the aesthetic restyles with its own corners.</p>`;
+    const modeLine = `<p class="bv-shape-note">Mode: ${t.isDark ? 'dark' : 'light'}. Canvas is the ${t.isDark ? 'dark' : 'light'} neutral and ink is the ${t.isDark ? 'light' : 'dark'} neutral.${state.pureBg ? ' Pure ' + (t.isDark ? 'black' : 'white') + ' background.' : ''}</p>`;
     const mat = findSection(sections, 'Shape and materials');
     let cards = '';
     if (mat) {

@@ -391,6 +391,26 @@ const aibNum = v => {
   return isFinite(n) ? Math.round(n) : null;
 };
 
+// Fallback corner radii (px) read from the aesthetic's material recipes (def.materials css text,
+// px and % only) for when the board probe is unavailable (no DOM). 0 where the recipes name none.
+function aibRecipeRadii(def) {
+  const mats = (def && def.materials) || [];
+  const radiusOf = m => {
+    const r = /border-radius:\s*(?:([\d.]+)px|([\d.]+)%)/i.exec(m.css || '');
+    return r ? (r[2] != null ? 999 : Math.round(+r[1])) : null;
+  };
+  const pick = re => {
+    for (const m of mats) { if (re.test(m.name || '')) { const v = radiusOf(m); if (v != null) return v; } }
+    return null;
+  };
+  const anyR = (() => { for (const m of mats) { const v = radiusOf(m); if (v != null) return v; } return null; })();
+  const control = pick(/button|cta|key|chip|pill/i);
+  const card = pick(/card|panel|tile|plate|well|slab|window/i);
+  const field = pick(/field|input|toggle|track/i);
+  const c = control != null ? control : (anyR != null ? anyR : 0);
+  return { control: c, field: field != null ? field : c, card: card != null ? card : (anyR != null ? anyR : c) };
+}
+
 function aibContext(state0, opts) {
   opts = opts || {};
   const view = abView(state0);
@@ -406,12 +426,13 @@ function aibContext(state0, opts) {
   const cur = mode === 'dark' ? D : L;
   const probe = opts.noProbe ? null : aibProbeBoard(state, def);
   const ty = state.typography;
-  const sp = state.shapePreset || {};
+  // The corners the board really draws (probe); the aesthetic's own recipes when there is none.
   const rad = (probe && probe.radius) || {};
+  const rec = aibRecipeRadii(def);
   const radius = {
-    control: aibNum(rad.button) != null ? aibNum(rad.button) : (aibNum(sp.radius) || 0),
-    field: aibNum(rad.field) != null ? aibNum(rad.field) : (aibNum(sp.radius) || 0),
-    card: aibNum(rad.card) != null ? aibNum(rad.card) : (aibNum(sp.radiusLg) || 0),
+    control: aibNum(rad.button) != null ? aibNum(rad.button) : rec.control,
+    field: aibNum(rad.field) != null ? aibNum(rad.field) : rec.field,
+    card: aibNum(rad.card) != null ? aibNum(rad.card) : rec.card,
   };
   const ctx = {
     state0, state, def, view, target, build, only, mode, L, D, modes, cur, probe, ty, radius,

@@ -85,7 +85,6 @@
       add('Shuffle', 'Shuffle style', () => click('shuffleAesthetic'), { keys: 'aesthetic random' });
       add('Shuffle', 'Shuffle fonts', () => click('shuffleFonts'), { keys: 'type random' });
       add('Shuffle', 'Shuffle colours', () => click('shuffleColors'), { keys: 'colors palette random' });
-      add('Shuffle', 'Shuffle shape', () => click('shuffleShape'), { keys: 'corners random' });
       const undo = $('undoShuffle');
       add('Shuffle', 'Undo', () => click('undoShuffle'), { keys: 'back last change', off: !undo || undo.disabled });
 

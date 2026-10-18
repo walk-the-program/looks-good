@@ -13,7 +13,6 @@ function serializeState(state) {
     scheme: state.scheme,
     hue: state.hue,
     colors: { ...state.colors },
-    shapePresetKey: state.shapePreset.key,
     bgMode: state.bgMode,
     // Pure #FFFFFF / #000000 ground instead of the style's canvas tint (js/aesthetic-board.js).
     pureBg: state.pureBg === true,
@@ -83,12 +82,8 @@ function applySavedSessionToState(saved, state) {
     state.colors = Object.fromEntries(COLOR_KEYS.map(k => [k, saved.colors[k].toLowerCase()]));
   }
 
-  // Restore shape preset. A session saved against a preset that no longer
-  // exists (e.g. the retired 'organic' key) falls back to the first preset
-  // rather than leaving a dangling reference behind.
-  if (typeof saved.shapePresetKey === 'string') {
-    state.shapePreset = SHAPE_PRESETS.find(p => p.key === saved.shapePresetKey) || SHAPE_PRESETS[0];
-  }
+  // saved.shapePresetKey (the retired Shape presets) is ignored: every aesthetic draws its
+  // own corners, borders and shadows. Brands saved with it, and with locks.shape, still load.
 
   // Restore bgMode
   if (typeof saved.bgMode === 'string') {
@@ -117,9 +112,11 @@ function applySavedSessionToState(saved, state) {
   state.blend = typeof normalizeBlend === 'function' ? normalizeBlend(saved.blend, state.aesthetic) : null;
 
   // Restore locks. Merged onto the defaults so a brand saved before a lock
-  // existed (e.g. aesthetic) still has every key.
+  // existed (e.g. aesthetic) still has every key. Unknown keys (the retired shape lock)
+  // are dropped.
   if (saved.locks && typeof saved.locks === 'object') {
-    state.locks = Object.assign({ typography: false, color: false, shape: false, aesthetic: false }, saved.locks);
+    state.locks = { typography: false, color: false, aesthetic: false };
+    Object.keys(state.locks).forEach(k => { if (k in saved.locks) state.locks[k] = saved.locks[k]; });
   }
 
   // Restore typography fine-tuning (size/weight/tracking/case). Merge onto
