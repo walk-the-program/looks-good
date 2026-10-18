@@ -22,3 +22,15 @@ The brief's UI kit tables are style-neutral (generic fill/text/edge per componen
 - On-card colours: give `--card-ink` / `--card-muted` when the card ground differs from canvas.
 - One definition per thing (pressed, focus ring, toggle size, corner set, slider fill) — no duplicates across States, Motion, recipes.
 - Remove noise for App: App icon prose in screens, "Target: Web" when iOS rules are described, Increase Contrast/Reduce Transparency lines that apply to nothing, board tokens (`--ab-*`) without a use.
+
+## Results by round (Signl, closeness to the Built view)
+| Style | R1 | R2 | R3 | R4 | R5 |
+|---|---|---|---|---|---|
+| Mesh × Liquid Glass (Signl) | generic | 6 | 8 (dark broken) | 8.5 | — |
+| Soft Form | generic | 6 | 7 | 8.5 | — |
+| Dystopian Luxury | generic | 6 | 8 | 8 | — |
+| Gorpcore | generic | 7 | 8 | 8 | — |
+| Blob Tracking | generic | 5 | 7 | 8 | — |
+| Pirate Broadcast | generic | 5 | 6 | 6 | 7 |
+| Xerox Punk | generic | 5 | 7 | 6 | 7 |
+Brief revisions 5–6 (after R4/R5) added flow layout, app versions of drawn headlines, pseudo-element text marks, and a contrast check on every stated text pair; not yet re-tested end to end.

@@ -323,7 +323,7 @@
 :is(.ab.sb-ab, .sb-gen).sb-kit .ab-subcopy.sb-ob-body { margin: 12px 0 0 !important; max-width: none; font-size: var(--k-body, 17px) !important; line-height: var(--k-body-lh, 24px) !important; }
 .sb-ob-list { margin-top: var(--k-gap, 28px); }
 .sb-dots { display: flex; justify-content: center; gap: 8px; margin: 24px 0; }
-.sb-dots i { width: 7px; height: 7px; border-radius: 4px; background: var(--ab-line); }
+.sb-dots i { width: 7px; height: 7px; border-radius: 4px; background: color-mix(in srgb, var(--ab-ink) 55%, var(--ab-canvas)); }
 .sb-dots i.is-on { width: 20px; background: var(--k-pri-text, var(--ab-primary-text)); }
 .sb-ob-actions { display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; }
 

@@ -785,6 +785,11 @@ check('paste: empty text', run(`extractColors('').length`) === 0, 'found colors 
     return [card, v ? v.get({ mode: 'light' }) + '/' + v.get({ mode: 'dark' }) : '', ink].join('|'); })()`);
   check('kit: a colour measured in light and dark is named only by a token matching both (else a kit token with both values)',
     /^--kit-card\|#ffffff\/#2f352b\|--ink$/.test(pairName), pairName);
+  check('kit: pseudo-element text is read with counters as N, and arrows are named by shape',
+    M(`aibPseudoText('"ITEM " counter(sb-item, decimal-leading-zero) "  /  2026.114." counter(sb-item)')`) === 'ITEM N  /  2026.114.N' && M(`AIB_GLYPH_NAME['↗']`) === 'an up-right diagonal arrow' && !M(`AIB_ARROW_GLYPH.test('>')`), 'pseudo text');
+  const cssBlock = (dl.match(/```css\n([\s\S]*?)```/) || ['', ''])[1];
+  const undef = (cssBlock.match(/var\((--[a-z0-9-]+)\)/g) || []).map(v => v.slice(4, -1)).filter(k => cssBlock.indexOf(k + ':') < 0);
+  check('kit: every var() in the App token block is defined in it', undef.length === 0, undef.join(', '));
   check('kit: without a page to measure in, the App brief keeps the generic rows and says so in one line',
     /These are the generic kit rows/.test(dlStatic) && !/### How Dystopian Luxury shows up/.test(dlStatic) && !/These are the generic kit rows/.test(dl), 'static');
   check('kit: the Website brief keeps its sections and gets no kit measurement', !/### How /.test(dlWeb) && /## Components/.test(dlWeb) && !/These are the generic kit rows/.test(dlWeb), 'web');

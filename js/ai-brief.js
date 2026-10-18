@@ -472,7 +472,7 @@ const AIB_KIT_PARTS = {
   segmented: [['control', '.ab-seg', 1], ['selected', '.ab-seg-btn[aria-pressed="true"]', 1], ['unselected', '.ab-seg-btn[aria-pressed="false"]', 1]],
   slider: [['slider', '.sb-k-range', 0], ['label', '.sb-k-slider-h', 0]],
   card: [['card', '.ab-card', 1], ['title', '.ab-card-title', 1], ['body', '.ab-card-body', 0]],
-  list: [['list', '.sb-k-list', 1], ['row', '.sb-k-row', 1], ['title', '.sb-k-title', 1], ['detail', '.sb-k-sub', 0], ['trailing value', '.sb-k-trail', 1], ['row avatar', '.sb-k-av', 0]],
+  list: [['list', '.sb-k-list', 1], ['row', '.sb-k-row', 1], ['title', '.sb-k-title', 1], ['detail', '.sb-k-sub', 1], ['trailing value', '.sb-k-trail', 1], ['row avatar', '.sb-k-av', 0]],
   callout: [['callout', '.sb-k-callout', 1], ['title', '.sb-k-callout b', 0], ['icon', '.sb-k-callout > svg', 0]],
   sheet: [['sheet', '.sb-k-sheet', 1], ['grabber', '.sb-k-grab', 0], ['title', '.sb-k-sheet-t', 0]],
   divider: [['section label', '.sb-k-section .ab-label', 1], ['rule', '.ab-rule', 1]],
@@ -510,8 +510,7 @@ function aibReadBox(el, pseudo) {
   if (pseudo) {
     o.content = c.content;
     o.pos = c.position;
-    const text = /^["'](.*)["']$/.exec(c.content);
-    o.text = text ? text[1] : '';
+    o.text = aibPseudoText(c.content);
     o.z = c.zIndex;
     o.mg = [px(c.marginTop), px(c.marginLeft)];
     o.at = [c.top, c.right, c.bottom, c.left].map(v => (v === 'auto' ? null : px(v)));
@@ -716,9 +715,18 @@ function aibPseudoText(content) {
   return parts.map(x => (/^counter/.test(x) ? 'N' : /^attr/.test(x) ? '(label)' : x.slice(1, -1).replace(/\\(.)/g, '$1'))).join('');
 }
 
-const AIB_ARROW_GLYPH = /^\s*[→↗↘➔➜⟶›»>←‹<↑↓⟵]\s*$/;
+const AIB_ARROW_GLYPH = /^\s*[→↗↘➔➜⟶←↑↓⟵↖↙]\s*$/;
+const AIB_GLYPH_NAME = { '→': 'a right arrow', '➔': 'a right arrow', '➜': 'a right arrow', '⟶': 'a long right arrow', '↗': 'an up-right diagonal arrow', '↘': 'a down-right diagonal arrow',
+  '↖': 'an up-left diagonal arrow', '↙': 'a down-left diagonal arrow', '←': 'a left arrow', '⟵': 'a long left arrow', '↑': 'an up arrow', '↓': 'a down arrow' };
 
 // A ::before / ::after box in a plain buildable sentence (what it is, where it sits, size, colour token).
+// Text a style draws with ::before / ::after ("> " prompts, "ITEM 01" captions, tags), noted per owner for "How it shows up".
+function aibNoteTextMark(ctx, txt) {
+  ctx.textMarks = ctx.textMarks || {};
+  const k = String(txt).trim();
+  if (!k) return;
+  (ctx.textMarks[k] = ctx.textMarks[k] || new Set()).add(ctx._markOwner || 'kit');
+}
 function aibKitPseudo(ctx, p, which, host, name) {
   if (!p) return '';
   const where = aibPlace(p, host || {}, which);
@@ -726,12 +734,14 @@ function aibKitPseudo(ctx, p, which, host, name) {
   const tilt = tf ? `, ${tf}` : '';
   const txt = aibPseudoText(p.content);
   const col = name(p.color);
-  if (txt && AIB_ARROW_GLYPH.test(txt)) return `a trailing arrow icon in ${col} (draw it as a 24pt SVG arrow, not a text glyph)`;
+  if (txt && AIB_ARROW_GLYPH.test(txt)) return `${AIB_GLYPH_NAME[txt.trim()] || 'an arrow'} in ${col}, ${where} (draw it as a 24pt SVG of that arrow, not a text glyph)`;
+  if (txt && txt.trim()) aibNoteTextMark(ctx, txt);
   if (txt && /^\s*[✓✔]\s*$/.test(txt)) return `a check icon in ${col} (24pt SVG, not a text glyph)`;
   const fill = aibKitFill(p, name);
   const edge = aibKitEdge(p, name);
   const sh = aibKitShadow(p.sh, name, p.filter).text;
   if (txt && txt.trim()) {
+    if (/^\s*[>›»]\s*$/.test(txt)) return `a "${txt.replace(/\s+$/, ' ')}" prompt in ${col}, ${where}`;
     if (/^[\s—–\-_|▮▯■□●○•·]+$/.test(txt)) return `the mark "${txt.trim()}" in ${col}${p.fs ? ` at ${Math.round(p.fs)}pt` : ''}, ${where}`;
     return `a small tag "${txt.trim()}" in ${col}${p.fs ? ` ${Math.round(p.fs)}pt` : ''}${fill !== 'none' ? ` on a ${fill} strip` : ''}, ${where}, on one line (\`white-space: nowrap\`) and clear of the other parts${tilt}`;
   }
@@ -810,11 +820,13 @@ function aibScreenSnap(host) {
       if (!el) return;
       const r = el.getBoundingClientRect();
       P[pn] = { box: aibReadBox(el), before: aibReadBox(el, '::before'), after: aibReadBox(el, '::after'),
-        rect: { x: Math.round((r.left - rb.left) / k), y: Math.round((r.top - rb.top) / k), w: Math.round(r.width / k), h: Math.round(r.height / k) },
+        rect: (() => { const ow = el.offsetWidth, oh = el.offsetHeight; if (!ow && !oh) return { x: Math.round((r.left - rb.left) / k), y: Math.round((r.top - rb.top) / k), w: Math.round(r.width / k), h: Math.round(r.height / k) };
+          const cx = (r.left + r.width / 2 - rb.left) / k, cy = (r.top + r.height / 2 - rb.top) / k; return { x: Math.round(cx - ow / 2), y: Math.round(cy - oh / 2), w: Math.round(ow), h: Math.round(oh) }; })(),
         text: txt(el).slice(0, 140), n: root.querySelectorAll(sel).length, glyph: glyph(el) };
     });
     const list = root.querySelector(id === 'home' ? '.sb-home-list .sb-k-list' : '.sb-ob-list .sb-k-list');
     P.listInfo = aibListInfo(list, k);
+    P.extra = aibScreenExtra(root, k, id);
     const all = sel => Array.from(root.querySelectorAll(sel));
     P.copy = id === 'home' ? {
       tabs: all('.sb-tab').map(t => [txt(t), glyph(t)]),
@@ -1062,6 +1074,11 @@ function aibKitPhoneRow(ctx, row, srcIn) {
             : row.role === 'Body' ? ((K.screens && K.screens.body) || part('card', 'body'))
               : part('card', 'body'));
   if (!src) return row;
+  if (K.screens && K.screens.pixel && /^(Display|Large title|Title|Title 2)$/.test(row.role) && ctx.state.headingFont) {
+    const hf = ctx.state.headingFont, w = abWeightNear(hf, 400);
+    if (ctx.fontUse) { const u = (ctx.fontUse[hf.name] = ctx.fontUse[hf.name] || { face: hf, weights: {} }); u.weights[String(w)] = { weight: w, italic: false }; }
+    return Object.assign({}, row, { face: hf, weight: w, italic: false, note: 'uppercase (the pixel face the Built view draws its title glyphs from)', display: true, ps: aibPostScript(hf, w, false) });
+  }
   const { face } = aibKitFaceObj(ctx, src.ff);
   const weight = aibKitWeight(ctx, src.ff, src.fw);
   const italic = src.fst === 'italic';
@@ -1165,7 +1182,7 @@ function aibKitShadow(sh, name, filter) {
     .filter(l => { const col = (/(?:rgba?|color)\([^()]*\)(?:\|(?:rgba?|color)\([^()]*\))?/i.exec(l) || [''])[0]; return !col || aibAlpha(col) >= 0.03; });
   const kinds = [];
   const add = k => { if (kinds.indexOf(k) < 0) kinds.push(k); };
-  const dir = (x, y) => [y ? `${Math.abs(Math.round(y))}pt ${y > 0 ? 'down' : 'up'}` : '', x ? `${Math.abs(Math.round(x))}pt ${x > 0 ? 'right' : 'left'}` : ''].filter(Boolean).join(' and ');
+  const dir = (x, y) => [x ? `${Math.abs(Math.round(x))}pt ${x > 0 ? 'right' : 'left'}` : '', y ? `${Math.abs(Math.round(y))}pt ${y > 0 ? 'down' : 'up'}` : ''].filter(Boolean).join(' and ');
   const words = layers.map(l => {
     const col = (/(?:rgba?|color)\([^()]*\)(?:\|(?:rgba?|color)\([^()]*\))?|#[0-9a-f]{3,8}\b/i.exec(l) || [''])[0];
     const inset = /\binset\b/.test(l);
@@ -1235,7 +1252,7 @@ function aibKitModel(ctx, snap) {
   const usage = {};
   let curId = '';
   const name = css => {
-    const n = name0(css, curId);
+    const n = name0(css, ctx._nameHint || curId);
     const base = (/^(--[a-z0-9-]+)/.exec(n) || [])[1];
     if (base && curId) (usage[base] = usage[base] || new Set()).add(curId);
     return n;
@@ -1248,6 +1265,7 @@ function aibKitModel(ctx, snap) {
   const dims = o => (Math.abs(o.w - o.h) < 1 ? `${Math.round(o.w)}x${Math.round(o.h)}pt` : `${Math.round(o.w)}x${Math.round(o.h)}pt`);
   Object.keys(snap.cells).forEach(id => {
     curId = id;
+    ctx._markOwner = nameOf(id).toLowerCase();
     const states = snap.cells[id];
     const order = Object.keys(states);
     if (!order.length) return;
@@ -1358,14 +1376,24 @@ function aibKitModel(ctx, snap) {
     }
     if (id === 'tabbar' && snap.chrome && snap.chrome.tabbar) size = `${Math.round(snap.chrome.tabbar.h)}pt high on a screen, including the 34pt home indicator area`;
     if (id === 'list' && snap.listInfo) marks.unshift(aibListWords(snap.listInfo, name));
+    if (id === 'toggle') {
+      const sw = st => states[st] && states[st].switch;
+      const knob = st => { const P = sw(st); if (!P) return ''; const k = [P.before, P.after].find(x => x && x.w > 0 && x.w < P.box.w * 0.8); return k ? aibPlace(k, P.box, '::before').replace(/^vertically centred in the box, /, '').replace(/the box, /, '') : ''; };
+      const off = knob(order[0]), on = knob(order[1] || '');
+      if (off || on) marks.unshift(`knob: ${off ? `off — ${off}` : ''}${off && on ? '; ' : ''}${on ? `on — ${on}` : ''}; any tag beside it keeps at least 6pt from the knob`);
+      const word = st => { const P = sw(st); return P ? [P.before, P.after].map(x => (x ? aibPseudoText(x.content).trim() : '')).filter(Boolean).join(' ') : ''; };
+      const wOff = word(order[0]), wOn = word(order[1] || '');
+      if (wOff || wOn) marks.unshift(`meaning: off shows ${wOff ? `"${wOff}"` : 'no mark'}, on shows ${wOn ? `"${wOn}"` : 'no mark'}`);
+    }
     if (id === 'btn-primary' && /gradient/.test(main.img || '')) {
       const c = aibGradContrast(ctx, main, name);
       if (c) marks.push(c);
     }
-    rows[id] = { fill: fillCell, text: aibKitType(ctx, tp, name), edge, size, marks: marks.filter(Boolean), states: diffs, main, tp, sh, rest, all: states };
+    rows[id] = { fill: fillCell, text: aibKitType(ctx, tp, name), edge, size, marks: marks.filter(Boolean), states: diffs, main, tp, sh, rest, all: states, groundRaw: useLayer ? lay.o.bg : main.bg };
   });
   aibKitFixContrast(ctx, rows);
   curId = 'screens';
+  ctx._kitRows = rows;
   const scr = snap.screens ? aibScreenModel(ctx, snap.screens, name) : null;
   curId = 'chrome';
   const ch = snap.chrome || {};
@@ -1385,6 +1413,42 @@ function aibKitModel(ctx, snap) {
 
 // Each kit row's own text against its fill (or the canvas behind it), in light and in dark. Text under 4.5:1 in
 // either mode gets a kit token shaded just enough (toward black or white) in the mode that fails.
+// A token's value in mode m: palette rows and their on-colours, kit tokens, the style's own variables, derived tones.
+function aibTokenValue(ctx, tk, m) {
+  const r = (ctx.rows || []).find(x => x.token === tk);
+  if (r) return r.get(m);
+  for (const x of ctx.rows || []) { const on = (x.on || []).find(([t]) => t === tk); if (on) return on[1](m); }
+  if (ctx.kitVars && ctx.kitVars[tk]) return ctx.kitVars[tk].get(m);
+  if (/^--ab-/.test(tk) && m && m.extras && m.extras[tk] != null) return String(m.extras[tk]).trim();
+  const d = typeof aibKitDerived === 'function' ? aibKitDerived(ctx)[tk] : null;
+  return d ? d.get(m) : '';
+}
+
+// A text colour on its ground ("light|dark" measurements) in both modes. Passing: null. Failing (under 4.5:1, or 3:1
+// for text 24pt and up): the first on-colour token that passes in both modes, logged in ctx.pairLog and, when the
+// pair is what the Built view draws, in ctx.styleIssues.
+function aibPairFix(ctx, textRaw, groundRaw, big, label, notBuilt) {
+  if (typeof contrastRatio !== 'function') return null;
+  const need = big ? 3 : 4.5;
+  const hex = p => '#' + p.slice(0, 3).map(x => Math.round(Math.max(0, Math.min(255, x))).toString(16).padStart(2, '0')).join('');
+  const L = ctx.modes.find(m => m.mode === 'light') || ctx.modes[0], D = ctx.modes.find(m => m.mode === 'dark') || L;
+  const MS = [L, D];
+  const two = raw => { const p = String(raw || '').split('|'); return [aibRgba(p[0]), aibRgba(p[1] || p[0])]; };
+  const t = two(textRaw), g = two(groundRaw);
+  if (!t[0] || !g[0]) return null;
+  const flat = (c, i) => { const cv = aibRgba(MS[i].t.canvas) || [255, 255, 255, 1]; return hex(c.map((v, j) => (j < 3 ? v * c[3] + cv[j] * (1 - c[3]) : v))); };
+  const grounds = [0, 1].map(i => flat(g[i], i));
+  const ratios = [0, 1].map(i => contrastRatio(flat(t[i], i), grounds[i]));
+  ctx.pairLog = ctx.pairLog || [];
+  if (ratios.every(r => r >= need)) { ctx.pairLog.push({ label, ratios, need }); return null; }
+  const cands = ['--ink', '--canvas', '--on-primary', '--on-accent', '--on-secondary', '--card-ink', '--ab-sheet-ink', '--white', '--black'];
+  const score = tk => [0, 1].map(i => { const v = aibRgba(aibTokenValue(ctx, tk, MS[i])); return v ? contrastRatio(flat(v, i), grounds[i]) : 0; });
+  const pick = cands.map(tk => ({ tk, r: score(tk) })).find(x => x.r.every(v => v >= need)) || cands.map(tk => ({ tk, r: score(tk) })).sort((a, b) => Math.min(...b.r) - Math.min(...a.r))[0];
+  ctx.pairLog.push({ label, ratios: pick.r, need, was: ratios });
+  if (!notBuilt) (ctx.styleIssues = ctx.styleIssues || []).push(`${label}: the Built view draws text at ${ratios.map(r => r.toFixed(1)).join(' / ')}:1 (light / dark); the brief uses ${pick.tk}`);
+  return { token: pick.tk, ratios: pick.r, was: ratios };
+}
+
 function aibKitFixContrast(ctx, rows) {
   if (typeof contrastRatio !== 'function') return;
   const hex = p => '#' + p.slice(0, 3).map(x => Math.round(Math.max(0, Math.min(255, x))).toString(16).padStart(2, '0')).join('');
@@ -1393,7 +1457,7 @@ function aibKitFixContrast(ctx, rows) {
   Object.keys(rows).forEach(id => {
     const r = rows[id], t = r.tp, f = r.main;
     if (!t || !t.color || (t.fs || 0) >= 24 || (f.img && f.img !== 'none')) return;   // gradient fills: aibGradContrast
-    const tc = halves(t.color), fc = halves(f.bg);
+    const tc = halves(t.color), fc = halves(t !== f && aibAlpha(t.bg) >= 0.5 ? t.bg : (r.groundRaw || f.bg));
     const fix = [0, 1].map(i => {
       const tp = aibRgba(tc[i] || tc[0]), fp = aibRgba(fc[i] || fc[0]);
       if (!tp) return null;
@@ -1405,6 +1469,7 @@ function aibKitFixContrast(ctx, rows) {
       return { col: hex(toward), ok: false };
     });
     if (!fix[0] || !fix[1] || (fix[0].ok && fix[1].ok)) return;
+    (ctx.styleIssues = ctx.styleIssues || []).push(`kit ${id} text under 4.5:1 on its ground in ${fix[0].ok ? 'dark' : fix[1].ok ? 'light' : 'both modes'}; the brief shades it (--kit-${id.replace(/^btn-/, '')}-text)`);
     const nm = `--kit-${id.replace(/^btn-/, '')}-text`;
     const l = fix[0].col, d = fix[1].col;
     ctx.kitVars = ctx.kitVars || {};
@@ -1442,49 +1507,149 @@ function aibGradContrast(ctx, o, name) {
   return `label contrast on the gradient: ${r(label)} against its two ends${pick[1] !== label ? `; set the label in ${pick[0]} instead (${r(pick[1])})` : ''}`;
 }
 
-// The Built Mobile screens (Welcome, Home) top to bottom in plain words, measured: what sits where (y from the top
-// of the screen), the gaps between blocks, what sits inside which band, the marks the style adds, the sample copy.
+// Measured details of one Built phone: the welcome title's line breaks and drawn-letter tiles, body lines, icon
+// sizes per context, the home indicator, tab icons, and where a button's label and trailing mark sit.
+function aibScreenExtra(root, k, id) {
+  const rect = el => { const r = el.getBoundingClientRect(); return { x: r.left / k, y: r.top / k, w: r.width / k, h: r.height / k, b: r.bottom / k, r: r.right / k }; };
+  const lines = (el, units) => {
+    const rows = [];
+    units.forEach(u => { const t = String(u.t || '').trim(); if (!t) return; const y = Math.round(u.y); const row = rows.find(r => Math.abs(r.y - y) < 6); if (row) row.w.push(t); else rows.push({ y, w: [t] }); });
+    return rows.sort((a, b) => a.y - b.y).map(r => r.w.join(' '));
+  };
+  const words = el => {
+    const out = [];
+    const walk = n => {
+      if (n.nodeType === 3) {
+        const re = /\S+/g; let m;
+        while ((m = re.exec(n.textContent))) { const rg = document.createRange(); rg.setStart(n, m.index); rg.setEnd(n, m.index + m[0].length); const rr = rg.getClientRects()[0]; if (rr) out.push({ t: m[0], y: rr.top / k }); }
+      } else if (n.nodeType === 1 && n.getAttribute('aria-hidden') !== 'true') Array.from(n.childNodes).forEach(walk);
+    };
+    walk(el);
+    return out;
+  };
+  const ex = {};
+  const h = root.querySelector('.sb-ob-h');
+  if (h) {
+    const custom = h.classList.contains('ab-headline--custom');
+    const label = h.getAttribute('aria-label') || h.textContent;
+    if (!custom) ex.titleLines = lines(h, words(h));
+    else {
+      const wordEls = Array.from(h.querySelectorAll('[aria-hidden] .xpw, [aria-hidden] .pbh, [aria-hidden] .pbh-hl'));
+      const labelWords = String(label).trim().split(/\s+/);
+      const lineEls = Array.from(h.querySelectorAll('[aria-hidden] .xpl'));
+      if (lineEls.length) {
+        let i = 0;
+        ex.titleLines = lineEls.map(l => { const n = l.querySelectorAll('.xpw').length; const w = labelWords.slice(i, i + n).join(' '); i += n; return w; }).filter(Boolean);
+      } else if (wordEls.length === labelWords.length) {
+        const lh = parseFloat(getComputedStyle(h).lineHeight) || 30;
+        const ys = wordEls.map(w => { const r = rect(w); return r.y + r.h / 2; });
+        const rows = [];
+        ys.forEach((y, i) => { const row = rows.find(r => Math.abs(r.y - y) < lh / 2); if (row) row.w.push(labelWords[i]); else rows.push({ y, w: [labelWords[i]] }); });
+        ex.titleLines = rows.sort((a, b) => a.y - b.y).map(r => r.w.join(' '));
+      }
+      const tiles = Array.from(h.querySelectorAll('[aria-hidden] *')).filter(e => { const c = getComputedStyle(e); return aibAlpha(c.backgroundColor) > 0.3 && e.children.length === 0 && String(e.textContent).trim(); });
+      ex.tiles = tiles.map(e => { const c = getComputedStyle(e); const m = /^matrix\(([^)]+)\)$/.exec(c.transform); const p = m ? m[1].split(',').map(Number) : [1, 0]; return { ff: c.fontFamily, bg: c.backgroundColor, color: c.color, deg: Math.round(Math.atan2(p[1], p[0]) * 1800 / Math.PI) / 10, word: e.classList.contains('xpt-word'), t: e.textContent.trim(), gap: parseFloat(getComputedStyle(e).marginRight) || 0, h: rect(e).h }; });
+      const loop = h.querySelector('[aria-hidden] svg:not(.pbh-w)');
+      if (loop) { const c = getComputedStyle(loop); ex.loop = { color: c.color, word: (loop.closest('.xpw') || {}).textContent || '' }; }
+      ex.pixel = !!h.querySelector('.pbh-w');
+      ex.titleWords = labelWords;
+      const tile0 = h.querySelector('[aria-hidden] .xpw');
+      ex.wordGap = tile0 ? Math.round(parseFloat(getComputedStyle(tile0.parentNode).columnGap || getComputedStyle(tile0.parentNode).gap) || 0) : 0;
+    }
+    ex.titleH = Math.round(rect(h).h);
+    ex.titleLH = parseFloat(getComputedStyle(h).lineHeight) || 0;
+    const hl = h.querySelector('.ab-hl'), glue = h.querySelector('.ab-hl-glue');
+    ex.stopOutside = !!(glue && hl && /[.!?,…]$/.test(glue.textContent.trim()) && !/[.!?,…]$/.test(hl.textContent.trim()));
+  }
+  const body = root.querySelector('.sb-ob-body');
+  if (body) { const lh = parseFloat(getComputedStyle(body).lineHeight) || 24; ex.bodyLines = Math.round(rect(body).h / lh); ex.bodyChars = body.textContent.trim().length; }
+  const size = sel => { const e = root.querySelector(sel); return e ? Math.round(rect(e).w) : 0; };
+  ex.icons = { chip: size('.sb-k-ico svg'), bell: size('.sb-icon-btn svg'), tab: size('.sb-tab svg'), chevron: size('.sb-k-chev svg') };
+  const hb = root.querySelector('.sb-homebar');
+  if (hb) { const r = rect(hb), rb = rect(root); ex.homebar = { w: Math.round(r.w), h: Math.round(r.h), bottom: Math.round(rb.b - r.b), color: getComputedStyle(hb).backgroundColor }; }
+  const tabIco = sel => { const e = root.querySelector(sel); return e ? getComputedStyle(e).color + '|' + (getComputedStyle(e).fill || '') : ''; };
+  ex.tabIcon = { on: tabIco('.sb-tab[aria-current] svg'), off: tabIco('.sb-tab:not([aria-current]) svg') };
+  const tl = root.querySelector('.sb-tab[aria-current] span');
+  if (tl) { const c = getComputedStyle(tl); ex.tabChip = { padX: parseFloat(c.paddingLeft) || 0, padY: parseFloat(c.paddingTop) || 0, r: parseFloat(c.borderTopLeftRadius) || 0, bg: c.backgroundColor }; }
+  const btn = root.querySelector(id === 'home' ? '.sb-home-card .ab-cta' : '.sb-ob-actions .ab-cta');
+  if (btn) {
+    const b = rect(btn), lab = btn.querySelector('.ab-cta-label'), arr = btn.querySelector('.ab-cta-arrow');
+    if (lab) { const l = rect(lab); const words = words2 => words2; ex.label = Math.abs((l.x + l.w / 2) - (b.x + b.w / 2)) < 3 ? 'centred' : `left-aligned, ${Math.round(l.x - b.x)}pt in`; }
+    if (arr && rect(arr).w > 0) { const a = rect(arr); ex.arrowIn = Math.round(b.r - a.r); }
+  }
+  return ex;
+}
+
+// The Built Mobile screens (Welcome, Home) top to bottom in plain words, measured. Blocks flow: each gives its gap
+// below the previous block's bottom; only pinned parts (top band, bottom actions, tab bar) give a y from the top
+// of the screen. Every block sits on the 20pt side margins (350pt wide) unless a step says otherwise.
 function aibScreenModel(ctx, S, name) {
   const T = o => (o ? aibKitType(ctx, o, name) + (aibAlpha(o.bg) >= 0.03 ? `, on a ${aibKitFill(o, name)} strip${o.w ? ` ${Math.round(o.w)}pt wide` : ''}` : '') : '');
   const F = o => { const f = o ? aibKitFill(o, name) : 'none'; return f === 'none' ? 'no fill' : f; };
   const E = o => { const e = o ? aibKitEdge(o, name) : 'no edge'; return e === 'no edge' ? '' : `, a ${e} edge`; };
   const SH = o => { const t = o ? aibKitShadow(o.sh, name, o.filter).text : ''; return t ? `, ${t}` : ''; };
-  const mk = P => [P && P.before, P && P.after].map((x, i) => (x ? aibKitPseudo(ctx, x, i ? '::after' : '::before', P.box, name) : '')).filter(Boolean).join('; ');
-  const withMk = P => (mk(P) ? `, with ${mk(P)}` : '');
+  const mk = (P, owner) => { ctx._markOwner = owner || ''; const r = [P && P.before, P && P.after].map((x, i) => (x ? aibKitPseudo(ctx, x, i ? '::after' : '::before', P.box, name) : '')).filter(Boolean).join('; '); ctx._markOwner = ''; return r; };
+  const withMk = (P, owner) => { const m = mk(P, owner); return m ? `, with ${m}` : ''; };
   const gap = (a, b) => (a && b ? Math.max(0, b.rect.y - (a.rect.y + a.rect.h)) : 0);
+  const below = (a, b) => `${gap(a, b)}pt below the previous block`;
   const q = s => `"${String(s || '').replace(/"/g, '\'')}"`;
   const vis = P => (P && P.rect.w > 0 && P.rect.h > 0 ? P : null);
   const out = { welcome: [], home: [], copyW: [], copyH: [] };
   const W = S.welcome || {}, H = S.home || {};
+  const XW = W.extra || {}, XH = H.extra || {};
   const status = P => {
     const ic = ['signal', 'wifi', 'battery'].map(k => P[k]).filter(Boolean);
-    return `Status bar, ${P['status bar'].rect.h}pt from the top of the screen: the time ${q(P.time && P.time.text)} at the left in ${T(P.time && P.time.box)}; at the right ${ic.length ? ic.map(x => `${x === P.signal ? 'signal bars' : x === P.wifi ? 'Wi-Fi' : 'battery'} ${x.rect.w}x${x.rect.h}pt`).join(', ') : 'signal, Wi-Fi and battery'} in ${name(((ic[0] || P['status bar']).box).color)}, ${P['status bar'].box.pad ? Math.round(P['status bar'].box.pad[3]) : 20}pt in from each side.`;
+    return `Status bar (pinned, the top ${P['status bar'].rect.h}pt): the time ${q(P.time && P.time.text)} at the left in ${T(P.time && P.time.box)}; at the right ${ic.length ? `signal bars (four rising bars, ${P.signal ? P.signal.rect.w + 'x' + P.signal.rect.h : ''}pt), Wi-Fi (three arcs, ${P.wifi ? P.wifi.rect.w + 'x' + P.wifi.rect.h : ''}pt) and the battery (a rounded outline with its charge level and a small cap, ${P.battery ? P.battery.rect.w + 'x' + P.battery.rect.h : ''}pt)` : 'signal, Wi-Fi and battery'} in ${name(((ic[0] || P['status bar']).box).color)}.`;
   };
   const band = P => (P && aibAlpha(P.box.bg) >= 0.03 ? `a full-width band filled ${F(P.box)}${E(P.box)}` : `no band fill (on the canvas)${E(P && P.box)}`);
+  const home = X => (X.homebar ? `Home indicator (pinned): a ${X.homebar.w}x${X.homebar.h}pt ${name(X.homebar.color)} pill, centred, ${X.homebar.bottom}pt above the bottom edge.` : '');
   if (W['status bar']) {
     out.welcome.push(status(W));
+    ctx._nameHint = 'logo';
     const chip = vis(W['logo chip']), img = vis(W['logo image']), ini = W['logo initial'];
-    const logo = img ? `the logo image, ${img.rect.h}pt high` : chip ? `a ${chip.rect.w}x${chip.rect.h}pt logo chip (${F(chip.box)}, ${aibKitCorner(chip.box)}${E(chip.box)}${SH(chip.box)}) ${ini && vis(ini) && ini.text ? `holding the initial ${q(ini.text)} in ${T(ini.box)}` : 'with no letter'}${withMk(chip)}${ini && mk(ini) ? `, and inside it ${mk(ini)}` : ''}` : '';
-    const wm = W.wordmark ? `the name ${q(W.wordmark.text)} in ${T(W.wordmark.box)}` : '';
+    const logo = img ? `the logo image, ${img.rect.h}pt high` : chip ? `a ${chip.rect.w}x${chip.rect.h}pt logo chip (${F(chip.box)}, ${aibKitCorner(chip.box)}${E(chip.box)}${SH(chip.box)}) ${ini && vis(ini) && ini.text ? `holding the initial ${q(ini.text)} in ${T(ini.box)}` : 'with no letter'}${withMk(chip, 'logo chip')}${ini && mk(ini, 'logo chip') ? `, and inside it ${mk(ini, 'logo chip')}` : ''}` : '';
+    const wm = W.wordmark ? `the name ${q(W.wordmark.text)} in ${T(W.wordmark.box)}${withMk(W.wordmark, 'name')}` : '';
     const tr = W['top row'];
-    if (tr) out.welcome.push(`Top band at ${tr.rect.y}pt, ${tr.rect.h}pt high, ${band(tr)}; inside it: ${[logo, wm].filter(Boolean).join(', then ')}${W.skip ? `, and a ${q(W.skip.text)} text button at the right edge (${T(W.skip.box)})` : ''}.`);
-    if (W.eyebrow) out.welcome.push(`At ${W.eyebrow.rect.y}pt (${gap(tr, W.eyebrow)}pt below the band): the eyebrow ${q(W.eyebrow.text)} in ${T(W.eyebrow.box)}${withMk(W.eyebrow)}.`);
+    if (tr) out.welcome.push(`Top band (pinned at ${tr.rect.y}pt from the top of the screen, ${tr.rect.h}pt high), ${band(tr)}${withMk(tr, 'top band')}; inside it: ${[logo, wm].filter(Boolean).join(', then ')}${W.skip ? `, and a ${q(W.skip.text)} text button at the right margin (${T(W.skip.box)})` : ''}.`);
+    const topGap = gap(tr, W.eyebrow || W.headline), botGap = W['feature list'] && W.pager ? gap(W['feature list'], W.pager) : null;
+    const centred = botGap != null && Math.abs(topGap - botGap) <= 12;
+    const stamp = o => { if (!o) return ''; const e = aibKitEdge(o, name); const tf = aibKitTransform(o.tf).split(', ').filter(x => /^rotated/.test(x)).join(''); return [e !== 'no edge' ? `boxed by a ${e} edge` : '', e !== 'no edge' && o.pad && o.pad.some(v => v) ? `padding ${Math.round(o.pad[0])} ${Math.round(o.pad[1])}pt` : '', tf].filter(Boolean).join(', '); };
+    if (W.eyebrow) out.welcome.push(`${centred ? 'The content block (eyebrow to feature rows) is centred vertically between the band and the pager; it starts with' : `${topGap}pt below the band:`} the eyebrow ${q(W.eyebrow.text)} in ${T(W.eyebrow.box)}${stamp(W.eyebrow.box) ? ', ' + stamp(W.eyebrow.box) : ''}${withMk(W.eyebrow, 'eyebrow')}.`);
     const hd = W.headline;
+    ctx._nameHint = 'title-tile';
     if (hd) {
-      const custom = /ab-headline--custom/.test(hd.box.cls || '');
-      out.welcome.push(`At ${hd.rect.y}pt (${gap(W.eyebrow || tr, hd)}pt lower): the welcome title, the brand's tagline word for word, in ${T(hd.box)}${hd.box.lh ? ` on a ${Math.round(parseFloat(hd.box.lh))}pt line` : ''}, ${hd.rect.h}pt tall here, with \`text-wrap: balance\` so no word is left alone on a line${custom ? `. The Built view letters it in ${ctx.def.name}'s own drawn glyphs; in the app set it as plain text in that face, size and colour` : ''}${withMk(hd)}; its last word carries the highlight (see Colors).`);
+      const lines = XW.titleLines || [];
+      const brk = lines.length > 1 ? ` The Built view breaks it into ${lines.length} lines (${lines.map(q).join(' / ')}), breaking after ${lines.slice(0, -1).map(l => q(l.split(' ').pop())).join(' and ')}; set \`text-wrap: balance\` so no word is ever alone on a line.` : ' It fits on one line; set `text-wrap: balance` so a longer tagline never leaves one word alone on a line.';
+      let how = `in ${T(hd.box)}${hd.box.lh ? ` on a ${Math.round(parseFloat(hd.box.lh))}pt line` : ''}`;
+      if (XW.pixel) {
+        const face = ctx.state.headingFont;
+        if (face && ctx.fontUse) { const u = (ctx.fontUse[face.name] = ctx.fontUse[face.name] || { face, weights: {} }); u.weights['400'] = { weight: 400, italic: false }; }
+        how = `in ${face ? face.name : 'the display face'} (the pixel face this style draws its glyphs from; bundle it), uppercase, ${name(hd.box.color)}, sized so the title fills ${lines.length || Math.max(1, Math.round(XW.titleH / (XW.titleLH || 41)))} lines in ${XW.titleH}pt as the Built view does`;
+      } else if (XW.tiles && XW.tiles.length) {
+        const faces = Array.from(new Set(XW.tiles.map(t => String(t.ff).split(',')[0].replace(/["']/g, '').trim())));
+        faces.forEach(f => { const o = aibKitFaceObj(ctx, f); if (o.face && ctx.fontUse) { const u = (ctx.fontUse[f] = ctx.fontUse[f] || { face: o.face, weights: {} }); u.weights['400'] = { weight: 400, italic: false }; } });
+        const grounds = Array.from(new Set(XW.tiles.map(t => { const fx = aibPairFix(ctx, t.color, t.bg, (t.h || 0) >= 24, `title tile ${name(t.bg)}`); return `${name(t.bg)} with ${fx ? fx.token : name(t.color)} letters`; })));
+        const tilt = Math.max(...XW.tiles.map(t => Math.abs(t.deg)));
+        const whole = XW.tiles.filter(t => t.word).map(t => q(t.t));
+        how = `as ransom-note tiles: most words are cut into one tile per letter, each tile cycling the faces ${faces.join(' and ')} and the grounds ${grounds.slice(0, 6).join(', ')}${whole.length ? `; the words ${whole.join(' and ')} are each one whole-word tile` : ''}; about one tile in three is tilted, by up to ±${Math.round(tilt * 10) / 10}°, tiles touch within a word and words sit ${XW.wordGap || 6}pt apart; tile height about ${Math.round(Math.max(...XW.tiles.map(t => t.h)))}pt so the title fills ${lines.length || 2} lines in ${XW.titleH}pt`;
+        if (XW.loop) how += `; the highlight word ${q(String(XW.loop.word).trim())} is circled by a hand-drawn ${name(XW.loop.color)} marker loop`;
+      }
+      out.welcome.push(`${gap(W.eyebrow || tr, hd)}pt below the previous block: the welcome title, the brand's tagline word for word, ${how}.${brk}${withMk(hd, 'welcome title') ? ' Around it' + withMk(hd, 'welcome title').replace(/^,/, ':') + '.' : ''} Its last word carries the highlight (see Colors)${XW.stopOutside ? '; the full stop sits just outside the coloured part, inside the same nowrap span' : ''}.`);
     }
-    if (W.body) out.welcome.push(`At ${W.body.rect.y}pt (${gap(hd, W.body)}pt lower): one sentence of body in ${T(W.body.box)}.`);
+    if (W.body) out.welcome.push(`${below(hd, W.body)}: one sentence of body in ${T(W.body.box)}${withMk(W.body, 'body text')}, ${XW.bodyLines || 2} lines at most (about ${XW.bodyChars || 90} characters here).`);
     const fl = W['feature list'];
+    ctx._nameHint = 'feature';
     if (fl) {
       const ico = W['feature icon chip'], r1 = W['feature row'], r2 = W['second feature row'];
-      const rowMk = r1 && mk(r1), row2Mk = r2 && mk(r2);
-      out.welcome.push(`At ${fl.rect.y}pt (${gap(W.body || hd, fl)}pt lower): ${r1 ? r1.n : 3} feature rows, ${S.welcome.listInfo ? S.welcome.listInfo.rowH : r1.rect.h}pt each. Each starts with ${ico ? `a ${ico.rect.w}x${ico.rect.h}pt icon chip (${F(ico.box)}, ${aibKitCorner(ico.box)}${E(ico.box)}${SH(ico.box)}) holding an 18pt icon in ${name(ico.box.color)}` : 'a leading icon'}, then the title in ${T(W['feature title'] && W['feature title'].box)}. ${aibCap(aibListWords(S.welcome.listInfo, name).replace(/^grouping: /, ''))}${mk(fl) ? `; around the whole group: ${mk(fl)}` : ''}${rowMk && rowMk !== row2Mk ? `; the first row only: ${rowMk}` : rowMk ? `; on every row: ${rowMk}` : ''}.`);
+      const noLeader = m => String(m || '').split('; ').filter(x => !/leader line/.test(x)).join('; ');
+      const rowMk = r1 && noLeader(mk(r1, 'feature rows')), row2Mk = r2 && noLeader(mk(r2, 'feature rows'));
+      out.welcome.push(`${below(W.body || hd, fl)}: ${r1 ? r1.n : 3} feature rows, ${S.welcome.listInfo ? S.welcome.listInfo.rowH : r1.rect.h}pt each. Each starts with ${ico ? `a ${ico.rect.w}x${ico.rect.h}pt icon chip (${F(ico.box)}, ${aibKitCorner(ico.box)}${E(ico.box)}${SH(ico.box)}) holding a ${XW.icons && XW.icons.chip || 18}pt icon in ${name(ico.box.color)}` : 'a leading icon'}, then the title in ${T(W['feature title'] && W['feature title'].box)}. ${aibCap(aibListWords(S.welcome.listInfo, name).replace(/^grouping: /, ''))}${mk(fl, 'feature list') ? `; around the whole group: ${mk(fl, 'feature list')}` : ''}${rowMk && rowMk !== row2Mk ? `; the first row only: ${rowMk}` : rowMk ? `; on every row: ${rowMk}` : ''}.`);
     }
-    const dot = W['current dot'], od = W['other dot'];
-    if (W.pager && dot) out.welcome.push(`At ${W.pager.rect.y}pt: ${od ? od.n + 1 : 3} pager dots centred, the current one a ${dot.rect.w}x${dot.rect.h}pt ${F(dot.box)} ${/pill|circle/.test(aibKitCorner(dot.box)) ? 'pill' : 'block'}, the others ${od ? `${od.rect.w}x${od.rect.h}pt ${F(od.box)}` : 'smaller'}, ${od ? Math.max(0, od.rect.x - (dot.rect.x + dot.rect.w)) : 6}pt apart.`);
+    ctx._nameHint = 'pager';
     const pb = W['primary button'], sb = W['second button'];
-    if (pb) out.welcome.push(`Pinned at the bottom: the Primary button ${q(pb.text)} at ${pb.rect.y}pt${vis(W['primary arrow']) ? ' (with its trailing mark)' : ' (no trailing mark)'}${sb ? `, then at ${sb.rect.y}pt the Secondary button ${q(sb.text)}` : ''}, ending ${844 - ((sb || pb).rect.y + (sb || pb).rect.h)}pt above the bottom of the screen (the 34pt home indicator area included). Both as their UI kit rows.`);
+    const dot = W['current dot'], od = W['other dot'];
+    if (pb) out.welcome.push(`Pinned at the bottom, from the top of the screen: ${W.pager && dot ? `${od ? od.n + 1 : 3} pager dots centred at ${W.pager.rect.y}pt (the current one a ${dot.rect.w}x${dot.rect.h}pt ${F(dot.box)} ${/pill|circle/.test(aibKitCorner(dot.box)) ? 'pill' : 'block'}, the others ${od ? `${od.rect.w}x${od.rect.h}pt ${F(od.box)}` : 'smaller'}, ${od ? Math.max(0, od.rect.x - (dot.rect.x + dot.rect.w)) : 6}pt apart), then ` : ''}the Primary button ${q(pb.text)} at ${pb.rect.y}pt (label ${XW.label || 'centred'}${XW.arrowIn != null ? `, its trailing mark ${XW.arrowIn}pt in from the right edge` : ', no trailing mark'})${sb ? `, then the Secondary button ${q(sb.text)} at ${sb.rect.y}pt` : ''}; the last one is ${(sb || pb).rect.h}pt tall and ends ${844 - ((sb || pb).rect.y + (sb || pb).rect.h)}pt above the bottom edge.`);
+    if (home(XW)) out.welcome.push(home(XW));
     const fc = (S.welcome.copy || {}).features || [];
     if (fc.length) out.copyW.push(`feature rows: ${fc.map(([t, g]) => `${q(t)}${g ? ` (${g} icon)` : ''}`).join(', ')}`);
     if (W.eyebrow) out.copyW.push(`eyebrow ${q(W.eyebrow.text)}`);
@@ -1492,42 +1657,53 @@ function aibScreenModel(ctx, S, name) {
     if (pb) out.copyW.push(`buttons ${q(pb.text)} and ${q(sb && sb.text)}`);
   }
   if (H['status bar']) {
+    ctx._nameHint = 'home';
     out.home.push(status(H));
     const t = H.title, ey = H.eyebrow, tb = H['top band'];
     const bell = H['bell button'], bd = H['bell dot'];
-    if (tb) out.home.push(`Top band at ${tb.rect.y}pt, ${tb.rect.h}pt high, ${band(tb)}; inside it: ${ey ? `the eyebrow ${q(ey.text)} at ${ey.rect.y}pt in ${T(ey.box)}${withMk(ey)}; ` : ''}${t ? `the screen title ${q(t.text)} at ${t.rect.y}pt in ${T(t.box)}${withMk(t)}` : ''}${bell ? `, and at the right the notifications Icon button (${bell.rect.w}x${bell.rect.h}pt, as its kit row)${bd ? ` with a ${bd.rect.w}pt ${F(bd.box)} status dot${SH(bd.box)} on its top-right corner` : ''}` : ''}.`);
+    if (tb) out.home.push(`Top band (pinned at ${tb.rect.y}pt from the top of the screen, ${tb.rect.h}pt high), ${band(tb)}${withMk(tb, 'top band')}; inside it: ${ey ? `the eyebrow ${q(ey.text)} in ${T(ey.box)}${withMk(ey, 'eyebrow')}; ${gap(ey, t)}pt below it ` : ''}${t ? `the screen title ${q(t.text)} in ${T(t.box)}${withMk(t, 'screen title')}` : ''}${bell ? `; at the right margin the notifications Icon button (${bell.rect.w}x${bell.rect.h}pt, as its kit row, ${XH.icons && XH.icons.bell || 20}pt bell)${bd ? ` with a ${bd.rect.w}pt ${F(bd.box)} status dot${SH(bd.box)} on its top-right corner` : ''}` : ''}.`);
     const c = H['summary card'];
     if (c) {
       const seg = H['card segmented control'], ctit = H['card title'], cb = H['card body'], cbtn = H['card button'];
       const rel = P => (P ? `${P.rect.y - c.rect.y}pt` : '');
-      const inner = [seg && `the Segmented control at ${rel(seg)} (${seg.rect.h}pt)`, ctit && `the card title ${q(ctit.text)} at ${rel(ctit)} (${ctit.rect.h}pt, ${T(ctit.box)})`, cb && `the body at ${rel(cb)} (${cb.rect.h}pt, ${T(cb.box)})`, cbtn && `the Primary button ${q(cbtn.text)} at ${rel(cbtn)} (${cbtn.rect.h}pt${vis(H['card arrow']) ? ', with its trailing mark' : ', no trailing mark'})`].filter(Boolean);
+      const inner = [seg && `the Segmented control at ${rel(seg)} (${seg.rect.h}pt tall)`, ctit && `the card title ${q(ctit.text)} at ${rel(ctit)} (${ctit.rect.h}pt, ${T(ctit.box)}${withMk(ctit, 'card title')})`, cb && `the body at ${rel(cb)} (${cb.rect.h}pt, ${T(cb.box)}${withMk(cb, 'card body')})`, cbtn && `the Primary button ${q(cbtn.text)} at ${rel(cbtn)} (${cbtn.rect.h}pt, label ${XH.label || 'centred'}${XH.arrowIn != null ? `, trailing mark ${XH.arrowIn}pt in from the right edge` : ', no trailing mark'})`].filter(Boolean);
       const last = cbtn || cb || ctit || seg;
-      out.home.push(`At ${c.rect.y}pt (${gap(tb || t, c)}pt below the band): the summary Card, ${c.rect.w}pt wide and ${c.rect.h}pt tall${withMk(c)}. Inside, measured from the card's top edge: ${inner.join(', ')}; ${last ? `${c.rect.y + c.rect.h - (last.rect.y + last.rect.h)}pt of padding below the button` : ''}.`);
+      out.home.push(`${gap(tb || t, c)}pt below the band: the summary Card, full width, ${c.rect.h}pt tall${withMk(c, 'card')}. Inside, as y offsets from the card's top edge (these replace the kit card's padding): ${inner.join(', ')}; ${last ? `${c.rect.y + c.rect.h - (last.rect.y + last.rect.h)}pt below the button to the card's bottom edge` : ''}.`);
     }
     const sec = H['section row'], sl = H['section label'], sa = H['see all'], li = H.list;
-    if (sec) out.home.push(`At ${sec.rect.y}pt (${gap(c, sec)}pt below the card): the section label ${q(sl && sl.text)} in ${T(sl && sl.box)}${withMk(sl)}${sa ? `, with a ${q(sa.text)} text button at the right (${T(sa.box)})` : ''}; the list starts ${gap(sec, li)}pt below it.`);
+    if (sec) out.home.push(`${gap(c, sec)}pt below the card: the section label ${q(sl && sl.text)} in ${T(sl && sl.box)}${withMk(sl, 'section label')}${sa ? `, with a ${q(sa.text)} text button at the right margin (${T(sa.box)})` : ''}.`);
     if (li) {
       const r1 = H.row, r2 = H['second row'];
-      const rowMk = r1 && mk(r1), row2Mk = r2 && mk(r2);
-      out.home.push(`At ${li.rect.y}pt: the list, ${r1 ? r1.n : ''} rows of ${S.home.listInfo ? S.home.listInfo.rowH : r1.rect.h}pt: the avatar, the title in ${T(H['row title'] && H['row title'].box)}, a detail line in ${T(H['row detail'] && H['row detail'].box)}, and the value with a chevron at the right in ${T(H['row value'] && H['row value'].box)}. ${aibCap(aibListWords(S.home.listInfo, name).replace(/^grouping: /, ''))}${mk(li) ? `; around the whole group: ${mk(li)}` : ''}${rowMk && rowMk !== row2Mk ? `; the first row only: ${rowMk}` : rowMk ? `; on every row: ${rowMk}` : ''}. It scrolls under the tab bar and ends on a whole row above it.`);
+      const rowMk = r1 && mk(r1, 'list rows'), row2Mk = r2 && mk(r2, 'list rows');
+      const tMk = mk(H['row title'], 'row title'), vMk = mk(H['row value'], 'row value');
+      out.home.push(`${below(sec, li)}: the list, ${r1 ? r1.n : ''} rows of ${S.home.listInfo ? S.home.listInfo.rowH : r1.rect.h}pt: the avatar, the title in ${T(H['row title'] && H['row title'].box)}${H['row title'] && H['row title'].box.tt === 'none' ? ' (sentence case, as written)' : ''}${tMk ? ` (${tMk})` : ''}, a detail line in ${T(H['row detail'] && H['row detail'].box)}${mk(H['row detail'], 'row detail') ? ` (${mk(H['row detail'], 'row detail')})` : ''}, and the value with a ${XH.icons && XH.icons.chevron || 16}pt chevron at the right in ${T(H['row value'] && H['row value'].box)}${vMk ? ` (${vMk})` : ''}. ${aibCap(aibListWords(S.home.listInfo, name).replace(/^grouping: /, ''))}${mk(li, 'list') ? `; around the whole group: ${mk(li, 'list')}` : ''}${rowMk && rowMk !== row2Mk ? `; the first row only: ${rowMk}` : rowMk ? `; on every row: ${rowMk}` : ''}.${(() => { const tbY = H['tab bar'] ? H['tab bar'].rect.y : 761; const left = tbY - (li.rect.y + li.rect.h); return left > 80 ? ` Home shows exactly ${r1 ? r1.n : 3} rows, as the Built view does; the list ends ${left}pt above the tab bar and that space stays empty.` : ' It scrolls under the tab bar and ends on a whole row above it.'; })()}`);
     }
-    const tbar = H['tab bar'], st = H['selected tab'], stl = H['selected tab label'], ot = H['other tab'], otl = H['other tab label'];
+    ctx._nameHint = 'tab';
+    const kt = ((ctx.kit && ctx.kit.rows) || ctx._kitRows || {}).tabbar, kitSel = kt && kt.tp ? name(kt.tp.color) : '';
+    if (kitSel && H['selected tab label'] && name(H['selected tab label'].box.color) !== kitSel) (ctx.styleIssues = ctx.styleIssues || []).push(`tab bar: the UI kit draws the selected label in ${kitSel}, the Home screen in ${name(H['selected tab label'].box.color)}; the brief follows the screen`);
+    const tbar = H['tab bar'], st = H['selected tab'], stl = H['selected tab label'], otl = H['other tab label'];
     if (tbar) {
       const tabs = (S.home.copy || {}).tabs || [];
-      const fillOf = (a, b) => [a, b].map(x => (x ? F(x.box) : 'none')).find(f => f !== 'none') || 'no fill';
-      out.home.push(`Tab bar at ${tbar.rect.y}pt, ${tbar.rect.h}pt including the home indicator: ${F(tbar.box) === 'none' ? 'no fill' : F(tbar.box)}${aibKitEdge(tbar.box, name) !== 'no edge' ? `, a ${aibKitEdge(tbar.box, name)} rule` : ''}, ${Math.round(tbar.box.pad[3])}pt side padding; ${tabs.length} tabs (${tabs.map(([l, g]) => `${q(l)} with the ${g} icon`).join(', ')}). The selected tab: label ${stl ? name(stl.box.color) : ''} on ${fillOf(stl, st)}${st && mk(st) ? `, with ${mk(st)}` : ''}; other tabs: label ${otl ? name(otl.box.color) : ''} on ${fillOf(otl, ot)}. Labels are text on that fill, never solid blocks of the label colour.`);
+      const ico = v => name(String(v || '').split('|')[0]);
+      const chip = XH.tabChip && aibAlpha(XH.tabChip.bg) >= 0.03 ? `the label alone sits on a chip (${F(stl.box)}, the text width plus ${Math.round(XH.tabChip.padX)}pt each side, ${Math.round(XH.tabChip.padY)}pt above and below${XH.tabChip.r ? `, ${Math.round(XH.tabChip.r)}pt corners` : ''})` : `the label has no chip`;
+      out.home.push(`Tab bar (pinned at ${tbar.rect.y}pt from the top of the screen, ${tbar.rect.h}pt including the home indicator): ${F(tbar.box)}${aibKitEdge(tbar.box, name) !== 'no edge' ? `, a ${aibKitEdge(tbar.box, name)} rule` : ''}, ${Math.round(tbar.box.pad[3])}pt side padding; ${tabs.length} tabs (${tabs.map(([l, g]) => `${q(l)} with the ${g} icon`).join(', ')}), each a ${XH.icons && XH.icons.tab || 24}pt icon over its label. Tab cells are transparent. Selected tab: ${chip}, label text ${stl ? name(stl.box.color) : ''}, icon ${ico(XH.tabIcon && XH.tabIcon.on)}${st && mk(st, 'tab bar') ? `, with ${mk(st, 'tab bar')}` : ''}. Other tabs: label text ${otl ? name(otl.box.color) : ''}, icon ${ico(XH.tabIcon && XH.tabIcon.off)}, no chip. Labels are text, never solid blocks of the label colour.`);
     }
+    if (home(XH)) out.home.push(home(XH));
     const cp = S.home.copy || {};
     if (cp.segments && cp.segments.length) out.copyH.push(`segments ${cp.segments.map(q).join(', ')}`);
     if (c) out.copyH.push(`card ${q(H['card title'] && H['card title'].text)}, ${q(H['card body'] && H['card body'].text)}, button ${q(H['card button'] && H['card button'].text)}`);
     if (cp.rows && cp.rows.length) out.copyH.push(`rows ${cp.rows.map(r => r.filter(Boolean).map(q).join(' / ')).join('; ')}`);
     if (sec) out.copyH.push(`section ${q(sl && sl.text)}, ${q(sa && sa.text)}`);
   }
+  ctx._nameHint = 'highlight';
   const hl = W.highlight;
   const hd = W.headline;
+  const pagerLow = W['other dot'] && typeof contrastRatio === 'function' ? (() => { const a = aibRgba(W['other dot'].box.bg), cv = aibRgba(ctx.cur.t.canvas); if (!a || !cv) return 0; const hex = p => '#' + p.slice(0, 3).map(x => Math.round(x).toString(16).padStart(2, '0')).join(''); return contrastRatio(hex(a.slice(0, 3).map((v, i) => v * a[3] + cv[i] * (1 - a[3]))), ctx.cur.t.canvas); })() : 0;
+  const hlWords = hl ? aibHlWords(ctx, hl, hd && hd.box, name) : null;
+  ctx._nameHint = '';
   return { welcome: out.welcome, home: out.home, copyW: out.copyW, copyH: out.copyH, display: hd && hd.box, displayCustom: !!(hd && /ab-headline--custom/.test(hd.box.cls || '')), eyebrow: (W.eyebrow || H.eyebrow || {}).box,
-    body: W.body && W.body.box, homeTitle: H.title && H.title.box, hl: hl ? aibHlWords(ctx, hl, hd && hd.box, name) : null,
-    arrows: { welcome: !!vis(W['primary arrow']), home: !!vis(H['card arrow']) } };
+    body: W.body && W.body.box, homeTitle: H.title && H.title.box, hl: hlWords, pixel: !!XW.pixel, tiles: !!(XW.tiles && XW.tiles.length),
+    arrows: { welcome: XW.arrowIn != null, home: XH.arrowIn != null }, homeList: S.home && S.home.listInfo, icons: XH.icons || XW.icons || {}, chipIcon: XW.icons && XW.icons.chip, pagerContrast: pagerLow };
 }
 
 // The highlight word as the Built Welcome headline draws it: '' when it looks like the rest of the title.
@@ -1538,6 +1714,12 @@ function aibHlWords(ctx, P, head, name) {
   if (aibAlpha(o.bg) >= 0.03) bits.push(`a solid ${name(o.bg)} block behind it`);
   const img = aibImgWords(o, name, 'the word');
   if (img) bits.push(img);
+  const bandCol = aibAlpha(o.bg) >= 0.03 ? o.bg : ((String(o.img || '').match(/(?:rgba?|color)\([^()]*\)(?:\|(?:rgba?|color)\([^()]*\))?/g) || []).find(c => aibAlpha(c) >= 0.5) || '');
+  if (bandCol && /block|band covering|full width/.test(bits.join(' ')) && !/low across|very bottom|along the bottom/.test(bits.join(' '))) {
+    const fx = aibPairFix(ctx, o.color, bandCol, (o.fs || 0) >= 24, 'highlight word');
+    if (fx) bits.splice(0, bits.length, ...bits.filter(b => !/^text /.test(b)));
+    if (fx) bits.push(`its letters in ${fx.token} so they read on the ${name(bandCol)} (${fx.ratios.map(r => r.toFixed(1)).join(' / ')}:1 light / dark)`);
+  }
   if (/underline/.test(o.deco || '')) bits.push(`an underline in ${name(o.dc || o.color)}${o.dt && o.dt !== 'auto' ? `, ${Math.round((parseFloat(o.dt) / (o.fs || 1)) * 100) / 100}em thick` : ''}${o.uo && o.uo !== 'auto' ? `, ${Math.round((parseFloat(o.uo) / (o.fs || 1)) * 100) / 100}em below the baseline` : ''}`);
   if (head && o.fst !== head.fst) bits.push(o.fst);
   if (head && o.fw !== head.fw) bits.push(`weight ${o.fw}`);
@@ -1661,7 +1843,7 @@ function aibSecSignature(ctx) {
   out.push(`- Surfaces: ${['card', 'list', 'sheet'].map(surf).filter(Boolean).join('; ')}.`);
   const tt = o => (o ? aibKitType(ctx, o, name).replace(/^[^,]+, /, '').replace(/ \d+(?:\.\d+)?pt/, '') : '');
   const S = K.screens;
-  const type = [S && S.display ? `welcome title ${tt(S.display)}` : '', R.divider ? `section labels ${tt(R.divider.main)}` : '', R['btn-primary'] ? `button labels ${tt(R['btn-primary'].main)}` : ''].filter(Boolean);
+  const type = [S && S.pixel && ctx.state.headingFont ? `welcome and screen titles ${ctx.state.headingFont.name} (display), uppercase` : S && S.display ? `welcome title ${tt(S.display)}` : '', R.divider ? `section labels ${tt(R.divider.main)}` : '', R['btn-primary'] ? `button labels ${tt(R['btn-primary'].main)}` : ''].filter(Boolean);
   out.push(`- Type: ${type.join('; ')}.`);
   const pb = R['btn-primary'];
   const segSel = R.segmented && R.segmented.rest.selected && R.segmented.rest.selected.box;
@@ -1679,6 +1861,10 @@ function aibSecSignature(ctx) {
     if (tf && motif.length < 4) motif.push(`${nm(id)} ${tf}`);
   });
   if (motif.length) out.push(`- Signature details: ${motif.slice(0, 4).join('; ')}.`);
+  const tm = ctx.textMarks ? Object.keys(ctx.textMarks).filter(k => !/^N$/.test(k)) : [];
+  if (tm.length) out.push(`- Text the style draws as marks (keep them, with your own values where they are data): ${tm.slice(0, 8).map(k => `"${k}" on ${Array.from(ctx.textMarks[k]).filter(Boolean).slice(0, 3).join(', ')}`).join('; ')}.`);
+  const leaders = Object.keys(R).filter(id => R[id].marks.some(m => /leader line/.test(m)));
+  if (leaders.length) out.push(`- Dotted or dashed leader lines on list rows that show a value (${leaders.map(nm).join(', ')}), filling the gap between the label and the value; never on the Welcome feature rows.`);
   return out;
 }
 
@@ -1790,9 +1976,11 @@ function aibPaletteRows(ctx) {
   return rows;
 }
 
-function aibColorsTable(ctx) {
+function aibColorsTable(ctx0) {
+  const darkFirst = ctx0.app && ctx0.mode === 'dark' && ctx0.modes.length > 1;
+  const ctx = darkFirst ? Object.assign({}, ctx0, { modes: ctx0.modes.slice().reverse() }) : ctx0;
   const single = ctx.modes.length === 1;
-  const head = single ? ['Token', 'Value', 'Job', 'On (text and icons on it)'] : ['Token', 'Light', 'Dark', 'Job', 'On (text and icons on it)'];
+  const head = single ? ['Token', 'Value', 'Job', 'On (text and icons on it)'] : ['Token'].concat(darkFirst ? ['Dark (default)', 'Light'] : ['Light', 'Dark'], ['Job', 'On (text and icons on it)']);
   const nm = tk => '`' + (ctx.swiftOnly ? aibSwiftTok(tk) : tk) + '`';
   const body = ctx.rows.map(r => {
     const vals = ctx.modes.map(m => r.get(m));
@@ -2046,8 +2234,18 @@ function aibHighlightRule(ctx) {
     if (S && S.displayCustom) {
       const sents = String(def.highlightNote || '').split(/(?<=\.)\s+/);
       const plain = sents.find(x => /running|UI text|in the app|in text/i.test(x));
-      const how2 = plain ? plain.replace(/^In running UI text,?\s*/i, '').replace(/^the highlight word is\s*/i, '').replace(/\.$/, '') : /primary|inverse/i.test(def.highlightNote || '') ? 'a `--primary` block behind it with `--on-primary` text, padding 0 0.15em' : 'set in `--accent-ink`';
-      return `- Highlight word: ${one}. The Built view letters the welcome title in ${def.name}'s own drawn glyphs; in the app it is plain text (see Built screens) and the last word is ${how2.charAt(0).toLowerCase() + how2.slice(1)}.`;
+      let how2 = plain ? plain.replace(/^In running UI text,?\s*/i, '').replace(/^the highlight word is\s*/i, '').replace(/\.$/, '') : /primary|inverse/i.test(def.highlightNote || '') ? 'a `--primary` block behind it with `--on-primary` text, padding 0 0.15em' : 'set in `--accent-ink`';
+      let letters = '';
+      if (/swipe|highlighter|block|behind/i.test(how2)) {
+        const L = ctx.modes.find(m => m.mode === 'light') || ctx.modes[0], D = ctx.modes.find(m => m.mode === 'dark') || L;
+        const groundTk = /fluoro/i.test(how2) && aibTokenValue(ctx, '--ab-fluoro', L) ? '--ab-fluoro' : /primary/i.test(how2) ? '--primary' : '--accent';
+        const textTk = /\bink\b/i.test(how2) ? '--ink' : /on-primary/.test(how2) ? '--on-primary' : '--ink';
+        const raw = tk => `${aibTokenValue(ctx, tk, L)}|${aibTokenValue(ctx, tk, D)}`;
+        const fx = aibPairFix(ctx, raw(textTk), raw(groundTk), true, 'highlight word', true);
+        if (fx) how2 = how2.replace(/\bplain ink\b/i, `\`${fx.token}\` letters`);
+        letters = fx ? ` The swipe is \`${groundTk}\`; set the word's letters in \`${fx.token}\` (${fx.ratios.map(r => r.toFixed(1)).join(' / ')}:1 light / dark), not \`${textTk}\`, which drops to ${Math.min(...fx.was).toFixed(1)}:1.` : ` The swipe is \`${groundTk}\` with \`${textTk}\` letters.`;
+      }
+      return `- Highlight word: ${one}.${letters} The Built view letters the welcome title in ${def.name}'s own drawn glyphs; in the app ${S.pixel ? 'set it in the bundled pixel face' : S.tiles ? 'build it from tiles' : 'set it as text'} as Built screens describes, and the last word is ${how2.charAt(0).toLowerCase() + how2.slice(1)}.`;
     }
     if (kind === 'custom' && /\bno highlight\b/i.test(def.highlightNote || '')) return `- Highlight word: no highlight in this style; ${one.replace(/ and highlight[\s\S]*$/, '')}.`;
     const note = String(def.highlightNote || '').replace(/\s*Use it once per view\.?$/, '').replace(/\.$/, '');
@@ -2189,7 +2387,13 @@ function aibSecScreens(ctx) {
   const names = { title: 'Large title', body: 'Body text', section: 'Section label' };
   UI_KIT.forEach(g => g.items.forEach(it => { names[it.id] = it.name; }));
   const out = ['## Screen layouts'];
+  const built = ctx.kit && ctx.kit.screens;
   UI_KIT_SCREENS.forEach(sc => {
+    if (built && sc.id !== 'list') {
+      out.push('', `### ${sc.name}`, sc.id === 'onboarding' ? 'As the Built Welcome screen (see Built screens).' : sc.id === 'settings' ? 'As the Settings composition under Built screens.'
+        : `${sc.use} Top to bottom: ${sc.blocks.map(b => names[b] || b).join(', ')}. ${sc.rules[sc.rules.length - 1]}`);
+      return;
+    }
     const more = { list: ['Show at least 6 rows so the screen reads as a real list.'], settings: ['At least 3 groups.', 'Settings is a tab: the screen shows the tab bar.'] }[sc.id] || [];
     out.push('', `### ${sc.name}`, sc.use, '', ...sc.blocks.map((b, i) => `${i + 1}. ${names[b] || b}`), '', ...sc.rules.concat(more).map(r => `- ${r}`));
   });
@@ -2210,11 +2414,18 @@ function aibSecBuilt(ctx) {
   if (S.copyW.length) out.push(`Sample copy (keep the structure and length, write your app's content): ${S.copyW.join('; ')}.`);
   if (S.home.length) out.push('', '### Home', ...S.home.map((l, i) => `${i + 1}. ${l}`));
   if (S.copyH.length) out.push(`Sample copy (keep the structure and length, write your app's content): ${S.copyH.join('; ')}.`);
+  // a composition that shows the destructive button at rest on 390 x 844, from the measured heights
+  const R = ctx.kit.rows;
+  const row = ch.rowPlain || ch.rowDetail || 52, label = R.divider ? Math.round(parseFloat(R.divider.main.lh) || 18) : 18, title = 41, danger = R['btn-destructive'] ? Math.round(R['btn-destructive'].main.h) : 52;
+  const avail = bottom - top;
+  const fits = g => 8 + title + 16 + g.reduce((a, n, i) => a + (i ? 28 : 0) + label + 8 + n * row, 0) + 28 + danger + 16 <= avail;
+  const groups = [[3, 2], [2, 2], [2, 1], [1, 1]].find(fits) || [1, 1];
+  const used = 8 + title + 16 + groups.reduce((a, n, i) => a + (i ? 28 : 0) + label + 8 + n * row, 0) + 28 + danger;
   out.push('', '### Settings (compose from the kit)',
-    `1. Status bar ${Math.round(ch.status)}pt, then the Top bar with only the back button${ch.back ? ` (${ch.back})` : ''}, then the Large title "Settings".`,
-    '2. At least three groups, each a section label above a list grouped as the Home list is: account rows with values and chevrons, a group whose last row is a Toggle, and an About group.',
-    '3. The Destructive button ("Sign out") alone as the last item of the scroll.',
-    `4. The tab bar stays at the bottom (Settings is a tab). Wrap everything below the top bar in one scroll container (\`flex: 1; overflow-y: auto\`) that runs from the top bar's bottom (${top}pt) to the tab bar's top (${bottom}pt); nothing pinned overlaps the tab bar.`);
+    `1. Status bar ${Math.round(ch.status)}pt, then the Top bar (pinned) with only the back button${ch.back ? ` (${ch.back})` : ''}.`,
+    `2. Below the top bar, one scroll container (\`flex: 1; overflow-y: auto\`) from the top bar's bottom (${top}pt from the top of the screen) to the tab bar's top (${bottom}pt). Inside it, flowing: the Large title "Settings" 8pt down; 16pt below it the first group, a section label (${label}pt) with its list 8pt below it, ${groups[0]} rows of ${row}pt (account rows: label, value and chevron); 28pt below it the second group, ${groups[1]} row${groups[1] > 1 ? 's' : ''}${groups[1] > 1 ? ', the last one a label with a Toggle' : ' (a label with a Toggle)'}; then 28pt below it the Destructive button ("Sign out", ${danger}pt) alone. That totals ${used}pt of the ${avail}pt between the bars, so "Sign out" is visible at rest; more groups (About, Help) go below it only if they still leave it on screen, otherwise above it with the screen scrolling.`,
+    `3. Every group has its section label. Lists group as the Home list does. ${(S.home && /no rule/.test(aibListWords(ctx.kit.screens.homeList || null, c => c) || 'no rule')) || !(ctx.kit.screens.homeList && (ctx.kit.screens.homeList.dv || ctx.kit.screens.homeList.rowRule)) ? 'Rows have no dividers, as the Home list.' : 'Rows without a lead start their divider 16pt in from the left edge of the list.'} The Toggle row is shown on.`,
+    '4. The tab bar stays at the bottom (Settings is a tab); nothing pinned overlaps it.');
   return out;
 }
 
@@ -2245,7 +2456,7 @@ function aibSecPhone(ctx) {
   const K = ctx.kit, R = K ? K.rows : {};
   const h = (id, d) => (R[id] ? Math.round(R[id].main.h) : d);
   const rowsTxt = K && K.chrome.rowDetail ? (K.chrome.rowPlain && K.chrome.rowPlain !== K.chrome.rowDetail ? `list rows ${K.chrome.rowPlain}pt with one line and ${K.chrome.rowDetail}pt with a detail line` : `list rows ${K.chrome.rowDetail}pt`) : `list rows ${P.rowHeight}pt`;
-  out.push(`- Layout: ${P.margin}pt side margins on every screen. Spacing comes from ${space.join(', ')}pt only; ${P.sectionGap}pt between sections. Sizes: buttons ${h('btn-primary', P.buttonHeight)}pt, fields ${h('field', P.fieldHeight)}pt, ${rowsTxt}, card padding ${R.card ? aibKitPad(R.card.main).replace(/^padding /, '') || '0' : P.cardPadding + 'pt'}, tab bar ${K ? Math.round(K.chrome.tabbar) : P.tabBarHeight}pt, nothing tappable under ${P.tapTarget}pt.`);
+  out.push(`- Layout: ${P.margin}pt side margins on every screen. Spacing comes from ${space.join(', ')}pt only; ${P.sectionGap}pt between sections. Sizes: buttons ${h('btn-primary', P.buttonHeight)}pt, fields ${h('field', P.fieldHeight)}pt, ${rowsTxt}, card insides ${K && K.screens ? 'as the Home card in Built screens' : R.card ? aibKitPad(R.card.main).replace(/^padding /, '') || '0' : P.cardPadding + 'pt'}, tab bar ${K ? Math.round(K.chrome.tabbar) : P.tabBarHeight}pt, nothing tappable under ${P.tapTarget}pt.`);
   out.push('- Support Dynamic Type; never let a word split or a label truncate; one Large title per screen.');
   if (!ctx.kit) (Array.isArray(ctx.def.typeNotes) ? ctx.def.typeNotes : ctx.def.typeNotes ? [ctx.def.typeNotes] : []).forEach(n => out.push(`- ${aibFixWeights(ctx, n)}`));
   return out;
@@ -2456,7 +2667,8 @@ function aibSecIcons(ctx) {
   if (ctx.swift) plat.push(`SwiftUI: SF Symbols at weight \`.${build.iconWeight}\`, monochrome rendering; template-rendered SVG assets only for glyphs SF Symbols lacks.`);
   if (!ctx.app) return ['## Icons', `${ctx.tok(build.icons)} ${plat.join(' ')}`];
   return ['## Icons', `${ctx.tok(build.icons)} ${plat.join(' ')}`,
-    '- Sizes: 24pt icons everywhere (row leads, icon buttons, top bar); icon buttons centre the icon in a 44x44pt hit area. Tab bar: a 24pt icon over a 10pt label. List chevrons: a 16pt chevron icon in the trailing slot, never a text glyph (no ›, > or →).',
+    (ctx.kit && ctx.kit.screens ? (I => `- Sizes as the Built screens draw them: ${I.tab || 24}pt tab bar icons over their 10pt labels; ${I.bell || 20}pt icons in icon buttons, centred in a 44x44pt hit area; ${I.chip || 18}pt icons inside the 32pt feature-row chips; ${I.chevron || 16}pt chevrons in the trailing slot of rows, never a text glyph (no ›, > or →); 24pt anywhere else.`)(ctx.kit.screens.icons || {})
+      : '- Sizes: 24pt icons everywhere (row leads, icon buttons, top bar); icon buttons centre the icon in a 44x44pt hit area. Tab bar: a 24pt icon over a 10pt label. List chevrons: a 16pt chevron icon in the trailing slot, never a text glyph (no ›, > or →).'),
     '- Glyphs the kit uses (draw each once, same stroke): back, more, notifications (bell), search, chevron right, chevron down, check, plus, info, success, warning, error, inbox (empty state), home, list, heart, user.'];
 }
 
@@ -2512,6 +2724,16 @@ function aibKitRuleOk(ctx, text, dont) {
   if (dont && /\bgradients?\b/i.test(text) && grad) return false;
   const spread = tk => Object.keys(K.usage[tk] ? Array.from(K.usage[tk]).reduce((o, k) => (o[k] = 1, o), {}) : {}).filter(k => k !== 'chrome' && k !== 'screens').length;
   if (/\b(?:only|once|one|single)\b/i.test(text) && /\b(?:colou?r|primary|accent)\b/i.test(text) && (spread('--primary') > 2 || spread('--accent') > 2)) return false;
+  // a line that claims a look for a component the kit draws differently ("tabs circled" vs a tab-bar pill)
+  const NOUN = [[/\btabs?\b/i, ['tabbar', 'tabs']], [/\bbuttons?\b/i, ['btn-primary', 'btn-secondary']], [/\bcards?\b/i, ['card']], [/\b(?:rows?|lists?)\b/i, ['list']],
+    [/\btoggles?|switch(?:es)?\b/i, ['toggle']], [/\b(?:fields?|inputs?)\b/i, ['field']], [/\b(?:badges?|tags?|chips?)\b/i, ['badge']]];
+  const CLAIM = [[/\bcircled\b/i, /circle|loop/], [/\bunderlined\b/i, /underline|bar|rule/], [/\b(?:outlined|boxed)\b/i, /edge|ring|frame|outline/], [/\bstamped\b/i, /rotated|tilt|stamp/],
+    [/\b(?:tilted|rotated|skewed)\b/i, /rotated|tilt/], [/\btorn\b/i, /torn/], [/\bpills?\b/i, /pill/]];
+  const rowText = ids => ids.map(id => (K.rows[id] ? [K.rows[id].fill, K.rows[id].text, K.rows[id].edge, K.rows[id].marks.join(' '), K.rows[id].states.join(' ')].join(' ') : '')).join(' ');
+  for (const [nre, ids] of NOUN) {
+    if (!nre.test(text) || !ids.some(id => K.rows[id])) continue;
+    for (const [cre, look] of CLAIM) if (cre.test(text) && !look.test(rowText(ids))) return false;
+  }
   if (dont && /\bglass\b|\bblur\b/i.test(text) && Object.keys(K.rows).some(id => K.rows[id].main.bd !== 'none')) return false;
   return true;
 }
@@ -2643,9 +2865,15 @@ function aibCssApp(ctx, colourTokens) {
   } else if (sw === 'hard') lines.push(`  --shadow-rest: ${sh.x}px ${sh.y}px 0 var(--shadow); --shadow-pressed: 0 0 0 var(--shadow);`);
   else if (sw === 'soft') lines.push(`  --shadow-rest: ${sh.d}px ${sh.d}px ${sh.blur}px var(--shadow-lo), -${sh.d}px -${sh.d}px ${sh.blur}px var(--shadow-hi);`);
   lines.push(`  --dur-fast: ${mo.fast}ms; --dur-base: ${mo.base}ms; --dur-slow: ${mo.slow}ms; --ease: ${BUILD_EASE[mo.ease]};`);
+  // every var() the block uses is defined in it (kit tokens a shadow names after the Colors table was built)
+  const defined = new Set((lines.join('\n').match(/--[a-z0-9-]+(?=:)/g) || []));
+  const late = Array.from(new Set((lines.join('\n').match(/var\((--[a-z0-9-]+)\)/g) || []).map(v => v.slice(4, -1)))).filter(k => !defined.has(k));
+  const lateVal = (k, m) => (ctx.kitVars && ctx.kitVars[k] ? ctx.kitVars[k].get(m) : valueOf(k, m));
+  late.forEach(k => { const v = lateVal(k, DEF); if (v) { lines.push(`  ${k}: ${v};`); names.push(k); } });
   lines.push('}');
   if (D && L && !ctx.only) {
-    const dark = names.map(k => [k, valueOf(k, ALT)]).filter(([k, v]) => v !== valueOf(k, DEF));
+    const vOf = (k, m) => (late.indexOf(k) >= 0 ? lateVal(k, m) : valueOf(k, m));
+    const dark = names.map(k => [k, vOf(k, ALT)]).filter(([k, v]) => v !== vOf(k, DEF));
     lines.push(`:root[data-theme="${alt}"] {`, `  color-scheme: ${alt};`, ...three(dark, '  '), '}');
   }
   lines.push('@media (prefers-reduced-motion: reduce) { :root { --dur-fast: 0ms; --dur-base: 0ms; --dur-slow: 0ms; } }', '```');
@@ -2942,12 +3170,13 @@ function aibBuild(ctx) {
     aibSecMotion(ctx),
     aibSecA11y(ctx),
     aibSecIcons(ctx),
-    aibSecAppIcon(ctx),
+    ctx.app ? [] : aibSecAppIcon(ctx),
     aibSecFonts(ctx),
     aibSecRules(ctx),
     ctx.web ? aibSecCss(ctx) : [],
     ctx.swift ? aibSecSwift(ctx) : [],
     aibSecPatterns(ctx),
+    ctx.app ? aibSecAppIcon(ctx) : [],
   ].filter(b => b.length);
   return blocks.map(b => b.join('\n')).join('\n\n') + '\n';
 }

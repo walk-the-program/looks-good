@@ -469,3 +469,5 @@
   box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--ab-secondary) 70%, #000), 0 2px 4px color-mix(in srgb, var(--ab-secondary) 35%, transparent);
 }
 .ab.sb-ab[data-ae="frutiger-aero"].sb-kit .sb-k-av::before { content: ""; position: absolute; z-index: -1; left: 16%; right: 16%; top: 4%; height: 40%; border-radius: 50% 50% 42% 42% / 72% 72% 28% 28%; background: var(--fa-cap); opacity: 0.8; }
+/* inactive pager dots hold 3:1 on the airy canvas (ink 55% measured 2.94:1) */
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit .sb-dots i:not(.is-on) { background: color-mix(in srgb, var(--ab-ink) 62%, var(--ab-canvas)); }

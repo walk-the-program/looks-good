@@ -474,3 +474,16 @@
 @supports (color: contrast-color(red)) {
   .ab.sb-ab:is([data-ae="xerox-punk"], [data-ae="xerox-punk--classic"]):is(.sb-screen, .sb-kit) > * { --ab-on-primary: contrast-color(var(--ab-primary-brand)); }
 }
+/* Both versions, dark mode, phones and the kit: a near-black offset vanishes on the black wall, so the hard offsets
+   print in bone instead (solid under the primary action, bone at 45% under the cream scraps so the scrap edge still shows) */
+.ab.sb-ab:is([data-ae="xerox-punk"], [data-ae="xerox-punk--classic"])[data-mode="dark"]:is(.sb-screen, .sb-kit) .ab-cta { box-shadow: 4px 4px 0 #EDE6D3; }
+.ab.sb-ab:is([data-ae="xerox-punk"], [data-ae="xerox-punk--classic"])[data-mode="dark"]:is(.sb-screen, .sb-kit) .ab-cta.is-pressed { box-shadow: 1px 1px 0 #EDE6D3; }
+.ab.sb-ab:is([data-ae="xerox-punk"], [data-ae="xerox-punk--classic"])[data-mode="dark"]:is(.sb-screen, .sb-kit) .ab-cta:disabled { box-shadow: none; }
+.ab.sb-ab:is([data-ae="xerox-punk"], [data-ae="xerox-punk--classic"])[data-mode="dark"]:is(.sb-screen, .sb-kit) :is(.ab-card, .ab-panel)::after { filter: url(#xpn-torn) drop-shadow(3px 4px 0 rgba(237, 230, 211, 0.45)); }
+.ab.sb-ab:is([data-ae="xerox-punk"], [data-ae="xerox-punk--classic"])[data-mode="dark"]:is(.sb-screen, .sb-kit) :is(.sb-k-toast, .sb-k-emptyico) { box-shadow: 3px 4px 0 rgba(237, 230, 211, 0.45); }
+.ab.sb-ab:is([data-ae="xerox-punk"], [data-ae="xerox-punk--classic"])[data-mode="dark"]:is(.sb-screen, .sb-kit) .sb-k-sheet { box-shadow: 3px -4px 0 rgba(237, 230, 211, 0.45); }
+/* the photo tile in the headline: ink letters with a paper outline over the halftone (bone letters on the grey photo
+   ground read only by their stroke) */
+.ab.sb-ab:is([data-ae="xerox-punk"], [data-ae="xerox-punk--classic"]):is(.sb-screen, .sb-kit) .xpt[data-g="photo"] { color: #111; -webkit-text-stroke-color: #EDE6D3; }
+.ab.sb-ab:is([data-ae="xerox-punk"], [data-ae="xerox-punk--classic"])[data-mode="dark"]:is(.sb-screen, .sb-kit) :is(.ab-card, .ab-panel, .ab-list, .sb-k-sheet) .ab-cta { box-shadow: 4px 4px 0 #111; }
+.ab.sb-ab:is([data-ae="xerox-punk"], [data-ae="xerox-punk--classic"])[data-mode="dark"]:is(.sb-screen, .sb-kit) :is(.ab-card, .ab-panel, .ab-list, .sb-k-sheet) .ab-cta.is-pressed { box-shadow: 1px 1px 0 #111; }

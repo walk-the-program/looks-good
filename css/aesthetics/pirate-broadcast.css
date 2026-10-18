@@ -439,3 +439,9 @@
 .ab.sb-ab.sb-kit:is([data-ae="pirate-broadcast"], [data-ae="pirate-broadcast--classic"]) .sb-home-top .ab-type-apply.sb-icon-btn { position: absolute; z-index: 1; top: 0; right: 0; width: 44px; height: 44px; border: 0; background: transparent; color: #000; box-shadow: none; }
 .ab.sb-ab.sb-kit:is([data-ae="pirate-broadcast"], [data-ae="pirate-broadcast--classic"]) .sb-home-top .ab-type-apply.sb-icon-btn::before { content: none; }
 .ab.sb-ab.sb-kit:is([data-ae="pirate-broadcast"], [data-ae="pirate-broadcast--classic"]) .sb-home-top .sb-badge { box-shadow: 0 0 0 2px var(--ab-tt-cyan); }
+/* App UI: the CRT scanline is a faint light line on the black screens (a dark line on #000 vanished);
+   --ab-tt-scan is set inline by tokens(), so --pb-scan takes the colour directly. Inactive pager dots hold 3:1. */
+.ab.sb-ab.sb-kit:is([data-ae="pirate-broadcast"], [data-ae="pirate-broadcast--classic"]) {
+  --pb-scan: repeating-linear-gradient(0deg, color-mix(in srgb, var(--ab-tt-fg) 7%, transparent) 0 1px, transparent 1px 3px);
+}
+.ab.sb-ab.sb-kit:is([data-ae="pirate-broadcast"], [data-ae="pirate-broadcast--classic"]) .sb-dots i:not(.is-on) { background: color-mix(in srgb, var(--ab-ink) 58%, var(--ab-canvas)); }
