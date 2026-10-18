@@ -225,3 +225,5 @@
 .ab.sb-ab[data-ae="japanese-minimal"] .sb-top .ab-kicker { display: inline-flex; align-items: center; gap: 10px; }
 .ab.sb-ab[data-ae="japanese-minimal"] .sb-top .ab-kicker::before { content: ""; flex: none; width: 7px; height: 7px; border-radius: 50%; background: var(--ab-jm-dot); }
 .ab.sb-ab[data-ae="japanese-minimal"] .sb-title { font-weight: 400; }
+/* phone home: a list row cut by the tab bar fades out instead of being sliced mid-line */
+.ab.sb-ab[data-ae="japanese-minimal"] .sb-home-list { -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 26px), transparent); mask-image: linear-gradient(to bottom, #000 calc(100% - 26px), transparent); }

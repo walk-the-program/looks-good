@@ -42,7 +42,8 @@
 .ab[data-ae="gorpcore"] .ab-hero { grid-template-columns: minmax(0, 1fr) minmax(0, 1.06fr); gap: clamp(18px, 3.4cqw, 40px); padding: clamp(30px, 4.6cqw, 52px) 0; align-items: center; }
 .ab[data-ae="gorpcore"] .ab-kicker { display: flex; align-items: center; gap: 9px; margin-bottom: 18px !important; color: var(--ab-ink); font-size: 11px; letter-spacing: 0.12em; }
 .ab[data-ae="gorpcore"] .ab-kicker::before { content: ""; flex: none; width: 11px; height: 11px; background: var(--ab-blazemark); transform: rotate(45deg); }
-.ab[data-ae="gorpcore"] .ab-kicker::after { content: "· SS26 · REF GC-044"; color: var(--ab-muted); }
+.ab[data-ae="gorpcore"] .ab-kicker { flex-wrap: wrap; row-gap: 4px; }
+.ab[data-ae="gorpcore"] .ab-kicker::after { content: "· SS26 · REF GC-044"; flex: none; white-space: nowrap; color: var(--ab-muted); }
 .ab[data-ae="gorpcore"] .ab-headline {
   font-weight: var(--gc-hw, 800); text-transform: uppercase; letter-spacing: 0; line-height: 0.92; text-wrap: balance; color: var(--ab-ink);
   font-size: calc(clamp(40px, 8.6cqw, 96px) * var(--ab-hl-scale, 1) * var(--ab-hs, 1) * var(--ab-display, 1));
@@ -294,3 +295,16 @@
 .ab[data-ae="gorpcore"] .ab-type-col[data-role="body"] .ab-type-pick:first-child { font-weight: 700; }
 .ab[data-ae="gorpcore"] .ab-type-col[data-role="mono"] .ab-type-pick:first-child { font-weight: 600; }
 .ab.ab-slide[data-ae="gorpcore"] .ab-deck-pchip { font-weight: var(--gc-hw, 800); }
+
+/* ---- Built screens ---- */
+/* the sidebar is too narrow for the lockup's coordinates: the name stays whole, the coordinates go */
+.ab.sb-ab[data-ae="gorpcore"] .sb-side .ab-wordmark::after { content: none; }
+/* narrow art (the phone's welcome map): the tag name drops its GC-044 stamp and shrinks to fit whole,
+   and the coordinate strip wraps inside the left half so the hang tag never covers it */
+@container (max-width: 300px) {
+  .ab[data-ae="gorpcore"] .gca-th span { display: none; }
+  .ab[data-ae="gorpcore"] .gca-th b { font-size: calc(max(9px, 4.4cqw) * var(--gc-tag-k, 1)); }
+  .ab[data-ae="gorpcore"] .gca-coord { max-width: 44%; white-space: normal; line-height: 1.25; }
+}
+/* phone home: a list row cut by the tab bar fades out instead of being sliced mid-line */
+.ab.sb-ab[data-ae="gorpcore"] .sb-home-list { -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 26px), transparent); mask-image: linear-gradient(to bottom, #000 calc(100% - 26px), transparent); }
