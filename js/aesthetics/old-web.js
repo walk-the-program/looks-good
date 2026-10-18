@@ -128,6 +128,7 @@ registerAesthetic({
 
   tokens(t) {
     const d = t.isDark;
+    owLoad(['Arimo']);
     const pri = t.printPrimary || t.primary;
     const titleEnd = owCR('#ffffff', pri) >= 3 ? pri : OW_FALLBACK;
     const page = d ? '#000000' : '#FFFFFF';
@@ -159,7 +160,7 @@ registerAesthetic({
       '--ow-on-sec': t.readable(t.secondary),
       '--ow-star': d ? '#FFFFFF' : '#B8BED6',
       '--ow-star2': d ? '#9DB4FF' : '#D5D9EA',
-      '--ow-sys': 'Tahoma, Verdana, "Segoe UI", Arial, sans-serif',
+      '--ow-sys': 'Arimo, Arial, "MS Sans Serif", Tahoma, sans-serif',
       '--ow-pix': '"Silkscreen", "Pixelify Sans", Tahoma, Verdana, monospace',
       '--ow-led-font': '"VT323", "Courier Prime", "Courier New", monospace',
       '--ow-comic': '"Comic Neue", "Comic Sans MS", cursive',
@@ -236,9 +237,9 @@ registerAesthetic({
   },
 
   materials: [
-    { name: 'Raised bevel', css: 'background: #C0C0C0; box-shadow: {raised}; border-radius: 0; color: #000000; font: 11px Tahoma, Verdana, sans-serif; /* the exact four-tone bevel: white and #DFDFDF top-left, #808080 and #0A0A0A bottom-right; the default button gets an extra 1px black frame */' },
+    { name: 'Raised bevel', css: 'background: #C0C0C0; box-shadow: {raised}; border-radius: 0; color: #000000; font: 11px Arial, "MS Sans Serif", sans-serif; /* the exact four-tone bevel: white and #DFDFDF top-left, #808080 and #0A0A0A bottom-right; the default button gets an extra 1px black frame */' },
     { name: 'Sunken field', css: 'background: #FFFFFF; box-shadow: {sunken}; border-radius: 0; color: #000000; /* the raised pairs swapped; text fields, the counter, progress tracks */' },
-    { name: 'Title bar', css: 'background: linear-gradient(90deg, {navy}, {titleEnd}); color: #FFFFFF; font: 700 12px Tahoma, Verdana, sans-serif; /* navy into the client primary; three bevelled 16x14 caption buttons at the right */' },
+    { name: 'Title bar', css: 'background: linear-gradient(90deg, {navy}, {titleEnd}); color: #FFFFFF; font: 700 12px Arial, "MS Sans Serif", sans-serif; /* navy into the client primary; three bevelled 16x14 caption buttons at the right */' },
     { name: 'Hyperlink', css: 'color: #0000EE; text-decoration: underline; /* visited #551A8B; on the black page #9DB4FF / #C9A0FF */' },
     { name: 'Focus rectangle', css: 'outline: 1px dotted #000000; outline-offset: -4px; /* drawn inside the button; the original focus ring */' },
     { name: 'Grooved rule', css: 'border: 0; border-top: 1px solid #808080; border-bottom: 1px solid #FFFFFF; /* the default <hr> */' },

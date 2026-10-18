@@ -6,7 +6,7 @@
    body text, blue underlined links (--ow-link / --ow-visited on the page, #0000EE /
    #551A8B inside windows), WordArt (--ow-wa1..3 + --ow-wx extrusion; --ow-ha* for the
    highlighted word), counter LEDs (--ow-led), NEW! badges (--ow-new), window accents
-   (--ow-sec). Chrome face: --ow-sys (Tahoma / Verdana, system fonts only).
+   (--ow-sec). Chrome face: --ow-sys (Arimo = the bundled Arial stand-in, then Arial / MS Sans Serif / Tahoma; a decorative device, forced on purpose).
    Hooks: hero 'centered', headline hook (WordArt), highlight 'custom', states 'button'
    (Raised / Visited / Sunken), ctaFill 'ink' (silver button, black label).
 ------------------------------------------------------------------------ */
@@ -64,6 +64,14 @@
 .ab[data-ae="old-web"] .ab-panel::before { content: "Display Properties"; }
 .ab[data-ae="old-web"] .ab-list::before { content: "projects.htm"; }
 .ab[data-ae="old-web"] .ab-palette, .ab[data-ae="old-web"] .ab-type { margin: 22px 0; }
+
+/* Built stat cards are narrow: a slightly smaller bar caption and a tighter caption-button gutter so
+   "incoming.htm" / "outgoing.htm" fit whole instead of ending in an ellipsis. */
+.ab.sb-ab[data-ae="old-web"] .ab-card[data-win]::before { padding-right: 56px; font-size: 11px; letter-spacing: -0.01em; }
+
+/* muted text inside a silver window (axis labels, legends, hints, row numbers) stays 4.5:1 or better on #C0C0C0 */
+.ab[data-ae="old-web"] :is(.ab-palette, .ab-type, .ab-card, .ab-panel, .ab-list, .owa-win) { --ab-muted: #3A3A3A; }
+.ab[data-ae="old-web"] .sb-feat-n { color: #3A3A3A; }
 
 /* ---- header: a browser toolbar with the address field ---- */
 .ab[data-ae="old-web"] .ab-head { padding: 6px 8px; background: #C0C0C0; box-shadow: var(--ow-raised); color: #000; gap: 12px; }
@@ -268,7 +276,7 @@
 /* ---- 02 bevels: sunken field, classic checkbox, the three button states ---- */
 .ab[data-ae="old-web"] .ab-fieldlabel { color: #000; font: 400 13px/1.2 var(--ow-sys); margin-bottom: 6px; }
 .ab[data-ae="old-web"] .ab-fieldlabel::first-letter { text-decoration: underline; }
-.ab[data-ae="old-web"][data-ae] .ab-input { border: 0; border-radius: 0; background: #fff; color: #000; box-shadow: var(--ow-sunken); padding: 7px 8px 6px; font: 400 15px/1.2 var(--ab-font-b); margin-bottom: 14px; }
+.ab[data-ae="old-web"][data-ae] .ab-input { border: 0; border-radius: 0; background: #fff; color: #000; box-shadow: var(--ow-sunken); padding: 7px 8px 6px; font: 400 14px/1.2 var(--ow-sys); margin-bottom: 14px; }
 .ab[data-ae="old-web"][data-ae] .ab-input:focus { box-shadow: var(--ow-sunken); background: #fff; }
 /* the Win98 focus rectangle: dotted, drawn inside the sunken field */
 .ab[data-ae="old-web"][data-ae] .ab-input:focus-visible { outline: 1px dotted #000; outline-offset: -4px; }
