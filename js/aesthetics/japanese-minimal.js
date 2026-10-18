@@ -10,8 +10,8 @@
    - Type: a small, even gothic for UI and body (the brand's sans). A mincho (the brand's serif or
      Shippori Mincho) is used once per view, for the emphasised headline word, and nowhere else.
    - Colour: the client primary becomes the one plain rectangular action (2px corners, fill) and
-     the selected state. The accent is a restrained tone of the primary, used as a single small
-     hinomaru dot (a circle, as on a Japanese flag or a company seal) per view.
+     the selected state. The accent is a single small hinomaru dot per view: a flat vermilion
+     (#BC002D, the red of the flag and of a company seal) whatever the brand colour.
    Hero: a large field of space with a precise grid of thin lines, one small circle on a grid
    intersection, and a vertical label. No illustration. */
 
@@ -24,16 +24,15 @@ function jmInk(t) {
   return t.isDark ? t.mix(JM.inkDark, t.ink, 0.7) : t.mix(JM.ink, t.ink, 0.7);
 }
 
-// The hinomaru dot: a restrained tone of the client primary, at least 3:1 on the canvas.
+// The hinomaru dot: a flat vermilion (#BC002D, the red of the flag and of a company seal), the same for every
+// brand; the brand primary stays on the one plain action. On a near-black ground it is lifted until it holds 3:1.
 function jmDot(t) {
-  const { h, s, l } = hexToHsl(t.primary);
-  const sat = Math.min(s, 62);
-  const step = t.isDark ? 2 : -2;
-  let ll = t.isDark ? Math.max(l, 52) : Math.min(l, 50);
-  let out = hslToHex(h, sat, ll);
+  const { h, s, l } = hexToHsl('#BC002D');
+  let out = '#BC002D';
+  let ll = l;
   for (let i = 0; i < 40 && contrastRatio(out, t.canvas) < 3; i++) {
-    ll = Math.max(4, Math.min(96, ll + step));
-    out = hslToHex(h, sat, ll);
+    ll = Math.min(80, ll + 2);
+    out = hslToHex(h, s, ll);
   }
   return out;
 }
@@ -82,10 +81,15 @@ function jmHeroSvg(ctx) {
   let g = '';
   cols.forEach(x => { g += `<path d="M${x} 24V152"/>`; });
   rows.forEach(y => { g += `<path d="M24 ${y}H184"/>`; });
+  // a measuring scale: short ticks every 8 units along the foot and the left edge (vertical rhythm)
+  let tk = '';
+  for (let x = 24; x <= 184; x += 8) tk += `<path d="M${x} 152v${x % 32 === 24 ? 5 : 2.5}"/>`;
+  for (let y = 24; y <= 152; y += 8) tk += `<path d="M24 ${y}h-${y % 32 === 24 ? 5 : 2.5}"/>`;
   return `<div class="jm-art"><svg class="jm-scene" viewBox="0 0 200 176" xmlns="http://www.w3.org/2000/svg" role="presentation">
       <g stroke="${t.alpha(ink, 0.3)}" stroke-width=".5" fill="none">${g}</g>
       <path d="M24 152H184" stroke="${t.alpha(ink, 0.6)}" stroke-width=".5" fill="none"/>
-      <circle cx="120" cy="88" r="5" fill="${dot}"/>
+      <g stroke="${t.alpha(ink, 0.55)}" stroke-width=".45" fill="none">${tk}</g>
+      <circle cx="120" cy="88" r="5.5" fill="${dot}"/>
       <text x="197" y="152" font-family='${f.b}' font-size="5.2" letter-spacing="1.1" fill="${ink}" opacity=".7" transform="rotate(-90 197 152)">JAPANESE MINIMAL</text>
     </svg></div>`;
 }
@@ -121,7 +125,7 @@ registerAesthetic({
   layout: { hero: 'split', palette: 'list', sections: 'two-col' },
   type: { ui: 'sans', label: 'sans', display: 0.8 },
   highlight: 'custom',
-  highlightNote: 'The highlighted word keeps the ink colour and is set in a mincho (serif) at regular weight. No colour fill, no band, no underline, and no dot in the headline; the single hinomaru dot belongs to the hero art.',
+  highlightNote: 'The highlighted word keeps the ink colour and is set in a mincho (serif) at regular weight. No colour fill, no band, no underline, and no dot in the headline; the single vermilion hinomaru dot belongs to the hero art.',
   cardFill: '--ab-jm-card',
 
   roles: {
@@ -146,7 +150,7 @@ registerAesthetic({
       coverage: '≈5%',
     },
     accent: {
-      use: 'The hinomaru dot: one small circle per view, drawn in a restrained tone of the primary',
+      use: 'The hinomaru dot: one small circle per view, always the flag red (vermilion #BC002D, lifted only on a dark ground), whatever the brand colour',
       never: 'Fills, buttons, rules, text, or more than one dot per view',
       coverage: '≤1%',
     },
@@ -173,7 +177,7 @@ registerAesthetic({
       '--ab-line': t.alpha(ink, d ? 0.3 : 0.22),
       '--ab-jm-card': card,
       '--ab-jm-dot': jmDot(t),
-      // the accent row shows the dot's own hex (the dot follows the primary, not the client accent)
+      // the accent row shows the dot's own hex (the dot is a fixed vermilion, not the client accent)
       '--jm-accent-hex': JSON.stringify(jmDot(t).toUpperCase()),
       '--ab-type-pick-w': '400',
       // the selected segment's weight, from the weights the UI face really has (font-synthesis is off)
@@ -189,7 +193,8 @@ registerAesthetic({
     { name: 'Ground', css: 'background: {canvas}; /* warm off-white, never pure white; no texture, no grain, no shadows */' },
     { name: 'Plain action', css: 'background: {primary}; color: {onPrimary}; border-radius: 2px; font-size: 12px; letter-spacing: .08em; /* one per view; hover darkens one step, focus shows a 2px ring in the primary */' },
     { name: 'Hairline rule', css: 'height: 1px; background: {line}; /* the only divider; rows and sections are separated by 1px rules, never boxes */' },
-    { name: 'Hinomaru dot', css: 'background: {jmDot}; border-radius: 50%; /* one small circle per view, on a grid intersection or beside a state */' },
+    { name: 'Hinomaru dot', css: 'background: {jmDot}; border-radius: 50%; /* vermilion #BC002D whatever the brand colour; one small circle per view, on a grid intersection or beside a state */' },
+    { name: 'Washi ground', css: 'background: {canvas}; /* warm off-white paper; the only texture allowed is a very faint paper fibre (4% ink) behind the hero grid, never under text */' },
     { name: 'Grid', css: 'columns: 6 equal; gutters: 32px; /* every block aligns to the same columns; text left-aligned */' },
   ],
 
@@ -209,6 +214,10 @@ registerAesthetic({
   },
 
   deck: {
+    // Ma is the material: no pattern band under the cover and no closing strip (the grey blurred stones read
+    // as smudges on paper). The Patterns slide keeps the suite.
+    coverBand: false,
+    closingStrip: false,
     principles: [
       ['Ma is the material', 'Empty space does the work that colour and ornament usually do.'],
       ['One grid, kept strictly', 'Every block sits on the same columns and the same baseline.'],
