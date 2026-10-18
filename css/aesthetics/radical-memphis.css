@@ -326,3 +326,39 @@
 }
 .ab[data-ae="radical-memphis"] .mmr-plaque span { display: block; font-weight: 400; letter-spacing: 0.02em; text-transform: none; }
 .ab[data-ae="radical-memphis"] :is(.ab-fit, .ab-deck-pratio b, .ab-type-col[data-role="body"] .ab-type-cur b) { font-weight: 700; }
+
+/* ---- Built (product screens): laminate framing, no text sits on a pattern ---- */
+/* sidebar: a zig-zag laminate down its edge and a terrazzo block in the empty lower half */
+.ab.sb-ab[data-ae="radical-memphis"] .sb-side { position: relative; padding-right: 22px; }
+.ab.sb-ab[data-ae="radical-memphis"] .sb-side::before {
+  content: ""; position: absolute; right: 0; top: 0; bottom: 0; width: 10px;
+  background: var(--mm-zig); background-size: 10px 10px, 10px 10px, 10px 10px, 10px 10px, auto;
+}
+.ab.sb-ab[data-ae="radical-memphis"] .sb-nav::after {
+  content: ""; display: block; height: 150px; margin: 26px 8px 0 0; border-radius: 0 40px 0 0; box-shadow: 7px 7px 0 var(--ab-m-sheet);
+  background: var(--mm-terrazzo), var(--ab-m-paper); background-size: 110px 84px, auto;
+}
+/* a stacked-primitive cluster (circle, triangle, bar) after the page title */
+.ab.sb-ab[data-ae="radical-memphis"] .ab-card-title.sb-title::after {
+  content: ""; display: inline-block; width: 52px; height: 30px; margin-left: 14px; vertical-align: -3px;
+  background:
+    radial-gradient(circle at 12px 15px, var(--ab-accent) 0 11px, transparent 11.5px),
+    linear-gradient(to top right, var(--ab-primary) 49%, transparent 50%) 18px 4px / 24px 24px no-repeat,
+    linear-gradient(var(--ab-secondary), var(--ab-secondary)) 38px 12px / 14px 18px no-repeat;
+}
+/* stat cards: a small tilted laminate chip in the lower right corner (a different laminate per card) */
+.ab.sb-ab[data-ae="radical-memphis"] .ab-card.sb-stat::after {
+  content: ""; position: absolute; right: 16px; bottom: 16px; width: 38px; height: 22px; transform: rotate(-6deg); box-shadow: 3px 3px 0 var(--ab-m-sheet);
+}
+.ab.sb-ab[data-ae="radical-memphis"] .sb-stat:nth-child(1)::after { background: var(--mm-zig); background-size: 9px 9px, 9px 9px, 9px 9px, 9px 9px, auto; }
+.ab.sb-ab[data-ae="radical-memphis"] .sb-stat:nth-child(2)::after { background: var(--mm-dots); background-size: 9px 9px, auto; }
+.ab.sb-ab[data-ae="radical-memphis"] .sb-stat:nth-child(3)::after { background: var(--mm-bacterio), var(--ab-m-paper); background-size: 30px 30px, auto; }
+.ab.sb-ab[data-ae="radical-memphis"] .sb-stat:nth-child(4)::after { background: var(--mm-checker); background-size: 11px 11px; }
+/* the quick-settings panel opens on a terrazzo band */
+.ab.sb-ab[data-ae="radical-memphis"] .ab-panel.sb-quick { padding-top: calc(var(--mm-pad) + 18px); }
+.ab.sb-ab[data-ae="radical-memphis"] .ab-panel.sb-quick::after {
+  content: ""; position: absolute; left: 14px; right: 40px; top: 0; height: 20px;
+  background: var(--mm-terrazzo), var(--ab-m-paper); background-size: 100px 30px, auto;
+}
+/* chart: a 4px primary line with a second-hue offset copy, like the cards' sheets */
+.ab.sb-ab[data-ae="radical-memphis"] .sb-c-line { stroke: var(--ab-primary-text); stroke-width: 4; filter: drop-shadow(4px 4px 0 var(--ab-m-sheet-sec)); }
