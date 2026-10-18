@@ -56,7 +56,7 @@
 .ab[data-ae="corporate-vandalism"] .ab-headline { font-weight: 400; letter-spacing: calc(-0.01em * var(--ab-tr, 1)); line-height: 1.12; text-wrap: wrap; }
 .ab[data-ae="corporate-vandalism"]:not(.ab-slide) .ab-headline { font-size: calc(clamp(24px, 2.7cqw, 34px) * var(--ab-hs, 1)); }
 .ab[data-ae="corporate-vandalism"] .cvh-o { display: block; max-width: 18em; }
-.ab[data-ae="corporate-vandalism"] .cvh-k { position: relative; z-index: 2; display: block; margin: 0.06em 0 0 -0.04em; transform: rotate(-2deg); transform-origin: 0 50%; font: italic 800 2.9em/1.08 var(--cv-vandal); letter-spacing: -0.01em; text-transform: uppercase; }
+.ab[data-ae="corporate-vandalism"] .cvh-k { position: relative; z-index: 2; display: block; margin: 0.3em 0 0 -0.04em; transform: rotate(-2deg); transform-origin: 0 0; font: italic 800 2.9em/1.08 var(--cv-vandal); letter-spacing: -0.01em; text-transform: uppercase; }
 .ab[data-ae="corporate-vandalism"]:not(.ab-slide) .cvh-k { font-size: clamp(34px, 7.4cqw, 96px); }
 .ab[data-ae="corporate-vandalism"].ab-slide .cvh-k { font-size: 1.45em; margin-top: 0.34em; }   /* below the official line, never half over it */
 .ab[data-ae="corporate-vandalism"].ab-slide .cvh-o { max-width: none; }
