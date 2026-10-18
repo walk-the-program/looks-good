@@ -22,6 +22,8 @@
   background: var(--ab-ink); color: var(--ab-canvas); font-size: 11px; font-weight: 800; letter-spacing: 0;
 }
 .ab[data-ae="bauhaus-poster"] .ab-n::after { content: none; }
+.ab[data-ae="bauhaus-poster"] .ab-sec-touch .ab-n { border-radius: 0; }
+.ab[data-ae="bauhaus-poster"] .ab-sec-use .ab-n { width: 32px; height: 28px; padding-top: 8px; border-radius: 0; clip-path: polygon(50% 0, 100% 100%, 0 100%); }
 
 /* header */
 .ab[data-ae="bauhaus-poster"] .ab-brand { font-weight: 800; text-transform: uppercase; letter-spacing: 0.02em; }
@@ -30,6 +32,18 @@
 .ab[data-ae="bauhaus-poster"] .ab-tag b { font-weight: 800; }
 .ab[data-ae="bauhaus-poster"] .ab-head { padding-bottom: 16px; }
 .ab[data-ae="bauhaus-poster"] .ab-rule { height: 4px; background: var(--ab-ink); }
+
+/* the diagonal: one thick yellow bar tilted ~21 degrees on the right of the hero, with a thin ink bar beside
+   it, both running behind the art cluster. Flat planes only; kept clear of the headline so the type stays on
+   the plain field. */
+.ab[data-ae="bauhaus-poster"][data-hero="poster"]:not(.sb-ab) .ab-hero::before {
+  content: ""; position: absolute; z-index: 1; pointer-events: none; top: 4%; right: 10%; width: 11cqw; height: 92%;
+  background: var(--ab-bau-yellow); transform: rotate(21deg); transform-origin: 50% 50%;
+}
+.ab[data-ae="bauhaus-poster"][data-hero="poster"]:not(.sb-ab) .ab-hero::after {
+  content: ""; position: absolute; z-index: 1; pointer-events: none; top: 4%; right: 3.6%; width: 1cqw; height: 92%;
+  background: var(--ab-ink); transform: rotate(21deg); transform-origin: 50% 50%;
+}
 
 /* hero (poster): a huge, tight, lowercase headline across the board with the
    kicker running vertically beside it; the pattern tile sits bottom-right, flush
@@ -41,11 +55,14 @@
 .ab[data-ae="bauhaus-poster"] .ab-hero-copy {
   display: grid; grid-template-columns: auto minmax(0, 1fr); column-gap: clamp(12px, 2.2cqw, 22px); align-items: start;
 }
-.ab[data-ae="bauhaus-poster"] .ab-kicker {
+.ab[data-ae="bauhaus-poster"] .ab-hero-copy > .ab-kicker {
   grid-column: 1; grid-row: 1 / span 2; align-self: stretch; margin: 0 !important; padding-right: clamp(10px, 1.6cqw, 16px); border-right: 2px solid var(--ab-ink);
   writing-mode: vertical-rl; color: var(--ab-ink); font-size: 11px; letter-spacing: 0.34em; white-space: nowrap;
 }
-.ab[data-ae="bauhaus-poster"] .ab-kicker::before { content: ""; display: inline-block; width: 11px; height: 11px; margin-bottom: 12px; border-radius: 50%; background: var(--ab-ink); }
+.ab[data-ae="bauhaus-poster"] .ab-hero-copy > .ab-kicker::before { content: ""; display: inline-block; width: 11px; height: 11px; margin-bottom: 12px; border-radius: 50%; background: var(--ab-ink); }
+/* everywhere else (Built headers, landing) the kicker is a plain horizontal line with a small disc */
+.ab[data-ae="bauhaus-poster"] :not(.ab-hero-copy) > .ab-kicker { display: inline-flex; align-items: center; gap: 9px; color: var(--ab-ink); font-size: 11px; letter-spacing: 0.16em; }
+.ab[data-ae="bauhaus-poster"] :not(.ab-hero-copy) > .ab-kicker::before { content: ""; flex: none; width: 10px; height: 10px; border-radius: 50%; background: var(--ab-bau-red); }
 .ab[data-ae="bauhaus-poster"] .ab-headline {
   grid-column: 2; min-width: 0; font-weight: 600; text-transform: lowercase; line-height: calc(0.9 + 0.14 * (1 - var(--ab-tr, 1))); letter-spacing: calc(-0.02em * var(--ab-tr, 1));
 }
@@ -54,7 +71,7 @@
    ink above it) so it stays readable on a dark canvas too. */
 .ab[data-ae="bauhaus-poster"] .ab-hl,
 .ab[data-ae="bauhaus-poster"][data-accent-text="low"] .ab-hl {
-  position: relative; display: inline-block; line-height: 0.82; padding: 0.06em 0.04em 0.02em;
+  position: relative; display: inline-block; line-height: 0.82; padding: 0.06em 0.04em 0.16em; margin-bottom: -0.14em;
   background: linear-gradient(to top, var(--ab-on-accent) 0 46%, var(--ab-ink) 46%);
   -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; color: var(--ab-ink);
 }
@@ -74,7 +91,7 @@
 }
 .ab[data-ae="bauhaus-poster"] .ab-chip::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; top: 0; background: var(--sw); }
 .ab[data-ae="bauhaus-poster"] .ab-swatch[data-role="canvas"] .ab-chip::after { border: 2px solid var(--ab-ink); border-radius: 0; }
-.ab[data-ae="bauhaus-poster"] .ab-swatch[data-role="ink"] .ab-chip::after,
+.ab[data-ae="bauhaus-poster"] .ab-swatch[data-role="ink"] .ab-chip::after { clip-path: polygon(50% 0, 100% 100%, 0 100%); }
 .ab[data-ae="bauhaus-poster"] .ab-swatch[data-role="primary"] .ab-chip::after { border-radius: 50%; }
 .ab[data-ae="bauhaus-poster"] .ab-swatch[data-role="secondary"] .ab-chip::after { border-radius: 100% 0 0 0; }
 .ab[data-ae="bauhaus-poster"] .ab-swatch[data-role="accent"] .ab-chip::after { top: 50%; border-radius: 999px 999px 0 0; }
@@ -83,7 +100,12 @@
 .ab[data-ae="bauhaus-poster"] .ab-sw-hex { font-size: 11px; font-weight: 700; letter-spacing: 0.08em; color: var(--ab-ink); }
 
 /* 01 interface */
-.ab[data-ae="bauhaus-poster"] .ab-card { border: 2px solid var(--ab-ink); border-top-width: 10px; border-radius: 0; background: var(--ab-canvas); }
+.ab[data-ae="bauhaus-poster"] .ab-card { position: relative; border: 2px solid var(--ab-ink); border-radius: 0; background: var(--ab-canvas); padding-top: calc(clamp(16px, 2.4cqw, 24px) + 12px); }
+/* the stripe: three flat blocks (poster red, poster yellow, brand primary) over an ink rule */
+.ab[data-ae="bauhaus-poster"] .ab-card::before {
+  content: ""; position: absolute; left: 0; right: 0; top: 0; height: 14px; border-bottom: 2px solid var(--ab-ink);
+  background: linear-gradient(90deg, var(--ab-bau-red) 0 34%, var(--ab-bau-yellow) 34% 67%, var(--ab-primary) 67% 100%);
+}
 .ab[data-ae="bauhaus-poster"] .ab-seg { gap: 0; padding: 0; border: 0; border-radius: 0; background: none; }
 .ab[data-ae="bauhaus-poster"] .ab-seg-btn {
   display: flex; align-items: center; justify-content: center; gap: 8px; min-height: 42px; margin-left: -2px; padding: 8px 4px;
@@ -179,3 +201,25 @@
   .ab[data-ae="bauhaus-poster"] .ab-labelrow .ab-label:first-child { white-space: nowrap; }
   .ab[data-ae="bauhaus-poster"] .ab-labelrow .ab-label:last-child:not(:first-child) { text-align: right; }
 }
+
+/* ---- Built (product screens): the same poster language ---- */
+.ab.sb-ab[data-ae="bauhaus-poster"] .sb-side {
+  border-right: 2px solid var(--ab-ink); background:
+    radial-gradient(circle closest-side, var(--ab-bau-red) 0 96%, transparent 100%) 18px calc(100% - 118px) / 38px 38px no-repeat,
+    linear-gradient(to top right, transparent 49.5%, var(--ab-bau-yellow) 50%) 68px calc(100% - 118px) / 38px 38px no-repeat,
+    linear-gradient(var(--ab-primary), var(--ab-primary)) 118px calc(100% - 118px) / 38px 38px no-repeat,
+    color-mix(in srgb, var(--ab-ink) 3.5%, transparent);
+}
+.ab.sb-ab[data-ae="bauhaus-poster"] .sb-navi { border-radius: 0; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; font-size: 11.5px; }
+.ab.sb-ab[data-ae="bauhaus-poster"] .sb-navi[aria-current] { background: var(--ab-primary); color: var(--ab-on-primary); box-shadow: none; outline: 2px solid var(--ab-ink); outline-offset: -2px; }
+.ab.sb-ab[data-ae="bauhaus-poster"] .ab-card.sb-stat { padding-top: 26px; }
+.ab.sb-ab[data-ae="bauhaus-poster"] .sb-stat:nth-child(1)::before { background: var(--ab-bau-red); }
+.ab.sb-ab[data-ae="bauhaus-poster"] .sb-stat:nth-child(2)::before { background: var(--ab-bau-yellow); }
+.ab.sb-ab[data-ae="bauhaus-poster"] .sb-stat:nth-child(3)::before { background: var(--ab-primary); }
+.ab.sb-ab[data-ae="bauhaus-poster"] .sb-stat:nth-child(4)::before { background: var(--ab-ink); }
+.ab.sb-ab[data-ae="bauhaus-poster"] .sb-top { position: relative; }
+.ab.sb-ab[data-ae="bauhaus-poster"] .sb-main > .ab-rule { height: 6px; }
+.ab.sb-ab[data-ae="bauhaus-poster"] .sb-danger-row p { color: var(--ab-ink); }
+.ab.sb-ab[data-ae="bauhaus-poster"] .sb-ob-art .bau-x { display: none; }
+/* Built landing: the actions and the proof line span the whole hero copy instead of widening the kicker column */
+.ab[data-ae="bauhaus-poster"] .ab-hero-copy > :is(.sb-hero-act, .sb-proof) { grid-column: 1 / -1; }

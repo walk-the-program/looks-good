@@ -24,7 +24,9 @@ registerAesthetic({
 
   // --ab-tr scales the tight headline tracking: 0 for condensed/heavy faces (they collide when tightened), 1 otherwise
   tokens() {
-    return { '--ab-type-pick-w': 600 };
+    // The Bauhaus poster pigments: a fixed warm red and yellow, used only as flat decorative planes
+    // (the art, the diagonal bar, card stripes); blue is always the brand primary. No text sits on them.
+    return { '--ab-type-pick-w': 600, '--ab-bau-red': '#EE4035', '--ab-bau-yellow': '#F6C90E' };
   },
 
   roles: {
@@ -44,23 +46,25 @@ registerAesthetic({
     },
   },
 
-  // The classic Bauhaus pattern tile: a 3x3 grid of 30-unit cells, each a flat
-  // quarter circle, semicircle, circle or plane in primary / secondary / accent /
-  // ink, rotated 0/90/180/270. Flat fills only: no strokes, shadows or blend modes.
+  // The poster cluster: the classic 3x3 tile (flat quarter circles, semicircles, circles in the brand
+  // primary and ink plus the poster red and yellow, one cell each of secondary and accent) with a red
+  // disc and an ink triangle overlapping its left edge. Flat fills only: no strokes
+  // on shapes, shadows or blend modes; overlap is the only depth. The SVG overflows its box on purpose.
   art(ctx) {
     const t = ctx.t;
     const P = t.primary, S = t.secondary, A = t.accent, I = t.ink;
+    const R = '#EE4035', Y = '#F6C90E';
     const shapes = {
       quarter: 'M0 0 H30 A30 30 0 0 1 0 30 Z',
       semi: 'M0 30 A15 15 0 0 1 30 30 Z',
       circle: 'M15 0 A15 15 0 1 1 15 30 A15 15 0 1 1 15 0 Z',
-      square: 'M7 7 H23 V23 H7 Z',
+      tri: 'M0 30 L30 30 L0 0 Z',
     };
     // [background or null, shape, fill, rotation]
     const cells = [
-      [S, 'quarter', A, 0], [null, 'circle', P, 0], [I, 'semi', S, 90],
-      [null, 'semi', I, 180], [P, 'quarter', I, 270], [A, 'circle', S, 0],
-      [I, 'quarter', P, 90], [S, 'semi', A, 0], [null, 'quarter', S, 180],
+      [Y, 'quarter', I, 0], [null, 'circle', R, 0], [I, 'semi', Y, 90],
+      [null, 'tri', I, 90], [P, 'quarter', Y, 270], [S, 'circle', P, 0],
+      [I, 'quarter', R, 90], [A, 'semi', I, 0], [null, 'quarter', P, 180],
     ];
     const out = cells.map((c, i) => {
       const x = (i % 3) * 30;
@@ -68,7 +72,9 @@ registerAesthetic({
       return `<g transform="translate(${x} ${y})">${c[0] ? `<rect width="30" height="30" fill="${c[0]}"/>` : ''}`
         + `<path d="${shapes[c[1]]}" fill="${c[2]}" transform="rotate(${c[3]} 15 15)"/></g>`;
     }).join('');
-    return `<svg viewBox="0 0 90 90" width="100%" height="100%" focusable="false" shape-rendering="geometricPrecision">${out}</svg>`;
+    const extra = `<circle class="bau-x" cx="-4" cy="64" r="27" fill="${R}"/>`
+      + `<path class="bau-x" d="M-46 90 L-4 90 L-4 48 Z" fill="${I}"/>`;
+    return `<svg viewBox="0 0 90 90" width="100%" height="100%" focusable="false" shape-rendering="geometricPrecision" style="overflow:visible">${extra}${out}</svg>`;
   },
 
   materials: [
