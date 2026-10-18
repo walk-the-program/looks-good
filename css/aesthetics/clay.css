@@ -15,23 +15,32 @@
   --cl-gloss: radial-gradient(120% 90% at 30% 12%, rgba(255, 255, 255, 0.3), transparent 55%);
   --cl-tray: color-mix(in srgb, var(--ab-ink) 9%, var(--ab-card-fill));
   --cl-tray-p: color-mix(in srgb, var(--ab-ink) 8%, var(--ab-card-fill));
-  --cl-card: 0 24px 44px -20px var(--ab-card-sh), inset 0 6px 12px var(--ab-card-hi), inset 0 -6px 14px var(--ab-card-lo);
+  --cl-card: 0 30px 52px -22px var(--ab-card-sh), 0 3px 6px -2px var(--ab-card-sh), inset 8px 9px 18px var(--ab-card-hi), inset -8px -11px 22px var(--ab-card-lo);
   --cl-ramp: linear-gradient(160deg, var(--ab-pri-hi), var(--ab-primary) 45%, var(--ab-pri-lo) 135%);
   --cl-tray-c: color-mix(in srgb, var(--ab-ink) 7%, var(--ab-canvas));
   --cl-well: inset 0 4px 10px var(--ab-clay-lo), inset 0 -2px 0 var(--ab-clay-hi);
   border-radius: 36px;
+}
+/* the studio: soft pastel blobs in the page itself, so the clay has something to sit on (flat, no text under them) */
+.ab[data-ae="clay"]::before {
+  content: ""; position: absolute; inset: 0; z-index: 0; pointer-events: none;
+  background:
+    radial-gradient(circle at 96% 5%, var(--ab-cl-blob1) 0, transparent 26%),
+    radial-gradient(circle at 2% 30%, var(--ab-cl-blob2) 0, transparent 24%),
+    radial-gradient(circle at 98% 58%, var(--ab-cl-blob3) 0, transparent 22%),
+    radial-gradient(circle at 4% 88%, var(--ab-cl-blob1) 0, transparent 26%);
 }
 
 /* header */
 .ab[data-ae="clay"] .ab-brand { font-weight: 700; letter-spacing: calc(-0.03em * var(--ab-tr, 1)); }
 .ab[data-ae="clay"] .ab-mark {
   width: 34px; height: 34px; border-radius: 50%;
-  background: var(--cl-gloss), var(--ab-primary); color: var(--ab-on-primary); font-weight: 800;
-  box-shadow: 0 9px 14px -6px var(--ab-pri-sh), var(--cl-in-s);
+  background: var(--cl-gloss), var(--ab-cl-pa); color: var(--ab-cl-pa-on); font-weight: 800;
+  box-shadow: 0 9px 14px -6px var(--ab-cl-pa-sh), var(--cl-in-s);
 }
 .ab[data-ae="clay"] .ab-tag {
   padding: 6px 14px; border-radius: 999px; background: var(--cl-tray-c); box-shadow: var(--cl-well);
-  font-size: 11.5px; letter-spacing: 0.01em; text-transform: none;
+  font-size: 11.5px; letter-spacing: 0.01em; text-transform: none; color: color-mix(in srgb, var(--ab-ink) 84%, transparent);
 }
 /* clay separates with space and soft cards, not rules: the rule is spacing only */
 .ab[data-ae="clay"] .ab-rule { height: 0; background: none; margin: 10px 0; box-shadow: none; border: 0; }
@@ -73,12 +82,12 @@
 .ab[data-ae="clay"] .cla-tile {
   left: 11%; top: 13%; width: 55%; height: 55%; border-radius: 28%; transform: rotate(-7deg);
   display: grid; place-items: center; z-index: 2;
-  background: radial-gradient(120% 90% at 28% 10%, rgba(255, 255, 255, 0.34), transparent 55%), var(--ab-primary);
-  box-shadow: 0 7cqw 12cqw -4cqw var(--ab-pri-sh), inset 0 -3.6cqw 7cqw var(--ab-clay-lo), inset 0 3.4cqw 6cqw var(--ab-clay-hi);
+  background: radial-gradient(120% 90% at 28% 10%, rgba(255, 255, 255, 0.4), transparent 55%), var(--ab-cl-pa);
+  box-shadow: 0 7cqw 12cqw -4cqw var(--ab-cl-pa-sh), inset 0 -3.6cqw 7cqw var(--ab-clay-lo), inset 0 3.4cqw 6cqw var(--ab-clay-hi);
 }
 .ab[data-ae="clay"] .cla-tile span {
   font: 800 31cqw/1 var(--ab-font-h); letter-spacing: calc(-0.02em * var(--ab-tr, 1)); transform: translateY(-1cqw);
-  color: color-mix(in srgb, var(--ab-primary) 76%, #fff);
+  color: color-mix(in srgb, var(--ab-cl-pa) 45%, #fff);
   text-shadow: -0.5cqw -0.5cqw 0.6cqw rgba(255, 255, 255, 0.5), 0.7cqw 1cqw 0.9cqw rgba(0, 0, 0, 0.3);
 }
 .ab[data-ae="clay"] .cla-sphere {
@@ -86,9 +95,23 @@
   background:
     radial-gradient(circle at 31% 25%, rgba(255, 255, 255, 0.62) 0, rgba(255, 255, 255, 0) 33%),
     radial-gradient(circle at 70% 88%, rgba(0, 0, 0, 0.16), transparent 52%),
-    var(--ab-pri-hi);
-  box-shadow: 0 5cqw 9cqw -3.5cqw var(--ab-pri-hi-sh), inset 0 -2.4cqw 4.8cqw var(--ab-clay-lo), inset 0 2.4cqw 4.2cqw var(--ab-clay-hi);
+    var(--ab-cl-pa-hi);
+  box-shadow: 0 5cqw 9cqw -3.5cqw var(--ab-cl-pa-hi-sh), inset 0 -2.4cqw 4.8cqw var(--ab-clay-lo), inset 0 2.4cqw 4.2cqw var(--ab-clay-hi);
 }
+/* the sphere wears a face: two eyes and a smile, in ink */
+.ab[data-ae="clay"] .cla-sphere::before {
+  content: ""; position: absolute; left: 24%; top: 38%; width: 52%; height: 15%;
+  background:
+    radial-gradient(ellipse 11% 50% at 12% 50%, var(--ab-ink) 0 92%, transparent 100%),
+    radial-gradient(ellipse 11% 50% at 88% 50%, var(--ab-ink) 0 92%, transparent 100%);
+}
+.ab[data-ae="clay"] .cla-sphere::after {
+  content: ""; position: absolute; left: 50%; top: 56%; width: 26%; height: 13%; transform: translateX(-50%);
+  border: max(2px, 0.9cqw) solid var(--ab-ink); border-top: 0; border-radius: 0 0 99px 99px;
+}
+.ab[data-ae="clay"] .cla-bead { border-radius: 50%; z-index: 3; box-shadow: inset 0 -1.4cqw 2.4cqw var(--ab-clay-lo), inset 0 1.2cqw 2cqw var(--ab-clay-hi); }
+.ab[data-ae="clay"] .cla-bead-a { left: 3%; top: 6%; width: 11%; height: 11%; background: radial-gradient(circle at 32% 26%, rgba(255,255,255,0.55), transparent 42%), var(--ab-secondary); filter: drop-shadow(0 1.6cqw 1.6cqw var(--ab-sec-sh)); }
+.ab[data-ae="clay"] .cla-bead-b { left: 76%; top: 74%; width: 8%; height: 8%; background: radial-gradient(circle at 32% 26%, rgba(255,255,255,0.55), transparent 42%), var(--ab-cl-pa); filter: drop-shadow(0 1.2cqw 1.2cqw var(--ab-cl-pa-sh)); }
 .ab[data-ae="clay"] .cla-torus {
   left: 55%; top: 1%; width: 40%; height: 40%; border-radius: 50%; z-index: 1;
   background: radial-gradient(circle at 30% 22%, rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0) 40%), var(--ab-secondary);
@@ -103,8 +126,8 @@
   left: 64%; top: 44%; width: 18%; height: 46%; border-radius: 99px; transform: rotate(17deg); z-index: 3;
   background:
     linear-gradient(100deg, rgba(255, 255, 255, 0.4) 0, rgba(255, 255, 255, 0) 38%),
-    var(--ab-pri-lo);
-  box-shadow: 0 4.5cqw 8cqw -3cqw var(--ab-pri-lo-sh), inset 0 -2.4cqw 4.8cqw var(--ab-clay-lo), inset 0 2.4cqw 4cqw var(--ab-clay-hi);
+    var(--ab-cl-pa-lo);
+  box-shadow: 0 4.5cqw 8cqw -3cqw var(--ab-cl-pa-lo-sh), inset 0 -2.4cqw 4.8cqw var(--ab-clay-lo), inset 0 2.4cqw 4cqw var(--ab-clay-hi);
 }
 
 /* palette: clay beans, each with a soft colored drop plus a tight contact shadow where it touches the surface */
@@ -123,7 +146,7 @@
 
 /* near-white cards with a soft colored shadow: the clay finish lives on the objects */
 .ab[data-ae="clay"] .ab-card, .ab[data-ae="clay"] .ab-panel {
-  border-radius: 30px; padding: clamp(20px, 3cqw, 28px);
+  border-radius: 36px; padding: clamp(22px, 3.2cqw, 32px);
   background: var(--ab-card-fill); box-shadow: var(--cl-card);
 }
 
@@ -182,7 +205,7 @@
 .ab[data-ae="clay"] .ab-list { display: grid; gap: 14px; padding: 0 0 10px; }
 .ab[data-ae="clay"] .ab-row {
   grid-template-columns: 44px minmax(0, 1fr) auto minmax(60px, 150px) 4.5ch;
-  gap: 4px clamp(10px, 2cqw, 18px); padding: 12px 20px 12px 12px; border: 0; border-radius: 28px;
+  gap: 4px clamp(10px, 2cqw, 18px); padding: 12px 20px 12px 12px; border: 0; border-radius: 32px;
   background: var(--ab-card-fill); font-size: 13.5px;
   box-shadow: 0 16px 28px -16px var(--ab-card-sh), inset 0 5px 9px var(--ab-card-hi), inset 0 -5px 10px var(--ab-card-lo);
 }
@@ -193,9 +216,9 @@
   font-size: 17px; font-weight: 800; line-height: 1;
 }
 /* avatars step down the primary's tonal ramp: base, lighter, darker */
-.ab[data-ae="clay"] .ab-row:nth-child(1) .ab-av { background: var(--cl-gloss), var(--ab-primary); color: var(--ab-on-primary); box-shadow: 0 9px 14px -6px var(--ab-pri-sh), var(--cl-in-s); }
-.ab[data-ae="clay"] .ab-row:nth-child(2) .ab-av { background: var(--cl-gloss), var(--ab-pri-hi); color: var(--ab-pri-hi-on); box-shadow: 0 9px 14px -6px var(--ab-pri-hi-sh), var(--cl-in-s); }
-.ab[data-ae="clay"] .ab-row:nth-child(3) .ab-av { background: var(--cl-gloss), var(--ab-pri-lo); color: var(--ab-pri-lo-on); box-shadow: 0 9px 14px -6px var(--ab-pri-lo-sh), var(--cl-in-s); }
+.ab[data-ae="clay"] .ab-row:nth-child(1) .ab-av { background: var(--cl-gloss), var(--ab-cl-pa); color: var(--ab-cl-pa-on); box-shadow: 0 9px 14px -6px var(--ab-cl-pa-sh), var(--cl-in-s); }
+.ab[data-ae="clay"] .ab-row:nth-child(2) .ab-av { background: var(--cl-gloss), var(--ab-cl-pa-hi); color: var(--ab-cl-pa-hi-on); box-shadow: 0 9px 14px -6px var(--ab-cl-pa-hi-sh), var(--cl-in-s); }
+.ab[data-ae="clay"] .ab-row:nth-child(3) .ab-av { background: var(--cl-gloss), var(--ab-cl-pa-lo); color: var(--ab-cl-pa-lo-on); box-shadow: 0 9px 14px -6px var(--ab-cl-pa-lo-sh), var(--cl-in-s); }
 .ab[data-ae="clay"] .ab-row-name { font-weight: 700; }
 .ab[data-ae="clay"] .ab-row-status {
   padding: 4px 13px; background: var(--cl-gloss), var(--ab-secondary); color: var(--ab-on-secondary); font-weight: 700; font-size: 11px;
@@ -203,7 +226,7 @@
 }
 .ab[data-ae="clay"] .ab-row-bar { height: 14px; border-radius: 99px; background: var(--cl-tray-c); box-shadow: var(--cl-well); }
 .ab[data-ae="clay"] .ab-row-bar i {
-  border-radius: 99px; background: var(--cl-gloss), linear-gradient(90deg, var(--ab-pri-hi), var(--ab-primary));
+  border-radius: 99px; background: var(--cl-gloss), linear-gradient(90deg, var(--ab-cl-pa-hi), var(--ab-cl-pa));
   box-shadow: inset 0 -3px 5px var(--ab-clay-lo), inset 0 3px 4px var(--ab-clay-hi);
 }
 .ab[data-ae="clay"] .ab-row-pct { font-weight: 800; }
@@ -229,3 +252,22 @@
 @media (prefers-reduced-motion: reduce) {
   .ab[data-ae="clay"] .ab-cta:hover, .ab[data-ae="clay"] .ab-cta:active, .ab[data-ae="clay"] .ab-cta.is-hover, .ab[data-ae="clay"] .ab-cta.is-pressed { transform: none; }
 }
+
+/* ---- Built (product screens): a floating clay sidebar, puffy bubbles on the KPIs, a chunky chart line ---- */
+.ab.sb-ab[data-ae="clay"] .sb-side { margin: 14px 0 14px 14px; padding: 22px 12px 16px; border: 0; border-radius: 34px; background: var(--ab-card-fill); box-shadow: var(--cl-card); }
+.ab.sb-ab[data-ae="clay"] .sb-navi { border-radius: 999px; font-weight: 600; }
+.ab.sb-ab[data-ae="clay"] .sb-navi[aria-current] {
+  background: radial-gradient(120% 120% at 30% 0, #fff, var(--ab-pearl) 60%); color: var(--ab-pearl-ink); font-weight: 800; box-shadow: 0 8px 12px -6px var(--ab-ink-sh), inset 0 -4px 8px rgba(0, 0, 0, 0.09), inset 0 4px 6px rgba(255, 255, 255, 0.95);
+}
+.ab.sb-ab[data-ae="clay"] .ab-card.sb-stat { position: relative; padding-right: 58px; }
+.ab.sb-ab[data-ae="clay"] .sb-stat::after {
+  content: ""; position: absolute; right: 16px; top: 16px; width: 30px; height: 30px; border-radius: 50%;
+  background: var(--cl-gloss), var(--ab-cl-pa); box-shadow: 0 9px 12px -6px var(--ab-cl-pa-sh), var(--cl-in-s);
+}
+.ab.sb-ab[data-ae="clay"] .sb-stat:nth-child(2)::after { background: var(--cl-gloss), var(--ab-secondary); box-shadow: 0 9px 12px -6px var(--ab-sec-sh), var(--cl-in-s); }
+.ab.sb-ab[data-ae="clay"] .sb-stat:nth-child(3)::after { background: var(--cl-gloss), var(--ab-cl-pa-hi); box-shadow: 0 9px 12px -6px var(--ab-cl-pa-hi-sh), var(--cl-in-s); }
+.ab.sb-ab[data-ae="clay"] .sb-stat:nth-child(4)::after { background: var(--cl-gloss), var(--ab-cl-pa-lo); box-shadow: 0 9px 12px -6px var(--ab-cl-pa-lo-sh), var(--cl-in-s); }
+.ab.sb-ab[data-ae="clay"] .sb-c-line { stroke-width: 4; filter: drop-shadow(0 7px 6px var(--ab-pri-sh)); }
+.ab.sb-ab[data-ae="clay"] .sb-c-area { fill: color-mix(in srgb, var(--ab-cl-pa) 26%, transparent); }
+.ab.sb-ab[data-ae="clay"] .sb-c-dot { width: 17px; height: 17px; margin: -8.5px 0 0 -8.5px; background: radial-gradient(circle at 32% 26%, #fff, var(--ab-pearl) 60%); box-shadow: 0 6px 8px -3px var(--ab-pri-sh); }
+.ab.sb-ab[data-ae="clay"] .sb-top .ab-kicker { margin-bottom: 8px !important; }

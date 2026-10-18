@@ -3,6 +3,15 @@
    top) on the OBJECTS: the CTA, chips, toggle knob, avatars, segmented
    selection and the art. Objects use a tonal ramp of the primary rather than
    every brand hue at once. Look lives in css/aesthetics/clay.css. */
+// Clay is pastel: a dark or saturated brand primary is lifted and softened for the objects (art, avatars,
+// progress, bubbles) so they read as modeling clay, not gel. The one capsule action keeps the full primary
+// so its label stays at AA. Light primaries are left alone.
+function clayPastel(hex) {
+  const c = hexToHsl(hex);
+  const l = Math.max(c.l, 70), s = Math.min(c.s, 66) * (c.l < 60 ? 0.9 : 1);
+  return hslToHex(c.h, s, Math.min(l, 82));
+}
+
 registerAesthetic({
   key: 'clay', order: 9,
   name: 'Clay',
@@ -44,7 +53,16 @@ registerAesthetic({
     const priHi = t.mix('#ffffff', t.primary, 0.34);
     const priLo = t.mix('#000000', t.primary, 0.2);
     const pearl = t.mix('#ffffff', t.canvas, 0.9);
+    const pa = clayPastel(t.primary);
+    const paHi = t.mix('#ffffff', pa, 0.4);
+    const paLo = t.mix('#000000', pa, 0.16);
     return {
+      '--ab-cl-pa': pa, '--ab-cl-pa-on': t.readable(pa), '--ab-cl-pa-sh': sh(pa),
+      '--ab-cl-pa-hi': paHi, '--ab-cl-pa-hi-on': t.readable(paHi), '--ab-cl-pa-hi-sh': sh(paHi),
+      '--ab-cl-pa-lo': paLo, '--ab-cl-pa-lo-on': t.readable(paLo), '--ab-cl-pa-lo-sh': sh(paLo),
+      '--ab-cl-blob1': t.alpha(t.secondary, d ? 0.16 : 0.5),
+      '--ab-cl-blob2': t.alpha(pa, d ? 0.14 : 0.34),
+      '--ab-cl-blob3': t.alpha(t.accent, d ? 0.08 : 0.16),
       '--ab-pri-sh': sh(t.primary),
       '--ab-sec-sh': sh(t.secondary),
       '--ab-acc-sh': sh(t.accent),
@@ -60,9 +78,10 @@ registerAesthetic({
       // Cards are near-white (canvas lightened 82%), lit from above, with a soft
       // shadow in the primary's tone.
       '--ab-card-fill': d ? t.mix('#ffffff', t.canvas, 0.07) : t.mix('#ffffff', t.canvas, 0.82),
-      '--ab-card-sh': d ? 'rgba(0,0,0,0.55)' : t.alpha(t.mix('#000000', t.primary, 0.12), 0.26),
-      '--ab-card-hi': d ? 'rgba(255,255,255,0.07)' : 'rgba(255,255,255,0.95)',
-      '--ab-card-lo': d ? 'rgba(0,0,0,0.3)' : 'rgba(60,50,70,0.05)',
+      '--ab-card-sh': d ? 'rgba(0,0,0,0.55)' : t.alpha(t.mix('#000000', t.primary, 0.12), 0.3),
+      '--ab-card-hi': d ? 'rgba(255,255,255,0.09)' : 'rgba(255,255,255,1)',
+      // the underside of a puffy card is a tint of the object colour, not grey
+      '--ab-card-lo': d ? 'rgba(0,0,0,0.34)' : t.alpha(t.mix(t.mix('#ffffff', t.primary, 0.3), '#000000', 0.9), 0.16),
       '--ab-obj': d ? t.mix('#ffffff', t.canvas, 0.09) : t.mix('#ffffff', t.canvas, 0.8),
       '--ab-pearl': pearl,
       '--ab-pearl-ink': t.readable(pearl),
@@ -70,15 +89,16 @@ registerAesthetic({
   },
 
   art(ctx) {
-    // A clay "app icon" tile (primary, the brand initial embossed) as the focal
-    // object, with a lighter-primary sphere, one secondary torus and a darker
-    // primary capsule overlapping it; each has a soft contact shadow.
+    // A clay "app icon" tile (pastel primary, the brand initial embossed) as the focal
+    // object, with a lighter sphere that wears a little face, one secondary torus and a
+    // darker capsule overlapping it, plus two small beads; each has a soft contact shadow.
     return '<div class="cla">'
       + '<i class="cla-sh cla-sh-t"></i><i class="cla-sh cla-sh-s"></i><i class="cla-sh cla-sh-c"></i>'
       + '<span class="cla-torus"><span class="cla-hole"></span></span>'
       + '<i class="cla-cap"></i>'
       + `<div class="cla-tile"><span>${escapeHtml(ctx.initial)}</span></div>`
       + '<i class="cla-sphere"></i>'
+      + '<i class="cla-bead cla-bead-a"></i><i class="cla-bead cla-bead-b"></i>'
       + '</div>';
   },
 
