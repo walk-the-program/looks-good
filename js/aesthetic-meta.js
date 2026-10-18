@@ -498,7 +498,7 @@ function fontFitFor(key, state) {
    pair (d = offset, blur, ds/blurS for small controls), or a glow (r, a). SwiftUI radius = CSS blur / 2.
    `states[k]` is [colour role, visual]; the focus row's colour is computed from the palette.
    `sw` picks the SwiftUI recipe (hard | soft | glass | glow | flat | stepped).
-   Optional `accentOverride` { light, dark?, note }: the look draws its own accent whatever the brand
+   Optional `accentOverride` and `secondaryOverride` { light, dark?, on?, note } (`on` = the label colour the board uses on it): the look draws its own accent whatever the brand
    accent is; light/dark name an extras key ('--ab-x', read from the board's tokens function per mode),
    a hex, or a function(m) of the mode record { mode, t, extras }. The brief prints that value.
    Optional `fixedInks` [{ token, light, dark?, on?, job, decorativeOnly }]: extra colours the look
@@ -713,6 +713,7 @@ const AESTHETIC_BUILD = {
   'mid-century': {
     cls: 'flat',
     accentOverride: { light: '--mc-acc', note: 'the brand accent warmed toward 1950s yellow like the other mid-century inks' },
+    secondaryOverride: { light: '--mc-sec', on: '--mc-on-sec', note: 'the brand secondary warmed toward 1950s yellow like the other mid-century inks' },
     fixedInks: [
       { token: '--mustard', light: '--mc-mustard', on: '--mc-on-mustard', job: 'Period mustard: card header bands, seals, avatar and chip fills.', decorativeOnly: false },
       { token: '--teal', light: '--mc-teal', on: '--mc-on-teal', job: 'Period teal: selected segment, switch on, focus ring, panel bands.', decorativeOnly: false },

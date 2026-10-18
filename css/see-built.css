@@ -22,7 +22,7 @@
 }
 .sb-kind {
   height: 30px; padding: 0 14px; border: 0; border-radius: var(--r-ui); background: transparent; cursor: pointer;
-  font: 500 12.5px/1 var(--font-ui); color: var(--muted); white-space: nowrap;
+  font: 500 12.5px/1 var(--font-ui); color: var(--chrome-muted, color-mix(in srgb, var(--ink) 30%, var(--muted))); white-space: nowrap;
   transition: background-color var(--dur) var(--ease), color var(--dur) var(--ease);
 }
 .sb-kind:hover { color: var(--ink); }
@@ -37,7 +37,7 @@
 .sb-ba-btn[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: #fff; }
 .sb-ba-ico { position: relative; width: 14px; height: 12px; border: 1.5px solid currentColor; border-radius: 3px; overflow: hidden; }
 .sb-ba-ico::after { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 50%; background: currentColor; }
-.sb-note { margin: 12px 0 0; font-size: 12.5px; line-height: 1.5; color: var(--muted); }
+.sb-note { margin: 12px 0 0; font-size: 12.5px; line-height: 1.5; color: var(--chrome-muted, color-mix(in srgb, var(--ink) 30%, var(--muted))); }
 
 /* one screen, or two stacked under a divider */
 .sb-single, .sb-compare { min-width: 0; }

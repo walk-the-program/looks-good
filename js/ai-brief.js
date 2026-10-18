@@ -322,18 +322,26 @@ function aibInkValue(spec, m, field) {
   return AIB_HEX.test(v) ? v : '';
 }
 
-// accentOverride: the look prints its own accent, so the accent and its derived colours (label on it,
-// the accent as text) are recomputed from the value the board draws.
-function aibApplyAccentOverride(build, m) {
-  if (!m || !build.accentOverride) return;
-  const v = aibInkValue(build.accentOverride, m);
-  if (!v) return;
+// accentOverride / secondaryOverride: the look prints its own accent or secondary, so that role and its derived
+// colours (label on it, the accent as text, the tint) are recomputed from the value the board draws.
+// `on` (optional) names the label colour the board uses on it.
+function aibApplyOverrides(build, m) {
+  if (!m) return;
   const t = m.t;
-  t.accent = v;
-  t.onAccent = pickReadableText(v);
-  t.accentInk = abAccentInk(v, t.canvas, t.ink);
-  t.accentLow = contrastRatio(v, t.canvas) < 3;
-  t.accentText = slVisible(t.canvas, [v, t.primary], 3, t.ink);
+  const a = build.accentOverride && aibInkValue(build.accentOverride, m);
+  if (a) {
+    t.accent = a;
+    t.onAccent = aibInkValue(build.accentOverride, m, 'on') || pickReadableText(a);
+    t.accentInk = abAccentInk(a, t.canvas, t.ink);
+    t.accentLow = contrastRatio(a, t.canvas) < 3;
+    t.accentText = slVisible(t.canvas, [a, t.primary], 3, t.ink);
+  }
+  const sc = build.secondaryOverride && aibInkValue(build.secondaryOverride, m);
+  if (sc) {
+    t.secondary = sc;
+    t.onSecondary = aibInkValue(build.secondaryOverride, m, 'on') || pickReadableText(sc);
+    t.secTint = slMix(sc, t.canvas, 0.16);
+  }
 }
 
 // Errors need a colour the five brand roles do not have: a fixed red, shaded toward the ink
@@ -393,7 +401,7 @@ function aibContext(state0, opts) {
   const mode = only || (state.bgMode === 'dark' ? 'dark' : 'light');
   const L = only === 'dark' ? null : aibModeTokens(view, 'light');
   const D = only === 'light' ? null : aibModeTokens(view, 'dark');
-  [L, D].forEach(m => aibApplyAccentOverride(build, m));
+  [L, D].forEach(m => aibApplyOverrides(build, m));
   const modes = [L, D].filter(Boolean);
   const cur = mode === 'dark' ? D : L;
   const probe = opts.noProbe ? null : aibProbeBoard(state, def);
@@ -448,7 +456,10 @@ function aibPaletteRows(ctx) {
   add('--muted', m => m.t.muted, 'Secondary text, captions, placeholders (4.5:1 or better on the canvas).', []);
   add('--line', m => m.t.line, 'Hairlines, dividers, resting input borders.', []);
   add('--primary', m => aibPri(m.t), roleJob('primary') + printedNote, [['--on-primary', m => m.t.onPrimary]]);
-  add('--secondary', m => m.t.secondary, roleJob('secondary'), [['--on-secondary', m => m.t.onSecondary]]);
+  const so = build.secondaryOverride;
+  const secNote = so && modes.every(m => aibInkValue(so, m))
+    ? ` ${def.name} draws the secondary as ${so.note || 'its own colour, whatever the brand secondary is'}; use this value everywhere. The brand secondary (${ctx.state.colors.secondary}) appears only in the palette swatch.` : '';
+  add('--secondary', m => m.t.secondary, roleJob('secondary') + secNote, [['--on-secondary', m => m.t.onSecondary]]);
   const ao = build.accentOverride;
   const accentNote = ao && modes.every(m => aibInkValue(ao, m))
     ? ` ${def.name} draws the accent as ${ao.note || 'its own colour, whatever the brand accent is'}; use this value everywhere. The brand accent (${ctx.state.colors.accent}) appears only in the palette swatch.` : '';
