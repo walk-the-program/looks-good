@@ -348,6 +348,15 @@
 .ab[data-ae="neo-brutal-pop"] .ab-mark, .ab[data-ae="neo-brutal-pop"] .ab-type-col[data-role="heading"] .ab-type-cur b { font-weight: var(--np-hw, 800); }
 .ab[data-ae="neo-brutal-pop"] :is(.ab-type-col[data-role="body"] .ab-type-cur b, .ab-deck-pratio b) { font-weight: var(--np-uw, 700); }
 
+/* ---- Built > Mobile app ---- */
+/* welcome headline is 27px, not the 44-64px board headline the flower was sized for: a smaller flower, and the
+   pill gets right-hand room so the petals never cover the last letter */
+.ab.sb-ab[data-ae="neo-brutal-pop"] .sb-ob-h .ab-hl { --np-fl: 34px; padding-right: 0.32em; }
+/* home: the first row is the tallest object under the card (tile, name, status); one full row fits above the tab
+   bar, a second would show as a stub cut by it */
+.ab.sb-ab[data-ae="neo-brutal-pop"] .sb-home-list .ab-row:nth-child(n+2) { display: none; }
+.ab.sb-ab[data-ae="neo-brutal-pop"] .sb-home-list .ab-row:nth-child(1) { border-bottom: var(--np-b) solid var(--ab-ink); }
+
 /* ---- Built (product screens): colour fields, ink borders, hard shadows and a few stickers ---- */
 .ab.sb-ab[data-ae="neo-brutal-pop"] .sb-side {
   background: var(--ab-primary); color: var(--ab-on-primary); border-right: var(--np-b) solid var(--ab-ink);
@@ -375,7 +384,7 @@
 /* the "NEW" starburst stuck on the page title */
 .ab.sb-ab[data-ae="neo-brutal-pop"] .sb-top-t { position: relative; }
 .ab.sb-ab[data-ae="neo-brutal-pop"] .sb-top-t::after {
-  content: "NEW"; position: absolute; left: calc(100% - 34px); top: 18px; width: 48px; height: 48px; rotate: 12deg; pointer-events: none;
+  content: "NEW"; position: absolute; left: calc(100% - 18px); top: 26px; width: 44px; height: 44px; rotate: 12deg; pointer-events: none;
   display: grid; place-items: center; background: var(--np-star-img) center / 100% 100% no-repeat;
   font: var(--np-hw, 800) 10px/1 var(--ab-font-h); letter-spacing: 0; color: var(--ab-on-accent);
 }

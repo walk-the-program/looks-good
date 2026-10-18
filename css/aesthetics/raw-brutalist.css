@@ -50,6 +50,14 @@
 .ab[data-ae="raw-brutalist"] .ab-headline {
   margin-right: calc(var(--ab-pad) * -1); font-weight: 900; text-transform: uppercase; line-height: calc(0.86 + 0.16 * (1 - var(--ab-tr, 1))); letter-spacing: calc(-0.045em * var(--ab-tr, 1));
 }
+/* Built > Mobile app: the spec sheet sits at the foot of the art slot, next to the WELCOME kicker (not floating
+   mid-slot), and the home table keeps the two rows that fit above the tab bar (status tags dropped) so no
+   row is cut through against it. */
+.ab.sb-ab[data-ae="raw-brutalist"] .sb-ob-art .ab-art.sb-ob-artbox { display: flex; flex-direction: column; justify-content: flex-end; width: 100%; max-height: none; aspect-ratio: auto; }
+.ab.sb-ab[data-ae="raw-brutalist"] .sb-home-list .ab-row:nth-child(n+3) { display: none; }
+.ab.sb-ab[data-ae="raw-brutalist"] .sb-home-list .ab-row-status { display: none; }
+.ab.sb-ab[data-ae="raw-brutalist"] .sb-home-list .ab-row { padding-block: 8px; }
+.ab.sb-ab[data-ae="raw-brutalist"] .sb-home-list .ab-row:nth-child(2) { border-bottom: 2px solid var(--ab-ink); }
 /* the band is a tight plane (it must not eat the line above) that runs on to the
    board edge: a pseudo-element extends it, the board crops it */
 .ab[data-ae="raw-brutalist"] .ab-hl {

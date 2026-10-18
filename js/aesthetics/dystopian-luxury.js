@@ -44,12 +44,15 @@ function dlWordFit(state, word, maxFs) {
   return { fs, W, mode, strip };
 }
 
-// Split a word in two near its middle: a consonant-consonant boundary that is not a digraph
+// Split a long word in two near its middle: a consonant-consonant boundary that is not a digraph
 // ("STRAW" / "BERRY") when one sits within a quarter of the middle, else the vowel-consonant
-// boundary nearest the middle ("MARI" / "GOLD"), else the middle itself.
+// boundary nearest the middle ("MARI" / "GOLD"), else the middle itself. A word shorter than
+// DL_SPLIT_MIN letters stays whole on one line, scaled to fit: "SIG / NL" cost more than
+// the smaller type ever did, and up to nine letters still read at a phone's width.
+const DL_SPLIT_MIN = 10;
 function dlSplit(word) {
   const w = String(word);
-  if (w.length < 5) return [w];
+  if (w.length < DL_SPLIT_MIN) return [w];
   const V = /[AEIOUY]/;
   const DI = ['CH', 'SH', 'TH', 'PH', 'WH', 'CK', 'NG', 'GH', 'KN', 'QU', 'DG'];
   const mid = w.length / 2;
