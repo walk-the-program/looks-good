@@ -1154,3 +1154,190 @@ function initAestheticUi() {
   });
   if (window.ResizeObserver) new ResizeObserver(fitCompareGrid).observe(grid);
 }
+
+/* ---------------- logo legibility (Board, Built, Deck) ----------------
+   An uploaded logo is a fixed image, so on a surface its ink cannot read on (dark ink on
+   a dark header) it vanishes. Every `img.ab-logo` that appears anywhere is checked once
+   against the colour actually behind it: its main colours are sampled, and when any of
+   them falls under 3:1 a monochrome mark is flipped to black or white, and any other mark
+   sits on a small plate in the canvas (or ink) colour with the style's own corner radius.
+   Images that carry their own opaque background are left alone. The result is inline
+   style, so slide exports and clones keep it. */
+const AB_LOGO_MIN = 3;
+const abLogoTones = new Map();   // src -> Promise<{ tones: [{r,g,b,w}], opaque } | null>
+
+function abLogoSample(src) {
+  if (abLogoTones.has(src)) return abLogoTones.get(src);
+  const p = new Promise(resolve => {
+    const im = new Image();
+    im.onload = () => {
+      try {
+        const nw = im.naturalWidth || 160, nh = im.naturalHeight || 160;
+        const k = 96 / Math.max(nw, nh);
+        const w = Math.max(1, Math.round(nw * k)), h = Math.max(1, Math.round(nh * k));
+        const c = document.createElement('canvas');
+        c.width = w; c.height = h;
+        const cx = c.getContext('2d', { willReadFrequently: true });
+        cx.drawImage(im, 0, 0, w, h);
+        const d = cx.getImageData(0, 0, w, h).data;
+        const buckets = new Map();
+        let total = 0, solid = 0;
+        for (let i = 0; i < d.length; i += 4) {
+          const a = d[i + 3];
+          if (a >= 240) solid++;
+          if (a < 90) continue;
+          const wt = a / 255;
+          const key = (d[i] >> 4) << 8 | (d[i + 1] >> 4) << 4 | (d[i + 2] >> 4);
+          const b = buckets.get(key) || { r: 0, g: 0, b: 0, w: 0 };
+          b.r += d[i] * wt; b.g += d[i + 1] * wt; b.b += d[i + 2] * wt; b.w += wt;
+          buckets.set(key, b);
+          total += wt;
+        }
+        if (!total) return resolve(null);
+        const tones = [...buckets.values()].filter(b => b.w / total >= 0.06)
+          .map(b => ({ r: b.r / b.w, g: b.g / b.w, b: b.b / b.w, w: b.w / total }));
+        resolve({ tones, opaque: solid / (w * h) > 0.97 });
+      } catch (err) { resolve(null); }   // unreadable (tainted) image: leave it as it is
+    };
+    im.onerror = () => resolve(null);
+    im.src = src;
+  });
+  abLogoTones.set(src, p);
+  return p;
+}
+
+const abRgbLum = c => {
+  const f = v => { v /= 255; return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); };
+  return 0.2126 * f(c.r) + 0.7152 * f(c.g) + 0.0722 * f(c.b);
+};
+const abRgbContrast = (a, b) => {
+  const la = abRgbLum(a), lb = abRgbLum(b);
+  return (Math.max(la, lb) + 0.05) / (Math.min(la, lb) + 0.05);
+};
+function abParseColor(css) {
+  const m = /rgba?\(([^)]+)\)/.exec(css || '');
+  if (!m) return null;
+  const p = m[1].split(/[ ,/]+/).filter(Boolean).map(Number);
+  return { r: p[0], g: p[1], b: p[2], a: p.length > 3 ? p[3] : 1 };
+}
+
+// The colour a logo sits on: walks up the ancestors, stacking translucent fills until an
+// opaque one (gradients count as the average of their stops).
+function abBackdropOf(el) {
+  const layers = [];
+  for (let n = el.parentElement; n && n !== document.documentElement; n = n.parentElement) {
+    const cs = getComputedStyle(n);
+    const bi = cs.backgroundImage || '';
+    // Only a gradient that really fills the box counts: hairline grids, stripes and bars
+    // (repeating, sized, or with transparent stops) are decoration drawn over the fill.
+    const fills = /gradient\(/.test(bi) && !/repeating-/.test(bi) && /^(auto( auto)?|100% 100%|cover)?(, ?(auto( auto)?|100% 100%|cover))*$/.test(cs.backgroundSize || 'auto');
+    if (fills) {
+      const cols = (bi.match(/rgba?\([^)]+\)/g) || []).map(abParseColor).filter(Boolean);
+      if (cols.length && !cols.some(c => c.a < 0.3)) {
+        const avg = cols.reduce((s, c) => ({ r: s.r + c.r, g: s.g + c.g, b: s.b + c.b, a: s.a + c.a }), { r: 0, g: 0, b: 0, a: 0 });
+        const L = { r: avg.r / cols.length, g: avg.g / cols.length, b: avg.b / cols.length, a: avg.a / cols.length };
+        if (L.a > 0.95) { layers.push({ ...L, a: 1 }); break; }
+        if (L.a > 0.05) layers.push(L);
+      }
+    }
+    const c = abParseColor(cs.backgroundColor);
+    if (c && c.a > 0.05) { layers.push(c); if (c.a > 0.95) break; }
+  }
+  let out = { r: 255, g: 255, b: 255 };
+  for (let i = layers.length - 1; i >= 0; i--) {
+    const L = layers[i];
+    out = { r: out.r * (1 - L.a) + L.r * L.a, g: out.g * (1 - L.a) + L.g * L.a, b: out.b * (1 - L.a) + L.b * L.a };
+  }
+  return out;
+}
+
+function abHexRgb(hex) {
+  const m = /^#?([0-9a-f]{3}|[0-9a-f]{6})$/i.exec((hex || '').trim());
+  if (!m) return null;
+  const h = m[1].length === 3 ? m[1].replace(/./g, '$&$&') : m[1];
+  return { r: parseInt(h.slice(0, 2), 16), g: parseInt(h.slice(2, 4), 16), b: parseInt(h.slice(4, 6), 16) };
+}
+
+function abClearLogoFit(img) {
+  if (!img.hasAttribute('data-logo-fit')) return;
+  img.removeAttribute('data-logo-fit');
+  ['filter', 'background', 'padding', 'border-radius', 'box-sizing'].forEach(p => img.style.removeProperty(p));
+}
+
+// How much of a mark's ink is lost on a surface: the share under 3:1 and the share under
+// 2:1 (a pale tint in an otherwise visible mark is fine, a wordmark that vanishes is not).
+function abLogoLoss(tones, back) {
+  let under3 = 0, under2 = 0, all = 0;
+  tones.forEach(t => {
+    const c = abRgbContrast(t, back);
+    all += t.w;
+    if (c < AB_LOGO_MIN) under3 += t.w;
+    if (c < 2) under2 += t.w;
+  });
+  return { under3: all ? under3 / all : 0, under2: all ? under2 / all : 0 };
+}
+const abLogoLost = (tones, back) => { const l = abLogoLoss(tones, back); return l.under2 >= 0.25 || l.under3 >= 0.5; };
+
+function abFitLogo(img) {
+  const src = img.currentSrc || img.getAttribute('src');
+  if (!src) return Promise.resolve();
+  return abLogoSample(src).then(info => {
+    if (!img.isConnected) return;
+    abClearLogoFit(img);
+    if (!info || info.opaque || !info.tones.length) return;
+    const bg = abBackdropOf(img);
+    const tones = info.tones;
+    if (!abLogoLost(tones, bg)) return;
+    const root = img.closest('.ab') || document.body;
+    const rs = getComputedStyle(root);
+    const mono = tones.length === 1 || tones.every(t => Math.max(t.r, t.g, t.b) - Math.min(t.r, t.g, t.b) < 36);
+    if (mono) {
+      // One ink: flip it to whichever of white / black reads on the surface.
+      const white = abRgbContrast({ r: 255, g: 255, b: 255 }, bg), black = abRgbContrast({ r: 0, g: 0, b: 0 }, bg);
+      if (Math.max(white, black) >= AB_LOGO_MIN) {
+        img.setAttribute('data-logo-fit', 'flip');
+        img.style.setProperty('filter', white >= black ? 'brightness(0) invert(1)' : 'brightness(0)');
+        return;
+      }
+    }
+    // Plate: the canvas colour first, then the ink colour, then plain white / black.
+    const cands = [abHexRgb(rs.getPropertyValue('--ab-canvas')), abHexRgb(rs.getPropertyValue('--ab-ink')),
+      { r: 255, g: 255, b: 255 }, { r: 0, g: 0, b: 0 }].filter(Boolean);
+    const plate = cands.find(c => !abLogoLost(tones, c))
+      || cands.reduce((a, c) => (abLogoLoss(tones, c).under3 < abLogoLoss(tones, a).under3 ? c : a));
+    const card = root.querySelector('.ab-card, .ab-cta');
+    const rad = card ? parseFloat(getComputedStyle(card).borderTopLeftRadius) || 0 : 6;
+    img.setAttribute('data-logo-fit', 'plate');
+    img.style.setProperty('box-sizing', 'content-box');
+    img.style.setProperty('background', `rgb(${Math.round(plate.r)}, ${Math.round(plate.g)}, ${Math.round(plate.b)})`);
+    img.style.setProperty('padding', '5px 9px');
+    img.style.setProperty('border-radius', Math.min(rad, 14) + 'px');
+  });
+}
+
+function abFitLogos(root) {
+  (root || document).querySelectorAll('img.ab-logo').forEach(img => { abFitLogo(img); });
+}
+
+// Every board, Built screen, slide, tile and clone that gets added is checked, wherever
+// it is drawn from. Only added nodes are looked at, so the inline styles it sets never loop.
+(function watchLogos() {
+  if (typeof MutationObserver !== 'function' || !document.body) {
+    document.addEventListener('DOMContentLoaded', watchLogos, { once: true });
+    return;
+  }
+  const todo = new Set();
+  let queued = false;
+  const flush = () => { queued = false; const list = [...todo]; todo.clear(); list.forEach(abFitLogo); };
+  new MutationObserver(muts => {
+    for (const m of muts) {
+      m.addedNodes.forEach(n => {
+        if (n.nodeType !== 1) return;
+        if (n.matches && n.matches('img.ab-logo')) todo.add(n);
+        if (n.querySelectorAll) n.querySelectorAll('img.ab-logo').forEach(i => todo.add(i));
+      });
+    }
+    if (todo.size && !queued) { queued = true; Promise.resolve().then(flush); }
+  }).observe(document.body, { childList: true, subtree: true });
+  abFitLogos(document);
+})();

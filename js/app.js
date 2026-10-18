@@ -130,7 +130,28 @@ function chooseAesthetic(key) {
   if (key === state.aesthetic) return;
   pushUndoSnapshot(state);
   applyAesthetic(key);
+  const fonts = followAestheticFonts();
   render();
+  if (fonts) announceFollowedFonts(fonts);
+}
+// Fonts follow the style: an explicit style switch takes the new style's first
+// recommended pairing (what "Use recommended fonts" applies) unless Typography is
+// locked. Runs inside the caller's undo step; returns the pairing when fonts changed.
+// Opening a saved brand never goes through here, so its fonts stay as saved.
+function followAestheticFonts() {
+  if (state.locks.typography) return null;
+  const meta = window.aestheticMeta ? aestheticMeta(state.aesthetic) : null;
+  const pair = meta && meta.fonts && meta.fonts.pairings && meta.fonts.pairings[0];
+  const heading = pair && fontByName(pair[0]);
+  const body = pair && fontByName(pair[1]);
+  if (!heading || !body) return null;
+  if (state.headingFont === heading && state.bodyFont === body) return null;
+  state.headingFont = heading;
+  state.bodyFont = body;
+  return { heading, body };
+}
+function announceFollowedFonts(f) {
+  showToast(`Fonts: ${f.heading.name} / ${f.body.name}. Lock Type to keep your own.`);
 }
 // Classic | Current (the switch next to the aesthetic lock). One undo step; the
 // preference stays when another aesthetic is chosen, and applies to any that has a classic.
@@ -596,7 +617,10 @@ function wireEvents() {
 
   document.getElementById('shuffleAesthetic').addEventListener('click', () => {
     if (state.locks.aesthetic) return showToast('Unlock aesthetic to shuffle');
-    beginShuffle(); randomizeAesthetic(); render();
+    beginShuffle(); randomizeAesthetic();
+    const fonts = followAestheticFonts();
+    render();
+    if (fonts) announceFollowedFonts(fonts);
   });
 
   document.getElementById('lockAesthetic').addEventListener('change', e => state.locks.aesthetic = e.target.checked);

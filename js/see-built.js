@@ -807,6 +807,31 @@
         } catch (err) { /* a blend fix-up is cosmetic */ }
       });
     }
+    fitStats(host);
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(fitStatsSoon);
+  }
+
+  // Stat values (and the chart total) never truncate: each one is scaled down until it
+  // fits its card, in whatever case, tracking and face the aesthetic gives it.
+  function fitStats(host) {
+    host.querySelectorAll('.sb-num').forEach(el => {
+      el.style.removeProperty('font-size');
+      if (!el.clientWidth) return;
+      let px = parseFloat(getComputedStyle(el).fontSize) || 24;
+      for (let i = 0; i < 24 && el.scrollWidth > el.clientWidth + 0.5 && px > 10; i++) {
+        px = Math.max(10, px * 0.94);
+        el.style.setProperty('font-size', px.toFixed(2) + 'px', 'important');
+      }
+    });
+  }
+  let fitQueued = false;
+  function fitStatsSoon() {
+    const host = document.getElementById('builtView');
+    if (!host || fitQueued) return;
+    fitQueued = true;
+    const run = () => { if (!fitQueued) return; fitQueued = false; fitStats(host); };
+    requestAnimationFrame(run);
+    setTimeout(run, 150);   // a hidden or throttled window may never fire the frame
   }
 
   /* ---------------- interactions ---------------- */
@@ -823,6 +848,7 @@
     card.querySelector('[data-sb-readout]').textContent = `${s.labels[s.labels.length - 1]} · ${fmt(s.now[s.now.length - 1], unit)}`;
     card.dataset.range = range;
     if (root) root.dataset.range = range;
+    fitStatsSoon();
   }
 
   function chartHover(card, clientX) {
@@ -993,6 +1019,8 @@
   function init() {
     const host = document.getElementById('builtView');
     if (host) wire(host);
+    if (host && window.ResizeObserver) new ResizeObserver(fitStatsSoon).observe(host);
+    if (document.fonts && document.fonts.addEventListener) document.fonts.addEventListener('loadingdone', fitStatsSoon);   // a face that arrives late changes the widths
     // Esc leaves the Built view for the board (the demo loop sends it between beats), unless
     // a dialog or the brief tray has the keyboard.
     document.addEventListener('keydown', ev => {

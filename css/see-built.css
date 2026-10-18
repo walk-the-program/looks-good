@@ -140,8 +140,9 @@
 /* stat cards */
 .sb-stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; }
 :is(.ab.sb-ab, .sb-gen) .ab-card.sb-stat { margin: 0; min-width: 0; padding: 16px 18px 18px; display: block; }
-:is(.ab.sb-ab, .sb-gen) .ab-card-title.sb-num { margin: 8px 0 10px !important; font-size: clamp(20px, 2.4cqw, 28px); line-height: 1.05; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-:is(.ab.sb-ab, .sb-gen) .sb-stat .ab-label { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+:is(.ab.sb-ab, .sb-gen) .ab-card-title.sb-num { margin: 8px 0 10px !important; font-size: clamp(20px, 2.4cqw, 28px); line-height: 1.05; white-space: nowrap; overflow: visible; text-overflow: clip; }
+/* A stat value is never cut: the label wraps and sbFitStats (js/see-built.js) scales the value to its card. */
+:is(.ab.sb-ab, .sb-gen) .sb-stat .ab-label { white-space: normal; overflow: visible; text-overflow: clip; overflow-wrap: anywhere; }
 
 /* chart + quick settings */
 .sb-mid { display: grid; grid-template-columns: minmax(0, 1.8fr) minmax(0, 1fr); gap: 14px; align-items: stretch; }
