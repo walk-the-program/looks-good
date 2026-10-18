@@ -317,11 +317,11 @@
   font-family: var(--sb-ui-ff, var(--ab-font-ui)); font-size: 10.5px; font-weight: 500; color: color-mix(in srgb, var(--ab-ink) 28%, var(--ab-muted));
   text-transform: var(--sb-ui-tt, none); letter-spacing: var(--sb-ui-ls, 0);
 }
-/* The current tab keeps a primary cue (a bar on the tab bar's top edge) and sets its label in the ink,
+/* The current tab keeps a primary cue (a small pill under its label) and sets its label in the ink,
    which always holds contrast; the primary as text did not on some dark grounds. */
 .sb-tab { position: relative; }
 .sb-tab[aria-current] { color: var(--ab-ink); font-weight: 600; }
-.sb-tab[aria-current]::before { content: ""; position: absolute; top: -9px; left: 24%; right: 24%; height: 3px; border-radius: 0 0 3px 3px; background: var(--ab-primary); }
+.sb-tab[aria-current]::before { content: ""; position: absolute; bottom: 2px; left: 50%; width: 16px; margin-left: -8px; height: 3px; border-radius: 3px; background: var(--ab-primary); }
 .sb-tab[aria-current] > .sb-ico { color: var(--ab-primary-text, var(--ab-primary)); }
 .sb-tab:focus-visible { outline: 2px solid var(--ab-ink); outline-offset: -2px; }
 
