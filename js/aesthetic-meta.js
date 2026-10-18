@@ -498,12 +498,15 @@ function fontFitFor(key, state) {
    pair (d = offset, blur, ds/blurS for small controls), or a glow (r, a). SwiftUI radius = CSS blur / 2.
    `states[k]` is [colour role, visual]; the focus row's colour is computed from the palette.
    `sw` picks the SwiftUI recipe (hard | soft | glass | glow | flat | stepped).
+   Optional `ambient`: a sentence describing an always-on background motion; the brief prints it
+   (paused under Reduce Motion) instead of "nothing else animates idly".
 ------------------------------------------------------------------------ */
 
 const BUILD_EASE = {
   out: 'cubic-bezier(0.2, 0.8, 0.2, 1)',
   inout: 'cubic-bezier(0.4, 0, 0.2, 1)',
   spring: 'cubic-bezier(0.3, 1.6, 0.5, 1)',
+  gel: 'cubic-bezier(0.34, 1.56, 0.64, 1)',
   steps: 'steps(4, end)',
 };
 
@@ -667,7 +670,7 @@ const AESTHETIC_BUILD = {
   'liquid-glass': {
     cls: 'glass',
     press: { scale: 0.97, ms: 220 },
-    motion: { fast: 220, base: 250, slow: 400, ease: 'spring' },
+    motion: { fast: 220, base: 250, slow: 400, ease: 'gel' },
     pressText: 'Gel: the control swells to 1.03 on hover and squeezes to 0.97 on press, 220 ms with cubic-bezier(0.34, 1.56, 0.64, 1) so it overshoots and settles; the selected tab\'s glass slides to its new position with the same curve.',
     surface: 'Regular material panels and floating glass controls over the scene; on iOS 26 or later use the system glass effect (`glassEffect`), otherwise the regular material.',
   },
@@ -709,8 +712,9 @@ const AESTHETIC_BUILD = {
   'bauhaus-poster': { cls: 'flat' }, 'editorial-serif': { cls: 'flat' }, 'bento-grid': { cls: 'flat' },
   'mesh-gradient': {
     cls: 'flat',
-    surface: 'Flat fills divided by hairlines; no shadows. The mesh behind the content drifts slowly (12 to 20 s per cycle, translate and rotate only, never scale or colour change). The primary action is a 135deg two-stop gradient from `--primary` to the same hue shifted +28deg.',
-    reduceMotion: 'Pause the mesh drift on its first frame (it is the one idle animation allowed); replace slides and fades with an instant state swap; colour changes stay.',
+    surface: 'Flat fills divided by hairlines; no shadows. The primary action is a 135deg two-stop gradient from `--primary` to the same hue shifted +28deg.',
+    ambient: '12 to 20 s slow drift of the mesh behind the content, translate and rotate only (never scale or colour change)',
+    reduceMotion: 'Replace slides and fades with an instant state swap; colour changes stay.',
   },
   'micrographics': { cls: 'flat' }, 'mixed-type': { cls: 'flat' },
   'dystopian-luxury': { cls: 'flat' }, 'naive-doodle': { cls: 'flat' }, 'japanese-minimal': { cls: 'flat' },

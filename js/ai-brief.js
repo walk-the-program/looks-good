@@ -695,11 +695,12 @@ function aibSecStates(ctx) {
     ])];
 }
 
-const AIB_EASE_NAME = { out: 'ease-out', inout: 'ease-in-out', spring: 'spring', steps: 'stepped' };
+const AIB_EASE_NAME = { out: 'ease-out', inout: 'ease-in-out', spring: 'spring', gel: 'gel spring', steps: 'stepped' };
 const AIB_SWIFT_EASE = {
   out: n => `.easeOut(duration: ${n})`,
   inout: n => `.easeInOut(duration: ${n})`,
   spring: () => '.spring(response: 0.3, dampingFraction: 0.6)',
+  gel: () => '.spring(response: 0.32, dampingFraction: 0.62)',
   steps: n => `.linear(duration: ${n})`,
 };
 
@@ -709,7 +710,7 @@ function aibSecMotion(ctx) {
   const out = ['## Motion'];
   out.push(`- Durations: fast ${mo.fast} ms (press, toggle), base ${mo.base} ms (color, selection, shadow), slow ${mo.slow} ms (sheets, page changes). Easing: ${AIB_EASE_NAME[mo.ease]}${ctx.web ? ' `' + BUILD_EASE[mo.ease] + '`' : ''}${ctx.swift ? ' (`Motion.press`, `Motion.settle` in Theme.swift)' : ''}.`);
   out.push(`- Press: ${ctx.tok(build.pressText)}`);
-  out.push(`- Reduce Motion: ${ctx.tok(build.reduceMotion)} State changes stay; only the movement goes. Nothing else animates idly or loops except loading indicators.`);
+  out.push(`- Reduce Motion: ${ctx.tok(build.reduceMotion)} State changes stay; only the movement goes. ${build.ambient ? `Ambient motion: ${build.ambient}; it is paused under Reduce Motion. Nothing else animates idly or loops except loading indicators.` : 'Nothing else animates idly or loops except loading indicators.'}`);
   return out;
 }
 
