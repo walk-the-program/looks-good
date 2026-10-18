@@ -274,3 +274,6 @@
 @container ab (min-width: 601px) {
   .ab[data-ae="pirate-broadcast"][data-blend] .ab-hero > .ab-art > .ab.ab-blend-art { margin-left: 54% !important; width: 46% !important; }
 }
+
+/* Built mobile tab bar: the current tab is teletext cyan (the framework's primary text fell to 3:1 on black) */
+.ab.sb-ab[data-ae="pirate-broadcast"] .sb-tab[aria-current] { color: var(--ab-tt-cyan); }
