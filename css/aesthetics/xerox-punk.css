@@ -348,3 +348,129 @@
 /* Kit screen layouts: labels and status tags on the wall take the wall's ink (on a paper card they stay black). */
 .ab.sb-ab[data-ae="xerox-punk"].sb-kit .sb-k-scr .sb-k-blk > :is(.sb-field, .sb-k-selectwrap) .ab-fieldlabel,
 .ab.sb-ab[data-ae="xerox-punk"].sb-kit .sb-k-scr .sb-k-blk > .sb-k-row-inline .ab-fit { color: var(--ab-ink); border-color: var(--ab-ink); }
+
+/* App UI (phone screens and the UI kit). The punk lives in the components, never in art: cream paper-scrap cards,
+   lists, sheets and toasts with a hard 3px 4px offset shadow and at most a tiny tilt, rubber-stamp badges, cut-word
+   tabs circled in marker, marker ticks for switches. Labels on the wall take the wall's ink; anything on paper takes
+   the dark sheet ink and the dark sheet muted (the wall's light muted fails on cream). */
+.ab.sb-ab[data-ae="xerox-punk"]:is(.sb-screen, .sb-kit) :is(.ab-card, .ab-panel, .ab-list, .sb-k-sheet, .sb-k-toast) { --k-muted: var(--ab-sheet-mute); }
+.ab.sb-ab[data-ae="xerox-punk"]:is(.sb-screen, .sb-kit) .ab-fieldlabel { color: var(--ab-ink); }
+.ab.sb-ab[data-ae="xerox-punk"].sb-kit .sb-k-field .ab-input:disabled { border-bottom-style: dashed; }
+/* pressed action: pushed into the wall (the cross-out means deleted, not pressed) */
+.ab.sb-ab[data-ae="xerox-punk"]:is(.sb-screen, .sb-kit) .ab-cta.is-pressed { transform: translate(3px, 3px); box-shadow: 1px 1px 0 #111; filter: none; }
+.ab.sb-ab[data-ae="xerox-punk"]:is(.sb-screen, .sb-kit) .ab-cta.is-pressed::after, .ab.sb-ab[data-ae="xerox-punk"]:is(.sb-screen, .sb-kit) .ab-cta:active::after { content: none; }
+.ab.sb-ab[data-ae="xerox-punk"]:is(.sb-screen, .sb-kit) .ab-cta:disabled { box-shadow: none; }
+/* text buttons: wall ink with a fluoro marker underline (fluoro text fails on the wall and on newsprint) */
+.ab.sb-ab[data-ae="xerox-punk"]:is(.sb-screen, .sb-kit) .sb-k-textbtn { color: var(--ab-ink); text-decoration: underline; text-decoration-color: var(--ab-fluoro); text-decoration-thickness: 3px; text-underline-offset: 5px; }
+/* badges are rubber stamps: neutral = outline stamp in the ink of whatever it sits on, accent = a stamp on a bone label */
+.ab.sb-ab[data-ae="xerox-punk"]:is(.sb-screen, .sb-kit) .ab-fit, .ab.sb-ab[data-ae="xerox-punk"]:is(.sb-screen, .sb-kit) .ab-fit[data-fit="match"] { color: var(--ab-ink); border-color: var(--ab-ink); }
+.ab.sb-ab[data-ae="xerox-punk"]:is(.sb-screen, .sb-kit) :is(.sb-k-badge, .sb-k-count) {
+  min-height: 24px; padding: 0 8px; border: 2px solid var(--ab-ink); border-radius: 0; background: none; color: var(--ab-ink);
+  font-family: var(--xp-type); font-weight: var(--xp-bw, 400); letter-spacing: 0.12em; text-transform: uppercase; transform: rotate(-3deg);
+}
+.ab.sb-ab[data-ae="xerox-punk"]:is(.sb-screen, .sb-kit) :is(.sb-k-badge, .sb-k-count.is-accent) { background: #E9E3D0; border-color: #111; color: #111; }
+.ab.sb-ab[data-ae="xerox-punk"]:is(.sb-screen, .sb-kit) .sb-k-count.is-accent { transform: rotate(2deg); }
+/* tabs: the cut words keep their faces but every one is a full tap target */
+.ab.sb-ab[data-ae="xerox-punk"]:is(.sb-screen, .sb-kit) .ab-seg-btn { display: inline-flex; align-items: center; justify-content: center; min-height: 44px !important; min-width: 44px; padding-left: 0.4em; padding-right: 0.4em; }
+/* selected row on paper: a darker smudge of the same paper, ink unchanged */
+.ab.sb-ab[data-ae="xerox-punk"]:is(.sb-screen, .sb-kit) .ab-list .ab-row.is-picked { background-color: color-mix(in srgb, #111 10%, var(--ab-wire)); }
+/* switch: a torn scrap; on paper it is the grey copy stock so the off scrap still shows */
+.ab.sb-ab[data-ae="xerox-punk"]:is(.sb-screen, .sb-kit) :is(.ab-card, .ab-panel, .ab-list, .sb-k-sheet) .ab-switch { background: #CFCBBF; }
+.ab.sb-ab[data-ae="xerox-punk"]:is(.sb-screen, .sb-kit) .ab-switch:not(:checked)::before { opacity: 0.6; }
+.ab.sb-ab[data-ae="xerox-punk"]:is(.sb-screen, .sb-kit) .ab-toggle.sb-tog { color: var(--ab-ink); }
+/* checks and radios: ink edges, a filled ink box when chosen */
+.ab.sb-ab[data-ae="xerox-punk"] .sb-k-box { border: 2px solid var(--ab-ink); border-radius: 0; }
+.ab.sb-ab[data-ae="xerox-punk"] .sb-k-box[type="radio"] { border-radius: 50%; }
+.ab.sb-ab[data-ae="xerox-punk"] .sb-k-box:checked { background: var(--ab-ink); border-color: var(--ab-ink); }
+.ab.sb-ab[data-ae="xerox-punk"] .sb-k-box[type="checkbox"]:checked::after { border-color: var(--ab-canvas); }
+.ab.sb-ab[data-ae="xerox-punk"] .sb-k-box[type="radio"]:checked { background: none; }
+.ab.sb-ab[data-ae="xerox-punk"] .sb-k-box[type="radio"]:checked::after { background: var(--ab-ink); }
+/* slider: an ink rule and a paper-scrap handle */
+.ab.sb-ab[data-ae="xerox-punk"] .sb-k-range::-webkit-slider-runnable-track { height: 3px; border-radius: 0; background: linear-gradient(90deg, var(--ab-ink) var(--v, 50%), color-mix(in srgb, var(--ab-ink) 30%, transparent) var(--v, 50%)); }
+.ab.sb-ab[data-ae="xerox-punk"] .sb-k-range::-webkit-slider-thumb { width: 16px; height: 26px; margin-top: -11.5px; border: 2px solid #111; border-radius: 0; background: #F6F3EA; box-shadow: none; }
+.ab.sb-ab[data-ae="xerox-punk"] .sb-k-range::-moz-range-track { height: 3px; border-radius: 0; background: linear-gradient(90deg, var(--ab-ink) var(--v, 50%), color-mix(in srgb, var(--ab-ink) 30%, transparent) var(--v, 50%)); }
+.ab.sb-ab[data-ae="xerox-punk"] .sb-k-range::-moz-range-thumb { width: 16px; height: 26px; border: 2px solid #111; border-radius: 0; background: #F6F3EA; box-shadow: none; }
+/* sheet and toast are paper scraps too: cream, sheet ink, square, the hard offset shadow */
+.ab.sb-ab[data-ae="xerox-punk"]:is(.sb-screen, .sb-kit) .sb-k-sheet { --ab-ink: var(--ab-sheet-ink); --ab-muted: var(--ab-sheet-mute); border-radius: 0; background: var(--ab-sheet); color: var(--ab-sheet-ink); box-shadow: 3px -4px 0 rgba(0, 0, 0, 0.45); }
+.ab.sb-ab[data-ae="xerox-punk"]:is(.sb-screen, .sb-kit) .sb-k-sheet .sb-k-grab { background: rgba(0, 0, 0, 0.3); }
+.ab.sb-ab[data-ae="xerox-punk"]:is(.sb-screen, .sb-kit) .sb-k-toast { --ab-ink: var(--ab-sheet-ink); border-radius: 0; background: var(--ab-sheet); color: var(--ab-sheet-ink); box-shadow: 3px 4px 0 rgba(0, 0, 0, 0.65); transform: rotate(-0.6deg); }
+.ab.sb-ab[data-ae="xerox-punk"]:is(.sb-screen, .sb-kit) .sb-k-emptyico { border-radius: 0; background: #E9E3D0; color: #111; transform: rotate(-3deg); box-shadow: 3px 4px 0 rgba(0, 0, 0, 0.65); }
+/* the marker circle round the chosen tab is bone on the wall (it stays black on paper); a pressed action also darkens a step */
+.ab.sb-ab[data-ae="xerox-punk"]:is(.sb-screen, .sb-kit) .ab-seg-btn[aria-pressed="true"]::after { background-image: var(--xp-circle-wall); }
+.ab.sb-ab[data-ae="xerox-punk"]:is(.sb-screen, .sb-kit) :is(.ab-card, .ab-panel, .ab-list, .sb-k-sheet) .ab-seg-btn[aria-pressed="true"]::after { background-image: var(--xp-circle); }
+.ab.sb-ab[data-ae="xerox-punk"]:is(.sb-screen, .sb-kit) .ab-cta.is-pressed { filter: brightness(0.9); }
+
+/* Classic version (xerox-punk--classic): the same app-UI refinements, kept here because css/aesthetics/classic/ is generated. */
+/* App UI (phone screens and the UI kit). The punk lives in the components, never in art: cream paper-scrap cards,
+   lists, sheets and toasts with a hard 3px 4px offset shadow and at most a tiny tilt, rubber-stamp badges, cut-word
+   tabs circled in marker, marker ticks for switches. Labels on the wall take the wall's ink; anything on paper takes
+   the dark sheet ink and the dark sheet muted (the wall's light muted fails on cream). */
+.ab.sb-ab[data-ae="xerox-punk--classic"]:is(.sb-screen, .sb-kit) :is(.ab-card, .ab-panel, .ab-list, .sb-k-sheet, .sb-k-toast) { --k-muted: var(--ab-sheet-mute); }
+.ab.sb-ab[data-ae="xerox-punk--classic"]:is(.sb-screen, .sb-kit) .ab-fieldlabel { color: var(--ab-ink); }
+.ab.sb-ab[data-ae="xerox-punk--classic"].sb-kit .sb-k-field .ab-input:disabled { border-bottom-style: dashed; }
+/* pressed action: pushed into the wall (the cross-out means deleted, not pressed) */
+.ab.sb-ab[data-ae="xerox-punk--classic"]:is(.sb-screen, .sb-kit) .ab-cta.is-pressed { transform: translate(3px, 3px); box-shadow: 1px 1px 0 #111; filter: none; }
+.ab.sb-ab[data-ae="xerox-punk--classic"]:is(.sb-screen, .sb-kit) .ab-cta.is-pressed::after, .ab.sb-ab[data-ae="xerox-punk--classic"]:is(.sb-screen, .sb-kit) .ab-cta:active::after { content: none; }
+.ab.sb-ab[data-ae="xerox-punk--classic"]:is(.sb-screen, .sb-kit) .ab-cta:disabled { box-shadow: none; }
+/* text buttons: wall ink with a fluoro marker underline (fluoro text fails on the wall and on newsprint) */
+.ab.sb-ab[data-ae="xerox-punk--classic"]:is(.sb-screen, .sb-kit) .sb-k-textbtn { color: var(--ab-ink); text-decoration: underline; text-decoration-color: var(--ab-fluoro); text-decoration-thickness: 3px; text-underline-offset: 5px; }
+/* badges are rubber stamps: neutral = outline stamp in the ink of whatever it sits on, accent = a stamp on a bone label */
+.ab.sb-ab[data-ae="xerox-punk--classic"]:is(.sb-screen, .sb-kit) .ab-fit, .ab.sb-ab[data-ae="xerox-punk--classic"]:is(.sb-screen, .sb-kit) .ab-fit[data-fit="match"] { color: var(--ab-ink); border-color: var(--ab-ink); }
+.ab.sb-ab[data-ae="xerox-punk--classic"]:is(.sb-screen, .sb-kit) :is(.sb-k-badge, .sb-k-count) {
+  min-height: 24px; padding: 0 8px; border: 2px solid var(--ab-ink); border-radius: 0; background: none; color: var(--ab-ink);
+  font-family: var(--xp-type); font-weight: var(--xp-bw, 400); letter-spacing: 0.12em; text-transform: uppercase; transform: rotate(-3deg);
+}
+.ab.sb-ab[data-ae="xerox-punk--classic"]:is(.sb-screen, .sb-kit) :is(.sb-k-badge, .sb-k-count.is-accent) { background: #E9E3D0; border-color: #111; color: #111; }
+.ab.sb-ab[data-ae="xerox-punk--classic"]:is(.sb-screen, .sb-kit) .sb-k-count.is-accent { transform: rotate(2deg); }
+/* tabs: the cut words keep their faces but every one is a full tap target */
+.ab.sb-ab[data-ae="xerox-punk--classic"]:is(.sb-screen, .sb-kit) .ab-seg-btn { display: inline-flex; align-items: center; justify-content: center; min-height: 44px !important; min-width: 44px; padding-left: 0.4em; padding-right: 0.4em; }
+/* selected row on paper: a darker smudge of the same paper, ink unchanged */
+.ab.sb-ab[data-ae="xerox-punk--classic"]:is(.sb-screen, .sb-kit) .ab-list .ab-row.is-picked { background-color: color-mix(in srgb, #111 10%, var(--ab-wire)); }
+/* switch: a torn scrap; on paper it is the grey copy stock so the off scrap still shows */
+.ab.sb-ab[data-ae="xerox-punk--classic"]:is(.sb-screen, .sb-kit) .ab-toggle.sb-tog { color: var(--ab-ink); }
+/* checks and radios: ink edges, a filled ink box when chosen */
+.ab.sb-ab[data-ae="xerox-punk--classic"] .sb-k-box { border: 2px solid var(--ab-ink); border-radius: 0; }
+.ab.sb-ab[data-ae="xerox-punk--classic"] .sb-k-box[type="radio"] { border-radius: 50%; }
+.ab.sb-ab[data-ae="xerox-punk--classic"] .sb-k-box:checked { background: var(--ab-ink); border-color: var(--ab-ink); }
+.ab.sb-ab[data-ae="xerox-punk--classic"] .sb-k-box[type="checkbox"]:checked::after { border-color: var(--ab-canvas); }
+.ab.sb-ab[data-ae="xerox-punk--classic"] .sb-k-box[type="radio"]:checked { background: none; }
+.ab.sb-ab[data-ae="xerox-punk--classic"] .sb-k-box[type="radio"]:checked::after { background: var(--ab-ink); }
+/* slider: an ink rule and a paper-scrap handle */
+.ab.sb-ab[data-ae="xerox-punk--classic"] .sb-k-range::-webkit-slider-runnable-track { height: 3px; border-radius: 0; background: linear-gradient(90deg, var(--ab-ink) var(--v, 50%), color-mix(in srgb, var(--ab-ink) 30%, transparent) var(--v, 50%)); }
+.ab.sb-ab[data-ae="xerox-punk--classic"] .sb-k-range::-webkit-slider-thumb { width: 16px; height: 26px; margin-top: -11.5px; border: 2px solid #111; border-radius: 0; background: #F6F3EA; box-shadow: none; }
+.ab.sb-ab[data-ae="xerox-punk--classic"] .sb-k-range::-moz-range-track { height: 3px; border-radius: 0; background: linear-gradient(90deg, var(--ab-ink) var(--v, 50%), color-mix(in srgb, var(--ab-ink) 30%, transparent) var(--v, 50%)); }
+.ab.sb-ab[data-ae="xerox-punk--classic"] .sb-k-range::-moz-range-thumb { width: 16px; height: 26px; border: 2px solid #111; border-radius: 0; background: #F6F3EA; box-shadow: none; }
+/* sheet and toast are paper scraps too: cream, sheet ink, square, the hard offset shadow */
+.ab.sb-ab[data-ae="xerox-punk--classic"]:is(.sb-screen, .sb-kit) .sb-k-sheet { --ab-ink: var(--ab-sheet-ink); --ab-muted: var(--ab-sheet-mute); border-radius: 0; background: var(--ab-sheet); color: var(--ab-sheet-ink); box-shadow: 3px -4px 0 rgba(0, 0, 0, 0.45); }
+.ab.sb-ab[data-ae="xerox-punk--classic"]:is(.sb-screen, .sb-kit) .sb-k-sheet .sb-k-grab { background: rgba(0, 0, 0, 0.3); }
+.ab.sb-ab[data-ae="xerox-punk--classic"]:is(.sb-screen, .sb-kit) .sb-k-toast { --ab-ink: var(--ab-sheet-ink); border-radius: 0; background: var(--ab-sheet); color: var(--ab-sheet-ink); box-shadow: 3px 4px 0 rgba(0, 0, 0, 0.65); transform: rotate(-0.6deg); }
+.ab.sb-ab[data-ae="xerox-punk--classic"]:is(.sb-screen, .sb-kit) .sb-k-emptyico { border-radius: 0; background: #E9E3D0; color: #111; transform: rotate(-3deg); box-shadow: 3px 4px 0 rgba(0, 0, 0, 0.65); }
+/* the marker circle round the chosen tab is bone on the wall (it stays black on paper); a pressed action also darkens a step */
+.ab.sb-ab[data-ae="xerox-punk--classic"]:is(.sb-screen, .sb-kit) .ab-seg-btn[aria-pressed="true"]::after { background-image: var(--xp-circle-wall); }
+.ab.sb-ab[data-ae="xerox-punk--classic"]:is(.sb-screen, .sb-kit) :is(.ab-card, .ab-panel, .ab-list, .sb-k-sheet) .ab-seg-btn[aria-pressed="true"]::after { background-image: var(--xp-circle); }
+.ab.sb-ab[data-ae="xerox-punk--classic"]:is(.sb-screen, .sb-kit) .ab-cta.is-pressed { filter: brightness(0.9); }
+/* base app fixes written for "xerox-punk" only, repeated for the classic root on phones and the kit: the kicker sits in
+   flow above the title (never over the status bar), no marker caption after card copy, the brand text on a card stays ink */
+.ab.sb-ab[data-ae="xerox-punk--classic"]:is(.sb-screen, .sb-kit) :is(.sb-top, .sb-home-top, .sb-ob-copy, .sb-k-head) .ab-kicker { position: relative; inset: auto; left: auto; top: auto; display: inline-block; margin-bottom: 10px !important; }
+.ab.sb-ab[data-ae="xerox-punk--classic"]:is(.sb-screen, .sb-kit) .ab-card-body::after { content: none; }
+.ab.sb-ab[data-ae="xerox-punk--classic"]:is(.sb-screen, .sb-kit) .ab-card { --ab-primary-text: currentColor; }
+/* both versions: on the light newsprint wall a bone label hardly shows, so the accent stamp is reversed out of ink there;
+   a switch label reads like the row labels around it */
+.ab.sb-ab:is([data-ae="xerox-punk"], [data-ae="xerox-punk--classic"])[data-mode="light"]:is(.sb-screen, .sb-kit) :is(.sb-k-badge, .sb-k-count.is-accent) { background: var(--ab-ink); border-color: var(--ab-ink); color: #E9E3D0; }
+.ab.sb-ab:is([data-ae="xerox-punk"], [data-ae="xerox-punk--classic"]):is(.sb-screen, .sb-kit) .ab-toggle.sb-tog { letter-spacing: 0.02em; text-transform: none; }
+
+/* Both versions, phones and the UI kit: the app uses the TRUE brand primary, not the Day-Glo snap the board prints
+   (--ab-primary-brand is the unsnapped brand hex the board exposes when it prints another colour). The label on it is
+   --ab-on-primary-brand (black or white, set next to the brand hex), with contrast-color() as an enhancement; dark-mode brand text is pulled toward the bone ink so it keeps 4.5:1. */
+.ab.sb-ab:is([data-ae="xerox-punk"], [data-ae="xerox-punk--classic"]):is(.sb-screen, .sb-kit) > * {
+  --ab-fluoro: var(--ab-primary-brand); --ab-primary: var(--ab-primary-brand);
+  --ab-pri-tint: color-mix(in srgb, var(--ab-primary-brand) 16%, var(--ab-canvas));
+  --ab-on-primary: var(--ab-on-primary-brand, #0a0a0a);
+}
+.ab.sb-ab:is([data-ae="xerox-punk"], [data-ae="xerox-punk--classic"]):is(.sb-screen, .sb-kit) :is(.ab-cta, .ab-mark, .ab-sub-lead, .xpt[data-g="hot"]) { color: var(--ab-on-primary); }
+.ab.sb-ab:is([data-ae="xerox-punk"], [data-ae="xerox-punk--classic"])[data-mode="dark"]:is(.sb-screen, .sb-kit) > * {
+  --xp-hot: var(--ab-primary-brand); --ab-primary-text: color-mix(in srgb, var(--ab-primary-brand) 45%, var(--ab-ink));
+}
+@supports (color: contrast-color(red)) {
+  .ab.sb-ab:is([data-ae="xerox-punk"], [data-ae="xerox-punk--classic"]):is(.sb-screen, .sb-kit) > * { --ab-on-primary: contrast-color(var(--ab-primary-brand)); }
+}

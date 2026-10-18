@@ -681,6 +681,24 @@ check('paste: empty text', run(`extractColors('').length`) === 0, 'found colors 
   const rule = B(`(() => { const out = aibSecAppRules({ app: true, site: false }); return out[0] + '|' + (out[1] === UI_KIT_SURFACES.app.rule) + '|' + /none of it belongs in the app/.test(out.join('\\n')); })()`);
   check('brief: App UI rules carry the surface rule and the no-art line', rule === '## App UI rules|true|true', rule);
   check('brief: a website-only brief has no App UI rules', B('aibSecAppRules({ app: false, site: true }).length') === 0, 'web');
+  // Surface rules: no new colours in apps; the website hero shows the product, never the board art.
+  check('kit: the app rule forbids colours outside the palette', /Never introduce a colour that is not in the palette: destructive and status colours come from it too\./.test(B('UI_KIT_SURFACES.app.rule')), 'app rule');
+  check('kit: the web rule puts the product in the hero and keeps the board art off the website',
+    /The hero shows the product: a real screen built from the UI kit\./.test(B('UI_KIT_SURFACES.web.rule')) && /never put it on the website/.test(B('UI_KIT_SURFACES.web.rule')) && !/may add the hero illustration/.test(B('UI_KIT_SURFACES.web.rule')), 'web rule');
+  const webRules = B(`[aibSecWebRules({ app: false, site: true }).join('|'), aibSecWebRules({ app: true, site: true }).length, aibSecWebRules({ app: true, site: false }).length].join('#')`);
+  check('brief: Website-only briefs carry the Website rules section; App and Both do not repeat it', webRules === '## Website rules|' + B('UI_KIT_SURFACES.web.rule') + '#0#0', webRules);
+  // Destructive / error colour comes from the palette (js/ui-kit.js uiKitDanger).
+  const dz = B(`JSON.stringify([
+    uiKitDanger({ primary: '#2e6f95', secondary: '#d93a3a', accent: '#f2c14e', ink: '#1b1b1f', canvas: '#faf8f5' }),
+    uiKitDanger({ primary: '#a85a4a', secondary: '#e8d9b5', accent: '#5b7f6a', ink: '#1f2421', canvas: '#f6f4ef' }),
+    uiKitDanger({ primary: '#5b7f6a', secondary: '#e8d9b5', accent: '#c9a227', ink: '#1f2421', canvas: '#f6f4ef' }),
+    uiKitDanger({ primary: '#2e6f95', secondary: '#c9b8b5', accent: '#f2c14e', ink: '#1b1b1f', canvas: '#ffffff' })])`);
+  const [dzSec, dzPri, dzNone, dzGrey] = JSON.parse(dz);
+  check('kit: a reddish palette colour distinct from the primary is the filled destructive colour', dzSec.role === 'secondary' && dzSec.color === '#d93a3a' && dzSec.fill === true, JSON.stringify(dzSec));
+  check('kit: when the reddish colour is the primary, destructive is an outline in it (never filled)', dzPri.role === 'primary' && dzPri.fill === false, JSON.stringify(dzPri));
+  check('kit: no reddish colour (or a greyed one) means ink, never a stock red', dzNone.role === null && dzNone.color === '#1f2421' && dzGrey.role === null, JSON.stringify([dzNone, dzGrey]));
+  const tone = B(`JSON.stringify(uiKitTone('#e8d9b5', { ink: '#1f2421', canvas: '#f6f4ef' }, 3, 0.12))`);
+  check('kit: a pale status tone is shaded toward the ink until its icon holds 3:1', JSON.parse(tone).color === '#e8d9b5' && JSON.parse(tone).ico !== '#e8d9b5', tone);
   const rules = B(`(() => {
     const fx = (app, site) => aibSecRules({ app, site, def: { rules: { do: ['Use one hero band', 'Keep corners square'], dont: ['Add a glow behind titles'] } }, scale: { wantH: 0, wantB: 0 } }).join('\\n');
     return [fx(true, false), fx(true, true), fx(false, true)];
@@ -712,6 +730,68 @@ check('paste: empty text', run(`extractColors('').length`) === 0, 'found colors 
   check('brief: App blend table marks Art and Patterns as not used in the app', /\| Art \| — \| Not used in the app \(website and brand board only\)\. \|/.test(blendRows[0]) && /\| Patterns \| — \| Not used in the app/.test(blendRows[0]) && /\| Type \| A \| faces\. \|/.test(blendRows[0]), blendRows[0]);
   check('brief: Both appends Website only to the Art and Patterns rows', /hero art\. Website only\. \|/.test(blendRows[1]) && /Suite\. Website only\. \|/.test(blendRows[1]) && !/faces\. Website only/.test(blendRows[1]), blendRows[1]);
   check('brief: Website blend table is unchanged', /\| Art \| B \| hero art\. \|/.test(blendRows[2]) && !/Website only|Not used/.test(blendRows[2]), blendRows[2]);
+}
+
+/* ---- AI brief: App brief from the measured UI kit (js/ai-brief.js aibKitModel and the App sections) ---- */
+
+{
+  const mc = vm.createContext({
+    console: { log: console.log, warn() {}, error: console.error },
+    document: { getElementById: () => null, addEventListener() {}, createElement: () => ({ style: {} }), querySelectorAll: () => [] },
+    window: {}, localStorage: { getItem: () => null, setItem() {} },
+  });
+  for (const f of ['js/data.js', 'js/color.js', 'js/brand-deck.js', 'js/aesthetics/registry.js', 'js/aesthetics/dystopian-luxury.js', 'js/aesthetics/pirate-broadcast.js',
+    'js/aesthetic-meta.js', 'js/ui-kit.js', 'js/aesthetic-board.js', 'js/blend.js', 'js/color-roles.js', 'js/ai-brief.js']) {
+    vm.runInContext(fs.readFileSync(path.join(root, f), 'utf8'), mc, { filename: f });
+  }
+  const M = code => vm.runInContext(code, mc);
+  // aibKitSnap data as the UI kit tab measured it (2026-10-18): Dystopian Luxury's ink-block primary button with its
+  // 6pt primary square, Pirate Broadcast's teletext-green mono button; their cards (hairline vs scanlines + ring).
+  M(`var kbox = o => Object.assign({ bg: 'rgba(0, 0, 0, 0)', img: 'none', color: 'rgb(0, 0, 0)', ff: 'Lato, sans-serif', fs: 17, fw: '400', fst: 'normal', tt: 'none', ls: 0, deco: 'none',
+      r: [0, 0, 0, 0], b: [0, 1, 2, 3].map(() => ({ w: 0, s: 'none', c: 'rgb(0, 0, 0)' })), sh: 'none', op: 1, tf: 'none', bd: 'none', ol: '', pad: [0, 0, 0, 0], h: 52, w: 318, filter: 'none', clip: 'none' }, o);
+    var kitDL = { mode: 'light', chrome: { title: kbox({ fs: 34, h: 41 }) }, cells: {
+      'btn-primary': { rest: { button: { box: kbox({ bg: 'rgb(15, 17, 15)', color: 'rgb(247, 248, 247)', pad: [0, 20, 0, 20] }), before: kbox({ bg: 'rgb(158, 174, 41)', w: 6, h: 6, content: '""', text: '', at: [null, null, null, null] }) } },
+        pressed: { button: { box: kbox({ bg: 'rgb(248, 248, 247)', color: 'rgb(15, 17, 15)', sh: 'rgb(15, 17, 15) 0px 0px 0px 1px inset', pad: [0, 20, 0, 20] }) } } },
+      card: { rest: { card: { box: kbox({ b: [{ w: 1, s: 'solid', c: 'rgba(37, 38, 28, 0.16)' }].concat([1, 2, 3].map(() => ({ w: 0, s: 'none', c: 'rgb(0, 0, 0)' }))), pad: [16, 0, 0, 0], h: 236 }) } } } } };
+    var kitPB = { mode: 'light', chrome: { title: kbox({ fs: 34, h: 41, ff: 'ui-monospace, monospace', fw: '700', tt: 'uppercase' }) }, cells: {
+      'btn-primary': { rest: { button: { box: kbox({ bg: 'rgb(0, 255, 0)', color: 'rgb(0, 0, 0)', ff: 'ui-monospace, "SF Mono", monospace', fw: '700', tt: 'uppercase', ls: 1.7, pad: [0, 14, 0, 16] }) } } },
+      card: { rest: { card: { box: kbox({ bg: 'rgb(0, 0, 0)', img: 'repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.3) 0px, rgba(0, 0, 0, 0.3) 0.3px, rgba(0, 0, 0, 0) 0.3px, rgba(0, 0, 0, 0) 0.9px), none', sh: 'rgba(255, 255, 255, 0.22) 0px 0px 0px 2px', pad: [20, 20, 20, 20], h: 226 }) } } } } };
+    var kstate = key => { const st = { headingFont: FONTS[0], bodyFont: FONTS[0], typography: { headingSize: 44, bodySize: 16, headingWeight: 700, bodyWeight: 400 }, colors: { primary: '#9eae29', secondary: '#7598d1', accent: '#a126ed', neutralDark: '#25261c', neutralLight: '#f8f8f7' },
+      bgMode: 'light', pureBg: false, content: { brandName: 'Signl', tagline: 'Scroll math, not social media' }, aesthetic: key, aestheticVersion: 'current', blend: null, locks: {}, patterns: [] }; return st; };`);
+  const rowOf = (md, el) => (md.split('\n').find(l => l.startsWith('| ' + el + ' |')) || '');
+  const briefs = M(`[buildAiBrief(kstate('dystopian-luxury'), { surface: 'app', target: 'web', noProbe: true, kitSnap: kitDL }),
+    buildAiBrief(kstate('pirate-broadcast'), { surface: 'app', target: 'web', noProbe: true, kitSnap: kitPB }),
+    buildAiBrief(kstate('dystopian-luxury'), { surface: 'app', target: 'web', noProbe: true }),
+    buildAiBrief(kstate('dystopian-luxury'), { surface: 'web', target: 'web', noProbe: true })]`);
+  const [dl, pb, dlStatic, dlWeb] = briefs;
+  check('kit: the App brief has the "How … shows up in the app" signature', /### How Dystopian Luxury shows up in the app\n- Corners: /.test(dl) && /### How Pirate Broadcast shows up in the app/.test(pb), dl.slice(0, 1500));
+  check('kit: the App brief pastes a full :root token block with `color-scheme: light` and a dark block', /```css\n:root \{\n  color-scheme: light;\n  --canvas: #[0-9a-f]{6};/.test(dl) && /:root\[data-theme="dark"\] \{\n  color-scheme: dark;/.test(dl), (dl.match(/## Tokens \(CSS\)[\s\S]*/) || [''])[0].slice(0, 600));
+  check('kit: App briefs never point at tokens.css or a full-bleed hero', !/tokens\.css|full-bleed hero/.test(dl + pb + dlStatic), 'tokens.css / full-bleed hero');
+  const pDL = rowOf(dl, 'Primary button'), pPB = rowOf(pb, 'Primary button');
+  check('kit: measured primary button rows differ between Dystopian Luxury and Pirate Broadcast',
+    pDL && pPB && pDL !== pPB && /\| --ab-dl-ink \|/.test(pDL) && /a 6pt --primary square, before the text/.test(pDL) && /pressed: fill --canvas/.test(pDL) && /\| --ab-tt-green \|/.test(pPB) && /uppercase, tracking \+0\.1em/.test(pPB), pDL + '\n' + pPB);
+  check('kit: measured rows name the corner set, the shadow and the card surface as drawn',
+    /square corners/.test(pDL) && /top 1pt solid --ink at 16%|top 1pt solid --ab-dl-hair/.test(rowOf(dl, 'Card')) && /a 2pt --ab-tt-line ring outside the edge/.test(rowOf(pb, 'Card')) && /fine horizontal lines of --ab-tt-scan every 1pt/.test(rowOf(pb, 'Card')), rowOf(dl, 'Card') + '\n' + rowOf(pb, 'Card'));
+  check('kit: an App brief with a measured kit drops the board recipes and the generic press and pressed lines',
+    !/## Shape and materials/.test(dl) && !/- \*\*Crop strip\*\*/.test(dl) && !/- Press: /.test(dl) && /\| Pressed and disabled \| as each UI kit row states/.test(dl) && !/One primary-filled action per view/.test(dl), dl.match(/## States[\s\S]*?\n\n/)[0]);
+  check('kit: App briefs carry phone chrome, the spacing scale with 28, the icon spec and screen density',
+    /status bar takes 54pt/.test(dl) && /home indicator 34pt/.test(dl) && /top bar is 44pt/.test(dl) && /4, 8, 12, 16, 20, 24, 28, 32/.test(dl) && /16pt chevron icon/.test(dl) && /at least 6 rows/.test(dl) && /Settings is a tab/.test(dl), 'phone');
+  check('kit: no raw CSS leaks into the App brief outside its code blocks',
+    !/linear-gradient\(|clip-path|polygon\(|counter\(|::before|::after|\d+\.\d+x\d/.test((dl + pb).replace(/```[\s\S]*?```/g, '')), (dl + pb).replace(/```[\s\S]*?```/g, '').match(/.{0,60}(linear-gradient\(|clip-path|::before|::after).{0,40}/) || 'clean');
+  check('kit: shadows and textures are described in words', /a 2pt --ab-tt-line ring outside the edge/.test(pb) && /fine horizontal lines of/.test(pb), 'words');
+  const pairName = M(`(() => { const c = aibContext(kstate('dystopian-luxury'), { surface: 'app', target: 'web', noProbe: true }); const n = aibKitNamer(c);
+    const card = n('rgb(255, 255, 255)|rgb(47, 53, 43)', 'card'); const v = c.kitVars[card];
+    const ink = n(c.rows.find(r => r.token === '--ink').get(c.modes[0]) + '|' + c.rows.find(r => r.token === '--ink').get(c.modes[1]), 'x');
+    return [card, v ? v.get({ mode: 'light' }) + '/' + v.get({ mode: 'dark' }) : '', ink].join('|'); })()`);
+  check('kit: a colour measured in light and dark is named only by a token matching both (else a kit token with both values)',
+    /^--kit-card\|#ffffff\/#2f352b\|--ink$/.test(pairName), pairName);
+  check('kit: without a page to measure in, the App brief keeps the generic rows and says so in one line',
+    /These are the generic kit rows/.test(dlStatic) && !/### How Dystopian Luxury shows up/.test(dlStatic) && !/These are the generic kit rows/.test(dl), 'static');
+  check('kit: the Website brief keeps its sections and gets no kit measurement', !/### How /.test(dlWeb) && /## Components/.test(dlWeb) && !/These are the generic kit rows/.test(dlWeb), 'web');
+  check('kit: pattern placement is quiet section backgrounds, never a full-bleed hero',
+    M('AIB_USE_SHORT.hero') === 'Patterns only as quiet section backgrounds; never a full-bleed hero' && /^Patterns only as quiet section backgrounds; never a full-bleed hero/.test(M('AIB_USE_RULES.hero.rule')), M('AIB_USE_SHORT.hero'));
+  check('blend: borrowed art is board and deck only, never on the website or in app screens',
+    /never on the website or in app screens/.test(fs.readFileSync(path.join(root, 'js/blend.js'), 'utf8')) && !/landing page hero; never in app screens/.test(fs.readFileSync(path.join(root, 'js/blend.js'), 'utf8')), 'blend.js');
 }
 
 // Not run here (they need a real DOM): that blended tokens(t, state) see the view's fonts end to end, and the

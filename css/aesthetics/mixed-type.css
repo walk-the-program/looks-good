@@ -305,3 +305,19 @@
 /* ---- Built view fixes (S5 sweep) ---- */
 /* Stat labels: "MEDIAN RESPONSE" broke mid-word (RESPONS / E) in the narrow fourth stat; tighter tracking, break only at spaces. */
 .ab.sb-ab[data-ae="mixed-type"] .sb-stat .ab-label { letter-spacing: 0.08em; overflow-wrap: break-word; }
+
+/* ---- App UI detail pass (R6): phone screens and the UI kit only ----
+   The board turns its subcopy off; the welcome screen still needs its one sentence of body. */
+.ab.sb-ab.sb-kit[data-ae="mixed-type"] .ab-subcopy.sb-ob-body { display: block; }
+/* one icon per button: icon-only buttons and buttons with their own icon drop the arrow */
+.ab.sb-ab[data-ae="mixed-type"] .ab-type-apply.sb-k-iconbtn::after,
+.ab.sb-ab[data-ae="mixed-type"] .ab-type-apply.sb-k-btn2:has(> svg)::after { content: none; }
+.ab.sb-ab[data-ae="mixed-type"] .ab-type-apply.sb-k-btn2:has(> svg) { gap: 10px; }
+/* underlined fields stay underlined in focus and error: a 2px rule, no box ring */
+.ab.sb-ab.sb-kit[data-ae="mixed-type"] :is(.sb-k-field, .sb-k-search).is-focus .ab-input { border-color: var(--ab-primary-text) !important; box-shadow: 0 1px 0 var(--ab-primary-text) !important; }
+.ab.sb-ab.sb-kit[data-ae="mixed-type"] .sb-k-field.is-error .ab-input { border-color: var(--sb-danger) !important; box-shadow: 0 1px 0 var(--sb-danger) !important; }
+/* square, like the cards, fields and toggle */
+.ab.sb-ab[data-ae="mixed-type"] :is(.sb-k-badge, .sb-k-count) { border-radius: 0; }
+.ab.sb-ab[data-ae="mixed-type"] input.sb-k-range { height: 28px; background: transparent; }
+.ab.sb-ab[data-ae="mixed-type"] input.sb-k-range::-webkit-slider-runnable-track { height: 2px; border-radius: 0; background: linear-gradient(90deg, var(--ab-primary) var(--v, 50%), var(--ab-line) var(--v, 50%)); }
+.ab.sb-ab[data-ae="mixed-type"] input.sb-k-range::-webkit-slider-thumb { -webkit-appearance: none; width: 20px; height: 20px; margin-top: -9px; border: 1px solid var(--ab-ink); border-radius: 0; background: var(--ab-canvas); box-shadow: none; }

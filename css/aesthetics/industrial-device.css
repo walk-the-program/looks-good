@@ -292,3 +292,49 @@
 
 /* Built settings: website and email share a row; a long name ends in an ellipsis, not a cut letter */
 .ab.sb-ab[data-ae="industrial-device"] .sb-field-row .ab-input { text-overflow: ellipsis; letter-spacing: 0; font-size: 12.5px; }
+
+/* ---- app UI kit (phone screens + the UI kit tab) ----
+   Signature carried by components: printed-legend keys with a status LED (segments), the raised
+   main key with its edge, recessed slot fields, the gripped slide switch and a gripped fader cap
+   on the slider. Lists are plain panels: no "channel strip" legend or grille strip (board decoration). */
+.ab.sb-ab[data-ae="industrial-device"].sb-kit .ab-list.sb-k-list::before, .ab.sb-ab[data-ae="industrial-device"].sb-kit .ab-list.sb-k-list::after { content: none; }
+.ab.sb-ab[data-ae="industrial-device"].sb-kit .sb-k-list > .sb-k-row:first-child { border-top-width: 0; box-shadow: none; }
+.ab.sb-ab[data-ae="industrial-device"].sb-kit .ab-toggle.sb-tog > span { font: 500 var(--k-body, 17px)/var(--k-body-lh, 24px) var(--ab-font-ui, var(--ab-font-b)); letter-spacing: 0; text-transform: none; }
+.ab.sb-ab[data-ae="industrial-device"].sb-kit input.sb-k-range { height: 32px; margin: 0; background: transparent; }
+.ab.sb-ab[data-ae="industrial-device"].sb-kit input.sb-k-range::-webkit-slider-runnable-track {
+  height: 6px; border-radius: 3px; background: linear-gradient(90deg, var(--ab-primary) var(--v, 50%), var(--ab-slot) var(--v, 50%)); box-shadow: var(--ab-slot-sh), 0 0 0 1px var(--ab-hair);
+}
+.ab.sb-ab[data-ae="industrial-device"].sb-kit input.sb-k-range::-moz-range-track { height: 6px; border-radius: 3px; background: linear-gradient(90deg, var(--ab-primary) var(--v, 50%), var(--ab-slot) var(--v, 50%)); }
+.ab.sb-ab[data-ae="industrial-device"].sb-kit input.sb-k-range::-webkit-slider-thumb {
+  -webkit-appearance: none; width: 18px; height: 28px; margin-top: -11px; border: 1px solid var(--ab-hair); border-radius: 3px; transform: none;
+  background: repeating-linear-gradient(0deg, var(--ab-hair) 0 1px, transparent 1px 4px) center / 10px 13px no-repeat, var(--ab-key);
+  box-shadow: inset 0 1px 0 var(--ab-key-hi), 0 2px 0 var(--ab-key-edge);
+}
+.ab.sb-ab[data-ae="industrial-device"].sb-kit input.sb-k-range::-moz-range-thumb {
+  width: 18px; height: 28px; border: 1px solid var(--ab-hair); border-radius: 3px; transform: none;
+  background: repeating-linear-gradient(0deg, var(--ab-hair) 0 1px, transparent 1px 4px) center / 10px 13px no-repeat, var(--ab-key);
+}
+.ab.sb-ab[data-ae="industrial-device"].sb-kit .ab-seg-btn { letter-spacing: 0.06em; }
+
+/* ---- classic version (industrial-device--classic): app UI kit rules (the classic file is generated; these live here) ----
+   Signature carried by components: printed-legend keys with a status LED (segments), the raised
+   main key with its edge, recessed slot fields, the gripped slide switch and a gripped fader cap
+   on the slider. Lists are plain panels: no "channel strip" legend or grille strip (board decoration). */
+.ab.sb-ab[data-ae="industrial-device--classic"].sb-kit .ab-list.sb-k-list::before, .ab.sb-ab[data-ae="industrial-device--classic"].sb-kit .ab-list.sb-k-list::after { content: none; }
+.ab.sb-ab[data-ae="industrial-device--classic"].sb-kit .sb-k-list > .sb-k-row:first-child { border-top-width: 0; box-shadow: none; }
+.ab.sb-ab[data-ae="industrial-device--classic"].sb-kit .ab-toggle.sb-tog > span { font: 500 var(--k-body, 17px)/var(--k-body-lh, 24px) var(--ab-font-ui, var(--ab-font-b)); letter-spacing: 0; text-transform: none; }
+.ab.sb-ab[data-ae="industrial-device--classic"].sb-kit input.sb-k-range { height: 32px; margin: 0; background: transparent; }
+.ab.sb-ab[data-ae="industrial-device--classic"].sb-kit input.sb-k-range::-webkit-slider-runnable-track {
+  height: 6px; border-radius: 3px; background: linear-gradient(90deg, var(--ab-primary) var(--v, 50%), var(--ab-slot) var(--v, 50%)); box-shadow: var(--ab-slot-sh), 0 0 0 1px var(--ab-hair);
+}
+.ab.sb-ab[data-ae="industrial-device--classic"].sb-kit input.sb-k-range::-moz-range-track { height: 6px; border-radius: 3px; background: linear-gradient(90deg, var(--ab-primary) var(--v, 50%), var(--ab-slot) var(--v, 50%)); }
+.ab.sb-ab[data-ae="industrial-device--classic"].sb-kit input.sb-k-range::-webkit-slider-thumb {
+  -webkit-appearance: none; width: 18px; height: 28px; margin-top: -11px; border: 1px solid var(--ab-hair); border-radius: 3px; transform: none;
+  background: repeating-linear-gradient(0deg, var(--ab-hair) 0 1px, transparent 1px 4px) center / 10px 13px no-repeat, var(--ab-key);
+  box-shadow: inset 0 1px 0 var(--ab-key-hi), 0 2px 0 var(--ab-key-edge);
+}
+.ab.sb-ab[data-ae="industrial-device--classic"].sb-kit input.sb-k-range::-moz-range-thumb {
+  width: 18px; height: 28px; border: 1px solid var(--ab-hair); border-radius: 3px; transform: none;
+  background: repeating-linear-gradient(0deg, var(--ab-hair) 0 1px, transparent 1px 4px) center / 10px 13px no-repeat, var(--ab-key);
+}
+.ab.sb-ab[data-ae="industrial-device--classic"].sb-kit .ab-seg-btn { letter-spacing: 0.06em; }

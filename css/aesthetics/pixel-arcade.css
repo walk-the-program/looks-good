@@ -295,3 +295,51 @@
 
 /* Built settings: website and email share a row; a long name ends in an ellipsis, not a cut letter */
 .ab.sb-ab[data-ae="pixel-arcade"] .sb-field-row .ab-input { text-overflow: ellipsis; letter-spacing: 0; font-size: 14px; }
+
+/* ---- App UI (phone screens + UI kit tab; scope .sb-kit only, never the board) ----
+   The dashboard swaps line icons for 8x8 pixel masks and hides .sb-ico; app screens need every
+   icon (tab bar, row leads, chevrons, search), so they come back drawn on the pixel grid: square caps,
+   mitred joins, crisp edges. The icon button shows the same line bell (one icon style per context).
+   Selection is the ink, not a second primary fill, and drops the hard 4px underside: only the one
+   primary action keeps the pixel button's underside. */
+.ab.sb-ab.sb-kit:is([data-ae="pixel-arcade"], [data-ae="pixel-arcade--classic"]) .sb-ico { display: block; shape-rendering: crispEdges; }
+.ab.sb-ab.sb-kit:is([data-ae="pixel-arcade"], [data-ae="pixel-arcade--classic"]) .sb-ico * { stroke-linecap: square; stroke-linejoin: miter; }
+.ab.sb-ab.sb-kit:is([data-ae="pixel-arcade"], [data-ae="pixel-arcade--classic"]) .sb-icon-btn::before { content: none; }
+.ab.sb-ab.sb-kit:is([data-ae="pixel-arcade"], [data-ae="pixel-arcade--classic"]) .ab-seg-btn[aria-pressed="true"] { background: var(--ab-ink); color: var(--ab-canvas); box-shadow: var(--px-bd); }
+/* fields: focus and error keep the stepped 4px edge (ink / danger) and the inset, never a soft ring */
+.ab.sb-ab.sb-kit:is([data-ae="pixel-arcade"], [data-ae="pixel-arcade--classic"]) :is(.sb-k-field, .sb-k-search, .sb-k-selectwrap) .ab-input { letter-spacing: 0.01em; }
+.ab.sb-ab.sb-kit:is([data-ae="pixel-arcade"], [data-ae="pixel-arcade--classic"]) :is(.sb-k-field, .sb-k-search).is-focus .ab-input { box-shadow: 0 -4px 0 0 var(--ab-ink), 0 4px 0 0 var(--ab-ink), -4px 0 0 0 var(--ab-ink), 4px 0 0 0 var(--ab-ink), inset 4px 4px 0 0 rgba(0, 0, 0, .4) !important; }
+.ab.sb-ab.sb-kit:is([data-ae="pixel-arcade"], [data-ae="pixel-arcade--classic"]) .sb-k-field.is-error .ab-input {
+  box-shadow: 0 -4px 0 0 var(--sb-danger), 0 4px 0 0 var(--sb-danger), -4px 0 0 0 var(--sb-danger), 4px 0 0 0 var(--sb-danger), inset 4px 4px 0 0 rgba(0, 0, 0, .4) !important;
+}
+/* open select: a stepped panel, the chosen line in ink */
+.ab.sb-ab.sb-kit:is([data-ae="pixel-arcade"], [data-ae="pixel-arcade--classic"]) .sb-k-menu { margin: 12px 4px 0 !important; padding: 0; border: 0; border-radius: 0; background: var(--ab-panel); box-shadow: var(--px-bd); }
+.ab.sb-ab.sb-kit:is([data-ae="pixel-arcade"], [data-ae="pixel-arcade--classic"]) .sb-k-menu li { border-radius: 0; }
+.ab.sb-ab.sb-kit:is([data-ae="pixel-arcade"], [data-ae="pixel-arcade--classic"]) .sb-k-menu li[aria-selected="true"] { background: var(--ab-ink); color: var(--ab-canvas); }
+.ab.sb-ab.sb-kit:is([data-ae="pixel-arcade"], [data-ae="pixel-arcade--classic"]) .sb-k-menu li[aria-selected="true"] .sb-ico { color: var(--ab-canvas); }
+/* checkbox and radio: slot squares with the dim stepped edge; checked = ink fill; the radio is notched */
+.ab.sb-ab.sb-kit:is([data-ae="pixel-arcade"], [data-ae="pixel-arcade--classic"]) .sb-k-box { width: 20px; height: 20px; margin: 4px; border: 0; border-radius: 0; background: var(--ab-slot); box-shadow: var(--px-dim), inset 4px 4px 0 0 rgba(0, 0, 0, .25); }
+.ab.sb-ab.sb-kit:is([data-ae="pixel-arcade"], [data-ae="pixel-arcade--classic"]) .sb-k-box[type="radio"] { clip-path: var(--px-notch); box-shadow: inset 0 0 0 4px var(--ab-bd-dim); }
+.ab.sb-ab.sb-kit:is([data-ae="pixel-arcade"], [data-ae="pixel-arcade--classic"]) .sb-k-box:checked { background: var(--ab-ink); border: 0; box-shadow: var(--px-bd); }
+.ab.sb-ab.sb-kit:is([data-ae="pixel-arcade"], [data-ae="pixel-arcade--classic"]) .sb-k-box[type="radio"]:checked { box-shadow: inset 0 0 0 4px var(--ab-bd); background: var(--ab-slot); }
+.ab.sb-ab.sb-kit:is([data-ae="pixel-arcade"], [data-ae="pixel-arcade--classic"]) .sb-k-box[type="checkbox"]:checked::after { width: 10px; height: 5px; border-left: 3px solid var(--ab-canvas); border-bottom: 3px solid var(--ab-canvas); }
+.ab.sb-ab.sb-kit:is([data-ae="pixel-arcade"], [data-ae="pixel-arcade--classic"]) .sb-k-box[type="radio"]:checked::after { width: 8px; height: 8px; border-radius: 0; background: var(--ab-ink); }
+/* slider: a stepped slot, the travelled part in the primary, a square ink thumb */
+.ab.sb-ab.sb-kit:is([data-ae="pixel-arcade"], [data-ae="pixel-arcade--classic"]) .sb-k-range::-webkit-slider-runnable-track { height: 8px; border-radius: 0; background: linear-gradient(90deg, var(--ab-primary) var(--v, 50%), var(--ab-slot) var(--v, 50%)); box-shadow: var(--px-dim); }
+.ab.sb-ab.sb-kit:is([data-ae="pixel-arcade"], [data-ae="pixel-arcade--classic"]) .sb-k-range::-webkit-slider-thumb { width: 16px; height: 24px; margin-top: -8px; border: 0; border-radius: 0; background: var(--ab-ink); box-shadow: inset -4px -4px 0 0 rgba(0, 0, 0, .3); }
+.ab.sb-ab.sb-kit:is([data-ae="pixel-arcade"], [data-ae="pixel-arcade--classic"]) .sb-k-range::-moz-range-track { height: 8px; border-radius: 0; background: linear-gradient(90deg, var(--ab-primary) var(--v, 50%), var(--ab-slot) var(--v, 50%)); }
+.ab.sb-ab.sb-kit:is([data-ae="pixel-arcade"], [data-ae="pixel-arcade--classic"]) .sb-k-range::-moz-range-thumb { width: 16px; height: 24px; border: 0; border-radius: 0; background: var(--ab-ink); }
+/* square, notched shapes for every small piece: avatars, badges, counts, the notification dot, icon tiles */
+.ab.sb-ab.sb-kit:is([data-ae="pixel-arcade"], [data-ae="pixel-arcade--classic"]) :is(.sb-k-av, .sb-k-badge, .sb-k-count, .sb-k-ico, .sb-k-emptyico) { border-radius: 0; clip-path: var(--px-notch); }
+.ab.sb-ab.sb-kit:is([data-ae="pixel-arcade"], [data-ae="pixel-arcade--classic"]) .sb-k-avs .sb-k-av { clip-path: none; box-shadow: 0 0 0 2px var(--ab-canvas); }
+.ab.sb-ab.sb-kit:is([data-ae="pixel-arcade"], [data-ae="pixel-arcade--classic"]) .sb-badge { border-radius: 0; }
+.ab.sb-ab.sb-kit:is([data-ae="pixel-arcade"], [data-ae="pixel-arcade--classic"]) .sb-dots i { border-radius: 0; height: 8px; }
+/* destructive: the pixel button shape in the palette's danger colour (or ink outline) */
+.ab.sb-ab.sb-kit:is([data-ae="pixel-arcade"], [data-ae="pixel-arcade--classic"]) .sb-k-danger { width: calc(100% - 8px); margin: 0 4px; border-radius: 0; box-shadow: var(--px-bd), inset 0 -4px 0 0 rgba(0, 0, 0, .25); }
+/* sheet, toast, callouts, tab-bar box: square, no blur shadows */
+.ab.sb-ab.sb-kit:is([data-ae="pixel-arcade"], [data-ae="pixel-arcade--classic"]) :is(.sb-k-sheetbox, .sb-k-callout, .sb-k-tabbarbox, .sb-k-toast) { border-radius: 0; }
+.ab.sb-ab.sb-kit:is([data-ae="pixel-arcade"], [data-ae="pixel-arcade--classic"]) .sb-k-sheet { border-radius: 0; box-shadow: 0 -4px 0 0 var(--ab-bd); }
+.ab.sb-ab.sb-kit:is([data-ae="pixel-arcade"], [data-ae="pixel-arcade--classic"]) .sb-k-grab { width: 32px; height: 4px; border-radius: 0; }
+.ab.sb-ab.sb-kit:is([data-ae="pixel-arcade"], [data-ae="pixel-arcade--classic"]) .sb-k-toast { box-shadow: 0 4px 0 0 var(--ab-bd-dim); }
+/* classic copy: the board's floating dialog tag would pin the kicker to the top edge of the phone; in the app it is a plain caption */
+.ab.sb-ab.sb-kit[data-ae="pixel-arcade--classic"] .ab-kicker { position: static; display: block; padding: 0; background: none; box-shadow: none; color: var(--ab-muted); }

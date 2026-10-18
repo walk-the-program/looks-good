@@ -289,3 +289,47 @@
 .ab.sb-ab[data-ae="blueprint"]:not([data-mode="light"]) .ab-hero-copy .sb-proof { padding: 0 12px; margin: 12px 0 12px !important; font-size: 11px; letter-spacing: 0; }
 /* Built settings: website and email share a row; a long name ends in an ellipsis, not a cut letter */
 .ab.sb-ab[data-ae="blueprint"] .sb-field-row .ab-input { text-overflow: ellipsis; letter-spacing: 0; font-size: 14px; }
+
+/* ---- app UI kit (phone screens + the UI kit tab) ----
+   Signature carried by components, never art: square hairline outlines, mono caps legends, the
+   primary key drawn as a double outline (the same mark as the selected segment), underline fields,
+   a square slide switch, a diamond fader on the slider and the dimension tick line under the
+   highlighted word. No sheet frame, grid paper, title-block captions or legends with invented
+   text ("Detail E", "Bill of materials", "U.S. Patent") in app screens. */
+.ab.sb-ab[data-ae="blueprint"].sb-kit { background-image: none; }
+.ab.sb-ab[data-ae="blueprint"].sb-kit::after { content: none; }
+.ab.sb-ab[data-ae="blueprint"].sb-kit .ab-kicker { display: block; padding: 0; border: 0; }
+.ab.sb-ab[data-ae="blueprint"].sb-kit .ab-kicker::after,
+.ab.sb-ab[data-ae="blueprint"].sb-kit .ab-headline::before,
+.ab.sb-ab[data-ae="blueprint"].sb-kit .ab-hl::after,
+.ab.sb-ab[data-ae="blueprint"].sb-kit :is(.ab-card, .ab-panel, .ab-list)::before { content: none; }
+.ab.sb-ab[data-ae="blueprint"].sb-kit .ab-headline { padding: 0; }
+.ab.sb-ab[data-ae="blueprint"].sb-kit .ab-subcopy { padding: 0; border-top: 0; }
+.ab.sb-ab[data-ae="blueprint"].sb-kit .ab-cta.sb-k-btn { width: 100%; margin: 0; border: 0; box-shadow: var(--bp-sel); font-weight: 700; }
+.ab.sb-ab[data-ae="blueprint"].sb-kit .ab-type-apply.sb-k-btn2 { border: 1px solid var(--ab-l1); }
+.ab.sb-ab[data-ae="blueprint"].sb-kit :is(.sb-k-btn, .sb-k-btn2, .sb-k-iconbtn).sb-k-pressed { background: color-mix(in srgb, var(--ab-ink) 9%, transparent); filter: none; }
+.ab.sb-ab[data-ae="blueprint"].sb-kit .ab-toggle.sb-tog > span { font: 500 var(--k-body, 17px)/var(--k-body-lh, 24px) var(--bp-mono); letter-spacing: 0.02em; text-transform: none; }
+.ab.sb-ab[data-ae="blueprint"].sb-kit .ab-switch:checked::before { background: var(--ab-l1); box-shadow: none; }
+.ab.sb-ab[data-ae="blueprint"].sb-kit input.sb-k-range { height: 28px; margin: 0; background: transparent; }
+.ab.sb-ab[data-ae="blueprint"].sb-kit input.sb-k-range::-webkit-slider-runnable-track { height: 2px; border-radius: 0; background: linear-gradient(90deg, var(--ab-ink) var(--v, 50%), var(--ab-l2) var(--v, 50%)); }
+.ab.sb-ab[data-ae="blueprint"].sb-kit input.sb-k-range::-moz-range-track { height: 2px; border-radius: 0; background: linear-gradient(90deg, var(--ab-ink) var(--v, 50%), var(--ab-l2) var(--v, 50%)); }
+.ab.sb-ab[data-ae="blueprint"].sb-kit input.sb-k-range::-webkit-slider-thumb { -webkit-appearance: none; width: 15px; height: 15px; margin-top: -6.5px; border: 1.5px solid var(--ab-ink); border-radius: 0; background: var(--ab-canvas); box-shadow: none; transform: rotate(45deg); }
+.ab.sb-ab[data-ae="blueprint"].sb-kit input.sb-k-range::-moz-range-thumb { width: 15px; height: 15px; border: 1.5px solid var(--ab-ink); border-radius: 0; background: var(--ab-canvas); box-shadow: none; transform: rotate(45deg); }
+
+/* ---- classic version (blueprint--classic): app UI kit rules (the classic file is generated; these live here) ----
+   Signature carried by components: square hairline outlines, the filled primary key and the
+   corner registration marks on keys, underline fields, [ bracketed ] kickers and the dimension
+   tick line under the highlighted word. No grid paper, sheet frame or legends with invented text. */
+.ab.sb-ab[data-ae="blueprint--classic"].sb-kit { background-image: none; }
+.ab.sb-ab[data-ae="blueprint--classic"].sb-kit::after,
+.ab.sb-ab[data-ae="blueprint--classic"].sb-kit .ab-hl::after,
+.ab.sb-ab[data-ae="blueprint--classic"].sb-kit :is(.ab-card, .ab-panel, .ab-list)::before { content: none; }
+.ab.sb-ab[data-ae="blueprint--classic"].sb-kit .ab-cta.sb-k-btn { width: 100%; margin: 0; }
+.ab.sb-ab[data-ae="blueprint--classic"].sb-kit .ab-type-apply:is(.sb-k-btn2, .sb-k-iconbtn) { margin: 0; }
+.ab.sb-ab[data-ae="blueprint--classic"].sb-kit :is(.sb-k-btn2, .sb-k-iconbtn).sb-k-pressed { background: color-mix(in srgb, var(--ab-ink) 9%, transparent); filter: none; }
+.ab.sb-ab[data-ae="blueprint--classic"].sb-kit .ab-toggle.sb-tog > span { font: 500 var(--k-body, 17px)/var(--k-body-lh, 24px) var(--bp-mono); letter-spacing: 0.02em; text-transform: none; }
+.ab.sb-ab[data-ae="blueprint--classic"].sb-kit input.sb-k-range { height: 28px; margin: 0; background: transparent; }
+.ab.sb-ab[data-ae="blueprint--classic"].sb-kit input.sb-k-range::-webkit-slider-runnable-track { height: 2px; border-radius: 0; background: linear-gradient(90deg, var(--ab-primary) var(--v, 50%), var(--ab-l2) var(--v, 50%)); }
+.ab.sb-ab[data-ae="blueprint--classic"].sb-kit input.sb-k-range::-moz-range-track { height: 2px; border-radius: 0; background: linear-gradient(90deg, var(--ab-primary) var(--v, 50%), var(--ab-l2) var(--v, 50%)); }
+.ab.sb-ab[data-ae="blueprint--classic"].sb-kit input.sb-k-range::-webkit-slider-thumb { -webkit-appearance: none; width: 16px; height: 16px; margin-top: -7px; border: 1px solid var(--ab-ink); border-radius: 0; background: var(--ab-primary); box-shadow: none; transform: none; }
+.ab.sb-ab[data-ae="blueprint--classic"].sb-kit input.sb-k-range::-moz-range-thumb { width: 16px; height: 16px; border: 1px solid var(--ab-ink); border-radius: 0; background: var(--ab-primary); box-shadow: none; transform: none; }

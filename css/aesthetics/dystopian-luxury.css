@@ -242,3 +242,148 @@
 .ab[data-ae="dystopian-luxury"] .ab-deck-pratio b { font-weight: 700; }
 .ab[data-ae="dystopian-luxury"].ab-slide .ab-deck-pchip, .ab[data-ae="dystopian-luxury"].ab-slide .ab-deck-ptitle { font-weight: 400; }
 .ab[data-ae="dystopian-luxury"].ab-slide .ab-deck-pname { font-weight: 700; }
+
+/* ---- app screens and the UI kit (.sb-kit: phone screens, UI kit tab) ----
+   Severity through removal. Ink is the only colour that acts: selection, toggles, tabs, focus,
+   checks and badges are ink on near-white. The client primary appears once per screen, as the 6px
+   square before the main action's label. Corners square, no tints, no pills, no shadows;
+   Courier Prime catalogue labels (accession numbers) are the signature, set on components. */
+.ab.sb-ab[data-ae="dystopian-luxury"].sb-kit {
+  --ab-primary: var(--ab-dl-ink) !important; --ab-primary-text: var(--ab-dl-ink) !important; --ab-on-primary: var(--ab-canvas) !important;
+  --ab-accent: var(--ab-dl-ink) !important; --ab-accent-text: var(--ab-dl-ink) !important; --ab-on-accent: var(--ab-canvas) !important;
+  --ab-secondary: var(--ab-canvas) !important; --ab-on-secondary: var(--ab-dl-ink) !important;
+  --ab-pri-tint: var(--ab-dl-grey) !important;
+  --k-r: 0px;
+}
+/* primary: an ink block, the mark then the label, left-aligned as on the board */
+.ab.sb-ab[data-ae="dystopian-luxury"].sb-kit .ab-cta.sb-k-btn { justify-content: flex-start; gap: 12px; padding-left: 20px !important; padding-right: 20px !important; }
+.ab.sb-ab[data-ae="dystopian-luxury"].sb-kit .ab-cta.sb-k-btn::before { flex: none; margin: 0; }
+.ab.sb-ab[data-ae="dystopian-luxury"].sb-kit .ab-cta.sb-k-btn.sb-k-pressed { background: var(--ab-canvas); color: var(--ab-dl-ink); box-shadow: inset 0 0 0 1px var(--ab-dl-ink); filter: none; transform: none; }
+/* secondary: the outlined label button, quieter than the primary */
+.ab.sb-ab[data-ae="dystopian-luxury"].sb-kit .ab-type-apply.sb-k-btn2 { font-weight: 400; font-size: var(--k-subhead, 15px) !important; letter-spacing: 0.12em; }
+.ab.sb-ab[data-ae="dystopian-luxury"].sb-kit .ab-type-apply.sb-k-pressed { background: var(--ab-dl-grey); color: var(--ab-dl-ink); filter: none; transform: none; }
+/* text buttons: ink, regular, underlined (no colour) */
+.ab.sb-ab[data-ae="dystopian-luxury"].sb-kit .sb-k-textbtn { color: var(--ab-dl-ink); font-weight: 400; text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 4px; }
+.ab.sb-ab[data-ae="dystopian-luxury"].sb-kit .sb-k-danger { font-weight: 400; }
+/* fields: the board's underline; focus thickens it, error turns it the danger colour; no rings */
+.ab.sb-ab[data-ae="dystopian-luxury"].sb-kit :is(.sb-k-field, .sb-k-search).is-focus .ab-input { box-shadow: none !important; border-bottom-width: 2px; border-color: var(--ab-dl-ink) !important; }
+.ab.sb-ab[data-ae="dystopian-luxury"].sb-kit .sb-k-field.is-error .ab-input { box-shadow: none !important; border-bottom-width: 2px; }
+.ab.sb-ab[data-ae="dystopian-luxury"].sb-kit .sb-k-help.is-error::before { content: "ERROR\00a0\00a0"; font: 400 var(--k-caption, 12px) var(--dl-mono); letter-spacing: 0.04em; }
+.ab.sb-ab[data-ae="dystopian-luxury"].sb-kit .sb-k-search .ab-input { padding-left: 30px !important; }
+.ab.sb-ab[data-ae="dystopian-luxury"].sb-kit .sb-k-search > .sb-ico { left: 0; }
+.ab.sb-ab[data-ae="dystopian-luxury"].sb-kit .sb-k-menu { border-color: var(--ab-dl-ink); box-shadow: none; }
+.ab.sb-ab[data-ae="dystopian-luxury"].sb-kit .sb-k-menu li[aria-selected="true"] { font-weight: 400; }
+/* toggle rows read like the other rows: body type, the board's square X switch */
+.ab.sb-ab[data-ae="dystopian-luxury"].sb-kit .ab-toggle > span { font: 400 var(--k-body, 17px) / var(--k-body-lh, 24px) var(--ab-font-b); letter-spacing: 0; text-transform: none; }
+/* segmented: square ink cells, 44pt tall, catalogue caps */
+.ab.sb-ab[data-ae="dystopian-luxury"].sb-kit .ab-seg-btn { min-height: var(--k-tap, 44px) !important; font-size: var(--k-footnote, 13px) !important; line-height: var(--k-footnote-lh, 18px) !important; letter-spacing: 0.1em; }
+/* cards have no box here (a hairline top only), so their content keeps the screen margin */
+.ab.sb-ab[data-ae="dystopian-luxury"].sb-kit .ab-card:is(.sb-k-card, .sb-home-card) { padding-left: 0 !important; padding-right: 0 !important; padding-bottom: 0 !important; }
+/* list rows: an accession number before the detail; leads are hairline squares */
+.ab.sb-ab[data-ae="dystopian-luxury"].sb-kit .sb-k-list { counter-reset: dlk; }
+.ab.sb-ab[data-ae="dystopian-luxury"].sb-kit .sb-k-row { counter-increment: dlk; }
+.ab.sb-ab[data-ae="dystopian-luxury"].sb-kit .sb-k-sub::before { content: "2026.114." counter(dlk) "\00a0 "; font: 400 11px var(--dl-mono); letter-spacing: 0; color: var(--k-muted); }
+.ab.sb-ab[data-ae="dystopian-luxury"].sb-kit :is(.sb-k-ico, .sb-k-emptyico) { border-radius: 0; background: none; color: var(--ab-dl-ink); box-shadow: inset 0 0 0 1px var(--ab-dl-hair); }
+.ab.sb-ab[data-ae="dystopian-luxury"].sb-kit .sb-k-av { border-radius: 0; background: var(--ab-canvas); color: var(--ab-dl-ink); box-shadow: inset 0 0 0 1px var(--ab-dl-ink); font-family: var(--dl-mono); font-weight: 400; letter-spacing: 0.02em; }
+.ab.sb-ab[data-ae="dystopian-luxury"].sb-kit .sb-k-avs { padding-left: 1px; }
+.ab.sb-ab[data-ae="dystopian-luxury"].sb-kit .sb-k-avs .sb-k-av { margin-left: -1px; box-shadow: inset 0 0 0 1px var(--ab-dl-ink); }
+/* callouts: a blank label with an ink rule at the left; the icon and the catalogue-caps title
+   tell the kinds apart (no status hues: ink is the only colour that acts) */
+.ab.sb-ab[data-ae="dystopian-luxury"].sb-kit .sb-k-callout { --tone: var(--ab-dl-ink); --tone-ico: var(--ab-dl-ink); border: 1px solid var(--ab-dl-hair); border-left: 2px solid var(--ab-dl-ink); background: var(--ab-canvas); }
+.ab.sb-ab[data-ae="dystopian-luxury"].sb-kit .sb-k-callout > .sb-ico { color: var(--ab-dl-ink); }
+.ab.sb-ab[data-ae="dystopian-luxury"].sb-kit .sb-k-callout b { margin-bottom: 2px; font: 400 var(--k-footnote, 13px) / var(--k-footnote-lh, 18px) var(--dl-mono); letter-spacing: 0.04em; text-transform: uppercase; }
+/* badges and tags: square catalogue labels */
+.ab.sb-ab[data-ae="dystopian-luxury"].sb-kit :is(.sb-k-badge, .sb-k-count) { border-radius: 0; font: 400 var(--k-caption, 12px) / var(--k-caption-lh, 16px) var(--dl-mono); letter-spacing: 0.04em; text-transform: uppercase; }
+.ab.sb-ab[data-ae="dystopian-luxury"].sb-kit .sb-k-count:not(.is-accent) { background: none; box-shadow: inset 0 0 0 1px var(--ab-dl-hair); }
+.ab.sb-ab[data-ae="dystopian-luxury"].sb-kit .ab-fit { display: inline-flex; align-items: center; min-height: 22px; padding: 0 9px; font-size: var(--k-caption, 12px); line-height: var(--k-caption-lh, 16px); }
+.ab.sb-ab[data-ae="dystopian-luxury"].sb-kit .sb-badge { width: 6px; height: 6px; border-radius: 0; }
+/* progress and slider: a square ink bar on a hairline track */
+.ab.sb-ab[data-ae="dystopian-luxury"].sb-kit .ab-row-bar.sb-k-bar { height: 4px !important; background: var(--ab-dl-hair); }
+.ab.sb-ab[data-ae="dystopian-luxury"].sb-kit .ab-row-bar.sb-k-bar i { height: 100%; }
+.ab.sb-ab[data-ae="dystopian-luxury"].sb-kit .sb-k-range::-webkit-slider-runnable-track { height: 2px; border-radius: 0; background: linear-gradient(90deg, var(--ab-dl-ink) var(--v, 50%), var(--ab-dl-hair) var(--v, 50%)); }
+.ab.sb-ab[data-ae="dystopian-luxury"].sb-kit .sb-k-range::-webkit-slider-thumb { width: 20px; height: 20px; margin-top: -9px; border-radius: 0; border: 1px solid var(--ab-dl-ink); background: var(--ab-canvas); box-shadow: none; }
+.ab.sb-ab[data-ae="dystopian-luxury"].sb-kit .sb-k-range::-moz-range-track { height: 2px; border-radius: 0; background: linear-gradient(90deg, var(--ab-dl-ink) var(--v, 50%), var(--ab-dl-hair) var(--v, 50%)); }
+.ab.sb-ab[data-ae="dystopian-luxury"].sb-kit .sb-k-range::-moz-range-thumb { width: 20px; height: 20px; border-radius: 0; border: 1px solid var(--ab-dl-ink); background: var(--ab-canvas); box-shadow: none; }
+/* navigation: square markers; page dots square */
+.ab.sb-ab[data-ae="dystopian-luxury"].sb-kit .sb-tab[aria-current]::before { border-radius: 0; height: 2px; }
+.ab.sb-ab[data-ae="dystopian-luxury"].sb-kit .sb-dots i { border-radius: 0; width: 6px; height: 6px; }
+.ab.sb-ab[data-ae="dystopian-luxury"].sb-kit .sb-dots i.is-on { width: 18px; }
+/* flat surfaces: toast and sheet carry no shadow; the grab handle is a bar */
+.ab.sb-ab[data-ae="dystopian-luxury"].sb-kit .sb-k-toast { border-radius: 0; background: var(--ab-dl-ink); box-shadow: none; }
+.ab.sb-ab[data-ae="dystopian-luxury"].sb-kit .sb-k-toast button { font: 400 var(--k-footnote, 13px) / 1 var(--dl-mono); letter-spacing: 0.04em; text-transform: uppercase; }
+.ab.sb-ab[data-ae="dystopian-luxury"].sb-kit .sb-k-sheet { border-radius: 0; box-shadow: none; }
+.ab.sb-ab[data-ae="dystopian-luxury"].sb-kit .sb-k-grab { border-radius: 0; height: 3px; background: var(--ab-dl-hair); }
+
+/* ---- classic version (data-ae="dystopian-luxury--classic"): app screens and the UI kit ----
+   Kept here because css/aesthetics/classic/ is generated (dev/make-classic.js).
+   Severity through removal. Ink is the only colour that acts: selection, toggles, tabs, focus,
+   checks and badges are ink on near-white. The client primary appears once per screen, as the
+   fill of the one main action. Corners square, no tints, no pills, no shadows;
+   Courier Prime catalogue labels (accession numbers) are the signature, set on components. */
+.ab.sb-ab[data-ae="dystopian-luxury--classic"].sb-kit {
+  --ab-primary: var(--ab-dl-ink) !important; --ab-primary-text: var(--ab-dl-ink) !important; --ab-on-primary: var(--ab-canvas) !important;
+  --ab-accent: var(--ab-dl-ink) !important; --ab-accent-text: var(--ab-dl-ink) !important; --ab-on-accent: var(--ab-canvas) !important;
+  --ab-secondary: var(--ab-canvas) !important; --ab-on-secondary: var(--ab-dl-ink) !important;
+  --ab-pri-tint: var(--ab-dl-grey) !important;
+  --k-r: 0px;
+}
+/* primary: the classic keeps its one primary-filled action (the single mark per view);
+   pressed turns it ink instead of dimming it */
+.ab.sb-ab[data-ae="dystopian-luxury--classic"].sb-kit .ab-cta.sb-k-btn.sb-k-pressed { background: var(--ab-dl-ink); color: var(--ab-canvas); filter: none; transform: none; }
+/* secondary: the outlined label button, quieter than the primary */
+.ab.sb-ab[data-ae="dystopian-luxury--classic"].sb-kit .ab-type-apply.sb-k-btn2 { font-weight: 400; font-size: var(--k-subhead, 15px) !important; letter-spacing: 0.12em; }
+.ab.sb-ab[data-ae="dystopian-luxury--classic"].sb-kit .ab-type-apply.sb-k-pressed { background: var(--ab-dl-grey); color: var(--ab-dl-ink); filter: none; transform: none; }
+/* text buttons: ink, regular, underlined (no colour) */
+.ab.sb-ab[data-ae="dystopian-luxury--classic"].sb-kit .sb-k-textbtn { color: var(--ab-dl-ink); font-weight: 400; text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 4px; }
+.ab.sb-ab[data-ae="dystopian-luxury--classic"].sb-kit .sb-k-danger { font-weight: 400; }
+/* fields: the board's underline; focus thickens it, error turns it the danger colour; no rings */
+.ab.sb-ab[data-ae="dystopian-luxury--classic"].sb-kit :is(.sb-k-field, .sb-k-search).is-focus .ab-input { box-shadow: none !important; border-bottom-width: 2px; border-color: var(--ab-dl-ink) !important; }
+.ab.sb-ab[data-ae="dystopian-luxury--classic"].sb-kit .sb-k-field.is-error .ab-input { box-shadow: none !important; border-bottom-width: 2px; }
+.ab.sb-ab[data-ae="dystopian-luxury--classic"].sb-kit .sb-k-help.is-error::before { content: "ERROR\00a0\00a0"; font: 400 var(--k-caption, 12px) var(--dl-mono); letter-spacing: 0.04em; }
+.ab.sb-ab[data-ae="dystopian-luxury--classic"].sb-kit .sb-k-search .ab-input { padding-left: 30px !important; }
+.ab.sb-ab[data-ae="dystopian-luxury--classic"].sb-kit .sb-k-search > .sb-ico { left: 0; }
+.ab.sb-ab[data-ae="dystopian-luxury--classic"].sb-kit .sb-k-menu { border-color: var(--ab-dl-ink); box-shadow: none; }
+.ab.sb-ab[data-ae="dystopian-luxury--classic"].sb-kit .sb-k-menu li[aria-selected="true"] { font-weight: 400; }
+/* toggle rows read like the other rows: body type, the board's square X switch */
+.ab.sb-ab[data-ae="dystopian-luxury--classic"].sb-kit .ab-toggle > span { font: 400 var(--k-body, 17px) / var(--k-body-lh, 24px) var(--ab-font-b); letter-spacing: 0; text-transform: none; }
+/* segmented: square ink cells, 44pt tall, catalogue caps */
+.ab.sb-ab[data-ae="dystopian-luxury--classic"].sb-kit .ab-seg-btn { min-height: var(--k-tap, 44px) !important; font-size: var(--k-footnote, 13px) !important; line-height: var(--k-footnote-lh, 18px) !important; letter-spacing: 0.1em; }
+/* cards have no box here (a hairline top only), so their content keeps the screen margin */
+.ab.sb-ab[data-ae="dystopian-luxury--classic"].sb-kit .ab-card:is(.sb-k-card, .sb-home-card) { padding-left: 0 !important; padding-right: 0 !important; padding-bottom: 0 !important; }
+/* list rows: an accession number before the detail; leads are hairline squares */
+.ab.sb-ab[data-ae="dystopian-luxury--classic"].sb-kit .sb-k-list { counter-reset: dlk; }
+.ab.sb-ab[data-ae="dystopian-luxury--classic"].sb-kit .sb-k-row { counter-increment: dlk; }
+.ab.sb-ab[data-ae="dystopian-luxury--classic"].sb-kit .sb-k-sub::before { content: "2026.114." counter(dlk) "\00a0 "; font: 400 11px var(--dl-mono); letter-spacing: 0; color: var(--k-muted); }
+.ab.sb-ab[data-ae="dystopian-luxury--classic"].sb-kit :is(.sb-k-ico, .sb-k-emptyico) { border-radius: 0; background: none; color: var(--ab-dl-ink); box-shadow: inset 0 0 0 1px var(--ab-dl-hair); }
+.ab.sb-ab[data-ae="dystopian-luxury--classic"].sb-kit .sb-k-av { border-radius: 0; background: var(--ab-canvas); color: var(--ab-dl-ink); box-shadow: inset 0 0 0 1px var(--ab-dl-ink); font-family: var(--dl-mono); font-weight: 400; letter-spacing: 0.02em; }
+.ab.sb-ab[data-ae="dystopian-luxury--classic"].sb-kit .sb-k-avs { padding-left: 1px; }
+.ab.sb-ab[data-ae="dystopian-luxury--classic"].sb-kit .sb-k-avs .sb-k-av { margin-left: -1px; box-shadow: inset 0 0 0 1px var(--ab-dl-ink); }
+/* callouts: a blank label with an ink rule at the left; the icon and the catalogue-caps title
+   tell the kinds apart (no status hues: ink is the only colour that acts) */
+.ab.sb-ab[data-ae="dystopian-luxury--classic"].sb-kit .sb-k-callout { --tone: var(--ab-dl-ink); --tone-ico: var(--ab-dl-ink); border: 1px solid var(--ab-dl-hair); border-left: 2px solid var(--ab-dl-ink); background: var(--ab-canvas); }
+.ab.sb-ab[data-ae="dystopian-luxury--classic"].sb-kit .sb-k-callout > .sb-ico { color: var(--ab-dl-ink); }
+.ab.sb-ab[data-ae="dystopian-luxury--classic"].sb-kit .sb-k-callout b { margin-bottom: 2px; font: 400 var(--k-footnote, 13px) / var(--k-footnote-lh, 18px) var(--dl-mono); letter-spacing: 0.04em; text-transform: uppercase; }
+/* badges and tags: square catalogue labels */
+.ab.sb-ab[data-ae="dystopian-luxury--classic"].sb-kit :is(.sb-k-badge, .sb-k-count) { border-radius: 0; font: 400 var(--k-caption, 12px) / var(--k-caption-lh, 16px) var(--dl-mono); letter-spacing: 0.04em; text-transform: uppercase; }
+.ab.sb-ab[data-ae="dystopian-luxury--classic"].sb-kit .sb-k-count:not(.is-accent) { background: none; box-shadow: inset 0 0 0 1px var(--ab-dl-hair); }
+.ab.sb-ab[data-ae="dystopian-luxury--classic"].sb-kit .ab-fit { display: inline-flex; align-items: center; min-height: 22px; padding: 0 9px; font-size: var(--k-caption, 12px); line-height: var(--k-caption-lh, 16px); }
+.ab.sb-ab[data-ae="dystopian-luxury--classic"].sb-kit .sb-badge { width: 6px; height: 6px; border-radius: 0; }
+/* progress and slider: a square ink bar on a hairline track */
+.ab.sb-ab[data-ae="dystopian-luxury--classic"].sb-kit .ab-row-bar.sb-k-bar { height: 4px !important; background: var(--ab-dl-hair); }
+.ab.sb-ab[data-ae="dystopian-luxury--classic"].sb-kit .ab-row-bar.sb-k-bar i { height: 100%; }
+.ab.sb-ab[data-ae="dystopian-luxury--classic"].sb-kit .ab-row-bar.sb-k-bar i::after { display: none; }
+.ab.sb-ab[data-ae="dystopian-luxury--classic"].sb-kit .sb-k-range::-webkit-slider-runnable-track { height: 2px; border-radius: 0; background: linear-gradient(90deg, var(--ab-dl-ink) var(--v, 50%), var(--ab-dl-hair) var(--v, 50%)); }
+.ab.sb-ab[data-ae="dystopian-luxury--classic"].sb-kit .sb-k-range::-webkit-slider-thumb { width: 20px; height: 20px; margin-top: -9px; border-radius: 0; border: 1px solid var(--ab-dl-ink); background: var(--ab-canvas); box-shadow: none; }
+.ab.sb-ab[data-ae="dystopian-luxury--classic"].sb-kit .sb-k-range::-moz-range-track { height: 2px; border-radius: 0; background: linear-gradient(90deg, var(--ab-dl-ink) var(--v, 50%), var(--ab-dl-hair) var(--v, 50%)); }
+.ab.sb-ab[data-ae="dystopian-luxury--classic"].sb-kit .sb-k-range::-moz-range-thumb { width: 20px; height: 20px; border-radius: 0; border: 1px solid var(--ab-dl-ink); background: var(--ab-canvas); box-shadow: none; }
+/* navigation: square markers; page dots square */
+.ab.sb-ab[data-ae="dystopian-luxury--classic"].sb-kit .sb-tab[aria-current]::before { border-radius: 0; height: 2px; }
+.ab.sb-ab[data-ae="dystopian-luxury--classic"].sb-kit .sb-dots i { border-radius: 0; width: 6px; height: 6px; }
+.ab.sb-ab[data-ae="dystopian-luxury--classic"].sb-kit .sb-dots i.is-on { width: 18px; }
+/* flat surfaces: toast and sheet carry no shadow; the grab handle is a bar */
+.ab.sb-ab[data-ae="dystopian-luxury--classic"].sb-kit .sb-k-toast { border-radius: 0; background: var(--ab-dl-ink); box-shadow: none; }
+.ab.sb-ab[data-ae="dystopian-luxury--classic"].sb-kit .sb-k-toast button { font: 400 var(--k-footnote, 13px) / 1 var(--dl-mono); letter-spacing: 0.04em; text-transform: uppercase; }
+.ab.sb-ab[data-ae="dystopian-luxury--classic"].sb-kit .sb-k-sheet { border-radius: 0; box-shadow: none; }
+.ab.sb-ab[data-ae="dystopian-luxury--classic"].sb-kit .sb-k-grab { border-radius: 0; height: 3px; background: var(--ab-dl-hair); }
+/* the headline's highlight stripe is ink here: the main action already carries the one primary */
+.ab.sb-ab[data-ae="dystopian-luxury--classic"].sb-kit .ab-hl { text-decoration-color: var(--ab-dl-ink); }

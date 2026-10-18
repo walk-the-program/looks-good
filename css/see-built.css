@@ -86,10 +86,13 @@
 
 /* Both roots: --sb-r (corner radius), --sb-ui-* (the aesthetic's button lettering) are
    read from the root's own CTA by js/see-built.js, so token-styled pieces match it. */
-:is(.ab.sb-ab, .sb-gen) { --sb-danger: #c62f2f; --sb-danger-line: rgba(198, 47, 47, 0.35); }
+/* Destructive / error colour. Branded roots get it from the palette at render (js/see-built.js
+   kitColours, js/ui-kit.js uiKitDanger): the palette's reddish colour, or the ink with
+   data-sb-danger="ink". These defaults stay only for the generic "before" app. */
+:is(.ab.sb-ab, .sb-gen) { --sb-danger: #c62f2f; --sb-danger-line: rgba(198, 47, 47, 0.35); --sb-danger-on: #fff; }
 /* danger as text: pulled toward the ink so it holds 4.5:1 on any canvas, light or dark */
 :is(.ab.sb-ab, .sb-gen) { --sb-danger-text: color-mix(in srgb, var(--sb-danger) 62%, var(--ab-ink, #111)); }
-:is(.ab.sb-ab, .sb-gen)[data-mode="dark"] { --sb-danger: #ff7b72; --sb-danger-line: rgba(255, 123, 114, 0.4); }
+:is(.ab.sb-ab, .sb-gen)[data-mode="dark"] { --sb-danger: #ff7b72; --sb-danger-line: rgba(255, 123, 114, 0.4); --sb-danger-on: #1a0505; }
 :is(.ab.sb-ab, .sb-gen) .sb-ico { display: block; flex: none; }
 :is(.ab.sb-ab, .sb-gen) :is(button, a) { -webkit-tap-highlight-color: transparent; }
 .ab.sb-ab.sb-window { min-height: 100%; }
@@ -197,6 +200,14 @@
 .sb-links a:hover { opacity: 1; text-decoration: underline; text-underline-offset: 4px; }
 :is(.ab.sb-ab, .sb-gen) .ab-type-apply.sb-signin { flex: none; padding: 8px 14px; }
 .sb-hero-act { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin-top: clamp(20px, 3cqw, 30px); }
+/* The hero shows the product: the Home phone (js/see-built.js heroShot), a scaled 390 x 844 kit
+   screen on a soft field of the brand primary. No board art on the landing page. */
+:is(.ab.sb-ab, .sb-gen) .sb-lhero-shot {
+  --sb-phone-scale: 0.56; position: relative; display: grid; place-items: center; align-self: center; justify-self: stretch; min-width: min(100%, 240px); overflow: hidden;
+  padding: clamp(20px, 3cqw, 36px) 16px; border-radius: min(var(--sb-r, 16px), 24px);
+  background: radial-gradient(120% 90% at 50% 0%, color-mix(in srgb, var(--ab-primary) 16%, var(--ab-canvas)), color-mix(in srgb, var(--ab-primary) 5%, var(--ab-canvas)));
+}
+:is(.ab.sb-ab, .sb-gen) .sb-lhero-shot .sb-phone-frame { box-shadow: inset 0 0 0 2.5px #2c2c2e, 0 1px 2px rgba(0, 0, 0, 0.06), 0 24px 48px -24px rgba(0, 0, 0, 0.3); }
 .sb-proof { display: flex; align-items: center; gap: 8px; margin: 18px 0 0 !important; font-family: var(--ab-font-label, var(--ab-font-ui)); font-size: 12px; color: color-mix(in srgb, var(--ab-ink) 28%, var(--ab-muted)); }
 .sb-proof .sb-ico { color: var(--ab-primary-text); }
 .sb-features { padding: clamp(26px, 4cqw, 40px) 0 clamp(8px, 1.5cqw, 14px); }
@@ -251,8 +262,11 @@
   background: transparent; color: var(--sb-danger-text, var(--sb-danger)); font-family: var(--sb-ui-ff, var(--ab-font-ui)); font-size: 13px; font-weight: 600;
   text-transform: var(--sb-ui-tt, none); letter-spacing: var(--sb-ui-ls, 0); white-space: nowrap;
 }
-.sb-danger-btn.is-solid { background: var(--sb-danger); color: #fff; }
-:is(.ab.sb-ab, .sb-gen)[data-mode="dark"] .sb-danger-btn.is-solid { color: #1a0505; }
+.sb-danger-btn.is-solid { background: var(--sb-danger); color: var(--sb-danger-on, #fff); }
+/* No reddish colour in the palette: destructive actions are outlines with an ink label. */
+[data-sb-danger="ink"] .sb-danger-btn, [data-sb-danger="ink"] .sb-danger-btn.is-solid { border: 1.5px solid var(--ab-ink); background: transparent; color: var(--ab-ink); }
+[data-sb-danger="ink"] .sb-danger-box { border-color: var(--ab-line); background: transparent; }
+[data-sb-danger="ink"] .sb-danger-row + .sb-danger-row { border-top-color: var(--ab-line); }
 .sb-danger-btn[data-armed] { outline: 2px solid var(--sb-danger); outline-offset: 2px; }
 .sb-danger-btn:focus-visible { outline: 2px solid var(--ab-ink); outline-offset: 2px; }
 .sb-danger-note { margin: 0 0 12px !important; font-size: 12px; color: color-mix(in srgb, var(--ab-ink) 28%, var(--ab-muted)); }
@@ -310,7 +324,7 @@
 .sb-ob-list { margin-top: var(--k-gap, 28px); }
 .sb-dots { display: flex; justify-content: center; gap: 8px; margin: 24px 0; }
 .sb-dots i { width: 7px; height: 7px; border-radius: 4px; background: var(--ab-line); }
-.sb-dots i.is-on { width: 20px; background: var(--ab-primary-text); }
+.sb-dots i.is-on { width: 20px; background: var(--k-pri-text, var(--ab-primary-text)); }
 .sb-ob-actions { display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; }
 
 /* Home: large-title greeting, one card, a section of rows, the tab bar. */
@@ -336,20 +350,28 @@
    which always holds contrast; the primary as text did not on some dark grounds. */
 .sb-tab[aria-current] { color: var(--ab-ink); font-weight: 600; }
 .sb-tab[aria-current]::before { content: ""; position: absolute; bottom: 0; left: 50%; width: 16px; margin-left: -8px; height: 3px; border-radius: 3px; background: var(--ab-primary); }
-.sb-tab[aria-current] > .sb-ico { color: var(--ab-primary-text, var(--ab-primary)); }
+.sb-tab[aria-current] > .sb-ico { color: var(--k-pri-text, var(--ab-primary-text, var(--ab-primary))); }
 .sb-tab:focus-visible { outline: 2px solid var(--ab-ink); outline-offset: -2px; }
 
 /* ---- the kit: components shared by the UI kit tab and the phone screens ----
    Scope: a root with .sb-kit (phone screens, the UI kit page). The aesthetic draws each
    component (colour, faces, edges, corners, shadow); sizes here are UI_KIT_PHONE's and
    win over an aesthetic's own sizes (!important), never its look. */
+.sb-k-mid { margin: 0 0.12em; }
+/* Muted text and the picked-row tint resolve per surface: re-declared on cards, panels and lists, so a
+   card on its own ground (paper, a terminal screen) that redefines --ab-ink / --ab-muted gets its own. */
+:is(.ab.sb-ab, .sb-gen).sb-kit :is(.ab-card, .ab-panel, .ab-list) { --k-muted: color-mix(in srgb, var(--ab-ink) 28%, var(--ab-muted)); --k-picked: color-mix(in srgb, var(--ab-primary) 12%, transparent); }
+:is(.ab.sb-ab, .sb-gen).sb-kit .ab-row.sb-k-row.is-picked { background-color: var(--k-picked, var(--ab-pri-tint)); }
 :is(.ab.sb-ab, .sb-gen).sb-kit {
+  /* hooks a style may set: --k-list-box (card | open), --k-callout-fill (12%), --k-callout-r,
+     --k-callout-edge-w (1px), --k-callout-shadow (none), --k-sheet-r, --k-sheet-shadow.
+     Callout and sheet corners default to the style's card corner (--sb-card-r, read at render). */
   --k-ui: var(--sb-ui-ff, var(--ab-font-ui, var(--ab-font-b)));
   --k-muted: color-mix(in srgb, var(--ab-ink) 28%, var(--ab-muted));
   --k-r: min(var(--sb-r, 12px), 16px);
-  --k-ok: #2f8f5b; --k-warn: #b7791f;
 }
-:is(.ab.sb-ab, .sb-gen).sb-kit[data-mode="dark"] { --k-ok: #5fd08f; --k-warn: #f0b44c; }
+/* Generic "before" app keeps stock status hues; branded roots get palette tones from kitColours(). */
+.sb-gen.sb-kit { --k-ok: #2f8f5b; --k-warn: #b7791f; --k-err: var(--sb-danger); }
 :is(.ab.sb-ab, .sb-gen).sb-kit .ab-kicker { font-size: var(--k-footnote, 13px) !important; line-height: var(--k-footnote-lh, 18px) !important; }
 /* buttons */
 :is(.ab.sb-ab, .sb-gen).sb-kit :is(.ab-cta.sb-k-btn, .ab-type-apply.sb-k-btn2) {
@@ -361,21 +383,37 @@
 /* The arrow keeps its size; the label takes the rest and wraps between words, never inside one. */
 :is(.ab.sb-ab, .sb-gen).sb-kit .ab-cta.sb-k-btn .ab-cta-arrow { flex: none; }
 :is(.ab.sb-ab, .sb-gen).sb-kit .ab-type-apply.sb-k-btn2.sb-k-auto { width: auto; padding-left: 20px !important; padding-right: 20px !important; }
-:is(.ab.sb-ab, .sb-gen).sb-kit .sb-k-pressed { filter: brightness(0.88) saturate(1.05); transform: translateY(1px) scale(0.985); }
-:is(.ab.sb-ab, .sb-gen).sb-kit :is(.sb-k-btn, .sb-k-btn2, .sb-k-textbtn, .sb-k-danger, .sb-k-iconbtn):disabled { opacity: 0.42; cursor: not-allowed; filter: grayscale(0.3); }
+/* Pressed and disabled change no transform, filter or opacity on the button itself (those would lift a
+   style's ::before / ::after offset layers above it): pressed is a 7% ink veil over the fill (an inset
+   shadow paints above the background, under the label); disabled veils the fill with the canvas and
+   sets the label in the muted ink. A style's own .is-pressed / :disabled rules win on specificity. */
+:is(.ab.sb-ab, .sb-gen).sb-kit .sb-k-pressed { box-shadow: inset 0 0 0 100vmax color-mix(in srgb, var(--ab-ink) 7%, transparent); }
+:is(.ab.sb-ab, .sb-gen).sb-kit :is(.sb-k-btn, .sb-k-btn2, .sb-k-textbtn, .sb-k-danger, .sb-k-iconbtn):disabled {
+  cursor: not-allowed; color: var(--k-muted) !important; box-shadow: inset 0 0 0 100vmax color-mix(in srgb, var(--ab-canvas) 58%, transparent) !important;
+}
+:is(.ab.sb-ab, .sb-gen).sb-kit :is(.sb-k-btn, .sb-k-btn2):disabled * { color: inherit !important; }
 .sb-k-textbtn {
   min-height: var(--k-tap, 44px); padding: 0 4px; border: 0; background: none; cursor: pointer;
   font-family: var(--k-ui); font-size: var(--k-headline, 17px); line-height: var(--k-headline-lh, 22px); font-weight: 600;
-  color: var(--ab-primary-text, var(--ab-ink)); text-transform: var(--sb-ui-tt, none); letter-spacing: var(--sb-ui-ls, 0); white-space: nowrap;
+  color: var(--k-pri-text, var(--ab-primary-text, var(--ab-ink))); text-transform: var(--sb-ui-tt, none); letter-spacing: var(--sb-ui-ls, 0); white-space: nowrap;
 }
-:is(.ab.sb-ab, .sb-gen).sb-kit .sb-k-textbtn.sb-k-pressed { opacity: 0.5; filter: none; transform: none; }
+:is(.ab.sb-ab, .sb-gen).sb-kit .sb-k-textbtn.sb-k-pressed { box-shadow: none; color: var(--k-muted); }
 .sb-k-danger {
   width: 100%; min-height: var(--k-btn, 52px); padding: 0 20px; cursor: pointer;
-  border: 1px solid var(--sb-danger); border-radius: min(var(--sb-r, 10px), 999px); background: var(--sb-danger); color: #fff;
+  border: 1px solid var(--sb-danger); border-radius: min(var(--sb-r, 10px), 999px); background: var(--sb-danger); color: var(--sb-danger-on, #fff);
   font-family: var(--k-ui); font-size: var(--k-headline, 17px); font-weight: 600; text-transform: var(--sb-ui-tt, none); letter-spacing: var(--sb-ui-ls, 0);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04), 0 6px 16px -8px color-mix(in srgb, var(--sb-danger) 35%, transparent);
 }
-:is(.ab.sb-ab, .sb-gen)[data-mode="dark"] .sb-k-danger { color: #1a0505; }
-:is(.ab.sb-ab, .sb-gen).sb-kit .ab-type-apply.sb-k-iconbtn { width: var(--k-tap, 44px); height: var(--k-tap, 44px); padding: 0 !important; }
+/* No reddish colour in the palette: an outline button with an ink label; the label and the
+   confirmation sheet carry the meaning. */
+:is(.ab.sb-ab, .sb-gen)[data-sb-danger="ink"] .sb-k-danger { border: 1.5px solid var(--ab-ink); background: transparent; color: var(--ab-ink); box-shadow: none; }
+:is(.ab.sb-ab, .sb-gen)[data-sb-danger="ink"].sb-kit .sb-k-danger.sb-k-pressed { background: color-mix(in srgb, var(--ab-ink) 8%, transparent); }
+/* The reddish colour is the primary: an outline in that colour, so destructive never looks like the
+   main action (kitColours sets data-sb-danger="line"). */
+:is(.ab.sb-ab, .sb-gen)[data-sb-danger="line"] .sb-k-danger { border: 1.5px solid var(--sb-danger); background: transparent; color: var(--sb-danger-text, var(--sb-danger)); box-shadow: none; }
+:is(.ab.sb-ab, .sb-gen)[data-sb-danger="line"].sb-kit .sb-k-danger.sb-k-pressed { background: color-mix(in srgb, var(--sb-danger) 10%, transparent); }
+[data-sb-danger="line"] .sb-danger-btn.is-solid { background: transparent; color: var(--sb-danger-text, var(--sb-danger)); }
+:is(.ab.sb-ab, .sb-gen).sb-kit .ab-type-apply.sb-k-iconbtn { box-sizing: border-box; width: var(--k-tap, 44px); height: var(--k-tap, 44px); min-width: var(--k-tap, 44px) !important; min-height: var(--k-tap, 44px) !important; padding: 0 !important; }
 .sb-k-plain { display: grid; place-items: center; width: var(--k-tap, 44px); height: var(--k-tap, 44px); padding: 0; border: 0; background: none; color: var(--ab-ink); cursor: pointer; }
 /* inputs */
 :is(.ab.sb-ab, .sb-gen).sb-kit .sb-k-field .ab-fieldlabel, :is(.ab.sb-ab, .sb-gen).sb-kit .sb-k-selectwrap .ab-fieldlabel { margin: 0 0 8px !important; font-size: var(--k-footnote, 13px) !important; line-height: var(--k-footnote-lh, 18px) !important; }
@@ -384,9 +422,14 @@
   font-size: var(--k-body, 17px) !important; line-height: normal;
 }
 :is(.ab.sb-ab, .sb-gen).sb-kit .sb-k-field.is-focus .ab-input, :is(.ab.sb-ab, .sb-gen).sb-kit .sb-k-search.is-focus .ab-input {
-  border-color: var(--ab-primary-text) !important; box-shadow: 0 0 0 3px color-mix(in srgb, var(--ab-primary) 24%, transparent) !important;
+  border-color: var(--k-pri-text, var(--ab-primary-text)) !important; box-shadow: 0 0 0 3px color-mix(in srgb, var(--ab-primary) 24%, transparent) !important;
 }
 :is(.ab.sb-ab, .sb-gen).sb-kit .sb-k-field.is-error .ab-input { border-color: var(--sb-danger) !important; box-shadow: 0 0 0 3px color-mix(in srgb, var(--sb-danger) 18%, transparent) !important; }
+/* Fields drawn as an underline (data-k-field="line", kitColours) keep their shape: focus and error
+   thicken the underline instead of drawing a box around a value that sits on the field's edge. */
+:is(.ab.sb-ab, .sb-gen)[data-k-field="line"].sb-kit :is(.sb-k-field, .sb-k-search).is-focus .ab-input { box-shadow: inset 0 -1px 0 var(--k-pri-text, var(--ab-primary-text)) !important; }
+:is(.ab.sb-ab, .sb-gen)[data-k-field="line"].sb-kit .sb-k-field.is-error .ab-input { box-shadow: inset 0 -1px 0 var(--sb-danger) !important; }
+[data-sb-danger="ink"][data-k-field="box"].sb-kit .sb-k-field.is-error .ab-input { border-width: 2px !important; }
 :is(.ab.sb-ab, .sb-gen).sb-kit .sb-k-field .ab-input:disabled { opacity: 0.5; cursor: not-allowed; }
 .sb-k-help { margin: 6px 0 0 !important; font-family: var(--ab-font-b); font-size: var(--k-footnote, 13px); line-height: var(--k-footnote-lh, 18px); color: var(--k-muted); }
 .sb-k-help.is-error { color: var(--sb-danger-text, var(--sb-danger)); }
@@ -397,15 +440,15 @@
 :is(.ab.sb-ab, .sb-gen).sb-kit .ab-input.sb-k-select { display: flex !important; align-items: center; justify-content: space-between; gap: 10px; width: 100%; text-align: left; cursor: pointer; }
 .sb-k-menu {
   list-style: none; margin: 6px 0 0 !important; padding: 6px; border: 1px solid var(--ab-line); border-radius: var(--k-r); background: var(--ab-canvas); color: var(--ab-ink);
-  box-shadow: 0 14px 34px -14px rgba(0, 0, 0, 0.35);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04), 0 10px 24px -10px rgba(0, 0, 0, 0.16);
 }
 .sb-k-menu li { display: flex; align-items: center; justify-content: space-between; gap: 10px; min-height: var(--k-tap, 44px); padding: 0 12px; border-radius: max(calc(var(--k-r) - 4px), 0px); font-family: var(--ab-font-ui); font-size: var(--k-body, 17px); }
 .sb-k-menu li[aria-selected="true"] { background: var(--ab-pri-tint); font-weight: 600; }
-.sb-k-menu .sb-ico { color: var(--ab-primary-text); }
+.sb-k-menu .sb-ico { color: var(--k-pri-on-tint, var(--ab-primary-text)); }
 .sb-k-check { display: flex; align-items: center; gap: 12px; min-height: var(--k-tap, 44px); font-family: var(--ab-font-ui); font-size: var(--k-body, 17px); line-height: var(--k-body-lh, 24px); cursor: pointer; }
 .sb-k-box {
   appearance: none; -webkit-appearance: none; position: relative; flex: none; display: grid; place-items: center; width: 24px; height: 24px; margin: 0; cursor: pointer;
-  border: 1.5px solid color-mix(in srgb, var(--ab-ink) 45%, transparent); border-radius: min(var(--sb-r, 6px), 7px); background: transparent;
+  border: 1.5px solid color-mix(in srgb, var(--ab-ink) 72%, transparent); border-radius: min(var(--sb-r, 6px), 7px); background: transparent;
 }
 .sb-k-box[type="radio"] { border-radius: 50%; }
 .sb-k-box:checked { background: var(--ab-primary); border-color: var(--ab-primary); }
@@ -414,16 +457,16 @@
 .sb-k-box:focus-visible { outline: 2px solid var(--ab-ink); outline-offset: 2px; }
 :is(.ab.sb-ab, .sb-gen).sb-kit .ab-toggle.sb-tog { width: 100%; font-size: var(--k-body, 17px) !important; line-height: var(--k-body-lh, 24px); }
 :is(.ab.sb-ab, .sb-gen).sb-kit .ab-seg { width: 100%; }
-:is(.ab.sb-ab, .sb-gen).sb-kit .ab-seg-btn { min-height: 36px !important; font-size: var(--k-subhead, 15px) !important; line-height: var(--k-subhead-lh, 20px) !important; white-space: nowrap; }
+:is(.ab.sb-ab, .sb-gen).sb-kit .ab-seg-btn { min-height: var(--k-tap, 44px) !important; font-size: var(--k-subhead, 15px) !important; line-height: var(--k-subhead-lh, 20px) !important; white-space: nowrap; }
 .sb-k-slider, .sb-k-progress { width: 100%; }
 .sb-k-slider-h { display: flex; justify-content: space-between; gap: 12px; margin-bottom: 8px; font-family: var(--ab-font-ui); font-size: var(--k-subhead, 15px); line-height: var(--k-subhead-lh, 20px); }
 .sb-k-slider-h span:last-child { color: var(--k-muted); font-variant-numeric: tabular-nums; }
-.sb-k-range { -webkit-appearance: none; appearance: none; display: block; width: 100%; height: 28px; margin: 0; background: transparent; cursor: pointer; }
-.sb-k-range::-webkit-slider-runnable-track { height: 4px; border-radius: 2px; background: linear-gradient(90deg, var(--ab-primary) var(--v, 50%), var(--ab-line) var(--v, 50%)); }
-.sb-k-range::-moz-range-track { height: 4px; border-radius: 2px; background: linear-gradient(90deg, var(--ab-primary) var(--v, 50%), var(--ab-line) var(--v, 50%)); }
-.sb-k-range::-webkit-slider-thumb { -webkit-appearance: none; width: 26px; height: 26px; margin-top: -11px; border-radius: 50%; background: var(--ab-canvas); border: 1px solid var(--ab-line); box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25); }
-.sb-k-range::-moz-range-thumb { width: 26px; height: 26px; border-radius: 50%; background: var(--ab-canvas); border: 1px solid var(--ab-line); box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25); }
-.sb-k-range:focus-visible { outline: 2px solid var(--ab-ink); outline-offset: 4px; }
+:is(.ab.sb-ab, .sb-gen) input[type="range"].sb-k-range { -webkit-appearance: none; appearance: none; display: block; width: 100%; height: 28px; margin: 0; background: transparent; cursor: pointer; }
+:is(.ab.sb-ab, .sb-gen) input[type="range"].sb-k-range::-webkit-slider-runnable-track { height: 4px; border-radius: 2px; background: linear-gradient(90deg, var(--ab-primary) var(--v, 50%), color-mix(in srgb, var(--ab-ink) 16%, transparent) var(--v, 50%)); }
+:is(.ab.sb-ab, .sb-gen) input[type="range"].sb-k-range::-moz-range-track { height: 4px; border-radius: 2px; background: linear-gradient(90deg, var(--ab-primary) var(--v, 50%), color-mix(in srgb, var(--ab-ink) 16%, transparent) var(--v, 50%)); }
+:is(.ab.sb-ab, .sb-gen) input[type="range"].sb-k-range::-webkit-slider-thumb { -webkit-appearance: none; width: 28px; height: 28px; margin-top: -12px; border-radius: 50%; background: var(--ab-canvas); border: 1px solid color-mix(in srgb, var(--ab-ink) 14%, transparent); box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06), 0 3px 8px -2px rgba(0, 0, 0, 0.16); transform: none; }
+:is(.ab.sb-ab, .sb-gen) input[type="range"].sb-k-range::-moz-range-thumb { width: 28px; height: 28px; border-radius: 50%; background: var(--ab-canvas); border: 1px solid color-mix(in srgb, var(--ab-ink) 14%, transparent); box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06), 0 3px 8px -2px rgba(0, 0, 0, 0.16); transform: none; }
+:is(.ab.sb-ab, .sb-gen) input[type="range"].sb-k-range:focus-visible { outline: 2px solid var(--ab-ink); outline-offset: 4px; }
 /* containers */
 :is(.ab.sb-ab, .sb-gen).sb-kit .ab-card.sb-k-card { display: block; width: 100%; margin: 0; padding-left: var(--k-cardpad, 20px) !important; padding-right: var(--k-cardpad, 20px) !important; padding-bottom: var(--k-cardpad, 20px) !important; }
 :is(.ab.sb-ab, .sb-gen).sb-kit .sb-k-card .ab-seg { margin: 0 !important; }
@@ -436,29 +479,49 @@
 :is(.ab.sb-ab, .sb-gen).sb-kit .ab-list.sb-k-list { display: block !important; width: 100%; margin: 0; padding: 0; list-style: none; }
 :is(.ab.sb-ab, .sb-gen).sb-kit .ab-row.sb-k-row {
   display: grid !important; grid-template-columns: auto minmax(0, 1fr) auto !important; grid-template-rows: auto !important; align-items: center; gap: 0 14px !important;
-  min-height: var(--k-row, 52px) !important; height: auto !important; padding: 8px 4px !important; aspect-ratio: auto !important;
+  min-height: var(--k-row, 52px) !important; height: auto !important; padding: 8px 16px !important; aspect-ratio: auto !important;
   font-size: var(--k-body, 17px) !important; line-height: var(--k-body-lh, 24px) !important;
 }
 :is(.ab.sb-ab, .sb-gen).sb-kit .sb-k-row > * { grid-row: 1 !important; grid-column: auto !important; position: static !important; }
+/* Grouped rows sit 16pt in from their card (lead icon or avatar included). An open list (no box:
+   rows and rules on the canvas, js/see-built.js kitLists) keeps its text on the screen margin; a
+   picked row there bleeds its tint 16pt past the text instead of moving it. */
+:is(.ab.sb-ab, .sb-gen).sb-kit .sb-k-list.is-open > .ab-row.sb-k-row { padding-left: 0 !important; padding-right: 0 !important; }
+:is(.ab.sb-ab, .sb-gen).sb-kit .sb-k-list.is-open > .ab-row.sb-k-row.is-picked { margin: 0 -16px !important; padding-left: 16px !important; padding-right: 16px !important; }
+/* In a card, the section label above takes the rows' inset, and a rule between rows starts at
+   the text: kitLists moves the row's own rule (--k-dv) to an inset line (--k-dv-x). */
+:is(.ab.sb-ab, .sb-gen).sb-kit .ab-labelrow.sb-k-section.is-inset { padding-left: var(--k-inset, 16px) !important; padding-right: var(--k-inset, 16px) !important; }
+:is(.ab.sb-ab, .sb-gen).sb-kit .ab-row.sb-k-row.sb-k-dv { position: relative !important; }
+:is(.ab.sb-ab, .sb-gen).sb-kit .ab-row.sb-k-row.sb-k-dv-top { border-top-color: transparent !important; }
+:is(.ab.sb-ab, .sb-gen).sb-kit .ab-row.sb-k-row.sb-k-dv-bottom { border-bottom-color: transparent !important; }
+:is(.ab.sb-ab, .sb-gen).sb-kit .ab-row.sb-k-row.sb-k-dv::after { content: ""; position: absolute; left: var(--k-dv-x, 16px); right: 0; height: 0; border-top: var(--k-dv); pointer-events: none; }
+:is(.ab.sb-ab, .sb-gen).sb-kit .ab-row.sb-k-row.sb-k-dv-top::after { top: calc(-1 * var(--k-dv-w, 1px)); }
+:is(.ab.sb-ab, .sb-gen).sb-kit .ab-row.sb-k-row.sb-k-dv-bottom::after { bottom: calc(-1 * var(--k-dv-w, 1px)); }
 .sb-k-lead { display: grid; place-items: center; }
-.sb-k-ico { display: grid; place-items: center; width: 32px; height: 32px; border-radius: min(var(--sb-r, 8px), 10px); background: var(--ab-pri-tint); color: var(--ab-primary-text); }
+.sb-k-ico { display: grid; place-items: center; width: 32px; height: 32px; border-radius: min(var(--sb-r, 8px), 10px); background: var(--ab-pri-tint); color: var(--k-pri-on-tint, var(--ab-primary-text)); }
 .sb-k-text { display: grid; min-width: 0; }
 .sb-k-title { min-width: 0; font-weight: 500; overflow-wrap: normal; }
 .sb-k-sub { font-family: var(--ab-font-b); font-size: var(--k-footnote, 13px); line-height: var(--k-footnote-lh, 18px); color: var(--k-muted); }
 .sb-k-trail { display: flex; align-items: center; gap: 4px; font-size: var(--k-subhead, 15px); color: var(--k-muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
+/* Callouts are tints of palette colours (info primary, success secondary, warning accent, error the
+   palette's reddish colour or the ink with a strong edge); the icon and the label word carry the
+   meaning. --k-*-ico is the tone shaded to 3:1 on the canvas (kitColours). */
 .sb-k-callout {
-  --tone: var(--ab-primary-text); display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 12px; width: 100%; padding: 14px 16px;
-  border: 1px solid color-mix(in srgb, var(--tone) 38%, transparent); border-radius: var(--k-r); background: color-mix(in srgb, var(--tone) 9%, var(--ab-canvas)); color: var(--ab-ink);
+  --tone: var(--k-info, var(--ab-primary)); --tone-ico: var(--k-info-ico, var(--ab-primary-text));
+  display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 12px; width: 100%; padding: 14px 16px;
+  border: var(--k-callout-edge-w, 1px) solid var(--tone-ico); border-radius: var(--k-callout-r, min(var(--sb-card-r, var(--k-r)), 16px));
+  background: color-mix(in srgb, var(--tone) var(--k-callout-fill, 12%), var(--ab-canvas)); color: var(--ab-ink); box-shadow: var(--k-callout-shadow, none);
   font-family: var(--ab-font-b); font-size: var(--k-callout, 16px); line-height: var(--k-callout-lh, 22px);
 }
-.sb-k-callout[data-tone="success"] { --tone: var(--k-ok); }
-.sb-k-callout[data-tone="warning"] { --tone: var(--k-warn); }
-.sb-k-callout[data-tone="error"] { --tone: var(--sb-danger); }
-.sb-k-callout > .sb-ico { margin-top: 1px; color: color-mix(in srgb, var(--tone) 78%, var(--ab-ink)); }
+.sb-k-callout[data-tone="success"] { --tone: var(--k-ok, var(--ab-secondary)); --tone-ico: var(--k-ok-ico, var(--k-ok, var(--ab-ink))); }
+.sb-k-callout[data-tone="warning"] { --tone: var(--k-warn, var(--ab-accent)); --tone-ico: var(--k-warn-ico, var(--k-warn, var(--ab-ink))); }
+.sb-k-callout[data-tone="error"] { --tone: var(--k-err, var(--sb-danger)); --tone-ico: var(--k-err-ico, var(--sb-danger-text, var(--sb-danger))); }
+[data-sb-danger="ink"] .sb-k-callout[data-tone="error"] { border: 2px solid var(--ab-ink); background: var(--ab-canvas); }
+.sb-k-callout > .sb-ico { margin-top: 1px; color: var(--tone-ico); }
 .sb-k-callout b { display: block; font-family: var(--ab-font-ui); font-weight: 600; }
 .sb-k-sheetbox { position: relative; display: flex; flex-direction: column; justify-content: flex-end; width: 100%; min-height: 300px; border-radius: var(--k-r); overflow: hidden; background: color-mix(in srgb, var(--ab-ink) 6%, var(--ab-canvas)); }
 .sb-k-sheetbox::before { content: ""; position: absolute; inset: 0; background: rgba(0, 0, 0, 0.38); }
-.sb-k-sheet { position: relative; display: grid; gap: 10px; padding: 10px var(--k-margin, 20px) var(--k-margin, 20px); border-radius: calc(var(--k-r) + 6px) calc(var(--k-r) + 6px) 0 0; background: var(--ab-canvas); color: var(--ab-ink); box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.2); }
+.sb-k-sheet { position: relative; display: grid; gap: 10px; padding: 10px var(--k-margin, 20px) var(--k-margin, 20px); border-radius: var(--k-sheet-r, min(var(--sb-card-r, var(--k-r)), 24px)) var(--k-sheet-r, min(var(--sb-card-r, var(--k-r)), 24px)) 0 0; background: var(--ab-canvas); color: var(--ab-ink); box-shadow: var(--k-sheet-shadow, 0 -1px 2px rgba(0, 0, 0, 0.04), 0 -8px 24px -8px rgba(0, 0, 0, 0.14)); }
 .sb-k-grab { justify-self: center; width: 36px; height: 5px; border-radius: 3px; background: var(--ab-line); }
 :is(.ab.sb-ab, .sb-gen).sb-kit .ab-card-title.sb-k-sheet-t { margin: 6px 0 0 !important; font-size: var(--k-title-2, 22px) !important; line-height: var(--k-title-2-lh, 28px) !important; }
 .sb-k-sheet-b, .sb-k-para { margin: 0 !important; font-family: var(--ab-font-b); font-size: var(--k-subhead, 15px); line-height: var(--k-subhead-lh, 20px); color: var(--k-muted); }
@@ -491,20 +554,20 @@
 :is(.ab.sb-ab, .sb-gen).sb-kit .ab-row-bar.sb-k-bar { display: block !important; width: 100%; height: 8px !important; }
 .sb-k-toast {
   display: flex; align-items: center; gap: 12px; width: 100%; min-height: var(--k-btn, 52px); padding: 0 6px 0 16px;
-  border-radius: min(var(--sb-r, 12px), 14px); background: var(--ab-ink); color: var(--ab-canvas); box-shadow: 0 12px 30px -12px rgba(0, 0, 0, 0.45);
+  border-radius: min(var(--sb-r, 12px), 14px); background: var(--ab-ink); color: var(--ab-canvas); box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05), 0 8px 20px -8px rgba(0, 0, 0, 0.2);
   font-family: var(--ab-font-ui); font-size: var(--k-subhead, 15px); line-height: var(--k-subhead-lh, 20px);
 }
 .sb-k-toast > span { flex: 1; min-width: 0; }
 .sb-k-toast button { min-height: var(--k-tap, 44px); padding: 0 12px; border: 0; background: none; color: inherit; font: 600 var(--k-subhead, 15px)/1 var(--k-ui); cursor: pointer; text-decoration: underline; text-underline-offset: 3px; }
 .sb-k-empty { display: grid; justify-items: center; gap: 10px; width: 100%; padding: 20px 12px; text-align: center; }
-.sb-k-emptyico { display: grid; place-items: center; width: 56px; height: 56px; border-radius: 50%; background: var(--ab-pri-tint); color: var(--ab-primary-text); }
+.sb-k-emptyico { display: grid; place-items: center; width: 56px; height: 56px; border-radius: 50%; background: var(--ab-pri-tint); color: var(--k-pri-on-tint, var(--ab-primary-text)); }
 :is(.ab.sb-ab, .sb-gen).sb-kit .ab-card-title.sb-k-empty-t { margin: 4px 0 0 !important; font-size: var(--k-title-2, 22px) !important; line-height: var(--k-title-2-lh, 28px) !important; }
 .sb-k-empty-b { max-width: 28ch; margin: 0 0 6px !important; font-family: var(--ab-font-b); font-size: var(--k-subhead, 15px); line-height: var(--k-subhead-lh, 20px); color: var(--k-muted); }
 .sb-k-av { flex: none; display: grid; place-items: center; width: 40px; height: 40px; border-radius: 50%; background: var(--ab-secondary); color: var(--ab-on-secondary); font: 600 15px/1 var(--k-ui); letter-spacing: 0; text-transform: uppercase; }
 .sb-k-av-s { width: 32px; height: 32px; font-size: 13px; }
 .sb-k-av-l { width: 56px; height: 56px; font-size: 20px; }
-.sb-k-avs { display: inline-flex; padding-left: 8px; }
-.sb-k-avs .sb-k-av { margin-left: -8px; box-shadow: 0 0 0 2px var(--ab-canvas); }
+.sb-k-avs { display: inline-flex; padding-left: 4px; }
+.sb-k-avs .sb-k-av { margin-left: -4px; box-shadow: 0 0 0 2px var(--ab-canvas) !important; }
 
 /* ---- the UI kit page ---- */
 :is(.ab.sb-ab, .sb-gen) .ab-in.sb-kitpage { display: block; padding: clamp(24px, 4cqw, 44px); }
@@ -520,7 +583,8 @@
 .sb-k-name { margin: 0 !important; font-family: var(--ab-font-ui); font-size: var(--k-headline, 17px); line-height: var(--k-headline-lh, 22px); font-weight: 600; letter-spacing: 0; text-transform: none; }
 .sb-k-use { margin: 0 !important; font-family: var(--ab-font-b); font-size: var(--k-footnote, 13px); line-height: var(--k-footnote-lh, 18px); color: var(--k-muted); }
 .sb-k-states { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr)); gap: 18px 16px; align-items: start; }
-.sb-k-cell[data-k^="btn-"] .sb-k-states, .sb-k-cell:is([data-k="checkbox"], [data-k="radio"]) .sb-k-states { grid-template-columns: repeat(auto-fit, minmax(min(100%, 130px), 1fr)); }
+.sb-k-cell[data-k^="btn-"] .sb-k-states { grid-template-columns: repeat(auto-fit, minmax(min(100%, 130px), 1fr)); }
+.sb-k-cell:is([data-k="checkbox"], [data-k="radio"]) .sb-k-states { grid-template-columns: minmax(0, 1fr); }
 /* Full-width buttons and toggle rows need room for a label in a wide display face (plus the
    arrow or the switch) on one line. */
 .sb-k-cell:is([data-k="btn-primary"], [data-k="btn-secondary"], [data-k="btn-destructive"]) .sb-k-states { grid-template-columns: repeat(auto-fit, minmax(min(100%, 230px), 1fr)); }
@@ -545,7 +609,9 @@
 /* Native / Custom tag on each component (UI_KIT item.ios). */
 .sb-k-ios { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; margin: 6px 0 0 !important; font-family: var(--ab-font-ui); font-size: 12px; line-height: 16px; color: var(--k-muted); text-transform: none; letter-spacing: 0; }
 .sb-k-ios-tag { display: inline-block; padding: 2px 8px; border: 1px solid var(--ab-line); border-radius: 999px; font-size: 11px; font-weight: 600; letter-spacing: 0.04em; color: var(--ab-ink); background: transparent; }
-.sb-k-ios[data-ios="native"] .sb-k-ios-tag { border-color: transparent; background: var(--ab-pri-tint); color: var(--ab-primary-text, var(--ab-ink)); }
+/* chips: ink on a neutral tint, which holds contrast in every style */
+.sb-k-ios .sb-k-ios-tag { background: color-mix(in srgb, var(--ab-ink) 7%, var(--ab-canvas)); color: var(--ab-ink); }
+.sb-k-ios[data-ios="native"] .sb-k-ios-tag { border-color: transparent; background: color-mix(in srgb, var(--ab-ink) 12%, var(--ab-canvas)); }
 .sb-k-ios code { font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 12px; color: var(--ab-ink); overflow-wrap: anywhere; }
 
 /* Screen layouts: kit-only phones at 390 x 844, scaled down as a whole device. */
@@ -570,7 +636,7 @@
 .sb-k-blk[data-blk="section"] + .sb-k-blk { margin-top: 0; }
 .sb-k-blk[data-blk="title"] + .sb-k-blk[data-blk="body"] { margin-top: 12px; }
 .sb-k-blk[data-blk="btn-primary"] + .sb-k-blk[data-blk="btn-text"] { margin-top: 8px; display: grid; justify-items: center; }
-.sb-k-blk[data-blk="toggle"] { margin-top: 0; padding: 4px; border-bottom: 1px solid var(--ab-line); }
+.sb-k-blk[data-blk="toggle"] { margin-top: 0; padding: 4px 0; border-bottom: 1px solid var(--ab-line); }
 .sb-k-scr[data-scr="form"] .sb-k-blk[data-blk="toggle"] { margin-top: 16px; }
 /* Onboarding: the content block centred between the top bar and the pinned actions. */
 .sb-k-scr[data-scr="onboarding"] .sb-k-blk[data-blk="title"] { margin-top: auto; }
@@ -673,17 +739,6 @@
 .sb-gen .sb-tab, .sb-gen .sb-danger-btn { font-family: var(--sb-sys); text-transform: none; letter-spacing: 0; }
 .sb-gen .sb-danger-box { border-radius: 12px; }
 .sb-gen.sb-screen { border: 0; }
-/* the stock hero image: a soft indigo gradient with a faked app screenshot */
-.sb-gen .sb-gen-art {
-  justify-self: stretch; max-width: none; aspect-ratio: 4 / 3; border-radius: 16px; border: 1px solid #e5e7eb; overflow: hidden;
-  background: radial-gradient(circle at 25% 25%, #c7d2fe, transparent 55%), radial-gradient(circle at 80% 75%, #e9d5ff, transparent 55%), #f5f3ff;
-}
-.sb-gen .sb-gen-art i { position: absolute; display: block; border-radius: 8px; background: rgba(255, 255, 255, 0.85); box-shadow: 0 6px 18px rgba(99, 102, 241, 0.12); }
-.sb-gen .sb-gen-art i:nth-child(1) { left: 12%; top: 16%; width: 76%; height: 12%; }
-.sb-gen .sb-gen-art i:nth-child(2) { left: 12%; top: 34%; width: 36%; height: 48%; }
-.sb-gen .sb-gen-art i:nth-child(3) { left: 52%; top: 34%; width: 36%; height: 22%; }
-.sb-gen .sb-gen-art i:nth-child(4) { left: 52%; top: 60%; width: 36%; height: 22%; background: rgba(99, 102, 241, 0.75); }
-
 /* ======================= Part 4: narrow screens ======================= */
 
 @container ab (max-width: 760px) {
@@ -712,7 +767,6 @@
   .sb-set-sec { grid-template-columns: minmax(0, 1fr); gap: 12px; }
   .sb-field-row { grid-template-columns: minmax(0, 1fr); }
   .sb-danger-row { flex-direction: column; align-items: flex-start; gap: 10px; }
-  .sb-gen .sb-gen-art { aspect-ratio: 16 / 10; }
 }
 @container ab (max-width: 420px) {
   :is(.ab.sb-ab, .sb-gen) .ab-card.sb-stat { padding: 12px; }
@@ -732,88 +786,91 @@
 
 /* Dystopian Luxury numbers every card "ITEM 01" and every panel "ITEM 02"; on a product
    screen with many cards, count them instead. */
-.ab.sb-ab[data-ae="dystopian-luxury"] .ab-in { counter-reset: sb-item; }
-.ab.sb-ab[data-ae="dystopian-luxury"] :is(.ab-card, .ab-panel)::before {
+.ab.sb-ab:is([data-ae="dystopian-luxury"], [data-ae="dystopian-luxury--classic"]) .ab-in { counter-reset: sb-item; }
+.ab.sb-ab:is([data-ae="dystopian-luxury"], [data-ae="dystopian-luxury--classic"]) :is(.ab-card, .ab-panel)::before {
   counter-increment: sb-item; content: "ITEM " counter(sb-item, decimal-leading-zero) "  /  2026.114." counter(sb-item);
 }
 
 /* Bento Grid composes its 01 card as three tiles and its 02 panel as a six-column grid;
    product cards here are single tiles, so they go back to one plain tile each. */
-.ab.sb-ab[data-ae="bento-grid"] .ab-card,
-.ab.sb-ab[data-ae="bento-grid"] .ab-panel { display: block; min-height: 0; padding: clamp(18px, 2.4cqw, 24px); border-radius: var(--bn-r); background: var(--ab-tile); }
-.ab.sb-ab[data-ae="bento-grid"] .ab-card.sb-plan { display: flex; }
-.ab.sb-ab[data-ae="bento-grid"] .ab-card::before, .ab.sb-ab[data-ae="bento-grid"] .ab-card::after { content: none; }
-.ab.sb-ab[data-ae="bento-grid"] .ab-card .ab-card-title, .ab.sb-ab[data-ae="bento-grid"] .ab-card .ab-card-body,
-.ab.sb-ab[data-ae="bento-grid"] .ab-card .ab-card-title:hover, .ab.sb-ab[data-ae="bento-grid"] .ab-card .ab-card-body:hover,
-.ab.sb-ab[data-ae="bento-grid"] .ab-card-title.sb-title, .ab.sb-ab[data-ae="bento-grid"] .ab-card-title.sb-home-h { padding: 0; background: none; transform: none; }
-.ab.sb-ab[data-ae="bento-grid"] .ab-card .ab-seg { margin: 0; }
-.ab.sb-ab[data-ae="bento-grid"] .ab-card .ab-cta { display: flex; grid-area: auto; min-height: 0; aspect-ratio: auto; padding: 13px 16px; align-items: center; justify-content: space-between; }
-.ab.sb-ab[data-ae="bento-grid"] .ab-card .ab-cta-label { font-size: 15px; letter-spacing: 0; }
-.ab.sb-ab[data-ae="bento-grid"] .ab-card .ab-cta-arrow::before { width: 28px; height: 28px; font-size: 15px; }
-.ab.sb-ab[data-ae="bento-grid"] .ab-panel .ab-fieldlabel { margin: 0 0 8px; }
-.ab.sb-ab[data-ae="bento-grid"] .ab-panel .ab-input { padding: 14px 16px; font-size: 16px; margin-bottom: 10px; background: var(--ab-sub); }
-.ab.sb-ab[data-ae="bento-grid"] .ab-panel .ab-toggle { padding: 8px 14px; margin-bottom: 8px; background: var(--ab-sub); }
-.ab.sb-ab[data-ae="bento-grid"] .ab-panel .ab-status { margin: 6px 0 0; }
-.ab.sb-ab[data-ae="bento-grid"] .sb-listsec .ab-list { grid-template-columns: repeat(5, minmax(0, 1fr)); }
-.ab.sb-ab[data-ae="bento-grid"] .ab-row-pct { font-size: clamp(30px, 4.4cqw, 52px); }
-.ab.sb-ab[data-ae="bento-grid"] .ab-row { min-height: 0; }
-@container ab (max-width: 760px) { .ab.sb-ab[data-ae="bento-grid"] .sb-listsec .ab-list { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.ab.sb-ab:is([data-ae="bento-grid"], [data-ae="bento-grid--classic"]) .ab-card,
+.ab.sb-ab:is([data-ae="bento-grid"], [data-ae="bento-grid--classic"]) .ab-panel { display: block; min-height: 0; padding: clamp(18px, 2.4cqw, 24px); border-radius: var(--bn-r); background: var(--ab-tile); }
+.ab.sb-ab:is([data-ae="bento-grid"], [data-ae="bento-grid--classic"]) .ab-card.sb-plan { display: flex; }
+.ab.sb-ab:is([data-ae="bento-grid"], [data-ae="bento-grid--classic"]) .ab-card::before, .ab.sb-ab:is([data-ae="bento-grid"], [data-ae="bento-grid--classic"]) .ab-card::after { content: none; }
+.ab.sb-ab:is([data-ae="bento-grid"], [data-ae="bento-grid--classic"]) .ab-card .ab-card-title, .ab.sb-ab:is([data-ae="bento-grid"], [data-ae="bento-grid--classic"]) .ab-card .ab-card-body,
+.ab.sb-ab:is([data-ae="bento-grid"], [data-ae="bento-grid--classic"]) .ab-card .ab-card-title:hover, .ab.sb-ab:is([data-ae="bento-grid"], [data-ae="bento-grid--classic"]) .ab-card .ab-card-body:hover,
+.ab.sb-ab:is([data-ae="bento-grid"], [data-ae="bento-grid--classic"]) .ab-card-title.sb-title, .ab.sb-ab:is([data-ae="bento-grid"], [data-ae="bento-grid--classic"]) .ab-card-title.sb-home-h { padding: 0; background: none; transform: none; }
+.ab.sb-ab:is([data-ae="bento-grid"], [data-ae="bento-grid--classic"]) .ab-card .ab-seg { margin: 0; }
+.ab.sb-ab:is([data-ae="bento-grid"], [data-ae="bento-grid--classic"]) .ab-card .ab-cta { display: flex; grid-area: auto; min-height: 0; aspect-ratio: auto; padding: 13px 16px; align-items: center; justify-content: space-between; }
+.ab.sb-ab:is([data-ae="bento-grid"], [data-ae="bento-grid--classic"]) .ab-card .ab-cta-label { font-size: 15px; letter-spacing: 0; }
+.ab.sb-ab:is([data-ae="bento-grid"], [data-ae="bento-grid--classic"]) .ab-card .ab-cta-arrow::before { width: 28px; height: 28px; font-size: 15px; }
+.ab.sb-ab:is([data-ae="bento-grid"], [data-ae="bento-grid--classic"]) .ab-panel .ab-fieldlabel { margin: 0 0 8px; }
+.ab.sb-ab:is([data-ae="bento-grid"], [data-ae="bento-grid--classic"]) .ab-panel .ab-input { padding: 14px 16px; font-size: 16px; margin-bottom: 10px; background: var(--ab-sub); }
+.ab.sb-ab:is([data-ae="bento-grid"], [data-ae="bento-grid--classic"]) .ab-panel .ab-toggle { padding: 8px 14px; margin-bottom: 8px; background: var(--ab-sub); }
+.ab.sb-ab:is([data-ae="bento-grid"], [data-ae="bento-grid--classic"]) .ab-panel .ab-status { margin: 6px 0 0; }
+.ab.sb-ab:is([data-ae="bento-grid"], [data-ae="bento-grid--classic"]) .sb-listsec .ab-list { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+.ab.sb-ab:is([data-ae="bento-grid"], [data-ae="bento-grid--classic"]) .ab-row-pct { font-size: clamp(30px, 4.4cqw, 52px); }
+.ab.sb-ab:is([data-ae="bento-grid"], [data-ae="bento-grid--classic"]) .ab-row { min-height: 0; }
+@container ab (max-width: 760px) { .ab.sb-ab:is([data-ae="bento-grid"], [data-ae="bento-grid--classic"]) .sb-listsec .ab-list { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 
 /* Mid-Century draws cards, panels and lists as green terminal screens: the token-styled
    text and the chart inside them take the screen's own colours. */
-.ab.sb-ab[data-ae="mid-century"] :is(.ab-card, .ab-panel, .ab-list) {
+.ab.sb-ab:is([data-ae="mid-century"], [data-ae="mid-century--classic"]) :is(.ab-card, .ab-panel, .ab-list) {
   --ab-ink: var(--mc-crt-ink); --ab-muted: var(--mc-crt-dim); --ab-canvas: var(--mc-crt-bg);
   --ab-primary-text: var(--mc-crt-ink); --ab-primary: var(--mc-crt-ink); --ab-line: color-mix(in srgb, var(--mc-crt-ink) 28%, transparent);
   margin: 0;
 }
-.ab.sb-ab[data-ae="mid-century"] :is(.ab-card, .ab-panel) :is(.ab-label, .sb-chart-x, .sb-legend, .sb-hint, .sb-perks, .sb-price small, .sb-feat-n) { color: var(--mc-crt-dim); font-family: var(--mc-mono); }
+.ab.sb-ab:is([data-ae="mid-century"], [data-ae="mid-century--classic"]) :is(.ab-card, .ab-panel) :is(.ab-label, .sb-chart-x, .sb-legend, .sb-hint, .sb-perks, .sb-price small, .sb-feat-n) { color: var(--mc-crt-dim); font-family: var(--mc-mono); }
 
 
 /* Liquid Glass lists are iOS grouped rows (name, detail, chevron): no index, bar or percent */
-.ab.sb-ab[data-ae="liquid-glass"] .ab-row :is(.ab-row-n, .ab-av, .ab-row-bar, .ab-row-pct) { display: none; }
-.ab.sb-ab[data-ae="liquid-glass"] .ab-row { grid-template-columns: minmax(0, 1fr) auto; }
+.ab.sb-ab:is([data-ae="liquid-glass"], [data-ae="liquid-glass--classic"]) .ab-row :is(.ab-row-n, .ab-av, .ab-row-bar, .ab-row-pct) { display: none; }
+.ab.sb-ab:is([data-ae="liquid-glass"], [data-ae="liquid-glass--classic"]) .ab-row { grid-template-columns: minmax(0, 1fr) auto; }
 
 /* Japanese Minimal sets the hero kicker as a vertical line in the margin; in an app header it
    reads as an ordinary caption. */
-.ab.sb-ab[data-ae="japanese-minimal"] :is(.sb-top, .sb-home-top, .sb-ob-copy, .sb-k-head) .ab-kicker {
+.ab.sb-ab:is([data-ae="japanese-minimal"], [data-ae="japanese-minimal--classic"]) :is(.sb-top, .sb-home-top, .sb-ob-copy, .sb-k-head) .ab-kicker {
   position: static; writing-mode: horizontal-tb; padding-top: 0; background: none;
 }
 
 /* Xerox Punk unwraps the hero copy into its own grid; the actions and the proof line go
    under the subcopy, and marks on the cream paper cards are ink, not fluoro. */
-.ab.sb-ab[data-ae="xerox-punk"] .sb-lhero .sb-hero-act { grid-column: 1 / -1; grid-row: 4; position: relative; z-index: 2; }
-.ab.sb-ab[data-ae="xerox-punk"] .sb-lhero .sb-proof { grid-column: 1 / -1; grid-row: 5; position: relative; z-index: 2; margin-top: 0 !important; }
-.ab.sb-ab[data-ae="xerox-punk"] .ab-card { --ab-primary-text: currentColor; }
-.ab.sb-ab[data-ae="bento-grid"] .ab-row:nth-child(1) .ab-row-pct { font-size: clamp(40px, 6cqw, 68px); }
-.ab.sb-ab[data-ae="mid-century"] :is(.ab-card, .ab-panel) .ab-fit { background: transparent; color: var(--mc-crt-ink); box-shadow: inset 0 0 0 1px var(--mc-crt-dim); }
-.ab.sb-ab[data-ae="mid-century"] .ab-card-title.sb-num { font-size: clamp(18px, 2.1cqw, 24px); }
+.ab.sb-ab:is([data-ae="xerox-punk"], [data-ae="xerox-punk--classic"]) .sb-lhero .sb-hero-act { grid-column: 1 / -1; grid-row: 4; position: relative; z-index: 2; }
+.ab.sb-ab:is([data-ae="xerox-punk"], [data-ae="xerox-punk--classic"]) .sb-lhero .sb-proof { grid-column: 1 / -1; grid-row: 5; position: relative; z-index: 2; margin-top: 0 !important; }
+.ab.sb-ab:is([data-ae="xerox-punk"], [data-ae="xerox-punk--classic"]) .ab-card { --ab-primary-text: currentColor; }
+.ab.sb-ab:is([data-ae="bento-grid"], [data-ae="bento-grid--classic"]) .ab-row:nth-child(1) .ab-row-pct { font-size: clamp(40px, 6cqw, 68px); }
+.ab.sb-ab:is([data-ae="mid-century"], [data-ae="mid-century--classic"]) :is(.ab-card, .ab-panel) .ab-fit { background: transparent; color: var(--mc-crt-ink); box-shadow: inset 0 0 0 1px var(--mc-crt-dim); }
+.ab.sb-ab:is([data-ae="mid-century"], [data-ae="mid-century--classic"]) .ab-card-title.sb-num { font-size: clamp(18px, 2.1cqw, 24px); }
 /* Old Web's own list has no avatar column */
-.ab.sb-ab[data-ae="old-web"] .ab-row .ab-av { display: none; }
+.ab.sb-ab:is([data-ae="old-web"], [data-ae="old-web--classic"]) .ab-row .ab-av { display: none; }
 /* Old Web draws each card as a window: each one gets its own title (js/see-built.js data-win). */
-.ab.sb-ab[data-ae="old-web"] :is(.ab-card, .ab-panel)[data-win]::before { content: attr(data-win); }
+.ab.sb-ab:is([data-ae="old-web"], [data-ae="old-web--classic"]) :is(.ab-card, .ab-panel)[data-win]::before { content: attr(data-win); }
 /* Xerox Punk pins its kicker label to the board's top-left corner; in app screens and above the
    UI kit title it stays in the flow, so the tilted label never lands on the title */
-.ab.sb-ab[data-ae="xerox-punk"] :is(.sb-top, .sb-home-top, .sb-ob-copy, .sb-k-head) .ab-kicker { position: relative; inset: auto; left: auto; top: auto; display: inline-block; margin-bottom: 10px !important; }
-.ab.sb-ab[data-ae="dystopian-luxury"] .sb-feat-n { display: none; }
+.ab.sb-ab:is([data-ae="xerox-punk"], [data-ae="xerox-punk--classic"]) :is(.sb-top, .sb-home-top, .sb-ob-copy, .sb-k-head) .ab-kicker { position: relative; inset: auto; left: auto; top: auto; display: inline-block; margin-bottom: 10px !important; }
+.ab.sb-ab:is([data-ae="dystopian-luxury"], [data-ae="dystopian-luxury--classic"]) .sb-feat-n { display: none; }
 
 /* ---------- per-aesthetic fixes from the all-aesthetics sweep (dashboard + landing, 1360) ---------- */
 /* A ::after flourish on card titles ("New" chips) has no room beside a stat number. */
 :is(.ab.sb-ab) .ab-card-title.sb-num::after { content: none !important; }
 /* Liquid Glass: the 96px scene strip at the top of each card sat under the stat numbers and
    feature copy; in app screens it is a slim brand cap instead. */
-.ab.sb-ab[data-ae="liquid-glass"] .ab-card::before { height: 8px; }
-.ab.sb-ab[data-ae="liquid-glass"] .ab-card .ab-seg { margin-bottom: 18px; }
+.ab.sb-ab:is([data-ae="liquid-glass"], [data-ae="liquid-glass--classic"]) .ab-card::before { height: 8px; }
+.ab.sb-ab:is([data-ae="liquid-glass"], [data-ae="liquid-glass--classic"]) .ab-card .ab-seg { margin-bottom: 18px; }
 /* Gorpcore: the stat cards keep the room the spec-tag rivet and code need at the top. */
-.ab.sb-ab[data-ae="gorpcore"] .ab-card.sb-stat { padding-top: 38px; }
+.ab.sb-ab:is([data-ae="gorpcore"], [data-ae="gorpcore--classic"]) .ab-card.sb-stat { padding-top: 38px; }
 /* Pirate Broadcast's wordmark grows to fill a header row; in the sidebar it stays its own size. */
-.ab.sb-ab[data-ae="pirate-broadcast"] .ab-brand.sb-side-brand { flex: none; }
+.ab.sb-ab:is([data-ae="pirate-broadcast"], [data-ae="pirate-broadcast--classic"]) .ab-brand.sb-side-brand { flex: none; }
 /* Retro Futurist's wide, tracked type: stat numbers and the sidebar wordmark fit their boxes. */
-.ab.sb-ab[data-ae="retro-futurist"] .ab-card-title.sb-num { font-size: clamp(17px, 1.9cqw, 21px); letter-spacing: 0; }
-.ab.sb-ab[data-ae="retro-futurist"] .sb-side-brand .ab-wordmark { font-size: 12.5px; letter-spacing: 0.04em; }
+.ab.sb-ab:is([data-ae="retro-futurist"], [data-ae="retro-futurist--classic"]) .ab-card-title.sb-num { font-size: clamp(17px, 1.9cqw, 21px); letter-spacing: 0; }
+.ab.sb-ab:is([data-ae="retro-futurist"], [data-ae="retro-futurist--classic"]) .sb-side-brand .ab-wordmark { font-size: 12.5px; letter-spacing: 0.04em; }
 /* Pixel Arcade's pixel caps: plan buttons wrap inside their cards instead of spilling out. */
-.ab.sb-ab[data-ae="pixel-arcade"] .sb-plan :is(.sb-wide, .ab-cta) { white-space: normal; height: auto; min-height: 44px; letter-spacing: 0.04em; line-height: 1.3; text-align: center; }
+.ab.sb-ab:is([data-ae="pixel-arcade"], [data-ae="pixel-arcade--classic"]) .sb-plan :is(.sb-wide, .ab-cta) { white-space: normal; height: auto; min-height: 44px; letter-spacing: 0.04em; line-height: 1.3; text-align: center; }
 /* Xerox Punk's hand-written "← this one." points at one thing: the featured plan. */
-.ab.sb-ab[data-ae="xerox-punk"] .ab-card-body::after { content: none; }
-.ab.sb-ab[data-ae="xerox-punk"] .sb-plan.is-featured .ab-card-body::after { content: "  ← this one."; }
+.ab.sb-ab:is([data-ae="xerox-punk"], [data-ae="xerox-punk--classic"]) .ab-card-body::after { content: none; }
+.ab.sb-ab:is([data-ae="xerox-punk"], [data-ae="xerox-punk--classic"]) .sb-plan.is-featured .ab-card-body::after { content: "  ← this one."; }
 /* A board that turns its hero subcopy off still gets the body block on a kit screen. */
-:is(.ab.sb-ab, .sb-gen).sb-kit .sb-k-scr .ab-subcopy.sb-ob-body { display: block !important; }
+:is(.ab.sb-ab, .sb-gen).sb-kit .ab-subcopy.sb-ob-body { display: block !important; }
+/* A highlight drawn with inline padding and box-decoration-break: clone defeats text-wrap: balance on
+   phone titles (one word left alone on the last line): slice it and drop the inline padding. */
+:is(.ab.sb-ab, .sb-gen).sb-kit :is(.sb-ob-h, .sb-k-ltitle, .sb-home-h) .ab-hl { -webkit-box-decoration-break: slice !important; box-decoration-break: slice !important; padding-left: 0 !important; padding-right: 0 !important; }

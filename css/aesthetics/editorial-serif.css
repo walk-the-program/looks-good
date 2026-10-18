@@ -328,3 +328,72 @@
 .ab.sb-ab[data-ae="editorial-serif"] .sb-set-panel .sb-field-row .sb-field:last-child .ab-input { margin-bottom: 16px; }
 /* the plan card's one-line note ("Per seat · renews on the 1st") is not set in the 12.5em body measure */
 .ab.sb-ab[data-ae="editorial-serif"] .sb-planbox .ab-card-body { width: auto; }
+
+/* ---- app screens and the UI kit (.sb-kit: phone screens, UI kit tab) ----
+   Set like a page: paper, ink and hairlines. The primary fills the one main action and nothing
+   else; selection (tabs, segments, toggles, checks), focus and text buttons are ink; the accent
+   stays the one italic headline word. Square corners, no tinted boxes, no shadows. */
+.ab.sb-ab[data-ae="editorial-serif"].sb-kit {
+  --ab-primary-text: var(--ab-ink) !important;
+  --ab-pri-tint: color-mix(in srgb, var(--ab-ink) 6%, var(--ab-canvas)) !important;
+  --ab-accent: var(--ab-ink) !important; --ab-on-accent: var(--ab-canvas) !important;
+  --ab-secondary: var(--ab-canvas) !important; --ab-on-secondary: var(--ab-ink) !important;
+  --k-r: 0px;
+}
+/* actions: small-caps lettering at 15pt (17pt tracked caps shouted); pressed follows the board */
+.ab.sb-ab[data-ae="editorial-serif"].sb-kit :is(.ab-cta.sb-k-btn, .ab-type-apply.sb-k-btn2) { font-size: var(--k-subhead, 15px) !important; letter-spacing: 0.14em; }
+.ab.sb-ab[data-ae="editorial-serif"].sb-kit .ab-type-apply.sb-k-btn2 { font-weight: 500; }
+.ab.sb-ab[data-ae="editorial-serif"].sb-kit .ab-cta.sb-k-btn.sb-k-pressed { background: var(--ab-eds-primary-press); color: var(--ab-eds-on-press); filter: none; transform: translateY(1px); }
+.ab.sb-ab[data-ae="editorial-serif"].sb-kit .ab-type-apply.sb-k-pressed { background: var(--ab-pri-tint); filter: none; transform: translateY(1px); }
+.ab.sb-ab[data-ae="editorial-serif"].sb-kit .sb-k-textbtn { color: var(--ab-ink); font-size: var(--k-subhead, 15px); letter-spacing: 0.14em; }
+.ab.sb-ab[data-ae="editorial-serif"].sb-kit .sb-k-danger { box-shadow: none; letter-spacing: 0.14em; font-size: var(--k-subhead, 15px); }
+/* fields: the printed underline; focus thickens it in ink, error in the danger colour; no rings */
+.ab.sb-ab[data-ae="editorial-serif"].sb-kit :is(.sb-k-field, .sb-k-search).is-focus .ab-input { box-shadow: 0 1px 0 var(--ab-ink) !important; border-color: var(--ab-ink) !important; }
+.ab.sb-ab[data-ae="editorial-serif"].sb-kit .sb-k-field.is-error .ab-input { box-shadow: 0 1px 0 var(--sb-danger) !important; }
+.ab.sb-ab[data-ae="editorial-serif"].sb-kit .sb-k-search .ab-input { padding-left: 30px !important; }
+.ab.sb-ab[data-ae="editorial-serif"].sb-kit .sb-k-search > .sb-ico { left: 0; }
+.ab.sb-ab[data-ae="editorial-serif"].sb-kit .sb-k-menu { border-color: var(--ab-hair-strong); box-shadow: none; }
+.ab.sb-ab[data-ae="editorial-serif"].sb-kit .sb-k-box:checked { background: var(--ab-ink); border-color: var(--ab-ink); }
+.ab.sb-ab[data-ae="editorial-serif"].sb-kit .sb-k-box[type="checkbox"]:checked::after { border-color: var(--ab-canvas); }
+.ab.sb-ab[data-ae="editorial-serif"].sb-kit .sb-k-box[type="radio"]:checked::after { background: var(--ab-canvas); }
+/* toggle rows read like the other rows; on is an ink box */
+.ab.sb-ab[data-ae="editorial-serif"].sb-kit .ab-toggle.sb-tog { font-family: var(--ab-font-ui); font-weight: 400; letter-spacing: 0; text-transform: none; }
+.ab.sb-ab[data-ae="editorial-serif"].sb-kit .ab-switch:checked { background: var(--ab-ink); box-shadow: inset 0 0 0 1px var(--ab-ink); }
+.ab.sb-ab[data-ae="editorial-serif"].sb-kit .ab-switch:checked::before { background: var(--ab-canvas); }
+/* segments and tabs: small caps over a hairline, the current one underlined in ink, 44pt tall */
+.ab.sb-ab[data-ae="editorial-serif"].sb-kit .ab-seg-btn { min-height: var(--k-tap, 44px) !important; font-size: var(--k-footnote, 13px) !important; letter-spacing: 0.14em; }
+.ab.sb-ab[data-ae="editorial-serif"].sb-kit .ab-seg-btn[aria-pressed="true"] { border-bottom-color: var(--ab-ink); }
+.ab.sb-ab[data-ae="editorial-serif"].sb-kit .sb-k-tabs [role="tab"] { letter-spacing: 0.14em; }
+.ab.sb-ab[data-ae="editorial-serif"].sb-kit .sb-k-tabs [role="tab"][aria-selected="true"]::after { background: var(--ab-ink); }
+/* cards are paper with no box: content keeps the screen margin, the body runs the full measure */
+.ab.sb-ab[data-ae="editorial-serif"].sb-kit .ab-card:is(.sb-k-card, .sb-home-card) { padding-left: 0 !important; padding-right: 0 !important; padding-bottom: 0 !important; }
+.ab.sb-ab[data-ae="editorial-serif"].sb-kit .sb-k-card .ab-card-body { width: auto; }
+/* one rule between a section label and its list: the list's own ink rule */
+.ab.sb-ab[data-ae="editorial-serif"].sb-kit .ab-labelrow.sb-k-section { padding-bottom: 0; border-bottom: 0; }
+/* leads: an ink glyph in a hairline square; avatars are hairline circles with serif initials */
+.ab.sb-ab[data-ae="editorial-serif"].sb-kit :is(.sb-k-ico, .sb-k-emptyico) { border-radius: 0; background: none; color: var(--ab-ink); box-shadow: inset 0 0 0 1px var(--ab-hair); }
+.ab.sb-ab[data-ae="editorial-serif"].sb-kit .sb-k-av { background: var(--ab-canvas); color: var(--ab-ink); box-shadow: inset 0 0 0 1px var(--ab-hair-strong); font-family: var(--ab-font-h); font-weight: 400; }
+.ab.sb-ab[data-ae="editorial-serif"].sb-kit .sb-k-avs .sb-k-av { margin-left: -4px; box-shadow: inset 0 0 0 1px var(--ab-hair-strong), 0 0 0 2px var(--ab-canvas); }
+/* callouts: a sidebar between rules (a 2px rule in the tone over a hairline), no tinted box */
+.ab.sb-ab[data-ae="editorial-serif"].sb-kit .sb-k-callout { padding: 14px 0; border: 0; border-top: 2px solid var(--tone-ico, var(--tone)); border-bottom: 1px solid var(--ab-hair); background: none; }
+.ab.sb-ab[data-ae="editorial-serif"].sb-kit .sb-k-callout[data-tone="info"] { --tone: var(--ab-ink); --tone-ico: var(--ab-ink); }
+/* badges: square; "New" is the accent ink set as text */
+.ab.sb-ab[data-ae="editorial-serif"].sb-kit :is(.sb-k-badge, .sb-k-count) { border-radius: 0; letter-spacing: 0.08em; }
+.ab.sb-ab[data-ae="editorial-serif"].sb-kit .sb-k-badge { background: none; color: color-mix(in srgb, var(--ab-accent-ink) 55%, var(--ab-ink)); box-shadow: inset 0 0 0 1px currentColor; text-transform: uppercase; }
+.ab.sb-ab[data-ae="editorial-serif"].sb-kit .sb-k-count:not(.is-accent) { background: none; box-shadow: inset 0 0 0 1px var(--ab-hair); }
+.ab.sb-ab[data-ae="editorial-serif"].sb-kit .sb-badge { border-radius: 0; width: 6px; height: 6px; }
+/* progress: a 2px ink rule over a hairline (the board's dotted leader has no fill) */
+.ab.sb-ab[data-ae="editorial-serif"].sb-kit .ab-row-bar.sb-k-bar { position: relative; height: 2px !important; margin: 0; border: 0; background: var(--ab-hair); align-self: auto; }
+.ab.sb-ab[data-ae="editorial-serif"].sb-kit .ab-row-bar.sb-k-bar i { display: block; height: 100%; background: var(--ab-ink); }
+.ab.sb-ab[data-ae="editorial-serif"].sb-kit .sb-k-range::-webkit-slider-runnable-track { height: 2px; border-radius: 0; background: linear-gradient(90deg, var(--ab-ink) var(--v, 50%), var(--ab-hair) var(--v, 50%)); }
+.ab.sb-ab[data-ae="editorial-serif"].sb-kit .sb-k-range::-webkit-slider-thumb { width: 18px; height: 18px; margin-top: -8px; border-radius: 0; border: 1px solid var(--ab-ink); background: var(--ab-canvas); box-shadow: none; }
+.ab.sb-ab[data-ae="editorial-serif"].sb-kit .sb-k-range::-moz-range-track { height: 2px; border-radius: 0; background: linear-gradient(90deg, var(--ab-ink) var(--v, 50%), var(--ab-hair) var(--v, 50%)); }
+.ab.sb-ab[data-ae="editorial-serif"].sb-kit .sb-k-range::-moz-range-thumb { width: 18px; height: 18px; border-radius: 0; border: 1px solid var(--ab-ink); background: var(--ab-canvas); box-shadow: none; }
+/* navigation: ink marker, square; page dots square */
+.ab.sb-ab[data-ae="editorial-serif"].sb-kit .sb-tab[aria-current]::before { border-radius: 0; height: 2px; background: var(--ab-ink); }
+.ab.sb-ab[data-ae="editorial-serif"].sb-kit .sb-dots i { border-radius: 0; width: 6px; height: 6px; }
+.ab.sb-ab[data-ae="editorial-serif"].sb-kit .sb-dots i.is-on { width: 18px; }
+/* flat surfaces */
+.ab.sb-ab[data-ae="editorial-serif"].sb-kit .sb-k-toast { border-radius: 0; box-shadow: none; }
+.ab.sb-ab[data-ae="editorial-serif"].sb-kit .sb-k-sheet { border-radius: 0; box-shadow: none; border-top: 1px solid var(--ab-hair-strong); }
+.ab.sb-ab[data-ae="editorial-serif"].sb-kit .ab-fit { display: inline-flex; align-items: center; min-height: 22px; padding: 0 9px; font-size: var(--k-caption, 12px); line-height: var(--k-caption-lh, 16px); }

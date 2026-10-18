@@ -426,3 +426,72 @@
 
 /* muted text on paper cards and panels is pulled toward ink until it holds 4.5:1 (token computed in neo-brutal-pop.js) */
 .ab.sb-ab[data-ae="neo-brutal-pop"] :is(.ab-card, .ab-panel) { --ab-muted: var(--np-muted-paper); }
+
+/* ---- app screens and the UI kit (.sb-kit: phone screens, UI kit tab) ----
+   The app carries the board's signature through its components, never through stickers or art:
+   2px ink outlines, near-square corners (6px controls, 10px cards), hard offset shadows on the
+   things you press, and a press that squishes the control into its own shadow. Small chips,
+   badges and the selected segment get the outline but no shadow. The classic version shares
+   these rules (its shadows are plain ink) and drops its board stickers and graph paper here. */
+/* the highlight word stays a tilted block, but small and without the board's flower */
+.ab.sb-ab:is([data-ae="neo-brutal-pop"], [data-ae="neo-brutal-pop--classic"]).sb-kit .ab-hl { padding-right: 0.14em; margin-right: 0.02em; box-shadow: 3px 3px 0 var(--np-shc); transform: rotate(-2deg); }
+.ab.sb-ab:is([data-ae="neo-brutal-pop"], [data-ae="neo-brutal-pop--classic"]).sb-kit .ab-hl::after { content: none; }
+/* pressed: into the shadow, never a grey wash */
+.ab.sb-ab:is([data-ae="neo-brutal-pop"], [data-ae="neo-brutal-pop--classic"]).sb-kit :is(.ab-cta.sb-k-btn, .ab-type-apply.sb-k-btn2, .sb-k-iconbtn, .sb-k-danger).sb-k-pressed { filter: none; transform: translate(4px, 4px); box-shadow: 0 0 0 var(--np-shc); }
+.ab.sb-ab:is([data-ae="neo-brutal-pop"], [data-ae="neo-brutal-pop--classic"]).sb-kit .ab-type-apply.sb-k-btn2.sb-k-pressed,
+.ab.sb-ab:is([data-ae="neo-brutal-pop"], [data-ae="neo-brutal-pop--classic"]).sb-kit .sb-k-iconbtn.sb-k-pressed { background: var(--ab-paper); }
+.ab.sb-ab:is([data-ae="neo-brutal-pop"], [data-ae="neo-brutal-pop--classic"]).sb-kit .ab-cta.sb-k-btn .ab-cta-arrow { border-radius: 4px; }
+/* destructive is drawn like the other buttons: outline and hard shadow */
+.ab.sb-ab:is([data-ae="neo-brutal-pop"], [data-ae="neo-brutal-pop--classic"]).sb-kit .sb-k-danger { border: var(--np-b) solid var(--ab-ink); border-radius: var(--np-r); box-shadow: 4px 4px 0 var(--np-shc); font-weight: var(--np-uw, 700); }
+/* fields: focus lifts the field onto a hard shadow (the board's focus); error keeps its edge colour */
+.ab.sb-ab:is([data-ae="neo-brutal-pop"], [data-ae="neo-brutal-pop--classic"]).sb-kit :is(.sb-k-field, .sb-k-search).is-focus .ab-input { border-color: var(--ab-ink) !important; box-shadow: 4px 4px 0 var(--ab-primary) !important; }
+.ab.sb-ab:is([data-ae="neo-brutal-pop"], [data-ae="neo-brutal-pop--classic"]).sb-kit .sb-k-field.is-error .ab-input { box-shadow: 4px 4px 0 var(--sb-danger) !important; }
+.ab.sb-ab:is([data-ae="neo-brutal-pop"], [data-ae="neo-brutal-pop--classic"]).sb-kit .sb-k-menu { padding: 4px; border: var(--np-b) solid var(--ab-ink); border-radius: var(--np-rc); background: var(--ab-paper); box-shadow: 4px 4px 0 var(--np-shc); }
+.ab.sb-ab:is([data-ae="neo-brutal-pop"], [data-ae="neo-brutal-pop--classic"]).sb-kit .sb-k-menu li { border-radius: var(--np-r); }
+.ab.sb-ab:is([data-ae="neo-brutal-pop"], [data-ae="neo-brutal-pop--classic"]).sb-kit .sb-k-menu li[aria-selected="true"] { box-shadow: inset 0 0 0 var(--np-b) var(--ab-ink); }
+/* checkbox and radio: 2px ink outlines; checked fills primary inside the outline */
+.ab.sb-ab:is([data-ae="neo-brutal-pop"], [data-ae="neo-brutal-pop--classic"]).sb-kit .sb-k-box { border: var(--np-b) solid var(--ab-ink); border-radius: var(--np-r); background: var(--ab-paper); }
+.ab.sb-ab:is([data-ae="neo-brutal-pop"], [data-ae="neo-brutal-pop--classic"]).sb-kit .sb-k-box:checked { background: var(--ab-primary); border-color: var(--ab-ink); }
+.ab.sb-ab:is([data-ae="neo-brutal-pop"], [data-ae="neo-brutal-pop--classic"]).sb-kit .sb-k-box[type="radio"] { border-radius: 50%; }
+.ab.sb-ab:is([data-ae="neo-brutal-pop"], [data-ae="neo-brutal-pop--classic"]).sb-kit .ab-toggle > span { font-size: var(--k-body, 17px); }
+/* slider: a chunky outlined track with a primary fill, an outlined square-ish thumb */
+.ab.sb-ab:is([data-ae="neo-brutal-pop"], [data-ae="neo-brutal-pop--classic"]).sb-kit .sb-k-range::-webkit-slider-runnable-track { height: 12px; border: var(--np-b) solid var(--ab-ink); border-radius: var(--np-r); background: linear-gradient(90deg, var(--ab-primary) var(--v, 50%), var(--ab-paper) var(--v, 50%)); }
+.ab.sb-ab:is([data-ae="neo-brutal-pop"], [data-ae="neo-brutal-pop--classic"]).sb-kit .sb-k-range::-webkit-slider-thumb { width: 26px; height: 26px; margin-top: -9px; border: var(--np-b) solid var(--ab-ink); border-radius: var(--np-r); background: var(--ab-paper); box-shadow: none; }
+.ab.sb-ab:is([data-ae="neo-brutal-pop"], [data-ae="neo-brutal-pop--classic"]).sb-kit .sb-k-range::-moz-range-track { height: 8px; border: var(--np-b) solid var(--ab-ink); border-radius: var(--np-r); background: linear-gradient(90deg, var(--ab-primary) var(--v, 50%), var(--ab-paper) var(--v, 50%)); }
+.ab.sb-ab:is([data-ae="neo-brutal-pop"], [data-ae="neo-brutal-pop--classic"]).sb-kit .sb-k-range::-moz-range-thumb { width: 22px; height: 22px; border: var(--np-b) solid var(--ab-ink); border-radius: var(--np-r); background: var(--ab-paper); box-shadow: none; }
+/* progress: the board's striped bar, on a fill that reads against the track */
+.ab.sb-ab:is([data-ae="neo-brutal-pop"], [data-ae="neo-brutal-pop--classic"]).sb-kit .ab-row-bar.sb-k-bar i { background: repeating-linear-gradient(-45deg, rgba(255, 255, 255, 0.24) 0 5px, transparent 5px 10px), var(--ab-primary); }
+/* rows: a touched row squishes into its shadow */
+.ab.sb-ab:is([data-ae="neo-brutal-pop"], [data-ae="neo-brutal-pop--classic"]).sb-kit .ab-row.sb-k-row.is-picked { transform: translate(3px, 3px); box-shadow: 0 0 0 var(--np-shc) !important; }
+/* containers */
+.ab.sb-ab:is([data-ae="neo-brutal-pop"], [data-ae="neo-brutal-pop--classic"]).sb-kit .sb-k-callout { border: var(--np-b) solid var(--ab-ink); border-radius: var(--np-rc); }
+.ab.sb-ab:is([data-ae="neo-brutal-pop"], [data-ae="neo-brutal-pop--classic"]).sb-kit .sb-k-callout b { font-weight: var(--np-uw, 700); }
+.ab.sb-ab:is([data-ae="neo-brutal-pop"], [data-ae="neo-brutal-pop--classic"]).sb-kit .sb-k-sheet { border: var(--np-b) solid var(--ab-ink); border-bottom: 0; border-radius: 16px 16px 0 0; box-shadow: none; }
+.ab.sb-ab:is([data-ae="neo-brutal-pop"], [data-ae="neo-brutal-pop--classic"]).sb-kit .sb-k-grab { background: var(--ab-ink); }
+.ab.sb-ab:is([data-ae="neo-brutal-pop"], [data-ae="neo-brutal-pop--classic"]).sb-kit .sb-k-toast { border: var(--np-b) solid var(--ab-ink); border-radius: var(--np-rc); box-shadow: 4px 4px 0 var(--ab-primary); }
+.ab.sb-ab:is([data-ae="neo-brutal-pop"], [data-ae="neo-brutal-pop--classic"]).sb-kit .sb-k-toast button { font-weight: var(--np-uw, 700); }
+/* navigation: 2px ink rules; the current tab marker is a chunky bar */
+.ab.sb-ab:is([data-ae="neo-brutal-pop"], [data-ae="neo-brutal-pop--classic"]).sb-kit .sb-k-topbar { border-bottom: var(--np-b) solid var(--ab-ink); }
+.ab.sb-ab:is([data-ae="neo-brutal-pop"], [data-ae="neo-brutal-pop--classic"]).sb-kit .sb-k-tb-title { font-weight: var(--np-hw, 800); }
+.ab.sb-ab:is([data-ae="neo-brutal-pop"], [data-ae="neo-brutal-pop--classic"]).sb-kit .sb-tabs { border-top: var(--np-b) solid var(--ab-ink); }
+.ab.sb-ab:is([data-ae="neo-brutal-pop"], [data-ae="neo-brutal-pop--classic"]).sb-kit .sb-k-tabbarbox .sb-tabs { border-top: 0; }
+.ab.sb-ab:is([data-ae="neo-brutal-pop"], [data-ae="neo-brutal-pop--classic"]).sb-kit .sb-tab[aria-current] { font-weight: var(--np-uw, 700); }
+.ab.sb-ab:is([data-ae="neo-brutal-pop"], [data-ae="neo-brutal-pop--classic"]).sb-kit .sb-tab[aria-current]::before { width: 20px; margin-left: -10px; height: 4px; border-radius: 2px; background: var(--ab-ink); }
+.ab.sb-ab:is([data-ae="neo-brutal-pop"], [data-ae="neo-brutal-pop--classic"]).sb-kit .sb-k-tabs { border-bottom: var(--np-b) solid var(--ab-ink); }
+.ab.sb-ab:is([data-ae="neo-brutal-pop"], [data-ae="neo-brutal-pop--classic"]).sb-kit .sb-k-tabs [role="tab"][aria-selected="true"] { font-weight: var(--np-uw, 700); }
+.ab.sb-ab:is([data-ae="neo-brutal-pop"], [data-ae="neo-brutal-pop--classic"]).sb-kit .sb-k-tabs [role="tab"][aria-selected="true"]::after { bottom: -2px; height: 4px; background: var(--ab-ink); }
+.ab.sb-ab:is([data-ae="neo-brutal-pop"], [data-ae="neo-brutal-pop--classic"]).sb-kit .sb-dots i { border-radius: 2px; background: color-mix(in srgb, var(--ab-ink) 28%, transparent); }
+.ab.sb-ab:is([data-ae="neo-brutal-pop"], [data-ae="neo-brutal-pop--classic"]).sb-kit .sb-dots i.is-on { background: var(--ab-ink); }
+/* feedback: outlined chips (no shadow at this size), outlined avatars */
+.ab.sb-ab:is([data-ae="neo-brutal-pop"], [data-ae="neo-brutal-pop--classic"]).sb-kit :is(.sb-k-badge, .sb-k-count) { border-radius: var(--np-r); box-shadow: inset 0 0 0 var(--np-b) var(--ab-ink); font-weight: var(--np-uw, 700); }
+.ab.sb-ab:is([data-ae="neo-brutal-pop"], [data-ae="neo-brutal-pop--classic"]).sb-kit .sb-k-count:not(.is-accent) { background: var(--ab-paper); }
+.ab.sb-ab:is([data-ae="neo-brutal-pop"], [data-ae="neo-brutal-pop--classic"]).sb-kit .sb-badge { box-shadow: 0 0 0 2px var(--ab-ink); }
+.ab.sb-ab:is([data-ae="neo-brutal-pop"], [data-ae="neo-brutal-pop--classic"]).sb-kit .sb-k-av { border-radius: var(--np-r); box-shadow: inset 0 0 0 var(--np-b) var(--ab-ink); font-weight: var(--np-uw, 700); }
+.ab.sb-ab:is([data-ae="neo-brutal-pop"], [data-ae="neo-brutal-pop--classic"]).sb-kit .sb-k-avs .sb-k-av { box-shadow: inset 0 0 0 var(--np-b) var(--ab-ink), 0 0 0 2px var(--ab-paper); }
+.ab.sb-ab:is([data-ae="neo-brutal-pop"], [data-ae="neo-brutal-pop--classic"]).sb-kit :is(.sb-k-ico, .sb-k-emptyico) { border-radius: var(--np-r); box-shadow: inset 0 0 0 var(--np-b) var(--ab-ink); }
+/* small chips (the kicker sticker) keep the outline and tilt but cast no shadow */
+.ab.sb-ab:is([data-ae="neo-brutal-pop"], [data-ae="neo-brutal-pop--classic"]).sb-kit .ab-kicker { box-shadow: none; }
+/* classic: no graph-paper ground, no starburst or flower stickers on the welcome title */
+.ab.sb-ab[data-ae="neo-brutal-pop--classic"].sb-kit { --np-shc: var(--ab-ink); background-image: none; }
+.ab.sb-ab[data-ae="neo-brutal-pop--classic"].sb-kit .ab-headline::before { content: none; }
+.ab.sb-ab[data-ae="neo-brutal-pop--classic"].sb-kit .ab-hl { transform: none; }

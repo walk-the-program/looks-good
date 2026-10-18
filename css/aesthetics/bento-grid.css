@@ -411,3 +411,62 @@
 .ab.sb-ab[data-ae="bento-grid"] .ab-panel .sb-field-row .ab-input { font-size: 14px; padding-left: 14px; padding-right: 14px; text-overflow: ellipsis; }
 /* landing feature numerals are 12px text: lift the dark-mode brand blue (3.3:1) toward the ink so they reach 4.5:1 */
 .ab.sb-ab[data-ae="bento-grid"] .sb-feat-n { color: color-mix(in srgb, var(--ab-primary-text) 55%, var(--ab-ink)); }
+
+/* ---- App UI (phone screens + UI kit tab, root .sb-kit): the board's tile recipes are re-set for
+   components. Rows stay tiles (one idea each) with a 6px gutter and a real inner inset; titles
+   outside a card are plain type, never a tile; the card's action is a normal button, its label
+   centred; every button is a pill like the fields and the segmented control. ---- */
+.ab.sb-ab[data-ae="bento-grid"].sb-kit .ab-card-title:not(.ab-card .ab-card-title),
+.ab.sb-ab[data-ae="bento-grid"].sb-kit .ab-card-title:not(.ab-card .ab-card-title):hover {
+  padding: 0; border-radius: 0; background: none; box-shadow: none; transform: none;
+}
+.ab.sb-ab[data-ae="bento-grid"].sb-kit .ab-card .ab-cta { min-height: var(--k-btn, 52px); aspect-ratio: auto; padding: 0 6px 0 20px; }
+.ab.sb-ab[data-ae="bento-grid"].sb-kit .ab-cta-label { align-self: center; justify-self: auto; font-size: inherit; line-height: inherit; letter-spacing: -0.01em; }
+.ab.sb-ab[data-ae="bento-grid"].sb-kit .ab-cta-arrow { align-self: center; margin-left: auto; }
+.ab.sb-ab[data-ae="bento-grid"].sb-kit :is(.ab-cta.sb-k-btn, .ab-type-apply.sb-k-btn2, .sb-k-danger) { border-radius: 999px; }
+.ab.sb-ab[data-ae="bento-grid"].sb-kit .ab-cta.sb-k-btn { padding-left: 20px; padding-right: 6px; }
+.ab.sb-ab[data-ae="bento-grid"].sb-kit .ab-cta:hover { transform: none; }
+.ab.sb-ab[data-ae="bento-grid"].sb-kit .ab-list.sb-k-list { display: flex !important; flex-direction: column; gap: 6px; }
+.ab.sb-ab[data-ae="bento-grid"].sb-kit .ab-row.sb-k-row,
+.ab.sb-ab[data-ae="bento-grid"].sb-kit .ab-row.sb-k-row:nth-child(1) {
+  padding: 10px 16px !important; border-radius: 20px; background: var(--ab-tile); min-height: var(--k-row, 52px) !important;
+}
+.ab.sb-ab[data-ae="bento-grid"].sb-kit .ab-row.sb-k-row:hover { transform: none; }
+.ab.sb-ab[data-ae="bento-grid"].sb-kit .sb-k-row .sb-k-ico { border-radius: 10px; }
+.ab.sb-ab[data-ae="bento-grid"].sb-kit .ab-toggle.sb-tog { padding: 10px 16px; border-radius: 20px; min-height: var(--k-row, 52px); }
+/* the kicker chip is a plain tile in the app (the secondary tint turned muddy on dark grounds) */
+.ab.sb-ab[data-ae="bento-grid"].sb-kit .ab-kicker { background: var(--ab-tile); }
+.ab.sb-ab[data-ae="bento-grid"].sb-kit .ab-row.sb-k-row.is-picked { background: var(--ab-tile-pri); }
+
+/* ---- Classic version, App UI (phone screens + UI kit tab, root .sb-kit): the board's tile recipes are re-set for
+   components (classic root; the current version has its own block above). The card is one tile again (the board's
+   composed square action tile is a board layout), its action a normal pill button with the label
+   centred; rows are tiles with a 6px gutter and a real inner inset; titles outside a card are
+   plain type, never a tile. ---- */
+.ab.sb-ab[data-ae="bento-grid--classic"].sb-kit .ab-card.sb-k-card { background: var(--ab-tile); border-radius: var(--bn-r); box-shadow: var(--ab-shadow); min-height: 0; }
+.ab.sb-ab[data-ae="bento-grid--classic"].sb-kit .ab-card.sb-k-card::before { content: none; display: none; }
+.ab.sb-ab[data-ae="bento-grid--classic"].sb-kit .ab-card-title:not(.ab-card .ab-card-title),
+.ab.sb-ab[data-ae="bento-grid--classic"].sb-kit .ab-card-title:not(.ab-card .ab-card-title):hover {
+  padding: 0; border-radius: 0; background: none; box-shadow: none; transform: none;
+}
+.ab.sb-ab[data-ae="bento-grid--classic"].sb-kit .ab-card .ab-cta { min-height: var(--k-btn, 52px); aspect-ratio: auto; box-shadow: none; }
+.ab.sb-ab[data-ae="bento-grid--classic"].sb-kit .ab-cta-label { align-self: center; justify-self: auto; font-size: inherit; line-height: inherit; letter-spacing: -0.01em; }
+.ab.sb-ab[data-ae="bento-grid--classic"].sb-kit .ab-cta-arrow { align-self: center; margin-left: auto; }
+.ab.sb-ab[data-ae="bento-grid--classic"].sb-kit :is(.ab-cta.sb-k-btn, .ab-type-apply.sb-k-btn2, .sb-k-danger) { border-radius: 999px; }
+.ab.sb-ab[data-ae="bento-grid--classic"].sb-kit .ab-cta.sb-k-btn { padding-left: 20px; padding-right: 6px; }
+.ab.sb-ab[data-ae="bento-grid--classic"].sb-kit .ab-cta:hover { transform: none; }
+.ab.sb-ab[data-ae="bento-grid--classic"].sb-kit .ab-list.sb-k-list { display: flex !important; flex-direction: column; gap: 6px; }
+.ab.sb-ab[data-ae="bento-grid--classic"].sb-kit .ab-row.sb-k-row,
+.ab.sb-ab[data-ae="bento-grid--classic"].sb-kit .ab-row.sb-k-row:nth-child(1) {
+  padding: 10px 16px !important; border-radius: 20px; background: var(--ab-tile); min-height: var(--k-row, 52px) !important;
+}
+.ab.sb-ab[data-ae="bento-grid--classic"].sb-kit .ab-row.sb-k-row:hover { transform: none; box-shadow: var(--ab-shadow); }
+.ab.sb-ab[data-ae="bento-grid--classic"].sb-kit .ab-row.sb-k-row.is-picked { background: var(--ab-tile-pri); }
+.ab.sb-ab[data-ae="bento-grid--classic"].sb-kit .sb-k-row .sb-k-ico { border-radius: 10px; }
+.ab.sb-ab[data-ae="bento-grid--classic"].sb-kit .ab-toggle.sb-tog { padding: 10px 16px; border-radius: 20px; min-height: var(--k-row, 52px); }
+.ab.sb-ab[data-ae="bento-grid--classic"].sb-kit .ab-kicker { background: var(--ab-tile); }
+.ab.sb-ab[data-ae="bento-grid--classic"].sb-kit .ab-card.sb-k-card { padding-top: var(--k-cardpad, 20px) !important; }
+.ab.sb-ab[data-ae="bento-grid--classic"].sb-kit .sb-k-card :is(.ab-card-title, .ab-card-body),
+.ab.sb-ab[data-ae="bento-grid--classic"].sb-kit .sb-k-card :is(.ab-card-title, .ab-card-body):hover { padding: 0; }
+/* Form layout: the toggle is a plain row so its label lines up with the field labels above it */
+.ab.sb-ab:is([data-ae="bento-grid"], [data-ae="bento-grid--classic"]).sb-kit .sb-k-scr[data-scr="form"] .ab-toggle.sb-tog { padding-left: 0; padding-right: 0; background: none; box-shadow: none; border-radius: 0; }

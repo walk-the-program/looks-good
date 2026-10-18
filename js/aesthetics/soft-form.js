@@ -78,6 +78,12 @@ registerAesthetic({
       '--ab-gloss': t.isDark ? 'rgba(255,255,255,0.07)' : 'rgba(255,255,255,0.5)',
       '--ab-canvas-a': t.alpha(t.canvas, 0.7),   // lens body: mutes the original beneath the refracted copy
       '--ab-type-pick-w': 600,
+      // App UI only (phone screens and the UI kit tab, css .sb-kit block): the relief pair for
+      // components. Dark lifts the highlight and deepens the shadow so raised and recessed still
+      // read on a near-black canvas; the rim is a 1px top light on raised parts in dark only.
+      '--sfk-hi': t.isDark ? 'rgba(255,255,255,0.13)' : hi,
+      '--sfk-lo': t.isDark ? t.alpha(t.mix('#000000', t.canvas, 0.85), 0.8) : lo,
+      '--sfk-rim': t.isDark ? 'rgba(255,255,255,0.08)' : 'rgba(255,255,255,0)',
     };
   },
 

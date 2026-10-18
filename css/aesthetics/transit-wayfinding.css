@@ -355,3 +355,36 @@
 /* concourse chrome in light: the Built sidebar's quiet text, a touch darker than the framework muted */
 .ab.sb-ab[data-ae="transit-wayfinding"][data-mode="light"] .sb-side { --ab-muted: #3F4246; }
 .ab[data-ae="transit-wayfinding"][data-mode="light"] .ab-input::placeholder { color: var(--tw-dim); opacity: 1; }
+
+/* ---- app screens and the UI kit (.sb-kit: phone screens, UI kit tab) ----
+   Signage at component level: black sign panels with white type, 4px corners, numbered square
+   markers, route lines with station discs, and a press that turns a sign white (the board's
+   :active). Pictograms on a sign are white outlines, never pale tiles. */
+/* pressed: the sign flips to white with black type */
+.ab.sb-ab[data-ae="transit-wayfinding"].sb-kit :is(.ab-type-apply.sb-k-btn2, .sb-k-iconbtn).sb-k-pressed { background: #FFFFFF; color: #000000; box-shadow: inset 0 0 0 2px #000000; filter: none; }
+/* icon tiles and the empty-state pictogram: white outline squares on the sign, a sign square on the concourse */
+.ab.sb-ab[data-ae="transit-wayfinding"].sb-kit .sb-k-ico { border-radius: var(--tw-r); background: transparent; color: var(--tw-white); box-shadow: inset 0 0 0 2px var(--tw-white); }
+.ab.sb-ab[data-ae="transit-wayfinding"].sb-kit .sb-k-emptyico { border-radius: var(--tw-r); background: var(--ab-sign); color: #FFFFFF; }
+/* a touched row on a sign: a lit panel with a route bar at its edge, the type stays white */
+.ab.sb-ab[data-ae="transit-wayfinding"].sb-kit .ab-row.sb-k-row.is-picked { background: #262729 !important; box-shadow: inset 4px 0 0 var(--ab-route1); --tw-white: #FFFFFF; --tw-dim: #B9BBBE; --ab-ink: #FFFFFF; --ab-muted: #B9BBBE; color: #FFFFFF; }
+/* select menu: a sign panel */
+.ab.sb-ab[data-ae="transit-wayfinding"].sb-kit .sb-k-menu { padding: 4px; border: 0; border-radius: var(--tw-r); background: var(--ab-sign); color: #FFFFFF; box-shadow: none; }
+.ab.sb-ab[data-ae="transit-wayfinding"].sb-kit .sb-k-menu li { border-radius: 2px; }
+.ab.sb-ab[data-ae="transit-wayfinding"].sb-kit .sb-k-menu li[aria-selected="true"] { background: #262729; box-shadow: inset 4px 0 0 var(--ab-route1); }
+.ab.sb-ab[data-ae="transit-wayfinding"].sb-kit .sb-k-menu .sb-ico { color: #FFFFFF; }
+/* checkbox and radio: 2px ink edges, 2px corners on the box */
+.ab.sb-ab[data-ae="transit-wayfinding"].sb-kit .sb-k-box { border: 2px solid var(--ab-ink); border-radius: 2px; }
+.ab.sb-ab[data-ae="transit-wayfinding"].sb-kit .sb-k-box:checked { border-color: var(--ab-primary); }
+.ab.sb-ab[data-ae="transit-wayfinding"].sb-kit .sb-k-box[type="radio"] { border-radius: 50%; }
+/* slider: a route line with a station disc */
+.ab.sb-ab[data-ae="transit-wayfinding"].sb-kit .sb-k-range::-webkit-slider-runnable-track { height: 4px; border-radius: 2px; background: linear-gradient(90deg, var(--ab-route1, var(--ab-primary)) var(--v, 50%), var(--ab-rail) var(--v, 50%)); box-shadow: none; }
+.ab.sb-ab[data-ae="transit-wayfinding"].sb-kit .sb-k-range::-webkit-slider-thumb { width: 24px; height: 24px; margin-top: -10px; border: 4px solid var(--ab-ink); border-radius: 50%; background: var(--ab-canvas); box-shadow: none; }
+.ab.sb-ab[data-ae="transit-wayfinding"].sb-kit .sb-k-range::-moz-range-track { height: 4px; border-radius: 2px; background: linear-gradient(90deg, var(--ab-route1, var(--ab-primary)) var(--v, 50%), var(--ab-rail) var(--v, 50%)); }
+.ab.sb-ab[data-ae="transit-wayfinding"].sb-kit .sb-k-range::-moz-range-thumb { width: 16px; height: 16px; border: 4px solid var(--ab-ink); border-radius: 50%; background: var(--ab-canvas); box-shadow: none; }
+/* toast: a sign panel, no blur */
+.ab.sb-ab[data-ae="transit-wayfinding"].sb-kit .sb-k-toast { border-radius: var(--tw-r); background: var(--ab-sign); color: #FFFFFF; box-shadow: none; }
+.ab.sb-ab[data-ae="transit-wayfinding"].sb-kit .sb-k-sheet { box-shadow: none; border-top: 4px solid var(--ab-sign); }
+/* badges: plates. Draft is an outlined plate, the matched status a black sign plate */
+.ab.sb-ab[data-ae="transit-wayfinding"].sb-kit .sb-k-row-inline .ab-fit { display: inline-flex; align-items: center; min-height: 24px; padding: 0 8px; border-radius: 3px; box-shadow: inset 0 0 0 2px var(--ab-ink); color: var(--ab-ink); font-size: var(--k-caption, 12px); }
+.ab.sb-ab[data-ae="transit-wayfinding"].sb-kit .sb-k-row-inline .ab-fit[data-fit="match"] { background: var(--ab-sign); color: #FFFFFF; box-shadow: none; }
+.ab.sb-ab[data-ae="transit-wayfinding"].sb-kit :is(.sb-k-badge, .sb-k-count) { border-radius: 3px; }

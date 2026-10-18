@@ -247,3 +247,52 @@
 
 /* Built settings: website and email share a row; a long name ends in an ellipsis, not a cut letter */
 .ab.sb-ab[data-ae="cyber-hud"] .sb-field-row .ab-input { text-overflow: ellipsis; letter-spacing: 0; font-size: 14px; }
+
+/* ---- App UI (phone screens + UI kit tab; scope .sb-kit only, never the board) ----
+   The signature in the app is the chamfered component (TL / BR cut) with its 1px neon line; the
+   field (grid, sweep, scanlines) and the yellow hazard tab stay on the board: app screens sit on the
+   plain canvas like the kit's screen layouts, and the hazard yellow is not a palette colour. Every
+   small piece takes the chamfer instead of a pill; selection is a fill with a full 1px neon ring,
+   never a hard bottom edge. */
+.ab.sb-ab.sb-kit.sb-screen[data-ae="cyber-hud"]::before, .ab.sb-ab.sb-kit.sb-screen[data-ae="cyber-hud"]::after { content: none; }
+.ab.sb-ab.sb-kit[data-ae="cyber-hud"] :is(.sb-k-cell, .sb-k-layout) { position: relative; z-index: 1; border-radius: 0; background: var(--ab-canvas); }
+.ab.sb-ab.sb-kit[data-ae="cyber-hud"] .sb-k-ios-tag { border-radius: 0; }
+.ab.sb-ab.sb-kit[data-ae="cyber-hud"] .ab-labelrow::after { content: none; }
+/* the list's box is drawn by its pseudo layers; a transparent shadow marks it as a box for the row
+   inset pass (kitLists), so rows keep their 16pt inset instead of running to the neon line */
+.ab.sb-ab.sb-kit[data-ae="cyber-hud"] .ab-list.sb-k-list { box-shadow: 0 0 0 0 transparent; }
+.ab.sb-ab.sb-kit[data-ae="cyber-hud"] .ab-seg-btn[aria-pressed="true"] { box-shadow: inset 0 0 0 1px var(--ab-neon); }
+/* fields: focus = neon edge + corner brackets (the board's focus), error = danger edge; no glow ring */
+.ab.sb-ab.sb-kit[data-ae="cyber-hud"] :is(.sb-k-field, .sb-k-search).is-focus .ab-input { border-color: var(--ab-neon) !important; box-shadow: none !important; background: var(--ab-brackets), var(--ab-canvas); background-origin: border-box; }
+.ab.sb-ab.sb-kit[data-ae="cyber-hud"] .sb-k-field.is-error .ab-input { border-color: var(--sb-danger) !important; box-shadow: inset 0 0 0 1px var(--sb-danger) !important; }
+/* open select: a square panel with the 1px HUD line; the chosen row filled with a neon tick bar */
+.ab.sb-ab.sb-kit[data-ae="cyber-hud"] .sb-k-menu { --hc: 9px; padding: 0; border: 0; border-radius: 0; background: var(--ab-hud-fill); box-shadow: inset 0 0 0 1px var(--ab-hud-line); }
+.ab.sb-ab.sb-kit[data-ae="cyber-hud"] .sb-k-menu li { border-radius: 0; }
+.ab.sb-ab.sb-kit[data-ae="cyber-hud"] .sb-k-menu li[aria-selected="true"] { background: var(--ab-hud-fill3); box-shadow: inset 3px 0 0 var(--ab-neon); }
+.ab.sb-ab.sb-kit[data-ae="cyber-hud"] .sb-k-menu li[aria-selected="true"] .sb-ico { color: var(--ab-ink); }
+/* checkbox and radio: square frames on the line colour (a chamfer would cut the 1px frame open); checked = ink fill (radio: an ink core) */
+.ab.sb-ab.sb-kit[data-ae="cyber-hud"] .sb-k-box { width: 22px; height: 22px; border: 0; border-radius: 0; background: var(--ab-canvas); box-shadow: inset 0 0 0 1px var(--ab-hud-line); }
+.ab.sb-ab.sb-kit[data-ae="cyber-hud"] .sb-k-box[type="radio"] { border-radius: 0; }
+.ab.sb-ab.sb-kit[data-ae="cyber-hud"] .sb-k-box[type="checkbox"]:checked { background: var(--ab-ink); box-shadow: none; }
+.ab.sb-ab.sb-kit[data-ae="cyber-hud"] .sb-k-box[type="checkbox"]:checked::after { border-color: var(--ab-canvas); }
+.ab.sb-ab.sb-kit[data-ae="cyber-hud"] .sb-k-box[type="radio"]:checked { background: var(--ab-canvas); box-shadow: inset 0 0 0 1px var(--ab-ink); }
+.ab.sb-ab.sb-kit[data-ae="cyber-hud"] .sb-k-box[type="radio"]:checked::after { width: 10px; height: 10px; border-radius: 0; background: var(--ab-ink); }
+/* slider: the segmented HUD bar; the thumb a neon bar */
+.ab.sb-ab.sb-kit[data-ae="cyber-hud"] .sb-k-range::-webkit-slider-runnable-track { height: 8px; border-radius: 0; background: repeating-linear-gradient(90deg, transparent 0 5px, var(--ab-canvas) 5px 7px), linear-gradient(90deg, var(--ab-neon) var(--v, 50%), var(--ab-hud-line-soft) var(--v, 50%)); }
+.ab.sb-ab.sb-kit[data-ae="cyber-hud"] .sb-k-range::-webkit-slider-thumb { width: 10px; height: 26px; margin-top: -9px; border: 0; border-radius: 0; background: var(--ab-ink); box-shadow: 0 0 0 2px var(--ab-canvas); }
+.ab.sb-ab.sb-kit[data-ae="cyber-hud"] .sb-k-range::-moz-range-track { height: 8px; border-radius: 0; background: linear-gradient(90deg, var(--ab-neon) var(--v, 50%), var(--ab-hud-line-soft) var(--v, 50%)); }
+.ab.sb-ab.sb-kit[data-ae="cyber-hud"] .sb-k-range::-moz-range-thumb { width: 10px; height: 26px; border: 0; border-radius: 0; background: var(--ab-ink); }
+/* chamfered small pieces and surfaces */
+.ab.sb-ab.sb-kit[data-ae="cyber-hud"] :is(.sb-k-badge, .sb-k-count, .sb-k-av, .sb-k-ico, .sb-k-emptyico, .sb-k-danger, .sb-k-toast) {
+  --hc: 6px; border-radius: 0; clip-path: polygon(var(--hc) 0, 100% 0, 100% calc(100% - var(--hc)), calc(100% - var(--hc)) 100%, 0 100%, 0 var(--hc));
+}
+.ab.sb-ab.sb-kit[data-ae="cyber-hud"] :is(.sb-k-badge, .sb-k-count) { --hc: 4px; }
+.ab.sb-ab.sb-kit[data-ae="cyber-hud"] :is(.sb-k-danger, .sb-k-toast) { --hc: 9px; }
+/* callouts keep a square 1px frame (a clip would cut it open at the corners) */
+.ab.sb-ab.sb-kit[data-ae="cyber-hud"] .sb-k-callout { border-radius: 0; }
+.ab.sb-ab.sb-kit[data-ae="cyber-hud"] .sb-k-avs .sb-k-av { clip-path: none; }
+.ab.sb-ab.sb-kit[data-ae="cyber-hud"] :is(.sb-badge, .sb-dots i) { border-radius: 0; }
+.ab.sb-ab.sb-kit[data-ae="cyber-hud"] :is(.sb-k-toast, .sb-k-danger) { box-shadow: none; }
+.ab.sb-ab.sb-kit[data-ae="cyber-hud"] .sb-k-sheetbox, .ab.sb-ab.sb-kit[data-ae="cyber-hud"] .sb-k-tabbarbox { border-radius: 0; }
+.ab.sb-ab.sb-kit[data-ae="cyber-hud"] .sb-k-sheet { border-radius: 0; box-shadow: inset 0 1px 0 var(--ab-neon-line); }
+.ab.sb-ab.sb-kit[data-ae="cyber-hud"] .sb-k-grab { height: 3px; border-radius: 0; background: var(--ab-hud-line); }

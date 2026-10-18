@@ -240,3 +240,35 @@
 /* html2canvas has no 3D transforms and offsets a transformed element's clipped children from its frame:
    the export lays the plane flat so frame and fill line up */
 .deck-export-host .ab[data-ae="holo-iridescent"] .hof { transform: none; }
+
+/* ---- app UI (phone screens and the UI kit): the foil lives on components only (the selected
+   segment, the primary's spectral rim, the featured card's edge, avatars, the current tab). The
+   pearl wash behind the screen is board atmosphere, not app UI: phones sit on the plain canvas. ---- */
+.ab.sb-ab[data-ae="holo-iridescent"].sb-kit { background: var(--ab-canvas); }
+/* secondary and icon buttons: solid pearl with the chrome hairline, the primary's 12px corner */
+.ab.sb-ab[data-ae="holo-iridescent"].sb-kit .ab-type-apply {
+  border: 1px solid var(--ab-hair-strong); border-radius: 12px; background: var(--ab-card-solid); color: var(--ab-ink);
+  box-shadow: inset 0 1px 0 var(--ab-hl-line), 0 1px 2px rgba(20, 20, 50, 0.06);
+}
+.ab.sb-ab[data-ae="holo-iridescent"].sb-kit .ab-type-apply.sb-k-iconbtn { border-radius: 50%; }
+/* the primary's glow stays low on a phone */
+.ab.sb-ab[data-ae="holo-iridescent"].sb-kit .ab-cta { box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.22), 0 6px 14px -8px var(--ab-cta-glow); }
+.ab.sb-ab[data-ae="holo-iridescent"].sb-kit .ab-seg-btn[aria-pressed="true"] { box-shadow: inset 0 1px 0 #fff, 0 0 0 1px rgba(255, 255, 255, 0.7), 0 2px 6px -2px rgba(20, 20, 50, 0.2); }
+/* avatars: the restrained foil over chrome, as the product screens' account avatar */
+.ab.sb-ab[data-ae="holo-iridescent"].sb-kit .sb-k-av { background: var(--ho-foil-s), var(--ab-chrome); color: var(--ab-chrome-ink); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.7); }
+.ab.sb-ab[data-ae="holo-iridescent"].sb-kit .sb-k-avs .sb-k-av { box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.7), 0 0 0 2px var(--ab-canvas); }
+/* the foil word no longer clones its box per line: a cloned box stopped text-wrap: balance and left
+   "your pocket" as a short second line under a full first one */
+.ab.sb-ab[data-ae="holo-iridescent"].sb-kit .ab-hl { -webkit-box-decoration-break: slice; box-decoration-break: slice; }
+
+/* ==== classic version (data-ae="holo-iridescent--classic"): its app UI rules live here, since css/aesthetics/classic/ is generated ==== */
+/* ---- app UI (phone screens and the UI kit): foil only on components; phones sit on the plain
+   canvas, not the board's pearl wash. Secondary and icon buttons take the chrome hairline (the
+   1.5px ink outline read as a hard box); the foil word stops cloning its box so titles balance. ---- */
+.ab.sb-ab[data-ae="holo-iridescent--classic"].sb-kit { background: var(--ab-canvas); }
+.ab.sb-ab[data-ae="holo-iridescent--classic"].sb-kit .ab-type-apply {
+  border: 1px solid var(--ab-hair-strong); background: var(--ab-card-solid); color: var(--ab-ink);
+  box-shadow: inset 0 1px 0 var(--ab-hl-line), 0 1px 2px rgba(20, 20, 50, 0.06);
+}
+.ab.sb-ab[data-ae="holo-iridescent--classic"].sb-kit .ab-type-apply.sb-k-iconbtn { border-radius: 50%; }
+.ab.sb-ab[data-ae="holo-iridescent--classic"].sb-kit .ab-hl { -webkit-box-decoration-break: slice; box-decoration-break: slice; }

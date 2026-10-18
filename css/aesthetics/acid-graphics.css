@@ -322,3 +322,130 @@
 .deck-export-host .ab[data-ae="acid-graphics"] .aca-word span::before,
 .deck-export-host .ab[data-ae="acid-graphics"] .aca-word span::after { content: attr(data-w); position: absolute; z-index: -1; left: 0.05em; top: 0.05em; -webkit-text-stroke-color: var(--ab-clash); pointer-events: none; }
 .deck-export-host .ab[data-ae="acid-graphics"] .aca-word span::after { left: 0.1em; top: 0.1em; -webkit-text-stroke-color: #f4f4f4; }
+
+/* App UI (phone screens, UI kit tab: roots with .sb-kit). The components keep the acid block, the clash
+   edge and the stretched type, but none of the board's decoration: no ripple behind cards, no stripes,
+   no info strip or field band under section labels, no grid hairlines across the phone screen. */
+.ab.sb-ab.sb-screen[data-ae="acid-graphics"]::before { content: none; }
+.ab.sb-ab.sb-kit[data-ae="acid-graphics"] :is(.ab-card, .ab-panel)::before,
+.ab.sb-ab.sb-kit[data-ae="acid-graphics"] .ab-labelrow::before,
+.ab.sb-ab.sb-kit[data-ae="acid-graphics"] .ab-labelrow::after { content: none; }
+.ab.sb-ab.sb-kit[data-ae="acid-graphics"] .ab-labelrow.sb-k-section { padding: 8px 0 4px; }
+/* secondary: the same block, outlined (acid edge, ink label), so it never competes with the primary */
+.ab.sb-ab.sb-kit[data-ae="acid-graphics"] .ab-type-apply.sb-k-btn2 { border: 2px solid var(--ab-acid); background: transparent; color: var(--ab-ink); }
+.ab.sb-ab.sb-kit[data-ae="acid-graphics"] .ab-type-apply.sb-k-btn2:hover { background: var(--ac-acid-a); color: var(--ab-ink); border-color: var(--ab-acid); }
+.ab.sb-ab.sb-kit[data-ae="acid-graphics"] .ab-type-apply.sb-k-btn2.sb-k-pressed { background: var(--ac-acid-a); filter: none; }
+/* fields: the value is typed text in the body face, sentence case; the heavy underline stays, ink
+   (holds 3:1 on either ground) with the clash echoed under it; focus turns it acid, error the danger tone */
+.ab.sb-ab.sb-kit[data-ae="acid-graphics"] :is(.sb-k-field, .sb-k-search, .sb-k-selectwrap) .ab-input {
+  font-family: var(--ab-font-b); font-weight: 400; text-transform: none; letter-spacing: 0;
+  border-bottom: 2px solid var(--ab-ink); box-shadow: 0 3px 0 var(--ab-clash);
+}
+.ab.sb-ab.sb-kit[data-ae="acid-graphics"] .sb-k-select { font-weight: 600 !important; }
+.ab.sb-ab.sb-kit[data-ae="acid-graphics"] :is(.sb-k-field, .sb-k-search).is-focus .ab-input { border-color: var(--ab-acid) !important; border-bottom-width: 3px; box-shadow: 0 3px 0 var(--ab-clash) !important; }
+.ab.sb-ab.sb-kit[data-ae="acid-graphics"] .sb-k-field.is-error .ab-input { border-color: var(--sb-danger) !important; border-bottom-width: 3px; box-shadow: none !important; }
+/* row icons sit bare on both pair tints (a tinted tile vanished on the acid rows and showed on the clash ones) */
+.ab.sb-ab.sb-kit[data-ae="acid-graphics"] .sb-k-ico { background: none; border-radius: 0; color: var(--ab-primary-text); }
+/* the kit's signature: square blocks, the ✱, mono caps on small labels, and the clash as a thin hard echo
+   (3px offset, no blur) on the few things that float; selection is printed in the acid */
+.ab.sb-ab.sb-kit[data-ae="acid-graphics"] .sb-k-textbtn { font-family: var(--ab-font-h); font-weight: var(--ac-hw, 800); text-transform: uppercase; letter-spacing: 0.06em; }
+.ab.sb-ab.sb-kit[data-ae="acid-graphics"] :is(.sb-k-badge, .sb-k-count) { border-radius: 0; font-family: var(--ac-mono); font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; }
+.ab.sb-ab.sb-kit[data-ae="acid-graphics"] .sb-badge { border-radius: 0; }
+.ab.sb-ab.sb-kit[data-ae="acid-graphics"] .sb-k-callout { border-radius: 0; border-width: 0 0 0 4px; border-color: var(--tone); }
+.ab.sb-ab.sb-kit[data-ae="acid-graphics"] .sb-k-callout b { font-family: var(--ac-mono); font-size: 13px; letter-spacing: 0.1em; text-transform: uppercase; }
+.ab.sb-ab.sb-kit[data-ae="acid-graphics"] .sb-k-toast { border-radius: 0; box-shadow: 3px 3px 0 var(--ab-clash); }
+.ab.sb-ab.sb-kit[data-ae="acid-graphics"] .sb-k-toast button { font-family: var(--ac-mono); letter-spacing: 0.1em; text-transform: uppercase; }
+.ab.sb-ab.sb-kit[data-ae="acid-graphics"] .sb-k-menu { border: 2px solid var(--ab-ink); border-radius: 0; box-shadow: 3px 3px 0 var(--ab-clash); }
+.ab.sb-ab.sb-kit[data-ae="acid-graphics"] .sb-k-menu li { border-radius: 0; }
+.ab.sb-ab.sb-kit[data-ae="acid-graphics"] .sb-k-menu li[aria-selected="true"] { background: var(--ac-acid-a); }
+.ab.sb-ab.sb-kit[data-ae="acid-graphics"] .sb-k-sheet { border-radius: 0; border-top: 3px solid var(--ab-acid); }
+.ab.sb-ab.sb-kit[data-ae="acid-graphics"] .sb-k-grab { border-radius: 0; background: var(--ab-acid); }
+.ab.sb-ab.sb-kit[data-ae="acid-graphics"] .sb-k-sheetbox { border-radius: 0; }
+.ab.sb-ab.sb-kit[data-ae="acid-graphics"] :is(.sb-k-emptyico) { border-radius: 0; background: var(--ab-acid); color: var(--ab-on-acid); box-shadow: 3px 3px 0 var(--ab-clash); }
+.ab.sb-ab.sb-kit[data-ae="acid-graphics"] .sb-k-av { border-radius: 0; font-family: var(--ac-mono); font-weight: 700; }
+.ab.sb-ab.sb-kit[data-ae="acid-graphics"] .sb-k-box[type="checkbox"] { border-radius: 0; border: 2px solid var(--ab-ink); }
+.ab.sb-ab.sb-kit[data-ae="acid-graphics"] .sb-k-box[type="radio"] { border: 2px solid var(--ab-ink); }
+.ab.sb-ab.sb-kit[data-ae="acid-graphics"] .sb-k-box:checked { background: var(--ab-acid); border-color: var(--ab-acid); }
+.ab.sb-ab.sb-kit[data-ae="acid-graphics"] .sb-k-box[type="checkbox"]:checked::after { border-color: var(--ab-on-acid); }
+.ab.sb-ab.sb-kit[data-ae="acid-graphics"] .sb-k-box[type="radio"]:checked::after { background: var(--ab-on-acid); border-radius: 0; }
+.ab.sb-ab.sb-kit[data-ae="acid-graphics"] .sb-k-range::-webkit-slider-runnable-track { height: 6px; border-radius: 0; background: linear-gradient(90deg, var(--ab-acid) var(--v, 50%), color-mix(in srgb, var(--ab-ink) 22%, transparent) var(--v, 50%)); }
+.ab.sb-ab.sb-kit[data-ae="acid-graphics"] .sb-k-range::-webkit-slider-thumb { width: 22px; height: 28px; margin-top: -11px; border-radius: 0; border: 2px solid var(--ab-ink); background: var(--ab-acid); box-shadow: 3px 3px 0 var(--ab-clash); }
+.ab.sb-ab.sb-kit[data-ae="acid-graphics"] .sb-k-slider-h { font-family: var(--ac-mono); font-size: 13px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; }
+.ab.sb-ab.sb-kit[data-ae="acid-graphics"] .sb-k-tb-title { font-family: var(--ab-font-h); font-weight: var(--ac-hw, 800); text-transform: uppercase; letter-spacing: 0.02em; }
+.ab.sb-ab.sb-kit[data-ae="acid-graphics"] .sb-k-topbar { border-bottom: 3px solid var(--ab-ink); }
+.ab.sb-ab.sb-kit[data-ae="acid-graphics"] .sb-k-tabs { border-bottom: 1px solid var(--ab-line); }
+.ab.sb-ab.sb-kit[data-ae="acid-graphics"] .sb-k-tabs [role="tab"] { font-family: var(--ac-mono); font-size: 13px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; }
+.ab.sb-ab.sb-kit[data-ae="acid-graphics"] .sb-k-tabs [role="tab"][aria-selected="true"]::after { height: 4px; bottom: -2px; background: var(--ab-acid); box-shadow: 0 3px 0 var(--ab-clash); }
+.ab.sb-ab.sb-kit[data-ae="acid-graphics"] .sb-tabs { border-top: 3px solid var(--ab-ink); }
+.ab.sb-ab.sb-kit[data-ae="acid-graphics"] .sb-tab { font-family: var(--ac-mono); font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; }
+.ab.sb-ab.sb-kit[data-ae="acid-graphics"] .sb-tab[aria-current]::before { width: 18px; height: 4px; margin-left: -9px; border-radius: 0; background: var(--ab-acid); box-shadow: 2px 2px 0 var(--ab-clash); }
+.ab.sb-ab.sb-kit[data-ae="acid-graphics"] .sb-k-tabbarbox { border-radius: 0; }
+.ab.sb-ab.sb-kit[data-ae="acid-graphics"] .sb-k-ios-tag { border-radius: 0; }
+/* the divider is a plain heavy rule in the app (the board prints its catalogue ticker in it) */
+.ab.sb-ab.sb-kit[data-ae="acid-graphics"] .ab-rule { height: 3px; background: var(--ab-ink); }
+.ab.sb-ab.sb-kit[data-ae="acid-graphics"] .ab-rule::before { content: none; }
+
+/* Classic copy of the current version's app UI block (same rules, classic key). */
+/* App UI (phone screens, UI kit tab: roots with .sb-kit). The components keep the acid block, the clash
+   edge and the stretched type, but none of the board's decoration: no ripple behind cards, no stripes,
+   no info strip or field band under section labels, no grid hairlines across the phone screen. */
+.ab.sb-ab.sb-screen[data-ae="acid-graphics--classic"]::before { content: none; }
+.ab.sb-ab.sb-kit[data-ae="acid-graphics--classic"] :is(.ab-card, .ab-panel)::before,
+.ab.sb-ab.sb-kit[data-ae="acid-graphics--classic"] .ab-labelrow::before,
+.ab.sb-ab.sb-kit[data-ae="acid-graphics--classic"] .ab-labelrow::after { content: none; }
+.ab.sb-ab.sb-kit[data-ae="acid-graphics--classic"] .ab-labelrow.sb-k-section { padding: 8px 0 4px; }
+/* secondary: the same block, outlined (acid edge, ink label), so it never competes with the primary */
+.ab.sb-ab.sb-kit[data-ae="acid-graphics--classic"] .ab-type-apply.sb-k-btn2 { border: 2px solid var(--ab-acid); background: transparent; color: var(--ab-ink); }
+.ab.sb-ab.sb-kit[data-ae="acid-graphics--classic"] .ab-type-apply.sb-k-btn2:hover { background: var(--ac-acid-a); color: var(--ab-ink); border-color: var(--ab-acid); }
+.ab.sb-ab.sb-kit[data-ae="acid-graphics--classic"] .ab-type-apply.sb-k-btn2.sb-k-pressed { background: var(--ac-acid-a); filter: none; }
+/* fields: the value is typed text in the body face, sentence case; the heavy underline stays, ink
+   (holds 3:1 on either ground) with the clash echoed under it; focus turns it acid, error the danger tone */
+.ab.sb-ab.sb-kit[data-ae="acid-graphics--classic"] :is(.sb-k-field, .sb-k-search, .sb-k-selectwrap) .ab-input {
+  font-family: var(--ab-font-b); font-weight: 400; text-transform: none; letter-spacing: 0;
+  border-bottom: 2px solid var(--ab-ink); box-shadow: 0 3px 0 var(--ab-clash);
+}
+.ab.sb-ab.sb-kit[data-ae="acid-graphics--classic"] .sb-k-select { font-weight: 600 !important; }
+.ab.sb-ab.sb-kit[data-ae="acid-graphics--classic"] :is(.sb-k-field, .sb-k-search).is-focus .ab-input { border-color: var(--ab-acid) !important; border-bottom-width: 3px; box-shadow: 0 3px 0 var(--ab-clash) !important; }
+.ab.sb-ab.sb-kit[data-ae="acid-graphics--classic"] .sb-k-field.is-error .ab-input { border-color: var(--sb-danger) !important; border-bottom-width: 3px; box-shadow: none !important; }
+/* row icons sit bare on both pair tints (a tinted tile vanished on the acid rows and showed on the clash ones) */
+.ab.sb-ab.sb-kit[data-ae="acid-graphics--classic"] .sb-k-ico { background: none; border-radius: 0; color: var(--ab-primary-text); }
+/* the kit's signature: square blocks, the ✱, mono caps on small labels, and the clash as a thin hard echo
+   (3px offset, no blur) on the few things that float; selection is printed in the acid */
+.ab.sb-ab.sb-kit[data-ae="acid-graphics--classic"] .sb-k-textbtn { font-family: var(--ab-font-h); font-weight: var(--ac-hw, 800); text-transform: uppercase; letter-spacing: 0.06em; }
+.ab.sb-ab.sb-kit[data-ae="acid-graphics--classic"] :is(.sb-k-badge, .sb-k-count) { border-radius: 0; font-family: var(--ac-mono); font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; }
+.ab.sb-ab.sb-kit[data-ae="acid-graphics--classic"] .sb-badge { border-radius: 0; }
+.ab.sb-ab.sb-kit[data-ae="acid-graphics--classic"] .sb-k-callout { border-radius: 0; border-width: 0 0 0 4px; border-color: var(--tone); }
+.ab.sb-ab.sb-kit[data-ae="acid-graphics--classic"] .sb-k-callout b { font-family: var(--ac-mono); font-size: 13px; letter-spacing: 0.1em; text-transform: uppercase; }
+.ab.sb-ab.sb-kit[data-ae="acid-graphics--classic"] .sb-k-toast { border-radius: 0; box-shadow: 3px 3px 0 var(--ab-clash); }
+.ab.sb-ab.sb-kit[data-ae="acid-graphics--classic"] .sb-k-toast button { font-family: var(--ac-mono); letter-spacing: 0.1em; text-transform: uppercase; }
+.ab.sb-ab.sb-kit[data-ae="acid-graphics--classic"] .sb-k-menu { border: 2px solid var(--ab-ink); border-radius: 0; box-shadow: 3px 3px 0 var(--ab-clash); }
+.ab.sb-ab.sb-kit[data-ae="acid-graphics--classic"] .sb-k-menu li { border-radius: 0; }
+.ab.sb-ab.sb-kit[data-ae="acid-graphics--classic"] .sb-k-menu li[aria-selected="true"] { background: var(--ac-acid-a); }
+.ab.sb-ab.sb-kit[data-ae="acid-graphics--classic"] .sb-k-sheet { border-radius: 0; border-top: 3px solid var(--ab-acid); }
+.ab.sb-ab.sb-kit[data-ae="acid-graphics--classic"] .sb-k-grab { border-radius: 0; background: var(--ab-acid); }
+.ab.sb-ab.sb-kit[data-ae="acid-graphics--classic"] .sb-k-sheetbox { border-radius: 0; }
+.ab.sb-ab.sb-kit[data-ae="acid-graphics--classic"] :is(.sb-k-emptyico) { border-radius: 0; background: var(--ab-acid); color: var(--ab-on-acid); box-shadow: 3px 3px 0 var(--ab-clash); }
+.ab.sb-ab.sb-kit[data-ae="acid-graphics--classic"] .sb-k-av { border-radius: 0; font-family: var(--ac-mono); font-weight: 700; }
+.ab.sb-ab.sb-kit[data-ae="acid-graphics--classic"] .sb-k-box[type="checkbox"] { border-radius: 0; border: 2px solid var(--ab-ink); }
+.ab.sb-ab.sb-kit[data-ae="acid-graphics--classic"] .sb-k-box[type="radio"] { border: 2px solid var(--ab-ink); }
+.ab.sb-ab.sb-kit[data-ae="acid-graphics--classic"] .sb-k-box:checked { background: var(--ab-acid); border-color: var(--ab-acid); }
+.ab.sb-ab.sb-kit[data-ae="acid-graphics--classic"] .sb-k-box[type="checkbox"]:checked::after { border-color: var(--ab-on-acid); }
+.ab.sb-ab.sb-kit[data-ae="acid-graphics--classic"] .sb-k-box[type="radio"]:checked::after { background: var(--ab-on-acid); border-radius: 0; }
+.ab.sb-ab.sb-kit[data-ae="acid-graphics--classic"] .sb-k-range::-webkit-slider-runnable-track { height: 6px; border-radius: 0; background: linear-gradient(90deg, var(--ab-acid) var(--v, 50%), color-mix(in srgb, var(--ab-ink) 22%, transparent) var(--v, 50%)); }
+.ab.sb-ab.sb-kit[data-ae="acid-graphics--classic"] .sb-k-range::-webkit-slider-thumb { width: 22px; height: 28px; margin-top: -11px; border-radius: 0; border: 2px solid var(--ab-ink); background: var(--ab-acid); box-shadow: 3px 3px 0 var(--ab-clash); }
+.ab.sb-ab.sb-kit[data-ae="acid-graphics--classic"] .sb-k-slider-h { font-family: var(--ac-mono); font-size: 13px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; }
+.ab.sb-ab.sb-kit[data-ae="acid-graphics--classic"] .sb-k-tb-title { font-family: var(--ab-font-h); font-weight: var(--ac-hw, 800); text-transform: uppercase; letter-spacing: 0.02em; }
+.ab.sb-ab.sb-kit[data-ae="acid-graphics--classic"] .sb-k-topbar { border-bottom: 3px solid var(--ab-ink); }
+.ab.sb-ab.sb-kit[data-ae="acid-graphics--classic"] .sb-k-tabs { border-bottom: 1px solid var(--ab-line); }
+.ab.sb-ab.sb-kit[data-ae="acid-graphics--classic"] .sb-k-tabs [role="tab"] { font-family: var(--ac-mono); font-size: 13px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; }
+.ab.sb-ab.sb-kit[data-ae="acid-graphics--classic"] .sb-k-tabs [role="tab"][aria-selected="true"]::after { height: 4px; bottom: -2px; background: var(--ab-acid); box-shadow: 0 3px 0 var(--ab-clash); }
+.ab.sb-ab.sb-kit[data-ae="acid-graphics--classic"] .sb-tabs { border-top: 3px solid var(--ab-ink); }
+.ab.sb-ab.sb-kit[data-ae="acid-graphics--classic"] .sb-tab { font-family: var(--ac-mono); font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; }
+.ab.sb-ab.sb-kit[data-ae="acid-graphics--classic"] .sb-tab[aria-current]::before { width: 18px; height: 4px; margin-left: -9px; border-radius: 0; background: var(--ab-acid); box-shadow: 2px 2px 0 var(--ab-clash); }
+.ab.sb-ab.sb-kit[data-ae="acid-graphics--classic"] .sb-k-tabbarbox { border-radius: 0; }
+.ab.sb-ab.sb-kit[data-ae="acid-graphics--classic"] .sb-k-ios-tag { border-radius: 0; }
+/* the divider is a plain heavy rule in the app (the board prints its catalogue ticker in it) */
+.ab.sb-ab.sb-kit[data-ae="acid-graphics--classic"] .ab-rule { height: 3px; background: var(--ab-ink); }
+.ab.sb-ab.sb-kit[data-ae="acid-graphics--classic"] .ab-rule::before { content: none; }
+/* light mode prints the board hero's copy in the on-acid colour (the hero is an acid field); app screens have no field */
+.ab.sb-ab.sb-kit:is([data-ae="acid-graphics"], [data-ae="acid-graphics--classic"])[data-mode="light"] :is(.ab-subcopy, .ab-sub-rest, .ab-sub-lead) { color: var(--ab-muted); }

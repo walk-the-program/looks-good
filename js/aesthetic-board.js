@@ -302,7 +302,11 @@ function boardVars(t, state, def, tagline) {
   const ui = abResolveFace(ty2.ui, state);
   const label = ty2.label ? abResolveFace(ty2.label, state) : ui;
   vars['--ab-accent-ink'] = t.accentInk;
-  if (t.printed) vars['--ab-primary-brand'] = t.primary;   // the true brand hex, only where the board prints another
+  if (t.printed) {
+    vars['--ab-primary-brand'] = t.primary;   // the true brand hex, only where the board prints another
+    // its label colour: black or white, whichever reads better (no contrast-color() in older WebKit)
+    vars['--ab-on-primary-brand'] = contrastRatio('#000000', t.primary) >= contrastRatio('#ffffff', t.primary) ? '#000000' : '#ffffff';
+  }
   vars['--ab-font-ui'] = ui.expr;
   vars['--ab-font-label'] = label.expr;
   vars['--ab-display'] = Number(ty2.display) > 0 ? Number(ty2.display) : 1;

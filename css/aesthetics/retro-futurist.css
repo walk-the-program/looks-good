@@ -252,3 +252,85 @@
   content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 84px; pointer-events: none;
   background: linear-gradient(to bottom, var(--ab-rf-signal) 0 24px, transparent 24px 30px, var(--ab-secondary) 30px 54px, transparent 54px 60px, var(--ab-accent) 60px 84px);
 }
+
+/* ---- app UI kit (phone screens + the UI kit tab) ----
+   Signature carried by components, never art: mono-caps pill keys (primary in the signal colour with
+   a thin lip, secondary a hairline pill), ink pill for the selected segment, a lit signal lamp before
+   each section label, the spec-table list under a 2px ink rule, the LED-ladder progress bar, and
+   the three-stripe rule only as the group divider (never a band on a card). */
+.ab.sb-ab[data-ae="retro-futurist"].sb-kit .ab-card::before { content: none; }
+.ab.sb-ab[data-ae="retro-futurist"].sb-kit .ab-card.sb-k-card { padding-top: var(--k-cardpad, 20px) !important; }
+.ab.sb-ab[data-ae="retro-futurist"].sb-kit .ab-cta.sb-k-btn { box-shadow: inset 0 -2px 0 rgba(0, 0, 0, 0.2); }
+.ab.sb-ab[data-ae="retro-futurist"].sb-kit .ab-type-apply.sb-k-btn2 {
+  border-radius: 999px; font-family: var(--rf-mono); font-weight: 700; text-transform: uppercase; letter-spacing: 0.16em;
+}
+.ab.sb-ab[data-ae="retro-futurist"].sb-kit :is(.sb-k-btn2, .sb-k-iconbtn).sb-k-pressed { background: var(--ab-rf-off); filter: none; }
+/* section label: the lit lamp; a label over a list drops its hairline (the list's ink rule is the edge) */
+.ab.sb-ab[data-ae="retro-futurist"].sb-kit .sb-k-section > .ab-label:first-child { display: inline-flex; align-items: center; gap: 10px; }
+.ab.sb-ab[data-ae="retro-futurist"].sb-kit .sb-k-section > .ab-label:first-child::before {
+  content: ""; flex: none; width: 7px; height: 7px; border-radius: 50%; background: var(--ab-rf-signal);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--ab-rf-signal) 20%, transparent);
+}
+.ab.sb-ab[data-ae="retro-futurist"].sb-kit .sb-k-section:has(+ .sb-k-list) { border-bottom: 0; padding-bottom: 0; }
+.ab.sb-ab[data-ae="retro-futurist"].sb-kit .sb-k-list > .sb-k-row:first-child { border-top: 0; }
+/* fields: a hairline that reads (3:1), an ink edge plus a soft signal halo on focus */
+.ab.sb-ab[data-ae="retro-futurist"].sb-kit :is(.sb-k-field, .sb-k-search, .sb-k-selectwrap) .ab-input { box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--ab-ink) 50%, transparent); }
+.ab.sb-ab[data-ae="retro-futurist"].sb-kit :is(.sb-k-field, .sb-k-search).is-focus .ab-input {
+  box-shadow: inset 0 0 0 1.5px var(--ab-ink), 0 0 0 4px color-mix(in srgb, var(--ab-rf-signal) 22%, transparent) !important;
+}
+.ab.sb-ab[data-ae="retro-futurist"].sb-kit .sb-k-field.is-error .ab-input {
+  box-shadow: inset 0 0 0 1.5px var(--sb-danger), 0 0 0 4px color-mix(in srgb, var(--sb-danger) 16%, transparent) !important;
+}
+.ab.sb-ab[data-ae="retro-futurist"].sb-kit :is(.sb-k-field, .sb-k-search, .sb-k-selectwrap) .ab-input { letter-spacing: 0; }
+.ab.sb-ab[data-ae="retro-futurist"].sb-kit .ab-toggle.sb-tog > span { font-size: var(--k-body, 17px); line-height: var(--k-body-lh, 24px); font-weight: 500; letter-spacing: 0.06em; }
+/* slider: signal fill on an unlit track, a hairline-ringed knob */
+.ab.sb-ab[data-ae="retro-futurist"].sb-kit input.sb-k-range { height: 28px; margin: 0; background: transparent; }
+.ab.sb-ab[data-ae="retro-futurist"].sb-kit input.sb-k-range::-webkit-slider-runnable-track { height: 6px; border-radius: 999px; background: linear-gradient(90deg, var(--ab-rf-signal) var(--v, 50%), var(--ab-rf-off) var(--v, 50%)); }
+.ab.sb-ab[data-ae="retro-futurist"].sb-kit input.sb-k-range::-moz-range-track { height: 6px; border-radius: 999px; background: linear-gradient(90deg, var(--ab-rf-signal) var(--v, 50%), var(--ab-rf-off) var(--v, 50%)); }
+.ab.sb-ab[data-ae="retro-futurist"].sb-kit input.sb-k-range::-webkit-slider-thumb {
+  -webkit-appearance: none; width: 24px; height: 24px; margin-top: -9px; border: 0; border-radius: 50%; background: var(--ab-canvas);
+  box-shadow: inset 0 0 0 1.5px var(--ab-ink), 0 1px 3px rgba(0, 0, 0, 0.12); transform: none;
+}
+.ab.sb-ab[data-ae="retro-futurist"].sb-kit input.sb-k-range::-moz-range-thumb { width: 24px; height: 24px; border: 1.5px solid var(--ab-ink); border-radius: 50%; background: var(--ab-canvas); box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12); transform: none; }
+
+/* ---- classic version (retro-futurist--classic): app UI kit rules (the classic file is generated; these live here) ----
+   Signature carried by components: glowing pill primary, bevelled console keys (secondary, icon
+   button, segments), CRT readout fields and the readout list well, lamp toggle. No telemetry
+   header or sparkline on lists (that is board decoration). */
+.ab.sb-ab[data-ae="retro-futurist--classic"].sb-kit .ab-list.sb-k-list { padding: 4px 0; }
+.ab.sb-ab[data-ae="retro-futurist--classic"].sb-kit .ab-list.sb-k-list::before { content: none; }
+.ab.sb-ab[data-ae="retro-futurist--classic"].sb-kit .sb-k-list > .sb-k-row:first-child { border-top: 0; }
+.ab.sb-ab[data-ae="retro-futurist--classic"].sb-kit .sb-k-list .sb-k-title { color: var(--ab-screen-ink); }
+.ab.sb-ab[data-ae="retro-futurist--classic"].sb-kit .sb-k-list .sb-k-sub { color: color-mix(in srgb, var(--ab-screen-ink) 72%, transparent); }
+.ab.sb-ab[data-ae="retro-futurist--classic"].sb-kit .sb-k-list .sb-k-trail { color: var(--ab-readout); }
+.ab.sb-ab[data-ae="retro-futurist--classic"].sb-kit .sb-k-list .sb-k-row:is(.is-picked, .sb-k-pressed, [aria-selected="true"]) {
+  background: color-mix(in srgb, var(--ab-primary) 30%, var(--ab-screen)); filter: none;
+}
+.ab.sb-ab[data-ae="retro-futurist--classic"].sb-kit .ab-type-apply.sb-k-btn2,
+.ab.sb-ab[data-ae="retro-futurist--classic"].sb-kit .ab-type-apply.sb-k-iconbtn {
+  border: 1px solid var(--ab-bezel-edge); background: linear-gradient(180deg, var(--ab-key-top), var(--ab-key-bot)); color: var(--ab-ink);
+  box-shadow: inset 0 1px 0 var(--ab-bezel-hi), 0 2px 0 var(--ab-key-lip), 0 4px 8px -4px rgba(0, 0, 0, 0.3);
+}
+.ab.sb-ab[data-ae="retro-futurist--classic"].sb-kit .ab-type-apply.sb-k-btn2 { border-radius: 999px; font-family: var(--rf-mono); font-weight: 800; text-transform: uppercase; letter-spacing: 0.14em; }
+.ab.sb-ab[data-ae="retro-futurist--classic"].sb-kit .ab-type-apply.sb-k-iconbtn { border-radius: 12px; }
+.ab.sb-ab[data-ae="retro-futurist--classic"].sb-kit :is(.sb-k-btn2, .sb-k-iconbtn).sb-k-pressed {
+  filter: none; transform: translateY(2px); background: linear-gradient(180deg, var(--ab-key-bot), var(--ab-key-bot));
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.25), 0 0 0 var(--ab-key-lip);
+}
+.ab.sb-ab[data-ae="retro-futurist--classic"].sb-kit :is(.sb-k-field, .sb-k-search).is-focus .ab-input {
+  box-shadow: inset 0 3px 10px rgba(0, 0, 0, 0.75), 0 0 0 2px var(--ab-key-lip), 0 0 0 4px var(--ab-primary) !important;
+}
+.ab.sb-ab[data-ae="retro-futurist--classic"].sb-kit .sb-k-field.is-error .ab-input {
+  box-shadow: inset 0 3px 10px rgba(0, 0, 0, 0.75), 0 0 0 2px var(--ab-key-lip), 0 0 0 4px var(--sb-danger) !important;
+}
+.ab.sb-ab[data-ae="retro-futurist--classic"].sb-kit .ab-toggle.sb-tog > span { font-size: var(--k-body, 17px); line-height: var(--k-body-lh, 24px); font-weight: 600; letter-spacing: 0.06em; }
+.ab.sb-ab[data-ae="retro-futurist--classic"].sb-kit .ab-switch:not(:checked)::before { background: radial-gradient(circle at 36% 30%, rgba(255, 255, 255, 0.6), transparent 55%), var(--ab-key-top); }
+/* slider: a screen-well track lit in the primary up to the value, a console-key knob */
+.ab.sb-ab[data-ae="retro-futurist--classic"].sb-kit input.sb-k-range { height: 28px; margin: 0; background: transparent; }
+.ab.sb-ab[data-ae="retro-futurist--classic"].sb-kit input.sb-k-range::-webkit-slider-runnable-track { height: 8px; border-radius: 999px; background: linear-gradient(90deg, var(--ab-primary) var(--v, 50%), var(--ab-screen) var(--v, 50%)); box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.5); }
+.ab.sb-ab[data-ae="retro-futurist--classic"].sb-kit input.sb-k-range::-moz-range-track { height: 8px; border-radius: 999px; background: linear-gradient(90deg, var(--ab-primary) var(--v, 50%), var(--ab-screen) var(--v, 50%)); }
+.ab.sb-ab[data-ae="retro-futurist--classic"].sb-kit input.sb-k-range::-webkit-slider-thumb {
+  -webkit-appearance: none; width: 24px; height: 24px; margin-top: -8px; border: 1px solid var(--ab-bezel-edge); border-radius: 50%;
+  background: linear-gradient(180deg, var(--ab-key-top), var(--ab-key-bot)); box-shadow: inset 0 1px 0 var(--ab-bezel-hi), 0 2px 4px rgba(0, 0, 0, 0.25); transform: none;
+}
+.ab.sb-ab[data-ae="retro-futurist--classic"].sb-kit input.sb-k-range::-moz-range-thumb { width: 24px; height: 24px; border: 1px solid var(--ab-bezel-edge); border-radius: 50%; background: linear-gradient(180deg, var(--ab-key-top), var(--ab-key-bot)); transform: none; }

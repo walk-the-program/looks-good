@@ -5,12 +5,12 @@
    pure ground, fonts, colours, logo) as realistic, clickable product screens:
    the UI kit (every UI_KIT component and state, js/ui-kit.js), a SaaS
    dashboard, a mobile app (welcome + home), a landing page and a settings
-   page. App screens (kit, dashboard, mobile, settings) are built from the kit
-   only and never draw board art; only the landing page uses art(). Phones are
+   page. Every screen is built from the kit and none draws board art: the
+   landing hero shows the product itself (the Home phone). Phones are
    laid out at UI_KIT_PHONE's 390 x 844 and scaled down as a whole device. Every branded screen sits in the board's own
    `.ab[data-ae]` root (abBoardParts(...).rootOpen) and uses the board's
    component classes (.ab-card, .ab-panel, .ab-seg, .ab-cta, .ab-input,
-   .ab-toggle/.ab-switch, .ab-list/.ab-row, .ab-art, .ab-headline ...), so
+   .ab-toggle/.ab-switch, .ab-list/.ab-row, .ab-headline ...), so
    each aesthetic's own CSS styles it. Layout lives in css/see-built.css.
 
    Before / after: the same screen drawn as a generic AI-built app (system
@@ -45,7 +45,7 @@
       stats: [['Revenue', '$48,290', '+12.4%', 1], ['Orders', '1,284', '+8.1%', 1], ['Repeat customers', '62%', '+3.0%', 1], ['Average basket', '$37.60', '−1.2%', 0]],
       chart: ['Revenue', '$', 1700],
       listTitle: 'Orders in progress',
-      rows: [['Harbor Street Café', 'Packing', 72], ['Elm & Rye Bakery', 'Picking', 45], ['The Larder Co-op', 'Out for delivery', 90], ['Marigold Kitchen', 'Confirmed', 15]],
+      rows: [['Harbor Café', 'Packing', 72], ['Elm & Rye Bakery', 'Picking', 45], ['The Larder Co-op', 'Out for delivery', 90], ['Marigold Kitchen', 'Confirmed', 15]],
       panel: { title: 'Delivery', field: ['Order cut-off', '4:00 pm'], toggles: [['Auto-confirm orders', true], ['Text customers on dispatch', false]] },
       mobile: {
         welcome: 'From small farms to your door',
@@ -53,7 +53,7 @@
         hello: 'Your next box', card: ['Arrives Thursday', 'Seasonal vegetable box · 9 items'],
         cta: ['Edit this box', 'Box updated'], seg: ['This week', 'Next week'],
         listTitle: 'In your box',
-        rows: [['Heirloom tomatoes', 'Picked', 100], ['Sourdough loaf', 'Baking', 60], ['Free-range eggs', 'Packed', 100]],
+        rows: [['Ripe tomatoes', 'Picked', 100], ['Sourdough loaf', 'Baking', 60], ['Free-range eggs', 'Packed', 100]],
         tabs: ['Home', 'Boxes', 'Saved', 'Account'],
       },
       landing: {
@@ -82,7 +82,7 @@
       stats: [['Active users', '18,420', '+9.2%', 1], ['Deploys this week', '312', '+21%', 1], ['Uptime', '99.98%', '+0.02%', 1], ['Median response', '184 ms', '−6.5%', 1]],
       chart: ['Requests', '', 42000],
       listTitle: 'Projects shipping this week',
-      rows: [['Checkout redesign', 'In review', 72], ['Mobile sync', 'Building', 45], ['Billing API v2', 'Testing', 88], ['Onboarding emails', 'Planned', 10]],
+      rows: [['New checkout', 'In review', 72], ['Mobile sync', 'Building', 45], ['Billing API v2', 'Testing', 88], ['Welcome emails', 'Planned', 10]],
       panel: { title: 'Release', field: ['Release name', 'Spring 2.4'], toggles: [['Deploy on merge', true], ['Require a reviewer', true]] },
       mobile: {
         welcome: 'Your whole team, one place',
@@ -90,7 +90,7 @@
         hello: 'Good morning', card: ['3 reviews waiting', 'Checkout redesign needs a second look.'],
         cta: ['Start review', 'Review started'], seg: ['Assigned', 'Following'],
         listTitle: 'Today',
-        rows: [['Checkout redesign', 'Review', 72], ['Billing API v2', 'Testing', 88], ['Mobile sync', 'Building', 45]],
+        rows: [['New checkout', 'Review', 72], ['Billing API v2', 'Testing', 88], ['Mobile sync', 'Building', 45]],
         tabs: ['Home', 'Projects', 'Inbox', 'Profile'],
       },
       landing: {
@@ -156,8 +156,8 @@
       stats: [['Sessions this week', '146', '+14%', 1], ['Active clients', '892', '+6.3%', 1], ['Attendance', '94%', '+2.0%', 1], ['Waitlist', '23', '−4', 1]],
       chart: ['Bookings', '', 60],
       listTitle: 'Programs running',
-      rows: [['Morning strength', 'Full', 100], ['Mobility basics', 'Open', 60], ['Sleep reset', 'Starting soon', 25], ['Breathwork', 'Open', 45]],
-      panel: { title: 'Bookings', field: ['Cancellation window', '12 hours'], toggles: [['Allow waitlist', true], ['Send day-before reminders', true]] },
+      rows: [['Strength', 'Full', 100], ['Mobility basics', 'Open', 60], ['Sleep reset', 'Starting soon', 25], ['Breathwork', 'Open', 45]],
+      panel: { title: 'Bookings', field: ['Cancel by', '12 hrs before'], toggles: [['Allow waitlist', true], ['Send day-before reminders', true]] },
       mobile: {
         welcome: 'A little better, every day',
         body: 'Short sessions, gentle reminders and progress you can actually see.',
@@ -230,8 +230,8 @@
       stats: [['Sales', '$73,940', '+15.2%', 1], ['Orders', '2,316', '+9.4%', 1], ['Conversion', '3.4%', '+0.3%', 1], ['Returns', '2.1%', '−0.4%', 1]],
       chart: ['Sales', '$', 2600],
       listTitle: 'Restock in progress',
-      rows: [['Waxed field jacket', 'In transit', 72], ['Linen overshirt', 'Ordered', 35], ['Canvas tote', 'Received', 100], ['Wool beanie', 'Planned', 10]],
-      panel: { title: 'Store', field: ['Free shipping over', '$75'], toggles: [['Show low stock badges', true], ['Allow pre-orders', false]] },
+      rows: [['Field jacket', 'In transit', 72], ['Linen overshirt', 'Ordered', 35], ['Canvas tote', 'Received', 100], ['Wool beanie', 'Planned', 10]],
+      panel: { title: 'Store', field: ['Free shipping', 'Over $75'], toggles: [['Show low stock badges', true], ['Allow pre-orders', false]] },
       mobile: {
         welcome: 'Made to last',
         body: 'New arrivals every Thursday, free returns, and a wishlist that tells you when your size is back.',
@@ -275,7 +275,7 @@
       hello: 'Today', card: ['Launch site', 'Two tasks due before Friday'],
       cta: ['Open project', 'Project opened'], seg: ['Mine', 'Team'],
       listTitle: 'Up next',
-      rows: [['Brand refresh', 'Review', 72], ['Customer interviews', 'Writing', 88], ['Spring campaign', 'Planning', 10]],
+      rows: [['Brand refresh', 'Review', 72], ['User interviews', 'Writing', 88], ['Spring campaign', 'Planning', 10]],
       tabs: ['Home', 'Projects', 'Inbox', 'Profile'],
     },
     landing: {
@@ -304,6 +304,8 @@
   /* ---------------- small helpers ---------------- */
 
   const e = s => escapeHtml(String(s == null ? '' : s));
+  // " · " joins in kit text: the dot gets its own room, since some faces drop the space after it
+  const mid = s => e(s).replace(/ · /g, ' <span class="sb-k-mid">·</span> ');
   // A window title for aesthetics that draw cards as windows (Old Web shows it in each
   // card's title bar): 'Revenue this month' -> 'revenue-this.htm'.
   const win = s => ` data-win="${e(String(s).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').split('-').slice(0, 2).join('-') + '.htm')}"`;
@@ -433,7 +435,7 @@
     err: '<circle cx="12" cy="12" r="9"/><path d="m9 9 6 6M15 9l-6 6"/>',
     inbox: '<path d="M3.5 13.5 6 5h12l2.5 8.5V19h-17z"/><path d="M3.5 13.5H9a3 3 0 0 0 6 0h5.5"/>',
   };
-  const icon = (k, size = 18) => `<svg class="sb-ico" width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">${ICO[k] || ''}</svg>`;
+  const icon = (k, size = 18) => `<svg class="sb-ico" data-i="${k}" width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">${ICO[k] || ''}</svg>`;
   const NAV_ICONS = ['home', 'list', 'users', 'box', 'chart'];
   const TAB_ICONS = ['home', 'list', 'heart', 'user'];
 
@@ -451,10 +453,6 @@
     return `<h2 class="ab-headline${extra}">${abHeadline(text)}</h2>`;
   }
 
-  function art(X, cls = '') {
-    if (X.mode === 'brand') return `<div class="ab-art ${cls}" aria-hidden="true">${X.P.art()}</div>`;
-    return `<div class="ab-art sb-gen-art ${cls}" aria-hidden="true"><i></i><i></i><i></i><i></i></div>`;
-  }
 
   function cta(label, done, cls = '') {
     return `<button type="button" class="ab-cta ${cls}" data-done="${e(done)}" data-label="${e(label)}"><span class="ab-cta-label">${e(label)}</span><span class="ab-cta-arrow" aria-hidden="true"></span></button>`;
@@ -567,13 +565,19 @@
   // One kit list row: lead (icon tile or avatar), title and optional detail, trailing value.
   // A row without a lead (label / value rows) drops the lead column.
   function kRow(r) {
-    return `<li class="ab-row sb-k-row${r.picked ? ' is-picked' : ''}${r.lead ? '' : ' is-nolead'}" tabindex="0">
+    return `<li class="ab-row sb-k-row${r.picked ? ' is-picked' : ''}${r.lead ? '' : ' is-nolead'}${r.cls ? ' ' + r.cls : ''}" tabindex="0">
         ${r.lead ? `<span class="sb-k-lead">${r.lead}</span>` : ''}
-        <span class="sb-k-text"><span class="sb-k-title">${e(r.title)}</span>${r.sub ? `<span class="sb-k-sub">${e(r.sub)}</span>` : ''}</span>
+        <span class="sb-k-text"><span class="sb-k-title">${e(r.title)}</span>${r.sub ? `<span class="sb-k-sub">${mid(r.sub)}</span>` : ''}</span>
         ${r.trail != null ? `<span class="sb-k-trail">${r.trail}</span>` : ''}
       </li>`;
   }
   const kList = rows => `<ul class="ab-list sb-k-list">${rows.map(kRow).join('')}</ul>`;
+  // A project row on a phone: the name alone as the title (one line in any face), the client
+  // and status as the detail. "Brand refresh · Fernwood", "In review" -> "Brand refresh", "Fernwood · In review".
+  const kProject = (r, extra) => {
+    const [name, client] = String(r[0]).split(' · ');
+    return Object.assign({ lead: kAv(name[0], 's'), title: name, sub: client ? `${client} · ${r[1]}` : r[1], trail: `${r[2]}%${chev()}` }, extra || {});
+  };
   const kIco = k => `<span class="sb-k-ico">${icon(k, 18)}</span>`;
   const kAv = (t, size = '') => `<span class="sb-k-av${size ? ' sb-k-av-' + size : ''}" aria-hidden="true">${e(t)}</span>`;
   const chev = () => `<span class="sb-k-chev">${icon('chev', 16)}</span>`;
@@ -592,7 +596,7 @@
         <div class="sb-ob-main">
           <div class="sb-ob-copy">
             <p class="ab-kicker">Welcome</p>
-            ${headline(X, M.welcome, ' sb-ob-h')}
+            ${headline(X, X.welcomeTitle || M.welcome, ' sb-ob-h')}
             <p class="ab-subcopy sb-ob-body">${e(M.body)}</p>
           </div>
           <div class="sb-ob-list">${kList(feats.map(([t], i) => ({ lead: kIco(ICONS[i]), title: t })))}</div>
@@ -617,12 +621,12 @@
         <div class="ab-card sb-home-card sb-k-card"${win(M.card[0])}>
           ${seg(M.seg.map((s, i) => [String(i), s]), 0, 'mseg', 'Show')}
           <h3 class="ab-card-title">${e(M.card[0])}</h3>
-          <p class="ab-card-body">${e(M.card[1])}</p>
+          <p class="ab-card-body">${mid(M.card[1])}</p>
           ${cta(M.cta[0], M.cta[1], 'sb-k-btn')}
         </div>
         <section class="sb-home-list" aria-label="${e(M.listTitle)}">
           ${kSection(M.listTitle, 'See all')}
-          ${kList(M.rows.map(r => ({ lead: kAv(r[0][0], 's'), title: r[0], sub: r[1], trail: `${r[2]}%${chev()}` })))}
+          ${kList(M.rows.map(r => kProject(r)))}
         </section>
         ${tabBar(M.tabs)}
         <div class="sb-homebar" aria-hidden="true"></div>
@@ -630,6 +634,14 @@
   }
 
   /* ---------------- 3. landing page ---------------- */
+
+  // The hero shows the product, never the board's illustration: the Home phone from the Mobile
+  // tab, in its own kit root at the 390 x 844 reference, scaled down as a whole device on a soft
+  // field of the brand primary. inert: it is a picture of the app, not part of the page.
+  function heroShot(X) {
+    const open = X.mode === 'brand' ? cls => X.P.rootOpen('sb-ab ' + cls) : genericOpen;
+    return `<div class="sb-lhero-shot" aria-hidden="true" inert><div class="sb-dev"><div class="sb-phone-frame"><span class="sb-island" aria-hidden="true"></span>${open('sb-screen sb-kit')}${mobileHome(X)}</section></div></div></div>`;
+  }
 
   function landing(X) {
     const L = X.D.landing;
@@ -664,7 +676,7 @@
           <div class="sb-hero-act">${cta(L.cta[0], L.cta[1], 'sb-inline')}<button type="button" class="ab-type-apply">${e(L.second)}</button></div>
           <p class="sb-proof">${icon('check', 15)}<span>Trusted by 2,400 customers · Rated 4.9 out of 5</span></p>
         </div>
-        ${art(X)}
+        ${heroShot(X)}
       </section>
       <div class="ab-rule"></div>
       <section class="sb-features" aria-label="Features">
@@ -785,10 +797,10 @@
     slider: () => `<div class="sb-k-slider"><div class="sb-k-slider-h"><span>Volume</span><span data-sb-range-out>60%</span></div><input class="sb-k-range" type="range" min="0" max="100" value="60" style="--v:60%" aria-label="Volume" /></div>`,
     card: (X) => {
       const M = X.D.mobile;
-      return `<div class="ab-card sb-k-card"${win(M.card[0])}>${seg(M.seg.map((s, i) => [String(i), s]), 0, 'kcseg', 'Show')}<h3 class="ab-card-title">${e(M.card[0])}</h3><p class="ab-card-body">${e(M.card[1])}</p>${cta(M.cta[0], M.cta[1], 'sb-k-btn')}</div>`;
+      return `<div class="ab-card sb-k-card"${win(M.card[0])}>${seg(M.seg.map((s, i) => [String(i), s]), 0, 'kcseg', 'Show')}<h3 class="ab-card-title">${e(M.card[0])}</h3><p class="ab-card-body">${mid(M.card[1])}</p>${cta(M.cta[0], M.cta[1], 'sb-k-btn')}</div>`;
     },
     list: (X, st) => {
-      const rows = X.D.mobile.rows.map((r, i) => ({ lead: kAv(r[0][0], 's'), title: r[0], sub: r[1], trail: `${r[2]}%${icon('chev', 16)}`, picked: st === 'pressed' && i === 1 }));
+      const rows = X.D.mobile.rows.map((r, i) => kProject(r, { picked: st === 'pressed' && i === 1 }));
       return kList(st === 'pressed' ? rows.slice(1, 2) : rows);
     },
     callout: (X, st) => {
@@ -850,17 +862,23 @@
         form: kTopbar(kPlain('back', 'Back'), '', ''),
         settings: kTopbar(kPlain('back', 'Back'), '', ''),
       }[scr.id] || kTopbar(kPlain('back', 'Back'), '', '')),
-      title: () => scr.id === 'onboarding' ? headline(X, M.welcome, ' sb-ob-h')
+      title: () => scr.id === 'onboarding' ? headline(X, X.welcomeTitle || M.welcome, ' sb-ob-h')
         : `<h2 class="ab-card-title sb-k-ltitle">${e({ list: M.listTitle, detail: r0[0], form: X.D.action[0], settings: 'Settings' }[scr.id] || scr.name)}</h2>`,
       body: () => `<p class="ab-subcopy sb-ob-body">${e(M.body)}</p>`,
       section: () => kSection(sections[Math.min(nSec++, sections.length - 1)], '', scr.id === 'list' ? `${M.rows.length + X.D.rows.length} items` : ''),
       list: () => {
         const n = nList++;
         if (scr.id === 'onboarding') return kList(X.D.landing.features.slice(0, 3).map(([t], i) => ({ lead: kIco(['check', 'bell', 'heart'][i]), title: t })));
-        if (scr.id === 'list') return kList(M.rows.concat(X.D.rows).map(r => ({ lead: kAv(r[0][0], 's'), title: r[0], sub: r[1], trail: `${r[2]}%${chev()}` })));
+        if (scr.id === 'list') return kList(M.rows.concat(X.D.rows).map(r => kProject(r)));
         if (scr.id === 'detail') return lv([['Status', r0[1]], ['Owner', X.me], ['Updated', 'Today'], ['Progress', `${r0[2]}%`], [X.D.panel.field[0], X.D.panel.field[1]]]);
-        if (scr.id === 'settings') return n === 0 ? lv([['Name', X.me], ['Language', 'English']]) : lv([['Help', ''], ['Privacy', ''], ['Version', '2.4']]);
-        return kList(M.rows.map(r => ({ title: r[0], trail: chev() })));
+        if (scr.id === 'settings') {
+          if (n) return lv([['Help', ''], ['Privacy', ''], ['Version', '2.4']]);
+          // the Notifications toggle is the group's last row (label plus its control), inside the card
+          const rows = [['Name', X.me], ['Language', 'English']].map(([t, v]) => ({ title: t, trail: `${e(v)}${chev()}` }));
+          rows.push({ title: 'Notifications', trail: `<input class="ab-switch" type="checkbox" checked aria-label="Notifications" />`, cls: 'sb-k-togrow' });
+          return kList(rows);
+        }
+        return kList(M.rows.map(r => ({ title: String(r[0]).split(' · ')[0], trail: chev() })));
       },
       'btn-primary': () => scr.id === 'onboarding' ? cta('Get started', 'Setting things up', 'sb-k-btn')
         : scr.id === 'form' ? cta('Save', 'Saved', 'sb-k-btn') : cta(M.cta[0], M.cta[1], 'sb-k-btn'),
@@ -869,17 +887,18 @@
       search: () => KIT_SPEC.search(X, 'rest'),
       segmented: () => KIT_SPEC.segmented(X),
       badge: () => `<div class="sb-k-row-inline"><span class="ab-fit">${e(r0[1])}</span></div>`,
-      card: () => `<div class="ab-card sb-k-card"${win(r0[0])}><h3 class="ab-card-title">${r0[2]}% done</h3><p class="ab-card-body">${e(M.card[1])}</p></div>`,
+      card: () => `<div class="ab-card sb-k-card"${win(r0[0])}><h3 class="ab-card-title">${r0[2]}% done</h3><p class="ab-card-body">${mid(M.card[1])}</p></div>`,
       field: () => nField++ === 0 ? field(X, 'Name', M.card[0], 'sb-k-field is-rest') : field(X, 'Details', M.card[1], 'sb-k-field is-rest'),
       select: () => KIT_SPEC.select(X, 'rest'),
-      toggle: () => scr.id === 'settings' ? toggle(X, 'Notifications', true) : toggle(X, X.D.notify[0][0], true),
+      toggle: () => scr.id === 'settings' ? '' : toggle(X, X.D.notify[0][0], true),   // settings: a row in its list
       callout: () => KIT_SPEC.callout(X, 'info'),
       tabbar: () => tabBar(M.tabs),
     };
     return scr.blocks.map(id => {
       const draw = B[id] || (KIT_SPEC[id] ? () => KIT_SPEC[id](X, 'rest') : () => '');
       const fill = id === 'list' && (scr.id === 'list' || scr.id === 'detail');
-      return `<div class="sb-k-blk${fill ? ' sb-k-fill' : ''}" data-blk="${e(id)}">${draw()}</div>`;
+      const html = draw();
+      return html ? `<div class="sb-k-blk${fill ? ' sb-k-fill' : ''}" data-blk="${e(id)}">${html}</div>` : '';
     }).join('');
   }
 
@@ -975,8 +994,8 @@
     return `${open(kind === 'kit' ? 'sb-window sb-kit' : 'sb-window')}${BUILDERS[kind](X)}</section>`;
   }
 
-  function contextFor(mode) {
-    const v = abView();
+  function contextFor(mode, st) {
+    const v = st ? abView(st) : abView();
     const P = abBoardParts(v.state, v.def);
     const copy = P.copy;
     const D = domainFor(copy);
@@ -986,6 +1005,8 @@
       mode, v, P, def: v.def, ctx: P.ctx, D,
       name: copy.brandName, tagline: copy.tagline, logo: v.state.logoDataUrl,
       me, role: 'Owner', uid: `sb${++seq}${mode[0]}`,
+      // the Welcome title is the brand's own tagline when it has one (the sample line otherwise)
+      welcomeTitle: String(((v.state.content || {}).tagline) || '').replace(/\s+/g, ' ').trim(),
     };
   }
 
@@ -1041,6 +1062,12 @@
     }
     host.innerHTML = `${barHtml(brand.def)}${stage}
       <p class="sb-note">Every screen is drawn from the same colours, type and components as the board and the AI brief.${SB.before ? ' Drag the divider, or focus it and use the arrow keys.' : ''}</p>`;
+    finish(host, brand.def);
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(fitStatsSoon);
+  }
+
+  // The fix-ups every drawn screen gets once it is in the page (render and kitInto).
+  function finish(host, def) {
     // Token-styled pieces (sidebar items, tabs, danger buttons) borrow the corner radius
     // and button lettering of the aesthetic's own CTA.
     host.querySelectorAll('.sb-ab').forEach(root => {
@@ -1051,8 +1078,12 @@
       root.style.setProperty('--sb-ui-ff', cs.fontFamily);
       root.style.setProperty('--sb-ui-tt', cs.textTransform);
       root.style.setProperty('--sb-ui-ls', cs.letterSpacing === 'normal' ? '0' : cs.letterSpacing);
+      // sheets and callouts take the style's card corner
+      const card = root.querySelector('.ab-card');
+      if (card) root.style.setProperty('--sb-card-r', getComputedStyle(card).borderTopLeftRadius || '12px');
     });
-    if (brand.def.blend) {
+    host.querySelectorAll('.sb-ab').forEach(kitColours);
+    if (def.blend) {
       host.querySelectorAll('.sb-ab').forEach(root => {
         try {
           if (typeof blendClearArtText === 'function') blendClearArtText(root);
@@ -1060,8 +1091,157 @@
         } catch (err) { /* a blend fix-up is cosmetic */ }
       });
     }
+    kitLists(host);
+    fitHeroShot(host);
     fitStats(host);
-    if (document.fonts && document.fonts.ready) document.fonts.ready.then(fitStatsSoon);
+  }
+
+  // SeeBuilt.kitInto(host, { mode }): the UI kit tab (cells, screen layouts, phone type, colour roles) for the
+  // current state, drawn into `host` (an element already in the page), in `mode` ('light' | 'dark', default the
+  // state's own) without changing the state, the Built view or its tab. Returns the kit page element or null.
+  // The AI brief measures the kit this way (js/ai-brief.js aibKitMeasure).
+  function kitInto(host, opts) {
+    if (!host) return null;
+    const mode = opts && (opts.mode === 'light' || opts.mode === 'dark') ? opts.mode : null;
+    const st = mode && typeof state !== 'undefined' && state.bgMode !== mode ? Object.assign({}, state, { bgMode: mode }) : undefined;
+    if (typeof setBoardFonts === 'function') setBoardFonts(host);
+    Object.entries(kitVars()).forEach(([k, val]) => host.style.setProperty(k, val));
+    const brand = contextFor('brand', st);
+    host.innerHTML = `<div class="sb-single" data-kind="kit">${screens(brand, 'kit')}</div>`;
+    finish(host, brand.def);
+    return host.querySelector('.sb-ab .sb-kitpage');
+  }
+
+  // SeeBuilt.mobileInto(host, { mode }): the Mobile app tab's Welcome and Home phones for the current state,
+  // drawn into `host` like kitInto (state, Built view and its tab untouched). Returns host.
+  function mobileInto(host, opts) {
+    if (!host) return null;
+    const mode = opts && (opts.mode === 'light' || opts.mode === 'dark') ? opts.mode : null;
+    const st = mode && typeof state !== 'undefined' && state.bgMode !== mode ? Object.assign({}, state, { bgMode: mode }) : undefined;
+    if (typeof setBoardFonts === 'function') setBoardFonts(host);
+    Object.entries(kitVars()).forEach(([k, val]) => host.style.setProperty(k, val));
+    const brand = contextFor('brand', st);
+    const before = SB.before;
+    SB.before = false;   // both phones, as the Mobile tab shows them without the divider
+    try { host.innerHTML = `<div class="sb-single" data-kind="mobile">${screens(brand, 'mobile')}</div>`; } finally { SB.before = before; }
+    finish(host, brand.def);
+    return host;
+  }
+
+  // Destructive and status colours come from the brand palette only (js/ui-kit.js uiKitDanger,
+  // uiKitTone): destructive / error = the palette's reddish colour, or the ink (then the
+  // destructive button is an outline with an ink label, data-sb-danger="ink"); callouts tint
+  // info = primary, success = secondary, warning = accent, each icon shaded to 3:1 on the canvas.
+  function kitColours(root) {
+    if (typeof uiKitDanger !== 'function') return;
+    const probe = document.createElement('i');
+    probe.style.display = 'none';
+    root.appendChild(probe);
+    const read = v => { probe.style.color = `var(${v})`; return getComputedStyle(probe).color; };
+    const pal = { primary: read('--ab-primary'), secondary: read('--ab-secondary'), accent: read('--ab-accent'), ink: read('--ab-ink'), canvas: read('--ab-canvas') };
+    probe.remove();
+    const d = uiKitDanger(pal);
+    const set = (k, v) => root.style.setProperty(k, v);
+    // fill: a reddish palette colour distinct from the primary; line: it is the primary (an outline
+    // in that colour, so destructive never looks like the main action); ink: no reddish colour
+    root.dataset.sbDanger = d.role ? (d.fill ? 'fill' : 'line') : 'ink';
+    set('--sb-danger', d.color); set('--sb-danger-text', d.text); set('--sb-danger-on', d.on);
+    set('--sb-danger-line', `color-mix(in srgb, ${d.color} ${d.role ? 40 : 30}%, transparent)`);
+    // icon and edge hold 3.2:1 on the callout's own tint (12% of the tone over the canvas)
+    [['info', pal.primary], ['ok', pal.secondary], ['warn', pal.accent]].forEach(([k, c]) => {
+      const t = uiKitTone(c, pal, 3.2, 0.12);
+      set(`--k-${k}`, t.color); set(`--k-${k}-ico`, t.ico);
+    });
+    set('--k-err', d.color); set('--k-err-ico', d.role ? uiKitTone(d.color, pal, 3.2, 0.12).ico : d.text);
+    // the primary as text (text buttons, tags, tinted icons): 4.5:1 on the canvas and on --ab-pri-tint
+    set('--k-pri-text', uiKitTone(pal.primary, pal, 4.5).ico);
+    set('--k-pri-on-tint', uiKitTone(pal.primary, { ink: pal.ink, canvas: read2(root, '--ab-pri-tint') || pal.canvas }, 4.5).ico);
+    // fields drawn as an underline get a thicker underline on focus / error, never a box ring
+    const inp = root.querySelector('.ab-input');
+    if (inp) {
+      const ic = getComputedStyle(inp);
+      const line = parseFloat(ic.borderLeftWidth) === 0 && parseFloat(ic.borderBottomWidth) > 0 && ic.boxShadow === 'none';
+      root.dataset.kField = line ? 'line' : 'box';
+    }
+  }
+  function read2(root, v) {
+    const probe = document.createElement('i');
+    probe.style.display = 'none';
+    probe.style.color = `var(${v})`;
+    root.appendChild(probe);
+    const c = getComputedStyle(probe).color;
+    probe.remove();
+    return /rgba?\([^)]*,\s*0\)$/.test(c) ? '' : c;
+  }
+
+  // Grouped list rows sit 16pt in from their card. A list counts as a card when the list or its
+  // rows draw a box (side edge, fill or shadow); an open list (rows and rules on the canvas) keeps
+  // its text on the screen margin. In a card, the section label above takes the same inset and a
+  // rule between rows starts at the text, not at the card edge.
+  function kitLists(host) {
+    const alpha = c => { const m = /rgba?\(([^)]+)\)/.exec(c || ''); if (m) { const p = m[1].split(/[\s,\/]+/).filter(Boolean); return p.length > 3 ? +p[3] : 1; } const m2 = /color\([^)]*\/\s*([\d.]+)\)/.exec(c || ''); return m2 ? +m2[1] : (/color\(/.test(c || '') ? 1 : 0); };
+    const edge = (cs, side) => parseFloat(cs[`border${side}Width`]) > 0 && cs[`border${side}Style`] !== 'none' && alpha(cs[`border${side}Color`]) > 0.05;
+    const boxed = (cs, img) => edge(cs, 'Left') || edge(cs, 'Right') || alpha(cs.backgroundColor) > 0.03 || cs.boxShadow !== 'none' || (img && cs.backgroundImage !== 'none');
+    // a box drawn by the list's ::before / ::after (a positioned plate behind the rows) counts too
+    const pseudoBox = el => ['::before', '::after'].some(pe => { const c = getComputedStyle(el, pe); return c.content !== 'none' && c.position === 'absolute' && boxed(c, true); });
+    host.querySelectorAll('.sb-kit .sb-k-list').forEach(list => {
+      const rows = [...list.children].filter(r => r.classList.contains('sb-k-row'));
+      if (!rows.length) return;
+      const lcs = getComputedStyle(list);
+      const rowBox = rows.some(r => boxed(getComputedStyle(r), false));
+      // a style can say it outright: --k-list-box: card | open
+      const said = lcs.getPropertyValue('--k-list-box').trim();
+      const card = said === 'card' ? true : said === 'open' ? false : boxed(lcs, true) || rowBox || pseudoBox(list);
+      list.classList.toggle('is-open', !card);
+      if (!card) return;
+      // the section label right above the list (in a screen layout it sits in the block before)
+      const blk = list.parentElement && list.parentElement.classList.contains('sb-k-blk') ? list.parentElement : null;
+      const prev = blk ? blk.previousElementSibling : list.previousElementSibling;
+      const sec = prev && (prev.classList.contains('sb-k-section') ? prev : prev.querySelector(':scope > .sb-k-section'));
+      if (sec) { sec.classList.add('is-inset'); sec.style.setProperty('--k-inset', (16 + parseFloat(lcs.borderLeftWidth || 0)) + 'px'); }
+      if (rowBox) return;   // each row is its own box: no shared rules to inset
+      rows.forEach((r, i) => {
+        const cs = getComputedStyle(r);
+        if (getComputedStyle(r, '::after').content !== 'none') return;
+        const side = i > 0 && edge(cs, 'Top') ? 'Top' : i < rows.length - 1 && edge(cs, 'Bottom') ? 'Bottom' : '';
+        if (!side) return;
+        // from computed sizes, not layout: phones are scaled and the view may be hidden
+        const lead = r.querySelector(':scope > .sb-k-lead > *');
+        const x = parseFloat(cs.paddingLeft) + (lead ? (parseFloat(getComputedStyle(lead).width) || 32) + (parseFloat(cs.columnGap) || 14) : 0);
+        const w = cs[`border${side}Width`], line = `${w} ${cs[`border${side}Style`]} ${cs[`border${side}Color`]}`;   // read before the class hides it (cs is live)
+        r.style.setProperty('--k-dv-x', Math.round(x) + 'px');
+        r.style.setProperty('--k-dv-w', w);
+        r.style.setProperty('--k-dv', line);
+        r.classList.add('sb-k-dv', 'sb-k-dv-' + side.toLowerCase());
+      });
+    });
+  }
+
+  // The landing hero phone takes the grid slot the aesthetic gives its hero art (read from a
+  // throwaway .ab-art probe, removed at once, so no art is ever drawn), then scales to the
+  // column it gets (0.42 to 0.56).
+  function fitHeroShot(host) {
+    host.querySelectorAll('.sb-lhero-shot').forEach(shot => {
+      const probe = document.createElement('div');
+      probe.className = 'ab-art';
+      probe.style.display = 'none';
+      shot.parentElement.insertBefore(probe, shot);
+      const pcs = getComputedStyle(probe);
+      ['gridColumnStart', 'gridColumnEnd', 'gridRowStart', 'gridRowEnd', 'alignSelf', 'justifySelf', 'order'].forEach(k => {
+        const v = pcs[k];
+        if (v && v !== 'auto' && v !== 'normal' && v !== '0') shot.style[k] = v;
+      });
+      probe.remove();
+      // art drawn as a layer under the copy (same grid cell) is no slot for a phone: back to flow
+      const hl = shot.parentElement.querySelector('.ab-headline'), a = shot.getBoundingClientRect(), b = hl && hl.getBoundingClientRect();
+      if (b && b.width && a.width && !(a.right <= b.left || a.left >= b.right || a.bottom <= b.top || a.top >= b.bottom)) {
+        ['gridColumnStart', 'gridColumnEnd', 'gridRowStart', 'gridRowEnd'].forEach(k => { shot.style[k] = 'auto'; });
+        ['alignSelf', 'justifySelf', 'order'].forEach(k => { shot.style[k] = ''; });
+      }
+      const cs = getComputedStyle(shot);
+      const w = shot.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+      if (w > 0) shot.style.setProperty('--sb-phone-scale', Math.max(0.42, Math.min(0.56, w / 414)).toFixed(3));
+    });
   }
 
   // A phone list ends on a whole row above the tab bar: rows that would run past the
@@ -1316,7 +1496,7 @@
     });
   }
 
-  window.SeeBuilt = { render, kinds: KINDS.map(k => k[0]), domainFor };
+  window.SeeBuilt = { render, kitInto, mobileInto, kinds: KINDS.map(k => k[0]), domainFor };
   window.Show = window.Show || {};
   // Show.built(kind): open the Built view, optionally at 'kit' | 'dashboard' | 'mobile' | 'landing' | 'settings'.
   window.Show.built = function (kind) {

@@ -352,3 +352,85 @@
 
 /* Built settings: website and email share a row; a long name ends in an ellipsis, not a cut letter */
 .ab.sb-ab[data-ae="mesh-gradient"] .sb-field-row .ab-input { text-overflow: ellipsis; }
+
+/* ---- app UI (phone screens and the UI kit): the board's deep layered shadow reads as a dark
+   band under small phone cards, and the 2px primary underline as a hard edge under the selected
+   segment. Here the layers stay neutral navy but soft and low, the segment lifts on a shadow only. */
+.ab.sb-ab[data-ae="mesh-gradient"].sb-kit {
+  --mg-kit-sh: 0 1px 2px rgba(10, 37, 64, 0.05), 0 6px 18px -8px rgba(50, 50, 93, 0.16);
+  --mg-kit-sh-sm: 0 1px 2px rgba(10, 37, 64, 0.06), 0 3px 10px -4px rgba(50, 50, 93, 0.16);
+  --mg-kit-cta: 0 1px 2px rgba(10, 37, 64, 0.06), 0 6px 16px -8px rgba(50, 50, 93, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.24);
+}
+.ab.sb-ab[data-ae="mesh-gradient"].sb-kit[data-mode="dark"] {
+  --mg-kit-sh: 0 1px 2px rgba(0, 0, 0, 0.16), 0 8px 22px -8px rgba(0, 0, 0, 0.26);
+  --mg-kit-sh-sm: 0 1px 2px rgba(0, 0, 0, 0.16), 0 3px 10px -4px rgba(0, 0, 0, 0.22);
+  --mg-kit-cta: 0 1px 2px rgba(0, 0, 0, 0.16), 0 6px 16px -8px rgba(0, 0, 0, 0.26), inset 0 1px 0 rgba(255, 255, 255, 0.16);
+}
+.ab.sb-ab[data-ae="mesh-gradient"].sb-kit :is(.ab-card, .ab-panel, .ab-list) { box-shadow: var(--mg-kit-sh); }
+.ab.sb-ab[data-ae="mesh-gradient"].sb-kit .ab-type-apply { box-shadow: var(--mg-kit-sh-sm); }
+/* the primary token is set inline on the root, so the soft value is applied on the pill itself */
+.ab.sb-ab:is([data-ae="mesh-gradient"], [data-ae="mesh-gradient--classic"]).sb-kit .ab-cta { box-shadow: var(--mg-kit-cta); }
+.ab.sb-ab[data-ae="mesh-gradient"].sb-kit .ab-seg-btn[aria-pressed="true"] { box-shadow: var(--mg-kit-sh-sm); }
+/* the swash keeps its colour but no longer clones a padded box per line: that box stopped
+   text-wrap: balance, leaving the highlighted word alone on the second line */
+.ab.sb-ab[data-ae="mesh-gradient"].sb-kit .ab-hl { padding: 0; -webkit-box-decoration-break: slice; box-decoration-break: slice; }
+/* phone titles are 28-34px, not the board's 60px+: the board's -0.035em tracking closed the word spaces */
+.ab.sb-ab[data-ae="mesh-gradient"].sb-kit :is(.ab-headline, .sb-home-h, .sb-k-ltitle) { letter-spacing: calc(-0.012em * var(--ab-tr, 1)); }
+/* dark: the selected segment lifts lighter than its track (paper alone sat darker than the 7% ink track) */
+.ab.sb-ab:is([data-ae="mesh-gradient"], [data-ae="mesh-gradient--classic"]).sb-kit[data-mode="dark"] .ab-seg { background: color-mix(in srgb, #000 24%, var(--ab-paper)); border-color: rgba(255, 255, 255, 0.06); }
+.ab.sb-ab:is([data-ae="mesh-gradient"], [data-ae="mesh-gradient--classic"]).sb-kit[data-mode="dark"] .ab-seg-btn[aria-pressed="true"] {
+  background: color-mix(in srgb, var(--ab-ink) 22%, var(--ab-paper)); color: var(--ab-ink);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.08), var(--mg-kit-sh-sm);
+}
+/* lists sit flat on the page (hairline only); the layered shadow belongs to cards */
+.ab.sb-ab[data-ae="mesh-gradient"].sb-kit .ab-list { box-shadow: none; }
+/* blended with Liquid Glass: the glass does one job, on the surfaces that float over content.
+   The tab bar and the sheet are frosted with a bright top rim; nothing else turns to glass. */
+.ab.sb-ab[data-ae="mesh-gradient"][data-blend="liquid-glass"].sb-kit .sb-tabs {
+  background: color-mix(in srgb, var(--ab-canvas) 70%, transparent); border-top: 1px solid var(--ab-hair);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.75);
+  -webkit-backdrop-filter: blur(24px) saturate(180%); backdrop-filter: blur(24px) saturate(180%);
+}
+.ab.sb-ab[data-ae="mesh-gradient"][data-blend="liquid-glass"].sb-kit .sb-k-sheet {
+  background: color-mix(in srgb, var(--ab-canvas) 88%, transparent);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.75), 0 -8px 28px rgba(10, 37, 64, 0.14);
+  -webkit-backdrop-filter: blur(24px) saturate(180%); backdrop-filter: blur(24px) saturate(180%);
+}
+.ab.sb-ab[data-ae="mesh-gradient"][data-blend="liquid-glass"].sb-kit[data-mode="dark"] :is(.sb-tabs, .sb-k-sheet) { box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.14); }
+@media (prefers-reduced-transparency: reduce) {
+  .ab.sb-ab[data-ae="mesh-gradient"][data-blend="liquid-glass"].sb-kit :is(.sb-tabs, .sb-k-sheet) { -webkit-backdrop-filter: none; backdrop-filter: none; background: var(--ab-canvas); }
+}
+/* rest fields: a white field on the near-white page needs an edge you can find */
+.ab.sb-ab[data-ae="mesh-gradient"].sb-kit .ab-input { border-color: color-mix(in srgb, var(--ab-ink) 32%, transparent); }
+/* avatars carry the gradient (primary to the turned hue), as the board's do */
+.ab.sb-ab[data-ae="mesh-gradient"].sb-kit .sb-k-av { background: linear-gradient(140deg, var(--ab-primary), var(--ab-m-hue)); color: var(--ab-on-primary); }
+
+/* ==== classic version (data-ae="mesh-gradient--classic"): its app UI rules live here, since css/aesthetics/classic/ is generated ==== */
+/* ---- app UI (phone screens and the UI kit). The hero copy here is white for the mesh band, but a
+   phone screen has no band: the kicker, title and body take the page ink (they were invisible).
+   Board-only labels stay off the phone (the list's "Recent projects" header, the label underline);
+   shadows are soft and low; lists sit flat, cards carry the shadow. ---- */
+.ab.sb-ab[data-ae="mesh-gradient--classic"].sb-kit {
+  --mg-kit-sh: 0 1px 2px rgba(10, 37, 64, 0.05), 0 6px 18px -8px rgba(50, 50, 93, 0.16);
+  --mg-kit-sh-sm: 0 1px 2px rgba(10, 37, 64, 0.06), 0 3px 10px -4px rgba(50, 50, 93, 0.16);
+  --mg-kit-cta: 0 1px 2px rgba(10, 37, 64, 0.06), 0 6px 16px -8px rgba(50, 50, 93, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.24);
+}
+.ab.sb-ab[data-ae="mesh-gradient--classic"].sb-kit[data-mode="dark"] {
+  --mg-kit-sh: 0 1px 2px rgba(0, 0, 0, 0.16), 0 8px 22px -8px rgba(0, 0, 0, 0.26);
+  --mg-kit-sh-sm: 0 1px 2px rgba(0, 0, 0, 0.16), 0 3px 10px -4px rgba(0, 0, 0, 0.22);
+  --mg-kit-cta: 0 1px 2px rgba(0, 0, 0, 0.16), 0 6px 16px -8px rgba(0, 0, 0, 0.26), inset 0 1px 0 rgba(255, 255, 255, 0.16);
+}
+.ab.sb-ab[data-ae="mesh-gradient--classic"].sb-kit .ab-kicker { padding: 0; border: 0; background: none; color: var(--ab-ink); }
+.ab.sb-ab[data-ae="mesh-gradient--classic"].sb-kit .ab-kicker::before { background: var(--ab-primary); box-shadow: none; }
+.ab.sb-ab[data-ae="mesh-gradient--classic"].sb-kit .ab-headline { color: var(--ab-ink); text-shadow: none; letter-spacing: calc(-0.012em * var(--ab-tr, 1)); }
+.ab.sb-ab[data-ae="mesh-gradient--classic"].sb-kit :is(.sb-home-h, .sb-k-ltitle) { letter-spacing: calc(-0.012em * var(--ab-tr, 1)); }
+.ab.sb-ab[data-ae="mesh-gradient--classic"].sb-kit .ab-subcopy { color: var(--k-muted); }
+.ab.sb-ab[data-ae="mesh-gradient--classic"].sb-kit .ab-sub-lead { color: var(--ab-ink); }
+.ab.sb-ab[data-ae="mesh-gradient--classic"].sb-kit .ab-hl { padding: 0; -webkit-box-decoration-break: slice; box-decoration-break: slice; }
+.ab.sb-ab[data-ae="mesh-gradient--classic"].sb-kit .ab-list::before { content: none; }
+.ab.sb-ab[data-ae="mesh-gradient--classic"].sb-kit .ab-labelrow .ab-label:first-child::after { content: none; }
+.ab.sb-ab[data-ae="mesh-gradient--classic"].sb-kit :is(.ab-card, .ab-panel) { box-shadow: var(--mg-kit-sh); }
+.ab.sb-ab[data-ae="mesh-gradient--classic"].sb-kit .ab-list { box-shadow: none; }
+.ab.sb-ab[data-ae="mesh-gradient--classic"].sb-kit .ab-type-apply,
+.ab.sb-ab[data-ae="mesh-gradient--classic"].sb-kit .ab-seg-btn[aria-pressed="true"] { box-shadow: var(--mg-kit-sh-sm); }
+.ab.sb-ab[data-ae="mesh-gradient--classic"].sb-kit .ab-input { border-color: color-mix(in srgb, var(--ab-ink) 32%, transparent); }

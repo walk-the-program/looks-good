@@ -322,3 +322,35 @@
 @media (prefers-reduced-motion: reduce) {
   .ab[data-ae="mid-century"] * { transition: none !important; }
 }
+
+/* ---- App UI (phone screens + UI kit tab, root .sb-kit) ----
+   Cut paper without the poster: cards and grouped lists keep the 2px walnut outline and the one
+   cut corner, but drop the dotted colour-block band (decoration). Every colour comes from the
+   brand palette: no fixed mustard, teal, tomato or aqua. Selection is ink; the switch and the
+   main action take the primary; the starburst on the action is drawn in the label colour. */
+.ab.sb-ab.ab[data-ae="mid-century"].sb-kit :is(.ab-card, .ab-panel, .ab-list)::before { content: none; display: none; }
+.ab.sb-ab.ab[data-ae="mid-century"].sb-kit .ab-card.sb-k-card { padding-top: var(--k-cardpad, 20px) !important; }
+.ab.sb-ab.ab[data-ae="mid-century"].sb-kit .ab-list.sb-k-list { margin: 0; }
+.ab.sb-ab.ab[data-ae="mid-century"].sb-kit .ab-row.sb-k-row { padding: 8px 16px !important; }
+.ab.sb-ab.ab[data-ae="mid-century"].sb-kit .ab-row.sb-k-row.is-picked { background: color-mix(in srgb, var(--mc-ink) 7%, var(--mc-card)); }
+.ab.sb-ab.ab[data-ae="mid-century"].sb-kit .ab-row.sb-k-row.is-picked:first-child { border-radius: 20px 20px 0 0; }
+.ab.sb-ab.ab[data-ae="mid-century"].sb-kit .ab-row.sb-k-row.is-picked:last-child { border-radius: 0 0 20px 2px; }
+.ab.sb-ab.ab[data-ae="mid-century"].sb-kit .ab-row.sb-k-row.is-picked:only-child { border-radius: 20px 20px 20px 2px; }
+.ab.sb-ab.ab[data-ae="mid-century"].sb-kit .ab-kicker { background: var(--mc-sec); color: var(--mc-on-sec); }
+.ab.sb-ab.ab[data-ae="mid-century"].sb-kit .ab-seg-btn:not([aria-pressed="true"]):hover { background: transparent; color: var(--mc-ink); }
+.ab.sb-ab.ab[data-ae="mid-century"].sb-kit .ab-seg-btn[aria-pressed="true"] { background: var(--mc-ink); color: var(--mc-on-ink); }
+.ab.sb-ab.ab[data-ae="mid-century"].sb-kit .ab-switch:checked { background: var(--mc-pri); }
+.ab.sb-ab.ab[data-ae="mid-century"].sb-kit .ab-switch:checked::before { background: var(--mc-on-pri); }
+.ab.sb-ab.ab[data-ae="mid-century"].sb-kit .ab-cta-arrow {
+  background: currentColor; -webkit-mask: var(--mc-burst-ink) center / contain no-repeat; mask: var(--mc-burst-ink) center / contain no-repeat;
+}
+.ab.sb-ab.ab[data-ae="mid-century"].sb-kit .ab-type-apply.sb-icon-btn { background: var(--mc-card); color: var(--mc-ink); border: 2px solid var(--mc-ink); }
+.ab.sb-ab.ab[data-ae="mid-century"].sb-kit .ab-type-apply.sb-icon-btn:hover { background: var(--mc-paper2); color: var(--mc-ink); }
+.ab.sb-ab.ab[data-ae="mid-century"].sb-kit .ab-type-apply.sb-icon-btn.sb-k-pressed { background: var(--mc-paper2); }
+.ab.sb-ab.ab[data-ae="mid-century"].sb-kit .sb-badge { background: var(--mc-acc); box-shadow: 0 0 0 2px var(--ab-canvas); }
+.ab.sb-ab.ab[data-ae="mid-century"].sb-kit .ab-input:focus-visible { outline-color: var(--mc-ink); }
+/* the destructive pill is cut from the same paper as the others: walnut outline, no shadow */
+.ab.sb-ab.ab[data-ae="mid-century"].sb-kit .sb-k-danger { border: 2px solid var(--mc-ink); border-radius: 999px; box-shadow: none; font-family: var(--mc-sans); }
+/* progress outside a stat row has no row ink: it fills with the primary; dividers drop the sparkle */
+.ab.sb-ab.ab[data-ae="mid-century"].sb-kit .ab-row-bar.sb-k-bar i { background: var(--mc-pri); }
+.ab.sb-ab.ab[data-ae="mid-century"].sb-kit .sb-k-divider .ab-rule::after { content: none; }

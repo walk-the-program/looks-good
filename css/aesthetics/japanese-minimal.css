@@ -225,3 +225,72 @@
 .ab.sb-ab[data-ae="japanese-minimal"] .sb-top .ab-kicker { display: inline-flex; align-items: center; gap: 10px; }
 .ab.sb-ab[data-ae="japanese-minimal"] .sb-top .ab-kicker::before { content: ""; flex: none; width: 7px; height: 7px; border-radius: 50%; background: var(--ab-jm-dot); }
 .ab.sb-ab[data-ae="japanese-minimal"] .sb-title { font-weight: 400; }
+
+/* ---- app screens and the UI kit (.sb-kit: phone screens, UI kit tab) ----
+   Ma and hairlines. The primary is the one plain rectangular action and nothing else; selection
+   (segments, tabs, toggles, checks), focus and text buttons are ink. The hinomaru motif stays one
+   small circle per view, here the notification dot, in ink: app screens use only the brand palette
+   and the primary already marks the main action (the board keeps its red). Every corner 2px, 1px
+   rules, no tints or shadows. */
+.ab.sb-ab[data-ae="japanese-minimal"].sb-kit {
+  --ab-primary-text: var(--ab-ink) !important;
+  --ab-pri-tint: color-mix(in srgb, var(--ab-ink) 5%, var(--ab-canvas)) !important;
+  --ab-accent: var(--ab-ink) !important; --ab-on-accent: var(--ab-canvas) !important;
+  --ab-secondary: var(--ab-canvas) !important; --ab-on-secondary: var(--ab-ink) !important;
+  --k-r: 2px;
+}
+/* actions: every button keeps the 2px corner of the one plain action */
+.ab.sb-ab[data-ae="japanese-minimal"].sb-kit :is(.ab-type-apply, .sb-k-danger) { border-radius: 2px; }
+.ab.sb-ab[data-ae="japanese-minimal"].sb-kit .ab-type-apply.sb-k-btn2 { font-weight: 400; }
+.ab.sb-ab[data-ae="japanese-minimal"].sb-kit .ab-type-apply.sb-k-pressed { background: var(--ab-pri-tint); filter: none; transform: translateY(1px); }
+.ab.sb-ab[data-ae="japanese-minimal"].sb-kit .ab-cta.sb-k-btn.sb-k-pressed { background: color-mix(in srgb, var(--ab-primary) 86%, #000); filter: none; transform: translateY(1px); }
+.ab.sb-ab[data-ae="japanese-minimal"][data-mode="dark"].sb-kit .ab-cta.sb-k-btn.sb-k-pressed { background: color-mix(in srgb, var(--ab-primary) 86%, #fff); }
+.ab.sb-ab[data-ae="japanese-minimal"].sb-kit .sb-k-textbtn { color: var(--ab-ink); font-weight: 400; }
+.ab.sb-ab[data-ae="japanese-minimal"].sb-kit .sb-k-danger { box-shadow: none; font-weight: 400; }
+/* fields: the hairline underline; focus 2px ink, error 2px in the danger colour; no rings */
+.ab.sb-ab[data-ae="japanese-minimal"].sb-kit :is(.sb-k-field, .sb-k-search).is-focus .ab-input { box-shadow: 0 1px 0 var(--ab-ink) !important; border-color: var(--ab-ink) !important; }
+.ab.sb-ab[data-ae="japanese-minimal"].sb-kit .sb-k-field.is-error .ab-input { box-shadow: 0 1px 0 var(--sb-danger) !important; }
+.ab.sb-ab[data-ae="japanese-minimal"].sb-kit .sb-k-search .ab-input { padding-left: 30px !important; }
+.ab.sb-ab[data-ae="japanese-minimal"].sb-kit .sb-k-search > .sb-ico { left: 0; }
+.ab.sb-ab[data-ae="japanese-minimal"].sb-kit .sb-k-menu { box-shadow: none; }
+.ab.sb-ab[data-ae="japanese-minimal"].sb-kit .sb-k-menu li[aria-selected="true"] { font-weight: var(--jm-ui-mid, 500); }
+.ab.sb-ab[data-ae="japanese-minimal"].sb-kit .sb-k-box { border-radius: 2px; }
+.ab.sb-ab[data-ae="japanese-minimal"].sb-kit .sb-k-box[type="radio"] { border-radius: 50%; }
+.ab.sb-ab[data-ae="japanese-minimal"].sb-kit .sb-k-box:checked { background: var(--ab-ink); border-color: var(--ab-ink); }
+.ab.sb-ab[data-ae="japanese-minimal"].sb-kit .sb-k-box[type="checkbox"]:checked::after { border-color: var(--ab-canvas); }
+.ab.sb-ab[data-ae="japanese-minimal"].sb-kit .sb-k-box[type="radio"]:checked::after { background: var(--ab-canvas); }
+.ab.sb-ab[data-ae="japanese-minimal"].sb-kit .ab-switch:checked { background: var(--ab-ink); border-color: var(--ab-ink); }
+.ab.sb-ab[data-ae="japanese-minimal"].sb-kit .ab-switch:checked::before { background: var(--ab-canvas); }
+/* segments and tabs: the chosen word takes a 2px ink underline, 44pt tall */
+.ab.sb-ab[data-ae="japanese-minimal"].sb-kit .ab-seg-btn { min-height: var(--k-tap, 44px) !important; }
+.ab.sb-ab[data-ae="japanese-minimal"].sb-kit .ab-seg-btn[aria-pressed="true"]::after { background: var(--ab-ink); }
+.ab.sb-ab[data-ae="japanese-minimal"].sb-kit .sb-k-tabs [role="tab"][aria-selected="true"]::after { background: var(--ab-ink); }
+/* list rows: one 1px rule between rows (the board's drawn rule doubled the kit's border) */
+.ab.sb-ab[data-ae="japanese-minimal"].sb-kit .sb-k-row::before { content: none; }
+/* leads: an ink glyph in a hairline square; avatars are hairline circles */
+.ab.sb-ab[data-ae="japanese-minimal"].sb-kit :is(.sb-k-ico, .sb-k-emptyico) { border-radius: 2px; background: none; color: var(--ab-ink); box-shadow: inset 0 0 0 1px var(--ab-line); }
+.ab.sb-ab[data-ae="japanese-minimal"].sb-kit .sb-k-av { background: var(--ab-canvas); color: var(--ab-ink); box-shadow: inset 0 0 0 1px var(--ab-line); font-weight: 400; }
+.ab.sb-ab[data-ae="japanese-minimal"].sb-kit .sb-k-avs .sb-k-av { margin-left: -4px; box-shadow: inset 0 0 0 1px var(--ab-line), 0 0 0 2px var(--ab-canvas); }
+/* callouts: a hairline box with a 2px rule at the left in the tone; no tinted fill */
+.ab.sb-ab[data-ae="japanese-minimal"].sb-kit .sb-k-callout { border: 1px solid var(--ab-line); border-left: 2px solid var(--tone-ico, var(--tone)); background: none; }
+.ab.sb-ab[data-ae="japanese-minimal"].sb-kit .sb-k-callout[data-tone="info"] { --tone: var(--ab-ink); --tone-ico: var(--ab-ink); }
+.ab.sb-ab[data-ae="japanese-minimal"].sb-kit .sb-k-callout b { font-weight: var(--jm-ui-mid, 500); }
+/* badges: 2px corners, quiet; the notification dot is the one circle (ink) */
+.ab.sb-ab[data-ae="japanese-minimal"].sb-kit :is(.sb-k-badge, .sb-k-count) { border-radius: 2px; font-weight: var(--jm-ui-mid, 500); }
+.ab.sb-ab[data-ae="japanese-minimal"].sb-kit .sb-k-count:not(.is-accent) { background: none; box-shadow: inset 0 0 0 1px var(--ab-line); }
+.ab.sb-ab[data-ae="japanese-minimal"].sb-kit .sb-badge { background: var(--ab-ink); }
+/* progress and slider: a 2px ink line on a hairline track */
+.ab.sb-ab[data-ae="japanese-minimal"].sb-kit .ab-row-bar.sb-k-bar { height: 2px !important; }
+.ab.sb-ab[data-ae="japanese-minimal"].sb-kit .ab-row-bar.sb-k-bar i { background: var(--ab-ink); }
+.ab.sb-ab[data-ae="japanese-minimal"].sb-kit .sb-k-range::-webkit-slider-runnable-track { height: 2px; border-radius: 0; background: linear-gradient(90deg, var(--ab-ink) var(--v, 50%), var(--ab-line) var(--v, 50%)); }
+.ab.sb-ab[data-ae="japanese-minimal"].sb-kit .sb-k-range::-webkit-slider-thumb { width: 18px; height: 18px; margin-top: -8px; border-radius: 50%; border: 1px solid var(--ab-ink); background: var(--ab-canvas); box-shadow: none; }
+.ab.sb-ab[data-ae="japanese-minimal"].sb-kit .sb-k-range::-moz-range-track { height: 2px; border-radius: 0; background: linear-gradient(90deg, var(--ab-ink) var(--v, 50%), var(--ab-line) var(--v, 50%)); }
+.ab.sb-ab[data-ae="japanese-minimal"].sb-kit .sb-k-range::-moz-range-thumb { width: 18px; height: 18px; border-radius: 50%; border: 1px solid var(--ab-ink); background: var(--ab-canvas); box-shadow: none; }
+/* navigation: a 2px ink marker; page dots small squares */
+.ab.sb-ab[data-ae="japanese-minimal"].sb-kit .sb-tab[aria-current]::before { border-radius: 0; height: 2px; background: var(--ab-ink); }
+.ab.sb-ab[data-ae="japanese-minimal"].sb-kit .sb-dots i { border-radius: 1px; width: 6px; height: 6px; }
+.ab.sb-ab[data-ae="japanese-minimal"].sb-kit .sb-dots i.is-on { width: 18px; }
+/* flat surfaces */
+.ab.sb-ab[data-ae="japanese-minimal"].sb-kit .sb-k-toast { border-radius: 2px; box-shadow: none; }
+.ab.sb-ab[data-ae="japanese-minimal"].sb-kit .sb-k-sheet { border-radius: 2px 2px 0 0; box-shadow: none; }
+.ab.sb-ab[data-ae="japanese-minimal"].sb-kit .ab-fit { font-size: var(--k-caption, 12px); line-height: var(--k-caption-lh, 16px); }

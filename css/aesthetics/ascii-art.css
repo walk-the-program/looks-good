@@ -294,3 +294,70 @@
 /* Stat labels: the closing ├ stays glued to the last word instead of wrapping alone onto a second line. */
 .ab.sb-ab[data-ae="ascii-art"] .sb-stat .ab-label::before { content: "┤\00a0"; }
 .ab.sb-ab[data-ae="ascii-art"] .sb-stat .ab-label::after { content: "\00a0├"; }
+
+/* ---- App UI (phone screens + UI kit tab; scope .sb-kit only, never the board) ----
+   Everything stays a character on the grid: framed 1px boxes with all four edges (no ┤ TITLE ├ edge
+   exists in the app, so the board's open top would read as a missing line), text controls ([x], ( ),
+   < a | b >), inverse video for pressed / picked / selected, no radius, no shadow. The character field
+   stays on the board: app screens sit on the plain canvas like the kit's screen layouts, and kit cells
+   are opaque so no stray glyph lands inside a component. */
+.ab.sb-ab.sb-kit.sb-screen[data-ae="ascii-art"] { background-image: none; }
+.ab.sb-ab.sb-kit:is([data-ae="ascii-art"], [data-ae="ascii-art--classic"]) :is(.sb-k-cell, .sb-k-layout) { border-radius: 0; background: var(--ab-canvas); }
+.ab.sb-ab.sb-kit:is([data-ae="ascii-art"], [data-ae="ascii-art--classic"]) .sb-k-ios-tag { border-radius: 0; }
+.ab.sb-ab.sb-kit:is([data-ae="ascii-art"], [data-ae="ascii-art--classic"]) :is(.ab-card, .ab-list.sb-k-list) { border-top: 1px solid var(--ab-frame); }
+.ab.sb-ab.sb-kit:is([data-ae="ascii-art"], [data-ae="ascii-art--classic"]) .ab-list.sb-k-list { padding: 0; }
+/* buttons: both actions are framed text lines starting at the same column; pressed = inverse video */
+.ab.sb-ab.sb-kit:is([data-ae="ascii-art"], [data-ae="ascii-art--classic"]) .ab-type-apply.sb-k-btn2 { justify-content: flex-start; gap: 0; padding-left: 2ch !important; padding-right: 2ch !important; text-align: left; }
+.ab.sb-ab.sb-kit:is([data-ae="ascii-art"], [data-ae="ascii-art--classic"]) .sb-k-pressed { filter: none; transform: none; }
+.ab.sb-ab.sb-kit:is([data-ae="ascii-art"], [data-ae="ascii-art--classic"]) .ab-cta.sb-k-btn.sb-k-pressed { background: var(--ab-primary-text); color: var(--ab-canvas); }
+.ab.sb-ab.sb-kit:is([data-ae="ascii-art"], [data-ae="ascii-art--classic"]) .ab-type-apply.sb-k-pressed { background: var(--ab-ink); color: var(--ab-canvas); }
+.ab.sb-ab.sb-kit:is([data-ae="ascii-art"], [data-ae="ascii-art--classic"]) .ab-type-apply.sb-k-pressed::before { color: inherit; }
+.ab.sb-ab.sb-kit:is([data-ae="ascii-art"], [data-ae="ascii-art--classic"]) .sb-k-textbtn.sb-k-pressed { opacity: 1; background: var(--ab-ink); color: var(--ab-canvas); }
+/* the icon button holds only its icon (no "> " prompt pushing the glyph off centre) */
+.ab.sb-ab.sb-kit:is([data-ae="ascii-art"], [data-ae="ascii-art--classic"]) .ab-type-apply.sb-k-iconbtn::before { content: none; }
+/* rows: the picked row in inverse video; avatars are framed character cells, ink on the canvas */
+.ab.sb-ab.sb-kit:is([data-ae="ascii-art"], [data-ae="ascii-art--classic"]) .ab-row.sb-k-row { border-top-color: var(--ab-frame); }
+.ab.sb-ab.sb-kit:is([data-ae="ascii-art"], [data-ae="ascii-art--classic"]) .ab-row.sb-k-row.is-picked { background: var(--ab-ink); color: var(--ab-canvas); }
+.ab.sb-ab.sb-kit:is([data-ae="ascii-art"], [data-ae="ascii-art--classic"]) .ab-row.sb-k-row.is-picked :is(.sb-k-sub, .sb-k-trail) { color: var(--ab-canvas); }
+.ab.sb-ab.sb-kit:is([data-ae="ascii-art"], [data-ae="ascii-art--classic"]) .ab-row.sb-k-row.is-picked .sb-k-av { border-color: var(--ab-canvas); color: var(--ab-canvas); }
+.ab.sb-ab.sb-kit:is([data-ae="ascii-art"], [data-ae="ascii-art--classic"]) .sb-k-av { border: 1px solid var(--ab-ink); border-radius: 0; background: transparent; color: var(--ab-ink); font-family: var(--aa-font, ui-monospace, monospace); font-weight: 600; }
+.ab.sb-ab.sb-kit:is([data-ae="ascii-art"], [data-ae="ascii-art--classic"]) .sb-k-avs .sb-k-av { background: var(--ab-canvas); box-shadow: none; }
+.ab.sb-ab.sb-kit:is([data-ae="ascii-art"], [data-ae="ascii-art--classic"]) :is(.sb-k-ico, .sb-k-emptyico) { border: 1px solid var(--ab-frame); border-radius: 0; background: transparent; color: var(--ab-ink); }
+/* fields: focus thickens the frame to 2px in ink, error to 2px in the danger colour; no glow */
+.ab.sb-ab.sb-kit:is([data-ae="ascii-art"], [data-ae="ascii-art--classic"]) :is(.sb-k-field, .sb-k-search).is-focus .ab-input { border-color: var(--ab-ink) !important; box-shadow: inset 0 0 0 1px var(--ab-ink) !important; }
+.ab.sb-ab.sb-kit:is([data-ae="ascii-art"], [data-ae="ascii-art--classic"]) .sb-k-field.is-error .ab-input { border-color: var(--sb-danger) !important; box-shadow: inset 0 0 0 1px var(--sb-danger) !important; }
+/* open select: a framed list, the chosen line in inverse video */
+.ab.sb-ab.sb-kit:is([data-ae="ascii-art"], [data-ae="ascii-art--classic"]) .sb-k-menu { margin-top: -1px !important; padding: 0; border-color: var(--ab-frame); border-radius: 0; box-shadow: none; }
+.ab.sb-ab.sb-kit:is([data-ae="ascii-art"], [data-ae="ascii-art--classic"]) .sb-k-menu li { border-radius: 0; font-family: var(--ab-font-ui); }
+.ab.sb-ab.sb-kit:is([data-ae="ascii-art"], [data-ae="ascii-art--classic"]) .sb-k-menu li[aria-selected="true"] { background: var(--ab-ink); color: var(--ab-canvas); }
+.ab.sb-ab.sb-kit:is([data-ae="ascii-art"], [data-ae="ascii-art--classic"]) .sb-k-menu li[aria-selected="true"] .sb-ico { color: var(--ab-canvas); }
+/* checkbox and radio are text, like the toggle: [ ] [x] and ( ) (*) */
+.ab.sb-ab.sb-kit:is([data-ae="ascii-art"], [data-ae="ascii-art--classic"]) .sb-k-box { width: 3ch; height: 24px; border: 0; border-radius: 0; background: none; color: var(--ab-muted); font: 600 var(--k-body, 17px)/24px var(--aa-font, ui-monospace, monospace); }
+.ab.sb-ab.sb-kit:is([data-ae="ascii-art"], [data-ae="ascii-art--classic"]) .sb-k-box::after,
+.ab.sb-ab.sb-kit:is([data-ae="ascii-art"], [data-ae="ascii-art--classic"]) .sb-k-box:checked::after { content: "[ ]"; width: auto; height: auto; border: 0; border-radius: 0; background: none; transform: none; white-space: pre; }
+.ab.sb-ab.sb-kit:is([data-ae="ascii-art"], [data-ae="ascii-art--classic"]) .sb-k-box[type="radio"]::after { content: "( )"; }
+.ab.sb-ab.sb-kit:is([data-ae="ascii-art"], [data-ae="ascii-art--classic"]) .sb-k-box:checked { background: none; border: 0; color: var(--ab-primary-text); }
+.ab.sb-ab.sb-kit:is([data-ae="ascii-art"], [data-ae="ascii-art--classic"]) .sb-k-box[type="checkbox"]:checked::after { content: "[x]"; }
+.ab.sb-ab.sb-kit:is([data-ae="ascii-art"], [data-ae="ascii-art--classic"]) .sb-k-box[type="radio"]:checked::after { content: "(*)"; }
+.ab.sb-ab.sb-kit:is([data-ae="ascii-art"], [data-ae="ascii-art--classic"]) .ab-toggle.sb-tog .ab-switch { font-size: var(--k-body, 17px); }
+/* slider: a row of character cells, filled cells in the primary, the thumb a solid block */
+.ab.sb-ab.sb-kit:is([data-ae="ascii-art"], [data-ae="ascii-art--classic"]) .sb-k-range::-webkit-slider-runnable-track { height: 12px; border-radius: 0; background: repeating-linear-gradient(90deg, transparent 0 8px, var(--ab-canvas) 8px 10px), linear-gradient(90deg, var(--ab-primary-text) var(--v, 50%), var(--ab-line) var(--v, 50%)); }
+.ab.sb-ab.sb-kit:is([data-ae="ascii-art"], [data-ae="ascii-art--classic"]) .sb-k-range::-webkit-slider-thumb { width: 12px; height: 24px; margin-top: -6px; border: 0; border-radius: 0; background: var(--ab-ink); box-shadow: none; }
+.ab.sb-ab.sb-kit:is([data-ae="ascii-art"], [data-ae="ascii-art--classic"]) .sb-k-range::-moz-range-track { height: 12px; border-radius: 0; background: linear-gradient(90deg, var(--ab-primary-text) var(--v, 50%), var(--ab-line) var(--v, 50%)); }
+.ab.sb-ab.sb-kit:is([data-ae="ascii-art"], [data-ae="ascii-art--classic"]) .sb-k-range::-moz-range-thumb { width: 12px; height: 24px; border: 0; border-radius: 0; background: var(--ab-ink); box-shadow: none; }
+/* sheet: a framed panel rising from the bottom, square, the grabber a short rule */
+.ab.sb-ab.sb-kit:is([data-ae="ascii-art"], [data-ae="ascii-art--classic"]) .sb-k-sheetbox { border-radius: 0; }
+.ab.sb-ab.sb-kit:is([data-ae="ascii-art"], [data-ae="ascii-art--classic"]) .sb-k-sheet { border-top: 1px solid var(--ab-frame); border-radius: 0; box-shadow: none; }
+.ab.sb-ab.sb-kit:is([data-ae="ascii-art"], [data-ae="ascii-art--classic"]) .sb-k-grab { height: 2px; border-radius: 0; background: var(--ab-frame); }
+/* in-page tabs: the selected tab underlined in ink */
+.ab.sb-ab.sb-kit:is([data-ae="ascii-art"], [data-ae="ascii-art--classic"]) .sb-k-tabs [role="tab"][aria-selected="true"]::after { background: var(--ab-ink); }
+/* badges and counts: square cells; the notification dot a square block; toast flat */
+.ab.sb-ab.sb-kit:is([data-ae="ascii-art"], [data-ae="ascii-art--classic"]) :is(.sb-k-badge, .sb-k-count, .sb-badge, .sb-k-toast, .sb-k-callout, .sb-k-tabbarbox) { border-radius: 0; }
+.ab.sb-ab.sb-kit:is([data-ae="ascii-art"], [data-ae="ascii-art--classic"]) :is(.sb-k-badge, .sb-k-count) { font-family: var(--aa-font, ui-monospace, monospace); }
+.ab.sb-ab.sb-kit:is([data-ae="ascii-art"], [data-ae="ascii-art--classic"]) .sb-k-toast { box-shadow: none; }
+.ab.sb-ab.sb-kit:is([data-ae="ascii-art"], [data-ae="ascii-art--classic"]) .sb-dots i { border-radius: 0; }
+/* classic copy: its primary action is a filled block, so pressed inverts to ink; its buttons pad 16px, not 2ch */
+.ab.sb-ab.sb-kit[data-ae="ascii-art--classic"] .ab-cta.sb-k-btn.sb-k-pressed { background: var(--ab-ink); color: var(--ab-canvas); }
+.ab.sb-ab.sb-kit[data-ae="ascii-art--classic"] .ab-type-apply.sb-k-btn2 { padding-left: 16px !important; padding-right: 16px !important; }
+/* app toggles: label first on the left edge (aligned with field labels), the [x] at the trailing edge */
+.ab.sb-ab.sb-kit:is([data-ae="ascii-art"], [data-ae="ascii-art--classic"]) .ab-toggle.sb-tog { flex-direction: row; justify-content: space-between; padding-left: 0; padding-right: 0; }

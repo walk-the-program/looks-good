@@ -267,3 +267,50 @@
 
 /* sidebar nav / owner line sat at 4.48:1 on the stock; nudge toward toner */
 .ab.sb-ab[data-ae="xerox"] .sb-side { --ab-muted: color-mix(in srgb, var(--ab-muted) 85%, var(--ab-ink)); }
+
+/* App UI (phone screens and the UI kit). The copy texture (dust, edge burn, drum streak) stays on the board:
+   app screens carry no decorative band, so the toner lives in the components instead. Everything is square
+   to the page: selection, checks and the slider are toner, never a soft tint. */
+.ab.sb-ab[data-ae="xerox"]:is(.sb-screen, .sb-kit)::before, .ab.sb-ab[data-ae="xerox"]:is(.sb-screen, .sb-kit)::after { content: none; }
+.ab.sb-ab[data-ae="xerox"]:is(.sb-screen, .sb-kit) :is(.sb-k-box, .sb-k-badge, .sb-k-count, .sb-k-emptyico, .sb-k-av, .ab-av, .sb-k-ico) { border-radius: 0; }
+.ab.sb-ab[data-ae="xerox"] .sb-k-box { border: 2px solid var(--ab-ink); }
+.ab.sb-ab[data-ae="xerox"] .sb-k-box[type="radio"] { border-radius: 50%; }
+.ab.sb-ab[data-ae="xerox"] .sb-k-box:checked { background: var(--ab-ink); border-color: var(--ab-ink); }
+.ab.sb-ab[data-ae="xerox"] .sb-k-box[type="checkbox"]:checked::after { border-color: var(--ab-canvas); }
+.ab.sb-ab[data-ae="xerox"] .sb-k-box[type="radio"]:checked { background: none; }
+.ab.sb-ab[data-ae="xerox"] .sb-k-box[type="radio"]:checked::after { background: var(--ab-ink); }
+.ab.sb-ab[data-ae="xerox"] .sb-k-range::-webkit-slider-runnable-track { height: 4px; border-radius: 0; background: linear-gradient(90deg, var(--ab-ink) var(--v, 50%), color-mix(in srgb, var(--ab-ink) 22%, transparent) var(--v, 50%)); }
+.ab.sb-ab[data-ae="xerox"] .sb-k-range::-webkit-slider-thumb { width: 14px; height: 26px; margin-top: -11px; border: 0; border-radius: 0; background: var(--ab-ink); box-shadow: none; }
+.ab.sb-ab[data-ae="xerox"] .sb-k-range::-moz-range-track { height: 4px; border-radius: 0; background: linear-gradient(90deg, var(--ab-ink) var(--v, 50%), color-mix(in srgb, var(--ab-ink) 22%, transparent) var(--v, 50%)); }
+.ab.sb-ab[data-ae="xerox"] .sb-k-range::-moz-range-thumb { width: 14px; height: 26px; border: 0; border-radius: 0; background: var(--ab-ink); box-shadow: none; }
+.ab.sb-ab[data-ae="xerox"] .sb-k-count:not(.is-accent) { background: none; box-shadow: inset 0 0 0 2px var(--ab-ink); font-weight: var(--xr-bw, 700); }
+.ab.sb-ab[data-ae="xerox"] .sb-k-emptyico { background: none; box-shadow: inset 0 0 0 2px var(--ab-ink); color: var(--ab-ink); }
+.ab.sb-ab[data-ae="xerox"].sb-kit .sb-k-field .ab-input:disabled { border-bottom-style: dashed; }
+/* a disabled action has no ghost copy behind it */
+.ab.sb-ab[data-ae="xerox"]:is(.sb-screen, .sb-kit) .ab-cta:disabled::after { content: none; }
+/* a switch in a settings row reads like the other rows (the OFF | ON key keeps the copier look) */
+.ab.sb-ab[data-ae="xerox"]:is(.sb-screen, .sb-kit) .ab-toggle.sb-tog { font-weight: 400; letter-spacing: 0; text-transform: none; }
+
+/* Classic version (xerox--classic): the same app-UI refinements, kept here because css/aesthetics/classic/ is generated. */
+/* App UI (phone screens and the UI kit). The copy texture (dust, edge burn, drum streaks) and the tape stay on the
+   board: app screens carry no decorative band or prop, so the paste-up lives in the components (skewed scrap
+   cards, the off-register primary under the action). A selected segment is a flat toner tile, no offset shadow. */
+.ab.sb-ab[data-ae="xerox--classic"]:is(.sb-screen, .sb-kit)::before, .ab.sb-ab[data-ae="xerox--classic"]:is(.sb-screen, .sb-kit)::after { content: none; }
+.ab.sb-ab[data-ae="xerox--classic"]:is(.sb-screen, .sb-kit) :is(.ab-card, .ab-panel)::before { content: none; }
+.ab.sb-ab[data-ae="xerox--classic"]:is(.sb-screen, .sb-kit) .ab-seg-btn[aria-pressed="true"] { box-shadow: none; transform: none; }
+.ab.sb-ab[data-ae="xerox--classic"]:is(.sb-screen, .sb-kit) .ab-cta:disabled::after { content: none; }
+.ab.sb-ab[data-ae="xerox--classic"]:is(.sb-screen, .sb-kit) :is(.sb-k-box, .sb-k-badge, .sb-k-count, .sb-k-emptyico, .sb-k-av, .ab-av, .sb-k-ico) { border-radius: 0; }
+.ab.sb-ab[data-ae="xerox--classic"] .sb-k-box { border: 2px solid var(--ab-ink); }
+.ab.sb-ab[data-ae="xerox--classic"] .sb-k-box[type="radio"] { border-radius: 50%; }
+.ab.sb-ab[data-ae="xerox--classic"] .sb-k-box:checked { background: var(--ab-ink); border-color: var(--ab-ink); }
+.ab.sb-ab[data-ae="xerox--classic"] .sb-k-box[type="checkbox"]:checked::after { border-color: var(--ab-canvas); }
+.ab.sb-ab[data-ae="xerox--classic"] .sb-k-box[type="radio"]:checked { background: none; }
+.ab.sb-ab[data-ae="xerox--classic"] .sb-k-box[type="radio"]:checked::after { background: var(--ab-ink); }
+.ab.sb-ab[data-ae="xerox--classic"] .sb-k-range::-webkit-slider-runnable-track { height: 4px; border-radius: 0; background: linear-gradient(90deg, var(--ab-ink) var(--v, 50%), color-mix(in srgb, var(--ab-ink) 22%, transparent) var(--v, 50%)); }
+.ab.sb-ab[data-ae="xerox--classic"] .sb-k-range::-webkit-slider-thumb { width: 14px; height: 26px; margin-top: -11px; border: 0; border-radius: 0; background: var(--ab-ink); box-shadow: none; }
+.ab.sb-ab[data-ae="xerox--classic"] .sb-k-range::-moz-range-track { height: 4px; border-radius: 0; background: linear-gradient(90deg, var(--ab-ink) var(--v, 50%), color-mix(in srgb, var(--ab-ink) 22%, transparent) var(--v, 50%)); }
+.ab.sb-ab[data-ae="xerox--classic"] .sb-k-range::-moz-range-thumb { width: 14px; height: 26px; border: 0; border-radius: 0; background: var(--ab-ink); box-shadow: none; }
+.ab.sb-ab[data-ae="xerox--classic"] .sb-k-count:not(.is-accent) { background: none; box-shadow: inset 0 0 0 2px var(--ab-ink); font-weight: 700; }
+.ab.sb-ab[data-ae="xerox--classic"] .sb-k-emptyico { background: none; box-shadow: inset 0 0 0 2px var(--ab-ink); color: var(--ab-ink); }
+.ab.sb-ab[data-ae="xerox--classic"].sb-kit .sb-k-field .ab-input:disabled { border-bottom-style: dashed; }
+.ab.sb-ab[data-ae="xerox--classic"]:is(.sb-screen, .sb-kit) .ab-toggle.sb-tog { font-weight: 400; letter-spacing: 0; text-transform: none; }

@@ -214,7 +214,6 @@
 .ab.sb-ab[data-ae="riso-print"] .sb-c-line { stroke-width: 3; }
 .ab.sb-ab[data-ae="riso-print"] .ab-card.sb-stat .ab-card-title.sb-num { overflow: visible; text-overflow: clip; }
 .ab.sb-ab[data-ae="riso-print"] .ab-type-apply.sb-icon-btn { border-radius: 50%; border: var(--rz-line); box-shadow: 2px 1.5px 0 var(--ab-plate); }
-.ab.sb-ab[data-ae="riso-print"] { --sb-danger: #a82020; }
 
 /* deck cover foot: a two-ink halftone band, the second ink printed half a cell off-register */
 .ab[data-ae="riso-print"].ab-slide[data-slide="cover"] > .ab-in.ab-slide-in { padding-bottom: 120px; }
@@ -229,3 +228,14 @@
 /* Built > Settings: stack Website and Support email so a long brand's domain is not cut off mid-word in a half-width field */
 .ab.sb-ab[data-ae="riso-print"] .sb-field-row { grid-template-columns: minmax(0, 1fr); }
 .ab.sb-ab[data-ae="riso-print"] .sb-set-panel .sb-field-row .sb-field:last-child .ab-input { margin-bottom: 16px; }
+
+/* App UI (phone screens and the UI kit): the board prints the accent as a fluorescent riso ink, but app screens use only
+   the brand's palette, so badges, dots and the headline ring take the brand accent itself. */
+.ab.sb-ab[data-ae="riso-print"]:is(.sb-screen, .sb-kit) > * { --ab-accent: var(--ab-accent-ink); }
+/* a switch label in a settings row reads like the other rows; check and radio edges are the riso line, not a faint grey */
+.ab.sb-ab[data-ae="riso-print"]:is(.sb-screen, .sb-kit) .ab-toggle.sb-tog > span { font-size: inherit; font-weight: 400; }
+.ab.sb-ab[data-ae="riso-print"] .sb-k-box { border: var(--rz-line); }
+.ab.sb-ab[data-ae="riso-print"] .sb-k-box:checked { border-color: var(--ab-primary); }
+/* the page grain tiles every 240px and its seams print as a faint grid across a phone screen; the grain stays on the
+   cards and halftone actions, the screen ground is plain paper */
+.ab.sb-ab[data-ae="riso-print"]:is(.sb-screen, .sb-kit)::after { content: none; }

@@ -314,3 +314,44 @@
 
 /* Built screens: the handwriting face reads small at the shared nav size */
 .ab.sb-ab[data-ae="naive-doodle"] .sb-navi { font-size: 16px; }
+
+/* ---- App UI (phone screens, UI kit tab: roots with .sb-kit) ----
+   The components keep the wobble line, the crayon fill set off its outline and the hand type; the
+   graph-paper ground stays on the board (on a phone it ran through every row and label). The kit's
+   motif: hand-drawn edges, and wobbly corners (unequal radii) on anything without a drawn outline. */
+.ab.sb-ab.sb-screen[data-ae="naive-doodle"] { background-image: none; }
+/* pressed: the crayon slides under the outline; no extra scribbled loop round the button */
+.ab.sb-ab.sb-kit[data-ae="naive-doodle"] .ab-cta.sb-k-btn.sb-k-pressed { transform: none; filter: none; }
+.ab.sb-ab.sb-kit[data-ae="naive-doodle"] .ab-cta.sb-k-btn:is(.is-pressed, .sb-k-pressed)::before { inset: 3px 2px 2px 3px; filter: saturate(1.25) brightness(0.94); }
+.ab.sb-ab.sb-kit[data-ae="naive-doodle"] .ab-cta.sb-k-btn:is(.is-pressed, .sb-k-pressed)::after { background: var(--nd-btn) center / calc(100% - 26px) calc(100% - 22px) no-repeat; }
+.ab.sb-ab.sb-kit[data-ae="naive-doodle"] .ab-type-apply.sb-k-btn2.sb-k-pressed { transform: none; filter: none; background: var(--nd-btn) 0 0 / 100% 100% no-repeat, linear-gradient(var(--nd-wash), var(--nd-wash)) 6px 6px / calc(100% - 10px) calc(100% - 10px) no-repeat; }
+.ab.sb-ab.sb-kit[data-ae="naive-doodle"] :is(.ab-cta.sb-k-btn, .sb-k-btn2):disabled { filter: none; }
+/* fields: the drawn underline is the edge in every state; focus turns it into the squiggle, error into the danger line */
+.ab.sb-ab.sb-kit[data-ae="naive-doodle"] :is(.sb-k-field, .sb-k-search).is-focus .ab-input { box-shadow: none !important; background: var(--nd-squig) 0 100% / 60px 12px repeat-x; }
+.ab.sb-ab.sb-kit[data-ae="naive-doodle"] .sb-k-field.is-error .ab-input { box-shadow: none !important; background: linear-gradient(var(--sb-danger), var(--sb-danger)) 0 calc(100% - 4px) / 100% 2.5px no-repeat; }
+/* things with no drawn outline get wobbly corners and the pencil edge, never a blur shadow */
+.ab.sb-ab.sb-kit[data-ae="naive-doodle"] .sb-k-danger { border-radius: 20px 14px 22px 12px / 14px 22px 12px 20px; box-shadow: none; }
+.ab.sb-ab.sb-kit[data-ae="naive-doodle"] .sb-k-callout { border: 2px solid color-mix(in srgb, var(--tone) 70%, var(--ab-ink)); border-radius: 18px 10px 20px 8px / 10px 18px 8px 20px; }
+.ab.sb-ab.sb-kit[data-ae="naive-doodle"] .sb-k-toast { border-radius: 18px 10px 20px 8px / 10px 18px 8px 20px; box-shadow: none; }
+.ab.sb-ab.sb-kit[data-ae="naive-doodle"] .sb-k-menu { border: 2px solid var(--ab-ink); border-radius: 18px 10px 20px 8px / 10px 18px 8px 20px; box-shadow: none; }
+.ab.sb-ab.sb-kit[data-ae="naive-doodle"] .sb-k-menu li { border-radius: 12px 6px 14px 8px / 8px 14px 6px 12px; }
+.ab.sb-ab.sb-kit[data-ae="naive-doodle"] .sb-k-menu li[aria-selected="true"] { background: var(--nd-wash); }
+.ab.sb-ab.sb-kit[data-ae="naive-doodle"] .sb-k-sheet { border-top: 2px solid var(--ab-ink); border-radius: 30px 18px 0 0 / 18px 30px 0 0; box-shadow: none; }
+.ab.sb-ab.sb-kit[data-ae="naive-doodle"] .sb-k-grab { background: var(--ab-ink); }
+.ab.sb-ab.sb-kit[data-ae="naive-doodle"] :is(.sb-k-emptyico, .sb-k-ico) { border: 2px solid var(--ab-ink); border-radius: 46% 54% 50% 50% / 54% 46% 54% 46%; }
+.ab.sb-ab.sb-kit[data-ae="naive-doodle"] .sb-k-ico { width: 34px; height: 34px; border-width: 1.6px; }
+.ab.sb-ab.sb-kit[data-ae="naive-doodle"] .sb-k-av { border: 1.6px solid var(--ab-ink); border-radius: 46% 54% 50% 50% / 54% 46% 54% 46%; }
+.ab.sb-ab.sb-kit[data-ae="naive-doodle"] .sb-k-box { border: 2px solid var(--ab-ink); border-radius: 7px 4px 8px 3px / 4px 8px 3px 7px; }
+.ab.sb-ab.sb-kit[data-ae="naive-doodle"] .sb-k-box[type="radio"] { border-radius: 46% 54% 50% 50% / 54% 46% 54% 46%; }
+.ab.sb-ab.sb-kit[data-ae="naive-doodle"] .sb-k-tabbarbox { border: 2px solid var(--ab-ink); border-radius: 18px 10px 20px 8px / 10px 18px 8px 20px; }
+.ab.sb-ab.sb-kit[data-ae="naive-doodle"] .sb-k-range::-webkit-slider-thumb { border: 2px solid var(--ab-ink); background: var(--ab-canvas); box-shadow: none; border-radius: 46% 54% 50% 50% / 54% 46% 54% 46%; }
+/* selection is drawn: the current tab and the in-page tab get the hand squiggle, titles the hand face */
+.ab.sb-ab.sb-kit[data-ae="naive-doodle"] .sb-tab[aria-current]::before { width: 28px; height: 8px; margin-left: -14px; border-radius: 0; background: var(--nd-squig) 0 50% / 28px 8px no-repeat; }
+.ab.sb-ab.sb-kit[data-ae="naive-doodle"] .sb-k-tabs [role="tab"][aria-selected="true"]::after { height: 10px; bottom: -5px; background: var(--nd-squig) 0 50% / 60px 10px repeat-x; }
+.ab.sb-ab.sb-kit[data-ae="naive-doodle"] :is(.sb-k-tb-title, .sb-k-tabs [role="tab"]) { font-family: var(--ab-font-h); font-weight: 400; }
+.ab.sb-ab.sb-kit[data-ae="naive-doodle"] .sb-k-topbar { border-bottom: 0; background: var(--nd-line) 0 100% / 100% 10px no-repeat; padding-bottom: 4px; }
+.ab.sb-ab.sb-kit[data-ae="naive-doodle"] .sb-k-tabs { border-bottom: 0; background: var(--nd-line) 0 100% / 100% 10px no-repeat; }
+/* the handwriting face has a small x-height: at the 13pt footnote size it read as 9pt, so the
+   hand-written kicker and section note are set a step up (17 / 18), still one line */
+.ab.sb-ab.sb-kit[data-ae="naive-doodle"] .ab-kicker { font-size: 17px !important; line-height: 18px !important; }
+.ab.sb-ab.sb-kit[data-ae="naive-doodle"] .sb-k-section .ab-label:last-child:not(:first-child) { font-size: 17px !important; line-height: 18px !important; }

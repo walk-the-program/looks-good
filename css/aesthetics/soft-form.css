@@ -241,3 +241,119 @@
   .ab[data-ae="soft-form"] .ab-card { border-color: var(--ab-ink); }
   .ab[data-ae="soft-form"] .ab-seg-btn[aria-pressed="false"] { color: var(--ab-ink); }
 }
+
+/* ---------------------------------------------------------------------
+   App UI (phone screens and the UI kit tab: roots with .sb-kit). Soft Form
+   lives in the components here, never in art: cards are raised controls with
+   no line border, list groups are flat rows in a recessed well, fields and
+   tracks are recessed, the primary is the one glossy solid, pressed parts sink.
+   Relief uses the app pair --sfk-hi / --sfk-lo (js tokens(); stronger in dark).
+   The Classic copy (generated, never hand-edited) gets the same app UI from here;
+   it has no --sfk-* tokens, so it falls back to its own --ab-hi / --ab-lo.
+   .ab.sb-ab...sb-kit outranks the shared kit rules in css/see-built.css.
+------------------------------------------------------------------------ */
+.ab.sb-ab:is([data-ae="soft-form"], [data-ae="soft-form--classic"]).sb-kit {
+  --sfk-raised: 5px 5px 12px var(--sfk-lo, var(--ab-lo)), -5px -5px 12px var(--sfk-hi, var(--ab-hi)), inset 0 1px 0 var(--sfk-rim, transparent);
+  --sfk-raised-s: 3px 3px 7px var(--sfk-lo, var(--ab-lo)), -3px -3px 7px var(--sfk-hi, var(--ab-hi)), inset 0 1px 0 var(--sfk-rim, transparent);
+  --sfk-inset: inset 4px 4px 9px var(--sfk-lo, var(--ab-lo)), inset -4px -4px 9px var(--sfk-hi, var(--ab-hi));
+  --sfk-inset-s: inset 2px 2px 5px var(--sfk-lo, var(--ab-lo)), inset -2px -2px 5px var(--sfk-hi, var(--ab-hi));
+  --sfk-gloss: linear-gradient(180deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0) 55%);
+}
+
+/* cards: a raised control on the canvas (no ring, no glass wash) */
+.ab.sb-ab:is([data-ae="soft-form"], [data-ae="soft-form--classic"]).sb-kit .ab-card {
+  border: 0 !important; border-radius: 22px; background: var(--ab-canvas) !important; box-shadow: var(--sfk-raised) !important;
+}
+.ab.sb-ab:is([data-ae="soft-form"], [data-ae="soft-form--classic"]).sb-kit .ab-card::before,
+.ab.sb-ab:is([data-ae="soft-form"], [data-ae="soft-form--classic"]).sb-kit .ab-card::after { content: none; }
+
+/* segmented: recessed track, ink-filled selected segment nested at track radius minus padding */
+.ab.sb-ab:is([data-ae="soft-form"], [data-ae="soft-form--classic"]).sb-kit .ab-seg { border: 0; border-radius: 14px; padding: 5px; background: var(--ab-canvas); box-shadow: var(--sfk-inset-s); }
+.ab.sb-ab:is([data-ae="soft-form"], [data-ae="soft-form--classic"]).sb-kit .ab-seg-btn { border-radius: 9px; }
+.ab.sb-ab:is([data-ae="soft-form"], [data-ae="soft-form--classic"]).sb-kit .ab-seg-btn[aria-pressed="true"] { background: var(--ab-ink); color: var(--ab-canvas); box-shadow: 2px 2px 6px var(--sfk-lo, var(--ab-lo)); }
+
+/* buttons: glossy solid primary, raised canvas secondary and icon keys; pressed sinks */
+.ab.sb-ab:is([data-ae="soft-form"], [data-ae="soft-form--classic"]).sb-kit .ab-cta {
+  border-radius: 12px; background: var(--sfk-gloss), var(--ab-primary);
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.4), 3px 4px 10px var(--sfk-lo, var(--ab-lo));
+}
+.ab.sb-ab:is([data-ae="soft-form"], [data-ae="soft-form--classic"]).sb-kit .ab-type-apply { border: 0; border-radius: 12px; background: var(--ab-canvas); box-shadow: var(--sfk-raised-s); }
+.ab.sb-ab:is([data-ae="soft-form"], [data-ae="soft-form--classic"]).sb-kit .sb-k-pressed { filter: none; transform: translateY(1px); }
+.ab.sb-ab:is([data-ae="soft-form"], [data-ae="soft-form--classic"]).sb-kit .ab-cta.sb-k-pressed { filter: brightness(0.92); box-shadow: inset 2px 3px 6px var(--sfk-lo, var(--ab-lo)); }
+.ab.sb-ab:is([data-ae="soft-form"], [data-ae="soft-form--classic"]).sb-kit .sb-k-danger.sb-k-pressed { filter: brightness(0.9); }
+.ab.sb-ab:is([data-ae="soft-form"], [data-ae="soft-form--classic"]).sb-kit .ab-type-apply.sb-k-pressed { transform: none; box-shadow: var(--sfk-inset-s); }
+.ab.sb-ab:is([data-ae="soft-form"], [data-ae="soft-form--classic"]).sb-kit .sb-k-textbtn.sb-k-pressed { transform: none; }
+.ab.sb-ab:is([data-ae="soft-form"], [data-ae="soft-form--classic"]).sb-kit .ab-type-apply:disabled { box-shadow: 2px 2px 5px var(--sfk-lo, var(--ab-lo)), -2px -2px 5px var(--sfk-hi, var(--ab-hi)); filter: none; }
+.ab.sb-ab:is([data-ae="soft-form"], [data-ae="soft-form--classic"]).sb-kit .sb-k-danger { border-radius: 12px; }
+
+/* fields, search and select: recessed; focus and error keep the recess and add a ring */
+.ab.sb-ab:is([data-ae="soft-form"], [data-ae="soft-form--classic"]).sb-kit .ab-input { border: 1px solid transparent; border-radius: 12px; background: var(--ab-canvas); box-shadow: var(--sfk-inset); }
+.ab.sb-ab:is([data-ae="soft-form"], [data-ae="soft-form--classic"]).sb-kit :is(.sb-k-field, .sb-k-search).is-focus .ab-input {
+  border-color: var(--ab-primary-text) !important; box-shadow: var(--sfk-inset-s), 0 0 0 3px color-mix(in srgb, var(--ab-primary) 22%, transparent) !important;
+}
+.ab.sb-ab:is([data-ae="soft-form"], [data-ae="soft-form--classic"]).sb-kit .sb-k-field.is-error .ab-input {
+  border-color: var(--sb-danger) !important; box-shadow: var(--sfk-inset-s), 0 0 0 3px color-mix(in srgb, var(--sb-danger) 18%, transparent) !important;
+}
+.ab.sb-ab:is([data-ae="soft-form"], [data-ae="soft-form--classic"]).sb-kit .sb-k-menu { border: 0; border-radius: 16px; padding: 6px; box-shadow: var(--sfk-raised); }
+.ab.sb-ab:is([data-ae="soft-form"], [data-ae="soft-form--classic"]).sb-kit .sb-k-menu li { border-radius: 10px; }
+.ab.sb-ab:is([data-ae="soft-form"], [data-ae="soft-form--classic"]).sb-kit .sb-k-menu li[aria-selected="true"] { background: var(--ab-canvas); box-shadow: var(--sfk-inset-s); }
+
+/* checkbox and radio: recessed sockets; on = the glossy primary (box) or a raised primary dot (radio) */
+.ab.sb-ab:is([data-ae="soft-form"], [data-ae="soft-form--classic"]).sb-kit .sb-k-box {
+  border: 0; border-radius: 8px; background: var(--ab-canvas);
+  box-shadow: var(--sfk-inset-s), inset 0 0 0 1px color-mix(in srgb, var(--ab-ink) 30%, transparent);   /* the ring keeps an empty socket findable */
+}
+.ab.sb-ab:is([data-ae="soft-form"], [data-ae="soft-form--classic"]).sb-kit .sb-k-box[type="radio"] { border-radius: 50%; }
+.ab.sb-ab:is([data-ae="soft-form"], [data-ae="soft-form--classic"]).sb-kit .sb-k-box[type="checkbox"]:checked { background: var(--sfk-gloss), var(--ab-primary); box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.4), 1px 2px 4px var(--sfk-lo, var(--ab-lo)); }
+.ab.sb-ab:is([data-ae="soft-form"], [data-ae="soft-form--classic"]).sb-kit .sb-k-box[type="radio"]:checked { background: var(--ab-canvas); }
+.ab.sb-ab:is([data-ae="soft-form"], [data-ae="soft-form--classic"]).sb-kit .sb-k-box[type="radio"]:checked::after {
+  width: 12px; height: 12px; background: var(--sfk-gloss), var(--ab-primary); box-shadow: 1px 1px 3px var(--sfk-lo, var(--ab-lo));
+}
+
+/* switch (the board recipe): recessed track, glossy knob, muted off / primary on */
+.ab.sb-ab:is([data-ae="soft-form"], [data-ae="soft-form--classic"]).sb-kit .ab-switch { background: var(--ab-canvas); box-shadow: var(--sfk-inset-s); }
+.ab.sb-ab:is([data-ae="soft-form"], [data-ae="soft-form--classic"]).sb-kit .ab-switch::before { box-shadow: inset 1px 1px 2px rgba(255, 255, 255, 0.6), 1px 2px 4px var(--sfk-lo, var(--ab-lo)); }
+.ab.sb-ab:is([data-ae="soft-form"], [data-ae="soft-form--classic"]).sb-kit .ab-switch:checked::before { box-shadow: inset 0 0 0 1.5px var(--sf-on-rim, transparent), inset 1px 1px 2px rgba(255, 255, 255, 0.6), 1px 2px 4px var(--sfk-lo, var(--ab-lo)); }
+
+/* slider: 8px recessed track, ink fill at 55%, raised canvas thumb */
+.ab.sb-ab:is([data-ae="soft-form"], [data-ae="soft-form--classic"]).sb-kit input.sb-k-range { height: 28px; margin: 0; background: transparent; }
+.ab.sb-ab:is([data-ae="soft-form"], [data-ae="soft-form--classic"]).sb-kit input.sb-k-range::-webkit-slider-runnable-track {
+  height: 8px; border-radius: 4px; box-shadow: var(--sfk-inset-s);
+  background: linear-gradient(90deg, color-mix(in srgb, var(--ab-ink) 55%, var(--ab-canvas)) var(--v, 50%), var(--ab-canvas) var(--v, 50%));
+}
+.ab.sb-ab:is([data-ae="soft-form"], [data-ae="soft-form--classic"]).sb-kit input.sb-k-range::-webkit-slider-thumb {
+  width: 24px; height: 24px; margin-top: -8px; border: 0; border-radius: 50%; background: var(--ab-canvas); box-shadow: var(--sfk-raised-s); transform: none;
+}
+.ab.sb-ab:is([data-ae="soft-form"], [data-ae="soft-form--classic"]).sb-kit input.sb-k-range::-moz-range-track {
+  height: 8px; border-radius: 4px; box-shadow: var(--sfk-inset-s);
+  background: linear-gradient(90deg, color-mix(in srgb, var(--ab-ink) 55%, var(--ab-canvas)) var(--v, 50%), var(--ab-canvas) var(--v, 50%));
+}
+.ab.sb-ab:is([data-ae="soft-form"], [data-ae="soft-form--classic"]).sb-kit input.sb-k-range::-moz-range-thumb { width: 24px; height: 24px; border: 0; border-radius: 50%; background: var(--ab-canvas); box-shadow: var(--sfk-raised-s); transform: none; }
+
+/* progress: the same recessed channel with an ink fill */
+.ab.sb-ab:is([data-ae="soft-form"], [data-ae="soft-form--classic"]).sb-kit .ab-row-bar.sb-k-bar {
+  display: flex !important; align-items: center; height: 10px !important; padding: 0 2px; border-radius: 5px;
+  background: var(--ab-canvas); box-shadow: var(--sfk-inset-s); overflow: hidden;
+}
+.ab.sb-ab:is([data-ae="soft-form"], [data-ae="soft-form--classic"]).sb-kit .sb-k-bar i { height: 6px; border-radius: 3px; background: var(--ab-ink); opacity: 0.55; box-shadow: none; }
+
+/* list groups: flat rows in one recessed well (rows sit 16pt in, the shared kit insets the hairlines) */
+.ab.sb-ab:is([data-ae="soft-form"], [data-ae="soft-form--classic"]).sb-kit .ab-list.sb-k-list {
+  padding: 4px 0 !important; border: 0; border-radius: 20px; background: var(--ab-canvas); box-shadow: var(--sfk-inset);
+}
+.ab.sb-ab:is([data-ae="soft-form"], [data-ae="soft-form--classic"]).sb-kit .ab-row.sb-k-row { border-color: color-mix(in srgb, var(--ab-ink) 13%, transparent); background: none; box-shadow: none; }
+.ab.sb-ab:is([data-ae="soft-form"], [data-ae="soft-form--classic"]).sb-kit .ab-row.sb-k-row.is-picked { margin: 0 4px; padding-left: 12px !important; padding-right: 12px !important; border-radius: 14px; background: color-mix(in srgb, var(--ab-ink) 7%, var(--ab-canvas)); }
+/* feature-row icon chips: small raised keys inside the well */
+.ab.sb-ab:is([data-ae="soft-form"], [data-ae="soft-form--classic"]).sb-kit .sb-k-ico { border-radius: 10px; background: var(--ab-canvas); box-shadow: 2px 2px 5px var(--sfk-lo, var(--ab-lo)), -2px -2px 5px var(--sfk-hi, var(--ab-hi)); }
+
+/* tab bar: no hairline; a soft lift off the content. The kit sample sits in a raised box. */
+.ab.sb-ab:is([data-ae="soft-form"], [data-ae="soft-form--classic"]).sb-kit .sb-tabs { border-top: 0; background: var(--ab-canvas); box-shadow: 0 -1px 0 var(--sfk-hi, var(--ab-hi)), 0 -8px 16px -12px var(--sfk-lo, var(--ab-lo)); }
+.ab.sb-ab:is([data-ae="soft-form"], [data-ae="soft-form--classic"]).sb-kit .sb-k-tabbarbox { border: 0; border-radius: 22px; box-shadow: var(--sfk-raised); }
+.ab.sb-ab:is([data-ae="soft-form"], [data-ae="soft-form--classic"]).sb-kit .sb-k-tabbarbox .sb-tabs { box-shadow: none; background: none; }
+
+/* feedback: toast and sheet shadows from the relief pair; the empty-state icon sits in a recessed socket */
+.ab.sb-ab:is([data-ae="soft-form"], [data-ae="soft-form--classic"]).sb-kit .sb-k-toast { border-radius: 14px; box-shadow: 4px 6px 16px var(--sfk-lo, var(--ab-lo)); }
+.ab.sb-ab:is([data-ae="soft-form"], [data-ae="soft-form--classic"]).sb-kit .sb-k-sheet { box-shadow: 0 -8px 24px var(--sfk-lo, var(--ab-lo)); }
+.ab.sb-ab:is([data-ae="soft-form"], [data-ae="soft-form--classic"]).sb-kit .sb-k-emptyico { background: var(--ab-canvas); box-shadow: var(--sfk-inset-s); }
+/* callouts: a tinted recess instead of a line box (the tone itself comes from the shared kit) */
+.ab.sb-ab:is([data-ae="soft-form"], [data-ae="soft-form--classic"]).sb-kit .sb-k-callout { border-color: transparent; border-radius: 16px; box-shadow: var(--sfk-inset-s); }

@@ -297,3 +297,25 @@
    longer hides the first letters of the brand name in the memo strip (the name starts to its right). */
 .ab.sb-ab[data-ae="corporate-vandalism"] .sb-lhero .cvh-k { margin-top: 0.6em; }
 .ab.sb-ab[data-ae="corporate-vandalism"] .sb-lhero .cva-bar { padding-left: 58px; }
+
+/* App UI (phone screens and the UI kit). The vandal's bar adds made-up words to the headline, so it leaves the app
+   (the hazard red with it): the title is the brand's own words.
+   The literal "BUTTON" / "HEADLINE" labels are board annotations, not interface, so they leave the app. */
+.ab.sb-ab:is([data-ae="corporate-vandalism"], [data-ae="corporate-vandalism--classic"]):is(.sb-screen, .sb-kit) .cvh-k { display: none; }
+.ab.sb-ab[data-ae="corporate-vandalism"]:is(.sb-screen, .sb-kit) .ab-cta:not(.ab-state-ctl)::after { content: none; }
+.ab.sb-ab[data-ae="corporate-vandalism"]:is(.sb-screen, .sb-kit) .ab-headline::before { content: none; }
+/* Classic version (corporate-vandalism--classic), phones and the UI kit: the literal quoted labels, the form notice strips,
+   the fine print, the "#030 ???" index row and the footnote marks are board jokes, not interface; the app keeps the
+   bracket kicker, the numbered tabs and the square 1px shell. */
+.ab.sb-ab[data-ae="corporate-vandalism--classic"]:is(.sb-screen, .sb-kit) :is(.ab-seg, .ab-toggle, .ab-fieldlabel, .ab-card, .ab-panel, .ab-row-name)::after,
+.ab.sb-ab[data-ae="corporate-vandalism--classic"]:is(.sb-screen, .sb-kit) .ab-cta:not(.ab-state-ctl)::after,
+.ab.sb-ab[data-ae="corporate-vandalism--classic"]:is(.sb-screen, .sb-kit) .ab-toggle > span::after,
+.ab.sb-ab[data-ae="corporate-vandalism--classic"]:is(.sb-screen, .sb-kit) :is(.ab-list, .ab-card, .ab-panel, .ab-headline)::before,
+.ab.sb-ab[data-ae="corporate-vandalism--classic"]:is(.sb-screen, .sb-kit) .ab-list::after,
+.ab.sb-ab[data-ae="corporate-vandalism--classic"]:is(.sb-screen, .sb-kit) > .ab-in::before { content: none; }
+/* both versions, phones and the UI kit: a settings switch reads like the other rows (no footnote mark, no mono caps);
+   the progress track is a quiet ink rule under the ink fill; badges, counts and the empty-state mark keep the square shell */
+.ab.sb-ab:is([data-ae="corporate-vandalism"], [data-ae="corporate-vandalism--classic"]):is(.sb-screen, .sb-kit) .ab-toggle > span::after { content: none; }
+.ab.sb-ab:is([data-ae="corporate-vandalism"], [data-ae="corporate-vandalism--classic"]):is(.sb-screen, .sb-kit) .ab-toggle.sb-tog { font-family: var(--ab-font-ui); letter-spacing: 0; text-transform: none; }
+.ab.sb-ab:is([data-ae="corporate-vandalism"], [data-ae="corporate-vandalism--classic"]):is(.sb-screen, .sb-kit) .ab-row-bar { background: color-mix(in srgb, var(--ab-ink) 18%, transparent); }
+.ab.sb-ab:is([data-ae="corporate-vandalism"], [data-ae="corporate-vandalism--classic"]):is(.sb-screen, .sb-kit) :is(.sb-k-badge, .sb-k-count, .sb-k-emptyico) { border-radius: 0; }

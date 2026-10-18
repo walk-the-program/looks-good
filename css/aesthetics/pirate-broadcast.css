@@ -280,3 +280,162 @@
 
 /* Built screens: panels carry no header row, so give the first line some air under the frame */
 .ab.sb-ab[data-ae="pirate-broadcast"] :is(.sb-chart, .sb-quick) { padding-top: 16px; }
+
+/* ---- App UI (phone screens, UI kit tab: roots with .sb-kit) ----
+   Teletext components: square blocks, mono caps on controls, the "> " prompt on buttons. The kit's
+   signature: the top bar is a cyan title row, the tab bar is the Fastext row (red, green, yellow, cyan
+   keys), rows with a value run a dotted leader to it. */
+.ab.sb-ab.sb-kit[data-ae="pirate-broadcast"] .ab-card.sb-k-card { padding-top: var(--k-cardpad, 20px) !important; }
+.ab.sb-ab.sb-kit[data-ae="pirate-broadcast"] .ab-seg-btn { padding: 6px 10px; }
+/* secondary: the white block outlined, never a second solid block beside the green action */
+.ab.sb-ab.sb-kit[data-ae="pirate-broadcast"] .ab-type-apply.sb-k-btn2 { background: transparent; color: var(--ab-tt-fg); box-shadow: inset 0 0 0 2px var(--ab-tt-fg); }
+.ab.sb-ab.sb-kit[data-ae="pirate-broadcast"] .ab-type-apply.sb-k-btn2:hover { background: transparent; color: var(--ab-tt-fg); }
+.ab.sb-ab.sb-kit[data-ae="pirate-broadcast"] .ab-type-apply.sb-k-btn2.sb-k-pressed { background: var(--ab-tt-fg); color: #000; filter: none; }
+/* icon buttons: an outlined key, no "> " prompt stacked over the glyph */
+.ab.sb-ab.sb-kit[data-ae="pirate-broadcast"] .ab-type-apply.sb-icon-btn { background: transparent; color: var(--ab-tt-fg); box-shadow: inset 0 0 0 2px var(--ab-tt-line); }
+.ab.sb-ab.sb-kit[data-ae="pirate-broadcast"] .ab-type-apply.sb-icon-btn::before { content: none; }
+.ab.sb-ab.sb-kit[data-ae="pirate-broadcast"] .ab-type-apply.sb-icon-btn.sb-k-pressed { background: var(--ab-tt-fg); color: #000; filter: none; }
+.ab.sb-ab.sb-kit[data-ae="pirate-broadcast"] .sb-badge { border-radius: 0; }
+/* fields: typed text keeps its case; focus is the cyan edge, error the danger edge */
+.ab.sb-ab.sb-kit[data-ae="pirate-broadcast"] :is(.sb-k-field, .sb-k-search) .ab-input { text-transform: none; letter-spacing: 0; }
+.ab.sb-ab.sb-kit[data-ae="pirate-broadcast"] :is(.sb-k-field, .sb-k-search).is-focus .ab-input { box-shadow: inset 0 0 0 2px var(--ab-tt-cyan) !important; }
+.ab.sb-ab.sb-kit[data-ae="pirate-broadcast"] .sb-k-field.is-error .ab-input { box-shadow: inset 0 0 0 2px var(--sb-danger) !important; }
+.ab.sb-ab.sb-kit[data-ae="pirate-broadcast"] .ab-toggle.sb-tog > span { font: 400 var(--k-body, 17px)/var(--k-body-lh, 24px) var(--pb-mono); letter-spacing: 0; text-transform: none; }
+/* every block is square */
+.ab.sb-ab.sb-kit[data-ae="pirate-broadcast"] :is(.sb-k-badge, .sb-k-count, .sb-k-callout, .sb-k-toast, .sb-k-menu, .sb-k-menu li, .sb-k-sheet, .sb-k-sheetbox, .sb-k-emptyico, .sb-k-ico, .sb-k-av, .sb-k-tabbarbox, .sb-k-grab, .sb-k-ios-tag) { border-radius: 0; }
+.ab.sb-ab.sb-kit[data-ae="pirate-broadcast"] :is(.sb-k-badge, .sb-k-count) { font-family: var(--pb-mono); font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; }
+.ab.sb-ab.sb-kit[data-ae="pirate-broadcast"] .sb-k-av { font-family: var(--pb-mono); }
+.ab.sb-ab.sb-kit[data-ae="pirate-broadcast"] :is(.sb-k-toast, .sb-k-menu, .sb-k-sheet) { box-shadow: none; }
+.ab.sb-ab.sb-kit[data-ae="pirate-broadcast"] .sb-k-menu { border: 0; box-shadow: inset 0 0 0 2px var(--ab-tt-line); background: #000; }
+.ab.sb-ab.sb-kit[data-ae="pirate-broadcast"] .sb-k-sheet { box-shadow: inset 0 2px 0 var(--ab-tt-cyan); }
+.ab.sb-ab.sb-kit[data-ae="pirate-broadcast"] .sb-k-callout b { font-family: var(--pb-mono); text-transform: uppercase; letter-spacing: 0.06em; }
+.ab.sb-ab.sb-kit[data-ae="pirate-broadcast"] .sb-k-toast button { font-family: var(--pb-mono); text-transform: uppercase; letter-spacing: 0.08em; }
+/* the top bar is a cyan title row (black ink on cyan), as on a teletext page */
+.ab.sb-ab.sb-kit[data-ae="pirate-broadcast"] .sb-k-topbar { border-bottom: 0; background: var(--ab-tt-cyan); color: #000; }
+.ab.sb-ab.sb-kit[data-ae="pirate-broadcast"] .sb-k-topbar :is(.sb-k-plain, .sb-k-tb-title) { color: #000; }
+.ab.sb-ab.sb-kit[data-ae="pirate-broadcast"] .sb-k-tb-title { font-family: var(--pb-mono); font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; }
+.ab.sb-ab.sb-kit[data-ae="pirate-broadcast"] .sb-k-tabs [role="tab"][aria-selected="true"]::after { height: 3px; background: var(--ab-tt-cyan); }
+/* the tab bar is the Fastext row: each key in its teletext colour, the current one as a filled key */
+.ab.sb-ab.sb-kit[data-ae="pirate-broadcast"] .sb-tab { --fx: var(--ab-tt-red); color: var(--fx); font-family: var(--pb-mono); font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; }
+.ab.sb-ab.sb-kit[data-ae="pirate-broadcast"] .sb-tab:nth-child(2) { --fx: var(--ab-tt-green); }
+.ab.sb-ab.sb-kit[data-ae="pirate-broadcast"] .sb-tab:nth-child(3) { --fx: var(--ab-tt-yellow); }
+/* the blue key, lifted toward white so its label holds 4.5:1 on the black screen */
+.ab.sb-ab.sb-kit[data-ae="pirate-broadcast"] .sb-tab:nth-child(4) { --fx: color-mix(in srgb, var(--ab-tt-blue) 60%, #ffffff); }
+.ab.sb-ab.sb-kit[data-ae="pirate-broadcast"] .sb-tab > .sb-ico { color: var(--fx); }
+.ab.sb-ab.sb-kit[data-ae="pirate-broadcast"] .sb-tab[aria-current] { color: var(--fx); }
+.ab.sb-ab.sb-kit[data-ae="pirate-broadcast"] .sb-tab[aria-current] > .sb-ico { color: var(--fx); }
+.ab.sb-ab.sb-kit[data-ae="pirate-broadcast"] .sb-tab span { padding: 0 4px; }
+.ab.sb-ab.sb-kit[data-ae="pirate-broadcast"] .sb-tab[aria-current] span { background: var(--fx); color: #000; }
+.ab.sb-ab.sb-kit[data-ae="pirate-broadcast"] .sb-tab:nth-child(4)[aria-current] span { background: var(--ab-tt-blue); color: #fff; }
+.ab.sb-ab.sb-kit[data-ae="pirate-broadcast"] .sb-tab[aria-current]::before { content: none; }
+/* a row with a value runs a dotted leader from its title to the value */
+.ab.sb-ab.sb-kit[data-ae="pirate-broadcast"] .sb-k-row:has(.sb-k-trail) .sb-k-title { display: flex; align-items: baseline; }
+.ab.sb-ab.sb-kit[data-ae="pirate-broadcast"] .sb-k-row:has(.sb-k-trail) .sb-k-title::after { content: ""; flex: 1 1 0; min-width: 0; margin-left: 8px; border-bottom: 2px dotted var(--ab-tt-line); transform: translateY(-4px); }
+.ab.sb-ab.sb-kit[data-ae="pirate-broadcast"] .sb-k-topbar :is(.ab-brand, .sb-k-tb-brand) { color: #000; }
+/* the title row starts with its page number, as row 0 of a teletext page does */
+.ab.sb-ab.sb-kit[data-ae="pirate-broadcast"] .sb-k-tb-title::before { content: "P101  "; white-space: pre; }
+/* nothing round: radio, its dot, the page dots */
+.ab.sb-ab.sb-kit[data-ae="pirate-broadcast"] .sb-k-box { border-radius: 0; border: 2px solid var(--ab-tt-fg); }
+.ab.sb-ab.sb-kit[data-ae="pirate-broadcast"] .sb-k-box[type="radio"]:checked::after { border-radius: 0; }
+.ab.sb-ab.sb-kit[data-ae="pirate-broadcast"] .sb-dots i { border-radius: 0; }
+
+/* Classic copy of the current version's app UI block (same rules, classic key). */
+/* ---- App UI (phone screens, UI kit tab: roots with .sb-kit) ----
+   Teletext components: square blocks, mono caps on controls, the "> " prompt on buttons. The kit's
+   signature: the top bar is a cyan title row, the tab bar is the Fastext row (red, green, yellow, cyan
+   keys), rows with a value run a dotted leader to it. */
+.ab.sb-ab.sb-kit[data-ae="pirate-broadcast--classic"] .ab-card.sb-k-card { padding-top: var(--k-cardpad, 20px) !important; }
+.ab.sb-ab.sb-kit[data-ae="pirate-broadcast--classic"] .ab-seg-btn { padding: 6px 10px; }
+/* secondary: the white block outlined, never a second solid block beside the green action */
+.ab.sb-ab.sb-kit[data-ae="pirate-broadcast--classic"] .ab-type-apply.sb-k-btn2 { background: transparent; color: var(--ab-tt-fg); box-shadow: inset 0 0 0 2px var(--ab-tt-fg); }
+.ab.sb-ab.sb-kit[data-ae="pirate-broadcast--classic"] .ab-type-apply.sb-k-btn2:hover { background: transparent; color: var(--ab-tt-fg); }
+.ab.sb-ab.sb-kit[data-ae="pirate-broadcast--classic"] .ab-type-apply.sb-k-btn2.sb-k-pressed { background: var(--ab-tt-fg); color: #000; filter: none; }
+/* icon buttons: an outlined key, no "> " prompt stacked over the glyph */
+.ab.sb-ab.sb-kit[data-ae="pirate-broadcast--classic"] .ab-type-apply.sb-icon-btn { background: transparent; color: var(--ab-tt-fg); box-shadow: inset 0 0 0 2px var(--ab-tt-line); }
+.ab.sb-ab.sb-kit[data-ae="pirate-broadcast--classic"] .ab-type-apply.sb-icon-btn::before { content: none; }
+.ab.sb-ab.sb-kit[data-ae="pirate-broadcast--classic"] .ab-type-apply.sb-icon-btn.sb-k-pressed { background: var(--ab-tt-fg); color: #000; filter: none; }
+.ab.sb-ab.sb-kit[data-ae="pirate-broadcast--classic"] .sb-badge { border-radius: 0; }
+/* fields: typed text keeps its case; focus is the cyan edge, error the danger edge */
+.ab.sb-ab.sb-kit[data-ae="pirate-broadcast--classic"] :is(.sb-k-field, .sb-k-search) .ab-input { text-transform: none; letter-spacing: 0; }
+.ab.sb-ab.sb-kit[data-ae="pirate-broadcast--classic"] :is(.sb-k-field, .sb-k-search).is-focus .ab-input { box-shadow: inset 0 0 0 2px var(--ab-tt-cyan) !important; }
+.ab.sb-ab.sb-kit[data-ae="pirate-broadcast--classic"] .sb-k-field.is-error .ab-input { box-shadow: inset 0 0 0 2px var(--sb-danger) !important; }
+.ab.sb-ab.sb-kit[data-ae="pirate-broadcast--classic"] .ab-toggle.sb-tog > span { font: 400 var(--k-body, 17px)/var(--k-body-lh, 24px) var(--pb-mono); letter-spacing: 0; text-transform: none; }
+/* every block is square */
+.ab.sb-ab.sb-kit[data-ae="pirate-broadcast--classic"] :is(.sb-k-badge, .sb-k-count, .sb-k-callout, .sb-k-toast, .sb-k-menu, .sb-k-menu li, .sb-k-sheet, .sb-k-sheetbox, .sb-k-emptyico, .sb-k-ico, .sb-k-av, .sb-k-tabbarbox, .sb-k-grab, .sb-k-ios-tag) { border-radius: 0; }
+.ab.sb-ab.sb-kit[data-ae="pirate-broadcast--classic"] :is(.sb-k-badge, .sb-k-count) { font-family: var(--pb-mono); font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; }
+.ab.sb-ab.sb-kit[data-ae="pirate-broadcast--classic"] .sb-k-av { font-family: var(--pb-mono); }
+.ab.sb-ab.sb-kit[data-ae="pirate-broadcast--classic"] :is(.sb-k-toast, .sb-k-menu, .sb-k-sheet) { box-shadow: none; }
+.ab.sb-ab.sb-kit[data-ae="pirate-broadcast--classic"] .sb-k-menu { border: 0; box-shadow: inset 0 0 0 2px var(--ab-tt-line); background: #000; }
+.ab.sb-ab.sb-kit[data-ae="pirate-broadcast--classic"] .sb-k-sheet { box-shadow: inset 0 2px 0 var(--ab-tt-cyan); }
+.ab.sb-ab.sb-kit[data-ae="pirate-broadcast--classic"] .sb-k-callout b { font-family: var(--pb-mono); text-transform: uppercase; letter-spacing: 0.06em; }
+.ab.sb-ab.sb-kit[data-ae="pirate-broadcast--classic"] .sb-k-toast button { font-family: var(--pb-mono); text-transform: uppercase; letter-spacing: 0.08em; }
+/* the top bar is a cyan title row (black ink on cyan), as on a teletext page */
+.ab.sb-ab.sb-kit[data-ae="pirate-broadcast--classic"] .sb-k-topbar { border-bottom: 0; background: var(--ab-tt-cyan); color: #000; }
+.ab.sb-ab.sb-kit[data-ae="pirate-broadcast--classic"] .sb-k-topbar :is(.sb-k-plain, .sb-k-tb-title) { color: #000; }
+.ab.sb-ab.sb-kit[data-ae="pirate-broadcast--classic"] .sb-k-tb-title { font-family: var(--pb-mono); font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; }
+.ab.sb-ab.sb-kit[data-ae="pirate-broadcast--classic"] .sb-k-tabs [role="tab"][aria-selected="true"]::after { height: 3px; background: var(--ab-tt-cyan); }
+/* the tab bar is the Fastext row: each key in its teletext colour, the current one as a filled key */
+.ab.sb-ab.sb-kit[data-ae="pirate-broadcast--classic"] .sb-tab { --fx: var(--ab-tt-red); color: var(--fx); font-family: var(--pb-mono); font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; }
+.ab.sb-ab.sb-kit[data-ae="pirate-broadcast--classic"] .sb-tab:nth-child(2) { --fx: var(--ab-tt-green); }
+.ab.sb-ab.sb-kit[data-ae="pirate-broadcast--classic"] .sb-tab:nth-child(3) { --fx: var(--ab-tt-yellow); }
+/* the blue key, lifted toward white so its label holds 4.5:1 on the black screen */
+.ab.sb-ab.sb-kit[data-ae="pirate-broadcast--classic"] .sb-tab:nth-child(4) { --fx: color-mix(in srgb, var(--ab-tt-blue) 60%, #ffffff); }
+.ab.sb-ab.sb-kit[data-ae="pirate-broadcast--classic"] .sb-tab > .sb-ico { color: var(--fx); }
+.ab.sb-ab.sb-kit[data-ae="pirate-broadcast--classic"] .sb-tab[aria-current] { color: var(--fx); }
+.ab.sb-ab.sb-kit[data-ae="pirate-broadcast--classic"] .sb-tab[aria-current] > .sb-ico { color: var(--fx); }
+.ab.sb-ab.sb-kit[data-ae="pirate-broadcast--classic"] .sb-tab span { padding: 0 4px; }
+.ab.sb-ab.sb-kit[data-ae="pirate-broadcast--classic"] .sb-tab[aria-current] span { background: var(--fx); color: #000; }
+.ab.sb-ab.sb-kit[data-ae="pirate-broadcast--classic"] .sb-tab:nth-child(4)[aria-current] span { background: var(--ab-tt-blue); color: #fff; }
+.ab.sb-ab.sb-kit[data-ae="pirate-broadcast--classic"] .sb-tab[aria-current]::before { content: none; }
+/* a row with a value runs a dotted leader from its title to the value */
+.ab.sb-ab.sb-kit[data-ae="pirate-broadcast--classic"] .sb-k-row:has(.sb-k-trail) .sb-k-title { display: flex; align-items: baseline; }
+.ab.sb-ab.sb-kit[data-ae="pirate-broadcast--classic"] .sb-k-row:has(.sb-k-trail) .sb-k-title::after { content: ""; flex: 1 1 0; min-width: 0; margin-left: 8px; border-bottom: 2px dotted var(--ab-tt-line); transform: translateY(-4px); }
+.ab.sb-ab.sb-kit[data-ae="pirate-broadcast--classic"] .sb-k-topbar :is(.ab-brand, .sb-k-tb-brand) { color: #000; }
+/* the title row starts with its page number, as row 0 of a teletext page does */
+.ab.sb-ab.sb-kit[data-ae="pirate-broadcast--classic"] .sb-k-tb-title::before { content: "P101  "; white-space: pre; }
+/* nothing round: radio, its dot, the page dots */
+.ab.sb-ab.sb-kit[data-ae="pirate-broadcast--classic"] .sb-k-box { border-radius: 0; border: 2px solid var(--ab-tt-fg); }
+.ab.sb-ab.sb-kit[data-ae="pirate-broadcast--classic"] .sb-k-box[type="radio"]:checked::after { border-radius: 0; }
+.ab.sb-ab.sb-kit[data-ae="pirate-broadcast--classic"] .sb-dots i { border-radius: 0; }
+/* Light mode (classic, and current when switched off its dark default) is a pale wall with black screens (cards, lists), so anything that sits on
+   the wall itself takes the wall's ink, and the Fastext row is a black strip like a screen */
+.ab.sb-ab.sb-kit:is([data-ae="pirate-broadcast--classic"], [data-ae="pirate-broadcast"][data-mode="light"]) .ab-type-apply.sb-k-btn2 { color: var(--ab-ink); box-shadow: inset 0 0 0 2px var(--ab-ink); }
+.ab.sb-ab.sb-kit:is([data-ae="pirate-broadcast--classic"], [data-ae="pirate-broadcast"][data-mode="light"]) .ab-type-apply.sb-k-btn2:hover { color: var(--ab-ink); }
+.ab.sb-ab.sb-kit:is([data-ae="pirate-broadcast--classic"], [data-ae="pirate-broadcast"][data-mode="light"]) .ab-type-apply.sb-k-btn2.sb-k-pressed { background: var(--ab-ink); color: var(--ab-canvas); }
+.ab.sb-ab.sb-kit:is([data-ae="pirate-broadcast--classic"], [data-ae="pirate-broadcast"][data-mode="light"]) .ab-type-apply.sb-icon-btn { color: var(--ab-ink); box-shadow: inset 0 0 0 2px var(--ab-line); }
+.ab.sb-ab.sb-kit:is([data-ae="pirate-broadcast--classic"], [data-ae="pirate-broadcast"][data-mode="light"]) .ab-type-apply.sb-icon-btn.sb-k-pressed { background: var(--ab-ink); color: var(--ab-canvas); }
+.ab.sb-ab.sb-kit:is([data-ae="pirate-broadcast--classic"], [data-ae="pirate-broadcast"][data-mode="light"]) :is(.sb-k-ltitle, .sb-home-h, .sb-k-empty-t, .sb-k-sheet-t) { color: var(--ab-ink); }
+.ab.sb-ab.sb-kit:is([data-ae="pirate-broadcast--classic"], [data-ae="pirate-broadcast"][data-mode="light"]) :is(.ab-fieldlabel, .ab-toggle.sb-tog > span) { color: var(--ab-ink); }
+.ab.sb-ab.sb-kit:is([data-ae="pirate-broadcast--classic"], [data-ae="pirate-broadcast"][data-mode="light"]) :is(.ab-card, .ab-list, .ab-panel) .ab-toggle.sb-tog > span { color: var(--ab-tt-fg); }
+.ab.sb-ab.sb-kit:is([data-ae="pirate-broadcast--classic"], [data-ae="pirate-broadcast"][data-mode="light"]) .ab-seg-btn:not([aria-pressed="true"]) { color: var(--ab-ink); box-shadow: inset 0 0 0 1px var(--ab-line); }
+.ab.sb-ab.sb-kit:is([data-ae="pirate-broadcast--classic"], [data-ae="pirate-broadcast"][data-mode="light"]) .ab-card .ab-seg-btn:not([aria-pressed="true"]) { color: var(--ab-tt-dim); box-shadow: inset 0 0 0 1px var(--ab-tt-line); }
+.ab.sb-ab.sb-kit:is([data-ae="pirate-broadcast--classic"], [data-ae="pirate-broadcast"][data-mode="light"]) .sb-tabs { background: var(--ab-tt-screen); border-top-color: var(--ab-tt-screen); }
+.ab.sb-ab.sb-kit:is([data-ae="pirate-broadcast--classic"], [data-ae="pirate-broadcast"][data-mode="light"]) .sb-k-menu { background: var(--ab-canvas); color: var(--ab-ink); box-shadow: inset 0 0 0 2px var(--ab-line); }
+.ab.sb-ab.sb-kit[data-ae="pirate-broadcast"][data-mode="light"] :is(.ab-subcopy, .ab-sub-rest) { color: var(--ab-muted); }
+.ab.sb-ab.sb-kit[data-ae="pirate-broadcast"][data-mode="light"] .ab-kicker { color: var(--ab-ink); }
+.ab.sb-ab.sb-kit[data-ae="pirate-broadcast"][data-mode="light"] :is(.ab-brand, .sb-k-row .sb-k-ico) { color: var(--ab-ink); }
+.ab.sb-ab.sb-kit[data-ae="pirate-broadcast"][data-mode="light"] :is(.ab-card, .ab-list) { --k-muted: var(--ab-tt-dim); }
+/* classic cards open with their title row: no top padding above it, the row spans the card's own padding */
+.ab.sb-ab.sb-kit[data-ae="pirate-broadcast--classic"] .ab-card.sb-k-card { padding-top: 0 !important; }
+.ab.sb-ab.sb-kit[data-ae="pirate-broadcast--classic"] .ab-card.sb-k-card::before { margin-left: calc(-1 * var(--k-cardpad, 20px)); margin-right: calc(-1 * var(--k-cardpad, 20px)); margin-bottom: var(--k-cardpad, 20px); }
+/* on the black screens the quiet text and a picked row follow the screen, not the wall */
+.ab.sb-ab.sb-kit[data-ae="pirate-broadcast--classic"] :is(.ab-card, .ab-list) { --k-muted: var(--ab-tt-dim); }
+.ab.sb-ab.sb-kit:is([data-ae="pirate-broadcast--classic"], [data-ae="pirate-broadcast"][data-mode="light"]) .ab-list .ab-row.sb-k-row.is-picked { background: color-mix(in srgb, var(--ab-tt-fg) 14%, var(--ab-tt-screen)); color: var(--ab-tt-fg); }
+
+/* Phone screens use the kit's Title row (both versions): Welcome's top bar is the cyan row with the page
+   number, the brand and Skip; Home's kicker and bell become the Title row above the large title. */
+.ab.sb-ab.sb-kit:is([data-ae="pirate-broadcast"], [data-ae="pirate-broadcast--classic"]) .sb-ob-top { min-height: 44px; padding: 0 0 0 12px; background: var(--ab-tt-cyan); color: #000; }
+.ab.sb-ab.sb-kit:is([data-ae="pirate-broadcast"], [data-ae="pirate-broadcast--classic"]) .sb-ob-top .ab-brand { color: #000; font-family: var(--pb-mono); font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; }
+.ab.sb-ab.sb-kit:is([data-ae="pirate-broadcast"], [data-ae="pirate-broadcast--classic"]) .sb-ob-top .ab-brand::before { content: "P100"; margin-right: 8px; }
+.ab.sb-ab.sb-kit:is([data-ae="pirate-broadcast"], [data-ae="pirate-broadcast--classic"]) .sb-ob-top .sb-k-textbtn { padding: 0 12px; color: #000; font-family: var(--pb-mono); letter-spacing: 0.08em; text-transform: uppercase; }
+.ab.sb-ab.sb-kit:is([data-ae="pirate-broadcast"], [data-ae="pirate-broadcast--classic"]) .sb-k-scr[data-scr="onboarding"] .sb-k-topbar .sb-k-tb-title::before { content: "P100  "; white-space: pre; }
+.ab.sb-ab.sb-kit:is([data-ae="pirate-broadcast"], [data-ae="pirate-broadcast--classic"]) .sb-home-top { position: relative; padding-top: 56px; }
+.ab.sb-ab.sb-kit:is([data-ae="pirate-broadcast"], [data-ae="pirate-broadcast--classic"]) .sb-home-top .ab-kicker {
+  position: absolute; left: 0; right: 0; top: 0; display: flex; align-items: center; height: 44px; margin: 0 !important; padding: 0 56px 0 12px;
+  background: var(--ab-tt-cyan); color: #000; font: 700 var(--k-headline, 17px)/1 var(--pb-mono) !important; letter-spacing: 0.06em; text-transform: uppercase;
+}
+.ab.sb-ab.sb-kit:is([data-ae="pirate-broadcast"], [data-ae="pirate-broadcast--classic"]) .sb-home-top .ab-kicker::before { content: "P101"; margin-right: 8px; }
+.ab.sb-ab.sb-kit:is([data-ae="pirate-broadcast"], [data-ae="pirate-broadcast--classic"]) .sb-home-top .ab-kicker::after { content: none; }
+.ab.sb-ab.sb-kit:is([data-ae="pirate-broadcast"], [data-ae="pirate-broadcast--classic"]) .sb-home-top .ab-type-apply.sb-icon-btn { position: absolute; z-index: 1; top: 0; right: 0; width: 44px; height: 44px; border: 0; background: transparent; color: #000; box-shadow: none; }
+.ab.sb-ab.sb-kit:is([data-ae="pirate-broadcast"], [data-ae="pirate-broadcast--classic"]) .sb-home-top .ab-type-apply.sb-icon-btn::before { content: none; }
+.ab.sb-ab.sb-kit:is([data-ae="pirate-broadcast"], [data-ae="pirate-broadcast--classic"]) .sb-home-top .sb-badge { box-shadow: 0 0 0 2px var(--ab-tt-cyan); }

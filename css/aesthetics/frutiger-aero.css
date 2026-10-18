@@ -430,3 +430,42 @@
 .ab.sb-ab[data-ae="frutiger-aero"] .sb-lhero .sb-proof { width: fit-content; margin-inline: auto; padding: 3px 14px; border-radius: 999px; background: rgba(255, 255, 255, 0.82); color: var(--ab-ink); box-shadow: 0 0 0 1px rgba(35, 90, 140, 0.2); }
 .ab.sb-ab[data-ae="frutiger-aero"][data-mode="dark"] .sb-lhero .sb-proof { background: rgba(10, 30, 50, 0.78); }
 .ab.sb-ab[data-ae="frutiger-aero"] .sb-lhero .sb-proof * { color: inherit; }
+
+/* ---------- app UI (phone screens and the UI kit) ----------
+   The Aero signature rides on components: the gel primary and selected segment, the glossy orb
+   knob, gel avatars, the glass kicker capsule, the striped gel progress. Board-only devices stay
+   off the phone: the headline's wet-floor reflection, the boxed subcopy, the 52px title-bar gap in
+   cards, the Explorer's selected first row, and the companion tints (triad hues outside the palette). */
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit .fa-hl-refl { display: none; }
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit .ab-kicker { width: fit-content; max-width: 100%; }
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit .ab-subcopy { padding: 0; border-radius: 0; background: none; box-shadow: none; color: var(--k-muted); max-width: none; }
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit .ab-card.sb-k-card { padding-top: var(--k-cardpad, 20px); }
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit .ab-row:first-child:not(.sb-k-pressed) { background: none; border-color: transparent; box-shadow: none; }
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit .ab-card, .ab.sb-ab[data-ae="frutiger-aero"].sb-kit .ab-list { box-shadow: inset 0 0 0 1px var(--ab-fa-rim-in), 0 1px 2px rgba(20, 70, 120, 0.06), 0 8px 20px -12px rgba(20, 70, 120, 0.28); }
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit[data-mode="dark"] :is(.ab-card, .ab-list) { box-shadow: inset 0 0 0 1px var(--ab-fa-rim-in), 0 8px 20px -12px rgba(0, 0, 0, 0.6); }
+/* secondary and icon buttons: a white glass capsule with a cap and a cool rim (no pink tint, no red rim) */
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit .ab-type-apply {
+  background: linear-gradient(180deg, #fff 0%, #F3F8FC 48%, #E4EEF6 52%, #F4F9FD 100%); color: var(--ab-ink);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.9), 0 0 0 1px color-mix(in srgb, var(--ab-ink) 26%, transparent), 0 2px 4px rgba(0, 50, 100, 0.12);
+}
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit[data-mode="dark"] .ab-type-apply { background: linear-gradient(180deg, #4F7898, #24445F 50%, #163550 51%, #2A5272); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.2), 0 0 0 1px #000; }
+/* segmented: the selected segment is the gel; the others sit clear on the glass track */
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit .ab-seg-btn:not([aria-pressed="true"]),
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit .ab-seg-btn:not([aria-pressed="true"]):nth-child(n) { background: transparent; }
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit .ab-seg-btn:not([aria-pressed="true"])::before { content: none; }
+/* the "match" tag: a pale primary gel, not a fixed green */
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit .ab-fit[data-fit="match"] {
+  background: linear-gradient(180deg, color-mix(in srgb, var(--ab-primary) 6%, #fff), color-mix(in srgb, var(--ab-primary) 20%, #fff));
+  border-color: color-mix(in srgb, var(--ab-primary) 55%, #fff); color: var(--ab-ink);
+}
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit[data-mode="dark"] .ab-fit[data-fit="match"] {
+  background: linear-gradient(180deg, color-mix(in srgb, var(--ab-primary) 40%, var(--ab-canvas)), color-mix(in srgb, var(--ab-primary) 22%, var(--ab-canvas)));
+  border-color: color-mix(in srgb, var(--ab-primary) 60%, var(--ab-canvas)); color: var(--ab-ink);
+}
+/* avatars: secondary gel orbs with the white cap */
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit .sb-k-av {
+  position: relative; overflow: hidden; isolation: isolate;
+  background: linear-gradient(180deg, color-mix(in srgb, var(--ab-secondary) 58%, #fff) 0%, var(--ab-secondary) 56%, color-mix(in srgb, var(--ab-secondary) 82%, #000) 100%);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--ab-secondary) 70%, #000), 0 2px 4px color-mix(in srgb, var(--ab-secondary) 35%, transparent);
+}
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit .sb-k-av::before { content: ""; position: absolute; z-index: -1; left: 16%; right: 16%; top: 4%; height: 40%; border-radius: 50% 50% 42% 42% / 72% 72% 28% 28%; background: var(--fa-cap); opacity: 0.8; }

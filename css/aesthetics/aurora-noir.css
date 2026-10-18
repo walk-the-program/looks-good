@@ -344,3 +344,53 @@
 /* Built > Settings: stack Website and Support email so a long brand's domain is not cut off mid-word in a half-width field */
 .ab.sb-ab[data-ae="aurora-noir"] .sb-field-row { grid-template-columns: minmax(0, 1fr); }
 .ab.sb-ab[data-ae="aurora-noir"] .sb-set-panel .sb-field-row .sb-field:last-child .ab-input { margin-bottom: 16px; }
+
+/* ---------------------------------------------------------------------
+   App UI (phone screens and the UI kit tab: roots with .sb-kit). Aurora Noir
+   lives in the components here: hairline surfaces on near-black, the ink pill
+   with its return-key chip, the neutral lifted segment. App screens drop the
+   aurora clouds, the grid wallpaper, the "New" title tag and the glowing row
+   bars (art and decoration, not components). The Classic copy is generated and
+   never hand-edited, so it is covered here too.
+   .ab.sb-ab...sb-kit outranks the shared kit rules in css/see-built.css.
+------------------------------------------------------------------------ */
+.ab.sb-ab:is([data-ae="aurora-noir"], [data-ae="aurora-noir--classic"]).sb-kit::before,
+.ab.sb-ab:is([data-ae="aurora-noir"], [data-ae="aurora-noir--classic"]).sb-kit::after,
+.ab.sb-ab:is([data-ae="aurora-noir"], [data-ae="aurora-noir--classic"]).sb-kit .ab-card-title::after,
+.ab.sb-ab:is([data-ae="aurora-noir"], [data-ae="aurora-noir--classic"]).sb-kit .ab-list::before,
+.ab.sb-ab:is([data-ae="aurora-noir"], [data-ae="aurora-noir--classic"]).sb-kit .ab-list::after { content: none; }   /* Classic's list caption and footer are board copy ("ISSUES · 3 OPEN") */
+
+/* list rows: one flat group; no featured first row, no glow bars */
+.ab.sb-ab:is([data-ae="aurora-noir"], [data-ae="aurora-noir--classic"]).sb-kit .ab-row.sb-k-row:first-child { background: none; }
+.ab.sb-ab:is([data-ae="aurora-noir"], [data-ae="aurora-noir--classic"]).sb-kit .ab-row.sb-k-row.is-picked { background: var(--ab-fill2); }
+.ab.sb-ab:is([data-ae="aurora-noir"], [data-ae="aurora-noir--classic"]).sb-kit .ab-row.sb-k-row::before { content: none; }
+
+/* secondary and icon buttons: hairline pills that match the ink pill (were square stock outlines) */
+.ab.sb-ab:is([data-ae="aurora-noir"], [data-ae="aurora-noir--classic"]).sb-kit .ab-type-apply {
+  border: 1px solid var(--ab-hair2); border-radius: 999px; background: transparent; color: var(--ab-ink); font-weight: 500; box-shadow: none;
+}
+.ab.sb-ab:is([data-ae="aurora-noir"], [data-ae="aurora-noir--classic"]).sb-kit .ab-type-apply.sb-icon-btn { border-radius: 50%; }
+.ab.sb-ab:is([data-ae="aurora-noir"], [data-ae="aurora-noir--classic"]).sb-kit .ab-type-apply.sb-k-pressed { filter: none; transform: none; background: var(--ab-fill2); border-color: var(--ab-sel-line, var(--ab-hair2)); }
+.ab.sb-ab:is([data-ae="aurora-noir"], [data-ae="aurora-noir--classic"]).sb-kit .ab-cta.sb-k-pressed { filter: none; transform: scale(0.99); background: var(--ab-ink-hover, var(--ab-ink)); }
+
+/* text buttons: the primary as text fell to 3.8:1 on the near-black canvas; pull it toward ink */
+.ab.sb-ab:is([data-ae="aurora-noir"], [data-ae="aurora-noir--classic"]).sb-kit .sb-k-textbtn { color: color-mix(in srgb, var(--ab-primary-text) 68%, var(--ab-ink)); }
+
+/* switch at a phone size (the board's 32 x 18 is a desktop control) and its label at body size */
+.ab.sb-ab:is([data-ae="aurora-noir"], [data-ae="aurora-noir--classic"]).sb-kit .ab-switch { width: 46px; height: 28px; }
+.ab.sb-ab:is([data-ae="aurora-noir"], [data-ae="aurora-noir--classic"]).sb-kit .ab-switch::before { left: 4px; top: 4px; width: 20px; height: 20px; }
+.ab.sb-ab:is([data-ae="aurora-noir"], [data-ae="aurora-noir--classic"]).sb-kit .ab-switch:checked::before { transform: translateX(18px); }
+.ab.sb-ab:is([data-ae="aurora-noir"], [data-ae="aurora-noir--classic"]).sb-kit .ab-toggle > span { font-size: var(--k-body, 17px); line-height: var(--k-body-lh, 24px); }
+
+/* slider: a hairline track with the primary filled in, an ink thumb */
+.ab.sb-ab:is([data-ae="aurora-noir"], [data-ae="aurora-noir--classic"]).sb-kit input.sb-k-range { height: 28px; margin: 0; background: transparent; }
+.ab.sb-ab:is([data-ae="aurora-noir"], [data-ae="aurora-noir--classic"]).sb-kit input.sb-k-range::-webkit-slider-runnable-track {
+  height: 4px; border-radius: 2px; background: linear-gradient(90deg, var(--ab-primary) var(--v, 50%), var(--ab-hair2) var(--v, 50%));
+}
+.ab.sb-ab:is([data-ae="aurora-noir"], [data-ae="aurora-noir--classic"]).sb-kit input.sb-k-range::-webkit-slider-thumb {
+  width: 22px; height: 22px; margin-top: -9px; border: 0; border-radius: 50%; background: var(--ab-ink); box-shadow: 0 0 0 4px var(--ab-canvas); transform: none;
+}
+.ab.sb-ab:is([data-ae="aurora-noir"], [data-ae="aurora-noir--classic"]).sb-kit input.sb-k-range::-moz-range-track {
+  height: 4px; border-radius: 2px; background: linear-gradient(90deg, var(--ab-primary) var(--v, 50%), var(--ab-hair2) var(--v, 50%));
+}
+.ab.sb-ab:is([data-ae="aurora-noir"], [data-ae="aurora-noir--classic"]).sb-kit input.sb-k-range::-moz-range-thumb { width: 22px; height: 22px; border: 0; border-radius: 50%; background: var(--ab-ink); transform: none; }

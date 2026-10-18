@@ -274,3 +274,86 @@
 /* Built > Settings: stack Website and Support email so a long brand's domain is not cut off mid-word in a half-width field */
 .ab.sb-ab[data-ae="clay"] .sb-field-row { grid-template-columns: minmax(0, 1fr); }
 .ab.sb-ab[data-ae="clay"] .sb-set-panel .sb-field-row .sb-field:last-child .ab-input { margin-bottom: 16px; }
+
+/* ---------------------------------------------------------------------
+   App UI (phone screens and the UI kit tab: roots with .sb-kit). Clay lives
+   in the components: puffy pills on near-white cards, tray wells for inputs,
+   pearl knobs. No studio blobs behind app screens (no art). Shadows use the
+   style's own tokens (--ab-card-*, --ab-clay-*, --ab-*-sh).
+   .ab.sb-ab...sb-kit outranks the shared kit rules in css/see-built.css.
+------------------------------------------------------------------------ */
+.ab.sb-ab[data-ae="clay"].sb-kit {
+  --clk-puff: 0 12px 20px -12px var(--ab-card-sh), 0 2px 4px -2px var(--ab-card-sh), inset 0 4px 8px var(--ab-card-hi), inset 0 -4px 9px var(--ab-card-lo);
+  --clk-puff-down: 0 4px 8px -4px var(--ab-card-sh), inset 0 4px 8px var(--ab-card-hi), inset 0 -3px 7px var(--ab-card-lo);
+  /* a shallower ramp and gloss than the board's: the white label sat on the light top of the
+     ramp at about 2.5:1; this keeps it near 4.5:1 while the button still reads as a bean */
+  --cl-ramp: linear-gradient(160deg, color-mix(in srgb, var(--ab-pri-hi) 45%, var(--ab-primary)), var(--ab-primary) 45%, var(--ab-pri-lo) 135%);
+}
+.ab.sb-ab[data-ae="clay"].sb-kit .ab-cta { background: radial-gradient(120% 140% at 30% 0, rgba(255, 255, 255, 0.14), transparent 55%), var(--cl-ramp); }
+.ab.sb-ab[data-ae="clay"].sb-kit::before { content: none; }
+
+/* secondary and icon buttons: near-white clay pills (were stock outline boxes) */
+.ab.sb-ab[data-ae="clay"].sb-kit .ab-type-apply {
+  border: 0; border-radius: 999px; background: var(--ab-card-fill); color: var(--ab-ink); font-weight: 700; box-shadow: var(--clk-puff);
+}
+.ab.sb-ab[data-ae="clay"].sb-kit .ab-type-apply.sb-icon-btn { border-radius: 50%; }
+.ab.sb-ab[data-ae="clay"].sb-kit .ab-type-apply.sb-k-pressed { filter: none; transform: scale(0.97); box-shadow: var(--clk-puff-down); }
+.ab.sb-ab[data-ae="clay"].sb-kit .ab-cta.sb-k-pressed { filter: none; transform: scale(0.97); box-shadow: 0 6px 12px -6px var(--ab-pri-sh), inset 0 -6px 12px var(--ab-clay-lo), inset 0 6px 10px var(--ab-clay-hi); }
+
+/* toggle label at the phone body size (the board's 13.5px bold read as a caption) */
+.ab.sb-ab[data-ae="clay"].sb-kit .ab-toggle > span { font-size: var(--k-body, 17px); line-height: var(--k-body-lh, 24px); font-weight: 500; }
+
+/* checkbox and radio: tray sockets; on = a clay bean of the primary ramp */
+.ab.sb-ab[data-ae="clay"].sb-kit .sb-k-box {
+  width: 26px; height: 26px; border: 0; border-radius: 9px; background: var(--cl-tray-p);
+  box-shadow: var(--cl-well), inset 0 0 0 1.5px color-mix(in srgb, var(--ab-ink) 22%, transparent);
+}
+.ab.sb-ab[data-ae="clay"].sb-kit .sb-k-box[type="radio"] { border-radius: 50%; }
+.ab.sb-ab[data-ae="clay"].sb-kit .sb-k-box[type="checkbox"]:checked {
+  background: var(--cl-gloss), var(--cl-ramp); box-shadow: 0 6px 9px -4px var(--ab-pri-sh), var(--cl-in-s);
+}
+.ab.sb-ab[data-ae="clay"].sb-kit .sb-k-box[type="radio"]:checked { background: var(--cl-tray-p); box-shadow: var(--cl-well); }
+.ab.sb-ab[data-ae="clay"].sb-kit .sb-k-box[type="radio"]:checked::after {
+  width: 14px; height: 14px; background: var(--cl-gloss), var(--cl-ramp); box-shadow: 0 3px 5px -2px var(--ab-pri-sh), var(--cl-in-s);
+}
+
+/* slider: a tray track with the primary ramp filled in, a pearl knob */
+.ab.sb-ab[data-ae="clay"].sb-kit input.sb-k-range { height: 32px; margin: 0; background: transparent; }
+.ab.sb-ab[data-ae="clay"].sb-kit input.sb-k-range::-webkit-slider-runnable-track {
+  height: 12px; border-radius: 99px; box-shadow: var(--cl-well);
+  background: linear-gradient(90deg, var(--ab-cl-pa-hi, var(--ab-pri-hi)), var(--ab-primary) var(--v, 50%), var(--cl-tray-p) var(--v, 50%));
+}
+.ab.sb-ab[data-ae="clay"].sb-kit input.sb-k-range::-webkit-slider-thumb {
+  width: 28px; height: 28px; margin-top: -8px; border: 0; border-radius: 50%; transform: none;
+  background: radial-gradient(circle at 32% 25%, #fff, var(--ab-pearl) 58%);
+  box-shadow: 0 7px 10px -3px var(--ab-ink-sh), inset 0 -4px 7px var(--ab-clay-lo), inset 0 3px 5px var(--ab-clay-hi);
+}
+.ab.sb-ab[data-ae="clay"].sb-kit input.sb-k-range::-moz-range-track {
+  height: 12px; border-radius: 99px; box-shadow: var(--cl-well);
+  background: linear-gradient(90deg, var(--ab-cl-pa-hi, var(--ab-pri-hi)), var(--ab-primary) var(--v, 50%), var(--cl-tray-p) var(--v, 50%));
+}
+.ab.sb-ab[data-ae="clay"].sb-kit input.sb-k-range::-moz-range-thumb {
+  width: 28px; height: 28px; border: 0; border-radius: 50%; transform: none;
+  background: radial-gradient(circle at 32% 25%, #fff, var(--ab-pearl) 58%); box-shadow: 0 7px 10px -3px var(--ab-ink-sh);
+}
+/* progress: the board's chunky tray bar */
+.ab.sb-ab[data-ae="clay"].sb-kit .ab-row-bar.sb-k-bar { height: 12px !important; }
+
+/* select menu: a near-white clay card, pill options, the chosen one a pearl */
+.ab.sb-ab[data-ae="clay"].sb-kit .sb-k-menu { border: 0; border-radius: 26px; padding: 8px; background: var(--ab-card-fill); box-shadow: var(--clk-puff); }
+.ab.sb-ab[data-ae="clay"].sb-kit .sb-k-menu li { border-radius: 999px; padding: 0 14px; }
+.ab.sb-ab[data-ae="clay"].sb-kit .sb-k-menu li[aria-selected="true"] {
+  background: radial-gradient(120% 120% at 30% 0, #fff, var(--ab-pearl) 60%); color: var(--ab-pearl-ink);
+  box-shadow: 0 8px 12px -6px var(--ab-ink-sh), inset 0 -4px 8px var(--ab-clay-lo), inset 0 4px 6px var(--ab-clay-hi);
+}
+
+/* list rows: each row is its own clay pill, so they need air between them */
+.ab.sb-ab[data-ae="clay"].sb-kit .ab-row.sb-k-row + .ab-row.sb-k-row { margin-top: 8px; }
+
+/* callouts: soft rounded tints without the stock line (error keeps its strong edge) */
+.ab.sb-ab[data-ae="clay"].sb-kit .sb-k-callout { border-radius: 24px; padding: 16px 18px; }
+.ab.sb-ab[data-ae="clay"].sb-kit .sb-k-callout:not([data-tone="error"]) { border-color: transparent; box-shadow: var(--cl-well); }
+
+/* tab bar sample: a floating clay card; toast: a pill */
+.ab.sb-ab[data-ae="clay"].sb-kit .sb-k-tabbarbox { border: 0; border-radius: 30px; background: var(--ab-card-fill); box-shadow: var(--clk-puff); }
+.ab.sb-ab[data-ae="clay"].sb-kit .sb-k-toast { border-radius: 999px; padding-left: 20px; box-shadow: 0 12px 20px -10px var(--ab-ink-sh); }
