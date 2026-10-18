@@ -393,3 +393,36 @@
 .ab[data-ae="frutiger-aero"] .fa-mark[data-k="dont"] { background: linear-gradient(180deg, #FDFEFF, #E3EEF7 50%, #CFE1EF 51%, #E9F3FB); color: #36536E; box-shadow: inset 0 0 0 1px #7896B0, 0 2px 4px rgba(0, 50, 100, 0.15); }
 .ab[data-ae="frutiger-aero"][data-mode="dark"] .fa-mark[data-k="dont"] { background: linear-gradient(180deg, #587D9C, #2A4A66 50%, #173550 51%, #2C5576); color: #EAF5FF; box-shadow: inset 0 0 0 1px #000; }
 .ab[data-ae="frutiger-aero"] .fa-mark::before { content: ""; position: absolute; left: 12%; right: 12%; top: 5%; height: 46%; border-radius: 50% 50% 40% 40% / 70% 70% 30% 30%; background: var(--fa-cap); }
+
+/* ---------- Built product screens: the sky, bubbles and glossy glass come with the UI ----------
+   Export-safe like the board: plain gradients, no backdrop-filter. The page header sits on a sky band
+   (ink on pale sky, well above 4.5:1); cards are near-opaque glass with the hard 115deg streak and a white
+   inner rim; two bubbles float behind the KPI row. Night keeps the same shapes in deep blues. */
+.ab.sb-ab[data-ae="frutiger-aero"] { --fa-sky-a: #6CCBF4; --fa-sky-b: #B4E7FC; --fa-bub: rgba(255, 255, 255, 0.9); --fa-bub-tint: rgba(170, 230, 255, 0.5); }
+.ab.sb-ab[data-ae="frutiger-aero"][data-mode="dark"] { --fa-sky-a: #0E3556; --fa-sky-b: #1B5A8A; --fa-bub: rgba(190, 230, 255, 0.6); --fa-bub-tint: rgba(90, 170, 230, 0.2); }
+.ab.sb-ab[data-ae="frutiger-aero"] .sb-main { position: relative; isolation: isolate; }
+.ab.sb-ab[data-ae="frutiger-aero"] .sb-main::before {
+  content: ""; position: absolute; z-index: -2; left: 0; right: 0; top: 0; height: 290px; pointer-events: none;
+  background:
+    radial-gradient(ellipse 150px 34px at 14% 22%, rgba(255, 255, 255, 0.75), transparent 72%),
+    radial-gradient(ellipse 210px 44px at 62% 12%, rgba(255, 255, 255, 0.6), transparent 72%),
+    radial-gradient(ellipse 130px 30px at 90% 34%, rgba(255, 255, 255, 0.7), transparent 72%),
+    linear-gradient(180deg, var(--fa-sky-a) 0%, var(--fa-sky-b) 55%, transparent 100%);
+}
+.ab.sb-ab[data-ae="frutiger-aero"] .sb-main::after {
+  content: ""; position: absolute; z-index: -1; left: 0; right: 0; top: 0; height: 330px; pointer-events: none;
+  background:
+    radial-gradient(circle at 34% 28%, var(--fa-bub) 0 4px, transparent 5px) 29% 3% / 68px 68px no-repeat,
+    radial-gradient(circle at 50% 50%, var(--fa-bub-tint) 0 56%, rgba(255, 255, 255, 0.95) 59% 64%, transparent 66%) 29% 3% / 68px 68px no-repeat,
+    radial-gradient(circle at 34% 28%, var(--fa-bub) 0 3px, transparent 4px) 98% 52% / 46px 46px no-repeat,
+    radial-gradient(circle at 50% 50%, var(--fa-bub-tint) 0 56%, rgba(255, 255, 255, 0.95) 59% 64%, transparent 66%) 98% 52% / 46px 46px no-repeat,
+    radial-gradient(circle at 34% 28%, var(--fa-bub) 0 2px, transparent 3px) 4% 62% / 30px 30px no-repeat,
+    radial-gradient(circle at 50% 50%, var(--fa-bub-tint) 0 56%, rgba(255, 255, 255, 0.9) 59% 64%, transparent 66%) 4% 62% / 30px 30px no-repeat;
+}
+.ab.sb-ab[data-ae="frutiger-aero"] :is(.ab-card.sb-stat, .ab-card.sb-chart, .ab-panel.sb-quick, .ab-panel.sb-set-panel, .ab-card.sb-planbox, .ab-card.sb-feat, .ab-card.sb-plan) {
+  background: var(--fa-glass-bg); border: 1px solid var(--ab-fa-rim-out);
+  box-shadow: inset 0 1px 0 var(--ab-fa-rim-in), inset 0 0 0 1px rgba(255, 255, 255, 0.35), 0 12px 26px -16px rgba(20, 70, 110, 0.45);
+}
+.ab.sb-ab[data-ae="frutiger-aero"] .sb-side { background: linear-gradient(115deg, rgba(255, 255, 255, 0.34) 0 30%, transparent 30.3%), rgba(255, 255, 255, 0.4); box-shadow: inset -1px 0 0 var(--ab-fa-rim-in); }
+.ab.sb-ab[data-ae="frutiger-aero"][data-mode="dark"] .sb-side { background: rgba(10, 30, 50, 0.55); }
+.ab.sb-ab[data-ae="frutiger-aero"] .sb-chart-head .ab-seg-btn { flex: 1 0 auto; padding-inline: 12px; font-size: 12.5px; }
