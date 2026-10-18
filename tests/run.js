@@ -790,6 +790,8 @@ check('paste: empty text', run(`extractColors('').length`) === 0, 'found colors 
   const cssBlock = (dl.match(/```css\n([\s\S]*?)```/) || ['', ''])[1];
   const undef = (cssBlock.match(/var\((--[a-z0-9-]+)\)/g) || []).map(v => v.slice(4, -1)).filter(k => cssBlock.indexOf(k + ':') < 0);
   check('kit: every var() in the App token block is defined in it', undef.length === 0, undef.join(', '));
+  check('kit: App briefs state no zero sizes ("0pt", "0x0pt")', !/\b0pt\b|0x0pt/.test((dl + pb).replace(/```[\s\S]*?```/g, '')), ((dl + pb).match(/.{30}(\b0pt\b|0x0pt).{20}/) || ['none'])[0]);
+  check('kit: a knob moved right of centre reads "at the right"', /at the right$/.test(M(`aibPlace({ pos: 'absolute', at: [2, 22, null, 2], w: 27, h: 27, tf: 'matrix(1, 0, 0, 1, 20, 0)' }, { w: 51, h: 31 }, '::before')`)), M(`aibPlace({ pos: 'absolute', at: [2, 22, null, 2], w: 27, h: 27, tf: 'matrix(1, 0, 0, 1, 20, 0)' }, { w: 51, h: 31 }, '::before')`));
   check('kit: without a page to measure in, the App brief keeps the generic rows and says so in one line',
     /These are the generic kit rows/.test(dlStatic) && !/### How Dystopian Luxury shows up/.test(dlStatic) && !/These are the generic kit rows/.test(dl), 'static');
   check('kit: the Website brief keeps its sections and gets no kit measurement', !/### How /.test(dlWeb) && /## Components/.test(dlWeb) && !/These are the generic kit rows/.test(dlWeb), 'web');

@@ -445,3 +445,16 @@
   --pb-scan: repeating-linear-gradient(0deg, color-mix(in srgb, var(--ab-tt-fg) 7%, transparent) 0 1px, transparent 1px 3px);
 }
 .ab.sb-ab.sb-kit:is([data-ae="pirate-broadcast"], [data-ae="pirate-broadcast--classic"]) .sb-dots i:not(.is-on) { background: color-mix(in srgb, var(--ab-ink) 58%, var(--ab-canvas)); }
+/* App UI toggle: 84pt wide so the 18pt key and the [ OFF ] / [ ON ] tag keep >= 8pt between them */
+.ab.sb-ab.sb-kit:is([data-ae="pirate-broadcast"], [data-ae="pirate-broadcast--classic"]) .ab-switch { flex: none; width: 84px; min-width: 84px; }
+.ab.sb-ab.sb-kit:is([data-ae="pirate-broadcast"], [data-ae="pirate-broadcast--classic"]) .ab-switch::before { left: 6px; }
+.ab.sb-ab.sb-kit:is([data-ae="pirate-broadcast"], [data-ae="pirate-broadcast--classic"]) .ab-switch::after { right: 8px; }
+.ab.sb-ab.sb-kit:is([data-ae="pirate-broadcast"], [data-ae="pirate-broadcast--classic"]) .ab-switch:checked::before { transform: translateX(54px); }
+.ab.sb-ab.sb-kit:is([data-ae="pirate-broadcast"], [data-ae="pirate-broadcast--classic"]) .ab-switch:checked::after { left: 8px; right: auto; }
+/* segments: 12pt inside each cell; the channel number and label tighten their tracking to fit */
+.ab.sb-ab.sb-kit:is([data-ae="pirate-broadcast"], [data-ae="pirate-broadcast--classic"]) .ab-seg-btn { min-width: 0; padding: 6px 12px !important; gap: 6px; letter-spacing: 0.04em; }
+/* three segments on a 390pt screen: single-digit channel keys, 13pt, no tracking, so the label clears 12pt */
+.ab.sb-ab.sb-kit:is([data-ae="pirate-broadcast"], [data-ae="pirate-broadcast--classic"]) .ab-seg:has(> .ab-seg-btn:nth-child(3)) .ab-seg-btn { gap: 4px; font-size: 13px !important; letter-spacing: 0; }
+.ab.sb-ab.sb-kit:is([data-ae="pirate-broadcast"], [data-ae="pirate-broadcast--classic"]) .ab-seg:has(> .ab-seg-btn:nth-child(3)) .ab-seg-btn:nth-child(1)::before { content: "1"; }
+.ab.sb-ab.sb-kit:is([data-ae="pirate-broadcast"], [data-ae="pirate-broadcast--classic"]) .ab-seg:has(> .ab-seg-btn:nth-child(3)) .ab-seg-btn:nth-child(2)::before { content: "2"; }
+.ab.sb-ab.sb-kit:is([data-ae="pirate-broadcast"], [data-ae="pirate-broadcast--classic"]) .ab-seg:has(> .ab-seg-btn:nth-child(3)) .ab-seg-btn:nth-child(3)::before { content: "3"; }

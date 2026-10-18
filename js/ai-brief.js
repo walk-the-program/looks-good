@@ -537,6 +537,8 @@ function aibRgba(c) {
   if (m) return [+m[1], +m[2], +m[3], m[4] == null ? 1 : /%/.test(m[4]) ? parseFloat(m[4]) / 100 : +m[4]];
   m = /^color\(srgb\s+([\d.]+)\s+([\d.]+)\s+([\d.]+)(?:\s*\/\s*([\d.]+%?))?\s*\)$/i.exec(s);
   if (m) return [m[1] * 255, m[2] * 255, m[3] * 255, m[4] == null ? 1 : /%/.test(m[4]) ? parseFloat(m[4]) / 100 : +m[4]];
+  const short3 = /^#([0-9a-f])([0-9a-f])([0-9a-f])$/i.exec(s);
+  if (short3) return [1, 2, 3].map(i => parseInt(short3[i] + short3[i], 16)).concat(1);
   m = /^#([0-9a-f]{6})([0-9a-f]{2})?$/i.exec(s);
   if (m) return [0, 2, 4].map(i => parseInt(m[1].slice(i, i + 2), 16)).concat(m[2] ? parseInt(m[2], 16) / 255 : 1);
   if (s === 'transparent') return [0, 0, 0, 0];
@@ -588,7 +590,17 @@ const AIB_COLOR_IN = /(?:rgba?|color)\([^()]*\)(?:\|(?:rgba?|color)\([^()]*\))?|
 // One background-image layer as data: { kind: 'image' | 'stripes' | 'solid' | 'diagonal' | 'band' | 'gradient' | 'other', ... }.
 function aibGradLayer(layer, size, pos, name) {
   const m = /^(repeating-)?(linear|radial|conic)-gradient\(([\s\S]*)\)$/.exec(String(layer).trim());
-  if (!m) return { kind: /url\(/.test(layer) ? 'image' : 'other' };
+  if (!m) {
+    const svg = /url\(\s*["']?data:image\/svg\+xml[^,]*,([\s\S]*?)["']?\s*\)$/.exec(String(layer));
+    if (svg) {
+      let t = svg[1]; try { t = decodeURIComponent(t); } catch (err) { /* already plain */ }
+      if (/feTurbulence/i.test(t)) return { kind: 'image' };
+      const st = (/stroke=["']?(#[0-9a-f]{3,8}|rgba?\([^)]*\)|currentColor)/i.exec(t) || [])[1];
+      const loop = /<(ellipse|circle)\b/i.test(t) || /[Aa]\s*[\d.]|[Cc]\s*[\d.-]/.test(t);
+      if (st || loop) return { kind: 'svgmark', loop, col: st && !/currentColor/i.test(st) ? name(st) : 'the text colour' };
+    }
+    return { kind: /url\(/.test(layer) ? 'image' : 'other' };
+  }
   const args = aibSplitTop(m[3]);
   let angle = 180;
   if (args.length && !AIB_COLOR_IN.test(args[0])) {
@@ -663,16 +675,18 @@ function aibImgWords(o, name, what) {
   const ps = layers.map((l, i) => aibGradLayer(l, sizes[i % sizes.length] || 'auto', poss[i % poss.length] || '0% 0%', name));
   const words = [];
   if (ps.some(p => p.kind === 'image' || p.kind === 'other')) words.push('a fine grain texture');
+  ps.filter(p => p.kind === 'svgmark').forEach(p => words.push(p.loop ? `a hand-drawn ${p.col} loop (an SVG stroke) around it` : `a drawn ${p.col} SVG mark`));
   ps.filter(p => p.kind === 'stripes').forEach(p => words.push(`fine ${p.orient} of ${p.col} every ${p.period}pt`));
   const solids = ps.filter(p => p.kind === 'solid');
   if (solids.length) {
-    const dims = solids.map(p => String(p.size).split(/\s+/).map(v => (/px$/.test(v) ? parseFloat(v) : null)));
+    const dims = solids.map(p => String(p.size).split(/\s+/).map(v => (/px$/.test(v) ? parseFloat(v) : /%$/.test(v) ? 999 : null)));
     const sized = dims.filter(d => d[1] != null);
     if (!sized.length) words.push(`filled ${solids[0].col}`);
     else if (solids.length >= 4) {
       const t = Math.round(Math.min(...sized.map(d => Math.min(d[0] == null ? d[1] : d[0], d[1])))), l = Math.round(Math.max(...sized.map(d => Math.max(d[0] == null ? d[1] : d[0], d[1]))));
       words.push(`${solids[0].col} corner ticks, ${l}pt long and ${t}pt thick`);
     } else if (solids.length === 1) words.push(aibBandWords(solids[0], o, what));
+    else if (solids.length === 2 && sized.length === 2 && ((sized[0][0] == null || sized[0][0] > sized[0][1]) !== (sized[1][0] == null || sized[1][0] > sized[1][1]))) words.push(`a ${solids[0].col} plus sign`);
     else words.push(`${solids.length} small ${solids[0].col} marks`);
   }
   const diag = ps.filter(p => p.kind === 'diagonal');
@@ -699,7 +713,7 @@ function aibPlace(p, host, which) {
   }
   const r = n => Math.round(n);
   const v = y + p.h <= 0.5 ? `${r(-y - p.h)}pt above` : y >= H - 0.5 ? `${r(y - H)}pt below` : y < -0.5 ? 'straddling the top edge of' : y + p.h > H + 0.5 ? 'straddling the bottom edge of' : Math.abs(y + p.h / 2 - H / 2) < 2 ? 'vertically centred in' : y < H / 2 ? 'near the top of' : 'near the bottom of';
-  const h = x + p.w <= 0.5 ? 'left of' : x >= W - 0.5 ? 'right of' : x < -0.5 ? 'across the left edge' : x + p.w > W + 0.5 ? 'across the right edge' : Math.abs(x + p.w / 2 - W / 2) < 2 ? 'centred' : x < W / 2 ? 'at the left' : 'at the right';
+  const h = x + p.w <= 0.5 ? 'left of' : x >= W - 0.5 ? 'right of' : x < -0.5 ? 'across the left edge' : x + p.w > W + 0.5 ? 'across the right edge' : Math.abs(x + p.w / 2 - W / 2) < 2 ? 'centred' : x + p.w / 2 < W / 2 ? 'at the left' : 'at the right';
   if (/straddling the top/.test(v) && /left/.test(h)) return 'straddling the top-left corner';
   if (/straddling the top/.test(v) && /right/.test(h)) return 'straddling the top-right corner';
   if (/straddling the bottom/.test(v) && /left/.test(h)) return 'straddling the bottom-left corner';
@@ -743,16 +757,19 @@ function aibKitPseudo(ctx, p, which, host, name) {
   if (txt && txt.trim()) {
     if (/^\s*[>›»]\s*$/.test(txt)) return `a "${txt.replace(/\s+$/, ' ')}" prompt in ${col}, ${where}`;
     if (/^[\s—–\-_|▮▯■□●○•·]+$/.test(txt)) return `the mark "${txt.trim()}" in ${col}${p.fs ? ` at ${Math.round(p.fs)}pt` : ''}, ${where}`;
-    return `a small tag "${txt.trim()}" in ${col}${p.fs ? ` ${Math.round(p.fs)}pt` : ''}${fill !== 'none' ? ` on a ${fill} strip` : ''}, ${where}, on one line (\`white-space: nowrap\`) and clear of the other parts${tilt}`;
+    const nb = /\S\s{2,}\S/.test(txt) ? ' (keep the spacing exactly: each run of spaces is that many &nbsp;)' : '';
+    return `a small tag "${txt.trim()}"${nb} in ${col}${p.fs ? ` ${Math.round(p.fs)}pt` : ''}${fill !== 'none' ? ` on a ${fill} strip` : ''}, ${where}, on one line (\`white-space: nowrap\`) and clear of the other parts${tilt}`;
   }
   const W = (host && host.w) || 0, H = (host && host.h) || 0;
   const big = W && p.w >= W * 0.8 && p.h >= H * 0.6;
   const dash = p.b.find(x => /dotted|dashed/.test(x.s) && x.w > 0);
   const torn = (p.clip && p.clip !== 'none') || /url\(/.test(p.filter || '');
   const shText = sh ? `, with ${sh}` : '';
+  if (/plus sign/.test(fill) && p.r.some(v => v > 0)) return `a ${Math.round(p.w)}pt circled plus: a ${edge !== 'no edge' ? edge + ' ' : ''}circle holding ${fill}, ${where}${tilt}`;
   if (big) {
     if (dash && fill === 'none') return `a ${Math.round(dash.w)}pt ${dash.s} ${name(dash.c)} frame ${where}${tilt}`;
     if (/corner ticks/.test(fill)) return `${fill} framing it, ${where}${tilt}`;
+    if (/^a hand-drawn .* loop/.test(fill)) return `${fill}, ${where}${tilt}`;
     return `a ${fill === 'none' ? 'clear' : fill} sheet ${where}${+p.z < 0 ? ', behind the content' : ''}${torn ? ', with a torn, uneven outline' : ''}${shText}${tilt}`;
   }
   if (dash) return `a ${dash.s} ${name(dash.c)} leader line, ${Math.round(dash.w)}pt, ${where}`;
@@ -760,6 +777,10 @@ function aibKitPseudo(ctx, p, which, host, name) {
   const sq = Math.abs(p.w - p.h) < 1;
   const shape = round ? (sq ? 'dot' : 'pill') : sq ? 'square' : p.w > p.h * 3 ? 'bar' : p.h > p.w * 3 ? 'upright bar' : 'block';
   const dims = sq ? `${Math.round(p.w)}pt` : `${Math.round(p.w)}x${Math.round(p.h)}pt`;
+  const sides = p.b.map(x => x.w > 0 && x.s !== 'none');
+  const open = sides.filter(Boolean).length === 3 ? ['∪ (open at the top)', '⊂ (open at the right)', '∩ (open at the bottom)', '⊃ (open at the left)'][sides.indexOf(false)] : '';
+  if (open && fill === 'none') return `a ${Math.round(p.w)}x${Math.round(p.h)}pt bracket shaped ${open}, ${Math.round(p.b[sides.indexOf(true)].w)}pt ${name(p.b[sides.indexOf(true)].c)} strokes, ${where}${tilt}`;
+  if (/plus sign/.test(fill) && p.r.some(v => v > 0)) return `a ${Math.round(p.w)}pt circled plus: a ${edge !== 'no edge' ? edge + ' ' : ''}circle holding ${fill}, ${where}${tilt}`;
   const partial = edge !== 'no edge' && fill === 'none' && !p.b.every(x => x.w > 0) ? ` drawn as ${edge} strokes` : edge !== 'no edge' ? ` with a ${edge} edge` : '';
   if (/ marks| ticks|lines of|an X drawn|diagonal/.test(fill) && !/^--[a-z0-9-]+( at \d+%)?$/.test(fill)) return `a ${dims} mark drawn as ${fill}${partial}, ${where}${shText}${tilt}`;
   const base = fill === 'none' ? '' : fill.split(' with ')[0], extra = fill.indexOf(' with ') > 0 ? ' with ' + fill.split(' with ').slice(1).join(' with ') : '';
@@ -792,16 +813,16 @@ function aibListInfo(list, scale) {
 // plus their sample copy (with icon names) and how each list groups its rows.
 const AIB_SCREEN_PARTS = {
   welcome: ['.sb-onboard', [['status bar', '.sb-statusbar'], ['time', '.sb-statusbar > span'], ['signal', '.sb-sig'], ['wifi', '.sb-wifi'], ['battery', '.sb-bat'], ['top row', '.sb-ob-top'],
-    ['logo chip', '.sb-ob-top .ab-mark'], ['logo initial', '.sb-ob-top .ab-mark > span'], ['logo image', '.sb-ob-top .ab-logo'], ['wordmark', '.sb-ob-top .ab-wordmark'],
+    ['brand', '.sb-ob-top .ab-brand'], ['logo chip', '.sb-ob-top .ab-mark'], ['logo initial', '.sb-ob-top .ab-mark > span'], ['logo image', '.sb-ob-top .ab-logo'], ['wordmark', '.sb-ob-top .ab-wordmark'],
     ['skip', '.sb-ob-top .sb-k-textbtn'], ['eyebrow', '.sb-ob-copy .ab-kicker'], ['headline', '.sb-ob-h'], ['highlight', '.sb-ob-h .ab-hl'], ['body', '.sb-ob-body'],
     ['feature list', '.sb-ob-list .sb-k-list'], ['feature row', '.sb-ob-list .sb-k-row'], ['second feature row', '.sb-ob-list .sb-k-row:nth-child(2)'], ['feature icon chip', '.sb-ob-list .sb-k-ico'], ['feature title', '.sb-ob-list .sb-k-title'],
     ['pager', '.sb-dots'], ['current dot', '.sb-dots i.is-on'], ['other dot', '.sb-dots i:not(.is-on)'], ['primary button', '.sb-ob-actions .ab-cta'], ['primary arrow', '.sb-ob-actions .ab-cta .ab-cta-arrow'],
     ['second button', '.sb-ob-actions .sb-k-btn2'], ['home indicator', '.sb-homebar']]],
   home: ['.sb-home', [['status bar', '.sb-statusbar'], ['time', '.sb-statusbar > span'], ['top band', '.sb-home-top'], ['eyebrow', '.sb-home-t .ab-kicker'], ['title', '.sb-home-h'], ['bell button', '.sb-home-top .sb-icon-btn'],
     ['bell dot', '.sb-home-top .sb-badge'], ['summary card', '.sb-home-card'], ['card segmented control', '.sb-home-card .ab-seg'],
-    ['card selected segment', '.sb-home-card .ab-seg-btn[aria-pressed="true"]'], ['card title', '.sb-home-card .ab-card-title'], ['card body', '.sb-home-card .ab-card-body'],
+    ['card selected segment', '.sb-home-card .ab-seg-btn[aria-pressed="true"]'], ['card other segment', '.sb-home-card .ab-seg-btn[aria-pressed="false"]'], ['card title', '.sb-home-card .ab-card-title'], ['card body', '.sb-home-card .ab-card-body'],
     ['card button', '.sb-home-card .ab-cta'], ['card arrow', '.sb-home-card .ab-cta .ab-cta-arrow'], ['section row', '.sb-home-list .sb-k-section'], ['section label', '.sb-home-list .sb-k-section .ab-label'], ['see all', '.sb-home-list .sb-k-see'],
-    ['list', '.sb-home-list .sb-k-list'], ['row', '.sb-home-list .sb-k-row'], ['second row', '.sb-home-list .sb-k-row:nth-child(2)'], ['row title', '.sb-home-list .sb-k-title'], ['row detail', '.sb-home-list .sb-k-sub'], ['row value', '.sb-home-list .sb-k-trail'], ['row avatar', '.sb-home-list .sb-k-av'],
+    ['list', '.sb-home-list .sb-k-list'], ['row', '.sb-home-list .sb-k-row'], ['last row', '.sb-home-list .sb-k-row:last-child'], ['second row', '.sb-home-list .sb-k-row:nth-child(2)'], ['row title', '.sb-home-list .sb-k-title'], ['row detail', '.sb-home-list .sb-k-sub'], ['row value', '.sb-home-list .sb-k-trail'], ['row avatar', '.sb-home-list .sb-k-av'],
     ['tab bar', '.sb-tabs'], ['selected tab', '.sb-tab[aria-current]'], ['selected tab label', '.sb-tab[aria-current] span'], ['other tab', '.sb-tab:not([aria-current])'], ['other tab label', '.sb-tab:not([aria-current]) span'], ['home indicator', '.sb-homebar']]],
 };
 function aibScreenSnap(host) {
@@ -829,7 +850,8 @@ function aibScreenSnap(host) {
     P.extra = aibScreenExtra(root, k, id);
     const all = sel => Array.from(root.querySelectorAll(sel));
     P.copy = id === 'home' ? {
-      tabs: all('.sb-tab').map(t => [txt(t), glyph(t)]),
+      tabs: all('.sb-tab').map(t => { const l = t.querySelector('span'), g = t.querySelector('svg'); const lc = l ? getComputedStyle(l) : null; return [txt(t), glyph(t), lc ? lc.color : '', lc ? lc.backgroundColor : '', g ? getComputedStyle(g).color : '', t.hasAttribute('aria-current')]; }),
+      avatars: all('.sb-home-list .sb-k-av').map(txt),
       segments: all('.sb-home-card .ab-seg-btn').map(txt),
       rows: all('.sb-home-list .sb-k-row').map(r => [txt(r.querySelector('.sb-k-title')), txt(r.querySelector('.sb-k-sub')), txt(r.querySelector('.sb-k-trail'))]),
     } : { features: all('.sb-ob-list .sb-k-row').map(r => [txt(r.querySelector('.sb-k-title')), glyph(r)]) };
@@ -896,10 +918,12 @@ function aibKitMeasure(state0, mode, both) {
     const host = document.createElement('div');
     host.className = 'sb-view';
     host.setAttribute('aria-hidden', 'true');
-    host.style.cssText = 'position:fixed;left:-30000px;top:0;width:1200px;visibility:hidden;pointer-events:none;';
+    // straight on <body>: the editor (and #builtView's parent) is display:none in the library, brief and share
+    // views, and nothing inside a display:none ancestor gets a layout
+    host.style.cssText = 'position:fixed;left:-20000px;top:0;width:1200px;visibility:hidden;pointer-events:none;display:block;contain:layout style;';
     let snap = null;
     try {
-      (live && live.parentNode ? live.parentNode : document.body).appendChild(host);
+      document.body.appendChild(host);
       const page = SeeBuilt.kitInto(host, { mode: m });
       if (page) { snap = aibKitSnap(page); snap.mode = m; }
       if (snap && typeof SeeBuilt.mobileInto === 'function') { SeeBuilt.mobileInto(host, { mode: m }); snap.screens = aibScreenSnap(host); }
@@ -1074,7 +1098,7 @@ function aibKitPhoneRow(ctx, row, srcIn) {
             : row.role === 'Body' ? ((K.screens && K.screens.body) || part('card', 'body'))
               : part('card', 'body'));
   if (!src) return row;
-  if (K.screens && K.screens.pixel && /^(Display|Large title|Title|Title 2)$/.test(row.role) && ctx.state.headingFont) {
+  if (K.screens && K.screens.pixel && row.role === 'Display' && ctx.state.headingFont) {
     const hf = ctx.state.headingFont, w = abWeightNear(hf, 400);
     if (ctx.fontUse) { const u = (ctx.fontUse[hf.name] = ctx.fontUse[hf.name] || { face: hf, weights: {} }); u.weights[String(w)] = { weight: w, italic: false }; }
     return Object.assign({}, row, { face: hf, weight: w, italic: false, note: 'uppercase (the pixel face the Built view draws its title glyphs from)', display: true, ps: aibPostScript(hf, w, false) });
@@ -1170,7 +1194,7 @@ function aibKitCorner(o) {
     if (pill(r[0])) return o.w && o.h && Math.abs(o.w - o.h) < 1 ? 'circle' : 'pill';
     return `${aibPt(r[0])}pt corners`;
   }
-  return `corners ${r.map(v => (pill(v) ? 'pill' : aibPt(v))).join(' ')}pt (clockwise from top-left)`;
+  return `corners ${r.map(v => (pill(v) ? 'pill' : v ? aibPt(v) + 'pt' : '0')).join(' ')} (clockwise from top-left)`;
 }
 
 // box-shadow (and filter drop-shadow) in words, colours named: { text, kinds: ['hard offset' | 'soft' | 'ring' | 'inset' | 'veil'] }.
@@ -1214,9 +1238,10 @@ function aibKitShadow(sh, name, filter) {
 function aibKitPad(o) {
   const p = o.pad;
   if (!p || p.every(v => !v)) return '';
-  if (p.every(v => v === p[0])) return `padding ${aibPt(p[0])}pt`;
-  if (p[0] === p[2] && p[1] === p[3]) return `padding ${aibPt(p[0])} ${aibPt(p[1])}pt`;
-  return `padding ${p.map(aibPt).join(' ')}pt`;
+  const u = v => (v ? `${aibPt(v)}pt` : '0');
+  if (p.every(v => v === p[0])) return `padding ${u(p[0])}`;
+  if (p[0] === p[2] && p[1] === p[3]) return `padding ${u(p[0])} ${u(p[1])}`;
+  return `padding ${p.map(u).join(' ')}`;
 }
 
 // Rotation and offset from a computed transform matrix: '' when there is none.
@@ -1297,12 +1322,13 @@ function aibKitModel(ctx, snap) {
         const pieces = [P.before, P.after].filter(Boolean);
         const textArrow = pieces.find(x => AIB_ARROW_GLYPH.test(aibPseudoText(x.content)));
         if (!pieces.length && !(o.w > 0)) return;
-        if (textArrow && pieces.length === 1) marks.push(`trailing mark: an arrow; draw it as a 24pt SVG arrow in ${name(textArrow.color)} at the trailing edge, not a text glyph`);
+        const chip = aibKitFill(o, name), chipEdge = aibKitEdge(o, name), chipSh = aibKitShadow(o.sh, name, o.filter).text;
+        const holder = chip !== 'none' || chipEdge !== 'no edge' || chipSh ? `a ${Math.round(o.w)}pt ${/pill|circle/.test(aibKitCorner(o)) ? 'circle' : 'chip'} filled ${chip}${chipEdge !== 'no edge' ? ', ' + chipEdge + ' edge' : ''}${chipSh ? ', ' + chipSh : ''}, holding ` : '';
+        const glyphName = x => AIB_GLYPH_NAME[aibPseudoText(x.content).trim()] || 'an arrow';
+        if (textArrow && pieces.length === 1 && !holder) marks.push(`trailing mark: ${glyphName(textArrow)} in ${name(textArrow.color)} at the trailing edge (draw it as a 24pt SVG of that arrow, not a text glyph)`);
         else {
-          const chip = aibKitFill(o, name), chipEdge = aibKitEdge(o, name), chipSh = aibKitShadow(o.sh, name, o.filter).text;
-          const holder = chip !== 'none' || chipEdge !== 'no edge' || chipSh ? `a ${Math.round(o.w)}x${Math.round(o.h)}pt ${/pill|circle/.test(aibKitCorner(o)) ? 'round' : ''} chip (${chip}${chipEdge !== 'no edge' ? ', ' + chipEdge + ' edge' : ''}${chipSh ? ', ' + chipSh : ''}) holding ` : '';
-          const desc = pieces.map((x, k) => (AIB_ARROW_GLYPH.test(aibPseudoText(x.content)) ? `an arrow (24pt SVG) in ${name(x.color)}` : aibKitPseudo(ctx, x, k ? '::after' : '::before', o, name))).join(' and ');
-          marks.push(`trailing mark at the end of the label: ${holder}${desc || 'nothing'}`.replace(/\s+/g, ' '));
+          const desc = pieces.map((x, k) => (AIB_ARROW_GLYPH.test(aibPseudoText(x.content)) ? `${glyphName(x)} (an SVG, not a text glyph) in ${name(x.color)}` : aibKitPseudo(ctx, x, k ? '::after' : '::before', o, name))).join(' and ');
+          marks.push(`trailing mark at the end of the label: ${holder}${(desc || 'nothing').replace(/, (before|after) the text/g, '')}`.replace(/\s+/g, ' '));
         }
         return;
       }
@@ -1392,6 +1418,7 @@ function aibKitModel(ctx, snap) {
     rows[id] = { fill: fillCell, text: aibKitType(ctx, tp, name), edge, size, marks: marks.filter(Boolean), states: diffs, main, tp, sh, rest, all: states, groundRaw: useLayer ? lay.o.bg : main.bg };
   });
   aibKitFixContrast(ctx, rows);
+  if (rows.tabbar && snap.screens && snap.screens.home) rows.tabbar.text = 'per tab, as Built screens → Home → Tab bar lists';
   curId = 'screens';
   ctx._kitRows = rows;
   const scr = snap.screens ? aibScreenModel(ctx, snap.screens, name) : null;
@@ -1457,7 +1484,9 @@ function aibKitFixContrast(ctx, rows) {
   Object.keys(rows).forEach(id => {
     const r = rows[id], t = r.tp, f = r.main;
     if (!t || !t.color || (t.fs || 0) >= 24 || (f.img && f.img !== 'none')) return;   // gradient fills: aibGradContrast
-    const tc = halves(t.color), fc = halves(t !== f && aibAlpha(t.bg) >= 0.5 ? t.bg : (r.groundRaw || f.bg));
+    // text beside its control (toggle, checkbox and radio labels, the empty state's title) sits on the canvas, not on the control
+    const beside = /^(toggle|checkbox|radio|empty|slider)$/.test(id);
+    const tc = halves(t.color), fc = halves(t !== f && aibAlpha(t.bg) >= 0.5 ? t.bg : beside ? '' : (r.groundRaw || f.bg));
     const fix = [0, 1].map(i => {
       const tp = aibRgba(tc[i] || tc[0]), fp = aibRgba(fc[i] || fc[0]);
       if (!tp) return null;
@@ -1561,6 +1590,21 @@ function aibScreenExtra(root, k, id) {
     const hl = h.querySelector('.ab-hl'), glue = h.querySelector('.ab-hl-glue');
     ex.stopOutside = !!(glue && hl && /[.!?,…]$/.test(glue.textContent.trim()) && !/[.!?,…]$/.test(hl.textContent.trim()));
   }
+  const isl = root.parentNode && root.parentNode.parentNode && root.parentNode.parentNode.querySelector('.sb-island');
+  const rb0 = rect(root);
+  if (isl && rect(isl).w > 0) { const r = rect(isl); ex.island = { w: Math.round(r.w), h: Math.round(r.h), y: Math.round(r.y - rb0.y) }; }
+  const time = root.querySelector('.sb-statusbar > span'), icons = root.querySelector('.sb-sb-r');
+  if (time) ex.timeX = Math.round(rect(time).x - rb0.x);
+  if (icons) ex.iconsR = Math.round(rb0.r - rect(icons).r);
+  if (h && ex.tiles && ex.tiles.length) {
+    const tl = Array.from(h.querySelectorAll('[aria-hidden] *')).filter(e => { const c = getComputedStyle(e); return aibAlpha(c.backgroundColor) > 0.3 && e.children.length === 0 && String(e.textContent).trim(); });
+    const cs = tl.map(e => getComputedStyle(e));
+    ex.tileFs = Math.round(Math.max(...cs.map(c => parseFloat(c.fontSize) || 0)));
+    ex.tileMinW = Math.round(Math.min(...tl.map(e => e.offsetWidth || rect(e).w)));
+    ex.tilePad = [Math.round(parseFloat(cs[0].paddingTop) || 0), Math.round(parseFloat(cs[0].paddingLeft) || 0)];
+    const ls = Array.from(h.querySelectorAll('[aria-hidden] .xpl')).map(rect);
+    if (ls.length > 1) ex.lineGap = Math.max(0, Math.round(ls[1].y - (ls[0].y + ls[0].h)));
+  }
   const body = root.querySelector('.sb-ob-body');
   if (body) { const lh = parseFloat(getComputedStyle(body).lineHeight) || 24; ex.bodyLines = Math.round(rect(body).h / lh); ex.bodyChars = body.textContent.trim().length; }
   const size = sel => { const e = root.querySelector(sel); return e ? Math.round(rect(e).w) : 0; };
@@ -1584,7 +1628,8 @@ function aibScreenExtra(root, k, id) {
 // below the previous block's bottom; only pinned parts (top band, bottom actions, tab bar) give a y from the top
 // of the screen. Every block sits on the 20pt side margins (350pt wide) unless a step says otherwise.
 function aibScreenModel(ctx, S, name) {
-  const T = o => (o ? aibKitType(ctx, o, name) + (aibAlpha(o.bg) >= 0.03 ? `, on a ${aibKitFill(o, name)} strip${o.w ? ` ${Math.round(o.w)}pt wide` : ''}` : '') : '');
+  const stripH = o => Math.round(o.bs === 'border-box' ? o.h : o.h + (o.pad ? o.pad[0] + o.pad[2] : 0) + (o.b ? o.b[0].w + o.b[2].w : 0));
+  const T = o => (o ? aibKitType(ctx, o, name) + (aibAlpha(o.bg) >= 0.03 ? `, on a ${aibKitFill(o, name)} strip${o.w ? ` ${Math.round(o.w)}pt wide` : ''}, ${stripH(o)}pt tall${o.pad && o.pad.some(v => v) ? ` (that height includes its ${aibKitPad(o)})` : ''}` : '') : '');
   const F = o => { const f = o ? aibKitFill(o, name) : 'none'; return f === 'none' ? 'no fill' : f; };
   const E = o => { const e = o ? aibKitEdge(o, name) : 'no edge'; return e === 'no edge' ? '' : `, a ${e} edge`; };
   const SH = o => { const t = o ? aibKitShadow(o.sh, name, o.filter).text : ''; return t ? `, ${t}` : ''; };
@@ -1599,18 +1644,19 @@ function aibScreenModel(ctx, S, name) {
   const XW = W.extra || {}, XH = H.extra || {};
   const status = P => {
     const ic = ['signal', 'wifi', 'battery'].map(k => P[k]).filter(Boolean);
-    return `Status bar (pinned, the top ${P['status bar'].rect.h}pt): the time ${q(P.time && P.time.text)} at the left in ${T(P.time && P.time.box)}; at the right ${ic.length ? `signal bars (four rising bars, ${P.signal ? P.signal.rect.w + 'x' + P.signal.rect.h : ''}pt), Wi-Fi (three arcs, ${P.wifi ? P.wifi.rect.w + 'x' + P.wifi.rect.h : ''}pt) and the battery (a rounded outline with its charge level and a small cap, ${P.battery ? P.battery.rect.w + 'x' + P.battery.rect.h : ''}pt)` : 'signal, Wi-Fi and battery'} in ${name(((ic[0] || P['status bar']).box).color)}.`;
+    return `Status bar (pinned, the top ${P['status bar'].rect.h}pt): the time ${q(P.time && P.time.text)} at the left in ${T(P.time && P.time.box)}; at the right ${ic.length ? `signal bars (four rising bars, ${P.signal ? P.signal.rect.w + 'x' + P.signal.rect.h : ''}pt), Wi-Fi (three arcs, ${P.wifi ? P.wifi.rect.w + 'x' + P.wifi.rect.h : ''}pt) and the battery (a rounded outline with its charge level and a small cap, ${P.battery ? P.battery.rect.w + 'x' + P.battery.rect.h : ''}pt)` : 'signal, Wi-Fi and battery'} in ${name(((ic[0] || P['status bar']).box).color)}. ${(P.extra || {}).timeX != null ? `The time starts ${P.extra.timeX}pt from the left edge and the icons end ${P.extra.iconsR}pt from the right edge. ` : ''}${(P.extra || {}).island ? `A Dynamic Island is drawn: a ${P.extra.island.w}x${P.extra.island.h}pt black pill centred ${P.extra.island.y}pt from the top (a device mock; leave it to the system).` : 'No Dynamic Island is drawn.'}`;
   };
   const band = P => (P && aibAlpha(P.box.bg) >= 0.03 ? `a full-width band filled ${F(P.box)}${E(P.box)}` : `no band fill (on the canvas)${E(P && P.box)}`);
   const home = X => (X.homebar ? `Home indicator (pinned): a ${X.homebar.w}x${X.homebar.h}pt ${name(X.homebar.color)} pill, centred, ${X.homebar.bottom}pt above the bottom edge.` : '');
   if (W['status bar']) {
+    W.extra = XW;
     out.welcome.push(status(W));
     ctx._nameHint = 'logo';
     const chip = vis(W['logo chip']), img = vis(W['logo image']), ini = W['logo initial'];
     const logo = img ? `the logo image, ${img.rect.h}pt high` : chip ? `a ${chip.rect.w}x${chip.rect.h}pt logo chip (${F(chip.box)}, ${aibKitCorner(chip.box)}${E(chip.box)}${SH(chip.box)}) ${ini && vis(ini) && ini.text ? `holding the initial ${q(ini.text)} in ${T(ini.box)}` : 'with no letter'}${withMk(chip, 'logo chip')}${ini && mk(ini, 'logo chip') ? `, and inside it ${mk(ini, 'logo chip')}` : ''}` : '';
     const wm = W.wordmark ? `the name ${q(W.wordmark.text)} in ${T(W.wordmark.box)}${withMk(W.wordmark, 'name')}` : '';
     const tr = W['top row'];
-    if (tr) out.welcome.push(`Top band (pinned at ${tr.rect.y}pt from the top of the screen, ${tr.rect.h}pt high), ${band(tr)}${withMk(tr, 'top band')}; inside it: ${[logo, wm].filter(Boolean).join(', then ')}${W.skip ? `, and a ${q(W.skip.text)} text button at the right margin (${T(W.skip.box)})` : ''}.`);
+    if (tr) out.welcome.push(`Top band (pinned at ${tr.rect.y}pt from the top of the screen, ${tr.rect.h}pt high), ${band(tr)}${withMk(tr, 'top band')}${W.brand && mk(W.brand, 'top band') ? `, with ${mk(W.brand, 'top band')}` : ''}; inside it: ${[logo, wm].filter(Boolean).join(', then ')}${W.skip ? `, and a ${q(W.skip.text)} text button at the right margin (${T(W.skip.box)})` : ''}.`);
     const topGap = gap(tr, W.eyebrow || W.headline), botGap = W['feature list'] && W.pager ? gap(W['feature list'], W.pager) : null;
     const centred = botGap != null && Math.abs(topGap - botGap) <= 12;
     const stamp = o => { if (!o) return ''; const e = aibKitEdge(o, name); const tf = aibKitTransform(o.tf).split(', ').filter(x => /^rotated/.test(x)).join(''); return [e !== 'no edge' ? `boxed by a ${e} edge` : '', e !== 'no edge' && o.pad && o.pad.some(v => v) ? `padding ${Math.round(o.pad[0])} ${Math.round(o.pad[1])}pt` : '', tf].filter(Boolean).join(', '); };
@@ -1619,7 +1665,7 @@ function aibScreenModel(ctx, S, name) {
     ctx._nameHint = 'title-tile';
     if (hd) {
       const lines = XW.titleLines || [];
-      const brk = lines.length > 1 ? ` The Built view breaks it into ${lines.length} lines (${lines.map(q).join(' / ')}), breaking after ${lines.slice(0, -1).map(l => q(l.split(' ').pop())).join(' and ')}; set \`text-wrap: balance\` so no word is ever alone on a line.` : ' It fits on one line; set `text-wrap: balance` so a longer tagline never leaves one word alone on a line.';
+      const brk = lines.length > 1 ? ` The Built view breaks it into ${lines.length} lines (${lines.map(q).join(' / ')}), breaking after ${lines.slice(0, -1).map(l => q(l.split(' ').pop())).join(' and ')}: insert a line break after ${lines.slice(0, -1).map(l => q(l.split(' ').pop())).join(' and ')} for this tagline, and also set \`text-wrap: balance\` so other taglines never leave a word alone on a line.` : ' It fits on one line; set `text-wrap: balance` so a longer tagline never leaves one word alone on a line.';
       let how = `in ${T(hd.box)}${hd.box.lh ? ` on a ${Math.round(parseFloat(hd.box.lh))}pt line` : ''}`;
       if (XW.pixel) {
         const face = ctx.state.headingFont;
@@ -1631,19 +1677,19 @@ function aibScreenModel(ctx, S, name) {
         const grounds = Array.from(new Set(XW.tiles.map(t => { const fx = aibPairFix(ctx, t.color, t.bg, (t.h || 0) >= 24, `title tile ${name(t.bg)}`); return `${name(t.bg)} with ${fx ? fx.token : name(t.color)} letters`; })));
         const tilt = Math.max(...XW.tiles.map(t => Math.abs(t.deg)));
         const whole = XW.tiles.filter(t => t.word).map(t => q(t.t));
-        how = `as ransom-note tiles: most words are cut into one tile per letter, each tile cycling the faces ${faces.join(' and ')} and the grounds ${grounds.slice(0, 6).join(', ')}${whole.length ? `; the words ${whole.join(' and ')} are each one whole-word tile` : ''}; about one tile in three is tilted, by up to ±${Math.round(tilt * 10) / 10}°, tiles touch within a word and words sit ${XW.wordGap || 6}pt apart; tile height about ${Math.round(Math.max(...XW.tiles.map(t => t.h)))}pt so the title fills ${lines.length || 2} lines in ${XW.titleH}pt`;
-        if (XW.loop) how += `; the highlight word ${q(String(XW.loop.word).trim())} is circled by a hand-drawn ${name(XW.loop.color)} marker loop`;
+        how = `as ransom-note tiles: most words are cut into one tile per letter, each tile cycling the faces ${faces.join(' and ')} and the grounds ${grounds.slice(0, 6).join(', ')}${whole.length ? `; the words ${whole.join(' and ')} are each one whole-word tile` : ''}; about one tile in three is tilted, by up to ±${Math.round(tilt * 10) / 10}°, tiles touch within a word and words sit ${XW.wordGap || 6}pt apart; letters ${XW.tileFs || 34}pt, tiles ${Math.round(Math.max(...XW.tiles.map(t => t.h)))}pt tall and at least ${XW.tileMinW || 16}pt wide with ${XW.tilePad ? `${XW.tilePad[0]}pt top/bottom and ${XW.tilePad[1]}pt side` : 'tight'} padding, ${XW.lineGap != null ? `${XW.lineGap}pt between lines, ` : ''}filling ${lines.length || 2} lines in ${XW.titleH}pt`;
+        if (XW.loop) how += `; the highlight is the last word's tiles sitting inside a hand-drawn ${name(XW.loop.color)} marker loop, as drawn (no swipe or block)`;
       }
-      out.welcome.push(`${gap(W.eyebrow || tr, hd)}pt below the previous block: the welcome title, the brand's tagline word for word, ${how}.${brk}${withMk(hd, 'welcome title') ? ' Around it' + withMk(hd, 'welcome title').replace(/^,/, ':') + '.' : ''} Its last word carries the highlight (see Colors)${XW.stopOutside ? '; the full stop sits just outside the coloured part, inside the same nowrap span' : ''}.`);
+      out.welcome.push(`${gap(W.eyebrow || tr, hd)}pt below the previous block: the welcome title, the brand's tagline word for word, ${how}.${brk}${withMk(hd, 'welcome title') ? ' Around it' + withMk(hd, 'welcome title').replace(/^,/, ':') + '.' : ''} ${S.welcome && S.welcome.highlight && aibHlWords(ctx, S.welcome.highlight, hd.box, name) || XW.tiles || XW.pixel ? ` Its last word carries the highlight (see Colors)${XW.stopOutside ? '; the full stop sits just outside the coloured part, inside the same nowrap span' : ''}.` : ' No word is highlighted in this style.'}`);
     }
-    if (W.body) out.welcome.push(`${below(hd, W.body)}: one sentence of body in ${T(W.body.box)}${withMk(W.body, 'body text')}, ${XW.bodyLines || 2} lines at most (about ${XW.bodyChars || 90} characters here).`);
+    if (W.body) out.welcome.push(`${below(hd, W.body)}: one sentence of body in ${T(W.body.box)}${E(W.body.box) ? `, with ${E(W.body.box).replace(/^, /, '')}${W.body.box.pad && W.body.box.pad[3] ? ` and ${Math.round(W.body.box.pad[3])}pt of space between it and the text` : ''}` : ''}${withMk(W.body, 'body text')}, ${XW.bodyLines || 2} lines at most (about ${XW.bodyChars || 90} characters here).`);
     const fl = W['feature list'];
     ctx._nameHint = 'feature';
     if (fl) {
       const ico = W['feature icon chip'], r1 = W['feature row'], r2 = W['second feature row'];
       const noLeader = m => String(m || '').split('; ').filter(x => !/leader line/.test(x)).join('; ');
       const rowMk = r1 && noLeader(mk(r1, 'feature rows')), row2Mk = r2 && noLeader(mk(r2, 'feature rows'));
-      out.welcome.push(`${below(W.body || hd, fl)}: ${r1 ? r1.n : 3} feature rows, ${S.welcome.listInfo ? S.welcome.listInfo.rowH : r1.rect.h}pt each. Each starts with ${ico ? `a ${ico.rect.w}x${ico.rect.h}pt icon chip (${F(ico.box)}, ${aibKitCorner(ico.box)}${E(ico.box)}${SH(ico.box)}) holding a ${XW.icons && XW.icons.chip || 18}pt icon in ${name(ico.box.color)}` : 'a leading icon'}, then the title in ${T(W['feature title'] && W['feature title'].box)}. ${aibCap(aibListWords(S.welcome.listInfo, name).replace(/^grouping: /, ''))}${mk(fl, 'feature list') ? `; around the whole group: ${mk(fl, 'feature list')}` : ''}${rowMk && rowMk !== row2Mk ? `; the first row only: ${rowMk}` : rowMk ? `; on every row: ${rowMk}` : ''}.`);
+      out.welcome.push(`${below(W.body || hd, fl)}: ${r1 ? r1.n : 3} feature rows, ${S.welcome.listInfo ? S.welcome.listInfo.rowH : r1.rect.h}pt each. ${fl.box.pad && fl.box.pad.some(v => v) ? `The group has ${aibKitPad(fl.box)}. ` : ''}Each starts with ${ico ? `a ${ico.rect.w}x${ico.rect.h}pt icon chip (${F(ico.box)}, ${aibKitCorner(ico.box)}${E(ico.box)}${SH(ico.box)}) holding a ${XW.icons && XW.icons.chip || 18}pt icon in ${name(ico.box.color)}` : 'a leading icon'}, then the title in ${T(W['feature title'] && W['feature title'].box)}. ${aibCap(aibListWords(S.welcome.listInfo, name).replace(/^grouping: /, ''))}${mk(fl, 'feature list') ? `; around the whole group: ${mk(fl, 'feature list')}` : ''}${rowMk && rowMk !== row2Mk ? `; the first row only: ${rowMk}` : rowMk ? `; on every row: ${rowMk}` : ''}.`);
     }
     ctx._nameHint = 'pager';
     const pb = W['primary button'], sb = W['second button'];
@@ -1658,15 +1704,18 @@ function aibScreenModel(ctx, S, name) {
   }
   if (H['status bar']) {
     ctx._nameHint = 'home';
+    H.extra = XH;
     out.home.push(status(H));
     const t = H.title, ey = H.eyebrow, tb = H['top band'];
     const bell = H['bell button'], bd = H['bell dot'];
-    if (tb) out.home.push(`Top band (pinned at ${tb.rect.y}pt from the top of the screen, ${tb.rect.h}pt high), ${band(tb)}${withMk(tb, 'top band')}; inside it: ${ey ? `the eyebrow ${q(ey.text)} in ${T(ey.box)}${withMk(ey, 'eyebrow')}; ${gap(ey, t)}pt below it ` : ''}${t ? `the screen title ${q(t.text)} in ${T(t.box)}${withMk(t, 'screen title')}` : ''}${bell ? `; at the right margin the notifications Icon button (${bell.rect.w}x${bell.rect.h}pt, as its kit row, ${XH.icons && XH.icons.bell || 20}pt bell)${bd ? ` with a ${bd.rect.w}pt ${F(bd.box)} status dot${SH(bd.box)} on its top-right corner` : ''}` : ''}.`);
+    if (tb) out.home.push(`Top band (pinned at ${tb.rect.y}pt from the top of the screen, ${tb.rect.h}pt high), ${band(tb)}${withMk(tb, 'top band')}; inside it: ${ey ? `the eyebrow ${q(ey.text)} in ${T(ey.box)}${withMk(ey, 'eyebrow')}; ${gap(ey, t)}pt below it ` : ''}${t ? `the screen title ${q(t.text)} in ${T(t.box)}${withMk(t, 'screen title')}` : ''}${bell ? (() => { const inEy = ey && aibAlpha(ey.box.bg) >= 0.03 && bell.rect.y >= ey.rect.y - 2 && bell.rect.y + bell.rect.h <= ey.rect.y + ey.rect.h + 2; const look = [F(bell.box) === 'no fill' ? '' : F(bell.box), E(bell.box).replace(/^, /, ''), SH(bell.box).replace(/^, /, '')].filter(Boolean).join(', '); return `; ${inEy ? `inside the eyebrow's strip, at its right end,` : 'at the right margin,'} the notifications button: ${look ? `a ${bell.rect.w}x${bell.rect.h}pt button (${look}) holding a` : 'a bare'} ${XH.icons && XH.icons.bell || 20}pt bell icon in ${name(bell.box.color)}${look ? '' : ` with a ${bell.rect.w}x${bell.rect.h}pt hit area and no ring or fill`}${bd ? `, with a ${bd.rect.w}pt ${F(bd.box)} status dot${SH(bd.box)} on its top-right corner` : ''}`; })() : ''}.`);
     const c = H['summary card'];
     if (c) {
       const seg = H['card segmented control'], ctit = H['card title'], cb = H['card body'], cbtn = H['card button'];
       const rel = P => (P ? `${P.rect.y - c.rect.y}pt` : '');
-      const inner = [seg && `the Segmented control at ${rel(seg)} (${seg.rect.h}pt tall)`, ctit && `the card title ${q(ctit.text)} at ${rel(ctit)} (${ctit.rect.h}pt, ${T(ctit.box)}${withMk(ctit, 'card title')})`, cb && `the body at ${rel(cb)} (${cb.rect.h}pt, ${T(cb.box)}${withMk(cb, 'card body')})`, cbtn && `the Primary button ${q(cbtn.text)} at ${rel(cbtn)} (${cbtn.rect.h}pt, label ${XH.label || 'centred'}${XH.arrowIn != null ? `, trailing mark ${XH.arrowIn}pt in from the right edge` : ', no trailing mark'})`].filter(Boolean);
+      const so = H['card selected segment'], oo = H['card other segment'];
+      const segTxt = seg ? `the Segmented control at ${rel(seg)} (${seg.rect.h}pt tall${so ? `; segments ${so.rect.w}pt wide with ${aibKitPad(so.box) || 'no padding'}; selected: text ${name(so.box.color)} on ${F(so.box)}${E(so.box)}${mk(so, 'segment') ? ', ' + mk(so, 'segment') : ''}` : ''}${oo ? `; unselected: text ${name(oo.box.color)} on ${F(oo.box)}${E(oo.box)}${mk(oo, 'segment') ? ', ' + mk(oo, 'segment') : ''}` : ''})` : '';
+      const inner = [segTxt, ctit && `the card title ${q(ctit.text)} at ${rel(ctit)} (${ctit.rect.h}pt, ${T(ctit.box)}${withMk(ctit, 'card title')})`, cb && `the body at ${rel(cb)} (${cb.rect.h}pt, ${T(cb.box)}${withMk(cb, 'card body')})`, cbtn && `the Primary button ${q(cbtn.text)} at ${rel(cbtn)} (${cbtn.rect.h}pt, label ${XH.label || 'centred'}${XH.arrowIn != null ? `, trailing mark ${XH.arrowIn}pt in from the right edge` : ', no trailing mark'})`].filter(Boolean);
       const last = cbtn || cb || ctit || seg;
       out.home.push(`${gap(tb || t, c)}pt below the band: the summary Card, full width, ${c.rect.h}pt tall${withMk(c, 'card')}. Inside, as y offsets from the card's top edge (these replace the kit card's padding): ${inner.join(', ')}; ${last ? `${c.rect.y + c.rect.h - (last.rect.y + last.rect.h)}pt below the button to the card's bottom edge` : ''}.`);
     }
@@ -1676,7 +1725,7 @@ function aibScreenModel(ctx, S, name) {
       const r1 = H.row, r2 = H['second row'];
       const rowMk = r1 && mk(r1, 'list rows'), row2Mk = r2 && mk(r2, 'list rows');
       const tMk = mk(H['row title'], 'row title'), vMk = mk(H['row value'], 'row value');
-      out.home.push(`${below(sec, li)}: the list, ${r1 ? r1.n : ''} rows of ${S.home.listInfo ? S.home.listInfo.rowH : r1.rect.h}pt: the avatar, the title in ${T(H['row title'] && H['row title'].box)}${H['row title'] && H['row title'].box.tt === 'none' ? ' (sentence case, as written)' : ''}${tMk ? ` (${tMk})` : ''}, a detail line in ${T(H['row detail'] && H['row detail'].box)}${mk(H['row detail'], 'row detail') ? ` (${mk(H['row detail'], 'row detail')})` : ''}, and the value with a ${XH.icons && XH.icons.chevron || 16}pt chevron at the right in ${T(H['row value'] && H['row value'].box)}${vMk ? ` (${vMk})` : ''}. ${aibCap(aibListWords(S.home.listInfo, name).replace(/^grouping: /, ''))}${mk(li, 'list') ? `; around the whole group: ${mk(li, 'list')}` : ''}${rowMk && rowMk !== row2Mk ? `; the first row only: ${rowMk}` : rowMk ? `; on every row: ${rowMk}` : ''}.${(() => { const tbY = H['tab bar'] ? H['tab bar'].rect.y : 761; const left = tbY - (li.rect.y + li.rect.h); return left > 80 ? ` Home shows exactly ${r1 ? r1.n : 3} rows, as the Built view does; the list ends ${left}pt above the tab bar and that space stays empty.` : ' It scrolls under the tab bar and ends on a whole row above it.'; })()}`);
+      out.home.push(`${below(sec, li)}: the list, ${r1 ? r1.n : ''} rows of ${S.home.listInfo ? S.home.listInfo.rowH : r1.rect.h}pt: the avatar, the title in ${T(H['row title'] && H['row title'].box)}${H['row title'] && H['row title'].box.tt === 'none' ? ' (sentence case, as written)' : ''}${tMk ? ` (${tMk})` : ''}, a detail line in ${T(H['row detail'] && H['row detail'].box)}${mk(H['row detail'], 'row detail') ? ` (${mk(H['row detail'], 'row detail')})` : ''}, and the value with a ${XH.icons && XH.icons.chevron || 16}pt chevron at the right in ${T(H['row value'] && H['row value'].box)}${vMk ? ` (${vMk})` : ''}. ${aibCap(aibListWords(S.home.listInfo, name).replace(/^grouping: /, ''))}${mk(li, 'list') ? `; around the whole group: ${mk(li, 'list')}` : ''}${rowMk && rowMk !== row2Mk ? `; the first row only: ${rowMk}` : rowMk ? `; on every row: ${rowMk}` : ''}${r1 && r2 && F(r1.box) !== F(r2.box) ? `; the first row is filled ${F(r1.box)}${E(r1.box)} while the others are ${F(r2.box)}` : ''}. ${(() => { const av = ((S.home.copy || {}).avatars || []).filter(Boolean); return av.length ? `Avatars show ${av.every(a => a.length === 1) ? 'one initial' : av.every(a => a.length === 2) ? 'two initials' : 'one or two initials'} (${av.map(q).join(', ')}).` : ''; })()}${(() => { const tbY = H['tab bar'] ? H['tab bar'].rect.y : 761; const lr = H['last row'] || li; const left = tbY - (lr.rect.y + lr.rect.h); return left > 80 ? ` Home shows exactly ${r1 ? r1.n : 3} rows, as the Built view does; the list ends ${left}pt above the tab bar and that space stays empty.` : ' It scrolls under the tab bar and ends on a whole row above it.'; })()}`);
     }
     ctx._nameHint = 'tab';
     const kt = ((ctx.kit && ctx.kit.rows) || ctx._kitRows || {}).tabbar, kitSel = kt && kt.tp ? name(kt.tp.color) : '';
@@ -1686,7 +1735,8 @@ function aibScreenModel(ctx, S, name) {
       const tabs = (S.home.copy || {}).tabs || [];
       const ico = v => name(String(v || '').split('|')[0]);
       const chip = XH.tabChip && aibAlpha(XH.tabChip.bg) >= 0.03 ? `the label alone sits on a chip (${F(stl.box)}, the text width plus ${Math.round(XH.tabChip.padX)}pt each side, ${Math.round(XH.tabChip.padY)}pt above and below${XH.tabChip.r ? `, ${Math.round(XH.tabChip.r)}pt corners` : ''})` : `the label has no chip`;
-      out.home.push(`Tab bar (pinned at ${tbar.rect.y}pt from the top of the screen, ${tbar.rect.h}pt including the home indicator): ${F(tbar.box)}${aibKitEdge(tbar.box, name) !== 'no edge' ? `, a ${aibKitEdge(tbar.box, name)} rule` : ''}, ${Math.round(tbar.box.pad[3])}pt side padding; ${tabs.length} tabs (${tabs.map(([l, g]) => `${q(l)} with the ${g} icon`).join(', ')}), each a ${XH.icons && XH.icons.tab || 24}pt icon over its label. Tab cells are transparent. Selected tab: ${chip}, label text ${stl ? name(stl.box.color) : ''}, icon ${ico(XH.tabIcon && XH.tabIcon.on)}${st && mk(st, 'tab bar') ? `, with ${mk(st, 'tab bar')}` : ''}. Other tabs: label text ${otl ? name(otl.box.color) : ''}, icon ${ico(XH.tabIcon && XH.tabIcon.off)}, no chip. Labels are text, never solid blocks of the label colour.`);
+      const per = tabs.map(([l, g, lc, lb, ic, on]) => `${q(l)}${on ? ' (selected)' : ''}: ${g} icon in ${name(ic)}, label ${name(lc)}${aibAlpha(lb) >= 0.03 ? ` on a ${name(lb)} chip` : ''}`);
+      out.home.push(`Tab bar (pinned at ${tbar.rect.y}pt from the top of the screen, ${tbar.rect.h}pt including the home indicator): ${F(tbar.box)}${aibKitEdge(tbar.box, name) !== 'no edge' ? `, a ${aibKitEdge(tbar.box, name)} rule` : ''}, ${Math.round(tbar.box.pad[3])}pt side padding; ${tabs.length} tabs, each a ${XH.icons && XH.icons.tab || 24}pt icon over its label, tab cells transparent. Per tab, as the Home screen draws it: ${per.join('; ')}. ${/no chip/.test(chip) ? 'The selected label has no chip' : 'On the selected tab ' + chip}${st && mk(st, 'tab bar') ? `, with ${mk(st, 'tab bar')}` : ''}. Labels are text, never solid blocks of the label colour. On Settings the selected tab is ${q((tabs[tabs.length - 1] || [''])[0])} (Settings lives under it).`);
     }
     if (home(XH)) out.home.push(home(XH));
     const cp = S.home.copy || {};
@@ -1769,6 +1819,12 @@ function aibKitApply(ctx) {
     row.job = `${aibStrip(head)}. In the UI kit: ${where.length ? (k === 'primary' ? where : where.map(w => w.split(' (')[0])).join(k === 'primary' ? '; ' : ', ')
       : same ? `drawn as \`${same.token}\` (the same value here) wherever a kit row shows an error or destructive state` : 'not drawn by any component'}.`;
   });
+  const mutedRow = ctx.rows.find(r => r.token === '--muted');
+  const styleMuted = ctx.rows.find(r => /^--ab-.*mut/.test(r.token));
+  if (mutedRow && styleMuted) {
+    const w = aibKitWhere(ctx, '--muted').map(x => x.split(' (')[0]);
+    mutedRow.job = `Secondary text from the palette. In the UI kit: ${w.length ? w.join(', ') : 'not drawn by any component'}. \`${styleMuted.token}\` is ${ctx.def.name}'s own muted colour for the components its row lists; use each only where stated.`;
+  }
   aibKitCardTokens(ctx, R, valueIn);
   // Tokens no component or screen draws leave the Colors table and :root for a one-line footnote.
   const blob = Object.keys(R).map(id => { const r = R[id]; return [r.fill, r.text, r.edge, r.marks.join(' '), r.states.join(' ')].join(' '); }).join(' ')
@@ -1843,7 +1899,7 @@ function aibSecSignature(ctx) {
   out.push(`- Surfaces: ${['card', 'list', 'sheet'].map(surf).filter(Boolean).join('; ')}.`);
   const tt = o => (o ? aibKitType(ctx, o, name).replace(/^[^,]+, /, '').replace(/ \d+(?:\.\d+)?pt/, '') : '');
   const S = K.screens;
-  const type = [S && S.pixel && ctx.state.headingFont ? `welcome and screen titles ${ctx.state.headingFont.name} (display), uppercase` : S && S.display ? `welcome title ${tt(S.display)}` : '', R.divider ? `section labels ${tt(R.divider.main)}` : '', R['btn-primary'] ? `button labels ${tt(R['btn-primary'].main)}` : ''].filter(Boolean);
+  const type = [S && S.pixel && ctx.state.headingFont ? `welcome title ${ctx.state.headingFont.name} (display), uppercase` : S && S.display ? `welcome title ${tt(S.display)}` : '', R.divider ? `section labels ${tt(R.divider.main)}` : '', R['btn-primary'] ? `button labels ${tt(R['btn-primary'].main)}` : ''].filter(Boolean);
   out.push(`- Type: ${type.join('; ')}.`);
   const pb = R['btn-primary'];
   const segSel = R.segmented && R.segmented.rest.selected && R.segmented.rest.selected.box;
@@ -2197,7 +2253,7 @@ function aibSecColors(ctx) {
   const { def } = ctx;
   const inkCta = def.ctaFill === 'ink';
   const out = ['## Colors', aibColorsTable(ctx)];
-  if (ctx.unusedRows && ctx.unusedRows.length) out.push(`Palette colours no app component draws (brand board and app icon only): ${ctx.unusedRows.map(r => `\`${r.token}\` ${ctx.modes.map(m => r.get(m)).filter((v, i, a) => a.indexOf(v) === i).join(' / ')}`).join(', ')}.`);
+  if (ctx.unusedRows && ctx.unusedRows.length) out.push(`Palette colours no app component draws (brand board and app icon only; they stay in \`:root\`): ${ctx.unusedRows.map(r => `\`${r.token}\` ${ctx.modes.map(m => r.get(m)).filter((v, i, a) => a.indexOf(v) === i).join(' / ')}`).join(', ')}.`);
   if (ctx.web && ctx.swift) out.push('SwiftUI name: `Palette.` plus the camelCase token (`--on-primary` is `Palette.onPrimary`).');
   if (ctx.kit) {
     const hlRule = aibHighlightRule(ctx);
@@ -2236,6 +2292,7 @@ function aibHighlightRule(ctx) {
       const plain = sents.find(x => /running|UI text|in the app|in text/i.test(x));
       let how2 = plain ? plain.replace(/^In running UI text,?\s*/i, '').replace(/^the highlight word is\s*/i, '').replace(/\.$/, '') : /primary|inverse/i.test(def.highlightNote || '') ? 'a `--primary` block behind it with `--on-primary` text, padding 0 0.15em' : 'set in `--accent-ink`';
       let letters = '';
+      if (S.tiles) return `- Highlight word: ${one}. The Built view builds the welcome title from tiles (see Built screens); the highlight is the last word's tiles sitting inside a hand-drawn marker loop, exactly as Built screens describes, with no swipe or block behind them.`;
       if (/swipe|highlighter|block|behind/i.test(how2)) {
         const L = ctx.modes.find(m => m.mode === 'light') || ctx.modes[0], D = ctx.modes.find(m => m.mode === 'dark') || L;
         const groundTk = /fluoro/i.test(how2) && aibTokenValue(ctx, '--ab-fluoro', L) ? '--ab-fluoro' : /primary/i.test(how2) ? '--primary' : '--accent';
@@ -2774,7 +2831,7 @@ function aibCssLines(ctx, full) {
     return modes.length === 1 || v[0] === v[1] ? v[0] : `light-dark(${v[0]}, ${v[1]})`;
   };
   const colourTokens = [];
-  ctx.rows.forEach(r => {
+  (ctx.app ? ctx.rows.concat(ctx.unusedRows || []) : ctx.rows).forEach(r => {
     if (!colourTokens.some(x => x[0] === r.token)) colourTokens.push([r.token, ld(r)]);
     r.on.forEach(([tk, g]) => { if (!colourTokens.some(x => x[0] === tk)) { const v = modes.map(m => g(m)); colourTokens.push([tk, modes.length === 1 || v[0] === v[1] ? v[0] : `light-dark(${v[0]}, ${v[1]})`]); } });
   });
@@ -2818,10 +2875,11 @@ function aibCssApp(ctx, colourTokens) {
   const { build, scale, radius, modes } = ctx;
   const mo = build.motion, sw = build.sw, sh = build.sh || {};
   const L = modes.find(m => m.mode === 'light') || modes[0], D = modes.find(m => m.mode === 'dark');
+  const allRows = ctx.rows.concat(ctx.unusedRows || []);
   const valueOf = (tk, m) => {
-    const r = ctx.rows.find(x => x.token === tk);
+    const r = allRows.find(x => x.token === tk);
     if (r) return r.get(m);
-    for (const x of ctx.rows) { const on = (x.on || []).find(([t]) => t === tk); if (on) return on[1](m); }
+    for (const x of allRows) { const on = (x.on || []).find(([t]) => t === tk); if (on) return on[1](m); }
     return '';
   };
   const names = colourTokens.map(([k]) => k);
@@ -3182,7 +3240,25 @@ function aibBuild(ctx) {
 }
 
 function buildAiBrief(state0, opts) {
-  return aibBuild(aibContext(state0, opts));
+  const ctx = aibContext(state0, opts);
+  let md = aibBuild(ctx);
+  if (ctx.app && ctx.kit) {
+    const css = (md.match(/```css\n[\s\S]*?```/) || [''])[0];
+    const defined = new Set(css.match(/--[a-z0-9-]+(?=:)/g) || []);
+    const prose = md.replace(/```[\s\S]*?```/g, '');
+    const skip = /^--(x|shadow-|font-|text-|space-|radius-|row|top-bar|tab-bar|status-bar|home-indicator|margin|hit|dur|ease)/;
+    const missing = Array.from(new Set(prose.match(/--[a-z][a-z0-9-]*[a-z0-9]/g) || [])).filter(t => !defined.has(t) && !skip.test(t) && ctx.modes.every(m => aibRgba(aibTokenValue(ctx, t, m))));
+    if (missing.length) {
+      missing.forEach(t => { const v = {}; ctx.modes.forEach(m => { v[m.mode] = aibTokenValue(ctx, t, m); }); ctx.rows.push({ token: t, get: m => v[(m && m.mode) || ctx.modes[0].mode] || v[ctx.modes[0].mode], job: 'Named in this brief (a colour of the style).', on: [] }); });
+      ctx._phone = null;
+      md = aibBuild(ctx);
+    }
+  }
+  // zero distances read as words, outside code blocks ("0pt apart" -> "with no gap")
+  return md.split(/(```[\s\S]*?```)/).map((part, i) => (i % 2 ? part : part
+    .replace(/\b0pt apart\b/g, 'with no gap between them').replace(/\b0pt above and below\b/g, 'no space above and below')
+    .replace(/\b0pt (below|above) (it|the button|the previous block)/g, 'directly $1 $2').replace(/\b0pt in from\b/g, 'flush with')
+    .replace(/\b0pt\b/g, 'no'))).join('');
 }
 
 /* ---------------- checks: contradictions to resolve before copying ---------------- */
