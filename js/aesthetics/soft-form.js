@@ -58,7 +58,13 @@ registerAesthetic({
     let strongMuted = t.muted;
     const panelBg = t.isDark ? t.mix('#ffffff', t.canvas, 0.1) : t.canvas;
     for (let k = 0.05; k <= 1.001 && t.contrast(strongMuted, panelBg) < 4.6; k += 0.05) strongMuted = t.mix(t.ink, t.muted, k);
+    // small muted text (status words, axis labels, hints, nav): the muted pulled toward ink until it holds
+    // 4.6:1 on every surface it sits on (canvas, the lifted dark panel, the ink-tinted Built sidebar and the inset wells)
+    let mutedAA = t.muted;
+    const surfaces = [t.canvas, panelBg, t.mix(t.ink, t.canvas, 0.1)];
+    for (let k = 0.05; k <= 1.001 && surfaces.some(s => t.contrast(mutedAA, s) < 4.6); k += 0.05) mutedAA = t.mix(t.ink, t.muted, k);
     return {
+      '--ab-muted': mutedAA,
       '--ab-accent-ink': hl,
       // secondary text inside the glass card and the instrument panel: the muted pulled toward
       // ink until it holds 4.6:1 on the lifted dark-mode panel (the framework muted fell to 3.9-4.0:1)
