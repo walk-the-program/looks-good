@@ -283,3 +283,9 @@
 .ab[data-ae="blueprint"] :is(.ab-type-col[data-role="heading"] .ab-type-cur b, .ab-deck-ptitle, .ab-deck-pchip) { font-weight: var(--bp-hw, 600); }
 /* at 400 the 3:1 highlight chip needs large-text size */
 .ab[data-ae="blueprint"].ab-slide .ab-deck-pchip { font-size: 24px; }
+
+/* ---- Built landing: the title block's buttons and trust line ran flush to its border (the trust line touched the right edge); give them the block's 12px margin ---- */
+.ab.sb-ab[data-ae="blueprint"]:not([data-mode="light"]) .ab-hero-copy .sb-hero-act { margin-top: 14px; padding: 0 12px; }
+.ab.sb-ab[data-ae="blueprint"]:not([data-mode="light"]) .ab-hero-copy .sb-proof { padding: 0 12px; margin: 12px 0 12px !important; font-size: 11px; letter-spacing: 0; }
+/* Built settings: website and email share a row; a long name ends in an ellipsis, not a cut letter */
+.ab.sb-ab[data-ae="blueprint"] .sb-field-row .ab-input { text-overflow: ellipsis; letter-spacing: 0; font-size: 14px; }

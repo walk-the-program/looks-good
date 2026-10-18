@@ -349,3 +349,9 @@
 .ab.sb-ab[data-ae="mesh-gradient"] .sb-c-dot { z-index: 2; }
 .ab[data-ae="mesh-gradient"] .ab-row-bar i { background: linear-gradient(90deg, var(--ab-primary), var(--ab-m-hue)); }
 .ab.sb-ab[data-ae="mesh-gradient"] .sb-navi[aria-current] { background: linear-gradient(90deg, var(--ab-pri-tint), transparent); }
+
+/* ---- Built mobile welcome: the art box is ~196px square, so the spec card used to sit on the chart (labels hidden) and the approval chip on the spec card; show the chart card and the chip only ---- */
+.ab.sb-ab[data-ae="mesh-gradient"] .sb-ob-artbox .mga-code { display: none; }
+.ab.sb-ab[data-ae="mesh-gradient"] .sb-ob-artbox .mga-pay { left: 20%; top: 70%; width: 76%; }
+/* Built settings: website and email share a row; a long name ends in an ellipsis, not a cut letter */
+.ab.sb-ab[data-ae="mesh-gradient"] .sb-field-row .ab-input { text-overflow: ellipsis; }

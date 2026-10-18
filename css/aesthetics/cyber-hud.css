@@ -70,7 +70,7 @@
 }
 /* the highlight word: accent ink with a 2px primary / secondary chromatic split */
 .ab[data-ae="cyber-hud"] .ab-headline { text-shadow: 0 0 22px var(--ab-hud-glow); }
-.ab[data-ae="cyber-hud"] .ab-hl { color: var(--ab-accent-ink); text-shadow: -2px 0 var(--ab-split-a), 2px 0 var(--ab-split-b), 0 0 18px var(--ab-hud-glow-hi); background: none; }
+.ab[data-ae="cyber-hud"] .ab-hl { color: var(--ab-accent-ink); text-shadow: -0.04em 0 var(--ab-split-a), 0.04em 0 var(--ab-split-b), 0 0 18px var(--ab-hud-glow-hi); background: none; }
 .ab[data-ae="cyber-hud"][data-accent-text="low"] .ab-hl { background-image: none; }
 .ab[data-ae="cyber-hud"] .ab-subcopy { padding-left: 14px; border-left: 2px solid var(--ab-neon); max-width: 30em; }
 .ab[data-ae="cyber-hud"] .ab-sub-lead { color: var(--ab-ink); }
@@ -98,6 +98,7 @@
   font-size: clamp(7px, 2.2cqw, 10px); line-height: 1.35;
 }
 .ab[data-ae="cyber-hud"] .chs-call b { display: block; color: var(--ab-neon); font-weight: 700; text-shadow: 0 0 8px var(--ab-hud-glow); }
+.ab[data-ae="cyber-hud"] .chs-call { z-index: 2; } /* the leader line runs under the label, never through its text */
 
 /* ---- palette: readout swatches ---- */
 .ab[data-ae="cyber-hud"] .ab-swatches { counter-reset: hsw; }
@@ -243,3 +244,6 @@
 .ab.sb-ab[data-ae="cyber-hud"] .sb-main > .ab-rule { height: 1px; background: var(--ab-neon-line); }
 .ab.sb-ab[data-ae="cyber-hud"] .sb-top .ab-kicker::before { content: "\25AE\25AE\25AE"; }
 .ab.sb-ab[data-ae="cyber-hud"] .sb-icon-btn::before { content: none; }
+
+/* Built settings: website and email share a row; a long name ends in an ellipsis, not a cut letter */
+.ab.sb-ab[data-ae="cyber-hud"] .sb-field-row .ab-input { text-overflow: ellipsis; letter-spacing: 0; font-size: 14px; }

@@ -403,3 +403,13 @@
 .ab[data-ae="bento-grid"] .bnm-colour span { color: var(--ab-on-primary); }
 .ab[data-ae="bento-grid"] .bnm-render { grid-row: 1 / 4; }
 .ab[data-ae="bento-grid"] .bnm-flat b { font-size: 34px; }
+
+/* ---- Built screens: collisions found in the visual sweep ---- */
+/* the mobile welcome art box is ~150px, so the second floating chip would sit on the ring and repeat its 72%; keep the first only */
+.ab.sb-ab[data-ae="bento-grid"] .sb-ob-artbox .bna-c2 { display: none; }
+/* settings: the section blurb is bare text, not a tile (the tile fill left a ragged white pill behind it) */
+.ab.sb-ab[data-ae="bento-grid"] .sb-set-intro .ab-card-body { background: none; padding: 0; border-radius: 0; }
+/* settings: website and email share a row; long names end in an ellipsis instead of being cut mid-letter */
+.ab.sb-ab[data-ae="bento-grid"] .ab-panel .sb-field-row .ab-input { font-size: 14px; padding-left: 14px; padding-right: 14px; text-overflow: ellipsis; }
+/* landing feature numerals are 12px text: lift the dark-mode brand blue (3.3:1) toward the ink so they reach 4.5:1 */
+.ab.sb-ab[data-ae="bento-grid"] .sb-feat-n { color: color-mix(in srgb, var(--ab-primary-text) 55%, var(--ab-ink)); }

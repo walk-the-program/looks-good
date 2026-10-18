@@ -289,3 +289,12 @@
 /* deck colour slide: the "Aa" chips at a weight the heading face publishes, and at 24px so the 3:1 highlight
    chip is large text at any weight */
 .ab[data-ae="industrial-device"].ab-slide .ab-deck-pchip { font-weight: var(--id-hw7, 700); font-size: 24px; }
+
+/* ---- Built mobile welcome: the device is wider than tall, so the square art box left it pinned to the top with a dead gap below; size the box to the device and let the column centre it ---- */
+.ab.sb-ab[data-ae="industrial-device"] .ab-art.sb-ob-artbox { aspect-ratio: 100 / 64; width: 100%; height: auto; max-height: none; }
+/* Built settings: website and email share a row; a long name ends in an ellipsis, not a cut letter */
+.ab.sb-ab[data-ae="industrial-device"] .sb-field-row .ab-input { text-overflow: ellipsis; letter-spacing: 0; font-size: 12.5px; }
+/* ...and show the whole device there, closed on the right, rather than the narrow-board crop that sliced the key columns mid-key */
+.ab.sb-ab[data-ae="industrial-device"] .ab-art.sb-ob-artbox { margin: 0; overflow: visible; }
+.ab.sb-ab[data-ae="industrial-device"] .ab-art.sb-ob-artbox .idv { inset: 0; left: 0; top: 0; width: 100%; height: 100%; aspect-ratio: auto; }
+.ab.sb-ab[data-ae="industrial-device"] .ab-art.sb-ob-artbox .idv-body { border-right: 1px solid var(--ab-hair); border-radius: 2.4cqw; }

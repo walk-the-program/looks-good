@@ -289,3 +289,9 @@
 .ab.sb-ab.ab[data-ae="pixel-arcade"] :is(.sb-top, .sb-home-top, .sb-ob-copy) .ab-kicker {
   position: static; display: flex; align-items: center; padding: 0; background: none; box-shadow: none; color: var(--ab-muted); margin: 0 0 8px !important;
 }
+
+/* ---- Built landing: the dialog's kicker tab clipped the tip of the first heart; the HUD sits a few px higher ---- */
+.ab.sb-ab[data-ae="pixel-arcade"] .pxa-hud { padding-top: 7px; }
+
+/* Built settings: website and email share a row; a long name ends in an ellipsis, not a cut letter */
+.ab.sb-ab[data-ae="pixel-arcade"] .sb-field-row .ab-input { text-overflow: ellipsis; letter-spacing: 0; font-size: 14px; }
