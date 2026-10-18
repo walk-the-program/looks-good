@@ -13,6 +13,22 @@ function hudWeight(font, target) {
   return le.length ? Math.max(...le) : Math.min(...ws);
 }
 
+// Neon is a light, not a tint: the primary's hue pushed to full saturation and a lightness that glows on the
+// near-black field (>= 8:1). Greys fall back to cyan. On a light canvas the plain readable primary is kept.
+function hudNeon(t, base, hueShift) {
+  if (!t.isDark) return base === t.primary ? t.primaryText : t.mix(base, '#000000', 0.45);
+  const c = hexToHsl(base);
+  let h = c.s < 12 ? 190 : c.h;
+  // deep blues and indigos glow as electric azure / cyan, the HUD's signature light
+  if (!hueShift && h >= 205 && h <= 280) h = Math.max(192, h - 32);
+  if (hueShift) h = (h + hueShift + 360) % 360;
+  const s = c.s < 12 ? 100 : Math.max(c.s, 88);
+  let l = (h >= 200 && h <= 280) ? 64 : (h >= 35 && h <= 170 ? 56 : 62);
+  let out = hslToHex(h, s, l);
+  for (let i = 0; i < 20 && contrastRatio(out, t.canvas) < 8; i++) { l = Math.min(92, l + 2); out = hslToHex(h, s, l); }
+  return out;
+}
+
 registerAesthetic({
   key: 'cyber-hud', order: 14,
   name: 'Cyber HUD',
@@ -68,8 +84,11 @@ registerAesthetic({
     const d = t.isDark;
     const hf = typeof state !== 'undefined' && state.headingFont;
     // the neon must read on the canvas; secondary likewise (lifted toward white if not)
-    const neon = t.primaryText;
-    const neon2 = t.contrast(t.secondary, t.canvas) >= 3 ? t.secondary : t.mix(t.secondary, d ? '#ffffff' : '#000000', 0.5);
+    const neon = hudNeon(t, t.primary);
+    // the second signal: the secondary's hue, or a hot shift of the neon when the two sit on the same hue
+    const nh = hexToHsl(neon).h, sh = hexToHsl(t.secondary);
+    const near = sh.s < 15 || Math.min(Math.abs(nh - sh.h), 360 - Math.abs(nh - sh.h)) < 40;
+    const neon2 = d ? (near ? hudNeon(t, neon, 105) : hudNeon(t, t.secondary)) : (t.contrast(t.secondary, t.canvas) >= 3 ? t.secondary : t.mix(t.secondary, '#000000', 0.5));
     const bracket = (c, w, l) => [
       `linear-gradient(${c},${c}) 0 0/${l}px ${w}px no-repeat`, `linear-gradient(${c},${c}) 0 0/${w}px ${l}px no-repeat`,
       `linear-gradient(${c},${c}) 100% 0/${l}px ${w}px no-repeat`, `linear-gradient(${c},${c}) 100% 0/${w}px ${l}px no-repeat`,
@@ -82,7 +101,11 @@ registerAesthetic({
       '--ab-neon2': neon2,
       '--ab-hud-line': t.alpha(neon, 0.62),
       '--ab-hud-line-soft': t.alpha(neon, 0.28),
-      '--ab-hud-glow': t.alpha(neon, d ? 0.42 : 0.3),
+      '--ab-hud-glow': t.alpha(neon, d ? 0.62 : 0.34),
+      '--ab-hud-glow-hi': t.alpha(neon, d ? 0.85 : 0.5),
+      '--ab-haz': '#FCE205',
+      '--ab-haz-ink': '#0a0a0c',
+      '--ab-neon-line': t.alpha(neon, d ? 0.92 : 0.8),
       '--ab-hud-fill': t.mix(neon, t.canvas, 0.06),
       '--ab-hud-fill2': t.mix(neon, t.canvas, 0.13),
       '--ab-hud-fill3': t.mix(neon, t.canvas, 0.24),
@@ -91,6 +114,7 @@ registerAesthetic({
       '--ab-hud-hi': t.mix(t.primary, '#ffffff', 0.78),
       '--ab-brackets': bracket(neon, 2, 9),
       '--ab-brackets-dim': bracket(t.alpha(neon, 0.55), 1.5, 7),
+      '--ab-brackets-lg': bracket(neon, 2, 22),
       '--ab-split-a': t.alpha(neon, 0.95),
       '--ab-split-b': t.alpha(neon2, 0.95),
     };
@@ -102,8 +126,10 @@ registerAesthetic({
   // non-scaling so the line weight is constant.
   art(ctx) {
     const t = ctx.t;
-    const neon = t.primaryText;
-    const neon2 = t.contrast(t.secondary, t.canvas) >= 3 ? t.secondary : t.mix(t.secondary, t.isDark ? '#ffffff' : '#000000', 0.5);
+    const neon = hudNeon(t, t.primary);
+    const nh = hexToHsl(neon).h, sh = hexToHsl(t.secondary);
+    const near = sh.s < 15 || Math.min(Math.abs(nh - sh.h), 360 - Math.abs(nh - sh.h)) < 40;
+    const neon2 = t.isDark ? (near ? hudNeon(t, neon, 105) : hudNeon(t, t.secondary)) : (t.contrast(t.secondary, t.canvas) >= 3 ? t.secondary : t.mix(t.secondary, '#000000', 0.5));
     const vf = 'vector-effect="non-scaling-stroke"';
     const floor = [66, 71, 78, 87, 98].map((y, i) => `<path ${vf} d="M${50 - (y - 56) * 1.9} ${y}H${50 + (y - 56) * 1.9}" stroke="${neon}" stroke-opacity="${(0.16 + i * 0.07).toFixed(2)}"/>`).join('')
       + [-60, -42, -26, -12, 0, 12, 26, 42, 60].map(dx => `<path ${vf} d="M50 56L${50 + dx * 1.95} 100" stroke="${neon}" stroke-opacity=".3"/>`).join('');
@@ -128,6 +154,8 @@ registerAesthetic({
       <span class="chs-r chs-tl">SYNC 98.2%<br><i>SIG ▮▮▮▮▯</i></span>
       <span class="chs-r chs-tr">X 012.4<br>Y 087.1</span>
       <span class="chs-tag">LOCK 0.82s</span>
+      <span class="chs-call"><b>TGT-07</b>${escapeHtml(String(ctx.brandName || ctx.name || '').toUpperCase().slice(0, 14))} // ACTIVE</span>
+      <svg class="chs-lead" viewBox="0 0 100 100" preserveAspectRatio="none" focusable="false"><path vector-effect="non-scaling-stroke" d="M2 66H15L24 55H35" fill="none" stroke="${neon}" stroke-width="1" stroke-opacity=".9"/><circle cx="35" cy="55" r="1.1" fill="${neon}"/></svg>
       <span class="chs-bar" aria-hidden="true"><b></b></span>
       <svg class="chs-gauge" viewBox="0 0 44 44" focusable="false"><circle cx="22" cy="22" r="17" fill="none" stroke="${neon}" stroke-opacity=".22" stroke-width="3" pathLength="100" stroke-dasharray="1.6 1.4"/>
         <circle cx="22" cy="22" r="17" fill="none" stroke="${neon}" stroke-width="3" pathLength="100" stroke-dasharray="72 28" transform="rotate(-90 22 22)" opacity=".9"/></svg>
