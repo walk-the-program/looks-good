@@ -329,7 +329,89 @@
     return { x: Math.round(x), y: Math.round(y), r };
   }
 
-  function morphBoard(renderBoard) {
+  /* Keep the reader where they are across a board re-render. renderAestheticBoard replaces the
+     board's content, so the stage collapses for a moment and the browser clamps the scroll to the
+     top. Pin the stage height, put the same section back at the same offset, then let go. */
+  let holdTok = 0;        // a newer render cancels the previous hold's pending frames
+  let holdMin = null;     // { el, prev }: the pinned element and its inline min-height before the pin
+  let lastSig = null;     // editor view at the previous render; a view change is not a re-render in place
+  const PIN_IDS = ['previewCard', 'compareGrid', 'patternsView', 'builtView', 'deckSection'];
+
+  function scrollerOf(host) {
+    for (let n = host && host.parentElement; n && n !== document.body && n !== document.documentElement; n = n.parentElement) {
+      const oy = getComputedStyle(n).overflowY;
+      if ((oy === 'auto' || oy === 'scroll') && n.scrollHeight > n.clientHeight + 1) return n;
+    }
+    return document.scrollingElement || document.documentElement;
+  }
+
+  function scrollSet(sc, top) {
+    const t = Math.max(0, Math.round(top));
+    if (Math.abs(sc.scrollTop - t) < 1) return;
+    if (sc === document.scrollingElement || sc === document.documentElement) window.scrollTo({ top: t, behavior: 'instant' });
+    else sc.scrollTo({ top: t, behavior: 'instant' });
+  }
+
+  function withScrollKept(renderBoard) {
+    const sig = inEditor() ? curView() : null;
+    const keep = !!sig && sig === lastSig;
+    lastSig = sig;
+    const pinEl = keep && PIN_IDS.map(id => document.getElementById(id)).find(el => el && !el.hidden && el.offsetHeight > 0);
+    if (!keep || !pinEl) return renderBoard;
+    const sc = scrollerOf(pinEl);
+    const top0 = sc.scrollTop;
+    const base = sc === document.scrollingElement || sc === document.documentElement ? 0 : sc.getBoundingClientRect().top;
+    // The first board section that reaches into the viewport, remembered by its class (the order
+    // can change with the style) and by its index, with how far from the top edge it sits.
+    const secs = [...pinEl.querySelectorAll('.ab-sec')];
+    const at = secs.find(el => el.getBoundingClientRect().bottom > base + 1);
+    const anchor = at && {
+      cls: [...at.classList].find(c => /^ab-sec-/.test(c)) || null,
+      i: secs.indexOf(at),
+      off: at.getBoundingClientRect().top - base,
+    };
+    const tok = ++holdTok;
+    if (!holdMin || holdMin.el !== pinEl) {
+      if (holdMin) holdMin.el.style.minHeight = holdMin.prev;
+      holdMin = { el: pinEl, prev: pinEl.style.minHeight };
+    }
+    pinEl.style.minHeight = pinEl.offsetHeight + 'px';
+    let touched = false;
+    const mark = () => { touched = true; };
+    ['wheel', 'touchstart', 'keydown', 'pointerdown'].forEach(t => window.addEventListener(t, mark, { passive: true, once: true }));
+    const restore = () => {
+      if (tok !== holdTok || touched) return;
+      let want = top0;
+      if (anchor) {
+        const now = [...pinEl.querySelectorAll('.ab-sec')];
+        const el = (anchor.cls && now.find(n => n.classList.contains(anchor.cls))) || now[anchor.i];
+        if (el) want = sc.scrollTop + (el.getBoundingClientRect().top - base) - anchor.off;
+      }
+      scrollSet(sc, want);
+    };
+    return () => {
+      renderBoard();
+      restore();
+      requestAnimationFrame(() => {
+        restore();
+        requestAnimationFrame(() => {
+          if (tok === holdTok && holdMin) { holdMin.el.style.minHeight = holdMin.prev; holdMin = null; }
+          restore();
+          // Late web fonts and fit passes reflow the sections above; settle once more.
+          const done = () => {
+            restore();
+            ['wheel', 'touchstart', 'keydown', 'pointerdown'].forEach(t => window.removeEventListener(t, mark));
+          };
+          const fonts = document.fonts && document.fonts.ready;
+          if (!fonts) { setTimeout(done, 300); return; }
+          Promise.race([fonts, new Promise(r => setTimeout(r, 900))]).then(() => { restore(); setTimeout(done, 250); });
+        });
+      });
+    };
+  }
+
+  function morphBoard(renderBoardRaw) {
+    const renderBoard = withScrollKept(renderBoardRaw);
     if (viewWatch.takeRecords().length) lastLook = null;
     const key = inEditor() ? lookKey() : null;
     const prev = lastLook;
