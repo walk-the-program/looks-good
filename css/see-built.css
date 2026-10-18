@@ -228,6 +228,7 @@
 :is(.ab.sb-ab, .sb-gen) .ab-panel.sb-set-panel, :is(.ab.sb-ab, .sb-gen) .ab-card.sb-planbox { margin: 0; min-width: 0; display: block; }
 :is(.ab.sb-ab, .sb-gen) .sb-field .ab-input { margin-bottom: 16px; }
 .sb-field-row { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 14px; }
+.sb-field-row .ab-input { min-width: 0; text-overflow: ellipsis; }
 :is(.ab.sb-ab, .sb-gen) .sb-set-panel .sb-field:last-child .ab-input { margin-bottom: 4px; }
 :is(.ab.sb-ab, .sb-gen) .ab-toggle.sb-tog { min-height: 54px; padding: 6px 0; }
 :is(.ab.sb-ab, .sb-gen) .ab-toggle.sb-tog + .ab-toggle.sb-tog { border-top: 1px solid var(--ab-line); }
@@ -260,7 +261,7 @@
   border-radius: 20px; background: #e9e8e3;
 }
 .sb-phone { margin: 0; display: grid; justify-items: center; gap: 12px; }
-.sb-phone figcaption { font: 500 12px/1 var(--font-ui); color: var(--muted); }
+.sb-phone figcaption { font: 500 12px/1 var(--font-ui); color: color-mix(in srgb, var(--ink) 62%, var(--muted)); }
 .sb-phone-frame {
   position: relative; width: 300px; height: 640px; padding: 10px; border-radius: 52px; background: #111;
   box-shadow: inset 0 0 0 2px #2c2c2e, 0 0 0 1px rgba(0, 0, 0, 0.25), 0 30px 60px -24px rgba(0, 0, 0, 0.45);
