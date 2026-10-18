@@ -7,12 +7,24 @@
    feTurbulence data URI in css/aesthetics/riso-print.css. */
 (function () {
 let seq = 0;
+const RZ_PAPER = '#F4EBDA';   // warm cream paper, independent of the brand canvas
+// Multiply two #rrggbb colours (an ink printed on paper): the colour the overprint really shows.
+function rzMul(a, b) {
+  const p = h => [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16));
+  const x = p(a), y = p(b);
+  return '#' + x.map((v, i) => Math.round(v * y[i] / 255).toString(16).padStart(2, '0')).join('');
+}
+// The accent prints as a fluorescent riso ink: pink, or orange when the primary is already pink or red.
+function rzFluoro(t) {
+  const h = hexToHsl(t.primary).h;
+  return (h >= 300 || h <= 20) ? '#FF7A1A' : '#FF48B0';
+}
 registerAesthetic({
   key: 'riso-print', order: 10,
   name: 'Riso Print',
   descriptor: 'Inked · Grainy · Human',
   influences: 'Risograph zines / Screen print / Editorial',
-  summary: 'Two overlapping inks on warm paper, a little off-register on purpose.',
+  summary: 'Two overlapping inks on warm cream paper, a little off-register on purpose, with halftone dots and a fluorescent third ink.',
   motto: 'Printed by people.',
   kicker: 'Two inks, one pass',
   mode: 'light',
@@ -45,15 +57,24 @@ registerAesthetic({
   },
 
   // Light canvases are warmed toward cream so the board reads as paper.
-  canvas(b) { return b.isDark ? null : b.mix('#f0dfba', b.canvas, 0.14); },
+  canvas(b) { return b.isDark ? null : RZ_PAPER; },
 
   tokens(t) {
     const d = t.isDark;
+    // muted text also sits on the app sidebar (ink 4% over the paper, plus grain): hold 4.7:1 there
+    const side = t.mix(t.ink, t.canvas, 0.1);
+    let muted = t.muted;
+    for (let k = 0.05; k <= 1.001 && Math.min(t.contrast(muted, side), t.contrast(muted, t.canvas)) < 4.7; k += 0.05) muted = t.mix(t.ink, t.muted, k);
     return {
+      '--ab-muted': muted,
       // Overprint blend: ink darkens paper in light mode, glows on dark paper.
       '--ab-blend': d ? 'screen' : 'multiply',
       '--ab-speck': t.alpha(t.ink, d ? 0.2 : 0.2),
-      '--ab-plate': t.mix(t.secondary, t.canvas, 0.4),
+      // the second ink as it prints on the paper (multiply), used as the off-register plate behind cards
+      '--ab-plate': d ? t.mix(t.secondary, t.canvas, 0.4) : rzMul(t.secondary, t.canvas),
+      // the accent snaps to a fluorescent ink
+      '--ab-accent': rzFluoro(t),
+      '--ab-ink-sat': 'saturate(1.15)',
       '--ab-paper-card': d ? t.mix(t.ink, t.canvas, 0.06) : t.mix('#ffffff', t.canvas, 0.4),
     };
   },
@@ -68,7 +89,7 @@ registerAesthetic({
     const cards = [
       { bg: t.primary, ink: t.secondary, shape: 'circle', cls: 'rza-1' },
       { bg: t.secondary, ink: t.primary, shape: 'arch', cls: 'rza-2' },
-      { bg: t.accent, ink: t.primary, shape: 'zig', cls: 'rza-3' },
+      { bg: rzFluoro(t), ink: t.primary, shape: 'zig', cls: 'rza-3' },
     ];
     const shapeSvg = (c, fill, extra) => {
       if (c.shape === 'circle') return `<circle cx="30" cy="35" r="19" fill="${fill}" ${extra}/>`;
@@ -107,7 +128,8 @@ registerAesthetic({
       'Print with two inks only (primary and secondary); let them overlap with multiply so the third color appears where they cross.',
       'Misregister on purpose: shift the second ink 2–3px and keep it consistent across the board.',
       'Shade with halftone dots whose size changes, not with smooth gradients or soft shadows.',
-      'Keep the accent tiny and hand-drawn: one ring, one art card, one dot.',
+      'Keep the accent tiny and hand-drawn: one ring, one art card, one dot; it prints as a fluorescent pink or orange, not the brand green.',
+      'Let overprint be the UI language: every card, chip and button has its second ink printed a few pixels off-register, and big areas (a sidebar head, a chart) take a halftone dot screen.',
       'Set the headline in one crisp ink (primary) with no shadow; grain and misregistration belong to art, cards and swatches.',
     ],
     dont: [
@@ -120,6 +142,8 @@ registerAesthetic({
   },
   // Deck copy (js/brand-deck.js): three principles, three do / don't lines, each short.
   deck: {
+    // The cover's foot is a two-ink halftone band drawn in css (the shared pattern band showed a mosaic artifact).
+    coverBand: false,
     principles: [
       ['Two inks, overlapped', 'Primary and secondary multiply into a third color.'],
       ['Off-register on purpose', 'Shift the second ink 2 to 3px, the same everywhere.'],
