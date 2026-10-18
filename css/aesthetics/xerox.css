@@ -20,25 +20,29 @@
   --xr-speck: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='640' height='640'><filter id='s' x='0' y='0' width='100%25' height='100%25'><feTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='2' seed='11' stitchTiles='stitch' result='a'/><feColorMatrix in='a' type='matrix' values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  28 0 0 0 -20.1' result='sp'/><feTurbulence type='fractalNoise' baseFrequency='.008' numOctaves='2' seed='4' stitchTiles='stitch' result='b'/><feColorMatrix in='b' type='matrix' values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  18 0 0 0 -10.5' result='mk'/><feComposite in='sp' in2='mk' operator='in'/></filter><rect width='100%25' height='100%25' filter='url(%23s)'/></svg>");
   /* one drum streak down the sheet, 30px at 7.5% toner, turbulent edge */
   --xr-streak: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='48' height='800'><filter id='d' x='-30%25' y='0' width='160%25' height='100%25'><feTurbulence type='fractalNoise' baseFrequency='.08 .005' numOctaves='2' seed='3' stitchTiles='stitch' result='w'/><feDisplacementMap in='SourceGraphic' in2='w' scale='16' xChannelSelector='R' yChannelSelector='G'/></filter><rect x='9' y='-30' width='30' height='860' fill='%23000' fill-opacity='.075' filter='url(%23d)'/></svg>");
-  --xr-burn: rgba(0, 0, 0, 0.3);
+  --xr-burn: rgba(0, 0, 0, 0.09);
 }
 .ab[data-ae="xerox"][data-mode="dark"] {
   --xr-speck: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='640' height='640'><filter id='s' x='0' y='0' width='100%25' height='100%25'><feTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='2' seed='11' stitchTiles='stitch' result='a'/><feColorMatrix in='a' type='matrix' values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  28 0 0 0 -20.1' result='sp'/><feTurbulence type='fractalNoise' baseFrequency='.008' numOctaves='2' seed='4' stitchTiles='stitch' result='b'/><feColorMatrix in='b' type='matrix' values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  18 0 0 0 -10.5' result='mk'/><feComposite in='sp' in2='mk' operator='in'/></filter><rect width='100%25' height='100%25' filter='url(%23s)'/></svg>");
   --xr-streak: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='48' height='800'><filter id='d' x='-30%25' y='0' width='160%25' height='100%25'><feTurbulence type='fractalNoise' baseFrequency='.08 .005' numOctaves='2' seed='3' stitchTiles='stitch' result='w'/><feDisplacementMap in='SourceGraphic' in2='w' scale='16' xChannelSelector='R' yChannelSelector='G'/></filter><rect x='9' y='-30' width='30' height='860' fill='%23fff' fill-opacity='.05' filter='url(%23d)'/></svg>");
-  --xr-burn: rgba(0, 0, 0, 0.55);
+  --xr-burn: rgba(0, 0, 0, 0.2);
 }
 
 /* the copy itself: clustered dust, then edge burn and one drum streak over everything */
 .ab[data-ae="xerox"]::after {
   content: ""; position: absolute; inset: 0; z-index: 5; pointer-events: none; opacity: 0.7;
   background: var(--xr-speck) 0 0 / 640px 640px; mix-blend-mode: var(--ab-blend, multiply);
+  /* dust lives on the sheet margins only: small UI text in the middle stays on clean toner */
+  -webkit-mask-image: linear-gradient(90deg, #000, transparent 9%, transparent 91%, #000), linear-gradient(180deg, #000, transparent 5%, transparent 95%, #000);
+  mask-image: linear-gradient(90deg, #000, transparent 9%, transparent 91%, #000), linear-gradient(180deg, #000, transparent 5%, transparent 95%, #000);
+  -webkit-mask-composite: source-over; mask-composite: add;
 }
 .ab[data-ae="xerox"]::before {
   content: ""; position: absolute; inset: 0; z-index: 6; pointer-events: none; mix-blend-mode: var(--ab-blend, multiply);
   background:
     var(--xr-streak) 66% 0 / 48px 800px repeat-y,
     linear-gradient(90deg, var(--xr-burn), transparent 7%, transparent 92%, var(--xr-burn)),
-    linear-gradient(180deg, rgba(0,0,0,0.16), transparent 4%, transparent 96%, rgba(0,0,0,0.22));
+    linear-gradient(180deg, rgba(0,0,0,0.05), transparent 4%, transparent 96%, rgba(0,0,0,0.07));
 }
 .ab[data-ae="xerox"] .xr-defs { position: absolute; }
 
@@ -260,3 +264,6 @@
     linear-gradient(var(--ab-canvas) 1px, transparent 1px 3px, var(--ab-canvas) 3px) 0 0 / 4px 4px, var(--ab-ink);
   transform: none; transition: none; inset: 6px -7px -6px 7px;   /* html2canvas over-shifted the translate() */
 }
+
+/* sidebar nav / owner line sat at 4.48:1 on the stock; nudge toward toner */
+.ab.sb-ab[data-ae="xerox"] .sb-side { --ab-muted: color-mix(in srgb, var(--ab-muted) 85%, var(--ab-ink)); }
