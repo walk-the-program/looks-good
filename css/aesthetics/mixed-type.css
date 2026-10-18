@@ -56,7 +56,11 @@
   text-transform: uppercase; letter-spacing: calc(-0.02em * var(--ab-tr, 1));
 }
 .ab[data-ae="mixed-type"] .mt-w[data-v="m"] {
-  font-family: var(--mt-f-m); font-weight: var(--mt-w-m); font-size: calc(1em * var(--mt-k-m, 1)); letter-spacing: -0.06em;
+  font-family: var(--mt-f-m); font-weight: var(--mt-w-m); font-size: calc(1em * var(--mt-k-m, 1)); letter-spacing: -0.13em;
+  /* a mono's fixed cell leaves a hole around i / l / t at display size ("wi th"): tighten the cell so a word reads as one,
+     and keep ligatures and contextual forms off so no pair is substituted */
+  font-variant-ligatures: none; font-feature-settings: "liga" 0, "calt" 0;
+  margin-right: 0.13em; /* the negative tracking also eats the word space after the last glyph */
 }
 .ab[data-ae="mixed-type"] .mt-hl { color: var(--ab-accent-ink); }
 .ab[data-ae="mixed-type"] .mt-ast {
@@ -271,3 +275,29 @@
 .ab[data-ae="mixed-type"].ab-slide[data-slide="cover"] .mt-cell { padding-top: 8px; padding-bottom: 8px; }
 .ab[data-ae="mixed-type"].ab-slide[data-slide="cover"] .mt-cell svg { margin: 2px 0; max-height: 34px; }
 .ab[data-ae="mixed-type"].ab-slide[data-slide="cover"] .mt-lower { display: none; }
+
+/* ----- Built (product screens): the voices mix inside the UI too, not only the headline.
+   Screen titles carry a mono figure caption; stat labels get the serif-italic asterisk; the lead stat is
+   the one heavy-grotesk number at about twice the size; list names go heavy, counts stay mono.
+   Fonts are the style's own voice variables (--mt-f-*), set from the brand's pairing in tokens(). ----- */
+.ab.sb-ab[data-ae="mixed-type"] .ab-card-title.sb-title::after {
+  content: " (Fig. 2)"; font-family: var(--mt-f-m); font-style: normal; font-weight: 400; font-size: 11px; letter-spacing: 0.06em;
+  vertical-align: 0.9em; color: var(--ab-ink); white-space: nowrap;
+}
+.ab.sb-ab[data-ae="mixed-type"] .sb-stat .ab-label::after {
+  content: "*"; margin-left: 3px; font-family: var(--mt-f-i); font-style: normal; font-weight: 400; font-size: 1.7em; line-height: 0; vertical-align: -0.12em; color: var(--ab-accent-ink);
+}
+.ab.sb-ab[data-ae="mixed-type"] .ab-row-name {
+  font-family: var(--mt-f-h); font-weight: var(--mt-w-h); font-size: 13px; text-transform: uppercase; letter-spacing: 0.01em;
+}
+.ab.sb-ab[data-ae="mixed-type"] .ab-row-pct { font-size: 14px; font-weight: 500; letter-spacing: 0; }
+@container ab (min-width: 760px) {
+  .ab.sb-ab[data-ae="mixed-type"] .sb-stats { grid-template-columns: 2.1fr 1fr 1fr 1fr; }
+  .ab.sb-ab[data-ae="mixed-type"] .sb-stat:first-child .ab-card-title.sb-num {
+    font-family: var(--mt-f-h); font-style: normal; font-weight: var(--mt-w-h); text-transform: uppercase;
+    font-size: calc(clamp(34px, 5.2cqw, 52px) * var(--mt-k-h, 1)); line-height: 0.95; letter-spacing: -0.03em;
+  }
+}
+
+/* muted copy on the tinted card surfaces was 4.26:1; deepen it a notch inside cards, panels and lists */
+.ab[data-ae="mixed-type"] :is(.ab-card, .ab-panel, .ab-list, .sb-side) { --ab-muted: color-mix(in srgb, var(--ab-muted) 80%, var(--ab-ink)); }
