@@ -275,7 +275,9 @@ registerAesthetic({
       '--ab-type-pick-w': 400,
       '--nd-pencil': PENCIL,
       '--nd-paper': '#FFFBF2',
-      '--nd-grid': d ? 'rgba(244, 238, 223, 0.05)' : '#ECEEE2',
+      '--nd-grid': d ? 'rgba(244, 238, 223, 0.09)' : 'rgba(31, 27, 22, 0.10)',
+      // graph-paper tile as an image (24px, 1px ink lines at ~10%): a plain gradient with var() colours rendered at 0.3px in WebKit
+      '--nd-gridimg': `url("data:image/svg+xml,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"><path d="M0 .5H24M.5 0V24" fill="none" stroke="${d ? '#F4EEDF' : '#1F1B16'}" stroke-opacity="${d ? 0.09 : 0.1}" stroke-width="1"/></svg>`)}")`,
       '--nd-c1': c1, '--nd-c2': c2, '--nd-c3': c3,
       '--nd-h1': hatch(c1), '--nd-h2': hatch(c2), '--nd-h3': hatch(c3),
       '--nd-wash': t.mix(c2, t.canvas, d ? 0.15 : 0.16),
