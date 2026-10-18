@@ -171,13 +171,15 @@ registerAesthetic({
       'Keep glass fill at 12% white or less, with a bright specular rim top-left, a softer rim bottom-right and a 0.5px dark hairline outside.',
       'Bend content at the rim only: the centre of a lens stays 1:1, the outer fifth refracts.',
       'Make every panel a near-opaque regular material on a neutral canvas; reserve glass for floating controls.',
+      'In the product, put a soft brand-colour field behind the app and make the sidebar, header, cards and current nav row glass over it, with capsule controls and 28px cards.',
+      'Give controls a gel feel: scale 1.03 on hover, 0.97 on press, a spring curve of about 220 ms.',
       'Provide an opaque fallback that keeps the rim for reduced transparency.',
     ],
     dont: [
       'Call a blur-only surface refraction.',
       'Put glass on a flat or pastel background, or nest glass panels inside glass panels.',
       'Put text on strong distortion; keep it on a stable, readable substrate.',
-      'Put glass over blurred blobs; refraction of a blur is invisible.',
+      'Put a refracting lens over blurred blobs; refraction of a blur is invisible (soft colour fields are for the app backdrop behind blurred glass).',
     ],
   },
   // Deck copy (js/brand-deck.js): three principles, three do / don't lines, each short.

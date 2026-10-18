@@ -325,3 +325,110 @@
 }
 /* html2canvas fills the CTA's 1px inset highlights across the whole pill (a pale wash): plain primary */
 .deck-export-host .ab[data-ae="liquid-glass"] .ab-cta { background: var(--ab-primary); box-shadow: none; }
+
+/* ---------------------------------------------------------------------
+   Product screens: glass floats over a colour backdrop. The app area is a soft field of three
+   brand blobs (primary, secondary, accent); the sidebar, the header bar, the stat / chart /
+   quick-settings cards, the lists, the tab bar and the current nav row are real glass over it
+   (white 55% in light, 9% in dark, a 1px rim, 22px blur, bright specular on the top edge).
+   Concentric shapes: capsules for controls, 28px cards. Controls gel on touch (scale 1.03 on
+   hover, 0.97 on press, spring curve).
+--------------------------------------------------------------------- */
+.ab.sb-ab[data-ae="liquid-glass"] {
+  --lgb-glass: rgba(255, 255, 255, 0.55); --lgb-glass-hi: rgba(255, 255, 255, 0.78); --lgb-edge: rgba(255, 255, 255, 0.85);
+  --lgb-gel: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --lgb-spec: inset 0 1px 0 rgba(255, 255, 255, 0.9), inset 0 -1px 0 rgba(255, 255, 255, 0.28), 0 8px 24px var(--ab-drop);
+}
+.ab.sb-ab[data-ae="liquid-glass"][data-mode="dark"] {
+  --lgb-glass: rgba(255, 255, 255, 0.09); --lgb-glass-hi: rgba(255, 255, 255, 0.2); --lgb-edge: rgba(255, 255, 255, 0.22);
+  --lgb-spec: inset 0 1px 0 rgba(255, 255, 255, 0.28), inset 0 -1px 0 rgba(255, 255, 255, 0.06), 0 8px 24px var(--ab-drop);
+}
+/* the colour backdrop under everything in the app */
+.ab.sb-ab[data-ae="liquid-glass"] .ab-in.sb-app {
+  background:
+    radial-gradient(46% 52% at 8% 4%, color-mix(in srgb, var(--ab-primary) 52%, transparent), transparent 72%),
+    radial-gradient(42% 50% at 96% 18%, color-mix(in srgb, var(--ab-accent) 46%, transparent), transparent 70%),
+    radial-gradient(50% 56% at 62% 104%, color-mix(in srgb, var(--ab-secondary) 70%, transparent), transparent 72%),
+    var(--ab-canvas);
+}
+.ab.sb-ab[data-ae="liquid-glass"][data-mode="dark"] .ab-in.sb-app {
+  background:
+    radial-gradient(46% 52% at 8% 4%, color-mix(in srgb, var(--ab-primary) 60%, transparent), transparent 72%),
+    radial-gradient(42% 50% at 96% 18%, color-mix(in srgb, var(--ab-accent) 50%, transparent), transparent 70%),
+    radial-gradient(50% 56% at 62% 104%, color-mix(in srgb, var(--ab-secondary) 45%, transparent), transparent 72%),
+    var(--ab-canvas);
+}
+/* glass: sidebar, header, segmented control, tab bar */
+.ab.sb-ab[data-ae="liquid-glass"] .sb-side {
+  background: var(--lgb-glass); border-right: 1px solid var(--lgb-edge);
+  -webkit-backdrop-filter: blur(22px) saturate(180%); backdrop-filter: blur(22px) saturate(180%);
+  box-shadow: inset -1px 0 0 rgba(255, 255, 255, 0.35), 8px 0 24px -12px var(--ab-drop);
+}
+.ab.sb-ab[data-ae="liquid-glass"] .sb-main > .ab-rule { display: none; }
+.ab.sb-ab[data-ae="liquid-glass"] .sb-top {
+  align-items: center; padding: 14px 20px; border-radius: 28px; border: 1px solid var(--lgb-edge); background: var(--lgb-glass); box-shadow: var(--lgb-spec);
+  -webkit-backdrop-filter: blur(22px) saturate(180%); backdrop-filter: blur(22px) saturate(180%);
+}
+/* the date line reads on glass (the hero's white kicker colour does not belong here) */
+.ab.sb-ab[data-ae="liquid-glass"] :is(.sb-top, .sb-home-top, .sb-ob-copy) .ab-kicker { color: var(--ab-muted); }
+/* the current nav row is a lens of glass */
+.ab.sb-ab[data-ae="liquid-glass"] .sb-navi { border-radius: 999px; padding: 8px 14px; transition: transform 0.22s var(--lgb-gel), background 0.2s, box-shadow 0.2s; }
+.ab.sb-ab[data-ae="liquid-glass"] .sb-navi:hover { transform: scale(1.03); background: rgba(255, 255, 255, 0.32); }
+.ab.sb-ab[data-ae="liquid-glass"] .sb-navi:active { transform: scale(0.97); }
+.ab.sb-ab[data-ae="liquid-glass"] .sb-navi[aria-current] {
+  background: var(--lgb-glass-hi); box-shadow: var(--lgb-spec), 0 0 0 1px var(--lgb-edge); color: var(--ab-ink);
+  -webkit-backdrop-filter: blur(12px) saturate(160%); backdrop-filter: blur(12px) saturate(160%);
+}
+/* cards: tinted clear glass over the backdrop, no scene strip, 28px */
+.ab.sb-ab[data-ae="liquid-glass"] :is(.ab-card, .ab-panel, .ab-list) {
+  border-radius: 28px; border: 1px solid var(--lgb-edge); background: var(--lgb-glass); box-shadow: var(--lgb-spec);
+  -webkit-backdrop-filter: blur(22px) saturate(180%); backdrop-filter: blur(22px) saturate(180%);
+}
+.ab.sb-ab[data-ae="liquid-glass"] .ab-card::before { display: none; }
+.ab.sb-ab[data-ae="liquid-glass"] .ab-card { padding-top: clamp(18px, 2.8cqw, 26px); }
+.ab.sb-ab[data-ae="liquid-glass"] .ab-card .ab-seg { margin-bottom: 18px; }
+.ab.sb-ab[data-ae="liquid-glass"] .ab-card.sb-stat { padding-top: 16px; }
+.ab.sb-ab[data-ae="liquid-glass"] .ab-list { border-radius: 28px; }
+.ab.sb-ab[data-ae="liquid-glass"] .ab-row + .ab-row { background: linear-gradient(rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0.5)) 16px 0 / calc(100% - 16px) 1px no-repeat; }
+.ab.sb-ab[data-ae="liquid-glass"] .ab-seg { background: var(--lgb-glass-hi); }
+.ab.sb-ab[data-ae="liquid-glass"] .ab-seg-btn:not([aria-pressed="true"]) { color: var(--ab-ink); }
+.ab.sb-ab[data-ae="liquid-glass"] .ab-seg-btn[aria-pressed="true"] { color: #10131c; }
+/* chips and delta pills: capsules */
+.ab.sb-ab[data-ae="liquid-glass"] .sb-delta { border-radius: 999px; background: rgba(255, 255, 255, 0.6); box-shadow: inset 0 1px 0 #fff, 0 0 0 1px var(--lgb-edge); }
+.ab.sb-ab[data-ae="liquid-glass"][data-mode="dark"] .sb-delta { background: rgba(255, 255, 255, 0.14); box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.3), 0 0 0 1px var(--lgb-edge); }
+.ab.sb-ab[data-ae="liquid-glass"] .ab-type-apply.sb-icon-btn { border-radius: 50%; background: var(--lgb-glass-hi); box-shadow: var(--lgb-spec); }
+.ab.sb-ab[data-ae="liquid-glass"] .sb-search .ab-input { background: var(--lgb-glass); }
+.ab.sb-ab[data-ae="liquid-glass"] .sb-tabs { background: var(--lgb-glass); -webkit-backdrop-filter: blur(22px) saturate(180%); backdrop-filter: blur(22px) saturate(180%); border-top: 1px solid var(--lgb-edge); }
+/* the chart reads over glass: a vertical primary-to-clear area */
+.ab.sb-ab[data-ae="liquid-glass"] .sb-c-area { fill: color-mix(in srgb, var(--ab-primary) 22%, transparent); }
+
+/* primary action: a specular streak across the top-left of the tinted glass, and a coloured glow */
+.ab[data-ae="liquid-glass"] .ab-cta { position: relative; overflow: hidden; transition: transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.22s; }
+.ab[data-ae="liquid-glass"] .ab-cta::before {
+  content: ""; position: absolute; left: 7%; right: 38%; top: 2px; height: 46%; border-radius: 999px; pointer-events: none;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.55), rgba(255, 255, 255, 0));
+}
+.ab[data-ae="liquid-glass"] .ab-cta:hover { transform: scale(1.03); box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7), inset 0 -1px 0 rgba(0, 0, 0, 0.1), 0 10px 26px -6px var(--ab-pri-glow-strong); }
+.ab[data-ae="liquid-glass"] .ab-cta:active { transform: scale(0.97); }
+.ab[data-ae="liquid-glass"] .ab-state-ctl::before { display: none; }
+/* the segmented selection gels too */
+.ab[data-ae="liquid-glass"] .ab-seg-btn { transition: transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.2s, box-shadow 0.2s; }
+.ab[data-ae="liquid-glass"] .ab-seg-btn:active { transform: scale(0.96); }
+@media (prefers-reduced-motion: reduce) {
+  .ab[data-ae="liquid-glass"] :is(.ab-cta, .ab-seg-btn, .sb-navi) { transition: none; }
+  .ab[data-ae="liquid-glass"] :is(.ab-cta, .sb-navi):is(:hover, :active) { transform: none; }
+}
+@media (prefers-reduced-transparency: reduce) {
+  .ab.sb-ab[data-ae="liquid-glass"] :is(.sb-side, .sb-top, .ab-card, .ab-panel, .ab-list, .sb-tabs, .sb-navi[aria-current]) { -webkit-backdrop-filter: none; backdrop-filter: none; background: var(--ab-glass-solid); }
+}
+
+/* landing hero: the copy sits on the dark scene (wide boards), so the secondary action and the proof
+   line are light glass on it, not ink on navy */
+@container ab (min-width: 601px) {
+  .ab.sb-ab[data-ae="liquid-glass"][data-hero="scene"] .sb-lhero .sb-hero-act .ab-type-apply {
+    color: #fff; background: rgba(255, 255, 255, 0.14); border: 1px solid rgba(255, 255, 255, 0.55); box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4);
+    -webkit-backdrop-filter: blur(14px) saturate(160%); backdrop-filter: blur(14px) saturate(160%);
+  }
+  .ab.sb-ab[data-ae="liquid-glass"][data-hero="scene"] .sb-lhero .sb-proof { color: rgba(255, 255, 255, 0.82); }
+  .ab.sb-ab[data-ae="liquid-glass"][data-hero="scene"] .sb-lhero .sb-proof .sb-ico { color: #fff; }
+}
