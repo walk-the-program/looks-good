@@ -498,6 +498,12 @@ function fontFitFor(key, state) {
    pair (d = offset, blur, ds/blurS for small controls), or a glow (r, a). SwiftUI radius = CSS blur / 2.
    `states[k]` is [colour role, visual]; the focus row's colour is computed from the palette.
    `sw` picks the SwiftUI recipe (hard | soft | glass | glow | flat | stepped).
+   Optional `accentOverride` { light, dark?, note }: the look draws its own accent whatever the brand
+   accent is; light/dark name an extras key ('--ab-x', read from the board's tokens function per mode),
+   a hex, or a function(m) of the mode record { mode, t, extras }. The brief prints that value.
+   Optional `fixedInks` [{ token, light, dark?, on?, job, decorativeOnly }]: extra colours the look
+   adds regardless of the palette; same value sources; `on` is the label colour on it; they become
+   rows of the Colors table, tokens.css and Theme.swift.
    Optional `ambient`: a sentence describing an always-on background motion; the brief prints it
    (paused under Reduce Motion) instead of "nothing else animates idly".
 ------------------------------------------------------------------------ */
@@ -646,6 +652,7 @@ const AESTHETIC_BUILD = {
   },
   'neo-brutal-pop': {
     cls: 'hard',
+    surface: 'Flat colour fields (primary, secondary, accent) with ink borders and a hard offset shadow (no blur); decoration is stickers (starburst, flower, !).',
     line: 2,
     sh: { x: 4, y: 4, blur: 0 }, lift: { x: 6, y: 6 }, press: { dx: 4, dy: 4, ms: 100 },
     motion: { fast: 100, base: 160, slow: 240, ease: 'out' },
@@ -674,31 +681,46 @@ const AESTHETIC_BUILD = {
     pressText: 'Gel: the control swells to 1.03 on hover and squeezes to 0.97 on press, 220 ms with cubic-bezier(0.34, 1.56, 0.64, 1) so it overshoots and settles; the selected tab\'s glass slides to its new position with the same curve.',
     surface: 'Regular material panels and floating glass controls over the scene; on iOS 26 or later use the system glass effect (`glassEffect`), otherwise the regular material.',
   },
-  'cyber-hud': { cls: 'glow', modes: { only: 'dark', because: 'neon edges and glow only read against a near-black ground' } },
+  'cyber-hud': {
+    cls: 'glow', modes: { only: 'dark', because: 'neon edges and glow only read against a near-black ground' },
+    surface: 'Near-black panels with a 1pt neon edge and a soft glow of the same colour. The neon is the primary hue at full saturation (blues pushed toward azure); a hot second signal comes from the secondary hue. HUD readouts are mono. Hazard stripes (#FCE205 on near-black) are decorative only.',
+    fixedInks: [
+      { token: '--hazard', light: '--ab-haz', on: '--ab-haz-ink', job: 'Hazard yellow #FCE205: warning stripes and caution bars on near-black.', decorativeOnly: true },
+    ],
+  },
   'retro-futurist': {
     cls: 'glow',
     surface: 'Near-black panels with a 1pt coloured edge and a soft glow of the same colour. Controls are pill keys; progress is an LED ladder (a row of lamps lighting in turn); each stat gets a dial; status is a lamp plus a text label; exactly one hot-orange alert lamp is allowed per screen.',
   },
   'blob-tracking': { cls: 'glow', modes: { only: 'dark', because: 'detection overlays sit on dark footage plates' } },
-  'acid-graphics': { cls: 'glow' },
-  'aurora-noir': { cls: 'glass', modes: { only: 'dark', because: 'its aurora beams and hairlines only read as light on a near-black ground' } },
-  'holo-iridescent': { cls: 'glass' },
-  'frutiger-aero': { cls: 'glass' },
-  'clay': { cls: 'soft', sh: { d: 8, blur: 18, ds: 4, blurS: 9 } },
+  'acid-graphics': { cls: 'glow', surface: 'Near-black panels with a 1pt coloured edge and a soft glow of the same colour. The clash colour is fluorescent (chartreuse or hot magenta) and labels on it are black.' },
+  'aurora-noir': { cls: 'glass', surface: 'The aurora is three soft colour clouds (accent, primary, secondary) above the hero, plus one wide beam and a horizon arc. The interface itself is flat: no colour wash over cards or text. The featured card has a 2px top edge in the beam colour.', modes: { only: 'dark', because: 'its aurora beams and hairlines only read as light on a near-black ground' } },
+  'holo-iridescent': { cls: 'glass', surface: 'Translucent material over the scene with a 1pt light rim. Foil appears only on the CTA rim, the selected tab and card rims.' },
+  'frutiger-aero': { cls: 'glass', surface: 'Translucent material over the scene with a 1pt light rim. The product UI itself carries the sky gradient, bubbles and glossy glass.' },
+  'clay': { cls: 'soft', sh: { d: 8, blur: 18, ds: 4, blurS: 9 }, surface: 'Surfaces share the canvas colour; paired highlight and shadow make them raised or recessed. Clay objects use a pastel tonal ramp of the primary; the capsule CTA keeps the full primary; the hero sphere has a smiling face.' },
   'industrial-device': { cls: 'soft' },
-  'radical-memphis': { cls: 'hard' },
-  'riso-print': { cls: 'hard', sh: { x: 3, y: 3, blur: 0 }, surface: 'Flat fills with a solid outline and a hard offset shadow (no blur), like overprinted ink. The accent prints fluorescent pink; if the primary is pink or red, the accent prints orange instead.', modes: { only: 'light', because: 'it imitates ink on uncoated paper; there is no dark paper' } },
+  'radical-memphis': { cls: 'hard', surface: 'Flat fills with a solid outline and a hard offset shadow (no blur). Laminate patterns (zig-zag, terrazzo, dots, checker, bacterio) frame the product UI and never sit behind text.' },
+  'riso-print': { cls: 'hard', sh: { x: 3, y: 3, blur: 0 }, accentOverride: { light: '--ab-accent', note: 'a fluorescent riso ink: pink, or orange when the primary is pink or red' }, surface: 'Flat fills with a solid outline and a hard offset shadow (no blur), like overprinted ink. The accent prints fluorescent pink; if the primary is pink or red, the accent prints orange instead.', modes: { only: 'light', because: 'it imitates ink on uncoated paper; there is no dark paper' } },
   'pixel-arcade': {
     cls: 'stepped', modes: { only: 'dark', because: 'sprites and dither are tuned for a CRT-black ground' },
     surface: 'Square 2pt-edged blocks; depth, where any, is a hard bevel; nothing is smoothed. Charts are stepped blocks (bars and gauges built from whole squares, no smooth curves); micro-labels are set in Silkscreen.',
     icons: '8x8 pixel sprites, solid fills, scaled up with nearest-neighbour; no curves smoothed, no outlines-only glyphs.',
     appIcon: 'An 8x8 pixel sprite in `{primary}` on a `{canvas}` tile, scaled up with nearest-neighbour; no smoothing, no text.',
   },
-  'ascii-art': { cls: 'stepped', modes: { only: 'dark', because: 'it is a phosphor terminal; light characters on black are the medium' } },
+  'ascii-art': { cls: 'stepped', surface: 'Square 2pt-edged blocks; depth, where any, is a hard bevel; nothing is smoothed. Heading and body must both be mono.', modes: { only: 'dark', because: 'it is a phosphor terminal; light characters on black are the medium' } },
   'pirate-broadcast': { cls: 'stepped', modes: { only: 'dark', because: 'teletext is bright text on a black screen' } },
   'old-web': { cls: 'stepped' },
   'mid-century': {
     cls: 'flat',
+    accentOverride: { light: '--mc-acc', note: 'the brand accent warmed toward 1950s yellow like the other mid-century inks' },
+    fixedInks: [
+      { token: '--mustard', light: '--mc-mustard', on: '--mc-on-mustard', job: 'Period mustard: card header bands, seals, avatar and chip fills.', decorativeOnly: false },
+      { token: '--teal', light: '--mc-teal', on: '--mc-on-teal', job: 'Period teal: selected segment, switch on, focus ring, panel bands.', decorativeOnly: false },
+      { token: '--tomato', light: '--mc-tomato', on: '--mc-on-tomato', job: 'Period tomato: list bands, badges, seals.', decorativeOnly: false },
+      { token: '--olive', light: '--mc-olive', on: '--mc-on-olive', job: 'Period olive: quick-action bands and positive-delta dots.', decorativeOnly: false },
+      { token: '--aqua', light: '--mc-aqua', on: '--mc-on-aqua', job: 'Period aqua: hover washes and icon buttons.', decorativeOnly: false },
+      { token: '--walnut', light: '--mc-on-mustard', job: 'Walnut #2F2018, the poster ink: the label colour on mustard and aqua, and the line colour in art. It is already --ink in light mode; in dark mode --ink is cream, so use walnut only where a dark ink sits on a period fill.', decorativeOnly: false },
+    ],
     press: { opacity: 1, ms: 180 },
     motion: { fast: 180, base: 180, slow: 280, ease: 'out' },
     surface: 'Flat warm-cream paper fills divided by thin hairlines; no shadows.',
@@ -708,17 +730,34 @@ const AESTHETIC_BUILD = {
     appIcon: 'Full-bleed `{primary}` tile with one simple geometric shape or starburst in `{accent}`; flat, no shadow, no gradient, no text.',
   },
   'blueprint': { cls: 'flat', modes: { only: 'dark', because: 'pale linework on blueprint blue is the medium' } },
-  'xerox': { cls: 'flat', modes: { only: 'light', because: 'it imitates toner on white paper; there is no dark paper' } },
-  'bauhaus-poster': { cls: 'flat' }, 'editorial-serif': { cls: 'flat' }, 'bento-grid': { cls: 'flat' },
+  'xerox': { cls: 'flat', surface: 'Flat fills divided by hairlines; no shadows. Dust and noise appear only on the sheet margins, never over UI text.', modes: { only: 'light', because: 'it imitates toner on white paper; there is no dark paper' } },
+  'bauhaus-poster': {
+    cls: 'flat',
+    press: { opacity: 1, dx: 2, dy: 2, ms: 0 },
+    motion: { fast: 0, base: 120, slow: 200, ease: 'out' },
+    surface: 'Flat fills divided by hairlines; no shadows. Poster red #EE4035 and poster yellow #F6C90E are fixed decorative planes (art, stripes and shapes only, never text or controls); the blue plane is always the brand primary. The vertical kicker appears in the hero only. Headlines are lowercase.',
+    pressText: 'Instant, no easing and no shadow: the control travels (2,2) when pressed and returns on release; colour does not change.',
+    states: { pressed: ['No colour change', 'Travels (2,2) instantly (0 ms), no shadow, no easing.'] },
+    fixedInks: [
+      { token: '--poster-red', light: '--ab-bau-red', job: 'Poster red #EE4035: the red plane in the hero art, stripes and shapes.', decorativeOnly: true },
+      { token: '--poster-yellow', light: '--ab-bau-yellow', job: 'Poster yellow #F6C90E: the yellow plane in the hero art, stripes and shapes.', decorativeOnly: true },
+    ],
+  },
+  'editorial-serif': { cls: 'flat', surface: 'Flat fills divided by hairlines; no shadows. A drop cap is used on long-form article text only, never on cards, captions or short copy.' },
+  'bento-grid': { cls: 'flat' },
   'mesh-gradient': {
     cls: 'flat',
     surface: 'Flat fills divided by hairlines; no shadows. The primary action is a 135deg two-stop gradient from `--primary` to the same hue shifted +28deg.',
     ambient: '12 to 20 s slow drift of the mesh behind the content, translate and rotate only (never scale or colour change)',
     reduceMotion: 'Replace slides and fades with an instant state swap; colour changes stay.',
   },
-  'micrographics': { cls: 'flat' }, 'mixed-type': { cls: 'flat' },
-  'dystopian-luxury': { cls: 'flat' }, 'naive-doodle': { cls: 'flat' }, 'japanese-minimal': { cls: 'flat' },
-  'transit-wayfinding': { cls: 'flat' }, 'gorpcore': { cls: 'flat' }, 'xerox-punk': { cls: 'flat' },
+  'micrographics': { cls: 'flat', surface: 'Flat fills divided by hairlines; no shadows. One huge number per screen, with tiny mono micro-labels.' }, 'mixed-type': { cls: 'flat' },
+  'dystopian-luxury': { cls: 'flat' }, 'naive-doodle': { cls: 'flat', surface: 'Flat fills divided by hairlines; no shadows. The ground is 24px graph paper at about 10% ink.' }, 'japanese-minimal': {
+    cls: 'flat',
+    surface: 'Flat fills divided by hairlines; no shadows. The accent is a fixed vermilion #BC002D (lifted only on a dark ground), not the client accent. No pattern band on the deck cover or closing.',
+    accentOverride: { light: '--ab-jm-dot', note: 'a fixed vermilion (the hinomaru dot, #BC002D, lifted only on a dark ground), whatever the brand accent' },
+  },
+  'transit-wayfinding': { cls: 'flat', surface: 'Flat fills divided by hairlines; no shadows. Route colour appears as numbered line badges and route bars.' }, 'gorpcore': { cls: 'flat' }, 'xerox-punk': { cls: 'flat' },
   'corporate-vandalism': { cls: 'flat' },
 };
 

@@ -311,6 +311,31 @@ function aibModeTokens(view, mode) {
 
 const aibPri = t => (t.printed ? t.printPrimary : t.primary);
 
+// A colour the aesthetic draws whatever the brand palette is (AESTHETIC_BUILD accentOverride / fixedInks):
+// `spec.light` / `spec.dark` (either falls back to the other) is an extras key like '--ab-jm-dot' read from the
+// board's own tokens for this mode, a hex, or a function(m). Returns a #rrggbb hex or '' when it cannot resolve.
+function aibInkValue(spec, m, field) {
+  let v = field ? spec[field] : (m.mode === 'dark' ? (spec.dark != null ? spec.dark : spec.light) : (spec.light != null ? spec.light : spec.dark));
+  if (typeof v === 'function') v = v(m);
+  else if (typeof v === 'string' && v.slice(0, 2) === '--') v = m.extras[v];
+  v = String(v == null ? '' : v).trim();
+  return AIB_HEX.test(v) ? v : '';
+}
+
+// accentOverride: the look prints its own accent, so the accent and its derived colours (label on it,
+// the accent as text) are recomputed from the value the board draws.
+function aibApplyAccentOverride(build, m) {
+  if (!m || !build.accentOverride) return;
+  const v = aibInkValue(build.accentOverride, m);
+  if (!v) return;
+  const t = m.t;
+  t.accent = v;
+  t.onAccent = pickReadableText(v);
+  t.accentInk = abAccentInk(v, t.canvas, t.ink);
+  t.accentLow = contrastRatio(v, t.canvas) < 3;
+  t.accentText = slVisible(t.canvas, [v, t.primary], 3, t.ink);
+}
+
 // Errors need a colour the five brand roles do not have: a fixed red, shaded toward the ink
 // until it holds 4.5:1 on the canvas in this mode.
 function aibError(t) {
@@ -368,6 +393,7 @@ function aibContext(state0, opts) {
   const mode = only || (state.bgMode === 'dark' ? 'dark' : 'light');
   const L = only === 'dark' ? null : aibModeTokens(view, 'light');
   const D = only === 'light' ? null : aibModeTokens(view, 'dark');
+  [L, D].forEach(m => aibApplyAccentOverride(build, m));
   const modes = [L, D].filter(Boolean);
   const cur = mode === 'dark' ? D : L;
   const probe = opts.noProbe ? null : aibProbeBoard(state, def);
@@ -423,8 +449,16 @@ function aibPaletteRows(ctx) {
   add('--line', m => m.t.line, 'Hairlines, dividers, resting input borders.', []);
   add('--primary', m => aibPri(m.t), roleJob('primary') + printedNote, [['--on-primary', m => m.t.onPrimary]]);
   add('--secondary', m => m.t.secondary, roleJob('secondary'), [['--on-secondary', m => m.t.onSecondary]]);
-  add('--accent', m => m.t.accent, roleJob('accent'), [['--on-accent', m => m.t.onAccent]]);
+  const ao = build.accentOverride;
+  const accentNote = ao && modes.every(m => aibInkValue(ao, m))
+    ? ` ${def.name} draws the accent as ${ao.note || 'its own colour, whatever the brand accent is'}; use this value everywhere. The brand accent (${ctx.state.colors.accent}) appears only in the palette swatch.` : '';
+  add('--accent', m => m.t.accent, roleJob('accent') + accentNote, [['--on-accent', m => m.t.onAccent]]);
   add('--accent-ink', m => m.t.accentInk, 'The accent as text, shaded or tinted to 3:1 on the canvas. The highlight word only; never plain accent as text.', []);
+  (build.fixedInks || []).forEach(ink => {
+    if (!modes.every(m => aibInkValue(ink, m))) return;
+    const job = ink.decorativeOnly ? `Decorative only, never text or controls. ${ink.job}` : ink.job;
+    add(ink.token, m => aibInkValue(ink, m), job, ink.on ? [['--on-' + ink.token.replace(/^--/, ''), m => aibInkValue(ink, m, 'on')]] : []);
+  });
   add('--pri-tint', m => m.t.priTint, 'Quiet primary wash: selected background, hover on primary-linked items.', [['--ink', m => m.t.ink]]);
   add('--sec-tint', m => m.t.secTint, 'Quiet secondary wash: selected row, tonal fills, hover on secondary items.', [['--ink', m => m.t.ink]]);
   add('--error', m => aibError(m.t), 'Errors only: field edge, icon and message. Fixed red, 4.5:1 or better on the canvas; never a brand colour.', [['--on-error', m => pickReadableText(aibError(m.t))]]);
@@ -898,7 +932,7 @@ function aibSwiftLines(ctx) {
     '}', '');
   const ease = n => AIB_SWIFT_EASE[mo.ease](n);
   P('enum Motion {',
-    `    static let fast = ${mo.fast / 1000}, base = ${mo.base / 1000}, slow = ${mo.slow / 1000}`,
+    `    static let fast: Double = ${mo.fast / 1000}, base: Double = ${mo.base / 1000}, slow: Double = ${mo.slow / 1000}`,
     `    static let press: Animation = ${mo.ease === 'steps' ? '.linear(duration: 0)' : ease('fast')}`,
     `    static let settle: Animation = ${mo.ease === 'steps' ? '.linear(duration: 0.12)' : ease('base')}`,
     '}', '');
@@ -930,7 +964,8 @@ function aibSwiftLines(ctx) {
   } else if (sw === 'stepped') {
     btn.push('.overlay(shape.strokeBorder(isEnabled ? Palette.ink : Palette.muted, lineWidth: Metrics.outline))');
   } else {
-    btn.push(`.opacity(down ? ${build.press.opacity} : 1)`);
+    if (build.press.opacity !== 1) btn.push(`.opacity(down ? ${build.press.opacity} : 1)`);
+    if (build.press.dx != null) btn.push(`.offset(x: down ? ${build.press.dx} : 0, y: down ? ${build.press.dy} : 0)`);
   }
   P('struct ThemeButtonStyle: ButtonStyle {',
     '    @Environment(\\.isEnabled) private var isEnabled',
