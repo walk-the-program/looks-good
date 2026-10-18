@@ -347,3 +347,72 @@
 .ab[data-ae="neo-brutal-pop"] .npp-buy { font-size: 20px; padding: 16px 16px 16px 26px; }
 .ab[data-ae="neo-brutal-pop"] .ab-mark, .ab[data-ae="neo-brutal-pop"] .ab-type-col[data-role="heading"] .ab-type-cur b { font-weight: var(--np-hw, 800); }
 .ab[data-ae="neo-brutal-pop"] :is(.ab-type-col[data-role="body"] .ab-type-cur b, .ab-deck-pratio b) { font-weight: var(--np-uw, 700); }
+
+/* ---- Built (product screens): colour fields, ink borders, hard shadows and a few stickers ---- */
+.ab.sb-ab[data-ae="neo-brutal-pop"] .sb-side {
+  background: var(--ab-primary); color: var(--ab-on-primary); border-right: var(--np-b) solid var(--ab-ink);
+}
+.ab.sb-ab[data-ae="neo-brutal-pop"] .sb-side .ab-brand, .ab.sb-ab[data-ae="neo-brutal-pop"] .sb-side .ab-wordmark { color: var(--ab-on-primary); }
+.ab.sb-ab[data-ae="neo-brutal-pop"] .sb-navi {
+  position: relative; color: var(--ab-on-primary); font-weight: var(--np-uw, 700);
+  border: var(--np-b) solid transparent; border-radius: var(--np-r);
+}
+.ab.sb-ab[data-ae="neo-brutal-pop"] .sb-navi:hover { background: color-mix(in srgb, var(--ab-on-primary) 16%, transparent); color: var(--ab-on-primary); }
+.ab.sb-ab[data-ae="neo-brutal-pop"] .sb-navi[aria-current] {
+  background: var(--ab-paper); color: var(--ab-ink); border-color: var(--ab-ink); box-shadow: 3px 3px 0 var(--np-shc);
+}
+.ab.sb-ab[data-ae="neo-brutal-pop"] .sb-navi[aria-current]::after {
+  content: ""; position: absolute; right: -9px; top: -11px; width: 24px; height: 24px; rotate: 14deg; pointer-events: none;
+  background: var(--np-flower-img) center / 100% 100% no-repeat;
+}
+.ab.sb-ab[data-ae="neo-brutal-pop"] .sb-navi:focus-visible { outline: 3px solid var(--ab-ink); outline-offset: 2px; }
+.ab.sb-ab[data-ae="neo-brutal-pop"] .sb-me { border-top: var(--np-b) solid var(--ab-on-primary); color: var(--ab-on-primary); }
+.ab.sb-ab[data-ae="neo-brutal-pop"] .sb-me-name small { color: var(--ab-on-primary); }
+.ab.sb-ab[data-ae="neo-brutal-pop"] .sb-me-av {
+  border: var(--np-b) solid var(--ab-ink); border-radius: var(--np-r); box-shadow: 2px 2px 0 var(--np-shc); font-weight: var(--np-hw, 800);
+}
+
+/* the "NEW" starburst stuck on the page title */
+.ab.sb-ab[data-ae="neo-brutal-pop"] .sb-top-t { position: relative; }
+.ab.sb-ab[data-ae="neo-brutal-pop"] .sb-top-t::after {
+  content: "NEW"; position: absolute; left: calc(100% - 34px); top: 18px; width: 48px; height: 48px; rotate: 12deg; pointer-events: none;
+  display: grid; place-items: center; background: var(--np-star-img) center / 100% 100% no-repeat;
+  font: var(--np-hw, 800) 10px/1 var(--ab-font-h); letter-spacing: 0; color: var(--ab-on-accent);
+}
+.ab.sb-ab[data-ae="neo-brutal-pop"] .sb-top .ab-kicker { box-shadow: 3px 3px 0 var(--np-shc); }
+
+/* stat cards: four flat colour fields, tilted a hair on alternating cells */
+.ab.sb-ab[data-ae="neo-brutal-pop"] .ab-card.sb-stat { box-shadow: 5px 5px 0 var(--np-shc); }
+.ab.sb-ab[data-ae="neo-brutal-pop"] .ab-card.sb-stat:nth-child(odd) { rotate: -0.6deg; }
+.ab.sb-ab[data-ae="neo-brutal-pop"] .ab-card.sb-stat:nth-child(even) { rotate: 0.5deg; }
+.ab.sb-ab[data-ae="neo-brutal-pop"] .sb-stat:nth-child(1) { background: var(--ab-secondary); color: var(--ab-on-secondary); }
+.ab.sb-ab[data-ae="neo-brutal-pop"] .sb-stat:nth-child(2) { background: var(--ab-accent); color: var(--ab-on-accent); }
+.ab.sb-ab[data-ae="neo-brutal-pop"] .sb-stat:nth-child(4) { background: var(--ab-primary); color: var(--ab-on-primary); }
+.ab.sb-ab[data-ae="neo-brutal-pop"] .sb-stat:is(:nth-child(1), :nth-child(2), :nth-child(4)) :is(.ab-label, .ab-card-title) { color: inherit; }
+.ab.sb-ab[data-ae="neo-brutal-pop"] .sb-stat .ab-fit { background: var(--ab-paper); color: var(--ab-ink); font-weight: var(--np-uw, 700); }
+.ab.sb-ab[data-ae="neo-brutal-pop"] .ab-card.sb-stat .ab-card-title.sb-num { font-weight: var(--np-hw, 800); }
+.ab.sb-ab[data-ae="neo-brutal-pop"] .sb-stat:nth-child(4) { position: relative; }
+.ab.sb-ab[data-ae="neo-brutal-pop"] .sb-stat:nth-child(4)::after {
+  content: "!"; position: absolute; right: -12px; top: -14px; width: 30px; height: 30px; rotate: 10deg; pointer-events: none;
+  display: grid; place-items: center; border: var(--np-b) solid var(--ab-ink); border-radius: 50%; box-shadow: 2px 2px 0 var(--np-shc);
+  background: var(--ab-paper); color: var(--ab-ink); font: var(--np-hw, 800) 16px/1 var(--ab-font-h);
+}
+
+/* chart: flat secondary area, a chunky square ink line with a hard shadow, a square marker */
+.ab.sb-ab[data-ae="neo-brutal-pop"] .sb-chart-plot { border-left: var(--np-b) solid var(--ab-ink); border-bottom: var(--np-b) solid var(--ab-ink); }
+.ab.sb-ab[data-ae="neo-brutal-pop"] .sb-c-grid { stroke: var(--ab-ink); opacity: 0.18; }
+.ab.sb-ab[data-ae="neo-brutal-pop"] .sb-c-area { fill: var(--ab-secondary); }
+.ab.sb-ab[data-ae="neo-brutal-pop"] .sb-c-line {
+  stroke: var(--ab-ink); stroke-width: 3.5; stroke-linecap: square; stroke-linejoin: miter; filter: drop-shadow(3px 3px 0 var(--np-shc));
+}
+.ab.sb-ab[data-ae="neo-brutal-pop"] .sb-c-prev { stroke: var(--ab-ink); opacity: 0.55; }
+.ab.sb-ab[data-ae="neo-brutal-pop"] .sb-c-dot { width: 16px; height: 16px; margin: -8px 0 0 -8px; border-radius: 3px; border: var(--np-b) solid var(--ab-ink); background: var(--ab-accent); box-shadow: 2px 2px 0 var(--np-shc); }
+.ab.sb-ab[data-ae="neo-brutal-pop"] .sb-lg-now { height: 4px; border-radius: 0; background: var(--ab-ink); }
+
+/* the quick-settings panel is a colour field too; its text stays ink */
+.ab.sb-ab[data-ae="neo-brutal-pop"] .ab-panel.sb-quick { background: var(--ab-card-fill); }
+.ab.sb-ab[data-ae="neo-brutal-pop"] .sb-hint { color: var(--ab-ink); }
+.ab.sb-ab[data-ae="neo-brutal-pop"] .sb-quick .ab-input, .ab.sb-ab[data-ae="neo-brutal-pop"] .sb-quick .ab-switch:not(:checked) { background: var(--ab-paper); }
+
+/* invoice rows: a primary-tinted leader bar down the left edge of the list header */
+.ab.sb-ab[data-ae="neo-brutal-pop"] .sb-listsec > .ab-labelrow .ab-label:last-child { padding: 3px 10px; border: var(--np-b) solid var(--ab-ink); border-radius: var(--np-r); background: var(--ab-accent); color: var(--ab-on-accent); }
