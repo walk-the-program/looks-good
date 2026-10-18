@@ -76,6 +76,10 @@ registerAesthetic({
       // lights and darks are derived from the brand primary, never invented
       '--ab-eds-plate-dark': t.mix(t.primary, '#000000', 0.5),
       '--ab-eds-plate': t.mix(t.primary, t.ink, 0.35),
+      '--ab-eds-plate-hi': d ? t.mix(t.mix(t.primary, t.ink, 0.35), t.ink, 0.4) : t.mix(t.mix(t.primary, t.ink, 0.35), t.canvas, 0.3),
+      // light mode: the plate deepens toward the foot (canvas-coloured coverline on top); dark mode keeps it light
+      // (the coverline is canvas-coloured, i.e. dark, there)
+      '--ab-eds-plate-lo': d ? t.mix(t.mix(t.primary, t.ink, 0.35), t.ink, 0.25) : t.mix(t.mix(t.primary, t.ink, 0.35), '#000000', 0.45),
       '--ab-eds-paper': d ? t.ink : t.canvas,
       '--ab-eds-ink-hover': t.mix(t.ink, t.primary, 0.88),
       '--ab-eds-primary-press': t.mix(t.primary, '#000000', 0.78),
@@ -90,6 +94,7 @@ registerAesthetic({
     const e = escapeHtml;
     return `<figure class="eds">
       <div class="eds-plate">
+        <i class="eds-half"></i>
         <i class="eds-grain"></i>
         <span class="eds-no">No. 01</span>
         <span class="eds-cap">${e(ctx.initial)}</span>
