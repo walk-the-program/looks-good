@@ -24,7 +24,7 @@ registerAesthetic({
   name: 'Aurora Noir',
   descriptor: 'Precise · Nocturnal · Charged',
   influences: 'Dev-tool UI / Swiss grid / Aurora light',
-  summary: 'A near-black, exact interface with hairline surfaces, lit by one sharp beam of aurora light.',
+  summary: 'A near-black, exact interface with hairline surfaces, lit by glowing aurora light.',
   motto: 'Quiet. Exact. Charged.',
   kicker: 'Lit by one beam',   // true in both modes (it was "Built for the dark", wrong on a light board)
   mode: 'dark',
@@ -60,7 +60,7 @@ registerAesthetic({
     },
     accent: {
       use: 'The "New" badge, the focus-mode status dot and the highlighted headline word (shaded to read as text); header and footer dots stay muted',
-      never: 'Buttons, body text, borders, aurora washes',
+      never: 'Buttons, body text, borders',
       coverage: '≤3%',
     },
   },
@@ -79,7 +79,7 @@ registerAesthetic({
     // No text sits on them (the window is opaque, the headline is above the beam),
     // so there is no contrast loop to dim them.
     const mid = t.mix(t.primary, t.secondary, 0.5);
-    const a1 = d ? 0.55 : 0.42, a2 = d ? 0.5 : 0.38, a3 = d ? 0.2 : 0.24;   // a3: the cone on the window, kept under the muted text's 4.5:1
+    const a1 = d ? 0.78 : 0.5, a2 = d ? 0.7 : 0.46, a3 = d ? 0.2 : 0.24;   // a3: the cone on the window, kept under the muted text's 4.5:1
     // light mode: muted text from 62% ink up, until it holds 4.5:1 on the deepest ink-alpha
     // fill it sits on (the selected chip, about 12% ink over the canvas)
     // (dark mode: the framework muted, pulled toward ink only if the same fill needs it, which
@@ -109,6 +109,12 @@ registerAesthetic({
       '--ab-sel-line': t.alpha(t.ink, d ? 0.16 : 0.14),
       '--ab-ink-hover': t.mix(t.ink, t.canvas, 0.86),
       '--ab-cta-kbd': t.alpha(t.canvas, 0.14),
+      // the aurora itself: three soft colour clouds (accent green / primary / secondary) above the hero, plus a
+      // pale crown; plain radial gradients, so they export with the board and need no filter
+      '--ab-au-acc': t.alpha(t.accent, d ? 0.5 : 0.34),
+      '--ab-au-pri': t.alpha(t.primary, d ? 0.62 : 0.4),
+      '--ab-au-sec': t.alpha(t.secondary, d ? 0.42 : 0.34),
+      '--ab-au-top': t.alpha(t.mix(t.primary, t.secondary, 0.5), d ? 0.3 : 0.2),
       '--ab-au1': t.alpha(t.primary, a1.toFixed(2)),
       '--ab-au2': t.alpha(t.secondary, a2.toFixed(2)),
       '--ab-au3': t.alpha(mid, a3.toFixed(2)),
@@ -156,8 +162,8 @@ registerAesthetic({
     </div>
     <svg class="ana-arc" viewBox="0 0 1000 120" preserveAspectRatio="none" focusable="false" aria-hidden="true"><defs>
       <linearGradient id="${id}g" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="${t.primary}" stop-opacity="0"/><stop offset=".22" stop-color="${t.primary}"/><stop offset=".5" stop-color="#ffffff"/><stop offset=".78" stop-color="${t.secondary}"/><stop offset="1" stop-color="${t.secondary}" stop-opacity="0"/></linearGradient></defs>
-      <ellipse cx="500" cy="420" rx="620" ry="404" fill="none" stroke="url(#${id}g)" stroke-width="3" opacity=".35" style="filter:blur(3px)"/>
-      <ellipse cx="500" cy="420" rx="620" ry="404" fill="none" stroke="url(#${id}g)" stroke-width="1.2" opacity=".8" vector-effect="non-scaling-stroke"/>
+      <ellipse cx="500" cy="420" rx="620" ry="404" fill="none" stroke="url(#${id}g)" stroke-width="6" opacity=".6" style="filter:blur(4px)"/>
+      <ellipse cx="500" cy="420" rx="620" ry="404" fill="none" stroke="url(#${id}g)" stroke-width="1.6" opacity="1" vector-effect="non-scaling-stroke"/>
     </svg></div>`;
   },
 
@@ -192,13 +198,13 @@ registerAesthetic({
     do: [
       'Build every surface from alphas of the ink color (3% fill, 8% hairline); never a second solid background.',
       'Fill the one main action with ink (canvas-colored label); show brand primary only in selected states, the focus ring, progress bars and the status dot.',
-      'Make the aurora a light: one sharp beam from above and a hairline horizon arc, at full strength, behind the opaque window; everything else stays flat and sharp.',
+      'Make the aurora visible: soft accent / primary / secondary colour clouds above the hero, a wide beam from above and a hairline horizon arc behind the opaque window; the interface itself stays flat and sharp.',
       'Set IDs, timestamps and numbers in mono with tabular figures, right-aligned in tables.',
       'Give one card per view the beam colors along its top edge only; the rest are plain hairlines.',
     ],
     dont: [
       'Add drop shadows or blurred panels to cards; depth comes from the 1px top highlight alone.',
-      'Fill the main action with primary, set the headline in a gradient, or turn the aurora into a blurred fog.',
+      'Fill the main action with primary, set the headline in a gradient, or let the aurora wash over cards, text or the whole page; it lives above the hero and along one top edge.',
       'Use accent for anything bigger than a dot, a badge or one headline word.',
       'Round controls past 8px or cards past 14px; this look is exact, not soft.',
     ],
@@ -212,7 +218,7 @@ registerAesthetic({
     principles: [
       ['Quiet, exact, charged', 'Hairline surfaces on a near-black field.'],
       ['Surfaces are alphas of ink', 'A 3% fill and an 8% hairline; no second background.'],
-      ['The aurora is a light', 'One sharp beam and a hairline horizon, not a fog.'],
+      ['The aurora is the light', 'Soft colour clouds, a wide beam and a hairline horizon over a flat interface.'],
     ],
     do: [
       'Build surfaces from alphas of the ink color.',

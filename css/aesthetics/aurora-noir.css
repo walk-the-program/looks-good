@@ -27,6 +27,22 @@
   background-size: 100% 100%, 48px 48px, 48px 48px; background-position: 0 0, -1px -1px, -1px -1px;
 }
 
+/* the aurora: soft accent / primary / secondary clouds above the hero. z-index 1 puts it over the grid wallpaper's
+   canvas veil (::after, z0) and under the content (.ab-in, z1, later in tree order). Plain radial gradients (no
+   filter, no mask) so the deck export draws them too; the clouds sit right and top of the headline, never as a
+   wash over cards or small text. */
+.ab[data-ae="aurora-noir"]::before {
+  content: ""; position: absolute; left: 0; right: 0; top: 0; height: min(920px, 100%); z-index: 1; pointer-events: none;
+  background:
+    radial-gradient(ellipse 32% 36% at 86% 19%, var(--ab-au-acc) 0, transparent 100%),
+    radial-gradient(ellipse 46% 40% at 54% 12%, var(--ab-au-pri) 0, transparent 100%),
+    radial-gradient(ellipse 32% 36% at 18% 17%, var(--ab-au-sec) 0, transparent 100%),
+    radial-gradient(ellipse 70% 18% at 50% 0%, var(--ab-au-top) 0, transparent 100%);
+}
+/* small muted text that sits over the clouds is lifted toward ink so it keeps 4.5:1 on the lit field */
+.ab[data-ae="aurora-noir"]:not(.sb-ab) :is(.ab-tag, .ab-kicker) { color: color-mix(in srgb, var(--ab-ink) 84%, transparent); }
+.ab[data-ae="aurora-noir"]:not(.sb-ab) .ab-sub-rest { color: color-mix(in srgb, var(--ab-ink) 74%, transparent); }
+
 /* labels are mono through --ab-font-label; touches here are size and tracking */
 .ab[data-ae="aurora-noir"] .ab-label { font-size: 11px; letter-spacing: 0.08em; color: var(--ab-muted); }
 .ab[data-ae="aurora-noir"] .ab-n { color: var(--ab-ink); }
@@ -76,8 +92,8 @@
    and a hairline horizon arc beneath. Conic angles are absolute (0deg = up), so 158-202deg points down. */
 .ab[data-ae="aurora-noir"] .ab-art::before {
   content: ""; position: absolute; inset: -16% -4% -4%; z-index: -1; pointer-events: none;
-  background: conic-gradient(at 50% 3%, transparent 146deg, var(--ab-au1) 166deg, rgba(255, 255, 255, 0.4) 180deg, var(--ab-au2) 194deg, transparent 214deg);
-  filter: blur(10px);
+  background: conic-gradient(at 50% 3%, transparent 128deg, var(--ab-au1) 156deg, rgba(255, 255, 255, 0.5) 180deg, var(--ab-au2) 204deg, transparent 232deg);
+  filter: blur(14px);
 }
 .ab[data-ae="aurora-noir"] .ab-art::after {
   content: ""; position: absolute; inset: -16% 5% 0; z-index: 2; pointer-events: none; mix-blend-mode: screen;
@@ -305,3 +321,18 @@
 /* deck cover: the art box is short, so the window shows its first rows only; drop the Teams group so
    the sidebar ends on a whole item instead of a cut label */
 .ab[data-ae="aurora-noir"].ab-slide[data-slide="cover"] :is(.ana-grp, .ana-nav-sub) { display: none; }
+
+/* ---- Built (product screens): the same light along the top edge; the interface stays flat ---- */
+.ab.sb-ab[data-ae="aurora-noir"]::before { height: min(360px, 100%); }
+.ab.sb-ab[data-ae="aurora-noir"] .ab-card.sb-stat:not(:first-child), .ab.sb-ab[data-ae="aurora-noir"] .ab-card.sb-chart {
+  background: linear-gradient(90deg, transparent, var(--ab-top), transparent) top / 100% 1px no-repeat, var(--ab-solid);
+}
+/* the one featured card: the beam colours (accent, primary, secondary) on a 2px top edge with a soft lit rim */
+.ab.sb-ab[data-ae="aurora-noir"] .ab-card.sb-stat:first-child {
+  background: linear-gradient(90deg, transparent, var(--ab-au-acc), var(--ab-au1), var(--ab-au2), transparent) top / 100% 2px no-repeat, var(--ab-solid);
+  box-shadow: 0 -10px 30px -14px var(--ab-au1);
+}
+
+/* deck: the clouds belong to the cover; on the other slides they stay a low glow behind the top edge so the
+   small tag and caption text keeps its contrast */
+.ab[data-ae="aurora-noir"].ab-slide:not([data-slide="cover"])::before { height: 40%; opacity: 0.5; }
