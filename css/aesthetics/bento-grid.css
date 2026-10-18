@@ -67,25 +67,7 @@
   margin: auto 0 0; padding: clamp(18px, 3cqw, 34px) 0 clamp(14px, 2cqw, 22px);
   font-size: calc(clamp(44px, 7.6cqw, 104px) * var(--ab-hl-scale, 1) * var(--ab-hs, 1));
 }
-.ab[data-ae="bento-grid"]:not(.ab-slide) > .ab-in > .ab-hero > .ab-hero-copy .ab-kicker { margin-bottom: clamp(14px, 2cqw, 22px) !important; }
-/* the mini-chart tile fills the dead zone between the kicker and the headline: one idea (momentum), a few bars */
-.ab[data-ae="bento-grid"]:not(.ab-slide) > .ab-in > .ab-hero > .ab-hero-copy::before {
-  content: "+24% this week"; order: 1; align-self: stretch; max-width: 420px; box-sizing: border-box; min-height: clamp(76px, 9.5cqw, 96px); padding: 16px 18px;
-  border-radius: calc(var(--bn-r) * 0.72); color: var(--ab-ink); font: 600 15px/1.2 var(--ab-font-ui); letter-spacing: -0.01em;
-  background:
-    linear-gradient(color-mix(in srgb, var(--ab-primary) 38%, transparent), color-mix(in srgb, var(--ab-primary) 38%, transparent)) right 120px bottom 16px / 8px 19px no-repeat,
-    linear-gradient(color-mix(in srgb, var(--ab-primary) 38%, transparent), color-mix(in srgb, var(--ab-primary) 38%, transparent)) right 107px bottom 16px / 8px 26px no-repeat,
-    linear-gradient(color-mix(in srgb, var(--ab-primary) 38%, transparent), color-mix(in srgb, var(--ab-primary) 38%, transparent)) right 94px bottom 16px / 8px 22px no-repeat,
-    linear-gradient(color-mix(in srgb, var(--ab-primary) 38%, transparent), color-mix(in srgb, var(--ab-primary) 38%, transparent)) right 81px bottom 16px / 8px 32px no-repeat,
-    linear-gradient(color-mix(in srgb, var(--ab-primary) 38%, transparent), color-mix(in srgb, var(--ab-primary) 38%, transparent)) right 68px bottom 16px / 8px 29px no-repeat,
-    linear-gradient(color-mix(in srgb, var(--ab-primary) 38%, transparent), color-mix(in srgb, var(--ab-primary) 38%, transparent)) right 55px bottom 16px / 8px 40px no-repeat,
-    linear-gradient(var(--ab-primary), var(--ab-primary)) right 42px bottom 16px / 8px 35px no-repeat,
-    linear-gradient(var(--ab-primary), var(--ab-primary)) right 29px bottom 16px / 8px 48px no-repeat,
-    linear-gradient(var(--ab-primary), var(--ab-primary)) right 16px bottom 16px / 8px 56px no-repeat,
-    var(--ab-tile-pri);
-}
-.ab[data-ae="bento-grid"]:not(.ab-slide) > .ab-in > .ab-hero > .ab-hero-copy .ab-headline { order: 2; }
-.ab[data-ae="bento-grid"]:not(.ab-slide) > .ab-in > .ab-hero > .ab-hero-copy .ab-subcopy { order: 3; }
+.ab[data-ae="bento-grid"]:not(.ab-slide) > .ab-in > .ab-hero > .ab-hero-copy .ab-kicker { margin-bottom: auto !important; }
 .ab[data-ae="bento-grid"]:not(.ab-slide) > .ab-in > .ab-hero::before,
 .ab[data-ae="bento-grid"]:not(.ab-slide) > .ab-in > .ab-hero::after { grid-column: 8 / -1; grid-row: 3; min-width: 0; }
 .ab[data-ae="bento-grid"]:not(.ab-slide) > .ab-in > .ab-hero::before {
