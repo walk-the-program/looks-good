@@ -186,7 +186,9 @@ function abHeadline(tagline) {
   const text = String(tagline || '').trim();
   const m = text.match(/^([\s\S]*?)([^\s]+?)([.,;:!?…]*)$/);
   if (!m) return escapeHtml(text);
-  return `${escapeHtml(m[1])}<span class="ab-hl">${escapeHtml(m[2])}</span>${escapeHtml(m[3])}`;
+  // The highlight and its closing punctuation are one unbreakable unit, so a lone "." never wraps onto its own line.
+  if (!m[3]) return `${escapeHtml(m[1])}<span class="ab-hl">${escapeHtml(m[2])}</span>`;
+  return `${escapeHtml(m[1])}<span class="ab-hl-glue"><span class="ab-hl">${escapeHtml(m[2])}</span>${escapeHtml(m[3])}</span>`;
 }
 
 // The headline's h2 for the board hero and the deck's cover, principles and closing
@@ -1340,4 +1342,137 @@ function abFitLogos(root) {
     if (todo.size && !queued) { queued = true; Promise.resolve().then(flush); }
   }).observe(document.body, { childList: true, subtree: true });
   abFitLogos(document);
+})();
+
+/* ---------------- headline word fit ----------------
+   A headline never breaks a word in the middle ("INSTAGR / AM."). The stylesheet lets words
+   overflow instead (overflow-wrap: normal), and this pass shrinks --ab-hs on the board root,
+   which every headline size multiplies, until the longest word fits its box. Floor 0.55 of
+   the designed size; a word still wider at the floor is cut as a last resort
+   (data-wrap-last-resort). Measured in the headline's own box, so a zoomed mini board
+   (.ob-mini-board) and a scaled deck slide read the same as a full-size board. Deck slides
+   have their own fit (bdFitDeck) and are left alone. */
+const AB_HL_FLOOR = 0.55;
+const abHlRoots = new Set();
+
+// Width of the box divided by the widest word that spills it (1 = every word fits; a word
+// split across lines counts as 0.94, one more step down).
+function abHeadlineNeed(h) {
+  const box = h.getBoundingClientRect();
+  if (box.width < 4) return 1;
+  let need = 1;
+  const rng = document.createRange();
+  // Each word is a run of text; the highlight with its closing punctuation (.ab-hl-glue) is one word.
+  const words = [];
+  const walker = document.createTreeWalker(h, NodeFilter.SHOW_TEXT);
+  for (let n = walker.nextNode(); n; n = walker.nextNode()) {
+    if (n.parentElement && n.parentElement.closest('.ab-hl-glue')) continue;
+    const re = /\S+/g;
+    let m;
+    while ((m = re.exec(n.nodeValue))) {
+      const from = m.index, to = m.index + m[0].length;
+      words.push(() => { rng.setStart(n, from); rng.setEnd(n, to); return [...rng.getClientRects()]; });
+    }
+  }
+  // The glued unit is measured by its text alone, not the highlight's band or padding.
+  h.querySelectorAll('.ab-hl-glue').forEach(g => words.push(() => {
+    const out = [];
+    const tw = document.createTreeWalker(g, NodeFilter.SHOW_TEXT);
+    for (let t = tw.nextNode(); t; t = tw.nextNode()) { rng.selectNodeContents(t); out.push(...rng.getClientRects()); }
+    return out;
+  }));
+  for (const rectsOf of words) {
+    const rects = rectsOf().filter(q => q.width > 0.5 && q.height > 0.5);
+    if (!rects.length) continue;
+    const left = Math.min(...rects.map(q => q.left)), right = Math.max(...rects.map(q => q.right));
+    // How far past the box the word reaches, from the far edge: a narrow word on an overlong line (ransom tiles) counts too.
+    if (right > box.right + 1.5) need = Math.min(need, box.width / (right - box.left));
+    if (left < box.left - 1.5) need = Math.min(need, box.width / (box.right - left));
+    const mid = rects.map(q => q.top + q.height / 2);
+    if (Math.max(...mid) - Math.min(...mid) > Math.min(...rects.map(q => q.height)) * 0.5) need = Math.min(need, 0.94);
+  }
+  return need;
+}
+
+function abFitHeadlines(root) {
+  if (!root || !root.isConnected || root.classList.contains('ab-slide')) return;
+  const heads = [...root.querySelectorAll('.ab-headline')].filter(h => h.getClientRects().length);
+  if (!heads.length) return;
+  heads.forEach(h => {
+    h.removeAttribute('data-wrap-last-resort');
+    if (h.hasAttribute('data-ab-fs')) { h.style.removeProperty('font-size'); h.removeAttribute('data-ab-fs'); }
+    if (h.hasAttribute('data-ab-mw')) { h.style.removeProperty('max-width'); h.removeAttribute('data-ab-mw'); }
+  });
+  // Whatever --ab-hs a fit of mine did not set (a new render, a blend, the type size) is the new designed size.
+  const cur = root.style.getPropertyValue('--ab-hs');
+  if (root.dataset.abHsFit === undefined || root.dataset.abHsFit !== cur) root.dataset.abHs0 = cur || '1';
+  const base = parseFloat(root.dataset.abHs0) || 1;
+  const setHs = f => { const t = f === 1 ? root.dataset.abHs0 : (base * f).toFixed(3); root.style.setProperty('--ab-hs', t); root.dataset.abHsFit = t; };
+  setHs(1);
+  const worst = () => Math.min(1, ...heads.map(abHeadlineNeed));
+  let need = worst();
+  if (need >= 1) return;
+  // A max-width on the headline (a measure in ch, which shrinks with the type) is a nicety
+  // a whole word outranks: lift it before shrinking anything.
+  heads.forEach(h => {
+    if (abHeadlineNeed(h) < 1 && getComputedStyle(h).maxWidth !== 'none') { h.style.setProperty('max-width', 'none', 'important'); h.setAttribute('data-ab-mw', ''); }
+  });
+  need = worst();
+  if (need >= 1) return;
+  // The lever is --ab-hs; a headline whose own stylesheet ignores it is sized in px instead.
+  const fs0 = heads.map(h => parseFloat(getComputedStyle(h).fontSize));
+  let viaVar = true;
+  const apply = f => {
+    setHs(viaVar ? f : 1);
+    if (!viaVar) heads.forEach((h, i) => { h.style.setProperty('font-size', (fs0[i] * f).toFixed(2) + 'px', 'important'); h.setAttribute('data-ab-fs', ''); });
+  };
+  let f = Math.max(AB_HL_FLOOR, Math.min(0.97, need * 0.985));
+  apply(f);
+  if (heads.every((h, i) => Math.abs(parseFloat(getComputedStyle(h).fontSize) - fs0[i]) < 0.01)) { viaVar = false; apply(f); }
+  for (let i = 0; i < 8; i++) {
+    need = worst();
+    if (need >= 1 || f <= AB_HL_FLOOR) break;
+    // The first steps are proportional guesses; the later ones close any gap the guess left.
+    f = Math.max(AB_HL_FLOOR, f * (i < 3 ? Math.min(0.97, need * 0.985) : 0.96));
+    apply(f);
+  }
+  heads.forEach(h => { if (abHeadlineNeed(h) < 1) h.setAttribute('data-wrap-last-resort', ''); });
+}
+
+(function watchHeadlines() {
+  if (typeof MutationObserver !== 'function' || !document.body) {
+    document.addEventListener('DOMContentLoaded', watchHeadlines, { once: true });
+    return;
+  }
+  const todo = new Set();
+  let queued = false;
+  const flush = () => {
+    queued = false;
+    const list = [...todo];
+    todo.clear();
+    list.forEach(r => { try { abFitHeadlines(r); } catch (err) { /* an unfitted headline still shows */ } });
+  };
+  // A frame, or 120ms when frames are held back (a background tab): measuring needs layout, not a paint.
+  const schedule = root => { todo.add(root); if (!queued) { queued = true; requestAnimationFrame(flush); setTimeout(flush, 120); } };
+  const size = typeof ResizeObserver === 'function' ? new ResizeObserver(entries => entries.forEach(e => schedule(e.target))) : null;
+  const add = root => {
+    if (abHlRoots.has(root)) { schedule(root); return; }
+    abHlRoots.add(root);
+    if (size) size.observe(root);
+    schedule(root);
+  };
+  const scan = node => {
+    if (node.nodeType !== 1) return;
+    const hit = n => { const r = n.closest('.ab'); if (r) add(r); };
+    if (node.matches && node.matches('.ab-headline')) hit(node);
+    if (node.querySelectorAll) node.querySelectorAll('.ab-headline').forEach(hit);
+  };
+  new MutationObserver(muts => muts.forEach(m => m.addedNodes.forEach(scan))).observe(document.body, { childList: true, subtree: true });
+  // A face that arrives late changes the widths.
+  if (document.fonts && document.fonts.addEventListener) {
+    document.fonts.addEventListener('loadingdone', () => {
+      abHlRoots.forEach(r => { if (r.isConnected) schedule(r); else { abHlRoots.delete(r); if (size) size.unobserve(r); } });
+    });
+  }
+  scan(document.body);
 })();

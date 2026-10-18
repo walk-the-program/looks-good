@@ -706,6 +706,7 @@ function bdFitCover(root) {
   const hl = root.querySelector('.ab-hero .ab-headline');
   if (!hl) return;
   hl.style.removeProperty('font-size');
+  if (hl.hasAttribute('data-ab-mw')) { hl.style.removeProperty('max-width'); hl.removeAttribute('data-ab-mw'); }
   const art0 = root.querySelector('.ab-hero .ab-art');
   if (art0) { art0.style.maxWidth = ''; art0.style.width = ''; art0.style.removeProperty('justify-self'); }
   delete root.dataset.coverFlat;
@@ -733,12 +734,21 @@ function bdFitCover(root) {
     fs = Math.max(minPx, fs * 0.96);
     setFs(fs);
   }
-  // 1b. a word still broken at the 64px floor (a very wide or tracked face): give
-  //     up the floor before breaking a word, never below 40px.
-  for (let i = 0; i < 20 && fs > emergencyPx && bdTextSpills(hl, null, true); i++) {
-    fs = Math.max(emergencyPx, fs * 0.96);
+  // 1b. a word still wider than the headline at the 64px floor (a very wide or tracked
+  //     face; words overflow instead of breaking, css/aesthetic-board.css): give up the
+  //     floor before cutting a word, down to 24px. A word that still spills is cut
+  //     as a last resort (data-wrap-last-resort). The 40px emergency floor below still
+  //     rules every other case.
+  hl.removeAttribute('data-wrap-last-resort');
+  const wordFloorPx = Math.min(emergencyPx, 24);
+  const spills = () => (typeof abHeadlineNeed === 'function' ? abHeadlineNeed(hl) < 1 : bdTextSpills(hl));
+  // A max-width in ch (a measure that shrinks with the type) is lifted before a word is shrunk for it.
+  if (spills() && getComputedStyle(hl).maxWidth !== 'none') { hl.style.setProperty('max-width', 'none', 'important'); hl.setAttribute('data-ab-mw', ''); }
+  for (let i = 0; i < 40 && fs > wordFloorPx && spills(); i++) {
+    fs = Math.max(wordFloorPx, fs * 0.96);
     setFs(fs);
   }
+  if (spills()) hl.setAttribute('data-wrap-last-resort', '');
   // 2. too tall for the 0.85 floor: shrink the headline, but only down to a
   //    statement size, then the art box in 8% steps (the scene hero's copy
   //    sits inside the art, so there it is left alone), then the headline on to 64px.

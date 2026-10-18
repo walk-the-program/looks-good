@@ -89,8 +89,13 @@
 .ab-headline {
   font-family: var(--ab-font-h); font-weight: 600; line-height: 1; letter-spacing: -0.03em;
   font-size: calc(clamp(32px, 7.4cqw, 70px) * var(--ab-hl-scale, 1) * var(--ab-hs, 1) * var(--ab-display, 1));
-  text-wrap: balance; overflow-wrap: anywhere;
+  text-wrap: balance; overflow-wrap: normal;
 }
+/* Words stay whole: abFitHeadlines (js/aesthetic-board.js) shrinks --ab-hs until the longest
+   word fits, and only a word still wider than its box at the floor gets cut. */
+.ab[data-ae] .ab-headline:not([data-wrap-last-resort]) { overflow-wrap: normal; }   /* beats an aesthetic's own break-word */
+.ab-hl-glue { white-space: nowrap; }   /* the highlight word and its closing punctuation never part */
+.ab .ab-headline[data-wrap-last-resort] { overflow-wrap: anywhere !important; }
 /* Sub-copy under the headline: reading copy, so the brand body face. The two
    spans let an aesthetic set a two-tone statement (.ab-sub-lead / .ab-sub-rest). */
 .ab-subcopy {
