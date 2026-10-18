@@ -138,10 +138,13 @@ function chooseAesthetic(key) {
 // recommended pairing (what "Use recommended fonts" applies) unless Typography is
 // locked. Runs inside the caller's undo step; returns the pairing when fonts changed.
 // Opening a saved brand never goes through here, so its fonts stay as saved.
-function followAestheticFonts() {
+// opts.random picks any of the style's pairings instead of the first, so shuffles stay
+// varied but faithful to the style.
+function followAestheticFonts(opts) {
   if (state.locks.typography) return null;
   const meta = window.aestheticMeta ? aestheticMeta(state.aesthetic) : null;
-  const pair = meta && meta.fonts && meta.fonts.pairings && meta.fonts.pairings[0];
+  const pairs = meta && meta.fonts && meta.fonts.pairings;
+  const pair = pairs && pairs.length ? (opts && opts.random ? pickRandom(pairs) : pairs[0]) : null;
   const heading = pair && fontByName(pair[0]);
   const body = pair && fontByName(pair[1]);
   if (!heading || !body) return null;
@@ -598,7 +601,11 @@ function wireEvents() {
     if (!state.locks.color) randomizeColor();
     if (!state.locks.shape) randomizeShape();
     // Last, so an unlocked aesthetic's slide shape wins over the random one.
-    if (!state.locks.aesthetic) randomizeAesthetic();
+    if (!state.locks.aesthetic) {
+      randomizeAesthetic();
+      // Faithful to the new style: a random one of its pairings (no-op when Type is locked).
+      followAestheticFonts({ random: true });
+    }
     render();
   });
 

@@ -454,6 +454,7 @@
     }
     hold = null;
     busy = null;
+    followAestheticFonts();           // fonts follow the landed style (no-op when Type is locked)
     lastLook = lookKey();
     render();                         // the full render: deck, findings, save state
     lastLook = lookKey();
