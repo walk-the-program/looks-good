@@ -32,13 +32,15 @@ function btBayer(n) {
   return m;
 }
 const BT_B = btBayer(8);
-const BT_NX = 432, BT_NY = 180;          // dither grid (2.4 : 1); one cell = one viewBox unit (~2px at 884w)
+const BT_NX = 432, BT_NY = 180;          // dither grid (2.4 : 1, shown at 2.1 : 1); one cell = one viewBox unit (~2px at 884w)
 const BT_HASH = (x, y) => { const v = Math.sin(x * 127.1 + y * 311.7) * 43758.5453; return v - Math.floor(v); };
 
 // ---- the subject: people crossing a plaza, seen from a high angle ----
 // Feet positions along two crossing paths (one runs to a lit doorway at the right). Each
 // figure: head disc r 3, torso capsule 5 x 11, two leg strokes at +-15 deg (two stride
 // frames), and a long cast shadow (an ellipse at 25% amplitude, offset +8, +4).
+// Figure scale: people are drawn at 1.45x so they read as people (not specks) at board width.
+const BT_K = 1.45;
 const BT_DOOR = { x0: 394, y0: 26, x1: 414, y1: 98 };
 const BT_SUBJ = (function () {
   const feet = [
@@ -50,10 +52,10 @@ const BT_SUBJ = (function () {
   return feet.map(([fx, fy], i) => ({
     fx, fy, frame: i % 2, amp: 0.86 + BT_HASH(i, 1) * 0.14,
     // bounding box of the figure (used by the clustering below)
-    x: fx, y: fy - 12, hx: 3.6, hy: 12.6,
+    x: fx, y: fy - 12 * BT_K, hx: 3.6 * BT_K, hy: 12.6 * BT_K,
   }));
 })();
-const BT_SHADOWS = BT_SUBJ.map(s => ({ x: s.fx + 8, y: s.fy + 4, rx: 9, ry: 2.4 }));
+const BT_SHADOWS = BT_SUBJ.map(s => ({ x: s.fx + 8 * BT_K, y: s.fy + 4 * BT_K, rx: 9 * BT_K, ry: 2.4 * BT_K }));
 
 // Luminance field: a dark plaza with a faint paving grid, a lit doorway and its spill,
 // bright figures and their dim cast shadows.
@@ -75,7 +77,7 @@ const BT_LUM = (function () {
   };
   const add = (x, y, v) => { if (x >= 0 && y >= 0 && x < BT_NX && y < BT_NY) { const k = y * BT_NX + x; L[k] = Math.max(L[k], v); } };
   BT_SHADOWS.forEach(sh => {
-    for (let y = Math.floor(sh.y - 5); y <= sh.y + 5; y++) for (let x = Math.floor(sh.x - 13); x <= sh.x + 13; x++) {
+    for (let y = Math.floor(sh.y - 5 * BT_K); y <= sh.y + 5 * BT_K; y++) for (let x = Math.floor(sh.x - 13 * BT_K); x <= sh.x + 13 * BT_K; x++) {
       const u = (x + 0.5 - sh.x) / sh.rx, w = (y + 0.5 - sh.y) / sh.ry;
       const d = Math.max(0, Math.sqrt(u * u + w * w) - 1) * sh.ry;
       add(x, y, 0.25 * Math.exp(-d * d * 0.9) + 0.03);
@@ -83,13 +85,13 @@ const BT_LUM = (function () {
   });
   BT_SUBJ.forEach(s => {
     const { fx, fy } = s;
-    const sp = Math.tan(15 * Math.PI / 180) * 7;
-    const legs = s.frame ? [[fx - 1, fy - 7, fx - 1 - sp, fy], [fx + 1, fy - 7, fx + 1 + sp, fy]] : [[fx - 1, fy - 7, fx - 0.6, fy], [fx + 1, fy - 7, fx + 1 + sp * 0.7, fy - 0.4]];
-    for (let y = Math.floor(fy - 26); y <= fy + 1; y++) for (let x = Math.floor(fx - 6); x <= fx + 6; x++) {
+    const K = BT_K, sp = Math.tan(15 * Math.PI / 180) * 7 * K;
+    const legs = s.frame ? [[fx - K, fy - 7 * K, fx - K - sp, fy], [fx + K, fy - 7 * K, fx + K + sp, fy]] : [[fx - K, fy - 7 * K, fx - 0.6 * K, fy], [fx + K, fy - 7 * K, fx + K + sp * 0.7, fy - 0.4]];
+    for (let y = Math.floor(fy - 26 * K); y <= fy + 1; y++) for (let x = Math.floor(fx - 6 * K); x <= fx + 6 * K; x++) {
       const px = x + 0.5, py = y + 0.5;
-      const head = Math.max(0, Math.hypot(px - fx, py - (fy - 21.5)) - 3);
-      const torso = Math.max(0, seg(px, py, fx, fy - 15.5, fx, fy - 9.5) - 2.5);
-      const leg = Math.min(...legs.map(l => Math.max(0, seg(px, py, l[0], l[1], l[2], l[3]) - 0.9)));
+      const head = Math.max(0, Math.hypot(px - fx, py - (fy - 21.5 * K)) - 3 * K);
+      const torso = Math.max(0, seg(px, py, fx, fy - 15.5 * K, fx, fy - 9.5 * K) - 2.5 * K);
+      const leg = Math.min(...legs.map(l => Math.max(0, seg(px, py, l[0], l[1], l[2], l[3]) - 0.9 * K)));
       const v = Math.max(s.amp * Math.exp(-head * head * 1.4), s.amp * 0.82 * Math.exp(-torso * torso * 1.4), s.amp * 0.7 * Math.exp(-leg * leg * 1.6));
       add(x, y, v);
     }
@@ -258,7 +260,7 @@ function btPlateSvg(t, id, opts) {
       ${o.grain ? `<filter id="${id}n" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" seed="4" stitchTiles="stitch"/><feColorMatrix values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 1.4 -0.42"/></filter>` : ''}
     </defs>
     <rect width="${BT_NX}" height="${BT_NY}" fill="${plate}"/>
-    <g fill="${lit}" shape-rendering="crispEdges"><use href="#${id}d" fill-opacity=".16"/><use href="#${id}e" fill-opacity=".5"/></g>
+    <g fill="${lit}" shape-rendering="crispEdges"><use href="#${id}d" fill-opacity=".3"/><use href="#${id}e" fill-opacity=".85"/></g>
     <g clip-path="url(#${id}g)" shape-rendering="crispEdges"><rect width="${BT_NX}" height="${BT_NY}" fill="${plate}"/><g fill="${lit}"><use href="#${id}d" fill-opacity=".3"/><use href="#${id}e" fill-opacity=".92"/></g></g>
     <g clip-path="url(#${id}i)" shape-rendering="crispEdges"><rect width="${BT_NX}" height="${BT_NY}" fill="${lit}"/><g fill="${plate}"><use href="#${id}d" fill-opacity=".3"/><use href="#${id}e" fill-opacity=".92"/></g></g>
     ${L ? `<g clip-path="url(#${id}l)"><rect width="${BT_NX}" height="${BT_NY}" fill="${t.primary}" opacity=".35" style="mix-blend-mode:multiply"/></g>` : ''}

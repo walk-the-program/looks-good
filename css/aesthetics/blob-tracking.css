@@ -13,7 +13,7 @@
 
 .ab[data-ae="blob-tracking"] {
   border-radius: 4px; font-synthesis: none;
-  --ab-art-ratio: 2.4 / 1; --ab-art-ratio-narrow: 4 / 3;
+  --ab-art-ratio: 2.1 / 1; --ab-art-ratio-narrow: 4 / 3;
   --bt-tab-bg: var(--ab-ink); --bt-tab-fg: var(--ab-canvas);
   --bt-grain: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n' x='0' y='0' width='100%25' height='100%25'><feTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='2' stitchTiles='stitch' seed='3'/><feColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 1.6 -.62'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
   --bt-grain-op: 0.25;
@@ -99,16 +99,16 @@
 .ab[data-ae="blob-tracking"] .ab-art { border-top: 1px solid var(--ab-box-soft); border-bottom: 1px solid var(--ab-box-soft); background: var(--ab-plate); overflow: hidden; }
 .ab[data-ae="blob-tracking"]:not(.ab-slide)[data-hero="centered"] .ab-art { width: calc(100% + 2 * var(--ab-pad)); margin-inline: calc(-1 * var(--ab-pad)); justify-self: stretch; }
 .ab[data-ae="blob-tracking"] .bta { position: absolute; inset: 0; overflow: hidden; font-family: ui-monospace, "SF Mono", Menlo, monospace; color: var(--ab-lit); }
-/* the plate is always 2.4:1; a taller box (phone 4:3, the deck stage) crops its sides */
-.ab[data-ae="blob-tracking"] .bta-plate { position: absolute; top: 0; bottom: 0; left: 50%; height: 100%; width: auto; min-width: 100%; aspect-ratio: 2.4 / 1; transform: translateX(-50%); }
+/* the plate is always 2.1:1; a taller box (phone 4:3, the deck stage) crops its sides */
+.ab[data-ae="blob-tracking"] .bta-plate { position: absolute; top: 0; bottom: 0; left: 50%; height: 100%; width: auto; min-width: 100%; aspect-ratio: 2.1 / 1; transform: translateX(-50%); }
 .ab[data-ae="blob-tracking"] .bta-fx { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
 .ab[data-ae="blob-tracking"] .bta-frame { position: absolute; inset: 0; overflow: hidden; container-type: size; }
 /* tabs and the lock readout are placed on the plate (--x / --x1 = the box's left / right edge in % of the
    plate) but held 6px inside the visible frame when the plate is cropped (phone, deck stage); a tab whose
    box is wholly outside the frame is moved out of it (no half label pokes in). --pw = plate width, --c = the
-   crop on each side (the plate is 2.4:1, full height, centred). */
+   crop on each side (the plate is 2.1:1, full height, centred). */
 .ab[data-ae="blob-tracking"] :is(.bta-tab, .bta-xy) {
-  --pw: max(100cqw, 240cqh); --c: calc((var(--pw) - 100cqw) / 2);
+  --pw: max(100cqw, 210cqh); --c: calc((var(--pw) - 100cqw) / 2);
   --xl: calc(var(--x, 0) * var(--pw) / 100); --xr: calc(var(--x1, 0) * var(--pw) / 100);
   left: min(max(calc(var(--c) + 6px), var(--xl)), calc(var(--xl) - 9999px + max(0px, var(--xr) - var(--c)) * 1000000));
   transform: translate(max(min(0px, calc(var(--c) + 100cqw - 6px - var(--xl) - 100%)), calc(min(0px, var(--xl) - var(--c) - 100cqw) * 1000000 + 9999px)), var(--ty, -100%));
