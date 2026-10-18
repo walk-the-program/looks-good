@@ -1,9 +1,11 @@
 /* 04 Retro-Futurist — space-age graphic systems (NASA standards manual, 2001,
    Syd Mead, Space: 1999): a lit white field, bold extended type, one signal
    colour and an orbital horizon plate. The hero art is a full-bleed planet limb
-   with orbits and one tiny craft; the mission console (dial, LCD, LED ladder)
-   is a secondary material shown only on the deck's Material slide. Look lives
-   in css/aesthetics/retro-futurist.css. */
+   with orbits and one tiny craft (a lit planet, an accent orbit, a stripe band along the
+   foot); the mission console (dial, LCD, LED ladder) is shown on the deck's Material
+   slide and its gauge language (stat dials, LED-ladder bars, lamp chips, a T+ readout)
+   runs through the product UI. Display type follows the brand heading face (the recommended
+   pairing is Michroma). Look lives in css/aesthetics/retro-futurist.css. */
 (function () {
   let seq = 0;
 
@@ -24,6 +26,7 @@
   // Orbital horizon plate: black sky into the canvas haze, a planet limb with an
   // atmosphere rim in the signal colour, three orbits, one craft, a 12-col grid.
   function horizon(t, id) {
+    const acc = t.accent;
     // The plate is deep space in both modes: the one dark image on a lit page.
     const sig = t.primary;
     const haze = t.mix(sig, '#000000', 0.22);
@@ -32,8 +35,10 @@
     const R = 262, CX = 120, CY = 75 + R;   // limb top at y = 75
     let grid = '';
     for (let i = 1; i < 12; i++) grid += `<line x1="${i * 20}" y1="0" x2="${i * 20}" y2="100" stroke="#ffffff" stroke-opacity=".05" stroke-width="1" vector-effect="non-scaling-stroke"/>`;
-    const orbits = [[105, 13, ''], [142, 19, ''], [180, 25, '0.9 2.1']].map(o =>
-      `<ellipse cx="${CX}" cy="66" rx="${o[0]}" ry="${o[1]}" fill="none" stroke="#ffffff" stroke-opacity=".38" stroke-width=".9" vector-effect="non-scaling-stroke"${o[2] ? ` stroke-dasharray="${o[2]}"` : ''}/>`).join('');
+    // three orbits: white, the accent (a lit ring), white dashed
+    const orbits = [[105, 13, '', '#ffffff', 0.38, 0.9], [142, 19, '', acc, 0.95, 1.4], [180, 25, '0.9 2.1', '#ffffff', 0.38, 0.9]].map(o =>
+      `<ellipse cx="${CX}" cy="66" rx="${o[0]}" ry="${o[1]}" fill="none" stroke="${o[3]}" stroke-opacity="${o[4]}" stroke-width="${o[5]}" vector-effect="non-scaling-stroke"${o[2] ? ` stroke-dasharray="${o[2]}"` : ''}/>`).join('');
+    const pale = t.mix(sig, '#ffffff', 0.78), lit = t.mix(sig, '#ffffff', 0.3), deep = t.mix(sig, '#000000', 0.62);
     // the craft rides the middle orbit, upper left (258deg on the unrotated ellipse)
     const at = deg => [CX + 142 * Math.cos(deg * Math.PI / 180), 66 + 19 * Math.sin(deg * Math.PI / 180)];
     const [px, py] = at(258);
@@ -47,20 +52,21 @@
           <stop offset=".64" stop-color="${t.mix(haze, '#000000', 0.25)}"/><stop offset=".75" stop-color="${haze}"/>
         </linearGradient>
         <linearGradient id="${id}p" x1="0" y1="${CY - R}" x2="0" y2="100" gradientUnits="userSpaceOnUse">
-          <stop offset="0" stop-color="${ground0}"/><stop offset="1" stop-color="${ground1}"/>
+          <stop offset="0" stop-color="${pale}"/><stop offset=".035" stop-color="${lit}"/><stop offset=".2" stop-color="${sig}"/><stop offset="1" stop-color="${deep}"/>
         </linearGradient>
         <filter id="${id}b" x="-10%" y="-40%" width="120%" height="180%"><feGaussianBlur stdDeviation="2.2"/></filter>
       </defs>
       <rect width="240" height="100" fill="url(#${id}k)"/>
       <circle cx="31" cy="14" r=".45" fill="#ffffff" opacity=".8"/><circle cx="188" cy="9" r=".35" fill="#ffffff" opacity=".6"/><circle cx="214" cy="31" r=".4" fill="#ffffff" opacity=".7"/>
       <g transform="rotate(-8 ${CX} 66)">${orbits}</g>
-      <circle cx="${CX}" cy="${CY}" r="${R}" fill="none" stroke="${sig}" stroke-width="6" opacity=".35" filter="url(#${id}b)"/>
+      <circle cx="${CX}" cy="${CY}" r="${R}" fill="none" stroke="${lit}" stroke-width="7" opacity=".55" filter="url(#${id}b)"/>
       <circle cx="${CX}" cy="${CY}" r="${R}" fill="url(#${id}p)"/>
-      <circle cx="${CX}" cy="${CY}" r="${R}" fill="none" stroke="${sig}" stroke-width=".8" opacity=".9"/>
+      <circle cx="${CX}" cy="${CY}" r="${R}" fill="none" stroke="${pale}" stroke-width=".9" opacity=".95"/>
       <g transform="rotate(-8 ${CX} 66)">
         <polyline points="${arcPts}" fill="none" stroke="${sig}" stroke-width="1.4" vector-effect="non-scaling-stroke" stroke-linecap="round"/>
         <g transform="translate(${px.toFixed(2)} ${py.toFixed(2)}) rotate(6)">
-          <polygon points="-1.5,-.6 1.5,-.2 1.5,.2 -1.5,.6" fill="#ffffff"/>
+          <polygon points="-1.8,-.8 1.8,-.25 1.8,.25 -1.8,.8" fill="#ffffff"/>
+          <circle cx="-1.9" cy="0" r=".5" fill="${acc}"/>
           <line x1="-1.5" y1="0" x2="-4" y2="0" stroke="#ffffff" stroke-width=".2" stroke-opacity=".7"/>
           <text x="3" y="-2.2" ${MONO} font-size="2.1" fill="#ffffff" letter-spacing=".25">MRG-01 / T+00:41:07</text>
         </g>
@@ -148,7 +154,7 @@
     name: 'Retro-Futurist',
     descriptor: 'Analog · Orbital · Glowing',
     influences: 'NASA standards / 2001 / Syd Mead / Space: 1999',
-    summary: 'A space-age graphic system: a lit white field, extended type, one signal colour and an orbit.',
+    summary: 'A space-age graphic system: a lit white field, extended type, a lit planet and orbit, stripe bands, dials and LED ladders around one signal colour.',
     motto: 'All systems nominal.',
     kicker: 'Mission control',
     mode: 'light',
@@ -188,7 +194,13 @@
     tokens(t, st) {
       const S = st || (typeof state !== 'undefined' ? state : null) || {};
       const sig = signalOf(t);
+      // muted text also sits on the app sidebar (a 3.5% ink tint over the canvas): hold 4.6:1 there
+      const side = t.mix(t.ink, t.canvas, 0.08);
+      let muted = t.muted;
+      for (let k = 0.05; k <= 1.001 && Math.min(t.contrast(muted, side), t.contrast(muted, t.canvas)) < 4.6; k += 0.05) muted = t.mix(t.ink, t.muted, k);
       return {
+        '--ab-muted': muted,
+        '--ab-rf-hot': t.isDark ? '#FF7A4D' : '#D93A12',
         '--rf-hair-2': t.alpha(t.ink, 0.08),
         // --ab-rf-* (not --rf-*) so materials[].css placeholders ({rfSignal} -> --ab-rf-signal) resolve
         '--ab-rf-signal': sig, '--ab-rf-hair': t.alpha(t.ink, 0.18), '--ab-rf-off': t.alpha(t.ink, 0.15),
@@ -217,17 +229,18 @@
 
     rules: {
       do: [
-        'Use one signal colour: the primary marks the action, one headline word, one orbit and the lit lamp; everything else is ink.',
-        'Set headlines in a bold extended grotesk, uppercase, tight, very large; set captions in ultra-wide thin caps.',
-        'Give the hero a vast field and a tiny object: a planet limb, three orbits and one craft.',
-        'Number every section like a standards manual (1.1, 1.2 …) and keep panels flat with 1px hairlines.',
-        'Make light the hero mode: a white, evenly lit field with black type, as in 2001 and the NASA manual.',
+        'Use one signal colour: the primary marks the action, one headline word, one lit ring and the lit lamps; everything else is ink.',
+        'Set headlines in an extended grotesk (Eurostile style), uppercase, large; set captions in ultra-wide thin caps.',
+        'Give the hero a vast field, a lit planet limb, three orbits and one tiny craft, with the stripe band along the foot.',
+        'Use the three-stripe band (primary, secondary, accent) as the rule, the divider and the card top edge.',
+        'Make progress an LED ladder, a stat a small dial or a mono readout, and a status a lamp plus a label; use the hot orange only for an alert lamp.',
+        'Round the keys: pill buttons and switches, 22px panels, flat with 1px hairlines.',
       ],
       dont: [
-        'Glow, chrome or gloss anything; space-age type is flat white, flat black or flat signal.',
-        'Spread the client palette over lamps and readouts; one hue per screen.',
+        'Chrome, gloss or soft blurs; only a lit lamp may glow, and only a little.',
+        'Spread the client palette over lamps and readouts; one hue per screen, plus the hot lamp.',
         'Fill the hero with a gadget; the console is a secondary material.',
-        'Use pill buttons or candy lamps; keys and lamps are square.',
+        'Use rainbow stripes or more than three bands.',
         'Use psychedelic swirls or op-art; the system is orbits, grids and horizons.',
       ],
     },
@@ -238,14 +251,16 @@
       },
     },
     deck: {
+      // The cover's foot is the NASA three-stripe band drawn in css (the shared grey pattern band read as a placeholder).
+      coverBand: false,
       // Material slide: the mission console (dial, LCD, LED ladder), the deck's second idea.
       materialArt(ctx) {
         return `<div class="rfa-console" style="position:absolute;inset:0">${consoleArt(ctx.t, 'rfc' + (++seq))}</div>`;
       },
       principles: [
         ['One signal colour', 'The primary marks one thing per screen; the rest is ink.'],
-        ['Horizon and orbit', 'A vast field, a planet limb and one tiny craft.'],
-        ['Extended type', 'Bold, wide, uppercase headlines and thin wide captions.'],
+        ['Horizon and orbit', 'A lit planet limb, an accent ring and one tiny craft.'],
+        ['Dials and stripes', 'Extended type, three-stripe bands, dials and LED ladders.'],
       ],
       do: [
         'Mark one thing per screen in the signal colour.',
@@ -253,9 +268,9 @@
         'Number sections like a standards manual.',
       ],
       dont: [
-        'Glow, chrome or gloss anything.',
+        'Use chrome or gloss.',
         'Light every lamp in a different colour.',
-        'Use pill buttons or candy lamps.',
+        'Stack more than three stripe bands.',
       ],
     },
   });
