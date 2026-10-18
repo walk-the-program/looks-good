@@ -26,6 +26,8 @@ const AA_PUNCT = {
   '&': '01100 10010 10100 01000 10101 10010 01101', ':': '00000 01100 01100 00000 01100 01100 00000',
 };
 const AA_CGA = ['#0000AA', '#00AA00', '#00AAAA', '#AA0000', '#AA00AA', '#AA5500', '#AAAAAA', '#555555', '#5555FF', '#55FF55', '#55FFFF', '#FF5555', '#FF55FF', '#FFFF55', '#FFFFFF'];
+// On black the dark blue, red and magenta (1.5-3:1) are dropped: those hues snap to their bright twins (#5555FF, #FF5555, #FF55FF).
+const AA_CGA_ON_BLACK = AA_CGA.filter(h => !['#0000AA', '#AA0000', '#AA00AA'].includes(h));
 const AA_CGA_DARK = ['#0000AA', '#00AA00', '#00AAAA', '#AA0000', '#AA00AA', '#AA5500', '#555555'];
 
 // Faces whose character advance is 0.6em (the grid maths needs a known advance).
@@ -78,10 +80,10 @@ function aaCga(hex, set) {
 // from the same set on paper (so the chip and the 3:1 highlight word are one colour family), from all
 // sixteen on black.
 function aaQuant(t) {
-  const set = t.isDark ? AA_CGA : AA_CGA_DARK;
+  const set = t.isDark ? AA_CGA_ON_BLACK : AA_CGA_DARK;
   const p = aaCga(t.primary, set);
   const sc = aaCga(t.secondary, set.filter(h => h !== p));
-  const ac = aaCga(t.accent, (t.isDark ? AA_CGA : AA_CGA_DARK).filter(h => h !== p && h !== sc && h !== '#FFFFFF'));
+  const ac = aaCga(t.accent, (t.isDark ? AA_CGA_ON_BLACK : AA_CGA_DARK).filter(h => h !== p && h !== sc && h !== '#FFFFFF'));
   return { p, s: sc, a: ac };
 }
 
@@ -351,7 +353,7 @@ registerAesthetic({
     const safe = (hex, min) => { let c = hex; for (let k = 1; k <= 20 && t.contrast(c, t.canvas) < min; k++) c = t.mix(hex, t.ink, 1 - k * 0.05); return c; };
     vars['--aa-sec'] = safe(q.s, 4.5);
     vars['--ab-accent-ink'] = safe(q.a, 3);
-    vars['--ab-primary-text'] = safe(q.p, 3);
+    vars['--ab-primary-text'] = safe(q.p, 4.5);
     // on paper the accent chip shows the colour the highlight word actually prints (shaded to 3:1 when needed)
     if (!t.isDark) { vars['--aa-q-a'] = vars['--ab-accent-ink']; vars['--ab-accent'] = vars['--ab-accent-ink']; vars['--ab-on-accent'] = t.readable(vars['--ab-accent-ink']); }
     // readouts print the client hex as a register value: 0xE4572E

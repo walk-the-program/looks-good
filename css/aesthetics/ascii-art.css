@@ -275,3 +275,16 @@
 .ab[data-ae="ascii-art"].ab-slide[data-slide="cover"] .aa-narrow, .ab[data-ae="ascii-art"].ab-slide[data-slide="material"] .aa-narrow { display: block; }
 .ab[data-ae="ascii-art"].ab-slide[data-slide="cover"] .ab-deck-cover .ab-hero { grid-template-columns: minmax(0, 1fr) auto; align-items: center; }
 .ab[data-ae="ascii-art"].ab-slide[data-slide="cover"] .ab-deck-cover .ab-art { width: 380px !important; max-width: 100% !important; justify-self: end; }
+
+/* Built product screens sit on the character grid: no negative tracking (every glyph is one cell wide), tabular
+   figures, spacing in ch / whole line heights, stat values and titles on whole-cell sizes. Faces are not forced:
+   the style asks for a mono heading and body (see its font pairing); this only keeps the spacing on the grid. */
+.ab.sb-ab[data-ae="ascii-art"] { --aa-cell: 1.5em; }
+.ab.sb-ab[data-ae="ascii-art"] :is(.ab-card-title, .sb-num, .sb-title, .ab-row-name, .ab-row-pct, .sb-navi, .ab-cta, .ab-type-apply, .ab-seg-btn) { letter-spacing: 0; font-variant-numeric: tabular-nums; font-variant-ligatures: none; }
+.ab.sb-ab[data-ae="ascii-art"] .sb-main { gap: 24px; padding: 24px 3ch 30px; }
+.ab.sb-ab[data-ae="ascii-art"] .sb-stats, .ab.sb-ab[data-ae="ascii-art"] .sb-mid { gap: 2ch; }
+.ab.sb-ab[data-ae="ascii-art"] .ab-card.sb-stat { padding: 16px 2ch 18px; }
+.ab.sb-ab[data-ae="ascii-art"] .ab-card-title.sb-title { font-size: 28px; line-height: 1.2; }
+.ab.sb-ab[data-ae="ascii-art"] .ab-card-title.sb-num { font-size: 22px; line-height: 1.2; }
+.ab.sb-ab[data-ae="ascii-art"] .sb-navi { padding-left: 2ch; padding-right: 2ch; }
+.ab.sb-ab[data-ae="ascii-art"] .ab-row { column-gap: 2ch; }
