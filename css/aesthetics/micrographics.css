@@ -240,6 +240,17 @@
 .ab[data-ae="micrographics"] .ab-row { grid-template-columns: 2.6ch minmax(0, 1fr) auto minmax(60px, 150px) minmax(4.5ch, auto); }
 .ab[data-ae="micrographics"] .ab-row-pct { justify-self: end; font-family: var(--ab-font-h); font-weight: var(--ab-hw, 700); font-size: clamp(22px, 3.6cqw, 40px); line-height: 0.9; letter-spacing: -0.05em; }
 
+/* Built: scale contrast belongs to ONE element per screen (the plate's rule). On the dashboard that is the lead stat,
+   given two columns and a huge figure under a tiny mono label; the other figures stay ordinary and the invoice
+   percentages drop to table size. fitStats() in js/see-built.js still shrinks the figure if a heavy face runs wide. */
+@container ab (min-width: 760px) {
+  .ab.sb-ab[data-ae="micrographics"] .sb-stats { grid-template-columns: 2.2fr 1fr 1fr 1fr; }
+  .ab.sb-ab[data-ae="micrographics"] .sb-stat:first-child .ab-card-title.sb-num { margin: 14px 0 12px !important; font-size: clamp(40px, 6.2cqw, 64px); line-height: 0.88; letter-spacing: -0.05em; }
+  .ab.sb-ab[data-ae="micrographics"] .sb-stat:first-child .ab-label { font-size: 8px; }
+  .ab.sb-ab[data-ae="micrographics"] .sb-stat:first-child .ab-label::after { content: "  ·  FIG.01  ·  USD"; color: var(--ab-muted); font-weight: 500; }
+}
+.ab.sb-ab[data-ae="micrographics"] .ab-row-pct { font-size: clamp(16px, 2.2cqw, 24px); letter-spacing: -0.03em; }
+
 /* footer */
 .ab[data-ae="micrographics"] .ab-foot { border-top: 1px solid var(--ab-ink); padding-top: 8px; font-size: 8px; letter-spacing: 0.2em; color: var(--ab-muted); }
 .ab[data-ae="micrographics"] .ab-motto { color: var(--ab-ink); font-weight: 700; }
