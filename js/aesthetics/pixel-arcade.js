@@ -9,6 +9,16 @@
 
 let pxaSeq = 0;
 
+// Silkscreen is a decorative device (micro-label and HUD captions), not brand type, so it is loaded
+// here. Titles, figures and buttons follow the brand heading face (recommended pairing: Pixelify Sans).
+function pxaFonts() {
+  if (typeof window === 'undefined' || !window.loadFontFamily || typeof FONTS === 'undefined') return;
+  ['Silkscreen'].forEach(n => {
+    const f = FONTS.find(x => x.name === n);
+    if (f) window.loadFontFamily(f);
+  });
+}
+
 // star glyph for the star collectibles
 const PXA_STAR = '00100 00100 11111 01110 01010 10001 00000';
 
@@ -17,7 +27,7 @@ registerAesthetic({
   name: 'Pixel Arcade',
   descriptor: 'Playful · Crunchy · Nostalgic',
   influences: '8-bit/16-bit games / Pixel art / Indie game UI',
-  summary: 'Stepped pixel borders, dithered shading and a sprite on a pixel landscape.',
+  summary: 'Bitmap type, stepped pixel borders, sprite icons, dithered shading and stepped bar charts, with a sprite on a pixel landscape.',
   motto: 'Press start.',
   kicker: 'Player one',
   mode: 'dark',
@@ -58,6 +68,7 @@ registerAesthetic({
 
   tokens(t) {
     const d = t.isDark;
+    pxaFonts();
     const st = typeof state !== 'undefined' ? state : null;
     const hName = st && st.headingFont ? st.headingFont.name : '';
     const hPixel = !!(st && st.headingFont && st.headingFont.cls === 'pixel');
@@ -72,7 +83,7 @@ registerAesthetic({
       '--ab-display': display,
       '--ab-uis': uiScale,
       '--ab-smooth': hPixel ? 'antialiased' : 'none',
-      '--ab-hw': hPixel ? 400 : 800,
+      '--ab-hw': hPixel ? (typeof abWeight === 'function' ? abWeight(st.headingFont, 600) : 400) : 800,
       '--ab-bd': d ? t.mix(t.ink, t.canvas, 0.82) : t.ink,
       '--ab-bd-dim': t.mix(t.ink, t.canvas, d ? 0.3 : 0.45),
       '--ab-panel': d ? t.mix(t.ink, t.canvas, 0.07) : t.mix('#ffffff', t.canvas, 0.6),
@@ -92,6 +103,7 @@ registerAesthetic({
   // The landscape is drawn on a 168 x 80 unit grid; the SVG is sliced, so narrow boards crop the sides.
   art(ctx) {
     const t = ctx.t;
+    pxaFonts();
     const n = ++pxaSeq;
     const mixc = (a, b, x) => t.mix(a, b, x);
     const outline = mixc('#000000', t.canvas, 0.62);
@@ -205,6 +217,8 @@ registerAesthetic({
 
   rules: {
     do: [
+      'Set titles, figures and buttons in a bitmap heading face (Pixelify Sans is the recommended pairing) and micro-labels in Silkscreen; keep paragraphs in a readable body face.',
+      'Draw icons as 8x8 sprites (house, list, person, crate, bars, gear, bell) and charts as stepped blocks or bars, never smooth lines.',
       'Draw every border as a stepped 4px box-shadow stack that notches the corners; keep every size a multiple of 4px.',
       'Shade with 2x2 dither and hard bands, never a smooth gradient or blur.',
       'Make the main button raise 4px on its underside and let that underside vanish when pressed.',
@@ -212,7 +226,7 @@ registerAesthetic({
     ],
     dont: [
       'Use border-radius, soft shadows, blur or anti-aliased curves on UI or art.',
-      'Set long text in a pixel display face; keep paragraphs in VT323 or a mono at a readable size.',
+      'Set long text in a pixel display face; keep paragraphs in the body face at a readable size.',
       'Tint panels with the primary or accent; panels are the canvas lifted one step.',
       'Animate beyond a two-frame blink or a 4px press; no easing, no fades.',
     ],
