@@ -289,3 +289,50 @@
 .ab.ab-slide[data-ae="transit-wayfinding"] .ab-deck-prodtools { padding: 14px 18px; background: var(--ab-sign); border-radius: var(--tw-r); color: var(--tw-white); }
 .ab.ab-slide[data-ae="transit-wayfinding"] .ab-deck-prod .ab-sec > .ab-labelrow .ab-label:last-child:not(:first-child) { color: var(--ab-muted); }
 .ab.ab-slide[data-ae="transit-wayfinding"] .ab-deck-pchip { font-weight: var(--tw-hw, 800); }
+
+/* ---- Built (product screens): route colour = line bars, line badges and route lines ---- */
+.ab.sb-ab[data-ae="transit-wayfinding"] .ab-row:nth-child(4n + 1) { --tw-c: var(--ab-route1); --tw-o: var(--tw-o1); }
+.ab.sb-ab[data-ae="transit-wayfinding"] .ab-row:nth-child(4n + 2) { --tw-c: var(--ab-route2); --tw-o: var(--tw-o2); }
+.ab.sb-ab[data-ae="transit-wayfinding"] .ab-row:nth-child(4n + 3) { --tw-c: var(--ab-route3); --tw-o: var(--tw-o3); }
+.ab.sb-ab[data-ae="transit-wayfinding"] .ab-row:nth-child(4n) { --tw-c: var(--ab-route1); --tw-o: var(--tw-o1); }
+/* the row number is the line badge: a numbered circle; the express (route 3) is a rounded square */
+.ab.sb-ab[data-ae="transit-wayfinding"] .ab-row:nth-child(4n + 3) .ab-row-n { border-radius: 8px; }
+/* status words lead with a short line segment in the row's route colour */
+.ab.sb-ab[data-ae="transit-wayfinding"] .ab-row-status { display: inline-flex; align-items: center; gap: 8px; }
+.ab.sb-ab[data-ae="transit-wayfinding"] .ab-row-status::before { content: ""; flex: none; width: 18px; height: 4px; border-radius: 2px; background: var(--tw-c, var(--ab-route1)); }
+
+/* sidebar: numbered line badges instead of line icons */
+.ab.sb-ab[data-ae="transit-wayfinding"] .sb-nav { counter-reset: twn; }
+.ab.sb-ab[data-ae="transit-wayfinding"] .sb-navi .sb-ico { display: none; }
+.ab.sb-ab[data-ae="transit-wayfinding"] .sb-navi::before {
+  counter-increment: twn; content: counter(twn); flex: none; display: grid; place-items: center; width: 22px; height: 22px; border-radius: 50%;
+  background: var(--tw-bc, var(--ab-rail)); color: var(--tw-bo, #000); font: var(--tw-hw, 800) 12px/1 var(--ab-font-h); font-variant-numeric: tabular-nums;
+}
+.ab.sb-ab[data-ae="transit-wayfinding"] .sb-navi:nth-child(5n + 1) { --tw-bc: var(--ab-route1); --tw-bo: var(--tw-o1); }
+.ab.sb-ab[data-ae="transit-wayfinding"] .sb-navi:nth-child(5n + 2) { --tw-bc: var(--ab-route2); --tw-bo: var(--tw-o2); }
+.ab.sb-ab[data-ae="transit-wayfinding"] .sb-navi:nth-child(5n + 3) { --tw-bc: var(--ab-route3); --tw-bo: var(--tw-o3); }
+.ab.sb-ab[data-ae="transit-wayfinding"] .sb-navi:nth-child(5n + 3)::before { border-radius: 6px; }
+.ab.sb-ab[data-ae="transit-wayfinding"] .sb-navi:nth-child(5n + 4) { --tw-bc: var(--ab-route1); --tw-bo: var(--tw-o1); }
+.ab.sb-ab[data-ae="transit-wayfinding"] .sb-navi:nth-child(5n) { --tw-bc: var(--ab-route2); --tw-bo: var(--tw-o2); }
+.ab.sb-ab[data-ae="transit-wayfinding"] .sb-navi:nth-child(6) { --tw-bc: var(--ab-rail); --tw-bo: #000; }
+
+/* a route-line stub on top of each stat sign: the three routes, then the one alert yellow on Overdue */
+.ab.sb-ab[data-ae="transit-wayfinding"] .ab-card.sb-stat { position: relative; }
+.ab.sb-ab[data-ae="transit-wayfinding"] .ab-card.sb-stat::before {
+  content: ""; position: absolute; left: 18px; top: 0; width: 44px; height: 5px; border-radius: 0 0 2px 2px; background: var(--ab-route1);
+}
+.ab.sb-ab[data-ae="transit-wayfinding"] .sb-stat:nth-child(2)::before { background: var(--ab-route2); }
+.ab.sb-ab[data-ae="transit-wayfinding"] .sb-stat:nth-child(3)::before { background: var(--ab-route3); }
+.ab.sb-ab[data-ae="transit-wayfinding"] .sb-stat:nth-child(4)::before { background: var(--ab-alert); }
+
+/* a three-route line under the page title; the chart reads as route 1 against route 2 */
+.ab.sb-ab[data-ae="transit-wayfinding"] .sb-top-t::after {
+  content: ""; display: block; width: 132px; height: 5px; margin-top: 10px; border-radius: 2px;
+  background: linear-gradient(90deg, var(--ab-route1) 0 36%, var(--ab-route2) 36% 68%, var(--ab-route3) 68%);
+}
+.ab.sb-ab[data-ae="transit-wayfinding"] .sb-c-line { stroke: var(--ab-route1); stroke-width: 3.5; stroke-linejoin: round; }
+.ab.sb-ab[data-ae="transit-wayfinding"] .sb-c-prev { stroke: var(--ab-route2); opacity: 0.9; }
+.ab.sb-ab[data-ae="transit-wayfinding"] .sb-c-area { fill: color-mix(in srgb, var(--ab-route1) 14%, transparent); }
+.ab.sb-ab[data-ae="transit-wayfinding"] .sb-c-dot { border-color: var(--ab-route1); }
+.ab.sb-ab[data-ae="transit-wayfinding"] .sb-lg-now { background: var(--ab-route1); }
+.ab.sb-ab[data-ae="transit-wayfinding"] .sb-lg-prev { border-top-color: var(--ab-route2); }
