@@ -248,7 +248,7 @@
 /* the vandal's marker: one official word struck through, the replacement written above it */
 .ab[data-ae="corporate-vandalism"] .ab-row-name s { position: relative; text-decoration: none; }
 .ab[data-ae="corporate-vandalism"] .ab-row-name s::after { content: ""; position: absolute; left: -3px; right: -4px; top: 52%; height: 3px; background: var(--ab-hazard); border-radius: 2px; transform: rotate(-3deg); }
-.ab[data-ae="corporate-vandalism"] .cv-never { position: absolute; left: 0.4em; bottom: 78%; font: 22px/1 "Permanent Marker", "Marker Felt", cursive; color: var(--ab-hazard); transform: rotate(-6deg); white-space: nowrap; }
+.ab[data-ae="corporate-vandalism"] .cv-never { position: absolute; left: 0.4em; bottom: 78%; font: 24px/1 "Permanent Marker", "Marker Felt", cursive; color: var(--ab-hazard); transform: rotate(-6deg); white-space: nowrap; }
 
 /* footer: the footnotes are the longest text on the board */
 .ab[data-ae="corporate-vandalism"] .ab-foot { border-top: 1px solid var(--cv-bd); font-size: 10px; letter-spacing: 0.04em; text-transform: uppercase; color: var(--ab-ink); }

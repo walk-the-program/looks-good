@@ -98,14 +98,20 @@ registerAesthetic({
     const ph = hexToHsl(t.printPrimary || t.primary), hz = hexToHsl(HAZARD);
     const collide = typeof hueDiff === 'function' && hueDiff(ph.h, hz.h) < 25 && ph.s >= 45 && ph.l > 15 && ph.l < 85;
     const shell = collide ? t.ink : t.printPrimary || t.primary;
+    // small text must hold 4.5:1 on the tinted form / sidebar surfaces too, not just the canvas: the muted grey, the rest-state
+    // grey and the primary used as text are shaded toward ink until they do (the framework's defaults stop at 3:1 / canvas-only)
+    const formBg = t.mix(t.ink, t.canvas, d ? 0.1 : 0.05);
+    const lift = c => { let r = c; for (let k = 1; k <= 20 && t.contrast(r, formBg) < 4.6; k++) r = t.mix(c, t.ink, k * 0.05); return r; };
     return {
+      '--ab-muted': lift(t.muted),
+      '--ab-primary-text': lift(t.primaryText),
       '--ab-type-pick-w': hw,
       '--cv-hw': hw,
       '--ab-hazard': HAZARD,
       '--ab-safety': SAFETY,
       '--cv-paper': d ? '#F2F2F0' : '#FFFFFF',
       '--cv-bd': d ? t.mix(t.ink, t.canvas, 0.5) : t.ink,
-      '--cv-rest': t.contrast(grey, t.canvas) >= 4.5 ? grey : t.muted,
+      '--cv-rest': lift(t.contrast(grey, t.canvas) >= 4.5 ? grey : t.muted),
       '--cv-receipt': '#FFFFFF', // thermal paper: white in both modes
       '--ab-receipt': '#FFFFFF',
       '--cv-form': d ? t.mix(t.ink, t.canvas, 0.1) : t.mix(t.ink, t.canvas, 0.05),
