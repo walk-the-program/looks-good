@@ -362,3 +362,11 @@
 }
 /* chart: a 4px primary line with a second-hue offset copy, like the cards' sheets */
 .ab.sb-ab[data-ae="radical-memphis"] .sb-c-line { stroke: var(--ab-primary-text); stroke-width: 4; filter: drop-shadow(4px 4px 0 var(--ab-m-sheet-sec)); }
+
+/* ---- text contrast: cabinets are always paper, so their text uses the board's black / soft, never the (light) dark-mode ink ---- */
+.ab[data-ae="radical-memphis"][data-mode="dark"] :is(.ab-card, .ab-panel, .ab-list, .ab-type-col) {
+  --ab-ink: var(--ab-m-black); --ab-muted: var(--ab-m-soft);
+  --ab-primary-text: color-mix(in srgb, var(--ab-primary) 55%, var(--ab-m-black));
+}
+/* the Built sidebar sits on the floor, not on paper: its quiet text is pulled toward ink */
+.ab.sb-ab[data-ae="radical-memphis"] .sb-side { --ab-muted: color-mix(in srgb, var(--ab-ink) 78%, var(--ab-canvas)); }

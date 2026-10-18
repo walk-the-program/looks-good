@@ -416,3 +416,6 @@
 
 /* invoice rows: a primary-tinted leader bar down the left edge of the list header */
 .ab.sb-ab[data-ae="neo-brutal-pop"] .sb-listsec > .ab-labelrow .ab-label:last-child { padding: 3px 10px; border: var(--np-b) solid var(--ab-ink); border-radius: var(--np-r); background: var(--ab-accent); color: var(--ab-on-accent); }
+
+/* muted text on paper cards and panels is pulled toward ink until it holds 4.5:1 (token computed in neo-brutal-pop.js) */
+.ab.sb-ab[data-ae="neo-brutal-pop"] :is(.ab-card, .ab-panel) { --ab-muted: var(--np-muted-paper); }

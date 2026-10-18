@@ -157,7 +157,7 @@
 
 /* 02: a prefixed field, a bracket switch, three signal states */
 .ab[data-ae="pirate-broadcast"] .ab-fieldlabel { font: 700 11px var(--pb-mono); letter-spacing: 0.1em; text-transform: uppercase; }
-.ab[data-ae="pirate-broadcast"] .ab-fieldlabel::before { content: "P__"; margin-right: 8px; padding: 0 5px; background: var(--ab-tt-white); color: #000; }
+.ab[data-ae="pirate-broadcast"] .ab-fieldlabel::before { content: "P__"; display: inline-block; margin-right: 8px; padding: 0 5px 3px; line-height: 1.1; vertical-align: middle; background: var(--ab-tt-white); color: #000; }
 .ab[data-ae="pirate-broadcast"] .ab-input {
   padding: 11px 14px; border: 0; border-radius: 0; background: #000; color: var(--ab-tt-fg); box-shadow: inset 0 0 0 2px var(--ab-tt-dim); font: 600 14px var(--pb-mono); letter-spacing: 0.04em; text-transform: uppercase;
   caret-color: var(--ab-tt-green); caret-shape: block;

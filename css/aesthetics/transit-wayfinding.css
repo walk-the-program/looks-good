@@ -146,12 +146,12 @@
 }
 .ab[data-ae="transit-wayfinding"] .ab-seg-btn::before {
   content: counter(twp); display: grid; place-items: center; box-sizing: border-box; width: 28px; height: 28px; border: 2px solid currentColor; border-radius: 2px;
-  background: #000; font-weight: var(--tw-hw, 800); font-size: 14px; line-height: 1; font-variant-numeric: tabular-nums;
+  background: var(--tw-box, #000); font-weight: var(--tw-hw, 800); font-size: 14px; line-height: 1; font-variant-numeric: tabular-nums;
 }
 .ab[data-ae="transit-wayfinding"] .ab-seg-btn::after { content: none; }
 .ab[data-ae="transit-wayfinding"] .ab-seg-btn:hover { color: var(--tw-white); }
 .ab[data-ae="transit-wayfinding"] .ab-seg-btn[aria-pressed="true"] { color: var(--tw-white); font-weight: var(--tw-hw, 800); }
-.ab[data-ae="transit-wayfinding"] .ab-seg-btn[aria-pressed="true"]::before { background: var(--tw-white); border-color: var(--tw-white); color: #000; }
+.ab[data-ae="transit-wayfinding"] .ab-seg-btn[aria-pressed="true"]::before { background: var(--tw-white); border-color: var(--tw-white); color: var(--tw-inv, #000); }
 .ab[data-ae="transit-wayfinding"] .ab-card-title { margin: 28px 0 8px !important; color: var(--tw-white); font-weight: var(--tw-hw, 800); letter-spacing: -0.01em; font-size: clamp(22px, 3cqw, 30px); line-height: 1.1; }
 .ab[data-ae="transit-wayfinding"] .ab-card-body { color: var(--tw-dim); font-size: 14px; margin-bottom: 26px !important; }
 
@@ -164,7 +164,7 @@
 .ab[data-ae="transit-wayfinding"] .ab-cta-arrow::after { content: none; }
 .ab[data-ae="transit-wayfinding"] .ab-cta:hover, .ab[data-ae="transit-wayfinding"] .ab-cta.is-hover { box-shadow: inset 0 0 0 2px var(--tw-white); }
 .ab[data-ae="transit-wayfinding"] .ab-cta:hover .ab-cta-arrow, .ab[data-ae="transit-wayfinding"] .ab-cta.is-hover .ab-cta-arrow { transform: translateX(2px); }
-.ab[data-ae="transit-wayfinding"] .ab-cta:active { background: var(--tw-white); color: #000; box-shadow: none; }
+.ab[data-ae="transit-wayfinding"] .ab-cta:active { background: var(--tw-white); color: var(--tw-inv, #000); box-shadow: none; }
 .ab[data-ae="transit-wayfinding"] .ab-cta:focus-visible { outline: 2px solid var(--tw-white); outline-offset: 3px; }
 
 /* ---- 02 input: "where to?" field, toggle, the three service states ---- */
@@ -336,3 +336,14 @@
 .ab.sb-ab[data-ae="transit-wayfinding"] .sb-c-dot { border-color: var(--ab-route1); }
 .ab.sb-ab[data-ae="transit-wayfinding"] .sb-lg-now { background: var(--ab-route1); }
 .ab.sb-ab[data-ae="transit-wayfinding"] .sb-lg-prev { border-top-color: var(--ab-route2); }
+
+/* ---- light mode: the signs stay black; text that sits on the pale concourse is ink, text on a sign is white ----
+   Every text rule reads --tw-white / --tw-dim. On the concourse (light) they are ink; each black sign surface
+   resets them, so the sign content is exactly what it is in dark mode. */
+.ab[data-ae="transit-wayfinding"][data-mode="light"] { --tw-white: #0E0F10; --tw-dim: #44474B; --tw-inv: #FFFFFF; --tw-box: transparent; }
+.ab[data-ae="transit-wayfinding"][data-mode="light"] :is(.ab-card, .ab-panel, .ab-list, .ab-hero-copy, .ab-type-col, .ab-type-apply, .ab-deck-principle, .ab-deck-rule, .ab-deck-cell, .ab-deck-uistates, .ab-deck-prodtools) {
+  --tw-white: #FFFFFF; --tw-dim: #B9BBBE; --tw-inv: #000000; --tw-box: #000000; --ab-ink: #FFFFFF; --ab-muted: #B9BBBE; --ab-primary-text: #FFFFFF;
+}
+/* concourse chrome in light: the Built sidebar's quiet text, a touch darker than the framework muted */
+.ab.sb-ab[data-ae="transit-wayfinding"][data-mode="light"] .sb-side { --ab-muted: #3F4246; }
+.ab[data-ae="transit-wayfinding"][data-mode="light"] .ab-input::placeholder { color: var(--tw-dim); opacity: 1; }
