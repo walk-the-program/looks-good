@@ -289,3 +289,12 @@
 .ab.sb-ab[data-ae="ascii-art"] .sb-navi { padding-left: 2ch; padding-right: 2ch; }
 .ab.sb-ab[data-ae="ascii-art"] .ab-row { column-gap: 2ch; }
 .ab.sb-ab[data-ae="ascii-art"] .sb-me-av { color: var(--ab-canvas); }   /* the avatar initial on the quantised ANSI fill: canvas on #AA00AA is 5.7:1 (was ink at 2.9:1) */
+
+/* ---- Built view fixes (S5 sweep) ----
+   Phone onboarding: a headline that sets in four or more block-letter lines ("Your whole team, one place") took the whole
+   screen: the plate was squeezed to nothing and the actions ran into the home bar. Four-plus lines print at 70%. */
+.ab.sb-ab[data-ae="ascii-art"] .sb-ob-h .aah:has(.aah-l:nth-child(4)) { font-size: min(calc(60cqw / (var(--fc) * var(--aa-adv, 0.6))), 13px); }
+.ab.sb-ab[data-ae="ascii-art"] .sb-ob-h .aah:has(.aah-l:nth-child(5)) { font-size: min(calc(50cqw / (var(--fc) * var(--aa-adv, 0.6))), 11px); }
+/* Stat labels: the closing ├ stays glued to the last word instead of wrapping alone onto a second line. */
+.ab.sb-ab[data-ae="ascii-art"] .sb-stat .ab-label::before { content: "┤\00a0"; }
+.ab.sb-ab[data-ae="ascii-art"] .sb-stat .ab-label::after { content: "\00a0├"; }

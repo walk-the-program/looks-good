@@ -291,3 +291,21 @@
 /* cover: the notice keeps its natural width (side by side with the receipt); the headline gives way first */
 .ab[data-ae="corporate-vandalism"].ab-slide[data-slide="cover"] .ab-deck-cover .ab-art { width: 100% !important; max-width: none !important; }
 .ab[data-ae="corporate-vandalism"] .ab-deck-pchip, .ab[data-ae="corporate-vandalism"] .ab-n { font-weight: var(--cv-bw, 600); }
+
+/* ---- Built view fixes (S5 sweep) ----
+   Phone onboarding headline: the vandal's tilted bar rides up at its right end and covered the second line of the
+   official headline ("team, one place"); it starts lower so the line stays readable. */
+.ab.sb-ab[data-ae="corporate-vandalism"] .sb-ob-h .cvh-k { margin-top: 0.8em; }
+/* Phone onboarding plate: the memo is a ~125pt square here, so it shows only its strip and title (the
+   sticker shrinks and stops covering the form number); fine print, redactions, warning and receipt would be cut mid-line. */
+.ab.sb-ab[data-ae="corporate-vandalism"] .sb-ob-artbox :is(.cva-class, .cva-ref, .cva-fine, .cva-rr, .cva-warn, .cva-sign, .cva-rw, .cva-bar span, .cva-stk i) { display: none; }
+.ab.sb-ab[data-ae="corporate-vandalism"] .sb-ob-artbox .cva-stk { width: 40px; height: 40px; left: -11px; top: -12px; }
+.ab.sb-ab[data-ae="corporate-vandalism"] .sb-ob-artbox .cva-stk b { font-size: 12.5px; }
+.ab.sb-ab[data-ae="corporate-vandalism"] .sb-ob-artbox .cva-body { padding: 10px; }
+.ab.sb-ab[data-ae="corporate-vandalism"] .sb-ob-artbox .cva-title { font-size: 14px; margin-bottom: 0; }
+/* the "BUTTON" label above the card CTA sat on the last line of the card copy */
+.ab.sb-ab[data-ae="corporate-vandalism"] .sb-home-card .ab-cta { margin-top: 20px; }
+/* Landing hero: the tilted red bar cut across the descenders of the official headline; it starts lower. The sticker no
+   longer hides the first letters of the brand name in the memo strip (the name starts to its right). */
+.ab.sb-ab[data-ae="corporate-vandalism"] .sb-lhero .cvh-k { margin-top: 0.6em; }
+.ab.sb-ab[data-ae="corporate-vandalism"] .sb-lhero .cva-bar { padding-left: 58px; }
