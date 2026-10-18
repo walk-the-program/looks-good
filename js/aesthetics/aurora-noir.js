@@ -152,7 +152,7 @@ registerAesthetic({
         <div class="ana-desc">Align type, color and surfaces across the product and the site.</div>
         <dl class="ana-props">
           <div><dt>Status</dt><dd><i class="ana-dot"></i>In progress</dd></div>
-          <div><dt>Assignee</dt><dd><i class="ana-av">${e(ctx.initial)}</i>${name}</dd></div>
+          <div><dt>Assignee</dt><dd><i class="ana-av">${e(ctx.initial)}</i><span class="ana-nm">${name}</span></dd></div>
           <div><dt>Progress</dt><dd><span class="ana-bar"><i></i></span><code>72%</code></dd></div>
         </dl>
         <div class="ana-log"><i></i><span>Status changed to <b>In progress</b></span><code>2m</code></div>

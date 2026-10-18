@@ -271,3 +271,6 @@
 .ab.sb-ab[data-ae="clay"] .sb-c-area { fill: color-mix(in srgb, var(--ab-cl-pa) 26%, transparent); }
 .ab.sb-ab[data-ae="clay"] .sb-c-dot { width: 17px; height: 17px; margin: -8.5px 0 0 -8.5px; background: radial-gradient(circle at 32% 26%, #fff, var(--ab-pearl) 60%); box-shadow: 0 6px 8px -3px var(--ab-pri-sh); }
 .ab.sb-ab[data-ae="clay"] .sb-top .ab-kicker { margin-bottom: 8px !important; }
+/* Built > Settings: stack Website and Support email so a long brand's domain is not cut off mid-word in a half-width field */
+.ab.sb-ab[data-ae="clay"] .sb-field-row { grid-template-columns: minmax(0, 1fr); }
+.ab.sb-ab[data-ae="clay"] .sb-set-panel .sb-field-row .sb-field:last-child .ab-input { margin-bottom: 16px; }

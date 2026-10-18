@@ -79,6 +79,15 @@ registerAesthetic({
     };
   },
 
+  // The usual headline (last word in .ab-hl), with the closing full stop glued to the circled word so
+  // "YOU" and "." never split across two lines (the stop used to drop alone onto a fifth line).
+  headline(ctx, text) {
+    const e = escapeHtml;
+    const m = String(text || '').trim().match(/^([\s\S]*?)([^\s]+?)([.,;:!?…]*)$/);
+    if (!m) return e(text);
+    return `${e(m[1])}<span class="rz-hlw"><span class="ab-hl">${e(m[2])}</span>${e(m[3])}</span>`;
+  },
+
   // A zine spread: three riso cards (primary, secondary, accent), each a flat
   // ink color carrying one shape (circle, arch, zigzag) printed in a second ink
   // with multiply, a solid pass plus a halftone pass 2 units off-register.
@@ -106,7 +115,7 @@ registerAesthetic({
           <g ${blend} transform="translate(2 2)" opacity=".55">${c.shape === 'zig'
     ? `<polyline points="7,52 19,24 31,52 43,24 55,52" fill="none" stroke="url(#${pat})" stroke-width="8" stroke-linejoin="miter" stroke-miterlimit="4"/>`
     : shapeSvg(c, `url(#${pat})`, '')}</g>
-          <text x="5" y="74.5" font-size="4.2" fill="${on}" font-family="ui-monospace,Menlo,monospace" letter-spacing=".3" opacity=".9">NO. 0${i + 1}</text>
+          <text class="rza-no" x="5" y="74.5" font-size="4.2" fill="${on}" font-family="ui-monospace,Menlo,monospace" letter-spacing=".3" opacity=".9">NO. 0${i + 1}</text>
         </svg>
       </div>`;
     }).join('');

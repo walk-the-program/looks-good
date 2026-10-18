@@ -142,6 +142,7 @@
 .ab[data-ae="aurora-noir"] .ana-props dd { margin: 0; display: flex; align-items: center; gap: 0.7em; min-width: 0; }
 .ab[data-ae="aurora-noir"] .ana-dot { width: 0.8em; height: 0.8em; border-radius: 50%; border: 2px solid var(--ab-accent); box-shadow: 0 0 0.9em var(--ab-acc-line); }
 .ab[data-ae="aurora-noir"] .ana-av { width: 1.7em; height: 1.7em; border-radius: 50%; place-items: center; font-size: 0.8em; font-weight: 600; background: linear-gradient(135deg, var(--ab-pri-a), var(--ab-sec-a)); border: 1px solid var(--ab-hair2); }
+.ab[data-ae="aurora-noir"] .ana-nm { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .ab[data-ae="aurora-noir"] .ana-bar { flex: 0 1 9em; height: 0.35em; border-radius: 1em; background: var(--ab-hair2); overflow: hidden; }
 .ab[data-ae="aurora-noir"] .ana-bar i { width: 72%; height: 100%; background: var(--ab-primary); border-radius: 1em; }
 .ab[data-ae="aurora-noir"] .ana-log { display: flex; align-items: center; gap: 0.8em; margin-top: 1em; color: var(--ab-muted); }
@@ -264,6 +265,9 @@
   .ab[data-ae="aurora-noir"] .ana-main { padding: 14px 14px; }
   .ab[data-ae="aurora-noir"] .ana-props > div { grid-template-columns: 6em minmax(0, 1fr); }
   .ab[data-ae="aurora-noir"] .ana-log { display: none; }
+  /* three property rows must fit the phone's art height (a long brand name pushed Assignee under the clip) */
+  .ab[data-ae="aurora-noir"] .ana-desc { display: none; }
+  .ab[data-ae="aurora-noir"] .ana-props { margin-top: 1.2em; }
   .ab[data-ae="aurora-noir"] .ana-win { bottom: auto; }
   .ab[data-ae="aurora-noir"] .ana-main { padding-bottom: 6px; }
   .ab[data-ae="aurora-noir"] .ana-props > div:last-child { border-bottom: 0; }
@@ -336,3 +340,7 @@
 /* deck: the clouds belong to the cover; on the other slides they stay a low glow behind the top edge so the
    small tag and caption text keeps its contrast */
 .ab[data-ae="aurora-noir"].ab-slide:not([data-slide="cover"])::before { height: 40%; opacity: 0.5; }
+
+/* Built > Settings: stack Website and Support email so a long brand's domain is not cut off mid-word in a half-width field */
+.ab.sb-ab[data-ae="aurora-noir"] .sb-field-row { grid-template-columns: minmax(0, 1fr); }
+.ab.sb-ab[data-ae="aurora-noir"] .sb-set-panel .sb-field-row .sb-field:last-child .ab-input { margin-bottom: 16px; }

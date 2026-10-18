@@ -266,7 +266,7 @@
   .ab[data-ae="editorial-serif"] .ab-type-col + .ab-type-col { padding-left: 0; border-left: 0; }
   .ab[data-ae="editorial-serif"] .ab-type-col { padding-right: 0; }
   .ab[data-ae="editorial-serif"] .ab-sec-touch { padding-left: 0; border-left: 0; }
-  .ab[data-ae="editorial-serif"] .ab-row { grid-template-columns: minmax(0, auto) minmax(14px, 1fr) auto 4.2ch; }
+  .ab[data-ae="editorial-serif"] .ab-row { grid-template-columns: minmax(0, auto) minmax(14px, 1fr) auto auto; }
   .ab[data-ae="editorial-serif"] .ab-row-n { display: none; }
   .ab[data-ae="editorial-serif"] .ab-row-name { grid-column: 1; }
   .ab[data-ae="editorial-serif"] .ab-row-bar { display: block; grid-column: 2; }
@@ -308,3 +308,23 @@
 .ab.sb-ab[data-ae="editorial-serif"] .sb-lnav .sb-links { grid-column: 1; grid-row: 1; justify-self: start; }
 .ab.sb-ab[data-ae="editorial-serif"] .sb-lnav .ab-brand { grid-column: 2; grid-row: 1; }
 .ab.sb-ab[data-ae="editorial-serif"] .sb-lnav .sb-signin { grid-column: 3; grid-row: 1; justify-self: end; width: auto; }
+
+/* Phone-sized rows: the dotted leader is only a 20px stub there (it landed under a wrapped name), so the row is
+   name, status, percent; the percent column is as wide as its text ("100%" used to be cut at the edge) */
+@container ab (max-width: 360px) {
+  .ab[data-ae="editorial-serif"] .ab-row { grid-template-columns: minmax(0, 1fr) auto auto; }
+  .ab[data-ae="editorial-serif"] .ab-row-bar { display: none; }
+  .ab[data-ae="editorial-serif"] .ab-row-status { grid-column: 2; }
+  .ab[data-ae="editorial-serif"] .ab-row-pct { grid-column: 3; }
+}
+
+/* Built > Settings: the plan meter is a real meter (dotted track, solid fill to 68%), not a stub in a stray grid column */
+.ab.sb-ab[data-ae="editorial-serif"] .sb-usage .ab-row-bar { grid-column: 1; grid-row: 1; align-self: center; position: relative; overflow: visible; height: 0; margin: 5px 0; border-bottom: 1px dotted var(--ab-hair-strong); }
+.ab.sb-ab[data-ae="editorial-serif"] .sb-usage .ab-row-bar i { display: block; position: absolute; left: 0; bottom: -1px; height: 3px; background: var(--ab-primary); }
+.ab.sb-ab[data-ae="editorial-serif"] .sb-usage .ab-label { grid-row: 2; }
+
+/* Built > Settings: stack Website and Support email so a long brand's domain is not cut off mid-word in a half-width field */
+.ab.sb-ab[data-ae="editorial-serif"] .sb-field-row { grid-template-columns: minmax(0, 1fr); }
+.ab.sb-ab[data-ae="editorial-serif"] .sb-set-panel .sb-field-row .sb-field:last-child .ab-input { margin-bottom: 16px; }
+/* the plan card's one-line note ("Per seat · renews on the 1st") is not set in the 12.5em body measure */
+.ab.sb-ab[data-ae="editorial-serif"] .sb-planbox .ab-card-body { width: auto; }
