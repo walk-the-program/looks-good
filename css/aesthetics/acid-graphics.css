@@ -1,7 +1,7 @@
 /* ---------------------------------------------------------------------
    30 Acid Graphics — toxic, warped, loud. Every selector is scoped under
    .ab[data-ae="acid-graphics"]. Vibrating colour pairs (the acid = client primary pushed
-   to full chroma, --ab-acid; its clash = hue +165deg at equal luminance, --ab-clash),
+   to full chroma, --ab-acid; its clash = a fluorescent partner (chartreuse / hot magenta), --ab-clash),
    a headline stretched tall at the face's natural width (scaleY, with the last word's letters growing taller one by one), op-art ripple, ticket tabs, an event
    strip, dense mono info, over a hidden 12-column grid. Vars from tokens(): --ab-acid,
    --ab-clash, --ab-on-acid, --ab-on-clash, --ac-sx (headline squeeze), --ac-fg,
@@ -139,8 +139,8 @@
 /* palette: edge-to-edge colour strips with the labels inside, then the vibrating pair with its measured luminance delta */
 .ab[data-ae="acid-graphics"] .ab-swatches[data-kind="strips"]::after {
   content: var(--ac-pair); white-space: pre-line; overflow-wrap: anywhere; flex: 0 0 24%; min-width: 0; padding: 12px 14px;
-  font: 700 10px/1.5 var(--ac-mono); letter-spacing: 0.1em; color: var(--ab-on-acid);
-  background: linear-gradient(90deg, var(--ab-acid) 0 50%, var(--ab-clash) 50% 100%);
+  font: 700 10px/1.5 var(--ac-mono); letter-spacing: 0.1em; color: var(--ab-clash);
+  background: linear-gradient(90deg, var(--ab-acid) 0 50%, var(--ab-clash) 50% 100%) 0 100% / 100% 16px no-repeat, #050505;
 }
 .ab[data-ae="acid-graphics"] .ab-swatches[data-kind="strips"] { border-radius: 0; box-shadow: 0 0 0 2px var(--ab-ink); }
 .ab[data-ae="acid-graphics"] .ab-swatches[data-kind="strips"] .ab-swatch { min-height: clamp(110px, 14cqw, 160px); }
@@ -212,7 +212,7 @@
 .ab[data-ae="acid-graphics"] .ab-switch { width: 76px; height: 26px; border: 2px solid var(--ab-clash); border-radius: 0; background: none; transition: none; }
 .ab[data-ae="acid-graphics"] .ab-switch::before { content: "OFF"; left: 0; top: 0; width: 100%; height: 100%; display: grid; place-items: center; border-radius: 0; background: none; color: var(--ab-muted); font: 700 10px/1 var(--ac-mono); letter-spacing: 0.16em; transform: none; transition: none; }
 .ab[data-ae="acid-graphics"] .ab-switch:checked { background: repeating-linear-gradient(90deg, var(--ab-acid) 0 6px, var(--ab-clash) 6px 9px); }
-.ab[data-ae="acid-graphics"] .ab-switch:checked::before { content: "ON AIR"; left: 0; transform: none; color: #050505; background: none; text-shadow: 0 0 2px var(--ab-acid), 0 0 2px var(--ab-acid); }
+.ab[data-ae="acid-graphics"] .ab-switch:checked::before { content: "ON AIR"; left: 4px; top: 3px; width: calc(100% - 8px); height: calc(100% - 6px); transform: none; color: var(--ab-clash); background: #050505; text-shadow: none; }
 .ab[data-ae="acid-graphics"] .ab-switch:focus-visible, .ab[data-ae="acid-graphics"] .ab-cta:focus-visible, .ab[data-ae="acid-graphics"] .ab-seg-btn:focus-visible, .ab[data-ae="acid-graphics"] .ab-type-apply:focus-visible { outline: 3px solid var(--ab-accent); outline-offset: 3px; }
 .ab[data-ae="acid-graphics"] .ab-status { font-family: var(--ac-mono); font-size: 10.5px; letter-spacing: 0.08em; text-transform: uppercase; }
 .ab[data-ae="acid-graphics"] .ab-states { margin-top: 22px; gap: 12px; }
@@ -259,6 +259,22 @@
   .ab[data-ae="acid-graphics"] .ab-states { gap: 6px; }
   .ab[data-ae="acid-graphics"] .ab-state-ctl { font-size: 11px; }
 }
+/* Built product screens: the hidden 12-column grid shows as hairlines, the page title is stretched with the
+   acid / clash echo, KPI numerals are stretched display type (one outlined echo), one ripple sits behind the
+   header. Text stays on the black field; only the type accents and hairlines carry the effect. */
+.ab.sb-ab[data-ae="acid-graphics"] .sb-main {
+  background-image: linear-gradient(90deg, color-mix(in srgb, var(--ab-acid) 13%, transparent) 1px, transparent 1px), linear-gradient(0deg, color-mix(in srgb, var(--ab-clash) 8%, transparent) 1px, transparent 1px);
+  background-size: calc((100% - 56px) / 12) 100%, 100% 44px; background-position: 28px 0, 0 0;
+}
+.ab.sb-ab[data-ae="acid-graphics"] .sb-top { position: relative; isolation: isolate; padding-top: 6px; }
+.ab.sb-ab[data-ae="acid-graphics"] .sb-top::before { content: ""; position: absolute; z-index: -1; left: -6%; top: -90%; width: 150px; aspect-ratio: 1; border-radius: 50%; background: repeating-radial-gradient(circle at 50% 50%, var(--ab-acid) 0 7px, var(--ab-clash) 7px 14px); opacity: 0.2; filter: url(#acr); pointer-events: none; }
+.ab.sb-ab[data-ae="acid-graphics"] .sb-top .ab-kicker { margin-bottom: 20px !important; }
+.ab.sb-ab[data-ae="acid-graphics"] .ab-card-title.sb-title { text-transform: uppercase; transform: scaleY(1.5); transform-origin: 0 100%; letter-spacing: -0.01em; text-shadow: 0.05em 0.05em 0 var(--ab-acid), 0.1em 0.1em 0 var(--ab-clash); }
+.ab.sb-ab[data-ae="acid-graphics"] .sb-stat .ab-card-title.sb-num { transform: scaleY(1.28); transform-origin: 0 100%; margin: 14px 0 14px !important; font-weight: var(--ac-hw, 800); }
+.ab.sb-ab[data-ae="acid-graphics"] .sb-stat:nth-child(3) .ab-card-title.sb-num { text-shadow: 0.05em 0.05em 0 var(--ab-acid); }
+.ab.sb-ab[data-ae="acid-graphics"][data-mode="light"] .sb-stat:nth-child(3) .ab-card-title.sb-num { text-shadow: 0.05em 0.05em 0 var(--ab-clash); }
+.ab.sb-ab[data-ae="acid-graphics"] .sb-feat-n { color: var(--ac-on-canvas); }
+
 @media (prefers-reduced-motion: reduce) {
   .ab[data-ae="acid-graphics"] .ab-cta, .ab[data-ae="acid-graphics"] .ab-switch, .ab[data-ae="acid-graphics"] .ab-switch::before { transition: none; }
 }

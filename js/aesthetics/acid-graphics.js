@@ -4,7 +4,7 @@
    pairs), rave flyers' who / where / when.
 
    Mechanism. COLOUR THAT VIBRATES: the client primary is pushed to full chroma (the "acid")
-   and paired with a computed CLASH colour 165 degrees away in OKLCH at EQUAL luminance and the most
+   and paired with a computed FLUORESCENT CLASH colour (chartreuse beside a dark acid, hot magenta beside a green / yellow one; otherwise the hue 165 degrees away in OKLCH at equal luminance) at the most
    chroma sRGB holds there (never a dull olive or brown; see acClash); the palette
    shows the pair and its measured luminance delta. EVERY display line is distorted (def.headline):
    the first line's letters stretch 1.4-2.2x on a wave, the middle line is compressed to 62%
@@ -53,7 +53,9 @@ function acMaxC(L, h) {
   for (let i = 0; i < 22; i++) { const m = (lo + hi) / 2; if (acInGamut(acRgb(L, m, h))) lo = m; else hi = m; }
   return lo;
 }
-// The CLASH partner: the hue 165 degrees round (OKLCH) at the most chroma sRGB holds there, with only the
+// The CLASH partner: a dark acid (electric blue / violet / red) takes chartreuse and a green / yellow acid takes hot
+// magenta, both fluorescent and 4.5:1+ on black (an equal-luminance partner of a dark blue came out as dull rust).
+// Any other acid: the hue 165 degrees round (OKLCH) at the most chroma sRGB holds there, with only the
 // lightness moved until its relative luminance equals the acid's. A pair at equal luminance vibrates; a
 // result that comes out dull (chroma < 0.10, or an olive / brown: hue 50-140 at L < 0.7) is rejected and
 // the nearest offset (150, 180, 135, 195 ... 240 degrees) that holds chroma >= 0.12 is taken instead. When
@@ -62,6 +64,12 @@ function acMaxC(L, h) {
 function acClash(acid) {
   const a = acOk(acid), c0 = hexToRgb(acid);
   const target = acY([acLin(c0.r), acLin(c0.g), acLin(c0.b)]);
+  // A fluorescent clash, not an equal-luminance one: a green / yellow acid clashes with hot magenta, and any other
+  // dark acid (electric blue, violet, red) with chartreuse. Both hold 4.5:1+ against the black canvas and
+  // black label type, so they read as acid rather than rust. Light acids (orange, cyan) use the search below.
+  const flo = (L, h) => acHex(acRgb(L, acMaxC(L, h) * 0.98, h));
+  if (a.h >= 95 && a.h <= 200) return flo(0.7, 340);
+  if (target < 0.45) return flo(0.89, 128);
   const at = off => {
     const h = (a.h + off) % 360;
     let lo = 0.05, hi = 0.98;
@@ -152,6 +160,9 @@ registerAesthetic({
     const eqH = [0.55, 0.9, 0.7, 1, 0.45, 0.8, 0.6, 0.95, 0.5, 0.75];
     const eq = `<svg xmlns="http://www.w3.org/2000/svg" width="60" height="14" viewBox="0 0 60 14" preserveAspectRatio="none">${eqH.map((h, i) => `<rect x="${i * 6}" y="${(14 * (1 - h)).toFixed(1)}" width="4" height="${(14 * h).toFixed(1)}" fill="${i % 3 === 2 ? clash : acid}"/>`).join('')}</svg>`;
     const dY = Math.abs(relativeLuminance(acid) - relativeLuminance(clash));
+    // the acid lifted until small / mid-size text on the black field (and on its tinted rows) holds 5:1; the display type keeps the full-chroma acid
+    let acidText = acid;
+    if (d) for (let k = 0.06; k <= 1 && t.contrast(acidText, t.mix(clash, t.canvas, 0.12)) < 5; k += 0.06) acidText = t.mix(acid, '#ffffff', k);
     // em width of one capital in the heading face, so the headline wrapper can fit its longest line
     const cw = { wide: 0.96, techno: 0.86, heavy: 0.78, condensed: 0.5, display: 0.72 }[cls] ?? 0.68;
     return {
@@ -166,7 +177,7 @@ registerAesthetic({
       '--ac-on-spark': on(spark),
       '--ac-fg': d ? acid : t.ink,
       '--ac-fg2': d ? clash : t.ink,
-      '--ac-on-canvas': d ? acid : t.ink,
+      '--ac-on-canvas': d ? acidText : t.ink,
       '--ac-grid': t.alpha(t.ink, d ? 0.045 : 0.065),
       '--ac-acid-a': t.alpha(acid, 0.12),
       '--ac-clash-a': t.alpha(clash, 0.12),
@@ -268,7 +279,7 @@ registerAesthetic({
   },
 
   materials: [
-    { name: 'Vibrating pair', css: 'background: {acid}; border: 2px solid {clash}; /* the client primary pushed to full chroma beside its clash: primary hue +165 degrees at equal luminance, so the edge shimmers; never thin text on that edge */' },
+    { name: 'Vibrating pair', css: 'background: {acid}; border: 2px solid {clash}; /* the client primary pushed to full chroma beside its clash: a fluorescent partner (chartreuse beside a dark acid, hot magenta beside a green one), so the edge shimmers; never thin text on that edge */' },
     { name: 'Op-art ripple', css: 'background: repeating-radial-gradient(circle at 50% 50%, {acid} 0 9px, {clash} 9px 18px); filter: url(#acr); /* 8-14px bands in the pair, bent by a BLURRED turbulence displacement (smooth edges, no stair steps) and run edge to edge with no vignette; at 20% opacity as a card background */' },
     { name: 'Warped headline', css: 'text-transform: uppercase; /* every display line is distorted: line 1 letters scaleY 1.4–2.2 on a wave (from the baseline), the middle line scaleX(.62) and stretched, the last line an outline (-webkit-text-stroke: 2px {clash}; color: transparent) with two offset echoes in {acid} and {clash}; section titles get the same treatment smaller */' },
     { name: 'Ticket stub', css: 'background: {accent} (a fixed #B6FF00 lime when the accent is soft); color: {onAccent}; transform: skewX(-8deg); font: 700 10px ui-monospace, Menlo, monospace; /* half-circle perforation cut-outs on both sides; also the tab shape: a dashed 2px divider with a notch top and bottom */' },
@@ -280,7 +291,7 @@ registerAesthetic({
 
   rules: {
     do: [
-      'Pair the dominant acid with its computed clash colour (primary hue +165 degrees at equal luminance) and let them meet edge to edge.',
+      'Pair the dominant acid with its computed fluorescent clash colour (chartreuse or hot magenta) and let them meet edge to edge.',
       'Distort every display line differently (stretch on a wave, compress one line, outline-echo the last) and the section titles too; keep dates, tabs, strips and labels in clean mono caps.',
       'Keep a neutral rest area of about 30% and a hidden 12-column grid under 5 to 9 overlapping layers, with micro-type (catalogue numbers, trademark slogans, barcodes, registration marks) in every margin.',
       'Carry the flyer through the board: a field band and a dense info strip (catalogue no., BPM, katakana, sponsors, barcode) on every section; type listed like a line-up.',
