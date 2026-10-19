@@ -124,9 +124,9 @@ header, hero (kicker, your tagline with the last word in the accent color,
 signature art), a palette row that names each color's job and coverage,
 `01 / Interface`, `02 / <material>` and `03 / In use` sections, and a footer.
 It renders in the brand's own fonts, colors, name and logo. The sidebar's
-**Aesthetic** panel picks one of 36 aesthetics, narrowed by family chips (Tactile, Graphic,
+**Aesthetic** panel picks one of 37 aesthetics, narrowed by family chips (Tactile, Graphic,
 Digital, Print & editorial, Luminous; the choice is remembered, and Shuffle and
-Compare work within it), lockable, with Shuffle aesthetic; choosing one also takes its recommended Light/Dark mode. **Compare all** shows all 36 boards at once
+Compare work within it), lockable, with Shuffle aesthetic; choosing one also takes its recommended Light/Dark mode. **Compare all** shows all 37 boards at once
 in the current brand (built only while that view is open; off-screen tiles skip layout with `content-visibility`); click a tile to select it. The choice is saved with the
 brand and is one Undo step. Compare tiles use each aesthetic's recommended
 mode (what selecting it gives you); the main board stays in the brand's current

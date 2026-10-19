@@ -321,6 +321,14 @@
       ['weave', 'Lake lines', 'brand', { bands: 9, rhythm: 'even', gap: 0.15, stripe: 0.7 }],
       ['stipple', 'Pine grain', 'brand', { density: 0.9, dot: 0.9, field: 'clouds', duo: true }, 0.8],
     ],
+    'data-pebble': [
+      ['pebbles', 'Pebble field', 'brand', { size: 1.3, gap: 0.6, erode: 0.3, mode: 'halftone', lit: 0.6 }, 0.7],
+      ['colony', 'Cell colony', 'brand', { cells: 20, rings: 3, fuse: 1.1, finish: 'film', nuclei: false }, 0.7],
+      ['aura', 'Soft lumps', 'brand', { layout: 'scatter', blobs: 5, strength: 0.85, soft: 0.8, grain: 0.14 }, 0.7],
+      ['thermal', 'Heat tiles', 'brand', { bands: 4, cell: 1.6, turb: 0.6, shape: 'round', flat: true }, 0.7],
+      ['sonar', 'Contour map', 'brand', { land: 0.45, size: 1, speckle: 0.4, contours: true }, 0.7],
+      ['flow', 'Soft contours', 'brand', { field: 'waves', strands: 5, gap: 2, bend: 0.8, weight: 0.8 }, 0.7],
+    ],
     'old-web': [
       ['oprings', 'Hypno GIF', 'brand', { mode: 'rings', centres: 2, freq: 14, warp: 0.2, bands: 'three' }],
       ['marble', 'Marble GIF', 'brand', { bands: 5, warp: 1.6, cover: 0.9, stars: 0, outline: true }],

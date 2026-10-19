@@ -400,6 +400,16 @@ const AESTHETIC_META = {
       pairings: [['Oswald', 'Nunito Sans'], ['Barlow Condensed', 'Source Sans 3'], ['Alfa Slab One', 'Figtree']],
     },
   },
+  'data-pebble': {
+    family: 'digital',
+    fonts: {
+      heading: { classes: ['soft-serif', 'text-serif'], picks: ['Newsreader', 'Fraunces', 'Source Serif 4', 'Instrument Serif'] },
+      body: { classes: ['neo-grotesk', 'humanist'], picks: ['Instrument Sans', 'Figtree', 'Public Sans', 'DM Sans'] },
+      avoid: ['pixel', 'groovy', 'condensed', 'blackletter', 'deco', 'slab'],
+      why: 'Big light serif figures with lining tabular numerals lead, and a clean grotesque carries the labels. Newsreader at display size is the lightest bundled serif; Instrument Serif has one fine weight.',
+      pairings: [['Newsreader', 'Instrument Sans'], ['Fraunces', 'Figtree'], ['Source Serif 4', 'Public Sans'], ['Instrument Serif', 'Instrument Sans']],
+    },
+  },
   'old-web': {
     family: 'digital',
     fonts: {
@@ -720,6 +730,11 @@ const AESTHETIC_BUILD = {
   'ascii-art': { cls: 'stepped', surface: 'Square 2pt-edged blocks; depth, where any, is a hard bevel; nothing is smoothed. Heading and body must both be mono.', modes: { only: 'dark', because: 'it is a phosphor terminal; light characters on black are the medium' } },
   'pirate-broadcast': { cls: 'stepped', modes: { only: 'dark', because: 'teletext is bright text on a black screen' } },
   'old-web': { cls: 'stepped' },
+  'data-pebble': {
+    cls: 'flat',
+    surface: 'Solid cards (white in light, a raised tint of the ground in dark) with a 1pt hairline tinted to the ground hue, an 18pt corner and one very soft shadow tinted with the primary (never grey-black): 0 1pt 2pt primary 6%, 0 14pt 32pt -18pt primary 28%. Controls are pills; the toggle knob stays round. The app carries no decoration: pebbles appear only as data marks (a stat tile\'s pebble sparkline, pebble progress of five pebbles filling left to right, the pebble-shaped avatar and row glyph).',
+    pressText: 'The main pill moves one step darker in light mode (lighter in dark) and scales to 0.985 over 140 ms ease-out; secondary and text controls take a `--pri-tint` wash.',
+  },
   'wpa-screenprint': {
     cls: 'hard',
     line: 1.5,
