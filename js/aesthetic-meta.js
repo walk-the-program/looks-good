@@ -742,8 +742,8 @@ const AESTHETIC_BUILD = {
     motion: { fast: 120, base: 140, slow: 220, ease: 'out' },
     surface: 'Flat rounded tiles (14px cards, 8px controls) with a 1.5px ink edge and no blur or gradient. The only depth is a hard 2px down-right offset block in the second spot ink (`--offset`) behind the main button, the stamp tags and the poster card; never behind body text. App screens carry no poster, grain, pattern or band.',
     pressText: 'The main button travels 2pt right and down while its hard offset block closes to 0, so it lands flat on the paper; hover lifts it 1pt up and left with the block at 3pt. 120 ms, ease-out. Toggles slide without bounce.',
-    accentOverride: { light: '--wp-f3', on: '--wp-on-f3', note: 'the brand accent printed as spot ink 3: muted (saturation capped at 55%) and moved just far enough for a label on it to hold 4.7:1' },
-    secondaryOverride: { light: '--wp-f2', on: '--wp-on-f2', note: 'the brand secondary printed as spot ink 2: muted (saturation capped at 55%) and moved just far enough for a label on it to hold 4.7:1' },
+    accentOverride: { light: '--wp-f3', on: '--wp-on-f3', note: 'the brand accent printed as spot ink 3: muted (saturation capped at 40%) and moved just far enough for a label on it to hold 4.7:1' },
+    secondaryOverride: { light: '--wp-f2', on: '--wp-on-f2', note: 'the brand secondary printed as spot ink 2: muted (saturation capped at 40%) and moved just far enough for a label on it to hold 4.7:1' },
     fixedInks: [
       { token: '--forest', light: '--wp-forest', job: 'Forest ink #23392F: the deep ink of the art (near ridge, title strip) and the label colour on a light spot ink. In light mode the board draws its text in it.', decorativeOnly: false },
       { token: '--spot-1', light: '--wp-a1', job: 'Spot ink 1, the brand primary muted for print: the sun in the art and the toggle knob.', decorativeOnly: true },
