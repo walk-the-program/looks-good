@@ -649,6 +649,7 @@ window.AiBriefCopy = (function () {
   const esc = s => escapeHtml(s);
   const toast = m => { if (typeof showToast === 'function') showToast(m); };
   let panel = null, targetBox = null, surfaceBox = null, saveBtn = null;
+  let dock = null, sumBtn = null, moreBtn = null, prefsPop = null, menuPop = null;
   let pendingKind = null;
   let lastCount = 0;
 
@@ -682,18 +683,73 @@ window.AiBriefCopy = (function () {
     saveBtn = document.createElement('button');
     saveBtn.type = 'button';
     saveBtn.id = 'saveAiBriefFiles';
-    saveBtn.className = 'btn btn-ghost btn-block aibc-save';
+    saveBtn.className = 'aibc-save';
+    saveBtn.setAttribute('role', 'menuitem');
     saveBtn.title = 'Download BRIEF.md, the token files and the brief\'s pattern files as one .zip';
-    saveBtn.innerHTML = '<svg class="ico" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M21 21H3"/></svg>Save brief + files';
-    foot.insertBefore(panel, copy);
-    foot.insertBefore(surfaceBox, copy);
-    foot.insertBefore(targetBox, copy);
-    foot.insertBefore(saveBtn, copy.nextSibling);
+    saveBtn.innerHTML = '<svg class="ico" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M21 21H3"/></svg><span><b>Save brief + files</b><small>BRIEF.md, tokens and patterns as a .zip</small></span>';
+
+    // One compact dock: [ App · Web ▾ ] [ Copy AI brief | ▾ ], popovers open upward.
+    const caret = '<svg class="ico" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>';
+    dock = document.createElement('div');
+    dock.className = 'aibc-dock';
+    sumBtn = document.createElement('button');
+    sumBtn.type = 'button';
+    sumBtn.id = 'aibSummary';
+    sumBtn.className = 'btn btn-ghost aibc-sum';
+    sumBtn.setAttribute('aria-haspopup', 'true');
+    sumBtn.setAttribute('aria-expanded', 'false');
+    sumBtn.setAttribute('aria-controls', 'aibPrefs');
+    moreBtn = document.createElement('button');
+    moreBtn.type = 'button';
+    moreBtn.id = 'aibMore';
+    moreBtn.className = 'btn btn-primary aibc-more';
+    moreBtn.setAttribute('aria-haspopup', 'menu');
+    moreBtn.setAttribute('aria-expanded', 'false');
+    moreBtn.setAttribute('aria-controls', 'aibMenu');
+    moreBtn.setAttribute('aria-label', 'More brief actions');
+    moreBtn.innerHTML = caret;
+    const split = document.createElement('div');
+    split.className = 'aibc-split';
+    prefsPop = document.createElement('div');
+    prefsPop.id = 'aibPrefs';
+    prefsPop.className = 'aibc-pop aibc-prefs';
+    prefsPop.setAttribute('role', 'group');
+    prefsPop.setAttribute('aria-label', 'What the brief is for');
+    prefsPop.hidden = true;
+    prefsPop.append(surfaceBox, targetBox);
+    menuPop = document.createElement('div');
+    menuPop.id = 'aibMenu';
+    menuPop.className = 'aibc-pop tb-menu aibc-menu';
+    menuPop.setAttribute('role', 'menu');
+    menuPop.setAttribute('aria-label', 'More brief actions');
+    menuPop.hidden = true;
+    menuPop.append(saveBtn);
+    foot.insertBefore(dock, copy);
+    foot.insertBefore(panel, dock);
+    split.append(copy, moreBtn);
+    dock.append(sumBtn, split);
+    foot.append(prefsPop, menuPop);
+    sumBtn.addEventListener('click', () => (prefsPop.hidden ? openPop('prefs') : closePops(true)));
+    moreBtn.addEventListener('click', () => (menuPop.hidden ? openPop('menu') : closePops(true)));
+    document.addEventListener('pointerdown', e => {
+      if (prefsPop.hidden && menuPop.hidden) return;
+      if (e.target.closest && e.target.closest('.aibc-pop, #aibSummary, #aibMore')) return;
+      closePops(false);
+    });
+    foot.addEventListener('keydown', e => {
+      if (e.key === 'Escape' && (!prefsPop.hidden || !menuPop.hidden)) { e.stopPropagation(); e.preventDefault(); closePops(true); return; }
+      if (!menuPop.hidden && (e.key === 'ArrowDown' || e.key === 'ArrowUp' || e.key === 'Home' || e.key === 'End') && menuPop.contains(document.activeElement)) { e.preventDefault(); saveBtn.focus(); }
+    });
+    foot.addEventListener('focusout', e => {
+      if (prefsPop.hidden && menuPop.hidden) return;
+      if (e.relatedTarget && !foot.contains(e.relatedTarget)) closePops(false);
+    });
+    menuPop.addEventListener('click', e => { if (e.target.closest('button')) closePops(true); });
     targetBox.addEventListener('change', e => {
-      if (e.target && e.target.name === 'aibTargetSel' && e.target.checked) { aibSetTarget(state, e.target.value); hidePanel(); }
+      if (e.target && e.target.name === 'aibTargetSel' && e.target.checked) { aibSetTarget(state, e.target.value); hidePanel(); updateSummary(); }
     });
     surfaceBox.addEventListener('change', e => {
-      if (e.target && e.target.name === 'aibSurfaceSel' && e.target.checked) { aibSetSurface(state, e.target.value); hidePanel(); }
+      if (e.target && e.target.name === 'aibSurfaceSel' && e.target.checked) { aibSetSurface(state, e.target.value); hidePanel(); updateSummary(); }
     });
     saveBtn.addEventListener('click', () => run('save'));
     panel.addEventListener('click', onPanelClick);
@@ -701,14 +757,48 @@ window.AiBriefCopy = (function () {
     syncTarget();
   }
 
+  const SUM_SURFACE = { app: 'App', web: 'Website', both: 'App + Website' };
+  const SUM_TARGET = { web: 'Web', swiftui: 'SwiftUI', both: 'Web + SwiftUI' };
+
+  function updateSummary() {
+    if (!sumBtn) return;
+    const sv = typeof aibGetSurface === 'function' ? aibGetSurface(state) : 'app';
+    const tv = aibGetTarget(state);
+    const text = `${SUM_SURFACE[sv] || 'App'} \u00b7 ${SUM_TARGET[tv] || 'Web'}`;
+    sumBtn.innerHTML = `<span class="aibc-sum-text">${esc(text)}</span><svg class="ico" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>`;
+    sumBtn.title = `Building: ${(AIB_SURFACES.find(x => x.value === sv) || {}).label || ''}. Build for: ${targetLabel()}. Click to change.`;
+  }
+
+  function openPop(which) {
+    closePops(false);
+    const pop = which === 'prefs' ? prefsPop : menuPop;
+    const btn = which === 'prefs' ? sumBtn : moreBtn;
+    hidePanel();
+    pop.hidden = false;
+    btn.setAttribute('aria-expanded', 'true');
+    const target = which === 'prefs' ? (pop.querySelector('input:checked') || pop.querySelector('input')) : saveBtn;
+    if (target) target.focus({ preventScroll: true });
+  }
+
+  function closePops(restoreFocus) {
+    if (!prefsPop) return;
+    const hadPrefs = !prefsPop.hidden, hadMenu = !menuPop.hidden;
+    prefsPop.hidden = true; menuPop.hidden = true;
+    sumBtn.setAttribute('aria-expanded', 'false');
+    moreBtn.setAttribute('aria-expanded', 'false');
+    if (restoreFocus && (hadPrefs || hadMenu)) (hadMenu ? moreBtn : sumBtn).focus({ preventScroll: true });
+  }
+
   function syncTarget() {
     if (surfaceBox && typeof aibGetSurface === 'function') {
       const sv = aibGetSurface(state);
       surfaceBox.querySelectorAll('input[name="aibSurfaceSel"]').forEach(r => { r.checked = r.value === sv; });
     }
-    if (!targetBox) return;
-    const v = aibGetTarget(state);
-    targetBox.querySelectorAll('input[name="aibTargetSel"]').forEach(r => { r.checked = r.value === v; });
+    if (targetBox) {
+      const v = aibGetTarget(state);
+      targetBox.querySelectorAll('input[name="aibTargetSel"]').forEach(r => { r.checked = r.value === v; });
+    }
+    updateSummary();
   }
 
   /* ---------------- resolve panel ---------------- */
