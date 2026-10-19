@@ -5,7 +5,7 @@
 
    Mechanism.
    - Inks: cream paper (#EFE6D2) and deep forest ink (#23392F) are fixed; the brand's three colours
-     print as spot inks. A spot ink is the brand colour muted for print (saturation capped at 55,
+     print as spot inks. A spot ink is the brand colour muted for print (saturation capped at 40,
      lightness pulled into 42-60), so a neon brand still prints as an ink. wpMute() makes the art
      inks (a1 a2 a3); wpFit() nudges one only as far as a label (cream or forest) needs 4.7:1 on it,
      for the few places that carry text on a spot (f1 f2 f3).
@@ -39,15 +39,15 @@ function wpMul(a, b) {
 // The label colour that reads on a fill: cream or forest.
 const wpOn = fill => (wpCR(CREAM, fill) >= wpCR(FOREST, fill) ? CREAM : FOREST);
 
-// A brand colour as a print ink: muted (saturation <= 55) and pulled into print-ink lightness.
+// A brand colour as a print ink: muted (saturation <= 40) and pulled into print-ink lightness.
 function wpMute(hex) {
   const c = hexToHsl(hex);
-  return hslToHex(c.h, Math.min(c.s, 55), Math.max(42, Math.min(c.l, 60)));
+  return hslToHex(c.h, Math.min(c.s, 40), Math.max(42, Math.min(c.l, 60)));
 }
 // The muted ink moved the shortest way in lightness until a label on it holds `min`:1.
 function wpFit(hex, min) {
   const c = hexToHsl(hex);
-  const s = Math.min(c.s, 55);
+  const s = Math.min(c.s, 40);
   const base = Math.max(42, Math.min(c.l, 60));
   for (let d = 0; d <= 50; d++) {
     for (const dir of d ? [-1, 1] : [0]) {
@@ -63,7 +63,7 @@ function wpFit(hex, min) {
 // ink under a forest label on the night ground (it also holds 3:1 on that ground).
 function wpPrimary(hex, dark) {
   const c = hexToHsl(hex);
-  const s = Math.min(c.s, 55);
+  const s = Math.min(c.s, 40);
   const base = Math.max(42, Math.min(c.l, 60));
   if (dark) {
     for (let l = base; l <= 88; l++) {
@@ -120,7 +120,7 @@ registerAesthetic({
   influences: '1930s public-works posters / Screenprint / Flat layered colour',
   summary: 'Flat layered inks on cream paper with a visible overprint where two cross, rounded poster tiles and a hard offset block behind the main actions.',
   motto: 'Printed for the public.',
-  kicker: 'Three inks, one pull',
+  kicker: 'Public works',
   mode: 'light',
   slideShape: 'soft',
   labels: { material: 'Ink', states: ['Rest', 'Hover', 'Pressed'], statesKind: 'button' },
@@ -145,7 +145,7 @@ registerAesthetic({
     },
     primary: {
       job: 'Spot ink 1 · main action',
-      use: 'The brand primary printed as a spot ink: muted (saturation capped at 55%) and moved into the lightness its label needs. It fills the one main button (deep on cream, lighter on the night ground), the "on" toggle, progress fills and the sun in the art',
+      use: 'The brand primary printed as a spot ink: muted (saturation capped at 40%) and moved into the lightness its label needs. It fills the one main button (deep on cream, lighter on the night ground), the "on" toggle, progress fills and the sun in the art',
       never: 'Body text, a second main button, large backgrounds',
       coverage: '≈10%',
     },
@@ -269,7 +269,7 @@ registerAesthetic({
       'Give the main button, the stamp tags and the poster card one hard 2px offset block in a second ink.',
       'Keep cards flat and rounded (14px cards, 8px controls) with a 1.5px ink edge, and rule lists with 1px ink hairlines.',
       'Set display type in condensed caps with slightly open tracking; keep body text in a friendly humanist sans.',
-      'Mute the brand colours into print inks (saturation capped near 55%) so any palette reads as a screenprint.',
+      'Mute the brand colours into print inks (saturation capped near 40%) so any palette reads as a screenprint.',
     ],
     dont: [
       'Put art, grain, patterns or decorative bands in app screens; the poster and the grain are for the website and the deck.',
