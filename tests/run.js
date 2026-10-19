@@ -257,7 +257,7 @@ check('paste: empty text', run(`extractColors('').length`) === 0, 'found colors 
 /* ---- board layout contract (js/aesthetic-board.js) ---- */
 
 {
-  const bc = vm.createContext({ console });
+  const bc = vm.createContext({ console, document: { addEventListener() {}, body: null } });
   vm.runInContext(fs.readFileSync(path.join(root, 'js/aesthetic-board.js'), 'utf8'), bc, { filename: 'aesthetic-board.js' });
   const lay = d => vm.runInContext(`abLayoutOf(${JSON.stringify(d)})`, bc);
   const d0 = lay({});
@@ -277,7 +277,7 @@ check('paste: empty text', run(`extractColors('').length`) === 0, 'found colors 
 /* ---- font weights (js/aesthetic-board.js: abWeights / abWeight / abWeightNear) ---- */
 
 {
-  const bc = vm.createContext({ console });
+  const bc = vm.createContext({ console, document: { addEventListener() {}, body: null } });
   vm.runInContext(fs.readFileSync(path.join(root, 'js/aesthetic-board.js'), 'utf8'), bc, { filename: 'aesthetic-board.js' });
   const w = (fn, face, n) => vm.runInContext(`${fn}(${JSON.stringify(face)}, ${n})`, bc);
   const two = { weights: '700;400' }, one = { weights: '400' }, many = { weights: '300;400;600;800' };
@@ -676,7 +676,7 @@ check('paste: empty text', run(`extractColors('').length`) === 0, 'found colors 
   check('brief: kit Fill/Text show light and dark values where a dark palette exists', /--canvas \(#fff \/ #111\)/.test(kitOut[0]) && /--ink \(#000 \/ #eee\)/.test(kitOut[0]) && !/--line \(#/.test(kitOut[0]), kitOut[0].slice(0, 800));
   check('brief: a single-palette brief keeps the kit cells without dark pairs', !/--canvas \(#/.test(kitOut[2]), kitOut[2].slice(0, 300));
   check('brief: App briefs list all five screen layouts with numbered components and the closing line',
-    (kitOut[3].match(/^### /gm) || []).length === 5 && /^## Screen layouts/.test(kitOut[3]) && /### Onboarding[\s\S]*1\. Top bar\n2\. Large title\n3\. Body text/.test(kitOut[3]) && /Section label/.test(kitOut[3]) && /do not invent layouts with hero areas or decorative headers\.$/.test(kitOut[3]), kitOut[3].slice(0, 400));
+    (kitOut[3].match(/^### /gm) || []).length === 5 && /^## Screen layouts/.test(kitOut[3]) && /### Onboarding[\s\S]*1\. Top bar\n2\. Large title\n3\. Body text/.test(kitOut[3]) && /Section label/.test(kitOut[3]) && /with no hero areas or decorative headers\.$/.test(kitOut[3]), kitOut[3].slice(0, 400));
   check('brief: a Website-only brief has no screen layouts', kitOut[4] === 0, 'web');
   const rule = B(`(() => { const out = aibSecAppRules({ app: true, site: false }); return out[0] + '|' + (out[1] === UI_KIT_SURFACES.app.rule) + '|' + /none of it belongs in the app/.test(out.join('\\n')); })()`);
   check('brief: App UI rules carry the surface rule and the no-art line', rule === '## App UI rules|true|true', rule);
@@ -799,6 +799,100 @@ check('paste: empty text', run(`extractColors('').length`) === 0, 'found colors 
     M('AIB_USE_SHORT.hero') === 'Patterns only as quiet section backgrounds; never a full-bleed hero' && /^Patterns only as quiet section backgrounds; never a full-bleed hero/.test(M('AIB_USE_RULES.hero.rule')), M('AIB_USE_SHORT.hero'));
   check('blend: borrowed art is board and deck only, never on the website or in app screens',
     /never on the website or in app screens/.test(fs.readFileSync(path.join(root, 'js/blend.js'), 'utf8')) && !/landing page hero; never in app screens/.test(fs.readFileSync(path.join(root, 'js/blend.js'), 'utf8')), 'blend.js');
+  // Tiers, header wording and Why this works in the real briefs.
+  const heads = md => md.split('\n').filter(l => /^## /.test(l));
+  const noTier = [dl, pb, dlStatic, dlWeb].map(md => heads(md).filter(h => !/\((?:Locked|Guided|Free)\)$/.test(h))).reduce((a, b) => a.concat(b), []);
+  check('brief: every ## heading ends with (Locked), (Guided) or (Free)', noTier.length === 0 && /^## Colors \(Locked\)$/m.test(dl) && /^## Screen layouts \(Free\)$/m.test(dl) && /^## App UI rules \(Guided\)$/m.test(dl), noTier.join(' | '));
+  check('brief: the header names the tiers and no longer says "invent nothing" or "Every value is final"',
+    !/invent nothing|Every value is final/i.test(dl + pb + dlStatic + dlWeb) && /Sections are marked Locked, Guided or Free\. Locked values are final/.test(dl) && /Free means design it for this product: layout, screen structure and how many sections a screen has\./.test(dlWeb), dl.slice(0, 700));
+  const built = M('aibSecBuilt.toString()').replace(/\\'/g, "'");
+  check('brief: Built screens are a sample composition, not a spec of the product\'s screens', /sample composition/.test(built) && /not the sample app's content, screen list or exact positions/.test(built) && !/Build these two screens to match/.test(built), 'aibSecBuilt');
+  check('why: no section while the principles are absent', !/Why this works/.test(dl) && !/Why this works/.test(dlWeb), 'absent');
+  M(`window.AESTHETIC_PRINCIPLES = { 'dystopian-luxury': { principles: [{ rule: 'Let ink carry the weight.', board: 'Black blocks on bone.', app: 'The primary is an ink block with a lime \`--primary\` square.' }], traps: [{ element: 'The poster collage', instead: 'Leave it out.' }, { element: 'Marquee text', instead: 'Use a plain caption.' }] } }`);
+  const withWhy = M(`[buildAiBrief(kstate('dystopian-luxury'), { surface: 'app', target: 'web', noProbe: true, kitSnap: kitDL }), buildAiBrief(kstate('dystopian-luxury'), { surface: 'web', target: 'web', noProbe: true }), buildAiBrief(kstate('pirate-broadcast'), { surface: 'app', target: 'web', noProbe: true, kitSnap: kitPB })]`);
+  check('why: with data, an App brief has the section after the App UI rules and before Colors, in the stated format',
+    /## App UI rules \(Guided\)[\s\S]*\n## Why this works \(Guided\)\n[^\n]*\n\n1\. \*\*Let ink carry the weight\.\*\* On the board: Black blocks on bone\. In the app: The primary is an ink block with a lime `--primary` square\.\n\nLiteral traps — board elements that do not reach the app as drawn:\n- The poster collage: Leave it out\.\n- Marquee text: Use a plain caption\.\n\n## Colors/.test(withWhy[0]), (withWhy[0].match(/## Why this works[\s\S]{0,500}/) || ['none'])[0]);
+  check('why: a Website brief and an aesthetic without data have no section', !/Why this works/.test(withWhy[1]) && !/Why this works/.test(withWhy[2]), 'omitted');
+  M(`delete window.AESTHETIC_PRINCIPLES`);
+  // The lint on the real briefs runs without error and returns plain-English issues with a section.
+  const realLint = M(`JSON.stringify([aiBriefLint(kstate('dystopian-luxury'), { surface: 'app', target: 'web', noProbe: true, kitSnap: kitDL }), aiBriefLint(kstate('pirate-broadcast'), { surface: 'both', target: 'both', noProbe: true })])`);
+  check('lint: aiBriefLint builds its own context and returns issues shaped { code, section, message }', JSON.parse(realLint).every(list => Array.isArray(list) && list.every(i => i.code && i.section && i.message)), realLint.slice(0, 400));
+
+}
+
+/* ---- AI brief: tiers, Why this works and the lint (js/ai-brief.js) ---- */
+
+{
+  const lc = vm.createContext({ console, window: {}, localStorage: { getItem: () => null, setItem() {} } });
+  for (const f of ['js/color.js', 'js/ui-kit.js', 'js/ai-brief.js']) vm.runInContext(fs.readFileSync(path.join(root, f), 'utf8'), lc, { filename: f });
+  const L = code => vm.runInContext(code, lc);
+  // Why this works: the formatter is pure, so a fixture object stands in for js/aesthetic-principles.js.
+  L(`var fx = [{ name: 'Soft Form', principles: [
+      { rule: 'Give every control one material.', board: 'Fields are recessed, buttons raised', app: '\`--primary\` fills one button per screen.' },
+      { rule: 'Keep one big type step.', board: 'A large headline.', app: 'Large title 34pt.' }],
+    traps: [{ element: 'The hero art.', instead: 'Leave it out.' }, { element: 'Glass card', instead: 'Use a raised card.' }] }];`);
+  const one = L(`aibWhyLines(fx).join('\\n')`);
+  check('why: heading, numbered "rule / On the board / In the app" lines, and the traps list',
+    /^## Why this works\n/.test(one) && /\n1\. \*\*Give every control one material\.\*\* On the board: Fields are recessed, buttons raised\. In the app: `--primary` fills one button per screen\.\n2\. \*\*Keep one big type step\.\*\* On the board: A large headline\. In the app: Large title 34pt\./.test(one)
+    && /\nLiteral traps — board elements that do not reach the app as drawn:\n- The hero art: Leave it out\.\n- Glass card: Use a raised card\.$/.test(one) && !/### /.test(one), one);
+  const two = L(`aibWhyLines(fx.concat([{ name: 'Liquid Glass', principles: [{ rule: 'R', board: 'b', app: 'a' }], traps: [] }])).join('\\n')`);
+  check('why: two aesthetics get a sub-heading each; no traps means no traps line', /### Soft Form\n1\./.test(two) && /### Liquid Glass\n1\. \*\*R\*\* On the board: b\. In the app: a\.$/.test(two) && (two.match(/Literal traps/g) || []).length === 1, two);
+  check('why: nothing to say renders nothing', L(`aibWhyLines([]).length + aibWhyLines(null).length`) === 0, 'empty');
+  check('why: a SwiftUI-only brief gets Palette. names through the token mapper', /Palette\.primary/.test(L(`aibWhyLines(fx, aibSwiftTok).join('\\n')`)), 'tok');
+  const look = L(`(() => {
+    const ctx = { def: { key: 'soft-form', name: 'Soft Form' }, key: 'soft-form' };
+    const none = aibPrinciplesFor(ctx).length;               // no global at all
+    window.AESTHETIC_PRINCIPLES = { 'soft-form': { principles: [{ rule: 'R', board: 'b', app: 'a' }], traps: [{ element: 'e', instead: 'i' }] }, 'liquid-glass': { principles: [{ rule: 'Q', board: 'b', app: 'a' }], traps: [] } };
+    const base = aibPrinciplesFor(ctx).map(e => e.name).join();
+    const miss = aibPrinciplesFor({ def: { key: 'raw-brutalist', name: 'Raw' }, key: 'raw-brutalist' }).length;   // key not in the data
+    const blend = aibPrinciplesFor({ def: { key: 'soft-form', name: 'Soft Form', blend: { base: { key: 'soft-form', name: 'Soft Form' }, donor: { key: 'liquid-glass', name: 'Liquid Glass' } } }, key: 'soft-form' }).map(e => e.name).join();
+    const web = aibSecWhy({ app: false, def: ctx.def, key: 'soft-form' }).length;
+    delete window.AESTHETIC_PRINCIPLES;
+    return [none, base, miss, blend, web].join('|');
+  })()`);
+  check('why: a missing global or key renders nothing; a blend adds the donor; a website-only brief has no section', look === '0|Soft Form|0|Soft Form,Liquid Glass|0', look);
+  check('tiers: headings take their tier; "Blend: X" follows Blend; unlisted sections are Guided',
+    L(`[aibTierHeading('## Colors'), aibTierHeading('## Screen layouts'), aibTierHeading('## Blend: A × B'), aibTierHeading('## Something new'), aibTierHeading('## Colors (Locked)'), aibTierHeading('### Sub')].join('|')`)
+    === '## Colors (Locked)|## Screen layouts (Free)|## Blend: A × B (Guided)|## Something new (Guided)|## Colors (Locked)|### Sub', 'tiers');
+
+  // aibLint on synthetic input: one fixture per check, and a clean brief.
+  L(`var lint = (over, md) => { const ctx = Object.assign({ app: true, swiftOnly: false, modes: [{ mode: 'light' }, { mode: 'dark' }], rows: [
+      { token: '--canvas', get: m => (m.mode === 'light' ? '#ffffff' : '#111111'), job: '', on: [['--ink', m => (m.mode === 'light' ? '#222222' : '#eeeeee')]] },
+      { token: '--ink', get: m => (m.mode === 'light' ? '#222222' : '#eeeeee'), job: '', on: [] },
+      { token: '--primary', get: m => (m.mode === 'light' ? '#2255cc' : '#6688ee'), job: '', on: [['--on-primary', m => (m.mode === 'light' ? '#ffffff' : '#101010')]] },
+      { token: '--on-primary', get: m => (m.mode === 'light' ? '#ffffff' : '#101010'), job: '', on: [] },
+      { token: '--accent-ink', get: m => (m.mode === 'light' ? '#996600' : '#ffcc66'), job: '', on: [] }] }, over); return aibLint(ctx, md); };
+    var table = (rows) => '## Components (Locked)\\n| Element | Fill | Text | Edge |\\n| --- | --- | --- | --- |\\n' + rows + '\\n';
+    var okMd = '# Brief\\nIntro.\\n\\n## Colors (Locked)\\nUse \`--primary\` and \`--ink\`.\\n\\n' + table('| Primary button | \`--primary\` | \`--on-primary\` | none |\\n| Card | \`--canvas\` | \`--ink\` | 1px |') +
+      '\\n## Do and don\\'t (Guided)\\n- Do: Keep the surface calm.\\n- Don\\'t: Use stock red.\\n\\n## Shape and materials (Locked)\\n- **Card**: border: 1px solid var(--ink);\\n\\n## Tokens (CSS) (Locked)\\n\`\`\`css\\n:root { --canvas: #fff; --ink: #222; --primary: #25c; --on-primary: #fff; background: linear-gradient(135deg, #ff0000, #0000ff); }\\n\`\`\`\\n';`);
+  const clean = L(`JSON.stringify(lint({}, okMd))`);
+  check('lint: a consistent brief has no issues', clean === '[]', clean);
+  const bad = (over, md) => JSON.parse(L(`JSON.stringify(lint(${over}, ${md}))`));
+  const c1 = bad(`{ rows: [{ token: '--muted', get: () => '#cccccc', job: '', on: [] }, { token: '--canvas', get: () => '#ffffff', job: '', on: [['--muted', () => '#aaaaaa']] }, { token: '--accent-ink', get: () => '#eeeeaa', job: '', on: [] }] }`, 'okMd');
+  check('lint: a stated text-on-fill pair under 4.5:1 is flagged in each mode; accent-ink under 3:1 too',
+    c1.filter(i => i.code === 'contrast' && /`--muted` text \(#aaaaaa\) on `--canvas`/.test(i.message)).length === 2 && c1.some(i => /accent-ink/.test(i.message) && /needs 3:1/.test(i.message)) && c1.every(i => i.section && i.message), JSON.stringify(c1));
+  const c2 = bad(`{}`, `okMd.replace('| Card | \`--canvas\` | \`--ink\` | 1px |', '| Card | \`--primary\` | \`--ink\` | 1px |')`);
+  check('lint: a component Fill/Text pair under 4.5:1 is flagged in each mode', c2.filter(i => i.code === 'contrast' && /^Card: `--ink` text .* on a `--primary` fill/.test(i.message)).length === 2 && c2.every(i => i.section === 'Components'), JSON.stringify(c2));
+  const c3 = bad(`{ rows: [{ token: '--canvas', get: m => (m.mode === 'light' ? '#ffffff' : '#111111'), job: '', on: [] }, { token: '--primary', get: m => (m.mode === 'light' ? '#2255cc' : '#121212'), job: '', on: [] }, { token: '--on-primary', get: () => '#ffffff', job: '', on: [] }] }`, 'okMd');
+  check('lint: a filled primary action that matches the canvas is flagged (black on black in dark mode); an edge excuses it',
+    c3.length === 1 && c3[0].code === 'primary-on-canvas' && /dark mode/.test(c3[0].message) && !/light mode/.test(c3[0].message)
+    && bad(`{ rows: [{ token: '--canvas', get: () => '#111111', job: '', on: [] }, { token: '--primary', get: () => '#121212', job: '', on: [] }, { token: '--on-primary', get: () => '#ffffff', job: '', on: [] }] }`, `okMd.replace('| Primary button | \`--primary\` | \`--on-primary\` | none |', '| Primary button | \`--primary\` | \`--on-primary\` | 1px solid --ink |')`).length === 0, JSON.stringify(c3));
+  const c4 = bad(`{}`, `okMd.replace('- Do: Keep the surface calm.', '- Do: Use no shadows anywhere on the surface.').replace('- **Card**: border: 1px solid var(--ink);', '- **Card**: box-shadow: 0 8px 24px rgba(0,0,0,0.2);')`);
+  check('lint: a "no shadows" rule against a box-shadow recipe is flagged; box-shadow: none and a 0-blur ring are not',
+    c4.length === 1 && c4[0].code === 'recipe-vs-prose' && /shadow/.test(c4[0].message)
+    && bad(`{}`, `okMd.replace('- Do: Keep the surface calm.', '- Do: Use no shadows anywhere.').replace('border: 1px solid var(--ink);', 'box-shadow: none; box-shadow: 0 0 0 1px var(--ink);')`).length === 0
+    && bad(`{}`, `okMd.replace('- Do: Keep the surface calm.', '- Do: Use no shadows anywhere.').replace('border: 1px solid var(--ink);', 'box-shadow: 0 0 0 1px var(--ink);')`).length === 0, JSON.stringify(c4));
+  const c5 = bad(`{}`, `okMd.replace('- Do: Keep the surface calm.', '- Do: Never use gradients; keep fills flat.')`);
+  check('lint: a "no gradients" rule against a gradient in the tokens is flagged', c5.length === 1 && c5[0].code === 'recipe-vs-prose' && /gradient/.test(c5[0].message), JSON.stringify(c5));
+  const c6 = bad(`{}`, `okMd.replace('Use \`--primary\` and \`--ink\`.', 'Use \`--primary\` and \`--brand-glow\`.')`);
+  check('lint: a --token named in the text with no value is flagged; --on-* and a defined token are not', c6.length === 1 && c6[0].code === 'undefined-token' && /--brand-glow/.test(c6[0].message)
+    && bad(`{}`, `okMd.replace('Use \`--primary\` and \`--ink\`.', 'Use \`--primary\`, \`--ink\` and the \`--on-*\` token.')`).length === 0, JSON.stringify(c6));
+  const c7 = bad(`{}`, `okMd.replace('#ff0000, #0000ff', '#ff0000, #FF0000')`);
+  check('lint: a gradient whose stops are all one colour is flagged; a sized single-colour line is not',
+    c7.length === 1 && c7[0].code === 'flat-gradient'
+    && bad(`{}`, `okMd.replace('linear-gradient(135deg, #ff0000, #0000ff);', 'linear-gradient(var(--ink),var(--ink)) center / 100% 1px no-repeat;')`).length === 0, JSON.stringify(c7));
+  check('lint: the confirm text counts the problems and ends with the question',
+    /^This brief has 2 problems an agent would have to guess at:\n\n- a\n- b\n\nExport anyway\?$/.test(L(`aibLintMessage([{ message: 'a' }, { message: 'b' }])`)) && L(`aibLintConfirm([])`) === true, 'confirm');
 }
 
 // Not run here (they need a real DOM): that blended tokens(t, state) see the view's fonts end to end, and the

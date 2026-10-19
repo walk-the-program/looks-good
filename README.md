@@ -356,7 +356,7 @@ edit the files directly.
 
 ## Tests
 
-`node tests/run.js` checks saving/loading a brand (including old or hand-edited files), the "Paste brand colors" reader, pattern colourways and the pattern contrast floor, the board layout contract, hook fallbacks (a throwing aesthetic hook falls back and warns once), the weight helpers, blend rules and pattern suites for every base and donor pair, the font names in `js/aesthetic-meta.js`, and that Undo carries the blend. No dependencies. Checks that need a real DOM (render timing, deck fitting, exports) are run in a browser against `dev/deck-gore.js`, the deck overlap checker (load it after `js/brand-deck.js` in a test page).
+`node tests/run.js` checks saving/loading a brand (including old or hand-edited files), the "Paste brand colors" reader, pattern colourways and the pattern contrast floor, the board layout contract, hook fallbacks (a throwing aesthetic hook falls back and warns once), the weight helpers, blend rules and pattern suites for every base and donor pair, the font names in `js/aesthetic-meta.js`, that Undo carries the blend, and the AI brief: Locked / Guided / Free section tags, the Why this works section, and the brief lint (contrast, rules against recipes, undefined tokens, flat gradients). No dependencies. Checks that need a real DOM (render timing, deck fitting, exports) are run in a browser against `dev/deck-gore.js`, the deck overlap checker (load it after `js/brand-deck.js` in a test page).
 
 ## Rolling back round 6
 

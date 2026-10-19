@@ -430,9 +430,10 @@ window.Show = window.Show || {};
   function textHtml(ctx) {
     // Sections already drawn above (colour, type, components, shape, do and don't) are skipped here.
     const skip = ['Colors', 'Components', 'Type', 'Shape and materials', "Do and don't"];
-    const keep = ctx.sections.filter(s => !skip.includes(s.title));
+    const bare = s => aibStripTier(s.title);   // headings carry a Locked / Guided / Free tag
+    const keep = ctx.sections.filter(s => !skip.includes(bare(s)));
     const html = keep.map(s => {
-      const long = /^(Patterns|Tokens \(CSS\)|Theme\.swift)$/.test(s.title);
+      const long = /^(Patterns|Tokens \(CSS\)|Theme\.swift)$/.test(bare(s));
       return `<details class="bv-acc"${long ? '' : ' open'}><summary><span>${esc(s.title)}</span></summary><div class="bv-md">${mdBlocks(s.lines)}</div></details>`;
     }).join('');
     const head = `<div class="bv-md bv-lede-md">${mdBlocks(ctx.leadLines)}</div>`;
@@ -442,11 +443,22 @@ window.Show = window.Show || {};
 
   /* ---------------- build + open ---------------- */
 
+  // A notice above the brief when it would contradict itself or leave a value undefined (aibLint in ai-brief.js).
+  function lintHtml(issues) {
+    if (!issues || !issues.length) return '';
+    const n = issues.length;
+    return `<aside class="bv-lint" role="status" style="margin:0 0 40px;padding:16px 20px;border:1px solid var(--line-strong);border-left-width:3px;border-radius:var(--r-ui)">
+      <h3 class="bv-sub" style="margin-top:0">${n} ${n === 1 ? 'problem' : 'problems'} an agent would have to guess at</h3>
+      <ul class="bv-notes">${issues.map(i => `<li>${esc(i.message)}${i.section ? ` <span class="is-muted">(${esc(i.section)})</span>` : ''}</li>`).join('')}</ul>
+    </aside>`;
+  }
+
   function build() {
     const view = abView(state);
     const st = view.state, def = view.def;
     const t = boardTokens(st, def);
-    const md = buildAiBrief(state);
+    const checked = buildAiBriefChecked(state);
+    const md = checked.md;
     currentMd = md;
     const sections = parseSections(md);
     const lead = md.split('\n');
@@ -460,8 +472,8 @@ window.Show = window.Show || {};
       tagline: String(aibContent(st).tagline).trim(),
       probe: aibProbeBoard(st, def),
     };
-    docEl.innerHTML = [coverHtml(ctx), colourHtml(ctx), typeHtml(ctx), componentsHtml(ctx), patternsHtml(ctx), shapeHtml(ctx), textHtml(ctx)].join('') +
-      `<footer class="bv-foot">Made with Branding Designer. Colours, fonts and rules above are final; nothing here is sent anywhere.</footer>`;
+    docEl.innerHTML = lintHtml(checked.issues) + [coverHtml(ctx), colourHtml(ctx), typeHtml(ctx), componentsHtml(ctx), patternsHtml(ctx), shapeHtml(ctx), textHtml(ctx)].join('') +
+      `<footer class="bv-foot">Made with Branding Designer. Locked colours, fonts and shapes above are final; nothing here is sent anywhere.</footer>`;
     drawPatterns(ctx);
     root.querySelector('.bv-bar-brand').textContent = ctx.brandName;
   }
@@ -532,14 +544,18 @@ window.Show = window.Show || {};
   function copyFor(toolId, btn) {
     const tool = TOOLS.find(x => x.id === toolId);
     if (!tool) return;
-    const text = tool.preface + '\n\n' + buildAiBrief(state);
+    const checked = buildAiBriefChecked(state);
+    if (!aibLintConfirm(checked.issues)) return;
+    const text = tool.preface + '\n\n' + checked.md;
     copyText(text)
       .then(() => { showToast('Brief copied for ' + tool.label + (window.AiBriefCopy ? window.AiBriefCopy.pendingNote() : '')); flash(btn, 'Copied'); })
       .catch(() => showToast('Clipboard blocked. Try again from the app window'));
   }
 
   function download() {
-    const blob = new Blob([buildAiBrief(state)], { type: 'text/markdown;charset=utf-8' });
+    const checked = buildAiBriefChecked(state);
+    if (!aibLintConfirm(checked.issues)) return;
+    const blob = new Blob([checked.md], { type: 'text/markdown;charset=utf-8' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
@@ -862,7 +878,9 @@ window.AiBriefCopy = (function () {
   }
 
   function doCopy() {
-    const text = buildAiBrief(state);
+    const checked = buildAiBriefChecked(state);
+    if (!aibLintConfirm(checked.issues)) return Promise.resolve();
+    const text = checked.md;
     return copyText(text)
       .then(() => toast(`AI brief copied for ${targetLabel()}${patternNote()}`))
       .catch(() => toast('Clipboard blocked. Try again from the app window'));
@@ -871,6 +889,7 @@ window.AiBriefCopy = (function () {
   function bytesToBlob(bytes) { return new Blob([bytes], { type: 'application/zip' }); }
 
   async function doSave() {
+    if (!aibLintConfirm(aiBriefLint(state))) return null;
     saveBtn.disabled = true;
     try {
       const files = await aibFiles(state);

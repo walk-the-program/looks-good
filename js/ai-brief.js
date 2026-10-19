@@ -2454,7 +2454,7 @@ function aibSecScreens(ctx) {
     const more = { list: ['Show at least 6 rows so the screen reads as a real list.'], settings: ['At least 3 groups.', 'Settings is a tab: the screen shows the tab bar.'] }[sc.id] || [];
     out.push('', `### ${sc.name}`, sc.use, '', ...sc.blocks.map((b, i) => `${i + 1}. ${names[b] || b}`), '', ...sc.rules.concat(more).map(r => `- ${r}`));
   });
-  out.push('', 'Every app screen is one of these five or a combination; do not invent layouts with hero areas or decorative headers.');
+  out.push('', 'These five are starting points, not a fixed list: design each screen for its job from the kit\'s components, as one of these or a combination, with no hero areas or decorative headers.');
   return out;
 }
 
@@ -2464,7 +2464,7 @@ function aibSecBuilt(ctx) {
   if (!S || (!S.welcome.length && !S.home.length)) return [];
   const ch = ctx.kit.chrome;
   const top = Math.round(ch.status + ch.topbar + (ch.topRule || 0)), bottom = 844 - Math.round(ch.tabbar);
-  const out = ['## Built screens', 'The Mobile app tab of the Built view, measured at 390 x 844 and listed top to bottom; every y is in pt from the top of the screen. Build these two screens to match; components are drawn as their UI kit rows. Where these screens differ from Screen layouts (for example Home shows 3 list rows), the Built screens win; the layouts\' rules are for standalone screens.'];
+  const out = ['## Built screens', 'A sample composition: the Mobile app tab of the Built view, measured at 390 x 844 and listed top to bottom; every y is in pt from the top of the screen. It shows how this style builds a phone screen. Match its components, type ladder and spacing rhythm, not the sample app\'s content, screen list or exact positions; the product\'s own screens are designed for its jobs. Components are drawn as their UI kit rows. Where this composition differs from Screen layouts (for example Home shows 3 list rows), it shows the style\'s intended density.'];
   const where = S.arrows.welcome && S.arrows.home ? 'on every Primary button (Welcome and Home)' : S.arrows.welcome ? 'on the Welcome Primary button only' : S.arrows.home ? 'on the Home card\'s Primary button only' : '';
   if (where) out.push(`The Primary button's trailing mark (see its kit row) appears ${where}; other buttons have none.`);
   if (S.welcome.length) out.push('', '### Welcome', ...S.welcome.map((l, i) => `${i + 1}. ${l}`));
@@ -3205,16 +3205,88 @@ function buildPatternItemBrief(state0, i, opts) {
 
 /* ---------------- the brief ---------------- */
 
+// How firmly an agent must follow each section. Locked: values are final. Guided: an intent and a range to
+// stay inside. Free: designed for the product. Every "## " heading in the brief carries its tier.
+const AIB_TIERS = {
+  'Why this works': 'Guided', 'App UI rules': 'Guided', 'Website rules': 'Guided', 'Blend': 'Guided', 'Built screens': 'Guided',
+  'Phone layout and type': 'Guided', 'Motion': 'Guided', "Do and don't": 'Guided',
+  'Colors': 'Locked', 'Components': 'Locked', 'UI kit': 'Locked', 'Type': 'Locked', 'Website type': 'Locked', 'Shape and materials': 'Locked',
+  'Light and dark': 'Locked', 'States': 'Locked', 'Accessibility': 'Locked', 'Icons': 'Locked', 'App icon': 'Locked', 'Fonts to bundle': 'Locked',
+  'Tokens (CSS)': 'Locked', 'Theme.swift': 'Locked', 'Patterns': 'Locked',
+  'Screen layouts': 'Free',
+};
+
+// "## Colors" -> "## Colors (Locked)". "Blend: X" takes the tier of "Blend". An unlisted section is Guided.
+function aibTierOf(title) {
+  const t = String(title).replace(/\s*\((?:Locked|Guided|Free)\)$/, '');
+  return AIB_TIERS[t] || AIB_TIERS[t.replace(/:.*$/, '')] || 'Guided';
+}
+function aibTierHeading(line) {
+  const m = /^## (.*)$/.exec(line);
+  if (!m || /\((?:Locked|Guided|Free)\)$/.test(m[1])) return line;
+  return `## ${m[1]} (${aibTierOf(m[1])})`;
+}
+// The section title without its tier tag.
+const aibStripTier = title => String(title).replace(/\s*\((?:Locked|Guided|Free)\)$/, '');
+
+const AIB_HEADER_TIERS = 'Build the real product from this brief, not a mock-up. Sections are marked Locked, Guided or Free. Locked values are final: use only these colors, fonts, shapes and motion, and where one is missing use the nearest listed token. Guided sections give an intent and a range; stay inside them. Free means design it for this product: layout, screen structure and how many sections a screen has. ';
+const AIB_HEADER_APP = 'Screens are composed from the UI kit below, one component for each need; do not invent new component styles, and do not copy the brand board\'s layout. ';
+
+/* ---- Why this works: the reasons behind the style, from js/aesthetic-principles.js ---- */
+
+// The aesthetics a brief draws on: the base, plus the blend donor when the style is a blend.
+// Returns [{ name, data }] for those with principles; nothing when the data file is missing.
+function aibPrinciplesFor(ctx) {
+  const all = (typeof window !== 'undefined' && window.AESTHETIC_PRINCIPLES) || (typeof AESTHETIC_PRINCIPLES !== 'undefined' ? AESTHETIC_PRINCIPLES : null);
+  if (!all || typeof all !== 'object') return [];
+  const def = ctx.def || {};
+  const bd = def.blend;
+  const list = bd && bd.base && bd.donor
+    ? [[bd.base.key, bd.base.name], [bd.donor.key, bd.donor.name]]
+    : [[ctx.key || def.classicOf || def.key, def.name]];
+  const seen = {};
+  return list.map(([key, name]) => {
+    const k = String(key || '').replace(/--classic$/, '');
+    const data = all[k] || all[key];
+    if (!data || seen[k]) return null;
+    seen[k] = 1;
+    const principles = Array.isArray(data.principles) ? data.principles.filter(p => p && p.rule) : [];
+    const traps = Array.isArray(data.traps) ? data.traps.filter(t => t && t.element) : [];
+    return principles.length || traps.length ? { name: name || k, principles, traps } : null;
+  }).filter(Boolean);
+}
+
+// Pure: entries [{ name, principles, traps }] -> the section's lines. Empty when there is nothing to say.
+function aibWhyLines(entries, tok) {
+  if (!entries || !entries.length) return [];
+  const t = typeof tok === 'function' ? tok : (x => x);
+  const end = s => { const v = String(s == null ? '' : s).replace(/\s+/g, ' ').trim(); return v && !/[.!?]$/.test(v) ? v + '.' : v; };
+  const out = ['## Why this works', 'The reasons behind the style, most important first. Keep the reason and change the drawing where a board element does not fit a phone screen.'];
+  entries.forEach(e => {
+    if (entries.length > 1) out.push('', `### ${e.name}`);
+    else out.push('');
+    e.principles.forEach((p, i) => out.push(t(`${i + 1}. **${String(p.rule).trim()}** On the board: ${end(p.board)} In the app: ${end(p.app)}`)));
+    if (e.traps.length) {
+      out.push('', 'Literal traps — board elements that do not reach the app as drawn:');
+      e.traps.forEach(x => out.push(t(`- ${String(x.element).trim().replace(/[.:;]+$/, '')}: ${String(x.instead).trim()}`)));
+    }
+  });
+  return out;
+}
+
+function aibSecWhy(ctx) {
+  return ctx.app ? aibWhyLines(aibPrinciplesFor(ctx), ctx.tok) : [];
+}
+
 function aibBuild(ctx) {
   const label = AIB_TARGETS.find(x => x.value === ctx.target).label;
   const blocks = [
     [`# ${ctx.brandName} — build brief`,
-      (ctx.app
-        ? 'Build the real product from this brief, not a mock-up. Every value is final: use only these colors, fonts, shapes and motion; where something is missing, use the nearest listed token. Screens are composed from the UI kit below, one component for each need; do not invent new component styles, and do not copy the brand board\'s layout. '
-        : 'Build the real product from this brief, not a mock-up. Every value is final: use only these colors, fonts, shapes and motion, and invent nothing; where something is missing, use the nearest listed token. ') + (ctx.app && !ctx.site && ctx.target === 'web' ? 'Target: a phone app in HTML and CSS, laid out in iOS points (1pt = 1 CSS px).' : `Target: ${label}${ctx.target === 'web' ? ' (CSS)' : ctx.target === 'swiftui' ? ' (iOS 17 and macOS 14 or later)' : ' (CSS and SwiftUI)'}.`),
+      AIB_HEADER_TIERS + (ctx.app ? AIB_HEADER_APP : '') + (ctx.app && !ctx.site && ctx.target === 'web' ? 'Target: a phone app in HTML and CSS, laid out in iOS points (1pt = 1 CSS px).' : `Target: ${label}${ctx.target === 'web' ? ' (CSS)' : ctx.target === 'swiftui' ? ' (iOS 17 and macOS 14 or later)' : ' (CSS and SwiftUI)'}.`),
       aibBrandLine(ctx)],
     aibSecAppRules(ctx),
     aibSecWebRules(ctx),
+    aibSecWhy(ctx),
     aibSecBlend(ctx),
     aibSecColors(ctx),
     ctx.app ? aibSecKit(ctx) : aibSecComponents(ctx),
@@ -3235,19 +3307,19 @@ function aibBuild(ctx) {
     ctx.swift ? aibSecSwift(ctx) : [],
     aibSecPatterns(ctx),
     ctx.app ? aibSecAppIcon(ctx) : [],
-  ].filter(b => b.length);
+  ].filter(b => b.length).map(b => [aibTierHeading(b[0])].concat(b.slice(1)));
   return blocks.map(b => b.join('\n')).join('\n\n') + '\n';
 }
 
-function buildAiBrief(state0, opts) {
+// The brief and the context it was built from (the missing-token pass can add palette rows to the context).
+function aibBriefParts(state0, opts) {
   const ctx = aibContext(state0, opts);
   let md = aibBuild(ctx);
   if (ctx.app && ctx.kit) {
     const css = (md.match(/```css\n[\s\S]*?```/) || [''])[0];
     const defined = new Set(css.match(/--[a-z0-9-]+(?=:)/g) || []);
     const prose = md.replace(/```[\s\S]*?```/g, '');
-    const skip = /^--(x|shadow-|font-|text-|space-|radius-|row|top-bar|tab-bar|status-bar|home-indicator|margin|hit|dur|ease)/;
-    const missing = Array.from(new Set(prose.match(/--[a-z][a-z0-9-]*[a-z0-9]/g) || [])).filter(t => !defined.has(t) && !skip.test(t) && ctx.modes.every(m => aibRgba(aibTokenValue(ctx, t, m))));
+    const missing = Array.from(new Set(prose.match(/--[a-z][a-z0-9-]*[a-z0-9]/g) || [])).filter(t => !defined.has(t) && !AIB_TOKEN_SKIP.test(t) && ctx.modes.every(m => aibRgba(aibTokenValue(ctx, t, m))));
     if (missing.length) {
       missing.forEach(t => { const v = {}; ctx.modes.forEach(m => { v[m.mode] = aibTokenValue(ctx, t, m); }); ctx.rows.push({ token: t, get: m => v[(m && m.mode) || ctx.modes[0].mode] || v[ctx.modes[0].mode], job: 'Named in this brief (a colour of the style).', on: [] }); });
       ctx._phone = null;
@@ -3255,10 +3327,218 @@ function buildAiBrief(state0, opts) {
     }
   }
   // zero distances read as words, outside code blocks ("0pt apart" -> "with no gap")
-  return md.split(/(```[\s\S]*?```)/).map((part, i) => (i % 2 ? part : part
+  md = md.split(/(```[\s\S]*?```)/).map((part, i) => (i % 2 ? part : part
     .replace(/\b0pt apart\b/g, 'with no gap between them').replace(/\b0pt above and below\b/g, 'no space above and below')
     .replace(/\b0pt (below|above) (it|the button|the previous block)/g, 'directly $1 $2').replace(/\b0pt in from\b/g, 'flush with')
     .replace(/\b0pt\b/g, 'no'))).join('');
+  return { ctx, md };
+}
+
+// Tokens that are not colours of the palette (type, space, motion and layout variables).
+const AIB_TOKEN_SKIP = /^--(x|shadow-|font-|text-|space-|radius-|row|top-bar|tab-bar|status-bar|home-indicator|margin|hit|dur|ease)/;
+
+function buildAiBrief(state0, opts) {
+  return aibBriefParts(state0, opts).md;
+}
+
+// { md, issues } for callers that show the lint beside the text (the Brief view).
+function buildAiBriefChecked(state0, opts) {
+  const { ctx, md } = aibBriefParts(state0, opts);
+  let issues = [];
+  try { issues = aibLint(ctx, md); } catch (err) { if (typeof console !== 'undefined') console.warn('brief lint failed', err); }
+  return { md, issues };
+}
+
+function aiBriefLint(state0, opts) {
+  return buildAiBriefChecked(state0, opts).issues;
+}
+
+// The prompt shown before a brief with problems is copied or saved (pure, so it is testable).
+function aibLintMessage(issues) {
+  const n = issues.length, shown = issues.slice(0, 6).map(i => '- ' + i.message);
+  if (n > shown.length) shown.push(`- and ${n - shown.length} more`);
+  return `This brief has ${n} ${n === 1 ? 'problem' : 'problems'} an agent would have to guess at:\n\n${shown.join('\n')}\n\nExport anyway?`;
+}
+// true when there is nothing to confirm, or the user chose to export anyway.
+function aibLintConfirm(issues) {
+  if (!issues || !issues.length) return true;
+  if (typeof window === 'undefined' || typeof window.confirm !== 'function') return true;
+  return window.confirm(aibLintMessage(issues));
+}
+
+/* ---------------- lint: contradictions a brief must not ship with ---------------- */
+
+// Plain-English problems an agent would have to guess at. Pure: reads the context (palette rows, modes) and
+// the finished Markdown. Returns [{ code, section, message }]; [] when the brief is consistent.
+// Codes: contrast, primary-on-canvas, recipe-vs-prose, undefined-token, flat-gradient.
+const AIB_HEXRE = /^#[0-9a-f]{6}$/i;
+
+function aibLintTables(md) {
+  // Tables outside code fences, with the section each sits in: [{ section, head, rows }]
+  const out = [];
+  const lines = md.split('\n');
+  let sec = '', fence = false;
+  for (let i = 0; i < lines.length; i++) {
+    const l = lines[i];
+    if (/^```/.test(l)) { fence = !fence; continue; }
+    if (fence) continue;
+    const h = /^## (.*)$/.exec(l);
+    if (h) { sec = aibStripTier(h[1]); continue; }
+    if (/^\|/.test(l) && /^\|[\s:|-]+\|\s*$/.test(lines[i + 1] || '')) {
+      const cut = s => s.trim().replace(/^\|/, '').replace(/\|\s*$/, '').split(/(?<!\\)\|/).map(c => c.replace(/\\\|/g, '|').trim());
+      const head = cut(l), rows = [];
+      i += 2;
+      while (i < lines.length && /^\|/.test(lines[i])) rows.push(cut(lines[i++]));
+      i--;
+      out.push({ section: sec, head, rows });
+    }
+  }
+  return out;
+}
+
+function aibLint(ctx, md) {
+  const issues = [];
+  const add = (code, section, message) => issues.push({ code, section, message });
+  const modes = (ctx && ctx.modes) || [];
+  const multi = modes.length > 1;
+  const inMode = m => (multi ? ` in ${m.mode} mode` : '');
+  const val = (tk, m) => { try { return String(aibTokenValue(ctx, tk, m) || '').trim(); } catch (err) { return ''; } };
+  const ratio = (a, b) => (AIB_HEXRE.test(a) && AIB_HEXRE.test(b) ? contrastRatio(a, b) : null);
+  const seen = new Set();
+  const once = (key, fn) => { if (!seen.has(key)) { seen.add(key); fn(); } };
+
+  // (a) contrast: Colors "On" pairs, accent-ink, and the Fill / Text pairs of the component tables
+  (ctx.rows || []).forEach(r => {
+    if (/^Decorative only/.test(r.job || '')) return;
+    (r.on || []).forEach(([tk, get]) => modes.forEach(m => {
+      const fg = String(get(m) || '').trim(), bg = String(r.get(m) || '').trim();
+      const k = ratio(fg, bg);
+      if (k != null && k < 4.5) once(`c|${tk}|${r.token}|${m.mode}`, () => add('contrast', 'Colors', `\`${tk}\` text (${fg}) on \`${r.token}\` (${bg}) is ${k.toFixed(2)}:1${inMode(m)}; text needs 4.5:1.`));
+    }));
+  });
+  const accentInk = (ctx.rows || []).find(r => r.token === '--accent-ink'), canvas = (ctx.rows || []).find(r => r.token === '--canvas');
+  if (accentInk && canvas) modes.forEach(m => {
+    const k = ratio(String(accentInk.get(m) || '').trim(), String(canvas.get(m) || '').trim());
+    if (k != null && k < 3) add('contrast', 'Colors', `The highlight word colour \`--accent-ink\` on \`--canvas\` is ${k.toFixed(2)}:1${inMode(m)}; it needs 3:1.`);
+  });
+
+  const solo = cell => { const m = /^`?(--[a-z][a-z0-9-]*[a-z0-9])`?(?:\s*\([^)]*\))?$/.exec(String(cell || '').trim()); return m ? m[1] : null; };
+  const edgeDrawn = cell => /(\d+(?:\.\d+)?(?:px|pt)\s+(?:solid|dashed|dotted|double|--|#)|\b(?:ring|outline|border|edge)\b|^`?(?:--[a-z]|#[0-9a-f]{3}))/i.test(String(cell || '')) && !/^(none|no edge|n\/a)\b/i.test(String(cell || '').trim());
+  aibLintTables(md).forEach(tb => {
+    const col = re => tb.head.findIndex(h => re.test(h));
+    const iEl = col(/^element$/i), iFill = col(/^fill$/i), iText = col(/^text$/i), iEdge = col(/^edge/i);
+    if (iEl < 0 || iFill < 0 || iText < 0) return;
+    tb.rows.forEach(row => {
+      const el = row[iEl] || '';
+      const fillTk = solo(row[iFill]), textTk = solo(row[iText]);
+      if (fillTk && textTk) modes.forEach(m => {
+        const fg = val(textTk, m), bg = val(fillTk, m), k = ratio(fg, bg);
+        if (k != null && k < 4.5) once(`k|${el}|${textTk}|${fillTk}|${m.mode}`, () => add('contrast', tb.section, `${el}: \`${textTk}\` text (${fg}) on a \`${fillTk}\` fill (${bg}) is ${k.toFixed(2)}:1${inMode(m)}; it needs 4.5:1.`));
+      });
+      if (fillTk && /^(Primary|Main) button/i.test(el) && !(iEdge >= 0 && edgeDrawn(row[iEdge]))) modes.forEach(m => {
+        const fill = val(fillTk, m), ground = val('--canvas', m), k = ratio(fill, ground);
+        if (k != null && k < 1.5) once(`p|${fillTk}|${m.mode}`, () => add('primary-on-canvas', tb.section, `The ${el.toLowerCase()} fill (\`${fillTk}\`, ${fill}) is ${k.toFixed(2)}:1 against the canvas (${ground})${inMode(m)} and has no edge, so the main action would be nearly invisible.`));
+      });
+    });
+  });
+
+  // (b) rules that deny a look the recipes and kit rows then use
+  const lines = md.split('\n');
+  let sec = '', fence = false, siteOnly = false;
+  const rules = [], evidence = { shadow: null, gradient: null, blur: null };
+  const CLAIMS = [
+    ['shadow', /\b(?:no|never use|never add|without|avoid)\s+(?:any\s+)?(?:(?:soft|drop|heavy)\s+)?(?:box[- ])?(?:drop\s+)?shadows?\b(?!\s+(?:on|in|behind|over|under|across|inside|for|beyond|unless)\b)/i],
+    ['gradient', /\b(?:no|never use|never add|without|avoid)\s+(?:any\s+)?(?:\w+\s+)?gradients?\b(?!\s+(?:on|in|behind|over|under|across|inside|for|beyond|unless)\b)/i],
+    ['blur', /\b(?:no|never use|never add|without|avoid)\s+(?:any\s+)?(?:backdrop[- ])?(?:blur|frosted glass|glassmorphism)\b(?!\s+(?:on|in|behind|over|under|across|inside|for|beyond|unless)\b)/i],
+    ['flat', /\b(?:everything|every surface|all surfaces|the whole interface|the interface|surfaces) (?:is|are|stays?|stay) (?:completely |entirely |fully )?flat\b/i],
+  ];
+  const EVID = {
+    shadow: /box-shadow[ \t]*:[ \t]*(?![ \t]|none\b|(?:inset )?0(?:px)? 0(?:px)? 0(?:px)? )[^;}\n]+/i,
+    gradient: /(?<!repeating-)(?:linear|radial|conic)-gradient\([^\n]*\)/i,
+    blur: /backdrop-filter[ \t]*:[ \t]*(?![ \t]|none\b)[^;}\n]+/i,
+  };
+  const WORD_EVID = {
+    shadow: /\b(?:drop|soft|hard|offset|layered|inset|glow)\s+shadows?\b/i,
+    gradient: null,
+    blur: /\bbackdrop[- ](?:filter|blur)\b/i,
+  };
+  lines.forEach(l => {
+    if (/^```/.test(l)) { fence = !fence; return; }
+    const h = /^## (.*)$/.exec(l);
+    if (h) { sec = aibStripTier(h[1]); siteOnly = false; return; }
+    if (/^(?:\*\*)?Website only/i.test(l)) siteOnly = true;
+    if (/^### /.test(l) || (!l.trim() && false)) return;
+    const isRule = !fence && /^- (?:Don't|Do|Never|Always|Rule)\b/.test(l) && /^(?:Do and don't|App UI rules|Website rules)$/.test(sec);
+    if (isRule) { rules.push({ sec, text: l.replace(/^- /, '') }); return; }
+    if (siteOnly && ctx.app) return;
+    const isRow = /^\|/.test(l);
+    ['shadow', 'gradient', 'blur'].forEach(k => {
+      if (evidence[k]) return;
+      const m = (fence || /^- \*\*/.test(l) ? EVID[k].exec(l) : null) || (isRow && WORD_EVID[k] && /^(?:UI kit|Components)$/.test(sec) ? WORD_EVID[k].exec(l) : null);
+      if (m) evidence[k] = { sec, snippet: m[0].replace(/\s+/g, ' ').slice(0, 70) };
+    });
+  });
+  rules.forEach(r => CLAIMS.forEach(([kind, re]) => {
+    const hit = re.exec(r.text);
+    // only a blanket denial: it opens the rule, and is not about one element ("the headline ... with no shadow")
+    if (!hit || hit.index > 45 || /\b(?:headlines?|titles?|headings?|text|labels?|icons?|logos?|photos?|images?)\b/i.test(r.text.slice(0, hit.index))) return;
+    // a rule that carves out an exception ("except", "only", "unless") is not a blanket denial
+    if (/\b(?:except|only|unless|apart from|other than|outside|besides|aside from)\b/i.test(r.text)) return;
+    const kinds = kind === 'flat' ? ['shadow', 'gradient'] : [kind];
+    kinds.forEach(k => {
+      const ev = evidence[k];
+      if (!ev) return;
+      const what = { shadow: 'a shadow', gradient: 'a gradient', blur: 'a blur (backdrop-filter)' }[k];
+      once(`r|${k}|${r.text}`, () => add('recipe-vs-prose', r.sec, `A rule says "${r.text.replace(/^(?:Do|Don't): /, '').slice(0, 90)}", but ${ev.sec} uses ${what} (\`${ev.snippet}\`). Pick one.`));
+    });
+  }));
+
+  // (c) named but undefined: a token in prose with no value, and a gradient that is one colour
+  const css = (md.match(/```css\n[\s\S]*?```/g) || []).join('\n');
+  const defined = new Set(css.match(/--[a-z0-9-]+(?=\s*:)/g) || []);
+  (ctx.rows || []).forEach(r => { defined.add(r.token); (r.on || []).forEach(([tk]) => defined.add(tk)); });
+  Object.keys(ctx.kitVars || {}).forEach(k => defined.add(k));
+  const prose = md.replace(/```[\s\S]*?```/g, '');
+  const swiftOnly = !!ctx.swiftOnly;
+  if (!swiftOnly) {
+    let curSec = '';
+    prose.split('\n').forEach(l => {
+      const h = /^## (.*)$/.exec(l);
+      if (h) { curSec = aibStripTier(h[1]); return; }
+      (l.match(/--[a-z][a-z0-9-]*[a-z0-9](?![a-z0-9*-])/g) || []).forEach(t => {
+        if (defined.has(t) || AIB_TOKEN_SKIP.test(t)) return;
+        if (modes.length && modes.every(m => val(t, m))) return;
+        once(`u|${t}`, () => add('undefined-token', curSec, `\`${t}\` is named in the text but has no value anywhere in the brief.`));
+      });
+    });
+  }
+  const stopKey = (s, m) => {
+    const v = /^var\((--[a-z0-9-]+)\)$/i.exec(s);
+    if (v) { const x = m ? val(v[1], m) : ''; return (x || s).toLowerCase().replace(/\s+/g, ''); }
+    return s.toLowerCase().replace(/\s+/g, '');
+  };
+  const grads = [];
+  const gre = /((?:repeating-)?(?:linear|radial|conic)-gradient)\(/gi;
+  let gm;
+  while ((gm = gre.exec(md))) {
+    let depth = 1, i = gre.lastIndex;
+    for (; i < md.length && depth; i++) { if (md[i] === '(') depth++; else if (md[i] === ')') depth--; }
+    if (depth) continue;
+    grads.push({ body: md.slice(gre.lastIndex, i - 1), tail: md.slice(i, i + 60).split(/[;,\n]/)[0] });
+  }
+  grads.forEach(({ body, tail }) => {
+    const parts = []; let d = 0, cur = '';
+    for (const ch of body) { if (ch === '(') d++; if (ch === ')') d--; if (ch === ',' && !d) { parts.push(cur.trim()); cur = ''; } else cur += ch; }
+    parts.push(cur.trim());
+    const stops = parts.filter((p, i) => !(i === 0 && /^(?:to\s|[-\d.]+(?:deg|turn|rad|grad)\b|circle|ellipse|closest|farthest|at\s|from\s|in\s)/i.test(p)))
+      .map(p => (/^(#[0-9a-f]{3,8}|(?:rgba?|hsla?)\([^)]*\)|var\(--[a-z0-9-]+\)|[a-z]+)/i.exec(p) || [''])[0]).filter(Boolean);
+    if (stops.length < 2) return;
+    const sameIn = m => new Set(stops.map(s => stopKey(s, m))).size === 1;
+    // one colour written the same way twice and then sized or boxed is how a plain line or fill is drawn (not a mistake)
+    const drawn = new Set(stops.map(x => x.toLowerCase().replace(/\s+/g, ''))).size === 1 && /\/|no-repeat|-box\b/.test(tail);
+    if (!drawn && (modes.length ? modes.some(sameIn) : sameIn(null))) once(`g|${stops.join()}`, () => add('flat-gradient', 'Gradients', `A gradient runs from ${stops[0]} to ${stops[stops.length - 1]}, but every stop is the same colour, so it draws as a flat fill.`));
+  });
+  return issues;
 }
 
 /* ---------------- checks: contradictions to resolve before copying ---------------- */

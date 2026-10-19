@@ -94,10 +94,13 @@ The Built view renders the product's own screens with its sample content. Walker
    - [ ] Without a product sheet, the App brief falls back to today's output and is labelled "generic sample".
    - [ ] With a sheet, each screen gets a ranked content list, a signature placement, a fold budget and four states.
    - [ ] A product sheet can be imported from a Markdown file in the product repo, so Signl's isn't retyped.
+5. **Rendered comps of the product's real screens, approved before any build** (Walker's call, 2026-10-18).
+   - [ ] With a product sheet, the Built view renders each listed screen from the UI kit with its real sample content, following its Screen spec.
+   - [ ] Walker approves or comments per screen; the App brief can't be exported for a product until every screen is approved.
+   - [ ] The brief links the approved comps as the visual target. Ranking, signature placement and fold budget are checked against them; pixel positions aren't.
 
 ### P1: fast follow
 
-5. **Built view renders the product's own screens** from the product sheet, using the UI kit and real sample content.
 6. **Review rubric in the brief.** A short checklist the build agent and a review agent score against. Each item comes from a real rejection:
    - Does it read like a token sheet?
    - Is there more than one material moment on a screen?
@@ -121,12 +124,12 @@ The Built view renders the product's own screens with its sample content. Walker
 ## Open questions
 
 - **[Walker, blocking] Where does product knowledge live?** Typed into Branding Designer, or read from the product repo's docs? I lean towards importing from the repo, with a small form for anything missing.
-- **[Walker, blocking] Should Branding Designer design the screens or only brief them?** Option 1: it renders comps of the real screens for you to approve (P1 #5 becomes P0). Option 2: it hands over ranked Screen specs and the build agent's design lane composes them. Option 1 catches problems earlier and costs more to build.
+- **Decided 2026-10-18:** Branding Designer renders comps of the real screens and Walker approves them before any agent builds (P0 #5).
 - **[Design, non-blocking] Who writes "Why this works" for 35 aesthetics?** I propose writing the six tested ones first, then the rest in batches.
 - **[Engineering, non-blocking] Does the lint run on export only, or live as the board changes?**
 
 ## Phasing
 
 1. **Phase 1:** tiers, the contradiction lint, and "Why this works" for the six tested aesthetics. These are brief-only changes, with no new UI.
-2. **Phase 2:** product intake and the Screen spec, using Signl as the first product sheet. Retest with 3 agents.
-3. **Phase 3:** the Built view renders product screens, plus the rubric and the decision log. A second product type validates the work.
+2. **Phase 2:** product intake, the Screen spec, and rendered comps with per-screen approval, using Signl as the first product sheet. Retest with 3 agents.
+3. **Phase 3:** the rubric and the decision log. A second product type validates the work.

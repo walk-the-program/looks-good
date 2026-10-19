@@ -768,7 +768,9 @@ function wireEvents() {
   });
 
   document.getElementById('copyAiBrief').addEventListener('click', () => {
-    copyText(buildAiBrief(state))
+    const checked = buildAiBriefChecked(state);
+    if (!aibLintConfirm(checked.issues)) return;
+    copyText(checked.md)
       .then(() => showToast('AI brief copied'))
       .catch(() => showToast('Clipboard blocked — try again from the app window'));
   });
