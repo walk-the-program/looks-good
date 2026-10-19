@@ -530,7 +530,7 @@ output {
   .segmented label:active,
   .mode-switch button:not(:disabled):active,
   .seg button:not(:disabled):active,
-  .tile:active {
+  .tile:active:not(:has(button:active)) {
     transform: translateY(1px) scale(0.98);
     transition: transform 120ms var(--ease);
   }
