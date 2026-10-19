@@ -296,6 +296,8 @@
 .ab.sb-ab[data-ae="data-pebble"].sb-kit :is(.ab-card, .ab-panel) { padding-top: var(--k-cardpad, 20px); }
 .ab.sb-ab[data-ae="data-pebble"].sb-kit .ab-toggle.sb-tog { border-radius: var(--dp-r); }
 .ab.sb-ab[data-ae="data-pebble"].sb-kit .ab-input { border-radius: 14px; }
+/* error: a solid 1pt inner ring in the error colour (a color-mix ring is read back as unparsable colour text in the brief) */
+.ab.sb-ab[data-ae="data-pebble"].sb-kit .sb-k-field.is-error .ab-input { border-color: var(--sb-danger) !important; box-shadow: inset 0 0 0 1px var(--sb-danger) !important; }
 .ab.sb-ab[data-ae="data-pebble"].sb-kit .sb-tabs { background: var(--ab-surface); border-top: 1px solid var(--ab-hair); }
 .ab.sb-ab[data-ae="data-pebble"].sb-kit .sb-tab[aria-current]::before { border-radius: 999px; }
 .ab.sb-ab[data-ae="data-pebble"].sb-kit .ab-row.sb-k-row.is-picked { background-color: var(--ab-tag-bg); }

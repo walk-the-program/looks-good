@@ -225,7 +225,7 @@
 .ab.sb-ab.ab[data-ae="wpa-screenprint"].sb-kit .sb-k-textbtn { font-family: var(--wp-head); font-weight: var(--wp-hw, 600); text-transform: uppercase; letter-spacing: 0.07em; }
 .ab.sb-ab.ab[data-ae="wpa-screenprint"].sb-kit .sb-k-danger { border-width: 1.5px; border-radius: 8px; box-shadow: none; font-family: var(--wp-head); font-weight: var(--wp-hw, 600); text-transform: uppercase; letter-spacing: 0.08em; }
 .ab.sb-ab.ab[data-ae="wpa-screenprint"].sb-kit .sb-k-field.is-focus .ab-input, .ab.sb-ab.ab[data-ae="wpa-screenprint"].sb-kit .sb-k-search.is-focus .ab-input { border-color: var(--wp-ink) !important; box-shadow: 2px 2px 0 var(--wp-off) !important; }
-.ab.sb-ab.ab[data-ae="wpa-screenprint"].sb-kit .sb-k-field.is-error .ab-input { box-shadow: 2px 2px 0 var(--sb-danger-line, transparent) !important; }
+.ab.sb-ab.ab[data-ae="wpa-screenprint"].sb-kit .sb-k-field.is-error .ab-input { border-color: var(--sb-danger) !important; box-shadow: inset 0 0 0 1px var(--sb-danger) !important; }
 .ab.sb-ab.ab[data-ae="wpa-screenprint"].sb-kit .ab-input { background: var(--wp-card); }
 .ab.sb-ab.ab[data-ae="wpa-screenprint"].sb-kit .sb-k-menu { border: var(--wp-edge); border-radius: 8px; box-shadow: none; background: var(--wp-card); }
 .ab.sb-ab.ab[data-ae="wpa-screenprint"].sb-kit .sb-k-menu li[aria-selected="true"] { background: var(--ab-pri-tint); }
