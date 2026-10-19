@@ -217,6 +217,7 @@ const Onboarding = (function () {
     { key: 'gorpcore', loud: 0.55, kinds: 'shop product website', hue: 98 },
     { key: 'naive-doodle', loud: 0.55, kinds: 'shop studio website', hue: 36 },
     { key: 'old-web', loud: 0.65, kinds: 'website studio', hue: 42 },
+    { key: 'wpa-screenprint', loud: 0.5, kinds: 'website shop studio', hue: 140 },
     { key: 'xerox', loud: 0.6, kinds: 'studio shop website', hue: 4 },
     { key: 'corporate-vandalism', loud: 0.75, kinds: 'website studio app', hue: 218 },
     { key: 'xerox-punk', loud: 0.85, kinds: 'shop studio website', hue: 8 },

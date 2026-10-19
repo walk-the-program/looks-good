@@ -477,7 +477,7 @@ const LogoStart = (function () {
   };
   const MOOD_OF = {
     'acid-graphics': 'loud', 'radical-memphis': 'loud', 'pirate-broadcast': 'loud', 'xerox-punk': 'loud', 'corporate-vandalism': 'loud', 'neo-brutal-pop': 'loud',
-    'naive-doodle': 'craft', 'gorpcore': 'craft', 'xerox': 'craft', 'old-web': 'craft', 'riso-print': 'craft', 'clay': 'craft',
+    'naive-doodle': 'craft', 'gorpcore': 'craft', 'xerox': 'craft', 'old-web': 'craft', 'riso-print': 'craft', 'clay': 'craft', 'wpa-screenprint': 'craft',
     'bento-grid': 'tech', 'blueprint': 'tech', 'industrial-device': 'tech', 'micrographics': 'tech', 'ascii-art': 'tech', 'blob-tracking': 'tech',
     'dystopian-luxury': 'luxe', 'aurora-noir': 'luxe', 'holo-iridescent': 'luxe', 'editorial-serif': 'luxe',
   };

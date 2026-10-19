@@ -313,6 +313,14 @@
       ['parcels', 'Gear tags', 'mono', { cell: 1.6, size: 1, every: 6, labels: true }],
       ['zigzag', 'Switchbacks', 'brand', { style: 'chevron', colors: 'two', band: 6, amp: 8, period: 12, phase: 'parallel', vertical: true }],
     ],
+    'wpa-screenprint': [
+      ['cutup', 'Ridgelines', 'brand', { pieces: 5, cell: 1.5, hills: 1.2, slip: 0.3 }],
+      ['arcrise', 'Sun and bands', 'brand', { origin: 'bottom', bands: 6, suns: 1, bars: false }],
+      ['sonar', 'Lake map', 'brand', { land: 0.4, size: 1, speckle: 0, contours: true }],
+      ['zigzag', 'Trail bands', 'brand', { style: 'chevron', colors: 'three', band: 7, amp: 6, period: 11, phase: 'parallel' }],
+      ['weave', 'Lake lines', 'brand', { bands: 9, rhythm: 'even', gap: 0.15, stripe: 0.7 }],
+      ['stipple', 'Pine grain', 'brand', { density: 0.9, dot: 0.9, field: 'clouds', duo: true }, 0.8],
+    ],
     'old-web': [
       ['oprings', 'Hypno GIF', 'brand', { mode: 'rings', centres: 2, freq: 14, warp: 0.2, bands: 'three' }],
       ['marble', 'Marble GIF', 'brand', { bands: 5, warp: 1.6, cover: 0.9, stars: 0, outline: true }],

@@ -390,6 +390,16 @@ const AESTHETIC_META = {
       pairings: [['Barlow Condensed', 'Barlow'], ['Saira Stencil', 'Inter'], ['Big Shoulders Display', 'IBM Plex Sans']],
     },
   },
+  'wpa-screenprint': {
+    family: 'print',
+    fonts: {
+      heading: { classes: ['condensed', 'slab'], picks: ['Oswald', 'Barlow Condensed', 'Bebas Neue', 'Alfa Slab One'] },
+      body: { classes: ['humanist'], picks: ['Nunito Sans', 'Source Sans 3', 'Figtree'] },
+      avoid: ['techno', 'pixel', 'blackletter', 'script', 'groovy', 'didone'],
+      why: 'Travel-poster screenprints set condensed or slab caps with open tracking over a friendly humanist text face, so the display reads at a glance and the body stays easy.',
+      pairings: [['Oswald', 'Nunito Sans'], ['Barlow Condensed', 'Source Sans 3'], ['Alfa Slab One', 'Figtree']],
+    },
+  },
   'old-web': {
     family: 'digital',
     fonts: {
@@ -710,6 +720,24 @@ const AESTHETIC_BUILD = {
   'ascii-art': { cls: 'stepped', surface: 'Square 2pt-edged blocks; depth, where any, is a hard bevel; nothing is smoothed. Heading and body must both be mono.', modes: { only: 'dark', because: 'it is a phosphor terminal; light characters on black are the medium' } },
   'pirate-broadcast': { cls: 'stepped', modes: { only: 'dark', because: 'teletext is bright text on a black screen' } },
   'old-web': { cls: 'stepped' },
+  'wpa-screenprint': {
+    cls: 'hard',
+    line: 1.5,
+    sh: { x: 2, y: 2, blur: 0 }, lift: { x: 3, y: 3 }, press: { dx: 2, dy: 2, ms: 120 },
+    motion: { fast: 120, base: 140, slow: 220, ease: 'out' },
+    surface: 'Flat rounded tiles (14px cards, 8px controls) with a 1.5px ink edge and no blur or gradient. The only depth is a hard 2px down-right offset block in the second spot ink (`--offset`) behind the main button, the stamp tags and the poster card; never behind body text. App screens carry no poster, grain, pattern or band.',
+    pressText: 'The main button travels 2pt right and down while its hard offset block closes to 0, so it lands flat on the paper; hover lifts it 1pt up and left with the block at 3pt. 120 ms, ease-out. Toggles slide without bounce.',
+    accentOverride: { light: '--wp-f3', on: '--wp-on-f3', note: 'the brand accent printed as spot ink 3: muted (saturation capped at 55%) and moved just far enough for a label on it to hold 4.7:1' },
+    secondaryOverride: { light: '--wp-f2', on: '--wp-on-f2', note: 'the brand secondary printed as spot ink 2: muted (saturation capped at 55%) and moved just far enough for a label on it to hold 4.7:1' },
+    fixedInks: [
+      { token: '--forest', light: '--wp-forest', job: 'Forest ink #23392F: the deep ink of the art (near ridge, title strip) and the label colour on a light spot ink. In light mode the board draws its text in it.', decorativeOnly: false },
+      { token: '--spot-1', light: '--wp-a1', job: 'Spot ink 1, the brand primary muted for print: the sun in the art and the toggle knob.', decorativeOnly: true },
+      { token: '--offset', light: '--wp-off', job: 'The offset block: spot ink 2 printed 2px down and right behind the main button and the poster card.', decorativeOnly: true },
+    ],
+    states: { pressed: ['No colour change', 'Travels (2,2) as the hard offset block closes to 0, 120 ms ease-out, landing flat on the paper.'] },
+    icons: 'Simple flat glyphs with a 2pt stroke and square caps (pine, sun, lake wave, trail marker), no gradients; the glyph in a list row sits in a small flat spot-ink tile.',
+    appIcon: '`{canvas}` tile with a flat `{primary}` sun disc over two stacked ridgelines in `{secondary}` and `{ink}`, the overlap a darker third tone; no text, no gradients.',
+  },
   'mid-century': {
     cls: 'flat',
     accentOverride: { light: '--mc-acc', note: 'the brand accent warmed toward 1950s yellow like the other mid-century inks' },
