@@ -68,7 +68,7 @@ function dpPebble(cx, cy, r, seed) {
 const dpRadius = (value, k) => k * Math.sqrt(Math.max(0, value));
 
 registerAesthetic({
-  key: 'data-pebble', order: 46,
+  key: 'data-pebble', order: 47,
   name: 'Data Pebble',
   descriptor: 'Calm · Quantified · Organic',
   influences: 'Impact reports / Data stories / Wellbeing dashboards',
