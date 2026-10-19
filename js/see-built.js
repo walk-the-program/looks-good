@@ -27,6 +27,7 @@
     ['mobile', 'Mobile app'],
     ['landing', 'Landing page'],
     ['settings', 'Settings'],
+    ['product', 'Product'],   // the loaded product sheet's screens, js/product-screens.js
   ];
   const SB = { kind: 'dashboard', before: false, split: 50 };
   let seq = 0;
@@ -1015,9 +1016,9 @@
       `<button type="button" class="sb-kind" data-kind="${k}" aria-pressed="${k === SB.kind}">${label}</button>`).join('');
     return `<div class="sb-bar">
         <div class="sb-kinds" role="group" aria-label="Product type">${kinds}</div>
-        <button type="button" class="sb-ba-btn" aria-pressed="${SB.before}">
+        ${SB.kind === 'product' ? '' : `<button type="button" class="sb-ba-btn" aria-pressed="${SB.before}">
           <span class="sb-ba-ico" aria-hidden="true"></span>Before and after
-        </button>
+        </button>`}
       </div>`;
   }
 
@@ -1044,6 +1045,14 @@
     if (!host) return;
     if (typeof setBoardFonts === 'function') setBoardFonts(host);
     Object.entries(kitVars()).forEach(([k, val]) => host.style.setProperty(k, val));
+    if (SB.kind === 'product') {
+      // The Product tab is drawn by js/product-screens.js from the shared kit (SeeBuilt.api).
+      host.innerHTML = `${barHtml()}<div class="sb-single" data-kind="product"><div class="ps-host"></div></div>`;
+      const ph = host.querySelector('.ps-host');
+      if (window.ProductScreens && ph) ProductScreens.renderInto(ph, state, {});
+      else if (ph) ph.innerHTML = '<p class="sb-note">Product screens are not loaded.</p>';
+      return;
+    }
     const brand = contextFor('brand');
     const brandHtml = screens(brand, SB.kind);
     let stage;
@@ -1496,7 +1505,14 @@
     });
   }
 
-  window.SeeBuilt = { render, kitInto, mobileInto, kinds: KINDS.map(k => k[0]), domainFor };
+  // The kit pieces js/product-screens.js composes product screens from (same markup as the Mobile tab).
+  const api = {
+    contextFor, finish, kitVars, rootOpen: (X, cls, attrs) => (X.mode === 'brand' ? X.P.rootOpen('sb-ab ' + cls, attrs || '') : genericOpen(cls)),   // attrs: leading space
+    e, mid, win, icon, statusBar, brandMark, headline, cta, seg, toggle, field, kList, kRow, kSection, kIco, kAv, chev,
+    kTopbar, kPlain, chartSvg, kBtn, ctaInner, ICO,
+  };
+  // 'product' is not in kinds: the share export walks kinds, and the Product tab is not a board view.
+  window.SeeBuilt = { render, kitInto, mobileInto, kinds: KINDS.map(k => k[0]).filter(k => k !== 'product'), domainFor, api };
   window.Show = window.Show || {};
   // Show.built(kind): open the Built view, optionally at 'kit' | 'dashboard' | 'mobile' | 'landing' | 'settings'.
   window.Show.built = function (kind) {

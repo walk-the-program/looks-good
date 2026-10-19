@@ -36,6 +36,10 @@ function serializeState(state) {
     // { key, params, colorway, seed, use, svg }; brands saved before `use` / `svg`
     // existed have neither and load with the family default.
     patterns: Array.isArray(state.patterns) ? state.patterns.map(p => ({ key: p.key, params: p.params, colorway: p.colorway, seed: p.seed, use: p.use, svg: p.svg })) : [],
+    // The product sheet (js/product-sheet.js) and the owner's approval of each of its screens.
+    // Brands saved before it existed have neither and load with null / {}.
+    product: state.product && typeof state.product === 'object' ? JSON.parse(JSON.stringify(state.product)) : null,
+    productApprovals: state.productApprovals && typeof state.productApprovals === 'object' ? JSON.parse(JSON.stringify(state.productApprovals)) : {},
   };
 }
 
@@ -131,6 +135,19 @@ function applySavedSessionToState(saved, state) {
   // Patterns in the brief. Older brands have none; entries are cleaned against the
   // engine's schema (unknown families dropped, parameters clamped).
   state.patterns = typeof PatternPins !== 'undefined' ? PatternPins.normalizeList(saved.patterns) : [];
+
+  // The product and its approvals. A malformed product loads as none; approvals keep only well-formed entries.
+  const sp = saved.product;
+  state.product = sp && typeof sp === 'object' && Array.isArray(sp.screens) ? JSON.parse(JSON.stringify(sp)) : null;
+  state.productApprovals = {};
+  if (state.product && saved.productApprovals && typeof saved.productApprovals === 'object') {
+    Object.keys(saved.productApprovals).forEach(id => {
+      const a = saved.productApprovals[id];
+      if (a && typeof a === 'object' && (a.status === 'approved' || a.status === 'changes') && typeof a.sig === 'string') {
+        state.productApprovals[id] = { status: a.status, note: typeof a.note === 'string' ? a.note : '', sig: a.sig, at: typeof a.at === 'string' ? a.at : '' };
+      }
+    });
+  }
 
   // Restore logo if present
   if (saved.logoDataUrl && typeof saved.logoDataUrl === 'string') {

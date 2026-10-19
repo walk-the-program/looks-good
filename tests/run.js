@@ -8,12 +8,13 @@ const path = require('path');
 
 const root = path.join(__dirname, '..');
 const ctx = vm.createContext({ console, AESTHETICS: [{ key: 'soft-form' }, { key: 'raw-brutalist' }] });
-for (const f of ['js/data.js', 'js/color.js', 'js/blend.js', 'js/persistence.js', 'js/color-import.js']) {
+for (const f of ['js/data.js', 'js/color.js', 'js/blend.js', 'js/persistence.js', 'js/product-sheet.js', 'js/color-import.js']) {
   vm.runInContext(fs.readFileSync(path.join(root, f), 'utf8'), ctx, { filename: f });
 }
 const run = code => vm.runInContext(code, ctx);
 
 let failed = 0;
+const pendingChecks = [];
 function check(name, ok, detail) {
   console.log(`${ok ? 'ok  ' : 'FAIL'} ${name}${ok ? '' : ' — ' + detail}`);
   if (!ok) failed++;
@@ -640,6 +641,29 @@ check('paste: empty text', run(`extractColors('').length`) === 0, 'found colors 
   check('showcase: each brand has a small SVG logo', marks, 'logo svg');
 }
 
+/* ---- product sheet in a saved brand (js/persistence.js, js/product-sheet.js) ---- */
+
+{
+  const r = run(`(() => {
+    const st = freshState();
+    st.product = parseProductSheet('# Product: P\\nPurpose: p\\nCore action: c\\n## Screen: Home\\nJob: j\\nPrimary action: none\\nContent:\\n1. text: hi', 'f.md').product;
+    st.productApprovals = { home: { status: 'approved', note: 'ok', sig: productScreenSig(st, st.product.screens[0]), at: '2026-10-18T00:00:00.000Z' }, ghost: 5 };
+    const saved = JSON.parse(JSON.stringify(serializeState(st)));
+    st.product.screens[0].job = 'changed after save';
+    const back = freshState(); back.product = { junk: 1 }; back.productApprovals = { x: 1 };
+    applySavedSessionToState(saved, back);
+    const old = JSON.parse(JSON.stringify(serializeState(freshState()))); delete old.product; delete old.productApprovals;
+    const o = freshState(); o.product = saved.product; o.productApprovals = saved.productApprovals;
+    applySavedSessionToState(old, o);
+    const bad = freshState(); applySavedSessionToState(Object.assign({}, saved, { product: { screens: 'x' } }), bad);
+    return { name: back.product.name, job: back.product.screens[0].job, ap: back.productApprovals, status: productApprovalStatus(back), nullSave: serializeState(freshState()).product, oldP: o.product, oldA: o.productApprovals, badP: bad.product, badA: bad.productApprovals };
+  })()`);
+  check('product: a saved brand round-trips its product and approvals (a copy, not a reference); the approval still counts after load',
+    r.name === 'P' && r.job === 'j' && r.ap.home.status === 'approved' && r.ap.home.note === 'ok' && !('ghost' in r.ap) && r.status.allApproved === true && r.nullSave === null, JSON.stringify(r));
+  check('product: an older save without a product loads as null / {}; a malformed product loads as null',
+    r.oldP === null && JSON.stringify(r.oldA) === '{}' && r.badP === null && JSON.stringify(r.badA) === '{}', JSON.stringify(r));
+}
+
 /* ---- AI brief: Building choice and the UI kit section (js/ai-brief.js, js/ui-kit.js) ---- */
 
 {
@@ -748,7 +772,7 @@ check('paste: empty text', run(`extractColors('').length`) === 0, 'found colors 
     window: {}, localStorage: { getItem: () => null, setItem() {} },
   });
   for (const f of ['js/data.js', 'js/color.js', 'js/brand-deck.js', 'js/aesthetics/registry.js', 'js/aesthetics/dystopian-luxury.js', 'js/aesthetics/pirate-broadcast.js',
-    'js/aesthetic-meta.js', 'js/ui-kit.js', 'js/aesthetic-board.js', 'js/blend.js', 'js/color-roles.js', 'js/ai-brief.js']) {
+    'js/aesthetic-meta.js', 'js/ui-kit.js', 'js/aesthetic-board.js', 'js/blend.js', 'js/color-roles.js', 'js/product-sheet.js', 'js/ai-brief.js']) {
     vm.runInContext(fs.readFileSync(path.join(root, f), 'utf8'), mc, { filename: f });
   }
   const M = code => vm.runInContext(code, mc);
@@ -771,6 +795,97 @@ check('paste: empty text', run(`extractColors('').length`) === 0, 'found colors 
     buildAiBrief(kstate('dystopian-luxury'), { surface: 'app', target: 'web', noProbe: true }),
     buildAiBrief(kstate('dystopian-luxury'), { surface: 'web', target: 'web', noProbe: true })]`);
   const [dl, pb, dlStatic, dlWeb] = briefs;
+  // Without a product, every brief is exactly what it was before the product sheet (hash and length taken before the change).
+  {
+    const fnv = str => { let h = 0x811c9dc5; for (let i = 0; i < str.length; i++) { h ^= str.charCodeAt(i); h = Math.imul(h, 0x01000193) >>> 0; } return h.toString(16); };
+    const got = briefs.map(b => fnv(b) + ':' + b.length), want = ['30fcf8af:18232', '6460af88:17713', 'a1f1fa61:24964', '22931d14:12556'];
+    check('product: briefs without a product are byte-identical to before', JSON.stringify(got) === JSON.stringify(want), JSON.stringify(got));
+  }
+  /* ---- product sheet (js/product-sheet.js) and its brief section ---- */
+  {
+    const SHEET = fs.readFileSync(path.join(root, 'docs/product-sheet-format.md'), 'utf8').match(/```markdown\n([\s\S]*?)```/)[1];
+    mc.SHEET = SHEET;
+    const R = M(`parseProductSheet(SHEET, 'product-sheet.md')`);
+    const P = R.product, home = P && P.screens[0];
+    check('product: the contract example parses to the exact model',
+      JSON.stringify(R.warnings) === '[]' && P.name === 'Signl' && P.purpose === 'Fast mental math that feels like a feed but leaves you sharper.'
+      && P.coreAction === 'Start a two-minute sprint.' && JSON.stringify(P.tabs) === '["Home","Modes","Stats"]' && P.source === 'product-sheet.md' && P.raw === SHEET && P.screens.length === 1
+      && home.id === 'home' && home.name === 'Home' && home.job === "Show I'm improving and get me into a run in one tap." && home.primary === 'Start sprint'
+      && home.chrome === 'tabbar' && home.fold === 'Rating, Start and Daily fit above the tab bar at default text size.' && home.signature === 'tab bar'
+      && JSON.stringify(home.notes) === '[]' && home.blocks.length === 6
+      && JSON.stringify(home.blocks[0]) === '{"rank":1,"type":"hero-numeral","text":"1,482","props":{"label":"Arithmetic rating","meta":"+60 this week"}}'
+      && JSON.stringify(home.blocks[1]) === '{"rank":2,"type":"text","text":"12-day streak · 3 runs today","props":{}}'
+      && home.blocks[2].props.points === '1310,1350,1342,1400,1420,1482' && home.blocks[3].type === 'action' && home.blocks[3].props.meta === '2:00 · Arithmetic'
+      && home.blocks[5].props.rows === 'Drill your slowest — 7×8, 15% of 340 — 1:00'
+      && JSON.stringify(home.states) === JSON.stringify({ empty: 'New player. Welcome headline, Take placement as the only primary action.', loading: 'none; all data is on the device.', error: 'none.', firstRun: 'Getting-started line under the action: 0 of 3 steps.' }),
+      JSON.stringify(R).slice(0, 600));
+    const bad = M(`(() => { const out = [];
+      ['', null, undefined, 'just words\\nand more', '# Product:\\n## Screen:\\nContent:\\n1. nonsense: x | broken\\n1. text', '## Screen: A\\n## Screen: A\\nJob: j\\nPrimary action: none\\nChrome: sideways\\nWhat is this\\nContent:\\n1. text: hi\\n2. wobble: x\\nStates:\\n- Odd: y'].forEach(t => { try { out.push(parseProductSheet(t, 's')); } catch (e) { out.push('THROW ' + e.message); } });
+      return out; })()`);
+    check('product: malformed input never throws and warns with line numbers', bad.every(b => typeof b === 'object') && bad[0].product === null && bad[1].product === null && bad[0].warnings.length > 0 && bad[3].warnings.every(w => typeof w.line === 'number'), JSON.stringify(bad.map(b => b.warnings && b.warnings.length)));
+    const b5 = bad[5], s1 = b5.product.screens[0], s0 = b5.product.screens[1];
+    check('product: malformed sheet keeps unknown lines in notes, slugs unique, bad chrome falls back, states default',
+      s1.id === 'a' && s0.id === 'a-2' && s0.chrome === 'topbar' && s0.primary === null && s0.notes.includes('What is this') && s0.notes.some(n => /wobble/.test(n)) && s0.notes.includes('- Odd: y')
+      && s0.states.empty === 'not specified' && b5.warnings.every(w => typeof w.line === 'number' && w.message) && b5.warnings.some(w => w.line === 5 && /Chrome/.test(w.message)) && s1.blocks.length === 0 && b5.warnings.some(w => /no Content/.test(w.message)) && s0.blocks.length === 1,
+      JSON.stringify(b5.warnings));
+    check('product: a bare text has no product and warns; a sheet with only a screen still returns a product',
+      bad[3].product === null && bad[3].warnings.length > 0 && bad[4].product !== null && bad[4].product.screens.length === 1 && bad[4].warnings.some(w => /Unknown block type/.test(w.message)), JSON.stringify(bad[3].warnings));
+
+    // signature
+    mc.P = P;
+    const sig = M(`(() => { const st = kstate('dystopian-luxury'); st.scheme = 'analogous'; st.product = JSON.parse(JSON.stringify(P));
+      const sc = st.product.screens[0], a = productScreenSig(st, sc);
+      const v = f => { const s2 = JSON.parse(JSON.stringify(st)); s2.headingFont = st.headingFont; s2.bodyFont = st.bodyFont; f(s2); return productScreenSig(s2, s2.product.screens[0]); };
+      return { a, again: productScreenSig(st, sc), re: /^[0-9a-f]{8}$/.test(a),
+        aes: v(s => { s.aesthetic = 'pirate-broadcast'; }), col: v(s => { s.colors.primary = '#112233'; }), screen: v(s => { s.product.screens[0].job = 'Other'; }),
+        block: v(s => { s.product.screens[0].blocks[0].text = '9'; }), same: v(s => { s.bgMode = 'dark'; s.content.brandName = 'X'; }) }; })()`);
+    check('product: the signature is stable and changes with the aesthetic, colours and screen, not otherwise',
+      sig.re && sig.a === sig.again && sig.aes !== sig.a && sig.col !== sig.a && sig.screen !== sig.a && sig.block !== sig.a && sig.same === sig.a, JSON.stringify(sig));
+
+    // approval status
+    const ap = M(`(() => { const st = kstate('dystopian-luxury'); st.product = parseProductSheet(SHEET + '\\n## Screen: Modes\\nJob: j\\nPrimary action: none\\nContent:\\n1. text: hi\\n## Screen: Stats\\nJob: j\\nPrimary action: none\\nContent:\\n1. text: hi\\n', 'x').product;
+      const [h, m, t] = st.product.screens; const r = [];
+      r.push(productApprovalStatus(st)); r.push(productApprovalStatus({}));
+      st.productApprovals = { home: { status: 'approved', note: '', sig: productScreenSig(st, h), at: 'x' }, modes: { status: 'changes', note: 'n', sig: productScreenSig(st, m), at: 'x' }, stats: { status: 'approved', note: '', sig: 'stale', at: 'x' } };
+      r.push(productApprovalStatus(st));
+      st.productApprovals.modes = { status: 'approved', note: '', sig: productScreenSig(st, m), at: 'x' }; st.productApprovals.stats.sig = productScreenSig(st, t);
+      r.push(productApprovalStatus(st));
+      st.colors.primary = '#010203'; r.push(productApprovalStatus(st));
+      return r; })()`);
+    check('product: approval status counts pending, stale (changed since approved) and approved',
+      JSON.stringify(ap[0]) === '{"total":3,"approved":0,"stale":0,"pending":3,"allApproved":false}' && JSON.stringify(ap[1]) === '{"total":0,"approved":0,"stale":0,"pending":0,"allApproved":false}'
+      && JSON.stringify(ap[2]) === '{"total":3,"approved":1,"stale":1,"pending":1,"allApproved":false}' && JSON.stringify(ap[3]) === '{"total":3,"approved":3,"stale":0,"pending":0,"allApproved":true}'
+      && JSON.stringify(ap[4]) === '{"total":3,"approved":0,"stale":3,"pending":0,"allApproved":false}', JSON.stringify(ap));
+
+    // brief with a product
+    M(`var pstate = key => { const st = kstate(key); st.product = parseProductSheet(SHEET, 'x').product; st.productApprovals = {}; return st; };`);
+    const withP = M(`(() => { const st = pstate('dystopian-luxury'); const o = { surface: 'app', target: 'web', noProbe: true, kitSnap: kitDL };
+      const pend = buildAiBriefChecked(st, o);
+      const sc = st.product.screens[0]; st.productApprovals = { home: { status: 'approved', note: '', sig: productScreenSig(st, sc), at: 'x' } };
+      const ok = buildAiBriefChecked(st, o);
+      return { pend: pend.md, pi: pend.issues, oi: ok.issues, web: buildAiBrief(st, { surface: 'web', target: 'web', noProbe: true }), comps: buildAiBrief(st, Object.assign({ comps: true }, o)) }; })()`);
+    const md = withP.pend;
+    check('product: the App brief with a product has a Guided Product screens section, no Built screens or Screen layouts, and the product header',
+      /\n## Product screens \(Guided\)\n/.test(md) && !/## Built screens|## Screen layouts|Built screens/.test(md) && /\nProduct: Signl\. Fast mental math/.test(md)
+      && /### Home\n- Job: Show I'm improving/.test(md) && /  1\. Hero numeral "1,482", labelled "Arithmetic rating", with "\+60 this week"\./.test(md)
+      && /Fold budget: Rating, Start and Daily/.test(md) && /Signature placement: tab bar\./.test(md) && /  - Error: none\./.test(md) && /comps are viewable in Branding Designer only|Comps of these screens are viewable in Branding Designer only/.test(md) && !/comps\/home-light/.test(md)
+      && /comps\/home-light\.png, comps\/home-dark\.png/.test(withP.comps) && !/## Product screens/.test(withP.web), md.slice(md.indexOf('## Product screens') - 20, md.indexOf('## Product screens') + 400));
+    check('product: lint adds unapproved-screens (N of M approved) until every screen is approved',
+      withP.pi.some(i => i.code === 'unapproved-screens' && i.section === 'Product screens' && i.message === 'Approve every product screen first (0 of 1 approved)') && !withP.oi.some(i => i.code === 'unapproved-screens'), JSON.stringify(withP.pi.map(i => i.code)));
+    mc.SAMPLE_SECTION = md.slice(md.indexOf('## Product screens'), md.indexOf('\n## ', md.indexOf('## Product screens') + 5));
+
+    // zip: comps from ProductScreens.compPng, or none
+    pendingChecks.push((async () => {
+      const run2 = async (withPS, reject) => {
+        mc.window.ProductScreens = withPS ? { compPng: (st, id, mode) => (reject ? Promise.reject(new Error('no')) : Promise.resolve(new Uint8Array([137, 80, id.length, mode.length]))) } : undefined;
+        const files = await M(`aibFiles(pstate('dystopian-luxury'), { surface: 'app', target: 'web', noProbe: true, kitSnap: kitDL })`);
+        return files.map(f => f.name);
+      };
+      const a = await run2(true, false), b = await run2(false), c = await run2(true, true);
+      check('product: the zip carries comps/<id>-light.png and -dark.png; without compPng, or when it rejects, no comps',
+        a.includes('comps/home-light.png') && a.includes('comps/home-dark.png') && !b.some(n => /^comps\//.test(n)) && !c.some(n => /^comps\//.test(n)) && a.includes('BRIEF.md'), JSON.stringify([a, b, c]));
+    })().catch(e => check('product: the zip carries comps', false, e.stack)));
+  }
   check('kit: the App brief has the "How … shows up in the app" signature', /### How Dystopian Luxury shows up in the app\n- Corners: /.test(dl) && /### How Pirate Broadcast shows up in the app/.test(pb), dl.slice(0, 1500));
   check('kit: the App brief pastes a full :root token block with `color-scheme: light` and a dark block', /```css\n:root \{\n  color-scheme: light;\n  --canvas: #[0-9a-f]{6};/.test(dl) && /:root\[data-theme="dark"\] \{\n  color-scheme: dark;/.test(dl), (dl.match(/## Tokens \(CSS\)[\s\S]*/) || [''])[0].slice(0, 600));
   check('kit: App briefs never point at tokens.css or a full-bleed hero', !/tokens\.css|full-bleed hero/.test(dl + pb + dlStatic), 'tokens.css / full-bleed hero');
@@ -922,5 +1037,7 @@ check('paste: empty text', run(`extractColors('').length`) === 0, 'found colors 
 // Not run here (they need a real DOM): that blended tokens(t, state) see the view's fonts end to end, and the
 // render timings. They are covered by the in-browser sweeps in docs/round6/.
 
-console.log(failed ? `\n${failed} failed` : '\nall passed');
-process.exit(failed ? 1 : 0);
+Promise.all(pendingChecks).then(() => {
+  console.log(failed ? `\n${failed} failed` : '\nall passed');
+  process.exit(failed ? 1 : 0);
+});

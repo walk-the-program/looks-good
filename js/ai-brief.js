@@ -1994,6 +1994,9 @@ function aibContext(state0, opts) {
     key: def.classicOf || def.key,
     assets: surface === 'app' ? [] : (opts.assets || aibPatternAssets(state0)),
   };
+  // The product sheet (js/product-sheet.js) replaces the sample screens in an app brief.
+  ctx.product = ctx.app && state0 && state0.product && Array.isArray(state0.product.screens) && state0.product.screens.length ? state0.product : null;
+  ctx.comps = !!opts.comps;
   // The phone layout and type section: every app, and any SwiftUI build.
   ctx.phone = ctx.app || ctx.swift;
   ctx.brandName = String(ctx.content.brandName).replace(/\s+/g, ' ').trim();
@@ -3263,7 +3266,7 @@ function buildPatternItemBrief(state0, i, opts) {
 // How firmly an agent must follow each section. Locked: values are final. Guided: an intent and a range to
 // stay inside. Free: designed for the product. Every "## " heading in the brief carries its tier.
 const AIB_TIERS = {
-  'Why this works': 'Guided', 'App UI rules': 'Guided', 'Website rules': 'Guided', 'Blend': 'Guided', 'Built screens': 'Guided',
+  'Why this works': 'Guided', 'App UI rules': 'Guided', 'Website rules': 'Guided', 'Blend': 'Guided', 'Built screens': 'Guided', 'Product screens': 'Guided',
   'Phone layout and type': 'Guided', 'Motion': 'Guided', "Do and don't": 'Guided',
   'Colors': 'Locked', 'Components': 'Locked', 'UI kit': 'Locked', 'Type': 'Locked', 'Website type': 'Locked', 'Shape and materials': 'Locked',
   'Light and dark': 'Locked', 'States': 'Locked', 'Accessibility': 'Locked', 'Icons': 'Locked', 'App icon': 'Locked', 'Fonts to bundle': 'Locked',
@@ -3333,20 +3336,90 @@ function aibSecWhy(ctx) {
   return ctx.app ? aibWhyLines(aibPrinciplesFor(ctx), ctx.tok) : [];
 }
 
+/* ---- Product screens: the product sheet's screens as a Screen spec per screen (docs/product-sheet-format.md) ---- */
+
+// One content block in plain words (no pixel positions).
+function aibProductBlock(b) {
+  const q = v => '"' + String(v == null ? '' : v).replace(/\s+/g, ' ').trim() + '"';
+  const p = b.props || {}, t = b.text || '';
+  const yes = v => /^(yes|true|on)$/i.test(String(v || '').trim());
+  const list = v => String(v || '').split(';').map(x => x.trim()).filter(Boolean);
+  const pinned = /^bottom$/i.test(p.pin || '') ? ', pinned in a bottom bar above the home indicator or tab bar, always above the fold' : '';
+  let s;
+  switch (b.type) {
+    case 'title': s = `Large title ${q(t)}` + (p.highlight ? `, highlight word ${q(p.highlight)}` : ''); break;
+    case 'hero-numeral': s = `Hero numeral ${q(t)}` + (p.label ? `, labelled ${q(p.label)}` : '') + (p.meta ? `, with ${q(p.meta)}` : ''); break;
+    case 'text': s = (/^large$/i.test(p.size || '') ? 'Title-size line ' : yes(p.muted) ? 'Muted caption ' : 'Body line ') + q(t); break;
+    case 'action': s = `The one primary button ${q(t)}` + (p.meta ? `, with ${q(p.meta)}` : '') + pinned; break;
+    case 'action-secondary': s = `Secondary button ${q(t)}` + (p.meta ? `, with ${q(p.meta)}` : '') + pinned; break;
+    case 'link': s = `Text link ${q(t)}`; break;
+    case 'card': s = `Card ${q(t)}` + (p.meta ? `, with ${q(p.meta)}` : '') + (p.body ? `, body ${q(p.body)}` : ''); break;
+    case 'list': {
+      const rows = list(p.rows).map(r => {
+        const c = r.split(/\s+—\s+|—/).map(x => x.trim()).filter(Boolean);
+        return c.length > 1 ? `${q(c[0])} (${c[1]}${c[2] ? ', ' + c.slice(2).join(', ') : ''})` : q(c[0] || r);
+      });
+      s = `List group ${q(t)}` + (rows.length ? ` with ${rows.length} row${rows.length > 1 ? 's' : ''}: ${rows.join('; ')}` : ''); break;
+    }
+    case 'stats': {
+      const items = list(p.items).map(x => x.replace(/\s*=\s*/, ': '));
+      s = `Stat row ${q(t)}` + (items.length ? ` with ${items.join('; ')}` : ''); break;
+    }
+    case 'chart': {
+      const pts = String(p.points || '').split(',').map(x => parseFloat(x)).filter(x => !isNaN(x));
+      s = `Sparkline ${q(t)} in the style's chart colour` + (pts.length > 1 ? `, ${pts.length} points from ${pts[0]} to ${pts[pts.length - 1]}` : ''); break;
+    }
+    case 'segmented': s = `Segmented control ${q(t)}` + (list(p.options).length ? ` with options ${list(p.options).map(q).join(', ')}` : '') + (p.selected ? `, ${q(p.selected)} selected` : ''); break;
+    case 'toggle': s = `Toggle row ${q(t)}, ${yes(p.on) ? 'on' : 'off'}` + (p.meta ? `, with ${q(p.meta)}` : ''); break;
+    case 'field': s = `Input field ${q(t)}` + (p.value ? `, value ${q(p.value)}` : '') + (p.placeholder ? `, placeholder ${q(p.placeholder)}` : ''); break;
+    case 'keypad': s = `Number keypad with keys ${p.keys || '1 2 3 4 5 6 7 8 9 . 0 ⌫'}, pinned in a bottom bar above the home indicator, always above the fold`; break;
+    case 'tiles': {
+      const n = String(p.values || '').split(',').filter(x => x.trim()).length;
+      s = `Tile strip ${q(t)}` + (n ? `, ${n} tiles in tonal steps` : ''); break;
+    }
+    default: s = `${b.type} ${q(t)}`;
+  }
+  return s;
+}
+
+function aibSecProduct(ctx) {
+  const P = ctx.product;
+  if (!P) return [];
+  const out = ['## Product screens', `These are ${P.name || 'the product'}'s own screens, from its product sheet. What gets checked is the content ranking (1 is the most important), where the style's signature lands, and the fold budget; the layout itself is designed for the product from the kit's components, with no pixel positions given.` + (ctx.comps ? ' Each screen has a comp image in comps/ showing the intended look in light and dark; match its ranking and feel, not its exact positions.' : ' Comps of these screens are viewable in Branding Designer only.')];
+  const end = s => { const v = String(s == null ? '' : s).replace(/\s+/g, ' ').trim(); return v && !/[.!?]$/.test(v) ? v + '.' : v; };
+  P.screens.forEach(sc => {
+    const selected = (P.tabs || []).find(t => t.toLowerCase() === String(sc.name).toLowerCase());
+    const chrome = sc.chrome === 'tabbar' ? `Tab bar${(P.tabs || []).length ? ` (${P.tabs.join(', ')})` : ''}${selected ? `, ${selected} selected` : ''}` : sc.chrome === 'none' ? 'None: no top bar and no tab bar' : 'Top bar';
+    out.push('', `### ${sc.name}`,
+      `- Job: ${end(sc.job) || 'not specified'}`,
+      `- Primary action: ${sc.primary ? sc.primary : 'none on this screen'}`,
+      `- Chrome: ${chrome}`,
+      '- Content, ranked:');
+    sc.blocks.forEach(b => out.push(`  ${b.rank}. ${end(aibProductBlock(b))}`));
+    out.push(`- Signature placement: ${sc.signature ? end(sc.signature) : 'none on this screen'}`,
+      `- Fold budget: ${sc.fold ? end(sc.fold) : 'not specified'}`,
+      '- States:',
+      `  - Empty: ${sc.states.empty}`, `  - Loading: ${sc.states.loading}`, `  - Error: ${sc.states.error}`, `  - First run: ${sc.states.firstRun}`);
+    if (sc.notes && sc.notes.length) out.push('- Notes from the sheet: ' + sc.notes.map(end).join(' '));
+    if (ctx.comps) out.push(`- Comp: comps/${sc.id}-light.png, comps/${sc.id}-dark.png`);
+  });
+  return out;
+}
+
 function aibBuild(ctx) {
   const label = AIB_TARGETS.find(x => x.value === ctx.target).label;
   const blocks = [
     [`# ${ctx.brandName} — build brief`,
       AIB_HEADER_TIERS + (ctx.app ? AIB_HEADER_APP : '') + (ctx.app && !ctx.site && ctx.target === 'web' ? 'Target: a phone app in HTML and CSS, laid out in iOS points (1pt = 1 CSS px).' : `Target: ${label}${ctx.target === 'web' ? ' (CSS)' : ctx.target === 'swiftui' ? ' (iOS 17 and macOS 14 or later)' : ' (CSS and SwiftUI)'}.`),
-      aibBrandLine(ctx)],
+      aibBrandLine(ctx)].concat(ctx.product ? [`Product: ${ctx.product.name}. ${ctx.product.purpose}`.replace(/\s+/g, ' ').trim()] : []),
     aibSecAppRules(ctx),
     aibSecWebRules(ctx),
     aibSecWhy(ctx),
     aibSecBlend(ctx),
     aibSecColors(ctx),
     ctx.app ? aibSecKit(ctx) : aibSecComponents(ctx),
-    aibSecScreens(ctx),
-    aibSecBuilt(ctx),
+    ctx.product ? aibSecProduct(ctx) : aibSecScreens(ctx),
+    ctx.product ? [] : aibSecBuilt(ctx),
     ctx.phone ? aibSecPhone(ctx) : [],
     aibSecType(ctx),
     aibSecShape(ctx),
@@ -3363,7 +3436,9 @@ function aibBuild(ctx) {
     aibSecPatterns(ctx),
     ctx.app ? aibSecAppIcon(ctx) : [],
   ].filter(b => b.length).map(b => [aibTierHeading(b[0])].concat(b.slice(1)));
-  return blocks.map(b => b.join('\n')).join('\n\n') + '\n';
+  const md = blocks.map(b => b.join('\n')).join('\n\n') + '\n';
+  // Other sections point at the sample "Built screens"; with the product's own screens there is no such section.
+  return ctx.product ? md.replace(/ \(see Built screens\)/g, '').replace('as Built screens → Home → Tab bar lists', 'as the tab bar row lists').replace(/the Built screens/g, 'the sample screens').replace(/Built screens/g, 'the sample screens') : md;
 }
 
 // The brief and the context it was built from (the missing-token pass can add palette rows to the context).
@@ -3593,6 +3668,11 @@ function aibLint(ctx, md) {
     const drawn = new Set(stops.map(x => x.toLowerCase().replace(/\s+/g, ''))).size === 1 && /\/|no-repeat|-box\b/.test(tail);
     if (!drawn && (modes.length ? modes.some(sameIn) : sameIn(null))) once(`g|${stops.join()}`, () => add('flat-gradient', 'Gradients', `A gradient runs from ${stops[0]} to ${stops[stops.length - 1]}, but every stop is the same colour, so it draws as a flat fill.`));
   });
+  // A product loaded: every screen must be approved in its current look (js/product-sheet.js). The Brief view blocks export on this code.
+  if (ctx && ctx.product && ctx.state0 && typeof productApprovalStatus === 'function') {
+    const st = productApprovalStatus(ctx.state0);
+    if (!st.allApproved) add('unapproved-screens', 'Product screens', `Approve every product screen first (${st.approved} of ${st.total} approved)`);
+  }
   return issues;
 }
 
@@ -3847,10 +3927,20 @@ async function aibFiles(state0, opts) {
     try { files.push({ name: null, a, data: await aibPatternBytes(a) }); } catch (err) { console.warn('brief files: pattern failed', a.entry.key, err); }
   }
   const ok = files.map(f => f.a);
-  const ctx = aibContext(state0, Object.assign({}, opts, { assets: ok }));
+  // Comps of the product screens (W2b's ProductScreens.compPng). All or none: any failure writes the zip without them.
+  const comps = [];
+  const prod = surf !== 'web' && state0 && state0.product && Array.isArray(state0.product.screens) ? state0.product : null;
+  const PS = typeof window !== 'undefined' && window.ProductScreens;
+  if (prod && prod.screens.length && PS && typeof PS.compPng === 'function') {
+    try {
+      for (const sc of prod.screens) for (const mode of ['light', 'dark']) comps.push({ name: `comps/${sc.id}-${mode}.png`, data: await PS.compPng(state0, sc.id, mode) });
+    } catch (err) { console.warn('brief files: comps failed', err); comps.length = 0; }
+  }
+  const ctx = aibContext(state0, Object.assign({}, opts, { assets: ok, comps: comps.length > 0 }));
   const out = [{ name: 'BRIEF.md', data: aibBuild(ctx) }];
   if (ctx.web) out.push({ name: 'tokens.css', data: aibCssLines(ctx, true).filter(l => !/^```/.test(l)).join('\n') + '\n' });
   if (ctx.swift) out.push({ name: 'Theme.swift', data: aibSwiftLines(ctx).join('\n') + '\n' });
   files.forEach(f => out.push({ name: f.a.name, data: f.data }));
+  comps.forEach(c => out.push(c));
   return out;
 }

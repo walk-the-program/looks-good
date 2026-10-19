@@ -24,6 +24,23 @@
 
 window.Show = window.Show || {};
 
+/* Unapproved product screens block the brief (lint code unapproved-screens, js/ai-brief.js): Copy,
+   Download and Save + files stay off until every screen is approved in Built > Product. Every other
+   lint code only asks for confirmation. */
+function briefProductBlock(issues) {
+  return (issues || []).find(i => i && i.code === 'unapproved-screens') || null;
+}
+// The same gate without building the brief (for the sidebar buttons): the issue-shaped message, or null.
+function briefProductGate() {
+  if (typeof state === 'undefined' || !state.product || typeof productApprovalStatus !== 'function') return null;
+  const st = productApprovalStatus(state);
+  return st.allApproved ? null : { code: 'unapproved-screens', message: `Approve every product screen first (${st.approved} of ${st.total} approved)` };
+}
+function briefOpenProduct() {
+  if (window.Show.brief && window.Show.brief.close) window.Show.brief.close();
+  if (typeof window.Show.built === 'function') window.Show.built('product');
+}
+
 (function () {
   const esc = s => escapeHtml(s);
 
@@ -444,10 +461,17 @@ window.Show = window.Show || {};
   /* ---------------- build + open ---------------- */
 
   // A notice above the brief when it would contradict itself or leave a value undefined (aibLint in ai-brief.js).
-  function lintHtml(issues) {
-    if (!issues || !issues.length) return '';
+  function lintHtml(all) {
+    if (!all || !all.length) return '';
+    const block = briefProductBlock(all);
+    const issues = all.filter(i => i !== block);
+    const blockHtml = block ? `<aside class="bv-lint bv-lint-block" role="alert" style="margin:0 0 24px;padding:16px 20px;border:1px solid var(--line-strong);border-left-width:3px;border-radius:var(--r-ui);display:flex;flex-wrap:wrap;align-items:center;gap:10px 16px">
+      <span style="flex:1 1 260px"><b>${esc(block.message)}.</b> Copy and Download stay off until every screen is approved.</span>
+      <button type="button" class="bv-btn" data-bv-act="product">Open Built › Product</button>
+    </aside>` : '';
+    if (!issues.length) return blockHtml;
     const n = issues.length;
-    return `<aside class="bv-lint" role="status" style="margin:0 0 40px;padding:16px 20px;border:1px solid var(--line-strong);border-left-width:3px;border-radius:var(--r-ui)">
+    return blockHtml + `<aside class="bv-lint" role="status" style="margin:0 0 40px;padding:16px 20px;border:1px solid var(--line-strong);border-left-width:3px;border-radius:var(--r-ui)">
       <h3 class="bv-sub" style="margin-top:0">${n} ${n === 1 ? 'problem' : 'problems'} an agent would have to guess at</h3>
       <ul class="bv-notes">${issues.map(i => `<li>${esc(i.message)}${i.section ? ` <span class="is-muted">(${esc(i.section)})</span>` : ''}</li>`).join('')}</ul>
     </aside>`;
@@ -472,10 +496,21 @@ window.Show = window.Show || {};
       tagline: String(aibContent(st).tagline).trim(),
       probe: aibProbeBoard(st, def),
     };
+    syncBlocked(checked.issues);
     docEl.innerHTML = lintHtml(checked.issues) + [coverHtml(ctx), colourHtml(ctx), typeHtml(ctx), componentsHtml(ctx), patternsHtml(ctx), shapeHtml(ctx), textHtml(ctx)].join('') +
       `<footer class="bv-foot">Made with Branding Designer. Locked colours, fonts and shapes above are final; nothing here is sent anywhere.</footer>`;
     drawPatterns(ctx);
     root.querySelector('.bv-bar-brand').textContent = ctx.brandName;
+  }
+
+  // Copy, Download and Save + files are off while a product screen is unapproved; the message is their tooltip.
+  function syncBlocked(issues) {
+    const block = briefProductBlock(issues);
+    root.querySelectorAll('[data-bv-copy], [data-bv-act="download"], [data-bv-act="zip"]').forEach(btn => {
+      if (btn.dataset.bvTitle == null) btn.dataset.bvTitle = btn.title || '';
+      btn.disabled = !!block;
+      btn.title = block ? block.message : btn.dataset.bvTitle;
+    });
   }
 
   // Draw the pattern tiles one at a time so opening never blocks on a heavy raster family.
@@ -545,6 +580,8 @@ window.Show = window.Show || {};
     const tool = TOOLS.find(x => x.id === toolId);
     if (!tool) return;
     const checked = buildAiBriefChecked(state);
+    const blocked = briefProductBlock(checked.issues);
+    if (blocked) { showToast(blocked.message); return; }
     if (!aibLintConfirm(checked.issues)) return;
     const text = tool.preface + '\n\n' + checked.md;
     copyText(text)
@@ -554,6 +591,8 @@ window.Show = window.Show || {};
 
   function download() {
     const checked = buildAiBriefChecked(state);
+    const blocked = briefProductBlock(checked.issues);
+    if (blocked) { showToast(blocked.message); return; }
     if (!aibLintConfirm(checked.issues)) return;
     const blob = new Blob([checked.md], { type: 'text/markdown;charset=utf-8' });
     const url = URL.createObjectURL(blob);
@@ -585,6 +624,7 @@ window.Show = window.Show || {};
     if (!act) return;
     const a = act.dataset.bvAct;
     if (a === 'close') close(true);
+    else if (a === 'product') briefOpenProduct();
     else if (a === 'download') download();
     else if (a === 'zip') { if (window.AiBriefCopy) window.AiBriefCopy.save({ skipCheck: true }); }
     else if (a === 'expand' || a === 'collapse') docEl.querySelectorAll('.bv-acc').forEach(d => { d.open = a === 'expand'; });
@@ -879,6 +919,8 @@ window.AiBriefCopy = (function () {
 
   function doCopy() {
     const checked = buildAiBriefChecked(state);
+    const blocked = briefProductBlock(checked.issues);
+    if (blocked) { toast(blocked.message); return Promise.resolve(); }
     if (!aibLintConfirm(checked.issues)) return Promise.resolve();
     const text = checked.md;
     return copyText(text)
@@ -889,7 +931,10 @@ window.AiBriefCopy = (function () {
   function bytesToBlob(bytes) { return new Blob([bytes], { type: 'application/zip' }); }
 
   async function doSave() {
-    if (!aibLintConfirm(aiBriefLint(state))) return null;
+    const lint = aiBriefLint(state);
+    const blocked = briefProductBlock(lint);
+    if (blocked) { toast(blocked.message); return null; }
+    if (!aibLintConfirm(lint)) return null;
     saveBtn.disabled = true;
     try {
       const files = await aibFiles(state);
@@ -941,7 +986,21 @@ window.AiBriefCopy = (function () {
       e.stopImmediatePropagation();
       run('copy');
     }, true);
-    setInterval(syncTarget, 1500);
+    setInterval(() => { syncTarget(); syncGate(); }, 1500);
+    syncGate();
+  }
+
+  // Unapproved product screens switch Copy AI brief and Save brief + files off (the message is the tooltip).
+  let gated = false;
+  function syncGate() {
+    const gate = briefProductGate();
+    [$('copyAiBrief'), saveBtn].forEach(b => {
+      if (!b) return;
+      if (b.dataset.gateTitle == null) b.dataset.gateTitle = b.title || '';
+      if (gate) { b.disabled = true; b.title = gate.message; }
+      else if (gated) { b.disabled = false; b.title = b.dataset.gateTitle; }
+    });
+    gated = !!gate;
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', wire); else wire();
 
