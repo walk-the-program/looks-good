@@ -295,12 +295,8 @@ const LibraryUI = (function () {
     } else if (has && sc) count = 'Showcase is on: load the showcase brands to show them off';
     else if (has) count = `${n(records.length)}, most recently edited first`;
     $('libCount').textContent = count;
-    const plus = `
-      <button type="button" class="tile tile-new" id="libPlus" aria-label="New brand">
-        <div class="tile-art"><span class="tile-plus">+</span></div>
-        <div class="tile-meta"><div class="tile-text"><div class="tile-title">New brand</div><div class="tile-sub">Start from a fresh combination</div></div></div>
-      </button>`;
-    grid.innerHTML = plus + shown.map(tileHtml).join('');
+    // The header's New brand button (#libNew) starts a brand; the grid holds brands only.
+    grid.innerHTML = shown.map(tileHtml).join('');
     // A wide logo (mark plus wordmark) gets a wider plate (css .tile-mark.is-wide).
     // If its ink would vanish on the tile's canvas, it sits on a small light or dark plate.
     grid.querySelectorAll('.tile-mark.has-logo img').forEach(img => {
@@ -423,7 +419,6 @@ const LibraryUI = (function () {
     $('libEmptyNew').addEventListener('click', newBrandFlow);
 
     grid.addEventListener('click', e => {
-      if (e.target.closest('#libPlus')) return newBrandFlow();
       const more = e.target.closest('.tile-more');
       const rec = recordFor(e.target);
       if (!rec) return;
