@@ -18,7 +18,7 @@
 .sidebar {
   position: sticky;
   top: 0;
-  height: 100vh;
+  height: 100vh; height: 100dvh;
   min-width: 0;
   display: flex;
   flex-direction: column;
@@ -452,7 +452,7 @@ body[data-showcase="on"] .sd-tabs { bottom: 64px; }
   .sd-rail {
     position: sticky;
     top: 0;
-    z-index: 20;
+    z-index: var(--z-sticky);
     flex-direction: row;
     border-right: 0;
     border-top: 1px solid var(--line);

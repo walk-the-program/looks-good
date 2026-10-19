@@ -50,7 +50,7 @@ body.m-revealing #previewCard { visibility: hidden; }
 .m-reveal {
   position: fixed;
   inset: 0;
-  z-index: 900;
+  z-index: var(--z-motion-top);
   overflow: hidden;
   cursor: pointer;
 }
@@ -134,7 +134,7 @@ html.m-morphing::view-transition-new(root) {
 
 .m-reel {
   position: fixed;
-  z-index: 800;
+  z-index: var(--z-motion);
   display: flex;
   align-items: center;
   gap: 10px;
@@ -173,7 +173,7 @@ body.m-worlds-open { overflow: hidden; }
 .m-worlds {
   position: fixed;
   inset: 0;
-  z-index: 900;
+  z-index: var(--z-motion-top);
   overflow: hidden;
   color: var(--m-stage-ink);
 }

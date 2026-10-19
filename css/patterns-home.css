@@ -9,8 +9,8 @@ body[data-view="patterns"] .app,
 body[data-view="patterns"] .library { display: none; }
 body:not([data-view="patterns"]) .patterns { display: none; }
 
-.patterns { min-height: 100vh; background: var(--canvas); }
-.patterns[data-tool="open"] { height: 100vh; overflow: hidden; }
+.patterns { min-height: 100vh; min-height: 100dvh; background: var(--canvas); }
+.patterns[data-tool="open"] { height: 100vh; height: 100dvh; overflow: hidden; }
 .patterns [hidden] { display: none !important; }
 
 /* ---------- Segmented switch (mode + source filter) ---------- */
@@ -162,7 +162,7 @@ html.is-mac-app.is-fullscreen .lib-top .mode-switch { position: static; margin: 
 .pt-tool {
   display: flex;
   flex-direction: column;
-  height: 100vh;
+  height: 100vh; height: 100dvh;
   background: var(--canvas);
 }
 .pt-tool-bar {

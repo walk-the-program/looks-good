@@ -13,13 +13,13 @@
 html.is-presenting { overflow-y: hidden; padding-right: var(--pr-sbw, 0px); }
 
 .pr {
-  position: fixed; inset: 0; z-index: 1000;
+  position: fixed; inset: 0; z-index: var(--z-present);
   background: #0a0a0a; color: #f4f4f2;
   display: flex; flex-direction: column;
   outline: none; cursor: default;
   font-family: var(--font-ui);
 }
-.pr:fullscreen { width: 100vw; height: 100vh; }
+.pr:fullscreen { width: 100vw; height: 100vh; height: 100dvh; }
 .pr:not(.is-awake) { cursor: none; }
 .pr.is-auto { cursor: none; }
 
@@ -129,7 +129,7 @@ html.is-mac-app body.is-presenter .workspace { padding-top: 44px; }
 body.is-presenter .workspace-header { margin-bottom: 18px; }
 body.is-presenter .ae-current { font-size: 15px; margin: 0; }
 
-.show-chrome { position: fixed; inset: auto 0 0 0; z-index: 900; pointer-events: none; }
+.show-chrome { position: fixed; inset: auto 0 0 0; z-index: var(--z-motion-top); pointer-events: none; }
 .show-chrome > * { pointer-events: auto; }
 
 .show-legend {

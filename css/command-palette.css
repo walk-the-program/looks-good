@@ -2,7 +2,7 @@
    hairlines, the same tokens as the menus (css/styles.css). */
 
 .cp-overlay {
-  position: fixed; inset: 0; z-index: 2000;
+  position: fixed; inset: 0; z-index: var(--z-palette);
   display: flex; align-items: flex-start; justify-content: center;
   padding: min(14vh, 120px) 16px 16px;
   background: rgba(17, 17, 17, 0.28);

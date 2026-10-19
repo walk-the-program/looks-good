@@ -5,7 +5,7 @@
 ------------------------------------------------------------------------ */
 
 .bv {
-  position: fixed; inset: 0; z-index: 160;
+  position: fixed; inset: 0; z-index: var(--z-view);
   display: flex; flex-direction: column;
   background: var(--canvas);
   color: var(--ink);

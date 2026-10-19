@@ -33,6 +33,28 @@
 
   --r-card: 12px;
   --r-ui: 6px;
+  /* z-index scale: relative order matches the old ad-hoc values. */
+  --z-raised: 3;
+  --z-sticky: 20;
+  --z-header: 40;
+  --z-dropdown: 60;
+  --z-overlay: 100;
+  --z-gallery: 120;
+  --z-drawer-scrim: 140;
+  --z-drawer: 150;
+  --z-view: 160;
+  --z-toast: 200;
+  --z-popover: 300;
+  --z-menu: 400;
+  --z-coach-target: 440;
+  --z-coach: 450;
+  --z-modal: 500;
+  --z-motion: 800;
+  --z-motion-top: 900;
+  --z-present: 1000;
+  --z-palette: 2000;
+  --z-share: 2147483600;
+
   --ease: cubic-bezier(0.16, 1, 0.3, 1);
   --dur: 200ms;
 
@@ -92,7 +114,7 @@ html, body {
 .app {
   display: grid;
   grid-template-columns: var(--sd-w, 400px) minmax(0, 1fr);
-  min-height: 100vh;
+  min-height: 100vh; min-height: 100dvh;
   min-width: 0;
 }
 
@@ -114,7 +136,7 @@ output,
 .sidebar-brand {
   position: sticky;
   top: 0;
-  z-index: 3;
+  z-index: var(--z-raised);
   display: flex;
   align-items: center;
   gap: 9px;
@@ -486,6 +508,20 @@ output {
 }
 .btn:hover { background: var(--hover); }
 .btn:active { transform: scale(0.98); }
+
+/* Shared press state for chrome controls (disabled excluded, none when motion is reduced). */
+@media (prefers-reduced-motion: no-preference) {
+  .btn:not(:disabled):active,
+  .ae-name-btn:not(:disabled):active,
+  .cart-btn:not(:disabled):active,
+  .segmented label:active,
+  .mode-switch button:not(:disabled):active,
+  .seg button:not(:disabled):active,
+  .tile:active {
+    transform: translateY(1px) scale(0.98);
+    transition: transform 120ms var(--ease);
+  }
+}
 .btn:disabled {
   opacity: 0.4;
   cursor: not-allowed;
@@ -738,7 +774,7 @@ body:not([data-dev="on"]):not([data-classic="on"]) .sd-version { display: none !
   box-shadow: var(--shadow-3);
   opacity: 0;
   pointer-events: none;
-  z-index: 200;
+  z-index: var(--z-toast);
   transition: opacity var(--dur) var(--ease), transform var(--dur) var(--ease);
 }
 .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
@@ -754,7 +790,7 @@ body:not([data-dev="on"]):not([data-classic="on"]) .sd-version { display: none !
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 100;
+  z-index: var(--z-overlay);
   padding: 32px;
   animation: overlayIn var(--dur) var(--ease) both;
 }
@@ -862,7 +898,7 @@ body:not([data-dev="on"]):not([data-classic="on"]) .sd-version { display: none !
 
 .fp-panel {
   position: fixed;
-  z-index: 300;
+  z-index: var(--z-popover);
   display: flex;
   flex-direction: column;
   background: var(--surface);
@@ -1003,7 +1039,7 @@ body[data-view="editor"] .library { display: none; }
 /* ---------- Library ---------- */
 
 .library {
-  min-height: 100vh;
+  min-height: 100vh; min-height: 100dvh;
   background: var(--canvas);
 }
 .lib-top {
@@ -1207,7 +1243,7 @@ html.is-mac-app.is-fullscreen .lib-inner { padding-top: 52px; }
 
 .tile-menu {
   position: fixed;
-  z-index: 400;
+  z-index: var(--z-menu);
   min-width: 168px;
   padding: 5px;
   background: var(--surface);
@@ -1236,7 +1272,7 @@ html.is-mac-app.is-fullscreen .lib-inner { padding-top: 52px; }
 .dlg-overlay {
   position: fixed;
   inset: 0;
-  z-index: 500;
+  z-index: var(--z-modal);
   display: flex;
   align-items: center;
   justify-content: center;

@@ -6,7 +6,7 @@
 .gal-overlay {
   position: fixed;
   inset: 0;
-  z-index: 120;
+  z-index: var(--z-gallery);
   display: flex;
   padding: 20px;
   background: rgba(24, 22, 18, 0.32);

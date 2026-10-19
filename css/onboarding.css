@@ -12,7 +12,7 @@
 
 /* ---------- the New brand dialog ---------- */
 
-.dlg.ob-dlg { width: min(560px, 100%); max-height: calc(100vh - 40px); overflow: auto; transition: width 220ms var(--ease); }
+.dlg.ob-dlg { width: min(560px, 100%); max-height: calc(100vh - 40px); max-height: calc(100dvh - 40px); overflow: auto; transition: width 220ms var(--ease); }
 .dlg.ob-dlg.is-wide { width: min(940px, 100%); }
 .ob-tabs {
   display: flex; gap: 4px; padding: 3px; margin: 14px 0 18px;
@@ -139,7 +139,7 @@
 /* ---------- coach marks ---------- */
 
 .ob-coach {
-  position: fixed; z-index: 450; width: 252px; padding: 14px 16px 12px;
+  position: fixed; z-index: var(--z-coach); width: 252px; padding: 14px 16px 12px;
   background: var(--ink); color: #fff; border-radius: 12px; box-shadow: 0 16px 40px rgba(0, 0, 0, 0.28);
   opacity: 0; transform: translateY(4px); transition: opacity 200ms ease, transform 200ms var(--ease);
 }
@@ -161,7 +161,7 @@
 .ob-coach[data-side="left"]::before { right: -5px; top: calc(var(--ob-ay, 24px) - 6px); }
 .ob-coach[data-side="bottom"]::before { top: -5px; left: calc(var(--ob-ax, 24px) - 6px); }
 .ob-coach[data-side="top"]::before { bottom: -5px; left: calc(var(--ob-ax, 24px) - 6px); }
-.ob-coach-target { position: relative; z-index: 440; box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.9), 0 0 0 5px var(--ink) !important; }
+.ob-coach-target { position: relative; z-index: var(--z-coach-target); box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.9), 0 0 0 5px var(--ink) !important; }
 @media (prefers-reduced-motion: reduce) {
   .ob-coach { transform: none; transition: opacity 120ms linear; }
 }
