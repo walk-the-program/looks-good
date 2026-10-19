@@ -36,7 +36,6 @@
   /* z-index scale: relative order matches the old ad-hoc values. */
   --z-raised: 3;
   --z-sticky: 20;
-  --z-header: 40;
   --z-dropdown: 60;
   --z-overlay: 100;
   --z-gallery: 120;
@@ -57,6 +56,8 @@
 
   --tonal: #ebe9e4;
   --tonal-hover: #e3e1dc;
+
+  --ws-bar-h: 52px;
 
   --ease: cubic-bezier(0.16, 1, 0.3, 1);
   --dur: 200ms;
@@ -600,7 +601,9 @@ kbd {
 /* ---------- Workspace ---------- */
 
 .workspace {
-  padding: 40px 48px 80px;
+  --ws-pt: 40px;
+  --ws-px: 48px;
+  padding: var(--ws-pt) var(--ws-px) 80px;
   max-width: 1120px;
   width: 100%;
   margin: 0 auto;
@@ -621,6 +624,58 @@ kbd {
 }
 
 .workspace-header { margin-bottom: 32px; }
+
+/* ---------- Sticky editor bar ----------
+   One ~52px bar: style chip + prev/next on the left, view tabs and menus on the right. It
+   bleeds to the workspace edges and sticks to the top of the page. The h1 stays for screen
+   readers; the style's descriptor and summary scroll away in .ws-lede under the bar.
+   (These selectors out-rank the older header rules in css/aesthetic-board.css.) */
+html { scroll-padding-top: calc(var(--ws-bar-h) + 8px); }
+.sr-only {
+  position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden;
+  clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; border: 0;
+}
+.workspace > .workspace-header {
+  position: sticky; top: 0; z-index: var(--z-sticky);
+  margin: calc(-1 * var(--ws-pt)) calc(-1 * var(--ws-px)) 16px;
+  padding: 0 var(--ws-px);
+  background: var(--canvas);
+  border-bottom: 1px solid var(--line);
+}
+html.is-mac-app .workspace > .workspace-header { margin-top: 0; }
+.workspace > .workspace-header .ws-bar {
+  display: flex; flex-direction: row; flex-wrap: wrap; align-items: center; justify-content: space-between;
+  gap: 8px 16px; min-height: var(--ws-bar-h); padding: 8px 0;
+}
+.workspace > .workspace-header .ws-bar > .ws-style { flex: 0 1 auto; min-width: 0; display: flex; align-items: center; gap: 6px; }
+.workspace > .workspace-header .ws-bar > .ws-tools { flex: 0 1 auto; min-width: 0; }
+.workspace-header .ae-name-btn {
+  max-width: 240px; margin: 0; padding: 0 10px; height: 32px; gap: 6px; border: 1px solid var(--line-strong);
+  background: var(--surface); font-size: 13px;
+}
+.workspace-header .ae-name-btn:hover, .workspace-header .ae-name-btn[aria-expanded="true"] { background: var(--hover); }
+.workspace-header .ae-name-btn strong { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 13px; font-weight: 600; }
+.workspace-header .ae-name-btn .ico { flex: none; }
+.workspace > .workspace-header .ae-step { display: inline-flex; gap: 2px; }
+.workspace > .workspace-header .ae-step .btn.btn-small { width: 28px; height: 28px; padding: 0; justify-content: center; border-color: transparent; }
+.workspace > .workspace-header .ae-step .btn.btn-small:hover { background: var(--hover); }
+.ws-lede { margin: 0 0 14px; }
+.ws-lede p { margin: 0; max-width: 70ch; font-size: 13px; line-height: 1.5; color: var(--muted); }
+.ws-lede .ae-current { display: block; margin: 0 0 2px; }
+.ws-lede .ae-summary:empty { display: none; }
+.ab-head { display: flex; justify-content: flex-end; margin: 0 0 12px; }
+.ab-head:has(> [hidden]) { display: none; }
+.ab-head .ab-mode { margin: 0; }
+.ab-stage > * { scroll-margin-top: calc(var(--ws-bar-h) + 8px); }
+body.is-presenter .workspace > .workspace-header {
+  position: static; margin: 0 0 8px; padding: 0; background: none; border-bottom: 0;
+}
+body.is-presenter .workspace-header .ws-bar { min-height: 0; padding: 0; }
+body.is-presenter .workspace-header .ae-step { display: none; }
+body.is-presenter .workspace-header .ae-name-btn { border-color: transparent; background: transparent; padding: 0; height: auto; }
+@media (max-width: 560px) {
+  .workspace > .workspace-header { position: static; }
+}
 .workspace-header-top {
   display: flex;
   align-items: flex-start;
@@ -850,7 +905,7 @@ body:not([data-dev="on"]):not([data-classic="on"]) .sd-version { display: none !
 /* ---------- Responsive ---------- */
 
 @media (max-width: 1180px) {
-  .workspace { padding: 36px 32px 72px; }
+  .workspace { --ws-pt: 36px; --ws-px: 32px; padding-bottom: 72px; }
 }
 
 /* Header toolbar (prev/next, view tabs, In brief, Share, Show): one line from 1000px up. Below
@@ -868,7 +923,7 @@ body:not([data-dev="on"]):not([data-classic="on"]) .sd-version { display: none !
 
 @media (max-width: 900px) {
   .app { grid-template-columns: minmax(0, 1fr); }
-  .workspace { padding: 28px 20px 64px; }
+  .workspace { --ws-pt: 28px; --ws-px: 20px; padding-bottom: 64px; }
   .workspace-header-top { flex-direction: column; align-items: flex-start; gap: 14px; }
   .font-specimen { max-width: 520px; }
   .slide-grid { grid-template-columns: minmax(0, 1fr); }
@@ -1024,13 +1079,13 @@ html.is-mac-app .sidebar-brand {
   line-height: 32px;
 }
 html.is-mac-app .sidebar-brand .logo-mark { height: 32px; align-items: center; }
-html.is-mac-app .workspace { padding-top: 52px; }
+html.is-mac-app .workspace { --ws-pt: 52px; }
 /* Full screen hides the traffic lights, so the brand goes back to the edge. */
 html.is-mac-app.is-fullscreen .sidebar-brand { padding-left: 20px; height: 46px; align-items: center; line-height: normal; }
 html.is-mac-app.is-fullscreen .sidebar-brand .logo-mark { height: auto; }
-html.is-mac-app.is-fullscreen .workspace { padding-top: 40px; }
+html.is-mac-app.is-fullscreen .workspace { --ws-pt: 40px; }
 @media (max-width: 900px) {
-  html.is-mac-app .workspace { padding-top: 36px; }
+  html.is-mac-app .workspace { --ws-pt: 36px; }
 }
 
 /* ---------- Views: Library (home) vs editor ---------- */

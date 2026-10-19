@@ -546,13 +546,10 @@
 
   <main class="workspace">
     <header class="workspace-header">
-      <div class="workspace-header-top">
-        <div>
-          <h1>Design language</h1>
-          <p class="ae-current"><button type="button" class="ae-name-btn" id="aeNameBtn" aria-haspopup="dialog" aria-controls="styleGallery" title="Choose a style"><strong id="aeName">Soft Form</strong><svg class="ico" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button><span id="aeDesc"></span></p>
-          <p class="ae-summary" id="aeSummary"></p>
-        </div>
-        <div class="ws-tools">
+      <div class="workspace-header-top ws-bar">
+        <h1 class="sr-only">Design language</h1>
+        <div class="ws-style">
+          <button type="button" class="ae-name-btn" id="aeNameBtn" aria-haspopup="dialog" aria-controls="styleGallery" title="Choose a style"><strong id="aeName">Soft Form</strong><svg class="ico" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
           <div class="ae-step">
             <button type="button" id="aePrev" class="btn btn-ghost btn-small" aria-label="Previous aesthetic">
               <svg class="ico" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>
@@ -561,6 +558,8 @@
               <svg class="ico" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
             </button>
           </div>
+        </div>
+        <div class="ws-tools">
           <div class="segmented view-toggle" id="workTabs" role="radiogroup" aria-label="View">
             <label title="The brand board (1)"><input type="radio" name="workView" value="board" checked /> Board</label>
             <label title="Patterns made from the brand (2)"><input type="radio" name="workView" value="patterns" /> Patterns</label>
@@ -619,11 +618,18 @@
     </header>
 
     <section class="ab-stage" aria-label="Design language board">
-      <!-- Inside the Board tab: the brand's UI, on real product screens, or across every style. -->
-      <div class="segmented ab-mode" id="boardMode" role="radiogroup" aria-label="Board view">
-        <label title="The brand board"><input type="radio" name="boardMode" value="board" checked /> UI</label>
-        <label title="The brand on real product screens"><input type="radio" name="boardMode" value="built" /> Built</label>
-        <label title="This brand in every style, side by side"><input type="radio" name="boardMode" value="compare" /> Compare</label>
+      <!-- The style's one-line descriptor and summary: scrolls away under the sticky bar. -->
+      <div class="ws-lede">
+        <p class="ae-current"><span id="aeDesc"></span></p>
+        <p class="ae-summary" id="aeSummary"></p>
+      </div>
+      <div class="ab-head">
+        <!-- Inside the Board tab: the brand's UI, on real product screens, or across every style. -->
+        <div class="segmented ab-mode" id="boardMode" role="radiogroup" aria-label="Board view">
+          <label title="The brand board"><input type="radio" name="boardMode" value="board" checked /> UI</label>
+          <label title="The brand on real product screens"><input type="radio" name="boardMode" value="built" /> Built</label>
+          <label title="This brand in every style, side by side"><input type="radio" name="boardMode" value="compare" /> Compare</label>
+        </div>
       </div>
       <div id="previewCard"></div>
       <div class="cmp-grid" id="compareGrid" hidden></div>
