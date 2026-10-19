@@ -23,12 +23,12 @@
   padding: 16px 16px 12px;
   background: var(--surface); color: var(--ink);
   border-radius: 14px; box-shadow: var(--shadow-modal);
-  font-family: var(--font-ui); font-size: 13px;
+  font-family: var(--font-ui); font-size: var(--fs-3);
 }
 .sh-veil.is-capturing .sh-prog { visibility: hidden; }
 .sh-prog-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
-.sh-prog-title { font-size: 14px; font-weight: 600; }
-.sh-prog-pct { font-family: var(--font-mono); font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.sh-prog-title { font-size: var(--fs-3); font-weight: 600; }
+.sh-prog-pct { font-family: var(--font-mono); font-size: var(--fs-2); color: var(--muted); font-variant-numeric: tabular-nums; }
 .sh-prog-bar { height: 4px; margin: 12px 0 8px; border-radius: 2px; background: var(--hover); overflow: hidden; }
 .sh-prog-bar i { display: block; height: 100%; width: 0; background: var(--ink); border-radius: 2px; transition: width 160ms linear; }
 .sh-prog-detail { margin: 0; color: var(--muted); min-height: 1.4em; }

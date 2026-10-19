@@ -29,7 +29,7 @@ body:not([data-view="patterns"]) .patterns { display: none; }
   border-radius: var(--r-ui);
   background: none;
   font: inherit;
-  font-size: 12px;
+  font-size: var(--fs-2);
   font-weight: 500;
   letter-spacing: 0;
   color: var(--muted);
@@ -68,7 +68,7 @@ html.is-mac-app.is-fullscreen .lib-top .mode-switch { position: static; margin: 
   background: var(--surface);
   color: var(--ink);
   font: inherit;
-  font-size: 13px;
+  font-size: var(--fs-3);
 }
 .pt-search {
   width: 260px;
@@ -101,7 +101,7 @@ html.is-mac-app.is-fullscreen .lib-top .mode-switch { position: static; margin: 
   border-radius: var(--r-ui);
   background: var(--surface);
   font-family: var(--font-mono);
-  font-size: 12.5px;
+  font-size: var(--fs-2);
   user-select: all;
 }
 
@@ -141,7 +141,7 @@ html.is-mac-app.is-fullscreen .lib-top .mode-switch { position: static; margin: 
 .pt-name {
   display: block;
   margin-top: 12px;
-  font-size: 14px;
+  font-size: var(--fs-3);
   font-weight: 600;
   letter-spacing: -0.01em;
   white-space: nowrap;
@@ -151,7 +151,7 @@ html.is-mac-app.is-fullscreen .lib-top .mode-switch { position: static; margin: 
 .pt-meta {
   display: block;
   margin-top: 2px;
-  font-size: 12px;
+  font-size: var(--fs-2);
   color: var(--muted);
   white-space: nowrap;
   overflow: hidden;
@@ -177,9 +177,9 @@ html.is-mac-app.is-fullscreen .lib-top .mode-switch { position: static; margin: 
 }
 html.is-mac-app .pt-tool-bar { height: 72px; padding: 28px 16px 0 78px; box-sizing: border-box; }
 html.is-mac-app.is-fullscreen .pt-tool-bar { height: 46px; padding: 0 16px; }
-.pt-tool-name { flex: 1; min-width: 0; display: flex; align-items: baseline; gap: 10px; font-size: 13px; }
+.pt-tool-name { flex: 1; min-width: 0; display: flex; align-items: baseline; gap: 10px; font-size: var(--fs-3); }
 .pt-tool-name strong { font-weight: 600; letter-spacing: -0.01em; white-space: nowrap; }
-.pt-tool-name span { color: var(--muted); font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pt-tool-name span { color: var(--muted); font-size: var(--fs-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .pt-tool-nav { display: flex; gap: 6px; }
 .pt-tool-nav .btn-small { width: 28px; padding: 0; }
 .pt-frame {

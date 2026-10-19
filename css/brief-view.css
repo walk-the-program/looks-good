@@ -34,15 +34,15 @@
   -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px);
 }
 .bv-bar-title { display: flex; flex-direction: column; min-width: 0; line-height: 1.2; margin-right: auto; }
-.bv-bar-title b { font-size: 13px; font-weight: 600; letter-spacing: -0.01em; }
-.bv-bar-brand { font-size: 12px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 28ch; }
+.bv-bar-title b { font-size: var(--fs-3); font-weight: 600; letter-spacing: -0.01em; }
+.bv-bar-brand { font-size: var(--fs-2); color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 28ch; }
 .bv-bar-actions { display: flex; align-items: center; gap: 8px; }
 .bv-btn, .bv-close {
   display: inline-flex; align-items: center; justify-content: center; gap: 0;
   height: 34px; padding: 0 13px;
   border: 1px solid var(--line-strong); border-radius: var(--r-ui);
   background: var(--surface); color: var(--ink);
-  font: 500 13px/1 var(--font-ui); letter-spacing: -0.005em; white-space: nowrap;
+  font: 500 var(--fs-3)/1 var(--font-ui); letter-spacing: -0.005em; white-space: nowrap;
   cursor: pointer;
   transition: background-color var(--dur) var(--ease), border-color var(--dur) var(--ease), transform var(--dur) var(--ease);
 }
@@ -273,7 +273,7 @@
   .bv-bar-actions::-webkit-scrollbar { display: none; }
   .bv-pre { display: none; }
   .bv-btn { height: 32px; }
-  .bv-bar-actions::before { content: 'Copy for'; flex: none; font: 500 12px/1 var(--font-ui); color: var(--muted); margin-right: 2px; }
+  .bv-bar-actions::before { content: 'Copy for'; flex: none; font: 500 var(--fs-2)/1 var(--font-ui); color: var(--muted); margin-right: 2px; }
   .bv-doc { padding: 28px 16px 72px; }
   .bv-cover { padding-bottom: 44px; }
   .bv-tag { font-size: 17px; }
@@ -304,9 +304,9 @@
 /* ---------- sidebar: Build for picker, resolve panel, Save brief + files (js/brief-view.js, AiBriefCopy) ---------- */
 
 .aibc-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
-.aibc-label { flex: none; min-width: 56px; font-size: 12px; font-weight: 500; color: var(--muted); }
+.aibc-label { flex: none; min-width: 56px; font-size: var(--fs-2); font-weight: 500; color: var(--muted); }
 .aibc-seg { flex: 1; min-width: 0; grid-template-columns: repeat(3, 1fr); }
-.aibc-seg label { height: 26px; font-size: 12px; }
+.aibc-seg label { height: 26px; font-size: var(--fs-2); }
 .aibc-row:last-child { margin-bottom: 0; }
 
 /* The dock: a summary button and a split Copy button on one row; the pickers and the
@@ -334,11 +334,11 @@
   max-height: min(46vh, 360px); overflow-y: auto;
   border: 1px solid var(--line-strong); border-left: 3px solid var(--bad-ink);
   border-radius: var(--r-ui); background: var(--surface);
-  font-size: 12px; line-height: 1.45; color: var(--ink);
+  font-size: var(--fs-2); line-height: 1.45; color: var(--ink);
 }
 .aibc-panel[hidden] { display: none; }
 .aibc-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
-.aibc-head b { font-size: 13px; font-weight: 600; letter-spacing: -0.01em; }
+.aibc-head b { font-size: var(--fs-3); font-weight: 600; letter-spacing: -0.01em; }
 .aibc-x {
   display: grid; place-items: center; width: 24px; height: 24px; padding: 0;
   border: 0; border-radius: var(--r-ui); background: transparent; color: var(--muted); cursor: pointer;

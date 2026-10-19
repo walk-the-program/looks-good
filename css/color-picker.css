@@ -56,11 +56,11 @@
   line-height: 1.25;
 }
 .cp-role-text b {
-  font-size: 12.5px;
+  font-size: var(--fs-2);
   font-weight: 500;
 }
 .cp-role-text small {
-  font-size: 11px;
+  font-size: var(--fs-1);
   color: var(--muted);
   overflow: hidden;
   text-overflow: ellipsis;
@@ -68,7 +68,7 @@
 }
 .cp-role-hex {
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: var(--fs-1);
   color: var(--muted);
   letter-spacing: 0;
 }
@@ -141,7 +141,7 @@
 }
 .cp-readout {
   font-family: var(--font-mono);
-  font-size: 10.5px;
+  font-size: var(--fs-1);
   white-space: pre;
 }
 
@@ -175,7 +175,7 @@ input.cp-bright::-moz-range-thumb {
 
 .cp-hex {
   font-family: var(--font-mono);
-  font-size: 12.5px;
+  font-size: var(--fs-2);
   text-transform: uppercase;
 }
 .cp-hex.is-invalid,
@@ -200,9 +200,9 @@ input.cp-bright::-moz-range-thumb {
   justify-content: space-between;
   gap: 8px;
 }
-.cp-guide-head b { font-size: 13px; font-weight: 600; }
+.cp-guide-head b { font-size: var(--fs-3); font-weight: 600; }
 .cp-guide-head span {
-  font-size: 11px;
+  font-size: var(--fs-1);
   color: var(--muted);
   text-transform: uppercase;
   letter-spacing: 0.08em;
@@ -210,7 +210,7 @@ input.cp-bright::-moz-range-thumb {
 .cp-guide dl { margin: 0; display: grid; gap: 2px; }
 .cp-guide dt {
   margin-top: 6px;
-  font-size: 10.5px;
+  font-size: var(--fs-1);
   font-weight: 500;
   text-transform: uppercase;
   letter-spacing: 0.08em;
@@ -219,7 +219,7 @@ input.cp-bright::-moz-range-thumb {
 .cp-guide dt:first-child { margin-top: 0; }
 .cp-guide dd {
   margin: 0;
-  font-size: 12px;
+  font-size: var(--fs-2);
   line-height: 1.45;
   color: var(--ink-2);
   overflow-wrap: anywhere;
@@ -236,14 +236,14 @@ input.cp-bright::-moz-range-thumb {
   grid-template-columns: minmax(0, 1fr) auto auto;
   align-items: center;
   gap: 8px;
-  font-size: 12px;
+  font-size: var(--fs-2);
   color: var(--ink-2);
 }
-.cp-contrast-row b { font-family: var(--font-mono); font-size: 11.5px; font-weight: 500; color: var(--ink); }
+.cp-contrast-row b { font-family: var(--font-mono); font-size: var(--fs-2); font-weight: 500; color: var(--ink); }
 .cp-pill,
 .cp-tag {
   font-style: normal;
-  font-size: 10px;
+  font-size: var(--fs-1);
   font-weight: 500;
   line-height: 1;
   padding: 4px 7px;
@@ -265,7 +265,7 @@ input.cp-bright::-moz-range-thumb {
   border: 1px solid var(--line-strong);
   border-radius: var(--r-ui);
   color: var(--ink);
-  font: 400 12px/1.5 var(--font-mono);
+  font: 400 var(--fs-2)/1.5 var(--font-mono);
   text-transform: none;
   letter-spacing: 0;
   transition: border-color var(--dur) var(--ease);
@@ -280,7 +280,7 @@ input.cp-bright::-moz-range-thumb {
   grid-template-columns: 18px 64px minmax(0, 1fr) 52px;
   align-items: center;
   gap: 8px;
-  font-size: 12px;
+  font-size: var(--fs-2);
 }
 .cp-imp-sw {
   width: 18px;
@@ -292,7 +292,7 @@ input.cp-bright::-moz-range-thumb {
 .cp-imp-row select {
   height: 28px;
   font-family: var(--font-mono);
-  font-size: 11.5px;
+  font-size: var(--fs-2);
   padding: 0 24px 0 8px;
   background-position: right 8px center;
 }
@@ -303,7 +303,7 @@ input.cp-bright::-moz-range-thumb {
 
 .cp-imp-note {
   margin: 0;
-  font-size: 11.5px;
+  font-size: var(--fs-2);
   line-height: 1.5;
   color: var(--muted);
 }
@@ -313,7 +313,7 @@ input.cp-bright::-moz-range-thumb {
   gap: 4px;
   margin-right: 6px;
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: var(--fs-1);
 }
 .cp-unused i {
   width: 10px;

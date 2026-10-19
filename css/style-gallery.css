@@ -54,11 +54,11 @@ html.is-mac-app .gal-overlay { padding-top: 34px; }
   background: var(--surface);
   border-bottom: 1px solid var(--line);
 }
-.gal-titles h2 { margin: 0; font-size: 20px; font-weight: 600; letter-spacing: -0.02em; }
-.gal-titles p { margin: 4px 0 0; font-size: 13px; color: var(--muted); }
+.gal-titles h2 { margin: 0; font-size: var(--fs-5); font-weight: 600; letter-spacing: -0.02em; }
+.gal-titles p { margin: 4px 0 0; font-size: var(--fs-3); color: var(--muted); }
 .gal-tools { display: flex; align-items: center; gap: 8px; }
 .gal-head .ae-families { grid-column: 1 / -1; }
-.gal-head .ae-fam { padding: 5px 12px; font-size: 12.5px; }
+.gal-head .ae-fam { padding: 5px 12px; font-size: var(--fs-2); }
 
 .gal-search {
   position: relative;
@@ -83,7 +83,7 @@ html.is-mac-app .gal-overlay { padding-top: 34px; }
   background: transparent;
   color: var(--ink);
   font: inherit;
-  font-size: 13px;
+  font-size: var(--fs-3);
   outline: none;
   -webkit-appearance: none;
   appearance: none;
@@ -110,7 +110,7 @@ html.is-mac-app .gal-overlay { padding-top: 34px; }
   grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
   gap: 26px 20px;
 }
-.gal-empty { margin: 48px 0; text-align: center; font-size: 14px; color: var(--muted); }
+.gal-empty { margin: 48px 0; text-align: center; font-size: var(--fs-3); color: var(--muted); }
 
 .gal-tile {
   position: relative;
@@ -164,7 +164,7 @@ html.is-mac-app .gal-overlay { padding-top: 34px; }
   border-radius: 999px;
   background: var(--ink);
   color: #fff;
-  font-size: 11px;
+  font-size: var(--fs-1);
   font-weight: 500;
   line-height: 1.4;
 }
@@ -178,9 +178,9 @@ html.is-mac-app .gal-overlay { padding-top: 34px; }
   align-items: baseline;
   padding: 0 2px;
 }
-.gal-num { font-family: var(--font-mono); font-size: 11px; color: var(--muted); }
-.gal-name { font-size: 13.5px; font-weight: 600; letter-spacing: -0.01em; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.gal-desc { grid-column: 2 / -1; font-size: 12px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.gal-num { font-family: var(--font-mono); font-size: var(--fs-1); color: var(--muted); }
+.gal-name { font-size: var(--fs-3); font-weight: 600; letter-spacing: -0.01em; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.gal-desc { grid-column: 2 / -1; font-size: var(--fs-2); color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
 /* ---------- narrow ---------- */
 
@@ -199,7 +199,7 @@ html.is-mac-app .gal-overlay { padding-top: 34px; }
   .gal-head .gal-tools { position: static; }
   .gal-close { position: absolute; right: 12px; top: 14px; }
   .gal-titles { padding-right: 84px; }
-  .gal-titles h2 { font-size: 18px; }
+  .gal-titles h2 { font-size: var(--fs-5); }
   .gal-search kbd { display: none; }
   .gal-head .ae-families { flex-wrap: nowrap; overflow-x: auto; margin: 0 -16px; padding: 0 16px 2px; scrollbar-width: none; }
   .gal-head .ae-families::-webkit-scrollbar { display: none; }
