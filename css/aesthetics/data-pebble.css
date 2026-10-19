@@ -1,0 +1,307 @@
+/* ---------------------------------------------------------------------
+   46 Data Pebble — calm, quantified, organic. Reference: the humane look of a good
+   impact report. A pale ground tinted from the brand hue, solid white cards (18px, a
+   hairline tinted to the ground, a soft tinted shadow), big light serif figures, and
+   smooth pebble shapes whose AREA carries the value. Pill buttons, pill segmented
+   control, pill chips; the toggle knob stays round for legibility.
+   Variables (from js/aesthetics/data-pebble.js tokens() / printPrimary()):
+   --ab-surface --ab-surface-2 --ab-hair --ab-peb --ab-peb-soft --ab-peb-track
+   --ab-sec-fill --ab-sec-edge --ab-tag-bg --ab-tag-ink --ab-tag-down-bg --ab-shadow
+   --ab-shadow-hi --ab-glass --ab-glass-edge --ab-pri-hover --ab-pri-press --ab-fig-w.
+   Hooks used: hero 'split', palette 'swatches', sections 'two-col', highlight 'ink',
+   states 'button', panels.list (pebble glyph sized by value), deck.materialArt.
+   HARD RULE: app UI (.sb-ab, the Built screens and the UI kit) carries no art. The frosted
+   field and pebble art are board / deck only. In the app, pebbles are data: the stat tile
+   sparkline, pebble progress, and the pebble-shaped avatar / glyph.
+------------------------------------------------------------------------ */
+
+.ab[data-ae="data-pebble"] {
+  --dp-r: 18px;
+  --dp-blob-a: 54% 46% 52% 48% / 50% 58% 42% 50%;
+  --dp-blob-b: 47% 53% 44% 56% / 56% 46% 54% 44%;
+  --dp-blob-c: 51% 49% 57% 43% / 45% 52% 48% 55%;
+  --dp-fig: lining-nums tabular-nums;
+  border-radius: 28px;
+}
+.ab[data-ae="data-pebble"] .ab-in { padding: clamp(18px, 4cqw, 40px); }
+
+/* ---- header ---- */
+.ab[data-ae="data-pebble"] .ab-brand { font-weight: 600; letter-spacing: -0.01em; }
+.ab[data-ae="data-pebble"] .ab-mark { border-radius: var(--dp-blob-a); background: var(--ab-primary); color: var(--ab-on-primary); }
+.ab[data-ae="data-pebble"] .ab-tag {
+  padding: 6px 13px; border-radius: 999px; background: var(--ab-surface); border: 1px solid var(--ab-hair);
+  font-size: 11px; letter-spacing: 0.04em; text-transform: none; color: var(--ab-muted);
+}
+.ab[data-ae="data-pebble"] .ab-tag b { font-weight: 600; color: var(--ab-ink); }
+.ab[data-ae="data-pebble"] .ab-rule { background: var(--ab-hair); }
+
+/* ---- labels: sentence case, not tracked capitals ---- */
+.ab[data-ae="data-pebble"] .ab-label { font-size: 12px; letter-spacing: 0.02em; text-transform: none; font-weight: 600; }
+.ab[data-ae="data-pebble"] .ab-n { font-family: var(--ab-font-h); font-weight: var(--ab-fig-w, 400); font-variant-numeric: var(--dp-fig); color: var(--ab-primary-text); }
+.ab[data-ae="data-pebble"] .ab-n::after { content: " · "; }
+
+/* ---- hero ---- */
+.ab[data-ae="data-pebble"] .ab-hero { grid-template-columns: minmax(0, 1fr) minmax(0, 1.12fr); align-items: center; }
+.ab[data-ae="data-pebble"] .ab-kicker {
+  display: inline-flex; align-items: center; gap: 8px; padding: 5px 13px 5px 10px; border-radius: 999px;
+  background: var(--ab-surface); border: 1px solid var(--ab-hair); color: var(--ab-ink);
+  font-size: 12px; font-weight: 600; letter-spacing: 0; text-transform: none;
+}
+.ab[data-ae="data-pebble"] .ab-kicker::before { content: ""; width: 9px; height: 8px; border-radius: var(--dp-blob-b); background: var(--ab-peb); }
+.ab[data-ae="data-pebble"] .ab-headline {
+  font-weight: var(--ab-fig-w, 400); line-height: 1.04; letter-spacing: calc(-0.02em * var(--ab-tr, 1));
+  font-variant-numeric: var(--dp-fig);
+}
+.ab[data-ae="data-pebble"] .ab-hl { font-style: italic; }
+.ab[data-ae="data-pebble"] .ab-art { max-width: none; aspect-ratio: auto; justify-self: stretch; }
+
+/* the hero art (board, deck cover): a frosted card over a soft field of blurred pebbles */
+.ab[data-ae="data-pebble"] .dpa {
+  position: relative; width: 100%; padding: clamp(14px, 4.5cqw, 30px); border-radius: 28px; overflow: hidden; isolation: isolate;
+  background:
+    radial-gradient(70% 60% at 12% 8%, color-mix(in srgb, var(--ab-peb) 20%, transparent), transparent 70%),
+    radial-gradient(60% 60% at 92% 96%, color-mix(in srgb, var(--ab-secondary) 34%, transparent), transparent 70%),
+    var(--ab-canvas);
+  border: 1px solid var(--ab-hair);
+}
+.ab[data-ae="data-pebble"] .dpa-field { position: absolute; inset: 0; z-index: -1; width: 100%; height: 100%; filter: blur(14px); opacity: 0.85; }
+.ab[data-ae="data-pebble"] .dpa-f0 { fill: var(--ab-peb-soft); }
+.ab[data-ae="data-pebble"] .dpa-f1 { fill: var(--ab-sec-fill); }
+.ab[data-ae="data-pebble"] .dpa-card {
+  padding: clamp(12px, 4cqw, 22px); border-radius: 22px;
+  background: var(--ab-glass); border: 1px solid var(--ab-glass-edge);
+  -webkit-backdrop-filter: blur(18px) saturate(140%); backdrop-filter: blur(18px) saturate(140%);
+  box-shadow: var(--ab-shadow);
+}
+.ab[data-ae="data-pebble"] .dpa-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 4px 12px; }
+.ab[data-ae="data-pebble"] .dpa-k { font-size: 12px; font-weight: 600; color: var(--ab-ink); }
+.ab[data-ae="data-pebble"] .dpa-key { display: inline-flex; align-items: center; gap: 6px; font-size: 11.5px; color: var(--ab-muted-glass); }
+.ab[data-ae="data-pebble"] .dpa-kd { width: 11px; height: 10px; margin-left: 6px; border-radius: var(--dp-blob-c); background: var(--ab-peb); }
+.ab[data-ae="data-pebble"] .dpa-kd:first-child { margin-left: 0; }
+.ab[data-ae="data-pebble"] .dpa-kd.is-prev { background: var(--ab-sec-fill); box-shadow: inset 0 0 0 1.5px var(--ab-sec-edge); }
+.ab[data-ae="data-pebble"] .dpa-svg { display: block; width: 100%; height: auto; margin: 6px 0 2px; overflow: visible; }
+.ab[data-ae="data-pebble"] .dpa-a { fill: var(--ab-peb); }
+.ab[data-ae="data-pebble"] .dpa-b { fill: var(--ab-sec-fill); stroke: var(--ab-sec-edge); stroke-width: 1.5px; vector-effect: non-scaling-stroke; }
+.ab[data-ae="data-pebble"] .dpa-num { fill: var(--ab-on-primary); font-family: var(--ab-font-h); font-weight: var(--ab-fig-w, 400); font-variant-numeric: var(--dp-fig); }
+.ab[data-ae="data-pebble"] .dpa-leg {
+  list-style: none; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px 12px;
+  margin-top: 8px; padding-top: 12px; border-top: 1px solid var(--ab-hair);
+}
+.ab[data-ae="data-pebble"] .dpa-leg li { display: grid; min-width: 0; line-height: 1.25; }
+.ab[data-ae="data-pebble"] .dpa-name { font-size: 12px; color: var(--ab-ink); }
+.ab[data-ae="data-pebble"] .dpa-val { font-family: var(--ab-font-h); font-weight: var(--ab-fig-w, 400); font-size: clamp(22px, 7cqw, 30px); line-height: 1.1; font-variant-numeric: var(--dp-fig); color: var(--ab-ink); }
+.ab[data-ae="data-pebble"] .dpa-was { font-size: 11.5px; color: var(--ab-muted-glass); }
+@container (max-width: 380px) {
+  .ab[data-ae="data-pebble"] .dpa-leg { grid-template-columns: minmax(0, 1fr); }
+  .ab[data-ae="data-pebble"] .dpa-leg li { grid-template-columns: minmax(0, 1fr) auto; column-gap: 10px; align-items: baseline; }
+  .ab[data-ae="data-pebble"] .dpa-name { grid-column: 1; }
+  .ab[data-ae="data-pebble"] .dpa-val { grid-column: 2; grid-row: 1 / span 2; font-size: 24px; }
+}
+
+/* ---- palette: pebble-shaped swatches ---- */
+.ab[data-ae="data-pebble"] .ab-chip { height: clamp(46px, 7cqw, 68px); border-radius: var(--dp-blob-a); box-shadow: inset 0 0 0 1px var(--ab-hair); }
+.ab[data-ae="data-pebble"] .ab-swatch:nth-child(2) .ab-chip { border-radius: var(--dp-blob-b); }
+.ab[data-ae="data-pebble"] .ab-swatch:nth-child(3) .ab-chip { border-radius: var(--dp-blob-c); }
+.ab[data-ae="data-pebble"] .ab-swatch:nth-child(4) .ab-chip { border-radius: var(--dp-blob-a); }
+.ab[data-ae="data-pebble"] .ab-swatch:nth-child(5) .ab-chip { border-radius: var(--dp-blob-b); }
+.ab[data-ae="data-pebble"] .ab-sw-role { font-weight: 600; }
+
+/* ---- type block ---- */
+.ab[data-ae="data-pebble"] .ab-type-col { border-top-color: var(--ab-hair); }
+.ab[data-ae="data-pebble"] .ab-type-role { letter-spacing: 0.02em; text-transform: none; font-weight: 600; font-size: 12px; }
+.ab[data-ae="data-pebble"] .ab-fit { border-radius: 999px; border-color: transparent; background: var(--ab-surface-2); }
+.ab[data-ae="data-pebble"] .ab-fit[data-fit="match"] { background: var(--ab-tag-bg); color: var(--ab-tag-ink); }
+.ab[data-ae="data-pebble"] .ab-fit[data-fit="avoid"] { background: var(--ab-ink); color: var(--ab-canvas); }
+.ab[data-ae="data-pebble"] .ab-type-apply { border-radius: 999px; border-color: var(--ab-primary-text); color: var(--ab-primary-text); }
+.ab[data-ae="data-pebble"] .ab-type-apply:hover { background: var(--ab-tag-bg); }
+.ab[data-ae="data-pebble"] .ab-type-apply:focus-visible { outline-color: var(--ab-primary-text); }
+
+/* ---- cards, panels: solid surface, 18px, tinted hairline, soft tinted shadow ---- */
+.ab[data-ae="data-pebble"] :is(.ab-card, .ab-panel) {
+  background: var(--ab-surface); border: 1px solid var(--ab-hair); border-radius: var(--dp-r); box-shadow: var(--ab-shadow);
+  padding: clamp(18px, 3cqw, 28px);
+}
+.ab[data-ae="data-pebble"] .ab-seg { gap: 2px; padding: 4px; border-radius: 999px; background: var(--ab-surface-2); border: 1px solid var(--ab-hair); }
+.ab[data-ae="data-pebble"] .ab-seg-btn { border-radius: 999px; min-height: 36px; font-size: 12.5px; color: var(--ab-muted); transition: background 0.18s, color 0.18s; }
+.ab[data-ae="data-pebble"] .ab-seg-btn[aria-pressed="true"] {
+  background: var(--ab-surface); color: var(--ab-ink); font-weight: 600; box-shadow: 0 0 0 1px var(--ab-hair), 0 1px 2px color-mix(in srgb, var(--ab-primary) 18%, transparent);
+}
+.ab[data-ae="data-pebble"] .ab-seg-btn:focus-visible { outline: 2px solid var(--ab-primary-text); outline-offset: 1px; }
+.ab[data-ae="data-pebble"] .ab-card-title {
+  margin: 22px 0 6px !important; font-weight: var(--ab-fig-w, 400); font-size: clamp(26px, 4cqw, 36px); line-height: 1.08; letter-spacing: -0.015em; font-variant-numeric: var(--dp-fig);
+}
+.ab[data-ae="data-pebble"] .ab-card-body { font-size: 14px; line-height: 1.5; }
+
+/* ---- buttons: pills; the main one is the deep pebble ---- */
+.ab[data-ae="data-pebble"] .ab-cta {
+  min-height: 52px; padding: 0 8px 0 24px; border-radius: 999px; font-size: 15px; font-weight: 600; letter-spacing: 0;
+  background: var(--ab-primary); color: var(--ab-on-primary); box-shadow: none;
+  transition: background 0.18s, transform 0.18s;
+}
+.ab[data-ae="data-pebble"] .ab-cta:hover, .ab[data-ae="data-pebble"] .ab-cta.is-hover { background: var(--ab-pri-hover); }
+.ab[data-ae="data-pebble"] .ab-cta:active, .ab[data-ae="data-pebble"] .ab-cta.is-pressed { background: var(--ab-pri-press); transform: scale(0.985); }
+.ab[data-ae="data-pebble"] .ab-cta:focus-visible { outline: 2px solid var(--ab-primary-text); outline-offset: 3px; }
+.ab[data-ae="data-pebble"] .ab-cta-arrow {
+  width: 38px; height: 38px; display: grid; place-items: center; border-radius: var(--dp-blob-a); font-size: 16px;
+  background: color-mix(in srgb, var(--ab-on-primary) 16%, transparent);
+}
+.ab[data-ae="data-pebble"] .ab-states[data-kind="button"] .ab-state-ctl { min-height: 42px; padding: 0 12px; font-size: 13px; }
+.ab[data-ae="data-pebble"] .ab-state-name { color: var(--ab-muted); }
+
+/* ---- field, toggle ---- */
+.ab[data-ae="data-pebble"] .ab-fieldlabel { font-size: 12.5px; font-weight: 600; color: var(--ab-ink); letter-spacing: 0; text-transform: none; }
+.ab[data-ae="data-pebble"] .ab-input {
+  padding: 13px 16px; border: 1px solid color-mix(in srgb, var(--ab-ink) 52%, var(--ab-surface)); border-radius: 14px;
+  background: var(--ab-surface); color: var(--ab-ink); transition: border-color 0.18s, box-shadow 0.18s;
+}
+.ab[data-ae="data-pebble"] .ab-input:focus-visible { outline: 2px solid var(--ab-primary-text); outline-offset: 2px; border-color: var(--ab-primary-text); }
+.ab[data-ae="data-pebble"] .ab-toggle { font-size: 14px; }
+.ab[data-ae="data-pebble"] .ab-switch { width: 52px; height: 32px; border-radius: 999px; background: color-mix(in srgb, var(--ab-ink) 55%, var(--ab-surface)); }
+.ab[data-ae="data-pebble"] .ab-switch::before {
+  left: 4px; top: 4px; width: 24px; height: 24px; border-radius: 50%; background: var(--ab-surface);
+  box-shadow: 0 1px 2px color-mix(in srgb, var(--ab-ink) 30%, transparent);
+}
+.ab[data-ae="data-pebble"] .ab-switch:checked { background: var(--ab-primary); }
+.ab[data-ae="data-pebble"] .ab-switch:checked::before { background: var(--ab-on-primary); transform: translateX(20px); }
+.ab[data-ae="data-pebble"] .ab-switch:focus-visible { outline: 2px solid var(--ab-primary-text); outline-offset: 2px; }
+.ab[data-ae="data-pebble"] .ab-status { font-size: 12px; }
+
+/* ---- 03 in use (board and dashboard rows): white row cards, a pebble glyph, pebble progress ---- */
+.ab[data-ae="data-pebble"] .ab-list:not(.sb-k-list) { display: grid; gap: 8px; }
+.ab[data-ae="data-pebble"] .ab-row:not(.sb-k-row) {
+  grid-template-columns: 44px minmax(0, 1fr) auto minmax(76px, 96px) 4.5ch; column-gap: clamp(10px, 2cqw, 18px);
+  padding: 10px 16px 10px 12px; border: 1px solid var(--ab-hair); border-radius: var(--dp-r); background: var(--ab-surface);
+}
+.ab[data-ae="data-pebble"] .ab-row:not(.sb-k-row):last-child { border-bottom: 1px solid var(--ab-hair); }
+.ab[data-ae="data-pebble"] .ab-row:not(.sb-k-row) .ab-row-n { display: none; }
+.ab[data-ae="data-pebble"] .ab-row:not(.sb-k-row) .ab-av {
+  display: grid; place-items: center; width: 44px; height: 44px; border-radius: var(--dp-blob-a);
+  background: var(--ab-peb-soft); color: var(--ab-primary-text); font: 600 15px/1 var(--ab-font-ui, var(--ab-font-b));
+}
+.ab[data-ae="data-pebble"] .ab-row:not(.sb-k-row) .ab-av.dp-av { background: none; border-radius: 0; }
+.ab[data-ae="data-pebble"] .dp-av svg { display: block; width: 44px; height: 44px; }
+.ab[data-ae="data-pebble"] .dp-av path { fill: var(--ab-peb); }
+.ab[data-ae="data-pebble"] .ab-row-name { font-weight: 600; }
+.ab[data-ae="data-pebble"] .ab-row-status { background: var(--ab-tag-bg); color: var(--ab-tag-ink); font-weight: 600; }
+.ab[data-ae="data-pebble"] .ab-row-pct { font-family: var(--ab-font-h); font-weight: var(--ab-fig-w, 400); font-size: 20px; font-variant-numeric: var(--dp-fig); color: var(--ab-ink); }
+.ab[data-ae="data-pebble"] .ab-row:focus-visible { outline: 2px solid var(--ab-primary-text); outline-offset: 2px; }
+
+/* pebble progress: five pebbles in a row fill left to right. The whole bar is masked to the five
+   pebble shapes, so the fill (a plain width) is clipped by them; a part pebble shows part-filled. */
+.ab[data-ae="data-pebble"] .ab-row-bar {
+  display: block; width: 100%; height: auto; aspect-ratio: 5 / 1; border-radius: 0; overflow: visible; align-self: center;
+  background: var(--ab-peb-track);
+  -webkit-mask: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20100%2020%22%20preserveAspectRatio%3D%22none%22%3E%3Cpath%20d%3D%22M5.5%2015.9C4.4%2014.5%203.1%2012.0%202.8%2010.1C2.6%208.3%202.7%206.0%203.9%204.6C5.2%203.2%208.5%202.0%2010.2%201.6C12.0%201.3%2013.3%201.1%2014.6%202.4C15.8%203.6%2017.6%206.8%2017.7%209.1C17.7%2011.4%2016.0%2014.5%2014.7%2016.0C13.4%2017.5%2011.3%2018.2%209.8%2018.2C8.3%2018.1%206.7%2017.2%205.5%2015.9Z%22%2F%3E%3Cpath%20d%3D%22M25.1%2016.6C23.8%2015.3%2022.7%2012.6%2022.5%2010.7C22.2%208.9%2022.6%207.1%2023.8%205.7C24.9%204.3%2027.4%202.7%2029.3%202.2C31.1%201.7%2033.7%201.9%2034.9%203.0C36.2%204.1%2036.8%206.8%2036.9%208.9C37.1%2010.9%2037.0%2013.7%2036.0%2015.3C34.9%2016.8%2032.2%2018.0%2030.4%2018.2C28.6%2018.5%2026.4%2017.8%2025.1%2016.6Z%22%2F%3E%3Cpath%20d%3D%22M48.7%2017.2C46.9%2016.9%2044.1%2016.0%2043.0%2014.4C41.9%2012.9%2042.0%209.8%2042.4%208.0C42.7%206.2%2043.1%204.6%2044.9%203.7C46.7%202.8%2051.2%202.1%2053.3%202.6C55.4%203.0%2056.6%204.7%2057.3%206.2C58.1%207.7%2058.4%209.9%2057.8%2011.6C57.2%2013.2%2055.2%2015.2%2053.7%2016.1C52.2%2017.0%2050.5%2017.4%2048.7%2017.2Z%22%2F%3E%3Cpath%20d%3D%22M71.2%2016.9C69.4%2017.2%2067.4%2016.7%2065.8%2015.8C64.2%2014.8%2061.9%2013.0%2061.6%2011.2C61.3%209.3%2062.5%206.2%2063.9%204.7C65.2%203.2%2067.8%202.3%2069.6%202.1C71.5%201.8%2073.7%201.9%2075.1%203.2C76.5%204.5%2077.7%207.9%2077.9%209.8C78.2%2011.6%2077.5%2013.0%2076.4%2014.2C75.3%2015.4%2073.0%2016.7%2071.2%2016.9Z%22%2F%3E%3Cpath%20d%3D%22M90.9%202.4C93.0%202.7%2095.3%204.3%2096.5%205.5C97.7%206.8%2098.3%208.2%2098.2%209.8C98.1%2011.5%2097.3%2014.1%2096.0%2015.4C94.7%2016.7%2092.3%2017.8%2090.4%2017.8C88.5%2017.7%2086.2%2016.4%2084.8%2015.0C83.5%2013.7%2082.2%2011.5%2082.1%209.7C82.0%207.9%2082.6%205.4%2084.0%204.2C85.5%203.0%2088.9%202.2%2090.9%202.4Z%22%2F%3E%3C%2Fsvg%3E") 0 0 / 100% 100% no-repeat; mask: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20100%2020%22%20preserveAspectRatio%3D%22none%22%3E%3Cpath%20d%3D%22M5.5%2015.9C4.4%2014.5%203.1%2012.0%202.8%2010.1C2.6%208.3%202.7%206.0%203.9%204.6C5.2%203.2%208.5%202.0%2010.2%201.6C12.0%201.3%2013.3%201.1%2014.6%202.4C15.8%203.6%2017.6%206.8%2017.7%209.1C17.7%2011.4%2016.0%2014.5%2014.7%2016.0C13.4%2017.5%2011.3%2018.2%209.8%2018.2C8.3%2018.1%206.7%2017.2%205.5%2015.9Z%22%2F%3E%3Cpath%20d%3D%22M25.1%2016.6C23.8%2015.3%2022.7%2012.6%2022.5%2010.7C22.2%208.9%2022.6%207.1%2023.8%205.7C24.9%204.3%2027.4%202.7%2029.3%202.2C31.1%201.7%2033.7%201.9%2034.9%203.0C36.2%204.1%2036.8%206.8%2036.9%208.9C37.1%2010.9%2037.0%2013.7%2036.0%2015.3C34.9%2016.8%2032.2%2018.0%2030.4%2018.2C28.6%2018.5%2026.4%2017.8%2025.1%2016.6Z%22%2F%3E%3Cpath%20d%3D%22M48.7%2017.2C46.9%2016.9%2044.1%2016.0%2043.0%2014.4C41.9%2012.9%2042.0%209.8%2042.4%208.0C42.7%206.2%2043.1%204.6%2044.9%203.7C46.7%202.8%2051.2%202.1%2053.3%202.6C55.4%203.0%2056.6%204.7%2057.3%206.2C58.1%207.7%2058.4%209.9%2057.8%2011.6C57.2%2013.2%2055.2%2015.2%2053.7%2016.1C52.2%2017.0%2050.5%2017.4%2048.7%2017.2Z%22%2F%3E%3Cpath%20d%3D%22M71.2%2016.9C69.4%2017.2%2067.4%2016.7%2065.8%2015.8C64.2%2014.8%2061.9%2013.0%2061.6%2011.2C61.3%209.3%2062.5%206.2%2063.9%204.7C65.2%203.2%2067.8%202.3%2069.6%202.1C71.5%201.8%2073.7%201.9%2075.1%203.2C76.5%204.5%2077.7%207.9%2077.9%209.8C78.2%2011.6%2077.5%2013.0%2076.4%2014.2C75.3%2015.4%2073.0%2016.7%2071.2%2016.9Z%22%2F%3E%3Cpath%20d%3D%22M90.9%202.4C93.0%202.7%2095.3%204.3%2096.5%205.5C97.7%206.8%2098.3%208.2%2098.2%209.8C98.1%2011.5%2097.3%2014.1%2096.0%2015.4C94.7%2016.7%2092.3%2017.8%2090.4%2017.8C88.5%2017.7%2086.2%2016.4%2084.8%2015.0C83.5%2013.7%2082.2%2011.5%2082.1%209.7C82.0%207.9%2082.6%205.4%2084.0%204.2C85.5%203.0%2088.9%202.2%2090.9%202.4Z%22%2F%3E%3C%2Fsvg%3E") 0 0 / 100% 100% no-repeat;
+}
+.ab[data-ae="data-pebble"] .ab-row-bar i { background: var(--ab-peb); }
+
+/* ---- narrow board ---- */
+@container ab (max-width: 600px) {
+  .ab[data-ae="data-pebble"] .ab-row:not(.sb-k-row) { grid-template-columns: 44px minmax(0, 1fr) auto; row-gap: 4px; }
+  .ab[data-ae="data-pebble"] .ab-row:not(.sb-k-row) .ab-av { grid-column: 1; grid-row: 1 / span 2; }
+  .ab[data-ae="data-pebble"] .ab-row:not(.sb-k-row) .ab-row-name { grid-column: 2; grid-row: 1; }
+  .ab[data-ae="data-pebble"] .ab-row:not(.sb-k-row) .ab-row-pct { grid-column: 3; grid-row: 1; }
+  .ab[data-ae="data-pebble"] .ab-row:not(.sb-k-row) .ab-row-status { grid-column: 2; grid-row: 2; }
+  .ab[data-ae="data-pebble"] .ab-row:not(.sb-k-row) .ab-row-bar { display: block; grid-column: 3; grid-row: 2; width: 76px; justify-self: end; }
+  .ab[data-ae="data-pebble"] .ab-hero { grid-template-columns: minmax(0, 1fr); }
+  .ab[data-ae="data-pebble"] .ab-art { max-width: none; justify-self: stretch; }
+}
+
+/* ---- footer ---- */
+.ab[data-ae="data-pebble"] .ab-foot { border-top-color: var(--ab-hair); }
+.ab[data-ae="data-pebble"] .ab-dot { border-radius: var(--dp-blob-b); width: 9px; height: 8px; }
+
+/* ---- reduced motion / transparency ---- */
+@media (prefers-reduced-motion: reduce) {
+  .ab[data-ae="data-pebble"] * { transition: none !important; }
+  .ab[data-ae="data-pebble"] .ab-cta:active, .ab[data-ae="data-pebble"] .ab-cta.is-pressed { transform: none; }
+}
+@media (prefers-reduced-transparency: reduce) {
+  .ab[data-ae="data-pebble"] .dpa-card { background: var(--ab-surface); -webkit-backdrop-filter: none; backdrop-filter: none; }
+}
+
+/* ----- deck ----- */
+.ab[data-ae="data-pebble"].ab-slide .ab-art { max-width: none; justify-self: stretch; }
+.ab[data-ae="data-pebble"].ab-slide .dpa-val { font-size: 34px; }
+.ab[data-ae="data-pebble"].ab-slide .dpa-name, .ab[data-ae="data-pebble"].ab-slide .dpa-was, .ab[data-ae="data-pebble"].ab-slide .dpa-k, .ab[data-ae="data-pebble"].ab-slide .dpa-key { font-size: 13px; }
+
+/* deck Material slide (def.deck.materialArt): the components as specimens */
+.ab[data-ae="data-pebble"] .dpm { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; align-items: stretch; width: 100%; padding: 12px 0; }
+.ab[data-ae="data-pebble"] .dpm-card {
+  display: flex; flex-direction: column; justify-content: center; gap: 10px; min-height: 220px; padding: 22px;
+  background: var(--ab-surface); border: 1px solid var(--ab-hair); border-radius: var(--dp-r); box-shadow: var(--ab-shadow);
+}
+.ab[data-ae="data-pebble"] .dpm-l { font-size: 13px; font-weight: 600; color: var(--ab-muted); }
+.ab[data-ae="data-pebble"] .dpm-n { font-family: var(--ab-font-h); font-weight: var(--ab-fig-w, 400); font-size: 72px; line-height: 1; font-variant-numeric: var(--dp-fig); color: var(--ab-ink); }
+.ab[data-ae="data-pebble"] .dpm-n small { font-size: 0.45em; margin-left: 2px; }
+.ab[data-ae="data-pebble"] .dpm-tag { align-self: flex-start; padding: 3px 11px; border-radius: 999px; background: var(--ab-tag-bg); color: var(--ab-tag-ink); font-size: 13px; font-weight: 600; }
+.ab[data-ae="data-pebble"] .dpm-spark { width: 130px; height: 26px; fill: var(--ab-peb); }
+.ab[data-ae="data-pebble"] .dpm-prog { width: 100%; max-width: 220px; height: auto; aspect-ratio: 5 / 1; overflow: visible; }
+.ab[data-ae="data-pebble"] .dpm-track path { fill: var(--ab-peb-track); }
+.ab[data-ae="data-pebble"] .dpm-fill path { fill: var(--ab-peb); }
+.ab[data-ae="data-pebble"] .dpm-cap { font-size: 14px; color: var(--ab-muted); }
+.ab[data-ae="data-pebble"] .dpm-frost {
+  background: var(--ab-glass); border-color: var(--ab-glass-edge);
+  -webkit-backdrop-filter: blur(18px) saturate(140%); backdrop-filter: blur(18px) saturate(140%);
+}
+.ab[data-ae="data-pebble"] .ab-deck-stage[data-stage="own"], .ab[data-ae="data-pebble"] .ab-deck-material .ab-deck-stage {
+  background:
+    radial-gradient(60% 70% at 10% 10%, color-mix(in srgb, var(--ab-peb) 18%, transparent), transparent 70%),
+    radial-gradient(60% 70% at 92% 92%, color-mix(in srgb, var(--ab-secondary) 30%, transparent), transparent 70%),
+    var(--ab-canvas);
+}
+
+/* =====================================================================
+   App UI (Built screens, UI kit: .sb-ab, kit root .sb-kit). No art here: surfaces, type and data
+   marks only. The stat tile's pebble sparkline and pebble progress show data.
+   ===================================================================== */
+.ab.sb-ab[data-ae="data-pebble"] { --dp-spark: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20100%2020%22%20preserveAspectRatio%3D%22none%22%3E%3Cpath%20d%3D%22M7.2%205.9C8.1%205.3%209.2%205.0%2010.3%205.1C11.3%205.1%2012.6%205.3%2013.4%206.2C14.1%207.1%2014.9%209.3%2014.8%2010.5C14.8%2011.8%2013.7%2013.1%2012.9%2013.8C12.2%2014.6%2011.2%2015.2%2010.1%2015.2C9.0%2015.1%207.1%2014.6%206.3%2013.5C5.5%2012.5%205.1%2010.3%205.2%209.0C5.4%207.7%206.4%206.6%207.2%205.9Z%22%2F%3E%3Cpath%20d%3D%22M34.7%206.7C35.4%207.7%2035.8%2010.1%2035.4%2011.4C35.0%2012.7%2033.6%2013.8%2032.5%2014.5C31.4%2015.2%2030.1%2015.7%2028.9%2015.6C27.7%2015.4%2026.2%2014.9%2025.3%2013.7C24.4%2012.6%2023.6%209.9%2023.7%208.5C23.8%207.1%2024.8%205.9%2026.1%205.3C27.3%204.8%2030.0%204.7%2031.4%205.0C32.9%205.2%2034.1%205.6%2034.7%206.7Z%22%2F%3E%3Cpath%20d%3D%22M52.3%204.3C53.8%204.7%2055.1%206.0%2055.8%207.4C56.5%208.7%2056.9%2010.9%2056.4%2012.3C55.9%2013.7%2054.1%2015.3%2052.5%2015.9C50.9%2016.5%2048.5%2016.4%2047.0%2015.8C45.4%2015.1%2044.0%2013.4%2043.5%2012.1C43.0%2010.7%2043.6%208.8%2044.1%207.6C44.7%206.4%2045.5%205.5%2046.9%204.9C48.3%204.4%2050.8%203.9%2052.3%204.3Z%22%2F%3E%3Cpath%20d%3D%22M63.6%209.0C63.5%207.1%2063.3%205.2%2064.6%203.9C65.8%202.6%2069.3%201.1%2071.0%201.1C72.8%201.2%2074.1%202.7%2075.0%204.1C75.9%205.6%2076.5%208.1%2076.5%2010.1C76.4%2012.0%2075.8%2014.1%2074.6%2015.6C73.4%2017.1%2071.1%2019.2%2069.5%2019.1C67.9%2019.0%2065.9%2016.7%2064.9%2015.0C63.9%2013.3%2063.6%2010.8%2063.6%209.0Z%22%2F%3E%3Cpath%20d%3D%22M98.3%2012.7C97.5%2014.6%2095.4%2018.1%2093.5%2019.0C91.6%2019.9%2088.6%2019.0%2086.8%2018.1C84.9%2017.3%2083.4%2015.9%2082.4%2013.9C81.3%2011.9%2080.0%208.1%2080.6%206.0C81.2%203.9%2084.0%202.0%2086.0%201.4C88.1%200.7%2090.9%200.8%2092.9%201.8C94.9%202.9%2097.3%205.7%2098.2%207.5C99.1%209.3%2099.1%2010.8%2098.3%2012.7Z%22%2F%3E%3C%2Fsvg%3E"); --dp-spark-down: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20100%2020%22%20preserveAspectRatio%3D%22none%22%3E%3Cpath%20d%3D%22M16.3%2015.3C14.8%2016.6%2012.1%2018.1%209.9%2018.2C7.7%2018.4%204.7%2017.5%203.2%2016.2C1.7%2014.8%201.1%2012.3%201.1%2010.3C1.0%208.4%201.5%206.0%203.2%204.5C4.8%203.0%209.0%201.3%2011.1%201.4C13.3%201.5%2014.7%203.6%2016.1%205.0C17.4%206.5%2019.2%208.6%2019.2%2010.3C19.2%2012.0%2017.9%2014.0%2016.3%2015.3Z%22%2F%3E%3Cpath%20d%3D%22M36.9%206.3C37.5%208.1%2037.2%2010.6%2036.6%2012.5C36.0%2014.4%2035.0%2016.8%2033.4%2017.8C31.8%2018.7%2029.0%2018.9%2027.2%2018.2C25.4%2017.4%2023.3%2015.1%2022.7%2013.4C22.0%2011.6%2022.6%209.5%2023.2%207.6C23.8%205.7%2024.7%203.0%2026.3%202.0C28.0%201.0%2031.2%200.9%2033.0%201.6C34.7%202.4%2036.3%204.5%2036.9%206.3Z%22%2F%3E%3Cpath%20d%3D%22M55.9%205.3C57.1%206.5%2057.7%208.9%2057.7%2010.4C57.7%2011.9%2057.3%2013.3%2056.0%2014.4C54.8%2015.4%2052.1%2016.7%2050.1%2016.7C48.1%2016.7%2045.1%2015.6%2044.0%2014.5C42.9%2013.5%2042.9%2011.7%2043.2%2010.3C43.5%208.8%2044.5%206.7%2045.8%205.6C47.0%204.4%2049.1%203.3%2050.8%203.3C52.5%203.2%2054.8%204.1%2055.9%205.3Z%22%2F%3E%3Cpath%20d%3D%22M63.9%2011.0C63.5%209.7%2064.2%207.3%2064.9%206.3C65.7%205.2%2067.1%204.9%2068.5%204.8C69.8%204.6%2071.9%204.6%2073.0%205.2C74.1%205.9%2074.9%207.4%2075.3%208.8C75.7%2010.1%2076.1%2012.1%2075.5%2013.2C74.9%2014.3%2072.9%2015.1%2071.6%2015.3C70.2%2015.5%2068.6%2015.1%2067.4%2014.4C66.1%2013.6%2064.3%2012.4%2063.9%2011.0Z%22%2F%3E%3Cpath%20d%3D%22M86.3%206.1C87.1%205.1%2089.2%204.4%2090.4%204.5C91.6%204.5%2093.1%205.5%2093.7%206.4C94.3%207.3%2094.2%208.7%2094.2%209.9C94.1%2011.2%2094.0%2012.8%2093.3%2013.7C92.7%2014.6%2091.1%2015.2%2090.1%2015.2C89.0%2015.2%2088.0%2014.6%2087.2%2013.8C86.4%2013.0%2085.6%2011.6%2085.4%2010.3C85.3%209.0%2085.5%207.0%2086.3%206.1Z%22%2F%3E%3C%2Fsvg%3E"); }
+
+/* dashboard */
+.ab.sb-ab[data-ae="data-pebble"] .sb-side { background: var(--ab-surface); border-right: 1px solid var(--ab-hair); }
+.ab.sb-ab[data-ae="data-pebble"] .sb-navi { border-radius: 999px; }
+.ab.sb-ab[data-ae="data-pebble"] .sb-navi[aria-current] { background: var(--ab-tag-bg); color: var(--ab-ink); box-shadow: none; }
+.ab.sb-ab[data-ae="data-pebble"] .sb-me-av, .ab.sb-ab[data-ae="data-pebble"] .sb-k-av { border-radius: var(--dp-blob-a); background: var(--ab-peb-soft); color: var(--ab-primary-text); }
+.ab.sb-ab[data-ae="data-pebble"] .sb-k-av-s { border-radius: var(--dp-blob-b); }
+.ab.sb-ab[data-ae="data-pebble"] .sb-k-av-l { border-radius: var(--dp-blob-c); }
+.ab.sb-ab[data-ae="data-pebble"] .sb-k-ico { border-radius: var(--dp-blob-b); background: var(--ab-peb-soft); color: var(--ab-primary-text); }
+.ab.sb-ab[data-ae="data-pebble"] .sb-c-prev { stroke: var(--ab-sec-edge); stroke-dasharray: none; opacity: 1; }
+.ab.sb-ab[data-ae="data-pebble"] .sb-c-area { fill: color-mix(in srgb, var(--ab-primary) 12%, transparent); }
+
+/* stat tile: big light serif figure, delta tag, a pebble sparkline that follows the delta's direction */
+.ab.sb-ab[data-ae="data-pebble"] .ab-card.sb-stat { padding: 18px 20px 18px; }
+.ab.sb-ab[data-ae="data-pebble"] .ab-card-title.sb-num { font-size: clamp(28px, 3.4cqw, 40px); font-weight: var(--ab-fig-w, 400); font-variant-numeric: var(--dp-fig); letter-spacing: -0.02em; }
+.ab.sb-ab[data-ae="data-pebble"] .sb-stat .sb-delta { background: var(--ab-tag-bg); color: var(--ab-tag-ink); border-color: transparent; font-weight: 600; }
+.ab.sb-ab[data-ae="data-pebble"] .sb-stat .sb-delta[data-fit="consider"] { background: var(--ab-tag-down-bg); color: var(--ab-ink); }
+.ab.sb-ab[data-ae="data-pebble"] .sb-stat::after {
+  content: ""; display: block; width: 88px; height: 18px; margin-top: 14px; background: var(--ab-peb);
+  -webkit-mask: var(--dp-spark) 0 0 / 100% 100% no-repeat; mask: var(--dp-spark) 0 0 / 100% 100% no-repeat;
+}
+.ab.sb-ab[data-ae="data-pebble"] .sb-stat:has(.sb-delta[data-fit="consider"])::after { -webkit-mask-image: var(--dp-spark-down); mask-image: var(--dp-spark-down); }
+.ab.sb-ab[data-ae="data-pebble"] .sb-usage .ab-row-bar { height: auto; max-width: 150px; }
+
+/* phone screens and the kit */
+.ab.sb-ab[data-ae="data-pebble"].sb-kit .ab-kicker::before { content: none; }
+.ab.sb-ab[data-ae="data-pebble"].sb-kit .ab-kicker { padding: 0; border: 0; background: none; border-radius: 0; }
+.ab.sb-ab[data-ae="data-pebble"].sb-kit .ab-headline,
+.ab.sb-ab[data-ae="data-pebble"].sb-kit :is(.sb-home-h, .sb-k-ltitle, .sb-k-pagetitle) { font-weight: var(--ab-fig-w, 400); letter-spacing: -0.015em; font-variant-numeric: var(--dp-fig); }
+.ab.sb-ab[data-ae="data-pebble"].sb-kit .ab-card .ab-card-title { font-size: var(--k-title-2, 22px) !important; }
+.ab.sb-ab[data-ae="data-pebble"].sb-kit .ab-cta { padding: 0 20px; }
+.ab.sb-ab[data-ae="data-pebble"].sb-kit .ab-cta-arrow { width: 32px; height: 32px; }
+.ab.sb-ab[data-ae="data-pebble"].sb-kit :is(.ab-cta.sb-k-btn, .ab-type-apply.sb-k-btn2, .sb-k-danger, .sb-k-textbtn, .sb-k-iconbtn) { border-radius: 999px; }
+.ab.sb-ab[data-ae="data-pebble"].sb-kit .ab-type-apply.sb-k-btn2 { border-color: var(--ab-primary-text); color: var(--ab-primary-text); background: transparent; }
+.ab.sb-ab[data-ae="data-pebble"].sb-kit :is(.ab-list.sb-k-list) { background: var(--ab-surface); border: 1px solid var(--ab-hair); border-radius: var(--dp-r); box-shadow: var(--ab-shadow); }
+.ab.sb-ab[data-ae="data-pebble"].sb-kit :is(.ab-card, .ab-panel) { padding-top: var(--k-cardpad, 20px); }
+.ab.sb-ab[data-ae="data-pebble"].sb-kit .ab-toggle.sb-tog { border-radius: var(--dp-r); }
+.ab.sb-ab[data-ae="data-pebble"].sb-kit .ab-input { border-radius: 14px; }
+.ab.sb-ab[data-ae="data-pebble"].sb-kit .sb-tabs { background: var(--ab-surface); border-top: 1px solid var(--ab-hair); }
+.ab.sb-ab[data-ae="data-pebble"].sb-kit .sb-tab[aria-current]::before { border-radius: 999px; }
+.ab.sb-ab[data-ae="data-pebble"].sb-kit .ab-row.sb-k-row.is-picked { background-color: var(--ab-tag-bg); }
+
+/* kit progress: five pebbles (the same mask as a row's bar), larger */
+.ab.sb-ab[data-ae="data-pebble"].sb-kit .ab-row-bar.sb-k-bar { height: auto !important; aspect-ratio: 5 / 1; max-width: 170px; }
+.ab.sb-ab[data-ae="data-pebble"].sb-kit .sb-k-slider-h { max-width: 170px; margin-bottom: 8px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .ab.sb-ab[data-ae="data-pebble"] * { transition: none !important; }
+}
