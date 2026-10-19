@@ -694,7 +694,14 @@ check('paste: empty text', run(`extractColors('').length`) === 0, 'found colors 
     uiKitDanger({ primary: '#5b7f6a', secondary: '#e8d9b5', accent: '#c9a227', ink: '#1f2421', canvas: '#f6f4ef' }),
     uiKitDanger({ primary: '#2e6f95', secondary: '#c9b8b5', accent: '#f2c14e', ink: '#1b1b1f', canvas: '#ffffff' })])`);
   const [dzSec, dzPri, dzNone, dzGrey] = JSON.parse(dz);
-  check('kit: a reddish palette colour distinct from the primary is the filled destructive colour', dzSec.role === 'secondary' && dzSec.color === '#d93a3a' && dzSec.fill === true, JSON.stringify(dzSec));
+  check('kit: a reddish palette colour distinct from the primary is the filled destructive colour (shaded to hold 4.5:1 on the canvas)', dzSec.role === 'secondary' && dzSec.color === dzSec.text && dzSec.fill === true && B(`UIK_COLOR.con(UIK_COLOR.parse('${dzSec.color}'), UIK_COLOR.parse('#faf8f5'))`) >= 4.5, JSON.stringify(dzSec));
+  // --on-error: whichever label scores best on the one error colour, 4.5:1 on it and the error 4.5:1 on the canvas, light and dark, for reddish palettes
+  const onErr = JSON.parse(B(`JSON.stringify([
+    ['#9c5048', '#1d1c26', '#f6f4ef'], ['#cd776c', '#f2f0ea', '#16151a'], ['#ad574c', '#1d1c26', '#fbf7f2'], ['#de5777', '#f2f0ea', '#171717'], ['#bc002d', '#1d1c26', '#ffffff'],
+    ['#ff6b57', '#10131a', '#fff7f2'], ['#e8261c', '#f5f5f5', '#0a0a0a'], ['#7a1f2b', '#f5f5f5', '#120a0c'], ['#ff3d7f', '#2a1020', '#fff5f8'], ['#d93a3a', '#f2f2f2', '#6b6b6b']]
+    .map(([c, ink, canvas]) => { const d = uiKitDanger({ primary: '#2e6f95', secondary: c, accent: '#f2c14e', ink, canvas }); const K = UIK_COLOR, P = K.parse;
+      return { c, ink, canvas, role: d.role, text: d.text, on: d.on, onR: K.con(P(d.on), P(d.text)), cvR: K.con(P(d.text), P(canvas)) }; }))`));
+  check('kit: --on-error holds 4.5:1 on the error colour and the error holds 4.5:1 on the canvas (palettes with a red, both modes)', onErr.filter(r => r.role).length >= 8 && onErr.every(r => !r.role || (r.onR >= 4.5 && r.cvR >= 4.5)), JSON.stringify(onErr.filter(r => r.role && !(r.onR >= 4.5 && r.cvR >= 4.5))));
   check('kit: when the reddish colour is the primary, destructive is an outline in it (never filled)', dzPri.role === 'primary' && dzPri.fill === false, JSON.stringify(dzPri));
   check('kit: no reddish colour (or a greyed one) means ink, never a stock red', dzNone.role === null && dzNone.color === '#1f2421' && dzGrey.role === null, JSON.stringify([dzNone, dzGrey]));
   const tone = B(`JSON.stringify(uiKitTone('#e8d9b5', { ink: '#1f2421', canvas: '#f6f4ef' }, 3, 0.12))`);
@@ -891,6 +898,23 @@ check('paste: empty text', run(`extractColors('').length`) === 0, 'found colors 
   check('lint: a gradient whose stops are all one colour is flagged; a sized single-colour line is not',
     c7.length === 1 && c7[0].code === 'flat-gradient'
     && bad(`{}`, `okMd.replace('linear-gradient(135deg, #ff0000, #0000ff);', 'linear-gradient(var(--ink),var(--ink)) center / 100% 1px no-repeat;')`).length === 0, JSON.stringify(c7));
+  // --ab-* names resolve to the Colors tokens: the aesthetic's own canvas (or a panel equal to it) is --canvas.
+  const cf = JSON.parse(L(`JSON.stringify([
+    aibCardFill({ cardFill: '--ab-canvas' }, { canvas: '#112233' }, {}),
+    aibCardFill({ cardFill: '--ab-panel' }, { canvas: '#F4F1E8' }, { '--ab-panel': '#f4f1e8' }),
+    aibCardFill({ cardFill: '--ab-sheet' }, { canvas: '#D9D4C4' }, { '--ab-sheet': '#E9E3D0' })])`));
+  check('brief: a card fill that is the canvas under another name is written --canvas; a real paper keeps its token and value', cf[0] === '--canvas' && cf[1] === '--canvas' && cf[2] === '--ab-sheet (#E9E3D0)', JSON.stringify(cf));
+  // --card-ink / --card-muted: defined where --ink does not read on the card ground, from the aesthetic or the most readable colour.
+  const ci = JSON.parse(L(`JSON.stringify((() => {
+    const mk = (mode, ink, canvas, extras) => ({ mode, t: { ink, canvas, muted: ink, mix: (a, b, k) => a }, extras });
+    const def = { cardFill: '--ab-sheet', cardInk: { ink: { light: '--ab-sheet-ink', dark: '--ab-sheet-ink' }, muted: { light: '#4a463b', dark: '#4a463b' } } };
+    const ex = { '--ab-sheet': '#E9E3D0', '--ab-sheet-ink': '#0d0d0d' };
+    const dark = mk('dark', '#f6f5f9', '#0b0b0c', ex), light = mk('light', '#1b1b1f', '#D9D4C4', ex);
+    return { needs: aibNeedsCardInk(def, [light, dark]), dark: aibCardInkValue(def, dark), light: aibCardInkValue(def, light),
+      plain: aibNeedsCardInk({ cardFill: '--ab-sheet' }, [mk('light', '#1b1b1f', '#D9D4C4', ex)]), fb: aibCardInkValue({ cardFill: '--ab-sheet' }, dark) };
+  })())`));
+  check('brief: card ink is defined when --ink fails on the card ground, from the aesthetic data, else the most readable colour',
+    ci.needs === true && ci.plain === false && ci.dark.ink === '#0d0d0d' && ci.dark.muted === '#4a463b' && ci.fb.ink === '#000000', JSON.stringify(ci));
   check('lint: the confirm text counts the problems and ends with the question',
     /^This brief has 2 problems an agent would have to guess at:\n\n- a\n- b\n\nExport anyway\?$/.test(L(`aibLintMessage([{ message: 'a' }, { message: 'b' }])`)) && L(`aibLintConfirm([])`) === true, 'confirm');
 }

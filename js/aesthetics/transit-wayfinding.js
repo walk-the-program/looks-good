@@ -121,6 +121,7 @@ registerAesthetic({
   type: { ui: 'heading', label: 'heading', display: 0.78 },
   highlight: 'custom',
   highlightNote: 'The destination word stays white on the black sign and gets a route line under it (route 1 colour, 0.09em thick, square ends), never a colour change or a highlighter band; the straight arrow always stands in front of the headline.',
+  cardInk: { ink: { light: '#FFFFFF' }, muted: { light: '#B9BBBE' } },   // light mode: signs stay black with white text (dark mode: --ink)
   cardFill: '--ab-sign',
 
   roles: {

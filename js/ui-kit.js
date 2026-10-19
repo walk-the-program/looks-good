@@ -144,6 +144,11 @@ const UIK_COLOR = (() => {
     h *= 60; if (h < 0) h += 360;
     return { h, s, l };
   };
+  const hslToRgb = (h, s, l) => {
+    l = Math.max(0, Math.min(1, l));
+    const k = n => (n + h / 30) % 12, a = s * Math.min(l, 1 - l), f = n => l - a * Math.max(-1, Math.min(k(n) - 3, 9 - k(n), 1));
+    return [f(0) * 255, f(8) * 255, f(4) * 255].map(Math.round);
+  };
   const lab = c => {
     const f = x => { x /= 255; return x <= 0.04045 ? x / 12.92 : Math.pow((x + 0.055) / 1.055, 2.4); };
     const [r, g, b] = c.map(f);
@@ -152,7 +157,7 @@ const UIK_COLOR = (() => {
     return [116 * Y - 16, 500 * (X - Y), 200 * (Y - Z)];
   };
   const dE = (a, b) => { const p = lab(a), q = lab(b); return Math.hypot(p[0] - q[0], p[1] - q[1], p[2] - q[2]); };
-  return { parse, hex, con, mix, hsl, dE, lum };
+  return { parse, hex, con, mix, hsl, hslToRgb, dE, lum };
 })();
 
 /* Destructive and error colour, from the palette only (no default red).
@@ -161,16 +166,17 @@ const UIK_COLOR = (() => {
    usable when it holds 3:1 on the canvas, shaded toward the ink by at most half if it must.
    Returns { role, color, text, on }:
      role  'primary' | 'secondary' | 'accent' when the palette has a usable reddish colour, else null
-     color the fill / edge colour (that palette colour, or the ink when role is null)
-     text  the same colour shaded toward the ink until it holds 4.5:1 on the canvas (messages, labels)
-     on    canvas, ink or white, whichever holds 4.5:1 on `color` (a filled destructive button's label;
-           `color` is shaded up to 40% when none does, else fill turns false)
+     color the fill / edge colour: the error colour `text` when the destructive button is filled, else the
+           palette colour itself (or the ink when role is null)
+     text  the one error colour (the brief's --error): the palette colour shaded toward the ink until it holds
+           4.5:1 on the canvas; if no label then reaches 4.5:1 on it, its lightness moves (same hue)
+     on    canvas, ink or white, whichever scores highest on `text`; always 4.5:1 when role is set
      fill  true only when that colour is distinct from the primary (not the primary role, Delta E > 10):
            destructive never looks like the main action, so otherwise it is an outline in `text`
    With no reddish colour, destructive is an outline button with an ink label and errors use the ink
    with a strong edge; the label and a confirmation sheet carry the meaning. */
 function uiKitDanger(pal) {
-  const { parse, hex, con, mix, hsl, dE, lum } = UIK_COLOR;
+  const { parse, hex, con, mix, hsl, hslToRgb, dE } = UIK_COLOR;
   const ink = parse(pal && pal.ink) || [17, 17, 17], canvas = parse(pal && pal.canvas) || [255, 255, 255];
   let best = null;
   ['primary', 'secondary', 'accent'].forEach(role => {
@@ -189,23 +195,27 @@ function uiKitDanger(pal) {
   let t = best.c, k = 0;
   while (con(t, canvas) < 4.5 && k < 1) { k = Math.min(1, k + 0.05); t = mix(best.c, ink, k); }
   const pri = parse(pal && pal.primary);
-  let fill = best.role !== 'primary' && !(pri && dE(best.c, pri) <= 10);
-  // the label on a filled button: canvas, ink or white, whichever holds 4.5:1; if none does, the fill
-  // is shaded (darker under a light label, lighter under a dark one) by at most 40%, else outline it
+  const fill = best.role !== 'primary' && !(pri && dE(best.c, pri) <= 10);
+  // `t` is the one error colour (the brief's --error and the filled destructive button). Its label is the
+  // best of canvas, ink or white; if none holds 4.5:1, the lightness moves (same hue) to the nearest value that
+  // holds 4.5:1 both on the canvas and under its label.
   const ons = [canvas, ink, [255, 255, 255]];
-  let fc = best.c, on = ons.reduce((a, b) => (con(b, fc) > con(a, fc) ? b : a));
-  if (con(on, fc) < 4.5) {
-    const light = ons.reduce((a, b) => (lum(b) > lum(a) ? b : a)), dark = ons.reduce((a, b) => (lum(b) < lum(a) ? b : a));
+  const labelOn = c => ons.reduce((a, b) => (con(b, c) > con(a, c) ? b : a));
+  const ok = c => { c = c.map(Math.round); return con(c, canvas) >= 4.5 && con(labelOn(c), c) >= 4.5; };
+  if (!ok(t)) {
+    const { h, s, l } = hsl(t);
     let found = null;
-    for (let j = 0.05; j <= 0.4001 && !found; j += 0.05) {
-      const d = mix(best.c, dark, j), l = mix(best.c, light, j);
-      if (con(light, d) >= 4.5) found = [d, light];
-      else if (con(dark, l) >= 4.5) found = [l, dark];
+    for (let j = 0.01; j <= 1.0001 && !found; j += 0.01) {
+      for (const sign of [1, -1]) {
+        const c = hslToRgb(h, s, l + sign * j);
+        if (ok(c)) { found = c; break; }
+      }
     }
-    if (found) [fc, on] = found;
-    else fill = false;
+    if (found) t = found;
   }
-  return { role: best.role, color: hex(fill ? fc : best.c), text: hex(t), on: hex(on), fill };
+  t = t.map(Math.round);
+  const on = labelOn(t);
+  return { role: best.role, color: hex(fill ? t : best.c), text: hex(t), on: hex(on), fill };
 }
 
 /* A palette colour as a status tone: the colour itself for fills and tints, and `ico`, the same colour

@@ -206,6 +206,8 @@ registerAesthetic({
   type: { ui: 'body', label: 'body', display: 1 },
   highlight: 'custom',
   highlightNote: 'The headline is cut ransom-note tiles (each letter its own face, ground, size and tilt; one tile in five is the fluoro; one tile is the accent) and the last word is circled by hand in marker. In running UI text the highlight word is plain ink with a fluoro highlighter swipe behind it.',
+  cardInk: { ink: { light: '--ab-sheet-ink', dark: '--ab-sheet-ink' }, muted: { light: '--ab-sheet-mute', dark: '--ab-sheet-mute' } },   // the paper sheet's own ink, in both modes
+  ctaEdge: (t, ex) => `2px solid #111111 plus a hard 4px 4px offset shadow (${t.isDark ? '#EDE6D3' : '#111111'}), no blur`,   // the fluoro tile is near-invisible on the wall without it
   cardFill: '--ab-sheet',
 
   roles: {

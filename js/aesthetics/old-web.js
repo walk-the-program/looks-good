@@ -89,6 +89,7 @@ registerAesthetic({
   highlight: 'custom',
   highlightNote: 'The whole headline is WordArt: a three-band gradient face (light primary, primary, deep primary) with a stacked 1px extrusion in a dark primary; the last word swaps to the accent bands. Built from clipped solid copies, never background-clip:text.',
   ctaFill: 'ink',
+  cardInk: { ink: { light: '#000000', dark: '#000000' }, muted: { light: '#3A3A3A', dark: '#3A3A3A' } },   // window text is black on silver in both modes
   cardFill: '--ow-silver',
 
   roles: {

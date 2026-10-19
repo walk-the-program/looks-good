@@ -106,6 +106,7 @@ registerAesthetic({
   layout: { hero: 'split', palette: 'strips', sections: 'two-col', subcopy: true },
   type: { ui: 'body', label: 'mono', display: 1 },
   highlight: 'custom',
+  ctaEdge: (t, ex) => `2px solid ${ex['--ab-clash'] || t.ink}`,   // the acid block is edged in the clash colour
   highlightNote: 'The last headline line is an outline only (no fill, a 2px stroke in the clash colour on black, ink on the acid field in light mode) with two offset echoes in the acid and the clash; the lines above are stretched on a wave and compressed. In running UI text the highlight word is plain ink.',
 
   roles: {

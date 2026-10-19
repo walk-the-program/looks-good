@@ -24,6 +24,7 @@ registerAesthetic({
   type: { ui: 'body', label: 'body', display: 0.86 },
   highlight: 'custom',
   highlightNote: 'The headline is furniture: each line sits on a paper laminate slab with a Bacterio squiggle edge, and the last word on a solid secondary slab with ink text and a primary-tint offset sheet; never coloured text, never a pill.',
+  cardInk: { ink: { dark: '--ab-m-black' }, muted: { dark: '--ab-m-soft' } },   // dark mode: cabinets stay paper, so they take the board's black / soft (light mode: --ink)
   cardFill: '--ab-m-paper',
 
   roles: {

@@ -107,7 +107,10 @@ function aibCardFill(def, t, extras) {
   const raw = def.cardFill;
   if (!raw) return '--canvas';
   const name = String(raw);
-  if (extras && extras[name] != null && AIB_HEX.test(String(extras[name]).trim())) return name + ' (' + String(extras[name]).trim() + ')';
+  // the aesthetic's own name for the canvas (--ab-canvas, or a panel token that equals it) is the --canvas token here
+  const own = extras && extras[name] != null ? String(extras[name]).trim() : '';
+  if (name === '--ab-canvas' || (own && t.canvas && own.toLowerCase() === String(t.canvas).toLowerCase())) return '--canvas';
+  if (AIB_HEX.test(own)) return name + ' (' + own + ')';
   return t[name] != null ? '--' + abKebab(name) : name;
 }
 
@@ -144,13 +147,15 @@ function aibComponentRows(t, def, extras) {
 
   const inkBorder = AIB_INK_BORDER.includes(key);
   const cardBg = aibCardFill(def, t, extras);
+  // The edge the aesthetic draws on the main action when it is not an --ink border (def.ctaEdge: a string, or function(t, extras)).
+  const ctaEdge = typeof def.ctaEdge === 'function' ? def.ctaEdge(t, extras || {}) : def.ctaEdge;
 
   return [
     ['Page', '--canvas', '--ink', 'none'],
     ['Card / panel', cardBg, '--ink', inkBorder ? '--ink' : '--line'],
     inkCta
       ? ['Main button (one per view, ink-filled)', '--ink', '--canvas', 'none']
-      : ['Primary button (one per view)', PRI, ONP, inkBorder ? '--ink' : 'none'],
+      : ['Primary button (one per view)', PRI, ONP, inkBorder ? '--ink' : ctaEdge || 'none'],
     ['Secondary button', 'transparent (hover: --sec-tint)', '--ink', '--secondary'],
     ['Ghost / tertiary link', 'none', '--ink (underlined)', 'none'],
     ['Input field, rest', '--canvas', '--ink (placeholder: --muted)', inkBorder ? '--ink' : '--line'],
@@ -420,6 +425,39 @@ function aibCardColor(def, m) {
   if (!raw) return null;
   const v = m.extras[String(raw)] != null ? String(m.extras[String(raw)]).trim() : String(raw);
   return AIB_HEX.test(v) && v.toLowerCase() !== m.t.canvas.toLowerCase() ? v : null;
+}
+
+// Text on the card ground. Where the card is a fixed paper (or a black sign) that --ink does not read on in some
+// mode, the aesthetic names the ink the kit really draws on it (def.cardInk = { ink, muted }, each { light, dark }:
+// an extras key, a hex or function(m)); without that, the most readable of ink, canvas, black and white.
+// Returns { ink, muted } hexes for mode m, or null when --ink already reads on the card in every mode.
+function aibCardInkValue(def, m) {
+  const card = aibCardColor(def, m);
+  if (!card) return null;
+  const t = m.t;
+  const spec = def.cardInk || {};
+  const pick = field => {
+    const sp = spec[field];
+    if (!sp) return '';
+    const one = { light: sp[m.mode], dark: sp[m.mode] };
+    return aibInkValue(one, m);
+  };
+  let ink = pick('ink'), muted = pick('muted');
+  if (!ink && contrastRatio(t.ink, card) >= 4.5) ink = t.ink;
+  if (!muted && ink === t.ink && contrastRatio(t.muted, card) >= 4.5) muted = t.muted;
+  if (!ink) {
+    ink = [t.ink, t.canvas, '#000000', '#ffffff'].reduce((a, b) => (contrastRatio(b, card) > contrastRatio(a, card) ? b : a));
+  }
+  if (!muted) {
+    let k = 0.3;
+    muted = t.mix(ink, card, k);
+    while (k < 1 && contrastRatio(muted, card) < 4.5) { k += 0.05; muted = t.mix(ink, card, Math.min(1, k)); }
+  }
+  return { ink, muted };
+}
+// True when --ink does not read (4.5:1) on the card ground in some mode, so the brief defines --card-ink / --card-muted.
+function aibNeedsCardInk(def, modes) {
+  return modes.some(m => { const c = aibCardColor(def, m); return c && contrastRatio(m.t.ink, c) < 4.5; });
 }
 
 const aibNum = v => {
@@ -1844,8 +1882,8 @@ function aibKitCardTokens(ctx, R, valueIn) {
     const tn = title ? namer(title.color) : '--ink', bn = body ? namer(body.color) : '--muted';
     const get = nm => m => valueIn(nm, m) || (aibRgba(nm) ? nm : valueIn('--ink', m));
     if (plain && !ctx.rows.some(r => r.token === '--card')) ctx.rows.push({ token: '--card', get: get(plain), job: `Card, list and sheet ground as the UI kit draws it (${plain}).`, on: [] });
-    if (/^--[a-z0-9-]+$|^#[0-9a-f]{6}$/i.test(tn)) ctx.rows.push({ token: '--card-ink', get: get(tn), job: `Titles and text on a card${plain ? ` (\`${plain}\` ground)` : ''}; the kit draws it as \`${tn}\`.`, on: [] });
-    if (/^--[a-z0-9-]+$|^#[0-9a-f]{6}$/i.test(bn)) ctx.rows.push({ token: '--card-muted', get: get(bn), job: `Secondary text on a card; the kit draws it as \`${bn}\`.`, on: [] });
+    if (!ctx.rows.some(r => r.token === '--card-ink') && /^--[a-z0-9-]+$|^#[0-9a-f]{6}$/i.test(tn)) ctx.rows.push({ token: '--card-ink', get: get(tn), job: `Titles and text on a card${plain ? ` (\`${plain}\` ground)` : ''}; the kit draws it as \`${tn}\`.`, on: [] });
+    if (!ctx.rows.some(r => r.token === '--card-muted') && /^--[a-z0-9-]+$|^#[0-9a-f]{6}$/i.test(bn)) ctx.rows.push({ token: '--card-muted', get: get(bn), job: `Secondary text on a card; the kit draws it as \`${bn}\`.`, on: [] });
   }
 }
 
@@ -2021,7 +2059,16 @@ function aibPaletteRows(ctx) {
   add('--pri-tint', m => m.t.priTint, 'Quiet primary wash: selected background, hover on primary-linked items.', [['--ink', m => m.t.ink]]);
   add('--sec-tint', m => m.t.secTint, 'Quiet secondary wash: selected row, tonal fills, hover on secondary items.', [['--ink', m => m.t.ink]]);
   add('--error', m => aibError(m.t), aibErrorJob(modes[0].t), [['--on-error', m => aibDanger(m.t).on]]);
-  if (modes.some(m => aibCardColor(def, m))) add('--card', m => aibCardColor(def, m) || m.t.canvas, 'Card and panel fill (paper); everything else sits on the canvas.', [['--ink', m => m.t.ink]]);
+  if (modes.some(m => aibCardColor(def, m))) {
+    const cardInk = aibNeedsCardInk(def, modes);
+    const ci = (m, f) => { const v = aibCardInkValue(def, m); return v ? v[f] : f === 'ink' ? m.t.ink : m.t.muted; };
+    add('--card', m => aibCardColor(def, m) || m.t.canvas, 'Card and panel fill (paper); everything else sits on the canvas.',
+      cardInk ? [['--card-ink', m => ci(m, 'ink')], ['--card-muted', m => ci(m, 'muted')]] : [['--ink', m => m.t.ink]]);
+    if (cardInk) {
+      add('--card-ink', m => ci(m, 'ink'), 'Titles and body text on a card, list or sheet (the card ground is not the canvas, so --ink does not read on it in every mode). Text on the canvas stays --ink.', []);
+      add('--card-muted', m => ci(m, 'muted'), 'Secondary text on a card, list or sheet (4.5:1 on --card).', []);
+    }
+  }
   const elevJob = {
     '--shadow': 'The hard offset shadow under every outlined surface.',
     '--shadow-lo': 'Dark half of the raised and recessed shadow pair (down-right on raised).',
@@ -2320,9 +2367,17 @@ function aibHighlightRule(ctx) {
   return '- Headline highlight word, once per view: set in `--accent-ink`. Never plain `--accent` as text.';
 }
 
+// Text drawn on the card ground names --card-ink / --card-muted when the brief defines them (the card's ground
+// differs from the canvas so much that --ink / --muted would not read on it).
+function aibOnCard(ctx, text) {
+  if (!ctx.rows || !ctx.rows.some(x => x.token === '--card-ink')) return text;
+  return String(text).replace(/--ink(?![\w-])/g, '--card-ink').replace(/--muted(?![\w-])/g, '--card-muted');
+}
+
 function aibSecComponents(ctx) {
   const { def, cur } = ctx;
-  const all = aibComponentRows(cur.t, def, cur.extras).map(r => r.map(c => ctx.tok(String(c).replace(/--[a-z-]+ \(#[0-9a-f]{6}\)/i, ctx.rows.some(x => x.token === '--card') ? '--card' : '--canvas'))));
+  const all = aibComponentRows(cur.t, def, cur.extras).map(r => r.map(c => ctx.tok(String(c).replace(/--[a-z-]+ \(#[0-9a-f]{6}\)/i, ctx.rows.some(x => x.token === '--card') ? '--card' : '--canvas'))))
+    .map(r => (/^(Card|List row)/.test(r[0]) && /^--card(?![\w-])/.test(r[1].replace(/`/g, '')) ? [r[0], r[1], aibOnCard(ctx, r[2]), r[3]] : r));
   const by = p => all.find(r => r[0].indexOf(p) === 0);
   const rest = by('Input field, rest'), foc = by('Input field, focus'), tag = by('Tag'), badge = by('Badge');
   const rows = [by('Card'), by('Primary button') || by('Main button'), by('Secondary button'),
@@ -2388,10 +2443,10 @@ function aibKitRowData(ctx) {
     'toggle': [`on: ${tog[1]}; off: ${by('Toggle, off')[1]}`, '--ink (label beside it)', 'no edge; pill', `51x31pt, ${tap}pt hit area`],
     'segmented': [`selected: ${segOn[1]}; unselected: transparent`, `selected ${segOn[2]}; unselected --muted`, edge(`selected ${segOn[3]}`, corner(r.control)), `${hl(tap)}, equal-width segments`],
     'slider': [`track --line; filled part ${'--primary'}`, 'n/a', edge('thumb --primary', 'pill track'), `4pt track, 28pt thumb, ${tap}pt hit area`],
-    'card': [card[1], card[2], edge(card[3] === 'none' ? 'none' : '1px ' + card[3], corner(r.card)), `padding ${P.cardPadding || 20}pt`],
-    'list': [`${card[1]}; selected: ${listSel[1]}`, '--ink (meta and chevron: --muted)', edge(`bottom 1px --line between rows; selected: ${listSel[3]}`, 'rows share the list\'s ' + corner(r.card)), `${hl(P.rowHeight || 52)}, full width`],
+    'card': [card[1], /^--card(?![\w-])/.test(card[1]) ? aibOnCard(ctx, card[2]) : card[2], edge(card[3] === 'none' ? 'none' : '1px ' + card[3], corner(r.card)), `padding ${P.cardPadding || 20}pt`],
+    'list': [`${card[1]}; selected: ${listSel[1]}`, /^--card(?![\w-])/.test(card[1]) ? aibOnCard(ctx, '--ink (meta and chevron: --muted)') : '--ink (meta and chevron: --muted)', edge(`bottom 1px --line between rows; selected: ${listSel[3]}`, 'rows share the list\'s ' + corner(r.card)), `${hl(P.rowHeight || 52)}, full width`],
     'callout': [`info --primary at 12% over --canvas; success --secondary at 12%; warning --accent at 12%; ${aibDanger(cur.t).role ? 'error --error at 12% over --canvas' : 'error --canvas'}`, '--ink (message), with an icon and a label word so status is never colour alone; icon in the tone, shaded to 3:1', edge(`1px of the tone at 40% (error: ${aibDanger(cur.t).role ? '1px --error' : '2px --ink'})`, corner(r.card)), 'padding 16pt, full width; palette colours only, no stock green, amber or red'],
-    'sheet': [card[1], card[2], edge(card[3] === 'none' ? 'none' : '1px ' + card[3], `${corner(r.card)} on the top corners`), `padding ${P.cardPadding || 20}pt; grabber 36x5pt in --line; scrim --ink at 40%`],
+    'sheet': [card[1], /^--card(?![\w-])/.test(card[1]) ? aibOnCard(ctx, card[2]) : card[2], edge(card[3] === 'none' ? 'none' : '1px ' + card[3], `${corner(r.card)} on the top corners`), `padding ${P.cardPadding || 20}pt; grabber 36x5pt in --line; scrim --ink at 40%`],
     'divider': ['--line', 'section label: --muted (Caption)', 'n/a', `1px; ${P.sectionGap || 28}pt above a section label`],
     'topbar': ['--canvas', '--ink (title, icons)', 'bottom 1px --line once content scrolls under it', `${tap}pt bar under the status area; one Large title below it`],
     'tabbar': ['--canvas', 'selected --ink with a small --primary pill under the label; unselected --muted', 'top 1px --line', `${P.tabBarHeight || 83}pt including the home indicator`],
