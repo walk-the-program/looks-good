@@ -314,20 +314,20 @@
       ['zigzag', 'Switchbacks', 'brand', { style: 'chevron', colors: 'two', band: 6, amp: 8, period: 12, phase: 'parallel', vertical: true }],
     ],
     'wpa-screenprint': [
-      ['cutup', 'Ridgelines', 'brand', { pieces: 5, cell: 1.5, hills: 1.2, slip: 0.3 }],
-      ['arcrise', 'Sun and bands', 'brand', { origin: 'bottom', bands: 6, suns: 1, bars: false }],
-      ['sonar', 'Lake map', 'brand', { land: 0.4, size: 1, speckle: 0, contours: true }],
-      ['zigzag', 'Trail bands', 'brand', { style: 'chevron', colors: 'three', band: 7, amp: 6, period: 11, phase: 'parallel' }],
-      ['weave', 'Lake lines', 'brand', { bands: 9, rhythm: 'even', gap: 0.15, stripe: 0.7 }],
-      ['stipple', 'Pine grain', 'brand', { density: 0.9, dot: 0.9, field: 'clouds', duo: true }, 0.8],
+      ['cutup', 'Ridgelines', 'wpa-ink', { pieces: 5, cell: 1.5, hills: 1.2, slip: 0.3 }],
+      ['weave', 'Poster bands', 'wpa-ink', { bands: 5, rhythm: 'even', gap: 0.35, stripe: 1 }, 0.9],
+      ['sonar', 'Lake map', 'wpa-ink', { land: 0.4, size: 1, speckle: 0, contours: true }],
+      ['zigzag', 'Trail bands', 'wpa-ink', { style: 'chevron', colors: 'two', band: 12, amp: 8, period: 16, phase: 'parallel' }],
+      ['terrain', 'Hill relief', 'wpa-ink', { levels: 4, pix: 0.6, dither: 0, style: 'hills' }, 0.9],
+      ['stipple', 'Pine grain', 'wpa-ink', { density: 0.7, dot: 1.1, field: 'clouds', duo: true }, 0.8],
     ],
     'data-pebble': [
-      ['pebbles', 'Pebble field', 'brand', { size: 1.3, gap: 0.6, erode: 0.3, mode: 'halftone', lit: 0.6 }, 0.7],
-      ['colony', 'Cell colony', 'brand', { cells: 20, rings: 3, fuse: 1.1, finish: 'film', nuclei: false }, 0.7],
-      ['aura', 'Soft lumps', 'brand', { layout: 'scatter', blobs: 5, strength: 0.85, soft: 0.8, grain: 0.14 }, 0.7],
-      ['thermal', 'Heat tiles', 'brand', { bands: 4, cell: 1.6, turb: 0.6, shape: 'round', flat: true }, 0.7],
-      ['sonar', 'Contour map', 'brand', { land: 0.45, size: 1, speckle: 0.4, contours: true }, 0.7],
-      ['flow', 'Soft contours', 'brand', { field: 'waves', strands: 5, gap: 2, bend: 0.8, weight: 0.8 }, 0.7],
+      ['pebbles', 'Pebble field', 'pebble-ink', { size: 1.3, gap: 0.6, erode: 0.3, mode: 'halftone', lit: 0.6 }, 0.8],
+      ['aura', 'Soft lumps', 'pebble-ink', { layout: 'scatter', blobs: 5, strength: 0.85, soft: 0.8, grain: 0.14 }, 0.8],
+      ['stipple', 'Fine dots', 'pebble-ink', { density: 0.6, dot: 1, field: 'clouds', duo: false }, 0.8],
+      ['thermal', 'Heat tiles', 'pebble-ink', { bands: 4, cell: 1.6, turb: 0.6, shape: 'round', flat: true }, 0.8],
+      ['sonar', 'Contour map', 'pebble-ink', { land: 0.45, size: 1, speckle: 0.4, contours: true }, 0.8],
+      ['flow', 'Soft contours', 'pebble-ink', { field: 'waves', strands: 5, gap: 2, bend: 0.8, weight: 0.8 }, 0.8],
     ],
     'old-web': [
       ['oprings', 'Hypno GIF', 'brand', { mode: 'rings', centres: 2, freq: 14, warp: 0.2, bands: 'three' }],
@@ -362,6 +362,33 @@
   P.LOAD_ORDER = ['js/patterns/engine.js'].concat(Object.keys(FAMILY_FILES).map(f => 'js/patterns/families/' + f), ['js/patterns/fit.js']);
   P.FAMILY_FILES = FILE_OF;                       // { familyKey: 'js/patterns/families/<file>.js' }
   P.fileOf = key => FILE_OF[key] || null;
+
+  /* Print colourways (round 10): WPA Screenprint and Data Pebble print their patterns in their own
+     inks, not the raw brand hex. Both are fixed colourways (so the contrast floor and the brief treat
+     them like the other fixed ones); the inks come from the style files (window.wpaPrintInks,
+     window.dpPrintInks) and the ground is the board's canvas. */
+  const E = P.E;
+  E.COLORWAYS.push(
+    { value: 'wpa-ink', label: 'Screenprint', fixed: true, note: 'WPA Screenprint: the brand colours muted into flat spot inks (saturation capped at 40%) with forest ink (cream on the night ground), on the paper canvas; never the raw brand hex' },
+    { value: 'pebble-ink', label: 'Pebble', fixed: true, note: 'Data Pebble: the deep pebble tone (the printed primary) with a soft and a paler pebble on the tinted ground; never the raw brand hex' },
+  );
+  const baseInks = P.inksFor;
+  P.inksFor = function (src, colorway, opts) {
+    if (colorway !== 'wpa-ink' && colorway !== 'pebble-ink') return baseInks.call(P, src, colorway, opts);
+    const b = baseInks.call(P, src, 'brand', opts);           // ground, raw primary / secondary / accent, neutral ink
+    const dark = b.dark;
+    let p = null;
+    if (colorway === 'wpa-ink' && typeof global.wpaPrintInks === 'function') p = global.wpaPrintInks(b.ink1, b.ink2, b.spark, dark);
+    if (colorway === 'pebble-ink' && typeof global.dpPrintInks === 'function') p = global.dpPrintInks(b.ink1, dark, b.ground);
+    if (!p) return b;
+    const mixTo = (c, g, k) => (typeof global.slMix === 'function' ? global.slMix(c, g, k) : c);
+    const out = Object.assign({}, b, p, { colorway, fixed: true });
+    out.t1 = mixTo(out.ink1, out.ground, 0.38); out.t2 = mixTo(out.ink2, out.ground, 0.38); out.mute = mixTo(out.deep, out.ground, 0.4);
+    out.pool = b.tints ? [out.ink1, out.ink2, out.t1, out.t2] : [out.ink1, out.ink2];
+    const lumOf = h => { const c = [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16) / 255).map(x => (x <= 0.03928 ? x / 12.92 : Math.pow((x + 0.055) / 1.055, 2.4))); return 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2]; };
+    out.ramp = [out.ground, out.ink2, out.ink1, out.deep].concat(b.tints ? [out.t1, out.t2] : []).filter((c, i, a) => a.indexOf(c) === i).sort((x, y) => lumOf(y) - lumOf(x));
+    return out;
+  };
 
   P.fit = FIT;
   P.suiteKeys = () => Object.keys(FIT);

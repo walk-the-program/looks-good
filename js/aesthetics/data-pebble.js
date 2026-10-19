@@ -15,6 +15,28 @@
 /* ---------- pebble geometry (shared by the board art, the deck and the list) ---------- */
 
 // Small seeded PRNG so every pebble differs but is the same on every render.
+// The deep pebble tone for a brand primary on a ground (also used by the pattern inks below).
+function dpDeep(primary, dark, canvas) {
+  const h = hexToHsl(primary);
+  const s = Math.max(24, Math.min(58, h.s * 0.85));
+  if (dark) {
+    let l = 72, hex = hslToHex(h.h, s, l);
+    while (contrastRatio(hex, canvas) < 7 && l < 90) { l += 1; hex = hslToHex(h.h, s, l); }
+    return hex;
+  }
+  let l = Math.min(h.l, 28), hex = hslToHex(h.h, s, l);
+  while (contrastRatio(hex, '#ffffff') < 7 && l > 8) { l -= 1; hex = hslToHex(h.h, s, l); }
+  return hex;
+}
+// Pebble tones for the pattern engine (js/patterns/fit.js, colourway 'pebble-ink'): a soft pebble and
+// a paler one on the tinted ground, the deep pebble as the single dark mark. Never the raw brand hex.
+if (typeof window !== 'undefined') {
+  window.dpPrintInks = function (primary, dark, ground) {
+    const deep = dpDeep(primary, dark, ground);
+    return { ink1: slMix(deep, ground, 0.55), ink2: slMix(deep, ground, 0.26), spark: deep, deep };
+  };
+}
+
 function dpRand(seed) {
   let a = (seed * 2654435761 + 1013904223) >>> 0;
   return () => {
@@ -122,18 +144,7 @@ registerAesthetic({
   // The primary is printed as the deep pebble tone. Light: the brand hue pulled to lightness <= 28
   // and pushed darker until white text holds 7:1. Dark: a lighter tint (lightness >= 72) that
   // holds 7:1 on the ground, so dark text sits on it at 4.5:1 or more and pebbles read at 3:1.
-  printPrimary(t) {
-    const h = hexToHsl(t.primary);
-    const s = Math.max(24, Math.min(58, h.s * 0.85));
-    if (t.isDark) {
-      let l = 72, hex = hslToHex(h.h, s, l);
-      while (t.contrast(hex, t.canvas) < 7 && l < 90) { l += 1; hex = hslToHex(h.h, s, l); }
-      return hex;
-    }
-    let l = Math.min(h.l, 28), hex = hslToHex(h.h, s, l);
-    while (t.contrast(hex, '#ffffff') < 7 && l > 8) { l -= 1; hex = hslToHex(h.h, s, l); }
-    return hex;
-  },
+  printPrimary(t) { return dpDeep(t.primary, t.isDark, t.canvas); },
 
   tokens(t, view) {
     const d = t.isDark;

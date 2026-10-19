@@ -89,6 +89,15 @@ function wpInks(t) {
   return { a, f, on: f.map(wpOn), pp: wpPrimary(t.primary, d), d };
 }
 
+// The muted spot inks for the pattern engine (js/patterns/fit.js, colourway 'wpa-ink'): the same
+// art inks the board prints, never the raw brand hex. deep = the forest (cream on the night ground).
+if (typeof window !== 'undefined') {
+  window.wpaPrintInks = function (primary, secondary, accent, dark) {
+    const a = [primary, secondary, accent].map(wpMute);
+    return { ink1: a[0], ink2: a[1], spark: a[2], deep: dark ? CREAM : FOREST };
+  };
+}
+
 const f1 = n => String(Math.round(n * 10) / 10);
 
 // Closed ridge band: the top contour plus the same contour `drop` lower, reversed.
