@@ -145,7 +145,9 @@
   width: 38px; height: 38px; display: grid; place-items: center; border-radius: var(--dp-blob-a); font-size: 16px;
   background: color-mix(in srgb, var(--ab-on-primary) 16%, transparent);
 }
-.ab[data-ae="data-pebble"] .ab-states[data-kind="button"] .ab-state-ctl { min-height: 42px; padding: 0 12px; font-size: 13px; }
+/* small buttons (the three board state samples, ~100px wide) drop the arrow disc and centre the label */
+.ab[data-ae="data-pebble"] .ab-states[data-kind="button"] .ab-state-ctl { min-height: 42px; padding: 0 16px; font-size: 13px; justify-content: center; text-align: center; }
+.ab[data-ae="data-pebble"] .ab-states[data-kind="button"] .ab-state-ctl .ab-cta-arrow { display: none; }
 .ab[data-ae="data-pebble"] .ab-state-name { color: var(--ab-muted); }
 
 /* ---- field, toggle ---- */
