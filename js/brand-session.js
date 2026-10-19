@@ -103,7 +103,7 @@ const BrandSession = (function () {
     $('brandBarName').textContent = currentName();
     const status = $('saveStatus');
     status.classList.toggle('is-dirty', dirty);
-    status.innerHTML = dirty ? '<i class="save-dot" aria-hidden="true"></i>Unsaved changes' : 'Saved';
+    status.innerHTML = dirty ? '<i class="save-dot" aria-hidden="true"></i>Unsaved changes' : '&#10003; Saved';
     $('saveBrand').disabled = !dirty;
     $('revertBrand').disabled = !dirty;
     $('draftNote').hidden = !(dirty && restoredDraft);

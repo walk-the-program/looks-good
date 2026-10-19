@@ -55,6 +55,9 @@
   --z-palette: 2000;
   --z-share: 2147483600;
 
+  --tonal: #ebe9e4;
+  --tonal-hover: #e3e1dc;
+
   --ease: cubic-bezier(0.16, 1, 0.3, 1);
   --dur: 200ms;
 
@@ -554,6 +557,15 @@ output {
 }
 .btn-primary:hover { background: #333333; border-color: #333333; }
 .btn-primary:disabled { background: var(--ink); border-color: var(--ink); }
+
+.btn-tonal {
+  background: var(--tonal);
+  border-color: transparent;
+  color: var(--ink);
+  font-weight: 500;
+}
+.btn-tonal:hover { background: var(--tonal-hover); }
+.btn-tonal kbd { background: rgba(255, 255, 255, 0.6); border-color: rgba(0, 0, 0, 0.08); color: var(--ink-2); }
 
 .btn-ghost {
   background: transparent;
