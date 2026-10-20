@@ -23,7 +23,7 @@ final class WebSchemeHandler: NSObject, WKURLSchemeHandler {
         "js": "text/javascript; charset=utf-8", "json": "application/json",
         "svg": "image/svg+xml", "png": "image/png", "jpg": "image/jpeg", "jpeg": "image/jpeg",
         "gif": "image/gif", "webp": "image/webp", "ico": "image/x-icon",
-        "woff": "font/woff", "woff2": "font/woff2", "txt": "text/plain; charset=utf-8",
+        "woff": "font/woff", "woff2": "font/woff2", "wasm": "application/wasm", "txt": "text/plain; charset=utf-8",
     ]
 
     func webView(_ webView: WKWebView, start task: WKURLSchemeTask) {

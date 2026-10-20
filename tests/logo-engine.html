@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Logo engine test</title>
+<style>
+  body { font: 14px/1.5 -apple-system, system-ui, sans-serif; margin: 24px; color: #1c1f26; }
+  .row { padding: 2px 0; } .pass { color: #0a7a2f; } .fail { color: #b00020; font-weight: 600; }
+  pre { background: #f4f4f6; padding: 8px; overflow: auto; }
+</style>
+</head>
+<body>
+<h1>Logo engine vs the Nominal Studios reference</h1>
+<div id="out"></div>
+<script src="../js/logo-engine.js"></script>
+<script>
+(function () {
+  'use strict';
+  const REF = '../docs/mockups/nominal-logo/';
+  const results = [];
+  window.__logoTestResults = results;
+  window.__logoTestDone = false;
+  const out = document.getElementById('out');
+
+  function record(name, pass, detail) {
+    results.push({ name: name, pass: !!pass, detail: detail });
+    const div = document.createElement('div');
+    div.className = 'row ' + (pass ? 'pass' : 'fail');
+    div.textContent = (pass ? 'PASS' : 'FAIL') + '  ' + name + (detail ? '  -  ' + detail : '');
+    out.appendChild(div);
+  }
+
+  const NOMINAL = {
+    word: 'NOMINAL', wordFont: { family: 'Instrument Serif', weight: 400, style: 'normal' },
+    tracking: -62, case: 'none',
+    device: { type: 'strip', crop: 610, height: 170 },
+    secondary: { text: 'STUDIOS', font: { family: 'Inter', weight: 500, style: 'normal', axes: { opsz: 14 } },
+                 size: 118, gap: 90, spread: true, align: 'left', tracking: 0 }
+  };
+  const INK = '#1C1F26', WHITE = '#FFFFFF';
+
+  function viewBox(svg) { return /viewBox="([^"]+)"/.exec(svg)[1].trim().split(/\s+/).map(Number); }
+  function maxDiff(a, b) { return a.reduce(function (m, v, i) { return Math.max(m, Math.abs(v - b[i])); }, 0); }
+
+  function raster(svg, wpx) {
+    const p = viewBox(svg), H = Math.round(wpx * p[3] / p[2]);
+    return new Promise(function (resolve, reject) {
+      const img = new Image();
+      img.onload = function () {
+        const c = document.createElement('canvas'); c.width = wpx; c.height = H;
+        const x = c.getContext('2d'); x.drawImage(img, 0, 0, wpx, H);
+        resolve(x.getImageData(0, 0, wpx, H));
+      };
+      img.onerror = function () { reject(new Error('could not draw SVG')); };
+      img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
+    });
+  }
+  // A pixel differs when any channel (RGBA) is off by more than 64.
+  function pixelDiff(a, b) {
+    if (a.width !== b.width || a.height !== b.height) return { frac: 1, n: -1, size: [a.width, a.height, b.width, b.height] };
+    let n = 0;
+    for (let i = 0; i < a.data.length; i += 4) {
+      if (Math.abs(a.data[i] - b.data[i]) > 64 || Math.abs(a.data[i + 1] - b.data[i + 1]) > 64 ||
+          Math.abs(a.data[i + 2] - b.data[i + 2]) > 64 || Math.abs(a.data[i + 3] - b.data[i + 3]) > 64) n++;
+    }
+    return { frac: n / (a.width * a.height), n: n };
+  }
+
+  async function fetchText(name) {
+    const r = await fetch(REF + name);
+    if (!r.ok) throw new Error(name + ' ' + r.status);
+    return r.text();
+  }
+
+  async function run() {
+    await LogoEngine.ready();
+    const faces = await LogoEngine.load(NOMINAL);
+    const mono = LogoEngine.monogram(NOMINAL, faces);
+    const lock = LogoEngine.lockup(NOMINAL, faces);
+    const word = LogoEngine.lockup(Object.assign({}, NOMINAL, { secondary: null }), faces);
+    const engine = {
+      lockup: LogoEngine.toSVG(lock, { fill: INK }),
+      wordmark: LogoEngine.toSVG(word, { fill: INK }),
+      monogram: LogoEngine.toSVG(mono, { fill: INK, bg: WHITE })
+    };
+    const ref = {
+      lockup: await fetchText('nominal-studios-logo.svg'),
+      wordmark: await fetchText('nominal-wordmark.svg'),
+      monogram: await fetchText('nominal-monogram.svg')
+    };
+
+    // (a) viewBox numbers
+    Object.keys(engine).forEach(function (k) {
+      const a = viewBox(engine[k]), b = viewBox(ref[k]), d = maxDiff(a, b);
+      record('(a) viewBox ' + k, d <= 0.5, 'engine [' + a.join(', ') + '] ref [' + b.join(', ') + '] max diff ' + d.toFixed(3));
+    });
+
+    // (b) word width
+    record('(b) word width 2982 +/- 0.5', Math.abs(lock.wordWidth - 2982) <= 0.5 && Math.abs(word.wordWidth - 2982) <= 0.5,
+      'lockup ' + lock.wordWidth.toFixed(3) + ', wordmark ' + word.wordWidth.toFixed(3) +
+      '; lockup bounds [' + lock.bounds.map(function (v) { return v.toFixed(1); }).join(', ') + ']');
+
+    // (c) pixel diff at 1200px
+    for (const k of Object.keys(engine)) {
+      const r = await pixelDiff(await raster(engine[k], 1200), await raster(ref[k], 1200));
+      record('(c) pixel diff ' + k + ' < 0.3%', r.frac <= 0.003,
+        r.n < 0 ? 'size mismatch ' + r.size.join(',') : r.n + ' px differ (' + (r.frac * 100).toFixed(4) + '%)');
+    }
+
+    // (d) PNG
+    try {
+      const blob = await LogoEngine.toPNG(engine.lockup, 800);
+      const bmp = await createImageBitmap(blob);
+      const head = new Uint8Array(await blob.slice(0, 8).arrayBuffer());
+      const sig = [137, 80, 78, 71, 13, 10, 26, 10].every(function (v, i) { return head[i] === v; });
+      record('(d) toPNG blob', blob.type === 'image/png' && sig && bmp.width === 800,
+        blob.type + ', ' + blob.size + ' bytes, ' + bmp.width + 'x' + bmp.height + ', signature ' + sig);
+    } catch (e) { record('(d) toPNG blob', false, String(e)); }
+
+    // errors
+    try { await LogoEngine.face('No Such Family'); record('error: missing family throws', false, 'did not throw'); }
+    catch (e) { record('error: missing family throws', /not in the logo font list/.test(e.message), e.message); }
+    try { LogoEngine.shape(faces.word, '中'); record('error: glyph-less text throws', false, 'did not throw'); }
+    catch (e) { record('error: glyph-less text throws', /no glyph/.test(e.message), e.message); }
+
+    // show the result
+    const pre = document.createElement('div');
+    pre.innerHTML = Object.keys(engine).map(function (k) { return '<img style="max-width:90%;margin:8px;border:1px solid #ddd" src="data:image/svg+xml;charset=utf-8,' + encodeURIComponent(engine[k]) + '">'; }).join('');
+    out.appendChild(pre);
+  }
+
+  run().catch(function (e) { record('run', false, e && e.stack || String(e)); })
+    .then(function () { window.__logoTestDone = true; });
+})();
+</script>
+</body>
+</html>
