@@ -47,6 +47,10 @@
   /* C: STUDIOS small, left, like a label */
   .logo.label .studios { justify-content: flex-start; gap: .55em; font-size: .09em; margin-top: .7em; letter-spacing: .02em; }
   .logo.label .studios i { font-style: normal; color: var(--muted); margin-left: auto; letter-spacing: .12em; }
+  /* A, set: Studios keeps its own tracking instead of spanning the word */
+  .logo.set .studios { display: block; font-size: .13em; letter-spacing: .22em; margin-top: .55em; }
+  .logo.set.center .studios { text-align: center; margin-right: -.22em; }
+  .logo.set.right .studios { text-align: right; margin-right: -.22em; }
   .logo.inverse { --ink-c: var(--canvas); --on-ink: var(--ink); }
   .logo.inverse.label .studios i { color: #9A9DA4; }
 
@@ -98,6 +102,37 @@
         <div class="word"><span class="nom">NOMINAL</span></div>
         <div class="strip"></div>
         <div class="studios"><span>S</span><span>T</span><span>U</span><span>D</span><span>I</span><span>O</span><span>S</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <p class="cap"><b>A · Set</b> — Studios at its own spacing, not stretched to the word</p>
+    <div class="card" style="padding: 80px 32px; margin-bottom: 16px;">
+      <div class="logo set" style="--s: 140px;">
+        <div class="word"><span class="nom">NOMINAL</span></div>
+        <div class="strip"></div>
+        <div class="studios">Studios</div>
+      </div>
+    </div>
+    <div class="grid3">
+      <div>
+        <div class="card" style="padding: 56px 24px; height: 220px;">
+          <div class="logo set" style="--s: 80px;"><div class="word"><span class="nom">NOMINAL</span></div><div class="strip"></div><div class="studios">Studios</div></div>
+        </div>
+        <p class="cap" style="margin-top:10px;">A1 · Left</p>
+      </div>
+      <div>
+        <div class="card" style="padding: 56px 24px; height: 220px;">
+          <div class="logo set center" style="--s: 80px;"><div class="word"><span class="nom">NOMINAL</span></div><div class="strip"></div><div class="studios">Studios</div></div>
+        </div>
+        <p class="cap" style="margin-top:10px;">A2 · Centred</p>
+      </div>
+      <div>
+        <div class="card" style="padding: 56px 24px; height: 220px;">
+          <div class="logo set right" style="--s: 80px;"><div class="word"><span class="nom">NOMINAL</span></div><div class="strip"></div><div class="studios">Studios</div></div>
+        </div>
+        <p class="cap" style="margin-top:10px;">A3 · Right</p>
       </div>
     </div>
   </section>
