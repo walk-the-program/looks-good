@@ -515,8 +515,10 @@ function renderBrandGuideHTML(state) {
 
   // Footer: brandmark bottom-left, page index bottom-right — the same meta
   // system the slide mockups use, so deck and guide read as one family.
-  const brandmark = state.logoDataUrl
-    ? `<img src="${state.logoDataUrl}" alt="">`
+  // Footer mark sits on the white paper page; the page is small, so the wordmark cut.
+  const footLogo = brandLogo(state, { variant: 'wordmark', ground: '#ffffff' });
+  const brandmark = footLogo
+    ? `<img src="${footLogo.url}" alt="">`
     : `<span>${brandName}</span>`;
 
   function foot(index) {
@@ -536,8 +538,9 @@ function renderBrandGuideHTML(state) {
   // With no logo uploaded the cover's own h1 *is* the wordmark, so the mark
   // slot is dropped rather than setting the brand name three times on one
   // page (mark, title, footer).
-  const coverMark = state.logoDataUrl
-    ? `<div class="bg-cover-mark"><img src="${state.logoDataUrl}" alt="Logo"></div>`
+  const coverLogo = brandLogo(state, { variant: 'full', ground: colors.primary });
+  const coverMark = coverLogo
+    ? `<div class="bg-cover-mark"><img src="${coverLogo.url}" alt="Logo"></div>`
     : '';
 
   const coverPage = `
@@ -704,8 +707,9 @@ function renderBrandGuideHTML(state) {
 
   /* ---------- 05 Logo & style ---------- */
 
-  const logoContent = state.logoDataUrl
-    ? `<img src="${state.logoDataUrl}" alt="Logo">`
+  const pageLogo = brandLogo(state, { variant: 'full', ground: '#ffffff' });
+  const logoContent = pageLogo
+    ? `<img src="${pageLogo.url}" alt="Logo">`
     : `<span class="logo-placeholder">No logo uploaded</span>`;
 
   // The style's own corners, read off the board it really draws (js/ai-brief.js probe).

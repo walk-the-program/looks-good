@@ -622,10 +622,12 @@ function abBoardParts(state, def) {
   const copy = effectiveContent();
   const labels0 = def.labels || { material: 'Touch & depth', states: ['One', 'Two', 'Three'] };
   const labels = Object.assign({}, labels0, { states: abStateNames(def, state) });
+  // An upload wins; otherwise the Logo Studio wordmark (the slot is ~32px tall) in the tone that reads on the canvas.
+  const logoPick = brandLogo(state, { variant: 'wordmark', ground: t.canvas });
   const ctx = {
     t, key: def.key, state,
     brandName: copy.brandName, tagline: copy.tagline,
-    initial: abInitial(copy.brandName), logoDataUrl: state.logoDataUrl,
+    initial: abInitial(copy.brandName), logoDataUrl: logoPick ? logoPick.url : null,
     labels: abLabelsCtx(labels),
     // True when the brand's typography is locked (state.locks.typography): the faces in
     // ctx.state are then the user's own, and a hook that would pick a face of its own must not.
@@ -637,8 +639,8 @@ function abBoardParts(state, def) {
   const uid = 'ab' + (++abSeq);
   const e = escapeHtml;
 
-  const brand = state.logoDataUrl
-    ? `<img class="ab-logo" src="${e(state.logoDataUrl)}" alt="${e(copy.brandName)}" />`
+ const brand = ctx.logoDataUrl
+    ? `<img class="ab-logo" src="${e(ctx.logoDataUrl)}" alt="${e(copy.brandName)}" />`
     : `<span class="ab-mark" aria-hidden="true"><span>${e(ctx.initial)}</span></span><span class="ab-wordmark">${e(copy.brandName)}</span>`;
 
   const layout = abLayoutOf(def);

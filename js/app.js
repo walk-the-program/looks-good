@@ -437,8 +437,41 @@ function effectiveContent(content) {
   });
   // Voice and specimen-copy overrides ride along: views that rebuild state.content from this
   // (deck, present, share, thumbnails) must print the same words as the main board.
-  ['voiceMode', 'voiceNote', 'voiceMotto', 'copy'].forEach(key => { if (src[key] !== undefined) out[key] = src[key]; });
+  ['voiceMode', 'voiceNote', 'voiceMotto', 'copy', 'logo'].forEach(key => { if (src[key] !== undefined) out[key] = src[key]; });
   return out;
+}
+
+/* ---------------- Brand logo: upload first, Logo Studio second ---------------- */
+
+// The studio logo, when it holds usable files (js/logo-studio.js writes state.content.logo).
+function studioLogoOf(st) {
+  const lg = st && st.content && st.content.logo;
+  return lg && typeof lg === 'object' && lg.files && typeof lg.files === 'object' ? lg : null;
+}
+function brandHasLogo(st) {
+  st = st || state;
+  return !!(st && st.logoDataUrl) || !!studioLogoOf(st);
+}
+// What a view draws as the brand's logo. An upload always wins; otherwise the generated
+// logo, in the tone that reads on `ground` (a hex). variant: 'full' | 'wordmark' | 'mono'
+// (mono = the square monogram; on a dark ground it is the white-N tile, else the ink-N tile).
+// Returns { url, kind: 'upload'|'studio', svg? } or null.
+function brandLogo(st, opts) {
+  st = st || state;
+  opts = opts || {};
+  if (st && st.logoDataUrl) return { url: st.logoDataUrl, kind: 'upload' };
+  const lg = studioLogoOf(st);
+  if (!lg) return null;
+  const variant = opts.variant === 'wordmark' || opts.variant === 'mono' ? opts.variant : 'full';
+  let dark = false;
+  if (/^#[0-9a-f]{3}([0-9a-f]{3})?$/i.test(String(opts.ground || ''))) {
+    try { dark = pickReadableText(opts.ground) === '#ffffff'; } catch (err) { dark = false; }
+  }
+  const set = lg.files[variant] || (variant === 'mono' ? null : lg.files.full);
+  if (!set) return null;
+  const svg = variant === 'mono' ? (dark ? set.dark : set.light) : (dark ? set.white : set.ink);
+  if (typeof svg !== 'string' || !svg) return null;
+  return { url: 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg), kind: 'studio', svg };
 }
 
 function updateControlsFromState() {

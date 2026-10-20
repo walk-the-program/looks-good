@@ -19,10 +19,17 @@
    logo-engine.html checks this engine against them.
 
    Lockup recipe:
-     { word, wordFont:{family,weight,style,axes}, tracking, case:'upper'|'lower'|'none',
-       device:{type:'strip'|'none', crop, height},
-       secondary:{text, font, size, gap, spread, align:'left'|'center'|'right', tracking},
-       monogram:{tile, scale, strip} }   // monogram block optional (1000, .95, .24)
+     { word, wordFont:{family,weight,style,axes}, tracking,
+       case:'upper'|'lower'|'none'|'as-typed',          // 'as-typed' = 'none'
+       device:{type:'none'|'strip'|'rule'|'box', crop, height, gap},
+         strip: bar of `height` at `crop` below the cap top, over the letters' feet (crop 610/height 170)
+         rule:  bar of `height` (36) `gap` (70) below the baseline (or the descenders), no crop
+         box:   an ink OUTLINE frame of stroke `height` (36) round the word, `gap` (110) of air inside it
+                (an outline, not a knockout: one nonzero path, no even-odd, so overlapping glyph
+                contours cannot punch holes)
+       secondary:{text, font, size, gap, spread, align:'left'|'center'|'right', tracking, case},
+                 // case defaults to the word's case
+       monogram:{tile, scale, strip, letters:1|2} }   // monogram block optional (1000, .95, .24, 1)
 
    Plain <script>, no modules. Loads vendor/harfbuzz/index.js with import(), so it needs
    to be served over http(s) or the app:// scheme, not file://.
@@ -303,7 +310,7 @@ const LogoEngine = (function () {
   };
 
   function applyCase(text, c) {
-    return c === 'upper' ? text.toUpperCase() : c === 'lower' ? text.toLowerCase() : text;
+    return c === 'upper' ? text.toUpperCase() : c === 'lower' ? text.toLowerCase() : text;   // 'none' and 'as-typed' leave it
   }
 
   function loadFont(spec) {
@@ -320,8 +327,22 @@ const LogoEngine = (function () {
 
   function deviceOf(recipe) {
     const d = recipe.device || { type: 'none' };
-    return { type: d.type || 'none', crop: d.crop == null ? 610 : d.crop, height: d.height == null ? 170 : d.height };
+    const type = d.type || 'none';
+    return {
+      type: type, crop: d.crop == null ? 610 : d.crop,
+      height: d.height == null ? (type === 'strip' ? 170 : 36) : d.height,
+      gap: d.gap == null ? (type === 'box' ? 110 : 70) : d.gap
+    };
   }
+
+  // Outline frame as one nonzero-fill shape: the outer rectangle clockwise, the inner one
+  // counter-clockwise, which leaves a hole.
+  Ink.prototype.frame = function (x0, y0, x1, y1, t) {
+    const f2 = function (v) { return v.toFixed(2); };
+    this.d.push('M' + f2(x0) + ' ' + f2(y0) + 'H' + f2(x1) + 'V' + f2(y1) + 'H' + f2(x0) + 'Z' +
+      'M' + f2(x0 + t) + ' ' + f2(y0 + t) + 'V' + f2(y1 - t) + 'H' + f2(x1 - t) + 'V' + f2(y0 + t) + 'Z');
+    this.grow([x0, y0, x1, y1]);
+  };
 
   // Draws the word with its cap top at capTop. Returns { width, wordScale }.
   function drawWord(ink, f, recipe, capTop) {
@@ -333,26 +354,43 @@ const LogoEngine = (function () {
     return { width: sh.width, capHeight: f.capHeight * scale };
   }
 
-  // Pure layout of a lockup: word, optional strip device, optional secondary line.
-  // faces comes from await load(recipe). Returns { d, paths, rects, bounds, wordWidth }.
+  // Pure layout of a lockup: word, optional device (strip, rule or box), optional secondary
+  // line. faces comes from await load(recipe). Returns { d, paths, rects, bounds, wordWidth }.
   function lockup(recipe, faces) {
     const ink = new Ink();
     const dev = deviceOf(recipe);
+    // The box frames the word, so the word starts inside it; everything is laid out from the
+    // word's own origin (0, cap top) and the frame reaches into negative x / y.
     const w = drawWord(ink, faces.word, recipe, 0);
-    if (dev.type === 'strip') ink.rect(0, dev.crop, w.width, dev.crop + dev.height);
+    const wordBottom = ink.bounds ? ink.bounds[3] : w.capHeight;
+    const low = wordBottom > w.capHeight + 40 ? wordBottom : w.capHeight;   // real descenders only, not overshoot
+    const wordTop = ink.bounds ? Math.min(0, ink.bounds[1]) : 0;
+    let x0 = 0, x1 = w.width, anchor = w.capHeight;
+    if (dev.type === 'strip') {
+      ink.rect(0, dev.crop, w.width, dev.crop + dev.height);
+      anchor = dev.crop + dev.height;
+    } else if (dev.type === 'rule') {
+      ink.rect(0, low + dev.gap, w.width, low + dev.gap + dev.height);
+      anchor = low + dev.gap + dev.height;
+    } else if (dev.type === 'box') {
+      const m = dev.gap + dev.height;
+      x0 = -m; x1 = w.width + m;
+      ink.frame(x0, wordTop - m, x1, low + m, dev.height);
+      anchor = low + m;
+    }
     const sec = recipe.secondary;
     if (sec && sec.text) {
       const f = faces.secondary;
       const k = (sec.size == null ? 118 : sec.size) / f.upem;
-      const anchor = dev.type === 'strip' ? dev.crop + dev.height : w.capHeight;
       const base = anchor + (sec.gap == null ? 90 : sec.gap) + f.capHeight * k;
-      const text = applyCase(sec.text, sec.case);
+      const text = applyCase(sec.text, sec.case || recipe.case);
+      const boxW = x1 - x0;
       if (sec.spread) {
         // letters spread edge to edge (flex space-between); each letter shaped alone
         const letters = Array.from(text).map(function (c) { return shape(f, c).glyphs[0]; });
         const total = letters.reduce(function (a, g) { return a + g.advance * k * f.upem / 1000; }, 0);
-        const gap = letters.length > 1 ? (w.width - total) / (letters.length - 1) : 0;
-        let x = letters.length > 1 ? 0 : placeX(sec.align, w.width, total);
+        const gap = letters.length > 1 ? (boxW - total) / (letters.length - 1) : 0;
+        let x = x0 + (letters.length > 1 ? 0 : placeX(sec.align, boxW, total));
         letters.forEach(function (g) {
           ink.glyph(f, g.gid, k, x + g.dx * k * f.upem / 1000, base);
           x += g.advance * k * f.upem / 1000 + gap;
@@ -360,34 +398,48 @@ const LogoEngine = (function () {
       } else {
         const sh = shape(f, text, { tracking: sec.tracking || 0, features: sec.features });
         const unit = k * f.upem / 1000;                 // shape() units -> layout units
-        const x0 = placeX(sec.align, w.width, sh.width * unit);
-        sh.glyphs.forEach(function (g) { ink.glyph(f, g.gid, k, x0 + (g.x + g.dx) * unit, base); });
+        const xs = x0 + placeX(sec.align, boxW, sh.width * unit);
+        sh.glyphs.forEach(function (g) { ink.glyph(f, g.gid, k, xs + (g.x + g.dx) * unit, base); });
       }
     }
-    return { d: ink.d, paths: ink.paths, rects: ink.rects, bounds: ink.bounds, wordWidth: w.width };
+    return { d: ink.d, paths: ink.paths, rects: ink.rects, bounds: ink.bounds, wordWidth: w.width, capHeight: w.capHeight };
   }
 
   function placeX(align, boxW, w) {
     return align === 'center' ? (boxW - w) / 2 : align === 'right' ? boxW - w : 0;
   }
 
-  // Square monogram tile: the word's first letter standing on a full-width strip, centred
-  // on its own outline (serif to serif), not its advance box.
+  // Square monogram tile. With a strip device: the word's first letter standing on a
+  // full-width strip, centred on its own outline (serif to serif), not its advance box.
+  // Other devices: the letter(s) centred in the tile, no strip. recipe.monogram.letters
+  // (or recipe.mono.letters) = 1 or 2 initials.
   function monogram(recipe, faces) {
-    const m = Object.assign({ tile: 1000, scale: 0.95, strip: 0.24 }, recipe.monogram || {});
+    const m = Object.assign({ tile: 1000, scale: 0.95, strip: 0.24, letters: 1 }, recipe.mono || {}, recipe.monogram || {});
     const dev = deviceOf(recipe);
     const f = faces.word;
-    const T = m.tile, s = m.scale;
-    const letter = Array.from(applyCase(recipe.word, recipe.case))[0];
-    const g = shape(f, letter).glyphs[0];
-    const scale = 1000 / f.upem * s;
+    const T = m.tile;
+    const n = m.letters === 2 ? 2 : 1;
+    const text = Array.from(applyCase(recipe.word, recipe.case)).filter(function (c) { return !/\s/.test(c); }).slice(0, n).join('');
+    const sh = shape(f, text);
+    const u = 1000 / f.upem;
+    // outline extent of the whole run, in layout units at scale 1
+    let gx0 = Infinity, gx1 = -Infinity;
+    sh.glyphs.forEach(function (g) {
+      const b = glyphPath(f, g.gid).bounds;
+      if (!b) return;
+      gx0 = Math.min(gx0, g.x + g.dx + b[0] * u); gx1 = Math.max(gx1, g.x + g.dx + b[2] * u);
+    });
+    if (!isFinite(gx0)) { gx0 = 0; gx1 = sh.width; }
+    let s = m.scale;
+    if (n === 2) s = Math.min(s, 0.86 * T / (gx1 - gx0));        // two initials must still fit the tile
+    const strip = dev.type === 'strip';
+    const cap = f.capHeight * u * s;
     const stripTop = T - m.strip * 1000 * s;
-    const capTop = stripTop - dev.crop * s;
-    const gb = glyphPath(f, g.gid).bounds;
-    const gx0 = gb[0] * 1000 / f.upem, gx1 = gb[2] * 1000 / f.upem;
+    const capTop = strip ? stripTop - dev.crop * s : (T - cap) / 2;
     const ink = new Ink();
-    ink.glyph(f, g.gid, scale, (T - (gx1 - gx0) * s) / 2 - gx0 * s, capTop + f.capHeight * 1000 / f.upem * s);
-    ink.rect(0, stripTop, T, T);
+    const x0 = (T - (gx1 - gx0) * s) / 2 - gx0 * s;
+    sh.glyphs.forEach(function (g) { ink.glyph(f, g.gid, u * s, x0 + (g.x + g.dx) * s, capTop + cap); });
+    if (strip) ink.rect(0, stripTop, T, T);
     return { d: ink.d, paths: ink.paths, rects: ink.rects, bounds: ink.bounds, box: [0, 0, T, T] };
   }
 
@@ -429,7 +481,7 @@ const LogoEngine = (function () {
   }
 
   return {
-    configure: configure, ready: ready, face: face, load: load,
+    configure: configure, ready: ready, face: face, load: load, manifest: manifest, applyCase: applyCase,
     shape: shape, glyphPath: glyphPath, placeGlyph: placeGlyph,
     lockup: lockup, monogram: monogram, toSVG: toSVG, toPNG: toPNG
   };

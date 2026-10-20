@@ -85,7 +85,7 @@ window.Show = window.Show || {};
       v, st, def, t, content, name,
       tagline: clean(content.tagline),
       initial: typeof abInitial === 'function' ? abInitial(name) : name.charAt(0).toUpperCase(),
-      logo: st.logoDataUrl || null,
+      logo: (brandLogo(st, { variant: 'mono', ground: t.canvas }) || {}).url || null,
       head: st.headingFont, body: st.bodyFont,
     };
   }

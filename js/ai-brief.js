@@ -962,7 +962,7 @@ function aibKitMeasure(state0, mode, both) {
   if (typeof SeeBuilt === 'undefined' || typeof SeeBuilt.kitInto !== 'function') return null;
   if (typeof state === 'undefined' || state0 !== state) return null;
   let key = '';
-  try { key = JSON.stringify(state0, (k, v) => (k === 'logoDataUrl' ? String(v || '').length : v)); } catch (err) { key = ''; }
+  try { key = JSON.stringify(state0, (k, v) => (k === 'logoDataUrl' ? String(v || '').length : k === 'logo' && v && typeof v === 'object' && v.files ? 'logo@' + (v.updatedAt || String(JSON.stringify(v.files)).length) : v)); } catch (err) { key = ''; }
   key += '|' + mode + '|' + both;
   if (key && AIB_KIT_CACHE.key === key) return AIB_KIT_CACHE.snap;
   const live = document.getElementById('builtView');
@@ -2008,6 +2008,8 @@ function aibContext(state0, opts) {
     key: def.classicOf || def.key,
     assets: surface === 'app' ? [] : (opts.assets || aibPatternAssets(state0)),
   };
+  // The logo files the zip carries (an upload, else the Logo Studio set); null when the brand has none.
+  ctx.logo = aibLogoPlan(state0, opts.logoPng === true);
   // The product sheet (js/product-sheet.js) replaces the sample screens in an app brief.
   ctx.product = ctx.app && state0 && state0.product && Array.isArray(state0.product.screens) && state0.product.screens.length ? state0.product : null;
   ctx.comps = !!opts.comps;
@@ -2945,6 +2947,95 @@ function aibSecRules(ctx) {
   return out;
 }
 
+/* ---------------- logo (upload or Logo Studio) ---------------- */
+
+const AIB_LOGO_MIME = { 'image/png': 'png', 'image/jpeg': 'jpg', 'image/jpg': 'jpg', 'image/svg+xml': 'svg', 'image/webp': 'webp', 'image/gif': 'gif' };
+
+// The logo files for the zip and the brief. An upload wins. Pure and synchronous (no PNG work):
+// { kind: 'upload'|'studio', files: [{ name, role, use, svg?, dataUrl? }], minPx, clearSpace, png } or null.
+// png = the zip also carries a PNG of every SVG (aibFiles renders them when LogoEngine.toPNG exists).
+function aibLogoPlan(state0, png) {
+  if (!state0) return null;
+  const slug = String(((state0.content && state0.content.brandName) || '')).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'brand';
+  if (state0.logoDataUrl && typeof state0.logoDataUrl === 'string') {
+    const mime = (/^data:([^;,]+)/.exec(state0.logoDataUrl) || [])[1] || '';
+    const ext = AIB_LOGO_MIME[mime.toLowerCase()] || 'png';
+    return { kind: 'upload', png: false, minPx: null, clearSpace: null, files: [{ name: `logo/${slug}-logo.${ext}`, role: 'full', use: 'the logo, as uploaded', dataUrl: state0.logoDataUrl }] };
+  }
+  const lg = state0.content && state0.content.logo;
+  if (!lg || typeof lg !== 'object' || !lg.files) return null;
+  const F = lg.files, files = [];
+  const add = (set, key, suffix, use) => { if (set && typeof set[key] === 'string' && set[key]) files.push({ name: `logo/${slug}-${suffix}.svg`, role: suffix, use, svg: set[key] }); };
+  add(F.full, 'ink', 'logo', 'full lockup in the brand ink, for light backgrounds');
+  add(F.full, 'white', 'logo-white', 'full lockup in white, for dark or coloured backgrounds');
+  add(F.wordmark, 'ink', 'wordmark', 'wordmark alone in the brand ink, for light backgrounds');
+  add(F.wordmark, 'white', 'wordmark-white', 'wordmark alone in white, for dark or coloured backgrounds');
+  add(F.mono, 'light', 'monogram', 'square monogram, ink on a white tile (favicon, app icon, avatar on light)');
+  add(F.mono, 'dark', 'monogram-dark', 'square monogram, white on an ink tile (favicon, app icon, avatar on dark)');
+  if (!files.length) return null;
+  const mp = lg.minPx && typeof lg.minPx === 'object' ? lg.minPx : {};
+  const cs = Number(lg.clearSpace);
+  return { kind: 'studio', png: !!png, files, minPx: { full: Number(mp.full) || null, wordmark: Number(mp.wordmark) || null }, clearSpace: cs > 0 ? cs : null };
+}
+
+function aibSecLogo(ctx) {
+  const L = ctx.logo;
+  if (!L) return [];
+  const out = ['## Logo'];
+  if (L.kind === 'upload') {
+    out.push(`The brand's logo is one uploaded file: \`${L.files[0].name}\` (written by "Save brief + files"). Use that file everywhere the logo appears. Never recolour, stretch, re-type or rebuild the logo; use the file.`);
+    return out;
+  }
+  out.push('Files in `logo/` (written by "Save brief + files"). Use these files as they are. Never recolour, stretch, re-type or rebuild the logo; use the files.');
+  L.files.forEach(f => out.push(`- \`${f.name}\`${L.png ? ` (and \`${f.name.replace(/\.svg$/, '.png')}\`)` : ''}: ${f.use}.`));
+  const has = r => L.files.some(f => f.role === r);
+  const mp = L.minPx || {};
+  const w = mp.wordmark, fu = mp.full;
+  out.push('', 'Which to use where:');
+  if (has('logo')) out.push(`- Headers, covers and sign-in screens${fu ? ` at ${fu}px wide or more` : ''}: the full lockup (\`logo\` on light grounds, \`logo-white\` on dark ones).`);
+  if (has('wordmark')) out.push(`- Smaller marks${fu ? ` (under ${fu}px wide)` : ''}${w ? ` down to ${w}px wide` : ''}: the wordmark (\`wordmark\` on light, \`wordmark-white\` on dark).`);
+  if (has('monogram')) out.push(`- Favicon, app icon, avatar and any square slot${w ? ` or anything under ${w}px wide` : ''}: the monogram (\`monogram\` on light, \`monogram-dark\` on dark).`);
+  if (L.clearSpace) out.push('', `Clear space: keep ${Math.round(L.clearSpace * 100)}% of the logo's height free on every side (a logo drawn 40px tall needs ${+(L.clearSpace * 40).toFixed(1)}px around it). Nothing else sits inside that margin.`);
+  if (fu || w) out.push(`Minimum sizes: ${[fu ? `full lockup ${fu}px wide` : '', w ? `wordmark ${w}px wide` : ''].filter(Boolean).join(', ')}. Below the wordmark minimum use the monogram.`);
+  return out;
+}
+
+// SVG-only unless the zip path can render PNGs; the caller adds them to the zip files.
+async function aibLogoZipFiles(state0) {
+  const plan = aibLogoPlan(state0, false);
+  if (!plan) return { plan: null, files: [] };
+  const files = [];
+  const enc = new TextEncoder();
+  if (plan.kind === 'upload') {
+    const f = plan.files[0];
+    try {
+      const m = /^data:([^,]*),(.*)$/s.exec(f.dataUrl);
+      if (m) {
+        let bytes;
+        if (/;base64/i.test(m[1])) { const bin = atob(m[2]); bytes = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i); }
+        else bytes = enc.encode(decodeURIComponent(m[2]));
+        files.push({ name: f.name, data: bytes });
+      }
+    } catch (err) { console.warn('brief files: uploaded logo failed', err); }
+    return { plan: files.length ? plan : null, files };
+  }
+  plan.files.forEach(f => files.push({ name: f.name, data: f.svg }));
+  // PNGs: all or none, only when the logo engine can draw them.
+  const LE = typeof LogoEngine !== 'undefined' ? LogoEngine : null;
+  if (LE && typeof LE.toPNG === 'function' && typeof document !== 'undefined') {
+    try {
+      const pngs = [];
+      for (const f of plan.files) {
+        const px = f.role.startsWith('monogram') ? 1024 : f.role.startsWith('wordmark') ? 1200 : 1600;
+        pngs.push({ name: f.name.replace(/\.svg$/, '.png'), data: new Uint8Array(await (await LE.toPNG(f.svg, px)).arrayBuffer()) });
+      }
+      pngs.forEach(p => files.push(p));
+      plan.png = true;
+    } catch (err) { console.warn('brief files: logo PNGs failed, SVG only', err); }
+  }
+  return { plan, files };
+}
+
 function aibSecPatterns(ctx) {
   const items = ctx.assets;
   if (!items.length) return [];
@@ -3349,7 +3440,7 @@ const AIB_TIERS = {
   'Phone layout and type': 'Guided', 'Motion': 'Guided', "Do and don't": 'Guided',
   'Colors': 'Locked', 'Components': 'Locked', 'UI kit': 'Locked', 'Type': 'Locked', 'Website type': 'Locked', 'Shape and materials': 'Locked',
   'Light and dark': 'Locked', 'States': 'Locked', 'Accessibility': 'Locked', 'Icons': 'Locked', 'App icon': 'Locked', 'Fonts to bundle': 'Locked',
-  'Tokens (CSS)': 'Locked', 'Theme.swift': 'Locked', 'Patterns': 'Locked', 'Specimen copy': 'Locked',
+  'Logo': 'Locked', 'Tokens (CSS)': 'Locked', 'Theme.swift': 'Locked', 'Patterns': 'Locked', 'Specimen copy': 'Locked',
   'Screen layouts': 'Free',
 };
 
@@ -3498,6 +3589,7 @@ function aibBuild(ctx) {
     aibSecSpecimen(ctx),
     aibSecBlend(ctx),
     aibSecColors(ctx),
+    aibSecLogo(ctx),
     ctx.app ? aibSecKit(ctx) : aibSecComponents(ctx),
     ctx.product ? aibSecProduct(ctx) : aibSecScreens(ctx),
     ctx.product ? [] : aibSecBuilt(ctx),
@@ -4018,11 +4110,13 @@ async function aibFiles(state0, opts) {
       for (const sc of prod.screens) for (const mode of ['light', 'dark']) comps.push({ name: `comps/${sc.id}-${mode}.png`, data: await PS.compPng(state0, sc.id, mode) });
     } catch (err) { console.warn('brief files: comps failed', err); comps.length = 0; }
   }
-  const ctx = aibContext(state0, Object.assign({}, opts, { assets: ok, comps: comps.length > 0 }));
+  const logoZip = await aibLogoZipFiles(state0);
+  const ctx = aibContext(state0, Object.assign({}, opts, { assets: ok, comps: comps.length > 0, logoPng: !!(logoZip.plan && logoZip.plan.png) }));
   const out = [{ name: 'BRIEF.md', data: aibBuild(ctx) }];
   if (ctx.web) out.push({ name: 'tokens.css', data: aibCssLines(ctx, true).filter(l => !/^```/.test(l)).join('\n') + '\n' });
   if (ctx.swift) out.push({ name: 'Theme.swift', data: aibSwiftLines(ctx).join('\n') + '\n' });
   files.forEach(f => out.push({ name: f.a.name, data: f.data }));
   comps.forEach(c => out.push(c));
+  logoZip.files.forEach(f => out.push(f));
   return out;
 }

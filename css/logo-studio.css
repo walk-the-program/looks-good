@@ -1,0 +1,73 @@
+/* ---------------------------------------------------------------------
+   logo-studio.css — the "Or make one" section of the Logo & background tab (js/logo-studio.js).
+   Built from the sidebar's own parts (.sd-sec, .segmented, .field, .sd-toggle-row, .btn);
+   only the preview, the preset cards and the size tests are new.
+------------------------------------------------------------------------ */
+
+.ls-body, .ls-editor, .ls-group { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.ls-group { gap: 10px; }
+.ls-group[hidden], .ls-group [hidden] { display: none; }
+.ls-note { margin: 0; }
+#lsUpload:empty { display: none; }
+#lsUpload .ls-note { margin: 0 0 4px; }
+
+/* Presets: two cards across. */
+.ls-presets { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.ls-preset {
+  display: flex; flex-direction: column; align-items: stretch; gap: 2px; min-width: 0;
+  padding: 6px 6px 9px; text-align: left; font: inherit; color: var(--ink);
+  background: var(--surface); border: 1px solid var(--line-strong); border-radius: 12px; cursor: pointer;
+  transition: background-color var(--dur) var(--ease), border-color var(--dur) var(--ease);
+}
+.ls-preset:hover:not(:disabled) { background: var(--hover); border-color: var(--ink); }
+.ls-preset:focus-visible { outline: 2px solid rgba(17, 17, 17, 0.25); outline-offset: 2px; }
+.ls-preset:disabled { cursor: default; opacity: 0.55; }
+.ls-preset b { padding: 6px 4px 0; font-size: var(--fs-3); font-weight: 500; }
+.ls-preset small { padding: 0 4px; font-size: var(--fs-2); line-height: 1.4; color: var(--muted); }
+.ls-thumb {
+  display: flex; align-items: center; justify-content: center; height: 64px; padding: 10px;
+  border-radius: 8px; box-shadow: inset 0 0 0 1px var(--line); overflow: hidden;
+}
+.ls-thumb img { display: block; max-width: 100%; max-height: 100%; width: auto; height: auto; }
+.ls-thumb-off { background: var(--canvas); }
+
+/* The live preview. */
+.ls-preview {
+  display: flex; align-items: center; justify-content: center; min-height: 112px; padding: 20px;
+  border-radius: 12px; box-shadow: inset 0 0 0 1px var(--line-strong);
+}
+.ls-preview img { display: block; max-width: 100%; max-height: 120px; width: auto; height: auto; }
+.ls-tools { justify-content: flex-start; }
+
+.ls-seg { grid-template-columns: repeat(var(--n, 2), 1fr); }
+.ls-toggle { grid-template-columns: minmax(0, 1fr) auto; }
+
+/* Size tests: the logo at real sizes on the current ground. */
+.ls-sizes {
+  display: flex; flex-direction: column; gap: 10px; padding: 12px;
+  border-radius: 12px; box-shadow: inset 0 0 0 1px var(--line-strong); overflow: hidden;
+}
+.ls-size { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.ls-size > span { flex: none; width: 66px; font-size: var(--fs-1); color: inherit; }
+.ls-size img { display: block; max-width: 100%; }
+.ls-size-mono { align-items: flex-end; }
+.ls-mono { display: flex; flex-direction: column; gap: 4px; width: auto; }
+.ls-size > span.ls-mono { width: auto; }
+.ls-mono small { font-size: var(--fs-1); color: inherit; }
+
+/* Warnings */
+.ls-warns { display: flex; flex-direction: column; gap: 8px; }
+.ls-warns:empty { display: none; }
+.ls-warn {
+  display: grid; grid-template-columns: 14px minmax(0, 1fr); gap: 8px; align-items: start;
+  padding: 9px 10px; border: 1px solid var(--line-strong); border-radius: 10px; background: var(--canvas);
+  font-size: var(--fs-2); line-height: 1.45; color: var(--ink-2);
+}
+.ls-warn svg { margin-top: 2px; color: var(--ink); }
+.ls-warn button {
+  padding: 0; border: 0; background: none; font: inherit; font-weight: 500; color: var(--ink);
+  cursor: pointer; text-decoration: underline; text-underline-offset: 2px;
+}
+
+.ls-foot { align-items: center; margin-top: 4px; }
+.ls-foot .ls-export { flex: 1 1 auto; }

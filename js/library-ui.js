@@ -244,8 +244,10 @@ const LibraryUI = (function () {
     const muted = look.muted || slMix(canvas, ink, 0.4);
     const fontCss = look.font.css.replace(/"/g, "'");
     const initial = ([...(rec.name || '').trim()][0] || '?').toUpperCase();
-    const mark = s.logoDataUrl
-      ? `<span class="tile-mark has-logo"><img src="${escapeHtml(s.logoDataUrl)}" alt="" /></span>`
+    // The tile mark is a white square: an upload as is, else the studio monogram (ink N on white).
+    const tileLogo = brandLogo({ logoDataUrl: s.logoDataUrl, content: s.content }, { variant: 'mono', ground: '#ffffff' });
+    const mark = tileLogo
+      ? `<span class="tile-mark has-logo"><img src="${escapeHtml(tileLogo.url)}" alt="" /></span>`
       : `<span class="tile-mark" style="background:${escapeHtml(primary)};color:${pickReadableText(primary)}">${escapeHtml(initial)}</span>`;
     const band = ['primary', 'secondary', 'accent', 'neutralDark', 'neutralLight']
       .map(k => `<i style="background:${escapeHtml(colors[k] || '#cccccc')}"></i>`).join('');

@@ -207,7 +207,8 @@ function briefOpenProduct() {
     // Warmer shows no motto here: the tagline is already on the cover.
     const voice = brandVoice(state);
     const motto = specimenMotto(state, def);
-    const logo = state.logoDataUrl ? `<img class="bv-plate-logo" src="${esc(state.logoDataUrl)}" alt="" />` : '';
+    const plateLogo = brandLogo(state, { variant: 'wordmark', ground: t.canvas });
+    const logo = plateLogo ? `<img class="bv-plate-logo" src="${esc(plateLogo.url)}" alt="" />` : '';
     const toc = [['colour', 'Colour'], ['type', 'Type'], ['components', 'Components'], ['patterns', 'Patterns'], ['shape', 'Shape and materials'], ['text', 'Full text']]
       .map(([id, name], i) => `<li><a href="#bv-${id}" data-bv-go="${id}"><span>0${i + 1}</span>${esc(name)}</a></li>`).join('');
     return `<section class="bv-cover" aria-label="Cover">

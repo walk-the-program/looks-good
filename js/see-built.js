@@ -1004,7 +1004,7 @@
     const me = people[hashStr(copy.brandName) % people.length];
     return {
       mode, v, P, def: v.def, ctx: P.ctx, D,
-      name: copy.brandName, tagline: copy.tagline, logo: v.state.logoDataUrl,
+      name: copy.brandName, tagline: copy.tagline, logo: P.ctx.logoDataUrl || null,
       me, role: 'Owner', uid: `sb${++seq}${mode[0]}`,
       // the Welcome title is the brand's own tagline when it has one (the sample line otherwise)
       welcomeTitle: String(((v.state.content || {}).tagline) || '').replace(/\s+/g, ' ').trim(),
