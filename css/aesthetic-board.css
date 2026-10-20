@@ -108,7 +108,7 @@
    the canvas, as text. 'band' = opt-in highlighter plane. 'custom' = the
    aesthetic styles .ab-hl itself. :where() keeps these at lower specificity than
    any aesthetic's own .ab[data-ae] .ab-hl rule, which always wins. */
-.ab:where([data-highlight="ink"]) .ab-hl { color: var(--ab-accent-ink); }
+.ab:where([data-highlight="ink"]) .ab-hl { color: var(--ab-accent-ink); background-image: linear-gradient(transparent 62%, var(--ab-accent-mark, transparent) 62%, var(--ab-accent-mark, transparent) 94%, transparent 94%); -webkit-box-decoration-break: clone; box-decoration-break: clone; }
 .ab:where([data-highlight="band"]) .ab-hl {
   color: var(--ab-on-accent); background: var(--ab-accent);
   padding: 0 0.1em; margin: 0 -0.04em;

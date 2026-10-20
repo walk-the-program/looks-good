@@ -20,24 +20,10 @@ function abAlpha(hex, a) {
 }
 
 // Accent as text: the accent itself when it reaches 3:1 on the canvas (large
-// text AA), otherwise the same hue and saturation shaded toward black on a
-// light canvas or tinted toward white on a dark one, one lightness step at a
-// time, until it does. Falls back to ink only if no step reaches 3:1.
-// Exception (light canvas only): a yellow or yellow-green accent (hue 38-80)
-// darkened at constant hue turns olive, so the hue rotates toward 34 (amber)
-// while it darkens: h' = h - min(14, (h - 34) * 0.6), s' = max(s, 85).
+// text AA). Otherwise the ink; the exact accent is then drawn as a marker
+// behind the word (see accentMark). Never a shaded or tinted accent.
 function abAccentInk(accent, canvas, ink) {
   if (contrastRatio(accent, canvas) >= 3) return accent;
-  const hsl = hexToHsl(accent);
-  const darken = contrastRatio(canvas, '#000000') >= contrastRatio(canvas, '#ffffff');
-  const step = darken ? -1 : 1;
-  const warm = darken && hsl.h >= 38 && hsl.h <= 80;
-  const h = warm ? hsl.h - Math.min(14, (hsl.h - 34) * 0.6) : hsl.h;
-  const s = warm ? Math.max(hsl.s, 85) : hsl.s;
-  for (let l = Math.round(hsl.l); l >= 0 && l <= 100; l += step) {
-    const hex = hslToHex(h, s, l);
-    if (contrastRatio(hex, canvas) >= 3) return hex;
-  }
   return ink;
 }
 
@@ -126,9 +112,12 @@ function boardTokens(state, def) {
     // Legible-as-text versions of the two hue colors (accent falls back to
     // primary, then ink, when it would vanish on the canvas).
     accentText: slVisible(canvas, [c.accent, c.primary], 3, ink),
-    // Accent shaded/tinted to >= 3:1 on the canvas, same hue: the colour of the
+    // Accent as text when it reaches 3:1 on the canvas, else ink: the colour of the
     // highlight word when def.highlight is 'ink' (the default).
     accentInk: abAccentInk(c.accent, canvas, ink),
+    // Exact accent drawn as a marker behind the highlight word when accentInk
+    // falls back to ink (accent under 3:1); 'transparent' otherwise.
+    accentMark: contrastRatio(c.accent, canvas) >= 3 ? 'transparent' : c.accent,
     primaryText: slVisible(canvas, [c.primary], 3, ink),
     // true when the accent itself is under 3:1 on the canvas (informational:
     // drives data-accent-text; the default 'ink' highlight no longer needs it).
@@ -302,6 +291,7 @@ function boardVars(t, state, def, tagline) {
   const ui = abResolveFace(ty2.ui, state);
   const label = ty2.label ? abResolveFace(ty2.label, state) : ui;
   vars['--ab-accent-ink'] = t.accentInk;
+  vars['--ab-accent-mark'] = t.accentMark || 'transparent';
   if (t.printed) {
     vars['--ab-primary-brand'] = t.primary;   // the true brand hex, only where the board prints another
     // its label colour: black or white, whichever reads better (no contrast-color() in older WebKit)

@@ -126,7 +126,7 @@
 /* narrow boards: the scene stacks above the copy, which then sits on the canvas in ink / muted colors */
 @container ab (max-width: 600px) {
   .ab[data-ae="liquid-glass--classic"] .ab-hero-copy { padding-top: 4px; text-shadow: none; }
-  .ab[data-ae="liquid-glass--classic"] .ab-hero-copy .ab-hl { color: var(--ab-accent-ink); }
+  .ab[data-ae="liquid-glass--classic"] .ab-hero-copy .ab-hl { color: var(--ab-accent-ink); background-image: linear-gradient(transparent 62%, var(--ab-accent-mark, transparent) 62%, var(--ab-accent-mark, transparent) 94%, transparent 94%); -webkit-box-decoration-break: clone; box-decoration-break: clone; }
   .ab[data-ae="liquid-glass--classic"] .lgs-initial { left: 62%; top: 50%; font-size: 50cqw; }
   .ab[data-ae="liquid-glass--classic"] .lgs-lens-w { display: none; }
   .ab[data-ae="liquid-glass--classic"] .lgs-lens-n { display: block; }

@@ -62,7 +62,7 @@
   font-variant-ligatures: none; font-feature-settings: "liga" 0, "calt" 0;
   margin-right: 0.13em; /* the negative tracking also eats the word space after the last glyph */
 }
-.ab[data-ae="mixed-type"] .mt-hl { color: var(--ab-accent-ink); }
+.ab[data-ae="mixed-type"] .mt-hl { color: var(--ab-accent-ink); background-image: linear-gradient(transparent 62%, var(--ab-accent-mark, transparent) 62%, var(--ab-accent-mark, transparent) 94%, transparent 94%); -webkit-box-decoration-break: clone; box-decoration-break: clone; }
 .ab[data-ae="mixed-type"] .mt-ast {
   display: inline-block; position: relative; top: 0.04em; margin-left: 0.06em; vertical-align: top;
   font-family: var(--mt-f-i); font-style: normal; font-weight: 400; font-size: 0.5em; line-height: 1;

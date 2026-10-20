@@ -51,7 +51,7 @@
 .ab[data-ae="ascii-art"] .aah-l:last-child { margin-bottom: 0; }
 .ab[data-ae="ascii-art"] .aah .aa-g { color: var(--ab-ink); }
 .ab[data-ae="ascii-art"] .aah .aa-w { color: var(--ab-frame); }
-.ab[data-ae="ascii-art"] .aah .aa-h { color: var(--ab-accent-ink); }
+.ab[data-ae="ascii-art"] .aah .aa-h { color: var(--ab-accent-ink); background-image: linear-gradient(transparent 62%, var(--ab-accent-mark, transparent) 62%, var(--ab-accent-mark, transparent) 94%, transparent 94%); -webkit-box-decoration-break: clone; box-decoration-break: clone; }
 .ab[data-ae="ascii-art"]:not(.ab-slide) .aah-w { font-size: min(calc(86cqw / (var(--fc) * var(--aa-adv, 0.6))), 19px); }
 .ab[data-ae="ascii-art"].ab-slide .aah-w { font-size: 0.17em; }
 .ab[data-ae="ascii-art"] .aah-n { display: none; }

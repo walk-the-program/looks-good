@@ -62,7 +62,7 @@ const AIB_DERIVED_JOB = {
   printPrimary: 'The primary as this aesthetic prints it: the brand primary pushed to a more vivid color. Use it wherever the board fills, rules or marks something with the primary (button, selected segment, switch on, focus ring, progress). The true brand primary appears only in the palette swatch',
   onSecondary: 'Text and icons on a secondary fill only',
   onAccent: 'Text and icons on an accent fill only',
-  accentInk: 'The accent as text: same hue family (yellows shift toward amber on light canvases), shaded (light canvas) or tinted (dark canvas) just enough to reach 3:1 on the canvas. Set the highlight word in it, never plain accent',
+  accentInk: 'The accent as text when it reaches 3:1 on the canvas; otherwise the ink, with the exact accent as a marker behind the word. Never a shaded or tinted accent.',
   priTint: 'Quiet primary wash: selected state background, hover on primary-linked items',
   secTint: 'Quiet secondary wash: selected row, tonal fills, hover on secondary items',
 };
@@ -2053,7 +2053,7 @@ function aibPaletteRows(ctx) {
   const accentNote = ao && modes.every(m => aibInkValue(ao, m))
     ? ` ${def.name} draws the accent as ${ao.note || 'its own colour, whatever the brand accent is'}; use this value everywhere. The brand accent (${ctx.state.colors.accent}) appears only in the palette swatch.` : '';
   add('--accent', m => m.t.accent, roleJob('accent') + accentNote, [['--on-accent', m => m.t.onAccent]]);
-  add('--accent-ink', m => m.t.accentInk, 'The accent as text, shaded or tinted to 3:1 on the canvas. The highlight word only; never plain accent as text.', []);
+  add('--accent-ink', m => m.t.accentInk, 'The accent as text when it reaches 3:1 on the canvas; otherwise the ink, with the exact accent as a marker behind the word. Never a shaded or tinted accent.', []);
   (build.fixedInks || []).forEach(ink => {
     if (!modes.every(m => aibInkValue(ink, m))) return;
     const job = ink.decorativeOnly ? `Decorative only, never text or controls. ${aibAppText(ctx, ink.job, '')}`.trim() : aibAppText(ctx, ink.job, 'A fixed colour of this look.');

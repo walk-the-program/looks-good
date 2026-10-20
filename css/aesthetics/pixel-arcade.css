@@ -75,7 +75,7 @@
   font-weight: var(--ab-hw); letter-spacing: 0; line-height: 1.18; text-wrap: balance; color: var(--ab-ink);
   text-shadow: 4px 4px 0 var(--ab-p-deep); -webkit-font-smoothing: var(--ab-smooth, antialiased);
 }
-.ab[data-ae="pixel-arcade"] .ab-hl { color: var(--ab-accent-ink); text-shadow: 4px 4px 0 var(--ab-a-deep); }
+.ab[data-ae="pixel-arcade"] .ab-hl { color: var(--ab-accent-ink); background-image: linear-gradient(transparent 62%, var(--ab-accent-mark, transparent) 62%, var(--ab-accent-mark, transparent) 94%, transparent 94%); -webkit-box-decoration-break: clone; box-decoration-break: clone; text-shadow: 4px 4px 0 var(--ab-a-deep); }
 /* light mode: the stepped shadows shrink and soften so the type stays crisp */
 .ab[data-ae="pixel-arcade"][data-mode="light"] .ab-headline { text-shadow: 2px 2px 0 var(--ab-hl-soft); }
 .ab[data-ae="pixel-arcade"][data-mode="light"] .ab-hl { text-shadow: 2px 2px 0 var(--ab-a-deep); }
