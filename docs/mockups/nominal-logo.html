@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nominal Studios Logo</title>
+<link rel="stylesheet" href="../../fonts/fonts.css">
+<style>
+  :root {
+    --canvas: #FFFFFF;
+    --paper: #F4F4F2;
+    --ink: #1C1F26;
+    --muted: #6B6E75;
+    --hair: #E3E3E0;
+    --accent: #B7D196;
+  }
+  * { box-sizing: border-box; margin: 0; }
+  body { background: var(--paper); color: var(--ink); font-family: 'Inter', sans-serif; padding: 48px 16px 96px; }
+  .wrap { max-width: 1120px; margin: 0 auto; }
+  header.page { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 40px; font-size: 13px; color: var(--muted); }
+  header.page b { color: var(--ink); font-weight: 500; }
+  .cap { font-family: ui-monospace, 'SF Mono', Menlo, monospace; font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin: 0 0 12px; }
+  .cap b { color: var(--ink); font-weight: 500; }
+  section { margin-bottom: 56px; }
+  .card { background: var(--canvas); border: 1px solid var(--hair); display: grid; place-items: center; }
+
+  /* ---------- the lockup ----------
+     Sized by --s (the NOMINAL cap size in px). Everything else is in em of that. */
+  .logo { --ink-c: var(--ink); --on-ink: var(--canvas); font-size: var(--s, 160px); display: inline-flex; flex-direction: column; color: var(--ink-c); }
+  /* crop line: the caps' baseline sits at .725em; the strip hides the feet and serifs
+     but stops short of the L's foot, so the word still reads NOMINAL, not NOMINAI */
+  .logo .word { position: relative; height: .713em; overflow: hidden; }
+  /* small sizes: no crop, and a hairline gap so the L's foot doesn't melt into the strip */
+  .logo.sm .word { height: .726em; }
+  .logo.sm .strip { margin-top: .03em; }
+  .logo .nom {
+    display: block; font-family: 'Instrument Serif', serif; font-weight: 400; font-style: normal;
+    font-size: 1em; line-height: 1; letter-spacing: -.062em; margin-right: -.062em;
+    white-space: nowrap; transform: translateY(-.115em);
+  }
+  /* the strip: crops the feet and runs the full width of the word */
+  .logo .strip { height: .16em; background: var(--ink-c); position: relative; }
+  .logo .studios {
+    font-family: 'Inter', sans-serif; font-weight: 500; font-size: max(.118em, 7px); text-transform: uppercase;
+    display: flex; justify-content: space-between; margin-top: .62em; line-height: 1;
+  }
+  /* B: STUDIOS reversed out of the strip */
+  .logo.in-strip .strip { height: .21em; display: flex; align-items: center; padding: 0 .07em; }
+  .logo.in-strip .strip .studios { margin: 0; flex: 1; color: var(--on-ink); font-size: .104em; }
+  /* C: STUDIOS small, left, like a label */
+  .logo.label .studios { justify-content: flex-start; gap: .55em; font-size: .09em; margin-top: .7em; letter-spacing: .02em; }
+  .logo.label .studios i { font-style: normal; color: var(--muted); margin-left: auto; letter-spacing: .12em; }
+  .logo.inverse { --ink-c: var(--canvas); --on-ink: var(--ink); }
+  .logo.inverse.label .studios i { color: #9A9DA4; }
+
+  .grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .ink-bg { background: var(--ink); border-color: var(--ink); }
+
+  /* small sizes */
+  .sizes { display: flex; align-items: flex-end; gap: 48px; padding: 48px; flex-wrap: wrap; justify-content: center; }
+  .sizes figure { display: flex; flex-direction: column; align-items: flex-start; gap: 10px; }
+  .sizes figcaption { font-family: ui-monospace, Menlo, monospace; font-size: 10px; color: var(--muted); letter-spacing: .06em; }
+  /* the N stands on a strip that runs the full width of the tile */
+  .monogram { width: var(--m); height: var(--m); background: var(--canvas); border: 1px solid var(--hair); border-radius: 22%; overflow: hidden; display: flex; align-items: flex-end; }
+  .monogram .logo { width: 100%; align-items: center; }
+  .monogram .logo .strip { align-self: stretch; height: .24em; }
+  .bcard .logo, .site nav .logo { align-self: flex-start; }
+
+  /* business card */
+  .bcard { width: 100%; max-width: 420px; aspect-ratio: 3.5 / 2; background: var(--canvas); box-shadow: 0 1px 2px rgba(0,0,0,.06), 0 12px 32px rgba(0,0,0,.08); padding: 26px 28px; display: flex; flex-direction: column; justify-content: space-between; }
+  .bcard .meta { display: flex; justify-content: space-between; align-items: flex-end; font-size: 10px; line-height: 1.5; }
+  .bcard .meta span:last-child { text-align: right; color: var(--muted); font-family: ui-monospace, Menlo, monospace; font-size: 9px; letter-spacing: .06em; }
+  .bcard.back { background: var(--ink); justify-content: center; align-items: center; }
+
+  /* site header */
+  .site { background: var(--canvas); border: 1px solid var(--hair); }
+  .site nav { display: flex; justify-content: space-between; align-items: center; padding: 22px 28px; border-bottom: 1px solid var(--hair); font-size: 13px; }
+  .site nav ul { display: flex; gap: 28px; list-style: none; padding: 0; color: var(--muted); }
+  .site nav ul li:first-child { color: var(--ink); }
+  .site .hero { padding: 72px 28px 64px; display: grid; grid-template-columns: 1.2fr 1fr; gap: 32px; align-items: end; }
+  .site .hero h1 { font-family: 'Instrument Serif', serif; font-weight: 400; font-size: 56px; line-height: 1; letter-spacing: -.02em; }
+  .site .hero h1 em { font-style: italic; }
+  .site .hero p { font-size: 15px; line-height: 1.55; color: var(--muted); max-width: 34ch; }
+
+  @media (max-width: 760px) {
+    .grid3, .grid2, .site .hero { grid-template-columns: 1fr; }
+    .card.hero-card .logo { --s: 26vw !important; }
+    .site nav ul { display: none; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="page"><span><b>Nominal Studios</b> — logo lockup</span><span>Instrument Serif · Inter Medium · #1C1F26</span></header>
+
+  <section>
+    <p class="cap"><b>A · Primary</b> — Studios spans the full width under the strip</p>
+    <div class="card hero-card" style="padding: 96px 32px;">
+      <div class="logo" style="--s: 168px;">
+        <div class="word"><span class="nom">NOMINAL</span></div>
+        <div class="strip"></div>
+        <div class="studios"><span>S</span><span>T</span><span>U</span><span>D</span><span>I</span><span>O</span><span>S</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <p class="cap"><b>Alternates</b></p>
+    <div class="grid3">
+      <div>
+        <div class="card" style="padding: 56px 24px; height: 240px;">
+          <div class="logo in-strip sm" style="--s: 80px;">
+            <div class="word"><span class="nom">NOMINAL</span></div>
+            <div class="strip"><div class="studios"><span>S</span><span>T</span><span>U</span><span>D</span><span>I</span><span>O</span><span>S</span></div></div>
+          </div>
+        </div>
+        <p class="cap" style="margin-top:10px;">B · Reversed out of the strip</p>
+      </div>
+      <div>
+        <div class="card" style="padding: 56px 24px; height: 240px;">
+          <div class="logo label sm" style="--s: 80px;">
+            <div class="word"><span class="nom">NOMINAL</span></div>
+            <div class="strip"></div>
+            <div class="studios"><span>Studios</span><i>EST. 2026</i></div>
+          </div>
+        </div>
+        <p class="cap" style="margin-top:10px;">C · Label, left-set</p>
+      </div>
+      <div>
+        <div class="card ink-bg" style="padding: 56px 24px; height: 240px;">
+          <div class="logo inverse sm" style="--s: 80px;">
+            <div class="word"><span class="nom">NOMINAL</span></div>
+            <div class="strip"></div>
+            <div class="studios"><span>S</span><span>T</span><span>U</span><span>D</span><span>I</span><span>O</span><span>S</span></div>
+          </div>
+        </div>
+        <p class="cap" style="margin-top:10px;">A · Inverse</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <p class="cap"><b>Scale</b> — the strip and Studios hold down to header size; below that, the N alone</p>
+    <div class="card sizes">
+      <figure><div class="logo sm" style="--s: 64px;"><div class="word"><span class="nom">NOMINAL</span></div><div class="strip"></div><div class="studios"><span>S</span><span>T</span><span>U</span><span>D</span><span>I</span><span>O</span><span>S</span></div></div><figcaption>64 PX</figcaption></figure>
+      <figure><div class="logo sm" style="--s: 40px;"><div class="word"><span class="nom">NOMINAL</span></div><div class="strip"></div><div class="studios"><span>S</span><span>T</span><span>U</span><span>D</span><span>I</span><span>O</span><span>S</span></div></div><figcaption>40 PX</figcaption></figure>
+      <figure><div class="logo sm" style="--s: 26px;"><div class="word"><span class="nom">NOMINAL</span></div><div class="strip"></div></div><figcaption>26 PX · NO STUDIOS</figcaption></figure>
+      <figure><div class="monogram" style="--m: 96px;"><div class="logo" style="--s: 74px;"><div class="word"><span class="nom">N</span></div><div class="strip"></div></div></div><figcaption>APP / AVATAR</figcaption></figure>
+      <figure><div class="monogram" style="--m: 40px;"><div class="logo" style="--s: 31px;"><div class="word"><span class="nom">N</span></div><div class="strip"></div></div></div><figcaption>FAVICON</figcaption></figure>
+    </div>
+  </section>
+
+  <section>
+    <p class="cap"><b>In use</b></p>
+    <div class="grid2" style="margin-bottom:16px;">
+      <div class="card" style="padding: 48px 24px; background: #ECECE9;">
+        <div class="bcard">
+          <div class="logo sm" style="--s: 54px;"><div class="word"><span class="nom">NOMINAL</span></div><div class="strip"></div><div class="studios"><span>S</span><span>T</span><span>U</span><span>D</span><span>I</span><span>O</span><span>S</span></div></div>
+          <div class="meta"><span><b style="font-weight:500">Walker Tracy</b><br>hello@nominal.studio</span><span>THE SMALL THINGS,<br>PERFECTED.</span></div>
+        </div>
+      </div>
+      <div class="card" style="padding: 48px 24px; background: #ECECE9;">
+        <div class="bcard back">
+          <div class="logo inverse in-strip sm" style="--s: 64px;"><div class="word"><span class="nom">NOMINAL</span></div><div class="strip"><div class="studios"><span>S</span><span>T</span><span>U</span><span>D</span><span>I</span><span>O</span><span>S</span></div></div></div>
+        </div>
+      </div>
+    </div>
+    <div class="site">
+      <nav>
+        <div class="logo sm" style="--s: 40px;"><div class="word"><span class="nom">NOMINAL</span></div><div class="strip"></div><div class="studios"><span>S</span><span>T</span><span>U</span><span>D</span><span>I</span><span>O</span><span>S</span></div></div>
+        <ul><li>Apps</li><li>Notes</li><li>About</li></ul>
+      </nav>
+      <div class="hero">
+        <h1>The small things, <em>perfected.</em></h1>
+        <p>Weather, Actually. Some Noise. Signl. Little apps for ordinary days, made with an unreasonable amount of care.</p>
+      </div>
+    </div>
+  </section>
+</div>
+</body>
+</html>
