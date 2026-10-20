@@ -27,19 +27,16 @@
   /* ---------- the lockup ----------
      Sized by --s (the NOMINAL cap size in px). Everything else is in em of that. */
   .logo { --ink-c: var(--ink); --on-ink: var(--canvas); font-size: var(--s, 160px); display: inline-flex; flex-direction: column; color: var(--ink-c); }
-  /* crop line: the caps' baseline sits at .725em; the strip hides the feet and serifs
-     but stops short of the L's foot, so the word still reads NOMINAL, not NOMINAI */
-  .logo .word { position: relative; height: .713em; overflow: hidden; }
-  /* small sizes: no crop, and a hairline gap so the L's foot doesn't melt into the strip */
-  .logo.sm .word { height: .726em; }
-  .logo.sm .strip { margin-top: .03em; }
+  /* crop line: the caps' baseline sits at .725em; the strip swallows the bottom ~15% of
+     the word (feet, serifs and the L's foot), as in the reference */
+  .logo .word { position: relative; height: .615em; overflow: hidden; }
   .logo .nom {
     display: block; font-family: 'Instrument Serif', serif; font-weight: 400; font-style: normal;
     font-size: 1em; line-height: 1; letter-spacing: -.062em; margin-right: -.062em;
     white-space: nowrap; transform: translateY(-.115em);
   }
   /* the strip: crops the feet and runs the full width of the word */
-  .logo .strip { height: .16em; background: var(--ink-c); position: relative; }
+  .logo .strip { height: .17em; background: var(--ink-c); position: relative; }
   .logo .studios {
     font-family: 'Inter', sans-serif; font-weight: 500; font-size: max(.118em, 7px); text-transform: uppercase;
     display: flex; justify-content: space-between; margin-top: .62em; line-height: 1;
@@ -110,7 +107,7 @@
     <div class="grid3">
       <div>
         <div class="card" style="padding: 56px 24px; height: 240px;">
-          <div class="logo in-strip sm" style="--s: 80px;">
+          <div class="logo in-strip" style="--s: 80px;">
             <div class="word"><span class="nom">NOMINAL</span></div>
             <div class="strip"><div class="studios"><span>S</span><span>T</span><span>U</span><span>D</span><span>I</span><span>O</span><span>S</span></div></div>
           </div>
@@ -119,7 +116,7 @@
       </div>
       <div>
         <div class="card" style="padding: 56px 24px; height: 240px;">
-          <div class="logo label sm" style="--s: 80px;">
+          <div class="logo label" style="--s: 80px;">
             <div class="word"><span class="nom">NOMINAL</span></div>
             <div class="strip"></div>
             <div class="studios"><span>Studios</span><i>EST. 2026</i></div>
@@ -129,7 +126,7 @@
       </div>
       <div>
         <div class="card ink-bg" style="padding: 56px 24px; height: 240px;">
-          <div class="logo inverse sm" style="--s: 80px;">
+          <div class="logo inverse" style="--s: 80px;">
             <div class="word"><span class="nom">NOMINAL</span></div>
             <div class="strip"></div>
             <div class="studios"><span>S</span><span>T</span><span>U</span><span>D</span><span>I</span><span>O</span><span>S</span></div>
@@ -143,9 +140,9 @@
   <section>
     <p class="cap"><b>Scale</b> — the strip and Studios hold down to header size; below that, the N alone</p>
     <div class="card sizes">
-      <figure><div class="logo sm" style="--s: 64px;"><div class="word"><span class="nom">NOMINAL</span></div><div class="strip"></div><div class="studios"><span>S</span><span>T</span><span>U</span><span>D</span><span>I</span><span>O</span><span>S</span></div></div><figcaption>64 PX</figcaption></figure>
-      <figure><div class="logo sm" style="--s: 40px;"><div class="word"><span class="nom">NOMINAL</span></div><div class="strip"></div><div class="studios"><span>S</span><span>T</span><span>U</span><span>D</span><span>I</span><span>O</span><span>S</span></div></div><figcaption>40 PX</figcaption></figure>
-      <figure><div class="logo sm" style="--s: 26px;"><div class="word"><span class="nom">NOMINAL</span></div><div class="strip"></div></div><figcaption>26 PX · NO STUDIOS</figcaption></figure>
+      <figure><div class="logo" style="--s: 64px;"><div class="word"><span class="nom">NOMINAL</span></div><div class="strip"></div><div class="studios"><span>S</span><span>T</span><span>U</span><span>D</span><span>I</span><span>O</span><span>S</span></div></div><figcaption>64 PX</figcaption></figure>
+      <figure><div class="logo" style="--s: 40px;"><div class="word"><span class="nom">NOMINAL</span></div><div class="strip"></div><div class="studios"><span>S</span><span>T</span><span>U</span><span>D</span><span>I</span><span>O</span><span>S</span></div></div><figcaption>40 PX</figcaption></figure>
+      <figure><div class="logo" style="--s: 26px;"><div class="word"><span class="nom">NOMINAL</span></div><div class="strip"></div></div><figcaption>26 PX · NO STUDIOS</figcaption></figure>
       <figure><div class="monogram" style="--m: 96px;"><div class="logo" style="--s: 74px;"><div class="word"><span class="nom">N</span></div><div class="strip"></div></div></div><figcaption>APP / AVATAR</figcaption></figure>
       <figure><div class="monogram" style="--m: 40px;"><div class="logo" style="--s: 31px;"><div class="word"><span class="nom">N</span></div><div class="strip"></div></div></div><figcaption>FAVICON</figcaption></figure>
     </div>
@@ -156,19 +153,19 @@
     <div class="grid2" style="margin-bottom:16px;">
       <div class="card" style="padding: 48px 24px; background: #ECECE9;">
         <div class="bcard">
-          <div class="logo sm" style="--s: 54px;"><div class="word"><span class="nom">NOMINAL</span></div><div class="strip"></div><div class="studios"><span>S</span><span>T</span><span>U</span><span>D</span><span>I</span><span>O</span><span>S</span></div></div>
+          <div class="logo" style="--s: 54px;"><div class="word"><span class="nom">NOMINAL</span></div><div class="strip"></div><div class="studios"><span>S</span><span>T</span><span>U</span><span>D</span><span>I</span><span>O</span><span>S</span></div></div>
           <div class="meta"><span><b style="font-weight:500">Walker Tracy</b><br>hello@nominal.studio</span><span>THE SMALL THINGS,<br>PERFECTED.</span></div>
         </div>
       </div>
       <div class="card" style="padding: 48px 24px; background: #ECECE9;">
         <div class="bcard back">
-          <div class="logo inverse in-strip sm" style="--s: 64px;"><div class="word"><span class="nom">NOMINAL</span></div><div class="strip"><div class="studios"><span>S</span><span>T</span><span>U</span><span>D</span><span>I</span><span>O</span><span>S</span></div></div></div>
+          <div class="logo inverse in-strip" style="--s: 64px;"><div class="word"><span class="nom">NOMINAL</span></div><div class="strip"><div class="studios"><span>S</span><span>T</span><span>U</span><span>D</span><span>I</span><span>O</span><span>S</span></div></div></div>
         </div>
       </div>
     </div>
     <div class="site">
       <nav>
-        <div class="logo sm" style="--s: 40px;"><div class="word"><span class="nom">NOMINAL</span></div><div class="strip"></div><div class="studios"><span>S</span><span>T</span><span>U</span><span>D</span><span>I</span><span>O</span><span>S</span></div></div>
+        <div class="logo" style="--s: 40px;"><div class="word"><span class="nom">NOMINAL</span></div><div class="strip"></div><div class="studios"><span>S</span><span>T</span><span>U</span><span>D</span><span>I</span><span>O</span><span>S</span></div></div>
         <ul><li>Apps</li><li>Notes</li><li>About</li></ul>
       </nav>
       <div class="hero">
