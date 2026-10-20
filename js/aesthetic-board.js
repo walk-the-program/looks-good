@@ -682,7 +682,7 @@ function abBoardParts(state, def) {
         ${P.list()}
       </section>`;
 
-  P.foot = () => `<footer class="ab-foot"><span class="ab-motto"><i class="ab-dot" aria-hidden="true"></i>${e(def.motto)}</span><span class="ab-infl">${e(def.influences)}</span></footer>`;
+  P.foot = () => `<footer class="ab-foot"><span class="ab-motto"><i class="ab-dot" aria-hidden="true"></i>${e(displayMotto(state, def, copy.tagline))}</span><span class="ab-infl">${e(def.influences)}</span></footer>`;
 
   // def.states(ctx) (optional): the aesthetic's own state component, as the inner HTML
   // of <div class="ab-states" data-kind="custom"> (root data-states="custom"). ctx is

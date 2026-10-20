@@ -204,6 +204,9 @@ function briefOpenProduct() {
     const PRI = t.printed ? t.printPrimary : t.primary;
     const ctaBg = def.ctaFill === 'ink' ? t.ink : PRI;
     const ctaFg = def.ctaFill === 'ink' ? t.canvas : t.onPrimary;
+    // Warmer shows no motto here: the tagline is already on the cover.
+    const voice = brandVoice(state);
+    const motto = voice.mode === 'style' ? def.motto : voice.motto;
     const logo = state.logoDataUrl ? `<img class="bv-plate-logo" src="${esc(state.logoDataUrl)}" alt="" />` : '';
     const toc = [['colour', 'Colour'], ['type', 'Type'], ['components', 'Components'], ['patterns', 'Patterns'], ['shape', 'Shape and materials'], ['text', 'Full text']]
       .map(([id, name], i) => `<li><a href="#bv-${id}" data-bv-go="${id}"><span>0${i + 1}</span>${esc(name)}</a></li>`).join('');
@@ -218,7 +221,7 @@ function briefOpenProduct() {
           <div><dt>Type</dt><dd>${esc(hf.name)}${bf.name !== hf.name ? ' and ' + esc(bf.name) : ''}</dd></div>
         </dl>
         <p class="bv-lede">${esc(def.summary || def.descriptor || '')}</p>
-        ${def.motto ? `<p class="bv-motto">${esc(def.motto)}</p>` : ''}
+        ${motto ? `<p class="bv-motto">${esc(motto)}</p>` : ''}
         <nav class="bv-toc" aria-label="Contents"><ol>${toc}</ol></nav>
       </div>
       <figure class="bv-plate bv-cover-plate" style="${plateStyle(t, state, 'b')}" aria-label="The brand, set in its own colours and fonts">

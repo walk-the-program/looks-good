@@ -98,6 +98,8 @@ registerAesthetic({
   influences: 'Balenciaga web / Maison Margiela labels / Museum accession',
   summary: 'Severity through removal: a tiny logo, vast white space, enormous cropped type and blank labels.',
   motto: 'Access is a privilege.',
+  signature: 'the enormous cropped brand word under a black strip',
+  ctaFill: 'ink',
   mode: 'light',
   slideShape: 'minimal',
   labels: { material: 'Accession', states: ['Catalogued', 'Private', 'Reserved'], statesKind: 'button' },

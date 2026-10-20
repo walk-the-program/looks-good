@@ -308,6 +308,7 @@ const DECK_SLIDES = [
     key: 'principles', title: 'Principles',
     build(P, state, def) {
       const e = escapeHtml;
+      const motto = displayMotto(state, def, P.copy.tagline);
       const items = bdPrinciples(def).map((p, i) => `<li class="ab-deck-principle">
           <span class="ab-label"><i class="ab-n">${String(i + 1).padStart(2, '0')}</i></span>
           <div><h3 class="ab-deck-ptitle">${e(p[0])}</h3>${p[1] ? `<p class="ab-deck-pline">${e(p[1])}</p>` : ''}</div>
@@ -315,7 +316,7 @@ const DECK_SLIDES = [
       return `<div class="ab-deck-principles">
         <div class="ab-deck-lead">
           <p class="ab-label ab-deck-kick">How ${e(P.copy.brandName)} looks and feels</p>
-          ${abHeadlineH2(def, P.ctx, def.motto, ' ab-deck-h', ` style="--dk-fs:${bdMottoPx(def.motto, 70)}px"`)}
+          ${abHeadlineH2(def, P.ctx, motto, ' ab-deck-h', ` style="--dk-fs:${bdMottoPx(motto, 70)}px"`)}
           <p class="ab-deck-desc">${e(def.summary || def.descriptor)}</p>
         </div>
         <ol class="ab-deck-plist">${items}</ol>
@@ -498,9 +499,10 @@ const DECK_SLIDES = [
     key: 'closing', title: 'Closing', pattern: true, foot: 'closing',
     build(P, state, def) {
       const e = escapeHtml;
+      const motto = displayMotto(state, def, P.copy.tagline);
       return `<div class="ab-deck-closing">
         <div class="ab-deck-closemain">
-          ${abHeadlineH2(def, P.ctx, def.motto, ' ab-deck-h', ` style="--dk-fs:${bdMottoPx(def.motto, 104)}px"`)}
+          ${abHeadlineH2(def, P.ctx, motto, ' ab-deck-h', ` style="--dk-fs:${bdMottoPx(motto, 104)}px"`)}
           <p class="ab-deck-desc">${e(def.descriptor)}</p>
         </div>
         <div class="ab-deck-contact">

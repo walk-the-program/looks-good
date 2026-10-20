@@ -96,6 +96,18 @@ const AIB_HEX = /^#[0-9a-f]{6}$/i;
 function aibHighlightKind(def) {
   return def.highlight === 'band' || def.highlight === 'custom' ? def.highlight : 'ink';
 }
+// True when the aesthetic's colour rules keep a role in the palette only (its `use` starts "Palette only").
+const aibPaletteOnly = (roles, role) => !!(roles && roles[role] && /^palette only/i.test(roles[role].use || ''));
+
+// True when the aesthetic's own colour rules keep the primary off buttons and controls (its role's `never`
+// names a button fill, or buttons in a list of things). The generic component text then draws those states in
+// --ink, and the main action is ink-filled, so no component line contradicts the rule.
+function aibPrimaryBarred(roles) {
+  const r = roles && roles.primary;
+  return !!r && /\ba button fill\b|\bbuttons,|,\s*buttons\b/i.test(r.never || '');
+}
+const aibInkCta = def => def.ctaFill === 'ink' || aibPrimaryBarred(def.roles);
+
 // Aesthetics whose UI controls (cards, inputs, buttons, selected segments) carry
 // an ink border. In Bauhaus Poster only the controls do; the art shapes have no
 // outline.
@@ -120,11 +132,13 @@ function aibComponentRows(t, def, extras) {
   // primary fills, rules and marks use --primary-print; --primary is the brand hex only.
   // A printed primary (def.printPrimary) is the one --primary token in the brief: the table lists the
   // printed hex, so the components always say --primary.
-  const PRI = '--primary';
-  const ONP = '--on-primary';
-  const focusLow = contrastRatio(t.printPrimary, t.canvas) < 3;
+  const barred = aibPrimaryBarred(def.roles);
+  const PRI = barred ? '--ink' : '--primary';   // where the colour rules bar the primary, its states are drawn in --ink
+  const ONP = barred ? '--canvas' : '--on-primary';
+  const secOff = aibPaletteOnly(def.roles, 'secondary'), accOff = aibPaletteOnly(def.roles, 'accent');
+  const focusLow = !barred && contrastRatio(t.printPrimary, t.canvas) < 3;
   const hlKind = aibHighlightKind(def);
-  const inkCta = def.ctaFill === 'ink';
+  const inkCta = aibInkCta(def);
 
   let segOn;
   if (key === 'soft-form' || key === 'raw-brutalist') segOn = ['--ink', '--canvas', 'none'];
@@ -156,23 +170,23 @@ function aibComponentRows(t, def, extras) {
     inkCta
       ? ['Main button (one per view, ink-filled)', '--ink', '--canvas', 'none']
       : ['Primary button (one per view)', PRI, ONP, inkBorder ? '--ink' : ctaEdge || 'none'],
-    ['Secondary button', 'transparent (hover: --sec-tint)', '--ink', '--secondary'],
+    ['Secondary button', secOff ? 'transparent' : 'transparent (hover: --sec-tint)', '--ink', secOff ? '--ink' : '--secondary'],
     ['Ghost / tertiary link', 'none', '--ink (underlined)', 'none'],
     ['Input field, rest', '--canvas', '--ink (placeholder: --muted)', inkBorder ? '--ink' : '--line'],
-    ['Input field, focus', '--canvas', '--ink', `${PRI} (plus a 3px ring of ${PRI} at 40% opacity)`],
+    ['Input field, focus', '--canvas', '--ink', barred ? '2px --ink, no ring' : `${PRI} (plus a 3px ring of ${PRI} at 40% opacity)`],
     ['Segmented control, selected', ...segOn],
     ['Segmented control, unselected', 'transparent', '--muted', 'none'],
     ['Toggle, on', toggleOn, '--ink (label)', 'none'],
     ['Toggle, off', toggleOff, '--ink (label)', 'none'],
-    ['Tag / chip', '--secondary', '--on-secondary', 'none'],
-    ['Badge ("New", notification)', key === 'aurora-noir' && !t.accentLow
+    secOff ? ['Tag / chip', '--canvas', '--ink', '--line'] : ['Tag / chip', '--secondary', '--on-secondary', 'none'],
+    accOff ? ['Badge ("New", notification)', '--canvas', '--ink', '--ink'] : ['Badge ("New", notification)', key === 'aurora-noir' && !t.accentLow
       ? t.mix(t.accent, t.canvas, 0.15) + ' (accent at 15%)' : '--accent',
     key === 'aurora-noir' && !t.accentLow ? '--accent' : '--on-accent', 'none'],
     ['Headline highlight word (one per view)', ...hl],
     ['Divider / hairline', '--line', 'n/a', 'n/a'],
     ['List row, selected', '--sec-tint', '--ink', `left edge 2px ${PRI}`],
     ['List row, resting', 'transparent', '--ink (meta: --muted)', 'bottom 1px --line'],
-    ['Progress / data bar', 'track --line', 'n/a', `fill ${PRI} (second series: --secondary)`],
+    ['Progress / data bar', 'track --line', 'n/a', `fill ${PRI}${secOff ? '' : ' (second series: --secondary)'}`],
     ['Focus ring (any control)', 'n/a', 'n/a', focusLow ? `3px ${PRI} with an outer 1px --ink ring (primary alone is under 3:1 on this canvas)` : PRI],
   ];
 }
@@ -2003,7 +2017,7 @@ function aibContext(state0, opts) {
   ctx.tagline = String(ctx.content.tagline).replace(/\s+/g, ' ').trim();
   ctx.rows = aibPaletteRows(ctx);
   ctx.scale = aibTypeScale(ctx);
-  ctx.focusLow = modes.some(m => contrastRatio(aibPri(m.t), m.t.canvas) < 3);
+  ctx.focusLow = !aibPrimaryBarred(ctx.roles) && modes.some(m => contrastRatio(aibPri(m.t), m.t.canvas) < 3);
   // App briefs: the UI kit as the Built view draws it (null without a DOM, then the static rows stand in).
   ctx.kitSnap = ctx.app && !opts.noProbe ? (opts.kitSnap || aibKitMeasure(state0, mode, !only)) : (opts.kitSnap || null);
   // names in the kit rows resolve against the palette of the mode the kit was drawn in
@@ -2278,13 +2292,42 @@ function aibAppText(ctx, text, fallback, opts) {
 const aibUnit = ctx => (ctx.swiftOnly ? 'pt' : ctx.web && ctx.swift ? 'px (pt in SwiftUI)' : 'px');
 const aibCap = s => String(s).charAt(0).toUpperCase() + String(s).slice(1);
 
+// The brand's voice setting (app.js brandVoice); Style's voice when that is not loaded.
+const aibVoice = state => (typeof brandVoice === 'function' ? brandVoice(state) : { mode: 'style', note: '', motto: '' });
+
 function aibBrandLine(ctx) {
   const { def } = ctx;
   const plain = `${def.name}'s look, carried through the product's controls, surfaces and type.`;
   let summary = aibAppText(ctx, def.summary || '', plain, { subject: true });
   // When the leading sentence was art, the plain line stands in for it (blends add "Mixed with X." after it).
   if (summary !== (def.summary || '') && summary !== plain && !String(def.summary).startsWith(summary.split('. ')[0])) summary = plain + ' ' + summary;
-  return `${ctx.brandName}: ${ctx.tagline} Aesthetic: ${def.name} (${def.descriptor}; ${def.influences}). ${summary}${def.motto ? ' ' + def.motto : ''}`;
+  // The aesthetic's motto is its own voice: Style's voice keeps it, Own words swaps in the user's, Warmer drops it.
+  const v = aibVoice(ctx.state);
+  const motto = v.mode === 'style' ? def.motto : v.motto;
+  return `${ctx.brandName}: ${ctx.tagline} Aesthetic: ${def.name} (${def.descriptor}; ${def.influences}). ${summary}${motto ? ' ' + motto : ''}`;
+}
+
+// Voice: only when the owner moved off the style's own wording. A written voice note is Locked; Warmer is Guided.
+function aibSecVoice(ctx) {
+  const v = aibVoice(ctx.state), { def } = ctx;
+  if (v.mode === 'style') return [];
+  const mottoNote = def.motto ? ` Its motto ("${def.motto}") and the specimen phrases on its board and slides` : ' The specimen phrases on its board and slides';
+  return [`## Voice (${v.note ? 'Locked' : 'Guided'})`,
+    `- The aesthetic governs visuals only.${mottoNote} are style placeholders, not brand copy: never use them in the product.`,
+    ...(v.note ? [`- Voice, in the owner's words: "${v.note}". Write every line of copy in that voice.`] : []),
+    ...(v.motto ? [`- Motto, used as written wherever a motto belongs: "${v.motto}"`] : []),
+    '- Write copy warm, curious, plain and short: everyday words, no slogans, no formal or exclusive phrasing.',
+    '- Keep severity in the layout and type, not in the words: the look stays as strict as the rules below say, and the copy does not copy it.'];
+}
+
+// Rules that hold for every brand (product imagery) plus the aesthetic's signature device when it has one.
+function aibSecImagery(ctx) {
+  const { def } = ctx;
+  const where = ctx.site ? 'site' : 'app';
+  return ['## Signature and product imagery',
+    '- Embedded product screenshots, app icons and product imagery keep their own colours. They are exempt from the canvas and colour coverage budget and from the accent and primary limits; the studio frame around them (surfaces, captions, borders) follows the brand rules.',
+    '- Coverage and whitespace targets apply to the brand\'s own surfaces, not to product pages that showcase a product\'s own visual system.',
+    ...(def.signature ? [`- Signature: ${def.signature}. It appears once per ${where}, as the brand moment (for example the home hero or the footer), and is not repeated across pages or sections.`] : [])];
 }
 
 function aibSecBlend(ctx) {
@@ -2301,8 +2344,9 @@ function aibSecBlend(ctx) {
 
 function aibSecColors(ctx) {
   const { def } = ctx;
-  const inkCta = def.ctaFill === 'ink';
-  const out = ['## Colors', aibColorsTable(ctx)];
+  const inkCta = aibInkCta(def);
+  const barred = aibPrimaryBarred(ctx.roles);
+  const out = ['## Colors', aibColorsTable(ctx), 'Where this aesthetic\'s colour rules and a component description disagree, the colour rules win.'];
   if (ctx.unusedRows && ctx.unusedRows.length) out.push(`Palette colours no app component draws (brand board and app icon only; they stay in \`:root\`): ${ctx.unusedRows.map(r => `\`${r.token}\` ${ctx.modes.map(m => r.get(m)).filter((v, i, a) => a.indexOf(v) === i).join(' / ')}`).join(', ')}.`);
   if (ctx.web && ctx.swift) out.push('SwiftUI name: `Palette.` plus the camelCase token (`--on-primary` is `Palette.onPrimary`).');
   if (ctx.kit) {
@@ -2319,7 +2363,9 @@ function aibSecColors(ctx) {
   }
   out.push(...[
     inkCta
-      ? '- One main call to action per view, filled `--ink` with a `--canvas` label. `--primary` never fills a button; it marks state (selected controls, switch on, focus ring, progress, status dot). Secondary never fills it or sets body text; accent never goes on buttons, body text or borders.'
+      ? '- One main call to action per view, filled `--ink` with a `--canvas` label. ' + (barred
+        ? '`--primary` never fills a button and marks no state; it appears only as the Colors table says. '
+        : '`--primary` never fills a button; it marks state (selected controls, switch on, focus ring, progress, status dot). ') + 'Secondary never fills it or sets body text; accent never goes on buttons, body text or borders.'
       : '- One primary-filled action per view. Secondary never fills it or sets body text; accent never goes on buttons, body text or borders.',
     aibHighlightRule(ctx),
     '- Text is set only in `--ink`, `--muted` or the `--on-*` token for its fill (plus the highlight word). No other colors, tints or gradients; hover and pressed use only the States and Materials below.',
@@ -2419,6 +2465,8 @@ function aibKitRowData(ctx) {
   const sec = by('Secondary button'), ghost = by('Ghost'), rest = by('Input field, rest'), foc = by('Input field, focus');
   const segOn = by('Segmented control, selected'), tog = by('Toggle, on'), tag = by('Tag'), badge = by('Badge');
   const prog = by('Progress'), listSel = by('List row, selected');
+  const PRI = aibPrimaryBarred(ctx.roles) ? '--ink' : '--primary';   // the colour rules win over the generic rows
+  const secOff = aibPaletteOnly(ctx.roles, 'secondary'), accOff = aibPaletteOnly(ctx.roles, 'accent');
   const edgeTok = card[3] === '--ink' ? '--ink' : '--line';
   const r = ctx.radius, u = 'pt';
   const cn = n => (n >= 999 ? 'pill' : n + u);
@@ -2445,20 +2493,20 @@ function aibKitRowData(ctx) {
     'radio': [`off: ${rest[1]}; on: ${segOn[1]}`, `dot ${segOn[2]}`, edge(`off ${rest[3]}; on ${segOn[3]}`, 'circle'), `24pt, ${tap}pt hit area`],
     'toggle': [`on: ${tog[1]}; off: ${by('Toggle, off')[1]}`, '--ink (label beside it)', 'no edge; pill', `51x31pt, ${tap}pt hit area`],
     'segmented': [`selected: ${segOn[1]}; unselected: transparent`, `selected ${segOn[2]}; unselected --muted`, edge(`selected ${segOn[3]}`, corner(r.control)), `${hl(tap)}, equal-width segments`],
-    'slider': [`track --line; filled part ${'--primary'}`, 'n/a', edge('thumb --primary', 'pill track'), `4pt track, 28pt thumb, ${tap}pt hit area`],
+    'slider': [`track --line; filled part ${PRI}`, 'n/a', edge(`thumb ${PRI}`, 'pill track'), `4pt track, 28pt thumb, ${tap}pt hit area`],
     'card': [card[1], /^--card(?![\w-])/.test(card[1]) ? aibOnCard(ctx, card[2]) : card[2], edge(card[3] === 'none' ? 'none' : '1px ' + card[3], corner(r.card)), `padding ${P.cardPadding || 20}pt`],
     'list': [`${card[1]}; selected: ${listSel[1]}`, /^--card(?![\w-])/.test(card[1]) ? aibOnCard(ctx, '--ink (meta and chevron: --muted)') : '--ink (meta and chevron: --muted)', edge(`bottom 1px --line between rows; selected: ${listSel[3]}`, 'rows share the list\'s ' + corner(r.card)), `${hl(P.rowHeight || 52)}, full width`],
-    'callout': [`info --primary at 12% over --canvas; success --secondary at 12%; warning --accent at 12%; ${aibDanger(cur.t).role ? 'error --error at 12% over --canvas' : 'error --canvas'}`, '--ink (message), with an icon and a label word so status is never colour alone; icon in the tone, shaded to 3:1', edge(`1px of the tone at 40% (error: ${aibDanger(cur.t).role ? '1px --error' : '2px --ink'})`, corner(r.card)), 'padding 16pt, full width; palette colours only, no stock green, amber or red'],
+    'callout': [`info ${PRI} at 12% over --canvas; success ${secOff ? '--ink' : '--secondary'} at 12%; warning ${accOff ? '--ink' : '--accent'} at 12%; ${aibDanger(cur.t).role ? 'error --error at 12% over --canvas' : 'error --canvas'}`, '--ink (message), with an icon and a label word so status is never colour alone; icon in the tone, shaded to 3:1', edge(`1px of the tone at 40% (error: ${aibDanger(cur.t).role ? '1px --error' : '2px --ink'})`, corner(r.card)), 'padding 16pt, full width; palette colours only, no stock green, amber or red'],
     'sheet': [card[1], /^--card(?![\w-])/.test(card[1]) ? aibOnCard(ctx, card[2]) : card[2], edge(card[3] === 'none' ? 'none' : '1px ' + card[3], `${corner(r.card)} on the top corners`), `padding ${P.cardPadding || 20}pt; grabber 36x5pt in --line; scrim --ink at 40%`],
     'divider': ['--line', 'section label: --muted (Caption)', 'n/a', `1px; ${P.sectionGap || 28}pt above a section label`],
     'topbar': ['--canvas', '--ink (title, icons)', 'bottom 1px --line once content scrolls under it', `${tap}pt bar under the status area; one Large title below it`],
-    'tabbar': ['--canvas', 'selected --ink with a small --primary pill under the label; unselected --muted', 'top 1px --line', `${P.tabBarHeight || 83}pt including the home indicator`],
-    'tabs': ['none', 'selected --ink; unselected --muted', 'selected: 2px --primary under the label', hl(tap)],
+    'tabbar': ['--canvas', `selected --ink with a small ${PRI} pill under the label; unselected --muted`, 'top 1px --line', `${P.tabBarHeight || 83}pt including the home indicator`],
+    'tabs': ['none', 'selected --ink; unselected --muted', `selected: 2px ${PRI} under the label`, hl(tap)],
     'badge': [`neutral: ${tag[1]}; accent: ${badge[1]}`, `neutral ${tag[2]}; accent ${badge[2]}`, edge('none', 'pill'), '20pt high, Caption text'],
     'progress': [prog[1], 'n/a', edge(prog[3], 'pill'), '6pt high, full width'],
     'toast': ['--ink', '--canvas', edge('none', corner(r.card)), `min 48pt high, ${P.margin || 20}pt from the side edges, gone after 3 s`],
-    'empty': ['none', 'title --ink (Title 2); message --muted (Subhead); icon --muted', 'n/a', 'centred; one primary button; ' + (ctx.site ? 'an icon, never an illustration' : 'an icon only')],
-    'avatar': ['--secondary', '--on-secondary (initials)', edge('none', 'circle'), '32, 40 or 56pt'],
+    'empty': ['none', 'title --ink (Title 2); message --muted (Subhead); icon --muted', 'n/a', 'centred; one main button; ' + (ctx.site ? 'an icon, never an illustration' : 'an icon only')],
+    'avatar': [secOff ? '--line' : '--secondary', secOff ? '--ink (initials)' : '--on-secondary (initials)', edge('none', 'circle'), '32, 40 or 56pt'],
   };
 }
 
@@ -2693,14 +2741,17 @@ function aibSecModes(ctx) {
 }
 
 function aibFocusColor(ctx) {
-  if (ctx.kit) return '`--ink`';
+  if (ctx.kit || aibPrimaryBarred(ctx.roles)) return '`--ink`';
   return '`--primary`' + (ctx.focusLow ? ' plus an outer 1pt `--ink` ring (primary alone is under 3:1 on a canvas here)' : '');
 }
 
 function aibSecStates(ctx) {
   const { build } = ctx;
   const S = build.states;
-  const row = (name, colour, visual) => [name, ctx.tok(colour), ctx.tok(visual)];
+  // Where the colour rules bar the primary, the generic state colours name the ink instead.
+  const barred = aibPrimaryBarred(ctx.roles);
+  const fix = x => (barred ? String(x).replace(/`--primary`/g, '`--ink`').replace(/`--pri-tint`/g, '`--line`').replace(/\(primary\)/g, '(main action)') : x);
+  const row = (name, colour, visual) => [name, ctx.tok(fix(colour)), ctx.tok(fix(visual))];
   if (ctx.kit) {
     return ['## States',
       aibTable(['State', 'Colour', 'Visual'], [
@@ -2736,7 +2787,7 @@ function aibSecMotion(ctx) {
   const mo = build.motion;
   const out = ['## Motion'];
   out.push(`- Durations: fast ${mo.fast} ms (press, toggle), base ${mo.base} ms (color, selection, shadow), slow ${mo.slow} ms (sheets, page changes). Easing: ${AIB_EASE_NAME[mo.ease]}${ctx.web ? ' `' + BUILD_EASE[mo.ease] + '`' : ''}${ctx.swift ? ' (`Motion.press`, `Motion.settle` in Theme.swift)' : ''}.`);
-  if (!ctx.kit) out.push(`- Press: ${ctx.tok(build.pressText)}`);
+  if (!ctx.kit) out.push(`- Press: ${ctx.tok(aibPrimaryBarred(ctx.roles) ? build.pressText.replace(/`--pri-tint`/g, '`--line`') : build.pressText)}`);
   out.push(`- Reduce Motion: ${ctx.tok(build.reduceMotion)} State changes stay; only the movement goes. ${build.ambient && !(ctx.app && !ctx.site) ? `Ambient motion: ${build.ambient}; it is paused under Reduce Motion. Nothing else animates idly or loops except loading indicators.` : 'Nothing else animates idly or loops except loading indicators.'}`);
   return out;
 }
@@ -2855,7 +2906,14 @@ function aibKitRuleOk(ctx, text, dont) {
 
 function aibSecRules(ctx) {
   const r = ctx.def.rules || {};
-  const lines = [...(r.do || []).map(x => ['Do', x]), ...(r.dont || []).map(x => ['Don\'t', x])];
+  let lines = [...(r.do || []).map(x => ['Do', x]), ...(r.dont || []).map(x => ['Don\'t', x])];
+  // A rule the blend took from the second style must not use a colour role the first style's colour rules keep off the page.
+  const off = [aibPrimaryBarred(ctx.roles) && 'primary', aibPaletteOnly(ctx.roles, 'secondary') && 'secondary', aibPaletteOnly(ctx.roles, 'accent') && 'accent'].filter(Boolean);
+  const kept = ctx.def.blend && ctx.def.blend.donorRules;
+  if (off.length && kept) {
+    const rx = new RegExp('\\b(?:' + off.join('|') + ')\\b', 'i'), donor = new Set([].concat(kept.do || [], kept.dont || []));
+    lines = lines.filter(l => !(donor.has(l[1]) && rx.test(l[1])));
+  }
   const fmt = l => `- ${l[0]}: ${aibFixWeights(ctx, l[1])}`;
   if (!ctx.app) return ['## Do and don\'t', ...lines.map(fmt)];
   const appOk = l => (ctx.kit ? aibKitRuleOk(ctx, l[1], l[0] !== 'Do') : !AIB_ART_RULE.test(l[1]));
@@ -3016,7 +3074,7 @@ function aibOpacity(a) { return (Math.round(a * 100) / 100).toString(); }
 function aibSwiftLines(ctx) {
   const { build, scale, radius, modes, def, only } = ctx;
   const mo = build.motion, sh = build.sh || {}, sw = build.sw;
-  const inkCta = def.ctaFill === 'ink';
+  const inkCta = aibInkCta(def);
   const fillTok = inkCta ? 'ink' : 'primary', onTok = inkCta ? 'canvas' : 'onPrimary';
   const L = modes.find(m => m.mode === 'light'), D = modes.find(m => m.mode === 'dark');
   const out = [];
@@ -3171,7 +3229,7 @@ function aibSwiftLines(ctx) {
       ? ['            .modifier(Recessed(shape: shape))',
         '            .overlay(shape.strokeBorder(Palette.error, lineWidth: failed ? 1.5 : 0))']
       : [`            .overlay(shape.strokeBorder(failed ? Palette.error : ${edge}, lineWidth: failed ? 2 : ${edgeW}))`]),
-    '            .overlay(shape.inset(by: -4).stroke(Palette.primary, lineWidth: focused ? 3 : 0))',
+    `            .overlay(shape.inset(by: -4).stroke(Palette.${aibPrimaryBarred(ctx.roles) ? 'ink' : 'primary'}, lineWidth: focused ? 3 : 0))`,
     ...(ringLow ? ['            .overlay(shape.inset(by: -6).stroke(Palette.ink, lineWidth: focused ? 1 : 0))'] : []),
     '    }',
     '}', '');
@@ -3266,7 +3324,7 @@ function buildPatternItemBrief(state0, i, opts) {
 // How firmly an agent must follow each section. Locked: values are final. Guided: an intent and a range to
 // stay inside. Free: designed for the product. Every "## " heading in the brief carries its tier.
 const AIB_TIERS = {
-  'Why this works': 'Guided', 'App UI rules': 'Guided', 'Website rules': 'Guided', 'Blend': 'Guided', 'Built screens': 'Guided', 'Product screens': 'Guided',
+  'Why this works': 'Guided', 'Signature and product imagery': 'Guided', 'App UI rules': 'Guided', 'Website rules': 'Guided', 'Blend': 'Guided', 'Built screens': 'Guided', 'Product screens': 'Guided',
   'Phone layout and type': 'Guided', 'Motion': 'Guided', "Do and don't": 'Guided',
   'Colors': 'Locked', 'Components': 'Locked', 'UI kit': 'Locked', 'Type': 'Locked', 'Website type': 'Locked', 'Shape and materials': 'Locked',
   'Light and dark': 'Locked', 'States': 'Locked', 'Accessibility': 'Locked', 'Icons': 'Locked', 'App icon': 'Locked', 'Fonts to bundle': 'Locked',
@@ -3415,6 +3473,7 @@ function aibBuild(ctx) {
     aibSecAppRules(ctx),
     aibSecWebRules(ctx),
     aibSecWhy(ctx),
+    aibSecVoice(ctx),
     aibSecBlend(ctx),
     aibSecColors(ctx),
     ctx.app ? aibSecKit(ctx) : aibSecComponents(ctx),
@@ -3430,6 +3489,7 @@ function aibBuild(ctx) {
     aibSecIcons(ctx),
     ctx.app ? [] : aibSecAppIcon(ctx),
     aibSecFonts(ctx),
+    aibSecImagery(ctx),
     aibSecRules(ctx),
     ctx.web ? aibSecCss(ctx) : [],
     ctx.swift ? aibSecSwift(ctx) : [],

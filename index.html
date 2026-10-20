@@ -236,6 +236,24 @@
               <span>Tagline</span>
               <input type="text" id="tagline" value="A short tagline that captures the brand." />
             </label>
+            <div class="sd-sec" id="voiceBox">
+              <div class="sd-sec-head"><h3>Voice</h3><p>The style sets the look. This sets the words.</p></div>
+              <div class="segmented voice-mode" role="radiogroup" aria-label="Voice">
+                <label><input type="radio" name="voiceMode" value="style" checked /> Style’s voice</label>
+                <label><input type="radio" name="voiceMode" value="warmer" /> Warmer</label>
+                <label><input type="radio" name="voiceMode" value="own" /> Own words</label>
+              </div>
+              <div class="voice-own" id="voiceOwn" hidden>
+                <label class="field">
+                  <span>Voice note</span>
+                  <textarea id="voiceNote" rows="3" placeholder="e.g. Witty, approachable, understated"></textarea>
+                </label>
+                <label class="field">
+                  <span>Motto (optional)</span>
+                  <input type="text" id="voiceMotto" placeholder="One line, in your words" />
+                </label>
+              </div>
+            </div>
             <div class="sd-sec">
               <div class="sd-sec-head"><h3>Slide copy</h3><p>Shown on the brand deck.</p></div>
               <label class="field">

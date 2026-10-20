@@ -333,6 +333,25 @@ function contentDefaultsFor(name) {
   };
 }
 
+/* ---------------- Brand voice ---------------- */
+
+// How the brand talks, kept in state.content beside the copy so it saves and restores with the brand.
+// 'style' = the aesthetic's own wording (default), 'warmer' = same look with softer words,
+// 'own' = the user's voice note and optional motto. Neither of the last two uses the aesthetic's motto.
+const VOICE_MODES = ['style', 'warmer', 'own'];
+function brandVoice(state) {
+  const c = (state && state.content) || {};
+  const mode = VOICE_MODES.includes(c.voiceMode) ? c.voiceMode : 'style';
+  const own = k => (mode === 'own' && typeof c[k] === 'string' ? c[k].replace(/\s+/g, ' ').trim() : '');
+  return { mode, note: own('voiceNote'), motto: own('voiceMotto') };
+}
+// The motto line the board and deck show: the style's own, the user's (tagline when they gave none), or the tagline.
+function displayMotto(state, def, tagline) {
+  const v = brandVoice(state);
+  if (v.mode === 'style') return (def && def.motto) || '';
+  return (v.mode === 'own' && v.motto) || tagline || '';
+}
+
 // True while a field holds no copy of the user's own.
 function contentIsDefault(key, value) {
   if (typeof value !== 'string' || !value.trim()) return true;
@@ -361,6 +380,15 @@ function updateControlsFromState() {
     if (!el || el === document.activeElement) return;
     const value = state.content[id];
     el.value = contentIsDefault(id, value) ? shown[id] : value;
+  });
+
+  const voice = brandVoice(state);
+  document.querySelectorAll('input[name="voiceMode"]').forEach(r => { r.checked = r.value === voice.mode; });
+  const ownBox = document.getElementById('voiceOwn');
+  if (ownBox) ownBox.hidden = voice.mode !== 'own';
+  [['voiceNote', 'voiceNote'], ['voiceMotto', 'voiceMotto']].forEach(([id, key]) => {
+    const el = document.getElementById(id);
+    if (el && el !== document.activeElement) el.value = (state.content && state.content[key]) || '';
   });
 
   document.getElementById('headingFont').value = String(FONTS.indexOf(state.headingFont));
@@ -739,6 +767,17 @@ function wireEvents() {
     document.getElementById('logoInput').value = '';
     document.getElementById('logoPreviewRow').hidden = true;
     render();
+  });
+
+  // Voice: the mode control and, for Own words, the note and motto. Stored in state.content.
+  document.querySelectorAll('input[name="voiceMode"]').forEach(r => r.addEventListener('change', () => {
+    if (!r.checked) return;
+    state.content.voiceMode = r.value;
+    render();
+  }));
+  ['voiceNote', 'voiceMotto'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener('input', e => { state.content[id] = e.target.value; render(); });
   });
 
   // All brand copy lives in the Brand panel now. updateControlsFromState()
