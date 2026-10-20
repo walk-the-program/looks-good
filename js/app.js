@@ -347,9 +347,77 @@ function brandVoice(state) {
 }
 // The motto line the board and deck show: the style's own, the user's (tagline when they gave none), or the tagline.
 function displayMotto(state, def, tagline) {
+  const m = specimenMotto(state, def);
+  if (m) return m;
+  return brandVoice(state).mode === 'style' ? '' : (tagline || '');
+}
+// The aesthetic's motto for this brand, or '' when it shows none. Priority: the Own words motto,
+// the owner's edit of the style's motto (Advanced > Specimen copy), the style's motto (Style's
+// voice), its warm alternate (Warmer / Own words, when the aesthetic gives one). An aesthetic
+// that declares copy.motto reads it through the copy layer; older ones use def.motto.
+function specimenMotto(state, def) {
   const v = brandVoice(state);
-  if (v.mode === 'style') return (def && def.motto) || '';
-  return (v.mode === 'own' && v.motto) || tagline || '';
+  if (v.mode === 'own' && v.motto) return v.motto;
+  const entry = def && def.copy && def.copy.motto;
+  if (!entry) return v.mode === 'style' ? ((def && def.motto) || '') : '';
+  const own = abCopyUser(def, 'motto', state);
+  if (own) return own;
+  return v.mode === 'style' || entry.warm ? abCopyRaw(def, 'motto', state) : '';
+}
+
+/* ---------------- Specimen copy editor (Brand tab > Advanced) ---------------- */
+
+// state.content.copy[aestheticKey][copyKey] = the owner's text; absent = the aesthetic's default
+// (js/aesthetics/registry.js documents def.copy). Always written as new objects so saved
+// snapshots never share them.
+function setCopyOverride(aeKey, key, value) {
+  const all = Object.assign({}, state.content.copy);
+  const grp = Object.assign({}, all[aeKey]);
+  if (typeof value === 'string' && value.trim()) grp[key] = value; else delete grp[key];
+  if (Object.keys(grp).length) all[aeKey] = grp; else delete all[aeKey];
+  if (Object.keys(all).length) state.content.copy = all; else delete state.content.copy;
+}
+function resetCopyGroup(aeKey) {
+  const all = Object.assign({}, state.content.copy);
+  delete all[aeKey];
+  if (Object.keys(all).length) state.content.copy = all; else delete state.content.copy;
+}
+
+// Builds the groups only when the active styles change; otherwise just refreshes placeholders,
+// values and reset buttons, so typing in a field is never interrupted by a re-render.
+function syncCopyEditor() {
+  const host = document.getElementById('copyEditor');
+  if (!host || typeof abActiveDefs !== 'function') return;
+  const defs = abActiveDefs(state);
+  const sig = defs.map(d => d.key + ':' + Object.keys(d.copy || {}).join(',')).join('|');
+  if (host.dataset.sig !== sig) {
+    host.dataset.sig = sig;
+    const esc = escapeHtml;
+    host.innerHTML = defs.map(d => {
+      const ak = aestheticBaseKey(d.key);
+      const keys = Object.keys(d.copy || {});
+      const head = `<div class="copy-group-head"><p class="sd-adv-sub">${esc(d.name)}</p>${keys.length ? `<button type="button" class="btn btn-ghost btn-small copy-reset-all" data-ae="${esc(ak)}" hidden>Reset all</button>` : ''}</div>`;
+      if (!keys.length) return `<div class="copy-group" data-ae="${esc(ak)}">${head}<p class="sd-note">${esc(d.name)} has no editable specimen copy.</p></div>`;
+      const rows = keys.map(k => `<label class="field"><span>${esc(d.copy[k].label || k)}</span><span class="copy-row"><input type="text" data-ae="${esc(ak)}" data-ck="${esc(k)}" autocomplete="off" /><button type="button" class="btn btn-ghost btn-small copy-reset" data-ae="${esc(ak)}" data-ck="${esc(k)}" aria-label="Reset ${esc(d.copy[k].label || k)}" hidden>Reset</button></span></label>`).join('');
+      return `<div class="copy-group" data-ae="${esc(ak)}">${head}${rows}</div>`;
+    }).join('');
+  }
+  defs.forEach(d => {
+    const ak = aestheticBaseKey(d.key);
+    let any = false;
+    Object.keys(d.copy || {}).forEach(k => {
+      const input = host.querySelector(`input[data-ae="${ak}"][data-ck="${k}"]`);
+      if (!input) return;
+      const own = abCopyUser(d, k, state);
+      if (own) any = true;
+      input.placeholder = abCopyDefault(d, k, state);
+      if (input !== document.activeElement) input.value = own;
+      const rb = host.querySelector(`.copy-reset[data-ae="${ak}"][data-ck="${k}"]`);
+      if (rb) rb.hidden = !own;
+    });
+    const all = host.querySelector(`.copy-reset-all[data-ae="${ak}"]`);
+    if (all) all.hidden = !any;
+  });
 }
 
 // True while a field holds no copy of the user's own.
@@ -367,6 +435,9 @@ function effectiveContent(content) {
   CONTENT_FIELDS.forEach(key => {
     out[key] = contentIsDefault(key, src[key]) ? derived[key] : src[key];
   });
+  // Voice and specimen-copy overrides ride along: views that rebuild state.content from this
+  // (deck, present, share, thumbnails) must print the same words as the main board.
+  ['voiceMode', 'voiceNote', 'voiceMotto', 'copy'].forEach(key => { if (src[key] !== undefined) out[key] = src[key]; });
   return out;
 }
 
@@ -382,6 +453,7 @@ function updateControlsFromState() {
     el.value = contentIsDefault(id, value) ? shown[id] : value;
   });
 
+  syncCopyEditor();
   const voice = brandVoice(state);
   document.querySelectorAll('input[name="voiceMode"]').forEach(r => { r.checked = r.value === voice.mode; });
   const ownBox = document.getElementById('voiceOwn');
@@ -779,6 +851,21 @@ function wireEvents() {
     const el = document.getElementById(id);
     if (el) el.addEventListener('input', e => { state.content[id] = e.target.value; render(); });
   });
+
+  // Advanced > Specimen copy: edits and resets rewrite state.content.copy and re-render live.
+  const copyHost = document.getElementById('copyEditor');
+  if (copyHost) {
+    copyHost.addEventListener('input', e => {
+      const t = e.target;
+      if (t.matches && t.matches('input[data-ck]')) { setCopyOverride(t.dataset.ae, t.dataset.ck, t.value); render(); }
+    });
+    copyHost.addEventListener('click', e => {
+      const b = e.target.closest && e.target.closest('button');
+      if (!b) return;
+      if (b.classList.contains('copy-reset')) { setCopyOverride(b.dataset.ae, b.dataset.ck, ''); render(); }
+      else if (b.classList.contains('copy-reset-all')) { resetCopyGroup(b.dataset.ae); render(); }
+    });
+  }
 
   // All brand copy lives in the Brand panel now. updateControlsFromState()
   // skips the focused input, so a full render() per keystroke is safe.

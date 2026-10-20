@@ -33,6 +33,15 @@ registerAesthetic({
   mode: 'dark',
   slideShape: 'minimal',
   labels: { material: 'Sprites', states: ['Idle', 'Hover', 'Press'], statesKind: 'button' },
+  // Editable specimen copy (Brand > Advanced > Specimen copy); text matches motto / kicker / labels.states above.
+  copy: {
+    motto: { label: 'Motto', text: 'Press start.' },
+    kicker: { label: 'Kicker above the headline', text: 'Player one' },
+    state0: { label: 'State 1 name', text: 'Idle' },
+    state1: { label: 'State 2 name', text: 'Hover' },
+    state2: { label: 'State 3 name', text: 'Press' },
+    hudScore: { label: 'Score label in the game HUD', text: 'SCORE' },
+  },
   layout: { hero: 'scene', palette: 'swatches', sections: 'two-col' },
   type: { ui: 'sans', label: 'sans', display: 1 },
   highlight: 'custom',
@@ -202,7 +211,7 @@ registerAesthetic({
       const shine = on ? `<rect x="1" y="2" width="1" height="1" fill="${mixc('#ffffff', t.accent, 0.6)}"/>` : '';
       return `<svg viewBox="0 0 9 8" shape-rendering="crispEdges" focusable="false">${draw(outerRows, line)}${draw(innerRows, fill)}${shine}</svg>`;
     };
-    return `${svg}<div class="pxa-hud"><span class="pxa-life">${heart(true)}${heart(true)}${heart(false)}</span><span class="pxa-score">SCORE <b>004200</b></span></div>`;
+    return `${svg}<div class="pxa-hud"><span class="pxa-life">${heart(true)}${heart(true)}${heart(false)}</span><span class="pxa-score">${abCopy('pixel-arcade', 'hudScore')} <b>004200</b></span></div>`;
   },
 
   materials: [

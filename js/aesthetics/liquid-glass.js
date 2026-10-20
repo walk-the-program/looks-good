@@ -9,17 +9,30 @@
    the scene's dark base (never on a frosted slab). */
 let lgSeq = 0;   // unique SVG filter ids per rendered board (compare grid, deck)
 
+const LG_KEY = 'liquid-glass';   // abCopy key for the plain functions below (js/aesthetics/registry.js)
+
 registerAesthetic({
   key: 'liquid-glass', order: 5,
   name: 'Liquid Glass',
   descriptor: 'Fluid · Luminous · Layered',
   influences: 'Liquid glass / visionOS / Optical refraction',
   summary: 'Clear glass controls with bright rims floating over a vivid scene of your brand colors.',
-  motto: 'Light, bent gently.',
-  kicker: 'Light, layered',
+  motto: 'Light, bent gently.',   // = copy.motto.text
+  kicker: 'Light, layered',       // = copy.kicker.text
   mode: 'light',
   slideShape: 'soft',
   labels: { material: 'Optics', states: ['Clear', 'Tinted', 'Frosted'], statesKind: 'chip' },
+  // Editable specimen copy (Brand > Advanced > Specimen copy).
+  copy: {
+    motto: { label: 'Motto', text: 'Light, bent gently.' },
+    kicker: { label: 'Kicker above the headline', text: 'Light, layered' },
+    state0: { label: 'State 1 name', text: 'Clear' },
+    state1: { label: 'State 2 name', text: 'Tinted' },
+    state2: { label: 'State 3 name', text: 'Frosted' },
+    tab1: { label: 'Scene tab 1', text: 'Home' },
+    tab2: { label: 'Scene tab 2', text: 'Search' },
+    tab3: { label: 'Scene tab 3', text: 'Library' },
+  },
   // stacked inset-grouped sections (iOS Settings rhythm) and a compact chip palette
   layout: { hero: 'scene', palette: 'chips', sections: 'stacked' },
   type: { ui: 'sans' },
@@ -131,10 +144,10 @@ registerAesthetic({
       + '</filter></svg>';
     const icon = d => `<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${d}</svg>`;
     const tabs = [
-      ['Home', '<path d="M4 11l8-7 8 7v8a1 1 0 0 1-1 1h-4v-6h-6v6H5a1 1 0 0 1-1-1z"/>'],
-      ['Search', '<circle cx="11" cy="11" r="6.5"/><path d="M16 16l4 4"/>'],
-      ['Library', '<rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><rect x="13" y="13" width="7" height="7" rx="1.5"/>'],
-    ].map(([n, d], i) => `<span class="lgs-tab${i === 0 ? ' on' : ''}">${icon(d)}<em>${n}</em></span>`).join('');
+      ['tab1', '<path d="M4 11l8-7 8 7v8a1 1 0 0 1-1 1h-4v-6h-6v6H5a1 1 0 0 1-1-1z"/>'],
+      ['tab2', '<circle cx="11" cy="11" r="6.5"/><path d="M16 16l4 4"/>'],
+      ['tab3', '<rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><rect x="13" y="13" width="7" height="7" rx="1.5"/>'],
+    ].map(([n, d], i) => `<span class="lgs-tab${i === 0 ? ' on' : ''}">${icon(d)}<em>${abCopy(LG_KEY, n)}</em></span>`).join('');
     return `<div class="lgs">${filter}<div class="lgs-scene">${scene}</div>`
       + lens(80, 40, 30, 21 / 10, 'lgs-lens lgs-lens-w')
       + lens(72, 50, 50, 4 / 4.2, 'lgs-lens lgs-lens-n')

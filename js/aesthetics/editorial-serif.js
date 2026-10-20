@@ -5,17 +5,33 @@
    rules instead of shadows, square corners, a standfirst set in two columns,
    and a contents list (dotted leaders, page numbers) for the list and the type
    picks. Weight comes from contrast, never from boldness. */
+const EDS_KEY = 'editorial-serif';   // abCopy key for the plain functions below (js/aesthetics/registry.js)
+
 registerAesthetic({
   key: 'editorial-serif', order: 11,
   name: 'Editorial Serif',
   descriptor: 'Literate · Confident · Spacious',
   influences: 'Magazine editorial / Swiss columns / Book typography',
   summary: 'Magazine pages set in a high-contrast serif, with hairline rules and room to breathe.',
-  motto: 'Set it like a page.',
-  kicker: 'Issue 01 — Spring',
+  motto: 'Set it like a page.',   // = copy.motto.text
+  kicker: 'Issue 01 — Spring',    // = copy.kicker.text
   mode: 'light',
   slideShape: 'minimal',
   labels: { material: 'Page', states: ['Rest', 'Hover', 'Pressed'], statesKind: 'button' },
+  // Editable specimen copy (Brand > Advanced > Specimen copy). {brand} in coverSub is filled in by the template.
+  copy: {
+    motto: { label: 'Motto', text: 'Set it like a page.' },
+    kicker: { label: 'Kicker above the headline', text: 'Issue 01 — Spring' },
+    state0: { label: 'State 1 name', text: 'Rest' },
+    state1: { label: 'State 2 name', text: 'Hover' },
+    state2: { label: 'State 3 name', text: 'Pressed' },
+    plateNo: { label: 'Cover plate number', text: 'No. 01' },
+    coverLine: { label: 'Coverline', text: 'The design issue' },
+    coverSub: { label: 'Cover sub-line ({brand})', text: '{brand} · Spring' },
+    figLabel: { label: 'Figure label', text: 'Fig. 1' },
+    figCaption: { label: 'Figure caption', text: 'the brand at rest' },
+    pageNo: { label: 'Page number', text: 'p. 01' },
+  },
   layout: { hero: 'poster', palette: 'chips', sections: 'asym' },
   type: { ui: 'sans', label: 'sans', display: 1.22 },
   highlight: 'custom',
@@ -96,11 +112,11 @@ registerAesthetic({
       <div class="eds-plate">
         <i class="eds-half"></i>
         <i class="eds-grain"></i>
-        <span class="eds-no">No. 01</span>
+        <span class="eds-no">${abCopy(EDS_KEY, 'plateNo')}</span>
         <span class="eds-cap">${e(ctx.initial)}</span>
-        <div class="eds-cover"><em class="eds-line">The design issue</em><span class="eds-sub">${e(ctx.brandName || ctx.name || '')} · Spring</span></div>
+        <div class="eds-cover"><em class="eds-line">${abCopy(EDS_KEY, 'coverLine')}</em><span class="eds-sub">${abCopy(EDS_KEY, 'coverSub').replace('{brand}', () => e(ctx.brandName || ctx.name || ''))}</span></div>
       </div>
-      <figcaption class="eds-fig"><span><em>Fig. 1</em> — the brand at rest</span><span>p. 01</span></figcaption>
+      <figcaption class="eds-fig"><span><em>${abCopy(EDS_KEY, 'figLabel')}</em> — ${abCopy(EDS_KEY, 'figCaption')}</span><span>${abCopy(EDS_KEY, 'pageNo')}</span></figcaption>
     </figure>`;
   },
 

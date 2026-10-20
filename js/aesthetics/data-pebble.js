@@ -100,6 +100,26 @@ registerAesthetic({
   mode: 'light',
   slideShape: 'soft',
   labels: { material: 'Surfaces & pebbles', states: ['Rest', 'Hover', 'Pressed'], statesKind: 'button' },
+  // Editable specimen copy (Brand > Advanced > Specimen copy).
+  copy: {
+    motto: { label: 'Motto', text: 'Numbers first. Shapes that breathe.' },
+    kicker: { label: 'Kicker above the headline', text: 'Numbers first' },
+    state0: { label: 'State 1 name', text: 'Rest' },
+    state1: { label: 'State 2 name', text: 'Hover' },
+    state2: { label: 'State 3 name', text: 'Pressed' },
+    project0: { label: 'Chart project 1', text: 'Brand refresh' },
+    project1: { label: 'Chart project 2', text: 'Launch site' },
+    project2: { label: 'Chart project 3', text: 'Spring campaign' },
+    chartTitle: { label: 'Chart title', text: 'Completion by project' },
+    keyNow: { label: 'Chart key: this period', text: 'This month' },
+    keyPrev: { label: 'Chart key: last period', text: 'Last month' },
+    was: { label: 'Legend previous value ({n} = percent)', text: 'last month {n}%' },
+    statTile: { label: 'Material card: stat tile', text: 'Stat tile' },
+    pebbleProgress: { label: 'Material card: progress', text: 'Pebble progress' },
+    planCap: { label: 'Progress caption', text: '62% of the plan' },
+    frostedCard: { label: 'Material card: frosted', text: 'Frosted card' },
+    frostedCap: { label: 'Frosted card caption', text: 'Board and website only' },
+  },
   layout: { hero: 'split', palette: 'swatches', sections: 'two-col' },
   type: { ui: 'sans', label: 'sans', display: 1 },
   highlight: 'ink',
@@ -212,21 +232,21 @@ registerAesthetic({
     const K = 8.2;
     // [name, now, before, x, y, seed, bx, by]
     const G = [
-      ['Brand refresh', 72, 58, 128, 168, 3, 214, 226],
-      ['Launch site', 45, 51, 340, 118, 7, 388, 206],
-      ['Spring campaign', 10, 4, 468, 98, 11, 490, 140],
+      [abCopyRaw(this, 'project0'), 72, 58, 128, 168, 3, 214, 226],
+      [abCopyRaw(this, 'project1'), 45, 51, 340, 118, 7, 388, 206],
+      [abCopyRaw(this, 'project2'), 10, 4, 468, 98, 11, 490, 140],
     ];
     const rings = G.map((g, i) => `<path class="dpa-b" d="${dpPebble(g[6], g[7], dpRadius(g[2], K), g[5] + 20 + i)}"/>`).join('');
     const fills = G.map(g => `<path class="dpa-a" d="${dpPebble(g[3], g[4], dpRadius(g[1], K), g[5])}"/>`).join('');
     const nums = G.slice(0, 2).map((g, i) => `<text class="dpa-num" x="${g[3]}" y="${g[4]}" dy=".35em" text-anchor="middle" style="font-size:${i ? 26 : 34}px">${g[1]}%</text>`).join('');
     const field = [[70, 60, 120, 0], [430, 300, 150, 1], [250, 20, 60, 2], [20, 300, 80, 3]].map((p, i) =>
       `<path class="dpa-f${i % 2}" d="${dpPebble(p[0], p[1], p[2], 40 + p[3])}"/>`).join('');
-    const legend = G.map(g => `<li><span class="dpa-name">${e(g[0])}</span><b class="dpa-val">${g[1]}%</b><span class="dpa-was">last month ${g[2]}%</span></li>`).join('');
+    const legend = G.map(g => `<li><span class="dpa-name">${e(g[0])}</span><b class="dpa-val">${g[1]}%</b><span class="dpa-was">${abCopy(this, 'was').replace('{n}', () => g[2])}</span></li>`).join('');
     return `<div class="dpa">
       <svg class="dpa-field" viewBox="0 0 520 340" preserveAspectRatio="xMidYMid slice" aria-hidden="true" focusable="false">${field}</svg>
       <div class="dpa-card">
-        <div class="dpa-head"><span class="dpa-k">Completion by project</span>
-          <span class="dpa-key"><i class="dpa-kd"></i>This month<i class="dpa-kd is-prev"></i>Last month</span></div>
+        <div class="dpa-head"><span class="dpa-k">${abCopy(this, 'chartTitle')}</span>
+          <span class="dpa-key"><i class="dpa-kd"></i>${abCopy(this, 'keyNow')}<i class="dpa-kd is-prev"></i>${abCopy(this, 'keyPrev')}</span></div>
         <svg class="dpa-svg" viewBox="0 0 520 300" aria-hidden="true" focusable="false">${rings}${fills}${nums}</svg>
         <ul class="dpa-leg">${legend}</ul>
       </div>
@@ -287,13 +307,13 @@ registerAesthetic({
       const spark = [3, 4, 5, 7, 10].map((v, i) => `<path d="${dpPebble(10 + i * 20, 10, dpRadius(v, 2.85), 70 + i)}"/>`).join('');
       const prog = [0, 1, 2, 3, 4].map(i => `<path d="${dpPebble(10 + i * 20, 10, 8.2, 80 + i)}"/>`).join('');
       return `<div class="dpm">
-        <div class="dpm-card"><span class="dpm-l">Stat tile</span><b class="dpm-n">72<small>%</small></b>
+        <div class="dpm-card"><span class="dpm-l">${abCopy(this, 'statTile')}</span><b class="dpm-n">72<small>%</small></b>
           <span class="dpm-tag">+8.1%</span>
           <svg class="dpm-spark" viewBox="0 0 100 20" aria-hidden="true" focusable="false">${spark}</svg></div>
-        <div class="dpm-card"><span class="dpm-l">Pebble progress</span>
+        <div class="dpm-card"><span class="dpm-l">${abCopy(this, 'pebbleProgress')}</span>
           <svg class="dpm-prog" viewBox="0 0 100 20" aria-hidden="true" focusable="false"><defs><clipPath id="dpm-clip"><rect x="0" y="0" width="62" height="20"/></clipPath></defs><g class="dpm-track">${prog}</g><g class="dpm-fill" clip-path="url(#dpm-clip)">${prog}</g></svg>
-          <span class="dpm-cap">${e('62% of the plan')}</span></div>
-        <div class="dpm-card dpm-frost"><span class="dpm-l">Frosted card</span><span class="dpm-cap">Board and website only</span></div>
+          <span class="dpm-cap">${abCopy(this, 'planCap')}</span></div>
+        <div class="dpm-card dpm-frost"><span class="dpm-l">${abCopy(this, 'frostedCard')}</span><span class="dpm-cap">${abCopy(this, 'frostedCap')}</span></div>
       </div>`;
     },
     principles: [

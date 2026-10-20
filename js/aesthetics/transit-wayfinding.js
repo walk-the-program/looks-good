@@ -104,6 +104,7 @@ function twBullet(letter, r, i, extra) {
 }
 
 let twSeq = 0;
+const TW_KEY = 'transit-wayfinding';   // abCopy key for the plain functions below (js/aesthetics/registry.js)
 
 registerAesthetic({
   key: 'transit-wayfinding', order: 43,
@@ -111,11 +112,28 @@ registerAesthetic({
   descriptor: 'Directional · Coded · Calm',
   influences: 'Vignelli NYC subway / SBB Swiss rail / Heathrow wayfinding / Kinneir & Calvert',
   summary: 'Black sign panels and white type where every brand colour is a route and one yellow means alert.',
-  motto: 'Colour means a route.',
-  kicker: 'Next stop',
+  motto: 'Colour means a route.',   // = copy.motto.text
+  kicker: 'Next stop',              // = copy.kicker.text
   mode: 'dark',
   slideShape: 'minimal',
   labels: { material: 'Lines', states: ['Scheduled', 'Approaching', 'Diverted'], statesKind: 'button' },
+  // Editable specimen copy (Brand > Advanced > Specimen copy). {brand} and {n} are filled in by the template.
+  copy: {
+    motto: { label: 'Motto', text: 'Colour means a route.' },
+    kicker: { label: 'Kicker above the headline', text: 'Next stop' },
+    state0: { label: 'State 1 name', text: 'Scheduled' },
+    state1: { label: 'State 2 name', text: 'Approaching' },
+    state2: { label: 'State 3 name', text: 'Diverted', warm: 'Rerouted' },
+    station1: { label: 'Map station 1', text: 'Mill Lane' },
+    station2: { label: 'Map station 2', text: 'Market' },
+    station3: { label: 'Map station 3', text: 'Archive' },
+    station4: { label: 'Map station 4', text: 'Library' },
+    station5: { label: 'Map station 5', text: 'Old Quay' },
+    signTitle: { label: 'Sign title ({brand})', text: '{brand} network' },
+    signDir: { label: 'Sign direction label', text: 'All lines' },
+    platform: { label: 'Platform label ({n})', text: 'Plat {n}' },
+    departFoot: { label: 'Departures footer', text: 'Departures · updated every 30 s' },
+  },
   // a concourse leads with the departures list: 03 In use first, then the components
   layout: { hero: 'centered', palette: 'swatches', sections: 'two-col', sectionOrder: ['use', 'ui', 'touch'] },
   type: { ui: 'heading', label: 'heading', display: 0.78 },
@@ -216,11 +234,11 @@ registerAesthetic({
     const stroke = lines.map(l => `<path d="${twPath(l.pts, 30)}" stroke="${l.r.g}"/>`).join('');
     // stations: [x, y, line, tick dir (dx,dy), label, anchor, lx, ly]
     const st = [
-      [150, 150, 0, [0, -1], 'Mill Lane', 'middle', 150, 126],
-      [250, 150, 0, [0, -1], 'Market', 'middle', 250, 126],
-      [470, 150, 0, [0, -1], 'Archive', 'middle', 470, 126],
-      [360, 92, 1, [1, 0], 'Library', 'start', 378, 97],
-      [300, 210, 1, [-1, -1], 'Old Quay', 'end', 284, 196],
+      [150, 150, 0, [0, -1], abCopyRaw(TW_KEY, 'station1'), 'middle', 150, 126],
+      [250, 150, 0, [0, -1], abCopyRaw(TW_KEY, 'station2'), 'middle', 250, 126],
+      [470, 150, 0, [0, -1], abCopyRaw(TW_KEY, 'station3'), 'middle', 470, 126],
+      [360, 92, 1, [1, 0], abCopyRaw(TW_KEY, 'station4'), 'start', 378, 97],
+      [300, 210, 1, [-1, -1], abCopyRaw(TW_KEY, 'station5'), 'end', 284, 196],
     ];
     const ticks = st.map(s => {
       const [x, y, li, [dx, dy]] = s;
@@ -232,7 +250,7 @@ registerAesthetic({
     // preserveAspectRatio meet the whole box is always shown, so no label is ever cut to a fragment.
     const span = s => { const w = s[4].length * 7.4; return s[5] === 'middle' ? [s[6] - w / 2, s[6] + w / 2] : s[5] === 'end' ? [s[6] - w, s[6]] : [s[6], s[6] + w]; };
     const labels = (x0, x1) => st.filter(s => { const [a, b] = span(s); return a >= x0 + 2 && b <= x1 - 2; })
-      .map(s => `<text x="${s[6]}" y="${s[7]}" text-anchor="${s[5]}" class="twa-st" font-size="12.5" font-weight="600">${s[4]}</text>`).join('');
+      .map(s => `<text x="${s[6]}" y="${s[7]}" text-anchor="${s[5]}" class="twa-st" font-size="12.5" font-weight="600">${e(s[4])}</text>`).join('');
     const hub = x1 => `<text x="386" y="184" class="twa-hub" font-size="16" font-weight="800" fill="${lbl}">${e(twFitName(name, Math.min(x1, 600) - 386 - 6, 16))}</text>`;
     // terminus bullets: route 1 at both ends of its line, route 2 at both ends of its branch
     const term = [[lines[0].pts[0], 0], [lines[0].pts[2], 0], [lines[1].pts[0], 1], [lines[1].pts[2], 1]];
@@ -255,8 +273,8 @@ registerAesthetic({
     return `<div class="twa" data-dark="${dark ? 1 : 0}">
       <div class="twa-sign">
         <span class="twa-buls">${L.map((l, i) => twBullet(l, R[i], i)).join('')}</span>
-        <span class="twa-dest"><b>${e(twFitName(name, 211, 22))} network</b></span>
-        <span class="twa-dir">${twArrow(0, 'tw-arrow')}<b>All lines</b></span>
+        <span class="twa-dest"><b>${abCopy(TW_KEY, 'signTitle').replace('{brand}', () => e(twFitName(name, 211, 22)))}</b></span>
+        <span class="twa-dir">${twArrow(0, 'tw-arrow')}<b>${abCopy(TW_KEY, 'signDir')}</b></span>
       </div>
       <div class="twa-mapbox">${map}</div>
     </div>`;
@@ -272,11 +290,11 @@ registerAesthetic({
       const rows = (ctx.rows || []).slice(0, 3).map((r, i) => `<li class="ab-row" style="--tw-c:${R[i].b};--tw-o:${R[i].ob}">
           <span class="ab-row-n tw-rn${i === 2 ? ' tw-rn--x' : ''}"><i>${e(L[i])}</i></span>
           <span class="ab-row-name">${e(r[0])}</span>
-          <span class="ab-row-status"><b>Plat ${i + 1}</b> ${TW_SEP} ${e(r[1])}</span>
+          <span class="ab-row-status"><b>${abCopy(TW_KEY, 'platform').replace('{n}', () => i + 1)}</b> ${TW_SEP} ${e(r[1])}</span>
           <span class="ab-row-bar" aria-hidden="true"><i style="width:${Number(r[2]) || 0}%"></i></span>
           <span class="ab-row-pct">${Number(r[2]) || 0}%</span>
         </li>`).join('');
-      return `<ul class="ab-list tw-dep">${rows}<li class="tw-dfoot">Departures · updated every 30 s</li></ul>`;
+      return `<ul class="ab-list tw-dep">${rows}<li class="tw-dfoot">${abCopy(TW_KEY, 'departFoot')}</li></ul>`;
     },
   },
 

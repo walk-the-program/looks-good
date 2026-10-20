@@ -20,6 +20,14 @@ registerAesthetic({
   // Raised / Recessed / Glass discs are the three materials themselves, so the
   // states row stays 'swatch'. The accent word is shaded text, not a band.
   labels: { material: 'Touch & depth', states: ['Raised', 'Recessed', 'Glass'] },
+  // Editable specimen copy (Brand > Advanced > Specimen copy).
+  copy: {
+    motto: { label: 'Motto', text: 'Precise structure. Soft edges.' },
+    kicker: { label: 'Kicker above the headline', text: 'Geometry with feeling' },
+    state0: { label: 'State 1 name', text: 'Raised' },
+    state1: { label: 'State 2 name', text: 'Recessed' },
+    state2: { label: 'State 3 name', text: 'Glass' },
+  },
   // asym (7/5): the glass card leads, the instrument panel is the narrower column.
   layout: { hero: 'split', sections: 'asym' },
   type: { ui: 'sans', label: 'sans', display: 1.28 },

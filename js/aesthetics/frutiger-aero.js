@@ -31,6 +31,7 @@
    Export-safe: no mask-image and no backdrop-filter (glass is a near-opaque fill). */
 (function () {
 let seq = 0;
+const FA_KEY = 'frutiger-aero';   // abCopy key for the plain functions below (js/aesthetics/registry.js)
 
 const FA_TEXT = '#23415A';        // deep blue-grey text (never black)
 const FA_TEXT_NIGHT = '#EAF5FF';
@@ -342,7 +343,7 @@ function faSeal(t, id, fonts) {
     <defs><linearGradient id="${id}a" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${st.top}"/><stop offset=".55" stop-color="${st.mid}"/><stop offset="1" stop-color="${st.bot}"/></linearGradient></defs>
     <polygon points="${pts.trim()}" fill="url(#${id}a)" stroke="${st.rim}" stroke-width="1.5" stroke-linejoin="round"/>
     <path d="M17 44C20 26 34 15 50 15S80 26 83 44C72 49 62 50 50 50S28 49 17 44Z" fill="#fff" fill-opacity=".6"/>
-    <text x="50" y="60" text-anchor="middle" font-family="var(--ab-font-b, sans-serif)" font-size="24" font-weight="${abWeightNear(fonts.b, 600)}" fill="${lab}" color="${lab}">new</text>
+    <text x="50" y="60" text-anchor="middle" font-family="var(--ab-font-b, sans-serif)" font-size="24" font-weight="${abWeightNear(fonts.b, 600)}" fill="${lab}" color="${lab}">${abCopy(FA_KEY, 'seal')}</text>
   </svg>`;
 }
 
@@ -413,7 +414,7 @@ function faAnatomy(ctx) {
       <ellipse cx="280" cy="286" rx="150" ry="22" fill="url(#${id}c)"/>
       <rect x="80.8" y="196.8" width="398.4" height="94.4" rx="47.2" fill="none" stroke="${st.rim}" stroke-width="1.6"/>
       <path d="M104 236C104 214 122 202 146 202H414C438 202 456 214 456 236C456 242 444 244 420 244H140C116 244 104 242 104 236Z" fill="url(#${id}k)"/>`;
-  const label = `<text x="280" y="256" text-anchor="middle" font-family="var(--ab-font-b, sans-serif)" font-size="25" font-weight="${bw}" fill="${g.label}">Save direction</text>`;
+  const label = `<text x="280" y="256" text-anchor="middle" font-family="var(--ab-font-b, sans-serif)" font-size="25" font-weight="${bw}" fill="${g.label}">${abCopy(FA_KEY, 'btnLabel')}</text>`;
   const call = (x1, y1, x2, y2, tx, ty, anchor, a, b) => `<path d="M${x1} ${y1}L${x2} ${y2}" stroke="${ink}" stroke-opacity=".55" stroke-width="1.4" fill="none"/><circle cx="${x1}" cy="${y1}" r="4" fill="${ink}"/>
       <text x="${tx}" y="${ty}" text-anchor="${anchor}" font-family="var(--ab-font-b, sans-serif)" fill="${ink}"><tspan font-size="17" font-weight="${bw}">${a}</tspan><tspan x="${tx}" dy="21" font-size="15" fill-opacity=".8">${b}</tspan></text>`;
   const orbCol = faCompanions(t)[1].st;
@@ -435,10 +436,10 @@ function faAnatomy(ctx) {
     <g stroke="#fff" stroke-opacity=".55" stroke-width="1.6" stroke-linecap="round"><path d="M120 344h90M250 352h120M410 342h60M160 372h70"/></g>
     <circle cx="500" cy="104" r="44" fill="url(#${id}o)"/><circle cx="500" cy="104" r="43.2" fill="none" stroke="${orbCol.rim}" stroke-width="1.5"/>
     <path d="M467 96C467 78 482 66 500 66S533 78 533 96C533 102 518 104 500 104S467 102 467 96Z" fill="url(#${id}k)"/>
-    ${call(150, 214, 150, 138, 40, 104, 'start', 'Specular cap', 'a crisp lower lip, no blur')}
-    ${call(456, 104, 380, 60, 372, 40, 'end', 'Every icon in a gel orb', 'one sphere per icon')}
-    ${call(330, 280, 420, 420, 590, 446, 'end', 'Caustic', 'light pools at the base')}
-    ${call(150, 338, 110, 440, 30, 470, 'start', 'Wet floor', 'flipped, faded into the water')}
+    ${call(150, 214, 150, 138, 40, 104, 'start', abCopy(FA_KEY, 'call1'), abCopy(FA_KEY, 'call1Sub'))}
+    ${call(456, 104, 380, 60, 372, 40, 'end', abCopy(FA_KEY, 'call2'), abCopy(FA_KEY, 'call2Sub'))}
+    ${call(330, 280, 420, 420, 590, 446, 'end', abCopy(FA_KEY, 'call3'), abCopy(FA_KEY, 'call3Sub'))}
+    ${call(150, 338, 110, 440, 30, 470, 'start', abCopy(FA_KEY, 'call4'), abCopy(FA_KEY, 'call4Sub'))}
   </svg>`;
 }
 
@@ -448,11 +449,34 @@ registerAesthetic({
   descriptor: 'Glossy · Bright · Bubbly',
   influences: 'Y2K tech optimism / Skeuomorphic gloss / Candy rainbow',
   summary: 'Sunny aqua sky, rainbow swooshes and candy orbs, with every control a wet glossy gel lit from above.',
-  motto: 'Technology as good weather.',
-  kicker: 'Clear skies ahead',
+  motto: 'Technology as good weather.',   // = copy.motto.text
+  kicker: 'Clear skies ahead',            // = copy.kicker.text
   mode: 'light',
   slideShape: 'soft',
   labels: { material: 'Gloss', states: ['Rest', 'Shine', 'Pressed'], statesKind: 'button' },
+  // Editable specimen copy (Brand > Advanced > Specimen copy).
+  copy: {
+    motto: { label: 'Motto', text: 'Technology as good weather.' },
+    kicker: { label: 'Kicker above the headline', text: 'Clear skies ahead' },
+    state0: { label: 'State 1 name', text: 'Rest' },
+    state1: { label: 'State 2 name', text: 'Shine' },
+    state2: { label: 'State 3 name', text: 'Pressed' },
+    seal: { label: 'Starburst seal text', text: 'new' },
+    btnLabel: { label: 'Material specimen button label', text: 'Save direction' },
+    call1: { label: 'Material callout 1 title', text: 'Specular cap' },
+    call1Sub: { label: 'Material callout 1 detail', text: 'a crisp lower lip, no blur' },
+    call2: { label: 'Material callout 2 title', text: 'Every icon in a gel orb' },
+    call2Sub: { label: 'Material callout 2 detail', text: 'one sphere per icon' },
+    call3: { label: 'Material callout 3 title', text: 'Caustic' },
+    call3Sub: { label: 'Material callout 3 detail', text: 'light pools at the base' },
+    call4: { label: 'Material callout 4 title', text: 'Wet floor' },
+    call4Sub: { label: 'Material callout 4 detail', text: 'flipped, faded into the water' },
+    winCard: { label: 'Card window title', text: 'Project — Untitled' },
+    winPanel: { label: 'Panel window title', text: 'Settings' },
+    colName: { label: 'List column 1', text: 'Name' },
+    colStatus: { label: 'List column 2', text: 'Status' },
+    colProgress: { label: 'List column 3', text: 'Progress' },
+  },
   layout: { hero: 'centered', palette: 'swatches', sections: 'two-col', subcopy: true },
   type: { ui: 'body', label: 'body', display: 1 },
   highlight: 'custom',
@@ -571,13 +595,13 @@ registerAesthetic({
   // and caption buttons), instead of CSS generated content.
   panels: {
     card(ctx) {
-      return faWindow(ctx.parts.cardBase(), 'ab-card', 'Project — Untitled', 'all');
+      return faWindow(ctx.parts.cardBase(), 'ab-card', abCopyRaw(FA_KEY, 'winCard'), 'all');
     },
     panel(ctx) {
-      return faWindow(ctx.parts.panelBase(), 'ab-panel', 'Settings', 'close');
+      return faWindow(ctx.parts.panelBase(), 'ab-panel', abCopyRaw(FA_KEY, 'winPanel'), 'close');
     },
     list(ctx) {
-      return `<div class="fa-explorer"><div class="fa-lhead" aria-hidden="true"><span>Name</span><span>Status</span><span>Progress</span></div>${ctx.parts.listBase()}</div>`;
+      return `<div class="fa-explorer"><div class="fa-lhead" aria-hidden="true"><span>${abCopy(FA_KEY, 'colName')}</span><span>${abCopy(FA_KEY, 'colStatus')}</span><span>${abCopy(FA_KEY, 'colProgress')}</span></div>${ctx.parts.listBase()}</div>`;
     },
   },
 

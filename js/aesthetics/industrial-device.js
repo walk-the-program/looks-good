@@ -7,8 +7,10 @@
    white and graphite key families, ONE primary main-action key and the knob pointer; the
    OLED is single-ink pixels. UI radius 8 for panels, 4 for keys; only hardware has an edge. */
 // The device (board hero, deck cover); deck.materialArt wraps it in a zoom on the pads and the keybed.
+const ID_KEY = 'industrial-device';   // abCopy key for idvArt (a plain function; js/aesthetics/registry.js)
 function idvArt(ctx) {
   const e = escapeHtml;
+  const cp = k => abCopy(ID_KEY, k);
   const Y = 64;
   const at = (x, y, w, h) => `left:${x}%;top:${(y / Y) * 100}%;width:${w}%;${h != null ? `height:${(h / Y) * 100}%` : ''}`;
   const name = e(String(ctx.brandName || '').toLowerCase());
@@ -32,8 +34,8 @@ function idvArt(ctx) {
     const lab = L[r * 4 + c];
     keys += `<i class="idv-key${main ? ' main' : dark ? ' g' : ''}${lab.startsWith('<svg') ? ' ic' : ''}"><b>${lab}</b></i>`;
   }
-  const fn = ['seq', 'synth', 'drum', 'tape', 'mix', 'shift'].map((k, i) => `<span><i class="idv-key g${i === 5 ? ' sh' : ''}"></i><small>${k}</small></span>`).join('');
-  const encs = [['b', 'tune'], ['g', 'mix'], ['w', 'fx'], ['p', 'lvl']].map(([c, k]) => `<span><i class="idv-enc ${c}"></i><small>${k}</small></span>`).join('');
+  const fn = ['fnSeq', 'fnSynth', 'fnDrum', 'fnTape', 'fnMix', 'fnShift'].map((k, i) => `<span><i class="idv-key g${i === 5 ? ' sh' : ''}"></i><small>${cp(k)}</small></span>`).join('');
+  const encs = [['b', 'encTune'], ['g', 'encMix'], ['w', 'encFx'], ['p', 'encLvl']].map(([c, k]) => `<span><i class="idv-enc ${c}"></i><small>${cp(k)}</small></span>`).join('');
   const bed = Array.from({ length: 16 }, (_, i) => `<i${i % 4 === 0 ? ` data-n="${i + 1}"` : ''}></i>`).join('');
   const dots = Array.from({ length: 48 }, () => '<i></i>').join('');
   // OLED: single-ink pixel meter
@@ -55,16 +57,16 @@ function idvArt(ctx) {
   return `<div class="idv">
     <div class="idv-body" style="${at(0, 0, 100, 64)}"></div>
     <div class="idv-grille" style="${at(4, 5, 11, 11)}">${dots}</div>
-    <small class="idv-pr" style="${at(19, 2.4, 20)}">mode &middot; a.01</small>
+    <small class="idv-pr" style="${at(19, 2.4, 20)}">${cp('legendMode')}</small>
     <div class="idv-oled" style="${at(19, 5, 37, 11)}"><b style="--idv-oled-k:${oledFs.toFixed(3)}">${e(word)}</b><span class="idv-bars">${bars}</span></div>
     <div class="idv-encs" style="${at(60, 5, 36, 13)}">${encs}</div>
     <div class="idv-knob" style="${at(KX - 9.6, KY - 9.6 * 100 / 64 * 64 / 100, 19.2)}"><span></span></div>
-    <svg class="idv-marks" viewBox="0 0 100 ${Y}" focusable="false"><g class="idv-scale">${knurl}${scale}</g><text class="pr" x="${KX}" y="${KY + 15.2}" text-anchor="middle">vol</text></svg>
+    <svg class="idv-marks" viewBox="0 0 100 ${Y}" focusable="false"><g class="idv-scale">${knurl}${scale}</g><text class="pr" x="${KX}" y="${KY + 15.2}" text-anchor="middle">${cp('knobVol')}</text></svg>
     <div class="idv-keys" style="${at(33, 21, 29)}">${keys}</div>
-    <small class="idv-pr idv-tr" style="${at(33, 50.6, 29)}"><span>loop</span><span>play</span><span>rec</span><span>stop</span></small>
+    <small class="idv-pr idv-tr" style="${at(33, 50.6, 29)}"><span>${cp('trLoop')}</span><span>${cp('trPlay')}</span><span>${cp('trRec')}</span><span>${cp('trStop')}</span></small>
     <div class="idv-fn" style="${at(66, 21, 30, 26)}">${fn}</div>
     <div class="idv-bed" style="${at(4, 54, 92, 6)}">${bed}</div>
-    <small class="idv-pr idv-model" style="${at(4, 61, 60)}">tp-01 &middot; field &middot; ${name}</small>
+    <small class="idv-pr idv-model" style="${at(4, 61, 60)}">${cp('modelLine').replace('{brand}', () => name)}</small>
   </div>`;
 }
 
@@ -79,6 +81,31 @@ registerAesthetic({
   mode: 'light',
   slideShape: 'minimal',
   labels: { material: 'Controls', states: ['Up', 'Hover', 'Down'], statesKind: 'button' },
+  // Editable specimen copy (Brand > Advanced > Specimen copy); text matches motto / kicker / labels.states above.
+  copy: {
+    motto: { label: 'Motto', text: 'Every control has a job.' },
+    kicker: { label: 'Kicker above the headline', text: 'tp-01 · field' },
+    state0: { label: 'State 1 name', text: 'Up' },
+    state1: { label: 'State 2 name', text: 'Hover' },
+    state2: { label: 'State 3 name', text: 'Down' },
+    legendMode: { label: 'Device legend above the screen', text: 'mode · a.01' },
+    modelLine: { label: 'Device model line ({brand})', text: 'tp-01 · field · {brand}' },
+    knobVol: { label: 'Knob legend', text: 'vol' },
+    encTune: { label: 'Encoder 1 legend', text: 'tune' },
+    encMix: { label: 'Encoder 2 legend', text: 'mix' },
+    encFx: { label: 'Encoder 3 legend', text: 'fx' },
+    encLvl: { label: 'Encoder 4 legend', text: 'lvl' },
+    fnSeq: { label: 'Function key 1 legend', text: 'seq' },
+    fnSynth: { label: 'Function key 2 legend', text: 'synth' },
+    fnDrum: { label: 'Function key 3 legend', text: 'drum' },
+    fnTape: { label: 'Function key 4 legend', text: 'tape' },
+    fnMix: { label: 'Function key 5 legend', text: 'mix' },
+    fnShift: { label: 'Function key 6 legend', text: 'shift' },
+    trLoop: { label: 'Transport legend 1', text: 'loop' },
+    trPlay: { label: 'Transport legend 2', text: 'play' },
+    trRec: { label: 'Transport legend 3', text: 'rec' },
+    trStop: { label: 'Transport legend 4', text: 'stop' },
+  },
   layout: { hero: 'split', palette: 'strips', sections: 'asym' },
   type: { ui: 'sans', label: 'mono', display: 1 },
   highlight: 'custom',

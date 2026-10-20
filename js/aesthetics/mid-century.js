@@ -183,6 +183,14 @@ registerAesthetic({
   mode: 'light',
   slideShape: 'classic',
   labels: { material: 'Cut paper', states: ['Rest', 'Hover', 'Pressed'], statesKind: 'chip' },
+  // Editable specimen copy (Brand > Advanced > Specimen copy).
+  copy: {
+    motto: { label: 'Motto', text: 'Keep it simple, keep it sunny.' },
+    kicker: { label: 'Kicker above the headline', text: 'Modern living, 1958 edition' },
+    state0: { label: 'State 1 name', text: 'Rest' },
+    state1: { label: 'State 2 name', text: 'Hover' },
+    state2: { label: 'State 3 name', text: 'Pressed' },
+  },
   layout: { hero: 'split', palette: 'swatches', sections: 'asym', subcopy: true },
   type: { ui: 'body', label: 'heading', display: 1 },
   highlight: 'custom',

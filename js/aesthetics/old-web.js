@@ -84,6 +84,45 @@ registerAesthetic({
   mode: 'dark',
   slideShape: 'minimal',
   labels: { material: 'Bevels', states: ['Raised', 'Visited', 'Sunken'], statesKind: 'button' },
+  // Editable specimen copy (Brand > Advanced > Specimen copy). {brand} = the brand name; in the news lines
+  // [word] makes a link and [*word] a visited link.
+  copy: {
+    motto: { label: 'Motto', text: 'Default HTML, made with love.' },
+    kicker: { label: 'Kicker above the headline', text: 'Welcome to the homepage' },
+    state0: { label: 'State 1 name', text: 'Raised' },
+    state1: { label: 'State 2 name', text: 'Visited' },
+    state2: { label: 'State 3 name', text: 'Sunken' },
+    windowTitle: { label: 'Window title ({brand})', text: 'Welcome to {brand}\'s Homepage!' },
+    nav0: { label: 'Page link 1', text: 'My projects' },
+    nav1: { label: 'Page link 2', text: 'About me' },
+    nav2: { label: 'Page link 3', text: 'Guestbook' },
+    nav3: { label: 'Page link 4', text: 'Cool links' },
+    construction: { label: 'Under-construction banner', text: 'UNDER CONSTRUCTION' },
+    constructionSub: { label: 'Under-construction sub-line', text: 'pardon our dust \u00B7 last updated 10/11/1999' },
+    marquee: { label: 'Scrolling message ({brand})', text: '*** Thanks for visiting {brand}! Sign my guestbook before you go! *** New stuff added every week!! ***' },
+    visitor: { label: 'Visitor counter label', text: 'You are visitor #' },
+    guestbook: { label: 'Guestbook line', text: '\u2665 please sign my guestbook \u2665' },
+    webring: { label: 'Webring legend ({brand})', text: '{brand} webring' },
+    ringPrev: { label: 'Webring: previous', text: '<< prev' },
+    ringRandom: { label: 'Webring: random', text: 'random' },
+    ringList: { label: 'Webring: list', text: 'list' },
+    ringNext: { label: 'Webring: next', text: 'next >>' },
+    newTitle: { label: "What's New heading", text: "What's New?" },
+    news0: { label: 'News line 1', text: 'added my [design language] page' },
+    news1: { label: 'News line 2', text: 'fixed the [*guestbook] (sorry!!)' },
+    news2: { label: 'News line 3 ({brand})', text: '[{brand}] joined the webring' },
+    newBadge: { label: 'New badge', text: 'NEW!' },
+    badge1a: { label: 'Badge 1, top', text: 'BEST VIEWED' },
+    badge1b: { label: 'Badge 1, bottom', text: '800 \u00D7 600' },
+    badge2a: { label: 'Badge 2, top', text: 'MADE WITH' },
+    badge2b: { label: 'Badge 2, bottom', text: 'NOTEPAD' },
+    badge3b: { label: 'Badge 3, bottom (top is the brand)', text: 'WEBRING' },
+    statusDone: { label: 'Status bar', text: 'Done' },
+    thName: { label: 'Table heading: name', text: 'Name' },
+    thStatus: { label: 'Table heading: status', text: 'Status' },
+    thProgress: { label: 'Table heading: progress', text: 'Progress' },
+    thDone: { label: 'Table heading: done', text: 'Done' },
+  },
   layout: { hero: 'centered', palette: 'swatches', sections: 'two-col' },
   type: { ui: 'body', label: 'body', display: 1 },
   highlight: 'custom',
@@ -190,32 +229,35 @@ registerAesthetic({
     const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '').slice(0, 14) || 'home';
     const count = '000417';
     const digits = count.split('').map(ch => `<b>${ch}</b>`).join('');
-    const links = [['folder', 'My projects'], ['note', 'About me'], ['mail', 'Guestbook'], ['globe', 'Cool links']]
-      .map(([ic, l], i) => `<li>${OW_ICONS[ic](sec)}<a class="${i === 2 ? 'ow-vis' : ''}">${l}</a></li>`).join('');
+    const cp = k => abCopy(this, k);
+    const brand = s => s.replace(/\{brand\}/g, () => e(name));
+    const links = [['folder', 'nav0'], ['note', 'nav1'], ['mail', 'nav2'], ['globe', 'nav3']]
+      .map(([ic, k], i) => `<li>${OW_ICONS[ic](sec)}<a class="${i === 2 ? 'ow-vis' : ''}">${cp(k)}</a></li>`).join('');
+    const news = k => brand(cp(k).replace(/\[(\*?)([^\]]+)\]/g, (m, v, w) => `<a${v ? ' class="ow-vis"' : ''}>${w}</a>`));
     const badges = [
-      ['ow-bd1', 'BEST VIEWED', '800 × 600'],
-      ['ow-bd2', 'MADE WITH', 'NOTEPAD'],
-      ['ow-bd3', e(name.split(/\s+/)[0].toUpperCase().slice(0, 10)), 'WEBRING'],
+      ['ow-bd1', cp('badge1a'), cp('badge1b')],
+      ['ow-bd2', cp('badge2a'), cp('badge2b')],
+      ['ow-bd3', e(name.split(/\s+/)[0].toUpperCase().slice(0, 10)), cp('badge3b')],
     ].map(([c, a, b]) => `<span class="ow-88 ${c}"><i>${a}</i><i>${b}</i></span>`).join('');
     return `<div class="owa">
       <div class="owa-win">
-        <div class="ow-title" style="background-color:${OW_NAVY};background-image:linear-gradient(90deg, ${OW_NAVY}, ${titleEnd})">${OW_ICONS.globe(sec)}<b>Welcome to ${e(name)}'s Homepage!</b><span class="ow-caps"><i class="ow-cap ow-min"></i><i class="ow-cap ow-max"></i><i class="ow-cap ow-cls"></i></span></div>
+        <div class="ow-title" style="background-color:${OW_NAVY};background-image:linear-gradient(90deg, ${OW_NAVY}, ${titleEnd})">${OW_ICONS.globe(sec)}<b>${brand(cp('windowTitle'))}</b><span class="ow-caps"><i class="ow-cap ow-min"></i><i class="ow-cap ow-max"></i><i class="ow-cap ow-cls"></i></span></div>
         <div class="owa-menu"><span><u>F</u>ile</span><span><u>E</u>dit</span><span><u>V</u>iew</span><span><u>G</u>o</span><span><u>H</u>elp</span></div>
         <div class="owa-body">
           <ul class="owa-nav">${links}</ul>
           <div class="owa-main">
-            <div class="owa-uc"><span class="owa-sign" aria-hidden="true"><i>!</i></span><b>UNDER CONSTRUCTION</b><small>pardon our dust · last updated 10/11/1999</small></div>
-            <div class="owa-marq"><span>*** Thanks for visiting ${e(name)}! Sign my guestbook before you go! *** New stuff added every week!! ***</span></div>
+            <div class="owa-uc"><span class="owa-sign" aria-hidden="true"><i>!</i></span><b>${cp('construction')}</b><small>${cp('constructionSub')}</small></div>
+            <div class="owa-marq"><span>${brand(cp('marquee'))}</span></div>
             <div class="owa-row">
-              <div class="owa-count"><span>You are visitor #</span><span class="owa-odo" style="--ow-led:${led}">${digits}</span></div>
-              <p class="owa-gb">♥ please sign my guestbook ♥</p>
+              <div class="owa-count"><span>${cp('visitor')}</span><span class="owa-odo" style="--ow-led:${led}">${digits}</span></div>
+              <p class="owa-gb">${cp('guestbook')}</p>
             </div>
-            <div class="owa-ring"><span class="ow-legend">${e(name)} webring</span><a>&lt;&lt; prev</a> | <a>random</a> | <a class="ow-vis">list</a> | <a>next &gt;&gt;</a></div>
-            <div class="owa-new"><b>What's New?</b><ul><li><i>NEW!</i> 10/11 · added my <a>design language</a> page</li><li>09/30 · fixed the <a class="ow-vis">guestbook</a> (sorry!!)</li><li>09/02 · <a>${e(name)}</a> joined the webring</li></ul></div>
+            <div class="owa-ring"><span class="ow-legend">${brand(cp('webring'))}</span><a>${cp('ringPrev')}</a> | <a>${cp('ringRandom')}</a> | <a class="ow-vis">${cp('ringList')}</a> | <a>${cp('ringNext')}</a></div>
+            <div class="owa-new"><b>${cp('newTitle')}</b><ul><li><i>${cp('newBadge')}</i> 10/11 · ${news('news0')}</li><li>09/30 · ${news('news1')}</li><li>09/02 · ${news('news2')}</li></ul></div>
             <div class="owa-badges">${badges}</div>
           </div>
         </div>
-        <div class="owa-status"><span>Done</span><span>http://www.${slug}.com/~home/index.html</span></div>
+        <div class="owa-status"><span>${cp('statusDone')}</span><span>http://www.${slug}.com/~home/index.html</span></div>
       </div>
     </div>`;
   },
@@ -229,11 +271,11 @@ registerAesthetic({
       const rows = (ctx.rows || []).slice(0, 3).map((r, i) => `<li class="ab-row">
           <span class="ab-row-n" aria-hidden="true">${OW_ICONS.folder(sec)}</span>
           <span class="ab-row-name"><a class="${i === 1 ? 'ow-vis' : ''}">${e(r[0])}</a></span>
-          <span class="ab-row-status">${e(r[1])}${i === 0 ? ' <i class="ow-new">NEW!</i>' : ''}</span>
+          <span class="ab-row-status">${e(r[1])}${i === 0 ? ` <i class="ow-new">${abCopy(this, 'newBadge')}</i>` : ''}</span>
           <span class="ab-row-bar" aria-hidden="true"><i style="width:${Number(r[2]) || 0}%"></i></span>
           <span class="ab-row-pct">${Number(r[2]) || 0}%</span>
         </li>`).join('');
-      return `<ul class="ab-list ow-table"><li class="ab-row ow-th" aria-hidden="true"><span></span><span>Name</span><span>Status</span><span>Progress</span><span>Done</span></li>${rows}</ul>`;
+      return `<ul class="ab-list ow-table"><li class="ab-row ow-th" aria-hidden="true"><span></span><span>${abCopy(this, 'thName')}</span><span>${abCopy(this, 'thStatus')}</span><span>${abCopy(this, 'thProgress')}</span><span>${abCopy(this, 'thDone')}</span></li>${rows}</ul>`;
     },
   },
 

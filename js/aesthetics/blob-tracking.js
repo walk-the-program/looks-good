@@ -296,6 +296,19 @@ registerAesthetic({
   mode: 'dark',
   slideShape: 'minimal',
   labels: { material: 'Detection', states: ['Searching', 'Locked', 'Lost'], statesKind: 'button' },
+  // Editable specimen copy (Brand > Advanced > Specimen copy). The per-box class tabs (PERSON, ZONE,
+  // GROUP, SHADOW, DOORWAY) are placed at module load from their text width, so they stay fixed.
+  copy: {
+    motto: { label: 'Motto', text: 'Everything in frame is accounted for.', warm: 'Everyone in frame is welcome.' },
+    kicker: { label: 'Kicker above the headline', text: 'Frame 0412 \u00B7 Tracking 13', warm: 'Frame 0412 \u00B7 Gathering 13' },
+    state0: { label: 'State 1 name', text: 'Searching', warm: 'Looking' },
+    state1: { label: 'State 2 name', text: 'Locked', warm: 'Found' },
+    state2: { label: 'State 3 name', text: 'Lost', warm: 'Resting' },
+    hudRec: { label: 'Recording readout (top left)', text: 'REC \u00B7 FRAME 0412' },
+    hudTrack: { label: 'Tracking readout (top right)', text: 'TRACKING {n} PERSONS \u00B7 {boxes} BOXES \u00B7 30 FPS', warm: 'WATCHING OVER {n} PEOPLE \u00B7 {boxes} BOXES \u00B7 30 FPS' },
+    hudThresh: { label: 'Threshold readout (bottom left)', text: 'THRESH 0.62 \u00B7 MIN AREA 240' },
+    lockTag: { label: 'Locked-box tab suffix', text: ' \u00B7 LOCK', warm: ' \u00B7 HERE' },
+  },
   layout: { hero: 'centered', palette: 'swatches', sections: 'two-col' },
   type: { ui: 'mono', label: 'mono', display: 0.7 },
   highlight: 'custom',
@@ -391,7 +404,7 @@ registerAesthetic({
       const left = pct(b.x0, BT_NX), top = pct(T.pos === 'below' ? b.y1 : b.y0, BT_NY);
       const small = (b.x1 - b.x0) < BT_NX * 0.03 && !b.lock;
       const cls = `bta-tab${b.lock ? ' is-lock' : ''}${b.k === 'group' ? ' is-grp' : ''}${b.k === 'shadow' ? ' is-sh' : ''}${small ? ' is-sm' : ''}${T.pos === 'below' ? ' is-below' : ''}`;
-      return `<span class="${cls}" style="--x:${left};--x1:${pct(b.x1, BT_NX)};top:${top}%">${b.lock ? `<b>${T.txt}</b><i> · LOCK</i>` : `<b>${T.txt}</b>`}</span>`;
+      return `<span class="${cls}" style="--x:${left};--x1:${pct(b.x1, BT_NX)};top:${top}%">${b.lock ? `<b>${T.txt}</b><i>${abCopy(this, 'lockTag')}</i>` : `<b>${T.txt}</b>`}</span>`;
     }).join('');
     const L = BT_BOXES.find(b => b.lock);
     // the locked readout sits above the locked box's tab on a backing, so it always reads
@@ -408,9 +421,9 @@ registerAesthetic({
         </svg>
         ${tabs}${xy}
       </div></div>
-      <span class="bta-hud bta-tl"><i class="bta-rec"></i>REC · FRAME 0412</span>
-      <span class="bta-hud bta-tr">TRACKING ${BT_SUBJ.length} PERSONS · ${BT_BOXES.length} BOXES · 30 FPS</span>
-      <span class="bta-hud bta-bl">THRESH 0.62 · MIN AREA 240</span>
+      <span class="bta-hud bta-tl"><i class="bta-rec"></i>${abCopy(this, 'hudRec')}</span>
+      <span class="bta-hud bta-tr">${abCopy(this, 'hudTrack').replace('{n}', () => BT_SUBJ.length).replace('{boxes}', () => BT_BOXES.length)}</span>
+      <span class="bta-hud bta-bl">${abCopy(this, 'hudThresh')}</span>
       <span class="bta-hud bta-br">00:00:13:12</span>
       <i class="bta-corner" aria-hidden="true"></i>
     </div>`;

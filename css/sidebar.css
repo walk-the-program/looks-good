@@ -185,6 +185,16 @@ body[data-showcase="on"] .sd-tabs { bottom: 64px; }
 }
 .sidebar .voice-own textarea:focus-visible { border-color: #c9c8c4; outline: none; }
 
+/* Advanced > Specimen copy: one group per active style, a text input per entry with its own reset. */
+.copy-group { display: flex; flex-direction: column; gap: 10px; }
+.copy-group + .copy-group { padding-top: 14px; border-top: 1px solid var(--line); }
+.copy-group-head { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
+.copy-group-head .sd-adv-sub { margin: 0; }
+.sidebar .copy-reset-all { height: 24px; padding: 0 8px; font-size: var(--fs-1); }
+.copy-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 6px; align-items: center; }
+.sidebar .copy-reset { height: 32px; padding: 0 8px; font-size: var(--fs-1); }
+.copy-reset[hidden], .copy-reset-all[hidden] { display: none; }
+
 /* The lock: a labelled switch in the panel title row. */
 .sd-head .lock { font-size: var(--fs-2); font-weight: 500; text-transform: none; letter-spacing: 0; gap: 8px; }
 

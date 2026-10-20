@@ -7,6 +7,44 @@
    aesthetic-board.js. Plain <script> tags, no modules.
 ------------------------------------------------------------------------ */
 
+/* ---------------------------------------------------------------------
+   SPECIMEN COPY CONTRACT (def.copy, abCopy)  -  every aesthetic's flavour text
+
+   Any user-visible specimen / flavour string an aesthetic prints (label sub-lines,
+   price lines, button labels, state names, the motto, captions, the kicker) is declared
+   in an optional def.copy map and read through abCopy; it is never hardcoded in a template.
+   The owner can rewrite each entry per brand (Brand tab > Advanced > Specimen copy).
+
+     copy: { <key>: { label: 'Name shown in the editor', text: 'Default', warm: 'Softer default (optional)' } }
+
+   - Keys are camelCase and unique within the aesthetic. `label` is required, `text` is the
+     Style's-voice default, `warm` is optional: used when the brand's voice is Warmer or
+     Own words. Give `warm` to anything harsh or exclusionary; keep it the same length class.
+   - Read: abCopy(defOrKey, key)     -> HTML-escaped string (between tags, in attributes, SVG <text>)
+           abCopyRaw(defOrKey, key)  -> unescaped (you escape; brief text). Optional 3rd arg: a
+           brand state (default: the global state). In a hook use `this`, or a plain function's
+           own key string ('dystopian-luxury'); inside a blend the donor's art hook still
+           resolves its own key.
+     Resolution: owner's override (state.content.copy[aestheticKey][key], non-empty)
+     -> `warm` if the voice is Warmer / Own words and the entry has one -> `text`.
+     An unknown key returns '' and warns once.
+   - Reserved keys the framework reads for you:
+       state0, state1, state2  the three state names (replace def.labels.states; board, deck)
+       motto                   the footer / cover motto (displayMotto, brief); Own words motto still wins
+       kicker                  the line above the board headline (not used inside a blend)
+     Keep def.labels.states / def.motto / def.kicker as they are (other readers); make the
+     copy `text` match them.
+   - Text with a variable inside: put {brand} (or any token) in the text and replace it in the
+     template after abCopy: abCopy(k, 'caption').replace('{brand}', () => e(ctx.brandName)).
+   - Not copy: CSS names, font names, rule text (rules / deck.principles / do / dont), and the
+     brand's own name, tagline and fallbacks.
+
+   Example:
+     registerAesthetic({ key: 'x', ...,
+       copy: { price: { label: 'Price line', text: 'Price on request', warm: 'Fairly priced' } },
+       deck: { product(ctx) { return `<p>${abCopy('x', 'price')}</p>`; } } });
+------------------------------------------------------------------------ */
+
 const AESTHETICS = [];
 
 // Classic versions: the aesthetic as it was at git tag r6-0-baseline, generated into

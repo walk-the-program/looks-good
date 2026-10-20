@@ -15,6 +15,7 @@
    Hero: a large field of space with a precise grid of thin lines, one small circle on a grid
    intersection, and a vertical label. No illustration. */
 
+const JM_KEY = 'japanese-minimal';   // abCopy key for the plain functions below (js/aesthetics/registry.js)
 const JM = {
   ground: '#F7F6F3', night: '#161615', ink: '#1C1C1A', inkDark: '#ECEBE6',
 };
@@ -90,7 +91,7 @@ function jmHeroSvg(ctx) {
       <path d="M24 152H184" stroke="${t.alpha(ink, 0.6)}" stroke-width=".5" fill="none"/>
       <g stroke="${t.alpha(ink, 0.55)}" stroke-width=".45" fill="none">${tk}</g>
       <circle cx="120" cy="88" r="5.5" fill="${dot}"/>
-      <text x="197" y="152" font-family='${f.b}' font-size="5.2" letter-spacing="1.1" fill="${ink}" opacity=".7" transform="rotate(-90 197 152)">JAPANESE MINIMAL</text>
+      <text x="197" y="152" font-family='${f.b}' font-size="5.2" letter-spacing="1.1" fill="${ink}" opacity=".7" transform="rotate(-90 197 152)">${abCopy(JM_KEY, 'vertLabel')}</text>
     </svg></div>`;
 }
 
@@ -107,7 +108,7 @@ function jmSpecimenSvg(ctx) {
       <path d="M20 80H100" stroke="${t.alpha(ink, 0.25)}" stroke-width=".5"/>
       <rect x="130" y="34" width="40" height="22" rx="2" fill="${t.primary}"/>
       <circle cx="250" cy="45" r="6" fill="${dot}"/>
-      ${cap(60, 'HAIRLINE 1PX')}${cap(150, 'PLAIN ACTION')}${cap(250, 'ONE DOT')}
+      ${cap(60, abCopy(JM_KEY, 'capHairline'))}${cap(150, abCopy(JM_KEY, 'capAction'))}${cap(250, abCopy(JM_KEY, 'capDot'))}
     </svg></div>`;
 }
 
@@ -117,11 +118,23 @@ registerAesthetic({
   descriptor: 'Quiet · Precise · Spacious',
   influences: 'Kenya Hara / Muji / Naoto Fukasawa',
   summary: 'Ma as the material: a warm off-white ground, a strict grid, hairline rules and one small dot of colour.',
-  motto: 'Less, placed exactly.',
-  kicker: 'Less, measured',
+  motto: 'Less, placed exactly.',   // = copy.motto.text
+  kicker: 'Less, measured',         // = copy.kicker.text
   mode: 'light',
   slideShape: 'minimal',
   labels: { material: 'Control', states: ['Rest', 'Focus', 'Done'], statesKind: 'swatch' },
+  // Editable specimen copy (Brand > Advanced > Specimen copy).
+  copy: {
+    motto: { label: 'Motto', text: 'Less, placed exactly.' },
+    kicker: { label: 'Kicker above the headline', text: 'Less, measured' },
+    state0: { label: 'State 1 name', text: 'Rest' },
+    state1: { label: 'State 2 name', text: 'Focus' },
+    state2: { label: 'State 3 name', text: 'Done' },
+    vertLabel: { label: 'Hero vertical label', text: 'JAPANESE MINIMAL' },
+    capHairline: { label: 'Material specimen caption 1', text: 'HAIRLINE 1PX' },
+    capAction: { label: 'Material specimen caption 2', text: 'PLAIN ACTION' },
+    capDot: { label: 'Material specimen caption 3', text: 'ONE DOT' },
+  },
   layout: { hero: 'split', palette: 'list', sections: 'two-col' },
   type: { ui: 'sans', label: 'sans', display: 0.8 },
   highlight: 'custom',

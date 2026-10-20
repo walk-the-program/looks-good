@@ -40,6 +40,19 @@ registerAesthetic({
   mode: 'dark',
   slideShape: 'minimal',
   labels: { material: 'Systems', states: ['Idle', 'Target', 'Locked'], statesKind: 'button' },
+  // Editable specimen copy (Brand > Advanced > Specimen copy). The X / Y position readout is data and stays as drawn.
+  copy: {
+    motto: { label: 'Motto', text: 'Target acquired.', warm: 'Found what you need.' },
+    kicker: { label: 'Kicker above the headline', text: 'Sync 98.2%' },
+    state0: { label: 'State 1 name', text: 'Idle' },
+    state1: { label: 'State 2 name', text: 'Target', warm: 'Found' },
+    state2: { label: 'State 3 name', text: 'Locked', warm: 'Ready' },
+    sync: { label: 'Sync readout', text: 'SYNC 98.2%' },
+    signal: { label: 'Signal readout', text: 'SIG \u25AE\u25AE\u25AE\u25AE\u25AF' },
+    lockTime: { label: 'Lock tag', text: 'LOCK 0.82s', warm: 'READY 0.82s' },
+    targetId: { label: 'Target id', text: 'TGT-07' },
+    active: { label: 'Status after the brand name', text: '// ACTIVE' },
+  },
   layout: { hero: 'split', palette: 'swatches', sections: 'two-col' },
   type: { ui: 'mono', label: 'mono', display: 0.84 },
   highlight: 'custom',
@@ -151,10 +164,10 @@ registerAesthetic({
         <path ${vf} d="M63.5 35.2l3 3-3 3-3-3z" fill="${t.accent}" stroke="${t.accent}"/>
         <circle ${vf} cx="63.5" cy="38.2" r="6" fill="none" stroke="${t.accent}" stroke-opacity=".6"/>
       </svg>
-      <span class="chs-r chs-tl">SYNC 98.2%<br><i>SIG ▮▮▮▮▯</i></span>
+      <span class="chs-r chs-tl">${abCopy(this, 'sync')}<br><i>${abCopy(this, 'signal')}</i></span>
       <span class="chs-r chs-tr">X 012.4<br>Y 087.1</span>
-      <span class="chs-tag">LOCK 0.82s</span>
-      <span class="chs-call"><b>TGT-07</b>${escapeHtml(String(ctx.brandName || ctx.name || '').toUpperCase().slice(0, 14))} // ACTIVE</span>
+      <span class="chs-tag">${abCopy(this, 'lockTime')}</span>
+      <span class="chs-call"><b>${abCopy(this, 'targetId')}</b>${escapeHtml(String(ctx.brandName || ctx.name || '').toUpperCase().slice(0, 14))} ${abCopy(this, 'active')}</span>
       <svg class="chs-lead" viewBox="0 0 100 100" preserveAspectRatio="none" focusable="false"><path vector-effect="non-scaling-stroke" d="M2 66H15L24 55H35" fill="none" stroke="${neon}" stroke-width="1" stroke-opacity=".9"/><circle cx="35" cy="55" r="1.1" fill="${neon}"/></svg>
       <span class="chs-bar" aria-hidden="true"><b></b></span>
       <svg class="chs-gauge" viewBox="0 0 44 44" focusable="false"><circle cx="22" cy="22" r="17" fill="none" stroke="${neon}" stroke-opacity=".22" stroke-width="3" pathLength="100" stroke-dasharray="1.6 1.4"/>

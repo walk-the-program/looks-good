@@ -19,7 +19,9 @@
 (function () {
 const HAZARD = '#E10600';
 const SAFETY = '#FFD400';
-const CV_BARS_TXT = ['Feelings not included', 'Nobody approved this', 'Alive costs extra', 'Your feelings, our asset'];
+const CV_KEY = 'corporate-vandalism';   // abCopy key for the plain functions and hooks below (js/aesthetics/registry.js)
+const cvCp = k => abCopy(CV_KEY, k);
+const CV_BARS_KEYS = ['bar1', 'bar2', 'bar3', 'bar4'];   // the Kruger bar lines, picked by hash of the headline
 function cvHash(str) { let h = 2166136261; for (let i = 0; i < str.length; i++) { h ^= str.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; }
 function cvVandalFace() { return '"Jost", "Futura", "Century Gothic", sans-serif'; }
 
@@ -45,6 +47,45 @@ registerAesthetic({
   mode: 'light',
   slideShape: 'minimal',
   labels: { material: 'Compliance', states: ['Approved', 'Flagged', 'Redacted'], statesKind: 'button' },
+  // Editable specimen copy (Brand > Advanced > Specimen copy); text matches motto / kicker / labels.states above.
+  // Warm entries swap the deadpan bite for a gentler office joke. {co} {re} in fine1 and {brand} in asset are filled in.
+  copy: {
+    motto: { label: 'Motto', text: 'Everything is fine. Please initial here.' },
+    kicker: { label: 'Kicker above the headline', text: 'Pending review' },
+    state0: { label: 'State 1 name', text: 'Approved' },
+    state1: { label: 'State 2 name', text: 'Flagged', warm: 'Noted' },
+    state2: { label: 'State 3 name', text: 'Redacted', warm: 'Filed' },
+    bar1: { label: 'Headline bar line 1', text: 'Feelings not included', warm: 'Feelings welcome here' },
+    bar2: { label: 'Headline bar line 2', text: 'Nobody approved this', warm: 'Someone approved this' },
+    bar3: { label: 'Headline bar line 3', text: 'Alive costs extra', warm: 'Alive is included' },
+    bar4: { label: 'Headline bar line 4', text: 'Your feelings, our asset', warm: 'Your feelings, our care' },
+    stkVoid: { label: 'Void sticker word', text: 'VOID', warm: 'COPY' },
+    stkSub: { label: 'Void sticker sub-line', text: 'where feelings', warm: 'where it counts' },
+    memo: { label: 'Memo classification line', text: 'MEMO // FOR INTERNAL FEELINGS ONLY', warm: 'MEMO // FOR FRIENDLY EYES ONLY' },
+    title: { label: 'Notice title', text: 'Notice of Compliance Review' },
+    ref: { label: 'Notice reference line', text: 'Ref. 2291-B \u00b7 Page 1 of 1 \u00b7 Please retain' },
+    fine1: { label: 'Fine print ({co}, {re})', text: 'Pursuant to Section 4.2, all feelings remain the property of {co} and may be {re} without notice.', warm: 'Pursuant to Section 4.2, all feelings remain the property of {co} and may be {re} with a kind word.' },
+    fineCo: { label: 'Fine print: redacted word 1', text: 'the Company' },
+    fineRe: { label: 'Fine print: redacted word 2', text: 'reassigned' },
+    redact1: { label: 'Redacted line 1', text: 'Section 4.2(c) applies to every feeling the Subscriber has had.' },
+    redact2: { label: 'Redacted line 2', text: 'Permitted feelings: mild interest, polite surprise, boredom.', warm: 'Permitted feelings: interest, delight, surprise, joy.' },
+    fine2: { label: 'Fine print line 2', text: 'Unlisted feelings are deemed alive.' },
+    warning: { label: 'Warning line', text: 'Warning: contains 14% opinion', warm: 'Note: contains 14% opinion' },
+    initial: { label: 'Signature line', text: 'Initial here' },
+    rcptHead: { label: 'Receipt heading', text: 'Receipt' },
+    rcptL1: { label: 'Receipt line 1', text: 'Good design x1' },
+    rcptL2: { label: 'Receipt line 2', text: 'Feeling (alive) x1' },
+    rcptL3: { label: 'Receipt line 3', text: 'Tax on feelings 7%', warm: 'Tip for feelings 7%' },
+    rcptTotal: { label: 'Receipt total label', text: 'Total' },
+    rcptDue: { label: 'Receipt amount due', text: 'Amount due: one (1) apology', warm: 'Amount due: one (1) smile' },
+    stripCard: { label: 'Card header strip', text: 'Notice 2291-B \u00b7 Form 7' },
+    stripPanel: { label: 'Panel header strip', text: 'Form 7 \u00b7 Part 2' },
+    terms: { label: 'Card footnote', text: '\u2020 Terms apply. Terms are subject to change, including this sentence.' },
+    never: { label: 'Struck-word note', text: 'never' },
+    asset: { label: 'Asset tag ({brand})', text: 'Property of {brand} \u00b7 Do not remove' },
+    stampDo: { label: 'Do stamp (deck)', text: 'Approved' },
+    stampDont: { label: 'Don\'t stamp (deck)', text: 'Rejected', warm: 'Revised' },
+  },
   layout: { hero: 'split', palette: 'swatches', sections: 'two-col' },
   type: { ui: 'body', label: 'mono', display: 1.14 },
   highlight: 'custom',
@@ -84,8 +125,8 @@ registerAesthetic({
   // The official headline, small and bored, with the vandal's Kruger bar applied over it.
   headline(ctx, text) {
     const e = escapeHtml;
-    const bar = CV_BARS_TXT[cvHash(String(ctx.brandName || '') + '|' + String(text || '')) % CV_BARS_TXT.length];
-    return `<span class="cvh-o">${e(text)}</span><span class="cvh-k"><span>${e(bar)}</span></span>`;
+    const bar = cvCp(CV_BARS_KEYS[cvHash(String(ctx.brandName || '') + '|' + String(text || '')) % CV_BARS_KEYS.length]);
+    return `<span class="cvh-o">${e(text)}</span><span class="cvh-k"><span>${bar}</span></span>`;
   },
 
   tokens(t, view) {
@@ -136,26 +177,26 @@ registerAesthetic({
     return `<div class="cva">
       <div class="cva-doc">
         <div class="cva-bar"><i>${e(ctx.initial)}</i><b>${name}</b><span>FORM 27-B</span></div>
-        <span class="cva-stk" aria-hidden="true"><b>VOID</b><i>where feelings</i></span>
+        <span class="cva-stk" aria-hidden="true"><b>${cvCp('stkVoid')}</b><i>${cvCp('stkSub')}</i></span>
         <div class="cva-body">
-          <p class="cva-class">MEMO // FOR INTERNAL FEELINGS ONLY</p>
-          <p class="cva-title">Notice of Compliance Review</p>
-          <p class="cva-ref">Ref. 2291-B · Page 1 of 1 · Please retain</p>
-          <p class="cva-fine">Pursuant to Section 4.2, all feelings remain the property of ${R('the Company')} and may be ${R('reassigned')} without notice.</p>
-          <div class="cva-rr"><div class="cva-rx cva-rx1">Section 4.2(c) applies to every feeling the Subscriber has had.</div><i>(b)(6)</i></div>
-          <div class="cva-rr"><div class="cva-rx">Permitted feelings: mild interest, polite surprise, boredom.</div><i>(b)(7)(C)</i></div>
-          <p class="cva-fine">Unlisted feelings are deemed alive.</p>
-          <div class="cva-warn">${warn}<span>Warning: contains 14% opinion</span></div>
-          <div class="cva-sign"><span>Initial here</span><i></i></div>
+          <p class="cva-class">${cvCp('memo')}</p>
+          <p class="cva-title">${cvCp('title')}</p>
+          <p class="cva-ref">${cvCp('ref')}</p>
+          <p class="cva-fine">${cvCp('fine1').replace('{co}', () => R(cvCp('fineCo'))).replace('{re}', () => R(cvCp('fineRe')))}</p>
+          <div class="cva-rr"><div class="cva-rx cva-rx1">${cvCp('redact1')}</div><i>(b)(6)</i></div>
+          <div class="cva-rr"><div class="cva-rx">${cvCp('redact2')}</div><i>(b)(7)(C)</i></div>
+          <p class="cva-fine">${cvCp('fine2')}</p>
+          <div class="cva-warn">${warn}<span>${cvCp('warning')}</span></div>
+          <div class="cva-sign"><span>${cvCp('initial')}</span><i></i></div>
         </div>
       </div>
       <div class="cva-rw"><div class="cva-rcpt">
-        <p class="cva-rh">Receipt</p>
-        <p class="cva-rl"><span>Good design x1</span><b>0.00</b></p>
-        <p class="cva-rl"><span>Feeling (alive) x1</span><b>0.00</b></p>
-        <p class="cva-rl"><span>Tax on feelings 7%</span><b>0.00</b></p>
-        <p class="cva-rl cva-rt"><span>Total</span><b>0.00</b></p>
-        <p class="cva-rn">Amount due: one (1) apology</p>
+        <p class="cva-rh">${cvCp('rcptHead')}</p>
+        <p class="cva-rl"><span>${cvCp('rcptL1')}</span><b>0.00</b></p>
+        <p class="cva-rl"><span>${cvCp('rcptL2')}</span><b>0.00</b></p>
+        <p class="cva-rl"><span>${cvCp('rcptL3')}</span><b>0.00</b></p>
+        <p class="cva-rl cva-rt"><span>${cvCp('rcptTotal')}</span><b>0.00</b></p>
+        <p class="cva-rn">${cvCp('rcptDue')}</p>
         ${cvBarcode()}
       </div></div>
     </div>`;
@@ -165,16 +206,16 @@ registerAesthetic({
   // list with its asset tag, and the vandal's marker strike through one official word.
   panels: {
     card: ctx => ctx.parts.cardBase()
-      .replace(/^(\s*<div class="ab-card">)/, '$1<p class="cv-strip">Notice 2291-B · Form 7</p>')
-      .replace(/<\/div>\s*$/, '<p class="cv-fine">† Terms apply. Terms are subject to change, including this sentence.</p></div>'),
-    panel: ctx => ctx.parts.panelBase().replace(/^(\s*<div class="ab-panel">)/, '$1<p class="cv-strip">Form 7 · Part 2</p>'),
+      .replace(/^(\s*<div class="ab-card">)/, (m, g1) => `${g1}<p class="cv-strip">${cvCp('stripCard')}</p>`)
+      .replace(/<\/div>\s*$/, () => `<p class="cv-fine">${cvCp('terms')}</p></div>`),
+    panel: ctx => ctx.parts.panelBase().replace(/^(\s*<div class="ab-panel">)/, (m, g1) => `${g1}<p class="cv-strip">${cvCp('stripPanel')}</p>`),
     list(ctx) {
       const e = ctx.e;
       const name = String(ctx.brandName || '').trim().toUpperCase();
       return `<div class="ab-list cv-po"><ul class="cv-rows">${ctx.rows.map((r, i) => {
         const w = String(r[0]).split(' ');
         const label = i === 2 && w.length > 1
-          ? `<s>${e(w[0])}</s> ${e(w.slice(1).join(' '))}<span class="cv-never" aria-hidden="true">never</span>`
+          ? `<s>${e(w[0])}</s> ${e(w.slice(1).join(' '))}<span class="cv-never" aria-hidden="true">${cvCp('never')}</span>`
           : e(r[0]);
         return `<li class="ab-row">
       <span class="ab-row-n">PO-229${i + 1}-B</span>
@@ -184,7 +225,7 @@ registerAesthetic({
       <span class="ab-row-bar" aria-hidden="true"><i style="width:${r[2]}%"></i></span>
       <span class="ab-row-pct">${r[2]}%</span>
     </li>`;
-      }).join('')}</ul><p class="cv-asset">Property of ${e(name)} · Do not remove</p></div>`;
+      }).join('')}</ul><p class="cv-asset">${cvCp('asset').replace('{brand}', () => e(name))}</p></div>`;
     },
   },
 
@@ -217,7 +258,7 @@ registerAesthetic({
   deck: {
     coverDisplay: 0.78,   // a smaller cover start size keeps the taller notice at its natural width (it re-stacks when its box narrows)
     // Do / Don't marks are the corporation's own rubber stamps
-    marks: (ctx, kind) => `<span class="cv-stamp" data-kind="${kind}">${kind === 'do' ? 'Approved' : 'Rejected'}</span>`,
+    marks: (ctx, kind) => `<span class="cv-stamp" data-kind="${kind}">${kind === 'do' ? cvCp('stampDo') : cvCp('stampDont')}</span>`,
     principles: [
       ['Two hands', 'Their spotless shell; our mark on top of it.'],
       ['Theirs and ours', 'Client colours run the shell; hazard red and safety yellow are fixed.'],

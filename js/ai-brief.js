@@ -2303,7 +2303,7 @@ function aibBrandLine(ctx) {
   if (summary !== (def.summary || '') && summary !== plain && !String(def.summary).startsWith(summary.split('. ')[0])) summary = plain + ' ' + summary;
   // The aesthetic's motto is its own voice: Style's voice keeps it, Own words swaps in the user's, Warmer drops it.
   const v = aibVoice(ctx.state);
-  const motto = v.mode === 'style' ? def.motto : v.motto;
+  const motto = typeof specimenMotto === 'function' ? specimenMotto(ctx.state, def) : (v.mode === 'style' ? def.motto : v.motto);
   return `${ctx.brandName}: ${ctx.tagline} Aesthetic: ${def.name} (${def.descriptor}; ${def.influences}). ${summary}${motto ? ' ' + motto : ''}`;
 }
 
@@ -2311,13 +2311,34 @@ function aibBrandLine(ctx) {
 function aibSecVoice(ctx) {
   const v = aibVoice(ctx.state), { def } = ctx;
   if (v.mode === 'style') return [];
-  const mottoNote = def.motto ? ` Its motto ("${def.motto}") and the specimen phrases on its board and slides` : ' The specimen phrases on its board and slides';
+  const mottoText = typeof specimenMotto === 'function' ? specimenMotto(ctx.state, def) : '';
+  const mottoNote = def.motto && !mottoText ? ` Its motto ("${def.motto}") and the specimen phrases on its board and slides` : ' The specimen phrases on its board and slides';
+  // Softer defaults the aesthetic offers for its specimen text (Advanced > Specimen copy edits are listed separately, Locked).
+  const sugg = aibActiveCopy(ctx).flatMap(({ d }) => Object.keys(d.copy || {})
+    .filter(k => d.copy[k].warm && !abCopyUser(d, k, ctx.state))
+    .map(k => `  - ${d.copy[k].label || k}: "${abCopyRaw(d, k, ctx.state)}"`));
   return [`## Voice (${v.note ? 'Locked' : 'Guided'})`,
     `- The aesthetic governs visuals only.${mottoNote} are style placeholders, not brand copy: never use them in the product.`,
     ...(v.note ? [`- Voice, in the owner's words: "${v.note}". Write every line of copy in that voice.`] : []),
     ...(v.motto ? [`- Motto, used as written wherever a motto belongs: "${v.motto}"`] : []),
+    ...(sugg.length ? ['- Where the style places specimen text, these softer phrases are suggestions, not required copy:'].concat(sugg) : []),
     '- Write copy warm, curious, plain and short: everyday words, no slogans, no formal or exclusive phrasing.',
     '- Keep severity in the layout and type, not in the words: the look stays as strict as the rules below say, and the copy does not copy it.'];
+}
+
+// The active aesthetics (base, plus the blend's donor) that declare specimen copy: [{ d }].
+const aibActiveCopy = ctx => (typeof abActiveDefs === 'function' ? abActiveDefs(ctx.state) : []).filter(d => d.copy && Object.keys(d.copy).length).map(d => ({ d }));
+
+// Specimen copy: only when the owner rewrote an entry (Brand > Advanced > Specimen copy). Locked.
+function aibSecSpecimen(ctx) {
+  const groups = aibActiveCopy(ctx).map(({ d }) => ({ d, rows: abCopyEdited(d, ctx.state) })).filter(g => g.rows.length);
+  if (!groups.length) return [];
+  const lines = ['## Specimen copy (Locked)', 'Use these exact phrases where the style places specimen text:'];
+  groups.forEach(({ d, rows }) => {
+    if (groups.length > 1) lines.push(`${d.name}:`);
+    rows.forEach(r => lines.push(`- ${r.label} → "${r.text}"`));
+  });
+  return lines;
 }
 
 // Rules that hold for every brand (product imagery) plus the aesthetic's signature device when it has one.
@@ -3328,7 +3349,7 @@ const AIB_TIERS = {
   'Phone layout and type': 'Guided', 'Motion': 'Guided', "Do and don't": 'Guided',
   'Colors': 'Locked', 'Components': 'Locked', 'UI kit': 'Locked', 'Type': 'Locked', 'Website type': 'Locked', 'Shape and materials': 'Locked',
   'Light and dark': 'Locked', 'States': 'Locked', 'Accessibility': 'Locked', 'Icons': 'Locked', 'App icon': 'Locked', 'Fonts to bundle': 'Locked',
-  'Tokens (CSS)': 'Locked', 'Theme.swift': 'Locked', 'Patterns': 'Locked',
+  'Tokens (CSS)': 'Locked', 'Theme.swift': 'Locked', 'Patterns': 'Locked', 'Specimen copy': 'Locked',
   'Screen layouts': 'Free',
 };
 
@@ -3474,6 +3495,7 @@ function aibBuild(ctx) {
     aibSecWebRules(ctx),
     aibSecWhy(ctx),
     aibSecVoice(ctx),
+    aibSecSpecimen(ctx),
     aibSecBlend(ctx),
     aibSecColors(ctx),
     ctx.app ? aibSecKit(ctx) : aibSecComponents(ctx),

@@ -23,6 +23,7 @@
      the same inside another aesthetic's hero box (blend donor). */
 (function () {
 let seq = 0;
+const ND_KEY = 'naive-doodle';   // abCopy key for the plain functions below (js/aesthetics/registry.js)
 const PENCIL = '#1F1B16';
 
 function ndRand(seed) {
@@ -208,11 +209,20 @@ registerAesthetic({
   descriptor: 'Wobbly · Honest · Sunny',
   influences: 'Kid Core / Oatly / Haring & Jullien line',
   summary: 'A confident but untrained line, colour filled a little outside it, and a page that talks back in handwriting.',
-  motto: 'Proof a human drew it.',
-  kicker: 'Drawn this morning',
+  motto: 'Proof a human drew it.',   // = copy.motto.text
+  kicker: 'Drawn this morning',      // = copy.kicker.text
   mode: 'light',
   slideShape: 'soft',
   labels: { material: 'Crayon', states: ['Outlined', 'Coloured in', 'Circled'], statesKind: 'button' },
+  // Editable specimen copy (Brand > Advanced > Specimen copy).
+  copy: {
+    motto: { label: 'Motto', text: 'Proof a human drew it.' },
+    kicker: { label: 'Kicker above the headline', text: 'Drawn this morning' },
+    state0: { label: 'State 1 name', text: 'Outlined' },
+    state1: { label: 'State 2 name', text: 'Coloured in' },
+    state2: { label: 'State 3 name', text: 'Circled' },
+    handNote: { label: 'Handwritten note', text: 'made by hand!' },
+  },
   layout: { hero: 'split', palette: 'swatches', sections: 'two-col', subcopy: true },
   type: { ui: 'body', label: 'body', display: 1.22 },
   highlight: 'custom',
@@ -339,7 +349,7 @@ registerAesthetic({
       + `<path d="${ndD(ndWobble(ndArc(cx + 28, cy - 16, 9, 7, 200, 140), rnd, 0.4, 3))}" fill="none" stroke="${PENCIL}" stroke-width="3.2" stroke-linecap="round"/>`
       + `<ellipse cx="${cx - 46}" cy="${cy + 14}" rx="12" ry="8" fill="${c3}" opacity=".9"/><ellipse cx="${cx + 46}" cy="${cy + 12}" rx="12" ry="8" fill="${c3}" opacity=".9"/>`
       + `<path d="${ndD(ndWobble(ndArc(cx, cy + 6, 34, 30, 22, 136), rnd, 0.7, 4))}" fill="none" stroke="${PENCIL}" stroke-width="3.4" stroke-linecap="round"/>`;
-    const note = `<g transform="rotate(-7 86 58)"><text x="22" y="66" font-family="Caveat, 'Patrick Hand', 'Marker Felt', cursive" font-size="34" font-weight="700" fill="${ink}">made by hand!</text></g>`
+    const note = `<g transform="rotate(-7 86 58)"><text x="22" y="66" font-family="Caveat, 'Patrick Hand', 'Marker Felt', cursive" font-size="34" font-weight="700" fill="${ink}">${abCopy(ND_KEY, 'handNote')}</text></g>`
       + (() => { const [a, h] = ndLoopArrow(84, 88, 166, 132, 11, 1); return P(a, 0.6, 4, 2.4) + P(h, 0.3, 3, 2.4); })();
     return `<svg class="nd-art" viewBox="0 0 400 400" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg" role="presentation" focusable="false" style="display:block;width:100%;height:100%">
       <defs>${hatch('a', c1, 18)}${hatch('b', c2, 18)}</defs>

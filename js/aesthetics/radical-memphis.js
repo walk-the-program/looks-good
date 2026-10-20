@@ -20,6 +20,17 @@ registerAesthetic({
   mode: 'light',
   slideShape: 'soft',
   labels: { material: 'Laminates', states: ['Plain', 'Patterned', 'Stacked'], statesKind: 'swatch' },
+  // Editable specimen copy (Brand > Advanced > Specimen copy); text matches motto / kicker / labels.states above.
+  copy: {
+    motto: { label: 'Motto', text: 'Furniture for the screen.' },
+    kicker: { label: 'Kicker above the headline', text: 'Showroom, 1981' },
+    state0: { label: 'State 1 name', text: 'Plain' },
+    state1: { label: 'State 2 name', text: 'Patterned' },
+    state2: { label: 'State 3 name', text: 'Stacked' },
+    artCap: { label: 'Art caption (piece name)', text: 'Tahiti \u2014 No.\u200907' },
+    plaqueName: { label: 'Showroom plaque: piece name', text: 'Tahiti, No. 07' },
+    plaqueLine: { label: 'Showroom plaque line ({brand}, {year})', text: '{brand} showroom, {year}' },
+  },
   layout: { hero: 'split', palette: 'swatches', sections: 'two-col' },
   type: { ui: 'body', label: 'body', display: 0.86 },
   highlight: 'custom',
@@ -122,7 +133,7 @@ registerAesthetic({
     const style = s => `left:${s.x}%;top:${s.y}%;width:${s.w}%;height:${s.h}%;`;
     const sheets = shapes.map(s => `<i class="mm-s mm-${s.k} mm-sh mm-f-${s.f === 'primary' ? 'primary' : 'x'}" style="${style(s)}transform:translate(1.8cqw,1.8cqw) rotate(${s.r}deg)"></i>`).join('');
     const solids = shapes.map(s => `<i class="mm-s mm-${s.k} mm-f-${s.f}" style="${style(s)}transform:rotate(${s.r}deg)">${s.f === 'accent' ? `<b>${e(ctx.initial)}</b>` : ''}</i>`).join('');
-    return `<div class="mm-art">${sheets}${solids}<span class="mm-cap">Tahiti &mdash; No.&thinsp;07</span></div>`;
+    return `<div class="mm-art">${sheets}${solids}<span class="mm-cap">${abCopy('radical-memphis', 'artCap')}</span></div>`;
   },
 
   materials: [
@@ -165,7 +176,7 @@ registerAesthetic({
         <div class="mmr-floor" aria-hidden="true"></div>
         <div class="mmr-totem" aria-hidden="true">${totem}</div>
         <div class="mmr-table" aria-hidden="true"><i class="mmr-top"></i><i class="mmr-leg"></i></div>
-        <p class="mmr-plaque">Tahiti, No. 07<span>${e(ctx.brandName || '')} showroom, ${new Date().getFullYear()}</span></p>
+        <p class="mmr-plaque">${abCopy('radical-memphis', 'plaqueName')}<span>${abCopy('radical-memphis', 'plaqueLine').replace('{brand}', () => e(ctx.brandName || '')).replace('{year}', () => new Date().getFullYear())}</span></p>
       </div>`;
     },
     principles: [

@@ -147,6 +147,27 @@ registerAesthetic({
   mode: 'light',
   slideShape: 'minimal',
   labels: { material: 'Fabric', states: ['Ripstop', 'Taped', 'Reflective'], statesKind: 'swatch' },
+  // Editable specimen copy (Brand > Advanced > Specimen copy); text matches motto / kicker / labels.states above.
+  copy: {
+    motto: { label: 'Motto', text: 'The gear spec is the story.' },
+    kicker: { label: 'Kicker above the headline', text: 'Field tested' },
+    state0: { label: 'State 1 name', text: 'Ripstop' },
+    state1: { label: 'State 2 name', text: 'Taped' },
+    state2: { label: 'State 3 name', text: 'Reflective' },
+    modelName: { label: 'Hang tag product line', text: 'Alpine shell' },
+    specWeightK: { label: 'Spec row 1 label', text: 'Weight' },
+    specWeightV: { label: 'Spec row 1 value', text: '312 g' },
+    specFabricK: { label: 'Spec row 2 label', text: 'Fabric' },
+    specFabricV: { label: 'Spec row 2 value', text: '20D ripstop' },
+    specShellK: { label: 'Spec row 3 label', text: 'Shell' },
+    specShellV: { label: 'Spec row 3 value', text: '3-layer' },
+    specRangeK: { label: 'Spec row 4 label', text: 'Range' },
+    specRangeV: { label: 'Spec row 4 value', text: '\u22125 to 15 \u00b0C' },
+    specSeamsK: { label: 'Spec row 5 label', text: 'Seams' },
+    specSeamsV: { label: 'Spec row 5 value', text: 'fully taped' },
+    colourway: { label: 'Hang tag colourway label', text: 'Colourway 01' },
+    logHead: { label: 'Trail log header', text: 'Trail log \u00b7 3 routes \u00b7 21.4 km \u00b7 +1,860 m' },
+  },
   layout: { hero: 'split', palette: 'swatches', sections: 'two-col' },
   type: { ui: 'body', label: 'mono', display: 1.18 },
   highlight: 'custom',
@@ -295,8 +316,8 @@ registerAesthetic({
       <circle cx="${here[0].toFixed(2)}" cy="${here[1].toFixed(2)}" r="1.25" fill="${GC_BLAZE}" stroke="#fff" stroke-width="0.45"/>
       <g class="gca-n" fill="${carbon}"><path d="M8 7.5l1.6 4.6-1.6-1-1.6 1z"/><text x="8" y="6">N</text></g>
     </svg>`;
-    const specs = [['Weight', '312 g'], ['Fabric', '20D ripstop'], ['Shell', '3-layer'], ['Range', '−5 to 15 °C'], ['Seams', 'fully taped']];
-    const rows = specs.map(([k, v]) => `<div><dt>${k}</dt><dd>${v}</dd></div>`).join('');
+    const specs = [['specWeightK', 'specWeightV'], ['specFabricK', 'specFabricV'], ['specShellK', 'specShellV'], ['specRangeK', 'specRangeV'], ['specSeamsK', 'specSeamsV']];
+    const rows = specs.map(([k, v]) => `<div><dt>${abCopy('gorpcore', k)}</dt><dd>${abCopy('gorpcore', v)}</dd></div>`).join('');
     const shell2 = gcDye(t.secondary);
     return `<div class="gca" data-dark="${d ? 1 : 0}">
       <div class="gca-panel">${map}
@@ -309,9 +330,9 @@ registerAesthetic({
       <div class="gca-tag">
         <i class="gca-grom"></i>
         <div class="gca-th"><b style="--gc-tag-k:${tagName.k.toFixed(3)}">${e(tagName.text)}</b><span>GC—044</span></div>
-        <p class="gca-model">Alpine shell <em>M</em></p>
+        <p class="gca-model">${abCopy('gorpcore', 'modelName')} <em>M</em></p>
         <dl class="gca-spec">${rows}</dl>
-        <div class="gca-cw"><span style="background:${shell}"></span><span style="background:${shell2}"></span><span style="background:${GC_CARBON}"></span><small>Colourway 01</small></div>
+        <div class="gca-cw"><span style="background:${shell}"></span><span style="background:${shell2}"></span><span style="background:${GC_CARBON}"></span><small>${abCopy('gorpcore', 'colourway')}</small></div>
       </div>
     </div>`;
   },
@@ -329,7 +350,7 @@ registerAesthetic({
           <span class="ab-row-bar" aria-hidden="true"><i style="width:${Number(r[2]) || 0}%"></i></span>
           <span class="ab-row-pct"><b>${Number(r[2]) || 0}%</b><small>${dist[i]}</small></span>
         </li>`).join('');
-      return `<ul class="ab-list gc-log"><li class="gc-loghead">Trail log · 3 routes · 21.4 km · +1,860 m</li>${rows}</ul>`;
+      return `<ul class="ab-list gc-log"><li class="gc-loghead">${abCopy('gorpcore', 'logHead')}</li>${rows}</ul>`;
     },
   },
 

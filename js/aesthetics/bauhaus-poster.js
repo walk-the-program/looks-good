@@ -17,6 +17,14 @@ registerAesthetic({
   mode: 'light',
   slideShape: 'minimal',
   labels: { material: 'Form', states: ['Rest', 'Hover', 'Pressed'], statesKind: 'button' },
+  // Editable specimen copy (Brand > Advanced > Specimen copy); text matches motto / kicker / labels.states above.
+  copy: {
+    motto: { label: 'Motto', text: 'Form follows rhythm.' },
+    kicker: { label: 'Kicker above the headline', text: 'Constructed' },
+    state0: { label: 'State 1 name', text: 'Rest' },
+    state1: { label: 'State 2 name', text: 'Hover' },
+    state2: { label: 'State 3 name', text: 'Pressed' },
+  },
   layout: { hero: 'poster', palette: 'swatches' },
   type: { ui: 'sans', label: 'sans', display: 1.4 },
   highlight: 'custom',

@@ -23,6 +23,14 @@ registerAesthetic({
   mode: 'light',
   slideShape: 'soft',
   labels: { material: 'Clay', states: ['Rest', 'Hover', 'Pressed'], statesKind: 'button' },
+  // Editable specimen copy (Brand > Advanced > Specimen copy); text matches motto / kicker / labels.states above.
+  copy: {
+    motto: { label: 'Motto', text: 'Made by hand.' },
+    kicker: { label: 'Kicker above the headline', text: 'Soft and puffy' },
+    state0: { label: 'State 1 name', text: 'Rest' },
+    state1: { label: 'State 2 name', text: 'Hover' },
+    state2: { label: 'State 3 name', text: 'Pressed' },
+  },
   type: { ui: 'sans', label: 'sans' },
   highlight: 'custom',
   highlightNote: 'The word sits in a puffy accent clay pill (fully rounded, tilted about 1.5 degrees, soft accent-colored shadow, glossy top) with on-accent text.',

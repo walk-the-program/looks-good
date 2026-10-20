@@ -6,6 +6,7 @@
    hairline horizon arc beneath the window. An ink-filled main action with brand
    primary reserved for state. Translucent fills are alphas of the ink color, so
    the same recipe works if the brand is switched to light mode. */
+const AN_KEY = 'aurora-noir';   // abCopy key for the plain functions below (js/aesthetics/registry.js)
 let anSeq = 0;   // unique SVG ids per rendered board
 
 // Issue-ID prefix from the brand name: the first letters of the first two words
@@ -25,12 +26,46 @@ registerAesthetic({
   descriptor: 'Precise · Nocturnal · Charged',
   influences: 'Dev-tool UI / Swiss grid / Aurora light',
   summary: 'A near-black, exact interface with hairline surfaces, lit by glowing aurora light.',
-  motto: 'Quiet. Exact. Charged.',
-  kicker: 'Lit by one beam',   // true in both modes (it was "Built for the dark", wrong on a light board)
+  motto: 'Quiet. Exact. Charged.',   // = copy.motto.text
+  kicker: 'Lit by one beam',   // = copy.kicker.text; true in both modes (it was "Built for the dark", wrong on a light board)
   mode: 'dark',
   slideShape: 'minimal',
   labels: { material: 'Surfaces', states: ['Rest', 'Hover', 'Focus'], statesKind: 'button' },
   // the issues table leads the sections, the way a dev tool opens on its list
+  // Editable specimen copy (Brand > Advanced > Specimen copy). {brand}, {n} and {avg} are filled in by the template.
+  copy: {
+    motto: { label: 'Motto', text: 'Quiet. Exact. Charged.', warm: 'Quiet. Clear. Bright.' },
+    kicker: { label: 'Kicker above the headline', text: 'Lit by one beam' },
+    state0: { label: 'State 1 name', text: 'Rest' },
+    state1: { label: 'State 2 name', text: 'Hover' },
+    state2: { label: 'State 3 name', text: 'Focus' },
+    nav1: { label: 'Sidebar item 1', text: 'Briefs' },
+    nav2: { label: 'Sidebar item 2', text: 'Reviews' },
+    nav3: { label: 'Sidebar item 3', text: 'Assets' },
+    nav4: { label: 'Sidebar item 4', text: 'Releases' },
+    navBadge: { label: 'Sidebar item 1 badge', text: '3' },
+    teams: { label: 'Sidebar group label', text: 'Teams' },
+    team1: { label: 'Team 1', text: 'Identity' },
+    team2: { label: 'Team 2', text: 'Web' },
+    crumb: { label: 'Breadcrumb', text: 'Identity' },
+    issueTitle: { label: 'Issue title', text: 'Refresh the brand system' },
+    issueDesc: { label: 'Issue description', text: 'Align type, color and surfaces across the product and the site.' },
+    propStatus: { label: 'Property 1 label', text: 'Status' },
+    statusValue: { label: 'Status value', text: 'In progress' },
+    propAssignee: { label: 'Property 2 label', text: 'Assignee' },
+    propProgress: { label: 'Property 3 label', text: 'Progress' },
+    progressValue: { label: 'Progress value', text: '72%' },
+    logStatus: { label: 'Activity 1 (before the status)', text: 'Status changed to' },
+    logAdded: { label: 'Activity 2 (before the item, {brand})', text: '{brand} added' },
+    logItem: { label: 'Activity 2 item', text: 'Brand refresh' },
+    logAddedTail: { label: 'Activity 2 (after the item)', text: 'to the review' },
+    logOpened: { label: 'Activity 3', text: 'Brief opened' },
+    logTime1: { label: 'Activity 1 time', text: '2m' },
+    logTime2: { label: 'Activity 2 time', text: '1h' },
+    logTime3: { label: 'Activity 3 time', text: '3d' },
+    listCap: { label: 'Issues table caption ({n})', text: 'Issues · {n} open · sorted by updated' },
+    listFoot: { label: 'Issues table footer ({avg})', text: 'Σ {avg}% avg · updated 2m ago' },
+  },
   layout: { hero: 'centered', sections: 'asym', sectionOrder: ['use', 'ui', 'touch'] },
   type: { ui: 'sans', label: 'mono' },
   highlight: 'ink',
@@ -137,27 +172,28 @@ registerAesthetic({
     const id = 'ana' + (++anSeq);
     const pre = anPrefix(ctx.brandName, ctx.initial);
     const t = ctx.t;
-    const nav = ['Briefs', 'Reviews', 'Assets', 'Releases']
-      .map((n, i) => `<li${i === 1 ? ' class="on"' : ''}><i></i><span>${n}</span>${i === 0 ? '<em>3</em>' : ''}</li>`).join('');
+    const c = k => abCopy(AN_KEY, k);
+    const nav = ['nav1', 'nav2', 'nav3', 'nav4']
+      .map((n, i) => `<li${i === 1 ? ' class="on"' : ''}><i></i><span>${c(n)}</span>${i === 0 ? `<em>${c('navBadge')}</em>` : ''}</li>`).join('');
     return `<div class="ana"><div class="ana-win">
       <aside class="ana-side">
         <div class="ana-ws"><i class="ana-wsmark">${e(ctx.initial)}</i><b>${name}</b></div>
         <ul class="ana-nav">${nav}</ul>
-        <div class="ana-grp">Teams</div>
-        <ul class="ana-nav ana-nav-sub"><li><i></i><span>Identity</span></li><li><i></i><span>Web</span></li></ul>
+        <div class="ana-grp">${c('teams')}</div>
+        <ul class="ana-nav ana-nav-sub"><li><i></i><span>${c('team1')}</span></li><li><i></i><span>${c('team2')}</span></li></ul>
       </aside>
       <div class="ana-main">
-        <div class="ana-crumb"><span>Identity</span><span class="ana-sep">/</span><code>${pre}-142</code></div>
-        <div class="ana-title">Refresh the brand system</div>
-        <div class="ana-desc">Align type, color and surfaces across the product and the site.</div>
+        <div class="ana-crumb"><span>${c('crumb')}</span><span class="ana-sep">/</span><code>${pre}-142</code></div>
+        <div class="ana-title">${c('issueTitle')}</div>
+        <div class="ana-desc">${c('issueDesc')}</div>
         <dl class="ana-props">
-          <div><dt>Status</dt><dd><i class="ana-dot"></i>In progress</dd></div>
-          <div><dt>Assignee</dt><dd><i class="ana-av">${e(ctx.initial)}</i><span class="ana-nm">${name}</span></dd></div>
-          <div><dt>Progress</dt><dd><span class="ana-bar"><i></i></span><code>72%</code></dd></div>
+          <div><dt>${c('propStatus')}</dt><dd><i class="ana-dot"></i>${c('statusValue')}</dd></div>
+          <div><dt>${c('propAssignee')}</dt><dd><i class="ana-av">${e(ctx.initial)}</i><span class="ana-nm">${name}</span></dd></div>
+          <div><dt>${c('propProgress')}</dt><dd><span class="ana-bar"><i></i></span><code>${c('progressValue')}</code></dd></div>
         </dl>
-        <div class="ana-log"><i></i><span>Status changed to <b>In progress</b></span><code>2m</code></div>
-        <div class="ana-log"><i></i><span>${name} added <b>Brand refresh</b> to the review</span><code>1h</code></div>
-        <div class="ana-log"><i></i><span>Brief opened</span><code>3d</code></div>
+        <div class="ana-log"><i></i><span>${c('logStatus')} <b>${c('statusValue')}</b></span><code>${c('logTime1')}</code></div>
+        <div class="ana-log"><i></i><span>${c('logAdded').replace('{brand}', () => name)} <b>${c('logItem')}</b> ${c('logAddedTail')}</span><code>${c('logTime2')}</code></div>
+        <div class="ana-log"><i></i><span>${c('logOpened')}</span><code>${c('logTime3')}</code></div>
       </div>
     </div>
     <svg class="ana-arc" viewBox="0 0 1000 120" preserveAspectRatio="none" focusable="false" aria-hidden="true"><defs>
@@ -177,8 +213,8 @@ registerAesthetic({
       const rows = ctx.parts.listBase().replace(/<ul class="ab-list">|<\/ul>/g, '')
         .replace(/<span class="ab-row-n">\d+<\/span>/g, () => `<span class="ab-row-n">${e(pre)}-${101 + i++}</span>`);
       const avg = ctx.rows.reduce((a, r) => a + r[2], 0) / Math.max(1, ctx.rows.length);
-      return `<div class="ab-list"><p class="an-lcap">Issues · ${ctx.rows.length} open · sorted by updated</p>`
-        + `<ul class="an-rows">${rows}</ul><p class="an-lfoot">Σ ${avg.toFixed(1)}% avg · updated 2m ago</p></div>`;
+      return `<div class="ab-list"><p class="an-lcap">${abCopy(AN_KEY, 'listCap').replace('{n}', () => ctx.rows.length)}</p>`
+        + `<ul class="an-rows">${rows}</ul><p class="an-lfoot">${abCopy(AN_KEY, 'listFoot').replace('{avg}', () => avg.toFixed(1))}</p></div>`;
     },
   },
 

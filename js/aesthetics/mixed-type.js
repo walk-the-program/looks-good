@@ -24,6 +24,7 @@ const MT_METRICS = {
 };
 const MT_CAT_METRICS = { serif: [0.70, 0.48], sans: [0.71, 0.52], display: [0.70, 0.52], mono: [0.70, 0.50], slab: [0.70, 0.50] };
 const mtMeasured = {};
+const MT_KEY = 'mixed-type';   // abCopy key for the plain functions below (js/aesthetics/registry.js)
 
 function mtFace(name) {
   return (typeof FONTS !== 'undefined' && FONTS.find(f => f.name === name)) || null;
@@ -69,10 +70,10 @@ function mtVoices(st) {
   const bw = brand.cls === 'didone' || brand.cls === 'soft-serif' || brand.cls === 'old-style' || brand.cls === 'text-serif' || brand.cls === 'deco'
     ? mtWeight(brand, [400, 500, 600]) : mtWeight(brand, [600, 700, 500, 400]);
   const defs = [
-    { key: 'b', font: brand, weight: bw, style: 'normal', label: 'Heading' },
-    { key: 'i', font: mtPick(['Instrument Serif', 'Playfair Display', 'Fraunces'], brand.name), weight: 400, style: 'italic', label: 'Italic' },
-    { key: 'h', font: mtPick(['Bricolage Grotesque', 'Inter Tight', 'Archivo Black'], brand.name), weight: 0, style: 'normal', label: 'Heavy' },
-    { key: 'm', font: mtPick(['DM Mono', 'Space Mono'], brand.name), weight: 400, style: 'normal', label: 'Mono' },
+    { key: 'b', font: brand, weight: bw, style: 'normal', label: abCopyRaw(MT_KEY, 'voiceB') },
+    { key: 'i', font: mtPick(['Instrument Serif', 'Playfair Display', 'Fraunces'], brand.name), weight: 400, style: 'italic', label: abCopyRaw(MT_KEY, 'voiceI') },
+    { key: 'h', font: mtPick(['Bricolage Grotesque', 'Inter Tight', 'Archivo Black'], brand.name), weight: 0, style: 'normal', label: abCopyRaw(MT_KEY, 'voiceH') },
+    { key: 'm', font: mtPick(['DM Mono', 'Space Mono'], brand.name), weight: 400, style: 'normal', label: abCopyRaw(MT_KEY, 'voiceM') },
   ];
   defs[2].weight = mtWeight(defs[2].font, [800, 700, 400]);
   const capB = mtMetrics(brand, bw, 'normal')[0];
@@ -128,8 +129,8 @@ function mtCell(v, n) {
         <p class="mt-cell-k"><b>0${n}</b>${escapeHtml(v.label)}</p>
         <svg viewBox="0 0 124 80" width="100%" focusable="false">
           <g class="mt-guides"><line x1="0" x2="124" y1="${base}" y2="${base}"/><line class="mt-cap" x1="0" x2="124" y1="${capY.toFixed(1)}" y2="${capY.toFixed(1)}"/><line class="mt-xh" x1="0" x2="124" y1="${xY.toFixed(1)}" y2="${xY.toFixed(1)}"/></g>
-          <text x="4" y="${base}" class="mt-aa" font-size="${size.toFixed(1)}" style="font-family:var(--mt-f-${v.key});font-weight:var(--mt-w-${v.key});font-style:${v.style}">Aa</text>
-          <g class="mt-gl" font-size="4.6"><text x="121" y="${base - 2}" text-anchor="end">base</text><text x="121" y="${(capY - 2).toFixed(1)}" text-anchor="end">cap</text></g>
+          <text x="4" y="${base}" class="mt-aa" font-size="${size.toFixed(1)}" style="font-family:var(--mt-f-${v.key});font-weight:var(--mt-w-${v.key});font-style:${v.style}">${abCopy(MT_KEY, 'sample')}</text>
+          <g class="mt-gl" font-size="4.6"><text x="121" y="${base - 2}" text-anchor="end">${abCopy(MT_KEY, 'guideBase')}</text><text x="121" y="${(capY - 2).toFixed(1)}" text-anchor="end">${abCopy(MT_KEY, 'guideCap')}</text></g>
         </svg>
         <p class="mt-cell-n" style="font-family:var(--mt-f-${v.key});font-weight:var(--mt-w-${v.key});font-style:${v.style}">${escapeHtml(v.font.name)}</p>
         <p class="mt-cell-m">${escapeHtml(wLabel)} · cap ${v.cap.toFixed(2)}</p>
@@ -142,11 +143,29 @@ registerAesthetic({
   descriptor: 'Eclectic · Editorial · Witty',
   influences: 'Contemporary type mixing / Editorial covers / Specimen posters',
   summary: 'Headlines that switch between serif italic, heavy grotesk and mono within one line.',
-  motto: 'Many voices, one page.',
-  kicker: 'Specimen No. 4',
+  motto: 'Many voices, one page.',   // = copy.motto.text (kept for readers that predate copy)
+  kicker: 'Specimen No. 4',          // = copy.kicker.text
   mode: 'light',
   slideShape: 'refined',
   labels: { material: 'Voice', states: ['Roman', 'Italic', 'Mono'], statesKind: 'swatch' },
+  // Editable specimen copy (Brand > Advanced > Specimen copy). {brand} and {ks} in leadT are filled in by the template.
+  copy: {
+    motto: { label: 'Motto', text: 'Many voices, one page.' },
+    kicker: { label: 'Kicker above the headline', text: 'Specimen No. 4' },
+    state0: { label: 'State 1 name', text: 'Roman' },
+    state1: { label: 'State 2 name', text: 'Italic' },
+    state2: { label: 'State 3 name', text: 'Mono' },
+    leadK: { label: 'Figure label', text: 'Fig. 1' },
+    leadT: { label: 'Figure caption ({brand}, {ks})', text: 'A design language for {brand}: four voices on one baseline grid, sized to a shared cap height (× {ks}).' },
+    voiceB: { label: 'Voice 1 name', text: 'Heading' },
+    voiceI: { label: 'Voice 2 name', text: 'Italic' },
+    voiceH: { label: 'Voice 3 name', text: 'Heavy' },
+    voiceM: { label: 'Voice 4 name', text: 'Mono' },
+    sample: { label: 'Specimen sample letters', text: 'Aa' },
+    guideBase: { label: 'Baseline guide label', text: 'base' },
+    guideCap: { label: 'Cap line guide label', text: 'cap' },
+    scaleK: { label: 'Size scale label', text: 'Scale · px' },
+  },
   layout: { hero: 'centered', palette: 'swatches', sections: 'two-col', subcopy: false },
   type: { ui: 'body' },
   highlight: 'custom',
@@ -192,15 +211,15 @@ registerAesthetic({
       const v = voices.find(x => x.key === key);
       return `<div class="mt-grow" data-v="${key}"><span class="mt-grow-k">${lab}</span><span class="mt-grow-s" style="font-family:var(--mt-f-${key});font-weight:var(--mt-w-${key});font-style:${v.style}">${e(str)}</span></div>`;
     }).join('');
-    const scale = [11, 16, 24, 36, 54].map(n => `<span class="mt-sc" style="font-size:${n}px"><i>Aa</i><b>${n}</b></span>`).join('');
+    const scale = [11, 16, 24, 36, 54].map(n => `<span class="mt-sc" style="font-size:${n}px"><i>${abCopy(MT_KEY, 'sample')}</i><b>${n}</b></span>`).join('');
     const ks = voices.map(v => v.k.toFixed(2)).join(' / ');
     return `<div class="mt">
-      <p class="mt-lead"><span class="mt-lead-k">Fig. 1</span><span class="mt-lead-t">A design language for ${e(ctx.brandName)}: four voices on one baseline grid, sized to a shared cap height (× ${ks}).</span></p>
+      <p class="mt-lead"><span class="mt-lead-k">${abCopy(MT_KEY, 'leadK')}</span><span class="mt-lead-t">${abCopy(MT_KEY, 'leadT').replace('{brand}', () => e(ctx.brandName)).replace('{ks}', ks)}</span></p>
       <div class="mt-spec">
         <div class="mt-cells">${cells}</div>
         <div class="mt-lower">
           <div class="mt-glyphs">${glyphs}</div>
-          <div class="mt-scale" style="font-family:var(--mt-f-b);font-weight:var(--mt-w-b)"><p class="mt-scale-k">Scale · px</p><div class="mt-scale-row">${scale}</div></div>
+          <div class="mt-scale" style="font-family:var(--mt-f-b);font-weight:var(--mt-w-b)"><p class="mt-scale-k">${abCopy(MT_KEY, 'scaleK')}</p><div class="mt-scale-row">${scale}</div></div>
         </div>
       </div>
     </div>`;

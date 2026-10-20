@@ -20,6 +20,8 @@
    thirty micro annotations in all. One accent in tiny marks: primary appears as
    a few 3px registration marks and the single CTA. */
 (function () {
+const MG_KEY = 'micrographics';   // abCopy key for the plain functions and hooks below (js/aesthetics/registry.js)
+const mgCp = k => abCopy(MG_KEY, k);
 const MG_HASH = str => { let h = 2166136261; for (const c of String(str)) { h ^= c.charCodeAt(0); h = Math.imul(h, 16777619); } return h >>> 0; };
 function mgRand(seed) { let s = seed || 1; return () => { s = (Math.imul(s, 1664525) + 1013904223) >>> 0; return s / 4294967296; }; }
 
@@ -59,6 +61,41 @@ registerAesthetic({
   mode: 'light',
   slideShape: 'minimal',
   labels: { material: 'Detail', states: ['Base', 'Annotated', 'Marked'], statesKind: 'swatch' },
+  // Editable specimen copy (Brand > Advanced > Specimen copy); text matches motto / kicker / labels.states above.
+  // {brand}, {ink}, {primary} are filled in by the template.
+  copy: {
+    motto: { label: 'Motto', text: 'Small print, large idea.' },
+    kicker: { label: 'Kicker above the headline', text: 'SPEC 01/26' },
+    state0: { label: 'State 1 name', text: 'Base' },
+    state1: { label: 'State 2 name', text: 'Annotated' },
+    state2: { label: 'State 3 name', text: 'Marked' },
+    specHead: { label: 'Spec sticker title', text: 'SPEC 01/26' },
+    specRev: { label: 'Spec sticker revision line', text: 'REV 03 \u00b7 2026.10' },
+    cornerBl: { label: 'Plate corner label ({brand})', text: '\u00a9 2026 {brand}' },
+    callCap: { label: 'Callout 1 name', text: 'CAP HEIGHT' },
+    callBearing: { label: 'Callout 2 name', text: 'L. BEARING' },
+    callAdvance: { label: 'Callout 3 name', text: 'ADVANCE' },
+    callCenter: { label: 'Callout 4 name', text: 'OPT. CENTER' },
+    callBase: { label: 'Callout 5 name', text: 'BASELINE' },
+    callOrigin: { label: 'Callout 6 name', text: 'ORIGIN' },
+    rowHead: { label: 'Spec row: heading face', text: 'HEAD' },
+    rowBody: { label: 'Spec row: body face', text: 'BODY' },
+    rowGrid: { label: 'Spec row: grid', text: 'GRID' },
+    rowInk: { label: 'Spec row: ink', text: 'INK' },
+    rowPri: { label: 'Spec row: primary', text: 'PRI' },
+    rowSec: { label: 'Spec row: secondary', text: 'SEC' },
+    rowAcc: { label: 'Spec row: accent', text: 'ACC' },
+    warnTitle: { label: 'Warning sticker title', text: 'CAUTION', warm: 'NOTE' },
+    warnLine: { label: 'Warning sticker line', text: 'RE-ISSUE', warm: 'REVISED' },
+    matHair: { label: 'Material slide: hairline title', text: 'HAIRLINE' },
+    capHair: { label: 'Material slide: hairline caption ({ink})', text: '1PX {ink} \u00b7 100 / 50 / 20%' },
+    matMicro: { label: 'Material slide: microtype title', text: 'MICROTYPE' },
+    capMicro: { label: 'Material slide: microtype caption', text: '8PX MONO \u00b7 .16EM \u00b7 CAPS' },
+    matCorner: { label: 'Material slide: corner labels title', text: 'CORNER LABELS' },
+    capCorner: { label: 'Material slide: corner labels caption', text: 'INDEX \u00b7 CODE \u00b7 PAGE' },
+    matCross: { label: 'Material slide: crosshair title', text: 'CROSSHAIR' },
+    capCross: { label: 'Material slide: crosshair caption ({primary})', text: '9PX \u00b7 {primary} 3PX CORE' },
+  },
   layout: { hero: 'centered', palette: 'swatches', sections: 'two-col' },
   // Deck copy (js/brand-deck.js): three principles, three do / don't lines, each short.
   deck: {
@@ -68,10 +105,10 @@ registerAesthetic({
     materialArt(ctx) {
       const t = ctx.t;
       const cell = (n, k, code, body) => `<div class="mgm-cell mgm-${k}"><span class="mgm-i">A.0${n}</span><span class="mgm-c">${code}</span>${body}<span class="mgm-p">P.0${n}/04</span></div>`;
-      const hair = `<div class="mgm-rules"><i class="is-1"></i><i class="is-2"></i><i class="is-3"></i></div><p class="mgm-cap"><b>HAIRLINE</b> 1PX ${t.ink.toUpperCase()} · 100 / 50 / 20%</p>`;
-      const micro = `<p class="mgm-spec">ABCDEFGHIJKLM<br>NOPQRSTUVWXYZ<br>0123456789 →↑×</p><p class="mgm-cap"><b>MICROTYPE</b> 8PX MONO · .16EM · CAPS</p>`;
-      const corner = `<div class="mgm-box"><span>A.01</span><span>MG–0412–C</span><span>P.02/04</span></div><p class="mgm-cap"><b>CORNER LABELS</b> INDEX · CODE · PAGE</p>`;
-      const cross = `<div class="mgm-xs"><i class="mgm-x is-big is-p"></i><i class="mgm-x"></i><i class="mgm-x is-p"></i></div><p class="mgm-cap"><b>CROSSHAIR</b> 9PX · ${t.primary.toUpperCase()} 3PX CORE</p>`;
+      const hair = `<div class="mgm-rules"><i class="is-1"></i><i class="is-2"></i><i class="is-3"></i></div><p class="mgm-cap"><b>${mgCp('matHair')}</b> ${mgCp('capHair').replace('{ink}', () => t.ink.toUpperCase())}</p>`;
+      const micro = `<p class="mgm-spec">ABCDEFGHIJKLM<br>NOPQRSTUVWXYZ<br>0123456789 →↑×</p><p class="mgm-cap"><b>${mgCp('matMicro')}</b> ${mgCp('capMicro')}</p>`;
+      const corner = `<div class="mgm-box"><span>A.01</span><span>MG–0412–C</span><span>P.02/04</span></div><p class="mgm-cap"><b>${mgCp('matCorner')}</b> ${mgCp('capCorner')}</p>`;
+      const cross = `<div class="mgm-xs"><i class="mgm-x is-big is-p"></i><i class="mgm-x"></i><i class="mgm-x is-p"></i></div><p class="mgm-cap"><b>${mgCp('matCross')}</b> ${mgCp('capCross').replace('{primary}', () => t.primary.toUpperCase())}</p>`;
       return `<div class="mgm">${cell(1, 'hair', 'MG–0412–A', hair)}${cell(2, 'micro', 'MG–0412–B', micro)}${cell(3, 'corner', 'MG–0412–C', corner)}${cell(4, 'cross', 'MG–0412–D', cross)}</div>`;
     },
     principles: [
@@ -173,13 +210,13 @@ registerAesthetic({
     } catch (err) { /* keep the defaults */ }
     const span = br - bl;
     const calls = [
-      { i: 'A.01', k: 'CAP HEIGHT', x: 9, y: 22, tx: +(bl + span * 0.18).toFixed(1), ty: 10, ph: 1, cv: 1 },
-      { i: 'A.02', k: 'L. BEARING', x: Math.max(6, bl - 9), y: 40, tx: bl, ty: 40 },
+      { i: 'A.01', k: mgCp('callCap'), x: 9, y: 22, tx: +(bl + span * 0.18).toFixed(1), ty: 10, ph: 1, cv: 1 },
+      { i: 'A.02', k: mgCp('callBearing'), x: Math.max(6, bl - 9), y: 40, tx: bl, ty: 40 },
       // above the cap line, so its knock-out never bites the glyph
-      { i: 'A.04', k: 'ADVANCE', x: 58, y: 7, tx: +(br - span * 0.1).toFixed(1), ty: 10 },
-      { i: 'A.05', k: 'OPT. CENTER', x: 89, y: 48, tx: 50, ty: 50, mark: true },
-      { i: 'A.06', k: 'BASELINE', x: 89, y: 81, tx: +(br - span * 0.05).toFixed(1), ty: 88, ph: 1, cv: 1, mark: true },
-      { i: 'A.08', k: 'ORIGIN', x: 38, y: 94, tx: bl, ty: 88, ph: 1, cv: 1 },
+      { i: 'A.04', k: mgCp('callAdvance'), x: 58, y: 7, tx: +(br - span * 0.1).toFixed(1), ty: 10 },
+      { i: 'A.05', k: mgCp('callCenter'), x: 89, y: 48, tx: 50, ty: 50, mark: true },
+      { i: 'A.06', k: mgCp('callBase'), x: 89, y: 81, tx: +(br - span * 0.05).toFixed(1), ty: 88, ph: 1, cv: 1, mark: true },
+      { i: 'A.08', k: mgCp('callOrigin'), x: 38, y: 94, tx: bl, ty: 88, ph: 1, cv: 1 },
     ];
     const cls = c => [c.ph ? '' : 'mga-nph', c.cv ? '' : 'mga-ncv'].filter(Boolean).join(' ');
     const leaders = calls.map(c => `<path ${vf} d="M${c.x} ${c.y}H${c.tx}V${c.ty}" stroke-width="1"${cls(c) ? ` class="${cls(c)}"` : ''}/>`).join('');
@@ -190,20 +227,20 @@ registerAesthetic({
     }).join('');
 
     const table = [
-      ['01', 'HEAD', hName], ['02', 'BODY', bName], ['03', 'GRID', '8 PX / 10 U'],
-      ['04', 'INK', '#' + hex(t.ink)], ['05', 'PRI', '#' + hex(t.primary), 'p'], ['06', 'SEC', '#' + hex(t.secondary), 's'], ['07', 'ACC', '#' + hex(t.accent)],
+      ['01', mgCp('rowHead'), hName], ['02', mgCp('rowBody'), bName], ['03', mgCp('rowGrid'), '8 PX / 10 U'],
+      ['04', mgCp('rowInk'), '#' + hex(t.ink)], ['05', mgCp('rowPri'), '#' + hex(t.primary), 'p'], ['06', mgCp('rowSec'), '#' + hex(t.secondary), 's'], ['07', mgCp('rowAcc'), '#' + hex(t.accent)],
     ].map(r => `<div class="mga-row"><span>${r[0]}</span><span>${r[1]}</span><span>${r[3] ? `<i class="mga-sq mga-sq-${r[3]}"></i>` : ''}${r[2]}</span></div>`).join('');
-    const spec = `<p class="mga-h"><b>SPEC 01/26</b> · ${escapeHtml(brand)}<br>REV 03 · 2026.10</p><div class="mga-tab">${table}</div>`;
+    const spec = `<p class="mga-h"><b>${mgCp('specHead')}</b> · ${escapeHtml(brand)}<br>${mgCp('specRev')}</p><div class="mga-tab">${table}</div>`;
     const qr = `<div class="mga-qrrow">
           <svg class="mga-qr" viewBox="0 0 ${qrN} ${qrN}" shape-rendering="crispEdges" focusable="false"><path d="${mgQr(seed, qrN)}" fill="${t.ink}"/><path d="M${qrN - 5} 2h3v3h-3z" fill="${t.secondary}"/></svg>
-          <div class="mga-warn"><svg viewBox="0 0 12 11" focusable="false"><path d="M6 .8L11.2 10H.8Z" fill="${safe}" stroke="${t.ink}" stroke-width=".9" stroke-linejoin="round"/><path d="M6 4.2v3M6 8.2v.9" stroke="${t.ink}" stroke-width="1"/></svg><span><b>CAUTION</b><br>RE-ISSUE</span></div>
+          <div class="mga-warn"><svg viewBox="0 0 12 11" focusable="false"><path d="M6 .8L11.2 10H.8Z" fill="${safe}" stroke="${t.ink}" stroke-width=".9" stroke-linejoin="round"/><path d="M6 4.2v3M6 8.2v.9" stroke="${t.ink}" stroke-width="1"/></svg><span><b>${mgCp('warnTitle')}</b><br>${mgCp('warnLine')}</span></div>
         </div>
         <p class="mga-h"><b>V 2.6.0</b> / BUILD 0412<br>N 51.5074° / W 0.1278°</p>`;
     const barsSvg = `<svg class="mga-bar" viewBox="0 0 ${bars.w} 10" preserveAspectRatio="none" focusable="false"><path d="${bars.d}" fill="${t.ink}"/></svg>`;
 
     return `<div class="mga">
       <span class="mga-corner mga-c-tl">A–01</span><span class="mga-corner mga-c-tr">MG–0412</span>
-      <span class="mga-corner mga-c-bl">© 2026 ${escapeHtml(brand)}</span><span class="mga-corner mga-c-br">P.01/26</span>
+      <span class="mga-corner mga-c-bl">${mgCp('cornerBl').replace('{brand}', () => escapeHtml(brand))}</span><span class="mga-corner mga-c-br">P.01/26</span>
       <span class="mga-ruler mga-r-t"><i>000</i><i>100</i><i>200</i><i>300</i><i>400</i></span>
       <span class="mga-ruler mga-r-b"><i>A</i><i>B</i><i>C</i><i>D</i><i>E</i></span>
       <div class="mga-glyph">

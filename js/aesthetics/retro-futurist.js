@@ -8,6 +8,8 @@
    pairing is Michroma). Look lives in css/aesthetics/retro-futurist.css. */
 (function () {
   let seq = 0;
+  const RF_KEY = 'retro-futurist';   // abCopy key for the plain functions below (js/aesthetics/registry.js)
+  const rfCp = k => abCopy(RF_KEY, k);
 
   // Mono face for SVG lettering (self-contained: the art never relies on board css).
   const MONO = 'font-family="ui-monospace,SF Mono,Menlo,monospace"';
@@ -68,12 +70,12 @@
           <polygon points="-1.8,-.8 1.8,-.25 1.8,.25 -1.8,.8" fill="#ffffff"/>
           <circle cx="-1.9" cy="0" r=".5" fill="${acc}"/>
           <line x1="-1.5" y1="0" x2="-4" y2="0" stroke="#ffffff" stroke-width=".2" stroke-opacity=".7"/>
-          <text x="3" y="-2.2" ${MONO} font-size="2.1" fill="#ffffff" letter-spacing=".25">MRG-01 / T+00:41:07</text>
+          <text x="3" y="-2.2" ${MONO} font-size="2.1" fill="#ffffff" letter-spacing=".25">${rfCp('craftTag')}</text>
         </g>
       </g>
       ${grid}
     </svg>
-    <span class="rfa-cap" style="position:absolute;right:clamp(10px,2.2cqw,28px);top:50%;transform:translateY(-50%);writing-mode:vertical-rl;font:500 9px/1 ui-monospace,'SF Mono',Menlo,monospace;letter-spacing:.42em;text-transform:uppercase;color:#ffffff;opacity:.85;white-space:nowrap">A new kind of space</span>`;
+    <span class="rfa-cap" style="position:absolute;right:clamp(10px,2.2cqw,28px);top:50%;transform:translateY(-50%);writing-mode:vertical-rl;font:500 9px/1 ui-monospace,'SF Mono',Menlo,monospace;letter-spacing:.42em;text-transform:uppercase;color:#ffffff;opacity:.85;white-space:nowrap">${rfCp('plateCap')}</span>`;
   }
 
   // Mission console (secondary material, deck 06 only): bezel plate, LCD, analog
@@ -123,8 +125,8 @@
       <rect x="9" y="9.5" width="82" height="18" fill="${screen}"/>
       <text x="14" y="22.6" ${MONO} font-size="10.6" font-weight="700" fill="${sig}" opacity=".14" letter-spacing=".4">8 88.8</text>
       <text x="14" y="22.6" ${MONO} font-size="10.6" font-weight="700" fill="${sig}" letter-spacing=".4">${initial}  9.5</text>
-      <text x="86" y="15.6" ${MONO} font-size="2.8" fill="${screenInk}" opacity=".7" text-anchor="end" letter-spacing=".5">FREQ</text>
-      <text x="86" y="24.2" ${MONO} font-size="2.8" fill="${screenInk}" opacity=".7" text-anchor="end" letter-spacing=".5">MHZ</text>
+      <text x="86" y="15.6" ${MONO} font-size="2.8" fill="${screenInk}" opacity=".7" text-anchor="end" letter-spacing=".5">${rfCp('lcdTop')}</text>
+      <text x="86" y="24.2" ${MONO} font-size="2.8" fill="${screenInk}" opacity=".7" text-anchor="end" letter-spacing=".5">${rfCp('lcdBottom')}</text>
       <circle cx="${cx}" cy="${cy}" r="25.2" fill="#c3c4c0" stroke="#000" stroke-opacity=".25" stroke-width=".5"/>
       <circle cx="${cx}" cy="${cy}" r="22" fill="${screen}"/>
       ${ticks}
@@ -135,8 +137,8 @@
       <circle cx="${cx}" cy="${cy}" r="1.1" fill="${screen}"/>
       <rect x="64.5" y="33.5" width="27" height="51" fill="${screen}"/>
       ${bars}
-      <text x="${cx}" y="91.4" ${MONO} font-size="3" fill="#1a1b1d" text-anchor="middle" letter-spacing=".9">GAIN</text>
-      <text x="78" y="91.4" ${MONO} font-size="3" fill="#1a1b1d" text-anchor="middle" letter-spacing=".9">LEVEL</text>
+      <text x="${cx}" y="91.4" ${MONO} font-size="3" fill="#1a1b1d" text-anchor="middle" letter-spacing=".9">${rfCp('dialGain')}</text>
+      <text x="78" y="91.4" ${MONO} font-size="3" fill="#1a1b1d" text-anchor="middle" letter-spacing=".9">${rfCp('ladderLevel')}</text>
     </svg>`;
   }
 
@@ -161,6 +163,21 @@
     slideShape: 'minimal',
     layout: { hero: 'centered', palette: 'swatches', sections: 'two-col' },
     labels: { material: 'Console', states: ['Idle', 'Armed', 'Engaged'], statesKind: 'swatch' },
+    // Editable specimen copy (Brand > Advanced > Specimen copy); text matches motto / kicker / labels.states above.
+    copy: {
+      motto: { label: 'Motto', text: 'All systems nominal.' },
+      kicker: { label: 'Kicker above the headline', text: 'Mission control' },
+      state0: { label: 'State 1 name', text: 'Idle' },
+      state1: { label: 'State 2 name', text: 'Armed' },
+      state2: { label: 'State 3 name', text: 'Engaged' },
+      craftTag: { label: 'Craft tag on the horizon plate', text: 'MRG-01 / T+00:41:07' },
+      plateCap: { label: 'Vertical caption on the horizon plate', text: 'A new kind of space' },
+      lcdTop: { label: 'Console LCD label 1', text: 'FREQ' },
+      lcdBottom: { label: 'Console LCD label 2', text: 'MHZ' },
+      dialGain: { label: 'Console dial label', text: 'GAIN' },
+      ladderLevel: { label: 'Console LED ladder label', text: 'LEVEL' },
+      logHead: { label: 'Mission log header', text: 'Mission log \u00a0/\u00a0 T+00:41:07' },
+    },
     type: { ui: 'mono', label: 'mono' },
     highlight: 'custom',
     highlightNote: 'One headline word in the flat signal colour (the primary), like the one red mark in a standards manual. No glow, fill or band.',
@@ -247,7 +264,7 @@
     // The 03 list carries its own header row as real text (was CSS generated content).
     panels: {
       list(ctx) {
-        return ctx.parts.listBase().replace('<ul class="ab-list">', '<ul class="ab-list"><li class="rf-loghead">Mission log &nbsp;/&nbsp; T+00:41:07</li>');
+        return ctx.parts.listBase().replace('<ul class="ab-list">', () => `<ul class="ab-list"><li class="rf-loghead">${abCopy(RF_KEY, 'logHead')}</li>`);
       },
     },
     deck: {

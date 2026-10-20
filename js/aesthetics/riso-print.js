@@ -19,17 +19,29 @@ function rzFluoro(t) {
   const h = hexToHsl(t.primary).h;
   return (h >= 300 || h <= 20) ? '#FF7A1A' : '#FF48B0';
 }
+const RZ_KEY = 'riso-print';   // abCopy key for the plain functions below (js/aesthetics/registry.js)
+
 registerAesthetic({
   key: 'riso-print', order: 10,
   name: 'Riso Print',
   descriptor: 'Inked · Grainy · Human',
   influences: 'Risograph zines / Screen print / Editorial',
   summary: 'Two overlapping inks on warm cream paper, a little off-register on purpose, with halftone dots and a fluorescent third ink.',
-  motto: 'Printed by people.',
-  kicker: 'Two inks, one pass',
+  motto: 'Printed by people.',    // = copy.motto.text
+  kicker: 'Two inks, one pass',   // = copy.kicker.text
   mode: 'light',
   slideShape: 'minimal',
   labels: { material: 'Ink', states: ['Rest', 'Hover', 'Pressed'], statesKind: 'button' },
+  // Editable specimen copy (Brand > Advanced > Specimen copy). {n} in cardNo is the card number.
+  copy: {
+    motto: { label: 'Motto', text: 'Printed by people.' },
+    kicker: { label: 'Kicker above the headline', text: 'Two inks, one pass' },
+    state0: { label: 'State 1 name', text: 'Rest' },
+    state1: { label: 'State 2 name', text: 'Hover' },
+    state2: { label: 'State 3 name', text: 'Pressed' },
+    cardNo: { label: 'Card number stamp ({n})', text: 'NO. 0{n}' },
+    figCaption: { label: 'Print caption', text: 'FIG. 01 · 3 INKS · 1 PASS' },
+  },
   type: { ui: 'sans', label: 'mono', display: 1.5 },
   highlight: 'custom',
   highlightNote: 'The word keeps its ink color and is circled by a hand-drawn, slightly tilted ring in the raw accent ink (a second, fainter pass sits a hair off-register) that overprints the paper (multiply). No fill behind the word.',
@@ -115,11 +127,11 @@ registerAesthetic({
           <g ${blend} transform="translate(2 2)" opacity=".55">${c.shape === 'zig'
     ? `<polyline points="7,52 19,24 31,52 43,24 55,52" fill="none" stroke="url(#${pat})" stroke-width="8" stroke-linejoin="miter" stroke-miterlimit="4"/>`
     : shapeSvg(c, `url(#${pat})`, '')}</g>
-          <text class="rza-no" x="5" y="74.5" font-size="4.2" fill="${on}" font-family="ui-monospace,Menlo,monospace" letter-spacing=".3" opacity=".9">NO. 0${i + 1}</text>
+          <text class="rza-no" x="5" y="74.5" font-size="4.2" fill="${on}" font-family="ui-monospace,Menlo,monospace" letter-spacing=".3" opacity=".9">${abCopy(RZ_KEY, 'cardNo').replace('{n}', () => i + 1)}</text>
         </svg>
       </div>`;
     }).join('');
-    return `<div class="rza">${html}<span class="rza-cap">FIG. 01 · 3 INKS · 1 PASS</span></div>`;
+    return `<div class="rza">${html}<span class="rza-cap">${abCopy(RZ_KEY, 'figCaption')}</span></div>`;
   },
 
   materials: [

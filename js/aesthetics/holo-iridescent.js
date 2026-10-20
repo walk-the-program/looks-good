@@ -20,6 +20,14 @@
     mode: 'light',
     slideShape: 'refined',
     labels: { material: 'Finish', states: ['Matte', 'Pearl', 'Foil'], statesKind: 'chip' },
+    // Editable specimen copy (Brand > Advanced > Specimen copy). The art carries no printed text.
+    copy: {
+      motto: { label: 'Motto', text: 'Catch the light.' },
+      kicker: { label: 'Kicker above the headline', text: 'Thin-film foil' },
+      state0: { label: 'State 1 name', text: 'Matte' },
+      state1: { label: 'State 2 name', text: 'Pearl' },
+      state2: { label: 'State 3 name', text: 'Foil' },
+    },
     // split: copy left, the foil plane bleeding off the right edge; strips: the palette as flat planes
     layout: { hero: 'split', palette: 'strips' },
     type: { ui: 'sans', label: 'sans', display: 1.1 },

@@ -14,17 +14,35 @@ function rbFonts() {
   });
 }
 
+const RB_KEY = 'raw-brutalist';   // abCopy key for the plain functions below (js/aesthetics/registry.js)
+
 registerAesthetic({
   key: 'raw-brutalist', order: 2,
   name: 'Raw Brutalist',
   descriptor: 'Exposed · Severe · Honest',
   influences: 'Swiss print / Brutalist web / Terminal',
   summary: 'The web with the stylesheet half written: white ground, black borders, blue underlined links and controls that invert when you touch them.',
-  motto: 'Nothing hidden. Nothing soft.',
-  kicker: 'Index of hard surfaces',
+  motto: 'Nothing hidden. Nothing soft.',   // = copy.motto.text
+  kicker: 'Index of hard surfaces',          // = copy.kicker.text
   mode: 'light',
   slideShape: 'geometric',
   labels: { material: 'Hard surfaces', states: ['Rest', 'Hover', 'Pressed'], statesKind: 'button' },
+  // Editable specimen copy (Brand > Advanced > Specimen copy).
+  copy: {
+    motto: { label: 'Motto', text: 'Nothing hidden. Nothing soft.', warm: 'Nothing hidden. Everything clear.' },
+    kicker: { label: 'Kicker above the headline', text: 'Index of hard surfaces', warm: 'Index of sturdy surfaces' },
+    state0: { label: 'State 1 name', text: 'Rest' },
+    state1: { label: 'State 2 name', text: 'Hover' },
+    state2: { label: 'State 3 name', text: 'Pressed' },
+    specSubject: { label: 'Spec sheet row 1 label', text: 'SUBJECT' },
+    specSystem: { label: 'Spec sheet row 2 label', text: 'SYSTEM' },
+    specSystemVal: { label: 'Spec sheet row 2 value', text: '5 COLORS / 2 FACES' },
+    specSurface: { label: 'Spec sheet row 3 label', text: 'SURFACE' },
+    specDark: { label: 'Spec sheet surface value (dark)', text: 'DARK' },
+    specLight: { label: 'Spec sheet surface value (light)', text: 'LIGHT' },
+    specFig: { label: 'Spec sheet row 4 label', text: 'FIG.' },
+    specFigVal: { label: 'Spec sheet row 4 value', text: '01' },
+  },
   layout: { hero: 'poster', palette: 'strips' },
   // Deck copy (js/brand-deck.js): three principles, three do / don't lines, each short.
   deck: {
@@ -87,8 +105,9 @@ registerAesthetic({
   art(ctx) {
     rbFonts();
     const subject = String(ctx.brandName || '').toUpperCase().slice(0, 24);
-    const rows = [['SUBJECT', subject], ['SYSTEM', '5 COLORS / 2 FACES'], ['SURFACE', ctx.t.isDark ? 'DARK' : 'LIGHT'], ['FIG.', '01']];
-    return `<dl class="rba-spec">${rows.map(([k, v]) => `<div class="rba-row"><dt>${escapeHtml(k)}</dt><dd>${escapeHtml(v)}</dd></div>`).join('')}</dl>`;
+    const c = k => abCopy(RB_KEY, k);
+    const rows = [[c('specSubject'), escapeHtml(subject)], [c('specSystem'), c('specSystemVal')], [c('specSurface'), ctx.t.isDark ? c('specDark') : c('specLight')], [c('specFig'), c('specFigVal')]];
+    return `<dl class="rba-spec">${rows.map(([k, v]) => `<div class="rba-row"><dt>${k}</dt><dd>${v}</dd></div>`).join('')}</dl>`;
   },
 
   materials: [

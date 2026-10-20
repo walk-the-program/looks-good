@@ -5,17 +5,53 @@
    brand's primary), a wide palette tile, a type tile, and each numbered section
    as its own tile grid. Stat tiles carry huge numerals; the main action is the
    one solid primary tile; one tile is secondary-tinted. */
+const BN_KEY = 'bento-grid';   // abCopy key for the plain functions below (js/aesthetics/registry.js)
+
 registerAesthetic({
   key: 'bento-grid', order: 15,
   name: 'Bento Grid',
   descriptor: 'Modular · Clear · Product-proud',
   influences: 'Apple feature grids / Bento layouts / Product marketing',
   summary: 'A grid of rounded tiles, each one making a single point.',
-  motto: 'One tile, one idea.',
-  kicker: 'Everything in its tile',
+  motto: 'One tile, one idea.',       // = copy.motto.text
+  kicker: 'Everything in its tile',   // = copy.kicker.text
   mode: 'light',
   slideShape: 'refined',
   labels: { material: 'Tiles', states: ['Rest', 'Hover', 'Pressed'], statesKind: 'button' },
+  // Editable specimen copy (Brand > Advanced > Specimen copy).
+  copy: {
+    motto: { label: 'Motto', text: 'One tile, one idea.' },
+    kicker: { label: 'Kicker above the headline', text: 'Everything in its tile' },
+    state0: { label: 'State 1 name', text: 'Rest' },
+    state1: { label: 'State 2 name', text: 'Hover' },
+    state2: { label: 'State 3 name', text: 'Pressed' },
+    phoneTime: { label: 'Phone status-bar time', text: '9:41' },
+    cardLabel: { label: 'Phone card label', text: 'Brand health' },
+    cardValue: { label: 'Phone card figure', text: '72%' },
+    cardStatus: { label: 'Phone card status', text: 'On track' },
+    project1: { label: 'Project 1 name', text: 'Brand refresh' },
+    status1: { label: 'Project 1 status', text: 'In review' },
+    project2: { label: 'Project 2 name', text: 'Launch site' },
+    status2: { label: 'Project 2 status', text: 'Building' },
+    project3: { label: 'Project 3 name', text: 'Spring campaign' },
+    status3: { label: 'Project 3 status', text: 'Planned' },
+    chipSaved: { label: 'Floating chip 1', text: 'Direction saved' },
+    chipFigure: { label: 'Floating chip 2 figure', text: '72%' },
+    chipOn: { label: 'Floating chip 2 text', text: 'on track' },
+    seg1: { label: 'Segment 1', text: 'Design' },
+    seg2: { label: 'Segment 2', text: 'Build' },
+    seg3: { label: 'Segment 3', text: 'Launch' },
+    actTitle: { label: 'Action tile label', text: 'Save direction' },
+    actSub: { label: 'Action tile sub-line', text: 'The one action' },
+    nextTitle: { label: 'Next-step tile headline', text: 'Your next good idea.' },
+    nextSub: { label: 'Next-step tile sub-line', text: 'A little structure. Room to play.' },
+    tileRender: { label: 'Material tile 1 label', text: 'Render tile' },
+    tileNumFig: { label: 'Material tile 2 figure', text: '72%' },
+    tileNum: { label: 'Material tile 2 label', text: 'Numeral tile' },
+    tileColour: { label: 'Material tile 3 label', text: 'Colour tile' },
+    tileFlatHead: { label: 'Material tile 4 headline', text: 'One idea.' },
+    tileFlat: { label: 'Material tile 4 label', text: 'Flat tile' },
+  },
   layout: { hero: 'split', palette: 'chips', sections: 'stacked' },
   type: { ui: 'sans', label: 'sans', display: 1 },
   highlight: 'ink',
@@ -100,24 +136,25 @@ registerAesthetic({
   art(ctx) {
     const e = escapeHtml;
     const name = e(ctx.brandName);
+    const c = k => abCopy(BN_KEY, k);
     return `<div class="bna">
       <div class="bna-phone">
         <i class="bna-island"></i>
         <div class="bna-screen">
-          <div class="bna-bar"><span>9:41</span><span class="bna-sig"><i></i><i></i><i></i></span></div>
+          <div class="bna-bar"><span>${c('phoneTime')}</span><span class="bna-sig"><i></i><i></i><i></i></span></div>
           <div class="bna-top"><span class="bna-av">${e(ctx.initial)}</span><b>${name}</b><i class="bna-bell"></i></div>
           <div class="bna-card">
-            <div><small>Brand health</small><strong>72%</strong><em>On track</em></div>
+            <div><small>${c('cardLabel')}</small><strong>${c('cardValue')}</strong><em>${c('cardStatus')}</em></div>
             <svg viewBox="0 0 44 44" focusable="false"><circle cx="22" cy="22" r="16" fill="none" stroke="currentColor" stroke-opacity=".25" stroke-width="5"/><circle cx="22" cy="22" r="16" fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round" pathLength="100" stroke-dasharray="72 100" transform="rotate(-90 22 22)"/></svg>
           </div>
-          <div class="bna-row"><i class="bna-d1"></i><span>Brand refresh</span><em>In review</em></div>
-          <div class="bna-row"><i class="bna-d2"></i><span>Launch site</span><em>Building</em></div>
-          <div class="bna-row"><i class="bna-d3"></i><span>Spring campaign</span><em>Planned</em></div>
+          <div class="bna-row"><i class="bna-d1"></i><span>${c('project1')}</span><em>${c('status1')}</em></div>
+          <div class="bna-row"><i class="bna-d2"></i><span>${c('project2')}</span><em>${c('status2')}</em></div>
+          <div class="bna-row"><i class="bna-d3"></i><span>${c('project3')}</span><em>${c('status3')}</em></div>
           <div class="bna-tabs"><i class="on"></i><i></i><i></i><i></i></div>
         </div>
       </div>
-      <div class="bna-chip bna-c1"><i></i>Direction saved</div>
-      <div class="bna-chip bna-c2"><b>72%</b>on track</div>
+      <div class="bna-chip bna-c1"><i></i>${c('chipSaved')}</div>
+      <div class="bna-chip bna-c2"><b>${c('chipFigure')}</b>${c('chipOn')}</div>
     </div>`;
   },
 
@@ -174,30 +211,32 @@ registerAesthetic({
     // one solid primary action tile.
     product(ctx) {
       const e = ctx.e || escapeHtml;
-      const rows = ctx.rows || [['Brand refresh', 'In review', 72], ['Launch site', 'Building', 45], ['Spring campaign', 'Planned', 10]];
+      const c = k => abCopy(BN_KEY, k);
+      const rows = ctx.rows || [[abCopyRaw(BN_KEY, 'project1'), abCopyRaw(BN_KEY, 'status1'), 72], [abCopyRaw(BN_KEY, 'project2'), abCopyRaw(BN_KEY, 'status2'), 45], [abCopyRaw(BN_KEY, 'project3'), abCopyRaw(BN_KEY, 'status3'), 10]];
       const stat = (cls, [name, status, pct]) => `<div class="bnp-t ${cls}">
           <b class="bnp-num">${pct}%</b>
           <span class="bnp-name">${e(name)}</span>
           <span class="bnp-chip">${e(status)}</span>
           <i class="bnp-bar"><i style="width:${pct}%"></i></i>
         </div>`;
-      const segs = ['Design', 'Build', 'Launch'].map((s, i) => `<span class="ab-seg-btn" aria-pressed="${i === 0}">${s}</span>`).join('');
+      const segs = ['seg1', 'seg2', 'seg3'].map((s, i) => `<span class="ab-seg-btn" aria-pressed="${i === 0}">${c(s)}</span>`).join('');
       return `<div class="bnp">
         ${stat('bnp-hero', rows[0])}
         ${stat('bnp-s1', rows[1])}
-        <div class="bnp-t bnp-act"><i class="bnp-arrow" aria-hidden="true"></i><b>Save direction</b><span>The one action</span></div>
-        <div class="bnp-t bnp-card"><div class="ab-seg">${segs}</div><b class="bnp-title">Your next good idea.</b><span class="bnp-sub">A little structure. Room to play.</span></div>
+        <div class="bnp-t bnp-act"><i class="bnp-arrow" aria-hidden="true"></i><b>${c('actTitle')}</b><span>${c('actSub')}</span></div>
+        <div class="bnp-t bnp-card"><div class="ab-seg">${segs}</div><b class="bnp-title">${c('nextTitle')}</b><span class="bnp-sub">${c('nextSub')}</span></div>
         ${stat('bnp-s2', rows[2])}
       </div>`;
     },
     // Material slide: the tile materials as a small bento (flat tile, colour tile, numeral
     // tile, render tile), instead of repeating the hero phone.
     materialArt(ctx) {
+      const c = k => abCopy(BN_KEY, k);
       return `<div class="bnm">
-        <div class="bnm-t bnm-render"><span>Render tile</span></div>
-        <div class="bnm-t bnm-num"><b>72%</b><span>Numeral tile</span></div>
-        <div class="bnm-t bnm-colour"><span>Colour tile</span></div>
-        <div class="bnm-t bnm-flat"><b>One idea.</b><span>Flat tile</span></div>
+        <div class="bnm-t bnm-render"><span>${c('tileRender')}</span></div>
+        <div class="bnm-t bnm-num"><b>${c('tileNumFig')}</b><span>${c('tileNum')}</span></div>
+        <div class="bnm-t bnm-colour"><span>${c('tileColour')}</span></div>
+        <div class="bnm-t bnm-flat"><b>${c('tileFlatHead')}</b><span>${c('tileFlat')}</span></div>
       </div>`;
     },
     principles: [

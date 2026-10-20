@@ -101,7 +101,8 @@ function xrDefs() {
   </defs></svg>`;
 }
 
-const xrSheet = (html, n) => html.replace(/^(\s*<div class="ab-(?:card|panel)">)/, `$1<span class="xr-sheet" aria-hidden="true">SHEET ${n} / 2</span>`);
+const XR_KEY = 'xerox';   // abCopy key for the plain functions below (js/aesthetics/registry.js)
+const xrSheet = (html, n) => html.replace(/^(\s*<div class="ab-(?:card|panel)">)/, (m, open) => `${open}<span class="xr-sheet" aria-hidden="true">${abCopy(XR_KEY, 'sheet').replace('{n}', () => n)}</span>`);
 
 registerAesthetic({
   key: 'xerox', order: 22,
@@ -109,11 +110,24 @@ registerAesthetic({
   descriptor: 'Toner · Cold · Copied',
   influences: 'Pati Hill copier works / Copy art / Generation loss',
   summary: 'Toner on one paper stock, copied until it degrades: thresholds, filled counters and a lid-open black platen.',
-  motto: 'Copy of a copy of a copy.',
-  kicker: 'Copy 032 / 050',
+  motto: 'Copy of a copy of a copy.',   // = copy.motto.text
+  kicker: 'Copy 032 / 050',             // = copy.kicker.text
   mode: 'light',
   slideShape: 'minimal',
   labels: { material: 'Generations', states: ['Gen 1', 'Gen 3', 'Gen 7'], statesKind: 'swatch' },
+  // Editable specimen copy (Brand > Advanced > Specimen copy). {n} is filled in by the template.
+  copy: {
+    motto: { label: 'Motto', text: 'Copy of a copy of a copy.' },
+    kicker: { label: 'Kicker above the headline', text: 'Copy 032 / 050' },
+    state0: { label: 'State 1 name', text: 'Gen 1' },
+    state1: { label: 'State 2 name', text: 'Gen 3' },
+    state2: { label: 'State 3 name', text: 'Gen 7' },
+    edgeLabel: { label: 'Platen edge label', text: 'A4 → A3 · 141% · LID OPEN · COPY 032/050' },
+    stampMain: { label: 'Stamp headline', text: 'RECEIVED' },
+    stampSub: { label: 'Stamp sub-line', text: 'COPY ROOM · 032' },
+    sheet: { label: 'Sheet count ({n})', text: 'SHEET {n} / 2' },
+    rowNo: { label: 'Roster number ({n})', text: 'No.{n}' },
+  },
   layout: { hero: 'poster', palette: 'swatches', sections: 'two-col' },
   type: { ui: 'body', label: 'body', display: 1 },
   highlight: 'custom',
@@ -243,8 +257,8 @@ registerAesthetic({
       <g filter="url(#xrx-g5)" style="mix-blend-mode:multiply"><rect x="0" y="0" width="66" height="200" fill="#000"/><rect x="66" y="0" width="52" height="200" fill="url(#${id}r)"/></g>
       <g stroke-width=".5" fill="none">${ticks}</g>
       <g style="${font}" font-size="4.4">${nums}</g>
-      <g transform="rotate(-90 12 150)" fill="${paper}" style="${font};font-weight:var(--xr-bw,700)" font-size="5.6" letter-spacing=".5"><text x="12" y="152">A4 → A3 · 141% · LID OPEN · COPY 032/050</text></g>
-      <g style="mix-blend-mode:multiply" transform="translate(150 24)"><rect x="0" y="0" width="64" height="22" fill="none" stroke="${t.primary}" stroke-width="2"/><rect x="2.6" y="2.6" width="58.8" height="16.8" fill="none" stroke="${t.primary}" stroke-width=".8"/><text x="32" y="10" text-anchor="middle" fill="${t.primary}" font-size="6.4" letter-spacing=".8" style="${font};font-weight:var(--xr-bw,700)">RECEIVED</text><text x="32" y="16.6" text-anchor="middle" fill="${t.primary}" font-size="4.6" letter-spacing=".5" style="${font}">COPY ROOM · 032</text></g>
+      <g transform="rotate(-90 12 150)" fill="${paper}" style="${font};font-weight:var(--xr-bw,700)" font-size="5.6" letter-spacing=".5"><text x="12" y="152">${abCopy(XR_KEY, 'edgeLabel')}</text></g>
+      <g style="mix-blend-mode:multiply" transform="translate(150 24)"><rect x="0" y="0" width="64" height="22" fill="none" stroke="${t.primary}" stroke-width="2"/><rect x="2.6" y="2.6" width="58.8" height="16.8" fill="none" stroke="${t.primary}" stroke-width=".8"/><text x="32" y="10" text-anchor="middle" fill="${t.primary}" font-size="6.4" letter-spacing=".8" style="${font};font-weight:var(--xr-bw,700)">${abCopy(XR_KEY, 'stampMain')}</text><text x="32" y="16.6" text-anchor="middle" fill="${t.primary}" font-size="4.6" letter-spacing=".5" style="${font}">${abCopy(XR_KEY, 'stampSub')}</text></g>
       <path d="M176 0V200" stroke="${toner}" stroke-opacity=".1" stroke-width="7" fill="none" filter="url(#xrx-rule)"/>
     </svg></div>`;
   },
@@ -263,7 +277,7 @@ registerAesthetic({
     list(ctx) {
       const e = ctx.e;
       return `<ul class="ab-list">${ctx.rows.map((r, i) => `<li class="ab-row">
-      <span class="ab-row-n">No.${String(i + 1).padStart(2, '0')}</span>
+      <span class="ab-row-n">${abCopy(XR_KEY, 'rowNo').replace('{n}', () => String(i + 1).padStart(2, '0'))}</span>
       <span class="ab-av" aria-hidden="true">${e(r[0][0])}</span>
       <span class="ab-row-name">${e(r[0])}</span>
       <span class="ab-row-status">${e(r[1])}</span>

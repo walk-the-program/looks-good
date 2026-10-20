@@ -11,6 +11,8 @@ let bprSeq = 0;
 // Do / don't pair for the deck (a data-URI background on each column, like retro-futurist's): DO is the
 // line-type set on the field (a part drawn with visible, hidden, centre and dimension lines, and a legend
 // of the four); DON'T is the same part filled in the brand colour, rounded, shaded and traced with a squiggle.
+const BP_KEY = 'blueprint';   // abCopy key for the plain functions below (js/aesthetics/registry.js)
+const bpRaw = k => abCopyRaw(BP_KEY, k);
 function bpPairSvg(t, kind, line) {
   const f = t.canvas;
   const m = 'font-family="ui-monospace,Menlo,monospace" font-size="5.2" letter-spacing=".6"';
@@ -21,7 +23,7 @@ function bpPairSvg(t, kind, line) {
       + `<path d="M22 40H120" stroke-width=".6" stroke-dasharray="10 3 2 3"/><path d="M30 9V19M112 9V19M30 13H62M80 13H112" stroke-width=".6"/></g>`
       + `<path d="M30 13l4 -1.4v2.8zM112 13l-4 -1.4v2.8z" fill="${line}"/><text x="71" y="15" text-anchor="middle" fill="${line}" ${m}>82</text>`
       + `<g fill="none" stroke="${line}"><path d="M144 20H176" stroke-width="1.6"/><path d="M144 34H176" stroke-width=".8" stroke-dasharray="4 3"/><path d="M144 48H176" stroke-width=".6" stroke-dasharray="10 3 2 3"/><path d="M144 62H176M144 59V65M176 59V65" stroke-width=".6"/></g>`
-      + `<g fill="${line}" ${m}><text x="184" y="22">VISIBLE</text><text x="184" y="36">HIDDEN</text><text x="184" y="50">CENTRE</text><text x="184" y="64">DIM</text></g></svg>`
+      + `<g fill="${line}" ${m}><text x="184" y="22">${escapeHtml(bpRaw('legVisible'))}</text><text x="184" y="36">${escapeHtml(bpRaw('legHidden'))}</text><text x="184" y="50">${escapeHtml(bpRaw('legCentre'))}</text><text x="184" y="64">${escapeHtml(bpRaw('legDim'))}</text></g></svg>`
     : `<svg xmlns="http://www.w3.org/2000/svg" width="240" height="80" viewBox="0 0 240 80"><defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff" stop-opacity=".45"/><stop offset="1" stop-color="#ffffff" stop-opacity="0"/></linearGradient><filter id="s" x="-20%" y="-20%" width="140%" height="160%"><feGaussianBlur stdDeviation="3"/></filter></defs>`
       + `<rect width="240" height="80" fill="${f}"/><rect x="34" y="28" width="82" height="36" rx="12" fill="#000" opacity=".45" filter="url(#s)"/>`
       + `<rect x="30" y="22" width="82" height="36" rx="12" fill="${t.primary}"/><rect x="30" y="22" width="82" height="18" rx="9" fill="url(#g)"/>`
@@ -130,7 +132,7 @@ function bpDrawing(ctx) {
   const omid = (a, b, z) => { const p = O(a[0], a[1], z), q = O(b[0], b[1], z); return [(p[0] + q[0]) / 2, (p[1] + q[1]) / 2]; };
   let best = [2, 3], bd = 1e9;
   for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) if (f(x, y)) { const dd = Math.abs(x - 2) + Math.abs(y - 3); if (dd < bd) { bd = dd; best = [x, y]; } }
-  const calls = [[omid(topEdge.a, topEdge.b, 0.5), 'A', '10', 'TOP FACE', 44], [O(best[0] + 0.5, best[1] + 0.5, 0), 'B', '12', 'FRONT FACE', 70], [omid(leftEdge.a, leftEdge.b, 1), 'C', '14', 'HIDDEN EDGE', 96]];
+  const calls = [[omid(topEdge.a, topEdge.b, 0.5), 'A', '10', bpRaw('callTop'), 44], [O(best[0] + 0.5, best[1] + 0.5, 0), 'B', '12', bpRaw('callFront'), 70], [omid(leftEdge.a, leftEdge.b, 1), 'C', '14', bpRaw('callHidden'), 96]];
   const bx = 300;
   const callouts = calls.map(([a, letter, num, label, by]) => {
     if (pat) {
@@ -152,18 +154,18 @@ function bpDrawing(ctx) {
   const today = (d => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`)(new Date());
   const init = String(ctx.brandName || 'MS').split(/\s+/).filter(Boolean).map(w => w[0]).join('').slice(0, 3).toUpperCase() || 'MS';
   const NX = 22, NY = 222;
-  const notes = pat ? '' : txt(NX, NY, 'NOTES', 'bp-vt bp-lt')
-    + txt(NX, NY + 7, '1. ALL DIMENSIONS IN MILLIMETRES.') + txt(NX, NY + 13, '2. DO NOT SCALE THE DRAWING.') + txt(NX, NY + 19, '3. BREAK SHARP EDGES 0.5 x 45°.');
+  const notes = pat ? '' : txt(NX, NY, bpRaw('notesHead'), 'bp-vt bp-lt')
+    + txt(NX, NY + 7, bpRaw('note1')) + txt(NX, NY + 13, bpRaw('note2')) + txt(NX, NY + 19, bpRaw('note3'));
   const ta = pat ? '' : (() => {
     const x = 170, y = 218;
-    return `<path class="bp-k" d="M${x} ${y + 2}L${x + 16} ${y - 2}V${y + 14}L${x} ${y + 10}Z"/><circle class="bp-k" cx="${x + 30}" cy="${y + 6}" r="8"/><circle class="bp-k" cx="${x + 30}" cy="${y + 6}" r="4"/><path class="bp-cl" d="M${x - 3} ${y + 6}H${x + 41}M${x + 30} ${y - 5}V${y + 17}"/>${txt(x + 20, y + 25, 'THIRD ANGLE', 'bp-s', 'middle')}`;
+    return `<path class="bp-k" d="M${x} ${y + 2}L${x + 16} ${y - 2}V${y + 14}L${x} ${y + 10}Z"/><circle class="bp-k" cx="${x + 30}" cy="${y + 6}" r="8"/><circle class="bp-k" cx="${x + 30}" cy="${y + 6}" r="4"/><path class="bp-cl" d="M${x - 3} ${y + 6}H${x + 41}M${x + 30} ${y - 5}V${y + 17}"/>${txt(x + 20, y + 25, bpRaw('thirdAngle'), 'bp-s', 'middle')}`;
   })();
   const RX = 22, RY = 262, RW = 228;
   const rev = pat ? '' : `<path class="bp-l" d="M${RX} ${RY}H${RX + RW}V${RY + 26}H${RX}ZM${RX} ${RY + 8}H${RX + RW}M${RX} ${RY + 17}H${RX + RW}M${RX + 18} ${RY}V${RY + 26}M${RX + 150} ${RY}V${RY + 26}M${RX + 200} ${RY}V${RY + 26}"/>`
-    + txt(RX + 9, RY + 5.8, 'REV', 'bp-s', 'middle') + txt(RX + 22, RY + 5.8, 'DESCRIPTION', 'bp-s') + txt(RX + 154, RY + 5.8, 'DATE', 'bp-s') + txt(RX + 204, RY + 5.8, 'BY', 'bp-s')
+    + txt(RX + 9, RY + 5.8, bpRaw('revCol'), 'bp-s', 'middle') + txt(RX + 22, RY + 5.8, bpRaw('revDesc'), 'bp-s') + txt(RX + 154, RY + 5.8, bpRaw('revDate'), 'bp-s') + txt(RX + 204, RY + 5.8, bpRaw('revBy'), 'bp-s')
     + `<path class="bp-rev" d="M${RX + 9} ${RY + 9.6}l4.2 6.4h-8.4z"/>` + txt(RX + 9, RY + 15, '1', 'bp-rt', 'middle')
-    + txt(RX + 22, RY + 14.6, 'ISSUED FOR BRAND USE') + txt(RX + 154, RY + 14.6, today) + txt(RX + 204, RY + 14.6, init)
-    + txt(RX + 9, RY + 23.6, '0', 'bp-s', 'middle') + txt(RX + 22, RY + 23.6, 'FIRST DRAWN', 'bp-s');
+    + txt(RX + 22, RY + 14.6, bpRaw('revIssued')) + txt(RX + 154, RY + 14.6, today) + txt(RX + 204, RY + 14.6, init)
+    + txt(RX + 9, RY + 23.6, '0', 'bp-s', 'middle') + txt(RX + 22, RY + 23.6, bpRaw('revFirst'), 'bp-s');
   // the revision cloud: scallops around SECTION B-B, bulging outward, plus the revision triangle
   const cloud = (() => {
     const x0 = SX - 9, y0 = AY - 17, x1 = SX + D + 9, y1 = aBot + 7, s = 7.2;
@@ -186,8 +188,8 @@ function bpDrawing(ctx) {
   }
 
   const lab = pat
-    ? { a: ['FIG. 1', ''], b: ['FIG. 2', ''], c: ['FIG. 3', ''], d: ['FIG. 4', ''] }
-    : { a: ['VIEW A', 'FRONT  1:1'], b: ['SECTION B-B', '1:1'], c: ['VIEW C', 'OBLIQUE'], d: ['DETAIL D', '2:1'] };
+    ? { a: [bpRaw('fig1'), ''], b: [bpRaw('fig2'), ''], c: [bpRaw('fig3'), ''], d: [bpRaw('fig4'), ''] }
+    : { a: [bpRaw('viewA'), bpRaw('viewASub')], b: [bpRaw('viewB'), '1:1'], c: [bpRaw('viewC'), bpRaw('viewCSub')], d: [bpRaw('viewD'), '2:1'] };
   const titles = viewTitle(acx, aBot + 34, lab.a[0], lab.a[1]) + viewTitle(SX + D / 2, aBot + 34, lab.b[0], lab.b[1])
     + viewTitle(OX + 34, 146, lab.c[0], lab.c[1]) + viewTitle(DCX, DCY + DR + 13, lab.d[0], lab.d[1]);
 
@@ -238,6 +240,42 @@ registerAesthetic({
   mode: 'dark',
   slideShape: 'minimal',
   labels: { material: 'Drawing', states: ['Default', 'Hover', 'Active'], statesKind: 'button' },
+  // Editable specimen copy (Brand > Advanced > Specimen copy); text matches motto / kicker / labels.states above.
+  copy: {
+    motto: { label: 'Motto', text: 'Drawn to scale.' },
+    kicker: { label: 'Kicker above the headline', text: 'Sheet 01 / 01' },
+    state0: { label: 'State 1 name', text: 'Default' },
+    state1: { label: 'State 2 name', text: 'Hover' },
+    state2: { label: 'State 3 name', text: 'Active' },
+    viewA: { label: 'View A title', text: 'VIEW A' },
+    viewASub: { label: 'View A sub-title', text: 'FRONT  1:1' },
+    viewB: { label: 'Section view title', text: 'SECTION B-B' },
+    viewC: { label: 'View C title', text: 'VIEW C' },
+    viewCSub: { label: 'View C sub-title', text: 'OBLIQUE' },
+    viewD: { label: 'Detail view title', text: 'DETAIL D' },
+    fig1: { label: 'Patent figure 1 title (light mode)', text: 'FIG. 1' },
+    fig2: { label: 'Patent figure 2 title (light mode)', text: 'FIG. 2' },
+    fig3: { label: 'Patent figure 3 title (light mode)', text: 'FIG. 3' },
+    fig4: { label: 'Patent figure 4 title (light mode)', text: 'FIG. 4' },
+    callTop: { label: 'Callout A name', text: 'TOP FACE' },
+    callFront: { label: 'Callout B name', text: 'FRONT FACE' },
+    callHidden: { label: 'Callout C name', text: 'HIDDEN EDGE' },
+    notesHead: { label: 'General notes heading', text: 'NOTES' },
+    note1: { label: 'General note 1', text: '1. ALL DIMENSIONS IN MILLIMETRES.' },
+    note2: { label: 'General note 2', text: '2. DO NOT SCALE THE DRAWING.' },
+    note3: { label: 'General note 3', text: '3. BREAK SHARP EDGES 0.5 x 45\u00b0.' },
+    thirdAngle: { label: 'Third-angle symbol label', text: 'THIRD ANGLE' },
+    revCol: { label: 'Revision table: revision column', text: 'REV' },
+    revDesc: { label: 'Revision table: description column', text: 'DESCRIPTION' },
+    revDate: { label: 'Revision table: date column', text: 'DATE' },
+    revBy: { label: 'Revision table: initials column', text: 'BY' },
+    revIssued: { label: 'Revision 1 description', text: 'ISSUED FOR BRAND USE' },
+    revFirst: { label: 'Revision 0 description', text: 'FIRST DRAWN' },
+    legVisible: { label: 'Line legend: visible', text: 'VISIBLE' },
+    legHidden: { label: 'Line legend: hidden', text: 'HIDDEN' },
+    legCentre: { label: 'Line legend: centre', text: 'CENTRE' },
+    legDim: { label: 'Line legend: dimension', text: 'DIM' },
+  },
   // the sheet first, then the details (01-03), then the legend and the type table: a drawing set, not a landing page
   layout: { hero: 'split', palette: 'list', sections: 'asym', order: ['hero', 'sections', 'palette', 'type'] },
   type: { ui: 'mono', label: 'mono', display: 1 },

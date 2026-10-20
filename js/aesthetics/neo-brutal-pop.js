@@ -27,6 +27,9 @@ function npStarPoints(cx, cy, r1, r2, n) {
 }
 
 // Shared drawing bits for the sticker art (hero cluster, Material sheet, In product).
+// Copy is read through abCopy (js/aesthetics/registry.js); plain functions pass the key.
+const NP_KEY = 'neo-brutal-pop';
+
 function npKit(t) {
   const ink = t.ink;
   const paper = typeof t.mix === 'function'
@@ -38,8 +41,8 @@ function npKit(t) {
   const so = `stroke="${ink}" stroke-width="3" stroke-linejoin="round"`;
   const tag = '62,104 98,70 232,70 232,204 98,204 62,170';
   const star = npStarPoints(0, 0, 54, 40, 20);
-  const tagSvg = `<svg viewBox="52 60 192 156" xmlns="http://www.w3.org/2000/svg"><polygon points="${tag}" fill="${shc}" transform="${sh}"/><polygon points="${tag}" fill="${t.primary}" ${so}/><circle cx="88" cy="137" r="10" fill="${paper}" ${so}/><text x="168" y="164" text-anchor="middle" class="nba-t" font-size="76" fill="${on('onPrimary', ink)}" color="${on('onPrimary', ink)}">$1</text></svg>`;
-  const starSvg = (word = 'NEW') => `<svg viewBox="-60 -60 126 126" xmlns="http://www.w3.org/2000/svg"><polygon points="${star}" fill="${shc}" transform="${sh}"/><polygon points="${star}" fill="${t.accent}" ${so}/><text x="0" y="9" text-anchor="middle" class="nba-t" font-size="26" fill="${on('onAccent', ink)}" color="${on('onAccent', ink)}">${word}</text></svg>`;
+  const tagSvg = `<svg viewBox="52 60 192 156" xmlns="http://www.w3.org/2000/svg"><polygon points="${tag}" fill="${shc}" transform="${sh}"/><polygon points="${tag}" fill="${t.primary}" ${so}/><circle cx="88" cy="137" r="10" fill="${paper}" ${so}/><text x="168" y="164" text-anchor="middle" class="nba-t" font-size="76" fill="${on('onPrimary', ink)}" color="${on('onPrimary', ink)}">${abCopy(NP_KEY, 'priceTag')}</text></svg>`;
+  const starSvg = (word = abCopy(NP_KEY, 'starWord')) => `<svg viewBox="-60 -60 126 126" xmlns="http://www.w3.org/2000/svg"><polygon points="${star}" fill="${shc}" transform="${sh}"/><polygon points="${star}" fill="${t.accent}" ${so}/><text x="0" y="9" text-anchor="middle" class="nba-t" font-size="26" fill="${on('onAccent', ink)}" color="${on('onAccent', ink)}">${word}</text></svg>`;
   return { ink, shc, paper, on, sh, so, tag, star, tagSvg, starSvg };
 }
 
@@ -69,6 +72,28 @@ registerAesthetic({
   mode: 'light',
   slideShape: 'geometric',
   labels: { material: 'Stickers & squish', states: ['Rest', 'Lift', 'Squish'], statesKind: 'button' },
+  // Editable specimen copy (Brand > Advanced > Specimen copy). {brand} = the brand name.
+  copy: {
+    motto: { label: 'Motto', text: 'Loud, but friendly.' },
+    kicker: { label: 'Kicker above the headline', text: 'Stickers, stacked' },
+    state0: { label: 'State 1 name', text: 'Rest' },
+    state1: { label: 'State 2 name', text: 'Lift' },
+    state2: { label: 'State 3 name', text: 'Squish' },
+    priceTag: { label: 'Price tag sticker', text: '$1' },
+    starWord: { label: 'Starburst sticker word', text: 'NEW' },
+    cellCard: { label: 'Sticker sheet: card', text: 'Sticker card' },
+    cellBtn: { label: 'Sticker sheet: chunky button', text: 'Chunky button' },
+    cellPaper: { label: 'Sticker sheet: paper button', text: 'Paper button' },
+    cellSquish: { label: 'Sticker sheet: squish state', text: 'Squish state' },
+    cellStar: { label: 'Sticker sheet: starburst', text: 'Starburst' },
+    cellTag: { label: 'Sticker sheet: price tag', text: 'Price tag' },
+    btnGo: { label: 'Sample button word', text: 'Go' },
+    productTitle: { label: 'Product title', text: 'The starter kit' },
+    productDesc: { label: 'Product description ({brand})', text: 'Type, colour and material for {brand}, in one download. Loud, but friendly.' },
+    price: { label: 'Price', text: '$1+' },
+    rating: { label: 'Rating line', text: '\u2605\u2605\u2605\u2605\u2605 72 ratings' },
+    cta: { label: 'Buy button label', text: 'I want this!' },
+  },
   layout: { hero: 'split' },
   type: { ui: 'sans', label: 'sans', display: 1.0 },
   highlight: 'band',
@@ -137,12 +162,12 @@ registerAesthetic({
         <polygon points="${tag}" fill="${shc}" transform="${sh}"/>
         <polygon points="${tag}" fill="${t.primary}" ${so}/>
         <circle cx="88" cy="137" r="10" fill="${paper}" ${so}/>
-        <text x="168" y="164" text-anchor="middle" class="nba-t" font-size="76" fill="${on('onPrimary', ink)}" color="${on('onPrimary', ink)}">$1</text>
+        <text x="168" y="164" text-anchor="middle" class="nba-t" font-size="76" fill="${on('onPrimary', ink)}" color="${on('onPrimary', ink)}">${abCopy(NP_KEY, 'priceTag')}</text>
       </g>
       <g transform="translate(252 72) rotate(12)">
         <polygon points="${star}" fill="${shc}" transform="${sh}"/>
         <polygon points="${star}" fill="${t.accent}" ${so}/>
-        <text x="0" y="9" text-anchor="middle" class="nba-t" font-size="26" fill="${on('onAccent', ink)}" color="${on('onAccent', ink)}">NEW</text>
+        <text x="0" y="9" text-anchor="middle" class="nba-t" font-size="26" fill="${on('onAccent', ink)}" color="${on('onAccent', ink)}">${abCopy(NP_KEY, 'starWord')}</text>
       </g>
       <g transform="rotate(8 240 238)">
         <rect x="205" y="203" width="70" height="70" rx="8" fill="${shc}" transform="${sh}"/>
@@ -194,13 +219,14 @@ registerAesthetic({
     materialArt(ctx) {
       const { tagSvg, starSvg } = npKit(ctx.t);
       const cell = (cls, obj, label) => `<div class="nba-cell"><div class="nba-obj ${cls}">${obj}</div><span class="nba-lab">${label}</span></div>`;
+      const go = `<b>${abCopy(this, 'btnGo')}<em>→</em></b>`;
       return `<div class="nba-sheet">
-        ${cell('nba-o-card', '<i></i><i></i><i></i>', 'Sticker card')}
-        ${cell('nba-o-btn', '<b>Go<em>→</em></b>', 'Chunky button')}
-        ${cell('nba-o-paper', '<b>Go<em>→</em></b>', 'Paper button')}
-        ${cell('nba-o-squish', '<b>Go<em>→</em></b>', 'Squish state')}
-        ${cell('nba-o-star', starSvg(), 'Starburst')}
-        ${cell('nba-o-tag', tagSvg, 'Price tag')}
+        ${cell('nba-o-card', '<i></i><i></i><i></i>', abCopy(this, 'cellCard'))}
+        ${cell('nba-o-btn', go, abCopy(this, 'cellBtn'))}
+        ${cell('nba-o-paper', go, abCopy(this, 'cellPaper'))}
+        ${cell('nba-o-squish', go, abCopy(this, 'cellSquish'))}
+        ${cell('nba-o-star', starSvg(), abCopy(this, 'cellStar'))}
+        ${cell('nba-o-tag', tagSvg, abCopy(this, 'cellTag'))}
       </div>`;
     },
     // In product: a Gumroad-style product page. A cover tile in a full accent field
@@ -210,13 +236,13 @@ registerAesthetic({
       const { starSvg } = npKit(ctx.t);
       const name = e(ctx.brandName || 'Studio');
       return `<div class="npp">
-        <div class="npp-cover"><span class="npp-init">${e(ctx.initial)}</span><span class="npp-star">${starSvg('NEW')}</span></div>
+        <div class="npp-cover"><span class="npp-init">${e(ctx.initial)}</span><span class="npp-star">${starSvg()}</span></div>
         <div class="npp-info">
           <p class="npp-by"><span class="npp-av">${e(ctx.initial)}</span>${name}</p>
-          <h3 class="npp-title ab-headline">The starter kit</h3>
-          <p class="npp-desc">Type, colour and material for ${name}, in one download. Loud, but friendly.</p>
-          <p class="npp-meta"><span class="npp-price">$1+</span><span class="npp-rate">★★★★★ 72 ratings</span></p>
-          <span class="ab-cta npp-buy"><span class="ab-cta-label">I want this!</span><span class="ab-cta-arrow" aria-hidden="true"></span></span>
+          <h3 class="npp-title ab-headline">${abCopy(this, 'productTitle')}</h3>
+          <p class="npp-desc">${abCopy(this, 'productDesc').replace('{brand}', () => name)}</p>
+          <p class="npp-meta"><span class="npp-price">${abCopy(this, 'price')}</span><span class="npp-rate">${abCopy(this, 'rating')}</span></p>
+          <span class="ab-cta npp-buy"><span class="ab-cta-label">${abCopy(this, 'cta')}</span><span class="ab-cta-arrow" aria-hidden="true"></span></span>
         </div>
       </div>`;
     },

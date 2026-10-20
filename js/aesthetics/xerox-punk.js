@@ -176,6 +176,8 @@ function xpHeadline(ctx, seed, text) {
 
 // The deck Material slide's own art (def.deck.materialArt): a ransom specimen sheet. Tile anatomy, the face
 // pool, the scale range and photo tiles, built from the same tile grounds as the headline.
+const XP_KEY = 'xerox-punk';   // abCopy key for the plain functions and hooks below (js/aesthetics/registry.js)
+const xpCp = k => abCopy(XP_KEY, k);
 function xpSpecimen(ctx) {
   const seed = xpHash(String(ctx.brandName || 'brand') + '|' + String(ctx.tagline || ''));
   const ini = escapeHtml(ctx.initial);
@@ -183,10 +185,10 @@ function xpSpecimen(ctx) {
     const sp = (ch, face, g, extra) => `<i class="xpt" data-g="${g}" style="font-family:${face};${extra || ''}">${ch}</i>`;
     const mag = "'Playfair Display', Georgia, serif", slab = "'Alfa Slab One', Georgia, serif", cond = "'Bebas Neue', Impact, sans-serif", typ = "'Special Elite', 'Courier New', monospace";
     const spec = `<div class="xpsp">
-        <div class="xpsp-a"><span class="xpsp-k">Tile anatomy</span>${sp(ini, 'var(--ab-font-h)', 'news', 'font-size:3.2em;--r:-4deg;padding:.06em .16em .1em .08em')}<ul><li>own face</li><li>own ground</li><li>tilt ±6°</li><li>scissor edge</li></ul></div>
-        <div class="xpsp-b"><span class="xpsp-k">Face pool</span><span class="xpsp-row">${sp('A', slab, 'paper')}${sp('a', mag, 'ink')}${sp('A', cond, 'grey')}${sp('a', typ, 'news')}${sp('A', 'var(--ab-font-h)', 'hot')}</span></div>
-        <div class="xpsp-b"><span class="xpsp-k">Scale 0.72 – 1.45</span><span class="xpsp-row">${sp('S', slab, 'news', 'font-size:.72em')}${sp('S', slab, 'news')}${sp('S', slab, 'news', 'font-size:1.45em')}</span></div>
-        <div class="xpsp-b"><span class="xpsp-k">Photo tiles</span><span class="xpsp-row xph" style="--xp-ph:${ph2}">${sp('N', slab, 'photo', 'background-position:20% 30%')}${sp('O', cond, 'photo', 'background-position:70% 40%')}${sp('word', mag, 'paper', 'font-style:italic')}</span></div>
+        <div class="xpsp-a"><span class="xpsp-k">${xpCp('specAnatomy')}</span>${sp(ini, 'var(--ab-font-h)', 'news', 'font-size:3.2em;--r:-4deg;padding:.06em .16em .1em .08em')}<ul><li>${xpCp('anatFace')}</li><li>${xpCp('anatGround')}</li><li>${xpCp('anatTilt')}</li><li>${xpCp('anatEdge')}</li></ul></div>
+        <div class="xpsp-b"><span class="xpsp-k">${xpCp('specFaces')}</span><span class="xpsp-row">${sp('A', slab, 'paper')}${sp('a', mag, 'ink')}${sp('A', cond, 'grey')}${sp('a', typ, 'news')}${sp('A', 'var(--ab-font-h)', 'hot')}</span></div>
+        <div class="xpsp-b"><span class="xpsp-k">${xpCp('specScale')}</span><span class="xpsp-row">${sp('S', slab, 'news', 'font-size:.72em')}${sp('S', slab, 'news')}${sp('S', slab, 'news', 'font-size:1.45em')}</span></div>
+        <div class="xpsp-b"><span class="xpsp-k">${xpCp('specPhoto')}</span><span class="xpsp-row xph" style="--xp-ph:${ph2}">${sp('N', slab, 'photo', 'background-position:20% 30%')}${sp('O', cond, 'photo', 'background-position:70% 40%')}${sp('word', mag, 'paper', 'font-style:italic')}</span></div>
       </div>`;
   return spec;
 }
@@ -202,6 +204,29 @@ registerAesthetic({
   mode: 'dark',
   slideShape: 'minimal',
   labels: { material: 'Paste-up', states: ['Pasted', 'Circled', 'Crossed out'], statesKind: 'button' },
+  // Editable specimen copy (Brand > Advanced > Specimen copy); text matches motto / kicker / labels.states above.
+  // The warm entries soften the wall flyer and the defiant lines for a Warmer voice.
+  copy: {
+    motto: { label: 'Motto', text: 'Cut it. Paste it. Mean it.', warm: 'Cut it. Paste it. Share it.' },
+    kicker: { label: 'Kicker above the headline', text: 'Stick no bills', warm: 'Post it here' },
+    state0: { label: 'State 1 name', text: 'Pasted' },
+    state1: { label: 'State 2 name', text: 'Circled' },
+    state2: { label: 'State 3 name', text: 'Crossed out', warm: 'Set aside' },
+    flyer1: { label: 'Wall flyer line 1', text: 'Sat \u00b7 doors 8pm \u00b7 no fun', warm: 'Sat \u00b7 doors 8pm \u00b7 all fun' },
+    flyer2: { label: 'Wall flyer line 2', text: 'bring a friend \u00b7 bring a copy' },
+    flyer3: { label: 'Wall flyer line 3', text: 'all ages \u00b7 no gods', warm: 'all ages \u00b7 all welcome' },
+    strip: { label: 'Paste-up strip line', text: 'No gods \u00b7 no masters \u00b7 no templates', warm: 'Your voice \u00b7 your rules \u00b7 no templates' },
+    figCap: { label: 'Photo caption', text: 'fig. 1 \u2014 no comment.', warm: 'fig. 1 \u2014 as found.' },
+    setList: { label: 'Set list title', text: 'set list' },
+    specAnatomy: { label: 'Material slide: tile anatomy title', text: 'Tile anatomy' },
+    anatFace: { label: 'Material slide: anatomy item 1', text: 'own face' },
+    anatGround: { label: 'Material slide: anatomy item 2', text: 'own ground' },
+    anatTilt: { label: 'Material slide: anatomy item 3', text: 'tilt \u00b16\u00b0' },
+    anatEdge: { label: 'Material slide: anatomy item 4', text: 'scissor edge' },
+    specFaces: { label: 'Material slide: face pool title', text: 'Face pool' },
+    specScale: { label: 'Material slide: scale title', text: 'Scale 0.72 \u2013 1.45' },
+    specPhoto: { label: 'Material slide: photo tiles title', text: 'Photo tiles' },
+  },
   layout: { hero: 'centered', palette: 'swatches', sections: 'two-col', subcopy: true },
   type: { ui: 'body', label: 'body', display: 1 },
   highlight: 'custom',
@@ -295,7 +320,7 @@ registerAesthetic({
     const wall = `<div class="xpa-wall" aria-hidden="true">
         <span class="xpr xpr-1" style="background-image:${ph1}"></span>
         <span class="xpr xpr-2" style="--xpn-l:${big.length}"><b>${big}</b></span>
-        <span class="xpr xpr-3"><i>Sat · doors 8pm · no fun</i><i>bring a friend · bring a copy</i><i>all ages · no gods</i></span>
+        <span class="xpr xpr-3"><i>${xpCp('flyer1')}</i><i>${xpCp('flyer2')}</i><i>${xpCp('flyer3')}</i></span>
         <span class="xpr xpr-4" style="background-image:${ph2}"></span>
       </div>`;
     const staple = '<svg class="xps" viewBox="0 0 40 10" width="40" height="10" aria-hidden="true" focusable="false"><path d="M3 7V3h34v4" fill="none" stroke="#9a9a96" stroke-width="2.2" stroke-linejoin="round"/><path d="M3 7V3h34v4" fill="none" stroke="#e8e8e4" stroke-width=".8"/></svg>';
@@ -320,12 +345,12 @@ registerAesthetic({
     <div class="xpa">
       ${wall}
       <div class="xpa-main">
-        <div class="xpa-strip"><span>No gods · no masters · no templates</span></div>
+        <div class="xpa-strip"><span>${xpCp('strip')}</span></div>
       </div>
       <div class="xpa-photo">
         ${staple}
         <div class="xpa-img" style="background-image:${ph2}"><b>${ini}</b>${strike}</div>
-        <p class="xpa-cap">fig. 1 — no comment.</p>
+        <p class="xpa-cap">${xpCp('figCap')}</p>
       </div>
     </div>`;
   },
@@ -334,7 +359,7 @@ registerAesthetic({
   panels: {
     list(ctx) {
       const e = ctx.e;
-      return `<div class="ab-list xp-sl"><p class="xp-sl-h" aria-hidden="true">set list</p><ul class="xp-sl-rows">${ctx.rows.map((r, i) => `<li class="ab-row">
+      return `<div class="ab-list xp-sl"><p class="xp-sl-h" aria-hidden="true">${xpCp('setList')}</p><ul class="xp-sl-rows">${ctx.rows.map((r, i) => `<li class="ab-row">
       <span class="ab-row-n">${i + 1}.</span>
       <span class="ab-av" aria-hidden="true">${e(r[0][0])}</span>
       <span class="ab-row-name">${e(r[0])}</span>

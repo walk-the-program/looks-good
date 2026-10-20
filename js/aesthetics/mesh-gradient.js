@@ -25,6 +25,27 @@ registerAesthetic({
   mode: 'light',
   slideShape: 'refined',
   labels: { material: 'Surfaces', states: ['Rest', 'Hover', 'Pressed'], statesKind: 'button' },
+  // Editable specimen copy (Brand > Advanced > Specimen copy). {brand} = the brand name.
+  copy: {
+    motto: { label: 'Motto', text: 'Fluid on top, exact underneath.' },
+    kicker: { label: 'Kicker above the headline', text: 'Fluid on top, exact underneath' },
+    state0: { label: 'State 1 name', text: 'Rest' },
+    state1: { label: 'State 2 name', text: 'Hover' },
+    state2: { label: 'State 3 name', text: 'Pressed' },
+    axis0: { label: 'Chart axis 1', text: 'Brief' },
+    axis1: { label: 'Chart axis 2', text: 'Draft' },
+    axis2: { label: 'Chart axis 3', text: 'Review' },
+    axis3: { label: 'Chart axis 4', text: 'Thu' },
+    specFile: { label: 'Type card file name', text: 'type.spec' },
+    specNote: { label: 'Type card contrast note', text: 'ink on canvas' },
+    approved: { label: 'Approval title', text: 'Approved' },
+    approvedBy: { label: 'Approval line ({brand})', text: 'by {brand}' },
+    ownerLabel: { label: 'Detail list: owner label', text: 'Owner' },
+    dueLabel: { label: 'Detail list: due label', text: 'Due' },
+    dueValue: { label: 'Detail list: due value', text: 'Thu' },
+    reviewersLabel: { label: 'Detail list: reviewers label', text: 'Reviewers' },
+    listHead: { label: 'Project list heading', text: 'Recent projects' },
+  },
   // product-first (Ramp, Stripe): the interface sections follow the hero, the palette and type come after
   layout: { hero: 'split', palette: 'swatches', sections: 'two-col', order: ['hero', 'sections', 'palette', 'type'] },
   type: { ui: 'sans', label: 'sans', display: 1.2 },
@@ -150,18 +171,18 @@ registerAesthetic({
         <svg class="mga-spark" viewBox="0 0 200 56" preserveAspectRatio="none" focusable="false">
           <path class="mga-area" d="${area}"/><path class="mga-line" d="${line}" vector-effect="non-scaling-stroke"/>
         </svg>
-        <div class="mga-axis"><span>Brief</span><span>Draft</span><span>Review</span><span>Thu</span></div>
+        <div class="mga-axis"><span>${abCopy(this, 'axis0')}</span><span>${abCopy(this, 'axis1')}</span><span>${abCopy(this, 'axis2')}</span><span>${abCopy(this, 'axis3')}</span></div>
       </div>
       <div class="mga-card mga-code">
-        <div class="mga-dots"><i></i><i></i><i></i><code>type.spec</code></div>
+        <div class="mga-dots"><i></i><i></i><i></i><code>${abCopy(this, 'specFile')}</code></div>
         <pre><span class="k">H1</span>    <span class="n">300</span><span class="c">/64</span>  <span class="s">${e(hf)}</span>
 <span class="k">H2</span>    <span class="n">400</span><span class="c">/32</span>  <span class="s">${e(hf)}</span>
 <span class="k">Body</span>  <span class="n">400</span><span class="c">/16</span>  <span class="s">${e(bf)}</span>
-<span class="ok">AA</span>    <span class="c">ink on canvas</span></pre>
+<span class="ok">AA</span>    <span class="c">${abCopy(this, 'specNote')}</span></pre>
       </div>
       <div class="mga-card mga-pay">
         <span class="mga-av">${e(ctx.initial)}</span>
-        <span class="mga-pt"><b>Approved</b><em>by ${e(ctx.brandName)}</em></span>
+        <span class="mga-pt"><b>${abCopy(this, 'approved')}</b><em>${abCopy(this, 'approvedBy').replace('{brand}', () => e(ctx.brandName))}</em></span>
         <span class="mga-amt">v3</span>
       </div>
     </div>`;
@@ -173,12 +194,12 @@ registerAesthetic({
   panels: {
     card(ctx) {
       const e = ctx.e;
-      const meta = `<dl class="mg-meta"><div><dt>Owner</dt><dd>${e(ctx.brandName)}</dd></div>`
-        + '<div><dt>Due</dt><dd>Thu</dd></div><div><dt>Reviewers</dt><dd>3</dd></div></dl>';
+      const meta = `<dl class="mg-meta"><div><dt>${abCopy(this, 'ownerLabel')}</dt><dd>${e(ctx.brandName)}</dd></div>`
+        + `<div><dt>${abCopy(this, 'dueLabel')}</dt><dd>${abCopy(this, 'dueValue')}</dd></div><div><dt>${abCopy(this, 'reviewersLabel')}</dt><dd>3</dd></div></dl>`;
       return ctx.parts.cardBase().replace('<button type="button" class="ab-cta"', `${meta}\n          <button type="button" class="ab-cta"`);
     },
     list(ctx) {
-      return ctx.parts.listBase().replace('<ul class="ab-list">', '<div class="ab-list"><p class="mg-lhead">Recent projects</p><ul class="mg-rows">').replace(/<\/ul>\s*$/, '</ul></div>');
+      return ctx.parts.listBase().replace('<ul class="ab-list">', `<div class="ab-list"><p class="mg-lhead">${abCopy(this, 'listHead')}</p><ul class="mg-rows">`).replace(/<\/ul>\s*$/, '</ul></div>');
     },
   },
 

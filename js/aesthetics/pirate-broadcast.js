@@ -20,6 +20,7 @@ const PB_PUNCT = {
   '&': '01100 10010 10100 01000 10101 10010 01101', '/': '00001 00010 00010 00100 01000 01000 10000',
   '+': '00000 00100 00100 11111 00100 00100 00000', '#': '01010 01010 11111 01010 11111 01010 01010',
 };
+const PB_KEY = 'pirate-broadcast';   // abCopy key for the plain functions below (js/aesthetics/registry.js)
 let pbSeq = 0;
 // Glyph table guard: tokens() also runs where only the aesthetic files are loaded.
 const pbFont = () => (typeof AB_FONT_5X7 !== 'undefined' ? AB_FONT_5X7 : {});
@@ -77,15 +78,15 @@ function pbTestCard(t, name) {
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 120" preserveAspectRatio="xMidYMid slice"><rect width="160" height="120" fill="#000"/>${barSvg}${cast}
     <circle cx="80" cy="31" r="19.5" fill="#000" stroke="#fff" stroke-width="1.2"/><path d="M80 13V49M62 31H98" stroke="#fff" stroke-width=".5"/>
     <circle cx="80" cy="31" r="12" fill="none" stroke="#fff" stroke-width=".4" stroke-dasharray="1.2 1.2"/>
-    <text x="80" y="33.4" text-anchor="middle" ${mono} font-size="9" font-weight="700" fill="#fff">ST-9</text>
-    <text x="80" y="40.6" text-anchor="middle" ${mono} font-size="3.3" font-weight="700" fill="#fff">CH 43</text>
-    <text x="80" y="22.6" text-anchor="middle" ${mono} font-size="3.3" font-weight="700" fill="#fff">4.2 MHZ</text>
+    <text x="80" y="33.4" text-anchor="middle" ${mono} font-size="9" font-weight="700" fill="#fff">${abCopy(PB_KEY, 'cardIdent')}</text>
+    <text x="80" y="40.6" text-anchor="middle" ${mono} font-size="3.3" font-weight="700" fill="#fff">${abCopy(PB_KEY, 'cardChannel')}</text>
+    <text x="80" y="22.6" text-anchor="middle" ${mono} font-size="3.3" font-weight="700" fill="#fff">${abCopy(PB_KEY, 'cardFreq')}</text>
     <rect x="0" y="76" width="160" height="40.6" fill="#000"/>
     <g transform="translate(92 79) scale(1.32)">${pbIntrusion(t, false)}</g>
-    <text x="8" y="90" ${mono} font-size="7.2" font-weight="700" fill="#fff">GOOD EVENING.</text>
-    <text x="8" y="98" ${mono} font-size="4.4" fill="#fff">THIS IS NOT YOUR SIGNAL.</text>
+    <text x="8" y="90" ${mono} font-size="7.2" font-weight="700" fill="#fff">${abCopy(PB_KEY, 'cardHello')}</text>
+    <text x="8" y="98" ${mono} font-size="4.4" fill="#fff">${abCopy(PB_KEY, 'notYourSignal')}</text>
     <rect x="8" y="104" width="76" height="7" fill="#fff"/><rect x="8" y="104" width="20" height="7" fill="${T.r}"/>
-    <text x="10.5" y="109.2" ${mono} font-size="3.8" font-weight="700" fill="#fff">REC</text>
+    <text x="10.5" y="109.2" ${mono} font-size="3.8" font-weight="700" fill="#fff">${abCopy(PB_KEY, 'cardRec')}</text>
     <text x="31" y="109.2" ${mono} font-size="3.8" font-weight="700" fill="#000">${name}</text></svg>`;
 }
 
@@ -115,11 +116,34 @@ registerAesthetic({
   descriptor: 'Intercepted · Analog · Rogue',
   influences: 'Ceefax / Mode 7 / Test cards / Pirate TV',
   summary: 'A rigid teletext frame with test-card parts, interrupted by an intruding rogue signal.',
-  motto: 'Do not adjust your set.',
-  kicker: 'Page 100',
+  motto: 'Do not adjust your set.',   // = copy.motto.text
+  kicker: 'Page 100',                 // = copy.kicker.text
   mode: 'dark',
   slideShape: 'minimal',
   labels: { material: 'Signal', states: ['Carrier', 'Tuned', 'Intrusion'], statesKind: 'button' },
+  // Editable specimen copy (Brand > Advanced > Specimen copy).
+  copy: {
+    motto: { label: 'Motto', text: 'Do not adjust your set.', warm: 'Stay tuned, we are right here.' },
+    kicker: { label: 'Kicker above the headline', text: 'Page 100' },
+    state0: { label: 'State 1 name', text: 'Carrier' },
+    state1: { label: 'State 2 name', text: 'Tuned' },
+    state2: { label: 'State 3 name', text: 'Intrusion', warm: 'Message' },
+    cardIdent: { label: 'Test card ident', text: 'ST-9' },
+    cardChannel: { label: 'Test card channel', text: 'CH 43' },
+    cardFreq: { label: 'Test card frequency', text: '4.2 MHZ' },
+    cardHello: { label: 'Test card greeting', text: 'GOOD EVENING.' },
+    notYourSignal: { label: 'Intrusion message', text: 'THIS IS NOT YOUR SIGNAL.', warm: 'THIS SIGNAL IS FOR YOU.' },
+    cardRec: { label: 'Test card record tag', text: 'REC' },
+    pageDate: { label: 'Teletext date', text: 'SAT 11 OCT' },
+    pageTime: { label: 'Teletext time', text: '23:41/07' },
+    key1: { label: 'Fastext key 1', text: 'INDEX' },
+    key2: { label: 'Fastext key 2', text: 'BRAND' },
+    key3: { label: 'Fastext key 3', text: 'TYPE' },
+    key4: { label: 'Fastext key 4', text: 'SIGNAL' },
+    row1: { label: 'Page P101 title', text: 'CHANNEL SELECT' },
+    row2: { label: 'Page P102 title', text: 'TEST CARD / TUNING' },
+    row3: { label: 'Page P103 title', text: 'INDEX · 3 PAGES' },
+  },
   // the teletext page, then its index screens, then the palette and type pages
   layout: { hero: 'centered', palette: 'swatches', sections: 'two-col', order: ['hero', 'sections', 'palette', 'type'] },
   type: { ui: 'body', label: 'body' },
@@ -201,15 +225,15 @@ registerAesthetic({
     const e = escapeHtml;
     const svc = e(String(ctx.brandName || 'Station').trim().split(/\s+/)[0].toUpperCase().slice(0, 12));
     const ti = pbCardCtx(ctx);
-    const keys = [['INDEX', T.r], ['BRAND', T.g], ['TYPE', T.y], ['SIGNAL', T.c]];
+    const keys = [[abCopy(PB_KEY, 'key1'), T.r], [abCopy(PB_KEY, 'key2'), T.g], [abCopy(PB_KEY, 'key3'), T.y], [abCopy(PB_KEY, 'key4'), T.c]];
     // the station ident (client primary) on the black page, lifted until the 17px label holds 4.5:1
     let ident = t.primary;
     for (let k = 0.06; k <= 1 && t.contrast(ident, '#000000') < 4.6; k += 0.06) ident = t.mix('#ffffff', t.primary, k);
     return `<div class="pba">
-      <div class="pba-row pba-r0"><span><span style="color:${ident}">P100</span>&nbsp;&nbsp;<span style="color:${T.y}">${svc} 100</span></span><span style="color:${T.w}">SAT 11 OCT&nbsp;&nbsp;<span style="color:${T.y}">23:41/07</span></span></div>
+      <div class="pba-row pba-r0"><span><span style="color:${ident}">P100</span>&nbsp;&nbsp;<span style="color:${T.y}">${svc} 100</span></span><span style="color:${T.w}">${abCopy(PB_KEY, 'pageDate')}&nbsp;&nbsp;<span style="color:${T.y}">${abCopy(PB_KEY, 'pageTime')}</span></span></div>
       <div class="pba-gfx">
         <div class="pba-grab">${pbIntrusion(ti)}</div>
-        <div class="pba-msg">THIS IS NOT YOUR SIGNAL.</div>
+        <div class="pba-msg">${abCopy(PB_KEY, 'notYourSignal')}</div>
       </div>
       <div class="pba-row pba-r24">${keys.map(k => `<span style="color:${k[1]}">${k[0]}</span>`).join('')}</div>
       <div class="pba-scan"></div>
@@ -245,14 +269,14 @@ registerAesthetic({
   // picture, instead of CSS generated content.
   panels: {
     card(ctx) {
-      return ctx.parts.cardBase().replace('<div class="ab-card">', '<div class="ab-card"><p class="pb-row0">P101&nbsp; CHANNEL SELECT</p>');
+      return ctx.parts.cardBase().replace('<div class="ab-card">', () => `<div class="ab-card"><p class="pb-row0">P101&nbsp; ${abCopy(PB_KEY, 'row1')}</p>`);
     },
     panel(ctx) {
       const card = pbTestCard(pbCardCtx(ctx), escapeHtml(String(ctx.brandName || 'Station').toUpperCase().slice(0, 22)));
-      return ctx.parts.panelBase().replace('<div class="ab-panel">', `<div class="ab-panel"><p class="pb-row0">P102&nbsp; TEST CARD / TUNING</p><div class="pb-card" aria-hidden="true">${card}</div>`);
+      return ctx.parts.panelBase().replace('<div class="ab-panel">', () => `<div class="ab-panel"><p class="pb-row0">P102&nbsp; ${abCopy(PB_KEY, 'row2')}</p><div class="pb-card" aria-hidden="true">${card}</div>`);
     },
     list(ctx) {
-      return ctx.parts.listBase().replace('<ul class="ab-list">', '<ul class="ab-list"><li class="pb-row0">P103&nbsp; INDEX &middot; 3 PAGES</li>');
+      return ctx.parts.listBase().replace('<ul class="ab-list">', () => `<ul class="ab-list"><li class="pb-row0">P103&nbsp; ${abCopy(PB_KEY, 'row3')}</li>`);
     },
   },
 

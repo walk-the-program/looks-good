@@ -103,6 +103,31 @@ registerAesthetic({
   mode: 'dark',
   slideShape: 'minimal',
   labels: { material: 'Signal', states: ['Idle', 'Strobe', 'Melt'], statesKind: 'button' },
+  // Editable specimen copy (Brand > Advanced > Specimen copy): the motto, states and the flyer's printed text.
+  // The made-up sponsor marks on the flyer are decoration and stay as drawn.
+  copy: {
+    motto: { label: 'Motto', text: 'Turn it up until it hums.' },
+    kicker: { label: 'Kicker above the headline', text: 'Doors at midnight' },
+    state0: { label: 'State 1 name', text: 'Idle' },
+    state1: { label: 'State 2 name', text: 'Strobe' },
+    state2: { label: 'State 3 name', text: 'Melt' },
+    flyerDate: { label: 'Flyer date (top)', text: 'FRI 23.10' },
+    slogan: { label: 'Flyer slogan', text: 'DANCE \u00B7 FEEL \u00B7 REPEAT\u2122' },
+    sloganJp: { label: 'Flyer slogan, second script', text: '\u30C0\u30F3\u30B9 \u30FB \u30EA\u30D4\u30FC\u30C8' },
+    dateLabel: { label: 'Info grid: date label', text: 'DATE' },
+    dateValue: { label: 'Info grid: date', text: 'FRI 23.10 \u2192 SAT 04:00' },
+    placeLabel: { label: 'Info grid: place label', text: 'PLACE' },
+    placeValue: { label: 'Info grid: place', text: 'WAREHOUSE 04' },
+    doorsLabel: { label: 'Info grid: doors label', text: 'DOORS' },
+    doorsValue: { label: 'Info grid: doors', text: '23:00 \u00B7 NO RE-ENTRY', warm: '23:00 \u00B7 COME AND GO' },
+    lineupLabel: { label: 'Info grid: line-up label', text: 'LINEUP' },
+    lineupValue: { label: 'Info grid: line-up ({name} = brand)', text: '{name} / VOID.EXE' },
+    ticket: { label: 'Ticket stub text', text: 'ADMIT ONE' },
+    ticketAge: { label: 'Ticket stub age mark', text: '18+', warm: 'ALL' },
+    kata: { label: 'Flyer side line (Japanese)', text: '\u30B7\u30B0\u30CA\u30EB\u30FB\u30EB\u30FC\u30E0\u30FB\u30C0\u30F3\u30B9\u30FB\u30EA\u30D4\u30FC\u30C8' },
+    spine: { label: 'Flyer spine line ({name} = brand)', text: 'CAT.NO ACG-030 \u2731 {name}\u2122 \u2731 1-800-NO-SLEEP \u2731 \u00AE2026 \u2731 SIGNAL ROOM \u2731 ACG-030' },
+    strip: { label: 'Event strip', text: '\u2731 DOORS 23:00 \u2731 SIGNAL ROOM \u2731 NO PHOTOS \u2731 BRING EARPLUGS \u2731 DOORS 23:00 \u2731 SIGNAL ROOM \u2731', warm: '\u2731 DOORS 23:00 \u2731 SIGNAL ROOM \u2731 PHONES AWAY \u2731 BRING EARPLUGS \u2731 DOORS 23:00 \u2731 SIGNAL ROOM \u2731' },
+  },
   layout: { hero: 'split', palette: 'strips', sections: 'two-col', subcopy: true },
   type: { ui: 'body', label: 'mono', display: 1 },
   highlight: 'custom',
@@ -261,21 +286,21 @@ registerAesthetic({
       <div class="aca-rip2"></div>
       <div class="aca-rip"></div>
       ${reg}<span class="aca-reg-b">${reg}</span>
-      <div class="aca-top"><span>FRI 23.10</span><span class="aca-no">N° 030<i class="aca-bc" aria-hidden="true"></i></span></div>
+      <div class="aca-top"><span>${abCopy(this, 'flyerDate')}</span><span class="aca-no">N° 030<i class="aca-bc" aria-hidden="true"></i></span></div>
       <p class="aca-word"><span style="font-size:${wsz}cqw" data-w="${word}">${word}</span></p>
-      <p class="aca-slogan">DANCE · FEEL · REPEAT™ <em>ダンス ・ リピート</em></p>
+      <p class="aca-slogan">${abCopy(this, 'slogan')} <em>${abCopy(this, 'sloganJp')}</em></p>
       <div class="aca-grid">
-        <div><b>DATE</b>FRI 23.10 → SAT 04:00</div>
-        <div><b>PLACE</b>WAREHOUSE 04</div>
-        <div><b>DOORS</b>23:00 · NO RE-ENTRY</div>
-        <div><b>LINEUP</b>${name} / VOID.EXE</div>
+        <div><b>${abCopy(this, 'dateLabel')}</b>${abCopy(this, 'dateValue')}</div>
+        <div><b>${abCopy(this, 'placeLabel')}</b>${abCopy(this, 'placeValue')}</div>
+        <div><b>${abCopy(this, 'doorsLabel')}</b>${abCopy(this, 'doorsValue')}</div>
+        <div><b>${abCopy(this, 'lineupLabel')}</b>${abCopy(this, 'lineupValue').replace('{name}', () => name)}</div>
       </div>
-      <div class="aca-ticket"><i>✱</i>ADMIT ONE<b>18+</b><em>№ 000417</em></div>
-      <p class="aca-kata" aria-hidden="true">シグナル・ルーム・ダンス・リピート</p>
+      <div class="aca-ticket"><i>✱</i>${abCopy(this, 'ticket')}<b>${abCopy(this, 'ticketAge')}</b><em>№ 000417</em></div>
+      <p class="aca-kata" aria-hidden="true">${abCopy(this, 'kata')}</p>
       <div class="aca-picto">${picto}</div>
-      <p class="aca-spine" aria-hidden="true">CAT.NO ACG-030 ✱ ${name}™ ✱ 1-800-NO-SLEEP ✱ ®2026 ✱ SIGNAL ROOM ✱ ACG-030</p>
+      <p class="aca-spine" aria-hidden="true">${abCopy(this, 'spine').replace('{name}', () => name)}</p>
       <div class="aca-spons">${marks}</div>
-      <div class="aca-strip"><span>✱ DOORS 23:00 ✱ SIGNAL ROOM ✱ NO PHOTOS ✱ BRING EARPLUGS ✱ DOORS 23:00 ✱ SIGNAL ROOM ✱</span></div>
+      <div class="aca-strip"><span>${abCopy(this, 'strip')}</span></div>
     </div>`;
   },
 

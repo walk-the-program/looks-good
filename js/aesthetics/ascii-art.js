@@ -246,8 +246,8 @@ function aaPanelHtml(key, frame) {
   const e = aaLive[key];
   if (!e) return '';
   const rows = aaRows(e.cells, e.cols, e.rows, frame);
-  const status = `${e.slug} · frame ${String(frame).padStart(4, '0')}`;
-  return [`<span class="aa-bd">${escapeHtml(aaFrameTop(e.slug + '.txt', e.cols))}</span>`, ...rows, `<span class="aa-bd aa-live">${escapeHtml(aaFrameFoot(status, e.cols))}</span>`].join('\n');
+  const status = abCopyRaw('ascii-art', 'frameStatus').replace('{slug}', () => e.slug).replace('{n}', () => String(frame).padStart(4, '0'));
+  return [`<span class="aa-bd">${escapeHtml(aaFrameTop(abCopyRaw('ascii-art', 'frameFile').replace('{slug}', () => e.slug), e.cols))}</span>`, ...rows, `<span class="aa-bd aa-live">${escapeHtml(aaFrameFoot(status, e.cols))}</span>`].join('\n');
 }
 function aaPanel(ctx, cols, rows, cls) {
   const st = ctx.state || (typeof state !== 'undefined' ? state : null);
@@ -311,6 +311,16 @@ registerAesthetic({
   mode: 'dark',
   slideShape: 'minimal',
   labels: { material: 'Characters', states: ['Sparse', 'Dense', 'Solid'], statesKind: 'swatch' },
+  // Editable specimen copy (Brand > Advanced > Specimen copy). Frame strings flex: the frame rules are padded by width.
+  copy: {
+    motto: { label: 'Motto', text: 'Everything is a character.' },
+    kicker: { label: 'Kicker above the headline', text: 'cat brand.txt' },
+    state0: { label: 'State 1 name', text: 'Sparse' },
+    state1: { label: 'State 2 name', text: 'Dense' },
+    state2: { label: 'State 3 name', text: 'Solid' },
+    frameFile: { label: 'Character frame title ({slug} = brand slug)', text: '{slug}.txt' },
+    frameStatus: { label: 'Character frame status ({slug}, {n} = frame number)', text: '{slug} \u00B7 frame {n}' },
+  },
   layout: { hero: 'centered', palette: 'swatches', sections: 'two-col' },
   type: { ui: 'mono', label: 'mono' },
   highlight: 'custom',

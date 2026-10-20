@@ -57,6 +57,93 @@ function abHookHtml(def, fn, ctx, hook = 'hook', ...rest) {
   return typeof html === 'string' ? html : '';
 }
 
+/* ---------------- editable specimen copy ---------------- */
+
+// An aesthetic's specimen / flavour text lives in def.copy (see the contract in
+// js/aesthetics/registry.js) and is read ONLY through abCopy / abCopyRaw, so the owner
+// can rewrite it per brand (Brand tab > Advanced > Specimen copy) and Warmer voice can
+// swap in softer defaults. Overrides live at state.content.copy[aestheticKey][copyKey].
+const AB_COPY_WARNED = new Set();
+
+// `d` is a def or an aesthetic key (hooks that are plain functions pass the key string).
+function abCopyDefOf(d) { return typeof d === 'string' ? aestheticByKey(d) : d; }
+function abCopyState(st) { return st || (typeof state !== 'undefined' ? state : null); }
+
+// The owner's override for one entry ('' when there is none).
+function abCopyUser(d, key, st) {
+  const def = abCopyDefOf(d), s = abCopyState(st);
+  const v = s && s.content && s.content.copy && s.content.copy[def && def.key] && s.content.copy[def.key][key];
+  return typeof v === 'string' && v.trim() ? v : '';
+}
+
+// Is the brand speaking Warmer or Own words (the voices that prefer an entry's `warm` text)?
+function abCopySoft(st) {
+  const s = abCopyState(st);
+  if (typeof brandVoice !== 'function' || !s) return false;
+  const m = brandVoice(s).mode;
+  return m === 'warmer' || m === 'own';
+}
+
+// The default for one entry without the owner's override: `warm` in Warmer / Own words, else `text`.
+function abCopyDefault(d, key, st) {
+  const def = abCopyDefOf(d);
+  const entry = def && def.copy && def.copy[key];
+  if (!entry || typeof entry !== 'object') {
+    const id = `${def && def.key}|${key}`;
+    if (!AB_COPY_WARNED.has(id)) { AB_COPY_WARNED.add(id); if (typeof console !== 'undefined') console.warn(`abCopy: unknown copy key "${key}" for aesthetic "${def && def.key}"`); }
+    return '';
+  }
+  return abCopySoft(st) && entry.warm ? String(entry.warm) : String(entry.text == null ? '' : entry.text);
+}
+
+// The resolved string, unescaped: the owner's override, else the default. For SVG <text>,
+// attributes (the caller escapes) and the brief.
+function abCopyRaw(d, key, st) {
+  return abCopyUser(d, key, st) || abCopyDefault(d, key, st);
+}
+
+// The same, HTML-escaped: what a template puts between tags or inside an attribute.
+function abCopy(d, key, st) {
+  return escapeHtml(abCopyRaw(d, key, st));
+}
+
+// Entries the owner has rewritten for one aesthetic: [{ key, label, text }].
+function abCopyEdited(d, st) {
+  const def = abCopyDefOf(d);
+  if (!def || !def.copy) return [];
+  return Object.keys(def.copy).filter(k => abCopyUser(def, k, st))
+    .map(k => ({ key: k, label: def.copy[k].label || k, text: abCopyUser(def, k, st) }));
+}
+
+// The aesthetics whose copy is on screen for a brand state: the base and, in a blend, the donor.
+function abActiveDefs(st) {
+  const s = abCopyState(st);
+  if (!s) return [];
+  const base = resolveAestheticDef(s);
+  const out = [base];
+  const w = s.blend && s.blend.with;
+  if (w && w !== base.key && w !== aestheticBaseKey(base.key)) {
+    const donor = AESTHETICS.find(a => a.key === w);
+    if (donor) out.push(donor);
+  }
+  return out;
+}
+
+// The kicker line above the headline: copy.kicker when the aesthetic declares it (not in a blend,
+// whose kicker joins the two styles), else def.kicker, else the descriptor.
+function abKicker(def, st) {
+  if (def.copy && def.copy.kicker && !def.blend) return abCopyRaw(def, 'kicker', st);
+  return def.kicker || def.descriptor;
+}
+
+// The three state names the board shows: def.labels.states, with any state0 / state1 / state2
+// copy entries read through the copy layer. A blend that took the donor's material keeps its own names.
+function abStateNames(def, st) {
+  const base = (def.labels && def.labels.states) || [];
+  if (!def.copy || (def.blend && def.blend.channels && def.blend.channels.material)) return base;
+  return base.map((n, i) => (def.copy['state' + i] ? abCopyRaw(def, 'state' + i, st) : n));
+}
+
 // def.tokens(t, state): the aesthetic's extra CSS variables ({} when absent, broken or not
 // an object). `state` is the view state being rendered (a blend swaps the faces), so
 // weights and copy are read from it, never from the global.
@@ -533,7 +620,8 @@ function abLabelsCtx(labels) {
 function abBoardParts(state, def) {
   const t = boardTokens(state, def);
   const copy = effectiveContent();
-  const labels = def.labels || { material: 'Touch & depth', states: ['One', 'Two', 'Three'] };
+  const labels0 = def.labels || { material: 'Touch & depth', states: ['One', 'Two', 'Three'] };
+  const labels = Object.assign({}, labels0, { states: abStateNames(def, state) });
   const ctx = {
     t, key: def.key, state,
     brandName: copy.brandName, tagline: copy.tagline,
@@ -576,7 +664,7 @@ function abBoardParts(state, def) {
 
   P.hero = () => `<section class="ab-hero">
       <div class="ab-hero-copy">
-        <p class="ab-kicker">${e(def.kicker || def.descriptor)}</p>
+        <p class="ab-kicker">${e(abKicker(def, state))}</p>
         ${abHeadlineH2(def, ctx, copy.tagline)}${layout.subcopy
     ? `\n        <p class="ab-subcopy"><span class="ab-sub-lead">A design language for ${e(copy.brandName)}</span><span class="ab-sub-rest"> — type, color and material in one place.</span></p>` : ''}
       </div>
