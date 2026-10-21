@@ -176,7 +176,15 @@ A third home mode beside **Brands | Patterns**: **Logos**. It works like Pattern
 3. **Logo system:** master and linked outputs, colour versions, legibility checks on any document, clear space, logo pack export, mockups.
 4. **Delight:** shuffle with pins, style templates, text on a path, OpenType features, version compare, pattern fills.
 
-## Questions to settle before building
+## Decisions (2026-10-20, Walker)
+
+- **Scope:** logos only. Other brand graphics can come later.
+- **Pen tool, boolean operations and masks:** phase 2. Phase 1 is the canvas core.
+- **Brand link:** linked by default. A logo made from a brand follows that brand's colours and fonts, and each one can be unlinked.
+- **Logo Studio:** stays in the brand's Logo tab as the quick path, with an "Open in Logos" button for full editing.
+- **Still open:** bundling an open-source icon set (Lucide) and a geometry library (paper.js). These are phase 2 items.
+
+## Questions that were open before building
 
 1. **Logos only, or any brand graphic?** Should the module also make social posts, banners or app-store art? That changes artboards, templates and the name (a "Design" module, not "Logos").
 2. **Brand-linked by default?** Should a new logo start attached to the brand you came from, with its colours linked, or start standalone like a pattern?
