@@ -117,13 +117,17 @@ const PatternsHome = (function () {
     window.scrollTo(0, 0);
   }
 
+  function leaveLogos() { if (typeof LogosHome !== 'undefined') LogosHome.hide(); }
+
   function showBrands() {
+    leaveLogos();
     closeTool(true);
     saveMode('brands');
     setView('library');
   }
 
   async function showGrid() {
+    leaveLogos();
     saveMode('patterns');
     setView('patterns');
     closeTool(true);
@@ -227,7 +231,9 @@ const PatternsHome = (function () {
 
   function wire() {
     document.querySelectorAll('.mode-switch button').forEach(b => b.addEventListener('click', () => {
-      if (b.dataset.mode === 'patterns') showGrid(); else showBrands();
+      if (b.dataset.mode === 'patterns') showGrid();
+      else if (b.dataset.mode === 'logos') { closeTool(true); if (typeof LogosHome !== 'undefined') LogosHome.show(); }
+      else showBrands();
     }));
     el.search.addEventListener('input', () => { filters.q = el.search.value; renderGrid(); });
     el.source.addEventListener('click', e => {

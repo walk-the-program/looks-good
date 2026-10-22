@@ -517,11 +517,26 @@ final class AppDelegate: NSObject, NSApplicationDelegate, WKNavigationDelegate, 
         return dir
     }()
 
-    func brandFile(_ id: String) -> URL? {
+    /// ~/Library/Application Support/Branding Designer/logos (Logos mode documents)
+    lazy var logosDir: URL = {
+        let dir = brandsDir.deletingLastPathComponent().appendingPathComponent("logos")
+        try? FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
+        return dir
+    }()
+
+    /// The folder for a `library` message: no collection = brands (unchanged); "logos" = logos; anything else is refused.
+    func libraryDir(_ collection: String?) -> URL? {
+        guard let c = collection else { return brandsDir }
+        return c == "logos" ? logosDir : nil
+    }
+
+    func libraryFile(_ id: String, in dir: URL) -> URL? {
         // ids are hex from the web layer; refuse anything that could leave the folder
         let ok = !id.isEmpty && id.count <= 64 && id.allSatisfy { $0.isLetter || $0.isNumber || $0 == "-" || $0 == "_" }
-        return ok ? brandsDir.appendingPathComponent("\(id).json") : nil
+        return ok ? dir.appendingPathComponent("\(id).json") : nil
     }
+
+    func brandFile(_ id: String) -> URL? { libraryFile(id, in: brandsDir) }
 
     func userContentController(_ ucc: WKUserContentController, didReceive message: WKScriptMessage,
                                replyHandler: @escaping (Any?, String?) -> Void) {
@@ -530,19 +545,20 @@ final class AppDelegate: NSObject, NSApplicationDelegate, WKNavigationDelegate, 
         if message.name == "wallpaper" { wallpaper(message.body, replyHandler); return }
         guard message.name == "library", let body = message.body as? [String: Any],
               let op = body["op"] as? String else { replyHandler(nil, "bad request"); return }
+        guard let dir = libraryDir(body["collection"] as? String) else { replyHandler(nil, "unknown collection"); return }
         let fm = FileManager.default
         switch op {
         case "list":
-            let files = (try? fm.contentsOfDirectory(at: brandsDir, includingPropertiesForKeys: nil)) ?? []
+            let files = (try? fm.contentsOfDirectory(at: dir, includingPropertiesForKeys: nil)) ?? []
             // [file name without .json, file text]; JS keys each record by its file name.
             let rows: [[String]] = files.filter { $0.pathExtension == "json" }
                 .map { [$0.deletingPathExtension().lastPathComponent, (try? String(contentsOf: $0, encoding: .utf8)) ?? ""] }
             replyHandler(rows, nil)
         case "get":
-            guard let id = body["id"] as? String, let url = brandFile(id) else { replyHandler(nil, "bad id"); return }
+            guard let id = body["id"] as? String, let url = libraryFile(id, in: dir) else { replyHandler(nil, "bad id"); return }
             replyHandler(try? String(contentsOf: url, encoding: .utf8), nil)
         case "put":
-            guard let id = body["id"] as? String, let url = brandFile(id), let json = body["json"] as? String else {
+            guard let id = body["id"] as? String, let url = libraryFile(id, in: dir), let json = body["json"] as? String else {
                 replyHandler(false, "bad request"); return
             }
             do {
@@ -552,7 +568,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, WKNavigationDelegate, 
                 replyHandler(false, error.localizedDescription)
             }
         case "delete":
-            guard let id = body["id"] as? String, let url = brandFile(id) else { replyHandler(nil, "bad id"); return }
+            guard let id = body["id"] as? String, let url = libraryFile(id, in: dir) else { replyHandler(nil, "bad id"); return }
             try? fm.removeItem(at: url)
             replyHandler(true, nil)
         default:

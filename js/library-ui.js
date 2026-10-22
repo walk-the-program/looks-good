@@ -458,6 +458,7 @@ const LibraryUI = (function () {
     await refresh();
     document.body.dataset.view = 'library';
     if (typeof PatternsHome !== 'undefined') PatternsHome.start();   // may switch to the remembered Patterns mode
+    if (typeof LogosHome !== 'undefined') LogosHome.start();         // or open #logo=<id> / the remembered Logos mode
   }
 
   return { init, refresh, newBrandFlow };

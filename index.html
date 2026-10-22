@@ -83,12 +83,15 @@
 <link rel="stylesheet" href="css/logo-studio.css" />
 <link rel="stylesheet" href="css/style-gallery.css" />
 <link rel="stylesheet" href="css/patterns-home.css" />
+<link rel="stylesheet" href="css/logos-editor.css" />
+<link rel="stylesheet" href="css/logos.css" />
+<link rel="stylesheet" href="css/logos-chrome.css" />
 <link rel="stylesheet" href="css/command-palette.css" />
 </head>
 <body data-view="library">
 
 <section class="library" id="library" aria-label="Brand library">
-  <div class="lib-top"><span class="logo-mark" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0 16 8 8 16 0 8Z"/></svg></span><span>Branding Designer</span><div class="mode-switch" role="group" aria-label="Home mode"><button type="button" data-mode="brands" aria-pressed="true">Brands</button><button type="button" data-mode="patterns" aria-pressed="false">Patterns</button></div></div>
+  <div class="lib-top"><span class="logo-mark" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0 16 8 8 16 0 8Z"/></svg></span><span>Branding Designer</span><div class="mode-switch" role="group" aria-label="Home mode"><button type="button" data-mode="brands" aria-pressed="true">Brands</button><button type="button" data-mode="patterns" aria-pressed="false">Patterns</button><button type="button" data-mode="logos" aria-pressed="false">Logos</button></div></div>
   <div class="lib-inner">
     <header class="lib-head">
       <div>
@@ -108,7 +111,7 @@
 </section>
 
 <section class="patterns" id="patterns" aria-label="Patterns">
-  <div class="lib-top" id="ptTop"><span class="logo-mark" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0 16 8 8 16 0 8Z"/></svg></span><span>Branding Designer</span><div class="mode-switch" role="group" aria-label="Home mode"><button type="button" data-mode="brands" aria-pressed="false">Brands</button><button type="button" data-mode="patterns" aria-pressed="true">Patterns</button></div></div>
+  <div class="lib-top" id="ptTop"><span class="logo-mark" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0 16 8 8 16 0 8Z"/></svg></span><span>Branding Designer</span><div class="mode-switch" role="group" aria-label="Home mode"><button type="button" data-mode="brands" aria-pressed="false">Brands</button><button type="button" data-mode="patterns" aria-pressed="true">Patterns</button><button type="button" data-mode="logos" aria-pressed="false">Logos</button></div></div>
   <div class="lib-inner" id="ptHome">
     <header class="lib-head">
       <div>
@@ -145,6 +148,59 @@
       </div>
     </div>
     <iframe class="pt-frame" id="ptFrame" title="Pattern tool" allow="clipboard-write; fullscreen"></iframe>
+  </div>
+</section>
+
+<section class="logos" id="logos" aria-label="Logos">
+  <div id="lgHome">
+    <div class="lib-top" id="lgTop"><span class="logo-mark" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0 16 8 8 16 0 8Z"/></svg></span><span>Branding Designer</span><div class="mode-switch" role="group" aria-label="Home mode"><button type="button" data-mode="brands" aria-pressed="false">Brands</button><button type="button" data-mode="patterns" aria-pressed="false">Patterns</button><button type="button" data-mode="logos" aria-pressed="true">Logos</button></div></div>
+    <div class="lib-inner">
+      <header class="lib-head">
+        <div>
+          <h1>Logos</h1>
+          <p class="lib-count" id="lgCount"></p>
+        </div>
+        <button type="button" class="btn btn-primary" id="lgNew">New logo</button>
+      </header>
+      <div class="pt-bar" id="lgBar" hidden>
+        <input type="search" class="pt-search" id="lgSearch" placeholder="Search logos" aria-label="Search logos" autocomplete="off" spellcheck="false" />
+      </div>
+      <div class="lib-empty" id="lgEmpty" hidden>
+        <div class="lib-empty-mark" aria-hidden="true">Aa</div>
+        <h2>No logos yet</h2>
+        <p>Draw a logo from scratch, or start from a brand or one of its Logo Studio presets.</p>
+        <button type="button" class="btn btn-primary" id="lgEmptyNew">New logo</button>
+      </div>
+      <div class="lib-empty" id="lgNone" hidden>
+        <h2>No logos match</h2>
+        <p>Try a different search.</p>
+        <button type="button" class="btn btn-ghost" id="lgClear">Clear search</button>
+      </div>
+      <div class="lib-grid" id="lgGrid" hidden></div>
+    </div>
+  </div>
+  <!-- The logo editor shell (js/logos/home.js). The empty slots are filled by LogoEditor (canvas)
+       and LogoChrome (toolbar, layers, inspector, zoom, export). -->
+  <div class="le" id="logoEditor" hidden>
+    <header class="le-top" id="leTop">
+      <button type="button" class="btn btn-ghost btn-small" id="leBack"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>Logos</button>
+      <input type="text" class="le-name" id="leName" aria-label="Logo name" autocomplete="off" spellcheck="false" maxlength="80" />
+      <span class="le-brand" id="leBrand">No brand</span>
+      <span class="le-status" id="leStatus" role="status" aria-live="polite">Saved</span>
+      <span class="le-spacer"></span>
+      <button type="button" class="btn btn-primary btn-small" id="leExportBtn" disabled title="Export arrives with the editor tools">Export</button>
+    </header>
+    <div class="le-body">
+      <aside class="le-left" aria-label="Tools and layers">
+        <div class="le-toolbar" id="leToolbar"></div>
+        <div class="le-layers" id="leLayers"></div>
+      </aside>
+      <div class="le-center">
+        <div class="le-canvas" id="leCanvas"></div>
+        <div class="le-zoom" id="leZoom"></div>
+      </div>
+      <aside class="le-inspector" id="leInspector" aria-label="Inspector"></aside>
+    </div>
   </div>
 </section>
 
@@ -881,6 +937,13 @@
 <script src="js/logo-engine.js"></script>
 <script src="js/logo-studio.js"></script>
 <script src="js/style-gallery.js"></script>
+<script src="js/logos/doc.js"></script>
+<script src="js/logos/render.js"></script>
+<script src="js/logos/editor.js"></script>
+<script src="js/logos/store.js"></script>
+<script src="js/logos/chrome.js"></script>
+<script src="js/logos/attach.js"></script>
+<script src="js/logos/home.js"></script>
 <script src="js/patterns-home.js"></script>
 <script src="js/command-palette.js"></script>
 </body>

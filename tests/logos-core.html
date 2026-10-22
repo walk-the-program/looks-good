@@ -1,0 +1,439 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Logos core test</title>
+<link rel="stylesheet" href="../css/styles.css">
+<link rel="stylesheet" href="../css/logos-editor.css">
+<style>
+  body { font: 14px/1.5 -apple-system, system-ui, sans-serif; margin: 24px; color: #1c1f26; background: #fff; }
+  .row { padding: 2px 0; } .pass { color: #0a7a2f; } .fail { color: #b00020; font-weight: 600; }
+  #stage { width: 800px; height: 500px; border: 1px solid #ccc; margin: 16px 0; }
+</style>
+</head>
+<body>
+<h1>Logos core: doc, render, editor</h1>
+<div id="out"></div>
+<div id="stage"></div>
+<script src="../js/logo-engine.js"></script>
+<script src="../js/logos/doc.js"></script>
+<script src="../js/logos/render.js"></script>
+<script src="../js/logos/editor.js"></script>
+<script>
+(function () {
+  'use strict';
+  const REF = '../docs/mockups/nominal-logo/';
+  const results = [];
+  window.__logosCoreResults = results;
+  window.__logosCoreDone = false;
+  const out = document.getElementById('out');
+  const stage = document.getElementById('stage');
+  function record(name, pass, detail) {
+    results.push({ name: name, pass: !!pass, detail: detail || '' });
+    const div = document.createElement('div');
+    div.className = 'row ' + (pass ? 'pass' : 'fail');
+    div.textContent = (pass ? 'PASS' : 'FAIL') + '  ' + name + (detail ? '  -  ' + detail : '');
+    out.appendChild(div);
+  }
+  const near = function (a, b, e) { return Math.abs(a - b) <= (e == null ? 1e-6 : e); };
+  const sleep = function (ms) { return new Promise(function (r) { setTimeout(r, ms); }); };
+  const rect = function (x, y, w, h, extra) { return Object.assign({ type: 'rect', x: x, y: y, w: w, h: h }, extra || {}); };
+
+  function freshEditor(w, h) {
+    stage.innerHTML = '';
+    const doc = LogoDoc.create({ name: 'T' });
+    if (w) { doc.artboard.w = w; doc.artboard.h = h; }
+    return LogoEditor.mount(stage, doc, { tokens: LogoDoc.defaultTokens() });
+  }
+  function viewBox(svg) { return /viewBox="([^"]+)"/.exec(svg)[1].trim().split(/\s+/).map(Number); }
+  function raster(svg, wpx) {
+    const p = viewBox(svg), H = Math.round(wpx * p[3] / p[2]);
+    return new Promise(function (resolve, reject) {
+      const img = new Image();
+      img.onload = function () {
+        const c = document.createElement('canvas'); c.width = wpx; c.height = H;
+        const x = c.getContext('2d'); x.drawImage(img, 0, 0, wpx, H);
+        resolve(x.getImageData(0, 0, wpx, H));
+      };
+      img.onerror = function () { reject(new Error('could not draw SVG')); };
+      img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
+    });
+  }
+  function pixelDiff(a, b) {
+    if (a.width !== b.width || a.height !== b.height) return { frac: 1, n: -1, size: [a.width, a.height, b.width, b.height] };
+    let n = 0;
+    for (let i = 0; i < a.data.length; i += 4) {
+      if (Math.abs(a.data[i] - b.data[i]) > 64 || Math.abs(a.data[i + 1] - b.data[i + 1]) > 64 ||
+          Math.abs(a.data[i + 2] - b.data[i + 2]) > 64 || Math.abs(a.data[i + 3] - b.data[i + 3]) > 64) n++;
+    }
+    return { frac: n / (a.width * a.height), n: n };
+  }
+  function pe(type, el, pt, extra) {
+    el.dispatchEvent(new PointerEvent(type, Object.assign({ bubbles: true, cancelable: true, pointerId: 7, pointerType: 'mouse', button: 0, clientX: pt[0], clientY: pt[1] }, extra || {})));
+  }
+  async function dragPath(ed, from, to, steps, extra) {
+    const svg = ed.svg(), a = ed.clientPoint(from[0], from[1]), b = ed.clientPoint(to[0], to[1]);
+    pe('pointerdown', svg, a, extra);
+    for (let i = 1; i <= steps; i++) pe('pointermove', svg, [a[0] + (b[0] - a[0]) * i / steps, a[1] + (b[1] - a[1]) * i / steps], extra);
+    pe('pointerup', svg, b, extra);
+  }
+
+  const NOMINAL = {
+    word: 'NOMINAL', wordFont: { family: 'Instrument Serif', weight: 400, style: 'normal' },
+    tracking: -62, case: 'none',
+    device: { type: 'strip', crop: 610, height: 170 },
+    secondary: { text: 'STUDIOS', font: { family: 'Inter', weight: 500, style: 'normal', axes: { opsz: 14 } },
+                 size: 118, gap: 90, spread: true, align: 'left', tracking: 0 }
+  };
+
+  window.addEventListener('error', function (e) { record('uncaught error', false, e.message + ' @ ' + (e.filename || '') + ':' + e.lineno); });
+
+  async function run() {
+    await LogoEngine.ready();
+
+    // (a) create / add / update / remove / undo / redo
+    try {
+      const ed = freshEditor();
+      const doc = ed.doc();
+      const v = LogoDoc.validate(doc);
+      const id = ed.add(rect(10, 20, 100, 50));
+      const n0 = doc.nodes.length;
+      ed.update([id], { x: 55, fill: { ref: 'primary' } });
+      const upd = ed.node(id).x === 55;
+      ed.remove([id]);
+      const removed = doc.nodes.length === 0;
+      ed.undo();
+      const back = doc.nodes.length === 1 && ed.node(id).x === 55;
+      ed.undo();
+      const back2 = ed.node(id).x === 10;
+      ed.undo();
+      const gone = doc.nodes.length === 0;
+      ed.redo(); ed.redo(); ed.redo();
+      const fin = doc.nodes.length === 0 && !ed.canRedo();
+      const ok = v.ok && n0 === 1 && upd && removed && back && back2 && gone && fin && LogoDoc.validate(doc).ok === true;
+      record('(a) add/update/remove/undo/redo round-trip', ok, JSON.stringify({ valid: v.ok, n0: n0, upd: upd, removed: removed, back: back, back2: back2, gone: gone, fin: fin, errors: LogoDoc.validate(doc).errors }));
+      // history cap
+      const e2 = freshEditor(); const rid = e2.add(rect(0, 0, 10, 10));
+      for (let i = 0; i < 230; i++) e2.update([rid], { x: i + 1 });
+      let steps = 0; while (e2.canUndo()) { e2.undo(); steps++; }
+      record('(a2) undo history capped at 200', steps === 200, 'undo steps ' + steps);
+      // text node: layout and boxes
+      const e3 = freshEditor();
+      const tid = e3.add({ type: 'text', text: 'Hello', size: 100 });
+      await sleep(400);
+      const tn = e3.node(tid);
+      record('(a3) text node lays out with real glyph outlines', tn.w > 100 && tn.h === 120 && /path/.test(stage.innerHTML) && stage.querySelector('[data-id="' + tid + '"]').getAttribute('d').length > 100,
+        'w=' + tn.w.toFixed(1) + ' h=' + tn.h + ' fill=' + JSON.stringify(tn.fill) + ' font=' + JSON.stringify(tn.font));
+    } catch (e) { record('(a) round-trip', false, (e && (e.message + ' @ ' + e.stack)) || String(e)); }
+
+    // (b) align / distribute
+    try {
+      const ed = freshEditor(1200, 600);
+      const A = ed.add(rect(10, 20, 50, 30)), B = ed.add(rect(210, 100, 30, 70)), C = ed.add(rect(100, 60, 80, 40));
+      const bx = function (id) { const n = ed.node(id); return [n.x, n.y, n.w, n.h]; };
+      const exp = function (name, got, want) { return { name: name, ok: got.every(function (v, i) { return near(v, want[i]); }), got: got, want: want }; };
+      const checks = [];
+      const run1 = function (fn, snapshot) { ed.select([A, B, C]); fn(); return snapshot(); };
+      checks.push(exp('left', run1(function () { ed.align('left', 'selection'); }, function () { return [bx(A)[0], bx(B)[0], bx(C)[0]]; }), [10, 10, 10]));
+      ed.undo();
+      checks.push(exp('right', run1(function () { ed.align('right', 'selection'); }, function () { return [bx(A)[0], bx(B)[0], bx(C)[0]]; }), [190, 210, 160]));
+      ed.undo();
+      checks.push(exp('hcenter', run1(function () { ed.align('hcenter', 'selection'); }, function () { return [bx(A)[0], bx(B)[0], bx(C)[0]]; }), [100, 110, 85]));
+      ed.undo();
+      checks.push(exp('top', run1(function () { ed.align('top', 'selection'); }, function () { return [bx(A)[1], bx(B)[1], bx(C)[1]]; }), [20, 20, 20]));
+      ed.undo();
+      checks.push(exp('bottom', run1(function () { ed.align('bottom', 'selection'); }, function () { return [bx(A)[1], bx(B)[1], bx(C)[1]]; }), [140, 100, 130]));
+      ed.undo();
+      checks.push(exp('vcenter', run1(function () { ed.align('vcenter', 'selection'); }, function () { return [bx(A)[1], bx(B)[1], bx(C)[1]]; }), [80, 60, 75]));
+      ed.undo();
+      checks.push(exp('artboard hcenter', run1(function () { ed.align('hcenter', 'artboard'); }, function () { return [bx(A)[0], bx(B)[0], bx(C)[0]]; }), [575, 585, 560]));
+      ed.undo();
+      checks.push(exp('distribute h', run1(function () { ed.distribute('h'); }, function () { return [bx(A)[0], bx(C)[0], bx(B)[0]]; }), [10, 95, 210]));
+      ed.undo();
+      checks.push(exp('distribute v', run1(function () { ed.distribute('v'); }, function () { return [bx(A)[1], bx(C)[1], bx(B)[1]]; }), [20, 55, 100]));
+      // v: sorted by y A(20..50) C(60..100) B(100..170): span 150, sum 30+40+70=140, gap 5 -> A 20, C 55, B 100
+      const bad = checks.filter(function (c) { return !c.ok; });
+      record('(b) align left/hcenter/right/top/vcenter/bottom + distribute h on 3 rects exact', bad.length === 0,
+        bad.length ? JSON.stringify(bad) : checks.length + ' checks exact');
+    } catch (e) { record('(b) align/distribute', false, (e && (e.message + ' @ ' + e.stack)) || String(e)); }
+
+    // (c) group / ungroup preserves world positions (rotation, nesting, flips)
+    try {
+      const ed = freshEditor(1200, 600);
+      const A = ed.add(rect(100, 100, 80, 40, { rotation: 30 })), B = ed.add(rect(300, 200, 60, 60, { rotation: -15, flipX: true }));
+      const box = function (id) { return ed.worldBox(id).map(function (v) { return Math.round(v * 1e6) / 1e6; }); };
+      const before = [box(A), box(B)];
+      const gid = ed.group([A, B]);
+      const grouped = [box(A), box(B)];
+      ed.update([gid], { rotation: 25, x: ed.node(gid).x + 40 });
+      const rotated = [box(A), box(B)];
+      ed.ungroup(gid);
+      const after = [box(A), box(B)];
+      const eq = function (p, q) { return p.every(function (v, i) { return near(v, q[i], 1e-4); }); };
+      // flipped group
+      const gid2 = ed.group([A, B]);
+      ed.update([gid2], { flipX: true, rotation: 10 });
+      const flipBefore = [box(A), box(B)];
+      ed.ungroup(gid2);
+      const flipAfter = [box(A), box(B)];
+      // nested groups
+      const gid3 = ed.group([A, B]), C = ed.add(rect(500, 300, 50, 50));
+      const gid4 = ed.group([gid3, C]);
+      ed.update([gid4], { rotation: -40 });
+      const nestBefore = [box(A), box(B), box(C)];
+      ed.ungroup(gid4); ed.ungroup(gid3);
+      const nestAfter = [box(A), box(B), box(C)];
+      const ok = eq(before[0], grouped[0]) && eq(before[1], grouped[1]) && eq(rotated[0], after[0]) && eq(rotated[1], after[1]) &&
+        eq(flipBefore[0], flipAfter[0]) && eq(flipBefore[1], flipAfter[1]) &&
+        nestBefore.every(function (b, i) { return eq(b, nestAfter[i]); }) && ed.doc().nodes.length === 3;
+      record('(c) group/ungroup preserves world positions (rotation, flip, nesting)', ok, ok ? 'ok' : JSON.stringify({ before: before, grouped: grouped, rotated: rotated, after: after, flipBefore: flipBefore, flipAfter: flipAfter, nestBefore: nestBefore, nestAfter: nestAfter }));
+    } catch (e) { record('(c) group/ungroup', false, (e && (e.message + ' @ ' + e.stack)) || String(e)); }
+
+    // (d) fromRecipe(Nominal) vs the reference SVG
+    try {
+      const rec = await LogoDoc.fromRecipe(NOMINAL);
+      const doc = LogoDoc.create({ name: 'Nominal Studios' });
+      doc.nodes = rec.nodes; doc.artboard = rec.artboard;
+      const valid = LogoDoc.validate(doc);
+      const mine = await LogoRender.toSVG(doc, LogoDoc.defaultTokens(), { box: 'content' });
+      const ref = await (await fetch(REF + 'nominal-studios-logo.svg')).text();
+      const vm = viewBox(mine), vr = viewBox(ref);
+      const r = pixelDiff(await raster(mine, 1200), await raster(ref, 1200));
+      record('(d) fromRecipe(Nominal) pixel diff <= 0.5% vs reference', valid.ok && r.frac <= 0.005,
+        (r.n < 0 ? 'size mismatch ' + r.size.join(',') : r.n + ' px differ (' + (r.frac * 100).toFixed(4) + '%)') + '; viewBox mine [' + vm.map(function (v) { return v.toFixed(2); }).join(', ') + '] ref [' + vr.join(', ') + ']; nodes ' + rec.nodes.map(function (n) { return n.type + ':' + n.name; }).join(' | ') + (valid.ok ? '' : '; invalid ' + valid.errors.join(';')));
+      // box + rule recipes at least render and validate
+      const boxRec = await LogoDoc.fromRecipe(Object.assign({}, NOMINAL, { device: { type: 'box', height: 36, gap: 110 }, secondary: null }));
+      const bdoc = LogoDoc.create({}); bdoc.nodes = boxRec.nodes; bdoc.artboard = boxRec.artboard;
+      const bsvg = await LogoRender.toSVG(bdoc, LogoDoc.defaultTokens(), { box: 'content' });
+      const bvb = viewBox(bsvg);
+      const eng = LogoEngine; const faces = await eng.load(Object.assign({}, NOMINAL, { device: { type: 'box' }, secondary: null }));
+      const lock = eng.lockup(Object.assign({}, NOMINAL, { device: { type: 'box' }, secondary: null }), faces);
+      const lb = lock.bounds;
+      record('(d2) fromRecipe box = stroked rect, same extents as engine', LogoDoc.validate(bdoc).ok && near(bvb[2], lb[2] - lb[0], 0.05) && near(bvb[3], lb[3] - lb[1], 0.05),
+        'mine ' + bvb[2].toFixed(2) + 'x' + bvb[3].toFixed(2) + ' engine ' + (lb[2] - lb[0]).toFixed(2) + 'x' + (lb[3] - lb[1]).toFixed(2));
+    } catch (e) { record('(d) fromRecipe', false, (e && (e.message + ' @ ' + e.stack)) || String(e)); }
+
+    // (e) content bounds of a single rect = its box ; (f) toPNG width
+    try {
+      const doc = LogoDoc.create({ name: 'one' });
+      doc.nodes = [LogoDoc.makeNode(rect(120, 80, 300, 140))];
+      const svg = await LogoRender.toSVG(doc, LogoDoc.defaultTokens(), { box: 'content' });
+      const vb = viewBox(svg);
+      record('(e) toSVG content bounds of a single rect equal its box', vb[0] === 120 && vb[1] === 80 && vb[2] === 300 && vb[3] === 140, 'viewBox ' + vb.join(' '));
+      const padded = viewBox(await LogoRender.toSVG(doc, LogoDoc.defaultTokens(), { box: 'content', pad: 10 }));
+      const art = viewBox(await LogoRender.toSVG(doc, LogoDoc.defaultTokens(), { box: 'artboard' }));
+      record('(e2) pad and artboard boxes', padded.join() === '110,70,320,160' && art.join() === '0,0,1200,600', 'pad ' + padded.join(' ') + ' artboard ' + art.join(' '));
+      const white = await LogoRender.toSVG(doc, LogoDoc.defaultTokens(), { box: 'content', fill: '#FFFFFF' });
+      record('(e3) fill override and hidden nodes', /fill="#FFFFFF"/.test(white) && !/#1C1F26/.test(white), white.slice(0, 160));
+      const blob = await LogoRender.toPNG(doc, LogoDoc.defaultTokens(), 640, { box: 'content' });
+      const bmp = await createImageBitmap(blob);
+      record('(f) toPNG width', blob.type === 'image/png' && bmp.width === 640 && bmp.height === Math.round(640 * 140 / 300), blob.type + ' ' + bmp.width + 'x' + bmp.height + ' ' + blob.size + ' bytes');
+    } catch (e) { record('(e/f) bounds/png', false, (e && (e.message + ' @ ' + e.stack)) || String(e)); }
+
+    // (g) linked colour
+    try {
+      const doc = LogoDoc.create({ name: 'linked' });
+      doc.nodes = [LogoDoc.makeNode(rect(0, 0, 100, 100, { fill: { ref: 'primary' } })), LogoDoc.makeNode(rect(120, 0, 100, 100, { fill: { hex: '#123456' } }))];
+      const tA = LogoDoc.tokensFromBrandState({ colors: { primary: '#FF0000', secondary: '#00FF00', accent: '#0000FF', neutralDark: '#111111', neutralLight: '#EEEEEE' }, headingFont: { name: 'Inter' }, bodyFont: { name: 'Inter' }, typography: { headingWeight: 700, bodyWeight: 400 } });
+      const tB = LogoDoc.tokensFromBrandState({ colors: { primary: '#00AA00', secondary: '#00FF00', accent: '#0000FF', neutralDark: '#222222', neutralLight: '#EEEEEE' }, headingFont: { name: 'Inter' }, bodyFont: { name: 'Inter' }, typography: { headingWeight: 700, bodyWeight: 400 } });
+      const a = await LogoRender.toSVG(doc, tA, { box: 'content' }), b = await LogoRender.toSVG(doc, tB, { box: 'content' });
+      const ed = freshEditor();
+      const id = ed.add(rect(0, 0, 50, 50, { fill: { ref: 'primary' } }));
+      ed.setTokens(tA); const fa = stage.querySelector('[data-id="' + id + '"]').getAttribute('fill');
+      ed.setTokens(tB); const fb = stage.querySelector('[data-id="' + id + '"]').getAttribute('fill');
+      record('(g) linked colour follows tokens; unlinked hex stays', /fill="#FF0000"/.test(a) && /fill="#00AA00"/.test(b) && /#123456/.test(a) && /#123456/.test(b) && fa === '#FF0000' && fb === '#00AA00' && LogoDoc.tokensFromBrandState({ colors: { neutralDark: '#222222' } }).colors.ink === '#222222',
+        'svg A/B differ: ' + (a !== b) + '; editor fill ' + fa + ' -> ' + fb);
+    } catch (e) { record('(g) linked colour', false, (e && (e.message + ' @ ' + e.stack)) || String(e)); }
+
+    // (h) simulated pointer drag
+    try {
+      const ed = freshEditor(1200, 600);
+      ed.zoom('fit');
+      const id = ed.add(rect(100, 100, 200, 200));
+      let moves = 0, changes = [];
+      ed.on('change', function (ev) { changes.push(ev.reason); });
+      await dragPath(ed, [200, 200], [237, 211], 8);
+      const n = ed.node(id);
+      ed.undo();
+      const reverted = ed.node(id).x === 100 && ed.node(id).y === 100;
+      ed.redo();
+      ed.undo(); 
+      // after one undo the add is the next step; a second undo removes the rect
+      ed.redo();
+      record('(h) pointer drag moves a rect and makes exactly 1 undo step', near(n.x, 137, 0.01) && near(n.y, 111, 0.01) && changes.filter(function (c) { return c === 'move'; }).length === 1 && reverted,
+        'moved to (' + n.x.toFixed(3) + ', ' + n.y.toFixed(3) + '), change reasons ' + JSON.stringify(changes) + ', zoom ' + ed.zoomLevel().toFixed(3));
+      // click selects, shift-click adds, marquee, dblclick text
+      const id2 = ed.add(rect(500, 100, 100, 100));
+      ed.select([]);
+      const svg = ed.svg(), p1 = ed.clientPoint(550, 150), p0 = ed.clientPoint(200, 200);
+      pe('pointerdown', svg, p1); pe('pointerup', svg, p1);
+      const clicked = ed.selection().join() === id2;
+      pe('pointerdown', svg, p0, { shiftKey: true }); pe('pointerup', svg, p0, { shiftKey: true });
+      const both = ed.selection().length === 2;
+      ed.select([]);
+      await dragPath(ed, [20, 20], [700, 400], 5);
+      const marq = ed.selection().length === 2;
+      record('(h2) click, shift-click and marquee selection', clicked && both && marq, JSON.stringify({ clicked: clicked, both: both, marq: marq }));
+      // resize by handle, rotate by handle
+      ed.select([id2]);
+      await sleep(40);
+      const hs = stage.querySelector('[data-h="1,1"]');
+      const hr = hs.getBoundingClientRect(), hc = [hr.left + hr.width / 2, hr.top + hr.height / 2];
+      const z = ed.zoomLevel();
+      pe('pointerdown', hs, hc); pe('pointermove', ed.svg(), [hc[0] + 30 * z, hc[1] + 20 * z], { metaKey: true }); pe('pointerup', ed.svg(), [hc[0] + 30 * z, hc[1] + 20 * z], { metaKey: true });
+      const rn = ed.node(id2);
+      record('(h3) corner handle resizes', near(rn.w, 130, 1.5) && near(rn.h, 120, 1.5) && near(rn.x, 500, 1e-6), 'w=' + rn.w.toFixed(2) + ' h=' + rn.h.toFixed(2));
+      // keyboard: nudge, duplicate, group
+      ed.select([id2]);
+      stage.focus();
+      const key = function (k, extra) { stage.dispatchEvent(new KeyboardEvent('keydown', Object.assign({ key: k, bubbles: true, cancelable: true }, extra || {}))); };
+      const x0 = ed.node(id2).x; key('ArrowRight'); key('ArrowRight', { shiftKey: true });
+      const nudged = near(ed.node(id2).x, x0 + 11);
+      const cnt = ed.doc().nodes.length; key('d', { metaKey: true });
+      const dup = ed.doc().nodes.length === cnt + 1;
+      key('g', { metaKey: true });
+      const grouped = ed.doc().nodes.some(function (n) { return n.type === 'group'; });
+      key('z', { metaKey: true });
+      const ungrouped = !ed.doc().nodes.some(function (n) { return n.type === 'group'; });
+      key('r'); const tl = ed.tool() === 'rect';
+      record('(h4) shortcuts: nudge, duplicate, group, undo, tool keys', nudged && dup && grouped && ungrouped && tl, JSON.stringify({ nudged: nudged, dup: dup, grouped: grouped, ungrouped: ungrouped, tool: ed.tool() }));
+      // draw tool: drag creates one undo step
+      ed.setTool('ellipse');
+      const before = ed.doc().nodes.length;
+      await dragPath(ed, [700, 300], [800, 380], 6);
+      const created = ed.doc().nodes.length === before + 1 && ed.doc().nodes[before].type === 'ellipse' && near(ed.doc().nodes[before].w, 100, 0.01) && ed.tool() === 'select';
+      ed.undo();
+      record('(h5) ellipse tool drag creates one node / one undo step', created && ed.doc().nodes.length === before, 'nodes ' + before + ' -> ' + (before + 1));
+    } catch (e) { record('(h) pointer drag', false, (e && (e.message + ' @ ' + e.stack)) || String(e)); }
+
+    // snapping: guide lines and equal spacing
+    try {
+      const ed = freshEditor(1200, 600);
+      ed.zoom(1);
+      const A = ed.add(rect(100, 100, 100, 100)), B = ed.add(rect(500, 100, 100, 100)), C = ed.add(rect(260, 100, 100, 100));
+      // drag C so that it sits between A and B horizontally: gap A-B = 300 wide, C=100 -> gaps 100 each => x=300
+      ed.select([C]);
+      const c0 = ed.node(C).x;
+      await dragPath(ed, [310, 150], [346, 150], 4); // dx = +36 -> x = 296: within 6px of 300
+      const x = ed.node(C).x;
+      record('(h6) snapping pulls to equal spacing / edges', near(x, 300, 0.01), 'x ' + c0 + ' -> ' + x);
+      // snap to artboard centre
+      const e7 = freshEditor(1200, 600); e7.zoom(1);
+      const A7 = e7.add(rect(100, 100, 100, 100));
+      await dragPath(e7, [150, 150], [150 + 447, 153], 5);       // centre lands at 597, 3 off the artboard centre
+      record('(h7) snaps to artboard centre', near(e7.node(A7).x + 50, 600, 0.01) && near(e7.node(A7).y + 50, 153 > 0 ? 150 : 0, 5) , 'x ' + e7.node(A7).x + ' y ' + e7.node(A7).y);
+    } catch (e) { record('(h6) snapping', false, (e && (e.message + ' @ ' + e.stack)) || String(e)); }
+
+    // performance: drag 20 nodes
+    try {
+      const ed = freshEditor(2000, 1000);
+      ed.zoom('fit');
+      const ids = [];
+      for (let i = 0; i < 18; i++) ids.push(ed.add(rect(40 + (i % 6) * 150, 60 + Math.floor(i / 6) * 120, 100, 80, { fill: { ref: i % 2 ? 'primary' : 'ink' } })));
+      ids.push(ed.add({ type: 'text', text: 'Nominal', size: 90, x: 100, y: 600 }));
+      ids.push(ed.add({ type: 'text', text: 'Studios', size: 60, x: 700, y: 640 }));
+      await sleep(400);
+      ed.select(ids);
+      const t0 = performance.now();
+      await dragPath(ed, [60, 80], [960, 560], 60);
+      const dt = performance.now() - t0;
+      record('(p) drag of 20 nodes (18 shapes, 2 text): ms per pointermove', dt / 60 < 16, (dt / 60).toFixed(2) + ' ms avg over 60 moves (' + dt.toFixed(0) + ' ms total)');
+    } catch (e) { record('(p) perf', false, (e && (e.message + ' @ ' + e.stack)) || String(e)); }
+
+    // text editing overlay
+    try {
+      const ed = freshEditor(1200, 600);
+      const tid = ed.add({ type: 'text', text: 'Abc', size: 100, x: 100, y: 100 });
+      await sleep(400);
+      ed.editText(tid);
+      const ta = stage.querySelector('.lg-text-edit');
+      ta.value = 'Abcdef'; ta.dispatchEvent(new Event('input'));
+      const w1 = ed.node(tid).w;
+      ta.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+      const closed = !stage.querySelector('.lg-text-edit');
+      ed.undo();
+      record('(t) text overlay edits live, one undo step', !!ta && closed && w1 > 200 && ed.node(tid).text === 'Abc', 'w ' + w1.toFixed(1) + ' text after undo ' + ed.node(tid).text);
+      const e2 = freshEditor();
+      e2.setTool('text');
+      const p = e2.clientPoint(300, 200);
+      pe('pointerdown', e2.svg(), p); pe('pointerup', e2.svg(), p);
+      await sleep(300);
+      const nt = e2.doc().nodes[0];
+      record('(t2) text tool click creates heading-linked ink text and opens editing', nt && nt.type === 'text' && nt.font.ref === 'heading' && nt.fill.ref === 'ink' && !!stage.querySelector('.lg-text-edit'), JSON.stringify(nt && { font: nt.font, fill: nt.fill, size: nt.size }));
+    } catch (e) { record('(t) text', false, (e && (e.message + ' @ ' + e.stack)) || String(e)); }
+
+    // zoom / pan
+    try {
+      const ed = freshEditor(1200, 600);
+      ed.zoom('fit'); const zf = ed.zoomLevel();
+      ed.zoom(100); const zmax = ed.zoomLevel(); ed.zoom(0.001); const zmin = ed.zoomLevel();
+      ed.zoom(1); 
+      const svg = ed.svg(), cp = ed.clientPoint(600, 300);
+      svg.dispatchEvent(new WheelEvent('wheel', { bubbles: true, cancelable: true, ctrlKey: true, deltaY: -40, clientX: cp[0], clientY: cp[1] }));
+      const after = ed.clientPoint(600, 300);
+      record('(z) zoom clamps 10%-3200%, wheel zoom keeps cursor point fixed', near(zmax, 32) && near(zmin, 0.1) && ed.zoomLevel() > 1 && near(after[0], cp[0], 1) && near(after[1], cp[1], 1) && zf > 0, 'cp ' + cp.map(function (v) { return v.toFixed(2); }) + ' after ' + after.map(function (v) { return v.toFixed(2); }) + ' fit ' + zf.toFixed(3) + ' max ' + zmax + ' min ' + zmin + ' now ' + ed.zoomLevel().toFixed(3));
+    } catch (e) { record('(z) zoom', false, (e && (e.message + ' @ ' + e.stack)) || String(e)); }
+
+    // layers order, rotate handle, group enter, copy / paste, flip
+    try {
+      const ed = freshEditor(1200, 600); ed.zoom('fit');
+      const A = ed.add(rect(100, 100, 100, 100)), B = ed.add(rect(300, 100, 100, 100)), C = ed.add(rect(500, 100, 100, 100));
+      const order = function () { return ed.doc().nodes.map(function (n) { return n.id; }); };
+      ed.reorder(A, 'forward'); const o1 = order().join() === [B, A, C].join();
+      ed.reorder(A, 'front'); const o2 = order().join() === [B, C, A].join();
+      ed.reorder(A, 'back'); const o3 = order().join() === [A, B, C].join();
+      ed.reorder(C, 1); const o4 = order().join() === [A, C, B].join();
+      record('(l) reorder forward/front/back/index', o1 && o2 && o3 && o4, [o1, o2, o3, o4].join());
+      ed.select([B]); await sleep(80);
+      const hr = stage.querySelector('[data-h="rot"]').getBoundingClientRect(), hc = [hr.left + hr.width / 2, hr.top + hr.height / 2];
+      const cen = ed.clientPoint(350, 150);
+      pe('pointerdown', stage.querySelector('[data-h="rot"]'), hc);
+      pe('pointermove', ed.svg(), [cen[0] + 150, cen[1] - 2]);
+      pe('pointerup', ed.svg(), [cen[0] + 150, cen[1] - 2]);
+      const r1 = ed.node(B).rotation;
+      ed.undo();
+      await sleep(80);
+      const hr2 = stage.querySelector('[data-h="rot"]').getBoundingClientRect(), hc2 = [hr2.left + hr2.width / 2, hr2.top + hr2.height / 2];
+      pe('pointerdown', stage.querySelector('[data-h="rot"]'), hc2);
+      pe('pointermove', ed.svg(), [cen[0] + 150, cen[1] - 40], { shiftKey: true });
+      pe('pointerup', ed.svg(), [cen[0] + 150, cen[1] - 40], { shiftKey: true });
+      const r2 = ed.node(B).rotation;
+      record('(r) rotate handle rotates about centre, shift snaps to 15 deg', Math.abs(r1 - 90) < 2 && r2 % 15 === 0 && r2 > 60 && r2 < 90, 'free ' + r1.toFixed(2) + ', shift ' + r2);
+      const gid = ed.group([A, B]);
+      const pt = ed.clientPoint(150, 150);
+      pe('pointerdown', ed.svg(), pt); pe('pointerup', ed.svg(), pt);
+      const selGroup = ed.selection().join() === gid;
+      ed.svg().dispatchEvent(new MouseEvent('dblclick', { bubbles: true, clientX: pt[0], clientY: pt[1] }));
+      const entered = ed.scope() === gid && ed.selection().join() === A;
+      stage.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true })); 
+      stage.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+      record('(gr) click selects group, double-click enters it, Esc leaves', selGroup && entered && ed.scope() === null, JSON.stringify({ selGroup: selGroup, entered: entered, scope: ed.scope() }));
+      ed.select([C]); ed.copy(); const n0 = ed.doc().nodes.length; ed.paste(false); ed.paste(true);
+      const pasted = ed.doc().nodes.length === n0 + 2;
+      ed.flip([C], 'h');
+      record('(cp) copy / paste / flip', pasted && ed.node(C).flipX === true, 'nodes ' + n0 + ' -> ' + ed.doc().nodes.length);
+    } catch (e) { record('(l/r/gr) layers, rotate, group', false, (e && (e.message + ' @ ' + e.stack)) || String(e)); }
+
+    // demo scene for the screenshot
+    try {
+      const rec = await LogoDoc.fromRecipe(NOMINAL);
+      stage.innerHTML = '';
+      const d = LogoDoc.create({ name: 'Demo' }); d.nodes = rec.nodes; d.artboard = rec.artboard;
+      const ed = LogoEditor.mount(stage, d, { tokens: LogoDoc.defaultTokens() });
+      await sleep(300);
+      ed.select([d.nodes[0].id, d.nodes[1].id]);
+      window.__demoEditor = ed;
+    } catch (e) { /* demo only */ }
+  }
+
+  run().catch(function (e) { record('run', false, e && (e && (e.message + ' @ ' + e.stack)) || String(e)); })
+    .then(function () {
+      const bad = results.filter(function (r) { return !r.pass; }).length;
+      const s = document.createElement('h2'); s.textContent = bad ? bad + ' FAILED of ' + results.length : 'All ' + results.length + ' passed';
+      out.appendChild(s);
+      window.__logosCoreDone = true;
+    });
+})();
+</script>
+</body>
+</html>
