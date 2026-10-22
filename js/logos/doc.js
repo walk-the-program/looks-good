@@ -124,8 +124,9 @@ const LogoDoc = (function () {
         canvas: hex(c.neutralLight, d.colors.canvas), white: '#FFFFFF'
       },
       fonts: {
-        heading: { family: fam(st.headingFont, d.fonts.heading.family), weight: wt(t.headingWeight, 700) },
-        body: { family: fam(st.bodyFont, d.fonts.body.family), weight: wt(t.bodyWeight, 400) }
+        // live state has headingFont/bodyFont objects; a saved record has headingFontName/bodyFontName
+        heading: { family: fam(st.headingFont, st.headingFontName || d.fonts.heading.family), weight: wt(t.headingWeight, 700) },
+        body: { family: fam(st.bodyFont, st.bodyFontName || d.fonts.body.family), weight: wt(t.bodyWeight, 400) }
       }
     };
   }

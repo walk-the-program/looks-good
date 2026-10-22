@@ -146,7 +146,35 @@ html.is-mac-app:not(.is-fullscreen) .le-top { padding-left: 14px; }
 .le-canvas { position: absolute; inset: 0; overflow: hidden; }
 .le-zoom { position: absolute; right: 12px; bottom: 12px; z-index: var(--z-raised); }
 
+/* Narrow screens: the left column shrinks to a tool rail, the layers panel becomes a drawer
+   (top-bar Layers button), and below 760px the inspector is a drawer too. Buttons: css/logos-chrome.css. */
+.le-body { position: relative; }
+@media (max-width: 1100px) {
+  .le-body { grid-template-columns: 52px minmax(0, 1fr) 248px; }
+  .le-left { position: relative; z-index: 4; }
+  .le-layers {
+    display: none;
+    position: absolute;
+    left: 52px; top: 0; bottom: 0;
+    width: 236px;
+    background: var(--surface);
+    border-right: 1px solid var(--line-strong);
+    box-shadow: var(--shadow-3);
+  }
+  .le[data-lc-layers="open"] .le-layers { display: block; }
+}
 @media (max-width: 900px) {
-  .le-body { grid-template-columns: 180px minmax(0, 1fr) 220px; }
   .le-brand { display: none; }
+}
+@media (max-width: 760px) {
+  .le-body { grid-template-columns: 52px minmax(0, 1fr); }
+  .le-inspector {
+    display: none;
+    position: absolute;
+    right: 0; top: 0; bottom: 0;
+    width: 264px;
+    z-index: 4;
+    box-shadow: var(--shadow-3);
+  }
+  .le[data-lc-insp="open"] .le-inspector { display: block; }
 }

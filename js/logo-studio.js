@@ -307,7 +307,8 @@ const LogoStudio = (function () {
       brandName(), state.headingFont && state.headingFont.name, state.bodyFont && state.bodyFont.name,
       inkColor(), state.bgMode, state.pureBg ? 1 : 0, state.aesthetic, state.aestheticVersion || '',
       state.blend ? JSON.stringify(state.blend) : '', state.logoDataUrl ? 1 : 0,
-      lg ? lg.updatedAt : 'none', state.typography && state.typography.headingWeight
+      lg ? lg.updatedAt : 'none', state.typography && state.typography.headingWeight,
+      lg && lg.ref ? refTokenSig() : ''
     ].join('|');
   }
 
@@ -356,6 +357,131 @@ const LogoStudio = (function () {
     }
   }
 
+  /* ---- a logo attached from Logos (state.content.logo.ref; js/logos/attach.js) ---- */
+
+  let refTimer = null, refChecked = '';
+
+  // The committed brand state (a suggestion hover preview must not leak into the logo files).
+  function committedState() {
+    try { return window.withCommittedState ? window.withCommittedState(function () { return serializeState(state); }) : state; }
+    catch (e) { return state; }
+  }
+  function refTokenSig() {
+    return typeof LogoAttach === 'undefined' ? '' : LogoAttach.tokenSig(LogoAttach.tokensOf(committedState()));
+  }
+  function refStale(logo) { return !!(logo && logo.ref && typeof LogoAttach !== 'undefined' && logo.ref.sig !== refTokenSig()); }
+
+  // Once per stored logo version: has the Logos document moved on since this copy was made?
+  function refCheck(logo) {
+    const key = logo.ref.logoId + '|' + logo.ref.updatedAt;
+    if (refChecked === key || typeof LogoStore === 'undefined') return;
+    refChecked = key;
+    LogoStore.get(logo.ref.logoId).then(function (doc) {
+      const now = state.content && state.content.logo;
+      if (!now || !now.ref || now.ref.logoId !== logo.ref.logoId) return;
+      if (!doc) { staleNote = 'This logo was deleted from Logos. The brand keeps its last copy.'; paint(); }
+      else if ((doc.updatedAt || 0) > now.ref.updatedAt) { clearTimeout(refTimer); refTimer = setTimeout(regenRef, 0); }
+    }).catch(function () { /* the stored copy stays */ });
+  }
+
+  async function regenRef() {
+    const logo = state.content && state.content.logo;
+    if (!logo || !logo.ref || typeof LogoAttach === 'undefined' || typeof LogoStore === 'undefined') return;
+    const sig = signature();
+    const my = ++seq;
+    try {
+      const doc = await LogoStore.get(logo.ref.logoId);
+      if (my !== seq) return;
+      if (!doc) { staleNote = 'This logo was deleted from Logos. The brand keeps its last copy.'; paint(); return; }
+      const next = await LogoAttach.filesFor(doc, committedState());
+      if (my !== seq) return;
+      const now = state.content && state.content.logo;
+      if (!now || !now.ref || now.ref.logoId !== logo.ref.logoId) return;
+      staleNote = '';
+      state.content.logo = next;
+      cur = null;
+      lastSig = signature();
+      render();
+      paint();
+    } catch (e) {
+      failedSig = sig;
+      console.warn('Logo Studio: the Logos logo could not be rebuilt', e);
+      staleNote = 'The logo keeps its old colours and fonts: ' + (e && e.message ? e.message.replace(/^LogoEngine:\s*/, '') : 'it could not be rebuilt.');
+      paint();
+    }
+  }
+
+  function refHtml(logo) {
+    const g = ground();
+    const f = logo.files.full;
+    return '<div class="ls-ref">' +
+      '<div class="ls-preview" style="background:' + esc(g.bg) + '"><img alt="Logo from Logos" src="' + dataUrl(g.dark ? f.white : f.ink) + '" /></div>' +
+      '<p class="sd-note ls-note">Using <b>' + esc(logo.ref.name || 'a logo') + '</b> from Logos, in this brand’s colours and fonts. It updates when you change either one.</p>' +
+      (staleNote ? '<p class="sd-note ls-note">' + esc(staleNote) + '</p>' : '') +
+      '<div class="sd-row ls-foot">' +
+        '<button type="button" class="btn btn-primary" data-act="edit-logos">Edit in Logos</button>' +
+        '<button type="button" class="btn btn-ghost" data-act="export" id="lsExport">Export logo files</button>' +
+        '<button type="button" class="btn btn-ghost" data-act="stop-using">Stop using</button>' +
+      '</div></div>';
+  }
+
+  async function editInLogos() {
+    const logo = state.content && state.content.logo;
+    if (!logo || !logo.ref || typeof LogosHome === 'undefined') return;
+    const doc = typeof LogoStore !== 'undefined' ? await LogoStore.get(logo.ref.logoId) : null;
+    if (!doc) { if (typeof showToast === 'function') showToast('That logo isn’t in Logos any more'); return; }
+    await LogosHome.open(doc.id, { push: true });
+  }
+
+  async function stopUsing() {
+    const logo = state.content && state.content.logo;
+    if (!logo || !logo.ref) return;
+    const id = typeof BrandSession !== 'undefined' ? BrandSession.currentId() : null;
+    try { if (id) await LogoAttach.detach(logo.ref.logoId, [id]); }
+    catch (e) { console.warn('Logo Studio: detach failed', e); }
+    const now = state.content && state.content.logo;
+    if (now && now.ref) { remove(); return; }              // the Logos copy is gone: drop the brand's copy
+    clearTimeout(refTimer); ++seq; cur = null; staleNote = ''; built = '';
+    lastSig = signature();
+    paint();
+  }
+
+  // New Logos document from the current recipe (or the brand name), attached to this brand.
+  async function openInLogos() {
+    if (typeof LogoDoc === 'undefined' || typeof LogoAttach === 'undefined' || typeof LogosHome === 'undefined') return;
+    const btn = host && host.querySelector('[data-act="open-logos"]');
+    if (btn) btn.disabled = true;
+    try {
+      const bid = typeof BrandSession !== 'undefined' ? BrandSession.currentId() : null;
+      const tokens = LogoAttach.tokensOf(committedState());
+      const logo = state.content && state.content.logo;
+      const name = brandName() || 'Brand';
+      const doc = LogoDoc.create({ name: name + ' logo', brandId: bid });
+      if (logo && logo.recipe) {
+        doc.nodes = LogoAttach.fitNodes((await LogoDoc.fromRecipe(clone(logo.recipe), { tokens: tokens })).nodes, doc.artboard, 0.8);
+      } else {
+        const n = LogoDoc.makeNode({
+          type: 'text', name: 'Wordmark', text: name, font: { ref: 'heading', weight: headingWeight(), style: 'normal' },
+          size: 160, lineHeight: 1.2, fill: { ref: 'ink' }
+        });
+        const g = await LogoRender.nodeGeometry(n, tokens);
+        n.w = g.w; n.h = g.h;
+        n.x = (doc.artboard.w - n.w) / 2; n.y = (doc.artboard.h - n.h) / 2;
+        doc.nodes = [n];
+      }
+      doc.attached = [];
+      doc.preview = await LogoRender.toSVG(doc, tokens, { box: 'artboard' });
+      await LogoStore.put(doc);
+      if (bid) await LogoAttach.attach(doc.id, [bid]);
+      await LogosHome.open(doc.id, { push: true });
+    } catch (e) {
+      console.error('Logo Studio: Open in Logos failed', e);
+      if (typeof showToast === 'function') showToast(String(e && e.message || e).replace(/^LogoEngine:\s*/, ''));
+    } finally {
+      if (btn) btn.disabled = false;
+    }
+  }
+
   // Called after every render(): cheap when nothing relevant changed.
   function sync() {
     if (!host || !state || !state.content) return;
@@ -364,6 +490,10 @@ const LogoStudio = (function () {
     lastSig = sig;
     const logo = state.content.logo;
     if (logo && !booted) boot();                          // a stored logo may need its files rebuilt
+    if (logo && logo.ref) {                               // a logo from Logos follows the brand's colours and fonts
+      if (refStale(logo)) { clearTimeout(refTimer); refTimer = setTimeout(regenRef, REGEN_DELAY); }
+      else refCheck(logo);
+    }
     if (logo && eng === 'ready' && sig !== failedSig && stale(logo)) {
       clearTimeout(regenTimer);
       regenTimer = setTimeout(regenerate, REGEN_DELAY);
@@ -491,7 +621,10 @@ const LogoStudio = (function () {
 
   /* ======================= 6. the panel ======================= */
 
-  const SKELETON = '<div id="lsUpload"></div><div class="ls-body" id="lsBody"></div>';
+  const SKELETON = '<div id="lsUpload"></div><div class="ls-body" id="lsBody"></div>' +
+    '<div class="ls-group" id="lsLogos"><p class="sd-adv-sub">Logos editor</p>' +
+    '<p class="sd-note">Draw or refine a logo in the full editor. It starts from this one (or the brand name) and is used in this brand.</p>' +
+    '<button type="button" class="btn btn-ghost btn-small" data-act="open-logos">Open in Logos</button></div>';
 
   function presetsHtml(list, current) {
     return '<div class="ls-presets" role="list">' + list.map(function (p) {
@@ -581,7 +714,14 @@ const LogoStudio = (function () {
     const body = $('lsBody');
     const logo = state.content && state.content.logo;
     const hasLogo = !!(logo && logo.files && logo.recipe);
-    $('lsUpload').innerHTML = uploadNote(hasLogo);
+    const hasRef = !!(logo && logo.ref && logo.files);
+    $('lsUpload').innerHTML = uploadNote(hasLogo || hasRef);
+
+    if (hasRef) {
+      body.innerHTML = refHtml(logo);
+      built = 'ref';
+      return;
+    }
 
     if (eng === 'loading') { setStatus('Loading the logo tools…'); return; }
     if (eng === 'error') {
@@ -825,6 +965,9 @@ const LogoStudio = (function () {
     else if (act === 'styles') { showStyles = !showStyles; paintStyles(); }
     else if (act === 'export') exportZip();
     else if (act === 'remove') remove();
+    else if (act === 'edit-logos') editInLogos();
+    else if (act === 'stop-using') stopUsing();
+    else if (act === 'open-logos') openInLogos();
     else if (act === 'retry') { eng = 'loading'; booted = false; paint(); boot(); }
     else if (act === 'fix') {
       const res = cur && cur.result;

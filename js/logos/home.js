@@ -212,7 +212,7 @@ const LogosHome = (function () {
     let rec = null;
     try { rec = await LibraryStore.get(brandId); } catch (e) { /* treated as missing */ }
     if (!rec || !rec.savedState) return { tokens: LogoDoc.defaultTokens(), brand: null, missing: true };
-    return { tokens: LogoDoc.tokensFromBrandState(rec.savedState), brand: rec };
+    return { tokens: (typeof LogoAttach !== 'undefined' ? LogoAttach.tokensOf : LogoDoc.tokensFromBrandState)(rec.savedState), brand: rec };
   }
 
   /* ---------- new logo ---------- */
@@ -471,7 +471,10 @@ const LogosHome = (function () {
   }
 
   function paintBrandChip(c) {
-    if (c.brand) { el.brand.textContent = c.brand.name; el.brand.title = 'Colours and fonts follow this brand'; el.brand.classList.add('is-linked'); }
+    const link = !!c.brand;
+    el.brand.style.cursor = link ? 'pointer' : '';
+    if (link) { el.brand.setAttribute('role', 'button'); el.brand.tabIndex = 0; } else { el.brand.removeAttribute('role'); el.brand.removeAttribute('tabindex'); }
+    if (c.brand) { el.brand.textContent = c.brand.name; el.brand.title = 'Colours and fonts follow this brand. Click to open the brand.'; el.brand.classList.add('is-linked'); }
     else {
       el.brand.textContent = c.brandMissing ? 'Brand removed' : 'No brand';
       el.brand.title = c.brandMissing ? 'The linked brand no longer exists; default colours and fonts are used' : 'Using default colours and fonts';
@@ -499,10 +502,13 @@ const LogosHome = (function () {
       doc.name = c.name;
       doc.brandId = c.brandId;
       doc.updatedAt = Date.now();
+      // Attach / detach write the stored copy's `attached` list; the editor's own copy can be stale.
+      try { const stored = await LogoStore.get(doc.id); if (stored && Array.isArray(stored.attached)) doc.attached = stored.attached; } catch (e) { /* keep ours */ }
       try { doc.preview = await LogoRender.toSVG(doc, c.tokens, { box: 'artboard' }); }
       catch (e) { console.warn('Logo preview failed:', e); }
       try {
         await LogoStore.put(doc);
+        if (typeof LogoAttach !== 'undefined') LogoAttach.onSaved(doc);
         if (current === c && !c.dirty) setStatus('Saved');
       } catch (e) {
         c.dirty = true;
@@ -664,6 +670,38 @@ const LogosHome = (function () {
     return t.tokens;
   }
 
+  /* ---------- use in brand (js/logos/attach.js) ---------- */
+
+  let attachBtn = null;
+  function ensureAttachButton() {
+    if (!attachBtn) {
+      attachBtn = document.createElement('button');
+      attachBtn.type = 'button';
+      attachBtn.className = 'btn btn-ghost btn-small';
+      attachBtn.id = 'leUseInBrand';
+      attachBtn.textContent = 'Use in brand…';
+      attachBtn.addEventListener('click', async () => {
+        const c = current;
+        if (!c || typeof LogoAttach === 'undefined') return;
+        attachBtn.disabled = true;
+        try { await LogoAttach.openPicker(c.id); } catch (e) { console.error(e); toast('Could not open the brand list'); }
+        attachBtn.disabled = false;
+      });
+    }
+    if (!attachBtn.isConnected) el.top.insertBefore(attachBtn, el.exportBtn && el.exportBtn.parentNode === el.top ? el.exportBtn : null);
+  }
+
+  // The brand chip opens the linked brand in the brand editor.
+  async function openLinkedBrand() {
+    const c = current;
+    if (!c || !c.brand || typeof BrandSession === 'undefined') return;
+    const id = c.brand.id;
+    await closeEditor({ skipRefresh: true });
+    saveMode('brands');
+    if (!(await BrandSession.backToLibrary())) return;      // asks about unsaved edits in a brand left open
+    await BrandSession.openBrand(id);
+  }
+
   function wire() {
     $('lgNew').addEventListener('click', newLogoFlow);
     $('lgEmptyNew').addEventListener('click', newLogoFlow);
@@ -703,6 +741,10 @@ const LogosHome = (function () {
     window.addEventListener('blur', closeMenu);
 
     el.back.addEventListener('click', backClicked);
+    ensureAttachButton();
+    el.editor.addEventListener('logos:open', ensureAttachButton);    // the chrome may rebuild the top bar
+    el.brand.addEventListener('click', openLinkedBrand);
+    el.brand.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openLinkedBrand(); } });
     el.name.addEventListener('input', () => { if (current) { current.name = el.name.value.trim() || current.name; onChange(); } });
     el.name.addEventListener('blur', commitName);
     el.name.addEventListener('keydown', e => {

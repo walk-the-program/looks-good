@@ -238,6 +238,28 @@ const BrandSession = (function () {
     return true;
   }
 
+  /* ---------- logo attached from Logos (js/logos/attach.js) ---------- */
+
+  // Writes a content.logo into the open brand's record (saved and draft) and the live state without
+  // marking the brand as edited. logos: { saved, draft, live }; undefined = leave, null = remove.
+  async function adoptLogo(brandId, logos) {
+    if (!current || current.id !== brandId) return false;
+    const wasDirty = isDirty();
+    const put = (st, lg) => {
+      if (!st || lg === undefined) return;
+      st.content = Object.assign({}, st.content);
+      if (lg) st.content.logo = lg; else delete st.content.logo;
+    };
+    put(current.savedState, logos.saved);
+    put(current.draftState, logos.draft);
+    put(state, logos.live);
+    if (!wasDirty) baseline = snapshotJson();
+    else { try { const b = JSON.parse(baseline); put(b, logos.saved); baseline = JSON.stringify(b); } catch (e) { /* keep */ } }
+    render();
+    await persist();
+    return true;
+  }
+
   /* ---------- wiring ---------- */
 
   function wire() {
@@ -323,5 +345,5 @@ const BrandSession = (function () {
   };
   window.__flush = flushDraft;
 
-  return { wire, openBrand, createBrand, backToLibrary, isDirty, saveBrand };
+  return { wire, openBrand, createBrand, backToLibrary, isDirty, saveBrand, adoptLogo, currentId: () => (current ? current.id : null), record: () => current };
 })();
