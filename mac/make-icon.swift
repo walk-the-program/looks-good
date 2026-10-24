@@ -1,121 +1,117 @@
 // Draws the app icon and writes a 1024px PNG. Usage: swift make-icon.swift out.png
-// A fan of three brand cards on an ink tile: the same brand in three design languages
-// (a glowing gradient, a bold graphic print, and quiet paper with a serif "Aa" and swatches).
+// The "Crop, on the frost" mark: ink crop brackets around a coral dot, printed crisply on a
+// frosted white tile (lilac and coral glows blurred to light, a white veil, fine grain, a top
+// sheen and a bright rim). Same recipe as favicon.svg and mac/icon-layers/. The grain is seeded
+// noise, so every build produces the same pixels.
 import AppKit
+import CoreImage
 
 let out = CommandLine.arguments.count > 1 ? CommandLine.arguments[1] : "icon.png"
 let size = 1024
-let rep = NSBitmapImageRep(bitmapDataPlanes: nil, pixelsWide: size, pixelsHigh: size, bitsPerSample: 8,
-                           samplesPerPixel: 4, hasAlpha: true, isPlanar: false,
-                           colorSpaceName: .deviceRGB, bytesPerRow: 0, bitsPerPixel: 0)!
-NSGraphicsContext.saveGraphicsState()
-NSGraphicsContext.current = NSGraphicsContext(bitmapImageRep: rep)
-let ctx = NSGraphicsContext.current!.cgContext
+let T = 824                      // macOS icon grid: 824px tile centred on the 1024 canvas
+let k = CGFloat(T) / 100         // 100-unit design canvas -> tile pixels (8.24)
 
-func color(_ hex: UInt32, _ a: CGFloat = 1) -> NSColor {
-    NSColor(srgbRed: CGFloat((hex >> 16) & 255) / 255, green: CGFloat((hex >> 8) & 255) / 255,
+func color(_ hex: UInt32, _ a: CGFloat = 1) -> CGColor {
+    CGColor(srgbRed: CGFloat((hex >> 16) & 255) / 255, green: CGFloat((hex >> 8) & 255) / 255,
             blue: CGFloat(hex & 255) / 255, alpha: a)
 }
-func withState(_ body: () -> Void) { ctx.saveGState(); body(); ctx.restoreGState() }
-
-// macOS icon grid: 824px tile centred on the 1024 canvas.
-let tile = NSRect(x: 100, y: 100, width: 824, height: 824)
-let tilePath = NSBezierPath(roundedRect: tile, xRadius: 185, yRadius: 185)
-
-withState {
-    let s = NSShadow()
-    s.shadowColor = NSColor.black.withAlphaComponent(0.3)
-    s.shadowOffset = NSSize(width: 0, height: -14)
-    s.shadowBlurRadius = 28
-    s.set()
-    color(0x17151B).setFill()
-    tilePath.fill()
+let cs = CGColorSpace(name: CGColorSpace.sRGB)!
+func makeContext(_ w: Int, _ h: Int) -> CGContext {
+    CGContext(data: nil, width: w, height: h, bitsPerComponent: 8, bytesPerRow: 0, space: cs,
+              bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue)!
 }
-withState {
-    tilePath.addClip()
-    NSGradient(colors: [color(0x2A2631), color(0x121016)])!.draw(in: tile, angle: -90)
-    // a faint warm glow behind the fan
-    NSGradient(colors: [color(0xFF8A4C, 0.22), color(0xFF8A4C, 0)])!
-        .draw(fromCenter: NSPoint(x: 512, y: 600), radius: 0, toCenter: NSPoint(x: 512, y: 600), radius: 420, options: [])
+// Draw in the 100-unit design space with y pointing down, like the SVG.
+func designSpace(_ c: CGContext, _ body: () -> Void) {
+    c.saveGState(); c.translateBy(x: 0, y: CGFloat(T)); c.scaleBy(x: k, y: -k); body(); c.restoreGState()
 }
-color(0xFFFFFF, 0.07).setStroke()
-tilePath.lineWidth = 3
-tilePath.stroke()
 
-// Cards pivot around a point below the tile, so they fan like a hand of cards.
-let card = NSRect(x: -190, y: 0, width: 380, height: 510)   // in pivot space; y = distance above pivot
-let pivot = NSPoint(x: 512, y: -40)
-let lift: CGFloat = 252                                        // pivot -> card bottom
-func drawCard(angle: CGFloat, dx: CGFloat, _ paint: (NSRect, NSBezierPath) -> Void) {
-    withState {
-        ctx.translateBy(x: pivot.x + dx, y: pivot.y)
-        ctx.rotate(by: angle * .pi / 180)
-        ctx.translateBy(x: 0, y: lift)
-        let path = NSBezierPath(roundedRect: card, xRadius: 46, yRadius: 46)
-        withState {
-            let s = NSShadow()
-            s.shadowColor = NSColor.black.withAlphaComponent(0.45)
-            s.shadowOffset = NSSize(width: 0, height: -10)
-            s.shadowBlurRadius = 36
-            s.set()
-            color(0x000000).setFill()
-            path.fill()
-        }
-        withState { path.addClip(); paint(card, path) }
-        color(0xFFFFFF, 0.14).setStroke()
-        path.lineWidth = 2.5
-        path.stroke()
+// 1. Glows: two soft circles, Gaussian-blurred with sigma = 14% of the tile (CoreImage).
+let glowCtx = makeContext(T, T)
+designSpace(glowCtx) {
+    glowCtx.setFillColor(color(0xB9ADDF, 0.95)); glowCtx.fillEllipse(in: CGRect(x: 18 - 38, y: 14 - 38, width: 76, height: 76))
+    glowCtx.setFillColor(color(0xEE8F72, 0.70)); glowCtx.fillEllipse(in: CGRect(x: 86 - 34, y: 92 - 34, width: 68, height: 68))
+}
+let ci = CIContext(options: [.workingColorSpace: cs, .outputColorSpace: cs])
+let blurred = CIImage(cgImage: glowCtx.makeImage()!)
+    .applyingFilter("CIGaussianBlur", parameters: [kCIInputRadiusKey: 0.14 * Double(T)])
+    .cropped(to: CGRect(x: 0, y: 0, width: T, height: T))
+let glowImage = ci.createCGImage(blurred, from: CGRect(x: 0, y: 0, width: T, height: T), format: .RGBA8, colorSpace: cs)!
+
+// 2. Grain: seeded monochrome noise (xorshift), two octaves of 1px and 2px cells for a fine tooth.
+let grainCtx = makeContext(T, T)
+do {
+    let px = grainCtx.data!.assumingMemoryBound(to: UInt8.self)
+    let rb = grainCtx.bytesPerRow
+    var state: UInt64 = 0x9E3779B97F4A7C15
+    func rnd() -> Double {
+        state ^= state << 13; state ^= state >> 7; state ^= state << 17
+        return Double(state >> 11) / Double(1 << 53)
     }
+    var coarse = [Double](repeating: 0, count: (T / 2 + 1) * (T / 2 + 1))
+    for i in 0..<coarse.count { coarse[i] = rnd() }
+    for y in 0..<T { for x in 0..<T {
+        let g = 0.6 * rnd() + 0.4 * coarse[(y / 2) * (T / 2 + 1) + x / 2]
+        let v = UInt8(max(0, min(255, g * 255)))
+        let o = y * rb + x * 4
+        px[o] = v; px[o + 1] = v; px[o + 2] = v; px[o + 3] = 255
+    } }
 }
 
-// Back left: a luminous gradient world.
-drawCard(angle: 13, dx: -18) { r, _ in
-    NSGradient(colors: [color(0x3B1F8F), color(0x8E3BD8), color(0xFF5FA2), color(0xFFB36B)])!.draw(in: r, angle: 62)
-    NSGradient(colors: [color(0xFFFFFF, 0.55), color(0xFFFFFF, 0)])!
-        .draw(fromCenter: NSPoint(x: r.minX + 120, y: r.maxY - 140), radius: 0,
-              toCenter: NSPoint(x: r.minX + 120, y: r.maxY - 140), radius: 260, options: [])
-}
-
-// Back right: a bold graphic print, a red field with a halftone-dot grid and a black disc.
-drawCard(angle: -12, dx: 18) { r, _ in
-    color(0xE8452C).setFill(); r.fill()
-    color(0x1A1214, 0.9).setFill()
-    let step: CGFloat = 34
-    var y = r.minY + 22
-    var row = 0
-    while y < r.maxY {
-        var x = r.minX + 22 + (row % 2 == 0 ? 0 : step / 2)
-        while x < r.maxX {
-            let t = (y - r.minY) / r.height          // dots grow toward the top
-            let d = 4 + 12 * t
-            NSBezierPath(ovalIn: NSRect(x: x - d / 2, y: y - d / 2, width: d, height: d)).fill()
-            x += step
-        }
-        y += step; row += 1
+// 3. Compose the tile.
+let tileCtx = makeContext(T, T)
+tileCtx.setFillColor(color(0xF3F1F7)); tileCtx.fill(CGRect(x: 0, y: 0, width: T, height: T))
+tileCtx.draw(glowImage, in: CGRect(x: 0, y: 0, width: T, height: T))
+tileCtx.setFillColor(color(0xFFFFFF, 0.25)); tileCtx.fill(CGRect(x: 0, y: 0, width: T, height: T))   // veil
+tileCtx.saveGState()
+tileCtx.setBlendMode(.multiply); tileCtx.setAlpha(0.09)
+tileCtx.draw(grainCtx.makeImage()!, in: CGRect(x: 0, y: 0, width: T, height: T))
+tileCtx.restoreGState()
+// sheen: white 0.55 -> 0 from the top edge to 45% down
+let sheen = CGGradient(colorsSpace: cs, colors: [color(0xFFFFFF, 0.55), color(0xFFFFFF, 0)] as CFArray, locations: [0, 1])!
+tileCtx.drawLinearGradient(sheen, start: CGPoint(x: 0, y: CGFloat(T)), end: CGPoint(x: 0, y: CGFloat(T) * 0.55), options: [])
+// the mark, crisp on top
+let ink = color(0x1E1F21)
+designSpace(tileCtx) {
+    let p = CGMutablePath()
+    func line(_ pts: [(CGFloat, CGFloat)]) {
+        p.move(to: CGPoint(x: pts[0].0, y: pts[0].1))
+        for q in pts.dropFirst() { p.addLine(to: CGPoint(x: q.0, y: q.1)) }
     }
-    color(0xF6E7C9).setFill()
-    NSBezierPath(ovalIn: NSRect(x: r.midX + 10, y: r.maxY - 220, width: 180, height: 180)).fill()
+    line([(24, 37), (24, 24), (37, 24)]); line([(63, 24), (76, 24), (76, 37)])
+    line([(76, 63), (76, 76), (63, 76)]); line([(37, 76), (24, 76), (24, 63)])
+    tileCtx.setStrokeColor(ink); tileCtx.setLineWidth(6.5); tileCtx.setLineCap(.round); tileCtx.setLineJoin(.round)
+    tileCtx.addPath(p); tileCtx.strokePath()
+    let dot = CGRect(x: 38, y: 38, width: 24, height: 24)
+    tileCtx.setFillColor(color(0xEE8F72)); tileCtx.fillEllipse(in: dot)
+    tileCtx.strokeEllipse(in: dot)
 }
+let tileImage = tileCtx.makeImage()!
 
-// Front: warm paper with a serif "Aa" and three swatches.
-drawCard(angle: 0, dx: 0) { r, _ in
-    NSGradient(colors: [color(0xFBF8F2), color(0xEDE6D8)])!.draw(in: r, angle: -90)
-    let font = NSFont(name: "Georgia-Bold", size: 250) ?? NSFont.systemFont(ofSize: 250, weight: .bold)
-    let para = NSMutableParagraphStyle(); para.alignment = .center
-    let text = NSAttributedString(string: "Aa", attributes: [
-        .font: font, .foregroundColor: color(0x1B1A18), .paragraphStyle: para, .kern: -6,
-    ])
-    let ts = text.size()
-    text.draw(in: NSRect(x: r.minX, y: r.midY - ts.height / 2 + 60, width: r.width, height: ts.height))
-    let swatches: [UInt32] = [0xE8452C, 0x8E3BD8, 0x1B1A18]
-    let d: CGFloat = 64, gap: CGFloat = 22
-    var x = r.midX - (d * 3 + gap * 2) / 2
-    for c in swatches {
-        color(c).setFill()
-        NSBezierPath(ovalIn: NSRect(x: x, y: r.minY + 92, width: d, height: d)).fill()
-        x += d + gap
-    }
-}
+// 4. Place on the 1024 canvas: drop shadow, clipped tile, rim.
+let ctx = makeContext(size, size)
+let tileRect = CGRect(x: 100, y: 100, width: T, height: T)
+let tilePath = CGPath(roundedRect: tileRect, cornerWidth: 185, cornerHeight: 185, transform: nil)
+ctx.saveGState()
+ctx.setShadow(offset: CGSize(width: 0, height: -14), blur: 28, color: color(0x000000, 0.3))
+ctx.setFillColor(color(0xF3F1F7)); ctx.addPath(tilePath); ctx.fillPath()
+ctx.restoreGState()
+ctx.saveGState()
+ctx.addPath(tilePath); ctx.clip()
+ctx.draw(tileImage, in: tileRect)
+// rim: bright inner top highlight, faint darker bottom edge
+ctx.addPath(tilePath); ctx.clip()
+let top = CGGradient(colorsSpace: cs, colors: [color(0xFFFFFF, 0.9), color(0xFFFFFF, 0)] as CFArray, locations: [0, 1])!
+ctx.saveGState()
+ctx.addPath(tilePath); ctx.addPath(CGPath(roundedRect: tileRect.insetBy(dx: 0, dy: 0).offsetBy(dx: 0, dy: -12), cornerWidth: 185, cornerHeight: 185, transform: nil))
+ctx.clip(using: .evenOdd)
+ctx.drawLinearGradient(top, start: CGPoint(x: 0, y: tileRect.maxY), end: CGPoint(x: 0, y: tileRect.maxY - 40), options: [])
+ctx.restoreGState()
+ctx.saveGState()
+ctx.addPath(tilePath); ctx.addPath(CGPath(roundedRect: tileRect.offsetBy(dx: 0, dy: 8), cornerWidth: 185, cornerHeight: 185, transform: nil))
+ctx.clip(using: .evenOdd)
+ctx.setFillColor(color(0x281E3C, 0.18)); ctx.fill(tileRect)
+ctx.restoreGState()
+ctx.restoreGState()
 
-NSGraphicsContext.restoreGraphicsState()
+let rep = NSBitmapImageRep(cgImage: ctx.makeImage()!)
 try! rep.representation(using: .png, properties: [:])!.write(to: URL(fileURLWithPath: out))

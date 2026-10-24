@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="64" height="64">
+<clipPath id="c"><rect width="100" height="100" rx="22.5"/></clipPath>
+<g clip-path="url(#c)">
+<defs>
+<filter id="bf" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="14"/></filter>
+<filter id="nf"><feTurbulence type="fractalNoise" baseFrequency="1.6" numOctaves="2" seed="7" stitchTiles="stitch"/><feColorMatrix type="saturate" values="0"/></filter>
+<linearGradient id="gf" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity="0.55"/><stop offset=".45" stop-color="#fff" stop-opacity="0"/></linearGradient>
+</defs>
+<rect width="100" height="100" fill="#f3f1f7"/>
+<g filter="url(#bf)"><circle cx="18" cy="14" r="38" fill="#b9addf" opacity="0.95"/><circle cx="86" cy="92" r="34" fill="#ee8f72" opacity="0.7"/></g>
+<rect width="100" height="100" fill="rgba(255,255,255,.25)"/>
+<rect width="100" height="100" filter="url(#nf)" opacity="0.09" style="mix-blend-mode:multiply"/>
+<rect width="100" height="100" fill="url(#gf)"/>
+<path d="M24 37 V24 H37 M63 24 H76 V37 M76 63 V76 H63 M37 76 H24 V63" fill="none" stroke="#1e1f21" stroke-width="6.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="50" cy="50" r="12" fill="#ee8f72" stroke="#1e1f21" stroke-width="6.5"/>
+</g>
+<rect x=".75" y=".75" width="98.5" height="98.5" rx="21.75" fill="none" stroke="#fff" stroke-opacity=".5" stroke-width="1.5"/>
+</svg>
