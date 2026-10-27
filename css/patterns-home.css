@@ -204,3 +204,17 @@ html.is-mac-app.is-fullscreen .pt-tool-bar { height: 46px; padding: 0 16px; }
   .pt-search { width: 100%; }
   #ptSurprise { margin-left: 0; }
 }
+
+/* brand thumbnails: live renders in the chosen brand's colours */
+.pt-art img { transition: opacity 240ms var(--ease); }
+.pt-art img.is-swap { opacity: 0; }
+.pt-card.is-pending .pt-art img { opacity: 0.55; }
+.pt-card.is-pending .pt-art::after {
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(100deg, transparent 30%, rgba(255, 255, 255, 0.35) 50%, transparent 70%);
+  background-size: 220% 100%; animation: pt-shimmer 1.6s linear infinite;
+}
+.pt-art { position: relative; }
+@keyframes pt-shimmer { from { background-position: 120% 0; } to { background-position: -120% 0; } }
+@media (prefers-reduced-motion: reduce) { .pt-card.is-pending .pt-art::after { animation: none; } }
+.pt-thumb-frame { position: fixed; left: -10000px; top: 0; width: 800px; height: 600px; border: 0; opacity: 0; pointer-events: none; }

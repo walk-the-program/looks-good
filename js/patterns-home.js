@@ -113,6 +113,7 @@ const PatternsHome = (function () {
     if (brandId) lsSet(BRAND_KEY, brandId); else lsDel(BRAND_KEY);
     writeColours();
     renderBrandSelects();
+    if (openSlug === null && catalog) { restoreArt(); applyThumbs(true); } else { thumbRun++; thumbQueue = []; }
     if (openSlug !== null) {      // a tool reads the set when it loads: reload it
       const t = bySlug(openSlug);
       if (t) { el.frame.classList.remove('is-ready'); el.frame.src = 'about:blank'; el.frame.src = t.href; setTimeout(() => el.frame.classList.add('is-ready'), 1500); }
@@ -141,6 +142,186 @@ const PatternsHome = (function () {
       }
     } finally { win.__pickColour = origPick; }
     try { win.dispatchEvent(new win.StorageEvent('storage', { key: MYC_KEY })); } catch (e) { /* tool refits on its next change */ }
+  }
+
+  /* ---------- brand thumbnails ----------
+     With a brand chosen, every card re-renders its tool in the brand colours: a hidden,
+     off-screen iframe loads the tool (which reads ptrn.mycolors), we wait for it to draw,
+     then snapshot its biggest canvas or svg into a small image. At most THUMB_JOBS run at
+     once. Snapshots are cached per brand colour set + tool. Failures keep the static art. */
+
+  const THUMB_JOBS = 3, THUMB_TIMEOUT = 7000, THUMB_W = 480;
+  const thumbCache = new Map();   // sig|slug -> data URL
+  const thumbFailed = new Set();  // sig|slug
+  let thumbRun = 0;               // bumps whenever the brand changes: stale work stops
+  let thumbQueue = [];
+  let thumbActive = 0;
+  const thumbStats = { done: 0, failed: [], total: 0 };
+
+  function brandSig() {
+    const b = brands.find(x => x.id === brandId);
+    return b && b.cols.length ? b.cols.join(',') : '';
+  }
+  const thumbKey = slug => brandSig() + '|' + slug;
+
+  function cardFor(slug) {
+    return Array.prototype.find.call(el.grid.children, c => c.dataset.slug === slug) || null;
+  }
+
+  function paintCard(slug, url) {
+    const card = cardFor(slug);
+    if (!card) return;
+    const img = card.querySelector('img');
+    card.classList.remove('is-pending');
+    if (!img || !url) return;
+    if (!img.dataset.art) img.dataset.art = img.getAttribute('src');
+    img.classList.add('is-swap');
+    img.src = url;
+    requestAnimationFrame(() => img.classList.remove('is-swap'));
+  }
+
+  function restoreArt() {
+    Array.prototype.forEach.call(el.grid.children, card => {
+      card.classList.remove('is-pending');
+      const img = card.querySelector('img');
+      if (img && img.dataset.art) { img.src = img.dataset.art; delete img.dataset.art; }
+    });
+  }
+
+  function snapshot(win, doc) {
+    const area = n => { const r = n.getBoundingClientRect(); return r.width * r.height; };
+    const cvs = Array.prototype.filter.call(doc.querySelectorAll('canvas'), c => c.width > 16 && c.height > 16 && area(c) > 1000)
+      .sort((a, b) => area(b) - area(a));
+    const svgs = Array.prototype.filter.call(doc.querySelectorAll('svg'), n => area(n) > 20000)
+      .sort((a, b) => area(b) - area(a));
+    const out = document.createElement('canvas');
+    const fit = (w, h) => { const k = Math.min(1, THUMB_W / w); out.width = Math.round(w * k); out.height = Math.round(h * k); return out.getContext('2d'); };
+    for (const c of cvs) {
+      try {
+        const g = fit(c.width, c.height);
+        g.fillStyle = '#fff'; g.fillRect(0, 0, out.width, out.height);
+        g.drawImage(c, 0, 0, out.width, out.height);
+        const px = g.getImageData(0, 0, Math.min(out.width, 64), Math.min(out.height, 64)).data;   // throws if tainted
+        let blank = true;
+        for (let i = 0; i < px.length; i += 4) if (px[i] !== 255 || px[i + 1] !== 255 || px[i + 2] !== 255) { blank = false; break; }
+        if (!blank) return out.toDataURL('image/jpeg', 0.85);
+      } catch (e) { /* tainted or empty: try the next one */ }
+    }
+    if (svgs.length) {
+      const s = svgs[0], r = s.getBoundingClientRect();
+      const clone = s.cloneNode(true);
+      clone.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+      clone.setAttribute('width', r.width); clone.setAttribute('height', r.height);
+      return { svg: new win.XMLSerializer().serializeToString(clone), w: r.width, h: r.height };
+    }
+    return null;
+  }
+
+  function svgToJpeg(snap) {
+    return new Promise(resolve => {
+      const im = new Image();
+      im.onload = () => {
+        try {
+          const k = Math.min(1, THUMB_W / snap.w), c = document.createElement('canvas');
+          c.width = Math.round(snap.w * k); c.height = Math.round(snap.h * k);
+          const g = c.getContext('2d'); g.fillStyle = '#fff'; g.fillRect(0, 0, c.width, c.height);
+          g.drawImage(im, 0, 0, c.width, c.height);
+          resolve(c.toDataURL('image/jpeg', 0.85));
+        } catch (e) { resolve(null); }
+      };
+      im.onerror = () => resolve(null);
+      im.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(snap.svg);
+    });
+  }
+
+  // Load one tool off-screen and resolve with a data URL (or null).
+  function captureTool(t, run) {
+    return new Promise(resolve => {
+      const f = document.createElement('iframe');
+      f.className = 'pt-thumb-frame';
+      f.setAttribute('aria-hidden', 'true');
+      f.setAttribute('inert', '');
+      f.tabIndex = -1;
+      f.setAttribute('allow', '');
+      let done = false, timer = null;
+      const finish = url => {
+        if (done) return;
+        done = true; clearTimeout(timer);
+        f.src = 'about:blank';
+        f.remove();
+        resolve(url || null);
+      };
+      timer = setTimeout(() => finish(null), THUMB_TIMEOUT);
+      f.addEventListener('load', () => {
+        let win, doc;
+        try { win = f.contentWindow; doc = win.document; } catch (e) { return finish(null); }
+        if (!doc || doc.location.href === 'about:blank') return;
+        try { growSwatches(win, doc); } catch (e) { /* keep going with what the tool drew */ }
+        let tries = 0;
+        const poll = () => {
+          if (done) return;
+          if (run !== thumbRun) return finish(null);
+          let snap = null;
+          try { snap = snapshot(win, doc); } catch (e) { /* retry */ }
+          if (snap && ++tries >= 1) {
+            // settle briefly so the redraw after the colour change lands, then take it again
+            setTimeout(async () => {
+              if (done) return;
+              let again = null;
+              try { again = snapshot(win, doc) || snap; } catch (e) { again = snap; }
+              if (again && again.svg) again = await svgToJpeg(again);
+              finish(again);
+            }, 700);
+            return;
+          }
+          setTimeout(poll, 250);
+        };
+        setTimeout(poll, 400);
+      });
+      document.body.appendChild(f);
+      f.src = t.href;
+    });
+  }
+
+  function pumpThumbs() {
+    while (thumbActive < THUMB_JOBS && thumbQueue.length) {
+      const run = thumbRun, sig = brandSig(), t = thumbQueue.shift(), key = sig + '|' + t.slug;
+      if (!sig) return;
+      if (thumbCache.has(key) || thumbFailed.has(key)) continue;
+      thumbActive++;
+      captureTool(t, run).then(url => {
+        thumbActive--;
+        if (run === thumbRun) {
+          if (url) { thumbCache.set(key, url); thumbStats.done++; paintCard(t.slug, url); }
+          else { thumbFailed.add(key); thumbStats.failed.push(t.slug); paintCard(t.slug, null); }
+          if (el.section) el.section.dataset.thumbs = thumbStats.done + '/' + thumbStats.total;
+        }
+        pumpThumbs();
+      });
+    }
+  }
+
+  // Bring the grid in line with the chosen brand: cached thumbs now, the rest rendered in the background.
+  function applyThumbs(restart) {
+    if (restart) { thumbRun++; thumbQueue = []; }
+    const sig = brandSig();
+    if (!sig) { restoreArt(); return; }
+    if (!catalog || !visible.length) return;
+    const todo = [];
+    visible.forEach(t => {
+      const key = sig + '|' + t.slug;
+      if (thumbCache.has(key)) paintCard(t.slug, thumbCache.get(key));
+      else if (!thumbFailed.has(key)) { const c = cardFor(t.slug); if (c) c.classList.add('is-pending'); todo.push(t); }
+    });
+    // visible cards first (by grid position), then everything else in the catalog
+    const queued = new Set(thumbQueue.map(t => t.slug));
+    todo.forEach(t => { if (!queued.has(t.slug)) thumbQueue.push(t); });
+    if (restart) {
+      thumbStats.done = 0; thumbStats.failed = []; thumbStats.total = catalog.length;
+      thumbStats.done = catalog.filter(t => thumbCache.has(sig + '|' + t.slug)).length;
+      catalog.forEach(t => { const k = sig + '|' + t.slug; if (!thumbCache.has(k) && !thumbFailed.has(k) && !queued.has(t.slug) && !todo.includes(t)) thumbQueue.push(t); });
+    }
+    pumpThumbs();
   }
 
   /* ---------- catalog ---------- */
@@ -196,6 +377,7 @@ const PatternsHome = (function () {
         <span class="pt-name">${escapeHtml(t.name)}</span>
         <span class="pt-meta">${escapeHtml(t.cat)} &middot; ${sourceLabel(t)}</span>
       </button>`).join('');
+    applyThumbs(false);
   }
 
   function syncSourceButtons() {
@@ -233,6 +415,7 @@ const PatternsHome = (function () {
     await Promise.all([load(), refreshBrands()]);
     if (!el.cat.options.length || el.cat.options.length === 1) buildCategories();
     renderGrid();
+    applyThumbs(true);
   }
 
   /* ---------- tool ---------- */
