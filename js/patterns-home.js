@@ -20,6 +20,7 @@ const PatternsHome = (function () {
     source: $('ptSource'), cat: $('ptCat'), surprise: $('ptSurprise'), grid: $('ptGrid'),
     missing: $('ptMissing'), none: $('ptNone'), clear: $('ptClear'),
     tool: $('ptTool'), frame: $('ptFrame'), name: $('ptToolName'), toolCat: $('ptToolCat'),
+    brand: $('ptBrand'), toolBrand: $('ptToolBrand'),
     back: $('ptBack'), prev: $('ptPrev'), next: $('ptNext'),
   };
 
@@ -42,6 +43,104 @@ const PatternsHome = (function () {
   function setHash(slug) {
     const base = location.pathname + location.search;
     try { history.replaceState(null, '', slug ? base + '#pattern=' + encodeURIComponent(slug) : base); } catch (e) { /* ignore */ }
+  }
+
+  /* ---------- brand colours ----------
+     The tools keep one "My colors" set in localStorage ("ptrn.mycolors"), read when a
+     tool loads. Choosing a brand writes that brand's colours there (switched on); the
+     user's own set is parked under BACKUP_KEY first and put back on "No brand". */
+
+  const BRAND_KEY = 'bd.ptrn.brand';
+  const BACKUP_KEY = 'bd.ptrn.mycolors.backup';
+  const MYC_KEY = 'ptrn.mycolors';
+  const NONE = '__none__';
+  const ROLE_ORDER = ['primary', 'accent', 'secondary', 'neutralDark', 'neutralLight'];
+  let brands = [];             // [{ id, name, cols }]
+  let brandId = '';
+
+  const lsGet = k => { try { return localStorage.getItem(k); } catch (e) { return null; } };
+  const lsSet = (k, v) => { try { localStorage.setItem(k, v); } catch (e) { /* private mode */ } };
+  const lsDel = k => { try { localStorage.removeItem(k); } catch (e) { /* ignore */ } };
+
+  function brandCols(rec) {
+    const c = (rec.savedState && rec.savedState.colors) || (rec.draftState && rec.draftState.colors) || {};
+    const out = [];
+    ROLE_ORDER.forEach(k => {
+      const h = typeof c[k] === 'string' && /^#?([0-9a-f]{3}|[0-9a-f]{6})$/i.test(c[k].trim()) ? c[k].trim().toLowerCase() : null;
+      if (!h) return;
+      const full = h.startsWith('#') ? h : '#' + h;
+      if (!out.includes(full)) out.push(full);
+    });
+    return out;
+  }
+
+  // Put the chosen brand's colours where the tools read them, or put the user's own set back.
+  function writeColours() {
+    const b = brands.find(x => x.id === brandId);
+    if (b && b.cols.length) {
+      if (lsGet(BACKUP_KEY) === null) lsSet(BACKUP_KEY, lsGet(MYC_KEY) === null ? NONE : lsGet(MYC_KEY));
+      lsSet(MYC_KEY, JSON.stringify({ v: 1, cols: b.cols, on: true }));
+    } else {
+      const bk = lsGet(BACKUP_KEY);
+      if (bk !== null) {
+        if (bk === NONE) lsDel(MYC_KEY); else lsSet(MYC_KEY, bk);
+        lsDel(BACKUP_KEY);
+      }
+    }
+  }
+
+  function renderBrandSelects() {
+    const html = '<option value="">No brand</option>' +
+      brands.map(b => `<option value="${escapeHtml(b.id)}">${escapeHtml(b.name)}</option>`).join('');
+    [el.brand, el.toolBrand].forEach(s => { s.innerHTML = html; s.value = brandId; });
+  }
+
+  async function refreshBrands() {
+    try {
+      const recs = await LibraryStore.list();
+      brands = recs.map(r => ({ id: r.id, name: (r.name || '').trim() || 'Untitled brand', cols: brandCols(r) }))
+        .filter(b => b.cols.length)
+        .sort((a, b) => a.name.localeCompare(b.name));
+    } catch (e) { brands = []; }
+    if (!brandId) brandId = lsGet(BRAND_KEY) || '';
+    if (brandId && !brands.some(b => b.id === brandId)) { brandId = ''; lsDel(BRAND_KEY); }
+    writeColours();
+    renderBrandSelects();
+  }
+
+  function chooseBrand(id) {
+    brandId = id || '';
+    if (brandId) lsSet(BRAND_KEY, brandId); else lsDel(BRAND_KEY);
+    writeColours();
+    renderBrandSelects();
+    if (openSlug !== null) {      // a tool reads the set when it loads: reload it
+      const t = bySlug(openSlug);
+      if (t) { el.frame.classList.remove('is-ready'); el.frame.src = 'about:blank'; el.frame.src = t.href; setTimeout(() => el.frame.classList.add('is-ready'), 1500); }
+    }
+  }
+
+  // The tool's own "+" button adds an ink; answer its colour picker with the next brand colour
+  // so the swatch row can hold the whole brand, then let the tool's My colors listener refit.
+  function growSwatches(win, doc) {
+    const b = brands.find(x => x.id === brandId);
+    if (!b) return;
+    const host = doc.getElementById('swatches');
+    if (!host) return;
+    if (!host.querySelector('.sw-add')) return;
+    const have = () => host.querySelectorAll('.sw').length;
+    const origPick = win.__pickColour;
+    win.__pickColour = (anchor, commit) => commit(b.cols[Math.min(have(), b.cols.length - 1)]);
+    try {
+      // the row is rebuilt on every add, so find the button again each time
+      for (let n = 0; n < 12 && have() < b.cols.length; n++) {
+        const btn = host.querySelector('.sw-add');
+        const before = have();
+        if (!btn) break;
+        btn.click();
+        if (have() === before) break;
+      }
+    } finally { win.__pickColour = origPick; }
+    try { win.dispatchEvent(new win.StorageEvent('storage', { key: MYC_KEY })); } catch (e) { /* tool refits on its next change */ }
   }
 
   /* ---------- catalog ---------- */
@@ -131,7 +230,7 @@ const PatternsHome = (function () {
     saveMode('patterns');
     setView('patterns');
     closeTool(true);
-    await load();
+    await Promise.all([load(), refreshBrands()]);
     if (!el.cat.options.length || el.cat.options.length === 1) buildCategories();
     renderGrid();
   }
@@ -170,6 +269,7 @@ const PatternsHome = (function () {
     if (!openSlug || !doc || doc.location.href === 'about:blank') return;
     if (HOME_PATHS.includes(win.location.pathname)) { showGrid(); return; }   // the tool linked home: back to our grid
     doc.addEventListener('keydown', onKey);
+    growSwatches(win, doc);
     injectTheme(doc).then(() => el.frame.classList.add('is-ready'));
   }
 
@@ -244,6 +344,8 @@ const PatternsHome = (function () {
       renderGrid();
     });
     el.cat.addEventListener('change', () => { filters.cat = el.cat.value; renderGrid(); });
+    el.brand.addEventListener('change', () => chooseBrand(el.brand.value));
+    el.toolBrand.addEventListener('change', () => chooseBrand(el.toolBrand.value));
     el.surprise.addEventListener('click', surprise);
     el.clear.addEventListener('click', clearFilters);
     el.grid.addEventListener('click', e => {
