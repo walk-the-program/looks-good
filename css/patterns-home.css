@@ -217,4 +217,6 @@ html.is-mac-app.is-fullscreen .pt-tool-bar { height: 46px; padding: 0 16px; }
 .pt-art { position: relative; }
 @keyframes pt-shimmer { from { background-position: 120% 0; } to { background-position: -120% 0; } }
 @media (prefers-reduced-motion: reduce) { .pt-card.is-pending .pt-art::after { animation: none; } }
-.pt-thumb-frame { position: fixed; left: -10000px; top: 0; width: 800px; height: 600px; border: 0; opacity: 0; pointer-events: none; }
+/* On-screen but invisible and behind the page: WebKit pauses the frame loop of off-screen iframes, so tools
+   would never redraw in the brand colours there. */
+.pt-thumb-frame { position: fixed; left: 0; top: 0; width: 800px; height: 600px; border: 0; opacity: 0.001; z-index: -1; pointer-events: none; }

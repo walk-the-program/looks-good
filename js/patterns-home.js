@@ -145,96 +145,209 @@ const PatternsHome = (function () {
   }
 
   /* ---------- brand thumbnails ----------
-     With a brand chosen, every card re-renders its tool in the brand colours: a hidden,
-     off-screen iframe loads the tool (which reads ptrn.mycolors), we wait for it to draw,
-     then snapshot its biggest canvas or svg into a small image. At most THUMB_JOBS run at
-     once. Snapshots are cached per brand colour set + tool. Failures keep the static art. */
+     With a brand chosen, every card re-renders its tool in the brand colours: a hidden
+     iframe loads the tool (which reads ptrn.mycolors), we wait for it to draw, then
+     snapshot its biggest canvas or svg into a small image. At most THUMB_JOBS run at once.
+     Snapshots are stored as image bytes in their own IndexedDB (per brand colour set + tool +
+     CACHE_VERSION + the catalog's "released" date), so reopening the app paints them at
+     once and only tools with no stored snapshot are rendered. Blank or failed captures
+     keep the static art and get one retry. Bump CACHE_VERSION to invalidate every stored
+     snapshot (e.g. after changing how they are captured). */
 
-  const THUMB_JOBS = 3, THUMB_TIMEOUT = 7000, THUMB_W = 480;
-  const thumbCache = new Map();   // sig|slug -> data URL
-  const thumbFailed = new Set();  // sig|slug
+  const THUMB_JOBS = 3, THUMB_TIMEOUT = 9000, THUMB_W = 480;
+  const CACHE_VERSION = 1, THUMB_DB = 'bdPtrnThumbs', MAX_BRAND_SETS = 6;
+  const thumbUrls = new Map();    // slug -> object URL, for thumbSig only
+  const thumbFailed = new Set();  // slugs that failed for thumbSig
+  let thumbSig = '';
+  let thumbReady = false;         // stored snapshots for thumbSig have been loaded
+  let thumbRetried = false;
   let thumbRun = 0;               // bumps whenever the brand changes: stale work stops
-  let thumbQueue = [];
+  let thumbQueue = [];            // [{ t, retry }]
   let thumbActive = 0;
-  const thumbStats = { done: 0, failed: [], total: 0 };
 
   function brandSig() {
     const b = brands.find(x => x.id === brandId);
     return b && b.cols.length ? b.cols.join(',') : '';
   }
-  const thumbKey = slug => brandSig() + '|' + slug;
+  const thumbVer = t => CACHE_VERSION + '|' + (t.released || '');
 
+  /* -- storage -- */
+  let thumbDbP = null;
+  function thumbDb() {
+    if (!thumbDbP) thumbDbP = new Promise(resolve => {
+      try {
+        const rq = indexedDB.open(THUMB_DB, 1);
+        rq.onupgradeneeded = () => {
+          const d = rq.result;
+          d.createObjectStore('thumbs', { keyPath: 'key' }).createIndex('sig', 'sig');
+          d.createObjectStore('sets', { keyPath: 'sig' });
+        };
+        rq.onsuccess = () => resolve(rq.result);
+        rq.onerror = rq.onblocked = () => resolve(null);
+      } catch (e) { resolve(null); }
+    });
+    return thumbDbP;
+  }
+  const idb = rq => new Promise(res => { rq.onsuccess = () => res(rq.result); rq.onerror = () => res(null); });
+
+  async function storedLoad(sig) {
+    const out = new Map();
+    try {
+      const db = await thumbDb();
+      if (!db) return out;
+      const rows = await idb(db.transaction('thumbs').objectStore('thumbs').index('sig').getAll(sig));
+      (rows || []).forEach(r => out.set(r.slug, r));
+    } catch (e) { /* no storage: render fresh */ }
+    return out;
+  }
+
+  async function storedPut(sig, t, blob) {
+    try {
+      const db = await thumbDb();
+      if (!db) return;
+      // raw bytes, not a Blob: WebKit refuses Blobs in IndexedDB in some storage modes
+      const buf = await blob.arrayBuffer();
+      await idb(db.transaction('thumbs', 'readwrite').objectStore('thumbs')
+        .put({ key: sig + '|' + t.slug, sig, slug: t.slug, ver: thumbVer(t), buf, type: blob.type || 'image/jpeg', at: Date.now() }));
+    } catch (e) { /* storage full or blocked: the in-memory copy still works */ }
+  }
+
+  // Mark this brand set as just used and drop the oldest sets beyond MAX_BRAND_SETS.
+  async function storedTouch(sig) {
+    try {
+      const db = await thumbDb();
+      if (!db) return;
+      await idb(db.transaction('sets', 'readwrite').objectStore('sets').put({ sig, at: Date.now() }));
+      const sets = (await idb(db.transaction('sets').objectStore('sets').getAll())) || [];
+      sets.sort((a, b) => b.at - a.at);
+      for (const s of sets.slice(MAX_BRAND_SETS)) {
+        const tx = db.transaction(['thumbs', 'sets'], 'readwrite');
+        const keys = await idb(tx.objectStore('thumbs').index('sig').getAllKeys(s.sig));
+        (keys || []).forEach(k => tx.objectStore('thumbs').delete(k));
+        tx.objectStore('sets').delete(s.sig);
+        await new Promise(res => { tx.oncomplete = tx.onerror = tx.onabort = res; });
+      }
+    } catch (e) { /* ignore */ }
+  }
+
+  /* -- grid painting -- */
   function cardFor(slug) {
     return Array.prototype.find.call(el.grid.children, c => c.dataset.slug === slug) || null;
   }
 
-  function paintCard(slug, url) {
-    const card = cardFor(slug);
+  function revertCard(img) {
+    img.onerror = null;
+    if (img.dataset.art) { img.src = img.dataset.art; delete img.dataset.art; }
+  }
+
+  function paintCard(slug) {
+    const card = cardFor(slug), url = thumbUrls.get(slug);
     if (!card) return;
-    const img = card.querySelector('img');
     card.classList.remove('is-pending');
-    if (!img || !url) return;
+    const img = card.querySelector('img');
+    if (!img || !url || img.src === url) return;
     if (!img.dataset.art) img.dataset.art = img.getAttribute('src');
+    img.onerror = () => revertCard(img);         // a bad snapshot never leaves a blank card
     img.classList.add('is-swap');
     img.src = url;
-    requestAnimationFrame(() => img.classList.remove('is-swap'));
+    setTimeout(() => img.classList.remove('is-swap'), 40);   // not rAF: a paused frame loop must never leave the card invisible
   }
 
   function restoreArt() {
     Array.prototype.forEach.call(el.grid.children, card => {
       card.classList.remove('is-pending');
       const img = card.querySelector('img');
-      if (img && img.dataset.art) { img.src = img.dataset.art; delete img.dataset.art; }
+      if (img) revertCard(img);
     });
   }
 
-  function snapshot(win, doc) {
+  function dropThumbs() {     // call after restoreArt so no card still shows one
+    thumbUrls.forEach(u => URL.revokeObjectURL(u));
+    thumbUrls.clear(); thumbFailed.clear();
+  }
+
+  function paintAll() {
+    visible.forEach(t => {
+      if (thumbUrls.has(t.slug)) paintCard(t.slug);
+      else if (!thumbFailed.has(t.slug)) { const c = cardFor(t.slug); if (c) c.classList.add('is-pending'); }
+    });
+    if (el.section && catalog) el.section.dataset.thumbs = thumbUrls.size + '/' + catalog.length;
+  }
+
+  /* -- capture -- */
+
+  // Run fn in the tool's next animation frame (a WebGL canvas reads back blank outside the
+  // frame that drew it). If frames are paused for a hidden iframe, run it anyway.
+  function inFrame(win, fn) {
+    return new Promise(resolve => {
+      let done = false;
+      const go = () => { if (done) return; done = true; let r = null; try { r = fn(); } catch (e) { /* null */ } resolve(r); };
+      try { win.requestAnimationFrame(go); } catch (e) { /* fall through */ }
+      setTimeout(go, 500);
+    });
+  }
+
+  // Flat or single-colour output means nothing was really drawn. Sparse dots on a dark
+  // ground still count as drawn: it is the number of pixels off the average that matters.
+  function looksBlank(src) {
+    const g = src.getContext('2d');
+    const d = g.getImageData(0, 0, src.width, src.height).data;
+    let r = 0, gr = 0, b = 0, n = 0;
+    for (let i = 0; i < d.length; i += 4) { r += d[i]; gr += d[i + 1]; b += d[i + 2]; n++; }
+    r /= n; gr /= n; b /= n;
+    let off = 0;
+    for (let i = 0; i < d.length; i += 4) {
+      if (Math.abs(d[i] - r) + Math.abs(d[i + 1] - gr) + Math.abs(d[i + 2] - b) > 30) off++;
+    }
+    return off < n * 0.001;
+  }
+
+  function fitCanvas(w, h) {
+    const k = Math.min(1, THUMB_W / w), c = document.createElement('canvas');
+    c.width = Math.max(1, Math.round(w * k)); c.height = Math.max(1, Math.round(h * k));
+    const g = c.getContext('2d');
+    g.fillStyle = '#fff'; g.fillRect(0, 0, c.width, c.height);
+    return c;
+  }
+
+  // The tool's main artwork as a canvas: its largest canvas, else its largest svg. Null if none/blank/tainted.
+  async function shoot(win, doc) {
     const area = n => { const r = n.getBoundingClientRect(); return r.width * r.height; };
     const cvs = Array.prototype.filter.call(doc.querySelectorAll('canvas'), c => c.width > 16 && c.height > 16 && area(c) > 1000)
       .sort((a, b) => area(b) - area(a));
     const svgs = Array.prototype.filter.call(doc.querySelectorAll('svg'), n => area(n) > 20000)
       .sort((a, b) => area(b) - area(a));
-    const out = document.createElement('canvas');
-    const fit = (w, h) => { const k = Math.min(1, THUMB_W / w); out.width = Math.round(w * k); out.height = Math.round(h * k); return out.getContext('2d'); };
     for (const c of cvs) {
-      try {
-        const g = fit(c.width, c.height);
-        g.fillStyle = '#fff'; g.fillRect(0, 0, out.width, out.height);
-        g.drawImage(c, 0, 0, out.width, out.height);
-        const px = g.getImageData(0, 0, Math.min(out.width, 64), Math.min(out.height, 64)).data;   // throws if tainted
-        let blank = true;
-        for (let i = 0; i < px.length; i += 4) if (px[i] !== 255 || px[i + 1] !== 255 || px[i + 2] !== 255) { blank = false; break; }
-        if (!blank) return out.toDataURL('image/jpeg', 0.85);
-      } catch (e) { /* tainted or empty: try the next one */ }
+      const out = await inFrame(win, () => {
+        const o = fitCanvas(c.width, c.height);
+        o.getContext('2d').drawImage(c, 0, 0, o.width, o.height);
+        o.getContext('2d').getImageData(0, 0, 1, 1);        // throws if the canvas is tainted
+        return o;
+      });
+      if (out && !looksBlank(out)) return out;
     }
     if (svgs.length) {
-      const s = svgs[0], r = s.getBoundingClientRect();
-      const clone = s.cloneNode(true);
+      const s = svgs[0], r = s.getBoundingClientRect(), clone = s.cloneNode(true);
       clone.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
       clone.setAttribute('width', r.width); clone.setAttribute('height', r.height);
-      return { svg: new win.XMLSerializer().serializeToString(clone), w: r.width, h: r.height };
+      const xml = new win.XMLSerializer().serializeToString(clone);
+      const out = await new Promise(resolve => {
+        const im = new Image();
+        im.onload = () => {
+          try { const o = fitCanvas(r.width, r.height); o.getContext('2d').drawImage(im, 0, 0, o.width, o.height); resolve(o); }
+          catch (e) { resolve(null); }
+        };
+        im.onerror = () => resolve(null);
+        im.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(xml);
+      });
+      if (out && !looksBlank(out)) return out;
     }
     return null;
   }
 
-  function svgToJpeg(snap) {
-    return new Promise(resolve => {
-      const im = new Image();
-      im.onload = () => {
-        try {
-          const k = Math.min(1, THUMB_W / snap.w), c = document.createElement('canvas');
-          c.width = Math.round(snap.w * k); c.height = Math.round(snap.h * k);
-          const g = c.getContext('2d'); g.fillStyle = '#fff'; g.fillRect(0, 0, c.width, c.height);
-          g.drawImage(im, 0, 0, c.width, c.height);
-          resolve(c.toDataURL('image/jpeg', 0.85));
-        } catch (e) { resolve(null); }
-      };
-      im.onerror = () => resolve(null);
-      im.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(snap.svg);
-    });
-  }
+  const toBlob = c => new Promise(res => { try { c.toBlob(b => res(b), 'image/jpeg', 0.85); } catch (e) { res(null); } });
 
-  // Load one tool off-screen and resolve with a data URL (or null).
+  // Load one tool in a hidden iframe and resolve with a JPEG Blob (or null).
   function captureTool(t, run) {
     return new Promise(resolve => {
       const f = document.createElement('iframe');
@@ -244,12 +357,12 @@ const PatternsHome = (function () {
       f.tabIndex = -1;
       f.setAttribute('allow', '');
       let done = false, timer = null;
-      const finish = url => {
+      const finish = blob => {
         if (done) return;
         done = true; clearTimeout(timer);
         f.src = 'about:blank';
         f.remove();
-        resolve(url || null);
+        resolve(blob || null);
       };
       timer = setTimeout(() => finish(null), THUMB_TIMEOUT);
       f.addEventListener('load', () => {
@@ -257,24 +370,20 @@ const PatternsHome = (function () {
         try { win = f.contentWindow; doc = win.document; } catch (e) { return finish(null); }
         if (!doc || doc.location.href === 'about:blank') return;
         try { growSwatches(win, doc); } catch (e) { /* keep going with what the tool drew */ }
-        let tries = 0;
-        const poll = () => {
+        const poll = async () => {
           if (done) return;
           if (run !== thumbRun) return finish(null);
-          let snap = null;
-          try { snap = snapshot(win, doc); } catch (e) { /* retry */ }
-          if (snap && ++tries >= 1) {
-            // settle briefly so the redraw after the colour change lands, then take it again
-            setTimeout(async () => {
-              if (done) return;
-              let again = null;
-              try { again = snapshot(win, doc) || snap; } catch (e) { again = snap; }
-              if (again && again.svg) again = await svgToJpeg(again);
-              finish(again);
-            }, 700);
-            return;
-          }
-          setTimeout(poll, 250);
+          let shot = null;
+          try { shot = await shoot(win, doc); } catch (e) { /* retry */ }
+          if (done) return;
+          if (!shot) return void setTimeout(poll, 300);
+          // settle so the redraw after the colour change lands, then shoot again
+          setTimeout(async () => {
+            if (done) return;
+            let again = null;
+            try { again = await shoot(win, doc); } catch (e) { /* keep the first */ }
+            finish(await toBlob(again || shot));
+          }, 700);
         };
         setTimeout(poll, 400);
       });
@@ -285,42 +394,55 @@ const PatternsHome = (function () {
 
   function pumpThumbs() {
     while (thumbActive < THUMB_JOBS && thumbQueue.length) {
-      const run = thumbRun, sig = brandSig(), t = thumbQueue.shift(), key = sig + '|' + t.slug;
-      if (!sig) return;
-      if (thumbCache.has(key) || thumbFailed.has(key)) continue;
+      const run = thumbRun, sig = brandSig(), job = thumbQueue.shift(), t = job.t;
+      if (!sig) { thumbQueue = []; return; }
+      if (thumbUrls.has(t.slug)) continue;
       thumbActive++;
-      captureTool(t, run).then(url => {
+      captureTool(t, run).then(blob => {
         thumbActive--;
+        if (blob) storedPut(sig, t, blob);                     // keep it even if the grid has moved on
         if (run === thumbRun) {
-          if (url) { thumbCache.set(key, url); thumbStats.done++; paintCard(t.slug, url); }
-          else { thumbFailed.add(key); thumbStats.failed.push(t.slug); paintCard(t.slug, null); }
-          if (el.section) el.section.dataset.thumbs = thumbStats.done + '/' + thumbStats.total;
+          if (blob) { thumbUrls.set(t.slug, URL.createObjectURL(blob)); thumbFailed.delete(t.slug); }
+          else thumbFailed.add(t.slug);
+          paintCard(t.slug);
+          paintAll();
+          if (!thumbQueue.length && !thumbActive && !thumbRetried && thumbFailed.size) {   // one more go at the failures
+            thumbRetried = true;
+            thumbFailed.forEach(slug => { const x = bySlug(slug); if (x) thumbQueue.push({ t: x, retry: true }); });
+          }
         }
         pumpThumbs();
       });
     }
   }
 
-  // Bring the grid in line with the chosen brand: cached thumbs now, the rest rendered in the background.
-  function applyThumbs(restart) {
-    if (restart) { thumbRun++; thumbQueue = []; }
+  // Bring the grid in line with the chosen brand: stored snapshots paint at once, the rest render in the background.
+  async function applyThumbs(restart) {
     const sig = brandSig();
-    if (!sig) { restoreArt(); return; }
+    if (restart) { thumbRun++; thumbQueue = []; }
+    const run = thumbRun;
+    if (!sig) { restoreArt(); dropThumbs(); thumbSig = ''; thumbReady = false; return; }
+    if (sig !== thumbSig) { restoreArt(); dropThumbs(); thumbSig = sig; thumbReady = false; }
     if (!catalog || !visible.length) return;
-    const todo = [];
-    visible.forEach(t => {
-      const key = sig + '|' + t.slug;
-      if (thumbCache.has(key)) paintCard(t.slug, thumbCache.get(key));
-      else if (!thumbFailed.has(key)) { const c = cardFor(t.slug); if (c) c.classList.add('is-pending'); todo.push(t); }
-    });
-    // visible cards first (by grid position), then everything else in the catalog
-    const queued = new Set(thumbQueue.map(t => t.slug));
-    todo.forEach(t => { if (!queued.has(t.slug)) thumbQueue.push(t); });
-    if (restart) {
-      thumbStats.done = 0; thumbStats.failed = []; thumbStats.total = catalog.length;
-      thumbStats.done = catalog.filter(t => thumbCache.has(sig + '|' + t.slug)).length;
-      catalog.forEach(t => { const k = sig + '|' + t.slug; if (!thumbCache.has(k) && !thumbFailed.has(k) && !queued.has(t.slug) && !todo.includes(t)) thumbQueue.push(t); });
+    if (!restart) { paintAll(); return; }              // renderGrid rebuilt the cards
+    paintAll();
+    if (!thumbReady) {
+      const rec = await storedLoad(sig);
+      if (run !== thumbRun) return;
+      catalog.forEach(t => {
+        const r = rec.get(t.slug);
+        if (r && r.buf && r.ver === thumbVer(t)) thumbUrls.set(t.slug, URL.createObjectURL(new Blob([r.buf], { type: r.type })));
+      });
+      thumbReady = true; thumbRetried = false;
+      storedTouch(sig);
+      paintAll();
     }
+    const seen = new Set();
+    visible.concat(catalog).forEach(t => {
+      if (seen.has(t.slug)) return;
+      seen.add(t.slug);
+      if (!thumbUrls.has(t.slug) && !thumbFailed.has(t.slug)) thumbQueue.push({ t, retry: false });
+    });
     pumpThumbs();
   }
 
