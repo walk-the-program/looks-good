@@ -1,0 +1,197 @@
+/* ---------------------------------------------------------------------
+   02 Raw Brutalist — zero radius, 2px ink borders, hard offset shadows,
+   monospace UI. --ab-grid comes from js/aesthetics/raw-brutalist.js.
+   Layout hooks used: hero 'poster' (display 1.35), palette 'strips', type
+   ui/label 'mono', highlight 'band', states 'button'.
+------------------------------------------------------------------------ */
+
+.ab[data-ae="raw-brutalist--classic"] {
+  --rb-mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --rb-shadow: 6px 6px 0 var(--ab-ink);
+  border-radius: 0;
+}
+.ab[data-ae="raw-brutalist--classic"] *, .ab[data-ae="raw-brutalist--classic"] *::before, .ab[data-ae="raw-brutalist--classic"] *::after { border-radius: 0; }
+
+/* uppercase labels; the mono face itself comes from --ab-font-ui / --ab-font-label (def.type) */
+.ab[data-ae="raw-brutalist--classic"] .ab-label, .ab[data-ae="raw-brutalist--classic"] .ab-tag, .ab[data-ae="raw-brutalist--classic"] .ab-kicker, .ab[data-ae="raw-brutalist--classic"] .ab-sw-role, .ab[data-ae="raw-brutalist--classic"] .ab-sw-job, .ab[data-ae="raw-brutalist--classic"] .ab-sw-hex, .ab[data-ae="raw-brutalist--classic"] .ab-fieldlabel,
+.ab[data-ae="raw-brutalist--classic"] .ab-seg-btn, .ab[data-ae="raw-brutalist--classic"] .ab-cta, .ab[data-ae="raw-brutalist--classic"] .ab-toggle > span, .ab[data-ae="raw-brutalist--classic"] .ab-status, .ab[data-ae="raw-brutalist--classic"] .ab-state, .ab[data-ae="raw-brutalist--classic"] .ab-row, .ab[data-ae="raw-brutalist--classic"] .ab-foot {
+  text-transform: uppercase; letter-spacing: 0.04em;
+}
+.ab[data-ae="raw-brutalist--classic"] .ab-label { color: var(--ab-ink); font-size: 11.5px; font-weight: 600; letter-spacing: 0.06em; }
+.ab[data-ae="raw-brutalist--classic"] .ab-n::before { content: "["; }
+.ab[data-ae="raw-brutalist--classic"] .ab-n::after { content: "]  "; }
+.ab[data-ae="raw-brutalist--classic"] .ab-label:last-child:not(:first-child) { color: var(--ab-muted); font-weight: 400; }
+.ab[data-ae="raw-brutalist--classic"] .ab-labelrow { padding-bottom: 8px; margin-bottom: 18px; border-bottom: 1px solid var(--ab-line); }
+
+/* header */
+.ab[data-ae="raw-brutalist--classic"] .ab-brand { font-weight: 900; text-transform: uppercase; letter-spacing: calc(-0.02em * var(--ab-tr, 1)); }
+.ab[data-ae="raw-brutalist--classic"] .ab-mark { border: 2px solid var(--ab-ink); background: var(--ab-primary); color: var(--ab-on-primary); width: 30px; height: 30px; }
+.ab[data-ae="raw-brutalist--classic"] .ab-tag::before { content: "["; }
+.ab[data-ae="raw-brutalist--classic"] .ab-tag::after { content: "]"; }
+.ab[data-ae="raw-brutalist--classic"] .ab-tag { color: var(--ab-muted); letter-spacing: 0.06em; }
+.ab[data-ae="raw-brutalist--classic"] .ab-head { padding-bottom: 16px; }
+.ab[data-ae="raw-brutalist--classic"] .ab-rule { height: 2px; background: var(--ab-ink); }
+
+/* hero (poster): 12-column grid lines, an enormous uppercase headline that
+   bleeds into the right edge, and a mono spec index at the top right. Size comes from the framework poster hero x def.type.display. */
+.ab[data-ae="raw-brutalist--classic"] {
+  --ab-poster-art-w: clamp(150px, 29cqw, 300px);
+}
+.ab[data-ae="raw-brutalist--classic"] .ab-hero { padding-bottom: clamp(70px, 16cqw, 190px); }
+.ab[data-ae="raw-brutalist--classic"] .ab-hero::before {
+  content: ""; position: absolute; inset: 0; z-index: 0; pointer-events: none;
+  background: linear-gradient(90deg, var(--ab-grid) 1px, transparent 1px) 0 0 / calc(100% / 12) 100%;
+  border-right: 1px solid var(--ab-grid);
+}
+.ab[data-ae="raw-brutalist--classic"] .ab-hero-copy { display: block; z-index: 2; }
+.ab[data-ae="raw-brutalist--classic"] .ab-kicker { color: var(--ab-ink); font-weight: 600; }
+.ab[data-ae="raw-brutalist--classic"] .ab-kicker::before { content: "[00] "; color: var(--ab-muted); }
+.ab[data-ae="raw-brutalist--classic"] .ab-headline {
+  margin-right: calc(var(--ab-pad) * -1); font-weight: 900; text-transform: uppercase; line-height: calc(0.86 + 0.16 * (1 - var(--ab-tr, 1))); letter-spacing: calc(-0.045em * var(--ab-tr, 1));
+}
+/* the band is a tight plane (it must not eat the line above) that runs on to the
+   board edge: a pseudo-element extends it, the board crops it */
+.ab[data-ae="raw-brutalist--classic"] .ab-hl {
+  display: inline-block; line-height: 0.8; padding: 0.06em 0.08em 0.02em; margin: 0 0 0 -0.02em;
+  position: relative; color: var(--ab-on-accent); background: var(--ab-accent);
+}
+.ab[data-ae="raw-brutalist--classic"] .ab-hl::after { content: ""; position: absolute; left: 100%; top: 0; bottom: 0; width: 100cqw; background: var(--ab-accent); }
+.ab[data-ae="raw-brutalist--classic"] .ab-art {
+  top: clamp(30px, 5.4cqw, 64px); bottom: auto; right: 0;
+  width: clamp(170px, 24cqw, 240px); aspect-ratio: auto; z-index: 1;
+}
+.ab[data-ae="raw-brutalist--classic"] .ab-subcopy { max-width: min(60ch, 100%); color: var(--ab-ink); font-size: 14px; }
+.ab[data-ae="raw-brutalist--classic"] .ab-sub-rest { color: var(--ab-muted); }
+
+/* art: a mono spec index, ruled like a data sheet (SUBJECT / SYSTEM / SURFACE / FIG.) */
+.ab[data-ae="raw-brutalist--classic"] .rba-spec {
+  margin: 0; border-top: 2px solid var(--ab-ink);
+  font: 600 10.5px/1.3 var(--rb-mono); text-transform: uppercase; letter-spacing: 0.08em;
+}
+.ab[data-ae="raw-brutalist--classic"] .rba-row {
+  display: flex; justify-content: space-between; align-items: baseline; gap: 12px;
+  padding: 6px 0; border-bottom: 1px solid var(--ab-ink);
+}
+.ab[data-ae="raw-brutalist--classic"] .rba-row dt { margin: 0; color: var(--ab-muted); flex: none; }
+.ab[data-ae="raw-brutalist--classic"] .rba-row dd { margin: 0; color: var(--ab-ink); text-align: right; min-width: 0; overflow-wrap: anywhere; }
+
+/* palette: full-width strips, labels inside, separated by 2px ink rules */
+.ab[data-ae="raw-brutalist--classic"] .ab-swatches[data-kind="strips"] { border: 2px solid var(--ab-ink); box-shadow: none; }
+.ab[data-ae="raw-brutalist--classic"] .ab-swatches[data-kind="strips"] .ab-swatch + .ab-swatch { border-left: 2px solid var(--ab-ink); }
+.ab[data-ae="raw-brutalist--classic"] .ab-sw-role { font-weight: 700; }
+.ab[data-ae="raw-brutalist--classic"] .ab-swatches[data-kind="strips"] .ab-sw-job { font-size: 10px; opacity: 0.9; }
+.ab[data-ae="raw-brutalist--classic"] .ab-swatches[data-kind="strips"] .ab-sw-hex { font-size: 10.5px; opacity: 1; font-weight: 600; }
+
+/* 01 interface */
+.ab[data-ae="raw-brutalist--classic"] .ab-card { border: 2px solid var(--ab-ink); box-shadow: var(--rb-shadow); background: var(--ab-canvas); }
+.ab[data-ae="raw-brutalist--classic"] .ab-seg { gap: 0; padding: 0; border: 2px solid var(--ab-ink); background: transparent; }
+.ab[data-ae="raw-brutalist--classic"] .ab-seg-btn { border: 0; border-right: 2px solid var(--ab-ink); color: var(--ab-ink); min-height: 40px; font-size: 12px; font-weight: 600; }
+.ab[data-ae="raw-brutalist--classic"] .ab-seg-btn:last-child { border-right: 0; }
+.ab[data-ae="raw-brutalist--classic"] .ab-seg-btn[aria-pressed="true"] { background: var(--ab-ink); color: var(--ab-canvas); }
+.ab[data-ae="raw-brutalist--classic"] .ab-card-title { font-weight: 900; text-transform: uppercase; line-height: 0.95; letter-spacing: calc(-0.02em * var(--ab-tr, 1)); font-size: clamp(22px, 3cqw, 32px); }
+.ab[data-ae="raw-brutalist--classic"] .ab-card-body { color: var(--ab-ink); font-size: 13px; }
+.ab[data-ae="raw-brutalist--classic"] .ab-cta {
+  background: var(--ab-primary); color: var(--ab-on-primary); border: 2px solid var(--ab-ink);
+  box-shadow: var(--rb-shadow); font-size: 12.5px; font-weight: 700;
+  transition: transform 0.08s, box-shadow 0.08s;
+}
+.ab[data-ae="raw-brutalist--classic"] .ab-cta-arrow::before { content: "→"; font-size: 17px; line-height: 1; }
+.ab[data-ae="raw-brutalist--classic"] .ab-cta:hover, .ab[data-ae="raw-brutalist--classic"] .ab-cta.is-hover { transform: translate(-2px, -2px); box-shadow: 8px 8px 0 var(--ab-ink); }
+.ab[data-ae="raw-brutalist--classic"] .ab-cta:active, .ab[data-ae="raw-brutalist--classic"] .ab-cta.is-pressed { transform: translate(6px, 6px); box-shadow: none; }
+
+/* 02 hard surfaces */
+.ab[data-ae="raw-brutalist--classic"] .ab-fieldlabel { font-size: 11.5px; font-weight: 600; }
+.ab[data-ae="raw-brutalist--classic"] .ab-input {
+  border: 2px solid var(--ab-ink); background: var(--ab-canvas); font-family: var(--rb-mono); font-size: 14px;
+  padding: 12px 14px; caret-color: var(--ab-ink); caret-shape: block;
+}
+.ab[data-ae="raw-brutalist--classic"] .ab-input:focus { box-shadow: 4px 4px 0 var(--ab-ink); }
+.ab[data-ae="raw-brutalist--classic"] .ab-toggle > span { font-weight: 600; font-size: 12px; }
+.ab[data-ae="raw-brutalist--classic"] .ab-switch {
+  width: 76px; height: 34px; background: var(--ab-canvas); border: 2px solid var(--ab-ink); transition: none;
+}
+.ab[data-ae="raw-brutalist--classic"] .ab-switch::before {
+  left: 3px; top: 3px; width: 24px; height: 24px; background: var(--ab-ink); transition: transform 0.08s;
+}
+.ab[data-ae="raw-brutalist--classic"] .ab-switch::after {
+  content: "OFF"; position: absolute; right: 8px; top: 50%; transform: translateY(-50%);
+  font: 700 10px var(--rb-mono); letter-spacing: 0.08em; color: var(--ab-ink);
+}
+.ab[data-ae="raw-brutalist--classic"] .ab-switch:checked { background: var(--ab-primary); }
+.ab[data-ae="raw-brutalist--classic"] .ab-switch:checked::before { transform: translateX(42px); }
+.ab[data-ae="raw-brutalist--classic"] .ab-switch:checked::after { content: "ON"; right: auto; left: 9px; color: var(--ab-on-primary); }
+.ab[data-ae="raw-brutalist--classic"] .ab-status { font-size: 10.5px; }
+.ab[data-ae="raw-brutalist--classic"] .ab-states { margin-top: 26px; }
+.ab[data-ae="raw-brutalist--classic"] .ab-states[data-kind="button"] { gap: 16px; padding: 4px 4px 0 2px; }
+.ab[data-ae="raw-brutalist--classic"] .ab-state-ctl { justify-content: center; padding: 11px 8px; font-size: 11.5px; transition: none; }
+.ab[data-ae="raw-brutalist--classic"] .ab-states[data-kind="button"] .ab-state-ctl { margin-bottom: 14px; }
+.ab[data-ae="raw-brutalist--classic"] .ab-state { font-weight: 600; font-size: 10.5px; color: var(--ab-ink); }
+
+/* 03 in use: a bordered table */
+.ab[data-ae="raw-brutalist--classic"] .ab-list { border: 2px solid var(--ab-ink); }
+.ab[data-ae="raw-brutalist--classic"] .ab-row {
+  gap: 4px clamp(10px, 2cqw, 18px); padding: 11px 14px; border-top: 2px solid var(--ab-ink);
+  font-size: 12px; letter-spacing: 0.03em;
+}
+.ab[data-ae="raw-brutalist--classic"] .ab-row:first-child { border-top: 0; }
+.ab[data-ae="raw-brutalist--classic"] .ab-row:last-child { border-bottom: 0; }
+.ab[data-ae="raw-brutalist--classic"] .ab-row-n::before { content: "["; }
+.ab[data-ae="raw-brutalist--classic"] .ab-row-n::after { content: "]"; }
+.ab[data-ae="raw-brutalist--classic"] .ab-row-n { color: var(--ab-ink); width: 4ch; }
+.ab[data-ae="raw-brutalist--classic"] .ab-row { grid-template-columns: 4ch minmax(0, 1fr) auto minmax(60px, 150px) 4.5ch; }
+.ab[data-ae="raw-brutalist--classic"] .ab-row-name { font-weight: 700; }
+.ab[data-ae="raw-brutalist--classic"] .ab-row-status {
+  background: var(--ab-secondary); color: var(--ab-on-secondary); border: 2px solid var(--ab-ink);
+  padding: 2px 8px; font-weight: 600; font-size: 10.5px;
+}
+.ab[data-ae="raw-brutalist--classic"] .ab-row-bar { height: 12px; border: 2px solid var(--ab-ink); background: transparent; }
+.ab[data-ae="raw-brutalist--classic"] .ab-row-bar i { background: var(--ab-ink); }
+.ab[data-ae="raw-brutalist--classic"] .ab-row-pct { font-weight: 700; }
+@container ab (max-width: 600px) {
+  .ab[data-ae="raw-brutalist--classic"] .ab-wordmark { font-size: 13px; letter-spacing: 0; }
+  .ab[data-ae="raw-brutalist--classic"] .ab-tag { font-size: 9px; letter-spacing: .06em; }
+  .ab[data-ae="raw-brutalist--classic"] .ab-row { grid-template-columns: 4ch minmax(0, 1fr) auto 4.5ch; }
+  .ab[data-ae="raw-brutalist--classic"] .ab-hero { padding-bottom: 24px; }
+  .ab[data-ae="raw-brutalist--classic"] .ab-art { position: relative; top: auto; right: auto; width: 100%; max-width: 280px; justify-self: start; margin-right: 0; }
+  .ab[data-ae="raw-brutalist--classic"] .ab-swatches[data-kind="strips"] .ab-swatch + .ab-swatch { border-left: 0; border-top: 2px solid var(--ab-ink); }
+  .ab[data-ae="raw-brutalist--classic"] .ab-state-ctl { font-size: 10.5px; padding: 10px 4px; }
+  .ab[data-ae="raw-brutalist--classic"] .ab-states[data-kind="button"] { gap: 8px; }
+}
+
+/* fit pill: a stamped label, not a soft pill */
+.ab[data-ae="raw-brutalist--classic"] .ab-fit {
+  border-radius: 0; border: 1.5px solid var(--ab-ink); font: 700 10px var(--rb-mono); text-transform: uppercase; letter-spacing: 0.08em;
+}
+.ab[data-ae="raw-brutalist--classic"] .ab-fit[data-fit="match"] { background: var(--ab-ink); color: var(--ab-canvas); }
+
+/* footer */
+.ab[data-ae="raw-brutalist--classic"] .ab-foot { border-top: 2px solid var(--ab-ink); color: var(--ab-ink); font-size: 10.5px; }
+.ab[data-ae="raw-brutalist--classic"] .ab-dot { width: 9px; height: 9px; background: var(--ab-ink); margin-right: 9px; }
+.ab[data-ae="raw-brutalist--classic"] .ab-motto::after { content: " →"; }
+
+.ab[data-ae="raw-brutalist--classic"] .ab-seg-btn:focus-visible, .ab[data-ae="raw-brutalist--classic"] .ab-cta:focus-visible, .ab[data-ae="raw-brutalist--classic"] .ab-switch:focus-visible {
+  outline: 3px solid var(--ab-ink); outline-offset: 3px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .ab[data-ae="raw-brutalist--classic"] .ab-cta:hover, .ab[data-ae="raw-brutalist--classic"] .ab-cta:active { transform: none; }
+}
+
+/* ----- deck cover: poster scale. The headline spans the slide at 120px+ (three
+   lines); the spec index becomes a one-row, four-column strip under it (it
+   stands in for the cover's meta row), so nothing narrows the headline.
+   Deck-scoped; the board is unchanged. ----- */
+.ab[data-ae="raw-brutalist--classic"].ab-slide[data-slide="cover"] .ab-deck-cover .ab-hero { padding-top: 0; row-gap: 0; }
+.ab[data-ae="raw-brutalist--classic"].ab-slide[data-slide="cover"] .ab-deck-cover .ab-kicker { display: none; }
+.ab[data-ae="raw-brutalist--classic"].ab-slide[data-slide="cover"] .ab-deck-cover .ab-subcopy { max-width: none; margin-top: 8px; }
+.ab[data-ae="raw-brutalist--classic"].ab-slide[data-slide="cover"] .ab-deck-cover .ab-headline { line-height: 0.88; }
+.ab[data-ae="raw-brutalist--classic"].ab-slide[data-slide="cover"] .ab-deck-cover .ab-art {
+  position: relative; top: auto; right: auto; bottom: auto; width: 100%; max-width: none; justify-self: stretch; margin-top: 8px;
+}
+.ab[data-ae="raw-brutalist--classic"].ab-slide[data-slide="cover"] .ab-deck-cover .rba-spec { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0 24px; }
+.ab[data-ae="raw-brutalist--classic"].ab-slide[data-slide="cover"] .ab-deck-cover .rba-row { padding: 5px 0; }
+.ab[data-ae="raw-brutalist--classic"].ab-slide[data-slide="cover"] .ab-deck-cover-meta { display: none; }
+
+/* ----- deck slides: the highlight band runs on to the slide edge, measured
+   by js/brand-deck.js (--ab-hl-bleed) so it does not count as column overflow. ----- */
+.ab[data-ae="raw-brutalist--classic"].ab-slide .ab-hl::after { width: var(--ab-hl-bleed, 0px); }
+.ab[data-ae="raw-brutalist--classic"].ab-slide .ab-headline { margin-right: 0; }

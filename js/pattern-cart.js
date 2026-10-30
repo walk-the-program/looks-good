@@ -237,7 +237,6 @@ const PatternCart = (function () {
     if (!act || !li) return;
     const i = Number(li.dataset.i);
     if (act === 'use') PatternPins.patch(i, { use: e.target.value });
-    else if (act === 'svg') PatternPins.patch(i, { svg: e.target.checked });
     else return;
     keepFocus(`.cart-item[data-i="${i}"] [data-act="${act}"]`);
   }

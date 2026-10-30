@@ -118,6 +118,7 @@ const LogoEditor = (function () {
     const histState = function () { return { canUndo: hi > 0, canRedo: hi < hist.length - 1 }; };
     function restore(i) {
       endEdit(false, true);
+      drag = null; marquee = null;               // a gesture in flight points at nodes that are about to be replaced
       hi = i; lastMerge = null;
       const s = JSON.parse(hist[i]);
       doc.name = s.name; doc.artboard = s.artboard; doc.nodes = s.nodes; doc.updatedAt = Date.now();
@@ -577,7 +578,11 @@ const LogoEditor = (function () {
 
     // Scales a group's children (the group's own x / y / w / h are the caller's job).
     function scaleGroup(g, sx, sy) {
-      g.children.forEach(function (c) { scaleNode(c, sx, sy, true); c.x *= sx; c.y *= sy; });
+      g.children.forEach(function (c) {
+        const cx = (c.x + c.w / 2) * sx, cy = (c.y + c.h / 2) * sy;   // the centre scales; a 90° child swaps its axes
+        scaleNode(c, sx, sy, true);
+        c.x = cx - c.w / 2; c.y = cy - c.h / 2;
+      });
     }
     // Scales a node's size in its own frame; rotated nodes take the geometric mean unless axis-aligned.
     function scaleNode(n, sx, sy, strokes) {
@@ -1085,7 +1090,7 @@ const LogoEditor = (function () {
         if (d.dup) emit('select', { ids: sel.slice() });
       } else drawOverlay();
     }
-    function onCancel(e) { pointers.delete(e.pointerId); }
+    function onCancel(e) { onUp(e); }              // a cancelled pointer ends the gesture like a release
 
     function onDbl(e) {
       if (tool !== 'select') return;

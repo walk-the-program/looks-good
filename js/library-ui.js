@@ -124,15 +124,16 @@ const LibraryUI = (function () {
 
   async function migrate() {
     if (localStorage.getItem(MIGRATED_KEY)) return;
-    localStorage.setItem(MIGRATED_KEY, '1');
     const old = loadSession();
-    if (!old) return;
+    if (!old) { localStorage.setItem(MIGRATED_KEY, '1'); return; }
     const name = ((old.content && old.content.brandName) || '').trim() || 'Untitled brand';
     const now = Date.now();
     await LibraryStore.put({
       id: LibraryStore.newId(), name, createdAt: now, updatedAt: now,
       savedState: old, draftState: null,
     });
+    // Marked done only once the brand is in the library; a failed write retries next launch.
+    localStorage.setItem(MIGRATED_KEY, '1');
   }
 
   /* ---------- tiles ---------- */

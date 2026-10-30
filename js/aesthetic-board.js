@@ -1178,21 +1178,22 @@ function wireBoardInteractions(host) {
     if (seg) {
       board.querySelectorAll('.ab-seg-btn').forEach(b => b.setAttribute('aria-pressed', String(b === seg)));
       const copy = AB_STAGES[seg.dataset.stage];
-      board.querySelector('[data-ab-title]').textContent = copy[0];
-      board.querySelector('[data-ab-body]').textContent = copy[1];
+      const title = board.querySelector('[data-ab-title]'), body = board.querySelector('[data-ab-body]');
+      if (copy && title) title.textContent = copy[0];   // an aesthetic's own card markup may omit these
+      if (copy && body) body.textContent = copy[1];
       const label = board.querySelector('.ab-cta-label');
       if (label) label.textContent = 'Save direction';
       return;
     }
     if (e.target.closest('.ab-type-apply')) { applyRecommendedFonts(); return; }
     const cta = e.target.closest('.ab-cta:not(.ab-state-ctl)');
-    if (cta) {
-      cta.querySelector('.ab-cta-label').textContent = 'Direction saved';
-    }
+    const ctaLabel = cta && cta.querySelector('.ab-cta-label');
+    if (ctaLabel) ctaLabel.textContent = 'Direction saved';
   });
   host.addEventListener('change', e => {
     if (!e.target.classList.contains('ab-switch')) return;
-    const status = e.target.closest('.ab-panel').querySelector('.ab-status');
+    const panel = e.target.closest('.ab-panel');
+    const status = panel && panel.querySelector('.ab-status');
     if (status) status.textContent = e.target.checked ? 'Focus mode on' : 'Focus mode off';
   });
 }
@@ -1542,7 +1543,11 @@ function abFitHeadlines(root) {
     queued = false;
     const list = [...todo];
     todo.clear();
-    list.forEach(r => { try { abFitHeadlines(r); } catch (err) { /* an unfitted headline still shows */ } });
+    list.forEach(r => {
+      // A board that was re-rendered away reports once on removal: forget it, or every redraw leaks one.
+      if (!r.isConnected) { abHlRoots.delete(r); if (size) size.unobserve(r); return; }
+      try { abFitHeadlines(r); } catch (err) { /* an unfitted headline still shows */ }
+    });
   };
   // A frame, or 120ms when frames are held back (a background tab): measuring needs layout, not a paint.
   const schedule = root => { todo.add(root); if (!queued) { queued = true; requestAnimationFrame(flush); setTimeout(flush, 120); } };

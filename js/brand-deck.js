@@ -2031,7 +2031,7 @@ function bdSaveBlob(blob, filename) {
   document.body.appendChild(a);
   a.click();
   a.remove();
-  URL.revokeObjectURL(url);
+  setTimeout(() => URL.revokeObjectURL(url), 20000);   // WebKit starts the download after the click returns
 }
 
 /* ---------------- native export (Mac app) ---------------- */

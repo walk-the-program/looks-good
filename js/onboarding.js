@@ -112,7 +112,10 @@ const Onboarding = (function () {
     if (!w) return;
     frame.style.setProperty('--ob-zoom', (w / MINI_DESIGN_W).toFixed(4));
   }
-  const miniObserver = 'ResizeObserver' in window ? new ResizeObserver(entries => entries.forEach(e => fitMini(e.target))) : null;
+  const miniObserver = 'ResizeObserver' in window ? new ResizeObserver(entries => entries.forEach(e => {
+    // A frame removed from the page reports once (size 0): stop watching it so frames don't pile up.
+    if (!e.target.isConnected) miniObserver.unobserve(e.target); else fitMini(e.target);
+  })) : null;
 
   // Returns an element: frame > board. Fonts load in the background; the frame fades in.
   function miniBoardEl(preset, over) {
@@ -378,7 +381,14 @@ const Onboarding = (function () {
       let qPresets = [];
       let busy = false;
 
+      // The dialog is already gone when the brand is made, so a failure must be told, not swallowed.
+      async function make(job, source) {
+        try { await job(); } catch (err) { showToast('Could not create the brand'); return; }
+        if (source) reveal(source);
+      }
+
       function close() {
+        clearTimeout(previewTimer); clearTimeout(qTimer);
         overlay.remove();
         document.body.classList.remove('has-dialog');
         if (previousFocus && previousFocus.focus) previousFocus.focus();
@@ -512,8 +522,7 @@ const Onboarding = (function () {
         busy = true;
         const preset = qPresets[Number(card.dataset.i)];
         close();
-        await createFromPreset(preset);
-        reveal('questions');
+        await make(() => createFromPreset(preset), 'questions');
       });
 
       /* ---- name tab ---- */
@@ -524,7 +533,7 @@ const Onboarding = (function () {
         if (missing) { err.textContent = `${missing[0]} is required.`; err.hidden = false; missing[1].focus(); return; }
         busy = true;
         close();
-        await BrandSession.createBrand(name, tagline);
+        await make(() => BrandSession.createBrand(name, tagline));
       }
       q('#obName').addEventListener('input', () => { q('#obNameError').hidden = true; });
       q('#obTag').addEventListener('input', () => { q('#obNameError').hidden = true; });
@@ -551,8 +560,7 @@ const Onboarding = (function () {
           busy = true; syncCreate();
           const preset = logoPreset();
           close();
-          await createFromPreset(preset);
-          reveal('logo');
+          await make(() => createFromPreset(preset), 'logo');
         }
       });
       overlay.addEventListener('mousedown', e => { if (e.target === overlay) close(); });
@@ -756,7 +764,9 @@ const Onboarding = (function () {
     try { const s = coachSeen(); delete s[id]; localStorage.setItem(COACH_KEY, JSON.stringify(s)); } catch (e) { /* ignore */ }
   }
 
+  let coachEnd = null;        // releases the open tip's timer and listeners
   function closeCoach() {
+    if (coachEnd) { const end = coachEnd; coachEnd = null; end(); }
     if (coachEl) { coachEl.remove(); coachEl = null; }
   }
 
@@ -807,6 +817,7 @@ const Onboarding = (function () {
       // Closed by a show starting (not by the person): the tip is not used up.
       const watch = setInterval(() => { if (coachBlocked()) { coachUnmark(tip.id); done(); } }, 250);
       const done = () => {
+        coachEnd = null;
         clearInterval(watch);
         target.classList.remove('ob-coach-target');
         window.removeEventListener('resize', place);
@@ -826,6 +837,7 @@ const Onboarding = (function () {
       };
       window.addEventListener('resize', place);
       document.addEventListener('keydown', onKey, true);
+      coachEnd = done;
       // A click aimed at the tip must never fall through to the control it points at: for the
       // first moments the tip is open, a click on the target only closes the tip.
       const shownAt = performance.now();

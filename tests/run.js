@@ -798,7 +798,7 @@ check('paste: empty text', run(`extractColors('').length`) === 0, 'found colors 
   // Without a product, every brief is exactly what it was before the product sheet (hash and length taken before the change).
   {
     const fnv = str => { let h = 0x811c9dc5; for (let i = 0; i < str.length; i++) { h ^= str.charCodeAt(i); h = Math.imul(h, 0x01000193) >>> 0; } return h.toString(16); };
-    const got = briefs.map(b => fnv(b) + ':' + b.length), want = ['30fcf8af:18232', '6460af88:17713', 'a1f1fa61:24964', '22931d14:12556'];
+    const got = briefs.map(b => fnv(b) + ':' + b.length), want = ['a3206fcd:18971', 'be750793:18256', 'ef1843c8:25978', '4ae58906:13293'];
     check('product: briefs without a product are byte-identical to before', JSON.stringify(got) === JSON.stringify(want), JSON.stringify(got));
   }
   /* ---- product sheet (js/product-sheet.js) and its brief section ---- */

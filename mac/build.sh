@@ -48,7 +48,7 @@ iconutil -c icns "$ICON_TMP/AppIcon.iconset" -o "$APP/Contents/Resources/AppIcon
 
 echo "==> Copying web files"
 WEB="$APP/Contents/Resources/web"
-cp "$ROOT/index.html" "$WEB/"
+cp "$ROOT/index.html" "$ROOT/favicon.svg" "$WEB/"
 # fonts/ and vendor/ make the app work fully offline: every Google Font the app uses
 # (dev/vendor-fonts.py) and the export libraries (html2canvas, jsPDF). The page loads
 # these local copies first; the CDN / Google Fonts are only a fallback.
@@ -75,14 +75,16 @@ if [ ! -w "$DEST_DIR" ]; then
 fi
 # Quit only the copy being replaced (a test build elsewhere leaves the installed app running).
 RUNNING="$DEST_DIR/$APP_NAME.app/Contents/MacOS/BrandingDesigner"
-if pgrep -f "$RUNNING" >/dev/null 2>&1; then
+# pgrep -f is an unanchored regex: anchor it so ~/Applications/... is not matched by a /Applications/... pattern.
+RUNNING_RE="^$RUNNING( |\$)"
+if pgrep -f "$RUNNING_RE" >/dev/null 2>&1; then
   echo "    quitting running instance"
   osascript -e "tell application id \"$BUNDLE_ID\" to quit" >/dev/null 2>&1 || true
   for _ in $(seq 1 20); do
-    pgrep -f "$RUNNING" >/dev/null 2>&1 || break
+    pgrep -f "$RUNNING_RE" >/dev/null 2>&1 || break
     sleep 0.25
   done
-  pkill -f "$RUNNING" >/dev/null 2>&1 || true
+  pkill -f "$RUNNING_RE" >/dev/null 2>&1 || true
 fi
 rm -rf "$DEST_DIR/$APP_NAME.app"
 cp -R "$APP" "$DEST_DIR/$APP_NAME.app"

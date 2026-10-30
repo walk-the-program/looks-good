@@ -142,6 +142,10 @@ def main():
             rules.append(local)
         print('%-28s ok' % f['name'])
 
+    if failed:  # keep the existing fonts/ intact rather than pruning and rewriting it from a partial run
+        print('FAILED, fonts/ left unchanged: ' + '; '.join(failed))
+        sys.exit(1)
+
     # Drop files left over from an earlier run.
     keep = set(saved.values())
     for name in os.listdir(FILES):

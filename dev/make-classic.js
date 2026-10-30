@@ -37,7 +37,10 @@ const keys = fs.readdirSync(path.join(ROOT, 'js/aesthetics'))
 
 function classicCss(key, src) {
   const re = new RegExp(`\\[data-ae=(["']?)${key}\\1\\]`, 'g');
-  return src.replace(re, `[data-ae="${key}--classic"]`);
+  // 7e51bfa: highlight words carry the accent marker; carry that into the old rule too.
+  const hl = /(\.ab-hl \{ color: var\(--ab-accent-ink\);)(?= (?:\}|text-shadow))/g;
+  return src.replace(re, `[data-ae="${key}--classic"]`)
+    .replace(hl, '$1 background-image: linear-gradient(transparent 62%, var(--ab-accent-mark, transparent) 62%, var(--ab-accent-mark, transparent) 94%, transparent 94%); -webkit-box-decoration-break: clone; box-decoration-break: clone;');
 }
 
 function classicJs(key, src) {

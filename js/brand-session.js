@@ -53,6 +53,8 @@ const BrandSession = (function () {
     state.pureBg = false;
     state.dismissed = [];
     state.patterns = [];
+    state.product = null;
+    state.productApprovals = {};
   }
 
   function syncLogoUi() {
@@ -130,8 +132,9 @@ const BrandSession = (function () {
     render();
   }
 
+  // Resolves true when the brand reached disk.
   async function saveBrand() {
-    if (!current) return;
+    if (!current) return false;
     clearTimeout(draftTimer);
     const s = snapshot();
     current.savedState = s;
@@ -144,11 +147,13 @@ const BrandSession = (function () {
     try {
       await persist();
       showToast('Saved');
+      return true;
     } catch (e) {
       // Not on disk: show the brand as unsaved again so autosave keeps retrying.
       baseline = '';
       updateChrome();
       showToast('Could not save this brand');
+      return false;
     }
   }
 
@@ -222,8 +227,10 @@ const BrandSession = (function () {
         ],
       });
       if (choice === 'cancel' || !choice) return false;
-      if (choice === 'save') await saveBrand();
-      else {
+      if (choice === 'save') {
+        // A failed write keeps the editor open; leaving now would drop the edits.
+        if (!(await saveBrand())) return false;
+      } else {
         clearTimeout(draftTimer);
         current.draftState = null;
         await persist();

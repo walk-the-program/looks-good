@@ -23,7 +23,7 @@ function parseProductSheet(text, sourceName) {
   try {
     const lines = raw.replace(/^﻿/, '').split(/\r\n|\r|\n/);
     let hasHeader = false, scr = null, mode = null; // mode: 'content' | 'states' | null
-    const ids = {};
+    const ids = Object.create(null);   // a screen called "constructor" must not collide with Object.prototype
     const closeScreen = () => {
       if (!scr) return;
       if (!scr.job) warn(scr._line, `Screen "${scr.name}" has no Job line.`);

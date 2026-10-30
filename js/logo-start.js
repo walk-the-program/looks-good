@@ -557,7 +557,11 @@ const LogoStart = (function () {
     if (/^data:image\/svg\+xml/i.test(src) && typeof atob === 'function') {
       try {
         const b64 = /;base64,/.test(src);
-        const text = b64 ? atob(src.split(',')[1]) : decodeURIComponent(src.split(',')[1]);
+        let text;
+        if (b64) {
+          const bin = atob(src.split(',')[1]);
+          try { text = decodeURIComponent(escape(bin)); } catch (e) { text = bin; }   // keep non-ASCII text intact
+        } else text = decodeURIComponent(src.split(',')[1]);
         if (!/<svg[^>]*\swidth=/i.test(text) && /viewBox="[^"]*"/i.test(text)) {
           const vb = /viewBox="([^"]*)"/i.exec(text)[1].trim().split(/[\s,]+/).map(Number);
           if (vb.length === 4 && vb[2] > 0 && vb[3] > 0) {

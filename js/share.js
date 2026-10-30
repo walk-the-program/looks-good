@@ -1101,7 +1101,7 @@ if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeT
     shape = SHAPES[shape] ? shape : 'vertical';
     Share.busy = true;
     const J = job(shape === 'vertical' ? 'Making the vertical video' : 'Making the horizontal video');
-    let rec = null;
+    let rec = null, stream = null;
     try {
       const A = await reelAssets(shape, J);
       const { W, H } = A.S;
@@ -1116,7 +1116,7 @@ if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeT
       const base = `${slug()}-reel-${shape}`;
       if (mime && canStream) {
         J.set(0.42, 'Recording 15 seconds');
-        const stream = cv.captureStream(30);
+        stream = cv.captureStream(30);
         const chunks = [];
         rec = new MediaRecorder(stream, { mimeType: mime, videoBitsPerSecond: shape === 'vertical' ? 10e6 : 12e6 });
         rec.ondataavailable = e => { if (e.data && e.data.size) chunks.push(e.data); };
@@ -1167,6 +1167,7 @@ if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeT
       return Share.last;
     } catch (err) {
       try { if (rec && rec.state !== 'inactive') rec.stop(); } catch (e) { /* already stopped */ }
+      if (stream) stream.getTracks().forEach(tr => tr.stop());
       J.done();
       if (err !== CANCEL) { console.error('reel failed', err); toast('The video could not be made'); }
       else toast('Video cancelled');

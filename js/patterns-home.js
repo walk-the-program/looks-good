@@ -78,7 +78,10 @@ const PatternsHome = (function () {
   function writeColours() {
     const b = brands.find(x => x.id === brandId);
     if (b && b.cols.length) {
-      if (lsGet(BACKUP_KEY) === null) lsSet(BACKUP_KEY, lsGet(MYC_KEY) === null ? NONE : lsGet(MYC_KEY));
+      if (lsGet(BACKUP_KEY) === null) {
+        lsSet(BACKUP_KEY, lsGet(MYC_KEY) === null ? NONE : lsGet(MYC_KEY));
+        if (lsGet(BACKUP_KEY) === null) return;     // backup not stored (quota): never overwrite the user's own set
+      }
       lsSet(MYC_KEY, JSON.stringify({ v: 1, cols: b.cols, on: true }));
     } else {
       const bk = lsGet(BACKUP_KEY);
@@ -162,7 +165,7 @@ const PatternsHome = (function () {
   let thumbReady = false;         // stored snapshots for thumbSig have been loaded
   let thumbRetried = false;
   let thumbRun = 0;               // bumps whenever the brand changes: stale work stops
-  let thumbQueue = [];            // [{ t, retry }]
+  let thumbQueue = [];            // [{ t }]
   let thumbActive = 0;
 
   function brandSig() {
@@ -182,7 +185,7 @@ const PatternsHome = (function () {
           d.createObjectStore('thumbs', { keyPath: 'key' }).createIndex('sig', 'sig');
           d.createObjectStore('sets', { keyPath: 'sig' });
         };
-        rq.onsuccess = () => resolve(rq.result);
+        rq.onsuccess = () => { rq.result.onversionchange = () => { rq.result.close(); thumbDbP = null; }; resolve(rq.result); };
         rq.onerror = rq.onblocked = () => resolve(null);
       } catch (e) { resolve(null); }
     });
@@ -380,8 +383,10 @@ const PatternsHome = (function () {
           // settle so the redraw after the colour change lands, then shoot again
           setTimeout(async () => {
             if (done) return;
+            if (run !== thumbRun) return finish(null);   // brand changed: the tool may have refit to the new colours
             let again = null;
             try { again = await shoot(win, doc); } catch (e) { /* keep the first */ }
+            if (run !== thumbRun) return finish(null);
             finish(await toBlob(again || shot));
           }, 700);
         };
@@ -408,7 +413,7 @@ const PatternsHome = (function () {
           paintAll();
           if (!thumbQueue.length && !thumbActive && !thumbRetried && thumbFailed.size) {   // one more go at the failures
             thumbRetried = true;
-            thumbFailed.forEach(slug => { const x = bySlug(slug); if (x) thumbQueue.push({ t: x, retry: true }); });
+            thumbFailed.forEach(slug => { const x = bySlug(slug); if (x) thumbQueue.push({ t: x }); });
           }
         }
         pumpThumbs();
@@ -441,7 +446,7 @@ const PatternsHome = (function () {
     visible.concat(catalog).forEach(t => {
       if (seen.has(t.slug)) return;
       seen.add(t.slug);
-      if (!thumbUrls.has(t.slug) && !thumbFailed.has(t.slug)) thumbQueue.push({ t, retry: false });
+      if (!thumbUrls.has(t.slug) && !thumbFailed.has(t.slug)) thumbQueue.push({ t });
     });
     pumpThumbs();
   }
@@ -574,7 +579,7 @@ const PatternsHome = (function () {
     if (!openSlug || !doc || doc.location.href === 'about:blank') return;
     if (HOME_PATHS.includes(win.location.pathname)) { showGrid(); return; }   // the tool linked home: back to our grid
     doc.addEventListener('keydown', onKey);
-    growSwatches(win, doc);
+    try { growSwatches(win, doc); } catch (e) { /* the tool still opens with its own swatches */ }
     injectTheme(doc).then(() => el.frame.classList.add('is-ready'));
   }
 

@@ -133,12 +133,15 @@ const LogoDoc = (function () {
 
   // ColorRef -> '#RRGGBB' | null.
   function resolveColor(ref, tokens) {
+    // Only #RRGGBB leaves here: the value goes straight into SVG attributes (innerHTML in the editor),
+    // and a stored / restored document is not trusted.
+    const ok = function (v) { return typeof v === 'string' && /^#[0-9a-f]{6}$/i.test(v) ? v : null; };
     if (ref == null) return null;
-    if (typeof ref === 'string') return ref;
-    if (ref.hex) return ref.hex;
+    if (typeof ref === 'string') return ok(ref);
+    if (ref.hex) return ok(ref.hex);
     if (ref.ref) {
-      const c = ((tokens || defaultTokens()).colors || {})[ref.ref];
-      return c || defaultTokens().colors[ref.ref] || null;
+      const c = ok(((tokens || defaultTokens()).colors || {})[ref.ref]);
+      return c || ok(defaultTokens().colors[ref.ref]);
     }
     return null;
   }

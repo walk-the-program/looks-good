@@ -235,8 +235,7 @@ const PatternsUI = (function () {
   }
 
   function redrawThumbs() {
-    queue = [];
-    pumping = false;
+    queue = [];     // a pending pump keeps running (pumping stays true) and drains the new queue
     // visible-first order: suite, in your brief, then the family picker (on-screen tiles only)
     const order = ['#ptSuite canvas', '#ptPins canvas'];
     queueThumbs(order.flatMap(sel => Array.from(root.querySelectorAll(sel))));
@@ -587,12 +586,13 @@ const PatternsUI = (function () {
 
   function isPinned(entry) { return PatternPins.has(entry); }
 
-  function edited() {
+  // skipPicker: a family control moved; the picker tiles draw defaults, so none of their add buttons can change.
+  function edited(skipPicker) {
     pristine = false;
     $('ptReset').disabled = false;
     root.querySelectorAll('#ptSuite .pt-tile').forEach(t => t.classList.remove('is-on'));
     setPinButton($('ptPin'), isPinned(cur));
-    syncPickerAdds();
+    if (!skipPicker) syncPickerAdds();
   }
 
   /* ---------------- destinations, frames and the calm area ---------------- */
@@ -831,7 +831,7 @@ const PatternsUI = (function () {
     }
     else {
       clearTimeout(refreshTimer); clearTimeout(fastTimer); clearTimeout(settleTimer);
-      queue = []; pumping = false;
+      queue = [];
     }
   }
 
@@ -1031,7 +1031,7 @@ const PatternsUI = (function () {
         cur.params[el.dataset.k] = Number(el.value);
         const out = $(el.id + '-o');
         if (out) out.textContent = el.value;
-        edited();
+        edited(true);
         scheduleRender();
       }
     });
@@ -1050,7 +1050,7 @@ const PatternsUI = (function () {
         if (el.type === 'range') cur.params[el.dataset.k] = Number(el.value);
         else if (el.type === 'checkbox') cur.params[el.dataset.k] = el.checked;
         else cur.params[el.dataset.k] = el.value;
-        edited();
+        edited(true);
         return renderNow();
       }
       if (el.id === 'ptTone') {

@@ -1085,6 +1085,7 @@ const LogoChrome = (function () {
   function openExport() {
     if (S.dlg) return;
     closePop();
+    const ses = S;                                  // the dialog can outlive unmount() while an export runs
     const doc = S.ed.doc(), tk = tokens();
     const slug = slugify(doc.name);
     const prev = document.activeElement;
@@ -1154,17 +1155,17 @@ const LogoChrome = (function () {
       overlay.remove();
       document.body.classList.remove('has-dialog');
       document.removeEventListener('keydown', onKey, true);
-      S.dlg = null;
+      ses.dlg = null;
       if (prev && prev.focus) prev.focus();
     }
-    function onKey(e) { if (e.key === 'Escape') { e.stopPropagation(); if (!S.exporting) close(); } }
-    cancel.addEventListener('click', function () { if (!S.exporting) close(); });
-    overlay.addEventListener('pointerdown', function (e) { if (e.target === overlay && !S.exporting) close(); });
+    function onKey(e) { if (e.key === 'Escape') { e.stopPropagation(); if (!ses.exporting) close(); } }
+    cancel.addEventListener('click', function () { if (!ses.exporting) close(); });
+    overlay.addEventListener('pointerdown', function (e) { if (e.target === overlay && !ses.exporting) close(); });
     document.addEventListener('keydown', onKey, true);
     form.addEventListener('submit', async function (e) {
       e.preventDefault();
-      if (S.exporting) return;
-      S.exporting = true;
+      if (ses.exporting) return;
+      ses.exporting = true;
       go.disabled = true; cancel.disabled = true;
       const label = go.textContent;
       go.textContent = 'Preparing…';
@@ -1178,11 +1179,11 @@ const LogoChrome = (function () {
         err.textContent = 'Could not export: ' + (ex && ex.message ? ex.message : 'something went wrong');
         err.hidden = false;
         go.disabled = false; cancel.disabled = false; go.textContent = label;
-      } finally { S.exporting = false; }
+      } finally { ses.exporting = false; }
     });
     document.body.appendChild(overlay);
     document.body.classList.add('has-dialog');
-    S.dlg = { close: close };
+    ses.dlg = { close: close };
     paint();
     form.querySelector('.seg button').focus();
   }

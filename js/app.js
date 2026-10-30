@@ -684,6 +684,7 @@ async function exportPalettePng() {
   try {
     const canvas = await html2canvas(wrap, { scale: 2, backgroundColor: '#ffffff' });
     canvas.toBlob(blob => {
+      if (!blob) { showToast('Palette PNG export failed'); return; }
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
@@ -863,8 +864,10 @@ function wireEvents() {
         const shown = url === src ? img : new Image();
         if (shown === img) done(); else { shown.onload = done; shown.src = url; }
       };
+      img.onerror = () => showToast('That file could not be read as an image');
       img.src = ev.target.result;
     };
+    reader.onerror = () => showToast('That file could not be read');
     reader.readAsDataURL(file);
   });
   document.getElementById('removeLogo').addEventListener('click', () => {

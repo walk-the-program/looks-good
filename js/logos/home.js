@@ -56,7 +56,6 @@ const LogosHome = (function () {
     const rnd = Array.from(r, x => x.toString(36)).join('').slice(0, 4).padEnd(4, '0');
     return 'lg_' + Date.now().toString(36) + rnd;
   }
-  function nodeId() { return 'n_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6); }
 
   function timeAgo(ts) {
     const s = Math.max(0, (Date.now() - ts) / 1000);
@@ -425,26 +424,6 @@ const LogosHome = (function () {
     });
   }
 
-  // fromRecipe lays a preset out in engine units (1000 per em), several times wider than
-  // any artboard: scale the nodes to `share` of the artboard and centre them on it.
-  function fitNodes(nodes, board, share) {
-    if (!nodes.length) return nodes;
-    const x0 = Math.min(...nodes.map(n => n.x)), y0 = Math.min(...nodes.map(n => n.y));
-    const x1 = Math.max(...nodes.map(n => n.x + n.w)), y1 = Math.max(...nodes.map(n => n.y + n.h));
-    const k = Math.min(board.w * share / (x1 - x0 || 1), board.h * share / (y1 - y0 || 1));
-    const dx = (board.w - (x1 - x0) * k) / 2, dy = (board.h - (y1 - y0) * k) / 2;
-    const scale = (n, top) => {
-      const o = Object.assign({}, n, {
-        x: top ? (n.x - x0) * k + dx : n.x * k, y: top ? (n.y - y0) * k + dy : n.y * k,
-        w: n.w * k, h: n.h * k,
-      });
-      ['size', 'strokeWidth', 'radius'].forEach(p => { if (typeof n[p] === 'number') o[p] = n[p] * k; });
-      if (n.children) o.children = n.children.map(c => scale(c, false));
-      return o;
-    };
-    return nodes.map(n => scale(n, true));
-  }
-
   async function newLogoFlow() {
     if (typeof LogoDoc === 'undefined') { toast('The logo editor is not loaded'); return; }
     const r = await newLogoDialog();
@@ -454,7 +433,7 @@ const LogosHome = (function () {
     const seed = { specs: [], recipe: null };
     if (r.kind === 'brand') seed.specs.push(textSpec(r.brand.name, r.brand.savedState));
     if (r.kind === 'preset') {
-      try { doc.nodes = fitNodes((await LogoDoc.fromRecipe(r.recipe)).nodes, doc.artboard, 0.8); seed.recipe = true; }
+      try { doc.nodes = LogoAttach.fitNodes((await LogoDoc.fromRecipe(r.recipe)).nodes, doc.artboard, 0.8); seed.recipe = true; }
       catch (e) { toast(String(e && e.message || e).replace(/^LogoEngine:\s*/, '')); return; }
     }
     doc.updatedAt = doc.createdAt = doc.createdAt || Date.now();

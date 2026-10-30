@@ -210,6 +210,7 @@
     refreshStale();
     applySearch();
     requestAnimationFrame(() => {
+      if (!isOpen) return;                         // closed again before the first frame
       fit();
       const cur = currentOrFirst();
       if (cur) {

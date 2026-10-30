@@ -125,6 +125,14 @@
       record('(a3) text node lays out with real glyph outlines', tn.w > 100 && tn.h === 120 && /path/.test(stage.innerHTML) && stage.querySelector('[data-id="' + tid + '"]').getAttribute('d').length > 100,
         'w=' + tn.w.toFixed(1) + ' h=' + tn.h + ' fill=' + JSON.stringify(tn.fill) + ' font=' + JSON.stringify(tn.font));
     } catch (e) { record('(a) round-trip', false, (e && (e.message + ' @ ' + e.stack)) || String(e)); }
+    try {
+      const T = LogoDoc.defaultTokens();
+      const bad = '#112233" onload="x';
+      record('(a4) resolveColor only returns #RRGGBB (stored docs are not trusted in SVG attributes)',
+        LogoDoc.resolveColor({ hex: bad }, T) === null && LogoDoc.resolveColor({ hex: '#a1B2c3' }, T) === '#a1B2c3' &&
+        LogoDoc.resolveColor({ ref: 'ink' }, { colors: { ink: bad } }) === T.colors.ink && LogoDoc.resolveColor({ ref: 'primary' }, T) === T.colors.primary,
+        JSON.stringify(LogoDoc.resolveColor({ hex: bad }, T)));
+    } catch (e) { record('(a4) resolveColor', false, (e && e.message) || String(e)); }
 
     // (b) align / distribute
     try {

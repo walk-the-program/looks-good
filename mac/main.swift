@@ -463,6 +463,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, WKNavigationDelegate, 
 
     func download(_ download: WKDownload, didFailWithError error: Error, resumeData: Data?) {
         downloadTargets.removeValue(forKey: ObjectIdentifier(download))
+        if (error as NSError).domain == NSURLErrorDomain, (error as NSError).code == NSURLErrorCancelled { return }   // user cancelled the panel
         NSLog("Download failed: \(error.localizedDescription)")
         let alert = NSAlert()
         alert.messageText = "The download failed"
@@ -660,7 +661,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, WKNavigationDelegate, 
         // CSS px -> view points (View > Zoom changes the page zoom).
         let rect = CGRect(x: r[0] * Double(zoom), y: r[1] * Double(zoom), width: r[2] * Double(zoom), height: r[3] * Double(zoom))
         let pixelWidth = max(1, min(8192, (body["pixelWidth"] as? Double) ?? r[2] * 2))
-        let pixelHeight = (pixelWidth * r[3] / r[2]).rounded()
+        let pixelHeight = min(16384, max(1, (pixelWidth * r[3] / r[2]).rounded()))   // Int() of a huge Double would trap
         let jpeg = (body["format"] as? String) == "jpeg"
         let quality = (body["quality"] as? Double) ?? 0.92
         let config = WKSnapshotConfiguration()

@@ -262,6 +262,7 @@
     if (m.length === 3) m = m.split('').map(ch => ch + ch).join('');
     const n = parseInt(m.slice(0, 6), 16) || 0;
     c = [(n >> 16) & 255, (n >> 8) & 255, n & 255];
+    if (rgbCache.size > 2000) rgbCache.clear();   // colour-picker drags feed it endless distinct hexes
     rgbCache.set(hex, c);
     return c;
   }

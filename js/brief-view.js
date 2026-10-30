@@ -146,15 +146,6 @@ function briefOpenProduct() {
   }
   const findSection = (secs, prefix) => secs.find(s => s.title.toLowerCase().indexOf(prefix.toLowerCase()) === 0);
 
-  // The lines under a "### heading" inside a section, up to the next "###".
-  function subBlock(lines, headPrefix) {
-    const at = lines.findIndex(l => l.indexOf('### ' + headPrefix) === 0);
-    if (at < 0) return null;
-    let end = lines.length;
-    for (let i = at + 1; i < lines.length; i++) if (/^### /.test(lines[i])) { end = i; break; }
-    return { head: lines.slice(at, at + 1)[0], body: lines.slice(at + 1, end), before: lines.slice(0, at), after: lines.slice(end) };
-  }
-
   /* ---------------- data helpers ---------------- */
 
   const dot = (hex, cls) => `<i class="bv-dot${cls ? ' ' + cls : ''}" style="background:${hex}"></i>`;
@@ -164,14 +155,6 @@ function briefOpenProduct() {
     if (!nums) return 10;
     const v = nums.slice(0, 2).map(Number);
     return v.length === 2 ? (v[0] + v[1]) / 2 : v[0];
-  }
-
-  function tokenMap(t, extras) {
-    const map = {};
-    AIB_TOKEN_ROWS.forEach(([name, field]) => { if (t[field] != null) map[name] = t[field]; });
-    if (t.printed) { map['--primary-print'] = t.printPrimary; map['--on-primary-print'] = t.onPrimary; }
-    Object.keys(extras || {}).forEach(k => { const v = String(extras[k]).trim(); if (AIB_HEX.test(v)) map[k] = v; });
-    return map;
   }
 
   /* ---------------- section builders (HTML strings) ---------------- */

@@ -83,10 +83,6 @@ function aibGrade(ratio) {
   return 'FAIL';
 }
 
-function aibRatio(a, b) {
-  return contrastRatio(a, b).toFixed(2) + ':1';
-}
-
 const AIB_HEX = /^#[0-9a-f]{6}$/i;
 
 // Color treatments that differ per aesthetic. Everything is a token name;
@@ -189,14 +185,6 @@ function aibComponentRows(t, def, extras) {
     ['Progress / data bar', 'track --line', 'n/a', `fill ${PRI}${secOff ? '' : ' (second series: --secondary)'}`],
     ['Focus ring (any control)', 'n/a', 'n/a', focusLow ? `3px ${PRI} with an outer 1px --ink ring (primary alone is under 3:1 on this canvas)` : PRI],
   ];
-}
-
-function aibFontUrl(fonts) {
-  const seen = new Set();
-  const families = fonts.filter(f => !seen.has(f.name) && seen.add(f.name))
-    .sort((a, b) => a.name.localeCompare(b.name))
-    .map(f => googleFamilyParam(f));
-  return `https://fonts.googleapis.com/css2?${families.join('&')}&display=swap`;
 }
 
 // The board as it is really drawn, for the Typography section: an off-screen board for
@@ -1134,8 +1122,6 @@ function aibKitDerived(ctx) {
 }
 
 const aibPt = n => `${Math.round(n * 10) / 10}`;
-
-function aibKitShortImg(text) { return String(text || ''); }
 
 // A phone type role as the measured kit and Built screens set it: the face, weight, case and tracking of the text
 // that plays the role (sizes stay UI_KIT_PHONE's, except the extra roles, which keep their measured size).

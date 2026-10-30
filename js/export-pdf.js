@@ -44,26 +44,31 @@ async function exportBrandGuidePdf(state) {
   }
 
   const pages = Array.from(container.querySelectorAll('.bg-page'));
-  if (!pages.length) return;
+  if (!pages.length) { container.innerHTML = ''; return; }
+  try {
 
-  const { jsPDF } = window.jspdf;
-  let pdf = null;
+    const { jsPDF } = window.jspdf;
+    let pdf = null;
 
-  for (let i = 0; i < pages.length; i++) {
-    const canvas = await html2canvas(pages[i], { scale: 2, backgroundColor: '#ffffff', useCORS: true });
-    const imgData = canvas.toDataURL('image/jpeg', 0.92);
-    // canvas is rendered at scale:2, so divide back down to CSS px for the
-    // PDF page size — 1 PDF "px" unit maps 1:1 to a CSS px this way.
-    const pageW = canvas.width / 2;
-    const pageH = canvas.height / 2;
+    for (let i = 0; i < pages.length; i++) {
+      const canvas = await html2canvas(pages[i], { scale: 2, backgroundColor: '#ffffff', useCORS: true });
+      const imgData = canvas.toDataURL('image/jpeg', 0.92);
+      // canvas is rendered at scale:2, so divide back down to CSS px for the
+      // PDF page size — 1 PDF "px" unit maps 1:1 to a CSS px this way.
+      const pageW = canvas.width / 2;
+      const pageH = canvas.height / 2;
 
-    if (!pdf) {
-      pdf = new jsPDF({ unit: 'px', format: [pageW, pageH], hotfixes: ['px_scaling'] });
-    } else {
-      pdf.addPage([pageW, pageH]);
+      if (!pdf) {
+        pdf = new jsPDF({ unit: 'px', format: [pageW, pageH], hotfixes: ['px_scaling'] });
+      } else {
+        pdf.addPage([pageW, pageH]);
+      }
+      pdf.addImage(imgData, 'JPEG', 0, 0, pageW, pageH);
     }
-    pdf.addImage(imgData, 'JPEG', 0, 0, pageW, pageH);
-  }
 
-  pdf.save(`${brandFileSlug()}-brand-guide.pdf`);
+    pdf.save(`${brandFileSlug()}-brand-guide.pdf`);
+  } finally {
+    // The offscreen copy would otherwise linger (and repeat the guide's ids) after a failed export.
+    container.innerHTML = '';
+  }
 }
