@@ -1004,6 +1004,7 @@ function init() {
   initAestheticUi();
   wireEvents();
   render();
+  if (typeof OwnerBrands !== 'undefined') OwnerBrands.seed().catch(() => {});
 }
 
 document.addEventListener('DOMContentLoaded', init);
