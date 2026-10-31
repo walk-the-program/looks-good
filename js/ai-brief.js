@@ -410,7 +410,11 @@ function aibParseColor(v) {
 // Elevation colours of the material class, per mode: tokens beyond the five roles.
 function aibElevation(build, def, m) {
   const t = m.t, ex = m.extras;
-  if (build.sw === 'hard') return { '--shadow': build.shadowInk || !t.isDark ? t.ink : '#000000' };
+  if (build.sw === 'hard') {
+    // build.shadowToken names a fixedInks token (e.g. '--lip'): the hard shadow is a darker shade of the fill, not the ink.
+    const lip = build.shadowToken && (build.fixedInks || []).find(i => i.token === build.shadowToken);
+    return { '--shadow': (lip && aibInkValue(lip, m)) || (build.shadowInk || !t.isDark ? t.ink : '#000000') };
+  }
   if (build.sw === 'soft') {
     return {
       '--shadow-lo': ex['--ab-lo'] || (t.isDark ? 'rgba(0,0,0,0.5)' : 'rgba(0,0,0,0.2)'),
@@ -2075,7 +2079,7 @@ function aibPaletteRows(ctx) {
     }
   }
   const elevJob = {
-    '--shadow': 'The hard offset shadow under every outlined surface.',
+    '--shadow': build.shadowToken ? `The hard offset shadow: a lip in a darker shade of the fill (the same colour as \`${build.shadowToken}\`), never the ink and never blurred.` : 'The hard offset shadow under every outlined surface.',
     '--shadow-lo': 'Dark half of the raised and recessed shadow pair (down-right on raised).',
     '--shadow-hi': 'Light half of the pair (up-left on raised).',
     '--rim': 'The 1pt light rim on glass surfaces.',
@@ -2453,6 +2457,7 @@ function aibSecAppRules(ctx) {
   const out = ['## App UI rules', UI_KIT_SURFACES.app.rule,
     'The brand board, deck and landing page show art for the brand\'s identity and marketing; none of it belongs in the app.',
     'Screens are composed from the UI kit and the phone layout below: pick the component for the need, set text in the type scale, and leave the rest to the tokens.'];
+  out.push('Focus rings appear on keyboard focus only (`:focus-visible` on the web, the system focus on SwiftUI), never on tap or click; disabled controls take no focus and no press response.');
   if (ctx.site) out.push(`Website (the other surface of this brief): ${UI_KIT_SURFACES.web.rule}`);
   if (ctx.kit) out.push('', ...aibSecSignature(ctx));
   return out;
@@ -2750,7 +2755,9 @@ function aibSecModes(ctx) {
 }
 
 function aibFocusColor(ctx) {
-  if (ctx.kit || aibPrimaryBarred(ctx.roles)) return '`--ink`';
+  if (aibPrimaryBarred(ctx.roles)) return '`--ink`';
+  // the kit draws the ring in the primary where it holds 3:1 on the canvas (see-built.js kitColours), else the ink
+  if (ctx.kit) return ctx.focusLow ? '`--primary` where it holds 3:1 on the canvas, else `--ink`' : '`--primary`';
   return '`--primary`' + (ctx.focusLow ? ' plus an outer 1pt `--ink` ring (primary alone is under 3:1 on a canvas here)' : '');
 }
 
@@ -2765,7 +2772,7 @@ function aibSecStates(ctx) {
     return ['## States',
       aibTable(['State', 'Colour', 'Visual'], [
         row('Pressed and disabled', 'as each UI kit row states', 'The "Other states" column of the UI kit is the one definition; nothing else changes on press. Disabled controls take no press response.'),
-        row('Focus', aibFocusColor(ctx), 'Keyboard, switch control and VoiceOver focus on any control: 3pt ring, 2pt gap; never removed. Text fields show their own focus state from the UI kit instead.'),
+        row('Focus', aibFocusColor(ctx), 'Keyboard focus on any control: a 2pt ring with a 2pt gap, following the control\'s corners; exactly as the "focus" state of the Primary and Secondary button rows in the UI kit draws it. Shown on keyboard focus only (`:focus-visible` on the web), never on tap or click; never removed. Text fields show their own focus state from the UI kit instead.'),
         row('Empty', S.empty[0], 'The Empty state row of the UI kit.'),
         row('Loading', S.loading[0], aibAppText(ctx, S.loading[1], 'A progress indicator.') + ' Show it after 300 ms of waiting, with a text label for screen readers.'),
         row('Error', '`--error`', 'The Text field row\'s error state, with the message under the field.'),
@@ -3248,8 +3255,9 @@ function aibSwiftLines(ctx) {
   let fg = labelFg;
   if (sw === 'stepped') { bg = `isEnabled ? (down ? Palette.ink : Palette.${fillTok}) : Palette.line`; fg = `isEnabled ? (down ? Palette.canvas : Palette.${onTok}) : Palette.muted`; }
   if (sw === 'hard') {
-    btn.push('.overlay(shape.strokeBorder(isEnabled ? Palette.ink : Palette.muted, lineWidth: Metrics.outline))',
-      `.offset(x: down ? ${build.press.dx} : 0, y: down ? ${build.press.dy} : 0)`,
+    // With build.shadowToken the shadow is a lip of the fill's own shade: no ink outline on the key.
+    if (!build.shadowToken) btn.push('.overlay(shape.strokeBorder(isEnabled ? Palette.ink : Palette.muted, lineWidth: Metrics.outline))');
+    btn.push(`.offset(x: down ? ${build.press.dx} : 0, y: down ? ${build.press.dy} : 0)`,
       `.shadow(color: isEnabled ? Palette.shadow : .clear, radius: 0, x: down ? 0 : ${sh.x}, y: down ? 0 : ${sh.y})`);
   } else if (sw === 'soft') {
     btn.push(`.shadow(color: isEnabled ? Palette.shadowLo : .clear, radius: down ? 1.5 : ${rawBlur(sh.blurS || sh.blur)}, x: down ? 1 : ${sh.ds || sh.d}, y: down ? 2 : ${sh.ds || sh.d})`,
@@ -3290,7 +3298,8 @@ function aibSwiftLines(ctx) {
   const cardTok = ctx.rows.some(r => r.token === '--card') ? 'card' : 'canvas';
   const surf = [];
   let surfEnv = '';
-  if (sw === 'hard') surf.push(`.background(Palette.${cardTok}, in: shape)`, '.overlay(shape.strokeBorder(Palette.ink, lineWidth: Metrics.outline))', `.shadow(color: Palette.shadow, radius: 0, x: ${sh.x}, y: ${sh.y})`);
+  if (sw === 'hard' && build.shadowToken) surf.push(`.background(Palette.${cardTok}, in: shape)`, '.overlay(shape.strokeBorder(Palette.line, lineWidth: Metrics.outline))');
+  else if (sw === 'hard') surf.push(`.background(Palette.${cardTok}, in: shape)`, '.overlay(shape.strokeBorder(Palette.ink, lineWidth: Metrics.outline))', `.shadow(color: Palette.shadow, radius: 0, x: ${sh.x}, y: ${sh.y})`);
   else if (sw === 'soft') surf.push(`.background(Palette.${cardTok}, in: shape)`, `.shadow(color: Palette.shadowLo, radius: ${rawBlur(sh.blur)}, x: ${sh.d}, y: ${sh.d})`, `.shadow(color: Palette.shadowHi, radius: ${rawBlur(sh.blur)}, x: -${sh.d}, y: -${sh.d})`);
   else if (sw === 'glass') {
     surfEnv = '    @Environment(\\.accessibilityReduceTransparency) private var reduceTransparency';
@@ -3310,7 +3319,7 @@ function aibSwiftLines(ctx) {
     '}', '');
 
   // field (text inputs): recessed for soft, outlined otherwise; carries the focus and error states
-  const edge = sw === 'hard' || sw === 'stepped' ? 'Palette.ink' : 'Palette.line';
+  const edge = sw === 'hard' && build.edgeToken ? aibSwiftTok(build.edgeToken) : sw === 'hard' || sw === 'stepped' ? 'Palette.ink' : 'Palette.line';
   const edgeW = sw === 'flat' ? 'Metrics.outline' : sw === 'soft' ? '0' : sw === 'glow' || sw === 'glass' ? '1' : 'Metrics.outline';
   const ringLow = ctx.focusLow;
   P('struct ThemeField: ViewModifier {',

@@ -796,9 +796,11 @@ check('paste: empty text', run(`extractColors('').length`) === 0, 'found colors 
     buildAiBrief(kstate('dystopian-luxury'), { surface: 'web', target: 'web', noProbe: true })]`);
   const [dl, pb, dlStatic, dlWeb] = briefs;
   // Without a product, every brief is exactly what it was before the product sheet (hash and length taken before the change).
+  // Re-pinned 2026-10-30 (Round 11) after the kit gained focus / disabled states: the three kit-aware briefs differ from the old pin only in
+  // the kit table's State column (secondary focus, checkbox and toggle disabled), the Focus colour row and one keyboard-focus rule line; the web brief is unchanged.
   {
     const fnv = str => { let h = 0x811c9dc5; for (let i = 0; i < str.length; i++) { h ^= str.charCodeAt(i); h = Math.imul(h, 0x01000193) >>> 0; } return h.toString(16); };
-    const got = briefs.map(b => fnv(b) + ':' + b.length), want = ['a3206fcd:18971', 'be750793:18256', 'ef1843c8:25978', '4ae58906:13293'];
+    const got = briefs.map(b => fnv(b) + ':' + b.length), want = ['b320c22a:19366', '417a5624:18655', 'c4f601c6:26192', '4ae58906:13293'];
     check('product: briefs without a product are byte-identical to before', JSON.stringify(got) === JSON.stringify(want), JSON.stringify(got));
   }
   /* ---- product sheet (js/product-sheet.js) and its brief section ---- */

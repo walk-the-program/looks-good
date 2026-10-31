@@ -1,0 +1,316 @@
+/* ---------------------------------------------------------------------
+   50 Tonal Shape — soft, tonal, friendly. Reference: the tonal surfaces and shape libraries of
+   current mobile design systems (ideas only). Elevation is tone: the ground is a 4% tint of
+   the primary, containers step up in a few percent of the primary each, and nothing is
+   separated by a border or a shadow. Pill buttons squish to a 12px corner when pressed.
+   Cards and sheets 28px, small containers 12px. The brand's signature shape (seeded from the
+   brand name, js/aesthetics/tonal-shape.js) is a container: avatar, icon button, list-row icon.
+   Variables (from tonal-shape.js tokens() / printPrimary()):
+   --ab-tn-low --ab-tn-mid --ab-tn-high --ab-tn-pc --ab-tn-on-pc --ab-tn-sc --ab-tn-on-sc
+   --ab-tn-ac --ab-tn-outline --ab-pri-hover --ab-pri-press --ab-hw --ts-mask.
+   Hooks used: hero 'split', palette 'swatches', sections 'two-col', highlight 'ink', states
+   'button', panels.list (signature-shape avatar), deck.materialArt.
+   HARD RULE: app UI (.sb-ab, the Built screens and the UI kit) carries no art. The interlocking
+   hero composition is board / deck only. In the app the signature shape only contains an
+   initial or an icon.
+------------------------------------------------------------------------ */
+
+.ab[data-ae="tonal-shape"] {
+  --tn-pill: 28px;            /* a full pill for any control up to 56px tall; a number (not 999px) so the squish can animate */
+  --tn-card: 28px;
+  --tn-small: 12px;
+  --tn-snap: 12px;            /* the pressed corner */
+  --tn-ease: cubic-bezier(0.34, 1.56, 0.64, 1);
+  border-radius: 28px;
+}
+.ab[data-ae="tonal-shape"] .ab-in { padding: clamp(18px, 4cqw, 40px); }
+
+/* ---- the signature shape as a container (board mark, row avatar, app avatar / icon button / list icon) ---- */
+.ab[data-ae="tonal-shape"] :is(.ab-mark, .ab-av, .tsm-sh, .sb-me-av, .sb-k-av, .sb-k-ico, .sb-k-emptyico, .sb-icon-btn) {
+  position: relative; isolation: isolate; background: none !important; border: 0 !important; box-shadow: none !important;
+  border-radius: 30%; color: var(--ab-tn-on-pc);
+}
+.ab[data-ae="tonal-shape"] :is(.ab-mark, .ab-av, .tsm-sh, .sb-me-av, .sb-k-av, .sb-k-ico, .sb-k-emptyico, .sb-icon-btn)::before {
+  content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none;
+  background: var(--ts-fill, var(--ab-tn-pc));
+  -webkit-mask: var(--ts-mask) center / 100% 100% no-repeat; mask: var(--ts-mask) center / 100% 100% no-repeat;
+}
+.ab[data-ae="tonal-shape"] .ab-mark { --ts-fill: var(--ab-primary); color: var(--ab-on-primary); }
+.ab[data-ae="tonal-shape"] .ab-mark > span { position: relative; }
+
+/* ---- header ---- */
+.ab[data-ae="tonal-shape"] .ab-brand { font-weight: var(--ab-hw, 600); letter-spacing: -0.01em; }
+.ab[data-ae="tonal-shape"] .ab-tag {
+  padding: 6px 14px; border-radius: 999px; background: var(--ab-tn-low); border: 0;
+  font-size: 11.5px; letter-spacing: 0.02em; text-transform: none; color: var(--ab-muted);
+}
+.ab[data-ae="tonal-shape"] .ab-tag b { font-weight: 600; color: var(--ab-ink); }
+.ab[data-ae="tonal-shape"] .ab-rule { background: var(--ab-line); }
+
+/* ---- labels: sentence case ---- */
+.ab[data-ae="tonal-shape"] .ab-label { font-size: 12px; letter-spacing: 0.02em; text-transform: none; font-weight: 600; }
+.ab[data-ae="tonal-shape"] .ab-n { font-family: var(--ab-font-h); font-weight: var(--ab-hw, 600); color: var(--ab-tn-text); }
+.ab[data-ae="tonal-shape"] .ab-n::after { content: " · "; }
+
+/* ---- hero ---- */
+.ab[data-ae="tonal-shape"] .ab-hero { grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); align-items: center; }
+.ab[data-ae="tonal-shape"] .ab-kicker {
+  display: inline-flex; align-items: center; gap: 8px; padding: 6px 14px; border-radius: 999px;
+  background: var(--ab-tn-pc); color: var(--ab-tn-on-pc); font-size: 12px; font-weight: 600; letter-spacing: 0; text-transform: none;
+}
+.ab[data-ae="tonal-shape"] .ab-headline {
+  font-weight: var(--ab-hw, 600); line-height: 1.04; letter-spacing: calc(-0.025em * var(--ab-tr, 1));
+}
+.ab[data-ae="tonal-shape"] .ab-hl { font-style: normal; }
+.ab[data-ae="tonal-shape"] .ab-art { max-width: none; aspect-ratio: auto; justify-self: stretch; }
+
+/* hero art (board, deck cover): interlocking tonal shapes; the gap between neighbours is the panel colour */
+.ab[data-ae="tonal-shape"] .tsa { width: 100%; padding: clamp(10px, 3cqw, 20px) clamp(10px, 3cqw, 20px) clamp(8px, 2cqw, 14px); border-radius: 28px; background: var(--ab-tn-low); }
+.ab[data-ae="tonal-shape"] .tsa-svg { display: block; width: 100%; height: auto; overflow: visible; }
+.ab[data-ae="tonal-shape"] .tsa-svg path { stroke: var(--ab-tn-low); stroke-width: 7px; vector-effect: non-scaling-stroke; stroke-linejoin: round; }
+.ab[data-ae="tonal-shape"] .tsa-sig { fill: var(--ab-primary); }
+.ab[data-ae="tonal-shape"] .tsa-pc { fill: var(--ab-tn-pc); }
+.ab[data-ae="tonal-shape"] .tsa-sc { fill: var(--ab-tn-sc); }
+.ab[data-ae="tonal-shape"] .tsa-hi { fill: var(--ab-tn-high); }
+.ab[data-ae="tonal-shape"] .tsa-ac { fill: var(--ab-tn-ac); }
+.ab[data-ae="tonal-shape"] .tsa-init {
+  fill: var(--ab-on-primary); font-family: var(--ab-font-h); font-weight: var(--ab-hw, 600); font-size: 150px; stroke: none;
+}
+.ab[data-ae="tonal-shape"] .tsa-cap { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 2px 12px; margin: 8px 6px 0; font-size: 12px; color: var(--ab-muted); }
+.ab[data-ae="tonal-shape"] .tsa-cap b { font-weight: 600; color: var(--ab-ink); }
+
+/* ---- palette: soft rounded swatches ---- */
+.ab[data-ae="tonal-shape"] .ab-chip { height: clamp(46px, 7cqw, 68px); border-radius: 20px; box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--ab-ink) 12%, transparent); }
+.ab[data-ae="tonal-shape"] .ab-sw-role { font-weight: 600; }
+
+/* ---- type block ---- */
+.ab[data-ae="tonal-shape"] .ab-type-col { border-top-color: var(--ab-line); }
+.ab[data-ae="tonal-shape"] .ab-type-role { letter-spacing: 0.02em; text-transform: none; font-weight: 600; font-size: 12px; }
+.ab[data-ae="tonal-shape"] .ab-fit { border-radius: 999px; border-color: transparent; background: var(--ab-tn-high); }
+.ab[data-ae="tonal-shape"] .ab-fit[data-fit="match"] { background: var(--ab-tn-pc); color: var(--ab-tn-on-pc); }
+.ab[data-ae="tonal-shape"] .ab-fit[data-fit="avoid"] { background: var(--ab-ink); color: var(--ab-canvas); }
+.ab[data-ae="tonal-shape"] .ab-type-apply { border-radius: var(--tn-pill); border-color: var(--ab-tn-outline); color: var(--ab-tn-text); transition: border-radius 0.18s var(--tn-ease), background 0.18s; }
+.ab[data-ae="tonal-shape"] .ab-type-apply:hover { background: var(--ab-tn-pc); }
+.ab[data-ae="tonal-shape"] .ab-type-apply:active { border-radius: var(--tn-snap); }
+.ab[data-ae="tonal-shape"] .ab-type-apply:focus-visible { outline: 2px solid var(--ab-tn-text); outline-offset: 2px; }
+
+/* ---- cards, panels: the next tone up, no border, no shadow ---- */
+.ab[data-ae="tonal-shape"] :is(.ab-card, .ab-panel) {
+  background: var(--ab-tn-low); border: 0; border-radius: var(--tn-card); box-shadow: none;
+  padding: clamp(18px, 3cqw, 28px);
+}
+/* segmented control: a connected group, full outer corners, 4px inner corners; the selected segment is primary-container */
+.ab[data-ae="tonal-shape"] .ab-seg { display: flex; gap: 2px; padding: 0; border: 0; background: none; border-radius: var(--tn-pill); }
+.ab[data-ae="tonal-shape"] .ab-seg-btn {
+  flex: 1 1 0; border: 1px solid var(--ab-tn-outline); border-radius: 4px; min-height: 40px; font-size: 13px; color: var(--ab-ink); background: transparent;
+  transition: background 0.18s, border-radius 0.18s var(--tn-ease);
+}
+.ab[data-ae="tonal-shape"] .ab-seg-btn:first-child { border-top-left-radius: var(--tn-pill); border-bottom-left-radius: var(--tn-pill); }
+.ab[data-ae="tonal-shape"] .ab-seg-btn:last-child { border-top-right-radius: var(--tn-pill); border-bottom-right-radius: var(--tn-pill); }
+.ab[data-ae="tonal-shape"] .ab-seg-btn[aria-pressed="true"] { background: var(--ab-tn-pc); border-color: var(--ab-tn-outline); color: var(--ab-tn-on-pc); font-weight: 600; }
+.ab[data-ae="tonal-shape"] .ab-seg-btn:hover:not([aria-pressed="true"]) { background: var(--ab-tn-mid); }
+.ab[data-ae="tonal-shape"] .ab-seg-btn:focus-visible { outline: 2px solid var(--ab-tn-text); outline-offset: 2px; position: relative; z-index: 1; }
+.ab[data-ae="tonal-shape"] .ab-card-title {
+  margin: 22px 0 6px !important; font-weight: var(--ab-hw, 600); font-size: clamp(24px, 3.6cqw, 32px); line-height: 1.1; letter-spacing: -0.015em;
+}
+.ab[data-ae="tonal-shape"] .ab-card-body { font-size: 14px; line-height: 1.5; }
+
+/* ---- buttons: full pills; the main one is the primary; pressed squishes the corner ---- */
+.ab[data-ae="tonal-shape"] .ab-cta {
+  min-height: 52px; padding: 0 8px 0 24px; border-radius: var(--tn-pill); font-size: 15px; font-weight: 600; letter-spacing: 0;
+  background: var(--ab-primary); color: var(--ab-on-primary); box-shadow: none; border: 0;
+  transition: border-radius 0.18s var(--tn-ease), background 0.18s;
+}
+.ab[data-ae="tonal-shape"] .ab-cta:hover, .ab[data-ae="tonal-shape"] .ab-cta.is-hover { background: var(--ab-pri-hover); }
+.ab[data-ae="tonal-shape"] .ab-cta:active, .ab[data-ae="tonal-shape"] .ab-cta.is-pressed { background: var(--ab-pri-press); border-radius: var(--tn-snap); }
+.ab[data-ae="tonal-shape"] .ab-cta:focus-visible { outline: 2px solid var(--ab-tn-text); outline-offset: 3px; }
+.ab[data-ae="tonal-shape"] .ab-cta-arrow {
+  width: 38px; height: 38px; display: grid; place-items: center; border-radius: 50%; font-size: 16px;
+  background: color-mix(in srgb, var(--ab-on-primary) 16%, transparent);
+}
+.ab[data-ae="tonal-shape"] .ab-states[data-kind="button"] .ab-state-ctl { min-height: 42px; padding: 0 16px; font-size: 13px; justify-content: center; text-align: center; }
+.ab[data-ae="tonal-shape"] .ab-states[data-kind="button"] .ab-state-ctl .ab-cta-arrow { display: none; }
+.ab[data-ae="tonal-shape"] .ab-state-name { color: var(--ab-muted); }
+
+/* ---- field, toggle ---- */
+.ab[data-ae="tonal-shape"] .ab-fieldlabel { font-size: 12.5px; font-weight: 600; color: var(--ab-ink); letter-spacing: 0; text-transform: none; }
+.ab[data-ae="tonal-shape"] .ab-input {
+  padding: 13px 16px; border: 1px solid var(--ab-tn-outline); border-radius: var(--tn-small);
+  background: var(--ab-canvas); color: var(--ab-ink); transition: border-color 0.18s, box-shadow 0.18s;
+}
+.ab[data-ae="tonal-shape"] .ab-input:focus-visible { outline: 2px solid var(--ab-tn-text); outline-offset: 2px; border-color: var(--ab-tn-text); }
+.ab[data-ae="tonal-shape"] .ab-toggle { font-size: 14px; }
+.ab[data-ae="tonal-shape"] .ab-switch { width: 52px; height: 32px; border-radius: 999px; background: var(--ab-tn-high); box-shadow: inset 0 0 0 2px var(--ab-tn-outline); }
+.ab[data-ae="tonal-shape"] .ab-switch::before {
+  left: 8px; top: 8px; width: 16px; height: 16px; border-radius: 50%; background: var(--ab-tn-outline);
+  transition: left 0.18s var(--tn-ease), top 0.18s, width 0.18s, height 0.18s, background 0.18s;
+}
+.ab[data-ae="tonal-shape"] .ab-switch:checked { background: var(--ab-primary); box-shadow: none; }
+.ab[data-ae="tonal-shape"] .ab-switch:checked::before { left: 4px; top: 4px; width: 24px; height: 24px; background: var(--ab-on-primary); transform: translateX(20px); }
+.ab[data-ae="tonal-shape"] .ab-switch:focus-visible { outline: 2px solid var(--ab-tn-text); outline-offset: 2px; }
+.ab[data-ae="tonal-shape"] .ab-status { font-size: 12px; }
+
+/* ---- 03 in use (board rows): tonal rows with a signature-shape avatar ---- */
+.ab[data-ae="tonal-shape"] .ab-list:not(.sb-k-list) { display: grid; gap: 8px; }
+.ab[data-ae="tonal-shape"] .ab-row:not(.sb-k-row) {
+  grid-template-columns: 44px minmax(0, 1fr) auto minmax(76px, 96px) 4.5ch; column-gap: clamp(10px, 2cqw, 18px);
+  padding: 10px 16px 10px 12px; border: 0; border-radius: var(--tn-small); background: var(--ab-tn-low);
+}
+.ab[data-ae="tonal-shape"] .ab-row:not(.sb-k-row):last-child { border-bottom: 0; }
+.ab[data-ae="tonal-shape"] .ab-row:not(.sb-k-row) .ab-row-n { display: none; }
+.ab[data-ae="tonal-shape"] .ab-row:not(.sb-k-row) .ab-av {
+  display: grid; place-items: center; width: 44px; height: 44px; font: 600 15px/1 var(--ab-font-ui, var(--ab-font-b));
+}
+.ab[data-ae="tonal-shape"] .ab-row:nth-child(3n+2) .ab-av { --ts-fill: var(--ab-tn-sc); color: var(--ab-tn-on-sc); }
+.ab[data-ae="tonal-shape"] .ab-row:nth-child(3n) .ab-av { --ts-fill: var(--ab-tn-high); color: var(--ab-ink); }
+.ab[data-ae="tonal-shape"] .ab-row-name { font-weight: 600; }
+.ab[data-ae="tonal-shape"] .ab-row-status { background: var(--ab-tn-pc); color: var(--ab-tn-on-pc); font-weight: 600; border-radius: 999px; border-color: transparent; }
+.ab[data-ae="tonal-shape"] .ab-row-pct { font-family: var(--ab-font-h); font-weight: var(--ab-hw, 600); font-size: 20px; color: var(--ab-ink); }
+.ab[data-ae="tonal-shape"] .ab-row-bar { height: 8px; border-radius: 999px; background: var(--ab-tn-high); overflow: hidden; }
+.ab[data-ae="tonal-shape"] .ab-row-bar i { background: var(--ab-primary); border-radius: 999px; }
+.ab[data-ae="tonal-shape"] .ab-row:focus-visible { outline: 2px solid var(--ab-tn-text); outline-offset: 2px; }
+
+/* ---- narrow board ---- */
+@container ab (max-width: 600px) {
+  .ab[data-ae="tonal-shape"] .ab-row:not(.sb-k-row) { grid-template-columns: 44px minmax(0, 1fr) auto; row-gap: 4px; }
+  .ab[data-ae="tonal-shape"] .ab-row:not(.sb-k-row) .ab-av { grid-column: 1; grid-row: 1 / span 2; }
+  .ab[data-ae="tonal-shape"] .ab-row:not(.sb-k-row) .ab-row-name { grid-column: 2; grid-row: 1; }
+  .ab[data-ae="tonal-shape"] .ab-row:not(.sb-k-row) .ab-row-pct { grid-column: 3; grid-row: 1; }
+  .ab[data-ae="tonal-shape"] .ab-row:not(.sb-k-row) .ab-row-status { grid-column: 2; grid-row: 2; }
+  .ab[data-ae="tonal-shape"] .ab-row:not(.sb-k-row) .ab-row-bar { display: block; grid-column: 3; grid-row: 2; width: 76px; justify-self: end; }
+  .ab[data-ae="tonal-shape"] .ab-hero { grid-template-columns: minmax(0, 1fr); }
+  .ab[data-ae="tonal-shape"] .ab-art { max-width: none; justify-self: stretch; }
+}
+
+/* ---- footer ---- */
+.ab[data-ae="tonal-shape"] .ab-foot { border-top-color: var(--ab-line); }
+.ab[data-ae="tonal-shape"] .ab-dot { border-radius: 30%; }
+
+/* ---- reduced motion: the corner changes at once, nothing overshoots ---- */
+@media (prefers-reduced-motion: reduce) {
+  .ab[data-ae="tonal-shape"] * { transition: none !important; }
+}
+
+/* ----- deck ----- */
+.ab[data-ae="tonal-shape"].ab-slide .ab-art { max-width: none; justify-self: stretch; }
+.ab[data-ae="tonal-shape"].ab-slide .tsa-cap { font-size: 13px; }
+
+/* deck Material slide (def.deck.materialArt): the pieces as specimens */
+.ab[data-ae="tonal-shape"] .tsm { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; align-items: stretch; width: 100%; padding: 12px 0; }
+.ab[data-ae="tonal-shape"] .tsm-card {
+  display: flex; flex-direction: column; justify-content: center; gap: 16px; min-height: 220px; padding: 22px;
+  background: var(--ab-tn-low); border-radius: var(--tn-card);
+}
+.ab[data-ae="tonal-shape"] .tsm-l { font-size: 13px; font-weight: 600; color: var(--ab-muted); }
+.ab[data-ae="tonal-shape"] .tsm-cap { font-size: 14px; color: var(--ab-muted); }
+.ab[data-ae="tonal-shape"] .tsm-shapes { display: flex; align-items: center; gap: 6px; }
+.ab[data-ae="tonal-shape"] .tsm-sh { flex: none; display: grid; place-items: center; font: 600 18px/1 var(--ab-font-h); }
+.ab[data-ae="tonal-shape"] .tsm-sh.is-l { width: 56px; height: 56px; font-size: 25px; --ts-fill: var(--ab-primary); color: var(--ab-on-primary); }
+.ab[data-ae="tonal-shape"] .tsm-sh.is-m { width: 40px; height: 40px; font-size: 18px; }
+.ab[data-ae="tonal-shape"] .tsm-sh.is-s { width: 28px; height: 28px; font-size: 12px; --ts-fill: var(--ab-tn-sc); color: var(--ab-tn-on-sc); }
+.ab[data-ae="tonal-shape"] .tsm-btns { display: flex; flex-wrap: wrap; gap: 12px; }
+.ab[data-ae="tonal-shape"] .tsm-pill {
+  display: inline-grid; place-items: center; min-height: 48px; padding: 0 24px; border-radius: var(--tn-pill);
+  background: var(--ab-primary); color: var(--ab-on-primary); font: 600 15px/1 var(--ab-font-ui, var(--ab-font-b));
+}
+.ab[data-ae="tonal-shape"] .tsm-pill.is-pressed { border-radius: var(--tn-snap); background: var(--ab-pri-press); }
+.ab[data-ae="tonal-shape"] .tsm-seg { display: flex; gap: 2px; }
+.ab[data-ae="tonal-shape"] .tsm-seg span {
+  flex: 1; display: grid; place-items: center; min-height: 38px; border: 1px solid var(--ab-tn-outline); border-radius: 4px; font: 500 13px/1 var(--ab-font-ui, var(--ab-font-b)); color: var(--ab-ink);
+}
+.ab[data-ae="tonal-shape"] .tsm-seg span:first-child { border-radius: var(--tn-pill) 4px 4px var(--tn-pill); }
+.ab[data-ae="tonal-shape"] .tsm-seg span:last-child { border-radius: 4px var(--tn-pill) var(--tn-pill) 4px; }
+.ab[data-ae="tonal-shape"] .tsm-seg span.is-on { background: var(--ab-tn-pc); color: var(--ab-tn-on-pc); font-weight: 600; }
+.ab[data-ae="tonal-shape"] .tsm-ramp { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.ab[data-ae="tonal-shape"] .tsm-t { display: grid; place-items: center; min-height: 52px; border-radius: var(--tn-small); font: 600 13px/1 var(--ab-font-ui, var(--ab-font-b)); color: var(--ab-ink); }
+.ab[data-ae="tonal-shape"] .tsm-t.t-low { background: var(--ab-tn-low); box-shadow: inset 0 0 0 1px var(--ab-line); }
+.ab[data-ae="tonal-shape"] .tsm-t.t-mid { background: var(--ab-tn-mid); }
+.ab[data-ae="tonal-shape"] .tsm-t.t-high { background: var(--ab-tn-high); }
+.ab[data-ae="tonal-shape"] .tsm-t.t-pc { background: var(--ab-tn-pc); color: var(--ab-tn-on-pc); }
+
+/* =====================================================================
+   App UI (Built screens, UI kit: .sb-ab, kit root .sb-kit). No art here: surfaces, type, and the
+   signature shape as a container only (it holds an initial or an icon).
+   ===================================================================== */
+
+/* the shape's tone per use */
+.ab.sb-ab[data-ae="tonal-shape"] :is(.sb-me-av, .sb-k-av, .sb-k-ico, .sb-k-emptyico) { --ts-fill: var(--ab-tn-pc); color: var(--ab-tn-on-pc); }
+.ab.sb-ab[data-ae="tonal-shape"] .sb-k-avs .sb-k-av { margin-left: -2px; }
+.ab.sb-ab[data-ae="tonal-shape"] .sb-k-avs .sb-k-av:nth-child(2n) { --ts-fill: var(--ab-tn-sc); color: var(--ab-tn-on-sc); }
+.ab.sb-ab[data-ae="tonal-shape"] .sb-k-avs .sb-k-av:nth-child(3n) { --ts-fill: var(--ab-tn-high); color: var(--ab-ink); }
+.ab.sb-ab[data-ae="tonal-shape"] .sb-k-av { font-weight: var(--ab-hw, 600); }
+
+/* the icon button: the signature shape, holding its glyph (a floating action button where a product has one) */
+.ab.sb-ab[data-ae="tonal-shape"] .ab-type-apply.sb-icon-btn { --ts-fill: var(--ab-tn-pc); color: var(--ab-tn-on-pc); transition: transform 0.18s var(--tn-ease); }
+.ab.sb-ab[data-ae="tonal-shape"] .ab-type-apply.sb-icon-btn:hover::before { background: color-mix(in srgb, var(--ab-tn-on-pc) 10%, var(--ab-tn-pc)); }
+.ab.sb-ab[data-ae="tonal-shape"] .ab-type-apply.sb-icon-btn:is(:active, .is-pressed, .sb-k-pressed) { transform: scale(0.92); }
+.ab.sb-ab[data-ae="tonal-shape"] .ab-type-apply.sb-icon-btn:is(:active, .is-pressed, .sb-k-pressed)::before { background: color-mix(in srgb, var(--ab-tn-on-pc) 16%, var(--ab-tn-pc)); }
+.ab.sb-ab[data-ae="tonal-shape"] .ab-type-apply.sb-icon-btn:focus-visible { outline: 2px solid var(--ab-tn-text); outline-offset: 2px; }
+.ab.sb-ab[data-ae="tonal-shape"] .sb-badge { box-shadow: 0 0 0 2px var(--ab-canvas); }
+
+/* dashboard */
+.ab.sb-ab[data-ae="tonal-shape"] .sb-side { background: var(--ab-tn-low); border-right: 0; }
+.ab.sb-ab[data-ae="tonal-shape"] .sb-navi { border-radius: var(--tn-pill); }
+.ab.sb-ab[data-ae="tonal-shape"] .sb-navi[aria-current] { background: var(--ab-tn-pc); color: var(--ab-tn-on-pc); box-shadow: none; }
+.ab.sb-ab[data-ae="tonal-shape"] .sb-me { border-top-color: var(--ab-line); }
+.ab.sb-ab[data-ae="tonal-shape"] .sb-c-prev { stroke: var(--ab-tn-outline); }
+.ab.sb-ab[data-ae="tonal-shape"] .sb-c-area { fill: color-mix(in srgb, var(--ab-primary) 14%, transparent); }
+.ab.sb-ab[data-ae="tonal-shape"] .sb-stat .sb-delta { background: var(--ab-tn-pc); color: var(--ab-tn-on-pc); border-color: transparent; font-weight: 600; }
+.ab.sb-ab[data-ae="tonal-shape"] .ab-card.sb-stat { padding: 18px 20px; }
+.ab.sb-ab[data-ae="tonal-shape"] .ab-card-title.sb-num { font-size: clamp(28px, 3.4cqw, 40px); }
+
+/* phone screens and the kit */
+.ab.sb-ab[data-ae="tonal-shape"].sb-kit .ab-headline,
+.ab.sb-ab[data-ae="tonal-shape"].sb-kit :is(.sb-home-h, .sb-k-ltitle, .sb-k-pagetitle) { font-weight: var(--ab-hw, 600); letter-spacing: -0.015em; }
+.ab.sb-ab[data-ae="tonal-shape"].sb-kit .ab-card .ab-card-title { font-size: var(--k-title-2, 22px) !important; }
+.ab.sb-ab[data-ae="tonal-shape"].sb-kit :is(.ab-card, .ab-panel) { padding-top: var(--k-cardpad, 20px); }
+.ab.sb-ab[data-ae="tonal-shape"].sb-kit .ab-kicker { padding: 0; background: none; border-radius: 0; color: var(--ab-muted); }
+
+/* buttons: pills that squish; the corner is the same 12px in the pressed state of the kit (.sb-k-pressed) and on touch */
+.ab.sb-ab[data-ae="tonal-shape"].sb-kit :is(.ab-cta.sb-k-btn, .ab-type-apply.sb-k-btn2, .sb-k-danger, .sb-k-textbtn) {
+  border-radius: var(--tn-pill); transition: border-radius 0.18s var(--tn-ease), background 0.18s;
+}
+.ab.sb-ab[data-ae="tonal-shape"].sb-kit :is(.ab-cta.sb-k-btn, .ab-type-apply.sb-k-btn2, .sb-k-danger, .sb-k-textbtn):is(:active, .is-pressed, .sb-k-pressed) { border-radius: var(--tn-snap); }
+.ab.sb-ab[data-ae="tonal-shape"].sb-kit .ab-cta { padding: 0 20px; }
+.ab.sb-ab[data-ae="tonal-shape"].sb-kit .ab-cta-arrow { width: 32px; height: 32px; }
+.ab.sb-ab[data-ae="tonal-shape"].sb-kit .ab-type-apply.sb-k-btn2 { border: 1px solid var(--ab-tn-outline); color: var(--ab-tn-text); background: transparent; }
+.ab.sb-ab[data-ae="tonal-shape"].sb-kit .ab-type-apply.sb-k-btn2.sb-k-pressed { background: var(--ab-tn-pc); box-shadow: none; }
+.ab.sb-ab[data-ae="tonal-shape"].sb-kit .sb-k-textbtn { color: var(--ab-tn-text); }
+.ab.sb-ab[data-ae="tonal-shape"].sb-kit .sb-k-textbtn.sb-k-pressed { background: var(--ab-tn-pc); color: var(--ab-tn-on-pc); }
+
+/* containers: cards and the grouped list are 28px tonal; fields, callouts, toast and menus 12px.
+   Inside a kit cell (itself container-low) a nested card, list or sheet steps up one tone. */
+.ab.sb-ab[data-ae="tonal-shape"].sb-kit .sb-k-cell :is(.ab-card.sb-k-card, .ab-list.sb-k-list) { background: var(--ab-tn-mid); }
+.ab.sb-ab[data-ae="tonal-shape"].sb-kit .ab-list.sb-k-list { background: var(--ab-tn-low); border: 0; border-radius: var(--tn-card); box-shadow: none; overflow: hidden; }
+.ab.sb-ab[data-ae="tonal-shape"].sb-kit .ab-row.sb-k-row.is-picked { background-color: var(--ab-tn-pc); }
+.ab.sb-ab[data-ae="tonal-shape"].sb-kit .ab-input { border-radius: var(--tn-small); border-color: var(--ab-tn-outline); background: var(--ab-canvas); }
+.ab.sb-ab[data-ae="tonal-shape"].sb-kit .ab-toggle.sb-tog { border-radius: var(--tn-small); }
+.ab.sb-ab[data-ae="tonal-shape"].sb-kit .sb-k-field.is-error .ab-input { border-color: var(--sb-danger) !important; box-shadow: inset 0 0 0 1px var(--sb-danger) !important; }
+.ab.sb-ab[data-ae="tonal-shape"].sb-kit :is(.sb-k-callout, .sb-k-toast, .sb-k-menu) { border-radius: var(--tn-small); }
+.ab.sb-ab[data-ae="tonal-shape"].sb-kit .sb-k-sheet { border-radius: var(--tn-card) var(--tn-card) 0 0; background: var(--ab-tn-mid); box-shadow: none; }
+.ab.sb-ab[data-ae="tonal-shape"].sb-kit .sb-k-grab { background: var(--ab-tn-outline); }
+
+/* segmented (4px inner corners come from the shared board rule); in-page tabs keep a pill indicator */
+.ab.sb-ab[data-ae="tonal-shape"].sb-kit .ab-seg { gap: 2px; background: none; padding: 0; }
+.ab.sb-ab[data-ae="tonal-shape"].sb-kit .sb-k-tabs { border-bottom-color: var(--ab-line); }
+.ab.sb-ab[data-ae="tonal-shape"].sb-kit .sb-k-tabs [role="tab"][aria-selected="true"]::after { height: 3px; border-radius: 3px 3px 0 0; background: var(--ab-primary); }
+
+/* tab bar: tonal bar, the selected item is a pill behind its icon */
+.ab.sb-ab[data-ae="tonal-shape"] .sb-tabs { background: var(--ab-tn-low); border-top: 0; }
+.ab.sb-ab[data-ae="tonal-shape"] .sb-tab { isolation: isolate; padding-top: 4px; }
+.ab.sb-ab[data-ae="tonal-shape"] .sb-tab[aria-current]::before {
+  content: ""; position: absolute; z-index: -1; top: 4px; left: 50%; bottom: auto; width: 60px; height: 32px; margin-left: -30px;
+  border-radius: 16px; background: var(--ab-tn-pc);
+}
+.ab.sb-ab[data-ae="tonal-shape"] .sb-tab[aria-current] > .sb-ico { color: var(--ab-tn-on-pc); }
+.ab.sb-ab[data-ae="tonal-shape"] .sb-tab > .sb-ico { padding: 4px 0; box-sizing: content-box; }
+.ab.sb-ab[data-ae="tonal-shape"] .sb-tab:focus-visible { outline: 2px solid var(--ab-tn-text); outline-offset: -2px; border-radius: 12px; }
+
+/* progress: a rounded track */
+.ab.sb-ab[data-ae="tonal-shape"].sb-kit .ab-row-bar.sb-k-bar { height: 8px !important; border-radius: 999px; background: var(--ab-tn-high); overflow: hidden; }
+.ab.sb-ab[data-ae="tonal-shape"].sb-kit .ab-row-bar.sb-k-bar i { background: var(--ab-primary); border-radius: 999px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .ab.sb-ab[data-ae="tonal-shape"] * { transition: none !important; }
+  .ab.sb-ab[data-ae="tonal-shape"] .ab-type-apply.sb-icon-btn:is(:active, .is-pressed, .sb-k-pressed) { transform: none; }
+}

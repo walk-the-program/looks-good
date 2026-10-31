@@ -464,9 +464,9 @@
       `<button type="button" class="ab-seg-btn" aria-pressed="${i === pressed}" data-v="${e(v)}">${e(t)}</button>`).join('')}</div>`;
   }
 
-  function toggle(X, label, on, hint) {
+  function toggle(X, label, on, hint, disabled) {
     const id = `${X.uid}-t${++seq}`;
-    return `<label class="ab-toggle sb-tog" for="${id}"><span>${e(label)}${hint ? `<small class="sb-hint">${e(hint)}</small>` : ''}</span><input class="ab-switch" id="${id}" type="checkbox"${on ? ' checked' : ''} /></label>`;
+    return `<label class="ab-toggle sb-tog${disabled ? ' is-disabled' : ''}" for="${id}"><span>${e(label)}${hint ? `<small class="sb-hint">${e(hint)}</small>` : ''}</span><input class="ab-switch" id="${id}" type="checkbox"${on ? ' checked' : ''}${disabled ? ' disabled' : ''} /></label>`;
   }
 
   function field(X, label, value, cls = '') {
@@ -768,7 +768,8 @@
   // Every UI_KIT component (js/ui-kit.js) in every listed state, drawn from the board's own
   // component classes plus the sb-k-* pieces in css/see-built.css, so the aesthetic styles it.
   // Sizes come from UI_KIT_PHONE (custom properties set on #builtView by render()).
-  const kBtn = (cls, label, st) => `<button type="button" class="${cls}${st === 'pressed' ? ' is-pressed sb-k-pressed' : ''}"${st === 'disabled' ? ' disabled' : ''}>${label}</button>`;
+  // focus: the keyboard ring (css/see-built.css .sb-k-focus, set by --sb-focus*); disabled: the attribute, so a style's :disabled rules apply too
+  const kBtn = (cls, label, st) => `<button type="button" class="${cls}${st === 'pressed' ? ' is-pressed sb-k-pressed' : ''}${st === 'focus' ? ' is-focus sb-k-focus' : ''}"${st === 'disabled' ? ' disabled' : ''}>${label}</button>`;
   const ctaInner = label => `<span class="ab-cta-label">${e(label)}</span><span class="ab-cta-arrow" aria-hidden="true"></span>`;
 
   // Top bar: leading control, centred title, trailing control; an empty side keeps its 44pt slot.
@@ -784,16 +785,17 @@
     field: (X, st) => {
       const id = `${X.uid}-kf${++seq}`;
       const val = st === 'error' ? 'hello@' : st === 'rest' ? '' : 'maya@' + slugOf(X.name) + '.com';
-      return `<div class="sb-field sb-k-field is-${st}"><label class="ab-fieldlabel" for="${id}">Email</label><input class="ab-input" id="${id}" type="text" value="${e(val)}" placeholder="you@example.com" autocomplete="off" spellcheck="false"${st === 'disabled' ? ' disabled' : ''}${st === 'error' ? ' aria-invalid="true"' : ''} />${st === 'error' ? '<p class="sb-k-help is-error">Enter a full email address.</p>' : ''}</div>`;
+      return `<div class="sb-field sb-k-field is-${st}"><label class="ab-fieldlabel" for="${id}">Email</label><input class="ab-input" id="${id}" type="text" value="${e(val)}" placeholder="you@example.com" autocomplete="off" spellcheck="false"${st === 'disabled' ? ' disabled' : ''}${st === 'error' ? ' aria-invalid="true"' : ''} />${st === 'error' ? '<p class="sb-k-help is-error">Enter a full email address.</p>' : st === 'rest' ? '<p class="sb-k-help">We send receipts here.</p>' : ''}</div>`;
     },
     search: (X, st) => `<div class="sb-search sb-k-search is-${st}">${icon('search', 18)}<input class="ab-input" type="text" placeholder="${e(X.D.search)}" value="${st === 'focus' ? e(X.D.rows[0][0].split(' ')[0]) : ''}" aria-label="${e(X.D.search)}" autocomplete="off" /></div>`,
     select: (X, st) => {
       const opts = X.D.mobile.seg.concat(['Everything']);
       return `<div class="sb-k-selectwrap"><p class="ab-fieldlabel">Show</p><button type="button" class="ab-input sb-k-select" aria-haspopup="listbox" aria-expanded="${st === 'open'}"><span>${e(opts[0])}</span>${icon('down', 18)}</button>${st === 'open' ? `<ul class="sb-k-menu" role="listbox">${opts.map((o, i) => `<li role="option" aria-selected="${i === 0}"><span>${e(o)}</span>${i === 0 ? icon('check', 18) : ''}</li>`).join('')}</ul>` : ''}</div>`;
     },
-    checkbox: (X, st) => `<label class="sb-k-check"><input class="sb-k-box" type="checkbox"${st === 'on' ? ' checked' : ''} /><span>Email me receipts</span></label>`,
+    // disabled is drawn in its on position, so the veil shows over a filled box
+    checkbox: (X, st) => `<label class="sb-k-check${st === 'disabled' ? ' is-disabled' : ''}"><input class="sb-k-box" type="checkbox"${st === 'on' || st === 'disabled' ? ' checked' : ''}${st === 'disabled' ? ' disabled' : ''} /><span>Email me receipts</span></label>`,
     radio: (X, st) => `<label class="sb-k-check"><input class="sb-k-box" type="radio" name="${X.uid}-kr${++seq}"${st === 'on' ? ' checked' : ''} /><span>${st === 'on' ? 'Weekly' : 'Daily'}</span></label>`,
-    toggle: (X, st) => toggle(X, 'Push notifications', st === 'on'),
+    toggle: (X, st) => toggle(X, 'Push notifications', st === 'on' || st === 'disabled', '', st === 'disabled'),
     segmented: (X) => seg(X.D.mobile.seg.concat(['All']).map((s, i) => [String(i), s]), 0, 'kseg', 'Show'),
     slider: () => `<div class="sb-k-slider"><div class="sb-k-slider-h"><span>Volume</span><span data-sb-range-out>60%</span></div><input class="sb-k-range" type="range" min="0" max="100" value="60" style="--v:60%" aria-label="Volume" /></div>`,
     card: (X) => {
@@ -1091,7 +1093,9 @@
       const card = root.querySelector('.ab-card');
       if (card) root.style.setProperty('--sb-card-r', getComputedStyle(card).borderTopLeftRadius || '12px');
     });
-    host.querySelectorAll('.sb-ab').forEach(kitColours);
+    // keyboard focus ring colour: the primary, or the ink where the colour rules bar the primary from controls
+    const barred = typeof aibPrimaryBarred === 'function' && typeof colorRolesFor === 'function' && aibPrimaryBarred(colorRolesFor(typeof state !== 'undefined' ? state : null));
+    host.querySelectorAll('.sb-ab').forEach(root => kitColours(root, barred));
     if (def.blend) {
       host.querySelectorAll('.sb-ab').forEach(root => {
         try {
@@ -1141,7 +1145,7 @@
   // uiKitTone): destructive / error = the palette's reddish colour, or the ink (then the
   // destructive button is an outline with an ink label, data-sb-danger="ink"); callouts tint
   // info = primary, success = secondary, warning = accent, each icon shaded to 3:1 on the canvas.
-  function kitColours(root) {
+  function kitColours(root, barred) {
     if (typeof uiKitDanger !== 'function') return;
     const probe = document.createElement('i');
     probe.style.display = 'none';
@@ -1165,6 +1169,18 @@
     // the primary as text (text buttons, tags, tinted icons): 4.5:1 on the canvas and on --ab-pri-tint
     set('--k-pri-text', uiKitTone(pal.primary, pal, 4.5).ico);
     set('--k-pri-on-tint', uiKitTone(pal.primary, { ink: pal.ink, canvas: read2(root, '--ab-pri-tint') || pal.canvas }, 4.5).ico);
+    // focus ring: the primary where it holds 3:1 on the canvas and the colour rules allow it, else the ink
+    set('--sb-focus-auto', !barred && UIK_COLOR.con(UIK_COLOR.parse(pal.primary) || [0, 0, 0], UIK_COLOR.parse(pal.canvas) || [255, 255, 255]) >= 3 ? 'var(--ab-primary)' : 'var(--ab-ink)');
+    // disabled buttons: the label is the muted ink over the veiled fill; where that falls under 3:1 (a dark or
+    // mid-tone fill), the label takes the ink instead
+    root.querySelectorAll('.sb-k-btn:disabled, .sb-k-btn2:disabled').forEach(b => {
+      const cs = getComputedStyle(b), bgc = UIK_COLOR.parse(cs.backgroundColor), lab = b.querySelector('.ab-cta-label') || b;
+      const veil = /color\(srgb ([\d.]+) ([\d.]+) ([\d.]+) \/ ([\d.]+)\)/.exec(cs.boxShadow), a = /rgba?\([^)]*,\s*([\d.]+)\)/.exec(cs.backgroundColor);
+      const fg = UIK_COLOR.parse(getComputedStyle(lab).color);
+      if (!bgc || !veil || !fg || (a && +a[1] < 0.9)) return;
+      const eff = bgc.map((x, i) => x * (1 - +veil[4]) + +veil[i + 1] * 255 * +veil[4]);
+      if (UIK_COLOR.con(fg, eff) < 3) b.style.setProperty('--k-dis-label', 'var(--ab-ink)');
+    });
     // fields drawn as an underline get a thicker underline on focus / error, never a box ring
     const inp = root.querySelector('.ab-input');
     if (inp) {

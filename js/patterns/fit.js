@@ -1,5 +1,5 @@
 /* ---------------------------------------------------------------------
-   patterns/fit.js — aesthetic fit: six tuned patterns for each of the 35
+   patterns/fit.js — aesthetic fit: six tuned patterns for each of the 41
    aesthetics (keys match js/aesthetics/*.js).
 
      Patterns.suiteFor(aestheticKey) -> [{ key, name, colorway, params, tone }]
@@ -30,7 +30,7 @@
    share a first family, so every deck cover reads as its own aesthetic. Exempt (both deck.coverBand
    and deck.closingStrip false, lead seen only on the Patterns slide): liquid-glass, holo-iridescent,
    aurora-noir. The ownership table is in docs/patterns.md, "Round 6 suite
-   ownership"; change a lead only by taking a family no band/strip aesthetic leads with (halftone, terrain, arcrise, cutup, burst, neonspray, bloomgrid, kaleidopix, prismpix, totem, colony, seafan, marble, thermalstreak, waves, snow, panels, flyposter, festival, blades, rods) or by
+   ownership"; change a lead only by taking a family no band/strip aesthetic leads with (halftone, terrain, cutup, burst, neonspray, kaleidopix, prismpix, colony, seafan, marble, thermalstreak, waves, snow, flyposter, festival, blades, rods) or by
    swapping with its owner. Nothing here invents a colour except the fixed
    colourways above, which are documented exceptions: otherwise the colorway only chooses how the
    brand roles map to inks.
@@ -328,6 +328,38 @@
       ['thermal', 'Heat tiles', 'pebble-ink', { bands: 4, cell: 1.6, turb: 0.6, shape: 'round', flat: true }, 0.8],
       ['sonar', 'Contour map', 'pebble-ink', { land: 0.45, size: 1, speckle: 0.4, contours: true }, 0.8],
       ['flow', 'Soft contours', 'pebble-ink', { field: 'waves', strands: 5, gap: 2, bend: 0.8, weight: 0.8 }, 0.8],
+    ],
+    'toy-press': [
+      ['bloomgrid', 'Pixel bloom', 'brand', { px: 3, levels: 4, rings: 4, calm: 0.5, dither: false }],
+      ['gradpanes', 'Pressed panes', 'brand', { rows: 3, cols: 4, gap: 1.6, radius: 3.4, steps: 0, grain: 0 }],
+      ['modulargrid', 'Block grid', 'brand', { cols: 8, merge: 1, gap: 1.6, empty: 0 }],
+      ['tokens', 'Chunky capsules', 'brand', { cell: 10, link: 0.3, density: 1, fill: 'mixed', grain: 0 }],
+      ['glyphgrid', 'Key caps', 'brand', { glyphs: 'blocks', cell: 3.8, bands: 5, duo: true }],
+      ['pixelquilt', 'Pixel quilt', 'brand', { px: 1.2, block: 6, motifs: 'geometric', big: 0.3 }],
+    ],
+    'live-tile': [
+      ['totem', 'Nested tiles', 'brand', { px: 3, panel: 1, band: 3, frame: 1 }],
+      ['modulargrid', 'Tile wall', 'brand', { cols: 4, merge: 0.7, gap: 1.6, empty: 0.08 }],
+      ['gradpanes', 'Flat panes', 'brand', { rows: 3, cols: 4, gap: 1.6, radius: 0, steps: 0, grain: 0 }],
+      ['weave', 'Pivot bands', 'brand', { bands: 4, rhythm: 'even', skew: 0, gap: 0.35, stripe: 1 }],
+      ['panels', 'Wide panels', 'brand', { depth: 2, gutter: 0.5, pitch: 1.2, flat: 1, frame: false }],
+      ['parcels', 'Block parcels', 'brand', { cell: 2, size: 1.35, every: 8, labels: false }],
+    ],
+    'mainframe': [
+      ['panels', 'Rack panels', 'mono', { depth: 4, gutter: 0.6, pitch: 0.9, flat: 0.5, frame: true }, 0.8],
+      ['modulargrid', 'Module grid', 'mono', { cols: 8, style: 'filled', merge: 0.6, gap: 0.3, empty: 0.25 }, 0.8],
+      ['weave', 'Uneven pitch', 'brand', { bands: 14, rhythm: 'mixed', gap: 0.1, stripe: 0.9 }, 0.9],
+      ['parcels', 'Ledger tags', 'mono', { cell: 1.6, size: 1, every: 6, labels: true }, 0.8],
+      ['pixelgrid', 'Punch field', 'mono', { cell: 2.5, mode: 'dots', zones: 2, density: 0.8, phase: 0 }, 0.8],
+      ['glyphgrid', 'Register marks', 'mono', { glyphs: 'crosses', cell: 5, bands: 4, duo: false }, 0.8],
+    ],
+    'tonal-shape': [
+      ['arcrise', 'Arch rise', 'brand', { origin: 'bottom', bands: 6, suns: 1, bars: false, bar: 3.6, scale: 1, grain: 0, tints: false }, 0.7],
+      ['tokens', 'Soft capsules', 'brand', { cell: 7.5, link: 0.4, density: 0.8, fill: 'mixed', grain: 0 }, 0.8],
+      ['aura', 'Soft lumps', 'brand', { layout: 'scatter', blobs: 6, soft: 0.8, mode: 'paint', strength: 0.8, grain: 0 }, 0.7],
+      ['colony', 'Cell colony', 'duotone', { cells: 26, rings: 3, fuse: 1.3, finish: 'film', nuclei: false, grain: 0.05 }, 0.7],
+      ['gradpanes', 'Rounded panes', 'brand', { rows: 3, cols: 4, gap: 1.6, steps: 0, radius: 4, grain: 0 }, 0.75],
+      ['modulargrid', 'Shape tiles', 'brand', { cols: 6, style: 'filled', merge: 0.5, gap: 1, empty: 0.1, grain: 0 }, 0.8],
     ],
     'old-web': [
       ['oprings', 'Hypno GIF', 'brand', { mode: 'rings', centres: 2, freq: 14, warp: 0.2, bands: 'three' }],

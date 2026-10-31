@@ -17,8 +17,8 @@
    (iOS users expect its behaviour); 'custom' = draw it in the aesthetic's style. */
 const UI_KIT = [
   { group: 'Actions', items: [
-    { id: 'btn-primary', ios: 'custom', name: 'Primary button', use: 'The one main action on a screen.', states: ['rest', 'pressed', 'disabled'] },
-    { id: 'btn-secondary', ios: 'custom', name: 'Secondary button', use: 'The alternative next to a primary button.', states: ['rest', 'pressed', 'disabled'] },
+    { id: 'btn-primary', ios: 'custom', name: 'Primary button', use: 'The one main action on a screen.', states: ['rest', 'pressed', 'focus', 'disabled'] },
+    { id: 'btn-secondary', ios: 'custom', name: 'Secondary button', use: 'The alternative next to a primary button.', states: ['rest', 'pressed', 'focus', 'disabled'] },
     { id: 'btn-text', ios: 'custom', name: 'Text button', use: 'Low-emphasis actions: Skip, Cancel, See all.', states: ['rest', 'pressed'] },
     { id: 'btn-destructive', ios: 'custom', name: 'Destructive button', use: 'Delete, remove, sign out.', states: ['rest', 'pressed'] },
     { id: 'btn-icon', ios: 'custom', name: 'Icon button', use: 'A single icon action in a top bar or row.', states: ['rest', 'pressed'] },
@@ -27,9 +27,9 @@ const UI_KIT = [
     { id: 'field', ios: 'custom', name: 'Text field', use: 'Single-line entry with a label above it.', states: ['rest', 'focus', 'error', 'disabled'] },
     { id: 'search', ios: 'native:.searchable', name: 'Search field', use: 'Search with a leading icon.', states: ['rest', 'focus'] },
     { id: 'select', ios: 'native:Picker / Menu', name: 'Select', use: 'Pick one value from a list.', states: ['rest', 'open'] },
-    { id: 'checkbox', ios: 'custom', name: 'Checkbox', use: 'Multi-select options.', states: ['off', 'on'] },
+    { id: 'checkbox', ios: 'custom', name: 'Checkbox', use: 'Multi-select options.', states: ['off', 'on', 'disabled'] },
     { id: 'radio', ios: 'custom', name: 'Radio', use: 'Single choice from a short list.', states: ['off', 'on'] },
-    { id: 'toggle', ios: 'native:Toggle', name: 'Toggle', use: 'An on/off setting that applies at once.', states: ['off', 'on'] },
+    { id: 'toggle', ios: 'native:Toggle', name: 'Toggle', use: 'An on/off setting that applies at once.', states: ['off', 'on', 'disabled'] },
     { id: 'segmented', ios: 'native:Picker(.segmented)', name: 'Segmented control', use: 'Switch between 2 to 4 views of the same content.', states: ['rest'] },
     { id: 'slider', ios: 'native:Slider', name: 'Slider', use: 'A value on a continuous range.', states: ['rest'] },
   ] },
@@ -169,7 +169,7 @@ const UIK_COLOR = (() => {
      color the fill / edge colour: the error colour `text` when the destructive button is filled, else the
            palette colour itself (or the ink when role is null)
      text  the one error colour (the brief's --error): the palette colour shaded toward the ink until it holds
-           4.5:1 on the canvas; if no label then reaches 4.5:1 on it, its lightness moves (same hue)
+           4.5:1 on the canvas and on the canvas tinted 6% toward the ink (the kit's panels); if no label then reaches 4.5:1 on it, its lightness moves (same hue)
      on    canvas, ink or white, whichever scores highest on `text`; always 4.5:1 when role is set
      fill  true only when that colour is distinct from the primary (not the primary role, Delta E > 10):
            destructive never looks like the main action, so otherwise it is an outline in `text`
@@ -192,8 +192,12 @@ function uiKitDanger(pal) {
     if (!best || chroma > best.chroma + 0.02 || (Math.abs(chroma - best.chroma) <= 0.02 && dist < best.dist)) best = { role, c: use, chroma, dist };
   });
   if (!best) return { role: null, color: hex(ink), text: hex(ink), on: hex(canvas), fill: false };
+  // The error line sits on the kit's panels, which tint the canvas a few percent toward the ink: it must hold
+  // 4.5:1 on the canvas and on that tinted ground (6%), or it slips under 4.5 on the panel it is drawn on.
+  const ground = mix(canvas, ink, 0.06);
+  const both = c => Math.min(con(c, canvas), con(c, ground));
   let t = best.c, k = 0;
-  while (con(t, canvas) < 4.5 && k < 1) { k = Math.min(1, k + 0.05); t = mix(best.c, ink, k); }
+  while (both(t) < 4.5 && k < 1) { k = Math.min(1, k + 0.05); t = mix(best.c, ink, k); }
   const pri = parse(pal && pal.primary);
   const fill = best.role !== 'primary' && !(pri && dE(best.c, pri) <= 10);
   // `t` is the one error colour (the brief's --error and the filled destructive button). Its label is the
@@ -201,7 +205,7 @@ function uiKitDanger(pal) {
   // holds 4.5:1 both on the canvas and under its label.
   const ons = [canvas, ink, [255, 255, 255]];
   const labelOn = c => ons.reduce((a, b) => (con(b, c) > con(a, c) ? b : a));
-  const ok = c => { c = c.map(Math.round); return con(c, canvas) >= 4.5 && con(labelOn(c), c) >= 4.5; };
+  const ok = c => { c = c.map(Math.round); return both(c) >= 4.5 && con(labelOn(c), c) >= 4.5; };
   if (!ok(t)) {
     const { h, s, l } = hsl(t);
     let found = null;

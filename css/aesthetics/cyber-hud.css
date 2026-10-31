@@ -296,3 +296,10 @@
 .ab.sb-ab.sb-kit[data-ae="cyber-hud"] .sb-k-sheetbox, .ab.sb-ab.sb-kit[data-ae="cyber-hud"] .sb-k-tabbarbox { border-radius: 0; }
 .ab.sb-ab.sb-kit[data-ae="cyber-hud"] .sb-k-sheet { border-radius: 0; box-shadow: inset 0 1px 0 var(--ab-neon-line); }
 .ab.sb-ab.sb-kit[data-ae="cyber-hud"] .sb-k-grab { height: 3px; border-radius: 0; background: var(--ab-hud-line); }
+
+/* keyboard focus in the UI kit: the chamfer clip-path hides the kit's outside ring, so the ring is drawn inside the
+   clip as a canvas line under an ink line (one of the two always reads against a neon or a dark fill) */
+.ab.sb-ab.sb-kit[data-ae="cyber-hud"] .sb-k-focus,
+.ab.sb-ab.sb-kit[data-ae="cyber-hud"] :is(.sb-k-btn, .sb-k-btn2, .sb-k-textbtn, .sb-k-danger, .sb-k-iconbtn):focus-visible {
+  outline: 2px solid var(--ab-canvas); outline-offset: -2px; box-shadow: inset 0 0 0 4px var(--ab-ink);
+}
