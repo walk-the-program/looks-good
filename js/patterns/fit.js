@@ -1,5 +1,5 @@
 /* ---------------------------------------------------------------------
-   patterns/fit.js — aesthetic fit: six tuned patterns for each of the 41
+   patterns/fit.js — aesthetic fit: six tuned patterns for each of the 45
    aesthetics (keys match js/aesthetics/*.js).
 
      Patterns.suiteFor(aestheticKey) -> [{ key, name, colorway, params, tone }]
@@ -30,7 +30,7 @@
    share a first family, so every deck cover reads as its own aesthetic. Exempt (both deck.coverBand
    and deck.closingStrip false, lead seen only on the Patterns slide): liquid-glass, holo-iridescent,
    aurora-noir. The ownership table is in docs/patterns.md, "Round 6 suite
-   ownership"; change a lead only by taking a family no band/strip aesthetic leads with (halftone, terrain, cutup, burst, neonspray, kaleidopix, prismpix, colony, seafan, marble, thermalstreak, waves, snow, flyposter, festival, blades, rods) or by
+   ownership"; change a lead only by taking a family no band/strip aesthetic leads with (terrain, cutup, burst, neonspray, kaleidopix, prismpix, colony, seafan, marble, thermalstreak, snow, festival, blades, rods) or by
    swapping with its owner. Nothing here invents a colour except the fixed
    colourways above, which are documented exceptions: otherwise the colorway only chooses how the
    brand roles map to inks.
@@ -360,6 +360,38 @@
       ['colony', 'Cell colony', 'duotone', { cells: 26, rings: 3, fuse: 1.3, finish: 'film', nuclei: false, grain: 0.05 }, 0.7],
       ['gradpanes', 'Rounded panes', 'brand', { rows: 3, cols: 4, gap: 1.6, steps: 0, radius: 4, grain: 0 }, 0.75],
       ['modulargrid', 'Shape tiles', 'brand', { cols: 6, style: 'filled', merge: 0.5, gap: 1, empty: 0.1, grain: 0 }, 0.8],
+    ],
+    'isogrid': [
+      ['kaleidopix', 'Folded quarters', 'brand', { px: 3, patches: 0.7, fold: 'quad' }, 0.7],
+      ['modulargrid', 'Doubling grid', 'mono', { cols: 8, style: 'line' }, 0.6],
+      ['chevron', 'Thirty-degree lozenges', 'brand', { bands: 8, slope: 30, mirror: 'quad', rhythm: 'even', colors: 'three' }, 0.6],
+      ['glyphgrid', 'Lattice marks', 'mono', { glyphs: 'geometric', cell: 4.5, bands: 3, duo: false }, 0.6],
+      ['parcels', 'Survey blocks', 'mono', { cell: 1.6, size: 1, every: 8, labels: true }, 0.7],
+      ['counterchange', 'Counter-step', 'mono', { figure: 'square', bar: 3, dir: 'v', size: 0.6, nest: 2, second: false }, 0.6],
+    ],
+    'tab-stack': [
+      ['flyposter', 'Tab slabs', 'brand', { stripe: 1.1, harden: 0.6, blocks: 7, marks: 1, angle: 0 }, 0.85],
+      ['gradpanes', 'Stacked panes', 'brand', { rows: 5, cols: 2, gap: 1.2, steps: 0, radius: 3.6, grain: 0 }, 0.85],
+      ['tokens', 'Tab capsules', 'brand', { cell: 8, link: 0.5, density: 0.9, fill: 'mixed', grain: 0 }, 0.85],
+      ['modulargrid', 'Index grid', 'brand', { cols: 5, style: 'filled', merge: 0.7, gap: 1.2, empty: 0.1, grain: 0 }, 0.85],
+      ['halftone', 'Dot screen', 'duotone', { cell: 4, levels: 3, shape: 'round', field: 'ridges', duo: true }, 0.7],
+      ['waves', 'Layered bands', 'brand', { rows: 5, crests: 1.5, curl: 0.6, strands: 8, drops: 0 }, 0.8],
+    ],
+    'patchbay': [
+      ['waves', 'Cable strands', 'brand', { rows: 5, crests: 2.5, curl: 1.4, strands: 12, drops: 0, grain: 0.1 }, 0.7],
+      ['prismpix', 'Dot-grid streams', 'brand', { px: 2.2, streams: 4, glow: 0.8, dots: true, grain: 0.05 }, 0.7],
+      ['relief', 'Routed traces', 'duotone', { cols: 4, traces: 9, blocks: 4, trace: 1, grain: 0 }, 0.8],
+      ['tokens', 'Port capsules', 'brand', { cell: 7.5, link: 0.45, density: 0.7, fill: 'open', grain: 0 }, 0.8],
+      ['gradpanes', 'Module panes', 'brand', { rows: 3, cols: 4, gap: 1.6, steps: 0, radius: 3.6, grain: 0 }, 0.75],
+      ['modulargrid', 'Rack tiles', 'brand', { cols: 7, style: 'filled', merge: 0.4, gap: 1.4, empty: 0.16, grain: 0 }, 0.8],
+    ],
+    'paddock-pass': [
+      ['halftone', 'Dot matrix', 'mono', { cell: 2.4, levels: 3, shape: 'square', angle: 0, field: 'ridges', duo: false, grain: 0 }, 0.7],
+      ['chevron', 'Pit-lane chevrons', 'brand', { bands: 8, slope: 38, mirror: 'x', rhythm: 'even', colors: 'three', grain: 0 }, 0.85],
+      ['weave', 'Livery stripes', 'brand', { bands: 7, rhythm: 'pinstripe', skew: 0.55, gap: 0.2, stripe: 1.2, spark: true, grain: 0 }, 0.85],
+      ['gradpanes', 'Panel set', 'brand', { rows: 3, cols: 5, gap: 0.8, steps: 0, radius: 0, grain: 0 }, 0.8],
+      ['modulargrid', 'Number blocks', 'mono', { cols: 10, style: 'filled', merge: 0.3, gap: 0.6, empty: 0.2, grain: 0 }, 0.7],
+      ['pixelquilt', 'Chequer flag', 'mono', { px: 1.2, block: 6, motifs: 'geometric', big: 0.2, grain: 0 }, 0.7],
     ],
     'old-web': [
       ['oprings', 'Hypno GIF', 'brand', { mode: 'rings', centres: 2, freq: 14, warp: 0.2, bands: 'three' }],

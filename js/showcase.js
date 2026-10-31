@@ -19,7 +19,7 @@ const SHOWCASE_KEYS = [
   'industrial-device', 'blueprint', 'blob-tracking', 'xerox', 'micrographics',
   'ascii-art', 'corporate-vandalism', 'xerox-punk', 'acid-graphics', 'radical-memphis',
   'pirate-broadcast', 'dystopian-luxury', 'naive-doodle', 'gorpcore', 'old-web',
-  'toy-press', 'live-tile', 'mainframe', 'tonal-shape',
+  'toy-press', 'live-tile', 'mainframe', 'tonal-shape', 'isogrid', 'tab-stack', 'patchbay', 'paddock-pass',
 ];
 const SHOWCASE_STORE = 'bd.showcase';
 

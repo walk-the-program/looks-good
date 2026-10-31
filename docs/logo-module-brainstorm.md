@@ -110,7 +110,7 @@ A third home mode beside **Brands | Patterns**: **Logos**. It works like Pattern
 
 ### 9. Starting points and generation
 - **Logo types as templates:** wordmark, lettermark/monogram, emblem/badge, combination mark (symbol plus word), and horizontal and stacked lockups.
-- **Style templates:** each of the 41 styles contributes a starter that uses its signature device (strip, offset, rule, box, sticker, stamp…).
+- **Style templates:** each of the 45 styles contributes a starter that uses its signature device (strip, offset, rule, box, sticker, stamp…).
 - **Shuffle:** like the app's "Shuffle everything", it permutes font, tracking, device and layout within the brand's rules and the style's rules. Pin the bits you like and shuffle the rest. This is the app's own idea applied to logos; Canva has no equivalent.
 - No paid model API is involved: generation is rules and permutation, like the rest of the app.
 

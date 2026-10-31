@@ -1,0 +1,358 @@
+/* ---------------------------------------------------------------------
+   53 Patchbay — a modular-synth patch bay. Influence: dark node-graph workflow editors (ideas only).
+   Spin: the brand colours are the cables and ports. Near-black ground (dark, the default) or pale
+   grey (light); rounded modules (cards) a step above it with a 1px hairline and a 14px corner; a
+   title row with a status dot; pill toolbars; ONE white (light mode: ink) pill as the main action
+   and grey pills beside it; name-tag chips as the tag component; Geist Mono for numerals.
+   Variables (from js/aesthetics/patchbay.js tokens() / printPrimary()):
+   --ab-pb-card --ab-pb-inset --ab-pb-grey --ab-pb-grey-hi --ab-pb-hair --ab-pb-edge
+   --ab-pb-pri --ab-pb-on-pri --ab-pb-sec --ab-pb-on-sec --ab-pb-acc --ab-pb-on-acc
+   --ab-pb-ink-hover --ab-pb-ink-press --ab-hw.
+   Hooks used: hero 'split', palette 'swatches', sections 'two-col', highlight 'ink', states
+   'button', art (the node graph), ctaFill 'ink'.
+   HARD RULE: app UI (.sb-ab, the Built screens and the UI kit) carries no art: no dot grid, no glow,
+   no wires, no texture. The node graph, its dot grid and glow are board / deck only.
+   Fonts: Geist (headings 600, body 400) and Geist Mono (400 / 600), all bundled in fonts/.
+------------------------------------------------------------------------ */
+
+.ab[data-ae="patchbay"] {
+  --pb-mono: "Geist Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --pb-r: 14px;            /* modules (cards, sheets, grouped lists) */
+  --pb-r-s: 10px;          /* fields, small containers, icon tiles */
+  border-radius: 18px;
+}
+.ab[data-ae="patchbay"] .ab-in { padding: clamp(18px, 4cqw, 40px); }
+/* no shadows anywhere on a module; a state's own focus ring or error ring (non-important) can still win */
+.ab[data-ae="patchbay"] :is(.ab-card, .ab-panel, .ab-cta, .ab-type-apply, .ab-seg, .ab-row, .ab-input) { box-shadow: none; }
+
+/* ---- mono numerals ---- */
+.ab[data-ae="patchbay"] :is(.ab-n, .ab-row-pct, .ab-sw-hex, .ab-sw-print, .ab-status, .sb-num, .sb-delta, .sb-readout, .sb-price, .sb-k-trail, .sb-k-count, .sb-k-badge, .sb-k-slider-h span:last-child) {
+  font-family: var(--pb-mono); font-variant-numeric: tabular-nums; letter-spacing: 0;
+}
+
+/* ---- header ---- */
+.ab[data-ae="patchbay"] .ab-brand { font-weight: var(--ab-hw, 600); letter-spacing: -0.02em; }
+.ab[data-ae="patchbay"] .ab-mark { border-radius: 9px; background: var(--ab-pb-pri); color: var(--ab-pb-on-pri); font-weight: 600; }
+.ab[data-ae="patchbay"] .ab-tag {
+  display: inline-flex; align-items: center; padding: 6px 14px; border-radius: 999px; background: var(--ab-pb-inset); border: 1px solid var(--ab-pb-hair);
+  font-family: var(--pb-mono); font-size: 11px; letter-spacing: 0; text-transform: none; color: var(--ab-muted);
+}
+.ab[data-ae="patchbay"] .ab-tag b { font-weight: 600; color: var(--ab-ink); }
+.ab[data-ae="patchbay"] .ab-rule { background: var(--ab-pb-hair); }
+
+/* ---- labels: small mono, sentence case ---- */
+.ab[data-ae="patchbay"] .ab-label { font-family: var(--pb-mono); font-size: 11.5px; letter-spacing: 0; text-transform: none; font-weight: 400; }
+.ab[data-ae="patchbay"] .ab-n { color: var(--ab-primary-text); font-weight: 600; }
+.ab[data-ae="patchbay"] .ab-n::after { content: " /"; color: var(--ab-muted); }
+
+/* ---- hero ---- */
+.ab[data-ae="patchbay"] .ab-hero { grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr); align-items: center; }
+.ab[data-ae="patchbay"] .ab-kicker {
+  display: inline-flex; align-items: center; gap: 8px; padding: 5px 12px; border-radius: 999px; background: var(--ab-pb-inset); border: 1px solid var(--ab-pb-hair);
+  font-family: var(--pb-mono); font-size: 11.5px; letter-spacing: 0; text-transform: none; color: var(--ab-muted);
+}
+.ab[data-ae="patchbay"] .ab-kicker::before { content: ""; flex: none; width: 7px; height: 7px; border-radius: 50%; background: var(--ab-pb-pri); }
+.ab[data-ae="patchbay"] .ab-headline { font-weight: var(--ab-hw, 600); line-height: 1.03; letter-spacing: calc(-0.035em * var(--ab-tr, 1)); }
+.ab[data-ae="patchbay"] .ab-hl { font-style: normal; }
+.ab[data-ae="patchbay"] .ab-art { max-width: none; aspect-ratio: auto; justify-self: stretch; }
+
+/* ---- hero art: the node graph (board and deck only; the app never draws any of this) ---- */
+.ab[data-ae="patchbay"] .pba { width: 100%; }
+.ab[data-ae="patchbay"] .pba-svg { display: block; width: 100%; height: auto; overflow: hidden; border-radius: 16px; border: 1px solid var(--ab-pb-hair); }
+.ab[data-ae="patchbay"] .pba-bg { fill: var(--ab-canvas); }
+.ab[data-ae="patchbay"] .pba-grid { fill: color-mix(in srgb, var(--ab-ink) 16%, transparent); }
+.ab[data-ae="patchbay"] .pba-glow { stop-color: var(--ab-pb-pri); }
+.ab[data-ae="patchbay"] .pba-card { fill: var(--ab-pb-card); stroke: var(--ab-pb-hair); stroke-width: 1; }
+.ab[data-ae="patchbay"] .pba-wire-under { fill: none; stroke: var(--ab-canvas); stroke-width: 6; stroke-linecap: round; }
+.ab[data-ae="patchbay"] .pba-wire { fill: none; stroke-width: 2.2; stroke-linecap: round; }
+.ab[data-ae="patchbay"] .pba-wire.p1 { stroke: var(--ab-pb-pri); }
+.ab[data-ae="patchbay"] .pba-wire.p2 { stroke: var(--ab-pb-sec); }
+.ab[data-ae="patchbay"] .pba-wire.p3 { stroke: var(--ab-pb-acc); }
+.ab[data-ae="patchbay"] .pba-port { stroke: var(--ab-pb-card); stroke-width: 2; }
+.ab[data-ae="patchbay"] .pba-port.p1, .ab[data-ae="patchbay"] .pba-dot.p1 { fill: var(--ab-pb-pri); }
+.ab[data-ae="patchbay"] .pba-port.p2, .ab[data-ae="patchbay"] .pba-dot.p2 { fill: var(--ab-pb-sec); }
+.ab[data-ae="patchbay"] .pba-port.p3, .ab[data-ae="patchbay"] .pba-dot.p3 { fill: var(--ab-pb-acc); }
+.ab[data-ae="patchbay"] .pba-t { fill: var(--ab-muted); font: 600 11.5px var(--pb-mono); }
+.ab[data-ae="patchbay"] .pba-pk { fill: var(--ab-muted); font: 400 11px var(--pb-mono); }
+.ab[data-ae="patchbay"] .pba-pv { fill: var(--ab-ink); font: 600 12px var(--pb-mono); font-variant-numeric: tabular-nums; }
+.ab[data-ae="patchbay"] .pba-big { fill: var(--ab-ink); font-family: var(--ab-font-h); font-weight: var(--ab-hw, 600); font-size: 58px; letter-spacing: -0.03em; }
+.ab[data-ae="patchbay"] .pba-name { fill: var(--ab-ink); font-family: var(--ab-font-h); font-weight: var(--ab-hw, 600); letter-spacing: -0.02em; }
+.ab[data-ae="patchbay"] .pba-prev { fill: var(--ab-pb-pri); }
+.ab[data-ae="patchbay"] .pba-prevt { fill: var(--ab-pb-on-pri); font-family: var(--ab-font-h); font-weight: var(--ab-hw, 600); font-size: 64px; letter-spacing: -0.03em; }
+.ab[data-ae="patchbay"] .pba-tag.t2 .pba-cur, .ab[data-ae="patchbay"] .pba-tag.t2 .pba-chip { fill: var(--ab-pb-sec); }
+.ab[data-ae="patchbay"] .pba-tag.t3 .pba-cur, .ab[data-ae="patchbay"] .pba-tag.t3 .pba-chip { fill: var(--ab-pb-acc); }
+.ab[data-ae="patchbay"] .pba-tag.t2 .pba-tagt { fill: var(--ab-pb-on-sec); }
+.ab[data-ae="patchbay"] .pba-tag.t3 .pba-tagt { fill: var(--ab-pb-on-acc); }
+.ab[data-ae="patchbay"] .pba-cur { stroke: var(--ab-canvas); stroke-width: 1; stroke-linejoin: round; }
+.ab[data-ae="patchbay"] .pba-tagt { font: 600 11px var(--pb-mono); }
+.ab[data-ae="patchbay"] .pba-bar { fill: var(--ab-pb-card); stroke: var(--ab-pb-hair); stroke-width: 1; }
+.ab[data-ae="patchbay"] .pba-bt { fill: var(--ab-muted); font: 400 11.5px var(--pb-mono); }
+.ab[data-ae="patchbay"] .pba-sel { fill: var(--ab-pb-grey); stroke: var(--ab-pb-edge); stroke-width: 1; }
+.ab[data-ae="patchbay"] .pba-sel + .pba-bt { fill: var(--ab-ink); }
+.ab[data-ae="patchbay"] .pba-ico { fill: none; stroke: var(--ab-muted); stroke-width: 1.6; stroke-linejoin: round; }
+.ab[data-ae="patchbay"] .pba-pill-g { fill: var(--ab-pb-grey); }
+.ab[data-ae="patchbay"] .pba-pill-gt { fill: var(--ab-ink); font: 600 12px var(--ab-font-ui, var(--ab-font-b)); }
+.ab[data-ae="patchbay"] .pba-pill-w { fill: var(--ab-ink); }
+.ab[data-ae="patchbay"] .pba-pill-wt { fill: var(--ab-canvas); font: 600 12px var(--ab-font-ui, var(--ab-font-b)); }
+.ab[data-ae="patchbay"] .pba-read { fill: var(--ab-muted); font: 400 11px var(--pb-mono); white-space: pre; }
+
+/* ---- palette: rounded swatches ---- */
+.ab[data-ae="patchbay"] .ab-chip { border-radius: 10px; box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--ab-ink) 14%, transparent); }
+.ab[data-ae="patchbay"] .ab-sw-role { font-weight: 600; }
+
+/* ---- type block ---- */
+.ab[data-ae="patchbay"] .ab-type-col { border-top-color: var(--ab-pb-hair); }
+.ab[data-ae="patchbay"] .ab-type-role { font-family: var(--pb-mono); letter-spacing: 0; text-transform: none; font-size: 11.5px; }
+/* name-tag chips: a small chip with the bottom-left corner squared */
+.ab[data-ae="patchbay"] .ab-fit {
+  padding: 2px 9px; border: 0; border-radius: 7px 7px 7px 2px; background: var(--ab-pb-grey); color: var(--ab-ink); font-family: var(--pb-mono); font-weight: 600; font-size: 11px;
+}
+.ab[data-ae="patchbay"] .ab-fit[data-fit="match"] { background: var(--ab-pb-sec); color: var(--ab-pb-on-sec); }
+.ab[data-ae="patchbay"] .ab-fit[data-fit="avoid"] { background: var(--ab-ink); color: var(--ab-canvas); }
+
+/* ---- modules: cards and panels, a step above the ground, hairline, 14px ---- */
+.ab[data-ae="patchbay"] :is(.ab-card, .ab-panel) {
+  background: var(--ab-pb-card); border: 1px solid var(--ab-pb-hair); border-radius: var(--pb-r); padding: clamp(16px, 2.8cqw, 24px);
+}
+/* title row: a status dot in a port colour, then a small title */
+.ab[data-ae="patchbay"] .ab-card .ab-card-title {
+  margin: 18px 0 6px !important; font-weight: var(--ab-hw, 600); font-size: clamp(15px, 2.2cqw, 18px); line-height: 1.25; letter-spacing: -0.01em;
+}
+.ab[data-ae="patchbay"] .ab-card h3.ab-card-title { display: flex; align-items: center; gap: 9px; }
+.ab[data-ae="patchbay"] .ab-card h3.ab-card-title::before { content: ""; flex: none; width: 8px; height: 8px; border-radius: 50%; background: var(--ab-pb-pri); }
+.ab[data-ae="patchbay"] .ab-card:nth-of-type(3n + 2) h3.ab-card-title::before { background: var(--ab-pb-sec); }
+.ab[data-ae="patchbay"] .ab-card:nth-of-type(3n) h3.ab-card-title::before { background: var(--ab-pb-acc); }
+.ab[data-ae="patchbay"] .ab-card-body { font-size: 13.5px; line-height: 1.5; }
+
+/* pill toolbar: the segmented control. The selected segment is a grey pill with a 3:1 ring. */
+.ab[data-ae="patchbay"] .ab-seg {
+  display: flex; gap: 2px; padding: 3px; border: 1px solid var(--ab-pb-hair); border-radius: 999px; background: var(--ab-pb-inset);
+}
+.ab[data-ae="patchbay"] .ab-seg-btn {
+  flex: 1 1 0; min-height: 34px; padding: 0 12px; border: 0; border-radius: 999px; background: transparent; color: var(--ab-muted);
+  font-size: 12.5px; font-weight: 400; transition: background 0.12s ease-out, color 0.12s ease-out;
+}
+.ab[data-ae="patchbay"] .ab-seg-btn[aria-pressed="true"] { background: var(--ab-pb-grey); color: var(--ab-ink); font-weight: 600; box-shadow: inset 0 0 0 1px var(--ab-pb-edge); }
+.ab[data-ae="patchbay"] .ab-seg-btn:hover:not([aria-pressed="true"]) { color: var(--ab-ink); }
+.ab[data-ae="patchbay"] .ab-seg-btn:focus-visible { outline: 2px solid var(--ab-pb-pri); outline-offset: 2px; }
+
+/* ---- the white pill (light mode: ink) and the grey pills ---- */
+.ab[data-ae="patchbay"] .ab-cta {
+  min-height: 48px; padding: 0 8px 0 22px; border: 0; border-radius: 999px; background: var(--ab-ink); color: var(--ab-canvas);
+  font-size: 14.5px; font-weight: 600; letter-spacing: 0; transition: background 0.12s ease-out, transform 0.12s ease-out;
+}
+.ab[data-ae="patchbay"] .ab-cta:hover, .ab[data-ae="patchbay"] .ab-cta.is-hover { background: var(--ab-pb-ink-hover); }
+.ab[data-ae="patchbay"] .ab-cta:active, .ab[data-ae="patchbay"] .ab-cta.is-pressed { background: var(--ab-pb-ink-press); transform: scale(0.98); }
+.ab[data-ae="patchbay"] .ab-cta:focus-visible { outline: 2px solid var(--ab-pb-pri); outline-offset: 3px; }
+.ab[data-ae="patchbay"] .ab-cta-arrow {
+  width: 32px; height: 32px; display: grid; place-items: center; border-radius: 50%; font-size: 14px; background: color-mix(in srgb, var(--ab-canvas) 16%, transparent);
+}
+.ab[data-ae="patchbay"] .ab-states[data-kind="button"] .ab-state-ctl { min-height: 42px; padding: 0 14px; font-size: 13px; justify-content: center; text-align: center; }
+.ab[data-ae="patchbay"] .ab-state-name { color: var(--ab-muted); font-family: var(--pb-mono); font-size: 11.5px; }
+.ab[data-ae="patchbay"] .ab-type-apply {
+  min-height: 40px; padding: 0 18px; border: 0; border-radius: 999px; background: var(--ab-pb-grey); color: var(--ab-ink);
+  font-size: 13.5px; font-weight: 600; transition: background 0.12s ease-out, transform 0.12s ease-out;
+}
+.ab[data-ae="patchbay"] .ab-type-apply:hover { background: var(--ab-pb-grey-hi); }
+.ab[data-ae="patchbay"] .ab-type-apply:active { transform: scale(0.98); }
+.ab[data-ae="patchbay"] .ab-type-apply:focus-visible { outline: 2px solid var(--ab-pb-pri); outline-offset: 2px; }
+
+/* ---- field, toggle ---- */
+.ab[data-ae="patchbay"] .ab-fieldlabel { font-family: var(--pb-mono); font-size: 11.5px; letter-spacing: 0; text-transform: none; color: var(--ab-muted); }
+.ab[data-ae="patchbay"] .ab-input {
+  padding: 12px 14px; border: 1px solid var(--ab-pb-edge); border-radius: var(--pb-r-s); background: var(--ab-pb-inset); color: var(--ab-ink);
+  transition: border-color 0.12s ease-out;
+}
+.ab[data-ae="patchbay"] .ab-input::placeholder { color: var(--ab-muted); opacity: 1; }
+.ab[data-ae="patchbay"] .ab-input:focus, .ab[data-ae="patchbay"] .ab-input:focus-visible {
+  outline: none; border-color: var(--ab-pb-pri); box-shadow: 0 0 0 1px var(--ab-pb-pri);
+}
+.ab[data-ae="patchbay"] .ab-toggle { font-size: 13.5px; }
+.ab[data-ae="patchbay"] .ab-switch { width: 46px; height: 28px; border-radius: 999px; background: var(--ab-pb-inset); box-shadow: inset 0 0 0 1px var(--ab-pb-edge); }
+.ab[data-ae="patchbay"] .ab-switch::before { left: 4px; top: 4px; width: 20px; height: 20px; background: var(--ab-pb-edge); }
+.ab[data-ae="patchbay"] .ab-switch:checked { background: var(--ab-pb-pri); box-shadow: none; }
+.ab[data-ae="patchbay"] .ab-switch:checked::before { background: var(--ab-pb-on-pri); transform: translateX(18px); }
+.ab[data-ae="patchbay"] .ab-switch:focus-visible { outline: 2px solid var(--ab-pb-pri); outline-offset: 2px; }
+.ab[data-ae="patchbay"] .ab-status { font-size: 11.5px; }
+
+/* ---- 03 in use (board rows): each row is a small module; the number column is a port dot ---- */
+.ab[data-ae="patchbay"] .ab-list:not(.sb-k-list) { display: grid; gap: 8px; }
+.ab[data-ae="patchbay"] .ab-row:not(.sb-k-row) {
+  grid-template-columns: 10px minmax(0, 1fr) auto minmax(70px, 130px) 5ch; column-gap: clamp(10px, 2cqw, 18px);
+  padding: 10px 14px; border: 1px solid var(--ab-pb-hair); border-radius: var(--pb-r); background: var(--ab-pb-card);
+}
+.ab[data-ae="patchbay"] .ab-row:not(.sb-k-row):last-child { border-bottom: 1px solid var(--ab-pb-hair); }
+.ab[data-ae="patchbay"] .ab-row:not(.sb-k-row) .ab-row-n { width: 8px; height: 8px; border-radius: 50%; background: var(--ab-pb-pri); font-size: 0; overflow: hidden; }
+.ab[data-ae="patchbay"] .ab-row:nth-child(3n + 2):not(.sb-k-row) .ab-row-n { background: var(--ab-pb-sec); }
+.ab[data-ae="patchbay"] .ab-row:nth-child(3n):not(.sb-k-row) .ab-row-n { background: var(--ab-pb-acc); }
+.ab[data-ae="patchbay"] .ab-row-name { font-weight: 600; }
+.ab[data-ae="patchbay"] .ab-row-status { padding: 2px 9px; border-radius: 7px 7px 7px 2px; background: var(--ab-pb-grey); color: var(--ab-ink); font-family: var(--pb-mono); font-weight: 600; font-size: 11px; }
+.ab[data-ae="patchbay"] .ab-row:nth-child(3n + 2) .ab-row-status { background: var(--ab-pb-sec); color: var(--ab-pb-on-sec); }
+.ab[data-ae="patchbay"] .ab-row:nth-child(3n) .ab-row-status { background: var(--ab-pb-acc); color: var(--ab-pb-on-acc); }
+.ab[data-ae="patchbay"] .ab-row-pct { font-size: 12.5px; color: var(--ab-ink); }
+.ab[data-ae="patchbay"] .ab-row-bar { box-sizing: border-box; height: 8px; border: 1px solid var(--ab-pb-edge); border-radius: 999px; background: var(--ab-pb-inset); }
+.ab[data-ae="patchbay"] .ab-row-bar i { background: var(--ab-pb-pri); border-radius: 999px; }
+.ab[data-ae="patchbay"] .ab-row:focus-visible { outline: 2px solid var(--ab-pb-pri); outline-offset: 2px; }
+
+/* ---- footer ---- */
+.ab[data-ae="patchbay"] .ab-foot { border-top-color: var(--ab-pb-hair); font-family: var(--pb-mono); font-size: 11.5px; }
+.ab[data-ae="patchbay"] .ab-dot { background: var(--ab-pb-pri); }
+
+/* ---- narrow board ---- */
+@container ab (max-width: 600px) {
+  .ab[data-ae="patchbay"] .ab-row:not(.sb-k-row) { grid-template-columns: 10px minmax(0, 1fr) 5ch; row-gap: 4px; }
+  .ab[data-ae="patchbay"] .ab-row:not(.sb-k-row) .ab-row-n { grid-column: 1; grid-row: 1; }
+  .ab[data-ae="patchbay"] .ab-row:not(.sb-k-row) .ab-row-name { grid-column: 2; grid-row: 1; }
+  .ab[data-ae="patchbay"] .ab-row:not(.sb-k-row) .ab-row-pct { grid-column: 3; grid-row: 1; }
+  .ab[data-ae="patchbay"] .ab-row:not(.sb-k-row) .ab-row-status { grid-column: 2; grid-row: 2; justify-self: start; }
+  .ab[data-ae="patchbay"] .ab-hero { grid-template-columns: minmax(0, 1fr); }
+  .ab[data-ae="patchbay"] .ab-art { max-width: none; justify-self: stretch; }
+}
+
+/* ---- reduced motion: states swap at once ---- */
+@media (prefers-reduced-motion: reduce) {
+  .ab[data-ae="patchbay"] * { transition: none !important; }
+  .ab[data-ae="patchbay"] .ab-cta:active, .ab[data-ae="patchbay"] .ab-cta.is-pressed, .ab[data-ae="patchbay"] .ab-type-apply:active { transform: none; }
+}
+
+/* ----- deck ----- */
+.ab[data-ae="patchbay"].ab-slide .ab-art { max-width: none; justify-self: stretch; }
+
+/* =====================================================================
+   App UI (Built screens, UI kit: .sb-ab, kit root .sb-kit). No art here: no dot grid, no glow, no
+   wires, no texture. Modules, title rows with a status dot, pill toolbars, the ink pill, grey pills,
+   name-tag chips and mono numerals only. State changes are the only motion.
+   ===================================================================== */
+.ab.sb-ab[data-ae="patchbay"] { background: var(--ab-canvas); }
+
+/* headlines: semibold, tight; numerals in the mono face */
+.ab.sb-ab[data-ae="patchbay"].sb-kit :is(.ab-headline, .sb-home-h, .sb-k-ltitle, .sb-k-pagetitle, .sb-title, .sb-top-t .ab-card-title) { font-weight: var(--ab-hw, 600); letter-spacing: -0.025em; }
+.ab.sb-ab[data-ae="patchbay"] .ab-card-title.sb-num { margin: 4px 0 0 !important; font-family: var(--pb-mono); font-weight: 600; letter-spacing: -0.02em; font-size: clamp(26px, 3.2cqw, 36px); }
+.ab.sb-ab[data-ae="patchbay"] .ab-card-title.sb-num::before { content: none; }
+.ab.sb-ab[data-ae="patchbay"] .ab-kicker { padding: 0; border: 0; background: none; border-radius: 0; color: var(--ab-muted); }
+.ab.sb-ab[data-ae="patchbay"] .ab-kicker::before { content: none; }
+
+/* title row of a module: a status dot, then a 17px 600 title (the kit's 22px card title is too loud for a module) */
+.ab.sb-ab[data-ae="patchbay"].sb-kit .ab-card h3.ab-card-title { margin: 0 0 6px !important; font-size: var(--k-headline, 17px) !important; line-height: var(--k-headline-lh, 22px) !important; }
+.ab.sb-ab[data-ae="patchbay"].sb-kit .ab-seg + h3.ab-card-title { margin-top: 14px !important; }
+.ab.sb-ab[data-ae="patchbay"].sb-kit :is(.ab-card.sb-home-card, .ab-card.sb-k-card) { padding-top: var(--k-cardpad, 20px); }
+.ab.sb-ab[data-ae="patchbay"].sb-kit :is(.sb-k-empty-t, .sb-k-sheet-t) { font-weight: var(--ab-hw, 600); }
+
+/* the kit page: cells are modules too */
+.ab.sb-ab[data-ae="patchbay"].sb-kit .sb-k-cell { border: 1px solid var(--ab-pb-hair); border-radius: var(--pb-r); background: var(--ab-pb-card); }
+.ab.sb-ab[data-ae="patchbay"].sb-kit .sb-k-cell :is(.ab-card.sb-k-card, .ab-list.sb-k-list) { background: var(--ab-pb-inset); }
+.ab.sb-ab[data-ae="patchbay"].sb-kit .ab-list.sb-k-list { border: 1px solid var(--ab-pb-hair); border-radius: var(--pb-r); background: var(--ab-pb-card); box-shadow: none; overflow: hidden; }
+.ab.sb-ab[data-ae="patchbay"].sb-kit .ab-row.sb-k-row.is-picked { background-color: var(--ab-pb-grey); }
+.ab.sb-ab[data-ae="patchbay"].sb-kit .sb-k-name { font-weight: 600; }
+
+/* ---- buttons ---- */
+/* main action: the one white pill (light mode: ink). Pressed darkens a step and scales to 0.98; disabled is a flat grey pill. */
+.ab.sb-ab[data-ae="patchbay"].sb-kit .ab-cta.sb-k-btn { border-radius: 999px; background: var(--ab-ink); color: var(--ab-canvas); font-weight: 600; letter-spacing: 0; text-transform: none; padding: 0 8px 0 22px; }
+.ab.sb-ab[data-ae="patchbay"].sb-kit .ab-cta.sb-k-btn:hover { background: var(--ab-pb-ink-hover); }
+.ab.sb-ab[data-ae="patchbay"].sb-kit .ab-cta.sb-k-btn.sb-k-pressed { background: var(--ab-pb-ink-press); box-shadow: none; transform: scale(0.98); }
+.ab.sb-ab[data-ae="patchbay"].sb-kit .ab-cta.sb-k-btn:disabled { background: var(--ab-pb-grey) !important; color: var(--k-muted) !important; box-shadow: none !important; transform: none; }
+.ab.sb-ab[data-ae="patchbay"].sb-kit .ab-cta .ab-cta-arrow { margin-left: auto; width: 32px; height: 32px; }
+/* secondary: a grey pill, no outline; pressed one step lighter and scales to 0.98 */
+.ab.sb-ab[data-ae="patchbay"].sb-kit .ab-type-apply.sb-k-btn2 { border: 0; border-radius: 999px; background: var(--ab-pb-grey); color: var(--ab-ink); font-weight: 600; }
+.ab.sb-ab[data-ae="patchbay"].sb-kit .ab-type-apply.sb-k-btn2:hover { background: var(--ab-pb-grey-hi); }
+.ab.sb-ab[data-ae="patchbay"].sb-kit .ab-type-apply.sb-k-btn2.sb-k-pressed { background: var(--ab-pb-grey-hi); box-shadow: none; transform: scale(0.98); }
+.ab.sb-ab[data-ae="patchbay"].sb-kit .ab-type-apply.sb-k-btn2:disabled { background: var(--ab-pb-inset) !important; color: var(--k-muted) !important; box-shadow: none !important; transform: none; }
+.ab.sb-ab[data-ae="patchbay"].sb-kit :is(.sb-k-danger) { border-radius: 999px; font-weight: 600; }
+.ab.sb-ab[data-ae="patchbay"].sb-kit .sb-k-danger.sb-k-pressed { transform: scale(0.98); }
+.ab.sb-ab[data-ae="patchbay"].sb-kit .sb-k-textbtn.sb-k-pressed { transform: none; }
+/* icon button: a round grey button */
+.ab.sb-ab[data-ae="patchbay"] .ab-type-apply.sb-icon-btn { border-radius: 50%; background: var(--ab-pb-grey); color: var(--ab-ink); }
+.ab.sb-ab[data-ae="patchbay"] .ab-type-apply.sb-icon-btn:hover { background: var(--ab-pb-grey-hi); }
+.ab.sb-ab[data-ae="patchbay"] .sb-badge { background: var(--ab-pb-acc); box-shadow: 0 0 0 2px var(--ab-pb-card); }
+
+/* ---- fields: inset, 1px 3:1 edge, 10px corner; focus draws the edge and a 1px ring in the primary ---- */
+.ab.sb-ab[data-ae="patchbay"].sb-kit :is(.sb-k-field, .sb-k-search, .sb-k-selectwrap) .ab-input { border: 1px solid var(--ab-pb-edge); border-radius: var(--pb-r-s); background: var(--ab-pb-inset); }
+.ab.sb-ab[data-ae="patchbay"].sb-kit :is(.sb-k-field, .sb-k-search).is-focus .ab-input,
+.ab.sb-ab[data-ae="patchbay"].sb-kit :is(.sb-k-field, .sb-k-search) .ab-input:focus-visible {
+  border-color: var(--ab-pb-pri) !important; box-shadow: 0 0 0 1px var(--ab-pb-pri) !important; outline: none;
+}
+.ab.sb-ab[data-ae="patchbay"].sb-kit .sb-k-field.is-error .ab-input { border-color: var(--sb-danger) !important; box-shadow: 0 0 0 1px var(--sb-danger) !important; }
+.ab.sb-ab[data-ae="patchbay"].sb-kit .sb-k-menu { border: 1px solid var(--ab-pb-hair); border-radius: var(--pb-r); background: var(--ab-pb-card); box-shadow: none; }
+.ab.sb-ab[data-ae="patchbay"].sb-kit .sb-k-menu li { border-radius: var(--pb-r-s); }
+.ab.sb-ab[data-ae="patchbay"].sb-kit .sb-k-menu li[aria-selected="true"] { background: var(--ab-pb-grey); }
+.ab.sb-ab[data-ae="patchbay"].sb-kit .sb-k-menu .sb-ico { color: var(--ab-ink); }
+
+/* checkbox and radio: 1.5px 3:1 edge; checked fills with the primary */
+.ab.sb-ab[data-ae="patchbay"].sb-kit .sb-k-box { border: 1.5px solid var(--ab-pb-edge); border-radius: 7px; background: transparent; }
+.ab.sb-ab[data-ae="patchbay"].sb-kit .sb-k-box[type="radio"] { border-radius: 50%; }
+.ab.sb-ab[data-ae="patchbay"].sb-kit .sb-k-box:checked { background: var(--ab-pb-pri); border-color: var(--ab-pb-pri); }
+.ab.sb-ab[data-ae="patchbay"].sb-kit .sb-k-box[type="checkbox"]:checked::after { border-color: var(--ab-pb-on-pri); }
+.ab.sb-ab[data-ae="patchbay"].sb-kit .sb-k-box[type="radio"]:checked::after { background: var(--ab-pb-on-pri); }
+
+/* slider: a 4px track (primary fill, the 3:1 edge colour for the rest) and a round ink thumb */
+.ab.sb-ab[data-ae="patchbay"].sb-kit input[type="range"].sb-k-range::-webkit-slider-runnable-track { background: linear-gradient(90deg, var(--ab-pb-pri) var(--v, 50%), var(--ab-pb-edge) var(--v, 50%)); }
+.ab.sb-ab[data-ae="patchbay"].sb-kit input[type="range"].sb-k-range::-moz-range-track { background: linear-gradient(90deg, var(--ab-pb-pri) var(--v, 50%), var(--ab-pb-edge) var(--v, 50%)); }
+.ab.sb-ab[data-ae="patchbay"].sb-kit input[type="range"].sb-k-range::-webkit-slider-thumb { width: 20px; height: 20px; margin-top: -8px; border: 0; background: var(--ab-ink); box-shadow: none; }
+.ab.sb-ab[data-ae="patchbay"].sb-kit input[type="range"].sb-k-range::-moz-range-thumb { width: 20px; height: 20px; border: 0; background: var(--ab-ink); box-shadow: none; }
+.ab.sb-ab[data-ae="patchbay"].sb-kit input[type="range"].sb-k-range:focus-visible { outline: 2px solid var(--ab-pb-pri); outline-offset: 4px; }
+
+/* segmented control (the pill toolbar) and in-page tabs */
+.ab.sb-ab[data-ae="patchbay"].sb-kit .ab-seg { gap: 2px; padding: 3px; border: 1px solid var(--ab-pb-hair); background: var(--ab-pb-inset); border-radius: 999px; }
+.ab.sb-ab[data-ae="patchbay"].sb-kit .ab-seg-btn { flex: 1; justify-content: center; border-radius: 999px; min-height: 38px !important; }
+.ab.sb-ab[data-ae="patchbay"].sb-kit .sb-k-tabs { border-bottom-color: var(--ab-pb-hair); }
+.ab.sb-ab[data-ae="patchbay"].sb-kit .sb-k-tabs [role="tab"][aria-selected="true"]::after { height: 2px; background: var(--ab-pb-pri); }
+.ab.sb-ab[data-ae="patchbay"].sb-kit .sb-k-tabs [role="tab"]:focus-visible { outline: 2px solid var(--ab-pb-pri); }
+
+/* name-tag chips: the tag component (badge, count, status). A coloured chip, bottom-left corner squared, mono label. */
+.ab.sb-ab[data-ae="patchbay"] :is(.sb-k-badge, .sb-k-count) { min-height: 22px; padding: 0 9px; border-radius: 7px 7px 7px 2px; font-weight: 600; }
+.ab.sb-ab[data-ae="patchbay"] .sb-k-badge { background: var(--ab-pb-sec); color: var(--ab-pb-on-sec); }
+.ab.sb-ab[data-ae="patchbay"] .sb-k-count { background: var(--ab-pb-grey); color: var(--ab-ink); }
+.ab.sb-ab[data-ae="patchbay"] .sb-k-count.is-accent { background: var(--ab-pb-acc); color: var(--ab-pb-on-acc); }
+.ab.sb-ab[data-ae="patchbay"] :is(.ab-fit, .sb-delta, .ab-row-status) { border: 0; border-radius: 7px 7px 7px 2px; font-family: var(--pb-mono); font-weight: 600; }
+.ab.sb-ab[data-ae="patchbay"] .sb-delta[data-fit="match"] { background: var(--ab-pb-sec); color: var(--ab-pb-on-sec); }
+.ab.sb-ab[data-ae="patchbay"] .sb-delta[data-fit="consider"] { background: var(--ab-pb-grey); color: var(--ab-ink); }
+.ab.sb-ab[data-ae="patchbay"] .ab-row:not(.sb-k-row) .ab-row-status { background: var(--ab-pb-grey); color: var(--ab-ink); }
+.ab.sb-ab[data-ae="patchbay"] .ab-row:nth-child(3n + 2):not(.sb-k-row) .ab-row-status { background: var(--ab-pb-sec); color: var(--ab-pb-on-sec); }
+.ab.sb-ab[data-ae="patchbay"] .ab-row:nth-child(3n):not(.sb-k-row) .ab-row-status { background: var(--ab-pb-acc); color: var(--ab-pb-on-acc); }
+
+/* avatars: a disc in a port colour with its on-colour initial (a cursor avatar); icon tiles and the empty-state icon are grey tiles */
+.ab.sb-ab[data-ae="patchbay"] :is(.sb-k-av, .sb-me-av) { background: var(--ab-pb-pri); color: var(--ab-pb-on-pri); font-weight: 600; }
+.ab.sb-ab[data-ae="patchbay"] .sb-k-avs .sb-k-av { box-shadow: 0 0 0 2px var(--ab-pb-card) !important; }
+.ab.sb-ab[data-ae="patchbay"] .sb-k-avs .sb-k-av:nth-child(3n + 1) { background: var(--ab-pb-pri); color: var(--ab-pb-on-pri); }
+.ab.sb-ab[data-ae="patchbay"] .sb-k-avs .sb-k-av:nth-child(3n + 2) { background: var(--ab-pb-sec); color: var(--ab-pb-on-sec); }
+.ab.sb-ab[data-ae="patchbay"] .sb-k-avs .sb-k-av:nth-child(3n) { background: var(--ab-pb-acc); color: var(--ab-pb-on-acc); }
+.ab.sb-ab[data-ae="patchbay"].sb-kit .sb-k-ico { border-radius: var(--pb-r-s); background: var(--ab-pb-grey); color: var(--ab-ink); }
+.ab.sb-ab[data-ae="patchbay"].sb-kit .sb-k-emptyico { border-radius: 16px; background: var(--ab-pb-grey); color: var(--ab-ink); }
+
+/* progress: a rounded inset track with a 3:1 edge, primary fill (the fill holds 3:1 on the inset) */
+.ab.sb-ab[data-ae="patchbay"].sb-kit .ab-row-bar.sb-k-bar { box-sizing: border-box; height: 8px !important; border: 1px solid var(--ab-pb-edge); border-radius: 999px; background: var(--ab-pb-inset); overflow: hidden; }
+.ab.sb-ab[data-ae="patchbay"].sb-kit .ab-row-bar.sb-k-bar i { background: var(--ab-pb-pri); border-radius: 999px; }
+
+/* callout, toast, sheet */
+.ab.sb-ab[data-ae="patchbay"].sb-kit .sb-k-callout { border-radius: var(--pb-r); }
+.ab.sb-ab[data-ae="patchbay"].sb-kit .sb-k-toast { border-radius: 999px; box-shadow: none; padding-left: 20px; }
+.ab.sb-ab[data-ae="patchbay"].sb-kit .sb-k-sheetbox { border-radius: var(--pb-r); }
+.ab.sb-ab[data-ae="patchbay"].sb-kit .sb-k-sheet { border: 1px solid var(--ab-pb-hair); border-bottom: 0; border-radius: var(--pb-r) var(--pb-r) 0 0; background: var(--ab-pb-card); box-shadow: none; }
+.ab.sb-ab[data-ae="patchbay"].sb-kit .sb-k-grab { background: var(--ab-pb-edge); }
+.ab.sb-ab[data-ae="patchbay"].sb-kit .sb-k-topbar, .ab.sb-ab[data-ae="patchbay"].sb-kit .sb-k-tabbarbox { border-color: var(--ab-pb-hair); }
+
+/* dashboard */
+.ab.sb-ab[data-ae="patchbay"] .sb-side { background: var(--ab-pb-card); border-right: 1px solid var(--ab-pb-hair); }
+.ab.sb-ab[data-ae="patchbay"] .sb-navi { border-radius: 999px; }
+.ab.sb-ab[data-ae="patchbay"] .sb-navi[aria-current] { background: var(--ab-pb-grey); color: var(--ab-ink); box-shadow: inset 0 0 0 1px var(--ab-pb-edge); }
+.ab.sb-ab[data-ae="patchbay"] .sb-navi:focus-visible { outline: 2px solid var(--ab-pb-pri); outline-offset: 1px; }
+.ab.sb-ab[data-ae="patchbay"] .sb-me { border-top-color: var(--ab-pb-hair); }
+.ab.sb-ab[data-ae="patchbay"] .sb-c-prev { stroke: var(--ab-pb-edge); }
+.ab.sb-ab[data-ae="patchbay"] .sb-c-area { fill: color-mix(in srgb, var(--ab-pb-pri) 14%, transparent); }
+.ab.sb-ab[data-ae="patchbay"] .ab-card.sb-stat { padding: 16px 18px; }
+
+/* tab bar: a card-coloured bar; the selected item sits on a grey pill with a 3:1 ring */
+.ab.sb-ab[data-ae="patchbay"] .sb-tabs { background: var(--ab-pb-card); border-top: 1px solid var(--ab-pb-hair); }
+.ab.sb-ab[data-ae="patchbay"] .sb-tab { isolation: isolate; padding-top: 4px; }
+.ab.sb-ab[data-ae="patchbay"] .sb-tab > .sb-ico { padding: 4px 0; box-sizing: content-box; }
+.ab.sb-ab[data-ae="patchbay"] .sb-tab[aria-current]::before {
+  content: ""; position: absolute; z-index: -1; top: 4px; left: 50%; bottom: auto; width: 56px; height: 32px; margin-left: -28px; border-radius: 999px;
+  background: var(--ab-pb-grey); box-shadow: inset 0 0 0 1px var(--ab-pb-edge);
+}
+.ab.sb-ab[data-ae="patchbay"] .sb-tab[aria-current] { color: var(--ab-ink); }
+.ab.sb-ab[data-ae="patchbay"] .sb-tab:focus-visible { outline: 2px solid var(--ab-pb-pri); outline-offset: -2px; border-radius: 12px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .ab.sb-ab[data-ae="patchbay"] * { transition: none !important; }
+  .ab.sb-ab[data-ae="patchbay"].sb-kit :is(.sb-k-pressed, .is-pressed) { transform: none !important; }
+}
