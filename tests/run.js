@@ -1067,6 +1067,82 @@ check('paste: empty text', run(`extractColors('').length`) === 0, 'found colors 
     /^This brief has 2 problems an agent would have to guess at:\n\n- a\n- b\n\nExport anyway\?$/.test(L(`aibLintMessage([{ message: 'a' }, { message: 'b' }])`)) && L(`aibLintConfirm([])`) === true, 'confirm');
 }
 
+/* ---- build pack (js/build-pack.js): the pure half, fed stub data ---- */
+{
+  const bc = vm.createContext({ console });
+  vm.runInContext(fs.readFileSync(path.join(root, 'js/build-pack.js'), 'utf8'), bc, { filename: 'build-pack.js' });
+  bc.stub = {
+    brand: { name: 'Acme', styleName: 'Soft Form', styleKey: 'soft-form', slug: 'acme' },
+    target: 'both', surface: 'both',
+    briefMd: '# Acme brief\n\nIntro.\n\n## Colors\n\n```css\n# not a heading\n:root { --x: 1; }\n```\n\n### Type\n',
+    tokens: { css: ':root { --primary: #123456; }\n', swift: 'let primary = Color(hex: 0x123456)\n' },
+    vars: { names: ['--ab-ink', '--k-opt'], values: { light: { '--ab-ink': '#111111' }, dark: { '--ab-ink': '#eeeeee' } }, primary: 'light', other: 'dark', local: [], optional: ['--k-opt'] },
+    kit: {
+      css: '/* ===== css/see-built.css ===== */\n.ab .sb-k-btn {\n  color: var(--ab-ink);\n}', ruleCount: 1, sources: ['css/see-built.css'],
+      root: { tag: 'section', classes: 'ab sb-ab', attrs: { 'data-ae': 'soft-form', 'data-mode': 'light' } },
+      groups: [{ group: 'Actions', items: [
+        { id: 'btn-primary', name: 'Primary button', use: 'Main action.', ios: 'custom', web: false, terms: ['Button'],
+          states: [{ name: 'rest', html: '<button class="ab-cta">Go</button>' }, { name: 'pressed', html: '<button class="ab-cta is-pressed">Go</button>' }, { name: 'focus', html: '<button class="ab-cta">Go</button>' }] },
+        { id: 'toggle', name: 'Toggle', use: 'On/off.', ios: 'native:Toggle', web: false, terms: [], states: [{ name: 'off', html: '<input type="checkbox">' }] },
+      ] }, { group: 'Navigation', items: [
+        { id: 'megamenu', name: 'Mega menu', use: 'Wide menu.', ios: 'custom', web: true, terms: ['Mega Menu'], states: [{ name: 'rest', html: '<div class="sb-k-mega"></div>' }] },
+      ] }],
+      screens: [{ id: 'list', name: 'List', use: 'An index.', blocks: ['topbar', 'list'], rules: ['Rows are 52pt.'], html: '<div class="sb-k-scr"></div>' }],
+    },
+    patterns: {
+      engine: { path: 'js/patterns/engine.js', text: 'const E = 1;' },
+      families: [{ path: 'js/patterns/families/field.js', text: 'P.register({ key: "halftone" });' }],
+      items: [{ familyKey: 'halftone', familyName: 'Halftone', familyFile: 'js/patterns/families/field.js', file: 'patterns/01-halftone-hero.svg', usage: '- `patterns/01-halftone-hero.svg`: Halftone.', settings: { key: 'halftone', colorway: 'brand', params: {}, inks: { ground: '#ffffff' } }, svg: '<svg xmlns="http://www.w3.org/2000/svg"></svg>' }],
+    },
+    logo: { files: [{ name: 'logo.svg', svg: '<svg xmlns="http://www.w3.org/2000/svg"></svg>' }] },
+  };
+  const J = JSON.stringify;
+  const BP = c => vm.runInContext(c, bc);
+  const info = md => {
+    let fence = null, h1 = 0, open = false; const parts = [];
+    md.split('\n').forEach(l => {
+      const m = /^(`{3,}|~{3,})/.exec(l);
+      if (m) { if (!fence) fence = m[1]; else if (l.trim() === fence) fence = null; return; }
+      if (fence) return;
+      if (/^# /.test(l)) h1++;
+      const p = /^## (Part \d)/.exec(l); if (p) parts.push(p[1]);
+    });
+    return { h1, parts, balanced: !fence };
+  };
+  const both = BP(`buildPackMarkdown(stub)`);
+  const bi = info(both);
+  check('build pack: one H1, Parts 0-7 in order, code fences balanced',
+    bi.h1 === 1 && J(bi.parts) === J(['Part 0', 'Part 1', 'Part 2', 'Part 3', 'Part 4', 'Part 5', 'Part 6', 'Part 7']) && bi.balanced, J(bi));
+  const p0 = both.slice(both.indexOf('## Part 0'), both.indexOf('## Part 1'));
+  check('build pack: Part 0 gives the authority order, the BUILD-PACK.md filename and the SwiftUI Native rule',
+    /Authority order/.test(p0) && p0.indexOf('Part 1 brief') < p0.indexOf('Part 2 tokens') && p0.indexOf('Part 2 tokens') < p0.indexOf('Part 3 component CSS') && p0.indexOf('Part 3 component CSS') < p0.indexOf('Part 3 and Part 4 reference markup')
+      && /BUILD-PACK\.md/.test(p0) && /Native rows/.test(p0) && /Theme\.swift/.test(p0) && /tokens\.css/.test(p0), p0.slice(0, 300));
+  check('build pack: the brief goes in whole with its headings two levels down, code untouched',
+    /\n### Acme brief\n/.test(both) && /\n#### Colors\n/.test(both) && /\n# not a heading\n/.test(both), 'brief headings');
+  check('build pack: identical state markup is collapsed; web-only kit items stay for Both',
+    /State: rest, focus \(identical markup\)/.test(both) && /Mega menu/.test(both) && /Optional hooks/.test(both) && /data-mode="dark"/.test(both), 'collapse');
+  const app = BP(`buildPackMarkdown(Object.assign({}, stub, { surface: 'app', target: 'web' }))`);
+  const ai = info(app);
+  const p5 = app.slice(app.indexOf('## Part 5'), app.indexOf('## Part 6'));
+  check('build pack: an App-only pack leaves out Part 5 content and web-only kit items, and says so in one line',
+    ai.h1 === 1 && ai.balanced && /Not included/.test(p5) && !/Halftone|halftone|<details>/.test(p5) && !/Mega menu|sb-k-mega/.test(app) && /Primary button/.test(app) && !/Theme\.swift/.test(app.slice(app.indexOf('## Part 0'), app.indexOf('## Part 1'))), J(ai) + p5.slice(0, 200));
+  const none = BP(`buildPackMarkdown(Object.assign({}, stub, { patterns: { items: [] } }))`);
+  const p4 = both.slice(both.indexOf('## Part 4'), both.indexOf('## Part 5'));
+  check('build pack: Part 4 lists each screen with its blocks, rules and markup', /### List \(`list`\)/.test(p4) && /Rows are 52pt/.test(p4) && /sb-k-scr/.test(p4) && !/No screen layouts/.test(p4), p4.slice(0, 300));
+  check('build pack: no pinned patterns gives a one-line Part 5', /No patterns are pinned/.test(none) && info(none).balanced, 'no pins');
+  check('build pack: the Part 5 code for a pin has the engine once in a collapsed block, the family, the settings JSON and the SVG',
+    (both.match(/js\/patterns\/engine\.js<\/code>/g) || []).length === 1 && /<details>/.test(both) && /```json/.test(both) && /```svg/.test(both), 'part 5');
+  const sw = BP(`buildPackMarkdown(Object.assign({}, stub, { target: 'swiftui' }))`);
+  check('build pack: a fence inside the embedded code gets a longer fence, so the text stays balanced',
+    BP(`bpFence('a\\n\`\`\`js\\nb\\n\`\`\`', 'md')`).startsWith('````md') && info(sw).balanced && !/tokens\.css\n/.test(sw.slice(sw.indexOf('## Part 0'), sw.indexOf('## Part 1')).replace(/`tokens\.css`/g, '')), 'fence');
+  const pr = BP(`buildPackPrompt({ brandName: 'Acme', styleName: 'Soft Form', target: 'swiftui', surface: 'app' })`);
+  check('build pack: the paste-in prompt is 3-5 sentences, names BUILD-PACK.md and Part 0, and follows the target',
+    /BUILD-PACK\.md/.test(pr) && /Part 0/.test(pr) && /SwiftUI/.test(pr) && !/patterns only/i.test(pr) && (pr.match(/\. /g) || []).length + 1 >= 3 && (pr.match(/\. /g) || []).length + 1 <= 5, pr);
+  check('build pack: kit CSS matching strips pseudo-elements and dynamic states, and splits selector lists at top level',
+    BP(`bpProbe('a.x:hover::before')`) === 'a.x' && BP(`bpProbe('.x >::after')`) === '.x >*' && BP(`bpProbe('.x:not(:hover) .y:focus-visible')`) === '.x .y'
+      && BP(`bpSplitTop(':is(.a, .b), .c[data-x="1,2"]', ',').length`) === 2, 'probe');
+}
+
 // Not run here (they need a real DOM): that blended tokens(t, state) see the view's fonts end to end, and the
 // render timings. They are covered by the in-browser sweeps in docs/round6/.
 

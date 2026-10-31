@@ -537,6 +537,8 @@ function briefOpenProduct() {
         <div class="bv-bar-actions" role="group" aria-label="Copy the brief">${copyBtns}
           <button type="button" class="bv-btn is-quiet" data-bv-act="download" title="Download the brief as a Markdown file">Download .md</button>
           <button type="button" class="bv-btn is-quiet" data-bv-act="zip" title="Download BRIEF.md, the token files and the pattern files as one .zip">Save + files</button>
+          <button type="button" class="bv-btn is-quiet" data-bv-act="buildpack" data-bp-build title="Download one Markdown file with the brief, the code that draws the UI kit and patterns, and a prompt for your AI agent">Build pack</button>
+          <button type="button" class="bv-btn is-quiet" data-bv-act="bpprompt" title="Copy a short prompt that points your AI agent at BUILD-PACK.md">Copy build-pack prompt</button>
         </div>
         <button type="button" class="bv-close" data-bv-act="close" aria-label="Close brief" title="Close (Esc)">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>
@@ -614,6 +616,8 @@ function briefOpenProduct() {
     else if (a === 'product') briefOpenProduct();
     else if (a === 'download') download();
     else if (a === 'zip') { if (window.AiBriefCopy) window.AiBriefCopy.save({ skipCheck: true }); }
+    else if (a === 'buildpack') { if (window.BuildPack) window.BuildPack.run(act); }
+    else if (a === 'bpprompt') { if (window.BuildPack) window.BuildPack.copyPrompt().then(() => flash(act, 'Copied')); }
     else if (a === 'expand' || a === 'collapse') docEl.querySelectorAll('.bv-acc').forEach(d => { d.open = a === 'expand'; });
   }
 
@@ -691,7 +695,7 @@ window.AiBriefCopy = (function () {
   const $ = id => document.getElementById(id);
   const esc = s => escapeHtml(s);
   const toast = m => { if (typeof showToast === 'function') showToast(m); };
-  let panel = null, targetBox = null, surfaceBox = null, saveBtn = null;
+  let panel = null, targetBox = null, surfaceBox = null, saveBtn = null, packBtn = null;
   let dock = null, sumBtn = null, moreBtn = null, prefsPop = null, menuPop = null;
   let pendingKind = null;
   let lastCount = 0;
@@ -731,6 +735,15 @@ window.AiBriefCopy = (function () {
     saveBtn.title = 'Download BRIEF.md, the token files and the brief\'s pattern files as one .zip';
     saveBtn.innerHTML = '<svg class="ico" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M21 21H3"/></svg><span><b>Save brief + files</b><small>BRIEF.md, tokens and patterns as a .zip</small></span>';
 
+    packBtn = document.createElement('button');
+    packBtn.type = 'button';
+    packBtn.id = 'saveBuildPack';
+    packBtn.className = 'aibc-save';
+    packBtn.setAttribute('role', 'menuitem');
+    packBtn.setAttribute('data-bp-build', '');
+    packBtn.title = 'Download one Markdown file with the brief, the code that draws the UI kit and patterns, and a prompt for your AI agent';
+    packBtn.innerHTML = '<svg class="ico" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/><path d="m10 13-2 2 2 2"/><path d="m14 13 2 2-2 2"/></svg><span><b>Save build pack</b><small>One .md: brief, UI kit code, patterns, agent prompt</small></span>';
+
     // One compact dock: [ App · Web ▾ ] [ Copy AI brief | ▾ ], popovers open upward.
     const caret = '<svg class="ico" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>';
     dock = document.createElement('div');
@@ -766,7 +779,7 @@ window.AiBriefCopy = (function () {
     menuPop.setAttribute('role', 'menu');
     menuPop.setAttribute('aria-label', 'More brief actions');
     menuPop.hidden = true;
-    menuPop.append(saveBtn);
+    menuPop.append(saveBtn, packBtn);
     foot.insertBefore(dock, copy);
     foot.insertBefore(panel, dock);
     split.append(copy, moreBtn);
@@ -781,7 +794,7 @@ window.AiBriefCopy = (function () {
     });
     foot.addEventListener('keydown', e => {
       if (e.key === 'Escape' && (!prefsPop.hidden || !menuPop.hidden)) { e.stopPropagation(); e.preventDefault(); closePops(true); return; }
-      if (!menuPop.hidden && (e.key === 'ArrowDown' || e.key === 'ArrowUp' || e.key === 'Home' || e.key === 'End') && menuPop.contains(document.activeElement)) { e.preventDefault(); saveBtn.focus(); }
+      if (!menuPop.hidden && (e.key === 'ArrowDown' || e.key === 'ArrowUp' || e.key === 'Home' || e.key === 'End') && menuPop.contains(document.activeElement)) { e.preventDefault(); (document.activeElement === saveBtn ? packBtn : saveBtn).focus(); }
     });
     foot.addEventListener('focusout', e => {
       if (prefsPop.hidden && menuPop.hidden) return;
@@ -795,6 +808,7 @@ window.AiBriefCopy = (function () {
       if (e.target && e.target.name === 'aibSurfaceSel' && e.target.checked) { aibSetSurface(state, e.target.value); hidePanel(); updateSummary(); }
     });
     saveBtn.addEventListener('click', () => run('save'));
+    packBtn.addEventListener('click', () => run('pack'));
     panel.addEventListener('click', onPanelClick);
     panel.addEventListener('keydown', e => { if (e.key === 'Escape') { e.stopPropagation(); hidePanel(); copy.focus(); } });
     syncTarget();
@@ -851,7 +865,7 @@ window.AiBriefCopy = (function () {
   function showPanel(issues, kind) {
     shown = issues;
     pendingKind = kind;
-    const verb = kind === 'save' ? 'save' : 'copy';
+    const verb = kind === 'copy' ? 'copy' : 'save';
     panel.innerHTML = `<div class="aibc-head"><b>Fix before you ${verb}</b><button type="button" class="aibc-x" data-aibc="close" aria-label="Close">
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div>
       <p class="aibc-lede">${issues.length === 1 ? 'The brief would contradict itself here.' : 'The brief would contradict itself in ' + issues.length + ' places.'}</p>
@@ -861,7 +875,7 @@ window.AiBriefCopy = (function () {
           ? `<span class="aibc-hint">${esc(f.hint)}</span>`
           : `<button type="button" class="btn btn-small aibc-fix" data-aibc="fix" data-i="${i}" data-j="${j}">${esc(f.label)}</button>`).join('')}</span>
       </li>`).join('')}</ul>
-      <button type="button" class="btn btn-ghost btn-small aibc-any" data-aibc="any">${kind === 'save' ? 'Save anyway' : 'Copy anyway'}</button>`;
+      <button type="button" class="btn btn-ghost btn-small aibc-any" data-aibc="any">${kind === 'copy' ? 'Copy anyway' : 'Save anyway'}</button>`;
     panel.hidden = false;
     const first = panel.querySelector('.aibc-fix') || panel.querySelector('.aibc-any');
     if (first) first.focus({ preventScroll: true });
@@ -945,7 +959,7 @@ window.AiBriefCopy = (function () {
     }
   }
 
-  function act2(kind) { return kind === 'save' ? doSave() : doCopy(); }
+  function act2(kind) { return kind === 'save' ? doSave() : kind === 'pack' ? (window.BuildPack ? window.BuildPack.run(packBtn) : null) : doCopy(); }
 
   // opts.skipCheck: go straight to the action (the brief page's own button).
   function run(kind, opts) {
@@ -981,7 +995,7 @@ window.AiBriefCopy = (function () {
   let gated = false;
   function syncGate() {
     const gate = briefProductGate();
-    [$('copyAiBrief'), saveBtn].forEach(b => {
+    [$('copyAiBrief'), saveBtn, packBtn].forEach(b => {
       if (!b) return;
       if (b.dataset.gateTitle == null) b.dataset.gateTitle = b.title || '';
       if (gate) { b.disabled = true; b.title = gate.message; }

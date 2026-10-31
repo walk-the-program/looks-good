@@ -265,6 +265,19 @@
   .bv-pats.is-suite { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 
+/* Seven header buttons: below this width "Copy for" moves to one label in front of the group (as on phones). */
+@media (min-width: 721px) and (max-width: 1240px) {
+  .bv-pre { display: none; }
+  .bv-bar-actions::before { content: 'Copy for'; flex: none; font: 500 var(--fs-2)/1 var(--font-ui); color: var(--muted); margin-right: 2px; }
+}
+@media (min-width: 721px) and (max-width: 1060px) {
+  .bv-bar { flex-wrap: wrap; gap: 8px 12px; }
+  .bv-bar-title { order: 1; flex: 1 1 auto; }
+  .bv-close { order: 2; }
+  .bv-bar-actions { order: 3; flex: 1 1 100%; overflow-x: auto; margin: 0 -24px; padding: 0 24px 2px; scrollbar-width: none; }
+  .bv-bar-actions::-webkit-scrollbar { display: none; }
+}
+
 @media (max-width: 720px) {
   .bv-bar { flex-wrap: wrap; gap: 8px 12px; padding: 10px 16px; }
   .bv-bar-title { order: 1; flex: 1 1 auto; }
