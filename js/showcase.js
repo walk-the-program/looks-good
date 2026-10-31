@@ -5,7 +5,7 @@
    - body[data-showcase="on"], and window.isShowcase() is true;
    - the aesthetic list, step buttons, shuffle, Compare all, "Mix in" and
      anything else that calls showcaseFilter(list) only offer the owner's
-     20 favourites (SHOWCASE_KEYS); the rest stay in the app for him;
+     favourites (SHOWCASE_KEYS); the rest stay in the app for him;
    - css/showcase.css hides owner-only tools (Classic/Current, the
      recommendations panel, suggestion boxes) and folds fine-tuning (locks,
      type sliders, pattern settings) behind one "Refine" disclosure.
@@ -19,6 +19,7 @@ const SHOWCASE_KEYS = [
   'industrial-device', 'blueprint', 'blob-tracking', 'xerox', 'micrographics',
   'ascii-art', 'corporate-vandalism', 'xerox-punk', 'acid-graphics', 'radical-memphis',
   'pirate-broadcast', 'dystopian-luxury', 'naive-doodle', 'gorpcore', 'old-web',
+  'toy-press', 'live-tile', 'mainframe', 'tonal-shape',
 ];
 const SHOWCASE_STORE = 'bd.showcase';
 
