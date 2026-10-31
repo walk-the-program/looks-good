@@ -343,3 +343,166 @@
 .ab.sb-ab.sb-kit:is([data-ae="pixel-arcade"], [data-ae="pixel-arcade--classic"]) .sb-k-toast { box-shadow: 0 4px 0 0 var(--ab-bd-dim); }
 /* classic copy: the board's floating dialog tag would pin the kicker to the top edge of the phone; in the app it is a plain caption */
 .ab.sb-ab.sb-kit[data-ae="pixel-arcade--classic"] .ab-kicker { position: static; display: block; padding: 0; background: none; box-shadow: none; color: var(--ab-muted); }
+
+/* UI kit: NN/g glossary components
+   Pixel Arcade's language: no radius anywhere, 4px stepped frames, panels on --ab-panel and recesses on
+   --ab-slot with the 4px inner shade, selection is the ink fill (no second primary), only the primary
+   action keeps the pixel button underside, caps labels scaled by --ab-uis, stepped (never eased) motion.
+   Frames are drawn INSIDE each box (inset shadow, notched corners) so nothing spills out of its cell. */
+.ab.sb-ab.sb-kit:is([data-ae="pixel-arcade"], [data-ae="pixel-arcade--classic"]) { --pxk-in: inset 0 0 0 4px var(--ab-bd); --pxk-dim: inset 0 0 0 4px var(--ab-bd-dim); --pxk-shade: inset 4px 4px 0 0 rgba(0, 0, 0, .25); --pxk-label: calc(12px * var(--ab-uis, 1)); }
+/* shared pieces */
+.ab.sb-ab.sb-kit:is([data-ae="pixel-arcade"], [data-ae="pixel-arcade--classic"]) .sb-k-ph { border-radius: 0; background: var(--ab-slot); color: var(--k-muted); box-shadow: var(--pxk-shade); }
+.ab.sb-ab.sb-kit:is([data-ae="pixel-arcade"], [data-ae="pixel-arcade--classic"]) .sb-k-scrim { background: color-mix(in srgb, var(--ab-bd-dim) 55%, transparent); }
+.ab.sb-ab.sb-kit:is([data-ae="pixel-arcade"], [data-ae="pixel-arcade--classic"]) .sb-k-pop-arrow { border-radius: 0; box-shadow: none; }
+.ab.sb-ab.sb-kit:is([data-ae="pixel-arcade"], [data-ae="pixel-arcade--classic"]) .sb-k-cmdmenu li { gap: 8px; font-size: calc(14px * var(--ab-uis, 1)); letter-spacing: 0.04em; }
+.ab.sb-ab.sb-kit:is([data-ae="pixel-arcade"], [data-ae="pixel-arcade--classic"]) .sb-k-cmdmenu li:is(:hover, .is-open, :focus-visible) { background: var(--ab-ink); color: var(--ab-canvas); outline: 0; }
+.ab.sb-ab.sb-kit:is([data-ae="pixel-arcade"], [data-ae="pixel-arcade--classic"]) .sb-k-cmdmenu li:is(:hover, .is-open, :focus-visible) .sb-ico { color: var(--ab-canvas); }
+.ab.sb-ab.sb-kit:is([data-ae="pixel-arcade"], [data-ae="pixel-arcade--classic"]) .sb-k-cmdmenu li.is-danger, .ab.sb-ab.sb-kit:is([data-ae="pixel-arcade"], [data-ae="pixel-arcade--classic"]) .sb-k-cmdmenu li.is-danger .sb-ico { color: var(--sb-danger); }
+.ab.sb-ab.sb-kit:is([data-ae="pixel-arcade"], [data-ae="pixel-arcade--classic"]) .sb-k-cmdmenu li.is-danger:is(:hover, .is-open, :focus-visible), .ab.sb-ab.sb-kit:is([data-ae="pixel-arcade"], [data-ae="pixel-arcade--classic"]) .sb-k-cmdmenu li.is-danger:is(:hover, .is-open, :focus-visible) .sb-ico { background: var(--sb-danger); color: var(--ab-canvas); }
+.ab.sb-ab.sb-kit:is([data-ae="pixel-arcade"], [data-ae="pixel-arcade--classic"]) .sb-k-cmdmenu li.sb-k-menu-sep { padding: 0; background: none; border-top: 4px solid var(--ab-bd-dim); }
+.ab.sb-ab.sb-kit:is([data-ae="pixel-arcade"], [data-ae="pixel-arcade--classic"]) .sb-k-kbd { padding: 0 6px; border-radius: 0; background: var(--ab-slot); color: var(--k-muted); box-shadow: var(--pxk-shade); font-size: var(--pxk-label); letter-spacing: 0.06em; text-transform: uppercase; }
+.ab.sb-ab.sb-kit:is([data-ae="pixel-arcade"], [data-ae="pixel-arcade--classic"]) .sb-k-cmdmenu li:is(:hover, .is-open, :focus-visible) .sb-k-kbd { background: transparent; color: var(--ab-canvas); box-shadow: none; }
+/* focus: the 4px accent ring, drawn inside the control so a notched or clipped parent never hides it */
+.ab.sb-ab.sb-kit:is([data-ae="pixel-arcade"], [data-ae="pixel-arcade--classic"]) :is(.sb-k-fab, .sb-k-split-more, .sb-k-step, .sb-k-day, .sb-k-acc-sum, .sb-k-nm-item, .sb-k-rb-btn, .sb-k-pie-item, .sb-k-lb-close, .sb-k-lb-prev, .sb-k-lb-next, .sb-k-backtop, .sb-k-menubar button, .sb-k-nb-links a, .sb-k-anchors a, .sb-k-crumbs a, .sb-k-wheel-item):focus-visible { outline: 4px solid var(--ab-accent); outline-offset: -4px; }
+.ab.sb-ab.sb-kit:is([data-ae="pixel-arcade"], [data-ae="pixel-arcade--classic"]) .sb-k-link:focus-visible { outline: 4px solid var(--ab-accent); outline-offset: 2px; }
+
+/* buttons carry the style's 4px margins, so they give back the width (no cell overflow) */
+.ab.sb-ab.sb-kit:is([data-ae="pixel-arcade"], [data-ae="pixel-arcade--classic"]) :is(.ab-cta.sb-k-btn:not(.sb-k-split-main), .ab-type-apply.sb-k-btn2:not(.sb-k-auto)) { width: calc(100% - 8px); }
+/* btn-split: two pixel buttons sharing one 4px wall; the one underside stays on the pair */
+.ab.sb-ab.sb-kit:is([data-ae="pixel-arcade"], [data-ae="pixel-arcade--classic"]) .ab-cta.sb-k-split-main { width: auto; margin-right: 0; }
+.ab.sb-ab.sb-kit:is([data-ae="pixel-arcade"], [data-ae="pixel-arcade--classic"]) .ab-cta.sb-k-split-more { width: auto; min-width: 44px; margin-left: 0; padding: 14px 12px; justify-content: center; }
+.ab.sb-ab.sb-kit:is([data-ae="pixel-arcade"], [data-ae="pixel-arcade--classic"]) .ab-cta.sb-k-split-more:is([aria-expanded="true"], .sb-k-pressed) { transform: translateY(4px); box-shadow: var(--px-bd), inset 0 -4px 0 0 var(--ab-p-deep), inset 0 4px 0 0 var(--ab-p-hi), 0 4px 0 0 transparent; }
+/* fab: the primary action as a square pixel button; back-top: an ink block (selection colour, no underside) */
+.ab.sb-ab.sb-kit:is([data-ae="pixel-arcade"], [data-ae="pixel-arcade--classic"]) .sb-k-fab { border: 0; border-radius: 0; background: var(--ab-primary); color: var(--ab-on-primary); box-shadow: var(--px-bd), inset 0 -4px 0 0 var(--ab-p-deep), inset 0 4px 0 0 var(--ab-p-hi); }
+.ab.sb-ab.sb-kit:is([data-ae="pixel-arcade"], [data-ae="pixel-arcade--classic"]) .sb-k-fab:hover { filter: brightness(1.12); }
+.ab.sb-ab.sb-kit:is([data-ae="pixel-arcade"], [data-ae="pixel-arcade--classic"]) .sb-k-fab.sb-k-pressed { transform: translateY(4px); box-shadow: var(--px-bd), inset 0 4px 0 0 var(--ab-p-deep); filter: none; }
+.ab.sb-ab.sb-kit:is([data-ae="pixel-arcade"], [data-ae="pixel-arcade--classic"]) .sb-k-backtop { border: 0; border-radius: 0; background: var(--ab-ink); color: var(--ab-canvas); box-shadow: var(--px-bd), inset -4px -4px 0 0 rgba(0, 0, 0, .3); }
+.ab.sb-ab.sb-kit:is([data-ae="pixel-arcade"], [data-ae="pixel-arcade--classic"]) .sb-k-backtop:hover { filter: brightness(1.12); }
+.ab.sb-ab.sb-kit:is([data-ae="pixel-arcade"], [data-ae="pixel-arcade--classic"]) .sb-k-backtop.sb-k-pressed { transform: translateY(2px); box-shadow: var(--px-bd); }
+/* link, icon */
+.ab.sb-ab.sb-kit:is([data-ae="pixel-arcade"], [data-ae="pixel-arcade--classic"]) .sb-k-link { color: var(--ab-primary-text, var(--ab-ink)); text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 3px; }
+.ab.sb-ab.sb-kit:is([data-ae="pixel-arcade"], [data-ae="pixel-arcade--classic"]) .sb-k-link:hover { background: var(--ab-slot); }
+.ab.sb-ab.sb-kit:is([data-ae="pixel-arcade"], [data-ae="pixel-arcade--classic"]) .sb-k-link.sb-k-pressed { background: var(--ab-ink); color: var(--ab-canvas); text-decoration: none; }
+.ab.sb-ab.sb-kit:is([data-ae="pixel-arcade"], [data-ae="pixel-arcade--classic"]) .sb-k-icon { padding: 10px 14px; gap: 6px; border-radius: 0; background: var(--ab-panel); color: var(--ab-ink); box-shadow: var(--pxk-dim); clip-path: var(--px-notch); }
+.ab.sb-ab.sb-kit:is([data-ae="pixel-arcade"], [data-ae="pixel-arcade--classic"]) .sb-k-icon span { font-size: var(--pxk-label); letter-spacing: 0.06em; text-transform: uppercase; color: var(--k-muted); }
+/* combo, listbox */
+.ab.sb-ab.sb-kit:is([data-ae="pixel-arcade"], [data-ae="pixel-arcade--classic"]) .sb-k-combo .sb-k-combo-in { letter-spacing: 0.01em; }
+.ab.sb-ab.sb-kit:is([data-ae="pixel-arcade"], [data-ae="pixel-arcade--classic"]) .sb-k-combo .sb-k-combo-in:focus-visible { box-shadow: 0 -4px 0 0 var(--ab-ink), 0 4px 0 0 var(--ab-ink), -4px 0 0 0 var(--ab-ink), 4px 0 0 0 var(--ab-ink), inset 4px 4px 0 0 rgba(0, 0, 0, .4); outline: 0; }
+.ab.sb-ab.sb-kit:is([data-ae="pixel-arcade"], [data-ae="pixel-arcade--classic"]) mark.sb-k-match { padding: 0 2px; border-radius: 0; background: var(--ab-ink); color: var(--ab-canvas); }
+.ab.sb-ab.sb-kit:is([data-ae="pixel-arcade"], [data-ae="pixel-arcade--classic"]) .sb-k-listbox li:hover:not([aria-selected="true"]) { background: var(--ab-slot); }
+.ab.sb-ab.sb-kit:is([data-ae="pixel-arcade"], [data-ae="pixel-arcade--classic"]) .sb-k-listbox li[aria-selected="true"] .sb-k-box { background: var(--ab-canvas); box-shadow: 0 -4px 0 0 var(--ab-canvas), 0 4px 0 0 var(--ab-canvas), -4px 0 0 0 var(--ab-canvas), 4px 0 0 0 var(--ab-canvas); }
+.ab.sb-ab.sb-kit:is([data-ae="pixel-arcade"], [data-ae="pixel-arcade--classic"]) .sb-k-listbox li[aria-selected="true"] .sb-k-box[type="checkbox"]:checked::after { border-color: var(--ab-ink); }
+/* stepper, knob */
+.ab.sb-ab.sb-kit:is([data-ae="pixel-arcade"], [data-ae="pixel-arcade--classic"]) .sb-k-stepper { margin: 4px; border-radius: 0; background: var(--ab-slot); box-shadow: var(--px-bd), var(--pxk-shade); }
+.ab.sb-ab.sb-kit:is([data-ae="pixel-arcade"], [data-ae="pixel-arcade--classic"]) .sb-k-step { border: 0; border-radius: 0; background: transparent; color: var(--ab-ink); }
+.ab.sb-ab.sb-kit:is([data-ae="pixel-arcade"], [data-ae="pixel-arcade--classic"]) .sb-k-step:hover:not(:disabled), .ab.sb-ab.sb-kit:is([data-ae="pixel-arcade"], [data-ae="pixel-arcade--classic"]) .sb-k-step:active:not(:disabled) { background: var(--ab-ink); color: var(--ab-canvas); }
+.ab.sb-ab.sb-kit:is([data-ae="pixel-arcade"], [data-ae="pixel-arcade--classic"]) .sb-k-step:disabled { color: var(--k-muted); }
+.ab.sb-ab.sb-kit:is([data-ae="pixel-arcade"], [data-ae="pixel-arcade--classic"]) .sb-k-step-val { font-size: calc(18px * var(--ab-uis, 1)); letter-spacing: 0.04em; }
+.ab.sb-ab.sb-kit:is([data-ae="pixel-arcade"], [data-ae="pixel-arcade--classic"]) .sb-k-knob-arc { color: var(--ab-primary); }
+.ab.sb-ab.sb-kit:is([data-ae="pixel-arcade"], [data-ae="pixel-arcade--classic"]) .sb-k-knob-dial { border: 0; border-radius: 0; background: var(--ab-ink); box-shadow: none; clip-path: polygon(30% 0, 70% 0, 100% 30%, 100% 70%, 70% 100%, 30% 100%, 0 70%, 0 30%); }
+.ab.sb-ab.sb-kit:is([data-ae="pixel-arcade"], [data-ae="pixel-arcade--classic"]) .sb-k-knob-ind { border-radius: 0; background: var(--ab-canvas); }
+.ab.sb-ab.sb-kit:is([data-ae="pixel-arcade"], [data-ae="pixel-arcade--classic"]) .sb-k-knob-val { font-size: calc(16px * var(--ab-uis, 1)); letter-spacing: 0.06em; text-transform: uppercase; }
+/* date field, calendar, wheel */
+.ab.sb-ab.sb-kit:is([data-ae="pixel-arcade"], [data-ae="pixel-arcade--classic"]) .sb-k-date-ico { color: var(--ab-ink); }
+.ab.sb-ab.sb-kit:is([data-ae="pixel-arcade"], [data-ae="pixel-arcade--classic"]) .sb-k-cal { border-radius: 0; background: var(--ab-panel); box-shadow: var(--pxk-in); clip-path: var(--px-notch); }
+.ab.sb-ab.sb-kit:is([data-ae="pixel-arcade"], [data-ae="pixel-arcade--classic"]) .sb-k-cal-t { font-size: calc(14px * var(--ab-uis, 1)); letter-spacing: 0.06em; text-transform: uppercase; }
+.ab.sb-ab.sb-kit:is([data-ae="pixel-arcade"], [data-ae="pixel-arcade--classic"]) .sb-k-cal-dow { font-size: var(--pxk-label); letter-spacing: 0.06em; text-transform: uppercase; color: var(--k-muted); }
+.ab.sb-ab.sb-kit:is([data-ae="pixel-arcade"], [data-ae="pixel-arcade--classic"]) .sb-k-day { border-radius: 0; letter-spacing: 0.02em; }
+.ab.sb-ab.sb-kit:is([data-ae="pixel-arcade"], [data-ae="pixel-arcade--classic"]) .sb-k-day:hover:not(.is-sel):not(.is-start):not(.is-end) { background: var(--ab-slot); }
+.ab.sb-ab.sb-kit:is([data-ae="pixel-arcade"], [data-ae="pixel-arcade--classic"]) .sb-k-day.is-today { box-shadow: var(--pxk-dim); }
+.ab.sb-ab.sb-kit:is([data-ae="pixel-arcade"], [data-ae="pixel-arcade--classic"]) .sb-k-day.is-out { color: var(--k-muted); opacity: 0.6; }
+.ab.sb-ab.sb-kit:is([data-ae="pixel-arcade"], [data-ae="pixel-arcade--classic"]) .sb-k-day.is-range { background: var(--ab-slot); color: var(--ab-ink); }
+.ab.sb-ab.sb-kit:is([data-ae="pixel-arcade"], [data-ae="pixel-arcade--classic"]) :is(.sb-k-day.is-sel, .sb-k-day.is-start, .sb-k-day.is-end) { background: var(--ab-ink); color: var(--ab-canvas); box-shadow: none; }
+.ab.sb-ab.sb-kit:is([data-ae="pixel-arcade"], [data-ae="pixel-arcade--classic"]) .sb-k-wheel { border-radius: 0; background: var(--ab-slot); box-shadow: var(--pxk-dim); clip-path: var(--px-notch); }
+.ab.sb-ab.sb-kit:is([data-ae="pixel-arcade"], [data-ae="pixel-arcade--classic"]) .sb-k-wheel-item { font-size: calc(16px * var(--ab-uis, 1)); letter-spacing: 0.04em; color: var(--k-muted); }
+.ab.sb-ab.sb-kit:is([data-ae="pixel-arcade"], [data-ae="pixel-arcade--classic"]) .sb-k-wheel-item.is-sel { background: var(--ab-ink); color: var(--ab-canvas); }
+.ab.sb-ab.sb-kit:is([data-ae="pixel-arcade"], [data-ae="pixel-arcade--classic"]) .sb-k-wheel-band { border-radius: 0; background: none; box-shadow: inset 0 4px 0 0 var(--ab-primary), inset 0 -4px 0 0 var(--ab-primary); }
+/* accordion, carousel, matrix */
+.ab.sb-ab.sb-kit:is([data-ae="pixel-arcade"], [data-ae="pixel-arcade--classic"]) .sb-k-acc { border-radius: 0; background: var(--ab-panel); box-shadow: var(--pxk-dim); }
+.ab.sb-ab.sb-kit:is([data-ae="pixel-arcade"], [data-ae="pixel-arcade--classic"]) .sb-k-acc-sum { font-size: calc(14px * var(--ab-uis, 1)); letter-spacing: 0.06em; text-transform: uppercase; }
+.ab.sb-ab.sb-kit:is([data-ae="pixel-arcade"], [data-ae="pixel-arcade--classic"]) .sb-k-acc-sum:hover { background: var(--ab-slot); }
+.ab.sb-ab.sb-kit:is([data-ae="pixel-arcade"], [data-ae="pixel-arcade--classic"]) .sb-k-acc[open] > .sb-k-acc-sum .sb-k-acc-chev { color: var(--ab-canvas); opacity: 1; }
+.ab.sb-ab.sb-kit:is([data-ae="pixel-arcade"], [data-ae="pixel-arcade--classic"]) .sb-k-acc[open] > .sb-k-acc-sum { background: var(--ab-ink); color: var(--ab-canvas); }
+.ab.sb-ab.sb-kit:is([data-ae="pixel-arcade"], [data-ae="pixel-arcade--classic"]) .sb-k-acc-body { border-top: 4px solid var(--ab-bd-dim); }
+.ab.sb-ab.sb-kit:is([data-ae="pixel-arcade"], [data-ae="pixel-arcade--classic"]) .sb-k-car-card { border-radius: 0; }
+.ab.sb-ab.sb-kit:is([data-ae="pixel-arcade"], [data-ae="pixel-arcade--classic"]) .sb-k-dots i { border-radius: 0; background: var(--ab-bd-dim); }
+.ab.sb-ab.sb-kit:is([data-ae="pixel-arcade"], [data-ae="pixel-arcade--classic"]) .sb-k-dots i.is-on { background: var(--ab-ink); }
+.ab.sb-ab.sb-kit:is([data-ae="pixel-arcade"], [data-ae="pixel-arcade--classic"]) .sb-k-mx-tile { border-radius: 0; background: var(--ab-slot); clip-path: var(--px-notch); }
+.ab.sb-ab.sb-kit:is([data-ae="pixel-arcade"], [data-ae="pixel-arcade--classic"]) .sb-k-mx-label { font-size: var(--pxk-label); letter-spacing: 0.06em; text-transform: uppercase; }
+/* overlay, dialog, side sheet, drawer: the RPG dialog box, square and framed in the bone colour */
+.ab.sb-ab.sb-kit:is([data-ae="pixel-arcade"], [data-ae="pixel-arcade--classic"]) .sb-k-overlaybox { border-radius: 0; }
+.ab.sb-ab.sb-kit:is([data-ae="pixel-arcade"], [data-ae="pixel-arcade--classic"]) .sb-k-dialog { border-radius: 0; background: var(--ab-panel); box-shadow: var(--pxk-in); clip-path: var(--px-notch); }
+.ab.sb-ab.sb-kit:is([data-ae="pixel-arcade"], [data-ae="pixel-arcade--classic"]) .sb-k-dialog-t { font-size: calc(16px * var(--ab-uis, 1)); letter-spacing: 0.06em; text-transform: uppercase; }
+.ab.sb-ab.sb-kit:is([data-ae="pixel-arcade"], [data-ae="pixel-arcade--classic"]) .sb-k-side { border: 0; border-radius: 0; background: var(--ab-panel); box-shadow: inset 4px 0 0 0 var(--ab-bd); }
+.ab.sb-ab.sb-kit:is([data-ae="pixel-arcade"], [data-ae="pixel-arcade--classic"]) .sb-k-drawer { border: 0; border-radius: 0; background: var(--ab-panel); box-shadow: inset -4px 0 0 0 var(--ab-bd); }
+/* popover, popup tip, tooltip (no clip-path: the arrow sits outside the box), lightbox */
+.ab.sb-ab.sb-kit:is([data-ae="pixel-arcade"], [data-ae="pixel-arcade--classic"]) .sb-k-pop { border: 0; border-radius: 0; background: var(--ab-panel); box-shadow: var(--pxk-in); }
+.ab.sb-ab.sb-kit:is([data-ae="pixel-arcade"], [data-ae="pixel-arcade--classic"]) .sb-k-tip { border: 0; border-radius: 0; background: var(--ab-panel); box-shadow: inset 0 0 0 4px var(--ab-primary); }
+.ab.sb-ab.sb-kit:is([data-ae="pixel-arcade"], [data-ae="pixel-arcade--classic"]) .sb-k-tip .sb-k-textbtn { font-size: var(--pxk-label); letter-spacing: 0.06em; text-transform: uppercase; }
+.ab.sb-ab.sb-kit:is([data-ae="pixel-arcade"], [data-ae="pixel-arcade--classic"]) .sb-k-tooltip { border: 0; border-radius: 0; background: var(--ab-ink); color: var(--ab-canvas); box-shadow: none; font-size: var(--pxk-label); letter-spacing: 0.06em; text-transform: uppercase; }
+.ab.sb-ab.sb-kit:is([data-ae="pixel-arcade"], [data-ae="pixel-arcade--classic"]) .sb-k-lightbox { border-radius: 0; }
+.ab.sb-ab.sb-kit:is([data-ae="pixel-arcade"], [data-ae="pixel-arcade--classic"]) .sb-k-lb-img { border-radius: 0; }
+.ab.sb-ab.sb-kit:is([data-ae="pixel-arcade"], [data-ae="pixel-arcade--classic"]) :is(.sb-k-lb-close, .sb-k-lb-prev, .sb-k-lb-next) { border: 0; border-radius: 0; background: var(--ab-panel); color: var(--ab-ink); box-shadow: var(--pxk-in); }
+.ab.sb-ab.sb-kit:is([data-ae="pixel-arcade"], [data-ae="pixel-arcade--classic"]) :is(.sb-k-lb-close, .sb-k-lb-prev, .sb-k-lb-next):is(:hover, :active) { background: var(--ab-ink); color: var(--ab-canvas); }
+.ab.sb-ab.sb-kit:is([data-ae="pixel-arcade"], [data-ae="pixel-arcade--classic"]) .sb-k-lb-cap { border-radius: 0; background: var(--ab-ink); color: var(--ab-canvas); font-size: var(--pxk-label); letter-spacing: 0.06em; text-transform: uppercase; }
+/* navbar, nav menu, expandable menu, breadcrumbs, anchors, mega menu */
+.ab.sb-ab.sb-kit:is([data-ae="pixel-arcade"], [data-ae="pixel-arcade--classic"]) .sb-k-navbar { border-radius: 0; background: var(--ab-panel); box-shadow: inset 0 -4px 0 0 var(--ab-bd); }
+.ab.sb-ab.sb-kit:is([data-ae="pixel-arcade"], [data-ae="pixel-arcade--classic"]) .sb-k-navbar .ab-cta { width: auto; margin: 0 4px; padding: 8px 12px; font-size: calc(12px * var(--ab-uis, 1)); box-shadow: var(--px-bd), inset 0 -4px 0 0 var(--ab-p-deep), inset 0 4px 0 0 var(--ab-p-hi); }
+.ab.sb-ab.sb-kit:is([data-ae="pixel-arcade"], [data-ae="pixel-arcade--classic"]) .sb-k-nb-links a { padding-left: 10px; padding-right: 10px; border-radius: 0; font-size: calc(13px * var(--ab-uis, 1)); letter-spacing: 0.06em; text-transform: uppercase; }
+.ab.sb-ab.sb-kit:is([data-ae="pixel-arcade"], [data-ae="pixel-arcade--classic"]) .sb-k-nb-links a:hover { background: var(--ab-slot); }
+.ab.sb-ab.sb-kit:is([data-ae="pixel-arcade"], [data-ae="pixel-arcade--classic"]) .sb-k-nb-links a[aria-current] { background: var(--ab-ink); color: var(--ab-canvas); }
+.ab.sb-ab.sb-kit:is([data-ae="pixel-arcade"], [data-ae="pixel-arcade--classic"]) .sb-k-nm-item { border-radius: 0; font-size: calc(14px * var(--ab-uis, 1)); letter-spacing: 0.06em; text-transform: uppercase; }
+.ab.sb-ab.sb-kit:is([data-ae="pixel-arcade"], [data-ae="pixel-arcade--classic"]) .sb-k-nm-item:hover { background: var(--ab-slot); }
+.ab.sb-ab.sb-kit:is([data-ae="pixel-arcade"], [data-ae="pixel-arcade--classic"]) .sb-k-nm-item.ab-row[aria-current="page"] { background: var(--ab-ink); color: var(--ab-canvas); }
+.ab.sb-ab.sb-kit:is([data-ae="pixel-arcade"], [data-ae="pixel-arcade--classic"]) .sb-k-nm-children { border-left: 4px solid var(--ab-bd-dim); }
+.ab.sb-ab.sb-kit:is([data-ae="pixel-arcade"], [data-ae="pixel-arcade--classic"]) .sb-k-crumbs { font-size: var(--pxk-label); letter-spacing: 0.06em; text-transform: uppercase; }
+.ab.sb-ab.sb-kit:is([data-ae="pixel-arcade"], [data-ae="pixel-arcade--classic"]) .sb-k-crumbs a { text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 3px; }
+.ab.sb-ab.sb-kit:is([data-ae="pixel-arcade"], [data-ae="pixel-arcade--classic"]) .sb-k-crumbs [aria-current="page"] { padding: 0 6px; background: var(--ab-ink); color: var(--ab-canvas); }
+.ab.sb-ab.sb-kit:is([data-ae="pixel-arcade"], [data-ae="pixel-arcade--classic"]) .sb-k-crumb-sep { color: var(--k-muted); }
+.ab.sb-ab.sb-kit:is([data-ae="pixel-arcade"], [data-ae="pixel-arcade--classic"]) .sb-k-anchors-label { font-size: var(--pxk-label); letter-spacing: 0.06em; text-transform: uppercase; color: var(--k-muted); }
+.ab.sb-ab.sb-kit:is([data-ae="pixel-arcade"], [data-ae="pixel-arcade--classic"]) .sb-k-anchors a { border-radius: 0; font-size: calc(13px * var(--ab-uis, 1)); letter-spacing: 0.04em; text-transform: uppercase; }
+.ab.sb-ab.sb-kit:is([data-ae="pixel-arcade"], [data-ae="pixel-arcade--classic"]) .sb-k-anchors a:hover { background: var(--ab-slot); }
+.ab.sb-ab.sb-kit:is([data-ae="pixel-arcade"], [data-ae="pixel-arcade--classic"]) .sb-k-anchors a.is-on { background: var(--ab-ink); color: var(--ab-canvas); }
+.ab.sb-ab.sb-kit:is([data-ae="pixel-arcade"], [data-ae="pixel-arcade--classic"]) .sb-k-mega-panel { padding-top: 16px; border-radius: 0; background: var(--ab-panel); box-shadow: var(--pxk-in); }
+.ab.sb-ab.sb-kit:is([data-ae="pixel-arcade"], [data-ae="pixel-arcade--classic"]) .sb-k-mega-col .ab-label { line-height: 1.5; color: var(--k-muted); }
+.ab.sb-ab.sb-kit:is([data-ae="pixel-arcade"], [data-ae="pixel-arcade--classic"]) .sb-k-mega-col a { border-radius: 0; font-size: calc(14px * var(--ab-uis, 1)); letter-spacing: 0.04em; text-transform: uppercase; }
+.ab.sb-ab.sb-kit:is([data-ae="pixel-arcade"], [data-ae="pixel-arcade--classic"]) .sb-k-mega-col a:hover { background: var(--ab-ink); color: var(--ab-canvas); }
+/* scrollbar: a slot with a square ink thumb */
+.ab.sb-ab.sb-kit:is([data-ae="pixel-arcade"], [data-ae="pixel-arcade--classic"]) .sb-k-scrollbox { border-radius: 0; background: var(--ab-panel); box-shadow: var(--pxk-dim); }
+.ab.sb-ab.sb-kit:is([data-ae="pixel-arcade"], [data-ae="pixel-arcade--classic"]) .sb-k-sbar { border-radius: 0; background: var(--ab-slot); box-shadow: var(--pxk-shade); }
+.ab.sb-ab.sb-kit:is([data-ae="pixel-arcade"], [data-ae="pixel-arcade--classic"]) .sb-k-sbar-thumb { border-radius: 0; background: var(--ab-ink); box-shadow: inset -4px -4px 0 0 rgba(0, 0, 0, .3); }
+/* dropdown, context menu, submenu, menubar */
+.ab.sb-ab.sb-kit:is([data-ae="pixel-arcade"], [data-ae="pixel-arcade--classic"]) .sb-k-dd[aria-expanded="true"] { background: var(--ab-ink); color: var(--ab-canvas); }
+.ab.sb-ab.sb-kit:is([data-ae="pixel-arcade"], [data-ae="pixel-arcade--classic"]) .sb-k-menu.sb-k-ctx { margin: 4px !important; }
+.ab.sb-ab.sb-kit:is([data-ae="pixel-arcade"], [data-ae="pixel-arcade--classic"]) .sb-k-subwrap .sb-k-menu { margin: 4px !important; }
+.ab.sb-ab.sb-kit:is([data-ae="pixel-arcade"], [data-ae="pixel-arcade--classic"]) .sb-k-menubar { border-radius: 0; background: var(--ab-panel); box-shadow: var(--pxk-dim); }
+.ab.sb-ab.sb-kit:is([data-ae="pixel-arcade"], [data-ae="pixel-arcade--classic"]) .sb-k-menubar button { border: 0; border-radius: 0; background: transparent; color: var(--ab-ink); font-size: calc(14px * var(--ab-uis, 1)); letter-spacing: 0.06em; text-transform: uppercase; }
+.ab.sb-ab.sb-kit:is([data-ae="pixel-arcade"], [data-ae="pixel-arcade--classic"]) .sb-k-menubar button:hover { background: var(--ab-slot); }
+.ab.sb-ab.sb-kit:is([data-ae="pixel-arcade"], [data-ae="pixel-arcade--classic"]) .sb-k-menubar button[aria-expanded="true"] { background: var(--ab-ink); color: var(--ab-canvas); }
+/* ribbon */
+.ab.sb-ab.sb-kit:is([data-ae="pixel-arcade"], [data-ae="pixel-arcade--classic"]) .sb-k-ribbon { border-radius: 0; background: var(--ab-panel); box-shadow: var(--pxk-in); }
+.ab.sb-ab.sb-kit:is([data-ae="pixel-arcade"], [data-ae="pixel-arcade--classic"]) .sb-k-rb-groups { box-shadow: inset 0 4px 0 0 var(--ab-bd-dim); }
+.ab.sb-ab.sb-kit:is([data-ae="pixel-arcade"], [data-ae="pixel-arcade--classic"]) .sb-k-rb-group + .sb-k-rb-group { box-shadow: inset 4px 0 0 0 var(--ab-bd-dim); }
+.ab.sb-ab.sb-kit:is([data-ae="pixel-arcade"], [data-ae="pixel-arcade--classic"]) .sb-k-rb-btn { border: 0; border-radius: 0; background: transparent; color: var(--ab-ink); }
+.ab.sb-ab.sb-kit:is([data-ae="pixel-arcade"], [data-ae="pixel-arcade--classic"]) .sb-k-rb-btn:hover { background: var(--ab-slot); }
+.ab.sb-ab.sb-kit:is([data-ae="pixel-arcade"], [data-ae="pixel-arcade--classic"]) .sb-k-rb-btn:is(:active, .is-on, [aria-pressed="true"]) { background: var(--ab-ink); color: var(--ab-canvas); }
+.ab.sb-ab.sb-kit:is([data-ae="pixel-arcade"], [data-ae="pixel-arcade--classic"]) .sb-k-rb-label { font-size: var(--pxk-label); letter-spacing: 0.06em; text-transform: uppercase; color: var(--k-muted); }
+/* pie menu: square notched tiles round a primary hub */
+.ab.sb-ab.sb-kit:is([data-ae="pixel-arcade"], [data-ae="pixel-arcade--classic"]) .sb-k-pie { border-radius: 0; }
+.ab.sb-ab.sb-kit:is([data-ae="pixel-arcade"], [data-ae="pixel-arcade--classic"]) .sb-k-pie-hub { border-radius: 0; background: var(--ab-primary); color: var(--ab-on-primary); clip-path: var(--px-notch); box-shadow: inset 0 -4px 0 0 var(--ab-p-deep); }
+.ab.sb-ab.sb-kit:is([data-ae="pixel-arcade"], [data-ae="pixel-arcade--classic"]) .sb-k-pie-item { border: 0; border-radius: 0; background: var(--ab-panel); color: var(--ab-ink); box-shadow: var(--pxk-dim); clip-path: var(--px-notch); }
+.ab.sb-ab.sb-kit:is([data-ae="pixel-arcade"], [data-ae="pixel-arcade--classic"]) .sb-k-pie-item:hover { background: var(--ab-slot); }
+.ab.sb-ab.sb-kit:is([data-ae="pixel-arcade"], [data-ae="pixel-arcade--classic"]) .sb-k-pie-item.is-on { background: var(--ab-ink); color: var(--ab-canvas); box-shadow: none; }
+/* spinner: a square ring that turns in quarter steps; skeleton: flat slots, no shimmer */
+.ab.sb-ab.sb-kit:is([data-ae="pixel-arcade"], [data-ae="pixel-arcade--classic"]) .sb-k-spin { border-radius: 0; border: 4px solid var(--ab-slot); border-top-color: var(--ab-primary); animation: pxk-spin 0.8s steps(4) infinite; }
+.ab.sb-ab.sb-kit:is([data-ae="pixel-arcade"], [data-ae="pixel-arcade--classic"]) .sb-k-spinner { font-size: var(--pxk-label); letter-spacing: 0.06em; text-transform: uppercase; color: var(--k-muted); }
+.ab.sb-ab.sb-kit:is([data-ae="pixel-arcade"], [data-ae="pixel-arcade--classic"]) :is(.sb-k-skel-av, .sb-k-skel-line, .sb-k-skel-block) { border-radius: 0; background: var(--ab-slot); box-shadow: var(--pxk-shade); animation: none; }
+.ab.sb-ab.sb-kit:is([data-ae="pixel-arcade"], [data-ae="pixel-arcade--classic"]) .sb-k-skel-av { clip-path: var(--px-notch); }
+.ab.sb-ab.sb-kit:is([data-ae="pixel-arcade"], [data-ae="pixel-arcade--classic"]) :is(.sb-k-skel-av, .sb-k-skel-line, .sb-k-skel-block)::after { animation: none; }
+@keyframes pxk-spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) {
+  .ab.sb-ab.sb-kit:is([data-ae="pixel-arcade"], [data-ae="pixel-arcade--classic"]) .sb-k-spin { animation: none; }
+  .ab.sb-ab.sb-kit:is([data-ae="pixel-arcade"], [data-ae="pixel-arcade--classic"]) :is(.sb-k-fab, .sb-k-backtop, .sb-k-split-more).sb-k-pressed { transform: none; }
+}
+
+.ab.sb-ab.sb-kit:is([data-ae="pixel-arcade"], [data-ae="pixel-arcade--classic"]) .sb-k-ribbon .sb-k-tabs { padding-left: 8px; padding-right: 8px; }

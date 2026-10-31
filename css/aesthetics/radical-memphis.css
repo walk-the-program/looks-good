@@ -474,3 +474,140 @@
 .ab.sb-ab.sb-kit[data-ae="radical-memphis--classic"] :is(.sb-k-field, .sb-k-search, .sb-k-selectwrap) .ab-input { border-bottom-color: var(--ab-m-black); }
 /* a picked row stays on paper: the secondary's paper tint (the base tint is mixed from the floor) */
 .ab.sb-ab.sb-kit:is([data-ae="radical-memphis"], [data-ae="radical-memphis--classic"]) .ab-list .ab-row.sb-k-row.is-picked { background: var(--ab-m-sec-lo); color: var(--ab-m-black); }
+
+/* UI kit: NN/g glossary components
+   Radical Memphis: flat paper shapes on hard offset sheets (no blur anywhere), the one quarter-round corner,
+   2px black edges on the small controls, geometric tokens (a primary circle, a slab of sec-lo with an accent
+   underline) for every selected, current and open state; the pressed key drops onto its sheet. */
+/* shared pieces */
+.ab.sb-ab.sb-kit:is([data-ae="radical-memphis"], [data-ae="radical-memphis--classic"]) .sb-k-ph { background: var(--ab-m-pri-lo); color: var(--ab-m-black); border-radius: 0; }
+.ab.sb-ab.sb-kit:is([data-ae="radical-memphis"], [data-ae="radical-memphis--classic"]) .sb-k-scrim { background: color-mix(in srgb, var(--ab-m-black) 52%, transparent); }
+.ab.sb-ab.sb-kit:is([data-ae="radical-memphis"], [data-ae="radical-memphis--classic"]) .sb-k-sheetbox::before { background: color-mix(in srgb, var(--ab-m-black) 45%, transparent); }
+.ab.sb-ab.sb-kit:is([data-ae="radical-memphis"], [data-ae="radical-memphis--classic"]) :is(.sb-k-sheetbox, .sb-k-overlaybox) { border-radius: 0 22px 0 0; }
+.ab.sb-ab.sb-kit:is([data-ae="radical-memphis"], [data-ae="radical-memphis--classic"]) .sb-k-overlaybox { border: 2px solid var(--ab-m-black); }
+.ab.sb-ab.sb-kit:is([data-ae="radical-memphis"], [data-ae="radical-memphis--classic"]) :is(.sb-k-dialog, .sb-k-side, .sb-k-drawer, .sb-k-pop, .sb-k-tip, .sb-k-cal, .sb-k-ribbon, .sb-k-mega-panel, .sb-k-accordion, .sb-k-navbar, .sb-k-navmenu, .sb-k-menubar, .sb-k-wheel, .sb-k-lightbox) { background: var(--ab-m-paper); color: var(--ab-m-black); border: 0; border-radius: 0 22px 0 0; box-shadow: 5px 5px 0 var(--ab-m-sheet); }
+.ab.sb-ab.sb-kit:is([data-ae="radical-memphis"], [data-ae="radical-memphis--classic"]) :is(.sb-k-cal, .sb-k-ribbon, .sb-k-accordion, .sb-k-navbar, .sb-k-navmenu, .sb-k-menubar, .sb-k-wheel, .sb-k-lightbox, .sb-k-mega, .sb-k-stepper, .sb-k-scrollbox) { margin-right: 6px; margin-bottom: 6px; max-width: calc(100% - 6px); }
+.ab.sb-ab.sb-kit:is([data-ae="radical-memphis"], [data-ae="radical-memphis--classic"]) .sb-k-cmdmenu li.is-open { background: var(--ab-m-sec-lo); }
+.ab.sb-ab.sb-kit:is([data-ae="radical-memphis"], [data-ae="radical-memphis--classic"]) .sb-k-cmdmenu li.is-danger { box-shadow: inset 5px 0 0 var(--ab-primary); font-weight: 700; }
+.ab.sb-ab.sb-kit:is([data-ae="radical-memphis"], [data-ae="radical-memphis--classic"]) .sb-k-cmdmenu li.sb-k-menu-sep { min-height: 0; height: 0; margin: 4px 12px; padding: 0; border-top: 2px solid var(--ab-m-black); background: none; }
+.ab.sb-ab.sb-kit:is([data-ae="radical-memphis"], [data-ae="radical-memphis--classic"]) .sb-k-kbd { padding: 0 6px; border: 2px solid var(--ab-m-black); border-radius: 0 6px 0 0; background: var(--ab-m-sec-lo); color: var(--ab-m-black); font-size: 12px; font-weight: 700; }
+/* buttons and actions */
+.ab.sb-ab.sb-kit:is([data-ae="radical-memphis"], [data-ae="radical-memphis--classic"]) .sb-k-split-main { margin-right: 0; border-radius: 0; }
+.ab.sb-ab.sb-kit:is([data-ae="radical-memphis"], [data-ae="radical-memphis--classic"]) .sb-k-split-more { margin-right: 6px; border-radius: 0 26px 26px 0; background: var(--ab-m-paper); color: var(--ab-m-black); box-shadow: none; border-left: 2px solid var(--ab-m-black); }
+.ab.sb-ab.sb-kit:is([data-ae="radical-memphis"], [data-ae="radical-memphis--classic"]) :is(.sb-k-fab, .sb-k-backtop) { border: 0; color: var(--ab-m-black); transition: transform 220ms var(--mm-spring), box-shadow 220ms var(--mm-spring); }
+.ab.sb-ab.sb-kit:is([data-ae="radical-memphis"], [data-ae="radical-memphis--classic"]) .sb-k-fab { border-radius: 50%; background: var(--ab-primary); color: var(--ab-on-primary); box-shadow: 5px 5px 0 var(--ab-m-sheet-sec); }
+.ab.sb-ab.sb-kit:is([data-ae="radical-memphis"], [data-ae="radical-memphis--classic"]) .sb-k-backtop { border: 2px solid var(--ab-m-black); border-radius: 0 18px 0 0; background: var(--ab-m-paper); box-shadow: 4px 4px 0 var(--ab-m-sheet); }
+.ab.sb-ab.sb-kit:is([data-ae="radical-memphis"], [data-ae="radical-memphis--classic"]) :is(.sb-k-fab, .sb-k-backtop).sb-k-pressed { transform: translate(3px, 3px); box-shadow: 2px 2px 0 var(--ab-m-sheet); filter: none; }
+.ab.sb-ab.sb-kit:is([data-ae="radical-memphis"], [data-ae="radical-memphis--classic"]) .sb-k-link { color: var(--ab-m-black); font-weight: 700; text-decoration: underline; text-decoration-thickness: 3px; text-decoration-color: var(--ab-accent); text-underline-offset: 3px; }
+.ab.sb-ab.sb-kit:is([data-ae="radical-memphis"], [data-ae="radical-memphis--classic"]) .sb-k-link.sb-k-pressed { background: var(--ab-m-sec-lo); box-shadow: none; }
+.ab.sb-ab.sb-kit:is([data-ae="radical-memphis"], [data-ae="radical-memphis--classic"]) .sb-k-link.sb-k-focus { outline: 3px solid var(--ab-ink); outline-offset: 3px; }
+.ab.sb-ab.sb-kit:is([data-ae="radical-memphis"], [data-ae="radical-memphis--classic"]) .sb-k-icon { color: var(--ab-m-black); }
+.ab.sb-ab.sb-kit:is([data-ae="radical-memphis"], [data-ae="radical-memphis--classic"]) .sb-k-icon span { font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; }
+@media (prefers-reduced-motion: reduce) {
+  .ab.sb-ab.sb-kit:is([data-ae="radical-memphis"], [data-ae="radical-memphis--classic"]) :is(.sb-k-fab, .sb-k-backtop) { transition: none; }
+}
+/* inputs */
+.ab.sb-ab.sb-kit:is([data-ae="radical-memphis"], [data-ae="radical-memphis--classic"]) .sb-k-combo-in { border-bottom-color: var(--ab-m-black); }
+.ab.sb-ab.sb-kit:is([data-ae="radical-memphis"], [data-ae="radical-memphis--classic"]) mark.sb-k-match { background: var(--ab-m-sec-lo); color: var(--ab-m-black); font-weight: 700; box-shadow: inset 0 -4px 0 var(--ab-accent); }
+.ab.sb-ab.sb-kit:is([data-ae="radical-memphis"], [data-ae="radical-memphis--classic"]) .sb-k-listbox .sb-k-box { border: 2px solid var(--ab-m-black); border-radius: 0; }
+.ab.sb-ab.sb-kit:is([data-ae="radical-memphis"], [data-ae="radical-memphis--classic"]) .sb-k-listbox .sb-k-box:checked { background: var(--ab-primary); }
+.ab.sb-ab.sb-kit:is([data-ae="radical-memphis"], [data-ae="radical-memphis--classic"]) .sb-k-stepper { border: 2px solid var(--ab-m-black); border-radius: 0 16px 0 0; background: var(--ab-m-paper); box-shadow: 4px 4px 0 var(--ab-m-sheet); overflow: hidden; }
+.ab.sb-ab.sb-kit:is([data-ae="radical-memphis"], [data-ae="radical-memphis--classic"]) .sb-k-step { border: 0; background: var(--ab-m-paper); color: var(--ab-m-black); font-weight: 700; }
+.ab.sb-ab.sb-kit:is([data-ae="radical-memphis"], [data-ae="radical-memphis--classic"]) .sb-k-step:active { background: var(--ab-m-sec-lo); }
+.ab.sb-ab.sb-kit:is([data-ae="radical-memphis"], [data-ae="radical-memphis--classic"]) .sb-k-step:disabled { color: var(--ab-m-soft); opacity: 0.45; cursor: not-allowed; }
+.ab.sb-ab.sb-kit:is([data-ae="radical-memphis"], [data-ae="radical-memphis--classic"]) .sb-k-step-val { border-inline: 2px solid var(--ab-m-black); font-family: var(--ab-font-h); font-weight: var(--mm-hw, 400); font-variant-numeric: tabular-nums; }
+.ab.sb-ab.sb-kit:is([data-ae="radical-memphis"], [data-ae="radical-memphis--classic"]) .sb-k-knob-dial { border: 2px solid var(--ab-m-black); background: var(--ab-m-paper); box-shadow: 4px 4px 0 var(--ab-m-sheet); }
+.ab.sb-ab.sb-kit:is([data-ae="radical-memphis"], [data-ae="radical-memphis--classic"]) .sb-k-knob-ind { background: var(--ab-primary); }
+.ab.sb-ab.sb-kit:is([data-ae="radical-memphis"], [data-ae="radical-memphis--classic"]) .sb-k-knob-val { font-family: var(--ab-font-h); font-weight: var(--mm-hw, 400); color: var(--ab-m-black); }
+.ab.sb-ab.sb-kit:is([data-ae="radical-memphis"], [data-ae="radical-memphis--classic"]) .sb-k-date-ico { color: var(--ab-m-black); }
+/* pickers */
+.ab.sb-ab.sb-kit:is([data-ae="radical-memphis"], [data-ae="radical-memphis--classic"]) .sb-k-cal-head > :not(.sb-k-plain) { font-family: var(--ab-font-h); font-weight: var(--mm-hw, 400); }
+.ab.sb-ab.sb-kit:is([data-ae="radical-memphis"], [data-ae="radical-memphis--classic"]) .sb-k-cal-dow { color: var(--ab-m-soft); font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; }
+.ab.sb-ab.sb-kit:is([data-ae="radical-memphis"], [data-ae="radical-memphis--classic"]) .sb-k-day { color: var(--ab-m-black); font-weight: 700; }
+.ab.sb-ab.sb-kit:is([data-ae="radical-memphis"], [data-ae="radical-memphis--classic"]) .sb-k-day.is-today { box-shadow: inset 0 0 0 2px var(--ab-m-black); border-radius: 50%; }
+.ab.sb-ab.sb-kit:is([data-ae="radical-memphis"], [data-ae="radical-memphis--classic"]) .sb-k-day.is-range { background: var(--ab-m-sec-lo); border-radius: 0; color: var(--ab-m-black); }
+.ab.sb-ab.sb-kit:is([data-ae="radical-memphis"], [data-ae="radical-memphis--classic"]) .sb-k-day.is-sel { background: var(--ab-primary); color: var(--ab-on-primary); border-radius: 50%; box-shadow: 3px 3px 0 var(--ab-m-sheet-sec); }
+.ab.sb-ab.sb-kit:is([data-ae="radical-memphis"], [data-ae="radical-memphis--classic"]) .sb-k-day.is-start { background: var(--ab-primary); color: var(--ab-on-primary); border-radius: 50% 0 0 50%; box-shadow: none; }
+.ab.sb-ab.sb-kit:is([data-ae="radical-memphis"], [data-ae="radical-memphis--classic"]) .sb-k-day.is-end { background: var(--ab-primary); color: var(--ab-on-primary); border-radius: 0 50% 50% 0; box-shadow: none; }
+.ab.sb-ab.sb-kit:is([data-ae="radical-memphis"], [data-ae="radical-memphis--classic"]) .sb-k-day.is-out { color: var(--ab-m-soft); opacity: 0.6; }
+.ab.sb-ab.sb-kit:is([data-ae="radical-memphis"], [data-ae="radical-memphis--classic"]) .sb-k-wheel-item { color: var(--ab-m-soft); }
+.ab.sb-ab.sb-kit:is([data-ae="radical-memphis"], [data-ae="radical-memphis--classic"]) .sb-k-wheel-item.is-sel { color: var(--ab-m-black); font-family: var(--ab-font-h); font-weight: var(--mm-hw, 400); }
+.ab.sb-ab.sb-kit:is([data-ae="radical-memphis"], [data-ae="radical-memphis--classic"]) .sb-k-wheel-band { border-block: 2px solid var(--ab-m-black); border-radius: 0; background: color-mix(in srgb, var(--ab-m-sec-lo) 75%, transparent); }
+/* disclosure and content */
+.ab.sb-ab.sb-kit:is([data-ae="radical-memphis"], [data-ae="radical-memphis--classic"]) .sb-k-acc + .sb-k-acc { border-top: 2px solid var(--ab-m-black); }
+.ab.sb-ab.sb-kit:is([data-ae="radical-memphis"], [data-ae="radical-memphis--classic"]) .sb-k-acc-sum { font-family: var(--ab-font-h); font-weight: var(--mm-hw, 400); color: var(--ab-m-black); }
+.ab.sb-ab.sb-kit:is([data-ae="radical-memphis"], [data-ae="radical-memphis--classic"]) .sb-k-acc[open] > .sb-k-acc-sum { background: var(--ab-m-sec-lo); box-shadow: inset 0 -4px 0 var(--ab-accent); }
+.ab.sb-ab.sb-kit:is([data-ae="radical-memphis"], [data-ae="radical-memphis--classic"]) .sb-k-acc-chev { color: var(--ab-primary-text); }
+.ab.sb-ab.sb-kit:is([data-ae="radical-memphis"], [data-ae="radical-memphis--classic"]) .sb-k-dots i { background: color-mix(in srgb, var(--ab-m-black) 28%, transparent); border-radius: 50%; }
+.ab.sb-ab.sb-kit:is([data-ae="radical-memphis"], [data-ae="radical-memphis--classic"]) .sb-k-dots i.is-on { background: var(--ab-primary); box-shadow: 2px 2px 0 var(--ab-m-sheet-sec); }
+.ab.sb-ab.sb-kit:is([data-ae="radical-memphis"], [data-ae="radical-memphis--classic"]) .sb-k-mx-tile { border: 2px solid var(--ab-m-black); border-radius: 0 12px 0 0; background: var(--ab-m-paper); overflow: hidden; }
+/* layers */
+.ab.sb-ab.sb-kit:is([data-ae="radical-memphis"], [data-ae="radical-memphis--classic"]) .sb-k-dialog { border-radius: 0 28px 0 0; box-shadow: 6px 6px 0 var(--ab-m-sheet); }
+.ab.sb-ab.sb-kit:is([data-ae="radical-memphis"], [data-ae="radical-memphis--classic"]) .sb-k-dialog-t { font-family: var(--ab-font-h); font-weight: var(--mm-hw, 400); }
+.ab.sb-ab.sb-kit:is([data-ae="radical-memphis"], [data-ae="radical-memphis--classic"]) .sb-k-side { border-radius: 0 22px 0 0; box-shadow: -6px 0 0 var(--ab-m-sheet); }
+.ab.sb-ab.sb-kit:is([data-ae="radical-memphis"], [data-ae="radical-memphis--classic"]) .sb-k-drawer { border-radius: 0 22px 0 0; box-shadow: 6px 0 0 var(--ab-m-sheet); }
+.ab.sb-ab.sb-kit:is([data-ae="radical-memphis"], [data-ae="radical-memphis--classic"]) :is(.sb-k-pop, .sb-k-tip) { border-radius: 0 18px 0 0; }
+.ab.sb-ab.sb-kit:is([data-ae="radical-memphis"], [data-ae="radical-memphis--classic"]) .sb-k-tip { background: var(--ab-m-sec-lo); box-shadow: 5px 5px 0 var(--ab-m-sheet-sec); }
+.ab.sb-ab.sb-kit:is([data-ae="radical-memphis"], [data-ae="radical-memphis--classic"]) .sb-k-tooltip { background: var(--ab-m-black); color: var(--ab-m-paper); border: 0; border-radius: 0 12px 0 0; box-shadow: 3px 3px 0 var(--ab-m-sheet); font-weight: 700; }
+.ab.sb-ab.sb-kit:is([data-ae="radical-memphis"], [data-ae="radical-memphis--classic"]) .sb-k-lightbox { background: var(--ab-m-black); color: var(--ab-m-paper); }
+.ab.sb-ab.sb-kit:is([data-ae="radical-memphis"], [data-ae="radical-memphis--classic"]) :is(.sb-k-lb-close, .sb-k-lb-prev, .sb-k-lb-next) { border: 0; border-radius: 50%; background: var(--ab-m-paper); color: var(--ab-m-black); box-shadow: 3px 3px 0 var(--ab-m-sheet-sec); }
+.ab.sb-ab.sb-kit:is([data-ae="radical-memphis"], [data-ae="radical-memphis--classic"]) :is(.sb-k-lb-close, .sb-k-lb-prev, .sb-k-lb-next):active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--ab-m-sheet-sec); }
+.ab.sb-ab.sb-kit:is([data-ae="radical-memphis"], [data-ae="radical-memphis--classic"]) .sb-k-lb-cap { color: var(--ab-m-paper); font-weight: 700; }
+/* navigation */
+.ab.sb-ab.sb-kit:is([data-ae="radical-memphis"], [data-ae="radical-memphis--classic"]) .sb-k-nb-links a { color: var(--ab-m-black); font-weight: 700; text-decoration: none; }
+.ab.sb-ab.sb-kit:is([data-ae="radical-memphis"], [data-ae="radical-memphis--classic"]) :is(.sb-k-nb-links a, .sb-k-nm-item)[aria-current] { background: var(--ab-m-sec-lo); box-shadow: inset 0 -4px 0 var(--ab-accent); }
+.ab.sb-ab.sb-kit:is([data-ae="radical-memphis"], [data-ae="radical-memphis--classic"]) .sb-k-nm-item { color: var(--ab-m-black); font-weight: 700; }
+.ab.sb-ab.sb-kit:is([data-ae="radical-memphis"], [data-ae="radical-memphis--classic"]) .sb-k-nm-item[aria-current="page"] { box-shadow: inset 5px 0 0 var(--ab-primary); }
+.ab.sb-ab.sb-kit:is([data-ae="radical-memphis"], [data-ae="radical-memphis--classic"]) .sb-k-nm-children { background: var(--ab-m-pri-lo); border-left: 3px solid var(--ab-primary); }
+.ab.sb-ab.sb-kit:is([data-ae="radical-memphis"], [data-ae="radical-memphis--classic"]) .sb-k-drawer .sb-k-navmenu { margin: 0; max-width: none; border-radius: 0; box-shadow: none; background: none; }
+.ab.sb-ab.sb-kit:is([data-ae="radical-memphis"], [data-ae="radical-memphis--classic"]) .sb-k-crumbs a { color: var(--ab-m-black); font-weight: 700; text-decoration: underline; text-decoration-thickness: 2px; text-decoration-color: var(--ab-accent); text-underline-offset: 3px; }
+.ab.sb-ab.sb-kit:is([data-ae="radical-memphis"], [data-ae="radical-memphis--classic"]) .sb-k-crumbs [aria-current="page"] { padding: 0 6px; background: var(--ab-m-sec-lo); color: var(--ab-m-black); font-weight: 700; }
+.ab.sb-ab.sb-kit:is([data-ae="radical-memphis"], [data-ae="radical-memphis--classic"]) .sb-k-crumb-sep { color: var(--ab-primary-text); font-weight: 700; }
+.ab.sb-ab.sb-kit:is([data-ae="radical-memphis"], [data-ae="radical-memphis--classic"]) .sb-k-anchors > label { font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; }
+.ab.sb-ab.sb-kit:is([data-ae="radical-memphis"], [data-ae="radical-memphis--classic"]) .sb-k-anchors a { color: var(--ab-m-black); font-weight: 700; }
+.ab.sb-ab.sb-kit:is([data-ae="radical-memphis"], [data-ae="radical-memphis--classic"]) .sb-k-anchors a.is-on { background: var(--ab-m-sec-lo); box-shadow: inset 4px 0 0 var(--ab-primary); }
+.ab.sb-ab.sb-kit:is([data-ae="radical-memphis"], [data-ae="radical-memphis--classic"]) .sb-k-sbar { border-radius: 0; background: var(--ab-m-sec-lo); }
+.ab.sb-ab.sb-kit:is([data-ae="radical-memphis"], [data-ae="radical-memphis--classic"]) .sb-k-sbar-thumb { border-radius: 999px; background: var(--ab-primary); box-shadow: 2px 2px 0 var(--ab-m-sheet-sec); }
+.ab.sb-ab.sb-kit:is([data-ae="radical-memphis"], [data-ae="radical-memphis--classic"]) .sb-k-scrollbox { border: 2px solid var(--ab-m-black); border-radius: 0 18px 0 0; background: var(--ab-m-paper); color: var(--ab-m-black); }
+/* menus */
+.ab.sb-ab.sb-kit:is([data-ae="radical-memphis"], [data-ae="radical-memphis--classic"]) .sb-k-dd[aria-expanded="true"] { background: var(--ab-m-sec-lo); box-shadow: 2px 2px 0 var(--ab-m-sheet); }
+.ab.sb-ab.sb-kit:is([data-ae="radical-memphis"], [data-ae="radical-memphis--classic"]) .sb-k-ctxbox { border: 2px solid var(--ab-m-black); border-radius: 0 18px 0 0; }
+.ab.sb-ab.sb-kit:is([data-ae="radical-memphis"], [data-ae="radical-memphis--classic"]) .sb-k-subwrap > .sb-k-menu + .sb-k-menu { border-radius: 0 18px 0 0; box-shadow: 5px 5px 0 var(--ab-m-sheet-sec); }
+.ab.sb-ab.sb-kit:is([data-ae="radical-memphis"], [data-ae="radical-memphis--classic"]) .sb-k-mega { background: none; }
+.ab.sb-ab.sb-kit:is([data-ae="radical-memphis"], [data-ae="radical-memphis--classic"]) .sb-k-mega .sb-k-navbar { margin: 0; max-width: none; border-radius: 0; box-shadow: none; border-bottom: 3px solid var(--ab-m-black); }
+.ab.sb-ab.sb-kit:is([data-ae="radical-memphis"], [data-ae="radical-memphis--classic"]) .sb-k-mega .sb-k-mega-panel { box-shadow: 5px 5px 0 var(--ab-m-sheet); }
+.ab.sb-ab.sb-kit:is([data-ae="radical-memphis"], [data-ae="radical-memphis--classic"]) .sb-k-mega-col + .sb-k-mega-col { border-left: 2px solid var(--ab-m-black); }
+.ab.sb-ab.sb-kit:is([data-ae="radical-memphis"], [data-ae="radical-memphis--classic"]) .sb-k-mega-col .ab-label { font-family: var(--ab-font-h); font-weight: var(--mm-hw, 400); }
+.ab.sb-ab.sb-kit:is([data-ae="radical-memphis"], [data-ae="radical-memphis--classic"]) .sb-k-mega-col a { color: var(--ab-m-black); font-weight: 700; text-decoration-color: var(--ab-accent); }
+.ab.sb-ab.sb-kit:is([data-ae="radical-memphis"], [data-ae="radical-memphis--classic"]) .sb-k-menubar [role="menuitem"] { color: var(--ab-m-black); font-weight: 700; }
+.ab.sb-ab.sb-kit:is([data-ae="radical-memphis"], [data-ae="radical-memphis--classic"]) .sb-k-menubar [role="menuitem"][aria-expanded="true"] { background: var(--ab-m-sec-lo); box-shadow: inset 0 -4px 0 var(--ab-accent); }
+.ab.sb-ab.sb-kit:is([data-ae="radical-memphis"], [data-ae="radical-memphis--classic"]) .sb-k-rb-group + .sb-k-rb-group { border-left: 2px solid var(--ab-m-black); }
+.ab.sb-ab.sb-kit:is([data-ae="radical-memphis"], [data-ae="radical-memphis--classic"]) .sb-k-rb-btn { border: 2px solid var(--ab-m-black); border-radius: 0 12px 0 0; background: var(--ab-m-paper); color: var(--ab-m-black); font-weight: 700; box-shadow: 3px 3px 0 var(--ab-m-sheet); }
+.ab.sb-ab.sb-kit:is([data-ae="radical-memphis"], [data-ae="radical-memphis--classic"]) .sb-k-rb-btn:is(:active, [aria-pressed="true"], .is-on, .sb-k-pressed) { background: var(--ab-m-sec-lo); transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--ab-m-sheet); }
+.ab.sb-ab.sb-kit:is([data-ae="radical-memphis"], [data-ae="radical-memphis--classic"]) .sb-k-rb-label { color: var(--ab-m-soft); font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; }
+.ab.sb-ab.sb-kit:is([data-ae="radical-memphis"], [data-ae="radical-memphis--classic"]) .sb-k-pie { border: 2px solid var(--ab-m-black); border-radius: 50%; background: var(--ab-m-paper); box-shadow: 5px 5px 0 var(--ab-m-sheet); }
+.ab.sb-ab.sb-kit:is([data-ae="radical-memphis"], [data-ae="radical-memphis--classic"]) .sb-k-pie-hub { border-radius: 50%; background: var(--ab-m-black); color: var(--ab-m-paper); }
+.ab.sb-ab.sb-kit:is([data-ae="radical-memphis"], [data-ae="radical-memphis--classic"]) .sb-k-pie-item { border: 2px solid var(--ab-m-black); border-radius: 50%; background: var(--ab-m-paper); color: var(--ab-m-black); }
+.ab.sb-ab.sb-kit:is([data-ae="radical-memphis"], [data-ae="radical-memphis--classic"]) .sb-k-pie-item.is-on { background: var(--ab-primary); color: var(--ab-on-primary); box-shadow: 3px 3px 0 var(--ab-m-sheet-sec); }
+/* loading */
+.ab.sb-ab.sb-kit:is([data-ae="radical-memphis"], [data-ae="radical-memphis--classic"]) .sb-k-spinner { font-weight: 700; color: var(--ab-m-black); }
+.ab.sb-ab.sb-kit:is([data-ae="radical-memphis"], [data-ae="radical-memphis--classic"]) .sb-k-spin { border-color: var(--ab-m-black); border-top-color: var(--ab-primary); border-right-color: var(--ab-accent); }
+.ab.sb-ab.sb-kit:is([data-ae="radical-memphis"], [data-ae="radical-memphis--classic"]) .sb-k-skel-av { border-radius: 50%; background: var(--ab-m-pri-lo); background-image: none; animation: none; }
+.ab.sb-ab.sb-kit:is([data-ae="radical-memphis"], [data-ae="radical-memphis--classic"]) .sb-k-skel-line { border-radius: 0 6px 0 0; background: var(--ab-m-sec-lo); background-image: none; animation: none; }
+.ab.sb-ab.sb-kit:is([data-ae="radical-memphis"], [data-ae="radical-memphis--classic"]) .sb-k-skel-block { border-radius: 0 18px 0 0; background: var(--ab-m-pri-lo); background-image: none; animation: none; }
+
+/* fix round: tip text, ribbon and link padding, stepper keys */
+.ab.sb-ab.sb-kit:is([data-ae="radical-memphis"], [data-ae="radical-memphis--classic"]) .sb-k-ribbon :is(.sb-k-tabs, .sb-k-rb-groups) { box-sizing: border-box; padding-inline: 10px; }
+.ab.sb-ab.sb-kit:is([data-ae="radical-memphis"], [data-ae="radical-memphis--classic"]) .sb-k-step { box-shadow: none; border-radius: 0; }
+.ab.sb-ab.sb-kit:is([data-ae="radical-memphis"], [data-ae="radical-memphis--classic"]) .sb-k-nb-links a { padding-inline: 10px; }
+.ab.sb-ab.sb-kit:is([data-ae="radical-memphis"], [data-ae="radical-memphis--classic"]) .sb-k-icon span { color: var(--ab-m-black); }
+.ab.sb-ab.sb-kit:is([data-ae="radical-memphis"], [data-ae="radical-memphis--classic"]) .sb-k-tip-t { font-family: var(--ab-font-h); font-weight: var(--mm-hw, 400); color: var(--ab-m-black); }
+.ab.sb-ab.sb-kit:is([data-ae="radical-memphis"], [data-ae="radical-memphis--classic"]) .sb-k-tip-b { color: var(--ab-m-black); }
+.ab.sb-ab.sb-kit:is([data-ae="radical-memphis"], [data-ae="radical-memphis--classic"]) .sb-k-kbd { padding: 0 4px; }
+.ab.sb-ab.sb-kit:is([data-ae="radical-memphis"], [data-ae="radical-memphis--classic"]) .sb-k-rb-btn { box-shadow: 2px 2px 0 var(--ab-m-sheet); }
+.ab.sb-ab.sb-kit:is([data-ae="radical-memphis"], [data-ae="radical-memphis--classic"]) .sb-k-rb-btn:is(:active, [aria-pressed="true"], .is-on, .sb-k-pressed) { box-shadow: 1px 1px 0 var(--ab-m-sheet); transform: translate(1px, 1px); }
+/* the offset sheet of a button in these cells is a box-shadow (the ::before sheet would widen the button past its cell) */
+.ab.sb-ab.sb-kit:is([data-ae="radical-memphis"], [data-ae="radical-memphis--classic"]) :is(.sb-k-split, .sb-k-fabbox, .sb-k-side, .sb-k-navbar, .sb-k-dialog, .sb-k-drawer) .ab-cta::before { content: none; }
+.ab.sb-ab.sb-kit:is([data-ae="radical-memphis"], [data-ae="radical-memphis--classic"]) :is(.sb-k-split, .sb-k-fabbox, .sb-k-side, .sb-k-navbar, .sb-k-dialog, .sb-k-drawer) .ab-cta { box-shadow: 6px 6px 0 var(--ab-m-sheet-sec); }
+.ab.sb-ab.sb-kit:is([data-ae="radical-memphis"], [data-ae="radical-memphis--classic"]) .sb-k-fab { box-shadow: 5px 5px 0 var(--ab-m-sheet-sec); }
+.ab.sb-ab.sb-kit:is([data-ae="radical-memphis"], [data-ae="radical-memphis--classic"]) .sb-k-fab.sb-k-pressed { transform: translate(3px, 3px); box-shadow: 2px 2px 0 var(--ab-m-sheet-sec); }

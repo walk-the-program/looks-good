@@ -471,3 +471,148 @@
 .ab.sb-ab[data-ae="frutiger-aero"].sb-kit .sb-k-av::before { content: ""; position: absolute; z-index: -1; left: 16%; right: 16%; top: 4%; height: 40%; border-radius: 50% 50% 42% 42% / 72% 72% 28% 28%; background: var(--fa-cap); opacity: 0.8; }
 /* inactive pager dots hold 3:1 on the airy canvas (ink 55% measured 2.94:1) */
 .ab.sb-ab[data-ae="frutiger-aero"].sb-kit .sb-dots i:not(.is-on) { background: color-mix(in srgb, var(--ab-ink) 62%, var(--ab-canvas)); }
+
+/* UI kit: NN/g glossary components
+   The new components wear the Aero kit: floating panels and menus are near-opaque glass (hard
+   streak, white inner rim, small blue shadow), the chosen day, FAB, current nav pill and knob are
+   gels with a white cap and crisp lower lip, selections in lists and menus are a pale primary gel
+   (palette-based, not the Explorer blue), inset wells are the field gradient, focus is the cyan glow.
+   The spinner is a glowing gel ring; the skeleton is static pale gel (the style only animates on hover). */
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit {
+  --fa-glass-solid: linear-gradient(115deg, var(--ab-fa-streak) 0 34%, transparent 34.4%), linear-gradient(var(--ab-fa-glass), var(--ab-fa-glass)), var(--ab-canvas);
+  --fa-tint: linear-gradient(180deg, color-mix(in srgb, var(--ab-primary) 8%, var(--ab-canvas)), color-mix(in srgb, var(--ab-primary) 22%, var(--ab-canvas)));
+  --fa-tint-rim: color-mix(in srgb, var(--ab-primary) 52%, var(--ab-canvas));
+  --fa-gel-cap: linear-gradient(180deg, rgba(255, 255, 255, 0.5) 0, rgba(255, 255, 255, 0.12) 46%, transparent 47%);
+  --fa-panel-sh: inset 0 1px 0 var(--ab-fa-rim-in), inset 0 0 0 1px rgba(255, 255, 255, 0.35), 0 12px 26px -16px rgba(20, 70, 110, 0.45);
+  --fa-float-sh: inset 0 1px 0 var(--ab-fa-rim-in), inset 0 0 0 1px rgba(255, 255, 255, 0.35), 0 18px 34px -14px rgba(20, 70, 110, 0.55);
+  --fa-btn-bg: linear-gradient(180deg, #fff 0%, #F3F8FC 48%, #E4EEF6 52%, #F4F9FD 100%);
+  --fa-btn-sh: inset 0 0 0 1px rgba(255, 255, 255, 0.9), 0 0 0 1px color-mix(in srgb, var(--ab-ink) 26%, transparent), 0 2px 4px rgba(0, 50, 100, 0.12);
+  --fa-field-bg: linear-gradient(180deg, #F3F8FC, #fff 30%);
+  --fa-field-sh: inset 0 2px 3px rgba(0, 40, 80, 0.14);
+  --fa-track-bg: linear-gradient(180deg, rgba(220, 234, 245, 0.9), rgba(255, 255, 255, 0.95));
+  --fa-track-sh: inset 0 1px 3px rgba(20, 60, 100, 0.28), 0 0 0 1px rgba(35, 65, 90, 0.25), 0 1px 0 rgba(255, 255, 255, 0.9);
+  --fa-focus: 0 0 0 3px rgba(90, 200, 255, 0.55), 0 0 14px rgba(90, 200, 255, 0.7);
+}
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit[data-mode="dark"] {
+  --fa-btn-bg: linear-gradient(180deg, #4F7898, #24445F 50%, #163550 51%, #2A5272);
+  --fa-btn-sh: inset 0 0 0 1px rgba(255, 255, 255, 0.2), 0 0 0 1px #000;
+  --fa-field-bg: linear-gradient(180deg, #06121F, #0E2236 30%);
+  --fa-field-sh: inset 0 2px 3px rgba(0, 0, 0, 0.5);
+  --fa-track-bg: linear-gradient(180deg, rgba(4, 14, 24, 0.9), rgba(22, 46, 68, 0.9));
+  --fa-track-sh: inset 0 1px 3px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(0, 0, 0, 0.6), 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit .sb-k-ph { border-radius: 10px; background: var(--fa-tint); color: var(--ab-ink); box-shadow: inset 0 0 0 1px var(--ab-fa-rim-in), 0 0 0 1px var(--fa-tint-rim); }
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit .sb-k-lightbox .sb-k-lb-img.sb-k-ph { border-radius: 8px; background: color-mix(in srgb, var(--ab-canvas) 14%, var(--ab-ink)); color: var(--ab-canvas); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.35); }
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit .sb-k-scrim, .ab.sb-ab[data-ae="frutiger-aero"].sb-kit :is(.sb-k-dialogbox, .sb-k-sidebox, .sb-k-drawerbox)::before { background: color-mix(in srgb, var(--ab-primary) 26%, rgba(10, 30, 50, 0.42)); }
+/* shared menus: glass panels, pale-gel selection, etched separators, glass key caps */
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit .sb-k-menu { border-color: var(--ab-fa-rim-out); border-radius: 10px; background: var(--fa-glass-solid); box-shadow: var(--fa-panel-sh); }
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit .sb-k-menu li { border-radius: 6px; }
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit .sb-k-menu li[aria-selected="true"], .ab.sb-ab[data-ae="frutiger-aero"].sb-kit .sb-k-cmdmenu li.is-open { background: var(--fa-tint); box-shadow: inset 0 0 0 1px var(--fa-tint-rim), inset 0 1px 0 var(--ab-fa-rim-in); }
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit .sb-k-cmdmenu li.sb-k-menu-sep { background: var(--ab-fa-rim-out); box-shadow: 0 1px 0 var(--ab-fa-rim-in); }
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit .sb-k-kbd { padding: 1px 6px; border-radius: 4px; background: linear-gradient(180deg, var(--ab-canvas), color-mix(in srgb, var(--ab-ink) 8%, var(--ab-canvas))); box-shadow: inset 0 0 0 1px var(--ab-fa-rim-in), 0 0 0 1px var(--ab-fa-rim-out); font-weight: var(--fa-bw, 600); }
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit .sb-k-pop-arrow { border-color: var(--ab-fa-rim-out); }
+/* actions: the split button's halves are gels (the .ab-cta rule); the FAB is a gel orb */
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit .sb-k-split > .sb-k-split-more { border-left-color: rgba(255, 255, 255, 0.55); }
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit .ab-cta.sb-k-fab { border-radius: 50%; box-shadow: var(--fa-gel-sh), 0 8px 16px -6px var(--ab-fa-gel-shadow); }
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit .ab-cta.sb-k-fab.sb-k-pressed {
+  background: radial-gradient(70% 30% at 50% 100%, var(--ab-fa-gel-glow), transparent 70%), linear-gradient(180deg, var(--ab-fa-gel-bot) 0%, var(--ab-fa-gel) 34%, var(--ab-fa-gel) 70%, var(--ab-fa-gel-top) 100%);
+  box-shadow: inset 0 0 0 1px var(--ab-fa-gel-rim), inset 0 3px 6px rgba(0, 0, 0, 0.35), 0 1px 1px var(--ab-fa-gel-shadow);
+}
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit .sb-k-fabbox { border-color: var(--ab-fa-rim-out); border-radius: 12px; background: var(--fa-glass-solid); box-shadow: inset 0 1px 0 var(--ab-fa-rim-in); }
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit .sb-k-backtop { box-shadow: var(--fa-btn-sh), 0 6px 14px -6px rgba(20, 70, 110, 0.45); }
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit .sb-k-link { text-decoration-color: color-mix(in srgb, currentColor 45%, transparent); }
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit .sb-k-link.sb-k-pressed { border-radius: 4px; background: var(--fa-tint); color: var(--ab-ink); box-shadow: inset 0 0 0 1px var(--fa-tint-rim); }
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit .sb-k-link:is(.sb-k-focus, :focus-visible) { outline: none; border-radius: 4px; box-shadow: var(--fa-focus); }
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit .sb-k-icon { box-sizing: border-box; padding: 10px 12px; border-radius: 10px; background: var(--fa-tint); color: var(--ab-ink); box-shadow: inset 0 0 0 1px var(--ab-fa-rim-in), 0 0 0 1px var(--fa-tint-rim); }
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit .sb-k-icon .sb-ico { color: var(--ab-primary-text); filter: drop-shadow(0 1px 1px var(--ab-fa-gel-shadow)); }
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit .sb-k-icon > span { font-weight: var(--fa-bw, 600); }
+/* inputs */
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit .sb-k-match { padding: 0 2px; border-radius: 3px; background: var(--fa-tint); box-shadow: inset 0 0 0 1px var(--fa-tint-rim); }
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit .sb-k-stepper { padding: 3px; border-radius: 999px; background: var(--fa-track-bg); box-shadow: var(--fa-track-sh); }
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit .sb-k-step { border-radius: 999px; }
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit .sb-k-step-l { font-weight: var(--fa-bw, 600); }
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit .sb-k-step-val { font-weight: var(--fa-bw, 600); text-shadow: 0 1px 0 var(--ab-fa-text-glow); }
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit .sb-k-knob-arc { background: conic-gradient(from -135deg, var(--ab-fa-gel) calc(var(--v) * 270deg), color-mix(in srgb, var(--ab-ink) 16%, transparent) 0deg 270deg, transparent 0deg); filter: drop-shadow(0 0 3px var(--ab-fa-gel-shadow)); }
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit .sb-k-knob-dial { border: 0; background: var(--fa-gel-bg); box-shadow: var(--fa-gel-sh); }
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit .sb-k-knob-dial::before { content: ""; position: absolute; left: 18%; right: 18%; top: 22%; height: 28%; border-radius: 50% 50% 45% 45% / 70% 70% 30% 30%; background: var(--fa-cap); opacity: 0.55; pointer-events: none; }
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit .sb-k-knob-ind { background: var(--ab-fa-gel-on); box-shadow: 0 0 0 1px var(--ab-fa-gel-rim); }
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit .sb-k-knob-txt b { font-weight: var(--fa-bw, 600); }
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit .sb-k-knob-val { color: var(--ab-ink); font-weight: var(--fa-bw, 600); }
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit .sb-k-date-ico { color: var(--ab-primary-text); filter: drop-shadow(0 1px 1px var(--ab-fa-gel-shadow)); }
+/* pickers: glass calendar, pale-gel title bar, gel orb for the chosen day */
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit .sb-k-cal { border-color: var(--ab-fa-rim-out); border-radius: 10px; background: var(--fa-glass-solid); box-shadow: var(--fa-panel-sh); }
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit .sb-k-cal-head { border-radius: 8px; background: var(--fa-tint); box-shadow: inset 0 0 0 1px var(--ab-fa-rim-in), 0 0 0 1px var(--fa-tint-rim); }
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit .sb-k-cal-t { font-weight: var(--fa-bw, 600); text-shadow: 0 1px 0 var(--ab-fa-text-glow); }
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit .sb-k-cal-dow { font-weight: var(--fa-bw, 600); }
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit .sb-k-day { border-radius: 999px; }
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit .sb-k-day.is-today { background: var(--fa-tint); box-shadow: inset 0 0 0 1px var(--ab-fa-gel-rim), inset 0 1px 0 var(--ab-fa-rim-in); }
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit .sb-k-day.is-range { background: var(--fa-tint); border-radius: 0; box-shadow: inset 0 1px 0 var(--ab-fa-rim-in); }
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit .sb-k-day.is-start { border-radius: 999px 0 0 999px; }
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit .sb-k-day.is-end { border-radius: 0 999px 999px 0; }
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit .sb-k-day.is-sel { background: var(--fa-gel-cap), var(--fa-gel-lab-bg); color: var(--ab-fa-gel-on); box-shadow: var(--fa-gel-sh); text-shadow: 0 1px 1px var(--ab-fa-gel-on-sh); }
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit .sb-k-day:focus-visible { outline: none; box-shadow: var(--fa-focus); }
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit .sb-k-wheel { border: 1px solid var(--ab-fa-field-b); border-radius: 6px; background: var(--fa-field-bg); box-shadow: var(--fa-field-sh); }
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit .sb-k-wheel-band { border-radius: 6px; background: linear-gradient(180deg, color-mix(in srgb, var(--ab-primary) 8%, transparent), color-mix(in srgb, var(--ab-primary) 24%, transparent)); box-shadow: inset 0 0 0 1px var(--fa-tint-rim), inset 0 1px 0 var(--ab-fa-rim-in); }
+/* containers */
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit .sb-k-acc[open] > .ab-row.sb-k-acc-sum { background: var(--fa-tint); box-shadow: inset 0 0 0 1px var(--fa-tint-rim); }
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit .sb-k-acc-sum .sb-k-title { font-weight: var(--fa-bw, 600); }
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit .sb-k-acc-chev { color: var(--ab-primary-text); }
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit .sb-k-acc-body { border-top: 1px solid var(--ab-fa-rim-out); box-shadow: inset 0 1px 0 var(--ab-fa-rim-in); }
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit .ab-card.sb-k-car-card { border: 1px solid var(--ab-fa-rim-out); border-radius: 12px; background: var(--fa-glass-solid); }
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit .sb-k-dots i { background: color-mix(in srgb, var(--ab-ink) 62%, var(--ab-canvas)); }
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit .sb-k-dots i.is-on { width: 22px; border-radius: 999px; background: linear-gradient(180deg, var(--ab-fa-gel-top), var(--ab-fa-gel) 55%, var(--ab-fa-gel-bot)); box-shadow: inset 0 0 0 1px var(--ab-fa-gel-rim); }
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit .sb-k-mx-tile { font-weight: var(--fa-bw, 600); }
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit :is(.sb-k-overlaybox, .sb-k-dialogbox, .sb-k-sidebox, .sb-k-drawerbox) { border: 1px solid var(--ab-fa-rim-out); border-radius: 12px; box-shadow: inset 0 1px 0 var(--ab-fa-rim-in), 0 8px 20px -12px rgba(20, 70, 120, 0.28); }
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit .ab-card.sb-k-card:is(.sb-k-dialog, .sb-k-pop) { overflow: visible; border: 1px solid var(--ab-fa-rim-out); border-radius: 14px; background: var(--fa-glass-solid); box-shadow: var(--fa-float-sh); }
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit :is(.sb-k-dialog, .sb-k-pop) .ab-card-title { font-weight: var(--fa-bw, 600); text-shadow: 0 1px 0 var(--ab-fa-text-glow); }
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit .sb-k-day.is-range.is-sel { border-radius: 999px; }
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit .ab-card.sb-k-card.sb-k-tip { border-color: var(--fa-tint-rim); border-radius: 12px; background: var(--fa-tint); }
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit .sb-k-tip .sb-k-pop-arrow { border-color: var(--fa-tint-rim); background: color-mix(in srgb, var(--ab-primary) 9%, var(--ab-canvas)); }
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit .sb-k-side { border-left-color: var(--ab-fa-rim-out); border-radius: 14px 0 0 14px; background: var(--fa-glass-solid); box-shadow: inset 1px 0 0 var(--ab-fa-rim-in), -14px 0 26px -16px rgba(20, 70, 110, 0.5); }
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit .sb-k-drawer { border-right-color: var(--ab-fa-rim-out); border-radius: 0 14px 14px 0; background: var(--fa-glass-solid); box-shadow: inset -1px 0 0 var(--ab-fa-rim-in), 14px 0 26px -16px rgba(20, 70, 110, 0.5); }
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit .sb-k-tooltip { border-radius: 6px; font-weight: var(--fa-bw, 600); box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.28), 0 4px 10px -4px rgba(20, 70, 110, 0.5); }
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit .sb-k-lightbox { border-radius: 12px; box-shadow: inset 0 0 0 1px var(--ab-fa-rim-in), 0 12px 26px -16px rgba(20, 70, 110, 0.55); }
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit .sb-k-lightbox .sb-k-plain { border-radius: 50%; background: var(--fa-glass-solid); color: var(--ab-ink); box-shadow: inset 0 0 0 1px var(--ab-fa-rim-in), 0 0 0 1px var(--ab-fa-rim-out), 0 2px 6px rgba(20, 70, 110, 0.35); }
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit .sb-k-lightbox .sb-k-plain:focus-visible { outline: none; box-shadow: var(--fa-focus); }
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit .sb-k-lb-cap { font-weight: var(--fa-bw, 600); text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5); }
+/* navigation: a glass bar, the current link a gel pill */
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit .sb-k-navbar { border: 1px solid var(--ab-fa-rim-out); border-radius: 12px; background: var(--fa-glass-solid); box-shadow: var(--fa-panel-sh); }
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit .sb-k-nb-links { gap: 0 6px; }
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit .sb-k-nb-links a { padding: 0 14px; border-radius: 999px; font-weight: var(--fa-bw, 600); }
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit .sb-k-nb-links a[aria-current] { background: var(--fa-gel-cap), var(--fa-gel-lab-bg); color: var(--ab-fa-gel-on); box-shadow: var(--fa-gel-sh); text-shadow: 0 1px 1px var(--ab-fa-gel-on-sh); }
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit .sb-k-nb-links a:focus-visible { outline: none; box-shadow: var(--fa-focus); }
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit .sb-k-nm-item.ab-row[aria-current="page"] { border-radius: 8px; background: var(--fa-tint); box-shadow: inset 0 0 0 1px var(--fa-tint-rim), inset 0 1px 0 var(--ab-fa-rim-in); }
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit .sb-k-nm-item[aria-current="page"] .sb-k-title { font-weight: var(--fa-bw, 600); }
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit .sb-k-nm-children { background: linear-gradient(var(--ab-fa-rim-out), var(--ab-fa-rim-out)) 31px 0 / 1px 100% no-repeat, linear-gradient(var(--ab-fa-rim-in), var(--ab-fa-rim-in)) 32px 0 / 1px 100% no-repeat; }
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit .sb-k-crumbs { box-sizing: border-box; width: fit-content; max-width: 100%; padding: 0 14px; border: 1px solid var(--ab-fa-field-b); border-radius: 999px; background: var(--fa-field-bg); box-shadow: var(--fa-field-sh); }
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit .sb-k-crumbs [aria-current] { text-shadow: 0 1px 0 var(--ab-fa-text-glow); }
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit .sb-k-anchors { border-left-color: var(--ab-fa-rim-out); }
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit .sb-k-anchors a { font-weight: var(--fa-bw, 600); }
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit .sb-k-anchors a.is-on { border-left-color: var(--ab-fa-gel-rim); border-radius: 0 999px 999px 0; background: var(--fa-tint); box-shadow: inset 0 1px 0 var(--ab-fa-rim-in), inset -1px 0 0 var(--fa-tint-rim); }
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit .sb-k-sbar { background: color-mix(in srgb, var(--ab-ink) 8%, var(--ab-canvas)); box-shadow: inset 0 1px 3px rgba(20, 60, 100, 0.28), 0 0 0 1px var(--ab-fa-rim-out); }
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit .sb-k-sbar-thumb { background: linear-gradient(90deg, var(--ab-fa-gel-top), var(--ab-fa-gel) 55%, var(--ab-fa-gel-bot)); box-shadow: inset 0 0 0 1px var(--ab-fa-gel-rim), 0 1px 2px var(--ab-fa-gel-shadow); }
+/* menus */
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit .sb-k-dd[aria-expanded="true"] { box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.9), 0 0 0 1px #4E8FC4, 0 0 10px rgba(60, 170, 255, 0.55); }
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit .sb-k-cmdmenu.sb-k-ctx, .ab.sb-ab[data-ae="frutiger-aero"].sb-kit .sb-k-subwrap > .sb-k-cmdmenu { box-shadow: var(--fa-float-sh); }
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit .sb-k-menu.sb-k-mega-panel { border-radius: 0 0 12px 12px; }
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit .sb-k-mega-col > .ab-label { padding-bottom: 4px; border-bottom: 1px solid var(--ab-fa-rim-out); box-shadow: 0 1px 0 var(--ab-fa-rim-in); font-weight: var(--fa-bw, 600); }
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit .sb-k-menubar { border: 1px solid var(--ab-fa-rim-out); border-radius: 8px; background: var(--fa-glass-solid); box-shadow: inset 0 1px 0 var(--ab-fa-rim-in); }
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit .sb-k-menubar button { border-radius: 6px; font-weight: var(--fa-bw, 600); }
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit .sb-k-menubar button[aria-expanded="true"] { background: var(--fa-tint); box-shadow: inset 0 0 0 1px var(--fa-tint-rim), inset 0 1px 0 var(--ab-fa-rim-in); }
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit .sb-k-menubar button:focus-visible { outline: none; box-shadow: var(--fa-focus); }
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit .sb-k-rb-groups { padding: 8px 10px; border: 1px solid var(--ab-fa-rim-out); border-radius: 0 0 8px 8px; background: var(--fa-glass-solid); box-shadow: inset 0 1px 0 var(--ab-fa-rim-in); }
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit .sb-k-rb-group { border-left-color: var(--ab-fa-rim-out); box-shadow: inset 1px 0 0 var(--ab-fa-rim-in); }
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit .sb-k-rb-group:first-child { box-shadow: none; }
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit .sb-k-rb-label { font-weight: var(--fa-bw, 600); }
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit .sb-k-ribbon .sb-k-tabs [role="tab"][aria-selected="true"]::after { background: var(--ab-fa-gel); box-shadow: 0 0 6px var(--ab-fa-gel-glow); }
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit .sb-k-pie::before { border-color: var(--ab-fa-rim-out); background: var(--fa-glass-solid); box-shadow: var(--fa-panel-sh); }
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit .sb-k-pie-hub { background: var(--fa-gel-bg); box-shadow: inset 0 0 0 1px var(--ab-fa-gel-rim), 0 1px 3px var(--ab-fa-gel-shadow); }
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit .sb-k-pie-item.is-on { background: var(--fa-gel-cap), var(--fa-gel-lab-bg); color: var(--ab-fa-gel-on); box-shadow: var(--fa-gel-sh); }
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit :is(.sb-k-fab, .sb-k-backtop, .sb-k-step, .sb-k-rb-btn, .sb-k-pie-item, .sb-k-dd, .sb-k-split-more, .sb-k-acc-sum, .sb-k-nm-item, .sb-k-anchors a):focus-visible { outline: none; box-shadow: var(--fa-focus); }
+/* feedback: a glowing gel ring (it keeps the base rotation); the skeleton is a static pale gel */
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit .sb-k-spinner { color: var(--ab-ink); font-weight: var(--fa-bw, 600); text-shadow: 0 1px 0 var(--ab-fa-text-glow); }
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit .sb-k-spin { border-color: color-mix(in srgb, var(--ab-primary) 22%, var(--ab-canvas)); border-top-color: var(--ab-fa-gel); border-right-color: var(--ab-fa-gel-top); box-shadow: 0 0 8px var(--ab-fa-gel-shadow), inset 0 0 0 1px rgba(255, 255, 255, 0.6); }
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit :is(.sb-k-skel-av, .sb-k-skel-line, .sb-k-skel-block) { background: var(--fa-tint); animation: none; box-shadow: inset 0 0 0 1px var(--ab-fa-rim-in), 0 0 0 1px color-mix(in srgb, var(--ab-primary) 18%, transparent); }
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit .sb-k-skel-line { border-radius: 999px; }
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit .sb-k-skel-block { border-radius: 12px; }
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit .sb-k-mbwrap > .sb-k-cmdmenu { width: min(calc(100% - var(--mb) - 2px), 240px); }

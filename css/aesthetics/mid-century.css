@@ -354,3 +354,207 @@
 /* progress outside a stat row has no row ink: it fills with the primary; dividers drop the sparkle */
 .ab.sb-ab.ab[data-ae="mid-century"].sb-kit .ab-row-bar.sb-k-bar i { background: var(--mc-pri); }
 .ab.sb-ab.ab[data-ae="mid-century"].sb-kit .sb-k-divider .ab-rule::after { content: none; }
+
+/* UI kit: NN/g glossary components
+   Cut paper, one more time: cream faces, 2px walnut outline, the single cut corner on boxes
+   (22px 22px 22px 4px), pills for everything you press, tracked geometric caps for labels, dotted
+   rules for dividers. Selection is walnut ink; the main action keeps the primary. No shadows. */
+.ab.sb-ab.ab[data-ae="mid-century"].sb-kit .sb-k-ph { border: 2px solid var(--mc-ink); border-radius: 14px 14px 14px 3px; background: var(--mc-paper2); color: var(--mc-ink); }
+/* menus, listboxes and every command menu: one cut-paper surface, pill rows, ink for the chosen row */
+.ab.sb-ab.ab[data-ae="mid-century"].sb-kit .sb-k-menu { border: 2px solid var(--mc-ink); border-radius: 18px 18px 18px 4px; background: var(--mc-card); box-shadow: none; }
+.ab.sb-ab.ab[data-ae="mid-century"].sb-kit .sb-k-menu li { border-radius: 999px; font-family: var(--mc-sans); font-weight: 600; font-size: 13px; letter-spacing: 0.1em; text-transform: uppercase; }
+.ab.sb-ab.ab[data-ae="mid-century"].sb-kit .sb-k-menu li:hover { background: var(--mc-paper2); }
+.ab.sb-ab.ab[data-ae="mid-century"].sb-kit .sb-k-menu li[aria-selected="true"] { background: var(--mc-ink); color: var(--mc-on-ink); }
+.ab.sb-ab.ab[data-ae="mid-century"].sb-kit .sb-k-menu li[aria-selected="true"] :is(.sb-ico, .sb-k-box) { color: var(--mc-on-ink); border-color: var(--mc-on-ink); }
+.ab.sb-ab.ab[data-ae="mid-century"].sb-kit .sb-k-cmdmenu li.is-danger { color: var(--sb-danger); }
+.ab.sb-ab.ab[data-ae="mid-century"].sb-kit .sb-k-cmdmenu li.is-open { background: var(--mc-paper2); box-shadow: inset 0 0 0 2px var(--mc-ink); }
+.ab.sb-ab.ab[data-ae="mid-century"].sb-kit .sb-k-cmdmenu li.sb-k-menu-sep { height: 0; min-height: 0; margin: 6px 10px; padding: 0; border-radius: 0; border-top: 2px dotted color-mix(in srgb, var(--mc-ink) 45%, transparent); background: none; }
+.ab.sb-ab.ab[data-ae="mid-century"].sb-kit .sb-k-kbd { padding: 1px 8px; border: 2px solid var(--mc-ink); border-radius: 999px; font-family: var(--mc-sans); font-weight: 600; font-size: 10.5px; letter-spacing: 0.08em; color: var(--mc-ink); background: transparent; }
+.ab.sb-ab.ab[data-ae="mid-century"].sb-kit .sb-k-pop-arrow { background: var(--mc-card); border-color: var(--mc-ink); }
+.ab.sb-ab.ab[data-ae="mid-century"].sb-kit .sb-k-scrim { background: color-mix(in srgb, var(--mc-ink) 48%, transparent); }
+
+/* split button: one pill cut in two, a dotted seam between */
+.ab.sb-ab.ab[data-ae="mid-century"].sb-kit .sb-k-split :is(.sb-k-split-main, .sb-k-split-more) { margin: 0; }
+.ab.sb-ab.ab[data-ae="mid-century"].sb-kit .sb-k-split-main { border-radius: 999px 0 0 999px; border-right-width: 0; }
+.ab.sb-ab.ab[data-ae="mid-century"].sb-kit .sb-k-split-more { flex: none; justify-content: center; width: var(--k-btn, 52px); padding: 0; border-radius: 0 999px 999px 0; border-left: 2px dotted var(--mc-on-pri); }
+
+/* floating buttons: a round of cut paper with the one cut corner */
+.ab.sb-ab.ab[data-ae="mid-century"].sb-kit .sb-k-fab { width: 56px; height: 56px; border: 2px solid var(--mc-ink); border-radius: 50% 50% 50% 6px; background: var(--mc-pri); color: var(--mc-on-pri); box-shadow: none; }
+.ab.sb-ab.ab[data-ae="mid-century"].sb-kit .sb-k-fab.sb-k-pressed { background: var(--mc-ink); color: var(--mc-on-ink); }
+.ab.sb-ab.ab[data-ae="mid-century"].sb-kit .sb-k-backtop { border: 2px solid var(--mc-ink); border-radius: 999px; background: var(--mc-card); color: var(--mc-ink); box-shadow: none; font-family: var(--mc-sans); font-weight: 600; text-transform: uppercase; letter-spacing: 0.12em; font-size: 12px; }
+.ab.sb-ab.ab[data-ae="mid-century"].sb-kit .sb-k-backtop:hover { background: var(--mc-paper2); }
+.ab.sb-ab.ab[data-ae="mid-century"].sb-kit .sb-k-backtop:active { background: var(--mc-ink); color: var(--mc-on-ink); }
+.ab.sb-ab.ab[data-ae="mid-century"].sb-kit :is(.sb-k-fab, .sb-k-backtop):focus-visible { outline: 3px solid var(--mc-ink); outline-offset: 3px; }
+
+/* link: dotted underline in the primary text colour; pressed is a walnut pill */
+.ab.sb-ab.ab[data-ae="mid-century"].sb-kit .sb-k-link { color: var(--ab-primary-text); text-decoration: underline dotted 2px; text-underline-offset: 4px; border-radius: 4px; }
+.ab.sb-ab.ab[data-ae="mid-century"].sb-kit .sb-k-link.sb-k-pressed { background: var(--mc-ink); color: var(--mc-on-ink); text-decoration: none; box-shadow: 0 0 0 3px var(--mc-ink); }
+.ab.sb-ab.ab[data-ae="mid-century"].sb-kit .sb-k-link.sb-k-focus, .ab.sb-ab.ab[data-ae="mid-century"].sb-kit .sb-k-link:focus-visible { outline: 3px solid var(--mc-ink); outline-offset: 3px; }
+
+/* icons: each in a round walnut outline, labels in tracked caps */
+.ab.sb-ab.ab[data-ae="mid-century"].sb-kit .sb-k-icon svg { box-sizing: content-box; padding: 8px; border: 2px solid var(--mc-ink); border-radius: 50%; color: var(--mc-ink); stroke-width: 2; }
+.ab.sb-ab.ab[data-ae="mid-century"].sb-kit .sb-k-icon span { font-family: var(--mc-sans); font-weight: 600; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; }
+
+/* combo box: the matched letters are marked with a soft pill */
+.ab.sb-ab.ab[data-ae="mid-century"].sb-kit .sb-k-match { background: color-mix(in srgb, var(--mc-ink) 16%, transparent); color: inherit; border-radius: 999px; padding: 0 4px; font-weight: 700; }
+
+/* stepper: one pill, dotted walls round the value */
+.ab.sb-ab.ab[data-ae="mid-century"].sb-kit .sb-k-stepper { border: 2px solid var(--mc-ink); border-radius: 999px; background: var(--mc-card); overflow: hidden; }
+.ab.sb-ab.ab[data-ae="mid-century"].sb-kit .sb-k-step { border: 0; background: transparent; color: var(--mc-ink); font-family: var(--mc-sans); font-weight: 700; cursor: pointer; }
+.ab.sb-ab.ab[data-ae="mid-century"].sb-kit .sb-k-step:hover:not(:disabled) { background: var(--mc-paper2); }
+.ab.sb-ab.ab[data-ae="mid-century"].sb-kit .sb-k-step:active:not(:disabled) { background: var(--mc-ink); color: var(--mc-on-ink); }
+.ab.sb-ab.ab[data-ae="mid-century"].sb-kit .sb-k-step:disabled { color: color-mix(in srgb, var(--mc-ink) 35%, transparent); cursor: not-allowed; }
+.ab.sb-ab.ab[data-ae="mid-century"].sb-kit .sb-k-step:focus-visible { outline: 3px solid var(--mc-ink); outline-offset: -6px; }
+.ab.sb-ab.ab[data-ae="mid-century"].sb-kit .sb-k-step-val { border-inline: 2px dotted color-mix(in srgb, var(--mc-ink) 45%, transparent); font-family: var(--mc-sans); font-weight: 700; letter-spacing: 0.04em; font-variant-numeric: tabular-nums; color: var(--mc-ink); }
+
+/* knob: a walnut-edged dial with a dotted inner ring */
+.ab.sb-ab.ab[data-ae="mid-century"].sb-kit .sb-k-knob-dial { border: 2px solid var(--mc-ink); background: var(--mc-card); box-shadow: none; outline: 2px dotted color-mix(in srgb, var(--mc-ink) 40%, transparent); outline-offset: -8px; }
+.ab.sb-ab.ab[data-ae="mid-century"].sb-kit .sb-k-knob-ind { background: var(--mc-ink); border-radius: 999px; }
+.ab.sb-ab.ab[data-ae="mid-century"].sb-kit .sb-k-knob-val { font-family: var(--mc-sans); font-weight: 700; letter-spacing: 0.06em; font-variant-numeric: tabular-nums; color: var(--mc-ink); }
+
+/* date field: the pill field, the calendar mark in walnut */
+.ab.sb-ab.ab[data-ae="mid-century"].sb-kit .sb-k-date-ico { color: var(--mc-ink); }
+.ab.sb-ab.ab[data-ae="mid-century"].sb-kit .sb-k-datefield.is-error .sb-k-date-ico { color: var(--sb-danger); }
+
+/* calendar: a cut-paper card, round days, the chosen day (and the ends of a range) in walnut */
+.ab.sb-ab.ab[data-ae="mid-century"].sb-kit .sb-k-cal { border: 2px solid var(--mc-ink); border-radius: 22px 22px 22px 4px; background: var(--mc-card); color: var(--mc-ink); }
+.ab.sb-ab.ab[data-ae="mid-century"].sb-kit .sb-k-cal-head { font-family: var(--mc-sans); font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; font-size: 13px; }
+.ab.sb-ab.ab[data-ae="mid-century"].sb-kit .sb-k-cal-dow { font-family: var(--mc-sans); font-weight: 600; font-size: 10.5px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ab-muted); }
+.ab.sb-ab.ab[data-ae="mid-century"].sb-kit .sb-k-day { border: 2px solid transparent; border-radius: 50%; background: transparent; color: var(--mc-ink); font-family: var(--mc-sans); font-weight: 600; cursor: pointer; }
+.ab.sb-ab.ab[data-ae="mid-century"].sb-kit .sb-k-day:hover:not(.is-sel, .is-start, .is-end) { background: var(--mc-paper2); }
+.ab.sb-ab.ab[data-ae="mid-century"].sb-kit .sb-k-day.is-today { border-color: var(--mc-ink); }
+.ab.sb-ab.ab[data-ae="mid-century"].sb-kit .sb-k-day.is-range { background: color-mix(in srgb, var(--mc-ink) 12%, transparent); border-radius: 0; }
+.ab.sb-ab.ab[data-ae="mid-century"].sb-kit :is(.sb-k-day.is-sel, .sb-k-day.is-start, .sb-k-day.is-end) { background: var(--mc-ink); color: var(--mc-on-ink); border-color: var(--mc-ink); }
+.ab.sb-ab.ab[data-ae="mid-century"].sb-kit .sb-k-day.is-start:not(.is-end) { border-radius: 999px 0 0 999px; }
+.ab.sb-ab.ab[data-ae="mid-century"].sb-kit .sb-k-day.is-end:not(.is-start) { border-radius: 0 999px 999px 0; }
+.ab.sb-ab.ab[data-ae="mid-century"].sb-kit .sb-k-day.is-out { color: color-mix(in srgb, var(--mc-ink) 40%, transparent); }
+.ab.sb-ab.ab[data-ae="mid-century"].sb-kit .sb-k-day:focus-visible { outline: 3px solid var(--mc-ink); outline-offset: 2px; }
+
+/* wheel pickers: tracked caps, the centre line a pill-shaped band between two walnut rules */
+.ab.sb-ab.ab[data-ae="mid-century"].sb-kit .sb-k-wheel { border: 2px solid var(--mc-ink); border-radius: 22px 22px 22px 4px; background: var(--mc-card); overflow: hidden; }
+.ab.sb-ab.ab[data-ae="mid-century"].sb-kit .sb-k-wheel-item { font-family: var(--mc-sans); font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; color: var(--ab-muted); }
+.ab.sb-ab.ab[data-ae="mid-century"].sb-kit .sb-k-wheel-item.is-sel { font-weight: 700; color: var(--mc-ink); }
+.ab.sb-ab.ab[data-ae="mid-century"].sb-kit .sb-k-wheel-band { border-block: 2px solid var(--mc-ink); border-radius: 999px; background: color-mix(in srgb, var(--mc-ink) 8%, transparent); }
+
+/* accordion: one cut-paper box, dotted dividers, the open heading in walnut */
+.ab.sb-ab.ab[data-ae="mid-century"].sb-kit .sb-k-accordion { border: 2px solid var(--mc-ink); border-radius: 22px 22px 22px 4px; background: var(--mc-card); overflow: hidden; }
+.ab.sb-ab.ab[data-ae="mid-century"].sb-kit .sb-k-acc { border: 0; border-radius: 0; }
+.ab.sb-ab.ab[data-ae="mid-century"].sb-kit .sb-k-acc + .sb-k-acc { border-top: 2px dotted color-mix(in srgb, var(--mc-ink) 45%, transparent); }
+.ab.sb-ab.ab[data-ae="mid-century"].sb-kit .sb-k-acc-sum { font-family: var(--mc-sans); font-weight: 600; font-size: 13px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--mc-ink); cursor: pointer; }
+.ab.sb-ab.ab[data-ae="mid-century"].sb-kit .sb-k-acc[open] > .sb-k-acc-sum { background: var(--mc-ink); color: var(--mc-on-ink); }
+.ab.sb-ab.ab[data-ae="mid-century"].sb-kit .sb-k-acc-sum:focus-visible { outline: 3px solid var(--mc-ink); outline-offset: -6px; }
+.ab.sb-ab.ab[data-ae="mid-century"].sb-kit .sb-k-acc-body { color: var(--ab-muted); }
+
+/* carousel: the cards are the cut-paper cards; the dots are walnut rings, the current one filled */
+.ab.sb-ab.ab[data-ae="mid-century"].sb-kit .sb-k-dots i { box-sizing: border-box; width: 10px; height: 10px; border: 2px solid var(--mc-ink); border-radius: 999px; background: transparent; }
+.ab.sb-ab.ab[data-ae="mid-century"].sb-kit .sb-k-dots i.is-on { width: 22px; background: var(--mc-ink); }
+
+/* matrix: rows labelled in caps, each tile a small cut-paper card */
+.ab.sb-ab.ab[data-ae="mid-century"].sb-kit .sb-k-mx-row > :first-child:not(.sb-k-mx-track) { font-family: var(--mc-sans); font-weight: 600; font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--mc-ink); }
+.ab.sb-ab.ab[data-ae="mid-century"].sb-kit .sb-k-mx-tile { border: 2px solid var(--mc-ink); border-radius: 16px 16px 16px 3px; background: var(--mc-card); overflow: hidden; }
+
+/* overlay, dialog, side sheet, drawer, popover, tip, tooltip: cut paper, no shadow */
+.ab.sb-ab.ab[data-ae="mid-century"].sb-kit .sb-k-overlaybox { border: 2px solid var(--mc-ink); border-radius: 22px 22px 22px 4px; overflow: hidden; }
+.ab.sb-ab.ab[data-ae="mid-century"].sb-kit .sb-k-dialog { border: 2px solid var(--mc-ink); border-radius: 22px 22px 22px 4px; background: var(--mc-card); color: var(--mc-ink); box-shadow: none; }
+.ab.sb-ab.ab[data-ae="mid-century"].sb-kit .sb-k-dialog-t { font-family: var(--mc-sans); font-weight: 700; font-size: 15px; letter-spacing: 0.08em; text-transform: uppercase; }
+.ab.sb-ab.ab[data-ae="mid-century"].sb-kit .sb-k-dialog-b { color: var(--ab-muted); }
+.ab.sb-ab.ab[data-ae="mid-century"].sb-kit .sb-k-dialog-a { padding-top: 12px; border-top: 2px dotted color-mix(in srgb, var(--mc-ink) 45%, transparent); }
+.ab.sb-ab.ab[data-ae="mid-century"].sb-kit .sb-k-side { border: 2px solid var(--mc-ink); border-right: 0; border-radius: 22px 0 0 4px; background: var(--mc-card); color: var(--mc-ink); box-shadow: none; }
+.ab.sb-ab.ab[data-ae="mid-century"].sb-kit .sb-k-drawer { border: 2px solid var(--mc-ink); border-left: 0; border-radius: 0 22px 4px 0; background: var(--mc-card); color: var(--mc-ink); box-shadow: none; }
+.ab.sb-ab.ab[data-ae="mid-century"].sb-kit .sb-k-pop { border: 2px solid var(--mc-ink); border-radius: 18px 18px 18px 4px; background: var(--mc-card); color: var(--mc-ink); box-shadow: none; }
+.ab.sb-ab.ab[data-ae="mid-century"].sb-kit .sb-k-tip { border: 2px solid var(--mc-ink); border-radius: 18px 18px 18px 4px; background: var(--mc-sec); color: var(--mc-on-sec); box-shadow: none; }
+.ab.sb-ab.ab[data-ae="mid-century"].sb-kit .sb-k-tip .sb-k-textbtn { color: inherit; text-decoration: underline dotted 2px; text-underline-offset: 4px; }
+.ab.sb-ab.ab[data-ae="mid-century"].sb-kit .sb-k-tip .sb-k-pop-arrow { background: var(--mc-sec); }
+.ab.sb-ab.ab[data-ae="mid-century"].sb-kit .sb-k-tooltip { border: 2px solid var(--mc-ink); border-radius: 14px 14px 14px 3px; background: var(--mc-ink); color: var(--mc-on-ink); box-shadow: none; font-family: var(--mc-sans); font-weight: 600; font-size: 12px; letter-spacing: 0.08em; }
+.ab.sb-ab.ab[data-ae="mid-century"].sb-kit .sb-k-tooltip .sb-k-pop-arrow { background: var(--mc-ink); border-color: var(--mc-ink); }
+
+/* lightbox: walnut field, a cream-framed picture, round cream controls, caps caption */
+.ab.sb-ab.ab[data-ae="mid-century"].sb-kit .sb-k-lightbox { border: 2px solid var(--mc-ink); border-radius: 22px 22px 22px 4px; background: var(--mc-ink); overflow: hidden; }
+.ab.sb-ab.ab[data-ae="mid-century"].sb-kit .sb-k-lb-img { border: 2px solid var(--mc-on-ink); border-radius: 14px 14px 14px 3px; }
+.ab.sb-ab.ab[data-ae="mid-century"].sb-kit :is(.sb-k-lb-close, .sb-k-lb-prev, .sb-k-lb-next) { border: 2px solid var(--mc-ink); border-radius: 50%; background: var(--mc-card); color: var(--mc-ink); cursor: pointer; }
+.ab.sb-ab.ab[data-ae="mid-century"].sb-kit :is(.sb-k-lb-close, .sb-k-lb-prev, .sb-k-lb-next):focus-visible { outline: 3px solid var(--mc-on-ink); outline-offset: 3px; }
+.ab.sb-ab.ab[data-ae="mid-century"].sb-kit .sb-k-lb-cap { font-family: var(--mc-sans); font-weight: 600; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--mc-on-ink); }
+
+/* navigation: a pill bar, pill items, the current page in walnut */
+.ab.sb-ab.ab[data-ae="mid-century"].sb-kit .sb-k-navbar { border: 2px solid var(--mc-ink); border-radius: 999px; background: var(--mc-card); color: var(--mc-ink); }
+.ab.sb-ab.ab[data-ae="mid-century"].sb-kit .sb-k-nb-links a { padding: 0 14px; border-radius: 999px; font-family: var(--mc-sans); font-weight: 600; font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--mc-ink); }
+.ab.sb-ab.ab[data-ae="mid-century"].sb-kit .sb-k-nb-links a:hover { background: var(--mc-paper2); }
+.ab.sb-ab.ab[data-ae="mid-century"].sb-kit .sb-k-nb-links a[aria-current] { background: var(--mc-ink); color: var(--mc-on-ink); }
+.ab.sb-ab.ab[data-ae="mid-century"].sb-kit .sb-k-nm-item { padding: 8px 14px; border-radius: 999px; font-family: var(--mc-sans); font-weight: 500; font-size: 14.5px; color: var(--mc-ink); }
+.ab.sb-ab.ab[data-ae="mid-century"].sb-kit .sb-k-nm-item:hover { background: var(--mc-paper2); }
+.ab.sb-ab.ab[data-ae="mid-century"].sb-kit .sb-k-nm-item[aria-current] { background: var(--mc-ink); color: var(--mc-on-ink); font-weight: 600; }
+.ab.sb-ab.ab[data-ae="mid-century"].sb-kit :is(.sb-k-nm-item, .sb-k-nb-links a):focus-visible { outline: 3px solid var(--mc-ink); outline-offset: 3px; }
+.ab.sb-ab.ab[data-ae="mid-century"].sb-kit .sb-k-nm-children { margin-left: 20px; padding-left: 8px; border-left: 2px dotted color-mix(in srgb, var(--mc-ink) 45%, transparent); }
+.ab.sb-ab.ab[data-ae="mid-century"].sb-kit .sb-k-nm-children .sb-k-nm-item { font-size: 13.5px; }
+
+/* breadcrumbs and anchor links: tracked caps, the current one a walnut pill */
+.ab.sb-ab.ab[data-ae="mid-century"].sb-kit .sb-k-crumbs :is(a, span) { font-family: var(--mc-sans); font-weight: 600; font-size: 11.5px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--mc-ink); }
+.ab.sb-ab.ab[data-ae="mid-century"].sb-kit .sb-k-crumbs a { text-decoration: underline dotted 2px; text-underline-offset: 4px; }
+.ab.sb-ab.ab[data-ae="mid-century"].sb-kit .sb-k-crumbs [aria-current="page"] { padding: 2px 10px; border-radius: 999px; background: var(--mc-ink); color: var(--mc-on-ink); }
+.ab.sb-ab.ab[data-ae="mid-century"].sb-kit .sb-k-crumb-sep { color: var(--ab-muted); }
+.ab.sb-ab.ab[data-ae="mid-century"].sb-kit .sb-k-anchors > :not(a) { font-family: var(--mc-sans); font-weight: 600; font-size: 10.5px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--ab-muted); }
+.ab.sb-ab.ab[data-ae="mid-century"].sb-kit .sb-k-anchors a { padding-inline: 12px; border-radius: 999px; font-family: var(--mc-sans); font-weight: 600; font-size: 11.5px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--mc-ink); }
+.ab.sb-ab.ab[data-ae="mid-century"].sb-kit .sb-k-anchors a.is-on { background: var(--mc-ink); color: var(--mc-on-ink); }
+
+/* scrollbar: a pill track with a walnut thumb */
+.ab.sb-ab.ab[data-ae="mid-century"].sb-kit .sb-k-sbar { border-radius: 999px; background: color-mix(in srgb, var(--mc-ink) 14%, transparent); }
+.ab.sb-ab.ab[data-ae="mid-century"].sb-kit .sb-k-sbar-thumb { border-radius: 999px; background: var(--mc-ink); }
+
+/* menus that open from a trigger */
+.ab.sb-ab.ab[data-ae="mid-century"].sb-kit .sb-k-dd:is([aria-expanded="true"], .is-open, .sb-k-pressed) { background: var(--mc-paper2); }
+.ab.sb-ab.ab[data-ae="mid-century"].sb-kit .sb-k-ctx { border-radius: 14px 14px 14px 4px; }
+.ab.sb-ab.ab[data-ae="mid-century"].sb-kit .sb-k-subwrap > .sb-k-menu + .sb-k-menu { background: var(--mc-paper2); }
+.ab.sb-ab.ab[data-ae="mid-century"].sb-kit .sb-k-mega-panel { border: 2px solid var(--mc-ink); border-radius: 22px 22px 22px 4px; background: var(--mc-card); color: var(--mc-ink); box-shadow: none; }
+.ab.sb-ab.ab[data-ae="mid-century"].sb-kit .sb-k-mega-col .ab-label { padding-bottom: 6px; border-bottom: 2px dotted color-mix(in srgb, var(--mc-ink) 45%, transparent); font-family: var(--mc-sans); font-weight: 700; font-size: 11px; letter-spacing: 0.16em; color: var(--mc-ink); }
+.ab.sb-ab.ab[data-ae="mid-century"].sb-kit .sb-k-mega-col a { font-family: var(--mc-sans); font-weight: 500; color: var(--mc-ink); }
+.ab.sb-ab.ab[data-ae="mid-century"].sb-kit .sb-k-mega-col a:hover { text-decoration: underline dotted 2px; text-underline-offset: 4px; }
+
+/* menubar: a pill tray like the seg control, the open menu in walnut */
+.ab.sb-ab.ab[data-ae="mid-century"].sb-kit .sb-k-menubar { padding: 4px; gap: 4px; border: 2px solid var(--mc-ink); border-radius: 999px; background: var(--mc-paper2); }
+.ab.sb-ab.ab[data-ae="mid-century"].sb-kit .sb-k-menubar > button { min-height: 44px; padding: 0 14px; border: 0; border-radius: 999px; background: transparent; color: var(--mc-ink); font-family: var(--mc-sans); font-weight: 600; font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer; }
+.ab.sb-ab.ab[data-ae="mid-century"].sb-kit .sb-k-menubar > button:hover { background: var(--mc-card); }
+.ab.sb-ab.ab[data-ae="mid-century"].sb-kit .sb-k-menubar > button[aria-expanded="true"] { background: var(--mc-ink); color: var(--mc-on-ink); }
+.ab.sb-ab.ab[data-ae="mid-century"].sb-kit .sb-k-menubar > button:focus-visible { outline: 3px solid var(--mc-ink); outline-offset: 3px; }
+
+/* ribbon: tabs as pills over a paper tray of grouped tools, dotted between groups */
+.ab.sb-ab.ab[data-ae="mid-century"].sb-kit .sb-k-ribbon { border: 2px solid var(--mc-ink); border-radius: 22px 22px 22px 4px; background: var(--mc-card); overflow: hidden; }
+.ab.sb-ab.ab[data-ae="mid-century"].sb-kit .sb-k-ribbon .sb-k-tabs [role="tab"][aria-selected="true"] { background: var(--mc-ink); color: var(--mc-on-ink); border-radius: 999px; }
+.ab.sb-ab.ab[data-ae="mid-century"].sb-kit .sb-k-ribbon .sb-k-tabs [role="tab"][aria-selected="true"]::after { content: none; }
+.ab.sb-ab.ab[data-ae="mid-century"].sb-kit .sb-k-rb-groups { border-top: 2px solid var(--mc-ink); background: var(--mc-paper2); }
+.ab.sb-ab.ab[data-ae="mid-century"].sb-kit .sb-k-rb-group + .sb-k-rb-group { border-left: 2px dotted color-mix(in srgb, var(--mc-ink) 45%, transparent); }
+.ab.sb-ab.ab[data-ae="mid-century"].sb-kit .sb-k-rb-btn { border-radius: 14px 14px 14px 3px; color: var(--mc-ink); cursor: pointer; }
+.ab.sb-ab.ab[data-ae="mid-century"].sb-kit .sb-k-rb-btn:hover { background: var(--mc-card); }
+.ab.sb-ab.ab[data-ae="mid-century"].sb-kit .sb-k-rb-btn:focus-visible { outline: 3px solid var(--mc-ink); outline-offset: 2px; }
+.ab.sb-ab.ab[data-ae="mid-century"].sb-kit .sb-k-rb-label { font-family: var(--mc-sans); font-weight: 600; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ab-muted); }
+
+/* pie menu: a walnut hub, round cut-paper petals, the chosen one filled */
+.ab.sb-ab.ab[data-ae="mid-century"].sb-kit .sb-k-pie { border: 2px dotted color-mix(in srgb, var(--mc-ink) 45%, transparent); border-radius: 50%; }
+.ab.sb-ab.ab[data-ae="mid-century"].sb-kit .sb-k-pie-hub { border: 2px solid var(--mc-ink); border-radius: 50%; background: var(--mc-ink); color: var(--mc-on-ink); }
+.ab.sb-ab.ab[data-ae="mid-century"].sb-kit .sb-k-pie-item { border: 2px solid var(--mc-ink); border-radius: 50%; background: var(--mc-card); color: var(--mc-ink); cursor: pointer; }
+.ab.sb-ab.ab[data-ae="mid-century"].sb-kit .sb-k-pie-item:hover { background: var(--mc-paper2); }
+.ab.sb-ab.ab[data-ae="mid-century"].sb-kit .sb-k-pie-item.is-on { background: var(--mc-ink); color: var(--mc-on-ink); }
+.ab.sb-ab.ab[data-ae="mid-century"].sb-kit .sb-k-pie-item:focus-visible { outline: 3px solid var(--mc-ink); outline-offset: 2px; }
+
+/* loading: a ring of walnut dots turning; skeleton shapes cut from the same paper, dotted edge */
+.ab.sb-ab.ab[data-ae="mid-century"].sb-kit .sb-k-spinner { font-family: var(--mc-sans); font-weight: 600; font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--mc-ink); }
+.ab.sb-ab.ab[data-ae="mid-century"].sb-kit .sb-k-spin { box-sizing: border-box; border: 4px dotted var(--mc-ink); border-radius: 50%; background: none; animation: mc-spin 1.6s linear infinite; }
+.ab.sb-ab.ab[data-ae="mid-century"].sb-kit .sb-k-skel-av { border-radius: 50%; background: color-mix(in srgb, var(--mc-ink) 14%, transparent); }
+.ab.sb-ab.ab[data-ae="mid-century"].sb-kit .sb-k-skel-line { border-radius: 999px; background: color-mix(in srgb, var(--mc-ink) 14%, transparent); }
+.ab.sb-ab.ab[data-ae="mid-century"].sb-kit .sb-k-skel-block { border: 2px dotted color-mix(in srgb, var(--mc-ink) 40%, transparent); border-radius: 16px 16px 16px 3px; background: color-mix(in srgb, var(--mc-ink) 10%, transparent); }
+@keyframes mc-spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) {
+  .ab.sb-ab.ab[data-ae="mid-century"].sb-kit .sb-k-spin { animation: none; }
+}
+
+/* fix round: icon cell, readable open/current states, menubar and ribbon spacing */
+.ab.sb-ab.ab[data-ae="mid-century"].sb-kit .sb-k-icon { font-family: var(--mc-sans); font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--mc-ink); }
+.ab.sb-ab.ab[data-ae="mid-century"].sb-kit .sb-k-cmdmenu li.is-open { color: var(--mc-ink); }
+.ab.sb-ab.ab[data-ae="mid-century"].sb-kit .sb-k-nm-item.sb-k-nm-item.ab-row.sb-k-row[aria-current] { background: var(--mc-ink); color: var(--mc-on-ink); border-radius: 999px; border-top-color: transparent; }
+.ab.sb-ab.ab[data-ae="mid-century"].sb-kit .sb-k-nm-item.sb-k-nm-item.ab-row.sb-k-row[aria-current] .ab-row-name { color: var(--mc-on-ink); }
+.ab.sb-ab.ab[data-ae="mid-century"].sb-kit .sb-k-tip :is(.ab-card-title, .ab-card-body) { color: var(--mc-on-sec); }
+.ab.sb-ab.ab[data-ae="mid-century"].sb-kit .sb-k-pie-item.ab-type-apply.sb-icon-btn:is(.is-on, .sb-k-pressed) { background: var(--mc-ink); color: var(--mc-on-ink); }
+.ab.sb-ab.ab[data-ae="mid-century"].sb-kit .sb-k-mbwrap > .sb-k-cmdmenu { width: min(260px, calc(100% - var(--mb, 84px) - 8px)); box-sizing: border-box; }
+.ab.sb-ab.ab[data-ae="mid-century"].sb-kit .sb-k-ribbon .sb-k-tabs { box-sizing: border-box; gap: 6px; padding: 6px 12px 0; }
+.ab.sb-ab.ab[data-ae="mid-century"].sb-kit .sb-k-ribbon .sb-k-tabs [role="tab"] { padding: 0 14px; font-family: var(--mc-sans); font-weight: 600; font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; }
+.ab.sb-ab.ab[data-ae="mid-century"].sb-kit .sb-k-rb-groups { padding: 10px 12px; }
+.ab.sb-ab.ab[data-ae="mid-century"].sb-kit .sb-k-cmdmenu li.is-open :is(.sb-ico, svg) { color: var(--mc-ink); }

@@ -693,9 +693,39 @@ check('paste: empty text', run(`extractColors('').length`) === 0, 'found colors 
     const kit = c => aibSecKit(c).join('\\n');
     return [kit(mk(true, ['light', 'dark'])), kit(mk(false, ['light', 'dark'])), kit(mk(true, ['light'])), aibSecScreens({ app: true }).join('\\n'), aibSecScreens({ app: false }).length];
   })()`);
-  const nItems = +items, nNative = +B("UI_KIT.reduce((a, g) => a.concat(g.items), []).filter(i => /^native:/.test(i.ios)).length");
+  // These contexts are App-only (app: true, no site), so the table leaves out the website / desktop items (web: true).
+  const nItems = +B("UI_KIT.reduce((a, g) => a.concat(g.items), []).filter(i => !i.web).length"), nNative = +B("UI_KIT.reduce((a, g) => a.concat(g.items), []).filter(i => !i.web && /^native:/.test(i.ios)).length");
   check('brief: SwiftUI target adds an iOS column with a row per kit item and the native/custom line',
     /\| Element \| Use \| iOS \| Fill/.test(kitOut[0]) && (kitOut[0].match(/\| (Native `[^`]+`, tinted|Custom) \|/g) || []).length === nItems && (kitOut[0].match(/\| Native `/g) || []).length === nNative && /Native rows: use the system control/.test(kitOut[0]) && /\| Toggle \|[^\n]*Native `Toggle`, tinted/.test(kitOut[0]), kitOut[0].slice(0, 700));
+  // Every UI_KIT id has a drawing in the Built view (js/see-built.js needs a DOM, so its KIT_SPEC keys are read from the source).
+  {
+    const src = fs.readFileSync(path.join(root, 'js/see-built.js'), 'utf8');
+    const spec = src.slice(src.indexOf('const KIT_SPEC = {'), src.indexOf('const KIT_WIDE'));
+    const ids = JSON.parse(B("JSON.stringify(UI_KIT.reduce((a, g) => a.concat(g.items.map(i => i.id)), []))"));
+    const miss = ids.filter(id => !new RegExp(`^\\s{4}(?:'${id}'|${id}):\\s*\\(`, 'm').test(spec));
+    check(`kit: all ${ids.length} UI_KIT ids have a KIT_SPEC drawing in the Built view`, miss.length === 0, 'missing: ' + miss.join());
+    const parts = B("UI_KIT.reduce((a, g) => a.concat(g.items), []).filter(i => !AIB_KIT_PARTS[i.id]).map(i => i.id).join()");
+    check('brief: every UI_KIT id has an AIB_KIT_PARTS entry for the measured rows', parts === '', 'missing: ' + parts);
+  }
+  // The glossary covers 61 NN/g terms, each built from kit items that exist.
+  {
+    const g = JSON.parse(B("JSON.stringify({ n: UI_KIT_GLOSSARY.length, dup: UI_KIT_GLOSSARY.length - new Set(UI_KIT_GLOSSARY.map(t => t.term)).size, bad: UI_KIT_GLOSSARY.filter(t => !t.ids.length || t.ids.some(id => !UI_KIT.some(grp => grp.items.some(i => i.id === id)))).map(t => t.term) })"));
+    check('kit: the glossary maps 61 distinct NN/g terms to items that exist in UI_KIT', g.n === 61 && g.dup === 0 && g.bad.length === 0, JSON.stringify(g));
+  }
+  // App-only briefs leave out the website / desktop items; Website and Both briefs keep every item.
+  {
+    const names = JSON.parse(B("JSON.stringify(UI_KIT.reduce((a, g) => a.concat(g.items), []).filter(i => i.web).map(i => i.name))"));
+    const all = JSON.parse(B("JSON.stringify(UI_KIT.reduce((a, g) => a.concat(g.items.map(i => i.name)), []))"));
+    const tbl = site => B(`(() => {
+      const rows = [['--canvas', '#fff', '#fff']].map(([token, l, d]) => ({ token, get: m => (m === 'dark' ? d : l) }));
+      return aibSecKit({ def: {}, cur: { t: {}, extras: {} }, rows, modes: ['light'], swift: false, app: true, site: ${site}, radius: { control: 8, field: 8, card: 12 }, tok: s => String(s) }).join('\\n');
+    })()`);
+    const appOnly = tbl(false), both = tbl(true);
+    const has = (out, n) => out.split('\n').some(l => l.startsWith(`| ${n} |`));
+    check(`brief: an App-only kit table lists none of the ${names.length} web items`, names.length > 0 && names.every(n => !has(appOnly, n)) && all.filter(n => !names.includes(n)).every(n => has(appOnly, n)), names.filter(n => has(appOnly, n)).join());
+    check('brief: a Both brief lists every kit item, web ones included', all.every(n => has(both, n)), all.filter(n => !has(both, n)).join());
+    check('brief: an App-only brief drops a group whose items are all web (no empty group heading)', !/### [^\n]*\n\n\|[^\n]*\n\|[^\n]*\n\n/.test(appOnly), 'empty group');
+  }
   check('brief: a Web-only target has no iOS column and no native/custom line', !/\| iOS \|/.test(kitOut[1]) && !/Native rows/.test(kitOut[1]), kitOut[1].slice(0, 400));
   check('brief: kit Fill/Text show light and dark values where a dark palette exists', /--canvas \(#fff \/ #111\)/.test(kitOut[0]) && /--ink \(#000 \/ #eee\)/.test(kitOut[0]) && !/--line \(#/.test(kitOut[0]), kitOut[0].slice(0, 800));
   check('brief: a single-palette brief keeps the kit cells without dark pairs', !/--canvas \(#/.test(kitOut[2]), kitOut[2].slice(0, 300));
@@ -798,9 +828,10 @@ check('paste: empty text', run(`extractColors('').length`) === 0, 'found colors 
   // Without a product, every brief is exactly what it was before the product sheet (hash and length taken before the change).
   // Re-pinned 2026-10-30 (Round 11) after the kit gained focus / disabled states: the three kit-aware briefs differ from the old pin only in
   // the kit table's State column (secondary focus, checkbox and toggle disabled), the Focus colour row and one keyboard-focus rule line; the web brief is unchanged.
+  // Re-pinned 2026-10-31 (UI kit glossary round) after the kit gained 39 components: the three App briefs differ only by the new kit rows (the website / desktop ones left out); the web brief is unchanged.
   {
     const fnv = str => { let h = 0x811c9dc5; for (let i = 0; i < str.length; i++) { h ^= str.charCodeAt(i); h = Math.imul(h, 0x01000193) >>> 0; } return h.toString(16); };
-    const got = briefs.map(b => fnv(b) + ':' + b.length), want = ['b320c22a:19366', '417a5624:18655', 'c4f601c6:26192', '4ae58906:13293'];
+    const got = briefs.map(b => fnv(b) + ':' + b.length), want = ['4e3e7dfc:23797', '9a179386:23086', 'e01a7aec:37667', '4ae58906:13293'];
     check('product: briefs without a product are byte-identical to before', JSON.stringify(got) === JSON.stringify(want), JSON.stringify(got));
   }
   /* ---- product sheet (js/product-sheet.js) and its brief section ---- */

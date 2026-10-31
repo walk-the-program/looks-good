@@ -528,6 +528,45 @@ const AIB_KIT_PARTS = {
   toast: [['toast', '.sb-k-toast', 1], ['action', '.sb-k-toast button', 0]],
   empty: [['icon tile', '.sb-k-emptyico', 1], ['title', '.sb-k-empty-t', 0], ['message', '.sb-k-empty-b', 0], ['button', 'button', 0]],
   avatar: [['avatar', '.sb-k-av', 1]],
+  'btn-split': [['button', '.sb-k-split-main', 1], ['caret', '.sb-k-split-more', 1], ['menu', '.sb-k-menu', 1], ['chosen option', '.sb-k-menu [aria-selected="true"]', 1]],
+  fab: [['button', '.sb-k-fab', 1], ['icon', '.sb-k-fab svg', 0]],
+  link: [['link', '.sb-k-link', 1]],
+  icon: [['icon', '.sb-k-icon svg', 0], ['label', '.sb-k-icon > span', 0]],
+  combo: [['input', '.sb-k-combo-in', 1], ['label', '.ab-fieldlabel', 0], ['menu', '.sb-k-menu', 1], ['chosen option', '.sb-k-menu [aria-selected="true"]', 1], ['match', '.sb-k-match', 0]],
+  listbox: [['list', '.sb-k-listbox', 1], ['chosen option', '.sb-k-listbox [aria-selected="true"]', 1], ['box', '.sb-k-box', 1]],
+  stepper: [['stepper', '.sb-k-stepper', 0], ['button', '.sb-k-step', 1], ['value', '.sb-k-step-val', 0]],
+  knob: [['knob', '.sb-k-knob', 0], ['arc', '.sb-k-knob-arc', 0], ['dial', '.sb-k-knob-dial', 1], ['indicator', '.sb-k-knob-ind', 1], ['value', '.sb-k-knob-val', 0]],
+  'date-field': [['input', '.ab-input', 1], ['label', '.ab-fieldlabel', 0], ['icon', '.sb-k-date-ico svg', 0]],
+  calendar: [['calendar', '.sb-k-cal', 1], ['title', '.sb-k-cal-t', 0], ['weekday label', '.sb-k-cal-dow', 0], ['day', '.sb-k-day:not(.is-out):not(.is-sel):not(.is-today):not(.is-range)', 0], ['selected day', '.sb-k-day.is-sel', 1], ['today', '.sb-k-day.is-today', 1], ['range day', '.sb-k-day.is-range:not(.is-sel)', 1], ['outside day', '.sb-k-day.is-out', 0]],
+  wheel: [['wheel', '.sb-k-wheel', 1], ['band', '.sb-k-wheel-band', 1], ['chosen value', '.sb-k-wheel-item.is-sel', 0], ['value', '.sb-k-wheel-item:not(.is-sel)', 0]],
+  'wheel-date': [['wheel', '.sb-k-wheel', 1], ['band', '.sb-k-wheel-band', 1], ['chosen value', '.sb-k-wheel-item.is-sel', 0], ['value', '.sb-k-wheel-item:not(.is-sel)', 0]],
+  accordion: [['accordion', '.sb-k-accordion', 1], ['heading', '.sb-k-acc-sum', 1], ['title', '.sb-k-title', 0], ['body', '.sb-k-acc-body', 0]],
+  carousel: [['card', '.sb-k-car-card', 1], ['title', '.sb-k-car-card .ab-card-title', 0], ['body', '.sb-k-car-card .ab-card-body', 0], ['placeholder', '.sb-k-ph', 1], ['page dot', '.sb-k-dots i:not(.is-on)', 0], ['current dot', '.sb-k-dots i.is-on', 0]],
+  matrix: [['tile', '.sb-k-mx-tile .sb-k-ph', 1], ['caption label', '.sb-k-mx-tile > span', 0], ['row label', '.sb-k-mx-label .ab-label', 0]],
+  overlay: [['scrim', '.sb-k-scrim', 0], ['note', '.sb-k-scrimnote', 1]],
+  dialog: [['dialog', '.sb-k-dialog', 1], ['title', '.sb-k-dialog-t', 0], ['body', '.sb-k-dialog-b', 0], ['scrim', '.sb-k-dialogbox', 1]],
+  'side-sheet': [['panel', '.sb-k-side', 1], ['title', '.sb-k-sheet-t', 0], ['scrim', '.sb-k-sidebox', 1]],
+  popover: [['panel', '.sb-k-pop', 1], ['title', '.sb-k-pop .ab-card-title', 0], ['arrow', '.sb-k-pop-arrow', 1]],
+  'popup-tip': [['panel', '.sb-k-tip', 1], ['title', '.sb-k-tip-t', 0], ['arrow', '.sb-k-pop-arrow', 1], ['action', '.sb-k-tip .sb-k-textbtn', 0]],
+  tooltip: [['tooltip', '.sb-k-tooltip', 1], ['arrow', '.sb-k-pop-arrow', 1]],
+  lightbox: [['layer', '.sb-k-lightbox', 1], ['image', '.sb-k-lb-img', 1], ['count label', '.sb-k-lb-cap', 0]],
+  navbar: [['bar', '.sb-k-navbar', 1], ['selected link', '.sb-k-nb-links [aria-current]', 1], ['unselected link', '.sb-k-nb-links a:not([aria-current])', 0], ['action', '.sb-k-nb-cta', 1]],
+  'nav-menu': [['menu', '.sb-k-navmenu', 1], ['row', '.sb-k-nm-item', 1], ['selected row', '.sb-k-nm-item.is-picked', 1], ['title', '.sb-k-title', 0], ['icon tile', '.sb-k-ico', 1]],
+  drawer: [['panel', '.sb-k-drawer', 1], ['scrim', '.sb-k-drawerbox', 1], ['selected row', '.sb-k-drawer .is-picked', 1], ['row', '.sb-k-drawer .sb-k-nm-item:not(.is-picked)', 1]],
+  breadcrumbs: [['trail', '.sb-k-crumbs ol', 0], ['link label', '.sb-k-link', 0], ['current label', '[aria-current="page"]', 0], ['separator', '.sb-k-crumb-sep', 0]],
+  anchor: [['list', '.sb-k-anchors', 1], ['title label', '.sb-k-anchors-label', 0], ['selected link', '.sb-k-anchors a.is-on', 1], ['unselected link', '.sb-k-anchors a:not(.is-on)', 0]],
+  'back-top': [['button', '.sb-k-backtop', 1]],
+  scrollbar: [['track', '.sb-k-sbar', 1], ['thumb', '.sb-k-sbar-thumb', 1]],
+  'dropdown-menu': [['button', '.sb-k-dd', 1], ['menu', '.sb-k-menu', 1], ['chosen option', '.sb-k-menu [aria-selected="true"]', 1], ['separator', '.sb-k-menu-sep', 0]],
+  'context-menu': [['menu', '.sb-k-ctx', 1], ['chosen option', '.sb-k-ctx [aria-selected="true"]', 1], ['target row', '.sb-k-row', 1]],
+  submenu: [['menu', '.sb-k-subwrap .sb-k-menu', 1], ['open item', '.sb-k-menu .is-open', 1], ['submenu', '.sb-k-subwrap .sb-k-menu + .sb-k-menu', 1]],
+  'expandable-menu': [['menu', '.sb-k-expmenu', 1], ['parent row', '.sb-k-expmenu > .sb-k-nm-item', 1], ['selected row', '.sb-k-nm-children .is-picked', 1], ['child row', '.sb-k-nm-children .sb-k-nm-item:not(.is-picked)', 1]],
+  megamenu: [['bar', '.sb-k-navbar', 1], ['panel', '.sb-k-mega-panel', 1], ['group label', '.sb-k-mega-col .ab-label', 0], ['link label', '.sb-k-mega-col a', 0]],
+  menubar: [['bar', '.sb-k-menubar', 1], ['title label', '.sb-k-menubar button', 0], ['selected title', '.sb-k-menubar [aria-expanded="true"]', 1], ['menu', '.sb-k-menu', 1], ['shortcut value', '.sb-k-kbd', 0]],
+  ribbon: [['ribbon', '.sb-k-ribbon', 0], ['tabs', '.sb-k-tabs', 1], ['selected tab', '[aria-selected="true"]', 1], ['command', '.sb-k-rb-btn', 1], ['group label', '.sb-k-rb-label', 0]],
+  'pie-menu': [['ring', '.sb-k-pie', 1], ['hub', '.sb-k-pie-hub', 1], ['item', '.sb-k-pie-item', 1], ['chosen item', '.sb-k-pie-item.is-on', 1]],
+  spinner: [['spinner', '.sb-k-spin', 1], ['label', '.sb-k-spinner > span', 0]],
+  skeleton: [['placeholder', '.sb-k-skel-block', 1], ['avatar', '.sb-k-skel-av', 1], ['line', '.sb-k-skel-line', 1]],
 };
 
 // One element (or one of its ::before / ::after boxes) as plain numbers and strings. null: no such box.
@@ -1309,8 +1348,8 @@ function aibKitVisual(ctx, o, name) {
 }
 
 // Which part carries the component's text, and whether its height is a fixed control size.
-const AIB_KIT_TEXT = { card: 'title', list: 'title', topbar: 'title', tabbar: 'selected label', tabs: 'selected', field: 'input', search: 'input', checkbox: 'label', radio: 'label', toggle: 'label', segmented: 'selected', callout: 'title', sheet: 'title', empty: 'title', slider: 'label', select: 'box' };
-const AIB_KIT_FIXED = new Set(['btn-primary', 'btn-secondary', 'btn-text', 'btn-destructive', 'btn-icon', 'field', 'search', 'select', 'checkbox', 'radio', 'toggle', 'segmented', 'topbar', 'tabbar', 'tabs', 'progress', 'avatar', 'badge', 'toast']);
+const AIB_KIT_TEXT = { card: 'title', list: 'title', topbar: 'title', tabbar: 'selected label', tabs: 'selected', field: 'input', search: 'input', checkbox: 'label', radio: 'label', toggle: 'label', segmented: 'selected', callout: 'title', sheet: 'title', empty: 'title', slider: 'label', select: 'box', stepper: 'value', accordion: 'title', carousel: 'title', dialog: 'title', 'side-sheet': 'title', popover: 'title', 'popup-tip': 'title', lightbox: 'count label', navbar: 'selected link', anchor: 'selected link', wheel: 'chosen value', 'wheel-date': 'chosen value', calendar: 'selected day', spinner: 'label' };
+const AIB_KIT_FIXED = new Set(['btn-primary', 'btn-secondary', 'btn-text', 'btn-destructive', 'btn-icon', 'field', 'search', 'select', 'checkbox', 'radio', 'toggle', 'segmented', 'topbar', 'tabbar', 'tabs', 'progress', 'avatar', 'badge', 'toast', 'btn-split', 'fab', 'combo', 'date-field', 'stepper', 'back-top', 'spinner']);
 
 // The model the brief writes from: per kit id the row cells, plus what the signature and the rules read.
 function aibKitModel(ctx, snap) {
@@ -1353,7 +1392,7 @@ function aibKitModel(ctx, snap) {
     if (id === 'topbar') {
       const total = main.bs === 'border-box' ? main.h : main.h + bb + (main.b[0] ? main.b[0].w : 0);
       size = bb ? `${Math.round(total - bb)}pt bar plus its ${Math.round(bb)}pt bottom rule` : `${Math.round(total)}pt high`;
-    } else size = id === 'slider' ? '' : [AIB_KIT_FIXED.has(id) ? (/checkbox|radio|toggle|avatar|btn-icon/.test(id) ? dims(main) : `${Math.round(main.h)}pt high`) : '', aibKitPad(main)].filter(Boolean).join(', ');
+    } else size = id === 'slider' ? '' : [AIB_KIT_FIXED.has(id) ? (/checkbox|radio|toggle|avatar|btn-icon|fab|spinner/.test(id) ? dims(main) : `${Math.round(main.h)}pt high`) : '', aibKitPad(main)].filter(Boolean).join(', ');
     // Parts and marks: the other parts' notable looks and every ::before / ::after, in words.
     const marks = [];
     parts.forEach(([pn], i) => {
@@ -1378,13 +1417,13 @@ function aibKitModel(ctx, snap) {
         const bits = [];
         const fill = aibKitFill(o, name);
         if (fill !== 'none') bits.push(`fill ${fill}`);
-        if (/title|label|detail|value|message|count|tag|selected|unselected|action|chosen/.test(pn)) bits.push(aibKitType(ctx, o, name));
+        if (/title|label|detail|value|message|count|tag|selected|unselected|action|chosen|day/.test(pn)) bits.push(aibKitType(ctx, o, name));
         const e = aibKitEdge(o, name);
         if (e !== 'no edge') bits.push(`edge ${e}`);
         if ((fill !== 'none' || e !== 'no edge') && o.r.some(v => v > 0)) bits.push(aibKitCorner(o));
         const s = aibKitShadow(o.sh, name, o.filter).text;
         if (s) bits.push(s);
-        if (/row|grabber|icon tile|dot|fill|track|tag|count|selected/.test(pn) && o.h) bits.push(`${Math.round(o.h)}pt high`);
+        if (/row|grabber|icon tile|dot|fill|track|tag|count|selected|thumb|hub|item|day/.test(pn) && o.h) bits.push(`${Math.round(o.h)}pt high`);
         if (/row/.test(pn)) bits.push(aibKitPad(o));
         const tf = aibKitTransform(o.tf);
         if (tf) bits.push(tf);
@@ -1914,7 +1953,7 @@ function aibSecKitMeasured(ctx) {
     `Measured from the UI kit tab as ${ctx.def.name} draws it. Every control and container in the product is one of these components, drawn exactly as stated. Colours are tokens from Colors (a plain hex or rgba() is a fixed value the kit draws); "\`--x\` at N%" means \`color-mix(in srgb, var(--x) N%, transparent)\` and "at N% over \`--canvas\`" means \`color-mix(in srgb, var(--x) N%, var(--canvas))\`; sizes are points at the 390 x 844 reference (1pt = 1 CSS px); padding is CSS shorthand; exact shadow values are the \`--shadow-*\` tokens; (display) and (body) name the brand faces. "Other states" lists only what changes from the first state.`];
   if (ctx.swift) out.push('Native rows: use the system control and only tint it (accent, track, label font); keep its size, motion and behaviour. Custom rows: draw them exactly as described.');
   const P = (typeof UI_KIT_PHONE !== 'undefined' && UI_KIT_PHONE) || {};
-  UI_KIT.forEach(g => {
+  aibKitGroups(ctx).forEach(g => {
     const rows = g.items.map(it => {
       const r = K.rows[it.id];
       const ios = /^native:/.test(it.ios || '') ? `Native \`${it.ios.slice(7)}\`, tinted` : 'Custom';
@@ -2469,6 +2508,12 @@ function aibSecWebRules(ctx) {
   return ['## Website rules', UI_KIT_SURFACES.web.rule];
 }
 
+// The kit groups a brief lists: an App-only brief leaves out the website / desktop items (web: true), and a group left empty.
+function aibKitGroups(ctx) {
+  const appOnly = ctx.app && !ctx.site;
+  return UI_KIT.map(g => (appOnly ? { group: g.group, items: g.items.filter(it => !it.web) } : g)).filter(g => g.items.length);
+}
+
 // One row of the UI kit table per UI_KIT item, from the same data as the Components table where a row exists.
 function aibKitRowData(ctx) {
   const { def, cur } = ctx;
@@ -2521,6 +2566,45 @@ function aibKitRowData(ctx) {
     'toast': ['--ink', '--canvas', edge('none', corner(r.card)), `min 48pt high, ${P.margin || 20}pt from the side edges, gone after 3 s`],
     'empty': ['none', 'title --ink (Title 2); message --muted (Subhead); icon --muted', 'n/a', 'centred; one main button; ' + (ctx.site ? 'an icon, never an illustration' : 'an icon only')],
     'avatar': [secOff ? '--line' : '--secondary', secOff ? '--ink (initials)' : '--on-secondary (initials)', edge('none', 'circle'), '32, 40 or 56pt'],
+    'btn-split': [prim[1], prim[2], edge(`${prim[3]}; 1px divider in --on-primary at 40% between the label and the caret`, `${pill} on the outer ends, square where the two meet`), `${hl(P.buttonHeight || 52)}, full width; caret ${P.buttonHeight || 52}x${P.buttonHeight || 52}pt; open: a menu below, right-aligned, ${tap}pt rows`],
+    'fab': [prim[1], `${prim[2]} (24pt plus icon)`, edge(prim[3], pill), `56x56pt, 16pt from the bottom and right edges, over scrolling content; one per screen`],
+    'link': ['none', `${PRI} (shaded toward --ink until it holds 4.5:1 on --canvas), underlined; pressed --muted; focus ring on keyboard focus`, 'no edge', 'inline in body text (Subhead); never the only way to act'],
+    'icon': ['none', '--ink; --muted when disabled', 'no edge', '20, 24 or 28pt, 1.6pt line, round caps and joins; always beside a label or given an accessible name'],
+    'combo': [rest[1], '--ink (typed text; the matched part of each suggestion in bold)', edge(`rest ${rest[3]}; open ${foc[3]}`, corner(r.field)), `${hl(P.fieldHeight || 48)}; suggestions in the select menu style (--canvas, 1px --line, ${tap}pt rows, chosen row ${segOn[1]})`],
+    'listbox': [`${card[1]}; chosen row: --pri-tint`, '--ink; chosen row bold', edge('1px --line', corner(r.card)), `${tap}pt rows, full width; multiple: a 24pt check box leads each row`],
+    'stepper': ['none (pressed: `--sec-tint`)', '--ink (value, Body, 600)', edge(`buttons as the icon button: ${sec[3]}`, corner(r.control)), `two ${tap}x${tap}pt buttons around the value; minimum: the minus button disabled`],
+    'knob': [`track --line; filled arc ${PRI}`, '--ink (label); --muted (value)', edge('dial 1px --line', 'circle'), '72pt ring, 52pt dial turning over 270 degrees; the indicator is a 3x10pt bar in --ink'],
+    'date-field': [rest[1], '--ink (date); calendar icon --muted at the trailing edge', edge(`rest ${rest[3]}; focus ${foc[3]}`, corner(r.field)), `${hl(P.fieldHeight || 48)}; label above in Footnote, --muted`],
+    'calendar': [card[1], '--ink (days); --muted (weekday initials, days outside the month)', edge(`1px --line; selected day ${segOn[3]}; today a 1.5px --ink ring`, `${corner(r.card)}; days ${corner(r.control)}`), `7 columns, ${tap}pt days; selected ${segOn[1]} with ${segOn[2]}; range days --pri-tint with square inner edges`],
+    'wheel': ['--canvas; centre band --ink at 8%', '--ink (chosen, Title 2, 600); --muted (others, Body, smaller further away)', edge('none', corner(r.control)), '5 rows of 40pt per column, the chosen value in the middle band'],
+    'wheel-date': ['--canvas; centre band --ink at 8%', '--ink (chosen, Title 2, 600); --muted (others, Body, smaller further away)', edge('none', corner(r.control)), 'Month, day and year columns; 5 rows of 40pt each'],
+    'accordion': [card[1], /^--card(?![\w-])/.test(card[1]) ? aibOnCard(ctx, '--ink (headings); --muted (body)') : '--ink (headings); --muted (body)', edge('bottom 1px --line between sections', `sections share the list's ${corner(r.card)}`), `${hl(P.rowHeight || 52)} headings with a chevron that turns when open; body padding 16pt`],
+    'carousel': [card[1], card[2], edge(card[3] === 'none' ? 'none' : '1px ' + card[3], corner(r.card)), 'cards 72% of the width (max 240pt) so the next one peeks in; 12pt gap; 8pt page dots, the current one in ' + PRI],
+    'matrix': ['tiles --ink at 8% over --canvas (a placeholder tint)', '--ink (caption, Subhead); --muted (row label)', edge('none', corner(r.card)), 'square tiles 112pt wide, 12pt gap; rows scroll sideways, the next tile peeking in; a section label above each row'],
+    'overlay': ['--ink at 38% over the screen', '--canvas on an --ink pill (the hint)', 'no edge', 'covers the whole screen; tapping it closes non-critical overlays'],
+    'dialog': [card[1], /^--card(?![\w-])/.test(card[1]) ? aibOnCard(ctx, card[2]) : card[2], edge(card[3] === 'none' ? 'none' : '1px ' + card[3], corner(r.card)), `centred, max 340pt wide, padding ${P.cardPadding || 20}pt; the scrim --ink at 38%; two buttons side by side, the safe one first`],
+    'side-sheet': [card[1], card[2], edge('1px --line on the inner edge', `${corner(r.card)} on the inner corners`), 'full height, 80% of the width (max 300pt) from the right edge; padding 16pt; scrim --ink at 38%'],
+    'popover': [card[1], card[2], edge(card[3] === 'none' ? 'none' : '1px ' + card[3], corner(r.card)), `max 280pt wide, padding ${P.cardPadding || 20}pt; a 12pt arrow in the panel's fill and edge points at the control`],
+    'popup-tip': [card[1], card[2], edge(card[3] === 'none' ? 'none' : '1px ' + card[3], corner(r.card)), `max 280pt wide, padding ${P.cardPadding || 20}pt; title, one line of body, a "Got it" text button; a 12pt arrow points at the feature`],
+    'tooltip': ['--ink', '--canvas (Footnote)', edge('none', corner(Math.min(r.control, 10))), 'padding 6x10pt, one line, no wrap; a 12pt arrow in --ink points at the control'],
+    'lightbox': ['--ink at 92% over --canvas; the image tile --canvas at 14% over --ink', '--canvas (icons, count)', edge('none', corner(r.card)), `image max 420pt wide, 16:10; close top right, previous and next at the sides, each a ${tap}x${tap}pt target`],
+    'navbar': ['--canvas', 'selected --ink; unselected --muted (Subhead, 500)', `bottom 1px --line; selected: 2px ${PRI} under the label`, `${tap}pt links, 24pt between them; logo at the leading edge, one small primary button at the trailing edge`],
+    'nav-menu': [`--canvas; current: ${listSel[1]}`, '--ink (labels); a 32pt icon tile --pri-tint leads each row; a check mark trails the current row', edge(`bottom 1px --line between rows; current: ${listSel[3]}`, `rows share the list's ${corner(r.card)}`), `${hl(P.rowHeight || 52)}, full width`],
+    'drawer': [card[1], card[2], edge('1px --line on the inner edge', `${corner(r.card)} on the inner corners`), '80% of the width (max 300pt) from the leading edge; the logo, then the navigation menu rows; scrim --ink at 38%'],
+    'breadcrumbs': ['none', `links ${PRI} underlined; the current page --ink, 600 (Subhead)`, 'no edge', `${tap}pt high; a 14pt chevron --muted between steps; wraps when long`],
+    'anchor': ['none', 'selected --ink, 600; unselected --muted (Subhead); the title --muted (Footnote)', `left rail 1px --line; selected: 2px ${PRI} over the rail`, `${tap}pt rows, 14pt inset from the rail`],
+    'back-top': [sec[1], sec[2], edge(sec[3], pill), `${tap}pt high pill with an up chevron and "Back to top"; 16pt from the bottom and right edges; shown after a long scroll`],
+    'scrollbar': ['track --ink at 8%', 'n/a', edge('none', 'pill'), `12pt wide track; the thumb --ink at 45%, as long as the visible share of the content; at least ${tap}pt tall to drag`],
+    'dropdown-menu': [`button as the secondary button; menu ${card[1]}`, '--ink; icons --muted; the destructive item in --error', edge('menu 1px --line', `menu ${corner(r.field)}; ${corner(r.control)} on the button`), `${hl(P.buttonHeight || 52)} button; menu rows ${tap}pt, max 240pt wide; the first row highlighted ${segOn[1]}; a rule before destructive items`],
+    'context-menu': [card[1], '--ink; icons --muted; the destructive item in --error', edge('1px --line', corner(r.field)), `rows ${tap}pt, max 240pt wide; opens at the pressed item and lifts it with a ${listSel[1]} highlight`],
+    'submenu': [card[1], '--ink; the parent item has a trailing chevron', edge('1px --line', corner(r.field)), `rows ${tap}pt, max 220pt wide; the second menu opens beside the parent item, its first row level with it`],
+    'expandable-menu': [`--canvas; current: ${listSel[1]}`, '--ink; a chevron trails each item, pointing down when open', edge(`bottom 1px --line between rows; current: ${listSel[3]}`, `rows share the list's ${corner(r.card)}`), `${hl(P.rowHeight || 52)}; children indented 62pt to line up under the parent's label`],
+    'megamenu': [card[1], '--ink (links, Body); --muted (group labels, Caption)', edge('panel 1px --line', corner(r.card)), `panel as wide as the navigation bar, 12pt padding, groups in columns of at least 150pt; ${tap}pt links; opens under its bar item (underlined ${PRI})`],
+    'menubar': ['--canvas; open title --pri-tint', '--ink (Subhead); shortcuts --muted (Footnote)', 'bottom 1px --line under the bar; menu 1px --line', `${tap}pt titles, 84pt apart; the menu opens under its title, rows ${tap}pt, max 240pt wide`],
+    'ribbon': ['--canvas', '--ink; group labels --muted (Caption)', 'bottom 1px --line under the commands; 1px --line between groups', `tabs ${tap}pt; commands as ${tap}x${tap}pt icon buttons; each group has its label centred below it`],
+    'pie-menu': ['ring --ink at 3% with a 1px --line edge; hub ' + PRI, '--ink (icons)', edge('items as the icon button', 'circle'), `up to 6 round ${tap}pt items, 76pt from the centre, 60 degrees apart; the pressed one has the icon button's pressed look`],
+    'spinner': ['none', '--muted (label, Subhead)', `ring 3px --ink at 16% with a ${PRI} arc`, '28pt ring turning once every 0.9 s (static when the visitor asks for reduced motion); a label beside it'],
+    'skeleton': ['--ink at 8% over --canvas', 'n/a', edge('none', `${corner(Math.min(r.control, 8))}; avatars circle`), 'blocks the size of the coming layout (40pt avatar, 12 to 14pt lines, 96pt image); a soft light sweep every 1.4 s, none when motion is reduced'],
   };
 }
 
@@ -2546,7 +2630,7 @@ function aibSecKit(ctx) {
     'Every control and container in the product is one of these components, drawn exactly as below. Fill, text and edge are tokens from Colors; corners and shadows come from Shape and materials; text sizes come from Phone layout and type. Sizes are points at the 390 x 844 reference screen (1pt = 1 CSS px). Every state follows the States table.'];
   if (ctx.app) out.push('These are the generic kit rows: this brief was built without a page to render the style\'s UI kit in, so the measured rows are missing (copy the brief from the app to get them).');
   if (ctx.swift) out.push('Native rows: use the system control and only tint it (accent, track, label font); keep its size, motion and behaviour. Custom rows: draw them exactly as described.');
-  UI_KIT.forEach(g => {
+  aibKitGroups(ctx).forEach(g => {
     const rows = g.items.map(it => {
       const d = data[it.id] || ['--canvas', '--ink', 'none', ' '];
       const cells = d.map((c, i) => ctx.tok(i < 3 ? aibKitDark(ctx, c) : c));

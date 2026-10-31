@@ -297,3 +297,142 @@
 .ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-row-inline .ab-fit { display: inline-flex; align-items: center; min-height: 24px; padding: 0 8px; box-shadow: inset 0 0 0 2px var(--ab-ink); font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; font-size: var(--k-caption, 12px); }
 .ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-row-inline .ab-fit[data-fit="match"] { background: var(--ab-ink); color: var(--ab-canvas); }
 .ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-ico { border-radius: 0; background: transparent; color: var(--ab-ink); box-shadow: inset 0 0 0 2px var(--ab-ink); }
+
+/* UI kit: NN/g glossary components
+   The poster language on the glossary set: every surface is a square with a 2px ink edge and no shadow; the
+   circle is the one round form (FAB, selected day, lightbox arrows, spinner, pie, skeleton avatar); selected =
+   primary flood, pressed / open = ink flood; type is heavy tracked caps on every action and label. Flat planes
+   only (no blur, glow or gradient); the spinner turns in quarter steps. */
+/* shared pieces */
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-ph { border: 2px solid var(--ab-ink); border-radius: 0; background: var(--ab-pri-tint); color: var(--ab-ink); box-shadow: none; }
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-scrim { background: color-mix(in srgb, var(--ab-ink) 62%, transparent); border-radius: 0; }
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-pop-arrow { border-radius: 0; box-shadow: none; }
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-cmdmenu li { font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; font-size: var(--k-subhead, 15px); }
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-cmdmenu li:hover { background: var(--ab-accent); color: var(--ab-on-accent); }
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-cmdmenu li:hover .sb-ico { color: var(--ab-on-accent); }
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-cmdmenu li.is-open { background: var(--ab-ink); color: var(--ab-canvas); }
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-cmdmenu li.is-open .sb-ico { color: var(--ab-canvas); }
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-cmdmenu li.is-danger { color: var(--sb-danger-text, var(--sb-danger)); box-shadow: inset 6px 0 0 var(--sb-danger); }
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-cmdmenu li.is-danger .sb-ico { color: inherit; }
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-cmdmenu li.sb-k-menu-sep { min-height: 0; height: 4px; padding: 0; background: var(--ab-ink); box-shadow: none; }
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-cmdmenu li.sb-k-menu-sep:hover { background: var(--ab-ink); }
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-kbd { padding: 0 6px; border: 2px solid currentColor; border-radius: 0; background: transparent; font-weight: 800; letter-spacing: 0.06em; text-transform: none; color: inherit; box-shadow: none; }
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-listbox li { font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; font-size: var(--k-subhead, 15px); }
+/* buttons and links */
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-split-main, .ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-split-more { border: 2px solid var(--ab-ink); border-radius: 0; box-shadow: none; }
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-split-main { padding-left: 10px; padding-right: 6px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.04em; font-size: 0.92em; }
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-split-more { background: var(--ab-ink); color: var(--ab-canvas); }
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-splitwrap > .sb-k-menu { box-sizing: border-box; }
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-split-more.sb-k-pressed, .ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-split-more[aria-expanded="true"] { background: var(--ab-primary); color: var(--ab-on-primary); }
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-fab { border: 2px solid var(--ab-ink); border-radius: 50%; background: var(--ab-primary); color: var(--ab-on-primary); box-shadow: none; }
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-fab.sb-k-pressed { background: var(--ab-ink); color: var(--ab-canvas); transform: translate(2px, 2px); }
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-link { color: var(--ab-ink); font-weight: 800; text-decoration: underline; text-decoration-thickness: 3px; text-underline-offset: 4px; }
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-link.sb-k-pressed { background: var(--ab-ink); color: var(--ab-canvas); text-decoration: none; }
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-link.sb-k-focus { outline: 3px solid var(--ab-ink); outline-offset: 2px; }
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-icon { padding: 10px 12px; border: 2px solid var(--ab-ink); border-radius: 0; background: var(--ab-canvas); }
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-icon svg { color: var(--ab-ink); }
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-icon span { font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; font-size: var(--k-caption, 12px); color: var(--ab-ink); }
+/* inputs */
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-combo-in { border-radius: 0; }
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit mark.sb-k-match { background: var(--ab-accent); color: var(--ab-on-accent); font-weight: 800; }
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-stepper { border: 2px solid var(--ab-ink); border-radius: 0; background: var(--ab-canvas); box-shadow: none; }
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-step { border: 0; border-radius: 0; background: transparent; color: var(--ab-ink); }
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-step:active { background: var(--ab-ink); color: var(--ab-canvas); }
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-step:disabled { background: transparent; color: var(--ab-ink); opacity: 0.35; }
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-step-val { border-left: 2px solid var(--ab-ink); border-right: 2px solid var(--ab-ink); font-weight: 800; letter-spacing: 0.08em; font-variant-numeric: tabular-nums; }
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-knob-dial { border: 2px solid var(--ab-ink); border-radius: 50%; background: var(--ab-canvas); box-shadow: none; }
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-knob-ind { border-radius: 0; background: var(--ab-primary); }
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-knob-val { font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; color: var(--ab-ink); }
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-date-ico { color: var(--ab-ink); }
+/* calendar and wheels */
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-cal { border: 2px solid var(--ab-ink); border-radius: 0; background: var(--ab-canvas); box-shadow: none; }
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-cal-head { border-bottom: 2px solid var(--ab-ink); font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; }
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-cal-head .sb-k-plain:active { background: var(--ab-ink); color: var(--ab-canvas); }
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-cal-dow { font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; color: var(--ab-ink); }
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-day { border: 0; border-radius: 0; font-weight: 700; }
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-day.is-out { opacity: 0.35; }
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-day.is-today { box-shadow: inset 0 0 0 2px var(--ab-ink); }
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-day.is-range { background: var(--ab-pri-tint); color: var(--ab-ink); }
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-day.is-sel, .ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-day.is-start, .ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-day.is-end { background: var(--ab-primary); color: var(--ab-on-primary); font-weight: 800; border-radius: 50%; box-shadow: none; }
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-wheel { border: 2px solid var(--ab-ink); border-radius: 0; background: var(--ab-canvas); }
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-wheel-col + .sb-k-wheel-col { border-left: 2px solid var(--ab-ink); }
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-wheel-item { font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--k-muted); }
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-wheel-item.is-sel { font-weight: 800; color: var(--ab-ink); }
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-wheel-band { border: solid var(--ab-ink); border-width: 2px 0; border-radius: 0; background: color-mix(in srgb, var(--ab-accent) 30%, transparent); }
+/* disclosure and collections */
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-acc { border: 2px solid var(--ab-ink); border-radius: 0; background: var(--ab-canvas); }
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-acc + .sb-k-acc { border-top: 0; }
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-acc-sum { font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; }
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-acc[open] > .sb-k-acc-sum { background: var(--ab-ink); color: var(--ab-canvas); }
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-acc-body { border-top: 2px solid var(--ab-ink); }
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-car-card { border: 2px solid var(--ab-ink); border-radius: 0; background: var(--ab-canvas); box-shadow: none; }
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-dots i { width: 8px; height: 8px; border-radius: 50%; background: transparent; box-shadow: inset 0 0 0 2px var(--ab-ink); }
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-dots i.is-on { background: var(--ab-ink); }
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-mx-tile { border: 2px solid var(--ab-ink); border-radius: 0; }
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-mx-row > :first-child:not(.sb-k-mx-track) { font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; }
+/* overlays */
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-overlaybox { border: 2px solid var(--ab-ink); border-radius: 0; }
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-dialog { border: 2px solid var(--ab-ink); border-top: 8px solid var(--ab-primary); border-radius: 0; background: var(--ab-canvas); box-shadow: none; }
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-dialog-t { font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; }
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-side { border-left: 4px solid var(--ab-ink); border-radius: 0; background: var(--ab-canvas); box-shadow: none; }
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-drawer { border-right: 4px solid var(--ab-ink); border-radius: 0; background: var(--ab-canvas); box-shadow: none; }
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-pop { border: 2px solid var(--ab-ink); border-radius: 0; background: var(--ab-canvas); box-shadow: none; }
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-tip { border: 2px solid var(--ab-ink); border-radius: 0; background: var(--ab-accent); color: var(--ab-on-accent); box-shadow: none; }
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-tip .sb-k-textbtn { color: inherit; text-decoration: underline; text-decoration-thickness: 3px; text-underline-offset: 4px; }
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-tooltip { border-radius: 0; background: var(--ab-ink); color: var(--ab-canvas); font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; box-shadow: none; }
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-lightbox { border: 2px solid var(--ab-ink); border-radius: 0; background: var(--ab-canvas); }
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-lb-img { border: 0; border-radius: 0; }
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit :is(.sb-k-lb-close, .sb-k-lb-prev, .sb-k-lb-next) { border: 2px solid var(--ab-ink); border-radius: 50%; background: var(--ab-canvas); color: var(--ab-ink); box-shadow: none; }
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit :is(.sb-k-lb-close, .sb-k-lb-prev, .sb-k-lb-next):active { background: var(--ab-ink); color: var(--ab-canvas); }
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-lb-cap { background: var(--ab-ink); color: var(--ab-canvas); font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; }
+/* navigation */
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-navbar { border-bottom: 4px solid var(--ab-ink); border-radius: 0; background: var(--ab-canvas); box-shadow: none; }
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-nb-links a { font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; color: var(--ab-ink); }
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-nb-links a[aria-current] { box-shadow: inset 0 -6px 0 var(--ab-ink); }
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-navmenu { border: 2px solid var(--ab-ink); border-radius: 0; background: var(--ab-canvas); }
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-nm-item { border-radius: 0; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; }
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-nm-item + .sb-k-nm-item { border-top: 2px solid var(--ab-ink); }
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-nm-item[aria-current="page"] { background: var(--ab-primary); color: var(--ab-on-primary); }
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-drawer .sb-k-navmenu { border: 0; }
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-nm-children { border-left: 8px solid var(--ab-accent); }
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-nm-children .sb-k-nm-item { font-weight: 700; text-transform: none; letter-spacing: 0.02em; }
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-crumbs ol { font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; }
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-crumbs a { color: var(--ab-ink); text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 4px; }
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-crumbs [aria-current="page"] { padding: 2px 8px; background: var(--ab-ink); color: var(--ab-canvas); }
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-crumb-sep { color: var(--ab-ink); font-weight: 800; }
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-anchors { border-left: 2px solid var(--ab-ink); }
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-anchors a { font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--ab-ink); }
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-anchors a.is-on { background: var(--ab-ink); color: var(--ab-canvas); font-weight: 800; }
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-backtop { border: 2px solid var(--ab-ink); border-radius: 50%; background: var(--ab-ink); color: var(--ab-canvas); box-shadow: none; }
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-backtop.sb-k-pressed { background: var(--ab-primary); color: var(--ab-on-primary); transform: translate(2px, 2px); }
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-scrollbox { border: 2px solid var(--ab-ink); border-radius: 0; }
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-sbar { border: 2px solid var(--ab-ink); border-radius: 0; background: transparent; }
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-sbar-thumb { border-radius: 0; background: var(--ab-ink); }
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-mega-panel { border: 2px solid var(--ab-ink); border-radius: 0; background: var(--ab-canvas); box-shadow: none; }
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-mega-col + .sb-k-mega-col { border-left: 2px solid var(--ab-ink); padding-left: 12px; }
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-mega-col a { font-weight: 700; color: var(--ab-ink); text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 4px; }
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-menubar { border: 2px solid var(--ab-ink); border-radius: 0; background: var(--ab-canvas); }
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-menubar button { border: 0; border-radius: 0; background: transparent; color: var(--ab-ink); font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; }
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-menubar button + button { border-left: 2px solid var(--ab-ink); }
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-menubar button[aria-expanded="true"] { background: var(--ab-ink); color: var(--ab-canvas); }
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-ribbon { border: 2px solid var(--ab-ink); border-radius: 0; background: var(--ab-canvas); }
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-rb-group + .sb-k-rb-group { border-left: 2px solid var(--ab-ink); }
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-rb-btn { border: 0; border-radius: 0; background: transparent; color: var(--ab-ink); }
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-rb-btn:active { background: var(--ab-ink); color: var(--ab-canvas); }
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-rb-label { font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; font-size: var(--k-caption, 12px); }
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-pie { border-radius: 50%; box-shadow: inset 0 0 0 2px var(--ab-ink); }
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-pie-hub { border-radius: 50%; background: var(--ab-ink); color: var(--ab-canvas); }
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-pie-item { border: 2px solid var(--ab-ink); border-radius: 50%; background: var(--ab-canvas); color: var(--ab-ink); box-shadow: none; }
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-pie-item.is-on { background: var(--ab-primary); color: var(--ab-on-primary); }
+/* loading */
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-spin { border: 4px solid var(--ab-ink); border-top-color: var(--ab-primary); border-radius: 50%; background: transparent; animation: sbk-bau-spin 1s steps(4) infinite; }
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-spinner { font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; }
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-skel-av { border-radius: 50%; background: color-mix(in srgb, var(--ab-ink) 16%, var(--ab-canvas)); box-shadow: inset 0 0 0 2px var(--ab-ink); }
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-skel-line { border-radius: 0; background: color-mix(in srgb, var(--ab-ink) 16%, var(--ab-canvas)); }
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-skel-block { border-radius: 0; background: color-mix(in srgb, var(--ab-ink) 16%, var(--ab-canvas)); }
+@keyframes sbk-bau-spin { to { transform: rotate(360deg); } }
+/* keyboard focus: a 3px ink ring, like the poster's other controls */
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit :is(.sb-k-split-more, .sb-k-fab, .sb-k-backtop, .sb-k-step, .sb-k-day, .sb-k-lb-close, .sb-k-lb-prev, .sb-k-lb-next, .sb-k-plain, .sb-k-nm-item, .sb-k-nb-links a, .sb-k-crumbs a, .sb-k-anchors a, .sb-k-menubar button, .sb-k-rb-btn, .sb-k-pie-item, .sb-k-acc-sum, .sb-k-link, .sb-k-mega-col a):focus-visible { outline: 3px solid var(--ab-ink); outline-offset: 2px; }
+@media (prefers-reduced-motion: reduce) {
+  .ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-spin { animation: none; }
+}

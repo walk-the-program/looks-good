@@ -435,6 +435,20 @@
     warn: '<path d="M12 3.5 21.5 20h-19z"/><path d="M12 10v4.5M12 17.2v.2"/>',
     err: '<circle cx="12" cy="12" r="9"/><path d="m9 9 6 6M15 9l-6 6"/>',
     inbox: '<path d="M3.5 13.5 6 5h12l2.5 8.5V19h-17z"/><path d="M3.5 13.5H9a3 3 0 0 0 6 0h5.5"/>',
+    calendar: '<rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4"/>',
+    image: '<rect x="3.5" y="4.5" width="17" height="15" rx="2.5"/><circle cx="9" cy="10" r="1.6"/><path d="m4 17.5 5-4.5 4 3.5 3-2.5 4 3.5"/>',
+    close: '<path d="m6 6 12 12M18 6 6 18"/>',
+    up: '<path d="m6 14.5 6-6 6 6"/>',
+    menu: '<path d="M4 7h16M4 12h16M4 17h16"/>',
+    minus: '<path d="M5 12h14"/>',
+    edit: '<path d="m4.5 19.5 1-4.2 9.8-9.8a1.8 1.8 0 0 1 2.5 0l.7.7a1.8 1.8 0 0 1 0 2.5l-9.8 9.8z"/><path d="m13.5 7.5 3 3"/>',
+    copy: '<rect x="8.5" y="8.5" width="11" height="11" rx="2"/><path d="M15.5 8.5V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v7.5a2 2 0 0 0 2 2h2.5"/>',
+    share: '<path d="M12 15V4M8 7.5l4-4 4 4"/><path d="M6 11h-.5A1.5 1.5 0 0 0 4 12.5v6A1.5 1.5 0 0 0 5.5 20h13a1.5 1.5 0 0 0 1.5-1.5v-6a1.5 1.5 0 0 0-1.5-1.5H18"/>',
+    trash: '<path d="M4.5 7h15M9.5 7V4.5h5V7M6.5 7l.8 12.5h9.4L17.5 7M10 11v5M14 11v5"/>',
+    star: '<path d="m12 4 2.4 5 5.4.7-4 3.8 1 5.4-4.8-2.7-4.8 2.7 1-5.4-4-3.8 5.4-.7z"/>',
+    folder: '<path d="M3.5 7v11A1.5 1.5 0 0 0 5 19.5h14a1.5 1.5 0 0 0 1.5-1.5V9.5A1.5 1.5 0 0 0 19 8h-7L10 5.5H5A1.5 1.5 0 0 0 3.5 7z"/>',
+    bold: '<path d="M7 4.5h5.5a3.5 3.5 0 0 1 0 7H7zM7 11.5h6.5a3.5 3.5 0 0 1 0 7H7z"/>',
+    italic: '<path d="M10 4.5h8M6 19.5h8M14.5 4.5 9.5 19.5"/>',
   };
   const icon = (k, size = 18) => `<svg class="sb-ico" data-i="${k}" width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">${ICO[k] || ''}</svg>`;
   const NAV_ICONS = ['home', 'list', 'users', 'box', 'chart'];
@@ -776,6 +790,40 @@
   const kPlain = (k, label) => `<button type="button" class="sb-k-plain" aria-label="${e(label)}">${icon(k, 22)}</button>`;
   const kTopbar = (lead, title, trail) => `<div class="sb-k-topbar">${lead || '<span></span>'}<span class="sb-k-tb-title">${title || ''}</span>${trail || '<span></span>'}</div>`;
 
+  // Pieces the new components share. Links and nav items are role="link" with no href: static demos that go nowhere.
+  const kLink = (label, st) => `<a role="link" tabindex="0" class="sb-k-link${st === 'pressed' ? ' is-pressed sb-k-pressed' : ''}${st === 'focus' ? ' is-focus sb-k-focus' : ''}">${e(label)}</a>`;
+  const kPh = (size = 28) => `<div class="sb-k-ph" aria-hidden="true">${icon('image', size)}</div>`;
+  const kName = r => String(r[0]).split(' · ')[0];
+  const kPlainAs = (k, label, cls) => kPlain(k, label).replace('class="sb-k-plain"', `class="sb-k-plain ${cls}"`);
+  const kIconBtn = (cls, k, label, st) => kBtn(`ab-type-apply sb-icon-btn sb-k-iconbtn ${cls}`, icon(k, 20), st).replace('<button', `<button aria-label="${e(label)}"`);
+  // A command menu: icon, label, then a shortcut or a submenu chevron. '-' is a separator; on = the highlighted item.
+  const kMenu = (items, cls = '') => `<ul class="sb-k-menu sb-k-cmdmenu${cls ? ' ' + cls : ''}" role="menu">${items.map(it => {
+    if (it === '-') return '<li class="sb-k-menu-sep" role="separator"></li>';
+    const c = [it.danger && 'is-danger', it.sub && 'has-sub', it.open && 'is-open'].filter(Boolean).join(' ');
+    return `<li role="menuitem"${c ? ` class="${c}"` : ''}${it.on || it.open ? ' aria-selected="true"' : ''}${it.sub ? ' aria-haspopup="menu"' : ''}>${it.ico ? icon(it.ico, 18) : ''}<span>${e(it.t)}</span>${it.key ? `<span class="sb-k-kbd">${e(it.key)}</span>` : it.sub ? icon('chev', 16) : ''}</li>`;
+  }).join('')}</ul>`;
+  const MENU_ACTIONS = [{ t: 'Edit', ico: 'edit', on: 1 }, { t: 'Duplicate', ico: 'copy' }, { t: 'Share', ico: 'share' }, '-', { t: 'Delete', ico: 'trash', danger: 1 }];
+  // A nav item is a kit row drawn as a link; the current one is picked and ticked.
+  const kNavItem = (r, cur) => kRow(r).replace('<li class="ab-row', `<a role="link"${cur ? ' aria-current="page"' : ''} class="sb-k-nm-item ab-row`).replace(/<\/li>\s*$/, '</a>');
+  const kNavItems = X => X.D.nav.slice(0, 4).map((t, i) => kNavItem({ lead: kIco(NAV_ICONS[i] || 'list'), title: t, picked: i === 0, trail: i === 0 ? icon('check', 16) : '' }, i === 0));
+  const kNavbar = (X, links, o = {}) => `<nav class="sb-k-navbar" aria-label="${e(X.name)}"><span class="ab-brand sb-k-tb-brand">${brandMark(X)}</span><div class="sb-k-nb-links">${links.map((t, i) => `<a role="link" tabindex="0"${i === 0 ? ` aria-current="page"${o.open ? ' aria-expanded="true"' : ''}` : ''}>${e(t)}</a>`).join('')}</div>${o.cta ? kBtn('ab-cta sb-k-btn sb-k-auto sb-k-nb-cta', ctaInner(o.cta)) : ''}</nav>`;
+  // The screen a modal sits over, so its dimmed layer has something to dim.
+  const kUnder = (X, bar) => `<div class="sb-k-under" aria-hidden="true" inert>${bar || ''}${kList(X.D.mobile.rows.map(r => kProject(r)))}</div>`;
+  const kWheel = (label, cols) => `<div class="sb-k-wheel" role="group" aria-label="${e(label)}">${cols.map(([name, vals]) => `<div class="sb-k-wheel-col" role="listbox" aria-label="${e(name)}">${vals.map((v, i) => `<span class="sb-k-wheel-item is-d${Math.abs(i - 2)}${i === 2 ? ' is-sel' : ''}" role="option" aria-selected="${i === 2}">${e(v)}</span>`).join('')}</div>`).join('')}<i class="sb-k-wheel-band" aria-hidden="true"></i></div>`;
+  // November 2026 (the 1st is a Sunday), Monday first: single = the 18th; range = the 12th to the 18th; the 9th is today.
+  const kCal = st => {
+    const days = [];
+    for (let d = 26; d <= 31; d++) days.push([d, 1]);
+    for (let d = 1; d <= 30; d++) days.push([d, 0]);
+    for (let d = 1; d <= 6; d++) days.push([d, 1]);
+    const range = st === 'range';
+    return `<div class="sb-k-cal"><div class="sb-k-cal-head">${kPlain('back', 'Previous month')}<span class="sb-k-cal-t">November 2026</span>${kPlain('chev', 'Next month')}</div><div class="sb-k-cal-grid" role="grid">${'MTWTFSS'.split('').map(d => `<span class="sb-k-cal-dow" aria-hidden="true">${d}</span>`).join('')}${days.map(([d, out]) => {
+      const sel = !out && (range ? d === 12 || d === 18 : d === 18);
+      const c = out ? 'is-out' : [d === 9 && 'is-today', sel && 'is-sel', range && d >= 12 && d <= 18 && 'is-range', range && d === 12 && 'is-start', range && d === 18 && 'is-end'].filter(Boolean).join(' ');
+      return `<button type="button" class="sb-k-day${c ? ' ' + c : ''}" tabindex="-1"${out ? ' aria-hidden="true"' : ` aria-label="November ${d}"${sel ? ' aria-pressed="true"' : ''}`}>${d}</button>`;
+    }).join('')}</div></div>`;
+  };
+
   const KIT_SPEC = {
     'btn-primary': (X, st) => kBtn('ab-cta sb-k-btn', ctaInner('Continue'), st),
     'btn-secondary': (X, st) => kBtn('ab-type-apply sb-k-btn2', 'Not now', st),
@@ -831,9 +879,102 @@
       const ini = n => n.split(' ').map(w => w[0]).join('');
       return `<div class="sb-k-row-inline">${kAv(ini(ppl[0]), 's')}${kAv(ini(ppl[1]))}${kAv(ini(ppl[2]), 'l')}<span class="sb-k-avs">${ppl.map(p => kAv(ini(p), 's')).join('')}</span></div>`;
     },
+
+    /* ---- Actions ---- */
+    'btn-split': (X, st) => `<div class="sb-k-splitwrap"><div class="sb-k-split">${kBtn('ab-cta sb-k-btn sb-k-split-main', `<span class="ab-cta-label">${e(X.D.mobile.cta[0])}</span>`)}${kBtn('ab-cta sb-k-split-more', icon('down', 20)).replace('<button', `<button aria-label="More actions" aria-haspopup="menu" aria-expanded="${st === 'open'}"`)}</div>${st === 'open' ? kMenu([{ t: 'Save as draft', ico: 'edit', on: 1 }, { t: 'Duplicate', ico: 'copy' }, { t: 'Share', ico: 'share' }]) : ''}</div>`,
+    fab: (X, st) => `<div class="sb-k-fabbox">${kList(X.D.mobile.rows.slice(0, 2).map(r => kProject(r)))}${kBtn('ab-cta sb-k-fab', icon('plus', 24), st).replace('<button', `<button aria-label="${e(X.D.action[0])}"`)}</div>`,
+    link: (X, st) => `<p class="sb-k-para">By continuing you accept the ${kLink('terms of use', st)}.</p>`,
+    icon: () => `<div class="sb-k-icons">${[['search', 20, 'Search · 20'], ['home', 24, 'Home · 24'], ['gear', 28, 'Settings · 28']].map(([k, s, t]) => `<span class="sb-k-icon">${icon(k, s)}<span>${t}</span></span>`).join('')}</div>`,
+
+    /* ---- Inputs ---- */
+    combo: (X, st) => {
+      const id = `${X.uid}-kc${++seq}`, open = st === 'open';
+      const hits = ['Maya Ortiz', 'Mara Lindqvist', 'Marcus Webb'];
+      return `<div class="sb-field sb-k-field sb-k-combo is-${open ? 'focus' : 'rest'}"><label class="ab-fieldlabel" for="${id}">Assign to</label><input class="ab-input sb-k-combo-in" id="${id}" type="text" role="combobox" aria-autocomplete="list" aria-expanded="${open}" value="${open ? 'Ma' : ''}" placeholder="Type a name" autocomplete="off" spellcheck="false" />${open ? `<ul class="sb-k-menu" role="listbox">${hits.map((n, i) => `<li role="option" aria-selected="${i === 0}"><span><mark class="sb-k-match">${e(n.slice(0, 2))}</mark>${e(n.slice(2))}</span></li>`).join('')}</ul>` : ''}</div>`;
+    },
+    listbox: (X, st) => {
+      const multi = st === 'multiple', on = multi ? [0, 2] : [0];
+      return `<ul class="sb-k-menu sb-k-listbox" role="listbox"${multi ? ' aria-multiselectable="true"' : ''} aria-label="${e(X.D.mobile.listTitle)}">${X.D.mobile.rows.map((r, i) => `<li role="option" aria-selected="${on.includes(i)}">${multi ? `<input class="sb-k-box" type="checkbox" tabindex="-1" aria-hidden="true"${on.includes(i) ? ' checked' : ''} />` : ''}<span>${e(kName(r))}</span>${!multi && on.includes(i) ? icon('check', 18) : ''}</li>`).join('')}</ul>`;
+    },
+    stepper: (X, st) => `<div class="sb-k-stepwrap"><span class="sb-k-step-l">Quantity</span><div class="sb-k-stepper">${kIconBtn('sb-k-step', 'minus', 'Decrease', st === 'minimum' ? 'disabled' : '')}<output class="sb-k-step-val" aria-live="polite">${st === 'minimum' ? 0 : 2}</output>${kIconBtn('sb-k-step', 'plus', 'Increase')}</div></div>`,
+    knob: () => `<div class="sb-k-knobwrap"><div class="sb-k-knob" role="slider" aria-label="Gain" aria-valuemin="0" aria-valuemax="100" aria-valuenow="65" style="--v:0.65"><span class="sb-k-knob-arc"></span><span class="sb-k-knob-dial"><i class="sb-k-knob-ind"></i></span></div><div class="sb-k-knob-txt"><b>Gain</b><span class="sb-k-knob-val">65%</span></div></div>`,
+
+    /* ---- Pickers ---- */
+    'date-field': (X, st) => {
+      const id = `${X.uid}-kd${++seq}`;
+      return `<div class="sb-field sb-k-field sb-k-datefield is-${st}"><label class="ab-fieldlabel" for="${id}">Due date</label><input class="ab-input" id="${id}" type="text" value="Nov 14, 2026" aria-haspopup="dialog" autocomplete="off" spellcheck="false" readonly /><span class="sb-k-date-ico">${icon('calendar', 20)}</span></div>`;
+    },
+    calendar: (X, st) => kCal(st),
+    wheel: () => kWheel('Time', [['Hour', ['7', '8', '9', '10', '11']], ['Minute', ['10', '20', '30', '40', '50']]]),
+    'wheel-date': () => kWheel('Date', [['Month', ['Sep', 'Oct', 'Nov', 'Dec', 'Jan']], ['Day', ['12', '13', '14', '15', '16']], ['Year', ['2024', '2025', '2026', '2027', '2028']]]),
+
+    /* ---- Containers ---- */
+    accordion: (X, st) => `<div class="ab-list sb-k-list sb-k-accordion">${X.D.mobile.rows.map((r, i) => `<details class="sb-k-acc"${st === 'open' && i === 0 ? ' open' : ''}><summary class="ab-row sb-k-row is-nolead sb-k-acc-sum"><span class="sb-k-text"><span class="sb-k-title">${e(kName(r))}</span></span><span class="sb-k-trail"><span class="sb-k-chev sb-k-acc-chev">${icon('down', 16)}</span></span></summary><p class="sb-k-acc-body">${e(r[1])} · ${r[2]}% complete. Open it to see who is on it and what comes next.</p></details>`).join('')}</div>`,
+    carousel: (X) => `<div class="sb-k-carousel"><div class="sb-k-car-track" role="group" aria-roledescription="carousel" aria-label="${e(X.D.mobile.listTitle)}" tabindex="0">${X.D.mobile.rows.map(r => `<div class="ab-card sb-k-card sb-k-car-card"${win(kName(r))}>${kPh()}<h3 class="ab-card-title">${e(kName(r))}</h3><p class="ab-card-body">${e(r[1])} · ${r[2]}%</p></div>`).join('')}</div><div class="sb-k-dots" aria-hidden="true"><i class="is-on"></i><i></i><i></i></div></div>`,
+    matrix: (X) => {
+      const a = X.D.mobile.rows.map(kName), b = X.D.rows.map(kName);
+      const row = (label, names) => `<div class="sb-k-mx-row">${kSection(label, 'See all').replace('sb-k-section"', 'sb-k-section sb-k-mx-label"')}<div class="sb-k-mx-track">${names.map(n => `<div class="sb-k-mx-tile">${kPh()}<span>${e(n)}</span></div>`).join('')}</div></div>`;
+      return `<div class="sb-k-matrix">${row(X.D.mobile.listTitle, a.concat(b))}${row(X.D.mobile.seg[0], b.concat(a))}</div>`;
+    },
+
+    /* ---- Overlays ---- */
+    overlay: (X) => `<div class="sb-k-overlaybox">${kUnder(X, kTopbar('', e(X.D.mobile.listTitle), ''))}<i class="sb-k-scrim" aria-hidden="true"></i><div class="sb-k-toast sb-k-scrimnote" role="note"><span>Tap the dimmed area to close</span></div></div>`,
+    dialog: (X) => {
+      const id = `${X.uid}-kdl${++seq}`;
+      return `<div class="sb-k-sheetbox sb-k-dialogbox is-under">${kUnder(X)}<div class="ab-card sb-k-card sb-k-dialog" role="dialog" aria-modal="true" aria-labelledby="${id}"${win('Delete this item')}><h3 class="ab-card-title sb-k-dialog-t" id="${id}">Delete this item?</h3><p class="ab-card-body sb-k-dialog-b">It is removed for everyone and cannot be recovered.</p><div class="sb-k-dialog-a">${kBtn('ab-type-apply sb-k-btn2', 'Cancel')}${kBtn('sb-k-danger', 'Delete')}</div></div></div>`;
+    },
+    'side-sheet': (X) => `<div class="sb-k-sheetbox sb-k-sidebox is-under">${kUnder(X)}<aside class="sb-k-side" role="dialog" aria-label="Filters"><div class="sb-k-side-h"><h3 class="ab-card-title sb-k-sheet-t">Filters</h3>${kPlain('close', 'Close')}</div>${kSection('Status', '')}${[...new Set(X.D.mobile.rows.map(r => r[1]))].map((s, i) => `<label class="sb-k-check"><input class="sb-k-box" type="checkbox"${i === 0 ? ' checked' : ''} /><span>${e(s)}</span></label>`).join('')}<div class="sb-k-sheet-a">${kBtn('ab-cta sb-k-btn', ctaInner('Apply'))}${kBtn('ab-type-apply sb-k-btn2', 'Reset')}</div></aside></div>`,
+    popover: (X) => `<div class="sb-k-popbox">${kBtn('ab-type-apply sb-k-btn2 sb-k-auto', icon('share', 18) + '<span>Share</span>').replace('<button', '<button aria-haspopup="dialog" aria-expanded="true"')}<div class="ab-card sb-k-card sb-k-pop" role="dialog" aria-label="Share"${win('Share link')}><i class="sb-k-pop-arrow" aria-hidden="true"></i><h3 class="ab-card-title">Share link</h3><p class="ab-card-body">Anyone with the link can view. Only you can edit.</p>${kBtn('sb-k-textbtn', 'Copy link')}</div></div>`,
+    'popup-tip': (X) => `<div class="sb-k-popbox is-end">${kIconBtn('sb-k-tip-target', 'plus', X.D.action[0])}<div class="ab-card sb-k-card sb-k-pop sb-k-tip" role="dialog" aria-label="Tip"${win('Tip')}><i class="sb-k-pop-arrow" aria-hidden="true"></i><h3 class="ab-card-title sb-k-tip-t">Start here</h3><p class="ab-card-body sb-k-tip-b">Tap plus to ${e(X.D.action[0].toLowerCase())}. You can change it later.</p>${kBtn('sb-k-textbtn', 'Got it')}</div></div>`,
+    tooltip: (X) => {
+      const id = `${X.uid}-ktt${++seq}`;
+      return `<div class="sb-k-popbox is-tooltip">${kIconBtn('', 'bell', 'Notifications').replace('<button', `<button aria-describedby="${id}"`)}<div class="sb-k-tooltip" role="tooltip" id="${id}">Notifications<i class="sb-k-pop-arrow is-down" aria-hidden="true"></i></div></div>`;
+    },
+    lightbox: () => `<div class="sb-k-lightbox" role="dialog" aria-label="Image 3 of 12"><div class="sb-k-lb-img sb-k-ph" aria-hidden="true">${icon('image', 40)}</div>${kPlainAs('close', 'Close', 'sb-k-lb-close')}${kPlainAs('back', 'Previous image', 'sb-k-lb-prev')}${kPlainAs('chev', 'Next image', 'sb-k-lb-next')}<p class="sb-k-lb-cap">3 of 12</p></div>`,
+
+    /* ---- Navigation ---- */
+    navbar: (X) => kNavbar(X, ['Features', 'Pricing', 'About'], { cta: X.D.landing.cta[0] }),
+    'nav-menu': (X) => `<nav class="ab-list sb-k-list sb-k-navmenu" aria-label="Sections">${kNavItems(X).join('')}</nav>`,
+    drawer: (X) => `<div class="sb-k-sheetbox sb-k-drawerbox is-under">${kUnder(X, kTopbar(kPlain('menu', 'Menu'), e(X.D.mobile.listTitle), ''))}<aside class="sb-k-drawer" role="dialog" aria-label="Menu"><span class="ab-brand sb-k-tb-brand">${brandMark(X)}</span><nav class="ab-list sb-k-list sb-k-navmenu" aria-label="Sections">${kNavItems(X).join('')}</nav></aside></div>`,
+    breadcrumbs: (X) => `<nav class="sb-k-crumbs" aria-label="Breadcrumb"><ol>${[['Home'], [X.D.nav[1]], [kName(X.D.mobile.rows[0]), 1]].map(([t, cur]) => `<li>${cur ? `<span aria-current="page">${e(t)}</span>` : `${kLink(t)}<span class="sb-k-crumb-sep" aria-hidden="true">${icon('chev', 14)}</span>`}</li>`).join('')}</ol></nav>`,
+    anchor: (X) => `<nav class="sb-k-anchors" aria-label="On this page"><p class="ab-label sb-k-anchors-label">On this page</p>${X.D.landing.features.map(f => f[0]).concat('Pricing').map((t, i) => `<a role="link" tabindex="0"${i === 1 ? ' class="is-on" aria-current="location"' : ''}>${e(t)}</a>`).join('')}</nav>`,
+    'back-top': (X) => `<div class="sb-k-fabbox">${kList(X.D.mobile.rows.slice(0, 2).map(r => kProject(r)))}${kBtn('ab-type-apply sb-k-btn2 sb-k-auto sb-k-backtop', icon('up', 18) + '<span>Back to top</span>')}</div>`,
+    scrollbar: (X) => {
+      const id = `${X.uid}-ksb${++seq}`;
+      return `<div class="sb-k-scroll"><div class="sb-k-scrollbox" id="${id}">${kList(X.D.mobile.rows.concat(X.D.rows).map(r => kProject(r)))}</div><div class="sb-k-sbar" role="scrollbar" aria-orientation="vertical" aria-controls="${id}" aria-valuemin="0" aria-valuemax="100" aria-valuenow="20"><i class="sb-k-sbar-thumb" style="--t:20%;--h:42%"></i></div></div>`;
+    },
+
+    /* ---- Menus ---- */
+    'dropdown-menu': (X, st) => `<div class="sb-k-ddwrap">${kBtn('ab-type-apply sb-k-btn2 sb-k-dd', '<span>Actions</span>' + icon('down', 18)).replace('<button', `<button aria-haspopup="menu" aria-expanded="${st === 'open'}"`)}${st === 'open' ? kMenu(MENU_ACTIONS) : ''}</div>`,
+    'context-menu': (X) => `<div class="sb-k-ctxbox">${kList([kProject(X.D.mobile.rows[0], { picked: true })])}${kMenu([{ t: 'Open', ico: 'folder', on: 1 }, { t: 'Rename', ico: 'edit' }, { t: 'Duplicate', ico: 'copy' }, { t: 'Share', ico: 'share' }, '-', { t: 'Delete', ico: 'trash', danger: 1 }], 'sb-k-ctx')}</div>`,
+    submenu: () => `<div class="sb-k-subwrap">${kMenu([{ t: 'Edit', ico: 'edit' }, { t: 'Move to', ico: 'folder', sub: 1, open: 1 }, { t: 'Duplicate', ico: 'copy' }])}${kMenu([{ t: 'Inbox', on: 1 }, { t: 'Archive' }, { t: 'Drafts' }])}</div>`,
+    'expandable-menu': (X) => {
+      const M = X.D.mobile;
+      return `<nav class="ab-list sb-k-list sb-k-navmenu sb-k-expmenu" aria-label="Sections">${kNavItem({ lead: kIco('folder'), title: M.listTitle, trail: icon('down', 16) }).replace('<a ', '<a aria-expanded="true" ')}<div class="sb-k-nm-children">${M.rows.map((r, i) => kNavItem({ title: kName(r), picked: i === 0 }, i === 0)).join('')}</div>${kNavItem({ lead: kIco('inbox'), title: 'Inbox', trail: chev() })}${kNavItem({ lead: kIco('chart'), title: 'Reports', trail: chev() })}</nav>`;
+    },
+    megamenu: (X) => {
+      const cols = [['Explore', ['Overview', 'Pricing', 'Changelog']], ['Learn', ['Guides', 'Examples', 'Support']], ['Company', ['About', 'Careers', 'Contact']]];
+      return `<div class="sb-k-mega">${kNavbar(X, ['Explore', 'Learn', 'Company'], { open: 1 })}<div class="sb-k-menu sb-k-mega-panel">${cols.map(([h, ls]) => `<div class="sb-k-mega-col"><p class="ab-label">${h}</p>${ls.map(t => `<a role="link" tabindex="0">${t}</a>`).join('')}</div>`).join('')}</div></div>`;
+    },
+    menubar: (X, st) => `<div class="sb-k-mbwrap"><div class="sb-k-menubar" role="menubar" aria-label="Application">${['File', 'Edit', 'View', 'Help'].map((t, i) => `<button type="button" role="menuitem" aria-haspopup="menu" aria-expanded="${st === 'open' && i === 1}">${t}</button>`).join('')}</div>${st === 'open' ? kMenu([{ t: 'Undo', key: 'Ctrl+Z', on: 1 }, { t: 'Redo', key: 'Ctrl+Y' }, '-', { t: 'Cut', key: 'Ctrl+X' }, { t: 'Copy', key: 'Ctrl+C' }, { t: 'Paste', key: 'Ctrl+V' }]) : ''}</div>`,
+    ribbon: () => {
+      const groups = [['Edit', ['edit', 'copy', 'trash']], ['Text', ['bold', 'italic']], ['Insert', ['image', 'calendar', 'folder']]];
+      return `<div class="sb-k-ribbon"><div class="sb-k-tabs" role="tablist">${['Home', 'Insert', 'View'].map((t, i) => `<button type="button" role="tab" aria-selected="${i === 0}">${t}</button>`).join('')}</div><div class="sb-k-rb-groups" role="toolbar" aria-label="Home">${groups.map(([g, ks]) => `<div class="sb-k-rb-group">${ks.map(k => kIconBtn('sb-k-rb-btn', k, k[0].toUpperCase() + k.slice(1))).join('')}<span class="ab-label sb-k-rb-label">${g}</span></div>`).join('')}</div></div>`;
+    },
+    'pie-menu': () => {
+      const items = [['edit', 'Edit'], ['copy', 'Duplicate'], ['share', 'Share'], ['star', 'Favourite'], ['folder', 'Move'], ['trash', 'Delete']];
+      return `<div class="sb-k-piebox"><div class="sb-k-pie" role="menu" aria-label="Actions"><i class="sb-k-pie-hub" aria-hidden="true"></i>${items.map(([k, t], i) => {
+        const a = (-90 + i * 60) * Math.PI / 180;
+        return kIconBtn(`sb-k-pie-item${i === 0 ? ' is-on' : ''}`, k, t, i === 0 ? 'pressed' : '').replace('<button', `<button role="menuitem" style="left:calc(50% + ${(Math.cos(a) * 76).toFixed(1)}px);top:calc(50% + ${(Math.sin(a) * 76).toFixed(1)}px)"`);
+      }).join('')}</div></div>`;
+    },
+
+    /* ---- Feedback ---- */
+    spinner: () => `<div class="sb-k-spinner" role="status"><i class="sb-k-spin" aria-hidden="true"></i><span>Loading</span></div>`,
+    skeleton: () => `<div class="sb-k-skel" role="status" aria-busy="true" aria-label="Loading">${[0, 1, 2].map(() => `<div class="sb-k-skel-row"><i class="sb-k-skel-av"></i><span><i class="sb-k-skel-line is-l1"></i><i class="sb-k-skel-line is-l2"></i></span></div>`).join('')}<i class="sb-k-skel-block"></i></div>`,
   };
   // Components that read better across two grid columns.
-  const KIT_WIDE = new Set(['field', 'callout', 'list', 'sheet', 'tabbar', 'select']);
+  const KIT_WIDE = new Set(['field', 'callout', 'list', 'sheet', 'tabbar', 'select', 'calendar', 'wheel-date', 'carousel', 'matrix', 'dialog', 'side-sheet', 'drawer', 'navbar', 'megamenu', 'menubar', 'ribbon', 'lightbox', 'overlay', 'popover', 'popup-tip', 'skeleton', 'context-menu', 'submenu']);
   const KIT_ROLES = [
     ['canvas', 'Canvas', 'Screen background'], ['ink', 'Ink', 'Text and icons'],
     ['primary', 'Primary', 'The one main action, selected states'], ['secondary', 'Secondary', 'Supporting fills, avatars, tags'],
@@ -841,11 +982,12 @@
   ];
 
   // item.ios: 'native:<SwiftUI view>' (the system control, tinted) or 'custom' (drawn from tokens).
-  function iosTag(ios) {
+  // web: a website / desktop element, left out of App-only briefs.
+  function iosTag(ios, web) {
     if (!ios) return '';
     const native = /^native:/.test(ios);
     const view = native ? ios.slice(7).trim() : '';
-    return `<p class="sb-k-ios" data-ios="${native ? 'native' : 'custom'}"><span class="sb-k-ios-tag">${native ? 'Native' : 'Custom'}</span>${native ? `<code>${e(view)}</code>` : '<span>Drawn from the brand tokens</span>'}</p>`;
+    return `<p class="sb-k-ios" data-ios="${native ? 'native' : 'custom'}"><span class="sb-k-ios-tag">${native ? 'Native' : 'Custom'}</span>${web ? '<span class="sb-k-ios-tag sb-k-web-tag" title="A website or desktop element: App-only briefs leave it out">Web</span>' : ''}${native ? `<code>${e(view)}</code>` : '<span>Drawn from the brand tokens</span>'}</p>`;
   }
 
   /* Screen layouts: one small phone per UI_KIT_SCREENS pattern, built strictly from its blocks
@@ -919,14 +1061,23 @@
       </figure>`).join('');
   }
 
+  // "Glossary coverage": one row per NN/g term, with links to the cells of the kit items that build it.
+  function kitGlossary(X) {
+    const byId = {};
+    (typeof UI_KIT !== 'undefined' ? UI_KIT : []).forEach(g => g.items.forEach(it => { byId[it.id] = it; }));
+    return `<ul class="sb-k-gl">${(typeof UI_KIT_GLOSSARY !== 'undefined' ? UI_KIT_GLOSSARY : []).map(t => `<li class="sb-k-gl-row"><div class="sb-k-gl-term"><b>${e(t.term)}</b>${t.aka ? `<span>${e(t.aka)}</span>` : ''}</div><div class="sb-k-gl-items">${t.ids.filter(id => byId[id]).map(id => `<a class="sb-k-gl-link" href="#${X.uid}-k-${e(id)}">${e(byId[id].name)}</a>`).join('')}</div></li>`).join('')}</ul>`;
+  }
+
   function kit(X) {
+    const nGroups = typeof UI_KIT !== 'undefined' ? UI_KIT.length : 0;
+    const nTerms = typeof UI_KIT_GLOSSARY !== 'undefined' ? UI_KIT_GLOSSARY.length : 0;
     const groups = (typeof UI_KIT !== 'undefined' ? UI_KIT : []).map((g, gi) => `<section class="sb-k-group" aria-label="${e(g.group)}">
         ${labelRow(num(gi + 1, g.group), `${g.items.length} components`)}
         <div class="sb-k-grid">${g.items.map(it => {
           const draw = KIT_SPEC[it.id];
           const states = it.states.map(st => `<div class="sb-k-state"><div class="sb-k-spec">${draw ? draw(X, st) : ''}</div><span class="sb-k-slabel">${e(st)}</span></div>`).join('');
-          return `<article class="sb-k-cell${KIT_WIDE.has(it.id) ? ' is-wide' : ''}" data-k="${e(it.id)}">
-            <header class="sb-k-cell-h"><h3 class="sb-k-name">${e(it.name)}</h3><p class="sb-k-use">${e(it.use)}</p>${iosTag(it.ios)}</header>
+          return `<article class="sb-k-cell${KIT_WIDE.has(it.id) ? ' is-wide' : ''}" id="${X.uid}-k-${e(it.id)}" data-k="${e(it.id)}">
+            <header class="sb-k-cell-h"><h3 class="sb-k-name">${e(it.name)}</h3><p class="sb-k-use">${e(it.use)}</p>${iosTag(it.ios, it.web)}</header>
             <div class="sb-k-states" data-n="${it.states.length}">${states}</div>
           </article>`;
         }).join('')}</div>
@@ -950,17 +1101,21 @@
       <div class="ab-rule"></div>
       ${groups}
       <section class="sb-k-group" aria-label="Screen layouts">
-        ${labelRow(num(6, 'Screen layouts'), `${typeof UI_KIT_SCREENS !== 'undefined' ? UI_KIT_SCREENS.length : 0} patterns · 390 × 844`)}
+        ${labelRow(num(nGroups + 1, 'Screen layouts'), `${typeof UI_KIT_SCREENS !== 'undefined' ? UI_KIT_SCREENS.length : 0} patterns · 390 × 844`)}
         <div class="sb-k-layouts">${kitScreens(X)}</div>
       </section>
       <section class="sb-k-group" aria-label="Phone type scale">
-        ${labelRow(num(7, 'Phone type scale'), 'points at 390 × 844')}
+        ${labelRow(num(nGroups + 2, 'Phone type scale'), 'points at 390 × 844')}
         <div class="sb-k-typescale">${typeRows}</div>
         <p class="sb-k-sizes">${e(sizes)}</p>
       </section>
       <section class="sb-k-group" aria-label="Colour roles">
-        ${labelRow(num(8, 'Colour roles'), '')}
+        ${labelRow(num(nGroups + 3, 'Colour roles'), '')}
         <div class="sb-k-swatches">${swatches}</div>
+      </section>
+      <section class="sb-k-group" aria-label="Glossary coverage">
+        ${labelRow(num(nGroups + 4, 'Glossary coverage'), e(`All ${nTerms} NN/g UI elements · nngroup.com/articles/ui-elements-glossary`))}
+        ${kitGlossary(X)}
       </section>
     </div>`;
   }

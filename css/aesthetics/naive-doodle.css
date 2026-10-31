@@ -355,3 +355,209 @@
    hand-written kicker and section note are set a step up (17 / 18), still one line */
 .ab.sb-ab.sb-kit[data-ae="naive-doodle"] .ab-kicker { font-size: 17px !important; line-height: 18px !important; }
 .ab.sb-ab.sb-kit[data-ae="naive-doodle"] .sb-k-section .ab-label:last-child:not(:first-child) { font-size: 17px !important; line-height: 18px !important; }
+
+/* UI kit: NN/g glossary components
+   The doodle kit: a 2px warm-black wobble edge (unequal radii, never a straight corner), no shadows,
+   the crayon wash (--nd-wash) for anything chosen or open, the squiggle for focus and the current tab,
+   hand type from the heading face for chrome. Menus keep the wobble menu surface set above. */
+.ab.sb-ab.sb-kit[data-ae="naive-doodle"] .sb-k-ph { border: 2px solid var(--ab-ink); border-radius: 12px 6px 14px 8px / 8px 14px 6px 12px; background: var(--nd-wash); color: var(--ab-ink); }
+/* command menus: wobble rows with hand type; open and hover rows take the wash */
+.ab.sb-ab.sb-kit[data-ae="naive-doodle"] .sb-k-cmdmenu li { font-family: var(--ab-font-h); font-weight: 400; }
+.ab.sb-ab.sb-kit[data-ae="naive-doodle"] .sb-k-menu li:hover { background: var(--nd-wash); }
+.ab.sb-ab.sb-kit[data-ae="naive-doodle"] .sb-k-cmdmenu li.is-danger { color: var(--sb-danger); }
+.ab.sb-ab.sb-kit[data-ae="naive-doodle"] .sb-k-cmdmenu li.is-open { background: var(--nd-wash); box-shadow: inset 0 0 0 2px var(--ab-ink); }
+.ab.sb-ab.sb-kit[data-ae="naive-doodle"] .sb-k-cmdmenu li.sb-k-menu-sep { height: 10px; min-height: 0; margin: 2px 0; padding: 0; border: 0; border-radius: 0; background: var(--nd-rule) 0 50% / 200px 10px repeat-x; }
+.ab.sb-ab.sb-kit[data-ae="naive-doodle"] .sb-k-kbd { padding: 0 8px; border: 1.6px solid var(--ab-ink); border-radius: 8px 4px 9px 5px / 5px 9px 4px 8px; font-family: var(--ab-font-h); font-weight: 400; font-size: 14px; color: var(--ab-ink); background: transparent; }
+.ab.sb-ab.sb-kit[data-ae="naive-doodle"] .sb-k-pop-arrow { background: var(--ab-canvas); border-color: var(--ab-ink); }
+.ab.sb-ab.sb-kit[data-ae="naive-doodle"] .sb-k-scrim { background: color-mix(in srgb, var(--ab-ink) 42%, transparent); }
+
+/* split button: two hand-drawn halves that touch; pressed slides the crayon like the other buttons */
+.ab.sb-ab.sb-kit[data-ae="naive-doodle"] .sb-k-split-main { margin-right: -4px; }
+.ab.sb-ab.sb-kit[data-ae="naive-doodle"] .sb-k-split-more { flex: none; justify-content: center; width: var(--k-btn, 56px); padding: 0; }
+.ab.sb-ab.sb-kit[data-ae="naive-doodle"] .sb-k-split-more.sb-k-pressed { transform: none; filter: saturate(1.25) brightness(0.94); }
+
+/* floating buttons: a blob in crayon with a wobble edge */
+.ab.sb-ab.sb-kit[data-ae="naive-doodle"] .sb-k-fab { width: 56px; height: 56px; border: 2px solid var(--ab-ink); border-radius: 46% 54% 50% 50% / 54% 46% 54% 46%; background: var(--ab-primary); color: var(--ab-on-primary); box-shadow: none; }
+.ab.sb-ab.sb-kit[data-ae="naive-doodle"] .sb-k-fab.sb-k-pressed { transform: none; filter: saturate(1.25) brightness(0.94); }
+.ab.sb-ab.sb-kit[data-ae="naive-doodle"] .sb-k-backtop { border: 2px solid var(--ab-ink); border-radius: 18px 10px 20px 8px / 10px 18px 8px 20px; background: var(--ab-canvas); color: var(--ab-ink); box-shadow: none; font-family: var(--ab-font-h); font-weight: 400; }
+.ab.sb-ab.sb-kit[data-ae="naive-doodle"] .sb-k-backtop:hover { background: var(--nd-wash); }
+.ab.sb-ab.sb-kit[data-ae="naive-doodle"] .sb-k-backtop:active { filter: saturate(1.25) brightness(0.94); }
+.ab.sb-ab.sb-kit[data-ae="naive-doodle"] :is(.sb-k-fab, .sb-k-backtop):focus-visible { outline: 2px dashed var(--ab-ink); outline-offset: 4px; }
+
+/* link: a squiggle under it; pressed fills it with the wash; focus is a dashed loop */
+.ab.sb-ab.sb-kit[data-ae="naive-doodle"] .sb-k-link { color: var(--ab-primary-text); text-decoration: underline wavy 1.5px; text-underline-offset: 4px; }
+.ab.sb-ab.sb-kit[data-ae="naive-doodle"] .sb-k-link.sb-k-pressed { background: var(--nd-wash); border-radius: 8px 4px 9px 5px / 5px 9px 4px 8px; }
+.ab.sb-ab.sb-kit[data-ae="naive-doodle"] .sb-k-link.sb-k-focus, .ab.sb-ab.sb-kit[data-ae="naive-doodle"] .sb-k-link:focus-visible { outline: 2px dashed var(--ab-ink); outline-offset: 3px; border-radius: 8px 4px 9px 5px / 5px 9px 4px 8px; }
+
+/* icons: each in a wobble blob, hand-lettered labels */
+.ab.sb-ab.sb-kit[data-ae="naive-doodle"] .sb-k-icon svg { box-sizing: content-box; padding: 7px; border: 2px solid var(--ab-ink); border-radius: 46% 54% 50% 50% / 54% 46% 54% 46%; color: var(--ab-ink); stroke-width: 2; }
+.ab.sb-ab.sb-kit[data-ae="naive-doodle"] .sb-k-icon span { font-family: var(--ab-font-h); font-weight: 400; font-size: 14px; }
+
+/* combo box: matches are coloured in with the wash, a little off the letters */
+.ab.sb-ab.sb-kit[data-ae="naive-doodle"] .sb-k-match { background: var(--nd-wash); color: inherit; font-weight: 700; padding: 0 3px; border-radius: 8px 4px 9px 5px / 5px 9px 4px 8px; }
+
+/* stepper: a wobble box with crooked walls round the value */
+.ab.sb-ab.sb-kit[data-ae="naive-doodle"] .sb-k-stepper { border: 2px solid var(--ab-ink); border-radius: 18px 10px 20px 8px / 10px 18px 8px 20px; background: transparent; overflow: hidden; }
+.ab.sb-ab.sb-kit[data-ae="naive-doodle"] .sb-k-step { border: 0; background: transparent; color: var(--ab-ink); font-family: var(--ab-font-h); font-weight: 400; cursor: pointer; }
+.ab.sb-ab.sb-kit[data-ae="naive-doodle"] .sb-k-step:hover:not(:disabled) { background: var(--nd-wash); }
+.ab.sb-ab.sb-kit[data-ae="naive-doodle"] .sb-k-step:active:not(:disabled) { filter: saturate(1.25) brightness(0.94); }
+.ab.sb-ab.sb-kit[data-ae="naive-doodle"] .sb-k-step:disabled { color: var(--k-muted, var(--ab-muted)); cursor: not-allowed; }
+.ab.sb-ab.sb-kit[data-ae="naive-doodle"] .sb-k-step:focus-visible { outline: 2px dashed var(--ab-ink); outline-offset: -6px; }
+.ab.sb-ab.sb-kit[data-ae="naive-doodle"] .sb-k-step-val { border-inline: 2px solid var(--ab-ink); font-family: var(--ab-font-h); font-weight: 400; font-variant-numeric: tabular-nums; color: var(--ab-ink); }
+
+/* knob: a wobble dial, a crayon pointer */
+.ab.sb-ab.sb-kit[data-ae="naive-doodle"] .sb-k-knob-dial { border: 2px solid var(--ab-ink); border-radius: 46% 54% 50% 50% / 54% 46% 54% 46%; background: var(--ab-canvas); box-shadow: none; }
+.ab.sb-ab.sb-kit[data-ae="naive-doodle"] .sb-k-knob-ind { background: var(--ab-ink); border-radius: 999px; }
+.ab.sb-ab.sb-kit[data-ae="naive-doodle"] .sb-k-knob-val { font-family: var(--ab-font-h); font-weight: 400; font-size: 17px; font-variant-numeric: tabular-nums; color: var(--ab-ink); }
+
+/* date field: the squiggle-underlined field, a hand-drawn calendar mark */
+.ab.sb-ab.sb-kit[data-ae="naive-doodle"] .sb-k-date-ico { color: var(--ab-ink); stroke-width: 2; }
+.ab.sb-ab.sb-kit[data-ae="naive-doodle"] .sb-k-datefield.is-error .sb-k-date-ico { color: var(--sb-danger); }
+
+/* calendar: a wobble card, blob days, the chosen day coloured in with the wash and circled */
+.ab.sb-ab.sb-kit[data-ae="naive-doodle"] .sb-k-cal { border: 2px solid var(--ab-ink); border-radius: 22px 12px 26px 10px / 12px 22px 10px 26px; background: var(--ab-canvas); color: var(--ab-ink); }
+.ab.sb-ab.sb-kit[data-ae="naive-doodle"] .sb-k-cal-head { font-family: var(--ab-font-h); font-weight: 400; font-size: 20px; }
+.ab.sb-ab.sb-kit[data-ae="naive-doodle"] .sb-k-cal-dow { font-family: var(--ab-font-h); font-weight: 400; font-size: 14px; color: var(--ab-muted); }
+.ab.sb-ab.sb-kit[data-ae="naive-doodle"] .sb-k-day { border: 2px solid transparent; border-radius: 46% 54% 50% 50% / 54% 46% 54% 46%; background: transparent; color: var(--ab-ink); font-family: var(--ab-font-b); cursor: pointer; }
+.ab.sb-ab.sb-kit[data-ae="naive-doodle"] .sb-k-day:hover:not(.is-sel, .is-start, .is-end) { background: var(--nd-wash); }
+.ab.sb-ab.sb-kit[data-ae="naive-doodle"] .sb-k-day.is-today { border-color: var(--ab-ink); border-style: dashed; }
+.ab.sb-ab.sb-kit[data-ae="naive-doodle"] .sb-k-day.is-range { background: var(--nd-wash); border-radius: 12px 6px 14px 8px / 8px 14px 6px 12px; }
+.ab.sb-ab.sb-kit[data-ae="naive-doodle"] :is(.sb-k-day.is-sel, .sb-k-day.is-start, .sb-k-day.is-end) { background: var(--nd-wash); border: 2px solid var(--ab-ink); font-weight: 700; }
+.ab.sb-ab.sb-kit[data-ae="naive-doodle"] .sb-k-day.is-out { color: var(--k-muted, var(--ab-muted)); }
+.ab.sb-ab.sb-kit[data-ae="naive-doodle"] .sb-k-day:focus-visible { outline: 2px dashed var(--ab-ink); outline-offset: 2px; }
+
+/* wheel pickers: hand-lettered values, the centre one inside a wobble band coloured with the wash */
+.ab.sb-ab.sb-kit[data-ae="naive-doodle"] .sb-k-wheel { border: 2px solid var(--ab-ink); border-radius: 18px 10px 20px 8px / 10px 18px 8px 20px; background: var(--ab-canvas); overflow: hidden; }
+.ab.sb-ab.sb-kit[data-ae="naive-doodle"] .sb-k-wheel-item { font-family: var(--ab-font-h); font-weight: 400; font-size: 18px; color: var(--ab-muted); }
+.ab.sb-ab.sb-kit[data-ae="naive-doodle"] .sb-k-wheel-item.is-sel { font-size: 22px; color: var(--ab-ink); }
+.ab.sb-ab.sb-kit[data-ae="naive-doodle"] .sb-k-wheel-band { border: 2px solid var(--ab-ink); border-radius: 12px 6px 14px 8px / 8px 14px 6px 12px; background: color-mix(in srgb, var(--nd-wash) 55%, transparent); }
+
+/* accordion: one wobble box, a hand-drawn rule between rows, the open row coloured with the wash */
+.ab.sb-ab.sb-kit[data-ae="naive-doodle"] .sb-k-accordion { border: 2px solid var(--ab-ink); border-radius: 22px 12px 26px 10px / 12px 22px 10px 26px; background: var(--ab-canvas); overflow: hidden; }
+.ab.sb-ab.sb-kit[data-ae="naive-doodle"] .sb-k-acc { border: 0; border-radius: 0; }
+.ab.sb-ab.sb-kit[data-ae="naive-doodle"] .sb-k-acc + .sb-k-acc { border-top: 0; background: var(--nd-rule) 0 0 / 200px 10px repeat-x; }
+.ab.sb-ab.sb-kit[data-ae="naive-doodle"] .sb-k-acc-sum { font-family: var(--ab-font-h); font-weight: 400; font-size: 19px; color: var(--ab-ink); cursor: pointer; }
+.ab.sb-ab.sb-kit[data-ae="naive-doodle"] .sb-k-acc[open] > .sb-k-acc-sum { background: var(--nd-wash); }
+.ab.sb-ab.sb-kit[data-ae="naive-doodle"] .sb-k-acc-sum:focus-visible { outline: 2px dashed var(--ab-ink); outline-offset: -5px; }
+
+/* carousel: blob dots, the current one coloured in */
+.ab.sb-ab.sb-kit[data-ae="naive-doodle"] .sb-k-dots i { box-sizing: border-box; width: 12px; height: 12px; border: 2px solid var(--ab-ink); border-radius: 46% 54% 50% 50% / 54% 46% 54% 46%; background: transparent; }
+.ab.sb-ab.sb-kit[data-ae="naive-doodle"] .sb-k-dots i.is-on { width: 12px; background: var(--ab-primary); }
+
+/* matrix: hand-lettered row labels, wobble tiles */
+.ab.sb-ab.sb-kit[data-ae="naive-doodle"] .sb-k-mx-row > :first-child:not(.sb-k-mx-track) { font-family: var(--ab-font-h); font-weight: 400; font-size: 17px; color: var(--ab-ink); }
+.ab.sb-ab.sb-kit[data-ae="naive-doodle"] .sb-k-mx-tile { border: 2px solid var(--ab-ink); border-radius: 14px 8px 16px 6px / 8px 14px 6px 16px; background: var(--ab-canvas); overflow: hidden; }
+
+/* overlay, dialog, sheets, popovers: wobble edge, no shadow, each a different crooked corner set */
+.ab.sb-ab.sb-kit[data-ae="naive-doodle"] .sb-k-overlaybox { border: 2px solid var(--ab-ink); border-radius: 22px 12px 26px 10px / 12px 22px 10px 26px; overflow: hidden; }
+.ab.sb-ab.sb-kit[data-ae="naive-doodle"] .sb-k-dialog { border: 2px solid var(--ab-ink); border-radius: 26px 14px 28px 12px / 14px 26px 12px 28px; background: var(--ab-canvas); color: var(--ab-ink); box-shadow: none; }
+.ab.sb-ab.sb-kit[data-ae="naive-doodle"] .sb-k-dialog-t { font-family: var(--ab-font-h); font-weight: 400; font-size: 24px; line-height: 1.1; }
+.ab.sb-ab.sb-kit[data-ae="naive-doodle"] .sb-k-dialog-b { color: var(--ab-muted); }
+.ab.sb-ab.sb-kit[data-ae="naive-doodle"] .sb-k-dialog-a { padding-top: 10px; border-top: 0; background: var(--nd-rule) 0 0 / 200px 10px no-repeat; }
+.ab.sb-ab.sb-kit[data-ae="naive-doodle"] .sb-k-side { border: 2px solid var(--ab-ink); border-right: 0; border-radius: 28px 0 0 20px / 20px 0 0 28px; background: var(--ab-canvas); color: var(--ab-ink); box-shadow: none; }
+.ab.sb-ab.sb-kit[data-ae="naive-doodle"] .sb-k-drawer { border: 2px solid var(--ab-ink); border-left: 0; border-radius: 0 28px 20px 0 / 0 20px 28px 0; background: var(--ab-canvas); color: var(--ab-ink); box-shadow: none; }
+.ab.sb-ab.sb-kit[data-ae="naive-doodle"] .sb-k-pop { border: 2px solid var(--ab-ink); border-radius: 18px 10px 20px 8px / 10px 18px 8px 20px; background: var(--ab-canvas); color: var(--ab-ink); box-shadow: none; }
+.ab.sb-ab.sb-kit[data-ae="naive-doodle"] .sb-k-tip { border: 2px solid var(--ab-ink); border-radius: 20px 10px 22px 8px / 10px 20px 8px 22px; background: var(--nd-wash); color: var(--ab-ink); box-shadow: none; }
+.ab.sb-ab.sb-kit[data-ae="naive-doodle"] .sb-k-tip .sb-k-textbtn { color: var(--ab-ink); font-family: var(--ab-font-h); font-weight: 400; text-decoration: underline wavy 1.5px; text-underline-offset: 4px; }
+.ab.sb-ab.sb-kit[data-ae="naive-doodle"] .sb-k-tip .sb-k-pop-arrow { background: var(--nd-wash); }
+.ab.sb-ab.sb-kit[data-ae="naive-doodle"] .sb-k-tooltip { border: 2px solid var(--ab-ink); border-radius: 12px 6px 14px 8px / 8px 14px 6px 12px; background: var(--ab-ink); color: var(--ab-canvas); box-shadow: none; font-family: var(--ab-font-h); font-weight: 400; font-size: 15px; }
+.ab.sb-ab.sb-kit[data-ae="naive-doodle"] .sb-k-tooltip .sb-k-pop-arrow { background: var(--ab-ink); border-color: var(--ab-ink); }
+
+/* lightbox: an ink field, a wobble-framed picture, blob controls, a hand-lettered caption */
+.ab.sb-ab.sb-kit[data-ae="naive-doodle"] .sb-k-lightbox { border: 2px solid var(--ab-ink); border-radius: 22px 12px 26px 10px / 12px 22px 10px 26px; background: var(--ab-ink); overflow: hidden; }
+.ab.sb-ab.sb-kit[data-ae="naive-doodle"] .sb-k-lb-img { border: 2px solid var(--ab-canvas); border-radius: 12px 6px 14px 8px / 8px 14px 6px 12px; }
+.ab.sb-ab.sb-kit[data-ae="naive-doodle"] :is(.sb-k-lb-close, .sb-k-lb-prev, .sb-k-lb-next) { border: 2px solid var(--ab-ink); border-radius: 46% 54% 50% 50% / 54% 46% 54% 46%; background: var(--ab-canvas); color: var(--ab-ink); cursor: pointer; }
+.ab.sb-ab.sb-kit[data-ae="naive-doodle"] :is(.sb-k-lb-close, .sb-k-lb-prev, .sb-k-lb-next):focus-visible { outline: 2px dashed var(--ab-canvas); outline-offset: 3px; }
+.ab.sb-ab.sb-kit[data-ae="naive-doodle"] .sb-k-lb-cap { font-family: var(--ab-font-h); font-weight: 400; font-size: 17px; color: var(--ab-canvas); }
+
+/* navigation: a wobble bar, hand-lettered links, the current page marked with the squiggle */
+.ab.sb-ab.sb-kit[data-ae="naive-doodle"] .sb-k-navbar { border: 2px solid var(--ab-ink); border-radius: 18px 10px 20px 8px / 10px 18px 8px 20px; background: var(--ab-canvas); color: var(--ab-ink); }
+.ab.sb-ab.sb-kit[data-ae="naive-doodle"] .sb-k-nb-links a { padding: 0 10px; border-radius: 12px 6px 14px 8px / 8px 14px 6px 12px; font-family: var(--ab-font-h); font-weight: 400; font-size: 17px; color: var(--ab-ink); }
+.ab.sb-ab.sb-kit[data-ae="naive-doodle"] .sb-k-nb-links a:hover { background: var(--nd-wash); }
+.ab.sb-ab.sb-kit[data-ae="naive-doodle"] .sb-k-nb-links a[aria-current] { background: var(--nd-squig) 50% 100% / 60px 10px repeat-x; }
+.ab.sb-ab.sb-kit[data-ae="naive-doodle"] .sb-k-nm-item { border-radius: 12px 6px 14px 8px / 8px 14px 6px 12px; font-family: var(--ab-font-h); font-weight: 400; font-size: 18px; color: var(--ab-ink); }
+.ab.sb-ab.sb-kit[data-ae="naive-doodle"] .sb-k-nm-item:hover { background: var(--nd-wash); }
+.ab.sb-ab.sb-kit[data-ae="naive-doodle"] .sb-k-nm-item[aria-current] { background: var(--nd-wash); box-shadow: inset 0 0 0 2px var(--ab-ink); }
+.ab.sb-ab.sb-kit[data-ae="naive-doodle"] :is(.sb-k-nm-item, .sb-k-nb-links a):focus-visible { outline: 2px dashed var(--ab-ink); outline-offset: 2px; }
+.ab.sb-ab.sb-kit[data-ae="naive-doodle"] .sb-k-nm-children { margin-left: 18px; padding-left: 8px; border-left: 2px dashed var(--ab-ink); }
+.ab.sb-ab.sb-kit[data-ae="naive-doodle"] .sb-k-nm-children .sb-k-nm-item { font-size: 16px; }
+
+/* breadcrumbs and anchor links: hand type, wavy underline on links, the current one coloured with the wash */
+.ab.sb-ab.sb-kit[data-ae="naive-doodle"] .sb-k-crumbs :is(a, span) { font-family: var(--ab-font-h); font-weight: 400; font-size: 16px; color: var(--ab-ink); }
+.ab.sb-ab.sb-kit[data-ae="naive-doodle"] .sb-k-crumbs a { text-decoration: underline wavy 1.5px; text-underline-offset: 4px; }
+.ab.sb-ab.sb-kit[data-ae="naive-doodle"] .sb-k-crumbs [aria-current="page"] { padding: 0 8px; background: var(--nd-wash); border-radius: 8px 4px 9px 5px / 5px 9px 4px 8px; }
+.ab.sb-ab.sb-kit[data-ae="naive-doodle"] .sb-k-crumb-sep { color: var(--ab-muted); }
+.ab.sb-ab.sb-kit[data-ae="naive-doodle"] .sb-k-anchors > :not(a) { font-family: var(--ab-font-h); font-weight: 400; font-size: 16px; color: var(--ab-muted); }
+.ab.sb-ab.sb-kit[data-ae="naive-doodle"] .sb-k-anchors a { padding-inline: 10px; border-radius: 12px 6px 14px 8px / 8px 14px 6px 12px; font-family: var(--ab-font-h); font-weight: 400; font-size: 16px; color: var(--ab-ink); }
+.ab.sb-ab.sb-kit[data-ae="naive-doodle"] .sb-k-anchors a.is-on { background: var(--nd-wash); box-shadow: inset 0 0 0 2px var(--ab-ink); }
+
+/* scrollbar: a wobble track, a blob thumb coloured in */
+.ab.sb-ab.sb-kit[data-ae="naive-doodle"] .sb-k-sbar { border: 1.6px solid var(--ab-ink); border-radius: 46% 54% 50% 50% / 54% 46% 54% 46%; background: transparent; }
+.ab.sb-ab.sb-kit[data-ae="naive-doodle"] .sb-k-sbar-thumb { border-radius: 46% 54% 50% 50% / 54% 46% 54% 46%; background: var(--ab-primary); }
+
+/* menus that open from a trigger */
+.ab.sb-ab.sb-kit[data-ae="naive-doodle"] .sb-k-dd:is([aria-expanded="true"], .is-open) { background: var(--nd-wash); }
+.ab.sb-ab.sb-kit[data-ae="naive-doodle"] .sb-k-ctx { border-radius: 14px 8px 16px 6px / 8px 14px 6px 16px; }
+.ab.sb-ab.sb-kit[data-ae="naive-doodle"] .sb-k-subwrap > .sb-k-menu + .sb-k-menu { background: var(--nd-wash); }
+.ab.sb-ab.sb-kit[data-ae="naive-doodle"] .sb-k-mega-panel { border: 2px solid var(--ab-ink); border-radius: 22px 12px 26px 10px / 12px 22px 10px 26px; background: var(--ab-canvas); color: var(--ab-ink); box-shadow: none; }
+.ab.sb-ab.sb-kit[data-ae="naive-doodle"] .sb-k-mega-col .ab-label { padding-bottom: 8px; border-bottom: 0; background: var(--nd-rule) 0 100% / 200px 10px no-repeat; font-family: var(--ab-font-h); font-size: 18px; }
+.ab.sb-ab.sb-kit[data-ae="naive-doodle"] .sb-k-mega-col a { font-family: var(--ab-font-b); color: var(--ab-ink); }
+.ab.sb-ab.sb-kit[data-ae="naive-doodle"] .sb-k-mega-col a:hover { text-decoration: underline wavy 1.5px; text-underline-offset: 4px; }
+
+/* menubar: a wobble tray of hand-lettered items; the open menu is coloured with the wash and circled */
+.ab.sb-ab.sb-kit[data-ae="naive-doodle"] .sb-k-menubar { padding: 3px; gap: 4px; border: 2px solid var(--ab-ink); border-radius: 18px 10px 20px 8px / 10px 18px 8px 20px; background: transparent; }
+.ab.sb-ab.sb-kit[data-ae="naive-doodle"] .sb-k-menubar > button { min-height: 44px; padding: 0 14px; border: 2px solid transparent; border-radius: 12px 6px 14px 8px / 8px 14px 6px 12px; background: transparent; color: var(--ab-ink); font-family: var(--ab-font-h); font-weight: 400; font-size: 17px; cursor: pointer; }
+.ab.sb-ab.sb-kit[data-ae="naive-doodle"] .sb-k-menubar > button:hover { background: var(--nd-wash); }
+.ab.sb-ab.sb-kit[data-ae="naive-doodle"] .sb-k-menubar > button[aria-expanded="true"] { background: var(--nd-wash); border-color: var(--ab-ink); }
+.ab.sb-ab.sb-kit[data-ae="naive-doodle"] .sb-k-menubar > button:focus-visible { outline: 2px dashed var(--ab-ink); outline-offset: 2px; }
+
+/* ribbon: a wobble sheet; the current tab keeps the squiggle; groups are split by a dashed line */
+.ab.sb-ab.sb-kit[data-ae="naive-doodle"] .sb-k-ribbon { border: 2px solid var(--ab-ink); border-radius: 22px 12px 26px 10px / 12px 22px 10px 26px; background: var(--ab-canvas); overflow: hidden; }
+.ab.sb-ab.sb-kit[data-ae="naive-doodle"] .sb-k-rb-groups { border-top: 0; background: var(--nd-line) 0 0 / 100% 10px no-repeat; padding-top: 6px; }
+.ab.sb-ab.sb-kit[data-ae="naive-doodle"] .sb-k-rb-group + .sb-k-rb-group { border-left: 2px dashed var(--ab-ink); }
+.ab.sb-ab.sb-kit[data-ae="naive-doodle"] .sb-k-rb-btn { border-radius: 12px 6px 14px 8px / 8px 14px 6px 12px; color: var(--ab-ink); cursor: pointer; }
+.ab.sb-ab.sb-kit[data-ae="naive-doodle"] .sb-k-rb-btn:hover { background: var(--nd-wash); }
+.ab.sb-ab.sb-kit[data-ae="naive-doodle"] .sb-k-rb-btn:focus-visible { outline: 2px dashed var(--ab-ink); outline-offset: 2px; }
+.ab.sb-ab.sb-kit[data-ae="naive-doodle"] .sb-k-rb-label { font-family: var(--ab-font-h); font-weight: 400; font-size: 14px; color: var(--ab-muted); }
+
+/* pie menu: a dashed ring, a coloured-in hub, blob petals; the chosen one is coloured with the wash */
+.ab.sb-ab.sb-kit[data-ae="naive-doodle"] .sb-k-pie { border: 2px dashed var(--ab-ink); border-radius: 46% 54% 50% 50% / 54% 46% 54% 46%; }
+.ab.sb-ab.sb-kit[data-ae="naive-doodle"] .sb-k-pie-hub { border: 2px solid var(--ab-ink); border-radius: 46% 54% 50% 50% / 54% 46% 54% 46%; background: var(--ab-primary); color: var(--ab-on-primary); }
+.ab.sb-ab.sb-kit[data-ae="naive-doodle"] .sb-k-pie-item { border: 2px solid var(--ab-ink); border-radius: 46% 54% 50% 50% / 54% 46% 54% 46%; background: var(--ab-canvas); color: var(--ab-ink); cursor: pointer; }
+.ab.sb-ab.sb-kit[data-ae="naive-doodle"] .sb-k-pie-item:hover { background: var(--nd-wash); }
+.ab.sb-ab.sb-kit[data-ae="naive-doodle"] .sb-k-pie-item.is-on { background: var(--nd-wash); box-shadow: inset 0 0 0 2px var(--ab-ink); }
+.ab.sb-ab.sb-kit[data-ae="naive-doodle"] .sb-k-pie-item:focus-visible { outline: 2px dashed var(--ab-ink); outline-offset: 2px; }
+
+/* loading: a dashed wobble ring turning in flip-book steps; the skeleton is crayon wash with a dashed edge */
+.ab.sb-ab.sb-kit[data-ae="naive-doodle"] .sb-k-spinner { font-family: var(--ab-font-h); font-weight: 400; font-size: 17px; color: var(--ab-ink); }
+.ab.sb-ab.sb-kit[data-ae="naive-doodle"] .sb-k-spin { box-sizing: border-box; border: 3px dashed var(--ab-ink); border-radius: 46% 54% 50% 50% / 54% 46% 54% 46%; background: none; animation: nd-flip 0.9s steps(8) infinite; }
+.ab.sb-ab.sb-kit[data-ae="naive-doodle"] .sb-k-skel-av { border: 2px dashed color-mix(in srgb, var(--ab-ink) 45%, transparent); border-radius: 46% 54% 50% 50% / 54% 46% 54% 46%; background: var(--nd-wash); }
+.ab.sb-ab.sb-kit[data-ae="naive-doodle"] .sb-k-skel-line { border-radius: 8px 4px 9px 5px / 5px 9px 4px 8px; background: var(--nd-wash); }
+.ab.sb-ab.sb-kit[data-ae="naive-doodle"] .sb-k-skel-block { border: 2px dashed color-mix(in srgb, var(--ab-ink) 45%, transparent); border-radius: 14px 8px 16px 6px / 8px 14px 6px 16px; background: var(--nd-wash); }
+@keyframes nd-flip { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) {
+  .ab.sb-ab.sb-kit[data-ae="naive-doodle"] .sb-k-spin { animation: none; }
+}
+
+/* fix round: icon cell, no doubled outlines on card-based panels, trimmed overshoot on drawn buttons, menubar and ribbon spacing */
+.ab.sb-ab.sb-kit[data-ae="naive-doodle"] .sb-k-icon { font-family: var(--ab-font-h); font-weight: 400; color: var(--ab-ink); letter-spacing: 0.02em; }
+/* the dialog, popover and tip are .ab-card: the card already draws the wobble outline and wash, so no second border */
+.ab.sb-ab.sb-kit[data-ae="naive-doodle"] :is(.sb-k-dialog, .sb-k-pop) { border: 0; border-radius: 0; background: transparent; }
+.ab.sb-ab.sb-kit[data-ae="naive-doodle"] .sb-k-tip { border: 0; border-radius: 0; background: transparent; }
+.ab.sb-ab.sb-kit[data-ae="naive-doodle"] :is(.sb-k-dialog, .sb-k-pop)::before { inset: 9px 0 -9px 10px; }
+.ab.sb-ab.sb-kit[data-ae="naive-doodle"] .sb-k-tip::before { inset: 9px 0 -9px 10px; background: var(--ab-pri-tint); }
+.ab.sb-ab.sb-kit[data-ae="naive-doodle"] .sb-k-tip .sb-k-pop-arrow { background: var(--ab-canvas); }
+/* drawn buttons in narrow parts: keep the outline and the crayon inside the button's own width */
+.ab.sb-ab.sb-kit[data-ae="naive-doodle"] :is(.sb-k-split, .sb-k-side, .sb-k-navbar) .ab-cta::before { inset: 4px 0 -6px 5px; }
+.ab.sb-ab.sb-kit[data-ae="naive-doodle"] :is(.sb-k-split, .sb-k-side, .sb-k-navbar) .ab-cta::after { inset: -11px 0; background: var(--nd-btn) center / 100% calc(100% - 22px) no-repeat; }
+.ab.sb-ab.sb-kit[data-ae="naive-doodle"] :is(.sb-k-split, .sb-k-side, .sb-k-navbar) .ab-cta:is(.is-pressed, .sb-k-pressed, :active)::after { background: var(--nd-btn) center / 100% calc(100% - 22px) no-repeat; }
+.ab.sb-ab.sb-kit[data-ae="naive-doodle"] :is(.sb-k-split, .sb-k-side, .sb-k-navbar) .ab-cta:focus-visible::after { background: var(--nd-btn) center / 100% calc(100% - 22px) no-repeat, var(--nd-squig) 50% 100% / 120px 12px no-repeat; }
+.ab.sb-ab.sb-kit[data-ae="naive-doodle"] .sb-k-fab::before, .ab.sb-ab.sb-kit[data-ae="naive-doodle"] .sb-k-fab::after { content: none; }
+.ab.sb-ab.sb-kit[data-ae="naive-doodle"] .sb-k-nm-item.sb-k-nm-item.ab-row.sb-k-row[aria-current] { background: var(--nd-wash); border-radius: 12px 6px 14px 8px / 8px 14px 6px 12px; }
+.ab.sb-ab.sb-kit[data-ae="naive-doodle"] .sb-k-pie-item.ab-type-apply.sb-icon-btn:is(.is-on, .sb-k-pressed) { background: var(--nd-wash); }
+.ab.sb-ab.sb-kit[data-ae="naive-doodle"] .sb-k-mbwrap > .sb-k-cmdmenu { width: min(260px, calc(100% - var(--mb, 84px) - 8px)); box-sizing: border-box; }
+.ab.sb-ab.sb-kit[data-ae="naive-doodle"] .sb-k-ribbon .sb-k-tabs { box-sizing: border-box; gap: 8px; padding: 6px 14px 0; background: none; }
+.ab.sb-ab.sb-kit[data-ae="naive-doodle"] .sb-k-ribbon .sb-k-tabs [role="tab"][aria-selected="true"] { background: var(--nd-wash); border-radius: 12px 6px 0 0 / 8px 14px 0 0; }
+.ab.sb-ab.sb-kit[data-ae="naive-doodle"] .sb-k-ribbon .sb-k-tabs [role="tab"][aria-selected="true"]::after { content: none; }
+.ab.sb-ab.sb-kit[data-ae="naive-doodle"] .sb-k-rb-groups { padding: 12px 14px 8px; }
+.ab.sb-ab.sb-kit[data-ae="naive-doodle"] .sb-k-ribbon .sb-k-tabs [role="tab"] { padding: 0 14px; font-size: 18px; }
