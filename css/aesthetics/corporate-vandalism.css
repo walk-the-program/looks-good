@@ -479,3 +479,56 @@
 @media (prefers-reduced-motion: reduce) {
   .ab.sb-ab:is([data-ae="corporate-vandalism"], [data-ae="corporate-vandalism--classic"]).sb-kit .sb-k-spin { animation: none; }
 }
+
+/* ===== Round 14 kit signature: Corporate Vandalism (current version, their hand only) =====
+   1 Shape: square everything; no radius anywhere in the kit.
+   2 Edge/depth: 1px --cv-bd form rules, no shadow; heavier 2px rule only under a section head.
+   3 Surfaces: each kit cell is a line on a procurement form: white sheet, a shell-coloured header strip.
+   4 Type: names in the heading face at the brand weight; form captions, tags and states in mono caps.
+   5 Fields: a boxed caption tab joined to a boxed field (the form strip).
+   6 Controls: square tick boxes; radio is a square with a centred square; toggle stays the tick box.
+   7 Selection: the shell fill with the --cv-ul underline (the CTA's own recipe).
+   8 Pressed inverts to ink; focus is a 2px ink outline; disabled is a dotted rule.
+   9 Overlays: square sheet with a shell header rule.
+  10 Chrome: "FORM CV-27 · LINE 01..65" header strips, form-box tags, "FIELD: REST" captions.
+   The foreign marks (Kruger bar, sticker, Dymo, hazard colours) stay out of the app. */
+.ab.ab.sb-ab[data-ae="corporate-vandalism"].sb-kit .sb-kitpage { counter-reset: cvk; }
+.ab.ab.sb-ab[data-ae="corporate-vandalism"].sb-kit .sb-k-cell {
+  counter-increment: cvk; position: relative; border: 1px solid var(--cvk-bd); border-radius: 0; background: var(--ab-canvas);
+  box-shadow: none; padding-top: 34px;
+}
+.ab.ab.sb-ab[data-ae="corporate-vandalism"].sb-kit .sb-k-cell::before {
+  content: "FORM CV-27  ·  LINE " counter(cvk, decimal-leading-zero); position: absolute; top: 0; left: 0; right: 0; height: 20px; padding: 0 10px;
+  background: var(--cvk-shell); color: var(--cvk-on-shell); box-shadow: var(--cvk-ul);
+  font: 600 10px/20px var(--cvk-mono); letter-spacing: 0.1em; white-space: nowrap; overflow: hidden;
+}
+.ab.ab.sb-ab[data-ae="corporate-vandalism"].sb-kit .sb-k-name { font-weight: var(--cv-hw, 700); letter-spacing: calc(-0.02em * var(--ab-tr, 1)); }
+.ab.ab.sb-ab[data-ae="corporate-vandalism"].sb-kit .sb-k-use { font-family: var(--cvk-mono); font-size: 11.5px; letter-spacing: 0.02em; }
+.ab.ab.sb-ab[data-ae="corporate-vandalism"].sb-kit :is(.sb-k-ios-tag, .sb-k-web-tag) {
+  border-radius: 0; border: 1px solid var(--cvk-bd); padding: 1px 6px; background: var(--ab-canvas); color: var(--ab-ink);
+  font: 600 10px/1.4 var(--cvk-mono); letter-spacing: 0.1em; text-transform: uppercase;
+}
+.ab.ab.sb-ab[data-ae="corporate-vandalism"].sb-kit .sb-k-ios[data-ios="native"] .sb-k-ios-tag { background: var(--ab-ink); color: var(--ab-canvas); }
+.ab.ab.sb-ab[data-ae="corporate-vandalism"].sb-kit .sb-k-web-tag { border-style: dashed; }
+.ab.ab.sb-ab[data-ae="corporate-vandalism"].sb-kit .sb-k-slabel { font: 600 10px/1.4 var(--cvk-mono); letter-spacing: 0.1em; color: var(--ab-ink); }
+.ab.ab.sb-ab[data-ae="corporate-vandalism"].sb-kit .sb-k-slabel::before { content: "FIELD: "; color: var(--k-muted); }
+/* the form strip: a boxed caption tab joined to a boxed field */
+.ab.ab.sb-ab[data-ae="corporate-vandalism"].sb-kit :is(.sb-k-field, .sb-k-selectwrap, .sb-k-combo) .ab-fieldlabel {
+  display: inline-block; margin: 0 !important; padding: 3px 8px; border: 1px solid var(--cvk-bd); border-bottom: 0;
+  background: var(--cvk-shell); color: var(--cvk-on-shell); font: 600 10px/1.3 var(--cvk-mono) !important; letter-spacing: 0.1em; text-transform: uppercase;
+}
+.ab.ab.sb-ab[data-ae="corporate-vandalism"].sb-kit :is(.sb-k-field, .sb-k-selectwrap, .sb-k-combo, .sb-k-search) .ab-input { border: 1px solid var(--cvk-bd) !important; border-radius: 0 !important; box-shadow: none !important; }
+.ab.ab.sb-ab[data-ae="corporate-vandalism"].sb-kit :is(.sb-k-field, .sb-k-search).is-focus .ab-input { outline: 2px solid var(--ab-ink); outline-offset: -3px; box-shadow: var(--cvk-ul) !important; }
+.ab.ab.sb-ab[data-ae="corporate-vandalism"].sb-kit .sb-k-field .ab-input:disabled { border-style: dotted !important; }
+/* tick boxes */
+.ab.ab.sb-ab[data-ae="corporate-vandalism"].sb-kit .sb-k-box { border: 1px solid var(--cvk-bd); border-radius: 0; background: var(--ab-canvas); }
+.ab.ab.sb-ab[data-ae="corporate-vandalism"].sb-kit .sb-k-box:checked { background: var(--cvk-shell); border-color: var(--cvk-bd); box-shadow: var(--cvk-ul); }
+.ab.ab.sb-ab[data-ae="corporate-vandalism"].sb-kit .sb-k-box[type="checkbox"]:checked::after { border-color: var(--cvk-on-shell); }
+.ab.ab.sb-ab[data-ae="corporate-vandalism"].sb-kit .sb-k-box[type="radio"] { border-radius: 0; }
+.ab.ab.sb-ab[data-ae="corporate-vandalism"].sb-kit .sb-k-box[type="radio"]:checked::after { width: 8px; height: 8px; border-radius: 0; background: var(--cvk-on-shell); }
+.ab.ab.sb-ab[data-ae="corporate-vandalism"].sb-kit .sb-k-box:disabled { border-style: dotted; background: var(--ab-canvas); box-shadow: none; }
+.ab.ab.sb-ab[data-ae="corporate-vandalism"].sb-kit :is(button, input, a, [tabindex]):focus-visible { outline: 2px solid var(--ab-ink); outline-offset: 2px; }
+/* section heads: a heavier 2px rule */
+.ab.ab.sb-ab[data-ae="corporate-vandalism"].sb-kit .sb-k-group > .ab-labelrow { border-bottom: 2px solid var(--cvk-bd); padding-bottom: 6px; }
+/* overlays: square sheet with a shell header rule */
+.ab.ab.sb-ab[data-ae="corporate-vandalism"].sb-kit :is(.sb-k-dialog, .sb-k-side, .sb-k-drawer, .sb-k-sheet) { border: 1px solid var(--cvk-bd); border-radius: 0; box-shadow: none; border-top: 6px solid var(--cvk-shell); }

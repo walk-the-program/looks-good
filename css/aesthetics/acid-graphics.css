@@ -590,3 +590,59 @@
 @media (prefers-reduced-motion: reduce) {
   .ab.sb-ab.sb-kit:is([data-ae="acid-graphics"], [data-ae="acid-graphics--classic"]) .sb-k-spin, .ab.sb-ab.sb-kit:is([data-ae="acid-graphics"], [data-ae="acid-graphics--classic"]) :is(.sb-k-skel-av, .sb-k-skel-line, .sb-k-skel-block) { animation: none; }
 }
+
+/* ===== Round 14 kit signature: Acid Graphics (current version) =====
+   1 Shape: square blocks; one skew (-8deg) reserved for commands that switch (segments, tabs, toggle).
+   2 Edge/depth: 2px ink edge, the clash colour as a hard 4px echo under anything raised; no blur.
+   3 Surfaces: each kit cell is a flyer ticket on the canvas: ink edge, clash echo, an acid stub along the top.
+   4 Type: names in the heading face, uppercase and stretched tall; labels, tags and states in mono caps.
+   5 Fields: open underline (ink, clash under it), acid under it on focus.
+   6 Controls: checkbox = square that floods acid with an ink X; radio = ring with a square acid core.
+   7 Selection: the acid block (a tint for long lists), always with the ink edge.
+   8 Pressed: the echo collapses (piece drops onto it). Focus: 3px dashed ink. Disabled: clash hatch, no echo.
+   9 Overlays: square, ink edge, clash echo, acid title stub.
+  10 Chrome: tickets numbered "N°01..65", tags as ticket tabs, states as "✱ REST". No ripple or art in the kit. */
+.ab.ab.sb-ab[data-ae="acid-graphics"].sb-kit .sb-kitpage { counter-reset: ack; }
+.ab.ab.sb-ab[data-ae="acid-graphics"].sb-kit .sb-k-cell {
+  counter-increment: ack; position: relative; border: 2px solid var(--ab-ink); border-radius: 0; background: var(--ab-canvas);
+  box-shadow: 4px 4px 0 var(--ab-clash); padding-top: 26px;
+}
+.ab.ab.sb-ab[data-ae="acid-graphics"].sb-kit .sb-k-cell::before {
+  content: "N°" counter(ack, decimal-leading-zero); position: absolute; top: 0; left: 0; right: 0; height: 18px; padding: 0 10px;
+  background: var(--ab-acid); color: var(--ab-on-acid); font: 700 10px/18px var(--ac-mono); letter-spacing: 0.14em;
+}
+.ab.ab.sb-ab[data-ae="acid-graphics"].sb-kit .sb-k-name {
+  display: inline-block; font-family: var(--ab-font-h); font-weight: var(--ac-hw, 800); text-transform: uppercase;
+  letter-spacing: 0.01em; transform: scaleY(1.22); transform-origin: 0 70%;
+}
+.ab.ab.sb-ab[data-ae="acid-graphics"].sb-kit .sb-k-use { font-family: var(--ac-mono); font-size: 12px; color: var(--ac-fg2, var(--k-muted)); }
+.ab.ab.sb-ab[data-ae="acid-graphics"].sb-kit .sb-k-ios-tag,
+.ab.ab.sb-ab[data-ae="acid-graphics"].sb-kit .sb-k-web-tag {
+  border-radius: 0; border: 2px solid var(--ab-ink); padding: 1px 7px; font: 700 10px/1.4 var(--ac-mono); letter-spacing: 0.12em; text-transform: uppercase;
+}
+.ab.ab.sb-ab[data-ae="acid-graphics"].sb-kit .sb-k-ios[data-ios="native"] .sb-k-ios-tag { background: var(--ab-ink); color: var(--ab-canvas); }
+.ab.ab.sb-ab[data-ae="acid-graphics"].sb-kit .sb-k-ios[data-ios="custom"] .sb-k-ios-tag { background: var(--ab-canvas); color: var(--ab-ink); }
+.ab.ab.sb-ab[data-ae="acid-graphics"].sb-kit .sb-k-web-tag { background: var(--ab-clash); color: var(--ab-on-clash); }
+.ab.ab.sb-ab[data-ae="acid-graphics"].sb-kit .sb-k-slabel { font: 700 10px/1.4 var(--ac-mono); letter-spacing: 0.14em; color: var(--ab-ink); }
+.ab.ab.sb-ab[data-ae="acid-graphics"].sb-kit .sb-k-slabel::before { content: "✱ "; color: var(--ab-ink); }
+/* controls */
+.ab.ab.sb-ab[data-ae="acid-graphics"].sb-kit .sb-k-box { border: 2px solid var(--ab-ink); border-radius: 0; background: var(--ab-canvas); }
+.ab.ab.sb-ab[data-ae="acid-graphics"].sb-kit .sb-k-box[type="checkbox"]:checked { background: var(--ab-acid); border-color: var(--ab-ink); box-shadow: 3px 3px 0 var(--ab-clash); }
+.ab.ab.sb-ab[data-ae="acid-graphics"].sb-kit .sb-k-box[type="checkbox"]:checked::after {
+  width: 14px; height: 14px; border: 0; transform: none;
+  background: linear-gradient(45deg, transparent 43%, var(--ab-ink) 43% 57%, transparent 57%), linear-gradient(-45deg, transparent 43%, var(--ab-ink) 43% 57%, transparent 57%);
+}
+.ab.ab.sb-ab[data-ae="acid-graphics"].sb-kit .sb-k-box[type="radio"] { border-radius: 50%; }
+.ab.ab.sb-ab[data-ae="acid-graphics"].sb-kit .sb-k-box[type="radio"]:checked { background: var(--ab-canvas); border-color: var(--ab-ink); }
+.ab.ab.sb-ab[data-ae="acid-graphics"].sb-kit .sb-k-box[type="radio"]:checked::after { width: 10px; height: 10px; border-radius: 0; background: var(--ab-acid); outline: 2px solid var(--ab-ink); }
+.ab.ab.sb-ab[data-ae="acid-graphics"].sb-kit .sb-k-box:disabled { box-shadow: none; background-image: repeating-linear-gradient(45deg, var(--ab-clash) 0 2px, transparent 2px 5px); }
+.ab.ab.sb-ab[data-ae="acid-graphics"].sb-kit :is(.ab-cta, .ab-type-apply).sb-k-pressed { box-shadow: none !important; transform: translate(3px, 3px); }
+.ab.ab.sb-ab[data-ae="acid-graphics"].sb-kit :is(button, input, a, [tabindex]):focus-visible { outline: 3px dashed var(--ab-ink); outline-offset: 3px; }
+/* tabs: skewed tickets, the open one is the acid block */
+.ab.ab.sb-ab[data-ae="acid-graphics"].sb-kit .sb-k-tabs { gap: 6px; border-bottom: 2px solid var(--ab-ink); }
+.ab.ab.sb-ab[data-ae="acid-graphics"].sb-kit .sb-k-tabs [role="tab"] { padding: 0 12px; border: 2px solid var(--ab-ink); border-bottom: 0; transform: skewX(-8deg); font: 700 12px/1 var(--ac-mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--ab-ink); }
+.ab.ab.sb-ab[data-ae="acid-graphics"].sb-kit .sb-k-tabs [role="tab"][aria-selected="true"] { background: var(--ab-acid); color: var(--ab-on-acid); }
+.ab.ab.sb-ab[data-ae="acid-graphics"].sb-kit .sb-k-tabs [role="tab"][aria-selected="true"]::after { display: none; }
+/* overlays get the acid stub too */
+.ab.ab.sb-ab[data-ae="acid-graphics"].sb-kit :is(.sb-k-dialog, .sb-k-side, .sb-k-drawer, .sb-k-sheet) { border: 2px solid var(--ab-ink); border-radius: 0; box-shadow: 4px 4px 0 var(--ab-clash); border-top-width: 8px; border-top-color: var(--ab-acid); }
+@media (prefers-reduced-motion: reduce) { .ab.ab.sb-ab[data-ae="acid-graphics"].sb-kit :is(.ab-cta, .ab-type-apply).sb-k-pressed { transform: none; } }
