@@ -319,7 +319,11 @@ function aestheticView(st) {
       typeFrom = donor.key;
     }
   }
-  return { state: vs, def: blendDef(base, donor, b, typeFrom, b.channels.type && locked), blend: b };
+  let def = blendDef(base, donor, b, typeFrom, b.channels.type && locked);
+  // A curated combo (js/combos.js) shows under its own name; the def stays the blended def otherwise.
+  const combo = typeof activeCombo === 'function' ? activeCombo(st) : null;
+  if (combo) def = comboDef(def, combo);
+  return { state: vs, def, blend: b };
 }
 
 /* ---------------- patterns ---------------- */
@@ -500,6 +504,7 @@ function blendParts(P) {
   const ch = bd.channels;
   const on = BLEND_CHANNELS.filter(c => ch[c]);
   let attrs = ` data-blend="${donor.key}" data-blend-ch="${on.join(' ')}"`;
+  if (P.def.combo) attrs += ` data-combo="${P.def.combo.id}"`;   // css/combos/<id>.css scopes to it
   const vars = [];
   const needProbe = ch.type || (ch.color && abHighlightOf(donor) === 'custom');
   const probe = needProbe ? blendProbe(donor, P) : null;
@@ -797,10 +802,64 @@ function blendFitWords(root) {
   });
 }
 
+// Reads one computed colour: rgb()/rgba() (comma or space syntax), color(srgb r g b [/ a]) (what a
+// browser reports for a color-mix() fill) or a #hex. Anything else (oklch, lab, display-p3,
+// keywords) returns null so callers skip it rather than guess. -> {r, g, b, a} with r/g/b 0-255.
+function blParseColor(v) {
+  const s = String(v == null ? '' : v).trim();
+  const num = (t, scale) => (/%$/.test(t) ? parseFloat(t) / 100 * scale : parseFloat(t));
+  let m = s.match(/^#([0-9a-f]{3,8})$/i);
+  if (m) {
+    let h = m[1];
+    if (h.length === 3 || h.length === 4) h = h.replace(/./g, c => c + c);
+    if (h.length !== 6 && h.length !== 8) return null;
+    return { r: parseInt(h.slice(0, 2), 16), g: parseInt(h.slice(2, 4), 16), b: parseInt(h.slice(4, 6), 16), a: h.length === 8 ? parseInt(h.slice(6), 16) / 255 : 1 };
+  }
+  m = s.match(/^(rgba?|color\(\s*srgb)\s*\(?\s*([^)]*)\)$/i);
+  if (!m) return null;
+  const srgb = /^color/i.test(m[1]);
+  const t = m[2].split(/[\s,\/]+/).filter(Boolean);
+  if (t.length < 3 || t.length > 4) return null;
+  const ch = t.slice(0, 3).map(x => num(x, srgb ? 1 : 255) * (srgb ? 255 : 1));
+  const a = t.length > 3 ? num(t[3], 1) : 1;
+  if (ch.concat(a).some(x => !isFinite(x))) return null;
+  const cl = x => Math.max(0, Math.min(255, x));
+  return { r: cl(ch[0]), g: cl(ch[1]), b: cl(ch[2]), a: Math.max(0, Math.min(1, a)) };
+}
+
+function blHex(c) {
+  return '#' + [c.r, c.g, c.b].map(x => Math.round(x).toString(16).padStart(2, '0')).join('');
+}
+
+// fg {r,g,b,a} laid over an opaque bg {r,g,b} -> {r,g,b,a:1}
+function blComposite(fg, bg) {
+  const a = fg.a;
+  return { r: fg.r * a + bg.r * (1 - a), g: fg.g * a + bg.g * (1 - a), b: fg.b * a + bg.b * (1 - a), a: 1 };
+}
+
 function blRgb(v) {
-  const n = String(v || '').match(/[\d.]+/g);
-  if (!n || n.length < 3) return null;
-  return { hex: '#' + n.slice(0, 3).map(x => Math.round(Number(x)).toString(16).padStart(2, '0')).join(''), a: n.length > 3 ? Number(n[3]) : 1 };
+  const c = blParseColor(v);
+  return c ? { hex: blHex(c), a: c.a } : null;
+}
+
+// The opaque colour a control's fill really shows: its own fill, composited over each translucent
+// ancestor fill down to the nearest opaque one. null when a gradient or image sits in the way,
+// a colour can't be read, or nothing opaque is found (the caller then leaves the label alone).
+function blGround(el) {
+  const layers = [];
+  let base = null;
+  for (let e = el; e && e.nodeType === 1; e = e.parentElement) {
+    const c = getComputedStyle(e);
+    if (c.backgroundImage && c.backgroundImage !== 'none') return null;
+    const bg = blParseColor(c.backgroundColor);
+    if (!bg) return null;
+    if (bg.a <= 0) continue;
+    if (bg.a >= 0.999) { base = bg; break; }
+    layers.push(bg);
+  }
+  if (!base) return null;
+  for (let i = layers.length - 1; i >= 0; i--) base = blComposite(layers[i], base);
+  return base;
 }
 
 function blendLegibility(root) {
@@ -936,9 +995,13 @@ function blendLegibility(root) {
   root.querySelectorAll('.ab-seg-btn, .ab-cta').forEach(el => {
     if (el.hasAttribute('data-bl-onfix')) { el.style.removeProperty('color'); el.removeAttribute('data-bl-onfix'); }
     const c = getComputedStyle(el);
-    const bg = blRgb(c.backgroundColor);
-    const fg = blRgb(c.color);
-    if (!bg || bg.a < 0.9 || c.backgroundImage !== 'none' || !fg || fg.a < 0.5 || !el.textContent.trim()) return;
+    const own = blParseColor(c.backgroundColor);
+    const fgc = blParseColor(c.color);
+    if (!own || own.a < 0.05 || c.backgroundImage !== 'none' || !fgc || fgc.a < 0.5 || !el.textContent.trim()) return;
+    const ground = blGround(el);
+    if (!ground) return;
+    const bg = { hex: blHex(ground) };
+    const fg = { hex: blHex(fgc.a < 1 ? blComposite(fgc, ground) : fgc) };
     if (contrastRatio(fg.hex, bg.hex) >= 4.5) return;
     const opts = [ink, canvas, '#000000', '#ffffff'].filter(x => /^#[0-9a-f]{6}$/i.test(x));
     const pick = opts.find(x => contrastRatio(x, bg.hex) >= 4.5) || opts.sort((p, q) => contrastRatio(q, bg.hex) - contrastRatio(p, bg.hex))[0];
@@ -1016,7 +1079,9 @@ function blendBriefLines(state, def, t) {
   rows.push(['Material', src('material'), ch.material
     ? `${donor.name}'s material recipes (below) and its ornament layer behind material panels; ${base.name}'s components keep their structure.`
     : `${base.name}'s materials.`]);
+  const cb = def.combo;
   const out = [`## Blend: ${def.name}`, '',
+    ...(cb ? [`This blend is the curated combo **${cb.name}**: ${base.name} blended with ${donor.name}, taking only its ${blendList(BLEND_CHANNELS.filter(c => ch[c]).map(c => BLEND_CHANNEL_LABEL[c].toLowerCase()))} ${BLEND_CHANNELS.filter(c => ch[c]).length > 1 ? 'channels' : 'channel'}.`, ''] : []),
     `This brand blends two design languages. **${base.name}** is the dominant system: it owns structure (layout, components, spacing, shapes), the ${t.isDark ? 'dark' : 'light'} mode and every accessibility rule. **${donor.name}** is the supporting system at ${BLEND_STRENGTH_LABEL[bd.strength].toLowerCase()} strength: it controls only the channels marked below. Where the two disagree, the owner of that channel wins.`, '',
     '| Channel | Source | What it controls |', '| --- | --- | --- |',
     ...rows.map(r => `| ${r.map(cell).join(' | ')} |`), ''];

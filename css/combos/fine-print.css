@@ -1,0 +1,12 @@
+/* ---------------------------------------------------------------------
+   combos/fine-print.css - the "Fine Print" combo (js/combos.js).
+   Pair:      mesh-gradient (base) x micrographics (donor)
+   Channels:  type
+   Scope:     every root carries data-combo="fine-print" while the combo is on (board, deck
+              slides, Built view), next to data-ae="mesh-gradient" and data-blend="micrographics":
+                .ab[data-combo="fine-print"] ...
+                [data-combo="fine-print"] .sb-k-...
+   Tune:      hand-tuning for this pair only: spacing, contrast and finish between the
+              base's structure and the donor's channels. Loaded last, so these rules win.
+              No rules yet.
+------------------------------------------------------------------------ */

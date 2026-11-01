@@ -32,6 +32,8 @@
   let pumping = false;
   let filledSig = '';
 
+  // The key of what the brand shows: a style's key, or "combo:<id>" while a combo is on (js/combos.js).
+  const curKey = () => (typeof comboPickKey === 'function' ? comboPickKey(state) : state.aesthetic);
   const grid = () => $('aeList');
   const tiles = () => Array.from(grid() ? grid().querySelectorAll('.gal-tile') : []);
   const shown = () => tiles().filter(t => !t.hidden);
@@ -42,14 +44,19 @@
   function brandSig() {
     try {
       const s = typeof serializeState === 'function' ? serializeState(state) : {};
-      return JSON.stringify(Object.assign({}, s, { aesthetic: null, aestheticVersion: null, blend: null, bgMode: null }));
+      return JSON.stringify(Object.assign({}, s, { aesthetic: null, aestheticVersion: null, blend: null, combo: null, bgMode: null }));
     } catch (e) { return String(Math.random()); }
   }
 
   function boardFor(key) {
     let st, def;
-    if (key === state.aesthetic) {
+    const combo = typeof comboIdFromKey === 'function' ? comboById(comboIdFromKey(key)) : null;
+    if (key === curKey()) {
       const v = typeof abView === 'function' ? abView() : { state, def: resolveAestheticDef(state) };
+      st = v.state; def = v.def;
+    } else if (combo) {
+      // A combo tile: the brand shown with the base style and the combo's fixed blend.
+      const v = aestheticView(comboState(combo, state));
       st = v.state; def = v.def;
     } else {
       def = aestheticByKey(key);
@@ -130,14 +137,14 @@
     const sig = brandSig();
     const all = tiles();
     all.forEach(t => {
-      const stale = sig !== filledSig || t.dataset.drawnCurrent === '1' || t.dataset.key === state.aesthetic;
+      const stale = sig !== filledSig || t.dataset.drawnCurrent === '1' || t.dataset.key === curKey();
       if (t.dataset.filled && stale) {
         delete t.dataset.filled;
         t.classList.remove('is-filled');
         const box = t.querySelector('.gal-board');
         if (box) box.replaceChildren();
       }
-      t.dataset.drawnCurrent = t.dataset.key === state.aesthetic ? '1' : '';
+      t.dataset.drawnCurrent = t.dataset.key === curKey() ? '1' : '';
     });
     filledSig = sig;
   }
@@ -155,6 +162,8 @@
       if (hit) n++;
     });
     $('galEmpty').hidden = n > 0;
+    const head = $('galCombos');                   // the Combos heading follows its tiles
+    if (head) head.hidden = !tiles().some(t => t.classList.contains('gal-combo') && !t.hidden);
     syncSub(n);
     rovingTo(currentOrFirst(), false);
     if (isOpen) { fit(); observe(); }
@@ -167,7 +176,9 @@
     const pool = typeof aePool === 'function' ? aePool().length : tiles().length;
     const listed = tiles().length;
     const fam = typeof aeFamily !== 'undefined' && aeFamily !== 'all' && typeof aestheticFamilyLabel === 'function' ? aestheticFamilyLabel(aeFamily) : '';
-    const count = n === listed ? `${n} styles` : `${n} of ${listed} styles`;
+    const nc = tiles().filter(t => t.classList.contains('gal-combo')).length;   // the curated combos (js/combos.js)
+    const unit = k => (!nc ? `${k} styles` : k === nc ? `${nc} combos` : `${k - nc} styles and ${nc} combos`);
+    const count = n === listed ? unit(n) : `${n} of ${listed} styles and combos`;
     sub.textContent = fam
       ? `${brand} in ${count}, ${fam} only (${pool} in all). Pick one to use it.`
       : `${brand} in ${count}. Pick one to use it.`;
@@ -175,7 +186,7 @@
 
   function markCurrent() {
     tiles().forEach(t => {
-      const on = t.dataset.key === state.aesthetic;
+      const on = t.dataset.key === curKey();
       t.classList.toggle('is-current', on);
       t.setAttribute('aria-pressed', String(on));
     });
@@ -183,7 +194,7 @@
 
   function currentOrFirst() {
     const vis = shown();
-    return vis.find(t => t.dataset.key === state.aesthetic) || vis[0] || null;
+    return vis.find(t => t.dataset.key === curKey()) || vis[0] || null;
   }
 
   function rovingTo(tile, focus) {
@@ -243,7 +254,7 @@
   // A tile was chosen: aesthetic-board.js's #aeList listener has already applied it.
   function choose(tile) {
     if (!tile) return;
-    if (tile.dataset.key !== state.aesthetic && typeof chooseAesthetic === 'function') chooseAesthetic(tile.dataset.key);
+    if (tile.dataset.key !== curKey() && typeof chooseAesthetic === 'function') chooseAesthetic(tile.dataset.key);
     close();
   }
 

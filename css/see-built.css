@@ -786,10 +786,11 @@
 .sb-k-skel-block { height: 96px; border-radius: min(var(--sb-card-r, var(--k-r)), 12px); }
 @media (prefers-reduced-motion: no-preference) {
   .sb-k-spin { animation: sb-k-spin 0.9s linear infinite; }
-  .sb-k-skel-av::after, .sb-k-skel-line::after, .sb-k-skel-block::after { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--ab-canvas) 55%, transparent), transparent); animation: sb-k-shimmer 1.4s ease-in-out infinite; }
+  .sb-k-skel-av::after, .sb-k-skel-line::after, .sb-k-skel-block::after { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, transparent 33%, color-mix(in srgb, var(--ab-canvas) 55%, transparent) 50%, transparent 67%) 0 0 / 300% 100% no-repeat; animation: sb-k-shimmer 1.4s ease-in-out infinite; }
 }
 @keyframes sb-k-spin { to { transform: rotate(360deg); } }
-@keyframes sb-k-shimmer { from { transform: translateX(-100%); } to { transform: translateX(100%); } }
+/* moves the gradient, not the layer, so the shimmer never adds overflow */
+@keyframes sb-k-shimmer { from { background-position: 100% 0; } to { background-position: 0 0; } }
 
 /* ---- the UI kit page ---- */
 :is(.ab.sb-ab, .sb-gen) .ab-in.sb-kitpage { display: block; padding: clamp(24px, 4cqw, 44px); }

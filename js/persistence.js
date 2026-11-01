@@ -23,6 +23,9 @@ function serializeState(state) {
     // { with, strength, channels }. Saved as is even when BLEND_ENABLED is false.
     blend: state.blend && typeof state.blend === 'object'
       ? { with: state.blend.with, strength: state.blend.strength, channels: { ...state.blend.channels } } : null,
+    // The curated combo being shown (js/combos.js): its id while the style and blend still match
+    // it, else null. Brands saved before combos existed load without one.
+    combo: typeof activeCombo === 'function' ? (activeCombo(state) || {}).id || null : null,
     logoDataUrl: state.logoDataUrl,
     content: { ...state.content },
     locks: { ...state.locks },
@@ -114,6 +117,12 @@ function applySavedSessionToState(saved, state) {
   // Restore the blend after the aesthetic: unknown donor, a donor equal to the base,
   // or malformed channels load as no blend. Brands saved before blends load with null.
   state.blend = typeof normalizeBlend === 'function' ? normalizeBlend(saved.blend, state.aesthetic) : null;
+  // The combo after the blend: only a known id that the restored style and blend still match.
+  state.combo = null;
+  if (typeof normalizeComboId === 'function' && normalizeComboId(saved.combo)) {
+    const c = activeCombo(state);
+    if (c && c.id === saved.combo) state.combo = c.id;
+  }
 
   // Restore locks. Merged onto the defaults so a brand saved before a lock
   // existed (e.g. aesthetic) still has every key. Unknown keys (the retired shape lock)

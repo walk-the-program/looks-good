@@ -616,3 +616,127 @@
 .ab.sb-ab[data-ae="frutiger-aero"].sb-kit .sb-k-skel-line { border-radius: 999px; }
 .ab.sb-ab[data-ae="frutiger-aero"].sb-kit .sb-k-skel-block { border-radius: 12px; }
 .ab.sb-ab[data-ae="frutiger-aero"].sb-kit .sb-k-mbwrap > .sb-k-cmdmenu { width: min(calc(100% - var(--mb) - 2px), 240px); }
+
+/* ==== D2 kit signature: frutiger-aero (begin) ==== */
+/* Frutiger Aero kit signature: "the Aero window kit" (Round D2). Keeps the gel buttons, glass menus and glow focus above and
+   replaces the plain page frame and the flat control marks.
+   1  Shape: gel capsules for buttons, tabs, steppers and badges; a 4px bevel for fields and marks; 8px for panels, lists and
+      cells; checkbox 4px, radio and slider thumb true spheres.
+   2  Edge and depth: bevel. A cool 1px outer rim, a white 1px inner rim, a small blue drop shadow; wells are inset; glow
+      only on focus and on the open menu button.
+   3  Surfaces: every cell is a glass WINDOW (glass fill, rimmed frame, glossy title bar holding the name and tags);
+      fields, tracks and wells are the inset field gradient; floating layers are the near-opaque glass with the hard streak.
+   4  UI type: brand body face at weight 600 with the white text glow on light grounds; sentence case; state captions are
+      small glass capsules, not tracked capitals.
+   5  Fields: inset well with a 4px corner and the cyan glow ring on focus.
+   6  Controls: checkbox = glossy bevel square that becomes a gel with a white tick; radio = glass sphere with a gel core;
+      toggle = glass capsule with ON / OFF lettering and a gloss orb knob; slider = groove with a gel fill and a gel orb;
+      tabs = Win7 file tabs that join the panel; segmented = gel segment on the glass track.
+   7  Selection: ONE signal, the pale primary gel with its 1px tint rim (tabs, menu items, list rows, days, nav, anchors).
+   8  Pressed: sink (inset shade, no lift). Focus: the cyan glow. Disabled: dimmed and desaturated.
+   9  Floating layers: glass-solid, hard streak, white inner rim, small blue shadow.
+  10  Page chrome: the window frame and its glass title bar with the board's caption buttons, glossy tag capsules, glass bars
+      for group heads. No art, no photo, no texture beyond the existing streak and caps. */
+
+/* ---- page chrome: every cell is an Aero window ---- */
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit .sb-k-cell, .ab.sb-ab[data-ae="frutiger-aero"].sb-kit .sb-k-layout {
+  position: relative; gap: 16px; padding-top: 0; border: 1px solid var(--ab-fa-rim-out); border-radius: 8px;
+  background: var(--fa-glass-solid); box-shadow: inset 0 0 0 1px var(--ab-fa-rim-in), 0 10px 22px -16px rgba(20, 70, 110, 0.5);
+}
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit .sb-k-cell-h {
+  margin: 0 -20px; padding: 10px 112px 12px 20px; border-bottom: 1px solid var(--ab-fa-rim-out); border-radius: 7px 7px 0 0;
+  background: linear-gradient(115deg, var(--ab-fa-streak) 0 30%, transparent 30.3%), linear-gradient(180deg, var(--ab-fa-bar-a), var(--ab-fa-bar-b));
+  box-shadow: inset 0 1px 0 var(--ab-fa-rim-in);
+}
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit .sb-k-cell-h::after { content: ""; position: absolute; right: 10px; top: 0; width: 72px; height: 17px; background: var(--fa-caption) center / 72px 17px no-repeat; }
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit .sb-k-cell:target { border-color: var(--ab-fa-gel-rim); box-shadow: inset 0 0 0 1px var(--ab-fa-rim-in), var(--fa-focus); }
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit .sb-k-layout-cap { margin: 0; }
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit .sb-k-states { padding-top: 0; }
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit .sb-k-name { font-weight: var(--fa-hbw, 600); letter-spacing: -0.005em; text-shadow: 0 1px 0 var(--ab-fa-text-glow); }
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit .sb-k-use { color: var(--ab-ink); opacity: 0.78; }
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit .sb-k-slabel {
+  justify-self: start; padding: 1px 10px 2px; border-radius: 999px; background: var(--fa-tint); box-shadow: inset 0 0 0 1px var(--fa-tint-rim), inset 0 1px 0 var(--ab-fa-rim-in);
+  color: var(--ab-ink); font-size: 11.5px; font-weight: var(--fa-bw, 600); letter-spacing: 0; text-transform: none; text-shadow: 0 1px 0 var(--ab-fa-text-glow);
+}
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit .sb-k-slabel::first-letter { text-transform: uppercase; }
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit .sb-k-ios .sb-k-ios-tag { padding: 1px 10px 2px; border: 0; border-radius: 999px; background: var(--fa-btn-bg); box-shadow: var(--fa-btn-sh); color: var(--ab-ink); font-weight: var(--fa-bw, 600); letter-spacing: 0; text-shadow: 0 1px 0 var(--ab-fa-text-glow); }
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit .sb-k-ios[data-ios="custom"] .sb-k-ios-tag { background: var(--fa-tint); box-shadow: inset 0 0 0 1px var(--fa-tint-rim), inset 0 1px 0 var(--ab-fa-rim-in); }
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit .sb-k-ios .sb-k-ios-tag.sb-k-web-tag { background: var(--fa-field-bg); box-shadow: var(--fa-field-sh), 0 0 0 1px var(--ab-fa-field-b); }
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit .sb-k-group > .ab-labelrow {
+  align-items: center; margin-bottom: 18px; padding: 8px 14px; border: 1px solid var(--ab-fa-rim-out); border-radius: 8px;
+  background: linear-gradient(115deg, var(--ab-fa-streak) 0 30%, transparent 30.3%), linear-gradient(180deg, var(--ab-fa-bar-a), var(--ab-fa-bar-b)); box-shadow: inset 0 1px 0 var(--ab-fa-rim-in);
+}
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit .sb-k-group > .ab-labelrow .ab-label:first-child { display: flex; align-items: center; gap: 8px; font-size: 16px; text-shadow: 0 1px 0 var(--ab-fa-text-glow); }
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit .sb-k-type-meta b, .ab.sb-ab[data-ae="frutiger-aero"].sb-kit .sb-k-gl-term b { font-weight: var(--fa-bw, 600); text-shadow: 0 1px 0 var(--ab-fa-text-glow); }
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit .sb-k-chip { border: 0; border-radius: 8px; box-shadow: inset 0 0 0 1px var(--ab-fa-rim-in), 0 0 0 1px var(--ab-fa-rim-out), 0 2px 4px var(--ab-fa-gel-shadow); }
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit .sb-k-gl-link { border: 0; background: var(--fa-btn-bg); box-shadow: var(--fa-btn-sh); font-weight: var(--fa-bw, 600); }
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit .sb-k-gl-link:hover { background: var(--fa-tint); }
+
+/* ---- buttons: the quiet and destructive ones are glass too ---- */
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit .sb-k-danger { background-image: var(--fa-gel-cap); border-radius: 999px; font-weight: var(--fa-bw, 600); }
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit:is([data-sb-danger="ink"], [data-sb-danger="line"]) .sb-k-danger { background: var(--fa-btn-bg); box-shadow: inset 0 1px 0 var(--ab-fa-rim-in), 0 1px 3px rgba(0, 50, 100, 0.18); }
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit .sb-k-pressed:not(.sb-k-fab) { box-shadow: inset 0 3px 6px rgba(0, 30, 60, 0.4), inset 0 0 0 1px rgba(0, 30, 60, 0.25); }
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit .sb-k-textbtn { font-weight: var(--fa-bw, 600); text-shadow: 0 1px 0 var(--ab-fa-text-glow); }
+
+/* ---- fields: inset wells with a 4px corner ---- */
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit :is(.sb-k-field, .sb-k-search, .sb-k-selectwrap) .ab-input { border-radius: 4px; background: var(--fa-field-bg); box-shadow: var(--fa-field-sh); }
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit :is(.sb-k-field, .sb-k-search).is-focus .ab-input { border-color: var(--ab-fa-gel-rim) !important; box-shadow: var(--fa-field-sh), var(--fa-focus) !important; }
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit .sb-k-field.is-error .ab-input { border-color: var(--sb-danger) !important; box-shadow: var(--fa-field-sh), 0 0 0 2px var(--ab-canvas), 0 0 0 4px var(--sb-danger) !important; }
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit .sb-k-field .ab-fieldlabel, .ab.sb-ab[data-ae="frutiger-aero"].sb-kit .sb-k-selectwrap .ab-fieldlabel { font-weight: var(--fa-bw, 600); text-shadow: 0 1px 0 var(--ab-fa-text-glow); }
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit .ab-input.sb-k-select[aria-expanded="true"] { border-color: var(--ab-fa-gel-rim); box-shadow: var(--fa-field-sh), var(--fa-focus); }
+
+/* ---- checkbox, radio, toggle, slider, tabs ---- */
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit .sb-k-box { border: 1px solid var(--ab-fa-field-b); background: var(--fa-btn-bg); box-shadow: inset 0 1px 0 var(--ab-fa-rim-in), 0 1px 2px rgba(0, 50, 100, 0.2); transition: box-shadow 0.15s; }
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit .sb-k-box[type="checkbox"] { border-radius: 4px; }
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit .sb-k-box::before { content: ""; position: absolute; left: 2px; right: 2px; top: 1px; height: 42%; border-radius: 3px 3px 9px 9px / 3px 3px 6px 6px; background: var(--fa-cap); opacity: 0.55; pointer-events: none; }
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit .sb-k-box[type="radio"] { border-radius: 50%; }
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit .sb-k-box[type="radio"]::before { border-radius: 50%; left: 15%; right: 15%; }
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit .sb-k-box:checked { border-color: var(--ab-fa-gel-rim); background: var(--fa-gel-bg); box-shadow: var(--fa-gel-sh); }
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit .sb-k-box:checked::before { opacity: 0.8; }
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit .sb-k-box[type="checkbox"]:checked::after { border-color: var(--ab-fa-gel-on); filter: drop-shadow(0 1px 0 var(--ab-fa-gel-on-sh)); }
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit .sb-k-box[type="radio"]:checked::after { width: 8px; height: 8px; background: var(--ab-fa-gel-on); box-shadow: 0 1px 2px var(--ab-fa-gel-on-sh); }
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit .sb-k-box:active { box-shadow: inset 0 2px 4px rgba(0, 30, 60, 0.4); }
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit .sb-k-check > span { font-weight: var(--fa-bw, 600); text-shadow: 0 1px 0 var(--ab-fa-text-glow); }
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit .ab-switch::after { content: "OFF"; position: absolute; right: 8px; top: 0; height: 100%; display: grid; align-items: center; color: var(--ab-ink); font: 700 9.5px/1 var(--ab-font-b); letter-spacing: 0.04em; pointer-events: none; }
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit .ab-switch:checked::after { content: "ON"; right: auto; left: 9px; color: var(--ab-fa-gel-on); text-shadow: 0 1px 1px var(--ab-fa-gel-on-sh); }
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit .ab-switch { position: relative; }
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit .sb-k-slider-h span:first-child { font-weight: var(--fa-bw, 600); text-shadow: 0 1px 0 var(--ab-fa-text-glow); }
+:is(.ab.sb-ab[data-ae="frutiger-aero"].sb-kit) input[type="range"].sb-k-range::-webkit-slider-runnable-track {
+  height: 8px; border-radius: 999px; box-shadow: var(--fa-field-sh), 0 0 0 1px var(--ab-fa-field-b);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.5), transparent 55%), linear-gradient(90deg, var(--ab-fa-gel) var(--v, 50%), color-mix(in srgb, var(--ab-ink) 12%, var(--ab-canvas)) var(--v, 50%));
+}
+:is(.ab.sb-ab[data-ae="frutiger-aero"].sb-kit) input[type="range"].sb-k-range::-moz-range-track {
+  height: 8px; border-radius: 999px; box-shadow: var(--fa-field-sh), 0 0 0 1px var(--ab-fa-field-b);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.5), transparent 55%), linear-gradient(90deg, var(--ab-fa-gel) var(--v, 50%), color-mix(in srgb, var(--ab-ink) 12%, var(--ab-canvas)) var(--v, 50%));
+}
+:is(.ab.sb-ab[data-ae="frutiger-aero"].sb-kit) input[type="range"].sb-k-range::-webkit-slider-thumb { width: 26px; height: 26px; margin-top: -9px; border: 0; border-radius: 50%; background: var(--fa-gel-cap), var(--fa-gel-bg); box-shadow: var(--fa-gel-sh); }
+:is(.ab.sb-ab[data-ae="frutiger-aero"].sb-kit) input[type="range"].sb-k-range::-moz-range-thumb { width: 26px; height: 26px; border: 0; border-radius: 50%; background: var(--fa-gel-cap), var(--fa-gel-bg); box-shadow: var(--fa-gel-sh); }
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit .sb-k-tabs { gap: 2px; padding: 0 4px; border-bottom: 1px solid var(--ab-fa-rim-out); box-shadow: 0 1px 0 var(--ab-fa-rim-in); }
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit .sb-k-tabs [role="tab"] {
+  padding: 0 12px; border: 1px solid transparent; border-bottom: 0; border-radius: 7px 7px 0 0; color: var(--ab-ink); font-weight: var(--fa-bw, 600); text-shadow: 0 1px 0 var(--ab-fa-text-glow);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.55), transparent); box-shadow: inset 0 1px 0 var(--ab-fa-rim-in);
+}
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit .sb-k-tabs [role="tab"][aria-selected="true"] { margin-bottom: -1px; border-color: var(--fa-tint-rim); background: var(--fa-tint); box-shadow: inset 0 1px 0 var(--ab-fa-rim-in); }
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit .sb-k-tabs [role="tab"][aria-selected="true"]::after { content: none; }
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit .sb-k-tabs [role="tab"]:focus-visible { outline: none; box-shadow: var(--fa-focus); }
+
+/* ---- lists, callouts, toast, badges ---- */
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit .ab-list.sb-k-list { border: 1px solid var(--ab-fa-rim-out); border-radius: 8px; }
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit .sb-k-callout {
+  border: 1px solid var(--tone-ico); border-radius: 8px; box-shadow: inset 0 1px 0 var(--ab-fa-rim-in), inset 0 0 0 1px rgba(255, 255, 255, 0.35), 0 4px 10px -6px rgba(20, 70, 110, 0.4);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--tone) 6%, var(--ab-canvas)), color-mix(in srgb, var(--tone) 20%, var(--ab-canvas)));
+}
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit .sb-k-callout b { font-weight: var(--fa-bw, 600); text-shadow: 0 1px 0 var(--ab-fa-text-glow); }
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit .sb-k-callout > .sb-ico { filter: drop-shadow(0 1px 1px var(--ab-fa-gel-shadow)); }
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit .sb-k-toast {
+  border-radius: 8px; box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.28), 0 6px 14px -6px rgba(20, 70, 110, 0.55); font-weight: var(--fa-bw, 600);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.2) 0, rgba(255, 255, 255, 0.04) 50%, transparent 51%), var(--ab-ink);
+}
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit .sb-k-count { background: var(--fa-btn-bg); box-shadow: var(--fa-btn-sh); color: var(--ab-ink); }
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit .sb-k-badge, .ab.sb-ab[data-ae="frutiger-aero"].sb-kit .sb-k-count.is-accent { background: var(--fa-gel-cap), linear-gradient(180deg, color-mix(in srgb, var(--ab-accent) 78%, #fff), var(--ab-accent) 55%, color-mix(in srgb, var(--ab-accent) 84%, #000)); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--ab-accent) 70%, #000), 0 1px 3px var(--ab-fa-gel-shadow); }
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit .sb-k-topbar { border: 1px solid var(--ab-fa-rim-out); border-radius: 8px; background: linear-gradient(115deg, var(--ab-fa-streak) 0 30%, transparent 30.3%), linear-gradient(180deg, var(--ab-fa-bar-a), var(--ab-fa-bar-b)); box-shadow: inset 0 1px 0 var(--ab-fa-rim-in); }
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit .sb-k-tb-title { font-weight: var(--fa-hbw, 600); text-shadow: 0 1px 0 var(--ab-fa-text-glow); }
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit .sb-k-emptyico { background: var(--fa-gel-cap), var(--fa-tint); box-shadow: inset 0 0 0 1px var(--fa-tint-rim), 0 2px 5px var(--ab-fa-gel-shadow); }
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit .sb-k-sbar-thumb { background: var(--fa-btn-bg); box-shadow: var(--fa-btn-sh); }
+.ab.sb-ab[data-ae="frutiger-aero"].sb-kit .sb-k-navbar { border-radius: 8px; background: linear-gradient(115deg, var(--ab-fa-streak) 0 30%, transparent 30.3%), linear-gradient(180deg, var(--ab-fa-bar-a), var(--ab-fa-bar-b)); box-shadow: inset 0 1px 0 var(--ab-fa-rim-in), 0 4px 10px -6px rgba(20, 70, 110, 0.4); }
+/* ==== D2 kit signature: frutiger-aero (end) ==== */

@@ -1,0 +1,67 @@
+/* ---------------------------------------------------------------------
+   combos/vitrine.css - the "Vitrine" combo (js/combos.js).
+   Pair:      dystopian-luxury (base) x mesh-gradient (donor)
+   Channels:  art, color
+   Scope:     every root carries data-combo="vitrine" while the combo is on (board, deck
+              slides, Built view), next to data-ae="dystopian-luxury" and data-blend="mesh-gradient":
+                .ab[data-combo="vitrine"] ...
+                [data-combo="vitrine"] .sb-k-...
+   Tune:      hand-tuning for this pair only: spacing, contrast and finish between the
+              base's structure and the donor's channels. Loaded last, so these rules win.
+              Vitrine: the base's catalogue plate, the donor's one mesh gradient set behind glass.
+------------------------------------------------------------------------ */
+
+/* ---- the case: the donor's art sits in one square, hairline-framed, lit by a single mesh gradient.
+        (The donor's own mesh is a hero band and a striated field that the blend crops to a sliver;
+        the case repaints it from the same donor tokens so the gradient is actually seen.) ---- */
+.ab[data-combo="vitrine"] .ab.ab-blend-art {
+  background-color: var(--ab-m-base) !important;
+  background-image:
+    radial-gradient(62% 58% at 92% 8%, color-mix(in srgb, var(--ab-m-s) 62%, transparent), transparent 72%),
+    radial-gradient(58% 54% at 8% 96%, color-mix(in srgb, var(--ab-m-p) 58%, transparent), transparent 72%),
+    radial-gradient(44% 40% at 86% 90%, color-mix(in srgb, var(--ab-m-a) 52%, transparent), transparent 72%) !important;
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--ab-dl-ink) 88%, transparent) !important;
+  border-radius: 0 !important;
+}
+/* a passe-partout between the frame and the cards, and no striped sliver poking out of the top */
+.ab[data-combo="vitrine"] .ab.ab-blend-art > .ab-art.ab-blend-inner:not(#bl) {
+  inset: 6% !important; width: 88% !important; height: 88% !important; overflow: visible !important;
+}
+/* deck slides give the art a small box: no passe-partout there, the cards need all of it */
+.ab.ab-slide[data-combo="vitrine"] .ab.ab-blend-art > .ab-art.ab-blend-inner:not(#bl) {
+  inset: 0 !important; width: 100% !important; height: 100% !important;
+}
+/* the cover's art box is about 90px: one card, centred in the case, instead of three cropped ones */
+.ab.ab-slide[data-slide="cover"][data-combo="vitrine"] .mga-code,
+.ab.ab-slide[data-slide="cover"][data-combo="vitrine"] .mga-pay,
+.ab.ab-slide[data-slide="cover"][data-combo="vitrine"] .mga-chip,
+.ab.ab-slide[data-slide="cover"][data-combo="vitrine"] .mga-axis { display: none; }
+.ab.ab-slide[data-slide="cover"][data-combo="vitrine"] .mga-rev { left: 12%; top: 14%; width: 76%; padding: 0.9em 1em; }
+.ab[data-combo="vitrine"] .mga-field { display: none; }
+
+/* donor finish squared to the base: cards are plates with a hairline, like its buttons and rows */
+.ab[data-combo="vitrine"] .mga-card {
+  border-radius: 0; border-color: color-mix(in srgb, var(--ab-dl-ink) 70%, transparent);
+  box-shadow: 0 18px 28px -20px color-mix(in srgb, var(--ab-dl-ink) 55%, transparent);
+}
+.ab[data-combo="vitrine"] .mga-rev { padding: 1.1em 1.25em 0.9em; }
+.ab[data-combo="vitrine"] .mga-pay { top: 86%; }
+.ab[data-combo="vitrine"] .mga-code { top: 47%; border-color: var(--ab-code-line); }
+/* chart marks in the accent ink so the line and its tint read 3:1 on the white card, whatever the palette */
+.ab[data-combo="vitrine"] .mga-line { stroke: var(--ab-accent-ink); }
+.ab[data-combo="vitrine"] .mga-area { fill: var(--ab-accent-ink); }
+.ab[data-combo="vitrine"] .mga-chip, .ab[data-combo="vitrine"] .mga-av { border-radius: 0; }
+.ab[data-combo="vitrine"] .mga-av { background: var(--ab-dl-ink); color: var(--ab-canvas); }
+
+/* highlight word: the donor's swash, drawn as a thin rule in the accent ink (always readable on the
+   canvas) so the one coloured mark on the page stays a mark, not a marker pen */
+.ab[data-combo="vitrine"] .ab-hl, [data-combo="vitrine"] .sb-ab .ab-hl {
+  background-image: linear-gradient(var(--ab-accent-ink), var(--ab-accent-ink)) !important;
+  background-size: 100% 0.075em !important; background-position: 0 96% !important; background-repeat: no-repeat !important;
+  padding-bottom: 0.08em !important;
+}
+
+/* selection is inversion, as in the base */
+.ab[data-combo="vitrine"] ::selection, [data-combo="vitrine"] .sb-ab ::selection {
+  background: var(--ab-dl-ink); color: var(--ab-canvas);
+}

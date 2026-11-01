@@ -588,3 +588,180 @@
   .ab.sb-ab[data-ae="toy-press"].sb-kit .sb-k-spin { animation: none; }
   .ab.sb-ab[data-ae="toy-press"].sb-kit :is(.sb-k-fab, .sb-k-backtop, .sb-k-step, .sb-k-day, .sb-k-nm-item, .sb-k-rb-btn, .sb-k-lb-close, .sb-k-lb-prev, .sb-k-lb-next, .sb-k-split-more, .sb-k-dd):is(:active, .sb-k-pressed, [aria-expanded="true"]) { transform: none; }
 }
+
+/* =====================================================================
+   UI kit differentiation (rev 1): kit signature, Toy Press
+   - Shape: keycaps are rounded squares (12px keys, 9px small keys); trays 22px / 18px nested; wells 12px.
+   - Edge and depth: a HARD LIP only. Trays 2-3px border + a thick bottom edge; keys a solid lip of their own
+     shade; fields are recessed WELLS with a hard inner top lip (no blur anywhere).
+   - Surfaces: the kit cell is a tray one step darker (--ab-surface-2); keys and nested trays are the lighter
+     --ab-surface; fields are sunk wells (--ab-track).
+   - UI type: the brand heading face carries the cell titles; controls and labels are sentence case, 700,
+     tabular numerals, labels sit above fields.
+   - Fields: sunk well, 2px edge, inner top lip. Custom marks are dashed, Native marks are filled.
+   - Controls: toggle = ROCKER KEY (square slide switch with a gripped keycap knob); checkbox = square key with a
+     heavy tick; radio = round peg with a lipped dot; slider = chunky slot with a square keycap thumb;
+     segmented / tabs = separate keys.
+   - Selection: one signal, the LIT KEY: primary face, on-primary text, lip under it (outer lip on keys,
+     inner lip on rows and menu items). Used by segments, tabs, tab bar, menu and list rows, days, nav items.
+   - Pressed = drop by the lip. Focus = 3px primary-text ring. Disabled = flat face + dashed edge, dim.
+   ===================================================================== */
+
+/* ---- page chrome: cell tray, title, stickers, state labels, group rows ---- */
+.ab.sb-ab[data-ae="toy-press"].sb-kit :is(.sb-k-cell, .sb-k-layout) {
+  border: 3px solid var(--ab-line); border-bottom-width: 7px; border-radius: 22px; background: var(--ab-surface-2);
+}
+.ab.sb-ab[data-ae="toy-press"].sb-kit .sb-k-cell:target { border-color: var(--ab-primary); }
+.ab.sb-ab[data-ae="toy-press"].sb-kit .sb-k-name { font-family: var(--ab-font-h); font-weight: var(--ab-hw, 700); letter-spacing: -0.005em; }
+.ab.sb-ab[data-ae="toy-press"].sb-kit .sb-k-use { font-weight: 600; }
+.ab.sb-ab[data-ae="toy-press"].sb-kit .sb-k-ios-tag {
+  padding: 1px 9px 2px; border: 2px solid var(--ab-edge); border-bottom-width: 4px; border-radius: 8px;
+  background: var(--ab-surface); color: var(--ab-ink); font-size: 11px; font-weight: 700; letter-spacing: 0;
+}
+.ab.sb-ab[data-ae="toy-press"].sb-kit .sb-k-ios[data-ios="native"] .sb-k-ios-tag { background: var(--ab-tag-bg); border-color: var(--ab-sec-lip); }
+.ab.sb-ab[data-ae="toy-press"].sb-kit .sb-k-ios .sb-k-ios-tag.sb-k-web-tag { background: transparent; border-style: dashed; border-color: var(--ab-edge); }
+.ab.sb-ab[data-ae="toy-press"].sb-kit .sb-k-ios { font-weight: 600; }
+.ab.sb-ab[data-ae="toy-press"].sb-kit .sb-k-slabel {
+  display: inline-flex; align-items: center; gap: 6px; font-family: var(--ab-font-ui); font-size: 11.5px; font-weight: 700; letter-spacing: 0.01em; text-transform: none;
+}
+.ab.sb-ab[data-ae="toy-press"].sb-kit .sb-k-slabel::before { content: ""; flex: none; width: 8px; height: 8px; border-radius: 3px; background: var(--ab-primary); box-shadow: 0 2px 0 var(--ab-lip); margin-bottom: 2px; }
+.ab.sb-ab[data-ae="toy-press"].sb-kit .sb-k-head .ab-kicker { font-size: 13px; }
+.ab.sb-ab[data-ae="toy-press"].sb-kit .sb-kitpage > .ab-rule { height: 5px; border-radius: 3px; background: var(--ab-line); }
+/* group rows: the number is a small keycap, the right label a sticker */
+.ab.sb-ab[data-ae="toy-press"].sb-kit .sb-k-group > .ab-labelrow { align-items: center; margin-bottom: 18px; }
+.ab.sb-ab[data-ae="toy-press"].sb-kit .sb-k-group > .ab-labelrow > .ab-label:first-child {
+  display: inline-flex; align-items: center; gap: 12px; font-family: var(--ab-font-h); font-size: 24px; line-height: 1.1; font-weight: var(--ab-hw, 700); color: var(--ab-ink);
+}
+.ab.sb-ab[data-ae="toy-press"].sb-kit .sb-k-group > .ab-labelrow > .ab-label:first-child .ab-n {
+  display: inline-grid; place-items: center; flex: none; width: 40px; height: 40px; margin-bottom: 4px; border-radius: 12px;
+  background: var(--ab-primary); color: var(--ab-on-primary); box-shadow: 0 4px 0 var(--ab-lip); font-family: var(--ab-font-h); font-size: 17px; font-style: normal; font-variant-numeric: tabular-nums;
+}
+.ab.sb-ab[data-ae="toy-press"].sb-kit .sb-k-group > .ab-labelrow > .ab-label:first-child .ab-n::after { content: none; }
+.ab.sb-ab[data-ae="toy-press"].sb-kit .sb-k-group > .ab-labelrow > .ab-label:not(:first-child) {
+  padding: 2px 12px 4px; border: 2px solid var(--ab-edge); border-bottom-width: 4px; border-radius: 10px; background: var(--ab-surface); color: var(--ab-ink); font-size: 12px; font-weight: 700; letter-spacing: 0; text-transform: none;
+}
+.ab.sb-ab[data-ae="toy-press"].sb-kit .sb-k-typescale { border-top: 3px solid var(--ab-line); }
+.ab.sb-ab[data-ae="toy-press"].sb-kit .sb-k-type-row { border-bottom: 3px solid var(--ab-line); }
+.ab.sb-ab[data-ae="toy-press"].sb-kit .sb-k-type-meta b { font-weight: 700; }
+.ab.sb-ab[data-ae="toy-press"].sb-kit .sb-k-chip { border: 2px solid var(--ab-line); border-radius: 14px; box-shadow: 0 5px 0 var(--ab-line); margin-bottom: 10px; }
+.ab.sb-ab[data-ae="toy-press"].sb-kit .sb-k-swatch b { font-weight: 700; }
+.ab.sb-ab[data-ae="toy-press"].sb-kit .sb-k-gl { border-top: 3px solid var(--ab-line); }
+.ab.sb-ab[data-ae="toy-press"].sb-kit .sb-k-gl-row { border-bottom: 3px solid var(--ab-line); }
+.ab.sb-ab[data-ae="toy-press"].sb-kit .sb-k-gl-term { font-weight: 700; }
+.ab.sb-ab[data-ae="toy-press"].sb-kit .sb-k-gl-link {
+  min-height: 30px; padding: 0 12px; border: 2px solid var(--ab-edge); border-radius: 9px; background: var(--ab-surface); color: var(--ab-ink); font-weight: 700; box-shadow: 0 3px 0 var(--ab-edge); margin-bottom: 3px;
+}
+.ab.sb-ab[data-ae="toy-press"].sb-kit .sb-k-gl-link:hover { background: var(--ab-tag-bg); }
+.ab.sb-ab[data-ae="toy-press"].sb-kit .sb-k-gl-link:active { transform: translateY(3px); box-shadow: 0 0 0 var(--ab-edge); }
+.ab.sb-ab[data-ae="toy-press"].sb-kit .sb-k-gl-link:focus-visible { outline: 3px solid var(--ab-primary-text); outline-offset: 3px; }
+
+/* ---- shape: keys 12px, small keys 9px, trays 22px (nested 18px) ---- */
+.ab.sb-ab[data-ae="toy-press"].sb-kit :is(.ab-cta.sb-k-btn, .ab-type-apply, .sb-k-danger, .ab-cta.sb-k-split-more) { border-radius: 12px; }
+.ab.sb-ab[data-ae="toy-press"].sb-kit :is(.ab-type-apply.sb-k-iconbtn, .ab-type-apply.sb-icon-btn, .sb-k-icon, .sb-k-backtop, .sb-k-step, .sb-k-rb-btn, .sb-k-lb-close, .sb-k-lb-prev, .sb-k-lb-next) { border-radius: 9px; }
+.ab.sb-ab[data-ae="toy-press"].sb-kit .sb-k-fab { border-radius: 14px; }
+.ab.sb-ab[data-ae="toy-press"].sb-kit .ab-seg-btn { border-radius: 10px; }
+.ab.sb-ab[data-ae="toy-press"].sb-kit .sb-k-tabs [role="tab"] { border-radius: 10px; }
+.ab.sb-ab[data-ae="toy-press"].sb-kit :is(.ab-card, .ab-panel, .ab-list.sb-k-list, .sb-k-cal, .sb-k-acc, .sb-k-navbar, .sb-k-ribbon, .sb-k-fabbox, .sb-k-tabbarbox) { border-width: 2px; border-bottom-width: 5px; border-radius: 18px; }
+.ab.sb-ab[data-ae="toy-press"].sb-kit :is(.sb-k-menu, .sb-k-listbox, .sb-k-pop, .sb-k-tip, .sb-k-mega-panel, .sb-k-menubar, .sb-k-stepper, .sb-k-wheel, .sb-k-overlaybox, .sb-k-ctxbox, .sb-k-mx-tile) { border-width: 2px; border-bottom-width: 5px; border-radius: 16px; }
+.ab.sb-ab[data-ae="toy-press"].sb-kit .sb-k-ctxbox { border-bottom-width: 5px; border-style: solid; border-color: var(--ab-line); }
+.ab.sb-ab[data-ae="toy-press"].sb-kit :is(.sb-k-dialog, .sb-k-lightbox) { border: 3px solid var(--ab-line); border-bottom-width: 7px; border-radius: 22px; }
+.ab.sb-ab[data-ae="toy-press"].sb-kit .sb-k-sheet { border-top: 3px solid var(--ab-line); border-radius: 22px 22px 0 0; }
+.ab.sb-ab[data-ae="toy-press"].sb-kit .sb-k-side { border-left: 3px solid var(--ab-line); border-radius: 22px 0 0 22px; }
+.ab.sb-ab[data-ae="toy-press"].sb-kit .sb-k-drawer { border-right: 3px solid var(--ab-line); border-radius: 0 22px 22px 0; }
+.ab.sb-ab[data-ae="toy-press"].sb-kit .sb-k-toast { border-radius: 12px; }
+.ab.sb-ab[data-ae="toy-press"].sb-kit .sb-k-callout { border-radius: 14px; }
+
+/* ---- fields: a sunk well with a hard inner top lip ---- */
+.ab.sb-ab[data-ae="toy-press"].sb-kit :is(.sb-k-field, .sb-k-search, .sb-k-selectwrap) .ab-input {
+  border: 2px solid var(--ab-edge); border-radius: 12px; background: var(--ab-track);
+  box-shadow: inset 0 4px 0 color-mix(in srgb, var(--ab-ink) 14%, transparent);
+}
+.ab.sb-ab[data-ae="toy-press"].sb-kit :is(.sb-k-field, .sb-k-search, .sb-k-selectwrap) .ab-input::placeholder { color: color-mix(in srgb, var(--ab-ink) 62%, transparent); opacity: 1; }
+.ab.sb-ab[data-ae="toy-press"].sb-kit .sb-k-field .ab-fieldlabel { font-weight: 700; color: var(--ab-ink); }
+.ab.sb-ab[data-ae="toy-press"].sb-kit .sb-k-field.is-focus .ab-input,
+.ab.sb-ab[data-ae="toy-press"].sb-kit .sb-k-search.is-focus .ab-input {
+  border-color: var(--ab-primary-text) !important; background: var(--ab-canvas);
+  box-shadow: inset 0 4px 0 color-mix(in srgb, var(--ab-primary-text) 24%, transparent), 0 0 0 3px color-mix(in srgb, var(--ab-primary-text) 28%, transparent) !important;
+}
+.ab.sb-ab[data-ae="toy-press"].sb-kit .sb-k-field.is-error .ab-input {
+  border-color: var(--sb-danger) !important;
+  box-shadow: inset 0 4px 0 color-mix(in srgb, var(--sb-danger) 22%, transparent), 0 0 0 3px color-mix(in srgb, var(--sb-danger) 24%, transparent) !important;
+}
+.ab.sb-ab[data-ae="toy-press"].sb-kit :is(.sb-k-field, .sb-k-search) .ab-input:disabled { border-style: dashed; box-shadow: none; background: var(--ab-dis-face); }
+.ab.sb-ab[data-ae="toy-press"].sb-kit .sb-k-help { font-weight: 600; }
+
+/* ---- controls ---- */
+/* checkbox: square key, heavy tick. radio: round peg, the dot sits on its own lip */
+.ab.sb-ab[data-ae="toy-press"].sb-kit .sb-k-box { border-radius: 8px; }
+.ab.sb-ab[data-ae="toy-press"].sb-kit .sb-k-box[type="radio"] { border-radius: 50%; }
+.ab.sb-ab[data-ae="toy-press"].sb-kit .sb-k-box[type="checkbox"]:checked::after { width: 13px; height: 7px; border-left-width: 4px; border-bottom-width: 4px; }
+.ab.sb-ab[data-ae="toy-press"].sb-kit .sb-k-box[type="radio"]:checked::after { width: 10px; height: 10px; margin-top: -2px; box-shadow: 0 3px 0 var(--ab-lip); }
+.ab.sb-ab[data-ae="toy-press"].sb-kit .sb-k-box:disabled { border-style: dashed; box-shadow: none; opacity: 1; }
+/* toggle: a rocker key. The knob is a square keycap with two grip grooves and slides to the lit side */
+.ab.sb-ab[data-ae="toy-press"].sb-kit .ab-switch { width: 64px; height: 36px; border-radius: 11px; background: var(--ab-track-off); box-shadow: 0 4px 0 var(--ab-edge-lip), inset 0 0 0 2px var(--ab-edge); margin-bottom: 4px; }
+.ab.sb-ab[data-ae="toy-press"].sb-kit .ab-switch::before {
+  left: 4px; top: 4px; width: 28px; height: 28px; border-radius: 8px; box-shadow: 0 3px 0 var(--ab-knob-lip);
+  background: linear-gradient(90deg, var(--ab-knob-lip) 0 2px, transparent 2px 6px, var(--ab-knob-lip) 6px 8px) center / 8px 12px no-repeat, var(--ab-knob);
+}
+.ab.sb-ab[data-ae="toy-press"].sb-kit .ab-switch:checked { background: var(--ab-primary); box-shadow: 0 4px 0 var(--ab-lip), inset 0 0 0 2px var(--ab-pri-bd); }
+.ab.sb-ab[data-ae="toy-press"].sb-kit .ab-switch:checked::before { transform: translateX(28px); }
+.ab.sb-ab[data-ae="toy-press"].sb-kit .ab-switch:active::before { transform: translateY(3px); box-shadow: 0 0 0 var(--ab-knob-lip); }
+.ab.sb-ab[data-ae="toy-press"].sb-kit .ab-switch:checked:active::before { transform: translate(28px, 3px); }
+.ab.sb-ab[data-ae="toy-press"].sb-kit .ab-switch:disabled { background: var(--ab-dis-face); box-shadow: 0 4px 0 var(--ab-dis-lip), inset 0 0 0 2px var(--ab-dis-lip); }
+.ab.sb-ab[data-ae="toy-press"].sb-kit .ab-switch:disabled::before { background: linear-gradient(90deg, var(--ab-dis-lip) 0 2px, transparent 2px 6px, var(--ab-dis-lip) 6px 8px) center / 8px 12px no-repeat, var(--ab-surface); box-shadow: 0 3px 0 var(--ab-dis-lip); }
+.ab.sb-ab[data-ae="toy-press"].sb-kit .ab-switch:checked:disabled { background: var(--ab-dis-lip); }
+/* slider: a chunky slot, a square keycap thumb with grip grooves */
+.ab.sb-ab[data-ae="toy-press"].sb-kit input.sb-k-range::-webkit-slider-runnable-track { height: 16px; border-radius: 8px; box-shadow: inset 0 0 0 2px var(--ab-edge); }
+.ab.sb-ab[data-ae="toy-press"].sb-kit input.sb-k-range::-moz-range-track { height: 16px; border-radius: 8px; box-shadow: inset 0 0 0 2px var(--ab-edge); }
+.ab.sb-ab[data-ae="toy-press"].sb-kit input.sb-k-range::-webkit-slider-thumb {
+  box-sizing: border-box; width: 28px; height: 28px; margin-top: -6px; border: 2px solid var(--ab-edge); border-radius: 9px; box-shadow: 0 4px 0 var(--ab-edge);
+  background: linear-gradient(90deg, var(--ab-edge) 0 2px, transparent 2px 6px, var(--ab-edge) 6px 8px) center / 8px 12px no-repeat, var(--ab-surface);
+}
+.ab.sb-ab[data-ae="toy-press"].sb-kit input.sb-k-range::-moz-range-thumb {
+  box-sizing: border-box; width: 28px; height: 28px; border: 2px solid var(--ab-edge); border-radius: 9px; box-shadow: 0 4px 0 var(--ab-edge);
+  background: linear-gradient(90deg, var(--ab-edge) 0 2px, transparent 2px 6px, var(--ab-edge) 6px 8px) center / 8px 12px no-repeat, var(--ab-surface);
+}
+.ab.sb-ab[data-ae="toy-press"].sb-kit input.sb-k-range:disabled { opacity: 1; }
+.ab.sb-ab[data-ae="toy-press"].sb-kit input.sb-k-range:focus-visible { outline: 3px solid var(--ab-primary-text); outline-offset: 3px; border-radius: 10px; }
+
+/* disabled keys: flat face, dashed edge */
+.ab.sb-ab[data-ae="toy-press"].sb-kit :is(.ab-cta.sb-k-btn, .ab-type-apply, .sb-k-danger, .sb-k-step):disabled { border-style: dashed; }
+
+/* ---- selection: the LIT KEY (primary face, on-primary text, a lip under it) ---- */
+.ab.sb-ab[data-ae="toy-press"].sb-kit .ab-seg-btn[aria-pressed="true"],
+.ab.sb-ab[data-ae="toy-press"].sb-kit .sb-k-tabs [role="tab"][aria-selected="true"],
+.ab.sb-ab[data-ae="toy-press"].sb-kit .sb-k-anchors a.is-on,
+.ab.sb-ab[data-ae="toy-press"].sb-kit .sb-k-nb-links a[aria-current],
+.ab.sb-ab[data-ae="toy-press"].sb-kit .sb-k-nm-item[aria-current="page"] {
+  background: var(--ab-primary); border-color: var(--ab-pri-bd); color: var(--ab-on-primary); box-shadow: 0 3px 0 var(--ab-lip);
+}
+.ab.sb-ab[data-ae="toy-press"].sb-kit .sb-k-nb-links a[aria-current],
+.ab.sb-ab[data-ae="toy-press"].sb-kit .sb-k-nm-item[aria-current="page"] { border: 2px solid var(--ab-pri-bd); margin-bottom: 3px; }
+.ab.sb-ab[data-ae="toy-press"].sb-kit .sb-k-nm-item[aria-current="page"] .sb-ico { color: var(--ab-on-primary); }
+.ab.sb-ab[data-ae="toy-press"].sb-kit :is(.sb-k-day.is-sel, .sb-k-day.is-start, .sb-k-day.is-end) { background: var(--ab-primary); color: var(--ab-on-primary); }
+.ab.sb-ab[data-ae="toy-press"].sb-kit .sb-tab[aria-current] { color: var(--ab-on-primary); }
+.ab.sb-ab[data-ae="toy-press"].sb-kit .sb-tab[aria-current] > .sb-ico { color: var(--ab-on-primary); }
+.ab.sb-ab[data-ae="toy-press"].sb-kit .sb-tab[aria-current]::before { background: var(--ab-primary); border-color: var(--ab-pri-bd); border-radius: 12px; }
+/* rows and menu items: the lit key's lip is inside the row */
+.ab.sb-ab[data-ae="toy-press"].sb-kit .ab-row.sb-k-row.is-picked:not(.sb-k-pressed):not(:active),
+.ab.sb-ab[data-ae="toy-press"].sb-kit .ab-row.sb-k-row.is-picked:last-child:not(.sb-k-pressed):not(:active) {
+  background-color: var(--ab-primary); color: var(--ab-on-primary); --k-muted: color-mix(in srgb, var(--ab-on-primary) 86%, var(--ab-primary));
+  box-shadow: inset 0 -4px 0 var(--ab-lip);
+}
+.ab.sb-ab[data-ae="toy-press"].sb-kit .ab-row.sb-k-row.is-picked :is(.sb-k-title, .sb-ico, .sb-k-chev) { color: var(--ab-on-primary); }
+.ab.sb-ab[data-ae="toy-press"].sb-kit :is(.sb-k-menu, .sb-k-listbox, .sb-k-cmdmenu, .sb-k-combo .sb-k-menu) li[aria-selected="true"],
+.ab.sb-ab[data-ae="toy-press"].sb-kit .sb-k-cmdmenu li.has-sub.is-open {
+  background: var(--ab-primary); color: var(--ab-on-primary); box-shadow: inset 0 -4px 0 var(--ab-lip);
+}
+.ab.sb-ab[data-ae="toy-press"].sb-kit :is(.sb-k-menu, .sb-k-listbox, .sb-k-cmdmenu, .sb-k-combo .sb-k-menu) li[aria-selected="true"] .sb-ico,
+.ab.sb-ab[data-ae="toy-press"].sb-kit .sb-k-cmdmenu li.has-sub.is-open .sb-ico { color: var(--ab-on-primary); }
+.ab.sb-ab[data-ae="toy-press"].sb-kit .sb-k-menubar button[aria-expanded="true"] { background: var(--ab-primary); color: var(--ab-on-primary); box-shadow: inset 0 -4px 0 var(--ab-lip); }
+.ab.sb-ab[data-ae="toy-press"].sb-kit .sb-k-match { background: var(--ab-primary); color: var(--ab-on-primary); border-radius: 5px; }
+.ab.sb-ab[data-ae="toy-press"].sb-kit .sb-k-acc[open] > .sb-k-acc-sum { box-shadow: inset 0 -4px 0 var(--ab-line); }
+
+/* ---- the kit's trays: one step lighter than the cell so they stand on it ---- */
+.ab.sb-ab[data-ae="toy-press"].sb-kit .sb-k-cell :is(.ab-card.sb-k-card, .ab-list.sb-k-list, .sb-k-cal, .sb-k-acc, .sb-k-menu, .sb-k-listbox, .sb-k-mega-panel, .sb-k-navbar, .sb-k-menubar, .sb-k-ribbon, .sb-k-wheel, .sb-k-stepper, .sb-k-pop) { background-color: var(--ab-surface); }
+.ab.sb-ab[data-ae="toy-press"].sb-kit .sb-k-cell .sb-k-acc[open] { background-color: var(--ab-surface-2); }
+.ab.sb-ab[data-ae="toy-press"].sb-kit .sb-k-sheet { background: var(--ab-surface); }
+.ab.sb-ab[data-ae="toy-press"].sb-kit .sb-k-dialog { box-shadow: none; }
+.ab.sb-ab[data-ae="toy-press"].sb-kit .sb-k-nb-links a { padding: 0 14px; }

@@ -475,3 +475,68 @@
 @media (prefers-reduced-motion: reduce) {
   .ab.sb-ab:is([data-ae="industrial-device"], [data-ae="industrial-device--classic"]).sb-kit .sb-k-spin { animation: none; }
 }
+
+/* ---- UI kit differentiation pass (Industrial Device only; the classic version keeps the rules above) ----
+   Kit signature
+   - Shape: 8px plates for containers, 4px keys for every control, round key caps only for radios and lamps.
+   - Edge and depth: the machined lip (1px hair, 2px lower lip on keys); nothing is soft or blurred.
+   - Surface: every cell is a plate (face fill) with an engraved name strip; fields and tracks are recessed slots.
+   - Type: Azeret Mono printed legends (uppercase, wide tracking) carry names, tags, labels and tabs; sans only for reading text.
+   - Controls: checkbox is a square key, radio a round key cap with the main-key ring, tabs a row of keys, avatars graphite keys.
+   - Selection: one signal, the key pressed in (primary fill, inset shadow); text rows sink into a slot with a primary bar.
+   - States: a printed legend with a lamp under every spec; disabled dims, focus is a 2px outline offset 3px.
+   - Chrome: plate cells with a nameplate header, Native / Custom / Web as printed key, slot and dashed tags. */
+.ab.sb-ab[data-ae="industrial-device"].sb-kit .sb-k-cell { gap: 0; padding: 0; border: 1px solid var(--ab-hair); border-radius: 8px; background: var(--ab-face); box-shadow: var(--id-lip); }
+.ab.sb-ab[data-ae="industrial-device"].sb-kit .sb-k-cell:target { border-color: var(--ab-primary); }
+.ab.sb-ab[data-ae="industrial-device"].sb-kit .sb-k-cell-h { gap: 6px; padding: 14px 20px 14px; border-bottom: 1px solid var(--ab-hair); border-radius: 7px 7px 0 0; background: var(--ab-slot); box-shadow: var(--ab-slot-sh), 0 1px 0 var(--ab-edge-hi); }
+.ab.sb-ab[data-ae="industrial-device"].sb-kit .sb-k-states { padding: 20px; }
+.ab.sb-ab[data-ae="industrial-device"].sb-kit .sb-k-name { font: 600 12px/16px var(--id-mono); letter-spacing: 0.1em; text-transform: uppercase; color: var(--ab-ink); }
+.ab.sb-ab[data-ae="industrial-device"].sb-kit .sb-k-use { color: var(--k-muted); }
+.ab.sb-ab[data-ae="industrial-device"].sb-kit .sb-k-ios { gap: 6px 8px; }
+.ab.sb-ab[data-ae="industrial-device"].sb-kit .sb-k-ios .sb-k-ios-tag { padding: 2px 7px; border: 1px solid var(--ab-hair); border-radius: 2px; background: var(--ab-key); color: var(--ab-ink); font: 600 9.5px/14px var(--id-mono); letter-spacing: 0.12em; text-transform: uppercase; box-shadow: var(--id-keyshadow); }
+.ab.sb-ab[data-ae="industrial-device"].sb-kit .sb-k-ios[data-ios="native"] .sb-k-ios-tag { background: var(--ab-face); box-shadow: var(--ab-slot-sh); }
+.ab.sb-ab[data-ae="industrial-device"].sb-kit .sb-k-ios .sb-k-ios-tag.sb-k-web-tag { border-style: dashed; border-color: var(--k-muted); background: transparent; box-shadow: none; }
+.ab.sb-ab[data-ae="industrial-device"].sb-kit .sb-k-ios code { font-family: var(--id-mono); font-size: 11px; letter-spacing: 0.02em; }
+.ab.sb-ab[data-ae="industrial-device"].sb-kit .sb-k-slabel { display: inline-flex; align-items: center; gap: 8px; font: 600 9.5px/1.3 var(--id-mono); letter-spacing: 0.14em; }
+.ab.sb-ab[data-ae="industrial-device"].sb-kit .sb-k-slabel::before { content: ""; flex: none; width: 6px; height: 6px; border-radius: 50%; background: var(--ab-slot); box-shadow: 0 0 0 1px var(--ab-hair), inset 0 1px 1px rgba(0, 0, 0, 0.35); }
+.ab.sb-ab[data-ae="industrial-device"].sb-kit .ab-card-title.sb-k-pagetitle { font-weight: 400; text-transform: lowercase; letter-spacing: calc(-0.01em * var(--ab-tr, 1)); }
+.ab.sb-ab[data-ae="industrial-device"].sb-kit .sb-k-layout { border: 1px solid var(--ab-hair); border-radius: 8px; background: var(--ab-face); box-shadow: var(--id-lip); }
+.ab.sb-ab[data-ae="industrial-device"].sb-kit :is(.sb-k-typescale, .sb-k-gl) { border-top-color: var(--ab-hair); }
+.ab.sb-ab[data-ae="industrial-device"].sb-kit :is(.sb-k-type-row, .sb-k-gl-row) { border-bottom-color: var(--ab-hair); box-shadow: 0 1px 0 var(--ab-edge-hi); }
+.ab.sb-ab[data-ae="industrial-device"].sb-kit .sb-k-type-meta b, .ab.sb-ab[data-ae="industrial-device"].sb-kit .sb-k-gl-term b, .ab.sb-ab[data-ae="industrial-device"].sb-kit .sb-k-swatch b { font: 600 11px/1.4 var(--id-mono); letter-spacing: 0.1em; text-transform: uppercase; }
+.ab.sb-ab[data-ae="industrial-device"].sb-kit .sb-k-type-meta span, .ab.sb-ab[data-ae="industrial-device"].sb-kit .sb-k-swatch code, .ab.sb-ab[data-ae="industrial-device"].sb-kit .sb-k-sizes { font-family: var(--id-mono); font-size: 11px; letter-spacing: 0.02em; }
+.ab.sb-ab[data-ae="industrial-device"].sb-kit .sb-k-chip { border-radius: 4px; border-color: var(--ab-hair); box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4), 0 2px 0 var(--ab-key-edge); }
+.ab.sb-ab[data-ae="industrial-device"].sb-kit .sb-k-gl-link { min-height: 28px; border: 1px solid var(--ab-hair); border-radius: 4px; background: var(--ab-key); font: 600 10px var(--id-mono); letter-spacing: 0.08em; text-transform: uppercase; box-shadow: var(--id-keyshadow); }
+.ab.sb-ab[data-ae="industrial-device"].sb-kit .sb-k-gl-link:hover { background: var(--ab-key-hi); }
+.ab.sb-ab[data-ae="industrial-device"].sb-kit .sb-k-gl-link:focus-visible { outline: 2px solid var(--ab-primary-text); outline-offset: 3px; }
+
+/* checkbox: a square key; radio: a round key cap with the main key's ring; checked = pressed in, primary */
+.ab.sb-ab[data-ae="industrial-device"].sb-kit .sb-k-box { border: 1px solid var(--ab-hair); border-radius: 4px; background: var(--ab-key); box-shadow: var(--id-keyshadow); }
+.ab.sb-ab[data-ae="industrial-device"].sb-kit .sb-k-box[type="radio"] { border-radius: 50%; }
+.ab.sb-ab[data-ae="industrial-device"].sb-kit .sb-k-box:checked { border-color: rgba(0, 0, 0, 0.2); background: var(--ab-primary); box-shadow: var(--idk-pressed); }
+.ab.sb-ab[data-ae="industrial-device"].sb-kit .sb-k-box[type="checkbox"]:checked::after { width: 11px; height: 6px; border-left-width: 3px; border-bottom-width: 3px; }
+.ab.sb-ab[data-ae="industrial-device"].sb-kit .sb-k-box[type="radio"]:checked::after { width: 10px; height: 10px; border: 2px solid var(--ab-on-primary); background: transparent; opacity: 0.9; box-sizing: border-box; }
+.ab.sb-ab[data-ae="industrial-device"].sb-kit .sb-k-check { font-size: var(--k-body, 17px); }
+
+/* tabs: a row of keys; the open one is pressed in (primary) */
+.ab.sb-ab[data-ae="industrial-device"].sb-kit .sb-k-tabs { gap: 6px; padding-bottom: 8px; border-bottom: 1px solid var(--ab-hair); box-shadow: 0 1px 0 var(--ab-edge-hi); }
+.ab.sb-ab[data-ae="industrial-device"].sb-kit .sb-k-tabs [role="tab"] { padding: 0 14px; border: 1px solid var(--ab-hair); border-radius: 4px; background: var(--ab-key); color: var(--ab-ink); font: 600 11px var(--id-mono); letter-spacing: 0.1em; text-transform: uppercase; box-shadow: var(--id-keyshadow); }
+.ab.sb-ab[data-ae="industrial-device"].sb-kit .sb-k-tabs [role="tab"]:hover { background: var(--ab-key-hi); }
+.ab.sb-ab[data-ae="industrial-device"].sb-kit .sb-k-tabs [role="tab"][aria-selected="true"] { border-color: rgba(0, 0, 0, 0.14); background: var(--ab-primary); color: var(--ab-on-primary); box-shadow: var(--idk-pressed); }
+.ab.sb-ab[data-ae="industrial-device"].sb-kit .sb-k-tabs [role="tab"][aria-selected="true"]::after { content: none; }
+.ab.sb-ab[data-ae="industrial-device"].sb-kit .sb-k-tabs [role="tab"]:focus-visible { outline: 2px solid var(--ab-primary-text); outline-offset: 3px; }
+
+/* rows: a picked row sinks into a slot with a primary bar; avatars are graphite keys; readouts are mono */
+.ab.sb-ab[data-ae="industrial-device"].sb-kit .ab-row.sb-k-row.is-picked { background-color: var(--ab-slot); box-shadow: var(--ab-slot-sh), inset 3px 0 0 var(--ab-primary); }
+.ab.sb-ab[data-ae="industrial-device"].sb-kit .sb-k-av { border-radius: 4px; background: var(--ab-key-dark); color: var(--ab-on-key-dark); font-family: var(--id-mono); font-weight: 600; box-shadow: inset 0 1px 0 var(--ab-key-dark-hi), 0 2px 0 var(--ab-key-dark-edge); }
+.ab.sb-ab[data-ae="industrial-device"].sb-kit .sb-k-avs .sb-k-av { box-shadow: 0 0 0 2px var(--ab-face) !important; }
+.ab.sb-ab[data-ae="industrial-device"].sb-kit .sb-k-trail { font-family: var(--id-mono); font-size: 13px; letter-spacing: 0.02em; }
+.ab.sb-ab[data-ae="industrial-device"].sb-kit .sb-k-sub { letter-spacing: 0.01em; }
+
+/* feedback: callouts are plates with a tone bar; badges are printed legends; toast is a panel strip; empty icon a keycap */
+.ab.sb-ab[data-ae="industrial-device"].sb-kit .sb-k-callout { border: 1px solid var(--ab-hair); border-radius: 4px; background: var(--ab-face); box-shadow: var(--id-lip), inset 5px 0 0 var(--tone-ico); padding-left: 21px; }
+.ab.sb-ab[data-ae="industrial-device"].sb-kit .sb-k-badge, .ab.sb-ab[data-ae="industrial-device"].sb-kit .sb-k-count { min-height: 20px; border: 1px solid var(--ab-hair); border-radius: 2px; font: 600 10px/1 var(--id-mono); letter-spacing: 0.1em; text-transform: uppercase; box-shadow: var(--id-keyshadow); }
+.ab.sb-ab[data-ae="industrial-device"].sb-kit .sb-k-toast { border-radius: 4px; border: 1px solid var(--ab-hair); background: var(--ab-oled); color: var(--ab-oled-ink); box-shadow: var(--ab-slot-sh); font-family: var(--id-mono); letter-spacing: 0.04em; }
+.ab.sb-ab[data-ae="industrial-device"].sb-kit .sb-k-emptyico { border-radius: 4px; border: 1px solid var(--ab-hair); background: var(--ab-key); color: var(--ab-ink); box-shadow: var(--id-keyshadow); }
+.ab.sb-ab[data-ae="industrial-device"].sb-kit .sb-k-sheet { border: 1px solid var(--ab-hair); border-bottom: 0; border-radius: 8px 8px 0 0; background: var(--ab-face); box-shadow: var(--id-lip); }
+.ab.sb-ab[data-ae="industrial-device"].sb-kit .sb-k-grab { border-radius: 1px; background: var(--idk-grip), var(--ab-hair); }

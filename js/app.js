@@ -34,6 +34,7 @@ function freshState() {
     aesthetic: 'soft-form',   // key into AESTHETICS (js/aesthetics/registry.js)
     aestheticVersion: 'current',   // 'current' | 'classic' (the r6-0-baseline copy; registry.js)
     blend: null,     // { with, strength, channels } — second aesthetic blended in (js/blend.js)
+    combo: null,     // id of the curated combo being shown (js/combos.js); derived from aesthetic + blend
     locks: { typography: false, color: false, aesthetic: false },
     dismissed: [],   // suggestion ids dismissed for this brand
     patterns: [],    // patterns in the brief (the cart): [{ key, params, colorway, seed, use, svg }] (js/patterns-ui.js)
@@ -105,9 +106,12 @@ function applyBrandColors(colors) {
 // Selecting an aesthetic also takes its recommended background mode.
 function applyAesthetic(key) {
   const def = aestheticByKey(key);
+  // Leaving a combo for a plain style drops the combo's blend with it (js/combos.js).
+  const leavingCombo = typeof activeCombo === 'function' && activeCombo(state);
   state.aesthetic = def.key;
+  state.combo = null;
   // A blend cannot use the base as its own donor: choosing the donor clears the blend.
-  if (state.blend && state.blend.with === def.key) state.blend = null;
+  if (state.blend && (leavingCombo || state.blend.with === def.key)) state.blend = null;
   applyAestheticLook(resolveAestheticDef(state));
 }
 // The recommended background mode of the version that renders: the classic copy can
@@ -118,7 +122,11 @@ function applyAestheticLook(def) {
 // Panel tiles, prev/next and Compare tiles: one undo step, then a normal render
 // (which also marks the brand unsaved via the serialized state).
 function chooseAesthetic(key) {
-  if (key === state.aesthetic) return;
+  // A combo tile (key "combo:<id>", js/combos.js) is applied as one undo step of its own.
+  const comboId = typeof comboIdFromKey === 'function' ? comboIdFromKey(key) : null;
+  if (comboId) return applyCombo(comboId);
+  // The base style's own tile while its combo is on: back to the plain style.
+  if (key === state.aesthetic && !(typeof activeCombo === 'function' && activeCombo(state))) return;
   pushUndoSnapshot(state);
   applyAesthetic(key);
   const fonts = followAestheticFonts();
@@ -159,10 +167,14 @@ function setAestheticVersion(version) {
 }
 // Picks among the aesthetics visible under the sidebar family filter (all of
 // them when the filter is "All"; visibleAesthetics() is in aesthetic-board.js).
+// The pool also holds the combos (picker keys "combo:<id>", aePickKeys in aesthetic-board.js).
 function randomizeAesthetic() {
-  let pool = (window.visibleAesthetics ? visibleAesthetics() : AESTHETICS).filter(a => a.key !== state.aesthetic);
-  if (!pool.length) pool = AESTHETICS.filter(a => a.key !== state.aesthetic);
-  applyAesthetic(pickRandom(pool).key);
+  const here = typeof comboPickKey === 'function' ? comboPickKey(state) : state.aesthetic;
+  let pool = (window.aePickKeys ? aePickKeys() : (window.visibleAesthetics ? visibleAesthetics() : AESTHETICS).map(a => a.key)).filter(k => k !== here);
+  if (!pool.length) pool = AESTHETICS.map(a => a.key).filter(k => k !== state.aesthetic);
+  const pick = pickRandom(pool);
+  const comboId = typeof comboIdFromKey === 'function' ? comboIdFromKey(pick) : null;
+  if (comboId) comboSet(comboId); else applyAesthetic(pick);
 }
 
 // "Use recommended fonts": the first pairing in the aesthetic's font

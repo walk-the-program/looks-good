@@ -151,8 +151,8 @@
     principles: [
       {
         rule: 'Allow one glass moment per screen.',
-        board: 'Glass floats as a few controls over a vivid scene. Every panel behind them is near-opaque.',
-        app: 'Glass (blur plus bright rim) only on the tab bar, sheets and a floating action plate. Cards, lists, the top bar and fields stay opaque. Never nest glass inside glass.'
+        board: 'Glass floats as a few clear controls over a vivid scene. The panels behind them stay plain so the scene shows through.',
+        app: 'Clear glass (see-through, light blur plus a bright rim) on the tab bar, sheets and a floating action plate. Cards, lists, the top bar and fields stay plain. Never nest glass inside glass.'
       },
       {
         rule: 'Float glass over content that scrolls beneath it.',
@@ -161,8 +161,8 @@
       },
       {
         rule: 'Keep glass thin, with a bright rim.',
-        board: 'Fill at 12% white or less, a specular rim top-left, a softer rim bottom-right and a dark outer hairline.',
-        app: 'Tab bar is a capsule 56–64pt tall floating 8–12pt above the home indicator, with a visible 1pt rim. Labels 10pt at 4.5:1 or better on its fill. Sheets use the same fill and rim.'
+        board: 'Fill at 18% white or less, so almost no tint. A bright rim with a specular highlight top-left, a softer rim bottom-right and a light blur of about 4px with a saturation lift.',
+        app: 'Tab bar is a capsule 56–64pt tall floating 8–12pt above the home indicator, with a visible 1pt rim and highlight. Labels 10pt at 4.5:1 or better; add a local tint behind text only over busy content. Sheets use the same clear fill and rim.'
       },
       {
         rule: 'Make one hero big and the rest quiet.',
@@ -171,7 +171,7 @@
       },
       {
         rule: 'Give glass an opaque fallback.',
-        board: 'A reduced-transparency version keeps the rim and drops the blur.',
+        board: 'A reduced-transparency version keeps the rim and swaps the see-through fill for a solid one.',
         app: 'With Reduce Transparency on, the tab bar and sheets turn solid, keeping the 1pt rim and the same height. Text contrast stays at 4.5:1 or better.'
       }
     ],

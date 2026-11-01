@@ -506,3 +506,71 @@
 }
 
 .ab.sb-ab.sb-kit:is([data-ae="pixel-arcade"], [data-ae="pixel-arcade--classic"]) .sb-k-ribbon .sb-k-tabs { padding-left: 8px; padding-right: 8px; }
+
+/* ---------------------------------------------------------------------
+   UI kit: Pixel Arcade kit signature (current version only; classic keeps the base look)
+   - Shape: square with 4px notched corners (clip-path), never a radius. Controls, fields and containers share the notch.
+   - Edge and depth: a 4px stepped frame drawn inside each box, a 4px inner bevel (light top-left, shade bottom-right)
+     on panels, a 4px underside only on the one primary action. No blur, no soft shadow.
+   - Surface: every cell is a game-menu panel (--ab-panel on the 2x2 dither); fields and wells are --ab-slot recesses.
+   - UI type: the brand label face scaled by --ab-uis, caps, 0.06-0.08em tracking. The component name is a primary
+     "title tab" pinned to the panel's top-left, like the hero's dialog tag.
+   - Tags: notched chips. Native = ink block, Custom = slot recess, Web = secondary (the status-tag colour).
+   - Checkbox mark: a pixel-stepped tick built from 4px squares; radio = notched ring with a square pip.
+   - Selection: one signal, the ink fill with canvas text (tabs, segments, menu rows, days, nav). Pressed = sink 4px.
+     Focus = the 4px accent ring inside the control. Disabled = dimmed, same shape.
+   - Page chrome: group rows end in the 4px dashed rule; type rows and colour roles are slot cards; links are notched chips.
+------------------------------------------------------------------------ */
+.ab.sb-ab.sb-kit[data-ae="pixel-arcade"] .sb-k-cell {
+  gap: 0; padding: 20px 24px 24px; border: 0; border-radius: 0; background: var(--px-dither), var(--ab-panel); clip-path: var(--px-notch);
+  box-shadow: inset 0 0 0 4px var(--ab-bd), inset -8px -8px 0 0 var(--ab-panel-sh), inset 8px 8px 0 0 var(--ab-panel-hi);
+}
+.ab.sb-ab.sb-kit[data-ae="pixel-arcade"] .sb-k-cell:target { outline: 4px dashed var(--ab-primary); outline-offset: -8px; }
+.ab.sb-ab.sb-kit[data-ae="pixel-arcade"] .sb-k-cell-h { justify-items: start; gap: 0; }
+.ab.sb-ab.sb-kit[data-ae="pixel-arcade"] .sb-k-name {
+  max-width: 100%; margin: 0 0 12px !important; padding: 4px 12px 3px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; clip-path: var(--px-notch);
+  background: var(--ab-primary); color: var(--ab-on-primary); font: var(--ab-hw) calc(13px * var(--ab-uis, 1))/1.25 var(--ab-font-label); letter-spacing: 0.08em; text-transform: uppercase;
+}
+.ab.sb-ab.sb-kit[data-ae="pixel-arcade"] .sb-k-use { margin-bottom: 2px !important; }
+.ab.sb-ab.sb-kit[data-ae="pixel-arcade"] .sb-k-ios { margin-top: 10px !important; font-size: calc(12px * var(--ab-uis, 1)); }
+.ab.sb-ab.sb-kit[data-ae="pixel-arcade"] .sb-k-ios .sb-k-ios-tag {
+  padding: 2px 8px 1px; border: 0; border-radius: 0; clip-path: var(--px-notch); background: var(--ab-slot); color: var(--ab-ink); box-shadow: inset 0 -2px 0 0 var(--ab-bd-dim);
+  font: var(--ab-hw) calc(11px * var(--ab-uis, 1))/1.4 var(--ab-font-label); letter-spacing: 0.08em; text-transform: uppercase;
+}
+.ab.sb-ab.sb-kit[data-ae="pixel-arcade"] .sb-k-ios[data-ios="native"] .sb-k-ios-tag { background: var(--ab-ink); color: var(--ab-canvas); box-shadow: none; }
+.ab.sb-ab.sb-kit[data-ae="pixel-arcade"] .sb-k-ios .sb-k-ios-tag.sb-k-web-tag { background: var(--ab-secondary); color: var(--ab-on-secondary); box-shadow: none; }
+.ab.sb-ab.sb-kit[data-ae="pixel-arcade"] .sb-k-states { padding-top: 6px; gap: 20px 16px; }
+.ab.sb-ab.sb-kit[data-ae="pixel-arcade"] .sb-k-slabel { color: var(--k-muted); font: var(--ab-hw) calc(11px * var(--ab-uis, 1))/1.3 var(--ab-font-label); letter-spacing: 0.08em; }
+.ab.sb-ab.sb-kit[data-ae="pixel-arcade"] .sb-k-slabel::before { content: "\25B6\00A0"; font-size: 0.8em; }
+/* group row ends in the 4px dashed rule */
+.ab.sb-ab.sb-kit[data-ae="pixel-arcade"] .sb-k-group > .ab-labelrow { margin-bottom: 18px; padding-bottom: 14px; background: repeating-linear-gradient(90deg, var(--ab-bd-dim) 0 4px, transparent 4px 8px) 0 100% / 100% 4px no-repeat; }
+.ab.sb-ab.sb-kit[data-ae="pixel-arcade"] .sb-k-group > .ab-labelrow .ab-label:first-child { font-size: calc(14px * var(--ab-uis, 1)); letter-spacing: 0.08em; }
+/* type scale, colour roles, glossary, layouts: slot cards and notched chips */
+.ab.sb-ab.sb-kit[data-ae="pixel-arcade"] .sb-k-typescale { gap: 8px; border-top: 0; }
+.ab.sb-ab.sb-kit[data-ae="pixel-arcade"] .sb-k-type-row { padding: 14px 20px; border: 0; background: var(--ab-panel); box-shadow: var(--pxk-dim); clip-path: var(--px-notch); }
+.ab.sb-ab.sb-kit[data-ae="pixel-arcade"] .sb-k-type-meta { font-family: var(--ab-font-label); font-size: calc(13px * var(--ab-uis, 1)); letter-spacing: 0.06em; text-transform: uppercase; }
+.ab.sb-ab.sb-kit[data-ae="pixel-arcade"] .sb-k-type-meta span { text-transform: none; letter-spacing: 0.02em; }
+.ab.sb-ab.sb-kit[data-ae="pixel-arcade"] .sb-k-swatch { padding: 16px; background: var(--ab-panel); box-shadow: var(--pxk-dim); clip-path: var(--px-notch); font-family: var(--ab-font-label); }
+.ab.sb-ab.sb-kit[data-ae="pixel-arcade"] .sb-k-swatch .sb-k-chip { height: 56px; border: 0; border-radius: 0; clip-path: var(--px-notch); box-shadow: inset 0 0 0 4px var(--ab-bd); }
+.ab.sb-ab.sb-kit[data-ae="pixel-arcade"] .sb-k-gl { border-top: 0; }
+.ab.sb-ab.sb-kit[data-ae="pixel-arcade"] .sb-k-gl-row { border-bottom: 0; padding-bottom: 16px; background: repeating-linear-gradient(90deg, var(--ab-bd-dim) 0 4px, transparent 4px 8px) 0 100% / 100% 4px no-repeat; }
+.ab.sb-ab.sb-kit[data-ae="pixel-arcade"] .sb-k-gl-term { font-family: var(--ab-font-label); font-size: calc(14px * var(--ab-uis, 1)); letter-spacing: 0.06em; text-transform: uppercase; }
+.ab.sb-ab.sb-kit[data-ae="pixel-arcade"] .sb-k-gl-term span { text-transform: none; letter-spacing: 0.02em; }
+.ab.sb-ab.sb-kit[data-ae="pixel-arcade"] .sb-k-gl-link { min-height: 32px; padding: 0 14px; border: 0; border-radius: 0; clip-path: var(--px-notch); background: var(--ab-slot); color: var(--ab-ink); box-shadow: inset 0 -4px 0 0 rgba(0, 0, 0, .25); font: var(--ab-hw) calc(12px * var(--ab-uis, 1)) var(--ab-font-label); letter-spacing: 0.06em; text-transform: uppercase; }
+.ab.sb-ab.sb-kit[data-ae="pixel-arcade"] .sb-k-gl-link:hover { background: var(--ab-ink); color: var(--ab-canvas); }
+.ab.sb-ab.sb-kit[data-ae="pixel-arcade"] .sb-k-gl-link:focus-visible { outline: 4px solid var(--ab-accent); outline-offset: -4px; }
+.ab.sb-ab.sb-kit[data-ae="pixel-arcade"] .sb-k-layout { padding: 24px; border: 0; border-radius: 0; background: var(--px-dither), var(--ab-panel); clip-path: var(--px-notch); box-shadow: var(--pxk-in); }
+/* checkbox tick: four 4px squares stepping down and up */
+.ab.sb-ab.sb-kit[data-ae="pixel-arcade"] .sb-k-box { --pxk-mark: var(--ab-canvas); }
+.ab.sb-ab.sb-kit[data-ae="pixel-arcade"] .sb-k-listbox li[aria-selected="true"] .sb-k-box { --pxk-mark: var(--ab-ink); }
+.ab.sb-ab.sb-kit[data-ae="pixel-arcade"] .sb-k-box[type="checkbox"]:checked::after {
+  width: 4px; height: 4px; border: 0; background: var(--pxk-mark); transform: translate(2px, 0);
+  box-shadow: -8px 0 0 0 var(--pxk-mark), -4px 4px 0 0 var(--pxk-mark), 4px -4px 0 0 var(--pxk-mark);
+}
+/* tabs: notched chips, the chosen one an ink block over a 4px dashed floor */
+.ab.sb-ab.sb-kit[data-ae="pixel-arcade"] .sb-k-tabs { gap: 8px; padding-bottom: 8px; border-bottom: 0; background: repeating-linear-gradient(90deg, var(--ab-bd-dim) 0 4px, transparent 4px 8px) 0 100% / 100% 4px no-repeat; }
+.ab.sb-ab.sb-kit[data-ae="pixel-arcade"] .sb-k-tabs [role="tab"] { padding: 0 14px; clip-path: var(--px-notch); color: var(--ab-ink); font: var(--ab-hw) calc(12px * var(--ab-uis, 1)) var(--ab-font-label); letter-spacing: 0.06em; text-transform: uppercase; }
+.ab.sb-ab.sb-kit[data-ae="pixel-arcade"] .sb-k-tabs [role="tab"]:hover { background: var(--ab-slot); }
+.ab.sb-ab.sb-kit[data-ae="pixel-arcade"] .sb-k-tabs [role="tab"][aria-selected="true"] { background: var(--ab-ink); color: var(--ab-canvas); }
+.ab.sb-ab.sb-kit[data-ae="pixel-arcade"] .sb-k-tabs [role="tab"][aria-selected="true"]::after { display: none; }
+.ab.sb-ab.sb-kit[data-ae="pixel-arcade"] .sb-k-tabs [role="tab"]:focus-visible { outline: 4px solid var(--ab-accent); outline-offset: -4px; }

@@ -517,3 +517,81 @@
   .ab.sb-ab[data-ae="paddock-pass"].sb-kit .sb-k-spin { animation: none; }
 }
 @keyframes pp-kit-step { to { transform: rotate(360deg); } }
+
+/* ---- UI kit signature ----
+   Kit signature: the race-day credential / spec sheet.
+   Shape: square everywhere, no radius on anything; controls are hard rectangles.
+   Edge and depth: 1.5px ink outlines on controls, 1px rules on panels, a 4px hi-vis strip on the leading
+   edge of every panel and selected row; no shadow, no glow.
+   Surfaces: a kit cell is a panel (one step whiter than the ground) with a ruled header band; fields are
+   inset wells (panel2 fill, ink floor, ink leading bar); controls are open until on, then hi-vis or ink.
+   UI type: heading face in caps for names, micro-caps tracked labels left, bold mono for values and tags,
+   tabular numerals.
+   Fields: a filled well with a 4px leading bar (hi-vis on focus, danger on error) and a 2px floor.
+   Controls: checkbox = square that fills hi-vis with an ink-on-hi-vis tick; radio = square with an ink square
+   inside a hi-vis fill; toggle = a two-cell rocker key printed OFF / ON; slider = a hollow gauge bar with a
+   hi-vis slider block; stepper = three joined cells; segments = ruled cells, the picked one ink with a hi-vis
+   leading bar.
+   Selection: panel2 or ink with the hi-vis leading bar. Pressed: panel2 sink. Focus: a 2px ink ring.
+   Disabled: dim. Chrome: Custom = hi-vis boxed tag, Native = outlined boxed tag; state labels lead with a
+   hi-vis square. */
+.ab.sb-ab[data-ae="paddock-pass"].sb-kit .sb-k-cell { gap: 0; padding: 0; border: 1px solid var(--ab-pp-rule); border-left: 4px solid var(--ab-pp-hv); border-radius: 0; background: var(--ab-pp-panel); }
+.ab.sb-ab[data-ae="paddock-pass"].sb-kit .sb-k-cell:target { border-color: var(--ab-ink); border-left-color: var(--ab-pp-hv); }
+.ab.sb-ab[data-ae="paddock-pass"].sb-kit .sb-k-cell-h { gap: 4px; padding: 14px 18px 12px; border-bottom: 1px solid var(--ab-ink); }
+.ab.sb-ab[data-ae="paddock-pass"].sb-kit .sb-k-states { padding: 18px 18px 20px; }
+.ab.sb-ab[data-ae="paddock-pass"].sb-kit .sb-k-name { font-family: var(--ab-font-h); font-weight: var(--ab-hw, 700); font-size: 15px; line-height: 20px; letter-spacing: 0.08em; text-transform: uppercase; }
+.ab.sb-ab[data-ae="paddock-pass"].sb-kit .sb-k-ios { margin-top: 8px !important; }
+.ab.sb-ab[data-ae="paddock-pass"].sb-kit .sb-k-ios code { font-family: var(--pp-mono); font-weight: 700; font-size: 11px; }
+.ab.sb-ab[data-ae="paddock-pass"].sb-kit .sb-k-ios .sb-k-ios-tag { min-height: 20px; padding: 2px 6px; border: 1.5px solid var(--ab-ink); border-radius: 0; background: transparent; color: var(--ab-ink); font: 700 10px/14px var(--pp-mono); letter-spacing: 0.08em; text-transform: uppercase; }
+.ab.sb-ab[data-ae="paddock-pass"].sb-kit .sb-k-ios[data-ios="custom"] .sb-k-ios-tag:not(.sb-k-web-tag) { background: var(--ab-pp-hv); color: var(--ab-pp-hv-on); }
+.ab.sb-ab[data-ae="paddock-pass"].sb-kit .sb-k-ios .sb-k-ios-tag.sb-k-web-tag { border-style: dashed; background: transparent; color: var(--ab-ink); }
+.ab.sb-ab[data-ae="paddock-pass"].sb-kit .sb-k-slabel { display: flex; align-items: center; gap: 8px; font: 700 11px/14px var(--pp-mono); letter-spacing: 0.12em; }
+.ab.sb-ab[data-ae="paddock-pass"].sb-kit .sb-k-slabel::before { content: ""; flex: none; width: 8px; height: 8px; border: 1.5px solid var(--ab-ink); background: var(--ab-pp-hv); box-sizing: border-box; }
+.ab.sb-ab[data-ae="paddock-pass"].sb-kit .sb-k-group > .ab-labelrow { padding-bottom: 8px; border-bottom: 2px solid var(--ab-ink); margin-bottom: 18px; }
+.ab.sb-ab[data-ae="paddock-pass"].sb-kit .sb-k-typescale { border-top: 2px solid var(--ab-ink); }
+.ab.sb-ab[data-ae="paddock-pass"].sb-kit .sb-k-type-meta b { font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; }
+.ab.sb-ab[data-ae="paddock-pass"].sb-kit .sb-k-type-meta span { font-family: var(--pp-mono); font-weight: 700; font-size: 11px; }
+.ab.sb-ab[data-ae="paddock-pass"].sb-kit .sb-k-gl { border-top: 2px solid var(--ab-ink); }
+.ab.sb-ab[data-ae="paddock-pass"].sb-kit .sb-k-gl-term b { font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; }
+.ab.sb-ab[data-ae="paddock-pass"].sb-kit .sb-k-gl-link { min-height: 24px; border: 1.5px solid var(--ab-ink); border-radius: 0; font: 700 11px var(--pp-mono); letter-spacing: 0.04em; }
+.ab.sb-ab[data-ae="paddock-pass"].sb-kit .sb-k-gl-link:is(:hover, :focus-visible) { background: var(--ab-ink); color: var(--ab-canvas); }
+.ab.sb-ab[data-ae="paddock-pass"].sb-kit .sb-k-chip { border: 1.5px solid var(--ab-ink); border-radius: 0; }
+.ab.sb-ab[data-ae="paddock-pass"].sb-kit .sb-k-swatch b { font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; }
+.ab.sb-ab[data-ae="paddock-pass"].sb-kit .sb-k-swatch code { font-family: var(--pp-mono); font-weight: 700; }
+.ab.sb-ab[data-ae="paddock-pass"].sb-kit .sb-k-layout { border: 1px solid var(--ab-pp-rule); border-left: 4px solid var(--ab-pp-hv); border-radius: 0; background: var(--ab-pp-panel); }
+/* fields: an inset well, an ink floor, an ink leading bar (hi-vis on focus, danger on error) */
+.ab.sb-ab[data-ae="paddock-pass"].sb-kit :is(.sb-k-field, .sb-k-search, .sb-k-selectwrap) .ab-input { border: 0 !important; border-bottom: 2px solid var(--ab-ink) !important; border-left: 4px solid var(--ab-ink) !important; background: var(--ab-pp-panel2); }
+.ab.sb-ab[data-ae="paddock-pass"].sb-kit :is(.sb-k-field, .sb-k-search).is-focus .ab-input { border-left-color: var(--ab-pp-hv) !important; }
+.ab.sb-ab[data-ae="paddock-pass"].sb-kit .sb-k-field.is-error .ab-input { border-bottom-color: var(--sb-danger) !important; border-left-color: var(--sb-danger) !important; box-shadow: none !important; }
+.ab.sb-ab[data-ae="paddock-pass"].sb-kit .sb-k-field .ab-input:disabled { border-bottom-style: dashed !important; background: transparent; }
+.ab.sb-ab[data-ae="paddock-pass"].sb-kit .sb-k-search .ab-input { padding-left: 46px !important; }
+.ab.sb-ab[data-ae="paddock-pass"].sb-kit .sb-k-search > .sb-ico { left: 18px; }
+/* checkbox and radio */
+.ab.sb-ab[data-ae="paddock-pass"].sb-kit .sb-k-box { border: 1.5px solid var(--ab-ink); background: var(--ab-canvas); }
+.ab.sb-ab[data-ae="paddock-pass"].sb-kit .sb-k-box:checked { background: var(--ab-pp-hv); border-color: var(--ab-ink); }
+.ab.sb-ab[data-ae="paddock-pass"].sb-kit .sb-k-box[type="checkbox"]:checked::after { border-left-color: var(--ab-pp-hv-on); border-bottom-color: var(--ab-pp-hv-on); }
+.ab.sb-ab[data-ae="paddock-pass"].sb-kit .sb-k-box[type="radio"]:checked { background: var(--ab-pp-hv); border-color: var(--ab-ink); }
+.ab.sb-ab[data-ae="paddock-pass"].sb-kit .sb-k-box[type="radio"]:checked::after { width: 10px; height: 10px; border-radius: 0; background: var(--ab-ink); }
+/* toggle: a two-cell rocker key printed OFF / ON */
+.ab.sb-ab[data-ae="paddock-pass"].sb-kit .ab-switch { width: 68px; height: 34px; border-radius: 0; background: var(--ab-canvas); box-shadow: inset 0 0 0 1.5px var(--ab-ink); transition: none; }
+.ab.sb-ab[data-ae="paddock-pass"].sb-kit .ab-switch::before { left: 0; top: 0; width: 34px; height: 34px; border-radius: 0; background: var(--ab-ink); transition: none; }
+.ab.sb-ab[data-ae="paddock-pass"].sb-kit .ab-switch::after { content: "OFF"; position: absolute; right: 0; top: 0; display: grid; place-items: center; width: 34px; height: 34px; color: var(--ab-ink); font: 700 10px/1 var(--pp-mono); letter-spacing: 0.04em; pointer-events: none; }
+.ab.sb-ab[data-ae="paddock-pass"].sb-kit .ab-switch:checked { background: var(--ab-pp-hv); box-shadow: inset 0 0 0 1.5px var(--ab-ink); }
+.ab.sb-ab[data-ae="paddock-pass"].sb-kit .ab-switch:checked::before { transform: translateX(34px); background: var(--ab-ink); }
+.ab.sb-ab[data-ae="paddock-pass"].sb-kit .ab-switch:checked::after { content: "ON"; right: auto; left: 0; color: var(--ab-pp-hv-on); }
+/* segments: ruled cells; the picked one is ink with the hi-vis leading bar */
+.ab.sb-ab[data-ae="paddock-pass"].sb-kit .ab-seg { box-shadow: inset 0 0 0 1.5px var(--ab-ink); background: var(--ab-canvas); }
+.ab.sb-ab[data-ae="paddock-pass"].sb-kit .ab-seg-btn { border: 0; border-radius: 0; font-family: var(--pp-mono); font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; }
+.ab.sb-ab[data-ae="paddock-pass"].sb-kit .ab-seg-btn + .ab-seg-btn { margin-left: 0; border-left: 1.5px solid var(--ab-ink); }
+.ab.sb-ab[data-ae="paddock-pass"].sb-kit .ab-seg-btn[aria-pressed="true"] { background: var(--ab-ink); color: var(--ab-canvas); box-shadow: inset 4px 0 0 var(--ab-pp-hv); }
+/* slider: a hollow gauge bar and a hi-vis slider block */
+.ab.sb-ab[data-ae="paddock-pass"].sb-kit input.sb-k-range::-webkit-slider-runnable-track { height: 12px; box-shadow: inset 0 0 0 1.5px var(--ab-ink); background: linear-gradient(90deg, var(--ab-ink) var(--v, 50%), var(--ab-canvas) var(--v, 50%)); }
+.ab.sb-ab[data-ae="paddock-pass"].sb-kit input.sb-k-range::-moz-range-track { height: 12px; box-shadow: inset 0 0 0 1.5px var(--ab-ink); background: linear-gradient(90deg, var(--ab-ink) var(--v, 50%), var(--ab-canvas) var(--v, 50%)); }
+.ab.sb-ab[data-ae="paddock-pass"].sb-kit input.sb-k-range::-webkit-slider-thumb { width: 14px; height: 28px; margin-top: -8px; border: 1.5px solid var(--ab-ink); background: var(--ab-pp-hv); box-sizing: border-box; }
+.ab.sb-ab[data-ae="paddock-pass"].sb-kit input.sb-k-range::-moz-range-thumb { width: 14px; height: 28px; border: 1.5px solid var(--ab-ink); background: var(--ab-pp-hv); box-sizing: border-box; }
+/* stepper: three joined cells */
+.ab.sb-ab[data-ae="paddock-pass"].sb-kit .sb-k-stepper { gap: 0; }
+.ab.sb-ab[data-ae="paddock-pass"].sb-kit .sb-k-step-val { box-sizing: border-box; display: grid; place-items: center; min-width: 48px; height: var(--k-tap, 44px); border-block: 1.5px solid var(--ab-ink); background: var(--ab-pp-panel2); }
+.ab.sb-ab[data-ae="paddock-pass"].sb-kit .sb-k-step { border-radius: 0; }
+/* radio: a gate; the heavy leading edge marks it as the one-of-many square */
+.ab.sb-ab[data-ae="paddock-pass"].sb-kit .sb-k-box[type="radio"] { border-left-width: 7px; }

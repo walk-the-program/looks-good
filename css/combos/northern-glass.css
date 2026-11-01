@@ -1,0 +1,124 @@
+/* ---------------------------------------------------------------------
+   combos/northern-glass.css - the "Northern Glass" combo (js/combos.js).
+   Pair:      aurora-noir (base) x liquid-glass (donor)
+   Channels:  material
+   Scope:     every root carries data-combo="northern-glass" while the combo is on (board, deck
+              slides, Built view), next to data-ae="aurora-noir" and data-blend="liquid-glass":
+                .ab[data-combo="northern-glass"] ...
+                [data-combo="northern-glass"] .sb-k-...
+   Tune:      hand-tuning for this pair only: spacing, contrast and finish between the
+              base's structure and the donor's channels. Loaded last, so these rules win.
+              Three jobs: (1) the 02 material samples sit on a scene strip so the glass has hard edges
+              to show through, tuned to the donor's own dark/light fill and rim; (2) in the Built view
+              (UI kit and phone screens) the floating layers (dialog, sheets, drawer, popovers, menus,
+              tab bar) get clear glass (at most 18% canvas in light, 10% ink in dark, a 2px blur with a
+              saturation lift) with a soft halo behind the text, and the raised parts (cards,
+              top bar, segmented track, primary button) get thin clear glass with a lit rim; (3) the
+              drafted base stays for cells, page chrome, fields, lists, labels and the selected state.
+------------------------------------------------------------------------ */
+
+/* ---- tokens: fill, tint behind copy, lit rim (dark reads from ink, light from canvas) ---- */
+.ab[data-combo="northern-glass"] {
+  --ng-tint: color-mix(in srgb, var(--ab-canvas) 18%, transparent);
+  --ng-fill: color-mix(in srgb, var(--ab-canvas) 14%, transparent);
+  --ng-halo-c: color-mix(in srgb, var(--ab-canvas) 92%, transparent);
+  --ng-halo: 0 0 1px var(--ng-halo-c), 0 0 3px var(--ng-halo-c), 0 0 7px var(--ng-halo-c), 0 0 13px var(--ng-halo-c), 0 0 22px var(--ng-halo-c);
+  --ng-dim: color-mix(in srgb, var(--ab-ink) 34%, transparent);
+  --ng-hi: var(--ab-canvas);
+  --ng-lo: color-mix(in srgb, var(--ab-ink) 18%, transparent);
+  --ng-bf: blur(2px) saturate(1.7) brightness(1.08);       /* floating layers over content */
+  --ng-bf-lo: blur(2px) saturate(1.7) brightness(1.08);    /* raised parts */
+  --ng-sh: 0 1px 2px color-mix(in srgb, var(--ab-ink) 10%, transparent), 0 6px 16px -6px color-mix(in srgb, var(--ab-ink) 24%, transparent);
+  --ng-rim: inset 1px 1px 0 var(--ng-hi), inset -1px -1px 0 var(--ng-lo);
+}
+.ab[data-combo="northern-glass"][data-mode="dark"] {
+  --ng-fill: color-mix(in srgb, var(--ab-ink) 9%, transparent);
+  --ng-tint: color-mix(in srgb, var(--ab-ink) 10%, transparent);
+  --ng-dim: color-mix(in srgb, #000 50%, transparent);
+  --ng-hi: color-mix(in srgb, var(--ab-ink) 55%, transparent);
+  --ng-lo: color-mix(in srgb, var(--ab-canvas) 70%, transparent);
+  --ng-sh: 0 1px 2px color-mix(in srgb, var(--ab-canvas) 60%, transparent), 0 6px 16px -6px color-mix(in srgb, var(--ab-canvas) 85%, transparent);
+}
+
+/* ---- 02 material samples (board, deck): glass needs something behind it ---- */
+.ab[data-combo="northern-glass"] .ab-blend-state:not([data-s="0"]) .ab-blend-scope {
+  background: linear-gradient(100deg, var(--ab-scene-base) 0 34%, var(--ab-primary) 34% 62%, var(--ab-accent) 62% 68%, var(--ab-secondary) 68%) !important;
+}
+.ab[data-combo="northern-glass"] .ab-blend-state:not([data-s="0"]) .ab-blend-sw {
+  background: var(--ab-material) !important;
+  outline: 0;                               /* the rim is the edge; the base's hairline outline would double it */
+  box-shadow: var(--lg-rim), var(--lg-sh) !important;
+}
+.ab[data-combo="northern-glass"] .ab-blend-state[data-s="1"] .ab-blend-sw { border-radius: 6px; }
+
+/* ---- Built view: floating layers are clear glass (18% canvas, 2px blur); the copy holds 4.5:1 on a halo behind the text, never a frosted slab ---- */
+.ab.sb-ab.sb-kit[data-combo="northern-glass"][data-ae] :is(.sb-k-dialog, .sb-k-drawer, .sb-k-side, .sb-k-sheet, .sb-k-pop, .sb-k-tip, .sb-k-mega-panel, .sb-k-menu, .sb-k-cmdmenu, .sb-k-listbox) {
+  background: var(--ng-tint);
+  -webkit-backdrop-filter: var(--ng-bf); backdrop-filter: var(--ng-bf);
+  text-shadow: var(--ng-halo);
+  --ab-muted: color-mix(in srgb, var(--ab-ink) 86%, var(--ab-canvas)); --k-muted: var(--ab-muted);   /* the grey steps toward the ink so copy holds 4.5:1 */
+  /* one lit edge top-left (replaces the hairline there), the hairline stays bottom-right */
+  border-top-color: transparent; border-left-color: transparent;
+  box-shadow: var(--ng-rim), var(--an-lift);
+}
+/* buttons keep their own fills (no halo), and rows the base inverts or fills for a selection keep their label clean */
+.ab.sb-ab.sb-kit[data-combo="northern-glass"][data-ae] :is(.sb-k-dialog, .sb-k-drawer, .sb-k-side, .sb-k-sheet, .sb-k-pop, .sb-k-tip, .sb-k-mega-panel, .sb-k-menu, .sb-k-cmdmenu, .sb-k-listbox)
+    :is(button, .ab-cta, .ab-type-apply, .sb-k-btn, .sb-k-btn2, .sb-k-danger, .sb-k-kbd, [aria-current], [aria-selected="true"], [aria-expanded="true"], .is-open, .is-sel, .is-on, .sb-k-match),
+.ab.sb-ab.sb-kit[data-combo="northern-glass"][data-ae] :is(.sb-k-dialog, .sb-k-drawer, .sb-k-side, .sb-k-sheet, .sb-k-pop, .sb-k-tip, .sb-k-mega-panel, .sb-k-menu, .sb-k-cmdmenu, .sb-k-listbox)
+    :is([aria-current], [aria-selected="true"], [aria-expanded="true"], .is-open, .is-sel, .is-on, .sb-k-match) * { text-shadow: none; }
+/* the dim layer: a plain darkening, no blur and no wash (the rows behind a dialog or sheet stay sharp, just darker) */
+.ab.sb-ab.sb-kit[data-combo="northern-glass"][data-ae] .sb-k-scrim { background: var(--ng-dim); -webkit-backdrop-filter: none; backdrop-filter: none; }
+.ab.sb-ab.sb-kit[data-combo="northern-glass"][data-ae] :is(.sb-k-dialogbox, .sb-k-sidebox, .sb-k-drawerbox, .sb-k-sheetbox)::before { -webkit-backdrop-filter: none; backdrop-filter: none; }
+/* the popup and tip cells sit on hard-edged brand planes (faint, so the copy stays readable): the glass visibly shows content through it */
+.ab.sb-ab.sb-kit[data-combo="northern-glass"][data-ae] .sb-k-popbox {
+  background:
+    linear-gradient(100deg, transparent 0 22%, color-mix(in srgb, var(--ab-primary) 15%, transparent) 22% 52%, color-mix(in srgb, var(--ab-accent) 22%, transparent) 52% 57%, color-mix(in srgb, var(--ab-secondary) 17%, transparent) 57% 86%, transparent 86%),
+    color-mix(in srgb, var(--ab-ink) 4%, var(--ab-canvas));
+}
+/* an edge that touches the frame keeps its own side bare */
+.ab.sb-ab.sb-kit[data-combo="northern-glass"][data-ae] .sb-k-side { border-left-color: transparent; border-top-color: transparent; }
+.ab.sb-ab.sb-kit[data-combo="northern-glass"][data-ae] .sb-k-drawer { border-top-color: transparent; }
+@media (prefers-reduced-transparency: reduce) {
+  .ab.sb-ab.sb-kit[data-combo="northern-glass"][data-ae] :is(.sb-k-dialog, .sb-k-drawer, .sb-k-side, .sb-k-sheet, .sb-k-pop, .sb-k-tip, .sb-k-mega-panel, .sb-k-menu, .sb-k-cmdmenu, .sb-k-listbox) {
+    background: var(--ab-solid); -webkit-backdrop-filter: none; backdrop-filter: none;
+  }
+}
+
+/* ---- Built view, raised parts: thin clear glass (2px blur, lit rim) on cards, the top bar, the segmented
+   track and the tab bar. Lists, fields, cells and mono labels keep the drafted hairlines. ---- */
+.ab.sb-ab[data-combo="northern-glass"][data-ae] :is(.ab-card, .sb-top) {
+  background: var(--ng-fill);
+  -webkit-backdrop-filter: var(--ng-bf-lo); backdrop-filter: var(--ng-bf-lo);
+  border-top-color: transparent; border-left-color: transparent;
+  box-shadow: var(--ng-rim), var(--ng-sh);
+}
+.ab.sb-ab[data-combo="northern-glass"][data-ae] .ab-seg {
+  background: color-mix(in srgb, var(--ng-fill) 60%, transparent);
+  -webkit-backdrop-filter: var(--ng-bf-lo); backdrop-filter: var(--ng-bf-lo);
+  box-shadow: var(--ng-rim);
+}
+/* the idle label stays near ink so it holds 4.5:1 on the glass track */
+.ab.sb-ab[data-combo="northern-glass"][data-ae] .ab-seg-btn:not([aria-pressed="true"]) { color: color-mix(in srgb, var(--ab-ink) 80%, transparent); }
+.ab.sb-ab[data-combo="northern-glass"][data-ae] .sb-tabs {
+  background: var(--ng-tint);
+  -webkit-backdrop-filter: var(--ng-bf); backdrop-filter: var(--ng-bf);
+  border-top-color: transparent; box-shadow: inset 0 1px 0 var(--ng-hi);
+}
+/* primary action: the primary with a lit glass rim and a coloured glow. The fill stays opaque on purpose:
+   the label colour (--ab-on-primary) is chosen against the solid primary, and any see-through fill drifts
+   toward the canvas and drops it under 4.5:1 for some brands (measured 4.1 at 88%). */
+.ab.sb-ab[data-combo="northern-glass"][data-ae] .ab-cta {
+  background: var(--ab-primary); border: 1px solid transparent; color: var(--ab-on-primary);
+  box-shadow: var(--ng-rim), 0 6px 16px -8px var(--ab-pri-glow-strong, var(--ab-pri-glow));
+}
+/* the phone screens: a faint brand-colour field behind the glass, so there is something to see through
+   (a colour wash, not art; 12% so every label keeps its contrast) */
+.ab.sb-ab[data-combo="northern-glass"][data-ae] .sb-phone-in {
+  background:
+    radial-gradient(70% 38% at 12% 0%, color-mix(in srgb, var(--ab-primary) 12%, transparent), transparent 72%),
+    radial-gradient(60% 34% at 100% 46%, color-mix(in srgb, var(--ab-secondary) 10%, transparent), transparent 70%);
+}
+@media (prefers-reduced-transparency: reduce) {
+  .ab.sb-ab[data-combo="northern-glass"][data-ae] :is(.ab-card, .sb-top, .ab-seg, .sb-tabs) { -webkit-backdrop-filter: none; backdrop-filter: none; }
+  .ab.sb-ab[data-combo="northern-glass"][data-ae] .sb-tabs { background: var(--ab-solid); }
+}

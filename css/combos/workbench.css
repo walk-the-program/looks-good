@@ -1,0 +1,164 @@
+/* ---------------------------------------------------------------------
+   combos/workbench.css - the "Workbench" combo (js/combos.js).
+   Pair:      blueprint (base) x industrial-device (donor)
+   Channels:  material
+   Scope:     every root carries data-combo="workbench" while the combo is on (board, deck
+              slides, Built view), next to data-ae="blueprint" and data-blend="industrial-device":
+                .ab[data-combo="workbench"] ...
+                [data-combo="workbench"] .sb-k-...
+   Tune:      hand-tuning for this pair only: spacing, contrast and finish between the
+              base's structure and the donor's channels. Loaded last, so these rules win.
+              Split: containers, cells, page chrome, menus, dialogs, tables and rows stay Blueprint's
+              open line drawing. Everything you press, type into or slide becomes Industrial Device
+              hardware, drawn in the drawing's own line (1.5px --ab-l1) and tokens only:
+                key      paper-tint face, 1.5px line, flat 3px lower lip (no blur)
+                slot     open face, hard inset line at the top (fields, switch and fader tracks, stepper, key rows)
+                pressed  the ONE selection signal: the key sits down 2px onto a 1px lip, face darkens,
+                         inset line at the top. It replaces Blueprint's double outline on controls.
+              The primary key is the inked key (ink face, canvas legend).
+------------------------------------------------------------------------ */
+
+/* Why gradients: js/blend.js (blendFix) flips the label colour of .ab-seg-btn and .ab-cta whose computed
+   background-colour it reads as low contrast. It cannot parse the colour(srgb ...) form that color-mix
+   computes to, so key faces on those two controls are painted as gradients, which it skips. */
+/* ---- tokens: every colour is a token or a mix of tokens ---- */
+.ab[data-combo="workbench"] {
+  --wb-key: color-mix(in srgb, var(--ab-ink) 9%, var(--ab-canvas));
+  --wb-key-hi: color-mix(in srgb, var(--ab-ink) 16%, var(--ab-canvas));
+  --wb-sunk: color-mix(in srgb, var(--ab-ink) 26%, var(--ab-canvas));
+  --wb-edge: 1.5px solid var(--ab-l1);
+  --wb-shine: inset 0 1px 0 color-mix(in srgb, var(--ab-ink) 14%, transparent);
+  --wb-lip: var(--wb-shine), 0 3px 0 var(--ab-l1);
+  --wb-lip-s: var(--wb-shine), 0 2px 0 var(--ab-l1);
+  --wb-slot: inset 0 2px 0 color-mix(in srgb, var(--ab-ink) 38%, transparent), inset 0 -1px 0 color-mix(in srgb, var(--ab-ink) 16%, transparent);
+  --wb-down: inset 0 2px 0 color-mix(in srgb, var(--ab-ink) 48%, transparent), 0 1px 0 var(--ab-l1);
+  --wb-grip-v: repeating-linear-gradient(90deg, var(--ab-l2) 0 1px, transparent 1px 4px);
+  --wb-grip-h: repeating-linear-gradient(0deg, var(--ab-l2) 0 1px, transparent 1px 4px);
+}
+
+/* ---- material samples (board 02): drawn parts, not soft shadows ---- */
+.ab[data-combo="workbench"] .ab-blend-scope .ab-blend-sw { outline: 1.5px solid var(--ab-l1); }
+
+/* ---- board + deck + kit: segmented control = a slot holding keys; pressed key = selected ---- */
+.ab[data-combo="workbench"] .ab-seg { gap: 4px; padding: 4px; border: var(--wb-edge); border-radius: 3px; box-shadow: var(--wb-slot); }
+.ab[data-combo="workbench"] .ab-seg-btn {
+  min-height: 34px; border: var(--wb-edge); border-radius: 3px; background: linear-gradient(var(--wb-key), var(--wb-key)); color: var(--ab-ink); box-shadow: var(--wb-lip-s);
+}
+.ab[data-combo="workbench"] .ab-seg-btn:first-child { border-left: var(--wb-edge); }
+.ab[data-combo="workbench"] .ab-seg-btn:hover { background: linear-gradient(var(--wb-key-hi), var(--wb-key-hi)); }
+.ab[data-combo="workbench"] .ab-seg-btn[aria-pressed="true"] {
+  background: linear-gradient(var(--wb-sunk), var(--wb-sunk)); box-shadow: var(--wb-down); transform: translateY(2px); font-weight: 700;
+}
+
+/* ---- action key (board CTA, kit primary, FAB, split-more): the inked key ---- */
+.ab[data-combo="workbench"] .ab-cta:not(.ab-state-ctl, :disabled) {
+  border: var(--wb-edge); border-radius: 3px; background: linear-gradient(var(--ab-ink), var(--ab-ink)); color: var(--ab-canvas);
+  box-shadow: inset 0 1px 0 color-mix(in srgb, var(--ab-canvas) 30%, transparent), 0 3px 0 var(--ab-l1);
+}
+.ab[data-combo="workbench"] .ab-cta:not(.ab-state-ctl, :disabled):active,
+.ab[data-combo="workbench"] .ab-cta.sb-k-pressed:not(:disabled) {
+  background: linear-gradient(color-mix(in srgb, var(--ab-ink) 80%, var(--ab-canvas)), color-mix(in srgb, var(--ab-ink) 80%, var(--ab-canvas))); transform: translateY(2px);
+  box-shadow: inset 0 2px 0 color-mix(in srgb, var(--ab-canvas) 45%, transparent), 0 1px 0 var(--ab-l1);
+}
+.ab[data-combo="workbench"] .ab-cta:not(.ab-state-ctl):hover { outline: 0; }
+
+/* ---- fields: recessed slots ---- */
+.ab[data-combo="workbench"] .ab-input:not(.pt-search, .pt-select, .le-name, .fp-search, .blend-search) {
+  padding: 9px 12px; border: var(--wb-edge); border-radius: 3px; background: transparent; box-shadow: var(--wb-slot);
+}
+.ab[data-combo="workbench"] .ab-input:focus { border-color: var(--ab-ink); box-shadow: var(--wb-slot), 0 0 0 1.5px var(--ab-ink); }
+
+/* ---- slide switch: slot track, gripped key thumb; on = the inked key ---- */
+.ab[data-combo="workbench"] .ab-switch { border: var(--wb-edge); border-radius: 3px; background: transparent; box-shadow: var(--wb-slot); }
+.ab[data-combo="workbench"] .ab-switch::before {
+  border-radius: 2px; background: var(--wb-grip-v) center / 10px 9px no-repeat, var(--wb-key-hi);
+  box-shadow: inset 0 0 0 1.5px var(--ab-l1), 0 2px 0 var(--ab-l1);
+}
+.ab[data-combo="workbench"] .ab-switch:checked { background: transparent; }
+.ab[data-combo="workbench"] .ab-switch:checked::before {
+  background: repeating-linear-gradient(90deg, var(--ab-canvas) 0 1px, transparent 1px 4px) center / 10px 9px no-repeat, var(--ab-ink);
+  box-shadow: inset 0 0 0 1.5px var(--ab-l1), 0 2px 0 var(--ab-l1);
+}
+
+/* ---- Built UI kit and Mobile app (kit roots): raise past Blueprint's kit rules ---- */
+.ab.sb-ab[data-combo="workbench"].sb-kit .ab-cta.sb-k-btn:not(:disabled),
+.ab.sb-ab[data-combo="workbench"].sb-kit .ab-cta.sb-k-fab:not(:disabled),
+.ab.sb-ab[data-combo="workbench"].sb-kit .ab-cta.sb-k-split-more:not(:disabled) {
+  border: var(--wb-edge); border-radius: 3px; background: linear-gradient(var(--ab-ink), var(--ab-ink)); color: var(--ab-canvas);
+  box-shadow: inset 0 1px 0 color-mix(in srgb, var(--ab-canvas) 30%, transparent), 0 3px 0 var(--ab-l1);
+}
+.ab.sb-ab[data-combo="workbench"].sb-kit .ab-cta.sb-k-btn.sb-k-pressed:not(:disabled),
+.ab.sb-ab[data-combo="workbench"].sb-kit .ab-cta.sb-k-fab.sb-k-pressed:not(:disabled),
+.ab.sb-ab[data-combo="workbench"].sb-kit .ab-cta.sb-k-split-more.sb-k-pressed:not(:disabled) {
+  background: linear-gradient(color-mix(in srgb, var(--ab-ink) 80%, var(--ab-canvas)), color-mix(in srgb, var(--ab-ink) 80%, var(--ab-canvas))); transform: translateY(2px);
+  box-shadow: inset 0 2px 0 color-mix(in srgb, var(--ab-canvas) 45%, transparent), 0 1px 0 var(--ab-l1);
+}
+/* secondary, icon and step keys: paper keys */
+.ab.sb-ab[data-combo="workbench"].sb-kit :is(.sb-k-btn2, .sb-k-iconbtn):not(:disabled, .sb-k-pressed) {
+  border: var(--wb-edge); border-radius: 3px; background: var(--wb-key); color: var(--ab-ink); box-shadow: var(--wb-lip-s);
+}
+.ab.sb-ab[data-combo="workbench"].sb-kit :is(.sb-k-btn2, .sb-k-iconbtn):not(:disabled, .sb-k-pressed):hover { background: var(--wb-key-hi); }
+.ab.sb-ab[data-combo="workbench"].sb-kit :is(.sb-k-btn2, .sb-k-iconbtn).sb-k-pressed:not(:disabled),
+.ab.sb-ab[data-combo="workbench"].sb-kit :is(.sb-k-btn2, .sb-k-iconbtn):not(:disabled):active {
+  border: var(--wb-edge); border-radius: 3px; background: var(--wb-sunk); color: var(--ab-ink); box-shadow: var(--wb-down); transform: translateY(2px);
+}
+.ab.sb-ab[data-combo="workbench"].sb-kit .sb-k-danger:not(:disabled) { border-radius: 3px; background: var(--wb-key); box-shadow: var(--wb-shine), 0 3px 0 var(--sb-danger-text, var(--ab-l1)); }
+.ab.sb-ab[data-combo="workbench"].sb-kit .sb-k-danger.sb-k-pressed:not(:disabled) { background: var(--wb-sunk); box-shadow: var(--wb-down); transform: translateY(2px); }
+/* stepper: a slot holding two keys and a readout */
+.ab.sb-ab[data-combo="workbench"].sb-kit .sb-k-stepper { padding: 3px; gap: 4px; border: var(--wb-edge); border-radius: 3px; background: transparent; box-shadow: var(--wb-slot); }
+.ab.sb-ab[data-combo="workbench"].sb-kit .sb-k-step-val { border-inline: 0; }
+.ab.sb-ab[data-combo="workbench"].sb-kit .sb-k-step:not(:disabled) { border: var(--wb-edge); border-radius: 3px; background: var(--wb-key); box-shadow: var(--wb-lip-s); }
+.ab.sb-ab[data-combo="workbench"].sb-kit .sb-k-step:not(:disabled):hover { background: var(--wb-key-hi); }
+.ab.sb-ab[data-combo="workbench"].sb-kit .sb-k-step:not(:disabled):active { background: var(--wb-sunk); box-shadow: var(--wb-down); transform: translateY(2px); }
+/* kit fields: Blueprint draws an underline with end ticks; here the field is a slot */
+.ab.sb-ab[data-combo="workbench"].sb-kit :is(.sb-k-field, .sb-k-search, .sb-k-selectwrap) .ab-input,
+.ab.sb-ab[data-combo="workbench"].sb-kit .ab-input:is(.sb-k-select, .sb-k-combo-in) {
+  padding: 9px 12px; border: var(--wb-edge); border-radius: 3px; background: transparent; box-shadow: var(--wb-slot);
+}
+/* checkbox and radio: small keys; checked = pressed in, mark kept */
+.ab.sb-ab[data-combo="workbench"].sb-kit :is(.sb-k-box, .sb-k-listbox .sb-k-box) {
+  border: var(--wb-edge); border-radius: 3px; background: var(--wb-key); box-shadow: var(--wb-lip-s);
+}
+.ab.sb-ab[data-combo="workbench"].sb-kit :is(.sb-k-box, .sb-k-listbox .sb-k-box):checked {
+  background: var(--wb-sunk); border-color: var(--ab-l1); box-shadow: var(--wb-down); transform: translateY(2px);
+}
+.ab.sb-ab[data-combo="workbench"].sb-kit .sb-k-box[type="radio"] { border-radius: 3px; }
+.ab.sb-ab[data-combo="workbench"].sb-kit .sb-k-box[type="radio"]::after { background: none; }
+.ab.sb-ab[data-combo="workbench"].sb-kit .sb-k-box[type="radio"]:checked::after { background: radial-gradient(circle, var(--ab-ink) 0 4px, transparent 4.5px); }
+.ab.sb-ab[data-combo="workbench"].sb-kit .sb-k-box:disabled { border-style: dashed; box-shadow: none; }
+/* kit switch: Blueprint's hatched track and filled thumb become the slot and the key */
+.ab.sb-ab[data-combo="workbench"].sb-kit .ab-switch { border: var(--wb-edge); border-radius: 3px; background: transparent; }
+.ab.sb-ab[data-combo="workbench"].sb-kit .ab-switch:checked { background: transparent; }
+.ab.sb-ab[data-combo="workbench"].sb-kit .ab-switch::before {
+  border-radius: 2px; background: var(--wb-grip-v) center / 10px 9px no-repeat, var(--wb-key-hi);
+  box-shadow: inset 0 0 0 1.5px var(--ab-l1), 0 2px 0 var(--ab-l1);
+}
+.ab.sb-ab[data-combo="workbench"].sb-kit .ab-switch:checked::before {
+  background: repeating-linear-gradient(90deg, var(--ab-canvas) 0 1px, transparent 1px 4px) center / 10px 9px no-repeat, var(--ab-ink);
+  box-shadow: inset 0 0 0 1.5px var(--ab-l1), 0 2px 0 var(--ab-l1);
+}
+.ab.sb-ab[data-combo="workbench"].sb-kit .ab-switch:disabled { border-style: dashed; box-shadow: none; }
+/* slider: a fader in a slot */
+.ab.sb-ab[data-combo="workbench"].sb-kit input.sb-k-range::-webkit-slider-runnable-track {
+  height: 8px; border-radius: 2px; box-shadow: var(--wb-slot), 0 0 0 1.5px var(--ab-l1);
+  background: linear-gradient(90deg, color-mix(in srgb, var(--ab-ink) 40%, transparent) var(--v, 50%), transparent var(--v, 50%));
+}
+.ab.sb-ab[data-combo="workbench"].sb-kit input.sb-k-range::-moz-range-track {
+  height: 8px; border-radius: 2px; box-shadow: var(--wb-slot), 0 0 0 1.5px var(--ab-l1);
+  background: linear-gradient(90deg, color-mix(in srgb, var(--ab-ink) 40%, transparent) var(--v, 50%), transparent var(--v, 50%));
+}
+.ab.sb-ab[data-combo="workbench"].sb-kit input.sb-k-range::-webkit-slider-thumb {
+  width: 16px; height: 26px; margin-top: -9px; border: var(--wb-edge); border-radius: 2px; transform: none;
+  background: var(--wb-grip-h) center / 8px 11px no-repeat, var(--wb-key-hi); box-shadow: 0 2px 0 var(--ab-l1);
+}
+.ab.sb-ab[data-combo="workbench"].sb-kit input.sb-k-range::-moz-range-thumb {
+  width: 16px; height: 26px; border: var(--wb-edge); border-radius: 2px; transform: none;
+  background: var(--wb-grip-h) center / 8px 11px no-repeat, var(--wb-key-hi); box-shadow: 0 2px 0 var(--ab-l1);
+}
+/* knob: a keyed cap; Blueprint's centre-line cross stays as its index */
+.ab.sb-ab[data-combo="workbench"].sb-kit .sb-k-knob-dial { border: var(--wb-edge); background: var(--wb-key); box-shadow: var(--wb-lip); }
+/* tabs and the phone tab bar: the active key sits down, no double outline */
+.ab.sb-ab[data-combo="workbench"].sb-kit .sb-k-tabs [role="tab"][aria-selected="true"],
+.ab.sb-ab[data-combo="workbench"].sb-kit .sb-tab[aria-current] {
+  background: var(--wb-sunk); border-radius: 3px; box-shadow: var(--wb-down); color: var(--ab-ink);
+}

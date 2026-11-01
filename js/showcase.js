@@ -6,6 +6,8 @@
    - the aesthetic list, step buttons, shuffle, Compare all, "Mix in" and
      anything else that calls showcaseFilter(list) only offer the owner's
      favourites (SHOWCASE_KEYS); the rest stay in the app for him;
+   - the nine curated combos (js/combos.js) are not narrowed: all of them stay in the style
+     gallery, prev / next and shuffle, because every base and donor is in SHOWCASE_KEYS;
    - css/showcase.css hides owner-only tools (Classic/Current, the
      recommendations panel, suggestion boxes) and folds fine-tuning (locks,
      type sliders, pattern settings) behind one "Refine" disclosure.

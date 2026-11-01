@@ -4,8 +4,9 @@
    hard-edged brand-color planes and one crisp glyph (the brand initial), a
    squircle lens whose rim bends them (an SVG displacement filter on a 1:1
    duplicate), a glass tab bar and a glass slider, glass controls in the
-   interface (the segmented control floats on a scene strip) and near-opaque
-   "regular material" panels everywhere else. The hero copy is set directly on
+   interface (the segmented control floats on a scene strip) and clear glass
+   everywhere else (a thin white fill, a light blur, a bright specular
+   rim, a soft contact shadow; never frosted). The hero copy is set directly on
    the scene's dark base (never on a frosted slab). */
 let lgSeq = 0;   // unique SVG filter ids per rendered board (compare grid, deck)
 
@@ -61,24 +62,35 @@ registerAesthetic({
     // In light mode the base is the ink only 20% darker (t.mix(a, b, k) = k of a), so
     // the scene reads as content inside the board rather than a pasted black slab.
     const sceneBase = d ? t.mix(t.canvas, '#000000', 0.5) : t.mix(t.ink, '#000000', 0.8);
-    const material = t.mix('#ffffff', t.canvas, d ? 0.07 : 0.72);
+    // Clear glass: the fill is white at a very low alpha over whatever is behind it, never a
+    // near-opaque slab. matteFx is the colour that fill makes on a flat canvas; contrast checks use it.
+    const matAlpha = d ? 0.07 : 0.16;
+    const matteFx = t.mix('#ffffff', t.canvas, matAlpha);
     // headline word on the scene: the raw accent if it holds 3:1 on the scene base, else lightened toward white
     const hlScene = t.contrast(t.accent, sceneBase) >= 3 ? t.accent : t.mix(t.accent, '#ffffff', 0.35);
-    // muted labels sit on the material panels (a step lighter than a dark canvas), so they
+    // muted labels sit on the glass over the canvas (a step lighter than a dark canvas), so they
     // have to hold 4.5:1 there, not only on the canvas: pull them toward the ink until they do
     let muted = t.muted;
-    for (let k = 0.1; k <= 1 && t.contrast(muted, material) < 4.5; k += 0.1) muted = t.mix(t.ink, t.muted, k);
+    for (let k = 0.1; k <= 1 && t.contrast(muted, matteFx) < 4.5; k += 0.1) muted = t.mix(t.ink, t.muted, k);
+    // primary action: tinted clear glass (primary at partial alpha, a specular on top). The partial alpha
+    // lets the canvas show through, so raise it until the label still holds 4.5:1 on the lifted tint.
+    let ctaA = 0.74;
+    for (; ctaA < 1; ctaA += 0.04) {
+      const base = t.mix(t.primary, t.canvas, ctaA);
+      if (t.contrast(t.onPrimary, t.mix('#ffffff', base, 0.2)) >= 4.5) break;
+    }
+    ctaA = Math.min(1, +ctaA.toFixed(2));
     return {
       '--ab-muted': muted,
       '--ab-hl-scene': hlScene,
       '--ab-scene-base': sceneBase,
-      // regular material: a near-opaque panel, one step lighter than the canvas
-      '--ab-material': material,
-      '--ab-material-line': t.alpha(t.ink, d ? 0.14 : 0.09),
-      '--ab-glass': t.alpha(t.canvas, d ? 0.35 : 0.45),
+      // clear material: white at 16% (7% in dark) over the canvas, with the backdrop blurred 2-6px behind it
+      '--ab-material': d ? 'rgba(255,255,255,0.07)' : 'rgba(255,255,255,0.16)',
+      '--ab-material-line': t.alpha(t.ink, d ? 0.18 : 0.11),
+      '--ab-glass': t.alpha(t.canvas, d ? 0.2 : 0.24),
       '--ab-glass-solid': t.mix('#ffffff', t.canvas, d ? 0.1 : 0.6),
-      '--ab-rim': d ? 'rgba(255,255,255,0.3)' : 'rgba(255,255,255,0.6)',
-      '--ab-spec': d ? 'rgba(255,255,255,0.28)' : 'rgba(255,255,255,0.8)',
+      '--ab-rim': d ? 'rgba(255,255,255,0.34)' : 'rgba(255,255,255,0.9)',
+      '--ab-spec': d ? 'rgba(255,255,255,0.34)' : 'rgba(255,255,255,0.9)',
       '--ab-drop': d ? 'rgba(0,0,0,0.4)' : 'rgba(10,14,30,0.16)',
       '--ab-lens-hi': d ? 'rgba(255,255,255,0.3)' : 'rgba(255,255,255,0.92)',
       '--ab-lens-lo': d ? 'rgba(255,255,255,0.12)' : 'rgba(255,255,255,0.55)',
@@ -86,7 +98,8 @@ registerAesthetic({
       '--ab-pri-glow': t.alpha(t.primary, 0.35),
       '--ab-pri-glow-strong': t.alpha(t.primary, 0.55),
       '--ab-primary-a': t.alpha(t.primary, 0.88),
-      '--lg-glass-fill': d ? 'rgba(255,255,255,0.12)' : 'rgba(255,255,255,0.18)',
+      '--ab-cta-fill': t.alpha(t.primary, ctaA),
+      '--lg-glass-fill': d ? 'rgba(255,255,255,0.1)' : 'rgba(255,255,255,0.12)',
       '--ab-type-pick-w': 700,
     };
   },
@@ -170,29 +183,33 @@ registerAesthetic({
   materials: [
     { name: 'Glass lens', css: 'border-radius: 28%; /* a squircle whose rim cuts through hard content; inside, a duplicate of the content with filter: url(#refract), an feDisplacementMap (scale 40, plus a 20% full-colour echo at 48 as the fringe, never a split colour channel) driven by a blurred normal map that is neutral in the middle and ramps in the outer 22%, so only the rim bends */ box-shadow: inset 1px 1px 0 rgba(255,255,255,.6), inset -1px -1px 0 rgba(255,255,255,.25), 0 0 0 .5px rgba(0,0,0,.25);' },
     { name: 'Scene (content under glass)', css: 'background: linear-gradient(100deg, {sceneBase} 0 50%, {primary} 50% 72%, {accent} 72% 77%, {secondary} 77%); /* hard edges for the glass to bend, plus one crisp glyph; never a blur */' },
-    { name: 'Floating glass control', css: 'background: rgba(255,255,255,.12); backdrop-filter: blur(14px) saturate(160%); border-radius: 999px; box-shadow: inset 1px 1px 0 rgba(255,255,255,.6), inset -1px -1px 0 rgba(255,255,255,.25), 0 0 0 .5px rgba(0,0,0,.35), 0 8px 24px {drop}; /* glass fill never above 12% white */' },
-    { name: 'Regular material (panels)', css: 'background: {material}; border: 1px solid {materialLine}; border-radius: 28px; box-shadow: 0 1px 2px rgba(0,0,0,.05), 0 12px 32px -16px {drop}; /* near-opaque; no backdrop blur */' },
+    { name: 'Clear glass (every surface)', css: 'background: rgba(255,255,255,.16); /* 7% in dark */ backdrop-filter: blur(4px) saturate(1.6) brightness(1.06); border: 1px solid {materialLine}; box-shadow: inset 1px 1px 0 rgba(255,255,255,.9), inset -1px -1px 0 rgba(10,14,30,.07), 0 1px 2px rgba(10,14,30,.08), 0 6px 16px -6px rgba(10,14,30,.22); /* see-through: whatever is behind shows, slightly refracted; the rim and the soft contact shadow do the work */' },
+    { name: 'Floating glass control', css: 'background: rgba(255,255,255,.12); backdrop-filter: blur(4px) saturate(1.6) brightness(1.06); border-radius: 999px; box-shadow: inset 1px 1px 0 rgba(255,255,255,.6), inset -1px -1px 0 rgba(255,255,255,.25), 0 0 0 .5px rgba(0,0,0,.35), 0 8px 24px {drop}; /* glass fill never above 18% white */' },
+    { name: 'Glass over text or a dim layer', css: 'background: color-mix(in srgb, {canvas} 62%, transparent); backdrop-filter: blur(6px) saturate(1.6) brightness(1.1); /* dialog, sheet, side sheet, drawer: a slight local tint behind the copy keeps 4.5:1; never a frosted slab */' },
     { name: 'Opaque fallback', css: 'background: {glassSolid}; backdrop-filter: none; /* under prefers-reduced-transparency, keep the rim */' },
-    { name: 'Primary action', css: 'background: radial-gradient(120% 90% at 30% 0%, rgba(255,255,255,.30), transparent 55%), {primary}; color: {onPrimary}; border: 1px solid rgba(255,255,255,.7); border-radius: 999px; box-shadow: inset 0 1px 0 rgba(255,255,255,.5), inset 0 -1px 0 rgba(0,0,0,.10), 0 8px 20px -8px {priGlowStrong}; /* tinted glass with a soft specular, not a split gloss */' },
+    { name: 'Primary action', css: 'background: linear-gradient(180deg, rgba(255,255,255,.2), rgba(255,255,255,0) 55%), {ctaFill}; backdrop-filter: blur(4px) saturate(1.6); color: {onPrimary}; border: 1px solid rgba(255,255,255,.7); border-radius: 999px; box-shadow: inset 1px 1px 0 rgba(255,255,255,.55), inset -1px -1px 0 rgba(0,0,0,.08), 0 8px 20px -8px {priGlowStrong}; /* the primary as tinted clear glass: partial alpha, a rim and a soft specular, not opaque plastic */' },
     { name: 'Selected segment (lens)', css: 'background: linear-gradient(180deg, {lensHi}, {lensLo}); border-radius: 999px; box-shadow: 0 2px 8px rgba(0,0,0,.14), inset 0 1px 0 #fff; /* inside a capsule track */' },
     { name: 'Glass droplet knob', css: 'background: radial-gradient(circle at 35% 28%, #fff, rgba(255,255,255,.85) 22%, rgba(255,255,255,.35) 60%, rgba(255,255,255,.55)); border: 1px solid rgba(255,255,255,.8); border-radius: 50%; box-shadow: 0 2px 6px rgba(0,0,0,.2);' },
   ],
 
   rules: {
     do: [
-      'Float glass only over sharp content (hard color edges, type, photos, lists) so there is something to bend.',
-      'Keep glass fill at 12% white or less, with a bright specular rim top-left, a softer rim bottom-right and a 0.5px dark hairline outside.',
+      'Make glass clear: a fill of 18% white or less (about 16% on a light canvas, 7% in dark), a 2-6px backdrop blur with a saturation and brightness lift, so what is behind shows through.',
+      'Give every glass surface a bright specular rim top-left, a faint darker edge bottom-right, a hairline and a soft, low contact shadow.',
+      'Float glass over sharp content (hard colour edges, type, photos, lists) so there is something to see through and bend.',
       'Bend content at the rim only: the centre of a lens stays 1:1, the outer fifth refracts.',
-      'Make every panel a near-opaque regular material on a neutral canvas; reserve glass for floating controls.',
+      'Where glass sits over copy or a dim layer, add a slight local tint (about 60% canvas) behind the text so it holds 4.5:1; do not fog the whole surface.',
+      'Make the primary action tinted clear glass: the primary at partial alpha with a rim and a soft specular.',
       'In the product, put a soft brand-colour field behind the app and make the sidebar, header, cards and current nav row glass over it, with capsule controls and 28px cards.',
       'Give controls a gel feel: scale 1.03 on hover, 0.97 on press, a spring curve of about 220 ms.',
       'Provide an opaque fallback that keeps the rim for reduced transparency.',
     ],
     dont: [
+      'Frost it: no milky 50-90% fills or 14px+ blur that turn glass into plastic.',
       'Call a blur-only surface refraction.',
-      'Put glass on a flat or pastel background, or nest glass panels inside glass panels.',
+      'Put glass on a flat or pastel background with nothing behind it to show, or nest glass panels inside glass panels.',
       'Put text on strong distortion; keep it on a stable, readable substrate.',
-      'Put a refracting lens over blurred blobs; refraction of a blur is invisible (soft colour fields are for the app backdrop behind blurred glass).',
+      'Put a refracting lens over blurred blobs; refraction of a blur is invisible (soft colour fields are for the app backdrop behind the glass).',
     ],
   },
   // Deck copy (js/brand-deck.js): three principles, three do / don't lines, each short.
@@ -203,16 +220,16 @@ registerAesthetic({
     closingStrip: false,
     principles: [
       ['Glass floats over sharp content', 'Hard edges and type are what the rim bends.'],
-      ['Thin fill, bright rim', '12% white fill, a specular rim and a dark hairline.'],
-      ['Panels stay solid', 'Near-opaque panels; glass is for floating controls.'],
+      ['Clear fill, bright rim', 'A thin white fill, a light blur, a specular rim and a hairline.'],
+      ['See through it', 'No frost: what sits behind the glass shows.'],
     ],
     do: [
       'Float glass only over sharp content.',
-      'Keep glass fill at 12% white or less.',
-      'Keep panels near-opaque on a neutral canvas.',
+      'Keep glass fill at 18% white or less.',
+      'Light blur, bright rim, soft shadow.',
     ],
     dont: [
-      'Call blur alone refraction.',
+      'Frost the glass into plastic.',
       'Nest glass inside glass.',
       'Put text on strong distortion.',
     ],

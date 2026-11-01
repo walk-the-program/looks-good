@@ -436,3 +436,96 @@
 @media (prefers-reduced-motion: reduce) {
   .ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-spin { animation: none; }
 }
+
+/* ---------------------------------------------------------------------
+   UI kit signature (round 2): the poster, not a boxed form
+   - Shape: three forms only. Square, circle, triangle. No rounded corners anywhere; a control is square
+     or fully round, and a state change may swap one form for another (toggle thumb, slider caret).
+   - Edge and depth: flat. 2px ink on controls, a 4px ink rule heads every cell, no shadow, no blur, no bevel.
+   - Surfaces: cells are OPEN (no box, no fill): a heavy rule, a big numeral and one geometric glyph.
+   - UI type: heading face for cell names (lowercase, heavy, tight, like the poster headline); heavy tracked
+     caps for labels, tags, actions; tabular numerals.
+   - Fields: a 4px underline; focus floods a primary-tint well with a primary square flag, error a danger triangle.
+   - Controls: checkbox = square, primary flood, square mark; radio = ring, primary flood, ring-in-ring mark;
+     toggle = square track, thumb round off and square on; slider = ink triangle caret on a rule;
+     stepper = two ink discs around a big numeral; tabs = primary block with an ink bar.
+   - Selection: primary flood, always on-primary text. Pressed / open: ink flood, nudged 2px.
+   - Focus: 3px ink ring. Disabled: dashed edge, no fill.
+------------------------------------------------------------------------ */
+/* page chrome */
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-group { counter-reset: bkc; }
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-grid { gap: 40px 20px; }
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-cell[data-k="stepper"] .sb-k-states { grid-template-columns: minmax(0, 1fr); }
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-cell {
+  position: relative; gap: 20px; padding: 14px 0 0; border: 0; border-top: 4px solid var(--ab-ink); border-radius: 0; background: transparent; counter-increment: bkc;
+}
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-cell:target { border-top-color: var(--ab-primary-text); }
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-cell::before { content: ""; position: absolute; top: 14px; right: 0; width: 22px; height: 22px; border-radius: 50%; background: var(--ab-primary); }
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-cell:nth-child(3n+2)::before { border-radius: 0; background: var(--ab-ink); }
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-cell:nth-child(3n)::before { border-radius: 0; background: var(--ab-accent); clip-path: polygon(50% 0, 100% 100%, 0 100%); }
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-cell-h { padding-right: 34px; }
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-cell-h::before { content: counter(bkc, decimal-leading-zero); color: var(--ab-ink); font: 800 28px/0.9 var(--ab-font-h); letter-spacing: calc(-0.04em * var(--ab-tr, 1)); font-variant-numeric: tabular-nums; }
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-name { font-family: var(--ab-font-h); font-size: 21px; line-height: 1.05; font-weight: 800; text-transform: lowercase; letter-spacing: calc(-0.02em * var(--ab-tr, 1)); color: var(--ab-ink); }
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-use { font-weight: 500; }
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-ios .sb-k-ios-tag { padding: 1px 7px; border: 2px solid var(--ab-ink); border-radius: 0; background: transparent; color: var(--ab-ink); font-size: 10px; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; }
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-ios[data-ios="native"] .sb-k-ios-tag { background: var(--ab-ink); color: var(--ab-canvas); }
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-ios .sb-k-ios-tag.sb-k-web-tag { border-style: dashed; border-radius: 999px; background: transparent; color: var(--ab-ink); border-color: var(--ab-ink); }
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-slabel { display: inline-flex; align-items: center; gap: 7px; color: var(--ab-ink); font-family: var(--ab-font-ui); font-size: 10.5px; font-weight: 800; letter-spacing: 0.14em; }
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-slabel::before { content: ""; flex: none; width: 8px; height: 8px; border-radius: 50%; background: var(--ab-ink); }
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-intro { color: var(--ab-ink); font-weight: 500; }
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-typescale { border-top: 4px solid var(--ab-ink); }
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-type-row { border-bottom: 2px solid var(--ab-ink); }
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-type-meta b { font-size: 12px; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; }
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-sizes { color: var(--ab-ink); font-weight: 600; }
+/* colour roles: one form per role, as on the board */
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-chip { width: 72px; height: 72px; margin-bottom: 10px; border: 0; border-radius: 0; }
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-swatch:nth-child(1) .sb-k-chip { box-shadow: inset 0 0 0 2px var(--ab-ink); }
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-swatch:nth-child(2) .sb-k-chip { clip-path: polygon(50% 0, 100% 100%, 0 100%); }
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-swatch:nth-child(3) .sb-k-chip { border-radius: 50%; }
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-swatch:nth-child(4) .sb-k-chip { border-radius: 100% 0 0 0; }
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-swatch:nth-child(5) .sb-k-chip { height: 36px; margin-top: 36px; border-radius: 999px 999px 0 0; }
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-swatch b { font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; }
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-gl { border-top: 4px solid var(--ab-ink); }
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-gl-row { border-bottom: 2px solid var(--ab-ink); }
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-gl-term b { font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; }
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-gl-link { border: 2px solid var(--ab-ink); border-radius: 0; color: var(--ab-ink); font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; font-size: 11px; }
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-gl-link:hover, .ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-gl-link:focus-visible { background: var(--ab-primary); color: var(--ab-on-primary); }
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-layout { padding: 14px 0 0; border: 0; border-top: 4px solid var(--ab-ink); border-radius: 0; background: transparent; }
+/* fields: a heavier rule; the focus flag is a primary square, the error flag a danger triangle */
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit :is(.sb-k-field, .sb-k-search, .sb-k-selectwrap) .ab-input { border-bottom-width: 4px; }
+html .ab.sb-ab[data-ae="bauhaus-poster"].sb-kit :is(.sb-k-field, .sb-k-search).is-focus .ab-input { background: linear-gradient(var(--ab-primary), var(--ab-primary)) right bottom / 18px 18px no-repeat, var(--ab-pri-tint); }
+html .ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-field.is-error .ab-input { border-bottom-color: var(--sb-danger) !important; background: linear-gradient(to top left, var(--sb-danger) 50%, transparent 50%) right bottom / 18px 18px no-repeat; }
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-field .ab-input:disabled { border-bottom-style: dashed; opacity: 1; color: var(--k-muted); }
+/* checkbox: square, primary flood, a solid square for the mark; radio: ring, primary flood, ring-in-ring mark */
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-box { border-width: 3px; }
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-box:checked { background: var(--ab-primary); }
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-box[type="checkbox"]:checked::after { width: 10px; height: 10px; border: 0; background: var(--ab-on-primary); transform: none; }
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-box[type="radio"]:checked::after { width: 8px; height: 8px; border: 3px solid var(--ab-on-primary); border-radius: 50%; background: transparent; box-sizing: content-box; }
+/* toggle: square track; the thumb is round when off and a square when on */
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .ab-switch { width: 62px; height: 32px; border: 3px solid var(--ab-ink); }
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .ab-switch::before { left: 3px; top: 3px; width: 20px; height: 20px; border-radius: 50%; }
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .ab-switch:checked::before { transform: translateX(30px); border-radius: 0; background: var(--ab-on-primary); }
+/* slider: a rule and an ink triangle caret */
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-slider-h span:first-child { font-size: 12px; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; }
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-slider-h span:last-child { color: var(--ab-ink); font-family: var(--ab-font-h); font-size: 20px; font-weight: 800; line-height: 1; }
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-range::-webkit-slider-runnable-track { height: 8px; }
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-range::-webkit-slider-thumb { width: 28px; height: 28px; margin-top: -10px; border: 0; border-radius: 0; background: var(--ab-ink); clip-path: polygon(50% 0, 100% 100%, 0 100%); }
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-range::-moz-range-track { height: 8px; }
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-range::-moz-range-thumb { width: 28px; height: 28px; border: 0; border-radius: 0; background: var(--ab-ink); clip-path: polygon(50% 0, 100% 100%, 0 100%); }
+/* stepper: two ink discs around a big numeral */
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-stepper { border: 0; background: transparent; gap: 6px; }
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-step { border: 2px solid var(--ab-ink); border-radius: 50%; background: var(--ab-canvas); color: var(--ab-ink); }
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-step:active { background: var(--ab-ink); color: var(--ab-canvas); }
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-step:disabled { border-style: dashed; background: transparent; opacity: 0.5; }
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-step-val { min-width: 52px; border: 0; font-family: var(--ab-font-h); font-size: 26px; font-weight: 800; letter-spacing: -0.02em; }
+/* tabs: the selected one is a primary block over an ink bar */
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-tabs { gap: 0 6px; }
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-tabs [role="tab"] { padding-inline: 12px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; }
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-tabs [role="tab"][aria-selected="true"] { background: var(--ab-primary); color: var(--ab-on-primary); }
+/* disabled: a dashed edge and no fill */
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit :is(.sb-k-btn, .sb-k-btn2, .sb-k-danger, .sb-k-iconbtn):disabled { border-style: dashed; }
+/* menus and popovers carry the accent as a heavy top edge */
+.ab.sb-ab[data-ae="bauhaus-poster"].sb-kit :is(.sb-k-menu, .sb-k-pop, .sb-k-navmenu, .sb-k-mega-panel) { border-top: 8px solid var(--ab-accent); }
+/* the current destination is a primary block (the base's picked tint wins on specificity otherwise) */
+html .ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-nm-item[aria-current="page"] { background-color: var(--ab-primary); color: var(--ab-on-primary); }
+html .ab.sb-ab[data-ae="bauhaus-poster"].sb-kit .sb-k-nm-item[aria-current="page"] :is(.sb-k-ico, .sb-ico) { color: var(--ab-on-primary); box-shadow: inset 0 0 0 2px var(--ab-on-primary); }

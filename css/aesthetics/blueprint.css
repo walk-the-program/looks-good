@@ -499,3 +499,161 @@
 /* classic: its registration marks sit 5px outside every key; inside the kit they are drawn inside the key so no cell overflows */
 .ab.sb-ab[data-ae="blueprint--classic"].sb-kit :is(.ab-cta, .ab-type-apply, .ab-state-ctl)::before { left: 0; top: 0; }
 .ab.sb-ab[data-ae="blueprint--classic"].sb-kit :is(.ab-cta, .ab-type-apply, .ab-state-ctl)::after { right: 0; bottom: 0; }
+
+/* =====================================================================
+   UI kit signature, round D13 (blueprint, the current version only; the classic file keeps the block above)
+   KIT SIGNATURE: Blueprint, a drafting sheet at component scale.
+   1 Shape: square everywhere; the only curves are the radio and the avatar, drawn as drafting circles and balloons.
+   2 Edge and depth: 1px hairline for containers, a double outline for the focal object, a 3px double rule for
+     sections, a second hairline 4px inside every cell (the sheet border). No shadow, no fill, no glow.
+   3 Surfaces: open. Nothing is filled; cells, cards, menus and tiles are canvas with a line.
+   4 UI type: the mono face for controls, labels, tags and figures, in capitals for legends and keys;
+     body copy keeps the brand body face. Numerals are tabular.
+   5 Fields: an underline with a dimension tick at each end; focus thickens the line and adds a dashed frame.
+   6 Controls: checkbox = square crossed by an X; radio = circle with centre lines and a dot; toggle = slide switch
+     (clear track and outline block off, hatched track and solid block on); slider = scale with ticks and a diamond;
+     stepper = [ - 02 + ] in square brackets; text button = [ bracketed ].
+   7 Selection signal everywhere (tabs, segments, menu items, rows, days, nav items, anchors, accordions, tab bar):
+     the double outline. Segments add hatch behind a clear label plate.
+   8 Pressed = hatch frame around a clear plate; focus = dashed 2px frame 4px out; disabled = dashed hidden-line outline.
+   9 Menus, dialogs, popovers: canvas with a hairline and a second hairline 3px out; sheets and drawers a 1.5px rule.
+   10 Page chrome: title-block header under every name, line-type tags (Native double, Custom single, Web dashed),
+     state labels with a dimension tick, a double rule under each group, a lettered colour-role legend.
+   11 Texture only the existing 45-degree hatch, on pressed frames, segments and the on-state track; never behind text.
+   ===================================================================== */
+.ab.sb-ab[data-ae="blueprint"].sb-kit {
+  --k-r: 0px;
+  --bk-dbl: inset 0 0 0 1px var(--ab-ink), inset 0 0 0 3px var(--ab-canvas), inset 0 0 0 4px var(--ab-ink);
+  --bk-press: linear-gradient(var(--ab-canvas), var(--ab-canvas)) center / calc(100% - 20px) calc(100% - 20px) no-repeat, var(--bp-hatch);
+  --bk-sheet: inset 0 0 0 4px var(--ab-canvas), inset 0 0 0 5px var(--bpk-l3);
+}
+
+/* ---- page chrome ---- */
+.ab.sb-ab[data-ae="blueprint"].sb-kit .sb-k-cell, .ab.sb-ab[data-ae="blueprint"].sb-kit .sb-k-layout { padding: 20px; border: 1px solid var(--bpk-l1); border-radius: 0; background: transparent; box-shadow: var(--bk-sheet); }
+.ab.sb-ab[data-ae="blueprint"].sb-kit .sb-k-cell:target { border-color: var(--bpk-l1); box-shadow: var(--bp-sel); }
+.ab.sb-ab[data-ae="blueprint"].sb-kit .sb-k-cell-h { gap: 6px; padding-bottom: 12px; border-bottom: 1px solid var(--bpk-l1); }
+.ab.sb-ab[data-ae="blueprint"].sb-kit .sb-k-name { font: 600 var(--k-headline, 17px)/var(--k-headline-lh, 22px) var(--bpk-mono); letter-spacing: 0.06em; text-transform: uppercase; }
+.ab.sb-ab[data-ae="blueprint"].sb-kit .sb-k-use { font-family: var(--bpk-mono); letter-spacing: 0.01em; }
+.ab.sb-ab[data-ae="blueprint"].sb-kit .sb-k-ios { gap: 6px 8px; margin-top: 4px !important; }
+.ab.sb-ab[data-ae="blueprint"].sb-kit .sb-k-ios .sb-k-ios-tag { padding: 3px 9px; border: 1px solid var(--bpk-l1); border-radius: 0; background: transparent; box-shadow: none; color: var(--ab-ink); font: 600 10px/1.4 var(--bpk-mono); letter-spacing: 0.12em; text-transform: uppercase; }
+.ab.sb-ab[data-ae="blueprint"].sb-kit .sb-k-ios[data-ios="native"] .sb-k-ios-tag { padding: 5px 12px; border: 0; box-shadow: var(--bk-dbl); }
+.ab.sb-ab[data-ae="blueprint"].sb-kit .sb-k-ios .sb-k-ios-tag.sb-k-web-tag { padding: 3px 9px; border: 1px dashed var(--bpk-l1); box-shadow: none; }
+.ab.sb-ab[data-ae="blueprint"].sb-kit .sb-k-ios code { font-size: 12px; letter-spacing: 0.02em; }
+.ab.sb-ab[data-ae="blueprint"].sb-kit .sb-k-slabel { display: flex; align-items: center; gap: 8px; font: 500 11px/1.2 var(--bpk-mono); letter-spacing: 0.14em; }
+.ab.sb-ab[data-ae="blueprint"].sb-kit .sb-k-slabel::before { content: ""; flex: none; width: 18px; height: 7px; background: linear-gradient(var(--bpk-l1), var(--bpk-l1)) 0 50% / 100% 1px no-repeat, linear-gradient(var(--bpk-l1), var(--bpk-l1)) 0 50% / 1px 100% no-repeat; }
+.ab.sb-ab[data-ae="blueprint"].sb-kit .sb-k-group > .ab-labelrow { margin-bottom: 20px; padding-bottom: 8px; border-bottom: 3px double var(--bpk-l1); }
+.ab.sb-ab[data-ae="blueprint"].sb-kit .sb-k-group > .ab-labelrow .ab-label:first-child:not(:only-child)::after { display: none; }
+.ab.sb-ab[data-ae="blueprint"].sb-kit .sb-k-group > .ab-labelrow .ab-n { width: 32px; height: 24px; border: 0; box-shadow: var(--bk-dbl); font-weight: 600; }
+.ab.sb-ab[data-ae="blueprint"].sb-kit .sb-k-head + .ab-rule { height: 0; border-top: 3px double var(--bpk-l1); background: none; }
+.ab.sb-ab[data-ae="blueprint"].sb-kit .ab-card-title.sb-k-pagetitle { font-family: var(--bpk-mono); font-weight: 600; letter-spacing: 0.1em; }
+.ab.sb-ab[data-ae="blueprint"].sb-kit .sb-k-typescale { border: 1px solid var(--bpk-l1); }
+.ab.sb-ab[data-ae="blueprint"].sb-kit .sb-k-type-row { padding: 14px 16px; border-bottom: 1px solid var(--bpk-l2); }
+.ab.sb-ab[data-ae="blueprint"].sb-kit .sb-k-type-row:last-child { border-bottom: 0; }
+.ab.sb-ab[data-ae="blueprint"].sb-kit .sb-k-type-meta { font-family: var(--bpk-mono); }
+.ab.sb-ab[data-ae="blueprint"].sb-kit .sb-k-type-meta b { font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; }
+.ab.sb-ab[data-ae="blueprint"].sb-kit .sb-k-sizes { font-family: var(--bpk-mono); font-size: 12px; }
+.ab.sb-ab[data-ae="blueprint"].sb-kit .sb-k-swatches { counter-reset: bpk; gap: 20px 16px; }
+.ab.sb-ab[data-ae="blueprint"].sb-kit .sb-k-swatch { counter-increment: bpk; font-family: var(--bpk-mono); }
+.ab.sb-ab[data-ae="blueprint"].sb-kit .sb-k-swatch b { font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; }
+.ab.sb-ab[data-ae="blueprint"].sb-kit .sb-k-swatch b::before { content: counter(bpk, upper-alpha) " \00b7  "; color: var(--ab-muted); font-weight: 500; }
+.ab.sb-ab[data-ae="blueprint"].sb-kit .sb-k-chip { height: 56px; margin: 6px 6px 14px; border: 1px solid var(--bpk-l1); border-radius: 0; outline: 1px solid var(--bpk-l1); outline-offset: 4px; }
+.ab.sb-ab[data-ae="blueprint"].sb-kit .sb-k-swatch span { font-family: var(--bpk-mono); }
+.ab.sb-ab[data-ae="blueprint"].sb-kit .sb-k-gl { border-top: 3px double var(--bpk-l1); }
+.ab.sb-ab[data-ae="blueprint"].sb-kit .sb-k-gl-row { border-bottom: 1px solid var(--bpk-l3); }
+.ab.sb-ab[data-ae="blueprint"].sb-kit .sb-k-gl-term { font-family: var(--bpk-mono); }
+.ab.sb-ab[data-ae="blueprint"].sb-kit .sb-k-gl-term b { font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; }
+.ab.sb-ab[data-ae="blueprint"].sb-kit .sb-k-gl-link { border: 1px solid var(--bpk-l2); border-radius: 0; background: transparent; font: 500 11px/1 var(--bpk-mono); letter-spacing: 0.08em; text-transform: uppercase; }
+.ab.sb-ab[data-ae="blueprint"].sb-kit .sb-k-gl-link:hover, .ab.sb-ab[data-ae="blueprint"].sb-kit .sb-k-gl-link:focus-visible { background: var(--bpk-hover); }
+.ab.sb-ab[data-ae="blueprint"].sb-kit .sb-k-gl-link:focus-visible { outline: 1px dashed var(--ab-ink); outline-offset: 3px; }
+.ab.sb-ab[data-ae="blueprint"].sb-kit .sb-k-rules { list-style: square; font-family: var(--bpk-mono); }
+
+/* ---- buttons: pressed = hatch frame round a clear plate; focus = dashed frame; disabled = hidden-line outline ---- */
+.ab.sb-ab[data-ae="blueprint"].sb-kit :is(.sb-k-btn, .sb-k-btn2, .sb-k-iconbtn, .sb-k-fab, .sb-k-backtop, .sb-k-split-more, .sb-k-danger).sb-k-pressed { background: var(--bk-press); box-shadow: none; }
+.ab.sb-ab[data-ae="blueprint"].sb-kit .ab-cta.sb-k-btn.sb-k-pressed, .ab.sb-ab[data-ae="blueprint"].sb-kit .ab-cta.sb-k-fab.sb-k-pressed, .ab.sb-ab[data-ae="blueprint"].sb-kit .ab-cta.sb-k-split-more.sb-k-pressed { box-shadow: var(--bp-sel); }
+.ab.sb-ab[data-ae="blueprint"].sb-kit :is(.sb-k-btn, .sb-k-btn2, .sb-k-danger, .sb-k-iconbtn, .sb-k-textbtn, .sb-k-fab, .sb-k-split-more, .sb-k-backtop, .sb-k-step, .sb-k-pie-item):is(:focus-visible, .sb-k-focus) { outline: 2px dashed var(--ab-ink); outline-offset: 4px; }
+.ab.sb-ab[data-ae="blueprint"].sb-kit :is(.ab-cta.sb-k-btn, .ab-cta.sb-k-split-more, .ab-type-apply.sb-k-btn2, .sb-k-danger):disabled { background: none; border: 1px dashed var(--bpk-l1); box-shadow: none !important; }
+.ab.sb-ab[data-ae="blueprint"].sb-kit .sb-k-danger { border: 2px solid var(--sb-danger-text, var(--ab-ink)); border-radius: 0; background: transparent; color: var(--sb-danger-text, var(--ab-ink)); box-shadow: none; font-family: var(--bpk-mono); letter-spacing: 0.1em; text-transform: uppercase; }
+.ab.sb-ab[data-ae="blueprint"].sb-kit .sb-k-textbtn { color: var(--k-pri-text, var(--ab-primary-text)); font-family: var(--bpk-mono); letter-spacing: 0.1em; text-transform: uppercase; }
+.ab.sb-ab[data-ae="blueprint"].sb-kit .sb-k-textbtn::before { content: "[\00a0" / ""; color: var(--ab-ink); }
+.ab.sb-ab[data-ae="blueprint"].sb-kit .sb-k-textbtn::after { content: "\00a0]" / ""; color: var(--ab-ink); }
+.ab.sb-ab[data-ae="blueprint"].sb-kit .sb-k-textbtn:hover { text-decoration: underline double; text-underline-offset: 4px; }
+.ab.sb-ab[data-ae="blueprint"].sb-kit .sb-k-icon { box-sizing: border-box; padding: 8px 12px; }
+.ab.sb-ab[data-ae="blueprint"].sb-kit .sb-k-icon span { white-space: nowrap; }
+
+/* ---- fields: an underline with a dimension tick at each end ---- */
+.ab.sb-ab[data-ae="blueprint"].sb-kit :is(.sb-k-field, .sb-k-search, .sb-k-selectwrap) .ab-input {
+  border: 0; border-bottom: 1px solid var(--bpk-l1); border-radius: 0; padding-left: 6px; padding-right: 6px; font-family: var(--bpk-mono);
+  background: linear-gradient(var(--bpk-l1), var(--bpk-l1)) 0 100% / 1px 10px no-repeat, linear-gradient(var(--bpk-l1), var(--bpk-l1)) 100% 100% / 1px 10px no-repeat;
+}
+.ab.sb-ab[data-ae="blueprint"].sb-kit :is(.sb-k-field, .sb-k-search, .sb-k-selectwrap) .ab-input::placeholder { color: var(--k-muted); opacity: 1; }
+.ab.sb-ab[data-ae="blueprint"].sb-kit :is(.sb-k-field, .sb-k-search).is-focus .ab-input.ab-input, .ab.sb-ab[data-ae="blueprint"].sb-kit .sb-k-field .ab-input.ab-input:focus-visible, .ab.sb-ab[data-ae="blueprint"].sb-kit .sb-k-selectwrap .ab-input.ab-input:focus-visible { border-bottom-color: var(--ab-ink) !important; box-shadow: inset 0 -2px 0 var(--ab-ink) !important; outline: 1px dashed var(--ab-ink); outline-offset: 4px; }
+.ab.sb-ab[data-ae="blueprint"].sb-kit .sb-k-field.is-error .ab-input.ab-input { border-bottom: 3px double var(--sb-danger-text, var(--ab-ink)) !important; box-shadow: none !important; }
+.ab.sb-ab[data-ae="blueprint"].sb-kit .sb-k-field .ab-input:disabled { opacity: 1; color: var(--k-muted); border-bottom-style: dashed; }
+.ab.sb-ab[data-ae="blueprint"].sb-kit .sb-k-help { font-family: var(--bpk-mono); letter-spacing: 0.02em; }
+
+/* ---- checkbox (X), radio (centre lines and a dot), toggle (slide switch), slider (scale) ---- */
+.ab.sb-ab[data-ae="blueprint"].sb-kit .sb-k-box { border: 1.5px solid var(--ab-ink); border-radius: 0; background: transparent; }
+.ab.sb-ab[data-ae="blueprint"].sb-kit .sb-k-box:checked { background: transparent; border-color: var(--ab-ink); }
+.ab.sb-ab[data-ae="blueprint"].sb-kit .sb-k-box[type="checkbox"]:checked::after {
+  width: 100%; height: 100%; border: 0; transform: none;
+  background: linear-gradient(to top right, transparent calc(50% - 1px), var(--ab-ink) calc(50% - 1px) calc(50% + 1px), transparent calc(50% + 1px)), linear-gradient(to bottom right, transparent calc(50% - 1px), var(--ab-ink) calc(50% - 1px) calc(50% + 1px), transparent calc(50% + 1px));
+}
+.ab.sb-ab[data-ae="blueprint"].sb-kit .sb-k-box[type="radio"] { border-radius: 50%; }
+.ab.sb-ab[data-ae="blueprint"].sb-kit .sb-k-box[type="radio"]::after { content: ""; width: 100%; height: 100%; border-radius: 0; background: linear-gradient(var(--bpk-l1), var(--bpk-l1)) 50% 0 / 1px 100% no-repeat, linear-gradient(var(--bpk-l1), var(--bpk-l1)) 0 50% / 100% 1px no-repeat; }
+.ab.sb-ab[data-ae="blueprint"].sb-kit .sb-k-box[type="radio"]:checked::after { width: 100%; height: 100%; border-radius: 0; background: radial-gradient(circle, var(--ab-ink) 0 4.5px, transparent 5px), linear-gradient(var(--ab-ink), var(--ab-ink)) 50% 0 / 1px 100% no-repeat, linear-gradient(var(--ab-ink), var(--ab-ink)) 0 50% / 100% 1px no-repeat; }
+.ab.sb-ab[data-ae="blueprint"].sb-kit .sb-k-box:disabled { border-style: dashed; }
+.ab.sb-ab[data-ae="blueprint"].sb-kit .sb-k-check { font-family: var(--bpk-mono); letter-spacing: 0.01em; }
+.ab.sb-ab[data-ae="blueprint"].sb-kit .ab-switch { width: 52px; height: 28px; border: 1.5px solid var(--ab-ink); border-radius: 0; background: transparent; }
+.ab.sb-ab[data-ae="blueprint"].sb-kit .ab-switch::before { left: 3px; top: 3px; width: 19px; height: 19px; border-radius: 0; background: transparent; box-shadow: inset 0 0 0 1.5px var(--ab-ink); }
+.ab.sb-ab[data-ae="blueprint"].sb-kit .ab-switch:checked { background: var(--bp-hatch); }
+.ab.sb-ab[data-ae="blueprint"].sb-kit .ab-switch:checked::before { background: var(--ab-ink); box-shadow: none; transform: translateX(24px); }
+.ab.sb-ab[data-ae="blueprint"].sb-kit .ab-switch:disabled { border-style: dashed; }
+.ab.sb-ab[data-ae="blueprint"].sb-kit input.sb-k-range { background: linear-gradient(90deg, var(--bpk-l2) 1px, transparent 1px) 0 100% / 10% 6px repeat-x, linear-gradient(var(--bpk-l1), var(--bpk-l1)) 0 100% / 1px 11px no-repeat, linear-gradient(var(--bpk-l1), var(--bpk-l1)) 100% 100% / 1px 11px no-repeat; }
+.ab.sb-ab[data-ae="blueprint"].sb-kit .sb-k-slider-h span:last-child { font-family: var(--bpk-mono); }
+.ab.sb-ab[data-ae="blueprint"].sb-kit .sb-k-stepper { padding: 0 2px; gap: 0; border: 0; border-left: 2px solid var(--ab-ink); border-right: 2px solid var(--ab-ink); background: linear-gradient(var(--ab-ink), var(--ab-ink)) 0 0 / 8px 2px no-repeat, linear-gradient(var(--ab-ink), var(--ab-ink)) 100% 0 / 8px 2px no-repeat, linear-gradient(var(--ab-ink), var(--ab-ink)) 0 100% / 8px 2px no-repeat, linear-gradient(var(--ab-ink), var(--ab-ink)) 100% 100% / 8px 2px no-repeat; }
+.ab.sb-ab[data-ae="blueprint"].sb-kit .sb-k-step-val { border-inline: 1px dashed var(--bpk-l2); color: var(--ab-ink); }
+.ab.sb-ab[data-ae="blueprint"].sb-kit .sb-k-knob-dial::before { content: ""; position: absolute; inset: 0; border-radius: 50%; background: linear-gradient(var(--bpk-l2), var(--bpk-l2)) 50% 0 / 1px 100% no-repeat, linear-gradient(var(--bpk-l2), var(--bpk-l2)) 0 50% / 100% 1px no-repeat; }
+
+/* ---- selection = the double outline ---- */
+.ab.sb-ab[data-ae="blueprint"].sb-kit .ab-row.sb-k-row.is-picked { background: none; box-shadow: var(--bp-sel); }
+.ab.sb-ab[data-ae="blueprint"].sb-kit .sb-k-tabs { gap: 0; border-bottom: 1px solid var(--bpk-l1); }
+.ab.sb-ab[data-ae="blueprint"].sb-kit .sb-k-tabs [role="tab"] { padding: 0 9px; font: 500 var(--k-footnote, 13px)/1 var(--bpk-mono); letter-spacing: 0.04em; text-transform: uppercase; }
+.ab.sb-ab[data-ae="blueprint"].sb-kit .sb-k-tabs [role="tab"][aria-selected="true"] { color: var(--ab-ink); font-weight: 700; box-shadow: var(--bp-sel); }
+.ab.sb-ab[data-ae="blueprint"].sb-kit .sb-k-tabs [role="tab"][aria-selected="true"]::after { content: none; }
+.ab.sb-ab[data-ae="blueprint"].sb-kit .sb-k-tabs [role="tab"]:focus-visible { outline: 2px dashed var(--ab-ink); outline-offset: 2px; }
+.ab.sb-ab[data-ae="blueprint"].sb-kit .sb-k-anchors a { border-left-color: transparent; }
+.ab.sb-ab[data-ae="blueprint"].sb-kit .sb-k-anchors a.is-on { border-left-color: transparent; box-shadow: var(--bp-sel); }
+.ab.sb-ab[data-ae="blueprint"].sb-kit .sb-k-acc[open] > .sb-k-acc-sum { box-shadow: var(--bp-sel); }
+.ab.sb-ab[data-ae="blueprint"].sb-kit .sb-tabs { border-top: 1.5px solid var(--ab-ink); background: var(--ab-canvas); }
+.ab.sb-ab[data-ae="blueprint"].sb-kit .sb-tab { padding-top: 7px; padding-bottom: 2px; font-family: var(--bpk-mono); text-transform: uppercase; letter-spacing: 0.08em; }
+.ab.sb-ab[data-ae="blueprint"].sb-kit .sb-tab[aria-current] { box-shadow: inset 0 1.5px 0 var(--ab-ink), inset 0 3.5px 0 var(--ab-canvas), inset 0 4.5px 0 var(--ab-ink); font-weight: 700; }
+.ab.sb-ab[data-ae="blueprint"].sb-kit .sb-tab[aria-current]::before { content: none; }
+.ab.sb-ab[data-ae="blueprint"].sb-kit .sb-tab[aria-current] > .sb-ico { color: var(--ab-ink); }
+.ab.sb-ab[data-ae="blueprint"].sb-kit .sb-tab:focus-visible { outline: 2px dashed var(--ab-ink); outline-offset: -3px; }
+
+/* ---- containers, feedback ---- */
+.ab.sb-ab[data-ae="blueprint"].sb-kit .sb-k-card:not(.sb-k-dialog, .sb-k-pop) { box-shadow: inset 0 0 0 3px var(--ab-canvas), inset 0 0 0 4px var(--bpk-l3); }
+.ab.sb-ab[data-ae="blueprint"].sb-kit .sb-k-popbox { border: 1px dashed var(--bpk-l2); border-radius: 0; background: transparent; }
+.ab.sb-ab[data-ae="blueprint"].sb-kit .sb-k-av { border: 1.5px solid var(--ab-ink); border-radius: 50%; background: var(--ab-canvas); color: var(--ab-ink); font-family: var(--bpk-mono); font-weight: 600; }
+.ab.sb-ab[data-ae="blueprint"].sb-kit .sb-k-ico { border: 1px solid var(--bpk-l2); border-radius: 0; background: transparent; color: var(--ab-ink); }
+.ab.sb-ab[data-ae="blueprint"].sb-kit .sb-k-emptyico { border: 1px dashed var(--ab-ink); border-radius: 0; background: transparent; color: var(--ab-ink); }
+.ab.sb-ab[data-ae="blueprint"].sb-kit .sb-k-grab { width: 48px; height: 7px; border-radius: 0; border-block: 1px solid var(--bpk-l1); background: var(--bp-hatch); }
+.ab.sb-ab[data-ae="blueprint"].sb-kit .sb-k-callout { border: 1px solid var(--tone-ico); border-radius: 0; background: transparent; box-shadow: none; }
+.ab.sb-ab[data-ae="blueprint"].sb-kit .sb-k-callout[data-tone="success"] { border-width: 2px; }
+.ab.sb-ab[data-ae="blueprint"].sb-kit .sb-k-callout[data-tone="warning"] { border-style: dashed; }
+.ab.sb-ab[data-ae="blueprint"].sb-kit .sb-k-callout[data-tone="error"] { border: 3px double var(--tone-ico); background: transparent; }
+.ab.sb-ab[data-ae="blueprint"].sb-kit .sb-k-callout b { font-family: var(--bpk-mono); letter-spacing: 0.08em; text-transform: uppercase; }
+.ab.sb-ab[data-ae="blueprint"].sb-kit .sb-k-toast { border: 1.5px solid var(--ab-ink); border-radius: 0; background: var(--ab-canvas); color: var(--ab-ink); box-shadow: var(--bpk-float); font-family: var(--bpk-mono); }
+.ab.sb-ab[data-ae="blueprint"].sb-kit .sb-k-toast button { font-family: var(--bpk-mono); letter-spacing: 0.1em; text-transform: uppercase; }
+.ab.sb-ab[data-ae="blueprint"].sb-kit :is(.sb-k-badge, .sb-k-count) { padding: 4px 10px; border: 1px solid var(--ab-ink); border-radius: 0; background: transparent; color: var(--ab-ink); font-family: var(--bpk-mono); letter-spacing: 0.06em; }
+.ab.sb-ab[data-ae="blueprint"].sb-kit :is(.sb-k-badge, .sb-k-count.is-accent) { border: 0; box-shadow: var(--bk-dbl); }
+.ab.sb-ab[data-ae="blueprint"].sb-kit .sb-badge { border-radius: 0; transform: rotate(45deg); background: var(--ab-ink); box-shadow: 0 0 0 2px var(--ab-canvas); }
+.ab.sb-ab[data-ae="blueprint"].sb-kit .sb-k-trail { font-family: var(--bpk-mono); }
+
+@media (prefers-reduced-motion: reduce) {
+  .ab.sb-ab[data-ae="blueprint"].sb-kit .ab-switch::before { transition: none; }
+}
+
+/* ---- later fixes ---- */
+.ab.sb-ab[data-ae="blueprint"].sb-kit .ab-cta.sb-k-nb-cta { width: auto; margin-left: auto; }
+.ab.sb-ab[data-ae="blueprint"].sb-kit .sb-k-mx-tile > span { padding: 6px 8px; font-family: var(--bpk-mono); letter-spacing: 0.01em; }

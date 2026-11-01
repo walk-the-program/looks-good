@@ -1,0 +1,136 @@
+/* ---------------------------------------------------------------------
+   combos/glasshouse.css - the "Glasshouse" combo (js/combos.js).
+   Pair:      dystopian-luxury (base) x liquid-glass (donor)
+   Channels:  material
+   Scope:     every root carries data-combo="glasshouse" while the combo is on (board, deck
+              slides, Built view), next to data-ae="dystopian-luxury" and data-blend="liquid-glass":
+                .ab[data-combo="glasshouse"] ...
+                [data-combo="glasshouse"] .sb-k-...
+   Tune:      hand-tuning for this pair only: spacing, contrast and finish between the
+              base's structure and the donor's channels. Loaded last, so these rules win.
+              Rules (see the notes at each block): the donor's clear glass on what floats or is raised
+              (overlays, sheets, tab bar, top bars, cards, segmented control, primary) and on the board's
+              glass samples; cells, fields, lists and page chrome stay the base's flat hairlines; corners
+              stay square; copy on glass steps toward the ink so it holds 4.5:1; selection is the
+              base's ink inversion.
+------------------------------------------------------------------------ */
+
+/* ---- one set of glass values: the donor's clear glass, drawn from the brand's tokens ----
+   A low-alpha canvas fill (at most 18% in light, 9% white in dark), a 2px blur with a saturation / brightness
+   lift (clear, never frosted: the shapes and colours behind stay recognisable), a bright rim on the top-left
+   edge with a faint dark one bottom-right, a crisp hairline and a soft low contact shadow. Copy holds 4.5:1 on a
+   halo in the canvas colour that sits only behind the text, not on a milky fill. */
+[data-combo="glasshouse"] {
+  --gh-fill: color-mix(in srgb, var(--ab-canvas) 16%, transparent);
+  --gh-tint: color-mix(in srgb, var(--ab-canvas) 18%, transparent);
+  --gh-ink-glass: color-mix(in srgb, var(--ab-dl-ink) 88%, transparent);
+  --gh-blur: blur(2px) saturate(1.7) brightness(1.08);
+  --gh-blur-hi: blur(2px) saturate(1.7) brightness(1.08);
+  --gh-halo-c: color-mix(in srgb, var(--ab-canvas) 92%, transparent);
+  --gh-halo: 0 0 1px var(--gh-halo-c), 0 0 3px var(--gh-halo-c), 0 0 7px var(--gh-halo-c), 0 0 13px var(--gh-halo-c), 0 0 22px var(--gh-halo-c);
+  --gh-dim: color-mix(in srgb, var(--ab-dl-ink) 34%, transparent);
+  --gh-edge: color-mix(in srgb, var(--ab-dl-ink) 30%, transparent);
+  --gh-rim: inset 1px 1px 0 color-mix(in srgb, #fff 95%, transparent), inset -1px -1px 0 color-mix(in srgb, var(--ab-dl-ink) 18%, transparent);
+  --gh-sh: 0 1px 2px color-mix(in srgb, var(--ab-dl-ink) 8%, transparent), 0 6px 16px -6px color-mix(in srgb, var(--ab-dl-ink) 24%, transparent);
+  --gh-sh-sm: 0 1px 2px color-mix(in srgb, var(--ab-dl-ink) 8%, transparent), 0 3px 8px -3px color-mix(in srgb, var(--ab-dl-ink) 18%, transparent);
+  --gh-soft: color-mix(in srgb, var(--ab-dl-ink) 88%, var(--ab-canvas));
+}
+[data-combo="glasshouse"][data-mode="dark"] {
+  --gh-fill: color-mix(in srgb, #fff 7%, transparent);
+  --gh-tint: color-mix(in srgb, #fff 9%, transparent);
+  --gh-dim: color-mix(in srgb, #000 50%, transparent);
+  --gh-rim: inset 1px 1px 0 color-mix(in srgb, #fff 42%, transparent), inset -1px -1px 0 color-mix(in srgb, #000 50%, transparent);
+  --gh-sh: 0 1px 2px color-mix(in srgb, #000 30%, transparent), 0 6px 16px -6px color-mix(in srgb, #000 55%, transparent);
+  --gh-sh-sm: 0 1px 2px color-mix(in srgb, #000 30%, transparent), 0 3px 8px -3px color-mix(in srgb, #000 45%, transparent);
+}
+
+/* ---- selection: the base's inversion (an ink bar), not the browser's blue ---- */
+[data-combo="glasshouse"] ::selection { background: var(--ab-dl-ink); color: var(--ab-canvas); }
+
+/* ---- Built view (UI kit, phone screens): the base stays a flat hairline catalogue; clear glass takes the
+   floating and raised parts only. Cells, fields, lists, rows, page chrome and the toast keep the base's flat
+   ink. Corners stay square (the base's geometry); the glass is the donor's finish, not its shape. ---- */
+/* 1. floating over content: menus, popovers, dialog, sheets, drawer, tab bar. Clear glass (18% canvas, 2px blur);
+   a halo in the canvas colour behind the copy keeps text at 4.5:1 over the dimmed, still visible screen, and the muted
+   grey steps toward the ink for the same reason. Buttons keep their own fills (no halo). */
+.ab.sb-ab[data-combo="glasshouse"] :is(.sb-k-dialog, .sb-k-side, .sb-k-drawer, .sb-k-pop, .sb-k-tip, .sb-k-cmdmenu, .sb-k-ctx,
+    .sb-k-combo .sb-k-menu, .sb-k-subwrap > .sb-k-menu, .sb-k-mega-panel, .sb-k-sheet, .sb-tabs) {
+  background: var(--gh-tint);
+  -webkit-backdrop-filter: var(--gh-blur-hi); backdrop-filter: var(--gh-blur-hi);
+  box-shadow: var(--gh-rim), var(--gh-sh);
+  text-shadow: var(--gh-halo);
+  --ab-muted: var(--gh-soft); --k-muted: var(--gh-soft);
+}
+.ab.sb-ab[data-combo="glasshouse"] :is(.sb-k-dialog, .sb-k-side, .sb-k-drawer, .sb-k-pop, .sb-k-tip, .sb-k-cmdmenu, .sb-k-ctx,
+    .sb-k-combo .sb-k-menu, .sb-k-subwrap > .sb-k-menu, .sb-k-mega-panel, .sb-k-sheet, .sb-tabs) :is(button, .ab-cta, .ab-type-apply, .sb-k-btn, .sb-k-btn2, .sb-k-danger, .sb-k-kbd) { text-shadow: none; }
+/* the popup and tip cells sit on one faint ink band with hairline edges, so the glass visibly shows content through it */
+.ab.sb-ab.sb-kit[data-combo="glasshouse"] .sb-k-popbox {
+  background:
+    linear-gradient(90deg, transparent 0 18%, var(--ab-dl-hair) 18% calc(18% + 1px), color-mix(in srgb, var(--ab-dl-ink) 12%, transparent) calc(18% + 1px) 52%, var(--ab-dl-hair) 52% calc(52% + 1px), transparent calc(52% + 1px)),
+    color-mix(in srgb, var(--ab-dl-ink) 4%, var(--ab-canvas));
+}
+/* rows the base inverts to an ink bar keep their canvas-coloured label with no halo (a canvas halo would wipe the bar) */
+.ab.sb-ab[data-combo="glasshouse"] :is(.sb-k-side, .sb-k-drawer, .sb-k-pop, .sb-k-cmdmenu, .sb-k-ctx, .sb-k-combo .sb-k-menu, .sb-k-subwrap > .sb-k-menu, .sb-k-mega-panel, .sb-tabs)
+    :is([aria-current], [aria-selected="true"], [aria-expanded="true"], .is-open, .is-sel, .is-on, .sb-k-match),
+.ab.sb-ab[data-combo="glasshouse"] :is(.sb-k-side, .sb-k-drawer, .sb-k-pop, .sb-k-cmdmenu, .sb-k-ctx, .sb-k-combo .sb-k-menu, .sb-k-subwrap > .sb-k-menu, .sb-k-mega-panel, .sb-tabs)
+    :is([aria-current], [aria-selected="true"], [aria-expanded="true"], .is-open, .is-sel, .is-on, .sb-k-match) * { text-shadow: none; }
+/* the dim layer behind a modal or the overlay cell: a plain darkening with no blur and no wash, so the screen under
+   it stays sharp, only darker (the base's 78% canvas wash would read as frost) */
+.ab.sb-ab.sb-kit[data-combo="glasshouse"] .sb-k-scrim { background: var(--gh-dim); -webkit-backdrop-filter: none; backdrop-filter: none; }
+.ab.sb-ab.sb-kit[data-combo="glasshouse"] :is(.sb-k-dialogbox, .sb-k-sidebox, .sb-k-drawerbox, .sb-k-sheetbox)::before { -webkit-backdrop-filter: none; backdrop-filter: none; }
+.ab.sb-ab[data-combo="glasshouse"] :is(.sb-k-dialog, .sb-k-side, .sb-k-drawer, .sb-k-pop, .sb-k-cmdmenu, .sb-k-ctx,
+    .sb-k-combo .sb-k-menu, .sb-k-subwrap > .sb-k-menu) { border-color: var(--gh-edge); }
+.ab.sb-ab[data-combo="glasshouse"] .sb-k-tip { border-color: var(--ab-dl-ink); }
+/* the sheet and the tab bar meet the screen along one edge: a hairline there, the rim on top, the shadow lifts upward */
+.ab.sb-ab[data-combo="glasshouse"] :is(.sb-k-sheet, .sb-tabs) {
+  border-top: 1px solid var(--gh-edge);
+  box-shadow: var(--gh-rim), 0 -6px 16px -8px color-mix(in srgb, var(--ab-dl-ink) 22%, transparent);
+}
+.ab.sb-ab[data-combo="glasshouse"] :is(.sb-k-pop, .sb-k-tip) .sb-k-pop-arrow { background: var(--ab-canvas); border-color: var(--gh-edge); }
+.ab.sb-ab[data-combo="glasshouse"] :is(.sb-k-pop, .sb-k-tip, .sb-k-cmdmenu, .sb-k-ctx, .sb-k-mega-panel) :is(li:hover) { background: var(--ab-dl-grey); }
+
+/* 2. raised: top bars, cards and the segmented control are clear glass too (16% fill, 2px blur) */
+.ab.sb-ab[data-combo="glasshouse"] :is(.sb-k-topbar, .sb-k-navbar, .sb-k-card:not(.sb-k-dialog, .sb-k-pop, .sb-k-tip), .sb-home-card, .ab-seg) {
+  background: var(--gh-fill);
+  -webkit-backdrop-filter: var(--gh-blur); backdrop-filter: var(--gh-blur);
+  box-shadow: var(--gh-rim), var(--gh-sh-sm);
+}
+.ab.sb-ab[data-combo="glasshouse"].sb-kit .ab-card:is(.sb-k-card:not(.sb-k-dialog, .sb-k-pop, .sb-k-tip), .sb-home-card) {
+  border: 1px solid var(--gh-edge); padding: 18px !important;
+}
+.ab.sb-ab[data-combo="glasshouse"] :is(.sb-k-topbar, .sb-k-navbar) { border-bottom-color: var(--gh-edge); }
+.ab.sb-ab[data-combo="glasshouse"] .ab-seg { border-color: var(--gh-edge); }
+
+/* 3. the primary: ink-tinted clear glass (88% ink, so the label keeps its contrast; blend.js leaves a fill under 90% alpha alone), the same rim, a soft shadow.
+   The square mark before the label stays. Pressed and disabled keep the kit's own states. */
+.ab.sb-ab[data-combo="glasshouse"] :is(.ab-cta.sb-k-btn, .sb-k-split-more, .ab-seg-btn[aria-pressed="true"]):not(.sb-k-pressed, :disabled) {
+  background: var(--gh-ink-glass);
+  -webkit-backdrop-filter: var(--gh-blur); backdrop-filter: var(--gh-blur);
+  box-shadow: inset 1px 1px 0 color-mix(in srgb, #fff 38%, transparent), inset -1px -1px 0 color-mix(in srgb, #000 22%, transparent), var(--gh-sh-sm);
+}
+.ab.sb-ab[data-combo="glasshouse"] .ab-seg-btn[aria-pressed="true"] { box-shadow: inset 1px 1px 0 color-mix(in srgb, #fff 38%, transparent), inset -1px -1px 0 color-mix(in srgb, #000 22%, transparent); }
+@media (prefers-reduced-transparency: reduce) {
+  .ab.sb-ab[data-combo="glasshouse"] :is(.sb-k-dialog, .sb-k-side, .sb-k-drawer, .sb-k-pop, .sb-k-tip, .sb-k-cmdmenu, .sb-k-ctx,
+      .sb-k-combo .sb-k-menu, .sb-k-subwrap > .sb-k-menu, .sb-k-mega-panel, .sb-k-sheet, .sb-tabs, .sb-k-topbar, .sb-k-navbar,
+      .sb-k-card, .sb-home-card, .ab-seg, .ab-cta.sb-k-btn, .ab-seg-btn) { -webkit-backdrop-filter: none; backdrop-filter: none; }
+  .ab.sb-ab[data-combo="glasshouse"] :is(.sb-k-dialog, .sb-k-side, .sb-k-drawer, .sb-k-pop, .sb-k-tip, .sb-k-cmdmenu, .sb-k-ctx,
+      .sb-k-combo .sb-k-menu, .sb-k-subwrap > .sb-k-menu, .sb-k-mega-panel, .sb-k-sheet, .sb-tabs, .sb-k-topbar, .sb-k-navbar,
+      .sb-k-card, .sb-home-card, .ab-seg) { background: var(--ab-canvas); }
+}
+
+/* ---- board, 02 Optics: the donor's material samples ----
+   The samples carry a soft drop shadow that is clipped to a grey box inside its frame, and rounded shapes that
+   fight the base's square corners. Square them, drop the clipped shadow, keep the rim, and put
+   one ink band behind the two glass samples so the glass visibly is see-through (clear glass over a flat
+   ground is otherwise a white tile on white). */
+.ab[data-combo="glasshouse"] .ab-blend-scope .ab-blend-sw {
+  border-radius: 0 !important; outline: 1px solid var(--ab-dl-hair);
+}
+.ab[data-combo="glasshouse"] .ab-blend-state:nth-child(n + 2) .ab-blend-sw {
+  box-shadow: var(--gh-rim) !important; border-color: var(--gh-edge);
+}
+.ab[data-combo="glasshouse"] .ab-blend-state:nth-child(n + 2) .ab.ab-blend-scope {
+  background-image: linear-gradient(to bottom, transparent 0 50%, var(--ab-dl-ink) 50% 66%, transparent 66% 100%) !important;
+  background-repeat: no-repeat !important; background-size: calc(100% - 24px) 100% !important; background-position: 12px 0 !important;
+}
+

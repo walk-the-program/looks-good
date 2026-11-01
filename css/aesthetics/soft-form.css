@@ -495,3 +495,97 @@
 @media (prefers-reduced-transparency: reduce) {
   .ab.sb-ab:is([data-ae="soft-form"], [data-ae="soft-form--classic"]).sb-kit .sb-k-scrim { backdrop-filter: none; }
 }
+
+/* ---------------------------------------------------------------------
+   UI kit signature (Soft Form, modern only; the Classic copy keeps the rules above)
+   - Shape: soft and continuous. Containers 26-28, fields and keys 12-16, dots and discs round.
+   - Depth: one material. Everything is the canvas colour; depth is only raised or recessed, lit
+     from the top-left. No hairline rules anywhere: seams are engraved (a dark line over a light one).
+   - Surfaces: cells and screen figures are raised plates; fields, tracks, wells and tags that
+     only label are recessed; the primary is the one glossy solid.
+   - Type: the brand faces, tighter and heavier on names (600, -0.02em), micro labels stay tracked caps.
+   - Control anatomy: unchecked checkbox is a raised key that turns glossy when on; radio is a socket
+     with a glossy pin; slider thumb carries a centre dimple; the toggle track warms when on.
+   - Selection: sink (recessed tab-bar pill, menu item, nav item), a raised key in a recessed track
+     (in-page tabs), or ink fill (segments, days).
+   - Press: the key sinks. Disabled: the relief is taken away (flush with the surface).
+   - Page chrome: raised plates, a recessed lamp before every state label, Native tags sunk and
+     Custom tags raised, engraved seams under group labels and between type scale rows.
+------------------------------------------------------------------------ */
+.ab.sb-ab[data-ae="soft-form"].sb-kit {
+  --sfk-seam-lo: color-mix(in srgb, var(--sfk-lo, var(--ab-lo)) 75%, transparent);
+  --sfk-seam-hi: var(--sfk-hi, var(--ab-hi));
+}
+
+/* page chrome */
+.ab.sb-ab[data-ae="soft-form"].sb-kit .sb-k-pagetitle { font-weight: 600; letter-spacing: calc(-0.045em * var(--ab-tr, 1)); }
+.ab.sb-ab[data-ae="soft-form"].sb-kit .sb-k-head + .ab-rule {
+  height: 2px; margin: 0; border: 0; box-shadow: none;
+  background: linear-gradient(180deg, var(--sfk-seam-lo) 0 1px, var(--sfk-seam-hi) 1px 2px);
+}
+.ab.sb-ab[data-ae="soft-form"].sb-kit .sb-k-group > .ab-labelrow {
+  padding-bottom: 14px; margin-bottom: 24px; border: 0;
+  background:
+    linear-gradient(var(--sfk-seam-lo), var(--sfk-seam-lo)) 0 calc(100% - 1px) / 100% 1px no-repeat,
+    linear-gradient(var(--sfk-seam-hi), var(--sfk-seam-hi)) 0 100% / 100% 1px no-repeat;
+}
+.ab.sb-ab[data-ae="soft-form"].sb-kit .sb-k-grid, .ab.sb-ab[data-ae="soft-form"].sb-kit .sb-k-layouts { gap: 26px; }
+.ab.sb-ab[data-ae="soft-form"].sb-kit :is(.sb-k-cell, .sb-k-layout) {
+  gap: 20px; padding: 24px; border: 0; border-radius: 28px; background: var(--ab-canvas); box-shadow: var(--sfk-raised);
+}
+.ab.sb-ab[data-ae="soft-form"].sb-kit .sb-k-cell:target { box-shadow: var(--sfk-raised), 0 0 0 2px color-mix(in srgb, var(--ab-primary) 55%, transparent); }
+.ab.sb-ab[data-ae="soft-form"].sb-kit .sb-k-name { font-weight: 600; letter-spacing: calc(-0.02em * var(--ab-tr, 1)); }
+.ab.sb-ab[data-ae="soft-form"].sb-kit .sb-k-ios .sb-k-ios-tag {
+  padding: 3px 11px; border: 0; background: var(--ab-canvas); font-weight: 600; letter-spacing: 0.06em;
+  box-shadow: 2px 2px 4px var(--sfk-lo, var(--ab-lo)), -2px -2px 4px var(--sfk-hi, var(--ab-hi));
+}
+.ab.sb-ab[data-ae="soft-form"].sb-kit .sb-k-ios[data-ios="native"] .sb-k-ios-tag {
+  background: var(--ab-canvas); box-shadow: inset 1px 1px 3px var(--sfk-lo, var(--ab-lo)), inset -1px -1px 3px var(--sfk-hi, var(--ab-hi));
+}
+.ab.sb-ab[data-ae="soft-form"].sb-kit .sb-k-ios .sb-k-ios-tag.sb-k-web-tag {
+  background: var(--ab-canvas); box-shadow: inset 1px 1px 3px var(--sfk-lo, var(--ab-lo)), inset -1px -1px 3px var(--sfk-hi, var(--ab-hi)), inset 0 0 0 1px color-mix(in srgb, var(--ab-ink) 28%, transparent);
+}
+.ab.sb-ab[data-ae="soft-form"].sb-kit .sb-k-slabel { display: inline-flex; align-items: center; gap: 9px; letter-spacing: 0.14em; }
+.ab.sb-ab[data-ae="soft-form"].sb-kit .sb-k-slabel::before {
+  content: ""; flex: none; width: 8px; height: 8px; border-radius: 50%; background: var(--ab-canvas);
+  box-shadow: inset 1px 1px 2px var(--sfk-lo, var(--ab-lo)), inset -1px -1px 2px var(--sfk-hi, var(--ab-hi));
+}
+.ab.sb-ab[data-ae="soft-form"].sb-kit .sb-k-typescale { border-top: 1px solid var(--sfk-seam-lo); box-shadow: 0 1px 0 var(--sfk-seam-hi); }
+.ab.sb-ab[data-ae="soft-form"].sb-kit .sb-k-type-row { border-bottom: 1px solid var(--sfk-seam-lo); box-shadow: 0 1px 0 var(--sfk-seam-hi); }
+.ab.sb-ab[data-ae="soft-form"].sb-kit .sb-k-type-meta b { font-weight: 600; letter-spacing: -0.01em; }
+.ab.sb-ab[data-ae="soft-form"].sb-kit .sb-k-chip { margin: 4px 4px 10px; border: 0; border-radius: 18px; box-shadow: var(--sfk-raised-s), inset 0 1px 1px rgba(255, 255, 255, 0.3); }
+.ab.sb-ab[data-ae="soft-form"].sb-kit .sb-k-swatch b { font-weight: 600; }
+.ab.sb-ab[data-ae="soft-form"].sb-kit .sb-k-gl { border-top: 1px solid var(--sfk-seam-lo); box-shadow: 0 1px 0 var(--sfk-seam-hi); }
+.ab.sb-ab[data-ae="soft-form"].sb-kit .sb-k-gl-row { border-bottom: 1px solid var(--sfk-seam-lo); box-shadow: 0 1px 0 var(--sfk-seam-hi); }
+.ab.sb-ab[data-ae="soft-form"].sb-kit .sb-k-gl-link {
+  min-height: 30px; padding: 0 12px; border: 0; background: var(--ab-canvas);
+  box-shadow: 2px 2px 5px var(--sfk-lo, var(--ab-lo)), -2px -2px 5px var(--sfk-hi, var(--ab-hi));
+}
+.ab.sb-ab[data-ae="soft-form"].sb-kit .sb-k-gl-link:hover, .ab.sb-ab[data-ae="soft-form"].sb-kit .sb-k-gl-link:focus-visible { background: var(--ab-canvas); box-shadow: var(--sfk-inset-s); }
+
+/* UI type: names and labels in the brand faces, sentence case, a touch tighter */
+.ab.sb-ab[data-ae="soft-form"].sb-kit :is(.ab-cta, .ab-type-apply) { font-weight: 600; letter-spacing: -0.01em; text-transform: none; }
+
+/* control anatomy */
+.ab.sb-ab[data-ae="soft-form"].sb-kit .sb-k-box[type="checkbox"]:not(:checked):not(:disabled) {
+  box-shadow: 2px 2px 5px var(--sfk-lo, var(--ab-lo)), -2px -2px 5px var(--sfk-hi, var(--ab-hi)), inset 0 0 0 1px color-mix(in srgb, var(--ab-ink) 30%, transparent);
+}
+.ab.sb-ab[data-ae="soft-form"].sb-kit .ab-switch:checked { background: color-mix(in srgb, var(--ab-primary) 16%, var(--ab-canvas)); }
+.ab.sb-ab[data-ae="soft-form"].sb-kit input.sb-k-range::-webkit-slider-thumb {
+  background: radial-gradient(circle, color-mix(in srgb, var(--ab-ink) 38%, var(--ab-canvas)) 0 2.5px, transparent 3px), var(--ab-canvas);
+}
+.ab.sb-ab[data-ae="soft-form"].sb-kit input.sb-k-range::-moz-range-thumb {
+  background: radial-gradient(circle, color-mix(in srgb, var(--ab-ink) 38%, var(--ab-canvas)) 0 2.5px, transparent 3px), var(--ab-canvas);
+}
+/* tab bar: the current tab sits in a recessed pill (no primary underline) */
+.ab.sb-ab[data-ae="soft-form"].sb-kit .sb-tab[aria-current]::before {
+  top: 0; bottom: auto; width: 54px; margin-left: -27px; height: 30px; border-radius: 15px; background: var(--ab-canvas); box-shadow: var(--sfk-inset-s); z-index: -1;
+}
+/* in-page tabs: a recessed track, the selected tab is a raised key with an ink label (no underline, no hairline) */
+.ab.sb-ab[data-ae="soft-form"].sb-kit .sb-k-tabs { gap: 4px; padding: 5px; border: 0; border-radius: 16px; background: var(--ab-canvas); box-shadow: var(--sfk-inset-s); }
+.ab.sb-ab[data-ae="soft-form"].sb-kit .sb-k-tabs [role="tab"] { border-radius: 11px; padding-left: 14px; padding-right: 14px; }
+.ab.sb-ab[data-ae="soft-form"].sb-kit .sb-k-tabs [role="tab"][aria-selected="true"] { background: var(--ab-canvas); box-shadow: var(--sfk-raised-s); }
+.ab.sb-ab[data-ae="soft-form"].sb-kit .sb-k-tabs [role="tab"][aria-selected="true"]::after { content: none; }
+/* destructive: a raised key with the danger tone in the label (no outline box); pressed sinks */
+.ab.sb-ab[data-ae="soft-form"].sb-kit .sb-k-danger:not(.sb-k-split-more) { border: 0; background: var(--ab-canvas); color: var(--sb-danger-text, var(--sb-danger)); font-weight: 600; box-shadow: var(--sfk-raised-s); }
+.ab.sb-ab[data-ae="soft-form"].sb-kit .sb-k-danger.sb-k-pressed:not(:disabled), .ab.sb-ab[data-ae="soft-form"].sb-kit .sb-k-danger:active:not(:disabled) { filter: none; box-shadow: var(--sfk-inset-s); }

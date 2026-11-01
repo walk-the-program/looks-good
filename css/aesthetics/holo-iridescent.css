@@ -401,3 +401,143 @@
 @media (prefers-reduced-motion: reduce) {
   .ab.sb-ab:is([data-ae="holo-iridescent"], [data-ae="holo-iridescent--classic"]).sb-kit .sb-k-spin { animation: none; }
 }
+
+/* ---------------------------------------------------------------------
+   UI kit signature (Holo Iridescent; the plain key only, Classic keeps the rules above)
+   Shape:     machined pearl. 10-12px on controls and fields (not pills), 22px containers; pills only for the
+              small selected lozenges and the badges. Checkbox and radio are 7px / round beads.
+   Edge:      a chrome hairline (--ab-hair-strong) plus a white bevel on the top edge. The one focal element
+              of a component gets the spectral rim (a 1px foil border).
+   Surface:   pearl fill (--ab-card-solid); fields are recessed pearl wells (inset shadow); cells are pearl
+              plates with a foil hairline across the top.
+   Type:      widest tracking in the kit: caps at 0.14-0.16em on field labels, state labels, tags and group
+              labels; weights 500 / 600; tabular numerals.
+   Field:     recessed well with a bevel; focus swaps the rim for the foil.
+   Controls:  checkbox = pearl bevel, foil fill with an ink tick; radio = pearl bead, foil ring with an ink
+              dot; toggle = chrome groove with a pearl bead, foil when on; slider = chrome groove, foil
+              fill, chrome bead with a spectral ring; stepper = pearl capsule split by hairlines;
+              segmented = recessed groove, selected is a raised pearl with the foil rim.
+   Selection: one signal, the foil wash (--hk-foil over the primary tint) with the white rim; vertical lists
+              add the 3px primary edge.
+   Pressed / focus / disabled: sink (inset bevel reverses) / ink ring + foil halo / matte (no bevel, flat chrome).
+   Overlays:  pearl plates with the spectral rim on the focal one, 20px corners, the low lift.
+------------------------------------------------------------------------ */
+.ab.sb-ab.sb-kit[data-ae="holo-iridescent"] { --hk-well: color-mix(in srgb, var(--ab-ink) 4.5%, var(--ab-card-solid)); --hk-well-sh: inset 0 2px 4px rgba(20, 20, 50, 0.12), inset 0 -1px 0 rgba(255, 255, 255, 0.7); --hk-bevel: inset 0 1px 0 var(--ab-hl-line), inset 0 -1px 0 rgba(20, 20, 50, 0.06); --sb-focus-offset: 2px; }
+
+/* page chrome: pearl plates with a foil hairline across the top */
+.ab.sb-ab.sb-kit[data-ae="holo-iridescent"] .sb-k-group > .ab-labelrow .ab-label { letter-spacing: 0.16em; }
+.ab.sb-ab.sb-kit[data-ae="holo-iridescent"] .sb-k-cell, .ab.sb-ab.sb-kit[data-ae="holo-iridescent"] .sb-k-layout { gap: 18px; padding: 22px; border: var(--hk-panel); border-radius: 22px; background: var(--ab-spec-linear) top / 100% 2px no-repeat, var(--ab-card-solid); box-shadow: var(--hk-bevel); }
+.ab.sb-ab.sb-kit[data-ae="holo-iridescent"] .sb-k-cell:target { border-color: var(--ab-ink); }
+.ab.sb-ab.sb-kit[data-ae="holo-iridescent"] .sb-k-name { font-weight: 600; letter-spacing: calc(-0.02em * var(--ab-tr, 1)); }
+.ab.sb-ab.sb-kit[data-ae="holo-iridescent"] .sb-k-ios-tag { padding: 3px 9px; border: var(--hk-panel); border-radius: 999px; background: var(--ab-card-solid); font-size: 10px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; box-shadow: var(--hk-bevel); }
+.ab.sb-ab.sb-kit[data-ae="holo-iridescent"] .sb-k-ios .sb-k-ios-tag { background: var(--ab-card-solid); }
+.ab.sb-ab.sb-kit[data-ae="holo-iridescent"] .sb-k-ios[data-ios="native"] .sb-k-ios-tag { border-color: transparent; background: var(--hk-foil), var(--ab-chrome); color: var(--ab-chrome-ink); }
+.ab.sb-ab.sb-kit[data-ae="holo-iridescent"] .sb-k-ios .sb-k-ios-tag.sb-k-web-tag { background: var(--ab-card-solid); border-color: var(--ab-hair-strong); border-style: dashed; box-shadow: none; }
+.ab.sb-ab.sb-kit[data-ae="holo-iridescent"] .sb-k-slabel { font-weight: 600; letter-spacing: 0.16em; }
+.ab.sb-ab.sb-kit[data-ae="holo-iridescent"] .sb-k-slabel::before { content: ""; display: inline-block; width: 6px; height: 6px; margin-right: 8px; border-radius: 50%; vertical-align: 1px; background: var(--ab-spec-linear); box-shadow: 0 0 0 1px var(--ab-hair-strong); }
+.ab.sb-ab.sb-kit[data-ae="holo-iridescent"] .sb-k-typescale { border-top: var(--hk-panel); }
+.ab.sb-ab.sb-kit[data-ae="holo-iridescent"] .sb-k-type-meta b, .ab.sb-ab.sb-kit[data-ae="holo-iridescent"] .sb-k-swatch b, .ab.sb-ab.sb-kit[data-ae="holo-iridescent"] .sb-k-gl-term b { letter-spacing: 0.04em; }
+.ab.sb-ab.sb-kit[data-ae="holo-iridescent"] .sb-k-chip { border: var(--hk-panel); border-radius: 14px; box-shadow: var(--hk-bevel); }
+.ab.sb-ab.sb-kit[data-ae="holo-iridescent"] .sb-k-gl { border-top: var(--hk-panel); }
+.ab.sb-ab.sb-kit[data-ae="holo-iridescent"] .sb-k-gl-link { border: var(--hk-panel); background: var(--ab-card-solid); box-shadow: var(--hk-bevel); letter-spacing: 0.04em; }
+.ab.sb-ab.sb-kit[data-ae="holo-iridescent"] .sb-k-gl-link:hover, .ab.sb-ab.sb-kit[data-ae="holo-iridescent"] .sb-k-gl-link:focus-visible { background: var(--hk-foil), var(--ab-pri-tint); }
+
+/* actions: pearl keys; the primary keeps its spectral rim */
+.ab.sb-ab.sb-kit[data-ae="holo-iridescent"] .ab-type-apply.sb-k-btn2 { border-radius: 12px; background: var(--ab-card-solid); box-shadow: var(--hk-bevel), 0 1px 2px rgba(20, 20, 50, 0.08); font-weight: 600; }
+.ab.sb-ab.sb-kit[data-ae="holo-iridescent"] .ab-type-apply.sb-k-iconbtn { border-radius: 12px; }
+.ab.sb-ab.sb-kit[data-ae="holo-iridescent"] .ab-cta.sb-k-btn { border-radius: 12px; font-weight: 600; letter-spacing: 0.01em; }
+.ab.sb-ab.sb-kit[data-ae="holo-iridescent"] :is(.ab-cta.sb-k-btn, .ab-type-apply.sb-k-btn2, .ab-type-apply.sb-k-iconbtn).sb-k-pressed { box-shadow: inset 0 3px 6px rgba(20, 20, 50, 0.28), inset 0 -1px 0 rgba(255, 255, 255, 0.3); }
+.ab.sb-ab.sb-kit[data-ae="holo-iridescent"] :is(.ab-type-apply.sb-k-btn2, .ab-type-apply.sb-k-iconbtn).sb-k-pressed { background: var(--hk-well); box-shadow: var(--hk-well-sh); }
+.ab.sb-ab.sb-kit[data-ae="holo-iridescent"] :is(.ab-cta.sb-k-btn, .ab-type-apply.sb-k-btn2):disabled { background: var(--hk-well); background-image: none; border-color: var(--ab-hair); box-shadow: none !important; }
+.ab.sb-ab.sb-kit[data-ae="holo-iridescent"] .sb-k-danger { border-radius: 12px; font-weight: 600; box-shadow: var(--hk-bevel); }
+.ab.sb-ab.sb-kit[data-ae="holo-iridescent"] .sb-k-textbtn { font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; font-size: 15px; }
+.ab.sb-ab.sb-kit[data-ae="holo-iridescent"] .sb-k-fab { border-radius: 50%; }
+.ab.sb-ab.sb-kit[data-ae="holo-iridescent"] .sb-k-fabbox { border: var(--hk-panel); border-radius: 22px; background: var(--hk-well); box-shadow: var(--hk-well-sh); }
+.ab.sb-ab.sb-kit[data-ae="holo-iridescent"] .sb-k-icon span { text-transform: uppercase; letter-spacing: 0.12em; font-size: 10px; }
+
+/* inputs: recessed wells, the foil rim on focus */
+.ab.sb-ab.sb-kit[data-ae="holo-iridescent"] .sb-k-field .ab-fieldlabel, .ab.sb-ab.sb-kit[data-ae="holo-iridescent"] .sb-k-selectwrap .ab-fieldlabel { letter-spacing: 0.16em; font-weight: 600; text-transform: uppercase; }
+.ab.sb-ab.sb-kit[data-ae="holo-iridescent"] :is(.sb-k-field, .sb-k-search, .sb-k-selectwrap) .ab-input { border: 1px solid var(--ab-hair-strong); border-radius: 10px; background: var(--hk-well); box-shadow: var(--hk-well-sh); }
+.ab.sb-ab.sb-kit[data-ae="holo-iridescent"] :is(.sb-k-field, .sb-k-search).is-focus .ab-input { border-color: transparent !important; background: linear-gradient(var(--ab-card-solid), var(--ab-card-solid)) padding-box, var(--ab-spec-linear) border-box; box-shadow: 0 0 0 2px var(--ab-card-solid), 0 0 0 3px var(--ab-ink), 0 0 14px color-mix(in srgb, var(--ab-primary) 30%, transparent) !important; }
+.ab.sb-ab.sb-kit[data-ae="holo-iridescent"] .sb-k-field.is-error .ab-input { box-shadow: var(--hk-well-sh), 0 0 0 3px color-mix(in srgb, var(--sb-danger) 22%, transparent) !important; }
+.ab.sb-ab.sb-kit[data-ae="holo-iridescent"] .sb-k-field .ab-input:disabled { background: var(--ab-card-solid); box-shadow: none; border-style: dashed; }
+.ab.sb-ab.sb-kit[data-ae="holo-iridescent"] .sb-k-menu { border-radius: 14px; }
+.ab.sb-ab.sb-kit[data-ae="holo-iridescent"] .sb-k-menu li { border-radius: 10px; }
+.ab.sb-ab.sb-kit[data-ae="holo-iridescent"] .sb-k-listbox { background: var(--hk-well); box-shadow: var(--hk-well-sh); }
+/* checkbox and radio: pearl beads, foil when chosen */
+.ab.sb-ab.sb-kit[data-ae="holo-iridescent"] .sb-k-box { border: 1px solid color-mix(in srgb, var(--ab-ink) 52%, transparent); background: var(--ab-card-solid); box-shadow: var(--hk-bevel), 0 1px 2px rgba(20, 20, 50, 0.12); }
+.ab.sb-ab.sb-kit[data-ae="holo-iridescent"] .sb-k-box[type="checkbox"] { border-radius: 7px; }
+.ab.sb-ab.sb-kit[data-ae="holo-iridescent"] .sb-k-box:checked { border-color: var(--ab-ink); background: var(--hk-foil), var(--ab-pri-tint); box-shadow: var(--hk-bevel); }
+.ab.sb-ab.sb-kit[data-ae="holo-iridescent"] .sb-k-box[type="checkbox"]:checked::after { border-color: var(--ab-ink); }
+.ab.sb-ab.sb-kit[data-ae="holo-iridescent"] .sb-k-box[type="radio"]:checked::after { background: var(--ab-ink); }
+/* toggle: a chrome groove with a pearl bead */
+.ab.sb-ab.sb-kit[data-ae="holo-iridescent"] .ab-switch { width: 52px; height: 30px; border-radius: 999px; background: var(--hk-well); box-shadow: var(--hk-well-sh), 0 0 0 1px var(--ab-hair-strong); }
+.ab.sb-ab.sb-kit[data-ae="holo-iridescent"] .ab-switch::before { left: 3px; top: 3px; width: 24px; height: 24px; background: var(--ho-knob); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.8), 0 0 0 1px var(--ab-hair-strong), 0 2px 4px rgba(20, 20, 50, 0.3); }
+.ab.sb-ab.sb-kit[data-ae="holo-iridescent"] .ab-switch:checked { background: var(--hk-foil), var(--ab-pri-tint); box-shadow: var(--hk-well-sh), 0 0 0 1px var(--ab-ink); }
+.ab.sb-ab.sb-kit[data-ae="holo-iridescent"] .ab-switch:checked::before { transform: translateX(22px); background: var(--ho-knob); }
+/* segmented: a recessed groove, the selected segment a raised pearl */
+.ab.sb-ab.sb-kit[data-ae="holo-iridescent"] .ab-seg { padding: 4px; border: 1px solid var(--ab-hair-strong); border-radius: 14px; background: var(--hk-well); box-shadow: var(--hk-well-sh); }
+.ab.sb-ab.sb-kit[data-ae="holo-iridescent"] .ab-seg-btn { border-radius: 10px; font-weight: 500; letter-spacing: 0.04em; }
+.ab.sb-ab.sb-kit[data-ae="holo-iridescent"] .ab-seg-btn[aria-pressed="true"] { background: var(--hk-foil), var(--ab-card-solid); color: var(--ab-ink); font-weight: 600; box-shadow: var(--hk-bevel), 0 0 0 1px var(--ab-hair-strong), 0 2px 5px -1px rgba(20, 20, 50, 0.22); }
+/* stepper: a pearl capsule split by hairlines */
+.ab.sb-ab.sb-kit[data-ae="holo-iridescent"] .sb-k-stepper { gap: 0; border-radius: 14px; box-shadow: var(--hk-bevel); overflow: hidden; }
+.ab.sb-ab.sb-kit[data-ae="holo-iridescent"] .sb-k-step { border-radius: 0; background: var(--ab-card-solid); }
+.ab.sb-ab.sb-kit[data-ae="holo-iridescent"] .sb-k-step-val { align-self: stretch; display: grid; place-items: center; min-width: 48px; border-inline: var(--hk-panel); background: var(--hk-well); box-shadow: var(--hk-well-sh); }
+/* slider: a chrome groove, foil fill, a chrome bead with the spectral ring */
+.ab.sb-ab.sb-kit[data-ae="holo-iridescent"] input.sb-k-range::-webkit-slider-runnable-track { height: 8px; border-radius: 999px; background: linear-gradient(90deg, var(--ab-primary-text) 0, var(--ab-primary-text) 0) 0 0 / var(--v, 50%) 2px no-repeat, linear-gradient(90deg, color-mix(in srgb, var(--ab-primary) 38%, var(--ab-pri-tint)) var(--v, 50%), var(--hk-well) var(--v, 50%)); box-shadow: inset 0 1px 3px rgba(20, 20, 50, 0.22), 0 0 0 1px var(--ab-hair-strong); }
+.ab.sb-ab.sb-kit[data-ae="holo-iridescent"] input.sb-k-range::-moz-range-track { height: 8px; border-radius: 999px; background: linear-gradient(90deg, color-mix(in srgb, var(--ab-primary) 38%, var(--ab-pri-tint)) var(--v, 50%), var(--hk-well) var(--v, 50%)); box-shadow: inset 0 1px 3px rgba(20, 20, 50, 0.22), 0 0 0 1px var(--ab-hair-strong); }
+.ab.sb-ab.sb-kit[data-ae="holo-iridescent"] input.sb-k-range::-webkit-slider-thumb { width: 28px; height: 28px; margin-top: -10px; border: 3px solid transparent; border-radius: 50%; background: var(--ho-knob) padding-box, var(--ab-spec-conic) border-box; box-shadow: 0 0 0 1px var(--ab-hair-strong), 0 2px 6px rgba(20, 20, 50, 0.3); }
+.ab.sb-ab.sb-kit[data-ae="holo-iridescent"] input.sb-k-range::-moz-range-thumb { width: 22px; height: 22px; border: 3px solid transparent; border-radius: 50%; background: var(--ho-knob) padding-box, var(--ab-spec-conic) border-box; box-shadow: 0 0 0 1px var(--ab-hair-strong), 0 2px 6px rgba(20, 20, 50, 0.3); }
+.ab.sb-ab.sb-kit[data-ae="holo-iridescent"] .sb-k-slider-h span:first-child { letter-spacing: 0.04em; font-weight: 500; }
+
+/* pickers */
+.ab.sb-ab.sb-kit[data-ae="holo-iridescent"] .sb-k-cal, .ab.sb-ab.sb-kit[data-ae="holo-iridescent"] .sb-k-wheel { border-radius: 22px; }
+.ab.sb-ab.sb-kit[data-ae="holo-iridescent"] .sb-k-day { border-radius: 12px; }
+.ab.sb-ab.sb-kit[data-ae="holo-iridescent"] .sb-k-day.is-start { border-radius: 12px 0 0 12px; }
+.ab.sb-ab.sb-kit[data-ae="holo-iridescent"] .sb-k-day.is-end { border-radius: 0 12px 12px 0; }
+
+/* containers */
+.ab.sb-ab.sb-kit[data-ae="holo-iridescent"] .ab-card.sb-k-card { border-radius: 22px; }
+.ab.sb-ab.sb-kit[data-ae="holo-iridescent"] :is(.ab-list.sb-k-list, .sb-k-accordion) { border-radius: 22px; }
+.ab.sb-ab.sb-kit[data-ae="holo-iridescent"] .sb-k-av { border-radius: 14px; }
+.ab.sb-ab.sb-kit[data-ae="holo-iridescent"] .sb-k-car-card { border-radius: 22px; }
+.ab.sb-ab.sb-kit[data-ae="holo-iridescent"] .sb-k-mx-tile { border-radius: 16px; }
+.ab.sb-ab.sb-kit[data-ae="holo-iridescent"] .sb-k-ph { border-radius: 12px; }
+.ab.sb-ab.sb-kit[data-ae="holo-iridescent"] .sb-k-callout { border: var(--hk-panel); border-left: 4px solid var(--tone-ico); border-radius: 14px; background: linear-gradient(90deg, color-mix(in srgb, var(--tone) 14%, var(--ab-card-solid)), var(--ab-card-solid)); box-shadow: var(--hk-bevel); }
+.ab.sb-ab.sb-kit[data-ae="holo-iridescent"] .sb-k-callout b { letter-spacing: 0.02em; }
+.ab.sb-ab.sb-kit[data-ae="holo-iridescent"] .sb-k-divider .ab-rule { height: 2px; background: var(--ab-spec-linear); opacity: 0.8; }
+
+/* overlays */
+.ab.sb-ab.sb-kit[data-ae="holo-iridescent"] .sb-k-sheet { border: var(--hk-panel); border-bottom: 0; border-radius: 26px 26px 0 0; background: var(--ab-spec-linear) top / 100% 2px no-repeat, var(--ab-card-solid); box-shadow: var(--hk-bevel), var(--hk-lift); }
+.ab.sb-ab.sb-kit[data-ae="holo-iridescent"] .sb-k-grab { width: 44px; height: 5px; background: var(--ab-spec-linear); box-shadow: 0 0 0 1px var(--ab-hair-strong); }
+.ab.sb-ab.sb-kit[data-ae="holo-iridescent"] .sb-k-toast { border-radius: 14px; box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18), var(--hk-lift); }
+.ab.sb-ab.sb-kit[data-ae="holo-iridescent"] .sb-k-tooltip { letter-spacing: 0.04em; }
+
+/* navigation: the foil wash marks the current item; tabs are a recessed rail */
+.ab.sb-ab.sb-kit[data-ae="holo-iridescent"] .sb-k-topbar { border-bottom: var(--hk-panel); }
+.ab.sb-ab.sb-kit[data-ae="holo-iridescent"] .sb-k-tabbarbox { border: var(--hk-panel); border-radius: 22px; background: var(--ab-card-solid); box-shadow: var(--hk-bevel); }
+.ab.sb-ab.sb-kit[data-ae="holo-iridescent"] .sb-tab[aria-current]::before { background: var(--ab-spec-linear); box-shadow: 0 0 0 1px var(--ab-ink); width: 22px; margin-left: -11px; }
+.ab.sb-ab.sb-kit[data-ae="holo-iridescent"] .sb-k-tabs { flex-wrap: nowrap; gap: 2px; padding: 4px; width: auto; max-width: 100%; border: 1px solid var(--ab-hair-strong); border-radius: 14px; background: var(--hk-well); box-shadow: var(--hk-well-sh); }
+.ab.sb-ab.sb-kit[data-ae="holo-iridescent"] .sb-k-tabs [role="tab"] { padding: 0 10px; border-radius: 10px; font-weight: 500; letter-spacing: 0.02em; }
+.ab.sb-ab.sb-kit[data-ae="holo-iridescent"] .sb-k-tabs [role="tab"][aria-selected="true"] { background: var(--hk-foil), var(--ab-card-solid); box-shadow: var(--hk-bevel), 0 0 0 1px var(--ab-hair-strong), 0 2px 5px -1px rgba(20, 20, 50, 0.22); font-weight: 600; }
+.ab.sb-ab.sb-kit[data-ae="holo-iridescent"] .sb-k-tabs [role="tab"][aria-selected="true"]::after { content: none; }
+.ab.sb-ab.sb-kit[data-ae="holo-iridescent"] .sb-k-navbar { border-radius: 14px; }
+.ab.sb-ab.sb-kit[data-ae="holo-iridescent"] .sb-k-nb-links a { border-radius: 10px; }
+.ab.sb-ab.sb-kit[data-ae="holo-iridescent"] .sb-k-backtop { border-radius: 14px; }
+.ab.sb-ab.sb-kit[data-ae="holo-iridescent"] .sb-k-scrollbox { border: var(--hk-panel); border-radius: 18px; box-shadow: var(--hk-well-sh); }
+
+/* menus */
+.ab.sb-ab.sb-kit[data-ae="holo-iridescent"] :is(.sb-k-cmdmenu, .sb-k-combo .sb-k-menu) { border-radius: 14px; }
+.ab.sb-ab.sb-kit[data-ae="holo-iridescent"] .sb-k-ctxbox { border: var(--hk-panel); border-radius: 22px; background: var(--hk-well); box-shadow: var(--hk-well-sh); }
+.ab.sb-ab.sb-kit[data-ae="holo-iridescent"] .sb-k-menubar { border-radius: 14px; }
+.ab.sb-ab.sb-kit[data-ae="holo-iridescent"] .sb-k-menubar [role="menuitem"] { border-radius: 10px; letter-spacing: 0.02em; }
+
+/* feedback */
+.ab.sb-ab.sb-kit[data-ae="holo-iridescent"] :is(.sb-k-badge, .sb-k-count) { letter-spacing: 0.1em; text-transform: uppercase; font-size: 11px; box-shadow: var(--hk-bevel); border: var(--hk-panel); }
+.ab.sb-ab.sb-kit[data-ae="holo-iridescent"] .sb-k-badge { background: var(--hk-foil), var(--ab-chrome); color: var(--ab-chrome-ink); border-color: transparent; }
+.ab.sb-ab.sb-kit[data-ae="holo-iridescent"] .sb-k-count.is-accent { background: var(--hk-foil), var(--ab-chrome); color: var(--ab-chrome-ink); border-color: transparent; }
+.ab.sb-ab.sb-kit[data-ae="holo-iridescent"] .sb-k-count { background: var(--ab-card-solid); }
+.ab.sb-ab.sb-kit[data-ae="holo-iridescent"] .sb-k-row-inline .ab-fit { border: var(--hk-panel); box-shadow: var(--hk-bevel); letter-spacing: 0.08em; text-transform: uppercase; font-size: 11px; }
+.ab.sb-ab.sb-kit[data-ae="holo-iridescent"] .ab-row-bar.sb-k-bar { border-radius: 999px; background: var(--hk-well); box-shadow: var(--hk-well-sh), 0 0 0 1px var(--ab-hair-strong); }
+.ab.sb-ab.sb-kit[data-ae="holo-iridescent"] .ab-row-bar.sb-k-bar i { border-radius: 999px; background: var(--ab-spec-linear); box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6), 0 0 0 1px color-mix(in srgb, var(--ab-ink) 45%, transparent); }
+.ab.sb-ab.sb-kit[data-ae="holo-iridescent"] .sb-k-emptyico { background: var(--hk-foil), var(--ab-chrome); color: var(--ab-chrome-ink); box-shadow: var(--hk-bevel), 0 0 0 1px var(--ab-hair-strong); }

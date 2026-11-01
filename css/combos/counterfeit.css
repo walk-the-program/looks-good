@@ -1,0 +1,26 @@
+/* ---------------------------------------------------------------------
+   combos/counterfeit.css - the "Counterfeit" combo (js/combos.js).
+   Pair:      dystopian-luxury (base) x xerox-punk (donor)
+   Channels:  patterns, type
+   Scope:     every root carries data-combo="counterfeit" while the combo is on (board, deck
+              slides, Built view), next to data-ae="dystopian-luxury" and data-blend="xerox-punk":
+                .ab[data-combo="counterfeit"] ...
+                [data-combo="counterfeit"] .sb-k-...
+   Tune:      hand-tuning for this pair only: spacing, contrast and finish between the
+              base's structure and the donor's channels. Loaded last, so these rules win.
+------------------------------------------------------------------------ */
+
+/* The donor's faces (Bebas Neue, Special Elite) ship one weight. The base asks for 600-700 on
+   the wordmark, tabs and buttons, and the browser would smear a fake bold over them. */
+[data-combo="counterfeit"] { font-synthesis-weight: none; }
+
+/* Bebas at the base's 15px caption size, set at the donor's -0.03em, closes up into one grey bar.
+   Open the tracking and give the caption room to wrap; the big deck and board words keep the donor's tight set. */
+.ab[data-combo="counterfeit"][data-blend-type] .ab-hero .ab-headline,
+[data-combo="counterfeit"][data-combo="counterfeit"] .ab-headline.sb-ob-h {
+  font-size: 17px; letter-spacing: 0.025em !important; line-height: 1.1 !important;
+}
+.ab[data-combo="counterfeit"][data-blend-type] .ab-hero .ab-headline { max-width: 26em; }
+
+/* Selection is an ink bar (the base's inversion, the donor's marker), also readable in dark mode. */
+[data-combo="counterfeit"]::selection, [data-combo="counterfeit"] ::selection { background: var(--ab-ink); color: var(--ab-canvas); }

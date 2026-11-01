@@ -109,6 +109,39 @@ for (const [name, rec] of Object.entries(partials)) {
 }
 check('blend: brands saved before blends load with null', run(`(() => { const s = freshState(); s.blend = { with: 'raw-brutalist', strength: 'bold' }; applySavedSessionToState({ aestheticKey: 'soft-form' }, s); return s.blend; })()`) === null, 'not null');
 check('blend: unblended state serializes blend: null', run(`serializeState(freshState()).blend`) === null, 'not null');
+// Reading computed colours for the label fixer (blendLegibility): a color-mix() fill is reported as
+// color(srgb r g b / a), which used to be misread and flip labels to white.
+{
+  const r = run(`(() => {
+    const h = v => { const c = blParseColor(v); return c && { hex: blHex(c), a: Math.round(c.a * 1000) / 1000 }; };
+    return {
+      srgb: h('color(srgb 0.9 0.8 0.7)'),
+      srgbA: h('color(srgb 1 0.5 0 / 0.25)'),
+      srgbPct: h('color(srgb 100% 0% 0% / 50%)'),
+      rgb: h('rgb(255, 128, 0)'),
+      rgba: h('rgba(10, 20, 30, 0.5)'),
+      rgbSpace: h('rgb(10 20 30 / 0.4)'),
+      clear: h('rgba(0, 0, 0, 0)'),
+      hex3: h('#fa0'), hex6: h('#1a2b3c'), hex8: h('#1a2b3c80'),
+      oklch: blParseColor('oklch(0.5 0.1 200)'), p3: blParseColor('color(display-p3 1 0 0)'),
+      word: blParseColor('transparent'), empty: blParseColor(''),
+      legacy: blRgb('rgb(255, 255, 255)'),
+      over: blHex(blComposite({ r: 255, g: 255, b: 255, a: 0.5 }, { r: 0, g: 0, b: 0 })),
+      overSolid: blHex(blComposite({ r: 10, g: 20, b: 30, a: 1 }, { r: 200, g: 200, b: 200 })),
+      overClear: blHex(blComposite({ r: 10, g: 20, b: 30, a: 0 }, { r: 200, g: 100, b: 50 })),
+      lightFill: contrastRatio('#000000', blHex(blComposite(blParseColor('color(srgb 1 1 1 / 0.88)'), { r: 230, g: 230, b: 230 }))) > 4.5,
+    };
+  })()`);
+  const eq = (a, b) => JSON.stringify(a) === JSON.stringify(b);
+  check('colour parse: color(srgb) without alpha', eq(r.srgb, { hex: '#e6ccb3', a: 1 }), JSON.stringify(r.srgb));
+  check('colour parse: color(srgb) with alpha (number and percent)', eq(r.srgbA, { hex: '#ff8000', a: 0.25 }) && eq(r.srgbPct, { hex: '#ff0000', a: 0.5 }), JSON.stringify([r.srgbA, r.srgbPct]));
+  check('colour parse: rgb / rgba / space syntax / fully clear', eq(r.rgb, { hex: '#ff8000', a: 1 }) && eq(r.rgba, { hex: '#0a141e', a: 0.5 }) && eq(r.rgbSpace, { hex: '#0a141e', a: 0.4 }) && eq(r.clear, { hex: '#000000', a: 0 }), JSON.stringify([r.rgb, r.rgba, r.rgbSpace, r.clear]));
+  check('colour parse: hex (3, 6 and 8 digits)', eq(r.hex3, { hex: '#ffaa00', a: 1 }) && eq(r.hex6, { hex: '#1a2b3c', a: 1 }) && eq(r.hex8, { hex: '#1a2b3c', a: 0.502 }), JSON.stringify([r.hex3, r.hex6, r.hex8]));
+  check('colour parse: oklch, display-p3, keywords and empty are skipped, not guessed', !r.oklch && !r.p3 && !r.word && !r.empty, JSON.stringify([r.oklch, r.p3, r.word, r.empty]));
+  check('colour parse: blRgb keeps its { hex, a } shape', eq(r.legacy, { hex: '#ffffff', a: 1 }), JSON.stringify(r.legacy));
+  check('colour composite: half white over black, solid, and clear', r.over === '#808080' && r.overSolid === '#0a141e' && r.overClear === '#c86432', JSON.stringify([r.over, r.overSolid, r.overClear]));
+  check('colour composite: an 88% white fill over a light ground still wants dark text', r.lightFill === true, String(r.lightFill));
+}
 const blendCases = {
   'unknown donor': `{ with: 'no-such-aesthetic', strength: 'bold' }`,
   'donor equals base': `{ with: 'soft-form', strength: 'bold' }`,
@@ -1141,6 +1174,70 @@ check('paste: empty text', run(`extractColors('').length`) === 0, 'found colors 
   check('build pack: kit CSS matching strips pseudo-elements and dynamic states, and splits selector lists at top level',
     BP(`bpProbe('a.x:hover::before')`) === 'a.x' && BP(`bpProbe('.x >::after')`) === '.x >*' && BP(`bpProbe('.x:not(:hover) .y:focus-visible')`) === '.x .y'
       && BP(`bpSplitTop(':is(.a, .b), .c[data-x="1,2"]', ',').length`) === 2, 'probe');
+}
+
+/* ---- curated combos (js/combos.js): data, activeCombo, persistence, brief ---- */
+
+{
+  const cc = vm.createContext({
+    console: { log: console.log, warn() {}, error: console.error },
+    document: { getElementById: () => null, addEventListener() {}, createElement: () => ({ style: {} }), querySelectorAll: () => [] },
+    window: {}, localStorage: { getItem: () => null, setItem() {} },
+  });
+  const aeDir = path.join(root, 'js/aesthetics');
+  const aeFiles = fs.readdirSync(aeDir).filter(f => f.endsWith('.js') && f !== 'registry.js').sort().map(f => 'js/aesthetics/' + f);
+  for (const f of ['js/data.js', 'js/color.js', 'js/brand-deck.js', 'js/aesthetics/registry.js'].concat(aeFiles,
+    ['js/aesthetic-meta.js', 'js/ui-kit.js', 'js/aesthetic-board.js', 'js/blend.js', 'js/combos.js', 'js/persistence.js', 'js/color-roles.js', 'js/product-sheet.js', 'js/ai-brief.js'])) {
+    vm.runInContext(fs.readFileSync(path.join(root, f), 'utf8'), cc, { filename: f });
+  }
+  const C = code => vm.runInContext(code, cc);
+  const J = JSON.stringify;
+  const bad = C(`COMBOS.filter(c => !(c.id && c.name && c.summary && /^[a-z-]+$/.test(c.id) && AESTHETICS.some(a => a.key === c.base) && AESTHETICS.some(a => a.key === c.with)
+    && c.base !== c.with && ['art', 'type', 'color', 'patterns', 'material'].some(k => c.channels[k] === true) && comboBlendOf(c))).map(c => c.id)`);
+  check('combos: nine valid entries (known base and donor, base is not the donor, at least one channel, unique ids)',
+    C('COMBOS.length') === 9 && bad.length === 0 && C('new Set(COMBOS.map(c => c.id)).size') === 9, J(bad));
+  check('combos: each has a stylesheet in css/combos/', C('COMBOS.map(c => c.id)').every(id => fs.existsSync(path.join(root, 'css/combos', id + '.css'))), 'css');
+  C(`var cstate = () => ({ headingFont: FONTS[0], bodyFont: FONTS[1], typography: {}, scheme: 'analogous', hue: 210, colors: generatePalette('analogous', 210),
+    bgMode: 'light', logoDataUrl: null, content: { brandName: 'Acme', tagline: 'Fine things' }, aesthetic: 'soft-form', aestheticVersion: 'current', blend: null,
+    locks: { typography: false, color: false, aesthetic: false }, dismissed: [], patterns: [] });
+    var withCombo = id => { const c = comboById(id); const s = cstate(); s.aesthetic = c.base; s.blend = comboBlendOf(c); s.combo = id; return s; };`);
+  check('combos: activeCombo is the combo for its exact style and blend, nothing for a plain style or a blend with no style match',
+    C(`activeCombo(withCombo('vitrine')).id`) === 'vitrine' && C('activeCombo(cstate())') === null
+    && C(`COMBOS.every(c => activeCombo(withCombo(c.id)).id === c.id)`) === true, 'exact');
+  check('combos: changing a channel, the donor or the style turns the combo off',
+    C(`(() => { const s = withCombo('vitrine'); s.blend = Object.assign({}, s.blend, { channels: Object.assign({}, s.blend.channels, { type: true }) }); return activeCombo(s); })()`) === null
+    && C(`(() => { const s = withCombo('vitrine'); s.blend = { with: 'liquid-glass', channels: s.blend.channels }; return activeCombo(s); })()`) === null
+    && C(`(() => { const s = withCombo('vitrine'); s.aesthetic = 'soft-form'; return activeCombo(s); })()`) === null
+    && C(`(() => { const s = withCombo('vitrine'); s.blend = null; return activeCombo(s); })()`) === null, 'off');
+  check('combos: two combos that share a base (Dystopian Luxury) are told apart by donor and channels',
+    C(`['vitrine', 'glasshouse', 'counterfeit', 'hallmark'].map(id => activeCombo(withCombo(id)).id).join()`) === 'vitrine,glasshouse,counterfeit,hallmark', 'siblings');
+  check('combos: picker keys round-trip and unknown ids give nothing',
+    C(`comboIdFromKey(comboKey(comboById('dial-up')))`) === 'dial-up' && C(`comboIdFromKey('combo:nope')`) === null && C(`comboIdFromKey('soft-form')`) === null
+    && C(`comboPickKey(withCombo('hallmark'))`) === 'combo:hallmark' && C(`comboPickKey(cstate())`) === 'soft-form', 'keys');
+  const rt = C(`(() => {
+    const saved = serializeState(withCombo('workbench'));
+    const s = cstate(); applySavedSessionToState(JSON.parse(JSON.stringify(saved)), s);
+    const edited = withCombo('workbench'); edited.blend = null;
+    const unknown = cstate(); applySavedSessionToState({ aestheticKey: 'blueprint', blend: saved.blend, combo: 'not-a-combo' }, unknown);
+    const stale = cstate(); applySavedSessionToState({ aestheticKey: 'soft-form', combo: 'workbench' }, stale);
+    const old = cstate(); applySavedSessionToState({ aestheticKey: 'blueprint' }, old);
+    return { saved: saved.combo, loaded: s.combo, aesthetic: s.aesthetic, blendWith: s.blend && s.blend.with, edited: serializeState(edited).combo, unknown: unknown.combo, stale: stale.combo, old: old.combo,
+      none: serializeState(cstate()).combo };
+  })()`);
+  check('combos: state.combo saves with the brand and loads back; an edited blend saves none; unknown ids, mismatches and old brands load none',
+    rt.saved === 'workbench' && rt.loaded === 'workbench' && rt.aesthetic === 'blueprint' && rt.blendWith === 'industrial-device' && rt.edited === null && rt.unknown === null && rt.stale === null && rt.old === null && rt.none === null, J(rt));
+  const bf = C(`(() => {
+    const brief = s => buildAiBrief(s, { surface: 'web', target: 'web', noProbe: true });
+    const combo = brief(withCombo('vitrine'));
+    const custom = withCombo('vitrine'); custom.blend = Object.assign({}, custom.blend, { channels: Object.assign({}, custom.blend.channels, { patterns: true }) });
+    const plain = cstate(); plain.aesthetic = 'dystopian-luxury';
+    return { combo, custom: brief(custom), plain: brief(plain), view: aestheticView(withCombo('vitrine')).def.name, viewPlain: aestheticView(custom).def.name };
+  })()`);
+  check('combos: the brief names the combo and its pair once, in the Blend section; a custom blend and a plain style have no combo line',
+    /This blend is the curated combo \*\*Vitrine\*\*: Dystopian Luxury blended with Mesh Gradient, taking only its art and color channels\./.test(bf.combo)
+    && (bf.combo.match(/curated combo/g) || []).length === 1 && /Vitrine \(Dystopian Luxury × Mesh Gradient\)/.test(bf.combo)
+    && !/curated combo/.test(bf.custom) && !/curated combo|Vitrine/.test(bf.plain) && bf.view === 'Vitrine (Dystopian Luxury × Mesh Gradient)' && bf.viewPlain === 'Dystopian Luxury × Mesh Gradient',
+    J({ view: bf.view, viewPlain: bf.viewPlain }));
 }
 
 // Not run here (they need a real DOM): that blended tokens(t, state) see the view's fonts end to end, and the

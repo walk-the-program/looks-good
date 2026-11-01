@@ -458,6 +458,9 @@
 .ab.sb-ab[data-ae="patchbay"].sb-kit .sb-k-nb-links a:hover { background: var(--ab-pb-grey); }
 .ab.sb-ab[data-ae="patchbay"].sb-kit .sb-k-nb-links a[aria-current] { background: var(--ab-pb-grey); color: var(--ab-ink); box-shadow: inset 0 0 0 1px var(--ab-pb-edge); }
 .ab.sb-ab[data-ae="patchbay"].sb-kit .sb-k-nm-item { border-radius: 999px; font-weight: 600; }
+/* the row hairline (border-top) bends along a pill and shrinks the padding box, so the inset selection ring clipped at the bottom corners; pill rows carry no hairline and the ring follows the row's own radius */
+.ab.sb-ab[data-ae="patchbay"].sb-kit :is(.sb-k-nm-item, .sb-k-nm-children .ab-row.sb-k-row) { border: 0 !important; background-clip: border-box; }
+.ab.sb-ab[data-ae="patchbay"].sb-kit .sb-k-navmenu { padding: 2px; }
 .ab.sb-ab[data-ae="patchbay"].sb-kit .sb-k-nm-item:hover { background: var(--ab-pb-grey); }
 .ab.sb-ab[data-ae="patchbay"].sb-kit .sb-k-nm-item.ab-row[aria-current="page"] { background: var(--ab-pb-grey); color: var(--ab-ink); box-shadow: inset 0 0 0 1px var(--ab-pb-edge); }
 .ab.sb-ab[data-ae="patchbay"].sb-kit .sb-k-nm-children { border-left: 1px solid var(--ab-pb-hair); }
@@ -467,7 +470,7 @@
 .ab.sb-ab[data-ae="patchbay"].sb-kit .sb-k-crumb-sep { color: var(--k-muted); font-family: var(--pb-mono); }
 .ab.sb-ab[data-ae="patchbay"].sb-kit .sb-k-anchors-label { font-family: var(--pb-mono); font-size: 11px; letter-spacing: 0; color: var(--k-muted); }
 .ab.sb-ab[data-ae="patchbay"].sb-kit .sb-k-anchors a { border-radius: 999px; color: var(--k-muted); }
-.ab.sb-ab[data-ae="patchbay"].sb-kit .sb-k-anchors a.is-on { background: var(--ab-pb-grey); color: var(--ab-ink); font-weight: 600; box-shadow: inset 0 0 0 1px var(--ab-pb-edge); }
+.ab.sb-ab[data-ae="patchbay"].sb-kit .sb-k-anchors a.is-on { border-left-color: transparent; background: var(--ab-pb-grey); color: var(--ab-ink); font-weight: 600; box-shadow: inset 0 0 0 1px var(--ab-pb-edge); }
 .ab.sb-ab[data-ae="patchbay"].sb-kit .sb-k-mega-panel { border: 1px solid var(--ab-pb-hair); border-radius: var(--pb-r); background: var(--ab-pb-card); box-shadow: none; }
 .ab.sb-ab[data-ae="patchbay"].sb-kit .sb-k-mega-col .ab-label { font-family: var(--pb-mono); letter-spacing: 0; text-transform: none; color: var(--k-muted); }
 .ab.sb-ab[data-ae="patchbay"].sb-kit .sb-k-mega-col a { border-radius: var(--pb-r-s); }
@@ -507,3 +510,86 @@
 @media (prefers-reduced-motion: reduce) {
   .ab.sb-ab[data-ae="patchbay"].sb-kit .sb-k-spin { animation: none; }
 }
+
+/* ---- UI kit differentiation pass ----
+   Kit signature
+   - Shape: 14px modules, 10px fields and chips; chips and tags carry the name-tag tail (10 10 10 3); only the ink action is a full pill.
+   - Edge and depth: 1px hairline modules, no shadow, no blur; a node is selected by a coloured outline, never a fill alone.
+   - Surfaces: every cell is a two-tone module, a card-coloured title row over an inset body; callouts are outlined, not tinted.
+   - Type: Geist for reading text; Geist Mono for every label, tag, state, field label and value (sentence case, tabular).
+   - Fields: boxed 10px wells with a mono value and a mono "label /" above.
+   - Controls: checkbox is a frame with a filled square, radio a jack (ring around a dot), toggle an outlined track with a ring-less
+     port thumb, slider a thin cable with a hollow ring thumb, stepper one rounded bar split by hairlines, segments and tabs name-tag chips.
+   - Selection: one signal, grey fill plus a 1.5px primary outline (segments, tabs, menu items, rows, nav, anchors, days).
+   - States: pressed scales 0.98, disabled flattens to grey, focus is a primary outline; labels read "/ rest".
+   - Chrome: module title row with a status dot, mono name-tag chips for Native / Custom / Web (grey / outlined / dashed). */
+.ab.sb-ab[data-ae="patchbay"].sb-kit { --pb-sel: inset 0 0 0 1.5px var(--ab-pb-pri); }
+.ab.sb-ab[data-ae="patchbay"].sb-kit .sb-k-cell { gap: 0; padding: 0; border-radius: var(--pb-r); background: var(--ab-pb-card); }
+.ab.sb-ab[data-ae="patchbay"].sb-kit .sb-k-cell:target { border-color: var(--ab-pb-pri); }
+.ab.sb-ab[data-ae="patchbay"].sb-kit .sb-k-cell-h { gap: 6px; padding: 14px 20px 14px; border-bottom: 1px solid var(--ab-pb-hair); }
+.ab.sb-ab[data-ae="patchbay"].sb-kit .sb-k-name { display: flex; align-items: center; gap: 10px; }
+.ab.sb-ab[data-ae="patchbay"].sb-kit .sb-k-name::before { content: ""; flex: none; width: 8px; height: 8px; border-radius: 50%; background: var(--ab-pb-pri); }
+.ab.sb-ab[data-ae="patchbay"].sb-kit .sb-k-states { flex: 1 1 auto; align-content: start; padding: 20px; border-radius: 0 0 calc(var(--pb-r) - 1px) calc(var(--pb-r) - 1px); background: var(--ab-pb-inset); }
+.ab.sb-ab[data-ae="patchbay"].sb-kit .sb-k-cell :is(.ab-card.sb-k-card, .ab-list.sb-k-list, .sb-k-cal, .sb-k-acc, .sb-k-navbar, .sb-k-ribbon, .sb-k-scrollbox) { background: var(--ab-pb-card); }
+.ab.sb-ab[data-ae="patchbay"].sb-kit .sb-k-states :is(.sb-k-field, .sb-k-search, .sb-k-selectwrap) .ab-input, .ab.sb-ab[data-ae="patchbay"].sb-kit .sb-k-states .sb-k-combo .sb-k-combo-in { background: var(--ab-pb-card); }
+.ab.sb-ab[data-ae="patchbay"].sb-kit .sb-k-ios { gap: 6px 8px; }
+.ab.sb-ab[data-ae="patchbay"].sb-kit .sb-k-ios .sb-k-ios-tag { padding: 2px 9px; border: 1px solid var(--ab-pb-hair); border-radius: 10px 10px 10px 3px; background: var(--ab-pb-grey); color: var(--ab-ink); font: 600 10.5px/16px var(--pb-mono); letter-spacing: 0; text-transform: none; }
+.ab.sb-ab[data-ae="patchbay"].sb-kit .sb-k-ios:not([data-ios="native"]) .sb-k-ios-tag { background: var(--ab-pb-card); border-color: var(--ab-pb-edge); }
+.ab.sb-ab[data-ae="patchbay"].sb-kit .sb-k-ios .sb-k-ios-tag.sb-k-web-tag { border-style: dashed; border-color: var(--k-muted); background: transparent; }
+.ab.sb-ab[data-ae="patchbay"].sb-kit .sb-k-ios code { font-family: var(--pb-mono); font-size: 11.5px; }
+.ab.sb-ab[data-ae="patchbay"].sb-kit .sb-k-slabel { font-family: var(--pb-mono); font-size: 11.5px; letter-spacing: 0; text-transform: lowercase; }
+.ab.sb-ab[data-ae="patchbay"].sb-kit .sb-k-slabel::before { content: "/ "; color: var(--ab-primary-text); font-weight: 600; white-space: pre; }
+.ab.sb-ab[data-ae="patchbay"].sb-kit .sb-k-layout { border-radius: var(--pb-r); background: var(--ab-pb-card); }
+.ab.sb-ab[data-ae="patchbay"].sb-kit :is(.sb-k-type-meta span, .sb-k-swatch code, .sb-k-sizes, .sb-k-type-meta b, .sb-k-swatch b) { font-family: var(--pb-mono); letter-spacing: 0; }
+.ab.sb-ab[data-ae="patchbay"].sb-kit .sb-k-gl-link { border-radius: 10px 10px 10px 3px; font-family: var(--pb-mono); border-color: var(--ab-pb-edge); }
+.ab.sb-ab[data-ae="patchbay"].sb-kit .sb-k-chip { border-radius: var(--pb-r-s); }
+
+/* fields: a mono "label /" and a mono value */
+.ab.sb-ab[data-ae="patchbay"].sb-kit .ab-fieldlabel { font-family: var(--pb-mono); text-transform: lowercase; letter-spacing: 0; }
+.ab.sb-ab[data-ae="patchbay"].sb-kit .sb-k-field .ab-fieldlabel::after { content: " /"; color: var(--ab-primary-text); font-weight: 600; }
+.ab.sb-ab[data-ae="patchbay"].sb-kit :is(.sb-k-field, .sb-k-search, .sb-k-selectwrap) .ab-input, .ab.sb-ab[data-ae="patchbay"].sb-kit .sb-k-combo-in { font-family: var(--pb-mono); letter-spacing: 0; }
+
+/* checkbox: a frame with a filled square; radio: a jack, a ring around a dot */
+.ab.sb-ab[data-ae="patchbay"].sb-kit .sb-k-box { border: 1.5px solid var(--ab-pb-edge); border-radius: 8px; background: transparent; }
+.ab.sb-ab[data-ae="patchbay"].sb-kit .sb-k-box[type="radio"] { border-radius: 50%; }
+.ab.sb-ab[data-ae="patchbay"].sb-kit .sb-k-box:checked { border: 2px solid var(--ab-pb-pri); background: transparent; }
+.ab.sb-ab[data-ae="patchbay"].sb-kit .sb-k-box[type="checkbox"]:checked::after { width: 12px; height: 12px; border: 0; border-radius: 3px; background: var(--ab-pb-pri); transform: none; }
+.ab.sb-ab[data-ae="patchbay"].sb-kit .sb-k-box[type="radio"]:checked::after { width: 10px; height: 10px; border-radius: 50%; background: var(--ab-pb-pri); }
+
+/* toggle: an outlined track and a port thumb; on, both take the primary */
+.ab.sb-ab[data-ae="patchbay"].sb-kit .ab-switch { box-sizing: border-box; width: 52px; height: 30px; border: 1.5px solid var(--ab-pb-edge); border-radius: 999px; background: transparent; }
+.ab.sb-ab[data-ae="patchbay"].sb-kit .ab-switch::before { left: 3.5px; top: 3.5px; width: 20px; height: 20px; background: var(--ab-pb-edge); }
+.ab.sb-ab[data-ae="patchbay"].sb-kit .ab-switch:checked { border-color: var(--ab-pb-pri); background: transparent; }
+.ab.sb-ab[data-ae="patchbay"].sb-kit .ab-switch:checked::before { transform: translateX(22px); background: var(--ab-pb-pri); }
+.ab.sb-ab[data-ae="patchbay"].sb-kit .ab-switch:focus-visible { outline: 2px solid var(--ab-pb-pri); outline-offset: 3px; }
+
+/* slider: a thin cable and a hollow ring thumb */
+.ab.sb-ab[data-ae="patchbay"].sb-kit input[type="range"].sb-k-range::-webkit-slider-thumb { box-sizing: border-box; width: 24px; height: 24px; margin-top: -10px; border: 3px solid var(--ab-pb-pri); border-radius: 50%; background: var(--ab-pb-card); box-shadow: none; }
+.ab.sb-ab[data-ae="patchbay"].sb-kit input[type="range"].sb-k-range::-moz-range-thumb { box-sizing: border-box; width: 24px; height: 24px; border: 3px solid var(--ab-pb-pri); border-radius: 50%; background: var(--ab-pb-card); box-shadow: none; }
+
+/* stepper: one rounded bar split by hairlines */
+.ab.sb-ab[data-ae="patchbay"].sb-kit .sb-k-stepper { gap: 0; overflow: hidden; border-radius: var(--pb-r-s); background: var(--ab-pb-card); }
+.ab.sb-ab[data-ae="patchbay"].sb-kit .sb-k-step { border-radius: 0; background: transparent; }
+.ab.sb-ab[data-ae="patchbay"].sb-kit .sb-k-step:hover:not(:disabled) { background: var(--ab-pb-grey); }
+.ab.sb-ab[data-ae="patchbay"].sb-kit .sb-k-step-val { align-self: stretch; display: grid; place-items: center; border-inline: 1px solid var(--ab-pb-hair); }
+
+/* segments and tabs: name-tag chips; the open one is a grey fill inside a primary outline */
+.ab.sb-ab[data-ae="patchbay"].sb-kit .ab-seg { gap: 6px; padding: 0; border-radius: 0; background: none; }
+.ab.sb-ab[data-ae="patchbay"].sb-kit .ab-seg-btn { border: 1px solid var(--ab-pb-hair); border-radius: 10px 10px 10px 3px; background: transparent; color: var(--ab-ink); font-weight: 500; box-shadow: none; }
+.ab.sb-ab[data-ae="patchbay"].sb-kit .ab-seg-btn:hover { background: var(--ab-pb-grey); }
+.ab.sb-ab[data-ae="patchbay"].sb-kit .ab-seg-btn[aria-pressed="true"] { border-color: var(--ab-pb-pri); background: var(--ab-pb-grey); font-weight: 600; box-shadow: var(--pb-sel); }
+.ab.sb-ab[data-ae="patchbay"].sb-kit .ab-seg-btn:focus-visible { outline: 2px solid var(--ab-pb-pri); outline-offset: 2px; }
+.ab.sb-ab[data-ae="patchbay"].sb-kit .sb-k-tabs { gap: 6px; border-bottom: 0; }
+.ab.sb-ab[data-ae="patchbay"].sb-kit .sb-k-tabs [role="tab"] { padding: 0 16px; border: 1px solid transparent; border-radius: 10px 10px 10px 3px; font-weight: 500; }
+.ab.sb-ab[data-ae="patchbay"].sb-kit .sb-k-tabs [role="tab"]:hover { background: var(--ab-pb-grey); }
+.ab.sb-ab[data-ae="patchbay"].sb-kit .sb-k-tabs [role="tab"][aria-selected="true"] { border-color: var(--ab-pb-pri); background: var(--ab-pb-grey); font-weight: 600; box-shadow: var(--pb-sel); }
+.ab.sb-ab[data-ae="patchbay"].sb-kit .sb-k-tabs [role="tab"][aria-selected="true"]::after { content: none; }
+
+/* one selection signal everywhere: grey fill plus the primary outline */
+.ab.sb-ab[data-ae="patchbay"].sb-kit :is(.sb-k-menu li[aria-selected="true"], .sb-k-listbox li[aria-selected="true"], .sb-k-cmdmenu li.is-open, .ab-row.sb-k-row.is-picked, .sb-k-nb-links a[aria-current], .sb-k-nm-item.ab-row[aria-current="page"], .sb-k-anchors a.is-on, .sb-k-menubar button[aria-expanded="true"], .sb-k-day:is(.is-sel, .is-start, .is-end)) { box-shadow: var(--pb-sel); }
+.ab.sb-ab[data-ae="patchbay"].sb-kit .sb-k-day:is(.is-sel, .is-start, .is-end) { background: var(--ab-pb-grey); color: var(--ab-ink); font-weight: 600; }
+
+/* feedback: outlined callouts, mono toast */
+.ab.sb-ab[data-ae="patchbay"].sb-kit .sb-k-callout { border: 1px solid var(--tone-ico); background: var(--ab-pb-card); }
+.ab.sb-ab[data-ae="patchbay"].sb-kit .sb-k-toast { border-radius: var(--pb-r-s); padding-left: 16px; font-family: var(--pb-mono); letter-spacing: 0; }
+.ab.sb-ab[data-ae="patchbay"].sb-kit .sb-k-tooltip { border-radius: 10px 10px 10px 3px; }

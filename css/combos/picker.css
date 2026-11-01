@@ -1,0 +1,26 @@
+/* ---------------------------------------------------------------------
+   combos/picker.css - how the curated combos (js/combos.js) sit in the style
+   gallery: a "Combos" heading across the grid, then one tile per combo
+   (name and "Base x Donor" under its board). Per-combo board tuning lives in
+   css/combos/<id>.css.
+------------------------------------------------------------------------ */
+
+.gal-section {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin: 14px 0 -6px;
+  padding-top: 18px;
+  border-top: 1px solid var(--line);
+  font-size: var(--fs-4, 1rem);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+.gal-section[hidden] { display: none; }
+.gal-section i { font-style: normal; font-size: var(--fs-1); font-weight: 500; color: var(--muted); }
+.gal-section span { font-size: var(--fs-2); font-weight: 400; color: var(--muted); }
+
+/* The style name in the header can now carry "Combo (Base x Donor)": keep it on one line. */
+.ae-name-btn strong { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }

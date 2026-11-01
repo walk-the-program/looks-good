@@ -621,3 +621,131 @@
 .ab.sb-ab:is([data-ae="xerox-punk"], [data-ae="xerox-punk--classic"]).sb-kit :is(.sb-k-skel-line, .sb-k-skel-block) { border-radius: 0; }
 .ab.sb-ab:is([data-ae="xerox-punk"], [data-ae="xerox-punk--classic"]).sb-kit :is(.sb-k-skel-av, .sb-k-skel-line, .sb-k-skel-block)::after { content: none; animation: none; }
 @media (prefers-reduced-motion: reduce) { .ab.sb-ab:is([data-ae="xerox-punk"], [data-ae="xerox-punk--classic"]).sb-kit .sb-k-spin { animation: none; } }
+
+/* ---- UI kit signature (xerox punk, version 2; the classic version keeps the rules above) ----
+   Punk kit = wheatpaste on a wall. Every sheet is a scrap; every control is something a person did by hand.
+   1 Shape: torn or wobbly, never a clean radius. Scraps tilt a hair; squares are slightly off.
+   2 Edge and depth: torn paper edge with a hard offset shadow, masking tape at the top of each sheet,
+     2px #111 outlines on controls, rubber-stamp double lines on tags.
+   3 Surfaces: every cell is a cream paper scrap pasted on the wall; fields are newsprint labels;
+     the primary stays the Day-Glo fluoro (the brand primary); floating pieces are smaller scraps.
+   4 Type: heading face in caps on a fluoro underline names a sheet; marker hand for numbers, state labels,
+     field labels and notes; typewriter mono carries controls in tracked caps.
+   5 Fields: a newsprint label with a heavy ruled line; focus = a fluoro highlighter band across it.
+   6 Controls: checkbox = a box scribbled in with marker hatching; radio = a hand-drawn ring with an ink blob;
+     toggle = a tick on a scrap; slider = a fluoro marker bar on a taped rule with a tilted scrap handle;
+     stepper = bone keys around a marker numeral; tabs/segments = cut words circled in marker.
+   7 Selection: the marker. A fluoro highlighter band with a 4px ink bar on rows, nav items, menus; a
+     hand-drawn circle on single picks (days, segments).
+   8 Pressed = pushed into the wall (offset shrinks); focus = 3px fluoro outline; disabled = dashed.
+   9 Menus, sheets, dialogs, popovers: smaller cream scraps with the hard offset shadow and a tiny tilt.
+   10 Chrome: group heads are pasted newsprint tiles over a zig-zag cut line; tags are stamps (double line =
+     native, dashed = custom); state labels are handwritten notes; callouts are stickers (plain scrap, tick,
+     hazard edge, blacked-out censor bar).
+   11 Texture: the wall grain and torn-paper filter only where punk already uses them; hatch for scribble. */
+.ab.ab.sb-ab[data-ae="xerox-punk"].sb-kit { counter-reset: xk-sheet; --xp-hl: color-mix(in srgb, var(--ab-fluoro) 38%, var(--ab-sheet)); --sb-focus: var(--xp-hot); --sb-focus-w: 3px; --sb-focus-offset: 3px; }
+
+/* page chrome: each cell is a taped, torn scrap */
+.ab.ab.sb-ab[data-ae="xerox-punk"].sb-kit :is(.sb-k-grid, .sb-k-layouts) { gap: 26px 22px; }
+.ab.ab.sb-ab[data-ae="xerox-punk"].sb-kit .sb-k-cell, .ab.ab.sb-ab[data-ae="xerox-punk"].sb-kit .sb-k-layout {
+  position: relative; isolation: isolate; border: 0; border-radius: 0; background: none; padding: 28px 22px 24px; counter-increment: xk-sheet;
+  --ab-ink: var(--ab-sheet-ink); --ab-canvas: var(--ab-sheet); --ab-muted: var(--ab-sheet-mute); --k-muted: var(--ab-sheet-mute); --ab-line: rgba(0, 0, 0, 0.38);
+  --xp-sh: #111; --xp-ps: rgba(0, 0, 0, 0.65); color: var(--ab-sheet-ink);
+  --xp-zig: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='10' viewBox='0 0 24 10'><polyline points='0,8 6,2 12,8 18,2 24,8' fill='none' stroke='%23111' stroke-opacity='.55' stroke-width='1.5' stroke-linejoin='round'/></svg>");
+}
+.ab.ab.sb-ab[data-ae="xerox-punk"].sb-kit :is(.sb-k-cell, .sb-k-layout)::after { content: ""; position: absolute; inset: 4px; z-index: -1; background: var(--ab-sheet); transform: rotate(var(--xk-r, -0.3deg)); filter: url(#xpn-torn) drop-shadow(3px 4px 0 rgba(0, 0, 0, 0.65)); }
+.ab.ab.sb-ab[data-ae="xerox-punk"][data-mode="dark"].sb-kit :is(.sb-k-cell, .sb-k-layout)::after { filter: url(#xpn-torn) drop-shadow(3px 4px 0 rgba(237, 230, 211, 0.45)); }
+.ab.ab.sb-ab[data-ae="xerox-punk"].sb-kit :is(.sb-k-cell, .sb-k-layout):nth-child(even)::after { --xk-r: 0.35deg; }
+.ab.ab.sb-ab[data-ae="xerox-punk"].sb-kit :is(.sb-k-cell, .sb-k-layout):nth-child(3n)::after { --xk-r: -0.12deg; }
+.ab.ab.sb-ab[data-ae="xerox-punk"].sb-kit :is(.sb-k-cell, .sb-k-layout)::before { content: ""; position: absolute; z-index: 3; top: -9px; left: 26px; width: 56px; height: 18px; pointer-events: none; background: var(--ab-tape); box-shadow: inset 0 0 0 1px var(--ab-tape-edge); transform: rotate(-4deg); }
+.ab.ab.sb-ab[data-ae="xerox-punk"].sb-kit :is(.sb-k-cell, .sb-k-layout):nth-child(even)::before { left: auto; right: 30px; transform: rotate(5deg); }
+.ab.ab.sb-ab[data-ae="xerox-punk"][data-mode="dark"].sb-kit .sb-k-cell .ab-cta { box-shadow: 4px 4px 0 #111; }
+.ab.ab.sb-ab[data-ae="xerox-punk"][data-mode="dark"].sb-kit .sb-k-cell .ab-cta.is-pressed { box-shadow: 1px 1px 0 #111; }
+.ab.ab.sb-ab[data-ae="xerox-punk"][data-mode="dark"].sb-kit .sb-k-cell :is(.ab-card, .ab-panel)::after { filter: url(#xpn-torn) drop-shadow(3px 4px 0 rgba(0, 0, 0, 0.45)); }
+.ab.ab.sb-ab[data-ae="xerox-punk"].sb-kit .sb-k-name { width: fit-content; font-family: var(--ab-font-h); font-weight: var(--ab-hw, 900); text-transform: uppercase; letter-spacing: 0.01em; text-decoration: underline; text-decoration-color: var(--ab-fluoro); text-decoration-thickness: 5px; text-decoration-skip-ink: none; text-underline-offset: 3px; }
+.ab.ab.sb-ab[data-ae="xerox-punk"].sb-kit .sb-k-name::before { content: counter(xk-sheet) "."; display: inline-block; margin-right: 8px; font: 400 20px/1 var(--xp-hand); transform: rotate(-5deg); text-decoration: none; }
+.ab.ab.sb-ab[data-ae="xerox-punk"].sb-kit .sb-k-use { font-family: var(--xp-type); }
+.ab.ab.sb-ab[data-ae="xerox-punk"].sb-kit .sb-k-ios-tag { padding: 1px 8px; border: 2px dashed #111; border-radius: 0; background: none; color: #111; font-family: var(--xp-type); font-size: 10.5px; font-weight: var(--xp-bw, 400); letter-spacing: 0.14em; text-transform: uppercase; transform: rotate(-2.5deg); }
+.ab.ab.sb-ab[data-ae="xerox-punk"].sb-kit .sb-k-ios[data-ios="native"] .sb-k-ios-tag { border: 2px solid #111; box-shadow: inset 0 0 0 1px var(--ab-sheet), inset 0 0 0 2.5px #111; }
+.ab.ab.sb-ab[data-ae="xerox-punk"].sb-kit .sb-k-ios .sb-k-ios-tag.sb-k-web-tag { border: 2px solid #111; background: var(--ab-news); box-shadow: none; transform: rotate(1.5deg); }
+.ab.ab.sb-ab[data-ae="xerox-punk"].sb-kit .sb-k-ios code { font-family: var(--xp-type); }
+.ab.ab.sb-ab[data-ae="xerox-punk"].sb-kit .sb-k-slabel { width: fit-content; color: #111; font: 400 15px/1.1 var(--xp-hand); letter-spacing: 0; text-transform: none; transform: rotate(-1.5deg); transform-origin: 0 100%; }
+.ab.ab.sb-ab[data-ae="xerox-punk"].sb-kit .sb-k-slabel::before { content: "\2191\00a0"; }
+.ab.ab.sb-ab[data-ae="xerox-punk"].sb-kit .sb-k-group > .ab-labelrow { margin-bottom: 24px; padding-bottom: 14px; background: var(--xp-zig) 0 100% / 24px 10px repeat-x; }
+.ab.ab.sb-ab[data-ae="xerox-punk"].sb-kit .sb-k-group > .ab-labelrow .ab-label:first-child { display: inline-block; padding: 2px 12px 1px; background: var(--ab-news); color: #111; font-family: var(--ab-font-h); font-weight: var(--ab-hw, 900); font-size: 22px; letter-spacing: 0.02em; transform: rotate(-1.2deg); clip-path: polygon(0 5%, 100% 0, 99% 95%, 1% 100%); }
+.ab.ab.sb-ab[data-ae="xerox-punk"].sb-kit .sb-k-group > .ab-labelrow .ab-n { background: #111; color: #E9E3D0; transform: rotate(-3deg); }
+.ab.ab.sb-ab[data-ae="xerox-punk"].sb-kit .sb-k-typescale { border-top: 0; }
+.ab.ab.sb-ab[data-ae="xerox-punk"].sb-kit .sb-k-type-row { border-bottom: 2px dashed var(--ab-line); }
+.ab.ab.sb-ab[data-ae="xerox-punk"].sb-kit .sb-k-type-meta b { font: 400 17px/1.1 var(--xp-hand); transform: rotate(-1.5deg); transform-origin: 0 100%; width: fit-content; }
+.ab.ab.sb-ab[data-ae="xerox-punk"].sb-kit .sb-k-chip { border: 0; border-radius: 0; clip-path: polygon(0 4%, 22% 0, 55% 5%, 100% 0, 98% 52%, 100% 100%, 60% 95%, 28% 100%, 0 96%, 2% 50%); transform: rotate(-1deg); }
+.ab.ab.sb-ab[data-ae="xerox-punk"].sb-kit .sb-k-swatch:nth-child(even) .sb-k-chip { transform: rotate(1deg); }
+.ab.ab.sb-ab[data-ae="xerox-punk"].sb-kit .sb-k-swatch b { font: 400 17px/1.1 var(--xp-hand); }
+.ab.ab.sb-ab[data-ae="xerox-punk"].sb-kit .sb-k-gl { border-top: 0; }
+.ab.ab.sb-ab[data-ae="xerox-punk"].sb-kit .sb-k-gl-row { border-bottom: 2px dashed var(--ab-line); }
+.ab.ab.sb-ab[data-ae="xerox-punk"].sb-kit .sb-k-gl-term { font-family: var(--xp-type); letter-spacing: 0.04em; text-transform: uppercase; font-size: 13px; }
+.ab.ab.sb-ab[data-ae="xerox-punk"].sb-kit .sb-k-gl-term span { text-transform: none; }
+.ab.ab.sb-ab[data-ae="xerox-punk"].sb-kit .sb-k-gl-link { border: 2px solid #111; border-radius: 0; background: #E9E3D0; color: #111; box-shadow: 2px 2px 0 var(--xp-sh); font-family: var(--xp-type); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; transform: rotate(-1deg); }
+.ab.ab.sb-ab[data-ae="xerox-punk"].sb-kit .sb-k-gl-link:nth-child(even) { transform: rotate(1.2deg); }
+.ab.ab.sb-ab[data-ae="xerox-punk"].sb-kit .sb-k-gl-link:is(:hover, :focus-visible) { background: var(--ab-fluoro); color: var(--ab-on-primary); }
+
+/* fields: a newsprint label with a heavy ruled line; focus = highlighter band */
+.ab.ab.sb-ab[data-ae="xerox-punk"].sb-kit .ab-input { padding-left: 10px; background: var(--ab-news); }
+.ab.ab.sb-ab[data-ae="xerox-punk"].sb-kit .sb-k-search .ab-input { padding-left: 44px !important; }
+.ab.ab.sb-ab[data-ae="xerox-punk"].sb-kit .sb-k-field .ab-input:disabled { background: repeating-linear-gradient(-35deg, transparent 0 5px, rgba(0, 0, 0, 0.09) 5px 7px), var(--ab-news); }
+.ab.ab.sb-ab[data-ae="xerox-punk"].sb-kit :is(.sb-k-field, .sb-k-search).is-focus .ab-input, .ab.ab.sb-ab[data-ae="xerox-punk"].sb-kit .ab-input:focus {
+  background: var(--xp-hl); border-bottom-width: 6px; border-color: #111 !important; box-shadow: none !important;
+}
+.ab.ab.sb-ab[data-ae="xerox-punk"].sb-kit .sb-k-field.is-error .ab-input { border-color: #111 !important; box-shadow: none !important; background: var(--xp-zig) 0 100% / 24px 10px repeat-x, var(--ab-news); padding-bottom: 14px; }
+.ab.ab.sb-ab[data-ae="xerox-punk"].sb-kit .sb-k-help { font-family: var(--xp-type); }
+.ab.ab.sb-ab[data-ae="xerox-punk"].sb-kit .sb-k-help.is-error { color: #111; font: 400 16px/1.2 var(--xp-hand); transform: rotate(-1deg); transform-origin: 0 0; }
+.ab.ab.sb-ab[data-ae="xerox-punk"].sb-kit .sb-k-help.is-error::before { content: "!! "; }
+.ab.ab.sb-ab[data-ae="xerox-punk"].sb-kit .sb-k-check { font-family: var(--xp-type); letter-spacing: 0.02em; }
+
+/* checkbox scribbled in; radio a hand-drawn ring with an ink blob */
+.ab.ab.sb-ab[data-ae="xerox-punk"].sb-kit .sb-k-box { width: 24px; height: 24px; border: 2.5px solid #111; border-radius: 2px 5px 3px 6px / 5px 2px 6px 3px; background: #F6F3EA; }
+.ab.ab.sb-ab[data-ae="xerox-punk"].sb-kit .sb-k-box[type="checkbox"]:checked { background: var(--xp-hl); border-color: #111; }
+.ab.ab.sb-ab[data-ae="xerox-punk"].sb-kit .sb-k-box[type="checkbox"]:checked::after { content: ""; width: 16px; height: 16px; border: 0; transform: rotate(-4deg); background: repeating-linear-gradient(-40deg, #111 0 2px, transparent 2px 5px); }
+.ab.ab.sb-ab[data-ae="xerox-punk"].sb-kit .sb-k-box[type="radio"] { border-radius: 52% 48% 55% 45% / 48% 55% 45% 52%; }
+.ab.ab.sb-ab[data-ae="xerox-punk"].sb-kit .sb-k-box[type="radio"]:checked { background: #F6F3EA; border-color: #111; }
+.ab.ab.sb-ab[data-ae="xerox-punk"].sb-kit .sb-k-box[type="radio"]:checked::after { width: 11px; height: 11px; border-radius: 55% 45% 50% 50% / 50% 55% 45% 50%; background: #111; transform: rotate(20deg); }
+.ab.ab.sb-ab[data-ae="xerox-punk"].sb-kit .sb-k-box:disabled { opacity: 0.55; border-style: dashed; }
+.ab.ab.sb-ab[data-ae="xerox-punk"].sb-kit .sb-k-listbox li[aria-selected="true"] .sb-k-box { border-color: #111; }
+.ab.ab.sb-ab[data-ae="xerox-punk"].sb-kit .sb-k-listbox li[aria-selected="true"] .sb-k-box[type="checkbox"]:checked::after { border: 0; }
+/* toggle: the tick scrap takes the highlighter when on */
+.ab.ab.sb-ab[data-ae="xerox-punk"].sb-kit .ab-switch:checked { background: var(--xp-hl); }
+.ab.ab.sb-ab[data-ae="xerox-punk"].sb-kit :is(.ab-card, .ab-panel, .ab-list, .sb-k-sheet, .sb-k-cell) .ab-switch:checked { background: var(--xp-hl); }
+.ab.ab.sb-ab[data-ae="xerox-punk"].sb-kit .sb-k-cell .ab-switch { background: #F6F3EA; width: 44px; }
+.ab.ab.sb-ab[data-ae="xerox-punk"].sb-kit .sb-k-cell .ab-switch:checked { background: var(--xp-hl); }
+
+/* slider: fluoro marker bar on a taped rule, tilted scrap handle */
+.ab.ab.sb-ab[data-ae="xerox-punk"].sb-kit .sb-k-range::-webkit-slider-runnable-track { box-sizing: border-box; height: 10px; border: 2px solid #111; background: linear-gradient(90deg, var(--ab-fluoro) var(--v, 50%), var(--ab-tape) var(--v, 50%)); }
+.ab.ab.sb-ab[data-ae="xerox-punk"].sb-kit .sb-k-range::-webkit-slider-thumb { box-sizing: border-box; width: 20px; height: 28px; margin-top: -9px; border: 2px solid #111; background: #F6F3EA; box-shadow: 2px 2px 0 #111; transform: rotate(-6deg); }
+.ab.ab.sb-ab[data-ae="xerox-punk"].sb-kit .sb-k-range::-moz-range-track { box-sizing: border-box; height: 10px; border: 2px solid #111; background: linear-gradient(90deg, var(--ab-fluoro) var(--v, 50%), var(--ab-tape) var(--v, 50%)); }
+.ab.ab.sb-ab[data-ae="xerox-punk"].sb-kit .sb-k-range::-moz-range-thumb { box-sizing: border-box; width: 20px; height: 28px; border: 2px solid #111; border-radius: 0; background: #F6F3EA; box-shadow: 2px 2px 0 #111; transform: rotate(-6deg); }
+.ab.ab.sb-ab[data-ae="xerox-punk"].sb-kit .sb-k-slider-h { font-family: var(--xp-type); }
+.ab.ab.sb-ab[data-ae="xerox-punk"].sb-kit .sb-k-step-val { font: 400 24px/1 var(--xp-hand); box-shadow: inset 0 -5px 0 var(--xp-hl); }
+
+/* selection: the marker */
+.ab.ab.sb-ab[data-ae="xerox-punk"].sb-kit .ab-row.sb-k-row.is-picked { background-color: var(--xp-hl); box-shadow: inset 4px 0 0 #111; }
+.ab.ab.sb-ab[data-ae="xerox-punk"].sb-kit .sb-k-menu li[aria-selected="true"] { background: var(--xp-hl); }
+.ab.ab.sb-ab[data-ae="xerox-punk"].sb-kit :is(.sb-k-nb-links a[aria-current], .sb-k-navmenu .ab-row.sb-k-nm-item[aria-current="page"]) { background-color: var(--xp-hl); color: #111; box-shadow: inset 0 -4px 0 #111; }
+.ab.ab.sb-ab[data-ae="xerox-punk"].sb-kit .sb-k-navmenu .ab-row.sb-k-nm-item[aria-current="page"] { box-shadow: inset 4px 0 0 #111; }
+.ab.ab.sb-ab[data-ae="xerox-punk"].sb-kit .sb-k-navmenu .ab-row.sb-k-nm-item[aria-current="page"] :is(.sb-k-title, .sb-k-trail, .sb-ico) { color: #111; }
+.ab.ab.sb-ab[data-ae="xerox-punk"].sb-kit .sb-k-anchors a.is-on { background: var(--xp-hl); border-left-color: #111; color: #111; }
+.ab.ab.sb-ab[data-ae="xerox-punk"].sb-kit :is(.sb-k-dd[aria-expanded="true"], .sb-k-menubar [role="menuitem"][aria-expanded="true"]) { background: var(--xp-hl); color: #111; box-shadow: inset 0 -4px 0 #111; }
+.ab.ab.sb-ab[data-ae="xerox-punk"].sb-kit .sb-k-cmdmenu li.has-sub.is-open { background: var(--xp-hl); color: #111; box-shadow: inset 4px 0 0 #111; }
+.ab.ab.sb-ab[data-ae="xerox-punk"].sb-kit .sb-k-day { border-radius: 50% 46% 52% 48% / 48% 52% 46% 50%; }
+.ab.ab.sb-ab[data-ae="xerox-punk"].sb-kit .sb-k-day.is-range { border-radius: 0; background: var(--xp-hl); }
+.ab.ab.sb-ab[data-ae="xerox-punk"].sb-kit .sb-k-day.is-today { box-shadow: inset 0 0 0 2px #111; }
+.ab.ab.sb-ab[data-ae="xerox-punk"].sb-kit .sb-k-day:is(.is-sel, .is-start, .is-end) { background: var(--xp-hl); color: #111; box-shadow: inset 0 0 0 3px #111; font-weight: var(--xp-bw, 400); }
+
+/* feedback: stickers. info = plain scrap, success = tick, warning = hazard edge, error = censor bar */
+.ab.ab.sb-ab[data-ae="xerox-punk"].sb-kit .sb-k-callout { --tone-ico: #111; border: 2px solid #111; border-radius: 0; background: var(--ab-news); color: #111; box-shadow: 3px 3px 0 var(--xp-sh); transform: rotate(-0.4deg); }
+.ab.ab.sb-ab[data-ae="xerox-punk"].sb-kit .sb-k-callout b { font-family: var(--xp-type); letter-spacing: 0.1em; text-transform: uppercase; font-weight: var(--xp-bw, 400); }
+.ab.ab.sb-ab[data-ae="xerox-punk"].sb-kit .sb-k-callout[data-tone="success"] { background: var(--xp-hl); transform: rotate(0.4deg); }
+.ab.ab.sb-ab[data-ae="xerox-punk"].sb-kit .sb-k-callout[data-tone="warning"] { padding-left: 28px; background: repeating-linear-gradient(-45deg, #111 0 6px, var(--ab-news) 6px 12px) 0 0 / 12px 100% no-repeat, var(--ab-news); }
+.ab.ab.sb-ab[data-ae="xerox-punk"].sb-kit .sb-k-callout[data-tone="error"] { background: #111; color: #E9E3D0; --tone-ico: #E9E3D0; border-style: dashed; border-color: #E9E3D0; box-shadow: 3px 3px 0 var(--xp-sh), inset 0 0 0 2px #111; transform: rotate(-0.6deg); }
+.ab.ab.sb-ab[data-ae="xerox-punk"].sb-kit .sb-k-av { border-radius: 0; background: #0B0B0B; color: #E9E3D0; font-family: var(--xp-type); transform: rotate(-3deg); box-shadow: 2px 2px 0 var(--xp-sh); }
+.ab.ab.sb-ab[data-ae="xerox-punk"].sb-kit .sb-k-av:nth-child(even) { background: var(--ab-news); color: #111; transform: rotate(2.5deg); }
+.ab.ab.sb-ab[data-ae="xerox-punk"].sb-kit .sb-k-av:nth-child(3n) { background: var(--xp-hl); color: #111; transform: rotate(-1deg); }
+.ab.ab.sb-ab[data-ae="xerox-punk"].sb-kit .sb-badge { border-radius: 0; transform: rotate(20deg); }

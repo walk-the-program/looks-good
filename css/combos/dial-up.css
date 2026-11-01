@@ -1,0 +1,39 @@
+/* ---------------------------------------------------------------------
+   combos/dial-up.css - the "Dial-Up" combo (js/combos.js).
+   Pair:      old-web (base) x pirate-broadcast (donor)
+   Channels:  type, color
+   Scope:     every root carries data-combo="dial-up" while the combo is on (board, deck
+              slides, Built view), next to data-ae="old-web" and data-blend="pirate-broadcast":
+                .ab[data-combo="dial-up"] ...
+                [data-combo="dial-up"] .sb-k-...
+   Tune:      hand-tuning for this pair only: spacing, contrast and finish between the
+              base's structure and the donor's channels. Loaded last, so these rules win.
+------------------------------------------------------------------------ */
+
+/* The donor's colour channel marks the highlight word "ink" (data-blend-hl), and that rule forces
+   display:inline. Old Web's WordArt word is an inline-block holding two absolutely placed colour
+   bands, so inline let the bands spill across the wrapped line: "made" printed twice. Keep it a box. */
+.ab[data-combo="dial-up"] .ab-hl.ow-w { display: inline-block !important; }
+
+/* Page titles sit on the starfield, not in a window. Old Web paints .ab-card-title black for
+   window bodies, which vanishes on the dark page. */
+.ab.sb-ab[data-combo="dial-up"] .ab-card-title:is(.sb-title, .sb-k-pagetitle) { color: var(--ab-ink); }
+
+/* Text on silver windows. The colours the style hands out (teletext green, red, the dark-mode pale
+   blue links and pale muted greys) were tuned for the page, not for #C0C0C0. Use Old Web's own
+   window colours for links and muted text, and a darkened danger for errors. */
+.ab.sb-ab[data-combo="dial-up"] :is(.sb-k-cell, .ab-card, .ab-list, .ab-panel, .owa-win) { --sb-danger-text: color-mix(in srgb, var(--sb-danger) 30%, #000); }
+.ab.sb-ab[data-combo="dial-up"] :is(.sb-k-cell, .ab-card, .ab-list, .ab-panel, .owa-win) :is(.sb-k-link, .sb-k-anchors a, .sb-k-crumbs a),
+.ab.sb-ab[data-combo="dial-up"] :is(.sb-k-cell, .ab-card, .ab-list, .ab-panel, .owa-win) .sb-k-textbtn:not(.sb-k-pressed, :disabled) {
+  color: #0000EE;
+}
+.ab.sb-ab[data-combo="dial-up"] :is(.sb-k-cell, .ab-card, .ab-list, .ab-panel, .owa-win) .sb-k-link.sb-k-pressed { color: #551A8B; }
+.ab.sb-ab[data-combo="dial-up"] :is(.sb-k-cell, .ab-card, .ab-list, .ab-panel, .owa-win) .sb-k-textbtn:not(:disabled) { text-decoration: underline; }
+.ab.sb-ab[data-combo="dial-up"] :is(.sb-k-cell, .ab-card, .ab-list, .ab-panel, .owa-win) .sb-k-help.is-error { font-weight: 700; }
+.ab.sb-ab[data-combo="dial-up"][data-mode="dark"] :is(.sb-k-cell, .ab-card, .ab-list, .ab-panel, .owa-win) :is(.sb-hint, .sb-legend, .sb-chart-x, .sb-from) { color: #3A3A3A; }
+
+/* Greyed calendar days: Old Web's #808080 is 3.95:1 on white. */
+.ab.sb-ab.sb-kit[data-combo="dial-up"] .sb-k-day.is-out { color: color-mix(in srgb, #000 62%, #fff); }
+
+/* The layout notes under the kit's example screens sit on the starfield, not in a window. */
+.ab.sb-ab[data-combo="dial-up"] .sb-k-layout-cap .sb-k-use { color: var(--ab-ink); }

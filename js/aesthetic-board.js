@@ -865,7 +865,8 @@ function renderCompareGrid() {
   if (!grid) return;
   setBoardFonts(grid);
   const defs = visibleAesthetics();
-  const note = aeFamily === 'all' ? '' : `<p class="cmp-note">${escapeHtml(aestheticFamilyLabel(aeFamily))}: ${defs.length} of ${aePool().length} aesthetics. Choose All in the style gallery to see every one.</p>`;
+  // Compare all draws each style on its own, unblended: it skips the curated combos (js/combos.js).
+  const note = aeFamily === 'all' || aeFamily === 'combos' ? '' : `<p class="cmp-note">${escapeHtml(aestheticFamilyLabel(aeFamily))}: ${defs.length} of ${aePool().length} aesthetics. Choose All in the style gallery to see every one.</p>`;
   // The tile of the selected aesthetic follows the Classic | Current choice.
   const shown = d => (d.key === state.aesthetic ? resolveAestheticDef(state) : d);
   grid.innerHTML = note + defs.map(def => {
@@ -1058,6 +1059,21 @@ function visibleAesthetics() {
   return list.length ? list : pool;
 }
 
+// The curated combos (js/combos.js) the picker lists: with All or the Combos family.
+function aeVisibleCombos() {
+  if (typeof visibleCombos !== 'function' || (aeFamily !== 'all' && aeFamily !== 'combos')) return [];
+  return visibleCombos();
+}
+// Picker keys in list order: the styles, then the combos ("combo:<id>"). Prev / next and shuffle walk these.
+function aePickKeys() {
+  const styles = aeFamily === 'combos' ? [] : visibleAesthetics().map(a => a.key);
+  return styles.concat(aeVisibleCombos().map(c => comboKey(c)));
+}
+// The picker key of what the brand shows: the active combo's key, else the style key.
+function aeCurrentKey() {
+  return typeof comboPickKey === 'function' ? comboPickKey(state) : state.aesthetic;
+}
+
 function buildAestheticFamilies() {
   const host = document.getElementById('aeFamilies');
   if (!host) return;
@@ -1065,8 +1081,9 @@ function buildAestheticFamilies() {
   const chip = (key, label, n) =>
     `<button type="button" class="ae-fam" data-family="${key}" aria-pressed="false">${escapeHtml(label)}<i>${n}</i></button>`;
   const pool = aePool();
-  host.innerHTML = chip('all', 'All', pool.length)
-    + AESTHETIC_FAMILIES.map(f => [f, pool.filter(a => aestheticFamilyOf(a.key) === f.key).length])
+  const combos = typeof visibleCombos === 'function' ? visibleCombos().length : 0;
+  host.innerHTML = chip('all', 'All', pool.length + combos)
+    + AESTHETIC_FAMILIES.map(f => [f, f.key === 'combos' ? combos : pool.filter(a => aestheticFamilyOf(a.key) === f.key).length])
       .filter(([, n]) => n).map(([f, n]) => chip(f.key, f.label, n)).join('');
 }
 
@@ -1087,7 +1104,7 @@ function syncAestheticChrome(def) {
   const sum = document.getElementById('aeSummary');
   if (sum) sum.textContent = def.summary || '';
   document.querySelectorAll('#aeList .gal-tile').forEach(b => {
-    const on = b.dataset.key === state.aesthetic;
+    const on = b.dataset.key === aeCurrentKey();
     b.setAttribute('aria-pressed', String(on));
     b.classList.toggle('is-current', on);
   });
@@ -1102,6 +1119,7 @@ function syncAestheticChrome(def) {
   renderFontRec(def.blend ? def.blend.base : def);
   if (typeof syncBlendUi === 'function') syncBlendUi();
   if (window.SidebarUI && typeof SidebarUI.syncStyle === 'function') SidebarUI.syncStyle();
+  if (typeof comboSync === 'function') { comboSync(); comboSyncPanel(); }   // js/combos.js
 }
 
 // The Classic | Current switch: only for an aesthetic that has a classic copy.
@@ -1138,23 +1156,40 @@ function renderFontRec(def) {
 function buildAestheticList() {
   const list = document.getElementById('aeList');
   if (!list) return;
-  list.innerHTML = visibleAesthetics().map(def => `
+  const styleTiles = aeFamily === 'combos' ? [] : visibleAesthetics();
+  list.innerHTML = styleTiles.map(def => `
     <div class="gal-tile" role="button" tabindex="-1" data-key="${def.key}" aria-pressed="false"
          aria-label="${escapeHtml(def.name)}: ${escapeHtml(def.descriptor)}" title="${escapeHtml(def.summary || def.name)}"
          data-search="${escapeHtml(`${def.name} ${def.descriptor} ${def.influences || ''} ${def.summary || ''}`.toLowerCase())}">
       <div class="gal-frame"><div class="gal-board" inert></div></div>
       <div class="gal-meta"><span class="gal-num">${aestheticNumber(def.key)}</span><span class="gal-name">${escapeHtml(def.name)}</span><span class="gal-badge">Current</span><span class="gal-desc">${escapeHtml(def.descriptor)}</span></div>
-    </div>`).join('');
+    </div>`).join('') + aeComboTilesHtml();
   if (window.StyleGallery && typeof StyleGallery.listBuilt === 'function') StyleGallery.listBuilt();
+}
+
+// The "Combos" section after the styles: a heading, then one tile per combo showing its name
+// and "Base × Donor". Its key is "combo:<id>"; the gallery draws it from comboState().
+function aeComboTilesHtml() {
+  const combos = aeVisibleCombos();
+  if (!combos.length) return '';
+  return `<h3 class="gal-section" id="galCombos">Combos<i>${combos.length}</i><span>A style blended with a second one, ready to use.</span></h3>`
+    + combos.map((c, i) => `
+    <div class="gal-tile gal-combo" role="button" tabindex="-1" data-key="${comboKey(c)}" aria-pressed="false"
+         aria-label="${escapeHtml(c.name)}: ${escapeHtml(comboPair(c))}" title="${escapeHtml(c.summary)}"
+         data-search="${escapeHtml(`${c.name} ${comboPair(c)} combo ${c.summary}`.toLowerCase())}">
+      <div class="gal-frame"><div class="gal-board" inert></div></div>
+      <div class="gal-meta"><span class="gal-num">C${i + 1}</span><span class="gal-name">${escapeHtml(c.name)}</span><span class="gal-badge">Current</span><span class="gal-desc">${escapeHtml(comboPair(c))}</span></div>
+    </div>`).join('');
 }
 
 // Prev / next walk the visible (filtered) list; from an aesthetic outside the
 // filter they land on its first or last entry.
+// The list is the styles, then the combos (aePickKeys).
 function stepAesthetic(dir) {
-  const list = visibleAesthetics();
-  const i = list.findIndex(a => a.key === state.aesthetic);
+  const list = aePickKeys();
+  const i = list.indexOf(aeCurrentKey());
   const next = i < 0 ? (dir > 0 ? list[0] : list[list.length - 1]) : list[(i + dir + list.length) % list.length];
-  chooseAesthetic(next.key);
+  chooseAesthetic(next);
 }
 
 function setBoardView(view) {

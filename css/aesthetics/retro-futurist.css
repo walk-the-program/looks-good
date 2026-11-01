@@ -528,3 +528,126 @@
 :is(.ab.sb-ab[data-ae="retro-futurist"], .ab.sb-ab[data-ae="retro-futurist--classic"]).sb-kit .sb-k-cmdmenu li.is-danger .sb-ico { color: var(--ab-rf-hot, var(--sb-danger)); }
 :is(.ab.sb-ab[data-ae="retro-futurist"], .ab.sb-ab[data-ae="retro-futurist--classic"]).sb-kit .sb-k-nm-children .sb-k-nm-item { border-radius: 0; }
 :is(.ab.sb-ab[data-ae="retro-futurist"], .ab.sb-ab[data-ae="retro-futurist--classic"]).sb-kit .sb-k-nm-item[aria-current] { border-radius: 999px; }
+
+/* ---------------------------------------------------------------------
+   KIT SIGNATURE (retro-futurist, non-classic only; the classic console keeps the rules above)
+   Shape: square keys (2px) for everything you press, field or choose; every plate (cell, dialog, popover, calendar,
+   ribbon, lightbox, sheet) carries ONE quarter-round corner (24-28px, top right; sheets and side panels on their free
+   corner), the other corners 2px. Round only where the part is a lamp or a dial (radio, fab, knob, dots, pie).
+   Edge and depth: a 1px hairline (ink at 50%, 3:1) on flat panels; no shadow, no halo; the three NASA stripes only as
+   the rule under a group heading and the tab on each cell.
+   Surfaces: panel fill with a hairline; open slots for fields; dark wells only for lists in the base.
+   UI type: the extended heading face for names and titles (caps, widely set), mono caps for every control, thin Mead caps
+   (400, 0.3em) for tags and figure numbers, tabular figures.
+   Field: a square readout slot; focus = ink edge plus a 3px signal bar down its left side; error = danger edge and bar.
+   Controls: checkbox = a square key, checked = ink with a signal lamp square; radio = ring with a lit lamp; toggle = a rocker
+   slot with a square key (signal when on); slider = fader cap (a bar with a signal line); stepper = square keys; tabs = keys.
+   Selection: ink inversion with a 3px signal bar on the left (tabs, segments, menu items, nav, days, rows).
+   Pressed: the key sinks and loses its lip. Focus: 2px ink ring. Disabled: dimmed, the outline stays.
+   Page chrome: "FIG. nn" in thin caps above each name, a stripe tab hanging from the cell edge, group headings ruled with the stripes.
+------------------------------------------------------------------------ */
+.ab.sb-ab[data-ae="retro-futurist"].sb-kit { --rfk-r: 2px; --rfk-q: 2px 26px 2px 2px; --rfk-edge: color-mix(in srgb, var(--ab-ink) 50%, transparent); }
+.ab.sb-ab[data-ae="retro-futurist"].sb-kit .sb-kitpage { counter-reset: rfk; }
+/* page chrome */
+.ab.sb-ab[data-ae="retro-futurist"].sb-kit .sb-k-cell { position: relative; counter-increment: rfk; padding: 26px 22px 22px; border: 0; border-radius: var(--rfk-q); background: var(--ab-rf-panel); box-shadow: inset 0 0 0 1px var(--rfk-edge); }
+.ab.sb-ab[data-ae="retro-futurist"].sb-kit .sb-k-cell::after { content: ""; position: absolute; top: 0; left: 22px; width: 56px; height: 8px; background: var(--rf-stripes); pointer-events: none; }
+.ab.sb-ab[data-ae="retro-futurist"].sb-kit .sb-k-cell:target { box-shadow: inset 0 0 0 2px var(--ab-ink); }
+.ab.sb-ab[data-ae="retro-futurist"].sb-kit .sb-k-cell-h::before { content: "FIG. " counter(rfk, decimal-leading-zero); font-family: var(--ab-font-h); font-size: 9px; font-weight: 400; letter-spacing: 0.4em; text-transform: uppercase; color: var(--k-muted); }
+.ab.sb-ab[data-ae="retro-futurist"].sb-kit .sb-k-name { font-family: var(--rf-ext); font-size: 15px; line-height: 20px; font-weight: var(--rf-hw, 700); text-transform: uppercase; letter-spacing: 0.04em; }
+.ab.sb-ab[data-ae="retro-futurist"].sb-kit .sb-k-use { max-width: 44ch; }
+.ab.sb-ab[data-ae="retro-futurist"].sb-kit .sb-k-ios-tag { padding: 3px 9px; border: 1px solid var(--rfk-edge); border-radius: 0; background: none; font-family: var(--ab-font-h); font-size: 9px; font-weight: 400; line-height: 12px; letter-spacing: 0.3em; text-transform: uppercase; color: var(--ab-ink); }
+.ab.sb-ab[data-ae="retro-futurist"].sb-kit .sb-k-ios .sb-k-ios-tag { background: none; }
+.ab.sb-ab[data-ae="retro-futurist"].sb-kit .sb-k-ios[data-ios="native"] .sb-k-ios-tag { background: var(--ab-ink); border-color: var(--ab-ink); color: var(--ab-canvas); }
+.ab.sb-ab[data-ae="retro-futurist"].sb-kit .sb-k-ios .sb-k-ios-tag.sb-k-web-tag { background: none; border-style: dashed; color: var(--ab-ink); }
+.ab.sb-ab[data-ae="retro-futurist"].sb-kit .sb-k-ios code { font-family: var(--rf-mono); font-size: 11px; letter-spacing: 0.04em; }
+.ab.sb-ab[data-ae="retro-futurist"].sb-kit .sb-k-slabel { display: inline-flex; align-items: center; gap: 8px; font-family: var(--rf-mono); font-size: 10px; letter-spacing: 0.22em; }
+.ab.sb-ab[data-ae="retro-futurist"].sb-kit .sb-k-slabel::before { content: ""; flex: none; width: 7px; height: 7px; border-radius: 50%; box-shadow: inset 0 0 0 1.5px var(--rfk-edge); }
+.ab.sb-ab[data-ae="retro-futurist"].sb-kit .sb-k-group > .ab-labelrow { margin-bottom: 18px; padding-bottom: 16px; border-bottom: 0; background: var(--rf-stripes) 0 100% / 100% 8px no-repeat; }
+.ab.sb-ab[data-ae="retro-futurist"].sb-kit .sb-k-intro { font-family: var(--rf-mono); font-size: 12px; letter-spacing: 0.04em; }
+.ab.sb-ab[data-ae="retro-futurist"].sb-kit .sb-k-typescale { border-top: 2px solid var(--ab-ink); }
+.ab.sb-ab[data-ae="retro-futurist"].sb-kit .sb-k-type-meta b { font-family: var(--rf-mono); font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; }
+.ab.sb-ab[data-ae="retro-futurist"].sb-kit .sb-k-chip { border: 0; border-radius: 2px 22px 2px 2px; box-shadow: inset 0 0 0 1px var(--rfk-edge); }
+.ab.sb-ab[data-ae="retro-futurist"].sb-kit .sb-k-swatch b { font-family: var(--rf-mono); font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; }
+.ab.sb-ab[data-ae="retro-futurist"].sb-kit .sb-k-gl { border-top: 2px solid var(--ab-ink); }
+.ab.sb-ab[data-ae="retro-futurist"].sb-kit .sb-k-gl-term b { font-family: var(--rf-mono); font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; }
+.ab.sb-ab[data-ae="retro-futurist"].sb-kit .sb-k-gl-link { border: 0; border-radius: 0; box-shadow: inset 0 0 0 1px var(--rfk-edge); font-family: var(--rf-mono); font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; }
+.ab.sb-ab[data-ae="retro-futurist"].sb-kit .sb-k-gl-link:is(:hover, :focus-visible) { background: var(--ab-ink); color: var(--ab-canvas); box-shadow: inset 3px 0 0 var(--ab-rf-signal); }
+.ab.sb-ab[data-ae="retro-futurist"].sb-kit .sb-k-layout { border: 0; border-radius: var(--rfk-q); background: var(--ab-rf-panel); box-shadow: inset 0 0 0 1px var(--rfk-edge); }
+/* keys: buttons, icon buttons, split, steppers */
+.ab.sb-ab[data-ae="retro-futurist"].sb-kit :is(.ab-cta.sb-k-btn, .ab-type-apply.sb-k-btn2, .sb-k-danger, .ab-type-apply.sb-k-iconbtn, .sb-k-backtop) { border-radius: 2px; }
+.ab.sb-ab[data-ae="retro-futurist"].sb-kit .ab-cta.sb-k-btn { box-shadow: inset 0 -3px 0 rgba(0, 0, 0, 0.25); }
+.ab.sb-ab[data-ae="retro-futurist"].sb-kit .ab-cta.sb-k-btn.sb-k-pressed { transform: translateY(2px); box-shadow: inset 0 -1px 0 rgba(0, 0, 0, 0.25), inset 0 0 0 100vmax color-mix(in srgb, var(--ab-ink) 7%, transparent); }
+.ab.sb-ab[data-ae="retro-futurist"].sb-kit .sb-k-danger { font-family: var(--rf-mono); font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; box-shadow: none; }
+.ab.sb-ab[data-ae="retro-futurist"].sb-kit .sb-k-textbtn { font-family: var(--rf-mono); font-size: 14px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; }
+.ab.sb-ab[data-ae="retro-futurist"].sb-kit .sb-k-split-main { border-radius: 2px 0 0 2px; }
+.ab.sb-ab[data-ae="retro-futurist"].sb-kit .sb-k-split-more { border-radius: 0 2px 2px 0; }
+.ab.sb-ab[data-ae="retro-futurist"].sb-kit .sb-k-stepper { border-radius: 2px; }
+.ab.sb-ab[data-ae="retro-futurist"].sb-kit .sb-k-step-val { box-shadow: inset 1px 0 0 var(--rfk-edge), inset -1px 0 0 var(--rfk-edge); }
+.ab.sb-ab[data-ae="retro-futurist"].sb-kit :is(.sb-k-badge, .sb-k-count, .ab-fit) { border-radius: 2px; font-family: var(--rf-mono); letter-spacing: 0.1em; text-transform: uppercase; }
+/* fields: a square readout slot, a signal bar down the left on focus */
+.ab.sb-ab[data-ae="retro-futurist"].sb-kit :is(.sb-k-field, .sb-k-search, .sb-k-selectwrap) .ab-input { border-radius: 0; }
+.ab.sb-ab[data-ae="retro-futurist"].sb-kit :is(.sb-k-field, .sb-k-search).is-focus .ab-input { box-shadow: inset 0 0 0 1.5px var(--ab-ink), inset 4px 0 0 var(--ab-rf-signal) !important; }
+.ab.sb-ab[data-ae="retro-futurist"].sb-kit .sb-k-field.is-error .ab-input { box-shadow: inset 0 0 0 1.5px var(--sb-danger), inset 4px 0 0 var(--sb-danger) !important; }
+.ab.sb-ab[data-ae="retro-futurist"].sb-kit .sb-k-field .ab-fieldlabel { font-family: var(--ab-font-h); font-weight: 400; letter-spacing: 0.3em; font-size: 10px !important; }
+.ab.sb-ab[data-ae="retro-futurist"].sb-kit .sb-k-help { font-family: var(--rf-mono); font-size: 11px; letter-spacing: 0.04em; }
+/* checkbox: a square key with a lamp; radio: a ring with a lit lamp */
+.ab.sb-ab[data-ae="retro-futurist"].sb-kit .sb-k-check { font-family: var(--rf-mono); font-size: 14px; letter-spacing: 0.1em; text-transform: uppercase; }
+.ab.sb-ab[data-ae="retro-futurist"].sb-kit .sb-k-box { width: 24px; height: 24px; border: 1.5px solid var(--ab-ink); border-radius: 2px; background: transparent; }
+.ab.sb-ab[data-ae="retro-futurist"].sb-kit .sb-k-box[type="checkbox"]:checked { background: var(--ab-ink); border-color: var(--ab-ink); }
+.ab.sb-ab[data-ae="retro-futurist"].sb-kit .sb-k-box[type="checkbox"]:checked::after { width: 10px; height: 10px; border: 0; transform: none; background: var(--ab-rf-signal); box-shadow: 0 0 0 1.5px var(--ab-canvas); }
+.ab.sb-ab[data-ae="retro-futurist"].sb-kit .sb-k-box[type="radio"] { border-radius: 50%; }
+.ab.sb-ab[data-ae="retro-futurist"].sb-kit .sb-k-box[type="radio"]:checked { background: transparent; border-color: var(--ab-ink); }
+.ab.sb-ab[data-ae="retro-futurist"].sb-kit .sb-k-box[type="radio"]:checked::after { width: 12px; height: 12px; background: var(--ab-rf-signal); box-shadow: 0 0 0 3px color-mix(in srgb, var(--ab-rf-signal) 24%, transparent); }
+.ab.sb-ab[data-ae="retro-futurist"].sb-kit .sb-k-listbox .sb-k-box { border-color: currentColor; }
+.ab.sb-ab[data-ae="retro-futurist"].sb-kit .sb-k-listbox li[aria-selected="true"] .sb-k-box[type="checkbox"]:checked { background: var(--ab-canvas); border-color: var(--ab-canvas); }
+/* toggle: a rocker slot with a square key */
+.ab.sb-ab[data-ae="retro-futurist"].sb-kit .ab-switch { width: 58px; height: 30px; border-radius: 2px; background: transparent; box-shadow: inset 0 0 0 1.5px var(--ab-ink); }
+.ab.sb-ab[data-ae="retro-futurist"].sb-kit .ab-switch::before { left: 4px; top: 4px; width: 24px; height: 22px; border-radius: 1px; background: var(--ab-ink); box-shadow: inset 0 -3px 0 rgba(255, 255, 255, 0.22); }
+.ab.sb-ab[data-ae="retro-futurist"].sb-kit .ab-switch:checked { background: var(--ab-ink); }
+.ab.sb-ab[data-ae="retro-futurist"].sb-kit .ab-switch:checked::before { transform: translateX(26px); background: var(--ab-rf-signal); box-shadow: inset 0 -3px 0 rgba(0, 0, 0, 0.25); }
+/* segmented: square keys on a hairline rail, the chosen one inverted with the signal bar */
+.ab.sb-ab[data-ae="retro-futurist"].sb-kit .ab-seg { gap: 0; padding: 0; border-radius: 2px; box-shadow: inset 0 0 0 1px var(--rfk-edge); }
+.ab.sb-ab[data-ae="retro-futurist"].sb-kit .ab-seg-btn { border-radius: 0; }
+.ab.sb-ab[data-ae="retro-futurist"].sb-kit .ab-seg-btn + .ab-seg-btn { box-shadow: inset 1px 0 0 var(--rfk-edge); }
+.ab.sb-ab[data-ae="retro-futurist"].sb-kit .ab-seg-btn[aria-pressed="true"] { background: var(--ab-ink); color: var(--ab-canvas); box-shadow: inset 0 -3px 0 var(--ab-rf-signal); }
+/* slider: a fader cap on a square-ended rail (the base thumb rules are more specific than the early ones) */
+.ab.sb-ab[data-ae="retro-futurist"].sb-kit input.sb-k-range::-webkit-slider-runnable-track { height: 6px; border-radius: 0; }
+.ab.sb-ab[data-ae="retro-futurist"].sb-kit input.sb-k-range::-moz-range-track { height: 6px; border-radius: 0; }
+.ab.sb-ab[data-ae="retro-futurist"].sb-kit input.sb-k-range::-webkit-slider-thumb { width: 14px; height: 28px; margin-top: -11px; border: 0; border-radius: 2px; background: linear-gradient(var(--ab-rf-signal), var(--ab-rf-signal)) 50% 50% / 2px 16px no-repeat, var(--ab-ink); box-shadow: 0 0 0 2px var(--ab-canvas); }
+.ab.sb-ab[data-ae="retro-futurist"].sb-kit input.sb-k-range::-moz-range-thumb { width: 14px; height: 28px; border: 0; border-radius: 2px; background: linear-gradient(var(--ab-rf-signal), var(--ab-rf-signal)) 50% 50% / 2px 16px no-repeat, var(--ab-ink); box-shadow: 0 0 0 2px var(--ab-canvas); }
+.ab.sb-ab[data-ae="retro-futurist"].sb-kit .sb-k-slider-h { font-family: var(--rf-mono); font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; }
+/* tabs: keys, the chosen one inverted */
+.ab.sb-ab[data-ae="retro-futurist"].sb-kit .sb-k-tabs { gap: 2px; border-bottom: 1px solid var(--rfk-edge); }
+.ab.sb-ab[data-ae="retro-futurist"].sb-kit .sb-k-tabs [role="tab"] { padding: 0 14px; font-family: var(--rf-mono); font-size: 12px; font-weight: 700; letter-spacing: 0.14em; }
+.ab.sb-ab[data-ae="retro-futurist"].sb-kit .sb-k-tabs [role="tab"][aria-selected="true"] { background: var(--ab-ink); color: var(--ab-canvas); }
+.ab.sb-ab[data-ae="retro-futurist"].sb-kit .sb-k-tabs [role="tab"][aria-selected="true"]::after { bottom: 0; height: 3px; background: var(--ab-rf-signal); }
+/* plates: one quarter-round corner each */
+.ab.sb-ab[data-ae="retro-futurist"].sb-kit :is(.sb-k-dialog, .sb-k-pop, .sb-k-tip, .sb-k-cal, .sb-k-ribbon, .sb-k-mega, .sb-k-lightbox, .sb-k-card, .sb-k-popbox, .sb-k-ctxbox, .sb-k-sheetbox, .sb-k-overlaybox, .sb-k-fabbox, .sb-k-tabbarbox) { border-radius: var(--rfk-q); }
+.ab.sb-ab[data-ae="retro-futurist"].sb-kit .sb-k-side { border-radius: 26px 0 0 2px; }
+.ab.sb-ab[data-ae="retro-futurist"].sb-kit .sb-k-drawer { border-radius: 0 26px 2px 0; }
+.ab.sb-ab[data-ae="retro-futurist"].sb-kit .sb-k-sheet { border-radius: 26px 2px 0 0; box-shadow: none; border-top: 1px solid var(--rfk-edge); }
+.ab.sb-ab[data-ae="retro-futurist"].sb-kit .sb-k-grab { width: 40px; height: 4px; border-radius: 0; background: var(--ab-ink); }
+.ab.sb-ab[data-ae="retro-futurist"].sb-kit :is(.sb-k-navbar, .sb-k-navmenu, .sb-k-menubar, .sb-k-accordion, .sb-k-scrollbox, .sb-k-wheel, .sb-k-mx-tile, .sb-k-icon, .sb-k-ph, .sb-k-menu, .sb-k-cmdmenu, .sb-k-listbox, .sb-k-mega-panel) { border-radius: 2px; }
+.ab.sb-ab[data-ae="retro-futurist"].sb-kit .sb-k-callout { border: 0; border-radius: 2px; background: var(--ab-rf-panel); box-shadow: inset 0 0 0 1px var(--rfk-edge), inset 5px 0 0 var(--tone-ico); }
+.ab.sb-ab[data-ae="retro-futurist"].sb-kit .sb-k-callout b { font-family: var(--rf-mono); font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; }
+.ab.sb-ab[data-ae="retro-futurist"].sb-kit .sb-k-toast { border-radius: 2px; font-family: var(--rf-mono); font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; box-shadow: none; }
+.ab.sb-ab[data-ae="retro-futurist"].sb-kit .sb-k-emptyico { background: none; box-shadow: inset 0 0 0 1px var(--rfk-edge); }
+.ab.sb-ab[data-ae="retro-futurist"].sb-kit .sb-k-topbar { border-bottom: 2px solid var(--ab-ink); }
+.ab.sb-ab[data-ae="retro-futurist"].sb-kit .sb-k-tb-title { font-family: var(--rf-ext); font-size: 14px; font-weight: var(--rf-hw, 700); letter-spacing: 0.06em; text-transform: uppercase; }
+/* selection: ink inversion with the signal bar on the left, on every list-like part */
+.ab.sb-ab[data-ae="retro-futurist"].sb-kit :is(.sb-k-cmdmenu, .sb-k-listbox, .sb-k-combo .sb-k-menu) li { border-radius: 0; }
+.ab.sb-ab[data-ae="retro-futurist"].sb-kit :is(.sb-k-cmdmenu, .sb-k-listbox, .sb-k-combo .sb-k-menu) li[aria-selected="true"], .ab.sb-ab[data-ae="retro-futurist"].sb-kit .sb-k-cmdmenu li.is-open { box-shadow: inset 3px 0 0 var(--ab-rf-signal); }
+.ab.sb-ab[data-ae="retro-futurist"].sb-kit .sb-k-menu:not(.sb-k-cmdmenu):not(.sb-k-listbox) li[aria-selected="true"] { background: var(--ab-ink); color: var(--ab-canvas); box-shadow: inset 3px 0 0 var(--ab-rf-signal); border-radius: 0; }
+.ab.sb-ab[data-ae="retro-futurist"].sb-kit .sb-k-menu:not(.sb-k-cmdmenu):not(.sb-k-listbox) li[aria-selected="true"] .sb-ico { color: var(--ab-canvas); }
+.ab.sb-ab[data-ae="retro-futurist"].sb-kit .sb-k-menu:not(.sb-k-cmdmenu):not(.sb-k-listbox) li { font-family: var(--rf-mono); text-transform: uppercase; letter-spacing: 0.1em; border-radius: 0; }
+.ab.sb-ab[data-ae="retro-futurist"].sb-kit :is(.sb-k-nb-links a, .sb-k-nm-item, .sb-k-menubar [role="menuitem"]) { border-radius: 0; }
+.ab.sb-ab[data-ae="retro-futurist"].sb-kit :is(.sb-k-nb-links a, .sb-k-nm-item)[aria-current], .ab.sb-ab[data-ae="retro-futurist"].sb-kit .sb-k-menubar [role="menuitem"][aria-expanded="true"] { border-radius: 0; box-shadow: inset 3px 0 0 var(--ab-rf-signal); }
+.ab.sb-ab[data-ae="retro-futurist"].sb-kit .sb-k-day { border-radius: 0; }
+.ab.sb-ab[data-ae="retro-futurist"].sb-kit .sb-k-day.is-today { border-radius: 0; }
+.ab.sb-ab[data-ae="retro-futurist"].sb-kit .sb-k-day:is(.is-sel, .is-start, .is-end) { border-radius: 0; box-shadow: inset 0 -3px 0 var(--ab-rf-signal); }
+.ab.sb-ab[data-ae="retro-futurist"].sb-kit .sb-k-rb-btn { border-radius: 2px; }
+.ab.sb-ab[data-ae="retro-futurist"].sb-kit :is(.sb-k-skel-line, .sb-k-sbar, .sb-k-sbar-thumb) { border-radius: 0; }
+.ab.sb-ab[data-ae="retro-futurist"].sb-kit .sb-k-skel-block { border-radius: var(--rfk-q); }
+.ab.sb-ab[data-ae="retro-futurist"].sb-kit .sb-k-cal-dow { color: var(--ab-ink); }
+.ab.sb-ab[data-ae="retro-futurist"].sb-kit .sb-k-menu:not(.sb-k-cmdmenu):not(.sb-k-listbox) { box-shadow: inset 0 0 0 1px var(--rfk-edge); border: 0; }
+.ab.sb-ab[data-ae="retro-futurist"].sb-kit :is(.sb-k-dialog, .sb-k-side, .sb-k-drawer, .sb-k-pop, .sb-k-tip, .sb-k-mega-panel) { box-shadow: inset 0 0 0 1px var(--rfk-edge); }

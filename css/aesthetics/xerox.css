@@ -447,3 +447,153 @@
 .ab.sb-ab:is([data-ae="xerox"], [data-ae="xerox--classic"]).sb-kit .sb-k-skel-block { border: 2px solid color-mix(in srgb, var(--ab-ink) 30%, transparent); border-radius: 0; background: color-mix(in srgb, var(--ab-ink) 8%, transparent); }
 .ab.sb-ab:is([data-ae="xerox"], [data-ae="xerox--classic"]).sb-kit :is(.sb-k-skel-av, .sb-k-skel-line, .sb-k-skel-block)::after { content: none; animation: none; }
 @media (prefers-reduced-motion: reduce) { .ab.sb-ab:is([data-ae="xerox"], [data-ae="xerox--classic"]).sb-kit .sb-k-spin { animation: none; } }
+
+/* ---- UI kit signature (xerox, version 2; the classic version keeps the rules above) ----
+   Xerox kit = one machine, one toner, one stock. Copier output with a form's discipline.
+   1 Shape: square everywhere, no radius, no tilt. Marks differ by role, not by roundness.
+   2 Edge and depth: 2px toner rules; a 4px top rule heads every sheet; floating things get a DOUBLE RULE
+     (a stock-coloured gap, then toner) and never a shadow; the primary action keeps its halftone ghost copy.
+   3 Surfaces: open sheets (no box, no fill) with crop marks at the foot; inverted toner blocks for "on".
+   4 Type: heading face in caps names each sheet; the mono body face carries every control in tracked caps
+     at the weight it has; numerals tabular; sheet numbers count up like a copier's tray counter.
+   5 Fields: a typed blank (heavy underline). Focus = the whole blank is inverted (toner block, stock type).
+   6 Controls: checkbox = X in a square; radio = bullseye (square in square); toggle = OFF | ON key;
+     slider = ruler (tick scale, solid bar, split-notch handle); stepper = reversed count window between
+     outlined keys; callouts are monochrome (plain / left bar / dashed / reversed).
+   7 Selection: ONE signal everywhere, a solid toner block with stock-coloured type (menu rows, list rows,
+     tabs, nav items, calendar days, anchors, segments).
+   8 Pressed = invert (or the ghost collapses and the key sinks); focus = 3px toner outline, 3px off;
+     disabled = dashed edge plus hatch. No colour: toner and stock only.
+   9 Menus, sheets, dialogs, popovers: stock sheets with the double rule.
+   10 Chrome: cell = open sheet, 4px head rule, crop marks, numbered chip; Native / Custom / Web tags are
+     square keys (reversed / outlined / dashed); state labels sit under a dashed cut line.
+   11 Texture: halftone only where the board already uses it (CTA ghost, progress hatch, disabled hatch). */
+.ab.ab.sb-ab[data-ae="xerox"].sb-kit { counter-reset: xk-sheet; --sb-focus: var(--ab-ink); --sb-focus-w: 3px; --sb-focus-offset: 3px; font-variant-numeric: tabular-nums; }
+
+/* page chrome */
+.ab.ab.sb-ab[data-ae="xerox"].sb-kit .sb-k-cell {
+  counter-increment: xk-sheet; position: relative; border: 0; border-top: 4px solid var(--ab-ink); border-radius: 0; padding: 18px 20px 24px;
+  background:
+    linear-gradient(var(--ab-ink), var(--ab-ink)) 0 100% / 2px 12px no-repeat, linear-gradient(var(--ab-ink), var(--ab-ink)) 0 100% / 12px 2px no-repeat,
+    linear-gradient(var(--ab-ink), var(--ab-ink)) 100% 100% / 2px 12px no-repeat, linear-gradient(var(--ab-ink), var(--ab-ink)) 100% 100% / 12px 2px no-repeat;
+}
+.ab.ab.sb-ab[data-ae="xerox"].sb-kit .sb-k-cell:target { outline: 2px dashed var(--ab-ink); outline-offset: 4px; }
+.ab.ab.sb-ab[data-ae="xerox"].sb-kit .sb-k-name { font-family: var(--ab-font-h); font-weight: var(--ab-hw, 900); text-transform: uppercase; letter-spacing: calc(0.03em * var(--ab-tr, 1)); }
+.ab.ab.sb-ab[data-ae="xerox"].sb-kit .sb-k-name::before {
+  content: counter(xk-sheet, decimal-leading-zero); display: inline-block; margin-right: 10px; padding: 0 6px; background: var(--ab-ink); color: var(--ab-canvas);
+  font: var(--xr-bw, 700) 11px/18px var(--ab-font-b); letter-spacing: 0.08em; vertical-align: 2px;
+}
+.ab.ab.sb-ab[data-ae="xerox"].sb-kit .sb-k-use { color: var(--k-muted); letter-spacing: 0.01em; }
+.ab.ab.sb-ab[data-ae="xerox"].sb-kit .sb-k-ios { text-transform: uppercase; letter-spacing: 0.1em; }
+.ab.ab.sb-ab[data-ae="xerox"].sb-kit .sb-k-ios-tag { padding: 1px 7px; border: 2px solid var(--ab-ink); border-radius: 0; background: none; color: var(--ab-ink); font-size: 10px; font-weight: var(--xr-bw, 700); letter-spacing: 0.14em; text-transform: uppercase; }
+.ab.ab.sb-ab[data-ae="xerox"].sb-kit .sb-k-ios[data-ios="native"] .sb-k-ios-tag { border-color: var(--ab-ink); background: var(--ab-ink); color: var(--ab-canvas); }
+.ab.ab.sb-ab[data-ae="xerox"].sb-kit .sb-k-ios .sb-k-ios-tag.sb-k-web-tag { border-style: dashed; background: none; color: var(--ab-ink); }
+.ab.ab.sb-ab[data-ae="xerox"].sb-kit .sb-k-ios code { font-size: 11px; letter-spacing: 0.04em; }
+.ab.ab.sb-ab[data-ae="xerox"].sb-kit .sb-k-slabel { padding-top: 5px; border-top: 2px dashed color-mix(in srgb, var(--ab-ink) 55%, transparent); font-weight: var(--xr-bw, 700); letter-spacing: 0.16em; }
+.ab.ab.sb-ab[data-ae="xerox"].sb-kit .sb-k-group > .ab-labelrow { padding-bottom: 8px; border-bottom: 4px solid var(--ab-ink); margin-bottom: 18px; }
+.ab.ab.sb-ab[data-ae="xerox"].sb-kit .sb-k-group > .ab-labelrow .ab-label:first-child { font-family: var(--ab-font-h); font-weight: var(--ab-hw, 900); font-size: 20px; letter-spacing: calc(0.03em * var(--ab-tr, 1)); }
+.ab.ab.sb-ab[data-ae="xerox"].sb-kit .sb-k-typescale { border-top: 4px solid var(--ab-ink); }
+.ab.ab.sb-ab[data-ae="xerox"].sb-kit .sb-k-type-row { border-bottom: 2px dashed color-mix(in srgb, var(--ab-ink) 55%, transparent); }
+.ab.ab.sb-ab[data-ae="xerox"].sb-kit .sb-k-type-meta b { text-transform: uppercase; letter-spacing: 0.12em; font-size: 12px; }
+.ab.ab.sb-ab[data-ae="xerox"].sb-kit .sb-k-chip { border: 2.5px solid var(--xr-toner); border-radius: 0; }
+.ab.ab.sb-ab[data-ae="xerox"].sb-kit .sb-k-swatch b { text-transform: uppercase; letter-spacing: 0.12em; font-size: 12px; }
+.ab.ab.sb-ab[data-ae="xerox"].sb-kit .sb-k-layout { border: 0; border-top: 4px solid var(--ab-ink); border-radius: 0; background: none; }
+.ab.ab.sb-ab[data-ae="xerox"].sb-kit .sb-k-gl { border-top: 4px solid var(--ab-ink); }
+.ab.ab.sb-ab[data-ae="xerox"].sb-kit .sb-k-gl-row { border-bottom: 2px dashed color-mix(in srgb, var(--ab-ink) 55%, transparent); }
+.ab.ab.sb-ab[data-ae="xerox"].sb-kit .sb-k-gl-term { text-transform: uppercase; letter-spacing: 0.08em; font-size: 13px; font-weight: var(--xr-bw, 700); }
+.ab.ab.sb-ab[data-ae="xerox"].sb-kit .sb-k-gl-term span { text-transform: none; letter-spacing: 0; font-weight: 400; }
+.ab.ab.sb-ab[data-ae="xerox"].sb-kit .sb-k-gl-link { border: 2px solid var(--ab-ink); border-radius: 0; font-size: 11px; font-weight: var(--xr-bw, 700); letter-spacing: 0.1em; text-transform: uppercase; }
+.ab.ab.sb-ab[data-ae="xerox"].sb-kit .sb-k-gl-link:is(:hover, :focus-visible) { background: var(--ab-ink); color: var(--ab-canvas); }
+
+/* buttons: pressed collapses the ghost copy or inverts */
+.ab.ab.sb-ab[data-ae="xerox"].sb-kit .ab-cta.sb-k-btn.sb-k-pressed { translate: 5px 5px; box-shadow: none; }
+.ab.ab.sb-ab[data-ae="xerox"].sb-kit .ab-cta.sb-k-btn.sb-k-pressed::after { transform: translate(-5px, -5px); }
+.ab.ab.sb-ab[data-ae="xerox"].sb-kit .ab-cta.sb-k-btn:disabled::before { background: repeating-linear-gradient(135deg, var(--ab-ink) 0 4px, color-mix(in srgb, var(--ab-ink) 62%, var(--ab-canvas)) 4px 7px); }
+.ab.ab.sb-ab[data-ae="xerox"].sb-kit :is(.ab-type-apply.sb-k-btn2, .sb-k-danger, .sb-k-iconbtn) { border: 2px solid var(--ab-ink); border-radius: 0; background: none; color: var(--ab-ink); box-shadow: none; font-weight: var(--xr-bw, 700); letter-spacing: 0.16em; text-transform: uppercase; }
+.ab.ab.sb-ab[data-ae="xerox"].sb-kit .sb-k-danger { min-height: var(--k-btn, 52px); background: repeating-linear-gradient(135deg, transparent 0 5px, color-mix(in srgb, var(--ab-ink) 16%, transparent) 5px 7px); }
+.ab.ab.sb-ab[data-ae="xerox"].sb-kit :is(.ab-type-apply.sb-k-btn2, .sb-k-danger, .sb-k-iconbtn).sb-k-pressed { background: var(--ab-ink); color: var(--ab-canvas); box-shadow: none; }
+.ab.ab.sb-ab[data-ae="xerox"].sb-kit :is(.ab-type-apply.sb-k-btn2, .sb-k-danger, .sb-k-iconbtn):disabled { border-style: dashed; box-shadow: none !important; }
+.ab.ab.sb-ab[data-ae="xerox"].sb-kit .sb-k-textbtn { color: var(--ab-ink); font-weight: var(--xr-bw, 700); letter-spacing: 0.16em; text-transform: uppercase; text-decoration: underline; text-decoration-thickness: 3px; text-underline-offset: 6px; }
+.ab.ab.sb-ab[data-ae="xerox"].sb-kit .sb-k-textbtn.sb-k-pressed { background: var(--ab-ink); color: var(--ab-canvas); text-decoration: none; box-shadow: none; }
+.ab.ab.sb-ab[data-ae="xerox"].sb-kit .sb-k-textbtn:disabled { text-decoration-style: dashed; }
+
+/* fields: typed blank; focus inverts the blank */
+.ab.ab.sb-ab[data-ae="xerox"].sb-kit .sb-k-field .ab-input:disabled { background: repeating-linear-gradient(135deg, transparent 0 6px, color-mix(in srgb, var(--ab-ink) 10%, transparent) 6px 8px); }
+.ab.ab.sb-ab[data-ae="xerox"].sb-kit :is(.sb-k-field, .sb-k-search).is-focus .ab-input, .ab.ab.sb-ab[data-ae="xerox"].sb-kit .ab-input:focus {
+  background: var(--ab-ink); color: var(--ab-canvas); border-bottom-width: 3px; border-color: var(--ab-ink) !important; box-shadow: none !important; caret-color: var(--ab-canvas);
+}
+.ab.ab.sb-ab[data-ae="xerox"].sb-kit :is(.sb-k-field, .sb-k-search).is-focus .ab-input::placeholder, .ab.ab.sb-ab[data-ae="xerox"].sb-kit .ab-input:focus::placeholder { color: color-mix(in srgb, var(--ab-canvas) 72%, var(--ab-ink)); }
+.ab.ab.sb-ab[data-ae="xerox"].sb-kit .sb-k-search.is-focus > .sb-ico { color: var(--ab-canvas); }
+.ab.ab.sb-ab[data-ae="xerox"].sb-kit .sb-k-field.is-error .ab-input { border-bottom: 7px double var(--ab-ink) !important; box-shadow: none !important; }
+.ab.ab.sb-ab[data-ae="xerox"].sb-kit .sb-k-help { letter-spacing: 0.02em; }
+.ab.ab.sb-ab[data-ae="xerox"].sb-kit .sb-k-help.is-error { color: var(--ab-ink); font-weight: var(--xr-bw, 700); }
+.ab.ab.sb-ab[data-ae="xerox"].sb-kit .sb-k-help.is-error::before { content: "ERR \00b7  "; letter-spacing: 0.1em; }
+.ab.ab.sb-ab[data-ae="xerox"].sb-kit .sb-k-check { letter-spacing: 0.02em; }
+
+/* checkbox = X in a square; radio = bullseye (square in square) */
+.ab.ab.sb-ab[data-ae="xerox"].sb-kit .sb-k-box { width: 24px; height: 24px; border: 2px solid var(--ab-ink); border-radius: 0; background: none; --xk-mark: var(--ab-canvas); }
+.ab.ab.sb-ab[data-ae="xerox"].sb-kit .sb-k-box[type="checkbox"]:checked { background: var(--ab-ink); }
+.ab.ab.sb-ab[data-ae="xerox"].sb-kit .sb-k-box[type="checkbox"]:checked::after {
+  content: ""; width: 16px; height: 16px; border: 0; transform: none;
+  background: linear-gradient(45deg, transparent calc(50% - 1.5px), var(--xk-mark) calc(50% - 1.5px) calc(50% + 1.5px), transparent calc(50% + 1.5px)), linear-gradient(-45deg, transparent calc(50% - 1.5px), var(--xk-mark) calc(50% - 1.5px) calc(50% + 1.5px), transparent calc(50% + 1.5px));
+}
+.ab.ab.sb-ab[data-ae="xerox"].sb-kit .sb-k-box[type="radio"] { border-radius: 0; }
+.ab.ab.sb-ab[data-ae="xerox"].sb-kit .sb-k-box[type="radio"]:checked { background: none; border-color: var(--ab-ink); }
+.ab.ab.sb-ab[data-ae="xerox"].sb-kit .sb-k-box[type="radio"]:checked::after { width: 10px; height: 10px; border-radius: 0; background: var(--ab-ink); }
+.ab.ab.sb-ab[data-ae="xerox"].sb-kit .sb-k-listbox li[aria-selected="true"] .sb-k-box { --xk-mark: var(--ab-ink); border-color: var(--ab-canvas); }
+.ab.ab.sb-ab[data-ae="xerox"].sb-kit .sb-k-listbox li[aria-selected="true"] .sb-k-box[type="checkbox"]:checked { background: var(--ab-canvas); }
+.ab.ab.sb-ab[data-ae="xerox"].sb-kit .sb-k-box:disabled { opacity: 1; border-style: dashed; --xk-mark: var(--ab-canvas); }
+.ab.ab.sb-ab[data-ae="xerox"].sb-kit .sb-k-box:disabled:checked { background: color-mix(in srgb, var(--ab-ink) 55%, var(--ab-canvas)); border-color: color-mix(in srgb, var(--ab-ink) 55%, var(--ab-canvas)); }
+
+/* slider = ruler: tick scale, solid bar for the value, a split-notch handle with a stock gap */
+.ab.ab.sb-ab[data-ae="xerox"].sb-kit .sb-k-range::-webkit-slider-runnable-track {
+  box-sizing: border-box; height: 12px; border: 2px solid var(--ab-ink); border-radius: 0;
+  background: linear-gradient(90deg, var(--ab-ink) var(--v, 50%), transparent var(--v, 50%)), repeating-linear-gradient(90deg, transparent 0 6px, var(--ab-ink) 6px 8px);
+}
+.ab.ab.sb-ab[data-ae="xerox"].sb-kit .sb-k-range::-webkit-slider-thumb {
+  box-sizing: border-box; width: 18px; height: 28px; margin-top: -8px; border: 2px solid var(--ab-ink); border-radius: 0; box-shadow: 0 0 0 2px var(--ab-canvas);
+  background: linear-gradient(90deg, var(--ab-ink) calc(50% - 1px), var(--ab-canvas) calc(50% - 1px) calc(50% + 1px), var(--ab-ink) calc(50% + 1px));
+}
+.ab.ab.sb-ab[data-ae="xerox"].sb-kit .sb-k-range::-moz-range-track { box-sizing: border-box; height: 12px; border: 2px solid var(--ab-ink); border-radius: 0; background: linear-gradient(90deg, var(--ab-ink) var(--v, 50%), transparent var(--v, 50%)), repeating-linear-gradient(90deg, transparent 0 6px, var(--ab-ink) 6px 8px); }
+.ab.ab.sb-ab[data-ae="xerox"].sb-kit .sb-k-range::-moz-range-thumb { box-sizing: border-box; width: 18px; height: 28px; border: 2px solid var(--ab-ink); border-radius: 0; box-shadow: 0 0 0 2px var(--ab-canvas); background: linear-gradient(90deg, var(--ab-ink) calc(50% - 1px), var(--ab-canvas) calc(50% - 1px) calc(50% + 1px), var(--ab-ink) calc(50% + 1px)); }
+.ab.ab.sb-ab[data-ae="xerox"].sb-kit .sb-k-slider-h { text-transform: uppercase; letter-spacing: 0.12em; font-size: 12px; font-weight: var(--xr-bw, 700); }
+
+/* stepper = reversed count window between outlined keys */
+.ab.ab.sb-ab[data-ae="xerox"].sb-kit .sb-k-step-val { display: inline-grid; place-items: center; min-width: 56px; min-height: 44px; border: 0; background: var(--ab-ink); color: var(--ab-canvas); font-size: 20px; }
+.ab.ab.sb-ab[data-ae="xerox"].sb-kit .sb-k-step:disabled ~ .sb-k-step-val, .ab.ab.sb-ab[data-ae="xerox"].sb-kit .sb-k-step-val:has(+ .sb-k-step:disabled) { background: color-mix(in srgb, var(--ab-ink) 55%, var(--ab-canvas)); }
+.ab.ab.sb-ab[data-ae="xerox"].sb-kit .sb-k-step { box-shadow: none; }
+.ab.ab.sb-ab[data-ae="xerox"].sb-kit .sb-k-step.sb-k-pressed { background: var(--ab-ink); color: var(--ab-canvas); }
+
+/* feedback: monochrome. info = plain, success = left bar, warning = dashed, error = reversed */
+.ab.ab.sb-ab[data-ae="xerox"].sb-kit .sb-k-callout { --k-callout-r: 0; --tone-ico: var(--ab-ink); border: 2px solid var(--ab-ink); border-radius: 0; background: none; box-shadow: none; }
+.ab.ab.sb-ab[data-ae="xerox"].sb-kit .sb-k-callout b { text-transform: uppercase; letter-spacing: 0.12em; font-weight: var(--xr-bw, 700); font-size: 13px; }
+.ab.ab.sb-ab[data-ae="xerox"].sb-kit .sb-k-callout[data-tone="success"] { box-shadow: inset 8px 0 0 var(--ab-ink); padding-left: 24px; }
+.ab.ab.sb-ab[data-ae="xerox"].sb-kit .sb-k-callout[data-tone="warning"] { border-style: dashed; border-width: 3px; }
+.ab.ab.sb-ab[data-ae="xerox"].sb-kit .sb-k-callout[data-tone="error"] { background: var(--ab-ink); color: var(--ab-canvas); --tone-ico: var(--ab-canvas); }
+.ab.ab.sb-ab[data-ae="xerox"].sb-kit :is(.sb-k-badge, .sb-k-count.is-accent) { min-height: 24px; padding: 0 8px; border: 2px solid var(--ab-ink); border-radius: 0; background: var(--ab-ink); color: var(--ab-canvas); font-weight: var(--xr-bw, 700); letter-spacing: 0.12em; text-transform: uppercase; }
+.ab.ab.sb-ab[data-ae="xerox"].sb-kit .sb-badge { border-radius: 0; background: var(--ab-ink); box-shadow: 0 0 0 2px var(--ab-canvas); }
+.ab.ab.sb-ab[data-ae="xerox"].sb-kit :is(.sb-k-av, .ab-av) { border-radius: 0; background: var(--ab-ink); color: var(--ab-canvas); font-weight: var(--xr-bw, 700); }
+.ab.ab.sb-ab[data-ae="xerox"].sb-kit .sb-k-toast { border: 2px solid var(--ab-ink); border-radius: 0; background: var(--ab-ink); color: var(--ab-canvas); box-shadow: none; }
+.ab.ab.sb-ab[data-ae="xerox"].sb-kit .sb-k-toast button { text-transform: uppercase; letter-spacing: 0.12em; font-weight: var(--xr-bw, 700); text-decoration-thickness: 2px; }
+.ab.ab.sb-ab[data-ae="xerox"].sb-kit .sb-k-emptyico { border-radius: 0; background: none; box-shadow: none; border: 2px solid var(--ab-ink); }
+.ab.ab.sb-ab[data-ae="xerox"].sb-kit .sb-k-dots i { border-radius: 0; }
+.ab.ab.sb-ab[data-ae="xerox"].sb-kit .sb-k-skel-av, .ab.ab.sb-ab[data-ae="xerox"].sb-kit .sb-k-skel-line { background: repeating-linear-gradient(135deg, transparent 0 4px, color-mix(in srgb, var(--ab-ink) 20%, transparent) 4px 6px); }
+
+/* selection: one signal, the inverted block. Rows, tabs, anchors */
+.ab.ab.sb-ab[data-ae="xerox"].sb-kit .ab-row.sb-k-row.is-picked { background-color: var(--ab-ink); color: var(--ab-canvas); }
+.ab.ab.sb-ab[data-ae="xerox"].sb-kit .ab-row.sb-k-row.is-picked * { color: inherit; }
+.ab.ab.sb-ab[data-ae="xerox"].sb-kit .ab-row.sb-k-row.is-picked :is(.sb-k-av, .ab-av) { background: var(--ab-canvas); color: var(--ab-ink); }
+.ab.ab.sb-ab[data-ae="xerox"].sb-kit .sb-k-tabs [role="tab"] { text-transform: uppercase; letter-spacing: 0.14em; font-weight: var(--xr-bw, 700); }
+.ab.ab.sb-ab[data-ae="xerox"].sb-kit .sb-k-tabs [role="tab"][aria-selected="true"] { background: var(--ab-ink); color: var(--ab-canvas); }
+.ab.ab.sb-ab[data-ae="xerox"].sb-kit .sb-k-tabs [role="tab"][aria-selected="true"]::after { content: none; }
+.ab.ab.sb-ab[data-ae="xerox"].sb-kit .sb-k-ribbon .sb-k-tabs [role="tab"][aria-selected="true"] { color: var(--ab-canvas); }
+.ab.ab.sb-ab[data-ae="xerox"].sb-kit .sb-k-anchors a.is-on { background: var(--ab-ink); border-left-color: var(--ab-ink); color: var(--ab-canvas); }
+.ab.ab.sb-ab[data-ae="xerox"].sb-kit .sb-k-menu li + li { border-top: 2px dashed color-mix(in srgb, var(--ab-ink) 40%, transparent); }
+.ab.ab.sb-ab[data-ae="xerox"].sb-kit .sb-k-menu li[aria-selected="true"] + li, .ab.ab.sb-ab[data-ae="xerox"].sb-kit .sb-k-menu li[aria-selected="true"] { border-top-color: transparent; }
+
+/* floating pieces: stock sheets under a double rule, no shadow */
+.ab.ab.sb-ab[data-ae="xerox"].sb-kit :is(.sb-k-menu, .sb-k-dialog, .sb-k-side, .sb-k-drawer, .sb-k-pop, .sb-k-cal, .sb-k-navbar, .sb-k-menubar, .sb-k-ribbon, .sb-k-mega-panel, .sb-k-wheel) {
+  box-shadow: 0 0 0 2px var(--xr-paper), 0 0 0 4px var(--xr-toner);
+}
+.ab.ab.sb-ab[data-ae="xerox"].sb-kit :is(.sb-k-dialog, .sb-k-pop) { border: 2px solid var(--xr-toner); border-radius: 0; background: var(--xr-paper); color: var(--xr-toner); --ab-ink: var(--xr-toner); --ab-canvas: var(--xr-paper); --ab-muted: var(--xr-paper-muted); --k-muted: var(--xr-paper-muted); }
+.ab.ab.sb-ab[data-ae="xerox"].sb-kit .sb-k-tooltip { box-shadow: 0 0 0 2px var(--xr-paper), 0 0 0 4px var(--xr-toner); }

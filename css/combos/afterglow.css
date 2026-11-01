@@ -1,0 +1,41 @@
+/* ---------------------------------------------------------------------
+   combos/afterglow.css - the "Afterglow" combo (js/combos.js).
+   Pair:      soft-form (base) x aurora-noir (donor)
+   Channels:  color
+   Scope:     every root carries data-combo="afterglow" while the combo is on (board, deck
+              slides, Built view), next to data-ae="soft-form" and data-blend="aurora-noir":
+                .ab[data-combo="afterglow"] ...
+                [data-combo="afterglow"] .sb-k-...
+   Tune:      hand-tuning for this pair only: spacing, contrast and finish between the
+              base's structure and the donor's channels. Loaded last, so these rules win.
+              Soft Form's relief is a pair of light/shadow tones; Aurora Noir's canvas is near black, so
+              in dark the shadow has nothing left to darken and the relief all rides on the highlight.
+------------------------------------------------------------------------ */
+
+/* Dark: the black shadow vanishes on Aurora Noir's canvas, so lift the top-left light (ink tinted,
+   from the token) and bevel raised parts: a lit top-left lip and a dark bottom-right lip, so a raised
+   disc and a recessed one no longer look alike. !important: the tokens are inline on the root. The
+   kit declares its own relief vars at higher specificity, hence the second selector. */
+.ab[data-combo="afterglow"][data-mode="dark"],
+.ab.sb-ab.sb-kit[data-combo="afterglow"][data-mode="dark"] {
+  --ab-hi: color-mix(in srgb, var(--ab-ink) 18%, transparent) !important;
+  --ab-lo: rgba(0, 0, 0, 0.75) !important;
+  --sfk-hi: color-mix(in srgb, var(--ab-ink) 18%, transparent) !important;
+  --sfk-lo: rgba(0, 0, 0, 0.75) !important;
+  --ag-lip: inset 1.5px 1.5px 1px color-mix(in srgb, var(--ab-ink) 22%, transparent), inset -1.5px -1.5px 2px rgba(0, 0, 0, 0.5);
+  --sf-raised: 6px 6px 13px var(--ab-lo), -6px -6px 13px var(--ab-hi), var(--ag-lip);
+  --sf-raised-s: 3px 3px 7px var(--ab-lo), -3px -3px 7px var(--ab-hi), var(--ag-lip);
+  --sfk-raised: 5px 5px 12px var(--sfk-lo), -5px -5px 12px var(--sfk-hi), var(--ag-lip);
+  --sfk-raised-s: 3px 3px 7px var(--sfk-lo), -3px -3px 7px var(--sfk-hi), var(--ag-lip);
+}
+
+/* The cover/board art is drawn in cqw, so it keeps its own shadows: give the disc a lit lip and the
+   well a faint rim light so the pair reads as one raised object in a recessed bowl. */
+.ab[data-combo="afterglow"][data-mode="dark"] .sfa-disc {
+  box-shadow: 3.8cqw 4.4cqw 7.5cqw var(--ab-lo), -3cqw -3cqw 6.5cqw var(--ab-hi),
+    inset 0.6cqw 0.6cqw 0.8cqw color-mix(in srgb, var(--ab-ink) 22%, transparent), inset -0.8cqw -0.8cqw 1.4cqw rgba(0, 0, 0, 0.5);
+}
+.ab[data-combo="afterglow"][data-mode="dark"] .sfa-well {
+  box-shadow: inset 4cqw 4cqw 8.5cqw var(--ab-lo), inset -4cqw -4cqw 8.5cqw var(--ab-hi),
+    0 0 0 0.25cqw color-mix(in srgb, var(--ab-ink) 8%, transparent);
+}

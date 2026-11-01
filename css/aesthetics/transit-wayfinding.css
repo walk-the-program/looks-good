@@ -512,3 +512,98 @@
 .ab.sb-ab[data-ae="transit-wayfinding"].sb-kit .sb-k-skel-block { border-radius: var(--tw-r); background: var(--ab-rail); }
 .ab.sb-ab[data-ae="transit-wayfinding"].sb-kit :is(.sb-k-skel-av, .sb-k-skel-line, .sb-k-skel-block)::after { content: none; animation: none; }
 @media (prefers-reduced-motion: reduce) { .ab.sb-ab[data-ae="transit-wayfinding"].sb-kit .sb-k-spin { animation: none; } }
+
+/* ---------------------------------------------------------------------
+   KIT SIGNATURE (transit-wayfinding)
+   Shape: 4px sign corners, 2px on small marks; circles are route bullets only (radio, avatar, fab, pie, the numbered name bullet);
+   the express route is a diamond.
+   Edge and depth: none. Flat black sign panels, a 4px route-colour bar as the one accent, no shadow, no blur, no hairline frames.
+   Surfaces: black sign panels for everything that is a sign (cell headers, menus, dialogs, callouts, top bar); open concourse for forms.
+   UI type: the brand sans, bold mixed case for names and actions, 11-12px tracked caps for labels, tabular numerals, labels above.
+   Field: a 3px underline under a black label plate. Focus: the underline turns route colour.
+   Controls: checkbox = a black sign square with a white tick; radio = a route bullet lit inside its ring; toggle = a route line with a disc;
+   slider = a route line with a station disc; segmented = numbered squares; tabs = black sign tab over a 4px route bar.
+   Selection: a black sign (or lit panel on a sign) with the 4px route bar at its edge: tabs, menu items, rows, nav, anchors, days.
+   Pressed: the sign flips to white with black type. Focus: 2px ink ring. Disabled: dimmed, the outline stays.
+   Page chrome: each cell opens with a black sign band (numbered route bullet, name, white type) over a route bar; tags are plates,
+   state labels are a route-line stub with a station disc.
+------------------------------------------------------------------------ */
+.ab.sb-ab[data-ae="transit-wayfinding"].sb-kit .sb-kitpage { counter-reset: twk; }
+.ab.sb-ab[data-ae="transit-wayfinding"].sb-kit .sb-k-cell { counter-increment: twk; gap: 20px; padding: 0 20px 22px; border: 0; border-radius: var(--tw-r); background: color-mix(in srgb, var(--ab-ink) 4%, transparent); }
+.ab.sb-ab[data-ae="transit-wayfinding"].sb-kit .sb-k-cell:target { box-shadow: inset 0 0 0 3px var(--ab-ink); }
+.ab.sb-ab[data-ae="transit-wayfinding"].sb-kit .sb-k-cell-h { --tw-white: #FFFFFF; --tw-dim: #B9BBBE; --ab-ink: #FFFFFF; --k-muted: #B9BBBE; gap: 6px; margin: 0 -20px; padding: 16px 20px 16px; border-radius: var(--tw-r) var(--tw-r) 0 0; border-bottom: 4px solid var(--ab-route1); background: var(--ab-sign); color: #FFFFFF; }
+.ab.sb-ab[data-ae="transit-wayfinding"].sb-kit .sb-k-cell:nth-child(3n+2) .sb-k-cell-h { border-bottom-color: var(--ab-route2, var(--ab-route1)); }
+.ab.sb-ab[data-ae="transit-wayfinding"].sb-kit .sb-k-cell:nth-child(3n) .sb-k-cell-h { border-bottom-color: var(--ab-route3, var(--ab-route1)); }
+.ab.sb-ab[data-ae="transit-wayfinding"].sb-kit .sb-k-name { display: flex; align-items: center; gap: 12px; font-size: 19px; line-height: 24px; font-weight: var(--tw-hw, 800); color: #FFFFFF; }
+.ab.sb-ab[data-ae="transit-wayfinding"].sb-kit .sb-k-cell-h .sb-k-name::before { content: counter(twk); flex: none; display: grid; place-items: center; width: 28px; height: 28px; border-radius: 50%; background: var(--ab-route1); color: var(--tw-o1); font: var(--tw-hw, 800) 14px/1 var(--ab-font-h); font-variant-numeric: tabular-nums; }
+.ab.sb-ab[data-ae="transit-wayfinding"].sb-kit .sb-k-cell:nth-child(3n+2) .sb-k-cell-h .sb-k-name::before { background: var(--ab-route2, var(--ab-route1)); color: var(--tw-o2, var(--tw-o1)); }
+.ab.sb-ab[data-ae="transit-wayfinding"].sb-kit .sb-k-cell:nth-child(3n) .sb-k-cell-h .sb-k-name::before { width: 24px; height: 24px; margin: 0 2px; border-radius: 2px; transform: rotate(45deg); background: var(--ab-route3, var(--ab-route1)); color: transparent; font-size: 0; }
+.ab.sb-ab[data-ae="transit-wayfinding"].sb-kit .sb-k-cell-h .sb-k-use { color: var(--tw-dim); font-size: 14px; line-height: 20px; }
+.ab.sb-ab[data-ae="transit-wayfinding"].sb-kit .sb-k-cell-h .sb-k-ios { color: var(--tw-dim); }
+.ab.sb-ab[data-ae="transit-wayfinding"].sb-kit .sb-k-ios-tag { padding: 1px 8px; border-radius: 2px; background: none; box-shadow: inset 0 0 0 2px #FFFFFF; font-size: 11px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: #FFFFFF; border: 0; }
+.ab.sb-ab[data-ae="transit-wayfinding"].sb-kit .sb-k-ios .sb-k-ios-tag { background: none; border: 0; color: #FFFFFF; }
+.ab.sb-ab[data-ae="transit-wayfinding"].sb-kit .sb-k-ios[data-ios="native"] .sb-k-ios-tag { background: #FFFFFF; color: #000000; box-shadow: none; }
+.ab.sb-ab[data-ae="transit-wayfinding"].sb-kit .sb-k-ios .sb-k-ios-tag.sb-k-web-tag { background: none; color: #FFFFFF; box-shadow: inset 0 0 0 2px #FFFFFF; text-decoration: underline; text-underline-offset: 3px; }
+.ab.sb-ab[data-ae="transit-wayfinding"].sb-kit .sb-k-ios code { color: var(--tw-dim); font-size: 12px; }
+.ab.sb-ab[data-ae="transit-wayfinding"].sb-kit .sb-k-slabel { display: inline-flex; align-items: center; gap: 8px; font-family: var(--ab-font-ui); font-size: 11px; font-weight: 800; letter-spacing: 0.1em; color: var(--ab-ink); }
+.ab.sb-ab[data-ae="transit-wayfinding"].sb-kit .sb-k-slabel::before { content: ""; flex: none; width: 26px; height: 12px; background: radial-gradient(circle at 20px 50%, var(--ab-canvas) 0 2.5px, var(--ab-ink) 3px 5.5px, transparent 6px), linear-gradient(var(--ab-route1), var(--ab-route1)) 0 50% / 18px 4px no-repeat; }
+.ab.sb-ab[data-ae="transit-wayfinding"].sb-kit .sb-k-group > .ab-labelrow { --tw-white: #FFFFFF; --tw-dim: #B9BBBE; --ab-ink: #FFFFFF; --ab-muted: #B9BBBE; --k-muted: #B9BBBE; padding: 10px 16px; border-left: 8px solid var(--ab-route1); border-radius: var(--tw-r); background: var(--ab-sign); color: #FFFFFF; }
+.ab.sb-ab[data-ae="transit-wayfinding"].sb-kit .sb-k-group > .ab-labelrow .ab-label { color: inherit; }
+.ab.sb-ab[data-ae="transit-wayfinding"].sb-kit .sb-k-typescale { border-top: 4px solid var(--ab-sign); }
+.ab.sb-ab[data-ae="transit-wayfinding"].sb-kit .sb-k-type-meta b { font-weight: 800; }
+.ab.sb-ab[data-ae="transit-wayfinding"].sb-kit .sb-k-chip { border: 2px solid var(--ab-ink); border-radius: var(--tw-r); }
+.ab.sb-ab[data-ae="transit-wayfinding"].sb-kit .sb-k-swatch b { font-weight: 800; }
+.ab.sb-ab[data-ae="transit-wayfinding"].sb-kit .sb-k-gl { border-top: 4px solid var(--ab-sign); }
+.ab.sb-ab[data-ae="transit-wayfinding"].sb-kit .sb-k-gl-term b { font-weight: 800; }
+.ab.sb-ab[data-ae="transit-wayfinding"].sb-kit .sb-k-gl-link { border: 0; border-radius: 2px; box-shadow: inset 0 0 0 2px var(--ab-ink); font-weight: 700; }
+.ab.sb-ab[data-ae="transit-wayfinding"].sb-kit .sb-k-gl-link:is(:hover, :focus-visible) { background: var(--ab-sign); color: #FFFFFF; box-shadow: none; }
+.ab.sb-ab[data-ae="transit-wayfinding"].sb-kit .sb-k-layout { border: 0; border-top: 4px solid var(--ab-sign); border-radius: 0 0 var(--tw-r) var(--tw-r); background: color-mix(in srgb, var(--ab-ink) 4%, transparent); }
+.ab.sb-ab[data-ae="transit-wayfinding"].sb-kit .sb-k-layout-cap .sb-k-name::before { content: none; }
+.ab.sb-ab[data-ae="transit-wayfinding"].sb-kit .sb-k-layout-cap .sb-k-name { color: var(--ab-ink); }
+.ab.sb-ab[data-ae="transit-wayfinding"].sb-kit .sb-k-rules li::marker { color: var(--ab-route1); }
+/* fields: a black label plate over a 3px underline */
+.ab.sb-ab[data-ae="transit-wayfinding"].sb-kit .sb-k-field .ab-fieldlabel { display: inline-block; justify-self: start; width: fit-content; padding: 2px 8px; border-radius: 2px; background: var(--ab-sign); color: #FFFFFF; font-size: 11px !important; line-height: 16px !important; font-weight: 800; letter-spacing: 0.1em; }
+.ab.sb-ab[data-ae="transit-wayfinding"].sb-kit :is(.sb-k-field, .sb-k-search, .sb-k-selectwrap) .ab-input { border-bottom-width: 3px; font-weight: 600; }
+.ab.sb-ab[data-ae="transit-wayfinding"].sb-kit :is(.sb-k-field, .sb-k-search).is-focus .ab-input { border-color: var(--ab-route1) !important; box-shadow: none !important; }
+.ab.sb-ab[data-ae="transit-wayfinding"].sb-kit .sb-k-field.is-error .ab-input { border-color: var(--ab-ink) !important; box-shadow: none !important; background: repeating-linear-gradient(135deg, var(--ab-ink) 0 3px, transparent 3px 8px) 0 100% / 100% 3px no-repeat; }
+.ab.sb-ab[data-ae="transit-wayfinding"].sb-kit .sb-k-help.is-error { font-weight: 700; color: var(--ab-ink); box-shadow: inset 4px 0 0 var(--ab-alert); padding-left: 10px; }
+/* checkbox: a sign square with a white tick; radio: a route bullet lit inside its ring */
+.ab.sb-ab[data-ae="transit-wayfinding"].sb-kit .sb-k-check { font-weight: 600; }
+.ab.sb-ab[data-ae="transit-wayfinding"].sb-kit .sb-k-box { width: 26px; height: 26px; border: 3px solid var(--ab-ink); border-radius: 2px; }
+.ab.sb-ab[data-ae="transit-wayfinding"].sb-kit .sb-k-box[type="checkbox"]:checked { background: var(--ab-sign); border-color: var(--ab-sign); box-shadow: 0 0 0 1px var(--ab-canvas), 0 0 0 3px var(--ab-sign); }
+.ab.sb-ab[data-ae="transit-wayfinding"].sb-kit .sb-k-box[type="checkbox"]:checked::after { border-color: #FFFFFF; }
+.ab.sb-ab[data-ae="transit-wayfinding"].sb-kit .sb-k-box[type="radio"] { border-radius: 50%; }
+.ab.sb-ab[data-ae="transit-wayfinding"].sb-kit .sb-k-box[type="radio"]:checked { background: var(--ab-route1); border-color: var(--ab-ink); box-shadow: inset 0 0 0 3px var(--ab-canvas); }
+.ab.sb-ab[data-ae="transit-wayfinding"].sb-kit .sb-k-box[type="radio"]:checked::after { content: none; }
+.ab.sb-ab[data-ae="transit-wayfinding"].sb-kit .sb-k-listbox .sb-k-box[type="checkbox"]:checked { background: var(--ab-route1); border-color: var(--ab-route1); box-shadow: none; }
+.ab.sb-ab[data-ae="transit-wayfinding"].sb-kit .sb-k-box:focus-visible { outline: 2px solid var(--ab-ink); outline-offset: 3px; }
+/* slider: a route line with a station disc (the base thumb rules are more specific than the early ones) */
+.ab.sb-ab[data-ae="transit-wayfinding"].sb-kit input.sb-k-range::-webkit-slider-runnable-track { height: 6px; border-radius: 0; background: linear-gradient(90deg, var(--ab-route1) var(--v, 50%), var(--ab-rail) var(--v, 50%)); }
+.ab.sb-ab[data-ae="transit-wayfinding"].sb-kit input.sb-k-range::-webkit-slider-thumb { width: 26px; height: 26px; margin-top: -10px; border: 5px solid var(--ab-ink); border-radius: 50%; background: var(--ab-canvas); box-shadow: none; }
+.ab.sb-ab[data-ae="transit-wayfinding"].sb-kit .sb-k-slider-h > span:first-child { font-weight: 800; }
+/* tabs: a black sign tab over a 4px route bar */
+.ab.sb-ab[data-ae="transit-wayfinding"].sb-kit .sb-k-tabs { gap: 4px; border-bottom: 4px solid var(--ab-rail); }
+.ab.sb-ab[data-ae="transit-wayfinding"].sb-kit .sb-k-tabs [role="tab"] { padding: 0 16px; border-radius: 2px 2px 0 0; font-weight: 600; }
+.ab.sb-ab[data-ae="transit-wayfinding"].sb-kit .sb-k-tabs [role="tab"][aria-selected="true"] { background: var(--ab-sign); color: #FFFFFF; font-weight: 800; }
+.ab.sb-ab[data-ae="transit-wayfinding"].sb-kit .sb-k-tabs [role="tab"][aria-selected="true"]::after { bottom: -4px; height: 4px; background: var(--ab-route1); }
+/* the rest of the chrome: sign bands, plates and bullets */
+.ab.sb-ab[data-ae="transit-wayfinding"].sb-kit .sb-k-cell .sb-k-topbar { --tw-white: #FFFFFF; --tw-dim: #B9BBBE; --ab-ink: #FFFFFF; border: 0; border-radius: var(--tw-r); background: var(--ab-sign); color: #FFFFFF; }
+.ab.sb-ab[data-ae="transit-wayfinding"].sb-kit .sb-k-cell .sb-k-topbar .sb-k-plain { color: #FFFFFF; }
+/* a sign inside a cell opens under the black header band, so nested sign panels step off it: a lighter
+   panel, a 1px grey rim, and the bars carry a route-colour edge underneath like a wayfinding strip */
+.ab.sb-ab[data-ae="transit-wayfinding"].sb-kit .sb-k-cell :is(.sb-k-topbar, .sb-k-navbar, .sb-k-drawer, .sb-k-side, .sb-k-navmenu) { background: #262729; box-shadow: inset 0 0 0 1px #44474B; }
+.ab.sb-ab[data-ae="transit-wayfinding"].sb-kit .sb-k-cell :is(.sb-k-topbar, .sb-k-navbar) { box-shadow: inset 0 0 0 1px #44474B, inset 0 -4px 0 var(--ab-route1); }
+.ab.sb-ab[data-ae="transit-wayfinding"].sb-kit .sb-k-cell .sb-k-drawer .sb-k-navmenu { background: none; box-shadow: none; }
+.ab.sb-ab[data-ae="transit-wayfinding"].sb-kit .sb-k-tb-title { font-weight: 800; }
+.ab.sb-ab[data-ae="transit-wayfinding"].sb-kit .sb-k-tabbarbox { border: 0; border-radius: var(--tw-r); box-shadow: inset 0 4px 0 var(--ab-sign); }
+.ab.sb-ab[data-ae="transit-wayfinding"].sb-kit .sb-k-callout { --tw-white: #FFFFFF; --tw-dim: #B9BBBE; --ab-ink: #FFFFFF; --ab-muted: #B9BBBE; --k-muted: #B9BBBE; padding: 14px 16px 14px 20px; border: 0; border-radius: var(--tw-r); background: var(--ab-sign); box-shadow: inset 6px 0 0 var(--tone); color: #FFFFFF; }
+.ab.sb-ab[data-ae="transit-wayfinding"].sb-kit .sb-k-callout > .sb-ico { color: #FFFFFF; }
+.ab.sb-ab[data-ae="transit-wayfinding"].sb-kit .sb-k-callout b { font-weight: 800; }
+.ab.sb-ab[data-ae="transit-wayfinding"].sb-kit .sb-k-av { background: var(--ab-route1); color: var(--tw-o1); font-family: var(--ab-font-h); font-weight: 800; }
+.ab.sb-ab[data-ae="transit-wayfinding"].sb-kit .sb-k-av:nth-child(3n) { border-radius: 4px; transform: rotate(45deg); font-size: 0; }
+.ab.sb-ab[data-ae="transit-wayfinding"].sb-kit .sb-k-empty { border-radius: var(--tw-r); background: color-mix(in srgb, var(--ab-ink) 4%, transparent); box-shadow: inset 0 4px 0 var(--ab-sign); }
+.ab.sb-ab[data-ae="transit-wayfinding"].sb-kit .sb-k-fabbox, .ab.sb-ab[data-ae="transit-wayfinding"].sb-kit .sb-k-popbox, .ab.sb-ab[data-ae="transit-wayfinding"].sb-kit .sb-k-ctxbox { border-radius: var(--tw-r); }
+.ab.sb-ab[data-ae="transit-wayfinding"].sb-kit .sb-k-fabbox { border: 0; box-shadow: inset 0 0 0 2px var(--ab-sign); }
+.ab.sb-ab[data-ae="transit-wayfinding"].sb-kit .sb-k-progress .ab-row-bar { height: 8px !important; border-radius: 0; background: var(--ab-rail); }
+.ab.sb-ab[data-ae="transit-wayfinding"].sb-kit .sb-k-progress .ab-row-bar > i { border-radius: 0; background: var(--ab-route1); }
+.ab.sb-ab[data-ae="transit-wayfinding"].sb-kit .sb-k-topbar, .ab.sb-ab[data-ae="transit-wayfinding"].sb-kit .sb-k-tabs [role="tab"] { text-transform: none; }

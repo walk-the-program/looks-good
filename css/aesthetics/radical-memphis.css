@@ -611,3 +611,94 @@
 .ab.sb-ab.sb-kit:is([data-ae="radical-memphis"], [data-ae="radical-memphis--classic"]) :is(.sb-k-split, .sb-k-fabbox, .sb-k-side, .sb-k-navbar, .sb-k-dialog, .sb-k-drawer) .ab-cta { box-shadow: 6px 6px 0 var(--ab-m-sheet-sec); }
 .ab.sb-ab.sb-kit:is([data-ae="radical-memphis"], [data-ae="radical-memphis--classic"]) .sb-k-fab { box-shadow: 5px 5px 0 var(--ab-m-sheet-sec); }
 .ab.sb-ab.sb-kit:is([data-ae="radical-memphis"], [data-ae="radical-memphis--classic"]) .sb-k-fab.sb-k-pressed { transform: translate(3px, 3px); box-shadow: 2px 2px 0 var(--ab-m-sheet-sec); }
+
+/* ---------------------------------------------------------------------
+   UI kit signature (round 2, current version only): the showroom, not a spec sheet
+   - Shape: ONE corner (0 22px 0 0) on containers; square keys and tokens; the toggle track and thumb take the
+     same quarter-round; circles only where the board has them (radio, FAB, selected day).
+   - Edge and depth: no outlines on surfaces. A hard second-hue sheet under everything raised; a 2px black
+     edge only on small controls. Pressed = the piece drops onto its sheet.
+   - Surfaces: every cell is a paper cabinet (sheet, quarter-round corner, a laminate strip down its left edge
+     that changes cell to cell: Bacterio, checker, zig-zag, dots). Slab fills (sec-lo) for wells and selection.
+   - UI type: heading face for cell names with a squiggle underline; 700 tracked caps for tags and state labels,
+     set on tilted slabs; tabular numerals.
+   - Fields: a filled slab well on a 6px black edge; focus lifts it onto a sheet, error turns the edge danger.
+   - Controls: checkbox = square key, X mark; radio = circle with a triangle token; toggle = zig-zag key,
+     quarter-round; slider = zig-zag track with a primary run and a checker tab; tabs = sec-lo slab + underline.
+   - Selection: sec-lo slab with an accent underline (primary token for the loud ones). Focus: 3px black ring.
+   Text never sits on a laminate; the strip is a margin, not a background.
+------------------------------------------------------------------------ */
+/* the cell is a cabinet; inside it the canvas is paper, in dark mode too */
+.ab.sb-ab.sb-kit[data-ae="radical-memphis"] .sb-k-grid { gap: 28px 20px; }
+.ab.sb-ab.sb-kit[data-ae="radical-memphis"] :is(.sb-k-cell, .sb-k-layout) {
+  --ab-canvas: var(--ab-m-paper); --ab-ink: var(--ab-m-black); --ab-muted: var(--ab-m-soft); --k-muted: var(--ab-m-soft);
+  --ab-primary-text: color-mix(in srgb, var(--ab-primary) 55%, var(--ab-m-black));
+  position: relative; padding: 22px 22px 22px 34px; border: 0; border-radius: 0 28px 0 0; background: var(--ab-m-paper); color: var(--ab-m-black); box-shadow: 7px 7px 0 var(--ab-m-sheet);
+}
+.ab.sb-ab.sb-kit[data-ae="radical-memphis"] .sb-k-layout { padding-left: 34px; }
+.ab.sb-ab.sb-kit[data-ae="radical-memphis"] .sb-k-cell:target { box-shadow: 7px 7px 0 var(--ab-m-sheet-sec); }
+.ab.sb-ab.sb-kit[data-ae="radical-memphis"] :is(.sb-k-cell, .sb-k-layout)::before {
+  content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 14px; background: var(--mm-bacterio), var(--ab-m-paper); background-size: 40px 40px, auto;
+}
+.ab.sb-ab.sb-kit[data-ae="radical-memphis"] :is(.sb-k-cell, .sb-k-layout):nth-child(4n+2)::before { background: var(--mm-checker); background-size: 14px 14px; }
+.ab.sb-ab.sb-kit[data-ae="radical-memphis"] :is(.sb-k-cell, .sb-k-layout):nth-child(4n+3)::before { background: var(--mm-zig); background-size: 10px 10px, 10px 10px, 10px 10px, 10px 10px, auto; }
+.ab.sb-ab.sb-kit[data-ae="radical-memphis"] :is(.sb-k-cell, .sb-k-layout):nth-child(4n)::before { background: var(--mm-dots); background-size: 11px 11px, auto; }
+.ab.sb-ab.sb-kit[data-ae="radical-memphis"] .sb-k-name { justify-self: start; padding-bottom: 11px; background: var(--mm-squiggle-edge) 0 100% / 22px 9px repeat-x; font-family: var(--ab-font-h); font-size: 20px; line-height: 1.1; font-weight: var(--mm-hw, 400); letter-spacing: calc(-0.02em * var(--ab-tr, 1)); color: var(--ab-m-black); }
+.ab.sb-ab.sb-kit[data-ae="radical-memphis"] .sb-k-ios .sb-k-ios-tag { padding: 3px 10px; border: 0; border-radius: 0; background: var(--ab-m-sec-lo); color: var(--ab-m-black); font-size: 10.5px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; transform: rotate(-3deg); }
+.ab.sb-ab.sb-kit[data-ae="radical-memphis"] .sb-k-ios[data-ios="native"] .sb-k-ios-tag { background: var(--ab-m-black); color: var(--ab-m-paper); }
+.ab.sb-ab.sb-kit[data-ae="radical-memphis"] .sb-k-ios .sb-k-ios-tag.sb-k-web-tag { border-radius: 0 10px 0 0; background: var(--ab-m-pri-lo); color: var(--ab-m-black); transform: rotate(2deg); }
+.ab.sb-ab.sb-kit[data-ae="radical-memphis"] .sb-k-slabel { justify-self: start; padding: 2px 14px 3px 9px; background: var(--ab-m-sec-lo); color: var(--ab-m-black); clip-path: polygon(0 0, 100% 0, calc(100% - 7px) 100%, 0 100%); font-size: 10.5px; font-weight: 700; letter-spacing: 0.1em; }
+/* page head and sections */
+.ab.sb-ab.sb-kit[data-ae="radical-memphis"] .ab-card-title.sb-k-pagetitle {
+  display: inline-block; padding: 0.06em 0.16em 0.24em; color: var(--ab-m-black); transform: rotate(-2deg); transform-origin: 0 100%; font-weight: var(--mm-hw, 400);
+  background: var(--mm-squiggle-edge) 0 100% / 0.42em 0.18em repeat-x, linear-gradient(var(--ab-m-paper), var(--ab-m-paper)) 0 0 / 100% calc(100% - 0.09em) no-repeat;
+}
+.ab.sb-ab.sb-kit[data-ae="radical-memphis"] .sb-k-intro { font-weight: 500; }
+.ab.sb-ab.sb-kit[data-ae="radical-memphis"] .sb-k-typescale { padding-top: 10px; border-top: 0; background: conic-gradient(var(--ab-ink) 25%, var(--ab-canvas) 0 50%, var(--ab-ink) 0 75%, var(--ab-canvas) 0) 0 0 / 10px 10px repeat-x; }
+.ab.sb-ab.sb-kit[data-ae="radical-memphis"] .sb-k-type-row { border-bottom: 3px dotted var(--ab-ink); }
+.ab.sb-ab.sb-kit[data-ae="radical-memphis"] .sb-k-type-meta b { font-family: var(--ab-font-h); font-size: 15px; font-weight: var(--mm-hw, 400); }
+.ab.sb-ab.sb-kit[data-ae="radical-memphis"] .sb-k-chip { position: relative; width: 92px; height: 64px; margin: 6px 0 14px; overflow: hidden; border: 0; border-radius: 6px; box-shadow: 5px 5px 0 var(--ab-m-sheet); transform: rotate(-4deg); transform-origin: 30% 50%; }
+.ab.sb-ab.sb-kit[data-ae="radical-memphis"] .sb-k-chip::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 30%; background: var(--mm-squiggle-k) 0 0 / 24px 10px repeat; }
+.ab.sb-ab.sb-kit[data-ae="radical-memphis"] .sb-k-swatch:nth-child(1) .sb-k-chip { box-shadow: 5px 5px 0 var(--ab-m-sheet), inset 0 0 0 1px var(--ab-line); }
+.ab.sb-ab.sb-kit[data-ae="radical-memphis"] .sb-k-swatch:nth-child(2) .sb-k-chip { transform: rotate(3deg); }
+.ab.sb-ab.sb-kit[data-ae="radical-memphis"] .sb-k-swatch:nth-child(2) .sb-k-chip::after { background-image: var(--mm-squiggle-w); }
+.ab.sb-ab.sb-kit[data-ae="radical-memphis"] .sb-k-swatch:nth-child(3) .sb-k-chip { transform: rotate(-2deg); box-shadow: 5px 5px 0 var(--ab-m-sheet-sec); }
+.ab.sb-ab.sb-kit[data-ae="radical-memphis"] .sb-k-swatch:nth-child(4) .sb-k-chip { transform: rotate(4deg); }
+.ab.sb-ab.sb-kit[data-ae="radical-memphis"] .sb-k-swatch:nth-child(5) .sb-k-chip { transform: rotate(-3deg); }
+.ab.sb-ab.sb-kit[data-ae="radical-memphis"] .sb-k-swatch b { font-family: var(--ab-font-h); font-size: 15px; font-weight: var(--mm-hw, 400); }
+.ab.sb-ab.sb-kit[data-ae="radical-memphis"] .sb-k-gl { border-top: 0; }
+.ab.sb-ab.sb-kit[data-ae="radical-memphis"] .sb-k-gl-row { border-bottom: 3px dotted var(--ab-ink); }
+.ab.sb-ab.sb-kit[data-ae="radical-memphis"] .sb-k-gl-term b { font-family: var(--ab-font-h); font-weight: var(--mm-hw, 400); }
+.ab.sb-ab.sb-kit[data-ae="radical-memphis"] .sb-k-gl-link { border: 0; border-radius: 0 10px 0 0; background: var(--ab-m-sec-lo); color: var(--ab-m-black); font-weight: 700; }
+.ab.sb-ab.sb-kit[data-ae="radical-memphis"] .sb-k-gl-link:hover, .ab.sb-ab.sb-kit[data-ae="radical-memphis"] .sb-k-gl-link:focus-visible { background: var(--ab-primary); color: var(--ab-on-primary); }
+/* fields: lift the slab onto its sheet on focus, turn the edge danger on error */
+html .ab.sb-ab.sb-kit[data-ae="radical-memphis"] :is(.sb-k-field, .sb-k-search).is-focus .ab-input { box-shadow: 5px 5px 0 var(--ab-m-sheet-sec) !important; border-bottom-color: var(--ab-primary-text) !important; }
+html .ab.sb-ab.sb-kit[data-ae="radical-memphis"] .sb-k-field.is-error .ab-input { box-shadow: 5px 5px 0 color-mix(in srgb, var(--sb-danger) 30%, var(--ab-m-paper)) !important; border-bottom-color: var(--sb-danger) !important; }
+/* checkbox: a square key with an X; radio: a circle with a triangle token; both sit on a sheet */
+.ab.sb-ab.sb-kit[data-ae="radical-memphis"] .sb-k-box { border: 2px solid var(--ab-m-black); border-radius: 0; background: var(--ab-m-paper); box-shadow: 3px 3px 0 var(--ab-m-sheet); }
+.ab.sb-ab.sb-kit[data-ae="radical-memphis"] .sb-k-box[type="radio"] { border-radius: 50%; }
+.ab.sb-ab.sb-kit[data-ae="radical-memphis"] .sb-k-box:checked { background: var(--ab-primary); border-color: var(--ab-m-black); }
+.ab.sb-ab.sb-kit[data-ae="radical-memphis"] .sb-k-box[type="checkbox"]:checked::after {
+  width: 14px; height: 14px; border: 0; transform: none;
+  background: linear-gradient(45deg, transparent 42%, var(--ab-on-primary) 42% 58%, transparent 58%), linear-gradient(-45deg, transparent 42%, var(--ab-on-primary) 42% 58%, transparent 58%);
+}
+.ab.sb-ab.sb-kit[data-ae="radical-memphis"] .sb-k-box[type="radio"]:checked::after { width: 11px; height: 10px; border-radius: 0; background: var(--ab-on-primary); clip-path: polygon(50% 0, 100% 100%, 0 100%); }
+/* toggle: the zig-zag key takes the quarter-round corner, thumb included */
+.ab.sb-ab.sb-kit[data-ae="radical-memphis"] .ab-switch { border-radius: 0 18px 0 0; }
+.ab.sb-ab.sb-kit[data-ae="radical-memphis"] .ab-switch::before { border-radius: 0 11px 0 0; }
+/* slider: primary run, then zig-zag; the thumb is a checker tab with the quarter-round corner */
+.ab.sb-ab.sb-kit[data-ae="radical-memphis"] .sb-k-range::-webkit-slider-runnable-track {
+  height: 12px; border: 2px solid var(--ab-m-black); border-radius: 0; box-shadow: none;
+  background: linear-gradient(90deg, var(--ab-primary) var(--v, 50%), transparent var(--v, 50%)) 0 0 / 100% 100% no-repeat, var(--mm-zig);
+}
+.ab.sb-ab.sb-kit[data-ae="radical-memphis"] .sb-k-range::-webkit-slider-thumb {
+  width: 28px; height: 28px; margin-top: -9px; border: 2px solid var(--ab-m-black); border-radius: 0 12px 0 0; box-shadow: 3px 3px 0 var(--ab-m-sheet);
+  background: var(--mm-checker); background-size: 10px 10px;
+}
+.ab.sb-ab.sb-kit[data-ae="radical-memphis"] .sb-k-range::-moz-range-track { height: 12px; border: 2px solid var(--ab-m-black); border-radius: 0; background: linear-gradient(90deg, var(--ab-primary) var(--v, 50%), transparent var(--v, 50%)) 0 0 / 100% 100% no-repeat, var(--mm-zig); }
+.ab.sb-ab.sb-kit[data-ae="radical-memphis"] .sb-k-range::-moz-range-thumb { width: 24px; height: 24px; border: 2px solid var(--ab-m-black); border-radius: 0 12px 0 0; box-shadow: 3px 3px 0 var(--ab-m-sheet); background: var(--mm-checker); background-size: 10px 10px; }
+/* tabs: the selected one is a sec-lo slab over its accent underline */
+.ab.sb-ab.sb-kit[data-ae="radical-memphis"] .sb-k-tabs { gap: 0 8px; }
+.ab.sb-ab.sb-kit[data-ae="radical-memphis"] .sb-k-tabs [role="tab"] { padding-inline: 12px; font-weight: 700; }
+.ab.sb-ab.sb-kit[data-ae="radical-memphis"] .sb-k-tabs [role="tab"][aria-selected="true"] { background: var(--ab-m-sec-lo); color: var(--ab-m-black); }
+.ab.sb-ab.sb-kit[data-ae="radical-memphis"] .sb-k-tabs [role="tab"][aria-selected="true"]::after { background: var(--ab-accent); box-shadow: none; }

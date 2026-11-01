@@ -1,0 +1,25 @@
+/* ---------------------------------------------------------------------
+   combos/hallmark.css - the "Hallmark" combo (js/combos.js).
+   Pair:      dystopian-luxury (base) x holo-iridescent (donor)
+   Channels:  color
+   Scope:     every root carries data-combo="hallmark" while the combo is on (board, deck
+              slides, Built view), next to data-ae="dystopian-luxury" and data-blend="holo-iridescent":
+                .ab[data-combo="hallmark"] ...
+                [data-combo="hallmark"] .sb-k-...
+   Tune:      hand-tuning for this pair only: spacing, contrast and finish between the
+              base's structure and the donor's channels. Loaded last, so these rules win.
+------------------------------------------------------------------------ */
+
+/* The one foil. Dystopian Luxury is ink on paper; Holo Iridescent's colour channel adds a
+   single thing, the foil-filled highlight word in the headline or tagline, once per screen.
+   Nothing else carries the spectrum: buttons, selected states and marks stay in the base's ink.
+   The donor's word starts on the accent ink for a quarter of its length, so a four-letter word
+   read half black, and its pink, violet and green stops sit at 3.5 to 3.9:1, short of the 4.5:1
+   a 15px tagline needs. Here the sweep is cropped to the spectral part, and a veil of the
+   brand's ink (a token, so it lightens on dark boards) lifts every stop past 5:1. */
+.ab[data-combo="hallmark"][data-blend-hl] .ab-hl {
+  background-image: linear-gradient(color-mix(in srgb, var(--ab-ink) 28%, transparent), color-mix(in srgb, var(--ab-ink) 28%, transparent)), var(--blh-bgi, var(--ab-hl-fill)) !important;
+  background-size: 100% 100%, 165% 100% !important;
+  background-position: 0 0, 100% 0 !important;
+  background-repeat: no-repeat !important;
+}
