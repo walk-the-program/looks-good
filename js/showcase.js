@@ -15,7 +15,7 @@
 ------------------------------------------------------------------------ */
 
 const SHOWCASE_KEYS = [
-  'soft-form', 'holo-iridescent', 'aurora-noir', 'bento-grid', 'mesh-gradient',
+  'soft-form', 'liquid-glass', 'holo-iridescent', 'aurora-noir', 'bento-grid', 'mesh-gradient',
   'industrial-device', 'blueprint', 'blob-tracking', 'xerox', 'micrographics',
   'ascii-art', 'corporate-vandalism', 'xerox-punk', 'acid-graphics', 'radical-memphis',
   'pirate-broadcast', 'dystopian-luxury', 'naive-doodle', 'gorpcore', 'old-web',
