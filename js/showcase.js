@@ -19,7 +19,7 @@
 const SHOWCASE_KEYS = [
   'soft-form', 'liquid-glass', 'holo-iridescent', 'aurora-noir', 'bento-grid', 'mesh-gradient',
   'industrial-device', 'blueprint', 'blob-tracking', 'xerox', 'micrographics',
-  'ascii-art', 'corporate-vandalism', 'xerox-punk', 'acid-graphics', 'radical-memphis',
+  'ascii-art', 'corporate-vandalism', 'xerox-punk', 'acid-graphics', 'radical-memphis', 'neo-brutal-pop',
   'pirate-broadcast', 'dystopian-luxury', 'naive-doodle', 'gorpcore', 'old-web',
   'toy-press', 'live-tile', 'mainframe', 'tonal-shape', 'isogrid', 'tab-stack', 'patchbay', 'paddock-pass',
 ];

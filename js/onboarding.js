@@ -234,6 +234,7 @@ const Onboarding = (function () {
     { key: 'corporate-vandalism', loud: 0.75, kinds: 'website studio app', hue: 218 },
     { key: 'xerox-punk', loud: 0.85, kinds: 'shop studio website', hue: 8 },
     { key: 'radical-memphis', loud: 0.85, kinds: 'shop app studio', hue: 332 },
+    { key: 'neo-brutal-pop', loud: 0.8, kinds: 'app shop website product', hue: 48 },
     { key: 'pirate-broadcast', loud: 0.9, kinds: 'studio website app', hue: 352 },
     { key: 'acid-graphics', loud: 0.95, kinds: 'app studio product', hue: 92 },
   ];
