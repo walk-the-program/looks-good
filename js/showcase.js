@@ -3,11 +3,11 @@
 
    An app-level setting (localStorage, not per brand). When it is on:
    - body[data-showcase="on"], and window.isShowcase() is true;
-   - the aesthetic list, step buttons, shuffle, Compare all, "Mix in" and
-     anything else that calls showcaseFilter(list) only offer the owner's
-     favourites (SHOWCASE_KEYS); the rest stay in the app for him;
-   - the nine curated combos (js/combos.js) are not narrowed: all of them stay in the style
-     gallery, prev / next and shuffle, because every base and donor is in SHOWCASE_KEYS;
+   - every aesthetic is a favourite: the aesthetic list, step buttons, shuffle, Compare all,
+     "Mix in" and anything else that calls showcaseFilter(list) offer them all, minus
+     SHOWCASE_HIDDEN (empty: the styles the owner called out in the r7-trim review were
+     deleted outright). New styles show up in Showcase without being added anywhere;
+   - the nine curated combos (js/combos.js) are not narrowed either;
    - css/showcase.css hides owner-only tools (Classic/Current, the
      recommendations panel, suggestion boxes) and folds fine-tuning (locks,
      type sliders, pattern settings) behind one "Refine" disclosure.
@@ -16,13 +16,8 @@
    (⇧⌘D) in the Mac app, which calls window.toggleShowcase().
 ------------------------------------------------------------------------ */
 
-const SHOWCASE_KEYS = [
-  'soft-form', 'liquid-glass', 'holo-iridescent', 'aurora-noir', 'bento-grid', 'mesh-gradient',
-  'industrial-device', 'blueprint', 'blob-tracking', 'xerox', 'micrographics',
-  'ascii-art', 'corporate-vandalism', 'xerox-punk', 'acid-graphics', 'radical-memphis', 'neo-brutal-pop',
-  'pirate-broadcast', 'dystopian-luxury', 'naive-doodle', 'gorpcore', 'old-web',
-  'toy-press', 'live-tile', 'mainframe', 'tonal-shape', 'isogrid', 'tab-stack', 'patchbay', 'paddock-pass',
-];
+// Aesthetic keys the owner asked to keep out of Showcase. Add a key here to hide a style.
+const SHOWCASE_HIDDEN = [];
 const SHOWCASE_STORE = 'bd.showcase';
 
 function isShowcase() {
@@ -33,7 +28,7 @@ function isShowcase() {
 // Outside showcase mode, or if nothing would be left, the list comes back unchanged.
 function showcaseFilter(list) {
   if (!isShowcase() || !Array.isArray(list)) return list;
-  const keep = list.filter(a => SHOWCASE_KEYS.includes(typeof a === 'string' ? a : a && (a.classicOf || a.key)));
+  const keep = list.filter(a => !SHOWCASE_HIDDEN.includes(typeof a === 'string' ? a : a && (a.classicOf || a.key)));
   return keep.length ? keep : list;
 }
 
@@ -112,7 +107,6 @@ function showcaseFilter(list) {
   window.showcaseFilter = showcaseFilter;
   window.setShowcase = setShowcase;
   window.toggleShowcase = toggleShowcase;
-  window.SHOWCASE_KEYS = SHOWCASE_KEYS;
   window.Show = window.Show || {};
   window.Show.showcase = setShowcase;
 
