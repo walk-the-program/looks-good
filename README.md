@@ -32,7 +32,7 @@ python3 -m http.server 8080   # or: python -m http.server 8080
 
 ## License
 
-TBD.
+MIT, see [LICENSE](LICENSE). The bundled fonts and libraries keep their own licenses, listed under Credits.
 
 ## Credits
 
