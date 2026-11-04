@@ -1,7 +1,8 @@
 /* ---------------------------------------------------------------------
    patterns-home.js — Patterns mode: the Brands | Patterns switch, the
    pattern grid, and the tool view (an iframe of a page under ptrn/, the
-   private Ptrn mirror that dev/sync-ptrn.py builds).
+   private Ptrn mirror that dev/sync-ptrn.py builds, or under patterns-library/,
+   the tracked public copy of the owner's own patterns).
 
    Views: body[data-view="patterns"]. The grid and the open tool live in the
    same section; the open tool is remembered in the URL hash (#pattern=slug)
@@ -10,9 +11,12 @@
 
 const PatternsHome = (function () {
   const MODE_KEY = 'bd.homeMode';
-  const CATALOG_URL = 'ptrn/catalog.json';
-  const THEME_CSS = ['/fonts/fonts.css', '/css/ptrn-theme.css'];
-  const HOME_PATHS = ['/ptrn/', '/ptrn/index.html'];
+  // The owner's full local mirror (git-ignored) wins when present; otherwise the tracked
+  // public library (dev/build-public-patterns.py). Relative, so any server root or subfolder works.
+  const CATALOG_URLS = ['ptrn/catalog.json', 'patterns-library/catalog.json'];
+  const THEME_CSS = ['fonts/fonts.css', 'css/ptrn-theme.css'].map(p => new URL(p, document.baseURI).href);
+  const HOME_PATHS = ['/ptrn/', '/ptrn/index.html', '/patterns-library/', '/patterns-library/index.html'];
+  const isHomePath = p => HOME_PATHS.some(h => p === h || p.endsWith(h));
 
   const $ = id => document.getElementById(id);
   const el = {
@@ -455,10 +459,11 @@ const PatternsHome = (function () {
 
   function load() {
     if (!loading) {
-      loading = fetch(CATALOG_URL, { cache: 'no-cache' })
+      const tryUrl = i => fetch(CATALOG_URLS[i], { cache: 'no-cache' })
         .then(r => { if (!r.ok) throw new Error(r.status); return r.json(); })
-        .then(list => { catalog = Array.isArray(list) ? list : []; })
-        .catch(() => { catalog = []; });
+        .then(list => { if (!Array.isArray(list) || !list.length) throw new Error('empty'); return list; })
+        .catch(e => { if (i + 1 < CATALOG_URLS.length) return tryUrl(i + 1); throw e; });
+      loading = tryUrl(0).then(list => { catalog = list; }).catch(() => { catalog = []; });
     }
     return loading;
   }
@@ -493,6 +498,10 @@ const PatternsHome = (function () {
       return;
     }
     el.missing.hidden = true; el.bar.hidden = false;
+    // One source only (the public library): the Mine/Ptrn filter has nothing to filter.
+    const sources = new Set(catalog.map(t => t.source));
+    el.source.hidden = sources.size < 2;
+    if (sources.size < 2) filters.source = 'all';
     applyFilters();
     const n = visible.length;
     el.count.textContent = n === total ? `${total} patterns` : `${n} of ${total} patterns`;
@@ -577,7 +586,7 @@ const PatternsHome = (function () {
     let win, doc;
     try { win = el.frame.contentWindow; doc = win.document; } catch (e) { return; }
     if (!openSlug || !doc || doc.location.href === 'about:blank') return;
-    if (HOME_PATHS.includes(win.location.pathname)) { showGrid(); return; }   // the tool linked home: back to our grid
+    if (isHomePath(win.location.pathname)) { showGrid(); return; }   // the tool linked home: back to our grid
     doc.addEventListener('keydown', onKey);
     try { growSwatches(win, doc); } catch (e) { /* the tool still opens with its own swatches */ }
     injectTheme(doc).then(() => el.frame.classList.add('is-ready'));

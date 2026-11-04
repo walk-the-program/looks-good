@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Studio — Ptrn</title>
+<link rel="icon" href="../../favicon.svg" type="image/svg+xml">
+<meta name="description" id="metaDesc" content="Pattern families from the Looks Good engine, in the Ptrn instrument.">
+<link rel="stylesheet" href="../_fonts/dm-mono.css">
+<link rel="stylesheet" href="../_shared/chassis.css">
+<script src="../_shared/head.js"></script>
+</head>
+<body>
+
+<span class="mark crop tl"></span><span class="mark crop tr"></span>
+<span class="mark crop bl"></span><span class="mark crop br"></span>
+<span class="mark edgetick" style="left:24px;top:32%"></span>
+<span class="mark edgetick" style="left:24px;top:50%"></span>
+<span class="mark edgetick" style="left:24px;top:68%"></span>
+<span class="mark edgetick" style="right:24px;top:50%"></span>
+
+<div class="rig">
+  <div class="zone z-left">
+    <div class="l-top idblock">
+      <a class="idline" href="../index.html" aria-label="Ptrn — all tools">
+        <span class="brand"><span class="ptrn-mark">ptrn</span></span>
+        <span class="slash">&frasl;</span>
+        <span class="tool" id="toolName">Studio</span>
+      </a>
+      <div class="tbl">
+        <span class="k">Index</span><span class="v" id="idxEcho">00 / 00</span>
+        <span class="k">Type</span><span class="v" id="typeEcho">&mdash;</span>
+      </div>
+      <a class="lnk back" href="../index.html">&larr; All tools</a>
+      <div class="newblk">
+        <div class="newlab"><span class="k">Variation</span>
+          <span class="seedwrap"><input class="seed" id="seed" value="1" inputmode="numeric" aria-label="Variation number"><button class="pbtn copy" id="copySeed"
+            aria-label="Copy variation number">Copy</button></span>
+        </div>
+        <button class="newbtn" id="randomize"><span class="ico" aria-hidden="true">&#8635;</span>
+          <span class="t">New variation</span>
+          <span class="sub">Reshuffle every shape</span></button>
+      </div>
+    </div>
+    <div class="l-scroll"><div id="ctlHost"></div><div data-tpl="dither"></div><div data-tpl="grain"></div></div>
+    <div class="l-bot"><details class="grp colr" open><summary>Color<button class="mycsw" id="mycTog" aria-pressed="false">My colors<span class="sw" aria-hidden="true"></span></button></summary><div class="grp-b"><div class="misc"><span class="mhead"><span class="k">Inks</span><span class="v" id="swCountVal">5</span></span><span class="mval"><div class="sw-grid" id="swatches"></div></span></div>
+
+      <div class="misc"><span class="mhead"></span><span class="mval"><button class="lnk" id="shufColors">New colors</button><button class="lnk" id="rotColors">Rotate</button></span></div>
+      <div data-tpl="myc"></div></div></details>
+      <div class="strip" id="strip"></div>
+      <div class="glyph" id="glyph"></div>
+    </div>
+  </div>
+
+  <main class="zone z-stage stage-inner">
+    <span class="ring"></span><span class="xh hz"></span><span class="xh vt"></span>
+    <span class="holder">
+      <canvas id="art" width="800" height="800"></canvas>
+      <span class="corner a"></span><span class="corner b"></span>
+      <span class="corner c"></span><span class="corner d"></span>
+    </span>
+  </main>
+
+  <div class="zone z-right">
+    <div class="r-top idblock">
+      <h2 class="h">Output</h2>
+      <div class="tbl">
+        <span class="k">Ratio</span><span class="v" id="ratioEcho">1:1</span>
+        <span class="k">Size</span><span class="v" id="sizeEcho">&mdash;</span>
+        <span class="k">Inks</span><span class="v" id="inkEcho">&mdash;</span>
+        <span class="k">Render</span><span class="v" id="dims">&mdash;</span>
+      </div>
+      <h2 class="h frame-h">Frame</h2><div class="rack" id="ratios"></div><span class="val" id="ratioVal" hidden>1:1</span>
+    </div>
+    <div class="r-bot">
+      <div class="tbl" style="margin-bottom:20px">
+        <span class="k">Version</span><span class="v build" id="build">v1</span>
+      </div>
+      <div class="btnrow"><button class="pillbtn" id="exportTog" aria-pressed="false">Export</button></div><div class="group" id="exportBody" hidden><div class="pr"><div class="top"><span class="k">Size</span><span class="v" id="sizeVal">2400 px</span></div><div class="track"><input type="range" id="size" min="600" max="6000" step="100" value="2400"></div></div>
+        <div class="misc"><span class="mhead"></span><span class="mval" id="expRow"><button class="lnk" id="expPng">PNG</button></span></div></div>
+    </div>
+  </div>
+
+  <div class="zone z-bottom">
+    <h2 class="h">Captures</h2>
+    <div class="caps" id="history"></div>
+    <span class="k hint">Space &mdash; new variation</span>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+<button id="shuf" hidden aria-hidden="true"></button>
+
+<!-- the pattern engine and its families, loaded in place from js/patterns/; load order = registry order -->
+<script src="../../js/patterns/engine.js"></script>
+<script src="../../js/patterns/families/field.js"></script>
+<script src="../../js/patterns/families/stripe.js"></script>
+<script src="../../js/patterns/families/grid.js"></script>
+<script src="../../js/patterns/families/texture.js"></script>
+<script src="../../js/patterns/families/print2.js"></script>
+<script src="../../js/patterns/families/op2.js"></script>
+<script src="../../js/patterns/families/pixel2.js"></script>
+<script src="../../js/patterns/families/organic2.js"></script>
+<script src="../../js/patterns/families/glitch2.js"></script>
+<script src="../../js/patterns/families/collage2.js"></script>
+<script src="../_shared/chassis.js"></script>
+<script>
+(() => {
+"use strict";
+/* studio: one host page for every family in the Looks Good pattern
+   engine, addressed as /studio/?p=<key>. The page reads the family's schema
+   and builds the left rail from it, maps the swatches onto the family's ink
+   roles, and hands the chassis a paint() that calls Patterns.render. The
+   engine is static (no Animate / video: the chassis `static` option) and
+   paints at exactly the size the chassis asks for.
+   Overrides vs the chassis defaults: shuffleColors (curated sets and the
+   engine's colourways). Options set below: slug, static, roles, swatchLabel,
+   palettes, buildSVG (vector families only), controls. */
+const P = Ptrn.tool;
+const {$} = Ptrn.util;
+const Pat = window.Patterns, E = Pat.E;
+
+/* controls that never change a family's output (probed by the sync) are left out of its rail */
+const HIDDEN = {"halftone":["tints"],"stipple":["tints"],"typeterrain":["tints"],"zigzag":["tints"],"weave":["tints"],"oprings":["tints"],"counterchange":["tints"],"chevron":["tints"],"arcrise":["tints"],"pixelquilt":["tints"],"gradpanes":["scale","tints"],"glyphgrid":["tints"],"modulargrid":["tints"],"signal":["tints"],"tornbands":["tints"],"aura":["scale","tints"],"flow":["tints"],"cutup":["tints"],"sonar":["tints"],"inkstill":["tints"],"warpcheck":["tints"],"burst":["tints"],"ribbonrise":["tints"],"neonspray":["tints"],"kaleidopix":["tints"],"pixelgrid":["tints"],"parcels":["tints"],"prismpix":["tints"],"totem":["tints"],"tokens":["tints"],"relief":["scale","tints"],"colony":["scale","tints"],"tissue":["tints"],"seafan":["tints"],"pebbles":["tints"],"marble":["tints"],"thermalstreak":["tints"],"waves":["tints"],"snow":["tints"],"onebit":["tints"],"satellite":["tints"],"panels":["tints"],"flyposter":["tints"],"festival":["tints"],"patchwork":["tints"],"specimens":["tints"],"sprigs":["tints"],"blades":["tints"],"rods":["tints"]};   /*STUDIO:HIDDEN generated by _scripts/sync-studio.py*/
+
+/* ---- which family ---------------------------------------------------- */
+const LIST = Pat.list();
+const want = new URLSearchParams(location.search).get("p");
+let idx = LIST.findIndex(f => f.key === want);
+if (idx < 0) idx = 0;
+const FAM = LIST[idx];
+
+/* ---- colours --------------------------------------------------------- */
+/* The five ink roles the engine's families draw with, in swatch order. A
+   family lists the roles it uses (`ink`), and gets exactly those swatches. */
+const ROLE_NAMES = ["ground", "ink1", "ink2", "deep", "spark"];
+const ROLE_LABEL = {ground: "Ground", ink1: "Ink 1", ink2: "Ink 2", deep: "Deep", spark: "Spark"};
+const ROLES = FAM.ink.filter(r => ROLE_NAMES.includes(r));
+const pick5 = p5 => ROLES.map(r => p5[ROLE_NAMES.indexOf(r)]);
+
+/* [ground, ink1, ink2, deep, spark] */
+const PALETTES = [
+  ["#F3EEE3", "#E2432A", "#2A4D9B", "#1B1B1F", "#F4B72D"],
+  ["#F6F1E7", "#1F3A5F", "#D9593D", "#14110F", "#E8B04A"],
+  ["#12141A", "#F25C54", "#4CC9F0", "#F2EFE9", "#FFD166"],
+  ["#E9EDE4", "#2F6B4F", "#E07A5F", "#1C2B24", "#F2CC8F"],
+  ["#FBEFF0", "#E5338F", "#4A2BD6", "#1A1030", "#FFD23F"],
+  ["#0B1F33", "#6EE7B7", "#60A5FA", "#F4F1EA", "#FB7185"],
+  ["#F2E8D5", "#8C3B2A", "#C8943E", "#2A1A12", "#4F7A63"],
+  ["#EDEDE8", "#111111", "#FF4A1C", "#111111", "#FF4A1C"],
+  ["#FFF4E0", "#FF6B35", "#1A936F", "#2B2D42", "#7B2CBF"],
+  ["#1A1A2E", "#E94560", "#0F3460", "#EAEAEA", "#F5C518"]
+];
+
+/* Swatches -> the engine's brand tokens. Patterns.inksFor(tokens, "brand")
+   maps canvas->ground, primary->ink1, secondary->ink2, accent->spark and
+   ink->deep, then derives t1/t2/mute/pool/ramp itself. A role the family does
+   not list is filled so the derived ones still make sense. */
+function tokens(pal) {
+  const get = r => pal[ROLES.indexOf(r)];
+  const ground = get("ground"), ink1 = get("ink1") || get("ground"), ink2 = get("ink2") || ink1;
+  const spark = get("spark") || ink1;
+  const deep = get("deep") || (E.lum(ground) < 0.4 ? "#F4F1EA" : "#161616");
+  return {canvas: ground, ink: deep, primary: ink1, secondary: ink2, accent: spark};
+}
+const inksOf = (pal, tints) => Pat.inksFor(tokens(pal), "brand", {tints: !!tints});
+
+/* "New colors": a curated set, or one of the engine's colourways (spectrum,
+   broadcast, primaries, earth, brass, ...) worked out over a curated set and
+   then handed back as plain swatches. */
+function dealPalette() {
+  const base = PALETTES[(Math.random() * PALETTES.length) | 0];
+  if (Math.random() < 0.5) return pick5(base);
+  const cws = E.COLORWAYS.filter(c => c.value !== "brand");
+  const cw = cws[(Math.random() * cws.length) | 0].value;
+  const k = Pat.inksFor({canvas: base[0], ink: base[3], primary: base[1], secondary: base[2], accent: base[4]}, cw);
+  return pick5([k.ground, k.ink1, k.ink2, k.deep, k.spark]);
+}
+
+/* ---- state ----------------------------------------------------------- */
+const S = {
+  seed: 7, ratio: "1:1", size: 2400,
+  params: Pat.defaults(FAM.key),
+  pal: pick5(PALETTES[0]),
+  motion: {on: false, mode: "none", amount: 0.6, fps: 12, frames: 24}
+};
+
+/* ---- the page's identity ---------------------------------------------- */
+const pad2 = n => String(n).padStart(2, "0");
+document.title = FAM.name + " — Ptrn";
+$("#metaDesc").setAttribute("content", FAM.blurb);
+$("#toolName").textContent = FAM.name;
+$("#idxEcho").textContent = pad2(idx + 1) + " / " + pad2(LIST.length);
+$("#typeEcho").textContent = FAM.category;
+$("#swCountVal").textContent = ROLES.length;
+
+/* ---- controls from the schema ------------------------------------------ */
+const esc = s => String(s).replace(/[&<>"]/g, c => ({"&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;"}[c]));
+const decimals = step => { const s = String(step); return s.indexOf(".") < 0 ? 0 : s.length - s.indexOf(".") - 1; };
+const optVal = o => (o && typeof o === "object") ? o.value : o;
+const optLab = o => (o && typeof o === "object") ? (o.label != null ? o.label : String(o.value)) : String(o);
+const labelOf = s => s.key === "grain" && s.common ? "Paper grain" : s.label;   // the chassis has its own Grain
+const cid = s => "p_" + s.key;
+
+function rowFor(s) {
+  const id = cid(s), v = S.params[s.key];
+  if (s.type === "range") {
+    const dp = decimals(s.step);
+    return `<div class="pr"><div class="top"><span class="k">${esc(labelOf(s))}</span><span class="v" id="${id}Val">${(+v).toFixed(dp)}</span></div>` +
+      `<div class="track"><input type="range" id="${id}" min="${s.min}" max="${s.max}" step="${s.step}" value="${v}"></div></div>`;
+  }
+  if (s.type === "select") {
+    return `<div class="misc stack"><span class="mhead"><span class="k">${esc(labelOf(s))}</span></span><span class="mval"><div class="chips" id="${id}"></div></span></div>`;
+  }
+  return `<div class="misc"><span class="mhead"><span class="k">${esc(labelOf(s))}</span></span><span class="mval">` +
+    `<button class="switch" type="button" id="${id}" aria-pressed="${!!v}" aria-label="${esc(labelOf(s))}"></button></span></div>`;
+}
+const SHOWN = FAM.params.filter(s => !(HIDDEN[FAM.key] || []).includes(s.key));
+const own = SHOWN.filter(s => !s.common), common = SHOWN.filter(s => s.common);
+$("#ctlHost").innerHTML =
+  (own.length ? `<details class="grp" open><summary>Pattern</summary><div class="grp-b">${own.map(rowFor).join("")}</div></details>` : "") +
+  (common.length ? `<details class="grp" open><summary>Finish</summary><div class="grp-b">${common.map(rowFor).join("")}</div></details>` : "");
+
+function wireControls(Pt) {
+  for (const s of SHOWN) {
+    const id = cid(s);
+    if (s.type === "range") {
+      const dp = decimals(s.step);
+      Pt.bindRange(id, v => v.toFixed(dp), v => { S.params[s.key] = v; });
+    } else if (s.type === "select") {
+      Pt.segmented($("#" + id), s.options.map(o => [optVal(o), optLab(o)]), () => S.params[s.key], v => { S.params[s.key] = v; Pt.reframe(); });
+    } else {
+      const b = $("#" + id);
+      b.addEventListener("click", () => { S.params[s.key] = !S.params[s.key]; b.setAttribute("aria-pressed", String(S.params[s.key])); Pt.reframe(); });
+    }
+  }
+}
+
+/* ---- paint -------------------------------------------------------------- */
+/* Patterns.render sizes the canvas it is given and paints the whole sheet.
+   A detached canvas of the right size (every export) is painted directly.
+   The on-screen preview is painted off-screen and copied: a canvas that is on
+   the page gets sub-pixel text smoothing, so a text family (type terrain)
+   would otherwise look different there than in its export. maxPixels is
+   lifted so a big export is never silently scaled down. */
+let off = null;
+function paint(c, W, H) {
+  const cv = c.canvas, direct = cv.width === W && cv.height === H && !cv.isConnected;
+  const target = direct ? cv : (off || (off = document.createElement("canvas")));
+  Pat.render(target, FAM.key, S.params, inksOf(S.pal, S.params.tints), S.seed,
+    {width: W, height: H, dpr: 1, setStyle: false, maxPixels: W * H});
+  if (!direct) c.drawImage(target, 0, 0);
+}
+
+/* SVG export: vector families only, rendered by the engine at export size */
+const cfg = {
+  slug: "studio-" + FAM.key, S, paint, static: true,
+  palettes: PALETTES.map(pick5),
+  roles: ROLES, swatchLabel: i => (ROLE_LABEL[ROLES[i]] || ROLES[i]) + " color",
+  override: {
+    shuffleColors(Pt) { Pt.setPalette(dealPalette()); }
+  },
+  controls: wireControls
+};
+if (FAM.vector) {
+  $("#expRow").insertAdjacentHTML("beforeend", `<button class="lnk" id="expSvg">SVG</button>`);
+  cfg.buildSVG = Pt => {
+    const r = Pt.frame(), W = S.ratio === Pt.MONITOR.id ? Pt.MONITOR.png[0] : S.size, H = Math.round(W * r.h / r.w);
+    return Pat.renderSVG(FAM.key, S.params, inksOf(S.pal, S.params.tints), S.seed, {width: W, height: H, dpr: 1, maxPixels: W * H});
+  };
+}
+Ptrn.boot(cfg);
+})();
+</script>
+<!-- Embed mode: open with ?embed to render just the artwork full-viewport. -->
+<script>
+(function(){
+  var q=new URLSearchParams(location.search);
+  var embedded=q.has("embed")||location.hash.indexOf("embed")>-1;
+  try{embedded=embedded||false;}catch(e){embedded=true;}
+  if(!embedded) return;
+  document.documentElement.classList.add("embed");
+  var R=[[9,16],[3,4],[4,5],[1,1],[5,4],[4,3],[3,2],[16,9]];
+  var vr=innerWidth/Math.max(1,innerHeight),best=3,bd=1e9;
+  for(var i=0;i<R.length;i++){var d=Math.abs(Math.log(vr*R[i][1]/R[i][0]));if(d<bd){bd=d;best=i}}
+  var rb=document.querySelectorAll("#ratios .ratio")[best]; if(rb) rb.click();
+  var seed=q.get("seed"), si=document.getElementById("seed");
+  if(seed&&si){si.value=seed;si.dispatchEvent(new Event("change"));}
+  else{var sh=document.getElementById("shuf"); if(sh) sh.click();}
+  setInterval(function(){var sh=document.getElementById("shuf");if(sh)sh.click();},7000);
+  requestAnimationFrame(function(){requestAnimationFrame(function(){
+    try{if(parent!==window)parent.postMessage({type:"tool-embed-ready"},"*");}catch(e){}
+  });});
+})();
+</script>
+<script src="../_shared/runtime.js"></script>
+</body>
+</html>

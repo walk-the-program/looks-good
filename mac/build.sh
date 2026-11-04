@@ -1,6 +1,9 @@
 #!/bin/bash
-# Builds "Branding Designer.app" and installs it to /Applications
+# Builds "Looks Good.app" and installs it to /Applications
 # (falls back to ~/Applications). Re-run any time; it rebuilds and reinstalls.
+#
+# The bundle identifier and the ~/Library/Application Support/Branding Designer folder keep
+# their old names on purpose: they hold saved brands, and renaming them would hide that work.
 #
 # Env overrides (used for test builds):
 #   BUNDLE_ID=...      bundle identifier      (default com.walkertracy.brandingdesigner)
@@ -10,7 +13,7 @@ set -euo pipefail
 
 MAC_DIR="$(cd "$(dirname "$0")" && pwd)"
 ROOT="$(dirname "$MAC_DIR")"
-APP_NAME="Branding Designer"
+APP_NAME="Looks Good"
 BUNDLE_ID="${BUNDLE_ID:-com.walkertracy.brandingdesigner}"
 BUILD_DIR="$MAC_DIR/build/stage"
 APP="$BUILD_DIR/$APP_NAME.app"
@@ -24,12 +27,12 @@ ARCH_DIR="$BUILD_DIR/arch"
 mkdir -p "$ARCH_DIR"
 for arch in arm64 x86_64; do
   swiftc -O -target "$arch-apple-macos13.0" ${SWIFT_FLAGS:-} \
-    -o "$ARCH_DIR/BrandingDesigner-$arch" "$MAC_DIR/main.swift"
+    -o "$ARCH_DIR/LooksGood-$arch" "$MAC_DIR/main.swift"
 done
-lipo -create "$ARCH_DIR/BrandingDesigner-arm64" "$ARCH_DIR/BrandingDesigner-x86_64" \
-  -output "$APP/Contents/MacOS/BrandingDesigner"
+lipo -create "$ARCH_DIR/LooksGood-arm64" "$ARCH_DIR/LooksGood-x86_64" \
+  -output "$APP/Contents/MacOS/LooksGood"
 rm -rf "$ARCH_DIR"
-lipo -info "$APP/Contents/MacOS/BrandingDesigner"
+lipo -info "$APP/Contents/MacOS/LooksGood"
 
 echo "==> Info.plist"
 sed -e "s/@BUNDLE_ID@/$BUNDLE_ID/" -e "s/@BUILD@/$(date +%Y%m%d%H%M)/" \
@@ -52,7 +55,7 @@ cp "$ROOT/index.html" "$ROOT/favicon.svg" "$WEB/"
 # fonts/ and vendor/ make the app work fully offline: every Google Font the app uses
 # (dev/vendor-fonts.py) and the export libraries (html2canvas, jsPDF). The page loads
 # these local copies first; the CDN / Google Fonts are only a fallback.
-cp -R "$ROOT/css" "$ROOT/js" "$ROOT/fonts" "$ROOT/vendor" "$WEB/"
+cp -R "$ROOT/css" "$ROOT/js" "$ROOT/fonts" "$ROOT/vendor" "$ROOT/patterns-library" "$WEB/"
 # Patterns mode: the private Ptrn mirror (git-ignored; dev/sync-ptrn.py builds it).
 if [ -d "$ROOT/ptrn" ]; then
   cp -R "$ROOT/ptrn" "$WEB/"
@@ -74,7 +77,7 @@ if [ ! -w "$DEST_DIR" ]; then
   mkdir -p "$DEST_DIR"
 fi
 # Quit only the copy being replaced (a test build elsewhere leaves the installed app running).
-RUNNING="$DEST_DIR/$APP_NAME.app/Contents/MacOS/BrandingDesigner"
+RUNNING="$DEST_DIR/$APP_NAME.app/Contents/MacOS/LooksGood"
 # pgrep -f is an unanchored regex: anchor it so ~/Applications/... is not matched by a /Applications/... pattern.
 RUNNING_RE="^$RUNNING( |\$)"
 if pgrep -f "$RUNNING_RE" >/dev/null 2>&1; then

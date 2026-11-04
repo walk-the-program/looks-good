@@ -678,7 +678,7 @@ window.Show = window.Show || {};
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>${esc(B.name)}: brand</title>
 <meta name="description" content="${esc(B.tagline || B.name + ' brand identity')}">
-<meta name="generator" content="Branding Designer">
+<meta name="generator" content="Looks Good">
 ${o.gf}
 <style>
 ${o.fontCss}
@@ -709,7 +709,7 @@ ${SITE_CSS}
 </section>
 ${sections.join('\n')}
 </main>
-<footer class="ms-foot"><span>${esc(B.name)}</span><span>Made with Branding Designer &middot; ${esc(date)}</span></footer>
+<footer class="ms-foot"><span>${esc(B.name)}</span><span>Made with Looks Good &middot; ${esc(date)}</span></footer>
 <div class="ms-pr" hidden role="dialog" aria-modal="true" aria-label="Deck">
   <div class="ms-pr-stage"></div>
   <div class="ms-pr-bar"><button type="button" class="ms-pr-btn" data-go="-1" aria-label="Previous slide">&larr;</button><span class="ms-pr-n" aria-live="polite"></span><button type="button" class="ms-pr-btn" data-go="1" aria-label="Next slide">&rarr;</button><button type="button" class="ms-pr-btn ms-pr-x" aria-label="Close (Esc)">&times;</button></div>
@@ -1090,7 +1090,7 @@ if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeT
       ctx.fillStyle = t.ink;
       ctx.textAlign = 'center';
       ctx.font = `500 ${Math.round(22 * u)}px -apple-system, "Inter", system-ui, sans-serif`;
-      ctx.fillText('Made with Branding Designer', W / 2, y + 80 * u);
+      ctx.fillText('Made with Looks Good', W / 2, y + 80 * u);
       ctx.restore();
     }
     ctx.restore();
@@ -1157,7 +1157,7 @@ if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeT
             J.set(0.42 + 0.56 * (f + 1) / count, `Saving frame ${f + 1} of ${count}`);
             await sleep(0);
           }
-          const note = `How to make the video\n\nThese ${count} pictures are the frames of a 15-second video of ${B4(A)} at ${fps} frames a second, ${W} by ${H} pixels.\nThis browser could not record video directly, so the frames were saved instead.\n\nTo join them into a video:\n- In the Branding Designer Mac app on macOS 14.1 or later, use Share > Video again: it records the video directly.\n- Or, with ffmpeg installed, run this in the folder with the frames:\n  ffmpeg -framerate ${fps} -i ${base}-frame-%03d.png -c:v libx264 -pix_fmt yuv420p ${base}.mp4\n- Or drop the frames into any video editor as an image sequence at ${fps} frames a second.\n`;
+          const note = `How to make the video\n\nThese ${count} pictures are the frames of a 15-second video of ${B4(A)} at ${fps} frames a second, ${W} by ${H} pixels.\nThis browser could not record video directly, so the frames were saved instead.\n\nTo join them into a video:\n- In the Looks Good Mac app on macOS 14.1 or later, use Share > Video again: it records the video directly.\n- Or, with ffmpeg installed, run this in the folder with the frames:\n  ffmpeg -framerate ${fps} -i ${base}-frame-%03d.png -c:v libx264 -pix_fmt yuv420p ${base}.mp4\n- Or drop the frames into any video editor as an image sequence at ${fps} frames a second.\n`;
           await saveBlob(new Blob([note], { type: 'text/plain' }), `${base}-how-to-make-the-video.txt`);
         } finally { batch('end'); }
         Share.last = { kind: 'reel', mode: 'frames', shape, frames: count, fps, width: W, height: H };
@@ -1480,7 +1480,7 @@ if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeT
     ctx.fillStyle = 'rgba(244,242,238,0.4)';
     ctx.fillText(B.tagline || '', m, H - 72, W / 2);
     ctx.textAlign = 'right';
-    ctx.fillText('Made with Branding Designer', W - m, H - 72);
+    ctx.fillText('Made with Looks Good', W - m, H - 72);
     return cv;
   }
 

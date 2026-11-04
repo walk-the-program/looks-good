@@ -1,0 +1,532 @@
+[
+ {
+  "slug": "studio?p=halftone",
+  "href": "patterns-library/studio/index.html?p=halftone",
+  "name": "Halftone field",
+  "cat": "Halftone & print",
+  "desc": "a cloudy noise field cut into a few levels",
+  "art": "patterns-library/thumbs/halftone.jpg",
+  "released": "2026-10-12",
+  "source": "mine"
+ },
+ {
+  "slug": "studio?p=stipple",
+  "href": "patterns-library/studio/index.html?p=stipple",
+  "name": "Stipple",
+  "cat": "Halftone & print",
+  "desc": "hand-inked dots that crowd together where the noise is dense",
+  "art": "patterns-library/thumbs/stipple.jpg",
+  "released": "2026-10-12",
+  "source": "mine"
+ },
+ {
+  "slug": "studio?p=terrain",
+  "href": "patterns-library/studio/index.html?p=terrain",
+  "name": "Posterised terrain",
+  "cat": "Halftone & print",
+  "desc": "noise cut into flat colour regions whose edges break up",
+  "art": "patterns-library/thumbs/terrain.jpg",
+  "released": "2026-10-12",
+  "source": "mine"
+ },
+ {
+  "slug": "studio?p=typeterrain",
+  "href": "patterns-library/studio/index.html?p=typeterrain",
+  "name": "Type terrain",
+  "cat": "Glitch & signal",
+  "desc": "terraced noise typed out one character per cell, light punctuation",
+  "art": "patterns-library/thumbs/typeterrain.jpg",
+  "released": "2026-10-12",
+  "source": "mine"
+ },
+ {
+  "slug": "studio?p=zigzag",
+  "href": "patterns-library/studio/index.html?p=zigzag",
+  "name": "Zigzag",
+  "cat": "Stripes & op-art",
+  "desc": "interlocking teeth in flat colour bands, rounded, chevron or staircase",
+  "art": "patterns-library/thumbs/zigzag.jpg",
+  "released": "2026-10-12",
+  "source": "mine"
+ },
+ {
+  "slug": "studio?p=weave",
+  "href": "patterns-library/studio/index.html?p=weave",
+  "name": "Weave",
+  "cat": "Stripes & op-art",
+  "desc": "stacked ribbons, each ruled with its own vertical stripe rhythm",
+  "art": "patterns-library/thumbs/weave.jpg",
+  "released": "2026-10-12",
+  "source": "mine"
+ },
+ {
+  "slug": "studio?p=oprings",
+  "href": "patterns-library/studio/index.html?p=oprings",
+  "name": "Op-art rings",
+  "cat": "Stripes & op-art",
+  "desc": "flat stripes bent around hidden centres until they read as rings",
+  "art": "patterns-library/thumbs/oprings.jpg",
+  "released": "2026-10-12",
+  "source": "mine"
+ },
+ {
+  "slug": "studio?p=counterchange",
+  "href": "patterns-library/studio/index.html?p=counterchange",
+  "name": "Counterchange",
+  "cat": "Stripes & op-art",
+  "desc": "an even bar field with a centred figure where the bars swap places",
+  "art": "patterns-library/thumbs/counterchange.jpg",
+  "released": "2026-10-12",
+  "source": "mine"
+ },
+ {
+  "slug": "studio?p=chevron",
+  "href": "patterns-library/studio/index.html?p=chevron",
+  "name": "Chevron mirror",
+  "cat": "Stripes & op-art",
+  "desc": "diagonal bands drawn in one quadrant and mirrored out into lozenges",
+  "art": "patterns-library/thumbs/chevron.jpg",
+  "released": "2026-10-12",
+  "source": "mine"
+ },
+ {
+  "slug": "studio?p=arcrise",
+  "href": "patterns-library/studio/index.html?p=arcrise",
+  "name": "Arc rise",
+  "cat": "Stripes & op-art",
+  "desc": "giant concentric colour bands rise from an edge across a field of",
+  "art": "patterns-library/thumbs/arcrise.jpg",
+  "released": "2026-10-12",
+  "source": "mine"
+ },
+ {
+  "slug": "studio?p=pixelquilt",
+  "href": "patterns-library/studio/index.html?p=pixelquilt",
+  "name": "Pixel quilt",
+  "cat": "Pixel & grid",
+  "desc": "a patchwork of coarse-pixel swatches: brick, plaid, checker",
+  "art": "patterns-library/thumbs/pixelquilt.jpg",
+  "released": "2026-10-12",
+  "source": "mine"
+ },
+ {
+  "slug": "studio?p=gradpanes",
+  "href": "patterns-library/studio/index.html?p=gradpanes",
+  "name": "Gradient panes",
+  "cat": "Soft color",
+  "desc": "rows of uneven panes, each one a two-ink ramp running",
+  "art": "patterns-library/thumbs/gradpanes.jpg",
+  "released": "2026-10-12",
+  "source": "mine"
+ },
+ {
+  "slug": "studio?p=glyphgrid",
+  "href": "patterns-library/studio/index.html?p=glyphgrid",
+  "name": "Glyph grid",
+  "cat": "Pixel & grid",
+  "desc": "a lattice of tiny marks: squares, diamonds, rings",
+  "art": "patterns-library/thumbs/glyphgrid.jpg",
+  "released": "2026-10-12",
+  "source": "mine"
+ },
+ {
+  "slug": "studio?p=modulargrid",
+  "href": "patterns-library/studio/index.html?p=modulargrid",
+  "name": "Modular grid",
+  "cat": "Pixel & grid",
+  "desc": "a seeded grid of modules: solid blocks, dot matrices, line fields",
+  "art": "patterns-library/thumbs/modulargrid.jpg",
+  "released": "2026-10-12",
+  "source": "mine"
+ },
+ {
+  "slug": "studio?p=signal",
+  "href": "patterns-library/studio/index.html?p=signal",
+  "name": "Signal mosaic",
+  "cat": "Glitch & signal",
+  "desc": "glitched horizontal bands of pixel confetti, block mosaics",
+  "art": "patterns-library/thumbs/signal.jpg",
+  "released": "2026-10-12",
+  "source": "mine"
+ },
+ {
+  "slug": "studio?p=tornbands",
+  "href": "patterns-library/studio/index.html?p=tornbands",
+  "name": "Torn bands",
+  "cat": "Collage & poster",
+  "desc": "ragged paper strips laid edge over edge, each printed",
+  "art": "patterns-library/thumbs/tornbands.jpg",
+  "released": "2026-10-12",
+  "source": "mine"
+ },
+ {
+  "slug": "studio?p=aura",
+  "href": "patterns-library/studio/index.html?p=aura",
+  "name": "Aura wash",
+  "cat": "Soft color",
+  "desc": "large blurred fields of colour that melt into each other, finished",
+  "art": "patterns-library/thumbs/aura.jpg",
+  "released": "2026-10-12",
+  "source": "mine"
+ },
+ {
+  "slug": "studio?p=flow",
+  "href": "patterns-library/studio/index.html?p=flow",
+  "name": "Flow filaments",
+  "cat": "Botanical & line",
+  "desc": "thin streamlines traced through a noise flow field and bundled",
+  "art": "patterns-library/thumbs/flow.jpg",
+  "released": "2026-10-12",
+  "source": "mine"
+ },
+ {
+  "slug": "studio?p=thermal",
+  "href": "patterns-library/studio/index.html?p=thermal",
+  "name": "Thermal screen",
+  "cat": "Halftone & print",
+  "desc": "turbulent noise posterised into heat-map bands",
+  "art": "patterns-library/thumbs/thermal.jpg",
+  "released": "2026-10-10",
+  "source": "mine"
+ },
+ {
+  "slug": "studio?p=cutup",
+  "href": "patterns-library/studio/index.html?p=cutup",
+  "name": "Cut-up hills",
+  "cat": "Halftone & print",
+  "desc": "one soft hilly field sliced into rectangles, each piece printed",
+  "art": "patterns-library/thumbs/cutup.jpg",
+  "released": "2026-10-10",
+  "source": "mine"
+ },
+ {
+  "slug": "studio?p=sonar",
+  "href": "patterns-library/studio/index.html?p=sonar",
+  "name": "Coastline",
+  "cat": "Halftone & print",
+  "desc": "a landmass cut from noise: halftone dots thin toward the shore",
+  "art": "patterns-library/thumbs/sonar.jpg",
+  "released": "2026-10-10",
+  "source": "mine"
+ },
+ {
+  "slug": "studio?p=inkstill",
+  "href": "patterns-library/studio/index.html?p=inkstill",
+  "name": "Riso still life",
+  "cat": "Halftone & print",
+  "desc": "flat cut-out masses, one-bit pixel outlines of vases and sprigs",
+  "art": "patterns-library/thumbs/inkstill.jpg",
+  "released": "2026-10-10",
+  "source": "mine"
+ },
+ {
+  "slug": "studio?p=warpcheck",
+  "href": "patterns-library/studio/index.html?p=warpcheck",
+  "name": "Warped check",
+  "cat": "Stripes & op-art",
+  "desc": "a razor-clean checker or slash grid pushed through a smooth wave",
+  "art": "patterns-library/thumbs/warpcheck.jpg",
+  "released": "2026-10-10",
+  "source": "mine"
+ },
+ {
+  "slug": "studio?p=burst",
+  "href": "patterns-library/studio/index.html?p=burst",
+  "name": "Dash burst",
+  "cat": "Stripes & op-art",
+  "desc": "rays of short dashes radiating from a centre in stacked inks",
+  "art": "patterns-library/thumbs/burst.jpg",
+  "released": "2026-10-10",
+  "source": "mine"
+ },
+ {
+  "slug": "studio?p=ribbonrise",
+  "href": "patterns-library/studio/index.html?p=ribbonrise",
+  "name": "Banded counterchange",
+  "cat": "Stripes & op-art",
+  "desc": "an even bar field with big concentric colour bands rising from one edge",
+  "art": "patterns-library/thumbs/ribbonrise.jpg",
+  "released": "2026-10-10",
+  "source": "mine"
+ },
+ {
+  "slug": "studio?p=neonspray",
+  "href": "patterns-library/studio/index.html?p=neonspray",
+  "name": "Neon spray",
+  "cat": "Soft color",
+  "desc": "vertical fluorescent streaks bleeding over soft pastel patches",
+  "art": "patterns-library/thumbs/neonspray.jpg",
+  "released": "2026-10-10",
+  "source": "mine"
+ },
+ {
+  "slug": "studio?p=bloomgrid",
+  "href": "patterns-library/studio/index.html?p=bloomgrid",
+  "name": "Mirrored pixel bloom",
+  "cat": "Pixel & grid",
+  "desc": "soft rings spreading from the centre, quantised",
+  "art": "patterns-library/thumbs/bloomgrid.jpg",
+  "released": "2026-10-10",
+  "source": "mine"
+ },
+ {
+  "slug": "studio?p=kaleidopix",
+  "href": "patterns-library/studio/index.html?p=kaleidopix",
+  "name": "Pixel kaleidoscope",
+  "cat": "Pixel & grid",
+  "desc": "a collage of zebra stripes, stairs, dot rows, bursts, chevrons",
+  "art": "patterns-library/thumbs/kaleidopix.jpg",
+  "released": "2026-10-10",
+  "source": "mine"
+ },
+ {
+  "slug": "studio?p=pixelgrid",
+  "href": "patterns-library/studio/index.html?p=pixelgrid",
+  "name": "Pixel grid art",
+  "cat": "Pixel & grid",
+  "desc": "seeded pixel compositions on a grid: zones of blocks, dots",
+  "art": "patterns-library/thumbs/pixelgrid.jpg",
+  "released": "2026-10-10",
+  "source": "mine"
+ },
+ {
+  "slug": "studio?p=parcels",
+  "href": "patterns-library/studio/index.html?p=parcels",
+  "name": "Pixel parcels",
+  "cat": "Pixel & grid",
+  "desc": "chunky two-tone block fields packed edge to edge",
+  "art": "patterns-library/thumbs/parcels.jpg",
+  "released": "2026-10-10",
+  "source": "mine"
+ },
+ {
+  "slug": "studio?p=prismpix",
+  "href": "patterns-library/studio/index.html?p=prismpix",
+  "name": "Pixel aurora",
+  "cat": "Pixel & grid",
+  "desc": "chunky pixel streams in a hot chromatic ramp drifting over a dark",
+  "art": "patterns-library/thumbs/prismpix.jpg",
+  "released": "2026-10-10",
+  "source": "mine"
+ },
+ {
+  "slug": "studio?p=totem",
+  "href": "patterns-library/studio/index.html?p=totem",
+  "name": "Pixel totem",
+  "cat": "Pixel & grid",
+  "desc": "a mirrored central panel of woven pixel motifs inside a static border",
+  "art": "patterns-library/thumbs/totem.jpg",
+  "released": "2026-10-10",
+  "source": "mine"
+ },
+ {
+  "slug": "studio?p=slipgrid",
+  "href": "patterns-library/studio/index.html?p=slipgrid",
+  "name": "Slipped grid",
+  "cat": "Pixel & grid",
+  "desc": "a field smeared into vertical streaks",
+  "art": "patterns-library/thumbs/slipgrid.jpg",
+  "released": "2026-10-10",
+  "source": "mine"
+ },
+ {
+  "slug": "studio?p=tokens",
+  "href": "patterns-library/studio/index.html?p=tokens",
+  "name": "Grid tokens",
+  "cat": "Pixel & grid",
+  "desc": "outlined circles and squares on a grid that chain into capsules",
+  "art": "patterns-library/thumbs/tokens.jpg",
+  "released": "2026-10-10",
+  "source": "mine"
+ },
+ {
+  "slug": "studio?p=relief",
+  "href": "patterns-library/studio/index.html?p=relief",
+  "name": "Routed board",
+  "cat": "Pixel & grid",
+  "desc": "a seamless board of striped, dotted",
+  "art": "patterns-library/thumbs/relief.jpg",
+  "released": "2026-10-10",
+  "source": "mine"
+ },
+ {
+  "slug": "studio?p=colony",
+  "href": "patterns-library/studio/index.html?p=colony",
+  "name": "Cell colony",
+  "cat": "Organic & cellular",
+  "desc": "soft metaball cells that fuse where they touch, each banded",
+  "art": "patterns-library/thumbs/colony.jpg",
+  "released": "2026-10-12",
+  "source": "mine"
+ },
+ {
+  "slug": "studio?p=tissue",
+  "href": "patterns-library/studio/index.html?p=tissue",
+  "name": "Cell tissue",
+  "cat": "Organic & cellular",
+  "desc": "loose Voronoi cells, each filled",
+  "art": "patterns-library/thumbs/tissue.jpg",
+  "released": "2026-10-12",
+  "source": "mine"
+ },
+ {
+  "slug": "studio?p=seafan",
+  "href": "patterns-library/studio/index.html?p=seafan",
+  "name": "Sea fan",
+  "cat": "Organic & cellular",
+  "desc": "ribbed, forking coral growing across a dark ground",
+  "art": "patterns-library/thumbs/seafan.jpg",
+  "released": "2026-10-12",
+  "source": "mine"
+ },
+ {
+  "slug": "studio?p=pebbles",
+  "href": "patterns-library/studio/index.html?p=pebbles",
+  "name": "Pebble field",
+  "cat": "Organic & cellular",
+  "desc": "irregular pebble silhouettes scattered over the ground",
+  "art": "patterns-library/thumbs/pebbles.jpg",
+  "released": "2026-10-12",
+  "source": "mine"
+ },
+ {
+  "slug": "studio?p=marble",
+  "href": "patterns-library/studio/index.html?p=marble",
+  "name": "Cut marbling",
+  "cat": "Organic & cellular",
+  "desc": "poured-paint marbling cut into flat",
+  "art": "patterns-library/thumbs/marble.jpg",
+  "released": "2026-10-12",
+  "source": "mine"
+ },
+ {
+  "slug": "studio?p=thermalstreak",
+  "href": "patterns-library/studio/index.html?p=thermalstreak",
+  "name": "Heat smear",
+  "cat": "Organic & cellular",
+  "desc": "a heat field cut into hard bands, dragged sideways",
+  "art": "patterns-library/thumbs/thermalstreak.jpg",
+  "released": "2026-10-12",
+  "source": "mine"
+ },
+ {
+  "slug": "studio?p=waves",
+  "href": "patterns-library/studio/index.html?p=waves",
+  "name": "Solarised waves",
+  "cat": "Organic & cellular",
+  "desc": "rows of skewed, curling waves combed into fine strands",
+  "art": "patterns-library/thumbs/waves.jpg",
+  "released": "2026-10-12",
+  "source": "mine"
+ },
+ {
+  "slug": "studio?p=snow",
+  "href": "patterns-library/studio/index.html?p=snow",
+  "name": "TV snow leaves",
+  "cat": "Glitch & signal",
+  "desc": "stacked pointed leaves filled with TV static over marbled colour",
+  "art": "patterns-library/thumbs/snow.jpg",
+  "released": "2026-10-10",
+  "source": "mine"
+ },
+ {
+  "slug": "studio?p=onebit",
+  "href": "patterns-library/studio/index.html?p=onebit",
+  "name": "One-bit glitch",
+  "cat": "Glitch & signal",
+  "desc": "two colours only: moire, scanlines, noise",
+  "art": "patterns-library/thumbs/onebit.jpg",
+  "released": "2026-10-10",
+  "source": "mine"
+ },
+ {
+  "slug": "studio?p=satellite",
+  "href": "patterns-library/studio/index.html?p=satellite",
+  "name": "Corrupt satellite",
+  "cat": "Glitch & signal",
+  "desc": "a marbled noise ground under mosaics of clashing pixel blocks",
+  "art": "patterns-library/thumbs/satellite.jpg",
+  "released": "2026-10-10",
+  "source": "mine"
+ },
+ {
+  "slug": "studio?p=panels",
+  "href": "patterns-library/studio/index.html?p=panels",
+  "name": "Panel collage",
+  "cat": "Collage & poster",
+  "desc": "the frame carved into rectangles, each given flat colour, hard stripes",
+  "art": "patterns-library/thumbs/panels.jpg",
+  "released": "2026-10-10",
+  "source": "mine"
+ },
+ {
+  "slug": "studio?p=flyposter",
+  "href": "patterns-library/studio/index.html?p=flyposter",
+  "name": "Fly-poster",
+  "cat": "Collage & poster",
+  "desc": "a sweep of colour that hardens into vertical stripes, with halftone",
+  "art": "patterns-library/thumbs/flyposter.jpg",
+  "released": "2026-10-10",
+  "source": "mine"
+ },
+ {
+  "slug": "studio?p=festival",
+  "href": "patterns-library/studio/index.html?p=festival",
+  "name": "Festival",
+  "cat": "Collage & poster",
+  "desc": "chunky colour patches, one big freehand looping line",
+  "art": "patterns-library/thumbs/festival.jpg",
+  "released": "2026-10-10",
+  "source": "mine"
+ },
+ {
+  "slug": "studio?p=patchwork",
+  "href": "patterns-library/studio/index.html?p=patchwork",
+  "name": "Glyph patchwork",
+  "cat": "Collage & poster",
+  "desc": "ragged blobs and stepped blocks layered on a grid, each filled",
+  "art": "patterns-library/thumbs/patchwork.jpg",
+  "released": "2026-10-10",
+  "source": "mine"
+ },
+ {
+  "slug": "studio?p=specimens",
+  "href": "patterns-library/studio/index.html?p=specimens",
+  "name": "Colour specimens",
+  "cat": "Collage & poster",
+  "desc": "a grid of abstract colour blocks on a light ground",
+  "art": "patterns-library/thumbs/specimens.jpg",
+  "released": "2026-10-10",
+  "source": "mine"
+ },
+ {
+  "slug": "studio?p=sprigs",
+  "href": "patterns-library/studio/index.html?p=sprigs",
+  "name": "Marker botanicals",
+  "cat": "Botanical & line",
+  "desc": "blooms, leaves, stems and berries drawn in a thick marker line",
+  "art": "patterns-library/thumbs/sprigs.jpg",
+  "released": "2026-10-10",
+  "source": "mine"
+ },
+ {
+  "slug": "studio?p=blades",
+  "href": "patterns-library/studio/index.html?p=blades",
+  "name": "Scattered blades",
+  "cat": "Botanical & line",
+  "desc": "curved blade shapes thrown across the ground in one ink",
+  "art": "patterns-library/thumbs/blades.jpg",
+  "released": "2026-10-10",
+  "source": "mine"
+ },
+ {
+  "slug": "studio?p=rods",
+  "href": "patterns-library/studio/index.html?p=rods",
+  "name": "Chained rods",
+  "cat": "Botanical & line",
+  "desc": "branching chains of short rods that wander and fork",
+  "art": "patterns-library/thumbs/rods.jpg",
+  "released": "2026-10-10",
+  "source": "mine"
+ }
+]

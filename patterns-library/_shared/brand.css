@@ -1,0 +1,20 @@
+/*
+ * Ptrn brand mark (replaces the old logo image).
+ * The wordmark is plain text in DM Mono (self-hosted in /_fonts). DM Mono is
+ * only shipped at weight 400, so that is the weight used here.
+ * .brand keeps the old image's aspect ratio (694:282), so the identity row
+ * keeps its height at every width the pages already set for .brand.
+ * (a.idline beats the pages' own `.idline .brand{display:block}` rule.)
+ */
+a.idline .brand{display:flex;align-items:center;aspect-ratio:694/282}
+.ptrn-mark{
+  display:block;
+  font-family:"DM Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  font-weight:400;
+  font-size:22px;
+  line-height:1;
+  letter-spacing:.02em;
+  text-transform:lowercase;
+  white-space:nowrap;
+  color:var(--ink,#15161A);
+}

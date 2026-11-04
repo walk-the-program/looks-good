@@ -2,9 +2,9 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-  <key>CFBundleName</key><string>Branding Designer</string>
-  <key>CFBundleDisplayName</key><string>Branding Designer</string>
-  <key>CFBundleExecutable</key><string>BrandingDesigner</string>
+  <key>CFBundleName</key><string>Looks Good</string>
+  <key>CFBundleDisplayName</key><string>Looks Good</string>
+  <key>CFBundleExecutable</key><string>LooksGood</string>
   <key>CFBundleIdentifier</key><string>@BUNDLE_ID@</string>
   <key>CFBundleIconFile</key><string>AppIcon</string>
   <key>CFBundlePackageType</key><string>APPL</string>

@@ -485,7 +485,7 @@ function briefOpenProduct() {
     };
     syncBlocked(checked.issues);
     docEl.innerHTML = lintHtml(checked.issues) + [coverHtml(ctx), colourHtml(ctx), typeHtml(ctx), componentsHtml(ctx), patternsHtml(ctx), shapeHtml(ctx), textHtml(ctx)].join('') +
-      `<footer class="bv-foot">Made with Branding Designer. Locked colours, fonts and shapes above are final; nothing here is sent anywhere.</footer>`;
+      `<footer class="bv-foot">Made with Looks Good. Locked colours, fonts and shapes above are final; nothing here is sent anywhere.</footer>`;
     drawPatterns(ctx);
     root.querySelector('.bv-bar-brand').textContent = ctx.brandName;
   }

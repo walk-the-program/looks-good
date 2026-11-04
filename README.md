@@ -1,31 +1,42 @@
-# Branding Designer
+# Looks Good
 
-A local, no-build-step tool for rapidly auditioning brand combinations —
-fonts and color palettes, set in an aesthetic that draws its own corners, borders and shadows — with live heuristic
-design feedback and a ten-slide brand deck rendered in the selected aesthetic. The
-app chrome is a light warm-grey workspace so the only colors on screen
-are the brand's own.
+*Formerly Branding Designer. A Nominal Studios tool.*
 
-## Run it
+Looks Good is a local, no-build-step tool for auditioning a brand live. Pick fonts, colour palettes and an aesthetic that draws its own corners, borders and shadows, and watch heuristic design feedback update as you go. It renders a ten-slide brand deck in the chosen look, writes an AI build brief you can hand to a coding agent, and includes a pattern studio with 53 generative patterns. The app chrome is a light warm-grey workspace so the only colours on screen are the brand's own.
 
-No dependencies, no build step. From this folder, start any static file
-server, for example:
+Everything runs in your browser. No backend, no account, no analytics; nothing leaves your machine. Fonts and the export libraries are bundled, so it works offline.
+
+## Quick start
+
+**Windows**
+1. On GitHub, click **Code > Download ZIP**, then unzip it (right-click > Extract All).
+2. Open the folder and double-click **Start Looks Good.bat**.
+3. If Windows SmartScreen says "Windows protected your PC", click **More info**, then **Run anyway**.
+4. Your browser opens on the app. Leave the black window open while you use it; close it to stop.
+
+It uses Python if you have it, and otherwise a built-in PowerShell server, so nothing needs installing.
+
+**Mac**
+1. Download the ZIP and unzip it.
+2. Double-click **Start Looks Good.command**. The first time, right-click it and choose **Open**, then **Open** again.
+3. Needs `python3` (a Mac prompts to install the command line tools if it is missing).
+
+**Any OS**
 
 ```bash
-python3 -m http.server 8080
+python3 -m http.server 8080   # or: python -m http.server 8080
 # then open http://localhost:8080
 ```
 
-or, if you have Node:
+`./start.sh` does the same on Mac and Linux, and picks a free port if 8765 is busy.
 
-```bash
-npx serve .
-```
+## License
 
-Requires an internet connection on first load (it pulls the type family
-set from Google Fonts, plus html2canvas/jsPDF for PNG/PDF export, from
-CDNs); everything else runs entirely client-side — no backend, no
-analytics, no data leaves your machine.
+TBD.
+
+## Credits
+
+The 118 fonts in `fonts/` are SIL Open Font License families from Google Fonts; copyright notices are in `fonts/CREDITS.txt`. `vendor/` holds html2canvas and jsPDF (both MIT). The pattern studio page uses DM Mono (OFL) from `patterns-library/_fonts/`.
 
 ## Mac app
 
@@ -39,10 +50,10 @@ To build and install it:
 This compiles the Swift wrapper as one universal binary (Apple silicon and
 Intel, macOS 13 or later), generates the icon, copies `index.html`, `css/`,
 `js/`, `fonts/` and `vendor/` into the bundle, ad-hoc signs it, and installs
-**Branding Designer.app** to `/Applications` (or `~/Applications` if that
+**Looks Good.app** to `/Applications` (or `~/Applications` if that
 isn't writable). Re-run it after any web change; it quits the installed copy
 first. Your session autosave and window size and position persist between
-launches. The browser version (`python3 -m http.server`) is unchanged.
+launches. The saved-work folder (`~/Library/Application Support/Branding Designer/`) and the bundle identifier keep their old names on purpose, so work saved before the rename still opens. The browser version (`python3 -m http.server`) is unchanged.
 
 **Works offline.** Every Google Font the app uses is bundled in `fonts/`
 (118 families, latin subset, about 4 MB) and html2canvas and jsPDF are in
@@ -74,7 +85,7 @@ With a Developer ID, sign and notarize the installed app like this, replacing
 `TEAMID` and the Apple ID details:
 
 ```bash
-APP="/Applications/Branding Designer.app"
+APP="/Applications/Looks Good.app"
 # 1. Sign with the Developer ID certificate and the hardened runtime.
 codesign --force --deep --options runtime --timestamp \
   --sign "Developer ID Application: Your Name (TEAMID)" "$APP"
@@ -82,12 +93,12 @@ codesign --verify --deep --strict --verbose=2 "$APP"
 # 2. Zip, submit to Apple's notary service and wait for the result.
 #    (Once: xcrun notarytool store-credentials bd-notary --apple-id you@example.com \
 #            --team-id TEAMID --password <app-specific password>)
-ditto -c -k --keepParent "$APP" "Branding Designer.zip"
-xcrun notarytool submit "Branding Designer.zip" --keychain-profile bd-notary --wait
+ditto -c -k --keepParent "$APP" "Looks Good.zip"
+xcrun notarytool submit "Looks Good.zip" --keychain-profile bd-notary --wait
 # 3. Staple the ticket so the app opens without a network check, then re-zip to share.
 xcrun stapler staple "$APP"
 spctl --assess --type execute --verbose "$APP"     # should say: source=Notarized Developer ID
-ditto -c -k --keepParent "$APP" "Branding Designer.zip"
+ditto -c -k --keepParent "$APP" "Looks Good.zip"
 ```
 
 The app needs no entitlements beyond the hardened runtime (WKWebView,
@@ -196,11 +207,13 @@ families that tile. Files: `js/patterns/` (engine, families, aesthetic fit),
 `docs/patterns.md`. `dev/patterns-lab.html` is a developer test bench only and
 is not part of the app or the Mac build's runtime.
 
-## Patterns mode (Ptrn tools)
+## Patterns mode
 
-The **Brands | Patterns** switch at the top of the opening screen toggles between your brand library and a browsable grid of 105 pattern tools: 52 mirrored Ptrn tools and 53 of my own pattern families. Open one to use it full-window inside Branding Designer's own top bar (`Esc` goes back, `[` and `]` step through the list). The last mode and the open tool are remembered, and `css/ptrn-theme.css` restyles the tools in Branding Designer's look.
+The **Brands | Patterns** switch at the top of the opening screen toggles between your brand library and a browsable grid of pattern tools. Open one to use it full-window inside Looks Good's own top bar (`Esc` goes back, `[` and `]` step through the list). The last mode and the open tool are remembered, and `css/ptrn-theme.css` restyles the tools in Looks Good's look.
 
-The tools live in `ptrn/`, which is **git-ignored on purpose**: it is a private mirror of `~/Desktop/Ptrn/site`, and the mirrored tools are not for publishing. Only the integration code is committed. To create or refresh the mirror:
+The public repository ships 53 of the author's own pattern families in `patterns-library/` (a studio page that runs the engine in `js/patterns/`, one thumbnail each, and `catalog.json`). `dev/build-public-patterns.py` regenerates that catalog and the thumbnails from a local Ptrn mirror, keeping only entries marked `source: "mine"`.
+
+The author's private working copy also has a git-ignored `ptrn/` folder (a mirror of his Ptrn site, 105 tools including third-party ones that are not for publishing). When `ptrn/catalog.json` exists the app uses it, with a Mine/Ptrn filter; when it doesn't, the app uses `patterns-library/`. To create or refresh the private mirror:
 
 ```
 python3 dev/sync-ptrn.py            # or: --source /path/to/Ptrn/site

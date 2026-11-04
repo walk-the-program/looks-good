@@ -5,7 +5,7 @@ Copies ~/Desktop/Ptrn/site into ./ptrn (git-ignored on purpose: the mirrored too
 someone else's work, not for publishing or version control), then:
   1. rewrites root-absolute asset paths (/_shared, /_fonts, /_studio, /favicon, /apple-touch)
      to /ptrn/... so the pages work from a subfolder and from app://local/;
-  2. neutralizes the "framed means embed" auto-detect, so a tool inside Branding Designer's
+  2. neutralizes the "framed means embed" auto-detect, so a tool inside Looks Good's
      iframe keeps its full controls (an explicit ?embed still works);
   3. writes ptrn/catalog.json from the TOOLS array on the Ptrn homepage.
 

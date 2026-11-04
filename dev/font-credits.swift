@@ -24,7 +24,7 @@ func copyright(_ file: String) -> String {
     return s.replacingOccurrences(of: "\n", with: " ").trimmingCharacters(in: .whitespaces)
 }
 var out = """
-Fonts bundled with Branding Designer
+Fonts bundled with Looks Good
 ====================================
 Copied unmodified from Google Fonts (fonts.google.com) by dev/vendor-fonts.py (latin subset).
 Each font is free software under the licence named with it:

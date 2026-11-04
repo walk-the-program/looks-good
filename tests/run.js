@@ -934,7 +934,7 @@ check('paste: empty text', run(`extractColors('').length`) === 0, 'found colors 
     check('product: the App brief with a product has a Guided Product screens section, no Built screens or Screen layouts, and the product header',
       /\n## Product screens \(Guided\)\n/.test(md) && !/## Built screens|## Screen layouts|Built screens/.test(md) && /\nProduct: Signl\. Fast mental math/.test(md)
       && /### Home\n- Job: Show I'm improving/.test(md) && /  1\. Hero numeral "1,482", labelled "Arithmetic rating", with "\+60 this week"\./.test(md)
-      && /Fold budget: Rating, Start and Daily/.test(md) && /Signature placement: tab bar\./.test(md) && /  - Error: none\./.test(md) && /comps are viewable in Branding Designer only|Comps of these screens are viewable in Branding Designer only/.test(md) && !/comps\/home-light/.test(md)
+      && /Fold budget: Rating, Start and Daily/.test(md) && /Signature placement: tab bar\./.test(md) && /  - Error: none\./.test(md) && /comps are viewable in Looks Good only|Comps of these screens are viewable in Looks Good only/.test(md) && !/comps\/home-light/.test(md)
       && /comps\/home-light\.png, comps\/home-dark\.png/.test(withP.comps) && !/## Product screens/.test(withP.web), md.slice(md.indexOf('## Product screens') - 20, md.indexOf('## Product screens') + 400));
     check('product: lint adds unapproved-screens (N of M approved) until every screen is approved',
       withP.pi.some(i => i.code === 'unapproved-screens' && i.section === 'Product screens' && i.message === 'Approve every product screen first (0 of 1 approved)') && !withP.oi.some(i => i.code === 'unapproved-screens'), JSON.stringify(withP.pi.map(i => i.code)));

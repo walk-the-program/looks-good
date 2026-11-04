@@ -383,7 +383,7 @@
     if (!product) {
       host.innerHTML = `<section class="ps-empty">
         <h2>Product</h2>
-        <p class="ps-lede">A product sheet lists your app's screens, what each one is for and its real content. Branding Designer draws each screen in this look so you can approve it before any agent builds.</p>
+        <p class="ps-lede">A product sheet lists your app's screens, what each one is for and its real content. Looks Good draws each screen in this look so you can approve it before any agent builds.</p>
         ${typeof parseProductSheet === 'function' ? '' : '<p class="ps-hint">Product sheet support is not loaded in this build.</p>'}
         ${loaderHtml(false)}${warningsHtml()}</section>`;
       return host;

@@ -1,0 +1,599 @@
+:root{
+  --gnd:#EFEFEC;
+  --ink:#15161A;
+  --hair:rgba(21,22,26,.28);
+  --hair2:rgba(21,22,26,.13);
+  --key:rgba(21,22,26,.45);
+  --mono:"DM Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  --pad:56px;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{min-height:100dvh;background:radial-gradient(120% 80% at 50% 0%,#F5F5F3 0%,#EAEAE7 100%);
+  background-attachment:fixed;color:var(--ink);font-family:var(--mono);font-weight:400;
+  -webkit-font-smoothing:antialiased;overflow:hidden}
+button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer}
+input{font:inherit;color:inherit}
+:focus-visible{outline:1px solid var(--ink);outline-offset:3px}
+
+/* ---------------- page marks ---------------- */
+.mark{position:fixed;pointer-events:none;z-index:1}
+.crop{width:20px;height:20px;border:1px solid var(--hair)}
+.crop.tl{left:26px;top:26px;border-right:0;border-bottom:0}
+.crop.tr{right:26px;top:26px;border-left:0;border-bottom:0}
+.crop.bl{left:26px;bottom:26px;border-right:0;border-top:0}
+.crop.br{right:26px;bottom:26px;border-left:0;border-top:0}
+.edgetick{width:8px;height:1px;background:var(--hair)}
+
+/* ---------------- type ---------------- */
+/* Output and Frame read heavier only because they are <h2>; state it outright so
+   the group headings can match */
+.h{font-size:10px;letter-spacing:.32em;text-transform:uppercase;margin:0 0 13px;
+  font-weight:700}
+.k{font-size:8.5px;letter-spacing:.19em;text-transform:uppercase;color:var(--key)}
+.v{font-size:8.5px;letter-spacing:.19em;text-transform:uppercase}
+.tbl{display:grid;grid-template-columns:auto auto;column-gap:22px;row-gap:5px;align-items:baseline}
+.tbl .v{justify-self:start}
+/* every button is a pill; anything you click carries the heading weight */
+.lnk{display:inline-flex;align-items:center;justify-content:center;gap:7px;
+  height:26px;padding:0 15px;border:1px solid var(--ink);border-radius:999px;
+  font-size:8.5px;letter-spacing:.19em;text-transform:uppercase;font-weight:700;
+  color:var(--ink);background:none;text-decoration:none;
+  transition:background .13s,color .13s}
+/* icons carried over from a tool's own buttons stay at label size */
+.lnk svg,.misc svg,.grp-b svg{width:11px;height:11px;flex:none;display:block}
+.lnk:hover{background:rgba(21,22,26,.07);color:var(--ink)}
+.lnk[aria-pressed=true],.lnk.on{background:var(--ink);color:var(--gnd);text-decoration:none}
+/* Video and SVG loop switch themselves off until Animate is on. The chassis
+   styled a disabled scrub bar and disabled capture arrows but never a
+   disabled .lnk, so those two buttons looked exactly like working ones,
+   swallowed the click, and read as broken. */
+.lnk[disabled]{opacity:.3;cursor:not-allowed}
+.lnk[disabled]:hover{background:none;color:var(--ink)}
+/* The one standing line of text that stays, because it is not documentation:
+   it says why the Video button is dead, which is the difference between a
+   control that is disabled and one that looks broken. It carries its own size
+   and colour rather than sharing a rule with the notes, which went — left
+   leaning on that rule it fell back to the browser's default paragraph and
+   came out at twice the size of everything around it. */
+.vidhint{margin:14px 0 0;font-size:8.5px;letter-spacing:.06em;line-height:1.7;
+  color:var(--key);text-transform:none}
+
+/* ---------------- rig ---------------- */
+.rig{height:100dvh;display:grid;
+  grid-template-columns:246px minmax(0,1fr) 246px;
+  grid-template-rows:minmax(0,1fr) auto;
+  padding:var(--pad) 60px;column-gap:38px;row-gap:16px;position:relative;z-index:2}
+.zone{min-width:0}
+/* the side columns run the full height of the page and scroll on their own, so a
+   tool can carry any number of parameter groups without the layout changing */
+.z-left{grid-column:1;grid-row:1/3} .z-right{grid-column:3;grid-row:1/3}
+.z-left,.z-right{align-self:stretch;min-height:0;max-height:100%;
+  display:flex;flex-direction:column}
+/* one soft-edged scroll box: no scrollbar, no border, just a fade at the foot */
+.l-scroll,.z-right{flex:1 1 auto;min-height:0;overflow-y:auto;overflow-x:hidden;
+  scrollbar-width:none;-ms-overflow-style:none;--fade:0px;
+  -webkit-mask-image:linear-gradient(to bottom,#000 calc(100% - var(--fade)),transparent 100%);
+  mask-image:linear-gradient(to bottom,#000 calc(100% - var(--fade)),transparent 100%)}
+.l-scroll::-webkit-scrollbar,.z-right::-webkit-scrollbar{width:0;height:0;display:none}
+.l-top,.l-bot{flex:none}
+.l-bot{padding-top:26px}
+.z-stage{grid-column:2;grid-row:1}
+.z-bottom{grid-column:2;grid-row:2;justify-self:center;text-align:center}
+.z-right{text-align:right}
+.r-mid{margin:auto 0}          /* centred between the readout and the corner */
+.r-bot{flex:none;margin-top:auto}   /* pinned to the foot of the column */
+
+/* ---------------- identity ---------------- */
+.idline{display:flex;align-items:center;gap:10px;text-decoration:none;color:inherit;margin-bottom:14px}
+.idline .brand{display:block;width:118px;color:var(--ink)}
+.idline .brand img{width:100%;height:auto;display:block}
+.idline .slash{font-size:10px;color:var(--key)}
+.idline .tool{font-size:10px;letter-spacing:.32em;text-transform:uppercase}
+.back{margin-top:16px}
+
+/* ---------------- variation pill ---------------- */
+.seed{width:62px;border:0;background:none;text-align:center;font-size:9px;
+  letter-spacing:.16em;padding:0}
+.seed:focus{outline:none;text-decoration:underline;text-underline-offset:4px}
+.pbtn{height:20px;padding:0 12px;border-radius:999px;font-size:8.5px;letter-spacing:.22em;
+  text-transform:uppercase;font-weight:700;color:var(--key);transition:.12s}
+.pbtn:hover{color:var(--ink)}
+
+/* standalone pill button — same language as the variation pill */
+.pillbtn{height:28px;padding:0 18px;border-radius:999px;border:1px solid var(--ink);
+  background:none;color:var(--ink);font-size:8.5px;letter-spacing:.22em;
+  text-transform:uppercase;font-weight:700;transition:background .13s,color .13s}
+.pillbtn:hover{background:rgba(21,22,26,.07)}
+.pillbtn[aria-pressed=true]{background:var(--ink);color:var(--gnd)}
+.pillbtn[aria-pressed=true]:hover{background:var(--ink);opacity:.85}
+.btnrow{display:flex;justify-content:flex-end;gap:10px}
+
+/* ---- Animate, Dither, Grain: switch-headed sections in the left rail ----
+   The row reads like every other group heading, full ink on or off: a greyed
+   heading looks like a control that has been taken away rather than one that
+   is merely switched off. The switch alone carries the state, and the dials
+   appear under the row once it is on. */
+.tog-grp{margin:0 0 4px}
+.tog-grp>.pillbtn{width:100%;height:auto;padding:15px 0 13px;border:0;border-radius:0;
+  background:none;color:var(--ink);display:flex;align-items:center;gap:12px;
+  justify-content:space-between;cursor:pointer;
+  font-size:10px;letter-spacing:.32em;text-transform:uppercase;font-weight:700}
+.tog-grp>.pillbtn:hover,.tog-grp>.pillbtn[aria-pressed=true]{background:none;color:var(--ink);opacity:1}
+/* The scroll box clips at its own right edge, and the switch sits on that
+   edge; the moment its border darkens on hover, a browser that rounds the
+   box a fraction wide cuts the right side off the track. So the scroll's
+   clip edge is pushed six pixels out into the column gap while its content
+   stays exactly where it was: nothing moves, and there is room to spare. */
+.l-scroll{padding-right:6px;margin-right:-6px}
+.tog-grp .sw{position:relative;flex:none;width:28px;height:15px;border-radius:999px;
+  border:1px solid var(--ink);background:none}
+/* nothing happens on hover; the knob slides only when the switch is thrown */
+.tog-grp .sw::after{content:"";position:absolute;top:2px;left:2px;width:9px;height:9px;
+  border-radius:50%;background:var(--ink);transition:transform .16s ease}
+.tog-grp>.pillbtn[aria-pressed=true] .sw{background:var(--ink);border-color:var(--ink)}
+.tog-grp>.pillbtn[aria-pressed=true] .sw::after{transform:translateX(13px);background:var(--gnd)}
+.tog-grp>.group{margin-top:0;padding-bottom:8px}
+.copy.done{color:var(--ink)}
+
+/* ---------------- hairline sliders ---------------- */
+.pr{margin-bottom:17px}
+.pr .top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:5px}
+.track{position:relative;height:16px}
+/* The two hairlines are drawn on the wrapper, and a wrapper's ::after paints
+   on top of its own children — so without this the fill line covered the
+   middle of the range input and ate the click that landed on it. */
+.track::before,.track::after,.scrubwrap::before{pointer-events:none}
+.track::before{content:"";position:absolute;left:0;right:0;top:7px;height:1px;background:var(--hair2)}
+.track{--tw:10px}
+.track::after{content:"";position:absolute;left:0;top:7px;height:1px;background:var(--ink);
+  width:calc(var(--tw)/2 + (100% - var(--tw)) * var(--p,0) / 100)}
+.pr:hover .track::after{height:2px;top:6.5px}
+.track input[type=range]{position:absolute;inset:0;width:100%;height:16px;margin:0;
+  -webkit-appearance:none;appearance:none;background:none;cursor:pointer;
+  /* A finger dragging sideways along a slider looks a lot like a finger
+     swiping the panel, and the browser resolves that in favour of the scroll
+     unless it is told otherwise. pan-y keeps the vertical swipe for the panel
+     and hands every sideways drag to the control. */
+  touch-action:pan-y}
+.track input[type=range]:active{cursor:grabbing}
+.track input[type=range]::-webkit-slider-runnable-track{height:16px;background:none}
+/* the dot stays one size — its width is baked into the fill and notch maths above */
+.track input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;
+  width:10px;height:10px;border:0;border-radius:50%;background:var(--ink);
+  /* webkit hangs the thumb from the top of the runnable track, so this margin is
+     what centres the dot on the 1px rule at 7.5px, not decoration */
+  margin-top:2.5px}
+.track input[type=range]::-moz-range-track{height:16px;background:none;border:0}
+.track input[type=range]::-moz-range-thumb{width:10px;height:10px;border:0;border-radius:50%;
+  background:var(--ink);cursor:grab}
+.track input[type=range]:active::-moz-range-thumb{cursor:grabbing}
+.notch{position:absolute;top:5px;width:1px;height:5px;background:var(--hair2)}
+/* A sixteen-pixel band is a hard thing to land a fingertip on: Apple asks for
+   forty-four and a finger covers most of the row either way. Under a coarse
+   pointer the input grows to forty and hangs over the row above and below its
+   own hairline. Nothing moves — the drawn slider is exactly where it was, the
+   target around it is simply bigger than what you can see. The rows are far
+   enough apart that two of these never overlap. */
+@media (pointer:coarse){
+  .track input[type=range]{top:-12px;bottom:-12px;height:auto}
+  .track input[type=range]::-webkit-slider-runnable-track{height:40px}
+  /* webkit hangs the thumb from the top of the runnable track, so this is what
+     re-centres the dot on the hairline now that the track is forty tall */
+  .track input[type=range]::-webkit-slider-thumb{margin-top:15px}
+  #scrub{height:38px;margin:-12px 0}
+  #scrub::-webkit-slider-runnable-track{height:38px}
+  #scrub::-webkit-slider-thumb{margin-top:13.5px}
+  .scrubwrap{position:relative;z-index:1}
+}
+/* safety net: if a range control ever escapes the converter it still reads in
+   ink rather than the browser's blue */
+input[type=range]{accent-color:var(--ink)}
+
+/* ---------------- stage ---------------- */
+.z-stage{position:relative;display:grid;place-items:center;padding:34px 46px 30px;min-height:0}
+.ring{position:absolute;left:50%;top:50%;translate:-50% -50%;
+  width:var(--ring,100%);height:var(--ring,100%);aspect-ratio:1;
+  border:1px solid var(--hair2);border-radius:50%;pointer-events:none}
+.xh{position:absolute;background:var(--hair2);pointer-events:none}
+.xh.hz{left:-24px;right:-24px;top:50%;height:1px}
+.xh.vt{top:-24px;bottom:-24px;left:50%;width:1px}
+.holder{position:relative;display:block;max-width:100%;max-height:100%;line-height:0}
+#art{display:block;max-width:100%;max-height:100%;cursor:pointer;
+  box-shadow:0 26px 60px rgba(21,22,26,.14)}
+.corner{position:absolute;width:12px;height:12px;border:1px solid var(--ink);pointer-events:none}
+.corner.a{left:-18px;top:-18px;border-right:0;border-bottom:0}
+.corner.b{right:-18px;top:-18px;border-left:0;border-bottom:0}
+.corner.c{left:-18px;bottom:-18px;border-right:0;border-top:0}
+.corner.d{right:-18px;bottom:-18px;border-left:0;border-top:0}
+
+/* ---------------- frame rack ---------------- */
+.rack{display:grid;grid-template-columns:repeat(4,1fr);gap:12px 10px;margin-bottom:18px}
+.ratio{height:40px;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:6px}
+.ratio .box{border:1px solid var(--hair);transition:.12s}
+.ratio .t{font-size:7.5px;letter-spacing:.15em;color:var(--key);transition:.12s}
+.ratio:hover .box{border-color:var(--ink)}
+.ratio:hover .t{color:var(--ink)}
+.ratio[aria-pressed=true] .box{border-color:var(--ink);background:var(--ink)}
+.ratio[aria-pressed=true] .t{color:var(--ink)}
+
+/* The hidden attribute only means display:none in the browser's own sheet, so
+   any display rule of ours quietly outranks it — .misc{display:flex} was
+   keeping rows on screen that had been hidden deliberately. State it once,
+   loudly, rather than remembering to at every rule that sets display. */
+[hidden]{display:none!important}
+
+/* ---------------- typed fields ---------------- */
+/* One hairline under the text, the same weight as a slider track, so a field
+   you type into reads as part of the instrument rather than as a web form. */
+.mval input[type=text]{width:100%;min-width:0;box-sizing:border-box;border:0;
+  border-bottom:1px solid var(--hair);background:none;color:var(--ink);
+  font-family:var(--mono);font-size:10px;letter-spacing:.10em;padding:4px 0}
+.mval input[type=text]:focus{outline:none;border-bottom-color:var(--ink)}
+.mval input[type=text]::placeholder{color:var(--key)}
+
+/* ---------------- first run ---------------- */
+/* The one thing a newcomer has to discover is that New deals a whole new
+   picture. Everything else can be found by poking about; that cannot, because
+   the button looks like a form control. Shown once, ever. */
+.firstrun{position:fixed;z-index:40;padding:9px 15px;border:1px solid var(--ink);
+  border-radius:999px;background:var(--gnd);color:var(--ink);
+  font-size:8.5px;letter-spacing:.19em;text-transform:uppercase;white-space:nowrap;
+  opacity:0;translate:0 -6px;transition:opacity .32s ease,translate .32s ease;
+  pointer-events:none;box-shadow:0 8px 26px rgba(21,22,26,.10)}
+.firstrun.on{opacity:1;translate:0 0}
+.firstrun::before{content:"";position:absolute;left:var(--ax,50%);top:-4px;width:6px;height:6px;
+  margin-left:-3px;background:var(--gnd);border-left:1px solid var(--ink);
+  border-top:1px solid var(--ink);rotate:45deg}
+/* ---- new variation ----------------------------------------------------
+   It used to float over the middle of the artwork's top edge, which put the
+   one control everybody reaches for somewhere nothing else lives, and cost
+   the artwork the space it sat in. It goes with the other controls now,
+   under the way back to the index, and says what it does.
+------------------------------------------------------------------------ */
+.newblk{margin-top:22px}
+.newlab{display:flex;align-items:center;justify-content:space-between;margin-bottom:9px}
+.newlab .seedwrap{display:flex;align-items:center;gap:4px}
+.newlab .seed{width:auto;min-width:34px;text-align:right}
+.newbtn{width:100%;display:grid;grid-template-columns:auto 1fr;grid-template-rows:auto auto;
+  column-gap:11px;align-items:center;text-align:left;
+  background:var(--ink);color:var(--gnd);border:0;border-radius:7px;
+  padding:12px 14px;cursor:pointer;font-family:var(--mono);
+  transition:opacity .15s ease,transform .12s ease}
+.newbtn:hover{opacity:.87}
+.newbtn:active{transform:translateY(1px)}
+.newbtn .ico{grid-row:1/3;font-size:21px;line-height:1;opacity:.9}
+.newbtn .t{font-size:11px;letter-spacing:.12em;text-transform:uppercase}
+.newbtn .sub{font-size:8px;letter-spacing:.1em;opacity:.62;margin-top:3px}
+.newbtn.nudge{animation:nudge 1.8s ease-in-out 3}
+@keyframes nudge{0%,100%{transform:none}12%{transform:translateY(-2px)}24%{transform:none}}
+@media (prefers-reduced-motion:reduce){
+  .firstrun{transition:none}
+  .newbtn.nudge{animation:none}
+}
+/* ---- My colors: one saved set, kept by the browser, used by every tool ----
+   Not a section of its own: a mode of the Color block. The switch sits on the
+   block's heading where the fold marker sits on the other groups, and when it
+   is on the swatch row is the set. */
+.grp.mine>summary::after{display:none}
+.mycsw[hidden]{display:none}
+.mycsw{display:flex;align-items:center;gap:10px;border:0;background:none;padding:0;margin:0;
+  color:var(--key);font-size:8.5px;letter-spacing:.19em;text-transform:uppercase;font-weight:700;
+  cursor:pointer}
+.mycsw[aria-pressed=true]{color:var(--ink)}
+.mycsw .sw{position:relative;flex:none;width:28px;height:15px;border-radius:999px;
+  border:1px solid var(--ink);background:none;display:block;cursor:pointer;transform:none}
+.mycsw .sw::after{content:"";position:absolute;top:2px;left:2px;width:9px;height:9px;
+  border-radius:50%;background:var(--ink);transition:transform .16s ease}
+.mycsw .sw:hover{transform:none}
+.mycsw[aria-pressed=true] .sw{background:var(--ink)}
+.mycsw[aria-pressed=true] .sw::after{transform:translateX(13px);background:var(--gnd)}
+.myc{margin-top:14px}
+/* three pills across a 246px rail: New colors, Rotate, Save */
+.grp.colr .lnk{padding:0 12px}
+.grp.colr .btn-row,.grp.colr .misc .mval{gap:8px}
+.myc-row{display:flex;flex-wrap:wrap;align-items:center;gap:10px}
+.myc-row:empty{display:none}
+.myc-hint{font-size:8.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--key);
+  line-height:1.6;margin:10px 0 0}
+.myc-hint:empty{display:none}
+.myc[hidden]{display:none}
+.myc-edit{margin-top:12px}
+.myc-ta{display:block;width:100%;box-sizing:border-box;min-height:74px;resize:vertical;
+  font:inherit;font-size:11px;letter-spacing:.06em;line-height:1.5;color:var(--ink);
+  background:none;border:1px solid var(--hair);border-radius:7px;padding:8px 10px}
+.myc-ta:focus{outline:none;border-color:var(--ink)}
+.myc-ta::placeholder{color:var(--key)}
+.myc-edit .myc-row{margin-top:10px}
+/* an ink the chassis made up to fill a slot the set could not: a dashed ring */
+.sw[data-derived]::after{content:"";position:absolute;inset:-4px;border-radius:50%;
+  border:1px dashed var(--key);pointer-events:none}
+/* with the set on, the swatches can be dragged into a new order */
+#swatches[data-mine] .sw{cursor:grab;transition:transform .14s}
+#swatches[data-mine] .sw.drag{cursor:grabbing;transition:none;z-index:3;transform:scale(1.2)}
+#swatches[data-mine] .sw.drag .fill{box-shadow:0 2px 8px rgba(21,22,26,.25)}
+/* ---------------- inks ---------------- */
+.sw-grid{display:flex;flex-wrap:wrap;gap:13px;align-items:center;max-width:210px}
+.l-bot .sw-grid{max-width:none}
+.l-bot .btn-row{margin-top:18px}
+/* the fill carries the circle, not the swatch: the swatch must not clip, or
+   the delete badge hanging off its corner would be sliced in half */
+.sw{position:relative;width:18px;height:18px;border-radius:50%;display:block;
+  cursor:pointer;transition:transform .12s}
+.sw:hover{transform:scale(1.14)}
+.sw .fill{position:absolute;inset:0;border-radius:50%}
+/* the native input is only a value holder now — clicking the circle opens the
+   wheel-and-hex popover instead, so this must never swallow the click */
+.sw input{position:absolute;inset:0;width:100%;height:100%;
+  border:0;padding:0;background:none;opacity:0;pointer-events:none}
+/* delete is a badge in the corner, so the circle itself is free to mean edit */
+.sw .x{position:absolute;top:-5px;right:-5px;width:12px;height:12px;border-radius:50%;
+  display:grid;place-items:center;font-size:8px;line-height:1;cursor:pointer;
+  background:var(--ink);color:var(--gnd);border:1px solid var(--gnd);
+  opacity:0;transform:scale(.6);transition:opacity .12s,transform .12s}
+.sw:hover .x,.sw:focus-visible .x,.sw .x:hover{opacity:1;transform:scale(1)}
+.sw.locked .x{display:none}
+/* single-colour chips get the same treatment: click to edit, no native dialog */
+[data-ink]{position:relative;cursor:pointer}
+[data-ink] input[type=color]{pointer-events:none}
+.sw-add{width:18px;height:18px;border-radius:50%;border:1px solid var(--hair);
+  display:grid;place-items:center;font-size:9px;line-height:1;color:var(--key);transition:.12s}
+.sw-add:hover{border-color:var(--ink);color:var(--ink)}
+.lnks{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px}
+
+/* ---------------- captures ---------------- */
+.caps{display:flex;gap:9px;justify-content:center}
+.cap{width:11px;height:11px;border-radius:50%;border:1px solid var(--hair);display:block;
+  padding:0;transition:.12s}
+.cap:hover{border-color:var(--ink)}
+.cap[aria-current=true]{background:var(--ink);border-color:var(--ink)}
+.cap.slot{opacity:.45;cursor:default}
+.capnav{font-size:9px;color:var(--key);padding:0 4px;line-height:11px}
+.capnav[disabled]{opacity:.3;pointer-events:none}
+.tport{display:flex;align-items:center;gap:12px;margin-top:16px;justify-content:center}
+.play{width:18px;height:18px;display:grid;place-items:center}
+.play svg{fill:var(--ink);width:8px;height:9px}
+#scrub{width:150px;height:14px;-webkit-appearance:none;appearance:none;background:none;margin:0;
+  touch-action:pan-y}
+#scrub::-webkit-slider-runnable-track{height:14px;background:none}
+#scrub::-webkit-slider-thumb{-webkit-appearance:none;width:3px;height:11px;border:0;
+  border-radius:0;background:var(--ink)}
+#scrub::-moz-range-track{height:14px;background:none;border:0}
+#scrub::-moz-range-thumb{width:3px;height:11px;border:0;border-radius:0;background:var(--ink)}
+.scrubwrap{position:relative;height:14px}
+.scrubwrap::before{content:"";position:absolute;left:0;right:0;top:6px;height:1px;
+  background:var(--hair2)}
+#scrub[disabled]{opacity:.35}
+.hint{display:block;margin-top:14px}
+
+/* ---------------- parameter groups ---------------- */
+.grp{margin:0 0 4px}
+.grp>summary{list-style:none;cursor:pointer;display:flex;align-items:center;
+  justify-content:space-between;gap:12px;font-size:10px;letter-spacing:.32em;
+  text-transform:uppercase;font-weight:700;padding:15px 0 13px;background:none}
+.grp>summary::after{font-weight:400}
+.grp>summary::-webkit-details-marker{display:none}
+.grp>summary::after{content:"+";font-size:12px;line-height:1;color:var(--key);
+  letter-spacing:0;transition:color .12s}
+.grp[open]>summary::after{content:"\2212"}
+.grp>summary:hover::after{color:var(--ink)}
+.grp-b{padding-bottom:8px}
+.z-right .grp>summary{flex-direction:row-reverse;justify-content:flex-start;gap:10px}
+.idblock{padding-bottom:4px}
+.frame-h{margin:30px 0 14px}
+.z-left .idblock{padding-bottom:34px}
+
+/* leftovers passed through from the tool's own panel */
+.misc{display:flex;align-items:center;justify-content:space-between;gap:12px;
+  margin-bottom:14px;min-height:20px}
+/* in the colour corner nothing sits opposite anything: label above, control below */
+.l-bot .misc{flex-direction:column;align-items:flex-start;gap:9px;margin-bottom:18px}
+.l-bot .misc .mhead{width:100%;justify-content:flex-start}
+.l-bot .misc .mval{justify-content:flex-start;width:100%}
+.l-bot .misc:last-child{margin-bottom:0}
+.misc .mhead{display:flex;align-items:baseline;gap:10px;flex:none}
+.misc.stack{flex-direction:column;align-items:flex-start;gap:9px}
+.misc.stack .mhead,.misc.stack .mval{width:100%;justify-content:flex-start}
+.misc .mval{display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:flex-end;
+  min-width:0}
+.l-bot .misc .mval{gap:10px}
+.misc .sw-grid{max-width:none}
+.btn-row,.expmenu{display:flex;flex-wrap:wrap;gap:10px;margin-top:22px}
+.z-left .btn-row{justify-content:flex-start}
+/* a row that is only a button has nothing to sit opposite — start it at the edge */
+.misc .mhead:empty{display:none}
+.misc .mhead:empty + .mval{justify-content:flex-start;flex:1}
+.pair{display:flex;gap:30px;margin-bottom:18px}
+.pair>*{display:flex;flex-direction:column;gap:9px}
+.pair .lab{font-size:8.5px;letter-spacing:.19em;text-transform:uppercase;color:var(--key);
+  display:block;margin:0}
+.sec-h{font-size:10px;letter-spacing:.32em;text-transform:uppercase;margin:0 0 12px}
+.lab{font-size:8.5px;letter-spacing:.19em;text-transform:uppercase;color:var(--key)}
+.val{font-size:8.5px;letter-spacing:.19em;text-transform:uppercase}
+.switch{width:30px;height:16px;border-radius:999px;border:1px solid var(--ink);position:relative}
+.switch::after{content:"";position:absolute;left:2px;top:1.5px;width:11px;height:11px;
+  border-radius:50%;background:var(--ink);transition:.13s}
+.switch[aria-pressed=true]{background:var(--ink)}
+.switch[aria-pressed=true]::after{left:15px;background:var(--gnd)}
+
+/* ---------------- disclosures ---------------- */
+.group{margin-top:14px}
+.group[hidden]{display:none}
+/* floats over the page so the layout underneath never reflows */
+.group.pop{position:fixed;z-index:70;margin:0;width:232px;padding:16px;
+  background:var(--gnd);border:1px solid var(--ink);text-align:left}
+.group.pop .chips,.group.pop .expmenu{justify-content:flex-start}
+.group.pop .pr .top{flex-direction:row}
+.group.pop .pr{margin-bottom:0}
+.group.pop .expmenu{gap:14px 18px;margin-top:14px}
+.group.pop > :last-child{margin-bottom:0}
+.chips{display:flex;flex-wrap:wrap;gap:14px;margin-top:4px;flex:1 1 auto;min-width:0}
+/* ---- pickers: one dropdown, the same on every tool ----
+   A row of names side by side read as a menu that had been spilled out; a
+   list of fourteen styles took three lines. Every picker is now a dropdown.
+   The browser's own menu draws its list in the system face and copies the
+   field's capitals into it, so the list is drawn here instead: a bordered
+   field with the current choice and a chevron, and a panel of choices in
+   the rail's own type that floats over the page. */
+.pick{position:relative;flex:1 1 auto;width:100%;min-width:0}
+.pick-btn{width:100%;display:flex;align-items:center;justify-content:space-between;gap:10px;
+  border:1px solid var(--ink);border-radius:4px;background:transparent;color:var(--ink);
+  padding:9px 11px 9px 12px;cursor:pointer;text-align:left;
+  font-family:var(--mono);font-size:8.5px;letter-spacing:.19em;text-transform:uppercase;font-weight:700}
+.pick-btn:focus{outline:none}
+.pick-btn .chev{flex:none;width:9px;height:9px;
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 10'%3E%3Cpath d='M1.5 3.5 5 7l3.5-3.5' fill='none' stroke='%2315161A' stroke-width='1.2'/%3E%3C/svg%3E") no-repeat center/9px 9px;
+  transition:transform .15s ease}
+.pick-btn[aria-expanded=true] .chev{transform:rotate(180deg)}
+.pick-menu{position:fixed;z-index:80;margin:0;padding:5px 0;list-style:none;
+  background:var(--gnd);border:1px solid var(--ink);border-radius:4px;
+  max-height:min(60vh,420px);overflow-y:auto;box-shadow:0 10px 30px rgba(21,22,26,.12)}
+.pick-menu[hidden]{display:none}
+.pick-menu li{display:flex;align-items:center;justify-content:space-between;gap:10px;
+  padding:9px 12px;cursor:pointer;color:var(--ink);
+  font-family:var(--mono);font-size:8.5px;letter-spacing:.19em;text-transform:uppercase;font-weight:700}
+.pick-menu li:hover,.pick-menu li.hi{background:rgba(21,22,26,.07)}
+.pick-menu li[aria-selected=true]::after{content:"\2713";font-size:10px;letter-spacing:0}
+/* the label sits close to its field, so the two read as one control */
+.misc.stack:has(.pick){gap:5px}
+.chips:has(.pick){margin-top:0}
+.chip{font-size:8.5px;letter-spacing:.19em;text-transform:uppercase;font-weight:700;
+  color:var(--key);transition:color .12s}
+.chip:hover{color:var(--ink)}
+.chip[aria-pressed=true]{color:var(--ink);text-decoration:underline;text-underline-offset:4px}
+.modrow{margin-bottom:14px}
+.expmenu{display:flex;flex-wrap:wrap;gap:16px;margin-top:14px;justify-content:flex-end}
+.z-right .rack,.z-right .tbl,.z-right .pr,.z-right .chips{margin-left:auto}
+.z-right,.z-br{text-align:right}
+/* the readout hugs the right edge, keys right-aligned against the gutter and
+   values left-aligned in a capped column so a long one wraps tidily instead of
+   stretching the table and ragging the second line */
+.z-right .tbl,.z-br .tbl{justify-content:end;column-gap:20px}
+.z-right .tbl .k{text-align:right;white-space:nowrap}
+.z-right .tbl .v{justify-self:stretch;text-align:right;max-width:150px;line-height:1.5}
+.z-right .chips{justify-content:flex-end}
+.z-right .pr .top,.z-br .pr .top{flex-direction:row}
+.rightblock{width:196px}
+
+/* ---------------- colour picker ----------------
+   One box, one click: the field of colour, the hue, the hex and the confirm
+   are all in it at once. The old one put the wheel behind a button that
+   opened the operating system's own dialog, which is neither one click nor
+   part of this instrument. */
+.cpick{position:fixed;z-index:80;width:198px;padding:11px;background:var(--gnd);
+  border:1px solid var(--ink);box-shadow:0 18px 44px rgba(21,22,26,.18)}
+.cpick .sv{position:relative;height:116px;cursor:crosshair;touch-action:none;
+  outline:1px solid var(--hair2)}
+.cpick .sv .lay{position:absolute;inset:0}
+.cpick .dot{position:absolute;width:11px;height:11px;border-radius:50%;
+  border:1.5px solid #fff;box-shadow:0 0 0 1px rgba(21,22,26,.55);
+  translate:-50% -50%;pointer-events:none}
+.cpick .hue{position:relative;height:11px;margin-top:10px;cursor:ew-resize;touch-action:none;
+  outline:1px solid var(--hair2);
+  background:linear-gradient(to right,#f00 0%,#ff0 17%,#0f0 33%,#0ff 50%,
+             #00f 67%,#f0f 83%,#f00 100%)}
+.cpick .hue .hnd{position:absolute;top:-2px;width:5px;height:15px;background:var(--gnd);
+  border:1px solid var(--ink);translate:-50% 0;pointer-events:none}
+.cpick .cprow{display:flex;align-items:center;gap:8px;margin-top:11px}
+.cpick .cpsw{flex:none;width:20px;height:20px;border-radius:50%;
+  box-shadow:inset 0 0 0 1px rgba(21,22,26,.3)}
+.cpick .cphex{flex:1 1 auto;min-width:0;height:20px;background:none;border:0;
+  border-bottom:1px solid var(--hair);padding:0;color:var(--ink);
+  font-family:var(--mono);font-size:9.5px;letter-spacing:.10em;text-transform:lowercase}
+.cpick .cphex:focus{outline:none;border-bottom-color:var(--ink)}
+.cpick .cphex.bad{border-bottom-color:#c8484d;color:#c8484d}
+.cpick .cpok{flex:none;height:20px;padding:0 11px;background:var(--ink);color:var(--gnd);
+  font-size:8.5px;letter-spacing:.19em;text-transform:uppercase;font-weight:700}
+.cpick .cpok:hover{opacity:.85}
+
+/* ---------------- toast ---------------- */
+.toast{position:fixed;left:50%;bottom:26px;translate:-50% 8px;background:var(--ink);
+  color:var(--gnd);padding:9px 18px;font-size:8.5px;letter-spacing:.19em;text-transform:uppercase;
+  opacity:0;pointer-events:none;transition:.2s;z-index:90}
+.toast.show{opacity:1;translate:-50% 0}
+.toast.busy::before{content:"";display:inline-block;width:5px;height:5px;border-radius:50%;
+  background:var(--gnd);margin-right:8px;vertical-align:middle;animation:pulse 1s infinite}
+@keyframes pulse{0%,100%{opacity:.3}50%{opacity:1}}
+
+#strip,#glyph,#ratioVal{display:none}
+
+/* ---------------- narrow ---------------- */
+@media (max-width:1180px){
+  body{overflow:auto}
+  .rig{height:auto;min-height:100dvh;grid-template-columns:1fr;
+    grid-template-rows:auto;row-gap:30px;padding:0 30px 60px}
+  .z-left,.z-stage,.z-right,.z-bottom{
+    grid-column:1;grid-row:auto;justify-self:stretch;align-self:auto;text-align:left;
+    max-height:none;overflow:visible;display:block}
+  .l-scroll{overflow:visible;max-height:none;-webkit-mask-image:none;mask-image:none}
+  .l-bot{padding-top:12px}
+  /* the tool name heads the page, then the work, which stays put while the
+     controls scroll under it. display:contents lets the identity block out of
+     the left column so it can be ordered ahead of the stage */
+  .z-left{display:contents}
+  .l-top{order:0} .z-stage{order:1} .l-scroll{order:2} .l-bot{order:3}
+  .z-bottom{order:4} .z-right{order:5}
+  .l-top{padding-top:30px}
+  /* The blanket display:block above is for the rails, but it lands on the
+     stage too and takes its place-items:center with it, so the artwork stacked
+     against the top of a fixed-height stage with the slack all below it. Worst
+     on a wide ratio, where the artwork is short and the gap is most of the
+     stage. Everything else in here is absolutely positioned, so the grid has
+     one item to centre and centres it. */
+  .z-stage{height:52dvh;padding:26px 26px 26px;overflow:hidden;
+    display:grid;place-items:center;
+    position:sticky;top:0;z-index:20;background:#F3F3F1;
+    margin:0 -30px;padding-left:30px;padding-right:30px}
+  .z-bottom{justify-self:stretch;text-align:left}
+  .z-right .grp>summary{flex-direction:row}
+  .xh.hz{left:0;right:0} .xh.vt{top:0;bottom:0}
+  .z-right,.z-br{text-align:left}
+  .z-right .rack,.z-right .tbl,.z-right .pr,.z-right .chips{margin-left:0}
+  .rack{justify-content:start}
+  .z-right .chips,.expmenu,.z-right .tbl,.z-br .tbl{justify-content:start}
+  /* Stacked, these spec tables are the full width of the page instead of a
+     narrow rail, and two auto columns split all of it between them — which
+     threw the values into the middle of the page, a long way from their
+     labels. Size the columns to their contents and let the slack sit after
+     them. */
+  .tbl{justify-content:start}
+  .btnrow{justify-content:flex-start}
+  .rightblock{width:auto}
+  /* Stacked, the right rail's three blocks fall into ordinary flow and the
+     Animate and Export pills end up edge to edge — on the desktop rig it is
+     the auto margins centring Animate that hold them apart, and those collapse
+     to nothing here. */
+  .r-mid,.r-bot{margin-top:26px}
+  .z-bottom{justify-self:stretch;text-align:left}
+  .caps,.tport{justify-content:flex-start}
+  .mark{display:none}
+}
+
+/* ===== brand mark (formerly a separate ptrn.css) ===== */
+/*
+ * Ptrn brand mark (replaces the old logo image).
+ * The wordmark is plain text in DM Mono (self-hosted in /_fonts). DM Mono is
+ * only shipped at weight 400, so that is the weight used here.
+ * .brand keeps the old image's aspect ratio (694:282), so the identity row
+ * keeps its height at every width the pages already set for .brand.
+ * (a.idline beats the pages' own `.idline .brand{display:block}` rule.)
+ */
+a.idline .brand{display:flex;align-items:center;aspect-ratio:694/282}
+.ptrn-mark{
+  display:block;
+  font-family:"DM Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  font-weight:400;
+  font-size:22px;
+  line-height:1;
+  letter-spacing:.02em;
+  text-transform:lowercase;
+  white-space:nowrap;
+  color:var(--ink,#15161A);
+}
+
+/* ===== embed mode (?embed / iframe): live rules from the old inline embed sheet ===== */
+html.embed .toast{display:none!important}
+html.embed .stage-inner{padding:0!important}
+html.embed #art{width:100vw!important;height:100dvh!important;max-width:none!important;max-height:none!important;object-fit:cover!important;border-radius:0!important;box-shadow:none!important;cursor:default!important}
+html.embed body{overflow:hidden!important}

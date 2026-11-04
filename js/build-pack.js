@@ -153,14 +153,14 @@ function bpPart0(data) {
     '1. Part 1 brief rules: what is allowed, where, and why.',
     '2. Part 2 tokens: the only colours, type faces and spacing values you may use.',
     '3. Part 3 component CSS values (`kit.css`): every colour, size, radius, border, shadow and type setting of every component.',
-    '4. Part 3 and Part 4 reference markup: illustrative. It shows structure and intent; class names are Branding Designer\'s own, and the demo copy ("Brand refresh", "Maya Ortiz") is placeholder text.', '');
+    '4. Part 3 and Part 4 reference markup: illustrative. It shows structure and intent; class names are Looks Good\'s own, and the demo copy ("Brand refresh", "Maya Ortiz") is placeholder text.', '');
   L.push('**Steps.**', '');
   let n = 1;
   L.push(`${n++}. Save this file in the project root as \`BUILD-PACK.md\`, and read Part 1 completely before writing code.`);
   if (web && swift) L.push(`${n++}. Create the token files from Part 2 in the project's stack: \`tokens.css\` (CSS custom properties, light and dark) for the web target and \`Theme.swift\` for the SwiftUI target. Keep the token names; every colour in the project comes from them.`);
   else if (web) L.push(`${n++}. Create the token file from Part 2 (\`tokens.css\`: CSS custom properties, light and dark) in the project's stack (plain CSS, Tailwind theme, CSS modules). Keep the token names; every colour in the project comes from them.`);
   else L.push(`${n++}. Add \`Theme.swift\` from Part 2 to the app target. Every colour, font and shadow in the project comes from it.`);
-  if (web) L.push(`${n++}. Build each UI kit component from Part 3 by porting the \`kit.css\` values exactly into the project's styling system. You may rename the Branding Designer class names (\`ab-*\`, \`sb-k-*\`, \`sb-*\`) to the project's own conventions, but keep every value: colours, sizes, radii, borders, shadows, type, spacing and every state (rest, pressed, focus, disabled, open and so on). The selectors are scoped to the kit root described in Part 3; keep the same scoping or fold it into your own. The custom properties \`kit.css\` reads are resolved in Part 2.`);
+  if (web) L.push(`${n++}. Build each UI kit component from Part 3 by porting the \`kit.css\` values exactly into the project's styling system. You may rename the Looks Good class names (\`ab-*\`, \`sb-k-*\`, \`sb-*\`) to the project's own conventions, but keep every value: colours, sizes, radii, borders, shadows, type, spacing and every state (rest, pressed, focus, disabled, open and so on). The selectors are scoped to the kit root described in Part 3; keep the same scoping or fold it into your own. The custom properties \`kit.css\` reads are resolved in Part 2.`);
   else L.push(`${n++}. Build each UI kit component from Part 3. \`kit.css\` is a specification of values (CSS pixels are points): read each component's colours, sizes, radii, borders, shadows, type and every state from it and draw it in SwiftUI with those values and the Theme.swift tokens.`);
   if (swift) L.push(`${n++}. For SwiftUI, Part 3 marks each component Native or Custom. Native rows: use the system control (\`Toggle\`, \`Picker\`, \`.searchable\` and so on), tinted with Theme.swift tokens only, and let the system supply its behaviour. Custom rows: draw them yourself from the Part 3 CSS values.`);
   L.push(`${n++}. Assemble screens from Part 4: each layout names its blocks in order, its rules, and gives the reference markup of the phone screen. Spacing, the 44pt tap target and the type scale come from Part 1 and do not change per screen.`);
@@ -257,7 +257,7 @@ function bpPart5(data) {
   L.push('### Generator code', '',
     'Load `js/patterns/engine.js` first, then the family files below, as plain scripts (they attach to `window.Patterns`). A pattern is drawn with `Patterns.renderSVG(key, params, inks, seed, { width, height })`, `Patterns.tileSVG(key, params, inks, seed, 160)` for a seamless tile, or `Patterns.render(canvas, key, params, inks, seed, { width, height, dpr: 1 })` for raster.', '');
   const src = (path, text, error) => {
-    if (text == null) return [`\`${path}\`: source could not be fetched${error ? ' (' + error + ')' : ''}. Get it from the Branding Designer repository.`, ''];
+    if (text == null) return [`\`${path}\`: source could not be fetched${error ? ' (' + error + ')' : ''}. Get it from the Looks Good repository.`, ''];
     return ['<details>', `<summary><code>${path}</code> (${Math.round(text.length / 1024)} KB)</summary>`, '', bpFence(text, 'js'), '', '</details>', ''];
   };
   if (P.engine) L.push(...src(P.engine.path, P.engine.text, P.engine.error));
@@ -306,7 +306,7 @@ function buildPackMarkdown(data) {
   const d = Object.assign({ target: 'web', surface: 'app' }, data);
   d.brand = Object.assign({ name: 'Brand', styleName: 'Style' }, d.brand);
   const L = [`# ${d.brand.name} build pack`, '',
-    `Everything an AI coding agent needs to rebuild the ${d.brand.name} ${BP_SURFACE_LABEL[d.surface].toLowerCase()} UI in the ${d.brand.styleName} style for ${bpTargetWords(d.target)}: the brief, the design tokens, the real code that draws the UI kit and screens${d.surface === 'app' ? '' : ', the patterns'} and the logo, with a prompt at the top that says how to use it. Generated by Branding Designer.`, ''];
+    `Everything an AI coding agent needs to rebuild the ${d.brand.name} ${BP_SURFACE_LABEL[d.surface].toLowerCase()} UI in the ${d.brand.styleName} style for ${bpTargetWords(d.target)}: the brief, the design tokens, the real code that draws the UI kit and screens${d.surface === 'app' ? '' : ', the patterns'} and the logo, with a prompt at the top that says how to use it. Generated by Looks Good.`, ''];
   L.push('## Contents', '', ...BP_PARTS.map((p, i) => `${i + 1}. [${p}](#${bpAnchor(p)})`), '');
   L.push(bpPart0(d));
   L.push(`## ${BP_PARTS[1]}`, '', 'The full AI brief for this brand, unchanged apart from its headings being one step deeper. It holds the rules: colours and where each is used, type, shape, states, motion, accessibility and what is allowed where. Where anything in this file conflicts with it, the brief wins.', '', bpDemote(d.briefMd || '', 2).replace(/\n+$/, ''), '');

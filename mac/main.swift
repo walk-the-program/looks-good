@@ -1,4 +1,4 @@
-// Branding Designer — native macOS wrapper (AppKit + WKWebView).
+// Looks Good — native macOS wrapper (AppKit + WKWebView).
 // Serves the bundled web app from app://local/ so localStorage has a stable,
 // persistent origin, and bridges the few things a bare WKWebView can't do:
 // file downloads, file pickers, dialogs and the clipboard.
@@ -7,7 +7,7 @@ import AppKit
 import WebKit
 import UniformTypeIdentifiers
 
-let appName = "Branding Designer"
+let appName = "Looks Good"
 let chromeColor = NSColor(srgbRed: 0xF7 / 255.0, green: 0xF6 / 255.0, blue: 0xF3 / 255.0, alpha: 1)
 let scheme = "app"
 
@@ -325,7 +325,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, WKNavigationDelegate, 
             add("\(licence)\n", bold, .secondaryLabelColor)
             add(byLicence[licence]!.sorted().joined(separator: ", ") + "\n\n", base, .secondaryLabelColor)
         }
-        add("Full copyright notices: Branding Designer.app/Contents/Resources/web/fonts/CREDITS.txt", base, .tertiaryLabelColor)
+        add("Full copyright notices: Looks Good.app/Contents/Resources/web/fonts/CREDITS.txt", base, .tertiaryLabelColor)
         NSApp.orderFrontStandardAboutPanel(options: [
             .applicationName: appName,
             .credits: credits,

@@ -1,5 +1,5 @@
 /* ---------------------------------------------------------------------
-   ptrn-theme.css — restyles the Ptrn instrument chassis in Branding Designer's
+   ptrn-theme.css — restyles the Ptrn instrument chassis in Looks Good's
    language. Injected into each tool's <head> by js/patterns-home.js after the
    tool's own stylesheets, so the mirrored files under ptrn/ stay untouched.
    Ground, ink, hairlines and buttons follow the tokens in css/styles.css.
@@ -25,7 +25,7 @@ body {
   letter-spacing: 0;
 }
 
-/* Branding Designer's bar already says where you are. */
+/* Looks Good's bar already says where you are. */
 .mark, .idline, .lnk.back, .firstrun, .ring, .xh, .corner { display: none !important; }
 
 @media (min-width: 1181px) {
