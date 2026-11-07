@@ -1,0 +1,3132 @@
+{
+ "group": "D",
+ "styles": [
+  {
+   "key": "holo-iridescent",
+   "name": "Holo Iridescent",
+   "coreTrick": "A pearl ground carries one large tilted plane whose hue drifts in bands (repeating radial fringes plus a conic sweep in a fixed five-colour order), while UI stays solid hairline cards with the spectrum confined to one featured edge, the primary's rim and selected states.",
+   "colourRecipe": "The client primary stays a solid action colour with a thin spectral rim; the spectrum is fixed pastel and never a brand role; the accent only seeds the one gradient headline word (shaded to 3.2:1); a muted client colour is pulled toward ink to 4.7:1; dark canvases are forced to near black (<=8% lightness).",
+   "moves": [
+    "tinted-neutral-canvas",
+    "fixed-decorative-palette",
+    "contrast-fit-search",
+    "pearl-wash-ground",
+    "hairline-rule",
+    "hairline-panel",
+    "corner-radius",
+    "inset-edge-light",
+    "soft-contact-shadow",
+    "glossy-single-action",
+    "bright-capsule-selected",
+    "spectral-hairline-edge",
+    "foil-wash-selected",
+    "foil-fringe-plane",
+    "thin-film-bubble",
+    "spectrum-text-fill",
+    "tight-display-tracking",
+    "display-weight-scale",
+    "caps-mono-labels",
+    "split-hero-ratio",
+    "edge-bleed-hero-object",
+    "palette-board-layout",
+    "ruled-row-list",
+    "single-accent-dot",
+    "brand-initial-hero-object",
+    "single-primary-action",
+    "outline-underline-field",
+    "toggle-anatomy",
+    "progress-bar-style",
+    "named-states",
+    "press-feedback",
+    "export-safe-fallback"
+   ],
+   "remainder": [
+    {
+     "what": "Foil plane composition: layer stacking, gradient origins (28% 118%, 72% 30%), 16deg/-8deg perspective tilt, 100cqw sizing, debossed initial position and the narrow-board and deck-cover variants, all hand-tuned in cqw units",
+     "where": "css/aesthetics/holo-iridescent.css:55-80,200-224",
+     "whyCode": "A generator could emit the gradients, but the placement values are visual judgements per board size, not parameters that transfer"
+    },
+    {
+     "what": "Bubble geometry: wedge rotation offsets, canvas-coloured black spot only in light mode, per-board unique filter ids",
+     "where": "js/aesthetics/holo-iridescent.js:119-148",
+     "whyCode": "Procedural SVG assembled in art() with mode-conditional branches"
+    },
+    {
+     "what": "App kit wiring: which of ~70 kit components receive foil wash, spectral rim, hairline panel or chrome (about 70 lines of selectors scoped to both holo-iridescent and --classic)",
+     "where": "css/aesthetics/holo-iridescent.css:281-349",
+     "whyCode": "Per-component decisions; only generable from a kit-component map plus rules like 'selected state gets foil wash'"
+    },
+    {
+     "what": "Row avatars as spectral dots shifted with hue-rotate",
+     "where": "css/aesthetics/holo-iridescent.css:177-182",
+     "whyCode": "One-off ornament replacing the avatar"
+    }
+   ],
+   "moveCoverage": 70,
+   "notes": "Kit lines 350-544 were not read in full; they repeat the foil-wash / hairline-panel / chrome pattern (kit cards, tables, tabs) so the coverage estimate assumes the same split as lines 281-349. exportSafe on spectral-hairline-edge is unverified."
+  },
+  {
+   "key": "industrial-device",
+   "name": "Industrial Device",
+   "coreTrick": "The product is the page: a life-size hardware illustration of keys, encoders and an OLED bleeds off the board edge with every legend printed on it, and the UI reuses the hardware parts (keys with a 2px underside that compresses, recessed slots, LED-bar meters).",
+   "colourRecipe": "The client primary appears on exactly four things: the one main key and selected key, the knob pointer, the fourth encoder cap, and the OLED pixels (lifted to 7:1 on black); every other colour on the device is a fixed code (blue, green, white, graphite), and the canvas is pulled 42% toward aluminium grey (55% toward graphite in dark).",
+   "moves": [
+    "tinted-neutral-canvas",
+    "fixed-decorative-palette",
+    "contrast-fit-search",
+    "hairline-rule",
+    "hairline-panel",
+    "corner-radius",
+    "inset-edge-light",
+    "key-underside-press",
+    "recessed-field",
+    "caps-mono-labels",
+    "printed-legend-on-object",
+    "tight-display-tracking",
+    "display-weight-scale",
+    "split-hero-ratio",
+    "edge-bleed-hero-object",
+    "palette-board-layout",
+    "catalogue-number",
+    "ruled-row-list",
+    "single-accent-dot",
+    "dot-field",
+    "brand-initial-hero-object",
+    "hardware-key-grid",
+    "oled-pixel-strip",
+    "encoder-knob-scale",
+    "single-primary-action",
+    "toggle-anatomy",
+    "progress-bar-style",
+    "named-states",
+    "press-feedback"
+   ],
+   "remainder": [
+    {
+     "what": "Device layout: a 100x64 unit coordinate board placing grille, OLED, encoders, knob, 4x4 pads, function keys, keybed and model line, plus transport icon SVGs",
+     "where": "js/aesthetics/industrial-device.js:11-71",
+     "whyCode": "A composed illustration; positions and part inventory are bespoke and not reducible to a few params"
+    },
+    {
+     "what": "OLED word fitting (first word only, font scale 9/len) and the key legend table with graphite function column logic",
+     "where": "js/aesthetics/industrial-device.js:17-36",
+     "whyCode": "Text-measurement and per-key conditional classes"
+    },
+    {
+     "what": "Deck material slide reuses the same drawing at 1.5x zoom cropped on the pads and keybed",
+     "where": "js/aesthetics/industrial-device.js:216-218",
+     "whyCode": "Bespoke crop of the bespoke art"
+    },
+    {
+     "what": "About 20 editable device legend strings (copy keys)",
+     "where": "js/aesthetics/industrial-device.js:85-108",
+     "whyCode": "Content, not look; a framework would need a legend-list field"
+    }
+   ],
+   "moveCoverage": 65,
+   "notes": "css lines 251-542 (kit and built-screen rules) were only skimmed via section markers; they reuse key-underside-press, recessed-field and hairline-panel."
+  },
+  {
+   "key": "isogrid",
+   "name": "Isogrid",
+   "coreTrick": "A single doubling ladder (spacing 4/8/16/32/64/128, type 12/24/48/96) drives every size, containers are 1px square outlines never fills, tall buttons anchor label top-left and arrow bottom-right, and selection is a 4px primary bar on the top edge.",
+   "colourRecipe": "The canvas is white or near-black with a trace of the primary hue; the primary is searched along lightness (both directions) until it holds 4.6:1 on the canvas and carries a 4.6:1 label, then used for the main button, selection bar, focus ring and the filled faces of the isometric drawing; hairlines are ink pulled toward the canvas until 3.2:1.",
+   "moves": [
+    "tinted-neutral-canvas",
+    "contrast-fit-search",
+    "doubling-scale",
+    "hairline-rule",
+    "hairline-panel",
+    "corner-radius",
+    "caps-mono-labels",
+    "catalogue-number",
+    "tight-display-tracking",
+    "display-weight-scale",
+    "split-hero-ratio",
+    "hidden-column-grid",
+    "palette-board-layout",
+    "ruled-row-list",
+    "dot-field",
+    "brand-initial-hero-object",
+    "isometric-extrusion-art",
+    "single-primary-action",
+    "corner-anchored-button",
+    "selection-bar",
+    "outline-underline-field",
+    "toggle-anatomy",
+    "progress-bar-style",
+    "named-states",
+    "press-feedback"
+   ],
+   "remainder": [
+    {
+     "what": "Isometric extrusion renderer: 5x7 glyph lookup with accent folding, per-cell seeded depth, back-to-front sort, hidden-face culling, ladder cubes",
+     "where": "js/aesthetics/isogrid.js:24-103",
+     "whyCode": "Geometry and seeded randomness; the svg-generator move names it but the algorithm itself is code"
+    },
+    {
+     "what": "Font weight resolution: light 300 only for Plex Sans (declared in mainframe.css), nearest published weight otherwise",
+     "where": "js/aesthetics/isogrid.js:217-221",
+     "whyCode": "Depends on the font registry and on another style's @font-face"
+    },
+    {
+     "what": "Board-only art lattice plus deck material specimen grid (2x2 cells of scale, buttons, field, tabs)",
+     "where": "js/aesthetics/isogrid.js:299-311",
+     "whyCode": "Bespoke specimen markup"
+    }
+   ],
+   "moveCoverage": 80,
+   "notes": "Most of the look is rule-driven so coverage is high. css lines 231-616 (built screens and kit) were not read in full; kit sizing is via --k-btn/--k-cardpad/--k-gap tokens (line 217) which is a tokens-only move."
+  },
+  {
+   "key": "japanese-minimal",
+   "name": "Japanese Minimal",
+   "coreTrick": "Ma as material: a warm off-white ground, a strict column grid and 1px hairline rules with small regular-weight type, one plain 2px-corner primary action, and a single fixed vermilion dot per view; the only ornament is a measured hairline grid with ticks.",
+   "colourRecipe": "The client primary is only the one plain filled action, the selected underline, focus ring and progress fill; the accent is ignored and replaced by a fixed flag-red dot (#BC002D, lifted in lightness only if under 3:1 on a dark canvas); ink is mixed 70% toward near-black and the canvas is mixed 80% toward warm off-white, so a muted client primary changes nothing but the action.",
+   "moves": [
+    "tinted-neutral-canvas",
+    "fixed-decorative-palette",
+    "contrast-fit-search",
+    "hairline-rule",
+    "hairline-panel",
+    "corner-radius",
+    "single-accent-dot",
+    "grain-overlay",
+    "hairline-grid-field",
+    "vertical-kicker",
+    "mixed-face-headline",
+    "caps-mono-labels",
+    "tight-display-tracking",
+    "display-weight-scale",
+    "catalogue-number",
+    "split-hero-ratio",
+    "hidden-column-grid",
+    "palette-board-layout",
+    "ruled-row-list",
+    "single-primary-action",
+    "selection-bar",
+    "outline-underline-field",
+    "toggle-anatomy",
+    "progress-bar-style",
+    "named-states",
+    "press-feedback"
+   ],
+   "remainder": [
+    {
+     "what": "Headline hook: balances lines with a character budget and wraps only the last word as the emphasis span",
+     "where": "js/aesthetics/japanese-minimal.js:49-71",
+     "whyCode": "Per-word text layout logic (line budget, trailing punctuation) a rule file cannot express"
+    },
+    {
+     "what": "Hero art and deck specimen SVGs: coordinates, tick loops, rotated label, three captioned samples",
+     "where": "js/aesthetics/japanese-minimal.js:75-113",
+     "whyCode": "Procedural SVG with fixed layout; only partly parameterised by hairline-grid-field"
+    },
+    {
+     "what": "Deck rules: do/dont marks drawn as a square and a rotated rule, deck cell and rule resets",
+     "where": "css/aesthetics/japanese-minimal.css:177-212",
+     "whyCode": "Slide-specific overrides"
+    },
+    {
+     "what": "Accent swatch shows the dot's own hex via a CSS custom string and pseudo-element",
+     "where": "css/aesthetics/japanese-minimal.css:72-75",
+     "whyCode": "Special-case swatch that bypasses the client accent"
+    },
+    {
+     "what": "Loads the Shippori Mincho font family on demand from tokens()",
+     "where": "js/aesthetics/japanese-minimal.js:177-182",
+     "whyCode": "Side effect in a token hook"
+    }
+   ],
+   "moveCoverage": 80,
+   "notes": "css lines 229-644 (kit block D14 from 436, built screens) not read in full; they follow the same hairline/2px-corner/one-dot rules."
+  },
+  {
+   "key": "liquid-glass",
+   "name": "Liquid Glass",
+   "coreTrick": "Clear see-through glass (7-16% white, 4px blur with saturate and brightness lift, bright two-sided rim, soft contact shadow) floats over a hard-edged brand-colour scene, with an SVG displacement-filter lens that bends the scene only at its rim; never frosted.",
+   "colourRecipe": "The client primary becomes the main light plane of the scene and a tinted-glass action at partial alpha (alpha raised until the label holds 4.5:1); accent and secondary become the other planes of the scene; the dark scene base is the ink 80% toward black (canvas 50% toward black in dark); a muted client colour is pulled toward ink until 4.5:1 on the glass fill.",
+   "moves": [
+    "contrast-fit-search",
+    "hairline-rule",
+    "corner-radius",
+    "clear-glass-panel",
+    "inset-edge-light",
+    "soft-contact-shadow",
+    "glossy-single-action",
+    "bright-capsule-selected",
+    "recessed-field",
+    "toggle-anatomy",
+    "tight-display-tracking",
+    "display-weight-scale",
+    "caps-mono-labels",
+    "copy-on-scene-hero",
+    "palette-board-layout",
+    "ruled-row-list",
+    "hard-edged-scene-under-glass",
+    "rim-refraction-lens",
+    "floating-glass-controls",
+    "brand-initial-hero-object",
+    "single-primary-action",
+    "named-states",
+    "press-feedback",
+    "export-safe-fallback",
+    "reduced-transparency-fallback"
+   ],
+   "remainder": [
+    {
+     "what": "Lens placement: width from a per-letter glyph-advance table, height from the art aspect ratio, and a duplicated scene repositioned so it registers 1:1 inside each lens",
+     "where": "js/aesthetics/liquid-glass.js:120-135",
+     "whyCode": "Geometry computed from letter metrics and container ratios; the filter is a move, the registration is code"
+    },
+    {
+     "what": "Unique per-board filter ids and feImage normal-map data URIs built in a chain",
+     "where": "js/aesthetics/liquid-glass.js:121,136-157",
+     "whyCode": "Runtime-generated SVG filter graph"
+    },
+    {
+     "what": "Tab icons and the hero art markup (scene, two lenses for wide and narrow, tabs, slider)",
+     "where": "js/aesthetics/liquid-glass.js:158-171",
+     "whyCode": "Bespoke illustration; narrow vs wide lens switch at css 146-157"
+    },
+    {
+     "what": "Narrow-board re-stacking: scene stops 30/62/70, tab bar to the top, slider to the bottom, copy below on canvas with highlight band",
+     "where": "css/aesthetics/liquid-glass.css:146-157",
+     "whyCode": "Responsive recomposition of the hero"
+    },
+    {
+     "what": "Product backdrop (soft brand field behind glass sidebar/header) and gel hover scale 1.03 / 0.97 are described in rules; only the 0.98 press was verified in css",
+     "where": "js/aesthetics/liquid-glass.js:203-204",
+     "whyCode": "Not read in the css range covered; unverified"
+    }
+   ],
+   "moveCoverage": 72,
+   "notes": "Record of the glass move follows the owner's brief: fill alpha <=18%, blur 2-6px, saturate/brightness lift, never frosted; the 'Frosted' state sample name is a label only. css lines 261-818 not read in full (product screens, kit, export block was grepped: 339-358)."
+  }
+ ],
+ "moves": [
+  {
+   "id": "tinted-neutral-canvas",
+   "category": "colour",
+   "name": "Tinted neutral canvas",
+   "what": "The canvas hook pulls the client's light or dark canvas toward a fixed neutral (or caps its lightness/saturation) so the ground is never the raw brand tint.",
+   "params": [
+    {
+     "name": "target-light",
+     "kind": "colour",
+     "range": "hex",
+     "default": "#d9d9d6"
+    },
+    {
+     "name": "target-dark",
+     "kind": "colour",
+     "range": "hex",
+     "default": "#1d1e21"
+    },
+    {
+     "name": "mix",
+     "kind": "number",
+     "range": "0-1",
+     "default": "0.42"
+    },
+    {
+     "name": "dark-lightness-cap",
+     "kind": "number",
+     "range": "0-100",
+     "default": "8"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "holo-iridescent",
+     "where": "js/aesthetics/holo-iridescent.js:57-63",
+     "variant": "dark only: lightness capped at 8%, saturation at 30%, no change in light mode"
+    },
+    {
+     "key": "industrial-device",
+     "where": "js/aesthetics/industrial-device.js:135-138",
+     "variant": "mix toward warm aluminium grey (42%) in light, graphite (55%) in dark"
+    },
+    {
+     "key": "isogrid",
+     "where": "js/aesthetics/isogrid.js:191-197",
+     "variant": "near-white 98.5% / near-black 6.5% lightness with a trace (<=6%) of the primary hue"
+    },
+    {
+     "key": "japanese-minimal",
+     "where": "js/aesthetics/japanese-minimal.js:172-175",
+     "variant": "mix 80% toward a warm off-white #F7F6F3 or night #161615"
+    }
+   ],
+   "expressibleAs": "tokens",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "fixed-decorative-palette",
+   "category": "colour",
+   "name": "Fixed decorative palette",
+   "what": "A set of colours that never follows the client palette (a spectrum, an encoder code, a flag red) and is used only as decoration or a coded function.",
+   "params": [
+    {
+     "name": "colours",
+     "kind": "text",
+     "range": "list of hex",
+     "default": ""
+    },
+    {
+     "name": "client-slots",
+     "kind": "number",
+     "range": "0-N colours that still take the client primary",
+     "default": "0"
+    },
+    {
+     "name": "lift-on-dark-to-contrast",
+     "kind": "number",
+     "range": "ratio",
+     "default": "3"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "holo-iridescent",
+     "where": "js/aesthetics/holo-iridescent.js:78,89-96",
+     "variant": "five-stop pastel spectrum #ff9ad5 #8fe3ff #b79cff #8bf5c4 #ffe08f, never a brand role"
+    },
+    {
+     "key": "holo-iridescent",
+     "where": "css/aesthetics/holo-iridescent.css:17-22",
+     "variant": "the same five stops baked into fringe / angle / foil-wash gradients at fixed alpha"
+    },
+    {
+     "key": "industrial-device",
+     "where": "css/aesthetics/industrial-device.css:91-94",
+     "variant": "encoder caps #2B7BE4 / #2FB15C / #F2F2EE fixed; only the 4th cap is the client primary"
+    },
+    {
+     "key": "japanese-minimal",
+     "where": "js/aesthetics/japanese-minimal.js:28-39",
+     "variant": "one vermilion #BC002D dot whatever the brand colour; lifted in lightness only until 3:1 on a dark canvas"
+    }
+   ],
+   "expressibleAs": "tokens",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "contrast-fit-search",
+   "category": "colour",
+   "name": "Contrast-fit search",
+   "what": "Walk a colour along one axis (mix toward ink, lightness step, alpha step) until it holds a target contrast ratio against a named background; the result becomes a token.",
+   "params": [
+    {
+     "name": "target-ratio",
+     "kind": "number",
+     "range": "3-7",
+     "default": "4.5"
+    },
+    {
+     "name": "against",
+     "kind": "enum",
+     "range": "canvas|wash|scene-base|lifted-tint",
+     "default": "canvas"
+    },
+    {
+     "name": "axis",
+     "kind": "enum",
+     "range": "mix-to-ink|lightness|alpha|mix-to-white",
+     "default": "mix-to-ink"
+    },
+    {
+     "name": "step",
+     "kind": "number",
+     "range": "0.02-0.1",
+     "default": "0.05"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "holo-iridescent",
+     "where": "js/aesthetics/holo-iridescent.js:67-74,82-85",
+     "variant": "spectrum stops and muted label pulled toward ink until 3.2:1 / 4.7:1"
+    },
+    {
+     "key": "industrial-device",
+     "where": "js/aesthetics/industrial-device.js:149,168",
+     "variant": "OLED ink lifted toward white until 7:1 on the OLED black"
+    },
+    {
+     "key": "isogrid",
+     "where": "js/aesthetics/isogrid.js:107-123,207-214",
+     "variant": "printPrimary walks lightness (both directions) until 4.6:1 on canvas and a readable label; hairline and muted found the same way"
+    },
+    {
+     "key": "japanese-minimal",
+     "where": "js/aesthetics/japanese-minimal.js:30-39,189",
+     "variant": "vermilion lifted to 3:1; muted falls back to ink if the mix misses 4.6:1"
+    },
+    {
+     "key": "liquid-glass",
+     "where": "js/aesthetics/liquid-glass.js:69-82",
+     "variant": "muted pulled until 4.5:1 on the glass fill; CTA alpha raised until the label holds 4.5:1 on the lifted tint"
+    }
+   ],
+   "expressibleAs": "needs-code",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "pearl-wash-ground",
+   "category": "colour",
+   "name": "Pastel wash over the ground",
+   "what": "Several low-alpha radial pastel gradients are layered over the canvas as board atmosphere (not part of app screens).",
+   "params": [
+    {
+     "name": "alpha-light",
+     "kind": "number",
+     "range": "0-0.4",
+     "default": "0.22"
+    },
+    {
+     "name": "alpha-dark",
+     "kind": "number",
+     "range": "0-0.15",
+     "default": "0.06"
+    },
+    {
+     "name": "blobs",
+     "kind": "text",
+     "range": "positions and colours",
+     "default": "4 radials"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "holo-iridescent",
+     "where": "js/aesthetics/holo-iridescent.js:75-94",
+     "variant": "four radial blobs (pink, cyan, lilac, mint) at 22% light / 6% dark"
+    },
+    {
+     "key": "holo-iridescent",
+     "where": "css/aesthetics/holo-iridescent.css:12-25,247",
+     "variant": "applied to the board root only; phones sit on the plain canvas"
+    }
+   ],
+   "expressibleAs": "tokens",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": false,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "hairline-rule",
+   "category": "material",
+   "name": "Hairline rule",
+   "what": "A 1px divider in a tint of the ink, the only separator between header, sections, rows and footer.",
+   "params": [
+    {
+     "name": "alpha",
+     "kind": "number",
+     "range": "0.1-0.35",
+     "default": "0.16"
+    },
+    {
+     "name": "highlight-line",
+     "kind": "bool",
+     "range": "",
+     "default": "false"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "holo-iridescent",
+     "where": "css/aesthetics/holo-iridescent.css:35,86,189",
+     "variant": "ink at 14%; rows use a gradient that fades at both ends plus a white highlight line below"
+    },
+    {
+     "key": "industrial-device",
+     "where": "css/aesthetics/industrial-device.css:32,224",
+     "variant": "ink at 16% with a 1px light line under it (machined lip)"
+    },
+    {
+     "key": "isogrid",
+     "where": "css/aesthetics/isogrid.css:45,60,177",
+     "variant": "1px solid --ab-edge (ink pulled to 3:1)"
+    },
+    {
+     "key": "japanese-minimal",
+     "where": "css/aesthetics/japanese-minimal.css:27-28,152-157",
+     "variant": "1px --ab-line, drawn with pseudo-elements on header, rows and footer"
+    },
+    {
+     "key": "liquid-glass",
+     "where": "css/aesthetics/liquid-glass.css:48,198",
+     "variant": "header rule and inset row separators in --ab-material-line (ink at 11%), separators inset 16px"
+    }
+   ],
+   "expressibleAs": "tokens",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "hairline-panel",
+   "category": "material",
+   "name": "Hairline panel",
+   "what": "Cards, panels and lists are drawn as a thin edge on the canvas instead of a shadowed fill; fill is none or a barely-lighter card tone.",
+   "params": [
+    {
+     "name": "fill",
+     "kind": "enum",
+     "range": "none|card-solid|glass",
+     "default": "card-solid"
+    },
+    {
+     "name": "edge-width",
+     "kind": "number",
+     "range": "1-2",
+     "default": "1"
+    },
+    {
+     "name": "radius",
+     "kind": "number",
+     "range": "0-28",
+     "default": "8"
+    },
+    {
+     "name": "light-edge-inset",
+     "kind": "bool",
+     "range": "",
+     "default": "false"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "holo-iridescent",
+     "where": "css/aesthetics/holo-iridescent.css:93-101",
+     "variant": "solid pearl card, plain hairline, radius 20, inset top highlight; one featured card gets the spectral edge"
+    },
+    {
+     "key": "industrial-device",
+     "where": "css/aesthetics/industrial-device.css:161-165",
+     "variant": "flat face tone, 1px hair, radius 8, no shadow ('only hardware has an edge')"
+    },
+    {
+     "key": "isogrid",
+     "where": "css/aesthetics/isogrid.css:97-100",
+     "variant": "transparent fill, 1px edge, radius 0, no shadow"
+    },
+    {
+     "key": "japanese-minimal",
+     "where": "css/aesthetics/japanese-minimal.css:93-99",
+     "variant": "flat card tone (50% white), 1px line, radius 2"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [
+    "card",
+    "panel",
+    "list",
+    "accordion",
+    "carousel-card",
+    "calendar"
+   ],
+   "conflictsWith": [
+    "clear-glass-panel"
+   ]
+  },
+  {
+   "id": "corner-radius",
+   "category": "material",
+   "name": "Corner radius",
+   "what": "One radius per surface class (panel, key, control, pill) set as a token or a rule.",
+   "params": [
+    {
+     "name": "panel",
+     "kind": "number",
+     "range": "0-32",
+     "default": "8"
+    },
+    {
+     "name": "control",
+     "kind": "number",
+     "range": "0-999",
+     "default": "4"
+    },
+    {
+     "name": "pill",
+     "kind": "bool",
+     "range": "",
+     "default": "false"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "holo-iridescent",
+     "where": "css/aesthetics/holo-iridescent.css:23,93-101,112-114",
+     "variant": "24 board, 20 panels, 12 controls, 999 segments"
+    },
+    {
+     "key": "industrial-device",
+     "where": "css/aesthetics/industrial-device.css:18,145,153-156",
+     "variant": "10 board, 8 panels, 4 keys"
+    },
+    {
+     "key": "isogrid",
+     "where": "css/aesthetics/isogrid.css:25,98-100",
+     "variant": "0 everywhere; deck.radius 0 in the definition"
+    },
+    {
+     "key": "japanese-minimal",
+     "where": "css/aesthetics/japanese-minimal.css:14,94-99,109-111",
+     "variant": "2px on card, action, chip; 0 on segment"
+    },
+    {
+     "key": "liquid-glass",
+     "where": "css/aesthetics/liquid-glass.css:13,184-193,234-240",
+     "variant": "32 board, 28 cards, 22 panels/lists, 999 capsules"
+    }
+   ],
+   "expressibleAs": "tokens",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [
+    "button",
+    "card",
+    "input",
+    "switch"
+   ],
+   "conflictsWith": []
+  },
+  {
+   "id": "key-underside-press",
+   "category": "material",
+   "name": "Key with underside, compresses on press",
+   "what": "A square control has a 1-2px darker underside (hard, zero-blur) and a top highlight; pressing translates it down by the same amount and drops the underside.",
+   "params": [
+    {
+     "name": "underside",
+     "kind": "number",
+     "range": "1-4",
+     "default": "2"
+    },
+    {
+     "name": "underside-colour",
+     "kind": "enum",
+     "range": "ink-mix|dark-key",
+     "default": "ink-mix"
+    },
+    {
+     "name": "press-translate",
+     "kind": "number",
+     "range": "0-4",
+     "default": "2"
+    },
+    {
+     "name": "top-highlight",
+     "kind": "bool",
+     "range": "",
+     "default": "true"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "industrial-device",
+     "where": "css/aesthetics/industrial-device.css:14-17,108-113,153-158,167-190",
+     "variant": "pads, seg buttons, type-apply and CTA; pressed seg stays down with inset shadow"
+    },
+    {
+     "key": "industrial-device",
+     "where": "js/aesthetics/industrial-device.js:185-195",
+     "variant": "materials 'Key', 'Graphite key', 'Key pressed'"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [
+    "button",
+    "segment",
+    "switch",
+    "stepper"
+   ],
+   "conflictsWith": [
+    "soft-raised-relief"
+   ]
+  },
+  {
+   "id": "recessed-field",
+   "category": "material",
+   "name": "Recessed field",
+   "what": "Inputs and toggle tracks sit sunk into the surface: a darker well tone with inset top shadow and a bottom light lip.",
+   "params": [
+    {
+     "name": "well-tone",
+     "kind": "enum",
+     "range": "ink-mix|white-alpha|dark-alpha",
+     "default": "ink-mix"
+    },
+    {
+     "name": "depth",
+     "kind": "number",
+     "range": "1-4",
+     "default": "2"
+    },
+    {
+     "name": "radius",
+     "kind": "number",
+     "range": "4-999",
+     "default": "4"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "industrial-device",
+     "where": "js/aesthetics/industrial-device.js:164-165",
+     "variant": "--ab-slot and --ab-slot-sh tokens"
+    },
+    {
+     "key": "industrial-device",
+     "where": "css/aesthetics/industrial-device.css:195-199,202-212",
+     "variant": "input and slide-switch track are slots; focus adds a primary ring"
+    },
+    {
+     "key": "liquid-glass",
+     "where": "css/aesthetics/liquid-glass.css:244-254",
+     "variant": "pill input and track use a faint well tint with a light inset shadow, backdrop blur on the input"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [
+    "input",
+    "switch",
+    "range"
+   ],
+   "conflictsWith": []
+  },
+  {
+   "id": "clear-glass-panel",
+   "category": "material",
+   "name": "Clear glass panel",
+   "what": "See-through surface: white at 7-16% alpha over the content behind, 2-6px backdrop blur with saturate/brightness lift, two-sided inset rim, hairline, soft contact shadow. Never a frosted slab.",
+   "params": [
+    {
+     "name": "fill-alpha",
+     "kind": "number",
+     "range": "0-0.18",
+     "default": "0.16"
+    },
+    {
+     "name": "blur",
+     "kind": "number",
+     "range": "2-6",
+     "default": "4"
+    },
+    {
+     "name": "saturate",
+     "kind": "number",
+     "range": "1-2",
+     "default": "1.6"
+    },
+    {
+     "name": "brightness",
+     "kind": "number",
+     "range": "0.85-1.1",
+     "default": "1.06"
+    },
+    {
+     "name": "local-tint",
+     "kind": "number",
+     "range": "0-0.62",
+     "default": "0"
+    },
+    {
+     "name": "rim",
+     "kind": "enum",
+     "range": "light|dark",
+     "default": "light"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "liquid-glass",
+     "where": "js/aesthetics/liquid-glass.js:58-105,183-193",
+     "variant": "tokens --ab-material (16%/7%), --ab-rim; materials 'Clear glass', 'Floating glass control', 'Glass over text' (62% canvas tint, 6px blur)"
+    },
+    {
+     "key": "liquid-glass",
+     "where": "css/aesthetics/liquid-glass.css:13-31,91-97,184-189,210-218",
+     "variant": "board root vars, floating glass, every card/panel/list, seg strip at 50% white tint"
+    },
+    {
+     "key": "liquid-glass",
+     "where": "css/aesthetics/liquid-glass.css:117-122",
+     "variant": "tab bar is smoked: 48% dark tint + brightness .85 so white labels hold 4.5:1"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": false,
+   "appSafe": true,
+   "kitScope": [
+    "card",
+    "panel",
+    "list",
+    "menu",
+    "dialog",
+    "sheet",
+    "segment",
+    "input",
+    "swatch"
+   ],
+   "conflictsWith": [
+    "hairline-panel",
+    "recessed-field"
+   ]
+  },
+  {
+   "id": "inset-edge-light",
+   "category": "material",
+   "name": "Inset edge light",
+   "what": "Two inset 1px shadows, a bright top-left edge and a darker or fainter bottom-right edge, give a surface a lit rim without a drop shadow.",
+   "params": [
+    {
+     "name": "hi-alpha",
+     "kind": "number",
+     "range": "0.05-0.95",
+     "default": "0.9"
+    },
+    {
+     "name": "lo-alpha",
+     "kind": "number",
+     "range": "0-0.55",
+     "default": "0.07"
+    },
+    {
+     "name": "lo-colour",
+     "kind": "enum",
+     "range": "ink|white",
+     "default": "ink"
+    },
+    {
+     "name": "size",
+     "kind": "number",
+     "range": "1-2",
+     "default": "1"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "liquid-glass",
+     "where": "css/aesthetics/liquid-glass.css:17,23,102-114",
+     "variant": "specular rim top-left plus fainter bottom-right; lens adds radial specular highlight"
+    },
+    {
+     "key": "holo-iridescent",
+     "where": "css/aesthetics/holo-iridescent.css:65-66,95-96",
+     "variant": "inset 0 1px 0 white highlight on foil plane and panels"
+    },
+    {
+     "key": "industrial-device",
+     "where": "css/aesthetics/industrial-device.css:14-17,68",
+     "variant": "--id-panel / --id-lip: light top edge plus darker bottom edge and a 1px lip"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [
+    "card",
+    "button",
+    "panel"
+   ],
+   "conflictsWith": []
+  },
+  {
+   "id": "soft-contact-shadow",
+   "category": "material",
+   "name": "Soft contact shadow",
+   "what": "A low, wide, low-alpha drop shadow (negative spread) under a floating surface so it reads as hovering a few pixels up.",
+   "params": [
+    {
+     "name": "y",
+     "kind": "number",
+     "range": "1-30",
+     "default": "6"
+    },
+    {
+     "name": "blur",
+     "kind": "number",
+     "range": "2-60",
+     "default": "16"
+    },
+    {
+     "name": "spread",
+     "kind": "number",
+     "range": "-30-0",
+     "default": "-6"
+    },
+    {
+     "name": "alpha",
+     "kind": "number",
+     "range": "0.08-0.5",
+     "default": "0.22"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "liquid-glass",
+     "where": "css/aesthetics/liquid-glass.css:18,24-25,91-97",
+     "variant": "--lg-sh / --lg-sh-sm / --lg-glass-shadow"
+    },
+    {
+     "key": "holo-iridescent",
+     "where": "js/aesthetics/holo-iridescent.js:105",
+     "variant": "--ab-lift: 0 14px 34px -16px ink at 20% on the featured card"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [
+    "card",
+    "menu",
+    "dialog"
+   ],
+   "conflictsWith": [
+    "hairline-panel"
+   ]
+  },
+  {
+   "id": "glossy-single-action",
+   "category": "material",
+   "name": "Glossy single action",
+   "what": "The one primary action carries a finishing layer on top of the solid or tinted primary: a flush rim, a soft specular, a low coloured glow.",
+   "params": [
+    {
+     "name": "finish",
+     "kind": "enum",
+     "range": "spectral-rim|tinted-glass-specular",
+     "default": "tinted-glass-specular"
+    },
+    {
+     "name": "primary-alpha",
+     "kind": "number",
+     "range": "0.74-1",
+     "default": "1"
+    },
+    {
+     "name": "glow-alpha",
+     "kind": "number",
+     "range": "0.3-0.55",
+     "default": "0.5"
+    },
+    {
+     "name": "radius",
+     "kind": "number",
+     "range": "12-999",
+     "default": "999"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "holo-iridescent",
+     "where": "css/aesthetics/holo-iridescent.css:112-125",
+     "variant": "solid primary inside a 2px spectral linear rim, 16% sheen, glow shadow; hover brightness 1.08"
+    },
+    {
+     "key": "liquid-glass",
+     "where": "css/aesthetics/liquid-glass.css:233-241",
+     "variant": "primary at partial alpha (--ab-cta-fill) plus radial specular, white rim, backdrop blur, glow; active scale .98"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [
+    "button",
+    "fab",
+    "split-button"
+   ],
+   "conflictsWith": []
+  },
+  {
+   "id": "bright-capsule-selected",
+   "category": "material",
+   "name": "Bright capsule for the selected item",
+   "what": "The selected segment, nav item or day becomes a bright near-white capsule (chrome or glass gradient) with dark ink and a small lift, instead of a primary fill.",
+   "params": [
+    {
+     "name": "gradient",
+     "kind": "enum",
+     "range": "chrome|white-glass",
+     "default": "white-glass"
+    },
+    {
+     "name": "ink",
+     "kind": "colour",
+     "range": "hex",
+     "default": "#10131c"
+    },
+    {
+     "name": "shape",
+     "kind": "enum",
+     "range": "pill|circle",
+     "default": "pill"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "holo-iridescent",
+     "where": "css/aesthetics/holo-iridescent.css:106-109,332",
+     "variant": "chrome gradient plus a pale foil wash; ink #17171b; also calendar selected day"
+    },
+    {
+     "key": "liquid-glass",
+     "where": "css/aesthetics/liquid-glass.css:226-230,131-134",
+     "variant": "white 94%->78% gradient capsule; the scene tab bar's selected tab uses the same"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [
+    "segment",
+    "tab",
+    "calendar-day",
+    "backtop"
+   ],
+   "conflictsWith": []
+  },
+  {
+   "id": "spectral-hairline-edge",
+   "category": "material",
+   "name": "Spectral hairline edge",
+   "what": "A gradient border (padding-box fill over a conic or linear border-box) used on exactly one featured surface, the focused field and the primary's rim.",
+   "params": [
+    {
+     "name": "gradient",
+     "kind": "enum",
+     "range": "conic|linear",
+     "default": "conic"
+    },
+    {
+     "name": "width",
+     "kind": "number",
+     "range": "1-2",
+     "default": "2"
+    },
+    {
+     "name": "surfaces",
+     "kind": "number",
+     "range": "1-3",
+     "default": "1"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "holo-iridescent",
+     "where": "css/aesthetics/holo-iridescent.css:13,97-100,129-137,112-118",
+     "variant": "featured card edge, field focus, CTA rim; every other panel is plain hairline"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [
+    "card",
+    "input",
+    "button",
+    "dialog"
+   ],
+   "conflictsWith": []
+  },
+  {
+   "id": "foil-wash-selected",
+   "category": "kit",
+   "name": "Restrained foil wash on selected state",
+   "what": "A pale (54-58% alpha) multi-stop sheen layered over the primary tint marks selected/current items in the app kit; solid text surface stays under it.",
+   "params": [
+    {
+     "name": "alpha",
+     "kind": "number",
+     "range": "0.1-0.6",
+     "default": "0.58"
+    },
+    {
+     "name": "angle",
+     "kind": "number",
+     "range": "90-135",
+     "default": "115"
+    },
+    {
+     "name": "sheen-alpha",
+     "kind": "number",
+     "range": "0.1-0.2",
+     "default": "0.16"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "holo-iridescent",
+     "where": "css/aesthetics/holo-iridescent.css:20-22,212-213,282-283,294,313,331-332",
+     "variant": "nav pill, avatar, menu item, back-to-top, calendar range and selected day, wheel band"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [
+    "nav",
+    "avatar",
+    "menu",
+    "calendar",
+    "wheel",
+    "accordion"
+   ],
+   "conflictsWith": []
+  },
+  {
+   "id": "foil-fringe-plane",
+   "category": "pattern",
+   "name": "Foil interference plane",
+   "what": "A large tilted card whose surface is repeating radial bands in a fixed colour order plus a conic angle sweep and a fixed specular band, so hue drifts in bands.",
+   "params": [
+    {
+     "name": "fringe-pitch-cqw",
+     "kind": "number",
+     "range": "1-4",
+     "default": "2.2"
+    },
+    {
+     "name": "alpha",
+     "kind": "number",
+     "range": "0.3-0.7",
+     "default": "0.62"
+    },
+    {
+     "name": "tilt",
+     "kind": "text",
+     "range": "perspective rotateX rotate",
+     "default": "900px 16deg -8deg"
+    },
+    {
+     "name": "stops",
+     "kind": "text",
+     "range": "colour list",
+     "default": "spectrum"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "holo-iridescent",
+     "where": "css/aesthetics/holo-iridescent.css:17-18,60-76",
+     "variant": "hero plane: fringe + angle + sheen layers, tilted, debossed initial"
+    },
+    {
+     "key": "holo-iridescent",
+     "where": "js/aesthetics/holo-iridescent.js:111-118,144-147",
+     "variant": "art() markup; materials 'Foil plane'"
+    },
+    {
+     "key": "holo-iridescent",
+     "where": "css/aesthetics/holo-iridescent.css:155-163",
+     "variant": "same gradient shrunk to a 28px disc as the Foil state sample"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": false,
+   "appSafe": false,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "thin-film-bubble",
+   "category": "ornament",
+   "name": "Thin-film bubble",
+   "what": "A circle ring of 40 spectral wedges swirled by feTurbulence, faded in from 56% radius, with a thin white rim and an optional canvas-coloured black spot.",
+   "params": [
+    {
+     "name": "wedges",
+     "kind": "number",
+     "range": "20-60",
+     "default": "40"
+    },
+    {
+     "name": "displace-scale",
+     "kind": "number",
+     "range": "6-20",
+     "default": "14"
+    },
+    {
+     "name": "black-spot",
+     "kind": "bool",
+     "range": "",
+     "default": "true (light only)"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "holo-iridescent",
+     "where": "js/aesthetics/holo-iridescent.js:123-143",
+     "variant": "SVG bubble built in art(); black spot dropped in dark mode"
+    }
+   ],
+   "expressibleAs": "svg-generator",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": false,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "spectrum-text-fill",
+   "category": "type",
+   "name": "Spectrum text fill",
+   "what": "The one highlighted headline word is filled with a gradient clipped to the letters, starting at the shaded accent and fading into the fixed spectrum.",
+   "params": [
+    {
+     "name": "start-colour",
+     "kind": "colour",
+     "range": "accent",
+     "default": "accent-ink shaded to 3.2:1"
+    },
+    {
+     "name": "stops",
+     "kind": "text",
+     "range": "colour list",
+     "default": "pink violet green"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "holo-iridescent",
+     "where": "js/aesthetics/holo-iridescent.js:35,104",
+     "variant": "--ab-hl-fill, each stop shaded to 3.2:1"
+    },
+    {
+     "key": "holo-iridescent",
+     "where": "css/aesthetics/holo-iridescent.css:46-52,260-262",
+     "variant": "background-clip text; slice (not clone) in the kit so wrapping balances"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": false,
+   "exportSafe": false,
+   "appSafe": true,
+   "kitScope": [
+    "headline"
+   ],
+   "conflictsWith": []
+  },
+  {
+   "id": "tight-display-tracking",
+   "category": "type",
+   "name": "Tight display tracking",
+   "what": "Display and title text uses a small negative letter-spacing scaled by the user's tracking token.",
+   "params": [
+    {
+     "name": "em",
+     "kind": "number",
+     "range": "-0.04-0",
+     "default": "-0.02"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "holo-iridescent",
+     "where": "css/aesthetics/holo-iridescent.css:28,44,110",
+     "variant": "-0.02em headline, -0.03em card title"
+    },
+    {
+     "key": "industrial-device",
+     "where": "css/aesthetics/industrial-device.css:22,54-57,182",
+     "variant": "-0.01em lowercase headline"
+    },
+    {
+     "key": "isogrid",
+     "where": "css/aesthetics/isogrid.css:51-54,109-111",
+     "variant": "-0.025em headline, -0.02em card title"
+    },
+    {
+     "key": "japanese-minimal",
+     "where": "css/aesthetics/japanese-minimal.css:46,98",
+     "variant": "-0.01em"
+    },
+    {
+     "key": "liquid-glass",
+     "where": "css/aesthetics/liquid-glass.css:40,52,231",
+     "variant": "-0.025em bold headline with opsz 32"
+    }
+   ],
+   "expressibleAs": "tokens",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "display-weight-scale",
+   "category": "type",
+   "name": "Display weight, size and case",
+   "what": "Headline weight and size step per style: light at huge size, regular at small size, or bold, plus optional lowercase.",
+   "params": [
+    {
+     "name": "weight",
+     "kind": "number",
+     "range": "300-700",
+     "default": "400"
+    },
+    {
+     "name": "size-max",
+     "kind": "number",
+     "range": "28-96",
+     "default": "44"
+    },
+    {
+     "name": "case",
+     "kind": "enum",
+     "range": "as-typed|lowercase",
+     "default": "as-typed"
+    },
+    {
+     "name": "line-height",
+     "kind": "number",
+     "range": "1-1.3",
+     "default": "1.1"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "holo-iridescent",
+     "where": "css/aesthetics/holo-iridescent.css:44",
+     "variant": "weight 300, line-height 1.04"
+    },
+    {
+     "key": "industrial-device",
+     "where": "css/aesthetics/industrial-device.css:54-57",
+     "variant": "weight 400, 30-44px, lowercase"
+    },
+    {
+     "key": "isogrid",
+     "where": "css/aesthetics/isogrid.css:51-54",
+     "variant": "weight 300 (declared in mainframe.css), 48-96px, line-height 1"
+    },
+    {
+     "key": "japanese-minimal",
+     "where": "css/aesthetics/japanese-minimal.css:46",
+     "variant": "weight 400, line-height 1.28, display 0.8x"
+    },
+    {
+     "key": "liquid-glass",
+     "where": "css/aesthetics/liquid-glass.css:52,66",
+     "variant": "weight 700, 28-62px, white over the scene"
+    }
+   ],
+   "expressibleAs": "tokens",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "caps-mono-labels",
+   "category": "type",
+   "name": "Small tracked labels",
+   "what": "Tag, kicker, section label and field label are set small with wide tracking, usually uppercase and often mono.",
+   "params": [
+    {
+     "name": "size",
+     "kind": "number",
+     "range": "10-13",
+     "default": "10.5"
+    },
+    {
+     "name": "tracking-em",
+     "kind": "number",
+     "range": "0-0.28",
+     "default": "0.16"
+    },
+    {
+     "name": "case",
+     "kind": "enum",
+     "range": "upper|lower|none",
+     "default": "upper"
+    },
+    {
+     "name": "face",
+     "kind": "enum",
+     "range": "mono|ui",
+     "default": "ui"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "holo-iridescent",
+     "where": "css/aesthetics/holo-iridescent.css:34-43,128",
+     "variant": "10.5px, 0.24em, uppercase UI face"
+    },
+    {
+     "key": "industrial-device",
+     "where": "css/aesthetics/industrial-device.css:27,35,52,194",
+     "variant": "10px mono 0.12em; kicker lowercase"
+    },
+    {
+     "key": "isogrid",
+     "where": "css/aesthetics/isogrid.css:29-33",
+     "variant": "Plex Mono 12/16 uppercase 0.04em"
+    },
+    {
+     "key": "japanese-minimal",
+     "where": "css/aesthetics/japanese-minimal.css:24,30,120",
+     "variant": "10.5px 0.16em uppercase"
+    },
+    {
+     "key": "liquid-glass",
+     "where": "css/aesthetics/liquid-glass.css:33-37",
+     "variant": "inverse: 12px sentence case, no caps (labels read as sentences)"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [
+    "label",
+    "tag"
+   ],
+   "conflictsWith": []
+  },
+  {
+   "id": "mixed-face-headline",
+   "category": "type",
+   "name": "Mixed-face emphasis word",
+   "what": "The one emphasised headline word switches to a different face (a mincho serif) at regular weight and keeps the ink colour.",
+   "params": [
+    {
+     "name": "face",
+     "kind": "text",
+     "range": "font stack",
+     "default": "Shippori Mincho"
+    },
+    {
+     "name": "words",
+     "kind": "number",
+     "range": "1",
+     "default": "1"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "japanese-minimal",
+     "where": "css/aesthetics/japanese-minimal.css:49-51",
+     "variant": ".jm-em at weight 400, falls back to heading face"
+    },
+    {
+     "key": "japanese-minimal",
+     "where": "js/aesthetics/japanese-minimal.js:49-71",
+     "variant": "headline hook wraps the last word in .ab-hl.jm-em"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [
+    "headline"
+   ],
+   "conflictsWith": []
+  },
+  {
+   "id": "vertical-kicker",
+   "category": "type",
+   "name": "Vertical kicker with a lead line",
+   "what": "The kicker is set top-to-bottom (vertical-rl) in the hero margin, with a 1px line drawn above it by a background gradient.",
+   "params": [
+    {
+     "name": "line-length",
+     "kind": "number",
+     "range": "12-48",
+     "default": "24"
+    },
+    {
+     "name": "tracking-em",
+     "kind": "number",
+     "range": "0.1-0.3",
+     "default": "0.22"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "japanese-minimal",
+     "where": "css/aesthetics/japanese-minimal.css:41-45",
+     "variant": "writing-mode vertical-rl, absolutely placed at left"
+    },
+    {
+     "key": "japanese-minimal",
+     "where": "js/aesthetics/japanese-minimal.js:94",
+     "variant": "the hero SVG also carries a rotated -90deg text label"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": false,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "printed-legend-on-object",
+   "category": "type",
+   "name": "Printed legend on the object",
+   "what": "Tiny lowercase mono captions sit directly on or under each part of a drawn object, in the hardware's own print position, never as callouts.",
+   "params": [
+    {
+     "name": "size",
+     "kind": "number",
+     "range": "5-8",
+     "default": "7"
+    },
+    {
+     "name": "tracking-em",
+     "kind": "number",
+     "range": "0-0.1",
+     "default": "0.06"
+    },
+    {
+     "name": "case",
+     "kind": "enum",
+     "range": "lowercase",
+     "default": "lowercase"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "industrial-device",
+     "where": "js/aesthetics/industrial-device.js:60,64,66,69",
+     "variant": "legends above the OLED, under knob, transport row and model line"
+    },
+    {
+     "key": "industrial-device",
+     "where": "css/aesthetics/industrial-device.css:69-72,106-107",
+     "variant": "6-8px Azeret Mono muted, nowrap; SVG text legends at 1.15-1.3 units"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": false,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "split-hero-ratio",
+   "category": "layout",
+   "name": "Split hero with set column ratio",
+   "what": "Hero is two columns (copy and art) with a stated ratio, alignment and vertical padding.",
+   "params": [
+    {
+     "name": "copy-fr",
+     "kind": "number",
+     "range": "0.5-1.2",
+     "default": "1"
+    },
+    {
+     "name": "art-fr",
+     "kind": "number",
+     "range": "0.8-1.5",
+     "default": "1"
+    },
+    {
+     "name": "align",
+     "kind": "enum",
+     "range": "start|center|end|stretch",
+     "default": "center"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "holo-iridescent",
+     "where": "css/aesthetics/holo-iridescent.css:42",
+     "variant": "1.15fr / 1fr"
+    },
+    {
+     "key": "industrial-device",
+     "where": "css/aesthetics/industrial-device.css:49-51",
+     "variant": "0.55fr / 1.45fr, bottom-aligned"
+    },
+    {
+     "key": "isogrid",
+     "where": "css/aesthetics/isogrid.css:47-48",
+     "variant": "1fr / 1fr halves, centred"
+    },
+    {
+     "key": "japanese-minimal",
+     "where": "css/aesthetics/japanese-minimal.css:34-40",
+     "variant": "1fr / 1fr, art in row 1, copy spans two rows, min-height 360-580"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": false,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "edge-bleed-hero-object",
+   "category": "layout",
+   "name": "Hero object bleeds off the board edge",
+   "what": "The hero art uses a negative margin equal to the board padding so a large object runs off the right edge instead of sitting in a frame.",
+   "params": [
+    {
+     "name": "edge",
+     "kind": "enum",
+     "range": "right",
+     "default": "right"
+    },
+    {
+     "name": "size",
+     "kind": "text",
+     "range": "width / aspect",
+     "default": "100cqw / 1.6"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "holo-iridescent",
+     "where": "css/aesthetics/holo-iridescent.css:55-67",
+     "variant": "foil plane 100cqw wide, margin-right -pad"
+    },
+    {
+     "key": "industrial-device",
+     "where": "css/aesthetics/industrial-device.css:62,68",
+     "variant": "device body 100:64 aspect, left corners rounded, right edge open"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": false,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "copy-on-scene-hero",
+   "category": "layout",
+   "name": "Headline set on the art, not on the canvas",
+   "what": "On wide boards the hero copy is placed directly over the dark lower-left of the scene art in white, with a text-shadow; on narrow boards it drops below on the canvas.",
+   "params": [
+    {
+     "name": "breakpoint-px",
+     "kind": "number",
+     "range": "600",
+     "default": "600"
+    },
+    {
+     "name": "max-width-cqw",
+     "kind": "number",
+     "range": "30-40",
+     "default": "37"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "liquid-glass",
+     "where": "css/aesthetics/liquid-glass.css:50-71,146-157",
+     "variant": "copy over the scene, accent word lightened to 3:1; narrow restacks"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": false,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "hidden-column-grid",
+   "category": "layout",
+   "name": "Strict column grid",
+   "what": "All blocks align to a fixed shared column set (halves, quarters, eight columns), with column spans assigned per swatch/section.",
+   "params": [
+    {
+     "name": "columns",
+     "kind": "number",
+     "range": "2-8",
+     "default": "2"
+    },
+    {
+     "name": "gap",
+     "kind": "number",
+     "range": "16-72",
+     "default": "32"
+    },
+    {
+     "name": "spans",
+     "kind": "text",
+     "range": "per role",
+     "default": ""
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "isogrid",
+     "where": "css/aesthetics/isogrid.css:72-79,94-95",
+     "variant": "8 columns; primary and secondary span 4, ink and canvas 2; sections in halves"
+    },
+    {
+     "key": "japanese-minimal",
+     "where": "css/aesthetics/japanese-minimal.css:35-40,89-91",
+     "variant": "strict two columns; every block left-aligned to the same columns"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": false,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "palette-board-layout",
+   "category": "layout",
+   "name": "Palette presentation",
+   "what": "How the five role swatches are laid out on the board: strips, numbered chips, ruled list, grid, or glass capsules.",
+   "params": [
+    {
+     "name": "kind",
+     "kind": "enum",
+     "range": "strips|chips|list|swatches|capsules",
+     "default": "swatches"
+    },
+    {
+     "name": "numbered",
+     "kind": "bool",
+     "range": "",
+     "default": "false"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "holo-iridescent",
+     "where": "css/aesthetics/holo-iridescent.css:86-90",
+     "variant": "flat strips with hairline ring"
+    },
+    {
+     "key": "industrial-device",
+     "where": "css/aesthetics/industrial-device.css:134-142",
+     "variant": "numbered CMF chips, CSS counter in Doto"
+    },
+    {
+     "key": "isogrid",
+     "where": "css/aesthetics/isogrid.css:68-79",
+     "variant": "8-column swatch grid, square chips"
+    },
+    {
+     "key": "japanese-minimal",
+     "where": "css/aesthetics/japanese-minimal.css:65-75",
+     "variant": "ruled index, square chips, accent chip is a circle with fixed hex"
+    },
+    {
+     "key": "liquid-glass",
+     "where": "css/aesthetics/liquid-glass.css:159-181",
+     "variant": "glass capsules, five on one row on wide boards"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": false,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "ruled-row-list",
+   "category": "layout",
+   "name": "Ruled row list",
+   "what": "A list is rows separated by rules; the rule style, row height, leading index, status chip and trailing meter are the settings.",
+   "params": [
+    {
+     "name": "rule",
+     "kind": "enum",
+     "range": "solid|fade|inset16|ticks",
+     "default": "solid"
+    },
+    {
+     "name": "row-min-px",
+     "kind": "number",
+     "range": "44-64",
+     "default": "54"
+    },
+    {
+     "name": "index",
+     "kind": "enum",
+     "range": "none|counter|number",
+     "default": "number"
+    },
+    {
+     "name": "trailing",
+     "kind": "enum",
+     "range": "bar|chevron|none",
+     "default": "bar"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "holo-iridescent",
+     "where": "css/aesthetics/holo-iridescent.css:166-186",
+     "variant": "fading gradient rules, spectral dot in place of the avatar, 4px bar"
+    },
+    {
+     "key": "industrial-device",
+     "where": "css/aesthetics/industrial-device.css:220-247",
+     "variant": "channel strip: caption bar, CSS counter 01.., LED meter, perforation footer"
+    },
+    {
+     "key": "isogrid",
+     "where": "css/aesthetics/isogrid.css:146-163",
+     "variant": "64px min rows, bottom rule, outlined status and track"
+    },
+    {
+     "key": "japanese-minimal",
+     "where": "css/aesthetics/japanese-minimal.css:139-150",
+     "variant": "pseudo-element rules, 2px progress line, uppercase status"
+    },
+    {
+     "key": "liquid-glass",
+     "where": "js/aesthetics/liquid-glass.js:173-181",
+     "variant": "inset grouped list: title, detail, chevron markup"
+    },
+    {
+     "key": "liquid-glass",
+     "where": "css/aesthetics/liquid-glass.css:192-202",
+     "variant": "17px rows, separators inset 16px, glass list container"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [
+    "list",
+    "row"
+   ],
+   "conflictsWith": []
+  },
+  {
+   "id": "single-accent-dot",
+   "category": "ornament",
+   "name": "Single accent dot",
+   "what": "One small dot per view carries the accent: a flag-red circle, a power LED, a footer bead; it is not a brand role beyond that.",
+   "params": [
+    {
+     "name": "size",
+     "kind": "number",
+     "range": "6-9",
+     "default": "7"
+    },
+    {
+     "name": "shape",
+     "kind": "enum",
+     "range": "circle|square",
+     "default": "circle"
+    },
+    {
+     "name": "colour",
+     "kind": "enum",
+     "range": "fixed|accent",
+     "default": "accent"
+    },
+    {
+     "name": "count",
+     "kind": "number",
+     "range": "1",
+     "default": "1"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "japanese-minimal",
+     "where": "css/aesthetics/japanese-minimal.css:152-157,226",
+     "variant": "footer dot removed, one vermilion dot beside the kicker in the app"
+    },
+    {
+     "key": "industrial-device",
+     "where": "css/aesthetics/industrial-device.css:28-31,52-53",
+     "variant": "6px LED in the accent beside the tag and kicker"
+    },
+    {
+     "key": "holo-iridescent",
+     "where": "css/aesthetics/holo-iridescent.css:190-194",
+     "variant": "9px accent bead with a chrome ring"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [
+    "kicker",
+    "status"
+   ],
+   "conflictsWith": []
+  },
+  {
+   "id": "grain-overlay",
+   "category": "material",
+   "name": "Paper fibre overlay",
+   "what": "A masked feTurbulence texture at low opacity sits behind the hero art only, never under text.",
+   "params": [
+    {
+     "name": "opacity",
+     "kind": "number",
+     "range": "0.1-0.5",
+     "default": "0.32"
+    },
+    {
+     "name": "base-frequency",
+     "kind": "text",
+     "range": "x y",
+     "default": ".9 .018"
+    },
+    {
+     "name": "mask",
+     "kind": "enum",
+     "range": "radial|none",
+     "default": "radial"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "japanese-minimal",
+     "where": "css/aesthetics/japanese-minimal.css:55-63",
+     "variant": "data-URI SVG noise behind .jm-art, masked radially"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": false,
+   "appSafe": false,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "hairline-grid-field",
+   "category": "pattern",
+   "name": "Measured hairline grid field",
+   "what": "Hero art is a grid of half-width ink lines with short ticks along the foot and left edge, one filled dot on a crossing and a rotated label.",
+   "params": [
+    {
+     "name": "cell",
+     "kind": "number",
+     "range": "16-64",
+     "default": "32"
+    },
+    {
+     "name": "tick-step",
+     "kind": "number",
+     "range": "4-16",
+     "default": "8"
+    },
+    {
+     "name": "dot-radius",
+     "kind": "number",
+     "range": "3-8",
+     "default": "5.5"
+    },
+    {
+     "name": "label",
+     "kind": "text",
+     "range": "",
+     "default": ""
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "japanese-minimal",
+     "where": "js/aesthetics/japanese-minimal.js:75-96",
+     "variant": "200x176 viewBox, 6 columns by 5 rows, ticks, vermilion dot at (120,88)"
+    },
+    {
+     "key": "japanese-minimal",
+     "where": "js/aesthetics/japanese-minimal.js:99-113",
+     "variant": "deck specimen: three captioned hairline/action/dot samples"
+    }
+   ],
+   "expressibleAs": "svg-generator",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": false,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "dot-field",
+   "category": "pattern",
+   "name": "Regular dot field",
+   "what": "A regular lattice of small dots (square or isometric offset) as a perforation, a lattice behind drawing or a strip footer.",
+   "params": [
+    {
+     "name": "pitch",
+     "kind": "number",
+     "range": "8-28",
+     "default": "16"
+    },
+    {
+     "name": "radius",
+     "kind": "number",
+     "range": "0.9-3",
+     "default": "1.3"
+    },
+    {
+     "name": "offset",
+     "kind": "enum",
+     "range": "square|isometric",
+     "default": "square"
+    },
+    {
+     "name": "ink",
+     "kind": "enum",
+     "range": "ink-faint|hair",
+     "default": "ink-faint"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "industrial-device",
+     "where": "js/aesthetics/industrial-device.js:40",
+     "variant": "48-dot speaker grille"
+    },
+    {
+     "key": "industrial-device",
+     "where": "css/aesthetics/industrial-device.css:130-132,226-229",
+     "variant": "grille as 8x6 grid of dots; list footer radial-gradient dots"
+    },
+    {
+     "key": "isogrid",
+     "where": "js/aesthetics/isogrid.js:250-258",
+     "variant": "isometric offset dot pattern under the drawing, tile = 2*cos30*16"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": false,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "brand-initial-hero-object",
+   "category": "ornament",
+   "name": "Brand initial as the hero object",
+   "what": "The brand initial is the one subject of the hero art, drawn as a flat glyph, a debossed mark, or an extruded block stack.",
+   "params": [
+    {
+     "name": "treatment",
+     "kind": "enum",
+     "range": "flat-glyph|deboss|extruded-stack|pixel-word",
+     "default": "flat-glyph"
+    },
+    {
+     "name": "source",
+     "kind": "enum",
+     "range": "initial|first-word",
+     "default": "initial"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "liquid-glass",
+     "where": "js/aesthetics/liquid-glass.js:120-122",
+     "variant": "crisp 30cqw glyph in the scene for the lens to bend"
+    },
+    {
+     "key": "holo-iridescent",
+     "where": "js/aesthetics/holo-iridescent.js:121,145",
+     "variant": "debossed in the foil plane's lower right (transparent text, light and dark text-shadow)"
+    },
+    {
+     "key": "isogrid",
+     "where": "js/aesthetics/isogrid.js:44-53,242-251",
+     "variant": "5x7 bitmap glyph extruded into isometric blocks"
+    },
+    {
+     "key": "industrial-device",
+     "where": "js/aesthetics/industrial-device.js:17-20,61",
+     "variant": "OLED shows the first word in single-ink pixels, sized to fit nine characters"
+    }
+   ],
+   "expressibleAs": "svg-generator",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": false,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "isometric-extrusion-art",
+   "category": "ornament",
+   "name": "Isometric extruded block drawing",
+   "what": "Each lit cell of a bitmap glyph is extruded backwards 1-3 blocks (seeded from the brand name), drawn at 30-degree axes with hidden faces culled; one face set is filled with the primary, others hairline ink.",
+   "params": [
+    {
+     "name": "unit",
+     "kind": "number",
+     "range": "16-40",
+     "default": "26"
+    },
+    {
+     "name": "seed",
+     "kind": "text",
+     "range": "brand name hash",
+     "default": ""
+    },
+    {
+     "name": "fill-face",
+     "kind": "enum",
+     "range": "top|front|right",
+     "default": "top"
+    },
+    {
+     "name": "max-depth",
+     "kind": "number",
+     "range": "1-4",
+     "default": "3"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "isogrid",
+     "where": "js/aesthetics/isogrid.js:24-103,242-264",
+     "variant": "igStack, igLadder (4/8/16/32 cubes), igPath; FNV-1a and mulberry32 seeding"
+    },
+    {
+     "key": "isogrid",
+     "where": "css/aesthetics/isogrid.css:57-66",
+     "variant": "faces are canvas with 1px ink stroke, one set primary, non-scaling stroke"
+    }
+   ],
+   "expressibleAs": "svg-generator",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": false,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "rim-refraction-lens",
+   "category": "ornament",
+   "name": "Rim-refraction lens",
+   "what": "A squircle lens holds a 1:1 duplicate of the scene run through an SVG displacement filter driven by a blurred normal map that is neutral in the middle and ramps in the outer ~22%, plus a faint echo as fringe; bright rim and specular on top.",
+   "params": [
+    {
+     "name": "scale",
+     "kind": "number",
+     "range": "20-60",
+     "default": "40"
+    },
+    {
+     "name": "ramp-edge",
+     "kind": "number",
+     "range": "0.15-0.3",
+     "default": "0.22"
+    },
+    {
+     "name": "map-blur",
+     "kind": "number",
+     "range": "2-6",
+     "default": "4"
+    },
+    {
+     "name": "echo-mix",
+     "kind": "number",
+     "range": "0-0.3",
+     "default": "0.2"
+    },
+    {
+     "name": "radius-pct",
+     "kind": "number",
+     "range": "20-50",
+     "default": "28"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "liquid-glass",
+     "where": "js/aesthetics/liquid-glass.js:107-157",
+     "variant": "ramp() normal-map data URIs, feImage/feComposite/feDisplacementMap chain, lens() geometry"
+    },
+    {
+     "key": "liquid-glass",
+     "where": "css/aesthetics/liquid-glass.css:102-115",
+     "variant": "lens box-shadow, bend filter, ::after specular; narrow board swaps lens-w for lens-n"
+    }
+   ],
+   "expressibleAs": "svg-generator",
+   "paletteAgnostic": true,
+   "exportSafe": false,
+   "appSafe": false,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "hard-edged-scene-under-glass",
+   "category": "pattern",
+   "name": "Hard-edged brand scene under glass",
+   "what": "A dark base plus adjacent hard-stop planes of primary, accent and secondary (and one crisp glyph) so something sharp exists for glass to float over; also reused as a strip behind a floating control.",
+   "params": [
+    {
+     "name": "base",
+     "kind": "enum",
+     "range": "ink-80|canvas-50",
+     "default": "ink-80"
+    },
+    {
+     "name": "stops",
+     "kind": "text",
+     "range": "% positions",
+     "default": "50 72 77"
+    },
+    {
+     "name": "highlight",
+     "kind": "number",
+     "range": "0-0.3",
+     "default": "0.25"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "liquid-glass",
+     "where": "css/aesthetics/liquid-glass.css:73-89,146-157",
+     "variant": "hero scene gradient, narrow stops 30/62/70"
+    },
+    {
+     "key": "liquid-glass",
+     "where": "css/aesthetics/liquid-glass.css:204-209,221-223",
+     "variant": "96px scene strip behind the segmented control; deck cell backdrop"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": false,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "floating-glass-controls",
+   "category": "kit",
+   "name": "Floating glass tab bar and slider",
+   "what": "A capsule tab bar and slider drawn as glass over the scene, with a smoked tint and bright lens for the selected tab, and a droplet thumb.",
+   "params": [
+    {
+     "name": "tint",
+     "kind": "number",
+     "range": "0-0.5",
+     "default": "0.48"
+    },
+    {
+     "name": "thumb",
+     "kind": "number",
+     "range": "24-32",
+     "default": "28"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "liquid-glass",
+     "where": "css/aesthetics/liquid-glass.css:93-97,117-144",
+     "variant": "tab bar, slider track/fill/thumb"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": false,
+   "appSafe": false,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "hardware-key-grid",
+   "category": "kit",
+   "name": "Hardware key grid",
+   "what": "A grid of square keys in two families (light key, graphite key) plus one primary key, with a legend inside each cap.",
+   "params": [
+    {
+     "name": "cols",
+     "kind": "number",
+     "range": "3-6",
+     "default": "4"
+    },
+    {
+     "name": "families",
+     "kind": "number",
+     "range": "1-3",
+     "default": "2"
+    },
+    {
+     "name": "main-key",
+     "kind": "bool",
+     "range": "",
+     "default": "true"
+    },
+    {
+     "name": "keybed-steps",
+     "kind": "number",
+     "range": "8-24",
+     "default": "16"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "industrial-device",
+     "where": "js/aesthetics/industrial-device.js:27-36,39",
+     "variant": "4x4 pads, graphite function column and transport row, one main key, 16-step keybed"
+    },
+    {
+     "key": "industrial-device",
+     "where": "css/aesthetics/industrial-device.css:108-129",
+     "variant": "idv-keys, idv-fn, idv-bed rules"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": false,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "oled-pixel-strip",
+   "category": "ornament",
+   "name": "Single-ink OLED strip",
+   "what": "A black screen with the name in pixel type and a segmented meter, both in one lifted ink, with scanlines over the glass.",
+   "params": [
+    {
+     "name": "ink",
+     "kind": "colour",
+     "range": "primary lifted to 7:1",
+     "default": ""
+    },
+    {
+     "name": "scanline",
+     "kind": "text",
+     "range": "0 1px 3px",
+     "default": "1px / 3px"
+    },
+    {
+     "name": "meter-bars",
+     "kind": "number",
+     "range": "5-12",
+     "default": "9"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "industrial-device",
+     "where": "js/aesthetics/industrial-device.js:17-20,41-42,61,150-168",
+     "variant": "word sizing, bars, token --ab-oled-ink"
+    },
+    {
+     "key": "industrial-device",
+     "where": "css/aesthetics/industrial-device.css:73-85",
+     "variant": "OLED box, scanline pseudo, Doto text, striped bars"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": false,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "encoder-knob-scale",
+   "category": "ornament",
+   "name": "Knob with printed scale",
+   "what": "A round knob with 11 printed ticks over 270 degrees, 0/5/10 numerals, a knurled ring and a primary pointer; and a row of coded encoder caps.",
+   "params": [
+    {
+     "name": "ticks",
+     "kind": "number",
+     "range": "5-21",
+     "default": "11"
+    },
+    {
+     "name": "sweep-deg",
+     "kind": "number",
+     "range": "180-300",
+     "default": "270"
+    },
+    {
+     "name": "knurl-ticks",
+     "kind": "number",
+     "range": "24-96",
+     "default": "48"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "industrial-device",
+     "where": "js/aesthetics/industrial-device.js:38,43-56,63-64",
+     "variant": "SVG tick/numeral generator and encoder caps"
+    },
+    {
+     "key": "industrial-device",
+     "where": "css/aesthetics/industrial-device.css:86-107",
+     "variant": "cap rings, knob inner disc, pointer, scale strokes"
+    }
+   ],
+   "expressibleAs": "svg-generator",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": false,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "single-primary-action",
+   "category": "kit",
+   "name": "Single primary action",
+   "what": "Exactly one filled primary button per view; its radius, label case, font, padding and finish are set by the style, all other actions are outlined or key-like.",
+   "params": [
+    {
+     "name": "radius",
+     "kind": "number",
+     "range": "0-999",
+     "default": "4"
+    },
+    {
+     "name": "label-case",
+     "kind": "enum",
+     "range": "upper|lower|as-typed",
+     "default": "as-typed"
+    },
+    {
+     "name": "font",
+     "kind": "enum",
+     "range": "mono|ui",
+     "default": "ui"
+    },
+    {
+     "name": "min-height",
+     "kind": "number",
+     "range": "36-64",
+     "default": "48"
+    },
+    {
+     "name": "arrow",
+     "kind": "enum",
+     "range": "none|rule|glyph|corner",
+     "default": "none"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "holo-iridescent",
+     "where": "css/aesthetics/holo-iridescent.css:112-118",
+     "variant": "12px radius, glossy rim"
+    },
+    {
+     "key": "industrial-device",
+     "where": "css/aesthetics/industrial-device.css:184-191",
+     "variant": "4px, mono uppercase 12px, underside, ▸ arrow"
+    },
+    {
+     "key": "isogrid",
+     "where": "css/aesthetics/isogrid.css:115-125",
+     "variant": "min-height 64, grid with arrow bottom-right"
+    },
+    {
+     "key": "japanese-minimal",
+     "where": "css/aesthetics/japanese-minimal.css:108-116",
+     "variant": "2px radius, 12px, a 14px 1px-rule arrow"
+    },
+    {
+     "key": "liquid-glass",
+     "where": "css/aesthetics/liquid-glass.css:233-241",
+     "variant": "999 capsule, tinted glass"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [
+    "button"
+   ],
+   "conflictsWith": []
+  },
+  {
+   "id": "corner-anchored-button",
+   "category": "kit",
+   "name": "Corner-anchored tall button",
+   "what": "A tall button sets its label at top-left and a 20px arrow at bottom-right of the same box.",
+   "params": [
+    {
+     "name": "min-height",
+     "kind": "number",
+     "range": "48-96",
+     "default": "64"
+    },
+    {
+     "name": "arrow",
+     "kind": "text",
+     "range": "glyph",
+     "default": "→"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "isogrid",
+     "where": "css/aesthetics/isogrid.css:115-128",
+     "variant": "grid columns 1fr auto; label align-self start, arrow end"
+    },
+    {
+     "key": "isogrid",
+     "where": "js/aesthetics/isogrid.js:270-272",
+     "variant": "materials 'Main button' / 'Secondary button'"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [
+    "button"
+   ],
+   "conflictsWith": []
+  },
+  {
+   "id": "selection-bar",
+   "category": "kit",
+   "name": "Selection bar on an edge",
+   "what": "The selected tab, segment, nav row or list row is marked by a bar in the primary on one edge, with the label going to ink at a heavier weight.",
+   "params": [
+    {
+     "name": "edge",
+     "kind": "enum",
+     "range": "top|bottom|left",
+     "default": "top"
+    },
+    {
+     "name": "thickness",
+     "kind": "number",
+     "range": "2-4",
+     "default": "4"
+    },
+    {
+     "name": "label-weight",
+     "kind": "number",
+     "range": "500-600",
+     "default": "600"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "isogrid",
+     "where": "css/aesthetics/isogrid.css:101-108",
+     "variant": "4px inset bar on the top edge"
+    },
+    {
+     "key": "japanese-minimal",
+     "where": "css/aesthetics/japanese-minimal.css:101-106,214-217",
+     "variant": "2px bottom underline on segments; 2px left bar on nav row"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [
+    "segment",
+    "tab",
+    "nav",
+    "row"
+   ],
+   "conflictsWith": []
+  },
+  {
+   "id": "outline-underline-field",
+   "category": "kit",
+   "name": "Field anatomy",
+   "what": "Input is outlined, underlined or softly framed, with a defined focus treatment (ring, thicker underline, spectral edge).",
+   "params": [
+    {
+     "name": "kind",
+     "kind": "enum",
+     "range": "outline|underline|soft-frame",
+     "default": "outline"
+    },
+    {
+     "name": "height",
+     "kind": "number",
+     "range": "40-56",
+     "default": "48"
+    },
+    {
+     "name": "focus",
+     "kind": "enum",
+     "range": "outline-ring|thicker-underline|glow|spectral",
+     "default": "outline-ring"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "isogrid",
+     "where": "css/aesthetics/isogrid.css:131-136",
+     "variant": "48px outlined, transparent, 2px outline on focus"
+    },
+    {
+     "key": "japanese-minimal",
+     "where": "css/aesthetics/japanese-minimal.css:118-122",
+     "variant": "bottom hairline only, 2px primary on focus"
+    },
+    {
+     "key": "holo-iridescent",
+     "where": "css/aesthetics/holo-iridescent.css:129-137",
+     "variant": "12px soft frame, focus swaps to spectral border and lilac halo"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [
+    "input"
+   ],
+   "conflictsWith": []
+  },
+  {
+   "id": "toggle-anatomy",
+   "category": "kit",
+   "name": "Toggle anatomy",
+   "what": "The switch has a track shape, a knob shape and an on colour: square outlined, slide block with grip lines, chrome bead, or glass droplet.",
+   "params": [
+    {
+     "name": "track",
+     "kind": "enum",
+     "range": "square|pill|slot",
+     "default": "pill"
+    },
+    {
+     "name": "knob",
+     "kind": "enum",
+     "range": "block|chrome-bead|glass-droplet|square",
+     "default": "block"
+    },
+    {
+     "name": "on-fill",
+     "kind": "enum",
+     "range": "primary",
+     "default": "primary"
+    },
+    {
+     "name": "size",
+     "kind": "text",
+     "range": "w x h",
+     "default": "52x26"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "japanese-minimal",
+     "where": "css/aesthetics/japanese-minimal.css:124-127",
+     "variant": "40x20 square track, 12px square knob"
+    },
+    {
+     "key": "isogrid",
+     "where": "css/aesthetics/isogrid.css:138-144",
+     "variant": "64x32 square, 16px square knob"
+    },
+    {
+     "key": "industrial-device",
+     "where": "css/aesthetics/industrial-device.css:202-212",
+     "variant": "52x26 slot track, 24x20 grip-lined block knob"
+    },
+    {
+     "key": "holo-iridescent",
+     "where": "css/aesthetics/holo-iridescent.css:138-148",
+     "variant": "pill track, chrome radial knob, primary on"
+    },
+    {
+     "key": "liquid-glass",
+     "where": "css/aesthetics/liquid-glass.css:251-260",
+     "variant": "56x32 pill, 34px clear droplet knob"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [
+    "switch"
+   ],
+   "conflictsWith": []
+  },
+  {
+   "id": "progress-bar-style",
+   "category": "kit",
+   "name": "Progress bar style",
+   "what": "A progress track and fill set as thin line, outlined bar, hairline bar or segmented LED ticks.",
+   "params": [
+    {
+     "name": "height",
+     "kind": "number",
+     "range": "2-10",
+     "default": "4"
+    },
+    {
+     "name": "segmented",
+     "kind": "bool",
+     "range": "",
+     "default": "false"
+    },
+    {
+     "name": "outlined",
+     "kind": "bool",
+     "range": "",
+     "default": "false"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "japanese-minimal",
+     "where": "css/aesthetics/japanese-minimal.css:147-150",
+     "variant": "2px line on a 2px track"
+    },
+    {
+     "key": "isogrid",
+     "where": "css/aesthetics/isogrid.css:160-161",
+     "variant": "8px outlined track, primary fill, no radius"
+    },
+    {
+     "key": "industrial-device",
+     "where": "css/aesthetics/industrial-device.css:243-246",
+     "variant": "10px repeating-gradient segments, ink fill"
+    },
+    {
+     "key": "holo-iridescent",
+     "where": "css/aesthetics/holo-iridescent.css:185-186",
+     "variant": "4px hair track, secondary fill"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [
+    "progress",
+    "row"
+   ],
+   "conflictsWith": []
+  },
+  {
+   "id": "named-states",
+   "category": "kit",
+   "name": "Named state samples",
+   "what": "The three states a style names (e.g. Up / Hover / Down) are shown as samples of that style's control: chips with discs, squares, or the real control in each state.",
+   "params": [
+    {
+     "name": "kind",
+     "kind": "enum",
+     "range": "chip|swatch|button",
+     "default": "button"
+    },
+    {
+     "name": "names",
+     "kind": "text",
+     "range": "three words",
+     "default": ""
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "holo-iridescent",
+     "where": "css/aesthetics/holo-iridescent.css:149-163",
+     "variant": "28px discs: matte, pearl, foil"
+    },
+    {
+     "key": "industrial-device",
+     "where": "css/aesthetics/industrial-device.css:213-218",
+     "variant": "same key rendered up/hover/down"
+    },
+    {
+     "key": "isogrid",
+     "where": "css/aesthetics/isogrid.css:126-129",
+     "variant": "tall buttons rest/hover/pressed"
+    },
+    {
+     "key": "japanese-minimal",
+     "where": "css/aesthetics/japanese-minimal.css:131-137",
+     "variant": "three 28px squares: line, primary frame, filled ink"
+    },
+    {
+     "key": "liquid-glass",
+     "where": "js/aesthetics/liquid-glass.js:25",
+     "variant": "chip kind, names Clear/Tinted/Frosted"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [
+    "button"
+   ],
+   "conflictsWith": []
+  },
+  {
+   "id": "press-feedback",
+   "category": "motion",
+   "name": "Press and hover feedback",
+   "what": "Short transitions on hover and press: brightness, 1-2px translate, 0.98 scale, or background step.",
+   "params": [
+    {
+     "name": "hover",
+     "kind": "enum",
+     "range": "brightness|bg-step|none",
+     "default": "brightness"
+    },
+    {
+     "name": "press",
+     "kind": "enum",
+     "range": "translate-1|translate-2|scale-.98|bg-step",
+     "default": "translate-1"
+    },
+    {
+     "name": "ms",
+     "kind": "number",
+     "range": "80-200",
+     "default": "120"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "holo-iridescent",
+     "where": "css/aesthetics/holo-iridescent.css:124-125",
+     "variant": "hover brightness 1.08, press translateY(1px) brightness .94"
+    },
+    {
+     "key": "industrial-device",
+     "where": "css/aesthetics/industrial-device.css:158,176,189-190",
+     "variant": "press translateY(2px), shadow drops"
+    },
+    {
+     "key": "isogrid",
+     "where": "css/aesthetics/isogrid.css:123-124",
+     "variant": "background steps to --ab-pri-hover / --ab-pri-press, no movement"
+    },
+    {
+     "key": "japanese-minimal",
+     "where": "css/aesthetics/japanese-minimal.css:114-116",
+     "variant": "bg darkens 12%, press 1px"
+    },
+    {
+     "key": "liquid-glass",
+     "where": "css/aesthetics/liquid-glass.css:239-241",
+     "variant": "press scale .98, 180ms"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [
+    "button"
+   ],
+   "conflictsWith": []
+  },
+  {
+   "id": "catalogue-number",
+   "category": "ornament",
+   "name": "Section and row numbering",
+   "what": "Section labels and rows carry a printed index number (boxed, plain, or CSS counter with leading zero).",
+   "params": [
+    {
+     "name": "format",
+     "kind": "enum",
+     "range": "boxed|plain|counter-00",
+     "default": "plain"
+    },
+    {
+     "name": "face",
+     "kind": "enum",
+     "range": "mono|ui|dot",
+     "default": "mono"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "isogrid",
+     "where": "css/aesthetics/isogrid.css:34-38",
+     "variant": "boxed 1px number in Plex Mono"
+    },
+    {
+     "key": "japanese-minimal",
+     "where": "css/aesthetics/japanese-minimal.css:31-32,144",
+     "variant": "plain number in heading face"
+    },
+    {
+     "key": "industrial-device",
+     "where": "css/aesthetics/industrial-device.css:41-44,135-139,230-237",
+     "variant": "plain mono labels; CSS counters 01.. on palette roles and rows"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "doubling-scale",
+   "category": "structure",
+   "name": "Doubling spacing and type scale",
+   "what": "Every gap, size and type step is exactly twice the one below, defined once as tokens (spacing 4..128, type 12/24/48/96) and used everywhere.",
+   "params": [
+    {
+     "name": "base",
+     "kind": "number",
+     "range": "2-8",
+     "default": "4"
+    },
+    {
+     "name": "steps",
+     "kind": "number",
+     "range": "4-8",
+     "default": "6"
+    },
+    {
+     "name": "ratio",
+     "kind": "number",
+     "range": "2",
+     "default": "2"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "isogrid",
+     "where": "css/aesthetics/isogrid.css:20-21",
+     "variant": "--ig-1..--ig-6"
+    },
+    {
+     "key": "isogrid",
+     "where": "js/aesthetics/isogrid.js:1-8,280-289",
+     "variant": "stated in the header comment and the do-list"
+    },
+    {
+     "key": "isogrid",
+     "where": "css/aesthetics/isogrid.css:217",
+     "variant": "kit height/padding/gap set through --k-btn 64, --k-cardpad 32, --k-gap 32"
+    }
+   ],
+   "expressibleAs": "tokens",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [
+    "button",
+    "card",
+    "list"
+   ],
+   "conflictsWith": []
+  },
+  {
+   "id": "export-safe-fallback",
+   "category": "structure",
+   "name": "Export fallback rules",
+   "what": "Where html2canvas cannot draw a material (3D transform, conic, backdrop filter, displacement), a .deck-export-host rule swaps in a flat or linear stand-in.",
+   "params": [
+    {
+     "name": "replace",
+     "kind": "text",
+     "range": "selector -> stand-in",
+     "default": ""
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "holo-iridescent",
+     "where": "css/aesthetics/holo-iridescent.css:231-242",
+     "variant": "fringe becomes a banded linear sweep, angle layer hidden, plane laid flat"
+    },
+    {
+     "key": "liquid-glass",
+     "where": "css/aesthetics/liquid-glass.css:339-358",
+     "variant": "refraction duplicate hidden, glass drops shadows and gets a 1.5px white border"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "reduced-transparency-fallback",
+   "category": "structure",
+   "name": "Opaque glass fallback",
+   "what": "Under prefers-reduced-transparency the glass surfaces become opaque solid tones but keep their rim.",
+   "params": [
+    {
+     "name": "solid-mix",
+     "kind": "number",
+     "range": "0.1-0.6",
+     "default": "0.6"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "liquid-glass",
+     "where": "js/aesthetics/liquid-glass.js:189",
+     "variant": "materials 'Opaque fallback'"
+    },
+    {
+     "key": "liquid-glass",
+     "where": "css/aesthetics/liquid-glass.css:293-300",
+     "variant": "@media (prefers-reduced-transparency: reduce) block"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": false,
+   "appSafe": true,
+   "kitScope": [],
+   "conflictsWith": []
+  }
+ ],
+ "notes": "Contract rev 1 used unchanged. Line ranges refer to the files at HEAD 064d8c0. exportSafe was set false only where the file itself has a .deck-export-host workaround or html2canvas limit; other values are best-effort. No schema limitation blocked recording; per-component kit wiring (which kit parts get which move) is only coarsely captured by kitScope."
+}

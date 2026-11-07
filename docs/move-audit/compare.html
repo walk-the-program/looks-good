@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Move rebuilds</title>
+<style>
+  :root { --bg: #eceae6; --ink: #1c1d20; --muted: #6b6a66; --rule: #c9c6c0; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font: 14px/1.5 -apple-system, system-ui, sans-serif; }
+  header { padding: 24px 24px 8px; display: flex; flex-wrap: wrap; gap: 12px; align-items: baseline; }
+  h1 { font-size: 18px; margin: 0 16px 0 0; }
+  .ctl { display: flex; gap: 6px; flex-wrap: wrap; }
+  button { font: inherit; border: 1px solid var(--rule); background: transparent; padding: 4px 10px; border-radius: 4px; cursor: pointer; }
+  button[aria-pressed="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+  .pair { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; padding: 16px 24px 48px; }
+  figure { margin: 0; }
+  figcaption { color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: .06em; margin-bottom: 6px; }
+  img { width: 100%; display: block; border: 1px solid var(--rule); background: #fff; }
+  @media (max-width: 700px) { .pair { grid-template-columns: 1fr; padding: 16px; } header { padding: 16px; } }
+</style>
+</head>
+<body>
+<header>
+  <h1>Original vs rebuilt from moves</h1>
+  <div class="ctl" id="style"></div>
+  <div class="ctl" id="view"></div>
+  <div class="ctl" id="mode"></div>
+</header>
+<div class="pair">
+  <figure><figcaption>Original</figcaption><img id="a" alt="Original"></figure>
+  <figure><figcaption>Moves only</figcaption><img id="b" alt="Rebuilt from moves"></figure>
+</div>
+<script>
+  const sel = { style: 'soft-form', view: 'board', mode: 'light' };
+  const opts = {
+    style: [['soft-form', 'Soft Form'], ['acid-graphics', 'Acid Graphics'], ['editorial-serif', 'Editorial Serif']],
+    view: [['board', 'Board'], ['kit-top', 'Kit'], ['deck-cover', 'Deck cover']],
+    mode: [['light', 'Light'], ['dark', 'Dark']],
+  };
+  function draw() {
+    for (const k in opts) document.querySelectorAll('#' + k + ' button').forEach(b => b.setAttribute('aria-pressed', b.dataset.v === sel[k]));
+    const p = `shots/${sel.style}/`, n = `-${sel.view}-${sel.mode}.png`;
+    document.getElementById('a').src = p + 'original' + n;
+    document.getElementById('b').src = p + 'moves' + n;
+  }
+  for (const k in opts) {
+    const box = document.getElementById(k);
+    opts[k].forEach(([v, label]) => {
+      const b = document.createElement('button');
+      b.textContent = label; b.dataset.v = v;
+      b.onclick = () => { sel[k] = v; draw(); };
+      box.appendChild(b);
+    });
+  }
+  draw();
+</script>
+</body>
+</html>

@@ -1,0 +1,2644 @@
+{
+ "group": "I",
+ "styles": [
+  {
+   "key": "toy-press",
+   "name": "Toy Press",
+   "coreTrick": "Every pressable control sits on a hard, zero-blur lip in a darker shade of its own face and drops by that depth when pressed, with cards as flat bordered trays.",
+   "colourRecipe": "Primary becomes the main key face and its lip is the same hue shaded 9-24 L darker; secondary/accent are tints and the small art; light mode keeps the brand canvas, dark mode derives a deep canvas from the primary hue. A pale or near-black primary gets a 2px lip-shade edge and the headline word flips to ink on a marker strip; a muted primary is used as-is (no recolour).",
+   "moves": [
+    "derived-shade",
+    "derived-shade",
+    "contrast-fit",
+    "tonal-ramp",
+    "tinted-neutral-canvas",
+    "hard-offset-shadow",
+    "press-collapse",
+    "heavy-border",
+    "corner-radius",
+    "sentence-case-labels",
+    "highlight-word-treatment",
+    "tray-row-list",
+    "material-specimen-slide",
+    "keycap-block-art",
+    "keycap-block-art",
+    "switch-shape",
+    "progress-bar-form",
+    "input-style",
+    "checkbox-radio-form",
+    "slider-form",
+    "ink-filled-selected",
+    "named-states"
+   ],
+   "remainder": [
+    {
+     "what": "Keycap and toy-block hero art composition",
+     "where": "js/aesthetics/toy-press.js:164-196",
+     "whyCode": "Hand-placed SVG geometry (house, keycap with dish, glyph keys) keyed to palette roles"
+    },
+    {
+     "what": "Deck material specimen markup",
+     "where": "js/aesthetics/toy-press.js:224-248",
+     "whyCode": "Bespoke HTML structure for the deck slide"
+    },
+    {
+     "what": "Per-component kit geometry (grooved knob, ratchet spinner, split keycap pair, wheel, calendar)",
+     "where": "css/aesthetics/toy-press.css:362-767",
+     "whyCode": "About 400 lines of component-specific geometry, not derivable from a handful of lip/radius parameters"
+    },
+    {
+     "what": "Interdependent colour searches (edge 3:1, muted 4.6:1, tag bg, hover guard, priOk branch)",
+     "where": "js/aesthetics/toy-press.js:100-162",
+     "whyCode": "Branching loops over several grounds; a solver helper can run them but the wiring is style-specific"
+    }
+   ],
+   "moveCoverage": 62,
+   "notes": "Very coherent: one mechanism (lip) explains most of the look, so the framework fit is good. Kit CSS is the bulk of the remainder."
+  },
+  {
+   "key": "transit-wayfinding",
+   "name": "Transit Wayfinding",
+   "coreTrick": "Every message sits on a fixed black sign panel while each client colour is rationed to a route (a line stroke plus a lettered bullet) and one fixed yellow means alert.",
+   "colourRecipe": "Canvas is fixed (#16181A / #E8E8E4); each of primary, secondary, accent is tinted until it holds 3:1 on black (and shaded for the white map paper in light mode) and used only as a route; primary also fills the main action. A muted or grey brand still tints to 3:1 but the routes then look similar (no recolour).",
+   "moves": [
+    "contrast-fit",
+    "fixed-canvas",
+    "colour-rationing",
+    "single-alert-colour",
+    "single-alert-colour",
+    "corner-radius",
+    "fixed-ink-surface",
+    "caps-mono-labels",
+    "tight-display-tracking",
+    "highlight-word-treatment",
+    "arrow-led-headline",
+    "info-strip",
+    "bespoke-list-markup",
+    "route-bullet-letters",
+    "route-bullet-letters",
+    "route-map-art",
+    "route-map-art",
+    "switch-shape",
+    "progress-bar-form",
+    "input-style",
+    "checkbox-radio-form",
+    "slider-form",
+    "ink-filled-selected",
+    "named-states"
+   ],
+   "remainder": [
+    {
+     "what": "Octilinear route map generator with label-fit logic and narrow viewBox",
+     "where": "js/aesthetics/transit-wayfinding.js:81-94,218-281",
+     "whyCode": "Procedural geometry plus text-width estimates that choose which labels fit"
+    },
+    {
+     "what": "Route letters taken from the brand name",
+     "where": "js/aesthetics/transit-wayfinding.js:39-52",
+     "whyCode": "Brand-name derived data used by tokens, art and list markup"
+    },
+    {
+     "what": "Departures list markup",
+     "where": "js/aesthetics/transit-wayfinding.js:285-299",
+     "whyCode": "panels.list hook returning bespoke HTML"
+    },
+    {
+     "what": "Headline arrow and destination wrapper",
+     "where": "js/aesthetics/transit-wayfinding.js:208-216",
+     "whyCode": "headline() hook rewrites the DOM"
+    },
+    {
+     "what": "Light-mode inversion variables (--tw-white/--tw-dim/--tw-inv) and sign fixes across the kit",
+     "where": "css/aesthetics/transit-wayfinding.css:348-390",
+     "whyCode": "Many per-component overrides keeping signs black in a light page"
+    }
+   ],
+   "moveCoverage": 55,
+   "notes": "Strongly rule-based; the semantic colour mapping (colour = route) is a framework-level idea, not a CSS trick."
+  },
+  {
+   "key": "wpa-screenprint",
+   "name": "WPA Screenprint",
+   "coreTrick": "The three brand colours are muted into flat print inks on fixed cream paper, with a hard 2px second-ink offset block under actions and multiplied overprint where inks cross.",
+   "colourRecipe": "Primary, secondary and accent are muted (S<=40, L 42-60) into spot inks; the primary is then moved by lightness until the label (cream on light, forest on dark) holds 4.7:1; canvas is fixed cream or forest night. A neon brand prints as a dull ink; a muted brand passes almost unchanged.",
+   "moves": [
+    "contrast-fit",
+    "contrast-fit",
+    "mute-to-print-ink",
+    "fixed-canvas",
+    "tonal-ramp",
+    "ink-overprint",
+    "ink-overprint",
+    "ink-overprint",
+    "hard-offset-shadow",
+    "press-collapse",
+    "heavy-border",
+    "hairline-rule",
+    "corner-radius",
+    "grain-overlay",
+    "rubber-stamp",
+    "caps-mono-labels",
+    "uppercase-display-headline",
+    "highlight-word-treatment",
+    "tray-row-list",
+    "layered-landscape-poster",
+    "switch-shape",
+    "progress-bar-form",
+    "input-style",
+    "ink-filled-selected",
+    "named-states"
+   ],
+   "remainder": [
+    {
+     "what": "Layered landscape poster art",
+     "where": "js/aesthetics/wpa-screenprint.js:237-270",
+     "whyCode": "Hand-placed ridge and pine geometry"
+    },
+    {
+     "what": "Overprint product colour with clipPath and off-register",
+     "where": "js/aesthetics/wpa-screenprint.js:112-118",
+     "whyCode": "Computed multiply colour drawn as clipped SVG, needs generator code"
+    },
+    {
+     "what": "Label-driven ink search (wpFit/wpPrimary) for dark and light",
+     "where": "js/aesthetics/wpa-screenprint.js:47-80",
+     "whyCode": "Searches lightness in both directions against two label colours"
+    },
+    {
+     "what": "Offset block clearing rules per kit component",
+     "where": "css/aesthetics/wpa-screenprint.css:282-380",
+     "whyCode": "Individual kit shapes (split buttons, fab) with bespoke radius and offset"
+    }
+   ],
+   "moveCoverage": 62,
+   "notes": "The CSS part (flat tiles, offset blocks, caps) is very regular. Art and ink maths are the remainder."
+  },
+  {
+   "key": "xerox-punk",
+   "name": "Xerox Punk",
+   "coreTrick": "A fixed dark wall of pasted scraps where every element looks hand-made: seeded ransom-note tiles, filter-torn paper, tape, marker circles, with the primary snapped to one of five Day-Glo inks.",
+   "colourRecipe": "Primary snaps by hue to one of five Day-Glo inks (grey takes yellow, blues and violets take pink) and is used as the single fluoro; secondary is held back, accent is one headline tile; canvas fixed near-black or newsprint; app screens switch back to the true brand primary.",
+   "moves": [
+    "snap-primary-to-fixed-set",
+    "fixed-canvas",
+    "colour-rationing",
+    "mono-plus-accent",
+    "board-vs-app-colour-split",
+    "hard-offset-shadow",
+    "press-collapse",
+    "heavy-border",
+    "corner-radius",
+    "grain-overlay",
+    "fixed-ink-surface",
+    "threshold-displace-filter",
+    "threshold-displace-filter",
+    "halftone-dots",
+    "tape-strip",
+    "rubber-stamp",
+    "rubber-stamp",
+    "censor-bar",
+    "censor-bar",
+    "tilt-jitter",
+    "tilt-jitter",
+    "tilt-jitter",
+    "marker-mark-up",
+    "marker-mark-up",
+    "caps-mono-labels",
+    "mixed-face-headline",
+    "highlight-word-treatment",
+    "info-strip",
+    "bespoke-list-markup",
+    "material-specimen-slide",
+    "wall-collage-art",
+    "wall-collage-art",
+    "switch-shape",
+    "progress-bar-form",
+    "input-style",
+    "checkbox-radio-form",
+    "slider-form",
+    "callout-tones",
+    "ink-filled-selected",
+    "named-states"
+   ],
+   "remainder": [
+    {
+     "what": "Seeded ransom headline with per-letter face, ground, size, tilt, scissor clip, photo tiles",
+     "where": "js/aesthetics/xerox-punk.js:97-175",
+     "whyCode": "Per-letter randomised layout with font pool, load triggers and grouping rules"
+    },
+    {
+     "what": "Procedural one-bit halftone photograph",
+     "where": "js/aesthetics/xerox-punk.js:49-69",
+     "whyCode": "Raster-like figure generated from math"
+    },
+    {
+     "what": "Wall collage and photo card art",
+     "where": "js/aesthetics/xerox-punk.js:307-356",
+     "whyCode": "Hand-positioned remnants and torn SVG filter defs"
+    },
+    {
+     "what": "Hand-drawn marker circle, strike and staple paths",
+     "where": "js/aesthetics/xerox-punk.js:171,326-327",
+     "whyCode": "Authored path data"
+    },
+    {
+     "what": "Kit signature with 120 lines of hand-made component rules",
+     "where": "css/aesthetics/xerox-punk.css:625-751",
+     "whyCode": "Per-component shapes (zig-zag cut lines, hatch checkbox, hazard edge) bespoke by design"
+    }
+   ],
+   "moveCoverage": 40,
+   "notes": "Most of the identity is code (random layout and torn filters). A move library would cover colour, offsets, stamps and sheets, not the ransom headline. Two near-duplicate kit blocks (classic and v2) in the css; lines cited are the live v2."
+  },
+  {
+   "key": "xerox",
+   "name": "Xerox",
+   "coreTrick": "Everything is toner (#111) on one pale paper stock, with SVG alpha-threshold and displacement filters that degrade shapes like successive photocopy generations.",
+   "colourRecipe": "The primary only picks the paper: its hue bucket chooses one pale stock (canary, salmon, pink, lilac, blue, green) for the whole canvas, and appears as ink only in one multiplied stamp; secondary and accent are never printed but copied as dot density in the palette. A grey primary gives white stock.",
+   "moves": [
+    "contrast-fit",
+    "snap-primary-to-fixed-set",
+    "snap-primary-to-fixed-set",
+    "colour-rationing",
+    "mono-plus-accent",
+    "duotone-ink",
+    "duotone-ink",
+    "press-collapse",
+    "heavy-border",
+    "hairline-rule",
+    "corner-radius",
+    "grain-overlay",
+    "fixed-ink-surface",
+    "threshold-displace-filter",
+    "threshold-displace-filter",
+    "generation-loss-filter",
+    "generation-loss-filter",
+    "halftone-dots",
+    "halftone-dots",
+    "offset-ghost-copy",
+    "rubber-stamp",
+    "catalogue-number",
+    "copier-edge-scale",
+    "caps-mono-labels",
+    "uppercase-display-headline",
+    "highlight-word-treatment",
+    "info-strip",
+    "bespoke-list-markup",
+    "platen-copy-art",
+    "switch-shape",
+    "progress-bar-form",
+    "input-style",
+    "checkbox-radio-form",
+    "slider-form",
+    "callout-tones",
+    "ink-filled-selected",
+    "named-states"
+   ],
+   "remainder": [
+    {
+     "what": "Filter defs (copy, toner, edge, lite, rule, head, gen 1/3/7, fall-off)",
+     "where": "js/aesthetics/xerox.js:24-102",
+     "whyCode": "Generated SVG filter chains with tuned thresholds and noise seeds"
+    },
+    {
+     "what": "Platen art with dot ramp, mask by initial, specks, ticks, labels",
+     "where": "js/aesthetics/xerox.js:202-264",
+     "whyCode": "Procedural drawing keyed to brand initial"
+    },
+    {
+     "what": "States hook renders initial through three generation filters",
+     "where": "js/aesthetics/xerox.js:266-271",
+     "whyCode": "Custom markup"
+    },
+    {
+     "what": "html2canvas export workarounds",
+     "where": "css/aesthetics/xerox.css:252-266",
+     "whyCode": "Filters and gradient dots not supported by export"
+    }
+   ],
+   "moveCoverage": 48,
+   "notes": "Filters are the whole point and are not exportSafe. Stock chooser is data (hue buckets) and well within a move."
+  }
+ ],
+ "moves": [
+  {
+   "id": "derived-shade",
+   "category": "colour",
+   "name": "Derived shade of a colour",
+   "what": "A same-hue darker (or lighter) version of a face colour, never pure black, used as lip / hover / tint.",
+   "params": [
+    {
+     "name": "lightnessDrop",
+     "kind": "number",
+     "range": "9-24 points",
+     "default": "40% of L, clamped 9-24"
+    },
+    {
+     "name": "lightFaceSatScale",
+     "kind": "number",
+     "range": "0-1",
+     "default": "0.75"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "toy-press",
+     "where": "js/aesthetics/toy-press.js:15-23",
+     "variant": "tpLip(): used for primary, edge, secondary, accent, ink, knob and disabled lips"
+    },
+    {
+     "key": "toy-press",
+     "where": "js/aesthetics/toy-press.js:111-118",
+     "variant": "hover face lighter by 12% toward white while label contrast holds"
+    }
+   ],
+   "expressibleAs": "tokens",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "contrast-fit",
+   "category": "colour",
+   "name": "Contrast-fit colour search",
+   "what": "Step a colour (mix toward ink, tint or shade, shift lightness) until it holds N:1 on every ground it sits on.",
+   "params": [
+    {
+     "name": "minRatio",
+     "kind": "number",
+     "range": "3-4.7",
+     "default": "4.5"
+    },
+    {
+     "name": "grounds",
+     "kind": "enum",
+     "range": "canvas|surface|sign|paper",
+     "default": "canvas"
+    },
+    {
+     "name": "direction",
+     "kind": "enum",
+     "range": "toward-ink|toward-white-or-black|lightness-walk",
+     "default": "toward-ink"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "toy-press",
+     "where": "js/aesthetics/toy-press.js:106-128",
+     "variant": "muted text, edge border and sticker tag loops (4.6 / 3.05 targets on three grounds)"
+    },
+    {
+     "key": "transit-wayfinding",
+     "where": "js/aesthetics/transit-wayfinding.js:24-35",
+     "variant": "route colours tinted until 3:1 on black and shaded for white map paper"
+    },
+    {
+     "key": "wpa-screenprint",
+     "where": "js/aesthetics/wpa-screenprint.js:47-80",
+     "variant": "wpFit / wpPrimary: lightness walk until a cream or forest label reads 4.7:1"
+    },
+    {
+     "key": "wpa-screenprint",
+     "where": "js/aesthetics/wpa-screenprint.js:198-201",
+     "variant": "muted text must hold 4.7:1 on five surfaces"
+    },
+    {
+     "key": "xerox",
+     "where": "js/aesthetics/xerox.js:175",
+     "variant": "mutedOn(): mix toward ink until 4.6:1"
+    }
+   ],
+   "expressibleAs": "needs-code",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "mute-to-print-ink",
+   "category": "colour",
+   "name": "Mute to print ink",
+   "what": "Cap saturation and clamp lightness so any client hue reads as a muted spot ink.",
+   "params": [
+    {
+     "name": "satCap",
+     "kind": "number",
+     "range": "0-100",
+     "default": "40"
+    },
+    {
+     "name": "lightMin",
+     "kind": "number",
+     "range": "0-100",
+     "default": "42"
+    },
+    {
+     "name": "lightMax",
+     "kind": "number",
+     "range": "0-100",
+     "default": "60"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "wpa-screenprint",
+     "where": "js/aesthetics/wpa-screenprint.js:42-46",
+     "variant": "wpMute(): S<=40, L 42-60 for the three spot inks (art a1-a3)"
+    }
+   ],
+   "expressibleAs": "tokens",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "snap-primary-to-fixed-set",
+   "category": "colour",
+   "name": "Snap primary to a fixed set",
+   "what": "Map the client primary hue to the nearest entry of a small fixed palette (grey falls back to a default entry).",
+   "params": [
+    {
+     "name": "set",
+     "kind": "text",
+     "range": "list of hex + hue anchor",
+     "default": "Day-Glo five"
+    },
+    {
+     "name": "greyFallback",
+     "kind": "colour",
+     "range": "hex",
+     "default": "#EAFF00"
+    },
+    {
+     "name": "target",
+     "kind": "enum",
+     "range": "accent-ink|canvas-stock",
+     "default": "accent-ink"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "xerox-punk",
+     "where": "js/aesthetics/xerox-punk.js:38-47",
+     "variant": "xpFluoro(): pink/red/orange/yellow/green snapped by hue; blues and violets take pink; consumed via printPrimary 274"
+    },
+    {
+     "key": "xerox",
+     "where": "js/aesthetics/xerox.js:36-47",
+     "variant": "xrStock(): hue buckets pick one pale copy-paper stock for the whole canvas; grey takes white"
+    },
+    {
+     "key": "xerox",
+     "where": "js/aesthetics/xerox.js:165-173",
+     "variant": "canvas hook returns the stock; sheets keep the stock in both modes"
+    }
+   ],
+   "expressibleAs": "tokens",
+   "paletteAgnostic": false,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "fixed-canvas",
+   "category": "colour",
+   "name": "Fixed canvas",
+   "what": "The page ground ignores the client canvas and is a fixed value per mode.",
+   "params": [
+    {
+     "name": "light",
+     "kind": "colour",
+     "range": "hex",
+     "default": "#E8E8E4"
+    },
+    {
+     "name": "dark",
+     "kind": "colour",
+     "range": "hex",
+     "default": "#16181A"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "transit-wayfinding",
+     "where": "js/aesthetics/transit-wayfinding.js:178-179",
+     "variant": "#16181A dark / #E8E8E4 light concourse"
+    },
+    {
+     "key": "wpa-screenprint",
+     "where": "js/aesthetics/wpa-screenprint.js:183",
+     "variant": "cream paper #EFE6D2 / forest night #17261F"
+    },
+    {
+     "key": "xerox-punk",
+     "where": "js/aesthetics/xerox-punk.js:266-271",
+     "variant": "black wall (hue trace, L<=4.5) / newsprint #D9D4C4"
+    }
+   ],
+   "expressibleAs": "tokens",
+   "paletteAgnostic": false,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "colour-rationing",
+   "category": "colour",
+   "name": "Colour rationed to marks",
+   "what": "Client colours are allowed only in named marks (route lines and bullets, one stamp, one fluoro tile) and nowhere else.",
+   "params": [
+    {
+     "name": "primaryMarks",
+     "kind": "text",
+     "range": "list of marks",
+     "default": "route line, bullet"
+    },
+    {
+     "name": "secondaryMarks",
+     "kind": "text",
+     "range": "list of marks",
+     "default": "route 2 line"
+    },
+    {
+     "name": "heldBack",
+     "kind": "bool",
+     "range": "",
+     "default": "false"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "transit-wayfinding",
+     "where": "js/aesthetics/transit-wayfinding.js:145-176",
+     "variant": "three routes = line strokes + lettered bullets; nothing else carries a brand colour"
+    },
+    {
+     "key": "xerox",
+     "where": "js/aesthetics/xerox.js:137-161",
+     "variant": "primary only as paper stock and one overprinted stamp; secondary/accent copy as dot density in palette only"
+    },
+    {
+     "key": "xerox-punk",
+     "where": "js/aesthetics/xerox-punk.js:238-264",
+     "variant": "secondary held back; accent is one headline tile; stamps are bone"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "mono-plus-accent",
+   "category": "colour",
+   "name": "Mono plus one accent",
+   "what": "Near-monochrome ink and ground with a single saturated hit.",
+   "params": [
+    {
+     "name": "ink",
+     "kind": "colour",
+     "range": "hex",
+     "default": "#111111"
+    },
+    {
+     "name": "accent",
+     "kind": "colour",
+     "range": "hex or snapped",
+     "default": "fluoro"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "xerox-punk",
+     "where": "js/aesthetics/xerox-punk.js:281-305",
+     "variant": "bone/black plus one fluoro (--ab-fluoro, --xp-hot)"
+    },
+    {
+     "key": "xerox",
+     "where": "js/aesthetics/xerox.js:167-200",
+     "variant": "toner #111 on one stock; no colour fill anywhere"
+    }
+   ],
+   "expressibleAs": "tokens",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "duotone-ink",
+   "category": "colour",
+   "name": "Duotone ink on stock",
+   "what": "Everything is one ink on one paper colour; nothing intermediate (no greys).",
+   "params": [
+    {
+     "name": "ink",
+     "kind": "colour",
+     "range": "hex",
+     "default": "#111111"
+    },
+    {
+     "name": "paper",
+     "kind": "colour",
+     "range": "from primary hue",
+     "default": "stock"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "xerox",
+     "where": "js/aesthetics/xerox.js:48",
+     "variant": "XR_TONER"
+    },
+    {
+     "key": "xerox",
+     "where": "css/aesthetics/xerox.css:14-47",
+     "variant": "dust, edge burn and streak are toner at low alpha over the stock"
+    }
+   ],
+   "expressibleAs": "tokens",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "tonal-ramp",
+   "category": "colour",
+   "name": "Surface tonal steps",
+   "what": "Surface, card and field colours as small ink-into-canvas mix steps.",
+   "params": [
+    {
+     "name": "cardMix",
+     "kind": "number",
+     "range": "0-0.2",
+     "default": "0.07"
+    },
+    {
+     "name": "fieldMix",
+     "kind": "number",
+     "range": "0-0.2",
+     "default": "0.045 light / 0.12 dark"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "toy-press",
+     "where": "js/aesthetics/toy-press.js:103-104",
+     "variant": "surface and surface-2 by ink mix, canvas in light mode"
+    },
+    {
+     "key": "wpa-screenprint",
+     "where": "js/aesthetics/wpa-screenprint.js:194-197",
+     "variant": "card, paper2 wash, and spot-ink tints at 22-26%"
+    }
+   ],
+   "expressibleAs": "tokens",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "tinted-neutral-canvas",
+   "category": "colour",
+   "name": "Brand-hue dark canvas",
+   "what": "Dark canvas is a deep, low-saturation tint of the primary hue.",
+   "params": [
+    {
+     "name": "lightness",
+     "kind": "number",
+     "range": "0-100",
+     "default": "13"
+    },
+    {
+     "name": "satFactor",
+     "kind": "number",
+     "range": "0-1",
+     "default": "0.45"
+    },
+    {
+     "name": "satRange",
+     "kind": "number",
+     "range": "20-34",
+     "default": "20-34"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "toy-press",
+     "where": "js/aesthetics/toy-press.js:91-98",
+     "variant": "dark canvas hue from primary, L 13, S 20-34; grey primary keeps canvas hue at S 12"
+    }
+   ],
+   "expressibleAs": "tokens",
+   "paletteAgnostic": false,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "single-alert-colour",
+   "category": "colour",
+   "name": "Single fixed alert colour",
+   "what": "One non-brand colour reserved for one state (diverted / alert).",
+   "params": [
+    {
+     "name": "colour",
+     "kind": "colour",
+     "range": "hex",
+     "default": "#FFC72C"
+    },
+    {
+     "name": "state",
+     "kind": "text",
+     "range": "",
+     "default": "Diverted"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "transit-wayfinding",
+     "where": "js/aesthetics/transit-wayfinding.js:18",
+     "variant": "TW_ALERT"
+    },
+    {
+     "key": "transit-wayfinding",
+     "where": "css/aesthetics/transit-wayfinding.css:194-196",
+     "variant": "pressed/diverted state fills yellow with black label"
+    }
+   ],
+   "expressibleAs": "tokens",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "ink-overprint",
+   "category": "colour",
+   "name": "Ink overprint",
+   "what": "Where two spot-ink shapes cross, paint the multiplied third colour clipped to the first, with the second off-register.",
+   "params": [
+    {
+     "name": "offsetX",
+     "kind": "number",
+     "range": "0-3",
+     "default": "1.5"
+    },
+    {
+     "name": "offsetY",
+     "kind": "number",
+     "range": "0-3",
+     "default": "1"
+    },
+    {
+     "name": "blend",
+     "kind": "enum",
+     "range": "multiply",
+     "default": "multiply"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "wpa-screenprint",
+     "where": "js/aesthetics/wpa-screenprint.js:33-38",
+     "variant": "wpMul product colour"
+    },
+    {
+     "key": "wpa-screenprint",
+     "where": "js/aesthetics/wpa-screenprint.js:112-118",
+     "variant": "wpOver(): clipPath + translated second ink"
+    },
+    {
+     "key": "wpa-screenprint",
+     "where": "js/aesthetics/wpa-screenprint.js:250-261",
+     "variant": "sun/far ridge/mid ridge and lake reflection use it"
+    }
+   ],
+   "expressibleAs": "svg-generator",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": false,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "board-vs-app-colour-split",
+   "category": "colour",
+   "name": "Board snap, app true primary",
+   "what": "The board prints a snapped/shifted colour but app screens and the kit use the true brand primary with a derived label colour.",
+   "params": [
+    {
+     "name": "appPrimary",
+     "kind": "enum",
+     "range": "true|snapped",
+     "default": "true"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "xerox-punk",
+     "where": "css/aesthetics/xerox-punk.css:462-476",
+     "variant": "--ab-primary-brand overrides fluoro in .sb-screen/.sb-kit, contrast-color() enhancement"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "hard-offset-shadow",
+   "category": "material",
+   "name": "Hard offset shadow",
+   "what": "A zero-blur shadow offset down-right or down, in a chosen second colour; collapses or shrinks on press.",
+   "params": [
+    {
+     "name": "dx",
+     "kind": "number",
+     "range": "0-7 px",
+     "default": "0"
+    },
+    {
+     "name": "dy",
+     "kind": "number",
+     "range": "2-7 px",
+     "default": "4"
+    },
+    {
+     "name": "colourSource",
+     "kind": "enum",
+     "range": "shade-of-face|second-ink|ink|edge",
+     "default": "shade-of-face"
+    },
+    {
+     "name": "scope",
+     "kind": "enum",
+     "range": "keys|cards|tags|all",
+     "default": "keys"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "toy-press",
+     "where": "css/aesthetics/toy-press.css:138-145",
+     "variant": "main key 0 4px 0 in the primary shaded darker; 3px lips on segments, switch, boxes (119-131, 160-172, 335-346)"
+    },
+    {
+     "key": "wpa-screenprint",
+     "where": "css/aesthetics/wpa-screenprint.css:122-130",
+     "variant": "2px 2px 0 in the second spot ink under the button, stamp tags, poster card (68-79)"
+    },
+    {
+     "key": "xerox-punk",
+     "where": "css/aesthetics/xerox-punk.css:218-228",
+     "variant": "4px 4px 0 #111 under the fluoro button; torn sheets drop-shadow(3px 4px 0) at 193-202"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [
+    "button",
+    "checkbox",
+    "switch",
+    "segmented",
+    "card"
+   ],
+   "conflictsWith": []
+  },
+  {
+   "id": "press-collapse",
+   "category": "motion",
+   "name": "Press collapse",
+   "what": "On press the control translates by its offset and the shadow collapses to 0 in a very short transition.",
+   "params": [
+    {
+     "name": "durationMs",
+     "kind": "number",
+     "range": "0-120",
+     "default": "80"
+    },
+    {
+     "name": "translate",
+     "kind": "text",
+     "range": "matches offset",
+     "default": "0 4px"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "toy-press",
+     "where": "css/aesthetics/toy-press.css:17-21,138-145",
+     "variant": "--tp-press 80ms; translateY(4px) lip to 0; 3px variants on small keys"
+    },
+    {
+     "key": "wpa-screenprint",
+     "where": "css/aesthetics/wpa-screenprint.css:128-129",
+     "variant": "hover lifts -1px, active translate(2px,2px) shadow 0"
+    },
+    {
+     "key": "xerox",
+     "where": "css/aesthetics/xerox.css:151-160",
+     "variant": "active pulls the ghost copy to translate(0,0); hover pushes it out"
+    },
+    {
+     "key": "xerox-punk",
+     "where": "css/aesthetics/xerox-punk.css:359-362",
+     "variant": "pressed action pushed into the wall (offset shrinks)"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [
+    "button"
+   ],
+   "conflictsWith": []
+  },
+  {
+   "id": "heavy-border",
+   "category": "material",
+   "name": "Ink border",
+   "what": "A uniform 1.5-2px solid border in ink/edge colour on tiles and controls; may carry a thicker bottom edge.",
+   "params": [
+    {
+     "name": "width",
+     "kind": "number",
+     "range": "1.5-4 px",
+     "default": "2"
+    },
+    {
+     "name": "bottomWidth",
+     "kind": "number",
+     "range": "2-4 px",
+     "default": "4"
+    },
+    {
+     "name": "colourSource",
+     "kind": "enum",
+     "range": "line|edge|ink|toner",
+     "default": "line"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "toy-press",
+     "where": "css/aesthetics/toy-press.css:113-116",
+     "variant": "flat tray: 2px line border, 4px bottom, no shadow"
+    },
+    {
+     "key": "wpa-screenprint",
+     "where": "css/aesthetics/wpa-screenprint.css:111-114",
+     "variant": "1.5px ink edge on card/panel/list, no shadow"
+    },
+    {
+     "key": "xerox-punk",
+     "where": "css/aesthetics/xerox-punk.css:218-221",
+     "variant": "2px solid #111 on the main action"
+    },
+    {
+     "key": "xerox",
+     "where": "css/aesthetics/xerox.css:131-139",
+     "variant": "1.5px toner fringe on copied sheets"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [
+    "card",
+    "button"
+   ],
+   "conflictsWith": []
+  },
+  {
+   "id": "hairline-rule",
+   "category": "material",
+   "name": "Hairline rules",
+   "what": "1px ink or dashed toner dividers between rows and under headers.",
+   "params": [
+    {
+     "name": "width",
+     "kind": "number",
+     "range": "1-4 px",
+     "default": "1"
+    },
+    {
+     "name": "style",
+     "kind": "enum",
+     "range": "solid|dashed",
+     "default": "solid"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "wpa-screenprint",
+     "where": "css/aesthetics/wpa-screenprint.css:51,81-83,156-162",
+     "variant": "double 1.5px header rule; labelrow and list rows divided by 1px ink"
+    },
+    {
+     "key": "xerox",
+     "where": "css/aesthetics/xerox.css:199-209",
+     "variant": "rows separated by dashed toner gradient; list head bar 4px"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "corner-radius",
+   "category": "material",
+   "name": "Corner radius",
+   "what": "One radius scale for tiles, controls and pills.",
+   "params": [
+    {
+     "name": "card",
+     "kind": "number",
+     "range": "0-24 px",
+     "default": "16"
+    },
+    {
+     "name": "control",
+     "kind": "number",
+     "range": "0-16 px",
+     "default": "14"
+    },
+    {
+     "name": "small",
+     "kind": "number",
+     "range": "0-12 px",
+     "default": "9"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "toy-press",
+     "where": "css/aesthetics/toy-press.css:17-21",
+     "variant": "--tp-r 16px, controls 14, boxes 9, pills 999"
+    },
+    {
+     "key": "transit-wayfinding",
+     "where": "css/aesthetics/transit-wayfinding.css:12-15",
+     "variant": "4px everywhere, 2px on small boxes"
+    },
+    {
+     "key": "wpa-screenprint",
+     "where": "css/aesthetics/wpa-screenprint.css:111-117",
+     "variant": "14px tiles, 8px controls, 2px stamp tags"
+    },
+    {
+     "key": "xerox-punk",
+     "where": "css/aesthetics/xerox-punk.css:40-45",
+     "variant": "square (0) tiles, wobbly clip-paths instead"
+    },
+    {
+     "key": "xerox",
+     "where": "css/aesthetics/xerox.css:14-16",
+     "variant": "square: radius 0, \"square to the page\""
+    }
+   ],
+   "expressibleAs": "tokens",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "grain-overlay",
+   "category": "material",
+   "name": "Grain / dust overlay",
+   "what": "A fixed noise or dust layer over the board (not app screens).",
+   "params": [
+    {
+     "name": "opacity",
+     "kind": "number",
+     "range": "0.05-0.7",
+     "default": "0.05"
+    },
+    {
+     "name": "kind",
+     "kind": "enum",
+     "range": "fractal-grain|clustered-dust",
+     "default": "fractal-grain"
+    },
+    {
+     "name": "blend",
+     "kind": "enum",
+     "range": "normal|multiply|screen",
+     "default": "normal"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "wpa-screenprint",
+     "where": "css/aesthetics/wpa-screenprint.css:14-34",
+     "variant": "feTurbulence grain 0.55 light / 0.4 dark, board and deck only"
+    },
+    {
+     "key": "xerox-punk",
+     "where": "css/aesthetics/xerox-punk.css:29-31",
+     "variant": "wall grain at 0.05 over everything"
+    },
+    {
+     "key": "xerox",
+     "where": "css/aesthetics/xerox.css:14-47",
+     "variant": "clustered dust masked to margins, drum streak 30px, edge burn; blend multiply/screen by mode"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": false,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "fixed-ink-surface",
+   "category": "material",
+   "name": "Fixed-ink surface",
+   "what": "A panel keeps its own ground and ink regardless of mode (a black sign, a cream scrap, a copy sheet).",
+   "params": [
+    {
+     "name": "ground",
+     "kind": "colour",
+     "range": "hex",
+     "default": "#000000"
+    },
+    {
+     "name": "ink",
+     "kind": "colour",
+     "range": "hex",
+     "default": "#FFFFFF"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "transit-wayfinding",
+     "where": "js/aesthetics/transit-wayfinding.js:142-143",
+     "variant": "cardInk keeps white on black sign in light mode"
+    },
+    {
+     "key": "xerox-punk",
+     "where": "js/aesthetics/xerox-punk.js:234-236",
+     "variant": "cardInk uses sheet ink/mute in both modes; css 32-36 black type on paper"
+    },
+    {
+     "key": "xerox",
+     "where": "css/aesthetics/xerox.css:325-330",
+     "variant": "sheets of stock: toner on paper whatever the mode"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [
+    "card",
+    "sheet",
+    "toast"
+   ],
+   "conflictsWith": []
+  },
+  {
+   "id": "threshold-displace-filter",
+   "category": "material",
+   "name": "Threshold-displace filter",
+   "what": "SVG filter chain: turbulence displaces the source, a second noise punches holes, alpha is hard-thresholded for a toothed or torn edge.",
+   "params": [
+    {
+     "name": "baseFrequency",
+     "kind": "text",
+     "range": "0.016-0.7",
+     "default": "0.028 0.05"
+    },
+    {
+     "name": "displaceScale",
+     "kind": "number",
+     "range": "1.5-11",
+     "default": "4"
+    },
+    {
+     "name": "alphaTable",
+     "kind": "text",
+     "range": "discrete tableValues",
+     "default": "0 0 0 1 1 1"
+    },
+    {
+     "name": "holes",
+     "kind": "bool",
+     "range": "",
+     "default": "true"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "xerox-punk",
+     "where": "js/aesthetics/xerox-punk.js:328-344",
+     "variant": "xpn-torn (fibrous torn edge) and xpn-copy defs"
+    },
+    {
+     "key": "xerox-punk",
+     "where": "css/aesthetics/xerox-punk.css:193-202",
+     "variant": "filter: url(#xpn-torn) drop-shadow on sheet ::after"
+    },
+    {
+     "key": "xerox",
+     "where": "js/aesthetics/xerox.js:50-97",
+     "variant": "xrx-copy, toner, edge, lite, rule, head filters"
+    },
+    {
+     "key": "xerox",
+     "where": "css/aesthetics/xerox.css:56-71,131-139,151-157",
+     "variant": "toner on bands, mark, rule, sheets and main action"
+    }
+   ],
+   "expressibleAs": "svg-generator",
+   "paletteAgnostic": true,
+   "exportSafe": false,
+   "appSafe": false,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "generation-loss-filter",
+   "category": "material",
+   "name": "Generation-loss filter",
+   "what": "Blur the alpha, add noise, threshold lower per generation, flood with pure ink: shapes fatten, counters fill.",
+   "params": [
+    {
+     "name": "blur",
+     "kind": "number",
+     "range": "0-1.8",
+     "default": "1.1"
+    },
+    {
+     "name": "noise",
+     "kind": "number",
+     "range": "0-0.75",
+     "default": "0.4"
+    },
+    {
+     "name": "generations",
+     "kind": "number",
+     "range": "1-7",
+     "default": "3"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "xerox",
+     "where": "js/aesthetics/xerox.js:24-34,98-100",
+     "variant": "xrGen() gen1/3/7 (+ paper-coloured w variants)"
+    },
+    {
+     "key": "xerox",
+     "where": "css/aesthetics/xerox.css:185-197",
+     "variant": "filter on the glyph only in three states; hover re-copies the headline at 82-83"
+    }
+   ],
+   "expressibleAs": "svg-generator",
+   "paletteAgnostic": true,
+   "exportSafe": false,
+   "appSafe": false,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "halftone-dots",
+   "category": "material",
+   "name": "Halftone dot screen",
+   "what": "A tone-sized dot grid at an angle, thresholded to pure ink.",
+   "params": [
+    {
+     "name": "pitch",
+     "kind": "number",
+     "range": "3-7 px",
+     "default": "3.2"
+    },
+    {
+     "name": "tone",
+     "kind": "text",
+     "range": "figure or initial mask",
+     "default": "figure"
+    },
+    {
+     "name": "seed",
+     "kind": "number",
+     "range": "",
+     "default": "brand hash"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "xerox-punk",
+     "where": "js/aesthetics/xerox-punk.js:49-69",
+     "variant": "xpPhoto(): original head-and-shoulders dot figure as data URI, photo tiles and wall scraps"
+    },
+    {
+     "key": "xerox",
+     "where": "js/aesthetics/xerox.js:208-223",
+     "variant": "tone-ramp dot screen masked by the initial, ghost sparser screen, dust specks"
+    },
+    {
+     "key": "xerox",
+     "where": "css/aesthetics/xerox.css:151-160",
+     "variant": "CTA ghost copy as radial-gradient dot tile"
+    }
+   ],
+   "expressibleAs": "svg-generator",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": false,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "offset-ghost-copy",
+   "category": "material",
+   "name": "Offset ghost copy",
+   "what": "A sparser dot-screen duplicate offset behind a block (original moved during the scan).",
+   "params": [
+    {
+     "name": "dx",
+     "kind": "number",
+     "range": "5-11 px",
+     "default": "7"
+    },
+    {
+     "name": "dy",
+     "kind": "number",
+     "range": "5-9 px",
+     "default": "7"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "xerox",
+     "where": "css/aesthetics/xerox.css:151-158",
+     "variant": "CTA ::after dot tile translate(7px,7px); art ghost translate(10 8) at js 246"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [
+    "button"
+   ],
+   "conflictsWith": []
+  },
+  {
+   "id": "tape-strip",
+   "category": "ornament",
+   "name": "Tape strip",
+   "what": "A translucent paper strip rotated across a corner of a sheet.",
+   "params": [
+    {
+     "name": "angle",
+     "kind": "number",
+     "range": "-34..32 deg",
+     "default": "-34"
+    },
+    {
+     "name": "size",
+     "kind": "text",
+     "range": "w x h",
+     "default": "58x19"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "xerox-punk",
+     "where": "css/aesthetics/xerox-punk.css:193-202,153-159",
+     "variant": "sheet ::before tape; swatches taped; torn-edge cards"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "rubber-stamp",
+   "category": "ornament",
+   "name": "Rubber stamp tag",
+   "what": "Small caps tag with a bordered (or double-ruled) box, optionally offset or rotated.",
+   "params": [
+    {
+     "name": "border",
+     "kind": "text",
+     "range": "1.5-2px",
+     "default": "2px"
+    },
+    {
+     "name": "rotate",
+     "kind": "number",
+     "range": "-3..0 deg",
+     "default": "-3"
+    },
+    {
+     "name": "offset",
+     "kind": "bool",
+     "range": "",
+     "default": "false"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "xerox-punk",
+     "where": "js/aesthetics/xerox-punk.js:381",
+     "variant": "material: double line, rotated -3deg"
+    },
+    {
+     "key": "xerox-punk",
+     "where": "css/aesthetics/xerox-punk.css:37-52,253,365-372",
+     "variant": "tag, status and badges as stamps"
+    },
+    {
+     "key": "wpa-screenprint",
+     "where": "js/aesthetics/wpa-screenprint.js:275",
+     "variant": "stamp tag: 1.5px ink edge, 2px offset in ink 3, caps"
+    },
+    {
+     "key": "xerox",
+     "where": "js/aesthetics/xerox.js:261",
+     "variant": "one overprinted rubber stamp in the primary, multiply"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [
+    "badge"
+   ],
+   "conflictsWith": []
+  },
+  {
+   "id": "censor-bar",
+   "category": "ornament",
+   "name": "Censor bar",
+   "what": "Solid black bar with transparent text for an error or hidden line.",
+   "params": [
+    {
+     "name": "colour",
+     "kind": "colour",
+     "range": "hex",
+     "default": "#000"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "xerox-punk",
+     "where": "js/aesthetics/xerox-punk.js:378",
+     "variant": "material definition"
+    },
+    {
+     "key": "xerox-punk",
+     "where": "css/aesthetics/xerox-punk.css:742-751",
+     "variant": "error callout: black fill, dashed bone edge"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [
+    "callout"
+   ],
+   "conflictsWith": []
+  },
+  {
+   "id": "tilt-jitter",
+   "category": "layout",
+   "name": "Tilt jitter",
+   "what": "Small fixed rotations on scraps, tags, avatars and badges (alternating by nth-child).",
+   "params": [
+    {
+     "name": "maxAngle",
+     "kind": "number",
+     "range": "0.4-20 deg",
+     "default": "3"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "xerox-punk",
+     "where": "css/aesthetics/xerox-punk.css:193-202",
+     "variant": "card -0.6deg, panel 0.5deg"
+    },
+    {
+     "key": "xerox-punk",
+     "where": "css/aesthetics/xerox-punk.css:742-751",
+     "variant": "avatars -3/2.5/-1deg, badge 20deg, callouts +-0.4deg"
+    },
+    {
+     "key": "xerox-punk",
+     "where": "css/aesthetics/xerox-punk.css:64",
+     "variant": "kicker -3deg"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "marker-mark-up",
+   "category": "ornament",
+   "name": "Marker mark-up",
+   "what": "Hand-drawn circle, strike and tick strokes used for selection and deletion.",
+   "params": [
+    {
+     "name": "stroke",
+     "kind": "number",
+     "range": "2-3.5 px",
+     "default": "3.2"
+    },
+    {
+     "name": "colour",
+     "kind": "enum",
+     "range": "ink|fluoro|bone",
+     "default": "ink"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "xerox-punk",
+     "where": "js/aesthetics/xerox-punk.js:171,326-327",
+     "variant": "SVG circle round the last word, cross-out strike, staple"
+    },
+    {
+     "key": "xerox-punk",
+     "where": "css/aesthetics/xerox-punk.css:203-217,229-241,704-741",
+     "variant": "circled tabs, crossed-out state, scribbled checkbox, highlighter selection"
+    }
+   ],
+   "expressibleAs": "svg-generator",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "catalogue-number",
+   "category": "ornament",
+   "name": "Counter / catalogue number",
+   "what": "Sheet counts, roster numbers and copy counts printed as real text.",
+   "params": [
+    {
+     "name": "format",
+     "kind": "text",
+     "range": "",
+     "default": "No.01 / 036/050 / SHEET 1 / 2"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "xerox",
+     "where": "js/aesthetics/xerox.js:105,125-129,279-285",
+     "variant": "xrSheet \"SHEET n / 2\", roster \"No.nn\", progress as copy count n/050"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "copier-edge-scale",
+   "category": "ornament",
+   "name": "Copier edge scale",
+   "what": "Millimetre ticks and an enlargement label along the platen edge.",
+   "params": [
+    {
+     "name": "tickSpacing",
+     "kind": "number",
+     "range": "",
+     "default": "2.2"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "xerox",
+     "where": "js/aesthetics/xerox.js:231-240,260",
+     "variant": "ticks, numbers and rotated edge label"
+    }
+   ],
+   "expressibleAs": "svg-generator",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": false,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "sentence-case-labels",
+   "category": "type",
+   "name": "Sentence-case labels",
+   "what": "Labels in plain mixed case at 13px, no tracking or caps.",
+   "params": [
+    {
+     "name": "size",
+     "kind": "number",
+     "range": "11-14 px",
+     "default": "13"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "toy-press",
+     "where": "css/aesthetics/toy-press.css:25-40,98,153",
+     "variant": "ab-label, kicker, type role, fieldlabel with letter-spacing 0 and no uppercase"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "caps-mono-labels",
+   "category": "type",
+   "name": "Tracked caps labels",
+   "what": "Small uppercase labels with letter-spacing (typewriter or heading face).",
+   "params": [
+    {
+     "name": "tracking",
+     "kind": "number",
+     "range": "0.06-0.18 em",
+     "default": "0.12"
+    },
+    {
+     "name": "face",
+     "kind": "enum",
+     "range": "mono|heading|body",
+     "default": "body"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "transit-wayfinding",
+     "where": "css/aesthetics/transit-wayfinding.css:53-55,98",
+     "variant": "kicker and labels: caps at 0.08em, weight 600"
+    },
+    {
+     "key": "wpa-screenprint",
+     "where": "css/aesthetics/wpa-screenprint.css:36-39,81",
+     "variant": "condensed caps at 0.12em"
+    },
+    {
+     "key": "xerox",
+     "where": "css/aesthetics/xerox.css:49-55",
+     "variant": "typewriter caps 0.14em on labels, tag, kicker"
+    },
+    {
+     "key": "xerox-punk",
+     "where": "css/aesthetics/xerox-punk.css:218-224",
+     "variant": "typewriter caps 0.14em on controls"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "uppercase-display-headline",
+   "category": "type",
+   "name": "Uppercase display headline",
+   "what": "Headline and card titles in heavy or condensed uppercase with tight leading.",
+   "params": [
+    {
+     "name": "lineHeight",
+     "kind": "number",
+     "range": "0.92-1.08",
+     "default": "0.98"
+    },
+    {
+     "name": "tracking",
+     "kind": "number",
+     "range": "0.01-0.07 em",
+     "default": "0.03"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "wpa-screenprint",
+     "where": "css/aesthetics/wpa-screenprint.css:36-39,59",
+     "variant": "condensed caps 0.03em, 0.98 leading"
+    },
+    {
+     "key": "xerox",
+     "where": "css/aesthetics/xerox.css:73-80",
+     "variant": "weight 900 caps, 0.92 leading, copied by xrx-head filter"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "tight-display-tracking",
+   "category": "type",
+   "name": "Tight display tracking",
+   "what": "Slight negative tracking on headline and sign titles.",
+   "params": [
+    {
+     "name": "tracking",
+     "kind": "number",
+     "range": "-0.02..0 em",
+     "default": "-0.012"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "transit-wayfinding",
+     "where": "css/aesthetics/transit-wayfinding.css:56-59,79",
+     "variant": "headline -0.012em, sign title -0.01em"
+    }
+   ],
+   "expressibleAs": "tokens",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "mixed-face-headline",
+   "category": "type",
+   "name": "Ransom mixed-face headline",
+   "what": "Each letter is its own tile with face, ground, size, tilt, baseline and clip outline, seeded per brand; whole words from a magazine face.",
+   "params": [
+    {
+     "name": "sizeRange",
+     "kind": "text",
+     "range": "0.72-1.45",
+     "default": "0.72-1.45"
+    },
+    {
+     "name": "tilt",
+     "kind": "number",
+     "range": "0-6 deg",
+     "default": "6"
+    },
+    {
+     "name": "photoTileRatio",
+     "kind": "number",
+     "range": "0-0.4",
+     "default": "0.2"
+    },
+    {
+     "name": "seed",
+     "kind": "text",
+     "range": "brand hash",
+     "default": ""
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "xerox-punk",
+     "where": "js/aesthetics/xerox-punk.js:97-175",
+     "variant": "xpHeadline(); hooked via headline() at 277-279"
+    }
+   ],
+   "expressibleAs": "needs-code",
+   "paletteAgnostic": true,
+   "exportSafe": false,
+   "appSafe": false,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "highlight-word-treatment",
+   "category": "type",
+   "name": "Last-word highlight",
+   "what": "The last or key headline word gets a distinctive treatment.",
+   "params": [
+    {
+     "name": "style",
+     "kind": "enum",
+     "range": "text-lip|route-underline|ink-block+offset|reversed-slab|marker-circle",
+     "default": "text-lip"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "toy-press",
+     "where": "css/aesthetics/toy-press.css:52-57",
+     "variant": "primary text with hard 3px text lip, marker strip when primary <3:1"
+    },
+    {
+     "key": "transit-wayfinding",
+     "where": "css/aesthetics/transit-wayfinding.css:63-66",
+     "variant": "white word with 0.09em route-1 underline"
+    },
+    {
+     "key": "wpa-screenprint",
+     "where": "css/aesthetics/wpa-screenprint.css:60-63",
+     "variant": "flat spot-ink block with 0.055em offset block"
+    },
+    {
+     "key": "xerox",
+     "where": "css/aesthetics/xerox.css:84-87",
+     "variant": "reversed paper-on-toner slab"
+    },
+    {
+     "key": "xerox-punk",
+     "where": "js/aesthetics/xerox-punk.js:171-172",
+     "variant": "hand circle round the last ransom word"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "arrow-led-headline",
+   "category": "type",
+   "name": "Arrow-led headline",
+   "what": "A straight arrow glyph in front of the headline words.",
+   "params": [
+    {
+     "name": "angle",
+     "kind": "number",
+     "range": "0-360 deg",
+     "default": "0"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "transit-wayfinding",
+     "where": "js/aesthetics/transit-wayfinding.js:96-99,209-216",
+     "variant": "twArrow + headline() hook, grid arrow then text"
+    }
+   ],
+   "expressibleAs": "svg-generator",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "info-strip",
+   "category": "layout",
+   "name": "Info strip",
+   "what": "A label strip across a block carrying small facts or a slogan.",
+   "params": [
+    {
+     "name": "content",
+     "kind": "text",
+     "range": "",
+     "default": "copy key"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "transit-wayfinding",
+     "where": "js/aesthetics/transit-wayfinding.js:273-278",
+     "variant": "sign strip: three bullets, title, direction arrow"
+    },
+    {
+     "key": "xerox-punk",
+     "where": "js/aesthetics/xerox-punk.js:348",
+     "variant": "paste-up strip line"
+    },
+    {
+     "key": "xerox",
+     "where": "js/aesthetics/xerox.js:260",
+     "variant": "edge label rotated along the platen"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": false,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "tray-row-list",
+   "category": "layout",
+   "name": "Row-as-tray list",
+   "what": "The 03 list rendered with CSS only: each row a bordered tile or ruled line with a glyph.",
+   "params": [
+    {
+     "name": "rowStyle",
+     "kind": "enum",
+     "range": "tray|ruled",
+     "default": "tray"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "toy-press",
+     "where": "css/aesthetics/toy-press.css:176-199",
+     "variant": "each row a flat tray, avatar on lip, sticker pill, chunky progress"
+    },
+    {
+     "key": "wpa-screenprint",
+     "where": "css/aesthetics/wpa-screenprint.css:156-176",
+     "variant": "rows ruled 1px, glyph rotating through spot inks by nth-child"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "bespoke-list-markup",
+   "category": "structure",
+   "name": "Bespoke list markup",
+   "what": "panels.list returns different HTML for the 03 list (route bullets, set list, copy roster).",
+   "params": [
+    {
+     "name": "rowSlots",
+     "kind": "text",
+     "range": "",
+     "default": "number, name, status, bar, pct"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "transit-wayfinding",
+     "where": "js/aesthetics/transit-wayfinding.js:285-299",
+     "variant": "departures: route bullet letter, platform, ring on bar, footer"
+    },
+    {
+     "key": "xerox-punk",
+     "where": "js/aesthetics/xerox-punk.js:359-371",
+     "variant": "handwritten set list with title and numbered rows"
+    },
+    {
+     "key": "xerox",
+     "where": "js/aesthetics/xerox.js:274-288",
+     "variant": "sheet counts + typed roster with copy counts"
+    }
+   ],
+   "expressibleAs": "needs-code",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "material-specimen-slide",
+   "category": "structure",
+   "name": "Material specimen slide",
+   "what": "deck.materialArt builds a themed specimen of the kit for the deck.",
+   "params": [],
+   "usedBy": [
+    {
+     "key": "toy-press",
+     "where": "js/aesthetics/toy-press.js:224-248",
+     "variant": "main key rest/pressed, secondary, tray with progress and badge"
+    },
+    {
+     "key": "xerox-punk",
+     "where": "js/aesthetics/xerox-punk.js:177-194,402",
+     "variant": "ransom specimen: anatomy, face pool, scale, photo tiles"
+    }
+   ],
+   "expressibleAs": "needs-code",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": false,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "route-bullet-letters",
+   "category": "ornament",
+   "name": "Route bullets with letters",
+   "what": "Circle (or diamond) bullets carrying a letter taken from the brand name.",
+   "params": [
+    {
+     "name": "count",
+     "kind": "number",
+     "range": "3",
+     "default": "3"
+    },
+    {
+     "name": "shape3",
+     "kind": "enum",
+     "range": "circle|diamond",
+     "default": "diamond"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "transit-wayfinding",
+     "where": "js/aesthetics/transit-wayfinding.js:39-44,101-104",
+     "variant": "twLetters, twBullet"
+    },
+    {
+     "key": "transit-wayfinding",
+     "where": "css/aesthetics/transit-wayfinding.css:207-212,104-114",
+     "variant": "row-n bullets, palette chip bullets, express diamond"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "keycap-block-art",
+   "category": "pattern",
+   "name": "Keycap and block art",
+   "what": "Hero SVG of stacked toy blocks and a keycap with the brand initial, each on its lip.",
+   "params": [
+    {
+     "name": "initial",
+     "kind": "text",
+     "range": "",
+     "default": "brand"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "toy-press",
+     "where": "js/aesthetics/toy-press.js:25-28,164-196",
+     "variant": "tpKey() + house composition"
+    },
+    {
+     "key": "toy-press",
+     "where": "css/aesthetics/toy-press.css:60-82",
+     "variant": "palette-role fills for faces and lips"
+    }
+   ],
+   "expressibleAs": "svg-generator",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": false,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "route-map-art",
+   "category": "pattern",
+   "name": "Octilinear route map",
+   "what": "Two-route 0/45/90 map with rounded turns, ticks, labelled stations and an interchange disc.",
+   "params": [
+    {
+     "name": "routes",
+     "kind": "number",
+     "range": "2",
+     "default": "2"
+    },
+    {
+     "name": "stations",
+     "kind": "number",
+     "range": "5",
+     "default": "5"
+    },
+    {
+     "name": "cornerRadius",
+     "kind": "number",
+     "range": "",
+     "default": "30"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "transit-wayfinding",
+     "where": "js/aesthetics/transit-wayfinding.js:81-94,218-281",
+     "variant": "twPath, twFitName, label-fit logic, narrow viewBox variant"
+    },
+    {
+     "key": "transit-wayfinding",
+     "where": "css/aesthetics/transit-wayfinding.css:70-94",
+     "variant": "sign + map panel layout"
+    }
+   ],
+   "expressibleAs": "svg-generator",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": false,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "layered-landscape-poster",
+   "category": "pattern",
+   "name": "Layered landscape poster",
+   "what": "Flat ridge bands, sun disc, lake and pines in the spot inks with a title strip.",
+   "params": [
+    {
+     "name": "bands",
+     "kind": "number",
+     "range": "3",
+     "default": "3"
+    },
+    {
+     "name": "title",
+     "kind": "text",
+     "range": "brand name",
+     "default": ""
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "wpa-screenprint",
+     "where": "js/aesthetics/wpa-screenprint.js:103-111,237-270",
+     "variant": "wpBand/wpFill bands, sun, reflection, pines; board only"
+    }
+   ],
+   "expressibleAs": "svg-generator",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": false,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "wall-collage-art",
+   "category": "pattern",
+   "name": "Pasted-wall collage",
+   "what": "Torn poster remnants, giant name, flyer, defaced stapled photo card stacked at low contrast.",
+   "params": [
+    {
+     "name": "remnants",
+     "kind": "number",
+     "range": "4",
+     "default": "4"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "xerox-punk",
+     "where": "js/aesthetics/xerox-punk.js:307-356",
+     "variant": "wall + photo card + strip"
+    },
+    {
+     "key": "xerox-punk",
+     "where": "css/aesthetics/xerox-punk.css:85-133",
+     "variant": "remnant positions, rotation, clip-paths"
+    }
+   ],
+   "expressibleAs": "needs-code",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": false,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "platen-copy-art",
+   "category": "pattern",
+   "name": "Lid-open platen art",
+   "what": "Black field with dither fall-off, the brand initial as a dot screen, ghost copy, dust and edge scale.",
+   "params": [
+    {
+     "name": "initial",
+     "kind": "text",
+     "range": "",
+     "default": "brand"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "xerox",
+     "where": "js/aesthetics/xerox.js:202-264",
+     "variant": "dot ramp, specks, masks, filters, stamp"
+    }
+   ],
+   "expressibleAs": "svg-generator",
+   "paletteAgnostic": true,
+   "exportSafe": false,
+   "appSafe": false,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "switch-shape",
+   "category": "kit",
+   "name": "Switch form",
+   "what": "Toggle drawn as keycap, rail dot, OFF|ON key, two-ink pill or marker tick.",
+   "params": [
+    {
+     "name": "variant",
+     "kind": "enum",
+     "range": "keycap|rail|offon-key|pill|tick",
+     "default": "keycap"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "toy-press",
+     "where": "css/aesthetics/toy-press.css:160-172",
+     "variant": "pill track with lip, knob on its own lip"
+    },
+    {
+     "key": "transit-wayfinding",
+     "where": "css/aesthetics/transit-wayfinding.css:178-187",
+     "variant": "rail line with travelling dot"
+    },
+    {
+     "key": "wpa-screenprint",
+     "where": "css/aesthetics/wpa-screenprint.css:141-148",
+     "variant": "paper track, ink edge, on = printed primary"
+    },
+    {
+     "key": "xerox",
+     "where": "css/aesthetics/xerox.css:168-184",
+     "variant": "OFF | ON copier key, active half inverted"
+    },
+    {
+     "key": "xerox-punk",
+     "where": "css/aesthetics/xerox-punk.css:248-252,714-719",
+     "variant": "tick on a scrap"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [
+    "switch"
+   ],
+   "conflictsWith": []
+  },
+  {
+   "id": "progress-bar-form",
+   "category": "kit",
+   "name": "Progress bar form",
+   "what": "Bar as chunky pill with highlight strip, thin line with station ring, outlined bar, hatched bar or marker bar.",
+   "params": [
+    {
+     "name": "variant",
+     "kind": "enum",
+     "range": "chunky|line-ring|outlined|hatched|marker",
+     "default": "chunky"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "toy-press",
+     "where": "css/aesthetics/toy-press.css:194-199",
+     "variant": "14px track, top-third highlight"
+    },
+    {
+     "key": "transit-wayfinding",
+     "where": "css/aesthetics/transit-wayfinding.css:216-224",
+     "variant": "4px line + ring at current station"
+    },
+    {
+     "key": "wpa-screenprint",
+     "where": "css/aesthetics/wpa-screenprint.css:174-175",
+     "variant": "12px bordered bar, right edge rule"
+    },
+    {
+     "key": "xerox",
+     "where": "css/aesthetics/xerox.css:199-209",
+     "variant": "45deg hatch with end bar"
+    },
+    {
+     "key": "xerox-punk",
+     "where": "css/aesthetics/xerox-punk.css:257-272",
+     "variant": "marker bars in the set list"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [
+    "progress"
+   ],
+   "conflictsWith": []
+  },
+  {
+   "id": "input-style",
+   "category": "kit",
+   "name": "Input form",
+   "what": "Field as sunk well, underline, newsprint label, typed blank or bordered box with offset focus.",
+   "params": [
+    {
+     "name": "variant",
+     "kind": "enum",
+     "range": "well|underline|label-rule|typed-blank|offset-focus",
+     "default": "well"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "toy-press",
+     "where": "css/aesthetics/toy-press.css:154-158",
+     "variant": "2px edge, surface-2 bed, primary outline focus"
+    },
+    {
+     "key": "transit-wayfinding",
+     "where": "css/aesthetics/transit-wayfinding.css:171-176",
+     "variant": "2px white underline, route-1 focus line"
+    },
+    {
+     "key": "wpa-screenprint",
+     "where": "css/aesthetics/wpa-screenprint.css:134-138",
+     "variant": "ink box, 2px offset on focus"
+    },
+    {
+     "key": "xerox",
+     "where": "css/aesthetics/xerox.css:520-532",
+     "variant": "typed blank, focus inverts"
+    },
+    {
+     "key": "xerox-punk",
+     "where": "css/aesthetics/xerox-punk.css:691-703",
+     "variant": "newsprint label with heavy ruled line, highlighter focus"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [
+    "input"
+   ],
+   "conflictsWith": []
+  },
+  {
+   "id": "checkbox-radio-form",
+   "category": "kit",
+   "name": "Checkbox and radio form",
+   "what": "Check/radio as keycap box, ink-edged square, X-in-square or scribbled hatch.",
+   "params": [
+    {
+     "name": "variant",
+     "kind": "enum",
+     "range": "key|ink-edge|x-square|scribble",
+     "default": "key"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "toy-press",
+     "where": "css/aesthetics/toy-press.css:335-346",
+     "variant": "square key with lip, radio round peg"
+    },
+    {
+     "key": "transit-wayfinding",
+     "where": "css/aesthetics/transit-wayfinding.css:375-378",
+     "variant": "2px ink edge, 2px corners"
+    },
+    {
+     "key": "xerox",
+     "where": "css/aesthetics/xerox.css:533-547",
+     "variant": "X in a square, bullseye for radio"
+    },
+    {
+     "key": "xerox-punk",
+     "where": "css/aesthetics/xerox-punk.css:704-713",
+     "variant": "hatched scribble, hand-drawn ring"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [
+    "checkbox",
+    "radio"
+   ],
+   "conflictsWith": []
+  },
+  {
+   "id": "slider-form",
+   "category": "kit",
+   "name": "Slider form",
+   "what": "Slider as chunky slot, route line with station disc, ruler, or marker bar.",
+   "params": [
+    {
+     "name": "variant",
+     "kind": "enum",
+     "range": "chunky|route-line|ruler|marker",
+     "default": "chunky"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "toy-press",
+     "where": "css/aesthetics/toy-press.css:357-360",
+     "variant": "14px track, keycap thumb"
+    },
+    {
+     "key": "transit-wayfinding",
+     "where": "css/aesthetics/transit-wayfinding.css:379-383",
+     "variant": "4px line, 24px station disc thumb"
+    },
+    {
+     "key": "xerox",
+     "where": "css/aesthetics/xerox.css:548-560",
+     "variant": "ruler tick scale, split-notch handle"
+    },
+    {
+     "key": "xerox-punk",
+     "where": "css/aesthetics/xerox-punk.css:720-727",
+     "variant": "fluoro marker bar on a taped rule"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [
+    "slider"
+   ],
+   "conflictsWith": []
+  },
+  {
+   "id": "callout-tones",
+   "category": "kit",
+   "name": "Callout tone coding",
+   "what": "Info/success/warning/error callouts distinguished by shape (bar, dashed, hazard stripe, reversed or censored) rather than colour.",
+   "params": [
+    {
+     "name": "success",
+     "kind": "enum",
+     "range": "tick|left-bar|highlight",
+     "default": "left-bar"
+    },
+    {
+     "name": "error",
+     "kind": "enum",
+     "range": "reversed|censor",
+     "default": "reversed"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "xerox",
+     "where": "css/aesthetics/xerox.css:567-581",
+     "variant": "monochrome: left bar, dashed, reversed"
+    },
+    {
+     "key": "xerox-punk",
+     "where": "css/aesthetics/xerox-punk.css:742-751",
+     "variant": "stickers: tick, hazard stripe, censor bar"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [
+    "callout"
+   ],
+   "conflictsWith": []
+  },
+  {
+   "id": "ink-filled-selected",
+   "category": "kit",
+   "name": "Ink-filled selected state",
+   "what": "The chosen item inverts to a solid ink/primary fill with a contrasting label.",
+   "params": [
+    {
+     "name": "fill",
+     "kind": "enum",
+     "range": "primary|ink|white|highlighter",
+     "default": "primary"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "toy-press",
+     "where": "css/aesthetics/toy-press.css:127-131",
+     "variant": "selected segment lit in the primary with its own lip"
+    },
+    {
+     "key": "transit-wayfinding",
+     "where": "css/aesthetics/transit-wayfinding.css:363-390",
+     "variant": "pressed sign flips to white/black; picked row lit panel + route bar"
+    },
+    {
+     "key": "wpa-screenprint",
+     "where": "css/aesthetics/wpa-screenprint.css:119",
+     "variant": "selected segment ink with canvas text"
+    },
+    {
+     "key": "xerox",
+     "where": "css/aesthetics/xerox.css:582-593",
+     "variant": "selection: the inverted block"
+    },
+    {
+     "key": "xerox-punk",
+     "where": "css/aesthetics/xerox-punk.css:728-741",
+     "variant": "highlighter band with 4px ink bar"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [
+    "segmented",
+    "row",
+    "tab",
+    "menu"
+   ],
+   "conflictsWith": []
+  },
+  {
+   "id": "named-states",
+   "category": "kit",
+   "name": "Named button states",
+   "what": "The three-state specimen carries themed names or glyph states.",
+   "params": [
+    {
+     "name": "names",
+     "kind": "text",
+     "range": "3 strings",
+     "default": "Rest|Hover|Pressed"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "toy-press",
+     "where": "js/aesthetics/toy-press.js:40-47",
+     "variant": "Rest / Hover / Pressed"
+    },
+    {
+     "key": "transit-wayfinding",
+     "where": "js/aesthetics/transit-wayfinding.js:119-126",
+     "variant": "Scheduled / Approaching / Diverted"
+    },
+    {
+     "key": "wpa-screenprint",
+     "where": "js/aesthetics/wpa-screenprint.js:135-142",
+     "variant": "Rest / Hover / Pressed"
+    },
+    {
+     "key": "xerox-punk",
+     "where": "js/aesthetics/xerox-punk.js:206-214",
+     "variant": "Pasted / Circled / Crossed out"
+    },
+    {
+     "key": "xerox",
+     "where": "js/aesthetics/xerox.js:117-124,266-271",
+     "variant": "Gen 1 / Gen 3 / Gen 7 rendered by states() hook"
+    }
+   ],
+   "expressibleAs": "tokens",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [
+    "button"
+   ],
+   "conflictsWith": []
+  }
+ ],
+ "notes": "Schema fit: ok. Gaps: (1) contrast-fit and similar colour searches are framework helpers, not styles; classed needs-code but one shared function serves all styles. (2) \"variant\" params hold enums that switch shapes (switch, slider, progress); a generator needs a template per enum value. (3) Seeded randomness (xerox-punk) has no schema slot. (4) Kit line ranges point at the live signature block; xerox-punk and xerox keep a duplicate \"classic\" block that was ignored."
+}

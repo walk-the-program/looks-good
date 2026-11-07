@@ -1,0 +1,581 @@
+{
+  "group": "C",
+  "styles": [
+    {
+      "key": "data-pebble", "name": "Data Pebble",
+      "coreTrick": "Every quantity is drawn as a smooth closed 8-point blob whose AREA (not width) equals the value, on a pale ground tinted from the brand hue, with white 18px cards carrying big light serif lining figures and a contrast-clamped deep primary.",
+      "colourRecipe": "Primary is re-printed as a 'deep pebble tone': saturation = clamp(s*0.85, 24, 58), then lightness stepped (light mode: start at min(L,28) and darken until white text holds 7:1; dark mode: start at L72 and lighten up to 90 until 7:1 on the ground). A muted or grey primary therefore still gets a forced 24% chroma in its own hue (no fixed fallback). Ground = low-chroma tint of the primary hue (light L93.5, dark L9.5; achromatic primary gets sat 3). Secondary only draws the comparison series (soft fill plus deeper edge); accent is one headline spark.",
+      "moves": ["tinted-neutral-canvas","primary-push-chroma","contrast-clamp","hairline-rule","corner-radius","soft-raised-relief","frosted-glass-panel","organic-blob-radius","area-proportional-pebbles","shape-masked-data-mark","ring-comparison-series","light-display-weight","serif-numeral-figures","tight-display-tracking","highlight-last-word","caps-mono-labels","state-colour-derivation","tint-selected","button-shape-recipe","segmented-recipe","toggle-recipe","progress-recipe","board-list-recipe","hero-layout","palette-swatch-form","section-number-marker","named-states","kit-cell-frame","focus-ring","overlay-surface","voice-register","checkbox-radio-marks","italic-secondary-voice"],
+      "remainder": [
+        { "what": "Contrast-search token derivation: muted text pulled toward ink in 0.1 steps until 4.6:1 on card, ground and inset surface; a separate 'muted on glass'; secondary edge stepped to 3.2:1; tag ink to 4.6:1", "where": "js/aesthetics/data-pebble.js:174-191", "whyCode": "iterative colour searches over several backgrounds; a generator would need a shared contrast-clamp primitive" },
+        { "what": "Board hero art composition: a frosted card over a blurred pebble field; the cluster chart uses a hand-placed table of [name, now, before, x, y, seed, bx, by] and a hand-placed four-pebble background field", "where": "js/aesthetics/data-pebble.js:230-254", "whyCode": "bespoke chart layout with hand-tuned coordinates and per-datum copy" },
+        { "what": "Hand-authored SVG data-URI masks for the five-pebble progress bar and the up/down pebble sparkline (shapes are baked paths, not generated)", "where": "css/aesthetics/data-pebble.css:196", "whyCode": "baked path data; could become a svg-generator output but today is a literal" },
+        { "what": "Phone/Built overrides that retarget board components to kit selectors (.sb-k-*): the sparkline ::after on stat tiles, sidebar pills, avatar blobs, danger ring", "where": "css/aesthetics/data-pebble.css:256-311", "whyCode": "selector mapping to the shared kit DOM, data rather than logic but not expressible as palette moves" },
+        { "what": "Deck materialArt specimens (stat tile + sparkline + pebble progress + frosted card) assembled from pebble generator calls", "where": "js/aesthetics/data-pebble.js:305-318", "whyCode": "hook returns bespoke markup" }
+      ],
+      "moveCoverage": 75,
+      "notes": "Pebble generator is deterministic from a seed (dpRand mulberry-style PRNG, js 40-49) so renders are stable. Frosted card and the blurred pebble field are board/website only; the style's own rule (js 295, css 13-15) bans decoration in app UI where pebbles are data only (sparkline, progress, row glyph)."
+    },
+    {
+      "key": "dystopian-luxury", "name": "Dystopian Luxury",
+      "coreTrick": "Severity by removal: strip every card, shadow, radius and tint, then spend one oversized brand word cropped to its top 88% under a plain ink strip plus one blank accession label, and show the client primary exactly once per view as a 6px square before the action label.",
+      "colourRecipe": "Canvas is pushed to near-pure neutral (light: sat<=3, L>=97; dark: sat<=4, L<=5) and ink is near-black/near-white mixed 25-30% with the client ink. The client primary is never a fill: it is only a 6px square (--ab-dl-mark = t.primary, no fallback, a dull primary is still used). Secondary and accent appear only as 24px reference squares in the palette row. In the app kit primary, accent, secondary are all overridden to ink.",
+      "moves": ["tinted-neutral-canvas","fixed-ink-colour","mono-plus-accent","hairline-rule","corner-radius","chromeless-card","caps-mono-labels","cropped-giant-type","paper-tag-object","catalogue-number","vast-whitespace","tiny-wordmark-header","underline-field","ink-filled-selected","named-states","dashed-stitch","toggle-recipe","checkbox-radio-marks","button-shape-recipe","segmented-recipe","board-list-recipe","progress-recipe","footer-treatment","palette-swatch-form","section-number-marker","hero-layout","tight-display-tracking","highlight-last-word","voice-register","kit-cell-frame","focus-ring","overlay-surface"],
+      "remainder": [
+        { "what": "Word fit: measure the first brand word with a canvas 2D context at weight 800, scale it so its width is 102% of the board, cap at 64 (100 on narrow plates) and fall back to natural width for short words, then compute the crop strip y so 88% of the cap height shows", "where": "js/aesthetics/dystopian-luxury.js:26-45", "whyCode": "runtime text measurement and per-brand sizing" },
+        { "what": "Word split: break a long brand word (>=10 letters) near its middle at a consonant-consonant non-digraph boundary, else a vowel-consonant boundary, so two cropped plates stack on narrow boards", "where": "js/aesthetics/dystopian-luxury.js:52-70", "whyCode": "string heuristic over the brand name" },
+        { "what": "Hero re-grid: art wrapper and .dl-art set to display:contents so the plate runs edge to edge above the caption and the label; wide/narrow plates swapped by container query", "where": "css/aesthetics/dystopian-luxury.css:46-55", "whyCode": "layout override of the shared hero grid; structural, not a visual parameter" },
+        { "what": "Accession numbers: literal 'ITEM 01 / 2026.114.1' strings and CSS counters prefixed '2026.114.' injected via ::before on cards, rows and kit cells", "where": "css/aesthetics/dystopian-luxury.css:109-111", "whyCode": "generated content tied to board DOM; text is data, the counter wiring is per-selector" },
+        { "what": "Square-X stitch switch built from two 45deg conic-free linear gradients, and the 4-stitch label corners", "where": "css/aesthetics/dystopian-luxury.css:71-78", "whyCode": "hand-drawn gradient glyphs, could be a css-recipe if the glyph set is in the library" }
+      ],
+      "moveCoverage": 70,
+      "notes": "The file also contains a '--classic' variant (css 317+); ignored per the brief. Header comment forbids classification text next to the brand name (js 8-10). The giant-word is the signature and is the part least reducible to params."
+    },
+    {
+      "key": "editorial-serif", "name": "Editorial Serif",
+      "coreTrick": "Set the page like a magazine: weight comes from contrast (400-weight serif, one italic accent word, small-caps sans labels) and structure from hairline and thick-over-thin rules on a cream-warmed paper canvas, with a duotone cover plate mixed from the primary as the only filled object.",
+      "colourRecipe": "Canvas (light only) is mixed toward cream: b.mix(b.canvas,'#f3ead9',0.74) (comment says ~25% toward cream; check mix() weight order). Primary fills only the one main action, the duotone plate (primary mixed 35% toward ink, so even a light or muted primary goes dark; a grey primary yields a grey plate, no chroma boost), the switch-on and the board tab underline. Pressed = mix(primary,#000,0.78) with readable text. Hover = ink background, canvas text. Accent is text only (accent-ink on the italic word and the section sign). Secondary tints small tags. In the kit everything except the one main action is ink (css 336-342).",
+      "moves": ["tinted-neutral-canvas","duotone-ink","halftone-dots","grain-overlay","cropped-giant-type","figure-caption","double-rule-masthead","centered-masthead","hairline-rule","corner-radius","chromeless-card","caps-mono-labels","tight-display-tracking","light-display-weight","highlight-last-word","serif-numeral-figures","hanging-drop-cap","italic-secondary-voice","pull-quote","dotted-leader-contents","underline-field","rule-marked-selected","ink-filled-selected","named-states","state-colour-derivation","mono-plus-accent","catalogue-number","hero-layout","palette-swatch-form","section-number-marker","button-shape-recipe","segmented-recipe","toggle-recipe","checkbox-radio-marks","board-list-recipe","progress-recipe","kit-cell-frame","overlay-surface","focus-ring","footer-treatment","voice-register","dashed-stitch"],
+      "remainder": [
+        { "what": "Tracking multiplier --ab-tr from the heading face class (condensed 0, heavy 0, wide 0.4, techno 0.4, else 1) and the interface sans choice (the brand's own sans, else Inter): read from global state.headingFont/bodyFont", "where": "js/aesthetics/editorial-serif.js:73-82", "whyCode": "reads the live font object (class and category) at render time; a move spec needs a font-class lookup primitive" },
+        { "what": "Cover plate art markup: figure > plate with half-tone layer, grain layer, plate number, cropped initial, coverline and sub-line, plus figcaption with italic label and page number, all copy-driven with a {brand} placeholder", "where": "js/aesthetics/editorial-serif.js:109-121", "whyCode": "art() hook returns bespoke markup; composable only if the library has a 'cover plate' template" },
+        { "what": "Pull quote text lives as a literal in a CSS ::before content string and is only shown outside .sb-ab and .ab-slide", "where": "css/aesthetics/editorial-serif.css:174-179", "whyCode": "fixed copy plus selector exclusions; not a palette or token move" },
+        { "what": "Narrow and phone container-query re-layouts: masthead collapses to flex, hero to one column (plate to 4/4.6 under), palette to one column, list rows drop the leader at <=360px", "where": "css/aesthetics/editorial-serif.css:254-275", "whyCode": "responsive layout rules specific to the board grid; recipe-able but per-breakpoint bespoke" },
+        { "what": "Kit adapter: ~230 lines of selectors that map each shared-kit component class (.sb-k-*, .sb-tab, .ab-row.sb-k-row) to the editorial recipes; counters for 'No. NN' cell numbers; drop cap disabled on .ab-slide", "where": "css/aesthetics/editorial-serif.css:336-670", "whyCode": "mostly mechanical (same few recipes applied to many selectors) but a class-selector map, so a move system needs a component-to-recipe table, not just recipes" }
+      ],
+      "moveCoverage": 85,
+      "notes": "REBUILD TABLE (exact values). Radii: 0 everywhere (board css 15, kit --k-r 0px css 341); only radio ring and skeleton avatar are round. Rules: --ab-hair = alpha(ink, 0.30 light / 0.26 dark); --ab-hair-soft = alpha(ink, 0.16 / 0.14); --ab-hair-strong = ink. Masthead rule = 7px tall: 3px strong on top + 1px strong at the foot (two 100% x 3px / 100% x 1px linear-gradient layers, css 37-41); kit reuses it as 3px solid top + 1px solid bottom on buttons, cards, menus, bars, cells; overlays 3px double. Plate: primary mix ink 0.35 (plate), mix black 0.5 (dark, unused in css), hi = mix(plate,canvas,0.3) light / mix(plate,ink,0.4) dark, lo = mix(plate,black,0.45) light / mix(plate,ink,0.25) dark; background = radial(90% 70% at 24% 14%, hi, transparent 62%) over linear(162deg, plate, lo); 1px strong border; halftone 5px grid, dot rgba(0,0,0,.75) 0.9-1.3px, opacity .34 (dark .16) multiply, mask 180deg transparent 20% to black 100%; grain 180px feTurbulence fractalNoise baseFrequency .85, 2 octaves, opacity .09 multiply. Initial letter: heading face 400 uppercase, 150cqh, left -8%, bottom -38%, colour mix(plate 72%, canvas 28%). Plate box: width clamp(190px,29cqw,370px), aspect 3/4.15 (narrow 4/4.6). Headline: weight 400, size clamp(44px,11.5cqw,160px) x hl-scale x hs x display(1.22), line-height .94, tracking -0.028em x tr, balance wrap; narrow clamp(44px,17cqw,78px). Wordmark: uppercase 400, .05em x tr, clamp(20px,3cqw,34px). Dateline/tag 10.5px .16em uppercase muted; 'Vol. 01 · No. 1' is a ::before string. Kicker 11px 500 .22em ink with a flex hairline after. Standfirst clamp(16px,2cqw,23px)/1.38, max 30em, 1px hair top rule, padding-top clamp(12px,1.8cqw,20px). Section label 10.5px .16em 500; labelrow border-bottom 1px hair, pb 9px mb 18px; numerals heading italic 17px followed by ' — '. Palette: 5 cols, top 1px strong / bottom 1px hair, chips 18px square ringed 1px strong, role 10.5px 600 .14em caps, hex 11px tabular. Contents row: grid 3.4ch auto 1fr auto 5ch, row padding clamp(11px,1.5cqw,16px) 0, top 1px soft, name serif clamp(19px,2.3cqw,26px)/1.1 tracking -0.01em x tr, dotted 1px strong leader, status 10.5px .14em caps muted, pct italic 17px; type-pick counters start 12/24/38. Pull quote italic clamp(26px,4cqw,50px)/1.08, max 17em, centred, 1px strong top / 1px hair bottom. Card title clamp(28px,3.6cqw,42px)/1.02 tracking -0.02em x tr, body 17px/1.4 in 12.5em, drop cap 3.15em / line-height .8 / padding .05em .09em 0 0. Main action: padding 15px 18px, 11.5px 600 .18em uppercase, bg primary, hover bg ink / canvas text, active mix(primary,#000,.78) + translateY(1px), arrow '→' 15px. Field: underline 1px strong, italic heading 24px/1.2, label 10.5px 600 .18em caps; focus underline primary + 0 1px 0. Tabs: gap 26px, 11px 500 .16em caps muted, selected ink 600 + 2px primary underline (kit: 700 + 3px ink). Toggle: 40x18 square, inset 1px strong ring, 12px ink slug (kit 48x24 rule with 16px square slug). Kit: selection = ink text + 2-3px ink rule and italic title; pressed = ink fill reversed; focus = 2px ink outline offset 3px; disabled = dotted 3px/1px rules; checkbox = 22px 1px ink square with serif x (28px); radio = 22px ring 1.5px with 8px ink bullet; slider = 3px ink fill over 1px rule with 22px ink diamond; calendar: 3px/1px rules, serif 17px days, chosen day bold italic with inset 3px ink underline; cells numbered 'No. NN' italic 13px with 24px/28px serif name; accordion/menus hairline or dotted separators. Footer: 1px strong top, 11px .12em caps; motto italic 14px; dot replaced by serif '§' 15px in accent-ink. Unused tokens declared but not referenced in css I read: --ab-eds-plate-dark, --ab-eds-paper, --ab-eds-ink-hover."
+    },
+    {
+      "key": "frutiger-aero", "name": "Frutiger Aero",
+      "coreTrick": "Every control is a vertical-gradient gel (lightness +34 / base / -9) with a white specular cap that ends in a crisp lower lip, built from the client primary lifted to candy chroma, sitting on near-opaque Aero glass with a hard 115deg gloss streak under a sky, hill and water scene where the headline is mirrored on a wet floor.",
+      "colourRecipe": "Primary is lifted to a candy gel: saturation floored at 55 when s>12 (below 12 stays grey), lightness clamped 40-62, then shaded down to L32 until white text reaches 4.5:1 (not for yellow hues 38-80) or lightened to L82 with the fixed dark label #0E2233. Companion gels are the primary's triad (+120, +240) and complement (+180) at saturation >=86, L52; an achromatic primary uses fixed candy greens/violet/orange. Secondary becomes the landscape: a green-ish hue (70-170, s>=18) is used as the hill, else fixed lime #7ED33F. Ink fixed #23415A (night #EAF5FF), canvas fixed #F2F7FB (night #071A2B), close button fixed red #D9442B.",
+      "moves": ["gel-specular-cap","aero-glass-streak","companion-hues-triad","primary-push-chroma","contrast-clamp","fixed-ink-colour","tinted-neutral-canvas","wet-floor-reflection","sky-scene-art","window-title-bar","bleed-header-band","light-display-weight","tight-display-tracking","highlight-last-word","corner-radius","soft-raised-relief","hairline-rule","tint-selected","segmented-recipe","button-shape-recipe","toggle-recipe","progress-recipe","board-list-recipe","palette-swatch-form","section-number-marker","footer-treatment","named-states","state-colour-derivation","focus-ring","hero-layout","voice-register","kit-cell-frame","overlay-surface","checkbox-radio-marks","caps-mono-labels"],
+      "remainder": [
+        { "what": "Procedural scene: sky gradient, light rays, sparkles, lens-flare string, three rainbow swooshes with gloss lines, bokeh, clouds, hill with crest/foot, four rising orbs, water with mirrored primary orb, a 12-point 'new' seal, and a closing-slide strip SVG", "where": "js/aesthetics/frutiger-aero.js:195-395", "whyCode": "large hand-composed SVG scenes with night variant; only partly parameterised by the palette (colours), composition is bespoke. Internals of 195-345 skimmed, not read line by line" },
+        { "what": "Gel label decision: choose white vs dark label by searching lightness so contrast >=4.5, with the dark label also checked on the darker base stop; pale companion tints found by walking lightness against the ink on both stops", "where": "js/aesthetics/frutiger-aero.js:48-65", "whyCode": "iterative colour searches (contrast-clamp)" },
+        { "what": "Landscape test: use the secondary as the hill only when hue 70-170 and sat >=18, else the fixed lime", "where": "js/aesthetics/frutiger-aero.js:129-140", "whyCode": "palette-dependent branch with a fixed fallback" },
+        { "what": "headline() hook: wet-floor markup, headline cut into five horizontal slices with data-t pseudo content so the reflection carries no text nodes", "where": "js/aesthetics/frutiger-aero.js:149-166", "whyCode": "hook generates DOM; the slice offsets and opacity ramp are CSS vars but the structure is code" },
+        { "what": "panels hooks emit real window chrome markup (title bar text plus caption-button SVG, explorer column header) for card, panel and list", "where": "js/aesthetics/frutiger-aero.js:396-403", "whyCode": "structural markup, not CSS generated content" },
+        { "what": "Built screens bring a sky band and a bubble behind the app UI", "where": "css/aesthetics/frutiger-aero.css:397-417", "whyCode": "decorative art in product screens; conflicts with the 'app UI has no art' rule, flagged not corrected" }
+      ],
+      "moveCoverage": 60,
+      "notes": "Roughly 40% of the look is the procedural sky/water/orb scene and the wet-floor headline, which are not param-driven. The gel material itself (gradient + cap + caustic + rim + shadow) is highly regular and carries the kit. Header states export-safe (no mask-image, no backdrop-filter; glass is near-opaque fill) (js 31). The kit signature block (css 620-639) says 'No art'; the Built sky band at css 397-417 contradicts it."
+    },
+    {
+      "key": "gorpcore", "name": "Gorpcore",
+      "coreTrick": "A fixed stone ground woven with a 5px ripstop line grid carries the client colours as dyed fabric colourways (primary = shell, secondary = second panel and contour tint), while hardware metaphors (webbing, buckles, grommets, dashed stitching, a paper hang tag with a spec table) replace every control and a seeded marching-squares contour map is the hero art.",
+      "colourRecipe": "Primary is the shell fabric: client primary dyed 10% flatter (saturation x0.9, lightness unchanged) with a readable on-colour; used for the main action, the woven highlight label, the trail line and the selected toggle clip. A muted primary just gets flatter (no fallback; the rules say 'needs a real colourway'). Secondary = second colour-blocked panel, contour tint and lake. Accent = trail-blaze marker colour (accentInk). Fixed colours: stone #EDEBE6 (dark #1A1C1B), carbon #1B1D1C, blaze orange #FF5F1F (under ~3%, zip pull and position dot only), silver #C9CCCF, paper #F7F4EC. In the app kit the shell is simply the primary and blaze is spent on the selected-tab dot.",
+      "moves": ["hairline-rule","line-grid-texture","fixed-ink-colour","tinted-neutral-canvas","primary-push-chroma","mono-plus-accent","bleed-header-band","heavy-caps-display","highlight-last-word","dashed-stitch","paper-tag-object","contour-map-art","webbing-strap","reflective-strip","shape-coded-markers","caps-mono-labels","catalogue-number","spec-table-rows","hero-layout","palette-swatch-form","section-number-marker","named-states","button-shape-recipe","segmented-recipe","toggle-recipe","progress-recipe","board-list-recipe","kit-cell-frame","checkbox-radio-marks","focus-ring","footer-treatment","heavy-border","soft-raised-relief","corner-radius","ink-filled-selected","overlay-surface","voice-register"],
+      "remainder": [
+        { "what": "Seeded height field (hand-placed gaussian bumps, ridge and value noise) plus marching-squares contour extraction, segment chaining, index-contour label placement (rotated, knock-out stroke) and a summit search", "where": "js/aesthetics/gorpcore.js:48-135", "whyCode": "algorithmic generator; as a library it is one svg-generator primitive, but the bump table and ridge are bespoke" },
+        { "what": "Map composition: hand-authored switchback trail points relative to the summit, lake path, 'you are here' dot, scale bar, coordinates, north arrow, cord path, carabiner, webbing loop; tag brand line fit (<=16 chars else shrink)", "where": "js/aesthetics/gorpcore.js:253-336", "whyCode": "bespoke art composition with hand-tuned coordinates" },
+        { "what": "Elevation-profile progress bar: hand-drawn SVG silhouette as a data-URI background (light and dark versions) with an orange position dot at the fill end", "where": "css/aesthetics/gorpcore.css:239-245", "whyCode": "baked path data" },
+        { "what": "App/kit rewrite: native-style segmented, toggle and progress replace the board hardware (webbing, buckle); grommets, stamps and spec text suppressed; section labels become stitched ink tape; badges get a punched hole", "where": "css/aesthetics/gorpcore.css:310-373", "whyCode": "per-selector adaptation of board components to the kit, i.e. two parallel recipes per component" },
+        { "what": "Kit signature: field label as carbon tape folder tab, stencil face on the tape, slotted zip-pull slider, grommet radio", "where": "css/aesthetics/gorpcore.css:498-570", "whyCode": "multi-part hardware drawings built from gradients and pseudo-elements; css-recipe in principle, few reusable params" }
+      ],
+      "moveCoverage": 62,
+      "notes": "Heavy reliance on fixed (non-client) colours: only shell, shell2 and blaze-mark take client colour. Many moves here are visual metaphors (webbing, buckle, hang tag) that are one-off drawings with a handful of params, so they reuse poorly across other styles. The ripstop grid is explicitly absent on app screens (css 310-311)."
+    }
+  ],
+  "moves": [
+    { "id": "tinted-neutral-canvas", "category": "colour", "name": "Tinted or fixed neutral canvas", "what": "The page ground is derived from, or replaces, the client canvas with a near-neutral tone whose hue, chroma and lightness are set by the style.",
+      "params": [ { "name": "hueSource", "kind": "enum", "range": "client-canvas|primary|fixed", "default": "client-canvas" }, { "name": "chromaLight", "kind": "number", "range": "0-24 (HSL s)", "default": "3" }, { "name": "lightnessLight", "kind": "number", "range": "90-99", "default": "97" }, { "name": "chromaDark", "kind": "number", "range": "0-24", "default": "4" }, { "name": "lightnessDark", "kind": "number", "range": "4-12", "default": "5" }, { "name": "fixedHex", "kind": "colour", "range": "any", "default": "" } ],
+      "usedBy": [
+        { "key": "editorial-serif", "where": "js/aesthetics/editorial-serif.js:68-71", "variant": "light only: mix(canvas,'#f3ead9',0.74), a cream warm; dark mode untouched" },
+        { "key": "dystopian-luxury", "where": "js/aesthetics/dystopian-luxury.js:158-162", "variant": "near-pure neutral, light sat<=3 L>=97, dark sat<=4 L<=5, hue kept" },
+        { "key": "data-pebble", "where": "js/aesthetics/data-pebble.js:156-162", "variant": "hue of primary; light sat clamp(s*0.3,8,16) (3 if s<6) L93.5, dark sat clamp(s*0.4,6,24) L9.5" },
+        { "key": "frutiger-aero", "where": "js/aesthetics/frutiger-aero.js:514-516", "variant": "fixed #F2F7FB light / #071A2B night" },
+        { "key": "gorpcore", "where": "js/aesthetics/gorpcore.js:210", "variant": "fixed stone #EDEBE6 / #1A1C1B" } ],
+      "expressibleAs": "tokens", "paletteAgnostic": true, "exportSafe": true, "appSafe": true, "kitScope": ["page"], "conflictsWith": [] },
+
+    { "id": "primary-push-chroma", "category": "colour", "name": "Re-print the primary's chroma", "what": "The client primary is re-printed with a saturation scale or floor (up for candy, down for dyed or deep tones) before any role uses it.",
+      "params": [ { "name": "chromaScale", "kind": "number", "range": "0.8-1.4", "default": "1" }, { "name": "chromaFloor", "kind": "number", "range": "0-90", "default": "0" }, { "name": "chromaCeil", "kind": "number", "range": "40-100", "default": "100" }, { "name": "lightMin", "kind": "number", "range": "5-60", "default": "0" }, { "name": "lightMax", "kind": "number", "range": "28-95", "default": "100" } ],
+      "usedBy": [
+        { "key": "frutiger-aero", "where": "js/aesthetics/frutiger-aero.js:48-65", "variant": "floor 55 when s>12, L 40-62; companions floor 86 at L52 (lines 87-93)" },
+        { "key": "data-pebble", "where": "js/aesthetics/data-pebble.js:19-30", "variant": "scale 0.85, clamp 24-58, light L<=28" },
+        { "key": "gorpcore", "where": "js/aesthetics/gorpcore.js:31-36", "variant": "scale 0.9 only (the 'dyed 10% flatter' fabric)" } ],
+      "expressibleAs": "tokens", "paletteAgnostic": true, "exportSafe": true, "appSafe": true, "kitScope": ["button","tab","toggle"], "conflictsWith": [] },
+
+    { "id": "contrast-clamp", "category": "colour", "name": "Contrast-clamped colour search", "what": "A colour is stepped in lightness or mixed toward ink in small increments until it reaches a target contrast ratio on one or more backgrounds.",
+      "params": [ { "name": "target", "kind": "number", "range": "3-7", "default": "4.5" }, { "name": "against", "kind": "enum", "range": "white|canvas|surface|several", "default": "canvas" }, { "name": "step", "kind": "number", "range": "0.05-2", "default": "1" } ],
+      "usedBy": [
+        { "key": "data-pebble", "where": "js/aesthetics/data-pebble.js:174-191", "variant": "muted 4.6 on surface+ground, secondary edge 3.2, tag ink 4.6; primary 7:1 (lines 19-30)" },
+        { "key": "frutiger-aero", "where": "js/aesthetics/frutiger-aero.js:45-65", "variant": "gel label 4.5; highlight word 3.2 on the horizon glow (lines 543-546); pale tints 4.5 on two stops (95-113)" } ],
+      "expressibleAs": "needs-code", "paletteAgnostic": true, "exportSafe": true, "appSafe": true, "kitScope": [], "conflictsWith": [] },
+
+    { "id": "fixed-ink-colour", "category": "colour", "name": "Fixed style ink", "what": "Text and rules use a style-fixed near-black (or near-white at night) instead of the client ink.",
+      "params": [ { "name": "inkLight", "kind": "colour", "range": "any", "default": "#0A0A0A" }, { "name": "inkDark", "kind": "colour", "range": "any", "default": "#F7F7F5" }, { "name": "clientInkMix", "kind": "number", "range": "0-1", "default": "0" } ],
+      "usedBy": [
+        { "key": "dystopian-luxury", "where": "js/aesthetics/dystopian-luxury.js:167", "variant": "#0A0A0A / #F7F7F5 mixed 25-30% with client ink" },
+        { "key": "frutiger-aero", "where": "js/aesthetics/frutiger-aero.js:36-37", "variant": "#23415A deep blue-grey (never black) / #EAF5FF night" },
+        { "key": "gorpcore", "where": "js/aesthetics/gorpcore.js:21-25", "variant": "carbon #1B1D1C, also fixed silver and paper" } ],
+      "expressibleAs": "tokens", "paletteAgnostic": false, "exportSafe": true, "appSafe": true, "kitScope": [], "conflictsWith": [] },
+
+    { "id": "mono-plus-accent", "category": "colour", "name": "Neutral plus a single budgeted accent", "what": "The page is neutral and one accent appears in a tiny, capped form: a 6px square, an orange dot or one italic word.",
+      "params": [ { "name": "form", "kind": "enum", "range": "square-mark|dot|italic-word", "default": "square-mark" }, { "name": "colourSource", "kind": "enum", "range": "primary|accent-ink|fixed", "default": "primary" }, { "name": "sizePx", "kind": "number", "range": "4-12", "default": "6" }, { "name": "maxPerView", "kind": "number", "range": "1-3", "default": "1" } ],
+      "usedBy": [
+        { "key": "dystopian-luxury", "where": "css/aesthetics/dystopian-luxury.css:124", "variant": "6px primary square before the action label, once per view (js 141-145)" },
+        { "key": "gorpcore", "where": "css/aesthetics/gorpcore.css:176-178", "variant": "fixed blaze #FF5F1F zip pull on the action, position dot (245), selected-tab dot in the app (362), under 3% (js 9-10)" },
+        { "key": "editorial-serif", "where": "css/aesthetics/editorial-serif.css:60", "variant": "accent only as the italic headline word and the § sign (249); in the kit primary fills only the one action (336-342)" } ],
+      "expressibleAs": "css-recipe", "paletteAgnostic": true, "exportSafe": true, "appSafe": true, "kitScope": ["button","tab"], "conflictsWith": [] },
+
+    { "id": "duotone-ink", "category": "colour", "name": "Duotone plate from the primary", "what": "A filled plate whose highlight, base and deep tones are all derived by mixing the primary toward ink, canvas or black, never an invented colour.",
+      "params": [ { "name": "mixTowardInk", "kind": "number", "range": "0-1", "default": "0.35" }, { "name": "hiMix", "kind": "number", "range": "0-1", "default": "0.3" }, { "name": "loMix", "kind": "number", "range": "0-1", "default": "0.45" }, { "name": "angleDeg", "kind": "number", "range": "0-360", "default": "162" }, { "name": "glowAt", "kind": "text", "range": "css position", "default": "90% 70% at 24% 14%" } ],
+      "usedBy": [ { "key": "editorial-serif", "where": "js/aesthetics/editorial-serif.js:91-98", "variant": "plate=mix(primary,ink,.35); hi toward canvas .3 (dark: toward ink .4); lo toward black .45 (dark: ink .25); css 77-84" } ],
+      "expressibleAs": "css-recipe", "paletteAgnostic": true, "exportSafe": true, "appSafe": false, "kitScope": [], "conflictsWith": [] },
+
+    { "id": "companion-hues-triad", "category": "colour", "name": "Companion hues from the primary", "what": "Extra high-chroma hues are rotated from the primary (triad and complement) to supply second and third accents, with a fixed set for achromatic primaries.",
+      "params": [ { "name": "rotations", "kind": "text", "range": "list of degrees", "default": "120,240,180" }, { "name": "chromaFloor", "kind": "number", "range": "60-100", "default": "86" }, { "name": "lightness", "kind": "number", "range": "40-65", "default": "52" }, { "name": "fallbackSet", "kind": "text", "range": "3 hex", "default": "#3DD65C,#9B4DFF,#FF8A1F" } ],
+      "usedBy": [ { "key": "frutiger-aero", "where": "js/aesthetics/frutiger-aero.js:85-93", "variant": "feeds toggle-on, avatars, progress fills, tab tints and the title-bar rainbow line (115-126, 566)" } ],
+      "expressibleAs": "tokens", "paletteAgnostic": true, "exportSafe": true, "appSafe": true, "kitScope": ["toggle","progress","tab"], "conflictsWith": [] },
+
+    { "id": "state-colour-derivation", "category": "kit", "name": "Hover and pressed tones derived from the primary", "what": "Hover and pressed fills are computed from the primary by mixing toward black, white or ink, with an optional scale or inset press.",
+      "params": [ { "name": "hoverMode", "kind": "enum", "range": "ink-swap|mix-toward-black|glow", "default": "mix-toward-black" }, { "name": "hoverAmount", "kind": "number", "range": "0-1", "default": "0.14" }, { "name": "pressAmount", "kind": "number", "range": "0-1", "default": "0.28" }, { "name": "pressTransform", "kind": "enum", "range": "none|translateY(1px)|scale(.985)|inset", "default": "translateY(1px)" } ],
+      "usedBy": [
+        { "key": "editorial-serif", "where": "js/aesthetics/editorial-serif.js:100-102", "variant": "hover = ink bg + canvas text (css 206); pressed = mix(primary,#000,.78) + readable text + translateY(1px) (207)" },
+        { "key": "data-pebble", "where": "js/aesthetics/data-pebble.js:220-221", "variant": "hover mix(#000,deep,.14) / press .28 (dark toward white), scale .985 (css 141-142)" },
+        { "key": "frutiger-aero", "where": "css/aesthetics/frutiger-aero.css:201-208", "variant": "shine = glow ring + brighter cap; pressed flips the gradient darker with inset shadow" } ],
+      "expressibleAs": "css-recipe", "paletteAgnostic": true, "exportSafe": true, "appSafe": true, "kitScope": ["button"], "conflictsWith": [] },
+
+    { "id": "ring-comparison-series", "category": "pattern", "name": "Ring style for the comparison series", "what": "The previous or comparison data series is drawn as a soft secondary fill with a deeper edge instead of the lead series' solid primary.",
+      "params": [ { "name": "fillMix", "kind": "number", "range": "0-1", "default": "0.4" }, { "name": "edgeContrast", "kind": "number", "range": "3-4.5", "default": "3.2" }, { "name": "edgePx", "kind": "number", "range": "1-2", "default": "1.5" } ],
+      "usedBy": [ { "key": "data-pebble", "where": "js/aesthetics/data-pebble.js:184-187", "variant": "fill mix(secondary,surface,.4 / .34 dark), edge mixed toward ink until 3.2:1; css 81-84" } ],
+      "expressibleAs": "css-recipe", "paletteAgnostic": true, "exportSafe": true, "appSafe": true, "kitScope": ["chart"], "conflictsWith": [] },
+
+    { "id": "hairline-rule", "category": "material", "name": "Hairline rules", "what": "Dividers are 1px lines (solid, dotted or fading) in an alpha of ink or a tint of the ground, in one to three tiers.",
+      "params": [ { "name": "weightPx", "kind": "number", "range": "1-3", "default": "1" }, { "name": "colourSource", "kind": "enum", "range": "ink-alpha|ink|ground-tint|fade-ends", "default": "ink-alpha" }, { "name": "alpha", "kind": "number", "range": "0.12-0.35", "default": "0.3" }, { "name": "style", "kind": "enum", "range": "solid|dotted|dashed", "default": "solid" }, { "name": "tiers", "kind": "number", "range": "1-3", "default": "3" } ],
+      "usedBy": [
+        { "key": "editorial-serif", "where": "js/aesthetics/editorial-serif.js:88-90", "variant": "three tiers: hair alpha(ink,.30/.26), soft .16/.14, strong = ink; vertical hairline between asym columns (css 183)" },
+        { "key": "dystopian-luxury", "where": "js/aesthetics/dystopian-luxury.js:172", "variant": "alpha(ink,.16), wide air either side (css 31, 108)" },
+        { "key": "data-pebble", "where": "js/aesthetics/data-pebble.js:183", "variant": "tinted to the ground hue: mix(deep, canvas,.14), never grey-black" },
+        { "key": "frutiger-aero", "where": "css/aesthetics/frutiger-aero.css:55", "variant": "gradient that fades to transparent at both ends (12%-88%)" },
+        { "key": "gorpcore", "where": "js/aesthetics/gorpcore.js:232", "variant": "rgba(27,29,28,.22), plus 2px ink spec-table rules (css 228-229)" } ],
+      "expressibleAs": "css-recipe", "paletteAgnostic": true, "exportSafe": true, "appSafe": true, "kitScope": ["list","card","field"], "conflictsWith": [] },
+
+    { "id": "corner-radius", "category": "material", "name": "Corner radius", "what": "One radius scale for board, cards, controls, from square to full pill.",
+      "params": [ { "name": "boardPx", "kind": "number", "range": "0-32", "default": "0" }, { "name": "cardPx", "kind": "number", "range": "0-24", "default": "0" }, { "name": "controlPx", "kind": "number", "range": "0-999", "default": "0" } ],
+      "usedBy": [
+        { "key": "editorial-serif", "where": "css/aesthetics/editorial-serif.css:15", "variant": "0 everywhere; kit --k-r:0px (341); only radio ring and skeleton avatar round" },
+        { "key": "dystopian-luxury", "where": "css/aesthetics/dystopian-luxury.css:19", "variant": "0, no round shape except none (radio is a diamond)" },
+        { "key": "data-pebble", "where": "css/aesthetics/data-pebble.css:19-24", "variant": "cards 18px, frosted card 22, board 28, controls 999" },
+        { "key": "frutiger-aero", "where": "css/aesthetics/frutiger-aero.css:20", "variant": "board 14px, field 6px (214), gel controls 999" },
+        { "key": "gorpcore", "where": "css/aesthetics/gorpcore.css:15", "variant": "board 6px, cards 8px (142), controls 3-6px" } ],
+      "expressibleAs": "tokens", "paletteAgnostic": true, "exportSafe": true, "appSafe": true, "kitScope": ["button","card","field","badge"], "conflictsWith": [] },
+
+    { "id": "soft-raised-relief", "category": "material", "name": "Soft raised relief shadow", "what": "A surface lifts with a small contact shadow plus a large diffuse shadow, tinted by the primary or a gel colour.",
+      "params": [ { "name": "tintSource", "kind": "enum", "range": "black|primary|gel", "default": "primary" }, { "name": "tintAlpha", "kind": "number", "range": "0.06-0.45", "default": "0.28" }, { "name": "blurPx", "kind": "number", "range": "8-40", "default": "32" }, { "name": "offsetY", "kind": "number", "range": "2-24", "default": "14" } ],
+      "usedBy": [
+        { "key": "data-pebble", "where": "js/aesthetics/data-pebble.js:197-199", "variant": "0 1px 2px alpha(deep,.06), 0 14px 32px -18px alpha(deep,.28); dark black .7" },
+        { "key": "frutiger-aero", "where": "css/aesthetics/frutiger-aero.css:28", "variant": "small coloured gel drop: 0 2px 4px + 0 6px 14px -6px gel at .38" },
+        { "key": "gorpcore", "where": "css/aesthetics/gorpcore.css:91", "variant": "hang tag only: 0 1px 0 .14 + 0 10px 22px -10px .45 black" } ],
+      "expressibleAs": "css-recipe", "paletteAgnostic": true, "exportSafe": true, "appSafe": true, "kitScope": ["card","menu"], "conflictsWith": ["chromeless-card"] },
+
+    { "id": "frosted-glass-panel", "category": "material", "name": "Frosted glass panel over a blurred field", "what": "A translucent white card with backdrop blur and saturation sits over a soft field of blurred shapes.",
+      "params": [ { "name": "blurPx", "kind": "number", "range": "8-30", "default": "18" }, { "name": "saturatePct", "kind": "number", "range": "100-180", "default": "140" }, { "name": "fillAlpha", "kind": "number", "range": "0.4-0.8", "default": "0.62" } ],
+      "usedBy": [ { "key": "data-pebble", "where": "css/aesthetics/data-pebble.css:59-75", "variant": "card 22px, glass tokens js 218-219; backdrop of 14px-blurred pebble field at .85 opacity" } ],
+      "expressibleAs": "css-recipe", "paletteAgnostic": true, "exportSafe": false, "appSafe": false, "kitScope": [], "conflictsWith": ["aero-glass-streak"] },
+
+    { "id": "aero-glass-streak", "category": "material", "name": "Aero glass with hard diagonal streak", "what": "Near-opaque glass fill with a hard-edged 115deg highlight streak, a dark outer 1px rim and a white inner 1px rim.",
+      "params": [ { "name": "angleDeg", "kind": "number", "range": "100-135", "default": "115" }, { "name": "streakStopPct", "kind": "number", "range": "25-45", "default": "34" }, { "name": "fillAlpha", "kind": "number", "range": "0.7-0.9", "default": "0.78" } ],
+      "usedBy": [ { "key": "frutiger-aero", "where": "js/aesthetics/frutiger-aero.js:559-563", "variant": "light fill rgba(255,255,255,.78), streak .62; night fill rgba(14,34,54,.72), streak .10; css 29, 243" } ],
+      "expressibleAs": "css-recipe", "paletteAgnostic": true, "exportSafe": true, "appSafe": true, "kitScope": ["card","menu","cell"], "conflictsWith": ["frosted-glass-panel"] },
+
+    { "id": "gel-specular-cap", "category": "material", "name": "Gel with specular cap", "what": "A control is a vertical three-stop gradient with a white cap over its top third to half ending in a crisp lip, a base caustic, a darker 1px rim and a coloured drop shadow.",
+      "params": [ { "name": "lightTop", "kind": "number", "range": "20-40", "default": "34" }, { "name": "lightBottom", "kind": "number", "range": "4-14", "default": "9" }, { "name": "capHeightPct", "kind": "number", "range": "30-50", "default": "46" }, { "name": "capAlphaTop", "kind": "number", "range": "0.5-1", "default": "0.94" }, { "name": "rimDarken", "kind": "number", "range": "10-30", "default": "20" }, { "name": "shadowAlpha", "kind": "number", "range": "0.2-0.5", "default": "0.38" } ],
+      "usedBy": [ { "key": "frutiger-aero", "where": "css/aesthetics/frutiger-aero.css:23-28", "variant": "applied to CTA (192-198), mark (49-54), numerals (60-65), swatch orbs (123-128), active segment (180-181), avatars (255-261), footer dot (290-294); stops in js 75-83" } ],
+      "expressibleAs": "css-recipe", "paletteAgnostic": true, "exportSafe": true, "appSafe": true, "kitScope": ["button","segmented","toggle","progress","avatar","badge","checkbox"], "conflictsWith": ["hard-offset-shadow"] },
+
+    { "id": "halftone-dots", "category": "material", "name": "Halftone dot screen", "what": "A fine dot screen multiplied over a plate and masked to fade, strongest at the foot.",
+      "params": [ { "name": "pitchPx", "kind": "number", "range": "3-12", "default": "5" }, { "name": "dotPx", "kind": "number", "range": "0.5-3", "default": "0.9" }, { "name": "opacity", "kind": "number", "range": "0.1-0.6", "default": "0.34" }, { "name": "fadeFromPct", "kind": "number", "range": "0-60", "default": "20" } ],
+      "usedBy": [ { "key": "editorial-serif", "where": "css/aesthetics/editorial-serif.css:87-92", "variant": "dot rgba(0,0,0,.75) 0.9-1.3px on a 5px grid, mix-blend multiply, mask 180deg transparent 20% to black; dark opacity .16 (85)" } ],
+      "expressibleAs": "css-recipe", "paletteAgnostic": true, "exportSafe": false, "appSafe": false, "kitScope": [], "conflictsWith": [] },
+
+    { "id": "grain-overlay", "category": "material", "name": "Grain overlay", "what": "An SVG fractal-noise tile is multiplied over a surface at low opacity.",
+      "params": [ { "name": "baseFrequency", "kind": "number", "range": "0.5-1.2", "default": "0.85" }, { "name": "octaves", "kind": "number", "range": "1-4", "default": "2" }, { "name": "tilePx", "kind": "number", "range": "120-300", "default": "180" }, { "name": "opacity", "kind": "number", "range": "0.03-0.2", "default": "0.09" } ],
+      "usedBy": [ { "key": "editorial-serif", "where": "css/aesthetics/editorial-serif.css:94-97", "variant": "feTurbulence fractalNoise .85, 2 octaves, 180px, grey .5 matrix alpha .9, opacity .09, multiply, plate only" } ],
+      "expressibleAs": "css-recipe", "paletteAgnostic": true, "exportSafe": false, "appSafe": false, "kitScope": [], "conflictsWith": [] },
+
+    { "id": "organic-blob-radius", "category": "material", "name": "Organic blob radii", "what": "Small marks (swatches, avatars, icons, FAB, badges) take one of a few irregular elliptical border-radius silhouettes instead of circles or squares.",
+      "params": [ { "name": "blobSet", "kind": "text", "range": "3-4 radius strings", "default": "54% 46% 52% 48% / 50% 58% 42% 50%" } ],
+      "usedBy": [ { "key": "data-pebble", "where": "css/aesthetics/data-pebble.css:20-22", "variant": "blob a/b/c cycled over chips (102-106), avatars and icons (266-269), FAB (352), pie items (448-451); kit adds blob-t (486)" } ],
+      "expressibleAs": "tokens", "paletteAgnostic": true, "exportSafe": true, "appSafe": true, "kitScope": ["avatar","icon","badge","checkbox","button"], "conflictsWith": ["corner-radius"] },
+
+    { "id": "line-grid-texture", "category": "pattern", "name": "Fine line grid texture", "what": "A faint minor grid with a heavier major line every Nth cell is drawn as four layered linear-gradients under the content.",
+      "params": [ { "name": "minorPx", "kind": "number", "range": "3-12", "default": "5" }, { "name": "majorEvery", "kind": "number", "range": "2-10", "default": "5" }, { "name": "minorAlpha", "kind": "number", "range": "0.02-0.08", "default": "0.045" }, { "name": "majorAlpha", "kind": "number", "range": "0.04-0.12", "default": "0.075" } ],
+      "usedBy": [ { "key": "gorpcore", "where": "css/aesthetics/gorpcore.css:16-21", "variant": "5px / 25px ripstop weave, ink alpha .045 / .075 (dark .035 / .06, js 233-234); also a darker weave on swatch chips (113-116); explicitly omitted in app screens (310-311)" } ],
+      "expressibleAs": "css-recipe", "paletteAgnostic": true, "exportSafe": true, "appSafe": false, "kitScope": [], "conflictsWith": [] },
+
+    { "id": "chromeless-card", "category": "material", "name": "Chromeless card", "what": "Cards and panels lose fill, border, radius and shadow and are separated only by whitespace or a single top rule.",
+      "params": [ { "name": "topRule", "kind": "enum", "range": "none|hairline|thick-over-thin", "default": "hairline" }, { "name": "padding", "kind": "text", "range": "css", "default": "16px 0 0" } ],
+      "usedBy": [
+        { "key": "editorial-serif", "where": "css/aesthetics/editorial-serif.css:184", "variant": "padding 0, no rule at all; paper with hairlines elsewhere; kit cards keep screen margin (369)" },
+        { "key": "dystopian-luxury", "where": "css/aesthetics/dystopian-luxury.css:108", "variant": "padding 16px 0 0, 1px hairline top, catalogue text above (109-111); kit 281" } ],
+      "expressibleAs": "css-recipe", "paletteAgnostic": true, "exportSafe": true, "appSafe": true, "kitScope": ["card","panel"], "conflictsWith": ["soft-raised-relief"] },
+
+    { "id": "heavy-border", "category": "material", "name": "Heavier control edge", "what": "Controls and key blocks get a 1.5-2px solid edge instead of a hairline.",
+      "params": [ { "name": "weightPx", "kind": "number", "range": "1-3", "default": "2" }, { "name": "colourSource", "kind": "enum", "range": "ink|carbon|primary", "default": "ink" } ],
+      "usedBy": [ { "key": "gorpcore", "where": "css/aesthetics/gorpcore.css:502-503", "variant": "1.5-2px carbon edge on kit controls; 1px ink on fields (190); 2px ink top on type columns (124)" } ],
+      "expressibleAs": "css-recipe", "paletteAgnostic": true, "exportSafe": true, "appSafe": true, "kitScope": ["field","button","segmented"], "conflictsWith": [] },
+
+    { "id": "caps-mono-labels", "category": "type", "name": "Small tracked labels", "what": "Labels, kickers, field names and tags are set small, tracked, in a mono or caps-sans face (or sentence case when the style wants calm).",
+      "params": [ { "name": "face", "kind": "enum", "range": "mono|sans|body", "default": "mono" }, { "name": "sizePx", "kind": "number", "range": "9.5-13", "default": "10.5" }, { "name": "trackingEm", "kind": "number", "range": "0-0.22", "default": "0.12" }, { "name": "case", "kind": "enum", "range": "upper|sentence", "default": "upper" }, { "name": "weight", "kind": "number", "range": "400-700", "default": "500" } ],
+      "usedBy": [
+        { "key": "dystopian-luxury", "where": "css/aesthetics/dystopian-luxury.css:39", "variant": "Courier-class mono 10px .04em uppercase; field labels (128)" },
+        { "key": "gorpcore", "where": "css/aesthetics/gorpcore.css:23-24", "variant": "JetBrains Mono, 10.5px .12em (108); stencil face on field tape (186)" },
+        { "key": "editorial-serif", "where": "css/aesthetics/editorial-serif.css:117", "variant": "caps SANS, 10.5px .16em 500; swatch role .14em 600 (136); field labels .18em 600 (211)" },
+        { "key": "data-pebble", "where": "css/aesthetics/data-pebble.css:39", "variant": "opposite: sentence case, 12px 600, .02em" },
+        { "key": "frutiger-aero", "where": "css/aesthetics/frutiger-aero.css:58", "variant": "sentence case, 12px 600, .01em" } ],
+      "expressibleAs": "css-recipe", "paletteAgnostic": true, "exportSafe": true, "appSafe": true, "kitScope": ["label","badge","tab"], "conflictsWith": [] },
+
+    { "id": "tight-display-tracking", "category": "type", "name": "Tight display tracking", "what": "Display and title type is set with negative letter-spacing, scaled down for wide, techno, heavy or condensed faces.",
+      "params": [ { "name": "trackingEm", "kind": "number", "range": "-0.05-0", "default": "-0.02" }, { "name": "faceClassScale", "kind": "text", "range": "map of class to multiplier", "default": "condensed:0,heavy:0,wide:0.4,techno:0.4" } ],
+      "usedBy": [
+        { "key": "editorial-serif", "where": "css/aesthetics/editorial-serif.css:58", "variant": "headline -0.028em x --ab-tr; card title -0.02em (196); row names -0.01em (239); tr from face class js 73-79" },
+        { "key": "dystopian-luxury", "where": "css/aesthetics/dystopian-luxury.css:63", "variant": "-0.04em on the giant word only; body 0" },
+        { "key": "data-pebble", "where": "css/aesthetics/data-pebble.css:52", "variant": "-0.02em x --ab-tr headline; -0.015em titles (131)" },
+        { "key": "frutiger-aero", "where": "css/aesthetics/frutiger-aero.css:86", "variant": "-0.015em at weight 300" } ],
+      "expressibleAs": "css-recipe", "paletteAgnostic": true, "exportSafe": true, "appSafe": true, "kitScope": ["title"], "conflictsWith": [] },
+
+    { "id": "light-display-weight", "category": "type", "name": "Light display weight", "what": "Display type uses the lightest published weight at or below a target so contrast, not boldness, carries emphasis.",
+      "params": [ { "name": "targetWeight", "kind": "number", "range": "300-400", "default": "400" }, { "name": "snapToFace", "kind": "bool", "range": "", "default": "true" } ],
+      "usedBy": [
+        { "key": "editorial-serif", "where": "css/aesthetics/editorial-serif.css:57", "variant": "400 everywhere; 'weight from contrast' (js 7)" },
+        { "key": "data-pebble", "where": "js/aesthetics/data-pebble.js:194-196", "variant": "abWeightNear(heading,300) -> --ab-fig-w on figures, headline (css 52), titles (131)" },
+        { "key": "frutiger-aero", "where": "js/aesthetics/frutiger-aero.js:552", "variant": "300 for headlines (--fa-lw), 600 for labels (553)" } ],
+      "expressibleAs": "tokens", "paletteAgnostic": true, "exportSafe": true, "appSafe": true, "kitScope": ["title"], "conflictsWith": [] },
+
+    { "id": "highlight-last-word", "category": "type", "name": "Last-word highlight treatment", "what": "The last word of the headline gets a style-specific highlight: italic, coloured text with glow, a filled woven label, or nothing.",
+      "params": [ { "name": "mode", "kind": "enum", "range": "italic|colour-text|filled-label|none", "default": "italic" }, { "name": "colourSource", "kind": "enum", "range": "accent-ink|primary|ink", "default": "accent-ink" }, { "name": "stitchInsetEm", "kind": "number", "range": "0-0.1", "default": "0" } ],
+      "usedBy": [
+        { "key": "editorial-serif", "where": "css/aesthetics/editorial-serif.css:60-61", "variant": "italic 400, accent-ink, no fill or underline (js 37-38)" },
+        { "key": "data-pebble", "where": "css/aesthetics/data-pebble.css:55", "variant": "italic only, ink-coloured (js 125 highlight:'ink')" },
+        { "key": "frutiger-aero", "where": "css/aesthetics/frutiger-aero.css:93", "variant": "gel colour as text shaded to 3.2:1 on the horizon glow (js 543-546) with white glow (87)" },
+        { "key": "gorpcore", "where": "css/aesthetics/gorpcore.css:52-58", "variant": "filled woven label: shell bg, on-shell text, dashed inset .07em / .025em at .75 opacity" },
+        { "key": "dystopian-luxury", "where": "css/aesthetics/dystopian-luxury.css:59-60", "variant": "none: inherits ink, no decoration (js 127)" } ],
+      "expressibleAs": "css-recipe", "paletteAgnostic": true, "exportSafe": true, "appSafe": true, "kitScope": [], "conflictsWith": [] },
+
+    { "id": "serif-numeral-figures", "category": "type", "name": "Serif numeral figures", "what": "Numerals (figures, indices, values) are set in the heading serif with lining tabular figures, optionally italic.",
+      "params": [ { "name": "italic", "kind": "bool", "range": "", "default": "false" }, { "name": "figureVariant", "kind": "enum", "range": "lining-tabular|oldstyle", "default": "lining-tabular" }, { "name": "sizePx", "kind": "number", "range": "15-40", "default": "20" } ],
+      "usedBy": [
+        { "key": "data-pebble", "where": "css/aesthetics/data-pebble.css:23", "variant": "upright, lining+tabular, big light figures: stat num clamp(28px,3.4cqw,40px) (275); row pct 20px (188); stepper 24px (359)" },
+        { "key": "editorial-serif", "where": "css/aesthetics/editorial-serif.css:119", "variant": "italic: section numerals 17px (119), row n 15px (238), row pct 17px (243), stepper 26px (607), knob 20px (437)" } ],
+      "expressibleAs": "css-recipe", "paletteAgnostic": true, "exportSafe": true, "appSafe": true, "kitScope": ["stat","stepper","list"], "conflictsWith": [] },
+
+    { "id": "hanging-drop-cap", "category": "type", "name": "Drop cap", "what": "The first letter of the first paragraph floats left at about three lines tall.",
+      "params": [ { "name": "sizeEm", "kind": "number", "range": "2.5-4", "default": "3.15" }, { "name": "lineHeight", "kind": "number", "range": "0.7-1", "default": "0.8" }, { "name": "padding", "kind": "text", "range": "css", "default": ".05em .09em 0 0" } ],
+      "usedBy": [ { "key": "editorial-serif", "where": "css/aesthetics/editorial-serif.css:199-201", "variant": "heading face 400, ink; excluded in app screens and slides (302)" } ],
+      "expressibleAs": "css-recipe", "paletteAgnostic": true, "exportSafe": true, "appSafe": false, "kitScope": [], "conflictsWith": [] },
+
+    { "id": "heavy-caps-display", "category": "type", "name": "Heavy condensed caps display", "what": "Headline and titles are uppercase at the heaviest published weight with a very tight line height.",
+      "params": [ { "name": "weight", "kind": "number", "range": "700-900", "default": "800" }, { "name": "lineHeight", "kind": "number", "range": "0.85-1.05", "default": "0.92" }, { "name": "displayRatio", "kind": "number", "range": "1-1.4", "default": "1.18" } ],
+      "usedBy": [ { "key": "gorpcore", "where": "css/aesthetics/gorpcore.css:47-50", "variant": "headline, card titles (165), trail names (236); weight via abWeight(heading,800) (js 219); display ratio js 172" } ],
+      "expressibleAs": "css-recipe", "paletteAgnostic": true, "exportSafe": true, "appSafe": true, "kitScope": ["title"], "conflictsWith": ["light-display-weight"] },
+
+    { "id": "italic-secondary-voice", "category": "type", "name": "Italic secondary voice", "what": "Secondary text (captions, values, state captions, the current item) is set in italic serif while headings stay upright.",
+      "params": [ { "name": "scope", "kind": "text", "range": "list of roles", "default": "caption,value,status,current-item,placeholder" } ],
+      "usedBy": [
+        { "key": "editorial-serif", "where": "css/aesthetics/editorial-serif.css:144", "variant": "type class (144), type why (164), field value 24px (214), status (223), motto (247), accordion body (453), dialog titles (643)" },
+        { "key": "data-pebble", "where": "css/aesthetics/data-pebble.css:471-472", "variant": "kit: italic serif state captions only" } ],
+      "expressibleAs": "css-recipe", "paletteAgnostic": true, "exportSafe": true, "appSafe": true, "kitScope": ["field","help","state"], "conflictsWith": [] },
+
+    { "id": "cropped-giant-type", "category": "type", "name": "Cropped giant type", "what": "One oversized word or initial is cropped by an edge or a strip so only part of its height shows.",
+      "params": [ { "name": "unit", "kind": "enum", "range": "word|initial", "default": "word" }, { "name": "widthPct", "kind": "number", "range": "50-110", "default": "102" }, { "name": "visibleFraction", "kind": "number", "range": "0.5-1", "default": "0.88" }, { "name": "cropEdge", "kind": "enum", "range": "strip-bottom|plate-bottom-left", "default": "strip-bottom" }, { "name": "heightCqh", "kind": "number", "range": "100-200", "default": "150" } ],
+      "usedBy": [
+        { "key": "dystopian-luxury", "where": "js/aesthetics/dystopian-luxury.js:83-95", "variant": "first brand word, 800 weight, textLength to 102% board width, top 88% visible above an ink strip; css 52-54, 63" },
+        { "key": "editorial-serif", "where": "css/aesthetics/editorial-serif.css:101-106", "variant": "brand initial 150cqh, heading face 400 uppercase, left -8% bottom -38%, tone mix(plate 72%, canvas 28%)" } ],
+      "expressibleAs": "svg-generator", "paletteAgnostic": true, "exportSafe": true, "appSafe": false, "kitScope": [], "conflictsWith": [] },
+
+    { "id": "tiny-wordmark-header", "category": "layout", "name": "Tiny wordmark header", "what": "The header is only a small tracked caps wordmark and a tiny tag, with no mark and no rule.",
+      "params": [ { "name": "wordmarkPx", "kind": "number", "range": "10-16", "default": "12" }, { "name": "trackingEm", "kind": "number", "range": "0.08-0.2", "default": "0.14" }, { "name": "hideMark", "kind": "bool", "range": "", "default": "true" } ],
+      "usedBy": [ { "key": "dystopian-luxury", "where": "css/aesthetics/dystopian-luxury.css:23-32", "variant": "12px 700 uppercase .14em, logo 22px max, tag 10px, header rule hidden" } ],
+      "expressibleAs": "css-recipe", "paletteAgnostic": true, "exportSafe": true, "appSafe": true, "kitScope": [], "conflictsWith": ["centered-masthead","bleed-header-band"] },
+
+    { "id": "hero-layout", "category": "layout", "name": "Hero layout preset", "what": "The hero uses a registry preset (poster, split, centered) with a column ratio, gap and art aspect.",
+      "params": [ { "name": "preset", "kind": "enum", "range": "poster|split|centered", "default": "split" }, { "name": "columns", "kind": "text", "range": "css grid-template-columns", "default": "1fr 1.1fr" }, { "name": "artAspect", "kind": "text", "range": "ratio", "default": "auto" } ],
+      "usedBy": [
+        { "key": "editorial-serif", "where": "js/aesthetics/editorial-serif.js:35", "variant": "poster re-gridded: headline and standfirst left, plate right: 1fr / clamp(190px,29cqw,370px), gap clamp(24px,4.4cqw,60px) (css 44-48), plate aspect 3/4.15" },
+        { "key": "dystopian-luxury", "where": "js/aesthetics/dystopian-luxury.js:124", "variant": "centered re-gridded: plate first full width, caption and label beneath (css 46-55)" },
+        { "key": "data-pebble", "where": "js/aesthetics/data-pebble.js:123", "variant": "split 1fr / 1.12fr, art free aspect (css 44, 56)" },
+        { "key": "frutiger-aero", "where": "js/aesthetics/frutiger-aero.js:480", "variant": "centered: text over a full-bleed sky art box, min-height clamp(470px,50cqw,620px) (css 69-79)" },
+        { "key": "gorpcore", "where": "js/aesthetics/gorpcore.js:171", "variant": "split 1fr / 1.06fr, art ratio 1/1.04 (css 42, 63)" } ],
+      "expressibleAs": "tokens", "paletteAgnostic": true, "exportSafe": true, "appSafe": false, "kitScope": [], "conflictsWith": [] },
+
+    { "id": "centered-masthead", "category": "layout", "name": "Centred masthead", "what": "The header is a three-column grid: dateline left, centred uppercase wordmark, tag right, closed by a rule.",
+      "params": [ { "name": "datelineText", "kind": "text", "range": "", "default": "Vol. 01 · No. 1" }, { "name": "wordmarkPx", "kind": "text", "range": "css clamp", "default": "clamp(20px,3cqw,34px)" }, { "name": "trackingEm", "kind": "number", "range": "0-0.1", "default": "0.05" } ],
+      "usedBy": [ { "key": "editorial-serif", "where": "css/aesthetics/editorial-serif.css:22-35", "variant": "grid 1fr auto 1fr, dateline 10.5px .16em caps via ::before, wordmark 400 uppercase, mark hidden; collapses to flex under 600px (255-258); built landing nav the same (306-310)" } ],
+      "expressibleAs": "css-recipe", "paletteAgnostic": true, "exportSafe": true, "appSafe": true, "kitScope": ["navbar"], "conflictsWith": ["tiny-wordmark-header","bleed-header-band"] },
+
+    { "id": "bleed-header-band", "category": "layout", "name": "Full-bleed header band", "what": "The header becomes a full-bleed filled band (solid ink or glass gradient) with a heavy bottom edge.",
+      "params": [ { "name": "fill", "kind": "enum", "range": "solid-ink|glass-gradient", "default": "solid-ink" }, { "name": "bottomEdgePx", "kind": "number", "range": "1-3", "default": "3" }, { "name": "edgeColour", "kind": "enum", "range": "silver|rim", "default": "silver" } ],
+      "usedBy": [
+        { "key": "gorpcore", "where": "css/aesthetics/gorpcore.css:27-30", "variant": "carbon band (black in dark), 3px silver bottom border, light text, grommet mark (34), coordinates string (35)" },
+        { "key": "frutiger-aero", "where": "css/aesthetics/frutiger-aero.css:41-45", "variant": "glass gradient bar with streak and 3px rainbow foot line, 96x22 caption buttons ::after; rule hidden (56)" } ],
+      "expressibleAs": "css-recipe", "paletteAgnostic": true, "exportSafe": true, "appSafe": true, "kitScope": ["navbar"], "conflictsWith": ["tiny-wordmark-header","centered-masthead"] },
+
+    { "id": "vast-whitespace", "category": "layout", "name": "Vast section air", "what": "Large vertical gaps (48-96px) surround each board block, with the same air on both sides of every rule.",
+      "params": [ { "name": "gap", "kind": "text", "range": "css clamp", "default": "clamp(48px,8cqw,96px)" } ],
+      "usedBy": [ { "key": "dystopian-luxury", "where": "css/aesthetics/dystopian-luxury.css:17", "variant": "--dl-gap on palette, type and sections padding (33-36)" } ],
+      "expressibleAs": "tokens", "paletteAgnostic": true, "exportSafe": true, "appSafe": false, "kitScope": [], "conflictsWith": [] },
+
+    { "id": "palette-swatch-form", "category": "layout", "name": "Palette swatch form", "what": "The palette row is drawn as a style-specific swatch form: index cells, coverage-sized squares, blobs, gel orbs or fabric swatches.",
+      "params": [ { "name": "form", "kind": "enum", "range": "index|coverage|blob|orb|fabric", "default": "index" }, { "name": "chromeSizePx", "kind": "number", "range": "18-92", "default": "18" } ],
+      "usedBy": [
+        { "key": "editorial-serif", "where": "css/aesthetics/editorial-serif.css:126-137", "variant": "index: 5 cols, 18px squares ringed 1px strong, 1px soft cell separators, top 1px strong / bottom 1px hair" },
+        { "key": "dystopian-luxury", "where": "css/aesthetics/dystopian-luxury.css:84-91", "variant": "coverage: grid 60fr 25fr then 24px squares" },
+        { "key": "data-pebble", "where": "css/aesthetics/data-pebble.css:102-106", "variant": "blob radii a/b/c cycled" },
+        { "key": "frutiger-aero", "where": "css/aesthetics/frutiger-aero.css:121-130", "variant": "orb: round gel with cap, 58-92px" },
+        { "key": "gorpcore", "where": "css/aesthetics/gorpcore.css:112-121", "variant": "fabric: 6px radius, weave overlay, grommet dot" } ],
+      "expressibleAs": "css-recipe", "paletteAgnostic": true, "exportSafe": true, "appSafe": false, "kitScope": ["swatch"], "conflictsWith": [] },
+
+    { "id": "footer-treatment", "category": "layout", "name": "Footer treatment", "what": "The footer is a style-specific band: ruled colophon, grey legal block, glass taskbar or reflective strip.",
+      "params": [ { "name": "kind", "kind": "enum", "range": "rule|grey-block|taskbar|strip", "default": "rule" } ],
+      "usedBy": [
+        { "key": "editorial-serif", "where": "css/aesthetics/editorial-serif.css:246-249", "variant": "rule: 1px strong top, 11px .12em caps, italic motto, '§' dot" },
+        { "key": "dystopian-luxury", "where": "css/aesthetics/dystopian-luxury.css:169-172", "variant": "grey-block bleeding to board padding, mono 10px caps" },
+        { "key": "frutiger-aero", "where": "css/aesthetics/frutiger-aero.css:285-294", "variant": "taskbar: glass bar with a gel start orb as dot" },
+        { "key": "gorpcore", "where": "css/aesthetics/gorpcore.css:251-254", "variant": "strip: 6px silver reflective band, blaze dot" } ],
+      "expressibleAs": "css-recipe", "paletteAgnostic": true, "exportSafe": true, "appSafe": false, "kitScope": [], "conflictsWith": [] },
+
+    { "id": "section-number-marker", "category": "ornament", "name": "Section number marker", "what": "The numeral beside each section label is dressed as italic text, a plain mono index, a gel badge or an ink chip.",
+      "params": [ { "name": "form", "kind": "enum", "range": "italic-dash|plain-mono|gel-badge|ink-chip|primary-dot", "default": "plain-mono" } ],
+      "usedBy": [
+        { "key": "editorial-serif", "where": "css/aesthetics/editorial-serif.css:119-120", "variant": "serif italic 17px followed by ' — '" },
+        { "key": "dystopian-luxury", "where": "css/aesthetics/dystopian-luxury.css:42-43", "variant": "mono 10px muted, no suffix" },
+        { "key": "data-pebble", "where": "css/aesthetics/data-pebble.css:40-41", "variant": "serif figure in primary text then ' · '" },
+        { "key": "frutiger-aero", "where": "css/aesthetics/frutiger-aero.css:60-66", "variant": "24px gel circle with cap" },
+        { "key": "gorpcore", "where": "css/aesthetics/gorpcore.css:110-111", "variant": "ink chip with canvas text, 2px radius" } ],
+      "expressibleAs": "css-recipe", "paletteAgnostic": true, "exportSafe": true, "appSafe": false, "kitScope": ["label"], "conflictsWith": [] },
+
+    { "id": "named-states", "category": "kit", "name": "Named state specimens", "what": "The three state demos carry style-voiced names and a kind (button samples or fabric swatches).",
+      "params": [ { "name": "names", "kind": "text", "range": "3 words", "default": "Rest,Hover,Pressed" }, { "name": "kind", "kind": "enum", "range": "button|swatch", "default": "button" } ],
+      "usedBy": [
+        { "key": "editorial-serif", "where": "js/aesthetics/editorial-serif.js:20", "variant": "Rest / Hover / Pressed, button samples; hover ink swap, pressed darkened primary (css 224-228)" },
+        { "key": "dystopian-luxury", "where": "js/aesthetics/dystopian-luxury.js:108", "variant": "Catalogued / Private / Reserved; blank, inverted, inverted with a dot (css 144-150)" },
+        { "key": "data-pebble", "where": "js/aesthetics/data-pebble.js:102", "variant": "Rest / Hover / Pressed, small pill samples (css 149-151)" },
+        { "key": "frutiger-aero", "where": "js/aesthetics/frutiger-aero.js:456", "variant": "Rest / Shine / Pressed (css 201-208)" },
+        { "key": "gorpcore", "where": "js/aesthetics/gorpcore.js:149", "variant": "Ripstop / Taped / Reflective as fabric swatches (css 212-220)" } ],
+      "expressibleAs": "tokens", "paletteAgnostic": true, "exportSafe": true, "appSafe": false, "kitScope": ["button"], "conflictsWith": [] },
+
+    { "id": "ink-filled-selected", "category": "kit", "name": "Ink-filled selection", "what": "A selected or open item is inverted: ink background with canvas text.",
+      "params": [ { "name": "scope", "kind": "text", "range": "segments,menu,days,nav", "default": "segments,menu" } ],
+      "usedBy": [
+        { "key": "dystopian-luxury", "where": "css/aesthetics/dystopian-luxury.css:116", "variant": "selected segment (116), picked menu item (577), the board's inverted selected cell" },
+        { "key": "gorpcore", "where": "css/aesthetics/gorpcore.css:510", "variant": "carbon fill for segments, menu items, days, nav (kit signature comment)" },
+        { "key": "editorial-serif", "where": "css/aesthetics/editorial-serif.css:415", "variant": "only for open menu items (415, 483, 490) and pressed state (559); normal selection is a rule" } ],
+      "expressibleAs": "css-recipe", "paletteAgnostic": true, "exportSafe": true, "appSafe": true, "kitScope": ["segmented","menu","calendar","nav"], "conflictsWith": ["rule-marked-selected","tint-selected"] },
+
+    { "id": "rule-marked-selected", "category": "kit", "name": "Rule-marked selection", "what": "The selected item is marked by ink text and a 2-3px ink rule under it or beside it, often with italic.",
+      "params": [ { "name": "edge", "kind": "enum", "range": "bottom|left", "default": "bottom" }, { "name": "thicknessPx", "kind": "number", "range": "2-3", "default": "3" }, { "name": "italicTitle", "kind": "bool", "range": "", "default": "true" } ],
+      "usedBy": [ { "key": "editorial-serif", "where": "css/aesthetics/editorial-serif.css:194", "variant": "board tab 2px primary underline (194); kit 3px ink (602, 659); picked row inset 3px left bar (630, 635, 661); anchors/nav inset rules (471, 479)" } ],
+      "expressibleAs": "css-recipe", "paletteAgnostic": true, "exportSafe": true, "appSafe": true, "kitScope": ["tab","list","accordion","nav"], "conflictsWith": ["ink-filled-selected","tint-selected"] },
+
+    { "id": "tint-selected", "category": "kit", "name": "Tint selection", "what": "Selection is one soft tint of the primary (tag tint or pale gel) with ink text.",
+      "params": [ { "name": "tintMix", "kind": "number", "range": "0.08-0.25", "default": "0.15" }, { "name": "weight", "kind": "number", "range": "500-700", "default": "600" } ],
+      "usedBy": [
+        { "key": "data-pebble", "where": "css/aesthetics/data-pebble.css:477", "variant": "ONE signal: --ab-tag-bg = mix(primary 15%, canvas), ink text 600 for segments, tabs, menu items, rows, nav, days (kit comment 464-481; nav 265)" },
+        { "key": "frutiger-aero", "where": "css/aesthetics/frutiger-aero.css:635", "variant": "pale primary gel with a 1px tint rim; list first row uses the Vista selection gradient (253)" } ],
+      "expressibleAs": "css-recipe", "paletteAgnostic": true, "exportSafe": true, "appSafe": true, "kitScope": ["segmented","tab","menu","list","nav","calendar"], "conflictsWith": ["ink-filled-selected","rule-marked-selected"] },
+
+    { "id": "underline-field", "category": "kit", "name": "Underline field", "what": "Inputs lose their box and become a label above a 1px bottom rule that thickens on focus.",
+      "params": [ { "name": "ruleColour", "kind": "enum", "range": "ink|hair-strong", "default": "ink" }, { "name": "focusExtraPx", "kind": "number", "range": "1-2", "default": "1" }, { "name": "valueFace", "kind": "enum", "range": "serif-italic|sans", "default": "sans" }, { "name": "valuePx", "kind": "number", "range": "15-24", "default": "15" } ],
+      "usedBy": [
+        { "key": "editorial-serif", "where": "css/aesthetics/editorial-serif.css:212-217", "variant": "heading italic 24px/1.2, 1px strong rule, mb 20px, focus rule primary + 0 1px 0 (kit: ink + 0 2px 0, 575-579)" },
+        { "key": "dystopian-luxury", "where": "css/aesthetics/dystopian-luxury.css:129-130", "variant": "sans 15px, 1px ink rule, focus 2px; kit focus thickens, error danger colour (269-270)" } ],
+      "expressibleAs": "css-recipe", "paletteAgnostic": true, "exportSafe": true, "appSafe": true, "kitScope": ["field","search"], "conflictsWith": [] },
+
+    { "id": "button-shape-recipe", "category": "kit", "name": "Primary action recipe", "what": "The one main action takes a style's shape, label case, fill and hover/press behaviour from a small parameter set.",
+      "params": [ { "name": "shape", "kind": "enum", "range": "square|pill|gel|fabric|ink-block", "default": "square" }, { "name": "fill", "kind": "enum", "range": "primary|ink|shell|gel", "default": "primary" }, { "name": "labelCase", "kind": "enum", "range": "upper|none", "default": "upper" }, { "name": "tracking", "kind": "number", "range": "0-0.2", "default": "0.18" }, { "name": "heightPx", "kind": "number", "range": "40-56", "default": "46" }, { "name": "extra", "kind": "enum", "range": "arrow|arrow-disc|pull-tab|primary-square|none", "default": "arrow" } ],
+      "usedBy": [
+        { "key": "editorial-serif", "where": "css/aesthetics/editorial-serif.css:202-208", "variant": "square, padding 15px 18px, 11.5px 600 .18em caps, primary fill, '→' arrow; kit: 3px/1px masthead-ruled outlined key (556-561)" },
+        { "key": "dystopian-luxury", "where": "css/aesthetics/dystopian-luxury.css:119-126", "variant": "ink block, inline-block (html2canvas fix), 12px, padding 10px 14px, 6px primary square ::before, no transition" },
+        { "key": "data-pebble", "where": "css/aesthetics/data-pebble.css:136-147", "variant": "pill 52px, 15px 600, primary fill, blob arrow disc 38px" },
+        { "key": "frutiger-aero", "where": "css/aesthetics/frutiger-aero.css:192-200", "variant": "gel pill 46px, 15px 600, white arrow orb" },
+        { "key": "gorpcore", "where": "css/aesthetics/gorpcore.css:169-183", "variant": "shell fabric 6px, inset 4px + 5.5px taped seam, pull-tab loop and orange zip pull, 16px 800 .05em caps" } ],
+      "expressibleAs": "css-recipe", "paletteAgnostic": true, "exportSafe": true, "appSafe": true, "kitScope": ["button"], "conflictsWith": [] },
+
+    { "id": "segmented-recipe", "category": "kit", "name": "Segmented control recipe", "what": "Tabs and segments are drawn as an underline row, a square-cell strip, a pill track, a glass capsule or a webbing strap.",
+      "params": [ { "name": "form", "kind": "enum", "range": "underline|square-cells|pill-track|glass-gel|strap", "default": "underline" }, { "name": "selected", "kind": "enum", "range": "ink-fill|rule|tint|gel|buckle", "default": "rule" } ],
+      "usedBy": [
+        { "key": "editorial-serif", "where": "css/aesthetics/editorial-serif.css:187-194", "variant": "underline: gap 26px, 11px .16em caps, selected 600 + 2px primary rule" },
+        { "key": "dystopian-luxury", "where": "css/aesthetics/dystopian-luxury.css:112-116", "variant": "square 1px ink cells, selected ink fill" },
+        { "key": "data-pebble", "where": "css/aesthetics/data-pebble.css:124-129", "variant": "pill track, selected raised surface pill with hairline" },
+        { "key": "frutiger-aero", "where": "css/aesthetics/frutiger-aero.css:173-187", "variant": "white glass capsule, selected gel; unselected get tinted gel pills" },
+        { "key": "gorpcore", "where": "css/aesthetics/gorpcore.css:155-163", "variant": "carbon webbing strap, selected silver buckle; app version is a quiet track + raised panel (328-335)" } ],
+      "expressibleAs": "css-recipe", "paletteAgnostic": true, "exportSafe": true, "appSafe": true, "kitScope": ["segmented","tab"], "conflictsWith": [] },
+
+    { "id": "toggle-recipe", "category": "kit", "name": "Toggle recipe", "what": "The switch control takes a style's drawing: rule with square slug, X square, pill with round knob, glass capsule with gloss orb or a buckle.",
+      "params": [ { "name": "form", "kind": "enum", "range": "rule-slug|x-square|pill-knob|glass-capsule|buckle", "default": "pill-knob" }, { "name": "onFill", "kind": "enum", "range": "primary|ink|gel", "default": "primary" } ],
+      "usedBy": [
+        { "key": "editorial-serif", "where": "css/aesthetics/editorial-serif.css:219-222", "variant": "40x18 square with 1px ring, 12px slug, on = primary; kit 48x24 rule with 16px square slug, on = ink (597-599)" },
+        { "key": "dystopian-luxury", "where": "css/aesthetics/dystopian-luxury.css:132-140", "variant": "22px hairline square, checked = two 45deg gradient strokes forming an X" },
+        { "key": "data-pebble", "where": "css/aesthetics/data-pebble.css:161-167", "variant": "52x32 pill, round 24px knob, on = primary" },
+        { "key": "frutiger-aero", "where": "css/aesthetics/frutiger-aero.css:222-233", "variant": "56x28 glass capsule, glossy white orb knob, on = accent gel" },
+        { "key": "gorpcore", "where": "css/aesthetics/gorpcore.css:194-209", "variant": "76x28 side-release buckle, male clip slides in; app version is a native switch (338-341)" } ],
+      "expressibleAs": "css-recipe", "paletteAgnostic": true, "exportSafe": true, "appSafe": true, "kitScope": ["toggle"], "conflictsWith": [] },
+
+    { "id": "checkbox-radio-marks", "category": "kit", "name": "Checkbox and radio marks", "what": "Check and radio controls take a style-specific mark: ballot square with serif x, diamond, stitched box, pebble outline or gel bevel.",
+      "params": [ { "name": "checkForm", "kind": "enum", "range": "serif-x|inner-square|stitched|pebble|gel-tick", "default": "serif-x" }, { "name": "radioForm", "kind": "enum", "range": "ring-bullet|diamond|grommet|sphere", "default": "ring-bullet" } ],
+      "usedBy": [
+        { "key": "editorial-serif", "where": "css/aesthetics/editorial-serif.css:589-594", "variant": "22px 1px ink square with a 28px serif x; radio 22px ring 1.5px with an 8px ink bullet" },
+        { "key": "dystopian-luxury", "where": "css/aesthetics/dystopian-luxury.css:567-571", "variant": "hairline 22px square with 10px solid ink square; radio rotated 45deg diamond" },
+        { "key": "data-pebble", "where": "css/aesthetics/data-pebble.css:474-476", "variant": "pebble outline that fills; radio ring with a pebble dot (kit comment)" },
+        { "key": "frutiger-aero", "where": "css/aesthetics/frutiger-aero.css:632-634", "variant": "glossy bevel square becoming a gel with white tick; radio glass sphere with gel core" },
+        { "key": "gorpcore", "where": "css/aesthetics/gorpcore.css:506-509", "variant": "stitched box filling carbon; radio dashed ring becoming a thick carbon grommet" } ],
+      "expressibleAs": "css-recipe", "paletteAgnostic": true, "exportSafe": true, "appSafe": true, "kitScope": ["checkbox","radio"], "conflictsWith": [] },
+
+    { "id": "progress-recipe", "category": "kit", "name": "Progress bar recipe", "what": "Progress is drawn as a dotted leader, a thin ink rule, a pebble-masked bar, a glossy capsule or an elevation profile.",
+      "params": [ { "name": "form", "kind": "enum", "range": "dotted-leader|hairline-fill|masked-shapes|gloss-capsule|elevation-profile", "default": "hairline-fill" }, { "name": "heightPx", "kind": "number", "range": "1-28", "default": "2" } ],
+      "usedBy": [
+        { "key": "editorial-serif", "where": "css/aesthetics/editorial-serif.css:240-241", "variant": "board: dotted 1px strong leader, no fill; kit: 2px ink over hairline (386-387)" },
+        { "key": "dystopian-luxury", "where": "css/aesthetics/dystopian-luxury.css:164-165", "variant": "1px hairline with 1px ink fill (kit 4px, 301-302)" },
+        { "key": "data-pebble", "where": "css/aesthetics/data-pebble.css:193-198", "variant": "five-pebble mask, fill clipped by shapes" },
+        { "key": "frutiger-aero", "where": "css/aesthetics/frutiger-aero.css:267-278", "variant": "14px glossy capsule; gel fill with diagonal sheen stripes, per-row companion hue (279-281)" },
+        { "key": "gorpcore", "where": "css/aesthetics/gorpcore.css:239-245", "variant": "elevation profile with dashed fill edge and orange position dot; app: plain 6px taped bar (366-368)" } ],
+      "expressibleAs": "css-recipe", "paletteAgnostic": true, "exportSafe": false, "appSafe": true, "kitScope": ["progress"], "conflictsWith": [] },
+
+    { "id": "board-list-recipe", "category": "kit", "name": "Board list recipe", "what": "The 03 'in use' list is drawn as a contents table, an accession ledger, white row cards, an explorer details view or a trail log.",
+      "params": [ { "name": "form", "kind": "enum", "range": "contents|ledger|row-cards|explorer|trail-log", "default": "contents" }, { "name": "rowPaddingPx", "kind": "number", "range": "9-16", "default": "12" } ],
+      "usedBy": [
+        { "key": "editorial-serif", "where": "css/aesthetics/editorial-serif.css:231-243", "variant": "contents: strong top rule, soft row rules, italic index, serif name, dotted leader, caps status, italic pct" },
+        { "key": "dystopian-luxury", "where": "css/aesthetics/dystopian-luxury.css:153-166", "variant": "ledger: counter-based '2026.114.n' accession, boxed mono status, end-tick bar" },
+        { "key": "data-pebble", "where": "css/aesthetics/data-pebble.css:172-189", "variant": "row cards 18px, area-sized pebble glyph, tag status, serif pct" },
+        { "key": "frutiger-aero", "where": "css/aesthetics/frutiger-aero.css:243-265", "variant": "explorer: column header, Vista selection on first row, gel avatars per row" },
+        { "key": "gorpcore", "where": "css/aesthetics/gorpcore.css:223-248", "variant": "trail log: blaze marker, caps name, boxed status, elevation bar, pct + distance" } ],
+      "expressibleAs": "css-recipe", "paletteAgnostic": true, "exportSafe": true, "appSafe": false, "kitScope": ["list"], "conflictsWith": [] },
+
+    { "id": "kit-cell-frame", "category": "kit", "name": "Kit cell frame", "what": "Each kit cell on the UI kit page is framed as a numbered ruled column, an accession cell, a ledger rule, a glass window or a gear panel.",
+      "params": [ { "name": "form", "kind": "enum", "range": "numbered-rules|accession|ledger|window|gear-panel", "default": "numbered-rules" }, { "name": "numbering", "kind": "text", "range": "prefix", "default": "No. " } ],
+      "usedBy": [
+        { "key": "editorial-serif", "where": "css/aesthetics/editorial-serif.css:526-531", "variant": "3px strong top + 1px hair bottom, no box; italic 13px 'No. NN' counter; names 24px/28px serif" },
+        { "key": "dystopian-luxury", "where": "css/aesthetics/dystopian-luxury.css:540-545", "variant": "hairline top, '2026.114.NN' counter in mono 11px" },
+        { "key": "data-pebble", "where": "css/aesthetics/data-pebble.css:490-495", "variant": "1.5px rule top, serif 26px names, no box" },
+        { "key": "frutiger-aero", "where": "css/aesthetics/frutiger-aero.css:641-645", "variant": "every cell is an Aero window: glass solid, rimmed, 8px radius, title bar" },
+        { "key": "gorpcore", "where": "css/aesthetics/gorpcore.css:512-514", "variant": "stone gear panel 8px, hairline ring, dashed header rule" } ],
+      "expressibleAs": "css-recipe", "paletteAgnostic": true, "exportSafe": true, "appSafe": true, "kitScope": ["page"], "conflictsWith": [] },
+
+    { "id": "overlay-surface", "category": "kit", "name": "Floating layer surface", "what": "Dialogs, menus, sheets and popovers take one of: double-rule paper, flat hairline, white soft-shadow, glass-solid with streak, or stone panel.",
+      "params": [ { "name": "form", "kind": "enum", "range": "double-rule|flat-hairline|soft-shadow|glass-solid|stone-panel", "default": "flat-hairline" } ],
+      "usedBy": [
+        { "key": "editorial-serif", "where": "css/aesthetics/editorial-serif.css:641-648", "variant": "3px double rule, no shadow; sheets 3px double top; tooltip ink fill" },
+        { "key": "dystopian-luxury", "where": "css/aesthetics/dystopian-luxury.css:312-315", "variant": "no radius, no shadow; menu border ink (274)" },
+        { "key": "data-pebble", "where": "css/aesthetics/data-pebble.css:332-333", "variant": "white surface, hairline, 18px (kit comment: 22px, soft tinted shadow, line 479)" },
+        { "key": "frutiger-aero", "where": "css/aesthetics/frutiger-aero.css:637-638", "variant": "glass-solid, hard streak, white inner rim, small blue shadow" },
+        { "key": "gorpcore", "where": "css/aesthetics/gorpcore.css:385-396", "variant": "stone panels, ink-filled selection, dashed separators" } ],
+      "expressibleAs": "css-recipe", "paletteAgnostic": true, "exportSafe": true, "appSafe": true, "kitScope": ["dialog","menu","sheet","popover","toast"], "conflictsWith": [] },
+
+    { "id": "focus-ring", "category": "kit", "name": "Focus ring", "what": "Keyboard focus is a solid, dashed or glowing ring in a style-fixed colour.",
+      "params": [ { "name": "form", "kind": "enum", "range": "solid|dashed|glow", "default": "solid" }, { "name": "widthPx", "kind": "number", "range": "1-3", "default": "2" }, { "name": "offsetPx", "kind": "number", "range": "1-3", "default": "3" }, { "name": "colour", "kind": "enum", "range": "ink|primary-text|cyan", "default": "ink" } ],
+      "usedBy": [
+        { "key": "editorial-serif", "where": "css/aesthetics/editorial-serif.css:251-252", "variant": "2px solid ink, offset 3px (kit --sb-focus-offset 3px, 523)" },
+        { "key": "dystopian-luxury", "where": "css/aesthetics/dystopian-luxury.css:180-182", "variant": "2px solid ink, offset 3px; kit 1px ring (comment 523)" },
+        { "key": "data-pebble", "where": "css/aesthetics/data-pebble.css:129", "variant": "2px primary-text ring (143, 159, 453)" },
+        { "key": "frutiger-aero", "where": "css/aesthetics/frutiger-aero.css:209", "variant": "3px cyan glow ring plus 14px glow; switch 3px outline offset 2 (235)" },
+        { "key": "gorpcore", "where": "css/aesthetics/gorpcore.css:183", "variant": "2px dashed ink, offset 3px (209)" } ],
+      "expressibleAs": "css-recipe", "paletteAgnostic": true, "exportSafe": true, "appSafe": true, "kitScope": ["button","segmented","toggle","field"], "conflictsWith": [] },
+
+    { "id": "double-rule-masthead", "category": "ornament", "name": "Thick-over-thin double rule", "what": "A 3px rule over a 1px rule, drawn as two gradient layers in a 7px box, frames the masthead and then reappears on kit buttons, menus, cards and bars.",
+      "params": [ { "name": "topPx", "kind": "number", "range": "2-4", "default": "3" }, { "name": "bottomPx", "kind": "number", "range": "1-2", "default": "1" }, { "name": "boxHeightPx", "kind": "number", "range": "5-9", "default": "7" }, { "name": "usage", "kind": "enum", "range": "masthead-only|kit-wide", "default": "kit-wide" } ],
+      "usedBy": [ { "key": "editorial-serif", "where": "css/aesthetics/editorial-serif.css:37-41", "variant": "board masthead; kit: borders on buttons (556), cards (624), lists (626), menus (583), navbar (469), divider 5px (636); overlays use 3px double (641-646)" } ],
+      "expressibleAs": "css-recipe", "paletteAgnostic": true, "exportSafe": true, "appSafe": true, "kitScope": ["button","card","list","menu","navbar","divider"], "conflictsWith": [] },
+
+    { "id": "figure-caption", "category": "ornament", "name": "Figure caption", "what": "A caption line under a figure: italic label and dash plus description left, small-caps page number right.",
+      "params": [ { "name": "labelText", "kind": "text", "range": "", "default": "Fig. 1" }, { "name": "captionText", "kind": "text", "range": "", "default": "the brand at rest" }, { "name": "pageText", "kind": "text", "range": "", "default": "p. 01" } ],
+      "usedBy": [ { "key": "editorial-serif", "where": "js/aesthetics/editorial-serif.js:119", "variant": "body face clamp(10.5px,3.8cqw,12.5px), em italic ink, page number ui .82em .14em caps (css 110-114); chart caption 'Fig. 2 — ...' on Built screens (290-293)" } ],
+      "expressibleAs": "css-recipe", "paletteAgnostic": true, "exportSafe": true, "appSafe": false, "kitScope": [], "conflictsWith": [] },
+
+    { "id": "pull-quote", "category": "ornament", "name": "Pull quote band", "what": "A centred italic quote between two rules breaks up the board.",
+      "params": [ { "name": "text", "kind": "text", "range": "", "default": "Weight comes from contrast, never from boldness." }, { "name": "sizePx", "kind": "text", "range": "css clamp", "default": "clamp(26px,4cqw,50px)" }, { "name": "maxWidthEm", "kind": "number", "range": "12-24", "default": "17" } ],
+      "usedBy": [ { "key": "editorial-serif", "where": "css/aesthetics/editorial-serif.css:174-179", "variant": "italic 400/1.08, tracking -0.015em x tr, 1px strong top + 1px hair bottom, hidden in app screens and slides" } ],
+      "expressibleAs": "css-recipe", "paletteAgnostic": true, "exportSafe": true, "appSafe": false, "kitScope": [], "conflictsWith": [] },
+
+    { "id": "dotted-leader-contents", "category": "ornament", "name": "Dotted-leader contents row", "what": "Rows are name, a 1px dotted leader, then status and number, like a table of contents, with CSS-counter numbering.",
+      "params": [ { "name": "leaderStyle", "kind": "enum", "range": "dotted|dashed|none", "default": "dotted" }, { "name": "counterStart", "kind": "text", "range": "per column", "default": "12,24,38" } ],
+      "usedBy": [ { "key": "editorial-serif", "where": "css/aesthetics/editorial-serif.css:152-155", "variant": "type picks: ::after dotted leader, ::before counter 11px tabular; list rows grid with dotted bar (240); counters start 12/24/38 (145-147); drops leader at <=360px (314-319)" } ],
+      "expressibleAs": "css-recipe", "paletteAgnostic": true, "exportSafe": true, "appSafe": false, "kitScope": ["list"], "conflictsWith": [] },
+
+    { "id": "catalogue-number", "category": "ornament", "name": "Catalogue number", "what": "Items carry a small structured reference (accession, spec code, issue and plate number) in a muted mono or small-caps style.",
+      "params": [ { "name": "pattern", "kind": "text", "range": "", "default": "2026.114.n" }, { "name": "face", "kind": "enum", "range": "mono|serif-italic|sans-caps", "default": "mono" } ],
+      "usedBy": [
+        { "key": "dystopian-luxury", "where": "css/aesthetics/dystopian-luxury.css:109-111", "variant": "'ITEM 01 / 2026.114.1' above cards, '2026.114.n' counters on rows (159) and kit (285, 545); label no. js 115" },
+        { "key": "gorpcore", "where": "css/aesthetics/gorpcore.css:151-152", "variant": "'GC-01 · 420 g' on cards, 'REF GC-044' on kicker (46), 'GC—044' on the hang tag (js 332)" },
+        { "key": "editorial-serif", "where": "css/aesthetics/editorial-serif.css:27", "variant": "'Vol. 01 · No. 1' dateline, 'No. 01' plate number (js 28), kit cell 'No. NN' (531), page 'p. 01' (js 33)" } ],
+      "expressibleAs": "css-recipe", "paletteAgnostic": true, "exportSafe": true, "appSafe": false, "kitScope": [], "conflictsWith": [] },
+
+    { "id": "paper-tag-object", "category": "ornament", "name": "Paper tag object", "what": "A small paper label sits on the board as an object: fixed paper colour, corner hardware, a header and rows.",
+      "params": [ { "name": "hardware", "kind": "enum", "range": "x-stitches|grommet", "default": "x-stitches" }, { "name": "border", "kind": "enum", "range": "1px-ink|shadow", "default": "1px-ink" }, { "name": "rotationDeg", "kind": "number", "range": "-6-0", "default": "0" }, { "name": "rows", "kind": "enum", "range": "accession|spec-table", "default": "accession" } ],
+      "usedBy": [
+        { "key": "dystopian-luxury", "where": "css/aesthetics/dystopian-luxury.css:66-81", "variant": "210px blank white label, four 7px X stitches at 6px corners, accession no. 15px 700, circled numeral, sub-line; large 300px in deck (221-224); markup js 76-81" },
+        { "key": "gorpcore", "where": "css/aesthetics/gorpcore.css:88-105", "variant": "paper #F7F4EC tag rotated -4deg hung by a cord from a carabiner, grommet, carbon header, spec table, colourway chips; markup js 329-336" } ],
+      "expressibleAs": "css-recipe", "paletteAgnostic": true, "exportSafe": true, "appSafe": false, "kitScope": [], "conflictsWith": [] },
+
+    { "id": "dashed-stitch", "category": "ornament", "name": "Dashed stitch line", "what": "A dashed or dotted 1-1.5px line suggests stitching or perforation: an inset seam, a focus ring, a separator or a disabled state.",
+      "params": [ { "name": "style", "kind": "enum", "range": "dashed|dotted", "default": "dashed" }, { "name": "weightPx", "kind": "number", "range": "1-2", "default": "1.5" }, { "name": "insetPx", "kind": "number", "range": "2-6", "default": "4" }, { "name": "usage", "kind": "text", "range": "list", "default": "seam,focus,separator" } ],
+      "usedBy": [
+        { "key": "gorpcore", "where": "css/aesthetics/gorpcore.css:56-58", "variant": "woven label inset (56-58), taped state swatch (219), section label tape (347-349), focus (183), cell header rule (514), seam on kit CTA (172)" },
+        { "key": "dystopian-luxury", "where": "css/aesthetics/dystopian-luxury.css:100", "variant": "dashed border only to mark 'consider' fit and Web tag (551), a dashed row-status (163)" },
+        { "key": "editorial-serif", "where": "css/aesthetics/editorial-serif.css:561", "variant": "dotted: disabled keys use 3px/1px dotted rules; dotted leaders (152)" } ],
+      "expressibleAs": "css-recipe", "paletteAgnostic": true, "exportSafe": true, "appSafe": true, "kitScope": ["button","badge","separator"], "conflictsWith": [] },
+
+    { "id": "webbing-strap", "category": "pattern", "name": "Webbing strap texture", "what": "A repeating 3px two-tone stripe imitates woven webbing for tab strips and buckle bars.",
+      "params": [ { "name": "periodPx", "kind": "number", "range": "2-6", "default": "3" }, { "name": "colourA", "kind": "colour", "range": "", "default": "#1B1D1C" }, { "name": "colourB", "kind": "colour", "range": "", "default": "#2E3130" } ],
+      "usedBy": [ { "key": "gorpcore", "where": "css/aesthetics/gorpcore.css:155-163", "variant": "segmented strip (155-163), toggle buckle strap (194-208), webbing loop on the map (81); material js 364" } ],
+      "expressibleAs": "css-recipe", "paletteAgnostic": false, "exportSafe": true, "appSafe": false, "kitScope": [], "conflictsWith": [] },
+
+    { "id": "reflective-strip", "category": "ornament", "name": "Reflective strip", "what": "A diagonal silver band (115deg) with a bright core runs across a surface like reflective tape.",
+      "params": [ { "name": "angleDeg", "kind": "number", "range": "100-135", "default": "115" }, { "name": "heightPx", "kind": "number", "range": "4-10", "default": "6" } ],
+      "usedBy": [ { "key": "gorpcore", "where": "css/aesthetics/gorpcore.css:252", "variant": "6px footer strip; 'Reflective' state swatch on carbon (220); material js 362" } ],
+      "expressibleAs": "css-recipe", "paletteAgnostic": false, "exportSafe": true, "appSafe": false, "kitScope": [], "conflictsWith": [] },
+
+    { "id": "shape-coded-markers", "category": "ornament", "name": "Shape-coded markers", "what": "Circle, square and diamond marks in one accent colour code difficulty or category in rows, kicker and deck marks.",
+      "params": [ { "name": "shapes", "kind": "text", "range": "list", "default": "circle,square,diamond" }, { "name": "sizePx", "kind": "number", "range": "10-18", "default": "16" } ],
+      "usedBy": [ { "key": "gorpcore", "where": "css/aesthetics/gorpcore.css:230-235", "variant": "trail-blaze marks in the log (js 344-347), diamond kicker mark (44), deck do/don't marks (js 385-386)" } ],
+      "expressibleAs": "css-recipe", "paletteAgnostic": true, "exportSafe": true, "appSafe": false, "kitScope": [], "conflictsWith": [] },
+
+    { "id": "spec-table-rows", "category": "layout", "name": "Spec table rows", "what": "A definition list of label/value rows separated by 1px rules, uppercase labels left and bold right-aligned values.",
+      "params": [ { "name": "rows", "kind": "number", "range": "3-6", "default": "5" }, { "name": "ruleAlpha", "kind": "number", "range": "0.2-0.4", "default": "0.3" } ],
+      "usedBy": [ { "key": "gorpcore", "where": "css/aesthetics/gorpcore.css:99-105", "variant": "dt uppercase .04em #55585A, dd 600 right-aligned nowrap; rows from copy keys js 319-320, 334" } ],
+      "expressibleAs": "css-recipe", "paletteAgnostic": true, "exportSafe": true, "appSafe": false, "kitScope": [], "conflictsWith": [] },
+
+    { "id": "contour-map-art", "category": "pattern", "name": "Contour map art", "what": "A procedural topographic map: seeded height field, marching-squares contours, heavier index contours with knock-out elevation labels, a dashed trail, summit and scale bar.",
+      "params": [ { "name": "seedFromBrand", "kind": "bool", "range": "", "default": "true" }, { "name": "levels", "kind": "number", "range": "10-30", "default": "24" }, { "name": "indexEvery", "kind": "number", "range": "3-8", "default": "5" }, { "name": "gridSize", "kind": "text", "range": "nx x ny", "default": "70x74" }, { "name": "lineTint", "kind": "enum", "range": "secondary|ink", "default": "secondary" } ],
+      "usedBy": [ { "key": "gorpcore", "where": "js/aesthetics/gorpcore.js:48-135", "variant": "generator; composition at 253-318, CSS box 62-79; secondary-tinted contour at 55% / 85% mix with ground; trail in shell colour; blaze position dot" } ],
+      "expressibleAs": "svg-generator", "paletteAgnostic": true, "exportSafe": true, "appSafe": false, "kitScope": [], "conflictsWith": [] },
+
+    { "id": "sky-scene-art", "category": "pattern", "name": "Sky, hill and water scene", "what": "A procedural board scene: aqua sky gradient with rays, sparkles, flare string, swooshes, hill, rising orbs and water with a mirrored orb.",
+      "params": [ { "name": "night", "kind": "bool", "range": "", "default": "false" }, { "name": "waterHeight", "kind": "text", "range": "css clamp", "default": "clamp(120px,15cqw,176px)" }, { "name": "hillSource", "kind": "enum", "range": "secondary-if-green|fixed-lime", "default": "secondary-if-green" } ],
+      "usedBy": [ { "key": "frutiger-aero", "where": "js/aesthetics/frutiger-aero.js:195-345", "variant": "faSky, faWater, faOrb, faScene; css 111-118; fixed sky colours (#0AA6EE to #EFFFD9, js 488); not read line by line" } ],
+      "expressibleAs": "svg-generator", "paletteAgnostic": false, "exportSafe": true, "appSafe": false, "kitScope": [], "conflictsWith": [] },
+
+    { "id": "wet-floor-reflection", "category": "ornament", "name": "Wet-floor reflection", "what": "The headline (or hero object) is flipped under its baseline, sliced into horizontal bands that fade and drift, with no text nodes.",
+      "params": [ { "name": "slices", "kind": "number", "range": "3-8", "default": "5" }, { "name": "startOpacity", "kind": "number", "range": "0.2-0.6", "default": "0.42" }, { "name": "opacityStep", "kind": "number", "range": "0.05-0.12", "default": "0.085" }, { "name": "sliceHeightEm", "kind": "number", "range": "0.08-0.2", "default": "0.14" } ],
+      "usedBy": [ { "key": "frutiger-aero", "where": "js/aesthetics/frutiger-aero.js:524-531", "variant": "headline hook with data-t pseudo-content slices; css 91-98; plain opacity so it exports" } ],
+      "expressibleAs": "needs-code", "paletteAgnostic": true, "exportSafe": true, "appSafe": false, "kitScope": [], "conflictsWith": [] },
+
+    { "id": "window-title-bar", "category": "structure", "name": "Window title bar chrome", "what": "Cards, panels and the board header are dressed as OS windows with a glass title bar, caption buttons and a rainbow foot line.",
+      "params": [ { "name": "barHeightPx", "kind": "number", "range": "26-40", "default": "34" }, { "name": "buttons", "kind": "enum", "range": "all|close", "default": "all" }, { "name": "footLine", "kind": "enum", "range": "rainbow|none", "default": "rainbow" } ],
+      "usedBy": [ { "key": "frutiger-aero", "where": "css/aesthetics/frutiger-aero.css:162-171", "variant": "card/panel title bars (markup via faWindow js 396-403, panels hook 594-606), board header (41-45), explorer column head (246-250), 96x22 / 34x20 caption SVG data-URIs (31-32)" } ],
+      "expressibleAs": "css-recipe", "paletteAgnostic": true, "exportSafe": true, "appSafe": false, "kitScope": ["card","panel","list"], "conflictsWith": [] },
+
+    { "id": "area-proportional-pebbles", "category": "pattern", "name": "Area-proportional pebbles", "what": "Data values are drawn as smooth closed 8-point blobs seeded for variety, rescaled so each blob's area equals the value.",
+      "params": [ { "name": "controlPoints", "kind": "number", "range": "6-12", "default": "8" }, { "name": "radiusJitter", "kind": "number", "range": "0-0.3", "default": "0.2" }, { "name": "areaScale", "kind": "number", "range": "1-12", "default": "8.2" }, { "name": "seed", "kind": "number", "range": "int", "default": "per datum" } ],
+      "usedBy": [ { "key": "data-pebble", "where": "js/aesthetics/data-pebble.js:40-90", "variant": "PRNG + Catmull-Rom closed Bezier + area normalisation; used by board art (230-254), list glyph (258-273), deck sparkline and progress (305-318)" } ],
+      "expressibleAs": "svg-generator", "paletteAgnostic": true, "exportSafe": true, "appSafe": true, "kitScope": ["list","stat","progress"], "conflictsWith": [] },
+
+    { "id": "shape-masked-data-mark", "category": "kit", "name": "Shape-masked data mark", "what": "A progress bar or sparkline is a plain coloured box clipped by a data-URI SVG mask of repeated shapes.",
+      "params": [ { "name": "shapeCount", "kind": "number", "range": "3-8", "default": "5" }, { "name": "aspect", "kind": "text", "range": "w/h", "default": "5/1" } ],
+      "usedBy": [ { "key": "data-pebble", "where": "css/aesthetics/data-pebble.css:193-198", "variant": "five-pebble bar with part-filled last shape; stat tile sparkline ::after mask, direction follows the delta (278-282); kit bar max 170px (305-306)" } ],
+      "expressibleAs": "css-recipe", "paletteAgnostic": true, "exportSafe": false, "appSafe": true, "kitScope": ["progress","stat"], "conflictsWith": [] },
+
+    { "id": "voice-register", "category": "voice", "name": "Voice register", "what": "Motto, kicker, state names and sample copy follow one register (publication paratext, clinical catalogue, numbers-first, optimistic, technical spec with units).",
+      "params": [ { "name": "register", "kind": "enum", "range": "publication|catalogue|numbers-first|optimistic|spec-units", "default": "publication" }, { "name": "motto", "kind": "text", "range": "", "default": "Set it like a page." }, { "name": "kicker", "kind": "text", "range": "", "default": "Issue 01 — Spring" } ],
+      "usedBy": [
+        { "key": "editorial-serif", "where": "js/aesthetics/editorial-serif.js:15-33", "variant": "publication: Issue 01, Vol., Fig., p. 01, 'The design issue'" },
+        { "key": "dystopian-luxury", "where": "js/aesthetics/dystopian-luxury.js:103-123", "variant": "catalogue/clinical with a warmer alternate for Warmer / Own words" },
+        { "key": "data-pebble", "where": "js/aesthetics/data-pebble.js:98-99", "variant": "numbers-first: 'Numbers first. Shapes that breathe.'" },
+        { "key": "frutiger-aero", "where": "js/aesthetics/frutiger-aero.js:452-453", "variant": "optimistic weather metaphors: 'Technology as good weather.', 'Clear skies ahead'" },
+        { "key": "gorpcore", "where": "js/aesthetics/gorpcore.js:145-146", "variant": "spec-units: every number has a unit (js 10, 369); spec rows 157-169" } ],
+      "expressibleAs": "tokens", "paletteAgnostic": true, "exportSafe": true, "appSafe": false, "kitScope": [], "conflictsWith": [] }
+  ],
+  "notes": "Group C audit (rev 1). All five styles read from their full js and css files, except: frutiger-aero.js lines 195-345 (faSky / faWater / faOrb / faScene SVG internals) and 353-445 were skimmed by function header and comment, not read line by line; per-style css kit blocks past the NN/g glossary section (data-pebble 310-463, dystopian 316-526 classic variant, frutiger 453-620, gorpcore 375-498) were skimmed by section comment, since they restate the same recipes per selector. dystopian-luxury.css also holds a '--classic' variant (from line 317), ignored per the brief. exportSafe flags are inferred from CSS features (mask-image, backdrop-filter, mix-blend-mode) and from the styles' own export comments (frutiger js 31, dystopian css 120); none were tested through the export path. Schema gaps: (1) the kit is selector-coupled: each style re-applies a handful of recipes to ~100 kit class selectors, and the schema has kitScope but no way to express a component-to-recipe map; moveCoverage therefore counts that mapping as 'move-carried' where the recipe is regular, but a framework needs a mapping table. (2) Moves such as hero-layout, named-states and voice-register are registry-hook settings rather than CSS; the schema has no category for hook fields. (3) frutiger Built screens carry a sky band and bubble (css 397-417), against the repo's 'app UI has no art' rule; recorded under remainder, not changed. Editorial exact values are in the editorial-serif notes."
+}

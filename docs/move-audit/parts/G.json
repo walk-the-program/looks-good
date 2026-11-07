@@ -1,0 +1,3010 @@
+{
+ "group": "G",
+ "styles": [
+  {
+   "key": "patchbay",
+   "name": "Patchbay",
+   "coreTrick": "Near-black ground with hairline-edged rounded cards where brand hues are contrast-pushed into small ports, dots and tag chips, cabled together by a procedural node graph, while the one main action is a neutral ink pill instead of the brand colour.",
+   "colourRecipe": "Primary, secondary and accent are each pushed toward black or white until they hold 3:1 on the ground, card and inset field and a 4.5:1 label sits on them (pbTone); the main action is ink not primary; a muted client colour is mixed toward ink until 4.6:1 on five beds.",
+   "remainder": [
+    {
+     "what": "Dual-condition contrast search for port/tag colours (3:1 on three beds AND 4.5:1 label)",
+     "where": "js/aesthetics/patchbay.js:32-53",
+     "whyCode": "Two-sided colour search with a fallback nudge loop, not a formula"
+    },
+    {
+     "what": "Cursor and name-tag bezier geometry plus label-width estimate",
+     "where": "js/aesthetics/patchbay.js:70-76",
+     "whyCode": "Hand-built path math"
+    },
+    {
+     "what": "Node-graph composition: fixed module boxes, port coordinates, wire routing table",
+     "where": "js/aesthetics/patchbay.js:209-235",
+     "whyCode": "Layout is hard-coded coordinates; generator would need a graph spec"
+    },
+    {
+     "what": "Brand name fit into a 118-unit module",
+     "where": "js/aesthetics/patchbay.js:79-84",
+     "whyCode": "Per-string size computation"
+    },
+    {
+     "what": "Light-mode ink pill and 3n+k nth-of-type colour cycling depend on DOM order",
+     "where": "css/aesthetics/patchbay.css:122-124",
+     "whyCode": "Structural selectors tied to board markup"
+    }
+   ],
+   "moveCoverage": 70,
+   "notes": "Coverage counts css-recipe/tokens/svg-generator moves only; contrast-floor-push is needs-code and excluded. App screens carry no art by hard rule (css 13), so node-graph-diagram and dot-grid-glow-backdrop are board/deck only.",
+   "moves": [
+    "tinted-neutral-canvas",
+    "contrast-floor-push",
+    "derived-shade-tokens",
+    "fixed-surface-cards",
+    "hairline-rule",
+    "corner-radius",
+    "bracketed-labels",
+    "catalogue-number",
+    "caps-mono-labels",
+    "mono-ui-face",
+    "hero-layout-mode",
+    "status-dot-title-row",
+    "tag-chip-shape",
+    "nth-colour-cycle",
+    "mono-plus-accent",
+    "main-action-shape",
+    "invert-on-hover",
+    "press-travel",
+    "state-motion-curve",
+    "field-edge-style",
+    "switch-style",
+    "segmented-control-style",
+    "progress-bar-style",
+    "focus-ring-style",
+    "swatch-chip-style",
+    "themed-microcopy",
+    "named-states",
+    "node-graph-diagram",
+    "dot-grid-glow-backdrop"
+   ]
+  },
+  {
+   "key": "pirate-broadcast",
+   "name": "Pirate Broadcast",
+   "coreTrick": "A black teletext screen on a 40-column character grid in eight fixed hardware colours (brand colour reduced to the station ident), with a 5x7 bitmap font rendered as double-height SVG headline and a banded glitch frame-grab intruding on it.",
+   "colourRecipe": "Client primary is used only as the ident (mark, P100, inverse headline block), lifted toward white until 4.6:1 on black; every other on-screen colour is a fixed teletext hue; secondary/accent are off-screen only; light mode keeps a pale wall with black screens.",
+   "remainder": [
+    {
+     "what": "Test card SVG: fixed bars, castellations, grey ramp, grating, circle ident with copy slots",
+     "where": "js/aesthetics/pirate-broadcast.js:62-91",
+     "whyCode": "Hand-composed illustration with hard-coded geometry"
+    },
+    {
+     "what": "5x7 punctuation table the shared font lacks",
+     "where": "js/aesthetics/pirate-broadcast.js:16-22",
+     "whyCode": "Glyph data, not a parameter"
+    },
+    {
+     "what": "panels hook that string-replaces markup to inject P101-P103 title rows and the test card",
+     "where": "js/aesthetics/pirate-broadcast.js:270-281",
+     "whyCode": "DOM-shape surgery on shared panel HTML"
+    },
+    {
+     "what": "Signal-bar icon drawn with stacked gradients per state, RGB-split pressed state",
+     "where": "css/aesthetics/pirate-broadcast.css:182-193",
+     "whyCode": "Bespoke multi-gradient glyph per state"
+    },
+    {
+     "what": "Teletext hero page: row 0/24 absolute layout and torn grab message box",
+     "where": "css/aesthetics/pirate-broadcast.css:119-133",
+     "whyCode": "Absolute percentage layout tied to art markup"
+    },
+    {
+     "what": "Deck materialArt hook returning the test card",
+     "where": "js/aesthetics/pirate-broadcast.js:286-288",
+     "whyCode": "Deck-specific code path"
+    }
+   ],
+   "moveCoverage": 50,
+   "notes": "Roughly half the look is the fixed illustration/hero page. The fixed palette lives in tokens() but the style's identity is the grid + bitmap headline.",
+   "moves": [
+    "tinted-neutral-canvas",
+    "contrast-floor-push",
+    "fixed-hardware-palette",
+    "fixed-surface-cards",
+    "heavy-border",
+    "corner-radius",
+    "scanlines",
+    "dotted-dashed-rule",
+    "color-bars-strip",
+    "bracketed-labels",
+    "catalogue-number",
+    "caps-mono-labels",
+    "mono-ui-face",
+    "bitmap-glyph-text",
+    "glitch-band-offset",
+    "highlight-word-treatment",
+    "hero-layout-mode",
+    "character-cell-grid",
+    "info-strip",
+    "titlebar-strip",
+    "status-dot-title-row",
+    "tag-chip-shape",
+    "nth-colour-cycle",
+    "main-action-shape",
+    "invert-on-hover",
+    "state-motion-curve",
+    "blinking-cursor-caret",
+    "field-edge-style",
+    "switch-style",
+    "segmented-control-style",
+    "progress-bar-style",
+    "focus-ring-style",
+    "swatch-chip-style",
+    "themed-microcopy",
+    "named-states"
+   ]
+  },
+  {
+   "key": "pixel-arcade",
+   "name": "Pixel Arcade",
+   "coreTrick": "Everything snaps to a 4px grid: borders are four-shadow stacks that notch corners, shading is a 2x2 checker dither, the main button has a 4px underside that vanishes on press, and the hero is a rects-only pixel landscape with the brand initial as a sprite.",
+   "colourRecipe": "Primary, secondary and accent are used raw for fills (button, landscape, collectibles) with deep/hi shades derived by mixing toward black/white (p-deep 58%, p-hi 30%); dark canvas is clamped to L<=12% as a night sky; panels are canvas lifted one ink step; accent text is shaded to read as text.",
+   "remainder": [
+    {
+     "what": "Heading-face-dependent scaling (Press Start 2P 0.62, pixel face 0.92, VT323 UI x1.36, smoothing)",
+     "where": "js/aesthetics/pixel-arcade.js:82-95",
+     "whyCode": "Reads the selected font class and name at runtime"
+    },
+    {
+     "what": "Landscape drawing: hand-placed stars, moon spans, clouds, pines, gems, sine-wave hills",
+     "where": "js/aesthetics/pixel-arcade.js:133-185",
+     "whyCode": "Hard-coded coordinates and sine formulas"
+    },
+    {
+     "what": "Heart and HUD sprite bitmaps and score overlay",
+     "where": "js/aesthetics/pixel-arcade.js:205-214",
+     "whyCode": "Pixel bitmap data plus HTML overlay"
+    },
+    {
+     "what": "Silkscreen font load side effect inside tokens()/art()",
+     "where": "js/aesthetics/pixel-arcade.js:14-20",
+     "whyCode": "Imperative font loading"
+    },
+    {
+     "what": "RPG dialog box with blinking ▼ and tab kicker",
+     "where": "css/aesthetics/pixel-arcade.css:59-73",
+     "whyCode": "Bespoke hero copy container tied to scene hero"
+    }
+   ],
+   "moveCoverage": 68,
+   "notes": "Stepped-border and press-travel are strongly reusable by other pixel styles; the landscape is mostly bespoke.",
+   "moves": [
+    "tinted-neutral-canvas",
+    "derived-shade-tokens",
+    "hard-offset-shadow",
+    "corner-radius",
+    "stepped-pixel-border",
+    "checker-pattern",
+    "scanlines",
+    "dotted-dashed-rule",
+    "catalogue-number",
+    "caps-mono-labels",
+    "bitmap-glyph-text",
+    "hard-text-shadow",
+    "highlight-word-treatment",
+    "hero-layout-mode",
+    "titlebar-strip",
+    "status-dot-title-row",
+    "tag-chip-shape",
+    "nth-colour-cycle",
+    "main-action-shape",
+    "press-travel",
+    "state-motion-curve",
+    "blinking-cursor-caret",
+    "field-edge-style",
+    "switch-style",
+    "segmented-control-style",
+    "progress-bar-style",
+    "focus-ring-style",
+    "swatch-chip-style",
+    "clip-path-shapes",
+    "themed-microcopy",
+    "named-states",
+    "pixel-scene-landscape"
+   ]
+  },
+  {
+   "key": "radical-memphis",
+   "name": "Radical Memphis",
+   "coreTrick": "Surfaces are paper cabinets, each carrying a different laminate (squiggle, terrazzo, checker, dots, zig-zag) as a side strip or fill, and every shape gets a second-hue offset sheet (the other brand hue mixed into the canvas) instead of an outline or black shadow, with objects tilted on diagonals.",
+   "colourRecipe": "Primary is the dominant flat, secondary the second laminate, accent one screamer; the offset sheet is the secondary mixed 45% into the canvas behind primary shapes and the primary mixed 50% elsewhere; cards are always paper (white mixed into the light brand colour) with black/soft ink; canvas warmed toward #F6F1E7.",
+   "remainder": [
+    {
+     "what": "headline(): regex split of lead words onto paper slabs and last word on a secondary slab",
+     "where": "js/aesthetics/radical-memphis.js:107-112",
+     "whyCode": "Text parsing per headline"
+    },
+    {
+     "what": "Showroom totem composition: 10 hand-placed shapes with percent coordinates and rotations",
+     "where": "js/aesthetics/radical-memphis.js:120-132",
+     "whyCode": "Composition data, not parameters"
+    },
+    {
+     "what": "deck.product room-set (frame, floor, totem, side table, plaque with year)",
+     "where": "js/aesthetics/radical-memphis.js:170-181",
+     "whyCode": "Bespoke deck scene"
+    },
+    {
+     "what": "Bacterio squiggle data-URI tile artwork",
+     "where": "css/aesthetics/radical-memphis.css:15",
+     "whyCode": "Hand-drawn SVG asset"
+    },
+    {
+     "what": "Soft ink loop to hold 4.5:1 on paper",
+     "where": "js/aesthetics/radical-memphis.js:85-88",
+     "whyCode": "Iterative contrast loop"
+    }
+   ],
+   "moveCoverage": 62,
+   "notes": "Offset sheet colour logic and laminate fills are the transferable core; the slab headline and totem are bespoke. Slabs avoid CSS masks for html2canvas export safety (css 16, 195-203).",
+   "moves": [
+    "tinted-neutral-canvas",
+    "contrast-floor-push",
+    "derived-shade-tokens",
+    "fixed-surface-cards",
+    "second-hue-offset-sheet",
+    "hard-offset-shadow",
+    "corner-radius",
+    "checker-pattern",
+    "laminate-geometric-fills",
+    "squiggle-tile",
+    "catalogue-number",
+    "hard-text-shadow",
+    "highlight-word-treatment",
+    "poster-bleed-headline",
+    "diagonal-tilt",
+    "hero-layout-mode",
+    "tag-chip-shape",
+    "main-action-shape",
+    "press-travel",
+    "state-motion-curve",
+    "field-edge-style",
+    "switch-style",
+    "segmented-control-style",
+    "progress-bar-style",
+    "swatch-chip-style",
+    "clip-path-shapes",
+    "themed-microcopy",
+    "named-states",
+    "stacked-primitives-art"
+   ]
+  },
+  {
+   "key": "raw-brutalist",
+   "name": "Raw Brutalist",
+   "coreTrick": "Strip every effect: zero radius, 2px ink borders, no shadows, mono uppercase bracketed labels and controls that invert (ink fill, canvas text) on hover and flip back on press, with an enormous bleeding uppercase headline over visible 12-column grid lines.",
+   "colourRecipe": "Client canvas is replaced by pure white (or #0a0a0a dark); ink is the border/text colour; primary appears only on the single CTA block and switch-on, secondary on status cells, accent only as a highlighter band behind one word; links use a fixed default blue; muted is mixed toward ink until 4.6:1.",
+   "remainder": [
+    {
+     "what": "Highlight band ::after extended 100cqw to the board edge; deck measures the bleed",
+     "where": "css/aesthetics/raw-brutalist.css:55-59",
+     "whyCode": "Layout hack plus JS measurement (--ab-hl-bleed, css 199-202)"
+    },
+    {
+     "what": "Oversized off-grid '01' index numeral behind the spec table",
+     "where": "css/aesthetics/raw-brutalist.css:229-230",
+     "whyCode": "Positioned pseudo-element tied to hero geometry"
+    },
+    {
+     "what": "Deck cover reflow turning the spec table into a four-column strip",
+     "where": "css/aesthetics/raw-brutalist.css:184-197",
+     "whyCode": "Deck-specific overrides"
+    },
+    {
+     "what": "Muted-on-danger-tint contrast loop",
+     "where": "js/aesthetics/raw-brutalist.js:92-95",
+     "whyCode": "Iterative colour search against a fixed tint"
+    }
+   ],
+   "moveCoverage": 85,
+   "notes": "Most austere style: nearly everything is tokens or simple CSS recipes. The poster hero/bleed is the only structural piece. Kit rules live in css 260+ (read via grep only).",
+   "moves": [
+    "tinted-neutral-canvas",
+    "contrast-floor-push",
+    "fixed-hardware-palette",
+    "heavy-border",
+    "hairline-rule",
+    "corner-radius",
+    "bracketed-labels",
+    "catalogue-number",
+    "caps-mono-labels",
+    "mono-ui-face",
+    "highlight-word-treatment",
+    "poster-bleed-headline",
+    "hidden-column-grid",
+    "hero-layout-mode",
+    "info-strip",
+    "tag-chip-shape",
+    "mono-plus-accent",
+    "main-action-shape",
+    "invert-on-hover",
+    "press-travel",
+    "state-motion-curve",
+    "blinking-cursor-caret",
+    "field-edge-style",
+    "switch-style",
+    "segmented-control-style",
+    "progress-bar-style",
+    "focus-ring-style",
+    "swatch-chip-style",
+    "themed-microcopy",
+    "named-states",
+    "default-link-style"
+   ]
+  }
+ ],
+ "moves": [
+  {
+   "id": "tinted-neutral-canvas",
+   "category": "colour",
+   "name": "Tinted neutral canvas",
+   "what": "Replace the client canvas with a clamped neutral (lightness/saturation capped, optionally keeping a whisper of the client hue).",
+   "params": [
+    {
+     "name": "darkLightness",
+     "kind": "number",
+     "range": "0-100",
+     "default": "6.5"
+    },
+    {
+     "name": "lightLightness",
+     "kind": "number",
+     "range": "0-100",
+     "default": "94.5"
+    },
+    {
+     "name": "satCap",
+     "kind": "number",
+     "range": "0-100",
+     "default": "10"
+    },
+    {
+     "name": "hueSource",
+     "kind": "enum",
+     "range": "client|none|fixed",
+     "default": "client"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "patchbay",
+     "where": "js/aesthetics/patchbay.js:153-156",
+     "variant": "near-black 6.5% / pale grey 94.5%, hue whisper capped at sat 10"
+    },
+    {
+     "key": "pirate-broadcast",
+     "where": "js/aesthetics/pirate-broadcast.js:184-186",
+     "variant": "pure #000 in dark; light keeps client wall"
+    },
+    {
+     "key": "pixel-arcade",
+     "where": "js/aesthetics/pixel-arcade.js:72-76",
+     "variant": "dark canvas clamped to L<=12, sat<=45"
+    },
+    {
+     "key": "radical-memphis",
+     "where": "js/aesthetics/radical-memphis.js:70-72",
+     "variant": "light canvas mixed 38% toward warm #F6F1E7; dark untouched"
+    },
+    {
+     "key": "raw-brutalist",
+     "where": "js/aesthetics/raw-brutalist.js:86-88",
+     "variant": "fixed #ffffff / #0a0a0a, no client hue"
+    }
+   ],
+   "expressibleAs": "tokens",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "contrast-floor-push",
+   "category": "colour",
+   "name": "Contrast-floor push",
+   "what": "Nudge a colour toward black/white/ink in steps until it holds a contrast floor on one or more named beds.",
+   "params": [
+    {
+     "name": "floor",
+     "kind": "number",
+     "range": "3-7",
+     "default": "4.5"
+    },
+    {
+     "name": "beds",
+     "kind": "text",
+     "range": "list of surfaces",
+     "default": "canvas,card"
+    },
+    {
+     "name": "pushToward",
+     "kind": "enum",
+     "range": "black|white|ink|auto",
+     "default": "auto"
+    },
+    {
+     "name": "step",
+     "kind": "number",
+     "range": "0.02-0.1",
+     "default": "0.05"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "patchbay",
+     "where": "js/aesthetics/patchbay.js:32-53",
+     "variant": "pbHold/pbTone: 3.1:1 on 3 beds AND a 4.5:1 label on it; also muted 4.6 on 5 beds (171-177)"
+    },
+    {
+     "key": "pirate-broadcast",
+     "where": "js/aesthetics/pirate-broadcast.js:229-231",
+     "variant": "station ident lifted toward white until 4.6:1 on black"
+    },
+    {
+     "key": "radical-memphis",
+     "where": "js/aesthetics/radical-memphis.js:85-88",
+     "variant": "soft text mixed toward black until 4.5:1 on paper"
+    },
+    {
+     "key": "raw-brutalist",
+     "where": "js/aesthetics/raw-brutalist.js:92-95",
+     "variant": "muted held 4.6:1 on canvas and a danger tint"
+    }
+   ],
+   "expressibleAs": "needs-code",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "derived-shade-tokens",
+   "category": "colour",
+   "name": "Derived shade tokens",
+   "what": "Named tokens computed as a mix of a base colour toward black/white/canvas/ink (deep, hi, soft, sheet, panel, slot).",
+   "params": [
+    {
+     "name": "base",
+     "kind": "enum",
+     "range": "primary|secondary|accent|ink|canvas",
+     "default": "primary"
+    },
+    {
+     "name": "toward",
+     "kind": "enum",
+     "range": "black|white|canvas|ink",
+     "default": "black"
+    },
+    {
+     "name": "amount",
+     "kind": "number",
+     "range": "0-1",
+     "default": "0.5"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "pixel-arcade",
+     "where": "js/aesthetics/pixel-arcade.js:96-108",
+     "variant": "p-deep/p-hi/s-deep/a-deep/panel/slot/dither all mix formulas"
+    },
+    {
+     "key": "radical-memphis",
+     "where": "js/aesthetics/radical-memphis.js:81-95",
+     "variant": "sheet = primary/secondary mixed into canvas; paper, black, sec-lo, pri-lo"
+    },
+    {
+     "key": "patchbay",
+     "where": "js/aesthetics/patchbay.js:164-192",
+     "variant": "card, inset, grey, grey-hi, hover/press ink steps, hairline"
+    }
+   ],
+   "expressibleAs": "tokens",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "fixed-hardware-palette",
+   "category": "colour",
+   "name": "Fixed hardware palette",
+   "what": "A small set of fixed non-brand colours is the on-screen palette; the client colour is reduced to an ident accent.",
+   "params": [
+    {
+     "name": "colours",
+     "kind": "text",
+     "range": "hex list",
+     "default": "R G Y B M C W + K"
+    },
+    {
+     "name": "identOnly",
+     "kind": "bool",
+     "range": "",
+     "default": "true"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "pirate-broadcast",
+     "where": "js/aesthetics/pirate-broadcast.js:13",
+     "variant": "eight teletext colours, brand only the ident (188-201)"
+    },
+    {
+     "key": "raw-brutalist",
+     "where": "js/aesthetics/raw-brutalist.js:98",
+     "variant": "default-blue link colour fixed (#0000EE / #8DB4FF)"
+    }
+   ],
+   "expressibleAs": "tokens",
+   "paletteAgnostic": false,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "fixed-surface-cards",
+   "category": "material",
+   "name": "Fixed-mode surface cards",
+   "what": "Cards keep their own surface colour (paper or black screen) regardless of board light/dark mode, with matching ink tokens.",
+   "params": [
+    {
+     "name": "surface",
+     "kind": "enum",
+     "range": "paper|screen|lifted-canvas",
+     "default": "paper"
+    },
+    {
+     "name": "inkToken",
+     "kind": "text",
+     "range": "",
+     "default": "black"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "radical-memphis",
+     "where": "js/aesthetics/radical-memphis.js:38-39",
+     "variant": "paper cabinets; dark mode takes cardInk black/soft (83-88)"
+    },
+    {
+     "key": "pirate-broadcast",
+     "where": "js/aesthetics/pirate-broadcast.js:152",
+     "variant": "cardFill black screen; scanline screen css 85-87"
+    },
+    {
+     "key": "patchbay",
+     "where": "js/aesthetics/patchbay.js:122",
+     "variant": "cardFill is a computed card step above ground (29)"
+    }
+   ],
+   "expressibleAs": "tokens",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [
+    "card"
+   ],
+   "conflictsWith": []
+  },
+  {
+   "id": "second-hue-offset-sheet",
+   "category": "colour",
+   "name": "Second-hue offset sheet colour",
+   "what": "The colour behind an offset shape is the other brand hue mixed into the canvas (secondary behind primary shapes, primary elsewhere).",
+   "params": [
+    {
+     "name": "sheetFromPrimary",
+     "kind": "number",
+     "range": "0-1",
+     "default": "0.5"
+    },
+    {
+     "name": "sheetFromSecondary",
+     "kind": "number",
+     "range": "0-1",
+     "default": "0.45"
+    },
+    {
+     "name": "swapWhenFillIsPrimary",
+     "kind": "bool",
+     "range": "",
+     "default": "true"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "radical-memphis",
+     "where": "js/aesthetics/radical-memphis.js:79-82",
+     "variant": "--ab-m-sheet / --ab-m-sheet-sec (93-94)"
+    }
+   ],
+   "expressibleAs": "tokens",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "hard-offset-shadow",
+   "category": "material",
+   "name": "Hard offset shadow",
+   "what": "A zero-blur shadow offset in x/y, in a chosen colour, optionally drawn as a pseudo-element for export safety.",
+   "params": [
+    {
+     "name": "dx",
+     "kind": "number",
+     "range": "0-16px",
+     "default": "6"
+    },
+    {
+     "name": "dy",
+     "kind": "number",
+     "range": "0-16px",
+     "default": "6"
+    },
+    {
+     "name": "colour",
+     "kind": "colour",
+     "range": "",
+     "default": "sheet"
+    },
+    {
+     "name": "viaPseudo",
+     "kind": "bool",
+     "range": "",
+     "default": "false"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "radical-memphis",
+     "where": "css/aesthetics/radical-memphis.css:162-163",
+     "variant": "9px sheet on cabinets; chip/mark/switch use 3-5px (46,48,121,221)"
+    },
+    {
+     "key": "radical-memphis",
+     "where": "css/aesthetics/radical-memphis.css:200-203",
+     "variant": "CTA sheet is an inset:6px -6px pseudo-element (html2canvas workaround)"
+    },
+    {
+     "key": "pixel-arcade",
+     "where": "css/aesthetics/pixel-arcade.css:145",
+     "variant": "0 8px underside only (button)"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [
+    "button",
+    "card"
+   ],
+   "conflictsWith": [
+    "heavy-border"
+   ]
+  },
+  {
+   "id": "heavy-border",
+   "category": "material",
+   "name": "Heavy border",
+   "what": "A solid 2px-plus border in ink on controls and panels.",
+   "params": [
+    {
+     "name": "width",
+     "kind": "number",
+     "range": "1-4px",
+     "default": "2"
+    },
+    {
+     "name": "colour",
+     "kind": "colour",
+     "range": "",
+     "default": "ink"
+    },
+    {
+     "name": "method",
+     "kind": "enum",
+     "range": "border|ring-shadow|stepped",
+     "default": "border"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "raw-brutalist",
+     "where": "css/aesthetics/raw-brutalist.css:87-93",
+     "variant": "2px ink border on every card, seg, field, row, status"
+    },
+    {
+     "key": "pirate-broadcast",
+     "where": "css/aesthetics/pirate-broadcast.css:86",
+     "variant": "2px ring via box-shadow (--ab-tt-line) on every screen"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [
+    "card",
+    "button",
+    "field"
+   ],
+   "conflictsWith": []
+  },
+  {
+   "id": "hairline-rule",
+   "category": "material",
+   "name": "Hairline rule",
+   "what": "1px low-contrast edge on cards, dividers and rows.",
+   "params": [
+    {
+     "name": "alpha",
+     "kind": "number",
+     "range": "0.05-0.3",
+     "default": "0.13"
+    },
+    {
+     "name": "colour",
+     "kind": "colour",
+     "range": "",
+     "default": "ink mix"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "patchbay",
+     "where": "css/aesthetics/patchbay.css:114-116",
+     "variant": "card edge 1px, row edge 184, rule 41, tabs 297"
+    },
+    {
+     "key": "raw-brutalist",
+     "where": "css/aesthetics/raw-brutalist.css:25",
+     "variant": "labelrow underline, spec rows 74"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [
+    "card",
+    "list"
+   ],
+   "conflictsWith": []
+  },
+  {
+   "id": "corner-radius",
+   "category": "material",
+   "name": "Corner radius",
+   "what": "Corner shape for cards, fields, pills: uniform, per-corner or zero.",
+   "params": [
+    {
+     "name": "radius",
+     "kind": "number",
+     "range": "0-999px",
+     "default": "14"
+    },
+    {
+     "name": "perCorner",
+     "kind": "text",
+     "range": "tl tr br bl",
+     "default": "0 40px 0 0"
+    },
+    {
+     "name": "pill",
+     "kind": "bool",
+     "range": "",
+     "default": "false"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "patchbay",
+     "where": "css/aesthetics/patchbay.css:20-22",
+     "variant": "14px modules, 10px fields, 999px pills"
+    },
+    {
+     "key": "radical-memphis",
+     "where": "css/aesthetics/radical-memphis.css:162-163",
+     "variant": "0 40px 0 0 quarter-round cabinets; CTA 0 26px 26px 0 (192)"
+    },
+    {
+     "key": "pixel-arcade",
+     "where": "css/aesthetics/pixel-arcade.css:19",
+     "variant": "0 everywhere, replaced by stepped border"
+    },
+    {
+     "key": "raw-brutalist",
+     "where": "css/aesthetics/raw-brutalist.css:12-14",
+     "variant": "0 forced on every node"
+    },
+    {
+     "key": "pirate-broadcast",
+     "where": "css/aesthetics/pirate-broadcast.css:19",
+     "variant": "0, screens are square"
+    }
+   ],
+   "expressibleAs": "tokens",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [
+    "card",
+    "button",
+    "field"
+   ],
+   "conflictsWith": []
+  },
+  {
+   "id": "stepped-pixel-border",
+   "category": "material",
+   "name": "Stepped pixel border",
+   "what": "A 4-shadow stack on a pixel step that notches the corners; inner highlight/shade bevel.",
+   "params": [
+    {
+     "name": "step",
+     "kind": "number",
+     "range": "2-8px",
+     "default": "4"
+    },
+    {
+     "name": "bevel",
+     "kind": "bool",
+     "range": "",
+     "default": "true"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "pixel-arcade",
+     "where": "css/aesthetics/pixel-arcade.css:14-18",
+     "variant": "--px-bd / dim / pri stacks and notch polygon"
+    },
+    {
+     "key": "pixel-arcade",
+     "where": "css/aesthetics/pixel-arcade.css:124-126",
+     "variant": "panels: stack + inset 4px shade/highlight"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [
+    "card",
+    "button",
+    "field"
+   ],
+   "conflictsWith": [
+    "corner-radius"
+   ]
+  },
+  {
+   "id": "checker-pattern",
+   "category": "pattern",
+   "name": "Checker pattern",
+   "what": "A conic-gradient checker of a given cell size and two colours; used as shading, band or tab fill.",
+   "params": [
+    {
+     "name": "cell",
+     "kind": "number",
+     "range": "2-24px",
+     "default": "4"
+    },
+    {
+     "name": "a",
+     "kind": "colour",
+     "range": "",
+     "default": "ink"
+    },
+    {
+     "name": "b",
+     "kind": "colour",
+     "range": "",
+     "default": "paper"
+    },
+    {
+     "name": "alpha",
+     "kind": "number",
+     "range": "0-1",
+     "default": "0.07"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "pixel-arcade",
+     "where": "css/aesthetics/pixel-arcade.css:18",
+     "variant": "2x2 dither at 7-8% ink over panels (97, 124-125); sky bands js 129"
+    },
+    {
+     "key": "radical-memphis",
+     "where": "css/aesthetics/radical-memphis.css:32",
+     "variant": "16px black/paper laminate; ruled band 54; arrow tab 205"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "laminate-geometric-fills",
+   "category": "pattern",
+   "name": "Geometric laminate fills",
+   "what": "Terrazzo, dots and zig-zag tile fills built from CSS gradients in brand colours on a paper base.",
+   "params": [
+    {
+     "name": "kind",
+     "kind": "enum",
+     "range": "terrazzo|dots|zigzag",
+     "default": "dots"
+    },
+    {
+     "name": "cell",
+     "kind": "number",
+     "range": "6-140px",
+     "default": "11"
+    },
+    {
+     "name": "colours",
+     "kind": "text",
+     "range": "roles",
+     "default": "primary,secondary,accent"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "radical-memphis",
+     "where": "css/aesthetics/radical-memphis.css:21-39",
+     "variant": "terrazzo (10 radial dots), dots 11px, zig 12px; used on strips, switch, list swatches (168-169, 221-223, 243)"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [
+    "switch",
+    "card"
+   ],
+   "conflictsWith": []
+  },
+  {
+   "id": "squiggle-tile",
+   "category": "pattern",
+   "name": "Squiggle tile",
+   "what": "A drawn SVG tile (wavy line, crosses, dots) used as a fill or underline edge.",
+   "params": [
+    {
+     "name": "stroke",
+     "kind": "number",
+     "range": "1-4",
+     "default": "2.4"
+    },
+    {
+     "name": "tile",
+     "kind": "number",
+     "range": "24-64px",
+     "default": "64"
+    },
+    {
+     "name": "ink",
+     "kind": "colour",
+     "range": "",
+     "default": "black"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "radical-memphis",
+     "where": "css/aesthetics/radical-memphis.css:15-20",
+     "variant": "Bacterio 64px tile + squiggle edge strokes (data URIs); headline slab edge 81; strips 144,166"
+    }
+   ],
+   "expressibleAs": "svg-generator",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "scanlines",
+   "category": "pattern",
+   "name": "Scanlines",
+   "what": "A repeating horizontal line overlay over a screen or art box.",
+   "params": [
+    {
+     "name": "period",
+     "kind": "number",
+     "range": "2-6px",
+     "default": "3"
+    },
+    {
+     "name": "alpha",
+     "kind": "number",
+     "range": "0.1-0.4",
+     "default": "0.3"
+    },
+    {
+     "name": "scope",
+     "kind": "enum",
+     "range": "screens|art|both",
+     "default": "both"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "pirate-broadcast",
+     "where": "css/aesthetics/pirate-broadcast.css:14",
+     "variant": "--pb-scan on every screen (86, 132)"
+    },
+    {
+     "key": "pixel-arcade",
+     "where": "css/aesthetics/pixel-arcade.css:48-51",
+     "variant": "hero art only, 2px of 4 at 16%"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": false,
+   "kitScope": [
+    "card"
+   ],
+   "conflictsWith": []
+  },
+  {
+   "id": "dotted-dashed-rule",
+   "category": "ornament",
+   "name": "Dotted/dashed rule",
+   "what": "Dotted or dashed separators, row leaders and footers with a stepped period.",
+   "params": [
+    {
+     "name": "style",
+     "kind": "enum",
+     "range": "dotted|dashed|stepped",
+     "default": "dotted"
+    },
+    {
+     "name": "weight",
+     "kind": "number",
+     "range": "1-4px",
+     "default": "2"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "pirate-broadcast",
+     "where": "css/aesthetics/pirate-broadcast.css:35",
+     "variant": "dashed 1px section rule; dotted leader in rows 206"
+    },
+    {
+     "key": "pixel-arcade",
+     "where": "css/aesthetics/pixel-arcade.css:40",
+     "variant": "4px stepped rule header, row base 177, footer 4px dotted 193"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [
+    "list"
+   ],
+   "conflictsWith": []
+  },
+  {
+   "id": "color-bars-strip",
+   "category": "ornament",
+   "name": "Colour bars strip",
+   "what": "A strip of fixed adjacent colour bars as masthead or footer rule.",
+   "params": [
+    {
+     "name": "colours",
+     "kind": "text",
+     "range": "hex list",
+     "default": "W Y C G M R B"
+    },
+    {
+     "name": "height",
+     "kind": "number",
+     "range": "4-16px",
+     "default": "4"
+    },
+    {
+     "name": "position",
+     "kind": "enum",
+     "range": "masthead|footer|both",
+     "default": "both"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "pirate-broadcast",
+     "where": "css/aesthetics/pirate-broadcast.css:15",
+     "variant": "--pb-bars under masthead (36); R G Y B Fastext strip as footer 214"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": false,
+   "exportSafe": true,
+   "appSafe": false,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "bracketed-labels",
+   "category": "type",
+   "name": "Bracketed labels",
+   "what": "Wrap labels, numbers and actions in literal brackets or slashes via pseudo-elements.",
+   "params": [
+    {
+     "name": "open",
+     "kind": "text",
+     "range": "",
+     "default": "["
+    },
+    {
+     "name": "close",
+     "kind": "text",
+     "range": "",
+     "default": "]"
+    },
+    {
+     "name": "scope",
+     "kind": "text",
+     "range": "components",
+     "default": "number,tag,cta,row"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "raw-brutalist",
+     "where": "css/aesthetics/raw-brutalist.css:22-23",
+     "variant": "[01] numbers, [tag], [CTA], [row n] (30-31, 100-101, 143-144)"
+    },
+    {
+     "key": "pirate-broadcast",
+     "where": "css/aesthetics/pirate-broadcast.css:169-172",
+     "variant": "[ OFF ] / [ ON ] switch text"
+    },
+    {
+     "key": "patchbay",
+     "where": "css/aesthetics/patchbay.css:46",
+     "variant": "number suffix ' /' only"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [
+    "button",
+    "switch",
+    "tag"
+   ],
+   "conflictsWith": []
+  },
+  {
+   "id": "catalogue-number",
+   "category": "ornament",
+   "name": "Catalogue number",
+   "what": "A running index number on sections, rows and keys, in a themed format.",
+   "params": [
+    {
+     "name": "format",
+     "kind": "text",
+     "range": "",
+     "default": "P{n} / [{nn}] / LV.{nn} / {nn} /"
+    },
+    {
+     "name": "scope",
+     "kind": "text",
+     "range": "",
+     "default": "labels,rows,palette"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "pirate-broadcast",
+     "where": "css/aesthetics/pirate-broadcast.css:41-43",
+     "variant": "P1.. page numbers on labels, P20n swatches (80), row numbers (204); P101-103 title rows js 272-279"
+    },
+    {
+     "key": "raw-brutalist",
+     "where": "css/aesthetics/raw-brutalist.css:49",
+     "variant": "[00] kicker; giant '01' index numeral 229-230"
+    },
+    {
+     "key": "pixel-arcade",
+     "where": "css/aesthetics/pixel-arcade.css:182",
+     "variant": "LV.01 row numbers via counter; label tabs 91"
+    },
+    {
+     "key": "patchbay",
+     "where": "css/aesthetics/patchbay.css:45-46",
+     "variant": "primary-coloured number + ' /'"
+    },
+    {
+     "key": "radical-memphis",
+     "where": "css/aesthetics/radical-memphis.css:59-63",
+     "variant": "circle-badge number tilted -6deg"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [
+    "list"
+   ],
+   "conflictsWith": []
+  },
+  {
+   "id": "caps-mono-labels",
+   "category": "type",
+   "name": "Caps mono labels",
+   "what": "Small uppercase letter-spaced labels in a mono/label face.",
+   "params": [
+    {
+     "name": "case",
+     "kind": "enum",
+     "range": "upper|sentence",
+     "default": "upper"
+    },
+    {
+     "name": "tracking",
+     "kind": "number",
+     "range": "0-0.14em",
+     "default": "0.08"
+    },
+    {
+     "name": "size",
+     "kind": "number",
+     "range": "9-12px",
+     "default": "11"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "pirate-broadcast",
+     "where": "css/aesthetics/pirate-broadcast.css:39",
+     "variant": "11px 700 mono 0.12em upper"
+    },
+    {
+     "key": "raw-brutalist",
+     "where": "css/aesthetics/raw-brutalist.css:17-20",
+     "variant": "upper 0.04em on label, tag, seg, cta, row, foot"
+    },
+    {
+     "key": "pixel-arcade",
+     "where": "css/aesthetics/pixel-arcade.css:25-29",
+     "variant": "upper 0.06em, scaled by --ab-uis for VT323"
+    },
+    {
+     "key": "patchbay",
+     "where": "css/aesthetics/patchbay.css:44",
+     "variant": "sentence-case 11.5px mono (variant, no upper)"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [
+    "tag",
+    "button"
+   ],
+   "conflictsWith": []
+  },
+  {
+   "id": "mono-ui-face",
+   "category": "type",
+   "name": "Mono UI face",
+   "what": "Monospace (tabular) face for numerals or the whole UI.",
+   "params": [
+    {
+     "name": "scope",
+     "kind": "enum",
+     "range": "numerals|all-ui",
+     "default": "numerals"
+    },
+    {
+     "name": "face",
+     "kind": "text",
+     "range": "font stack",
+     "default": "mono"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "patchbay",
+     "where": "css/aesthetics/patchbay.css:29-31",
+     "variant": "numerals/readouts only, tabular-nums"
+    },
+    {
+     "key": "pirate-broadcast",
+     "where": "css/aesthetics/pirate-broadcast.css:17",
+     "variant": "--pb-mono on everything; headline uses 5x7 glyphs"
+    },
+    {
+     "key": "raw-brutalist",
+     "where": "js/aesthetics/raw-brutalist.js:66",
+     "variant": "def.type ui/label mono; css face var 9-11"
+    }
+   ],
+   "expressibleAs": "tokens",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [
+    "tag",
+    "list"
+   ],
+   "conflictsWith": []
+  },
+  {
+   "id": "bitmap-glyph-text",
+   "category": "type",
+   "name": "Bitmap glyph text",
+   "what": "Render text or the brand initial from a 5x7 pixel glyph table as one SVG path with per-axis cell scale.",
+   "params": [
+    {
+     "name": "cellW",
+     "kind": "number",
+     "range": "1-3",
+     "default": "1"
+    },
+    {
+     "name": "cellH",
+     "kind": "number",
+     "range": "1-3",
+     "default": "2"
+    },
+    {
+     "name": "table",
+     "kind": "text",
+     "range": "5x7 table",
+     "default": "AB_FONT_5X7"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "pirate-broadcast",
+     "where": "js/aesthetics/pirate-broadcast.js:38-57",
+     "variant": "double-height (1x2) word SVG; headline hook 207-214"
+    },
+    {
+     "key": "pixel-arcade",
+     "where": "js/aesthetics/pixel-arcade.js:197-200",
+     "variant": "initial as 2x2 pixels with 1px drop shade on the sprite"
+    }
+   ],
+   "expressibleAs": "svg-generator",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": false,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "glitch-band-offset",
+   "category": "ornament",
+   "name": "Glitch band offset",
+   "what": "Slice a mark into horizontal bands offset sideways, with 1px tear lines on a flat field.",
+   "params": [
+    {
+     "name": "bands",
+     "kind": "number",
+     "range": "2-5",
+     "default": "3"
+    },
+    {
+     "name": "offsets",
+     "kind": "text",
+     "range": "px list",
+     "default": "3,-2,5"
+    },
+    {
+     "name": "field",
+     "kind": "colour",
+     "range": "",
+     "default": "blue"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "pirate-broadcast",
+     "where": "js/aesthetics/pirate-broadcast.js:96-111",
+     "variant": "brand initial in 24x18 sixels torn into +3/-2/+5 bands, white tear lines"
+    }
+   ],
+   "expressibleAs": "svg-generator",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": false,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "hard-text-shadow",
+   "category": "type",
+   "name": "Hard text shadow",
+   "what": "Zero-blur offset text-shadow in a deep shade for headline and titles.",
+   "params": [
+    {
+     "name": "dx",
+     "kind": "number",
+     "range": "1-6px",
+     "default": "4"
+    },
+    {
+     "name": "colour",
+     "kind": "colour",
+     "range": "",
+     "default": "primary deep"
+    },
+    {
+     "name": "lightModeScale",
+     "kind": "number",
+     "range": "0-1",
+     "default": "0.5"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "pixel-arcade",
+     "where": "css/aesthetics/pixel-arcade.css:74-81",
+     "variant": "4px primary-deep on headline; card title 3px (137); light mode 2px/none 138"
+    },
+    {
+     "key": "radical-memphis",
+     "where": "css/aesthetics/radical-memphis.css:87",
+     "variant": "0.08em box-shadow sheet behind highlighted word (variant)"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "highlight-word-treatment",
+   "category": "type",
+   "name": "Highlight word treatment",
+   "what": "How the last/one headline word is marked: band, inverse block, hard shadow, or slab.",
+   "params": [
+    {
+     "name": "kind",
+     "kind": "enum",
+     "range": "band|inverse-block|hard-shadow|slab",
+     "default": "band"
+    },
+    {
+     "name": "fillRole",
+     "kind": "enum",
+     "range": "accent|primary|secondary",
+     "default": "accent"
+    },
+    {
+     "name": "bleed",
+     "kind": "bool",
+     "range": "",
+     "default": "false"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "raw-brutalist",
+     "where": "css/aesthetics/raw-brutalist.css:55-59",
+     "variant": "accent band with ::after extending 100cqw off the edge"
+    },
+    {
+     "key": "pirate-broadcast",
+     "where": "css/aesthetics/pirate-broadcast.css:73",
+     "variant": "inverse-video block in primary; js hook splits last word 207-214"
+    },
+    {
+     "key": "pixel-arcade",
+     "where": "css/aesthetics/pixel-arcade.css:78",
+     "variant": "accent-ink text + 4px accent-deep shadow"
+    },
+    {
+     "key": "radical-memphis",
+     "where": "css/aesthetics/radical-memphis.css:77-88",
+     "variant": "lead words on paper slab with squiggle edge, last on secondary slab; js hook 107-112"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": false,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "poster-bleed-headline",
+   "category": "type",
+   "name": "Poster bleed headline",
+   "what": "Oversized uppercase tight headline, enlarged display scale, bleeding off the board edge.",
+   "params": [
+    {
+     "name": "displayScale",
+     "kind": "number",
+     "range": "1-1.5",
+     "default": "1.35"
+    },
+    {
+     "name": "tracking",
+     "kind": "number",
+     "range": "-0.06-0em",
+     "default": "-0.045"
+    },
+    {
+     "name": "bleed",
+     "kind": "bool",
+     "range": "",
+     "default": "true"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "raw-brutalist",
+     "where": "css/aesthetics/raw-brutalist.css:50-52",
+     "variant": "900 upper 0.86 line height, margin-right negative; hero bottom padding 41"
+    },
+    {
+     "key": "radical-memphis",
+     "where": "css/aesthetics/radical-memphis.css:73-74",
+     "variant": "44-120px, -2.5deg slanted (variant, no bleed)"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": false,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "hidden-column-grid",
+   "category": "layout",
+   "name": "Column grid lines",
+   "what": "N-column grid drawn as faint vertical rules behind the hero.",
+   "params": [
+    {
+     "name": "columns",
+     "kind": "number",
+     "range": "6-16",
+     "default": "12"
+    },
+    {
+     "name": "alpha",
+     "kind": "number",
+     "range": "0.04-0.12",
+     "default": "0.06"
+    },
+    {
+     "name": "visible",
+     "kind": "bool",
+     "range": "",
+     "default": "true"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "raw-brutalist",
+     "where": "css/aesthetics/raw-brutalist.css:42-46",
+     "variant": "12 columns, 1px --ab-grid lines"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": false,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "diagonal-tilt",
+   "category": "layout",
+   "name": "Diagonal tilt",
+   "what": "Small per-element rotation for headline, chips, tags, wordmark and shapes.",
+   "params": [
+    {
+     "name": "degrees",
+     "kind": "number",
+     "range": "-12-12",
+     "default": "-2.5"
+    },
+    {
+     "name": "targets",
+     "kind": "text",
+     "range": "components",
+     "default": "headline,chip,wordmark,status"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "radical-memphis",
+     "where": "css/aesthetics/radical-memphis.css:73",
+     "variant": "headline -2.5deg; wordmark 48, number badge 62, chip tilts 121-132, fit tags 149, row status 246, discs 229-231"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [
+    "tag"
+   ],
+   "conflictsWith": []
+  },
+  {
+   "id": "hero-layout-mode",
+   "category": "structure",
+   "name": "Hero layout mode",
+   "what": "Which hero arrangement the board uses (split, centered grid, scene, poster).",
+   "params": [
+    {
+     "name": "hero",
+     "kind": "enum",
+     "range": "split|centered|scene|poster|stack",
+     "default": "split"
+    },
+    {
+     "name": "palette",
+     "kind": "enum",
+     "range": "swatches|strips",
+     "default": "swatches"
+    },
+    {
+     "name": "sections",
+     "kind": "enum",
+     "range": "two-col|one-col",
+     "default": "two-col"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "patchbay",
+     "where": "js/aesthetics/patchbay.js:119",
+     "variant": "split, swatches, two-col"
+    },
+    {
+     "key": "pirate-broadcast",
+     "where": "js/aesthetics/pirate-broadcast.js:148",
+     "variant": "centered + order override; css grid 46-57"
+    },
+    {
+     "key": "pixel-arcade",
+     "where": "js/aesthetics/pixel-arcade.js:45",
+     "variant": "scene; dialog box css 59-64"
+    },
+    {
+     "key": "radical-memphis",
+     "where": "js/aesthetics/radical-memphis.js:34",
+     "variant": "split, 1.9fr/1fr (css 68)"
+    },
+    {
+     "key": "raw-brutalist",
+     "where": "js/aesthetics/raw-brutalist.js:46",
+     "variant": "poster, strips palette"
+    }
+   ],
+   "expressibleAs": "tokens",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": false,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "character-cell-grid",
+   "category": "layout",
+   "name": "Character cell grid",
+   "what": "Hero text and art laid out on an N-column monospace cell grid where one cell sets the font size.",
+   "params": [
+    {
+     "name": "cols",
+     "kind": "number",
+     "range": "20-60",
+     "default": "40"
+    },
+    {
+     "name": "narrowCols",
+     "kind": "number",
+     "range": "16-30",
+     "default": "24"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "pirate-broadcast",
+     "where": "css/aesthetics/pirate-broadcast.css:18",
+     "variant": "--pb-cols 40 and --pb-u cell (46-50); 24 cols narrow 223"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": false,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "info-strip",
+   "category": "ornament",
+   "name": "Info strip",
+   "what": "Rows of key/value metadata ruled like a data sheet or a teletext header row.",
+   "params": [
+    {
+     "name": "rows",
+     "kind": "number",
+     "range": "2-6",
+     "default": "4"
+    },
+    {
+     "name": "keys",
+     "kind": "text",
+     "range": "labels",
+     "default": "SUBJECT,SYSTEM,SURFACE,FIG."
+    },
+    {
+     "name": "orientation",
+     "kind": "enum",
+     "range": "stacked|row",
+     "default": "stacked"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "raw-brutalist",
+     "where": "js/aesthetics/raw-brutalist.js:105-111",
+     "variant": "4-row dl spec index; css 68-77, deck 4-col strip 195"
+    },
+    {
+     "key": "pirate-broadcast",
+     "where": "css/aesthetics/pirate-broadcast.css:120-125",
+     "variant": "row 0 (page, service, date) and row 24 (Fastext keys) drawn in art js 233-238"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": false,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "titlebar-strip",
+   "category": "kit",
+   "name": "Title bar strip",
+   "what": "A filled strip carrying the component title or label on top of a card or dialog.",
+   "params": [
+    {
+     "name": "fill",
+     "kind": "colour",
+     "range": "",
+     "default": "cyan"
+    },
+    {
+     "name": "labelFormat",
+     "kind": "text",
+     "range": "",
+     "default": "P101  TITLE"
+    },
+    {
+     "name": "tab",
+     "kind": "bool",
+     "range": "",
+     "default": "false"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "pirate-broadcast",
+     "where": "css/aesthetics/pirate-broadcast.css:109-113",
+     "variant": "cyan strip full-bleed at top of card/panel/list; type-col role 89"
+    },
+    {
+     "key": "pixel-arcade",
+     "where": "css/aesthetics/pixel-arcade.css:69-73",
+     "variant": "primary tab sticking above the dialog (kicker)"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [
+    "card"
+   ],
+   "conflictsWith": []
+  },
+  {
+   "id": "status-dot-title-row",
+   "category": "kit",
+   "name": "Status dot title row",
+   "what": "A small coloured dot/glyph before a title or status line.",
+   "params": [
+    {
+     "name": "glyph",
+     "kind": "enum",
+     "range": "dot|square|arrow",
+     "default": "dot"
+    },
+    {
+     "name": "size",
+     "kind": "number",
+     "range": "6-10px",
+     "default": "8"
+    },
+    {
+     "name": "colourRole",
+     "kind": "enum",
+     "range": "primary|cycle|accent",
+     "default": "primary"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "patchbay",
+     "where": "css/aesthetics/patchbay.css:117-124",
+     "variant": "8px dot before card title in port colour (cycled 123-124); row number dot 185"
+    },
+    {
+     "key": "pirate-broadcast",
+     "where": "css/aesthetics/pirate-broadcast.css:174-175",
+     "variant": "square glyph before status, green when on"
+    },
+    {
+     "key": "pixel-arcade",
+     "where": "css/aesthetics/pixel-arcade.css:166",
+     "variant": "'▸ ' accent prefix on status"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [
+    "card"
+   ],
+   "conflictsWith": []
+  },
+  {
+   "id": "tag-chip-shape",
+   "category": "kit",
+   "name": "Tag chip shape",
+   "what": "The badge/fit/status chip shape: corner treatment, fill role and font.",
+   "params": [
+    {
+     "name": "corners",
+     "kind": "text",
+     "range": "tl tr br bl",
+     "default": "7px 7px 7px 2px"
+    },
+    {
+     "name": "fill",
+     "kind": "enum",
+     "range": "primary|secondary|accent|grey|ink",
+     "default": "secondary"
+    },
+    {
+     "name": "mono",
+     "kind": "bool",
+     "range": "",
+     "default": "true"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "patchbay",
+     "where": "css/aesthetics/patchbay.css:107-111",
+     "variant": "squared bottom-left name tag; kit badges 302-308; row status 189-191"
+    },
+    {
+     "key": "pixel-arcade",
+     "where": "css/aesthetics/pixel-arcade.css:110-112",
+     "variant": "notched clip-path chip, fit/status 187"
+    },
+    {
+     "key": "radical-memphis",
+     "where": "css/aesthetics/radical-memphis.css:149-152",
+     "variant": "square tilted -3deg chip in tint fills; row status 246"
+    },
+    {
+     "key": "raw-brutalist",
+     "where": "css/aesthetics/raw-brutalist.css:167-170",
+     "variant": "stamped 1.5px ink border, match = ink fill"
+    },
+    {
+     "key": "pirate-broadcast",
+     "where": "css/aesthetics/pirate-broadcast.css:95-97",
+     "variant": "square green/ink/red chip in teletext colours"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [
+    "tag"
+   ],
+   "conflictsWith": []
+  },
+  {
+   "id": "nth-colour-cycle",
+   "category": "colour",
+   "name": "Nth colour cycle",
+   "what": "Rows, cards and avatars cycle fills through primary / secondary / accent by position.",
+   "params": [
+    {
+     "name": "cycle",
+     "kind": "number",
+     "range": "2-3",
+     "default": "3"
+    },
+    {
+     "name": "roles",
+     "kind": "text",
+     "range": "",
+     "default": "primary,secondary,accent"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "patchbay",
+     "where": "css/aesthetics/patchbay.css:122-124",
+     "variant": "card dots, row dots/status 186-191, avatars 316-318"
+    },
+    {
+     "key": "pixel-arcade",
+     "where": "css/aesthetics/pixel-arcade.css:183-185",
+     "variant": "row avatars primary/secondary/accent"
+    },
+    {
+     "key": "pirate-broadcast",
+     "where": "css/aesthetics/pirate-broadcast.css:198-201",
+     "variant": "row colour cyan/white/yellow (fixed palette)"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [
+    "list",
+    "card"
+   ],
+   "conflictsWith": []
+  },
+  {
+   "id": "mono-plus-accent",
+   "category": "colour",
+   "name": "Mono plus accent",
+   "what": "The main action and large areas are neutral ink; brand hues appear only in small signals.",
+   "params": [
+    {
+     "name": "mainActionFill",
+     "kind": "enum",
+     "range": "ink|primary",
+     "default": "ink"
+    },
+    {
+     "name": "accentCarriers",
+     "kind": "text",
+     "range": "components",
+     "default": "dots,tags,ports"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "patchbay",
+     "where": "js/aesthetics/patchbay.js:96",
+     "variant": "ctaFill ink: white/ink pill, brand in ports and tags; css 140-142"
+    },
+    {
+     "key": "raw-brutalist",
+     "where": "js/aesthetics/raw-brutalist.js:86-88",
+     "variant": "white page, colour only where a role says so; spent in css 87-127"
+    }
+   ],
+   "expressibleAs": "tokens",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "main-action-shape",
+   "category": "kit",
+   "name": "Main action shape",
+   "what": "The single main button: fill, radius, border/shadow, label decoration and arrow.",
+   "params": [
+    {
+     "name": "fill",
+     "kind": "enum",
+     "range": "primary|ink|fixed-colour",
+     "default": "primary"
+    },
+    {
+     "name": "radius",
+     "kind": "text",
+     "range": "",
+     "default": "0"
+    },
+    {
+     "name": "labelPrefix",
+     "kind": "text",
+     "range": "",
+     "default": "[ or > or none"
+    },
+    {
+     "name": "shadow",
+     "kind": "enum",
+     "range": "none|offset|underside",
+     "default": "none"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "patchbay",
+     "where": "css/aesthetics/patchbay.css:140-146",
+     "variant": "ink pill, arrow in a circle; kit 250-254"
+    },
+    {
+     "key": "pirate-broadcast",
+     "where": "css/aesthetics/pirate-broadcast.css:150-156",
+     "variant": "green block, '> ' prefix, block arrow"
+    },
+    {
+     "key": "pixel-arcade",
+     "where": "css/aesthetics/pixel-arcade.css:141-151",
+     "variant": "primary block, stepped border, 8px underside, ▶ arrow"
+    },
+    {
+     "key": "radical-memphis",
+     "where": "css/aesthetics/radical-memphis.css:190-212",
+     "variant": "primary slab with semicircle end, checker arrow tab, offset sheet pseudo"
+    },
+    {
+     "key": "raw-brutalist",
+     "where": "css/aesthetics/raw-brutalist.css:95-102",
+     "variant": "primary block, 2px ink border, [LABEL]"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [
+    "button"
+   ],
+   "conflictsWith": []
+  },
+  {
+   "id": "invert-on-hover",
+   "category": "kit",
+   "name": "Invert on hover",
+   "what": "Hover swaps fill and text (ink/canvas); pressed flips back.",
+   "params": [
+    {
+     "name": "hoverFill",
+     "kind": "enum",
+     "range": "ink|canvas|green|white",
+     "default": "ink"
+    },
+    {
+     "name": "pressedFlip",
+     "kind": "bool",
+     "range": "",
+     "default": "true"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "raw-brutalist",
+     "where": "css/aesthetics/raw-brutalist.css:104-105",
+     "variant": "cta, seg, link: ink fill on hover, flips on press; 91-92, 219"
+    },
+    {
+     "key": "pirate-broadcast",
+     "where": "css/aesthetics/pirate-broadcast.css:103-104",
+     "variant": "type-apply hover green; cta hover white, active black/green 154-155"
+    },
+    {
+     "key": "patchbay",
+     "where": "css/aesthetics/patchbay.css:144-145",
+     "variant": "stepwise ink mix on hover/press (variant, no flip)"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [
+    "button",
+    "segmented"
+   ],
+   "conflictsWith": []
+  },
+  {
+   "id": "press-travel",
+   "category": "motion",
+   "name": "Press travel",
+   "what": "Hover lifts and press moves/collapses the control by a fixed distance or scale.",
+   "params": [
+    {
+     "name": "axis",
+     "kind": "enum",
+     "range": "y|xy|scale",
+     "default": "y"
+    },
+    {
+     "name": "hoverLift",
+     "kind": "number",
+     "range": "0-6px",
+     "default": "2"
+    },
+    {
+     "name": "pressDistance",
+     "kind": "number",
+     "range": "1-6px",
+     "default": "4"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "pixel-arcade",
+     "where": "css/aesthetics/pixel-arcade.css:119-120",
+     "variant": "hover -2px, press +4px and underside collapses; cta 150-151, states 169-170"
+    },
+    {
+     "key": "radical-memphis",
+     "where": "css/aesthetics/radical-memphis.css:209-212",
+     "variant": "hover lifts -3px off sheet, press +3px onto it"
+    },
+    {
+     "key": "raw-brutalist",
+     "where": "css/aesthetics/raw-brutalist.css:105",
+     "variant": "press translate(1px,1px)"
+    },
+    {
+     "key": "patchbay",
+     "where": "css/aesthetics/patchbay.css:145",
+     "variant": "press scale(0.98)"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [
+    "button"
+   ],
+   "conflictsWith": []
+  },
+  {
+   "id": "state-motion-curve",
+   "category": "motion",
+   "name": "State motion curve",
+   "what": "Transition timing for state changes: spring overshoot, steps, instant or short ease.",
+   "params": [
+    {
+     "name": "curve",
+     "kind": "enum",
+     "range": "spring|steps|instant|ease-out",
+     "default": "instant"
+    },
+    {
+     "name": "duration",
+     "kind": "number",
+     "range": "0-300ms",
+     "default": "0"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "radical-memphis",
+     "where": "css/aesthetics/radical-memphis.css:12",
+     "variant": "cubic-bezier(.34,1.56,.64,1) 220ms; 156, 180-182, 222"
+    },
+    {
+     "key": "pixel-arcade",
+     "where": "css/aesthetics/pixel-arcade.css:146",
+     "variant": "transition none; two-frame steps blink 66-68"
+    },
+    {
+     "key": "patchbay",
+     "where": "css/aesthetics/patchbay.css:133",
+     "variant": "0.12s ease-out; reduced-motion off 214"
+    },
+    {
+     "key": "pirate-broadcast",
+     "where": "css/aesthetics/pirate-broadcast.css:167-168",
+     "variant": "transition none on switch"
+    },
+    {
+     "key": "raw-brutalist",
+     "where": "css/aesthetics/raw-brutalist.css:98",
+     "variant": "transition none; thumb 0.08s 119"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [
+    "button",
+    "switch"
+   ],
+   "conflictsWith": []
+  },
+  {
+   "id": "blinking-cursor-caret",
+   "category": "motion",
+   "name": "Blinking cursor / block caret",
+   "what": "Blinking glyph or block caret as a typed-terminal cue.",
+   "params": [
+    {
+     "name": "glyph",
+     "kind": "text",
+     "range": "",
+     "default": "_ or ▼"
+    },
+    {
+     "name": "steps",
+     "kind": "number",
+     "range": "1-2",
+     "default": "1"
+    },
+    {
+     "name": "caretShape",
+     "kind": "enum",
+     "range": "block|bar",
+     "default": "block"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "raw-brutalist",
+     "where": "css/aesthetics/raw-brutalist.css:226-227",
+     "variant": "'_' after hero kicker; caret-shape block field 111"
+    },
+    {
+     "key": "pixel-arcade",
+     "where": "css/aesthetics/pixel-arcade.css:66-68",
+     "variant": "▼ blinking in dialog, dot blink 194"
+    },
+    {
+     "key": "pirate-broadcast",
+     "where": "css/aesthetics/pirate-broadcast.css:163",
+     "variant": "green block caret in field"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [
+    "field"
+   ],
+   "conflictsWith": []
+  },
+  {
+   "id": "field-edge-style",
+   "category": "kit",
+   "name": "Field edge style",
+   "what": "Text field look: border, inset ring, underline bar or stepped shadow, with focus change.",
+   "params": [
+    {
+     "name": "edge",
+     "kind": "enum",
+     "range": "box|inset-ring|underline|stepped",
+     "default": "box"
+    },
+    {
+     "name": "focus",
+     "kind": "enum",
+     "range": "ring|colour|outline",
+     "default": "outline"
+    },
+    {
+     "name": "upper",
+     "kind": "bool",
+     "range": "",
+     "default": "false"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "patchbay",
+     "where": "css/aesthetics/patchbay.css:162-169",
+     "variant": "inset bg, 1px 3:1 edge, focus primary border+ring"
+    },
+    {
+     "key": "pirate-broadcast",
+     "where": "css/aesthetics/pirate-broadcast.css:161-165",
+     "variant": "black, 2px inset dim ring, upper, cyan focus"
+    },
+    {
+     "key": "pixel-arcade",
+     "where": "css/aesthetics/pixel-arcade.css:155-159",
+     "variant": "stepped dim + inset shade, primary stack on focus"
+    },
+    {
+     "key": "radical-memphis",
+     "where": "css/aesthetics/radical-memphis.css:216-219",
+     "variant": "tinted bg, 6px accent underline, primary on focus"
+    },
+    {
+     "key": "raw-brutalist",
+     "where": "css/aesthetics/raw-brutalist.css:109-113",
+     "variant": "2px ink box, 3px outline focus"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [
+    "field"
+   ],
+   "conflictsWith": []
+  },
+  {
+   "id": "switch-style",
+   "category": "kit",
+   "name": "Switch style",
+   "what": "Switch track/thumb shape with optional ON/OFF text.",
+   "params": [
+    {
+     "name": "track",
+     "kind": "enum",
+     "range": "pill|square|stepped|laminate",
+     "default": "pill"
+    },
+    {
+     "name": "label",
+     "kind": "enum",
+     "range": "none|OFF-ON|[ OFF ]",
+     "default": "none"
+    },
+    {
+     "name": "onFill",
+     "kind": "enum",
+     "range": "primary|green|dots",
+     "default": "primary"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "patchbay",
+     "where": "css/aesthetics/patchbay.css:171-175",
+     "variant": "46x28 pill, primary on"
+    },
+    {
+     "key": "pirate-broadcast",
+     "where": "css/aesthetics/pirate-broadcast.css:167-172",
+     "variant": "70x28 square, [ OFF ]/[ ON ] green"
+    },
+    {
+     "key": "pixel-arcade",
+     "where": "css/aesthetics/pixel-arcade.css:161-164",
+     "variant": "56x28 stepped, primary on"
+    },
+    {
+     "key": "radical-memphis",
+     "where": "css/aesthetics/radical-memphis.css:221-224",
+     "variant": "62x32 pill, zig-zag to dots laminate"
+    },
+    {
+     "key": "raw-brutalist",
+     "where": "css/aesthetics/raw-brutalist.css:115-127",
+     "variant": "76x34 square, OFF/ON text"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [
+    "switch"
+   ],
+   "conflictsWith": []
+  },
+  {
+   "id": "segmented-control-style",
+   "category": "kit",
+   "name": "Segmented control style",
+   "what": "Tabs/segments: container shape, selected fill, joined or separated.",
+   "params": [
+    {
+     "name": "container",
+     "kind": "enum",
+     "range": "pill|joined|separate|stepped",
+     "default": "pill"
+    },
+    {
+     "name": "selectedFill",
+     "kind": "enum",
+     "range": "grey|ink|primary|white",
+     "default": "grey"
+    },
+    {
+     "name": "gap",
+     "kind": "number",
+     "range": "0-12px",
+     "default": "2"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "patchbay",
+     "where": "css/aesthetics/patchbay.css:128-137",
+     "variant": "pill toolbar, grey selected with 3:1 ring"
+    },
+    {
+     "key": "pirate-broadcast",
+     "where": "css/aesthetics/pirate-broadcast.css:137-147",
+     "variant": "separate channel keys, white selected, 01/02/03 prefixes"
+    },
+    {
+     "key": "pixel-arcade",
+     "where": "css/aesthetics/pixel-arcade.css:130-136",
+     "variant": "separate stepped tabs, primary selected"
+    },
+    {
+     "key": "radical-memphis",
+     "where": "css/aesthetics/radical-memphis.css:177-187",
+     "variant": "separate slabs with primitive icons, primary scaled+tilted selected"
+    },
+    {
+     "key": "raw-brutalist",
+     "where": "css/aesthetics/raw-brutalist.css:88-92",
+     "variant": "joined boxes, ink fill selected"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [
+    "segmented",
+    "tabs"
+   ],
+   "conflictsWith": []
+  },
+  {
+   "id": "progress-bar-style",
+   "category": "kit",
+   "name": "Progress bar style",
+   "what": "Progress track and fill drawn as blocks, beads, ticks, boxed bar or pill.",
+   "params": [
+    {
+     "name": "shape",
+     "kind": "enum",
+     "range": "blocks|beads|ticks|boxed|pill",
+     "default": "pill"
+    },
+    {
+     "name": "height",
+     "kind": "number",
+     "range": "6-14px",
+     "default": "8"
+    },
+    {
+     "name": "fill",
+     "kind": "enum",
+     "range": "primary|ink|row-colour",
+     "default": "primary"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "patchbay",
+     "where": "css/aesthetics/patchbay.css:193-194",
+     "variant": "8px pill, 3:1 edge, primary fill; kit 323-324"
+    },
+    {
+     "key": "pirate-broadcast",
+     "where": "css/aesthetics/pirate-broadcast.css:208-209",
+     "variant": "tick scale and striped fill in row colour"
+    },
+    {
+     "key": "pixel-arcade",
+     "where": "css/aesthetics/pixel-arcade.css:188-189",
+     "variant": "8px blocks with 4px gap via mask"
+    },
+    {
+     "key": "radical-memphis",
+     "where": "css/aesthetics/radical-memphis.css:247-249",
+     "variant": "12px bead row, primary beads"
+    },
+    {
+     "key": "raw-brutalist",
+     "where": "css/aesthetics/raw-brutalist.css:152-153",
+     "variant": "2px boxed bar, ink fill"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [
+    "progress"
+   ],
+   "conflictsWith": []
+  },
+  {
+   "id": "focus-ring-style",
+   "category": "kit",
+   "name": "Focus ring style",
+   "what": "Outline colour, width and offset for keyboard focus.",
+   "params": [
+    {
+     "name": "colour",
+     "kind": "colour",
+     "range": "",
+     "default": "primary"
+    },
+    {
+     "name": "width",
+     "kind": "number",
+     "range": "2-4px",
+     "default": "2"
+    },
+    {
+     "name": "offset",
+     "kind": "number",
+     "range": "2-4px",
+     "default": "2"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "patchbay",
+     "where": "css/aesthetics/patchbay.css:137",
+     "variant": "2px port-colour outline; 146, 158, 292"
+    },
+    {
+     "key": "pirate-broadcast",
+     "where": "css/aesthetics/pirate-broadcast.css:217-219",
+     "variant": "2px cyan outline"
+    },
+    {
+     "key": "pixel-arcade",
+     "where": "css/aesthetics/pixel-arcade.css:196-198",
+     "variant": "4px accent outline offset 4"
+    },
+    {
+     "key": "raw-brutalist",
+     "where": "css/aesthetics/raw-brutalist.css:177-179",
+     "variant": "3px ink outline offset 3"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [
+    "button",
+    "field",
+    "switch"
+   ],
+   "conflictsWith": []
+  },
+  {
+   "id": "swatch-chip-style",
+   "category": "kit",
+   "name": "Swatch chip style",
+   "what": "Palette swatch shape and labelling on the board (board only).",
+   "params": [
+    {
+     "name": "shape",
+     "kind": "enum",
+     "range": "strip|slot|tilted|rounded|square",
+     "default": "rounded"
+    },
+    {
+     "name": "shadow",
+     "kind": "enum",
+     "range": "none|sheet|ring",
+     "default": "none"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "raw-brutalist",
+     "where": "css/aesthetics/raw-brutalist.css:80-84",
+     "variant": "full-width strips, 2px rules"
+    },
+    {
+     "key": "pixel-arcade",
+     "where": "css/aesthetics/pixel-arcade.css:94-101",
+     "variant": "inventory slots with stepped dim border"
+    },
+    {
+     "key": "radical-memphis",
+     "where": "css/aesthetics/radical-memphis.css:119-138",
+     "variant": "92x64 tilted chips with squiggle bottom, sheet behind"
+    },
+    {
+     "key": "patchbay",
+     "where": "css/aesthetics/patchbay.css:99-101",
+     "variant": "10px radius chips, inset ring"
+    },
+    {
+     "key": "pirate-broadcast",
+     "where": "css/aesthetics/pirate-broadcast.css:76-82",
+     "variant": "square chips, P20n role numbers"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": false,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "clip-path-shapes",
+   "category": "ornament",
+   "name": "Clip-path shapes",
+   "what": "Triangles, notched corners and slanted tabs made with clip-path.",
+   "params": [
+    {
+     "name": "shape",
+     "kind": "enum",
+     "range": "triangle|notch|slant|trapezoid",
+     "default": "notch"
+    },
+    {
+     "name": "size",
+     "kind": "number",
+     "range": "4-16px",
+     "default": "4"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "radical-memphis",
+     "where": "css/aesthetics/radical-memphis.css:52",
+     "variant": "triangle bullet on tag; kicker slant 70; seg icons 183-184; shapes 100-103"
+    },
+    {
+     "key": "pixel-arcade",
+     "where": "css/aesthetics/pixel-arcade.css:17",
+     "variant": "--px-notch on mark 35, fit 110, avatar 183, status 187"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [
+    "tag"
+   ],
+   "conflictsWith": []
+  },
+  {
+   "id": "themed-microcopy",
+   "category": "voice",
+   "name": "Themed microcopy",
+   "what": "Editable specimen copy: state names, motto, kicker and art labels in the style's own vocabulary.",
+   "params": [
+    {
+     "name": "copyKeys",
+     "kind": "text",
+     "range": "key list",
+     "default": "motto,kicker,state0-2"
+    },
+    {
+     "name": "tone",
+     "kind": "text",
+     "range": "",
+     "default": "themed"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "patchbay",
+     "where": "js/aesthetics/patchbay.js:99-118",
+     "variant": "graph labels, tags, readout"
+    },
+    {
+     "key": "pirate-broadcast",
+     "where": "js/aesthetics/pirate-broadcast.js:125-146",
+     "variant": "Carrier/Tuned/Intrusion, teletext page copy"
+    },
+    {
+     "key": "pixel-arcade",
+     "where": "js/aesthetics/pixel-arcade.js:37-44",
+     "variant": "Idle/Hover/Press, SCORE"
+    },
+    {
+     "key": "radical-memphis",
+     "where": "js/aesthetics/radical-memphis.js:24-33",
+     "variant": "showroom caption and plaque"
+    },
+    {
+     "key": "raw-brutalist",
+     "where": "js/aesthetics/raw-brutalist.js:31-45",
+     "variant": "spec sheet row labels and values"
+    }
+   ],
+   "expressibleAs": "tokens",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "named-states",
+   "category": "kit",
+   "name": "Named states",
+   "what": "Three named demo states of the main control, with a themed label set and kind (button or swatch).",
+   "params": [
+    {
+     "name": "names",
+     "kind": "text",
+     "range": "3 labels",
+     "default": "Rest,Hover,Pressed"
+    },
+    {
+     "name": "kind",
+     "kind": "enum",
+     "range": "button|swatch",
+     "default": "button"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "patchbay",
+     "where": "js/aesthetics/patchbay.js:97",
+     "variant": "Rest/Hover/Pressed; css 150-151"
+    },
+    {
+     "key": "pirate-broadcast",
+     "where": "js/aesthetics/pirate-broadcast.js:123",
+     "variant": "Carrier/Tuned/Intrusion; signal-bar icons css 176-193"
+    },
+    {
+     "key": "pixel-arcade",
+     "where": "js/aesthetics/pixel-arcade.js:35",
+     "variant": "Idle/Hover/Press; css 167-171"
+    },
+    {
+     "key": "radical-memphis",
+     "where": "js/aesthetics/radical-memphis.js:22",
+     "variant": "Plain/Patterned/Stacked, swatch kind; discs css 228-233"
+    },
+    {
+     "key": "raw-brutalist",
+     "where": "js/aesthetics/raw-brutalist.js:29",
+     "variant": "Rest/Hover/Pressed; css 129-133"
+    }
+   ],
+   "expressibleAs": "tokens",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [
+    "button"
+   ],
+   "conflictsWith": []
+  },
+  {
+   "id": "default-link-style",
+   "category": "type",
+   "name": "Default link style",
+   "what": "Browser-default blue underlined links and bracketed link-like buttons.",
+   "params": [
+    {
+     "name": "colour",
+     "kind": "colour",
+     "range": "",
+     "default": "#0000EE"
+    },
+    {
+     "name": "bracket",
+     "kind": "bool",
+     "range": "",
+     "default": "true"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "raw-brutalist",
+     "where": "css/aesthetics/raw-brutalist.css:211-224",
+     "variant": "sub-lead, type-apply and influences rendered as links; --ab-link js 98"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": false,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [
+    "button"
+   ],
+   "conflictsWith": []
+  },
+  {
+   "id": "node-graph-diagram",
+   "category": "ornament",
+   "name": "Node graph diagram",
+   "what": "Procedural diagram of modules, bezier cables and ports in brand colours with name tags and toolbars.",
+   "params": [
+    {
+     "name": "modules",
+     "kind": "number",
+     "range": "3-6",
+     "default": "4"
+    },
+    {
+     "name": "cableColours",
+     "kind": "text",
+     "range": "roles",
+     "default": "primary,secondary,accent"
+    },
+    {
+     "name": "tags",
+     "kind": "number",
+     "range": "0-3",
+     "default": "2"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "patchbay",
+     "where": "js/aesthetics/patchbay.js:61-67",
+     "variant": "pbWire bezier, pbNameTag; art composition 202-267"
+    }
+   ],
+   "expressibleAs": "svg-generator",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": false,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "dot-grid-glow-backdrop",
+   "category": "ornament",
+   "name": "Dot grid and glow backdrop",
+   "what": "Faint dot-grid pattern with a radial brand glow behind the focal module.",
+   "params": [
+    {
+     "name": "spacing",
+     "kind": "number",
+     "range": "8-24px",
+     "default": "16"
+    },
+    {
+     "name": "glowRole",
+     "kind": "enum",
+     "range": "primary|accent",
+     "default": "primary"
+    },
+    {
+     "name": "glowOpacity",
+     "kind": "number",
+     "range": "0-1",
+     "default": "0.62"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "patchbay",
+     "where": "js/aesthetics/patchbay.js:239-244",
+     "variant": "pattern + radialGradient; css 62-64"
+    }
+   ],
+   "expressibleAs": "svg-generator",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": false,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "pixel-scene-landscape",
+   "category": "ornament",
+   "name": "Pixel scene landscape",
+   "what": "Rects-only procedural pixel landscape (dithered sky bands, hills, ground, collectibles, sprite of the initial) from the palette.",
+   "params": [
+    {
+     "name": "skyBands",
+     "kind": "number",
+     "range": "3-6",
+     "default": "5"
+    },
+    {
+     "name": "grid",
+     "kind": "number",
+     "range": "1-4",
+     "default": "1"
+    },
+    {
+     "name": "spriteInitial",
+     "kind": "text",
+     "range": "",
+     "default": "brand initial"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "pixel-arcade",
+     "where": "js/aesthetics/pixel-arcade.js:112-203",
+     "variant": "168x80 grid; hearts/HUD 205-214"
+    }
+   ],
+   "expressibleAs": "svg-generator",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": false,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "stacked-primitives-art",
+   "category": "ornament",
+   "name": "Stacked primitives art",
+   "what": "A showroom totem of stacked shapes (circle, bar, triangle, semi, trapezoid) each in a laminate/flat fill with an offset sheet behind.",
+   "params": [
+    {
+     "name": "shapes",
+     "kind": "text",
+     "range": "list x,y,w,h,rot,fill",
+     "default": "10 shapes"
+    },
+    {
+     "name": "sheetOffset",
+     "kind": "number",
+     "range": "0-4cqw",
+     "default": "1.8"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "radical-memphis",
+     "where": "js/aesthetics/radical-memphis.js:118-137",
+     "variant": "percent-positioned HTML shapes; css 94-115"
+    }
+   ],
+   "expressibleAs": "svg-generator",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": false,
+   "kitScope": [],
+   "conflictsWith": []
+  }
+ ],
+ "notes": "Schema gaps: (1) no field for hook-based JS (headline(), panels, deck.product) so these go in remainder; (2) moves cannot declare dependencies, e.g. hard-offset-shadow consumes second-hue-offset-sheet and contrast-floor-push serves many colour moves; (3) per-mode (light/dark) behaviour is only expressible in the variant text; (4) coverage counts tokens/css-recipe/svg-generator moves only. Read limits: patchbay.css lines 389-595, pirate-broadcast.css 261-758 (kit part seen via grep only), pixel-arcade.css 201-576, radical-memphis.css 251-704, raw-brutalist.css 231-657 were not read in full; kit evidence for them comes from grep hits and the file headers. Patchbay.css 249-388 was read."
+}

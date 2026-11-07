@@ -1,0 +1,3163 @@
+{
+ "group": "B",
+ "styles": [
+  {
+   "key": "blob-tracking",
+   "name": "Blob Tracking",
+   "coreTrick": "Every UI element is dressed as machine-vision output (1px boxes with class/confidence tabs, corner ticks, linked centroids) over a dithered footage plate whose boxes are derived from the same figures that were drawn.",
+   "colourRecipe": "Fixed graphite ground in dark mode (client canvas kept in light); the primary is lifted to 3.2:1 on the plate and used for exactly one locked target; the secondary is only a 12% wash in the plate; a muted that fails 4.6:1 is shaded toward ink.",
+   "moves": [
+    "fixed-ground-canvas",
+    "contrast-lift-colour",
+    "alpha-ramp-of-role",
+    "duotone-ink",
+    "single-use-primary",
+    "hairline-rule",
+    "grain-overlay",
+    "ordered-dither-field",
+    "corner-brackets",
+    "callout-label-tab",
+    "detected-region-frame",
+    "border-legend-label",
+    "registration-marks",
+    "catalogue-number",
+    "word-detection-box",
+    "tight-display-tracking",
+    "button-style",
+    "input-field-style",
+    "switch-control-style",
+    "segmented-control-style",
+    "progress-track",
+    "named-states",
+    "hover-press-response",
+    "themed-microcopy-pack",
+    "corner-radius",
+    "caps-mono-labels"
+   ],
+   "remainder": [
+    {
+     "what": "Footage subject: 13 figures on two paths, shadows, doorway, as a luminance field",
+     "where": "js/aesthetics/blob-tracking.js:38-101",
+     "whyCode": "hand-modelled scene geometry, not parameterisable by a palette"
+    },
+    {
+     "what": "Detection boxes derived from the subjects (person, group, shadow, zones) and tab de-collision with flip-under / ID-only fallback",
+     "where": "js/aesthetics/blob-tracking.js:126-192",
+     "whyCode": "layout solver tied to the scene and to the 884px board assumption"
+    },
+    {
+     "what": "Centroid links (k=2 nearest plus long dashed)",
+     "where": "js/aesthetics/blob-tracking.js:194-207",
+     "whyCode": "geometry derived from detected centroids"
+    },
+    {
+     "what": "Per-box footage processing (revealed groups, inverted persons, primary-tinted lock) and X/Y/A readout",
+     "where": "js/aesthetics/blob-tracking.js:217-276",
+     "whyCode": "bespoke SVG compositing logic"
+    },
+    {
+     "what": "Deck cover band / closing strip as a crop of the plate via data URI with caching",
+     "where": "js/aesthetics/blob-tracking.js:277-287",
+     "whyCode": "integration with deck pattern hooks"
+    }
+   ],
+   "moveCoverage": 40,
+   "notes": "Core identity is the scene plus the box solver, both code. The board/kit vocabulary (tabs, frames, ticks, counters) is reusable CSS and would transfer to any other tracked-subject art. Light mode keeps the plate dark, so the kit is two-surface."
+  },
+  {
+   "key": "blueprint",
+   "name": "Blueprint",
+   "coreTrick": "A full engineering drawing sheet (generated extruded initial in four views, with hatching, dimension lines, notes and a revision table) on a fixed Prussian-blue grid, with nothing filled: line weights and 45-degree hatch do all the work.",
+   "colourRecipe": "The client canvas is ignored (fixed hsl 218/62/24, nudged at most 8 degrees toward a blue brand hue; white paper in light mode); ink is all line work; the primary appears once as the revision cloud, accent as one dimension line, secondary as 6px status markers, each lifted to 3:1 on the field.",
+   "moves": [
+    "fixed-ground-canvas",
+    "contrast-lift-colour",
+    "alpha-ramp-of-role",
+    "single-use-primary",
+    "hairline-rule",
+    "corner-radius",
+    "line-grid-field",
+    "border-legend-label",
+    "registration-marks",
+    "catalogue-number",
+    "revision-cloud",
+    "engineering-line-types",
+    "hatched-selected-state",
+    "dimension-line-underline",
+    "title-block-layout",
+    "info-strip",
+    "caps-mono-labels",
+    "button-style",
+    "input-field-style",
+    "switch-control-style",
+    "segmented-control-style",
+    "progress-track",
+    "named-states",
+    "hover-press-response",
+    "themed-microcopy-pack"
+   ],
+   "remainder": [
+    {
+     "what": "Extruded block-letter drawing: boundary-edge merge of the initial glyph, projection to front, section, oblique and detail views, dimension chains and callouts",
+     "where": "js/aesthetics/blueprint.js:36-152",
+     "whyCode": "real geometry generated from a 5x7 glyph bitmap; no palette-level parameter describes it"
+    },
+    {
+     "what": "Patent-sheet light mode: different figure labels, numerals with leaders, no zone marks, no revision table",
+     "where": "js/aesthetics/blueprint.js:157-195; css/aesthetics/blueprint.css:86-93",
+     "whyCode": "a second structural variant, not a colour swap"
+    },
+    {
+     "what": "Brand-hue nudge of the Prussian blue limited to a window around hue 218",
+     "where": "js/aesthetics/blueprint.js:315-320",
+     "whyCode": "small hue-window logic with min/max clamps"
+    },
+    {
+     "what": "Do / Don't pair art (line-type set versus filled, rounded, shaded part)",
+     "where": "js/aesthetics/blueprint.js:16-32",
+     "whyCode": "hand-drawn SVG comparison"
+    },
+    {
+     "what": "Project-name and date strings injected into CSS content via tokens",
+     "where": "js/aesthetics/blueprint.js:331-348",
+     "whyCode": "text sanitising with unicode classes"
+    }
+   ],
+   "moveCoverage": 45,
+   "notes": "Kit and board chrome is highly regular (lines, hatch, legends) and moves cleanly; the drawing is the hero and is entirely code. Most moves are used by blueprint only, so reuse across styles is low."
+  },
+  {
+   "key": "clay",
+   "name": "Clay",
+   "coreTrick": "Every object carries the same three-layer finish (coloured soft drop shadow, dark inner underside, light inner top) built from a tonal ramp of one pastel-lifted primary, sitting on near-white cards with a primary-tinted shadow.",
+   "colourRecipe": "Canvas leans 8% toward the secondary; the primary is lifted to a pastel (L>=70, S<=66) for objects with hi/lo steps and darkened shadow colours, while the single capsule CTA keeps the full primary for AA; secondary is chips and one torus, accent only the highlight pill.",
+   "moves": [
+    "tinted-neutral-canvas",
+    "pastel-lift-primary",
+    "tonal-ramp",
+    "single-use-primary",
+    "soft-raised-relief",
+    "recessed-field",
+    "glossy-single-action",
+    "gloss-radial-highlight",
+    "ambient-blobs",
+    "puffy-pill-highlight",
+    "clay-primitive-solids",
+    "tight-display-tracking",
+    "button-style",
+    "input-field-style",
+    "switch-control-style",
+    "segmented-control-style",
+    "progress-track",
+    "named-states",
+    "hover-press-response",
+    "themed-microcopy-pack",
+    "corner-radius"
+   ],
+   "remainder": [
+    {
+     "what": "Hand-composed art scene: app-icon tile with embossed initial, sphere with a face, torus, capsule, beads, contact shadows",
+     "where": "js/aesthetics/clay.js:99-111; css/aesthetics/clay.css:74-131",
+     "whyCode": "composition and placement are authored per object; only the object finish is reusable"
+    },
+    {
+     "what": "Embossed initial on the tile via text-shadow pair and cqw-based sizing",
+     "where": "css/aesthetics/clay.css:82-91",
+     "whyCode": "tuned micro-typography on a single object"
+    },
+    {
+     "what": "Switch thumb overshoot and per-row avatar ramp assignment (nth-child)",
+     "where": "css/aesthetics/clay.css:188-195, 218-220",
+     "whyCode": "positional per-row logic"
+    }
+   ],
+   "moveCoverage": 70,
+   "notes": "Highest coverage of the five: almost everything is shadow and gradient layering from one recipe. Style depends on the framework offering a generic \"finish\" move with param shadows. Tone does not survive a dark canvas without the different --ab-clay-hi/lo values the tokens switch."
+  },
+  {
+   "key": "corporate-vandalism",
+   "name": "Corporate Vandalism",
+   "coreTrick": "A spotless square procurement shell in client colours with exactly one fixed-palette foreign mark per view (Kruger bar over a small headline, label-maker strip, sticker, marker strike), placed in a different technology and at a different angle.",
+   "colourRecipe": "Canvas pulled to pure white/black; client primary runs the shell (header strips, announcement bar, CTA) and falls back to ink with a primary underline if within 25 degrees of hazard red; secondary is the track and pattern band; muted/primary-text are shaded to 4.5:1 on the form tint; the vandal layer is fixed red, yellow, black, white and a fixed oblique face.",
+   "moves": [
+    "fixed-ground-canvas",
+    "contrast-lift-colour",
+    "fixed-signal-palette",
+    "primary-collision-guard",
+    "hairline-rule",
+    "registration-marks",
+    "catalogue-number",
+    "barcode-serial",
+    "slapped-sticker",
+    "label-maker-strip",
+    "marker-strike",
+    "redaction-bar",
+    "receipt-strip",
+    "rubber-stamp",
+    "kruger-bar-headline",
+    "fixed-secondary-face",
+    "info-strip",
+    "tight-display-tracking",
+    "button-style",
+    "input-field-style",
+    "switch-control-style",
+    "segmented-control-style",
+    "progress-track",
+    "named-states",
+    "hover-press-response",
+    "themed-microcopy-pack",
+    "corner-radius",
+    "caps-mono-labels"
+   ],
+   "remainder": [
+    {
+     "what": "Hijacked notice document and receipt as hero art: memo line, title, redacted lines, warning, signature, receipt rows",
+     "where": "js/aesthetics/corporate-vandalism.js:170-203; css/aesthetics/corporate-vandalism.css:67-119",
+     "whyCode": "authored document layout; composition logic"
+    },
+    {
+     "what": "Pool of four bar phrases chosen by hash of brand + headline so it never changes on re-render",
+     "where": "js/aesthetics/corporate-vandalism.js:24-25, 126-130",
+     "whyCode": "deterministic selection logic over copy slots"
+    },
+    {
+     "what": "Panel and list markup rewrites (header strips, footnote, PO list with struck word, asset tag)",
+     "where": "js/aesthetics/corporate-vandalism.js:207-230",
+     "whyCode": "regex edits of framework markup via def.panels"
+    },
+    {
+     "what": "Primary-vs-hazard collision test and shell fallback",
+     "where": "js/aesthetics/corporate-vandalism.js:138-141",
+     "whyCode": "hue arithmetic with conditions; the tokens it drives are simple"
+    },
+    {
+     "what": "Rule \"exactly one foreign mark per view\" and per-slide placement of marks",
+     "where": "css/aesthetics/corporate-vandalism.css:199-203, 296-297",
+     "whyCode": "cross-surface placement policy; selectors differ per board/deck/app"
+    }
+   ],
+   "moveCoverage": 50,
+   "notes": "The vandal marks are individually simple CSS, but the style is a composition policy (one mark per view, two layers of colour ownership) which a flat move list does not express. A fixed second typeface also sits uneasily with the typography lock; the style is a candidate for a \"restricted use\" flag on moves."
+  },
+  {
+   "key": "cyber-hud",
+   "name": "Cyber HUD",
+   "coreTrick": "Panels are chamfered by clip-path with a 1px neon edge drawn as a separate clipped layer behind an inset fill (borders ignore clip-path), glow added on the unclipped parent, over a near-black grid field with brackets for target/focus.",
+   "colourRecipe": "Canvas clamped to 5% lightness with 3.5% primary mixed in; the primary is rebuilt as neon (full saturation, hue-dependent lightness, raised to 8:1); the secondary becomes a second signal or a +105 degree hot shift of neon if it is near the neon hue; accent only blip, lamps and one split word; light mode keeps plain readable primary.",
+   "moves": [
+    "tinted-neutral-canvas",
+    "contrast-lift-colour",
+    "neon-saturate-primary",
+    "tonal-ramp",
+    "alpha-ramp-of-role",
+    "fixed-signal-palette",
+    "hairline-rule",
+    "glossy-single-action",
+    "chamfer-clip-edge-layer",
+    "glow-edge",
+    "line-grid-field",
+    "hazard-stripe",
+    "corner-brackets",
+    "callout-label-tab",
+    "catalogue-number",
+    "chromatic-split-text",
+    "wireframe-sphere-reticle",
+    "button-style",
+    "input-field-style",
+    "switch-control-style",
+    "segmented-control-style",
+    "progress-track",
+    "named-states",
+    "hover-press-response",
+    "themed-microcopy-pack",
+    "corner-radius",
+    "caps-mono-labels"
+   ],
+   "remainder": [
+    {
+     "what": "hudNeon(): lightness search with hue-dependent starting points and a blue-to-azure rotation",
+     "where": "js/aesthetics/cyber-hud.js:16-30",
+     "whyCode": "colour search loop and hue-conditional branches"
+    },
+    {
+     "what": "Second-signal selection (near-hue test, +105 degree shift)",
+     "where": "js/aesthetics/cyber-hud.js:102-104, 143-145",
+     "whyCode": "conditional colour logic duplicated in art()"
+    },
+    {
+     "what": "Readout composition on the art: coordinates, lock tag, leader line, callout, segmented bar, gauge",
+     "where": "js/aesthetics/cyber-hud.js:162-176; css/aesthetics/cyber-hud.css:78-101",
+     "whyCode": "hand-positioned overlays on the sphere art"
+    },
+    {
+     "what": "Product screens: side nav glow and aria-current states",
+     "where": "css/aesthetics/cyber-hud.css:233-237",
+     "whyCode": "app-only extras beyond the kit moves"
+    }
+   ],
+   "moveCoverage": 65,
+   "notes": "The chamfer-plus-edge-layer trick is the one thing that makes this style work and it is a self-contained CSS recipe, so it ports well. The neon derivation is the colour core and is code. Cyber HUD and Blob Tracking share ticks/brackets and mono tab vocabulary."
+  }
+ ],
+ "moves": [
+  {
+   "id": "fixed-ground-canvas",
+   "category": "colour",
+   "name": "Fixed ground canvas",
+   "what": "canvas() ignores the client canvas and returns a fixed neutral/signature ground (graphite, Prussian blue, pure white/black) so the style reads the same for every brand.",
+   "params": [
+    {
+     "name": "dark",
+     "kind": "colour",
+     "range": "hex or hsl triple",
+     "default": "#16181a"
+    },
+    {
+     "name": "light",
+     "kind": "colour",
+     "range": "hex, or null = keep client canvas",
+     "default": "null"
+    },
+    {
+     "name": "clientHueNudge",
+     "kind": "number",
+     "range": "0-8 deg",
+     "default": "0"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "blob-tracking",
+     "where": "js/aesthetics/blob-tracking.js:347-349",
+     "variant": "dark #16181a graphite; light mode keeps the client canvas and only the plate stays dark"
+    },
+    {
+     "key": "blueprint",
+     "where": "js/aesthetics/blueprint.js:315-320",
+     "variant": "dark = hsl(218,62%,24%) Prussian blue, nudged up to 8deg toward a blue brand hue; light = #FCFCFA"
+    },
+    {
+     "key": "corporate-vandalism",
+     "where": "js/aesthetics/corporate-vandalism.js:123",
+     "variant": "client canvas pulled 92% toward white (or 94% toward black) so the shell is flat and neutral"
+    }
+   ],
+   "expressibleAs": "tokens",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "tinted-neutral-canvas",
+   "category": "colour",
+   "name": "Tinted neutral canvas",
+   "what": "canvas() keeps a client-derived ground but clamps/leans it: toward the secondary for a studio feel, or clamped to near-black with a faint primary tint.",
+   "params": [
+    {
+     "name": "leanColour",
+     "kind": "enum",
+     "range": "secondary|primary|none",
+     "default": "secondary"
+    },
+    {
+     "name": "amount",
+     "kind": "number",
+     "range": "0-0.1",
+     "default": "0.08"
+    },
+    {
+     "name": "lightnessCap",
+     "kind": "number",
+     "range": "0-100 %, optional",
+     "default": "none"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "clay",
+     "where": "js/aesthetics/clay.js:54-55",
+     "variant": "lean 8% toward secondary so the clay has something to sit on"
+    },
+    {
+     "key": "cyber-hud",
+     "where": "js/aesthetics/cyber-hud.js:89-94",
+     "variant": "dark only: lightness capped at 5%, saturation capped at 30%, then 3.5% primary mixed in"
+    }
+   ],
+   "expressibleAs": "tokens",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "contrast-lift-colour",
+   "category": "colour",
+   "name": "Contrast-lift search",
+   "what": "Loop that nudges a colour toward white/black/ink in small steps until it reaches a target contrast ratio on a named ground; used for primaries, muted text and markers.",
+   "params": [
+    {
+     "name": "target",
+     "kind": "number",
+     "range": "3-8",
+     "default": "4.6"
+    },
+    {
+     "name": "toward",
+     "kind": "enum",
+     "range": "white|black|ink|auto",
+     "default": "auto"
+    },
+    {
+     "name": "ground",
+     "kind": "enum",
+     "range": "canvas|plate|form-tint",
+     "default": "canvas"
+    },
+    {
+     "name": "step",
+     "kind": "number",
+     "range": "0.04-0.08",
+     "default": "0.06"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "blob-tracking",
+     "where": "js/aesthetics/blob-tracking.js:210-214",
+     "variant": "lock colour lifted toward white to 3.2:1 on the plate"
+    },
+    {
+     "key": "blob-tracking",
+     "where": "js/aesthetics/blob-tracking.js:368-377",
+     "variant": "on-lock label picked from three candidates; lock text and muted lifted to 4.6:1"
+    },
+    {
+     "key": "blueprint",
+     "where": "js/aesthetics/blueprint.js:326-330",
+     "variant": "primary/secondary/accent lifted toward white (dark) or black (light) to 3:1 against the field"
+    },
+    {
+     "key": "corporate-vandalism",
+     "where": "js/aesthetics/corporate-vandalism.js:142-145",
+     "variant": "muted, rest grey and primary-as-text shaded toward ink until 4.5:1 on the form tint"
+    },
+    {
+     "key": "cyber-hud",
+     "where": "js/aesthetics/cyber-hud.js:28",
+     "variant": "lightness stepped up until the neon reaches 8:1 on the canvas"
+    }
+   ],
+   "expressibleAs": "needs-code",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "neon-saturate-primary",
+   "category": "colour",
+   "name": "Neon-saturate primary",
+   "what": "Turns the client primary into a light: full saturation, hue-dependent lightness, deep blues rotated toward cyan, greys fall back to cyan; plain readable primary on a light canvas.",
+   "params": [
+    {
+     "name": "minSaturation",
+     "kind": "number",
+     "range": "0-100",
+     "default": "88"
+    },
+    {
+     "name": "hueShift",
+     "kind": "number",
+     "range": "-180..180 deg",
+     "default": "0"
+    },
+    {
+     "name": "minContrast",
+     "kind": "number",
+     "range": "4-12",
+     "default": "8"
+    },
+    {
+     "name": "greyFallbackHue",
+     "kind": "number",
+     "range": "0-360",
+     "default": "190"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "cyber-hud",
+     "where": "js/aesthetics/cyber-hud.js:16-30",
+     "variant": "hudNeon(): the only colour-search in this style; also reused with +105deg shift for the second signal"
+    },
+    {
+     "key": "cyber-hud",
+     "where": "js/aesthetics/cyber-hud.js:100-104",
+     "variant": "neon and neon2 derived once in tokens() and once more in art()"
+    }
+   ],
+   "expressibleAs": "needs-code",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "pastel-lift-primary",
+   "category": "colour",
+   "name": "Pastel-lift primary",
+   "what": "Clamps a primary to lightness >=70 and saturation <=66 (cap 82 L) so objects read as modelling clay while the one CTA keeps the full primary for AA.",
+   "params": [
+    {
+     "name": "minLightness",
+     "kind": "number",
+     "range": "50-85",
+     "default": "70"
+    },
+    {
+     "name": "maxSaturation",
+     "kind": "number",
+     "range": "40-100",
+     "default": "66"
+    },
+    {
+     "name": "maxLightness",
+     "kind": "number",
+     "range": "70-95",
+     "default": "82"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "clay",
+     "where": "js/aesthetics/clay.js:6-13",
+     "variant": "clayPastel(); output feeds --ab-cl-pa and its hi/lo steps (js 64-70)"
+    }
+   ],
+   "expressibleAs": "tokens",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "tonal-ramp",
+   "category": "colour",
+   "name": "Tonal ramp of one role",
+   "what": "Derives lighter/base/darker (or 6/13/24 % mix) steps of one role colour with matching on-colour and shadow colour tokens.",
+   "params": [
+    {
+     "name": "role",
+     "kind": "enum",
+     "range": "primary|neon|accent",
+     "default": "primary"
+    },
+    {
+     "name": "steps",
+     "kind": "number",
+     "range": "2-5",
+     "default": "3"
+    },
+    {
+     "name": "mixTarget",
+     "kind": "enum",
+     "range": "white+black|canvas",
+     "default": "white+black"
+    },
+    {
+     "name": "amounts",
+     "kind": "text",
+     "range": "comma list 0-1",
+     "default": "0.34,0.2"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "clay",
+     "where": "js/aesthetics/clay.js:61-70",
+     "variant": "hi = 34% white, lo = 20% black, plus pastel hi/lo; each step also gets an on-colour and a darkened shadow colour; avatars step down the ramp (css 218-220)"
+    },
+    {
+     "key": "cyber-hud",
+     "where": "js/aesthetics/cyber-hud.js:122-124",
+     "variant": "neon mixed into canvas at 6 / 13 / 24 % for panel, hover and selected fills"
+    }
+   ],
+   "expressibleAs": "tokens",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "alpha-ramp-of-role",
+   "category": "colour",
+   "name": "Alpha ladder of a role",
+   "what": "Publishes one role colour as a ladder of alphas (full, soft, hair, fill, glow) used for lines, edges, fills and glows throughout the kit.",
+   "params": [
+    {
+     "name": "role",
+     "kind": "enum",
+     "range": "ink|neon|primary",
+     "default": "ink"
+    },
+    {
+     "name": "stops",
+     "kind": "text",
+     "range": "list of 0-1",
+     "default": "0.9,0.34,0.16,0.045"
+    },
+    {
+     "name": "glowStops",
+     "kind": "text",
+     "range": "list of 0-1",
+     "default": "none"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "blob-tracking",
+     "where": "js/aesthetics/blob-tracking.js:384-387",
+     "variant": "ink at 90 / 34 / 16 % plus a 4.5 % box fill"
+    },
+    {
+     "key": "blueprint",
+     "where": "js/aesthetics/blueprint.js:337-343",
+     "variant": "ink (or #111 on paper) at 92 / 55 / 24 % for the three line weights, 42 % hatch"
+    },
+    {
+     "key": "cyber-hud",
+     "where": "js/aesthetics/cyber-hud.js:115-126",
+     "variant": "neon at 62 / 28 % lines, 62-85 % glow, 6-9 % grid and sweep, 95 % split"
+    }
+   ],
+   "expressibleAs": "tokens",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "duotone-ink",
+   "category": "colour",
+   "name": "Duotone ink wash",
+   "what": "A dark base with a small percentage of the secondary mixed in, and one light ink for all marks, so a plate reads as two-tone.",
+   "params": [
+    {
+     "name": "wash",
+     "kind": "number",
+     "range": "0-0.3",
+     "default": "0.12"
+    },
+    {
+     "name": "base",
+     "kind": "enum",
+     "range": "canvas|ink darkened",
+     "default": "ink darkened"
+    },
+    {
+     "name": "lit",
+     "kind": "enum",
+     "range": "ink|canvas",
+     "default": "ink"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "blob-tracking",
+     "where": "js/aesthetics/blob-tracking.js:217-224",
+     "variant": "plate = base 30% darkened + 12% secondary wash, lit marks in ink (inverted in light mode)"
+    },
+    {
+     "key": "blob-tracking",
+     "where": "js/aesthetics/blob-tracking.js:365",
+     "variant": "same plate colour published as --ab-plate"
+    }
+   ],
+   "expressibleAs": "tokens",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "single-use-primary",
+   "category": "colour",
+   "name": "Single-use primary",
+   "what": "The primary is reserved for exactly one object per view; everything else stays ink/neutral.",
+   "params": [
+    {
+     "name": "object",
+     "kind": "enum",
+     "range": "lock-target|revision-cloud|capsule-cta|pill",
+     "default": "lock-target"
+    },
+    {
+     "name": "perView",
+     "kind": "number",
+     "range": "1",
+     "default": "1"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "blob-tracking",
+     "where": "js/aesthetics/blob-tracking.js:383-390",
+     "variant": "only the locked person box, its tab and the CTA/selected states use --ab-lock / primary"
+    },
+    {
+     "key": "blueprint",
+     "where": "js/aesthetics/blueprint.js:287-300",
+     "variant": "primary appears once, as the revision cloud and triangle; coverage <=2%"
+    },
+    {
+     "key": "clay",
+     "where": "js/aesthetics/clay.js:39-52",
+     "variant": "one capsule CTA in primary; accent appears once as the highlight pill"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "fixed-signal-palette",
+   "category": "colour",
+   "name": "Fixed signal palette",
+   "what": "A few constants (hazard red, safety yellow, warning yellow) that never take client colours, published as tokens for ornaments.",
+   "params": [
+    {
+     "name": "colours",
+     "kind": "text",
+     "range": "hex list",
+     "default": "#E10600,#FFD400"
+    },
+    {
+     "name": "scope",
+     "kind": "enum",
+     "range": "vandal-layer|ribbon-only",
+     "default": "vandal-layer"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "corporate-vandalism",
+     "where": "js/aesthetics/corporate-vandalism.js:20-21",
+     "variant": "HAZARD #E10600 and SAFETY #FFD400 constants; tokens 151-152; the whole foreign layer is fixed"
+    },
+    {
+     "key": "cyber-hud",
+     "where": "js/aesthetics/cyber-hud.js:119-120",
+     "variant": "#FCE205 / #0a0a0c used only for the hazard-stripe ribbon"
+    }
+   ],
+   "expressibleAs": "tokens",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "primary-collision-guard",
+   "category": "colour",
+   "name": "Primary collision guard",
+   "what": "Tests whether the client primary sits within N degrees of a fixed signal colour and, if so, swaps the shell to ink with an underline in the primary.",
+   "params": [
+    {
+     "name": "hueWindow",
+     "kind": "number",
+     "range": "10-40 deg",
+     "default": "25"
+    },
+    {
+     "name": "minSaturation",
+     "kind": "number",
+     "range": "30-60",
+     "default": "45"
+    },
+    {
+     "name": "fallback",
+     "kind": "enum",
+     "range": "ink-with-underline",
+     "default": "ink-with-underline"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "corporate-vandalism",
+     "where": "js/aesthetics/corporate-vandalism.js:138-141",
+     "variant": "collide test against HAZARD; sets --cv-shell, --cv-on-shell and --cv-ul (js 159-161)"
+    }
+   ],
+   "expressibleAs": "needs-code",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "hairline-rule",
+   "category": "material",
+   "name": "Hairline rule / border set",
+   "what": "Defines the style's line vocabulary: 1px (or 0.8/1.6px) borders and rules in a role colour, no radius, no shadow.",
+   "params": [
+    {
+     "name": "width",
+     "kind": "number",
+     "range": "0.5-2 px",
+     "default": "1"
+    },
+    {
+     "name": "colourRole",
+     "kind": "enum",
+     "range": "ink|neon|soft-alpha",
+     "default": "ink"
+    },
+    {
+     "name": "dash",
+     "kind": "enum",
+     "range": "solid|dashed|dotted",
+     "default": "solid"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "blob-tracking",
+     "where": "css/aesthetics/blob-tracking.css:49-59",
+     "variant": "1px boxes and rules at --ab-box / soft / hair alpha"
+    },
+    {
+     "key": "blueprint",
+     "where": "css/aesthetics/blueprint.css:95-121",
+     "variant": "three weights: 0.8 dimension, 1 hidden-dash, 1.6 visible"
+    },
+    {
+     "key": "corporate-vandalism",
+     "where": "css/aesthetics/corporate-vandalism.css:16-39",
+     "variant": "1px ink (or mixed) border, square, with tick ends on dividers"
+    },
+    {
+     "key": "cyber-hud",
+     "where": "css/aesthetics/cyber-hud.css:39-44",
+     "variant": "1px neon edge drawn as a clipped layer; dashed soft rules between rows (css 199)"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [
+    "card",
+    "panel",
+    "list",
+    "chip",
+    "divider"
+   ],
+   "conflictsWith": []
+  },
+  {
+   "id": "corner-radius",
+   "category": "material",
+   "name": "Corner radius",
+   "what": "One radius family for every surface: square, chamfered, capsule or very round.",
+   "params": [
+    {
+     "name": "radius",
+     "kind": "number",
+     "range": "0-999 px",
+     "default": "0"
+    },
+    {
+     "name": "buttonRadius",
+     "kind": "number",
+     "range": "0-999 px",
+     "default": "0"
+    },
+    {
+     "name": "cardRadius",
+     "kind": "number",
+     "range": "0-48 px",
+     "default": "0"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "blob-tracking",
+     "where": "css/aesthetics/blob-tracking.css:14-16",
+     "variant": "4px board, every box square (border-radius: 0 on controls)"
+    },
+    {
+     "key": "blueprint",
+     "where": "css/aesthetics/blueprint.css:17-18",
+     "variant": "radius 0 everywhere"
+    },
+    {
+     "key": "clay",
+     "where": "css/aesthetics/clay.css:12-22",
+     "variant": "36px board/cards, 999px controls and chips, 50% avatars"
+    },
+    {
+     "key": "corporate-vandalism",
+     "where": "css/aesthetics/corporate-vandalism.css:16",
+     "variant": "radius 0 on the board and shell"
+    },
+    {
+     "key": "cyber-hud",
+     "where": "css/aesthetics/cyber-hud.css:14",
+     "variant": "6px board, everything else 0 or chamfered"
+    }
+   ],
+   "expressibleAs": "tokens",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [
+    "all"
+   ],
+   "conflictsWith": []
+  },
+  {
+   "id": "soft-raised-relief",
+   "category": "material",
+   "name": "Soft raised relief (coloured)",
+   "what": "Surface relief from three layers: a soft drop shadow tinted with the object colour, an inner dark underside and an inner light top.",
+   "params": [
+    {
+     "name": "tint",
+     "kind": "enum",
+     "range": "object-darkened|primary-12|neutral",
+     "default": "object-darkened"
+    },
+    {
+     "name": "drop",
+     "kind": "text",
+     "range": "css shadow",
+     "default": "0 14px 24px -10px"
+    },
+    {
+     "name": "innerLo",
+     "kind": "text",
+     "range": "css shadow",
+     "default": "inset 0 -6px 12px"
+    },
+    {
+     "name": "innerHi",
+     "kind": "text",
+     "range": "css shadow",
+     "default": "inset 0 6px 10px"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "clay",
+     "where": "css/aesthetics/clay.css:12-21",
+     "variant": "--cl-in / --cl-card shadows; applied to cards (147-151), chips (134-139), CTA (165-169), avatars (214-220), rows (206-210)"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [
+    "card",
+    "panel",
+    "button",
+    "chip",
+    "row",
+    "avatar"
+   ],
+   "conflictsWith": []
+  },
+  {
+   "id": "recessed-field",
+   "category": "material",
+   "name": "Recessed field / tray",
+   "what": "Inputs, track and segmented tray sunk into the surface with an inner dark top shadow and an inner light bottom edge.",
+   "params": [
+    {
+     "name": "depth",
+     "kind": "number",
+     "range": "2-8 px",
+     "default": "4"
+    },
+    {
+     "name": "fill",
+     "kind": "enum",
+     "range": "ink-9%-of-card|canvas",
+     "default": "ink-9%-of-card"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "clay",
+     "where": "css/aesthetics/clay.css:16-21",
+     "variant": "--cl-tray, --cl-well"
+    },
+    {
+     "key": "clay",
+     "where": "css/aesthetics/clay.css:154-155",
+     "variant": "segmented tray"
+    },
+    {
+     "key": "clay",
+     "where": "css/aesthetics/clay.css:181-185",
+     "variant": "input well"
+    },
+    {
+     "key": "clay",
+     "where": "css/aesthetics/clay.css:187-195",
+     "variant": "switch track"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [
+    "input",
+    "switch",
+    "segmented"
+   ],
+   "conflictsWith": []
+  },
+  {
+   "id": "glossy-single-action",
+   "category": "material",
+   "name": "Glossy single action",
+   "what": "The one primary CTA gets a gradient ramp plus a white highlight overlay and a primary-tinted shadow.",
+   "params": [
+    {
+     "name": "highlight",
+     "kind": "text",
+     "range": "gradient css",
+     "default": "radial 30% 0"
+    },
+    {
+     "name": "ramp",
+     "kind": "enum",
+     "range": "hi-base-lo|flat|white-top",
+     "default": "hi-base-lo"
+    },
+    {
+     "name": "shadowTint",
+     "kind": "colour",
+     "range": "role",
+     "default": "primary"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "clay",
+     "where": "css/aesthetics/clay.css:165-177",
+     "variant": "tonal ramp (css 19) over a radial gloss, capsule, lifts 3px on hover"
+    },
+    {
+     "key": "cyber-hud",
+     "where": "css/aesthetics/cyber-hud.css:155-162",
+     "variant": "linear 22% white-to-transparent over solid primary, chamfered, brightness on hover"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [
+    "button"
+   ],
+   "conflictsWith": []
+  },
+  {
+   "id": "gloss-radial-highlight",
+   "category": "material",
+   "name": "Radial gloss highlight",
+   "what": "A soft radial white highlight layered on top of an object background to fake a lit top-left.",
+   "params": [
+    {
+     "name": "origin",
+     "kind": "text",
+     "range": "x% y%",
+     "default": "30% 12%"
+    },
+    {
+     "name": "opacity",
+     "kind": "number",
+     "range": "0.2-0.6",
+     "default": "0.3"
+    },
+    {
+     "name": "extent",
+     "kind": "number",
+     "range": "40-70 %",
+     "default": "55"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "clay",
+     "where": "css/aesthetics/clay.css:15",
+     "variant": "--cl-gloss, applied to mark, kicker, chips, avatars, tile (css 38, 62, 139, 219)"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [
+    "chip",
+    "avatar",
+    "button",
+    "tag"
+   ],
+   "conflictsWith": []
+  },
+  {
+   "id": "chamfer-clip-edge-layer",
+   "category": "material",
+   "name": "Chamfered clip with edge layer",
+   "what": "Two opposite corners cut at 45deg with clip-path; the 1px edge is a clipped neon layer behind a 1px-inset fill layer because borders do not follow clip-path.",
+   "params": [
+    {
+     "name": "size",
+     "kind": "number",
+     "range": "4-14 px (--hc per element)",
+     "default": "12"
+    },
+    {
+     "name": "corners",
+     "kind": "enum",
+     "range": "TL+BR|TR+BL|all",
+     "default": "TL+BR"
+    },
+    {
+     "name": "edgeColour",
+     "kind": "enum",
+     "range": "neon|ink",
+     "default": "neon"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "cyber-hud",
+     "where": "css/aesthetics/cyber-hud.css:14",
+     "variant": "--hc: 12px default"
+    },
+    {
+     "key": "cyber-hud",
+     "where": "css/aesthetics/cyber-hud.css:31-44",
+     "variant": "one grouped rule: polygon clip, ::before edge layer, ::after fill layer; per-element sizes override (--hc 5-10px)"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [
+    "card",
+    "panel",
+    "list",
+    "button",
+    "chip",
+    "tag",
+    "segmented",
+    "state-control"
+   ],
+   "conflictsWith": []
+  },
+  {
+   "id": "glow-edge",
+   "category": "material",
+   "name": "Neon glow on edge",
+   "what": "A small drop-shadow glow on the unclipped parent of an edged panel, plus a soft text-shadow on readout values.",
+   "params": [
+    {
+     "name": "radius",
+     "kind": "number",
+     "range": "3-9 px",
+     "default": "7"
+    },
+    {
+     "name": "alpha",
+     "kind": "number",
+     "range": "0.3-0.85",
+     "default": "0.62"
+    },
+    {
+     "name": "text",
+     "kind": "bool",
+     "range": "true|false",
+     "default": "true"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "cyber-hud",
+     "where": "css/aesthetics/cyber-hud.css:41",
+     "variant": "filter: drop-shadow(0 0 7px --ab-hud-glow) on card, panel, list"
+    },
+    {
+     "key": "cyber-hud",
+     "where": "css/aesthetics/cyber-hud.css:72-73",
+     "variant": "headline and highlight text-shadow glow"
+    },
+    {
+     "key": "cyber-hud",
+     "where": "css/aesthetics/cyber-hud.css:81",
+     "variant": "art svg glow 3px"
+    },
+    {
+     "key": "cyber-hud",
+     "where": "css/aesthetics/cyber-hud.css:216",
+     "variant": "status dot glow"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [],
+   "conflictsWith": [
+    "hard-offset-shadow",
+    "clear-glass-panel"
+   ]
+  },
+  {
+   "id": "grain-overlay",
+   "category": "material",
+   "name": "Grain overlay",
+   "what": "A fixed fractal-noise data-URI tile over the whole board at low opacity, tuned per mode.",
+   "params": [
+    {
+     "name": "baseFrequency",
+     "kind": "number",
+     "range": "0.5-1.2",
+     "default": "0.9"
+    },
+    {
+     "name": "opacityDark",
+     "kind": "number",
+     "range": "0.1-0.4",
+     "default": "0.25"
+    },
+    {
+     "name": "opacityLight",
+     "kind": "number",
+     "range": "0.1-0.4",
+     "default": "0.2"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "blob-tracking",
+     "where": "css/aesthetics/blob-tracking.css:18-29",
+     "variant": "220px feTurbulence tile as --bt-grain, ::after overlay; plate carries its own grain (js 239-276)"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "line-grid-field",
+   "category": "pattern",
+   "name": "Line grid field",
+   "what": "Static background grids built from linear-gradient lines at one or two pitches, optionally with a diagonal sweep and fine scanlines.",
+   "params": [
+    {
+     "name": "minorPitch",
+     "kind": "number",
+     "range": "4-32 px",
+     "default": "8"
+    },
+    {
+     "name": "majorPitch",
+     "kind": "number",
+     "range": "16-80 px",
+     "default": "40"
+    },
+    {
+     "name": "lineColour",
+     "kind": "enum",
+     "range": "white-alpha|role-alpha",
+     "default": "white-alpha"
+    },
+    {
+     "name": "sweep",
+     "kind": "bool",
+     "range": "true|false",
+     "default": "false"
+    },
+    {
+     "name": "scanlines",
+     "kind": "bool",
+     "range": "true|false",
+     "default": "false"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "blueprint",
+     "where": "css/aesthetics/blueprint.css:13-24",
+     "variant": "8px minor, 40px major white lines on blue; off in light mode (tokens js 340-341)"
+    },
+    {
+     "key": "cyber-hud",
+     "where": "css/aesthetics/cyber-hud.css:16-30",
+     "variant": "24px neon-alpha grid, one static diagonal sweep and fine scanlines (tokens js 125-126)"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": false,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "hazard-stripe",
+   "category": "pattern",
+   "name": "Hazard stripe ribbon",
+   "what": "A short 45-degree slash ribbon in warning yellow on black that opens a rule or tab.",
+   "params": [
+    {
+     "name": "angle",
+     "kind": "number",
+     "range": "30-60 deg",
+     "default": "45"
+    },
+    {
+     "name": "pitch",
+     "kind": "number",
+     "range": "4-12 px",
+     "default": "8"
+    },
+    {
+     "name": "length",
+     "kind": "number",
+     "range": "40-160 px",
+     "default": "80"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "cyber-hud",
+     "where": "css/aesthetics/cyber-hud.css:55-62",
+     "variant": "ribbon at the start of the header rule; short hazard tab under section labels (css 118-121)"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": false,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "ambient-blobs",
+   "category": "pattern",
+   "name": "Ambient pastel blobs",
+   "what": "Blurred radial blobs in the secondary/primary/accent behind the content so tangible objects have a surface to sit on.",
+   "params": [
+    {
+     "name": "count",
+     "kind": "number",
+     "range": "2-5",
+     "default": "3"
+    },
+    {
+     "name": "alphaLight",
+     "kind": "number",
+     "range": "0.15-0.5",
+     "default": "0.34"
+    },
+    {
+     "name": "alphaDark",
+     "kind": "number",
+     "range": "0.05-0.2",
+     "default": "0.14"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "clay",
+     "where": "css/aesthetics/clay.css:24-33",
+     "variant": "three radial blobs on ::before; tokens js 71-73"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": false,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "ordered-dither-field",
+   "category": "pattern",
+   "name": "Ordered-dither field",
+   "what": "Renders a luminance field into two tone levels via an n x n Bayer matrix as run-length SVG paths.",
+   "params": [
+    {
+     "name": "matrixSize",
+     "kind": "number",
+     "range": "2|4|8|16",
+     "default": "8"
+    },
+    {
+     "name": "gridW",
+     "kind": "number",
+     "range": "100-600 cells",
+     "default": "432"
+    },
+    {
+     "name": "gridH",
+     "kind": "number",
+     "range": "60-300 cells",
+     "default": "180"
+    },
+    {
+     "name": "tones",
+     "kind": "number",
+     "range": "2-4",
+     "default": "2"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "blob-tracking",
+     "where": "js/aesthetics/blob-tracking.js:19-34",
+     "variant": "btBayer(8)"
+    },
+    {
+     "key": "blob-tracking",
+     "where": "js/aesthetics/blob-tracking.js:102-123",
+     "variant": "btDitherPaths(): run-length paths, step 1 for hero, 2 for the deck band"
+    }
+   ],
+   "expressibleAs": "svg-generator",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": false,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "corner-brackets",
+   "category": "ornament",
+   "name": "Corner brackets / ticks",
+   "what": "Eight linear-gradient strokes (two per corner) published as a CSS variable and applied as a frame around targets, focused fields, buttons and the selected row.",
+   "params": [
+    {
+     "name": "stroke",
+     "kind": "number",
+     "range": "1-3 px",
+     "default": "1.5"
+    },
+    {
+     "name": "length",
+     "kind": "number",
+     "range": "5-22 px",
+     "default": "7"
+    },
+    {
+     "name": "colour",
+     "kind": "enum",
+     "range": "ink|neon|primary",
+     "default": "ink"
+    },
+    {
+     "name": "offset",
+     "kind": "number",
+     "range": "-6..0 px",
+     "default": "-5"
+    },
+    {
+     "name": "showOn",
+     "kind": "enum",
+     "range": "always|target|focus",
+     "default": "always"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "blob-tracking",
+     "where": "js/aesthetics/blob-tracking.js:358-366",
+     "variant": "ticks(ink,1.5,7), soft 1/5, lock primary 2/8; css 45, 227 (CTA at inset -5px), 239 (field focus), 277 (first row)"
+    },
+    {
+     "key": "cyber-hud",
+     "where": "js/aesthetics/cyber-hud.js:105-110",
+     "variant": "bracket(neon,2,9), dim 1.5/7, large 2/22; css 170 (field focus), 190, 192 (Target / Locked states)"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [
+    "input",
+    "button",
+    "row",
+    "state-control",
+    "swatch"
+   ],
+   "conflictsWith": []
+  },
+  {
+   "id": "callout-label-tab",
+   "category": "ornament",
+   "name": "Callout label tab",
+   "what": "A small solid mono tab attached to a box edge carrying a class, id and confidence (or a code), placed with a flip-under rule when it would collide.",
+   "params": [
+    {
+     "name": "background",
+     "kind": "enum",
+     "range": "ink|lock|neon",
+     "default": "ink"
+    },
+    {
+     "name": "size",
+     "kind": "number",
+     "range": "8-11 px",
+     "default": "9"
+    },
+    {
+     "name": "position",
+     "kind": "enum",
+     "range": "top-left|below|top-right",
+     "default": "top-left"
+    },
+    {
+     "name": "template",
+     "kind": "text",
+     "range": "CLASS 0.93",
+     "default": "ID 07 · 0.93"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "blob-tracking",
+     "where": "css/aesthetics/blob-tracking.css:31-43",
+     "variant": "one grouped tab rule on list, headline, chip, type pick, highlight, selected seg, hover state"
+    },
+    {
+     "key": "blob-tracking",
+     "where": "css/aesthetics/blob-tracking.css:110-124",
+     "variant": "plate tabs placed by BT_TABS, lock tab in --ab-lock"
+    },
+    {
+     "key": "cyber-hud",
+     "where": "css/aesthetics/cyber-hud.css:86",
+     "variant": "chs-tag: neon chamfered tab \"LOCK 0.82s\" on the art"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [
+    "chip",
+    "list",
+    "segmented",
+    "tag"
+   ],
+   "conflictsWith": []
+  },
+  {
+   "id": "detected-region-frame",
+   "category": "ornament",
+   "name": "Detected-region frame",
+   "what": "A faint box with an outer offset and a tab drawn around any element (headline, swatch, specimen, list) so ordinary UI reads as tracked output.",
+   "params": [
+    {
+     "name": "inset",
+     "kind": "text",
+     "range": "css inset",
+     "default": "-4px"
+    },
+    {
+     "name": "border",
+     "kind": "enum",
+     "range": "solid|dashed",
+     "default": "solid"
+    },
+    {
+     "name": "target",
+     "kind": "enum",
+     "range": "headline|chip|type-pick|list",
+     "default": "chip"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "blob-tracking",
+     "where": "css/aesthetics/blob-tracking.css:77-84",
+     "variant": "headline as a TEXT 0.99 region"
+    },
+    {
+     "key": "blob-tracking",
+     "where": "css/aesthetics/blob-tracking.css:160-168",
+     "variant": "every swatch boxed 4px outside with a class tab"
+    },
+    {
+     "key": "blob-tracking",
+     "where": "css/aesthetics/blob-tracking.css:173-182",
+     "variant": "type specimen word in a dashed FONT box"
+    },
+    {
+     "key": "blob-tracking",
+     "where": "css/aesthetics/blob-tracking.css:362-373",
+     "variant": "also tuned for the app kit (list, welcome headline)"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "border-legend-label",
+   "category": "ornament",
+   "name": "Border legend label",
+   "what": "A short uppercase legend sitting on a card/list border like a fieldset legend (\"Detail E\", \"TRACKED · 3 OBJECTS\").",
+   "params": [
+    {
+     "name": "text",
+     "kind": "text",
+     "range": "free",
+     "default": "Detail E"
+    },
+    {
+     "name": "offset",
+     "kind": "text",
+     "range": "css",
+     "default": "-8px 14px"
+    },
+    {
+     "name": "background",
+     "kind": "enum",
+     "range": "canvas|ink",
+     "default": "canvas"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "blueprint",
+     "where": "css/aesthetics/blueprint.css:156-166",
+     "variant": "::before legend on card, panel and list with canvas plate"
+    },
+    {
+     "key": "blob-tracking",
+     "where": "css/aesthetics/blob-tracking.css:274-275",
+     "variant": "list ::after tab \"TRACKED · 3 OBJECTS\"; counter version for the app kit (css 367-368)"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": false,
+   "kitScope": [
+    "card",
+    "panel",
+    "list"
+   ],
+   "conflictsWith": []
+  },
+  {
+   "id": "registration-marks",
+   "category": "ornament",
+   "name": "Registration / ruler marks",
+   "what": "Tick marks and crosses on rules, swatches and sheet edges: zone letters, end ticks, timecode ruler.",
+   "params": [
+    {
+     "name": "where",
+     "kind": "enum",
+     "range": "rule-ends|swatch-corners|sheet-edge|ruler",
+     "default": "rule-ends"
+    },
+    {
+     "name": "pitch",
+     "kind": "number",
+     "range": "3-60 px",
+     "default": "6"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "blueprint",
+     "where": "js/aesthetics/blueprint.js:180-188",
+     "variant": "zone marks 1-8 / A-D along sheet edge"
+    },
+    {
+     "key": "corporate-vandalism",
+     "where": "css/aesthetics/corporate-vandalism.css:32-39",
+     "variant": "tick at each end of the divider"
+    },
+    {
+     "key": "corporate-vandalism",
+     "where": "css/aesthetics/corporate-vandalism.css:148-155",
+     "variant": "registration crosses at two corners of each swatch"
+    },
+    {
+     "key": "blob-tracking",
+     "where": "js/aesthetics/blob-tracking.js:414-417",
+     "variant": "timecode ruler along the bottom of the footage"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": false,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "catalogue-number",
+   "category": "ornament",
+   "name": "Catalogue / ID numbers",
+   "what": "Mono ids on rows, sections and tabs (F0413, ID 07, PO-2291-B, [01], 01 //) generated from counters or fixed strings.",
+   "params": [
+    {
+     "name": "format",
+     "kind": "text",
+     "range": "pattern",
+     "default": "PO-229{n}-B"
+    },
+    {
+     "name": "placement",
+     "kind": "enum",
+     "range": "row|section-head|tab",
+     "default": "row"
+    },
+    {
+     "name": "counter",
+     "kind": "bool",
+     "range": "true|false",
+     "default": "true"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "blob-tracking",
+     "where": "css/aesthetics/blob-tracking.css:143-151",
+     "variant": "F0413–F0416 frame counters on section heads; ID tabs on rows (css 280)"
+    },
+    {
+     "key": "blueprint",
+     "where": "css/aesthetics/blueprint.css:38-45",
+     "variant": "boxed numbers with leader line; lettered legend rows (css 128-133); 22px round row numbers (css 206)"
+    },
+    {
+     "key": "corporate-vandalism",
+     "where": "js/aesthetics/corporate-vandalism.js:215-228",
+     "variant": "PO-229n-B per row (real markup); numbered seg tabs (css 190-195); type picks numbered (css 160-166)"
+    },
+    {
+     "key": "cyber-hud",
+     "where": "css/aesthetics/cyber-hud.css:104-123",
+     "variant": "swatch roles prefixed 01 //; row [01] counters (css 202-203); label //// run"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "barcode-serial",
+   "category": "ornament",
+   "name": "Barcode",
+   "what": "A deterministic barcode from a fixed width list, drawn as inline SVG rects.",
+   "params": [
+    {
+     "name": "widths",
+     "kind": "text",
+     "range": "list of 1-3",
+     "default": "2 1 3 1 1 2 ..."
+    },
+    {
+     "name": "height",
+     "kind": "number",
+     "range": "12-40",
+     "default": "22"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "corporate-vandalism",
+     "where": "js/aesthetics/corporate-vandalism.js:29-37",
+     "variant": "cvBarcode(); used on the receipt (js 200)"
+    }
+   ],
+   "expressibleAs": "svg-generator",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": false,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "revision-cloud",
+   "category": "ornament",
+   "name": "Revision cloud",
+   "what": "A scalloped arc path around a rectangle plus a numbered triangle, in the primary.",
+   "params": [
+    {
+     "name": "scallop",
+     "kind": "number",
+     "range": "4-12",
+     "default": "7.2"
+    },
+    {
+     "name": "radius",
+     "kind": "number",
+     "range": "2-8",
+     "default": "4.4"
+    },
+    {
+     "name": "colour",
+     "kind": "colour",
+     "range": "role",
+     "default": "primary"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "blueprint",
+     "where": "js/aesthetics/blueprint.js:169-179",
+     "variant": "scallops generated from side lengths; arcs A4.4 4.4"
+    }
+   ],
+   "expressibleAs": "svg-generator",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": false,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "engineering-line-types",
+   "category": "ornament",
+   "name": "Engineering line types",
+   "what": "A named set of stroke styles (visible, hidden dash, centre chain, dimension, hatch) as classes shared by all drawn art.",
+   "params": [
+    {
+     "name": "visible",
+     "kind": "number",
+     "range": "1-2.4 px",
+     "default": "1.6"
+    },
+    {
+     "name": "hiddenDash",
+     "kind": "text",
+     "range": "dasharray",
+     "default": "4 3"
+    },
+    {
+     "name": "centreDash",
+     "kind": "text",
+     "range": "dasharray",
+     "default": "10 3 2 3"
+    },
+    {
+     "name": "dimension",
+     "kind": "number",
+     "range": "0.4-1 px",
+     "default": "0.8"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "blueprint",
+     "where": "css/aesthetics/blueprint.css:95-121",
+     "variant": ".bp-k / .bp-dash / .bp-cl / .bp-l / .bp-h with non-scaling strokes"
+    },
+    {
+     "key": "blueprint",
+     "where": "js/aesthetics/blueprint.js:16-32",
+     "variant": "same set drawn in the Do / Don't pair art"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": false,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "hatched-selected-state",
+   "category": "kit",
+   "name": "Hatched selected state",
+   "what": "The selected/pressed/avoid state is a 45-degree hatch over a double outline, with the label on a clear plate.",
+   "params": [
+    {
+     "name": "angle",
+     "kind": "number",
+     "range": "30-60 deg",
+     "default": "45"
+    },
+    {
+     "name": "pitch",
+     "kind": "number",
+     "range": "3-8 px",
+     "default": "6"
+    },
+    {
+     "name": "outline",
+     "kind": "enum",
+     "range": "double|single",
+     "default": "double"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "blueprint",
+     "where": "css/aesthetics/blueprint.css:15-16",
+     "variant": "--bp-hatch and --bp-sel tokens"
+    },
+    {
+     "key": "blueprint",
+     "where": "css/aesthetics/blueprint.css:173-175",
+     "variant": "selected segment"
+    },
+    {
+     "key": "blueprint",
+     "where": "css/aesthetics/blueprint.css:190-193",
+     "variant": "switch thumb"
+    },
+    {
+     "key": "blueprint",
+     "where": "css/aesthetics/blueprint.css:198-200",
+     "variant": "pressed state"
+    },
+    {
+     "key": "blueprint",
+     "where": "css/aesthetics/blueprint.css:147",
+     "variant": "avoid chip"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [
+    "segmented",
+    "switch",
+    "state-control",
+    "fit-chip"
+   ],
+   "conflictsWith": []
+  },
+  {
+   "id": "slapped-sticker",
+   "category": "ornament",
+   "name": "Slapped vinyl sticker",
+   "what": "A rotated flat-colour sticker with a hard keyline and one peeled corner placed over official chrome.",
+   "params": [
+    {
+     "name": "rotation",
+     "kind": "number",
+     "range": "-12..12 deg",
+     "default": "8"
+    },
+    {
+     "name": "colour",
+     "kind": "enum",
+     "range": "safety|hazard",
+     "default": "safety"
+    },
+    {
+     "name": "peel",
+     "kind": "bool",
+     "range": "true|false",
+     "default": "true"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "corporate-vandalism",
+     "where": "css/aesthetics/corporate-vandalism.css:71-79",
+     "variant": "logo-strip sticker with ::after peeled corner"
+    },
+    {
+     "key": "corporate-vandalism",
+     "where": "js/aesthetics/corporate-vandalism.js:180",
+     "variant": "markup in art()"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": false,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "label-maker-strip",
+   "category": "ornament",
+   "name": "Label-maker strip",
+   "what": "Embossed black mono tape stuck, rotated, over a control label.",
+   "params": [
+    {
+     "name": "rotation",
+     "kind": "number",
+     "range": "-6..0 deg",
+     "default": "-3"
+    },
+    {
+     "name": "text",
+     "kind": "text",
+     "range": "free",
+     "default": "free"
+    },
+    {
+     "name": "tracking",
+     "kind": "number",
+     "range": "0.1-0.3 em",
+     "default": "0.18"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "corporate-vandalism",
+     "where": "css/aesthetics/corporate-vandalism.css:199-203",
+     "variant": "strip ::before on the interface card CTA (board and interface slide only)"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": false,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "marker-strike",
+   "category": "ornament",
+   "name": "Marker strike and handwriting",
+   "what": "A hazard-colour bar through one word with a handwritten replacement above it.",
+   "params": [
+    {
+     "name": "thickness",
+     "kind": "number",
+     "range": "2-5 px",
+     "default": "3"
+    },
+    {
+     "name": "replacement",
+     "kind": "text",
+     "range": "free",
+     "default": "never"
+    },
+    {
+     "name": "font",
+     "kind": "enum",
+     "range": "marker",
+     "default": "Permanent Marker"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "corporate-vandalism",
+     "where": "css/aesthetics/corporate-vandalism.css:248-251",
+     "variant": "strike ::after and handwritten replacement"
+    },
+    {
+     "key": "corporate-vandalism",
+     "where": "js/aesthetics/corporate-vandalism.js:212-219",
+     "variant": "markup: <s> on the first word of the third row"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": false,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "redaction-bar",
+   "category": "ornament",
+   "name": "Redaction bar",
+   "what": "Real text set transparent on an ink background so the bar is exactly the word width; also a state control.",
+   "params": [
+    {
+     "name": "background",
+     "kind": "enum",
+     "range": "ink|black",
+     "default": "black"
+    },
+    {
+     "name": "citation",
+     "kind": "text",
+     "range": "(b)(6)",
+     "default": "(b)(6)"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "corporate-vandalism",
+     "where": "css/aesthetics/corporate-vandalism.css:83-93",
+     "variant": "blocks and inline words in the notice"
+    },
+    {
+     "key": "corporate-vandalism",
+     "where": "css/aesthetics/corporate-vandalism.css:231-234",
+     "variant": "Redacted state control with citation"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [
+    "state-control"
+   ],
+   "conflictsWith": []
+  },
+  {
+   "id": "receipt-strip",
+   "category": "ornament",
+   "name": "Receipt strip",
+   "what": "Thermal-paper block with sawtooth top and bottom edges drawn in the page colour, dashed rules, a total line.",
+   "params": [
+    {
+     "name": "edge",
+     "kind": "enum",
+     "range": "sawtooth|straight",
+     "default": "sawtooth"
+    },
+    {
+     "name": "rule",
+     "kind": "enum",
+     "range": "dashed|solid",
+     "default": "dashed"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "corporate-vandalism",
+     "where": "css/aesthetics/corporate-vandalism.css:102-119",
+     "variant": "gradient sawtooth edges, no mask (export-safe)"
+    },
+    {
+     "key": "corporate-vandalism",
+     "where": "js/aesthetics/corporate-vandalism.js:193-201",
+     "variant": "markup"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": false,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "rubber-stamp",
+   "category": "ornament",
+   "name": "Rubber stamp mark",
+   "what": "Do / Don't markers rendered as bordered stamps, rotated, dashed for the negative.",
+   "params": [
+    {
+     "name": "rotation",
+     "kind": "number",
+     "range": "-8..8 deg",
+     "default": "-4"
+    },
+    {
+     "name": "border",
+     "kind": "number",
+     "range": "1-2 px",
+     "default": "1.5"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "corporate-vandalism",
+     "where": "css/aesthetics/corporate-vandalism.css:286-290",
+     "variant": ".cv-stamp, dashed for dont"
+    },
+    {
+     "key": "corporate-vandalism",
+     "where": "js/aesthetics/corporate-vandalism.js:260-261",
+     "variant": "deck.marks hook"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": false,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "wireframe-sphere-reticle",
+   "category": "ornament",
+   "name": "Wireframe sphere with reticle",
+   "what": "Generated SVG: latitude/longitude ellipses, perspective floor grid, dotted reticle rings, ticks, lock brackets and a blip, all non-scaling strokes.",
+   "params": [
+    {
+     "name": "latBands",
+     "kind": "number",
+     "range": "3-9",
+     "default": "5"
+    },
+    {
+     "name": "floorLines",
+     "kind": "number",
+     "range": "5-15",
+     "default": "9"
+    },
+    {
+     "name": "reticleRings",
+     "kind": "number",
+     "range": "1-3",
+     "default": "2"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "cyber-hud",
+     "where": "js/aesthetics/cyber-hud.js:147-166",
+     "variant": "floor, sphere, reticle, brackets, blip in one viewBox 100"
+    }
+   ],
+   "expressibleAs": "svg-generator",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": false,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "clay-primitive-solids",
+   "category": "ornament",
+   "name": "Clay primitive solids",
+   "what": "CSS-built sphere, torus, capsule, tile and beads with the three-layer finish and a contact shadow ellipse each.",
+   "params": [
+    {
+     "name": "shape",
+     "kind": "enum",
+     "range": "sphere|torus|capsule|tile|bead",
+     "default": "sphere"
+    },
+    {
+     "name": "colourRole",
+     "kind": "enum",
+     "range": "primary|secondary|pastel",
+     "default": "pastel"
+    },
+    {
+     "name": "contactShadow",
+     "kind": "bool",
+     "range": "true|false",
+     "default": "true"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "clay",
+     "where": "css/aesthetics/clay.css:74-131",
+     "variant": ".cla-* set composed into one art block (js 99-111)"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": false,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "caps-mono-labels",
+   "category": "type",
+   "name": "Caps mono labels",
+   "what": "All labels, tags, states and values in small uppercase mono (or body) with wide tracking.",
+   "params": [
+    {
+     "name": "size",
+     "kind": "number",
+     "range": "9-12 px",
+     "default": "10.5"
+    },
+    {
+     "name": "tracking",
+     "kind": "number",
+     "range": "0.04-0.2 em",
+     "default": "0.14"
+    },
+    {
+     "name": "face",
+     "kind": "enum",
+     "range": "mono|body",
+     "default": "mono"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "blob-tracking",
+     "where": "css/aesthetics/blob-tracking.css:154-155, 237",
+     "variant": "labels 0.18em, field label 10.5px 0.16em; hook type ui/label mono (js 313)"
+    },
+    {
+     "key": "blueprint",
+     "where": "css/aesthetics/blueprint.css:39, 186-189",
+     "variant": "mono 10-11px 0.12-0.14em"
+    },
+    {
+     "key": "corporate-vandalism",
+     "where": "css/aesthetics/corporate-vandalism.css:46, 212-216",
+     "variant": "11px 0.08em; label hook mono (js 90)"
+    },
+    {
+     "key": "cyber-hud",
+     "where": "css/aesthetics/cyber-hud.css:107, 114, 165",
+     "variant": "mono uppercase 0.1-0.18em; type hook mono (js 57)"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [
+    "label",
+    "tag",
+    "field-label"
+   ],
+   "conflictsWith": []
+  },
+  {
+   "id": "tight-display-tracking",
+   "category": "type",
+   "name": "Tight display tracking",
+   "what": "Negative letter-spacing on headline, brand and card titles, scaled by the font class factor --ab-tr.",
+   "params": [
+    {
+     "name": "tracking",
+     "kind": "number",
+     "range": "-0.05..0 em",
+     "default": "-0.03"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "blob-tracking",
+     "where": "css/aesthetics/blob-tracking.css:50, 77, 222",
+     "variant": "-0.02 to -0.025em"
+    },
+    {
+     "key": "clay",
+     "where": "css/aesthetics/clay.css:35, 66, 163",
+     "variant": "-0.03 to -0.035em"
+    },
+    {
+     "key": "corporate-vandalism",
+     "where": "css/aesthetics/corporate-vandalism.css:27, 56",
+     "variant": "-0.03em on brand, -0.01em on the small headline"
+    }
+   ],
+   "expressibleAs": "tokens",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "word-detection-box",
+   "category": "type",
+   "name": "Highlight word as detection box",
+   "what": "The highlight word gets a 1px ink box, corner ticks and an ID tab hanging under it; the word keeps the accent ink.",
+   "params": [
+    {
+     "name": "tabText",
+     "kind": "text",
+     "range": "free",
+     "default": "ID 07 · 0.93"
+    },
+    {
+     "name": "ticks",
+     "kind": "bool",
+     "range": "true|false",
+     "default": "true"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "blob-tracking",
+     "where": "css/aesthetics/blob-tracking.css:85-91",
+     "variant": "ab-hl::before box with ticks, ab-hl::after tab; \"custom\" highlight hook (js 314-315)"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "dimension-line-underline",
+   "category": "type",
+   "name": "Highlight word as dimension line",
+   "what": "The highlight word is measured by a dimension line below with end ticks and a mono figure in a gap, in the accent.",
+   "params": [
+    {
+     "name": "figure",
+     "kind": "text",
+     "range": "free",
+     "default": "auto"
+    },
+    {
+     "name": "colour",
+     "kind": "enum",
+     "range": "accent|ink",
+     "default": "accent"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "blueprint",
+     "where": "css/aesthetics/blueprint.css:67-79",
+     "variant": ".ab-hl::before/::after; also kept in the app kit (css 293-304)"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "puffy-pill-highlight",
+   "category": "type",
+   "name": "Highlight word as puffy pill",
+   "what": "The highlight word sits in a fully rounded accent pill with glossy top, soft accent shadow and about -1.5deg tilt.",
+   "params": [
+    {
+     "name": "tilt",
+     "kind": "number",
+     "range": "-3..3 deg",
+     "default": "-1.5"
+    },
+    {
+     "name": "padding",
+     "kind": "text",
+     "range": "em",
+     "default": "0 0.28em"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "clay",
+     "where": "css/aesthetics/clay.css:66-73",
+     "variant": ".ab-hl pill; highlight hook (js 35-36)"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "chromatic-split-text",
+   "category": "type",
+   "name": "Chromatic split text",
+   "what": "The highlight word has a +/-0.04em text-shadow in two signal colours behind it plus a glow.",
+   "params": [
+    {
+     "name": "offset",
+     "kind": "number",
+     "range": "0.02-0.08 em",
+     "default": "0.04"
+    },
+    {
+     "name": "left",
+     "kind": "enum",
+     "range": "neon|neon2",
+     "default": "neon"
+    },
+    {
+     "name": "right",
+     "kind": "enum",
+     "range": "neon|neon2",
+     "default": "neon2"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "cyber-hud",
+     "where": "css/aesthetics/cyber-hud.css:71-74",
+     "variant": ".ab-hl text-shadow; tokens --ab-split-a/b (js 131-132)"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "kruger-bar-headline",
+   "category": "type",
+   "name": "Kruger bar over headline",
+   "what": "A hazard-colour bar with white bold-oblique display text, rotated about -2deg, set over a small, plain official headline (scale inversion).",
+   "params": [
+    {
+     "name": "rotation",
+     "kind": "number",
+     "range": "-4..4 deg",
+     "default": "-2"
+    },
+    {
+     "name": "barColour",
+     "kind": "colour",
+     "range": "fixed",
+     "default": "#E10600"
+    },
+    {
+     "name": "officialSize",
+     "kind": "number",
+     "range": "24-34 px",
+     "default": "24-34"
+    },
+    {
+     "name": "barSize",
+     "kind": "number",
+     "range": "34-96 px",
+     "default": "34-96"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "corporate-vandalism",
+     "where": "css/aesthetics/corporate-vandalism.css:55-63",
+     "variant": ".cvh-o small, .cvh-k bar, box-decoration-break clone"
+    },
+    {
+     "key": "corporate-vandalism",
+     "where": "js/aesthetics/corporate-vandalism.js:126-130",
+     "variant": "headline() hook wraps the official headline"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": false,
+   "kitScope": [],
+   "conflictsWith": [
+    "outline-echo-headline"
+   ]
+  },
+  {
+   "id": "fixed-secondary-face",
+   "category": "type",
+   "name": "Fixed second typeface",
+   "what": "A second face fixed by the style (never client-selectable) used only for the foreign mark.",
+   "params": [
+    {
+     "name": "family",
+     "kind": "text",
+     "range": "font stack",
+     "default": "Jost, Futura"
+    },
+    {
+     "name": "weight",
+     "kind": "number",
+     "range": "400-900",
+     "default": "800"
+    },
+    {
+     "name": "oblique",
+     "kind": "bool",
+     "range": "true|false",
+     "default": "true"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "corporate-vandalism",
+     "where": "js/aesthetics/corporate-vandalism.js:26",
+     "variant": "cvVandalFace()"
+    },
+    {
+     "key": "corporate-vandalism",
+     "where": "js/aesthetics/corporate-vandalism.js:162",
+     "variant": "--cv-vandal"
+    },
+    {
+     "key": "corporate-vandalism",
+     "where": "js/aesthetics/corporate-vandalism.js:173",
+     "variant": "loads Jost via loadFontFamily"
+    }
+   ],
+   "expressibleAs": "tokens",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": false,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "title-block-layout",
+   "category": "layout",
+   "name": "Title-block hero",
+   "what": "The hero copy is a boxed title block in a corner of a full sheet drawing, with kicker row, headline, subcopy and meta cells ruled off.",
+   "params": [
+    {
+     "name": "corner",
+     "kind": "enum",
+     "range": "bottom-right|bottom-left",
+     "default": "bottom-right"
+    },
+    {
+     "name": "border",
+     "kind": "number",
+     "range": "1-2 px",
+     "default": "1.6"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "blueprint",
+     "where": "css/aesthetics/blueprint.css:47-93",
+     "variant": "grid overlay of art and copy; paper variant drops the box (css 86-93)"
+    },
+    {
+     "key": "blueprint",
+     "where": "css/aesthetics/blueprint.css:231-237",
+     "variant": "deck cover re-lays the same split"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": false,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "info-strip",
+   "category": "layout",
+   "name": "Info strip",
+   "what": "A ruled strip of labelled cells across the top or bottom of the board (record strip, announcement bar).",
+   "params": [
+    {
+     "name": "edge",
+     "kind": "enum",
+     "range": "top|bottom",
+     "default": "bottom"
+    },
+    {
+     "name": "cells",
+     "kind": "text",
+     "range": "content list",
+     "default": "Project · Note · Ref · Issued"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "blueprint",
+     "where": "css/aesthetics/blueprint.css:215-227",
+     "variant": "footer drawing-record strip"
+    },
+    {
+     "key": "corporate-vandalism",
+     "where": "css/aesthetics/corporate-vandalism.css:18-25",
+     "variant": "announcement bar in the official shell colour above the header"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": false,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "button-style",
+   "category": "kit",
+   "name": "Primary button style",
+   "what": "The CTA and state controls: fill or outline, shape, label treatment. Enum-parameterised family: the variant param names the authored look; each variant still needs its own CSS.",
+   "params": [
+    {
+     "name": "variant",
+     "kind": "enum",
+     "range": "filled-ticked|outline|gloss-capsule|chamfer-gloss|flat-shell",
+     "default": "filled-ticked"
+    },
+    {
+     "name": "labelCase",
+     "kind": "enum",
+     "range": "upper|sentence",
+     "default": "upper"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "blob-tracking",
+     "where": "css/aesthetics/blob-tracking.css:223-235",
+     "variant": "primary fill with ticks at -5px (variant filled-ticked)"
+    },
+    {
+     "key": "blueprint",
+     "where": "css/aesthetics/blueprint.css:177-183",
+     "variant": "transparent 1.5px outline, hover offset outline (outline)"
+    },
+    {
+     "key": "clay",
+     "where": "css/aesthetics/clay.css:165-177",
+     "variant": "gloss capsule with round arrow chip"
+    },
+    {
+     "key": "corporate-vandalism",
+     "where": "css/aesthetics/corporate-vandalism.css:205-209",
+     "variant": "flat square shell, underline when primary collides (flat-shell)"
+    },
+    {
+     "key": "cyber-hud",
+     "where": "css/aesthetics/cyber-hud.css:155-162",
+     "variant": "chamfered gloss with arrow glyph"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [
+    "button"
+   ],
+   "conflictsWith": []
+  },
+  {
+   "id": "input-field-style",
+   "category": "kit",
+   "name": "Input field style",
+   "what": "Text field and its focus: box, underline, recessed well, brackets on focus. Enum-parameterised family: the variant param names the authored look; each variant still needs its own CSS.",
+   "params": [
+    {
+     "name": "variant",
+     "kind": "enum",
+     "range": "box-ticks|underline|well|box|chamfer-brackets",
+     "default": "box"
+    },
+    {
+     "name": "focus",
+     "kind": "enum",
+     "range": "ticks|brackets|ring|border",
+     "default": "ring"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "blob-tracking",
+     "where": "css/aesthetics/blob-tracking.css:237-239",
+     "variant": "box with ticks on focus"
+    },
+    {
+     "key": "blueprint",
+     "where": "css/aesthetics/blueprint.css:186-188",
+     "variant": "underline only"
+    },
+    {
+     "key": "clay",
+     "where": "css/aesthetics/clay.css:180-185",
+     "variant": "recessed well with primary ring"
+    },
+    {
+     "key": "corporate-vandalism",
+     "where": "css/aesthetics/corporate-vandalism.css:212-214",
+     "variant": "1px box, double-ring focus"
+    },
+    {
+     "key": "cyber-hud",
+     "where": "css/aesthetics/cyber-hud.css:165-170",
+     "variant": "bordered, neon brackets on focus"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [
+    "input"
+   ],
+   "conflictsWith": []
+  },
+  {
+   "id": "switch-control-style",
+   "category": "kit",
+   "name": "Switch control style",
+   "what": "Toggle track and thumb: square, block with ON/OFF readout, fat clay, native-looking checkbox. Enum-parameterised family: the variant param names the authored look; each variant still needs its own CSS.",
+   "params": [
+    {
+     "name": "variant",
+     "kind": "enum",
+     "range": "square-lock|square-hatch|clay-fat|checkbox|block-onoff",
+     "default": "square-lock"
+    },
+    {
+     "name": "width",
+     "kind": "number",
+     "range": "18-64 px",
+     "default": "48"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "blob-tracking",
+     "where": "css/aesthetics/blob-tracking.css:240-250",
+     "variant": "square track, LOCK text, primary thumb"
+    },
+    {
+     "key": "blueprint",
+     "where": "css/aesthetics/blueprint.css:189-193",
+     "variant": "square outline, hatched thumb"
+    },
+    {
+     "key": "clay",
+     "where": "css/aesthetics/clay.css:186-195",
+     "variant": "64x36 recessed track, pearl thumb, primary on"
+    },
+    {
+     "key": "corporate-vandalism",
+     "where": "css/aesthetics/corporate-vandalism.css:215-221",
+     "variant": "18px square checkbox"
+    },
+    {
+     "key": "cyber-hud",
+     "where": "css/aesthetics/cyber-hud.css:171-181",
+     "variant": "block thumb, ON readout"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [
+    "switch"
+   ],
+   "conflictsWith": []
+  },
+  {
+   "id": "segmented-control-style",
+   "category": "kit",
+   "name": "Segmented control style",
+   "what": "Tabs/segments and their selected look. Enum-parameterised family: the variant param names the authored look; each variant still needs its own CSS.",
+   "params": [
+    {
+     "name": "variant",
+     "kind": "enum",
+     "range": "underline-tab|outline-hatch|tray-pearl|numbered-index|chamfer-fill",
+     "default": "underline-tab"
+    },
+    {
+     "name": "selected",
+     "kind": "enum",
+     "range": "tab-id|hatch|pearl|underline|fill+inset",
+     "default": "tab-id"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "blob-tracking",
+     "where": "css/aesthetics/blob-tracking.css:208-221",
+     "variant": "hairline row, selected gets ink tab and ID"
+    },
+    {
+     "key": "blueprint",
+     "where": "css/aesthetics/blueprint.css:168-175",
+     "variant": "outlined, selected = hatch"
+    },
+    {
+     "key": "clay",
+     "where": "css/aesthetics/clay.css:154-161",
+     "variant": "recessed tray, selected = raised pearl pill"
+    },
+    {
+     "key": "corporate-vandalism",
+     "where": "css/aesthetics/corporate-vandalism.css:189-195",
+     "variant": "numbered index, selected underlined"
+    },
+    {
+     "key": "cyber-hud",
+     "where": "css/aesthetics/cyber-hud.css:146-153",
+     "variant": "chamfered, selected = fill3 + neon inset"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [
+    "segmented"
+   ],
+   "conflictsWith": []
+  },
+  {
+   "id": "progress-track",
+   "category": "kit",
+   "name": "Progress track style",
+   "what": "Row progress bar: tick-track with square marker, segmented 5/2 blocks, hairline, or thick rounded fill. Enum-parameterised family: the variant param names the authored look; each variant still needs its own CSS.",
+   "params": [
+    {
+     "name": "variant",
+     "kind": "enum",
+     "range": "tick-marker|segmented|hairline|solid-rounded",
+     "default": "tick-marker"
+    },
+    {
+     "name": "segment",
+     "kind": "number",
+     "range": "3-8 px",
+     "default": "5"
+    },
+    {
+     "name": "marker",
+     "kind": "bool",
+     "range": "true|false",
+     "default": "true"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "blob-tracking",
+     "where": "css/aesthetics/blob-tracking.css:283-290",
+     "variant": "hairline track with ticks, 1px fill ending in square marker, lock row in primary"
+    },
+    {
+     "key": "blueprint",
+     "where": "css/aesthetics/blueprint.css:210-212",
+     "variant": "tick track, 1px fill, square end"
+    },
+    {
+     "key": "corporate-vandalism",
+     "where": "css/aesthetics/corporate-vandalism.css:243-244",
+     "variant": "2px secondary track, ink fill"
+    },
+    {
+     "key": "cyber-hud",
+     "where": "css/aesthetics/cyber-hud.css:206-210",
+     "variant": "5px/2px segmented via mask; art bar and gauge (css 87-90)"
+    },
+    {
+     "key": "clay",
+     "where": "css/aesthetics/clay.css:205-225",
+     "variant": "rows as chunky clay cards; fills use the tonal ramp"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [
+    "row",
+    "progress"
+   ],
+   "conflictsWith": []
+  },
+  {
+   "id": "named-states",
+   "category": "kit",
+   "name": "Named three-state vocabulary",
+   "what": "The Rest / Hover / Pressed trio renamed and re-drawn to carry the metaphor (Searching/Locked/Lost, Idle/Target/Locked, Approved/Flagged/Redacted).",
+   "params": [
+    {
+     "name": "names",
+     "kind": "text",
+     "range": "three labels",
+     "default": "Rest,Hover,Pressed"
+    },
+    {
+     "name": "restLook",
+     "kind": "enum",
+     "range": "dashed|outline|filled|quiet",
+     "default": "outline"
+    },
+    {
+     "name": "hoverLook",
+     "kind": "enum",
+     "range": "primary-ticks|brackets|offset-outline|lifted",
+     "default": "primary-ticks"
+    },
+    {
+     "name": "pressedLook",
+     "kind": "enum",
+     "range": "dotted-ghost|hatch|redacted|squished|locked",
+     "default": "dotted-ghost"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "blob-tracking",
+     "where": "css/aesthetics/blob-tracking.css:253-271",
+     "variant": "Searching dashed, Locked primary+ticks+ID tab, Lost dotted ghost"
+    },
+    {
+     "key": "blueprint",
+     "where": "css/aesthetics/blueprint.css:196-200",
+     "variant": "Default outline, Hover offset outline, Active hatch"
+    },
+    {
+     "key": "clay",
+     "where": "css/aesthetics/clay.css:198-202",
+     "variant": "Rest/Hover/Pressed = the CTA itself lifted and squished"
+    },
+    {
+     "key": "corporate-vandalism",
+     "where": "css/aesthetics/corporate-vandalism.css:224-234",
+     "variant": "Approved / Flagged flag glyph / Redacted bar"
+    },
+    {
+     "key": "cyber-hud",
+     "where": "css/aesthetics/cyber-hud.css:184-195",
+     "variant": "Idle muted, Target brackets, Locked solid with lamp"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [
+    "state-control"
+   ],
+   "conflictsWith": []
+  },
+  {
+   "id": "hover-press-response",
+   "category": "motion",
+   "name": "Hover / press response",
+   "what": "How hover and active change the primary control: lift, scale, brightness, inset change, outline offset, underline.",
+   "params": [
+    {
+     "name": "hover",
+     "kind": "enum",
+     "range": "lift|brightness|inset-shrink|offset-outline|underline",
+     "default": "brightness"
+    },
+    {
+     "name": "active",
+     "kind": "enum",
+     "range": "scale|dim|invert|hatch",
+     "default": "dim"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "blob-tracking",
+     "where": "css/aesthetics/blob-tracking.css:227-230",
+     "variant": "ticks pull in, brightness"
+    },
+    {
+     "key": "blueprint",
+     "where": "css/aesthetics/blueprint.css:181-182",
+     "variant": "offset outline, hatch on active"
+    },
+    {
+     "key": "clay",
+     "where": "css/aesthetics/clay.css:176-177",
+     "variant": "translateY(-3px), scale(0.97)"
+    },
+    {
+     "key": "corporate-vandalism",
+     "where": "css/aesthetics/corporate-vandalism.css:208-209",
+     "variant": "label underline, active inverts"
+    },
+    {
+     "key": "cyber-hud",
+     "where": "css/aesthetics/cyber-hud.css:160-161",
+     "variant": "brightness 1.14 / 0.9"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [
+    "button"
+   ],
+   "conflictsWith": []
+  },
+  {
+   "id": "themed-microcopy-pack",
+   "category": "voice",
+   "name": "Themed microcopy pack",
+   "what": "The editable specimen copy block: kicker, motto, state names, readouts and in-world strings, with warm alternates.",
+   "params": [
+    {
+     "name": "slots",
+     "kind": "number",
+     "range": "5-60",
+     "default": "5"
+    },
+    {
+     "name": "warmAlternates",
+     "kind": "bool",
+     "range": "true|false",
+     "default": "false"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "blob-tracking",
+     "where": "js/aesthetics/blob-tracking.js:301-311",
+     "variant": "HUD readouts, lock tag"
+    },
+    {
+     "key": "blueprint",
+     "where": "js/aesthetics/blueprint.js:244-278",
+     "variant": "view titles, notes, revision table, legend"
+    },
+    {
+     "key": "clay",
+     "where": "js/aesthetics/clay.js:27-33",
+     "variant": "motto, kicker, state names"
+    },
+    {
+     "key": "corporate-vandalism",
+     "where": "js/aesthetics/corporate-vandalism.js:52-88",
+     "variant": "35 slots incl. Kruger bars and warm alternates"
+    },
+    {
+     "key": "cyber-hud",
+     "where": "js/aesthetics/cyber-hud.js:44-55",
+     "variant": "sync, signal, lock time, target id"
+    }
+   ],
+   "expressibleAs": "tokens",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": false,
+   "kitScope": [],
+   "conflictsWith": []
+  }
+ ],
+ "notes": "Schema notes: (1) expressibleAs takes one value but several moves are mixed (e.g. kruger-bar-headline is css-recipe plus a hash pick in the headline hook; contrast-lift-colour is a loop a runtime would ship as a helper). I used the dominant class and recorded the code part in remainder. (2) Kit component moves (button-style, input-field-style, switch-control-style, segmented-control-style, progress-track, named-states) are enum families: each variant is authored CSS, so a generator can only choose among authored variants, not invent new ones. Counting them as moves flatters coverage; I discounted moveCoverage for this. (3) Highlight-word treatments (box, dimension line, pill, chromatic split) are four moves with one use each rather than one parametric move; the idea matches but the CSS shares nothing. (4) `where` for CSS refers to css/aesthetics/<key>.css; the key in usedBy tells the file family. Line ranges refer to the files as read on 2026-11-06. (5) appSafe: false means board/website/deck art only. Kit-family moves, colour moves, caps-mono-labels and corner-radius are app-safe; art, sticker, receipt, hazard ribbon and similar are not. (6) Light mode is a separate structural variant in blob-tracking (plate stays dark) and blueprint (patent sheet); the schema has no field for per-mode variants."
+}

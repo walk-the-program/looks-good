@@ -1,0 +1,3222 @@
+{
+ "group": "A",
+ "styles": [
+  {
+   "key": "acid-graphics",
+   "name": "Acid Graphics",
+   "coreTrick": "The primary is pushed to full chroma and paired with a computed fluorescent clash colour at near-equal luminance, then every display line is individually warped (stretched on a wave, compressed, outlined with echoes) over a hidden 12-column grid.",
+   "colourRecipe": "Primary re-printed at 100% saturation with lightness by hue band; a muted primary (s<24) falls back to fixed #B6FF00. The clash is chartreuse beside a dark acid, hot magenta beside a green/yellow one, else the hue 165 degrees round at equal luminance. Soft accent replaced by fixed lime. Canvas near-black (L 2.4) or near-white.",
+   "moves": [
+    "primary-push-chroma",
+    "equal-luminance-clash",
+    "fixed-pigment-fallback",
+    "tinted-neutral-canvas",
+    "contrast-lift",
+    "role-tint-fill",
+    "ink-alpha-ramp",
+    "hard-offset-shadow",
+    "heavy-border",
+    "corner-radius",
+    "warped-display-headline",
+    "outline-echo-headline",
+    "tight-display-tracking",
+    "caps-mono-labels",
+    "big-numeral-rows",
+    "hidden-column-grid",
+    "palette-as-blocks",
+    "section-number-marker",
+    "info-strip",
+    "catalogue-number",
+    "barcode-serial",
+    "registration-marks",
+    "invented-sponsor-marks",
+    "ticket-tabs",
+    "flat-colour-planes",
+    "field-band-pattern",
+    "op-art-ripple",
+    "ink-filled-selected",
+    "named-states",
+    "cta-arrow-glyph",
+    "field-anatomy",
+    "text-legend-controls",
+    "kit-cell-chrome",
+    "focus-ring",
+    "disabled-state",
+    "progress-bar-skin",
+    "status-chip"
+   ],
+   "remainder": [
+    {
+     "what": "OKLCH clash search (gamut bisection, luminance solve, dull-hue rejection, fallback offsets)",
+     "where": "js/aesthetics/acid-graphics.js:56-93",
+     "whyCode": "iterative colour search over gamut; no closed form a token or CSS can express"
+    },
+    {
+     "what": "Per-letter warped headline with wave, compressed middle line and fit-to-column sizing",
+     "where": "js/aesthetics/acid-graphics.js:218-244",
+     "whyCode": "per-letter layout computed from line length and index"
+    },
+    {
+     "what": "The flyer: composed 4:5 HTML poster (name, slogan, info grid, stub, kana spine, sponsor wall) with two SVG displacement filters",
+     "where": "js/aesthetics/acid-graphics.js:246-305",
+     "whyCode": "bespoke composition and hand-drawn marks; only the filters and ripple are generator-shaped"
+    },
+    {
+     "what": "Luminance-delta readout and pair legend printed in the palette strip",
+     "where": "js/aesthetics/acid-graphics.js:188-213",
+     "whyCode": "values computed at render time and injected through content:var()"
+    },
+    {
+     "what": "Line-up bill type list and per-section info strip copy",
+     "where": "css/aesthetics/acid-graphics.css:154-176",
+     "whyCode": "hand-authored layout and per-section strings"
+    }
+   ],
+   "moveCoverage": 55,
+   "notes": "Light mode turns the hero into a full-bleed acid field (css 65-68). The file also holds a classic copy of the kit block (css 388-452) which was ignored."
+  },
+  {
+   "key": "ascii-art",
+   "name": "ASCII Art",
+   "coreTrick": "Everything is a character: colour is snapped to the 16 ANSI colours, the headline is built from a 5x7 bitmap as block glyphs, and the hero is the brand word rasterised on a canvas then mapped to a 70-step glyph ramp with line-ASCII edges.",
+   "colourRecipe": "Primary, secondary and accent each snap to the nearest ANSI colour by hue (dark 7 on paper, bright twins on black); a grey or near-grey uses weighted RGB distance. Exact client hex only appears in 0xRRGGBB readouts. Canvas pure #000 or paper #F4F1E8.",
+   "moves": [
+    "quantise-to-fixed-palette",
+    "tinted-neutral-canvas",
+    "contrast-lift",
+    "block-glyph-headline",
+    "glyph-raster-art",
+    "character-field-background",
+    "scanline-overlay",
+    "ambient-motion",
+    "inline-title-rule",
+    "hairline-rule",
+    "heavy-border",
+    "corner-radius",
+    "tight-display-tracking",
+    "caps-mono-labels",
+    "text-legend-controls",
+    "role-shaped-swatch",
+    "section-number-marker",
+    "highlight-plane-word",
+    "ink-filled-selected",
+    "named-states",
+    "cta-arrow-glyph",
+    "field-anatomy",
+    "kit-cell-chrome",
+    "focus-ring",
+    "disabled-state",
+    "progress-bar-skin"
+   ],
+   "remainder": [
+    {
+     "what": "Canvas rasterisation of the brand word to a luminance grid and glyph-ramp mapping with edge detection",
+     "where": "js/aesthetics/ascii-art.js:160-243",
+     "whyCode": "image processing at render time, needs canvas and font loading"
+    },
+    {
+     "what": "Bitmap-font block-letter headline builder with shadow and half-block variant",
+     "where": "js/aesthetics/ascii-art.js:100-158",
+     "whyCode": "per-pixel layout from a font table"
+    },
+    {
+     "what": "Hue-aware ANSI snap and distinct-entry assignment",
+     "where": "js/aesthetics/ascii-art.js:58-88",
+     "whyCode": "nearest-colour search with exclusion"
+    },
+    {
+     "what": "Live ticker re-rendering panels and re-rasterising on font load",
+     "where": "js/aesthetics/ascii-art.js:264-284",
+     "whyCode": "timer-driven DOM updates"
+    },
+    {
+     "what": "Mono face selection with measured advance table so the glyph grid aligns",
+     "where": "js/aesthetics/ascii-art.js:33-98",
+     "whyCode": "grid maths depends on a known character advance per face"
+    },
+    {
+     "what": "Readout hex as 0xRRGGBB through a token",
+     "where": "js/aesthetics/ascii-art.js:369-370",
+     "whyCode": "CSS cannot strip # from text"
+    }
+   ],
+   "moveCoverage": 40,
+   "notes": "Most visible things (headline, hero, swatch glyph content) are code-built; the kit section is almost entirely css-recipe and reusable. The file also carries a classic copy of kit rules (css 359-364)."
+  },
+  {
+   "key": "aurora-noir",
+   "name": "Aurora Noir",
+   "coreTrick": "Every surface is an alpha of the ink colour on a near-black canvas (hairline fill, 1px lit top edge), lit by a soft colour-cloud wash, a conic beam and a hairline horizon arc above and below an opaque product-window mock.",
+   "colourRecipe": "Canvas capped at L 8% (dark). Primary is reserved for state (focus, switch, progress, status dot) and as the first beam and cloud colour; secondary is the second beam and cloud colour; accent is a small badge/dot and one headline word, shaded for contrast. The main action is ink-filled.",
+   "moves": [
+    "tinted-neutral-canvas",
+    "ink-alpha-ramp",
+    "contrast-lift",
+    "role-tint-fill",
+    "hairline-rule",
+    "top-edge-highlight",
+    "corner-radius",
+    "hidden-column-grid",
+    "colour-cloud-wash",
+    "conic-beam",
+    "horizon-arc",
+    "product-mock-art",
+    "catalogue-number",
+    "section-number-marker",
+    "caps-mono-labels",
+    "tight-display-tracking",
+    "ink-filled-action",
+    "ink-filled-selected",
+    "named-states",
+    "cta-arrow-glyph",
+    "status-chip",
+    "field-anatomy",
+    "text-legend-controls",
+    "kit-cell-chrome",
+    "focus-ring",
+    "disabled-state",
+    "ambient-motion"
+   ],
+   "remainder": [
+    {
+     "what": "Product-window markup with sidebar, properties and activity rows from editable copy",
+     "where": "js/aesthetics/aurora-noir.js:164-204",
+     "whyCode": "bespoke HTML with data-bound copy and brand-prefixed IDs"
+    },
+    {
+     "what": "Issues table panel built by rewriting the shared list markup and computing the average",
+     "where": "js/aesthetics/aurora-noir.js:206-219",
+     "whyCode": "transforms the framework's list output"
+    },
+    {
+     "what": "Muted-text contrast loops against ink fills, per mode",
+     "where": "js/aesthetics/aurora-noir.js:119-128",
+     "whyCode": "iterative contrast search"
+    },
+    {
+     "what": "Export workarounds for html2canvas (beam, arc, grid fade, lit top edge box-shadow)",
+     "where": "css/aesthetics/aurora-noir.css:305-327",
+     "whyCode": "renderer-specific overrides"
+    },
+    {
+     "what": "anPrefix: issue-ID prefix from brand words",
+     "where": "js/aesthetics/aurora-noir.js:12-21",
+     "whyCode": "text rule on the brand name"
+    }
+   ],
+   "moveCoverage": 70,
+   "notes": "Almost all values are tokens or css-recipe; the weight is in the hero art. appSafe: the aurora and window are board-only; the kit keeps the hairline and lit-edge language. The file also holds a classic copy of kit rules."
+  },
+  {
+   "key": "bauhaus-poster",
+   "name": "Bauhaus Poster",
+   "coreTrick": "Flat geometry only: a hard-edged 3x3 tile of quarter circles, semicircles and discs in the client primary plus two fixed poster pigments, with every control either square or fully round, 2px ink borders, and a huge tight lowercase headline.",
+   "colourRecipe": "Blue is always the client primary; red #EE4035 and yellow #F6C90E are fixed decorative planes (art, diagonal bar, card stripe). Secondary and accent run large only inside the art; in the UI they stay small tags and one highlight plane.",
+   "moves": [
+    "fixed-pigment-fallback",
+    "heavy-border",
+    "corner-radius",
+    "lowercase-poster-headline",
+    "vertical-kicker",
+    "tight-display-tracking",
+    "caps-mono-labels",
+    "highlight-plane-word",
+    "big-numeral-rows",
+    "section-number-marker",
+    "role-shaped-swatch",
+    "geometric-art-tile",
+    "flat-colour-planes",
+    "ink-filled-selected",
+    "named-states",
+    "cta-arrow-glyph",
+    "field-anatomy",
+    "status-chip",
+    "progress-bar-skin",
+    "kit-cell-chrome",
+    "focus-ring",
+    "disabled-state"
+   ],
+   "remainder": [
+    {
+     "what": "Hand-composed 3x3 cell table with the overlapping circle and triangle that overflow the box",
+     "where": "js/aesthetics/bauhaus-poster.js:57-86",
+     "whyCode": "composition is authored, not derived; a generator could take it as a table but a good default needs design"
+    },
+    {
+     "what": "Diagonal bar and thin ink bar angled to 21 degrees, placed behind the art",
+     "where": "css/aesthetics/bauhaus-poster.css:36-46",
+     "whyCode": "hand-tuned positions and angles relative to the hero"
+    },
+    {
+     "what": "Highlight word clipped with a hard-stop gradient that flips colour at 46%",
+     "where": "css/aesthetics/bauhaus-poster.css:69-80",
+     "whyCode": "background-clip text trick that is fragile on dark canvases"
+    }
+   ],
+   "moveCoverage": 80,
+   "notes": "The simplest style: only the art is svg-generator, the rest is css-recipe. It has no tokens() beyond the two fixed pigments and no canvas/headline hooks."
+  },
+  {
+   "key": "bento-grid",
+   "name": "Bento Grid",
+   "coreTrick": "The whole board is a 12-column grid of rounded tiles on a slightly darker canvas, with one radius, one gap, no borders, one solid primary action tile, secondary-tinted tiles and huge stat numerals.",
+   "colourRecipe": "Canvas a step darker than the tile (light mode); the tile is white mixed with canvas. The primary fills exactly one action tile, the lead numeral and the product mock; secondary tints the stage and the lead stat tile; accent is one dot. Muted and primary text are walked toward ink until they pass on the tile.",
+   "moves": [
+    "tinted-neutral-canvas",
+    "contrast-lift",
+    "role-tint-fill",
+    "ink-alpha-ramp",
+    "corner-radius",
+    "recessed-field",
+    "tight-display-tracking",
+    "big-numeral-rows",
+    "section-number-marker",
+    "bento-cells",
+    "palette-as-blocks",
+    "lit-sphere-render",
+    "product-mock-art",
+    "ink-filled-selected",
+    "named-states",
+    "cta-arrow-glyph",
+    "field-anatomy",
+    "status-chip",
+    "progress-bar-skin",
+    "kit-cell-chrome",
+    "focus-ring",
+    "disabled-state"
+   ],
+   "remainder": [
+    {
+     "what": "Phone product mock with floating chips and cropped rise",
+     "where": "js/aesthetics/bento-grid.js:132-159",
+     "whyCode": "bespoke HTML with editable copy"
+    },
+    {
+     "what": "Deck Patterns stage as a bento of pattern images with fixed tile sizes",
+     "where": "js/aesthetics/bento-grid.js:191-207",
+     "whyCode": "deck hook placing pattern images at computed slot sizes"
+    },
+    {
+     "what": "Deck In-product and Material bentos",
+     "where": "js/aesthetics/bento-grid.js:208-241",
+     "whyCode": "deck slides built from the board copy"
+    },
+    {
+     "what": "Squeeze-and-lift transform pairs across kit components",
+     "where": "css/aesthetics/bento-grid.css:693-733",
+     "whyCode": "one rule per component, not parameterisable by one number"
+    }
+   ],
+   "moveCoverage": 75,
+   "notes": "The JS holds no look-defining logic; the look is CSS plus tokens. The shadow tokens (--ab-shadow, js 120-125) are defined but the tile CSS sets box-shadow none (css 34), so the 'one soft shadow' in the header comment is stale. The file also holds a classic copy of the app block (css 441-470)."
+  }
+ ],
+ "moves": [
+  {
+   "id": "primary-push-chroma",
+   "category": "colour",
+   "name": "Push primary to full chroma",
+   "what": "The client primary is re-printed at 100% saturation with a lightness picked by hue band; a muted primary falls back to a fixed vivid colour.",
+   "params": [
+    {
+     "name": "saturation",
+     "kind": "number",
+     "range": "0-100",
+     "default": "100"
+    },
+    {
+     "name": "lightness-by-hue",
+     "kind": "text",
+     "range": "per hue band",
+     "default": "yellow-green 50, cyan-blue 58, rest 54"
+    },
+    {
+     "name": "muted-fallback",
+     "kind": "colour",
+     "range": "hex",
+     "default": "#B6FF00"
+    },
+    {
+     "name": "muted-threshold",
+     "kind": "number",
+     "range": "HSL s below",
+     "default": "24"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "acid-graphics",
+     "where": "js/aesthetics/acid-graphics.js:23-29",
+     "variant": "printPrimary hook; client hex still shown in the palette readout"
+    },
+    {
+     "key": "acid-graphics",
+     "where": "js/aesthetics/acid-graphics.js:171-171",
+     "variant": "wired in as printPrimary"
+    }
+   ],
+   "expressibleAs": "needs-code",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "equal-luminance-clash",
+   "category": "colour",
+   "name": "Computed clash partner",
+   "what": "A second colour is derived from the primary: either a fixed fluorescent partner by hue family or the hue ~165 degrees round at the most chroma sRGB holds, lightness solved until its luminance equals the primary's.",
+   "params": [
+    {
+     "name": "hue-offset",
+     "kind": "number",
+     "range": "120-240 deg",
+     "default": "165"
+    },
+    {
+     "name": "match-luminance",
+     "kind": "bool",
+     "range": "",
+     "default": "true"
+    },
+    {
+     "name": "min-chroma",
+     "kind": "number",
+     "range": "OKLCH 0.10-0.15",
+     "default": "0.10"
+    },
+    {
+     "name": "fluorescent-override",
+     "kind": "enum",
+     "range": "chartreuse|magenta|none",
+     "default": "by hue family"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "acid-graphics",
+     "where": "js/aesthetics/acid-graphics.js:56-93",
+     "variant": "OKLCH search with gamut bisection, dull-hue rejection and fallback offsets"
+    }
+   ],
+   "expressibleAs": "needs-code",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "fixed-pigment-fallback",
+   "category": "colour",
+   "name": "Fixed pigment colours",
+   "what": "A style-owned fixed colour (not derived from the client palette) used as a flat plane or as the fallback spark.",
+   "params": [
+    {
+     "name": "colours",
+     "kind": "colour",
+     "range": "1-3 hex",
+     "default": "#EE4035,#F6C90E"
+    },
+    {
+     "name": "use",
+     "kind": "enum",
+     "range": "decorative-plane|spark|fallback",
+     "default": "decorative-plane"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "bauhaus-poster",
+     "where": "js/aesthetics/bauhaus-poster.js:34-38",
+     "variant": "poster red and yellow, decorative planes only; blue is always the client primary"
+    },
+    {
+     "key": "acid-graphics",
+     "where": "js/aesthetics/acid-graphics.js:181-183",
+     "variant": "a soft accent is replaced by acid lime #B6FF00 for the ticket stub and 18+ tab"
+    }
+   ],
+   "expressibleAs": "tokens",
+   "paletteAgnostic": false,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "quantise-to-fixed-palette",
+   "category": "colour",
+   "name": "Quantise to a fixed palette",
+   "what": "Client colours snap to the nearest entry of a small fixed palette (hue-aware, lightness picks dark vs bright twin); exact hex appears only in readouts.",
+   "params": [
+    {
+     "name": "palette",
+     "kind": "enum",
+     "range": "ansi-16|ansi-dark-7|custom list",
+     "default": "ansi-16 (dark 7 on paper)"
+    },
+    {
+     "name": "hue-weight",
+     "kind": "number",
+     "range": "dh/30 vs dL/0.4",
+     "default": "30deg"
+    },
+    {
+     "name": "chroma-gate",
+     "kind": "number",
+     "range": "OKLCH",
+     "default": "0.035"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "ascii-art",
+     "where": "js/aesthetics/ascii-art.js:20-31",
+     "variant": "CGA/ANSI sets, bright-only on black"
+    },
+    {
+     "key": "ascii-art",
+     "where": "js/aesthetics/ascii-art.js:58-88",
+     "variant": "aaCga/aaQuant, primary and secondary and accent snapped to distinct entries"
+    },
+    {
+     "key": "ascii-art",
+     "where": "js/aesthetics/ascii-art.js:340-340",
+     "variant": "printPrimary"
+    }
+   ],
+   "expressibleAs": "needs-code",
+   "paletteAgnostic": false,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "tinted-neutral-canvas",
+   "category": "colour",
+   "name": "Style-owned canvas",
+   "what": "The framework canvas is replaced by a near-neutral the style controls: a lightness cap, a mix toward ink, or a pure value.",
+   "params": [
+    {
+     "name": "dark-lightness",
+     "kind": "number",
+     "range": "0-100 HSL L",
+     "default": "2.4 / 8 / 0"
+    },
+    {
+     "name": "dark-saturation-cap",
+     "kind": "number",
+     "range": "0-100",
+     "default": "12 / 28"
+    },
+    {
+     "name": "light-mix",
+     "kind": "number",
+     "range": "0-1",
+     "default": "0.85 / 0.95"
+    },
+    {
+     "name": "light-fixed",
+     "kind": "colour",
+     "range": "hex",
+     "default": "#F4F1E8"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "acid-graphics",
+     "where": "js/aesthetics/acid-graphics.js:165-168",
+     "variant": "dark: L 2.4, s <= 12; light: near white"
+    },
+    {
+     "key": "aurora-noir",
+     "where": "js/aesthetics/aurora-noir.js:103-109",
+     "variant": "dark: L capped at 8, s <= 28; light unchanged"
+    },
+    {
+     "key": "bento-grid",
+     "where": "js/aesthetics/bento-grid.js:88-91",
+     "variant": "light only: a step darker than the tiles (mix toward ink 0.95)"
+    },
+    {
+     "key": "ascii-art",
+     "where": "js/aesthetics/ascii-art.js:338-338",
+     "variant": "pure #000 or paper #F4F1E8"
+    }
+   ],
+   "expressibleAs": "tokens",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "contrast-lift",
+   "category": "colour",
+   "name": "Contrast-safe text shade",
+   "what": "A text colour (muted, primary, accent) is walked toward ink in steps until it reaches a target ratio on the surface it actually sits on.",
+   "params": [
+    {
+     "name": "min-ratio",
+     "kind": "number",
+     "range": "3-7",
+     "default": "3 / 4.5 / 5"
+    },
+    {
+     "name": "toward",
+     "kind": "enum",
+     "range": "ink|white",
+     "default": "ink"
+    },
+    {
+     "name": "step",
+     "kind": "number",
+     "range": "0.05-0.1",
+     "default": "0.05-0.1"
+    },
+    {
+     "name": "surface",
+     "kind": "enum",
+     "range": "canvas|tile|tint|fill",
+     "default": "by style"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "acid-graphics",
+     "where": "js/aesthetics/acid-graphics.js:188-191",
+     "variant": "acid lifted toward white to 5:1 on the tinted rows, dark mode only"
+    },
+    {
+     "key": "ascii-art",
+     "where": "js/aesthetics/ascii-art.js:362-368",
+     "variant": "prompts 4.5:1, highlight 3:1, primary text 4.5:1"
+    },
+    {
+     "key": "aurora-noir",
+     "where": "js/aesthetics/aurora-noir.js:119-128",
+     "variant": "muted held at 4.5:1 on the 12% ink fill"
+    },
+    {
+     "key": "bento-grid",
+     "where": "js/aesthetics/bento-grid.js:100-109",
+     "variant": "muted 4.6:1 on tile and tinted tile; primary text 3:1 on tile"
+    }
+   ],
+   "expressibleAs": "needs-code",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "ink-alpha-ramp",
+   "category": "colour",
+   "name": "Surfaces as alphas of ink",
+   "what": "Fills, hairlines, grid and selected chips are all alphas of the ink colour, so the same recipe flips to light mode unchanged.",
+   "params": [
+    {
+     "name": "fill",
+     "kind": "number",
+     "range": "0.02-0.08",
+     "default": "0.035"
+    },
+    {
+     "name": "hairline",
+     "kind": "number",
+     "range": "0.06-0.16",
+     "default": "0.09"
+    },
+    {
+     "name": "selected",
+     "kind": "number",
+     "range": "0.08-0.12",
+     "default": "0.10"
+    },
+    {
+     "name": "grid",
+     "kind": "number",
+     "range": "0.04-0.07",
+     "default": "0.06"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "aurora-noir",
+     "where": "js/aesthetics/aurora-noir.js:129-146",
+     "variant": "fill 3.5%, hair 9-14%, sel 10%, grid 6%"
+    },
+    {
+     "key": "acid-graphics",
+     "where": "js/aesthetics/acid-graphics.js:207-209",
+     "variant": "grid hairlines at 4.5-6.5% of ink; role tints are 12% alphas of acid and clash"
+    },
+    {
+     "key": "bento-grid",
+     "where": "js/aesthetics/bento-grid.js:118-119",
+     "variant": "tile line 8-10% of ink"
+    }
+   ],
+   "expressibleAs": "tokens",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "role-tint-fill",
+   "category": "colour",
+   "name": "Role tint fill",
+   "what": "A role colour mixed at low strength into a surface to give a tinted tile, row or chip.",
+   "params": [
+    {
+     "name": "role",
+     "kind": "enum",
+     "range": "primary|secondary|accent|acid|clash",
+     "default": "secondary"
+    },
+    {
+     "name": "amount",
+     "kind": "number",
+     "range": "0.12-0.24",
+     "default": "0.2"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "bento-grid",
+     "where": "js/aesthetics/bento-grid.js:103-103",
+     "variant": "secondary 20% over tile for the product stage"
+    },
+    {
+     "key": "bento-grid",
+     "where": "js/aesthetics/bento-grid.js:117-117",
+     "variant": "primary 14-20% over tile (match fit)"
+    },
+    {
+     "key": "acid-graphics",
+     "where": "css/aesthetics/acid-graphics.css:223-224",
+     "variant": "alternating rows tinted acid then clash at 12%"
+    },
+    {
+     "key": "aurora-noir",
+     "where": "js/aesthetics/aurora-noir.js:156-158",
+     "variant": "primary, secondary and accent 15-36% alpha for chips and badges"
+    }
+   ],
+   "expressibleAs": "tokens",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "hard-offset-shadow",
+   "category": "material",
+   "name": "Hard offset echo",
+   "what": "A zero-blur shadow offset 3-5px, in a second colour, under raised things; pressed removes it and nudges the piece onto it.",
+   "params": [
+    {
+     "name": "offset",
+     "kind": "number",
+     "range": "2-6px",
+     "default": "5"
+    },
+    {
+     "name": "colour",
+     "kind": "enum",
+     "range": "clash|ink|secondary",
+     "default": "clash"
+    },
+    {
+     "name": "pressed-translate",
+     "kind": "number",
+     "range": "px",
+     "default": "3"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "acid-graphics",
+     "where": "css/aesthetics/acid-graphics.css:179-180",
+     "variant": "cards echo in clash, panels in acid, 5px"
+    },
+    {
+     "key": "acid-graphics",
+     "where": "css/aesthetics/acid-graphics.css:356-358",
+     "variant": "toast and menu 3px echo in the kit"
+    },
+    {
+     "key": "acid-graphics",
+     "where": "css/aesthetics/acid-graphics.css:606-608,639",
+     "variant": "kit cell 4px echo; pressed collapses it and translates 3px"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [
+    "card",
+    "toast",
+    "menu",
+    "button",
+    "dialog"
+   ],
+   "conflictsWith": []
+  },
+  {
+   "id": "heavy-border",
+   "category": "material",
+   "name": "Heavy border",
+   "what": "A 1-3px solid (or double) frame in ink or a role colour on every control and container.",
+   "params": [
+    {
+     "name": "width",
+     "kind": "number",
+     "range": "1-3px",
+     "default": "2"
+    },
+    {
+     "name": "style",
+     "kind": "enum",
+     "range": "solid|double|dashed",
+     "default": "solid"
+    },
+    {
+     "name": "colour",
+     "kind": "enum",
+     "range": "ink|primary|acid|clash",
+     "default": "ink"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "bauhaus-poster",
+     "where": "css/aesthetics/bauhaus-poster.css:103-108",
+     "variant": "2px ink on cards, segments, CTA, status pills, bars"
+    },
+    {
+     "key": "bauhaus-poster",
+     "where": "css/aesthetics/bauhaus-poster.css:121-124,142-145",
+     "variant": "2px CTA border, 3px field underline"
+    },
+    {
+     "key": "acid-graphics",
+     "where": "css/aesthetics/acid-graphics.css:178-186",
+     "variant": "2px acid or clash edges on cards, panels, ticket tabs"
+    },
+    {
+     "key": "ascii-art",
+     "where": "css/aesthetics/ascii-art.css:175-178,605-606",
+     "variant": "1px frame at rest, 3px double on the primary action"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [
+    "card",
+    "button",
+    "field",
+    "segmented"
+   ],
+   "conflictsWith": []
+  },
+  {
+   "id": "hairline-rule",
+   "category": "material",
+   "name": "Hairline rule",
+   "what": "1px lines (rule rows, card borders, grid) at low contrast; depth comes from line weight, not shadow.",
+   "params": [
+    {
+     "name": "width",
+     "kind": "number",
+     "range": "1px",
+     "default": "1"
+    },
+    {
+     "name": "colour",
+     "kind": "enum",
+     "range": "ink-alpha|frame|line",
+     "default": "ink-alpha"
+    },
+    {
+     "name": "top-highlight",
+     "kind": "bool",
+     "range": "",
+     "default": "false"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "aurora-noir",
+     "where": "css/aesthetics/aurora-noir.css:160-163",
+     "variant": "hairline card border with a 1px top highlight"
+    },
+    {
+     "key": "ascii-art",
+     "where": "css/aesthetics/ascii-art.css:18-29,92-95",
+     "variant": "rule rows are box-drawing characters; label rows are a 1px line cut by the title"
+    },
+    {
+     "key": "ascii-art",
+     "where": "css/aesthetics/ascii-art.css:175-178",
+     "variant": "panel frame 1px with open top"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [
+    "card",
+    "divider"
+   ],
+   "conflictsWith": []
+  },
+  {
+   "id": "top-edge-highlight",
+   "category": "material",
+   "name": "Lit top edge",
+   "what": "A 1px linear-gradient along the top edge of a surface (transparent, highlight, transparent), optionally tinted by the aurora colours for one featured card.",
+   "params": [
+    {
+     "name": "colour",
+     "kind": "enum",
+     "range": "ink-alpha|aurora-pair",
+     "default": "ink-alpha"
+    },
+    {
+     "name": "featured-only",
+     "kind": "bool",
+     "range": "",
+     "default": "true"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "aurora-noir",
+     "where": "css/aesthetics/aurora-noir.css:160-168",
+     "variant": "top highlight on all surfaces; aurora pair on the featured card"
+    },
+    {
+     "key": "aurora-noir",
+     "where": "css/aesthetics/aurora-noir.css:548-551",
+     "variant": "kit selection: a 2px ink lit-edge bar on the leading edge"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [
+    "card",
+    "tabs",
+    "menu"
+   ],
+   "conflictsWith": []
+  },
+  {
+   "id": "corner-radius",
+   "category": "material",
+   "name": "Corner radius system",
+   "what": "One or two radii, applied by role (container, control, pill) or a strict square-or-round rule.",
+   "params": [
+    {
+     "name": "container",
+     "kind": "number",
+     "range": "0-28px",
+     "default": "0 / 14 / 28"
+    },
+    {
+     "name": "control",
+     "kind": "number",
+     "range": "0-16px",
+     "default": "0 / 8"
+    },
+    {
+     "name": "pill",
+     "kind": "bool",
+     "range": "",
+     "default": "true"
+    },
+    {
+     "name": "square-or-round-only",
+     "kind": "bool",
+     "range": "",
+     "default": "false"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "acid-graphics",
+     "where": "css/aesthetics/acid-graphics.css:13,178",
+     "variant": "0 everywhere"
+    },
+    {
+     "key": "ascii-art",
+     "where": "css/aesthetics/ascii-art.css:298-308",
+     "variant": "square everywhere; nothing curves"
+    },
+    {
+     "key": "bauhaus-poster",
+     "where": "css/aesthetics/bauhaus-poster.css:121-132",
+     "variant": "square blocks or fully round discs, never between"
+    },
+    {
+     "key": "aurora-noir",
+     "where": "css/aesthetics/aurora-noir.css:160-190",
+     "variant": "cards 14, segments 9, buttons pill, kit 3-6px"
+    },
+    {
+     "key": "bento-grid",
+     "where": "css/aesthetics/bento-grid.css:20-37",
+     "variant": "one 28px tile radius, controls are pills"
+    }
+   ],
+   "expressibleAs": "tokens",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [
+    "button",
+    "card",
+    "field"
+   ],
+   "conflictsWith": []
+  },
+  {
+   "id": "recessed-field",
+   "category": "material",
+   "name": "Recessed well",
+   "what": "Surfaces inside a tile sit one tone step deeper than the tile, with no outline; fields are filled wells holding their own label.",
+   "params": [
+    {
+     "name": "depth",
+     "kind": "number",
+     "range": "ink mix 5-9%",
+     "default": "7"
+    },
+    {
+     "name": "label-in-well",
+     "kind": "bool",
+     "range": "",
+     "default": "true"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "bento-grid",
+     "where": "css/aesthetics/bento-grid.css:625-627,640-654",
+     "variant": "kit: every surface inside a cell is the well, floating layers are the tile"
+    },
+    {
+     "key": "bento-grid",
+     "where": "css/aesthetics/bento-grid.css:733-769",
+     "variant": "field = filled well with label top-left"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [
+    "field",
+    "card",
+    "menu"
+   ],
+   "conflictsWith": []
+  },
+  {
+   "id": "warped-display-headline",
+   "category": "type",
+   "name": "Per-letter warped headline",
+   "what": "Each display line is split into letters scaled on a wave, one line compressed and stretched, sized so the longest line fits its column.",
+   "params": [
+    {
+     "name": "stretch-range",
+     "kind": "number",
+     "range": "1.4-2.2",
+     "default": "1.4-2.2"
+    },
+    {
+     "name": "compressed-line",
+     "kind": "number",
+     "range": "scaleX .62",
+     "default": "0.62"
+    },
+    {
+     "name": "max-line-letters",
+     "kind": "number",
+     "range": "6-10",
+     "default": "8"
+    },
+    {
+     "name": "wave",
+     "kind": "number",
+     "range": "phase 0.9 / 1.7",
+     "default": "0.9"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "acid-graphics",
+     "where": "js/aesthetics/acid-graphics.js:218-244",
+     "variant": "def.headline builds spans with --s per letter and --acn for fitting"
+    },
+    {
+     "key": "acid-graphics",
+     "where": "css/aesthetics/acid-graphics.css:73-87",
+     "variant": "wrapper fits longest line, per-letter scaleY from baseline"
+    }
+   ],
+   "expressibleAs": "needs-code",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": false,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "outline-echo-headline",
+   "category": "type",
+   "name": "Outline echo type",
+   "what": "Last line or name set as outline only (stroke, no fill) with one to two offset echo copies in role colours.",
+   "params": [
+    {
+     "name": "stroke",
+     "kind": "number",
+     "range": "1-3px",
+     "default": "2"
+    },
+    {
+     "name": "echoes",
+     "kind": "number",
+     "range": "1-3",
+     "default": "2"
+    },
+    {
+     "name": "echo-colours",
+     "kind": "text",
+     "range": "role names",
+     "default": "acid,clash"
+    },
+    {
+     "name": "echo-offset",
+     "kind": "number",
+     "range": "em",
+     "default": "0.06"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "acid-graphics",
+     "where": "js/aesthetics/acid-graphics.js:134-135",
+     "variant": "highlight is outline-only, with two echoes in the acid and the clash"
+    },
+    {
+     "key": "acid-graphics",
+     "where": "js/aesthetics/acid-graphics.js:313-313",
+     "variant": "Echo name material: transparent fill, 2px stroke, drop-shadow echoes"
+    },
+    {
+     "key": "acid-graphics",
+     "where": "css/aesthetics/acid-graphics.css:73-87,102-110",
+     "variant": "headline last line and flyer name"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "block-glyph-headline",
+   "category": "type",
+   "name": "Block-glyph headline",
+   "what": "The headline is drawn from a bitmap font one block glyph per pixel with a shaded shadow, wrapped by words, with a half-block variant for narrow widths.",
+   "params": [
+    {
+     "name": "font",
+     "kind": "enum",
+     "range": "5x7|custom bitmap",
+     "default": "5x7"
+    },
+    {
+     "name": "block",
+     "kind": "text",
+     "range": "char",
+     "default": "█"
+    },
+    {
+     "name": "shadow",
+     "kind": "text",
+     "range": "char",
+     "default": "▒"
+    },
+    {
+     "name": "narrow-rows",
+     "kind": "number",
+     "range": "4",
+     "default": "4"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "ascii-art",
+     "where": "js/aesthetics/ascii-art.js:100-158,342-347",
+     "variant": "aaFig builds wide (8 rows) and narrow (4 rows, ▀▄█) figures"
+    },
+    {
+     "key": "ascii-art",
+     "where": "css/aesthetics/ascii-art.css:47-63",
+     "variant": "pre-formatted rows sized so the longest figure fits 86cqw"
+    }
+   ],
+   "expressibleAs": "needs-code",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": false,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "tight-display-tracking",
+   "category": "type",
+   "name": "Display tracking",
+   "what": "Negative letter-spacing on display and numeral text, scaled by --ab-tr so condensed/heavy faces are not tightened into collisions.",
+   "params": [
+    {
+     "name": "tracking",
+     "kind": "number",
+     "range": "-0.005 to -0.055em",
+     "default": "-0.03"
+    },
+    {
+     "name": "face-scale",
+     "kind": "enum",
+     "range": "by font class",
+     "default": "condensed 0.4-0, heavy 0-0.5"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "bento-grid",
+     "where": "css/aesthetics/bento-grid.css:216,266",
+     "variant": "-0.045em on card titles, -0.055em on numerals"
+    },
+    {
+     "key": "bauhaus-poster",
+     "where": "css/aesthetics/bauhaus-poster.css:66-68,119,171",
+     "variant": "-0.02em to -0.04em, lowercase headline"
+    },
+    {
+     "key": "aurora-noir",
+     "where": "css/aesthetics/aurora-noir.css:176",
+     "variant": "-0.03em on card titles"
+    },
+    {
+     "key": "acid-graphics",
+     "where": "js/aesthetics/acid-graphics.js:214-214",
+     "variant": "--ab-tr by class"
+    },
+    {
+     "key": "ascii-art",
+     "where": "js/aesthetics/ascii-art.js:357-357",
+     "variant": "--ab-tr by class"
+    }
+   ],
+   "expressibleAs": "tokens",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": false,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "lowercase-poster-headline",
+   "category": "type",
+   "name": "Huge lowercase poster headline",
+   "what": "A heavy, tight, lowercase headline spanning the hero, with line-height derived from tracking.",
+   "params": [
+    {
+     "name": "case",
+     "kind": "enum",
+     "range": "lowercase|uppercase",
+     "default": "lowercase"
+    },
+    {
+     "name": "line-height",
+     "kind": "number",
+     "range": "0.9",
+     "default": "0.9"
+    },
+    {
+     "name": "hero",
+     "kind": "enum",
+     "range": "poster",
+     "default": "poster"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "bauhaus-poster",
+     "where": "css/aesthetics/bauhaus-poster.css:48-68",
+     "variant": "grid hero, headline in column 2"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": false,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "vertical-kicker",
+   "category": "type",
+   "name": "Vertical kicker",
+   "what": "The kicker runs top-to-bottom beside the headline with a rule and a disc.",
+   "params": [
+    {
+     "name": "tracking",
+     "kind": "number",
+     "range": "em",
+     "default": "0.34"
+    },
+    {
+     "name": "rule",
+     "kind": "bool",
+     "range": "",
+     "default": "true"
+    },
+    {
+     "name": "disc",
+     "kind": "bool",
+     "range": "",
+     "default": "true"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "bauhaus-poster",
+     "where": "css/aesthetics/bauhaus-poster.css:58-65",
+     "variant": "vertical-rl, 2px ink rule, ink disc; horizontal with red disc off-hero"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": false,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "caps-mono-labels",
+   "category": "type",
+   "name": "Tracked caps labels",
+   "what": "Small labels, tags and states in uppercase with wide tracking; set in mono where the style has a mono voice.",
+   "params": [
+    {
+     "name": "face",
+     "kind": "enum",
+     "range": "mono|heading|body",
+     "default": "mono"
+    },
+    {
+     "name": "tracking",
+     "kind": "number",
+     "range": "0.06-0.16em",
+     "default": "0.12"
+    },
+    {
+     "name": "size",
+     "kind": "number",
+     "range": "9-12px",
+     "default": "10.5"
+    },
+    {
+     "name": "weight",
+     "kind": "number",
+     "range": "400-800",
+     "default": "700"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "acid-graphics",
+     "where": "css/aesthetics/acid-graphics.css:37-38,204-210,226",
+     "variant": "mono caps, 700, 0.1-0.14em"
+    },
+    {
+     "key": "ascii-art",
+     "where": "js/aesthetics/ascii-art.js:325-325",
+     "variant": "whole UI is mono via type.ui"
+    },
+    {
+     "key": "aurora-noir",
+     "where": "css/aesthetics/aurora-noir.css:46-50",
+     "variant": "mono labels, 0.08em; state labels in brackets in the kit"
+    },
+    {
+     "key": "bauhaus-poster",
+     "where": "css/aesthetics/bauhaus-poster.css:12-18",
+     "variant": "heavy 800 sans caps at 0.14em (not mono)"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [
+    "label",
+    "badge",
+    "tab"
+   ],
+   "conflictsWith": []
+  },
+  {
+   "id": "highlight-plane-word",
+   "category": "type",
+   "name": "Highlight on lower half",
+   "what": "The highlighted headline word gets a flat plane covering its lower portion via a hard-stop gradient, or a lower-third underline mark.",
+   "params": [
+    {
+     "name": "coverage",
+     "kind": "number",
+     "range": "30-60%",
+     "default": "46"
+    },
+    {
+     "name": "colour",
+     "kind": "enum",
+     "range": "accent",
+     "default": "accent"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "bauhaus-poster",
+     "where": "css/aesthetics/bauhaus-poster.css:69-80",
+     "variant": "::before plane 46%, text clipped with a hard-stop gradient so it flips colour over the plane"
+    },
+    {
+     "key": "ascii-art",
+     "where": "css/aesthetics/ascii-art.css:54-54",
+     "variant": "block-letter highlight word with a 62% hard-stop underline"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": false,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "big-numeral-rows",
+   "category": "type",
+   "name": "Big numerals",
+   "what": "Rows or tiles lead with a very large heading-face numeral, tabular, tight, with a small label.",
+   "params": [
+    {
+     "name": "size",
+     "kind": "number",
+     "range": "26-132px",
+     "default": "46"
+    },
+    {
+     "name": "tabular",
+     "kind": "bool",
+     "range": "",
+     "default": "true"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "bento-grid",
+     "where": "css/aesthetics/bento-grid.css:254-273",
+     "variant": "stat tiles, 48-132px numerals, tabular, tracking -0.055em"
+    },
+    {
+     "key": "bauhaus-poster",
+     "where": "css/aesthetics/bauhaus-poster.css:163-172",
+     "variant": "row numerals 30-46px at 800"
+    },
+    {
+     "key": "acid-graphics",
+     "where": "css/aesthetics/acid-graphics.css:220-231",
+     "variant": "row numerals 26-36px in the acid tint"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "hidden-column-grid",
+   "category": "layout",
+   "name": "Grid under the content",
+   "what": "A column or square grid drawn at 4-6% under the board, either hairline columns or a 48px square wallpaper with a radial canvas fade.",
+   "params": [
+    {
+     "name": "kind",
+     "kind": "enum",
+     "range": "columns|squares",
+     "default": "columns"
+    },
+    {
+     "name": "columns",
+     "kind": "number",
+     "range": "12",
+     "default": "12"
+    },
+    {
+     "name": "cell",
+     "kind": "number",
+     "range": "48px",
+     "default": "48"
+    },
+    {
+     "name": "alpha",
+     "kind": "number",
+     "range": "0.04-0.07",
+     "default": "0.045"
+    },
+    {
+     "name": "fade",
+     "kind": "bool",
+     "range": "",
+     "default": "true"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "acid-graphics",
+     "where": "css/aesthetics/acid-graphics.css:15-19",
+     "variant": "12 hairline columns across the board padding"
+    },
+    {
+     "key": "aurora-noir",
+     "where": "css/aesthetics/aurora-noir.css:19-28",
+     "variant": "48px square grid with a radial canvas veil, no mask-image"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": false,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "bento-cells",
+   "category": "layout",
+   "name": "Tile grid",
+   "what": "The board is a 12-column grid of rounded tiles with one radius and one gap; spans vary so one tile dominates; wrappers dissolve into the grid.",
+   "params": [
+    {
+     "name": "columns",
+     "kind": "number",
+     "range": "12",
+     "default": "12"
+    },
+    {
+     "name": "radius",
+     "kind": "number",
+     "range": "22-28",
+     "default": "28"
+    },
+    {
+     "name": "gap",
+     "kind": "number",
+     "range": "10-16px",
+     "default": "14"
+    },
+    {
+     "name": "hero-span",
+     "kind": "text",
+     "range": "cols x rows",
+     "default": "7 x 2"
+    },
+    {
+     "name": "hover-scale",
+     "kind": "number",
+     "range": "1.01",
+     "default": "1.01"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "bento-grid",
+     "where": "css/aesthetics/bento-grid.css:20-37",
+     "variant": "grid, tile surface, hover lift"
+    },
+    {
+     "key": "bento-grid",
+     "where": "css/aesthetics/bento-grid.css:135-178",
+     "variant": "palette and type wrappers display:contents, swatches and specimens become tiles"
+    },
+    {
+     "key": "bento-grid",
+     "where": "css/aesthetics/bento-grid.css:185-273",
+     "variant": "section grids: capsule+title tile, action tile, stat tiles"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": false,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "palette-as-blocks",
+   "category": "structure",
+   "name": "Palette as colour blocks",
+   "what": "Role swatches are whole coloured blocks edge to edge, labelled inside (strips or tiles), instead of chips.",
+   "params": [
+    {
+     "name": "kind",
+     "kind": "enum",
+     "range": "strips|tiles",
+     "default": "strips"
+    },
+    {
+     "name": "min-height",
+     "kind": "number",
+     "range": "110-170px",
+     "default": "140"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "acid-graphics",
+     "where": "css/aesthetics/acid-graphics.css:139-153",
+     "variant": "strips with an extra readout block for acid, clash and luminance delta"
+    },
+    {
+     "key": "bento-grid",
+     "where": "css/aesthetics/bento-grid.css:135-161",
+     "variant": "each swatch is a 2- or 4-column tile with the label inside"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": false,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "role-shaped-swatch",
+   "category": "structure",
+   "name": "Role-shaped swatch",
+   "what": "Each palette role gets its own shape or glyph block: square, triangle, circle, quarter, semicircle, or block-shade character cells.",
+   "params": [
+    {
+     "name": "shapes",
+     "kind": "text",
+     "range": "per role",
+     "default": "square,triangle,circle,quarter,semi"
+    },
+    {
+     "name": "max-size",
+     "kind": "number",
+     "range": "px",
+     "default": "96"
+    },
+    {
+     "name": "glyph-mode",
+     "kind": "enum",
+     "range": "shape|block-glyph",
+     "default": "shape"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "bauhaus-poster",
+     "where": "css/aesthetics/bauhaus-poster.css:86-100",
+     "variant": "clip-path and border-radius shapes drawn on ::after"
+    },
+    {
+     "key": "ascii-art",
+     "where": "css/aesthetics/ascii-art.css:108-126",
+     "variant": "12x3 cells of █▓▒░ in the quantised colour, hex shown as 0xRRGGBB"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": false,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "inline-title-rule",
+   "category": "structure",
+   "name": "Title cut into a line",
+   "what": "The section label sits inside a rule, with bracket glyphs (┤ TITLE ├) and an optional negative margin so a panel's top edge is its label row.",
+   "params": [
+    {
+     "name": "glyphs",
+     "kind": "text",
+     "range": "pair",
+     "default": "┤ ├"
+    },
+    {
+     "name": "indent",
+     "kind": "number",
+     "range": "ch",
+     "default": "2"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "ascii-art",
+     "where": "css/aesthetics/ascii-art.css:91-107",
+     "variant": "1px line gradient broken by the label"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": false,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "section-number-marker",
+   "category": "ornament",
+   "name": "Numbered section marker",
+   "what": "Each section header carries its number as a disc, chip, slash, or FIG caption counter.",
+   "params": [
+    {
+     "name": "form",
+     "kind": "enum",
+     "range": "disc|chip|slash|fig-caption",
+     "default": "disc"
+    },
+    {
+     "name": "counter",
+     "kind": "bool",
+     "range": "",
+     "default": "true"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "bauhaus-poster",
+     "where": "css/aesthetics/bauhaus-poster.css:19-26",
+     "variant": "ink disc (square or triangle on some sections)"
+    },
+    {
+     "key": "acid-graphics",
+     "where": "css/aesthetics/acid-graphics.css:39-40",
+     "variant": "acid block chip"
+    },
+    {
+     "key": "ascii-art",
+     "where": "css/aesthetics/ascii-art.css:102-104",
+     "variant": "colour number followed by ' / '"
+    },
+    {
+     "key": "aurora-noir",
+     "where": "css/aesthetics/aurora-noir.css:51-58",
+     "variant": "FIG 0.n counter above each section, plus ' / ' after numbers"
+    },
+    {
+     "key": "bento-grid",
+     "where": "css/aesthetics/bento-grid.css:142-143",
+     "variant": "ink number followed by ' · '"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": false,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "info-strip",
+   "category": "ornament",
+   "name": "Dense info strip",
+   "what": "A band of micro-text (codes, BPM, katakana, sponsors) with a barcode, under every section header or across the top and foot.",
+   "params": [
+    {
+     "name": "content",
+     "kind": "text",
+     "range": "per section",
+     "default": "CAT.NO ✱ BPM ✱ kana"
+    },
+    {
+     "name": "font",
+     "kind": "text",
+     "range": "mono 9px",
+     "default": "mono 9"
+    },
+    {
+     "name": "barcode",
+     "kind": "bool",
+     "range": "",
+     "default": "true"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "acid-graphics",
+     "where": "css/aesthetics/acid-graphics.css:46-57",
+     "variant": "labelrow::after strip with per-section content"
+    },
+    {
+     "key": "acid-graphics",
+     "where": "css/aesthetics/acid-graphics.css:21-27,233-238",
+     "variant": "event strip across the top and a reversed one above the footer"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": false,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "catalogue-number",
+   "category": "ornament",
+   "name": "Catalogue or issue numbers",
+   "what": "Invented serials and IDs printed as micro-type: CAT.NO strings, N° counters, brand-prefixed issue IDs.",
+   "params": [
+    {
+     "name": "prefix",
+     "kind": "text",
+     "range": "from brand",
+     "default": "ACG / MS"
+    },
+    {
+     "name": "format",
+     "kind": "text",
+     "range": "",
+     "default": "N°01 / MS-101"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "acid-graphics",
+     "where": "css/aesthetics/acid-graphics.css:35,52-56",
+     "variant": "CAT.NO ACG-030/x strings on rule and strips"
+    },
+    {
+     "key": "acid-graphics",
+     "where": "css/aesthetics/acid-graphics.css:605-613",
+     "variant": "kit cells numbered N°01.. via a CSS counter"
+    },
+    {
+     "key": "aurora-noir",
+     "where": "js/aesthetics/aurora-noir.js:12-21,213-214",
+     "variant": "issue IDs from the brand name (anPrefix), mono, tabular"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "barcode-serial",
+   "category": "ornament",
+   "name": "Barcode and serial",
+   "what": "A striped barcode and a serial number printed on tickets and info strips.",
+   "params": [
+    {
+     "name": "bars",
+     "kind": "text",
+     "range": "gradient stops",
+     "default": "1-3-5 px"
+    },
+    {
+     "name": "serial",
+     "kind": "text",
+     "range": "",
+     "default": "№ 000417"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "acid-graphics",
+     "where": "js/aesthetics/acid-graphics.js:289-289",
+     "variant": "N° 030 with an inline barcode"
+    },
+    {
+     "key": "acid-graphics",
+     "where": "js/aesthetics/acid-graphics.js:298-298",
+     "variant": "ticket serial № 000417"
+    },
+    {
+     "key": "acid-graphics",
+     "where": "css/aesthetics/acid-graphics.css:49-52",
+     "variant": "barcode as a repeating-linear-gradient at the end of the strip"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": false,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "registration-marks",
+   "category": "ornament",
+   "name": "Registration crosshairs",
+   "what": "Crosshair and ring marks in the corners of the flyer.",
+   "params": [
+    {
+     "name": "count",
+     "kind": "number",
+     "range": "2",
+     "default": "2"
+    },
+    {
+     "name": "size",
+     "kind": "number",
+     "range": "px",
+     "default": "16"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "acid-graphics",
+     "where": "js/aesthetics/acid-graphics.js:272-272",
+     "variant": "svg crosshair, placed twice"
+    },
+    {
+     "key": "acid-graphics",
+     "where": "css/aesthetics/acid-graphics.css:128-138",
+     "variant": "positioning and density of micro-type"
+    }
+   ],
+   "expressibleAs": "svg-generator",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": false,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "invented-sponsor-marks",
+   "category": "ornament",
+   "name": "Invented marks and pictograms",
+   "what": "A wall of hand-drawn fake sponsor marks plus warning pictograms (no camera, ear protection, 18+, strobe) at mixed sizes.",
+   "params": [
+    {
+     "name": "marks",
+     "kind": "text",
+     "range": "12-unit svg paths + name",
+     "default": "10 marks"
+    },
+    {
+     "name": "size",
+     "kind": "number",
+     "range": "px",
+     "default": "11"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "acid-graphics",
+     "where": "js/aesthetics/acid-graphics.js:253-271",
+     "variant": "10 sponsor paths, 5 pictograms"
+    },
+    {
+     "key": "acid-graphics",
+     "where": "js/aesthetics/acid-graphics.js:302-302",
+     "variant": "rendered as aca-spons"
+    }
+   ],
+   "expressibleAs": "svg-generator",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": false,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "ticket-tabs",
+   "category": "ornament",
+   "name": "Ticket tabs and stubs",
+   "what": "Tabs and cards as tickets: dotted perforated left edge, skewed segments, half-circle cut-outs, an acid stub across the top.",
+   "params": [
+    {
+     "name": "skew",
+     "kind": "number",
+     "range": "deg",
+     "default": "-8"
+    },
+    {
+     "name": "perforation",
+     "kind": "enum",
+     "range": "dotted|notch",
+     "default": "dotted"
+    },
+    {
+     "name": "stub-height",
+     "kind": "number",
+     "range": "px",
+     "default": "18"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "acid-graphics",
+     "where": "css/aesthetics/acid-graphics.css:184-188",
+     "variant": "seg buttons with 3px dotted left edge, active ticket in acid"
+    },
+    {
+     "key": "acid-graphics",
+     "where": "css/aesthetics/acid-graphics.css:111-127",
+     "variant": "flyer ticket stub with cut-outs"
+    },
+    {
+     "key": "acid-graphics",
+     "where": "css/aesthetics/acid-graphics.css:605-613,641-647",
+     "variant": "kit cells with an acid N° stub; skewed tabs; overlays top 8px acid"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [
+    "tabs",
+    "card",
+    "dialog"
+   ],
+   "conflictsWith": []
+  },
+  {
+   "id": "flat-colour-planes",
+   "category": "pattern",
+   "name": "Flat colour planes",
+   "what": "Flat decorative planes (diagonal bar, three-block stripe, hatch) in fixed or role colours; depth only by overlap.",
+   "params": [
+    {
+     "name": "angle",
+     "kind": "number",
+     "range": "deg",
+     "default": "21"
+    },
+    {
+     "name": "blocks",
+     "kind": "text",
+     "range": "colour stops",
+     "default": "34/33/33"
+    },
+    {
+     "name": "kind",
+     "kind": "enum",
+     "range": "bar|stripe|hatch",
+     "default": "bar"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "bauhaus-poster",
+     "where": "css/aesthetics/bauhaus-poster.css:36-46",
+     "variant": "yellow diagonal bar plus thin ink bar behind the art"
+    },
+    {
+     "key": "bauhaus-poster",
+     "where": "css/aesthetics/bauhaus-poster.css:104-108",
+     "variant": "three-block stripe on each card top"
+    },
+    {
+     "key": "acid-graphics",
+     "where": "css/aesthetics/acid-graphics.css:181-182",
+     "variant": "panel carries 135deg stripes in the secondary"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": false,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "field-band-pattern",
+   "category": "pattern",
+   "name": "Field band",
+   "what": "A band behind each section header using repeating radial or conic gradients in the two role colours at 12-25% opacity.",
+   "params": [
+    {
+     "name": "kind",
+     "kind": "enum",
+     "range": "ripple|strobe-rays|check|rings",
+     "default": "ripple"
+    },
+    {
+     "name": "opacity",
+     "kind": "number",
+     "range": "0.12-0.25",
+     "default": "0.2"
+    },
+    {
+     "name": "width",
+     "kind": "number",
+     "range": "55-70%",
+     "default": "55"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "acid-graphics",
+     "where": "css/aesthetics/acid-graphics.css:58-64",
+     "variant": "ripple for palette, strobe rays for type, warped check for interface, rings for in-use"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": false,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "op-art-ripple",
+   "category": "pattern",
+   "name": "Op-art ripple",
+   "what": "Concentric bands in two colours bent by a blurred turbulence displacement filter, so edges stay smooth.",
+   "params": [
+    {
+     "name": "band",
+     "kind": "number",
+     "range": "8-14px",
+     "default": "9"
+    },
+    {
+     "name": "turbulence",
+     "kind": "text",
+     "range": "baseFrequency",
+     "default": "0.011 0.008"
+    },
+    {
+     "name": "blur",
+     "kind": "number",
+     "range": "stdDeviation",
+     "default": "4"
+    },
+    {
+     "name": "displacement",
+     "kind": "number",
+     "range": "scale",
+     "default": "34"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "acid-graphics",
+     "where": "js/aesthetics/acid-graphics.js:273-284",
+     "variant": "two SVG filters #acw and #acr"
+    },
+    {
+     "key": "acid-graphics",
+     "where": "css/aesthetics/acid-graphics.css:92-100",
+     "variant": "ripple layers in the flyer"
+    },
+    {
+     "key": "acid-graphics",
+     "where": "js/aesthetics/acid-graphics.js:309-309",
+     "variant": "Op-art ripple material"
+    }
+   ],
+   "expressibleAs": "svg-generator",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": false,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "geometric-art-tile",
+   "category": "pattern",
+   "name": "Geometric tile",
+   "what": "A grid of cells, each a background plus one primitive (quarter, semi, circle, triangle) with a rotation in 90 degree steps and a fill; extra overlapping shapes may overflow the box.",
+   "params": [
+    {
+     "name": "grid",
+     "kind": "number",
+     "range": "3x3",
+     "default": "3"
+    },
+    {
+     "name": "shapes",
+     "kind": "enum",
+     "range": "quarter|semi|circle|triangle",
+     "default": "4"
+    },
+    {
+     "name": "cells",
+     "kind": "text",
+     "range": "[bg,shape,fill,rot] x 9",
+     "default": "fixed table"
+    },
+    {
+     "name": "extras",
+     "kind": "text",
+     "range": "circle + triangle",
+     "default": "overlap left edge"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "bauhaus-poster",
+     "where": "js/aesthetics/bauhaus-poster.js:57-86",
+     "variant": "fixed 3x3 table with primary, secondary and accent in set cells"
+    },
+    {
+     "key": "bauhaus-poster",
+     "where": "css/aesthetics/bauhaus-poster.css:51-54",
+     "variant": "art sized by --ab-poster-art-w and flush bottom-right"
+    }
+   ],
+   "expressibleAs": "svg-generator",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": false,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "colour-cloud-wash",
+   "category": "pattern",
+   "name": "Colour cloud wash",
+   "what": "Three or four soft radial colour clouds (accent, primary, secondary, crown) above the hero in plain gradients so they export without filters.",
+   "params": [
+    {
+     "name": "clouds",
+     "kind": "number",
+     "range": "3-4",
+     "default": "4"
+    },
+    {
+     "name": "colours",
+     "kind": "text",
+     "range": "roles",
+     "default": "accent,primary,secondary"
+    },
+    {
+     "name": "alpha",
+     "kind": "number",
+     "range": "0.3-0.62",
+     "default": "0.5"
+    },
+    {
+     "name": "height",
+     "kind": "number",
+     "range": "px",
+     "default": "920"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "aurora-noir",
+     "where": "css/aesthetics/aurora-noir.css:30-41",
+     "variant": "::before with four radial-gradients"
+    },
+    {
+     "key": "aurora-noir",
+     "where": "js/aesthetics/aurora-noir.js:147-152",
+     "variant": "alpha per cloud by mode"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": false,
+   "kitScope": [],
+   "conflictsWith": [
+    "flat-colour-planes"
+   ]
+  },
+  {
+   "id": "conic-beam",
+   "category": "pattern",
+   "name": "Light beam",
+   "what": "A conic-gradient fan from an apex above the art in two role colours with a white core, blurred, plus a thin screen-blended cone on the opaque window.",
+   "params": [
+    {
+     "name": "apex-y",
+     "kind": "number",
+     "range": "% of box",
+     "default": "3"
+    },
+    {
+     "name": "spread",
+     "kind": "number",
+     "range": "deg",
+     "default": "50-110"
+    },
+    {
+     "name": "blur",
+     "kind": "number",
+     "range": "px",
+     "default": "14"
+    },
+    {
+     "name": "colours",
+     "kind": "text",
+     "range": "roles",
+     "default": "primary,secondary"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "aurora-noir",
+     "where": "css/aesthetics/aurora-noir.css:90-103",
+     "variant": "two layered conic gradients, ::before behind the window and ::after on it, hidden in light mode"
+    },
+    {
+     "key": "aurora-noir",
+     "where": "js/aesthetics/aurora-noir.js:226-226",
+     "variant": "Aurora beam material"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": false,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "horizon-arc",
+   "category": "ornament",
+   "name": "Horizon arc",
+   "what": "A hairline elliptical arc beneath the window, stroked in a gradient (transparent, primary, white, secondary, transparent) with a blurred copy.",
+   "params": [
+    {
+     "name": "stroke",
+     "kind": "number",
+     "range": "px",
+     "default": "1.6"
+    },
+    {
+     "name": "glow",
+     "kind": "number",
+     "range": "blur px",
+     "default": "4"
+    },
+    {
+     "name": "gradient",
+     "kind": "text",
+     "range": "roles",
+     "default": "primary,white,secondary"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "aurora-noir",
+     "where": "js/aesthetics/aurora-noir.js:199-203",
+     "variant": "inline SVG ellipse with two strokes"
+    },
+    {
+     "key": "aurora-noir",
+     "where": "css/aesthetics/aurora-noir.css:104-104",
+     "variant": "sits at the art's bottom 18%"
+    }
+   ],
+   "expressibleAs": "svg-generator",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": false,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "lit-sphere-render",
+   "category": "pattern",
+   "name": "Lit sphere tile",
+   "what": "A fake product render: a primary sphere with specular, shaded edge and a ground shadow built from stacked radial gradients on a tinted tile.",
+   "params": [
+    {
+     "name": "colour",
+     "kind": "enum",
+     "range": "primary",
+     "default": "primary"
+    },
+    {
+     "name": "specular",
+     "kind": "number",
+     "range": "%",
+     "default": "55"
+    },
+    {
+     "name": "ground-shadow",
+     "kind": "bool",
+     "range": "",
+     "default": "true"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "bento-grid",
+     "where": "css/aesthetics/bento-grid.css:196-205",
+     "variant": "card ::after image tile"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": false,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "scanline-overlay",
+   "category": "pattern",
+   "name": "Scanline texture",
+   "what": "A faint horizontal scanline overlay on dark boards only.",
+   "params": [
+    {
+     "name": "alpha",
+     "kind": "number",
+     "range": "0.02-0.05",
+     "default": "low"
+    },
+    {
+     "name": "mode",
+     "kind": "enum",
+     "range": "dark-only",
+     "default": "dark"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "ascii-art",
+     "where": "css/aesthetics/ascii-art.css:75-79",
+     "variant": "pseudo-element over the art on dark"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": false,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "character-field-background",
+   "category": "pattern",
+   "name": "Character field",
+   "what": "A sparse field of ramp characters on 10px cells in ink at ~9%, generated into a data-URI SVG, behind sections that are cut out of it.",
+   "params": [
+    {
+     "name": "ramp",
+     "kind": "text",
+     "range": "chars",
+     "default": "70-step ramp"
+    },
+    {
+     "name": "density",
+     "kind": "number",
+     "range": "0-0.55",
+     "default": "0.55"
+    },
+    {
+     "name": "alpha",
+     "kind": "number",
+     "range": "0.09",
+     "default": "0.09"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "ascii-art",
+     "where": "js/aesthetics/ascii-art.js:286-301",
+     "variant": "aaFieldUri builds the SVG from hashed positions"
+    },
+    {
+     "key": "ascii-art",
+     "where": "css/aesthetics/ascii-art.css:13-17",
+     "variant": "sections get canvas backgrounds so they read as cut-outs"
+    }
+   ],
+   "expressibleAs": "svg-generator",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": false,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "glyph-raster-art",
+   "category": "structure",
+   "name": "Rasterised glyph hero",
+   "what": "The brand word or initial is rendered on an offscreen canvas, each cell's luminance maps to a character ramp, an edge pass swaps in line characters, colour comes from one diagonal band field, and a ticker drifts dust.",
+   "params": [
+    {
+     "name": "cols-rows",
+     "kind": "text",
+     "range": "88x12 / 40x20",
+     "default": "88x12"
+    },
+    {
+     "name": "ramp",
+     "kind": "text",
+     "range": "70 chars",
+     "default": "70-step"
+    },
+    {
+     "name": "edge-chars",
+     "kind": "text",
+     "range": "/ \\ | _ -",
+     "default": "line ASCII"
+    },
+    {
+     "name": "bands",
+     "kind": "number",
+     "range": "2",
+     "default": "2"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "ascii-art",
+     "where": "js/aesthetics/ascii-art.js:160-263",
+     "variant": "aaRaster, aaCells, aaRows, aaPanel"
+    },
+    {
+     "key": "ascii-art",
+     "where": "js/aesthetics/ascii-art.js:383-385",
+     "variant": "art hook: wide and narrow panels"
+    }
+   ],
+   "expressibleAs": "needs-code",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": false,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "product-mock-art",
+   "category": "structure",
+   "name": "Product mock art",
+   "what": "The hero art is a fake product screen in real HTML (dev-tool window with sidebar, issue and log; or a phone with card, rows and tabs) styled by the board CSS, with floating chips.",
+   "params": [
+    {
+     "name": "form",
+     "kind": "enum",
+     "range": "window|phone",
+     "default": "window"
+    },
+    {
+     "name": "copy",
+     "kind": "text",
+     "range": "editable specimen strings",
+     "default": "per style"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "aurora-noir",
+     "where": "js/aesthetics/aurora-noir.js:164-204",
+     "variant": "window with sidebar, properties, activity log"
+    },
+    {
+     "key": "aurora-noir",
+     "where": "css/aesthetics/aurora-noir.css:105-152",
+     "variant": "layout and 1px lit frame"
+    },
+    {
+     "key": "bento-grid",
+     "where": "js/aesthetics/bento-grid.js:132-159",
+     "variant": "phone with primary health card, rows, tab bar, floating chips"
+    },
+    {
+     "key": "bento-grid",
+     "where": "css/aesthetics/bento-grid.css:85-134",
+     "variant": "phone rising from the bottom edge, cropped"
+    }
+   ],
+   "expressibleAs": "needs-code",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": false,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "ink-filled-action",
+   "category": "kit",
+   "name": "Ink-filled main action",
+   "what": "The main action is filled with the ink colour (canvas-coloured label), keeping the primary for state only.",
+   "params": [
+    {
+     "name": "fill",
+     "kind": "enum",
+     "range": "ink|primary",
+     "default": "ink"
+    },
+    {
+     "name": "shape",
+     "kind": "enum",
+     "range": "pill|square",
+     "default": "pill"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "aurora-noir",
+     "where": "js/aesthetics/aurora-noir.js:72-74",
+     "variant": "ctaFill: 'ink'"
+    },
+    {
+     "key": "aurora-noir",
+     "where": "css/aesthetics/aurora-noir.css:183-195",
+     "variant": "pill, hover mix toward canvas, scale .99 on press"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [
+    "button"
+   ],
+   "conflictsWith": [
+    "glossy-single-action"
+   ]
+  },
+  {
+   "id": "ink-filled-selected",
+   "category": "kit",
+   "name": "Selected = filled",
+   "what": "The selected item in segments, tabs, menus and rows is a solid fill with its on-colour label.",
+   "params": [
+    {
+     "name": "fill",
+     "kind": "enum",
+     "range": "ink|primary|acid|ink-alpha|inverse-video",
+     "default": "ink"
+    },
+    {
+     "name": "edge-bar",
+     "kind": "bool",
+     "range": "",
+     "default": "false"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "ascii-art",
+     "where": "css/aesthetics/ascii-art.css:179-186,519-520",
+     "variant": "inverse video in ink"
+    },
+    {
+     "key": "bento-grid",
+     "where": "css/aesthetics/bento-grid.css:207-212,632-633",
+     "variant": "ink pill on the board, primary tile in the kit"
+    },
+    {
+     "key": "bauhaus-poster",
+     "where": "css/aesthetics/bauhaus-poster.css:110-118,452",
+     "variant": "primary block, ink flood when pressed"
+    },
+    {
+     "key": "acid-graphics",
+     "where": "css/aesthetics/acid-graphics.css:184-188,641-645",
+     "variant": "acid block on skewed ticket"
+    },
+    {
+     "key": "aurora-noir",
+     "where": "css/aesthetics/aurora-noir.css:171-175,548-549",
+     "variant": "neutral ink-alpha lifted chip; 2px lit-edge bar"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [
+    "segmented",
+    "tabs",
+    "menu",
+    "row",
+    "nav"
+   ],
+   "conflictsWith": []
+  },
+  {
+   "id": "named-states",
+   "category": "kit",
+   "name": "Named states",
+   "what": "Hover and pressed have deliberate signatures (scale, skew, lift, inverse, ink flood, nudge) instead of a generic tint.",
+   "params": [
+    {
+     "name": "hover",
+     "kind": "enum",
+     "range": "scaleX|lift|inverse|ink-flood|bg-mix|brightness",
+     "default": "varies"
+    },
+    {
+     "name": "pressed",
+     "kind": "enum",
+     "range": "skew+echo|inverse|nudge|squeeze|sink",
+     "default": "varies"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "acid-graphics",
+     "where": "css/aesthetics/acid-graphics.css:198-203",
+     "variant": "hover scaleX 1.05 and flip; press skewX -12 with split text-shadow"
+    },
+    {
+     "key": "ascii-art",
+     "where": "css/aesthetics/ascii-art.css:202-202,311-315",
+     "variant": "hover and press are inverse video"
+    },
+    {
+     "key": "bauhaus-poster",
+     "where": "css/aesthetics/bauhaus-poster.css:133-137",
+     "variant": "hover ink fill with primary disc; press canvas fill nudged 2px"
+    },
+    {
+     "key": "aurora-noir",
+     "where": "css/aesthetics/aurora-noir.css:189-190",
+     "variant": "hover mix toward canvas; press scale .99"
+    },
+    {
+     "key": "bento-grid",
+     "where": "css/aesthetics/bento-grid.css:230-231",
+     "variant": "hover lift -2px and brightness; press .99"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [
+    "button",
+    "tabs",
+    "menu"
+   ],
+   "conflictsWith": []
+  },
+  {
+   "id": "cta-arrow-glyph",
+   "category": "kit",
+   "name": "CTA trailing glyph",
+   "what": "The main action ends with a glyph in its own container: asterisk, blinking block, disc arrow, key chip, circle arrow.",
+   "params": [
+    {
+     "name": "glyph",
+     "kind": "text",
+     "range": "",
+     "default": "✱ █ → ↵ ↗"
+    },
+    {
+     "name": "container",
+     "kind": "enum",
+     "range": "none|disc|key-chip|circle",
+     "default": "varies"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "acid-graphics",
+     "where": "css/aesthetics/acid-graphics.css:197-197",
+     "variant": "✱"
+    },
+    {
+     "key": "ascii-art",
+     "where": "css/aesthetics/ascii-art.css:199-201",
+     "variant": "'> ' prompt plus blinking █"
+    },
+    {
+     "key": "bauhaus-poster",
+     "where": "css/aesthetics/bauhaus-poster.css:128-132",
+     "variant": "42px ink disc with →"
+    },
+    {
+     "key": "aurora-noir",
+     "where": "css/aesthetics/aurora-noir.css:191-194",
+     "variant": "↵ in a keycap"
+    },
+    {
+     "key": "bento-grid",
+     "where": "css/aesthetics/bento-grid.css:232-235",
+     "variant": "↗ in an 18% on-primary circle"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [
+    "button"
+   ],
+   "conflictsWith": []
+  },
+  {
+   "id": "field-anatomy",
+   "category": "kit",
+   "name": "Field anatomy",
+   "what": "How the text field is built: heavy underline, bracketed slot with dotted leader, hairline box with a left rule, or filled well holding its label.",
+   "params": [
+    {
+     "name": "kind",
+     "kind": "enum",
+     "range": "underline|bracket-slot|left-rule-box|filled-well",
+     "default": "underline"
+    },
+    {
+     "name": "focus",
+     "kind": "enum",
+     "range": "colour|thicken|rule-ink|ring",
+     "default": "colour"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "acid-graphics",
+     "where": "css/aesthetics/acid-graphics.css:208-209,338-346",
+     "variant": "3px clash underline, acid on focus; kit uses 2px ink with a clash echo"
+    },
+    {
+     "key": "ascii-art",
+     "where": "css/aesthetics/ascii-art.css:616-640",
+     "variant": "corner ticks of [ ] with a dotted leader; focus thickens to 3px"
+    },
+    {
+     "key": "aurora-noir",
+     "where": "css/aesthetics/aurora-noir.css:198-209,599-611",
+     "variant": "hairline box; kit adds a 2px left rule that turns ink on focus"
+    },
+    {
+     "key": "bauhaus-poster",
+     "where": "css/aesthetics/bauhaus-poster.css:142-145,494-498",
+     "variant": "3px/4px underline; focus floods a primary tint with a flag"
+    },
+    {
+     "key": "bento-grid",
+     "where": "css/aesthetics/bento-grid.css:733-769",
+     "variant": "filled well holding its label"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [
+    "field",
+    "search",
+    "select"
+   ],
+   "conflictsWith": []
+  },
+  {
+   "id": "text-legend-controls",
+   "category": "kit",
+   "name": "Text-legend controls",
+   "what": "Controls carry text as their face: [x] / (*) boxes, < a | b > segments, an ON AIR or ON / OFF switch legend.",
+   "params": [
+    {
+     "name": "form",
+     "kind": "enum",
+     "range": "bracket-glyphs|switch-legend",
+     "default": "bracket-glyphs"
+    },
+    {
+     "name": "on-text",
+     "kind": "text",
+     "range": "",
+     "default": "ON AIR"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "ascii-art",
+     "where": "css/aesthetics/ascii-art.css:179-186,211-230,334-342",
+     "variant": "segments and toggle written as text"
+    },
+    {
+     "key": "acid-graphics",
+     "where": "css/aesthetics/acid-graphics.css:211-215",
+     "variant": "switch reads OFF / ON AIR"
+    },
+    {
+     "key": "aurora-noir",
+     "where": "css/aesthetics/aurora-noir.css:618-624",
+     "variant": "square rocker with an ON / OFF legend"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [
+    "toggle",
+    "checkbox",
+    "radio",
+    "segmented"
+   ],
+   "conflictsWith": []
+  },
+  {
+   "id": "kit-cell-chrome",
+   "category": "kit",
+   "name": "Kit cell chrome",
+   "what": "The UI kit page presents each component in a frame with a numbered caption (window caption, ticket stub, open cell with numeral).",
+   "params": [
+    {
+     "name": "caption",
+     "kind": "enum",
+     "range": "top-edge-name|stub|numeral|window",
+     "default": "window"
+    },
+    {
+     "name": "counter",
+     "kind": "bool",
+     "range": "",
+     "default": "true"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "ascii-art",
+     "where": "css/aesthetics/ascii-art.css:529-551",
+     "variant": "┤ NAME ├ cut into the top edge, number in the bottom"
+    },
+    {
+     "key": "acid-graphics",
+     "where": "css/aesthetics/acid-graphics.css:605-618",
+     "variant": "ticket cell with acid N° stub, stretched names"
+    },
+    {
+     "key": "aurora-noir",
+     "where": "css/aesthetics/aurora-noir.css:553-582",
+     "variant": "opaque window with a numbered mono caption"
+    },
+    {
+     "key": "bauhaus-poster",
+     "where": "css/aesthetics/bauhaus-poster.css:455-480",
+     "variant": "open cell: heavy rule, big numeral, one glyph"
+    },
+    {
+     "key": "bento-grid",
+     "where": "css/aesthetics/bento-grid.css:656-692",
+     "variant": "cell = tile, big numeral tile before each group"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [
+    "page"
+   ],
+   "conflictsWith": []
+  },
+  {
+   "id": "focus-ring",
+   "category": "kit",
+   "name": "Focus ring",
+   "what": "Keyboard focus ring: width, offset, dash style and colour, set per style.",
+   "params": [
+    {
+     "name": "width",
+     "kind": "number",
+     "range": "2-3px",
+     "default": "2"
+    },
+    {
+     "name": "offset",
+     "kind": "number",
+     "range": "2-3px",
+     "default": "3"
+    },
+    {
+     "name": "style",
+     "kind": "enum",
+     "range": "solid|dashed",
+     "default": "solid"
+    },
+    {
+     "name": "colour",
+     "kind": "enum",
+     "range": "ink|primary",
+     "default": "ink"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "acid-graphics",
+     "where": "css/aesthetics/acid-graphics.css:640-640",
+     "variant": "3px dashed ink, 3px off"
+    },
+    {
+     "key": "ascii-art",
+     "where": "css/aesthetics/ascii-art.css:525-527",
+     "variant": "2px dashed ink, 3px off via --sb-focus vars"
+    },
+    {
+     "key": "bauhaus-poster",
+     "where": "css/aesthetics/bauhaus-poster.css:434-435",
+     "variant": "3px ink ring"
+    },
+    {
+     "key": "aurora-noir",
+     "where": "css/aesthetics/aurora-noir.css:553-553",
+     "variant": "2px offset square ink ring"
+    },
+    {
+     "key": "bento-grid",
+     "where": "css/aesthetics/bento-grid.css:612-613,644-647",
+     "variant": "3px ring, 3px off, primary or ink"
+    }
+   ],
+   "expressibleAs": "tokens",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [
+    "button",
+    "field",
+    "tab"
+   ],
+   "conflictsWith": []
+  },
+  {
+   "id": "disabled-state",
+   "category": "kit",
+   "name": "Disabled style",
+   "what": "Disabled controls are marked by a dashed edge, hatch or flat unlit tile rather than opacity alone.",
+   "params": [
+    {
+     "name": "kind",
+     "kind": "enum",
+     "range": "dashed-edge|hatch|flat-tile",
+     "default": "dashed-edge"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "acid-graphics",
+     "where": "css/aesthetics/acid-graphics.css:638-638",
+     "variant": "clash hatch, no echo"
+    },
+    {
+     "key": "ascii-art",
+     "where": "css/aesthetics/ascii-art.css:612-613",
+     "variant": "dashed edge, muted text, line-through on text buttons"
+    },
+    {
+     "key": "bauhaus-poster",
+     "where": "css/aesthetics/bauhaus-poster.css:525-526",
+     "variant": "dashed edge, no fill"
+    },
+    {
+     "key": "aurora-noir",
+     "where": "css/aesthetics/aurora-noir.css:550-550",
+     "variant": "dashed hairline"
+    },
+    {
+     "key": "bento-grid",
+     "where": "css/aesthetics/bento-grid.css:634-635",
+     "variant": "unlit flat tile at ink 7%"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [
+    "button",
+    "field",
+    "checkbox"
+   ],
+   "conflictsWith": []
+  },
+  {
+   "id": "progress-bar-skin",
+   "category": "kit",
+   "name": "Progress bar skin",
+   "what": "The progress track and fill take the style's voice: equaliser bars, block characters, ink bar in a bordered track, thin pill.",
+   "params": [
+    {
+     "name": "kind",
+     "kind": "enum",
+     "range": "equaliser|blocks|bordered-flat|pill",
+     "default": "pill"
+    },
+    {
+     "name": "height",
+     "kind": "number",
+     "range": "8-14px",
+     "default": "12"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "acid-graphics",
+     "where": "js/aesthetics/acid-graphics.js:185-187",
+     "variant": "equaliser SVG data URI of ten bars"
+    },
+    {
+     "key": "acid-graphics",
+     "where": "css/aesthetics/acid-graphics.css:229-230",
+     "variant": "row bar uses the equaliser as a repeating image"
+    },
+    {
+     "key": "ascii-art",
+     "where": "css/aesthetics/ascii-art.css:245-249",
+     "variant": "progress blocks on the character grid"
+    },
+    {
+     "key": "bauhaus-poster",
+     "where": "css/aesthetics/bauhaus-poster.css:177-178",
+     "variant": "2px ink border track with ink fill"
+    },
+    {
+     "key": "bento-grid",
+     "where": "css/aesthetics/bento-grid.css:271-272",
+     "variant": "8px pill track, secondary fill"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [
+    "progress"
+   ],
+   "conflictsWith": []
+  },
+  {
+   "id": "status-chip",
+   "category": "kit",
+   "name": "Status chip",
+   "what": "A small pill or square tag for status, in ink-bordered, tinted, or mono-caps form.",
+   "params": [
+    {
+     "name": "shape",
+     "kind": "enum",
+     "range": "pill|square",
+     "default": "pill"
+    },
+    {
+     "name": "fill",
+     "kind": "enum",
+     "range": "secondary|tint|none",
+     "default": "tint"
+    },
+    {
+     "name": "caps",
+     "kind": "bool",
+     "range": "",
+     "default": "true"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "acid-graphics",
+     "where": "css/aesthetics/acid-graphics.css:228-228",
+     "variant": "2px ink border, no fill, mono caps"
+    },
+    {
+     "key": "bauhaus-poster",
+     "where": "css/aesthetics/bauhaus-poster.css:173-176",
+     "variant": "2px ink pill filled with secondary"
+    },
+    {
+     "key": "bento-grid",
+     "where": "css/aesthetics/bento-grid.css:270-270",
+     "variant": "sub-tone pill"
+    },
+    {
+     "key": "aurora-noir",
+     "where": "css/aesthetics/aurora-noir.css:177-181",
+     "variant": "New badge: accent tint, hairline, mono caps"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [
+    "badge"
+   ],
+   "conflictsWith": []
+  },
+  {
+   "id": "ambient-motion",
+   "category": "motion",
+   "name": "Ambient motion",
+   "what": "Low-key looping motion: stepped cursor blink, a slow pulse, or a drifting dust ticker; stopped under reduced motion.",
+   "params": [
+    {
+     "name": "kind",
+     "kind": "enum",
+     "range": "blink|pulse|drift",
+     "default": "blink"
+    },
+    {
+     "name": "steps",
+     "kind": "bool",
+     "range": "",
+     "default": "true"
+    },
+    {
+     "name": "period",
+     "kind": "number",
+     "range": "s",
+     "default": "1.1"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "ascii-art",
+     "where": "css/aesthetics/ascii-art.css:201-201",
+     "variant": "aa-blink steps(1)"
+    },
+    {
+     "key": "ascii-art",
+     "where": "js/aesthetics/ascii-art.js:264-284",
+     "variant": "drift ticker 0.2 cells per second, re-raster on font load"
+    },
+    {
+     "key": "aurora-noir",
+     "where": "css/aesthetics/aurora-noir.css:71-71",
+     "variant": "an-pulse keyframes on the status dot"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": false,
+   "kitScope": [],
+   "conflictsWith": []
+  }
+ ],
+ "notes": "Schema fit: moves carry no per-style numeric values (the same move holds different numbers per style), so those live in usedBy.variant text only. 'category' has no value for palette-chip shapes or hero composition, so those were filed under structure. Kit moves are tagged by component in kitScope; board-only moves have an empty kitScope and appSafe false. Seed ids unused: mono-plus-accent, duotone-ink, tonal-ramp, stretched-display, mixed-face-headline, glossy-single-action, clear-glass-panel, grain-overlay, halftone-dots. soft-raised-relief not used: bento shadow tokens exist but tile CSS sets none. contrast-lift is a generic helper the framework could provide as a built-in rather than a per-style move. The seed 'ink-filled-selected' was widened to cover other fills via the fill param. Classic copies of rules inside each css file were ignored as instructed. Line ranges are from reads of the files; kit ranges cite the section headers and signature comment blocks."
+}

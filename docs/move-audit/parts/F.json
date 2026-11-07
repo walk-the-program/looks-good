@@ -1,0 +1,891 @@
+{
+  "group": "F",
+  "notes": "Group F audit (mixed-type, naive-doodle, neo-brutal-pop, old-web, paddock-pass). Line ranges are from js/aesthetics/<key>.js and css/aesthetics/<key>.css as read on 2026-11-06; css ranges for large kit blocks point at the block's signature comment plus the key rules. Schema gaps: (1) `appSafe` is one boolean per move, but several moves are app-safe as a CSS recipe and board-only as SVG art (tick-ruler, catalogue-number); they were split or set conservatively. (2) The schema has no field for headline-hook moves (def.headline): mixed-face-headline, per-word-tilt-headline and wordart-headline are marked needs-code because they emit markup through the headline hook, although a generic per-word styling hook in the framework could turn them into recipes. (3) `moveCoverage` is a single number; for naive-doodle the wobble generator is a real svg-generator move but the scene art that uses it is hand-placed. Cross-style merges worth checking in M1: highlight-word (5 styles, 5 variants), kicker-treatment (5), stepped-spinner (5), focus-ring-style (5), contrast-floor-adjust (4: a colour search loop each, different targets), leading-edge-bar (mixed-type primary rule vs paddock hi-vis strip), perforated-rule (NBP dashes vs paddock stub with end ticks), repeating-stripe-fill (naive hatch 45deg, NBP progress -45deg, old-web 90deg blocks).",
+  "styles": [
+    {
+      "key": "mixed-type",
+      "name": "Mixed Type",
+      "coreTrick": "The headline is set word by word in four faces (brand heading, serif italic, heavy grotesk, mono), each scaled by capHeight(brand)/capHeight(voice) so capitals share one line, and the same four voices are shown as 'Aa' cells with cap/x-height/baseline guides.",
+      "colourRecipe": "Primary is only the CTA and selected-segment rule and never touches the type; canvas becomes paper (a 4.5% ink mix) with ink hairlines; the accent is the single coloured word (last headline word, serif italic, shaded to read as text via accent-ink) and a footer dot. A muted client colour just means less of that one spark; nothing depends on chroma.",
+      "moves": ["mixed-face-headline", "highlight-word", "type-specimen-art", "caps-mono-labels", "hairline-rule", "heavy-border", "hard-offset-shadow", "press-into-shadow", "corner-radius", "tinted-neutral-canvas", "ink-filled-selected", "leading-edge-bar", "rocker-toggle", "bracketed-field", "tick-ruler", "stepped-spinner", "named-states", "catalogue-number", "real-weight-pick", "focus-ring-style", "ruled-cell-grid", "kicker-treatment"],
+      "remainder": [
+        { "what": "Word-to-voice assignment (function words to mono, content words alternate heavy/brand, last word italic) and cap-height normalisation (size factor k per voice)", "where": "js/aesthetics/mixed-type.js:41-56,87-102,79-83", "whyCode": "Needs font metrics (table, canvas measureText fallback) and a stop-word heuristic; no CSS or token can compute k = capB/capVoice per brand face." },
+        { "what": "Voice resolution per brand: pick contrast faces that never repeat the brand family, with weight fallback chains", "where": "js/aesthetics/mixed-type.js:58-85", "whyCode": "Font-pairing search over the FONTS list with weight availability checks." },
+        { "what": "Specimen art: four 'Aa' cells whose guide lines are positioned from each voice's measured cap/x height, plus glyph rows and a size scale", "where": "js/aesthetics/mixed-type.js:122-138,204-226", "whyCode": "Guide y positions come from per-face metrics; cell geometry is computed, not styled." },
+        { "what": "Mono headline word hack: -0.13em tracking, ligatures off, margin to restore the word space; line-height 0 inline words", "where": "css/aesthetics/mixed-type.css:40-64", "whyCode": "Hand-tuned optical corrections that depend on the specific mono face at display size." },
+        { "what": "Built-screen voice mixing: stat labels get a serif-italic asterisk, lead stat in heavy grotesk at 2x, list names heavy caps, screen titles with a '(Fig. 2)' caption", "where": "css/aesthetics/mixed-type.css:279-300", "whyCode": "Per-component targeting of specific screen elements with voice-specific font maths (cap-height k factor); only partly generalisable." }
+      ],
+      "moveCoverage": 55,
+      "notes": "The look is half kit (square, ink hairlines, hard 4px slug, ink inversion, bracketed fields; all recipes) and half type engine (mixed-face-headline and the specimen, which are code because they depend on measured font metrics). A framework without a metrics-aware headline hook would lose the signature."
+    },
+    {
+      "key": "naive-doodle",
+      "name": "Naive Doodle",
+      "coreTrick": "Every outline is a seeded wobble path (a polyline resampled every few units and pushed along its normal by two summed low-frequency sines, loops overshooting their start) emitted as SVG data URIs per brand, with the colour as a hatched crayon fill offset a few pixels outside its outline.",
+      "colourRecipe": "Client primary/secondary/accent become crayons: same hue and chroma, lightness lifted until fixed warm-black pencil text reads 4.6:1 on them; paper is fixed cream #FFFBF2 with a graph grid (dark: client dark pressed to a deep warm slate, chalk ink). A muted client colour is lifted lighter and hatched, so it still works; a very dark one gets lifted to a pastel.",
+      "moves": ["wobble-line-outline", "offset-fill-under-outline", "repeating-stripe-fill", "contrast-floor-adjust", "grid-paper-ground", "tilt-rotation", "per-word-tilt-headline", "highlight-word", "handwritten-note-arrow", "hand-face-on-controls", "squiggle-line", "ink-filled-selected", "focus-ring-style", "stepped-spinner", "corner-radius", "corner-sticker-ornament", "named-states", "tinted-neutral-canvas", "kicker-treatment", "real-weight-pick"],
+      "remainder": [
+        { "what": "The hero drawing: smiley sun, 12 dash rays, scalloped clouds, hill coloured outside its line, three loop flowers, note with loop arrow", "where": "js/aesthetics/naive-doodle.js:299-362", "whyCode": "Hand-placed coordinates for one specific scene; only the wobble/arc primitives are reusable, the composition is bespoke illustration." },
+        { "what": "ndKit specific shapes: toggle faces on/off, flag, star with offset fill, tab ellipse, ring, tick, cross, checkbox with overshooting sides", "where": "js/aesthetics/naive-doodle.js:140-186", "whyCode": "Each is a hand-authored shape built from the wobble primitives; a framework would need a shape library or per-component glyph definitions." },
+        { "what": "Per-component alignment of drawn data-URI backgrounds to each control (stretched outline sizing, per-button walls between segments, outline bleed offsets)", "where": "css/aesthetics/naive-doodle.css:106-208,565-658", "whyCode": "Dozens of pixel offsets so an SVG outline sits just outside each component without crossing labels; component-specific tuning." },
+        { "what": "Muted-text contrast loop and crayon lift", "where": "js/aesthetics/naive-doodle.js:124-130,273-274", "whyCode": "Iterative colour search against fixed pencil/ink; tokens cannot express it." }
+      ],
+      "moveCoverage": 55,
+      "notes": "The wobble generator is genuinely reusable (it is a parameterised svg-generator: amplitude, step, seed, overshoot) and carries the style across every kit component. What is lost without code is the hero scene and the tuned outline alignments. Dark mode swaps ink to chalk and paper to slate but keeps the same recipe."
+    },
+    {
+      "key": "neo-brutal-pop",
+      "name": "Neo-Brutal Pop",
+      "coreTrick": "Everything is a flat colour block with a 2-3px ink outline and a plain-ink hard offset shadow that lifts on hover and collapses on press, on a near-white paper canvas, with whole sections as 100% primary/accent colour fields and UI-object stickers (price tag, starburst, flower, checkbox, cursor) as art.",
+      "colourRecipe": "Primary is the CTA, selected fills and the type section field; secondary is chips, checkbox sticker and progress stripes; accent is the highlight sticker and the In use field; all used flat at 100% with on-colour text. Canvas becomes paper by mixing the client canvas 85-90% toward white (dark: ink mixed into canvas); shadows are ink in light mode and black in dark. A muted client palette yields flat pastel blocks that still read because of the ink outline; chip fill is searched down until ink text holds 7:1.",
+      "moves": ["hard-offset-shadow", "heavy-border", "corner-radius", "press-into-shadow", "tinted-neutral-canvas", "solid-section-field", "sticker-object-art", "highlight-word", "tilt-rotation", "perforated-rule", "boxed-number-badge", "repeating-stripe-fill", "ink-filled-selected", "focus-ring-style", "stepped-spinner", "contrast-floor-adjust", "real-weight-pick", "named-states", "caps-mono-labels", "tinted-cell-cycle", "corner-sticker-ornament", "kicker-treatment"],
+      "remainder": [
+        { "what": "Sticker cluster composition: price tag, starburst (20-point), checkbox, flower, cursor, squiggle, each rotated and shadowed, placed at fixed coordinates", "where": "js/aesthetics/neo-brutal-pop.js:155-185", "whyCode": "Fixed hand-placed SVG layout; the star/flower/tag primitives are generatable but their arrangement is bespoke." },
+        { "what": "Deck Material sticker sheet and In-product page (Gumroad-style cover, price, buy button)", "where": "js/aesthetics/neo-brutal-pop.js:219-248", "whyCode": "Bespoke deck markup per style (def.deck hooks)." },
+        { "what": "Flower stuck on the highlight word's edge, centred off the pill with computed offsets", "where": "css/aesthetics/neo-brutal-pop.css:75-84", "whyCode": "Pseudo-element placement tuned to the highlight block; a recipe could cover it but it is tied to the sticker art." },
+        { "what": "Chip-fill contrast search and muted-on-paper search", "where": "js/aesthetics/neo-brutal-pop.js:127-132,149", "whyCode": "Iterative colour loops against 7:1 and 4.5:1 targets." }
+      ],
+      "moveCoverage": 80,
+      "notes": "The most recipe-like of the five: the whole kit is outline + hard shadow + flat fill + squish, with a few tunable numbers (border width 2 vs 3px, radii 6/10 vs 12/18, shadow offset 4-6px). Only the sticker art and deck pages are bespoke."
+    },
+    {
+      "key": "old-web",
+      "name": "Old Web",
+      "coreTrick": "Grey #C0C0C0 windows and buttons drawn with the exact four-tone Win9x bevel (white/#DFDFDF top-left, #808080/#0A0A0A bottom-right, swapped for sunken) with navy-to-primary title bars on a starfield tile, and a WordArt headline built from a stacked-text-shadow extrusion plus two clipped overlay copies forming a three-band gradient.",
+      "colourRecipe": "Primary only feeds the WordArt bands and the end of every title-bar gradient (navy #000080 into primary, falling back to #1084D0 when white cannot read at 3:1); secondary tints icons and one 88x31 badge; accent is NEW! badges, counter LEDs and the highlighted WordArt word. Window chrome, links and bevel greys are fixed. WordArt bands are searched to hold 3:1 on the page; a pale yellow primary on white switches to a saturated sunset ramp instead of going olive. A muted client colour mostly vanishes into a navy title bar.",
+      "moves": ["four-tone-bevel", "window-title-bar", "starfield-ground", "wordart-headline", "highlight-word", "browser-link-colours", "focus-ring-style", "stepped-spinner", "repeating-stripe-fill", "hairline-rule", "contrast-floor-adjust", "radial-planet-clipart", "kicker-treatment", "tinted-neutral-canvas", "named-states", "corner-radius", "ink-filled-selected", "real-weight-pick"],
+      "remainder": [
+        { "what": "WordArt band colours: light/mid/deep bands each holding 3:1 on the page, a yellow-on-white sunset ramp special case, and a dark extrusion colour", "where": "js/aesthetics/old-web.js:32-60", "whyCode": "Colour searches with hue-specific special cases; cannot be a token or fixed mix." },
+        { "what": "WordArt markup: each word is a base copy plus two clipped overlay copies at 36%/66% height so html2canvas keeps it", "where": "js/aesthetics/old-web.js:62-66,213-218", "whyCode": "Headline hook emitting three nested spans per word." },
+        { "what": "Homepage window art: menu bar, nav list with drawn icons, under-construction sign, marquee, visitor counter with LED digits, webring, What's New list, 88x31 badges, status bar", "where": "js/aesthetics/old-web.js:68-74,220-263", "whyCode": "Bespoke Web 1.0 furniture markup and copy; each piece is its own hand-built component." },
+        { "what": "Table panel with list-view column headers, folder icons, NEW! badge, segmented progress", "where": "js/aesthetics/old-web.js:267-280", "whyCode": "Custom panel hook (def.panels.list) with bespoke markup." },
+        { "what": "Win98 tab geometry (chosen tab taller and bold, others lower) and caption-button gradient stack", "where": "css/aesthetics/old-web.css:12-40,478-481", "whyCode": "Pixel-exact stacked gradients and per-state offsets; recipe-able only as a fixed Win98 component pack." }
+      ],
+      "moveCoverage": 60,
+      "notes": "Bevel, title bar, starfield, link colours and dotted focus are recipes and carry the kit and board windows well. The WordArt headline and the homepage art are the bespoke part. Mostly ignores the client palette by design, so palette-agnostic only in the sense of using fixed colours."
+    },
+    {
+      "key": "paddock-pass",
+      "name": "Paddock Pass",
+      "coreTrick": "A race-day credential: a hi-vis strip down the leading edge (full height on the board, 4px on every card and selected row), square corners and hairline-ruled spec rows (micro-caps label left, mono value right), with a race numeral, barcode and dot-matrix generated deterministically from the brand name.",
+      "colourRecipe": "Hi-vis is the brightest of the client's three colours that is saturated enough (luminance >= 8:1 vs black proxy, saturation >= 35), pushed to s>=88 and l 48-66, else neon #e4ff2e, used only as a fill with an on-colour label. Primary stays the brand colour and moves by the least lightness needed to hold 3:1 on ground and card and 4.6:1 for white or dark text (printPrimary). Ground is an ice blue-grey with 10% hue pull toward the brand (dark: navy). A muted palette falls back to the neon strip.",
+      "moves": ["tinted-neutral-canvas", "hivis-colour-pick", "leading-edge-bar", "perforated-rule", "ticket-stub-layout", "barcode-serial", "dot-matrix-block", "angled-stripe-bands", "tick-ruler", "catalogue-number", "caps-mono-labels", "spec-row", "hairline-rule", "heavy-border", "corner-radius", "rectangular-chevron-button", "boxed-number-badge", "ink-filled-selected", "rocker-toggle", "focus-ring-style", "stepped-spinner", "contrast-floor-adjust", "kicker-treatment", "highlight-word", "named-states", "real-weight-pick"],
+      "remainder": [
+        { "what": "printPrimary: search lightness in both directions for the smallest move that satisfies 3:1 on two beds and 4.6:1 for text", "where": "js/aesthetics/paddock-pass.js:164-179", "whyCode": "Bidirectional colour search with multiple constraints." },
+        { "what": "Hi-vis colour selection across three palette colours with neon fallback", "where": "js/aesthetics/paddock-pass.js:71-86", "whyCode": "Selection by luminance/saturation threshold, not a mix." },
+        { "what": "Livery panel art composition: numeral box with chevrons, dot matrix, three spec rows, tick scale, clipped stripe bands, notches, stub with barcode and sector time", "where": "js/aesthetics/paddock-pass.js:222-277", "whyCode": "Fixed hand-placed 520x340 SVG layout; individual primitives are generatable, the arrangement is not." },
+        { "what": "Deck Material specimens (boxed numeral card, perforated stub card, controls card)", "where": "js/aesthetics/paddock-pass.js:309-332", "whyCode": "Bespoke deck markup." },
+        { "what": "Muted/edge/track contrast searches against three beds", "where": "js/aesthetics/paddock-pass.js:186-194", "whyCode": "Iterative colour loops." }
+      ],
+      "moveCoverage": 70,
+      "notes": "Kit is mostly recipes (square, hairline, strip, rocker key, chevron button); app screens carry no art per its own hard rule, so everything bespoke is board/deck. The colour logic (hi-vis pick, printPrimary) is the code-heavy part and is what makes the strip feel brand-derived."
+    }
+  ],
+  "moves": [
+    {
+      "id": "mixed-face-headline", "category": "type", "name": "Mixed-face headline",
+      "what": "A headline set word by word in several faces, each scaled by a cap-height factor so capitals align.",
+      "params": [
+        { "name": "voices", "kind": "enum", "range": "brand|italic-serif|heavy-grotesk|mono", "default": "all four" },
+        { "name": "assignRule", "kind": "enum", "range": "stopwords-to-mono|alternate|last-word-italic", "default": "stopwords-to-mono + alternate + last italic" },
+        { "name": "capMatch", "kind": "bool", "range": "", "default": "true" }
+      ],
+      "usedBy": [
+        { "key": "mixed-type", "where": "js/aesthetics/mixed-type.js:68-114", "variant": "Four voices resolved per brand, k = capB/capVoice, last word serif italic with asterisk" },
+        { "key": "mixed-type", "where": "css/aesthetics/mixed-type.css:40-64", "variant": "Per-voice font-size calc(1em * k), uppercase heavy, mono tightened -0.13em" }
+      ],
+      "expressibleAs": "needs-code",
+      "paletteAgnostic": true, "exportSafe": true, "appSafe": false,
+      "kitScope": [], "conflictsWith": ["per-word-tilt-headline", "wordart-headline"]
+    },
+    {
+      "id": "highlight-word", "category": "type", "name": "Highlight word treatment",
+      "what": "The last headline word gets one distinct treatment in the accent colour.",
+      "params": [
+        { "name": "treatment", "kind": "enum", "range": "italic-asterisk|sticker-block|crayon-scribble|wordart-accent-bands|ink-plain", "default": "sticker-block" },
+        { "name": "tiltDeg", "kind": "number", "range": "-6..6", "default": "-4" },
+        { "name": "shadow", "kind": "bool", "range": "", "default": "true" }
+      ],
+      "usedBy": [
+        { "key": "mixed-type", "where": "css/aesthetics/mixed-type.css:65-70", "variant": "Serif italic in accent-ink with a trailing asterisk; no fill" },
+        { "key": "naive-doodle", "where": "css/aesthetics/naive-doodle.css:51-60", "variant": "Accent crayon scribble behind the word (hatch + offset, skewed) with a squiggle underline" },
+        { "key": "neo-brutal-pop", "where": "css/aesthetics/neo-brutal-pop.css:65-74", "variant": "Tilted accent sticker block, 2px ink outline, 6px hard shadow, plus a flower at its edge (80-84)" },
+        { "key": "old-web", "where": "css/aesthetics/old-web.css:144-146", "variant": "Last WordArt word swaps to the accent bands and extrusion" },
+        { "key": "paddock-pass", "where": "css/aesthetics/paddock-pass.css:81-85", "variant": "Highlight kept ink and upright (js highlight 'ink'); the accent goes to the hi-vis fills instead" }
+      ],
+      "expressibleAs": "css-recipe",
+      "paletteAgnostic": true, "exportSafe": true, "appSafe": true,
+      "kitScope": ["headline"], "conflictsWith": []
+    },
+    {
+      "id": "type-specimen-art", "category": "structure", "name": "Type specimen art",
+      "what": "Board art showing each type voice as a large 'Aa' with cap/x-height/baseline guides, a glyph set and a size scale.",
+      "params": [
+        { "name": "cells", "kind": "number", "range": "2-6", "default": "4" },
+        { "name": "guides", "kind": "enum", "range": "baseline|cap|xheight", "default": "all" }
+      ],
+      "usedBy": [
+        { "key": "mixed-type", "where": "js/aesthetics/mixed-type.js:122-138,204-226", "variant": "Guide y from measured per-face metrics; glyph rows and scale" },
+        { "key": "mixed-type", "where": "css/aesthetics/mixed-type.css:79-125", "variant": "Hairline-ruled cell table with dashed cap line and dotted x-height" }
+      ],
+      "expressibleAs": "needs-code",
+      "paletteAgnostic": true, "exportSafe": true, "appSafe": false,
+      "kitScope": [], "conflictsWith": []
+    },
+    {
+      "id": "caps-mono-labels", "category": "type", "name": "Tracked caps or mono labels",
+      "what": "Small tracked uppercase (or mono) labels for names, tabs, buttons and tags.",
+      "params": [
+        { "name": "face", "kind": "enum", "range": "ui-sans|mono|heading", "default": "mono" },
+        { "name": "sizePx", "kind": "number", "range": "10-13", "default": "11" },
+        { "name": "tracking", "kind": "number", "range": "0.06-0.16 em", "default": "0.1" },
+        { "name": "weight", "kind": "number", "range": "400-800", "default": "600" }
+      ],
+      "usedBy": [
+        { "key": "mixed-type", "where": "css/aesthetics/mixed-type.css:523-541,571-576", "variant": "Mono caps 12-13px tracked on buttons, tabs, labels and numerals" },
+        { "key": "paddock-pass", "where": "css/aesthetics/paddock-pass.css:44-48", "variant": "11px 600 micro caps, 0.1em tracking, mono kept for values only" },
+        { "key": "neo-brutal-pop", "where": "css/aesthetics/neo-brutal-pop.css:39-44", "variant": "12px bold, 0.09em tracking at the heaviest real weight, not forced uppercase" }
+      ],
+      "expressibleAs": "css-recipe",
+      "paletteAgnostic": true, "exportSafe": true, "appSafe": true,
+      "kitScope": ["button", "tab", "label", "tag"], "conflictsWith": []
+    },
+    {
+      "id": "hairline-rule", "category": "material", "name": "Hairline rules",
+      "what": "1px rules (ink or muted line colour) as the main separator between regions instead of fills or shadows.",
+      "params": [
+        { "name": "colour", "kind": "enum", "range": "ink|line|groove", "default": "line" },
+        { "name": "widthPx", "kind": "number", "range": "1-2", "default": "1" }
+      ],
+      "usedBy": [
+        { "key": "mixed-type", "where": "css/aesthetics/mixed-type.css:16-25,79-100", "variant": "Ink rule under the header, line-colour rules inside the specimen; cell borders shared" },
+        { "key": "paddock-pass", "where": "css/aesthetics/paddock-pass.css:180-196", "variant": "Rule under every spec row, ink rule on top of lists, 2px ink under group headings" },
+        { "key": "old-web", "where": "css/aesthetics/old-web.css:105-107", "variant": "Grooved hr: #808080 over #FFFFFF 1px pair" }
+      ],
+      "expressibleAs": "css-recipe",
+      "paletteAgnostic": true, "exportSafe": true, "appSafe": true,
+      "kitScope": ["divider", "list", "card"], "conflictsWith": []
+    },
+    {
+      "id": "heavy-border", "category": "material", "name": "Ink outline on everything",
+      "what": "A solid border in ink around cards, controls and fields.",
+      "params": [
+        { "name": "widthPx", "kind": "number", "range": "1-3", "default": "2" },
+        { "name": "colour", "kind": "enum", "range": "ink|edge", "default": "ink" }
+      ],
+      "usedBy": [
+        { "key": "neo-brutal-pop", "where": "css/aesthetics/neo-brutal-pop.css:11-17,651-676", "variant": "2px board, 3px kit, ink everywhere, via --np-b" },
+        { "key": "mixed-type", "where": "css/aesthetics/mixed-type.css:523-542,565", "variant": "1px ink (not grey) rules on kit cells, controls and menus" },
+        { "key": "paddock-pass", "where": "css/aesthetics/paddock-pass.css:148-165", "variant": "1.5px ink outline on controls, 1px rule on panels" }
+      ],
+      "expressibleAs": "css-recipe",
+      "paletteAgnostic": true, "exportSafe": true, "appSafe": true,
+      "kitScope": ["button", "field", "card", "chip"], "conflictsWith": []
+    },
+    {
+      "id": "hard-offset-shadow", "category": "material", "name": "Hard offset shadow",
+      "what": "A zero-blur shadow offset down-right in ink (black in dark mode).",
+      "params": [
+        { "name": "offsetPx", "kind": "number", "range": "3-8", "default": "4" },
+        { "name": "colour", "kind": "enum", "range": "ink|black-in-dark", "default": "ink" }
+      ],
+      "usedBy": [
+        { "key": "neo-brutal-pop", "where": "css/aesthetics/neo-brutal-pop.css:153-165,167-175,718-736", "variant": "4px board, 5px kit; black in dark mode (--np-shc); SVG stickers use translate(5 5) copies (js:29-47)" },
+        { "key": "mixed-type", "where": "css/aesthetics/mixed-type.css:571-578,584-586,680-687", "variant": "4px 'slug' (--mtk-slug) under keys and floating layers" }
+      ],
+      "expressibleAs": "css-recipe",
+      "paletteAgnostic": true, "exportSafe": true, "appSafe": true,
+      "kitScope": ["button", "card", "field", "overlay"], "conflictsWith": ["soft-raised-relief"]
+    },
+    {
+      "id": "press-into-shadow", "category": "kit", "name": "Lift and squish",
+      "what": "Hover lifts the element up-left and grows the shadow; press translates it by the shadow offset and removes the shadow.",
+      "params": [
+        { "name": "lift", "kind": "bool", "range": "", "default": "true" },
+        { "name": "pressPx", "kind": "number", "range": "2-6", "default": "4" }
+      ],
+      "usedBy": [
+        { "key": "neo-brutal-pop", "where": "css/aesthetics/neo-brutal-pop.css:164-165,439-443", "variant": "Hover translate(-2px) with 6px shadow; press translate(4px) with 0 shadow" },
+        { "key": "mixed-type", "where": "css/aesthetics/mixed-type.css:575-578,584-585", "variant": "No hover lift; press collapses the slug by its own size" }
+      ],
+      "expressibleAs": "css-recipe",
+      "paletteAgnostic": true, "exportSafe": true, "appSafe": true,
+      "kitScope": ["button", "fab", "row"], "conflictsWith": []
+    },
+    {
+      "id": "corner-radius", "category": "material", "name": "Corner radius set",
+      "what": "A radius scale for controls and containers, from square to pills, optionally uneven blobs.",
+      "params": [
+        { "name": "controlPx", "kind": "number", "range": "0-12", "default": "6" },
+        { "name": "containerPx", "kind": "number", "range": "0-26", "default": "10" },
+        { "name": "pillTags", "kind": "bool", "range": "", "default": "false" },
+        { "name": "uneven", "kind": "bool", "range": "", "default": "false" }
+      ],
+      "usedBy": [
+        { "key": "neo-brutal-pop", "where": "css/aesthetics/neo-brutal-pop.css:11-17,651-676", "variant": "6/10 board, 12/18 kit with pill tags and circle radios" },
+        { "key": "mixed-type", "where": "css/aesthetics/mixed-type.css:13,523-542", "variant": "Square everywhere; 4px outer board only" },
+        { "key": "paddock-pass", "where": "css/aesthetics/paddock-pass.css:22-26", "variant": "0 radius everywhere" },
+        { "key": "old-web", "where": "css/aesthetics/old-web.css:13-14", "variant": "0 radius (Win9x), except round radios" },
+        { "key": "naive-doodle", "where": "css/aesthetics/naive-doodle.css:106-134,584-586", "variant": "Uneven blob radii like 26px 16px 30px 18px / 18px 28px 16px 26px" }
+      ],
+      "expressibleAs": "tokens",
+      "paletteAgnostic": true, "exportSafe": true, "appSafe": true,
+      "kitScope": ["all"], "conflictsWith": []
+    },
+    {
+      "id": "tinted-neutral-canvas", "category": "colour", "name": "Tinted or fixed ground",
+      "what": "The page ground is derived from the client canvas (mixed toward paper/ink or pulled toward a fixed hue) or fixed outright.",
+      "params": [
+        { "name": "mode", "kind": "enum", "range": "mix-white|mix-ink|hue-pull|fixed", "default": "mix-white" },
+        { "name": "amount", "kind": "number", "range": "0-1", "default": "0.85" },
+        { "name": "fixedHex", "kind": "colour", "range": "", "default": "" }
+      ],
+      "usedBy": [
+        { "key": "neo-brutal-pop", "where": "js/aesthetics/neo-brutal-pop.js:122-123,139", "variant": "Canvas 85% toward white; cards 90%; dark: ink mixed 10% into canvas" },
+        { "key": "mixed-type", "where": "js/aesthetics/mixed-type.js:186-193", "variant": "Paper = canvas with 4.5% ink; cards use it" },
+        { "key": "paddock-pass", "where": "js/aesthetics/paddock-pass.js:60-69,159-160", "variant": "Ice blue-grey (dark navy) with 10% hue pull to the brand; card a step whiter" },
+        { "key": "naive-doodle", "where": "js/aesthetics/naive-doodle.js:260-265", "variant": "Fixed cream #FFFBF2; dark = client dark pressed to warm slate" },
+        { "key": "old-web", "where": "js/aesthetics/old-web.js:167", "variant": "Fixed #000 / #FFF" }
+      ],
+      "expressibleAs": "tokens",
+      "paletteAgnostic": true, "exportSafe": true, "appSafe": true,
+      "kitScope": [], "conflictsWith": []
+    },
+    {
+      "id": "ink-filled-selected", "category": "kit", "name": "Selected state by fill",
+      "what": "The selected item (tab, segment, row, day) is filled solid, either in ink, the primary, a wash or a title-bar colour.",
+      "params": [
+        { "name": "fill", "kind": "enum", "range": "ink|primary|wash|titlebar", "default": "ink" },
+        { "name": "extra", "kind": "enum", "range": "none|leading-bar|squiggle|small-shadow", "default": "none" }
+      ],
+      "usedBy": [
+        { "key": "mixed-type", "where": "css/aesthetics/mixed-type.css:336-338,650,664-670", "variant": "Ink inversion (canvas text) for rows, days, open accordion; primary never used for selection" },
+        { "key": "paddock-pass", "where": "css/aesthetics/paddock-pass.css:144,586", "variant": "Ink fill with an inset 4px hi-vis leading bar" },
+        { "key": "neo-brutal-pop", "where": "css/aesthetics/neo-brutal-pop.css:465,561,651-676", "variant": "Primary fill with ink outline and a small hard shadow; the picked row squishes" },
+        { "key": "naive-doodle", "where": "css/aesthetics/naive-doodle.css:565-578", "variant": "Crayon wash a little off the edges, plus the squiggle for tabs and nav" },
+        { "key": "old-web", "where": "css/aesthetics/old-web.css:456-459,481", "variant": "List-box highlight: white on the title-bar colour; chosen Win98 tab taller" }
+      ],
+      "expressibleAs": "css-recipe",
+      "paletteAgnostic": true, "exportSafe": true, "appSafe": true,
+      "kitScope": ["tab", "segmented", "row", "menu", "calendar"], "conflictsWith": []
+    },
+    {
+      "id": "leading-edge-bar", "category": "material", "name": "Leading-edge colour bar",
+      "what": "A thick bar on the left edge of a card, field, row or selected item, in a signal colour.",
+      "params": [
+        { "name": "widthPx", "kind": "number", "range": "3-18", "default": "4" },
+        { "name": "colour", "kind": "enum", "range": "hivis|primary|ink|danger", "default": "hivis" },
+        { "name": "edge", "kind": "enum", "range": "left|bottom", "default": "left" }
+      ],
+      "usedBy": [
+        { "key": "paddock-pass", "where": "css/aesthetics/paddock-pass.css:36-43,127-131,562-566,586", "variant": "Full-height strip on the board, 4px on cards, fields and selected segments; hi-vis on focus, danger on error" },
+        { "key": "mixed-type", "where": "css/aesthetics/mixed-type.css:336,403-408,447", "variant": "3px primary rule inset on chosen menu rows, open accordion and current nav" }
+      ],
+      "expressibleAs": "css-recipe",
+      "paletteAgnostic": true, "exportSafe": true, "appSafe": true,
+      "kitScope": ["card", "field", "row", "nav"], "conflictsWith": []
+    },
+    {
+      "id": "rocker-toggle", "category": "kit", "name": "Rocker-key toggle",
+      "what": "A square two-cell toggle printed OFF / ON with the knob as a filled half.",
+      "params": [
+        { "name": "labels", "kind": "text", "range": "", "default": "OFF / ON" },
+        { "name": "onFill", "kind": "enum", "range": "hivis|ink|primary", "default": "hivis" }
+      ],
+      "usedBy": [
+        { "key": "mixed-type", "where": "css/aesthetics/mixed-type.css:624-633", "variant": "84x32 rocker, inverted half, bracket labels" },
+        { "key": "paddock-pass", "where": "css/aesthetics/paddock-pass.css:575-581", "variant": "68x34 two-cell key, ON fills hi-vis" }
+      ],
+      "expressibleAs": "css-recipe",
+      "paletteAgnostic": true, "exportSafe": true, "appSafe": true,
+      "kitScope": ["toggle"], "conflictsWith": []
+    },
+    {
+      "id": "bracketed-field", "category": "kit", "name": "Bracketed field",
+      "what": "A text field framed by ink side walls with short corner ticks, mono value, caps label above.",
+      "params": [
+        { "name": "tickPx", "kind": "number", "range": "6-12", "default": "9" },
+        { "name": "focusWallPx", "kind": "number", "range": "2-4", "default": "3" }
+      ],
+      "usedBy": [
+        { "key": "mixed-type", "where": "css/aesthetics/mixed-type.css:591-599", "variant": "Multi-background gradient ticks at four corners; focus thickens side walls" }
+      ],
+      "expressibleAs": "css-recipe",
+      "paletteAgnostic": true, "exportSafe": true, "appSafe": true,
+      "kitScope": ["field"], "conflictsWith": []
+    },
+    {
+      "id": "tick-ruler", "category": "pattern", "name": "Tick ruler",
+      "what": "A row of short ticks with a longer one every fifth, used as a slider ground or a scale decoration.",
+      "params": [
+        { "name": "pitchPx", "kind": "number", "range": "6-12", "default": "6" },
+        { "name": "longEvery", "kind": "number", "range": "3-10", "default": "5" }
+      ],
+      "usedBy": [
+        { "key": "mixed-type", "where": "css/aesthetics/mixed-type.css:638-641", "variant": "Repeating-gradient ruler under the slider track (CSS, kit-safe)" },
+        { "key": "paddock-pass", "where": "js/aesthetics/paddock-pass.js:236-237,260,268", "variant": "SVG path ruler() on the livery panel, board only" }
+      ],
+      "expressibleAs": "css-recipe",
+      "paletteAgnostic": true, "exportSafe": true, "appSafe": true,
+      "kitScope": ["slider"], "conflictsWith": []
+    },
+    {
+      "id": "stepped-spinner", "category": "motion", "name": "Stepped spinner",
+      "what": "A loading ring or square that rotates in discrete steps (no smooth easing) with a style-specific shape.",
+      "params": [
+        { "name": "steps", "kind": "number", "range": "4-12", "default": "4" },
+        { "name": "shape", "kind": "enum", "range": "hairline-ring|dashed-wobble-ring|square|ring-with-track", "default": "square" }
+      ],
+      "usedBy": [
+        { "key": "mixed-type", "where": "css/aesthetics/mixed-type.css:501-510", "variant": "Hairline ring ticking in twelve steps, hairline skeleton" },
+        { "key": "naive-doodle", "where": "css/aesthetics/naive-doodle.css:531-537", "variant": "Dashed wobble ring turning in flip-book steps, crayon-wash skeleton" },
+        { "key": "neo-brutal-pop", "where": "css/aesthetics/neo-brutal-pop.css:637-648", "variant": "Tumbling square, steps(4), blocky blink skeleton" },
+        { "key": "old-web", "where": "css/aesthetics/old-web.css:632-642", "variant": "Square stepped spinner, no shimmer (style never animates)" },
+        { "key": "paddock-pass", "where": "css/aesthetics/paddock-pass.css:509-519", "variant": "Square stepped spinner with a track, track-coloured blocks" }
+      ],
+      "expressibleAs": "css-recipe",
+      "paletteAgnostic": true, "exportSafe": true, "appSafe": true,
+      "kitScope": ["spinner", "skeleton"], "conflictsWith": []
+    },
+    {
+      "id": "named-states", "category": "kit", "name": "Named state row",
+      "what": "A three-state specimen row with style-specific names (e.g. Rest/Lift/Squish) shown as buttons or swatches.",
+      "params": [
+        { "name": "names", "kind": "text", "range": "3 strings", "default": "Rest, Hover, Pressed" },
+        { "name": "kind", "kind": "enum", "range": "button|swatch", "default": "button" }
+      ],
+      "usedBy": [
+        { "key": "mixed-type", "where": "js/aesthetics/mixed-type.js:150", "variant": "Roman / Italic / Mono as swatches" },
+        { "key": "naive-doodle", "where": "js/aesthetics/naive-doodle.js:216", "variant": "Outlined / Coloured in / Circled as buttons" },
+        { "key": "neo-brutal-pop", "where": "js/aesthetics/neo-brutal-pop.js:74", "variant": "Rest / Lift / Squish as buttons" },
+        { "key": "old-web", "where": "js/aesthetics/old-web.js:86", "variant": "Raised / Visited / Sunken as buttons" },
+        { "key": "paddock-pass", "where": "js/aesthetics/paddock-pass.js:98", "variant": "Rest / Hover / Pressed as buttons" }
+      ],
+      "expressibleAs": "tokens",
+      "paletteAgnostic": true, "exportSafe": true, "appSafe": true,
+      "kitScope": [], "conflictsWith": []
+    },
+    {
+      "id": "catalogue-number", "category": "ornament", "name": "Catalogue or race number",
+      "what": "A number used as ornament or caption: a figure label, specimen number, or a numeral generated from the brand name.",
+      "params": [
+        { "name": "source", "kind": "enum", "range": "fixed-copy|brand-hash", "default": "fixed-copy" },
+        { "name": "format", "kind": "text", "range": "", "default": "Fig. N" }
+      ],
+      "usedBy": [
+        { "key": "mixed-type", "where": "js/aesthetics/mixed-type.js:147,158-159; css/aesthetics/mixed-type.css:279-283", "variant": "Kicker 'Specimen No. 4', 'Fig. 1' caption, '(Fig. 2)' appended to screen titles" },
+        { "key": "paddock-pass", "where": "js/aesthetics/paddock-pass.js:24-56,263", "variant": "FNV-1a race numeral 10-99 plus zone, gate, sector time derived from the brand name" }
+      ],
+      "expressibleAs": "svg-generator",
+      "paletteAgnostic": true, "exportSafe": true, "appSafe": false,
+      "kitScope": [], "conflictsWith": []
+    },
+    {
+      "id": "real-weight-pick", "category": "type", "name": "Real-weight pick",
+      "what": "Choose the heaviest (or nearest) weight a face actually ships, because synthetic bold is disabled.",
+      "params": [
+        { "name": "target", "kind": "number", "range": "400-900", "default": "800" },
+        { "name": "rule", "kind": "enum", "range": "heaviest-up-to|nearest", "default": "heaviest-up-to" }
+      ],
+      "usedBy": [
+        { "key": "neo-brutal-pop", "where": "js/aesthetics/neo-brutal-pop.js:12-16,143-145", "variant": "Heading and UI faces at their heaviest weight up to 800" },
+        { "key": "paddock-pass", "where": "js/aesthetics/paddock-pass.js:197-198", "variant": "Nearest to 700 via abWeightNear" },
+        { "key": "mixed-type", "where": "js/aesthetics/mixed-type.js:33-37,70-71", "variant": "Preference list per brand class (didone/serif prefers 400-600)" },
+        { "key": "naive-doodle", "where": "css/aesthetics/naive-doodle.css:14-17", "variant": "font-synthesis: none; hand face at 400" },
+        { "key": "old-web", "where": "css/aesthetics/old-web.css:12-14", "variant": "font-synthesis: none, forced chrome face" }
+      ],
+      "expressibleAs": "tokens",
+      "paletteAgnostic": true, "exportSafe": true, "appSafe": true,
+      "kitScope": [], "conflictsWith": []
+    },
+    {
+      "id": "focus-ring-style", "category": "kit", "name": "Focus ring style",
+      "what": "A named keyboard-focus indicator: ring width, offset and stroke style.",
+      "params": [
+        { "name": "style", "kind": "enum", "range": "solid|dashed-loop|dotted-inside|squiggle", "default": "solid" },
+        { "name": "widthPx", "kind": "number", "range": "1-3", "default": "2" },
+        { "name": "offsetPx", "kind": "number", "range": "-4..3", "default": "3" }
+      ],
+      "usedBy": [
+        { "key": "mixed-type", "where": "css/aesthetics/mixed-type.css:354,451,523-542", "variant": "2px ink outline, 3px offset" },
+        { "key": "neo-brutal-pop", "where": "css/aesthetics/neo-brutal-pop.css:279,714-717", "variant": "3px ink ring, offset 3px" },
+        { "key": "naive-doodle", "where": "css/aesthetics/naive-doodle.css:204-206,387", "variant": "Dashed hand loop; on buttons a squiggle under the drawn outline" },
+        { "key": "old-web", "where": "css/aesthetics/old-web.css:252,262,281", "variant": "1px dotted rectangle drawn inside the control (Win98)" },
+        { "key": "paddock-pass", "where": "css/aesthetics/paddock-pass.css:153,521-530", "variant": "2px ink ring, offset 3px" }
+      ],
+      "expressibleAs": "css-recipe",
+      "paletteAgnostic": true, "exportSafe": true, "appSafe": true,
+      "kitScope": ["button", "field", "tab", "row"], "conflictsWith": []
+    },
+    {
+      "id": "ruled-cell-grid", "category": "layout", "name": "Ruled cell grid",
+      "what": "A grid of cells that share 1px ink borders like a spec table, with no gaps.",
+      "params": [
+        { "name": "columns", "kind": "number", "range": "2-6", "default": "4" },
+        { "name": "borderColour", "kind": "enum", "range": "ink|line", "default": "ink" }
+      ],
+      "usedBy": [
+        { "key": "mixed-type", "where": "css/aesthetics/mixed-type.css:543-546,79-100", "variant": "Kit page cells share borders; specimen cells separated by hairlines" }
+      ],
+      "expressibleAs": "css-recipe",
+      "paletteAgnostic": true, "exportSafe": true, "appSafe": true,
+      "kitScope": ["page-chrome"], "conflictsWith": []
+    },
+    {
+      "id": "kicker-treatment", "category": "type", "name": "Kicker styling",
+      "what": "The small line above the headline is styled as a pill, a rule-led caption, a prefix badge or a rotated handwritten note.",
+      "params": [
+        { "name": "form", "kind": "enum", "range": "sticker-pill|rule-after|prefix-badge|prefix-glyph|rotated-hand", "default": "sticker-pill" },
+        { "name": "tiltDeg", "kind": "number", "range": "-4..0", "default": "-1.5" }
+      ],
+      "usedBy": [
+        { "key": "mixed-type", "where": "css/aesthetics/mixed-type.css:35-39", "variant": "Mono caps with a flex hairline rule after it" },
+        { "key": "naive-doodle", "where": "css/aesthetics/naive-doodle.css:40-47", "variant": "Hand-lettered 20-26px, rotated -3deg" },
+        { "key": "neo-brutal-pop", "where": "css/aesthetics/neo-brutal-pop.css:55-61", "variant": "Secondary-fill sticker pill, 2px ink outline, rotated -1.5deg" },
+        { "key": "old-web", "where": "css/aesthetics/old-web.css:124-126", "variant": "Italic with a NEW! accent badge before and '!!' after" },
+        { "key": "paddock-pass", "where": "css/aesthetics/paddock-pass.css:79-80", "variant": "Micro caps muted with a '» ' glyph prefix" }
+      ],
+      "expressibleAs": "css-recipe",
+      "paletteAgnostic": true, "exportSafe": true, "appSafe": true,
+      "kitScope": ["header"], "conflictsWith": []
+    },
+    {
+      "id": "wobble-line-outline", "category": "material", "name": "Wobble-line outlines",
+      "what": "Component outlines drawn as seeded hand-wobbled SVG paths (low-frequency noise along the normal, overshooting loops) delivered as data-URI backgrounds in the line colour.",
+      "params": [
+        { "name": "amplitude", "kind": "number", "range": "0.3-2", "default": "1.1" },
+        { "name": "stepUnits", "kind": "number", "range": "3-9", "default": "6" },
+        { "name": "overshoot", "kind": "number", "range": "0-14", "default": "10" },
+        { "name": "penPx", "kind": "number", "range": "1.6-3.4", "default": "2.6" },
+        { "name": "seed", "kind": "text", "range": "brand name + mode", "default": "brand|l" }
+      ],
+      "usedBy": [
+        { "key": "naive-doodle", "where": "js/aesthetics/naive-doodle.js:47-71,84-104,140-186", "variant": "ndWobble/ndLoopRect/ndBoxSides build card, button, ring, segmented box, rules, toggle, tab etc." },
+        { "key": "naive-doodle", "where": "css/aesthetics/naive-doodle.css:106-134,181-208", "variant": "CSS only positions the data-URI shapes (::after at inset, non-scaling stroke)" }
+      ],
+      "expressibleAs": "svg-generator",
+      "paletteAgnostic": true, "exportSafe": true, "appSafe": true,
+      "kitScope": ["card", "button", "segmented", "toggle", "tab", "bar"], "conflictsWith": ["heavy-border"]
+    },
+    {
+      "id": "offset-fill-under-outline", "category": "material", "name": "Offset colour fill",
+      "what": "A coloured fill sits a few pixels off its outline (down-right), like crayon coloured in slightly outside the line; hover snaps it inside.",
+      "params": [
+        { "name": "offsetPx", "kind": "number", "range": "3-9", "default": "6" },
+        { "name": "texture", "kind": "enum", "range": "flat|hatch", "default": "hatch" }
+      ],
+      "usedBy": [
+        { "key": "naive-doodle", "where": "css/aesthetics/naive-doodle.css:126-134,181-208", "variant": "::before inset 4px -6px -6px 5px with uneven radii; card wash behind the loop" },
+        { "key": "naive-doodle", "where": "js/aesthetics/naive-doodle.js:124-132,278", "variant": "Crayon colours and hatch gradient made in tokens()" }
+      ],
+      "expressibleAs": "css-recipe",
+      "paletteAgnostic": true, "exportSafe": true, "appSafe": true,
+      "kitScope": ["button", "card", "selected"], "conflictsWith": ["hard-offset-shadow"]
+    },
+    {
+      "id": "repeating-stripe-fill", "category": "pattern", "name": "Repeating stripe fill",
+      "what": "A repeating-linear-gradient of stripes or blocks over a base colour: hatch texture or segmented progress.",
+      "params": [
+        { "name": "angleDeg", "kind": "number", "range": "-45..90", "default": "-45" },
+        { "name": "stripePx", "kind": "number", "range": "1.5-8", "default": "5" },
+        { "name": "gapPx", "kind": "number", "range": "1.5-10", "default": "5" },
+        { "name": "stripeColour", "kind": "colour", "range": "", "default": "light mix of base" }
+      ],
+      "usedBy": [
+        { "key": "naive-doodle", "where": "js/aesthetics/naive-doodle.js:278,309", "variant": "-45deg 1.5px streaks of paper over the crayon (UI); 45deg hatch pattern in art" },
+        { "key": "neo-brutal-pop", "where": "css/aesthetics/neo-brutal-pop.css:224,463", "variant": "-45deg white 5px stripes on the progress fill" },
+        { "key": "old-web", "where": "css/aesthetics/old-web.css:490", "variant": "90deg 8px blocks with 2px gaps: the segmented Win98 progress bar" }
+      ],
+      "expressibleAs": "css-recipe",
+      "paletteAgnostic": true, "exportSafe": true, "appSafe": true,
+      "kitScope": ["progress", "fill"], "conflictsWith": []
+    },
+    {
+      "id": "contrast-floor-adjust", "category": "colour", "name": "Contrast-floor adjust",
+      "what": "A colour is lifted, shaded or pulled toward ink in steps until it holds a target contrast on a given background.",
+      "params": [
+        { "name": "minRatio", "kind": "number", "range": "3-7", "default": "4.6" },
+        { "name": "against", "kind": "enum", "range": "fixed-ink|page|card|multiple-beds", "default": "page" },
+        { "name": "direction", "kind": "enum", "range": "lighten|darken|toward-ink|least-move", "default": "toward-ink" }
+      ],
+      "usedBy": [
+        { "key": "naive-doodle", "where": "js/aesthetics/naive-doodle.js:124-130,273-274", "variant": "Crayon lightness lifted until warm-black reads 4.6:1; muted pulled toward ink" },
+        { "key": "neo-brutal-pop", "where": "js/aesthetics/neo-brutal-pop.js:127-132,149", "variant": "Chip fill eased down until ink holds 7:1; muted on paper to 4.6:1" },
+        { "key": "old-web", "where": "js/aesthetics/old-web.js:32-60", "variant": "owHold lifts/shades to 3:1 on the page; yellow-on-white sunset ramp special case" },
+        { "key": "paddock-pass", "where": "js/aesthetics/paddock-pass.js:164-179,186-194", "variant": "Least lightness move in both directions for 3:1 on two beds and 4.6:1 for text; muted and edge loops" }
+      ],
+      "expressibleAs": "needs-code",
+      "paletteAgnostic": true, "exportSafe": true, "appSafe": true,
+      "kitScope": [], "conflictsWith": []
+    },
+    {
+      "id": "grid-paper-ground", "category": "pattern", "name": "Graph-paper ground",
+      "what": "A thin square grid tile behind the page, drawn as an SVG data-URI at low ink opacity.",
+      "params": [
+        { "name": "cellPx", "kind": "number", "range": "16-32", "default": "24" },
+        { "name": "opacity", "kind": "number", "range": "0.06-0.14", "default": "0.1" }
+      ],
+      "usedBy": [
+        { "key": "naive-doodle", "where": "css/aesthetics/naive-doodle.css:12-24; js/aesthetics/naive-doodle.js:288-290", "variant": "24px tile of 1px ink lines at about 10%, chalk lines in dark" }
+      ],
+      "expressibleAs": "css-recipe",
+      "paletteAgnostic": true, "exportSafe": true, "appSafe": true,
+      "kitScope": [], "conflictsWith": ["starfield-ground"]
+    },
+    {
+      "id": "tilt-rotation", "category": "layout", "name": "Small tilt",
+      "what": "Elements (kicker, cards, stat cells, headline blocks) are rotated a degree or two to feel placed by hand.",
+      "params": [
+        { "name": "degrees", "kind": "number", "range": "-4..4", "default": "-1.5" },
+        { "name": "alternate", "kind": "bool", "range": "", "default": "true" }
+      ],
+      "usedBy": [
+        { "key": "naive-doodle", "where": "css/aesthetics/naive-doodle.css:40-47,126-134", "variant": "Kicker -3deg; cards -0.6deg, panels 0.45deg (scaled by --nd-tilt)" },
+        { "key": "neo-brutal-pop", "where": "css/aesthetics/neo-brutal-pop.css:55-61,65-74,391-407", "variant": "Kicker -1.5deg, highlight -4deg, stat cards alternating a hair" }
+      ],
+      "expressibleAs": "css-recipe",
+      "paletteAgnostic": true, "exportSafe": true, "appSafe": true,
+      "kitScope": ["card", "chip"], "conflictsWith": []
+    },
+    {
+      "id": "per-word-tilt-headline", "category": "type", "name": "Per-word tilt headline",
+      "what": "Each headline word is rotated by its own small seeded angle.",
+      "params": [
+        { "name": "rangeDeg", "kind": "number", "range": "0.4-1.5", "default": "1.5" },
+        { "name": "seed", "kind": "text", "range": "brand+text", "default": "brand|headline" }
+      ],
+      "usedBy": [
+        { "key": "naive-doodle", "where": "js/aesthetics/naive-doodle.js:189-204; css/aesthetics/naive-doodle.css:49", "variant": "ndw spans with --r and the last word skewed on its scribble" }
+      ],
+      "expressibleAs": "needs-code",
+      "paletteAgnostic": true, "exportSafe": true, "appSafe": false,
+      "kitScope": [], "conflictsWith": ["mixed-face-headline", "wordart-headline"]
+    },
+    {
+      "id": "handwritten-note-arrow", "category": "ornament", "name": "Handwritten note with loop arrow",
+      "what": "One handwritten note in a script face with a looping hand-drawn arrow pointing at the main action.",
+      "params": [
+        { "name": "face", "kind": "enum", "range": "script|marker", "default": "script" },
+        { "name": "tiltDeg", "kind": "number", "range": "-10..0", "default": "-7" },
+        { "name": "loopRadius", "kind": "number", "range": "6-14", "default": "8" }
+      ],
+      "usedBy": [
+        { "key": "naive-doodle", "where": "js/aesthetics/naive-doodle.js:106-117,178-179,352-353; css/aesthetics/naive-doodle.css:140-147", "variant": "Caveat note, ndLoopArrow with a loop in the shaft" }
+      ],
+      "expressibleAs": "svg-generator",
+      "paletteAgnostic": true, "exportSafe": true, "appSafe": false,
+      "kitScope": [], "conflictsWith": []
+    },
+    {
+      "id": "hand-face-on-controls", "category": "type", "name": "Display face on controls",
+      "what": "The heading or hand face is used for buttons, tabs, names and labels, while body, values and numbers stay in a plain sans.",
+      "params": [
+        { "name": "face", "kind": "enum", "range": "heading|hand|mono", "default": "heading" },
+        { "name": "bumpPx", "kind": "number", "range": "0-4", "default": "2" }
+      ],
+      "usedBy": [
+        { "key": "naive-doodle", "where": "css/aesthetics/naive-doodle.css:1-11,639-645", "variant": "Brand heading face (Patrick Hand default) on buttons, tabs, names; sized up because of low x-height" }
+      ],
+      "expressibleAs": "css-recipe",
+      "paletteAgnostic": true, "exportSafe": true, "appSafe": true,
+      "kitScope": ["button", "tab", "label"], "conflictsWith": []
+    },
+    {
+      "id": "squiggle-line", "category": "ornament", "name": "Squiggle line",
+      "what": "A hand-drawn wavy line as underline, focus mark, link underline and selected-tab indicator.",
+      "params": [
+        { "name": "wavePx", "kind": "number", "range": "3-5", "default": "5" },
+        { "name": "colour", "kind": "enum", "range": "accent|ink", "default": "accent" }
+      ],
+      "usedBy": [
+        { "key": "naive-doodle", "where": "js/aesthetics/naive-doodle.js:151; css/aesthetics/naive-doodle.css:51-60,204-206,387", "variant": "Accent-ink squiggle under the highlight, button focus, links and the current tab" }
+      ],
+      "expressibleAs": "svg-generator",
+      "paletteAgnostic": true, "exportSafe": true, "appSafe": true,
+      "kitScope": ["link", "tab", "focus"], "conflictsWith": []
+    },
+    {
+      "id": "corner-sticker-ornament", "category": "ornament", "name": "Corner ornament",
+      "what": "A small drawn star or flower stuck on a card corner or label row.",
+      "params": [
+        { "name": "shape", "kind": "enum", "range": "star|flower|starburst", "default": "star" },
+        { "name": "tiltDeg", "kind": "number", "range": "-14..14", "default": "10" }
+      ],
+      "usedBy": [
+        { "key": "naive-doodle", "where": "css/aesthetics/naive-doodle.css:135-139,584-586", "variant": "Wobble star breaking the top-right edge, alternating tilt/scale per cell" },
+        { "key": "neo-brutal-pop", "where": "css/aesthetics/neo-brutal-pop.css:80-84,309-318", "variant": "Flower or starburst in the label gutter and on the highlight" }
+      ],
+      "expressibleAs": "css-recipe",
+      "paletteAgnostic": true, "exportSafe": true, "appSafe": false,
+      "kitScope": [], "conflictsWith": []
+    },
+    {
+      "id": "solid-section-field", "category": "layout", "name": "Full-colour section field",
+      "what": "A whole section is filled at 100% primary or accent with an ink outline, using the matching on-colour for text, while cards inside stay paper.",
+      "params": [
+        { "name": "colour", "kind": "enum", "range": "primary|accent|secondary", "default": "accent" },
+        { "name": "shadow", "kind": "bool", "range": "", "default": "true" }
+      ],
+      "usedBy": [
+        { "key": "neo-brutal-pop", "where": "css/aesthetics/neo-brutal-pop.css:228-243", "variant": "Type section 100% primary; In use section 100% accent" }
+      ],
+      "expressibleAs": "css-recipe",
+      "paletteAgnostic": true, "exportSafe": true, "appSafe": false,
+      "kitScope": [], "conflictsWith": []
+    },
+    {
+      "id": "sticker-object-art", "category": "ornament", "name": "UI-object sticker art",
+      "what": "Board art made from flat UI objects (price tag, starburst, checkbox, cursor, flower, squiggle), each outlined with a hard shadow and tilted.",
+      "params": [
+        { "name": "objects", "kind": "enum", "range": "tag|starburst|checkbox|cursor|flower|squiggle", "default": "tag,starburst,checkbox,flower" },
+        { "name": "starPoints", "kind": "number", "range": "12-24", "default": "20" },
+        { "name": "tiltRangeDeg", "kind": "number", "range": "6-14", "default": "12" }
+      ],
+      "usedBy": [
+        { "key": "neo-brutal-pop", "where": "js/aesthetics/neo-brutal-pop.js:18-62,155-185,219-231", "variant": "npStarPoints, npFlowerG, tag polygon; fixed cluster layout; deck sticker sheet" }
+      ],
+      "expressibleAs": "svg-generator",
+      "paletteAgnostic": true, "exportSafe": true, "appSafe": false,
+      "kitScope": [], "conflictsWith": []
+    },
+    {
+      "id": "perforated-rule", "category": "ornament", "name": "Perforated divider",
+      "what": "Section dividers drawn as dashes like a tear-off line, optionally with square end ticks.",
+      "params": [
+        { "name": "dashPx", "kind": "number", "range": "5-12", "default": "6" },
+        { "name": "gapPx", "kind": "number", "range": "5-8", "default": "6" },
+        { "name": "endTicks", "kind": "bool", "range": "", "default": "false" }
+      ],
+      "usedBy": [
+        { "key": "neo-brutal-pop", "where": "css/aesthetics/neo-brutal-pop.css:33-37", "variant": "11px ink dashes with 6px gaps, 2px thick" },
+        { "key": "paddock-pass", "where": "css/aesthetics/paddock-pass.css:65-76", "variant": "6px/6px rule-coloured dashes with 2x10 ink end ticks; plain 1px rule in the app" }
+      ],
+      "expressibleAs": "css-recipe",
+      "paletteAgnostic": true, "exportSafe": true, "appSafe": false,
+      "kitScope": ["divider"], "conflictsWith": []
+    },
+    {
+      "id": "boxed-number-badge", "category": "kit", "name": "Boxed number badge",
+      "what": "Section and row numbers set in a small box (outlined or ink-filled) instead of bare digits.",
+      "params": [
+        { "name": "fill", "kind": "enum", "range": "ink|outline", "default": "ink" },
+        { "name": "sizePx", "kind": "number", "range": "20-26", "default": "22" },
+        { "name": "mono", "kind": "bool", "range": "", "default": "true" }
+      ],
+      "usedBy": [
+        { "key": "neo-brutal-pop", "where": "css/aesthetics/neo-brutal-pop.css:45-51", "variant": "Ink-filled 26px badge with canvas digits, rounded to the control radius" },
+        { "key": "paddock-pass", "where": "css/aesthetics/paddock-pass.css:49-53,183-187", "variant": "1.5px ink outline, mono tabular, square; also row numbers and status tags" }
+      ],
+      "expressibleAs": "css-recipe",
+      "paletteAgnostic": true, "exportSafe": true, "appSafe": true,
+      "kitScope": ["label", "row", "tag"], "conflictsWith": []
+    },
+    {
+      "id": "tinted-cell-cycle", "category": "kit", "name": "Tinted cell cycle",
+      "what": "Kit page cells cycle their background through primary, secondary and accent tints over paper.",
+      "params": [
+        { "name": "tintPercent", "kind": "number", "range": "10-30", "default": "16" },
+        { "name": "cycle", "kind": "number", "range": "2-4", "default": "3" }
+      ],
+      "usedBy": [
+        { "key": "neo-brutal-pop", "where": "css/aesthetics/neo-brutal-pop.css:684-685", "variant": "nth-child(3n+2) secondary 16%, 3n accent 16%" }
+      ],
+      "expressibleAs": "css-recipe",
+      "paletteAgnostic": true, "exportSafe": true, "appSafe": true,
+      "kitScope": ["page-chrome"], "conflictsWith": []
+    },
+    {
+      "id": "four-tone-bevel", "category": "material", "name": "Four-tone bevel",
+      "what": "Raised, sunken and window edges drawn as four inset 1px shadows (white/light and grey/black, swapped for sunken) on a silver face.",
+      "params": [
+        { "name": "mode", "kind": "enum", "range": "raised|sunken|window", "default": "raised" },
+        { "name": "face", "kind": "colour", "range": "", "default": "#C0C0C0" },
+        { "name": "tones", "kind": "colour", "range": "4 hex", "default": "#FFFFFF #DFDFDF #808080 #0A0A0A" }
+      ],
+      "usedBy": [
+        { "key": "old-web", "where": "js/aesthetics/old-web.js:185-189", "variant": "--ow-raised, --ow-sunken, --ow-window box-shadow stacks" },
+        { "key": "old-web", "where": "css/aesthetics/old-web.css:48-53,438-445", "variant": "Windows, buttons, thumbs raised; fields, tracks, checkboxes sunken; default button adds a 1px black frame" }
+      ],
+      "expressibleAs": "tokens",
+      "paletteAgnostic": true, "exportSafe": true, "appSafe": true,
+      "kitScope": ["button", "field", "card", "slider", "checkbox"], "conflictsWith": ["soft-raised-relief", "hard-offset-shadow"]
+    },
+    {
+      "id": "window-title-bar", "category": "kit", "name": "Window title bar",
+      "what": "Panels get a gradient title bar (fixed dark into the client primary) with a caption and drawn caption buttons.",
+      "params": [
+        { "name": "startHex", "kind": "colour", "range": "", "default": "#000080" },
+        { "name": "fallbackHex", "kind": "colour", "range": "", "default": "#1084D0" },
+        { "name": "captionButtons", "kind": "number", "range": "0-3", "default": "3" }
+      ],
+      "usedBy": [
+        { "key": "old-web", "where": "css/aesthetics/old-web.css:12-40,54-64", "variant": "::before bar with stacked-gradient caption buttons (--ow-caps)" },
+        { "key": "old-web", "where": "js/aesthetics/old-web.js:173,184", "variant": "End colour falls back to #1084D0 when white cannot reach 3:1 on the primary" }
+      ],
+      "expressibleAs": "css-recipe",
+      "paletteAgnostic": true, "exportSafe": true, "appSafe": true,
+      "kitScope": ["card", "dialog", "sheet"], "conflictsWith": []
+    },
+    {
+      "id": "starfield-ground", "category": "pattern", "name": "Starfield ground",
+      "what": "A page background of layered radial-gradient dots and crosses at different pitches over a solid canvas.",
+      "params": [
+        { "name": "layers", "kind": "number", "range": "3-8", "default": "7" },
+        { "name": "pitchesPx", "kind": "text", "range": "", "default": "64/97/131/173" },
+        { "name": "starColour", "kind": "colour", "range": "", "default": "#FFFFFF" }
+      ],
+      "usedBy": [
+        { "key": "old-web", "where": "css/aesthetics/old-web.css:12-42", "variant": "Seven gradient layers on #000; pale tile in light mode" }
+      ],
+      "expressibleAs": "css-recipe",
+      "paletteAgnostic": true, "exportSafe": true, "appSafe": false,
+      "kitScope": [], "conflictsWith": ["grid-paper-ground"]
+    },
+    {
+      "id": "wordart-headline", "category": "type", "name": "WordArt headline",
+      "what": "A headline with a three-band gradient face and a stacked-text-shadow extrusion, built from one base copy and two clipped overlay copies per word.",
+      "params": [
+        { "name": "bands", "kind": "number", "range": "2-4", "default": "3" },
+        { "name": "extrusionPx", "kind": "number", "range": "4-10", "default": "8" },
+        { "name": "skewDeg", "kind": "number", "range": "-6..0", "default": "-3" }
+      ],
+      "usedBy": [
+        { "key": "old-web", "where": "js/aesthetics/old-web.js:39-66,213-218", "variant": "owBands colour searches; owWord emits ow-x / ow-b1 / ow-b2 spans" },
+        { "key": "old-web", "where": "css/aesthetics/old-web.css:127-148", "variant": "text-shadow stack, text-stroke, clipped band heights 38%/64%, skewY(-3deg) hero headline" }
+      ],
+      "expressibleAs": "needs-code",
+      "paletteAgnostic": true, "exportSafe": true, "appSafe": false,
+      "kitScope": [], "conflictsWith": ["mixed-face-headline", "per-word-tilt-headline"]
+    },
+    {
+      "id": "browser-link-colours", "category": "colour", "name": "Browser default links",
+      "what": "Links use the fixed browser blue/purple and underline, with lighter equivalents on a dark page.",
+      "params": [
+        { "name": "link", "kind": "colour", "range": "", "default": "#0000EE" },
+        { "name": "visited", "kind": "colour", "range": "", "default": "#551A8B" }
+      ],
+      "usedBy": [
+        { "key": "old-web", "where": "js/aesthetics/old-web.js:190-191; css/aesthetics/old-web.css:45-46,311", "variant": "#0000EE/#551A8B in windows; #9DB4FF/#C9A0FF on black" }
+      ],
+      "expressibleAs": "tokens",
+      "paletteAgnostic": false, "exportSafe": true, "appSafe": true,
+      "kitScope": ["link"], "conflictsWith": []
+    },
+    {
+      "id": "radial-planet-clipart", "category": "ornament", "name": "Gradient clip-art planets",
+      "what": "Decorative spheres and ringed planets drawn with radial gradients on pseudo-elements beside the hero.",
+      "params": [
+        { "name": "count", "kind": "number", "range": "1-3", "default": "2" },
+        { "name": "highlightPercent", "kind": "number", "range": "20-40", "default": "32" }
+      ],
+      "usedBy": [
+        { "key": "old-web", "where": "css/aesthetics/old-web.css:111-123", "variant": "Secondary-tinted sphere and a ringed gold planet, rotated -16deg" }
+      ],
+      "expressibleAs": "css-recipe",
+      "paletteAgnostic": false, "exportSafe": true, "appSafe": false,
+      "kitScope": [], "conflictsWith": []
+    },
+    {
+      "id": "hivis-colour-pick", "category": "colour", "name": "Hi-vis colour pick",
+      "what": "Choose the brightest sufficiently saturated palette colour, push it to hi-vis saturation and lightness, else use a neon companion.",
+      "params": [
+        { "name": "minSaturation", "kind": "number", "range": "20-60", "default": "35" },
+        { "name": "minLuminanceRatio", "kind": "number", "range": "4-10", "default": "8" },
+        { "name": "fallbackHex", "kind": "colour", "range": "", "default": "#e4ff2e" }
+      ],
+      "usedBy": [
+        { "key": "paddock-pass", "where": "js/aesthetics/paddock-pass.js:71-86,185", "variant": "Search over accent, secondary, primary; s>=88, l 48-66; label colour via readable()" }
+      ],
+      "expressibleAs": "needs-code",
+      "paletteAgnostic": true, "exportSafe": true, "appSafe": true,
+      "kitScope": ["card", "field", "toggle", "tag"], "conflictsWith": ["primary-push-chroma"]
+    },
+    {
+      "id": "angled-stripe-bands", "category": "pattern", "name": "Angled stripe bands",
+      "what": "A cluster of diagonal parallelogram bands in different palette colours, clipped to a panel.",
+      "params": [
+        { "name": "bands", "kind": "number", "range": "2-4", "default": "3" },
+        { "name": "colours", "kind": "enum", "range": "hivis|ink|primary|secondary", "default": "hivis,ink,primary" },
+        { "name": "slantDeg", "kind": "number", "range": "20-35", "default": "25" }
+      ],
+      "usedBy": [
+        { "key": "paddock-pass", "where": "js/aesthetics/paddock-pass.js:250-256; css/aesthetics/paddock-pass.css:87-98", "variant": "Three clipped bands on the ticket stub (hi-vis, ink, primary)" }
+      ],
+      "expressibleAs": "svg-generator",
+      "paletteAgnostic": true, "exportSafe": true, "appSafe": false,
+      "kitScope": [], "conflictsWith": []
+    },
+    {
+      "id": "barcode-serial", "category": "ornament", "name": "Barcode serial",
+      "what": "A seeded barcode of random-width bars.",
+      "params": [
+        { "name": "barWidthRange", "kind": "text", "range": "1-3 units", "default": "1..3" },
+        { "name": "seed", "kind": "text", "range": "brand hash", "default": "brand" }
+      ],
+      "usedBy": [
+        { "key": "paddock-pass", "where": "js/aesthetics/paddock-pass.js:238-240,271", "variant": "44-unit bars across the stub, seeded from the brand hash" }
+      ],
+      "expressibleAs": "svg-generator",
+      "paletteAgnostic": true, "exportSafe": true, "appSafe": false,
+      "kitScope": [], "conflictsWith": []
+    },
+    {
+      "id": "dot-matrix-block", "category": "pattern", "name": "Dot-matrix block",
+      "what": "A grid of dim dots with a seeded subset lit, thinning toward one side.",
+      "params": [
+        { "name": "cols", "kind": "number", "range": "8-16", "default": "12" },
+        { "name": "rows", "kind": "number", "range": "10-20", "default": "17" },
+        { "name": "litProbability", "kind": "number", "range": "0.5-0.9", "default": "0.82" }
+      ],
+      "usedBy": [
+        { "key": "paddock-pass", "where": "js/aesthetics/paddock-pass.js:227-235,265-266", "variant": "12x17 pitch 8; lit probability falls by column and distance from the middle row" }
+      ],
+      "expressibleAs": "svg-generator",
+      "paletteAgnostic": true, "exportSafe": true, "appSafe": false,
+      "kitScope": [], "conflictsWith": ["halftone-dots"]
+    },
+    {
+      "id": "ticket-stub-layout", "category": "structure", "name": "Ticket stub split",
+      "what": "A panel split by a dashed perforation with semicircle notches at its ends into a main body and a stub.",
+      "params": [
+        { "name": "splitX", "kind": "number", "range": "0.5-0.7", "default": "0.6" },
+        { "name": "notchRadius", "kind": "number", "range": "6-12", "default": "10" }
+      ],
+      "usedBy": [
+        { "key": "paddock-pass", "where": "js/aesthetics/paddock-pass.js:250-258,269-270; css/aesthetics/paddock-pass.css:216-255", "variant": "Perforation path, two canvas-coloured notch circles, stub with bands, barcode and sector time; deck stub card" }
+      ],
+      "expressibleAs": "svg-generator",
+      "paletteAgnostic": true, "exportSafe": true, "appSafe": false,
+      "kitScope": [], "conflictsWith": []
+    },
+    {
+      "id": "rectangular-chevron-button", "category": "kit", "name": "Chevron rectangle button",
+      "what": "Square-cornered buttons with the label left and a small CSS-border chevron flush right.",
+      "params": [
+        { "name": "heightPx", "kind": "number", "range": "40-52", "default": "48" },
+        { "name": "chevronPx", "kind": "number", "range": "5-9", "default": "7" },
+        { "name": "caps", "kind": "bool", "range": "", "default": "true" }
+      ],
+      "usedBy": [
+        { "key": "paddock-pass", "where": "css/aesthetics/paddock-pass.css:26-33,148-157", "variant": "Two-border chevron drawn with currentColor; hover/press mix 14%/26% black (white in dark)" }
+      ],
+      "expressibleAs": "css-recipe",
+      "paletteAgnostic": true, "exportSafe": true, "appSafe": true,
+      "kitScope": ["button"], "conflictsWith": []
+    },
+    {
+      "id": "spec-row", "category": "kit", "name": "Ruled spec row",
+      "what": "A row with a micro-caps label on the left and a mono value on the right, ruled underneath.",
+      "params": [
+        { "name": "labelStyle", "kind": "enum", "range": "micro-caps|plain", "default": "micro-caps" },
+        { "name": "valueFace", "kind": "enum", "range": "mono|body", "default": "mono" }
+      ],
+      "usedBy": [
+        { "key": "paddock-pass", "where": "js/aesthetics/paddock-pass.js:243-246; css/aesthetics/paddock-pass.css:180-196,331-342", "variant": "Art rows (team, zone, gate) and kit rows; row steps to panel2 when picked" }
+      ],
+      "expressibleAs": "css-recipe",
+      "paletteAgnostic": true, "exportSafe": true, "appSafe": true,
+      "kitScope": ["row", "list"], "conflictsWith": []
+    }
+  ]
+}

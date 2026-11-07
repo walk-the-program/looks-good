@@ -1,0 +1,1291 @@
+{
+  "group": "E",
+  "notes": "Group E audit (live-tile, mainframe, mesh-gradient, micrographics, mid-century). Line refs are js/aesthetics/<key>.js and css/aesthetics/<key>.css. Schema gaps: (1) usedBy.where takes one range, so moves that span a js hook and a css rule list the main range and name the other in `variant`. (2) The schema has no field for 'colour solver' primitives; contrast-floor-print is recorded as a needs-code move with params so M1 can decide whether the framework ships it as a built-in solver. (3) Most of each style's ~35-component UI-kit CSS (live-tile css 274-711, mainframe 236-610, mesh-gradient 438-750, micrographics 397-727, mid-century 326-737) is a mechanical restyle of the same few material moves; moveCoverage assumes the generator can derive that kit CSS from the moves, which is untested. (4) Fixed non-brand inks (fixed-signal-inks) are board/website only: mid-century's own app block (css 326-331) drops them and uses the brand palette.",
+  "styles": [
+    {
+      "key": "live-tile",
+      "name": "Live Tile",
+      "coreTrick": "A true-black or white ground carries hierarchy in huge light lowercase type, while colour lives only on flat zero-radius rectangular tiles on a 4-column 8px-gap grid.",
+      "colourRecipe": "Ground is fixed pure black (dark) or white (light). The client primary, secondary and accent are each nudged toward black or white until they hold 3:1 on the ground and a white or near-black label holds 4.5:1 on them; a neutral tile is the ink eased toward the ground to 3:1. A muted primary is simply pushed until it reads, so it still works; only one accent tile is allowed per view.",
+      "moves": [
+        "tinted-neutral-canvas",
+        "contrast-floor-print",
+        "tonal-ramp",
+        "corner-radius",
+        "no-shadow-flat",
+        "bento-cells",
+        "caps-mono-labels",
+        "oversize-clipped-headline",
+        "pivot-heading-tabs",
+        "heading-weight-nearest",
+        "ink-filled-selected",
+        "heavy-border",
+        "named-states",
+        "focus-ring",
+        "mono-plus-accent",
+        "tile-flip-motion",
+        "press-hover-transform"
+      ],
+      "remainder": [
+        {
+          "what": "Two-sided colour search: nudge a colour toward black or white by the shortest step that satisfies BOTH 3:1 on the ground and 4.5:1 for its label",
+          "where": "js/aesthetics/live-tile.js:28-58",
+          "whyCode": "Iterative search with two simultaneous constraints and a choice of direction; not expressible as a variable or formula."
+        },
+        {
+          "what": "Tile wall composition: seven fixed tiles (role, size, count, flip delay, back face), the brand initial on tile one, one accent tile, five sliding squares",
+          "where": "js/aesthetics/live-tile.js:62-72,188-204",
+          "whyCode": "Bespoke hand-composed layout table with copy slots and a flip schedule; board art only."
+        },
+        {
+          "what": "Board list rows turned into tiles by nth-child cycling (3n+1 primary double-wide, 3n+2 secondary, rest neutral) with row internals re-gridded",
+          "where": "css/aesthetics/live-tile.css:153-169",
+          "whyCode": "Re-lays existing list markup positionally; depends on the board's row DOM, not a reusable recipe."
+        },
+        {
+          "what": "Cards and panels dissolved into the ground; swatches become plain tiles; radius zeroed with a radio-button exemption",
+          "where": "css/aesthetics/live-tile.css:20-25,83-100",
+          "whyCode": "Selector-specific overrides of base board parts with exceptions (radio, phone chrome); needs per-selector knowledge."
+        }
+      ],
+      "moveCoverage": 72,
+      "notes": "Most of the look is a short list of rules (ground, radius 0, shadow none, 2px edge, ink-fill selected, light lowercase type). The tile wall and the flip/slide motion are board-only and bespoke. Hover colour is a 14% ink mix kept only while the label reads (js 152-154), a small colour guard."
+    },
+    {
+      "key": "mainframe",
+      "name": "Mainframe",
+      "coreTrick": "Depth comes from stacking three greys (canvas, layer 1 at 4% ink, layer 2 at 8%) on an 8px grid instead of shadows, with filled fields over a bottom rule, left-aligned 48px buttons and Plex Sans plus Mono type.",
+      "colourRecipe": "Ground is a near-white with a trace of the brand hue (dark: a cool blue-grey black with 15% brand hue). The client primary is re-derived in HSL until white text on it holds 4.6:1 and it holds 4.6:1 on layer 2 (dark: lifted instead). The secondary button is filled with the ink; the secondary colour only tints the tag pills. A muted primary is pulled darker or lighter in lightness only, keeping its hue.",
+      "moves": [
+        "tinted-neutral-canvas",
+        "contrast-floor-print",
+        "tonal-ramp",
+        "stacked-surface-layers",
+        "corner-radius",
+        "no-shadow-flat",
+        "layered-ambient-shadow",
+        "underline-field",
+        "ink-filled-selected",
+        "caps-mono-labels",
+        "catalogue-number",
+        "perforation-rule",
+        "uneven-stripe-raster",
+        "heading-weight-nearest",
+        "named-states",
+        "focus-ring",
+        "hairline-rule",
+        "label-left-icon-right-button",
+        "ruled-data-table",
+        "base-unit-grid"
+      ],
+      "remainder": [
+        {
+          "what": "Primary printing by HSL loop: clamp saturation 30-88, step lightness until 4.6:1 against white (light) or layer 2 (dark)",
+          "where": "js/aesthetics/mainframe.js:53-65",
+          "whyCode": "Iterative colour search against two backgrounds; needs a solver, not a variable."
+        },
+        {
+          "what": "Muted ink searched until it holds 4.6:1 on canvas and both layers",
+          "where": "js/aesthetics/mainframe.js:161-163",
+          "whyCode": "Multi-surface contrast loop."
+        },
+        {
+          "what": "Stripe raster with constrained seeded randomness: retry up to 60 times until at least 5 distinct widths and 4 distinct pitches, all multiples of 4; brand initial cut by the stripes through a clipPath over a ghost raster",
+          "where": "js/aesthetics/mainframe.js:20-66,203-233",
+          "whyCode": "Seeded generator with rejection sampling and a composed SVG; the constraint set is bespoke."
+        },
+        {
+          "what": "Hero readout composition: hanging numbered mono rows, perforation hole row, caption, all in one SVG",
+          "where": "js/aesthetics/mainframe.js:203-233",
+          "whyCode": "Hand-placed SVG layout with copy slots."
+        },
+        {
+          "what": "Board list built as a table with a header row (panels.list) and its responsive collapse",
+          "where": "js/aesthetics/mainframe.js:235-248; css/aesthetics/mainframe.css:167-201",
+          "whyCode": "Replaces board markup with a different structure; custom DOM."
+        },
+        {
+          "what": "IBM Plex Sans 300 @font-face reusing the bundled variable file",
+          "where": "css/aesthetics/mainframe.css:17-27",
+          "whyCode": "Font-asset wiring tied to a specific bundled file."
+        }
+      ],
+      "moveCoverage": 70,
+      "notes": "The layer-stacking and 8px grid are the genuine portable ideas; both reduce to tokens plus a few selectors. Dark mode has its own hue and mix amounts (js 150-163), covered by params on tinted-neutral-canvas and tonal-ramp. Radius 0 has one deliberate exception (tags are full pills, css 100)."
+    },
+    {
+      "key": "mesh-gradient",
+      "name": "Mesh Gradient",
+      "coreTrick": "A clipped band behind the hero is painted with four blended radial lights of the brand colours plus 140 fine sine-wave striations and film grain, while everything below it is opaque white cards with neutral layered navy shadows and the same gradient reused on the primary action, bars and avatars.",
+      "colourRecipe": "Primary, secondary and accent are pushed 8-10 points more saturated (never darkened) for the band and striations. The client primary prints as the pill fill; a second stop is the primary turned 28 degrees round the wheel, lightness-adjusted until the button label still holds 4.5:1. Canvas stays near white (cards are pure white paper); a muted brand is saturation-boosted so the lights stay luminous, and ink text stays dark ink, never white on the mesh.",
+      "moves": [
+        "soft-mesh-band",
+        "grain-overlay",
+        "sine-striation-field",
+        "layered-ambient-shadow",
+        "gradient-action-carry",
+        "corner-radius",
+        "contrast-floor-print",
+        "tonal-ramp",
+        "tight-display-tracking",
+        "highlight-underline-swash",
+        "focus-ring",
+        "press-hover-transform",
+        "named-states",
+        "hairline-rule",
+        "tinted-neutral-canvas"
+      ],
+      "remainder": [
+        {
+          "what": "Hero art: a product-fragment trio (project card with sparkline, type-spec code tile using the brand's real font names, approval chip) built from live board data and straddling the band's diagonal cut",
+          "where": "js/aesthetics/mesh-gradient.js:161-192",
+          "whyCode": "Reads board rows and chosen fonts, builds real HTML mock UI; bespoke composition."
+        },
+        {
+          "what": "Hue-turn search: rotate the primary 28 degrees and step lightness until the label holds 4.5:1; syntax-colour lift loop on the dark code tile (6:1)",
+          "where": "js/aesthetics/mesh-gradient.js:76-114",
+          "whyCode": "Iterative contrast solving on rotated colours."
+        },
+        {
+          "what": "Diagonal sheared band: clip-path polygon cut tied to a container-query-sized cut variable, sitting behind the header and off the right edge",
+          "where": "css/aesthetics/mesh-gradient.css:19-32",
+          "whyCode": "Layout geometry that depends on the board's hero DOM and a bleed variable."
+        },
+        {
+          "what": "Panels overrides: 01 card gains a spec detail list, 03 list gains a header, stretched card heights, spec-sheet state rows",
+          "where": "js/aesthetics/mesh-gradient.js:194-205; css/aesthetics/mesh-gradient.css:173-241",
+          "whyCode": "Replaces and extends board markup per section."
+        },
+        {
+          "what": "Blended-with-Liquid-Glass rules for app surfaces and the title glow in product screens",
+          "where": "css/aesthetics/mesh-gradient.css:334-343,387-402",
+          "whyCode": "Cross-style interaction and per-screen placement; not reusable as a move."
+        }
+      ],
+      "moveCoverage": 60,
+      "notes": "The band, striations and grain are board-only art. The portable parts are gradient-action-carry (kit), layered shadows, pill CTA and the type tracking. The app glow behind the title (css 334-343) conflicts with the app-has-no-art rule and was not made a move. There is also a legacy 'mesh-gradient--classic' block (css 408-437) that was ignored."
+    },
+    {
+      "key": "micrographics",
+      "name": "Micrographics",
+      "coreTrick": "One giant brand glyph with an offset hairline duplicate is ringed by 8px mono microtype, crop marks, ruler ticks, orthogonal callout leaders and a few canvas-backed sticker panels, so the 80:1 scale contrast is the whole look.",
+      "colourRecipe": "Printed as one ink on the canvas: the client primary appears only as a few 3-5px marks and the single filled action; secondary and accent get tiny swatch squares. Hazard tape and the caution triangle use a fixed safety colour (orange on light, yellow on dark), never a brand colour. A muted primary barely changes the look because colour is almost absent.",
+      "moves": [
+        "mono-plus-accent",
+        "fixed-signal-inks",
+        "caps-mono-labels",
+        "catalogue-number",
+        "registration-marks",
+        "ruler-ticks",
+        "hairline-rule",
+        "live-data-microline",
+        "outline-echo-headline",
+        "orthogonal-leader-callouts",
+        "canvas-sticker-panel",
+        "barcode-serial",
+        "tight-display-tracking",
+        "corner-radius",
+        "underline-field",
+        "ink-filled-selected",
+        "heavy-border",
+        "heading-weight-nearest",
+        "base-unit-grid",
+        "named-states",
+        "no-shadow-flat"
+      ],
+      "remainder": [
+        {
+          "what": "Spec plate composition: glyph measured on a canvas for true ink edges, callout leaders and labels placed from those edges, stickers laid over it (spec table, QR block, hazard tape), a stacked fallback plate for phones",
+          "where": "js/aesthetics/micrographics.js:180-259",
+          "whyCode": "Measures text in a canvas at render time and derives positions; bespoke."
+        },
+        {
+          "what": "Seeded QR-like block with three finder squares and a seeded body, and seeded barcode bar widths",
+          "where": "js/aesthetics/micrographics.js:28-49",
+          "whyCode": "Procedural generators (kept as the barcode-serial move; the QR block is not in the seed set)."
+        },
+        {
+          "what": "Brand data piped into decoration: hex codes, font names, role rows and per-section data strings",
+          "where": "js/aesthetics/micrographics.js:162-178,224-236",
+          "whyCode": "Needs the live palette and fonts; partly tokens but the string templates are bespoke."
+        },
+        {
+          "what": "Vertical running spec line and four corner crop marks drawn as one pseudo-element each with many stacked gradients",
+          "where": "css/aesthetics/micrographics.css:27-40",
+          "whyCode": "Very long hand-written gradient stacks; a generator could emit them, but the layout is fixed to this board."
+        },
+        {
+          "what": "Counter-driven chip indexes and section codes ('C-01', 'T.01', 'P.03/04')",
+          "where": "css/aesthetics/micrographics.css:143-160,176-182",
+          "whyCode": "CSS counters plus string content tied to board class names."
+        }
+      ],
+      "moveCoverage": 55,
+      "notes": "The identity is concentrated in the hero plate, which is almost all remainder; the kit side is cleanly describable (hairline boxes, crop marks, mono caps, underline fields, ink-filled selection). Round-6 notes in the file header say the plate was rebuilt, so the art evolved a lot while the CSS stayed stable."
+    },
+    {
+      "key": "mid-century",
+      "name": "Mid-Century",
+      "coreTrick": "A cut-paper poster (jittered-edge sunburst, sun, atom, starburst seal, kidney, sputnik, boomerang) on cream, with the UI as cream cards in 2px walnut outlines with one cut corner and a dotted colour-block header band, pill buttons and fill-bar stats.",
+      "colourRecipe": "Cream paper, walnut ink and five fixed period inks (mustard, teal, tomato, olive, aqua) are the board's base. The client primary prints as the poster's sunburst, the script word and the main button after being warmed 6 degrees toward yellow with 15% less chroma and its lightness shifted until a cream or walnut label reaches 4.8:1; the secondary and accent get the same warming. In the app, the fixed inks are dropped and the brand palette is used. A muted primary just becomes a muted sunburst and button.",
+      "moves": [
+        "tinted-neutral-canvas",
+        "contrast-floor-print",
+        "fixed-signal-inks",
+        "warm-period-shift",
+        "tonal-ramp",
+        "corner-radius",
+        "heavy-border",
+        "dotted-colour-band-card",
+        "perforation-rule",
+        "solid-colour-stat-blocks",
+        "mixed-face-headline",
+        "caps-mono-labels",
+        "cut-paper-shape-set",
+        "sunburst-rays",
+        "paper-wear-speckle",
+        "press-hover-transform",
+        "named-states",
+        "focus-ring",
+        "ink-filled-selected"
+      ],
+      "remainder": [
+        {
+          "what": "Hero poster: composed layout of sunburst, sun, atom with three coloured electrons, seal with initial, kidney, boomerang and sparkles, seeded by brand name",
+          "where": "js/aesthetics/mid-century.js:284-327",
+          "whyCode": "Hand-placed illustration; the shape primitives are generators (kept in cut-paper-shape-set) but the composition is bespoke."
+        },
+        {
+          "what": "Jittered-edge outline resampler (mcCut) that makes every shape look scissor-cut",
+          "where": "js/aesthetics/mid-century.js:68-80",
+          "whyCode": "Geometric procedure on path points; could be a generator but needs a point-level shape engine."
+        },
+        {
+          "what": "Palette swatches turned into five distinct shapes (circle, half-round, leaf, sparkle) per role",
+          "where": "css/aesthetics/mid-century.css:80-88",
+          "whyCode": "Per-role bespoke shape CSS."
+        },
+        {
+          "what": "Decorative sparkle / starburst SVG data-URIs generated into CSS variables and used as list dots, status marks, rule ornaments and the button starburst",
+          "where": "js/aesthetics/mid-century.js:238-283",
+          "whyCode": "SVG generation inside tokens() feeding CSS url() values; needs code."
+        },
+        {
+          "what": "Kit restyle in cut paper (calendar, wheel pickers, accordion, carousel, lightbox, pie menus, knob)",
+          "where": "css/aesthetics/mid-century.css:358-737",
+          "whyCode": "Component-specific drawing for 20-odd kit parts; largely derivable from the card, pill and dotted-wall moves but never proven so."
+        }
+      ],
+      "moveCoverage": 60,
+      "notes": "The poster is board/website art only and is mostly remainder. The kit and cards are the portable part. Two fully different looks: board uses fixed period inks, app uses brand colours (css 326-331), so appSafe for fixed-signal-inks is false."
+    }
+  ],
+  "moves": [
+    {
+      "id": "tinted-neutral-canvas",
+      "category": "colour",
+      "name": "Tinted or fixed ground",
+      "what": "The page ground is a fixed pure/cream colour or a near-neutral carrying a trace of the brand hue, with its own dark-mode value.",
+      "params": [
+        { "name": "source", "kind": "enum", "range": "fixed|brand-hue-trace", "default": "brand-hue-trace" },
+        { "name": "lightnessLight", "kind": "number", "range": "90-100", "default": "97.5" },
+        { "name": "saturationCap", "kind": "number", "range": "0-16", "default": "8" },
+        { "name": "darkHue", "kind": "number", "range": "0-360 or brand", "default": "215" },
+        { "name": "fixedColour", "kind": "colour", "range": "any", "default": "#ffffff" }
+      ],
+      "usedBy": [
+        { "key": "live-tile", "where": "js/aesthetics/live-tile.js:140-141", "variant": "fixed pure black (dark) or white (light), no brand hue" },
+        { "key": "mainframe", "where": "js/aesthetics/mainframe.js:148-154", "variant": "97.5 L near-white with up to 8% brand saturation; dark: hue 85% pinned to 215, 15% brand, S9 L9" },
+        { "key": "mid-century", "where": "js/aesthetics/mid-century.js:228-232", "variant": "fixed cream #F3EAD7 in light; dark: brand hue, S capped 16, L 10-13" },
+        { "key": "mesh-gradient", "where": "js/aesthetics/mesh-gradient.js:76-90", "variant": "page near white with pure-white paper cards (--ab-paper); dark paper = ink 7% over canvas" }
+      ],
+      "expressibleAs": "tokens",
+      "paletteAgnostic": true,
+      "exportSafe": true,
+      "appSafe": true,
+      "kitScope": [],
+      "conflictsWith": []
+    },
+    {
+      "id": "contrast-floor-print",
+      "category": "colour",
+      "name": "Contrast-floor colour printing",
+      "what": "A client colour is moved in lightness (or toward black/white) by the smallest step that satisfies a contrast floor against the ground and/or its label colour.",
+      "params": [
+        { "name": "groundFloor", "kind": "number", "range": "3-7", "default": "3.1" },
+        { "name": "labelFloor", "kind": "number", "range": "4.5-7", "default": "4.5" },
+        { "name": "direction", "kind": "enum", "range": "toward-black-white|lightness-only|hue-keep", "default": "lightness-only" },
+        { "name": "against", "kind": "enum", "range": "canvas|layer2|white", "default": "canvas" }
+      ],
+      "usedBy": [
+        { "key": "live-tile", "where": "js/aesthetics/live-tile.js:28-51", "variant": "3.1:1 on the ground AND 4.5:1 label, toward black or white by the shortest path; applied to primary, secondary, accent" },
+        { "key": "mainframe", "where": "js/aesthetics/mainframe.js:53-65", "variant": "HSL loop: 4.6:1 under white text and on layer 2 (light), lift to 4.6:1 on layer 2 (dark); saturation clamp 30-88" },
+        { "key": "mid-century", "where": "js/aesthetics/mid-century.js:51-66", "variant": "warm first, then lightness steps until cream/walnut label reaches 4.8:1" },
+        { "key": "mesh-gradient", "where": "js/aesthetics/mesh-gradient.js:105-114", "variant": "second gradient stop only (primary +28 degrees), lightness stepped until label reaches 4.5:1; muted ink loop at js 91-97 pulls to 4.6:1" }
+      ],
+      "expressibleAs": "needs-code",
+      "paletteAgnostic": true,
+      "exportSafe": true,
+      "appSafe": true,
+      "kitScope": ["button", "tile", "chip"],
+      "conflictsWith": []
+    },
+    {
+      "id": "tonal-ramp",
+      "category": "colour",
+      "name": "Ink-over-ground tonal ramp",
+      "what": "A set of surfaces, edges and tracks derived by mixing the ink into the ground at fixed percentages.",
+      "params": [
+        { "name": "steps", "kind": "text", "range": "list of ink mix %", "default": "4,8,12" },
+        { "name": "darkSteps", "kind": "text", "range": "list of ink mix %", "default": "5,10,15" },
+        { "name": "edgeMix", "kind": "number", "range": "0-100", "default": "20" }
+      ],
+      "usedBy": [
+        { "key": "mainframe", "where": "js/aesthetics/mainframe.js:159-169", "variant": "layer1 4%, layer2 8%, layer3 12%, hairline 20% (dark 5/10/15/22)" },
+        { "key": "live-tile", "where": "js/aesthetics/live-tile.js:53-58,155-167", "variant": "neutral tile = ink eased 30% toward ground until 3:1; unfilled track 40%; edge mix 70%" },
+        { "key": "mesh-gradient", "where": "js/aesthetics/mesh-gradient.js:87-97,117-119", "variant": "fill = ink 4.5% (7% dark) alpha, hairline = ink 9% alpha" },
+        { "key": "mid-century", "where": "js/aesthetics/mid-century.js:243-244", "variant": "paper2 = walnut 7% over cream; plane = ink 9-12% over card" }
+      ],
+      "expressibleAs": "tokens",
+      "paletteAgnostic": true,
+      "exportSafe": true,
+      "appSafe": true,
+      "kitScope": ["card", "field", "list"],
+      "conflictsWith": []
+    },
+    {
+      "id": "stacked-surface-layers",
+      "category": "material",
+      "name": "Stacked surface layers (no shadow)",
+      "what": "Every component sits one tonal layer above what it is on (canvas, then card, then field) so depth comes from the stack, not from shadows.",
+      "params": [
+        { "name": "layerCount", "kind": "number", "range": "2-4", "default": "3" },
+        { "name": "hover", "kind": "enum", "range": "next-layer|brightness", "default": "next-layer" }
+      ],
+      "usedBy": [
+        { "key": "mainframe", "where": "css/aesthetics/mainframe.css:119-123", "variant": "cards/panels/lists on layer 1, field on layer 2, hover on layer 3; tokens at js 159-163" }
+      ],
+      "expressibleAs": "css-recipe",
+      "paletteAgnostic": true,
+      "exportSafe": true,
+      "appSafe": true,
+      "kitScope": ["card", "field", "list", "sidebar"],
+      "conflictsWith": ["layered-ambient-shadow"]
+    },
+    {
+      "id": "corner-radius",
+      "category": "material",
+      "name": "Corner radius scale",
+      "what": "One radius setting per component class, from square (0) to pill (999px), sometimes with a single cut corner.",
+      "params": [
+        { "name": "card", "kind": "number", "range": "0-24px", "default": "0" },
+        { "name": "control", "kind": "number", "range": "0-999px", "default": "0" },
+        { "name": "cutCorner", "kind": "bool", "range": "true|false", "default": "false" },
+        { "name": "exceptions", "kind": "text", "range": "selector list", "default": "radio" }
+      ],
+      "usedBy": [
+        { "key": "live-tile", "where": "css/aesthetics/live-tile.css:17-23", "variant": "0 everywhere under !important, except radio buttons" },
+        { "key": "mainframe", "where": "css/aesthetics/mainframe.css:29-35,100", "variant": "0 everywhere, only tags are full pills" },
+        { "key": "micrographics", "where": "css/aesthetics/micrographics.css:16-17", "variant": "0 everywhere" },
+        { "key": "mid-century", "where": "css/aesthetics/mid-century.css:111-115,147-152", "variant": "cards 22/22/22/4 (one cut corner), pills 999px" },
+        { "key": "mesh-gradient", "where": "css/aesthetics/mesh-gradient.css:195-198", "variant": "pill CTA 999px, cards and tiles 8-10px" }
+      ],
+      "expressibleAs": "tokens",
+      "paletteAgnostic": true,
+      "exportSafe": true,
+      "appSafe": true,
+      "kitScope": ["button", "card", "field", "chip", "switch"],
+      "conflictsWith": []
+    },
+    {
+      "id": "no-shadow-flat",
+      "category": "material",
+      "name": "Flat, shadowless surfaces",
+      "what": "box-shadow and text-shadow are cleared on every element so only fills, edges and type create hierarchy.",
+      "params": [
+        { "name": "overlaysKeepShadow", "kind": "bool", "range": "true|false", "default": "false" }
+      ],
+      "usedBy": [
+        { "key": "live-tile", "where": "css/aesthetics/live-tile.css:24-25", "variant": "none anywhere; focus and error rings are the only box-shadows left" },
+        { "key": "mainframe", "where": "css/aesthetics/mainframe.css:119-123", "variant": "none on cards; only sheet, dialog and toast keep one (--ab-shadow-ov, js 187-191)" },
+        { "key": "micrographics", "where": "css/aesthetics/micrographics.css:177-182", "variant": "hairline boxes and crop marks replace shadows" }
+      ],
+      "expressibleAs": "css-recipe",
+      "paletteAgnostic": true,
+      "exportSafe": true,
+      "appSafe": true,
+      "kitScope": ["card", "button", "overlay"],
+      "conflictsWith": ["layered-ambient-shadow"]
+    },
+    {
+      "id": "layered-ambient-shadow",
+      "category": "material",
+      "name": "Layered neutral ambient shadow",
+      "what": "Elevation is a stack of two or three long, low-opacity neutral (navy or ink) shadows, not tinted by the brand.",
+      "params": [
+        { "name": "layers", "kind": "number", "range": "1-3", "default": "3" },
+        { "name": "colour", "kind": "enum", "range": "neutral-navy|ink", "default": "neutral-navy" },
+        { "name": "blur", "kind": "number", "range": "6-60px", "default": "27" },
+        { "name": "scope", "kind": "enum", "range": "all|overlays-only", "default": "all" }
+      ],
+      "usedBy": [
+        { "key": "mesh-gradient", "where": "js/aesthetics/mesh-gradient.js:98-105", "variant": "three layers on every white card, lifted version on hover" },
+        { "key": "mainframe", "where": "js/aesthetics/mainframe.js:187-191", "variant": "overlays only (sheet, dialog, toast)" }
+      ],
+      "expressibleAs": "tokens",
+      "paletteAgnostic": true,
+      "exportSafe": true,
+      "appSafe": true,
+      "kitScope": ["card", "overlay", "button"],
+      "conflictsWith": ["no-shadow-flat", "stacked-surface-layers"]
+    },
+    {
+      "id": "bento-cells",
+      "category": "layout",
+      "name": "Flat colour tile grid",
+      "what": "Content is shown as flat rectangles of role colours on a fixed column grid with equal gaps, spanning 1 or 2 columns and rows.",
+      "params": [
+        { "name": "columns", "kind": "number", "range": "2-6", "default": "4" },
+        { "name": "gap", "kind": "number", "range": "4-24px", "default": "8" },
+        { "name": "labelCorner", "kind": "enum", "range": "bottom-left|top-left", "default": "bottom-left" },
+        { "name": "countCorner", "kind": "enum", "range": "top-right|none", "default": "top-right" }
+      ],
+      "usedBy": [
+        { "key": "live-tile", "where": "css/aesthetics/live-tile.css:54-69", "variant": "7-tile wall on 4 columns; board list rows reuse the same grid (153-169); swatches become tiles (83-88)" }
+      ],
+      "expressibleAs": "css-recipe",
+      "paletteAgnostic": true,
+      "exportSafe": true,
+      "appSafe": false,
+      "kitScope": ["list"],
+      "conflictsWith": []
+    },
+    {
+      "id": "caps-mono-labels",
+      "category": "type",
+      "name": "Small tracked label style",
+      "what": "Labels, tags and numbers use one small tracked face (mono caps, sans caps or lowercase) at a fixed size.",
+      "params": [
+        { "name": "family", "kind": "enum", "range": "mono|sans|body", "default": "mono" },
+        { "name": "case", "kind": "enum", "range": "upper|lower|none", "default": "upper" },
+        { "name": "size", "kind": "number", "range": "6-14px", "default": "9" },
+        { "name": "tracking", "kind": "number", "range": "0-0.3em", "default": "0.14" }
+      ],
+      "usedBy": [
+        { "key": "micrographics", "where": "css/aesthetics/micrographics.css:42-55", "variant": "8-9px mono uppercase, 0.14-0.2em tracking, plus 6.5px vertical running line" },
+        { "key": "mainframe", "where": "css/aesthetics/mainframe.css:42-51", "variant": "Plex Mono 12/16, slight tracking, em-dash numbering" },
+        { "key": "mid-century", "where": "css/aesthetics/mid-century.css:74-78", "variant": "geometric sans caps 0.18em, not mono" },
+        { "key": "live-tile", "where": "css/aesthetics/live-tile.css:33-34", "variant": "13px lowercase body face, zero tracking" }
+      ],
+      "expressibleAs": "tokens",
+      "paletteAgnostic": true,
+      "exportSafe": true,
+      "appSafe": true,
+      "kitScope": ["label", "tag", "chip"],
+      "conflictsWith": []
+    },
+    {
+      "id": "oversize-clipped-headline",
+      "category": "type",
+      "name": "Oversize light headline run off the edge",
+      "what": "A huge light one-line headline whose end is clipped by the board edge, with the highlight word kept in ink.",
+      "params": [
+        { "name": "size", "kind": "text", "range": "clamp(...)", "default": "clamp(52px,17cqw,110px)" },
+        { "name": "weight", "kind": "number", "range": "100-400", "default": "300" },
+        { "name": "case", "kind": "enum", "range": "lower|none", "default": "lower" },
+        { "name": "clip", "kind": "bool", "range": "true|false", "default": "true" }
+      ],
+      "usedBy": [
+        { "key": "live-tile", "where": "css/aesthetics/live-tile.css:42-50", "variant": "headline hook in js 176-182 wraps the last word as highlight; app version wraps normally (css 209-214)" }
+      ],
+      "expressibleAs": "css-recipe",
+      "paletteAgnostic": true,
+      "exportSafe": true,
+      "appSafe": false,
+      "kitScope": [],
+      "conflictsWith": []
+    },
+    {
+      "id": "pivot-heading-tabs",
+      "category": "kit",
+      "name": "Pivot headings as tabs",
+      "what": "Tabs and stage switches are large light headings, active in ink and the others muted, with the next one allowed to peek past the edge.",
+      "params": [
+        { "name": "size", "kind": "number", "range": "20-34px", "default": "28" },
+        { "name": "weight", "kind": "number", "range": "200-400", "default": "300" },
+        { "name": "inactive", "kind": "enum", "range": "muted|ink-50", "default": "muted" }
+      ],
+      "usedBy": [
+        { "key": "live-tile", "where": "css/aesthetics/live-tile.css:102-111,254-258", "variant": "board stage switch and the app tabs both become pivot headings" }
+      ],
+      "expressibleAs": "css-recipe",
+      "paletteAgnostic": true,
+      "exportSafe": true,
+      "appSafe": true,
+      "kitScope": ["tabs", "segmented"],
+      "conflictsWith": []
+    },
+    {
+      "id": "heading-weight-nearest",
+      "category": "type",
+      "name": "Heading weight resolved to the font's nearest weight",
+      "what": "A target weight (300, 600 or 700) is snapped to the nearest weight the chosen heading font actually ships.",
+      "params": [
+        { "name": "target", "kind": "number", "range": "100-900", "default": "300" },
+        { "name": "synthesis", "kind": "bool", "range": "true|false", "default": "false" }
+      ],
+      "usedBy": [
+        { "key": "live-tile", "where": "js/aesthetics/live-tile.js:158-170", "variant": "300 via abWeightNear, exported as --ab-lt-lw" },
+        { "key": "mainframe", "where": "js/aesthetics/mainframe.js:169-176,199", "variant": "300 (display) and 600 (titles); Plex gets a bundled 300 face" },
+        { "key": "micrographics", "where": "js/aesthetics/micrographics.js:162-168", "variant": "heaviest up to 700 via abWeight, exported as --ab-hw" }
+      ],
+      "expressibleAs": "tokens",
+      "paletteAgnostic": true,
+      "exportSafe": true,
+      "appSafe": true,
+      "kitScope": [],
+      "conflictsWith": []
+    },
+    {
+      "id": "tight-display-tracking",
+      "category": "type",
+      "name": "Tight display tracking",
+      "what": "Large display and title type is set with negative letter-spacing, scaled by one global tracking factor.",
+      "params": [
+        { "name": "tracking", "kind": "number", "range": "-0.06 to 0em", "default": "-0.03" },
+        { "name": "scope", "kind": "enum", "range": "headline|card-title|all-display", "default": "all-display" }
+      ],
+      "usedBy": [
+        { "key": "mesh-gradient", "where": "css/aesthetics/mesh-gradient.css:36,57,193,262", "variant": "-0.03em on brand, headline, card titles; row names -0.01em" },
+        { "key": "micrographics", "where": "css/aesthetics/micrographics.css:70,164,190", "variant": "-0.04 to -0.045em, line-height 0.95" }
+      ],
+      "expressibleAs": "tokens",
+      "paletteAgnostic": true,
+      "exportSafe": true,
+      "appSafe": true,
+      "kitScope": [],
+      "conflictsWith": []
+    },
+    {
+      "id": "mixed-face-headline",
+      "category": "type",
+      "name": "Caps lead, heavy slab last word",
+      "what": "A headline splits into tracked sans caps for the lead words and a heavy slab face in the brand primary for the last word.",
+      "params": [
+        { "name": "leadCase", "kind": "enum", "range": "upper|none", "default": "upper" },
+        { "name": "lastWordFace", "kind": "text", "range": "font name", "default": "Alfa Slab One" },
+        { "name": "lastWordColour", "kind": "enum", "range": "primary|secondary|ink", "default": "primary" }
+      ],
+      "usedBy": [
+        { "key": "mid-century", "where": "js/aesthetics/mid-century.js:164-175", "variant": "script word in primary if it holds 3:1 on paper, else secondary or ink (tokens 245-247); CSS at css 56-65" }
+      ],
+      "expressibleAs": "css-recipe",
+      "paletteAgnostic": true,
+      "exportSafe": true,
+      "appSafe": true,
+      "kitScope": [],
+      "conflictsWith": []
+    },
+    {
+      "id": "highlight-underline-swash",
+      "category": "type",
+      "name": "Highlight word with thick accent swash",
+      "what": "The highlighted headline word keeps ink colour and gets a thick accent band behind its lower half.",
+      "params": [
+        { "name": "thickness", "kind": "number", "range": "10-60%", "default": "35" },
+        { "name": "colour", "kind": "enum", "range": "accent|primary", "default": "accent" }
+      ],
+      "usedBy": [
+        { "key": "mesh-gradient", "where": "css/aesthetics/mesh-gradient.css:60-64", "variant": "colour from --ab-mesh-swash (js 123); one swash per line, not a padded box per line (css 374)" }
+      ],
+      "expressibleAs": "css-recipe",
+      "paletteAgnostic": true,
+      "exportSafe": true,
+      "appSafe": true,
+      "kitScope": [],
+      "conflictsWith": []
+    },
+    {
+      "id": "ink-filled-selected",
+      "category": "kit",
+      "name": "Ink fill for selected or focused",
+      "what": "Selected segments, open menu rows and focused fields flip to an ink fill with ground-coloured text.",
+      "params": [
+        { "name": "scope", "kind": "text", "range": "seg,menu,field,nav", "default": "seg" },
+        { "name": "marker", "kind": "bool", "range": "true|false", "default": "false" }
+      ],
+      "usedBy": [
+        { "key": "live-tile", "where": "css/aesthetics/live-tile.css:141-144,249-252,283", "variant": "segments, focused fields and open menu rows all fill with ink" },
+        { "key": "mainframe", "where": "css/aesthetics/mainframe.css:124-130", "variant": "active segment ink with canvas text; secondary button also ink-filled (js 164-167)" },
+        { "key": "micrographics", "where": "css/aesthetics/micrographics.css:184-189", "variant": "active segment ink plus a 4px square marker; selected calendar day and nav items ink with a primary mark (css 453,500)" },
+        { "key": "mid-century", "where": "css/aesthetics/mid-century.css:363-371", "variant": "app selection and chosen menu row use walnut ink; board segments use teal instead (css 137)" }
+      ],
+      "expressibleAs": "css-recipe",
+      "paletteAgnostic": true,
+      "exportSafe": true,
+      "appSafe": true,
+      "kitScope": ["segmented", "menu", "field", "nav"],
+      "conflictsWith": []
+    },
+    {
+      "id": "heavy-border",
+      "category": "material",
+      "name": "Heavy outline",
+      "what": "Surfaces and controls are outlined with a thick solid ink border instead of a fill difference or shadow.",
+      "params": [
+        { "name": "width", "kind": "number", "range": "1-4px", "default": "2" },
+        { "name": "colour", "kind": "enum", "range": "ink|edge-mix|brand", "default": "ink" },
+        { "name": "scope", "kind": "text", "range": "card,field,button,switch", "default": "card" }
+      ],
+      "usedBy": [
+        { "key": "live-tile", "where": "css/aesthetics/live-tile.css:94,137-146", "variant": "2px edge in an ink/ground mix on secondary buttons, fields and switches" },
+        { "key": "mid-century", "where": "css/aesthetics/mid-century.css:111-115", "variant": "2px walnut on cards, pills and the cta" },
+        { "key": "micrographics", "where": "css/aesthetics/micrographics.css:177,184", "variant": "1px solid ink, but at full strength, on every box (card, panel, seg)" }
+      ],
+      "expressibleAs": "css-recipe",
+      "paletteAgnostic": true,
+      "exportSafe": true,
+      "appSafe": true,
+      "kitScope": ["card", "field", "button", "switch"],
+      "conflictsWith": []
+    },
+    {
+      "id": "hairline-rule",
+      "category": "material",
+      "name": "Hairline rules and edges",
+      "what": "1px ink-alpha lines divide content, outline chips and separate list rows.",
+      "params": [
+        { "name": "opacity", "kind": "number", "range": "5-60%", "default": "20" },
+        { "name": "width", "kind": "number", "range": "1px", "default": "1" }
+      ],
+      "usedBy": [
+        { "key": "mainframe", "where": "js/aesthetics/mainframe.js:169; css/aesthetics/mainframe.css:92-101,167-190", "variant": "20% ink hair on chips, panel border, table rows" },
+        { "key": "micrographics", "where": "js/aesthetics/micrographics.js:166-168; css/aesthetics/micrographics.css:48,63", "variant": "three alphas (50%, 20%, 10%) for strong, soft and faint hairlines" },
+        { "key": "mesh-gradient", "where": "js/aesthetics/mesh-gradient.js:117-118; css/aesthetics/mesh-gradient.css:137,141,233", "variant": "9% ink alpha on cards, rows and meta lines (14% dark)" }
+      ],
+      "expressibleAs": "tokens",
+      "paletteAgnostic": true,
+      "exportSafe": true,
+      "appSafe": true,
+      "kitScope": ["card", "list", "divider"],
+      "conflictsWith": []
+    },
+    {
+      "id": "named-states",
+      "category": "kit",
+      "name": "Named rest/hover/pressed states",
+      "what": "The three states of the main control are shown and styled by a named rule, with a distinctive transform or colour change per state.",
+      "params": [
+        { "name": "states", "kind": "text", "range": "3 names", "default": "Rest,Hover,Pressed" },
+        { "name": "kind", "kind": "enum", "range": "button|chip|swatch", "default": "button" },
+        { "name": "pressed", "kind": "enum", "range": "scale|colour|inset|offset", "default": "colour" }
+      ],
+      "usedBy": [
+        { "key": "live-tile", "where": "css/aesthetics/live-tile.css:122-127", "variant": "hover = ink mix 14% into primary, pressed = scale 0.97; no shadow, no colour change in the app" },
+        { "key": "mainframe", "where": "css/aesthetics/mainframe.css:142-149", "variant": "hover/pressed are darker/lighter primary mixes (--ab-pri-hover/-press)" },
+        { "key": "mesh-gradient", "where": "css/aesthetics/mesh-gradient.css:223-241", "variant": "spec-sheet rows of a compact pill; pressed = inset shadow plus 1px drop" },
+        { "key": "micrographics", "where": "css/aesthetics/micrographics.css:214-226", "variant": "swatch kind: Base / Annotated / Marked with leader and crop marks" },
+        { "key": "mid-century", "where": "css/aesthetics/mid-century.css:188-195", "variant": "chip kind: hover = aqua and lifted 2px, pressed = teal and dropped 1px" }
+      ],
+      "expressibleAs": "css-recipe",
+      "paletteAgnostic": true,
+      "exportSafe": true,
+      "appSafe": true,
+      "kitScope": ["button", "chip"],
+      "conflictsWith": []
+    },
+    {
+      "id": "focus-ring",
+      "category": "kit",
+      "name": "Focus ring",
+      "what": "Focus-visible draws a solid outline (or a halo) of fixed width and offset in ink or the primary.",
+      "params": [
+        { "name": "width", "kind": "number", "range": "1-4px", "default": "2" },
+        { "name": "colour", "kind": "enum", "range": "ink|primary|ring-alpha", "default": "ink" },
+        { "name": "offset", "kind": "number", "range": "-2-4px", "default": "3" },
+        { "name": "halo", "kind": "bool", "range": "true|false", "default": "false" }
+      ],
+      "usedBy": [
+        { "key": "live-tile", "where": "css/aesthetics/live-tile.css:110,124,150", "variant": "2px ink outline, offset 3px" },
+        { "key": "mainframe", "where": "css/aesthetics/mainframe.css:130,144,157", "variant": "2px primary, inset -2px offset; button adds a 3px canvas inner ring" },
+        { "key": "mesh-gradient", "where": "css/aesthetics/mesh-gradient.css:215,275", "variant": "primary border plus 4px alpha ring (30%)" },
+        { "key": "mid-century", "where": "css/aesthetics/mid-century.css:139-141,174", "variant": "3px walnut outline offset 3px; fields use teal" },
+        { "key": "micrographics", "where": "css/aesthetics/micrographics.css:354-359", "variant": "fields keep a 2px underline instead of a box ring" }
+      ],
+      "expressibleAs": "tokens",
+      "paletteAgnostic": true,
+      "exportSafe": true,
+      "appSafe": true,
+      "kitScope": ["button", "field", "switch", "seg"],
+      "conflictsWith": []
+    },
+    {
+      "id": "mono-plus-accent",
+      "category": "colour",
+      "name": "One ink plus one accent",
+      "what": "Colour is rationed: ink on ground everywhere, with the brand colour limited to a tiny named set of marks or a single accent element.",
+      "params": [
+        { "name": "accentRole", "kind": "enum", "range": "primary|accent", "default": "primary" },
+        { "name": "maxElements", "kind": "number", "range": "1-6", "default": "1" },
+        { "name": "markSize", "kind": "number", "range": "3-9px", "default": "3" }
+      ],
+      "usedBy": [
+        { "key": "micrographics", "where": "css/aesthetics/micrographics.css:115,128-130; js/aesthetics/micrographics.js:261-272", "variant": "primary only as 3-5px marks and the one filled action; secondary and accent as tiny swatch squares" },
+        { "key": "live-tile", "where": "js/aesthetics/live-tile.js:107-138", "variant": "one accent tile per view, never text or button; roles block lists coverage" }
+      ],
+      "expressibleAs": "css-recipe",
+      "paletteAgnostic": true,
+      "exportSafe": true,
+      "appSafe": true,
+      "kitScope": [],
+      "conflictsWith": []
+    },
+    {
+      "id": "underline-field",
+      "category": "kit",
+      "name": "Underline field",
+      "what": "Text fields have no box: a fill or nothing, with a single rule under the text that stays a rule in focus and error.",
+      "params": [
+        { "name": "fill", "kind": "enum", "range": "layer|none", "default": "layer" },
+        { "name": "ruleWidth", "kind": "number", "range": "1-2px", "default": "1" },
+        { "name": "height", "kind": "number", "range": "36-56px", "default": "48" }
+      ],
+      "usedBy": [
+        { "key": "mainframe", "where": "css/aesthetics/mainframe.css:151-157", "variant": "48px high, filled with the next layer up, 1px muted bottom rule, outline replaces it in focus" },
+        { "key": "micrographics", "where": "css/aesthetics/micrographics.css:198-200,354-359", "variant": "no fill, 1px ink rule; 2px in focus and error, no box ring" }
+      ],
+      "expressibleAs": "css-recipe",
+      "paletteAgnostic": true,
+      "exportSafe": true,
+      "appSafe": true,
+      "kitScope": ["field"],
+      "conflictsWith": []
+    },
+    {
+      "id": "catalogue-number",
+      "category": "ornament",
+      "name": "Index numbering",
+      "what": "Sections, rows and chips carry visible index numbers in a set format (01 -, [01], C-01).",
+      "params": [
+        { "name": "format", "kind": "enum", "range": "bracket|dash|code", "default": "dash" },
+        { "name": "hang", "kind": "bool", "range": "true|false", "default": "true" },
+        { "name": "scope", "kind": "text", "range": "section,row,chip", "default": "section" }
+      ],
+      "usedBy": [
+        { "key": "mainframe", "where": "css/aesthetics/mainframe.css:47-51,110-118,181", "variant": "'01 —' mono numerals, hanging in the gutter on the board; row numbers in tables" },
+        { "key": "micrographics", "where": "css/aesthetics/micrographics.css:49-55,143-152", "variant": "[01] brackets, chip numerals, C-01 role codes, T.01 type codes" }
+      ],
+      "expressibleAs": "css-recipe",
+      "paletteAgnostic": true,
+      "exportSafe": true,
+      "appSafe": false,
+      "kitScope": [],
+      "conflictsWith": []
+    },
+    {
+      "id": "perforation-rule",
+      "category": "ornament",
+      "name": "Perforated or dotted divider",
+      "what": "The page divider and card borders are a repeating dot or dash pattern instead of a plain line.",
+      "params": [
+        { "name": "dotSize", "kind": "number", "range": "1-4px", "default": "2" },
+        { "name": "pitch", "kind": "number", "range": "4-12px", "default": "8" },
+        { "name": "hairlineUnder", "kind": "bool", "range": "true|false", "default": "true" },
+        { "name": "ornament", "kind": "enum", "range": "none|sparkle", "default": "none" }
+      ],
+      "usedBy": [
+        { "key": "mainframe", "where": "css/aesthetics/mainframe.css:59-65", "variant": "2px dashes at 8px pitch over a 1px hairline (punch card)" },
+        { "key": "mid-century", "where": "css/aesthetics/mid-century.css:38-44,92,221", "variant": "3px dotted walnut line with one sparkle ornament; also footer and type column rules" }
+      ],
+      "expressibleAs": "css-recipe",
+      "paletteAgnostic": true,
+      "exportSafe": true,
+      "appSafe": false,
+      "kitScope": ["divider"],
+      "conflictsWith": []
+    },
+    {
+      "id": "uneven-stripe-raster",
+      "category": "pattern",
+      "name": "Uneven stripe raster glyph",
+      "what": "The brand initial is cut by horizontal stripes of uneven pitch and width, shown over a ghost of the same raster, from a seed.",
+      "params": [
+        { "name": "seed", "kind": "text", "range": "brand name", "default": "brand" },
+        { "name": "minWidths", "kind": "number", "range": "3-8", "default": "5" },
+        { "name": "minPitches", "kind": "number", "range": "3-6", "default": "4" },
+        { "name": "unit", "kind": "number", "range": "4-8", "default": "4" }
+      ],
+      "usedBy": [
+        { "key": "mainframe", "where": "js/aesthetics/mainframe.js:20-66,203-233", "variant": "10-16 stripes, multiples of 4, 60 rejection-sampling retries; css art rules at 77-89" }
+      ],
+      "expressibleAs": "svg-generator",
+      "paletteAgnostic": true,
+      "exportSafe": true,
+      "appSafe": false,
+      "kitScope": [],
+      "conflictsWith": []
+    },
+    {
+      "id": "label-left-icon-right-button",
+      "category": "kit",
+      "name": "Left label, right icon button",
+      "what": "A full-width rectangular button with the label flush left and a small icon or arrow flush right.",
+      "params": [
+        { "name": "height", "kind": "number", "range": "40-56px", "default": "48" },
+        { "name": "maxWidth", "kind": "number", "range": "240-480px", "default": "320" },
+        { "name": "iconGlyph", "kind": "enum", "range": "arrow|plus|none", "default": "arrow" }
+      ],
+      "usedBy": [
+        { "key": "mainframe", "where": "css/aesthetics/mainframe.css:137-148", "variant": "48px, left label, 16px arrow right, no radius" },
+        { "key": "mid-century", "where": "css/aesthetics/mid-century.css:147-160", "variant": "pill with label left and a starburst chip right (arrow rotates on hover)" }
+      ],
+      "expressibleAs": "css-recipe",
+      "paletteAgnostic": true,
+      "exportSafe": true,
+      "appSafe": true,
+      "kitScope": ["button"],
+      "conflictsWith": []
+    },
+    {
+      "id": "ruled-data-table",
+      "category": "layout",
+      "name": "Ruled data table list",
+      "what": "A list is a table with a header row on a tonal layer, 1px row rules, mono values and a progress bar column.",
+      "params": [
+        { "name": "headerLayer", "kind": "number", "range": "1-3", "default": "2" },
+        { "name": "valueFace", "kind": "enum", "range": "mono|sans", "default": "mono" },
+        { "name": "bar", "kind": "bool", "range": "true|false", "default": "true" }
+      ],
+      "usedBy": [
+        { "key": "mainframe", "where": "css/aesthetics/mainframe.css:167-190; js/aesthetics/mainframe.js:235-248", "variant": "header row on layer 2, 8px bar, mono percent; custom list panel hook" }
+      ],
+      "expressibleAs": "css-recipe",
+      "paletteAgnostic": true,
+      "exportSafe": true,
+      "appSafe": false,
+      "kitScope": ["list"],
+      "conflictsWith": []
+    },
+    {
+      "id": "base-unit-grid",
+      "category": "structure",
+      "name": "Base-unit spacing grid",
+      "what": "All sizes, gaps, heights and tick pitches are multiples of a fixed base unit (8px, half-unit 4px).",
+      "params": [
+        { "name": "unit", "kind": "number", "range": "4-10px", "default": "8" },
+        { "name": "halfUnit", "kind": "bool", "range": "true|false", "default": "true" }
+      ],
+      "usedBy": [
+        { "key": "mainframe", "where": "css/aesthetics/mainframe.css:29-35,136-149; js/aesthetics/mainframe.js:46-66", "variant": "8px unit, 48px controls, stripe pitches in multiples of 4" },
+        { "key": "micrographics", "where": "css/aesthetics/micrographics.css:17-19,105-108", "variant": "8px tick rails and baseline-snapped labels (round to 8px); 10-unit module on the plate" }
+      ],
+      "expressibleAs": "tokens",
+      "paletteAgnostic": true,
+      "exportSafe": true,
+      "appSafe": true,
+      "kitScope": ["button", "field", "list"],
+      "conflictsWith": []
+    },
+    {
+      "id": "soft-mesh-band",
+      "category": "colour",
+      "name": "Soft mesh colour band",
+      "what": "A clipped band behind the hero is a base tint with three or four blended radial lights of the brand colours.",
+      "params": [
+        { "name": "lights", "kind": "number", "range": "3-5", "default": "4" },
+        { "name": "baseTintPct", "kind": "number", "range": "4-30", "default": "12" },
+        { "name": "saturationBoost", "kind": "number", "range": "0-15", "default": "8" },
+        { "name": "clip", "kind": "enum", "range": "diagonal|none", "default": "diagonal" }
+      ],
+      "usedBy": [
+        { "key": "mesh-gradient", "where": "css/aesthetics/mesh-gradient.css:19-32,308-320", "variant": "four lights (secondary, accent, two primary), base = primary 12% over white; polygon clip with a diagonal lower cut" }
+      ],
+      "expressibleAs": "css-recipe",
+      "paletteAgnostic": true,
+      "exportSafe": true,
+      "appSafe": false,
+      "kitScope": [],
+      "conflictsWith": []
+    },
+    {
+      "id": "grain-overlay",
+      "category": "material",
+      "name": "Grain overlay",
+      "what": "A fine fractal-noise SVG sits over a surface at low opacity with multiply blend so gradients do not band.",
+      "params": [
+        { "name": "opacity", "kind": "number", "range": "2-30%", "default": "20" },
+        { "name": "baseFrequency", "kind": "number", "range": "0.4-1.2", "default": "0.9" },
+        { "name": "blend", "kind": "enum", "range": "multiply|overlay|none", "default": "multiply" }
+      ],
+      "usedBy": [
+        { "key": "mesh-gradient", "where": "css/aesthetics/mesh-gradient.css:322-326", "variant": "data-URI feTurbulence over the band only, same clip as the band" }
+      ],
+      "expressibleAs": "css-recipe",
+      "paletteAgnostic": true,
+      "exportSafe": false,
+      "appSafe": false,
+      "kitScope": [],
+      "conflictsWith": []
+    },
+    {
+      "id": "sine-striation-field",
+      "category": "pattern",
+      "name": "Sine-wave striation field",
+      "what": "About 140 fine sine strokes, each a shifted copy of one path, run through a colour ramp of the brand colours and fade out from the left.",
+      "params": [
+        { "name": "strokes", "kind": "number", "range": "40-200", "default": "140" },
+        { "name": "amplitude", "kind": "number", "range": "20-100", "default": "70" },
+        { "name": "ramp", "kind": "text", "range": "primary,accent,secondary", "default": "primary,accent,secondary" }
+      ],
+      "usedBy": [
+        { "key": "mesh-gradient", "where": "js/aesthetics/mesh-gradient.js:144-160", "variant": "single reusable path + <use> transforms, mask fades the left edge; CSS placement at css 74-80" }
+      ],
+      "expressibleAs": "svg-generator",
+      "paletteAgnostic": true,
+      "exportSafe": true,
+      "appSafe": false,
+      "kitScope": [],
+      "conflictsWith": []
+    },
+    {
+      "id": "gradient-action-carry",
+      "category": "kit",
+      "name": "Gradient carried into actions and data",
+      "what": "The brand gradient (primary to a turned second hue) is reused on the main button, avatars, progress bars, chart fills and selected nav.",
+      "params": [
+        { "name": "angle", "kind": "number", "range": "90-180", "default": "135" },
+        { "name": "secondStop", "kind": "enum", "range": "turned-hue|accent|secondary", "default": "turned-hue" },
+        { "name": "turnDegrees", "kind": "number", "range": "10-60", "default": "28" }
+      ],
+      "usedBy": [
+        { "key": "mesh-gradient", "where": "css/aesthetics/mesh-gradient.css:331-350", "variant": "cta two-stop pill, bars primary to turned hue, avatars, chart area fade, selected nav tint fade; avatars at 256-261, kit fills at 604-750" }
+      ],
+      "expressibleAs": "css-recipe",
+      "paletteAgnostic": true,
+      "exportSafe": true,
+      "appSafe": true,
+      "kitScope": ["button", "progress", "avatar", "chart", "nav"],
+      "conflictsWith": []
+    },
+    {
+      "id": "press-hover-transform",
+      "category": "motion",
+      "name": "Hover and press transform",
+      "what": "Controls move on hover or press with a small translate, scale or rotation.",
+      "params": [
+        { "name": "hover", "kind": "text", "range": "css transform", "default": "translateY(-1px)" },
+        { "name": "press", "kind": "text", "range": "css transform", "default": "scale(0.97)" },
+        { "name": "duration", "kind": "number", "range": "0.1-0.3s", "default": "0.15" }
+      ],
+      "usedBy": [
+        { "key": "live-tile", "where": "css/aesthetics/live-tile.css:123,133,217", "variant": "press scale 0.97 only; reduced motion turns it off (css 195)" },
+        { "key": "mesh-gradient", "where": "css/aesthetics/mesh-gradient.css:200-207", "variant": "hover translateY(-1px) with brightness 1.06 and a 3px arrow nudge; press translateY(1px)" },
+        { "key": "mid-century", "where": "css/aesthetics/mid-century.css:153-159", "variant": "hover translateY(-2px) rotate(-1.2deg), arrow spins 30 degrees; press scale 0.98" }
+      ],
+      "expressibleAs": "css-recipe",
+      "paletteAgnostic": true,
+      "exportSafe": true,
+      "appSafe": true,
+      "kitScope": ["button", "seg"],
+      "conflictsWith": []
+    },
+    {
+      "id": "tile-flip-motion",
+      "category": "motion",
+      "name": "Tile flip and sliding dots",
+      "what": "Live tiles flip slowly on the X axis to a second face on a staggered 22s cycle, and a row of five squares slides as a loader.",
+      "params": [
+        { "name": "flipPeriod", "kind": "number", "range": "10-40s", "default": "22" },
+        { "name": "dots", "kind": "number", "range": "3-7", "default": "5" }
+      ],
+      "usedBy": [
+        { "key": "live-tile", "where": "css/aesthetics/live-tile.css:70-81,189-195", "variant": "off in the deck and under prefers-reduced-motion; board only" }
+      ],
+      "expressibleAs": "css-recipe",
+      "paletteAgnostic": true,
+      "exportSafe": false,
+      "appSafe": false,
+      "kitScope": [],
+      "conflictsWith": []
+    },
+    {
+      "id": "fixed-signal-inks",
+      "category": "colour",
+      "name": "Fixed non-brand inks",
+      "what": "A small set of fixed period or safety colours that do not change with the client palette is added next to the brand colours.",
+      "params": [
+        { "name": "inks", "kind": "text", "range": "hex list", "default": "#E8A920,#17706F,#C4411D,#5F6E2A,#A9D8D0" },
+        { "name": "labelRule", "kind": "text", "range": "per-ink on-colour", "default": "walnut on light inks, cream on dark" },
+        { "name": "scope", "kind": "enum", "range": "board-only|everywhere", "default": "board-only" }
+      ],
+      "usedBy": [
+        { "key": "micrographics", "where": "js/aesthetics/micrographics.js:165-172", "variant": "one safety colour for hazard tape and caution triangle: orange #FF4A1C light, yellow #FFE500 dark" },
+        { "key": "mid-century", "where": "js/aesthetics/mid-century.js:21-22,253-261", "variant": "five period inks with fixed on-colours; the app block drops them (css 326-331)" }
+      ],
+      "expressibleAs": "tokens",
+      "paletteAgnostic": false,
+      "exportSafe": true,
+      "appSafe": false,
+      "kitScope": [],
+      "conflictsWith": []
+    },
+    {
+      "id": "warm-period-shift",
+      "category": "colour",
+      "name": "Period hue shift",
+      "what": "Client secondary and accent colours are nudged a few degrees toward a period hue and slightly desaturated.",
+      "params": [
+        { "name": "targetHue", "kind": "number", "range": "0-360", "default": "60" },
+        { "name": "maxShiftDeg", "kind": "number", "range": "0-20", "default": "6" },
+        { "name": "chromaScale", "kind": "number", "range": "0.5-1", "default": "0.85" }
+      ],
+      "usedBy": [
+        { "key": "mid-century", "where": "js/aesthetics/mid-century.js:42-49", "variant": "applied to primary, secondary and accent before use" }
+      ],
+      "expressibleAs": "tokens",
+      "paletteAgnostic": true,
+      "exportSafe": true,
+      "appSafe": true,
+      "kitScope": [],
+      "conflictsWith": []
+    },
+    {
+      "id": "dotted-colour-band-card",
+      "category": "kit",
+      "name": "Card with dotted colour-block header band",
+      "what": "Cards, panels and lists have a 14px colour band with a dot pattern across the top and a thick outline with one cut corner.",
+      "params": [
+        { "name": "bandHeight", "kind": "number", "range": "8-24px", "default": "14" },
+        { "name": "bandColour", "kind": "enum", "range": "mustard|teal|tomato|brand", "default": "mustard" },
+        { "name": "dots", "kind": "bool", "range": "true|false", "default": "true" }
+      ],
+      "usedBy": [
+        { "key": "mid-century", "where": "css/aesthetics/mid-century.css:109-125", "variant": "board only: band per surface (mustard, teal, tomato); app drops the band (css 326-331)" }
+      ],
+      "expressibleAs": "css-recipe",
+      "paletteAgnostic": false,
+      "exportSafe": true,
+      "appSafe": false,
+      "kitScope": ["card"],
+      "conflictsWith": []
+    },
+    {
+      "id": "solid-colour-stat-blocks",
+      "category": "kit",
+      "name": "Solid colour stat blocks",
+      "what": "Stat cards fill with a solid colour per position, cycling through four inks with label colours chosen for each.",
+      "params": [
+        { "name": "cycle", "kind": "number", "range": "2-6", "default": "4" },
+        { "name": "fillSource", "kind": "enum", "range": "period-inks|brand-roles", "default": "period-inks" }
+      ],
+      "usedBy": [
+        { "key": "mid-century", "where": "css/aesthetics/mid-century.css:271-290", "variant": "4n+k nth-child cycle of mustard, teal, tomato, olive; peeking starburst" }
+      ],
+      "expressibleAs": "css-recipe",
+      "paletteAgnostic": false,
+      "exportSafe": true,
+      "appSafe": true,
+      "kitScope": ["stat-card"],
+      "conflictsWith": []
+    },
+    {
+      "id": "cut-paper-shape-set",
+      "category": "ornament",
+      "name": "Cut-paper shape set",
+      "what": "Starbursts, atoms, kidneys, sputniks, boomerangs and sparkles drawn as flat shapes whose edges are resampled with small jitter.",
+      "params": [
+        { "name": "shapes", "kind": "text", "range": "list of shape ids", "default": "starburst,atom,kidney,sputnik,boomerang,sparkle" },
+        { "name": "jitter", "kind": "number", "range": "0-2", "default": "0.8" },
+        { "name": "seed", "kind": "text", "range": "brand name", "default": "brand" }
+      ],
+      "usedBy": [
+        { "key": "mid-century", "where": "js/aesthetics/mid-century.js:68-135", "variant": "primitives used by art() at 284-327 and again by tokens() for sparkle/burst data URIs (238-283)" }
+      ],
+      "expressibleAs": "svg-generator",
+      "paletteAgnostic": true,
+      "exportSafe": true,
+      "appSafe": false,
+      "kitScope": [],
+      "conflictsWith": []
+    },
+    {
+      "id": "sunburst-rays",
+      "category": "pattern",
+      "name": "Sunburst rays",
+      "what": "Alternating wedges radiate from a centre past the edges in the primary colour on paper.",
+      "params": [
+        { "name": "wedges", "kind": "number", "range": "8-36", "default": "12" },
+        { "name": "colour", "kind": "enum", "range": "primary|accent", "default": "primary" },
+        { "name": "jitter", "kind": "number", "range": "0-2", "default": "0.8" }
+      ],
+      "usedBy": [
+        { "key": "mid-century", "where": "js/aesthetics/mid-century.js:290-296", "variant": "12 primary wedges, jittered edge, behind the sun and atom" }
+      ],
+      "expressibleAs": "svg-generator",
+      "paletteAgnostic": true,
+      "exportSafe": true,
+      "appSafe": false,
+      "kitScope": [],
+      "conflictsWith": []
+    },
+    {
+      "id": "paper-wear-speckle",
+      "category": "material",
+      "name": "Flat SVG paper wear",
+      "what": "A seeded layer of mottling ellipses, fold creases, specks and an edge stroke makes the art look like aged paper without filters.",
+      "params": [
+        { "name": "mottles", "kind": "number", "range": "0-30", "default": "14" },
+        { "name": "specks", "kind": "number", "range": "0-100", "default": "62" },
+        { "name": "creases", "kind": "number", "range": "0-12", "default": "6" }
+      ],
+      "usedBy": [
+        { "key": "mid-century", "where": "js/aesthetics/mid-century.js:136-153", "variant": "plain SVG shapes only, no CSS masks or filters (blend-donor safe)" }
+      ],
+      "expressibleAs": "svg-generator",
+      "paletteAgnostic": true,
+      "exportSafe": true,
+      "appSafe": false,
+      "kitScope": [],
+      "conflictsWith": []
+    },
+    {
+      "id": "ruler-ticks",
+      "category": "pattern",
+      "name": "Ruler tick rails",
+      "what": "Edge rails and top/bottom rulers are repeating 1px tick gradients with tiny numeric or letter labels.",
+      "params": [
+        { "name": "pitch", "kind": "number", "range": "4-16px", "default": "8" },
+        { "name": "tickLength", "kind": "number", "range": "3-8px", "default": "4" },
+        { "name": "labels", "kind": "text", "range": "list", "default": "000,100,200,300,400" }
+      ],
+      "usedBy": [
+        { "key": "micrographics", "where": "css/aesthetics/micrographics.css:16-19,92-95", "variant": "left and right rails on the board, top and bottom rulers on the plate" }
+      ],
+      "expressibleAs": "css-recipe",
+      "paletteAgnostic": true,
+      "exportSafe": true,
+      "appSafe": false,
+      "kitScope": [],
+      "conflictsWith": []
+    },
+    {
+      "id": "registration-marks",
+      "category": "ornament",
+      "name": "Registration and crop marks",
+      "what": "Corner crop marks and crosshairs are drawn with stacked gradient lines on the board, buttons and cards.",
+      "params": [
+        { "name": "length", "kind": "number", "range": "4-12px", "default": "6" },
+        { "name": "inset", "kind": "number", "range": "6-16px", "default": "9" },
+        { "name": "scope", "kind": "text", "range": "board,card,button", "default": "board,card,button" }
+      ],
+      "usedBy": [
+        { "key": "micrographics", "where": "css/aesthetics/micrographics.css:20-40,177-182,193", "variant": "four board corners, plus every card, list and the cta (inset -9px) via --mg-crops; dropped in cells of the kit grid (css 559)" }
+      ],
+      "expressibleAs": "css-recipe",
+      "paletteAgnostic": true,
+      "exportSafe": true,
+      "appSafe": false,
+      "kitScope": ["card", "button"],
+      "conflictsWith": []
+    },
+    {
+      "id": "live-data-microline",
+      "category": "ornament",
+      "name": "Live data micro lines",
+      "what": "Tiny printed lines carry real brand data (hex codes, font names, grid, page numbers) on section rules, corners and the spec table.",
+      "params": [
+        { "name": "fields", "kind": "text", "range": "list of palette/font fields", "default": "primary,ink,canvas,font" },
+        { "name": "format", "kind": "text", "range": "template", "default": "MG-0412-A · {hex} · 8PX GRID · P.03/04" }
+      ],
+      "usedBy": [
+        { "key": "micrographics", "where": "js/aesthetics/micrographics.js:171-174; css/aesthetics/micrographics.css:52-55", "variant": "three tokens feeding ::after content on section label rows; same hex data in the plate's spec table (js 223-236)" }
+      ],
+      "expressibleAs": "css-recipe",
+      "paletteAgnostic": true,
+      "exportSafe": true,
+      "appSafe": false,
+      "kitScope": [],
+      "conflictsWith": []
+    },
+    {
+      "id": "outline-echo-headline",
+      "category": "type",
+      "name": "Offset hairline echo",
+      "what": "A giant glyph or headline has a transparent outline duplicate offset by a few pixels behind it.",
+      "params": [
+        { "name": "offsetX", "kind": "number", "range": "2-12px", "default": "5" },
+        { "name": "offsetY", "kind": "number", "range": "2-12px", "default": "4" },
+        { "name": "strokeWidth", "kind": "number", "range": "1-2px", "default": "1" }
+      ],
+      "usedBy": [
+        { "key": "micrographics", "where": "css/aesthetics/micrographics.css:98-102", "variant": "applied to the plate's giant initial, not the headline" }
+      ],
+      "expressibleAs": "css-recipe",
+      "paletteAgnostic": true,
+      "exportSafe": true,
+      "appSafe": false,
+      "kitScope": [],
+      "conflictsWith": []
+    },
+    {
+      "id": "orthogonal-leader-callouts",
+      "category": "ornament",
+      "name": "Orthogonal leader callouts",
+      "what": "Labels with index and coordinates connect to marks by one horizontal run and one vertical drop, with the label knocking out the line behind it.",
+      "params": [
+        { "name": "count", "kind": "number", "range": "2-8", "default": "6" },
+        { "name": "markerStyle", "kind": "enum", "range": "square|crosshair|dot", "default": "square" },
+        { "name": "snap", "kind": "number", "range": "4-8px", "default": "8" }
+      ],
+      "usedBy": [
+        { "key": "micrographics", "where": "js/aesthetics/micrographics.js:186-222; css/aesthetics/micrographics.css:104-115", "variant": "anchor positions measured from the real glyph's ink edges at render time" }
+      ],
+      "expressibleAs": "svg-generator",
+      "paletteAgnostic": true,
+      "exportSafe": true,
+      "appSafe": false,
+      "kitScope": [],
+      "conflictsWith": []
+    },
+    {
+      "id": "canvas-sticker-panel",
+      "category": "ornament",
+      "name": "Canvas-backed sticker panels",
+      "what": "Small boxes with a 1px ink border and canvas background sit over the art like stickers, holding tables, codes or tape.",
+      "params": [
+        { "name": "border", "kind": "number", "range": "1-2px", "default": "1" },
+        { "name": "padding", "kind": "number", "range": "4-12px", "default": "8" },
+        { "name": "count", "kind": "number", "range": "1-4", "default": "3" }
+      ],
+      "usedBy": [
+        { "key": "micrographics", "where": "css/aesthetics/micrographics.css:116-136", "variant": "spec table, QR plus caution glyph, hazard tape plus barcode; stacked under the plate on phones" }
+      ],
+      "expressibleAs": "css-recipe",
+      "paletteAgnostic": true,
+      "exportSafe": true,
+      "appSafe": false,
+      "kitScope": [],
+      "conflictsWith": []
+    },
+    {
+      "id": "barcode-serial",
+      "category": "ornament",
+      "name": "Seeded barcode and serial",
+      "what": "A barcode of seeded bar widths and a serial/scale note line add technical decoration.",
+      "params": [
+        { "name": "bars", "kind": "number", "range": "20-80", "default": "46" },
+        { "name": "seed", "kind": "text", "range": "brand name", "default": "brand" },
+        { "name": "note", "kind": "text", "range": "free text", "default": "0 41227 06601 5 · SCALE 1:1 · SHEET 01" }
+      ],
+      "usedBy": [
+        { "key": "micrographics", "where": "js/aesthetics/micrographics.js:41-49,224-258", "variant": "46 bars in ink under the hazard tape; a seeded 21x21 QR block next to it (js 29-39)" }
+      ],
+      "expressibleAs": "svg-generator",
+      "paletteAgnostic": true,
+      "exportSafe": true,
+      "appSafe": false,
+      "kitScope": [],
+      "conflictsWith": []
+    }
+  ]
+}

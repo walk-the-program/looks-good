@@ -1,0 +1,3341 @@
+{
+ "group": "H",
+ "styles": [
+  {
+   "key": "soft-form",
+   "name": "Soft Form",
+   "coreTrick": "Fill every surface with the canvas colour itself and let a paired dark/light shadow (offset down-right / up-left, derived from the canvas) make it look raised or recessed, with one iridescent glass panel and one glossy primary.",
+   "colourRecipe": "Canvas is pulled 6% (light) or 4% (dark) toward ink. Primary appears only on the single glossy CTA, switch knob, one swatch pad and checked boxes; ink fills the selected segment and slider fill (55%). hi = white@.79 and lo = canvas mixed 25% to black@.6 (dark: white@.11 and black@.53, app .13/.8 plus 1px top rim). Muted is pulled toward ink to 4.6:1 on every surface; the highlight word is the accent shaded to 3:1 (yellows fall back to the shaded primary). A muted or pastel primary still works because the on-state knob gets a ring mixed 45% toward ink.",
+   "moves": [
+    "soft-raised-relief",
+    "recessed-field",
+    "light-pair-derivation",
+    "clear-glass-panel",
+    "glossy-single-action",
+    "ink-filled-selected",
+    "socketed-pad",
+    "recessed-track-slider",
+    "switch-knob",
+    "card-surface",
+    "field-surface",
+    "corner-radius",
+    "tinted-neutral-canvas",
+    "contrast-floor-search",
+    "highlight-word-treatment",
+    "tight-display-tracking",
+    "caps-mono-labels",
+    "named-states",
+    "progress-bar-fill",
+    "list-row-container",
+    "press-state-motion",
+    "mono-plus-accent",
+    "well-disc-semi-scene",
+    "glass-lens-refraction",
+    "hero-split-art-bleed",
+    "brand-mark",
+    "a11y-media-fallbacks",
+    "kit-per-component-dress"
+   ],
+   "remainder": [
+    {
+     "what": "Lens refraction: the scene is rendered twice, the copy scaled 1.24x and counter-rotated inside a clipped tilted pill",
+     "where": "js/aesthetics/soft-form.js:98-108",
+     "whyCode": "Duplicates art markup through the shared abLens helper; not a pure CSS parameter"
+    },
+    {
+     "what": "Yellow/amber accent fallback: if the accent is below 3:1 and hue 35-80, the highlight word switches to the primary shaded to 3:1",
+     "where": "js/aesthetics/soft-form.js:57-65",
+     "whyCode": "Hue-conditional colour search with a branching fallback"
+    },
+    {
+     "what": "Real slider markup is injected into the panel after the status line",
+     "where": "js/aesthetics/soft-form.js:110-117",
+     "whyCode": "Panel hook rewrites generated HTML with a regex"
+    },
+    {
+     "what": "Dark-mode constants for highlight, shadow, rim and gloss are hand-tuned literals",
+     "where": "js/aesthetics/soft-form.js:55-56",
+     "whyCode": "No formula; tuned values (fallback documented as lifted highlight plus 1px rim)"
+    },
+    {
+     "what": "Narrow-container reflow of progress channel, art and discs",
+     "where": "css/aesthetics/soft-form.css:207-214",
+     "whyCode": "Per-layout responsive rules"
+    },
+    {
+     "what": "Deck slide 06 material names set large instead of tracked micro caps; cover art size",
+     "where": "css/aesthetics/soft-form.css:216-225",
+     "whyCode": "Deck-specific overrides"
+    },
+    {
+     "what": "App kit: ~190 per-component rules (calendar range pills, menu separators, knob indicator, split buttons)",
+     "where": "css/aesthetics/soft-form.css:245-437",
+     "whyCode": "Each is the relief moves applied to a different component with local tuning; a generator would need a component table"
+    }
+   ],
+   "moveCoverage": 85,
+   "notes": "Exact recipe: raised 6px 6px 13px lo, -6px -6px 13px hi (small 3/7); inset 6/13 (small 3/6); app raised 5/12, inset 4/9 and 2/5. Radii 24 card, 22 wells/trays/app card, 12 field/seg track (14 in app), 10 CTA (12 app), 9 selected segment, 10 mark. Glass ring 1.5px; glass disc 84px. Light direction fixed top-left, no motion. Soft Form is the planned rebuild target: the moves above cover board and kit; the lens and highlight fallback must be built as bespoke helpers or omitted in the rebuild."
+  },
+  {
+   "key": "retro-futurist",
+   "name": "Retro-Futurist",
+   "coreTrick": "A lit white field with one flat signal colour, extended uppercase type, a three-stripe band as the rule and card edge, and gauge components (LED ladders, lamps, dials), headlined by a full-bleed procedural planet-and-orbit plate.",
+   "colourRecipe": "Canvas is white mixed 15% with the brand canvas (dark: #08090b), never tinted by the primary. Primary is nudged toward ink until it holds 3:1 and becomes the only chromatic mark; ink is flat; secondary and accent appear only in the stripe band and the accent orbit. A hot orange (#D93A12 / #FF7A4D) is reserved for the alert lamp. A muted primary still yields a signal because it is darkened to 3:1.",
+   "moves": [
+    "single-signal-colour",
+    "mono-plus-accent",
+    "tinted-neutral-canvas",
+    "contrast-floor-search",
+    "three-stripe-band",
+    "stretched-display",
+    "caps-mono-labels",
+    "catalogue-number",
+    "hairline-rule",
+    "card-surface",
+    "field-surface",
+    "pill-button",
+    "ink-filled-selected",
+    "switch-knob",
+    "recessed-track-slider",
+    "named-states",
+    "progress-bar-fill",
+    "list-row-container",
+    "gauge-instruments",
+    "planet-horizon-plate",
+    "hero-split-art-bleed",
+    "highlight-word-treatment",
+    "press-state-motion",
+    "corner-radius",
+    "a11y-media-fallbacks",
+    "kit-per-component-dress"
+   ],
+   "remainder": [
+    {
+     "what": "Planet limb with blurred rim, gradients, three orbits, craft, vertical caption",
+     "where": "js/aesthetics/retro-futurist.js:30-79",
+     "whyCode": "Procedural SVG composition; only partly parameterised (a generator needs the plate as its own svg-generator)"
+    },
+    {
+     "what": "Mission console: 31 ticks, value arc, needle with echo, LCD segments, LED ladder",
+     "where": "js/aesthetics/retro-futurist.js:83-143",
+     "whyCode": "Bespoke SVG instrument; deck-only"
+    },
+    {
+     "what": "Standards-manual numbering written as per-section ::before text (1.2, 1.3...) because CSS counters are scoped by containers",
+     "where": "css/aesthetics/retro-futurist.css:42-50",
+     "whyCode": "Hardcoded per section; a framework needs real text from the board"
+    },
+    {
+     "what": "Stat card conic dials and T+ readout generated by ::after / kicker::after",
+     "where": "css/aesthetics/retro-futurist.css:217-237",
+     "whyCode": "Per-component generated content tied to the dashboard markup"
+    },
+    {
+     "what": "Do/don't SVG pair rendered into data URIs in tokens",
+     "where": "js/aesthetics/retro-futurist.js:145-152",
+     "whyCode": "Bespoke illustration per deck"
+    },
+    {
+     "what": "Classic-version kit overrides live in the same file",
+     "where": "css/aesthetics/retro-futurist.css:296-325",
+     "whyCode": "Variant-specific"
+    }
+   ],
+   "moveCoverage": 68,
+   "notes": "Hero plate is dark in both modes (the one dark image on a light page). Display face is the brand heading face (recommended Michroma); weight resolves to the nearest published <= 700."
+  },
+  {
+   "key": "riso-print",
+   "name": "Riso Print",
+   "coreTrick": "Two brand colours act as riso inks: they overprint with multiply, sit a few px off-register as hard plate shadows and offset outlines, and shade with halftone dots on grainy cream paper, with a fluorescent third ink used tiny.",
+   "colourRecipe": "Light canvas is replaced by fixed paper #F4EBDA; dark keeps the brand canvas and switches blend to screen. Primary is the headline ink, CTA block and selected state; secondary is the off-register plate (multiplied with the paper, or mixed 40% in dark); accent is replaced by a fixed fluorescent pink (#FF48B0) or orange (#FF7A1A if primary hue is >=300 or <=20). Muted is pulled toward ink to 4.7:1. A pale or muted primary prints weakly but remains legible since text uses ink and primary-text.",
+   "moves": [
+    "tinted-neutral-canvas",
+    "duotone-ink",
+    "overprint-multiply",
+    "hard-offset-shadow",
+    "grain-overlay",
+    "halftone-dots",
+    "fixed-spot-ink",
+    "tilted-stamp-label",
+    "catalogue-number",
+    "hairline-rule",
+    "caps-mono-labels",
+    "tight-display-tracking",
+    "highlight-word-treatment",
+    "card-surface",
+    "field-surface",
+    "ink-filled-selected",
+    "switch-knob",
+    "progress-bar-fill",
+    "list-row-container",
+    "press-state-motion",
+    "named-states",
+    "contrast-floor-search",
+    "brand-mark",
+    "hero-split-art-bleed",
+    "corner-radius",
+    "kit-per-component-dress"
+   ],
+   "remainder": [
+    {
+     "what": "Headline last-word wrapper that glues the closing punctuation to the circled word so it never splits",
+     "where": "js/aesthetics/riso-print.js:94-101",
+     "whyCode": "Regex text transform in the headline hook"
+    },
+    {
+     "what": "Zine spread art: three rotated ink cards each with a circle/arch/zigzag shape printed solid plus a halftone pass offset 2 units",
+     "where": "js/aesthetics/riso-print.js:103-135",
+     "whyCode": "Procedural SVG with pattern fills; shape set is bespoke"
+    },
+    {
+     "what": "Hand-drawn ring around the highlight word built from two ::before/::after pseudo elements",
+     "where": "css/aesthetics/riso-print.css:66-77",
+     "whyCode": "Hand-tuned rotation and offsets"
+    },
+    {
+     "what": "Sidebar and chart halftone gradients fading up the page",
+     "where": "css/aesthetics/riso-print.css:193-214",
+     "whyCode": "Per-component mask gradients"
+    },
+    {
+     "what": "Cover foot halftone band, two inks half a cell off-register",
+     "where": "css/aesthetics/riso-print.css:218-226",
+     "whyCode": "Deck-specific generated content"
+    },
+    {
+     "what": "Grain data URI has separate light/dark seeds and the grain must be removed on app screens due to tile seams",
+     "where": "css/aesthetics/riso-print.css:15-33",
+     "whyCode": "Export and tiling workaround"
+    }
+   ],
+   "moveCoverage": 78,
+   "notes": "All blends (multiply/screen) are not exportSafe for PNG/PDF; marked exportSafe false on overprint and grain. Accent is a board-only ink; app screens use the real accent."
+  },
+  {
+   "key": "tab-stack",
+   "name": "Tab Stack",
+   "coreTrick": "Rounded colour cards (five brand-derived colours, all carrying one near-black text colour) tuck under each other like index tabs, with condensed capitals, mono details, white pills and circular arrow chips on a charcoal or sage ground.",
+   "colourRecipe": "Canvas is a charcoal tinted by the primary hue (dark) or a pale sage leaning 25% toward the primary hue (light), nudged to 7:1 against ink. The five card colours are the brand's distinct hues (primary, secondary, accent if >=24 deg apart and s>=12) plus rotated companions to five, lightness raised until near-black reads at 7:1; primary is printed as card A. On a greyscale brand the cards stay grey. Light mode pushes the printed primary deeper to 3.2:1 on the sage ground.",
+   "moves": [
+    "tinted-neutral-canvas",
+    "card-colour-set",
+    "colour-card-scope",
+    "fanned-stack-tuck",
+    "stack-peek-edge",
+    "folder-tab-segments",
+    "circular-arrow-chip",
+    "pill-button",
+    "condensed-caps-display",
+    "caps-mono-labels",
+    "catalogue-number",
+    "highlight-word-treatment",
+    "ink-filled-selected",
+    "field-surface",
+    "switch-knob",
+    "recessed-track-slider",
+    "progress-bar-fill",
+    "list-row-container",
+    "card-surface",
+    "hairline-rule",
+    "heavy-border",
+    "press-state-motion",
+    "named-states",
+    "contrast-floor-search",
+    "tab-card-fan-art",
+    "brand-mark",
+    "hero-split-art-bleed",
+    "corner-radius",
+    "a11y-media-fallbacks",
+    "kit-per-component-dress"
+   ],
+   "remainder": [
+    {
+     "what": "Five-colour derivation with hue spacing and lightness lifts to 7:1",
+     "where": "js/aesthetics/tab-stack.js:16-60",
+     "whyCode": "Colour search loops with fallbacks for grey brands"
+    },
+    {
+     "what": "Canvas and printPrimary searches against ink and label contrast",
+     "where": "js/aesthetics/tab-stack.js:134-160",
+     "whyCode": "Iterative colour solving"
+    },
+    {
+     "what": "Fanned five-card SVG with rotations, mono tags, arrow chips and ink doodles",
+     "where": "js/aesthetics/tab-stack.js:206-234",
+     "whyCode": "Bespoke composition with hardcoded geometry"
+    },
+    {
+     "what": "Kit signature block: index slot with corner tab labels, asymmetric tab radii (0 16 16 16), anchors, per-component colour cycling",
+     "where": "css/aesthetics/tab-stack.css:566-887",
+     "whyCode": "Per-component bespoke geometry"
+    },
+    {
+     "what": "Deck material specimens (stack, pill and chip, bar chart)",
+     "where": "js/aesthetics/tab-stack.js:262-284",
+     "whyCode": "Bespoke deck markup"
+    }
+   ],
+   "moveCoverage": 72,
+   "notes": "Board and website only for the stack art and doodles; app has no art. Note the kit signature block (Round 14) makes the app kit more bespoke than the board, so moveCoverage there is lower."
+  },
+  {
+   "key": "tonal-shape",
+   "name": "Tonal Shape",
+   "coreTrick": "Build elevation from tone steps of the primary mixed into the canvas (no borders or shadows), pill controls that squish on press, and one hash-chosen signature shape per brand used as the avatar, icon-button and list-icon container.",
+   "colourRecipe": "Canvas is a 4% (light) / 6% (dark, over a half-blackened canvas) tint of the primary tone. Low/mid/high containers are the tone mixed 4.5/8.5/15% into the ground; primary-container a 30% tint (dark 50% of a deepened tone) with on-text solved to 7:1; secondary-container 26% and accent tint 42%. Muted must hold 4.6:1 on all six beds; the outline is ink pulled toward the ground to 3.1:1. A neutral primary stays grey (low saturation is kept).",
+   "moves": [
+    "tinted-neutral-canvas",
+    "tonal-ramp",
+    "contrast-floor-search",
+    "card-surface",
+    "field-surface",
+    "corner-radius",
+    "pill-button",
+    "squish-corner-press",
+    "connected-segmented-control",
+    "signature-shape-container",
+    "tonal-shape-composition-art",
+    "switch-knob",
+    "progress-bar-fill",
+    "list-row-container",
+    "caps-mono-labels",
+    "highlight-word-treatment",
+    "hairline-rule",
+    "named-states",
+    "brand-mark",
+    "hero-split-art-bleed",
+    "a11y-media-fallbacks",
+    "kit-per-component-dress"
+   ],
+   "remainder": [
+    {
+     "what": "Shape library: scallop, clover, soft burst, arch, rounded diamond, leaf as generated paths",
+     "where": "js/aesthetics/tonal-shape.js:21-81",
+     "whyCode": "Path generators and fixed path strings; the library itself is code"
+    },
+    {
+     "what": "FNV-1a hash picking the shape from the brand name",
+     "where": "js/aesthetics/tonal-shape.js:83-92",
+     "whyCode": "Deterministic seeding logic"
+    },
+    {
+     "what": "Brand name lookup through effectiveContent for the tokens hook",
+     "where": "js/aesthetics/tonal-shape.js:100-105",
+     "whyCode": "Reads app state"
+    },
+    {
+     "what": "Board list avatar markup (signature shape holding the row initial)",
+     "where": "js/aesthetics/tonal-shape.js:286-300",
+     "whyCode": "Panel hook replaces the list markup"
+    },
+    {
+     "what": "Hero composition geometry",
+     "where": "js/aesthetics/tonal-shape.js:263-284",
+     "whyCode": "Hardcoded positions"
+    },
+    {
+     "what": "Deck material specimens (shape, pill before and after, ramp)",
+     "where": "js/aesthetics/tonal-shape.js:328-354",
+     "whyCode": "Bespoke deck markup"
+    }
+   ],
+   "moveCoverage": 76,
+   "notes": "Tonal Shape is the closest to a pure token-ramp style: tokens and card/button recipes cover most of it; the shape library is the main bespoke piece. Squish uses a numeric radius (28px) not 999px so it can animate."
+  }
+ ],
+ "moves": [
+  {
+   "id": "soft-raised-relief",
+   "category": "material",
+   "name": "Raised relief (same-colour, paired shadow)",
+   "what": "Fill a surface with the canvas colour itself and let a dark shadow offset down-right plus a light highlight offset up-left make it look lifted; light is fixed top-left.",
+   "params": [
+    {
+     "name": "offset",
+     "kind": "number",
+     "range": "3-9px",
+     "default": "6px (board) / 5px (app) / 3px small"
+    },
+    {
+     "name": "blur",
+     "kind": "number",
+     "range": "7-20px",
+     "default": "13px (board) / 12px (app) / 7px small"
+    },
+    {
+     "name": "lightAngle",
+     "kind": "enum",
+     "range": "top-left only",
+     "default": "top-left"
+    },
+    {
+     "name": "hi",
+     "kind": "colour",
+     "range": "from light-pair-derivation",
+     "default": "--ab-hi"
+    },
+    {
+     "name": "lo",
+     "kind": "colour",
+     "range": "from light-pair-derivation",
+     "default": "--ab-lo"
+    },
+    {
+     "name": "darkRim",
+     "kind": "bool",
+     "range": "",
+     "default": "true in dark: inset 0 1px 0 rgba(255,255,255,.06) (board) / --sfk-rim .08 (app)"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "soft-form",
+     "where": "css/aesthetics/soft-form.css:10",
+     "variant": "--sf-raised: 6px 6px 13px lo, -6px -6px 13px hi, inset 0 1px 0 white@.06; --sf-raised-s 3px/7px"
+    },
+    {
+     "key": "soft-form",
+     "where": "css/aesthetics/soft-form.css:21",
+     "variant": "brand mark: 30px, radius 10, raised-s"
+    },
+    {
+     "key": "soft-form",
+     "where": "css/aesthetics/soft-form.css:95",
+     "variant": "apply key: raised-s, pressed = inset-s"
+    },
+    {
+     "key": "soft-form",
+     "where": "css/aesthetics/soft-form.css:263",
+     "variant": "app card: 22px radius, 5px 5px 12px lo / -5px -5px 12px hi, no border"
+    },
+    {
+     "key": "soft-form",
+     "where": "css/aesthetics/soft-form.css:48",
+     "variant": "art disc: 3.8cqw 4.4cqw 7.5cqw lo, -3cqw -3cqw 6.5cqw hi"
+    },
+    {
+     "key": "soft-form",
+     "where": "js/aesthetics/soft-form.js:121",
+     "variant": "materials[] Raised control: 6px 6px 13px / -6px -6px 13px"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [
+    "card",
+    "button",
+    "icon-button",
+    "stepper",
+    "dialog",
+    "calendar",
+    "menu"
+   ],
+   "conflictsWith": []
+  },
+  {
+   "id": "recessed-field",
+   "category": "material",
+   "name": "Recessed field / well (same-colour inset)",
+   "what": "The mirrored raised recipe with the shadow pair inset: fields, tracks, wells and sockets look pressed into the canvas.",
+   "params": [
+    {
+     "name": "offset",
+     "kind": "number",
+     "range": "2-9px",
+     "default": "6px board / 4px app / 3px small"
+    },
+    {
+     "name": "blur",
+     "kind": "number",
+     "range": "5-20px",
+     "default": "13px / 9px / 6px"
+    },
+    {
+     "name": "radius",
+     "kind": "number",
+     "range": "4-24px",
+     "default": "12px field, 22px well"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "soft-form",
+     "where": "css/aesthetics/soft-form.css:12",
+     "variant": "--sf-inset: inset 6px 6px 13px lo, inset -6px -6px 13px hi; --sf-inset-s 3px/6px"
+    },
+    {
+     "key": "soft-form",
+     "where": "css/aesthetics/soft-form.css:143",
+     "variant": ".ab-input: 12px radius, 15px padding, 1px transparent border, focus = primary-text border"
+    },
+    {
+     "key": "soft-form",
+     "where": "css/aesthetics/soft-form.css:194",
+     "variant": "list rows sit in one recessed well, 22px radius, flat inside"
+    },
+    {
+     "key": "soft-form",
+     "where": "css/aesthetics/soft-form.css:173",
+     "variant": "states row: recessed tray 22px, discs inside"
+    },
+    {
+     "key": "soft-form",
+     "where": "css/aesthetics/soft-form.css:289",
+     "variant": "app input: inset 4px 4px 9px lo / -4px -4px 9px hi"
+    },
+    {
+     "key": "soft-form",
+     "where": "js/aesthetics/soft-form.js:120",
+     "variant": "materials[] Recessed well 9px/20px and Recessed field 6px/13px"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [
+    "input",
+    "search",
+    "select",
+    "listbox",
+    "list",
+    "tray",
+    "wheel",
+    "accordion-open"
+   ],
+   "conflictsWith": []
+  },
+  {
+   "id": "light-pair-derivation",
+   "category": "colour",
+   "name": "Highlight / lowlight pair from the canvas",
+   "what": "Derive the two relief colours from the canvas: light = white at .79 alpha, shadow = canvas mixed 25% toward black at .6 alpha; dark mode lifts the highlight to .11 white and the shadow to black .53.",
+   "params": [
+    {
+     "name": "hiAlphaLight",
+     "kind": "number",
+     "range": "0.5-0.9",
+     "default": "0.79"
+    },
+    {
+     "name": "loMixBlack",
+     "kind": "number",
+     "range": "0-1",
+     "default": "0.25"
+    },
+    {
+     "name": "loAlphaLight",
+     "kind": "number",
+     "range": "0.4-0.8",
+     "default": "0.6"
+    },
+    {
+     "name": "hiAlphaDark",
+     "kind": "number",
+     "range": "0.06-0.2",
+     "default": "0.11"
+    },
+    {
+     "name": "loAlphaDark",
+     "kind": "number",
+     "range": "0.4-0.8",
+     "default": "0.53"
+    },
+    {
+     "name": "appDarkHi",
+     "kind": "number",
+     "range": "",
+     "default": "0.13"
+    },
+    {
+     "name": "appDarkLo",
+     "kind": "colour",
+     "range": "mix(#000, canvas, .85)@.8",
+     "default": ""
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "soft-form",
+     "where": "js/aesthetics/soft-form.js:55",
+     "variant": "hi/lo by isDark"
+    },
+    {
+     "key": "soft-form",
+     "where": "js/aesthetics/soft-form.js:92",
+     "variant": "app pair --sfk-hi/lo/rim: dark lifts hi to .13, deepens lo, adds 1px top rim .08"
+    }
+   ],
+   "expressibleAs": "tokens",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "clear-glass-panel",
+   "category": "material",
+   "name": "Iridescent clear glass panel",
+   "what": "A panel filled with canvas plus a 135deg gloss wash, bordered by a 1.5px iridescent ring (white, cyan, lilac, peach) drawn as a border-box gradient under the padding-box fill, with two inset white highlights and two soft corner tints.",
+   "params": [
+    {
+     "name": "ringStops",
+     "kind": "text",
+     "range": "white/cyan/lilac/peach at 125deg",
+     "default": "#ffffffdd,#ffffff55,#b6dce7aa,#d6b9edcc,#efcfbbcc,#ffffffaa"
+    },
+    {
+     "name": "ringWidth",
+     "kind": "number",
+     "range": "1-2px",
+     "default": "1.5px"
+    },
+    {
+     "name": "glossAlpha",
+     "kind": "number",
+     "range": "0.07 dark - 0.5 light",
+     "default": "--ab-gloss"
+    },
+    {
+     "name": "radius",
+     "kind": "number",
+     "range": "24px",
+     "default": "24px"
+    },
+    {
+     "name": "cornerTints",
+     "kind": "text",
+     "range": "lilac top-right, aqua bottom-left",
+     "default": ".24 alpha, 45-48% reach"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "soft-form",
+     "where": "css/aesthetics/soft-form.css:111",
+     "variant": ".ab-card: ring + gloss + canvas layers, inset 1px 1px 2px white@.5, 6px 9px 20px lo, -4px -4px 12px hi"
+    },
+    {
+     "key": "soft-form",
+     "where": "css/aesthetics/soft-form.css:120",
+     "variant": "::before radial tints"
+    },
+    {
+     "key": "soft-form",
+     "where": "css/aesthetics/soft-form.css:181",
+     "variant": "glass disc (state 3): 135deg multi-stop wash, inset 2px 2px 3px white@.75, inner ring 6px in"
+    },
+    {
+     "key": "soft-form",
+     "where": "js/aesthetics/soft-form.js:123",
+     "variant": "materials[] Glass panel"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [
+    "card-board-only"
+   ],
+   "conflictsWith": [
+    "soft-raised-relief on the same element"
+   ]
+  },
+  {
+   "id": "glossy-single-action",
+   "category": "material",
+   "name": "Glossy single primary action",
+   "what": "The one coloured control per view: primary fill with a 180deg white gloss fading by 55%, a 1px white-27% rim, an inset top highlight and a short drop shadow; press shifts 1px and sinks.",
+   "params": [
+    {
+     "name": "glossTop",
+     "kind": "number",
+     "range": ".15-.24",
+     "default": ".2 board / .2 app"
+    },
+    {
+     "name": "rim",
+     "kind": "number",
+     "range": "",
+     "default": "1px rgba(255,255,255,.27)"
+    },
+    {
+     "name": "radius",
+     "kind": "number",
+     "range": "10-12px",
+     "default": "10 board / 12 app"
+    },
+    {
+     "name": "shadow",
+     "kind": "text",
+     "range": "",
+     "default": "3px 5px 9px rgba(0,0,0,.16)"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "soft-form",
+     "where": "css/aesthetics/soft-form.css:134",
+     "variant": ".ab-cta, active = translateY(1px) scale(.99) + inset shadow"
+    },
+    {
+     "key": "soft-form",
+     "where": "css/aesthetics/soft-form.css:275",
+     "variant": "app: --sfk-gloss, 3px 4px 10px lo"
+    },
+    {
+     "key": "soft-form",
+     "where": "css/aesthetics/soft-form.css:55",
+     "variant": "primary swatch pad gets the same gloss"
+    },
+    {
+     "key": "soft-form",
+     "where": "js/aesthetics/soft-form.js:124",
+     "variant": "materials[] Primary action"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [
+    "button",
+    "fab",
+    "checkbox-on",
+    "radio-dot",
+    "knob-indicator",
+    "split-button"
+   ],
+   "conflictsWith": []
+  },
+  {
+   "id": "ink-filled-selected",
+   "category": "kit",
+   "name": "Ink-filled selected segment",
+   "what": "Segmented control: recessed track (radius 12-14, padding 5) holding buttons radius 9; the selected one is filled with ink, text in canvas, a short drop shadow.",
+   "params": [
+    {
+     "name": "trackRadius",
+     "kind": "number",
+     "range": "12-14",
+     "default": "12 board / 14 app"
+    },
+    {
+     "name": "segRadius",
+     "kind": "number",
+     "range": "9",
+     "default": "9"
+    },
+    {
+     "name": "shadow",
+     "kind": "text",
+     "range": "",
+     "default": "2px 3px 5px rgba(0,0,0,.16)"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "soft-form",
+     "where": "css/aesthetics/soft-form.css:127",
+     "variant": ".ab-seg recessed-s; pressed button = ink fill, weight 500"
+    },
+    {
+     "key": "soft-form",
+     "where": "css/aesthetics/soft-form.css:270",
+     "variant": "app seg: padding 5px, selected shadow 2px 2px 6px lo"
+    },
+    {
+     "key": "soft-form",
+     "where": "js/aesthetics/soft-form.js:125",
+     "variant": "materials[] Selected segment"
+    },
+    {
+     "key": "retro-futurist",
+     "where": "css/aesthetics/retro-futurist.css:101",
+     "variant": "selected = ink fill on hairline pill"
+    },
+    {
+     "key": "tab-stack",
+     "where": "css/aesthetics/tab-stack.css:144",
+     "variant": "selected pill = ink (--tb-sel-bg), on cards the card text colour"
+    },
+    {
+     "key": "riso-print",
+     "where": "css/aesthetics/riso-print.css:108",
+     "variant": "selected = halftone-dotted primary"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [
+    "segmented",
+    "tabs",
+    "calendar-day-selected",
+    "menu-item-selected"
+   ],
+   "conflictsWith": []
+  },
+  {
+   "id": "socketed-pad",
+   "category": "material",
+   "name": "Raised pad in a recessed socket",
+   "what": "A swatch or control drawn as a coloured raised pad (inset 5px, radius 9) seated in a recessed canvas socket (radius 14).",
+   "params": [
+    {
+     "name": "socketRadius",
+     "kind": "number",
+     "range": "",
+     "default": "14"
+    },
+    {
+     "name": "padInset",
+     "kind": "number",
+     "range": "",
+     "default": "5px"
+    },
+    {
+     "name": "padShadow",
+     "kind": "text",
+     "range": "",
+     "default": "2px 3px 5px lo, -1px -1px 3px hi, inset 0 1px 1px white@.28"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "soft-form",
+     "where": "css/aesthetics/soft-form.css:79",
+     "variant": ".ab-chip socket + ::after pad; primary pad glossy, canvas pad raised with 1px grey ring"
+    },
+    {
+     "key": "soft-form",
+     "where": "css/aesthetics/soft-form.css:305",
+     "variant": "checkbox: recessed socket + 1px ink@30% ring; knob dial raised"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [
+    "swatch",
+    "checkbox",
+    "radio",
+    "knob"
+   ],
+   "conflictsWith": []
+  },
+  {
+   "id": "recessed-track-slider",
+   "category": "kit",
+   "name": "Recessed track slider",
+   "what": "Slider = 8px recessed track (radius 4), fill in ink at 55% mixed over canvas, thumb a raised canvas disc (22-24px).",
+   "params": [
+    {
+     "name": "trackH",
+     "kind": "number",
+     "range": "",
+     "default": "8px"
+    },
+    {
+     "name": "fillInkMix",
+     "kind": "number",
+     "range": "",
+     "default": "55%"
+    },
+    {
+     "name": "thumb",
+     "kind": "number",
+     "range": "22-24px",
+     "default": "22 board / 24 app"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "soft-form",
+     "where": "css/aesthetics/soft-form.css:161",
+     "variant": "sf-slider markup injected by panels.panel; track top 8px, fill 62%"
+    },
+    {
+     "key": "soft-form",
+     "where": "css/aesthetics/soft-form.css:318",
+     "variant": "app: ::-webkit/-moz-range track gradient var(--v), thumb raised-s"
+    },
+    {
+     "key": "soft-form",
+     "where": "js/aesthetics/soft-form.js:127",
+     "variant": "materials[] Recessed slider"
+    },
+    {
+     "key": "retro-futurist",
+     "where": "css/aesthetics/retro-futurist.css:287",
+     "variant": "signal fill on unlit 6px track, hairline-ringed 24px thumb"
+    },
+    {
+     "key": "tab-stack",
+     "where": "css/aesthetics/tab-stack.css:707",
+     "variant": "ruled bar with tab-shaped thumb"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [
+    "slider",
+    "range"
+   ],
+   "conflictsWith": []
+  },
+  {
+   "id": "switch-knob",
+   "category": "kit",
+   "name": "Switch with knob",
+   "what": "Toggle = track plus a round knob; the on-state colour logic differs per style.",
+   "params": [
+    {
+     "name": "trackW",
+     "kind": "number",
+     "range": "",
+     "default": "50-54px"
+    },
+    {
+     "name": "trackStyle",
+     "kind": "enum",
+     "range": "recessed|outline|filled",
+     "default": "recessed"
+    },
+    {
+     "name": "knobOff",
+     "kind": "colour",
+     "range": "",
+     "default": "muted"
+    },
+    {
+     "name": "knobOn",
+     "kind": "colour",
+     "range": "",
+     "default": "primary"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "soft-form",
+     "where": "css/aesthetics/soft-form.css:149",
+     "variant": "recessed 50x29 track, glossy knob (145deg white wash over muted off / primary on), on-rim = primary mixed 45% toward ink"
+    },
+    {
+     "key": "retro-futurist",
+     "where": "css/aesthetics/retro-futurist.css:121",
+     "variant": "round knob, track fills with signal when on"
+    },
+    {
+     "key": "riso-print",
+     "where": "css/aesthetics/riso-print.css:134",
+     "variant": "54x30 ink-lined pill, fills primary when on"
+    },
+    {
+     "key": "tab-stack",
+     "where": "css/aesthetics/tab-stack.css:173",
+     "variant": "54x32 outlined pill, thumb grows 18 to 24 when on"
+    },
+    {
+     "key": "tonal-shape",
+     "where": "css/aesthetics/tonal-shape.css:143",
+     "variant": "52x32 tonal-high track with outline, primary on"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [
+    "switch"
+   ],
+   "conflictsWith": []
+  },
+  {
+   "id": "card-surface",
+   "category": "kit",
+   "name": "Card surface",
+   "what": "The card/panel container recipe: fill, edge, shadow and radius chosen per style.",
+   "params": [
+    {
+     "name": "fill",
+     "kind": "enum",
+     "range": "canvas|panel-mix|paper|card-colour|tone-low",
+     "default": "canvas"
+    },
+    {
+     "name": "edge",
+     "kind": "enum",
+     "range": "none|hairline|ink-line|ring",
+     "default": "none"
+    },
+    {
+     "name": "shadow",
+     "kind": "enum",
+     "range": "relief|hard-plate|none",
+     "default": "relief"
+    },
+    {
+     "name": "radius",
+     "kind": "number",
+     "range": "2-28px",
+     "default": "24"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "soft-form",
+     "where": "css/aesthetics/soft-form.css:111",
+     "variant": "glass card on board; raised card in app"
+    },
+    {
+     "key": "retro-futurist",
+     "where": "css/aesthetics/retro-futurist.css:86",
+     "variant": "panel-mix fill, 1px hairline inset ring, 22px radius, 3-stripe top edge"
+    },
+    {
+     "key": "riso-print",
+     "where": "css/aesthetics/riso-print.css:103",
+     "variant": "paper-card, 1.5px ink line, 4px radius, 4px 3px 0 plate shadow"
+    },
+    {
+     "key": "tab-stack",
+     "where": "css/aesthetics/tab-stack.css:35",
+     "variant": "card colour fill, no border or shadow, 24px, re-points ink tokens"
+    },
+    {
+     "key": "tonal-shape",
+     "where": "css/aesthetics/tonal-shape.css:98",
+     "variant": "tn-low tone fill, no border/shadow, 28px"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [
+    "card",
+    "panel",
+    "dialog",
+    "sheet"
+   ],
+   "conflictsWith": []
+  },
+  {
+   "id": "field-surface",
+   "category": "kit",
+   "name": "Input field surface",
+   "what": "Text field look: fill, edge and focus treatment.",
+   "params": [
+    {
+     "name": "style",
+     "kind": "enum",
+     "range": "recessed|hairline|ink-line|slot-with-tab|outline",
+     "default": "recessed"
+    },
+    {
+     "name": "radius",
+     "kind": "number",
+     "range": "",
+     "default": "12"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "soft-form",
+     "where": "css/aesthetics/soft-form.css:143",
+     "variant": "recessed field"
+    },
+    {
+     "key": "retro-futurist",
+     "where": "css/aesthetics/retro-futurist.css:113",
+     "variant": "hairline field, focus = ink inset + 2px signal ring"
+    },
+    {
+     "key": "riso-print",
+     "where": "css/aesthetics/riso-print.css:128",
+     "variant": "ink-lined field, focus = 3px 2px 0 secondary plate"
+    },
+    {
+     "key": "tab-stack",
+     "where": "css/aesthetics/tab-stack.css:679",
+     "variant": "kit: index slot, 2px ink rule, square top-left corner, label as tab"
+    },
+    {
+     "key": "tonal-shape",
+     "where": "css/aesthetics/tonal-shape.css:137",
+     "variant": "outline field, 2px tonal-text focus ring"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [
+    "input",
+    "search",
+    "select"
+   ],
+   "conflictsWith": []
+  },
+  {
+   "id": "corner-radius",
+   "category": "material",
+   "name": "Corner radius scale",
+   "what": "A per-style radius vocabulary for card, control, small container and pill.",
+   "params": [
+    {
+     "name": "card",
+     "kind": "number",
+     "range": "2-28px",
+     "default": "24"
+    },
+    {
+     "name": "control",
+     "kind": "number",
+     "range": "2-12px",
+     "default": "10"
+    },
+    {
+     "name": "small",
+     "kind": "number",
+     "range": "4-12px",
+     "default": "12"
+    },
+    {
+     "name": "pill",
+     "kind": "number",
+     "range": "0-999px",
+     "default": "n/a"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "soft-form",
+     "where": "css/aesthetics/soft-form.css:14",
+     "variant": "24 card, 22 wells, 12 fields, 10 buttons, 9 selected segment"
+    },
+    {
+     "key": "retro-futurist",
+     "where": "css/aesthetics/retro-futurist.css:10",
+     "variant": "4px board, 22px panels, 999 pills, 0 chips/lamps squares"
+    },
+    {
+     "key": "riso-print",
+     "where": "css/aesthetics/riso-print.css:9",
+     "variant": "6px board, 2-4px parts"
+    },
+    {
+     "key": "tab-stack",
+     "where": "css/aesthetics/tab-stack.css:21",
+     "variant": "--tb-r 24, 999 pills, kit asymmetric 0 16 16 16"
+    },
+    {
+     "key": "tonal-shape",
+     "where": "css/aesthetics/tonal-shape.css:18",
+     "variant": "--tn-pill 28, card 28, small 12, snap 12"
+    }
+   ],
+   "expressibleAs": "tokens",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "tinted-neutral-canvas",
+   "category": "colour",
+   "name": "Canvas derived from brand + neutral",
+   "what": "The ground colour is computed, not taken raw: mixed toward ink, pure white, a fixed paper, or tinted with the primary hue.",
+   "params": [
+    {
+     "name": "mode",
+     "kind": "enum",
+     "range": "pull-from-ink|white-mix|fixed-paper|hue-tint|sage-charcoal",
+     "default": "pull-from-ink"
+    },
+    {
+     "name": "mixAmount",
+     "kind": "number",
+     "range": "0.04-0.15",
+     "default": "0.06 light / 0.04 dark"
+    },
+    {
+     "name": "fixed",
+     "kind": "colour",
+     "range": "",
+     "default": "#F4EBDA riso paper"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "soft-form",
+     "where": "js/aesthetics/soft-form.js:50",
+     "variant": "canvas = mix(ink, canvas, .06 light / .04 dark)"
+    },
+    {
+     "key": "retro-futurist",
+     "where": "js/aesthetics/retro-futurist.js:207",
+     "variant": "light = mix(#fff, canvas, .15); dark #08090b; never tinted by primary"
+    },
+    {
+     "key": "riso-print",
+     "where": "js/aesthetics/riso-print.js:72",
+     "variant": "fixed cream paper #F4EBDA in light, null (brand) in dark"
+    },
+    {
+     "key": "tab-stack",
+     "where": "js/aesthetics/tab-stack.js:134",
+     "variant": "dark: charcoal hsl(primary hue, 8, 11.5), light: sage hsl(140+25% hue delta,12,87), both nudged to 7:1 vs ink"
+    },
+    {
+     "key": "tonal-shape",
+     "where": "js/aesthetics/tonal-shape.js:188",
+     "variant": "4% (light) / 6% (dark) tint of tsTone(primary) over canvas"
+    }
+   ],
+   "expressibleAs": "tokens",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "contrast-floor-search",
+   "category": "colour",
+   "name": "Contrast-floor colour search",
+   "what": "Walk a colour (mix toward ink, or lightness steps) until it holds a target contrast on a list of grounds; used for muted text, signal colour, highlight word, on-container text.",
+   "params": [
+    {
+     "name": "target",
+     "kind": "number",
+     "range": "3-7",
+     "default": "4.6"
+    },
+    {
+     "name": "method",
+     "kind": "enum",
+     "range": "mix-toward-ink|lightness-walk",
+     "default": "mix-toward-ink"
+    },
+    {
+     "name": "grounds",
+     "kind": "text",
+     "range": "list of surfaces",
+     "default": "canvas + container surfaces"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "soft-form",
+     "where": "js/aesthetics/soft-form.js:66",
+     "variant": "strongMuted 4.6:1 on panel; mutedAA 4.6 on canvas/panel/ink-tint; highlight word shaded to 3:1"
+    },
+    {
+     "key": "retro-futurist",
+     "where": "js/aesthetics/retro-futurist.js:19",
+     "variant": "signalOf: primary mixed toward ink until 3:1"
+    },
+    {
+     "key": "riso-print",
+     "where": "js/aesthetics/riso-print.js:76",
+     "variant": "muted 4.7:1 on sidebar tint"
+    },
+    {
+     "key": "tab-stack",
+     "where": "js/aesthetics/tab-stack.js:55",
+     "variant": "tbPush lightness walk to 4.6; tbCard raises lightness to 7:1 on near-black"
+    },
+    {
+     "key": "tonal-shape",
+     "where": "js/aesthetics/tonal-shape.js:116",
+     "variant": "tsDeep on-container text 7:1; printPrimary 3:1"
+    }
+   ],
+   "expressibleAs": "needs-code",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [
+    "every text token"
+   ],
+   "conflictsWith": []
+  },
+  {
+   "id": "highlight-word-treatment",
+   "category": "type",
+   "name": "Headline highlight word",
+   "what": "How the one accent word in the headline is marked.",
+   "params": [
+    {
+     "name": "mode",
+     "kind": "enum",
+     "range": "shaded-text|flat-signal|hand-ring|tab-behind|ink",
+     "default": "shaded-text"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "soft-form",
+     "where": "js/aesthetics/soft-form.js:34",
+     "variant": "shaded text, no band; falls back to shaded primary if accent is yellow/amber (see remainder)"
+    },
+    {
+     "key": "retro-futurist",
+     "where": "css/aesthetics/retro-futurist.css:66",
+     "variant": "flat signal colour, no glow or band"
+    },
+    {
+     "key": "riso-print",
+     "where": "css/aesthetics/riso-print.css:69",
+     "variant": "hand-drawn tilted ring in fluorescent accent + faint second pass, multiply"
+    },
+    {
+     "key": "tab-stack",
+     "where": "css/aesthetics/tab-stack.css:79",
+     "variant": "word on its own small colour tab, 0.18em corners"
+    },
+    {
+     "key": "tonal-shape",
+     "where": "js/aesthetics/tonal-shape.js:156",
+     "variant": "highlight: ink"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "tight-display-tracking",
+   "category": "type",
+   "name": "Tight display headline",
+   "what": "Large headline with negative tracking and tight leading.",
+   "params": [
+    {
+     "name": "tracking",
+     "kind": "number",
+     "range": "-0.02 to -0.05em",
+     "default": "-0.045em"
+    },
+    {
+     "name": "lineHeight",
+     "kind": "number",
+     "range": "0.85-1",
+     "default": "0.95"
+    },
+    {
+     "name": "weight",
+     "kind": "number",
+     "range": "600-800",
+     "default": "600"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "soft-form",
+     "where": "css/aesthetics/soft-form.css:35",
+     "variant": "weight 600, -.045em, lh .95, word-spacing .04em"
+    },
+    {
+     "key": "riso-print",
+     "where": "css/aesthetics/riso-print.css:60",
+     "variant": "weight 800, -.035em, lh .88, uppercase"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "caps-mono-labels",
+   "category": "type",
+   "name": "Tracked caps / mono labels",
+   "what": "Small labels in tracked uppercase, optionally in a mono face.",
+   "params": [
+    {
+     "name": "tracking",
+     "kind": "number",
+     "range": "0.06-0.36em",
+     "default": "0.14em"
+    },
+    {
+     "name": "face",
+     "kind": "enum",
+     "range": "body|mono",
+     "default": "body"
+    },
+    {
+     "name": "size",
+     "kind": "number",
+     "range": "8.5-12px",
+     "default": "10"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "soft-form",
+     "where": "css/aesthetics/soft-form.css:29",
+     "variant": "tag .14em, kicker .17em (micro labels, TE/Braun scale contrast)"
+    },
+    {
+     "key": "retro-futurist",
+     "where": "css/aesthetics/retro-futurist.css:19",
+     "variant": "mono uppercase .12-.18em, labels numbered"
+    },
+    {
+     "key": "riso-print",
+     "where": "css/aesthetics/riso-print.css:36",
+     "variant": "tracked caps .1em, zine captions"
+    },
+    {
+     "key": "tab-stack",
+     "where": "css/aesthetics/tab-stack.css:73",
+     "variant": "mono body face for details, labels uppercase"
+    },
+    {
+     "key": "tonal-shape",
+     "where": "css/aesthetics/tonal-shape.css:51",
+     "variant": "COUNTER: sentence-case labels, no caps"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "stretched-display",
+   "category": "type",
+   "name": "Extended grotesk display",
+   "what": "Headline/brand/card titles in the brand heading face (recommended wide face) uppercase, weight picked as nearest published <=700.",
+   "params": [
+    {
+     "name": "case",
+     "kind": "enum",
+     "range": "upper",
+     "default": "upper"
+    },
+    {
+     "name": "weight",
+     "kind": "number",
+     "range": "",
+     "default": "abWeight(heading,700)"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "retro-futurist",
+     "where": "css/aesthetics/retro-futurist.css:31",
+     "variant": "brand, card title, headline in --rf-ext"
+    },
+    {
+     "key": "retro-futurist",
+     "where": "js/aesthetics/retro-futurist.js:228",
+     "variant": "--rf-hw weight resolution"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "condensed-caps-display",
+   "category": "type",
+   "name": "Condensed capitals display",
+   "what": "Headings and UI names in condensed capitals at weight 800; details in the mono body face.",
+   "params": [
+    {
+     "name": "weight",
+     "kind": "number",
+     "range": "",
+     "default": "abWeightNear(heading,800)"
+    },
+    {
+     "name": "case",
+     "kind": "enum",
+     "range": "upper",
+     "default": "upper"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "tab-stack",
+     "where": "css/aesthetics/tab-stack.css:63",
+     "variant": "headline, card title, brand"
+    },
+    {
+     "key": "tab-stack",
+     "where": "js/aesthetics/tab-stack.js:187",
+     "variant": "--ab-hw 800"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "hairline-rule",
+   "category": "material",
+   "name": "Hairline / dashed rule",
+   "what": "Thin divider lines, solid or dashed, at tinted ink.",
+   "params": [
+    {
+     "name": "style",
+     "kind": "enum",
+     "range": "solid|dashed",
+     "default": "solid"
+    },
+    {
+     "name": "weight",
+     "kind": "number",
+     "range": "1-2px",
+     "default": "1px"
+    },
+    {
+     "name": "alpha",
+     "kind": "number",
+     "range": ".08-.18",
+     "default": ".18"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "retro-futurist",
+     "where": "css/aesthetics/retro-futurist.css:41",
+     "variant": "1px at ink .18; list top 2px ink; label rows"
+    },
+    {
+     "key": "riso-print",
+     "where": "css/aesthetics/riso-print.css:40",
+     "variant": "1.5px dashed ink under every label row, rows and foot"
+    },
+    {
+     "key": "soft-form",
+     "where": "css/aesthetics/soft-form.css:64",
+     "variant": "type-col top rule as inset 1px tint"
+    },
+    {
+     "key": "tab-stack",
+     "where": "css/aesthetics/tab-stack.css:92",
+     "variant": "rule = ab-line"
+    },
+    {
+     "key": "tonal-shape",
+     "where": "css/aesthetics/tonal-shape.css:48",
+     "variant": "rule = ab-line"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "hard-offset-shadow",
+   "category": "material",
+   "name": "Hard offset plate shadow",
+   "what": "A zero-blur offset shadow in a second ink colour behind a card, chip or button.",
+   "params": [
+    {
+     "name": "x",
+     "kind": "number",
+     "range": "2-5px",
+     "default": "4px"
+    },
+    {
+     "name": "y",
+     "kind": "number",
+     "range": "1.5-4px",
+     "default": "3px"
+    },
+    {
+     "name": "colour",
+     "kind": "colour",
+     "range": "secondary x canvas (multiply)",
+     "default": "--ab-plate"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "riso-print",
+     "where": "css/aesthetics/riso-print.css:103",
+     "variant": "card 4px 3px 0 plate; panel 3px 2px 0; chips 2px 1.5px 0"
+    },
+    {
+     "key": "riso-print",
+     "where": "css/aesthetics/riso-print.css:186",
+     "variant": "combined box-shadow override with kit"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [
+    "card",
+    "chip",
+    "tag",
+    "icon-button",
+    "side-sheet"
+   ],
+   "conflictsWith": []
+  },
+  {
+   "id": "overprint-multiply",
+   "category": "colour",
+   "name": "Overprint (multiply blend, off-register)",
+   "what": "A second ink drawn with mix-blend-mode multiply (screen in dark) and shifted a few px so overlaps print a third colour.",
+   "params": [
+    {
+     "name": "offsetX",
+     "kind": "number",
+     "range": "0-5px",
+     "default": "3px"
+    },
+    {
+     "name": "offsetY",
+     "kind": "number",
+     "range": "0-4px",
+     "default": "2px"
+    },
+    {
+     "name": "blend",
+     "kind": "enum",
+     "range": "multiply|screen",
+     "default": "multiply"
+    },
+    {
+     "name": "pressedOffset",
+     "kind": "number",
+     "range": "0",
+     "default": "0px on press"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "riso-print",
+     "where": "css/aesthetics/riso-print.css:111",
+     "variant": ".ab-cta::after offset outline in secondary; hover 5,4; press 0,0 (inks register)"
+    },
+    {
+     "key": "riso-print",
+     "where": "css/aesthetics/riso-print.css:50",
+     "variant": ".ab-mark::after offset ring"
+    },
+    {
+     "key": "riso-print",
+     "where": "js/aesthetics/riso-print.js:109",
+     "variant": "art shapes use mix-blend-mode multiply"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": false,
+   "appSafe": true,
+   "kitScope": [
+    "button",
+    "mark"
+   ],
+   "conflictsWith": []
+  },
+  {
+   "id": "grain-overlay",
+   "category": "material",
+   "name": "Paper grain overlay",
+   "what": "feTurbulence noise as an inline SVG data URI over the page (0.6x opacity) and over cards (full), blend multiply or screen.",
+   "params": [
+    {
+     "name": "baseFrequency",
+     "kind": "number",
+     "range": ".85",
+     "default": ".85"
+    },
+    {
+     "name": "octaves",
+     "kind": "number",
+     "range": "2",
+     "default": "2"
+    },
+    {
+     "name": "opacity",
+     "kind": "number",
+     "range": ".28-.3",
+     "default": ".3"
+    },
+    {
+     "name": "tile",
+     "kind": "number",
+     "range": "240px",
+     "default": "240"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "riso-print",
+     "where": "css/aesthetics/riso-print.css:15",
+     "variant": "page grain z0 behind content; cards/art-cards carry own grain"
+    },
+    {
+     "key": "riso-print",
+     "where": "css/aesthetics/riso-print.css:239",
+     "variant": "app screens drop the grain (tiling seams)"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": false,
+   "appSafe": false,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "halftone-dots",
+   "category": "pattern",
+   "name": "Halftone dot screen",
+   "what": "Radial-gradient dot grid used as fill, progress, sidebar foot and chart base; dot size carries the shade.",
+   "params": [
+    {
+     "name": "cell",
+     "kind": "number",
+     "range": "4-6px",
+     "default": "4px"
+    },
+    {
+     "name": "dot",
+     "kind": "number",
+     "range": ".9-1.65px",
+     "default": "1.25"
+    },
+    {
+     "name": "angle",
+     "kind": "number",
+     "range": "rotate 20deg in art",
+     "default": "20"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "riso-print",
+     "where": "css/aesthetics/riso-print.css:38",
+     "variant": "--rz-ink-dot speck on solid ink blocks (CTA, selected segment)"
+    },
+    {
+     "key": "riso-print",
+     "where": "css/aesthetics/riso-print.css:159",
+     "variant": "progress fill = primary dots"
+    },
+    {
+     "key": "riso-print",
+     "where": "css/aesthetics/riso-print.css:195",
+     "variant": "sidebar foot halftone fading up"
+    },
+    {
+     "key": "riso-print",
+     "where": "js/aesthetics/riso-print.js:125",
+     "variant": "art SVG pattern, rotate 20, r 1.05 in 3.4 cell"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": false,
+   "appSafe": true,
+   "kitScope": [
+    "progress",
+    "sidebar",
+    "chart"
+   ],
+   "conflictsWith": []
+  },
+  {
+   "id": "duotone-ink",
+   "category": "colour",
+   "name": "Two-ink duotone",
+   "what": "Primary and secondary treated as two printing inks (cards swap bg/ink, shapes print in the other ink).",
+   "params": [
+    {
+     "name": "ink1",
+     "kind": "colour",
+     "range": "primary",
+     "default": ""
+    },
+    {
+     "name": "ink2",
+     "kind": "colour",
+     "range": "secondary",
+     "default": ""
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "riso-print",
+     "where": "js/aesthetics/riso-print.js:110",
+     "variant": "art cards: bg/ink pairs (primary,secondary) (secondary,primary) (fluoro,primary)"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "fixed-spot-ink",
+   "category": "colour",
+   "name": "Fixed fluorescent spot ink",
+   "what": "The client accent is replaced by a fixed fluorescent ink (pink, or orange if the primary hue is red/pink), used tiny; app screens revert to the real accent.",
+   "params": [
+    {
+     "name": "pink",
+     "kind": "colour",
+     "range": "",
+     "default": "#FF48B0"
+    },
+    {
+     "name": "orange",
+     "kind": "colour",
+     "range": "",
+     "default": "#FF7A1A"
+    },
+    {
+     "name": "swapHueRange",
+     "kind": "text",
+     "range": ">=300 or <=20",
+     "default": ""
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "riso-print",
+     "where": "js/aesthetics/riso-print.js:18",
+     "variant": "rzFluoro(t)"
+    },
+    {
+     "key": "riso-print",
+     "where": "css/aesthetics/riso-print.css:234",
+     "variant": "app screens use --ab-accent-ink instead"
+    }
+   ],
+   "expressibleAs": "tokens",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "tilted-stamp-label",
+   "category": "ornament",
+   "name": "Tilted stamped label",
+   "what": "Tags, kicker and statuses boxed in an ink line and rotated 1.5-2 degrees like rubber stamps.",
+   "params": [
+    {
+     "name": "rotation",
+     "kind": "number",
+     "range": "-2 to 1.5deg",
+     "default": "-2"
+    },
+    {
+     "name": "border",
+     "kind": "text",
+     "range": "",
+     "default": "1.5px ink"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "riso-print",
+     "where": "css/aesthetics/riso-print.css:51",
+     "variant": "tag -1.5deg"
+    },
+    {
+     "key": "riso-print",
+     "where": "css/aesthetics/riso-print.css:55",
+     "variant": "kicker -2deg on primary tint"
+    },
+    {
+     "key": "riso-print",
+     "where": "css/aesthetics/riso-print.css:157",
+     "variant": "second row status 1.5deg"
+    },
+    {
+     "key": "riso-print",
+     "where": "css/aesthetics/riso-print.css:191",
+     "variant": "delta chip -1.5deg"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [
+    "tag",
+    "badge"
+   ],
+   "conflictsWith": []
+  },
+  {
+   "id": "catalogue-number",
+   "category": "ornament",
+   "name": "Catalogue / section numbering",
+   "what": "Section labels and cards carry manual-style numbers (1.2, NO. 03, 01 /).",
+   "params": [
+    {
+     "name": "format",
+     "kind": "text",
+     "range": "1.2 | NO. 0{n} | 01 /",
+     "default": ""
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "retro-futurist",
+     "where": "css/aesthetics/retro-futurist.css:43",
+     "variant": "1.2/1.3/... set per section; rows 1.5."
+    },
+    {
+     "key": "riso-print",
+     "where": "js/aesthetics/riso-print.js:130",
+     "variant": "art card stamp NO. 0n"
+    },
+    {
+     "key": "tab-stack",
+     "where": "css/aesthetics/tab-stack.css:77",
+     "variant": ".ab-n \"01 /\""
+    },
+    {
+     "key": "tonal-shape",
+     "where": "css/aesthetics/tonal-shape.css:53",
+     "variant": ".ab-n \"01 · \""
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "three-stripe-band",
+   "category": "ornament",
+   "name": "Three-stripe band rule",
+   "what": "An 8px band of three thin stripes (signal, secondary, accent) used as board rule, card top edge and cover foot.",
+   "params": [
+    {
+     "name": "stripeHeights",
+     "kind": "text",
+     "range": "",
+     "default": "2,2,2 with 1px gaps"
+    },
+    {
+     "name": "colours",
+     "kind": "colour",
+     "range": "primary,secondary,accent",
+     "default": ""
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "retro-futurist",
+     "where": "css/aesthetics/retro-futurist.css:11",
+     "variant": "--rf-stripes gradient"
+    },
+    {
+     "key": "retro-futurist",
+     "where": "css/aesthetics/retro-futurist.css:37",
+     "variant": ".ab-rule 8px"
+    },
+    {
+     "key": "retro-futurist",
+     "where": "css/aesthetics/retro-futurist.css:92",
+     "variant": "card/panel ::before 8px"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [
+    "rule",
+    "card-top"
+   ],
+   "conflictsWith": []
+  },
+  {
+   "id": "single-signal-colour",
+   "category": "colour",
+   "name": "Ink plus one signal colour",
+   "what": "Everything is ink; the primary (lifted to 3:1) is the only chromatic mark; a hot orange only for alerts.",
+   "params": [
+    {
+     "name": "signal",
+     "kind": "colour",
+     "range": "primary lifted to 3:1",
+     "default": ""
+    },
+    {
+     "name": "hot",
+     "kind": "colour",
+     "range": "",
+     "default": "#D93A12 / #FF7A4D dark"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "retro-futurist",
+     "where": "js/aesthetics/retro-futurist.js:211",
+     "variant": "--ab-rf-signal, --ab-rf-hot, --ab-rf-off, --ab-rf-panel"
+    },
+    {
+     "key": "soft-form",
+     "where": "js/aesthetics/soft-form.js:89",
+     "variant": "colour only on primary action and switch knob (rule, not tokens)"
+    }
+   ],
+   "expressibleAs": "tokens",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "mono-plus-accent",
+   "category": "colour",
+   "name": "Mono ink plus accent",
+   "what": "A near-monochrome board where one colour (primary) carries action.",
+   "params": [
+    {
+     "name": "accent",
+     "kind": "colour",
+     "range": "primary",
+     "default": ""
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "retro-futurist",
+     "where": "css/aesthetics/retro-futurist.css:104",
+     "variant": "signal pill key"
+    },
+    {
+     "key": "soft-form",
+     "where": "css/aesthetics/soft-form.css:134",
+     "variant": "primary only on glossy CTA and switch"
+    }
+   ],
+   "expressibleAs": "tokens",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "pill-button",
+   "category": "kit",
+   "name": "Pill button",
+   "what": "Fully round main button, with a bottom bar, arrow chip or squish depending on the style.",
+   "params": [
+    {
+     "name": "height",
+     "kind": "number",
+     "range": "42-52px",
+     "default": "52"
+    },
+    {
+     "name": "edge",
+     "kind": "enum",
+     "range": "bottom-bar|none|arrow-chip",
+     "default": "none"
+    },
+    {
+     "name": "press",
+     "kind": "enum",
+     "range": "sink|squish|scale",
+     "default": "sink"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "retro-futurist",
+     "where": "css/aesthetics/retro-futurist.css:104",
+     "variant": "999 radius, inset 0 -3px 0 black@.25 key edge, active translateY(2px)"
+    },
+    {
+     "key": "tab-stack",
+     "where": "css/aesthetics/tab-stack.css:149",
+     "variant": "pill with 32px circular arrow chip, hover lift 2px, active scale .97"
+    },
+    {
+     "key": "tonal-shape",
+     "where": "css/aesthetics/tonal-shape.css:118",
+     "variant": "28px pill, hover/press colours, press squishes corner to 12px"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [
+    "button"
+   ],
+   "conflictsWith": []
+  },
+  {
+   "id": "squish-corner-press",
+   "category": "motion",
+   "name": "Squish-on-press corner",
+   "what": "Pill corners animate from 28px to 12px on press with an overshoot easing (cubic-bezier(.34,1.56,.64,1), .18s); reduced motion snaps.",
+   "params": [
+    {
+     "name": "rest",
+     "kind": "number",
+     "range": "",
+     "default": "28px"
+    },
+    {
+     "name": "pressed",
+     "kind": "number",
+     "range": "",
+     "default": "12px"
+    },
+    {
+     "name": "ease",
+     "kind": "text",
+     "range": "",
+     "default": "cubic-bezier(0.34,1.56,0.64,1)"
+    },
+    {
+     "name": "duration",
+     "kind": "number",
+     "range": "",
+     "default": "0.18s"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "tonal-shape",
+     "where": "css/aesthetics/tonal-shape.css:92",
+     "variant": "apply button transition"
+    },
+    {
+     "key": "tonal-shape",
+     "where": "css/aesthetics/tonal-shape.css:125",
+     "variant": "cta active = --tn-snap"
+    },
+    {
+     "key": "tonal-shape",
+     "where": "css/aesthetics/tonal-shape.css:216",
+     "variant": "deck specimen"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [
+    "button",
+    "chip"
+   ],
+   "conflictsWith": []
+  },
+  {
+   "id": "press-state-motion",
+   "category": "motion",
+   "name": "Press / hover state motion",
+   "what": "The pressed state is a small physical move, different per style.",
+   "params": [
+    {
+     "name": "kind",
+     "kind": "enum",
+     "range": "sink-inset|translate-down|pull-up|scale|register",
+     "default": "sink-inset"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "soft-form",
+     "where": "css/aesthetics/soft-form.css:139",
+     "variant": "translateY(1px) scale(.99) + inset shadow; app parts sink to inset-s"
+    },
+    {
+     "key": "retro-futurist",
+     "where": "css/aesthetics/retro-futurist.css:111",
+     "variant": "translateY(2px), edge thinner"
+    },
+    {
+     "key": "riso-print",
+     "where": "css/aesthetics/riso-print.css:121",
+     "variant": "hover: second ink drifts to 5,4; press: registers 0,0 and shifts 2,1"
+    },
+    {
+     "key": "tab-stack",
+     "where": "css/aesthetics/tab-stack.css:194",
+     "variant": "rows hover pull up 4px; kit selected tab up 4px, press up 3px, buttons scale .97"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [
+    "button",
+    "row",
+    "tab"
+   ],
+   "conflictsWith": []
+  },
+  {
+   "id": "named-states",
+   "category": "kit",
+   "name": "Three named states row",
+   "what": "The board shows three states in a row (discs or buttons), named per style.",
+   "params": [
+    {
+     "name": "names",
+     "kind": "text",
+     "range": "3 labels",
+     "default": "Raised/Recessed/Glass"
+    },
+    {
+     "name": "kind",
+     "kind": "enum",
+     "range": "swatch|button",
+     "default": "swatch"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "soft-form",
+     "where": "js/aesthetics/soft-form.js:22",
+     "variant": "states are the three materials (raised, recessed, glass discs 84px)"
+    },
+    {
+     "key": "retro-futurist",
+     "where": "js/aesthetics/retro-futurist.js:165",
+     "variant": "Idle/Armed/Engaged as lamps, signal glow 9px on engaged"
+    },
+    {
+     "key": "riso-print",
+     "where": "js/aesthetics/riso-print.js:34",
+     "variant": "Rest/Hover/Pressed buttons"
+    },
+    {
+     "key": "tab-stack",
+     "where": "js/aesthetics/tab-stack.js:72",
+     "variant": "Rest/Hover/Pressed buttons"
+    },
+    {
+     "key": "tonal-shape",
+     "where": "js/aesthetics/tonal-shape.js:134",
+     "variant": "Rest/Hover/Pressed buttons"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "progress-bar-fill",
+   "category": "kit",
+   "name": "Progress bar",
+   "what": "Progress as a channel plus fill; fill and channel style per aesthetic.",
+   "params": [
+    {
+     "name": "channel",
+     "kind": "enum",
+     "range": "recessed|flat|hairline",
+     "default": "flat"
+    },
+    {
+     "name": "fill",
+     "kind": "enum",
+     "range": "ink-55|segments|halftone|solid|on-ink",
+     "default": "solid"
+    },
+    {
+     "name": "height",
+     "kind": "number",
+     "range": "6-11px",
+     "default": "8"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "soft-form",
+     "where": "css/aesthetics/soft-form.css:201",
+     "variant": "10px recessed channel, 6px ink fill at .55"
+    },
+    {
+     "key": "retro-futurist",
+     "where": "css/aesthetics/retro-futurist.css:153",
+     "variant": "LED ladder: repeating 9px lit / 3px gap segments, unlit in ink@.15"
+    },
+    {
+     "key": "riso-print",
+     "where": "css/aesthetics/riso-print.css:158",
+     "variant": "11px ink-lined channel, halftone primary dots, ink right edge"
+    },
+    {
+     "key": "tab-stack",
+     "where": "css/aesthetics/tab-stack.css:199",
+     "variant": "8px pill, tinted channel, on-colour fill"
+    },
+    {
+     "key": "tonal-shape",
+     "where": "css/aesthetics/tonal-shape.css:169",
+     "variant": "8px pill, tn-high channel, primary fill"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [
+    "progress"
+   ],
+   "conflictsWith": []
+  },
+  {
+   "id": "list-row-container",
+   "category": "kit",
+   "name": "List / row container",
+   "what": "How rows are grouped and separated.",
+   "params": [
+    {
+     "name": "container",
+     "kind": "enum",
+     "range": "recessed-well|spec-table|dashed|fanned-tabs|tonal-rows",
+     "default": "recessed-well"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "soft-form",
+     "where": "css/aesthetics/soft-form.css:194",
+     "variant": "rows flat inside one recessed well"
+    },
+    {
+     "key": "retro-futurist",
+     "where": "css/aesthetics/retro-futurist.css:136",
+     "variant": "spec table: 2px ink top rule, hairlines, log header row"
+    },
+    {
+     "key": "riso-print",
+     "where": "css/aesthetics/riso-print.css:148",
+     "variant": "dashed rules between rows, stamped statuses"
+    },
+    {
+     "key": "tab-stack",
+     "where": "css/aesthetics/tab-stack.css:181",
+     "variant": "board rows are overlapped colour tabs (margin-top -18)"
+    },
+    {
+     "key": "tonal-shape",
+     "where": "css/aesthetics/tonal-shape.css:154",
+     "variant": "grid gap 8, tonal rows with signature-shape avatar"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [
+    "list",
+    "row"
+   ],
+   "conflictsWith": []
+  },
+  {
+   "id": "colour-card-scope",
+   "category": "layout",
+   "name": "Colour card scope (token re-pointing)",
+   "what": "A card carries a fill from a cycled five-colour set and re-points ink, muted, primary and canvas tokens so everything inside reads in one near-black.",
+   "params": [
+    {
+     "name": "fillSequence",
+     "kind": "text",
+     "range": "a,b,c,d,e by nth-child",
+     "default": "a..e"
+    },
+    {
+     "name": "onColour",
+     "kind": "colour",
+     "range": "hsl(primary hue,<=26,7)",
+     "default": ""
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "tab-stack",
+     "where": "css/aesthetics/tab-stack.css:35",
+     "variant": "card/panel re-point --ab-ink, --ab-primary, --ab-canvas to on/on-dark"
+    },
+    {
+     "key": "tab-stack",
+     "where": "css/aesthetics/tab-stack.css:51",
+     "variant": "stats/feature/plan grids take colours in order"
+    },
+    {
+     "key": "tab-stack",
+     "where": "css/aesthetics/tab-stack.css:189",
+     "variant": "rows 5n+1..5n+5"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [
+    "card",
+    "row",
+    "stat"
+   ],
+   "conflictsWith": []
+  },
+  {
+   "id": "card-colour-set",
+   "category": "colour",
+   "name": "Five derived card colours",
+   "what": "From the brand hues pick up to three distinct (>=24 deg apart, s>=12), rotate companions (150,210,60,300,...) until five at least 30 deg apart, saturation clamped 52-86, each lifted from a start lightness until the near-black reads at 7:1.",
+   "params": [
+    {
+     "name": "count",
+     "kind": "number",
+     "range": "5",
+     "default": "5"
+    },
+    {
+     "name": "minHueGap",
+     "kind": "number",
+     "range": "30deg",
+     "default": "30"
+    },
+    {
+     "name": "sat",
+     "kind": "number",
+     "range": "52-86",
+     "default": "mean of brand"
+    },
+    {
+     "name": "startL",
+     "kind": "text",
+     "range": "",
+     "default": "70,73,68,72,66"
+    },
+    {
+     "name": "contrast",
+     "kind": "number",
+     "range": "",
+     "default": "7"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "tab-stack",
+     "where": "js/aesthetics/tab-stack.js:35",
+     "variant": "tbCards + tbCard"
+    },
+    {
+     "key": "tab-stack",
+     "where": "js/aesthetics/tab-stack.js:152",
+     "variant": "printPrimary: primary printed as first card colour, light mode pushed to 3.2:1 on canvas and 4.6 with its label"
+    }
+   ],
+   "expressibleAs": "needs-code",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "fanned-stack-tuck",
+   "category": "layout",
+   "name": "Fanned tab stack",
+   "what": "Cards/rows overlap by 18-20px (negative margin), later above earlier, each in the next colour; hover pulls one up 4px.",
+   "params": [
+    {
+     "name": "tuck",
+     "kind": "number",
+     "range": "18-20px",
+     "default": "18"
+    },
+    {
+     "name": "colours",
+     "kind": "text",
+     "range": "5 card colours",
+     "default": "a..e"
+    },
+    {
+     "name": "hover",
+     "kind": "number",
+     "range": "",
+     "default": "-4px"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "tab-stack",
+     "where": "css/aesthetics/tab-stack.css:181",
+     "variant": "board rows"
+    },
+    {
+     "key": "tab-stack",
+     "where": "css/aesthetics/tab-stack.css:335",
+     "variant": "kit grouped list: tabs 20px under the next; open list flat"
+    },
+    {
+     "key": "tab-stack",
+     "where": "js/aesthetics/tab-stack.js:214",
+     "variant": "art: five cards, x +6, y +50 steps, fan angle -3 to 3"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [
+    "list",
+    "row"
+   ],
+   "conflictsWith": []
+  },
+  {
+   "id": "stack-peek-edge",
+   "category": "material",
+   "name": "Stack peek edge (zero-blur stack shadow)",
+   "what": "Depth as two colour cards peeking beneath the bottom of a panel via zero-blur negative-spread shadows.",
+   "params": [
+    {
+     "name": "s1",
+     "kind": "text",
+     "range": "",
+     "default": "0 6px 0 -2px b"
+    },
+    {
+     "name": "s2",
+     "kind": "text",
+     "range": "",
+     "default": "0 12px 0 -4px c"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "tab-stack",
+     "where": "css/aesthetics/tab-stack.css:567",
+     "variant": "--ts-stack / --ts-stack-s on kit panels, menus, dialogs"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [
+    "panel",
+    "menu",
+    "dialog",
+    "popover"
+   ],
+   "conflictsWith": []
+  },
+  {
+   "id": "folder-tab-segments",
+   "category": "kit",
+   "name": "Folder-tab controls",
+   "what": "Segments and tabs as overlapped folder tabs with 2px ink rule, 4px heavy rule underneath, selected tab pulls up 4px; fields get a label tab on the slot corner.",
+   "params": [
+    {
+     "name": "topRadius",
+     "kind": "number",
+     "range": "12-18px",
+     "default": "16"
+    },
+    {
+     "name": "overlap",
+     "kind": "number",
+     "range": "",
+     "default": "-10px"
+    },
+    {
+     "name": "heavyRule",
+     "kind": "number",
+     "range": "",
+     "default": "4px"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "tab-stack",
+     "where": "css/aesthetics/tab-stack.css:742",
+     "variant": ".ab-seg, .sb-k-tabs"
+    },
+    {
+     "key": "tab-stack",
+     "where": "css/aesthetics/tab-stack.css:679",
+     "variant": "field label as tab on slot top-left"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [
+    "segmented",
+    "tabs",
+    "field"
+   ],
+   "conflictsWith": []
+  },
+  {
+   "id": "circular-arrow-chip",
+   "category": "kit",
+   "name": "Circular icon / arrow chip",
+   "what": "Every icon button is a plain circle (ink on ground, on-colour on a card) with a diagonal arrow; the main CTA carries a 32px one.",
+   "params": [
+    {
+     "name": "size",
+     "kind": "number",
+     "range": "32-44px",
+     "default": "40"
+    },
+    {
+     "name": "glyph",
+     "kind": "enum",
+     "range": "arrow|plus",
+     "default": "arrow"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "tab-stack",
+     "where": "css/aesthetics/tab-stack.css:257",
+     "variant": ".sb-icon-btn, .sb-k-iconbtn"
+    },
+    {
+     "key": "tab-stack",
+     "where": "css/aesthetics/tab-stack.css:158",
+     "variant": ".ab-cta-arrow"
+    },
+    {
+     "key": "tab-stack",
+     "where": "js/aesthetics/tab-stack.js:217",
+     "variant": "art: chip r15 per card"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [
+    "icon-button"
+   ],
+   "conflictsWith": []
+  },
+  {
+   "id": "connected-segmented-control",
+   "category": "kit",
+   "name": "Connected segmented control",
+   "what": "Group with full outer corners and 4px inner corners, 1px outline, selected segment = primary-container tint.",
+   "params": [
+    {
+     "name": "gap",
+     "kind": "number",
+     "range": "",
+     "default": "2px"
+    },
+    {
+     "name": "inner",
+     "kind": "number",
+     "range": "",
+     "default": "4px"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "tonal-shape",
+     "where": "css/aesthetics/tonal-shape.css:102",
+     "variant": ".ab-seg"
+    },
+    {
+     "key": "tonal-shape",
+     "where": "css/aesthetics/tonal-shape.css:217",
+     "variant": "deck specimen"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [
+    "segmented"
+   ],
+   "conflictsWith": []
+  },
+  {
+   "id": "tonal-ramp",
+   "category": "colour",
+   "name": "Tonal container ramp",
+   "what": "Elevation by tone: low/mid/high containers are the primary tone mixed into the ground at ~4.5/8.5/15% (dark 5/9/14%); primary-container a 30% tint with deep on-text at 7:1; secondary and accent tints at 26% / 42%.",
+   "params": [
+    {
+     "name": "low",
+     "kind": "number",
+     "range": "",
+     "default": "0.045"
+    },
+    {
+     "name": "mid",
+     "kind": "number",
+     "range": "",
+     "default": "0.085"
+    },
+    {
+     "name": "high",
+     "kind": "number",
+     "range": "",
+     "default": "0.15"
+    },
+    {
+     "name": "pc",
+     "kind": "number",
+     "range": "",
+     "default": "0.3"
+    },
+    {
+     "name": "onPc",
+     "kind": "number",
+     "range": "contrast",
+     "default": "7"
+    },
+    {
+     "name": "sc",
+     "kind": "number",
+     "range": "",
+     "default": "0.26"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "tonal-shape",
+     "where": "js/aesthetics/tonal-shape.js:212",
+     "variant": "tokens"
+    },
+    {
+     "key": "tonal-shape",
+     "where": "css/aesthetics/tonal-shape.css:98",
+     "variant": "cards use tn-low"
+    }
+   ],
+   "expressibleAs": "tokens",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "signature-shape-container",
+   "category": "ornament",
+   "name": "Signature shape as container",
+   "what": "One shape per brand chosen by FNV-1a hash of the name from a library of six original paths (scallop, clover, soft burst, arch, rounded diamond, leaf), applied as a mask on avatar, icon button, list icon and empty-state icon.",
+   "params": [
+    {
+     "name": "library",
+     "kind": "text",
+     "range": "6 path generators",
+     "default": "cookie,clover,burst,arch,diamond,leaf"
+    },
+    {
+     "name": "seed",
+     "kind": "text",
+     "range": "brand name hash",
+     "default": ""
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "tonal-shape",
+     "where": "js/aesthetics/tonal-shape.js:21",
+     "variant": "path generators tsScallop/tsClover/tsBurst/tsRoundPoly"
+    },
+    {
+     "key": "tonal-shape",
+     "where": "js/aesthetics/tonal-shape.js:84",
+     "variant": "hash selection"
+    },
+    {
+     "key": "tonal-shape",
+     "where": "css/aesthetics/tonal-shape.css:28",
+     "variant": "mask applied via ::before on mark, avatar, icon button, list icon"
+    }
+   ],
+   "expressibleAs": "svg-generator",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [
+    "avatar",
+    "icon-button",
+    "list-icon",
+    "empty-state"
+   ],
+   "conflictsWith": []
+  },
+  {
+   "id": "tonal-shape-composition-art",
+   "category": "pattern",
+   "name": "Interlocking shape composition art",
+   "what": "Hero: five library shapes at set position, size, rotation, separated by 7px strokes in the panel colour; signature shape largest in primary with the initial.",
+   "params": [
+    {
+     "name": "parts",
+     "kind": "text",
+     "range": "[shape,x,y,size,rot,class]",
+     "default": "5 entries"
+    },
+    {
+     "name": "gapStroke",
+     "kind": "number",
+     "range": "",
+     "default": "7px"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "tonal-shape",
+     "where": "js/aesthetics/tonal-shape.js:263",
+     "variant": "art()"
+    },
+    {
+     "key": "tonal-shape",
+     "where": "css/aesthetics/tonal-shape.css:67",
+     "variant": ".tsa panel and fills"
+    }
+   ],
+   "expressibleAs": "svg-generator",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": false,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "tab-card-fan-art",
+   "category": "pattern",
+   "name": "Fanned tab-card art with doodles",
+   "what": "Hero: five tab-cards rotated -3..3 deg tucked in order, each with mono tag and arrow chip; front card has the brand initial; ink doodle marks (star, squiggle, ring, ticks) scattered.",
+   "params": [
+    {
+     "name": "cards",
+     "kind": "number",
+     "range": "5",
+     "default": "5"
+    },
+    {
+     "name": "angles",
+     "kind": "text",
+     "range": "",
+     "default": "-3,-1.5,0,1.5,3"
+    },
+    {
+     "name": "doodles",
+     "kind": "bool",
+     "range": "",
+     "default": "true"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "tab-stack",
+     "where": "js/aesthetics/tab-stack.js:209",
+     "variant": "art()"
+    },
+    {
+     "key": "tab-stack",
+     "where": "css/aesthetics/tab-stack.css:94",
+     "variant": ".tba-* classes"
+    }
+   ],
+   "expressibleAs": "svg-generator",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": false,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "planet-horizon-plate",
+   "category": "pattern",
+   "name": "Orbital horizon plate",
+   "what": "Full-bleed deep-space plate: black-to-haze sky, a planet limb (radius 262 circle, 4-stop gradient from pale to deep primary) with a blurred atmosphere rim, three orbits (white, accent lit, white dashed), a craft with a mono tag on the middle orbit, a 12-column faint grid.",
+   "params": [
+    {
+     "name": "limbRadius",
+     "kind": "number",
+     "range": "",
+     "default": "262"
+    },
+    {
+     "name": "orbits",
+     "kind": "text",
+     "range": "rx/ry/colour/dash",
+     "default": "105/13, 142/19, 180/25"
+    },
+    {
+     "name": "craftAngle",
+     "kind": "number",
+     "range": "",
+     "default": "258deg"
+    },
+    {
+     "name": "gridCols",
+     "kind": "number",
+     "range": "",
+     "default": "12"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "retro-futurist",
+     "where": "js/aesthetics/retro-futurist.js:30",
+     "variant": "horizon()"
+    },
+    {
+     "key": "retro-futurist",
+     "where": "js/aesthetics/retro-futurist.js:233",
+     "variant": "art() black field, in both modes"
+    },
+    {
+     "key": "retro-futurist",
+     "where": "css/aesthetics/retro-futurist.css:74",
+     "variant": "full-bleed escape of board padding"
+    }
+   ],
+   "expressibleAs": "svg-generator",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": false,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "gauge-instruments",
+   "category": "kit",
+   "name": "Gauge language (dial, lamp, LED)",
+   "what": "Stat dials (conic arc, --dial value), lamp chips (8px dot with 6px glow only when lit), T+ readout in a dark LCD, a console art (31-tick dial, needle with soft echo, LCD, LED ladder).",
+   "params": [
+    {
+     "name": "dialValue",
+     "kind": "number",
+     "range": "0-100",
+     "default": "72/55/40/18"
+    },
+    {
+     "name": "lit",
+     "kind": "bool",
+     "range": "",
+     "default": "first row"
+    },
+    {
+     "name": "ticks",
+     "kind": "number",
+     "range": "",
+     "default": "31"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "retro-futurist",
+     "where": "css/aesthetics/retro-futurist.css:222",
+     "variant": "sb-stat ::after dial, nth-child values, hot colour on 4th"
+    },
+    {
+     "key": "retro-futurist",
+     "where": "css/aesthetics/retro-futurist.css:238",
+     "variant": ".sb-delta lamp + label"
+    },
+    {
+     "key": "retro-futurist",
+     "where": "js/aesthetics/retro-futurist.js:83",
+     "variant": "consoleArt SVG"
+    },
+    {
+     "key": "retro-futurist",
+     "where": "css/aesthetics/retro-futurist.css:130",
+     "variant": "state lamps 16px, signal glow 9px"
+    }
+   ],
+   "expressibleAs": "svg-generator",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [
+    "stat-card",
+    "chip",
+    "status"
+   ],
+   "conflictsWith": []
+  },
+  {
+   "id": "well-disc-semi-scene",
+   "category": "pattern",
+   "name": "Well + disc + semicircle scene",
+   "what": "Hero art of few large forms: recessed circular well 90%, raised canvas disc 37% off-centre, primary semicircle 40x20% with inset gloss, sized in cqw so it scales; well bleeds past gutter (margin-right -6%).",
+   "params": [
+    {
+     "name": "wellInset",
+     "kind": "number",
+     "range": "",
+     "default": "5%"
+    },
+    {
+     "name": "discSize",
+     "kind": "number",
+     "range": "",
+     "default": "37%"
+    },
+    {
+     "name": "semiSize",
+     "kind": "text",
+     "range": "",
+     "default": "40% x 20%"
+    },
+    {
+     "name": "bleed",
+     "kind": "number",
+     "range": "",
+     "default": "-6%"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "soft-form",
+     "where": "css/aesthetics/soft-form.css:42",
+     "variant": ".sfa-well/.sfa-disc/.sfa-semi"
+    },
+    {
+     "key": "soft-form",
+     "where": "js/aesthetics/soft-form.js:104",
+     "variant": "scene markup"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": false,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "glass-lens-refraction",
+   "category": "material",
+   "name": "Glass bar lens (simulated refraction)",
+   "what": "A tilted (18deg) pill lens that redraws the scene scaled 1.24x inside it, counter-rotated and saturated 1.3, with a 105deg iridescent gradient and 2px white/lilac side rims.",
+   "params": [
+    {
+     "name": "tilt",
+     "kind": "number",
+     "range": "",
+     "default": "18deg"
+    },
+    {
+     "name": "scale",
+     "kind": "number",
+     "range": "",
+     "default": "1.24"
+    },
+    {
+     "name": "saturate",
+     "kind": "number",
+     "range": "",
+     "default": "1.3"
+    },
+    {
+     "name": "box",
+     "kind": "text",
+     "range": "x61 y5 w15 h90",
+     "default": ""
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "soft-form",
+     "where": "css/aesthetics/soft-form.css:59",
+     "variant": ".sfa-lens"
+    },
+    {
+     "key": "soft-form",
+     "where": "js/aesthetics/soft-form.js:106",
+     "variant": "abLens(scene, ...)"
+    }
+   ],
+   "expressibleAs": "needs-code",
+   "paletteAgnostic": true,
+   "exportSafe": false,
+   "appSafe": false,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "hero-split-art-bleed",
+   "category": "layout",
+   "name": "Hero split with bleeding art",
+   "what": "Two-column hero with a given ratio; art may bleed past the gutter or run full-bleed.",
+   "params": [
+    {
+     "name": "columns",
+     "kind": "text",
+     "range": "1.3fr 1fr | 1fr 1.1fr | stretch",
+     "default": "1.3fr 1fr"
+    },
+    {
+     "name": "bleed",
+     "kind": "number",
+     "range": "-6% to full",
+     "default": "-6%"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "soft-form",
+     "where": "css/aesthetics/soft-form.css:33",
+     "variant": "1.3fr/1fr, art max 440px margin-right -6%"
+    },
+    {
+     "key": "retro-futurist",
+     "where": "css/aesthetics/retro-futurist.css:54",
+     "variant": "centered hero turned flush-left over full-bleed plate"
+    },
+    {
+     "key": "tab-stack",
+     "where": "css/aesthetics/tab-stack.css:95",
+     "variant": "1fr/1.1fr"
+    },
+    {
+     "key": "tonal-shape",
+     "where": "css/aesthetics/tonal-shape.css:56",
+     "variant": "1fr/1.1fr"
+    },
+    {
+     "key": "riso-print",
+     "where": "css/aesthetics/riso-print.css:78",
+     "variant": "1.15fr/1fr zine spread"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": false,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "brand-mark",
+   "category": "ornament",
+   "name": "Brand mark chip",
+   "what": "The small mark beside the brand name.",
+   "params": [
+    {
+     "name": "shape",
+     "kind": "enum",
+     "range": "raised-key|circle-offset|circle|signature-shape",
+     "default": "raised-key"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "soft-form",
+     "where": "css/aesthetics/soft-form.css:19",
+     "variant": "30px raised key with a glossy primary dot"
+    },
+    {
+     "key": "riso-print",
+     "where": "css/aesthetics/riso-print.css:49",
+     "variant": "primary circle with offset secondary ring (multiply)"
+    },
+    {
+     "key": "tab-stack",
+     "where": "css/aesthetics/tab-stack.css:85",
+     "variant": "34px circle in card colour a"
+    },
+    {
+     "key": "tonal-shape",
+     "where": "css/aesthetics/tonal-shape.css:29",
+     "variant": "signature shape mask in primary"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": false,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "a11y-media-fallbacks",
+   "category": "structure",
+   "name": "Accessibility media fallbacks",
+   "what": "Reduced-motion, reduced-transparency and more-contrast overrides that remove transforms/transitions or strengthen borders.",
+   "params": [
+    {
+     "name": "rules",
+     "kind": "text",
+     "range": "",
+     "default": "per style"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "soft-form",
+     "where": "css/aesthetics/soft-form.css:230",
+     "variant": "transparency hides glass tints; more-contrast ink border"
+    },
+    {
+     "key": "retro-futurist",
+     "where": "css/aesthetics/retro-futurist.css:198",
+     "variant": "motion"
+    },
+    {
+     "key": "riso-print",
+     "where": "css/aesthetics/riso-print.css:173",
+     "variant": "motion"
+    },
+    {
+     "key": "tab-stack",
+     "where": "css/aesthetics/tab-stack.css:213",
+     "variant": "motion"
+    },
+    {
+     "key": "tonal-shape",
+     "where": "css/aesthetics/tonal-shape.css:189",
+     "variant": "motion"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [],
+   "conflictsWith": []
+  },
+  {
+   "id": "kit-per-component-dress",
+   "category": "kit",
+   "name": "Per-component kit dressing",
+   "what": "Each kit component gets its own rule set in the style vocabulary (the app UI kit block). Not a single move; it is the set of material moves above applied across 30-60 components.",
+   "params": [
+    {
+     "name": "components",
+     "kind": "text",
+     "range": "list",
+     "default": "see kitScope on other moves"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "soft-form",
+     "where": "css/aesthetics/soft-form.css:245",
+     "variant": ".ab.sb-ab.sb-kit block: ~190 rules covering card, seg, buttons, fields, boxes, switch, slider, progress, list, tab bar, toast, sheet, callout, menu, stepper, knob, calendar, wheel, accordion, dialogs, drawers"
+    },
+    {
+     "key": "retro-futurist",
+     "where": "css/aesthetics/retro-futurist.css:256",
+     "variant": "kit block"
+    },
+    {
+     "key": "tab-stack",
+     "where": "css/aesthetics/tab-stack.css:250",
+     "variant": "kit block + Round 14 signature block 566-887"
+    },
+    {
+     "key": "riso-print",
+     "where": "css/aesthetics/riso-print.css:243",
+     "variant": "kit block"
+    },
+    {
+     "key": "tonal-shape",
+     "where": "css/aesthetics/tonal-shape.css:28",
+     "variant": "kit parts share the signature-shape container rule and tonal fills"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [
+    "all"
+   ],
+   "conflictsWith": []
+  },
+  {
+   "id": "heavy-border",
+   "category": "material",
+   "name": "Heavy ink border / rule",
+   "what": "A 1.5-4px solid ink line used as the structural edge of controls and tab strips.",
+   "params": [
+    {
+     "name": "weight",
+     "kind": "number",
+     "range": "1.5-4px",
+     "default": "2px"
+    }
+   ],
+   "usedBy": [
+    {
+     "key": "tab-stack",
+     "where": "css/aesthetics/tab-stack.css:567",
+     "variant": "kit: 2px ink rules on slots and panels, 4px rule under tab strips"
+    },
+    {
+     "key": "riso-print",
+     "where": "css/aesthetics/riso-print.css:9",
+     "variant": "--rz-line 1.5px solid ink on cards, chips, switch, tag"
+    },
+    {
+     "key": "retro-futurist",
+     "where": "css/aesthetics/retro-futurist.css:136",
+     "variant": "2px ink rule on the list top"
+    }
+   ],
+   "expressibleAs": "css-recipe",
+   "paletteAgnostic": true,
+   "exportSafe": true,
+   "appSafe": true,
+   "kitScope": [],
+   "conflictsWith": []
+  }
+ ]
+}
