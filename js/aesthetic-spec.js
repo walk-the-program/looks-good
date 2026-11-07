@@ -1,10 +1,10 @@
-/* Spec runtime (move lab). Loaded ONLY when the URL has ?movelab=1 (see index.html and
-   dev/move-lab/lab.js). Turns a pure-data aesthetic spec (spec 2: aesthetic.json) into a normal
-   registerAesthetic def plus a generated, scoped <style id="spec-<key>">.
+/* Spec runtime. Always loaded by index.html (with js/moves/*.js); the lab specs still need ?movelab=1,
+   custom styles load through js/custom-aesthetics.js. Turns a pure-data aesthetic spec (spec 2:
+   aesthetic.json) into a normal registerAesthetic def plus a generated, scoped <style id="spec-<key>">.
    Contract: docs/aesthetic-spec/SPEC-v2.md; docs: dev/move-lab/README.md.
 
-   Public globals: registerMove, registerSpecAesthetic, KIT_COMPONENTS, specContrastFit, SPEC_LAB,
-   specSanitizeSvg, specAllowedImage, SPEC_SVG_RULES. */
+   Public globals: registerMove, registerSpecAesthetic, unregisterSpecAesthetic, KIT_COMPONENTS,
+   specContrastFit, SPEC_LAB, specSanitizeSvg, specAllowedImage, SPEC_SVG_RULES. */
 (function () {
 'use strict';
 
@@ -236,13 +236,14 @@ function registerMove(m) {
 function catalog() {
   return Object.values(MOVES).map(m => ({
     id: m.id, libraryId: m.libraryId, category: m.category || null, tier: m.tier || null, what: m.what,
-    params: Object.entries(m.params).map(([name, d]) => ({ name, kind: d.kind, default: d.default, range: d.range || null, options: d.options || null })),
+    params: Object.entries(m.params).map(([name, d]) => ({ name, kind: d.kind, default: d.default, range: d.range || null, options: d.options || null, selector: !!d.selector })),
     material: (m.material && m.material.name) || null,
     state: (m.state && m.state.name) || null,
     hooks: Object.keys(m.hooks || {}),
   }));
 }
 SPEC_LAB.catalog = catalog;
+SPEC_LAB.paramProblem = paramProblem;
 
 /* ---------------- spec validation ---------------- */
 /* Returns the path of the first non-data value (function, symbol, undefined, NaN, class
@@ -265,30 +266,97 @@ function impureAt(v, path) {
 const KEY_RE = /^[a-z0-9][a-z0-9-]{1,46}[a-z0-9]$/;
 const REQUIRED_V2 = ['name', 'descriptor', 'coreTrick', 'mode', 'colour', 'moves', 'kit'];
 const SCOPES = ['all', 'board', 'kit'];
+/* Top-level fields an untrusted spec (an imported bundle) may carry: the SPEC-v2 section 2 list. Anything
+   else is refused, so a bundle cannot set a def field the app reads as code (classicOf, tokens, ...). */
+const UNTRUSTED_FIELDS = ['spec', 'key', 'order', 'name', 'descriptor', 'influences', 'summary', 'coreTrick', 'motto', 'kicker', 'mode',
+  'lineage', 'meta', 'build', 'labels', 'copy', 'layout', 'type', 'roles', 'rules', 'highlight', 'slideShape', 'colour', 'moves', 'kit', 'art'];
+const isObj = v => !!v && typeof v === 'object' && !Array.isArray(v);
+const SPEC_LIMITS = { string: 4000, nodes: 20000, depth: 12 };
 
+/* First problem in an untrusted spec, or ''. Walks every value: no __proto__ / constructor / prototype keys,
+   no < or > in any string (names and copy are printed into HTML), bounded size and depth. */
+function untrustedProblem(spec) {
+  let nodes = 0;
+  const walk = (v, path, depth) => {
+    if (++nodes > SPEC_LIMITS.nodes) return 'spec is too large (more than 20000 values)';
+    if (depth > SPEC_LIMITS.depth) return `${path} is nested deeper than ${SPEC_LIMITS.depth} levels`;
+    if (typeof v === 'string') {
+      if (v.length > SPEC_LIMITS.string) return `${path} is longer than ${SPEC_LIMITS.string} characters`;
+      if (/[<>]/.test(v)) return `${path} contains < or >, which is not allowed in an imported style`;
+      return '';
+    }
+    if (Array.isArray(v)) { for (let i = 0; i < v.length; i++) { const r = walk(v[i], `${path}[${i}]`, depth + 1); if (r) return r; } return ''; }
+    if (v && typeof v === 'object') {
+      for (const k of Object.keys(v)) {
+        if (k === '__proto__' || k === 'constructor' || k === 'prototype') return `${path} has a forbidden key "${k}"`;
+        const r = walk(v[k], `${path}.${k}`, depth + 1); if (r) return r;
+      }
+    }
+    return '';
+  };
+  return walk(spec, 'spec', 0);
+}
+
+/* Shape check of meta / build before they enter the live AESTHETIC_META / AESTHETIC_BUILD tables (the app
+   reads fonts.heading.classes, BUILD_CLASSES[cls].states ... without guards). Returns a problem or ''. */
+function metaProblem(m) {
+  if (m === undefined) return '';
+  const strs = a => Array.isArray(a) && a.every(x => typeof x === 'string');
+  if (!isObj(m)) return 'meta must be an object';
+  if (typeof AESTHETIC_FAMILIES !== 'undefined' && !AESTHETIC_FAMILIES.some(f => f.key === m.family)) return 'meta.family is not a known family';
+  const f = m.fonts;
+  if (!isObj(f)) return 'meta.fonts is missing';
+  for (const role of ['heading', 'body']) {
+    if (!isObj(f[role]) || !strs(f[role].picks)) return `meta.fonts.${role}.picks must be an array of font names`;
+    if (f[role].classes !== undefined && !strs(f[role].classes)) return `meta.fonts.${role}.classes must be an array of strings`;
+  }
+  if (f.mono !== undefined && (!isObj(f.mono) || !strs(f.mono.picks))) return 'meta.fonts.mono.picks must be an array of font names';
+  if (f.avoid !== undefined && !strs(f.avoid)) return 'meta.fonts.avoid must be an array of strings';
+  if (!Array.isArray(f.pairings) || !f.pairings.length || !f.pairings.every(p => strs(p) && p.length === 2)) return 'meta.fonts.pairings must be a non-empty array of [heading, body] pairs';
+  return '';
+}
+function buildProblem(b) {
+  if (b === undefined) return '';
+  if (!isObj(b)) return 'build must be an object';
+  if (typeof BUILD_CLASSES !== 'undefined' && !(typeof b.cls === 'string' && Object.prototype.hasOwnProperty.call(BUILD_CLASSES, b.cls))) return 'build.cls is not a known build class';
+  if (b.states !== undefined && !isObj(b.states)) return 'build.states must be an object';
+  return '';
+}
+
+/* validateSpec(spec, opts): true when the spec may be registered. Every refusal is a console.error naming the
+   key, and is pushed onto opts.errors (an array) when the caller wants the text. opts.untrusted (imported
+   bundles) adds the strict checks above. */
 function validateSpec(spec, opts) {
   const key = spec && spec.key;
   const file = opts && opts.file ? ` (${opts.file})` : '';
-  if (!spec || typeof spec !== 'object' || typeof key !== 'string' || !key) {
-    console.error(`registerSpecAesthetic${file}: spec needs a string key`, spec); return false;
-  }
+  const no = msg => { console.error(msg); if (opts && opts.errors) opts.errors.push(msg.replace(/^registerSpecAesthetic\([^)]*\)[^:]*: /, '')); return false; };
+  if (!spec || typeof spec !== 'object' || typeof key !== 'string' || !key) return no(`registerSpecAesthetic${file}: spec needs a string key`);
   const bad = impureAt(spec, 'spec');
-  if (bad) { console.error(`registerSpecAesthetic("${key}")${file}: spec must be pure data; ${bad} is not JSON data (functions are rejected). Not registered.`); return false; }
-  if (JSON.stringify(JSON.parse(JSON.stringify(spec))) !== JSON.stringify(spec)) {
-    console.error(`registerSpecAesthetic("${key}")${file}: spec does not survive a JSON round trip. Not registered.`); return false;
-  }
-  if (spec.spec !== undefined && spec.spec !== 2) { console.error(`registerSpecAesthetic("${key}")${file}: "spec" must be 2, got ${JSON.stringify(spec.spec)}. Not registered.`); return false; }
-  if (opts && opts.json && spec.spec !== 2) { console.error(`registerSpecAesthetic("${key}")${file}: aesthetic.json needs "spec": 2. Not registered.`); return false; }
-  if (!KEY_RE.test(key)) { console.error(`registerSpecAesthetic("${key}")${file}: key must be lowercase kebab-case, 3 to 48 characters. Not registered.`); return false; }
+  if (bad) return no(`registerSpecAesthetic("${key}")${file}: spec must be pure data; ${bad} is not JSON data (functions are rejected). Not registered.`);
+  if (JSON.stringify(JSON.parse(JSON.stringify(spec))) !== JSON.stringify(spec)) return no(`registerSpecAesthetic("${key}")${file}: spec does not survive a JSON round trip. Not registered.`);
+  if (spec.spec !== undefined && spec.spec !== 2) return no(`registerSpecAesthetic("${key}")${file}: "spec" must be 2, got ${JSON.stringify(spec.spec)}. Not registered.`);
+  if (opts && (opts.json || opts.untrusted) && spec.spec !== 2) return no(`registerSpecAesthetic("${key}")${file}: aesthetic.json needs "spec": 2. Not registered.`);
+  if (!KEY_RE.test(key)) return no(`registerSpecAesthetic("${key}")${file}: key must be lowercase kebab-case, 3 to 48 characters. Not registered.`);
+  if (key.endsWith('--classic') || (typeof hasClassicAesthetic === 'function' && hasClassicAesthetic(key))) return no(`registerSpecAesthetic("${key}")${file}: key belongs to a built-in style. Not registered.`);
   if (SPECS[key] || (typeof AESTHETICS !== 'undefined' && AESTHETICS.some(a => a.key === key))) {
-    console.error(`registerSpecAesthetic("${key}")${file}: key already used by a built-in or another spec. Not registered.`); return false;
+    return no(`registerSpecAesthetic("${key}")${file}: key already used by a built-in or another spec. Not registered.`);
   }
   if (spec.spec === 2) {
     const missing = REQUIRED_V2.filter(f => spec[f] === undefined);
-    if (missing.length) { console.error(`registerSpecAesthetic("${key}")${file}: missing required field(s): ${missing.join(', ')}. Not registered.`); return false; }
+    if (missing.length) return no(`registerSpecAesthetic("${key}")${file}: missing required field(s): ${missing.join(', ')}. Not registered.`);
     if (!Array.isArray(spec.colour) || !Array.isArray(spec.moves) || !spec.kit || typeof spec.kit !== 'object' || Array.isArray(spec.kit)) {
-      console.error(`registerSpecAesthetic("${key}")${file}: colour and moves must be arrays, kit an object. Not registered.`); return false;
+      return no(`registerSpecAesthetic("${key}")${file}: colour and moves must be arrays, kit an object. Not registered.`);
     }
+  }
+  if (opts && opts.untrusted) {
+    const extra = Object.keys(spec).filter(k => !UNTRUSTED_FIELDS.includes(k));
+    if (extra.length) return no(`registerSpecAesthetic("${key}")${file}: field(s) not allowed in an imported style: ${extra.join(', ')}. Not registered.`);
+    for (const f of ['name', 'descriptor', 'coreTrick']) if (typeof spec[f] !== 'string' || !spec[f].trim()) return no(`registerSpecAesthetic("${key}")${file}: "${f}" must be a non-empty string. Not registered.`);
+    if (spec.mode !== 'light' && spec.mode !== 'dark') return no(`registerSpecAesthetic("${key}")${file}: "mode" must be light or dark. Not registered.`);
+    if (spec.order !== undefined && !(typeof spec.order === 'number' && Number.isFinite(spec.order))) return no(`registerSpecAesthetic("${key}")${file}: "order" must be a number. Not registered.`);
+    if (spec.colour.length > 20 || spec.moves.length > 200 || Object.keys(spec.kit).length > 120) return no(`registerSpecAesthetic("${key}")${file}: too many moves or kit entries. Not registered.`);
+    const why = untrustedProblem(spec) || metaProblem(spec.meta) || buildProblem(spec.build);
+    if (why) return no(`registerSpecAesthetic("${key}")${file}: ${why}. Not registered.`);
   }
   for (const f of ['name', 'descriptor', 'influences']) {
     if (typeof spec[f] !== 'string') console.warn(`spec "${key}": ${f} missing (the board prints "undefined")`);
@@ -298,6 +366,30 @@ function validateSpec(spec, opts) {
 
 /* ---------------- params ---------------- */
 const isPair = v => !!v && typeof v === 'object' && !Array.isArray(v) && ('light' in v || 'dark' in v);
+
+/* Text and colour params are written into CSS (content: "...", selectors, values) and into hook HTML, so a
+   value a spec supplies (not the move's own default) may not carry anything that could leave its place:
+   braces, semicolons, angle brackets, double quotes, backslashes, control characters, comments, url(),
+   @import, expression(), javascript:. A text param flagged `selector` (a CSS selector fragment) also may not
+   carry combinators or commas, so it cannot widen the rule beyond the style's own scope. */
+const TEXT_BAD = /[{}<>;"\\\u0000-\u001f]|\/\*|\*\/|url\s*\(|@import|expression\s*\(|javascript:/i;
+const SELECTOR_BAD = /[,>+~|*]/;
+const COLOUR_OK = /^(#[0-9a-f]{3,8}|(?:rgb|hsl)a?\([-0-9.,%\s/a-z]*\)|[a-z]{3,24}|var\(--[a-z0-9-]+\))$/i;
+function paramProblem(d, v) {
+  if (d.kind === 'colour') {
+    if (typeof v !== 'string') return 'is not a string';
+    if (v !== d.default && !COLOUR_OK.test(v)) return 'is not a plain colour (hex, rgb(), hsl() or a colour name)';
+  } else if (d.kind === 'text') {
+    if (typeof v !== 'string') return 'is not a string';
+    if (v !== d.default) {
+      if (v.length > 200) return 'is longer than 200 characters';
+      // a selector fragment may carry attribute selectors ([role="menuitem"]); they are set aside before the check
+      if (TEXT_BAD.test(d.selector ? v.replace(/\[[\w-]+(?:[~|^$*]?=(?:"[^"\\]*"|'[^'\\]*'))?\]/g, '') : v)) return 'has a character or word that is not allowed in text params ({ } < > ; " \\ url( @import)';
+      if (d.selector && SELECTOR_BAD.test(v)) return 'is a selector fragment: no commas or combinators';
+    }
+  }
+  return '';
+}
 
 /* One value checked against the move's declared param; returns the (clamped / defaulted) value. */
 function coerce(d, v, label, key) {
@@ -310,7 +402,8 @@ function coerce(d, v, label, key) {
   } else if (d.kind === 'bool') {
     if (typeof v !== 'boolean') return bad('is not a boolean');
   } else if (d.kind === 'colour' || d.kind === 'text') {
-    if (typeof v !== 'string') return bad('is not a string');
+    const why = paramProblem(d, v);
+    if (why) return bad(why);
   }
   return v;
 }
@@ -394,7 +487,12 @@ function loadSpecs(indexUrl) {
 SPEC_LAB.loadSpecs = loadSpecs;
 
 /* ---------------- registerSpecAesthetic ---------------- */
-/* registerSpecAesthetic(spec, opts?)  opts: { base: 'dev/move-lab/specs/<key>/', file, json: true }.
+/* registerSpecAesthetic(spec, opts?)  opts: { base: 'dev/move-lab/specs/<key>/', file, json: true,
+     files: { 'art/hero.svg': '<svg...', 'art/x.png': 'data:image/png;base64,...' }  art already fetched by the caller,
+     untrusted: true  an imported bundle: strict checks (field whitelist, no < > in strings, meta/build shape),
+                      art only from `files`, never from a path,
+     errors: []       receives the text of every refusal,
+     quietHooks: true no "hook X ignored; Y provides it" notes (the app's own loads; the checker still prints them) }.
    A spec object without `spec: 2` is the v1 JS-spec form: DEPRECATED, kept only so the three legacy JS
    specs (dev/move-lab/specs/{soft-form,acid-graphics,editorial-serif}.js) keep loading until they are
    migrated to aesthetic.json; JSON files always require spec 2.
@@ -446,7 +544,7 @@ function registerSpecAesthetic(spec, opts) {
   };
 
   const def = {};
-  for (const k of Object.keys(spec)) if (!BUILD_FIELDS.includes(k)) def[k] = JSON.parse(JSON.stringify(spec[k]));
+  for (const k of Object.keys(spec)) if (!BUILD_FIELDS.includes(k) && k !== 'classicOf') def[k] = JSON.parse(JSON.stringify(spec[k]));
   if (!def.mode) def.mode = 'light';
 
   // tokens: every move's tokens(t, p, ctx, state) merged in order (colour moves first), later wins.
@@ -488,25 +586,33 @@ function registerSpecAesthetic(spec, opts) {
         artOwner = { move, item };
       }
     } else if (hero.kind === 'svg') {
-      if (typeof hero.src !== 'string' || !/^[A-Za-z0-9._\- /]+\.svg$/i.test(hero.src) || hero.src.includes('..') || hero.src.startsWith('/')) console.warn(`spec "${key}": art.hero.src must be a relative .svg path (skipped)`);
-      else if (!opts.base) console.warn(`spec "${key}": art.hero svg needs a base folder (loaded from aesthetic.json); skipped`);
+      // Source of the file: opts.files (text already fetched by the caller, path -> text) first; a trusted
+      // spec with only opts.base falls back to a synchronous read (the lab).
+      const files = opts.files || (opts.untrusted ? {} : null);
+      let text = null, err = '';
+      if (typeof hero.src !== 'string' || !/^[A-Za-z0-9._\- /]+\.svg$/i.test(hero.src) || hero.src.includes('..') || hero.src.startsWith('/')) err = 'art.hero.src must be a relative .svg path';
+      else if (files && typeof files[hero.src] === 'string') text = files[hero.src];
+      else if (opts.base && !opts.untrusted && !files) { const r = xhrText(opts.base + hero.src); if (r.err) err = `cannot read art ${opts.base}${hero.src} (${r.err})`; else text = r.text; }
+      else err = files ? `art file ${hero.src} is not in the supplied files` : 'art.hero svg needs a base folder (loaded from aesthetic.json)';
+      if (err) (err.startsWith('cannot read') ? console.error : console.warn)(`spec "${key}": ${err} (art skipped)`);
       else {
-        const r = xhrText(opts.base + hero.src);
-        if (r.err) console.error(`spec "${key}": cannot read art ${opts.base}${hero.src} (${r.err})`);
+        const { svg, stripped } = specSanitizeSvg(text, { fit: hero.fit === 'contain' ? 'contain' : 'cover' });
+        if (!svg) console.error(`spec "${key}": ${hero.src} is not a usable SVG (${stripped.join(', ')}); art skipped`);
         else {
-          const { svg, stripped } = specSanitizeSvg(r.text, { fit: hero.fit === 'contain' ? 'contain' : 'cover' });
-          if (!svg) console.error(`spec "${key}": ${opts.base}${hero.src} is not a usable SVG (${stripped.join(', ')}); art skipped`);
-          else {
-            if (stripped.length) console.warn(`spec "${key}": sanitised ${hero.src}, stripped: ${stripped.join(', ')}`);
-            const html = `<div class="spec-hero spec-hero-svg" role="img" aria-label="${escAttr(hero.alt || '')}">${svg}</div>`;
-            def.art = () => html;
-          }
+          if (stripped.length) console.warn(`spec "${key}": sanitised ${hero.src}, stripped: ${stripped.join(', ')}`);
+          const html = `<div class="spec-hero spec-hero-svg" role="img" aria-label="${escAttr(hero.alt || '')}">${svg}</div>`;
+          def.art = () => html;
         }
       }
     } else if (hero.kind === 'image') {
+      const files = opts.files || (opts.untrusted ? {} : null);
+      let url = '';
       if (!specAllowedImage(hero.src)) console.warn(`spec "${key}": art.hero.src must be a relative png/jpg/webp/gif path or a data:image URL (skipped)`);
-      else {
-        const url = hero.src.startsWith('data:') ? hero.src : (opts.base || '') + hero.src;
+      else if (hero.src.startsWith('data:')) url = hero.src;
+      else if (files && typeof files[hero.src] === 'string' && files[hero.src].startsWith('data:') && specAllowedImage(files[hero.src])) url = files[hero.src];
+      else if (!opts.untrusted) url = (opts.base || '') + hero.src;
+      else console.warn(`spec "${key}": art image ${hero.src} is not in the supplied files as a data:image URL (skipped)`);
+      if (url) {
         const html = `<img class="spec-hero spec-hero-img" src="${escAttr(url)}" alt="${escAttr(hero.alt || '')}" style="object-fit:${hero.fit === 'contain' ? 'contain' : 'cover'}">`;
         def.art = () => html;
       }
@@ -538,7 +644,7 @@ function registerSpecAesthetic(spec, opts) {
   for (const it of entries) {
     for (const [name, fn] of Object.entries(it.move.hooks || {})) {
       if (RESERVED_HOOKS.includes(name) || typeof fn !== 'function') { console.warn(`move ${it.move.id}: hook "${name}" ignored`); continue; }
-      if (owner[name]) { if (owner[name] !== it.move.id) console.warn(`spec "${key}": hook "${name}" from "${it.move.id}" ignored; "${owner[name]}" provides it`); continue; }
+      if (owner[name]) { if (owner[name] !== it.move.id && !opts.quietHooks) console.warn(`spec "${key}": hook "${name}" from "${it.move.id}" ignored; "${owner[name]}" provides it`); continue; }
       wireHook(it, name, fn);
     }
   }
@@ -601,8 +707,20 @@ function registerSpecAesthetic(spec, opts) {
   return def;
 }
 
+/* unregisterSpecAesthetic(key): undoes registerSpecAesthetic (def, generated <style>, meta/build entries).
+   Returns false when the key is not a registered spec. */
+function unregisterSpecAesthetic(key) {
+  if (!SPECS[key]) return false;
+  delete SPECS[key]; delete CSS[key];
+  const old = document.getElementById('spec-' + key);
+  if (old) old.remove();
+  if (typeof unregisterAesthetic === 'function') unregisterAesthetic(key);
+  return true;
+}
+
 window.registerMove = registerMove;
 window.registerSpecAesthetic = registerSpecAesthetic;
+window.unregisterSpecAesthetic = unregisterSpecAesthetic;
 window.KIT_COMPONENTS = KIT_COMPONENTS;
 window.specContrastFit = specContrastFit;
 window.specSanitizeSvg = specSanitizeSvg;

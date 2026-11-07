@@ -525,10 +525,22 @@ final class AppDelegate: NSObject, NSApplicationDelegate, WKNavigationDelegate, 
         return dir
     }()
 
-    /// The folder for a `library` message: no collection = brands (unchanged); "logos" = logos; anything else is refused.
+    /// ~/Library/Application Support/Branding Designer/aesthetics (imported and duplicated custom aesthetics)
+    lazy var aestheticsDir: URL = {
+        let dir = brandsDir.deletingLastPathComponent().appendingPathComponent("aesthetics")
+        try? FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
+        return dir
+    }()
+
+    /// The folder for a `library` message: no collection = brands (unchanged); "logos" = logos;
+    /// "aesthetics" = custom aesthetics; anything else is refused.
     func libraryDir(_ collection: String?) -> URL? {
         guard let c = collection else { return brandsDir }
-        return c == "logos" ? logosDir : nil
+        switch c {
+        case "logos": return logosDir
+        case "aesthetics": return aestheticsDir
+        default: return nil
+        }
     }
 
     func libraryFile(_ id: String, in dir: URL) -> URL? {

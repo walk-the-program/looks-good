@@ -651,6 +651,7 @@ const PatternsHome = (function () {
   function wire() {
     document.querySelectorAll('.mode-switch button').forEach(b => b.addEventListener('click', () => {
       if (b.dataset.mode === 'patterns') showGrid();
+      else if (b.dataset.mode === 'styles') { closeTool(true); leaveLogos(); if (typeof StylesHome !== 'undefined') StylesHome.show(); }
       else if (b.dataset.mode === 'logos') { closeTool(true); if (typeof LogosHome !== 'undefined') LogosHome.show(); }
       else showBrands();
     }));

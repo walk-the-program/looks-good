@@ -99,6 +99,7 @@
 <link rel="stylesheet" href="css/logo-studio.css" />
 <link rel="stylesheet" href="css/style-gallery.css" />
 <link rel="stylesheet" href="css/patterns-home.css" />
+<link rel="stylesheet" href="css/styles-home.css" />
 <link rel="stylesheet" href="css/logos-editor.css" />
 <link rel="stylesheet" href="css/logos.css" />
 <link rel="stylesheet" href="css/logos-chrome.css" />
@@ -118,7 +119,7 @@
 <body data-view="library">
 
 <section class="library" id="library" aria-label="Brand library">
-  <div class="lib-top"><span class="logo-mark" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 100 100" aria-hidden="true"><path d="M24 37 V24 H37 M63 24 H76 V37 M76 63 V76 H63 M37 76 H24 V63" fill="none" stroke="currentColor" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/><circle cx="50" cy="50" r="13" fill="#ee8f72" stroke="currentColor" stroke-width="10"/></svg></span><span>Looks Good</span><div class="mode-switch" role="group" aria-label="Home mode"><button type="button" data-mode="brands" aria-pressed="true">Brands</button><button type="button" data-mode="patterns" aria-pressed="false">Patterns</button><button type="button" data-mode="logos" aria-pressed="false">Logos</button></div></div>
+  <div class="lib-top"><span class="logo-mark" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 100 100" aria-hidden="true"><path d="M24 37 V24 H37 M63 24 H76 V37 M76 63 V76 H63 M37 76 H24 V63" fill="none" stroke="currentColor" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/><circle cx="50" cy="50" r="13" fill="#ee8f72" stroke="currentColor" stroke-width="10"/></svg></span><span>Looks Good</span><div class="mode-switch" role="group" aria-label="Home mode"><button type="button" data-mode="brands" aria-pressed="true">Brands</button><button type="button" data-mode="patterns" aria-pressed="false">Patterns</button><button type="button" data-mode="logos" aria-pressed="false">Logos</button><button type="button" data-mode="styles" aria-pressed="false">Styles</button></div></div>
   <div class="lib-inner">
     <header class="lib-head">
       <div>
@@ -138,7 +139,7 @@
 </section>
 
 <section class="patterns" id="patterns" aria-label="Patterns">
-  <div class="lib-top" id="ptTop"><span class="logo-mark" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 100 100" aria-hidden="true"><path d="M24 37 V24 H37 M63 24 H76 V37 M76 63 V76 H63 M37 76 H24 V63" fill="none" stroke="currentColor" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/><circle cx="50" cy="50" r="13" fill="#ee8f72" stroke="currentColor" stroke-width="10"/></svg></span><span>Looks Good</span><div class="mode-switch" role="group" aria-label="Home mode"><button type="button" data-mode="brands" aria-pressed="false">Brands</button><button type="button" data-mode="patterns" aria-pressed="true">Patterns</button><button type="button" data-mode="logos" aria-pressed="false">Logos</button></div></div>
+  <div class="lib-top" id="ptTop"><span class="logo-mark" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 100 100" aria-hidden="true"><path d="M24 37 V24 H37 M63 24 H76 V37 M76 63 V76 H63 M37 76 H24 V63" fill="none" stroke="currentColor" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/><circle cx="50" cy="50" r="13" fill="#ee8f72" stroke="currentColor" stroke-width="10"/></svg></span><span>Looks Good</span><div class="mode-switch" role="group" aria-label="Home mode"><button type="button" data-mode="brands" aria-pressed="false">Brands</button><button type="button" data-mode="patterns" aria-pressed="true">Patterns</button><button type="button" data-mode="logos" aria-pressed="false">Logos</button><button type="button" data-mode="styles" aria-pressed="false">Styles</button></div></div>
   <div class="lib-inner" id="ptHome">
     <header class="lib-head">
       <div>
@@ -180,9 +181,53 @@
   </div>
 </section>
 
+<section class="styles-home" id="styles" aria-label="Styles">
+  <div class="lib-top" id="stTop"><span class="logo-mark" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 100 100" aria-hidden="true"><path d="M24 37 V24 H37 M63 24 H76 V37 M76 63 V76 H63 M37 76 H24 V63" fill="none" stroke="currentColor" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/><circle cx="50" cy="50" r="13" fill="#ee8f72" stroke="currentColor" stroke-width="10"/></svg></span><span>Looks Good</span><div class="mode-switch" role="group" aria-label="Home mode"><button type="button" data-mode="brands" aria-pressed="false">Brands</button><button type="button" data-mode="patterns" aria-pressed="false">Patterns</button><button type="button" data-mode="logos" aria-pressed="false">Logos</button><button type="button" data-mode="styles" aria-pressed="true">Styles</button></div></div>
+  <div class="lib-inner">
+    <div id="stGridView">
+      <header class="lib-head">
+        <div>
+          <h1>Styles</h1>
+          <p class="lib-count" id="stCount"></p>
+        </div>
+        <button type="button" class="btn btn-ghost" id="stImport">Import style</button>
+      </header>
+      <p class="st-status" id="stStatus" role="status" aria-live="polite" hidden></p>
+      <div class="pt-bar" id="stBar">
+        <input type="search" class="pt-search" id="stSearch" placeholder="Search styles" aria-label="Search styles" autocomplete="off" spellcheck="false" />
+        <div class="seg" id="stSource" role="group" aria-label="Source"><button type="button" data-source="all" aria-pressed="true">All</button><button type="button" data-source="builtin" aria-pressed="false">Built in</button><button type="button" data-source="yours" aria-pressed="false">Yours</button></div>
+        <select class="pt-select" id="stFamily" aria-label="Family"></select>
+        <label class="pt-brand"><span>Brand colours</span><select class="pt-select" id="stBrand" aria-label="Brand colours"></select></label>
+        <div class="seg" id="stShade" role="group" aria-label="Preview mode"><button type="button" data-shade="light" aria-pressed="true">Light</button><button type="button" data-shade="dark" aria-pressed="false">Dark</button></div>
+      </div>
+      <div class="lib-empty" id="stNone" hidden>
+        <h2 id="stNoneTitle">No styles match</h2>
+        <p id="stNoneText">Try a different search or clear the filters.</p>
+        <button type="button" class="btn btn-ghost" id="stClear">Clear filters</button>
+      </div>
+      <div class="st-grid" id="stGrid"></div>
+    </div>
+    <div class="st-detail" id="stDetail" hidden>
+      <div class="st-d-bar">
+        <button type="button" class="btn btn-ghost btn-small" id="stBack"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>Styles</button>
+        <label class="pt-brand"><span>Brand colours</span><select class="pt-select" id="stDBrand" aria-label="Brand colours"></select></label>
+        <div class="seg" id="stDShade" role="group" aria-label="Preview mode"><button type="button" data-shade="light" aria-pressed="true">Light</button><button type="button" data-shade="dark" aria-pressed="false">Dark</button></div>
+      </div>
+      <div class="st-d-main">
+        <div class="st-d-frame" id="stDFrame"><div class="st-d-board" id="stDBoard" inert></div></div>
+        <aside class="st-d-side">
+          <div id="stDInfo"></div>
+          <div class="st-d-actions" id="stDActions"></div>
+        </aside>
+      </div>
+      <div class="st-d-rounds" id="stDRounds"></div>
+    </div>
+  </div>
+</section>
+
 <section class="logos" id="logos" aria-label="Logos">
   <div id="lgHome">
-    <div class="lib-top" id="lgTop"><span class="logo-mark" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 100 100" aria-hidden="true"><path d="M24 37 V24 H37 M63 24 H76 V37 M76 63 V76 H63 M37 76 H24 V63" fill="none" stroke="currentColor" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/><circle cx="50" cy="50" r="13" fill="#ee8f72" stroke="currentColor" stroke-width="10"/></svg></span><span>Looks Good</span><div class="mode-switch" role="group" aria-label="Home mode"><button type="button" data-mode="brands" aria-pressed="false">Brands</button><button type="button" data-mode="patterns" aria-pressed="false">Patterns</button><button type="button" data-mode="logos" aria-pressed="true">Logos</button></div></div>
+    <div class="lib-top" id="lgTop"><span class="logo-mark" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 100 100" aria-hidden="true"><path d="M24 37 V24 H37 M63 24 H76 V37 M76 63 V76 H63 M37 76 H24 V63" fill="none" stroke="currentColor" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/><circle cx="50" cy="50" r="13" fill="#ee8f72" stroke="currentColor" stroke-width="10"/></svg></span><span>Looks Good</span><div class="mode-switch" role="group" aria-label="Home mode"><button type="button" data-mode="brands" aria-pressed="false">Brands</button><button type="button" data-mode="patterns" aria-pressed="false">Patterns</button><button type="button" data-mode="logos" aria-pressed="true">Logos</button><button type="button" data-mode="styles" aria-pressed="false">Styles</button></div></div>
     <div class="lib-inner">
       <header class="lib-head">
         <div>
@@ -930,6 +975,13 @@
 <script src="js/aesthetics/classic/soft-form.js"></script>
 <script src="js/aesthetics/classic/xerox-punk.js"></script>
 <script src="js/aesthetics/classic/xerox.js"></script>
+<script src="js/aesthetic-spec.js"></script>
+<script src="js/moves/core.js"></script>
+<script src="js/moves/soft.js"></script>
+<script src="js/moves/acid.js"></script>
+<script src="js/moves/editorial.js"></script>
+<script src="js/moves/darkroom.js"></script>
+<script src="js/custom-aesthetics.js"></script>
 <script>if(/[?&]movelab=1(&|$)/.test(location.search))document.write('<script src="dev/move-lab/lab.js"><\/script>')</script>
 <script src="js/aesthetic-meta.js"></script>
 <script src="js/aesthetic-principles.js"></script>
@@ -993,6 +1045,7 @@
 <script src="js/logos/attach.js"></script>
 <script src="js/logos/home.js"></script>
 <script src="js/patterns-home.js"></script>
+<script src="js/styles-home.js"></script>
 <script src="js/command-palette.js"></script>
 </body>
 </html>

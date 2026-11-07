@@ -62,6 +62,20 @@ function registerAesthetic(def) {
   return def;
 }
 
+// Removes a registered aesthetic (a custom style being deleted): its def, the generated
+// <style id="spec-<key>">, and its AESTHETIC_META / AESTHETIC_BUILD entries. Returns true when
+// something was removed. Built-in keys are never passed here.
+function unregisterAesthetic(key) {
+  const at = AESTHETICS.findIndex(a => a.key === key);
+  if (at < 0) return false;
+  AESTHETICS.splice(at, 1);
+  const style = typeof document !== 'undefined' && document.getElementById('spec-' + key);
+  if (style) style.remove();
+  if (typeof AESTHETIC_META !== 'undefined') delete AESTHETIC_META[key];
+  if (typeof AESTHETIC_BUILD !== 'undefined') delete AESTHETIC_BUILD[key];
+  return true;
+}
+
 // What a generated classic file calls in place of registerAesthetic.
 function registerClassicAesthetic(baseKey, def) {
   return registerAesthetic(Object.assign({}, def, { key: baseKey + CLASSIC_SUFFIX, classicOf: baseKey }));

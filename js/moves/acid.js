@@ -866,7 +866,7 @@ ${sfx(items, '.is-on')} { background: var(--ab-primary); color: var(--ab-on-prim
 
 registerMove({
   id: 'pair-current', libraryId: 'ink-filled-selected', what: 'State: the current, open or expanded item fills with a pair colour or its tint.', category: 'state', tier: 'recipe',
-  params: { fill: en('pair-a', ['pair-a', 'pair-b', 'tint']), bar: num(0, [0, 8]), kids: txt('') },   // kids: a child selector to mark instead of the component itself
+  params: { fill: en('pair-a', ['pair-a', 'pair-b', 'tint']), bar: num(0, [0, 8]), kids: { kind: 'text', default: '', selector: true } },   // kids: a child selector to mark instead of the component itself
   state: {
     name: 'pair-current',
     css(S, sel, p) {

@@ -20,7 +20,7 @@ const LibraryStore = (function () {
   const ID_OK = /^[A-Za-z0-9_-]{1,64}$/;
 
   /* ---- native (files) ---- */
-  // `coll` is null for brands (the original folder) or 'logos' (the logos/ subfolder).
+  // `coll` is null for brands (the original folder), 'logos' (logos/) or 'aesthetics' (aesthetics/).
   function nativeBackend(coll) {
     const msg = o => (coll ? Object.assign({ collection: coll }, o) : o);
     const self = {
@@ -48,7 +48,7 @@ const LibraryStore = (function () {
       },
       async put(record) {
         const ok = await native.postMessage(msg({ op: 'put', id: record.id, json: JSON.stringify(record) }));
-        if (ok !== true) throw new Error('Could not write ' + (coll ? 'logo' : 'brand') + ' file');
+        if (ok !== true) throw new Error('Could not write ' + (coll === 'logos' ? 'logo' : coll === 'aesthetics' ? 'aesthetic' : 'brand') + ' file');
       },
       async remove(id) { await native.postMessage(msg({ op: 'delete', id })); },
       skipped: 0,
@@ -57,9 +57,9 @@ const LibraryStore = (function () {
   }
 
   /* ---- IndexedDB ---- */
-  // Version 2 adds the 'logos' store. The upgrade only creates what is missing, so an
-  // existing v1 database keeps every record in 'brands'.
-  const DB_VERSION = 2;
+  // Version 2 adds the 'logos' store, version 3 the 'aesthetics' store (custom styles). The
+  // upgrade only creates what is missing, so an existing database keeps every record.
+  const DB_VERSION = 3;
   let dbPromise = null;
   function db() {
     if (!dbPromise) {
@@ -69,6 +69,7 @@ const LibraryStore = (function () {
           const d = req.result;
           if (!d.objectStoreNames.contains('brands')) d.createObjectStore('brands', { keyPath: 'id' });
           if (!d.objectStoreNames.contains('logos')) d.createObjectStore('logos', { keyPath: 'id' });
+          if (!d.objectStoreNames.contains('aesthetics')) d.createObjectStore('aesthetics', { keyPath: 'id' });
         };
         req.onsuccess = () => {
           const d = req.result;
@@ -117,7 +118,7 @@ const LibraryStore = (function () {
     get: id => backend.get(id),
     put: record => queued(() => backend.put(record)),
     remove: id => queued(() => backend.remove(id)),
-    // A second record collection with the same list/get/put/remove shape ('logos'), sharing the write queue.
+    // Another record collection with the same list/get/put/remove shape ('logos', 'aesthetics'), sharing the write queue.
     collection(name) {
       const b = backendFor(name);
       return {

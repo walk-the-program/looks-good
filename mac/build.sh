@@ -56,6 +56,9 @@ cp "$ROOT/index.html" "$ROOT/favicon.svg" "$WEB/"
 # (dev/vendor-fonts.py) and the export libraries (html2canvas, jsPDF). The page loads
 # these local copies first; the CDN / Google Fonts are only a fallback.
 cp -R "$ROOT/css" "$ROOT/js" "$ROOT/fonts" "$ROOT/vendor" "$ROOT/patterns-library" "$WEB/"
+# Custom aesthetics (folder styles): aesthetic.json, art/ and rounds.json ship; the checker's shots/ do not.
+cp -R "$ROOT/custom-aesthetics" "$WEB/"
+find "$WEB/custom-aesthetics" -name shots -type d -prune -exec rm -rf {} +
 # Patterns mode: the private Ptrn mirror (git-ignored; dev/sync-ptrn.py builds it).
 if [ -d "$ROOT/ptrn" ]; then
   cp -R "$ROOT/ptrn" "$WEB/"

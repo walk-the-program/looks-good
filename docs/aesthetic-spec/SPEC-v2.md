@@ -2,11 +2,17 @@
 
 Coordinator-owned. Workers implement this; changes go through the coordinator. It builds on the
 v1 runtime documented in `dev/move-lab/README.md` and closes the gaps in
-`docs/move-audit/findings.md` §4. Still lab-only: nothing loads unless the URL has `?movelab=1`.
+`docs/move-audit/findings.md` §4. Since 2026-11-07 the runtime, the move files and custom
+aesthetics load in the normal app (`js/custom-aesthetics.js`); only the lab specs (smoke and the
+`--moves` rebuilds) still need `?movelab=1`. Library and loading: `docs/aesthetic-library/PLAN.md`.
 
 ## 1. Files
 
-One folder per aesthetic: `dev/move-lab/specs/<key>/`
+One folder per aesthetic: `custom-aesthetics/<key>/` for real aesthetics (listed in
+`custom-aesthetics/index.json` as `{ "aesthetics": ["darkroom"] }`), or `dev/move-lab/specs/<key>/`
+for lab specs (listed in `dev/move-lab/specs/index.json`). Imported styles live in the app's
+`aesthetics` library collection as one bundle file, `<key>.aesthetic.json`:
+`{ "format": "looks-good-aesthetic", "version": 1, "aesthetic": {…}, "rounds": {…}|null, "art": { "art/hero.svg": "…" } }`.
 
 ```
 <key>/aesthetic.json   the aesthetic (pure JSON, spec 2)
@@ -15,9 +21,8 @@ One folder per aesthetic: `dev/move-lab/specs/<key>/`
 <key>/shots/…          screenshots written by the checker (committed: they are the round record)
 ```
 
-`dev/move-lab/specs/index.json` lists the folders to load: `{ "specs": ["smoke--moves", "soft-form--moves", …] }`.
-Adding an aesthetic = add its folder and one line here. Move files (code tier) stay in `js/moves/*.js`
-and are listed in `dev/move-lab/lab.js`.
+Adding an aesthetic = add its folder and one line to the matching index. Move files (code tier) stay
+in `js/moves/*.js` and are loaded by `index.html`.
 
 ## 2. aesthetic.json
 
@@ -60,8 +65,9 @@ values on `SD` (dark scope, higher specificity). Pairs are validated per side li
 
 ## 4. Runtime (js/aesthetic-spec.js) changes
 
-1. **Loader.** `lab.js` writes the runtime and move files (as now), then loads `specs/index.json`
-   and each `<key>/aesthetic.json` with synchronous XHR (lab only) and calls
+1. **Loader.** `index.html` loads the runtime and move files; `lab.js` then loads `specs/index.json`
+   and each `<key>/aesthetic.json` with synchronous XHR (lab only; the app loader `js/custom-aesthetics.js`
+   uses async fetch and passes art in `opts.files`) and calls
    `registerSpecAesthetic(json, { base: 'dev/move-lab/specs/<key>/' })`. A missing or invalid file
    logs one `console.error` naming the file and is skipped; the rest load.
 2. **`spec: 2` required** for JSON files. v1 JS specs are migrated, not supported side by side.
@@ -81,7 +87,7 @@ values on `SD` (dark scope, higher specificity). Pairs are validated per side li
    dial, split button and the rest; full list in `dev/move-lab/README.md`). Names stay kebab-case.
 8. **Art slot.** `art.hero`:
    - `generator`: calls that move's art hook with its params (as the rebuilds do today).
-   - `svg`: fetched (sync, lab) relative to `base`, **sanitised**: parse with DOMParser
+   - `svg`: taken from `opts.files` (app, imports) or fetched (sync, lab) relative to `base`, **sanitised**: parse with DOMParser
      (`image/svg+xml`), remove `script`, `foreignObject`, `iframe`, `object`, `embed`, every `on*`
      attribute, any `href`/`xlink:href` that is not `#…` or `data:image/(png|jpeg|webp|gif)`, and any
      `<style>` containing `@import` or `url(` to a non-`#`/non-`data:image` target. Then inlined.

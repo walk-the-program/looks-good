@@ -35,16 +35,18 @@ Rules from the owner that apply to every aesthetic:
 - If the style uses glass, it is clear see-through glass (material `clear-glass`), never frosted or milky.
 - It must look different from the 46 built-in styles, not a re-skin of one.
 
-Everything is lab-only: nothing loads unless the page URL has `?movelab=1`.
+A finished style lives in `custom-aesthetics/<key>/` and loads in the normal app (no flag): it shows beside the
+built-in styles in every picker. The lab (`?movelab=1`, `dev/move-lab/specs/`) only holds the rebuilds and smoke
+specs used to test the moves; new styles do not go there.
 
 ## 2. Folder layout
 
 ```
-dev/move-lab/specs/<key>/aesthetic.json   the aesthetic (pure JSON, "spec": 2)
-dev/move-lab/specs/<key>/art/...          optional art files (svg, png, jpg, webp)
-dev/move-lab/specs/<key>/rounds.json      the round log
-dev/move-lab/specs/<key>/shots/...        screenshots the checker writes (kept: they are the round record)
-dev/move-lab/specs/index.json             {"specs": ["<key>", ...]}: the folders the lab loads
+custom-aesthetics/<key>/aesthetic.json    the aesthetic (pure JSON, "spec": 2)
+custom-aesthetics/<key>/art/...           optional art files (svg, png, jpg, webp)
+custom-aesthetics/<key>/rounds.json       the round log
+custom-aesthetics/<key>/shots/...         screenshots the checker writes (kept: they are the round record)
+custom-aesthetics/index.json              {"aesthetics": ["<key>", ...]}: the folders the app loads
 ```
 
 `<key>`: lowercase kebab-case, 3-48 characters, equal to the folder name, not equal to a built-in
@@ -248,8 +250,8 @@ Rules:
   `docs/move-audit/move-library.json` the move implements, or `null` if it is new.
 - **Collisions are errors.** A move id, material name or state name that already exists logs
   `console.error` and the whole move is ignored. Check the catalog first; use a distinct name.
-- Put it in a new file `js/moves/<name>.js` and append that path to `MOVE_FILES` in
-  `dev/move-lab/lab.js` (lab-only loader). Do not edit `core.js`, another move file, or
+- Put it in a new file `js/moves/<name>.js` and add a `<script>` tag for it in
+  `index.html` (a `<script>` tag after `js/moves/darkroom.js`). Do not edit `core.js`, another move file, or
   `js/aesthetic-spec.js` unless you are fixing a bug in the move you wrote.
 
 Contract (see `dev/move-lab/README.md` "registerMove" for the full text):
@@ -289,25 +291,25 @@ Round 1 starts from the stages above. Later rounds start from the open notes in 
 `lsof -i :8412`, which prints nothing when it is).
 
 1. Copy the template (first round only):
-   `mkdir -p dev/move-lab/specs/<key> && rsync -a --exclude README.md docs/aesthetic-spec/template/ dev/move-lab/specs/<key>/`
+   `mkdir -p custom-aesthetics/<key> && rsync -a --exclude README.md docs/aesthetic-spec/template/ custom-aesthetics/<key>/`
    then set `"key"` in `aesthetic.json` to `<key>` and edit `name`, `descriptor`, `coreTrick` and the rest.
 2. List it (first round only), before any check, or the first run always WARNs. Other agents edit
-   `dev/move-lab/specs/index.json` too, so read it immediately before you change it, add only your
-   key, and never rewrite the file from memory. It holds one `specs` array; keep the format you find.
+   `custom-aesthetics/index.json` too, so read it immediately before you change it, add only your
+   key, and never rewrite the file from memory. It holds one `aesthetics` array; keep the format you find.
    This does read, add and write in one step:
-   `node -e 'const fs=require("fs"),f="dev/move-lab/specs/index.json",j=JSON.parse(fs.readFileSync(f,"utf8"));if(!j.specs.includes("<key>"))j.specs.push("<key>");fs.writeFileSync(f,"{ \"specs\": ["+j.specs.map(k=>JSON.stringify(k)).join(", ")+"] }\n")'`
+   `node -e 'const fs=require("fs"),f="custom-aesthetics/index.json",j=JSON.parse(fs.readFileSync(f,"utf8"));if(!j.aesthetics.includes("<key>"))j.aesthetics.push("<key>");fs.writeFileSync(f,"{ \"aesthetics\": ["+j.aesthetics.map(k=>JSON.stringify(k)).join(", ")+"] }\n")'`
 3. Edit `aesthetic.json` (one axis per variant; for several variants, make each one a round-note
    and try them one at a time, keeping the winner).
-4. Static check (no server): `node dev/aesthetic-check.js dev/move-lab/specs/<key>`.
+4. Static check (no server): `node dev/aesthetic-check.js custom-aesthetics/<key>`.
    Fix every FAIL before rendering. Output lines are `PASS|WARN|FAIL  <id>  <message>`.
 5. Serve the repo root: `python3 -m http.server <port>` (run in the background from the repo root).
 6. Render check and screenshots:
-   `node dev/aesthetic-check.js dev/move-lab/specs/<key> --render <port> --shots`
+   `node dev/aesthetic-check.js custom-aesthetics/<key> --render <port> --shots`
    It prints console errors per view and a stress-contrast table (six brand palettes, light and dark;
    columns are body, primary button, field, secondary text; `!` marks a failing value). It also
    measures display text (the headline highlight word and any accent-coloured text) and WARNs
    (`render-text`) when one is under 3:1, naming palette, mode and element; fix it or explain it.
-   It takes one to two minutes and writes PNGs to `dev/move-lab/specs/<key>/shots/`: board, kit-top
+   It takes one to two minutes and writes PNGs to `custom-aesthetics/<key>/shots/`: board, kit-top
    and deck, each in light and dark.
    **Pinned preview brand:** every round's shots use the same input, so rounds compare: primary
    `#2f5d8a`, analogous scheme, Inter for heading and body. The values used are written to
@@ -329,7 +331,7 @@ Round 1 starts from the stages above. Later rounds start from the open notes in 
    `notes` (`id`, `target` such as `board.hero`, `board.palette`, `kit.<component>`, `deck.cover`,
    `general`; `text`; `status` open/done; `doneIn` the round number that closed it), and `shots`
    (`shots/r<n>/`). Copy the round's PNGs into `shots/r<n>/` so later rounds do not overwrite them. Or skip the copy and
-add `--out dev/move-lab/specs/<key>/shots/r<n>/` to the step 6 command, which writes them there.
+add `--out custom-aesthetics/<key>/shots/r<n>/` to the step 6 command, which writes them there.
 9. Stop the server. Next round: read the open notes, change one axis per variant, repeat from
    step 3, and mark the notes you addressed `done` with `doneIn`. Note `id`s must be unique across
    all rounds. To close an older note, edit it in place (`status: "done"`, `doneIn: N`); never add
@@ -352,7 +354,7 @@ look at both modes every round.
 All of these, with the command output or PNG as evidence:
 
 1. Static check: 0 FAIL, and no WARN other than ones you can explain
-   (`node dev/aesthetic-check.js dev/move-lab/specs/<key>`).
+   (`node dev/aesthetic-check.js custom-aesthetics/<key>`).
 2. Render check: 0 FAIL, including `render-console` (no errors) and `render-contrast` for all six
    stress palettes in light and dark (`--render <port>`).
 3. Every kit component mapped (no `kit-unmapped` WARN), interactive ones with states.
@@ -361,7 +363,7 @@ All of these, with the command output or PNG as evidence:
 6. Screenshots reviewed in light and dark: board, kit-top, deck cover. Note what you saw in `rounds.json`.
 7. `art.hero` is clean (no stripped content) and board-only.
 8. `rounds.json` records what changed in each round and which notes are done.
-9. The folder is in `dev/move-lab/specs/index.json`, and a scratch or test folder is not.
+9. The folder is in `custom-aesthetics/index.json`, and a scratch or test folder is not.
 
 Report: the key, the final check output counts, which round you stopped at, and anything unresolved.
 

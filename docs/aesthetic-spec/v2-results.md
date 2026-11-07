@@ -53,5 +53,6 @@ after a browser session collision.
 3. **Palette block vs cast.** Darkroom's palette swatch shows the raw canvas hex, not the cast canvas.
 4. **Rebuild leftovers.** Each rebuild lists its weakest components in its worker report (for
    example Soft Form's split-button corners and Editorial's popup tip); worth one polish round each.
-5. **Product side.** Loading custom aesthetics without `?movelab=1`, the aesthetic library (built-in,
-   mine, imported), and the studio UI (dials, Variations, pinned notes writing `rounds.json`).
+5. **Product side.** Loading without `?movelab=1` and the Styles library are done (2026-11-07,
+   `docs/aesthetic-library/PLAN.md`). Left: the studio UI (dials, Variations, pinned notes writing
+   `rounds.json`).

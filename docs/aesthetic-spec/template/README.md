@@ -1,6 +1,6 @@
 # Template notes
 
-Copy with `rsync -a --exclude README.md docs/aesthetic-spec/template/ dev/move-lab/specs/<key>/`
+Copy with `rsync -a --exclude README.md docs/aesthetic-spec/template/ custom-aesthetics/<key>/`
 (this file is not part of a spec folder), set `"key"`, then follow `docs/aesthetic-spec/AUTHORING.md`.
 
 - `meta.family` must be one of `tactile`, `graphic`, `digital`, `print`, `luminous`
@@ -12,4 +12,4 @@ Copy with `rsync -a --exclude README.md docs/aesthetic-spec/template/ dev/move-l
   Change materials component by component to fit the look; see the cheat sheet in AUTHORING.md section 5.
 - `art/hero.svg` may use `var(--ab-primary,#hex)` and the other `--ab-*` roles so the art follows the
   client palette (AUTHORING.md section 7).
-- Add the key to `dev/move-lab/specs/index.json` before the first static check.
+- Add the key to `custom-aesthetics/index.json` (`"aesthetics"` array) before the first static check.

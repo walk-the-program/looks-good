@@ -456,9 +456,13 @@ const LibraryUI = (function () {
     BrandSession.wire();
     wire();
     try { await migrate(); } catch (e) { /* a failed import must not block the app */ }
+    // A brand saved with a custom style needs that style registered before it is opened: wait for the
+    // folder and stored styles, but never longer than 3 s.
+    if (typeof CustomAesthetics !== 'undefined') await Promise.race([CustomAesthetics.ready, new Promise(r => setTimeout(r, 3000))]);
     await refresh();
     document.body.dataset.view = 'library';
     if (typeof PatternsHome !== 'undefined') PatternsHome.start();   // may switch to the remembered Patterns mode
+    if (typeof StylesHome !== 'undefined') StylesHome.start();       // or the remembered Styles mode
     if (typeof LogosHome !== 'undefined') LogosHome.start();         // or open #logo=<id> / the remembered Logos mode
   }
 

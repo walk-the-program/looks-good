@@ -1,20 +1,33 @@
 # Move lab (spec runtime, contract: docs/aesthetic-spec/SPEC-v2.md)
 
-An aesthetic is a plain JSON folder (spec 2): `dev/move-lab/specs/<key>/aesthetic.json` + optional `art/` + `rounds.json`.
+An aesthetic is a plain JSON folder (spec 2): `aesthetic.json` + optional `art/` + `rounds.json`.
 `js/aesthetic-spec.js` turns it into a normal `registerAesthetic` def plus a generated, scoped `<style id="spec-<key>">`.
-Nothing loads unless the URL has `?movelab=1` (one guarded tag in `index.html` loads `dev/move-lab/lab.js`).
 
-Files: `js/aesthetic-spec.js` (runtime), `js/moves/*.js` (move libraries, code tier), `dev/move-lab/specs/index.json`
-(`{ "specs": [folder, ...] }`, the folders to load; add an aesthetic = add its folder and one line), `lab.js` (loader; its
-arrays list runtime and move files, only files that exist, a 404 shows as a console error). Lab keys end in `--moves`, `order` 900+.
-Every aesthetic is a v2 JSON folder under `specs/`; `lab.js` loads only the folders listed in `index.json`.
+Two places hold folders:
+- `custom-aesthetics/<key>/` (listed in `custom-aesthetics/index.json`, `{ "aesthetics": [folder, ...] }`): real styles. They
+  load in the normal app with no flag, through `js/custom-aesthetics.js` (async fetch, `CustomAesthetics.ready`), and appear in
+  every style picker. New agent-made styles go here. Users can also import, export, duplicate and delete their own
+  (`CustomAesthetics`, stored in the library; folder styles cannot be deleted in the app).
+- `dev/move-lab/specs/<key>/` (listed in `dev/move-lab/specs/index.json`, `{ "specs": [...] }`): lab rebuilds and smoke specs, loaded
+  only with `?movelab=1` (one guarded tag in `index.html` loads `dev/move-lab/lab.js`, which reads the index with synchronous XHR).
+  Lab keys end in `--moves`, `order` 900+.
 
-Run: serve the repo, open `/?movelab=1`. Shots: `LG_QUERY='?movelab=1' dev/move-lab/shoot.sh <port> <outdir> smoke--moves`.
+Files: `js/aesthetic-spec.js` (runtime) and `js/moves/*.js` (move libraries, code tier) are always loaded by `index.html`; a new
+move file needs a `<script>` tag there, after `js/moves/darkroom.js`. A 404 for a listed file shows as a console error.
+
+Run: serve the repo, open `/` (custom styles) or `/?movelab=1` (also the lab specs). Shots:
+`node dev/aesthetic-check.js custom-aesthetics/<key> --render <port> --shots` (no flag needed), or for the lab
+`LG_QUERY='?movelab=1' dev/move-lab/shoot.sh <port> <outdir> smoke--moves`.
 Inspect: `SPEC_LAB.{moves,materials,states,specs,css}` (css is keyed by spec key), `SPEC_LAB.catalog()`, `SPEC_LAB.loadSpecs(indexUrl)`.
 
-Loader: `SPEC_LAB.loadSpecs` reads `index.json` and each `<key>/aesthetic.json` with synchronous XHR and calls
-`registerSpecAesthetic(json, { base: 'dev/move-lab/specs/<key>/', file, json: true })`. A missing, unparsable or invalid
-file logs one `console.error` naming it and is skipped; the rest load. JSON files need `"spec": 2`.
+Loaders: `SPEC_LAB.loadSpecs` (lab) reads `index.json` and each `<key>/aesthetic.json` with synchronous XHR and calls
+`registerSpecAesthetic(json, { base: 'dev/move-lab/specs/<key>/', file, json: true })`. `CustomAesthetics` (app) does the same
+with async `fetch`, passes the art it fetched as `opts.files`, and registers stored/imported styles with `opts.untrusted`
+(strict checks: field whitelist, no `<` `>` in strings, meta/build shape, art only from the bundle, data:image only). A missing,
+unparsable or invalid file logs one `console.error` naming it and is skipped; the rest load. JSON files need `"spec": 2`.
+`unregisterSpecAesthetic(key)` undoes a registration. Text and colour params are checked in every spec: no `{ } < > ; " \`,
+comments, `url(`, `@import` in text; colours must be hex, `rgb()`, `hsl()` or a name (a bad value falls back to the default with a warning).
+Selector-fragment text params are flagged `selector: true` in the move (no commas or combinators).
 
 ## aesthetic.json (spec 2)
 
@@ -51,7 +64,7 @@ A second `registerMove` with an existing id, or a material / state name that alr
 
 ### Art slot (`art.hero`)
 - `generator`: `{ kind, move, params }`: that move's `art` hook (its css joins the spec as a board-scoped entry unless the move is already in `moves`, which is reused).
-- `svg`: `src` relative to the folder, must end `.svg`; fetched (sync, lab only), sanitised, inlined into the art slot. Stripped items are logged with one `console.warn`.
+- `svg`: `src` relative to the folder, must end `.svg`; fetched (async in the app, sync in the lab), sanitised, inlined into the art slot. Stripped items are logged with one `console.warn`.
 - `image`: relative `png/jpg/jpeg/webp/gif` path or a `data:image/(png|jpeg|webp|gif);base64,` URL; rendered as `<img alt>` with `object-fit` from `fit`.
 It fills `.ab-art` (board hero, and the deck slides that call the art hook); Built screens never render it.
 Sanitiser rules (`SPEC_SVG_RULES`, global and `module.exports`): remove `script foreignObject iframe object embed`; remove every `on*` attribute; remove `href` / `xlink:href`

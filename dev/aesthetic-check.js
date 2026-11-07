@@ -9,7 +9,8 @@ const vm = require('vm');
 const cp = require('child_process');
 
 const ROOT = path.resolve(__dirname, '..');
-const SPECS_DIR = path.join(ROOT, 'dev', 'move-lab', 'specs');
+const SPECS_DIR = path.join(ROOT, 'dev', 'move-lab', 'specs');               // lab specs (need ?movelab=1)
+const CUSTOM_DIR = path.join(ROOT, 'custom-aesthetics');                       // custom styles (load in the normal app)
 const FIXTURES = path.join(__dirname, 'aesthetic-check', 'fixtures');
 
 const USAGE = `Usage: node dev/aesthetic-check.js <folder | aesthetic.json | key> [options]
@@ -20,9 +21,9 @@ Validates a spec-2 aesthetic (docs/aesthetic-spec/SPEC-v2.md) so an agent can it
 render -> look -> fix without opening the app.
 
 Target
-  <folder>         dev/move-lab/specs/<key>/ (aesthetic.json, art/, rounds.json)
+  <folder>         custom-aesthetics/<key>/ (aesthetic.json, art/, rounds.json); a lab spec dev/move-lab/specs/<key>/ works too
   <aesthetic.json> a single file (art and rounds.json are read from its folder)
-  <key>            an already registered lab key: render / shots only, no static checks
+  <key>            an already registered key (custom-aesthetics/<key> or a lab key): render / shots only, no static checks
 
 Options
   --render <port>  render checks against a server already running at the repo root
@@ -164,6 +165,7 @@ function getCatalog(sb) {
     const hooks = Array.isArray(m.hooks) ? m.hooks : Object.keys(m.hooks || {});
     info.moves[m.id] = { id: m.id, libraryId: m.libraryId == null ? null : m.libraryId, category: m.category || '', tier: m.tier || '', what: m.what || '', params, materials: mat, states: st, hooks, hasArt: hooks.includes('art') || (Array.isArray(m.hooks) ? false : false) };
   }
+  PARAM_PROBLEM = typeof lab.paramProblem === 'function' ? lab.paramProblem : null;
   info.kit = sb.KIT_COMPONENTS ? Object.keys(sb.KIT_COMPONENTS) : null;
   if (Array.isArray(sb.SPEC_SVG_RULES) && sb.SPEC_SVG_RULES.length) {
     info.svgRules = svgRulesFrom(sb.SPEC_SVG_RULES);
@@ -189,17 +191,20 @@ function builtInKeys() {
   }
   return keys;
 }
-/* Keys of other specs: folders (index.json and any folder with aesthetic.json) and legacy v1 JS specs. */
+/* Keys of other specs: folders under dev/move-lab/specs/ (lab) and custom-aesthetics/ (index.json and any folder with
+   aesthetic.json), and legacy v1 JS specs in the lab folder. A custom key must not clash with either place. */
 function otherSpecKeys(selfDir) {
   const folders = new Map(), legacy = new Map();
-  if (fs.existsSync(SPECS_DIR)) {
-    for (const f of fs.readdirSync(SPECS_DIR)) {
-      const full = path.join(SPECS_DIR, f);
+  for (const dir of [SPECS_DIR, CUSTOM_DIR]) {
+    if (!fs.existsSync(dir)) continue;
+    const where = dir === CUSTOM_DIR ? 'custom-aesthetics/' : '';
+    for (const f of fs.readdirSync(dir)) {
+      const full = path.join(dir, f);
       if (fs.statSync(full).isDirectory()) {
         if (selfDir && path.resolve(full) === path.resolve(selfDir)) continue;
         const j = path.join(full, 'aesthetic.json');
-        if (fs.existsSync(j)) { try { const k = JSON.parse(fs.readFileSync(j, 'utf8')).key; if (k) folders.set(k, f); } catch (e) { /* its own checker run reports it */ } }
-      } else if (f.endsWith('.js')) {
+        if (fs.existsSync(j)) { try { const k = JSON.parse(fs.readFileSync(j, 'utf8')).key; if (k) folders.set(k, where + f); } catch (e) { /* its own checker run reports it */ } }
+      } else if (f.endsWith('.js') && dir === SPECS_DIR) {
         const m = fs.readFileSync(full, 'utf8').match(/\bkey:\s*['"]([a-z0-9-]+)['"]/);
         if (m) legacy.set(m[1], f);
       }
@@ -209,6 +214,7 @@ function otherSpecKeys(selfDir) {
 }
 
 /* ------------------------------------------------------------------ static checks */
+let PARAM_PROBLEM = null;   // SPEC_LAB.paramProblem of the runtime, set by getCatalog
 function validateParamValue(def, v) {
   if (!def) return 'unknown param';
   switch (def.kind) {
@@ -220,8 +226,11 @@ function validateParamValue(def, v) {
     }
     case 'enum': { const o = def.options || []; return o.includes(v) ? '' : `${JSON.stringify(v)} not one of ${o.join('|')}`; }
     case 'bool': return typeof v === 'boolean' ? '' : 'not a boolean';
-    case 'colour': return isStr(v) && v ? '' : 'not a colour string';
-    case 'text': return isStr(v) ? '' : 'not a string';
+    case 'colour': case 'text': {
+      if (!isStr(v) || (def.kind === 'colour' && !v)) return def.kind === 'colour' ? 'not a colour string' : 'not a string';
+      const why = PARAM_PROBLEM ? PARAM_PROBLEM(def, v) : '';      // the runtime's own text / colour rule (CSS-safe)
+      return why ? `${JSON.stringify(v).slice(0, 40)} ${why}` : '';
+    }
     default: return '';
   }
 }
@@ -284,11 +293,12 @@ function checkKey(spec, ctx, R) {
   if (builtIn.has(key)) problems.push(`clashes with the built-in key "${key}" (rebuilds end in --moves)`);
   const others = otherSpecKeys(ctx.folder);
   if (others.folders.has(key)) problems.push(`clashes with spec folder "${others.folders.get(key)}"`);
-  if (ctx.underSpecs) {
+  if (ctx.underSpecs || ctx.underCustom) {
     if (path.basename(ctx.folder) !== key) problems.push(`folder name "${path.basename(ctx.folder)}" must equal the key`);
     let listed = false;
-    try { listed = arr(JSON.parse(fs.readFileSync(path.join(SPECS_DIR, 'index.json'), 'utf8')).specs).includes(key); } catch (e) { /* no index yet */ }
-    if (!listed) R.warn('key', `"${key}" is not listed in dev/move-lab/specs/index.json (the lab will not load it)`);
+    const idxFile = ctx.underCustom ? 'custom-aesthetics/index.json' : 'dev/move-lab/specs/index.json';
+    try { const idx = JSON.parse(fs.readFileSync(path.join(ROOT, idxFile), 'utf8')); listed = arr(ctx.underCustom ? idx.aesthetics : idx.specs).includes(key); } catch (e) { /* no index yet */ }
+    if (!listed) R.warn('key', `"${key}" is not listed in ${idxFile} (${ctx.underCustom ? 'the app' : 'the lab'} will not load it)`);
   }
   if (problems.length) R.fail('key', problems.join('; '));
   else R.pass('key', `"${key}" ok, no clash with ${builtIn.size} built-in keys or ${others.folders.size} other spec folders`);
@@ -506,12 +516,13 @@ function checkSimilar(spec, cat, R) {
 
 /* runs every static check; returns { report, spec, key, folder } */
 function runStatic(target, R, catInfo) {
-  const ctx = { folder: null, file: null, underSpecs: false };
+  const ctx = { folder: null, file: null, underSpecs: false, underCustom: false };
   let jsonPath;
   const st = fs.statSync(target);
   if (st.isDirectory()) { ctx.folder = path.resolve(target); jsonPath = path.join(ctx.folder, 'aesthetic.json'); }
   else { jsonPath = path.resolve(target); ctx.folder = path.dirname(jsonPath); }
   ctx.underSpecs = path.dirname(ctx.folder) === SPECS_DIR;
+  ctx.underCustom = path.dirname(ctx.folder) === CUSTOM_DIR;
   if (!fs.existsSync(jsonPath)) { R.fail('json', `${path.relative(ROOT, jsonPath)} not found`); return { spec: null, ctx }; }
   let spec;
   try { spec = JSON.parse(fs.readFileSync(jsonPath, 'utf8')); } catch (e) { R.fail('json', `does not parse: ${e.message}`); return { spec: null, ctx }; }
@@ -655,7 +666,9 @@ function main() {
   if (o.render && key) {
     const render = require('./aesthetic-check/render.js');
     const outDir = o.out ? path.resolve(o.out) : (ctx.folder ? path.join(ctx.folder, 'shots') : null);
-    table = render.run({ port: o.render, key, R, ROOT, shots: o.shots, outDir, palette: o.palette });
+    // custom-aesthetics styles load in the normal app; only lab specs need ?movelab=1
+    const custom = ctx.underCustom || (!ctx.folder && fs.existsSync(path.join(CUSTOM_DIR, key, 'aesthetic.json')));
+    table = render.run({ port: o.render, key, R, ROOT, shots: o.shots, outDir, palette: o.palette, lab: !custom });
   } else if (o.render) R.fail('render', 'no key to render (static checks failed to read one)');
 
   const count = l => R.results.filter(r => r.level === l).length;

@@ -80,10 +80,10 @@ return JSON.stringify({rows:out,mode:root.dataset.mode,ae:root.dataset.ae})}`;
 
 function sleep(ms) { Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, ms); }
 
-function run({ port, key, R, ROOT, shots, outDir, palette }) {
+function run({ port, key, R, ROOT, shots, outDir, palette, lab }) {
   const session = `-s=lg-check-${process.pid}`;
   const work = fs.mkdtempSync(path.join(os.tmpdir(), 'lg-check-'));   // playwright-cli drops .playwright-cli/ in its cwd
-  const url = `http://localhost:${port}/?movelab=1`;
+  const url = `http://localhost:${port}/${lab === false ? '' : '?movelab=1'}`;   // custom-aesthetics styles load without the lab flag
   const pw = (...args) => cp.spawnSync('playwright-cli', [session, ...args], { cwd: work, encoding: 'utf8', timeout: 60000 });
   const ev = js => {
     const r = pw('--raw', 'eval', js);
@@ -102,10 +102,11 @@ function run({ port, key, R, ROOT, shots, outDir, palette }) {
     if (open.status !== 0) { R.fail('render', `playwright-cli could not open ${url}: ${((open.stderr || open.stdout) || '').trim().slice(0, 160)} (is the server running at the repo root?)`); return table; }
     pw('resize', '1440', '1000');
     ev("(()=>{document.body.dataset.view='editor';window.showToast=()=>{};return 'ok'})()");
-    const has = ev(`AESTHETICS.some(a=>a.key==='${key}')`);
+    // custom styles register asynchronously: wait for CustomAesthetics.ready first
+    const has = ev(`(async()=>{if(window.CustomAesthetics)await CustomAesthetics.ready;return AESTHETICS.some(a=>a.key==='${key}')})()`);
     if (has !== 'true') {
       const c = consoleStat();
-      R.fail('render-load', `"${key}" is not registered at ${url} (add its folder to dev/move-lab/specs/index.json; ${c.errors} console error(s) at load${c.errors ? ': ' + c.text.split('\n').filter(l => /error/i.test(l)).slice(0, 2).join(' | ').slice(0, 200) : ''})`);
+      R.fail('render-load', `"${key}" is not registered at ${url} (add its folder to custom-aesthetics/index.json (or dev/move-lab/specs/index.json for a lab spec); ${c.errors} console error(s) at load${c.errors ? ': ' + c.text.split('\n').filter(l => /error/i.test(l)).slice(0, 2).join(' | ').slice(0, 200) : ''})`);
       return table;
     }
     ev(PROBE_JS.replace(/\n/g, ''));
@@ -195,12 +196,12 @@ function run({ port, key, R, ROOT, shots, outDir, palette }) {
 
   if (shots) {
     if (!outDir) { R.fail('shots', 'no output folder (pass --out <dir> for a key-only run)'); return table; }
-    runShots({ port, key, R, ROOT, outDir, palette });
+    runShots({ port, key, R, ROOT, outDir, palette, lab });
   }
   return table;
 }
 
-function runShots({ port, key, R, ROOT, outDir, palette }) {
+function runShots({ port, key, R, ROOT, outDir, palette, lab }) {
   fs.mkdirSync(outDir, { recursive: true });
   const brand = Object.assign({}, SHOT_BRAND, palette ? { primary: palette } : {});
   const session = `-s=lg-shoot-${process.pid}`;
@@ -209,7 +210,7 @@ function runShots({ port, key, R, ROOT, outDir, palette }) {
   const ev = js => { const l = ((pw('--raw', 'eval', js).stdout || '')).split('\n').filter(x => x.trim()); return l.length ? l[l.length - 1] : ''; };
   let bad = 0;
   try {
-    const open = pw('open', '--browser=chromium', `http://localhost:${port}/?movelab=1`);
+    const open = pw('open', '--browser=chromium', `http://localhost:${port}/${lab === false ? '' : '?movelab=1'}`);
     if (open.status !== 0) { R.fail('shots', 'playwright-cli could not open the page for shots'); return; }
     pw('resize', '1440', '1000');
     ev("(()=>{document.body.dataset.view='editor';window.showToast=()=>{};return 'ok'})()");

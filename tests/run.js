@@ -1240,6 +1240,156 @@ check('paste: empty text', run(`extractColors('').length`) === 0, 'found colors 
     J({ view: bf.view, viewPlain: bf.viewPlain }));
 }
 
+/* ---- custom aesthetics (js/custom-aesthetics.js + the spec runtime), no DOM ---- */
+{
+  const logs = { error: [], warn: [] };
+  const store = new Map();                       // the 'aesthetics' collection, shared by every boot() = "reloads"
+  const boot = () => {
+    const sbx = {
+      console: { log() {}, info() {}, debug() {}, warn: (...a) => { logs.warn.push(a.join(' ')); }, error: (...a) => { logs.error.push(a.join(' ')); } },
+      setTimeout, clearTimeout,   // builtins (JSON, Promise, ...) stay the sandbox's own, so parsed data is plain data there
+      document: { readyState: 'complete', getElementById: () => null, createElement: () => ({ remove() {}, setAttribute() {} }), head: { appendChild() {} }, body: null, addEventListener() {} },
+      LibraryStore: {
+        collection: () => ({ list: async () => [...store.values()].map(r => JSON.parse(JSON.stringify(r))), put: async r => { store.set(r.id, JSON.parse(JSON.stringify(r))); }, remove: async id => { store.delete(id); } }),
+        newId: () => Math.random().toString(16).slice(2, 18),
+      },
+      fetch: async url => {   // serves the repo's files; 404 for the rest
+        const f = path.join(root, String(url));
+        if (!fs.existsSync(f)) return { ok: false, status: 404, text: async () => '' };
+        return { ok: true, status: 200, text: async () => fs.readFileSync(f, 'utf8') };
+      },
+    };
+    sbx.window = sbx;
+    const c = vm.createContext(sbx);
+    const load = f => vm.runInContext(fs.readFileSync(path.join(root, f), 'utf8'), c, { filename: f });
+    ['js/data.js', 'js/color.js', 'js/aesthetics/registry.js', 'js/aesthetic-spec.js'].forEach(load);
+    fs.readdirSync(path.join(root, 'js/moves')).filter(f => f.endsWith('.js')).sort((a, b) => (a === 'core.js' ? -1 : b === 'core.js' ? 1 : a.localeCompare(b))).forEach(f => load('js/moves/' + f));
+    vm.runInContext(`registerAesthetic({ key: 'soft-form', name: 'Soft Form', order: 1 });`, c);
+    load('js/aesthetic-meta.js');
+    load('js/custom-aesthetics.js');
+    return { c, run: code => vm.runInContext(code, c) };
+  };
+  const dr = JSON.parse(fs.readFileSync(path.join(root, 'custom-aesthetics/darkroom/aesthetic.json'), 'utf8'));
+  const mk = (key, extra) => Object.assign(JSON.parse(JSON.stringify(dr)), { key, name: 'Test ' + key, art: undefined }, extra || {});
+  const bundleOf = (aesthetic, extra) => Object.assign({ format: 'looks-good-aesthetic', version: 1, aesthetic, rounds: null, art: {} }, extra || {});
+  const J2 = JSON.stringify;
+
+  pendingChecks.push((async () => {
+    let app = boot();
+    await app.c.CustomAesthetics.ready;
+    const CA = () => app.c.CustomAesthetics;
+    const keys = () => JSON.parse(app.run('JSON.stringify(AESTHETICS.map(a => a.key))'));
+    check('custom: the Darkroom folder loads at boot as source "folder"; built-ins stay built-in',
+      CA().source('darkroom') === 'folder' && CA().source('soft-form') === 'builtin' && CA().source('nope') === null && keys().includes('darkroom'), J2(CA().list()));
+    check('custom: folder style has its rounds', !!CA().rounds('darkroom') && CA().list().find(x => x.key === 'darkroom').hasRounds === true, '');
+
+    // round trip: bundle -> import -> export gives the same bundle; survives a "reload"
+    const base = await CA().bundle('darkroom');
+    base.aesthetic.key = 'night-roll'; base.aesthetic.name = 'Night Roll';
+    delete base.aesthetic.art;                       // art needs a DOM parser; covered in the browser sweep
+    base.art = {};
+    let changes = 0; CA().onChange(() => changes++);
+    const imp = await CA().importText(J2(base));
+    check('custom: bundle import ok, registered and listed as mine', imp.ok && imp.key === 'night-roll' && CA().source('night-roll') === 'mine' && keys().includes('night-roll') && changes === 1, J2(imp));
+    const again = JSON.parse(await CA().exportText('night-roll'));
+    check('custom: export gives the identical bundle', J2(again) === J2(base), 'export differs');
+    app = boot(); await app.c.CustomAesthetics.ready;
+    check('custom: a stored style comes back after a reload', app.c.CustomAesthetics.source('night-roll') === 'mine' && keys().includes('night-roll'), J2(app.c.CustomAesthetics.list()));
+
+    // bare aesthetic.json
+    const bare = mk('bare-style'); delete bare.art;
+    const rb = await CA().importText(J2(bare));
+    check('custom: a bare aesthetic.json imports (no art files, no rounds)', rb.ok && CA().rounds('bare-style') === null && JSON.parse(await CA().exportText('bare-style')).format === 'looks-good-aesthetic', J2(rb));
+
+    // key rules
+    const biKey = await CA().importText(J2(bundleOf(mk('soft-form'))));
+    check('custom: a built-in key is refused with the message', !biKey.ok && biKey.error === 'This key belongs to a built-in style.', J2(biKey));
+    const classicKey = await CA().importText(J2(bundleOf(mk('soft-form--classic'))));
+    check('custom: a classic key is refused', !classicKey.ok, J2(classicKey));
+    let asked = 0;
+    const cancel = await CA().importText(J2(base), { onClash: k => { asked++; return 'cancel'; } });
+    const noCb = await CA().importText(J2(base));
+    check('custom: a clash asks onClash; cancel (or no callback) changes nothing', !cancel.ok && cancel.cancelled === true && asked === 1 && !noCb.ok && CA().list().filter(x => x.key.startsWith('night-roll')).length === 1, J2([cancel, noCb]));
+    const copy = await CA().importText(J2(base), { onClash: () => 'copy' });
+    const copy2 = await CA().importText(J2(base), { onClash: () => 'copy' });
+    check('custom: copy gets <key>-2, -3 and " (copy)" on the name', copy.ok && copy.key === 'night-roll-2' && copy2.key === 'night-roll-3' && CA().list().find(x => x.key === 'night-roll-2').name === 'Night Roll (copy)', J2([copy, copy2]));
+    const edited = JSON.parse(J2(base)); edited.aesthetic.name = 'Night Roll v2';
+    const rep = await CA().importText(J2(edited), { onClash: () => 'replace' });
+    check('custom: replace keeps the key and updates the style in place', rep.ok && rep.key === 'night-roll' && CA().list().find(x => x.key === 'night-roll').name === 'Night Roll v2' && CA().list().filter(x => x.key === 'night-roll').length === 1, J2(rep));
+    const folderBundle = await CA().bundle('darkroom');
+    const repFolder = await CA().importText(J2(folderBundle), { onClash: () => 'replace' });
+    check('custom: a folder style cannot be replaced by an import', !repFolder.ok && /can't be replaced/.test(repFolder.error) && CA().source('darkroom') === 'folder', J2(repFolder));
+
+    // duplicate / rename / remove
+    const dup = await CA().duplicate('darkroom');
+    check('custom: duplicate of a folder style becomes a stored copy with a new key and no rounds', dup.ok && dup.key === 'darkroom-2' && CA().source('darkroom-2') === 'mine' && CA().rounds('darkroom-2') === null && CA().list().find(x => x.key === 'darkroom-2').name === 'Darkroom (copy)', J2(dup));
+    const dupN = await CA().duplicate('darkroom-2', { name: 'My Roll' });
+    check('custom: duplicate with a name uses it', dupN.ok && CA().list().find(x => x.key === dupN.key).name === 'My Roll', J2(dupN));
+    const rn = await CA().rename('darkroom-2', 'Renamed Roll');
+    const rnBad = await CA().rename('darkroom-2', '<b>x</b>');
+    const rnFolder = await CA().rename('darkroom', 'Nope');
+    check('custom: rename works on stored styles only and refuses markup', rn.ok && CA().list().find(x => x.key === 'darkroom-2').name === 'Renamed Roll' && JSON.parse(app.run('JSON.stringify(aestheticByKey("darkroom-2").name)')) === 'Renamed Roll' && !rnBad.ok && !rnFolder.ok, J2([rn, rnBad, rnFolder]));
+    app.run(`globalThis.state = { aesthetic: 'darkroom-2', blend: { with: 'darkroom-2' }, aestheticVersion: 'current', combo: null };`);
+    const rm = await CA().remove('darkroom-2');
+    const rmFolder = await CA().remove('darkroom');
+    check('custom: remove deletes a stored style, the open brand falls back to the default, folder styles stay',
+      rm.ok && CA().source('darkroom-2') === null && !keys().includes('darkroom-2') && app.run('state.aesthetic') === 'soft-form' && app.run('state.blend') === null && !rmFolder.ok && CA().source('darkroom') === 'folder', J2([rm, rmFolder]));
+    app = boot(); await app.c.CustomAesthetics.ready;
+    check('custom: a removed style stays removed after a reload', app.c.CustomAesthetics.source('darkroom-2') === null, '');
+
+    // a stored record that clashes with a folder key is skipped with a warning, the folder wins
+    store.set('clash0000', { id: 'clash0000', createdAt: 1, updatedAt: 1, bundle: bundleOf(mk('darkroom')) });
+    store.set('broken000', { id: 'broken000', createdAt: 2, updatedAt: 2, bundle: { nonsense: true } });
+    logs.error.length = 0; logs.warn.length = 0;
+    app = boot(); await app.c.CustomAesthetics.ready;
+    check('custom: a stored style that clashes with a folder key is skipped (warning), a broken record is skipped (one error), the rest load',
+      app.c.CustomAesthetics.source('darkroom') === 'folder' && app.c.CustomAesthetics.list().filter(x => x.key === 'darkroom').length === 1 && logs.warn.some(w => /clashes/.test(w)) && logs.error.filter(e => /broken000/.test(e)).length === 1 && app.c.CustomAesthetics.source('night-roll') === 'mine',
+      J2({ e: logs.error.slice(0, 3), w: logs.warn.slice(0, 3) }));
+    store.delete('clash0000'); store.delete('broken000');
+
+    // hostile bundles
+    logs.error.length = 0; logs.warn.length = 0;
+    const evil = [
+      ['markup in the name', bundleOf(mk('evil-name', { name: 'Hi <img src=x onerror=alert(1)>' }))],
+      ['markup in a rule', bundleOf(mk('evil-rule', { rules: { do: ['<script>alert(1)</script>'], dont: [] } }))],
+      ['__proto__ key', JSON.parse('{"format":"looks-good-aesthetic","version":1,"aesthetic":' + J2(mk('evil-proto')).replace(/^\{/, '{"__proto__":{"x":1},') + ',"rounds":null,"art":{}}')],
+      ['classicOf field', bundleOf(mk('evil-classic', { classicOf: 'soft-form' }))],
+      ['tokens field', bundleOf(mk('evil-tokens', { tokens: { a: 1 } }))],
+      ['meta without fonts', bundleOf(mk('evil-meta', { meta: { family: 'graphic' } }))],
+      ['unknown build class', bundleOf(mk('evil-build', { build: { cls: 'nope' } }))],
+      ['art path outside art/', bundleOf(mk('evil-path'), { art: { '../x.svg': '<svg xmlns="http://www.w3.org/2000/svg"/>' } })],
+      ['art image that is not a data URL', bundleOf(mk('evil-img'), { art: { 'art/x.png': 'http://evil.example/x.png' } })],
+      ['too many art files', bundleOf(mk('evil-many'), { art: Object.fromEntries(Array.from({ length: 13 }, (_, i) => ['art/a' + i + '.svg', '<svg xmlns="http://www.w3.org/2000/svg"/>'])) })],
+      ['wrong version', bundleOf(mk('evil-ver'), { version: 2 })],
+      ['too many moves', bundleOf(mk('evil-moves', { moves: Array.from({ length: 201 }, () => ({ move: 'corner-radius' })) }))],
+    ];
+    const before = keys().length;
+    for (const [what, b] of evil) {
+      const r = await CA().importText(J2(b));
+      check(`hostile: ${what} is rejected`, !r.ok && typeof r.error === 'string' && r.error.length > 0, J2(r));
+    }
+    const big = await CA().importText('{"format":"looks-good-aesthetic","version":1,"aesthetic":{},"x":"' + 'a'.repeat(2 * 1024 * 1024) + '"}');
+    check('hostile: a bundle over 2 MB is rejected', !big.ok && /2 MB/.test(big.error), J2(big).slice(0, 120));
+    check('hostile: nothing hostile was registered', keys().length === before && !keys().some(k => k.startsWith('evil-')), keys().join());
+
+    // text and colour params that try to leave their CSS rule or inject markup are neutralised (default used), not rejected
+    const nasty = ['x"}body{display:none}/*', 'url(http://evil.example/p.png)', "a;}@import 'x'", 'x\\"y', 'javascript:alert(1)'];
+    const tagged = await CA().importText(J2(bundleOf(mk('evil-tag', { moves: mk('x').moves.concat([{ move: 'ticker-strip', params: { top: '</style><script>alert(1)</script>' } }]) }))));
+    check('hostile: </style> or <script> in a param rejects the whole import', !tagged.ok && /< or >/.test(tagged.error), J2(tagged));
+    const moves = mk('evil-css').moves.concat(nasty.map(t => ({ move: 'ticker-strip', params: { top: t, bottom: t, rule: t } })));
+    const colourMove = [{ move: 'fixed-lamp-cast', params: { lamp: 'red;}body{display:none' } }];
+    const hostile = mk('evil-css', { moves, colour: mk('x').colour.map(e => e.move === 'fixed-lamp-cast' ? colourMove[0] : e) });
+    const rc = await CA().importText(J2(bundleOf(hostile)));
+    const css = String(app.run(`SPEC_LAB.css['evil-css']`) || '');
+    check('hostile: text/colour params with } </style> url( @import are neutralised in the generated CSS',
+      rc.ok && css.length > 100 && !/evil\.example|<\/style>|<script|display:\s*none\s*}|@import|\*\/\s*$/.test(css) && logs.warn.filter(w => /evil-css/.test(w)).length >= 5, J2({ rc, w: logs.warn.filter(w => /evil-css/.test(w)).length, hit: (css.match(/evil\.example|<\/style>|<script|@import/) || [])[0] }));
+    // script in svg art never reaches the page: the sandbox has no DOM parser, so the art is dropped (the browser sweep checks real sanitising)
+    const svgB = mk('evil-svg', { art: { hero: { kind: 'svg', src: 'art/hero.svg', fit: 'cover', alt: 'x' } } });
+    const rs = await CA().importText(J2(bundleOf(svgB, { art: { 'art/hero.svg': '<svg xmlns="http://www.w3.org/2000/svg"><script>alert(1)</script><rect onload="x()" width="1" height="1"/></svg>' } })));
+    check('hostile: svg art with a script is never put on the def unsanitised', rs.ok && app.run(`typeof aestheticByKey('evil-svg').art`) !== 'function', J2(rs));
+  })());
+}
+
 // Not run here (they need a real DOM): that blended tokens(t, state) see the view's fonts end to end, and the
 // render timings. They are covered by the in-browser sweeps in docs/round6/.
 
