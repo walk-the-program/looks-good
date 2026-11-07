@@ -1,5 +1,5 @@
 /* Moves for a room lit by one fixed lamp: a lighting cast that ignores the client colour, a film-rebate frame
-   material and a headline underline. Generic and parameterised. Loaded by dev/move-lab/lab.js (?movelab=1 only). */
+   material and a headline underline. Generic and parameterised. Loaded by index.html at startup (and by dev/move-lab/lab.js in the lab). */
 (function () {
 'use strict';
 

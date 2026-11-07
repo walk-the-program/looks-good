@@ -44,6 +44,8 @@ node dev/aesthetic-check.js <scratch>/<key> --render <port> --shots    # works o
 node dev/aesthetic-check.js --pack <scratch>/<key> <scratch>/<key>.aesthetic.json
 ```
 
+Order: static check, render with shots (`--out <scratch>/shots-r<n>`), read the PNGs, pack; re-run pack after any late fix. Reuse a server already running at the repo root. When materials change, refresh `build.surface`, `build.pressText`, `build.icons`, `build.appIcon`, `meta.fonts.why`, `labels.material`.
+
 Then tell the owner the packed path and to import it in Styles with Replace.
 
 ## The loop (exact commands, repo root)
@@ -57,7 +59,7 @@ node dev/aesthetic-check.js custom-aesthetics/<key> --render <port> --shots
 Shots use one pinned preview brand (recorded in `shots/palette.txt`; `--palette <hex>` overrides the primary).
 Then Read every PNG in `custom-aesthetics/<key>/shots/` (board, kit-top, deck; light and dark),
 run the "review your own shots" checklist (AUTHORING.md section 9 step 7), record the round in `rounds.json`, and stop the server. Fix every FAIL before rendering.
-Regenerate the move catalog after adding a code move: `dev/aesthetic-spec-catalog.sh`.
+Regenerate the move catalog after adding a code move: `dev/aesthetic-spec-catalog.sh` (keep the regenerated `moves.md`). Code moves: `tokens()` runs for listed moves, then kit-only material/state moves with default params (`kit.params` don't reach it); start `what` with `Board:` or `Kit:` for one-scope moves; an SVG on a hardcoded paper colour hardcodes its ink too (AUTHORING.md sections 7, 8).
 
 ## Hard rules
 

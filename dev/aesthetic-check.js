@@ -292,6 +292,27 @@ function checkFields(spec, R) {
   if (extra.length) R.warn('fields', `unknown top-level field(s): ${extra.join(', ')}`);
 }
 
+/* Template placeholder sentences left in string fields (WARN, not FAIL): the wording of docs/aesthetic-spec/template/. */
+const TEMPLATE_TEXT = [
+  /\(stages? \d+(?: and \d+)?\)/i, /Word · Word · Word/, /One sentence a stranger understands\./, /Plain list of what this draws on/,
+  /Kicker above the headline/, /Short line\./, /Describe the hero art/, /One sentence on why these font classes carry the look/,
+  /What rest, hover and pressed do, in numbers/, /Stroke weight, caps, corners, selected treatment\./,
+  /One sentence describing the app icon tile in this look\./, /One sentence: the mechanism that makes it recognisable/,
+];
+/* copy.<item>.label fields are real specimen labels (e.g. "Kicker above the headline"), not placeholders. */
+const COPY_LABEL_PATH = /^copy\.[^.]+\.label$/;
+function checkTemplateText(spec, R) {
+  const hits = [];
+  const walk = (v, p) => {
+    if (typeof v === 'string') { if (!COPY_LABEL_PATH.test(p) && TEMPLATE_TEXT.some(re => re.test(v))) hits.push(p); }
+    else if (Array.isArray(v)) v.forEach((x, i) => walk(x, `${p}[${i}]`));
+    else if (isObj(v)) for (const k of Object.keys(v)) walk(v[k], p ? `${p}.${k}` : k);
+  };
+  walk(spec, '');
+  if (hits.length) R.warn('template-text', `template placeholder text still in ${hits.length} field${hits.length === 1 ? '' : 's'}: ${hits.join(', ')}`);
+  else R.pass('template-text', 'no template placeholder text left');
+}
+
 function checkKey(spec, ctx, R) {
   const key = spec.key;
   if (!isStr(key)) return;
@@ -648,6 +669,7 @@ function runStatic(target, R, catInfo) {
   if (!isObj(spec)) { R.fail('json', 'top level must be a JSON object'); return { spec: null, ctx }; }
   R.pass('json', `${path.relative(ROOT, jsonPath)} parses as pure JSON data`);
   checkFields(spec, R);
+  checkTemplateText(spec, R);
   checkKey(spec, ctx, R);
   checkMoves(spec, catInfo, R);
   checkKit(spec, catInfo, R);

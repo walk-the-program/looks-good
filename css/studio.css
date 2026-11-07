@@ -150,6 +150,7 @@ html.is-mac-app .studio { padding-top: 28px; }
 .stu-entry > summary .stu-tier + .stu-tier { margin-left: 0; }
 .stu-tier.is-bad { background: var(--bad-bg); color: var(--bad-ink); }
 .stu-entry-b { padding: 2px 10px 12px; }
+.stu-shadow { margin: 0 0 8px; padding: 7px 9px; border-radius: 6px; background: var(--bad-bg); color: var(--bad-ink); font-size: var(--fs-2); line-height: 1.5; }
 .stu-what { margin: 0 0 8px; font-size: var(--fs-2); line-height: 1.5; color: var(--ink-2); }
 .stu-entry-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; justify-content: space-between; margin-bottom: 6px; }
 .stu-entry-bar label { display: flex; align-items: center; gap: 6px; font-size: var(--fs-2); color: var(--muted); }

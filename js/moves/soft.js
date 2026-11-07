@@ -1,5 +1,5 @@
 /* Soft moves: generic relief / glass / gloss moves. Style-neutral: every value is a param.
-   Contract: dev/move-lab/README.md. Loaded by dev/move-lab/lab.js (?movelab=1 only), after core.js.
+   Contract: dev/move-lab/README.md. Loaded by index.html at startup (and by dev/move-lab/lab.js in the lab), after core.js.
    Vocabulary: a relief pair (--rl-hi light edge, --rl-lo shadow edge) derived from the canvas colour,
    then raised / recessed / glossy / clear-glass surfaces built from that pair. */
 (function () {

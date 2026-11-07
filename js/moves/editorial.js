@@ -1,7 +1,7 @@
 /* Editorial moves: generic, parameterised "printed page" vocabulary (hairline rules, thick-over-thin
    frames, paper canvas, duotone plate generator, hanging drop cap, ruled lists with dotted leaders,
    underline fields and tabs). No style names, no copied stylesheet: values come from spec params.
-   Contract: dev/move-lab/README.md. Loaded by dev/move-lab/lab.js (?movelab=1 only). */
+   Contract: dev/move-lab/README.md. Loaded by index.html at startup (and by dev/move-lab/lab.js in the lab). */
 (function () {
 'use strict';
 

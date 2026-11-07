@@ -55,8 +55,8 @@ key (`js/aesthetics/*.js`) or another spec. Keys ending `--moves` are reserved f
 built-ins; use a plain key for a new look. Use `order` 950 or higher.
 
 Starter files: `docs/aesthetic-spec/template/` (`aesthetic.json`, `rounds.json`, `art/hero.svg`;
-its `README.md` is notes and is not copied). The template passes the checker as is once renamed and
-listed in `index.json`; it maps all 70 kit components, with the material varying by component group.
+its `README.md` is notes and is not copied). The template passes the checker with no FAIL once renamed and
+listed in `index.json`, and a `template-text` WARN lists every placeholder sentence still to rewrite; it maps all 70 kit components, with the material varying by component group.
 
 `meta.family` must be one of: `tactile` (raised, pressed, physical), `graphic` (flat colour, hard
 edges, posters), `digital` (screens, terminals, UI chrome), `print` (editorial, paper, type-led),
@@ -211,7 +211,8 @@ move's `materials:` and `states:` names.
   work inside it as CSS variables: `--ab-primary`, `--ab-secondary`, `--ab-accent`, `--ab-ink`,
   `--ab-canvas`, `--ab-muted`, `--ab-line`, `--ab-pri-tint`, `--ab-sec-tint`, `--ab-on-primary`.
   Always add a fallback hex, and keep plain hexes for the neutral parts, so the art follows the
-  client colour:
+  client colour. An SVG drawn on a hardcoded paper colour must hardcode its ink too (or vary both
+  together): `var(--ab-ink)` on a fixed cream goes light-on-cream in dark mode.
 
   ```svg
   <rect width="200" height="200" fill="var(--ab-canvas,#f4ecd8)"/>
@@ -249,12 +250,14 @@ Rules:
   `night-ferry-sign`. No style names in ids, comments or text.
 - **Reusable.** Everything tunable is a param with a default and a range. No hard-coded brand hexes;
   take colours from the roles (`--ab-primary` etc.) or params.
-- **`what`** (required, one line) says what the move does. **`libraryId`** is the id from
+- **`what`** (required, one line) says what the move does. Start it with `Board:` or `Kit:` when the move only
+  makes sense in one scope. **`libraryId`** is the id from
   `docs/move-audit/move-library.json` the move implements, or `null` if it is new.
 - **Collisions are errors.** A move id, material name or state name that already exists logs
   `console.error` and the whole move is ignored. Check the catalog first; use a distinct name.
 - Put it in a new file `js/moves/<name>.js` and add a `<script>` tag for it in
-  `index.html` (a `<script>` tag after `js/moves/darkroom.js`). Do not edit `core.js`, another move file, or
+  `index.html` (a `<script>` tag after `js/moves/darkroom.js`). Nothing else registers it; regenerate
+  `docs/aesthetic-spec/moves.md` with `dev/aesthetic-spec-catalog.sh` and keep that file in the change. Do not edit `core.js`, another move file, or
   `js/aesthetic-spec.js` unless you are fixing a bug in the move you wrote.
 
 Contract (see `dev/move-lab/README.md` "registerMove" for the full text):
@@ -276,12 +279,26 @@ breaks other styles. Dark-mode values: use `{light,dark}` params or `ctx.SD`. Af
 move, run `node dev/aesthetic-check.js --list-moves | grep -A5 "### <id>"` to confirm it is in the
 catalog with its `what`, then use it like any other move. Regenerate `moves.md` (below).
 
-`tokens(t, p, ctx, state)` runs once per render and mode. Its returned values are merged after the
-board's own variables, so they can override framework roles such as `--ab-canvas`, `--ab-ink`,
-`--ab-muted` and `--ab-line`; later moves win. The `t` object has two helpers: `t.mix(hex, base,
-amount)` blends `hex` into `base` by `amount` (0 to 1), and `t.contrast(hexA, hexB)` returns the
-contrast ratio. `js/moves/darkroom.js` uses both: `t.mix(p.lamp, t.canvas, p.canvasMix)` tints the
-canvas, and `muted` steps toward the canvas until `t.contrast(muted, canvas) >= 4.6`.
+`tokens(t, p, ctx, state)` runs once per render and mode: first for the listed moves (`colour`, then `moves`, in
+order), then for every move that is only used as a kit material or state (`kit.<component>.material` / `.state`),
+with its default params and `'kit'` scope, after the listed ones. Per-component `kit.params` do not reach
+`tokens()`. A kit-only move's move-level `css()` is not emitted; only its material / state CSS is. Returned values
+are merged after the board's own variables, so they can override framework roles such as `--ab-canvas`,
+`--ab-ink`, `--ab-muted` and `--ab-line`; later moves win.
+
+`t` carries the role hexes `t.canvas`, `t.ink`, `t.muted`, `t.line`, `t.primary`, `t.secondary`, `t.accent`, their
+readable-text hexes `t.onPrimary`, `t.onSecondary`, `t.onAccent`, the tints `t.priTint`, `t.secTint`, the text-safe
+`t.primaryText`, `t.accentText`, `t.accentInk`, `t.accentMark`, `t.printPrimary` / `t.printed`, `t.accentLow`, and
+`t.isDark`. Helpers: `t.mix(hex, base, amount)` blends `hex` into `base` by `amount` (0 to 1), `t.contrast(hexA,
+hexB)` returns the contrast ratio, `t.readable(hex)` picks black or white text for a fill. `js/moves/darkroom.js`
+uses them: `t.mix(p.lamp, t.canvas, p.canvasMix)` tints the canvas, and `muted` steps toward the canvas until
+`t.contrast(muted, canvas) >= 4.6`.
+
+`role`, `ON_VAR` and `ROLES` in `core.js` are private to that file. A move file that needs them copies the small
+block at the top of `js/moves/printed-stock.js` (`ROLE_VAR`, `ON_VAR`, `ROLES`, `role`) inside its own `(function () {
+... })();`. The shortest pattern for a contrast-safe colour is `ink-stamp` in the same file: build the fill with
+`t.mix`, pick `t.canvas` or `t.ink` by `t.contrast`, nudge until 4.6:1, return it as a `--ab-...` property, and use
+it in the material CSS as `var(--ab-stamp-fill, <fallback>)`.
 
 ## 9. The round loop
 
@@ -398,17 +415,22 @@ for the next round, work on an unpacked copy, never on the app's folders. `<scra
    round as it is, and add yours as the next `n`.
 3. Make the round in `aesthetic.json`. One axis per variant (material, colour recipe, headline treatment, corners and
    edges, kit states, art); a note's `target` says where to look (`board.hero` is the headline and art, `kit.<component>`
-   a kit entry). Do not change `key`, `name`, `descriptor` or `coreTrick` unless a note asks.
+   a kit entry). Do not change `key`, `name`, `descriptor` or `coreTrick` unless a note asks. When materials change,
+   rewrite the descriptive fields that describe them so they do not contradict the look: `build.surface`,
+   `build.pressText`, `build.icons`, `build.appIcon`, `meta.fonts.why`, `labels.material`.
 4. Append your round to `rounds.json` (SPEC-v2 section 7): `n` is the last `n` plus 1, `by: "agent"`, `summary`,
    `changes` in plain sentences, `variants` with ids `r<n>a`, `r<n>b` (the one you applied is `keep`, the others `kill`
    or `open`). Mark each note you addressed `"status": "done"` with `"doneIn": <n>`; raise new notes as open with the next
    `n<k>` id. No `open` key in your round; leave `shots` out unless you copy PNGs next to it (the bundle does not carry shots).
-5. Check the folder: `node dev/aesthetic-check.js <scratch>/<key>`, then with a server running at the repo root,
-   `node dev/aesthetic-check.js <scratch>/<key> --render <port> --shots`. An unlisted folder renders too: the checker
+5. Check the folder, in this order: static check, render with shots, read the PNGs, pack.
+   `node dev/aesthetic-check.js <scratch>/<key>`, then with a server running at the repo root (reuse one that is
+   already serving it; start another only if none is),
+   `node dev/aesthetic-check.js <scratch>/<key> --render <port> --shots --out <scratch>/shots-r<n>`. Without `--out`,
+   shots go into `<scratch>/<key>/shots`; never point them into `custom-aesthetics/`. An unlisted folder renders too: the checker
    imports its packed bundle into the headless page under a temporary key and removes it afterwards (files and the
    report carry the real key). Read the PNGs as in section 9 step 7. A same-key WARN against the repo's copy of the style
    is expected for a scratch copy.
 6. Pack: `node dev/aesthetic-check.js --pack <scratch>/<key> <scratch>/<key>.aesthetic.json`. It runs the static checks
-   again, writes the file only when nothing FAILs, and prints its path.
+   again, writes the file only when nothing FAILs, and prints its path. Re-run pack after any late fix.
 7. Tell the owner the path and that they import it in Styles with **Replace**; the studio then shows your round waiting
    for review. Do not copy anything into `custom-aesthetics/` and do not edit the index.

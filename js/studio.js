@@ -181,9 +181,12 @@ const Studio = (function () {
     try { return fn(); } finally { added.forEach(k => { delete state[k]; }); Object.assign(state, saved); }
   }
 
+  // The neutral brand: the checker's pinned blue, derived once, so a redraw never shifts the colours.
+  const NEUTRAL_PALETTE = derivePalette('#2f5d8a', 'analogous');
+
   function baseState(id) {
     const st = freshState();
-    st.colors = generatePalette('analogous', 210);
+    st.colors = Object.assign({}, NEUTRAL_PALETTE);
     const b = brands.find(x => x.id === (id === undefined ? brandId : id));
     if (b) { try { const { logoDataUrl, ...rest } = b.saved; applySavedSessionToState(rest, st); } catch (e) { /* keep the neutral */ } }
     return st;
@@ -473,13 +476,14 @@ const Studio = (function () {
   function fText(path, label, val, o) {
     o = o || {};
     const id = fid();
-    const tag = o.area ? `<textarea id="${id}" data-p="${path}" data-t="text" rows="${o.rows || 3}" spellcheck="true">${esc(val)}</textarea>`
-      : `<input type="text" id="${id}" data-p="${path}" data-t="text" value="${esc(val)}" autocomplete="off" spellcheck="false" />`;
+    const ph = o.ph ? ` placeholder="${esc(o.ph)}"` : '';
+    const tag = o.area ? `<textarea id="${id}" data-p="${path}" data-t="text" rows="${o.rows || 3}" spellcheck="true"${ph}>${esc(val)}</textarea>`
+      : `<input type="text" id="${id}" data-p="${path}" data-t="text" value="${esc(val)}" autocomplete="off" spellcheck="false"${ph} />`;
     return `<div class="stu-f ${o.req && !String(val || '').trim() ? 'is-bad' : ''}"><label for="${id}">${esc(label)}${o.req ? ' <b>required</b>' : ''}</label>${tag}${o.help ? `<small>${esc(o.help)}</small>` : ''}</div>`;
   }
-  function fList(path, label, arr, help) {
+  function fList(path, label, arr, help, ph) {
     const id = fid();
-    return `<div class="stu-f"><label for="${id}">${esc(label)}</label><input type="text" id="${id}" data-p="${path}" data-t="list" value="${esc((arr || []).join(', '))}" autocomplete="off" spellcheck="false" />${help ? `<small>${esc(help)}</small>` : ''}</div>`;
+    return `<div class="stu-f"><label for="${id}">${esc(label)}</label><input type="text" id="${id}" data-p="${path}" data-t="list" value="${esc((arr || []).join(', '))}" autocomplete="off" spellcheck="false"${ph ? ` placeholder="${esc(ph)}"` : ''} />${help ? `<small>${esc(help)}</small>` : ''}</div>`;
   }
   function fSelect(path, label, val, options, o) {
     const id = fid();
@@ -535,7 +539,7 @@ const Studio = (function () {
     return `<div class="stu-dial${has ? ' is-set' : ''}" data-dial="${esc(path)}" data-name="${esc(d.name)}">
       <div class="stu-dial-h"><span class="stu-dial-n">${esc(d.name)}</span><span class="stu-dial-m">${esc(meta)}</span>${has ? `<button type="button" class="stu-link" data-act="reset" data-path="${esc(path)}" title="Back to the default">Reset</button>` : ''}</div>
       <div class="stu-dial-b">${body}</div>
-      <label class="stu-differ"><input type="checkbox" data-differ="${esc(path)}" data-name="${esc(d.name)}"${pair ? ' checked' : ''} /> Light / Dark differ</label>
+      <label class="stu-differ"><input type="checkbox" data-differ="${esc(path)}" data-name="${esc(d.name)}" aria-label="${esc(d.name)} differs in light and dark"${pair ? ' checked' : ''} /> Light / Dark differ</label>
     </div>`;
   }
 
@@ -565,10 +569,10 @@ const Studio = (function () {
     const noMeta = !s.meta ? '<p class="stu-note">This style has no family or font data yet.</p><button type="button" class="btn btn-ghost btn-small" data-act="add-meta">Add family and fonts</button>' : '';
     return [
       fText('name', 'Name', s.name, { req: true }),
-      fText('descriptor', 'Descriptor', s.descriptor, { req: true, help: 'Three words: Word · Word · Word' }),
-      fText('summary', 'Summary', s.summary || '', { area: true, rows: 2, help: 'One sentence a stranger understands.' }),
+      fText('descriptor', 'Descriptor', s.descriptor, { req: true, help: 'Three words, separated by dots.', ph: 'Word · Word · Word' }),
+      fText('summary', 'Summary', s.summary || '', { area: true, rows: 2, help: 'One sentence a stranger understands.', ph: 'One sentence a stranger understands.' }),
       fText('coreTrick', 'Core trick', s.coreTrick, { area: true, rows: 3, req: true, help: 'The mechanism, not the mood: what makes it work.' }),
-      fText('influences', 'Influences', s.influences || '', { area: true, rows: 2, help: 'Plain list of what this draws on.' }),
+      fText('influences', 'Influences', s.influences || '', { area: true, rows: 2, help: 'Plain list of what this draws on.', ph: 'Plain list of what this draws on' }),
       fSeg('mode', 'Looks best in', s.mode, ['light', 'dark']),
       s.meta ? fSelect('meta.family', 'Family', s.meta.family, fam) : noMeta,
       cls.length && s.build ? fSelect('build.cls', 'Build class', s.build.cls, cls) : '',
@@ -577,14 +581,28 @@ const Studio = (function () {
     ].join('');
   }
 
-  function entryHtml(list, i, e) {
+  // "Not in effect" words for an entry whose hooks an earlier entry already provides (order logic: StudioRounds.hookOrder).
+  function shadowNote(list, i, ho) {
+    const sh = ho.shadowed[`${list}.${i}`];
+    if (!sh || !sh.length) return '';
+    const m = byId[S.spec[list][i].move];
+    const mine = ((m && m.hooks) || []).filter(h => h !== 'tokens');
+    const all = mine.every(h => sh.some(x => x.hook === h));
+    const who = by => (by === 'art.hero' ? 'the hero art' : `${by} above`);
+    const parts = sh.map(x => `${who(x.by)} already ${StudioRounds.hookWords(x.hook)}`);
+    const fix = sh.some(x => x.by === 'art.hero') ? 'Change the hero art or remove this one.' : 'Move this one up or remove that one.';
+    return `<p class="stu-shadow" role="note"><b>${all ? 'Not in effect' : 'Partly not in effect'}:</b> ${esc(parts.join('; '))}. ${fix}</p>`;
+  }
+
+  function entryHtml(list, i, e, ho) {
     const m = byId[e.move];
     const base = `${list}.${i}.params`;
     const key = `${list}.${i}`;
     const scope = e.scope || 'all';
     return `<details class="stu-entry" data-d="${key}"${openDetails.has(key) ? ' open' : ''}>
-      <summary><span class="stu-entry-n">${esc(e.move)}</span>${m ? `<span class="stu-tier">${esc(m.tier || '')}</span>` : '<span class="stu-tier is-bad">unknown</span>'}</summary>
+      <summary><span class="stu-entry-n">${esc(e.move)}</span>${m ? `<span class="stu-tier">${esc(m.tier || '')}</span>` : '<span class="stu-tier is-bad">unknown</span>'}${ho.shadowed[key] ? '<span class="stu-tier is-bad">not in effect</span>' : ''}</summary>
       <div class="stu-entry-b">
+        ${shadowNote(list, i, ho)}
         <p class="stu-what">${esc(m ? m.what : 'This move is not in the catalog.')}</p>
         <div class="stu-entry-bar">
           <label>Applies to <select data-p="${key}.scope" data-t="scope" aria-label="Scope of ${esc(e.move)}">${SCOPES.map(sc => `<option value="${sc}"${sc === scope ? ' selected' : ''}>${sc === 'all' ? 'Board and kit' : sc === 'board' ? 'Board only' : 'Kit only'}</option>`).join('')}</select></label>
@@ -601,7 +619,8 @@ const Studio = (function () {
 
   function entriesHtml(list) {
     const items = S.spec[list] || [];
-    return `${items.length ? items.map((e, i) => entryHtml(list, i, e)).join('') : `<p class="stu-note">No ${list === 'colour' ? 'colour recipes' : 'moves'} yet.</p>`}
+    const ho = StudioRounds.hookOrder(S.spec, catalog);
+    return `${items.length ? items.map((e, i) => entryHtml(list, i, e, ho)).join('') : `<p class="stu-note">No ${list === 'colour' ? 'colour recipes' : 'moves'} yet.</p>`}
       <button type="button" class="btn btn-ghost btn-small stu-add" data-act="add" data-list="${list}">${list === 'colour' ? 'Add colour recipe' : 'Add move'}</button>`;
   }
 
@@ -666,13 +685,13 @@ const Studio = (function () {
       dial({ name: 'display', kind: 'number', default: 1, range: [0.6, 2] }, 'type', t.display),
       fSelect('highlight', 'Headline highlight', s.highlight, ['ink', 'band', 'custom'], { empty: 'Default' }),
       '<div class="stu-sub">Fonts to recommend</div>',
-      fList('meta.fonts.heading.picks', 'Heading picks', (f.heading || {}).picks, 'Font names from the font picker, separated by commas.'),
+      fList('meta.fonts.heading.picks', 'Heading picks', (f.heading || {}).picks, 'Font names from the font picker, separated by commas.', 'e.g. a heavy display or neo-grotesk'),
       cls('heading'),
       fList('meta.fonts.body.picks', 'Body picks', (f.body || {}).picks),
       cls('body'),
       fList('meta.fonts.mono.picks', 'Mono picks', (f.mono || {}).picks),
       fList('meta.fonts.avoid', 'Avoid (font classes)', f.avoid, 'Font classes this look should not use.'),
-      fText('meta.fonts.why', 'Why these fonts', f.why || '', { area: true, rows: 2 }),
+      fText('meta.fonts.why', 'Why these fonts', f.why || '', { area: true, rows: 2, ph: 'One sentence on why these font classes carry the look' }),
     ].join('');
   }
 
@@ -698,10 +717,10 @@ const Studio = (function () {
     const states3 = [0, 1, 2].map(i => fText(`labels.states.${i}`, `State ${i + 1} name`, (lab.states || [])[i] || ''));
     const copy = Object.entries(s.copy || {}).map(([k, v]) => `<div class="stu-copy"><div class="stu-sub">${esc(k)}</div>${fText(`copy.${k}.label`, 'Label', (v || {}).label || '')}${fText(`copy.${k}.text`, 'Text', (v || {}).text || '', { area: true, rows: 2 })}</div>`).join('');
     return [
-      fText('motto', 'Motto', s.motto || '', { help: 'A short line.' }),
-      fText('kicker', 'Kicker above the headline', s.kicker || ''),
+      fText('motto', 'Motto', s.motto || '', { help: 'A short line.', ph: 'Short line' }),
+      fText('kicker', 'Kicker above the headline', s.kicker || '', { help: 'Left empty, the board prints the descriptor.', ph: 'Kicker above the headline' }),
       '<div class="stu-sub">Material strip</div>',
-      fText('labels.material', 'Material name', lab.material || ''),
+      fText('labels.material', 'Material name', lab.material || '', { ph: 'e.g. Hard offset' }),
       `<div class="stu-row3">${states3.join('')}</div>`,
       fSelect('labels.statesKind', 'States drawn as', lab.statesKind, ['button', 'swatch', 'chip'], { empty: 'Default' }),
       copy ? `<div class="stu-sub">Specimen copy</div>${copy}` : '',
@@ -791,6 +810,17 @@ const Studio = (function () {
     return true;
   }
 
+  // An edit can change other fields shown in the panels (the motto is also the specimen copy). Bring every other
+  // text field up to the spec, leaving the one being typed in alone.
+  function syncTextFields(except) {
+    el.panels.querySelectorAll('[data-t="text"][data-p]').forEach(f => {
+      if (f === except || f === document.activeElement) return;
+      const v = getAt(S.spec, f.dataset.p);
+      const want = typeof v === 'string' ? v : '';
+      if (f.value !== want) f.value = want;
+    });
+  }
+
   function onInput(e) {
     const n = e.target;
     if (!S || !n.dataset) return;
@@ -807,6 +837,7 @@ const Studio = (function () {
         if ((path === 'motto' || path === 'kicker') && spec.copy && spec.copy[path] && spec.copy[path].text === before) spec.copy[path].text = val;
         if (path.startsWith('labels.states.')) { const a = spec.labels.states; for (let i = 0; i < a.length; i++) if (typeof a[i] !== 'string') a[i] = ''; }
       }, `${path.replace(/^meta\.fonts\./, '').replace(/\.\d+$/, '')} edited`, { coalesce: 'p:' + path });
+      syncTextFields(n);
       const f = n.closest('.stu-f');
       if (f) f.classList.toggle('is-bad', (path === 'name' || path === 'descriptor' || path === 'coreTrick') && !val.trim());
     } else if (t === 'list') {
@@ -835,7 +866,7 @@ const Studio = (function () {
     } else if (t === 'kitmat') setKitMaterial(n.dataset.kit, n.value);
     else if (t === 'kitstate') { if (n.value) addKitState(n.dataset.kit, n.value); }
     else if (t === 'artkind') setArtKind(n.value);
-    else if (t === 'artmove') edit(spec => { spec.art.hero.move = n.value; spec.art.hero.params = {}; }, `art move: ${n.value}`, { sections: 'art' });
+    else if (t === 'artmove') edit(spec => { spec.art.hero.move = n.value; spec.art.hero.params = {}; }, `art move: ${n.value}`, { sections: ['art', 'colour', 'moves'] });
     else if (t === 'artfile') { const f = n.files && n.files[0]; if (f) uploadArt(f); }
   }
 
@@ -877,11 +908,11 @@ const Studio = (function () {
     const act = b.dataset.act;
     const list = b.dataset.list, i = +b.dataset.i;
     if (act === 'add') return pickMove(list);
-    if (act === 'remove') { const name = S.spec[list][i].move; return edit(spec => { spec[list].splice(i, 1); }, `removed ${name}`, { sections: list }); }
+    if (act === 'remove') { const name = S.spec[list][i].move; return edit(spec => { spec[list].splice(i, 1); }, `removed ${name}`, { sections: ['colour', 'moves'] }); }
     if (act === 'up' || act === 'down') {
       const j = act === 'up' ? i - 1 : i + 1;
       if (j < 0 || j >= S.spec[list].length) return;
-      return edit(spec => { const t = spec[list][i]; spec[list][i] = spec[list][j]; spec[list][j] = t; }, `moved ${S.spec[list][i].move} ${act}`, { sections: list });
+      return edit(spec => { const t = spec[list][i]; spec[list][i] = spec[list][j]; spec[list][j] = t; }, `moved ${S.spec[list][i].move} ${act}`, { sections: ['colour', 'moves'] });
     }
     if (act === 'reset') {
       const path = b.dataset.path;
@@ -958,7 +989,7 @@ const Studio = (function () {
       spec.art = spec.art || {};
       if (kind === 'generator') spec.art.hero = { kind, move: (artMoves[0] || {}).id, params: {} };
       else spec.art.hero = { kind, src: kind === 'svg' ? 'art/hero.svg' : 'art/hero.png', fit: 'cover', alt: keepAlt };
-    }, `art: ${kind === 'none' ? 'removed' : kind}`, { art, sections: 'art' });
+    }, `art: ${kind === 'none' ? 'removed' : kind}`, { art, sections: ['art', 'colour', 'moves'] });
   }
 
   function artMsg(text) { const m = $('sdArtMsg'); if (m) m.textContent = text; }
@@ -1005,12 +1036,15 @@ const Studio = (function () {
     const box = ov.querySelector('.stu-picker-list');
     const search = ov.querySelector('input');
     const used = new Set((S.spec[list] || []).map(e => e.move));
+    const ho = StudioRounds.hookOrder(S.spec, catalog);
+    // A move whose hook an earlier entry already provides would be added but ignored for that hook.
+    const taken = m => (m.hooks || []).filter(h => h !== 'tokens' && ho.owners[h]).map(h => `${ho.owners[h].move === 'art.hero' ? 'the hero art' : ho.owners[h].move} ${StudioRounds.hookWords(h)}`);
     const draw = () => {
       const q = search.value.trim().toLowerCase();
       const hit = pool.filter(m => !q || `${m.id} ${m.what} ${m.category}`.toLowerCase().includes(q));
       box.innerHTML = hit.length ? CATEGORIES.map(([cat, label]) => {
         const ms = hit.filter(m => m.category === cat);
-        return ms.length ? `<div class="stu-cat">${label}</div>` + ms.map(m => `<button type="button" class="stu-pick" data-id="${esc(m.id)}" role="listitem"><span class="stu-pick-h"><b>${esc(m.id)}</b><span class="stu-tier">${esc(m.tier || '')}</span>${used.has(m.id) ? '<span class="stu-tier">in use</span>' : ''}</span><span class="stu-pick-w">${esc(m.what)}</span></button>`).join('') : '';
+        return ms.length ? `<div class="stu-cat">${label}</div>` + ms.map(m => `<button type="button" class="stu-pick" data-id="${esc(m.id)}" role="listitem"><span class="stu-pick-h"><b>${esc(m.id)}</b><span class="stu-tier">${esc(m.tier || '')}</span>${used.has(m.id) ? '<span class="stu-tier">in use</span>' : ''}${taken(m).length ? `<span class="stu-tier is-bad">replaces nothing: ${esc(taken(m).join('; '))}</span>` : ''}</span><span class="stu-pick-w">${esc(m.what)}</span></button>`).join('') : '';
       }).join('') : '<p class="stu-note">Nothing matches.</p>';
     };
     draw();
@@ -1018,7 +1052,7 @@ const Studio = (function () {
       ov.remove(); document.body.classList.remove('has-dialog');
       if (previous && previous.focus) previous.focus();
       if (id) {
-        edit(spec => { spec[list].push({ move: id, params: {} }); }, `added ${id}`, { sections: list });
+        edit(spec => { spec[list].push({ move: id, params: {} }); }, `added ${id}`, { sections: ['colour', 'moves'] });
         openDetails.add(`${list}.${S.spec[list].length - 1}`);
         renderSection(list);
       }

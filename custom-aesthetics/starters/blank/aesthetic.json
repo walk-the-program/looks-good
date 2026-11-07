@@ -3,12 +3,11 @@
  "key": "new-aesthetic",
  "order": 950,
  "name": "New Aesthetic",
- "descriptor": "Word · Word · Word",
- "influences": "Plain list of what this draws on (stage 2)",
- "summary": "One sentence a stranger understands.",
- "coreTrick": "One sentence: the mechanism that makes it recognisable, not the mood (stage 1).",
- "motto": "Short line.",
- "kicker": "Kicker above the headline",
+ "descriptor": "Hard-edged · Bordered · Light",
+ "influences": "",
+ "summary": "",
+ "coreTrick": "Flat fills with an ink border and a hard offset shadow, no blur.",
+ "motto": "",
  "mode": "light",
  "lineage": {
   "forkedFrom": null,
@@ -47,7 +46,7 @@
     "script",
     "groovy"
    ],
-   "why": "One sentence on why these font classes carry the look (stage 5).",
+   "why": "A heavy grotesque for headlines over a neutral sans: the borders and offset shadows carry the look, not the type.",
    "pairings": [
     [
      "Archivo Black",
@@ -74,12 +73,12 @@
    "slow": 240,
    "ease": "out"
   },
-  "pressText": "What rest, hover and pressed do, in numbers (stages 4 and 9).",
-  "icons": "Stroke weight, caps, corners, selected treatment.",
-  "appIcon": "One sentence describing the app icon tile in this look."
+  "pressText": "The surface travels 4 px right and down as its hard shadow closes, 100 ms ease-out; release returns it.",
+  "icons": "Stroke 2 px, round caps and joins, 2 px corners on boxy glyphs. Outline at rest; selected fills solid.",
+  "appIcon": "A flat tile with an ink border and a hard offset shadow, one bold glyph in the primary colour."
  },
  "labels": {
-  "material": "Hard offset",
+  "material": "Touch & depth",
   "states": [
    "Rest",
    "Hover",
@@ -90,11 +89,7 @@
  "copy": {
   "motto": {
    "label": "Motto",
-   "text": "Short line."
-  },
-  "kicker": {
-   "label": "Kicker above the headline",
-   "text": "Kicker above the headline"
+   "text": ""
   }
  },
  "layout": {
@@ -489,7 +484,7 @@
    "kind": "svg",
    "src": "art/hero.svg",
    "fit": "cover",
-   "alt": "Describe the hero art"
+   "alt": "Abstract geometric art: a circle, a square and a triangle."
   }
  }
 }

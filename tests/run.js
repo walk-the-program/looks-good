@@ -1425,6 +1425,24 @@ check('paste: empty text', run(`extractColors('').length`) === 0, 'found colors 
     return { ok: !!def, errors, warns: logs.warn.slice(w0).filter(m => !/art|svg/i.test(m)) };
   };
 
+  // a move used only as a kit material still runs its tokens() (default params, after the listed moves) and emits no move-level css
+  {
+    vm.runInContext(`registerMove({ id: 'tk-kit-only', libraryId: null, what: 'Kit: test.', category: 'material', tier: 'recipe',
+      params: { n: { kind: 'number', default: 3, range: [0, 9] } },
+      tokens(t, p) { return { '--tk-kit': 'n' + p.n }; },
+      css() { return '/*TK-MOVE-CSS*/'; },
+      material: { name: 'tk-kit-only', css(S, sel, p) { return sel + ' { outline: 0; }'; } } });`, c);
+    const spec = JSON.parse(J(parse('custom-aesthetics/darkroom/aesthetic.json')));
+    spec.kit = { 'button-primary': { material: 'tk-kit-only', params: { 'tk-kit-only': { n: 8 } } } };
+    delete spec.art;
+    const def = c.registerSpecAesthetic(vm.runInContext('JSON', c).parse(J(Object.assign(spec, { key: 'chk-kit-tokens' }))), { json: true, quietHooks: true, errors: [], file: 'variant' });
+    const tk = def && def.tokens ? def.tokens({ isDark: false, canvas: '#ffffff', ink: '#000000', primary: '#336699', mix: (a) => a, contrast: () => 10 }) : {};
+    const css = c.SPEC_LAB.css['chk-kit-tokens'] || '';
+    check('spec: a move used only as a kit material still runs tokens() with default params, and emits no move-level css',
+      tk['--tk-kit'] === 'n3' && !css.includes('TK-MOVE-CSS') && css.includes('outline: 0'), J(tk));
+    if (def) c.unregisterSpecAesthetic('chk-kit-tokens');
+  }
+
   // the checker's own move / kit / field rules (param kinds, ranges, options, materials, states), run on each variant file
   const checker = require(path.join(root, 'dev/aesthetic-check.js'));
   const checkerCat = checker.getCatalog(checker.loadRuntime().sb);
@@ -1565,7 +1583,7 @@ check('paste: empty text', run(`extractColors('').length`) === 0, 'found colors 
     m5.moves[1].scope = 'kit'; m5.art.hero.fit = 'cover'; m5.name = 'Darkroom with a much longer name than the short field allows here'; m5.type.label = 'sans';
     const d5 = SR.diff(dr, m5, catalog);
     check('rounds: diff reports scope, art fit, type and a shortened text field',
-      d5.includes(`${dr.moves[1].move} scope: all → kit`) && d5.includes('art fit: contain → cover') && d5.includes('type: label mono → sans') && d5.some(l => /^name: "Darkroom" → "Darkroom with a much longer name than t…"$/.test(l)), J(d5));
+      d5.includes(`${dr.moves[1].move} scope: all → kit`) && d5.includes('art fit: contain → cover') && d5.includes('label font: mono → sans') && d5.some(l => /^name: Darkroom → Darkroom with a much longer name .*…$/.test(l)), J(d5));
     const m6 = JSON.parse(J(dr));
     m6.moves[0].params.base = { light: 2, dark: 6 };
     check('rounds: diff shows a light / dark pair', SR.diff(dr, m6, catalog).some(l => /^corner-radius: base light 2 → 2, dark 2 → 6$|^corner-radius: base 2 → light 2 \/ dark 6$/.test(l)), J(SR.diff(dr, m6, catalog)));
@@ -1612,6 +1630,42 @@ check('paste: empty text', run(`extractColors('').length`) === 0, 'found colors 
     try { SR.addNote({ rounds: [] }, { target: 'general', text: 'x' }); } catch (e) { thr++; }
     try { SR.closeRound({ rounds: [] }, {}); } catch (e) { thr++; }
     check('rounds: working on a round when none is open is an error, not a silent change', thr === 2, '');
+  }
+
+  // variant ids match their cards; the change log is plain words; hook order mirrors the runtime
+  {
+    let r = SR.openRound(null, { by: 'studio', date: '2026-11-07' });
+    check('rounds: freeLetters offers a, b, c on a fresh round', J(SR.freeLetters(r, 3)) === '["a","b","c"]', J(SR.freeLetters(r, 3)));
+    r = SR.recordVariant(r, { change: 'material: x → y', verdict: 'keep', letter: 'b' });
+    r = SR.recordVariant(r, { change: 'type: x → y', verdict: 'kill', letter: 'a' });
+    r = SR.recordVariant(r, { change: 'kit: x → y', verdict: 'kill', letter: 'b' });
+    check('rounds: a variant recorded with a letter gets that letter (keep b first is r1b); a taken letter falls back to the next id',
+      J(r.rounds[0].variants.map(v => v.id)) === '["r1b","r1a","r1c"]', J(r.rounds[0].variants));
+    check('rounds: freeLetters skips the letters a round has used', J(SR.freeLetters(r, 3)) === '["d","e","f"]', J(SR.freeLetters(r, 3)));
+    r = SR.recordVariant(SR.openRound(null, { by: 'studio', date: '2026-11-07' }), { change: 'corner-radius: base 2 → 12' });
+    check('rounds: recordVariant without a letter keeps the old ids', r.rounds[0].variants[0].id === 'r1a', J(r.rounds[0].variants));
+
+    const b = { name: 'x', motto: 'Short line.', kicker: 'K', copy: { motto: { label: 'Motto', text: 'Short line.' }, kicker: { label: 'Kicker', text: 'K' } },
+      meta: { family: 'graphic', fonts: { heading: { picks: ['Archivo Black', 'Inter Tight'], classes: ['heavy'] }, pairings: [['A', 'B']] } }, build: { cls: 'hard' }, labels: { material: 'Hard offset', states: ['R', 'H', 'P'] } };
+    const a = JSON.parse(J(b));
+    a.motto = 'New'; a.copy.motto.text = 'New'; a.meta.family = 'print'; a.meta.fonts.heading.picks = ['Alfa Slab One', 'Rye']; a.build.cls = 'flat'; a.labels.material = 'Kraft and stamp';
+    const lines = SR.diff(b, a, catalog);
+    check('rounds: the change log is plain words, not field paths', J(lines) === J(['motto: Short line. → New', 'material name: Hard offset → Kraft and stamp', 'family: graphic → print & editorial', 'heading fonts: Archivo Black, Inter Tight → Alfa Slab One, Rye', 'build class: hard → flat']), J(lines));
+    check('rounds: a motto edit does not log its copy.motto mirror, but a copy-only edit is logged by name',
+      !lines.some(l => /specimen|copy/.test(l)) && J(SR.diff(b, Object.assign(JSON.parse(J(b)), { copy: { motto: { label: 'Motto', text: 'Else' }, kicker: b.copy.kicker } }), catalog)) === '["motto specimen text: Short line. → Else"]', '');
+    check('rounds: no field path leaks into any log line', !lines.some(l => /\b(meta|build|labels|copy)\./.test(l)), J(lines));
+
+    const colourMoves = catalog.filter(m => m.category === 'colour' && m.hooks.includes('canvas')).map(m => m.id);
+    const [c1, c2] = colourMoves;
+    const ho = SR.hookOrder({ colour: [{ move: c1 }, { move: c2 }], moves: [] }, catalog);
+    check('rounds: hookOrder: the first canvas provider owns the hook and the second is shadowed by it',
+      colourMoves.length >= 2 && ho.owners.canvas.move === c1 && J(ho.shadowed['colour.1']) === J([{ hook: 'canvas', by: c1 }]) && !ho.shadowed['colour.0'], J(ho));
+    check('rounds: hookOrder: moving the second recipe up swaps who is in effect', SR.hookOrder({ colour: [{ move: c2 }, { move: c1 }], moves: [] }, catalog).owners.canvas.move === c2, '');
+    const hero = catalog.find(m => m.hooks.includes('art'));
+    const hoArt = SR.hookOrder({ colour: [], moves: [{ move: hero.id }], art: { hero: { kind: 'generator', move: hero.id } } }, catalog);
+    check('rounds: hookOrder: an art.hero generator that is also in moves is not shadowed by itself', !hoArt.shadowed['moves.0'] && hoArt.owners.art.move === hero.id, J(hoArt));
+    const hoSvg = SR.hookOrder({ colour: [], moves: [{ move: hero.id }], art: { hero: { kind: 'svg', src: 'art/hero.svg' } } }, catalog);
+    check('rounds: hookOrder: an svg hero provides art ahead of a move with an art hook', J(hoSvg.shadowed['moves.0']) === J([{ hook: 'art', by: 'art.hero' }]), J(hoSvg));
   }
 
   // snapshot cap

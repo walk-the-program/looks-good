@@ -3,8 +3,8 @@
 Coordinator-owned. Workers implement this; changes go through the coordinator. It builds on the
 v1 runtime documented in `dev/move-lab/README.md` and closes the gaps in
 `docs/move-audit/findings.md` §4. Since 2026-11-07 the runtime, the move files and custom
-aesthetics load in the normal app (`js/custom-aesthetics.js`); only the lab specs (smoke and the
-`--moves` rebuilds) still need `?movelab=1`. Library and loading: `docs/aesthetic-library/PLAN.md`.
+aesthetics load in the normal app (`js/custom-aesthetics.js`, and `index.html` loads every `js/moves/*.js`);
+only the lab specs (smoke and the `--moves` rebuilds) still need `?movelab=1`. Library and loading: `docs/aesthetic-library/PLAN.md`.
 
 ## 1. Files
 

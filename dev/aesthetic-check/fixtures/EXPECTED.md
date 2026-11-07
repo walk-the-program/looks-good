@@ -68,3 +68,7 @@ rounds.json: bad date, `by`, variant verdict, and a done note without a numeric 
 ## similar-high
 - WARN similar
 Moves chosen to map onto 11 of toy-press's 15 library moves (73%, threshold 70%). No FAIL.
+
+## template-text
+- WARN template-text
+Valid fixture whose `summary` and `motto` still hold template placeholder sentences. No FAIL.

@@ -1,5 +1,5 @@
 /* Core moves: generic, parameterised, style-neutral. Contract: dev/move-lab/README.md.
-   Loaded by dev/move-lab/lab.js (?movelab=1 only). Needs js/aesthetic-spec.js first. */
+   Loaded by index.html at startup (and by dev/move-lab/lab.js in the lab). Needs js/aesthetic-spec.js first. */
 (function () {
 'use strict';
 

@@ -94,10 +94,13 @@ const StylesHome = (function () {
     [el.brand, el.dBrand].forEach(s => { s.innerHTML = html; s.value = brandId; });
   }
 
+  // The neutral brand: the checker's pinned blue, derived once, so a redraw never shifts the colours.
+  const NEUTRAL_PALETTE = derivePalette('#2f5d8a', 'analogous');
+
   // The brand every board is drawn with: a throwaway state, never the editor's.
   function baseState() {
     const st = freshState();
-    st.colors = generatePalette('analogous', 210);
+    st.colors = Object.assign({}, NEUTRAL_PALETTE);
     const b = brands.find(x => x.id === brandId);
     if (b) {
       try { const { logoDataUrl, ...rest } = b.saved; applySavedSessionToState(rest, st); } catch (e) { /* keep the neutral */ }
@@ -332,6 +335,7 @@ const StylesHome = (function () {
       if (!b) return fail('That starting point could not be loaded.');
       b.aesthetic.name = name;
       b.aesthetic.coreTrick = trick;
+      if (typeof b.aesthetic.summary !== 'string' || !b.aesthetic.summary.trim()) b.aesthetic.summary = trick;   // the board's one-line summary starts as the core trick
       b.aesthetic.key = CustomAesthetics.uniqueKey(name);
       b.aesthetic.lineage = Object.assign({}, b.aesthetic.lineage && typeof b.aesthetic.lineage === 'object' ? b.aesthetic.lineage : {}, { forkedFrom: id, version: 1 });
       b.rounds = null;

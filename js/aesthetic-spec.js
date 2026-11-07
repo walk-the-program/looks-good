@@ -568,7 +568,20 @@ function registerSpecAesthetic(spec, opts) {
   // tokens: every move's tokens(t, p, ctx, state) merged in order (colour moves first), later wins.
   // ctx.bus is a fresh object per pass (per render, per mode); each tokens() may read and write it, and the
   // returned --props are merged into it too.
-  const withTokens = entries.filter(e => typeof e.move.tokens === 'function');
+  // A move used only as a kit material / state (spec.kit.<comp>.material / .state) is not an entry, but its tokens()
+  // still run, after the listed entries, with default params and scope 'kit'. Its move-level css() is not emitted.
+  const kitOnly = [], seenKit = {};
+  for (const rule of Object.values(spec.kit || {})) {
+    if (!rule || typeof rule !== 'object') continue;
+    const hits = [MATERIALS[rule.material]].concat([].concat(rule.state || []).map(n => STATES[n]));
+    for (const hit of hits) {
+      const m = hit && hit.move;
+      if (!m || byId[m.id] || seenKit[m.id]) continue;
+      seenKit[m.id] = true;
+      kitOnly.push({ move: m, P: resolveParams(m, {}, key), scope: 'kit' });
+    }
+  }
+  const withTokens = entries.concat(kitOnly).filter(e => typeof e.move.tokens === 'function');
   if (withTokens.length) {
     def.tokens = function (t, ...rest) {   // rest = the framework's extra args (the view state)
       const out = {}, bus = {};

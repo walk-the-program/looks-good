@@ -228,16 +228,56 @@
 
   const TEXT_FIELDS = ['key', 'name', 'descriptor', 'influences', 'summary', 'coreTrick', 'motto', 'kicker', 'mode', 'order', 'highlight', 'slideShape'];
   const OBJECT_FIELDS = ['labels', 'copy', 'layout', 'roles', 'rules', 'meta', 'build', 'lineage', 'deck'];
-  function deepLines(path, x, y, out) {
-    if (same(x, y)) return;
-    if (isObj(x) && isObj(y)) {
+  const FIELD_LABELS = { coreTrick: 'core trick', slideShape: 'slide shape', mode: 'best in mode', highlight: 'headline highlight', key: 'key', order: 'order' };
+  const FAMILY_NAMES = { tactile: 'tactile', graphic: 'graphic', digital: 'digital', print: 'print & editorial', luminous: 'luminous' };
+  const TYPE_LABELS = { ui: 'UI text font', label: 'label font', display: 'display size' };
+
+  /* A spec field path in plain words: { label, map? }. Anything unlisted is spelled out from its path. */
+  function plainPath(p) {
+    let m;
+    if (p === 'meta.family') return { label: 'family', map: v => FAMILY_NAMES[v] || v };
+    if ((m = p.match(/^meta\.fonts\.(heading|body|mono)\.picks$/))) return { label: `${m[1]} fonts` };
+    if ((m = p.match(/^meta\.fonts\.(heading|body|mono)\.classes$/))) return { label: `${m[1]} font classes` };
+    if (p === 'meta.fonts.avoid') return { label: 'avoided font classes' };
+    if (p === 'meta.fonts.why') return { label: 'why these fonts' };
+    if (p === 'meta.fonts.pairings') return { label: 'font pairings' };
+    if (p === 'build.cls') return { label: 'build class' };
+    if (p === 'build.surface') return { label: 'surface description' };
+    if (p === 'build.pressText') return { label: 'press description' };
+    if (p === 'build.icons') return { label: 'icon style' };
+    if (p === 'build.appIcon') return { label: 'app icon description' };
+    if ((m = p.match(/^build\.(press|motion)\.(\w+)$/))) return { label: `${m[1]} ${m[2]}` };
+    if (p === 'labels.material') return { label: 'material name' };
+    if (p === 'labels.states') return { label: 'state names' };
+    if (p === 'labels.statesKind') return { label: 'states drawn as' };
+    if ((m = p.match(/^labels\.states\.(\d+)$/))) return { label: `state ${+m[1] + 1} name` };
+    if ((m = p.match(/^copy\.([\w-]+)\.(text|label)$/))) return { label: `${m[1]} specimen ${m[2]}` };
+    if ((m = p.match(/^layout\.(\w+)$/))) return { label: `${m[1]} layout` };
+    if ((m = p.match(/^roles\.(\w+)\.(\w+)$/))) return { label: `${m[1]} role ${m[2]}` };
+    if (p === 'rules.do') return { label: 'do rules' };
+    if (p === 'rules.dont') return { label: "don't rules" };
+    if (p === 'lineage.version') return { label: 'version' };
+    return { label: p.replace(/\./g, ' ').replace(/([a-z])([A-Z])/g, '$1 $2').toLowerCase() };
+  }
+  const plainVal = (v, map) => {
+    if (v === undefined || v === null || v === '' || (Array.isArray(v) && !v.length)) return '(none)';
+    if (Array.isArray(v)) return short(v.map(x => (map ? map(x) : x)).join(', '), 60);
+    if (typeof v === 'string') return short(map ? map(v) : v, 60);
+    return fmt(v);
+  };
+  const scalarList = v => v === undefined || (Array.isArray(v) && v.every(x => x === null || typeof x !== 'object'));
+  function deepLines(path, x, y, out, skip) {
+    if (same(x, y) || (skip && skip.has(path))) return;
+    if ((isObj(x) || x === undefined) && (isObj(y) || y === undefined)) {
       const ks = [];
-      for (const k of Object.keys(x).concat(Object.keys(y))) if (!ks.includes(k)) ks.push(k);
-      for (const k of ks) deepLines(`${path}.${k}`, x[k], y[k], out);
+      for (const k of Object.keys(x || {}).concat(Object.keys(y || {}))) if (!ks.includes(k)) ks.push(k);
+      for (const k of ks) deepLines(`${path}.${k}`, (x || {})[k], (y || {})[k], out, skip);
       return;
     }
-    if (typeof x === 'object' || typeof y === 'object') { out.push(`${path} changed`); return; }
-    out.push(`${path}: ${typeof x === 'string' ? `"${short(x, 40)}"` : fmt(x)} → ${typeof y === 'string' ? `"${short(y, 40)}"` : fmt(y)}`);
+    const { label, map } = plainPath(path);
+    if ((Array.isArray(x) || Array.isArray(y)) && scalarList(x) && scalarList(y)) { out.push(`${label}: ${plainVal(x, map)} → ${plainVal(y, map)}`); return; }
+    if (typeof x === 'object' || typeof y === 'object') { out.push(`${label} changed`); return; }
+    out.push(`${label}: ${plainVal(x, map)} → ${plainVal(y, map)}`);
   }
 
   /* diffDetailed -> [{ axis, text }], axis one of colour material type edges kit art other fields */
@@ -250,11 +290,14 @@
     diffKit(before.kit, after.kit, idx, out);
     diffArt(before.art, after.art, idx, out);
     const tb = isObj(before.type) ? before.type : {}, ta = isObj(after.type) ? after.type : {};
-    for (const k of new Set(Object.keys(tb).concat(Object.keys(ta)))) if (!same(tb[k], ta[k])) out.push({ axis: 'type', text: `type: ${k} ${fmt(tb[k])} → ${fmt(ta[k])}` });
-    for (const f of TEXT_FIELDS) if (!same(before[f], after[f])) out.push({ axis: 'fields', text: `${f}: ${typeof before[f] === 'string' ? `"${short(before[f], 40)}"` : fmt(before[f])} → ${typeof after[f] === 'string' ? `"${short(after[f], 40)}"` : fmt(after[f])}` });
+    for (const k of new Set(Object.keys(tb).concat(Object.keys(ta)))) if (!same(tb[k], ta[k])) out.push({ axis: 'type', text: `${TYPE_LABELS[k] || `type ${k}`}: ${fmt(tb[k])} → ${fmt(ta[k])}` });
+    for (const f of TEXT_FIELDS) if (!same(before[f], after[f])) out.push({ axis: 'fields', text: `${FIELD_LABELS[f] || f}: ${plainVal(before[f])} → ${plainVal(after[f])}` });
+    // the motto and kicker are mirrored into the specimen copy: that echo is not a second change
+    const skip = new Set();
+    for (const f of ['motto', 'kicker']) if (!same(before[f], after[f]) && isObj(after.copy) && isObj(after.copy[f]) && after.copy[f].text === after[f]) skip.add(`copy.${f}.text`);
     for (const f of OBJECT_FIELDS) {
       const lines = [];
-      deepLines(f, before[f], after[f], lines);
+      deepLines(f, before[f], after[f], lines, skip);
       lines.slice(0, 6).forEach(t => out.push({ axis: 'fields', text: t }));
       if (lines.length > 6) out.push({ axis: 'fields', text: `${f}: +${lines.length - 6} more changes` });
     }
@@ -264,6 +307,38 @@
     return out;
   }
   const diff = (before, after, catalog) => diffDetailed(before, after, catalog).map(d => d.text);
+
+  /* ---------------------------------------------------------------- hook order (mirrors registerSpecAesthetic)
+     The runtime wires each hook "first provider wins": the art.hero generator (or an svg / image hero, which provides
+     `art`) first, then the entries of spec.colour, then spec.moves. A later entry that offers a hook already taken is
+     ignored for that hook. hookOrder(spec, catalog) -> { owners: { hook: { move, key } }, shadowed: { 'colour.0': [{ hook, by }] } }
+     where key is 'colour.<i>', 'moves.<i>' or 'art.hero'. 'tokens' is reserved and never a hook here. */
+  function hookOrder(spec, catalog) {
+    const hooksOf = {};
+    for (const m of arr(catalog)) hooksOf[m.id] = (m.hooks || []).filter(h => h !== 'tokens');
+    const owners = {}, shadowed = {};
+    spec = spec || {};
+    const hero = isObj(spec.art) && spec.art.hero;
+    if (isObj(hero)) {
+      if (hero.kind === 'generator' && hooksOf[hero.move] && hooksOf[hero.move].includes('art')) {
+        let key = 'art.hero';
+        for (const l of ['colour', 'moves']) arr(spec[l]).forEach((e, i) => { if (key === 'art.hero' && e && e.move === hero.move) key = `${l}.${i}`; });
+        owners.art = { move: hero.move, key };
+      } else if (hero.kind === 'svg' || hero.kind === 'image') owners.art = { move: 'art.hero', key: 'art.hero' };
+    }
+    for (const l of ['colour', 'moves']) {
+      arr(spec[l]).forEach((e, i) => {
+        const key = `${l}.${i}`;
+        for (const h of hooksOf[e && e.move] || []) {
+          if (!owners[h]) owners[h] = { move: e.move, key };
+          else if (owners[h].key !== key) (shadowed[key] = shadowed[key] || []).push({ hook: h, by: owners[h].move });
+        }
+      });
+    }
+    return { owners, shadowed };
+  }
+  /* "tinted-neutral-canvas above already sets the canvas" style words for one hook */
+  const hookWords = h => (h === 'canvas' ? 'sets the canvas' : `provides ${h}`);
 
   /* ---------------------------------------------------------------- validation (mirrors the checker's move / kit rules) */
   function valueProblem(def, v) {
@@ -663,7 +738,16 @@
     return r;
   }
 
-  /* Adds a variant, or (with opts.id, a full id like "r2a") updates that variant's verdict. verdict: keep | kill | open. */
+  /* The first `count` single letters not yet used by a variant of the open round (a card's letter is its id's tail). */
+  function freeLetters(rounds, count) {
+    const o = current(rounds);
+    const used = new Set(((o && o.variants) || []).map(v => String(v.id).replace(/^r\d+/, '')));
+    const out = [];
+    for (let i = 0; i < 26 && out.length < count; i++) { const l = String.fromCharCode(97 + i); if (!used.has(l)) out.push(l); }
+    return out;
+  }
+
+  /* Adds a variant, or (with opts.id, a full id like "r2a") updates that variant's verdict. opts.letter ("b") asks for the id r<n>b when free, so an id can match its card. verdict: keep | kill | open. */
   function recordVariant(rounds, opts) {
     const r = rootOf(rounds);
     const o = needOpen(r);
@@ -671,7 +755,9 @@
     const existing = opts && opts.id ? o.variants.find(v => v.id === opts.id) : null;
     if (existing) { existing.verdict = verdict; if (typeof opts.change === 'string' && opts.change) existing.change = opts.change; return r; }
     if (!opts || typeof opts.change !== 'string' || !opts.change.trim()) throw new Error('StudioRounds: a variant needs a change');
-    o.variants.push({ id: `r${o.n}${letters(o.variants.length)}`, change: opts.change.replace(/[<>]/g, '').trim(), verdict });
+    const want = opts && typeof opts.letter === 'string' && /^[a-z]{1,2}$/.test(opts.letter) ? `r${o.n}${opts.letter}` : '';
+    const id = want && !o.variants.some(v => v.id === want) ? want : `r${o.n}${letters(o.variants.length)}`;
+    o.variants.push({ id, change: opts.change.replace(/[<>]/g, '').trim(), verdict });
     return r;
   }
 
@@ -733,7 +819,7 @@
     return b;
   }
 
-  const api = { AXES, variations, diff, diffDetailed, openRound, addNote, setNote, recordVariant, recordChanges, closeRound, current, openNotes, snapshot };
+  const api = { hookOrder, hookWords, AXES, variations, diff, diffDetailed, openRound, addNote, setNote, recordVariant, freeLetters, recordChanges, closeRound, current, openNotes, snapshot };
   if (typeof window !== 'undefined') window.StudioRounds = api;
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
 })();

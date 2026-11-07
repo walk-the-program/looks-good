@@ -100,3 +100,8 @@ Styles home calls `Studio.open(key)` from New style, Edit and Edit a copy.
 - Closest-match % in the UI and Mac folder watching stay out of scope.
 - Testing on port 8090 (plain http.server) can run stale cached scripts; hard-reload. The app's own
   launcher (`tools/serve.py`) sends no-cache.
+
+## Real test (2026-11-07)
+
+Seed Packet made from Blank through two studio rounds and one agent round, imported back with Replace.
+Findings, fixes and what's still open: [real-test.md](real-test.md).

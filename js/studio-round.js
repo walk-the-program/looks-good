@@ -62,7 +62,7 @@ const StudioRound = (function () {
       <section class="rd-sec" aria-labelledby="rdVarH">
         <h3 class="rd-h" id="rdVarH">Variations</h3>
         <div class="rd-vbar">
-          <label class="rd-axis"><span>Change</span><select id="rdAxis" aria-label="Which axis the variations change">${SR.AXES.map(a => `<option value="${esc(a.id)}">${esc(a.label)}</option>`).join('')}</select></label>
+          <label class="rd-axis" for="rdAxis"><span>Change</span><select id="rdAxis" aria-label="Which axis the variations change">${SR.AXES.map(a => `<option value="${esc(a.id)}">${esc(a.label)}</option>`).join('')}</select></label>
           <button type="button" class="btn btn-primary btn-small" id="rdVar">Variations</button>
         </div>
         <p class="rd-note" id="rdVMsg" role="status"></p>
@@ -78,7 +78,7 @@ const StudioRound = (function () {
         <p class="rd-note" id="rdPinHint" hidden>Click the preview to place a pin. Esc stops.</p>
         <form class="rd-draft" id="rdDraft" hidden>
           <label class="rd-f"><span>Note</span><textarea id="rdDraftText" rows="3" maxlength="400"></textarea></label>
-          <label class="rd-f"><span>About</span><select id="rdDraftTarget"></select></label>
+          <label class="rd-f" for="rdDraftTarget"><span>About</span><select id="rdDraftTarget" aria-label="What the note is about"></select></label>
           <div class="rd-btnrow"><button type="submit" class="btn btn-primary btn-small">Add note</button><button type="button" class="btn btn-ghost btn-small" id="rdDraftCancel">Cancel</button></div>
         </form>
         <div id="rdNotes"></div>
@@ -254,9 +254,13 @@ const StudioRound = (function () {
     endPreview(true);
     ctx.seed += 1;
     const out = SR.variations(cur.spec, { axis: ctx.axis, seed: ctx.seed, count: 3, catalog, visible: visibleFn(cur.bundle.art) });
+    write(r => r);            // opens the round
+    // A card's letter is the tail of the id it is recorded under (r<n><letter>), so cards a, b, c in a later batch
+    // take the letters the round has not used yet.
+    const letters = SR.freeLetters(roundsOf(), out.length);
+    out.forEach((v, i) => { if (letters[i]) v.id = letters[i]; });
     ctx.cards = out.map(v => ({ v, stale: false, base: clone(cur.spec), plan: planOf(v, cur.spec) }));
     $('rdVMsg').textContent = out.length ? '' : 'Nothing more to vary on this style.';
-    write(r => r);            // opens the round
     renderHead(); renderCards(); renderClose();
   }
 
@@ -266,7 +270,7 @@ const StudioRound = (function () {
     const c = ctx.cards.find(x => x.v.id === id);
     if (!c || c.stale) return;
     Studio.apply(c.v.spec, { label: c.v.change });
-    write(r => SR.recordVariant(r, { change: c.v.change, verdict: 'keep' }));
+    write(r => SR.recordVariant(r, { change: c.v.change, verdict: 'keep', letter: c.v.id }));
     ctx.cards = ctx.cards.filter(x => x.v.id !== id);
     ctx.cards.forEach(x => { x.stale = true; });
     ctx.previewing = null;
@@ -275,7 +279,7 @@ const StudioRound = (function () {
   function kill(id) {
     const c = ctx.cards.find(x => x.v.id === id);
     if (!c) return;
-    write(r => SR.recordVariant(r, { change: c.v.change, verdict: 'kill' }));
+    write(r => SR.recordVariant(r, { change: c.v.change, verdict: 'kill', letter: c.v.id }));
     dropCard(id);
     renderHead(); renderClose();
   }
