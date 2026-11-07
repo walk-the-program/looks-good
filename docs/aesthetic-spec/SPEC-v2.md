@@ -12,7 +12,11 @@ One folder per aesthetic: `custom-aesthetics/<key>/` for real aesthetics (listed
 `custom-aesthetics/index.json` as `{ "aesthetics": ["darkroom"] }`), or `dev/move-lab/specs/<key>/`
 for lab specs (listed in `dev/move-lab/specs/index.json`). Imported styles live in the app's
 `aesthetics` library collection as one bundle file, `<key>.aesthetic.json`:
-`{ "format": "looks-good-aesthetic", "version": 1, "aesthetic": {…}, "rounds": {…}|null, "art": { "art/hero.svg": "…" } }`.
+`{ "format": "looks-good-aesthetic", "version": 1, "aesthetic": {…}, "rounds": {…}|null, "art": { "art/hero.svg": "…" }, "versions": [ … ] }`.
+`versions` is optional (studio snapshots, newest last, capped so the bundle stays under 2 MB; older bundles without it load
+as before): `[ { "round": 2, "date": "2026-11-07", "aesthetic": {…spec 2, same key…} } ]`. As a folder it is
+`versions.json` = `{ "versions": [ … ] }`. The checker's `--unpack <bundle> <dir>` / `--pack <dir> <bundle>` convert between the
+two forms (art svg as text, other art as `data:image` URLs; byte-identical round trip).
 
 ```
 <key>/aesthetic.json   the aesthetic (pure JSON, spec 2)
@@ -40,7 +44,8 @@ in `js/moves/*.js` and are loaded by `index.html`.
   "lineage": { "forkedFrom": null, "version": 1 },
   "meta": { },  "build": { },
   "labels": { }, "copy": { }, "layout": { }, "type": { }, "roles": { }, "rules": { "do": [], "dont": [] },
-  "highlight": "", "slideShape": "",
+  "highlight": "", "highlightNote": "", "slideShape": "",
+  "deck":   { "coverDisplay": 0.8, "principles": [["Title", "One line"]], "do": [], "dont": [], "marks": { "do": "+", "dont": "x" } },
   "colour": [ { "move": "id", "params": { } } ],
   "moves":  [ { "move": "id", "params": { }, "scope": "all|board|kit" } ],
   "kit":    { "<component>": { "material": "name", "state": "name" | ["names"], "params": { }, "scope": "all|board|kit" } },
@@ -54,6 +59,10 @@ in `js/moves/*.js` and are loaded by `index.html`.
 - Meta fields are copied to the def verbatim (same meaning as in `registerAesthetic`).
   `meta` / `build` have the shape of an `AESTHETIC_META` / `AESTHETIC_BUILD` entry.
 - `scope` defaults to `all`. `board` = the board and the deck; `kit` = the Built kit and screens.
+- `deck` (optional) tunes the brand deck: `coverDisplay` (number 0.2 to 2, the cover headline size factor), `principles`
+  (up to 6 `[title, line]` pairs), `do` / `dont` (up to 8 short strings each), `marks` (`{ do, dont }` strings of up
+  to 4 characters). `highlightNote` (optional string, up to 400 characters) explains the headline highlight. Stored and
+  imported styles may carry both; any other key inside `deck` is refused (no code, no functions).
 - Required: `spec`, `key`, `name`, `descriptor`, `coreTrick`, `mode`, `colour`, `moves`, `kit`.
 
 ## 3. Params
@@ -137,7 +146,7 @@ Merge duplicates into the shared move with params: `focus-ring--soft`, `focus-ri
 `focus-ring`; `kit-cell-frame--soft`, `kit-cell-frame--acid` → `kit-cell-frame`;
 `section-number-marker--acid` → `section-number-marker`. `soft.js`: rim gradient colours become
 params. Every move gets `what` and `libraryId`. Rebuild specs become
-`specs/<key>--moves/aesthetic.json`, use `art.hero` where they use a generator today, and must render
+`custom-aesthetics/starters/<key>--moves/aesthetic.json`, use `art.hero` where they use a generator today, and must render
 the same as the committed shots in `docs/move-audit/shots/` (re-shoot and compare).
 
 ## 7. rounds.json
@@ -154,5 +163,15 @@ the same as the committed shots in `docs/move-audit/shots/` (re-shoot and compar
 } ] }
 ```
 
-Notes are what a studio pins in the UI later; an agent reads the open notes, makes the next round,
+Notes are what a studio pins in the UI; an agent reads the open notes, makes the next round,
 and marks them done. One axis per variant.
+
+Studio rounds (`"by": "studio"`, written by the studio editor, `js/studio-rounds.js`):
+- A round the studio has open carries `"open": true` (and may have an empty `summary` and `"shots": null`). Closing it
+  removes `open`, fills `summary`, and drops a null `shots`, so a closed round matches the schema above exactly.
+  A closed round never has an `open` key; at most one round in the file is open.
+- Variant ids are `r<n><letter>`; note ids `n<k>` are unique across all rounds. `doneIn` is the round that was open (or last)
+  when the note was marked done.
+- `changes` are plain-word lines ("corner-radius: base 4 → 12", "material (card, panel): recessed → film-frame").
+- A snapshot of the aesthetic at each closed round goes to the bundle's `versions` (§1), not into rounds.json.
+- An agent adds its own round as the next `n` (`"by": "agent"`); see `docs/aesthetic-spec/AUTHORING.md` §12.

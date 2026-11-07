@@ -100,6 +100,7 @@
 <link rel="stylesheet" href="css/style-gallery.css" />
 <link rel="stylesheet" href="css/patterns-home.css" />
 <link rel="stylesheet" href="css/styles-home.css" />
+<link rel="stylesheet" href="css/studio.css" />
 <link rel="stylesheet" href="css/logos-editor.css" />
 <link rel="stylesheet" href="css/logos.css" />
 <link rel="stylesheet" href="css/logos-chrome.css" />
@@ -190,7 +191,10 @@
           <h1>Styles</h1>
           <p class="lib-count" id="stCount"></p>
         </div>
-        <button type="button" class="btn btn-ghost" id="stImport">Import style</button>
+        <div class="st-head-actions">
+          <button type="button" class="btn btn-ghost" id="stImport">Import style</button>
+          <button type="button" class="btn btn-primary" id="stNew">New style</button>
+        </div>
       </header>
       <p class="st-status" id="stStatus" role="status" aria-live="polite" hidden></p>
       <div class="pt-bar" id="stBar">
@@ -221,6 +225,32 @@
         </aside>
       </div>
       <div class="st-d-rounds" id="stDRounds"></div>
+    </div>
+  </div>
+  <!-- The aesthetic studio's editor (js/studio.js). #studioRound is filled by the round panel. -->
+  <div class="studio" id="studio" hidden>
+    <header class="stu-top">
+      <button type="button" class="btn btn-ghost btn-small" id="sdBack"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>Styles</button>
+      <h2 class="stu-title" id="sdTitle"></h2>
+      <span class="stu-save is-saved" id="sdSave" role="status" aria-live="polite">Saved</span>
+      <div class="stu-top-actions">
+        <button type="button" class="btn btn-ghost btn-small" id="sdUndo" disabled title="Undo (Cmd/Ctrl+Z)">Undo</button>
+        <button type="button" class="btn btn-ghost btn-small" id="sdRedo" disabled title="Redo (Shift+Cmd/Ctrl+Z)">Redo</button>
+        <button type="button" class="btn btn-ghost btn-small" id="sdExport">Export</button>
+      </div>
+    </header>
+    <div class="stu-body">
+      <div class="stu-panels" id="sdPanels" aria-label="Style panels"></div>
+      <main class="stu-preview" aria-label="Live preview">
+        <div class="stu-bar">
+          <div class="seg" id="sdTabs" role="group" aria-label="Preview"><button type="button" data-tab="board" aria-pressed="true">Board</button><button type="button" data-tab="kit" aria-pressed="false">Kit</button><button type="button" data-tab="deck" aria-pressed="false">Deck cover</button><button type="button" data-tab="stress" aria-pressed="false">Stress</button></div>
+          <label class="pt-brand"><span>Brand colours</span><select class="pt-select" id="sdBrand" aria-label="Brand colours"></select></label>
+          <div class="seg" id="sdShade" role="group" aria-label="Preview mode"><button type="button" data-shade="light" aria-pressed="true">Light</button><button type="button" data-shade="dark" aria-pressed="false">Dark</button></div>
+        </div>
+        <div class="stu-errors" id="sdErrors" role="alert" hidden></div>
+        <div class="stu-stage" id="sdStage"></div>
+      </main>
+      <aside class="stu-round" id="studioRound" aria-label="Round"></aside>
     </div>
   </div>
 </section>
@@ -982,6 +1012,7 @@
 <script src="js/moves/editorial.js"></script>
 <script src="js/moves/darkroom.js"></script>
 <script src="js/custom-aesthetics.js"></script>
+<script src="js/studio-rounds.js"></script>
 <script>if(/[?&]movelab=1(&|$)/.test(location.search))document.write('<script src="dev/move-lab/lab.js"><\/script>')</script>
 <script src="js/aesthetic-meta.js"></script>
 <script src="js/aesthetic-principles.js"></script>
@@ -1045,6 +1076,8 @@
 <script src="js/logos/attach.js"></script>
 <script src="js/logos/home.js"></script>
 <script src="js/patterns-home.js"></script>
+<script src="js/studio.js"></script>
+<script src="js/studio-round.js"></script>
 <script src="js/styles-home.js"></script>
 <script src="js/command-palette.js"></script>
 </body>

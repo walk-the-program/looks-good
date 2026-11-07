@@ -3,7 +3,8 @@
 
    Every style (the 45 built-ins plus custom ones, see js/custom-aesthetics.js) drawn as a tile with
    real brand colours, a detail view for one style, "Use on a brand", and for custom styles Import,
-   Export, Duplicate, Rename, Delete and the read-only round history.
+   Export, Duplicate, Rename, Delete and the read-only round history. New style (a dialog: name, core trick,
+   starting point) and Edit / Edit a copy open the studio editor (js/studio.js).
 
    Views: body[data-view="styles"]; the grid and the open style share #styles. The last home mode is
    remembered in localStorage 'bd.homeMode' (shared with js/patterns-home.js and js/logos/home.js).
@@ -13,7 +14,7 @@
    effectiveContent(), which looks at the global state.content, so that one field is swapped for the
    synchronous draw and put straight back (a try/finally; nothing else runs in between).
 
-   Public: window.StylesHome = { start, show, hide, isOpen }
+   Public: window.StylesHome = { start, show, hide, isOpen, afterStudio }
 ------------------------------------------------------------------------ */
 
 const StylesHome = (function () {
@@ -26,7 +27,7 @@ const StylesHome = (function () {
   const esc = s => escapeHtml(String(s == null ? '' : s));
   const el = {
     section: $('styles'), gridView: $('stGridView'), detail: $('stDetail'),
-    count: $('stCount'), importBtn: $('stImport'), bar: $('stBar'), search: $('stSearch'),
+    count: $('stCount'), importBtn: $('stImport'), newBtn: $('stNew'), bar: $('stBar'), search: $('stSearch'),
     source: $('stSource'), family: $('stFamily'), brand: $('stBrand'), shade: $('stShade'),
     none: $('stNone'), noneTitle: $('stNoneTitle'), noneText: $('stNoneText'), clear: $('stClear'),
     grid: $('stGrid'), status: $('stStatus'),
@@ -286,6 +287,64 @@ const StylesHome = (function () {
     inp.click();
   }
 
+  /* ---------- new style ---------- */
+
+  async function newStyle() {
+    const [starters, custom] = [await CustomAesthetics.starters(), CustomAesthetics.list()];
+    const previous = document.activeElement;
+    const ov = document.createElement('div');
+    ov.className = 'dlg-overlay';
+    const starterOpts = starters.map(s => `<option value="starter:${esc(s.id)}">${esc(s.id === 'blank' ? 'Blank' : s.name + ' starter')}</option>`).join('');
+    const customOpts = custom.map(c => `<option value="style:${esc(c.key)}">${esc(c.name)}</option>`).join('');
+    ov.innerHTML = `<form class="dlg st-new" role="dialog" aria-modal="true" aria-label="New style" novalidate>
+      <h2 class="dlg-title">New style</h2>
+      <p class="dlg-message">It opens in the editor and saves as you work.</p>
+      <label class="field dlg-field"><span>Name</span><input type="text" name="name" maxlength="80" autocomplete="off" spellcheck="false" /></label>
+      <label class="field dlg-field"><span>Core trick</span><input type="text" name="trick" autocomplete="off" /><small class="st-help">The mechanism, not the mood: what makes it work.</small></label>
+      <label class="field dlg-field"><span>Start from</span><select name="from">${starterOpts}${customOpts ? `<optgroup label="Your styles">${customOpts}</optgroup>` : ''}</select></label>
+      <p class="dlg-error" hidden></p>
+      <div class="dlg-actions"><button type="button" class="btn btn-ghost" data-id="cancel">Cancel</button><button type="submit" class="btn btn-primary" data-id="create">Create</button></div>
+    </form>`;
+    document.body.appendChild(ov);
+    document.body.classList.add('has-dialog');
+    const form = ov.querySelector('form');
+    const err = ov.querySelector('.dlg-error');
+    const close = () => { ov.remove(); document.body.classList.remove('has-dialog'); if (previous && previous.focus) previous.focus(); };
+    const fail = (msg, field) => { err.textContent = msg; err.hidden = false; if (field) form.elements[field].focus(); };
+    form.elements.name.addEventListener('input', () => { err.hidden = true; });
+    form.elements.trick.addEventListener('input', () => { err.hidden = true; });
+    ov.addEventListener('mousedown', e => { if (e.target === ov) close(); });
+    ov.addEventListener('keydown', e => {
+      e.stopPropagation();
+      if (e.key === 'Escape') { e.preventDefault(); close(); }
+    });
+    ov.querySelector('[data-id="cancel"]').addEventListener('click', close);
+    form.addEventListener('submit', async e => {
+      e.preventDefault();
+      const name = form.elements.name.value.trim();
+      const trick = form.elements.trick.value.trim();
+      if (!name) return fail('Name is required.', 'name');
+      if (/[<>]/.test(name + trick)) return fail('Names and text can\'t contain < or >.', 'name');
+      if (!trick) return fail('Core trick is required: one sentence about the mechanism, not the mood.', 'trick');
+      const from = form.elements.from.value;
+      const [kind, id] = [from.slice(0, from.indexOf(':')), from.slice(from.indexOf(':') + 1)];
+      const b = kind === 'starter' ? await CustomAesthetics.starter(id) : await CustomAesthetics.bundle(id);
+      if (!b) return fail('That starting point could not be loaded.');
+      b.aesthetic.name = name;
+      b.aesthetic.coreTrick = trick;
+      b.aesthetic.key = CustomAesthetics.uniqueKey(name);
+      b.aesthetic.lineage = Object.assign({}, b.aesthetic.lineage && typeof b.aesthetic.lineage === 'object' ? b.aesthetic.lineage : {}, { forkedFrom: id, version: 1 });
+      b.rounds = null;
+      delete b.versions;
+      const r = await CustomAesthetics.create(b);
+      if (!r.ok) return fail(r.error || 'The style could not be created.');
+      close();
+      filters.q = ''; el.search.value = '';
+      await Studio.open(r.key);
+    });
+    form.elements.name.focus();
+  }
+
   /* ---------- detail ---------- */
 
   function chip(cls, text) { return `<span class="st-chip st-chip-${cls}">${esc(text)}</span>`; }
@@ -357,6 +416,7 @@ const StylesHome = (function () {
     const yours = isYours(openKey);
     el.dActions.innerHTML = `
       <button type="button" class="btn btn-primary" data-act="use">Use on a brand</button>
+      ${src === 'mine' ? '<button type="button" class="btn btn-ghost" data-act="edit">Edit</button>' : src === 'folder' ? '<button type="button" class="btn btn-ghost" data-act="edit-copy">Edit a copy</button>' : ''}
       ${yours ? `<button type="button" class="btn btn-ghost" data-act="export">Export</button>
       <button type="button" class="btn btn-ghost" data-act="duplicate">Duplicate</button>` : ''}
       ${src === 'mine' ? `<button type="button" class="btn btn-ghost" data-act="rename">Rename</button>
@@ -446,6 +506,13 @@ const StylesHome = (function () {
     if (!key) return;
     const d = defOf(key);
     if (name === 'use') return useOnBrand();
+    if (name === 'edit') return Studio.open(key);
+    if (name === 'edit-copy') {
+      const r = await CustomAesthetics.duplicate(key);
+      if (!r.ok) return tell('Could not make a copy', r.error || 'The style could not be copied.');
+      say('Made a copy you can edit.');
+      return Studio.open(r.key);
+    }
     if (name === 'export') {
       const r = await CustomAesthetics.exportFile(key);
       if (r.cancelled) return;
@@ -483,8 +550,17 @@ const StylesHome = (function () {
   }
 
   function onLibraryChange() {
-    if (!active()) { dirty = true; return; }
+    if (!active() || Studio.isOpen()) { dirty = true; return; }    // the studio saves often: redraw once it closes
     rebuild();
+  }
+
+  // The studio closed: redraw what changed while it was open and land on the style that was edited.
+  function afterStudio(key) {
+    if (!active()) return;
+    dirty = false;
+    buildFamilySelect();
+    renderGrid();
+    if (key && defOf(key)) openStyle(key); else showGrid();
   }
 
   function setShade(v) {
@@ -525,7 +601,7 @@ const StylesHome = (function () {
 
   function onKey(e) {
     if (!active() || e.defaultPrevented || e.metaKey || e.ctrlKey || e.altKey) return;
-    if (document.body.classList.contains('has-dialog')) return;
+    if (document.body.classList.contains('has-dialog') || Studio.isOpen()) return;
     const t = e.target;
     const typing = t && (t.isContentEditable || /^(input|textarea|select)$/i.test(t.tagName));
     if (openKey) {
@@ -546,6 +622,7 @@ const StylesHome = (function () {
 
   function wire() {
     el.importBtn.addEventListener('click', pickFile);
+    el.newBtn.addEventListener('click', newStyle);
     el.search.addEventListener('input', () => { filters.q = el.search.value; renderGrid(); });
     el.source.addEventListener('click', e => {
       const b = e.target.closest('button');
@@ -576,11 +653,11 @@ const StylesHome = (function () {
     if (hasCustom()) CustomAesthetics.onChange(onLibraryChange);
   }
 
-  if (!el.section) return { start() {}, show() {}, hide() {}, isOpen: () => false };
+  if (!el.section) return { start() {}, show() {}, hide() {}, isOpen: () => false, afterStudio() {} };
   shade = lsGet(SHADE_KEY) === 'dark' ? 'dark' : 'light';
   wire();
   // Avoid a flash of the Library when a Styles launch is coming.
   if (readMode() === 'styles') document.body.dataset.view = 'styles';
 
-  return { start, show, hide, isOpen: active };
+  return { start, show, hide, isOpen: active, afterStudio };
 })();

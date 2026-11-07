@@ -1390,6 +1390,306 @@ check('paste: empty text', run(`extractColors('').length`) === 0, 'found colors 
   })());
 }
 
+/* ---- studio rounds (js/studio-rounds.js) + checker pack/unpack: pure logic, no DOM ---- */
+{
+  const os = require('os');
+  const cp = require('child_process');
+  const logs = { warn: [] };
+  const sbx = {
+    console: { log() {}, info() {}, debug() {}, warn: (...a) => { logs.warn.push(a.join(' ')); }, error() {} },
+    setTimeout, clearTimeout,
+    document: { readyState: 'complete', getElementById: () => null, createElement: () => ({ remove() {}, setAttribute() {} }), head: { appendChild() {} }, body: null, addEventListener() {} },
+  };
+  sbx.window = sbx;
+  const c = vm.createContext(sbx);
+  const load = f => vm.runInContext(fs.readFileSync(path.join(root, f), 'utf8'), c, { filename: f });
+  ['js/data.js', 'js/color.js', 'js/aesthetics/registry.js', 'js/aesthetic-spec.js'].forEach(load);
+  fs.readdirSync(path.join(root, 'js/moves')).filter(f => f.endsWith('.js')).sort((a, b) => (a === 'core.js' ? -1 : b === 'core.js' ? 1 : a.localeCompare(b))).forEach(f => load('js/moves/' + f));
+  vm.runInContext(`registerAesthetic({ key: 'soft-form', name: 'Soft Form', order: 1 });`, c);
+  load('js/aesthetic-meta.js');
+  load('js/studio-rounds.js');
+  const SR = c.StudioRounds;
+  const catalog = c.SPEC_LAB.catalog();
+  const J = JSON.stringify, parse = f => JSON.parse(fs.readFileSync(path.join(root, f), 'utf8'));
+  const specPath = key => ['custom-aesthetics/starters/' + key + '--moves', 'custom-aesthetics/starters/' + key, 'dev/move-lab/specs/' + key + '--moves', 'custom-aesthetics/' + key].find(p => fs.existsSync(path.join(root, p, 'aesthetic.json')));
+  const specs = ['darkroom', 'soft-form', 'acid-graphics', 'editorial-serif'].map(k => ({ k, p: specPath(k) })).filter(x => x.p);
+  check('rounds: the four real specs are found (Darkroom + three rebuilds)', specs.length === 4, J(specs));
+
+  // validation through the real runtime: register under a scratch key, count refusals and fallback warnings, unregister
+  let seq = 0;
+  const validate = spec => {
+    const errors = [], w0 = logs.warn.length;
+    const copy = vm.runInContext('JSON', c).parse(J(spec)); copy.key = 'chk-var-' + (++seq);   // parsed inside the sandbox: the runtime's pure-data check rejects foreign objects
+    const def = c.registerSpecAesthetic(copy, { json: true, quietHooks: true, errors, file: 'variant' });
+    if (def) c.unregisterSpecAesthetic(copy.key);
+    return { ok: !!def, errors, warns: logs.warn.slice(w0).filter(m => !/art|svg/i.test(m)) };
+  };
+
+  // the checker's own move / kit / field rules (param kinds, ranges, options, materials, states), run on each variant file
+  const checker = require(path.join(root, 'dev/aesthetic-check.js'));
+  const checkerCat = checker.getCatalog(checker.loadRuntime().sb);
+  {
+    const f = path.join(fs.mkdtempSync(path.join(os.tmpdir(), 'lg-clash-')), 'aesthetic.json');
+    const own = parse('custom-aesthetics/starters/soft-form--moves/aesthetic.json');
+    fs.writeFileSync(f, J(own));
+    const R1 = checker.makeReport(); checker.runStatic(f, R1, checkerCat);
+    const clash = R1.results.filter(r => r.level === 'FAIL' && r.id === 'key');
+    check('checker: a new style with a starter\'s key FAILs the key check', clash.length === 1 && /soft-form--moves/.test(clash[0].msg), J(clash));
+    const R2 = checker.makeReport(); checker.runStatic(path.join(root, 'custom-aesthetics/starters/soft-form--moves/aesthetic.json'), R2, checkerCat);
+    check('checker: a starter\'s own folder does not clash with itself', !R2.results.some(r => r.level === 'FAIL' && r.id === 'key'), J(R2.results.filter(r => r.id === 'key')));
+    fs.rmSync(path.dirname(f), { recursive: true, force: true });
+  }
+  const scratchSpecs = fs.mkdtempSync(path.join(os.tmpdir(), 'lg-variants-'));
+  const staticFails = spec => {
+    const f = path.join(scratchSpecs, 'aesthetic.json');
+    fs.writeFileSync(f, J(spec));
+    const R = checker.makeReport();
+    checker.runStatic(f, R, checkerCat);
+    return R.results.filter(r => r.level === 'FAIL' && ['moves', 'kit', 'fields'].includes(r.id)).map(r => r.id + ': ' + r.msg);
+  };
+
+  // deck + highlightNote on an untrusted (stored / imported) spec: valid shapes pass, hostile ones are refused
+  {
+    const sf = parse('custom-aesthetics/starters/soft-form--moves/aesthetic.json'), ag = parse('custom-aesthetics/starters/acid-graphics--moves/aesthetic.json');
+    const untrusted = spec => {
+      const errors = [], copy = vm.runInContext('JSON', c).parse(J(spec)); copy.key = 'chk-deck-' + (++seq);
+      const def = c.registerSpecAesthetic(copy, { json: true, untrusted: true, quietHooks: true, errors, file: 'deck' });
+      if (def) c.unregisterSpecAesthetic(copy.key);
+      return { ok: !!def, errors };
+    };
+    check('deck: the Soft Form and Acid Graphics starters (deck, highlightNote) pass the untrusted checks', untrusted(sf).ok && untrusted(ag).ok, J(untrusted(sf).errors) + J(untrusted(ag).errors));
+    const withDeck = deck => Object.assign({}, sf, { deck });
+    const bads = {
+      markup: withDeck(Object.assign({}, sf.deck, { do: ['<img src=x onerror=1>'] })),
+      'marks markup': withDeck(Object.assign({}, sf.deck, { marks: { do: '<b>', dont: 'x' } })),
+      'wrong type': withDeck('a string'),
+      'coverDisplay string': withDeck({ coverDisplay: '0.8' }),
+      'coverDisplay huge': withDeck({ coverDisplay: 9999 }),
+      'principles shape': withDeck({ principles: [['only one']] }),
+      'huge array': withDeck({ do: Array.from({ length: 500 }, () => 'x') }),
+      'long string': withDeck({ do: ['x'.repeat(2000)] }),
+      'extra key': withDeck({ product: 'alert(1)' }),
+      'note markup': Object.assign({}, sf, { highlightNote: '<script>1</script>' }),
+      'note type': Object.assign({}, sf, { highlightNote: 5 }),
+    };
+    const accepted = Object.keys(bads).filter(k => untrusted(bads[k]).ok);
+    check('deck: hostile deck / highlightNote values (markup, wrong types, huge arrays, extra keys) are all refused', !accepted.length, 'accepted: ' + accepted.join(', '));
+  }
+
+  check('rounds: axes are Any, colour, material, type, edges, kit, art', J(SR.AXES.map(a => a.id)) === J(['any', 'colour', 'material', 'type', 'edges', 'kit', 'art']), J(SR.AXES));
+
+  // variations: every real spec x every axis x 3 seeds
+  const problemsV = [];
+  let made = 0, fellBack = 0;
+  const axisCounts = {};
+  for (const { k, p } of specs) {
+    const spec = parse(p + '/aesthetic.json');
+    const frozen = J(spec);
+    const base = validate(spec);
+    for (const axis of SR.AXES.map(a => a.id)) {
+      for (const seed of [1, 2, 3]) {
+        const tag = `${k}/${axis}/${seed}`;
+        const v = SR.variations(spec, { axis, seed, catalog });
+        if (J(spec) !== frozen) problemsV.push(`${tag}: input was mutated`);
+        if (J(v) !== J(SR.variations(spec, { axis, seed, catalog }))) problemsV.push(`${tag}: not deterministic`);
+        if (v.length !== 3) problemsV.push(`${tag}: ${v.length} variants`);
+        const seen = new Set([frozen]);
+        for (const x of v) {
+          made++;
+          const lines = SR.diffDetailed(spec, x.spec, catalog);
+          const axes = [...new Set(lines.map(l => l.axis))];
+          if (axes.length !== 1 || axes[0] !== x.axis) problemsV.push(`${tag}/${x.id}: diff axes [${axes}] vs axis ${x.axis}`);
+          if (!lines.length) problemsV.push(`${tag}/${x.id}: no-op`);
+          if (seen.has(J(x.spec))) problemsV.push(`${tag}/${x.id}: duplicate or unchanged`);
+          seen.add(J(x.spec));
+          if (typeof x.change !== 'string' || x.change.length < 8 || /undefined|NaN|\[object/.test(x.change)) problemsV.push(`${tag}/${x.id}: change text "${x.change}"`);
+          for (const f of ['name', 'key', 'coreTrick', 'descriptor']) if (x.spec[f] !== spec[f]) problemsV.push(`${tag}/${x.id}: touched ${f}`);
+          if (axis !== 'any' && x.axis !== axis) { fellBack++; if (!x.note) problemsV.push(`${tag}/${x.id}: fell back from ${axis} to ${x.axis} without a note`); }
+          const val = validate(x.spec);
+          if (!val.ok || val.warns.length > base.warns.length) problemsV.push(`${tag}/${x.id}: runtime ${val.ok ? 'warned: ' + val.warns.slice(0, 1) : 'refused: ' + val.errors[0]}`);
+          const sf = staticFails(x.spec);
+          if (sf.length) problemsV.push(`${tag}/${x.id}: checker ${sf[0]}`);
+          axisCounts[x.axis] = (axisCounts[x.axis] || 0) + 1;
+        }
+      }
+    }
+  }
+  fs.rmSync(scratchSpecs, { recursive: true, force: true });
+  check(`rounds: ${made} variations (4 specs x 7 axes x 3 seeds): one axis each, valid in the runtime and the checker, deterministic, never a no-op`, !problemsV.length, problemsV.slice(0, 5).join(' | ') + (problemsV.length > 5 ? ` (+${problemsV.length - 5})` : ''));
+  {
+    // the optional `visible` predicate: a stub rejecting one move (corner-radius) is never beaten, the count holds, and it stays deterministic
+    const sf = parse('custom-aesthetics/starters/soft-form--moves/aesthetic.json');
+    let baseHits = 0, leaks = 0, short = 0, nondet = 0, calls = 0;
+    for (let seed = 1; seed <= 8; seed++) {
+      const plain = SR.variations(sf, { axis: 'edges', seed, catalog });
+      if (plain.some(v => /corner-radius/.test(v.change))) baseHits++;
+      const reject = (base, variant, v) => { calls++; return !/corner-radius/.test(v.change); };
+      const a = SR.variations(sf, { axis: 'edges', seed, catalog, visible: reject });
+      const b = SR.variations(sf, { axis: 'edges', seed, catalog, visible: reject });
+      if (a.some(v => /corner-radius/.test(v.change))) leaks++;
+      if (a.length < plain.length) short++;
+      if (J(a) !== J(b)) nondet++;
+    }
+    check('rounds: a `visible` predicate rejecting corner-radius is never beaten, keeps 3 cards, stays deterministic (and the plain run did hit corner-radius)', baseHits > 0 && !leaks && !short && !nondet && calls > 0, J({ baseHits, leaks, short, nondet, calls }));
+    const never = SR.variations(sf, { axis: 'edges', seed: 1, catalog, visible: () => false });
+    check('rounds: when `visible` rejects everything no variation comes back (no endless search)', never.length === 0, J(never.length));
+  }
+  check('rounds: every concrete axis is actually produced', ['colour', 'material', 'type', 'edges', 'kit', 'art'].every(a => axisCounts[a] > 0), J(axisCounts));
+  {
+    const dr = parse('custom-aesthetics/darkroom/aesthetic.json');
+    const a = SR.variations(dr, { axis: 'any', seed: 7, catalog }), b = SR.variations(dr, { axis: 'any', seed: 8, catalog });
+    check('rounds: a different seed gives different variations', J(a.map(x => x.change)) !== J(b.map(x => x.change)), J(a.map(x => x.change)));
+    check('rounds: Any spreads the three variants over different axes', new Set(a.map(x => x.axis)).size === 3, J(a.map(x => x.axis)));
+    const e = SR.variations(dr, { axis: 'edges', seed: 4, count: 2, catalog });
+    check('rounds: count is honoured and a pinned axis is used when it can vary', e.length === 2 && e.every(x => x.axis === 'edges'), J(e.map(x => [x.axis, x.change])));
+    const bare = { spec: 2, key: 'bare-test', name: 'B', descriptor: 'D', coreTrick: 'T', mode: 'light', colour: [], moves: [], kit: {} };
+    check('rounds: a spec with nothing to vary returns no variants instead of a no-op', SR.variations(bare, { axis: 'art', seed: 1, catalog }).length === 0, '');
+
+    // diff wording
+    const m = JSON.parse(J(dr));
+    m.moves.find(x => x.move === 'corner-radius').params.base = 12;
+    check('rounds: diff names a param change like "corner-radius: base 2 → 12"', SR.diff(dr, m, catalog).includes('corner-radius: base 2 → 12'), J(SR.diff(dr, m, catalog)));
+    const m2 = JSON.parse(J(dr));
+    m2.kit.modal.material = 'film-frame'; m2.kit.sheet.material = 'film-frame';
+    const was = dr.kit.modal.material;
+    const d2 = SR.diff(dr, m2, catalog);
+    check('rounds: diff groups a kit material change ("material (modal, sheet): recessed → film-frame")', d2.length === 1 && d2[0] === `material (modal, sheet): ${was} → film-frame`, J(d2));
+    const m3 = JSON.parse(J(dr));
+    m3.moves.push({ move: 'hairline-rule' }); m3.moves.splice(0, 1);
+    const d3 = SR.diff(dr, m3, catalog);
+    check('rounds: diff reports a removed and an added move', d3.includes(`removed move ${dr.moves[0].move}`) && d3.includes('added move hairline-rule'), J(d3));
+    const m4 = JSON.parse(J(dr));
+    const first = m4.moves.shift(); m4.moves.splice(4, 0, first);
+    check('rounds: diff reports a reordered move', SR.diff(dr, m4, catalog).some(l => l.startsWith(`${first.move} moved from position 1 to 5`)), J(SR.diff(dr, m4, catalog)));
+    const m5 = JSON.parse(J(dr));
+    m5.moves[1].scope = 'kit'; m5.art.hero.fit = 'cover'; m5.name = 'Darkroom with a much longer name than the short field allows here'; m5.type.label = 'sans';
+    const d5 = SR.diff(dr, m5, catalog);
+    check('rounds: diff reports scope, art fit, type and a shortened text field',
+      d5.includes(`${dr.moves[1].move} scope: all → kit`) && d5.includes('art fit: contain → cover') && d5.includes('type: label mono → sans') && d5.some(l => /^name: "Darkroom" → "Darkroom with a much longer name than t…"$/.test(l)), J(d5));
+    const m6 = JSON.parse(J(dr));
+    m6.moves[0].params.base = { light: 2, dark: 6 };
+    check('rounds: diff shows a light / dark pair', SR.diff(dr, m6, catalog).some(l => /^corner-radius: base light 2 → 2, dark 2 → 6$|^corner-radius: base 2 → light 2 \/ dark 6$/.test(l)), J(SR.diff(dr, m6, catalog)));
+    check('rounds: diff of identical specs is empty', SR.diff(dr, JSON.parse(J(dr)), catalog).length === 0, '');
+  }
+
+  // round lifecycle
+  {
+    const { roundsProblems } = require(path.join(root, 'dev/aesthetic-check.js'));
+    let r = SR.openRound(null, { by: 'studio', date: '2026-11-07' });
+    const o0 = J(r);
+    check('rounds: openRound makes round 1 with the working fields', J(Object.keys(r.rounds[0])) === J(['n', 'date', 'by', 'summary', 'changes', 'variants', 'notes', 'shots', 'open']) && r.rounds[0].n === 1 && r.rounds[0].open === true && SR.current(r) === r.rounds[0], J(r));
+    check('rounds: a second openRound while one is open changes nothing', J(SR.openRound(r, { by: 'studio' })) === o0, '');
+    let t = SR.addNote(r, { target: 'board.hero', text: 'headline too loud' }); r = t.rounds;
+    check('rounds: addNote gives n1 and does not mutate its input', t.note.id === 'n1' && t.note.status === 'open' && J(SR.current(SR.openRound(null, { by: 'studio', date: '2026-11-07' })).notes) === '[]', J(t));
+    t = SR.addNote(r, { target: 'kit.nav-menu', text: 'rows too heavy' }); r = t.rounds;
+    let threw = 0;
+    for (const bad of [{ target: 'nowhere', text: 'x' }, { target: 'general', text: '  ' }]) { try { SR.addNote(r, bad); } catch (e) { threw++; } }
+    check('rounds: a bad note target or empty text is refused', t.note.id === 'n2' && threw === 2, '');
+    r = SR.recordVariant(r, { change: 'material (card): recessed → film-frame', verdict: 'open' });
+    r = SR.recordVariant(r, { change: 'corner-radius: base 2 → 12', verdict: 'kill' });
+    r = SR.recordVariant(r, { id: 'r1a', verdict: 'keep' });
+    check('rounds: variants get ids r1a, r1b and a verdict can be set afterwards', J(r.rounds[0].variants.map(v => [v.id, v.verdict])) === J([['r1a', 'keep'], ['r1b', 'kill']]), J(r.rounds[0].variants));
+    r = SR.recordChanges(r, ['corner-radius: base 2 → 8', 'corner-radius: base 8 → 12', 'type: label mono → sans', 'type: label sans → mono']);
+    check('rounds: recordChanges merges a run of edits and drops one that ends where it started', J(r.rounds[0].changes) === J(['corner-radius: base 2 → 12']), J(r.rounds[0].changes));
+    r = SR.setNote(r, 'n1', { status: 'done' });
+    check('rounds: marking a note done sets doneIn to the current round', r.rounds[0].notes[0].status === 'done' && r.rounds[0].notes[0].doneIn === 1, J(r.rounds[0].notes));
+    r = SR.closeRound(r, { summary: 'Calmer headline and a hairline card.', date: '2026-11-08' });
+    const closed = r.rounds[0];
+    check('rounds: a closed round matches section 7 (no open flag, no null shots) and passes the checker rules',
+      J(Object.keys(closed)) === J(['n', 'date', 'by', 'summary', 'changes', 'variants', 'notes']) && closed.date === '2026-11-08' && SR.current(r) === null && !roundsProblems(r).problems.length, J([closed, roundsProblems(r).problems]));
+    check('rounds: a closed round without a summary gets a plain one', SR.closeRound(SR.openRound(null, { by: 'studio' }), {}).rounds[0].summary === '0 changes.', '');
+    r = SR.openRound(r, { by: 'studio', date: '2026-11-09' });
+    t = SR.addNote(r, { target: 'general', text: 'feels flat' }); r = t.rounds;
+    r = SR.setNote(r, 'n2', { status: 'done' });
+    r = SR.recordVariant(r, { change: 'colour recipe: tinted-neutral-canvas → warm-paper-canvas' });
+    const ids = r.rounds.flatMap(x => x.notes.map(n => n.id).concat(x.variants.map(v => v.id)));
+    check('rounds: round 2 numbers n3 and r2a; ids are unique across rounds; an older note closed now gets doneIn 2',
+      t.note.id === 'n3' && r.rounds[1].n === 2 && r.rounds[1].variants[0].id === 'r2a' && r.rounds[0].notes[1].doneIn === 2 && new Set(ids).size === ids.length && J(SR.openNotes(r).map(n => n.id)) === '["n3"]', J(r));
+    check('rounds: an open round passes the checker rules; two open rounds or a leftover flag do not',
+      !roundsProblems(r).problems.length && roundsProblems({ rounds: [Object.assign({}, r.rounds[1]), Object.assign({}, r.rounds[1], { n: 3 })] }).problems.some(p => /more than one open/.test(p)) && roundsProblems({ rounds: [Object.assign({}, closed, { open: false })] }).problems.some(p => /leftover/.test(p)), '');
+    check('rounds: setNote back to open clears doneIn', !('doneIn' in SR.setNote(r, 'n1', { status: 'open' }).rounds[0].notes[0]), '');
+    let thr = 0;
+    try { SR.addNote({ rounds: [] }, { target: 'general', text: 'x' }); } catch (e) { thr++; }
+    try { SR.closeRound({ rounds: [] }, {}); } catch (e) { thr++; }
+    check('rounds: working on a round when none is open is an error, not a silent change', thr === 2, '');
+  }
+
+  // snapshot cap
+  {
+    const dr = parse('custom-aesthetics/darkroom/aesthetic.json');
+    const fat = n => Object.assign(JSON.parse(J(dr)), { summary: 'x'.repeat(420000) + n });
+    let b = { format: 'looks-good-aesthetic', version: 1, aesthetic: dr, rounds: null, art: {} };
+    b = SR.snapshot(b, 1, dr);
+    check('rounds: snapshot appends { round, date, aesthetic } and leaves its input alone', b.versions.length === 1 && b.versions[0].round === 1 && /^\d{4}-\d{2}-\d{2}$/.test(b.versions[0].date) && b.versions[0].aesthetic.key === 'darkroom', J(Object.keys(b)));
+    for (let n = 2; n <= 7; n++) b = SR.snapshot(b, n, fat(n));
+    const size = J(b).length;
+    check('rounds: snapshot keeps the bundle under ~1.5 MB by dropping the oldest, newest last', size <= 1.5 * 1024 * 1024 && b.versions.length >= 2 && b.versions.length < 7 && b.versions[b.versions.length - 1].round === 7 && b.versions[0].round > 1, J([size, b.versions.map(v => v.round)]));
+    const again = SR.snapshot(b, 7, dr);
+    check('rounds: a second snapshot of the same round replaces the first', again.versions.filter(v => v.round === 7).length === 1, '');
+  }
+
+  // checker: unpack / pack round trip on Darkroom's exported bundle
+  pendingChecks.push((async () => {
+    const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'lg-rounds-'));
+    try {
+      const store = new Map();
+      const sb2 = {
+        console: { log() {}, info() {}, debug() {}, warn() {}, error() {} }, setTimeout, clearTimeout,
+        document: { readyState: 'complete', getElementById: () => null, createElement: () => ({ remove() {}, setAttribute() {} }), head: { appendChild() {} }, body: null, addEventListener() {} },
+        LibraryStore: { collection: () => ({ list: async () => [...store.values()], put: async r => { store.set(r.id, r); }, remove: async id => { store.delete(id); } }), newId: () => 'x' },
+        fetch: async url => { const f = path.join(root, String(url)); return fs.existsSync(f) ? { ok: true, status: 200, text: async () => fs.readFileSync(f, 'utf8') } : { ok: false, status: 404, text: async () => '' }; },
+      };
+      sb2.window = sb2;
+      const c2 = vm.createContext(sb2);
+      const ld = f => vm.runInContext(fs.readFileSync(path.join(root, f), 'utf8'), c2, { filename: f });
+      ['js/data.js', 'js/color.js', 'js/aesthetics/registry.js', 'js/aesthetic-spec.js'].forEach(ld);
+      fs.readdirSync(path.join(root, 'js/moves')).filter(f => f.endsWith('.js')).sort((a, b) => (a === 'core.js' ? -1 : b === 'core.js' ? 1 : a.localeCompare(b))).forEach(f => ld('js/moves/' + f));
+      vm.runInContext(`registerAesthetic({ key: 'soft-form', name: 'Soft Form', order: 1 });`, c2);
+      ld('js/aesthetic-meta.js'); ld('js/custom-aesthetics.js');
+      await c2.CustomAesthetics.ready;
+      const exported = await c2.CustomAesthetics.exportText('darkroom');
+      const bundleFile = path.join(tmp, 'darkroom.aesthetic.json');
+      fs.writeFileSync(bundleFile, exported);
+      const cli = (...args) => cp.spawnSync(process.execPath, [path.join(root, 'dev/aesthetic-check.js'), ...args], { encoding: 'utf8', cwd: tmp });
+      const dir = path.join(tmp, 'unpacked');
+      const un = cli('--unpack', bundleFile, dir);
+      const files = fs.existsSync(dir) ? fs.readdirSync(dir).sort() : [];
+      check('checker: --unpack writes aesthetic.json, rounds.json and art/hero.svg', un.status === 0 && J(files) === J(['aesthetic.json', 'art', 'rounds.json']) && fs.readFileSync(path.join(dir, 'art/hero.svg'), 'utf8') === fs.readFileSync(path.join(root, 'custom-aesthetics/darkroom/art/hero.svg'), 'utf8'), un.stdout + un.stderr);
+      const again = cli('--unpack', bundleFile, dir);
+      check('checker: --unpack refuses a non-empty folder without --force', again.status === 1 && /not empty/.test(again.stderr), again.stdout + again.stderr);
+      check('checker: --unpack --force overwrites', cli('--unpack', bundleFile, dir, '--force').status === 0, '');
+      const out = path.join(tmp, 'repacked.aesthetic.json');
+      const pk = cli('--pack', dir, out);
+      check('checker: --pack of the unpacked folder reproduces the exported bundle byte for byte, prints the path', pk.status === 0 && fs.existsSync(out) && fs.readFileSync(out, 'utf8') === exported && pk.stdout.includes(out), pk.stdout.slice(-300) + pk.stderr);
+
+      // versions + a raster art file + an open studio round survive the trip
+      const rich = JSON.parse(exported);
+      const png = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==';
+      rich.art['art/p.png'] = png;
+      rich.rounds = SR.addNote(SR.openRound(rich.rounds, { by: 'studio', date: '2026-11-07' }), { target: 'general', text: 'more grain' }).rounds;
+      rich.versions = [{ round: 2, date: '2026-11-06', aesthetic: rich.aesthetic }];
+      const richFile = path.join(tmp, 'rich.aesthetic.json'), richDir = path.join(tmp, 'rich'), richOut = path.join(tmp, 'rich-out.json');
+      const richText = JSON.stringify(rich, null, 2) + '\n';
+      fs.writeFileSync(richFile, richText);
+      const u2 = cli('--unpack', richFile, richDir);
+      const p2 = cli('--pack', richDir, richOut);
+      check('checker: versions.json, a png (decoded to a file) and an open studio round round-trip byte for byte',
+        u2.status === 0 && fs.existsSync(path.join(richDir, 'versions.json')) && fs.readFileSync(path.join(richDir, 'art/p.png')).length > 20 && p2.status === 0 && fs.readFileSync(richOut, 'utf8') === richText, u2.stdout + u2.stderr + p2.stdout.slice(-400) + p2.stderr);
+
+      // static checks on studio rounds
+      const badDir = path.join(tmp, 'bad'); fs.cpSync(dir, badDir, { recursive: true });
+      const br = JSON.parse(fs.readFileSync(path.join(badDir, 'rounds.json'), 'utf8'));
+      br.rounds.push({ n: 9, date: '2026-11-07', by: 'studio', summary: 'closed but flagged', changes: [], variants: [], notes: [], open: false });
+      fs.writeFileSync(path.join(badDir, 'rounds.json'), JSON.stringify(br));
+      const badOut = path.join(tmp, 'bad-out.json');
+      const pb = cli('--pack', badDir, badOut);
+      check('checker: a closed studio round that keeps its open flag FAILs and the bundle is not written', pb.status === 1 && /FAIL\s+rounds.*leftover/.test(pb.stdout) && !fs.existsSync(badOut), pb.stdout.slice(0, 400));
+      const st = cli(dir);
+      check('checker: the static checks pass on the unpacked scratch folder (same key as the repo copy is only a WARN)', st.status === 0 && /WARN\s+key\s+same key as custom-aesthetics\/darkroom/.test(st.stdout), st.stdout.slice(0, 600));
+    } finally { fs.rmSync(tmp, { recursive: true, force: true }); }
+  })());
+}
+
 // Not run here (they need a real DOM): that blended tokens(t, state) see the view's fonts end to end, and the
 // render timings. They are covered by the in-browser sweeps in docs/round6/.
 

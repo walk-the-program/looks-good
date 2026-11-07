@@ -10,7 +10,10 @@ Two places hold folders:
   (`CustomAesthetics`, stored in the library; folder styles cannot be deleted in the app).
 - `dev/move-lab/specs/<key>/` (listed in `dev/move-lab/specs/index.json`, `{ "specs": [...] }`): lab rebuilds and smoke specs, loaded
   only with `?movelab=1` (one guarded tag in `index.html` loads `dev/move-lab/lab.js`, which reads the index with synchronous XHR).
-  Lab keys end in `--moves`, `order` 900+.
+  Lab keys end in `--moves`, `order` 900+. The three rebuilds (`soft-form--moves`, `acid-graphics--moves`,
+  `editorial-serif--moves`) live in `custom-aesthetics/starters/` (with `blank`, the spec template), the starting points of
+  New style in the Styles home; they are listed under `"starters"` in `custom-aesthetics/index.json`, are not registered by the
+  normal app, and `lab.js` registers the `--moves` ones from there under `?movelab=1`.
 
 Files: `js/aesthetic-spec.js` (runtime) and `js/moves/*.js` (move libraries, code tier) are always loaded by `index.html`; a new
 move file needs a `<script>` tag there, after `js/moves/darkroom.js`. A 404 for a listed file shows as a console error.

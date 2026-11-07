@@ -11,11 +11,14 @@ const cp = require('child_process');
 const ROOT = path.resolve(__dirname, '..');
 const SPECS_DIR = path.join(ROOT, 'dev', 'move-lab', 'specs');               // lab specs (need ?movelab=1)
 const CUSTOM_DIR = path.join(ROOT, 'custom-aesthetics');                       // custom styles (load in the normal app)
+const STARTERS_DIR = path.join(CUSTOM_DIR, 'starters');                         // starter specs for New style (not registered styles)
 const FIXTURES = path.join(__dirname, 'aesthetic-check', 'fixtures');
 
 const USAGE = `Usage: node dev/aesthetic-check.js <folder | aesthetic.json | key> [options]
        node dev/aesthetic-check.js --list-moves [--json]
        node dev/aesthetic-check.js --self-test
+       node dev/aesthetic-check.js --unpack <bundle.json> <dir> [--force]
+       node dev/aesthetic-check.js --pack <dir> <bundle.json>
 
 Validates a spec-2 aesthetic (docs/aesthetic-spec/SPEC-v2.md) so an agent can iterate
 render -> look -> fix without opening the app.
@@ -36,11 +39,17 @@ Options
   --out <dir>      shots directory for a key-only run (default <folder>/shots)
   --list-moves     print the move catalog as Markdown (--json for JSON)
   --json           print a JSON report instead of text lines
+  --unpack <bundle> <dir>  write a studio-exported <key>.aesthetic.json as a folder (aesthetic.json, rounds.json, versions.json,
+                   art/*); refuses a non-empty <dir> unless --force. Unpack OUTSIDE custom-aesthetics/ (a scratch dir).
+  --pack <dir> <bundle>    build the bundle from a folder, run the static checks, write it only if none FAIL, print the path
   --self-test      run every fixture in dev/aesthetic-check/fixtures/ against EXPECTED.md
   --help           this text
 
+A folder that is not listed in custom-aesthetics/index.json (a scratch unpack, a new folder) renders and shoots too: the
+checker imports its packed bundle into the headless page under a temporary key and removes it after.
+
 Output: one line per check, "PASS|WARN|FAIL  <check-id>  <message>", then a summary line.
-Exit code 1 if any check is FAIL. Static check ids: json fields key moves kit art rounds similar runtime.
+Exit code 1 if any check is FAIL. Static check ids: json fields key moves kit art rounds versions similar runtime.
 Never touches the network; render runs headless, in-memory, localhost only.`;
 
 /* ------------------------------------------------------------------ report */
@@ -195,9 +204,9 @@ function builtInKeys() {
    aesthetic.json), and legacy v1 JS specs in the lab folder. A custom key must not clash with either place. */
 function otherSpecKeys(selfDir) {
   const folders = new Map(), legacy = new Map();
-  for (const dir of [SPECS_DIR, CUSTOM_DIR]) {
+  for (const dir of [SPECS_DIR, CUSTOM_DIR, STARTERS_DIR]) {
     if (!fs.existsSync(dir)) continue;
-    const where = dir === CUSTOM_DIR ? 'custom-aesthetics/' : '';
+    const where = dir === CUSTOM_DIR ? 'custom-aesthetics/' : dir === STARTERS_DIR ? 'custom-aesthetics/starters/' : '';
     for (const f of fs.readdirSync(dir)) {
       const full = path.join(dir, f);
       if (fs.statSync(full).isDirectory()) {
@@ -292,7 +301,11 @@ function checkKey(spec, ctx, R) {
   const builtIn = builtInKeys();
   if (builtIn.has(key)) problems.push(`clashes with the built-in key "${key}" (rebuilds end in --moves)`);
   const others = otherSpecKeys(ctx.folder);
-  if (others.folders.has(key)) problems.push(`clashes with spec folder "${others.folders.get(key)}"`);
+  const scratch = !ctx.underSpecs && !ctx.underCustom;   // an unpacked studio file: its key may match the repo's copy of the same style
+  if (others.folders.has(key)) {
+    if (scratch && others.folders.get(key).startsWith('custom-aesthetics/') && !others.folders.get(key).startsWith('custom-aesthetics/starters/')) R.warn('key', `same key as ${others.folders.get(key)}: fine for a scratch copy of an exported style (import it with Replace); do not add this folder to the index`);
+    else problems.push(`clashes with spec folder "${others.folders.get(key)}"`);
+  }
   if (ctx.underSpecs || ctx.underCustom) {
     if (path.basename(ctx.folder) !== key) problems.push(`folder name "${path.basename(ctx.folder)}" must equal the key`);
     let listed = false;
@@ -424,18 +437,31 @@ function checkRounds(ctx, R) {
   if (!file || !fs.existsSync(file)) { R.pass('rounds', 'no rounds.json (optional)'); return; }
   let j;
   try { j = JSON.parse(fs.readFileSync(file, 'utf8')); } catch (e) { R.fail('rounds', `rounds.json does not parse: ${e.message}`); return; }
+  const bad = roundsProblems(j);
+  if (bad.problems.length) R.fail('rounds', `${bad.problems.length} problem(s): ${bad.problems.slice(0, 6).join('; ')}${bad.problems.length > 6 ? '; ...' : ''}`);
+  else R.pass('rounds', `${bad.rounds} round(s) valid${bad.open ? ` (1 open studio round)` : ''}, ${bad.openNotes} open note(s)`);
+}
+
+/* SPEC-v2 section 7 (+ studio rounds): returns { problems, rounds, open, openNotes }. A round the studio has not closed carries
+   "open": true (summary may be empty then); a closed round never carries an "open" key. At most one round is open. */
+function roundsProblems(j) {
   const bad = [];
-  if (!isObj(j) || !Array.isArray(j.rounds)) { R.fail('rounds', 'rounds.json needs {"rounds": [...]}'); return; }
+  if (!isObj(j) || !Array.isArray(j.rounds)) return { problems: ['rounds.json needs {"rounds": [...]}'], rounds: 0, open: 0, openNotes: 0 };
   const ns = new Set(), ids = new Set();
+  let open = 0;
   j.rounds.forEach((r, i) => {
     const w = `rounds[${i}]`;
     if (!isObj(r)) { bad.push(`${w}: must be an object`); return; }
+    const isOpen = r.open === true;
+    if (r.open !== undefined && r.open !== true) bad.push(`${w}: leftover "open" flag in a closed round (remove the key)`);
+    if (isOpen) { open++; if (open > 1) bad.push(`${w}: more than one open round`); if (r.by !== 'studio') bad.push(`${w}: only a studio round can be open`); }
     if (!Number.isInteger(r.n) || r.n < 1) bad.push(`${w}.n must be a positive integer`); else if (ns.has(r.n)) bad.push(`${w}.n ${r.n} duplicated`); else ns.add(r.n);
     if (!(isStr(r.date) && /^\d{4}-\d{2}-\d{2}$/.test(r.date) && !isNaN(Date.parse(r.date)))) bad.push(`${w}.date must be YYYY-MM-DD`);
     if (!['agent', 'studio'].includes(r.by)) bad.push(`${w}.by must be agent|studio`);
-    if (!isStr(r.summary) || !r.summary.trim()) bad.push(`${w}.summary required`);
+    if (!isOpen && (!isStr(r.summary) || !r.summary.trim())) bad.push(`${w}.summary required`);
+    if (isOpen && !isStr(r.summary)) bad.push(`${w}.summary must be a string`);
     if (!(Array.isArray(r.changes) && r.changes.every(isStr))) bad.push(`${w}.changes must be an array of strings`);
-    if (r.shots !== undefined && !isStr(r.shots)) bad.push(`${w}.shots must be a string`);
+    if (r.shots !== undefined && !isStr(r.shots) && !(isOpen && r.shots === null)) bad.push(`${w}.shots must be a string${isOpen ? ' or null' : ' (a closed studio round has none: remove the key)'}`);
     if (r.variants !== undefined) {
       if (!Array.isArray(r.variants)) bad.push(`${w}.variants must be an array`);
       else r.variants.forEach((v, k) => {
@@ -462,11 +488,104 @@ function checkRounds(ctx, R) {
       });
     }
   });
-  if (bad.length) R.fail('rounds', `${bad.length} problem(s): ${bad.slice(0, 6).join('; ')}${bad.length > 6 ? '; ...' : ''}`);
-  else {
-    const open = j.rounds.reduce((a, r) => a + arr(r.notes).filter(n => n.status === 'open').length, 0);
-    R.pass('rounds', `${j.rounds.length} round(s) valid, ${open} open note(s)`);
+  const openNotes = j.rounds.reduce((a, r) => a + arr(isObj(r) ? r.notes : []).filter(n => isObj(n) && n.status === 'open').length, 0);
+  return { problems: bad, rounds: j.rounds.length, open, openNotes };
+}
+
+/* versions.json: { "versions": [ { "round": 2, "date": "YYYY-MM-DD", "aesthetic": {spec 2, same key} } ] } (studio snapshots) */
+function checkVersions(spec, ctx, R) {
+  const file = ctx.folder && path.join(ctx.folder, 'versions.json');
+  if (!file || !fs.existsSync(file)) return;
+  let j;
+  try { j = JSON.parse(fs.readFileSync(file, 'utf8')); } catch (e) { R.fail('versions', `versions.json does not parse: ${e.message}`); return; }
+  const bad = [];
+  if (!isObj(j) || !Array.isArray(j.versions)) { R.fail('versions', 'versions.json needs {"versions": [...]}'); return; }
+  const rs = new Set();
+  j.versions.forEach((v, i) => {
+    const w = `versions[${i}]`;
+    if (!isObj(v)) { bad.push(`${w}: must be an object`); return; }
+    if (!Number.isInteger(v.round) || v.round < 1) bad.push(`${w}.round must be a positive integer`); else if (rs.has(v.round)) bad.push(`${w}.round ${v.round} duplicated`); else rs.add(v.round);
+    if (!(isStr(v.date) && /^\d{4}-\d{2}-\d{2}$/.test(v.date))) bad.push(`${w}.date must be YYYY-MM-DD`);
+    if (!isObj(v.aesthetic) || v.aesthetic.spec !== 2) bad.push(`${w}.aesthetic must be a spec 2 aesthetic`);
+    else if (spec && v.aesthetic.key !== spec.key) bad.push(`${w}.aesthetic.key "${v.aesthetic.key}" differs from the style's key`);
+  });
+  const size = JSON.stringify(j).length;
+  if (size > 1.6 * 1024 * 1024) bad.push(`versions.json is ${Math.round(size / 1024)} KB (cap about 1.5 MB: drop the oldest)`);
+  if (bad.length) R.fail('versions', `${bad.length} problem(s): ${bad.slice(0, 6).join('; ')}`);
+  else R.pass('versions', `${j.versions.length} snapshot(s) valid`);
+}
+
+/* ------------------------------------------------------------------ bundles: unpack / pack (studio export <-> folder) */
+const FORMAT = 'looks-good-aesthetic';
+const MAX_BUNDLE = 2 * 1024 * 1024, MAX_ART = 12;
+const ART_PATH = /^art\/[A-Za-z0-9._\- /]+\.(svg|png|jpe?g|webp|gif)$/i;
+const MIME = { '.png': 'image/png', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.webp': 'image/webp', '.gif': 'image/gif' };
+const jsonFile = v => JSON.stringify(v, null, 1) + '\n';
+
+function unpackBundle(bundlePath, dir, opts) {
+  opts = opts || {};
+  let b;
+  try { b = JSON.parse(fs.readFileSync(bundlePath, 'utf8')); } catch (e) { return { ok: false, error: `cannot read ${bundlePath}: ${e.message}` }; }
+  if (!isObj(b) || b.format !== FORMAT || b.version !== 1 || !isObj(b.aesthetic)) return { ok: false, error: `${bundlePath} is not a ${FORMAT} bundle (version 1)` };
+  const art = isObj(b.art) ? b.art : {};
+  for (const p of Object.keys(art)) if (!ART_PATH.test(p) || p.includes('..') || p.includes('//')) return { ok: false, error: `art path "${p}" is not allowed` };
+  const target = path.resolve(dir);
+  if (fs.existsSync(target)) {
+    if (!fs.statSync(target).isDirectory()) return { ok: false, error: `${dir} exists and is not a folder` };
+    if (fs.readdirSync(target).length && !opts.force) return { ok: false, error: `${dir} is not empty (use --force to overwrite its files)` };
   }
+  fs.mkdirSync(target, { recursive: true });
+  const written = ['aesthetic.json'];
+  fs.writeFileSync(path.join(target, 'aesthetic.json'), jsonFile(b.aesthetic));
+  if (b.rounds) { fs.writeFileSync(path.join(target, 'rounds.json'), jsonFile(b.rounds)); written.push('rounds.json'); }
+  if (Array.isArray(b.versions) && b.versions.length) { fs.writeFileSync(path.join(target, 'versions.json'), jsonFile({ versions: b.versions })); written.push('versions.json'); }
+  for (const [p, v] of Object.entries(art)) {
+    const f = path.join(target, p);
+    fs.mkdirSync(path.dirname(f), { recursive: true });
+    if (/\.svg$/i.test(p)) fs.writeFileSync(f, v);
+    else {
+      const m = String(v).match(/^data:image\/(?:png|jpeg|webp|gif);base64,([A-Za-z0-9+/=]+)$/);
+      if (!m) return { ok: false, error: `art file "${p}" is not a base64 data:image URL` };
+      fs.writeFileSync(f, Buffer.from(m[1], 'base64'));
+    }
+    written.push(p);
+  }
+  return { ok: true, dir: target, files: written, key: b.aesthetic.key };
+}
+
+/* packBundle(dir) -> { ok, bundle, text, problems } ; the key order matches CustomAesthetics.exportText */
+function packBundle(dir) {
+  const target = path.resolve(dir);
+  const problems = [];
+  const read = name => { const f = path.join(target, name); return fs.existsSync(f) ? fs.readFileSync(f, 'utf8') : null; };
+  const parse = (name, text) => { try { return JSON.parse(text); } catch (e) { problems.push(`${name} does not parse: ${e.message}`); return null; } };
+  const aText = read('aesthetic.json');
+  if (aText == null) return { ok: false, problems: [`${path.join(dir, 'aesthetic.json')} not found`] };
+  const aesthetic = parse('aesthetic.json', aText);
+  const rText = read('rounds.json'), vText = read('versions.json');
+  const rounds = rText == null ? null : parse('rounds.json', rText);
+  const versions = vText == null ? null : parse('versions.json', vText);
+  const art = {};
+  const artDir = path.join(target, 'art');
+  if (fs.existsSync(artDir)) {
+    const walk = d => fs.readdirSync(d).sort().flatMap(f => { const p = path.join(d, f); return fs.statSync(p).isDirectory() ? walk(p) : [p]; });
+    for (const f of walk(artDir)) {
+      const rel = path.relative(target, f).split(path.sep).join('/');
+      const ext = path.extname(f).toLowerCase();
+      if (!ART_PATH.test(rel) || rel.includes('..')) { problems.push(`art path "${rel}" is not allowed (art/<name>.svg, .png, .jpg, .webp or .gif)`); continue; }
+      art[rel] = ext === '.svg' ? fs.readFileSync(f, 'utf8') : `data:${MIME[ext]};base64,${fs.readFileSync(f).toString('base64')}`;
+    }
+  }
+  if (Object.keys(art).length > MAX_ART) problems.push(`more than ${MAX_ART} art files`);
+  for (const [p, v] of Object.entries(art)) if (/\.svg$/i.test(p) && !/<svg[\s>]/i.test(v)) problems.push(`${p} is not an SVG`);
+  if (versions && !(isObj(versions) && Array.isArray(versions.versions))) problems.push('versions.json needs {"versions": [...]}');
+  if (rounds && !isObj(rounds)) problems.push('rounds.json must be an object');
+  if (!isObj(aesthetic)) problems.push('aesthetic.json must be a JSON object');
+  const bundle = { format: FORMAT, version: 1, aesthetic, rounds: rounds || null, art };
+  if (versions && Array.isArray(versions.versions) && versions.versions.length) bundle.versions = versions.versions;
+  const text = JSON.stringify(bundle, null, 2) + '\n';
+  if (text.length > MAX_BUNDLE) problems.push(`the bundle is ${(text.length / 1048576).toFixed(2)} MB (limit 2 MB): drop old versions or shrink the art`);
+  return { ok: !problems.length, bundle, text, problems };
 }
 
 function loadLibrary() {
@@ -534,6 +653,7 @@ function runStatic(target, R, catInfo) {
   checkKit(spec, catInfo, R);
   checkArt(spec, catInfo, ctx, R);
   checkRounds(ctx, R);
+  checkVersions(spec, ctx, R);
   checkSimilar(spec, catInfo, R);
   return { spec, ctx };
 }
@@ -624,10 +744,34 @@ function selfTest() {
   return bad ? 1 : 0;
 }
 
+function customListed(key) {
+  try { return arr(JSON.parse(fs.readFileSync(path.join(CUSTOM_DIR, 'index.json'), 'utf8')).aesthetics).includes(key); } catch (e) { return false; }
+}
+
+/* --pack <dir> <bundle>: static checks on the folder, then the bundle file is written only when nothing FAILs */
+function packCommand(dir, out, asJson) {
+  if (!fs.existsSync(dir) || !fs.statSync(dir).isDirectory()) { console.error(`pack: ${dir} is not a folder`); return 1; }
+  const { sb, logs } = loadRuntime();
+  const cat = getCatalog(sb);
+  const R = makeReport();
+  runtimeNotes(logs, R);
+  runStatic(path.resolve(dir), R, cat);
+  const packed = packBundle(dir);
+  if (!packed.ok) packed.problems.forEach(p => R.fail('bundle', p));
+  else R.pass('bundle', `bundle is ${(packed.text.length / 1024).toFixed(1)} KB, ${Object.keys(packed.bundle.art).length} art file(s), ${(packed.bundle.versions || []).length} version(s)`);
+  const fails = R.results.filter(r => r.level === 'FAIL').length;
+  if (asJson) console.log(JSON.stringify({ results: R.results }, null, 2));
+  else for (const r of R.results) console.log(`${r.level}  ${r.id}  ${r.msg}`);
+  if (fails) { console.log(`pack: ${fails} FAIL: bundle not written`); return 1; }
+  fs.writeFileSync(path.resolve(out), packed.text);
+  console.log(`packed ${path.resolve(out)}`);
+  return 0;
+}
+
 /* ------------------------------------------------------------------ main */
 function main() {
   const argv = process.argv.slice(2);
-  const o = { json: false, render: null, shots: false, list: false, self: false, out: null, target: null };
+  const o = { json: false, render: null, shots: false, list: false, self: false, out: null, target: null, unpack: null, pack: null, force: false };
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
     if (a === '--help' || a === '-h') { console.log(USAGE); return 0; }
@@ -637,12 +781,26 @@ function main() {
     else if (a === '--self-test') o.self = true;
     else if (a === '--render') { o.render = argv[++i]; if (!/^\d+$/.test(o.render || '')) { console.error('--render needs a port number'); return 2; } }
     else if (a === '--out') o.out = argv[++i];
+    else if (a === '--force') o.force = true;
+    else if (a === '--unpack' || a === '--pack') {
+      const x = argv[++i], y = argv[++i];
+      if (!x || !y || x.startsWith('-') || y.startsWith('-')) { console.error(`${a} needs two paths (see --help)`); return 2; }
+      o[a.slice(2)] = [x, y];
+    }
     else if (a === '--palette') { o.palette = argv[++i]; if (!/^#[0-9a-fA-F]{6}$/.test(o.palette || '')) { console.error('--palette needs a #rrggbb hex'); return 2; } }
     else if (a.startsWith('-')) { console.error(`unknown option ${a}\n\n${USAGE}`); return 2; }
     else if (!o.target) o.target = a;
     else { console.error('only one target allowed'); return 2; }
   }
   if (o.self) return selfTest();
+  if (o.unpack) {
+    const r = unpackBundle(o.unpack[0], o.unpack[1], { force: o.force });
+    if (!r.ok) { console.error(`unpack: ${r.error}`); return 1; }
+    const inCustom = path.dirname(r.dir) === CUSTOM_DIR;
+    console.log(`unpacked "${r.key}" to ${r.dir}: ${r.files.join(', ')}${inCustom ? '\nwarning: this is inside custom-aesthetics/; unpack to a scratch folder instead' : ''}`);
+    return 0;
+  }
+  if (o.pack) return packCommand(o.pack[0], o.pack[1], o.json);
   const { sb, logs } = loadRuntime();
   const cat = getCatalog(sb);
   if (o.list) { console.log(listMoves(o.json, cat)); return 0; }
@@ -666,9 +824,25 @@ function main() {
   if (o.render && key) {
     const render = require('./aesthetic-check/render.js');
     const outDir = o.out ? path.resolve(o.out) : (ctx.folder ? path.join(ctx.folder, 'shots') : null);
-    // custom-aesthetics styles load in the normal app; only lab specs need ?movelab=1
-    const custom = ctx.underCustom || (!ctx.folder && fs.existsSync(path.join(CUSTOM_DIR, key, 'aesthetic.json')));
-    table = render.run({ port: o.render, key, R, ROOT, shots: o.shots, outDir, palette: o.palette, lab: !custom });
+    // lab specs need ?movelab=1; a listed custom-aesthetics folder loads in the normal app; any other folder (a scratch unpack,
+    // a folder not in the index yet) is packed and imported into the headless page under a temporary key
+    const listed = ctx.underCustom && customListed(key) && path.basename(ctx.folder) === key;
+    const keyOnlyCustom = !ctx.folder && fs.existsSync(path.join(CUSTOM_DIR, key, 'aesthetic.json'));
+    let inject = null, skip = false;
+    if (ctx.folder && !ctx.underSpecs && !listed) {
+      const packed = packBundle(ctx.folder);
+      if (!packed.ok) { R.fail('render-load', `cannot pack ${ctx.folder} for rendering: ${packed.problems.join('; ')}`); skip = true; }
+      else {
+        const tmp = ('chk-' + key).slice(0, 48).replace(/-+$/, '');
+        const b = JSON.parse(packed.text);
+        b.aesthetic.key = tmp;
+        delete b.versions;
+        inject = { text: JSON.stringify(b), key: tmp };
+      }
+    }
+    if (!skip) {
+      table = render.run({ port: o.render, key: inject ? inject.key : key, label: key, inject, R, ROOT, shots: o.shots, outDir, palette: o.palette, lab: !(listed || keyOnlyCustom || inject) });
+    }
   } else if (o.render) R.fail('render', 'no key to render (static checks failed to read one)');
 
   const count = l => R.results.filter(r => r.level === l).length;
@@ -682,4 +856,5 @@ function main() {
   return summary.fail ? 1 : 0;
 }
 
-process.exitCode = main();
+if (require.main === module) process.exitCode = main();
+else module.exports = { loadRuntime, getCatalog, runStatic, makeReport, packBundle, unpackBundle, roundsProblems };

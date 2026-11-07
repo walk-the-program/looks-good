@@ -17,6 +17,11 @@
      { "format": "looks-good-aesthetic", "version": 1, "aesthetic": {spec 2}, "rounds": {...}|null,
        "art": { "art/hero.svg": "<svg...", "art/p.png": "data:image/png;base64,..." } }
    A bare aesthetic.json (spec 2) is accepted too, with no art files.
+   Optional "versions": [{ "round": n, "date": "YYYY-MM-DD", "aesthetic": {spec 2} }] (round snapshots, newest last,
+   written by the studio editor, js/studio.js; the oldest are dropped so the bundle stays under 2 MB).
+
+   Starters (the studio's New style starting points) live in custom-aesthetics/starters/<id>/ and are listed under
+   "starters" in custom-aesthetics/index.json. They are never registered as styles: starters() and starter(id) read them.
 
    Public: window.CustomAesthetics — see docs/aesthetic-library/PLAN.md (API contract) and the
    comments on each method below.
@@ -29,11 +34,16 @@ const CustomAesthetics = (function () {
   const FORMAT = 'looks-good-aesthetic';
   const MAX_BUNDLE = 2 * 1024 * 1024;     // characters of bundle text
   const MAX_ART = 12;                     // art files per bundle
+  const MAX_VERSIONS = 30;                // round snapshots kept in a bundle
   const MAX_NAME = 80;
   const DEFAULT_KEY = 'soft-form';        // what a brand falls back to when its custom style goes away
   const MINE_WAIT = 2500;                 // ms ready waits for the stored styles
   const ART_PATH = /^art\/[A-Za-z0-9._\- /]+\.(svg|png|jpe?g|webp|gif)$/i;
   const FOLDER_OK = /^[a-z0-9][a-z0-9-]*$/;
+  // The top-level fields a stored (untrusted) style may carry: the runtime's whitelist (js/aesthetic-spec.js UNTRUSTED_FIELDS).
+  const SPEC_FIELDS = ['spec', 'key', 'order', 'name', 'descriptor', 'influences', 'summary', 'coreTrick', 'motto', 'kicker', 'mode',
+    'lineage', 'meta', 'build', 'labels', 'copy', 'layout', 'type', 'roles', 'rules', 'highlight', 'slideShape', 'highlightNote', 'deck', 'colour', 'moves', 'kit', 'art'];
+  const VERSION_PROBE_KEY = 'studio--vcheck';   // temporary key a version snapshot is validated under
 
   const folderEntries = new Map();   // key -> { key, folder, base, spec, rounds, files }
   const mineEntries = new Map();     // key -> { id, createdAt, updatedAt, bundle }
@@ -107,8 +117,8 @@ const CustomAesthetics = (function () {
     return walk(v, 0);
   }
 
-  /* checkBundle(raw) -> { ok, bundle } | { ok:false, error }. Normalises: a clean copy with art, rounds. */
-  function checkBundle(raw) {
+  /* checkBundle(raw, { deep }) -> { ok, bundle } | { ok:false, error }. Normalises: a clean copy with art, rounds, versions (deep also validates each version snapshot). */
+  function checkBundle(raw, opts) {
     if (!isObj(raw)) return fail('This is not an aesthetic bundle.');
     if (raw.format !== FORMAT) return fail(`This is not an aesthetic bundle (format must be "${FORMAT}").`);
     if (raw.version !== 1) return fail('This bundle needs a newer version of the app (unsupported bundle version).');
@@ -125,10 +135,37 @@ const CustomAesthetics = (function () {
       if (/\.svg$/i.test(p)) { if (!/<svg[\s>]/i.test(v)) return fail(`Art file "${p}" is not an SVG.`); }
       else if (!v.startsWith('data:') || !specAllowedImage(v)) return fail(`Art file "${p}" must be a data:image png, jpeg, webp or gif.`);
     }
+    let versions = [];
+    if (raw.versions != null) {
+      if (!Array.isArray(raw.versions)) return fail('The bundle\'s versions must be a list.');
+      for (const v of raw.versions) {
+        if (!isObj(v) || !isObj(v.aesthetic) || typeof v.round !== 'number' || !Number.isFinite(v.round)) return fail('Each version needs a round number and an aesthetic.');
+        if (v.date != null && typeof v.date !== 'string') return fail('A version\'s date must be text.');
+      }
+      versions = raw.versions.slice(-MAX_VERSIONS).map(v => ({ round: v.round, date: typeof v.date === 'string' ? v.date.slice(0, 40).replace(/[<>]/g, '') : '', aesthetic: clone(v.aesthetic) }));
+    }
+    const bundle = { format: FORMAT, version: 1, aesthetic: clone(raw.aesthetic), rounds: raw.rounds ? cleanRounds(raw.rounds) : null, art: clone(art) };
+    if (versions.length) bundle.versions = versions;
     let size = 0;
-    try { size = JSON.stringify(raw).length; } catch (e) { return fail('The bundle is not plain data.'); }
+    try { size = JSON.stringify(bundle).length; } catch (e) { return fail('The bundle is not plain data.'); }
+    // keep the bundle under the cap by dropping the oldest snapshots first
+    while (size > MAX_BUNDLE && bundle.versions && bundle.versions.length) {
+      bundle.versions.shift();
+      if (!bundle.versions.length) delete bundle.versions;
+      size = JSON.stringify(bundle).length;
+    }
     if (size > MAX_BUNDLE) return fail('This bundle is bigger than 2 MB.');
-    return { ok: true, bundle: { format: FORMAT, version: 1, aesthetic: clone(raw.aesthetic), rounds: raw.rounds ? cleanRounds(raw.rounds) : null, art: clone(art) } };
+    if (opts && opts.deep && bundle.versions) {
+      // Every snapshot is validated like the aesthetic itself (untrusted), under a temporary key that is removed again.
+      for (const v of bundle.versions) {
+        const errors = [];
+        unregisterSpecAesthetic(VERSION_PROBE_KEY);
+        const def = registerSpecAesthetic(Object.assign({}, v.aesthetic, { key: VERSION_PROBE_KEY }), { untrusted: true, files: bundle.art, errors, file: 'version snapshot', quietHooks: true });
+        unregisterSpecAesthetic(VERSION_PROBE_KEY);
+        if (!def) return fail(`Round ${v.round}'s saved version is not valid (${errors[0] || 'it could not be registered'}).`);
+      }
+    }
+    return { ok: true, bundle };
   }
 
   /* ---------------- registering ---------------- */
@@ -318,7 +355,7 @@ const CustomAesthetics = (function () {
 
   // Registers a checked bundle and stores it. `replacing` is the stored entry with the same key (replace flow).
   async function commit(raw, replacing) {
-    const c = checkBundle(raw);
+    const c = checkBundle(raw, { deep: true });
     if (!c.ok) return c;
     const b = c.bundle;
     const key = b.aesthetic.key;
@@ -351,7 +388,7 @@ const CustomAesthetics = (function () {
       let raw;
       try { raw = JSON.parse(text); } catch (e) { return fail('This is not a JSON file.'); }
       if (isObj(raw) && raw.format === undefined && raw.spec === 2) raw = { format: FORMAT, version: 1, aesthetic: raw, rounds: null, art: {} };
-      const c = checkBundle(raw);
+      const c = checkBundle(raw, { deep: true });
       if (!c.ok) return c;
       const b = c.bundle;
       let key = b.aesthetic.key;
@@ -385,6 +422,7 @@ const CustomAesthetics = (function () {
       b.aesthetic.name = name;
       b.aesthetic.lineage = Object.assign({}, isObj(b.aesthetic.lineage) ? b.aesthetic.lineage : {}, { forkedFrom: key });
       b.rounds = null;
+      delete b.versions;
       const r = await commit(b, null);
       return r.ok ? r : { ok: false, key: newKey, error: r.error };
     } catch (e) { return fail(msg(e)); }
@@ -432,14 +470,104 @@ const CustomAesthetics = (function () {
     } catch (e) { return fail(msg(e)); }
   }
 
-  // fn() runs after any add / remove / rename (after the pickers have been rebuilt). Returns an unsubscribe function.
+  /* ---------------- the studio editor's paths ---------------- */
+  // A free key for a new style: the name in lowercase kebab-case, 3 to 48 characters, made unique (-2, -3 ...).
+  function uniqueKey(name) {
+    let k = String(name || '').toLowerCase().normalize('NFKD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 44).replace(/-+$/, '');
+    if (k.length < 3) k = (k + '-style').replace(/^-/, '');
+    return keyTaken(k) ? freeKey(k) : k;
+  }
+
+  // Starters: custom-aesthetics/starters/<id>/ listed under "starters" in custom-aesthetics/index.json. Never registered.
+  let starterIds = null;
+  async function starterList() {
+    if (starterIds) return starterIds;
+    let ids = [];
+    try {
+      const r = await fetch(INDEX_URL, { cache: 'no-cache' });
+      if (r.ok) { const idx = JSON.parse(await r.text()); if (idx && Array.isArray(idx.starters)) ids = idx.starters.filter(f => typeof f === 'string' && FOLDER_OK.test(f)); }
+    } catch (e) { console.warn(`custom aesthetics: starters could not be listed (${msg(e)})`); }
+    starterIds = ids;
+    return ids;
+  }
+
+  async function readStarter(id) {
+    const base = `custom-aesthetics/starters/${id}/`;
+    const spec = JSON.parse(await getText(base + 'aesthetic.json'));
+    const art = {};
+    const hero = spec && spec.art && spec.art.hero;
+    if (hero && hero.kind === 'svg' && typeof hero.src === 'string' && ART_PATH.test(hero.src) && !hero.src.includes('..')) art[hero.src] = await getText(base + hero.src);
+    // Fields outside the stored-style whitelist are dropped (deck and highlightNote are on it).
+    Object.keys(spec).forEach(k => { if (!SPEC_FIELDS.includes(k)) delete spec[k]; });
+    return { format: FORMAT, version: 1, aesthetic: spec, rounds: null, art };
+  }
+
+  /* starters() -> Promise<[{ id, name, descriptor }]>: what New style can start from (Blank first). */
+  async function starters() {
+    const ids = await starterList();
+    const out = [];
+    for (const id of ids) {
+      try { const b = await readStarter(id); out.push({ id, name: id === 'blank' ? 'Blank' : String(b.aesthetic.name).replace(/\s*\(moves\)$/i, ''), descriptor: b.aesthetic.descriptor || '' }); }
+      catch (e) { console.error(`custom aesthetics: starter "${id}" is not usable (${msg(e)})`); }
+    }
+    return out;
+  }
+
+  /* starter(id) -> Promise<bundle | null>: a fresh bundle (spec, art; no rounds) to edit and create() from. */
+  async function starter(id) {
+    if (!(await starterList()).includes(id)) return null;
+    try { return await readStarter(id); }
+    catch (e) { console.error(`custom aesthetics: starter "${id}" is not usable (${msg(e)})`); return null; }
+  }
+
+  /* create(bundle) -> { ok, key, error }: adds a new stored style from a bundle. A key that is taken gets -2, -3 ...
+     (the name is kept); lineage and the rest are the caller's. */
+  async function create(bundle) {
+    try {
+      const c = checkBundle(bundle, { deep: true });
+      if (!c.ok) return c;
+      const b = c.bundle;
+      if (typeof b.aesthetic.key !== 'string' || !b.aesthetic.key) return fail('The style has no key.');
+      if (keyTaken(b.aesthetic.key)) b.aesthetic.key = freeKey(b.aesthetic.key);
+      const r = await commit(b, null);
+      return r.ok ? r : { ok: false, key: b.aesthetic.key, error: r.error };
+    } catch (e) { return fail(msg(e)); }
+  }
+
+  /* save(key, bundle) -> { ok, error }: replaces a stored ("mine") style with an edited bundle (the key must stay).
+     The real key is re-registered so every picker follows; onChange listeners run. On a refusal nothing changes. */
+  async function save(key, bundle) {
+    try {
+      const rec = mineEntries.get(key);
+      if (!rec) return fail(folderEntries.has(key) ? 'Folder styles can\'t be edited here. Edit a copy instead.' : 'Only your own styles can be edited.');
+      const c = checkBundle(bundle, { deep: true });
+      if (!c.ok) return c;
+      const next = c.bundle;
+      if (next.aesthetic.key !== key) return fail('The style\'s key can\'t change.');
+      const errors = [];
+      unregisterSpecAesthetic(key);
+      const restore = () => registerSpecAesthetic(rec.bundle.aesthetic, { untrusted: true, files: rec.bundle.art, file: 'saved style', quietHooks: true });
+      if (!registerSpecAesthetic(next.aesthetic, { untrusted: true, files: next.art, errors, file: 'saved style', quietHooks: true })) {
+        restore();
+        return fail(errors[0] || 'The style could not be saved.');
+      }
+      const updated = { id: rec.id, createdAt: rec.createdAt, updatedAt: Date.now(), bundle: next };
+      try { await coll().put(updated); }
+      catch (e) { unregisterSpecAesthetic(key); restore(); return fail(`The style could not be saved (${msg(e)}).`); }
+      mineEntries.set(key, updated);
+      notify();
+      return { ok: true };
+    } catch (e) { return fail(msg(e)); }
+  }
+
+  // fn() runs after any add / remove / rename / save (after the pickers have been rebuilt). Returns an unsubscribe function.
   function onChange(fn) {
     if (typeof fn !== 'function') return () => {};
     listeners.push(fn);
     return () => { const i = listeners.indexOf(fn); if (i >= 0) listeners.splice(i, 1); };
   }
 
-  return { ready, list, source, rounds, bundle, exportText, exportFile, importText, duplicate, rename, remove, onChange, MAX_BUNDLE, MAX_ART };
+  return { ready, list, source, rounds, bundle, exportText, exportFile, importText, duplicate, rename, remove, onChange, uniqueKey, starters, starter, create, save, MAX_BUNDLE, MAX_ART, MAX_VERSIONS };
 })();
 
 window.CustomAesthetics = CustomAesthetics;

@@ -80,7 +80,11 @@ return JSON.stringify({rows:out,mode:root.dataset.mode,ae:root.dataset.ae})}`;
 
 function sleep(ms) { Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, ms); }
 
-function run({ port, key, R, ROOT, shots, outDir, palette, lab }) {
+/* In-page import of a packed bundle (an unlisted folder) under a temporary key; and its removal afterwards. */
+const importJs = text => `(async()=>{if(window.CustomAesthetics)await CustomAesthetics.ready;const r=await CustomAesthetics.importText(${JSON.stringify(text)});return JSON.stringify({ok:!!r.ok,error:r.error||''})})()`;
+const removeJs = key => `(async()=>{try{await CustomAesthetics.remove('${key}')}catch(e){}return 'ok'})()`;
+
+function run({ port, key, label, inject, R, ROOT, shots, outDir, palette, lab }) {
   const session = `-s=lg-check-${process.pid}`;
   const work = fs.mkdtempSync(path.join(os.tmpdir(), 'lg-check-'));   // playwright-cli drops .playwright-cli/ in its cwd
   const url = `http://localhost:${port}/${lab === false ? '' : '?movelab=1'}`;   // custom-aesthetics styles load without the lab flag
@@ -102,6 +106,12 @@ function run({ port, key, R, ROOT, shots, outDir, palette, lab }) {
     if (open.status !== 0) { R.fail('render', `playwright-cli could not open ${url}: ${((open.stderr || open.stdout) || '').trim().slice(0, 160)} (is the server running at the repo root?)`); return table; }
     pw('resize', '1440', '1000');
     ev("(()=>{document.body.dataset.view='editor';window.showToast=()=>{};return 'ok'})()");
+    if (inject) {
+      const js = importJs(inject.text);
+      if (js.length > 900000) { R.fail('render-load', 'the packed bundle is too large to hand to the headless page'); return table; }
+      const got = evJson(js);
+      if (!got.ok) { R.fail('render-load', `could not import ${label || key} into the page: ${got.error || 'no answer'}`); return table; }
+    }
     // custom styles register asynchronously: wait for CustomAesthetics.ready first
     const has = ev(`(async()=>{if(window.CustomAesthetics)await CustomAesthetics.ready;return AESTHETICS.some(a=>a.key==='${key}')})()`);
     if (has !== 'true') {
@@ -190,19 +200,21 @@ function run({ port, key, R, ROOT, shots, outDir, palette, lab }) {
     }
     table = { rows, text: lines.join('\n').split('\n').map(l => '  ' + l).join('\n') };
   } finally {
+    if (inject) ev(removeJs(inject.key));
     pw('close');
     fs.rmSync(work, { recursive: true, force: true });
   }
 
   if (shots) {
     if (!outDir) { R.fail('shots', 'no output folder (pass --out <dir> for a key-only run)'); return table; }
-    runShots({ port, key, R, ROOT, outDir, palette, lab });
+    runShots({ port, key, label, inject, R, ROOT, outDir, palette, lab });
   }
   return table;
 }
 
-function runShots({ port, key, R, ROOT, outDir, palette, lab }) {
+function runShots({ port, key, label, inject, R, ROOT, outDir, palette, lab }) {
   fs.mkdirSync(outDir, { recursive: true });
+  const name = label || key;   // files carry the real key even when the page uses a temporary one
   const brand = Object.assign({}, SHOT_BRAND, palette ? { primary: palette } : {});
   const session = `-s=lg-shoot-${process.pid}`;
   const work = fs.mkdtempSync(path.join(os.tmpdir(), 'lg-shoot-'));
@@ -214,6 +226,10 @@ function runShots({ port, key, R, ROOT, outDir, palette, lab }) {
     if (open.status !== 0) { R.fail('shots', 'playwright-cli could not open the page for shots'); return; }
     pw('resize', '1440', '1000');
     ev("(()=>{document.body.dataset.view='editor';window.showToast=()=>{};return 'ok'})()");
+    if (inject) {
+      const got = (() => { const l = ev(importJs(inject.text)); try { const v = JSON.parse(l); return typeof v === 'string' ? JSON.parse(v) : v; } catch (e) { return {}; } })();
+      if (!got.ok) { R.fail('shots', `could not import ${name} into the page: ${got.error || 'no answer'}`); return; }
+    }
     /* the pinned brand: same palette, scheme and fonts for every round (the app's own derivePalette and font table) */
     const pin = `state.colors=derivePalette('${brand.primary}','${brand.scheme}');state.scheme='${brand.scheme}';state.hue=Math.round(hexToHsl('${brand.primary}').h);state.headingFont=fontByName('${brand.heading}')||state.headingFont;state.bodyFont=fontByName('${brand.body}')||state.bodyFont;`;
     for (const mode of ['light', 'dark']) for (const view of ['board', 'kit', 'deck']) {
@@ -222,26 +238,26 @@ function runShots({ port, key, R, ROOT, outDir, palette, lab }) {
       ev('document.fonts.ready.then(()=>1)');
       sleep(view === 'deck' ? 2000 : 500);
       const sel = view === 'board' ? '#previewCard' : view === 'deck' ? '#deckGrid .deck-card:nth-child(1)' : '#builtView';
-      const f = path.join(outDir, `${key}-${view}-${mode}.png`);
+      const f = path.join(outDir, `${name}-${view}-${mode}.png`);
       const r = pw('screenshot', sel, `--filename=${f}`);
       if (r.status !== 0 || !fs.existsSync(f)) { bad++; R.fail('shots', `screenshot failed: ${path.basename(f)}`); }
     }
-  } finally { pw('close'); fs.rmSync(work, { recursive: true, force: true }); }
+  } finally { if (inject) ev(removeJs(inject.key)); pw('close'); fs.rmSync(work, { recursive: true, force: true }); }
   if (bad) return;
   fs.writeFileSync(path.join(outDir, 'palette.txt'), `Preview brand used for these shots (same for every round; override the primary with --palette <hex>)\nprimary: ${brand.primary}\nscheme: ${brand.scheme} (app derivePalette)\nheading font: ${brand.heading}\nbody font: ${brand.body}\n`);
   const made = [];
   for (const mode of ['light', 'dark']) {
-    const kit = path.join(outDir, `${key}-kit-${mode}.png`);
+    const kit = path.join(outDir, `${name}-kit-${mode}.png`);
     if (!fs.existsSync(kit)) continue;
     const dim = cp.spawnSync('sips', ['-g', 'pixelWidth', '-g', 'pixelHeight', kit], { encoding: 'utf8' }).stdout || '';
     const w = +(dim.match(/pixelWidth:\s*(\d+)/) || [])[1], h = +(dim.match(/pixelHeight:\s*(\d+)/) || [])[1];
-    const top = path.join(outDir, `${key}-kit-top-${mode}.png`);
+    const top = path.join(outDir, `${name}-kit-top-${mode}.png`);
     /* crop from the top-left, never wider/taller than the image (sips pads when asked for more) */
     const c = cp.spawnSync('sips', ['-c', String(Math.min(4000, h || 4000)), String(Math.min(944, w || 944)), '--cropOffset', '0', '0', kit, '--out', top], { encoding: 'utf8' });
     if (c.status === 0) { fs.rmSync(kit, { force: true }); made.push(path.basename(top)); }
     else R.warn('shots', `sips crop failed for ${path.basename(kit)}: ${(c.stderr || '').trim().slice(0, 100)}`);
   }
-  for (const f of fs.readdirSync(outDir)) if (f.startsWith(key + '-') && !made.includes(f)) made.push(f);
+  for (const f of fs.readdirSync(outDir)) if (f.startsWith(name + '-') && !made.includes(f)) made.push(f);
   R.pass('shots', `${made.sort().join(', ')} in ${outDir} (palette.txt: primary ${brand.primary}, ${brand.heading}/${brand.body})`);
 }
 

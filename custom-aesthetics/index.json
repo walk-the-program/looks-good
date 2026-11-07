@@ -1,1 +1,4 @@
-{ "aesthetics": ["darkroom"] }
+{
+  "aesthetics": ["darkroom"],
+  "starters": ["blank", "soft-form--moves", "acid-graphics--moves", "editorial-serif--moves"]
+}

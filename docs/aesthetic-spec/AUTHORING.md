@@ -17,6 +17,7 @@ disagree, stop and report it. Do not work around it.
 9. The round loop
 10. Definition of done
 11. Do not
+12. Next round on a studio's file
 
 ## 1. What an aesthetic is here
 
@@ -36,8 +37,8 @@ Rules from the owner that apply to every aesthetic:
 - It must look different from the 46 built-in styles, not a re-skin of one.
 
 A finished style lives in `custom-aesthetics/<key>/` and loads in the normal app (no flag): it shows beside the
-built-in styles in every picker. The lab (`?movelab=1`, `dev/move-lab/specs/`) only holds the rebuilds and smoke
-specs used to test the moves; new styles do not go there.
+built-in styles in every picker. The lab (`?movelab=1`, `dev/move-lab/specs/`) only holds the smoke spec and shows
+the rebuilds (kept in `custom-aesthetics/starters/`); new styles do not go there.
 
 ## 2. Folder layout
 
@@ -99,7 +100,8 @@ Do the stages in order in your head, then write the JSON. Each stage names the f
 11. **App translation.** Principles and traps for turning the board into app screens. Field:
     `rules.do` and `rules.dont` (short, testable sentences), `layout` (`hero`
     `split|centered|poster|scene`, `palette` `swatches|chips|list|strips`, `sections`
-    `two-col|asym|stacked`), `slideShape` (`minimal|soft|refined|geometric|classic`).
+    `two-col|asym|stacked`), `slideShape` (`minimal|soft|refined|geometric|classic`). Optional `deck`
+    (`coverDisplay`, `principles`, `do`, `dont`, `marks`) and `highlightNote` shape the brand deck; see SPEC-v2 section 2.
 12. **Guardrails.** Contrast in light and dark, export safety, distinct from built-ins. Checked by
     the checker (section 10); `mode` is `light` or `dark` (the default mode), `lineage` records
     forks.
@@ -125,7 +127,8 @@ The catalog is the list of moves you may use. Do not invent move names.
 - `colour` moves run first, then `moves`, in listed order; later wins. They can pass values to later
   moves through the token bus (see `paper-edge` then `edge-underline` in `js/moves/core.js`).
 - Example of a complete aesthetic made only of catalog moves: `dev/move-lab/specs/smoke--moves/`.
-  Rebuilds of built-ins to study: `soft-form--moves`, `acid-graphics--moves`, `editorial-serif--moves`
+  Rebuilds of built-ins to study, in `custom-aesthetics/starters/`: `soft-form--moves`, `acid-graphics--moves`,
+  `editorial-serif--moves`
   (read them for shape, not content; they are being tidied).
 
 ## 5. Materials and the component map
@@ -376,5 +379,36 @@ Report: the key, the final check output counts, which round you stopped at, and 
 - Do not put an AI box, prompt field or generation feature in the product.
 - Do not put board art on app or Built screens.
 - Do not use frosted or milky glass. Use `clear-glass` and keep it see-through.
+- Do not unpack a studio's file into `custom-aesthetics/` or list it in `index.json`; use a scratch folder (section 12).
 - Do not hard-code client colours, fonts or sizes that should follow the client's brand.
 - Do not leave the dev server running, and do not commit a scratch folder or its `index.json` line (remove it by re-reading the file, dropping only your key, and writing it back).
+
+## 12. Next round on a studio's file
+
+The studio (the editor in the app) exports a style as `<key>.aesthetic.json`, a bundle holding the aesthetic, its
+`rounds`, the art files and, optionally, `versions` (snapshots of earlier rounds). When the owner hands you one and asks
+for the next round, work on an unpacked copy, never on the app's folders. `<scratch>` is any folder outside the repo's
+`custom-aesthetics/`; the style is not listed in `custom-aesthetics/index.json` and stays that way.
+
+1. Unpack: `node dev/aesthetic-check.js --unpack <file> <scratch>/<key>`. It writes `aesthetic.json`, `rounds.json`,
+   `versions.json` (leave it alone) and `art/*`; it refuses a non-empty folder unless you add `--force`.
+2. Read `rounds.json`. Open notes: every note with `"status": "open"`, in any round. The last closed round: its `changes`,
+   its kept variants (already applied, build on them) and its killed variants (tried and dropped, do not retry them). If
+   the last round still has `"open": true`, the owner exported mid-round: use its notes and changes as input, leave that
+   round as it is, and add yours as the next `n`.
+3. Make the round in `aesthetic.json`. One axis per variant (material, colour recipe, headline treatment, corners and
+   edges, kit states, art); a note's `target` says where to look (`board.hero` is the headline and art, `kit.<component>`
+   a kit entry). Do not change `key`, `name`, `descriptor` or `coreTrick` unless a note asks.
+4. Append your round to `rounds.json` (SPEC-v2 section 7): `n` is the last `n` plus 1, `by: "agent"`, `summary`,
+   `changes` in plain sentences, `variants` with ids `r<n>a`, `r<n>b` (the one you applied is `keep`, the others `kill`
+   or `open`). Mark each note you addressed `"status": "done"` with `"doneIn": <n>`; raise new notes as open with the next
+   `n<k>` id. No `open` key in your round; leave `shots` out unless you copy PNGs next to it (the bundle does not carry shots).
+5. Check the folder: `node dev/aesthetic-check.js <scratch>/<key>`, then with a server running at the repo root,
+   `node dev/aesthetic-check.js <scratch>/<key> --render <port> --shots`. An unlisted folder renders too: the checker
+   imports its packed bundle into the headless page under a temporary key and removes it afterwards (files and the
+   report carry the real key). Read the PNGs as in section 9 step 7. A same-key WARN against the repo's copy of the style
+   is expected for a scratch copy.
+6. Pack: `node dev/aesthetic-check.js --pack <scratch>/<key> <scratch>/<key>.aesthetic.json`. It runs the static checks
+   again, writes the file only when nothing FAILs, and prints its path.
+7. Tell the owner the path and that they import it in Styles with **Replace**; the studio then shows your round waiting
+   for review. Do not copy anything into `custom-aesthetics/` and do not edit the index.

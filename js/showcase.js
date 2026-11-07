@@ -27,7 +27,10 @@ function isShowcase() {
 // The showcase subset of a list of aesthetic defs (or keys), in the list's own order.
 // Outside showcase mode, or if nothing would be left, the list comes back unchanged.
 function showcaseFilter(list) {
-  if (!isShowcase() || !Array.isArray(list)) return list;
+  if (!Array.isArray(list)) return list;
+  // The studio editor's temporary preview styles (js/studio.js, keys "studio--…") are never offered anywhere.
+  if (list.some(a => String(typeof a === 'string' ? a : a && a.key).startsWith('studio--'))) list = list.filter(a => !String(typeof a === 'string' ? a : a && a.key).startsWith('studio--'));
+  if (!isShowcase()) return list;
   const keep = list.filter(a => !SHOWCASE_HIDDEN.includes(typeof a === 'string' ? a : a && (a.classicOf || a.key)));
   return keep.length ? keep : list;
 }

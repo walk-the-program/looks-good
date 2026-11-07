@@ -31,6 +31,21 @@ Related files:
 Read `custom-aesthetics/<key>/rounds.json`, take the notes with `"status": "open"`, change one
 axis per variant, run the loop, then write the new round and mark addressed notes `done` with `doneIn`.
 
+## Next round on a studio's file
+
+The owner hands you `<key>.aesthetic.json` exported from the studio. Full steps: AUTHORING.md section 12.
+
+```
+node dev/aesthetic-check.js --unpack <file> <scratch>/<key>          # scratch dir outside custom-aesthetics/, never in index.json
+# read rounds.json: open notes, last round's kept and killed variants; edit aesthetic.json (one axis per variant);
+# append your round (by "agent", next n, notes done with doneIn, no "open" key)
+node dev/aesthetic-check.js <scratch>/<key>
+node dev/aesthetic-check.js <scratch>/<key> --render <port> --shots    # works on the unlisted folder
+node dev/aesthetic-check.js --pack <scratch>/<key> <scratch>/<key>.aesthetic.json
+```
+
+Then tell the owner the packed path and to import it in Styles with Replace.
+
 ## The loop (exact commands, repo root)
 
 ```
@@ -46,7 +61,7 @@ Regenerate the move catalog after adding a code move: `dev/aesthetic-spec-catalo
 
 ## Hard rules
 
-- Only write under `custom-aesthetics/<key>/` (plus a new `js/moves/<name>.js` and a `<script>` tag for it in `index.html` after `js/moves/darkroom.js` when a code move is truly needed).
+- Only write under `custom-aesthetics/<key>/` (or the scratch folder of a studio round-trip; plus a new `js/moves/<name>.js` and a `<script>` tag for it in `index.html` after `js/moves/darkroom.js` when a code move is truly needed).
 - Never edit app code, built-in styles, `js/aesthetic-spec.js`, `js/moves/core.js` or the checker.
 - Never copy a built-in's CSS. Never add AI UI to the product.
 - Board art stays off app and Built screens. Every kit component is styled. Glass is clear, never frosted.

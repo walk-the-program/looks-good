@@ -6,8 +6,8 @@ unchanged without it (45 styles, clean console, `node tests/run.js` passes).
 
 ## Built
 
-- **An aesthetic is a folder of plain files**: `dev/move-lab/specs/<key>/aesthetic.json`, optional
-  `art/` and `rounds.json`, listed in `specs/index.json`.
+- **An aesthetic is a folder of plain files**: `custom-aesthetics/<key>/aesthetic.json` (or
+  `dev/move-lab/specs/<key>/` for lab specs), optional `art/` and `rounds.json`, listed in that folder's `index.json`.
 - **Runtime v2** (`js/aesthetic-spec.js`): JSON loading, per-mode params (`{light, dark}`), a token bus
   between moves, board/kit scoping, collision errors, a move catalog, 70 kit components (was 28),
   and an art slot that takes a generator, the studio's own SVG (sanitised) or an image.
@@ -54,5 +54,6 @@ after a browser session collision.
 4. **Rebuild leftovers.** Each rebuild lists its weakest components in its worker report (for
    example Soft Form's split-button corners and Editorial's popup tip); worth one polish round each.
 5. **Product side.** Loading without `?movelab=1` and the Styles library are done (2026-11-07,
-   `docs/aesthetic-library/PLAN.md`). Left: the studio UI (dials, Variations, pinned notes writing
-   `rounds.json`).
+   `docs/aesthetic-library/PLAN.md`). The studio editor (dials, Variations, pinned notes,
+   rounds and versions, agent round trip by pack/unpack) followed the same day
+   (`docs/aesthetic-studio/PLAN.md`).

@@ -269,7 +269,7 @@ const SCOPES = ['all', 'board', 'kit'];
 /* Top-level fields an untrusted spec (an imported bundle) may carry: the SPEC-v2 section 2 list. Anything
    else is refused, so a bundle cannot set a def field the app reads as code (classicOf, tokens, ...). */
 const UNTRUSTED_FIELDS = ['spec', 'key', 'order', 'name', 'descriptor', 'influences', 'summary', 'coreTrick', 'motto', 'kicker', 'mode',
-  'lineage', 'meta', 'build', 'labels', 'copy', 'layout', 'type', 'roles', 'rules', 'highlight', 'slideShape', 'colour', 'moves', 'kit', 'art'];
+  'lineage', 'meta', 'build', 'labels', 'copy', 'layout', 'type', 'roles', 'rules', 'highlight', 'slideShape', 'highlightNote', 'deck', 'colour', 'moves', 'kit', 'art'];
 const isObj = v => !!v && typeof v === 'object' && !Array.isArray(v);
 const SPEC_LIMITS = { string: 4000, nodes: 20000, depth: 12 };
 
@@ -295,6 +295,24 @@ function untrustedProblem(spec) {
     return '';
   };
   return walk(spec, 'spec', 0);
+}
+
+/* Shape check of deck / highlightNote (brand-deck tuning). Plain data only: numbers and short strings; the
+   untrustedProblem walk has already refused < and > anywhere in the spec. Returns a problem or ''. */
+function deckProblem(d, note) {
+  if (note !== undefined && !(typeof note === 'string' && note.length <= 400)) return 'highlightNote must be a string of at most 400 characters';
+  if (d === undefined) return '';
+  const str = (s, max) => typeof s === 'string' && s.length <= max;
+  const strs = (a, cap, max) => Array.isArray(a) && a.length <= cap && a.every(s => str(s, max));
+  if (!isObj(d)) return 'deck must be an object';
+  const extra = Object.keys(d).filter(k => !['coverDisplay', 'coverMin', 'principles', 'do', 'dont', 'marks'].includes(k));
+  if (extra.length) return `deck has field(s) not allowed in an imported style: ${extra.join(', ')}`;
+  if (d.coverDisplay !== undefined && !(typeof d.coverDisplay === 'number' && d.coverDisplay >= 0.2 && d.coverDisplay <= 2)) return 'deck.coverDisplay must be a number from 0.2 to 2';
+  if (d.coverMin !== undefined && !(typeof d.coverMin === 'number' && d.coverMin >= 16 && d.coverMin <= 64)) return 'deck.coverMin must be a number from 16 to 64';
+  if (d.principles !== undefined && !(Array.isArray(d.principles) && d.principles.length <= 6 && d.principles.every(p => Array.isArray(p) && p.length === 2 && str(p[0], 120) && str(p[1], 300)))) return 'deck.principles must be up to 6 [title, line] pairs of short strings';
+  for (const f of ['do', 'dont']) if (d[f] !== undefined && !strs(d[f], 8, 300)) return `deck.${f} must be up to 8 short strings`;
+  if (d.marks !== undefined && !(isObj(d.marks) && Object.keys(d.marks).every(k => k === 'do' || k === 'dont') && Object.values(d.marks).every(s => str(s, 4)))) return 'deck.marks must be { do, dont } strings of at most 4 characters';
+  return '';
 }
 
 /* Shape check of meta / build before they enter the live AESTHETIC_META / AESTHETIC_BUILD tables (the app
@@ -355,7 +373,7 @@ function validateSpec(spec, opts) {
     if (spec.mode !== 'light' && spec.mode !== 'dark') return no(`registerSpecAesthetic("${key}")${file}: "mode" must be light or dark. Not registered.`);
     if (spec.order !== undefined && !(typeof spec.order === 'number' && Number.isFinite(spec.order))) return no(`registerSpecAesthetic("${key}")${file}: "order" must be a number. Not registered.`);
     if (spec.colour.length > 20 || spec.moves.length > 200 || Object.keys(spec.kit).length > 120) return no(`registerSpecAesthetic("${key}")${file}: too many moves or kit entries. Not registered.`);
-    const why = untrustedProblem(spec) || metaProblem(spec.meta) || buildProblem(spec.build);
+    const why = untrustedProblem(spec) || metaProblem(spec.meta) || buildProblem(spec.build) || deckProblem(spec.deck, spec.highlightNote);
     if (why) return no(`registerSpecAesthetic("${key}")${file}: ${why}. Not registered.`);
   }
   for (const f of ['name', 'descriptor', 'influences']) {
