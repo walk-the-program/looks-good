@@ -1,0 +1,979 @@
+{
+ "spec": 2,
+ "key": "editorial-serif--moves",
+ "order": 903,
+ "meta": {
+  "family": "print",
+  "fonts": {
+   "heading": {
+    "classes": [
+     "didone",
+     "soft-serif"
+    ],
+    "picks": [
+     "Playfair Display",
+     "Bodoni Moda",
+     "Instrument Serif",
+     "Gloock"
+    ]
+   },
+   "body": {
+    "classes": [
+     "text-serif",
+     "old-style"
+    ],
+    "picks": [
+     "Newsreader",
+     "Source Serif 4",
+     "Libre Caslon Text",
+     "EB Garamond"
+    ]
+   },
+   "mono": {
+    "picks": [
+     "Inter"
+    ],
+    "note": "sans for captions"
+   },
+   "avoid": [
+    "rounded",
+    "techno",
+    "pixel",
+    "groovy"
+   ],
+   "why": "A magazine page is carried by high-contrast serif display over a book-quality text serif, with weight coming from contrast rather than boldness.",
+   "pairings": [
+    [
+     "Instrument Serif",
+     "Newsreader"
+    ],
+    [
+     "Bodoni Moda",
+     "Source Serif 4"
+    ],
+    [
+     "Playfair Display",
+     "Libre Caslon Text"
+    ]
+   ]
+  }
+ },
+ "build": {
+  "cls": "flat",
+  "surface": "Flat fills divided by hairlines; no shadows. A drop cap is used on long-form article text only, never on cards, captions or short copy."
+ },
+ "name": "Editorial Serif (moves)",
+ "descriptor": "Literate · Confident · Spacious",
+ "influences": "Magazine editorial / Swiss columns / Book typography",
+ "summary": "Magazine pages set in a high-contrast serif, with hairline rules and room to breathe.",
+ "coreTrick": "Set the page like a magazine: weight comes from contrast (400-weight serif, one italic accent word, small-caps sans labels) and structure from hairline and thick-over-thin rules on a cream-warmed paper canvas, with a duotone cover plate mixed from the primary as the only filled object.",
+ "motto": "Set it like a page.",
+ "kicker": "Issue 01 — Spring",
+ "mode": "light",
+ "slideShape": "minimal",
+ "labels": {
+  "material": "Page",
+  "states": [
+   "Rest",
+   "Hover",
+   "Pressed"
+  ],
+  "statesKind": "button"
+ },
+ "copy": {
+  "motto": {
+   "label": "Motto",
+   "text": "Set it like a page."
+  },
+  "kicker": {
+   "label": "Kicker above the headline",
+   "text": "Issue 01 — Spring"
+  },
+  "state0": {
+   "label": "State 1 name",
+   "text": "Rest"
+  },
+  "state1": {
+   "label": "State 2 name",
+   "text": "Hover"
+  },
+  "state2": {
+   "label": "State 3 name",
+   "text": "Pressed"
+  }
+ },
+ "layout": {
+  "hero": "poster",
+  "palette": "chips",
+  "sections": "asym"
+ },
+ "type": {
+  "ui": "sans",
+  "label": "sans",
+  "display": 1.22
+ },
+ "highlight": "custom",
+ "roles": {
+  "canvas": {
+   "use": "The paper: page and card background, warmed slightly toward cream; panels are the same paper separated by hairlines",
+   "never": "Text, or a second tinted background",
+   "coverage": "70–75%"
+  },
+  "ink": {
+   "use": "Headlines, body copy, rules (full ink for the masthead, a tint for hairlines) and the pressed/hover fill of the main action",
+   "never": "Large background fields",
+   "coverage": "18–22%"
+  },
+  "primary": {
+   "use": "The one main action per page, the duotone cover plate and the selected tab underline",
+   "never": "Body text, rules, decorative fills outside the plate",
+   "coverage": "≈8–10%"
+  },
+  "secondary": {
+   "use": "Pull-quote tint, the list \"status\" tags and the second bar in a chart; always small and quiet",
+   "never": "The main action, body text, the page background",
+   "coverage": "≈5–8%"
+  },
+  "accent": {
+   "use": "The one italic headline word and a single \"New\" flag; set as text, shaded to stay readable on paper",
+   "never": "Buttons, borders, rules or fills",
+   "coverage": "≤3%"
+  }
+ },
+ "rules": {
+  "do": [
+   "Set the headline in the serif at weight 400 and let the highlight word go italic in the accent ink; contrast carries the weight.",
+   "Separate everything with hairline rules; use a thick-over-thin double rule once, under the masthead.",
+   "Keep corners square (0–2px) and flat: no shadows, no gradients outside the duotone plate.",
+   "Set captions, tabs and labels in small-caps sans with .12em tracking; keep reading copy in the text serif with a drop cap on the first paragraph."
+  ],
+  "dont": [
+   "Bold the headline, round the controls or add a shadow to a card; this is print, not an app.",
+   "Use accent as a fill, button or rule; it is one italic word.",
+   "Fill the page with tinted cards; the page is one sheet of paper with hairlines.",
+   "Run body copy in sans or letter-space the serif."
+  ]
+ },
+ "colour": [
+  {
+   "move": "warm-paper-canvas",
+   "params": {
+    "cream": "#f3ead9",
+    "keep": 0.74
+   }
+  }
+ ],
+ "moves": [
+  {
+   "move": "interface-sans",
+   "params": {}
+  },
+  {
+   "move": "corner-radius",
+   "params": {
+    "base": 0
+   }
+  },
+  {
+   "move": "outline-frame",
+   "params": {}
+  },
+  {
+   "move": "state-colour-derivation",
+   "params": {}
+  },
+  {
+   "move": "duotone-plate",
+   "params": {}
+  },
+  {
+   "move": "caps-mono-labels",
+   "params": {
+    "font": "var(--ab-font-ui)",
+    "tracking": 0.16,
+    "size": 0.72
+   }
+  },
+  {
+   "move": "tight-display-tracking",
+   "params": {
+    "tracking": -0.028,
+    "leading": 0.94
+   }
+  },
+  {
+   "move": "display-weight-scale",
+   "params": {
+    "weight": 400
+   }
+  },
+  {
+   "move": "highlight-word",
+   "params": {
+    "italic": true
+   }
+  },
+  {
+   "move": "mono-plus-accent",
+   "params": {}
+  },
+  {
+   "move": "header-treatment",
+   "params": {}
+  },
+  {
+   "move": "catalogue-number",
+   "params": {
+    "dateline": "Vol. 01 · No. 1",
+    "cellPrefix": "No. "
+   }
+  },
+  {
+   "move": "double-rule",
+   "params": {
+    "top": 3,
+    "bottom": 1
+   }
+  },
+  {
+   "move": "hero-layout",
+   "params": {}
+  },
+  {
+   "move": "palette-board-form",
+   "params": {
+    "cols": 5,
+    "chip": 18
+   }
+  },
+  {
+   "move": "section-number-marker",
+   "params": {}
+  },
+  {
+   "move": "face-role-map",
+   "params": {}
+  },
+  {
+   "move": "ruled-row-list",
+   "params": {
+    "counterStarts": "12,24,38"
+   }
+  },
+  {
+   "move": "field-form",
+   "params": {}
+  },
+  {
+   "move": "hanging-drop-cap",
+   "params": {}
+  },
+  {
+   "move": "footer-treatment",
+   "params": {}
+  },
+  {
+   "move": "kit-cell-frame",
+   "params": {}
+  },
+  {
+   "move": "focus-ring",
+   "params": {}
+  }
+ ],
+ "kit": {
+  "button-primary": {
+   "material": "ruled-key",
+   "state": [
+    "ink-swap-hover",
+    "press-darken",
+    "focus-outline",
+    "dotted-disabled"
+   ],
+   "params": {
+    "ruled-key": {
+     "fill": "primary"
+    },
+    "press-darken": {
+     "fill": "ink"
+    }
+   }
+  },
+  "button-secondary": {
+   "material": "ruled-key",
+   "state": [
+    "ink-swap-hover",
+    "press-darken",
+    "focus-outline",
+    "dotted-disabled"
+   ],
+   "params": {
+    "ruled-key": {
+     "fill": "none",
+     "size": 11,
+     "tracking": 0.16,
+     "padY": 11,
+     "weight": 500
+    },
+    "press-darken": {
+     "fill": "ink"
+    }
+   }
+  },
+  "button-ghost": {
+   "material": "serif-link",
+   "state": [
+    "focus-outline",
+    "dotted-disabled"
+   ],
+   "params": {
+    "serif-link": {
+     "offset": 4,
+     "size": 17
+    }
+   }
+  },
+  "button-icon": {
+   "material": "ruled-key",
+   "state": [
+    "ink-swap-hover",
+    "press-darken",
+    "focus-outline"
+   ],
+   "params": {
+    "ruled-key": {
+     "fill": "none",
+     "padX": 8,
+     "padY": 8
+    },
+    "press-darken": {
+     "fill": "ink"
+    }
+   }
+  },
+  "button-danger": {
+   "material": "ruled-key",
+   "state": [
+    "press-darken",
+    "focus-outline",
+    "dotted-disabled"
+   ],
+   "params": {
+    "ruled-key": {
+     "fill": "none",
+     "colour": "danger",
+     "weight": 600
+    },
+    "press-darken": {
+     "fill": "ink"
+    }
+   }
+  },
+  "field": {
+   "material": "underline-field",
+   "state": [
+    "underline-focus",
+    "dotted-disabled"
+   ],
+   "params": {
+    "underline-focus": {
+     "colour": "ink"
+    }
+   }
+  },
+  "select": {
+   "material": "underline-field",
+   "state": [
+    "underline-focus",
+    "dotted-disabled"
+   ],
+   "params": {
+    "underline-field": {
+     "italic": false,
+     "size": 16,
+     "pad": 8
+    },
+    "underline-focus": {
+     "colour": "ink"
+    }
+   }
+  },
+  "switch": {
+   "material": "slug-switch",
+   "state": [
+    "focus-outline",
+    "dotted-disabled"
+   ]
+  },
+  "checkbox": {
+   "material": "ink-mark",
+   "state": [
+    "focus-outline",
+    "dotted-disabled"
+   ],
+   "params": {
+    "ink-mark": {
+     "round": false
+    }
+   }
+  },
+  "radio": {
+   "material": "ink-mark",
+   "state": [
+    "focus-outline",
+    "dotted-disabled"
+   ],
+   "params": {
+    "ink-mark": {
+     "round": true,
+     "ring": 1.5
+    }
+   }
+  },
+  "slider": {
+   "material": "rule-slider",
+   "state": [
+    "focus-outline",
+    "dotted-disabled"
+   ]
+  },
+  "segmented": {
+   "material": "underline-tab",
+   "state": [
+    "rule-selected",
+    "focus-outline"
+   ]
+  },
+  "tabs": {
+   "material": "underline-tab",
+   "state": [
+    "rule-selected",
+    "focus-outline"
+   ],
+   "params": {
+    "underline-tab": {
+     "gap": 4,
+     "size": 13
+    }
+   }
+  },
+  "card": {
+   "material": "flat-paper",
+   "state": [
+    "focus-outline"
+   ]
+  },
+  "panel": {
+   "material": "flat-paper",
+   "state": [
+    "focus-outline"
+   ]
+  },
+  "list-row": {
+   "material": "ruled-row",
+   "state": [
+    "rule-selected",
+    "focus-outline"
+   ],
+   "params": {
+    "rule-selected": {
+     "colour": "ink"
+    },
+    "ruled-row": {
+     "titles": "serif"
+    }
+   }
+  },
+  "chip": {
+   "material": "hairline-box",
+   "state": [
+    "focus-outline"
+   ]
+  },
+  "badge": {
+   "material": "outlined-caps-tag",
+   "state": [
+    "focus-outline"
+   ]
+  },
+  "progress": {
+   "material": "rule-meter",
+   "state": [
+    "dotted-disabled"
+   ]
+  },
+  "avatar": {
+   "material": "hairline-disc",
+   "state": [
+    "focus-outline"
+   ]
+  },
+  "tooltip": {
+   "material": "ink-block",
+   "state": [
+    "focus-outline"
+   ]
+  },
+  "modal": {
+   "material": "rule-frame",
+   "state": [
+    "focus-outline"
+   ],
+   "params": {
+    "rule-frame": {
+     "style": "double-box",
+     "restorePad": true,
+     "titles": "italic"
+    }
+   }
+  },
+  "sheet": {
+   "material": "rule-frame",
+   "state": [
+    "focus-outline"
+   ],
+   "params": {
+    "rule-frame": {
+     "style": "double-top",
+     "titles": "italic"
+    }
+   }
+  },
+  "toast": {
+   "material": "rule-frame",
+   "state": [
+    "focus-outline"
+   ],
+   "params": {
+    "rule-frame": {
+     "style": "rule-pair",
+     "face": "italic-serif"
+    }
+   }
+  },
+  "callout": {
+   "material": "rule-sidebar",
+   "state": [
+    "focus-outline"
+   ]
+  },
+  "menu": {
+   "material": "dotted-list-panel",
+   "state": [
+    "focus-outline"
+   ]
+  },
+  "navbar": {
+   "material": "caps-links",
+   "state": [
+    "focus-outline"
+   ],
+   "params": {
+    "caps-links": {
+     "size": 12,
+     "tracking": 0.16,
+     "frame": "rule-pair",
+     "current": "bar-bottom",
+     "bar": 3
+    }
+   }
+  },
+  "topbar": {
+   "material": "rule-frame",
+   "state": [
+    "focus-outline"
+   ],
+   "params": {
+    "rule-frame": {
+     "style": "rule-pair"
+    }
+   }
+  },
+  "button-split": {
+   "material": "ruled-key",
+   "state": [
+    "ink-swap-hover",
+    "press-darken",
+    "focus-outline",
+    "dotted-disabled"
+   ],
+   "params": {
+    "ruled-key": {
+     "fill": "primary"
+    },
+    "press-darken": {
+     "fill": "press"
+    }
+   }
+  },
+  "button-fab": {
+   "material": "ruled-key",
+   "state": [
+    "press-darken",
+    "focus-outline"
+   ],
+   "params": {
+    "ruled-key": {
+     "fill": "primary",
+     "padX": 0,
+     "padY": 0
+    },
+    "press-darken": {
+     "fill": "ink"
+    }
+   }
+  },
+  "button-back-top": {
+   "material": "ruled-key",
+   "state": [
+    "ink-swap-hover",
+    "press-darken",
+    "focus-outline"
+   ],
+   "params": {
+    "ruled-key": {
+     "fill": "none",
+     "size": 11,
+     "tracking": 0.14,
+     "padY": 10,
+     "weight": 500
+    },
+    "press-darken": {
+     "fill": "ink"
+    }
+   }
+  },
+  "link": {
+   "material": "serif-link",
+   "state": [
+    "focus-outline"
+   ]
+  },
+  "stepper": {
+   "material": "ruled-stepper",
+   "state": [
+    "focus-outline"
+   ]
+  },
+  "knob": {
+   "material": "ink-dial",
+   "state": [
+    "focus-outline"
+   ]
+  },
+  "date-field": {
+   "material": "underline-field",
+   "state": [
+    "underline-focus",
+    "dotted-disabled"
+   ],
+   "params": {
+    "underline-field": {
+     "italic": true,
+     "size": 16,
+     "pad": 8
+    },
+    "underline-focus": {
+     "colour": "ink"
+    }
+   }
+  },
+  "combo": {
+   "material": "underline-field",
+   "state": [
+    "underline-focus",
+    "dotted-disabled"
+   ],
+   "params": {
+    "underline-field": {
+     "italic": true,
+     "size": 16,
+     "pad": 8
+    },
+    "underline-focus": {
+     "colour": "ink"
+    }
+   }
+  },
+  "listbox": {
+   "material": "dotted-list-panel",
+   "state": [
+    "focus-outline"
+   ]
+  },
+  "calendar": {
+   "material": "printed-table",
+   "state": [
+    "focus-outline"
+   ]
+  },
+  "calendar-day": {
+   "material": "ruled-day",
+   "state": [
+    "focus-outline"
+   ]
+  },
+  "wheel": {
+   "material": "ruled-wheel",
+   "state": [
+    "focus-outline"
+   ]
+  },
+  "accordion": {
+   "material": "ruled-accordion",
+   "state": [
+    "focus-outline"
+   ]
+  },
+  "carousel-card": {
+   "material": "rule-frame",
+   "state": [
+    "focus-outline"
+   ],
+   "params": {
+    "rule-frame": {
+     "style": "rule-pair",
+     "top": 2,
+     "bottom": 0,
+     "fill": "none"
+    }
+   }
+  },
+  "matrix-tile": {
+   "material": "serif-caption"
+  },
+  "divider": {
+   "material": "thick-thin-rule"
+  },
+  "section-label": {
+   "material": "caps-label-row"
+  },
+  "empty-state": {
+   "material": "italic-titles"
+  },
+  "overlay-scrim": {
+   "material": "ink-wash-scrim",
+   "params": {
+    "ink-wash-scrim": {
+     "pct": {
+      "light": 34,
+      "dark": 55
+     }
+    }
+   }
+  },
+  "side-sheet": {
+   "material": "double-edge",
+   "params": {
+    "double-edge": {
+     "edge": "left"
+    }
+   }
+  },
+  "drawer": {
+   "material": "double-edge",
+   "params": {
+    "double-edge": {
+     "edge": "right"
+    }
+   }
+  },
+  "popover": {
+   "material": "rule-frame",
+   "state": [
+    "focus-outline"
+   ],
+   "params": {
+    "rule-frame": {
+     "style": "double-box",
+     "restorePad": true,
+     "titles": "italic"
+    }
+   }
+  },
+  "popup-tip": {
+   "material": "rule-frame",
+   "state": [
+    "focus-outline"
+   ],
+   "params": {
+    "rule-frame": {
+     "style": "double-box",
+     "restorePad": true,
+     "titles": "italic"
+    }
+   }
+  },
+  "lightbox": {
+   "material": "square-frame",
+   "params": {
+    "square-frame": {
+     "caption": true
+    }
+   }
+  },
+  "lightbox-control": {
+   "material": "hairline-box",
+   "state": [
+    "focus-outline"
+   ]
+  },
+  "topbar-title": {
+   "material": "serif-caps-title"
+  },
+  "tabbar": {
+   "material": "caps-links",
+   "state": [
+    "focus-outline"
+   ],
+   "params": {
+    "caps-links": {
+     "size": 10,
+     "tracking": 0.1,
+     "frame": "rule-pair",
+     "current": "bold"
+    }
+   }
+  },
+  "nav-menu": {
+   "material": "flat-paper"
+  },
+  "nav-item": {
+   "material": "ruled-row",
+   "state": [
+    "bar-selected",
+    "focus-outline"
+   ],
+   "params": {
+    "ruled-row": {
+     "rule": "soft",
+     "titles": "serif"
+    }
+   }
+  },
+  "breadcrumbs": {
+   "material": "caps-links",
+   "state": [
+    "focus-outline"
+   ],
+   "params": {
+    "caps-links": {
+     "current": "italic",
+     "items": "keep-face"
+    }
+   }
+  },
+  "anchor-nav": {
+   "material": "caps-links",
+   "state": [
+    "focus-outline"
+   ],
+   "params": {
+    "caps-links": {
+     "current": "bar-left"
+    }
+   }
+  },
+  "scrollbar": {
+   "material": "ink-scrollbar"
+  },
+  "dropdown-trigger": {
+   "material": "ruled-key",
+   "state": [
+    "open-ink-fill",
+    "press-darken",
+    "focus-outline",
+    "dotted-disabled"
+   ],
+   "params": {
+    "ruled-key": {
+     "fill": "none",
+     "size": 11,
+     "tracking": 0.16,
+     "padY": 11,
+     "weight": 500
+    },
+    "press-darken": {
+     "fill": "ink"
+    }
+   }
+  },
+  "menu-item": {
+   "material": "ruled-row",
+   "state": [
+    "bar-selected",
+    "focus-outline"
+   ],
+   "params": {
+    "ruled-row": {
+     "rule": "strong"
+    }
+   }
+  },
+  "mega-menu": {
+   "material": "rule-frame",
+   "state": [
+    "focus-outline"
+   ],
+   "params": {
+    "rule-frame": {
+     "style": "rule-pair",
+     "columns": true
+    }
+   }
+  },
+  "menubar": {
+   "material": "caps-links",
+   "state": [
+    "focus-outline"
+   ],
+   "params": {
+    "caps-links": {
+     "frame": "bottom",
+     "current": "fill"
+    }
+   }
+  },
+  "ribbon": {
+   "material": "caps-links",
+   "state": [
+    "focus-outline"
+   ],
+   "params": {
+    "caps-links": {
+     "frame": "bottom",
+     "size": 13
+    }
+   }
+  },
+  "pie-menu": {
+   "material": "ink-pie",
+   "state": [
+    "focus-outline"
+   ]
+  },
+  "spinner": {
+   "material": "stepped-ring"
+  },
+  "skeleton": {
+   "material": "flat-skeleton"
+  },
+  "notification-dot": {
+   "material": "square-mark"
+  },
+  "kbd": {
+   "material": "caps-key"
+  }
+ },
+ "lineage": {
+  "forkedFrom": "editorial-serif",
+  "version": 2
+ },
+ "art": {
+  "hero": {
+   "kind": "generator",
+   "move": "duotone-plate",
+   "params": {}
+  }
+ }
+}

@@ -1,0 +1,29 @@
+{
+ "rounds": [
+  {
+   "n": 1,
+   "date": "2026-11-06",
+   "by": "agent",
+   "summary": "What this round tried.",
+   "changes": [
+    "Plain sentence per change."
+   ],
+   "variants": [
+    {
+     "id": "r1a",
+     "change": "one axis only, e.g. material: flat-fill to outlined",
+     "verdict": "open"
+    }
+   ],
+   "notes": [
+    {
+     "id": "n1",
+     "target": "board.hero",
+     "text": "What to fix next.",
+     "status": "open"
+    }
+   ],
+   "shots": "shots/r1/"
+  }
+ ]
+}

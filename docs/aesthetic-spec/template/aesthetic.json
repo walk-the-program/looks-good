@@ -1,0 +1,495 @@
+{
+ "spec": 2,
+ "key": "new-aesthetic",
+ "order": 950,
+ "name": "New Aesthetic",
+ "descriptor": "Word · Word · Word",
+ "influences": "Plain list of what this draws on (stage 2)",
+ "summary": "One sentence a stranger understands.",
+ "coreTrick": "One sentence: the mechanism that makes it recognisable, not the mood (stage 1).",
+ "motto": "Short line.",
+ "kicker": "Kicker above the headline",
+ "mode": "light",
+ "lineage": {
+  "forkedFrom": null,
+  "version": 1
+ },
+ "meta": {
+  "family": "graphic",
+  "fonts": {
+   "heading": {
+    "classes": [
+     "heavy",
+     "neo-grotesk"
+    ],
+    "picks": [
+     "Archivo Black",
+     "Inter Tight"
+    ]
+   },
+   "body": {
+    "classes": [
+     "neo-grotesk"
+    ],
+    "picks": [
+     "Inter",
+     "IBM Plex Sans"
+    ]
+   },
+   "mono": {
+    "picks": [
+     "JetBrains Mono",
+     "IBM Plex Mono"
+    ]
+   },
+   "avoid": [
+    "didone",
+    "script",
+    "groovy"
+   ],
+   "why": "One sentence on why these font classes carry the look (stage 5).",
+   "pairings": [
+    [
+     "Archivo Black",
+     "Inter"
+    ],
+    [
+     "Inter Tight",
+     "Inter"
+    ]
+   ]
+  }
+ },
+ "build": {
+  "cls": "hard",
+  "surface": "Flat fills with an ink border and a hard offset shadow (no blur).",
+  "press": {
+   "dx": 4,
+   "dy": 4,
+   "ms": 100
+  },
+  "motion": {
+   "fast": 100,
+   "base": 160,
+   "slow": 240,
+   "ease": "out"
+  },
+  "pressText": "What rest, hover and pressed do, in numbers (stages 4 and 9).",
+  "icons": "Stroke weight, caps, corners, selected treatment.",
+  "appIcon": "One sentence describing the app icon tile in this look."
+ },
+ "labels": {
+  "material": "Hard offset",
+  "states": [
+   "Rest",
+   "Hover",
+   "Pressed"
+  ],
+  "statesKind": "button"
+ },
+ "copy": {
+  "motto": {
+   "label": "Motto",
+   "text": "Short line."
+  },
+  "kicker": {
+   "label": "Kicker above the headline",
+   "text": "Kicker above the headline"
+  }
+ },
+ "layout": {
+  "hero": "split",
+  "palette": "swatches",
+  "sections": "two-col"
+ },
+ "type": {
+  "ui": "sans",
+  "label": "mono",
+  "display": 1.0
+ },
+ "roles": {
+  "canvas": {
+   "use": "Page and panel background, tinted slightly toward the primary hue",
+   "never": "Text",
+   "coverage": "60-70%"
+  },
+  "ink": {
+   "use": "Headlines, body text, borders, hover fill",
+   "never": "Large background fields in light mode",
+   "coverage": "15-20%"
+  },
+  "primary": {
+   "use": "The one main action per view; selected state",
+   "never": "Body text; more than one CTA per view",
+   "coverage": "about 10%"
+  },
+  "secondary": {
+   "use": "Secondary buttons, chips, second data series",
+   "never": "The main CTA, body text",
+   "coverage": "10-15%"
+  },
+  "accent": {
+   "use": "One spark per view: the highlighted headline word, new badges",
+   "never": "Buttons, body text, borders, large fills",
+   "coverage": "5% or less"
+  }
+ },
+ "rules": {
+  "do": [
+   "Keep one border weight everywhere."
+  ],
+  "dont": [
+   "Use blur shadows."
+  ]
+ },
+ "highlight": "ink",
+ "slideShape": "minimal",
+ "colour": [
+  {
+   "move": "tinted-neutral-canvas",
+   "params": {
+    "tint": 16,
+    "paperMix": 0.4
+   }
+  }
+ ],
+ "moves": [
+  {
+   "move": "corner-radius",
+   "params": {
+    "base": 2,
+    "controls": 1,
+    "surfaces": 1,
+    "small": 1
+   }
+  },
+  {
+   "move": "heavy-border",
+   "params": {
+    "width": 3
+   }
+  },
+  {
+   "move": "caps-mono-labels",
+   "params": {
+    "tracking": 0.1
+   }
+  },
+  {
+   "move": "tight-display-tracking",
+   "params": {
+    "tracking": -0.05
+   }
+  },
+  {
+   "move": "hard-offset",
+   "params": {
+    "x": 4,
+    "y": 4
+   }
+  },
+  {
+   "move": "edge-underline",
+   "params": {
+    "width": 2
+   },
+   "scope": "board"
+  }
+ ],
+ "kit": {
+  "button-primary": {
+   "material": "hard-offset",
+   "state": [
+    "invert-on-hover",
+    "press-sink"
+   ],
+   "params": {
+    "hard-offset": {
+     "fill": "primary"
+    }
+   }
+  },
+  "button-secondary": {
+   "material": "outlined",
+   "state": [
+    "invert-on-hover",
+    "press-sink"
+   ]
+  },
+  "button-ghost": {
+   "material": "quiet-text",
+   "state": [
+    "invert-on-hover",
+    "press-sink"
+   ]
+  },
+  "button-icon": {
+   "material": "outlined",
+   "state": [
+    "invert-on-hover",
+    "press-sink"
+   ]
+  },
+  "button-danger": {
+   "material": "outlined",
+   "state": [
+    "invert-on-hover",
+    "press-sink"
+   ]
+  },
+  "field": {
+   "material": "outlined",
+   "state": "press-sink",
+   "params": {
+    "outlined": {
+     "width": {
+      "light": 2,
+      "dark": 3
+     },
+     "fill": "canvas"
+    }
+   }
+  },
+  "select": {
+   "material": "outlined",
+   "state": "press-sink"
+  },
+  "switch": {
+   "material": "flat-fill",
+   "state": "ink-fill-selected"
+  },
+  "checkbox": {
+   "material": "flat-fill",
+   "state": "ink-fill-selected"
+  },
+  "radio": {
+   "material": "flat-fill",
+   "state": "ink-fill-selected"
+  },
+  "slider": {
+   "material": "flat-fill",
+   "state": "ink-fill-selected"
+  },
+  "segmented": {
+   "material": "flat-fill",
+   "state": "ink-fill-selected"
+  },
+  "tabs": {
+   "material": "flat-fill",
+   "state": "ink-fill-selected"
+  },
+  "card": {
+   "material": "hard-offset"
+  },
+  "panel": {
+   "material": "flat-fill"
+  },
+  "list-row": {
+   "material": "outlined"
+  },
+  "chip": {
+   "material": "flat-fill",
+   "state": "ink-fill-selected"
+  },
+  "badge": {
+   "material": "flat-fill",
+   "params": {
+    "flat-fill": {
+     "fill": "accent"
+    }
+   }
+  },
+  "progress": {
+   "material": "flat-fill"
+  },
+  "avatar": {
+   "material": "outlined"
+  },
+  "tooltip": {
+   "material": "flat-fill",
+   "params": {
+    "flat-fill": {
+     "fill": "ink"
+    }
+   }
+  },
+  "modal": {
+   "material": "hard-offset"
+  },
+  "sheet": {
+   "material": "hard-offset"
+  },
+  "toast": {
+   "material": "outlined"
+  },
+  "callout": {
+   "material": "outlined",
+   "scope": "kit"
+  },
+  "menu": {
+   "material": "outlined"
+  },
+  "navbar": {
+   "material": "flat-fill"
+  },
+  "topbar": {
+   "material": "flat-fill"
+  },
+  "button-split": {
+   "material": "hard-offset",
+   "state": [
+    "invert-on-hover",
+    "press-sink"
+   ]
+  },
+  "button-fab": {
+   "material": "hard-offset",
+   "state": [
+    "invert-on-hover",
+    "press-sink"
+   ]
+  },
+  "button-back-top": {
+   "material": "outlined",
+   "state": [
+    "invert-on-hover",
+    "press-sink"
+   ]
+  },
+  "link": {
+   "material": "quiet-text"
+  },
+  "stepper": {
+   "material": "outlined",
+   "state": "press-sink"
+  },
+  "knob": {
+   "material": "flat-fill"
+  },
+  "date-field": {
+   "material": "outlined",
+   "state": "press-sink"
+  },
+  "combo": {
+   "material": "outlined",
+   "state": "press-sink"
+  },
+  "listbox": {
+   "material": "outlined",
+   "state": "press-sink"
+  },
+  "calendar": {
+   "material": "outlined"
+  },
+  "calendar-day": {
+   "material": "outlined"
+  },
+  "wheel": {
+   "material": "flat-fill"
+  },
+  "accordion": {
+   "material": "outlined"
+  },
+  "carousel-card": {
+   "material": "outlined"
+  },
+  "matrix-tile": {
+   "material": "outlined"
+  },
+  "divider": {
+   "material": "flat-fill"
+  },
+  "section-label": {
+   "material": "quiet-text"
+  },
+  "empty-state": {
+   "material": "outlined"
+  },
+  "overlay-scrim": {
+   "material": "flat-fill"
+  },
+  "side-sheet": {
+   "material": "hard-offset"
+  },
+  "drawer": {
+   "material": "hard-offset"
+  },
+  "popover": {
+   "material": "hard-offset"
+  },
+  "popup-tip": {
+   "material": "flat-fill",
+   "params": {
+    "flat-fill": {
+     "fill": "ink"
+    }
+   }
+  },
+  "lightbox": {
+   "material": "hard-offset"
+  },
+  "lightbox-control": {
+   "material": "outlined"
+  },
+  "topbar-title": {
+   "material": "quiet-text"
+  },
+  "tabbar": {
+   "material": "flat-fill"
+  },
+  "nav-menu": {
+   "material": "flat-fill"
+  },
+  "nav-item": {
+   "material": "outlined"
+  },
+  "breadcrumbs": {
+   "material": "quiet-text"
+  },
+  "anchor-nav": {
+   "material": "quiet-text"
+  },
+  "scrollbar": {
+   "material": "flat-fill"
+  },
+  "dropdown-trigger": {
+   "material": "outlined",
+   "state": "press-sink"
+  },
+  "menu-item": {
+   "material": "outlined"
+  },
+  "mega-menu": {
+   "material": "outlined"
+  },
+  "menubar": {
+   "material": "outlined"
+  },
+  "ribbon": {
+   "material": "outlined"
+  },
+  "pie-menu": {
+   "material": "outlined"
+  },
+  "spinner": {
+   "material": "flat-fill"
+  },
+  "skeleton": {
+   "material": "outlined"
+  },
+  "notification-dot": {
+   "material": "flat-fill"
+  },
+  "kbd": {
+   "material": "outlined"
+  }
+ },
+ "art": {
+  "hero": {
+   "kind": "svg",
+   "src": "art/hero.svg",
+   "fit": "cover",
+   "alt": "Describe the hero art"
+  }
+ }
+}

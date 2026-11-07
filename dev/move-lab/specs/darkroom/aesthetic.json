@@ -1,0 +1,997 @@
+{
+ "spec": 2,
+ "key": "darkroom",
+ "order": 960,
+ "name": "Darkroom",
+ "descriptor": "Safelight · Contact · Tray",
+ "influences": "Film contact sheets, 35mm film rebate edges with frame numbers, grease-pencil pick marks, enlarger-room trays and safelight glow",
+ "summary": "A photo darkroom under the safelight: every surface is a numbered film frame or a recessed developer tray.",
+ "coreTrick": "The canvas is a near-black warm room and every surface is either a hairline-framed contact-sheet cell (numbered like film frames, with a printed rebate strip of frame numbers on the board edges) or a recessed tray, and the picked or selected item gets a primary-colour grease-pencil rule instead of a fill.",
+ "motto": "Print the pick.",
+ "kicker": "Roll 07 / Contact sheet",
+ "mode": "dark",
+ "lineage": {
+  "forkedFrom": null,
+  "version": 2
+ },
+ "meta": {
+  "family": "graphic",
+  "fonts": {
+   "heading": {
+    "classes": [
+     "condensed",
+     "neo-grotesk"
+    ],
+    "picks": [
+     "Barlow Condensed",
+     "Archivo",
+     "Inter Tight"
+    ]
+   },
+   "body": {
+    "classes": [
+     "neo-grotesk"
+    ],
+    "picks": [
+     "Inter Tight",
+     "Archivo"
+    ]
+   },
+   "mono": {
+    "picks": [
+     "IBM Plex Mono",
+     "DM Mono",
+     "Space Mono"
+    ]
+   },
+   "avoid": [
+    "didone",
+    "script",
+    "groovy",
+    "soft-serif"
+   ],
+   "why": "Condensed caps read like edge-printed film stock; mono carries frame numbers and labels; a quiet neo-grotesk keeps body text out of the way.",
+   "pairings": [
+    [
+     "Barlow Condensed",
+     "Inter Tight"
+    ],
+    [
+     "Archivo",
+     "IBM Plex Mono"
+    ]
+   ]
+  }
+ },
+ "build": {
+  "cls": "flat",
+  "surface": "Near-black canvas; hairline frames for holding things, recessed trays for containers, no outer shadows.",
+  "press": {
+   "dx": 0,
+   "dy": 1,
+   "ms": 120
+  },
+  "motion": {
+   "fast": 120,
+   "base": 200,
+   "slow": 320,
+   "ease": "out"
+  },
+  "pressText": "Rest: hairline frame. Hover: frame brightens to the safelight colour. Pressed: sinks 1px.",
+  "icons": "Thin 1.5px strokes, square caps, selected icons get a grease-pencil underline.",
+  "appIcon": "Black tile with one 35mm frame outline and a primary-colour grease-pencil circle around it."
+ },
+ "labels": {
+  "material": "Frame and tray",
+  "states": [
+   "Rest",
+   "Safelit",
+   "Dunked"
+  ],
+  "statesKind": "button"
+ },
+ "copy": {
+  "motto": {
+   "label": "Motto",
+   "text": "Print the pick."
+  },
+  "kicker": {
+   "label": "Kicker above the headline",
+   "text": "Roll 07 / Contact sheet"
+  }
+ },
+ "layout": {
+  "hero": "centered",
+  "palette": "strips",
+  "sections": "stacked"
+ },
+ "type": {
+  "ui": "sans",
+  "label": "mono",
+  "display": 1.1
+ },
+ "roles": {
+  "canvas": {
+   "use": "The dark room: near-black, warm-tinted toward the primary",
+   "never": "Text",
+   "coverage": "70-80%"
+  },
+  "ink": {
+   "use": "Headlines, body text, borders, hover fill",
+   "never": "Large background fields in light mode",
+   "coverage": "15-20%"
+  },
+  "primary": {
+   "use": "The safelight: the one main action and grease-pencil pick marks",
+   "never": "Body text; more than one CTA per view",
+   "coverage": "about 10%"
+  },
+  "secondary": {
+   "use": "Secondary buttons, chips, second data series",
+   "never": "The main CTA, body text",
+   "coverage": "10-15%"
+  },
+  "accent": {
+   "use": "One frame number or tag lit per view",
+   "never": "Buttons, body text, borders, large fills",
+   "coverage": "5% or less"
+  }
+ },
+ "rules": {
+  "do": [
+   "Number every cell like a film frame.",
+   "Mark the selected item with a primary rule, not a fill.",
+   "Use hairlines for holding things and a recessed tray for containers."
+  ],
+  "dont": [
+   "Put a glow or blur shadow on a control.",
+   "Show art on app screens.",
+   "Fill large areas with the primary colour."
+  ]
+ },
+ "highlight": "band",
+ "slideShape": "geometric",
+ "colour": [
+  {
+   "move": "tinted-neutral-canvas",
+   "params": {
+    "tint": 8,
+    "darkL": 7,
+    "paperMix": 0.2
+   }
+  },
+  {
+   "move": "canvas-ink-pull",
+   "params": {
+    "light": 0.08,
+    "dark": 0.07
+   }
+  },
+  {
+   "move": "muted-contrast-floor",
+   "params": {
+    "min": 5
+   }
+  },
+  {
+   "move": "fixed-lamp-cast",
+   "params": {
+    "lamp": "#ff4a1f",
+    "canvasMix": {
+     "light": 0.06,
+     "dark": 0.1
+    },
+    "inkMix": {
+     "light": 0.2,
+     "dark": 0.16
+    },
+    "wash": 0.14
+   },
+   "scope": "all"
+  }
+ ],
+ "moves": [
+  {
+   "move": "corner-radius",
+   "params": {
+    "base": 2,
+    "controls": 1,
+    "surfaces": 1,
+    "small": 0.5
+   }
+  },
+  {
+   "move": "caps-mono-labels",
+   "params": {
+    "tracking": 0.14,
+    "size": 0.68
+   }
+  },
+  {
+   "move": "tight-display-tracking",
+   "params": {
+    "tracking": 0.01
+   }
+  },
+  {
+   "move": "highlight-word",
+   "params": {
+    "italic": false,
+    "weight": 600,
+    "colour": "ink",
+    "band": false
+   }
+  },
+  {
+   "move": "highlight-underline",
+   "params": {
+    "width": 6,
+    "offset": 6,
+    "colour": "primary"
+   }
+  },
+  {
+   "move": "catalogue-number",
+   "params": {
+    "dateline": "Roll 07 · Neg 24A",
+    "cellPrefix": "Frame "
+   }
+  },
+  {
+   "move": "section-number-marker",
+   "params": {
+    "look": "badge",
+    "size": 12,
+    "fill": "ink"
+   }
+  },
+  {
+   "move": "ticker-strip",
+   "params": {
+    "top": "▮ 12  ▸ 12A  ▮ 13  ▸ 13A  ▮ 14  ▸ 14A  ▮ 15",
+    "bottom": "KODAK SAFETY FILM 5063 ▸ 21 ▸ 22 ▸ 23 ▸ 24",
+    "rule": "▮ ▮ ▮ ▮ ▮ ▮ ▮ ▮ ▮ ▮ ▮ ▮ ▮ ▮ ▮ ▮ ▮ ▮ ▮ ▮ ▮ ▮ ▮ ▮ ▮",
+    "topFill": "ink",
+    "bottomFill": "ink",
+    "size": 9.5,
+    "tracking": 0.2
+   },
+   "scope": "board"
+  },
+  {
+   "move": "line-grid",
+   "params": {
+    "columns": 6,
+    "darkPct": 7,
+    "lightPct": 8,
+    "kitToo": false
+   },
+   "scope": "board"
+  },
+  {
+   "move": "footer-treatment",
+   "params": {
+    "size": 10,
+    "tracking": 0.2
+   }
+  },
+  {
+   "move": "focus-ring",
+   "params": {
+    "width": 2,
+    "offset": 2,
+    "colour": "primary",
+    "style": "dashed"
+   }
+  }
+ ],
+ "kit": {
+  "button-primary": {
+   "material": "flat-fill",
+   "params": {
+    "flat-fill": {
+     "fill": "primary"
+    }
+   },
+   "state": [
+    "press-sink",
+    "press-darken"
+   ]
+  },
+  "button-secondary": {
+   "material": "outlined",
+   "params": {
+    "outlined": {
+     "width": 1,
+     "colour": "line",
+     "fill": "transparent"
+    }
+   },
+   "state": [
+    "press-sink",
+    "rule-selected"
+   ]
+  },
+  "button-ghost": {
+   "material": "outlined",
+   "params": {
+    "outlined": {
+     "width": 1,
+     "colour": "line",
+     "fill": "transparent"
+    }
+   },
+   "state": [
+    "press-sink",
+    "rule-selected"
+   ]
+  },
+  "button-icon": {
+   "material": "outlined",
+   "params": {
+    "outlined": {
+     "width": 1,
+     "colour": "line",
+     "fill": "transparent"
+    }
+   },
+   "state": [
+    "press-sink",
+    "rule-selected"
+   ]
+  },
+  "button-danger": {
+   "material": "outlined",
+   "params": {
+    "outlined": {
+     "width": 1,
+     "colour": "line",
+     "fill": "transparent"
+    }
+   },
+   "state": [
+    "press-sink",
+    "rule-selected"
+   ]
+  },
+  "field": {
+   "material": "outlined",
+   "params": {
+    "outlined": {
+     "width": 1,
+     "colour": "line",
+     "fill": "transparent"
+    }
+   },
+   "state": [
+    "press-sink",
+    "rule-selected"
+   ]
+  },
+  "select": {
+   "material": "outlined",
+   "params": {
+    "outlined": {
+     "width": 1,
+     "colour": "line",
+     "fill": "transparent"
+    }
+   },
+   "state": [
+    "press-sink",
+    "rule-selected"
+   ]
+  },
+  "switch": {
+   "material": "slug-switch",
+   "params": {
+    "slug-switch": {
+     "onFill": "primary",
+     "kitOnFill": "primary"
+    }
+   },
+   "state": [
+    "press-sink"
+   ]
+  },
+  "checkbox": {
+   "material": "outlined",
+   "params": {
+    "outlined": {
+     "width": 1,
+     "colour": "line",
+     "fill": "transparent"
+    }
+   },
+   "state": [
+    "press-sink",
+    "rule-selected"
+   ]
+  },
+  "radio": {
+   "material": "outlined",
+   "params": {
+    "outlined": {
+     "width": 1,
+     "colour": "line",
+     "fill": "transparent"
+    }
+   },
+   "state": [
+    "press-sink",
+    "rule-selected"
+   ]
+  },
+  "slider": {
+   "material": "outlined",
+   "params": {
+    "outlined": {
+     "width": 1,
+     "colour": "line",
+     "fill": "transparent"
+    }
+   },
+   "state": [
+    "press-sink",
+    "rule-selected"
+   ]
+  },
+  "segmented": {
+   "material": "outlined",
+   "params": {
+    "outlined": {
+     "width": 1,
+     "colour": "line",
+     "fill": "transparent"
+    }
+   },
+   "state": [
+    "press-sink",
+    "rule-selected"
+   ]
+  },
+  "tabs": {
+   "material": "outlined",
+   "params": {
+    "outlined": {
+     "width": 1,
+     "colour": "line",
+     "fill": "transparent"
+    }
+   },
+   "state": [
+    "press-sink",
+    "rule-selected"
+   ]
+  },
+  "card": {
+   "material": "film-frame",
+   "params": {
+    "film-frame": {
+     "rebate": 9,
+     "hole": 4,
+     "pitch": 14,
+     "band": 14
+    }
+   }
+  },
+  "panel": {
+   "material": "film-frame",
+   "params": {
+    "film-frame": {
+     "rebate": 9,
+     "hole": 4,
+     "pitch": 14,
+     "band": 14
+    }
+   }
+  },
+  "list-row": {
+   "material": "recessed",
+   "params": {
+    "recessed": {
+     "distance": 3,
+     "blur": 10
+    }
+   }
+  },
+  "chip": {
+   "material": "outlined",
+   "params": {
+    "outlined": {
+     "width": 1,
+     "colour": "line",
+     "fill": "transparent"
+    }
+   },
+   "state": [
+    "press-sink",
+    "rule-selected"
+   ]
+  },
+  "badge": {
+   "material": "flat-fill",
+   "params": {
+    "flat-fill": {
+     "fill": "accent"
+    }
+   }
+  },
+  "progress": {
+   "material": "outlined",
+   "params": {
+    "outlined": {
+     "width": 1,
+     "colour": "line",
+     "fill": "transparent"
+    }
+   }
+  },
+  "avatar": {
+   "material": "outlined",
+   "params": {
+    "outlined": {
+     "width": 1,
+     "colour": "line",
+     "fill": "transparent"
+    }
+   }
+  },
+  "tooltip": {
+   "material": "flat-fill",
+   "params": {
+    "flat-fill": {
+     "fill": "ink"
+    }
+   }
+  },
+  "modal": {
+   "material": "recessed",
+   "params": {
+    "recessed": {
+     "distance": 3,
+     "blur": 10
+    }
+   }
+  },
+  "sheet": {
+   "material": "recessed",
+   "params": {
+    "recessed": {
+     "distance": 3,
+     "blur": 10
+    }
+   }
+  },
+  "toast": {
+   "material": "outlined",
+   "params": {
+    "outlined": {
+     "width": 1,
+     "colour": "line",
+     "fill": "transparent"
+    }
+   }
+  },
+  "callout": {
+   "material": "recessed",
+   "params": {
+    "recessed": {
+     "distance": 3,
+     "blur": 10
+    }
+   }
+  },
+  "menu": {
+   "material": "outlined",
+   "params": {
+    "outlined": {
+     "width": 1,
+     "colour": "line",
+     "fill": "transparent"
+    }
+   }
+  },
+  "navbar": {
+   "material": "flat-fill",
+   "params": {
+    "flat-fill": {
+     "fill": "canvas"
+    }
+   }
+  },
+  "topbar": {
+   "material": "flat-fill",
+   "params": {
+    "flat-fill": {
+     "fill": "canvas"
+    }
+   }
+  },
+  "button-split": {
+   "material": "outlined",
+   "params": {
+    "outlined": {
+     "width": 1,
+     "colour": "line",
+     "fill": "transparent"
+    }
+   },
+   "state": [
+    "press-sink",
+    "rule-selected"
+   ]
+  },
+  "button-fab": {
+   "material": "outlined",
+   "params": {
+    "outlined": {
+     "width": 1,
+     "colour": "line",
+     "fill": "transparent"
+    }
+   },
+   "state": [
+    "press-sink",
+    "rule-selected"
+   ]
+  },
+  "button-back-top": {
+   "material": "outlined",
+   "params": {
+    "outlined": {
+     "width": 1,
+     "colour": "line",
+     "fill": "transparent"
+    }
+   },
+   "state": [
+    "press-sink",
+    "rule-selected"
+   ]
+  },
+  "link": {
+   "material": "quiet-text"
+  },
+  "stepper": {
+   "material": "outlined",
+   "params": {
+    "outlined": {
+     "width": 1,
+     "colour": "line",
+     "fill": "transparent"
+    }
+   }
+  },
+  "knob": {
+   "material": "flat-fill",
+   "params": {
+    "flat-fill": {
+     "fill": "primary"
+    }
+   }
+  },
+  "date-field": {
+   "material": "outlined",
+   "params": {
+    "outlined": {
+     "width": 1,
+     "colour": "line",
+     "fill": "transparent"
+    }
+   }
+  },
+  "combo": {
+   "material": "outlined",
+   "params": {
+    "outlined": {
+     "width": 1,
+     "colour": "line",
+     "fill": "transparent"
+    }
+   }
+  },
+  "listbox": {
+   "material": "outlined",
+   "params": {
+    "outlined": {
+     "width": 1,
+     "colour": "line",
+     "fill": "transparent"
+    }
+   }
+  },
+  "calendar": {
+   "material": "outlined",
+   "params": {
+    "outlined": {
+     "width": 1,
+     "colour": "line",
+     "fill": "transparent"
+    }
+   }
+  },
+  "calendar-day": {
+   "material": "outlined",
+   "params": {
+    "outlined": {
+     "width": 1,
+     "colour": "line",
+     "fill": "transparent"
+    }
+   }
+  },
+  "wheel": {
+   "material": "flat-fill",
+   "params": {
+    "flat-fill": {
+     "fill": "primary"
+    }
+   }
+  },
+  "accordion": {
+   "material": "recessed",
+   "params": {
+    "recessed": {
+     "distance": 3,
+     "blur": 10
+    }
+   }
+  },
+  "carousel-card": {
+   "material": "film-frame",
+   "params": {
+    "film-frame": {
+     "rebate": 9,
+     "hole": 4,
+     "pitch": 14,
+     "band": 14
+    }
+   }
+  },
+  "matrix-tile": {
+   "material": "film-frame",
+   "params": {
+    "film-frame": {
+     "rebate": 9,
+     "hole": 4,
+     "pitch": 14,
+     "band": 14
+    }
+   }
+  },
+  "divider": {
+   "material": "flat-fill",
+   "params": {
+    "flat-fill": {
+     "fill": "muted"
+    }
+   }
+  },
+  "section-label": {
+   "material": "quiet-text"
+  },
+  "empty-state": {
+   "material": "recessed",
+   "params": {
+    "recessed": {
+     "distance": 3,
+     "blur": 10
+    }
+   }
+  },
+  "overlay-scrim": {
+   "material": "flat-fill",
+   "params": {
+    "flat-fill": {
+     "fill": "primary"
+    }
+   }
+  },
+  "side-sheet": {
+   "material": "recessed",
+   "params": {
+    "recessed": {
+     "distance": 3,
+     "blur": 10
+    }
+   }
+  },
+  "drawer": {
+   "material": "recessed",
+   "params": {
+    "recessed": {
+     "distance": 3,
+     "blur": 10
+    }
+   }
+  },
+  "popover": {
+   "material": "outlined",
+   "params": {
+    "outlined": {
+     "width": 1,
+     "colour": "line",
+     "fill": "transparent"
+    }
+   }
+  },
+  "popup-tip": {
+   "material": "outlined",
+   "params": {
+    "outlined": {
+     "width": 1,
+     "colour": "line",
+     "fill": "transparent"
+    }
+   }
+  },
+  "lightbox": {
+   "material": "outlined",
+   "params": {
+    "outlined": {
+     "width": 1,
+     "colour": "line",
+     "fill": "transparent"
+    }
+   }
+  },
+  "lightbox-control": {
+   "material": "outlined",
+   "params": {
+    "outlined": {
+     "width": 1,
+     "colour": "line",
+     "fill": "transparent"
+    }
+   }
+  },
+  "topbar-title": {
+   "material": "quiet-text"
+  },
+  "tabbar": {
+   "material": "outlined",
+   "params": {
+    "outlined": {
+     "width": 1,
+     "colour": "line",
+     "fill": "transparent"
+    }
+   }
+  },
+  "nav-menu": {
+   "material": "outlined",
+   "params": {
+    "outlined": {
+     "width": 1,
+     "colour": "line",
+     "fill": "transparent"
+    }
+   },
+   "state": [
+    "rule-selected"
+   ]
+  },
+  "nav-item": {
+   "material": "outlined",
+   "params": {
+    "outlined": {
+     "width": 1,
+     "colour": "line",
+     "fill": "transparent"
+    }
+   }
+  },
+  "breadcrumbs": {
+   "material": "quiet-text"
+  },
+  "anchor-nav": {
+   "material": "quiet-text"
+  },
+  "scrollbar": {
+   "material": "flat-fill",
+   "params": {
+    "flat-fill": {
+     "fill": "muted"
+    }
+   }
+  },
+  "dropdown-trigger": {
+   "material": "outlined",
+   "params": {
+    "outlined": {
+     "width": 1,
+     "colour": "line",
+     "fill": "transparent"
+    }
+   }
+  },
+  "menu-item": {
+   "material": "outlined",
+   "params": {
+    "outlined": {
+     "width": 1,
+     "colour": "line",
+     "fill": "transparent"
+    }
+   }
+  },
+  "mega-menu": {
+   "material": "outlined",
+   "params": {
+    "outlined": {
+     "width": 1,
+     "colour": "line",
+     "fill": "transparent"
+    }
+   }
+  },
+  "menubar": {
+   "material": "outlined",
+   "params": {
+    "outlined": {
+     "width": 1,
+     "colour": "line",
+     "fill": "transparent"
+    }
+   }
+  },
+  "ribbon": {
+   "material": "outlined",
+   "params": {
+    "outlined": {
+     "width": 1,
+     "colour": "line",
+     "fill": "transparent"
+    }
+   }
+  },
+  "pie-menu": {
+   "material": "outlined",
+   "params": {
+    "outlined": {
+     "width": 1,
+     "colour": "line",
+     "fill": "transparent"
+    }
+   }
+  },
+  "spinner": {
+   "material": "flat-fill",
+   "params": {
+    "flat-fill": {
+     "fill": "primary"
+    }
+   }
+  },
+  "skeleton": {
+   "material": "outlined",
+   "params": {
+    "outlined": {
+     "width": 1,
+     "colour": "line",
+     "fill": "transparent"
+    }
+   }
+  },
+  "notification-dot": {
+   "material": "flat-fill",
+   "params": {
+    "flat-fill": {
+     "fill": "primary"
+    }
+   }
+  },
+  "kbd": {
+   "material": "outlined-caps-tag"
+  }
+ },
+ "art": {
+  "hero": {
+   "kind": "svg",
+   "src": "art/hero.svg",
+   "fit": "contain",
+   "alt": "A contact sheet of film frames with sprocket holes, frame numbers and a grease-pencil circle around one pick"
+  }
+ }
+}

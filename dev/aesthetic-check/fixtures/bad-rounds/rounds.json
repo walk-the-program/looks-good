@@ -1,0 +1,37 @@
+{
+  "rounds": [
+    {
+      "n": 1,
+      "date": "6 Nov",
+      "by": "robot",
+      "summary": "First pass at the harbour-sign look.",
+      "changes": [
+        "Outlined cells everywhere.",
+        "Canvas tinted from the primary."
+      ],
+      "variants": [
+        {
+          "id": "r1a",
+          "change": "material: flat-fill to outlined",
+          "verdict": "maybe"
+        }
+      ],
+      "notes": [
+        {
+          "id": "n1",
+          "target": "board.hero",
+          "text": "headline too loud",
+          "status": "open"
+        },
+        {
+          "id": "n2",
+          "target": "kit.button-primary",
+          "text": "press feels flat",
+          "status": "done",
+          "doneIn": "x"
+        }
+      ],
+      "shots": "shots/r1/"
+    }
+  ]
+}

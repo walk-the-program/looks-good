@@ -1,0 +1,71 @@
+{
+  "spec": 2,
+  "key": "toy-press-twin",
+  "order": 950,
+  "name": "Night Ferry",
+  "descriptor": "Harbour · Ink · Lamp",
+  "influences": "Ferry timetables, enamel signs",
+  "summary": "A harbour-sign look.",
+  "coreTrick": "Every control is an outlined cell that fills with ink on hover, on a canvas tinted from the primary hue.",
+  "motto": "",
+  "kicker": "",
+  "mode": "light",
+  "lineage": {
+    "forkedFrom": null,
+    "version": 1
+  },
+  "rules": {
+    "do": [
+      "Keep one ink outline weight."
+    ],
+    "dont": [
+      "No soft shadows."
+    ]
+  },
+  "colour": [
+    {
+      "move": "tinted-neutral-canvas"
+    },
+    {
+      "move": "paper-edge"
+    }
+  ],
+  "moves": [
+    {
+      "move": "corner-radius"
+    },
+    {
+      "move": "caps-mono-labels"
+    },
+    {
+      "move": "highlight-word"
+    },
+    {
+      "move": "ruled-row-list"
+    },
+    {
+      "move": "outline-frame"
+    }
+  ],
+  "kit": {
+    "button-primary": {
+      "material": "hard-offset",
+      "state": [
+        "press-sink",
+        "state-signature"
+      ]
+    },
+    "chip": {
+      "material": "outlined",
+      "state": "ink-fill-selected"
+    }
+  },
+  "art": {
+    "hero": {
+      "kind": "svg",
+      "src": "art/hero.svg",
+      "fit": "cover",
+      "alt": "A ferry lamp on a dark harbour"
+    }
+  }
+}

@@ -1,0 +1,154 @@
+{
+ "rounds": [
+  {
+   "n": 1,
+   "date": "2026-11-06",
+   "by": "agent",
+   "summary": "First pass: dark room canvas, hairline frames, recessed trays, film-edge ticker, SVG contact sheet with grease-pencil circle.",
+   "changes": [
+    "Built from the template with 13 catalog moves and all 70 kit components mapped; no code-tier moves."
+   ],
+   "variants": [
+    {
+     "id": "r1a",
+     "change": "baseline: highlight band, primary nav-menu fill, art fit cover",
+     "verdict": "open"
+    }
+   ],
+   "notes": [
+    {
+     "id": "n1",
+     "target": "board.hero",
+     "text": "Headline highlight is a loud solid band that overlaps the line above.",
+     "status": "done",
+     "doneIn": 2
+    },
+    {
+     "id": "n2",
+     "target": "kit.nav-menu",
+     "text": "Nav menu rows are all solid primary, far over the 10% budget.",
+     "status": "done",
+     "doneIn": 2
+    },
+    {
+     "id": "n3",
+     "target": "board.hero",
+     "text": "Hero art is cropped: the grease-pencil circle is cut off at the left edge.",
+     "status": "done",
+     "doneIn": 2
+    },
+    {
+     "id": "n4",
+     "target": "board.hero",
+     "text": "Highlight word in primary on the dark canvas is low contrast with dark primaries (indigo). Try ink with a primary underline.",
+     "status": "done",
+     "doneIn": 3
+    }
+   ],
+   "shots": "shots/r1/"
+  },
+  {
+   "n": 2,
+   "date": "2026-11-06",
+   "by": "agent",
+   "summary": "Fixed the three loudest problems, one axis each.",
+   "changes": [
+    "Headline highlight: solid band replaced by a coloured word.",
+    "nav-menu material: flat primary fill to hairline outline with rule-selected.",
+    "art.hero fit: cover to contain so the whole contact sheet and circle show."
+   ],
+   "variants": [
+    {
+     "id": "r2a",
+     "change": "headline treatment: band to coloured word",
+     "verdict": "keep"
+    },
+    {
+     "id": "r2b",
+     "change": "material (nav-menu): flat-fill primary to outlined",
+     "verdict": "keep"
+    },
+    {
+     "id": "r2c",
+     "change": "art fit: cover to contain",
+     "verdict": "keep"
+    }
+   ],
+   "notes": [
+    {
+     "id": "n5",
+     "target": "general",
+     "text": "Studio review: this reads as a generic dark theme. The brief's strongest cue is the safelight, and there is no safelight anywhere. The room should feel lit by one red-amber lamp whatever the client's colour is: a fixed safelight cast on the canvas, rules and text, with the client primary kept for the picks (grease pencil) and the one main action.",
+     "status": "done",
+     "doneIn": 3
+    },
+    {
+     "id": "n6",
+     "target": "board.hero",
+     "text": "Studio review: the contact sheet is small and floats low on the right, below the headline. It should fill the art slot as the hero object, big enough that the film rebates, frame numbers and grease-pencil pick read at a glance.",
+     "status": "done",
+     "doneIn": 3
+    },
+    {
+     "id": "n7",
+     "target": "kit.card",
+     "text": "Studio review: the interface card and the frame-and-tray area lost the contact-sheet idea; they are plain hairline boxes. Surfaces that hold content should read as film frames (frame number, rebate edge) or recessed trays, as the core trick says.",
+     "status": "done",
+     "doneIn": 3
+    },
+    {
+     "id": "n8",
+     "target": "kit.switch",
+     "text": "Studio review: the Focus mode switch is nearly invisible on the dark canvas (dark outline on near-black).",
+     "status": "done",
+     "doneIn": 3
+    }
+   ],
+   "shots": "shots/r2/"
+  },
+  {
+   "n": 3,
+   "date": "2026-11-06",
+   "by": "agent",
+   "summary": "Studio notes n4-n8: fixed safelight cast, big contact-sheet hero, film-frame cells, visible switch, ink headline word with primary rule.",
+   "changes": [
+    "New code-tier file js/moves/darkroom.js with fixed-lamp-cast, film-frame and highlight-underline, because the catalog has no fixed lighting cast, no rebate-strip surface and no headline underline.",
+    "Safelight: fixed-lamp-cast tints canvas, ink, rules and muted text toward a fixed red-orange lamp with a soft wash on the board; client primary now only drives the picks and the main action.",
+    "Hero: layout poster to centered and art.hero redrawn as a 16:7 contact sheet (two rows of six numbered frames) so it fills the full-width slot.",
+    "card, panel, carousel-card and matrix-tile: recessed to film-frame (hairline frame with perforated rebate strips top and bottom); frame numbers come from catalogue-number.",
+    "switch: outlined to slug-switch with a primary slug when on.",
+    "Headline word: primary colour to ink, with a 6px primary underline.",
+    "Seen: n7 frame numbers appear on kit cells only; board cells carry rebate strips without numbers."
+   ],
+   "variants": [
+    {
+     "id": "r3a",
+     "change": "colour recipe: fixed lamp cast added",
+     "verdict": "keep"
+    },
+    {
+     "id": "r3b",
+     "change": "art slot: hero layout centered and 16:7 art",
+     "verdict": "keep"
+    },
+    {
+     "id": "r3c",
+     "change": "material (holding surfaces): recessed to film-frame",
+     "verdict": "keep"
+    },
+    {
+     "id": "r3d",
+     "change": "material (switch): outlined to slug-switch",
+     "verdict": "keep"
+    },
+    {
+     "id": "r3e",
+     "change": "headline treatment: ink word with primary underline",
+     "verdict": "keep"
+    }
+   ],
+   "notes": [],
+   "shots": "shots/r3/"
+  }
+ ]
+}

@@ -19,6 +19,8 @@ const fillOf = f => f === 'transparent' ? 'transparent' : `var(${ROLE_VAR[f] || 
 const raisedSh = (d, b) => d <= 0 ? 'none'
   : `${d}px ${d}px ${b}px var(--rl-lo), -${d}px -${d}px ${b}px var(--rl-hi), inset 0 1px 0 var(--rl-rim)`;
 const insetSh = (d, b) => `inset ${d}px ${d}px ${b}px var(--rl-lo), inset -${d}px -${d}px ${b}px var(--rl-hi)`;
+const inkOf = on => on ? ' color: var(--ab-ink);' : '';
+const rad = r => r < 0 ? '' : ` border-radius: ${r}px;`;
 const GLOSS = a => `linear-gradient(180deg, rgba(255,255,255,${a}), rgba(255,255,255,0) 55%)`;
 /* every selector of a list, with a pseudo-element appended */
 const pseudo = (sel, ps) => sel.split(',\n').map(s => s + ps).join(',\n');
@@ -28,7 +30,7 @@ const kitOnly = sel => sel.split(',\n').filter(s => s.includes('.sb-kit')).join(
 /* ---------------- tokens ---------------- */
 
 registerMove({
-  id: 'canvas-ink-pull', category: 'colour', tier: 'recipe',
+  id: 'canvas-ink-pull', libraryId: 'tinted-neutral-canvas', what: 'Mixes a small share of ink into the canvas so every surface sits a touch off the page colour, with separate amounts for light and dark.', category: 'colour', tier: 'recipe',
   params: {
     light: num(0.06, [0, 0.3]),   // share of ink mixed into the canvas, light mode
     dark:  num(0.04, [0, 0.3]),   // same, dark mode
@@ -37,7 +39,7 @@ registerMove({
 });
 
 registerMove({
-  id: 'relief-pair', category: 'colour', tier: 'generator',
+  id: 'relief-pair', libraryId: 'raised-relief', what: 'Derives the shared highlight, shadow, rim and gloss tones from the canvas that every raised, recessed and glossy surface uses.', category: 'colour', tier: 'generator',
   params: {
     hiLight:   num(0.79, [0, 1]),   // highlight alpha (white), light mode
     hiDark:    num(0.11, [0, 1]),   // highlight alpha, dark mode
@@ -60,7 +62,7 @@ registerMove({
 });
 
 registerMove({
-  id: 'muted-contrast-floor', category: 'colour', tier: 'generator',
+  id: 'muted-contrast-floor', libraryId: 'fw-contrast-fit', what: 'Pushes the muted text colour toward ink until it holds a contrast ratio on the canvas and the lifted panel, and sets the on-rim colour.', category: 'colour', tier: 'generator',
   params: {
     min:     num(4.6, [3, 7]),       // contrast ratio to hold
     onRim:   num(0.45, [0, 1]),      // primary pushed this far toward ink for the "on" rim
@@ -79,7 +81,7 @@ registerMove({
 /* ---------------- recipes (css moves) ---------------- */
 
 registerMove({
-  id: 'tracked-micro-labels', category: 'type', tier: 'recipe',
+  id: 'tracked-micro-labels', libraryId: 'kicker-treatment', what: 'Sets the letter-spacing of tags, kickers and footers in em.', category: 'type', tier: 'recipe',
   params: { tag: num(0.14, [0, 0.4]), kicker: num(0.17, [0, 0.4]), foot: num(0.02, [0, 0.2]) },   // em
   css(S, p) {
     return `${S} .ab-tag { letter-spacing: ${p.tag}em; }
@@ -89,7 +91,7 @@ ${S} .ab-foot { font-size: 11px; letter-spacing: ${p.foot}em; }`;
 });
 
 registerMove({
-  id: 'display-weight', category: 'type', tier: 'recipe',
+  id: 'display-weight', libraryId: 'display-weight-scale', what: 'Sets the weight and word spacing of the headline, brand and card titles.', category: 'type', tier: 'recipe',
   params: {
     headline: num(600, [100, 900]), brand: num(600, [100, 900]), cardTitle: num(500, [100, 900]),
     wordSpacing: num(0.04, [0, 0.3]),
@@ -103,7 +105,7 @@ ${S} .ab-sw-role { font-weight: 600; }`;
 });
 
 registerMove({
-  id: 'recessed-groups', category: 'structure', tier: 'generator',
+  id: 'recessed-groups', libraryId: 'recessed', what: 'Presses lists, state rows, segmented tracks and bars into the canvas with inset relief shadows.', category: 'structure', tier: 'generator',
   params: {
     distance: num(6, [1, 14]), blur: num(13, [2, 30]),
     smallDistance: num(3, [1, 8]), smallBlur: num(6, [1, 16]),
@@ -131,7 +133,7 @@ ${S}.sb-ab.sb-kit .ab-row.sb-k-row { background: none; box-shadow: none; }
 });
 
 registerMove({
-  id: 'socketed-swatch', category: 'structure', tier: 'generator',
+  id: 'socketed-swatch', libraryId: 'recessed', what: 'Seats each palette swatch in an inset socket with a raised pad inside it.', category: 'structure', tier: 'generator',
   params: {
     socketRadius: num(14, [0, 30]), padInset: num(5, [2, 12]), padRadius: num(9, [0, 24]),
     smallDistance: num(3, [1, 8]), smallBlur: num(6, [1, 16]),
@@ -150,7 +152,7 @@ ${S} .ab-swatch[data-role="canvas"] .ab-chip::after { box-shadow: ${raisedSh(p.s
 });
 
 registerMove({
-  id: 'material-discs', category: 'structure', tier: 'generator',
+  id: 'material-discs', libraryId: 'material-specimen-slide', what: 'Renders the three material specimen discs (raised, recessed, glass) on the board and deck.', category: 'structure', tier: 'generator',
   params: {
     first:  { kind: 'enum', default: 'raised', options: ['raised', 'recessed', 'glass'] },
     second: { kind: 'enum', default: 'recessed', options: ['raised', 'recessed', 'glass'] },
@@ -178,7 +180,7 @@ ${p.third === 'glass' ? rim : ''}
 });
 
 registerMove({
-  id: 'brand-mark-key', category: 'structure', tier: 'recipe',
+  id: 'brand-mark-key', libraryId: 'brand-mark', what: 'Turns the brand mark into a raised key with a primary dot.', category: 'structure', tier: 'recipe',
   params: { size: num(30, [16, 56]), radius: num(10, [0, 28]), dot: num(14, [6, 30]), distance: num(3, [1, 8]), blur: num(7, [1, 16]) },
   css(S, p) {
     const o = Math.round((p.size - p.dot) / 2);
@@ -190,7 +192,7 @@ ${S} .ab-mark::after { content: ""; position: absolute; left: ${o}px; top: ${o}p
 });
 
 registerMove({
-  id: 'inline-fit-tags', category: 'structure', tier: 'recipe',
+  id: 'inline-fit-tags', libraryId: 'status-marker', what: 'Shows fit tags as a dot plus text with no pill, and sets the deck material label type.', category: 'structure', tier: 'recipe',
   params: { dot: num(6, [3, 12]) },
   css(S, p) {
     return `${S} .ab-type-col { border-top-color: transparent; box-shadow: inset 0 1px 0 color-mix(in srgb, var(--ab-line) 70%, transparent); }
@@ -203,7 +205,7 @@ ${S}.ab-slide .ab-deck-mat .ab-label { font-family: var(--ab-font-h); font-size:
 });
 
 registerMove({
-  id: 'media-fallbacks', category: 'a11y', tier: 'recipe',
+  id: 'media-fallbacks', libraryId: 'fw-a11y-media-fallbacks', what: 'Adds reduced-transparency, more-contrast and reduced-motion fallbacks for the glass and relief surfaces.', category: 'a11y', tier: 'recipe',
   params: { ring: { kind: 'bool', default: true } },
   css(S, p, ctx) {
     return `@media (prefers-reduced-transparency: reduce) { ${S} .ab-card::before { display: none; } }
@@ -213,84 +215,71 @@ registerMove({
 });
 
 registerMove({
-  id: 'kit-cell-frame--soft', category: 'structure', tier: 'generator',   // duplicate: would merge into the shared kit-cell-frame
-  params: {
-    distance: num(5, [0, 14]), blur: num(12, [0, 30]), radius: num(22, [0, 40]),
-    smallDistance: num(3, [1, 8]), smallBlur: num(6, [1, 16]),
-  },
-  css(S, p) {
-    const K = `${S}.sb-ab.sb-kit`;
-    return `${K} :is(.sb-k-cell, .sb-k-layout, .sb-k-tabbarbox) { border: 0; border-radius: ${p.radius}px; background: var(--ab-canvas); box-shadow: ${raisedSh(p.distance, p.blur)}; }
-${K} .sb-k-tabbarbox .sb-tabs { box-shadow: none; background: none; border: 0; }
-${K} .sb-k-tabs { gap: 4px; padding: 5px; border: 0; border-radius: 16px; background: var(--ab-canvas); box-shadow: ${insetSh(p.smallDistance, p.smallBlur)}; }
-${K} .sb-k-tabs [role="tab"] { border-radius: 11px; padding-left: 14px; padding-right: 14px; border: 0; }
-${K} .sb-k-tabs [role="tab"][aria-selected="true"] { background: var(--ab-canvas); box-shadow: ${raisedSh(p.smallDistance, p.smallBlur + 1)}; }
-${K} .sb-k-tabs [role="tab"][aria-selected="true"]::after { content: none; }
-${K} .sb-k-ph { border-radius: 14px; background: var(--ab-canvas); box-shadow: ${insetSh(2, 5)}; }
-${K} .sb-k-ico { border-radius: 10px; background: var(--ab-canvas); box-shadow: ${raisedSh(2, 5)}; }
-${K} .sb-k-menu li[aria-selected="true"], ${K} .sb-k-listbox { background: var(--ab-canvas); box-shadow: ${insetSh(p.smallDistance, p.smallBlur)}; }
-${K} .sb-k-dots i { border-radius: 50%; background: var(--ab-canvas); box-shadow: ${insetSh(2, 5)}; }
-${K} .sb-k-dots i.is-on { background: ${GLOSS(0.2)}, var(--ab-primary); box-shadow: 1px 1px 3px var(--rl-lo); }`;
-  },
-});
-
-/* ---------------- materials ---------------- */
-
-registerMove({
-  id: 'raised-relief', category: 'material', tier: 'generator',
+  id: 'raised-relief', libraryId: 'raised-relief', what: 'Material: the canvas colour with a paired dark and light shadow so the part looks lifted.', category: 'material', tier: 'generator',
   params: {
     distance: num(6, [0, 14]),   // 0 = flat (no shadow)
     blur:     num(13, [0, 30]),
     fill:     { kind: 'enum', default: 'canvas', options: FILLS },
+    radius:   num(-1, [-1, 999]),   // px corner radius, -1 = leave the component's own
+    ink:      { kind: 'bool', default: false },   // true: force the text colour to ink (parts that were light-on-dark)
   },
   material: {
     name: 'raised-relief',
     css(S, sel, p) {
       const colour = p.fill === 'canvas' || p.fill === 'transparent' ? '' : ` color: var(${ON_VAR[p.fill]});`;
-      return `${sel} { background: ${fillOf(p.fill)};${colour} border-color: transparent; box-shadow: ${raisedSh(p.distance, p.blur)}; }`;
+      return `${sel} { background: ${fillOf(p.fill)};${colour} border-color: transparent; box-shadow: ${raisedSh(p.distance, p.blur)};${rad(p.radius)}${inkOf(p.ink && !colour)} }`;
     },
   },
 });
 
 registerMove({
-  id: 'recessed', category: 'material', tier: 'generator',
+  id: 'recessed', libraryId: 'recessed', what: 'Material: the canvas colour with an inset shadow pair so the part looks pressed in, with an optional ink ring.', category: 'material', tier: 'generator',
   params: {
     distance: num(4, [0, 14]),
     blur:     num(9, [0, 30]),
     ring:     num(0, [0, 60]),   // % ink ring keeping an empty socket findable (0 = none)
+    radius:   num(-1, [-1, 999]),   // px corner radius, -1 = leave the component's own
+    ink:      { kind: 'bool', default: false },   // true: force the text colour to ink (parts that were light-on-dark)
+    still:    { kind: 'bool', default: false },   // true: stop shimmer animations and drop their overlay (placeholders)
   },
   material: {
     name: 'recessed',
     css(S, sel, p) {
       const ring = p.ring ? `, inset 0 0 0 1px color-mix(in srgb, var(--ab-ink) ${p.ring}%, transparent)` : '';
-      return `${sel} { background: var(--ab-canvas); border-color: transparent; box-shadow: ${insetSh(p.distance, p.blur)}${ring}; }`;
+      const still = p.still ? `\n${sel} { animation: none; }\n${pseudo(sel, '::after')} { content: none; }` : '';
+      return `${sel} { background: var(--ab-canvas); border-color: transparent; box-shadow: ${insetSh(p.distance, p.blur)}${ring};${rad(p.radius)}${inkOf(p.ink)} }${still}`;
     },
   },
 });
 
 registerMove({
-  id: 'glossy', category: 'material', tier: 'generator',
+  id: 'glossy', libraryId: 'glossy', what: 'Material: a solid role colour with a white gloss wash, a faint rim and a soft drop shadow.', category: 'material', tier: 'generator',
   params: {
     fill:  { kind: 'enum', default: 'primary', options: ['primary', 'secondary', 'accent', 'ink'] },
     gloss: num(0.2, [0, 0.6]),
     x: num(3, [0, 10]), y: num(5, [0, 12]), blur: num(9, [0, 24]),
+    radius: num(-1, [-1, 999]),   // px corner radius, -1 = leave the component's own
   },
   material: {
     name: 'glossy',
     css(S, sel, p) {
       return `${sel} { background: ${GLOSS(p.gloss)}, ${fillOf(p.fill)}; color: var(${ON_VAR[p.fill]}); border: 1px solid rgba(255,255,255,0.27);
-  box-shadow: inset 0 1px 1px rgba(255,255,255,0.44), ${p.x}px ${p.y}px ${p.blur}px var(--rl-lo); }`;
+  box-shadow: inset 0 1px 1px rgba(255,255,255,0.44), ${p.x}px ${p.y}px ${p.blur}px var(--rl-lo);${rad(p.radius)} }`;
     },
   },
 });
 
 registerMove({
-  id: 'clear-glass', category: 'material', tier: 'generator',
+  id: 'clear-glass', libraryId: 'clear-glass', what: 'Material: see-through panel with a gradient rim, two corner tints and light edges; no blur. Rim and tint colours are params.', category: 'material', tier: 'generator',
   params: {
     ring:   num(1.5, [0, 4]),                       // px iridescent rim
     gloss:  { kind: 'bool', default: true },
-    tintA:  { kind: 'colour', default: 'rgba(214,189,255,0.24)' },   // corner tints (top right)
-    tintB:  { kind: 'colour', default: 'rgba(164,230,232,0.24)' },   // (bottom left)
+    tintA:  { kind: 'colour', default: 'rgba(200,200,200,0.24)' },   // corner tints (top right)
+    tintB:  { kind: 'colour', default: 'rgba(200,200,200,0.24)' },   // (bottom left)
+    // the rim gradient, 125deg, six stops at 0 / 28 / 45 / 64 / 79 / 100%
+    rim1: { kind: 'colour', default: '#ffffffdd' }, rim2: { kind: 'colour', default: '#ffffff55' },
+    rim3: { kind: 'colour', default: '#cfcfcfaa' }, rim4: { kind: 'colour', default: '#bdbdbdcc' },
+    rim5: { kind: 'colour', default: '#d9d9d9cc' }, rim6: { kind: 'colour', default: '#ffffffaa' },
     distance: num(6, [0, 14]), blur: num(20, [0, 40]),
   },
   material: {
@@ -299,7 +288,7 @@ registerMove({
     css(S, sel, p) {
       return `${sel} { position: relative; isolation: isolate; border: ${p.ring}px solid transparent;
   background: ${p.gloss ? 'linear-gradient(135deg, var(--rl-gloss), transparent 48%) padding-box, ' : ''}linear-gradient(var(--ab-canvas), var(--ab-canvas)) padding-box,
-    linear-gradient(125deg, #ffffffdd 0%, #ffffff55 28%, #b6dce7aa 45%, #d6b9edcc 64%, #efcfbbcc 79%, #ffffffaa) border-box;
+    linear-gradient(125deg, ${p.rim1} 0%, ${p.rim2} 28%, ${p.rim3} 45%, ${p.rim4} 64%, ${p.rim5} 79%, ${p.rim6}) border-box;
   box-shadow: inset 1px 1px 2px rgba(255,255,255,0.5), inset -1px -1px 2px rgba(255,255,255,0.15), ${p.distance}px ${Math.round(p.distance * 1.5)}px ${p.blur}px var(--rl-lo), -4px -4px 12px var(--rl-hi); }
 ${pseudo(sel, '::before')} { content: ""; position: absolute; inset: 0; z-index: -1; border-radius: inherit; pointer-events: none;
   background: radial-gradient(ellipse at 100% 0%, ${p.tintA}, transparent 45%), radial-gradient(ellipse at 0% 100%, ${p.tintB}, transparent 48%); }`;
@@ -308,7 +297,7 @@ ${pseudo(sel, '::before')} { content: ""; position: absolute; inset: 0; z-index:
 });
 
 registerMove({
-  id: 'knob-switch', category: 'material', tier: 'generator',
+  id: 'knob-switch', libraryId: 'switch-form', what: 'Material: switch with a recessed track and a lit knob that takes a role colour when on.', category: 'material', tier: 'generator',
   params: {
     distance: num(3, [0, 8]), blur: num(6, [0, 16]),
     off: { kind: 'enum', default: 'muted', options: ['muted', 'line', 'ink'] },
@@ -328,7 +317,7 @@ ${checked}::before { background: ${knob(p.on)}; box-shadow: inset 0 0 0 1.5px va
 });
 
 registerMove({
-  id: 'recessed-track-range', category: 'material', tier: 'generator',
+  id: 'recessed-track-range', libraryId: null, what: 'Material: range slider with a recessed track filled in ink and a raised round thumb.', category: 'material', tier: 'generator',
   params: {
     track: num(8, [3, 16]), thumb: num(24, [12, 40]), fillAlpha: num(0.55, [0.1, 1]),
     distance: num(2, [0, 8]), blur: num(5, [0, 16]),
@@ -348,10 +337,63 @@ ${pseudo(sel, '::-moz-range-thumb')} { ${thumb} }`;
   },
 });
 
+registerMove({
+  id: 'edge-cast', libraryId: null, what: 'Material: a canvas-coloured panel docked to one edge that throws a long soft shadow away from that edge, rounded on its free corners.', category: 'material', tier: 'generator',
+  params: {
+    edge: { kind: 'enum', default: 'left', options: ['left', 'right', 'top', 'bottom'] },   // the edge the panel is docked to
+    radius: num(22, [0, 40]), blur: num(24, [0, 50]), spread: num(-12, [-30, 0]), reach: num(8, [0, 20]),
+  },
+  material: {
+    name: 'edge-cast',
+    css(S, sel, p) {
+      const v = { left: [8, 0], right: [-8, 0], top: [0, -8], bottom: [0, 8] }[p.edge].map(n => n && Math.sign(n) * p.reach);
+      const r = p.radius, rr = { left: `0 ${r}px ${r}px 0`, right: `${r}px 0 0 ${r}px`, top: `0 0 ${r}px ${r}px`, bottom: `${r}px ${r}px 0 0` }[p.edge];
+      return `${sel} { background: var(--ab-canvas); border-color: transparent; border-radius: ${rr}; box-shadow: ${v[0]}px ${v[1]}px ${p.blur}px ${p.spread}px var(--rl-lo); }`;
+    },
+  },
+});
+
+registerMove({
+  id: 'ink-scrim', libraryId: null, what: 'Material: a dimming layer that tints the page with a share of ink and optionally blurs what is behind it.', category: 'material', tier: 'recipe',
+  params: { amount: num(24, [0, 80]), blur: num(3, [0, 16]) },   // % ink, px blur
+  material: {
+    name: 'ink-scrim',
+    css(S, sel, p) {
+      return `${sel} { background: color-mix(in srgb, var(--ab-ink) ${p.amount}%, transparent); ${p.blur ? `backdrop-filter: blur(${p.blur}px);` : 'backdrop-filter: none;'} }
+@media (prefers-reduced-transparency: reduce) { ${sel} { backdrop-filter: none; } }`;
+    },
+  },
+});
+
+registerMove({
+  id: 'lamp-label', libraryId: 'status-marker', what: 'Material: a small label that starts with a recessed round lamp dot, in the canvas colour.', category: 'material', tier: 'recipe',
+  params: { dot: num(8, [4, 16]), gap: num(9, [2, 16]), tracking: num(0.14, [0, 0.4]), distance: num(1, [0, 4]), blur: num(2, [0, 8]) },
+  material: {
+    name: 'lamp-label',
+    css(S, sel, p) {
+      return `${sel} { display: inline-flex; align-items: center; gap: ${p.gap}px; letter-spacing: ${p.tracking}em; }
+${pseudo(sel, '::before')} { content: ""; flex: none; width: ${p.dot}px; height: ${p.dot}px; border-radius: 50%; background: var(--ab-canvas); box-shadow: ${insetSh(p.distance, p.blur)}; }`;
+    },
+  },
+});
+
+registerMove({
+  id: 'arc-ring', libraryId: null, what: 'Material: a loading ring: a raised, faint track with one ink arc that turns.', category: 'material', tier: 'recipe',
+  params: { width: num(5, [2, 10]), arc: num(55, [10, 100]), track: num(10, [0, 50]), distance: num(2, [0, 6]), blur: num(5, [0, 12]) },   // % ink for the arc and the track
+  material: {
+    name: 'arc-ring',
+    css(S, sel, p) {
+      return `${sel} { background: none; -webkit-mask: none; mask: none; border: ${p.width}px solid color-mix(in srgb, var(--ab-ink) ${p.track}%, var(--ab-canvas));
+  border-top-color: color-mix(in srgb, var(--ab-ink) ${p.arc}%, var(--ab-canvas)); border-radius: 50%; box-shadow: ${raisedSh(p.distance, p.blur).replace(/, inset[^,]*$/, '')}; }
+@media (prefers-reduced-motion: reduce) { ${sel} { animation: none; } }`;
+    },
+  },
+});
+
 /* ---------------- states ---------------- */
 
 registerMove({
-  id: 'state-signature', category: 'state', tier: 'recipe',
+  id: 'state-signature', libraryId: 'state-signature', what: 'State: a pressed control sinks, scales down and swaps its shadow to inset.', category: 'state', tier: 'recipe',
   params: {
     lift:  num(1, [0, 4]),        // px the part drops while pressed
     scale: num(0.99, [0.9, 1]),
@@ -373,7 +415,7 @@ ${ctx.ON.press(sel)} { transform: translateY(${p.lift}px) scale(${p.scale});${sh
 });
 
 registerMove({
-  id: 'selected-ink-relief', category: 'state', tier: 'recipe',
+  id: 'selected-ink-relief', libraryId: 'ink-filled-selected', what: 'State: the selected item fills with ink and flips its text to the canvas colour.', category: 'state', tier: 'recipe',
   params: { weight: num(500, [300, 800]), radius: num(9, [0, 24]) },
   state: {
     name: 'selected-ink-relief',
@@ -385,7 +427,7 @@ ${ctx.ON.selected(sel)} { background: var(--ab-ink); color: var(--ab-canvas); fo
 });
 
 registerMove({
-  id: 'selected-sink', category: 'state', tier: 'recipe',
+  id: 'selected-sink', libraryId: null, what: 'State: the selected item is pressed into the canvas with an inset shadow.', category: 'state', tier: 'recipe',
   params: { distance: num(3, [0, 8]), blur: num(6, [0, 16]) },
   state: {
     name: 'selected-sink',
@@ -396,7 +438,7 @@ registerMove({
 });
 
 registerMove({
-  id: 'checked-glossy', category: 'state', tier: 'recipe',
+  id: 'checked-glossy', libraryId: 'glossy', what: 'State: a checked control fills with the primary and a gloss wash.', category: 'state', tier: 'recipe',
   params: { gloss: num(0.2, [0, 0.6]) },
   state: {
     name: 'checked-glossy',
@@ -408,20 +450,7 @@ registerMove({
 });
 
 registerMove({
-  id: 'focus-ring--soft', category: 'state', tier: 'recipe',   // duplicate: would merge into the shared focus-ring
-  params: { recess: { kind: 'bool', default: true }, ring: num(3, [0, 8]), tint: num(22, [0, 60]) },
-  state: {
-    name: 'focus-ring--soft',
-    css(S, sel, p, ctx) {
-      const keep = p.recess ? `${insetSh(2, 5)}, ` : '';
-      return `${ctx.ON.focus(sel)}, :is(.sb-k-field, .sb-k-search).is-focus ${sel.split(',\n')[0]} { border-color: var(--ab-primary-text) !important;
-  box-shadow: ${keep}0 0 0 ${p.ring}px color-mix(in srgb, var(--ab-primary) ${p.tint}%, transparent) !important; outline: none; }`;
-    },
-  },
-});
-
-registerMove({
-  id: 'app-raised', category: 'state', tier: 'recipe',
+  id: 'app-raised', libraryId: 'kit-component-map', what: 'State: in the Built kit only, replaces a board look such as glass with plain raised relief.', category: 'state', tier: 'recipe',
   params: { distance: num(5, [0, 14]), blur: num(12, [0, 30]), radius: num(22, [0, 40]) },
   state: {
     // In the Built kit / phone screens only: swap a board-only look (e.g. glass) for plain raised relief.
@@ -431,6 +460,23 @@ registerMove({
       if (!k) return '';
       return `${k} { border: 0 !important; border-radius: ${p.radius}px; background: var(--ab-canvas) !important; box-shadow: ${raisedSh(p.distance, p.blur)} !important; }
 ${pseudo(k, '::before')}, ${pseudo(k, '::after')} { content: none; }`;
+    },
+  },
+});
+registerMove({
+  id: 'marked-relief', libraryId: 'state-signature', what: 'State: the current, open or active item (aria-current, aria-expanded, open, .is-on) sinks into the canvas, rises, or fills with ink.', category: 'state', tier: 'recipe',
+  params: {
+    look: { kind: 'enum', default: 'sink', options: ['sink', 'raise', 'ink'] },
+    distance: num(3, [0, 8]), blur: num(6, [0, 16]), weight: num(600, [300, 800]),
+  },
+  state: {
+    name: 'marked-relief',
+    css(S, sel, p) {
+      const m = `:is(${sel}):is([aria-current]:not([aria-current="false"]), [aria-expanded="true"], [open], .is-on, .is-sel, .is-open, .is-picked)`;
+      const look = p.look === 'ink' ? `background: var(--ab-ink); color: var(--ab-canvas); box-shadow: 2px 3px 5px var(--rl-lo);`
+        : p.look === 'raise' ? `background: var(--ab-canvas); box-shadow: ${raisedSh(p.distance, p.blur)};`
+        : `background: var(--ab-canvas); box-shadow: ${insetSh(p.distance, p.blur)};`;
+      return `${m} { ${look} font-weight: ${p.weight}; }`;
     },
   },
 });

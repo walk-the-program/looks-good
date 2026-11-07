@@ -60,7 +60,7 @@ const STASH = new WeakMap();
 
 /* primary-reprint: the printed primary pushed to a chosen saturation, lightness by hue band; a muted one falls back. */
 registerMove({
-  id: 'primary-reprint', category: 'colour', tier: 'generator',
+  id: 'primary-reprint', libraryId: 'primary-reprint', what: 'Re-prints the primary at a chosen saturation with lightness set by hue band; a muted primary falls back to a fixed lime.', category: 'colour', tier: 'generator',
   params: {
     saturation: num(100, [0, 100]),
     bandFrom: num(52, [0, 360]), bandTo: num(170, [0, 360]), band2To: num(285, [0, 360]),
@@ -82,7 +82,7 @@ registerMove({
 
 /* equal-luminance-clash: partner colour for the printed primary (OKLCH search, gamut bisection, dull-hue rejection). */
 registerMove({
-  id: 'equal-luminance-clash', category: 'colour', tier: 'generator',
+  id: 'equal-luminance-clash', libraryId: 'equal-luminance-clash', what: 'Computes a partner colour at near-equal luminance to the primary so the two vibrate edge to edge.', category: 'colour', tier: 'generator',
   params: {
     offset: num(165, [60, 300]),            // hue turn for the equal-luminance search
     chromaFloor: num(0.10, [0, 0.3]),       // first pick must hold this chroma
@@ -132,7 +132,7 @@ registerMove({
 
 /* pair-colour-tints: alpha tints of both, a readable lift of pair-a on tinted rows (dark), foreground picks per mode. */
 registerMove({
-  id: 'pair-colour-tints', category: 'colour', tier: 'token',
+  id: 'pair-colour-tints', libraryId: 'role-tint-fill', what: 'Derives tinted fills, text and shadow colours from the vibrating pair.', category: 'colour', tier: 'token',
   params: { tint: num(0.12, [0, 0.5]), liftTo: num(5, [3, 8]) },
   tokens(t, p) {
     const st = STASH.get(t) || { a: t.printPrimary || t.primary, b: t.accent };
@@ -148,7 +148,7 @@ registerMove({
 
 /* skyline-bars: an export-safe data-URI bar skyline in the pair, as a token. */
 registerMove({
-  id: 'skyline-bars', category: 'colour', tier: 'generator',
+  id: 'skyline-bars', libraryId: 'colour-bar-strip', what: 'Builds a skyline bar strip in the pair colours for strips and meters.', category: 'colour', tier: 'generator',
   params: { bars: num(10, [4, 20]), width: num(4, [1, 10]), step: num(6, [2, 14]), height: num(14, [6, 40]) },
   tokens(t, p) {
     const heights = [0.55, 0.9, 0.7, 1, 0.45, 0.8, 0.6, 0.95, 0.5, 0.75];
@@ -166,7 +166,7 @@ registerMove({
 /* ================= STRUCTURE / RECIPES ================= */
 
 registerMove({
-  id: 'line-grid', category: 'structure', tier: 'recipe',
+  id: 'line-grid', libraryId: 'line-grid', what: 'Draws a faint 12-column grid under the layout.', category: 'structure', tier: 'recipe',
   params: { columns: num(12, [2, 24]), darkPct: num(4.5, [0, 20]), lightPct: num(6.5, [0, 20]), kitToo: bool(true) },
   css(S, p) {
     const g = pct => `linear-gradient(90deg, color-mix(in srgb, var(--ab-ink) ${pct}%, transparent) 1px, transparent 1px) 0 0 / calc(100% / ${p.columns}) 100%, linear-gradient(270deg, color-mix(in srgb, var(--ab-ink) ${pct}%, transparent) 1px, transparent 1px)`;
@@ -177,7 +177,7 @@ ${S}.sb-screen::before { content: none; }`;
 });
 
 registerMove({
-  id: 'ticker-strip', category: 'structure', tier: 'recipe',
+  id: 'ticker-strip', libraryId: 'info-strip', what: 'Prints repeating ticker text along the board edges and divider rules in the pair colours.', category: 'structure', tier: 'recipe',
   params: {
     top: txt(''), bottom: txt(''), rule: txt(''),   // rule: text printed along every divider rule
     topFill: en('pair-b', ['pair-a', 'pair-b', 'ink']), bottomFill: en('pair-a', ['pair-a', 'pair-b', 'ink']),
@@ -200,7 +200,7 @@ ${S} .ab-dot { border-radius: 0; width: 9px; height: 9px; background: var(--ab-p
 });
 
 registerMove({
-  id: 'solid-mark-header', category: 'structure', tier: 'recipe',
+  id: 'solid-mark-header', libraryId: 'brand-mark', what: 'Sets the header as a solid mark with a hard offset shadow and an ink tag chip.', category: 'structure', tier: 'recipe',
   params: { stretch: num(1.28, [1, 2]), offset: num(3, [0, 8]) },
   css(S, p) {
     return `${S} { border-radius: 0; }
@@ -213,16 +213,7 @@ ${S} .ab-tag b { color: inherit; font-weight: 700; }`;
 });
 
 registerMove({
-  id: 'section-number-marker--acid', category: 'structure', tier: 'recipe',   // duplicate: merges into shared section-number-marker
-  params: { fill: en('pair-a', COLS) },
-  css(S, p) {
-    return `${S} .ab-n { display: inline-block; margin-right: 8px; padding: 0 6px; background: ${COL[p.fill]}; color: ${ON[p.fill]}; }
-${S} .ab-n::after { content: none; }`;
-  },
-});
-
-registerMove({
-  id: 'stretched-section-title', category: 'type', tier: 'recipe',
+  id: 'stretched-section-title', libraryId: 'warped-display-headline', what: 'Stretches section titles vertically with an offset echo.', category: 'type', tier: 'recipe',
   params: { weight: num(800, [400, 900]), stretch: num(1.28, [1, 2]), echo: num(0.05, [0, 0.12]), minPx: num(20, [12, 40]), maxPx: num(32, [16, 64]), vw: num(2.8, [1, 6]) },
   css(S, p) {
     const e = p.echo;
@@ -237,7 +228,7 @@ ${S}.sb-kit .ab-labelrow { border-bottom: 0; }`;
 });
 
 registerMove({
-  id: 'full-bleed-hero-field', category: 'colour', tier: 'recipe',
+  id: 'full-bleed-hero-field', libraryId: 'flat-colour-planes', what: 'Fills the hero with a full-bleed pair-coloured field in the chosen mode.', category: 'colour', tier: 'recipe',
   params: { mode: en('light', ['light', 'dark', 'both']), kicker: en('pair-b', ['pair-a', 'pair-b', 'ink']) },
   css(S, p) {
     const sels = p.mode === 'both' ? [S] : [`${S}[data-mode="${p.mode}"]`];
@@ -249,7 +240,7 @@ ${m} .ab-kicker { background: var(--ab-ink); color: var(--ab-canvas); }`;
 });
 
 registerMove({
-  id: 'pair-readout-block', category: 'structure', tier: 'recipe',
+  id: 'pair-readout-block', libraryId: 'micro-caption', what: 'Prints a small readout of the two pair colours on the palette strips.', category: 'structure', tier: 'recipe',
   params: { title: txt('PAIR'), labelA: txt('A'), labelB: txt('B'), deltaLabel: txt('Δ LUMINANCE'), minHeight: num(110, [60, 220]), weight: num(1, [1, 1]) },
   tokens(t, p, ctx) { return {}; },
   css(S, p) {
@@ -266,7 +257,7 @@ ${S} .ab-sw-role { font-family: ${MONO}; font-size: 12px; font-weight: 700; lett
 });
 
 registerMove({
-  id: 'bill-type-list', category: 'type', tier: 'recipe',
+  id: 'bill-type-list', libraryId: 'ruled-row-list', what: 'Sets the type specimen as a ruled bill-style list.', category: 'type', tier: 'recipe',
   params: { prefix: txt('b2b '), mark: txt('✱ '), fitSquare: bool(true) },
   css(S, p) {
     const esc = s => String(s).replace(/"/g, '\\"');
@@ -294,7 +285,7 @@ ${S} .ab-type-k { color: var(--ab-ink); font-weight: 700; letter-spacing: 0.14em
 });
 
 registerMove({
-  id: 'big-numeral-rows', category: 'type', tier: 'recipe',
+  id: 'big-numeral-rows', libraryId: 'big-numeral-rows', what: 'Lists rows with large stretched numerals, a heavy top rule and a mono readout.', category: 'type', tier: 'recipe',
   params: { weight: num(800, [400, 900]), listRule: num(3, [0, 8]) },
   css(S, p) {
     return `${S} .ab-list { border-top: ${p.listRule}px solid var(--ab-ink); }
@@ -311,7 +302,7 @@ ${S} .ab-deck-prod .ab-row-bar { grid-column: 2 / -1; grid-row: 2; }
 });
 
 registerMove({
-  id: 'stretched-display-numerals', category: 'type', tier: 'recipe',
+  id: 'stretched-display-numerals', libraryId: 'warped-display-headline', what: 'Stretches kit card titles and big stat numerals vertically.', category: 'type', tier: 'recipe',
   params: { titleStretch: num(1.5, [1, 2]), numStretch: num(1.28, [1, 2]), echo: num(0.05, [0, 0.12]) },
   css(S, p) {
     return `${S}.sb-ab .ab-card-title.sb-title { text-transform: uppercase; transform: scaleY(${p.titleStretch}); transform-origin: 0 100%; letter-spacing: -0.01em; text-shadow: ${p.echo}em ${p.echo}em 0 var(--ab-primary), ${p.echo * 2}em ${p.echo * 2}em 0 var(--ab-pair-b); }
@@ -322,36 +313,7 @@ ${S}.sb-ab .sb-main { background-image: linear-gradient(90deg, color-mix(in srgb
 });
 
 registerMove({
-  id: 'kit-cell-frame--acid', category: 'structure', tier: 'recipe',   // duplicate: merges into shared kit-cell-frame
-  params: { stub: en('pair-a', COLS), offset: num(4, [0, 10]), prefix: txt('N°'), nameStretch: num(1.22, [1, 2]) },
-  css(S, p) {
-    const K = `${S}.sb-ab.sb-kit`;
-    return `${K} .sb-kitpage { counter-reset: mvcell; }
-${K} .sb-k-cell { counter-increment: mvcell; position: relative; border: 2px solid var(--ab-ink); border-radius: 0; background: var(--ab-canvas); box-shadow: ${p.offset}px ${p.offset}px 0 var(--ab-pair-b); padding-top: 26px; }
-${K} .sb-k-cell::before { content: "${p.prefix}" counter(mvcell, decimal-leading-zero); position: absolute; top: 0; left: 0; right: 0; height: 18px; padding: 0 10px; background: ${COL[p.stub]}; color: ${ON[p.stub]}; font: 700 10px/18px ${MONO}; letter-spacing: 0.14em; }
-${K} .sb-k-name { display: inline-block; font-family: var(--ab-font-h); font-weight: 800; text-transform: uppercase; letter-spacing: 0.01em; transform: scaleY(${p.nameStretch}); transform-origin: 0 70%; }
-${K} .sb-k-use { font-family: ${MONO}; font-size: 12px; color: var(--ab-pair-fg2, var(--ab-muted)); }
-${K} :is(.sb-k-ios-tag, .sb-k-web-tag) { border-radius: 0; border: 2px solid var(--ab-ink); padding: 1px 7px; font: 700 10px/1.4 ${MONO}; letter-spacing: 0.12em; text-transform: uppercase; }
-${K} .sb-k-ios[data-ios="native"] .sb-k-ios-tag { background: var(--ab-ink); color: var(--ab-canvas); }
-${K} .sb-k-ios[data-ios="custom"] .sb-k-ios-tag { background: var(--ab-canvas); color: var(--ab-ink); }
-${K} .sb-k-web-tag { background: var(--ab-pair-b); color: var(--ab-on-pair-b); }
-${K} .sb-k-slabel { font: 700 10px/1.4 ${MONO}; letter-spacing: 0.14em; color: var(--ab-ink); }
-${K} .sb-k-slabel::before { content: "✱ "; color: var(--ab-ink); }`;
-  },
-});
-
-registerMove({
-  id: 'focus-ring--acid', category: 'state', tier: 'recipe',   // duplicate: merges into shared focus-ring
-  params: { width: num(3, [1, 6]), offset: num(3, [0, 8]), style: en('dashed', ['solid', 'dashed', 'dotted']) },
-  css(S, p) {
-    return `${S}.sb-kit :is(button, input, a, [tabindex]):focus-visible, ${S} :is(.ab-switch, .ab-cta, .ab-seg-btn, .ab-type-apply):focus-visible { outline: ${p.width}px ${p.style} var(--ab-ink); outline-offset: ${p.offset}px; }`;
-  },
-});
-
-/* ================= WARPED / OUTLINE HEADLINE ================= */
-
-registerMove({
-  id: 'warped-display-headline', category: 'type', tier: 'generator',
+  id: 'warped-display-headline', libraryId: 'warped-display-headline', what: 'Splits the headline into stacked lines and warps each one differently: wave stretch, a compressed middle line, a stretched last line.', category: 'type', tier: 'generator',
   params: {
     maxLine: num(8, [4, 20]),          // letters per stacked line
     stretchMin: num(1.4, [1, 3]), stretchAmp: num(0.8, [0, 2]), midStretch: num(1.8, [1, 3]), lastStretch: num(1.5, [1, 3]),
@@ -415,7 +377,7 @@ ${S}.ab-slide[data-slide="cover"] .wdh-out { flex-basis: 100%; }
 });
 
 registerMove({
-  id: 'outline-echo-headline', category: 'type', tier: 'generator',
+  id: 'outline-echo-headline', libraryId: 'outline-echo-headline', what: 'Draws the last headline line as an outline with offset echoes in the pair colour.', category: 'type', tier: 'generator',
   params: { stroke: num(2, [1, 6]), echo: num(0.05, [0, 0.15]) },
   css(S, p) {
     const e = p.echo;
@@ -445,7 +407,7 @@ ensureWarpDefs();
 
 /* op-art-ripple: concentric bands in the pair, bent by a blurred turbulence displacement (SVG generator). */
 registerMove({
-  id: 'op-art-ripple', category: 'art', tier: 'generator',
+  id: 'op-art-ripple', libraryId: 'op-art-ripple', what: 'Art generator: concentric rings warped by an SVG turbulence displacement, set in a hard-edged frame.', category: 'art', tier: 'generator',
   params: {
     rings: num(26, [6, 60]), scale: num(34, [0, 80]), blur: num(4, [0, 12]), freqX: num(0.011, [0.001, 0.05]), freqY: num(0.008, [0.001, 0.05]),
     aspect: num(0.8, [0.5, 1.5]),      // width / height of the art frame
@@ -477,7 +439,7 @@ ${S}.ab-slide[data-slide="cover"] .ab-deck-cover .ab-art { width: 100% !importan
 /* field-band: a patterned band behind each section header (board only), pattern chosen per section slot. */
 const FIELD_PATTERNS = ['ripple', 'rays', 'check', 'rings', 'none'];
 registerMove({
-  id: 'field-band', category: 'art', tier: 'generator',
+  id: 'field-band', libraryId: 'geometric-fill', what: 'Fills a band behind a section with a chosen pattern such as ripple, rays or check.', category: 'art', tier: 'generator',
   params: {
     palette: en('ripple', FIELD_PATTERNS), type: en('rays', FIELD_PATTERNS), ui: en('check', FIELD_PATTERNS), touch: en('check', FIELD_PATTERNS), use: en('rings', FIELD_PATTERNS),
     opacity: num(0.2, [0.05, 0.6]), widthPct: num(55, [20, 100]),
@@ -499,21 +461,25 @@ ${slot('.ab-palette', p.palette)}${slot('.ab-type', p.type)}${slot('.ab-sec-ui',
 
 /* pair-block: solid block in the pair with a hard offset echo; optional overlay, edge sides, app-screen variant. */
 registerMove({
-  id: 'pair-block', category: 'material', tier: 'recipe',
+  id: 'pair-block', libraryId: 'hard-offset-shadow', what: 'Material: a block in the pair colours with a heavy edge and hard offset shadow, with optional hatch overlay.', category: 'material', tier: 'recipe',
   params: {
     fill: en('pair-a', COLS), edge: en('pair-b', COLS), shadow: en('none', COLS),
     width: num(2, [0, 8]), offset: num(5, [0, 12]),
-    sides: en('all', ['all', 'top', 'bottom', 'left']),
+    sides: en('all', ['all', 'top', 'bottom', 'left', 'right']),
     overlay: en('none', ['none', 'ripple', 'stripes']), overlayOpacity: num(0.2, [0.05, 0.6]),
     face: en('inherit', ['inherit', 'display', 'mono']), caps: bool(false), tracking: num(0.08, [0, 0.3]), size: num(13, [9, 20]),
     pad: bool(false), text: en('auto', ['auto', 'pair-text']),
+    accent: en('none', COLS), accentWidth: num(4, [1, 12]), accentSide: en('top', ['top', 'left', 'right', 'bottom']),   // a thicker coloured edge on one side
+    force: bool(false),    // !important on fill, edge and shadow (beats a sibling class such as a card base)
     kit: en('same', ['same', 'outline']),    // app screens: 'outline' = transparent fill, edge in pair-a, ink label
   },
   material: {
     name: 'pair-block',
     css(S, sel, p) {
       const bw = p.width > 0 && p.edge !== 'none' ? `${p.width}px solid ${COL[p.edge]}` : '0';
-      let out = `${sel} { background: ${p.fill === 'none' ? 'transparent' : COL[p.fill]}; color: ${p.fill === 'none' ? 'var(--ab-ink)' : ON[p.fill]}; ${p.sides === 'all' ? 'border' : 'border: 0; border-' + p.sides}: ${bw}; ${p.shadow !== 'none' ? `box-shadow: ${p.offset}px ${p.offset}px 0 ${COL[p.shadow]};` : 'box-shadow: none;'} position: relative; }\n`;
+      const im = p.force ? ' !important' : '';
+      let out = `${sel} { background: ${p.fill === 'none' ? 'transparent' : COL[p.fill]}${im}; color: ${p.fill === 'none' ? 'var(--ab-ink)' : ON[p.fill]}; ${p.sides === 'all' ? 'border' : 'border: 0; border-' + p.sides}: ${bw}${im}; ${p.shadow !== 'none' ? `box-shadow: ${p.offset}px ${p.offset}px 0 ${COL[p.shadow]}${im};` : `box-shadow: none${im};`}${p.overlay !== 'none' ? ' position: relative;' : ''} }\n`;
+      if (p.accent !== 'none') out += `${sel} { border-${p.accentSide}: ${p.accentWidth}px solid ${COL[p.accent]}${im}; }\n`;
       if (p.text === 'pair-text') out += `${sel} { color: var(--ab-pair-text); }\n`;
       if (p.pad) out += `${sel} { padding: clamp(18px, 2.8cqw, 26px); }\n`;
       if (p.face !== 'inherit' || p.caps) {
@@ -537,7 +503,7 @@ registerMove({
 
 /* heavy-underline: a field that is only a thick underline with a hard echo; app screens get a quiet body-face variant. */
 registerMove({
-  id: 'heavy-underline', category: 'material', tier: 'recipe',
+  id: 'heavy-underline', libraryId: 'field-form', what: 'Material: a field with a heavy underline that switches pair colour on focus.', category: 'material', tier: 'recipe',
   params: { width: num(3, [1, 8]), edge: en('pair-b', COLS), focusEdge: en('pair-a', COLS), upper: bool(true), appEcho: bool(true) },
   material: {
     name: 'heavy-underline',
@@ -554,7 +520,7 @@ registerMove({
 
 /* legend-switch: a switch that prints a word in each state (OFF / ON AIR style). */
 registerMove({
-  id: 'legend-switch', category: 'material', tier: 'recipe',
+  id: 'legend-switch', libraryId: 'text-legend-controls', what: 'Material: a switch that shows legend text (OFF and ON AIR) instead of a knob.', category: 'material', tier: 'recipe',
   params: { off: txt('OFF'), on: txt('ON'), width: num(76, [40, 120]), height: num(26, [18, 40]), edge: en('pair-b', COLS) },
   material: {
     name: 'legend-switch',
@@ -570,7 +536,7 @@ ${lines(sel).map(s => `${s}:checked::before`).join(',\n')} { content: "${esc(p.o
 
 /* pair-check: square check / radio in ink, checked state filled with pair-a (and a hard echo on checkboxes). */
 registerMove({
-  id: 'pair-check', category: 'material', tier: 'recipe',
+  id: 'pair-check', libraryId: null, what: 'Material: checkbox and radio drawn in the pair colours.', category: 'material', tier: 'recipe',
   params: { width: num(2, [1, 4]), echo: num(3, [0, 6]) },
   material: {
     name: 'pair-check',
@@ -586,7 +552,7 @@ ${mark} { border-color: var(--ab-on-primary); }`;
 
 /* pair-slider: square track and thumb, fill in pair-a, hard echo on the thumb. */
 registerMove({
-  id: 'pair-slider', category: 'material', tier: 'recipe',
+  id: 'pair-slider', libraryId: null, what: 'Material: range slider with a pair-coloured track and block thumb.', category: 'material', tier: 'recipe',
   params: { track: num(6, [2, 14]), thumbW: num(22, [10, 40]), thumbH: num(28, [10, 44]), echo: num(3, [0, 6]) },
   material: {
     name: 'pair-slider',
@@ -599,7 +565,7 @@ ${pseudo(sel, '::-webkit-slider-thumb')} { width: ${p.thumbW}px; height: ${p.thu
 
 /* skyline-fill: progress bars as a repeating skyline image in pair-a over a hairline track. */
 registerMove({
-  id: 'skyline-fill', category: 'material', tier: 'recipe',
+  id: 'skyline-fill', libraryId: 'colour-bar-strip', what: 'Material: progress bar filled with the skyline bar pattern.', category: 'material', tier: 'recipe',
   params: { height: num(14, [6, 30]), cell: num(30, [10, 80]) },
   material: {
     name: 'skyline-fill',
@@ -613,7 +579,7 @@ ${kid} { height: ${p.height}px; border-radius: 0; background: var(--ab-skyline-a
 
 /* pair-alternating-rows: rows tinted in the pair, alternating. */
 registerMove({
-  id: 'pair-alternating-rows', category: 'material', tier: 'recipe',
+  id: 'pair-alternating-rows', libraryId: 'positional-colour-cycle', what: 'Material: list rows that alternate between the two pair colours.', category: 'material', tier: 'recipe',
   params: { rule: num(1, [0, 3]) },
   material: {
     name: 'pair-alternating-rows',
@@ -627,7 +593,7 @@ ${sel} { border-bottom: ${p.rule}px solid var(--ab-line); }`;
 
 /* ticket-tab: skewed tab with a dotted perforated left edge; selected = pair-a block (via pair-selected). */
 registerMove({
-  id: 'ticket-tab', category: 'material', tier: 'generator',
+  id: 'ticket-tab', libraryId: 'ticket-cutout', what: 'Material: tabs as skewed ticket stubs with a dotted perforated left edge.', category: 'material', tier: 'generator',
   params: { skew: num(-8, [-20, 20]), edge: en('pair-b', COLS), width: num(2, [1, 5]), perf: num(3, [0, 6]), face: en('mono', ['mono', 'inherit']) },
   material: {
     name: 'ticket-tab',
@@ -642,7 +608,7 @@ ${pseudo(lines(sel).map(s => `${s}[aria-selected="true"]`).join(',\n'), '::after
 
 /* barcode-serial: a dense info strip under every section header, ending in a striped barcode. */
 registerMove({
-  id: 'barcode-serial', category: 'structure', tier: 'generator',
+  id: 'barcode-serial', libraryId: 'barcode-serial', what: 'Prints a barcode and serial line under the label row.', category: 'structure', tier: 'generator',
   params: { text: txt(''), size: num(9, [7, 12]), barcodeW: num(84, [0, 160]) },
   css(S, p) {
     const esc = s => String(s).replace(/\\/g, '\\\\').replace(/"/g, '\\"');
@@ -655,7 +621,7 @@ registerMove({
 
 /* display-card-titles: card titles and body in heavy uppercase display type. */
 registerMove({
-  id: 'display-card-titles', category: 'type', tier: 'recipe',
+  id: 'display-card-titles', libraryId: 'warped-display-headline', what: 'Sets card titles in the display face, uppercase and tracked.', category: 'type', tier: 'recipe',
   params: { weight: num(800, [400, 900]) },
   css(S, p) {
     return `${S} .ab-card-title { margin: 22px 0 6px !important; font-weight: ${p.weight}; text-transform: uppercase; letter-spacing: calc(-0.01em * var(--ab-tr, 1)); font-size: clamp(20px, 2.7cqw, 27px); line-height: 1.02; }
@@ -665,14 +631,14 @@ ${S} .ab-card-body { color: var(--ab-ink); margin-bottom: 20px !important; }`;
 
 /* action-glyph: a glyph in the primary action's arrow slot. */
 registerMove({
-  id: 'action-glyph', category: 'structure', tier: 'recipe',
+  id: 'action-glyph', libraryId: 'action-with-glyph', what: 'Replaces the action arrow with a chosen glyph.', category: 'structure', tier: 'recipe',
   params: { glyph: txt('✱'), size: num(16, [10, 28]) },
   css(S, p) { return `${S} .ab-cta-arrow::before { content: "${p.glyph}"; font-size: ${p.size}px; }`; },
 });
 
 /* mono-ui-labels: toggle / status / state / field labels in mono caps. */
 registerMove({
-  id: 'mono-ui-labels', category: 'type', tier: 'recipe',
+  id: 'mono-ui-labels', libraryId: 'caps-mono-labels', what: 'Sets toggle, status, state and field labels in mono caps.', category: 'type', tier: 'recipe',
   params: { tracking: num(0.12, [0, 0.3]), size: num(10.5, [8, 14]) },
   css(S, p) {
     return `${S} :is(.ab-fieldlabel, .ab-state, .ab-state-name, .ab-status, .sb-k-slider-h) { color: var(--ab-ink); font-family: ${MONO}; font-size: ${p.size}px; font-weight: 700; letter-spacing: ${p.tracking}em; text-transform: uppercase; }
@@ -686,7 +652,7 @@ ${S} .ab-state-ctl.is-pressed { background: var(--ab-ink); color: var(--ab-canva
 /* ================= STATES ================= */
 
 registerMove({
-  id: 'stretch-flip', category: 'state', tier: 'recipe',
+  id: 'stretch-flip', libraryId: 'state-signature', what: 'State: hover and press stretch the control vertically and swap its pair colours.', category: 'state', tier: 'recipe',
   params: { hoverScale: num(1.05, [1, 1.3]), skew: num(-12, [-30, 0]), split: num(2, [0, 6]) },
   state: {
     name: 'stretch-flip',
@@ -702,23 +668,223 @@ ${S}.sb-ab.sb-kit .sb-k-pressed { box-shadow: none !important; transform: transl
 });
 
 registerMove({
-  id: 'pair-selected', category: 'state', tier: 'recipe',
-  params: { fill: en('pair-a', ['pair-a', 'pair-b', 'ink']), tracking: num(0.14, [0, 0.3]) },
+  id: 'pair-selected', libraryId: 'ink-filled-selected', what: 'State: the selected item fills with a pair colour.', category: 'state', tier: 'recipe',
+  params: { fill: en('pair-a', ['pair-a', 'pair-b', 'ink', 'tint']), tracking: num(0.14, [0, 0.3]) },
   state: {
     name: 'pair-selected',
     css(S, sel, p, ctx) {
-      return `${ctx.ON.selected(sel)} { background: ${COL[p.fill]}; color: ${ON[p.fill]}; letter-spacing: ${p.tracking}em; }`;
+      return `${ctx.ON.selected(sel)} { ${p.fill === 'tint' ? 'background: var(--ab-pair-a-tint); color: var(--ab-ink);' : `background: ${COL[p.fill]}; color: ${ON[p.fill]};`} letter-spacing: ${p.tracking}em; }`;
     },
   },
 });
 
 registerMove({
-  id: 'disabled-hatch', category: 'state', tier: 'recipe',
+  id: 'disabled-hatch', libraryId: 'disabled-state', what: 'State: a disabled control shows a diagonal hatch and loses its offset shadow.', category: 'state', tier: 'recipe',
   params: { gap: num(3, [1, 8]) },
   state: {
     name: 'disabled-hatch',
     css(S, sel, p, ctx) {
       return `${ctx.ON.disabled(sel)} { box-shadow: none; background-image: repeating-linear-gradient(45deg, var(--ab-pair-b) 0 2px, transparent 2px ${2 + p.gap}px); }`;
+    },
+  },
+});
+
+/* ================= KIT MATERIALS (components with child parts) ================= */
+const kid = (sel, c) => lines(sel).map(s => `${s} ${c}`).join(',\n');
+const sfx = (sel, c) => lines(sel).map(s => s + c).join(',\n');
+const caps = (size, track) => `font-family: ${MONO}; font-size: ${size}px; font-weight: 700; letter-spacing: ${track}em; text-transform: uppercase;`;
+
+registerMove({
+  id: 'pair-link', libraryId: null, what: 'Material: an inline link in bold primary text with a thick partner-colour underline; pressed fills with a tint.', category: 'material', tier: 'recipe',
+  params: { thickness: num(3, [1, 6]), offset: num(3, [0, 8]), under: en('pair-b', COLS) },
+  material: {
+    name: 'pair-link',
+    css(S, sel, p) {
+      return `${sel} { color: var(--ab-pair-text, var(--ab-primary)); font-weight: 700; text-decoration: underline; text-decoration-thickness: ${p.thickness}px; text-decoration-color: ${COL[p.under]}; text-underline-offset: ${p.offset}px; }
+${sfx(sel, '.sb-k-pressed')} { background: var(--ab-pair-a-tint); box-shadow: none; text-decoration-color: var(--ab-primary); }`;
+    },
+  },
+});
+
+registerMove({
+  id: 'pair-stepper', libraryId: null, what: 'Material: a square stepper with ink edge, hard echo, primary-filled buttons and a mono value.', category: 'material', tier: 'recipe',
+  params: { width: num(2, [1, 5]), echo: num(3, [0, 6]) },
+  material: {
+    name: 'pair-stepper',
+    css(S, sel, p) {
+      return `${sel} { border: ${p.width}px solid var(--ab-ink); border-radius: 0; box-shadow: ${p.echo}px ${p.echo}px 0 var(--ab-pair-b); }
+${kid(sel, '.sb-k-step')} { border: 0; border-radius: 0; background: var(--ab-primary); color: var(--ab-on-primary); font-weight: 800; }
+${kid(sel, '.sb-k-step:first-child')} { border-right: ${p.width}px solid var(--ab-ink); }
+${kid(sel, '.sb-k-step:last-child')} { border-left: ${p.width}px solid var(--ab-ink); }
+${kid(sel, '.sb-k-step:hover:not(:disabled)')} { background: var(--ab-pair-b); color: var(--ab-on-pair-b); }
+${kid(sel, '.sb-k-step:disabled')} { background: transparent; color: var(--ab-muted); }
+${kid(sel, '.sb-k-step-val')} { font-family: ${MONO}; font-weight: 700; font-variant-numeric: tabular-nums; text-align: center; color: var(--ab-ink); }`;
+    },
+  },
+});
+
+registerMove({
+  id: 'pair-day', libraryId: null, what: 'Material: calendar days as square mono cells; today outlined, range tinted, selection filled with a partner-colour bar.', category: 'material', tier: 'recipe',
+  params: { bar: num(4, [0, 8]) },
+  material: {
+    name: 'pair-day',
+    css(S, sel, p) {
+      return `${sel} { border-radius: 0; font-family: ${MONO}; font-weight: 700; font-variant-numeric: tabular-nums; }
+${sfx(sel, '.is-today')} { box-shadow: inset 0 0 0 2px var(--ab-ink); }
+${sfx(sel, '.is-range')} { background: var(--ab-pair-a-tint); }
+${[].concat(lines(sel).flatMap(s => ['.is-sel', '.is-start', '.is-end'].map(c => s + c))).join(',\n')} { background: var(--ab-primary); color: var(--ab-on-primary); box-shadow: inset 0 -${p.bar}px 0 var(--ab-pair-b); }
+${sfx(sel, '.is-out')} { color: var(--ab-muted); }`;
+    },
+  },
+});
+
+registerMove({
+  id: 'pair-calendar', libraryId: null, what: 'Material: a calendar panel with ink edge, hard echo, a heavy rule under a display-caps month title and mono caps weekday letters.', category: 'material', tier: 'recipe',
+  params: { width: num(2, [1, 5]), echo: num(3, [0, 6]), rule: num(3, [1, 6]) },
+  material: {
+    name: 'pair-calendar',
+    css(S, sel, p) {
+      return `${sel} { border: ${p.width}px solid var(--ab-ink); border-radius: 0; background: var(--ab-canvas); box-shadow: ${p.echo}px ${p.echo}px 0 var(--ab-pair-b); }
+${kid(sel, '.sb-k-cal-head')} { border-bottom: ${p.rule}px solid var(--ab-ink); }
+${kid(sel, '.sb-k-cal-t')} { font-family: var(--ab-font-h); font-weight: 800; letter-spacing: 0.02em; text-transform: uppercase; }
+${kid(sel, '.sb-k-cal-dow')} { ${caps(11, 0.1)} color: var(--ab-muted); }`;
+    },
+  },
+});
+
+registerMove({
+  id: 'pair-wheel', libraryId: null, what: 'Material: a square picker wheel with a tinted centre band bracketed by primary rules.', category: 'material', tier: 'recipe',
+  params: { width: num(2, [1, 5]) },
+  material: {
+    name: 'pair-wheel',
+    css(S, sel, p) {
+      return `${sel} { border: ${p.width}px solid var(--ab-ink); border-radius: 0; background: var(--ab-canvas); }
+${kid(sel, '.sb-k-wheel-item')} { font-family: ${MONO}; font-weight: 700; color: var(--ab-muted); }
+${kid(sel, '.sb-k-wheel-item.is-sel')} { color: var(--ab-ink); font-weight: 800; }
+${kid(sel, '.sb-k-wheel-band')} { border-radius: 0; background: var(--ab-pair-a-tint); box-shadow: inset 0 2px 0 var(--ab-primary), inset 0 -2px 0 var(--ab-primary); }`;
+    },
+  },
+});
+
+registerMove({
+  id: 'pair-inset-frame', libraryId: null, what: 'Material: an overlay scrim framed by an inset border in a pair colour.', category: 'material', tier: 'recipe',
+  params: { width: num(4, [1, 10]), colour: en('pair-a', COLS) },
+  material: { name: 'pair-inset-frame', css(S, sel, p) { return `${sel} { box-shadow: inset 0 0 0 ${p.width}px ${COL[p.colour]}; border-radius: 0; }`; } },
+});
+
+registerMove({
+  id: 'pair-pulse', libraryId: null, what: 'Material: spinner and skeleton parts as square stepped blocks that turn or blink in jumps.', category: 'material', tier: 'recipe',
+  params: { steps: num(8, [2, 12]), ring: num(4, [2, 8]) },
+  material: {
+    name: 'pair-pulse',
+    css(S, sel, p) {
+      const spin = lines(sel).filter(s => /spin/.test(s)).join(',\n'), skel = lines(sel).filter(s => /skel/.test(s)).join(',\n');
+      let out = '';
+      if (spin) out += `${spin.replace(/\.sb-k-spin\b/g, '.sb-k-spinner')} { ${caps(12, 0.1)} }\n${spin} { border: ${p.ring}px solid var(--ab-pair-a-tint); border-top-color: var(--ab-primary); border-right-color: var(--ab-pair-b); border-radius: 0; animation: mv-pair-spin 0.9s steps(${p.steps}) infinite; }\n@keyframes mv-pair-spin { to { transform: rotate(360deg); } }\n`;
+      if (skel) out += `${skel} { border-radius: 0; background: var(--ab-pair-a-tint); box-shadow: inset 0 -3px 0 color-mix(in srgb, var(--ab-primary) 55%, transparent); animation: mv-pair-blink 1.2s steps(2) infinite; }\n@keyframes mv-pair-blink { 50% { opacity: 0.55; } }\n`;
+      return out + `@media (prefers-reduced-motion: reduce) { ${sel} { animation: none; } }`;
+    },
+  },
+});
+
+registerMove({
+  id: 'pair-scroll', libraryId: null, what: 'Material: a square scrollbar with a primary thumb in an ink edge.', category: 'material', tier: 'recipe',
+  params: { width: num(2, [1, 4]) },
+  material: {
+    name: 'pair-scroll',
+    css(S, sel, p) {
+      return `${sel} { border-radius: 0; background: color-mix(in srgb, var(--ab-ink) 10%, transparent); }
+${kid(sel, '.sb-k-sbar-thumb')} { border: ${p.width}px solid var(--ab-ink); border-radius: 0; background: var(--ab-primary); }`;
+    },
+  },
+});
+
+registerMove({
+  id: 'pair-heavy-rule', libraryId: 'heavy-rule', what: 'Material: a divider as a solid heavy rule in an ink or pair colour.', category: 'material', tier: 'recipe',
+  params: { height: num(3, [1, 8]), colour: en('ink', COLS) },
+  material: { name: 'pair-heavy-rule', css(S, sel, p) { return `${sel} { height: ${p.height}px; min-height: 0; background: ${COL[p.colour]}; border: 0; }\n${pseudo(sel, '::before')} { content: none; }`; } },
+});
+
+registerMove({
+  id: 'pair-accordion', libraryId: null, what: 'Material: accordion rows with a heavy top rule, display-caps summaries, an open summary filled with a pair colour and a partner-colour bar on the body.', category: 'material', tier: 'recipe',
+  params: { width: num(2, [1, 5]), bar: num(4, [0, 8]) },
+  material: {
+    name: 'pair-accordion',
+    css(S, sel, p) {
+      return `${sel} { border: 0; border-bottom: ${p.width}px solid var(--ab-ink); border-radius: 0; background: none; }
+${kid(sel, '.sb-k-acc-sum')} { font-family: var(--ab-font-h); font-weight: 800; letter-spacing: 0.04em; text-transform: uppercase; }
+${lines(sel).map(s => `${s}[open] > .sb-k-acc-sum`).join(',\n')} { background: var(--ab-primary); color: var(--ab-on-primary); }
+${kid(sel, '.sb-k-acc-body')} { box-shadow: inset ${p.bar}px 0 0 var(--ab-pair-b); }`;
+    },
+  },
+});
+
+registerMove({
+  id: 'pair-crumbs', libraryId: null, what: 'Material: breadcrumbs in mono caps with underlined links, a pair-coloured separator and the current page marked by a thick bar.', category: 'material', tier: 'recipe',
+  params: { size: num(12, [9, 16]), tracking: num(0.08, [0, 0.3]), bar: num(4, [1, 8]) },
+  material: {
+    name: 'pair-crumbs',
+    css(S, sel, p) {
+      return `${kid(sel, 'ol')} { ${caps(p.size, p.tracking)} }
+${kid(sel, 'a')} { text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 3px; }
+${kid(sel, '[aria-current="page"]')} { color: var(--ab-ink); font-weight: 800; box-shadow: inset 0 -${p.bar}px 0 var(--ab-primary); }
+${kid(sel, '.sb-k-crumb-sep')} { color: var(--ab-pair-text, var(--ab-primary)); font-weight: 800; }`;
+    },
+  },
+});
+
+registerMove({
+  id: 'pair-anchors', libraryId: null, what: 'Material: an on-this-page list on a heavy left rule in mono caps; the active link gets a primary bar and a tint.', category: 'material', tier: 'recipe',
+  params: { size: num(12, [9, 16]), tracking: num(0.08, [0, 0.3]), width: num(2, [1, 5]) },
+  material: {
+    name: 'pair-anchors',
+    css(S, sel, p) {
+      return `${sel} { border-left: ${p.width}px solid var(--ab-ink); }
+${kid(sel, 'a')}, ${kid(sel, '.sb-k-anchors-label')} { ${caps(p.size, p.tracking)} }
+${kid(sel, 'a')} { margin-left: -${p.width}px; }
+${kid(sel, 'a.is-on')} { border-left: 4px solid var(--ab-primary); background: var(--ab-pair-a-tint); color: var(--ab-ink); }`;
+    },
+  },
+});
+
+registerMove({
+  id: 'pair-pie', libraryId: null, what: 'Material: radial menu items as square canvas blocks with an ink edge; the active item fills with a pair colour and a hard echo.', category: 'material', tier: 'recipe',
+  params: { width: num(2, [1, 4]), echo: num(3, [0, 6]) },
+  material: {
+    name: 'pair-pie',
+    css(S, sel, p) {
+      const items = lines(sel).filter(s => /item/.test(s)).join(',\n');
+      if (!items) return '';
+      return `${items} { border: ${p.width}px solid var(--ab-ink); border-radius: 0; background: var(--ab-canvas); color: var(--ab-ink); box-shadow: none; }
+${sfx(items, ':hover')} { background: var(--ab-pair-a-tint); }
+${sfx(items, '.is-on')} { background: var(--ab-primary); color: var(--ab-on-primary); box-shadow: ${p.echo}px ${p.echo}px 0 var(--ab-pair-b); }`;
+    },
+  },
+});
+
+/* ================= KIT STATES ================= */
+
+registerMove({
+  id: 'pair-current', libraryId: 'ink-filled-selected', what: 'State: the current, open or expanded item fills with a pair colour or its tint.', category: 'state', tier: 'recipe',
+  params: { fill: en('pair-a', ['pair-a', 'pair-b', 'tint']), bar: num(0, [0, 8]), kids: txt('') },   // kids: a child selector to mark instead of the component itself
+  state: {
+    name: 'pair-current',
+    css(S, sel, p) {
+      const flag = ':is([aria-current]:not([aria-current="false"]), [aria-expanded="true"], .is-on, .is-open)';
+      const on = p.kids ? lines(sel).map(x => `${x} ${p.kids}${flag}`).join(',\n') : `:is(${sel})${flag}`;
+      const f = p.fill === 'tint' ? 'background: var(--ab-pair-a-tint); color: var(--ab-ink);' : `background: ${COL[p.fill]}; color: ${ON[p.fill]};`;
+      return `${on} { ${f}${p.bar ? ` box-shadow: inset ${p.bar}px 0 0 var(--ab-pair-b);` : ''} }`;
+    },
+  },
+});
+
+registerMove({
+  id: 'pair-item-selected', libraryId: 'ink-filled-selected', what: 'State: the selected child item of a list gets a tint and a primary bar down its left edge.', category: 'state', tier: 'recipe',
+  params: { bar: num(4, [0, 8]) },
+  state: {
+    name: 'pair-item-selected',
+    css(S, sel, p) {
+      return `${kid(sel, 'li[aria-selected="true"]')} { background: var(--ab-pair-a-tint); color: var(--ab-ink); box-shadow: inset ${p.bar}px 0 0 var(--ab-primary); }`;
     },
   },
 });

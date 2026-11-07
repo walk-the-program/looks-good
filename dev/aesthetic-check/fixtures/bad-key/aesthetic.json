@@ -1,0 +1,109 @@
+{
+  "spec": 2,
+  "key": "Night_Ferry!",
+  "order": 950,
+  "name": "Night Ferry",
+  "descriptor": "Harbour · Ink · Lamp",
+  "influences": "Ferry timetables, enamel signs",
+  "summary": "A harbour-sign look.",
+  "coreTrick": "Every control is an outlined cell that fills with ink on hover, on a canvas tinted from the primary hue.",
+  "motto": "",
+  "kicker": "",
+  "mode": "light",
+  "lineage": {
+    "forkedFrom": null,
+    "version": 1
+  },
+  "rules": {
+    "do": [
+      "Keep one ink outline weight."
+    ],
+    "dont": [
+      "No soft shadows."
+    ]
+  },
+  "colour": [
+    {
+      "move": "tinted-neutral-canvas",
+      "params": {
+        "tint": {
+          "light": 14,
+          "dark": 10
+        }
+      }
+    }
+  ],
+  "moves": [
+    {
+      "move": "corner-radius",
+      "params": {
+        "base": {
+          "light": 8,
+          "dark": 4
+        },
+        "pill": false
+      }
+    },
+    {
+      "move": "hairline-rule",
+      "params": {
+        "width": 1
+      }
+    },
+    {
+      "move": "caps-mono-labels",
+      "params": {
+        "tracking": 0.1
+      },
+      "scope": "board"
+    }
+  ],
+  "kit": {
+    "button-primary": {
+      "material": "flat-fill",
+      "state": "press-sink",
+      "params": {
+        "flat-fill": {
+          "fill": "primary"
+        }
+      }
+    },
+    "button-secondary": {
+      "material": "outlined",
+      "state": [
+        "invert-on-hover",
+        "press-sink"
+      ],
+      "params": {
+        "outlined": {
+          "width": 2
+        }
+      }
+    },
+    "field": {
+      "material": "outlined",
+      "state": "invert-on-hover"
+    },
+    "card": {
+      "material": "flat-fill",
+      "params": {
+        "flat-fill": {
+          "fill": "tint"
+        }
+      }
+    },
+    "chip": {
+      "material": "outlined",
+      "state": "ink-fill-selected",
+      "scope": "kit"
+    }
+  },
+  "art": {
+    "hero": {
+      "kind": "svg",
+      "src": "art/hero.svg",
+      "fit": "cover",
+      "alt": "A ferry lamp on a dark harbour"
+    }
+  }
+}

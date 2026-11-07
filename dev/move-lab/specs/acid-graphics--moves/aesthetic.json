@@ -1,0 +1,1140 @@
+{
+  "spec": 2,
+  "key": "acid-graphics--moves",
+  "order": 902,
+  "meta": {
+    "family": "luminous",
+    "fonts": {
+      "heading": {
+        "classes": [
+          "wide",
+          "heavy",
+          "techno"
+        ],
+        "picks": [
+          "Tilt Warp",
+          "Syncopate",
+          "Michroma"
+        ]
+      },
+      "body": {
+        "classes": [
+          "grotesk",
+          "neo-grotesk"
+        ],
+        "picks": [
+          "Space Grotesk",
+          "Inter"
+        ]
+      },
+      "mono": {
+        "picks": [
+          "Kode Mono",
+          "Space Mono"
+        ]
+      },
+      "avoid": [
+        "serif",
+        "rounded",
+        "deco"
+      ],
+      "why": "Warped, stretched headlines need an extended or heavy face that survives distortion, while the dense info layer stays in a plain grotesk and mono.",
+      "pairings": [
+        [
+          "Tilt Warp",
+          "Inter"
+        ],
+        [
+          "Syncopate",
+          "Space Grotesk"
+        ],
+        [
+          "Michroma",
+          "Kode Mono"
+        ]
+      ]
+    }
+  },
+  "build": {
+    "cls": "glow",
+    "surface": "Near-black panels with a 1pt coloured edge and a soft glow of the same colour. The clash colour is fluorescent (chartreuse or hot magenta) and labels on it are black."
+  },
+  "name": "Acid Graphics (moves)",
+  "descriptor": "Toxic · Warped · Loud",
+  "influences": "Rave flyers / Op-art / Warped type",
+  "summary": "Vibrating colour pairs, stretched type and dense information over a hidden calm grid.",
+  "coreTrick": "The primary is pushed to full chroma and paired with a computed fluorescent clash colour at near-equal luminance, then every display line is individually warped (stretched on a wave, compressed, outlined with echoes) over a hidden 12-column grid.",
+  "motto": "Turn it up until it hums.",
+  "kicker": "Doors at midnight",
+  "mode": "dark",
+  "slideShape": "minimal",
+  "labels": {
+    "material": "Signal",
+    "states": [
+      "Idle",
+      "Strobe",
+      "Melt"
+    ],
+    "statesKind": "button"
+  },
+  "copy": {
+    "motto": {
+      "label": "Motto",
+      "text": "Turn it up until it hums."
+    },
+    "kicker": {
+      "label": "Kicker above the headline",
+      "text": "Doors at midnight"
+    },
+    "state0": {
+      "label": "State 1 name",
+      "text": "Idle"
+    },
+    "state1": {
+      "label": "State 2 name",
+      "text": "Strobe"
+    },
+    "state2": {
+      "label": "State 3 name",
+      "text": "Melt"
+    }
+  },
+  "layout": {
+    "hero": "split",
+    "palette": "strips",
+    "sections": "two-col",
+    "subcopy": true
+  },
+  "type": {
+    "ui": "body",
+    "label": "mono",
+    "display": 1
+  },
+  "highlight": "custom",
+  "highlightNote": "The last headline line is an outline only with two offset echoes in the pair; the lines above are stretched on a wave and compressed. In running UI text the highlight word is plain ink.",
+  "roles": {
+    "canvas": {
+      "use": "The neutral rest area (about 30% of every view): near-black in dark mode, stark white in light mode; a hidden 12-column grid runs under it at 4-6%",
+      "never": "Text, gradients, a tinted wash; it is the silence that lets the density breathe",
+      "coverage": "30–40%"
+    },
+    "ink": {
+      "use": "White (dark) or black (light) body copy, mono info labels, the numerals and the 12-column grid lines",
+      "never": "Vibrating pairs: thin ink type is never set on a vibrating edge",
+      "coverage": "15–20%"
+    },
+    "primary": {
+      "use": "The dominant colour: the client primary pushed to full chroma (a muted primary falls back to a fixed lime): the headline, the main action fill, the selected tab. Its computed clash partner sits at equal luminance",
+      "never": "Thin text on a vibrating edge, a neutral flat fill, a second CTA",
+      "coverage": "≈25–30%"
+    },
+    "secondary": {
+      "use": "The pattern's second band and tinted shadow: stripes, the progress track",
+      "never": "The main action, body text, replacing the computed clash colour",
+      "coverage": "≈10%"
+    },
+    "accent": {
+      "use": "One spot colour, used sparingly: the focus ring and a single spark",
+      "never": "Buttons, body text, borders, large fills",
+      "coverage": "≤4%"
+    }
+  },
+  "rules": {
+    "do": [
+      "Pair the dominant colour with its computed fluorescent clash and let them meet edge to edge.",
+      "Distort every display line differently (stretch on a wave, compress one line, outline-echo the last); keep dates, tabs, strips and labels in clean mono caps.",
+      "Keep a neutral rest area of about 30% and a hidden 12-column grid under the layers.",
+      "Use tickets, perforated tabs, legend switches and equaliser bars as the interface vocabulary."
+    ],
+    "dont": [
+      "Set thin type on a vibrating edge, or neon text on neon; body copy stays ink on the neutral.",
+      "Warp every line the same way or drop the grid; without a resting area there is no hierarchy.",
+      "Use chrome, glossy gradients or blobs: here the vibration of two colours is the effect."
+    ]
+  },
+  "deck": {
+    "marks": {
+      "do": "✱",
+      "dont": "✕"
+    },
+    "principles": [
+      [
+        "Colour that vibrates",
+        "Two near-equal-luminance hues meet edge to edge."
+      ],
+      [
+        "Warp every line",
+        "Stretch, compress, echo: each display line differently."
+      ],
+      [
+        "Order underneath the noise",
+        "A hidden calm grid holds the dense layout together."
+      ]
+    ],
+    "do": [
+      "Pair the primary with a computed clash colour.",
+      "Distort every display line differently.",
+      "Keep dates, tabs and strips scannable."
+    ],
+    "dont": [
+      "Put thin type on a vibrating edge.",
+      "Warp every line the same way.",
+      "Use chrome or gloss."
+    ]
+  },
+  "colour": [
+    {
+      "move": "tinted-neutral-canvas",
+      "params": {
+        "tint": 12,
+        "darkL": 2.4,
+        "lightL": 98,
+        "paperMix": 0
+      }
+    },
+    {
+      "move": "primary-reprint",
+      "params": {}
+    }
+  ],
+  "moves": [
+    {
+      "move": "equal-luminance-clash",
+      "params": {}
+    },
+    {
+      "move": "pair-colour-tints",
+      "params": {
+        "tint": 0.12
+      }
+    },
+    {
+      "move": "skyline-bars",
+      "params": {}
+    },
+    {
+      "move": "corner-radius",
+      "params": {
+        "base": 0,
+        "round": false
+      }
+    },
+    {
+      "move": "line-grid",
+      "params": {
+        "columns": 12
+      }
+    },
+    {
+      "move": "solid-mark-header",
+      "params": {}
+    },
+    {
+      "move": "caps-mono-labels",
+      "params": {
+        "tracking": 0.14,
+        "size": 0.9
+      }
+    },
+    {
+      "move": "section-number-marker",
+      "params": {
+        "look": "badge"
+      }
+    },
+    {
+      "move": "stretched-section-title",
+      "params": {}
+    },
+    {
+      "move": "field-band",
+      "params": {}
+    },
+    {
+      "move": "warped-display-headline",
+      "params": {}
+    },
+    {
+      "move": "outline-echo-headline",
+      "params": {}
+    },
+    {
+      "move": "op-art-ripple",
+      "params": {}
+    },
+    {
+      "move": "full-bleed-hero-field",
+      "params": {
+        "mode": "light"
+      }
+    },
+    {
+      "move": "pair-readout-block",
+      "params": {
+        "title": "VIBRATING PAIR",
+        "labelA": "PRIMARY",
+        "labelB": "CLASH"
+      }
+    },
+    {
+      "move": "bill-type-list",
+      "params": {}
+    },
+    {
+      "move": "big-numeral-rows",
+      "params": {}
+    },
+    {
+      "move": "stretched-display-numerals",
+      "params": {}
+    },
+    {
+      "move": "ticker-strip",
+      "params": {
+        "rule": "✱ SIDE A ✱ ™ ✱ 1-800-NO-SLEEP ✱ ® ✱ NO RE-ENTRY ✱ ™ ✱ SIDE A ✱ ® ✱ 1-800-NO-SLEEP ✱ ™ ✱ SIDE A ✱ ® ✱ NO RE-ENTRY ✱ ™ ✱ SIDE A ✱ ®",
+        "top": "✱  FRI 23.10  ✱  DOORS 23:00  ✱  SIGNAL ROOM  ✱  NO RE-ENTRY  ✱  FRI 23.10  ✱  DOORS 23:00  ✱  SIGNAL ROOM",
+        "bottom": "✱  NO PHOTOS  ✱  BRING EARPLUGS  ✱  18+  ✱  NO PHOTOS  ✱  BRING EARPLUGS  ✱  18+  ✱  NO PHOTOS"
+      }
+    },
+    {
+      "move": "barcode-serial",
+      "params": {
+        "text": "✱ 128 BPM ✱ SIDE A ✱ カラー ✱ ROOM 1"
+      }
+    },
+    {
+      "move": "display-card-titles",
+      "params": {}
+    },
+    {
+      "move": "action-glyph",
+      "params": {}
+    },
+    {
+      "move": "mono-ui-labels",
+      "params": {}
+    },
+    {
+      "move": "kit-cell-frame",
+      "params": {
+        "look": "stub"
+      }
+    },
+    {
+      "move": "focus-ring",
+      "params": {
+        "look": "outline",
+        "reach": "all-controls",
+        "width": 3,
+        "offset": 3,
+        "style": "dashed"
+      }
+    }
+  ],
+  "kit": {
+    "button-primary": {
+      "material": "pair-block",
+      "state": [
+        "stretch-flip",
+        "disabled-hatch"
+      ],
+      "params": {
+        "pair-block": {
+          "fill": "pair-a",
+          "edge": "pair-b",
+          "width": 2,
+          "face": "display",
+          "caps": true,
+          "tracking": 0.08,
+          "size": 13
+        }
+      }
+    },
+    "button-secondary": {
+      "material": "pair-block",
+      "state": [
+        "stretch-flip",
+        "disabled-hatch"
+      ],
+      "params": {
+        "pair-block": {
+          "fill": "pair-a",
+          "edge": "pair-b",
+          "width": 2,
+          "face": "mono",
+          "caps": true,
+          "tracking": 0.1,
+          "size": 12,
+          "kit": "outline"
+        }
+      }
+    },
+    "button-ghost": {
+      "material": "pair-block",
+      "state": "stretch-flip",
+      "params": {
+        "pair-block": {
+          "fill": "none",
+          "edge": "none",
+          "width": 0,
+          "face": "display",
+          "caps": true,
+          "tracking": 0.06,
+          "size": 14,
+          "text": "pair-text"
+        }
+      }
+    },
+    "button-icon": {
+      "material": "pair-block",
+      "state": [
+        "stretch-flip",
+        "disabled-hatch"
+      ],
+      "params": {
+        "pair-block": {
+          "fill": "pair-a",
+          "edge": "none",
+          "width": 0,
+          "shadow": "pair-b",
+          "offset": 3
+        }
+      }
+    },
+    "button-danger": {
+      "material": "pair-block",
+      "state": [
+        "stretch-flip",
+        "disabled-hatch"
+      ],
+      "params": {
+        "pair-block": {
+          "fill": "none",
+          "edge": "danger",
+          "width": 2,
+          "face": "display",
+          "caps": true,
+          "tracking": 0.06,
+          "size": 13
+        }
+      }
+    },
+    "field": {
+      "material": "heavy-underline",
+      "state": [
+        "disabled-hatch"
+      ],
+      "params": {
+        "heavy-underline": {
+          "width": 3,
+          "edge": "pair-b",
+          "focusEdge": "pair-a"
+        }
+      }
+    },
+    "select": {
+      "material": "outlined",
+      "state": "disabled-hatch",
+      "params": {
+        "outlined": {
+          "width": 2,
+          "colour": "ink",
+          "fill": "canvas"
+        }
+      }
+    },
+    "switch": {
+      "material": "legend-switch",
+      "state": "disabled-hatch",
+      "params": {
+        "legend-switch": {
+          "off": "OFF",
+          "on": "ON AIR"
+        }
+      }
+    },
+    "checkbox": {
+      "material": "pair-check",
+      "state": "disabled-hatch"
+    },
+    "radio": {
+      "material": "pair-check",
+      "state": "disabled-hatch"
+    },
+    "slider": {
+      "material": "pair-slider",
+      "state": "disabled-hatch"
+    },
+    "segmented": {
+      "material": "ticket-tab",
+      "state": "pair-selected",
+      "params": {
+        "ticket-tab": {
+          "skew": -8,
+          "edge": "pair-b"
+        }
+      }
+    },
+    "tabs": {
+      "material": "ticket-tab",
+      "state": "pair-selected",
+      "params": {
+        "ticket-tab": {
+          "skew": -8,
+          "edge": "ink",
+          "perf": 2
+        }
+      }
+    },
+    "card": {
+      "material": "pair-block",
+      "state": "press-sink",
+      "params": {
+        "pair-block": {
+          "fill": "canvas",
+          "edge": "pair-a",
+          "width": 2,
+          "shadow": "pair-b",
+          "offset": 5,
+          "overlay": "ripple",
+          "overlayOpacity": 0.2,
+          "pad": true
+        }
+      }
+    },
+    "panel": {
+      "material": "pair-block",
+      "state": "press-sink",
+      "params": {
+        "pair-block": {
+          "fill": "canvas",
+          "edge": "pair-b",
+          "width": 2,
+          "shadow": "pair-a",
+          "offset": 5,
+          "overlay": "stripes",
+          "overlayOpacity": 0.14,
+          "pad": true
+        }
+      }
+    },
+    "list-row": {
+      "material": "pair-alternating-rows",
+      "state": "pair-selected",
+      "params": {
+        "pair-selected": {
+          "fill": "pair-a",
+          "tracking": 0
+        }
+      }
+    },
+    "chip": {
+      "material": "outlined",
+      "state": "invert-on-hover",
+      "params": {
+        "outlined": {
+          "width": 2,
+          "colour": "ink",
+          "fill": "transparent"
+        }
+      }
+    },
+    "badge": {
+      "material": "outlined",
+      "state": "disabled-hatch",
+      "params": {
+        "outlined": {
+          "width": 2,
+          "colour": "ink",
+          "fill": "transparent"
+        }
+      }
+    },
+    "progress": {
+      "material": "skyline-fill",
+      "state": "disabled-hatch"
+    },
+    "avatar": {
+      "material": "outlined",
+      "state": "disabled-hatch",
+      "params": {
+        "outlined": {
+          "width": 2,
+          "colour": "ink",
+          "fill": "canvas"
+        }
+      }
+    },
+    "tooltip": {
+      "material": "pair-block",
+      "state": "disabled-hatch",
+      "params": {
+        "pair-block": {
+          "fill": "ink",
+          "edge": "ink",
+          "width": 2,
+          "shadow": "pair-b",
+          "offset": 3,
+          "force": true
+        }
+      }
+    },
+    "modal": {
+      "material": "pair-block",
+      "state": "press-sink",
+      "params": {
+        "pair-block": {
+          "fill": "canvas",
+          "edge": "ink",
+          "width": 2,
+          "shadow": "pair-b",
+          "offset": 4,
+          "accent": "pair-a",
+          "accentWidth": 8,
+          "accentSide": "top"
+        }
+      }
+    },
+    "sheet": {
+      "material": "pair-block",
+      "state": "press-sink",
+      "params": {
+        "pair-block": {
+          "fill": "canvas",
+          "edge": "ink",
+          "width": 2,
+          "shadow": "pair-b",
+          "offset": 4,
+          "accent": "pair-a",
+          "accentWidth": 8,
+          "accentSide": "top"
+        }
+      }
+    },
+    "toast": {
+      "material": "pair-block",
+      "state": "press-sink",
+      "params": {
+        "pair-block": {
+          "fill": "canvas",
+          "edge": "ink",
+          "width": 2,
+          "shadow": "pair-b",
+          "offset": 3
+        }
+      }
+    },
+    "callout": {
+      "material": "pair-block",
+      "state": "disabled-hatch",
+      "params": {
+        "pair-block": {
+          "fill": "none",
+          "edge": "tone",
+          "width": 4,
+          "sides": "left"
+        }
+      }
+    },
+    "menu": {
+      "material": "pair-block",
+      "state": "pair-selected",
+      "params": {
+        "pair-block": {
+          "fill": "canvas",
+          "edge": "ink",
+          "width": 2,
+          "shadow": "pair-b",
+          "offset": 3
+        }
+      }
+    },
+    "navbar": {
+      "material": "pair-block",
+      "state": "pair-selected",
+      "params": {
+        "pair-block": {
+          "fill": "none",
+          "edge": "ink",
+          "width": 3,
+          "sides": "top"
+        }
+      }
+    },
+    "topbar": {
+      "material": "pair-block",
+      "state": "disabled-hatch",
+      "params": {
+        "pair-block": {
+          "fill": "none",
+          "edge": "ink",
+          "width": 3,
+          "sides": "bottom"
+        }
+      }
+    },
+    "button-split": {
+      "material": "pair-block",
+      "state": [
+        "stretch-flip",
+        "disabled-hatch"
+      ],
+      "params": {
+        "pair-block": {
+          "fill": "pair-a",
+          "edge": "ink",
+          "width": 2,
+          "face": "display",
+          "caps": true,
+          "tracking": 0.08,
+          "size": 13
+        }
+      }
+    },
+    "button-fab": {
+      "material": "pair-block",
+      "state": [
+        "press-sink",
+        "disabled-hatch"
+      ],
+      "params": {
+        "pair-block": {
+          "fill": "pair-a",
+          "edge": "ink",
+          "width": 2,
+          "shadow": "pair-b",
+          "offset": 4
+        }
+      }
+    },
+    "button-back-top": {
+      "material": "pair-block",
+      "state": [
+        "press-sink"
+      ],
+      "params": {
+        "pair-block": {
+          "fill": "canvas",
+          "edge": "ink",
+          "width": 2,
+          "shadow": "pair-b",
+          "offset": 3,
+          "face": "mono",
+          "caps": true,
+          "tracking": 0.1,
+          "size": 12,
+          "force": true
+        }
+      }
+    },
+    "link": {
+      "material": "pair-link"
+    },
+    "stepper": {
+      "material": "pair-stepper"
+    },
+    "knob": {
+      "material": "pair-block",
+      "state": "press-sink",
+      "params": {
+        "pair-block": {
+          "fill": "pair-a",
+          "edge": "ink",
+          "width": 2,
+          "shadow": "pair-b",
+          "offset": 3
+        }
+      }
+    },
+    "date-field": {
+      "material": "heavy-underline",
+      "state": "disabled-hatch",
+      "params": {
+        "heavy-underline": {
+          "width": 3,
+          "edge": "pair-b",
+          "focusEdge": "pair-a"
+        }
+      }
+    },
+    "combo": {
+      "material": "heavy-underline",
+      "state": "disabled-hatch",
+      "params": {
+        "heavy-underline": {
+          "width": 3,
+          "edge": "pair-b",
+          "focusEdge": "pair-a"
+        }
+      }
+    },
+    "listbox": {
+      "material": "pair-block",
+      "state": "pair-item-selected",
+      "params": {
+        "pair-block": {
+          "fill": "canvas",
+          "edge": "ink",
+          "width": 2,
+          "shadow": "pair-b",
+          "offset": 3
+        }
+      }
+    },
+    "calendar": {
+      "material": "pair-calendar"
+    },
+    "calendar-day": {
+      "material": "pair-day"
+    },
+    "wheel": {
+      "material": "pair-wheel"
+    },
+    "accordion": {
+      "material": "pair-accordion"
+    },
+    "carousel-card": {
+      "material": "pair-block",
+      "state": "press-sink",
+      "params": {
+        "pair-block": {
+          "fill": "canvas",
+          "edge": "ink",
+          "width": 2,
+          "shadow": "pair-b",
+          "offset": 3
+        }
+      }
+    },
+    "matrix-tile": {
+      "material": "pair-block",
+      "state": "press-sink",
+      "params": {
+        "pair-block": {
+          "fill": "canvas",
+          "edge": "ink",
+          "width": 2
+        }
+      }
+    },
+    "divider": {
+      "material": "pair-heavy-rule",
+      "params": {
+        "pair-heavy-rule": {
+          "height": 3,
+          "colour": "ink"
+        }
+      }
+    },
+    "section-label": {
+      "material": "pair-block",
+      "params": {
+        "pair-block": {
+          "fill": "none",
+          "edge": "none",
+          "width": 0,
+          "face": "inherit",
+          "caps": false,
+          "size": 17
+        }
+      }
+    },
+    "empty-state": {
+      "material": "pair-block",
+      "params": {
+        "pair-block": {
+          "fill": "none",
+          "edge": "ink",
+          "width": 2,
+          "shadow": "pair-b",
+          "offset": 3
+        }
+      }
+    },
+    "overlay-scrim": {
+      "material": "pair-inset-frame",
+      "params": {
+        "pair-inset-frame": {
+          "width": 4,
+          "colour": "pair-a"
+        }
+      }
+    },
+    "side-sheet": {
+      "material": "pair-block",
+      "params": {
+        "pair-block": {
+          "fill": "canvas",
+          "edge": "ink",
+          "width": 4,
+          "sides": "all",
+          "shadow": "pair-b",
+          "offset": 3,
+          "accent": "pair-a",
+          "accentWidth": 8,
+          "accentSide": "top"
+        }
+      }
+    },
+    "drawer": {
+      "material": "pair-block",
+      "params": {
+        "pair-block": {
+          "fill": "canvas",
+          "edge": "ink",
+          "width": 4,
+          "sides": "all",
+          "shadow": "pair-b",
+          "offset": 3,
+          "accent": "pair-a",
+          "accentWidth": 8,
+          "accentSide": "top"
+        }
+      }
+    },
+    "popover": {
+      "material": "pair-block",
+      "params": {
+        "pair-block": {
+          "fill": "canvas",
+          "edge": "ink",
+          "width": 2,
+          "shadow": "pair-b",
+          "offset": 3,
+          "force": true
+        }
+      }
+    },
+    "popup-tip": {
+      "material": "pair-block",
+      "params": {
+        "pair-block": {
+          "fill": "pair-a",
+          "edge": "ink",
+          "width": 2,
+          "shadow": "pair-b",
+          "offset": 3,
+          "force": true
+        }
+      }
+    },
+    "lightbox": {
+      "material": "pair-block",
+      "params": {
+        "pair-block": {
+          "fill": "ink",
+          "edge": "ink",
+          "width": 2
+        }
+      }
+    },
+    "lightbox-control": {
+      "material": "pair-block",
+      "state": [
+        "press-sink",
+        "disabled-hatch"
+      ],
+      "params": {
+        "pair-block": {
+          "fill": "pair-a",
+          "edge": "none",
+          "width": 0,
+          "shadow": "pair-b",
+          "offset": 3
+        }
+      }
+    },
+    "topbar-title": {
+      "material": "pair-block",
+      "params": {
+        "pair-block": {
+          "fill": "none",
+          "edge": "none",
+          "width": 0,
+          "face": "display",
+          "caps": true,
+          "tracking": 0.02,
+          "size": 17
+        }
+      }
+    },
+    "tabbar": {
+      "material": "pair-block",
+      "params": {
+        "pair-block": {
+          "fill": "none",
+          "edge": "ink",
+          "width": 3,
+          "sides": "top"
+        }
+      }
+    },
+    "nav-menu": {
+      "material": "pair-block",
+      "params": {
+        "pair-block": {
+          "fill": "none",
+          "edge": "ink",
+          "width": 3,
+          "sides": "top"
+        }
+      }
+    },
+    "nav-item": {
+      "material": "pair-block",
+      "state": "pair-current",
+      "params": {
+        "pair-block": {
+          "fill": "none",
+          "edge": "none",
+          "width": 0,
+          "face": "display",
+          "caps": true,
+          "tracking": 0.04,
+          "size": 13
+        },
+        "pair-current": {
+          "fill": "tint",
+          "bar": 4
+        }
+      }
+    },
+    "breadcrumbs": {
+      "material": "pair-crumbs"
+    },
+    "anchor-nav": {
+      "material": "pair-anchors"
+    },
+    "scrollbar": {
+      "material": "pair-scroll"
+    },
+    "dropdown-trigger": {
+      "material": "pair-block",
+      "state": [
+        "pair-current",
+        "disabled-hatch"
+      ],
+      "params": {
+        "pair-block": {
+          "fill": "canvas",
+          "edge": "ink",
+          "width": 2
+        },
+        "pair-current": {
+          "fill": "tint"
+        }
+      }
+    },
+    "menu-item": {
+      "material": "pair-block",
+      "state": "pair-selected",
+      "params": {
+        "pair-block": {
+          "fill": "none",
+          "edge": "none",
+          "width": 0,
+          "face": "mono",
+          "caps": true,
+          "tracking": 0.06,
+          "size": 13
+        },
+        "pair-selected": {
+          "fill": "tint",
+          "tracking": 0.06
+        }
+      }
+    },
+    "mega-menu": {
+      "material": "pair-block",
+      "params": {
+        "pair-block": {
+          "fill": "canvas",
+          "edge": "ink",
+          "width": 2,
+          "shadow": "pair-b",
+          "offset": 3,
+          "accent": "pair-a",
+          "accentWidth": 4,
+          "accentSide": "top"
+        }
+      }
+    },
+    "menubar": {
+      "material": "pair-block",
+      "state": "pair-current",
+      "params": {
+        "pair-block": {
+          "fill": "canvas",
+          "edge": "ink",
+          "width": 2,
+          "shadow": "pair-b",
+          "offset": 3,
+          "face": "display",
+          "caps": true,
+          "tracking": 0.06,
+          "size": 13
+        },
+        "pair-current": {
+          "fill": "pair-a",
+          "kids": "[role=\"menuitem\"]"
+        }
+      }
+    },
+    "ribbon": {
+      "material": "pair-block",
+      "params": {
+        "pair-block": {
+          "fill": "canvas",
+          "edge": "ink",
+          "width": 2,
+          "shadow": "pair-b",
+          "offset": 3
+        }
+      }
+    },
+    "pie-menu": {
+      "material": "pair-pie"
+    },
+    "spinner": {
+      "material": "pair-pulse"
+    },
+    "skeleton": {
+      "material": "pair-pulse"
+    },
+    "notification-dot": {
+      "material": "pair-block",
+      "params": {
+        "pair-block": {
+          "fill": "pair-b",
+          "edge": "none",
+          "width": 0
+        }
+      }
+    },
+    "kbd": {
+      "material": "pair-block",
+      "params": {
+        "pair-block": {
+          "fill": "canvas",
+          "edge": "ink",
+          "width": 2,
+          "face": "mono",
+          "caps": true,
+          "tracking": 0.08,
+          "size": 11
+        }
+      }
+    }
+  },
+  "lineage": {
+    "forkedFrom": "acid-graphics",
+    "version": 2
+  },
+  "art": {
+    "hero": {
+      "kind": "generator",
+      "move": "op-art-ripple",
+      "params": {}
+    }
+  }
+}
