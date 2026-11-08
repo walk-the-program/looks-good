@@ -52,7 +52,7 @@
           "script",
           "groovy"
         ],
-        "why": "One sentence on why these font classes carry the look (stage 5).",
+        "why": "Wood type and slab headlines are what packet printers had in the case; a typewriter body reads like the growing notes on the back.",
         "pairings": [
           [
             "Archivo Black",
@@ -79,9 +79,9 @@
         "slow": 240,
         "ease": "out"
       },
-      "pressText": "What rest, hover and pressed do, in numbers (stages 4 and 9).",
-      "icons": "Stroke weight, caps, corners, selected treatment.",
-      "appIcon": "One sentence describing the app icon tile in this look."
+      "pressText": "Rest: a flat printed ink with an inner keyline. Hover: the fill flips to full ink with canvas text. Pressed: the stamp sinks 2px, as if pushed into the pad.",
+      "icons": "Square-ended 2px ink strokes in caps-height glyphs, drawn like woodcut marks; a selected icon is filled solid ink.",
+      "appIcon": "A kraft tile with a double ink frame and a single sprouting seedling in one flat green ink, a row of perforation holes along the bottom edge."
     },
     "labels": {
       "material": "Kraft and stamp",
@@ -141,10 +141,11 @@
     },
     "rules": {
       "do": [
-        "Keep one border weight everywhere."
+        "Print every surface flat: one ink border weight, no gradients, no blur.",
+        "End a section with a perforation or a stamp, never a plain gap."
       ],
       "dont": [
-        "Use blur shadows."
+        "Use glossy, glass or soft shadows: nothing here is lit, it is printed."
       ]
     },
     "highlight": "ink",
@@ -153,8 +154,12 @@
       {
         "move": "warm-paper-canvas",
         "params": {
-          "cream": "#c8a46e",
-          "keep": 0.15
+          "cream": {
+            "light": "#c8a46e",
+            "dark": "#3a2a19"
+          },
+          "keep": 0.15,
+          "warmDark": true
         }
       }
     ],
@@ -178,7 +183,7 @@
       {
         "move": "caps-mono-labels",
         "params": {
-          "tracking": 0.1
+          "tracking": 0.26
         }
       },
       {
@@ -211,6 +216,13 @@
         "scope": "board"
       },
       {
+        "move": "swatch-keyline",
+        "params": {
+          "width": 2
+        },
+        "scope": "board"
+      },
+      {
         "move": "stamped-label",
         "params": {},
         "scope": "board"
@@ -218,14 +230,26 @@
       {
         "move": "tear-line",
         "params": {
-          "where": "both",
-          "label": "Tear here"
+          "where": "hero",
+          "label": "Tear here",
+          "gap": 14
         },
         "scope": "board"
       },
       {
         "move": "ink-stamp",
-        "params": {}
+        "params": {
+          "wearAt": "edge",
+          "wear": 0.4,
+          "fleck": 1.6
+        }
+      },
+      {
+        "move": "coupon-foot",
+        "params": {
+          "text": "Lot 14 · 2027 season · Tear off and keep"
+        },
+        "scope": "board"
       }
     ],
     "kit": {
@@ -633,14 +657,14 @@
           "art.hero: generic circle-and-shapes placeholder replaced by a framed botanical engraving of a sprouting seed, ink line work with one flat green ink",
           "new moves in js/moves/printed-stock.js: tear-line, stamped-label, ink-stamp, tear-edge (generic, with params)",
           "added board moves stamped-label (hero kicker as a tilted, worn rubber stamp) and tear-line (perforated line under the hero and above the footer, captioned Tear here)",
-          "kit.button-primary: hard-offset -> ink-stamp (dulled flat ink, inner keyline, caps text, speckled wear); ink-stamp also listed in moves because its text-contrast tokens only run from there",
-          "kit.card and kit.modal: hard-offset -> tear-edge (ink frame with a perforated strip along the bottom)",
-          "layout.palette: swatches -> chips with palette-board-form (square chips with a keyline and a caps caption)"
+          "kit.button-primary: hard-offset - ink-stamp (dulled flat ink, inner keyline, caps text, speckled wear); ink-stamp also listed in moves because its text-contrast tokens only run from there",
+          "kit.card and kit.modal: hard-offset - tear-edge (ink frame with a perforated strip along the bottom)",
+          "layout.palette: swatches - chips with palette-board-form (square chips with a keyline and a caps caption)"
         ],
         "variants": [
           {
             "id": "r3a",
-            "change": "art: placeholder shapes -> botanical engraving svg",
+            "change": "art: placeholder shapes - botanical engraving svg",
             "verdict": "keep"
           },
           {
@@ -655,12 +679,12 @@
           },
           {
             "id": "r3d",
-            "change": "material (button-primary): hard-offset -> ink-stamp",
+            "change": "material (button-primary): hard-offset - ink-stamp",
             "verdict": "keep"
           },
           {
             "id": "r3e",
-            "change": "palette layout: swatches -> chips (palette-board-form)",
+            "change": "palette layout: swatches - chips (palette-board-form)",
             "verdict": "keep"
           }
         ],
@@ -669,18 +693,118 @@
             "id": "n5",
             "target": "deck.cover",
             "text": "On the deck cover the hero tear line and the footer tear line sit next to each other and the footer text crowds them. Use where \"hero\" only or give the footer room.",
-            "status": "open"
+            "status": "done",
+            "doneIn": 5
           },
           {
             "id": "n6",
             "target": "general",
             "text": "Leftover template text: meta.fonts.why, build.pressText, build.icons, build.appIcon and rules.do/dont still hold placeholder sentences. Write them for this look.",
-            "status": "open"
+            "status": "done",
+            "doneIn": 5
           },
           {
             "id": "n7",
             "target": "kit.button-primary",
             "text": "The speckle wear on stamped buttons is even and reads as noise at small sizes; try fewer, larger flecks along the edge only.",
+            "status": "done",
+            "doneIn": 5
+          }
+        ]
+      },
+      {
+        "n": 4,
+        "date": "2026-11-07",
+        "by": "studio",
+        "summary": "Kraft holds in dark mode now; rules and font note rewritten; wider label tracking kept. Palette chip and deck foot need work.",
+        "changes": [
+          "colour recipe warm-paper-canvas: warmDark off → on",
+          "colour recipe warm-paper-canvas: cream #c8a46e → light #c8a46e / dark #c8a46e",
+          "colour recipe warm-paper-canvas: cream dark #c8a46e → #3a2a19",
+          "why these fonts: One sentence on why these font classes carry the look (stag… → Wood type and slab headlines are what packet printers had i…",
+          "do rules: Keep one border weight everywhere. → Print every surface flat: one ink border weight, no gradien…",
+          "don't rules: Use blur shadows. → Use glossy, glass or soft shadows: nothing here is lit, it…",
+          "do rules: Print every surface flat: one ink border weight, no gradien… → Print every surface flat: one ink border weight, no gradien…"
+        ],
+        "variants": [
+          {
+            "id": "r4a",
+            "change": "caps-mono-labels: tracking 0.1 → 0.26",
+            "verdict": "keep"
+          },
+          {
+            "id": "r4b",
+            "change": "caps-mono-labels: size 0.72 → 0.87",
+            "verdict": "kill"
+          },
+          {
+            "id": "r4c",
+            "change": "caps-mono-labels: tracking 0.1 → 0.21",
+            "verdict": "kill"
+          }
+        ],
+        "notes": [
+          {
+            "id": "n8",
+            "target": "board.palette",
+            "text": "The canvas chip disappears: it is the page colour with no edge, in light and dark. Every chip should be a printed swatch with an ink keyline so the canvas one still reads.",
+            "status": "done",
+            "doneIn": 5
+          },
+          {
+            "id": "n9",
+            "target": "deck.cover",
+            "text": "The striped blue band with a circle at the foot of the cover comes from another look and fights the kraft. Make the foot a tear-off coupon instead: a perforated strip with the lot number and season, printed in ink on kraft.",
+            "status": "done",
+            "doneIn": 5
+          }
+        ]
+      },
+      {
+        "n": 5,
+        "date": "2026-11-07",
+        "by": "agent",
+        "summary": "One tear line on the cover with room below it, a printed coupon foot in place of the striped band, keylined palette chips, fewer larger edge flecks on stamped buttons, and the leftover template text written.",
+        "changes": [
+          "tear-line: new gap param (default 0); the spec uses where hero only with gap 14, so the footer text no longer crowds a second line (n5)",
+          "new move coupon-foot in js/moves/printed-marks.js: on the deck cover it hides the pattern band and prints a perforated tear-off coupon strip reading 'Lot 14 · 2027 season · Tear off and keep' (n9)",
+          "new move swatch-keyline in js/moves/printed-marks.js: every palette chip gets a 2px ink keyline, so the canvas chip reads in light and dark (n8)",
+          "ink-stamp: new params wearAt (all|edge, default all) and fleck; the spec uses wearAt edge, wear 0.4, fleck 1.6: six larger flecks just inside the keyline instead of even speckle (n7)",
+          "build.pressText, build.icons and build.appIcon rewritten for the kraft and stamp look; fonts.why and rules were already rewritten in round 4 (n6)"
+        ],
+        "variants": [
+          {
+            "id": "r5a",
+            "change": "structure: tear-line where both - hero, with gap",
+            "verdict": "keep"
+          },
+          {
+            "id": "r5b",
+            "change": "structure: deck cover foot band - coupon-foot",
+            "verdict": "keep"
+          },
+          {
+            "id": "r5c",
+            "change": "structure: palette chips - swatch-keyline",
+            "verdict": "keep"
+          },
+          {
+            "id": "r5d",
+            "change": "material (button-primary): ink-stamp wear - edge flecks (fleck 2.2 killed as too big, 1.6 applied)",
+            "verdict": "keep"
+          }
+        ],
+        "notes": [
+          {
+            "id": "n10",
+            "target": "kit.button-primary",
+            "text": "On the small Rest/Pressed buttons an edge fleck can land beside the label; consider fewer flecks when the button is under 120px wide.",
+            "status": "open"
+          },
+          {
+            "id": "n11",
+            "target": "deck.cover",
+            "text": "The cover band is hidden by CSS from coupon-foot because an imported style cannot set deck.coverBand false; the coupon holds one text line only (lot and season), no split stub.",
             "status": "open"
           }
         ]
@@ -1692,6 +1816,534 @@
             "src": "art/hero.svg",
             "fit": "cover",
             "alt": "Describe the hero art"
+          }
+        }
+      }
+    },
+    {
+      "round": 4,
+      "date": "2026-11-07",
+      "aesthetic": {
+        "spec": 2,
+        "key": "seed-packet",
+        "order": 950,
+        "name": "Seed Packet",
+        "descriptor": "Kraft · Stamped · Botanical",
+        "influences": "1930s–50s seed packets, mail-order nursery catalogues, rubber date stamps, botanical engravings, perforated coupons",
+        "summary": "A brand dressed as a vintage seed packet: kraft paper, stamped labels and a tear-off strip.",
+        "coreTrick": "Every surface is a printed paper packet: kraft stock, a rubber-stamped ink label, and a perforated tear line where a card meets its footer.",
+        "motto": "Sow by the date stamped on the back.",
+        "kicker": "Packed for the 2027 season · Lot 14",
+        "mode": "light",
+        "lineage": {
+          "forkedFrom": "blank",
+          "version": 1
+        },
+        "meta": {
+          "family": "print",
+          "fonts": {
+            "heading": {
+              "classes": [
+                "slab",
+                "woodtype"
+              ],
+              "picks": [
+                "Alfa Slab One",
+                "Rye",
+                "Big Shoulders Display"
+              ]
+            },
+            "body": {
+              "classes": [
+                "typewriter",
+                "old-style"
+              ],
+              "picks": [
+                "Courier Prime",
+                "Libre Caslon Text"
+              ]
+            },
+            "mono": {
+              "picks": [
+                "JetBrains Mono",
+                "IBM Plex Mono"
+              ]
+            },
+            "avoid": [
+              "didone",
+              "script",
+              "groovy"
+            ],
+            "why": "Wood type and slab headlines are what packet printers had in the case; a typewriter body reads like the growing notes on the back.",
+            "pairings": [
+              [
+                "Archivo Black",
+                "Inter"
+              ],
+              [
+                "Inter Tight",
+                "Inter"
+              ]
+            ]
+          }
+        },
+        "build": {
+          "cls": "flat",
+          "surface": "Kraft paper with a double ink frame, a perforated tear line and rubber-stamped ink; no shadows.",
+          "press": {
+            "dx": 4,
+            "dy": 4,
+            "ms": 100
+          },
+          "motion": {
+            "fast": 100,
+            "base": 160,
+            "slow": 240,
+            "ease": "out"
+          },
+          "pressText": "What rest, hover and pressed do, in numbers (stages 4 and 9).",
+          "icons": "Stroke weight, caps, corners, selected treatment.",
+          "appIcon": "One sentence describing the app icon tile in this look."
+        },
+        "labels": {
+          "material": "Kraft and stamp",
+          "states": [
+            "Rest",
+            "Hover",
+            "Pressed"
+          ],
+          "statesKind": "button"
+        },
+        "copy": {
+          "motto": {
+            "label": "Motto",
+            "text": "Sow by the date stamped on the back."
+          },
+          "kicker": {
+            "label": "Kicker above the headline",
+            "text": "Packed for the 2027 season · Lot 14"
+          }
+        },
+        "layout": {
+          "hero": "split",
+          "palette": "chips",
+          "sections": "two-col"
+        },
+        "type": {
+          "ui": "sans",
+          "label": "mono",
+          "display": 1
+        },
+        "roles": {
+          "canvas": {
+            "use": "Page and panel background, tinted slightly toward the primary hue",
+            "never": "Text",
+            "coverage": "60-70%"
+          },
+          "ink": {
+            "use": "Headlines, body text, borders, hover fill",
+            "never": "Large background fields in light mode",
+            "coverage": "15-20%"
+          },
+          "primary": {
+            "use": "The one main action per view; selected state",
+            "never": "Body text; more than one CTA per view",
+            "coverage": "about 10%"
+          },
+          "secondary": {
+            "use": "Secondary buttons, chips, second data series",
+            "never": "The main CTA, body text",
+            "coverage": "10-15%"
+          },
+          "accent": {
+            "use": "One spark per view: the highlighted headline word, new badges",
+            "never": "Buttons, body text, borders, large fills",
+            "coverage": "5% or less"
+          }
+        },
+        "rules": {
+          "do": [
+            "Print every surface flat: one ink border weight, no gradients, no blur.",
+            "End a section with a perforation or a stamp, never a plain gap."
+          ],
+          "dont": [
+            "Use glossy, glass or soft shadows: nothing here is lit, it is printed."
+          ]
+        },
+        "highlight": "ink",
+        "slideShape": "minimal",
+        "colour": [
+          {
+            "move": "warm-paper-canvas",
+            "params": {
+              "cream": {
+                "light": "#c8a46e",
+                "dark": "#3a2a19"
+              },
+              "keep": 0.15,
+              "warmDark": true
+            }
+          }
+        ],
+        "moves": [
+          {
+            "move": "corner-radius",
+            "params": {
+              "base": 2,
+              "controls": 1,
+              "surfaces": 1,
+              "small": 1,
+              "round": false
+            }
+          },
+          {
+            "move": "heavy-border",
+            "params": {
+              "width": 5
+            }
+          },
+          {
+            "move": "caps-mono-labels",
+            "params": {
+              "tracking": 0.26
+            }
+          },
+          {
+            "move": "tight-display-tracking",
+            "params": {
+              "tracking": -0.05
+            }
+          },
+          {
+            "move": "edge-underline",
+            "params": {
+              "width": 2
+            },
+            "scope": "board"
+          },
+          {
+            "move": "ticket-tab",
+            "params": {}
+          },
+          {
+            "move": "double-rule",
+            "params": {}
+          },
+          {
+            "move": "palette-board-form",
+            "params": {
+              "cols": 5,
+              "chip": 30
+            },
+            "scope": "board"
+          },
+          {
+            "move": "stamped-label",
+            "params": {},
+            "scope": "board"
+          },
+          {
+            "move": "tear-line",
+            "params": {
+              "where": "both",
+              "label": "Tear here"
+            },
+            "scope": "board"
+          },
+          {
+            "move": "ink-stamp",
+            "params": {}
+          }
+        ],
+        "kit": {
+          "button-primary": {
+            "material": "ink-stamp",
+            "state": [
+              "invert-on-hover",
+              "press-sink"
+            ]
+          },
+          "button-secondary": {
+            "material": "outlined",
+            "state": [
+              "invert-on-hover",
+              "press-sink"
+            ]
+          },
+          "button-ghost": {
+            "material": "quiet-text",
+            "state": [
+              "invert-on-hover",
+              "press-sink"
+            ]
+          },
+          "button-icon": {
+            "material": "outlined",
+            "state": [
+              "invert-on-hover",
+              "press-sink"
+            ]
+          },
+          "button-danger": {
+            "material": "outlined",
+            "state": [
+              "invert-on-hover",
+              "press-sink"
+            ]
+          },
+          "field": {
+            "material": "outlined",
+            "state": "press-sink",
+            "params": {
+              "outlined": {
+                "width": {
+                  "light": 2,
+                  "dark": 3
+                },
+                "fill": "canvas"
+              }
+            }
+          },
+          "select": {
+            "material": "outlined",
+            "state": "press-sink"
+          },
+          "switch": {
+            "material": "flat-fill",
+            "state": "ink-fill-selected"
+          },
+          "checkbox": {
+            "material": "flat-fill",
+            "state": "ink-fill-selected"
+          },
+          "radio": {
+            "material": "flat-fill",
+            "state": "ink-fill-selected"
+          },
+          "slider": {
+            "material": "flat-fill",
+            "state": "ink-fill-selected"
+          },
+          "segmented": {
+            "material": "flat-fill",
+            "state": "ink-fill-selected"
+          },
+          "tabs": {
+            "material": "flat-fill",
+            "state": "ink-fill-selected"
+          },
+          "card": {
+            "material": "tear-edge"
+          },
+          "panel": {
+            "material": "flat-fill"
+          },
+          "list-row": {
+            "material": "outlined"
+          },
+          "chip": {
+            "material": "flat-fill",
+            "state": "ink-fill-selected"
+          },
+          "badge": {
+            "material": "flat-fill",
+            "params": {
+              "flat-fill": {
+                "fill": "accent"
+              }
+            }
+          },
+          "progress": {
+            "material": "flat-fill"
+          },
+          "avatar": {
+            "material": "outlined"
+          },
+          "tooltip": {
+            "material": "flat-fill",
+            "params": {
+              "flat-fill": {
+                "fill": "ink"
+              }
+            }
+          },
+          "modal": {
+            "material": "tear-edge"
+          },
+          "sheet": {
+            "material": "hard-offset"
+          },
+          "toast": {
+            "material": "outlined"
+          },
+          "callout": {
+            "material": "outlined",
+            "scope": "kit"
+          },
+          "menu": {
+            "material": "outlined"
+          },
+          "navbar": {
+            "material": "flat-fill"
+          },
+          "topbar": {
+            "material": "flat-fill"
+          },
+          "button-split": {
+            "material": "hard-offset",
+            "state": [
+              "invert-on-hover",
+              "press-sink"
+            ]
+          },
+          "button-fab": {
+            "material": "hard-offset",
+            "state": [
+              "invert-on-hover",
+              "press-sink"
+            ]
+          },
+          "button-back-top": {
+            "material": "outlined",
+            "state": [
+              "invert-on-hover",
+              "press-sink"
+            ]
+          },
+          "link": {
+            "material": "quiet-text"
+          },
+          "stepper": {
+            "material": "outlined",
+            "state": "press-sink"
+          },
+          "knob": {
+            "material": "flat-fill"
+          },
+          "date-field": {
+            "material": "outlined",
+            "state": "press-sink"
+          },
+          "combo": {
+            "material": "outlined",
+            "state": "press-sink"
+          },
+          "listbox": {
+            "material": "outlined",
+            "state": "press-sink"
+          },
+          "calendar": {
+            "material": "outlined"
+          },
+          "calendar-day": {
+            "material": "outlined"
+          },
+          "wheel": {
+            "material": "flat-fill"
+          },
+          "accordion": {
+            "material": "outlined"
+          },
+          "carousel-card": {
+            "material": "outlined"
+          },
+          "matrix-tile": {
+            "material": "outlined"
+          },
+          "divider": {
+            "material": "flat-fill"
+          },
+          "section-label": {
+            "material": "quiet-text"
+          },
+          "empty-state": {
+            "material": "outlined"
+          },
+          "overlay-scrim": {
+            "material": "flat-fill"
+          },
+          "side-sheet": {
+            "material": "hard-offset"
+          },
+          "drawer": {
+            "material": "hard-offset"
+          },
+          "popover": {
+            "material": "hard-offset"
+          },
+          "popup-tip": {
+            "material": "flat-fill",
+            "params": {
+              "flat-fill": {
+                "fill": "ink"
+              }
+            }
+          },
+          "lightbox": {
+            "material": "hard-offset"
+          },
+          "lightbox-control": {
+            "material": "outlined"
+          },
+          "topbar-title": {
+            "material": "quiet-text"
+          },
+          "tabbar": {
+            "material": "flat-fill"
+          },
+          "nav-menu": {
+            "material": "flat-fill"
+          },
+          "nav-item": {
+            "material": "outlined"
+          },
+          "breadcrumbs": {
+            "material": "quiet-text"
+          },
+          "anchor-nav": {
+            "material": "quiet-text"
+          },
+          "scrollbar": {
+            "material": "flat-fill"
+          },
+          "dropdown-trigger": {
+            "material": "outlined",
+            "state": "press-sink"
+          },
+          "menu-item": {
+            "material": "outlined"
+          },
+          "mega-menu": {
+            "material": "outlined"
+          },
+          "menubar": {
+            "material": "outlined"
+          },
+          "ribbon": {
+            "material": "outlined"
+          },
+          "pie-menu": {
+            "material": "outlined"
+          },
+          "spinner": {
+            "material": "flat-fill"
+          },
+          "skeleton": {
+            "material": "outlined"
+          },
+          "notification-dot": {
+            "material": "flat-fill"
+          },
+          "kbd": {
+            "material": "outlined"
+          }
+        },
+        "art": {
+          "hero": {
+            "kind": "svg",
+            "src": "art/hero.svg",
+            "fit": "cover",
+            "alt": "A botanical engraving of a sprouting seed: a husk under hatched soil, roots below, a stem with two leaves and a bud, in ink line work with one flat green ink, framed like a packet front."
           }
         }
       }

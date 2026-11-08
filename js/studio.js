@@ -576,6 +576,11 @@ const Studio = (function () {
       fSeg('mode', 'Looks best in', s.mode, ['light', 'dark']),
       s.meta ? fSelect('meta.family', 'Family', s.meta.family, fam) : noMeta,
       cls.length && s.build ? fSelect('build.cls', 'Build class', s.build.cls, cls) : '',
+      isObj(s.build) ? `<div class="stu-sub">Build notes</div>
+        ${fText('build.surface', 'Surface', s.build.surface || '', { area: true, rows: 2, help: 'One sentence on how surfaces are made. Keep it true to the look.' })}
+        ${fText('build.pressText', 'Press behaviour', s.build.pressText || '', { area: true, rows: 2, help: 'What a press does: how far the surface moves, how long, which easing.' })}
+        ${fText('build.icons', 'Icons', s.build.icons || '', { area: true, rows: 2, help: 'Stroke weight, caps, corners and how a selected icon looks.' })}
+        ${fText('build.appIcon', 'App icon', s.build.appIcon || '', { area: true, rows: 2, help: 'The app icon in one sentence: tile, border, glyph, colour.' })}` : '',
       `<div class="stu-row2">${fSelect('layout.hero', 'Hero layout', lay.hero, ['split', 'centered', 'poster', 'scene'], { empty: 'Default' })}${fSelect('layout.palette', 'Palette layout', lay.palette, ['swatches', 'chips', 'list', 'strips'], { empty: 'Default' })}</div>`,
       `<div class="stu-row2">${fSelect('layout.sections', 'Sections', lay.sections, ['two-col', 'asym', 'stacked'], { empty: 'Default' })}${fSelect('slideShape', 'Slide shape', s.slideShape, ['minimal', 'soft', 'refined', 'geometric', 'classic'], { empty: 'Default' })}</div>`,
     ].join('');
@@ -1098,6 +1103,7 @@ const Studio = (function () {
     shade = lsGet(SHADE_KEY) === 'dark' ? 'dark' : 'light';
     await refreshBrands();
     el.section.dataset.studio = 'open';
+    document.documentElement.classList.add('studio-open');
     el.root.hidden = false;
     syncSeg(el.tabs, 'tab', S.tab);
     syncSeg(el.shade, 'shade', shade);
@@ -1123,6 +1129,7 @@ const Studio = (function () {
     el.panels.innerHTML = '';
     el.root.hidden = true;
     delete el.section.dataset.studio;
+    document.documentElement.classList.remove('studio-open');
     emit('close', { key });
     if (typeof StylesHome !== 'undefined' && StylesHome.afterStudio) StylesHome.afterStudio(key);
   }

@@ -61,7 +61,7 @@ in `js/moves/*.js` and are loaded by `index.html`.
 - `scope` defaults to `all`. `board` = the board and the deck; `kit` = the Built kit and screens.
 - `deck` (optional) tunes the brand deck: `coverDisplay` (number 0.2 to 2, the cover headline size factor), `principles`
   (up to 6 `[title, line]` pairs), `do` / `dont` (up to 8 short strings each), `marks` (`{ do, dont }` strings of up
-  to 4 characters). `highlightNote` (optional string, up to 400 characters) explains the headline highlight. Stored and
+  to 4 characters), `coverBand` (boolean; `false` removes the pattern band at the foot of the deck cover). `highlightNote` (optional string, up to 400 characters) explains the headline highlight. Stored and
   imported styles may carry both; any other key inside `deck` is refused (no code, no functions).
 - Required: `spec`, `key`, `name`, `descriptor`, `coreTrick`, `mode`, `colour`, `moves`, `kit`.
 

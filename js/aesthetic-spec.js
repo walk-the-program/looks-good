@@ -305,9 +305,10 @@ function deckProblem(d, note) {
   const str = (s, max) => typeof s === 'string' && s.length <= max;
   const strs = (a, cap, max) => Array.isArray(a) && a.length <= cap && a.every(s => str(s, max));
   if (!isObj(d)) return 'deck must be an object';
-  const extra = Object.keys(d).filter(k => !['coverDisplay', 'coverMin', 'principles', 'do', 'dont', 'marks'].includes(k));
+  const extra = Object.keys(d).filter(k => !['coverDisplay', 'coverMin', 'principles', 'do', 'dont', 'marks', 'coverBand'].includes(k));
   if (extra.length) return `deck has field(s) not allowed in an imported style: ${extra.join(', ')}`;
   if (d.coverDisplay !== undefined && !(typeof d.coverDisplay === 'number' && d.coverDisplay >= 0.2 && d.coverDisplay <= 2)) return 'deck.coverDisplay must be a number from 0.2 to 2';
+  if (d.coverBand !== undefined && typeof d.coverBand !== 'boolean') return 'deck.coverBand must be true or false';
   if (d.coverMin !== undefined && !(typeof d.coverMin === 'number' && d.coverMin >= 16 && d.coverMin <= 64)) return 'deck.coverMin must be a number from 16 to 64';
   if (d.principles !== undefined && !(Array.isArray(d.principles) && d.principles.length <= 6 && d.principles.every(p => Array.isArray(p) && p.length === 2 && str(p[0], 120) && str(p[1], 300)))) return 'deck.principles must be up to 6 [title, line] pairs of short strings';
   for (const f of ['do', 'dont']) if (d[f] !== undefined && !strs(d[f], 8, 300)) return `deck.${f} must be up to 8 short strings`;

@@ -1296,6 +1296,23 @@ check('paste: empty text', run(`extractColors('').length`) === 0, 'found colors 
     app = boot(); await app.c.CustomAesthetics.ready;
     check('custom: a stored style comes back after a reload', app.c.CustomAesthetics.source('night-roll') === 'mine' && keys().includes('night-roll'), J2(app.c.CustomAesthetics.list()));
 
+    // an agent's closed round has no version: a replacing import adds one (never for an open round)
+    {
+      const rd = (n, extra) => Object.assign({ n, date: '2026-11-07', by: 'agent', summary: 'x', changes: [], variants: [], notes: [], shots: null }, extra || {});
+      const b2 = JSON.parse(J2(base)); b2.rounds = { rounds: [rd(1), rd(2), rd(3)] }; b2.versions = [{ round: 1, date: '2026-11-01', aesthetic: b2.aesthetic }];
+      b2.aesthetic.motto = 'Round three look';
+      const r3 = await CA().importText(J2(b2), { onClash: () => 'replace' });
+      const vs = JSON.parse(await CA().exportText('night-roll')).versions || [];
+      check('custom: a replacing import snapshots the last closed round when it has no version', r3.ok && J2(vs.map(v => v.round)) === '[1,3]' && vs[1].aesthetic.motto === 'Round three look', J2(vs.map(v => v.round)));
+      const b3 = JSON.parse(J2(b2)); b3.rounds = { rounds: [rd(1), rd(2), rd(3), rd(4, { open: true, by: 'studio' })] }; b3.versions = [{ round: 3, date: '2026-11-07', aesthetic: b3.aesthetic }];
+      await CA().importText(J2(b3), { onClash: () => 'replace' });
+      const b4 = JSON.parse(J2(b2)); b4.rounds = { rounds: [rd(1), rd(2, { open: true, by: 'studio' })] }; delete b4.versions;
+      await CA().importText(J2(b4), { onClash: () => 'replace' });
+      const v4 = JSON.parse(await CA().exportText('night-roll')).versions || [];
+      check('custom: an existing version is kept as is, and an open round gets no snapshot', J2(v4.map(v => v.round)) === '[1]', J2(v4.map(v => v.round)));
+      await CA().importText(J2(base), { onClash: () => 'replace' });
+    }
+
     // bare aesthetic.json
     const bare = mk('bare-style'); delete bare.art;
     const rb = await CA().importText(J2(bare));
@@ -1477,12 +1494,16 @@ check('paste: empty text', run(`extractColors('').length`) === 0, 'found colors 
     };
     check('deck: the Soft Form and Acid Graphics starters (deck, highlightNote) pass the untrusted checks', untrusted(sf).ok && untrusted(ag).ok, J(untrusted(sf).errors) + J(untrusted(ag).errors));
     const withDeck = deck => Object.assign({}, sf, { deck });
+    const noBand = untrusted(withDeck(Object.assign({}, sf.deck, { coverBand: false })));
+    check('deck: coverBand false is accepted on an untrusted spec', noBand.ok, J(noBand.errors));
     const bads = {
       markup: withDeck(Object.assign({}, sf.deck, { do: ['<img src=x onerror=1>'] })),
       'marks markup': withDeck(Object.assign({}, sf.deck, { marks: { do: '<b>', dont: 'x' } })),
       'wrong type': withDeck('a string'),
       'coverDisplay string': withDeck({ coverDisplay: '0.8' }),
       'coverDisplay huge': withDeck({ coverDisplay: 9999 }),
+      'coverBand string': withDeck({ coverBand: 'false' }),
+      'coverBand number': withDeck({ coverBand: 0 }),
       'principles shape': withDeck({ principles: [['only one']] }),
       'huge array': withDeck({ do: Array.from({ length: 500 }, () => 'x') }),
       'long string': withDeck({ do: ['x'.repeat(2000)] }),
@@ -1512,7 +1533,9 @@ check('paste: empty text', run(`extractColors('').length`) === 0, 'found colors 
         if (J(v) !== J(SR.variations(spec, { axis, seed, catalog }))) problemsV.push(`${tag}: not deterministic`);
         if (v.length !== 3) problemsV.push(`${tag}: ${v.length} variants`);
         const seen = new Set([frozen]);
+        const usedKeys = new Set();
         for (const x of v) {
+          for (const k of SR.changedKeys(spec, x.spec)) { if (usedKeys.has(k)) problemsV.push(`${tag}/${x.id}: ${k} is varied by two cards in one batch`); usedKeys.add(k); }
           made++;
           const lines = SR.diffDetailed(spec, x.spec, catalog);
           const axes = [...new Set(lines.map(l => l.axis))];
@@ -1632,6 +1655,28 @@ check('paste: empty text', run(`extractColors('').length`) === 0, 'found colors 
     check('rounds: working on a round when none is open is an error, not a silent change', thr === 2, '');
   }
 
+  // the change log merges one subject's edits, and says what a list gained or lost
+  {
+    const rec = lines => SR.recordChanges(SR.openRound(null, { by: 'studio', date: '2026-11-07' }), lines).rounds[0].changes;
+    const lt = rec(['colour recipe x: cream #c8a46e → light #c8a46e / dark #c8a46e', 'colour recipe x: cream dark #c8a46e → #3a2a19']);
+    check('rounds: switching a dial to Light / Dark and setting dark is one line', J(lt) === J(['colour recipe x: cream #c8a46e → light #c8a46e / dark #3a2a19']), J(lt));
+    const lt2 = rec(['x: cream #a → light #a / dark #a', 'x: cream dark #a → #b', 'x: cream light #a → #c', 'x: cream dark #b → #a']);
+    check('rounds: further light and dark edits keep updating that one line', J(lt2) === J(['x: cream #a → light #c / dark #a']), J(lt2));
+    const lt3 = rec(['x: cream #a → light #a / dark #a', 'x: cream dark #a → #b', 'x: cream dark #b → #a']);
+    check('rounds: a pair edited back to where it started leaves no line', J(lt3) === '[]', J(lt3));
+    const before = { rules: { do: ['Print flat'], dont: ['Blur'] }, meta: { fonts: { heading: { picks: ['A', 'B'] } } } };
+    const add = JSON.parse(J(before)); add.rules.do.push('End a section with a perforation of dashed ink that runs the full width of the column');
+    const dl = SR.diff(before, add, catalog);
+    check('rounds: adding a do rule says what was added', J(dl) === J(['do rules: added "End a section with a perforation of das…"']), J(dl));
+    const rm = JSON.parse(J(add)); rm.rules.do = ['Print flat']; rm.meta.fonts.heading.picks = ['A'];
+    check('rounds: removing list entries says what was removed ', J(SR.diff(add, rm, catalog).slice(0, 1)) === J(['do rules: removed "End a section with a perforation of das…"']), J(SR.diff(add, rm, catalog)));
+    // typing a new rule: blank add logs nothing, then keystrokes stay one "added" line
+    const blank = JSON.parse(J(before)); blank.rules.do.push('');
+    const k1 = JSON.parse(J(blank)); k1.rules.do[1] = 'En'; const k2 = JSON.parse(J(blank)); k2.rules.do[1] = 'End';
+    const typed = rec([].concat(SR.diff(blank, k1, catalog), SR.diff(k1, k2, catalog)));
+    check('rounds: a blank rule logs nothing and typing into it is one added line', SR.diff(before, blank, catalog).length === 0 && J(typed) === J(['do rules: added "End"']), J(typed));
+  }
+
   // variant ids match their cards; the change log is plain words; hook order mirrors the runtime
   {
     let r = SR.openRound(null, { by: 'studio', date: '2026-11-07' });
@@ -1650,7 +1695,7 @@ check('paste: empty text', run(`extractColors('').length`) === 0, 'found colors 
     const a = JSON.parse(J(b));
     a.motto = 'New'; a.copy.motto.text = 'New'; a.meta.family = 'print'; a.meta.fonts.heading.picks = ['Alfa Slab One', 'Rye']; a.build.cls = 'flat'; a.labels.material = 'Kraft and stamp';
     const lines = SR.diff(b, a, catalog);
-    check('rounds: the change log is plain words, not field paths', J(lines) === J(['motto: Short line. → New', 'material name: Hard offset → Kraft and stamp', 'family: graphic → print & editorial', 'heading fonts: Archivo Black, Inter Tight → Alfa Slab One, Rye', 'build class: hard → flat']), J(lines));
+    check('rounds: the change log is plain words, not field paths', J(lines) === J(['motto: Short line. → New', 'material name: Hard offset → Kraft and stamp', 'family: graphic → print & editorial', 'heading fonts: removed "Archivo Black"', 'heading fonts: removed "Inter Tight"', 'heading fonts: added "Alfa Slab One"', 'heading fonts: added "Rye"', 'build class: hard → flat']), J(lines));
     check('rounds: a motto edit does not log its copy.motto mirror, but a copy-only edit is logged by name',
       !lines.some(l => /specimen|copy/.test(l)) && J(SR.diff(b, Object.assign(JSON.parse(J(b)), { copy: { motto: { label: 'Motto', text: 'Else' }, kicker: b.copy.kicker } }), catalog)) === '["motto specimen text: Short line. → Else"]', '');
     check('rounds: no field path leaks into any log line', !lines.some(l => /\b(meta|build|labels|copy)\./.test(l)), J(lines));

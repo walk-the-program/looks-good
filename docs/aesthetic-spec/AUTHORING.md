@@ -101,7 +101,7 @@ Do the stages in order in your head, then write the JSON. Each stage names the f
     `rules.do` and `rules.dont` (short, testable sentences), `layout` (`hero`
     `split|centered|poster|scene`, `palette` `swatches|chips|list|strips`, `sections`
     `two-col|asym|stacked`), `slideShape` (`minimal|soft|refined|geometric|classic`). Optional `deck`
-    (`coverDisplay`, `principles`, `do`, `dont`, `marks`) and `highlightNote` shape the brand deck; see SPEC-v2 section 2.
+    (`coverDisplay`, `principles`, `do`, `dont`, `marks`, `coverBand`) and `highlightNote` shape the brand deck (`deck.coverBand: false` removes the pattern band at the foot of the deck cover); see SPEC-v2 section 2.
 12. **Guardrails.** Contrast in light and dark, export safety, distinct from built-ins. Checked by
     the checker (section 10); `mode` is `light` or `dark` (the default mode), `lineage` records
     forks.
@@ -256,7 +256,7 @@ Rules:
 - **Collisions are errors.** A move id, material name or state name that already exists logs
   `console.error` and the whole move is ignored. Check the catalog first; use a distinct name.
 - Put it in a new file `js/moves/<name>.js` and add a `<script>` tag for it in
-  `index.html` (a `<script>` tag after `js/moves/darkroom.js`). Nothing else registers it; regenerate
+  `index.html` (a `<script>` tag after the last `js/moves/` script tag). Nothing else registers it; regenerate
   `docs/aesthetic-spec/moves.md` with `dev/aesthetic-spec-catalog.sh` and keep that file in the change. Do not edit `core.js`, another move file, or
   `js/aesthetic-spec.js` unless you are fixing a bug in the move you wrote.
 
@@ -417,10 +417,10 @@ for the next round, work on an unpacked copy, never on the app's folders. `<scra
    edges, kit states, art); a note's `target` says where to look (`board.hero` is the headline and art, `kit.<component>`
    a kit entry). Do not change `key`, `name`, `descriptor` or `coreTrick` unless a note asks. When materials change,
    rewrite the descriptive fields that describe them so they do not contradict the look: `build.surface`,
-   `build.pressText`, `build.icons`, `build.appIcon`, `meta.fonts.why`, `labels.material`.
+   `build.pressText`, `build.icons`, `build.appIcon`, `meta.fonts.why`, `labels.material`, `rules.do`, `rules.dont`.
 4. Append your round to `rounds.json` (SPEC-v2 section 7): `n` is the last `n` plus 1, `by: "agent"`, `summary`,
    `changes` in plain sentences, `variants` with ids `r<n>a`, `r<n>b` (the one you applied is `keep`, the others `kill`
-   or `open`). Mark each note you addressed `"status": "done"` with `"doneIn": <n>`; raise new notes as open with the next
+   or `open`). If you tuned a variant in place before keeping it, record the final value in its change text and name the values you tried and dropped, e.g. "fleck 1.6 (2.2 tried, too big)". Mark each note you addressed `"status": "done"` with `"doneIn": <n>`; raise new notes as open with the next
    `n<k>` id. No `open` key in your round; leave `shots` out unless you copy PNGs next to it (the bundle does not carry shots).
 5. Check the folder, in this order: static check, render with shots, read the PNGs, pack.
    `node dev/aesthetic-check.js <scratch>/<key>`, then with a server running at the repo root (reuse one that is

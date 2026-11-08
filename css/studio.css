@@ -17,6 +17,12 @@
   color: var(--ink);
 }
 html.is-mac-app .studio { padding-top: 28px; }
+/* While the studio is open the editor owns the viewport: the document never scrolls (not even from scrollIntoView or Tab
+   focus), only the panels do. `clip` makes the editor itself a non-scrolling box. */
+@media (min-width: 1200px) {
+  html.studio-open, html.studio-open body { overflow: hidden; }
+  html.studio-open .studio { position: fixed; inset: 0; height: auto; overflow: clip; z-index: var(--z-sticky); }
+}
 .studio [hidden] { display: none !important; }
 
 /* ---------- Top bar ---------- */

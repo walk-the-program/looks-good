@@ -57,9 +57,39 @@ From the agent's report (15 friction points; the ones that mattered):
     `tokens()` receives, when to refresh descriptive fields after a material change, the check → render →
     pack order, and stale "lab only" comments in the move files.
 
+## Rounds 4 and 5
+
+| Round | By | What |
+|---|---|---|
+| 4 | studio | Kraft held in dark mode with the per-mode dial (warm the dark canvas, dark cream set to a deep brown). Rewrote the font note and the do / don't rules. Type Variations: kept wider label tracking. Two notes: the canvas chip vanishes, and the deck cover's striped band belongs to another look. |
+| 5 | agent | Every open note done: one tear line on the deck cover with room before the footer, larger and fewer flecks at the stamp's edge, build notes rewritten, keylined palette chips (`swatch-keyline`), and a perforated "Lot 14 · 2027 season · Tear off and keep" coupon at the foot of the cover (`coupon-foot`). Static 0 fail 0 warn, render 0 fail. Two new notes. |
+| 6 | studio | Imported with Replace; a snapshot of round 5 was saved on import, the review banner showed, and Compare with round 4 worked. |
+
+Board: [round5-board-light.png](real-test/round5-board-light.png),
+[round5-board-dark.png](real-test/round5-board-dark.png); deck cover:
+[round5-deck-dark.png](real-test/round5-deck-dark.png); compare: [studio-compare-round4.jpg](real-test/studio-compare-round4.jpg).
+
+Found and fixed in rounds 4 and 5:
+
+11. **Build notes weren't editable.** Surface, press behaviour, icons and app icon now sit in the
+    Identity panel, so a studio can clear the checker's template-text warning itself.
+12. **Change log noise.** A per-mode dial now logs one line with its start and end state; list edits
+    (rules, font picks) say `added "…"` / `removed "…"` instead of two identical truncated values.
+13. **Variations repeated themselves.** A Type batch gave three label tweaks, two on the same dial. A
+    batch now never changes the same setting twice and mixes in label face, UI face and display size.
+14. **Imported agent rounds had no snapshot**, so Compare and Go back couldn't reach them. Replacing
+    a style on import now saves one for the incoming round.
+15. **The editor could scroll itself off screen** when a field was focused. At desktop widths it is now
+    fixed to the window and only its panels scroll.
+16. **Imported styles couldn't turn off the deck cover band** (`deck.coverBand` was refused), so the
+    agent had to hide it with CSS. It is now allowed as true/false.
+17. **Guide:** add script tags after the last move file; refresh do / don't rules with other
+    descriptive fields; record values tried and dropped when a variant is tuned before keeping.
+
 ## Still open
 
-- Seed Packet's own notes n5–n7 (deck cover tear lines too close, button speckle noisy at small sizes,
-  leftover template text from the old Blank) and the dark board, which drops the kraft and reads as a
-  plain dark theme. That is the next round, not a tool problem.
-- The "canvas" palette chip is invisible on a canvas-coloured board.
+- Seed Packet's notes n10 (an edge fleck can sit beside the label on small buttons) and n11 (the
+  coupon has one line; it can now use `deck.coverBand: false` instead of hiding the band with CSS).
+- The hero engraving's "Fig. 1" caption drifts beside the stem at deck size.
+- Round 3 has no snapshot (it was imported before fix 14).
+- Below 1200px wide the editor still scrolls as a page.

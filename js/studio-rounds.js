@@ -242,10 +242,10 @@
     if (p === 'meta.fonts.why') return { label: 'why these fonts' };
     if (p === 'meta.fonts.pairings') return { label: 'font pairings' };
     if (p === 'build.cls') return { label: 'build class' };
-    if (p === 'build.surface') return { label: 'surface description' };
-    if (p === 'build.pressText') return { label: 'press description' };
-    if (p === 'build.icons') return { label: 'icon style' };
-    if (p === 'build.appIcon') return { label: 'app icon description' };
+    if (p === 'build.surface') return { label: 'surface' };
+    if (p === 'build.pressText') return { label: 'press behaviour' };
+    if (p === 'build.icons') return { label: 'icons' };
+    if (p === 'build.appIcon') return { label: 'app icon' };
     if ((m = p.match(/^build\.(press|motion)\.(\w+)$/))) return { label: `${m[1]} ${m[2]}` };
     if (p === 'labels.material') return { label: 'material name' };
     if (p === 'labels.states') return { label: 'state names' };
@@ -275,7 +275,25 @@
       return;
     }
     const { label, map } = plainPath(path);
-    if ((Array.isArray(x) || Array.isArray(y)) && scalarList(x) && scalarList(y)) { out.push(`${label}: ${plainVal(x, map)} → ${plainVal(y, map)}`); return; }
+    if ((Array.isArray(x) || Array.isArray(y)) && scalarList(x) && scalarList(y)) {
+      const xs = arr(x), ys = arr(y);
+      const q = v => `"${short(map ? map(v) : v, 40)}"`;
+      const gone = xs.filter(v => !ys.includes(v)), came = ys.filter(v => !xs.includes(v));
+      const at = xs.length === ys.length ? xs.map((v, i) => i).filter(i => xs[i] !== ys[i]) : [];
+      if (at.length === 1) {                       // one entry edited in place
+        const a = xs[at[0]], b = ys[at[0]];
+        if (a === '' || a == null) { if (b !== '' && b != null) out.push(`${label}: added ${q(b)}`); }
+        else if (b === '' || b == null) out.push(`${label}: removed ${q(a)}`);
+        else out.push(`${label}: ${q(a)} → ${q(b)}`);
+        return;
+      }
+      if (gone.length || came.length) {
+        for (const v of gone) if (v !== '' && v != null) out.push(`${label}: removed ${q(v)}`);
+        for (const v of came) if (v !== '' && v != null) out.push(`${label}: added ${q(v)}`);
+        return;
+      }
+      out.push(`${label}: ${plainVal(x, map)} → ${plainVal(y, map)}`); return;
+    }
     if (typeof x === 'object' || typeof y === 'object') { out.push(`${label} changed`); return; }
     out.push(`${label}: ${plainVal(x, map)} → ${plainVal(y, map)}`);
   }
@@ -608,19 +626,21 @@
   }
 
   function makeType(spec, rng, idx) {
-    const viaMoves = stepListEntry(spec, 'moves', 'type', rng, idx);
-    if (viaMoves) return viaMoves;
-    // recommendation fields when the style has no type moves to vary
+    // the recommendation fields (display size, UI and label face) are a second source next to the type moves
     const t = isObj(spec.type) ? spec.type : {};
     const options = [];
     if (typeof t.display === 'number') options.push(['display', round4(Math.min(1.5, Math.max(0.8, t.display + (t.display > 1.15 ? -0.2 : 0.2))))]);
     for (const k of ['ui', 'label']) if (typeof t[k] === 'string') for (const v of ['sans', 'mono', 'body']) if (v !== t[k]) options.push([k, v]);
     const ok = options.filter(([k, v]) => v !== t[k]);
-    if (!ok.length) return null;
-    const [k, v] = rng.pick(ok);
-    const out = clone(spec);
-    out.type = Object.assign({}, t, { [k]: v });
-    return out;
+    const viaFields = () => {
+      if (!ok.length) return null;
+      const [k, v] = rng.pick(ok);
+      const out = clone(spec);
+      out.type = Object.assign({}, t, { [k]: v });
+      return out;
+    };
+    const viaMoves = () => stepListEntry(spec, 'moves', 'type', rng, idx);
+    return rng() < 0.4 ? (viaFields() || viaMoves()) : (viaMoves() || viaFields());
   }
 
   function makeEdges(spec, rng, idx) { return stepListEntry(spec, 'moves', 'edges', rng, idx); }
@@ -648,6 +668,22 @@
   /* ---------------------------------------------------------------- variations */
   /* opts.visible(baseSpec, variantSpec, variant) -> boolean (optional): a candidate it rejects is never returned (the
      generator draws up to 12 candidates per card for it; it may then return fewer than `count`). */
+  /* The "things changed" of a candidate, as stable keys: moves by id (not position), kit by param (not component). */
+  function flat(v, path, out) {
+    if (Array.isArray(v) && v.some(isObj)) v.forEach((e, i) => flat(e, `${path}.${isObj(e) && e.move ? e.move : i}`, out));
+    else if (isObj(v)) for (const k of Object.keys(v)) flat(v[k], `${path}.${k}`, out);
+    else out[path] = JSON.stringify(v);
+  }
+  function changedKeys(a, b) {
+    const x = {}, y = {};
+    flat(a, 'spec', x); flat(b, 'spec', y);
+    const norm = k => k.replace(/^spec\.kit\.[^.]+\./, 'spec.kit.').replace(/\.(light|dark)$/, '');
+    const keys = new Set();
+    for (const k of new Set(Object.keys(x).concat(Object.keys(y)))) if (x[k] !== y[k]) keys.add(norm(k));
+    return keys;
+  }
+  const groupOf = k => k.replace(/\.[^.]+$/, '');
+
   function variations(spec, opts) {
     opts = opts || {};
     if (!isObj(spec)) throw new Error('StudioRounds.variations: spec must be an object');
@@ -656,6 +692,7 @@
     const wanted = AXES.some(a => a.id === opts.axis) ? opts.axis : 'any';
     const rng = rngOf(opts.seed, wanted);
     const taken = new Set([JSON.stringify(spec)]);
+    const usedKeys = new Set(), usedGroups = new Set();      // params / moves already varied by an earlier card in this batch
     const result = [];
     const shuffled = rng.shuffle(CONCRETE);
 
@@ -677,6 +714,9 @@
           const lines = diffDetailed(spec, cand, opts.catalog);
           const axes = [...new Set(lines.map(l => l.axis))];
           if (axes.length !== 1 || problems(cand, idx).length) continue;
+          const keys = changedKeys(spec, cand);
+          if ([...keys].some(k => usedKeys.has(k))) continue;                                   // never the same move + param twice
+          if (attempt < 12 && [...keys].some(k => usedGroups.has(groupOf(k)))) continue;       // prefer a different move or field
           taken.add(key);
           const cur = { id: String.fromCharCode(97 + n), axis: axes[0], change: lines.map(l => l.text).join('; '), spec: cand };
           if (typeof opts.visible === 'function') {
@@ -685,6 +725,7 @@
             if (!seen) continue;
           }
           made = cur;
+          keys.forEach(k => { usedKeys.add(k); usedGroups.add(groupOf(k)); });
           if (axis !== first) made.note = `nothing more to vary on ${first} for this style, so this one changes ${axes[0]}`;
           else if (wanted !== 'any' && axes[0] !== wanted) made.note = `nothing more to vary on ${wanted} for this style, so this one changes ${axes[0]}`;
         }
@@ -773,6 +814,28 @@
       const last = o.changes[o.changes.length - 1];
       if (last === line) continue;
       const p = parts(line), q = last && parts(last);
+      // a list entry typed in over several edits stays one line; adding then removing the same entry cancels
+      let m;
+      if (last && (m = last.match(/^(.*): added ("(?:.*)")$/))) {
+        if (p && p[0] === `${m[1]}: ${m[2]}`) { o.changes.pop(); o.changes.push(`${m[1]}: added ${p[1]}`); continue; }
+        if (line === `${m[1]}: removed ${m[2]}`) { o.changes.pop(); continue; }
+      }
+      // "x: a → light a / dark a" then "x dark a → b" is one edit: "x: a → light a / dark b"
+      if (p && q && (m = q[1].match(/^light (.*) \/ dark (.*)$/))) {
+        let merged = false;
+        for (const [side, at] of [['light', 1], ['dark', 2]]) {
+          const tail = ` ${side} ${m[at]}`;
+          if (!p[0].endsWith(tail)) continue;
+          const head = p[0].slice(0, -tail.length);
+          if (!head || !q[0].startsWith(head + ' ') || q[0].length <= head.length + 1) continue;
+          const l = side === 'light' ? p[1] : m[1], d = side === 'dark' ? p[1] : m[2];
+          o.changes.pop();
+          if (!(l === d && q[0].slice(head.length + 1) === l)) o.changes.push(`${q[0]} → light ${l} / dark ${d}`);
+          merged = true;
+          break;
+        }
+        if (merged) continue;
+      }
       if (p && q && p[0].endsWith(q[1])) {
         const head = p[0].slice(0, p[0].length - q[1].length);   // "corner-radius: base " of "corner-radius: base 8 → 12"
         if (head && /\s$/.test(head) && q[0].startsWith(head) && q[0].length > head.length) {
@@ -819,7 +882,7 @@
     return b;
   }
 
-  const api = { hookOrder, hookWords, AXES, variations, diff, diffDetailed, openRound, addNote, setNote, recordVariant, freeLetters, recordChanges, closeRound, current, openNotes, snapshot };
+  const api = { hookOrder, hookWords, AXES, variations, diff, diffDetailed, openRound, addNote, setNote, recordVariant, freeLetters, recordChanges, closeRound, current, openNotes, snapshot, changedKeys };
   if (typeof window !== 'undefined') window.StudioRounds = api;
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
 })();

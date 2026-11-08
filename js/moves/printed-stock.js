@@ -40,6 +40,7 @@ registerMove({
     mix:    num(60, [20, 100]),    // % ink in the hole colour (rest is canvas)
     label:  { kind: 'text', default: '' },   // caption set on the line, empty for none
     size:   num(9, [7, 13]),       // px, caption size
+    gap:    num(0, [0, 40]),       // px of room kept between the hero line and what follows it
   },
   css(S, p) {
     const h = holes(p.hole, p.pitch, `color-mix(in srgb, var(--ab-ink) ${p.mix}%, var(--ab-canvas))`);
@@ -49,6 +50,7 @@ registerMove({
     if (p.where !== 'footer') out += `${S} .ab-hero { position: relative; }
 ${line(`${S} .ab-hero::after`)}
 ${S} .ab-hero::after { bottom: 0; }
+${p.gap > 0 ? `${S} .ab-hero { margin-bottom: ${p.gap}px; }` : ''}
 ${cap(`${S} .ab-hero::before`)}
 ${p.label ? `${S} .ab-hero::before { bottom: ${p.hole / 2}px; top: auto; }` : ''}
 `;
@@ -99,6 +101,8 @@ registerMove({
     inset:    num(4, [2, 8]),      // px between the edge and the keyline
     wear:     num(0.18, [0, 0.5]), // share of canvas speckled over the fill
     tracking: num(0.12, [0, 0.3]), // em
+    wearAt:   { kind: 'enum', default: 'all', options: ['all', 'edge'] },   // all: speckle spread over the fill; edge: a few larger flecks just inside the keyline
+    fleck:    num(1, [0.5, 3.5]),  // fleck size factor (edge wear only)
   },
   tokens(t, p) {
     /* the text colour is whichever of canvas and ink reads better on the dulled fill; the fill moves away from it until 4.6:1 */
@@ -114,8 +118,22 @@ registerMove({
       const ink = `var(--ab-stamp-fill, ${dulled(p.fill, p.dull)})`;
       const speck = `color-mix(in srgb, var(--ab-stamp-on, var(--ab-canvas)) ${Math.round(p.wear * 100)}%, transparent)`;
       const dot = (x, y, r) => `radial-gradient(circle at ${x}% ${y}%, ${speck} 0 ${r}px, transparent ${r + 0.6}px)`;
-      const bg = p.wear > 0 ? `${dot(18, 35, 1.1)}, ${dot(70, 62, 0.9)}, ${dot(44, 12, 1)}, ${dot(88, 25, 0.8)}` : 'none';
-      return `${sel} { background-color: ${ink}; background-image: ${bg}; background-size: 21px 15px, 27px 19px, 17px 23px, 31px 13px; color: var(--ab-stamp-on, var(--ab-canvas)); border: 2px solid ${ink}; box-shadow: inset 0 0 0 ${p.inset}px ${ink}, inset 0 0 0 ${p.inset + p.keyline}px var(--ab-stamp-on, var(--ab-canvas)); text-transform: uppercase; letter-spacing: ${p.tracking}em; font-weight: 700; }`;
+      let bg = p.wear > 0 ? `${dot(18, 35, 1.1)}, ${dot(70, 62, 0.9)}, ${dot(44, 12, 1)}, ${dot(88, 25, 0.8)}` : 'none';
+      let size = '21px 15px, 27px 19px, 17px 23px, 31px 13px';
+      let place = '';
+      if (p.wearAt === 'edge' && p.wear > 0) {
+        /* a handful of flecks, each its own no-repeat layer, hugging the inside of the keyline top, bottom and sides */
+        const e = p.inset + p.keyline + 1;
+        const flecks = [
+          [1, '14%', `${e}px`], [0.8, '58%', `${e}px`], [1.2, '86%', `calc(100% - ${e}px)`],
+          [0.9, '33%', `calc(100% - ${e}px)`], [1.1, `${e}px`, '62%'], [0.8, `calc(100% - ${e}px)`, '30%'],
+        ];
+        const speckEdge = `color-mix(in srgb, var(--ab-stamp-on, var(--ab-canvas)) ${Math.round(Math.min(1, p.wear * 2) * 100)}%, transparent)`;
+        bg = flecks.map(([k]) => { const r = k * p.fleck * 1.4; return `radial-gradient(circle at 50% 50%, ${speckEdge} 0 ${r}px, transparent ${r + 0.6}px)`; }).join(', ');
+        size = flecks.map(([k]) => { const d = Math.ceil(k * p.fleck * 2.8 + 2); return `${d}px ${d}px`; }).join(', ');
+        place = ` background-position: ${flecks.map(([, x, y]) => `${x} ${y}`).join(', ')}; background-repeat: no-repeat;`;
+      }
+      return `${sel} { background-color: ${ink}; background-image: ${bg}; background-size: ${size};${place} color: var(--ab-stamp-on, var(--ab-canvas)); border: 2px solid ${ink}; box-shadow: inset 0 0 0 ${p.inset}px ${ink}, inset 0 0 0 ${p.inset + p.keyline}px var(--ab-stamp-on, var(--ab-canvas)); text-transform: uppercase; letter-spacing: ${p.tracking}em; font-weight: 700; }`;
     },
   },
 });

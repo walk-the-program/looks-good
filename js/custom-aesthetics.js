@@ -406,9 +406,24 @@ const CustomAesthetics = (function () {
           replacing = mineEntries.get(key);
         } else return { ok: false, key, error: 'Cancelled.', cancelled: true };
       }
+      if (replacing) addLastRoundSnapshot(b);
       const r = await commit(b, replacing);
       return r.ok ? r : { ok: false, key, error: r.error };
     } catch (e) { return fail(msg(e)); }
+  }
+
+  /* An agent closes rounds without saving a version. When an import replaces a stored style, the incoming bundle's last
+     closed round gets a snapshot of the incoming aesthetic (so Compare and Go back reach it), if it has none and the
+     bundle stays under the version and size caps. An open round is never snapshotted. */
+  function addLastRoundSnapshot(b) {
+    const list = b.rounds && Array.isArray(b.rounds.rounds) ? b.rounds.rounds.filter(x => x && !x.open && typeof x.n === 'number') : [];
+    if (!list.length) return;
+    const last = list.reduce((a, x) => (x.n > a.n ? x : a));
+    const versions = Array.isArray(b.versions) ? b.versions : [];
+    if (versions.some(v => v.round === last.n) || versions.length >= MAX_VERSIONS) return;
+    const next = versions.concat([{ round: last.n, date: typeof last.date === 'string' ? last.date : '', aesthetic: clone(b.aesthetic) }]);
+    if (JSON.stringify(Object.assign({}, b, { versions: next })).length > MAX_BUNDLE) return;
+    b.versions = next.sort((x, y) => x.round - y.round);
   }
 
   // Copies a folder or stored style into a new stored style (new key, " (copy)" on the name unless opts.name is given).

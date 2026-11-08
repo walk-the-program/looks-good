@@ -44,7 +44,7 @@ node dev/aesthetic-check.js <scratch>/<key> --render <port> --shots    # works o
 node dev/aesthetic-check.js --pack <scratch>/<key> <scratch>/<key>.aesthetic.json
 ```
 
-Order: static check, render with shots (`--out <scratch>/shots-r<n>`), read the PNGs, pack; re-run pack after any late fix. Reuse a server already running at the repo root. When materials change, refresh `build.surface`, `build.pressText`, `build.icons`, `build.appIcon`, `meta.fonts.why`, `labels.material`.
+Order: static check, render with shots (`--out <scratch>/shots-r<n>`), read the PNGs, pack; re-run pack after any late fix. Reuse a server already running at the repo root. When materials change, refresh `build.surface`, `build.pressText`, `build.icons`, `build.appIcon`, `meta.fonts.why`, `labels.material`, `rules.do`, `rules.dont`. A variant tuned in place before keeping: record the final value in its change text and name the values tried and dropped ("fleck 1.6 (2.2 tried, too big)").
 
 Then tell the owner the packed path and to import it in Styles with Replace.
 
@@ -63,7 +63,7 @@ Regenerate the move catalog after adding a code move: `dev/aesthetic-spec-catalo
 
 ## Hard rules
 
-- Only write under `custom-aesthetics/<key>/` (or the scratch folder of a studio round-trip; plus a new `js/moves/<name>.js` and a `<script>` tag for it in `index.html` after `js/moves/darkroom.js` when a code move is truly needed).
+- Only write under `custom-aesthetics/<key>/` (or the scratch folder of a studio round-trip; plus a new `js/moves/<name>.js` and a `<script>` tag for it in `index.html` after the last `js/moves/` script tag when a code move is truly needed).
 - Never edit app code, built-in styles, `js/aesthetic-spec.js`, `js/moves/core.js` or the checker.
 - Never copy a built-in's CSS. Never add AI UI to the product.
 - Board art stays off app and Built screens. Every kit component is styled. Glass is clear, never frosted.
