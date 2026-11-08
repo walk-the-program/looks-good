@@ -36,7 +36,7 @@ MIT, see [LICENSE](LICENSE). The bundled fonts and libraries keep their own lice
 
 ## Credits
 
-The 118 fonts in `fonts/` are SIL Open Font License families from Google Fonts; copyright notices are in `fonts/CREDITS.txt`. `vendor/` holds html2canvas and jsPDF (both MIT). The pattern studio page uses DM Mono (OFL) from `patterns-library/_fonts/`.
+The 136 fonts in `fonts/` are SIL Open Font License or Apache 2.0 families from Google Fonts; copyright notices are in `fonts/CREDITS.txt`. `vendor/` holds html2canvas and jsPDF (both MIT). The pattern studio page uses DM Mono (OFL) from `patterns-library/_fonts/`.
 
 ## Mac app
 
@@ -56,7 +56,7 @@ first. Your session autosave and window size and position persist between
 launches. The saved-work folder (`~/Library/Application Support/Branding Designer/`) and the bundle identifier keep their old names on purpose, so work saved before the rename still opens. The browser version (`python3 -m http.server`) is unchanged.
 
 **Works offline.** Every Google Font the app uses is bundled in `fonts/`
-(118 families, latin subset, about 4 MB) and html2canvas and jsPDF are in
+(136 families, latin subset, about 5 MB) and html2canvas and jsPDF are in
 `vendor/`. The page loads these local copies first; Google Fonts and the CDN
 are only a fallback for anything missing. After adding a font to `FONTS` in
 `js/data.js`, refresh the copies and the credits:
