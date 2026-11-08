@@ -2,6 +2,10 @@
    studio.js — the aesthetic studio's editor (inside the Styles section). A "mine" style is edited with dials
    and a live preview; every change autosaves to the stored bundle (CustomAesthetics.save).
 
+   Two views of the same spec, switched in the top bar and remembered under localStorage 'bd.studio.view': Simple (the default;
+   big visual controls from js/studio-simple.js: paper, surface, corners, lines, type feel, touches, art, words) and All settings
+   (the full panels). Both change the spec only through edit(), so undo, autosave, the preview and rounds behave the same.
+
    Public: window.Studio
      open(key)                 -> Promise<boolean>. Opens the editor for a stored ("mine") style. Folder and
                                   built-in styles are refused (Edit a copy first: CustomAesthetics.duplicate).
@@ -22,8 +26,9 @@
                                   'stress' (default 'board') under a temporary style key, with the editor's brand
                                   colours and Light / Dark unless overridden. Temporary keys start with "studio--"
                                   and are removed when the editor closes (a small cache is kept while it is open).
-     on(event, fn) -> off()    -> 'change' fn({ before, after, label, source }) after every edit, undo, redo or
-                                  apply (source: 'edit' | 'undo' | 'redo' | 'apply'); 'open' fn({ key });
+     on(event, fn) -> off()    -> 'change' fn({ before, after, label, source, plain? }) after every edit, undo, redo or
+                                  apply (source: 'edit' | 'undo' | 'redo' | 'apply'). `plain` is set by the Simple view: an array
+                                  of plain change lines ("paper: cream → kraft", "touch on: tear line") to use in place of a diff; 'open' fn({ key });
                                   'close' fn({ key }); 'preview' fn({ ok, errors }) after the preview redraws.
    The right column is <aside id="studioRound" class="stu-round"> (empty, labelled; the round panel fills it).
 ------------------------------------------------------------------------ */
@@ -36,7 +41,7 @@ const Studio = (function () {
   const SHADE_KEY = 'bd.styles.shade';
   const BOARD_W = 900;
   const UNDO_CAP = 100;
-  const SAVE_MS = 600, PREVIEW_MS = 150, CACHE_MAX = 12;
+  const SAVE_MS = 600, PREVIEW_MS = 150;
   const STRESS = [
     { id: 'muted-beige', label: 'Muted beige', primary: '#d8cbb4' },
     { id: 'neon-green', label: 'Neon green', primary: '#39ff14' },
@@ -57,6 +62,9 @@ const Studio = (function () {
     ['Data display', ['progress', 'avatar', 'kbd', 'divider', 'section-label', 'scrollbar']],
   ];
   const SCOPES = ['all', 'board', 'kit'];
+  const VIEW_KEY = 'bd.studio.view';        // 'simple' (default) | 'all'
+  const SS = window.StudioSimple;           // the Simple view's pure controls (js/studio-simple.js)
+  const SIMPLE_SOURCES = ['blank', 'soft-form--moves', 'acid-graphics--moves', 'editorial-serif--moves'];
 
   const $ = id => document.getElementById(id);
   const esc = s => escapeHtml(String(s == null ? '' : s));
@@ -86,6 +94,8 @@ const Studio = (function () {
   let seq = 0;
   let previewTimer = null, saveTimer = null, saving = false, saveAgain = false, lastError = '';
   let roMap = new WeakMap();
+  let view = lsGet(VIEW_KEY) === 'all' || !SS ? 'all' : 'simple';
+  let smSources = null;          // Surface preset sources: starters + Darkroom, loaded when the editor opens
 
   const emit = (name, arg) => listeners[name].slice().forEach(fn => { try { fn(arg); } catch (e) { console.error('studio: listener failed', e); } });
   function on(name, fn) {
@@ -159,13 +169,21 @@ const Studio = (function () {
     const def = registerSpecAesthetic(Object.assign(clone(spec), { key }), { untrusted: true, files: art || {}, errors, file: 'studio preview', quietHooks: true });
     if (!def) return { ok: false, errors: errors.map(e => e.split(key).join(S ? S.key : 'this style')).slice(0, 6).concat(errors.length ? [] : ['The style could not be drawn.']) };
     cache.set(sig, { key });
-    while (cache.size > CACHE_MAX) {
-      const victim = Array.from(cache.entries()).find(([, v]) => !(S && v.key === S.goodKey));
-      if (!victim) break;
-      cache.delete(victim[0]);
-      unregisterSpecAesthetic(victim[1].key);
-    }
+    prune(key);
     return { ok: true, key };
+  }
+
+  /* Only what is on screen keeps a registered stylesheet: the main preview's key, the keys of the cards and compare panes
+     still in the page (each drawn host carries data-stu-key), and the one being drawn. Every kit node is matched against every
+     registered scoped rule, so a leftover sheet slows each kit draw. A replaced key is unregistered as soon as it is replaced. */
+  function prune(current) {
+    const live = new Set([current, S && S.goodKey]);
+    document.querySelectorAll('[data-stu-key]').forEach(n => live.add(n.dataset.stuKey));
+    Array.from(cache.entries()).forEach(([sig, v]) => {
+      if (live.has(v.key)) return;
+      cache.delete(sig);
+      unregisterSpecAesthetic(v.key);
+    });
   }
 
   function dropTemp() {
@@ -259,12 +277,65 @@ const Studio = (function () {
     watch(host, () => host.querySelectorAll('.stu-frame').forEach(fitFrame));
   }
 
-  function drawKit(host, key, base, mode) {
+  /* The Kit tab holds about 3,300 nodes in 12 tall groups. Drawing them all at once froze the page for about a second, nearly
+     all of it style and layout forced by the kit's own fix-ups. css/studio.css gives each group content-visibility: auto, so
+     only the screenful in view is laid out at first; the rest is laid out as it scrolls near. A phone list in a group that was
+     not laid out when the kit was drawn is fitted (as SeeBuilt does for the others) once the group comes into view. */
+  let kitWatch = null;
+  function fitKitGroup(group) {
+    group.querySelectorAll('.sb-home-list, .sb-k-fill').forEach(sec => {
+      const rows = Array.from(sec.querySelectorAll('.sb-k-row'));
+      rows.forEach(r => r.classList.remove('sb-k-cut'));
+      const box = sec.getBoundingClientRect();
+      if (!box.height) return;
+      const scale = sec.offsetHeight ? box.height / sec.offsetHeight : 1;
+      rows.forEach(r => { if ((r.getBoundingClientRect().bottom - box.top) / scale > sec.clientHeight + 0.5) r.classList.add('sb-k-cut'); });
+    });
+  }
+
+  /* The stage draws the kit in chunks: the first two sections at once, then one section per idle task, so no single task
+     freezes the page. The result is the finished kit, same order and fix-ups (SeeBuilt.kitInto { append }). A card passes
+     `groups` and gets just those sections, in one go. */
+  const KIT_FIRST = 2;
+  let kitTask = null;
+  const idle = fn => (window.requestIdleCallback ? { ric: requestIdleCallback(fn, { timeout: 250 }) } : { t: setTimeout(fn, 16) });
+  function cancelKit() {
+    if (!kitTask) return;
+    if (kitTask.ric !== undefined) cancelIdleCallback(kitTask.ric); else clearTimeout(kitTask.t);
+    kitTask = null;
+  }
+
+  function drawKit(host, key, base, mode, groups) {
     const st = viewState(base, key, mode);
     const box = document.createElement('div');
     box.className = 'sb-view stu-kit';
     host.appendChild(box);
-    withState(st, () => { SeeBuilt.kitInto(box, { mode }); });
+    const staged = host === el.stage && !groups;
+    const total = SeeBuilt.kitGroupCount();
+    withState(st, () => { SeeBuilt.kitInto(box, { mode, groups: groups || (staged ? Array.from({ length: Math.min(KIT_FIRST, total) }, (_, i) => i) : undefined) }); });
+    if (kitWatch) { kitWatch.disconnect(); kitWatch = null; }
+    const watchGroup = g => { if (kitWatch) kitWatch.observe(g); };
+    if ('IntersectionObserver' in window && host === el.stage) {
+      kitWatch = new IntersectionObserver(entries => entries.forEach(en => {
+        if (!en.isIntersecting || !en.target.isConnected) return;
+        kitWatch.unobserve(en.target);
+        requestAnimationFrame(() => fitKitGroup(en.target));
+      }));
+      box.querySelectorAll('.sb-k-group').forEach(watchGroup);
+    }
+    if (staged && total > KIT_FIRST) {
+      let next = KIT_FIRST;
+      const step = () => {
+        kitTask = null;
+        if (!box.isConnected || !S) return;
+        const page = box.querySelector('.sb-kitpage');
+        const before = page ? page.querySelectorAll(':scope > .sb-k-group').length : 0;
+        withState(st, () => { SeeBuilt.kitInto(box, { mode, groups: [next], append: true }); });
+        if (page) Array.from(page.querySelectorAll(':scope > .sb-k-group')).slice(before).forEach(watchGroup);
+        if (++next < total) kitTask = idle(step);
+      };
+      kitTask = idle(step);
+    }
     watch(host, () => {});
   }
 
@@ -308,23 +379,25 @@ const Studio = (function () {
     watch(host, () => host.querySelectorAll('.stu-frame').forEach(fitFrame));
   }
 
-  function drawInto(host, key, tab, mode, brand) {
+  function drawInto(host, key, tab, mode, brand, groups) {
+    if (host === el.stage) cancelKit();
     host.innerHTML = '';
     host.dataset.stuTab = tab;
+    host.dataset.stuKey = key;
     const base = baseState(brand);
-    if (tab === 'kit') drawKit(host, key, base, mode);
+    if (tab === 'kit') drawKit(host, key, base, mode, groups);
     else if (tab === 'deck') drawDeck(host, key, base, mode);
     else if (tab === 'stress') drawStress(host, key, mode);
     else drawBoard(host, key, base, mode);
   }
 
-  /* renderInto(el, spec, { tab, art, shade, brand }) -> { ok, errors } */
+  /* renderInto(el, spec, { tab, art, shade, brand, groups }) -> { ok, errors }   (groups: kit sections to draw, Kit tab only) */
   function renderInto(host, spec, opts) {
     opts = opts || {};
     if (!host || !spec) return { ok: false, errors: ['Nothing to draw.'] };
     const r = register(spec, opts.art || (S && S.art) || {});
     if (!r.ok) return { ok: false, errors: r.errors };
-    try { drawInto(host, r.key, opts.tab || 'board', opts.shade === 'dark' ? 'dark' : opts.shade === 'light' ? 'light' : shade, opts.brand); }
+    try { drawInto(host, r.key, opts.tab || 'board', opts.shade === 'dark' ? 'dark' : opts.shade === 'light' ? 'light' : shade, opts.brand, opts.groups); }
     catch (e) { console.error('studio: could not draw a style', e); return { ok: false, errors: ['The preview could not be drawn.'] }; }
     return { ok: true, errors: [] };
   }
@@ -345,6 +418,7 @@ const Studio = (function () {
     if (r.ok) {
       S.goodKey = r.key;
       try { drawInto(el.stage, r.key, S.tab, shade, brandId); } catch (e) { console.error('studio: could not draw the preview', e); }
+      prune(r.key);
     } else if (!S.goodKey) {
       el.stage.innerHTML = '<p class="stu-empty">There is nothing valid to draw yet.</p>';
     }
@@ -413,12 +487,12 @@ const Studio = (function () {
     el.title.textContent = S ? S.spec.name || S.key : '';
   }
 
-  function afterChange(before, after, label, source, sections) {
+  function afterChange(before, after, label, source, sections, plain) {
     paintHistory();
     if (sections === 'all') renderPanels(); else if (sections) [].concat(sections).forEach(renderSection);
     schedulePreview();
     scheduleSave();
-    emit('change', { before: clone(before), after: clone(after), label: label || '', source });
+    emit('change', { before: clone(before), after: clone(after), label: label || '', source, plain });
   }
 
   function commit(next, art, label, o) {
@@ -434,7 +508,7 @@ const Studio = (function () {
     S.redo = [];
     S.spec = next;
     S.art = art;
-    afterChange(before, next, label, o.source || 'edit', o.sections);
+    afterChange(before, next, label, o.source || 'edit', o.sections, o.plain ? [o.plain] : undefined);
   }
 
   function edit(mutate, label, o) {
@@ -750,9 +824,216 @@ const Studio = (function () {
 
   function renderPanels() {
     const top = el.panels.scrollTop;
+    el.panels.classList.toggle('is-simple', view === 'simple' && !!SS);
+    if (view === 'simple' && SS) { renderSimple(); el.panels.scrollTop = top; return; }
     el.panels.innerHTML = SECTIONS.map(s => `<section class="stu-sec" data-sec="${s.id}"><button type="button" class="stu-sec-h" aria-expanded="${openSecs.has(s.id)}" aria-controls="sdsec-${s.id}"><span>${s.title}</span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button><div class="stu-sec-b" id="sdsec-${s.id}"${openSecs.has(s.id) ? '' : ' hidden'}></div></section>`).join('');
     SECTIONS.forEach(s => { if (openSecs.has(s.id)) renderSection(s.id); });
     el.panels.scrollTop = top;
+  }
+
+  /* ---------------- the Simple view ----------------
+     Big, visual controls over the same spec. Every control is a pure function in js/studio-simple.js; each click goes
+     through edit(), so undo, autosave, the preview and the round's change log work as they do for the full panels. */
+  const SM_NEUTRAL_PAPER = '#f4f0e8';
+  const smFonts = new Set();
+
+  function smCtx() {
+    const customs = [];
+    try {
+      CustomAesthetics.list().forEach(c => {
+        const rec = c.key !== (S && S.key) && SPEC_LAB.specs[c.key];
+        if (rec && rec.spec && isObj(rec.spec.kit)) customs.push({ key: c.key, name: c.name, spec: rec.spec });
+      });
+    } catch (e) { /* no custom styles to borrow from */ }
+    return { catalog, sources: smSources || {}, customs, fonts: typeof FONTS !== 'undefined' ? FONTS : [] };
+  }
+
+  async function loadSimpleSources() {
+    if (smSources) return;
+    const src = {};
+    await Promise.all(SIMPLE_SOURCES.map(async id => { try { const b = await CustomAesthetics.starter(id); if (b) src[id] = b.aesthetic; } catch (e) { /* that preset stays off */ } }));
+    const dr = SPEC_LAB.specs.darkroom;
+    if (dr && dr.spec) src.darkroom = dr.spec;
+    smSources = src;
+  }
+
+  // The first font of a class, to draw a type chip in.
+  function smFontOf(cls) { return (typeof FONTS !== 'undefined' ? FONTS : []).find(f => f.cls === cls) || null; }
+  function smLoadFont(f) {
+    if (!f || smFonts.has(f.name) || typeof window.loadFontFamily !== 'function') return;
+    smFonts.add(f.name);
+    try { window.loadFontFamily(f); } catch (e) { /* the chip keeps its fallback face */ }
+  }
+
+  const smSeg = (id, label, opts, cur) => `<div class="seg sm-seg" role="group" aria-label="${esc(label)}">${opts.map(o => `<button type="button" data-sm="${id}" data-val="${esc(o.id)}" aria-pressed="${o.id === cur}">${esc(o.name)}</button>`).join('')}</div>`;
+  const smCustom = (cur, field) => (cur === 'custom' ? `<p class="sm-custom"><b>Custom:</b> this ${esc(field)} doesn't match one of these options. Pick one to replace it.</p>` : '');
+  const smHead = (title, hint) => `<h3 class="sm-h">${esc(title)}</h3>${hint ? `<p class="sm-hint">${esc(hint)}</p>` : ''}`;
+
+  function smPaperHtml(spec, ctx) {
+    const cur = SS.read('paper', spec, ctx);
+    const colour = typeof cur === 'string' && cur.startsWith('color:') ? cur.slice(6) : '';
+    const sw = SS.PAPERS.map(p => `<button type="button" class="sm-swatch" data-sm="paper" data-val="${p.id}" aria-pressed="${p.id === cur}" aria-label="${esc(p.name)}" title="${esc(p.name)}"><i style="background:${p.light}"><b style="background:${p.dark || SS.deepOf(p.light)}"></b></i><span>${esc(p.name)}</span></button>`).join('');
+    const brand = `<button type="button" class="sm-swatch sm-swatch-brand" data-sm="paper" data-val="brand" aria-pressed="${cur === 'brand'}" aria-label="${esc(SS.BRAND_PAPER.name)}" title="${esc(SS.BRAND_PAPER.name)}"><i></i><span>Brand colour</span></button>`;
+    const own = `<label class="sm-swatch sm-swatch-own${colour ? ' is-on' : ''}" title="Pick any colour"><i style="${colour ? 'background:' + esc(colour) : ''}"><input type="color" data-sm-color="paper" value="${colour || '#d9cfc0'}" aria-label="Your own paper colour" /></i><span>Your colour</span></label>`;
+    return `<section class="sm-sec">${smHead('Paper', 'The colour of the page. Dark mode gets a deep version of the same colour.')}<div class="sm-swatches">${sw}${brand}${own}</div>${smCustom(cur, 'paper')}</section>`;
+  }
+
+  function smSurfaceHtml(spec, ctx) {
+    const cur = SS.read('surface', spec, ctx);
+    const have = id => !!ctx.sources[id];
+    const cards = SS.SURFACES.map(s => `<button type="button" class="sm-card sm-surf" data-sm="surface" data-val="${s.id}" aria-pressed="${s.id === cur}"${have(s.source) ? '' : ' disabled title="This preset could not be loaded."'}>
+      <span class="sm-prev sm-prev--${s.id}" aria-hidden="true"><span class="sm-pv-card"></span><span class="sm-pv-btn">Aa</span></span>
+      <span class="sm-card-n">${esc(s.name)}</span><span class="sm-card-l">${esc(s.line)}</span></button>`).join('');
+    const mine = ctx.customs;
+    const isStyle = typeof cur === 'string' && cur.startsWith('style:');
+    const own = mine.length ? `<div class="sm-card sm-surf sm-surf-own${isStyle ? ' is-on' : ''}"><span class="sm-prev sm-prev--own" aria-hidden="true"><span class="sm-pv-card"></span><span class="sm-pv-btn">Aa</span></span>
+      <span class="sm-card-n">Same as one of my styles</span><select data-sm-select="surface" aria-label="Take the surface of one of your styles"><option value="">Choose a style…</option>${mine.map(c => `<option value="style:${esc(c.key)}"${cur === 'style:' + c.key ? ' selected' : ''}>${esc(c.name)}</option>`).join('')}</select></div>` : '';
+    return `<section class="sm-sec">${smHead('Surface', 'How buttons, cards and fields are made. One click sets every component in the kit.')}<div class="sm-cards">${cards}${own}</div>${smCustom(cur, 'surface')}</section>`;
+  }
+
+  function smTypeHtml(spec, ctx) {
+    const head = SS.read('headFeel', spec, ctx), body = SS.read('bodyFeel', spec, ctx);
+    const chips = (id, list, cur) => `<div class="sm-chips" role="group" aria-label="${id === 'headFeel' ? 'Headline feel' : 'Body feel'}">${list.map(c => {
+      const f = smFontOf(c); smLoadFont(f);
+      return `<button type="button" class="sm-chip" data-sm="${id}" data-val="${esc(c)}" aria-pressed="${c === cur}" title="${esc(SS.FEELS[c].blurb)}"${f ? ` style="font-family:${esc(f.css)}"` : ''}>${esc(SS.FEELS[c].name)}</button>`;
+    }).join('')}</div>`;
+    return `<section class="sm-sec">${smHead('Type')}
+      <div class="stu-lab">Headline feel</div>${chips('headFeel', SS.HEAD_FEELS, head)}${smCustom(head, 'headline font')}
+      <div class="stu-lab">Body feel</div>${chips('bodyFeel', SS.BODY_FEELS, body)}${smCustom(body, 'body font')}
+      <div class="stu-lab">Labels</div>${smSeg('labels', 'Labels', SS.LABELS, SS.read('labels', spec, ctx))}${smCustom(SS.read('labels', spec, ctx), 'label style')}
+      <div class="stu-lab">Headline spacing</div>${smSeg('spacing', 'Headline spacing', SS.SPACINGS, SS.read('spacing', spec, ctx))}${smCustom(SS.read('spacing', spec, ctx), 'spacing')}</section>`;
+  }
+
+  function smTouchesHtml(spec) {
+    const on = SS.touchesOn(spec);
+    return `<section class="sm-sec">${smHead('Touches', 'Small signature details on the board. Switch on the ones you like.')}${SS.TOUCH_GROUPS.map(g => `<div class="stu-lab">${esc(g)}</div><div class="sm-touches">${SS.TOUCHES.filter(t => t.group === g).map(t => `<button type="button" class="sm-touch" data-sm-touch="${t.id}" aria-pressed="${on.includes(t.id)}"><i aria-hidden="true"></i><span class="sm-touch-t"><b>${esc(t.name)}</b><small>${esc(t.line)}</small></span></button>`).join('')}</div>`).join('')}</section>`;
+  }
+
+  function smArtHtml(spec, ctx) {
+    const cur = SS.read('art', spec, ctx);
+    const gens = SS.artGenerators(ctx);
+    const nm = id => id.replace(/-/g, ' ').replace(/^./, c => c.toUpperCase());
+    const card = (val, name, line) => `<button type="button" class="sm-card sm-art" data-sm="art" data-val="${esc(val)}" aria-pressed="${val === cur}"><span class="sm-card-n">${esc(name)}</span><span class="sm-card-l">${esc(line)}</span></button>`;
+    return `<section class="sm-sec">${smHead('Art', 'One picture on the board and the deck cover. App screens never carry art.')}<div class="sm-cards sm-cards-art">
+      ${card('none', 'No art', 'Just type and colour.')}
+      <button type="button" class="sm-card sm-art" data-sm-upload aria-pressed="${cur === 'upload'}"><span class="sm-card-n">Your own image or SVG</span><span class="sm-card-l">${cur === 'upload' ? 'Pick a file to replace it.' : 'png, jpeg, webp, gif or svg.'}</span></button>
+      ${gens.map(m => card(m.id, nm(m.id), m.what.split('. ')[0].replace(/\.$/, '') + '.')).join('')}</div>
+      <input type="file" id="smArtFile" data-sm-file accept=".svg,image/svg+xml,image/png,image/jpeg,image/webp,image/gif" hidden /><p class="stu-note" id="sdArtMsg" role="status"></p>${smCustom(cur, 'art')}</section>`;
+  }
+
+  function simpleHtml() {
+    const s = S.spec, ctx = smCtx();
+    const corners = SS.read('corners', s, ctx), lines = SS.read('lines', s, ctx);
+    const basics = `<section class="sm-sec">${smHead('Basics')}
+      ${fText('name', 'Name', s.name, { req: true })}
+      ${fText('coreTrick', 'What makes it yours', s.coreTrick || '', { area: true, rows: 3, ph: 'e.g. Every card is a ticket you can tear along a dotted line', help: 'Optional. One sentence about what makes it yours. Leave it empty and one is written from your choices.' })}
+      <div class="stu-f"><span class="stu-lab">Looks best in</span><div class="seg sm-seg" role="group" aria-label="Looks best in">${['light', 'dark'].map(m => `<button type="button" data-sm-mode="${m}" aria-pressed="${s.mode === m}">${m === 'light' ? 'Light' : 'Dark'}</button>`).join('')}</div></div></section>`;
+    const shape = `<section class="sm-sec">${smHead('Corners and lines')}
+      <div class="stu-lab">Corners</div>${smSeg('corners', 'Corners', SS.CORNERS, corners)}${smCustom(corners, 'corner setting')}
+      <div class="stu-lab">Lines</div>${smSeg('lines', 'Lines', SS.LINES, lines)}${smCustom(lines, 'line setting')}</section>`;
+    const words = `<section class="sm-sec">${smHead('Words', 'Both are optional.')}${fText('motto', 'Motto', s.motto || '', { ph: 'e.g. Plant it, mind it.' })}${fText('kicker', 'Kicker above the headline', s.kicker || '', { ph: 'e.g. Spring catalogue' })}</section>`;
+    return `<div class="sm">${basics}${smPaperHtml(s, ctx)}${smSurfaceHtml(s, ctx)}${shape}${smTypeHtml(s, ctx)}${smTouchesHtml(s)}${smArtHtml(s, ctx)}${words}<p class="sm-foot">Everything else is in <button type="button" class="stu-link" data-sm-view="all">All settings</button>.</p></div>`;
+  }
+
+  // The paper colour the Surface previews are drawn on.
+  function smPaperColour(spec, ctx) {
+    const p = SS.read('paper', spec, ctx);
+    const hit = SS.PAPERS.find(x => x.id === p);
+    return hit ? hit.light : typeof p === 'string' && p.startsWith('color:') ? p.slice(6) : SM_NEUTRAL_PAPER;
+  }
+
+  function renderSimple() {
+    const a = document.activeElement;
+    const keep = a && el.panels.contains(a) ? (a.dataset.sm ? `[data-sm="${a.dataset.sm}"][data-val="${a.dataset.val}"]` : a.dataset.smTouch ? `[data-sm-touch="${a.dataset.smTouch}"]` : a.dataset.smMode ? `[data-sm-mode="${a.dataset.smMode}"]` : a.dataset.smSelect ? `[data-sm-select="${a.dataset.smSelect}"]` : '') : '';
+    el.panels.innerHTML = simpleHtml();
+    el.panels.firstElementChild.style.setProperty('--sm-paper', smPaperColour(S.spec, smCtx()));
+    if (keep) { const n = el.panels.querySelector(keep); if (n) n.focus({ preventScroll: true }); }
+  }
+
+  // Replace a spec's contents with another spec's (edit() hands the mutator a clone to change in place).
+  function become(spec, next) { Object.keys(spec).forEach(k => delete spec[k]); Object.assign(spec, next); }
+
+  function smSet(id, value, o) {
+    if (!S || !SS) return;
+    o = o || {};
+    const ctx = smCtx();
+    const label = SS.labelFor(id, S.spec, value, ctx);
+    edit(spec => become(spec, SS.apply(id, spec, value, ctx)), label, { sections: o.render === false ? null : 'all', coalesce: o.coalesce, plain: label });
+    // Ink black is a dark paper: show it dark
+    if (id === 'paper' && value === 'ink' && shade !== 'dark') { shade = 'dark'; lsSet(SHADE_KEY, shade); syncSeg(el.shade, 'shade', shade); schedulePreview(0); }
+  }
+
+  function smTouch(id, on) {
+    if (!S || !SS) return;
+    const t = SS.TOUCHES.find(x => x.id === id);
+    const ctx = smCtx();
+    edit(spec => become(spec, SS.setTouch(spec, id, on, ctx)), `touch ${on ? 'on' : 'off'}: ${t ? t.name.toLowerCase() : id}`, { sections: 'all', plain: `touch ${on ? 'on' : 'off'}: ${t ? t.name.toLowerCase() : id}` });
+  }
+
+  function smMode(mode) {
+    if (!S || S.spec.mode === mode) return;
+    const ctx = smCtx();
+    edit(spec => become(spec, SS.setMode(spec, mode, ctx)), `looks best in: ${S.spec.mode} → ${mode}`, { sections: 'all', plain: `looks best in: ${S.spec.mode} → ${mode}` });
+  }
+
+  async function smUpload(file) {
+    if (!S) return;
+    const msg = t => { const m = $('sdArtMsg'); if (m) m.textContent = t; };
+    try {
+      const isSvg = /svg/i.test(file.type) || /\.svg$/i.test(file.name);
+      let key, data, kind;
+      if (isSvg) {
+        data = await file.text();
+        if (!/<svg[\s>]/i.test(data)) return msg('That file is not an SVG.');
+        if (data.length > 600000) return msg('That SVG is bigger than 600 KB.');
+        kind = 'svg'; key = 'art/hero.svg';
+      } else {
+        if (file.size > 1200000) return msg('That image is bigger than 1.2 MB. Use a smaller one.');
+        data = await new Promise((res, rej) => { const fr = new FileReader(); fr.onload = () => res(String(fr.result)); fr.onerror = () => rej(fr.error); fr.readAsDataURL(file); });
+        if (!specAllowedImage(data)) return msg('Use a png, jpeg, webp or gif image.');
+        kind = 'image'; key = `art/hero.${data.startsWith('data:image/jpeg') ? 'jpg' : data.slice(11, data.indexOf(';'))}`;
+      }
+      const art = Object.assign({}, S.art);
+      heroFiles(art).forEach(k => delete art[k]);
+      art[key] = data;
+      const alt = ((S.spec.art || {}).hero || {}).alt || `${S.spec.name || 'Style'} artwork`;
+      const c = smCtx(), label = `art: ${SS.nameOf('art', SS.read('art', S.spec, c), c)} → your own image`;
+      edit(spec => { spec.art = Object.assign({}, spec.art || {}, { hero: { kind, src: key, fit: 'cover', alt } }); }, label, { art, sections: 'all', plain: label });
+    } catch (err) { msg('That file could not be read.'); }
+  }
+
+  function onSimpleClick(e) {
+    if (!S || !SS || view !== 'simple') return;
+    const b = e.target.closest('[data-sm],[data-sm-touch],[data-sm-mode],[data-sm-upload],[data-sm-view]');
+    if (!b) return;
+    if (b.dataset.smView) return setView(b.dataset.smView);
+    if (b.dataset.smUpload !== undefined) { const f = $('smArtFile'); if (f) f.click(); return; }
+    if (b.dataset.smTouch) return smTouch(b.dataset.smTouch, b.getAttribute('aria-pressed') !== 'true');
+    if (b.dataset.smMode) return smMode(b.dataset.smMode);
+    if (b.dataset.sm) smSet(b.dataset.sm, b.dataset.val);
+  }
+
+  function onSimpleChange(e) {
+    if (!S || !SS || view !== 'simple') return;
+    const n = e.target;
+    if (n.dataset.smSelect) { if (n.value) smSet(n.dataset.smSelect, n.value); }
+    else if (n.dataset.smColor !== undefined || n.dataset.smColour !== undefined) renderSimple();   // the picker closed: show the new swatch state
+    else if (n.dataset.smFile !== undefined) { const f = n.files && n.files[0]; n.value = ''; if (f) smUpload(f); }
+  }
+
+  function onSimpleInput(e) {
+    if (!S || !SS || view !== 'simple') return;
+    const n = e.target;
+    if (n.dataset.smColor === 'paper') smSet('paper', 'color:' + n.value.toLowerCase(), { render: false, coalesce: 'sm:paper-colour' });
+  }
+
+  function setView(v) {
+    if (!SS) v = 'all';
+    view = v === 'all' ? 'all' : 'simple';
+    lsSet(VIEW_KEY, view);
+    el.root.dataset.view = view;
+    if (el.view) syncSeg(el.view, 'view', view);
+    if (S) renderPanels();
   }
 
   /* ---------------- panel events ---------------- */
@@ -838,6 +1119,8 @@ const Studio = (function () {
       const val = n.value;
       edit(spec => {
         setAt(spec, path, val);
+        // In Simple the core trick is optional: emptied, it is written from the choices (the field refills when you leave it).
+        if (path === 'coreTrick' && view === 'simple' && SS && !val.trim()) setAt(spec, path, SS.autoText(spec, smCtx()).coreTrick);
         // the motto and kicker are also printed as specimen copy
         if ((path === 'motto' || path === 'kicker') && spec.copy && spec.copy[path] && spec.copy[path].text === before) spec.copy[path].text = val;
         if (path.startsWith('labels.states.')) { const a = spec.labels.states; for (let i = 0; i < a.length; i++) if (typeof a[i] !== 'string') a[i] = ''; }
@@ -857,6 +1140,7 @@ const Studio = (function () {
     const t = n.dataset.t;
     if (n.dataset.differ !== undefined) return toggleDiffer(n);
     if (t === 'bool') return void onParam(n);
+    if (t === 'text' && n.dataset.p === 'coreTrick' && view === 'simple') { n.value = S.spec.coreTrick; return; }
     if (t === 'num' || t === 'colour' || t === 'ptext' || t === 'col') return;
     if (t === 'sel') {
       const path = n.dataset.p;
@@ -1098,6 +1382,7 @@ const Studio = (function () {
     const b = await CustomAesthetics.bundle(key);
     if (!b) return false;
     loadCatalog();
+    if (SS) await loadSimpleSources();
     S = { key, spec: b.aesthetic, art: b.art || {}, rounds: b.rounds || null, versions: b.versions || [], undo: [], redo: [], tab: 'board', valid: true, errors: [], goodKey: null, dirty: false };
     lastError = '';
     shade = lsGet(SHADE_KEY) === 'dark' ? 'dark' : 'light';
@@ -1107,6 +1392,8 @@ const Studio = (function () {
     el.root.hidden = false;
     syncSeg(el.tabs, 'tab', S.tab);
     syncSeg(el.shade, 'shade', shade);
+    el.root.dataset.view = view;
+    if (el.view) syncSeg(el.view, 'view', view);
     renderPanels();
     paintHistory();
     paintSave();
@@ -1122,6 +1409,8 @@ const Studio = (function () {
     if (!S) return;
     const key = S.key;
     clearTimeout(previewTimer); previewTimer = null;
+    cancelKit();
+    if (kitWatch) { kitWatch.disconnect(); kitWatch = null; }
     await flush();
     S = null;
     dropTemp();
@@ -1144,6 +1433,22 @@ const Studio = (function () {
 
   function wire() {
     if (!el.root) return;
+    if (SS) {
+      // The Simple | All settings switch lives in the top bar (built here so the page markup stays as it was).
+      const top = el.root.querySelector('.stu-top-actions');
+      const sw = document.createElement('div');
+      sw.className = 'seg stu-view';
+      sw.id = 'sdView';
+      sw.setAttribute('role', 'group');
+      sw.setAttribute('aria-label', 'Editor view');
+      sw.innerHTML = '<button type="button" data-view="simple" aria-pressed="true">Simple</button><button type="button" data-view="all" aria-pressed="false">All settings</button>';
+      if (top) top.parentNode.insertBefore(sw, top);
+      el.view = sw;
+      sw.addEventListener('click', e => { const b = e.target.closest('button'); if (b) setView(b.dataset.view); });
+      el.panels.addEventListener('click', onSimpleClick);
+      el.panels.addEventListener('change', onSimpleChange);
+      el.panels.addEventListener('input', onSimpleInput);
+    }
     el.back.addEventListener('click', () => close());
     el.undo.addEventListener('click', undo);
     el.redo.addEventListener('click', redo);

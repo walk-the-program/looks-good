@@ -1071,7 +1071,7 @@
   function kit(X) {
     const nGroups = typeof UI_KIT !== 'undefined' ? UI_KIT.length : 0;
     const nTerms = typeof UI_KIT_GLOSSARY !== 'undefined' ? UI_KIT_GLOSSARY.length : 0;
-    const groups = (typeof UI_KIT !== 'undefined' ? UI_KIT : []).map((g, gi) => `<section class="sb-k-group" aria-label="${e(g.group)}">
+    const groups = (typeof UI_KIT !== 'undefined' ? UI_KIT : []).map((g, gi) => [g.group, () => `<section class="sb-k-group" aria-label="${e(g.group)}">
         ${labelRow(num(gi + 1, g.group), `${g.items.length} components`)}
         <div class="sb-k-grid">${g.items.map(it => {
           const draw = KIT_SPEC[it.id];
@@ -1081,7 +1081,7 @@
             <div class="sb-k-states" data-n="${it.states.length}">${states}</div>
           </article>`;
         }).join('')}</div>
-      </section>`).join('');
+      </section>`]);
     const K = typeof UI_KIT_PHONE !== 'undefined' ? UI_KIT_PHONE : { type: [] };
     const sample = r => r.face === 'display' ? X.D.mobile.welcome : r.size >= 16 ? X.D.mobile.card[1] : X.D.mobile.body;
     const typeRows = K.type.map(r => `<div class="sb-k-type-row">
@@ -1092,31 +1092,36 @@
     const swatches = KIT_ROLES.map(([k, name, job]) => `<div class="sb-k-swatch"><span class="sb-k-chip" style="background:var(--ab-${k})"></span><b>${name}</b><span>${job}</span><code>${e(String(hexOf(k)).toUpperCase())}</code></div>`).join('');
     const sizes = K.margin ? `Screen ${K.screen.w} × ${K.screen.h} · margin ${K.margin} · button ${K.buttonHeight} · field ${K.fieldHeight} · row ${K.rowHeight} · card padding ${K.cardPadding} · section gap ${K.sectionGap} · tab bar ${K.tabBarHeight} · tap target ${K.tapTarget}` : '';
     const rule = typeof UI_KIT_SURFACES !== 'undefined' ? UI_KIT_SURFACES.app.rule : '';
-    return `<div class="ab-in sb-kitpage" data-sb-kind="kit">
+    const tail = [
+          ['Screen layouts', () => `<section class="sb-k-group" aria-label="Screen layouts">
+            ${labelRow(num(nGroups + 1, 'Screen layouts'), `${typeof UI_KIT_SCREENS !== 'undefined' ? UI_KIT_SCREENS.length : 0} patterns · 390 × 844`)}
+            <div class="sb-k-layouts">${kitScreens(X)}</div>
+          </section>`],
+          ['Phone type scale', () => `<section class="sb-k-group" aria-label="Phone type scale">
+            ${labelRow(num(nGroups + 2, 'Phone type scale'), 'points at 390 × 844')}
+            <div class="sb-k-typescale">${typeRows}</div>
+            <p class="sb-k-sizes">${e(sizes)}</p>
+          </section>`],
+          ['Colour roles', () => `<section class="sb-k-group" aria-label="Colour roles">
+            ${labelRow(num(nGroups + 3, 'Colour roles'), '')}
+            <div class="sb-k-swatches">${swatches}</div>
+          </section>`],
+          ['Glossary coverage', () => `<section class="sb-k-group" aria-label="Glossary coverage">
+            ${labelRow(num(nGroups + 4, 'Glossary coverage'), e(`All ${nTerms} NN/g UI elements · nngroup.com/articles/ui-elements-glossary`))}
+            ${kitGlossary(X)}
+          </section>`]];
+    // SeeBuilt.kitInto's `groups`: only the sections named (by index or label) are built; omitted = all.
+    const want = X.groups;
+    const pick = list => list.filter(([label], i) => !want || want.some(w => w === i || (typeof w === 'string' && w.toLowerCase() === String(label).toLowerCase()))).map(x => x[1]()).join('');
+    if (X.append) return pick(groups.concat(tail));
+    return `<div class="ab-in sb-kitpage" data-sb-kind="kit" data-sb-uid="${X.uid}">
       <header class="sb-k-head">
         <p class="ab-kicker">${e(X.name)} · ${e(X.mode === 'brand' ? X.def.name : 'Generic')}</p>
         <h2 class="ab-card-title sb-k-pagetitle">UI kit</h2>
         <p class="sb-k-intro">${e(rule)}</p>
       </header>
       <div class="ab-rule"></div>
-      ${groups}
-      <section class="sb-k-group" aria-label="Screen layouts">
-        ${labelRow(num(nGroups + 1, 'Screen layouts'), `${typeof UI_KIT_SCREENS !== 'undefined' ? UI_KIT_SCREENS.length : 0} patterns · 390 × 844`)}
-        <div class="sb-k-layouts">${kitScreens(X)}</div>
-      </section>
-      <section class="sb-k-group" aria-label="Phone type scale">
-        ${labelRow(num(nGroups + 2, 'Phone type scale'), 'points at 390 × 844')}
-        <div class="sb-k-typescale">${typeRows}</div>
-        <p class="sb-k-sizes">${e(sizes)}</p>
-      </section>
-      <section class="sb-k-group" aria-label="Colour roles">
-        ${labelRow(num(nGroups + 3, 'Colour roles'), '')}
-        <div class="sb-k-swatches">${swatches}</div>
-      </section>
-      <section class="sb-k-group" aria-label="Glossary coverage">
-        ${labelRow(num(nGroups + 4, 'Glossary coverage'), e(`All ${nTerms} NN/g UI elements · nngroup.com/articles/ui-elements-glossary`))}
-        ${kitGlossary(X)}
-      </section>
+      ${pick(groups.concat(tail))}
     </div>`;
   }
 
@@ -1268,16 +1273,61 @@
   // current state, drawn into `host` (an element already in the page), in `mode` ('light' | 'dark', default the
   // state's own) without changing the state, the Built view or its tab. Returns the kit page element or null.
   // The AI brief measures the kit this way (js/ai-brief.js aibKitMeasure).
+  // Optional: groups: [index | label, ...] builds only those kit sections (0 .. kitGroupCount() - 1; omitted = all).
+  // append: true adds `groups` to the end of the kit already in `host` (same ids and fix-ups), for drawing it in chunks.
   function kitInto(host, opts) {
     if (!host) return null;
     const mode = opts && (opts.mode === 'light' || opts.mode === 'dark') ? opts.mode : null;
     const st = mode && typeof state !== 'undefined' && state.bgMode !== mode ? Object.assign({}, state, { bgMode: mode }) : undefined;
-    if (typeof setBoardFonts === 'function') setBoardFonts(host);
-    Object.entries(kitVars()).forEach(([k, val]) => host.style.setProperty(k, val));
+    const page0 = opts && opts.append === true ? host.querySelector('.sb-kitpage') : null;
+    if (!page0) {
+      if (typeof setBoardFonts === 'function') setBoardFonts(host);
+      Object.entries(kitVars()).forEach(([k, val]) => host.style.setProperty(k, val));
+    }
     const brand = contextFor('brand', st);
+    brand.groups = opts && Array.isArray(opts.groups) ? opts.groups : null;
+    if (page0) {
+      brand.uid = page0.dataset.sbUid || brand.uid;   // the glossary links point at the first chunk's cell ids
+      brand.append = true;
+      const tpl = document.createElement('template');
+      tpl.innerHTML = kit(brand);
+      const added = Array.from(tpl.content.children);
+      page0.append(...added);
+      const root = page0.closest('.sb-ab');
+      const barred = typeof aibPrimaryBarred === 'function' && typeof colorRolesFor === 'function' && aibPrimaryBarred(colorRolesFor(typeof state !== 'undefined' ? state : null));
+      if (root) kitColours(root, barred);
+      added.forEach(sec => {
+        if (brand.def.blend) {
+          try {
+            if (typeof blendClearArtText === 'function') blendClearArtText(sec);
+            if (typeof blendLegibility === 'function') blendLegibility(sec);
+          } catch (err) { /* a blend fix-up is cosmetic */ }
+        }
+        kitLists(sec); fitHeroShot(sec); fitStats(sec);
+      });
+      return page0;
+    }
     host.innerHTML = `<div class="sb-single" data-kind="kit">${screens(brand, 'kit')}</div>`;
     finish(host, brand.def);
     return host.querySelector('.sb-ab .sb-kitpage');
+  }
+
+  // How many sections the kit has (the UI_KIT groups, then screen layouts, phone type, colour roles, glossary).
+  const kitGroupCount = () => (typeof UI_KIT !== 'undefined' ? UI_KIT.length : 0) + 4;
+  // The kit section that holds a component: `what` is a KIT_COMPONENTS name or a CSS selector. -> index, or -1.
+  // Read once from the kit's markup parsed off-page (no style or layout work).
+  let kitIndex = null;
+  function kitGroupOf(what) {
+    const sel = typeof KIT_COMPONENTS !== 'undefined' && KIT_COMPONENTS[what] ? KIT_COMPONENTS[what].join(',') : String(what || '');
+    if (!sel) return -1;
+    if (!kitIndex) {
+      const X = contextFor('brand');
+      X.groups = null; X.append = true;
+      const tpl = document.createElement('template');
+      tpl.innerHTML = kit(X);
+      kitIndex = Array.from(tpl.content.children);
+    }
+    try { return kitIndex.findIndex(g => g.querySelector(sel)); } catch (err) { return -1; }
   }
 
   // SeeBuilt.mobileInto(host, { mode }): the Mobile app tab's Welcome and Home phones for the current state,
@@ -1683,7 +1733,7 @@
     kTopbar, kPlain, chartSvg, kBtn, ctaInner, ICO,
   };
   // 'product' is not in kinds: the share export walks kinds, and the Product tab is not a board view.
-  window.SeeBuilt = { render, kitInto, mobileInto, kinds: KINDS.map(k => k[0]).filter(k => k !== 'product'), domainFor, api };
+  window.SeeBuilt = { render, kitInto, kitGroupOf, kitGroupCount, mobileInto, kinds: KINDS.map(k => k[0]).filter(k => k !== 'product'), domainFor, api };
   window.Show = window.Show || {};
   // Show.built(kind): open the Built view, optionally at 'kit' | 'dashboard' | 'mobile' | 'landing' | 'settings'.
   window.Show.built = function (kind) {

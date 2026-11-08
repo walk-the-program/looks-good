@@ -1789,6 +1789,182 @@ check('paste: empty text', run(`extractColors('').length`) === 0, 'found colors 
   })());
 }
 
+/* ---- studio simple view (js/studio-simple.js): pure spec -> spec controls, no DOM ---- */
+{
+  const os = require('os');
+  const cp = require('child_process');
+  const sbx = {
+    console: { log() {}, info() {}, debug() {}, warn() {}, error() {} }, setTimeout, clearTimeout,
+    document: { readyState: 'complete', getElementById: () => null, createElement: () => ({ remove() {}, setAttribute() {} }), head: { appendChild() {} }, body: null, addEventListener() {} },
+  };
+  sbx.window = sbx;
+  const c = vm.createContext(sbx);
+  const load = f => vm.runInContext(fs.readFileSync(path.join(root, f), 'utf8'), c, { filename: f });
+  ['js/data.js', 'js/color.js', 'js/aesthetics/registry.js', 'js/aesthetic-spec.js'].forEach(load);
+  fs.readdirSync(path.join(root, 'js/moves')).filter(f => f.endsWith('.js')).sort((a, b) => (a === 'core.js' ? -1 : b === 'core.js' ? 1 : a.localeCompare(b))).forEach(f => load('js/moves/' + f));
+  vm.runInContext(`registerAesthetic({ key: 'soft-form', name: 'Soft Form', order: 1 });`, c);
+  load('js/aesthetic-meta.js'); load('js/studio-rounds.js'); load('js/studio-simple.js');
+  const SS = c.StudioSimple, SR = c.StudioRounds;
+  const J = JSON.stringify, copy = v => JSON.parse(J(v));
+  const parse = f => JSON.parse(fs.readFileSync(path.join(root, f, 'aesthetic.json'), 'utf8'));
+  const sources = { blank: parse('custom-aesthetics/starters/blank'), 'soft-form--moves': parse('custom-aesthetics/starters/soft-form--moves'),
+    'acid-graphics--moves': parse('custom-aesthetics/starters/acid-graphics--moves'), 'editorial-serif--moves': parse('custom-aesthetics/starters/editorial-serif--moves'), darkroom: parse('custom-aesthetics/darkroom') };
+  const catalog = c.SPEC_LAB.catalog();
+  const ctx = { catalog, sources, customs: [{ key: 'darkroom', name: 'Darkroom', spec: sources.darkroom }, { key: 'blank-mine', name: 'My blank', spec: Object.assign(copy(sources.blank), { kit: Object.assign(copy(sources.blank.kit), { card: { material: 'outlined' } }) }) }], fonts: vm.runInContext('FONTS', c).map(f => ({ name: f.name, cls: f.cls })) };
+  const blank = () => copy(sources.blank);
+  let seq = 0;
+  const validate = spec => {
+    const errors = [];
+    const sp = vm.runInContext('JSON', c).parse(J(spec)); sp.key = 'chk-simple-' + (++seq);   // parsed inside the sandbox: the runtime's pure-data check rejects foreign objects
+    const def = c.registerSpecAesthetic(sp, { json: true, quietHooks: true, errors, file: 'simple' });
+    if (def) c.unregisterSpecAesthetic(sp.key);
+    return { ok: !!def, errors };
+  };
+  const canvasCount = spec => [].concat(spec.colour || [], spec.moves || []).filter(e => { const m = catalog.find(x => x.id === e.move); return m && m.hooks.includes('canvas'); }).length;
+
+  // every option of every control: apply -> read gives the same option back, the file stays valid
+  const options = {
+    paper: SS.PAPERS.map(p => p.id).concat(['brand', 'color:#336699']),
+    surface: SS.SURFACES.map(s => s.id).concat(['style:blank-mine']),
+    corners: SS.CORNERS.map(x => x.id), lines: SS.LINES.map(x => x.id), spacing: SS.SPACINGS.map(x => x.id), labels: SS.LABELS.map(x => x.id),
+    headFeel: SS.HEAD_FEELS, bodyFeel: SS.BODY_FEELS, art: ['none'].concat(SS.artGenerators(ctx).map(m => m.id)),
+  };
+  const bad = [];
+  for (const start of Object.keys(sources)) {
+    for (const [id, vals] of Object.entries(options)) {
+      for (const v of vals) {
+        const before = copy(sources[start]);
+        const next = SS.apply(id, before, v, ctx);
+        const v2 = validate(next);
+        if (SS.read(id, next, ctx) !== v) bad.push(`${start}/${id}/${v}: read ${SS.read(id, next, ctx)}`);
+        else if (!v2.ok) bad.push(`${start}/${id}/${v}: ${v2.errors[0]}`);
+        else if (J(before) !== J(sources[start])) bad.push(`${start}/${id}/${v}: the input was mutated`);
+      }
+    }
+  }
+  check('simple: every option of every control round-trips (apply then read) on all five sources and stays valid', !bad.length, bad.slice(0, 4).join(' | '));
+  check('simple: there are 7 papers + brand, 5 surfaces, 4 corners, 4 lines, 3 spacings, 3 label styles', options.paper.length === 9 && SS.SURFACES.length === 5 && options.corners.length === 4 && options.lines.length === 4 && options.spacing.length === 3 && options.labels.length === 3, J(Object.keys(options).map(k => options[k].length)));
+
+  // touches: each is a real catalog move with no hook (so it can never displace Paper, Art or another touch)
+  const hooky = SS.TOUCHES.filter(t => { const m = catalog.find(x => x.id === t.id); return !m || m.hooks.filter(h => h !== 'tokens').length; }).map(t => t.id);
+  check('simple: every touch is a catalog move with no hook', !hooky.length && SS.TOUCHES.length >= 8, J(hooky));
+  {
+    let s = blank(); const badT = [];
+    for (const t of SS.TOUCHES) {
+      s = SS.setTouch(s, t.id, true, ctx);
+      if (!SS.touchesOn(s).includes(t.id)) badT.push(t.id + ' on');
+    }
+    const all = validate(s);
+    check('simple: all touches on at once: each reads back as on, the file stays valid', !badT.length && all.ok && SR.hookOrder(s, catalog).shadowed && !Object.keys(SR.hookOrder(s, catalog).shadowed).length, J(badT) + J(all.errors));
+    for (const t of SS.TOUCHES) { s = SS.setTouch(s, t.id, false, ctx); if (SS.touchesOn(s).includes(t.id)) badT.push(t.id + ' off'); }
+    const twice = SS.setTouch(SS.setTouch(blank(), 'tear-line', true, ctx), 'tear-line', true, ctx);
+    check('simple: touches turn off again, and turning one on twice keeps one entry', !badT.length && twice.moves.filter(e => e.move === 'tear-line').length === 1 && twice.moves.find(e => e.move === 'tear-line').scope === 'board', J(badT));
+  }
+
+  {
+    const ink = SS.apply('paper', blank(), 'ink', ctx), kr = SS.apply('paper', ink, 'kraft', ctx);
+    const kOnly = blank(); kOnly.mode = 'dark'; const kk = SS.apply('paper', kOnly, 'kraft', ctx);
+    check('simple: Ink then Kraft puts the style back to light; Kraft alone keeps the mode', ink.mode === 'dark' && kr.mode === 'light' && kk.mode === 'dark', J([ink.mode, kr.mode, kk.mode]));
+    const fe = SS.apply('bodyFeel', SS.apply('headFeel', blank(), 'slab', ctx), 'humanist', ctx);
+    check('simple: body feel keeps the heading feel\'s avoid list', ['didone', 'script'].every(x => fe.meta.fonts.avoid.includes(x)) && new Set(fe.meta.fonts.avoid).size === fe.meta.fonts.avoid.length, J(fe.meta.fonts.avoid));
+  }
+
+  // custom detection: a setting made some other way reads as 'custom', and a missing one as null / none
+  {
+    const cs = [];
+    const mod = (name, fn, id, want) => { const s = blank(); fn(s); const got = SS.read(id, s, ctx); if (got !== want) cs.push(`${name}: ${got}`); };
+    mod('corner pair', s => { s.moves.find(e => e.move === 'corner-radius').params = { base: { light: 4, dark: 10 } }; }, 'corners', 'custom');
+    mod('both line moves', s => { s.moves.push({ move: 'hairline-rule', params: {} }); }, 'lines', 'custom');
+    mod('two canvas recipes', s => { s.colour.push({ move: 'canvas-ink-pull', params: {} }); }, 'paper', 'custom');
+    mod('paper with a partial keep', s => { s.colour = [{ move: 'warm-paper-canvas', params: { cream: '#f3ead9', keep: 0.74 } }]; }, 'paper', 'custom');
+    mod('no canvas recipe', s => { s.colour = []; }, 'paper', null);
+    mod('edited kit', s => { s.kit['button-primary'] = { material: 'outlined' }; }, 'surface', 'custom');
+    mod('mono labels without the caps move', s => { s.moves = s.moves.filter(e => e.move !== 'caps-mono-labels'); }, 'labels', 'custom');
+    mod('odd tracking', s => { s.moves.find(e => e.move === 'tight-display-tracking').params = { tracking: -0.01 }; }, 'spacing', 'custom');
+    mod('no tracking move', s => { s.moves = s.moves.filter(e => e.move !== 'tight-display-tracking'); }, 'spacing', 'normal');
+    mod('unknown font class', s => { s.meta.fonts.heading.classes = ['no-such-class']; }, 'headFeel', 'custom');
+    mod('generator that is not offered', s => { s.art = { hero: { kind: 'generator', move: 'field-band', params: {} } }; }, 'art', 'custom');
+    mod('hero upload', () => {}, 'art', 'upload');
+    check('simple: settings made some other way read as custom (or not set), never as a wrong option', !cs.length, cs.join(' | '));
+    check('simple: a custom setting is never rewritten by reading, and a surface read matches borrowed styles', SS.read('surface', blank(), ctx) === 'outline' && SS.read('surface', copy(sources.darkroom), ctx) === 'film', SS.read('surface', copy(sources.darkroom), ctx));
+  }
+
+  // Paper: exactly one canvas recipe, whatever the style had; dark derived; Surface leaves Paper alone
+  {
+    const probs = [];
+    for (const start of Object.keys(sources)) for (const v of options.paper) {
+      const s = SS.apply('paper', copy(sources[start]), v, ctx);
+      const ho = SR.hookOrder(s, catalog);
+      if (canvasCount(s) !== 1) probs.push(`${start}/${v}: ${canvasCount(s)} canvas recipes`);
+      if (Object.keys(ho.shadowed).length) probs.push(`${start}/${v}: shadowed ${J(ho.shadowed)}`);
+      for (const sf of options.surface) {
+        const t = SS.apply('surface', s, sf, ctx);
+        if (SS.read('paper', t, ctx) !== v || canvasCount(t) !== 1) probs.push(`${start}/${v}/${sf}: surface clobbered paper`);
+        if (Object.keys(SR.hookOrder(t, catalog).shadowed).length) probs.push(`${start}/${v}/${sf}: surface shadows ${J(SR.hookOrder(t, catalog).shadowed)}`);
+      }
+    }
+    check('simple: Paper leaves exactly one canvas recipe and no entry shadowed; Surface never touches it', !probs.length, probs.slice(0, 4).join(' | '));
+    const k = SS.apply('paper', blank(), 'kraft', ctx).colour[0].params;
+    const hex = h => parseInt(h.slice(1), 16);
+    const lum = h => { const n = hex(h); return ((n >> 16 & 255) + (n >> 8 & 255) + (n & 255)) / 3; };
+    check('simple: a paper gets a deep same-hue dark version (per mode, warmDark on)', k.warmDark === true && k.keep === 0 && k.cream.light === '#d8bd93' && lum(k.cream.dark) < 50 && /^#[0-9a-f]{6}$/.test(k.cream.dark) && k.cream.dark.slice(1, 3) > k.cream.dark.slice(5), J(k));
+    const ink = SS.apply('paper', blank(), 'ink', ctx);
+    check('simple: Ink black is a dark-mode paper and sets the style to look best in dark', ink.mode === 'dark' && lum(ink.colour[0].params.cream.dark) < 20, J(ink.colour[0]));
+  }
+
+  // auto text: written while empty or still what Simple wrote last time; a person's edit is theirs
+  {
+    let s = blank(); s.coreTrick = '';
+    s = SS.refreshAuto({}, s, ctx, { force: true });
+    const f1 = ['descriptor', 'summary', 'coreTrick'].every(k => s[k].trim()) && s.build.surface && s.build.pressText && s.build.icons && s.build.appIcon && s.meta.fonts.why && s.rules.do.length && s.rules.dont.length && s.labels.material;
+    check('simple: a new style gets descriptor, summary, core trick, build notes, font note, rules and material label written for it', !!f1, J(s).slice(0, 300));
+    const typed = blank(); typed.coreTrick = 'Tickets that tear.';
+    check('simple: a core trick the person typed is kept', SS.refreshAuto({}, typed, ctx, { force: true }).coreTrick === 'Tickets that tear.', '');
+    const a = SS.apply('paper', s, 'kraft', ctx);
+    check('simple: Simple-written text follows a later choice (descriptor and summary mention kraft)', /Kraft/.test(a.descriptor) && /kraft/i.test(a.summary) && a.descriptor !== s.descriptor, a.descriptor + ' | ' + a.summary);
+    const edited = copy(a); edited.build.surface = 'My own words about surfaces.'; edited.descriptor = 'Mine · Mine · Mine'; edited.rules.do = ['Always smile.'];
+    const b = SS.apply('surface', SS.apply('headFeel', edited, 'slab', ctx), 'soft', ctx);
+    check('simple: text a person edited is never overwritten by a later Simple choice', b.build.surface === 'My own words about surfaces.' && b.descriptor === 'Mine · Mine · Mine' && J(b.rules.do) === J(['Always smile.']) && b.build.pressText !== a.build.pressText, b.build.pressText);
+    const emptied = copy(b); emptied.descriptor = '   ';
+    check('simple: a field the person emptied is written again', SS.apply('corners', emptied, 'pill', ctx).descriptor.trim().length > 3, '');
+    check('simple: text is plain (no template wording, no angle brackets) and the spec gains no new fields', ['descriptor', 'summary', 'coreTrick'].every(k => !/<|>|Word · Word|stage \d|Short line/.test(b[k])) && Object.keys(b).every(k => Object.keys(sources.blank).includes(k)), Object.keys(b).join());
+    const plain = blank(); delete plain.build; delete plain.labels; plain.meta = undefined; delete plain.meta;
+    const q = SS.apply('corners', plain, 'square', ctx);
+    check('simple: auto text never invents build, labels or font data a file does not have', !('build' in q) && !('labels' in q) && validate(q).ok, Object.keys(q).join());
+  }
+
+  // words and mode
+  {
+    const s = blank(); s.copy = { motto: { label: 'Motto', text: s.motto } };
+    const w = SS.setWords(s, 'motto', 'Plant it, mind it.', ctx);
+    check('simple: the motto also updates the specimen copy that shows it', w.motto === 'Plant it, mind it.' && w.copy.motto.text === 'Plant it, mind it.' && s.motto !== w.motto, J(w.copy));
+    check('simple: looks best in dark / light changes the mode and the descriptor stays Simple\'s', SS.setMode(blank(), 'dark', ctx).mode === 'dark' && SS.setMode(blank(), 'sepia', ctx).mode === 'light', '');
+  }
+
+  // end to end: a spec built only through Simple passes the static checker with no FAIL and no WARN
+  pendingChecks.push((async () => {
+    const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'lg-simple-'));
+    try {
+      let s = blank(); s.coreTrick = ''; s = SS.refreshAuto({}, s, ctx, { force: true });
+      s = SS.apply('paper', s, 'kraft', ctx); s = SS.apply('surface', s, 'print', ctx); s = SS.apply('corners', s, 'square', ctx); s = SS.apply('lines', s, 'hairline', ctx);
+      s = SS.apply('headFeel', s, 'slab', ctx); s = SS.apply('bodyFeel', s, 'humanist', ctx); s = SS.apply('labels', s, 'sans', ctx); s = SS.apply('spacing', s, 'loose', ctx);
+      s = SS.setTouch(s, 'tear-line', true, ctx); s = SS.setTouch(s, 'double-rule', true, ctx); s = SS.apply('art', s, 'none', ctx); s = SS.setWords(s, 'motto', 'Plant it, mind it.', ctx);
+      s.key = 'simple-check'; s.name = 'Simple Check';
+      const dir = path.join(tmp, 'simple-check');
+      fs.mkdirSync(dir); fs.writeFileSync(path.join(dir, 'aesthetic.json'), JSON.stringify(s, null, 2));
+      const r = cp.spawnSync(process.execPath, [path.join(root, 'dev/aesthetic-check.js'), dir], { encoding: 'utf8' });
+      check('simple: a style built only through Simple controls passes the static checker with 0 fail and 0 warn', r.status === 0 && /, 0 warn, 0 fail/.test(r.stdout), r.stdout.slice(-500) + r.stderr);
+    } finally { fs.rmSync(tmp, { recursive: true, force: true }); }
+  })());
+}
+
+/* ---- kit drawing in parts (source checks; the timings are measured in a browser) ---- */
+{
+  const sb = fs.readFileSync(path.join(root, 'js/see-built.js'), 'utf8'), st = fs.readFileSync(path.join(root, 'js/studio.js'), 'utf8');
+  check('kit: SeeBuilt.kitInto takes groups and append, and exposes kitGroupOf / kitGroupCount', /kitInto, kitGroupOf, kitGroupCount/.test(sb) && /opts\.groups|opts && Array\.isArray\(opts\.groups\)/.test(sb), '');
+  check('kit: the Custom note no longer claims All settings was opened', !/was set in All settings/.test(st) && /doesn't match one of these options\. Pick one to replace it/.test(st), '');
+}
+
 // Not run here (they need a real DOM): that blended tokens(t, state) see the view's fonts end to end, and the
 // render timings. They are covered by the in-browser sweeps in docs/round6/.
 

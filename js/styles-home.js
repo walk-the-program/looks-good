@@ -3,8 +3,8 @@
 
    Every style (the 45 built-ins plus custom ones, see js/custom-aesthetics.js) drawn as a tile with
    real brand colours, a detail view for one style, "Use on a brand", and for custom styles Import,
-   Export, Duplicate, Rename, Delete and the read-only round history. New style (a dialog: name, core trick,
-   starting point) and Edit / Edit a copy open the studio editor (js/studio.js).
+   Export, Duplicate, Rename, Delete and the read-only round history. New style (a dialog: a name, an optional core trick,
+   and starting points as picture cards) and Edit / Edit a copy open the studio editor (js/studio.js).
 
    Views: body[data-view="styles"]; the grid and the open style share #styles. The last home mode is
    remembered in localStorage 'bd.homeMode' (shared with js/patterns-home.js and js/logos/home.js).
@@ -173,11 +173,8 @@ const StylesHome = (function () {
     if (f && f.clientWidth) el.grid.style.setProperty('--st-zoom', (f.clientWidth / BOARD_W).toFixed(4));
   }
 
-  function fillTile(tile, base) {
-    const box = tile.querySelector('.st-board');
-    if (!box) return;
-    const b = drawBoard(base, tile.dataset.key);
-    if (!b) return;
+  // The top of a board (its first two blocks) into `box`, as the grid tiles and the New style picker show it.
+  function boardTopInto(box, b) {
     box.style.setProperty('--font-heading', b.st.headingFont.css);
     box.style.setProperty('--font-body', b.st.bodyFont.css);
     const tpl = document.createElement('template');
@@ -197,6 +194,14 @@ const StylesHome = (function () {
       if (typeof blendLegibility === 'function') blendLegibility(box.firstElementChild);
     }
     loadFonts(b.st);
+  }
+
+  function fillTile(tile, base) {
+    const box = tile.querySelector('.st-board');
+    if (!box) return;
+    const b = drawBoard(base, tile.dataset.key);
+    if (!b) return;
+    boardTopInto(box, b);
     tile.dataset.filled = '1';
     tile.classList.add('is-filled');
   }
@@ -294,17 +299,22 @@ const StylesHome = (function () {
 
   async function newStyle() {
     const [starters, custom] = [await CustomAesthetics.starters(), CustomAesthetics.list()];
+    const bundles = {};      // starter id -> bundle (for the picture cards and for creating)
+    await Promise.all(starters.map(async s => { bundles[s.id] = await CustomAesthetics.starter(s.id); }));
     const previous = document.activeElement;
     const ov = document.createElement('div');
     ov.className = 'dlg-overlay';
-    const starterOpts = starters.map(s => `<option value="starter:${esc(s.id)}">${esc(s.id === 'blank' ? 'Blank' : s.name + ' starter')}</option>`).join('');
-    const customOpts = custom.map(c => `<option value="style:${esc(c.key)}">${esc(c.name)}</option>`).join('');
+    // Blank first, then the starters, then the person's own styles.
+    const picks = starters.filter(s => bundles[s.id]).sort((a, b) => (a.id === 'blank' ? -1 : b.id === 'blank' ? 1 : 0))
+      .map(s => ({ value: 'starter:' + s.id, name: s.id === 'blank' ? 'Blank' : s.name, sub: s.id === 'blank' ? 'Plain and flat. Start here if unsure.' : 'Starter', temp: 'newstyle--' + s.id, bundle: bundles[s.id] }))
+      .concat(custom.map(c => ({ value: 'style:' + c.key, name: c.name, sub: 'Your style', key: c.key })));
+    const card = (p, i) => `<label class="st-pick"><input type="radio" name="from" value="${esc(p.value)}"${i === 0 ? ' checked' : ''} /><span class="st-frame"><span class="st-board" inert></span></span><span class="st-pick-n">${esc(p.name)}</span><span class="st-pick-s">${esc(p.sub)}</span></label>`;
     ov.innerHTML = `<form class="dlg st-new" role="dialog" aria-modal="true" aria-label="New style" novalidate>
       <h2 class="dlg-title">New style</h2>
-      <p class="dlg-message">It opens in the editor and saves as you work.</p>
+      <p class="dlg-message">Only the name is needed. It opens in the editor and saves as you work.</p>
       <label class="field dlg-field"><span>Name</span><input type="text" name="name" maxlength="80" autocomplete="off" spellcheck="false" /></label>
-      <label class="field dlg-field"><span>Core trick</span><input type="text" name="trick" autocomplete="off" /><small class="st-help">The mechanism, not the mood: what makes it work.</small></label>
-      <label class="field dlg-field"><span>Start from</span><select name="from">${starterOpts}${customOpts ? `<optgroup label="Your styles">${customOpts}</optgroup>` : ''}</select></label>
+      <label class="field dlg-field"><span>What makes it yours <small class="st-opt">optional</small></span><input type="text" name="trick" autocomplete="off" placeholder="e.g. Every card is a ticket you can tear along a dotted line" /><small class="st-help">One sentence. Leave it empty and one is written from the choices you make.</small></label>
+      <fieldset class="st-picks-wrap"><legend>Start from</legend><div class="st-picks" role="radiogroup" aria-label="Start from">${picks.map(card).join('')}</div></fieldset>
       <p class="dlg-error" hidden></p>
       <div class="dlg-actions"><button type="button" class="btn btn-ghost" data-id="cancel">Cancel</button><button type="submit" class="btn btn-primary" data-id="create">Create</button></div>
     </form>`;
@@ -312,7 +322,8 @@ const StylesHome = (function () {
     document.body.classList.add('has-dialog');
     const form = ov.querySelector('form');
     const err = ov.querySelector('.dlg-error');
-    const close = () => { ov.remove(); document.body.classList.remove('has-dialog'); if (previous && previous.focus) previous.focus(); };
+    const temps = [];
+    const close = () => { temps.forEach(k => { try { unregisterSpecAesthetic(k); } catch (e) { /* already gone */ } }); ov.remove(); document.body.classList.remove('has-dialog'); if (previous && previous.focus) previous.focus(); };
     const fail = (msg, field) => { err.textContent = msg; err.hidden = false; if (field) form.elements[field].focus(); };
     form.elements.name.addEventListener('input', () => { err.hidden = true; });
     form.elements.trick.addEventListener('input', () => { err.hidden = true; });
@@ -322,24 +333,60 @@ const StylesHome = (function () {
       if (e.key === 'Escape') { e.preventDefault(); close(); }
     });
     ov.querySelector('[data-id="cancel"]').addEventListener('click', close);
+
+    // The picture cards: the same cheap board top as the Styles grid, a few per frame. Starters are not registered
+    // styles, so each is registered under a throwaway key for its picture and removed when the dialog closes.
+    const base = baseState();
+    const frames = Array.from(ov.querySelectorAll('.st-pick'));
+    const zoom = () => { const f = ov.querySelector('.st-frame'); if (f && f.clientWidth) ov.querySelector('.st-picks').style.setProperty('--st-zoom', (f.clientWidth / BOARD_W).toFixed(4)); };
+    zoom();
+    let n = 0;
+    const draw = () => {
+      if (!ov.isConnected) return;
+      const t0 = performance.now();
+      while (n < frames.length && performance.now() - t0 < 12) {
+        const p = picks[n], fr = frames[n++];
+        try {
+          let key = p.key;
+          if (!key) {
+            const errors = [];
+            const def = registerSpecAesthetic(Object.assign(JSON.parse(JSON.stringify(p.bundle.aesthetic)), { key: p.temp }), { untrusted: true, files: p.bundle.art || {}, errors, file: 'new style picker', quietHooks: true });
+            if (def) { key = p.temp; temps.push(p.temp); }
+          }
+          const b = key && drawBoard(base, key);
+          if (b) boardTopInto(fr.querySelector('.st-board'), b);
+          fr.classList.add('is-filled');
+        } catch (e) { console.error('Styles: could not draw ' + p.name, e); }
+      }
+      if (n < frames.length) setTimeout(draw, 0);
+    };
+    setTimeout(draw, 0);
+
     form.addEventListener('submit', async e => {
       e.preventDefault();
       const name = form.elements.name.value.trim();
       const trick = form.elements.trick.value.trim();
       if (!name) return fail('Name is required.', 'name');
       if (/[<>]/.test(name + trick)) return fail('Names and text can\'t contain < or >.', 'name');
-      if (!trick) return fail('Core trick is required: one sentence about the mechanism, not the mood.', 'trick');
       const from = form.elements.from.value;
       const [kind, id] = [from.slice(0, from.indexOf(':')), from.slice(from.indexOf(':') + 1)];
       const b = kind === 'starter' ? await CustomAesthetics.starter(id) : await CustomAesthetics.bundle(id);
       if (!b) return fail('That starting point could not be loaded.');
       b.aesthetic.name = name;
-      b.aesthetic.coreTrick = trick;
-      if (typeof b.aesthetic.summary !== 'string' || !b.aesthetic.summary.trim()) b.aesthetic.summary = trick;   // the board's one-line summary starts as the core trick
       b.aesthetic.key = CustomAesthetics.uniqueKey(name);
       b.aesthetic.lineage = Object.assign({}, b.aesthetic.lineage && typeof b.aesthetic.lineage === 'object' ? b.aesthetic.lineage : {}, { forkedFrom: id, version: 1 });
       b.rounds = null;
       delete b.versions;
+      if (window.StudioSimple && kind === 'starter') {
+        // The core trick is the person's if they typed one; otherwise (and for the descriptor, summary, build notes, font note,
+        // rules and material label) the text is written from the choices the starting point already makes. A copy of one of
+        // your own styles keeps that style's wording.
+        b.aesthetic.coreTrick = trick;
+        b.aesthetic = StudioSimple.refreshAuto({}, b.aesthetic, await simpleContext(bundles), { force: true });
+      } else {
+        if (trick) b.aesthetic.coreTrick = trick;
+        if (typeof b.aesthetic.summary !== 'string' || !b.aesthetic.summary.trim()) b.aesthetic.summary = b.aesthetic.coreTrick;
+      }
       const r = await CustomAesthetics.create(b);
       if (!r.ok) return fail(r.error || 'The style could not be created.');
       close();
@@ -347,6 +394,15 @@ const StylesHome = (function () {
       await Studio.open(r.key);
     });
     form.elements.name.focus();
+  }
+
+  // What StudioSimple needs to read a starting point's choices (its surface is found by comparing kits).
+  async function simpleContext(bundles) {
+    const sources = {};
+    Object.keys(bundles || {}).forEach(id => { if (bundles[id]) sources[id] = bundles[id].aesthetic; });
+    const dr = typeof SPEC_LAB !== 'undefined' && SPEC_LAB.specs.darkroom;
+    if (dr && dr.spec) sources.darkroom = dr.spec;
+    return { catalog: SPEC_LAB.catalog(), sources, customs: [], fonts: typeof FONTS !== 'undefined' ? FONTS : [] };
   }
 
   /* ---------- detail ---------- */

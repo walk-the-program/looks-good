@@ -60,10 +60,10 @@ const StudioRound = (function () {
       <div class="rd-head" id="rdHead"></div>
       <div class="rd-banner" id="rdBanner" hidden></div>
       <section class="rd-sec" aria-labelledby="rdVarH">
-        <h3 class="rd-h" id="rdVarH">Variations</h3>
+        <h3 class="rd-h" id="rdVarH">Show me options</h3>
         <div class="rd-vbar">
-          <label class="rd-axis" for="rdAxis"><span>Change</span><select id="rdAxis" aria-label="Which axis the variations change">${SR.AXES.map(a => `<option value="${esc(a.id)}">${esc(a.label)}</option>`).join('')}</select></label>
-          <button type="button" class="btn btn-primary btn-small" id="rdVar">Variations</button>
+          <label class="rd-axis" for="rdAxis"><span>Change only</span><select id="rdAxis" aria-label="Which axis the variations change">${SR.AXES.map(a => `<option value="${esc(a.id)}">${esc(a.label)}</option>`).join('')}</select></label>
+          <button type="button" class="btn btn-primary btn-small" id="rdVar">Show me options</button>
         </div>
         <p class="rd-note" id="rdVMsg" role="status"></p>
         <ul class="rd-cards" id="rdCards"></ul>
@@ -84,7 +84,7 @@ const StudioRound = (function () {
         <div id="rdNotes"></div>
       </section>
       <section class="rd-sec" aria-labelledby="rdClH">
-        <h3 class="rd-h" id="rdClH">Close round</h3>
+        <h3 class="rd-h" id="rdClH">Finish this round</h3>
         <div id="rdClose"></div>
       </section>
       <section class="rd-sec" aria-labelledby="rdHiH"><h3 class="rd-h" id="rdHiH">History</h3><div id="rdHistory"></div></section>`;
@@ -166,6 +166,8 @@ const StudioRound = (function () {
     kit.style.transform = 'none';
     let el = null;
     if (planSel(plan)) { try { el = kit.querySelector(planSel(plan)); } catch (e) { el = null; } }
+    const keep = el ? el.closest('.sb-k-group') : kit.querySelector('.sb-k-group');   // measure one real group, not placeholders
+    kit.querySelectorAll('.sb-k-group').forEach(g => { g.style.display = g === keep ? '' : 'none'; if (g === keep) g.style.contentVisibility = 'visible'; });
     let k = w / 900, tx = 0, ty = 0;
     if (el && plan.corner) {              // frames and edges: the cell's top-left corner, close up
       const kr = kit.getBoundingClientRect(), er = el.getBoundingClientRect();
@@ -182,9 +184,15 @@ const StudioRound = (function () {
     kit.style.transform = `translate(${tx.toFixed(1)}px, ${ty.toFixed(1)}px) scale(${k.toFixed(4)})`;
   }
 
+  // A card crops one group of the kit, so only that group is drawn: the one holding the target, else the first.
+  function cardGroups(plan) {
+    const g = planSel(plan) ? SeeBuilt.kitGroupOf(plan.comp || plan.sel) : 0;
+    return [g >= 0 ? g : 0];
+  }
+
   function paintPreview(host, spec, plan) {
     host.dataset.tab = plan.tab;
-    const r = Studio.renderInto(host, spec, { tab: plan.tab });
+    const r = Studio.renderInto(host, spec, plan.tab === 'kit' ? { tab: 'kit', groups: cardGroups(plan) } : { tab: plan.tab });
     if (!r.ok) { host.innerHTML = '<span class="rd-note">This variant could not be drawn.</span>'; return; }
     if (plan.tab === 'kit') cropKit(host, plan); else fitCardPreview(host);
   }
@@ -198,11 +206,12 @@ const StudioRound = (function () {
     btn.textContent = on ? 'Before' : 'Hold: before';
   }
 
+  let paintTok = null;
   function renderCards() {
     const ul = $('rdCards');
     ul.innerHTML = ctx.cards.map(c => `<li class="rd-card${c.stale ? ' is-stale' : ''}${ctx.previewing === c.v.id ? ' is-on' : ''}" data-id="${esc(c.v.id)}">
         <div class="rd-pv">
-          <button type="button" class="rd-vprev" data-act="enlarge" data-id="${esc(c.v.id)}" aria-label="Show variant ${esc(c.v.id)} in the main preview"></button>
+          <button type="button" class="rd-vprev" data-act="enlarge" data-id="${esc(c.v.id)}" aria-label="Show variant ${esc(c.v.id)} in the main preview"><span class="rd-note">Drawing…</span></button>
           <div class="rd-vprev rd-vbefore" aria-hidden="true"></div>
           <button type="button" class="rd-ba" title="Hover, focus or hold to see the current version at the same crop">Hold: before</button>
         </div>
@@ -214,21 +223,41 @@ const StudioRound = (function () {
           <div class="rd-btnrow">${c.stale ? '' : `<button type="button" class="btn btn-primary btn-small" data-act="keep" data-id="${esc(c.v.id)}">Keep</button>`}<button type="button" class="btn btn-ghost btn-small" data-act="kill" data-id="${esc(c.v.id)}">Kill</button></div>
         </div>
       </li>`).join('');
+    // The wiring is instant; the previews draw one card per frame so no single task freezes the page.
+    const tok = paintTok = {};
+    const draw = i => {
+      if (paintTok !== tok || !ctx) return;
+      const c = ctx.cards[i];
+      if (!c) return;
+      const li = ul.querySelector(`.rd-card[data-id="${CSS.escape(c.v.id)}"]`);
+      if (li) paintPreview(li.querySelector('.rd-vprev[data-act]'), c.v.spec, c.plan);
+      if (i + 1 < ctx.cards.length) requestAnimationFrame(() => draw(i + 1));
+    };
     ctx.cards.forEach(c => {
       const li = ul.querySelector(`.rd-card[data-id="${CSS.escape(c.v.id)}"]`);
       if (!li) return;
-      paintPreview(li.querySelector('.rd-vprev[data-act]'), c.v.spec, c.plan);
       const ba = li.querySelector('.rd-ba');
       ['mouseenter', 'focus', 'pointerdown'].forEach(t => ba.addEventListener(t, () => showBefore(li, true)));
       ['mouseleave', 'blur', 'pointerup', 'pointercancel'].forEach(t => ba.addEventListener(t, () => showBefore(li, false)));
     });
+    requestAnimationFrame(() => draw(0));
   }
   const axisLabel = id => (SR.AXES.find(a => a.id === id) || { label: id }).label;
 
   /* Does a variant change anything the style draws? Material, kit and edges variants are compared by the stylesheet
      the runtime generates for each spec (registered for a moment under a temporary key). Colour, type and art variants
      are always taken as visible: the runtime has no way to read their tokens without drawing. */
+  let cssMemo = { art: null, map: new Map() };      // generated css per spec, kept while the bundle's art is the same object
   function cssOf(spec, art) {
+    if (cssMemo.art !== art) cssMemo = { art, map: new Map() };
+    const mk = JSON.stringify(spec);
+    if (cssMemo.map.has(mk)) return cssMemo.map.get(mk);
+    const css = cssBuild(spec, art);
+    if (cssMemo.map.size > 300) cssMemo.map.clear();
+    if (css != null) cssMemo.map.set(mk, css);
+    return css;
+  }
+  function cssBuild(spec, art) {
     const key = 'studio--vis';
     const copy = clone(spec); copy.key = key;
     let css = null;
@@ -327,7 +356,8 @@ const StudioRound = (function () {
   function onChange(e) {
     if (!ctx || e.source === 'apply') return;
     let lines = [];
-    try { lines = SR.diff(e.before, e.after, catalog); } catch (err) { console.error('studio round: diff failed', err); }
+    if (Array.isArray(e.plain) && e.plain.length) lines = e.plain.slice();
+    else try { lines = SR.diff(e.before, e.after, catalog); } catch (err) { console.error('studio round: diff failed', err); }
     if (!lines.length) return;
     if (ctx.cards.some(c => !c.stale)) { ctx.cards.forEach(c => { c.stale = true; }); renderCards(); }   // they vary the version before this edit
     write(r => SR.recordChanges(r, lines));
@@ -483,10 +513,10 @@ const StudioRound = (function () {
     const r = roundsOf(), o = openOf(r), box = $('rdClose');
     if (!o) { box.innerHTML = '<p class="rd-note">Nothing to close yet. The round opens with your first change, variation or note.</p>'; ctx.closing = false; return; }
     if (ctx.closing && $('rdCloseForm')) return;
-    if (!ctx.closing) { box.innerHTML = `<button type="button" class="btn btn-ghost btn-small" data-act="close-start">Close round ${esc(o.n)}</button>`; return; }
+    if (!ctx.closing) { box.innerHTML = `<button type="button" class="btn btn-ghost btn-small" data-act="close-start">Finish this round</button>`; return; }
     let dflt = '';
     try { dflt = SR.closeRound(r, {}).rounds.find(x => x.n === o.n).summary; } catch (e) { dflt = ''; }
-    box.innerHTML = `<form class="rd-closef" id="rdCloseForm"><label class="rd-f"><span>One line on this round</span><input type="text" id="rdSummary" maxlength="300" placeholder="${esc(dflt)}" autocomplete="off" /></label><div class="rd-btnrow"><button type="submit" class="btn btn-primary btn-small">Close round ${esc(o.n)}</button><button type="button" class="btn btn-ghost btn-small" data-act="close-cancel">Cancel</button></div></form>`;
+    box.innerHTML = `<form class="rd-closef" id="rdCloseForm"><label class="rd-f"><span>One line on this round</span><input type="text" id="rdSummary" maxlength="300" placeholder="${esc(dflt)}" autocomplete="off" /></label><div class="rd-btnrow"><button type="submit" class="btn btn-primary btn-small">Finish round ${esc(o.n)}</button><button type="button" class="btn btn-ghost btn-small" data-act="close-cancel">Cancel</button></div></form>`;
     $('rdSummary').focus();
   }
 
