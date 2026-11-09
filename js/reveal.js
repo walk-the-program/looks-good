@@ -613,7 +613,8 @@
   // blocks is dropped before it reaches the page (35 full boards are slow to lay out).
   function tileBoard(def) {
     const tpl = document.createElement('template');
-    tpl.innerHTML = boardHtml(Object.assign({}, state, { bgMode: def.mode }), def);
+    const f = aestheticFontsFor(def.key);
+    tpl.innerHTML = boardHtml(Object.assign({}, state, { bgMode: def.mode, headingFont: f.heading, bodyFont: f.body }), def);
     const ab = tpl.content.firstElementChild;
     const inner = ab && ab.querySelector('.ab-in');
     if (inner) {
@@ -713,7 +714,7 @@
         const t = queue.shift();
         if (!t) return;
         const box = t.querySelector('.m-world-board');
-        setBoardFonts(box);
+        setBoardFonts(box, aestheticFontsFor(t._def.key));
         box.appendChild(tileBoard(t._def));
         t.classList.add('is-filled');
       } while (performance.now() - t0 < 12);

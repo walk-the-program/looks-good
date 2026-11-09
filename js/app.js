@@ -141,16 +141,34 @@ function chooseAesthetic(key) {
 // varied but faithful to the style.
 function followAestheticFonts(opts) {
   if (state.locks.typography) return null;
-  const meta = window.aestheticMeta ? aestheticMeta(state.aesthetic) : null;
+  const f = pairingFonts(state.aesthetic, opts && opts.random);
+  if (!f) return null;
+  if (state.headingFont === f.heading && state.bodyFont === f.body) return null;
+  state.headingFont = f.heading;
+  state.bodyFont = f.body;
+  return f;
+}
+// The style's recommended pairing as font objects (first one, or any with `random`), or null.
+function pairingFonts(styleKey, random) {
+  const meta = window.aestheticMeta ? aestheticMeta(styleKey) : null;
   const pairs = meta && meta.fonts && meta.fonts.pairings;
-  const pair = pairs && pairs.length ? (opts && opts.random ? pickRandom(pairs) : pairs[0]) : null;
+  const pair = pairs && pairs.length ? (random ? pickRandom(pairs) : pairs[0]) : null;
   const heading = pair && fontByName(pair[0]);
   const body = pair && fontByName(pair[1]);
-  if (!heading || !body) return null;
-  if (state.headingFont === heading && state.bodyFont === body) return null;
-  state.headingFont = heading;
-  state.bodyFont = body;
-  return { heading, body };
+  return heading && body ? { heading, body } : null;
+}
+// Pure: the fonts brand `st` would have after switching to `key` (a style key or "combo:<id>",
+// whose fonts are its base style's). The brand's own fonts when Typography is locked, when
+// `key` is what the brand is on already, or when the style has no usable pairing. Previews of
+// other styles (style gallery, compare) draw with this so they match what choosing them does.
+function aestheticFontsFor(key, st = state) {
+  const own = { heading: st.headingFont, body: st.bodyFont };
+  if (st.locks && st.locks.typography) return own;
+  const here = typeof comboPickKey === 'function' ? comboPickKey(st) : st.aesthetic;
+  if (key === here) return own;
+  const comboId = typeof comboIdFromKey === 'function' ? comboIdFromKey(key) : null;
+  const combo = comboId && typeof comboById === 'function' ? comboById(comboId) : null;
+  return pairingFonts(combo ? combo.base : key) || own;
 }
 function announceFollowedFonts(f) {
   showToast(`Fonts: ${f.heading.name} / ${f.body.name}. Lock Type to keep your own.`);

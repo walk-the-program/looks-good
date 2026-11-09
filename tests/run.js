@@ -1965,6 +1965,28 @@ check('paste: empty text', run(`extractColors('').length`) === 0, 'found colors 
   check('kit: the Custom note no longer claims All settings was opened', !/was set in All settings/.test(st) && /doesn't match one of these options\. Pick one to replace it/.test(st), '');
 }
 
+/* ---- fonts a style would give the brand (js/app.js is DOM-bound, so only these two functions are lifted) ---- */
+{
+  const src = fs.readFileSync(path.join(root, 'js/app.js'), 'utf8');
+  const lift = n => src.slice(src.indexOf('function ' + n + '('), src.indexOf('\n}\n', src.indexOf('function ' + n + '(')) + 3);
+  const fctx = vm.createContext({
+    window: { aestheticMeta: k => ({ a: { fonts: { pairings: [['Alpha', 'Beta']] } }, b: { fonts: { pairings: [['Gamma', 'Beta']] } }, none: {} }[k]) },
+    aestheticMeta: k => fctx.window.aestheticMeta(k),
+    FONTS: [{ name: 'Alpha' }, { name: 'Beta' }, { name: 'Gamma' }, { name: 'Own' }],
+    comboIdFromKey: k => (k === 'combo:x' ? 'x' : null), comboById: id => (id === 'x' ? { base: 'b' } : null),
+    comboPickKey: st => st.aesthetic, pickRandom: a => a[0],
+  });
+  vm.runInContext(['fontByName', 'pairingFonts', 'aestheticFontsFor'].map(lift).join('\n'), fctx);
+  const own = { name: 'Own' };
+  const st = { aesthetic: 'a', headingFont: own, bodyFont: own, locks: { typography: false } };
+  const f = (k, s = st) => vm.runInContext('aestheticFontsFor', fctx)(k, s);
+  check('fontsFor: another style gives its first pairing', f('b').heading.name === 'Gamma' && f('b').body.name === 'Beta', JSON.stringify(f('b')));
+  check('fontsFor: a combo gives its base style\'s pairing', f('combo:x').heading.name === 'Gamma', '');
+  check('fontsFor: the current style keeps the brand fonts', f('a').heading === own, '');
+  check('fontsFor: a style with no pairing keeps the brand fonts', f('none').heading === own, '');
+  check('fontsFor: Typography locked keeps the brand fonts', f('b', Object.assign({}, st, { locks: { typography: true } })).heading === own, '');
+}
+
 // Not run here (they need a real DOM): that blended tokens(t, state) see the view's fonts end to end, and the
 // render timings. They are covered by the in-browser sweeps in docs/round6/.
 

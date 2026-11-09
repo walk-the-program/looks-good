@@ -832,9 +832,10 @@ let boardMode = 'board';          // the mode the Board tab returns to
 const CMP_WIDE = 900;             // design width of a tile board on a wide grid
 const CMP_NARROW = 500;           // ...and on a one-column grid
 
-function setBoardFonts(el) {
-  el.style.setProperty('--font-heading', state.headingFont.css);
-  el.style.setProperty('--font-body', state.bodyFont.css);
+function setBoardFonts(el, fonts) {
+  const f = fonts || { heading: state.headingFont, body: state.bodyFont };
+  el.style.setProperty('--font-heading', f.heading.css);
+  el.style.setProperty('--font-body', f.body.css);
 }
 
 // The state and def the board, deck, patterns and brief render: the base aesthetic,
@@ -871,11 +872,12 @@ function renderCompareGrid() {
   const shown = d => (d.key === state.aesthetic ? resolveAestheticDef(state) : d);
   grid.innerHTML = note + defs.map(def => {
     const drawn = shown(def);
+    const f = aestheticFontsFor(def.key);
     return `
     <div class="cmp-tile${def.key === state.aesthetic ? ' is-current' : ''}" role="button" tabindex="0"
          data-key="${def.key}" aria-label="Use ${escapeHtml(def.name)}" aria-pressed="${def.key === state.aesthetic}">
       <div class="cmp-label"><span class="cmp-num">${aestheticNumber(def.key)}</span><span class="cmp-name">${escapeHtml(def.name)}</span><span class="cmp-desc">${escapeHtml(def.descriptor)}</span></div>
-      <div class="cmp-frame"><div class="cmp-board" inert>${boardHtml(Object.assign({}, state, { bgMode: drawn.mode }), drawn)}</div></div>
+      <div class="cmp-frame"><div class="cmp-board" inert style="--font-heading:${f.heading.css.replace(/"/g, "'")};--font-body:${f.body.css.replace(/"/g, "'")}">${boardHtml(Object.assign({}, state, { bgMode: drawn.mode, headingFont: f.heading, bodyFont: f.body }), drawn)}</div></div>
     </div>`;
   }).join('');
   fitCompareGrid();

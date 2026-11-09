@@ -56,11 +56,13 @@
       st = v.state; def = v.def;
     } else if (combo) {
       // A combo tile: the brand shown with the base style and the combo's fixed blend.
-      const v = aestheticView(comboState(combo, state));
+      const f = aestheticFontsFor(key);
+      const v = aestheticView(Object.assign(comboState(combo, state), { headingFont: f.heading, bodyFont: f.body }));
       st = v.state; def = v.def;
     } else {
       def = aestheticByKey(key);
-      st = Object.assign({}, state, { bgMode: def.mode || state.bgMode });
+      const f = aestheticFontsFor(key);
+      st = Object.assign({}, state, { bgMode: def.mode || state.bgMode, headingFont: f.heading, bodyFont: f.body });
     }
     const tpl = document.createElement('template');
     tpl.innerHTML = boardHtml(st, def);
@@ -79,7 +81,7 @@
   function fill(tile) {
     const box = tile.querySelector('.gal-board');
     if (!box) return;
-    if (typeof setBoardFonts === 'function') setBoardFonts(box);
+    if (typeof setBoardFonts === 'function') setBoardFonts(box, aestheticFontsFor(tile.dataset.key));
     const b = boardFor(tile.dataset.key);
     box.replaceChildren(b.frag);
     if (b.blend && box.firstElementChild) {
