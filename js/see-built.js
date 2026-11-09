@@ -1202,9 +1202,42 @@
     return v;
   }
 
+  // render() draws now. renderSoon() is for state changes that stream in (a colour drag): the first draw after
+  // a quiet spell is immediate, one that follows hard on another waits for the next animation frame and draws
+  // the latest state once. Switching into the view (nothing drawn yet) is always immediate.
+  const SOFT_GAP_MS = 200;
+  let lastDrawAt = 0, softPending = false, softRaf = 0, softTimer = 0;
+  function cancelSoft() {
+    softPending = false;
+    if (softRaf) cancelAnimationFrame(softRaf);
+    if (softTimer) clearTimeout(softTimer);
+    softRaf = softTimer = 0;
+  }
   function render() {
+    cancelSoft();
+    try { draw(); } finally { lastDrawAt = performance.now(); }
+  }
+  function renderSoon() {
+    const host = document.getElementById('builtView');
+    const shown = host && host.firstChild && typeof boardView !== 'undefined' && boardView === 'built';
+    if (!shown || (!softPending && performance.now() - lastDrawAt > SOFT_GAP_MS)) { render(); return; }
+    if (softPending) return;
+    softPending = true;
+    const run = () => {
+      if (!softPending) return;
+      cancelSoft();
+      if (typeof boardView === 'undefined' || boardView === 'built') render();
+    };
+    softRaf = requestAnimationFrame(run);
+    softTimer = setTimeout(run, 80);   // a hidden or throttled window may never fire the frame
+  }
+  // Draws a waiting renderSoon() at once (for code that reads the DOM straight after a state change).
+  function flushRender() { if (softPending) render(); }
+
+  function draw() {
     const host = document.getElementById('builtView');
     if (!host) return;
+    if (window.AestheticSheets) AestheticSheets.sync();
     if (typeof setBoardFonts === 'function') setBoardFonts(host);
     Object.entries(kitVars()).forEach(([k, val]) => host.style.setProperty(k, val));
     if (SB.kind === 'product') {
@@ -1238,26 +1271,41 @@
   }
 
   // The fix-ups every drawn screen gets once it is in the page (render and kitInto).
+  // Batched so the kit is restyled a handful of times, not once per read-after-write: every read of
+  // computed style comes first, then every write to the roots, then the per-element passes.
   function finish(host, def) {
-    // Token-styled pieces (sidebar items, tabs, danger buttons) borrow the corner radius
-    // and button lettering of the aesthetic's own CTA.
-    host.querySelectorAll('.sb-ab').forEach(root => {
-      const ref = root.querySelector('.ab-cta');
-      if (!ref) return;
-      const cs = getComputedStyle(ref);
-      root.style.setProperty('--sb-r', cs.borderTopLeftRadius || '8px');
-      root.style.setProperty('--sb-ui-ff', cs.fontFamily);
-      root.style.setProperty('--sb-ui-tt', cs.textTransform);
-      root.style.setProperty('--sb-ui-ls', cs.letterSpacing === 'normal' ? '0' : cs.letterSpacing);
-      // sheets and callouts take the style's card corner
-      const card = root.querySelector('.ab-card');
-      if (card) root.style.setProperty('--sb-card-r', getComputedStyle(card).borderTopLeftRadius || '12px');
-    });
+    const roots = [...host.querySelectorAll('.sb-ab')];
     // keyboard focus ring colour: the primary, or the ink where the colour rules bar the primary from controls
     const barred = typeof aibPrimaryBarred === 'function' && typeof colorRolesFor === 'function' && aibPrimaryBarred(colorRolesFor(typeof state !== 'undefined' ? state : null));
-    host.querySelectorAll('.sb-ab').forEach(root => kitColours(root, barred));
+    const colours = typeof uiKitDanger === 'function';
+    // 1. read: the aesthetic's own CTA and card (token-styled pieces borrow their corner radius and button lettering)
+    const ctaReads = roots.map(root => {
+      const ref = root.querySelector('.ab-cta');
+      if (!ref) return null;
+      const cs = getComputedStyle(ref);
+      const r = { radius: cs.borderTopLeftRadius || '8px', ff: cs.fontFamily, tt: cs.textTransform, ls: cs.letterSpacing === 'normal' ? '0' : cs.letterSpacing, card: null };
+      // sheets and callouts take the style's card corner
+      const card = root.querySelector('.ab-card');
+      if (card) r.card = getComputedStyle(card).borderTopLeftRadius || '12px';
+      return r;
+    });
+    // ... and the palette (probe colours, the primary's tint)
+    const pals = colours ? roots.map(readPalette) : [];
+    // 2. write: every root-level custom property and dataset at once
+    roots.forEach((root, i) => {
+      const r = ctaReads[i];
+      if (!r) return;
+      root.style.setProperty('--sb-r', r.radius);
+      root.style.setProperty('--sb-ui-ff', r.ff);
+      root.style.setProperty('--sb-ui-tt', r.tt);
+      root.style.setProperty('--sb-ui-ls', r.ls);
+      if (r.card) root.style.setProperty('--sb-card-r', r.card);
+    });
+    if (colours) roots.forEach((root, i) => kitColours(root, barred, pals[i]));
+    // 3. per-element passes: reads together, then writes together
+    if (colours) kitControls(roots);
     if (def.blend) {
-      host.querySelectorAll('.sb-ab').forEach(root => {
+      roots.forEach(root => {
         try {
           if (typeof blendClearArtText === 'function') blendClearArtText(root);
           if (typeof blendLegibility === 'function') blendLegibility(root);
@@ -1350,14 +1398,20 @@
   // uiKitTone): destructive / error = the palette's reddish colour, or the ink (then the
   // destructive button is an outline with an ink label, data-sb-danger="ink"); callouts tint
   // info = primary, success = secondary, warning = accent, each icon shaded to 3:1 on the canvas.
-  function kitColours(root, barred) {
-    if (typeof uiKitDanger !== 'function') return;
+  // readPalette(root) is the read half (computed colours through a hidden probe); kitColours(root, barred, pal)
+  // is the write half, so finish() can read every root before writing to any.
+  function readPalette(root) {
     const probe = document.createElement('i');
     probe.style.display = 'none';
     root.appendChild(probe);
     const read = v => { probe.style.color = `var(${v})`; return getComputedStyle(probe).color; };
     const pal = { primary: read('--ab-primary'), secondary: read('--ab-secondary'), accent: read('--ab-accent'), ink: read('--ab-ink'), canvas: read('--ab-canvas') };
+    const tint = read('--ab-pri-tint');
     probe.remove();
+    pal.priTint = /rgba?\([^)]*,\s*0\)$/.test(tint) ? '' : tint;   // transparent = no tint
+    return pal;
+  }
+  function kitColours(root, barred, pal) {
     const d = uiKitDanger(pal);
     const set = (k, v) => root.style.setProperty(k, v);
     // fill: a reddish palette colour distinct from the primary; line: it is the primary (an outline
@@ -1373,47 +1427,49 @@
     set('--k-err', d.color); set('--k-err-ico', d.role ? uiKitTone(d.color, pal, 3.2, 0.12).ico : d.text);
     // the primary as text (text buttons, tags, tinted icons): 4.5:1 on the canvas and on --ab-pri-tint
     set('--k-pri-text', uiKitTone(pal.primary, pal, 4.5).ico);
-    set('--k-pri-on-tint', uiKitTone(pal.primary, { ink: pal.ink, canvas: read2(root, '--ab-pri-tint') || pal.canvas }, 4.5).ico);
+    set('--k-pri-on-tint', uiKitTone(pal.primary, { ink: pal.ink, canvas: pal.priTint || pal.canvas }, 4.5).ico);
     // focus ring: the primary where it holds 3:1 on the canvas and the colour rules allow it, else the ink
     set('--sb-focus-auto', !barred && UIK_COLOR.con(UIK_COLOR.parse(pal.primary) || [0, 0, 0], UIK_COLOR.parse(pal.canvas) || [255, 255, 255]) >= 3 ? 'var(--ab-primary)' : 'var(--ab-ink)');
+  }
+  // After every root's colours are written: disabled buttons and the field style, read together, then written.
+  function kitControls(roots) {
     // disabled buttons: the label is the muted ink over the veiled fill; where that falls under 3:1 (a dark or
     // mid-tone fill), the label takes the ink instead
-    root.querySelectorAll('.sb-k-btn:disabled, .sb-k-btn2:disabled').forEach(b => {
+    const dark = [];
+    roots.forEach(root => root.querySelectorAll('.sb-k-btn:disabled, .sb-k-btn2:disabled').forEach(b => {
       const cs = getComputedStyle(b), bgc = UIK_COLOR.parse(cs.backgroundColor), lab = b.querySelector('.ab-cta-label') || b;
       const veil = /color\(srgb ([\d.]+) ([\d.]+) ([\d.]+) \/ ([\d.]+)\)/.exec(cs.boxShadow), a = /rgba?\([^)]*,\s*([\d.]+)\)/.exec(cs.backgroundColor);
       const fg = UIK_COLOR.parse(getComputedStyle(lab).color);
       if (!bgc || !veil || !fg || (a && +a[1] < 0.9)) return;
       const eff = bgc.map((x, i) => x * (1 - +veil[4]) + +veil[i + 1] * 255 * +veil[4]);
-      if (UIK_COLOR.con(fg, eff) < 3) b.style.setProperty('--k-dis-label', 'var(--ab-ink)');
-    });
+      if (UIK_COLOR.con(fg, eff) < 3) dark.push(b);
+    }));
     // fields drawn as an underline get a thicker underline on focus / error, never a box ring
-    const inp = root.querySelector('.ab-input');
-    if (inp) {
+    const fields = [];
+    roots.forEach(root => {
+      const inp = root.querySelector('.ab-input');
+      if (!inp) return;
       const ic = getComputedStyle(inp);
       const line = parseFloat(ic.borderLeftWidth) === 0 && parseFloat(ic.borderBottomWidth) > 0 && ic.boxShadow === 'none';
-      root.dataset.kField = line ? 'line' : 'box';
-    }
-  }
-  function read2(root, v) {
-    const probe = document.createElement('i');
-    probe.style.display = 'none';
-    probe.style.color = `var(${v})`;
-    root.appendChild(probe);
-    const c = getComputedStyle(probe).color;
-    probe.remove();
-    return /rgba?\([^)]*,\s*0\)$/.test(c) ? '' : c;
+      fields.push([root, line ? 'line' : 'box']);
+    });
+    dark.forEach(b => b.style.setProperty('--k-dis-label', 'var(--ab-ink)'));
+    fields.forEach(([root, k]) => { root.dataset.kField = k; });
   }
 
   // Grouped list rows sit 16pt in from their card. A list counts as a card when the list or its
   // rows draw a box (side edge, fill or shadow); an open list (rows and rules on the canvas) keeps
   // its text on the screen margin. In a card, the section label above takes the same inset and a
   // rule between rows starts at the text, not at the card edge.
+  // Every list is measured first and the classes and properties are written afterwards, so the
+  // writes of one list never force a restyle before the next list is read.
   function kitLists(host) {
     const alpha = c => { const m = /rgba?\(([^)]+)\)/.exec(c || ''); if (m) { const p = m[1].split(/[\s,\/]+/).filter(Boolean); return p.length > 3 ? +p[3] : 1; } const m2 = /color\([^)]*\/\s*([\d.]+)\)/.exec(c || ''); return m2 ? +m2[1] : (/color\(/.test(c || '') ? 1 : 0); };
     const edge = (cs, side) => parseFloat(cs[`border${side}Width`]) > 0 && cs[`border${side}Style`] !== 'none' && alpha(cs[`border${side}Color`]) > 0.05;
     const boxed = (cs, img) => edge(cs, 'Left') || edge(cs, 'Right') || alpha(cs.backgroundColor) > 0.03 || cs.boxShadow !== 'none' || (img && cs.backgroundImage !== 'none');
     // a box drawn by the list's ::before / ::after (a positioned plate behind the rows) counts too
     const pseudoBox = el => ['::before', '::after'].some(pe => { const c = getComputedStyle(el, pe); return c.content !== 'none' && c.position === 'absolute' && boxed(c, true); });
+    const plans = [];
     host.querySelectorAll('.sb-kit .sb-k-list').forEach(list => {
       const rows = [...list.children].filter(r => r.classList.contains('sb-k-row'));
       if (!rows.length) return;
@@ -1422,13 +1478,14 @@
       // a style can say it outright: --k-list-box: card | open
       const said = lcs.getPropertyValue('--k-list-box').trim();
       const card = said === 'card' ? true : said === 'open' ? false : boxed(lcs, true) || rowBox || pseudoBox(list);
-      list.classList.toggle('is-open', !card);
+      const plan = { list, card, sec: null, inset: '', dv: [] };
+      plans.push(plan);
       if (!card) return;
       // the section label right above the list (in a screen layout it sits in the block before)
       const blk = list.parentElement && list.parentElement.classList.contains('sb-k-blk') ? list.parentElement : null;
       const prev = blk ? blk.previousElementSibling : list.previousElementSibling;
       const sec = prev && (prev.classList.contains('sb-k-section') ? prev : prev.querySelector(':scope > .sb-k-section'));
-      if (sec) { sec.classList.add('is-inset'); sec.style.setProperty('--k-inset', (16 + parseFloat(lcs.borderLeftWidth || 0)) + 'px'); }
+      if (sec) { plan.sec = sec; plan.inset = (16 + parseFloat(lcs.borderLeftWidth || 0)) + 'px'; }
       if (rowBox) return;   // each row is its own box: no shared rules to inset
       rows.forEach((r, i) => {
         const cs = getComputedStyle(r);
@@ -1439,10 +1496,17 @@
         const lead = r.querySelector(':scope > .sb-k-lead > *');
         const x = parseFloat(cs.paddingLeft) + (lead ? (parseFloat(getComputedStyle(lead).width) || 32) + (parseFloat(cs.columnGap) || 14) : 0);
         const w = cs[`border${side}Width`], line = `${w} ${cs[`border${side}Style`]} ${cs[`border${side}Color`]}`;   // read before the class hides it (cs is live)
-        r.style.setProperty('--k-dv-x', Math.round(x) + 'px');
-        r.style.setProperty('--k-dv-w', w);
-        r.style.setProperty('--k-dv', line);
-        r.classList.add('sb-k-dv', 'sb-k-dv-' + side.toLowerCase());
+        plan.dv.push({ r, x, w, line, side });
+      });
+    });
+    plans.forEach(p => {
+      p.list.classList.toggle('is-open', !p.card);
+      if (p.sec) { p.sec.classList.add('is-inset'); p.sec.style.setProperty('--k-inset', p.inset); }
+      p.dv.forEach(d => {
+        d.r.style.setProperty('--k-dv-x', Math.round(d.x) + 'px');
+        d.r.style.setProperty('--k-dv-w', d.w);
+        d.r.style.setProperty('--k-dv', d.line);
+        d.r.classList.add('sb-k-dv', 'sb-k-dv-' + d.side.toLowerCase());
       });
     });
   }
@@ -1733,7 +1797,7 @@
     kTopbar, kPlain, chartSvg, kBtn, ctaInner, ICO,
   };
   // 'product' is not in kinds: the share export walks kinds, and the Product tab is not a board view.
-  window.SeeBuilt = { render, kitInto, kitGroupOf, kitGroupCount, mobileInto, kinds: KINDS.map(k => k[0]).filter(k => k !== 'product'), domainFor, api };
+  window.SeeBuilt = { render, renderSoon, flush: flushRender, kitInto, kitGroupOf, kitGroupCount, mobileInto, kinds: KINDS.map(k => k[0]).filter(k => k !== 'product'), domainFor, api };
   window.Show = window.Show || {};
   // Show.built(kind): open the Built view, optionally at 'kit' | 'dashboard' | 'mobile' | 'landing' | 'settings'.
   window.Show.built = function (kind) {

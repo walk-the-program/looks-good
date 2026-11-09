@@ -1383,6 +1383,7 @@ const Studio = (function () {
     if (!b) return false;
     loadCatalog();
     if (SS) await loadSimpleSources();
+    if (window.AestheticSheets) AestheticSheets.enableAll();   // the studio draws other styles: every sheet on before it draws
     S = { key, spec: b.aesthetic, art: b.art || {}, rounds: b.rounds || null, versions: b.versions || [], undo: [], redo: [], tab: 'board', valid: true, errors: [], goodKey: null, dirty: false };
     lastError = '';
     shade = lsGet(SHADE_KEY) === 'dark' ? 'dark' : 'light';
@@ -1420,6 +1421,7 @@ const Studio = (function () {
     delete el.section.dataset.studio;
     document.documentElement.classList.remove('studio-open');
     emit('close', { key });
+    if (window.AestheticSheets) AestheticSheets.sync();
     if (typeof StylesHome !== 'undefined' && StylesHome.afterStudio) StylesHome.afterStudio(key);
   }
 

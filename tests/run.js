@@ -1987,6 +1987,80 @@ check('paste: empty text', run(`extractColors('').length`) === 0, 'found colors 
   check('fontsFor: Typography locked keeps the brand fonts', f('b', Object.assign({}, st, { locks: { typography: true } })).heading === own, '');
 }
 
+/* ---- js/aesthetic-sheets.js: which stylesheets the Built view may switch off (the pure parts) ---- */
+{
+  const sctx = vm.createContext({ window: {}, document: {} });
+  vm.runInContext(fs.readFileSync(path.join(root, 'js/aesthetic-sheets.js'), 'utf8'), sctx, { filename: 'js/aesthetic-sheets.js' });
+  const AS = sctx.window.AestheticSheets;
+  const sc = sel => { const r = AS.scopeOfSelector(sel); return JSON.stringify([r.keys.slice().sort(), r.scoped]); };
+  check('sheets: a plain data-ae selector is scoped to its key', sc('.ab[data-ae="soft-form"] .ab-cta') === '[["soft-form"],true]', sc('.ab[data-ae="soft-form"] .ab-cta'));
+  check('sheets: a selector list needs every part scoped', sc('.ab[data-ae="a"] .x, .ab-y') === '[["a"],false]', sc('.ab[data-ae="a"] .x, .ab-y'));
+  check('sheets: :is() of data-ae tests covers both keys (current + classic)', sc('.ab.sb-ab:is([data-ae="soft-form"], [data-ae="soft-form--classic"]).sb-kit .ab-card') === '[["soft-form","soft-form--classic"],true]', sc('.ab.sb-ab:is([data-ae="soft-form"], [data-ae="soft-form--classic"]).sb-kit .ab-card'));
+  check('sheets: :is() holding the whole scope, with a pseudo-element after it', sc(':is(.ab.sb-ab[data-ae="d"].sb-kit) input::-webkit-slider-thumb') === '[["d"],true]', sc(':is(.ab.sb-ab[data-ae="d"].sb-kit) input::-webkit-slider-thumb'));
+  check('sheets: data-ae inside :not() is not a scope', JSON.parse(sc('.ab:not([data-ae="a"]) .x'))[1] === false, sc('.ab:not([data-ae="a"]) .x'));
+  check('sheets: a prefix match is not a scope', JSON.parse(sc('.ab[data-ae^="a"] .x'))[1] === false, sc('.ab[data-ae^="a"] .x'));
+  check('sheets: a :is() with an unscoped argument is not a scope', JSON.parse(sc(':is(.ab[data-ae="a"], .other) .x'))[1] === false, sc(':is(.ab[data-ae="a"], .other) .x'));
+  check('sheets: commas inside a quoted value do not split', AS.splitTop('.a[x="1,2"], .b:is(.c, .d)').length === 2, '');
+
+  const st = (sel, anim) => ({ t: 'style', sel, anim });
+  const a = AS.analyzeRules([st('.ab[data-ae="a"] .x'), { t: 'group', rules: [st('.ab[data-ae="a--classic"] .y', 'spin 1s')] }, { t: 'keyframes', name: 'spin' }]);
+  check('sheets: analyze reads keys through @media groups and keyframes', [...a.keys].sort().join() === 'a,a--classic' && a.safe && a.defines.has('spin'), JSON.stringify([...a.keys]));
+  check('sheets: one unscoped rule makes a sheet unsafe', !AS.analyzeRules([st('.ab[data-ae="a"] .x'), st('.plain')]).safe, '');
+  check('sheets: an @import / unknown at-rule makes a sheet unsafe', !AS.analyzeRules([st('.ab[data-ae="a"] .x'), { t: 'other' }]).safe, '');
+  check('sheets: a sheet with no data-ae is unsafe (never touched)', !AS.analyzeRules([st('.plain')]).safe, '');
+  const A = AS.analyzeRules([st('.ab[data-ae="a"] .x', 'blink 1s'), { t: 'keyframes', name: 'own' }]);
+  const B = AS.analyzeRules([st('.ab[data-ae="b"] .x'), { t: 'keyframes', name: 'blink' }]);
+  const C = AS.analyzeRules([st('.ab[data-ae="c"] .x'), { t: 'fontface' }]);
+  const D = AS.analyzeRules([st('.ab[data-ae="d"] .x'), { t: 'keyframes', name: 'own' }]);
+  const E = AS.analyzeRules([st('.ab[data-ae="e"] .x')]);
+  const man = AS.manageable([A, B, C, D, E, null]);
+  check('sheets: shared or duplicated @keyframes, @font-face and unreadable sheets are never managed', man.join() === 'false,false,false,false,true,false', man.join());
+  const keys = AS.neededKeys({ key: 'a--classic', classicOf: 'a', blend: { base: { key: 'a--classic', classicOf: 'a' }, donor: { key: 'b' } } });
+  check('sheets: needed keys cover a classic def and a blend\'s base and donor', [...keys].sort().join() === 'a,a--classic,b', [...keys].join());
+  check('sheets: needed keys of a plain def are just its key', [...AS.neededKeys({ key: 'e' })].join() === 'e', '');
+  const E2 = AS.analyzeRules([st('.ab[data-ae="e"] .x')]), F = AS.analyzeRules([st('.ab[data-ae="f"] .x')]);
+  const on = AS.enabledIndices([E2, F, null], [true, true, false], new Set(['e']));
+  check('sheets: only the needed sheet and the unmanaged ones stay on', [...on].sort().join() === '0,2', [...on].join());
+
+  // the real shipped sheets: how many the Built view can drop, with a small CSS reader for the test only
+  const cssDir = path.join(root, 'css/aesthetics');
+  const files = fs.readdirSync(cssDir).filter(f => f.endsWith('.css')).map(f => path.join(cssDir, f))
+    .concat(fs.readdirSync(path.join(cssDir, 'classic')).filter(f => f.endsWith('.css')).map(f => path.join(cssDir, 'classic', f)));
+  const toRules = txt => {
+    const t = txt.replace(/\/\*[\s\S]*?\*\//g, '');
+    let i = 0;
+    const skip = () => { let d = 1; while (i < t.length && d) { if (t[i] === '{') d++; else if (t[i] === '}') d--; i++; } };
+    const block = () => {
+      const out = []; let last = i;
+      while (i < t.length) {
+        const ch = t[i];
+        if (ch === '}') { i++; return out; }
+        if (ch === ';') { i++; last = i; continue; }
+        if (ch === '{') {
+          const pre = t.slice(last, i).trim(); i++;
+          if (/^@(-webkit-)?keyframes/.test(pre)) { skip(); out.push({ t: 'keyframes', name: pre.split(/\s+/)[1] }); }
+          else if (/^@font-face/.test(pre)) { skip(); out.push({ t: 'fontface' }); }
+          else if (/^@(media|supports|container|layer)/.test(pre)) out.push({ t: 'group', rules: block() });
+          else if (pre.startsWith('@')) { skip(); out.push({ t: 'other' }); }
+          else { const st0 = i; skip(); const m = /(?:^|[;\s])animation(?:-name)?\s*:\s*([^;]*)/.exec(t.slice(st0, i - 1)); out.push({ t: 'style', sel: pre, anim: m ? m[1] : '' }); }
+          last = i; continue;
+        }
+        i++;
+      }
+      return out;
+    };
+    return block();
+  };
+  const infos = files.map(f => AS.analyzeRules(toRules(fs.readFileSync(f, 'utf8'))));
+  const managed = AS.manageable(infos);
+  check('sheets: the shipped css/aesthetics sheets are mostly manageable', files.length === 73 && managed.filter(Boolean).length >= 60, files.length + ' sheets, ' + managed.filter(Boolean).length + ' managed');
+  const soft = AS.enabledIndices(infos, managed, AS.neededKeys({ key: 'soft-form' }));
+  const softFiles = [...soft].map(i => path.relative(cssDir, files[i]));
+  check('sheets: soft-form needs its own sheet, and the Built view drops most others', softFiles.includes('soft-form.css') && soft.size <= 12, softFiles.join(' '));
+  const cl = AS.enabledIndices(infos, managed, AS.neededKeys({ key: 'soft-form--classic', classicOf: 'soft-form' }));
+  check('sheets: a classic def keeps the sheet that scopes its --classic key', [...cl].some(i => /soft-form\.css$/.test(files[i])), '');
+}
+
 // Not run here (they need a real DOM): that blended tokens(t, state) see the view's fonts end to end, and the
 // render timings. They are covered by the in-browser sweeps in docs/round6/.
 

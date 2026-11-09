@@ -213,6 +213,7 @@
     const ov = $('styleGallery');
     if (!ov || isOpen || document.body.dataset.view !== 'editor') return;
     isOpen = true;
+    if (window.AestheticSheets) AestheticSheets.enableAll();   // its tiles draw every style: all sheets on before they do
     opener = from || document.activeElement;
     ov.hidden = false;
     document.body.classList.add('gal-open');
@@ -241,6 +242,7 @@
     const ov = $('styleGallery');
     if (!ov || !isOpen) return;
     isOpen = false;
+    if (window.AestheticSheets) AestheticSheets.sync();
     ov.hidden = true;
     if (io) io.disconnect();
     queue = [];

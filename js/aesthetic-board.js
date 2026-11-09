@@ -586,6 +586,9 @@ function abResolveMaterial(css, t, extras, onMissing) {
 // of hero, palette, sections, highlight, states, subcopy (default: the def's own layout;
 // a donor scope and the probe pin states 'swatch' and subcopy 'on').
 function abRootAttrs(def, t, state, over) {
+  // every board root passes here: if the Built view has switched this style's sheet off, they all come back on
+  // before the markup is inserted (js/aesthetic-sheets.js)
+  if (window.AestheticSheets) AestheticSheets.touch(def.key);
   const l = abLayoutOf(def);
   const a = Object.assign({
     hero: l.hero, palette: l.palette, sections: l.sections, highlight: abHighlightOf(def),
@@ -933,6 +936,8 @@ function observeCompareBoards(grid) {
 }
 
 function renderAestheticBoard() {
+  // Built view only: switch off the sheets of styles it does not draw (all on in every other view)
+  if (window.AestheticSheets) AestheticSheets.sync();
   const def = abView().def;
   const compare = boardView === 'compare';
   const patterns = boardView === 'patterns';
@@ -963,7 +968,8 @@ function renderAestheticBoard() {
   if (patterns || built || deck || brief) {
     if (host && host.firstChild) host.innerHTML = '';
     if (grid && grid.firstChild) grid.innerHTML = '';
-    if (built && typeof SeeBuilt !== 'undefined') SeeBuilt.render();
+    // a colour drag re-renders on every step: SeeBuilt.renderSoon draws once per frame, and at once on entering the view
+    if (built && typeof SeeBuilt !== 'undefined') (SeeBuilt.renderSoon || SeeBuilt.render)();
     if (brief) renderBriefView();
   } else if (compare) {
     renderCompareGrid();
