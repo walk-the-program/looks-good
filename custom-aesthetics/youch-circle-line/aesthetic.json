@@ -1,0 +1,863 @@
+{
+  "spec": 2,
+  "key": "youch-circle-line",
+  "order": 951,
+  "name": "Circle & Line",
+  "descriptor": "Round \u00b7 Inked \u00b7 Calm",
+  "influences": "Bauhaus geometry (Albers), Dieter Rams and Braun instrument panels, Swiss modernism",
+  "summary": "Every control is a flat round pill or a perfect circle drawn with one ink line, and choosing something fills it solid periwinkle.",
+  "coreTrick": "Every control is a flat, fully round pill or circle drawn with a 1.5px ink line, cards are flat radius-20 planes under a 1px hairline, and a chosen thing fills solid primary, with no shadow anywhere.",
+  "motto": "One line, one circle, one choice.",
+  "kicker": "Hold a key, talk",
+  "mode": "light",
+  "lineage": {
+    "forkedFrom": null,
+    "version": 1
+  },
+  "meta": {
+    "family": "graphic",
+    "fonts": {
+      "heading": {
+        "classes": [
+          "geometric"
+        ],
+        "picks": [
+          "Jost",
+          "Outfit"
+        ]
+      },
+      "body": {
+        "classes": [
+          "neo-grotesk"
+        ],
+        "picks": [
+          "Inter",
+          "IBM Plex Sans"
+        ]
+      },
+      "mono": {
+        "picks": [
+          "JetBrains Mono",
+          "IBM Plex Mono"
+        ]
+      },
+      "avoid": [
+        "didone",
+        "script",
+        "groovy"
+      ],
+      "why": "A geometric heading face echoes the circle and the straight line; a plain neo-grotesk body keeps a dictation log fast to read.",
+      "pairings": [
+        [
+          "Jost",
+          "Inter"
+        ],
+        [
+          "Outfit",
+          "Inter"
+        ]
+      ]
+    }
+  },
+  "build": {
+    "cls": "flat",
+    "surface": "Flat paper with no shadow: controls are round pills or circles under a 1.5px ink line, cards and lists are radius-20 planes under a 1px hairline.",
+    "press": {
+      "dx": 0,
+      "dy": 1,
+      "ms": 120
+    },
+    "motion": {
+      "fast": 120,
+      "base": 160,
+      "slow": 240,
+      "ease": "out"
+    },
+    "pressText": "Rest is a bare outline. Hover fills the pill with a pale primary wash. Pressed moves 1px down in 120 ms ease-out, with no squish and no shadow. Chosen fills solid primary under the same ink line. Focus is a 2px ink ring, 3px off the edge.",
+    "icons": "1.5px strokes, round caps, 20px, drawn in the ink line weight; the selected icon sits in a solid primary circle.",
+    "appIcon": "A paper circle with a 1.5px ink line holding one solid primary dot."
+  },
+  "labels": {
+    "material": "Circle and line",
+    "states": [
+      "Rest",
+      "Hover",
+      "Chosen"
+    ],
+    "statesKind": "button"
+  },
+  "copy": {
+    "motto": {
+      "label": "Motto",
+      "text": "One line, one circle, one choice."
+    },
+    "kicker": {
+      "label": "Kicker above the headline",
+      "text": "Hold a key, talk"
+    }
+  },
+  "layout": {
+    "hero": "split",
+    "palette": "chips",
+    "sections": "stacked"
+  },
+  "type": {
+    "ui": "sans",
+    "label": "sans",
+    "display": 1
+  },
+  "roles": {
+    "canvas": {
+      "use": "Page and panel background, near white in light and near #101116 in dark",
+      "never": "Text",
+      "coverage": "60-70%"
+    },
+    "ink": {
+      "use": "Headlines, body text and the 1.5px control line",
+      "never": "Large background fields in light mode",
+      "coverage": "15-20%"
+    },
+    "primary": {
+      "use": "The one main action, the selected nav item, the selected segment, a switch that is on, selection washes",
+      "never": "Card fills, body text, more than one main action per view",
+      "coverage": "about 10%"
+    },
+    "secondary": {
+      "use": "The selected row wash and chip tints",
+      "never": "The main action, body text",
+      "coverage": "10-15%"
+    },
+    "accent": {
+      "use": "One spark per view: the butter band behind the headline word",
+      "never": "Buttons, text colour, outlines, large fills",
+      "coverage": "5% or less"
+    }
+  },
+  "rules": {
+    "do": [
+      "Draw every control as a fully round pill or a circle with a 1.5px ink line.",
+      "Fill solid periwinkle only for the one main action, the selected nav item, the selected segment, a switch that is on and the selection wash.",
+      "Keep cards, lists and callouts flat: radius 20, 1px hairline, no shadow.",
+      "Set the butter band behind the lower half of one headline word per screen.",
+      "Use a light ink line in dark mode so every outline, track and focus ring reads.",
+      "Show errors and warnings as ink with an icon and a plain sentence.",
+      "Keep body Inter 14-15px and list rows compact; text 4.5:1, controls 3:1."
+    ],
+    "dont": [
+      "Square off a control or card: no radius under 8, none at 0, pills are fine.",
+      "Use periwinkle on card fills or body text.",
+      "Use butter as text colour, a button fill or an outline.",
+      "Use a gradient, blur, frosted glass, shadow or raised lip anywhere.",
+      "Use stock red for errors or warnings.",
+      "Put board art, patterns or stickers on app screens.",
+      "Make the switch off track faint: it must read at 3:1."
+    ]
+  },
+  "highlight": "band",
+  "slideShape": "geometric",
+  "colour": [
+    {
+      "move": "canvas-ink-pull",
+      "params": {
+        "light": 0,
+        "dark": 0
+      }
+    },
+    {
+      "move": "paper-edge",
+      "params": {
+        "amount": 0.4
+      }
+    },
+    {
+      "move": "muted-contrast-floor",
+      "params": {
+        "min": 5.0
+      }
+    },
+    {
+      "move": "state-colour-derivation",
+      "params": {
+        "pressMix": 0.82,
+        "hoverMix": 0.92
+      }
+    }
+  ],
+  "moves": [
+    {
+      "move": "corner-radius",
+      "params": {
+        "base": 20,
+        "controls": 1,
+        "surfaces": 1,
+        "small": 0.7,
+        "pill": true,
+        "round": true
+      }
+    },
+    {
+      "move": "hairline-rule",
+      "params": {
+        "width": 1,
+        "colour": "line"
+      }
+    },
+    {
+      "move": "interface-sans",
+      "params": {}
+    },
+    {
+      "move": "display-weight",
+      "params": {
+        "headline": 500,
+        "brand": 500,
+        "cardTitle": 500,
+        "wordSpacing": 0
+      }
+    },
+    {
+      "move": "tight-display-tracking",
+      "params": {
+        "tracking": -0.035,
+        "leading": 1.0
+      }
+    },
+    {
+      "move": "tracked-micro-labels",
+      "params": {
+        "tag": 0.08,
+        "kicker": 0.08,
+        "foot": 0.02
+      }
+    },
+    {
+      "move": "highlight-word",
+      "params": {
+        "italic": false,
+        "weight": 500,
+        "colour": "ink",
+        "band": false
+      }
+    },
+    {
+      "move": "highlight-underline",
+      "params": {
+        "width": 16,
+        "offset": 0,
+        "colour": "accent"
+      }
+    },
+    {
+      "move": "focus-ring",
+      "params": {
+        "look": "outline",
+        "reach": "all-controls",
+        "width": 2,
+        "offset": 3,
+        "colour": "ink"
+      }
+    },
+    {
+      "move": "edge-underline",
+      "params": {
+        "width": 2
+      },
+      "scope": "board"
+    }
+  ],
+  "kit": {
+    "button-primary": {
+      "material": "pair-block",
+      "state": [
+        "press-darken",
+        "focus-outline"
+      ],
+      "params": {
+        "pair-block": {
+          "fill": "pair-a",
+          "edge": "ink",
+          "shadow": "none",
+          "width": 1.5
+        }
+      }
+    },
+    "button-split": {
+      "material": "pair-block",
+      "state": [
+        "press-darken",
+        "focus-outline"
+      ],
+      "params": {
+        "pair-block": {
+          "fill": "pair-a",
+          "edge": "ink",
+          "shadow": "none",
+          "width": 1.5
+        }
+      }
+    },
+    "button-fab": {
+      "material": "pair-block",
+      "state": [
+        "press-darken",
+        "focus-outline"
+      ],
+      "params": {
+        "pair-block": {
+          "fill": "pair-a",
+          "edge": "ink",
+          "shadow": "none",
+          "width": 1.5
+        }
+      }
+    },
+    "button-secondary": {
+      "material": "outlined",
+      "state": [
+        "press-darken",
+        "focus-outline"
+      ],
+      "params": {
+        "outlined": {
+          "width": 1.5,
+          "colour": "ink",
+          "fill": "canvas"
+        }
+      }
+    },
+    "button-icon": {
+      "material": "outlined",
+      "state": [
+        "press-darken",
+        "focus-outline"
+      ],
+      "params": {
+        "outlined": {
+          "width": 1.5,
+          "colour": "ink",
+          "fill": "canvas"
+        }
+      }
+    },
+    "button-back-top": {
+      "material": "outlined",
+      "state": [
+        "press-darken",
+        "focus-outline"
+      ],
+      "params": {
+        "outlined": {
+          "width": 1.5,
+          "colour": "ink",
+          "fill": "canvas"
+        }
+      }
+    },
+    "button-danger": {
+      "material": "outlined",
+      "state": [
+        "press-darken",
+        "focus-outline"
+      ],
+      "params": {
+        "outlined": {
+          "width": 1.5,
+          "colour": "ink",
+          "fill": "canvas"
+        }
+      }
+    },
+    "button-ghost": {
+      "material": "quiet-text",
+      "state": "press-darken"
+    },
+    "link": {
+      "material": "quiet-text",
+      "state": "press-darken"
+    },
+    "topbar-title": {
+      "material": "quiet-text",
+      "state": "press-darken"
+    },
+    "section-label": {
+      "material": "caps-label-row",
+      "params": {
+        "caps-label-row": {
+          "tracking": 0.08,
+          "weight": 600
+        }
+      }
+    },
+    "breadcrumbs": {
+      "material": "quiet-text",
+      "state": "press-darken"
+    },
+    "anchor-nav": {
+      "material": "quiet-text",
+      "state": "press-darken"
+    },
+    "field": {
+      "material": "outlined",
+      "state": "focus-outline",
+      "params": {
+        "outlined": {
+          "width": 1.5,
+          "colour": "ink",
+          "fill": "canvas"
+        }
+      }
+    },
+    "select": {
+      "material": "outlined",
+      "state": "focus-outline",
+      "params": {
+        "outlined": {
+          "width": 1.5,
+          "colour": "ink",
+          "fill": "canvas"
+        }
+      }
+    },
+    "date-field": {
+      "material": "outlined",
+      "state": "focus-outline",
+      "params": {
+        "outlined": {
+          "width": 1.5,
+          "colour": "ink",
+          "fill": "canvas"
+        }
+      }
+    },
+    "combo": {
+      "material": "outlined",
+      "state": "focus-outline",
+      "params": {
+        "outlined": {
+          "width": 1.5,
+          "colour": "ink",
+          "fill": "canvas"
+        }
+      }
+    },
+    "listbox": {
+      "material": "outlined",
+      "state": "focus-outline",
+      "params": {
+        "outlined": {
+          "width": 1.5,
+          "colour": "ink",
+          "fill": "canvas"
+        }
+      }
+    },
+    "stepper": {
+      "material": "outlined",
+      "state": "focus-outline",
+      "params": {
+        "outlined": {
+          "width": 1.5,
+          "colour": "ink",
+          "fill": "canvas"
+        }
+      }
+    },
+    "dropdown-trigger": {
+      "material": "outlined",
+      "state": "focus-outline",
+      "params": {
+        "outlined": {
+          "width": 1.5,
+          "colour": "ink",
+          "fill": "canvas"
+        }
+      }
+    },
+    "switch": {
+      "material": "flat-fill",
+      "state": "pair-selected",
+      "params": {
+        "flat-fill": {
+          "fill": "muted"
+        },
+        "pair-selected": {
+          "fill": "pair-a",
+          "tracking": 0
+        }
+      }
+    },
+    "checkbox": {
+      "material": "ink-mark",
+      "state": "pair-selected"
+    },
+    "radio": {
+      "material": "ink-mark",
+      "state": "pair-selected"
+    },
+    "slider": {
+      "material": "rule-slider",
+      "state": "pair-selected"
+    },
+    "segmented": {
+      "material": "outlined",
+      "state": "pair-selected",
+      "params": {
+        "outlined": {
+          "width": 1.5,
+          "colour": "ink",
+          "fill": "canvas"
+        },
+        "pair-selected": {
+          "fill": "pair-a",
+          "tracking": 0
+        }
+      }
+    },
+    "tabs": {
+      "material": "outlined",
+      "state": "pair-selected",
+      "params": {
+        "outlined": {
+          "width": 1.5,
+          "colour": "ink",
+          "fill": "canvas"
+        },
+        "pair-selected": {
+          "fill": "pair-a",
+          "tracking": 0
+        }
+      }
+    },
+    "chip": {
+      "material": "outlined",
+      "state": "pair-selected",
+      "params": {
+        "outlined": {
+          "width": 1.5,
+          "colour": "ink",
+          "fill": "canvas"
+        },
+        "pair-selected": {
+          "fill": "pair-a",
+          "tracking": 0
+        }
+      }
+    },
+    "card": {
+      "material": "outlined",
+      "params": {
+        "outlined": {
+          "width": 1,
+          "colour": "line",
+          "fill": "canvas"
+        }
+      }
+    },
+    "panel": {
+      "material": "outlined",
+      "params": {
+        "outlined": {
+          "width": 1,
+          "colour": "line",
+          "fill": "canvas"
+        }
+      }
+    },
+    "modal": {
+      "material": "outlined",
+      "params": {
+        "outlined": {
+          "width": 1,
+          "colour": "line",
+          "fill": "canvas"
+        }
+      }
+    },
+    "sheet": {
+      "material": "outlined",
+      "params": {
+        "outlined": {
+          "width": 1,
+          "colour": "line",
+          "fill": "canvas"
+        }
+      }
+    },
+    "drawer": {
+      "material": "outlined",
+      "params": {
+        "outlined": {
+          "width": 1,
+          "colour": "line",
+          "fill": "canvas"
+        }
+      }
+    },
+    "side-sheet": {
+      "material": "outlined",
+      "params": {
+        "outlined": {
+          "width": 1,
+          "colour": "line",
+          "fill": "canvas"
+        }
+      }
+    },
+    "popover": {
+      "material": "outlined",
+      "params": {
+        "outlined": {
+          "width": 1,
+          "colour": "line",
+          "fill": "canvas"
+        }
+      }
+    },
+    "lightbox": {
+      "material": "outlined",
+      "params": {
+        "outlined": {
+          "width": 1,
+          "colour": "line",
+          "fill": "canvas"
+        }
+      }
+    },
+    "list-row": {
+      "material": "ruled-row",
+      "state": "pair-selected",
+      "params": {
+        "pair-selected": {
+          "fill": "tint"
+        }
+      }
+    },
+    "badge": {
+      "material": "outlined-caps-tag"
+    },
+    "notification-dot": {
+      "material": "flat-fill",
+      "params": {
+        "flat-fill": {
+          "fill": "ink"
+        }
+      }
+    },
+    "progress": {
+      "material": "rule-meter"
+    },
+    "avatar": {
+      "material": "hairline-disc"
+    },
+    "tooltip": {
+      "material": "flat-fill",
+      "params": {
+        "flat-fill": {
+          "fill": "ink"
+        }
+      }
+    },
+    "popup-tip": {
+      "material": "flat-fill",
+      "params": {
+        "flat-fill": {
+          "fill": "ink"
+        }
+      }
+    },
+    "toast": {
+      "material": "outlined",
+      "params": {
+        "outlined": {
+          "width": 1,
+          "colour": "line",
+          "fill": "canvas"
+        }
+      }
+    },
+    "callout": {
+      "material": "outlined",
+      "params": {
+        "outlined": {
+          "width": 1,
+          "colour": "line",
+          "fill": "canvas"
+        }
+      },
+      "scope": "kit"
+    },
+    "menu": {
+      "material": "outlined",
+      "params": {
+        "outlined": {
+          "width": 1,
+          "colour": "line",
+          "fill": "canvas"
+        }
+      }
+    },
+    "menu-item": {
+      "material": "ruled-row"
+    },
+    "navbar": {
+      "material": "flat-paper"
+    },
+    "topbar": {
+      "material": "flat-paper"
+    },
+    "tabbar": {
+      "material": "flat-paper"
+    },
+    "nav-menu": {
+      "material": "flat-paper"
+    },
+    "nav-item": {
+      "material": "outlined",
+      "state": "pair-selected",
+      "params": {
+        "outlined": {
+          "width": 1.5,
+          "colour": "line",
+          "fill": "transparent"
+        },
+        "pair-selected": {
+          "fill": "pair-a",
+          "tracking": 0
+        }
+      }
+    },
+    "mega-menu": {
+      "material": "outlined",
+      "params": {
+        "outlined": {
+          "width": 1,
+          "colour": "line",
+          "fill": "canvas"
+        }
+      }
+    },
+    "menubar": {
+      "material": "flat-paper"
+    },
+    "ribbon": {
+      "material": "flat-paper"
+    },
+    "pie-menu": {
+      "material": "outlined",
+      "params": {
+        "outlined": {
+          "width": 1.5,
+          "colour": "ink",
+          "fill": "canvas"
+        }
+      }
+    },
+    "knob": {
+      "material": "ink-dial"
+    },
+    "calendar": {
+      "material": "outlined",
+      "params": {
+        "outlined": {
+          "width": 1,
+          "colour": "line",
+          "fill": "canvas"
+        }
+      }
+    },
+    "calendar-day": {
+      "material": "ruled-day",
+      "state": "pair-selected",
+      "params": {
+        "pair-selected": {
+          "fill": "pair-a",
+          "tracking": 0
+        }
+      }
+    },
+    "wheel": {
+      "material": "ruled-wheel"
+    },
+    "accordion": {
+      "material": "ruled-accordion"
+    },
+    "carousel-card": {
+      "material": "outlined",
+      "params": {
+        "outlined": {
+          "width": 1,
+          "colour": "line",
+          "fill": "canvas"
+        }
+      }
+    },
+    "matrix-tile": {
+      "material": "outlined",
+      "params": {
+        "outlined": {
+          "width": 1,
+          "colour": "line",
+          "fill": "canvas"
+        }
+      }
+    },
+    "divider": {
+      "material": "flat-fill",
+      "params": {
+        "flat-fill": {
+          "fill": "line"
+        }
+      }
+    },
+    "empty-state": {
+      "material": "outlined",
+      "params": {
+        "outlined": {
+          "width": 1,
+          "colour": "line",
+          "fill": "canvas"
+        }
+      }
+    },
+    "overlay-scrim": {
+      "material": "ink-scrim"
+    },
+    "lightbox-control": {
+      "material": "outlined",
+      "params": {
+        "outlined": {
+          "width": 1.5,
+          "colour": "ink",
+          "fill": "canvas"
+        }
+      }
+    },
+    "scrollbar": {
+      "material": "ink-scrollbar"
+    },
+    "spinner": {
+      "material": "stepped-ring"
+    },
+    "skeleton": {
+      "material": "flat-skeleton"
+    },
+    "kbd": {
+      "material": "outlined",
+      "params": {
+        "outlined": {
+          "width": 1.5,
+          "colour": "ink",
+          "fill": "canvas"
+        }
+      }
+    }
+  },
+  "art": {
+    "hero": {
+      "kind": "svg",
+      "src": "art/hero.svg",
+      "fit": "cover",
+      "alt": "A ruled line through a hairline circle holding a solid periwinkle disc"
+    }
+  }
+}

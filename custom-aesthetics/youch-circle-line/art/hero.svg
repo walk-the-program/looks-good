@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <rect width="200" height="200" fill="var(--ab-canvas,#fafaf7)"/>
+  <circle cx="100" cy="100" r="64" fill="none" stroke="var(--ab-ink,#101116)" stroke-width="1.5"/>
+  <circle cx="100" cy="100" r="36" fill="var(--ab-primary,#8290c7)" stroke="var(--ab-ink,#101116)" stroke-width="1.5"/>
+  <line x1="12" y1="100" x2="188" y2="100" stroke="var(--ab-ink,#101116)" stroke-width="1.5"/>
+  <circle cx="164" cy="100" r="7" fill="var(--ab-ink,#101116)"/>
+</svg>

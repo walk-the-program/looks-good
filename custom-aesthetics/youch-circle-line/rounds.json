@@ -1,0 +1,136 @@
+{
+ "rounds": [
+  {
+   "n": 1,
+   "date": "2026-11-14",
+   "by": "agent",
+   "summary": "Round 1: full Circle & Line style. Its app renders (app/renders/r1/) were deleted before the owner saw them; round 2 renders in app/renders/r2/ supersede them.",
+   "changes": [
+    "Controls (buttons, fields, select, segmented, tabs, chips, switch) are outlined round pills with a 1.5px ink line; the main action is a solid primary pill with the same line.",
+    "Cards, callouts, toasts and overlays are flat paper planes with a 1px hairline and a 20px radius, no shadow.",
+    "Headline is Jost 500, tight, with a butter band along the foot of the highlight word; section labels are tracked small caps.",
+    "Canvas colour pull set to 0 so dark stays at the brand #101116 instead of a lifted blue-grey.",
+    "Switch drawn as an outlined pill so the off track is visible in both modes."
+   ],
+   "variants": [
+    {
+     "id": "r1a",
+     "change": "switch material: slug-switch (square, no off track) and knob-switch (shaded knob, no off track) killed for outlined pill",
+     "verdict": "keep"
+    },
+    {
+     "id": "r1b",
+     "change": "highlight: full butter block (white text on butter in dark) killed for a thick underline band",
+     "verdict": "keep"
+    },
+    {
+     "id": "r1c",
+     "change": "card and callout material: hairline-box (square) killed for outlined 1px line role (radius 20)",
+     "verdict": "keep"
+    }
+   ],
+   "notes": [
+    {
+     "id": "n1",
+     "target": "general",
+     "text": "Selected sidebar item is the shell's pale tint with a left primary bar, not a solid periwinkle pill: the Mac sidebar is not reachable by catalog moves.",
+     "status": "open"
+    },
+    {
+     "id": "n2",
+     "target": "kit.list-row",
+     "text": "Selected list row is a squared tint wash with no radius 14 and no periwinkle circle: no catalog move draws either.",
+     "status": "open"
+    },
+    {
+     "id": "n3",
+     "target": "kit.switch",
+     "text": "Off switch shows the outlined track but no visible knob (see n7 in round 2).",
+     "status": "done",
+     "doneIn": 2
+    },
+    {
+     "id": "n4",
+     "target": "general",
+     "text": "Replay audio and Export everything sit under the fold veil in the Mac window, so they render faded; the roomy 20px cards push the main action down.",
+     "status": "done",
+     "doneIn": 2
+    },
+    {
+     "id": "n5",
+     "target": "general",
+     "text": "Chart line and area use periwinkle in dark and ink in light; chart colour is a shell default.",
+     "status": "open"
+    },
+    {
+     "id": "n6",
+     "target": "kit.button-primary",
+     "text": "Solid ink circle holding the icon at the end of the main action pill is not expressible; the shell's arrow glyph stays.",
+     "status": "open"
+    }
+   ],
+   "shots": "shots/r1/"
+  },
+  {
+   "n": 2,
+   "date": "2026-11-14",
+   "by": "agent",
+   "summary": "Round 2: fix pass from the coordinator's read. App renders are in app/renders/r2/; checker shots in shots/r2/.",
+   "changes": [
+    "Selected and unselected segment, tab and chip labels now share the same tracking (pair-selected tracking 0); selection shows through the periwinkle fill and weight 600.",
+    "Section labels are Inter caps at weight 600 with 0.08em tracking; the mono label move was removed.",
+    "The product sheet now puts Replay audio right under the history list, so the main action sits above the fold.",
+    "Switch is now flat-fill muted (outlined only accepts transparent or canvas fill, so it cannot take muted): the off track is a solid grey that holds 3:1 against the canvas with a canvas-coloured knob in light and an ink knob in dark; on stays a periwinkle track."
+   ],
+   "variants": [
+    {
+     "id": "r2a",
+     "change": "switch material: knob-switch (gradient and shadow), slug-switch and legend-switch (square), ink-mark (broken crescent) and outlined (invisible off knob) all killed; flat-fill muted kept",
+     "verdict": "keep"
+    }
+   ],
+   "notes": [
+    {
+     "id": "n7",
+     "target": "kit.switch",
+     "text": "Off switch had no visible knob (canvas knob on a canvas-filled outlined track). Fixed by switching to flat-fill with fill muted; the switch no longer carries the 1.5px ink line.",
+     "status": "done",
+     "doneIn": 2
+    },
+    {
+     "id": "n8",
+     "target": "kit.card",
+     "text": "Cards keep about 50px above the title: the shell sets the card title margin with !important and no catalog param reaches it.",
+     "status": "open"
+    }
+   ]
+  },
+  {
+   "n": 3,
+   "date": "2026-11-14",
+   "by": "agent",
+   "summary": "Owner's notes on round 2 were taken past this renderer into HTML mock-ups of the real Youch! window (TTS+ design/directions/ui4/a-circle-line/). The owner picked this style there and Youch! locked it as look/circle-line (D-037).",
+   "changes": [
+    "Owner's notes on round 2: more modern, slightly more character, no colour highlighting (the butter band behind titles is gone), in HTML.",
+    "The HTML version uses Outfit 600 for the heading in place of Jost; look.json heading changed to match.",
+    "In HTML only (no catalog move reaches these): the selected nav pill, the list inside one hairline card with a radius-14 selected wash, circle app tiles, the main action ending in a solid ink circle, card padding 22-24, and the Insights thread chart as a flat area graph.",
+    "Butter is at most one small solid circle per screen, never behind text."
+   ],
+   "variants": [
+    {
+     "id": "r3a",
+     "change": "type: Outfit 600 headings in place of Jost",
+     "verdict": "keep"
+    }
+   ],
+   "notes": [
+    {
+     "id": "n9",
+     "target": "general",
+     "text": "The renderer cannot style the Mac sidebar, wrap a list in a card, round the selected row, end a button in a circle, or tighten card padding, so the HTML mock in TTS+ design/directions/ui4/a-circle-line/ is the visual reference wherever it and this style differ.",
+     "status": "open"
+    }
+   ]
+  }
+ ]
+}
