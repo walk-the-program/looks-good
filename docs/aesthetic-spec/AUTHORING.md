@@ -34,7 +34,9 @@ Rules from the owner that apply to every aesthetic:
 - Every kit component gets styled in every style (the checker lists unmapped ones).
 - The product gets no "ask AI" box and no AI feature. This work is done by an agent outside the app.
 - If the style uses glass, it is clear see-through glass (material `clear-glass`), never frosted or milky.
-- It must look different from the 46 built-in styles, not a re-skin of one.
+- It must look different from the 45 built-in styles, not a re-skin of one. The `similar` check
+  measures move overlap only; also `node dev/lg.js compare` a few components against the closest
+  built-ins and look.
 
 A finished style lives in `custom-aesthetics/<key>/` and loads in the normal app (no flag): it shows beside the
 built-in styles in every picker. The lab (`?movelab=1`, `dev/move-lab/specs/`) only holds the smoke spec and shows
@@ -156,6 +158,14 @@ move's `materials:` and `states:` names.
   `kit` FAILs.
 - The kit has 70 components. Unmapped ones are a `kit-unmapped` WARN that lists them; for done,
   map all of them (the template does; change materials component by component to fit the look).
+- Use only material and state names the catalog lists; a move id is not a state name (the
+  `focus-ring` move provides the `focus-outline` state). `node dev/lg.js components --spec` prints
+  every kit name with its valid materials and states.
+- These kit names are the spec's own. The drawn UI kit (`node dev/lg.js components`, `inspect`) uses
+  shorter ids (`btn-primary`, `toggle`); `components` shows which spec name styles each id.
+- Colour params name colour roles per move, not always `primary`: in the moves that use pairs,
+  `pair-a` is the brand primary and `pair-b` a partner colour the move computes from it (not the
+  palette's secondary). `node dev/lg.js moves` lists each param's options.
 - Component names: v1 set (button-primary, button-secondary, button-ghost, button-icon, button-danger,
   field, select, switch, checkbox, radio, slider, segmented, tabs, card, panel, list-row, chip, badge,
   progress, avatar, tooltip, modal, sheet, toast, callout, menu, navbar, topbar) plus the v2 set in
@@ -315,9 +325,9 @@ Round 1 starts from the stages above. Later rounds start from the open notes in 
    then set `"key"` in `aesthetic.json` to `<key>` and edit `name`, `descriptor`, `coreTrick` and the rest.
 2. List it (first round only), before any check, or the first run always WARNs. Other agents edit
    `custom-aesthetics/index.json` too, so read it immediately before you change it, add only your
-   key, and never rewrite the file from memory. It holds one `aesthetics` array; keep the format you find.
-   This does read, add and write in one step:
-   `node -e 'const fs=require("fs"),f="custom-aesthetics/index.json",j=JSON.parse(fs.readFileSync(f,"utf8"));if(!j.aesthetics.includes("<key>"))j.aesthetics.push("<key>");fs.writeFileSync(f,"{ \"aesthetics\": ["+j.aesthetics.map(k=>JSON.stringify(k)).join(", ")+"] }\n")'`
+   key, and never rewrite the file from memory. It holds an `aesthetics` array and a `starters` array;
+   keep both. This does read, add and write in one step, keeping every other key:
+   `node -e 'const fs=require("fs"),f="custom-aesthetics/index.json",j=JSON.parse(fs.readFileSync(f,"utf8"));if(!j.aesthetics.includes("<key>"))j.aesthetics.push("<key>");const q=a=>"["+a.map(k=>JSON.stringify(k)).join(", ")+"]";fs.writeFileSync(f,"{\n"+Object.keys(j).map(k=>"  "+JSON.stringify(k)+": "+(Array.isArray(j[k])?q(j[k]):JSON.stringify(j[k]))).join(",\n")+"\n}\n")'`
 3. Edit `aesthetic.json` (one axis per variant; for several variants, make each one a round-note
    and try them one at a time, keeping the winner).
 4. Static check (no server): `node dev/aesthetic-check.js custom-aesthetics/<key>`.
@@ -352,6 +362,9 @@ Round 1 starts from the stages above. Later rounds start from the open notes in 
    `general`; `text`; `status` open/done; `doneIn` the round number that closed it), and `shots`
    (`shots/r<n>/`). Copy the round's PNGs into `shots/r<n>/` so later rounds do not overwrite them. Or skip the copy and
 add `--out custom-aesthetics/<key>/shots/r<n>/` to the step 6 command, which writes them there.
+   A style made for one app (it has an `app/` folder, see `AGENTS.md`) also renders the app's own
+   screens each round into `app/renders/r<n>/`; `shots` still points at the checker's shots, and the
+   round's `summary` names the app renders folder.
 9. Stop the server. Next round: read the open notes, change one axis per variant, repeat from
    step 3, and mark the notes you addressed `done` with `doneIn`. Note `id`s must be unique across
    all rounds. To close an older note, edit it in place (`status: "done"`, `doneIn: N`); never add

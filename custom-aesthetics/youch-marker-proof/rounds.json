@@ -1,0 +1,72 @@
+{
+ "rounds": [
+  {
+   "n": 1,
+   "date": "2026-11-14",
+   "by": "agent",
+   "summary": "First pass of Marker Proof on Youch! History, Cleanup and Dictionary (Mac window, light and dark). Bare paper under a hairline; only chosen things take the primary band.",
+   "changes": [
+    "Resting surfaces are flat paper with a 1px hairline and no shadow, unlike the Keycap lip look the owner already locked (D-027).",
+    "Segmented, tabs and chips mark the selected item with a flat primary band; the main action is a flat primary band with a 1px press.",
+    "Fields and selects are hairline boxes; switches use the knob-switch with the primary track.",
+    "Headline highlight changed from a coloured band (it printed the teal pair colour) to ink with a 6px primary underline.",
+    "Card hairlines raised from hair to strong after the first renders showed History cards with no edge.",
+    "Segmented and tabs changed from flat-paper to outlined after the first renders showed no selected band."
+   ],
+   "variants": [
+    {
+     "id": "r1a",
+     "change": "material: bare paper plus highlighter-band selection, tried against the first flat-paper segmented",
+     "verdict": "keep"
+    },
+    {
+     "id": "r1b",
+     "change": "headline highlight: band (teal) killed, ink with primary underline kept",
+     "verdict": "keep"
+    }
+   ],
+   "notes": [
+    {
+     "id": "n1",
+     "target": "kit.card",
+     "text": "History cards (opened dictation, What you said) still read as loose text blocks; the strong hairline did not show in the screens. Give them a visible frame or a well.",
+     "status": "open"
+    },
+    {
+     "id": "n2",
+     "target": "general",
+     "text": "The preview palette's analogous accent is teal, which prints as the underline tint and the dark-mode headline colour; Youch! allows butter #F6CF6B as the one spark. Set look.json colours to the brand palette in round 2.",
+     "status": "done",
+     "doneIn": 2
+    },
+    {
+     "id": "n3",
+     "target": "kit.list-row",
+     "text": "The selected History row is not shown because the product sheet has no selected-row syntax; the highlighter band on the selected row is the signature and is not yet rendered.",
+     "status": "done",
+     "doneIn": 2
+    },
+    {
+     "id": "n4",
+     "target": "general",
+     "text": "Dark canvas renders blue-grey rather than Youch!'s #101116; pureBg or palette work needed.",
+     "status": "open"
+    }
+   ],
+   "shots": "shots/"
+  },
+  {
+   "n": 2,
+   "date": "2026-11-14",
+   "by": "agent",
+   "summary": "Preview inputs only, style unchanged: app/look.json takes Youch! colours from design/brand.json (secondary, butter accent, #101116 / #FAFAF7 neutrals) and the sheet uses the new selected-row, strike-through and callout blocks. App renders in app/renders/r2/.",
+   "changes": [
+    "look.json colors: secondary #dde1f2, accent #f6cf6b, neutralDark #101116, neutralLight #fafaf7 (the teal analogous accent is gone)",
+    "product sheet: History row Claude marked selected, filler words struck through, Learned card became a success callout with Undo"
+   ],
+   "variants": [],
+   "notes": [],
+   "shots": "shots/"
+  }
+ ]
+}

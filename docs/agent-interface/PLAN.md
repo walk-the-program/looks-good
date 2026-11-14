@@ -89,6 +89,11 @@ returns `{ width, height }`; `compPng` uses it. The Built view's Product tab sho
 
 Budget: 2 workers at once, disjoint files, shared checkout. Workers do not commit.
 
+Status 2026-11-14: A, B and C accepted. An end-to-end test (a fresh agent using only the skill and
+AGENTS.md) built `custom-aesthetics/youch-marker-proof/`; its 16 friction points led to task D
+(kit-name mapping, `components --spec`, `palette`, partial `colors`, pack NOTE + exit 0, selected
+rows / callout / progress / strike blocks, unknown-block ordering fix) and the AGENTS.md / AUTHORING.md fixes.
+
 ## Acceptance
 
 1. From the TTS+ repo, an agent following AGENTS.md lists styles and inspects `btn-primary` in two styles, getting values incl. transition timing and the matching CSS rules.

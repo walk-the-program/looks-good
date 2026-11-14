@@ -5,7 +5,7 @@
 ----------------------------------------------------------------------- */
 
 const PRODUCT_BLOCK_TYPES = ['title', 'hero-numeral', 'text', 'action', 'action-secondary', 'link', 'card', 'list', 'stats',
-  'chart', 'segmented', 'toggle', 'field', 'keypad', 'tiles'];
+  'chart', 'segmented', 'toggle', 'field', 'keypad', 'tiles', 'callout', 'progress'];
 const PRODUCT_CHROMES = ['tabbar', 'topbar', 'none'];
 const PRODUCT_MAC_CHROMES = ['sidebar', 'toolbar', 'none'];
 const PRODUCT_PLATFORMS = ['iphone', 'mac'];
@@ -49,7 +49,7 @@ function parseProductSheet(text, sourceName) {
       if (!scr.job) warn(scr._line, `Screen "${scr.name}" has no Job line.`);
       if (!scr._hasPrimary) warn(scr._line, `Screen "${scr.name}" has no Primary action line (write "none" if it has no main action).`);
       if (!scr.blocks.length) warn(scr._line, `Screen "${scr.name}" has no Content blocks.`);
-      delete scr._line; delete scr._hasPrimary;
+      delete scr._line; delete scr._hasPrimary; delete scr._seen;
       scr = null; mode = null;
     };
     const parseBlock = (body, n) => {
@@ -111,7 +111,8 @@ function parseProductSheet(text, sourceName) {
       }
       // inside a screen
       if (mode === 'content' && (m = /^(\d+)[.)]\s*(.*)$/.exec(line))) {
-        if (+m[1] !== scr.blocks.length + 1) warn(n, `Block number ${m[1]} is out of order; ranked by position.`);
+        scr._seen = (scr._seen || 0) + 1;   // numbered lines seen, so an unknown block (kept in notes) does not shift the check
+        if (+m[1] !== scr._seen) warn(n, `Block number ${m[1]} is out of order; ranked by position.`);
         parseBlock(m[2], n);
         return;
       }

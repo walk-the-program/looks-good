@@ -1,0 +1,988 @@
+{
+ "spec": 2,
+ "key": "youch-marker-proof",
+ "order": 960,
+ "name": "Marker Proof",
+ "descriptor": "Highlighted · Plain · Faithful",
+ "influences": "Highlighter pens on printed transcripts / Proofreader marks / Mac Notes and Mail / Gong and Zoom transcripts",
+ "summary": "Plain white paper cards under one hairline, where only the thing you chose is ever filled, like a highlighter on a transcript.",
+ "coreTrick": "Nothing rests filled or shadowed: every surface is bare paper under a single 1px hairline, and only a chosen thing (selected, current, open, focused, the one main action) takes a flat highlighter band of the primary, which a press darkens and a disabled control strikes through with a diagonal hatch.",
+ "motto": "Only what you marked.",
+ "kicker": "Said, kept, marked",
+ "mode": "light",
+ "lineage": {
+  "forkedFrom": null,
+  "version": 1
+ },
+ "meta": {
+  "family": "digital",
+  "fonts": {
+   "heading": {
+    "classes": [
+     "geometric"
+    ],
+    "picks": [
+     "Manrope",
+     "Plus Jakarta Sans"
+    ]
+   },
+   "body": {
+    "classes": [
+     "neo-grotesk"
+    ],
+    "picks": [
+     "Inter",
+     "Geist"
+    ]
+   },
+   "mono": {
+    "picks": [
+     "JetBrains Mono",
+     "IBM Plex Mono"
+    ]
+   },
+   "avoid": [
+    "script",
+    "groovy",
+    "blackletter",
+    "deco",
+    "pixel",
+    "condensed"
+   ],
+   "why": "A transcript tool should read like plain proofed text: a tight geometric heading over a neutral grotesk body, with tabular numerals for counts and times.",
+   "pairings": [
+    [
+     "Manrope",
+     "Inter"
+    ],
+    [
+     "Plus Jakarta Sans",
+     "Inter"
+    ],
+    [
+     "Manrope",
+     "Geist"
+    ]
+   ]
+  }
+ },
+ "build": {
+  "cls": "flat",
+  "surface": "Bare paper surfaces with a 1px hairline and no shadow. Corners 20 on cards, 12 on controls, pills for badges. Fields are shallow wells (a 2px inset shade). Colour appears only as a flat highlighter band on what is chosen.",
+  "press": {
+   "dx": 0,
+   "dy": 1,
+   "ms": 90
+  },
+  "motion": {
+   "fast": 90,
+   "base": 140,
+   "slow": 220,
+   "ease": "out"
+  },
+  "pressText": "Rest is flat. Hover tints the paper a step toward the primary. Pressed darkens the highlighter fill and moves 1px down in 90 ms; there is no lip, no shadow and no bounce. Disabled strikes through with a 3px diagonal hatch. Focus is a 2px primary outline, 3px off the edge.",
+  "icons": "1.75px strokes, round caps, 20px; the selected icon sits on a highlighter band.",
+  "appIcon": "A white rounded tile with one highlighted word-bar in the primary."
+ },
+ "labels": {
+  "material": "Highlighter band",
+  "states": [
+   "Rest",
+   "Marked",
+   "Pressed"
+  ],
+  "statesKind": "chip"
+ },
+ "copy": {
+  "motto": {
+   "label": "Motto",
+   "text": "Only what you marked."
+  },
+  "kicker": {
+   "label": "Kicker above the headline",
+   "text": "Said, kept, marked"
+  }
+ },
+ "layout": {
+  "hero": "split",
+  "palette": "swatches",
+  "sections": "two-col"
+ },
+ "type": {
+  "ui": "sans",
+  "label": "sans",
+  "display": 1
+ },
+ "roles": {
+  "canvas": {
+   "use": "Page and panel background, tinted slightly toward the primary hue",
+   "never": "Text",
+   "coverage": "60-70%"
+  },
+  "ink": {
+   "use": "Headlines, body text, borders, hover fill",
+   "never": "Large background fields in light mode",
+   "coverage": "15-20%"
+  },
+  "primary": {
+   "use": "The one main action per view; selected state",
+   "never": "Body text; more than one CTA per view",
+   "coverage": "about 10%"
+  },
+  "secondary": {
+   "use": "Secondary buttons, chips, second data series",
+   "never": "The main CTA, body text",
+   "coverage": "10-15%"
+  },
+  "accent": {
+   "use": "One spark per view: the highlighted headline word, new badges",
+   "never": "Buttons, body text, borders, large fills",
+   "coverage": "5% or less"
+  }
+ },
+ "rules": {
+  "do": [
+   "Keep every resting surface bare paper under a 1px hairline with no shadow.",
+   "Fill only what is chosen: selected, current, open, focused or the one main action.",
+   "Draw the main action as a flat primary band, one per screen.",
+   "Strike a disabled control through with the diagonal hatch rather than greying it.",
+   "Set counts, times and word totals in tabular numerals."
+  ],
+  "dont": [
+   "Use a shadow, lip, gradient or glow on any resting surface.",
+   "Fill a card or row at rest.",
+   "Put art, textures or decorative bands on app screens.",
+   "Draw errors in stock red: use ink, an icon and words.",
+   "Mark more than one thing per group as chosen."
+  ]
+ },
+ "highlight": "ink",
+ "slideShape": "soft",
+ "colour": [
+  {
+   "move": "canvas-ink-pull",
+   "params": {
+    "light": 0.03,
+    "dark": 0.05
+   }
+  },
+  {
+   "move": "paper-edge",
+   "params": {
+    "amount": 0.35
+   }
+  },
+  {
+   "move": "muted-contrast-floor",
+   "params": {
+    "min": 5.2
+   }
+  },
+  {
+   "move": "state-colour-derivation",
+   "params": {
+    "pressMix": 0.8,
+    "hoverMix": 0.92
+   }
+  }
+ ],
+ "moves": [
+  {
+   "move": "corner-radius",
+   "params": {
+    "base": 12,
+    "controls": 1,
+    "surfaces": 1.67,
+    "small": 0.8,
+    "pill": false,
+    "round": true
+   }
+  },
+  {
+   "move": "hairline-rule",
+   "params": {
+    "width": 1,
+    "colour": "line"
+   }
+  },
+  {
+   "move": "interface-sans",
+   "params": {}
+  },
+  {
+   "move": "display-weight",
+   "params": {
+    "headline": 700,
+    "brand": 700,
+    "cardTitle": 650,
+    "wordSpacing": 0
+   }
+  },
+  {
+   "move": "tight-display-tracking",
+   "params": {
+    "tracking": -0.03,
+    "leading": 1.05
+   }
+  },
+  {
+   "move": "tracked-micro-labels",
+   "params": {
+    "tag": 0.08,
+    "kicker": 0.12,
+    "foot": 0
+   }
+  },
+  {
+   "move": "highlight-underline",
+   "params": {
+    "width": 6,
+    "offset": 2,
+    "colour": "primary"
+   }
+  },
+  {
+   "move": "focus-ring",
+   "params": {
+    "look": "outline",
+    "reach": "all-controls",
+    "width": 2,
+    "offset": 3,
+    "colour": "primary"
+   }
+  }
+ ],
+ "kit": {
+  "button-primary": {
+   "material": "flat-fill",
+   "state": [
+    "press-darken",
+    "focus-outline",
+    "disabled-hatch"
+   ],
+   "params": {
+    "flat-fill": {
+     "fill": "primary"
+    }
+   }
+  },
+  "button-split": {
+   "material": "flat-fill",
+   "state": [
+    "press-darken",
+    "focus-outline",
+    "disabled-hatch"
+   ],
+   "params": {
+    "flat-fill": {
+     "fill": "primary"
+    }
+   }
+  },
+  "button-fab": {
+   "material": "flat-fill",
+   "state": [
+    "press-darken",
+    "focus-outline",
+    "disabled-hatch"
+   ],
+   "params": {
+    "flat-fill": {
+     "fill": "primary"
+    }
+   }
+  },
+  "button-secondary": {
+   "material": "outlined",
+   "state": [
+    "press-darken",
+    "focus-outline",
+    "disabled-hatch"
+   ],
+   "params": {
+    "outlined": {
+     "width": 1,
+     "colour": "line",
+     "fill": "transparent"
+    }
+   }
+  },
+  "button-icon": {
+   "material": "outlined",
+   "state": [
+    "press-darken",
+    "focus-outline",
+    "disabled-hatch"
+   ],
+   "params": {
+    "outlined": {
+     "width": 1,
+     "colour": "line",
+     "fill": "transparent"
+    }
+   }
+  },
+  "button-back-top": {
+   "material": "outlined",
+   "state": [
+    "press-darken",
+    "focus-outline"
+   ],
+   "params": {
+    "outlined": {
+     "width": 1,
+     "colour": "line",
+     "fill": "transparent"
+    }
+   }
+  },
+  "button-danger": {
+   "material": "outlined",
+   "state": [
+    "press-darken",
+    "focus-outline",
+    "disabled-hatch"
+   ],
+   "params": {
+    "outlined": {
+     "width": {
+      "light": 1,
+      "dark": 2
+     },
+     "colour": "ink",
+     "fill": "transparent"
+    }
+   }
+  },
+  "button-ghost": {
+   "material": "quiet-text",
+   "state": [
+    "press-darken"
+   ],
+   "params": {
+    "quiet-text": {
+     "size": 15,
+     "tracking": 0
+    }
+   }
+  },
+  "link": {
+   "material": "quiet-text",
+   "state": [
+    "press-darken"
+   ],
+   "params": {
+    "quiet-text": {
+     "size": 15,
+     "tracking": 0
+    }
+   }
+  },
+  "topbar-title": {
+   "material": "quiet-text",
+   "state": [
+    "press-darken"
+   ],
+   "params": {
+    "quiet-text": {
+     "size": 15,
+     "tracking": 0
+    }
+   }
+  },
+  "section-label": {
+   "material": "quiet-text",
+   "state": [
+    "press-darken"
+   ],
+   "params": {
+    "quiet-text": {
+     "size": 15,
+     "tracking": 0
+    }
+   }
+  },
+  "breadcrumbs": {
+   "material": "quiet-text",
+   "params": {
+    "quiet-text": {
+     "size": 13,
+     "tracking": 0
+    }
+   }
+  },
+  "anchor-nav": {
+   "material": "quiet-text",
+   "params": {
+    "quiet-text": {
+     "size": 13,
+     "tracking": 0
+    }
+   }
+  },
+  "field": {
+   "material": "outlined",
+   "state": "focus-outline",
+   "params": {
+    "outlined": {
+     "width": 1,
+     "colour": "line",
+     "fill": "canvas"
+    }
+   }
+  },
+  "select": {
+   "material": "outlined",
+   "state": "focus-outline",
+   "params": {
+    "outlined": {
+     "width": 1,
+     "colour": "line",
+     "fill": "canvas"
+    }
+   }
+  },
+  "date-field": {
+   "material": "outlined",
+   "state": "focus-outline",
+   "params": {
+    "outlined": {
+     "width": 1,
+     "colour": "line",
+     "fill": "canvas"
+    }
+   }
+  },
+  "combo": {
+   "material": "outlined",
+   "state": "focus-outline",
+   "params": {
+    "outlined": {
+     "width": 1,
+     "colour": "line",
+     "fill": "canvas"
+    }
+   }
+  },
+  "listbox": {
+   "material": "outlined",
+   "state": "focus-outline",
+   "params": {
+    "outlined": {
+     "width": 1,
+     "colour": "line",
+     "fill": "canvas"
+    }
+   }
+  },
+  "stepper": {
+   "material": "outlined",
+   "state": "focus-outline",
+   "params": {
+    "outlined": {
+     "width": 1,
+     "colour": "line",
+     "fill": "canvas"
+    }
+   }
+  },
+  "dropdown-trigger": {
+   "material": "outlined",
+   "state": "focus-outline",
+   "params": {
+    "outlined": {
+     "width": 1,
+     "colour": "line",
+     "fill": "canvas"
+    }
+   }
+  },
+  "switch": {
+   "material": "knob-switch",
+   "state": "pair-selected"
+  },
+  "checkbox": {
+   "material": "ink-mark",
+   "state": "pair-selected",
+   "params": {
+    "ink-mark": {
+     "size": 22,
+     "round": false,
+     "ring": 2,
+     "bullet": 10
+    }
+   }
+  },
+  "radio": {
+   "material": "ink-mark",
+   "state": "pair-selected",
+   "params": {
+    "ink-mark": {
+     "size": 22,
+     "round": false,
+     "ring": 2,
+     "bullet": 10
+    }
+   }
+  },
+  "slider": {
+   "material": "rule-slider",
+   "state": "pair-selected",
+   "params": {
+    "rule-slider": {
+     "track": 6,
+     "thumb": 22
+    }
+   }
+  },
+  "segmented": {
+   "material": "outlined",
+   "state": "pair-selected",
+   "params": {
+    "outlined": {
+     "width": 1,
+     "colour": "line",
+     "fill": "canvas"
+    },
+    "pair-selected": {
+     "fill": "pair-a",
+     "tracking": 0
+    }
+   }
+  },
+  "tabs": {
+   "material": "outlined",
+   "state": [
+    "pair-selected",
+    "rule-selected"
+   ],
+   "params": {
+    "outlined": {
+     "width": 1,
+     "colour": "line",
+     "fill": "transparent"
+    },
+    "pair-selected": {
+     "fill": "pair-a",
+     "tracking": 0
+    },
+    "rule-selected": {
+     "colour": "primary",
+     "kitColour": "primary",
+     "weight": 650
+    }
+   }
+  },
+  "chip": {
+   "material": "outlined",
+   "state": "pair-selected",
+   "params": {
+    "outlined": {
+     "width": 1,
+     "colour": "line",
+     "fill": "transparent"
+    },
+    "pair-selected": {
+     "fill": "pair-a",
+     "tracking": 0
+    }
+   }
+  },
+  "card": {
+   "material": "hairline-box",
+   "params": {
+    "hairline-box": {
+     "ring": "strong"
+    }
+   }
+  },
+  "carousel-card": {
+   "material": "hairline-box",
+   "params": {
+    "hairline-box": {
+     "ring": "strong"
+    }
+   }
+  },
+  "matrix-tile": {
+   "material": "hairline-box",
+   "params": {
+    "hairline-box": {
+     "ring": "strong"
+    }
+   }
+  },
+  "panel": {
+   "material": "flat-paper",
+   "params": {
+    "flat-paper": {
+     "fill": "canvas",
+     "padded": true
+    }
+   }
+  },
+  "list-row": {
+   "material": "ruled-row",
+   "state": "pair-item-selected",
+   "params": {
+    "ruled-row": {
+     "rule": "hair",
+     "titles": "keep"
+    },
+    "pair-item-selected": {
+     "bar": 3
+    }
+   }
+  },
+  "badge": {
+   "material": "flat-fill",
+   "params": {
+    "flat-fill": {
+     "fill": "tint"
+    }
+   }
+  },
+  "notification-dot": {
+   "material": "square-mark",
+   "params": {
+    "square-mark": {
+     "size": 8
+    }
+   }
+  },
+  "progress": {
+   "material": "rule-meter",
+   "params": {
+    "rule-meter": {
+     "leader": "dashed",
+     "kitHeight": 6
+    }
+   }
+  },
+  "avatar": {
+   "material": "hairline-disc",
+   "params": {
+    "hairline-disc": {
+     "serif": false
+    }
+   }
+  },
+  "kbd": {
+   "material": "caps-key",
+   "params": {
+    "caps-key": {
+     "size": 11,
+     "tracking": 0.02
+    }
+   }
+  },
+  "tooltip": {
+   "material": "flat-fill",
+   "params": {
+    "flat-fill": {
+     "fill": "ink"
+    }
+   }
+  },
+  "modal": {
+   "material": "rule-frame",
+   "params": {
+    "rule-frame": {
+     "style": "rule-pair",
+     "top": 1,
+     "bottom": 1,
+     "fill": "canvas",
+     "face": "keep"
+    }
+   }
+  },
+  "sheet": {
+   "material": "rule-frame",
+   "params": {
+    "rule-frame": {
+     "style": "rule-pair",
+     "top": 1,
+     "bottom": 1,
+     "fill": "canvas",
+     "face": "keep"
+    }
+   }
+  },
+  "side-sheet": {
+   "material": "rule-frame",
+   "params": {
+    "rule-frame": {
+     "style": "rule-pair",
+     "top": 1,
+     "bottom": 1,
+     "fill": "canvas",
+     "face": "keep"
+    }
+   }
+  },
+  "drawer": {
+   "material": "rule-frame",
+   "params": {
+    "rule-frame": {
+     "style": "rule-pair",
+     "top": 1,
+     "bottom": 1,
+     "fill": "canvas",
+     "face": "keep"
+    }
+   }
+  },
+  "popover": {
+   "material": "rule-frame",
+   "params": {
+    "rule-frame": {
+     "style": "rule-pair",
+     "top": 1,
+     "bottom": 1,
+     "fill": "canvas",
+     "face": "keep"
+    }
+   }
+  },
+  "lightbox": {
+   "material": "rule-frame",
+   "params": {
+    "rule-frame": {
+     "style": "rule-pair",
+     "top": 1,
+     "bottom": 1,
+     "fill": "canvas",
+     "face": "keep"
+    }
+   }
+  },
+  "menu": {
+   "material": "hairline-box",
+   "params": {
+    "hairline-box": {
+     "ring": "hair"
+    }
+   }
+  },
+  "menu-item": {
+   "material": "hairline-box",
+   "params": {
+    "hairline-box": {
+     "ring": "hair"
+    }
+   }
+  },
+  "mega-menu": {
+   "material": "hairline-box",
+   "params": {
+    "hairline-box": {
+     "ring": "hair"
+    }
+   }
+  },
+  "menubar": {
+   "material": "hairline-box",
+   "params": {
+    "hairline-box": {
+     "ring": "hair"
+    }
+   }
+  },
+  "ribbon": {
+   "material": "hairline-box",
+   "params": {
+    "hairline-box": {
+     "ring": "hair"
+    }
+   }
+  },
+  "toast": {
+   "material": "rule-sidebar",
+   "params": {
+    "rule-sidebar": {
+     "top": 3
+    }
+   }
+  },
+  "callout": {
+   "material": "rule-sidebar",
+   "params": {
+    "rule-sidebar": {
+     "top": 3
+    }
+   },
+   "scope": "kit"
+  },
+  "popup-tip": {
+   "material": "flat-fill",
+   "params": {
+    "flat-fill": {
+     "fill": "tint"
+    }
+   }
+  },
+  "navbar": {
+   "material": "flat-paper",
+   "params": {
+    "flat-paper": {
+     "fill": "canvas",
+     "padded": true
+    }
+   }
+  },
+  "topbar": {
+   "material": "flat-paper",
+   "params": {
+    "flat-paper": {
+     "fill": "canvas",
+     "padded": true
+    }
+   }
+  },
+  "tabbar": {
+   "material": "flat-paper",
+   "params": {
+    "flat-paper": {
+     "fill": "canvas",
+     "padded": true
+    }
+   }
+  },
+  "nav-menu": {
+   "material": "flat-paper",
+   "params": {
+    "flat-paper": {
+     "fill": "none",
+     "padded": true
+    }
+   }
+  },
+  "nav-item": {
+   "material": "flat-paper",
+   "state": [
+    "pair-current"
+   ],
+   "params": {
+    "flat-paper": {
+     "fill": "none",
+     "padded": false
+    },
+    "pair-current": {
+     "fill": "tint",
+     "bar": 0
+    }
+   }
+  },
+  "pie-menu": {
+   "material": "hairline-disc",
+   "params": {
+    "hairline-disc": {
+     "serif": false
+    }
+   }
+  },
+  "calendar": {
+   "material": "hairline-box",
+   "params": {
+    "hairline-box": {
+     "ring": "hair"
+    }
+   }
+  },
+  "calendar-day": {
+   "material": "flat-paper",
+   "state": "pair-selected",
+   "params": {
+    "flat-paper": {
+     "fill": "none",
+     "padded": false
+    },
+    "pair-selected": {
+     "fill": "tint",
+     "tracking": 0
+    }
+   }
+  },
+  "wheel": {
+   "material": "flat-paper",
+   "params": {
+    "flat-paper": {
+     "fill": "none",
+     "padded": false
+    }
+   }
+  },
+  "knob": {
+   "material": "hairline-disc",
+   "params": {
+    "hairline-disc": {
+     "serif": false
+    }
+   }
+  },
+  "accordion": {
+   "material": "ruled-accordion",
+   "params": {
+    "ruled-accordion": {
+     "bar": 2,
+     "body": 15
+    }
+   }
+  },
+  "divider": {
+   "material": "thick-thin-rule",
+   "params": {
+    "thick-thin-rule": {
+     "top": 1,
+     "bottom": 1
+    }
+   }
+  },
+  "empty-state": {
+   "material": "italic-titles",
+   "params": {
+    "italic-titles": {
+     "glyph": "bare"
+    }
+   }
+  },
+  "overlay-scrim": {
+   "material": "ink-wash-scrim",
+   "params": {
+    "ink-wash-scrim": {
+     "pct": 28
+    }
+   }
+  },
+  "lightbox-control": {
+   "material": "outlined",
+   "params": {
+    "outlined": {
+     "width": 1,
+     "colour": "line",
+     "fill": "canvas"
+    }
+   }
+  },
+  "scrollbar": {
+   "material": "ink-scrollbar",
+   "params": {
+    "ink-scrollbar": {
+     "inset": 3
+    }
+   }
+  },
+  "spinner": {
+   "material": "stepped-ring",
+   "params": {
+    "stepped-ring": {
+     "width": 2,
+     "steps": 12
+    }
+   }
+  },
+  "skeleton": {
+   "material": "flat-skeleton"
+  }
+ }
+}

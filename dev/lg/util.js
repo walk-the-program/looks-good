@@ -11,7 +11,7 @@ class Fail extends Error {}
 const fail = msg => { throw new Fail(msg); };
 
 /* flags that take a value; every other --flag is a boolean */
-const VALUE_FLAGS = new Set(['style', 'styles', 'state', 'look', 'sheet', 'png', 'out', 'port', 'round', 'target', 'surface', 'mode', 'query', 'family']);
+const VALUE_FLAGS = new Set(['style', 'styles', 'state', 'look', 'sheet', 'png', 'out', 'port', 'round', 'target', 'surface', 'mode', 'query', 'family', 'primary', 'scheme']);
 function parseArgs(argv) {
   const o = { _: [], flags: {} };
   for (let i = 0; i < argv.length; i++) {
@@ -19,7 +19,7 @@ function parseArgs(argv) {
     if (a.startsWith('--')) {
       let [k, v] = a.slice(2).split(/=(.*)/s);
       if (VALUE_FLAGS.has(k)) { if (v === undefined) { v = argv[++i]; if (v === undefined || v.startsWith('--')) fail(`--${k} needs a value`); } o.flags[k] = v; }
-      else if (k === 'json' || k === 'help') o.flags[k] = true;
+      else if (k === 'json' || k === 'help' || k === 'spec') o.flags[k] = true;
       else fail(`unknown option --${k} (node dev/lg.js --help)`);
     } else if (a === '-h') o.flags.help = true;
     else o._.push(a);
@@ -44,6 +44,7 @@ const didYouMean = (name, list) => { const m = closeMatches(name, list); return 
 const LOOK_KEYS = ['app', 'repo', 'brandName', 'style', 'blend', 'primary', 'scheme', 'colors', 'heading', 'body', 'typography', 'pureBg', 'modes'];
 const PINNED = { primary: '#2f5d8a', scheme: 'analogous', heading: 'Inter', body: 'Inter' };   // the checker's preview brand
 const HEX = /^#[0-9a-f]{6}$/i;
+const COLOR_KEYS = ['primary', 'secondary', 'accent', 'neutralDark', 'neutralLight'];   // the derivePalette shape (js/color.js) = state.colors
 
 function readLook(file, warnings) {
   let raw = {};
@@ -54,16 +55,22 @@ function readLook(file, warnings) {
   }
   const look = {
     brandName: raw.brandName || raw.app || null, style: raw.style || null, blend: raw.blend || null,
-    primary: raw.primary || PINNED.primary, scheme: raw.scheme || PINNED.scheme, colors: raw.colors || null,
+    primary: raw.primary || (raw.colors && typeof raw.colors === 'object' && HEX.test(raw.colors.primary || '') ? raw.colors.primary : PINNED.primary), scheme: raw.scheme || PINNED.scheme, colors: raw.colors || null,
     heading: raw.heading || PINNED.heading, body: raw.body || PINNED.body,
     typography: raw.typography || null, pureBg: raw.pureBg === true,
     modes: Array.isArray(raw.modes) && raw.modes.length ? raw.modes : ['light', 'dark'], file: file || null,
   };
   if (!HEX.test(look.primary)) fail(`look primary "${look.primary}" is not a #rrggbb colour`);
   look.modes.forEach(m => { if (m !== 'light' && m !== 'dark') fail(`look modes may only be "light" and "dark" (got "${m}")`); });
-  if (look.colors) {
-    const keys = ['primary', 'secondary', 'accent', 'neutralDark', 'neutralLight'];
-    if (typeof look.colors !== 'object' || !keys.every(k => HEX.test(look.colors[k] || ''))) fail(`look colors needs ${keys.join(', ')} as #rrggbb`);
+  if (look.colors != null) {
+    if (typeof look.colors !== 'object' || Array.isArray(look.colors)) fail(`look colors must be an object, a partial of ${COLOR_KEYS.join(', ')} as #rrggbb (merged over the palette derived from primary + scheme)`);
+    const c = {};
+    Object.keys(look.colors).forEach(k => {
+      if (!COLOR_KEYS.includes(k)) { warnings.push(`look.json: colors.${k} is not a palette key and was ignored (keys: ${COLOR_KEYS.join(', ')})`); return; }
+      if (!HEX.test(look.colors[k] || '')) fail(`look colors.${k} "${look.colors[k]}" is not a #rrggbb colour`);
+      c[k] = look.colors[k];
+    });
+    look.colors = Object.keys(c).length ? c : null;
   }
   return look;
 }
@@ -103,4 +110,4 @@ function nextRound(renders) {
   return n + 1;
 }
 
-module.exports = { ROOT, CUSTOM_DIR, Fail, fail, parseArgs, closeMatches, didYouMean, readLook, checkLook, checkStyle, resolveTarget, nextRound, PINNED };
+module.exports = { ROOT, CUSTOM_DIR, Fail, fail, parseArgs, closeMatches, didYouMean, readLook, checkLook, checkStyle, resolveTarget, nextRound, PINNED, HEX, COLOR_KEYS };

@@ -85,6 +85,7 @@
     return rows.map(r => {
       const p = r.split('—').map(x => x.trim()).filter((x, i) => i === 0 || x);
       const row = { title: p[0] };
+      if (/^>\s*/.test(p[0])) { row.picked = true; row.title = p[0].replace(/^>\s*/, ''); }   // "> row" is the selected row
       const trail = t => `${A.e(t)}${A.chev()}`;
       if (p.length === 2) { if (p[1].length > LONG) { row.sub = p[1]; row.trail = A.chev(); } else row.trail = trail(p[1]); }
       else if (p.length >= 3) {
@@ -97,7 +98,14 @@
     });
   }
 
+  // ~~text~~ is struck-through text. The block HTML is already escaped, so only text between tags is touched.
   function blockHtml(A, X, b, ctx) {
+    return blockHtmlRaw(A, X, b, ctx).replace(/>([^<>]*~~[^<>]*)</g, (m, t) => '>' + t.replace(/~~(.+?)~~/g, '<del>$1</del>') + '<');
+  }
+
+  const CALLOUT_TONES = { info: 'info', success: 'ok', warning: 'warn', error: 'err' };
+
+  function blockHtmlRaw(A, X, b, ctx) {
     const pr = b.props || {};
     const meta = pr.meta ? `<p class="ps-meta">${A.mid(pr.meta)}</p>` : '';
     switch (b.type) {
@@ -133,6 +141,15 @@
           `<div class="ab-card sb-k-card ps-stat"${A.win(l)}><p class="ab-label">${A.e(l)}</p><p class="ab-card-title ps-stat-v">${A.e(v)}</p></div>`).join('')}</div>`;
       }
       case 'chart': return chartHtml(A, b);
+      case 'callout': {
+        const tone = CALLOUT_TONES[String(pr.tone || '').trim().toLowerCase()] ? String(pr.tone).trim().toLowerCase() : 'info';
+        return `<div class="sb-k-callout ps-callout" data-tone="${tone}" role="${tone === 'error' ? 'alert' : 'status'}">${A.icon(CALLOUT_TONES[tone], 20)}<div><span>${A.mid(b.text)}</span>${pr.action ? ` <button type="button" class="sb-k-textbtn ps-callout-act" tabindex="-1">${A.e(pr.action)}</button>` : ''}</div></div>`;
+      }
+      case 'progress': {
+        const v = Number.isFinite(parseFloat(pr.value)) ? Math.max(0, Math.min(1, parseFloat(pr.value))) : 0;
+        const pct = Math.round(v * 100);
+        return `<div class="sb-k-progress ps-progress"><div class="sb-k-slider-h"><span>${A.mid(b.text)}</span><span>${pr.meta ? A.mid(pr.meta) : pct + '%'}</span></div><span class="ab-row-bar sb-k-bar" role="progressbar" aria-valuenow="${pct}" aria-valuemin="0" aria-valuemax="100"><i style="width:${pct}%"></i></span></div>`;
+      }
       case 'segmented': {
         const opts = parts(pr.options);
         if (!opts.length) return '';

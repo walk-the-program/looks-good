@@ -897,6 +897,19 @@ check('paste: empty text', run(`extractColors('').length`) === 0, 'found colors 
     check('product: a bare text has no product and warns; a sheet with only a screen still returns a product',
       bad[3].product === null && bad[3].warnings.length > 0 && bad[4].product !== null && bad[4].product.screens.length === 1 && bad[4].warnings.some(w => /Unknown block type/.test(w.message)), JSON.stringify(bad[3].warnings));
 
+    // v2 blocks: selected rows, callout, progress, strike; unknown blocks keep the rest in rank order
+    {
+      const sh = '# Product: P\nPurpose: p\nCore action: c\n## Screen: A\nJob: j\nPrimary action: none\nContent:\n1. text: ~~um~~ hello\n2. wobble: x\n3. list: History | rows: > Today 9:41 — Pramand call; Yesterday — Notes\n4. callout: Saved | tone: warning | action: Undo\n5. progress: Upload | value: 0.4 | meta: 2 of 5\n6. callout: Plain';
+      mc.SH2 = sh;
+      const r = M(`parseProductSheet(SH2, 's')`), bl = r.product.screens[0].blocks;
+      check('product: an unknown block between known ones keeps the rest in rank order with no out-of-order warning',
+        JSON.stringify(bl.map(b => [b.rank, b.type])) === '[[1,"text"],[2,"list"],[3,"callout"],[4,"progress"],[5,"callout"]]'
+        && r.warnings.length === 1 && /Unknown block type "wobble"/.test(r.warnings[0].message) && r.product.screens[0].notes.includes('wobble: x'), JSON.stringify(r.warnings));
+      check('product: list rows keep the ">" selected marker, callout and progress props parse',
+        bl[1].props.rows === '> Today 9:41 — Pramand call; Yesterday — Notes' && bl[2].props.tone === 'warning' && bl[2].props.action === 'Undo'
+        && bl[3].props.value === '0.4' && bl[3].props.meta === '2 of 5' && bl[4].text === 'Plain' && bl[0].text === '~~um~~ hello', JSON.stringify(bl));
+    }
+
     // platform and mac chrome
     const PL = M(`(() => { const mk = (plat, tabs, chromes) => '# Product: P\\nPurpose: p\\nCore action: c\\n' + plat + (tabs ? 'Tabs: A, B\\n' : '') + chromes.map((c, i) => '## Screen: S' + i + '\\nJob: j\\nPrimary action: none\\n' + (c ? 'Chrome: ' + c + '\\n' : '') + 'Content:\\n1. text: hi\\n').join('');
       const r = (plat, tabs, chromes) => { const x = parseProductSheet(mk(plat, tabs, chromes), 's'); return { plat: x.product.platform, ch: x.product.screens.map(s => s.chrome), w: x.warnings.map(w => w.line + ':' + w.message) }; };

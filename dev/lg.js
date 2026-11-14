@@ -19,8 +19,9 @@ Learn the styles
       node dev/lg.js styles --query glass
   style <key>                         meta, build recipe, do/don't rules, fonts; custom styles also moves and kit materials
       node dev/lg.js style soft-form
-  components                          the UI kit: id, group, name, use, states, iOS mapping
-      node dev/lg.js components
+  components [--spec]                 the UI kit: id, group, name, use, states, iOS mapping, and the spec kit name(s) that style it
+      node dev/lg.js components            (--spec lists every spec-v2 "kit" name with the valid material and state names)
+      node dev/lg.js components --spec --json
   fonts                               the font library by category (names to use in look.json)
       node dev/lg.js fonts
   moves                               the spec-v2 move catalog (same as aesthetic-check.js --list-moves)
@@ -31,6 +32,10 @@ See how a style draws a component (real computed values, motion timing, the matc
       node dev/lg.js inspect btn-primary --style soft-form --png /tmp/btn.png
   compare <component> --styles a,b,c [--state s] [--look file] [--mode light|dark] [--png strip.png]
       node dev/lg.js compare btn-primary --styles soft-form,raw-brutalist,liquid-glass --png /tmp/strip.png
+
+See the colours a look resolves to
+  palette [--primary #hex] [--scheme s] [--look file]   the state.colors the screens are drawn with (default: the preview brand)
+      node dev/lg.js palette --primary #7f8cc6
 
 Render an app's own screens and export the build pack
   screens <key|folder> [--look file] [--sheet file] [--round n] [--out dir]
@@ -44,8 +49,12 @@ Options
   <key|folder>   a registered style key, or a spec-v2 folder (an unlisted folder is packed and imported under a
                  temporary key for the run and removed afterwards)
   look.json      { app, brandName, style, blend, primary, scheme, colors, heading, body, typography, pureBg, modes }
+                 colors is optional and partial: { primary, secondary, accent, neutralDark, neutralLight } as #rrggbb, each one
+                 replaces the value derived from primary + scheme (the others stay derived); unknown keys warn.
+                 See the resolved palette: node dev/lg.js palette --primary #7f8cc6 --scheme analogous
                  no look file = the checker's preview brand (primary #2f5d8a, analogous, Inter / Inter)
-Everything runs headless and in memory; writes go only to <folder>/app/ or the --out path. Exit 1 on any error.`;
+Everything runs headless and in memory; writes go only to <folder>/app/ or the --out path.
+Exit 0 when the output was written (pack prints brief-gate and lint findings as NOTE lines, and as "notes" in --json); exit 1 when nothing was written.`;
 
 /* ------------------------------------------------------------------ page session */
 const cleanups = [];
@@ -128,7 +137,27 @@ async function cmdStyle(a) {
   out(s, a.flags, F.style(s));
 }
 
-async function cmdComponents(a) { const P = await openPage(a.flags, {}); const rows = await P.call('components'); out(rows, a.flags, F.components(rows)); }
+async function cmdComponents(a) {
+  const P = await openPage(a.flags, {});
+  if (a.flags.spec) { const c = await P.call('specCatalog'); return out(c, a.flags, F.specCatalog(c)); }
+  const r = await P.call('components');
+  const o = { components: r.rows, specOnly: r.unmatched };
+  out(o, a.flags, F.components({ rows: r.rows, specOnly: r.unmatched }));
+}
+async function cmdPalette(a) {
+  const warnings = [];
+  const look = lookFor(a, warnings, null);
+  if (a.flags.primary) { if (!U.HEX.test(a.flags.primary)) fail(`--primary "${a.flags.primary}" is not a #rrggbb colour`); look.primary = a.flags.primary; }
+  if (a.flags.scheme) look.scheme = a.flags.scheme;
+  const P = await openPage(a.flags, {});
+  U.checkLook(look, P.known);
+  warnings.forEach(warn);
+  const r = await P.call('palette', { primary: look.primary, scheme: look.scheme, colors: look.colors });
+  const o = { primary: r.primary, scheme: r.scheme, hue: r.hue, colors: r.resolved, derived: r.derived, fromLook: r.overridden, look: look.file };
+  out(o, a.flags, `palette for primary ${r.primary}, scheme ${r.scheme}, hue ${r.hue}${look.file ? ' (look ' + path.basename(look.file) + ')' : ''}\n` +
+    U.COLOR_KEYS.map(k => `  ${k.padEnd(12)} ${r.resolved[k]}${r.overridden.includes(k) ? '   (from look.json colors; derived would be ' + r.derived[k] + ')' : ''}`).join('\n') +
+    `\nThis is state.colors. In look.json, "colors": { ... } takes any subset of these keys.`);
+}
 async function cmdFonts(a) { const P = await openPage(a.flags, {}); const rows = await P.call('fonts'); out(rows, a.flags, F.fonts(rows)); }
 
 function cmdMoves(a) {
@@ -151,8 +180,8 @@ function lookFor(a, warnings, folder, optionalFolderFile) {
 }
 
 async function cmdInspect(a, compare) {
-  const component = a._[1];
-  if (!component) fail(`${compare ? 'compare' : 'inspect'} needs a component id: node dev/lg.js components`);
+  const component0 = a._[1];
+  if (!component0) fail(`${compare ? 'compare' : 'inspect'} needs a component id: node dev/lg.js components`);
   const list = compare ? String(a.flags.styles || '').split(',').map(s => s.trim()).filter(Boolean) : (a.flags.style ? [a.flags.style] : []);
   if (compare && list.length < 2) fail('compare needs --styles a,b[,c...] (two or more)');
   if (!compare && !list.length) {
@@ -166,7 +195,14 @@ async function cmdInspect(a, compare) {
   const extras = {}, specs = list.map((s, i) => prepareStyle(s, i, extras));
   const P = await openPage(a.flags, extras, { lab: specs.some(s => s.lab) });
   await importStyles(P, specs);
-  if (!P.known.components.includes(component)) fail(`unknown component "${component}".${U.didYouMean(component, P.known.components) || ' List them with: node dev/lg.js components'}`);
+  let component = component0;
+  if (!P.known.components.includes(component) && P.known.specKit.includes(component)) {
+    const ids = (await P.call('resolveKit', { name: component })).ids;
+    if (!ids.length) fail(`"${component}" is a spec kit name but no UI kit specimen draws it. List them with: node dev/lg.js components`);
+    warn(`"${component}" is a spec kit name; showing UI kit "${ids[0]}"${ids.length > 1 ? ` (it also styles: ${ids.slice(1, 4).join(', ')})` : ''}`);
+    component = ids[0];
+  }
+  if (!P.known.components.includes(component)) fail(`unknown component "${component}".${U.didYouMean(component, P.known.components.concat(P.known.specKit)) || ' List them with: node dev/lg.js components'}`);
   specs.forEach(s => U.checkStyle(s.key, P.known));
   U.checkLook(look, P.known);
   warnings.forEach(warn);
@@ -291,10 +327,10 @@ async function cmdPack(a) {
   mkdirp(path.dirname(outFile));
   fs.writeFileSync(outFile, r.md);
   const notes = ap.warnings.map(w => `sheet line ${w.line}: ${w.message}`);
-  if (r.blocked) notes.push('brief gate (the app would block this export): ' + r.blocked);
-  r.issues.forEach(m => notes.push('brief lint: ' + m));
+  if (r.blocked) notes.push('brief gate (the app would block Copy/Download until fixed, the pack is written anyway): ' + r.blocked);
+  r.issues.forEach(m => { if (m !== r.blocked) notes.push('brief lint: ' + m); });
   const o = { out: outFile, bytes: Buffer.byteLength(r.md), style: spec.label, target: r.target, surface: r.surface, notes };
-  out(o, a.flags, `build pack for ${spec.label} (target ${r.target}, surface ${r.surface}) -> ${outFile} (${(o.bytes / 1024).toFixed(1)} KB)` + (notes.length ? '\nnotes (the pack was written anyway):\n' + notes.map(n => '  ' + n).join('\n') : ''));
+  out(o, a.flags, `build pack for ${spec.label} (target ${r.target}, surface ${r.surface}) -> ${outFile} (${(o.bytes / 1024).toFixed(1)} KB)` + (notes.length ? '\n' + notes.map(n => 'NOTE: ' + n).join('\n') : ''));
 }
 
 /* ------------------------------------------------------------------ main */
@@ -302,7 +338,7 @@ async function main() {
   const a = U.parseArgs(process.argv.slice(2));
   const cmd = a._[0];
   if (a.flags.help || !cmd || cmd === 'help') { console.log(USAGE); return cmd || a.flags.help ? 0 : 1; }
-  const table = { styles: cmdStyles, style: cmdStyle, components: cmdComponents, fonts: cmdFonts, moves: cmdMoves, inspect: x => cmdInspect(x, false), compare: x => cmdInspect(x, true), screens: cmdScreens, pack: cmdPack };
+  const table = { styles: cmdStyles, style: cmdStyle, components: cmdComponents, fonts: cmdFonts, palette: cmdPalette, moves: cmdMoves, inspect: x => cmdInspect(x, false), compare: x => cmdInspect(x, true), screens: cmdScreens, pack: cmdPack };
   if (!table[cmd]) fail(`unknown command "${cmd}".${U.didYouMean(cmd, Object.keys(table))} See: node dev/lg.js --help`);
   await table[cmd](a);
   return 0;

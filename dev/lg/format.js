@@ -49,13 +49,26 @@ function style(s) {
   return L.filter(Boolean).join('\n');
 }
 
-function components(rows) {
+function components(data) {
+  const rows = data.rows;
   const L = []; let g = '';
   rows.forEach(r => {
     if (r.group !== g) { g = r.group; L.push(`\n${g}`); }
     L.push(`  ${r.id.padEnd(14)} ${r.name} - ${r.use}  [states: ${r.states.join(', ')}; ios: ${r.ios}${r.web ? '; web only' : ''}]`);
+    const sp = r.spec.length ? r.spec.join(', ') : '-';
+    L.push(`  ${''.padEnd(14)} spec kit name: ${sp}${r.specInside.length ? '   (also inside: ' + r.specInside.join(', ') + ')' : ''}`);
   });
-  return L.join('\n').trim() + `\n${rows.length} components. Inspect one: node dev/lg.js inspect <id> --style <key>`;
+  const only = data.specOnly.length ? `\nSpec kit names with no UI kit specimen of their own: ${data.specOnly.join(', ')}` : '';
+  return L.join('\n').trim() + only + `\n${rows.length} components. Inspect one: node dev/lg.js inspect <id or spec kit name> --style <key>\nSpec kit names, materials and states for a spec-v2 "kit" map: node dev/lg.js components --spec`;
+}
+
+function specCatalog(c) {
+  const L = [`Kit names for a spec-v2 "kit" map (${c.components.length}); each takes { "material": <name>, "state": <name or [names]>, "params"?, "scope"? }`];
+  c.components.forEach(k => L.push(`  ${k.name.padEnd(18)} ${k.ui.length ? 'UI kit: ' + k.ui.join(', ') : '(no UI kit specimen of its own)'}`));
+  L.push(`\nMaterials (${c.materials.length}), the "material" value:`, wrap(c.materials.map(m => m.name + (m.move && m.move !== m.name ? ' (' + m.move + ')' : '')).join(', '), 110, '  '));
+  L.push(`\nStates (${c.states.length}), the "state" value (a name or an array of names):`, wrap(c.states.map(m => m.name + (m.move && m.move !== m.name ? ' (' + m.move + ')' : '')).join(', '), 110, '  '));
+  L.push('\nA name in brackets is the move that provides it (node dev/lg.js moves). Names are exact: the focus state is focus-outline, not focus-ring.');
+  return L.join('\n');
 }
 
 function fonts(rows) {
@@ -134,4 +147,4 @@ function compare(res) {
   return L.join('\n');
 }
 
-module.exports = { styles, style, components, fonts, inspect, compare };
+module.exports = { styles, style, components, specCatalog, fonts, inspect, compare };

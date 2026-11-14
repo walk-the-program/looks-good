@@ -52,7 +52,7 @@ Rules:
 | `action-secondary` | Button label | `meta`, `pin: bottom` | Secondary button |
 | `link` | Link label | | Text link |
 | `card` | Card title | `meta`, `body` | Card |
-| `list` | Group label | `rows` (`;`-separated; `—` splits title — value — detail) | List group with rows |
+| `list` | Group label | `rows` (`;`-separated; `—` splits title — value — detail; a row that starts with `>` is the selected row) | List group with rows; the `>` row gets the style's selected list-row treatment |
 | `stats` | Group label | `items` (`;`-separated `Label = Value`) | Stat row / tiles |
 | `chart` | Caption | `points` (comma numbers) | Sparkline in the style's chart colour |
 | `segmented` | Group label | `options` (`;`), `selected` | Segmented control |
@@ -60,6 +60,19 @@ Rules:
 | `field` | Field label | `value`, `placeholder` | Input field |
 | `keypad` | (empty) | `keys` (default `1 2 3 4 5 6 7 8 9 . 0 ⌫`); always pinned to the bottom | Number keypad grid from kit keys/buttons |
 | `tiles` | Caption | `values` (comma; 0–1 each) | Tile strip in tonal steps |
+| `callout` | The message | `tone` (`info` default, `success`, `warning`, `error`), `action` (label of an inline text button) | Callout, tinted and iconed per tone; `error` reads as an alert |
+| `progress` | Label | `value` (0 to 1), `meta` (right-hand text; default is the percent) | Progress bar with its label row |
+
+Inline in any block's main text, in `rows` and in `meta`: `~~text~~` draws as struck-through text (`<del>`). The text is escaped first, so only the tildes carry meaning.
+
+```markdown
+6. list: History | rows: > Today 9:41 — Pramand call — 12 min; Yesterday — Notes; ~~Mon~~ Tue — Standup
+7. callout: Sync paused until you reconnect | tone: warning | action: Retry
+8. progress: Uploading 3 files | value: 0.62 | meta: 2 of 3
+9. text: ~~um~~ the plan is simple
+```
+
+An unknown block type warns with its line number and the line is kept in the screen's `notes`. The blocks around it keep their order and rank (1 to N over the blocks that were kept), and a missing number from the dropped line does not warn.
 
 ## Data model (what the parser returns)
 

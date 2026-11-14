@@ -14,7 +14,7 @@
     window.showToast = () => {};
     return {
       styles: AESTHETICS.map(a => a.key), fonts: FONTS.map(f => f.name), schemes: Object.keys(COLOR_SCHEMES),
-      components: UI_KIT.flatMap(g => g.items.map(i => i.id)),
+      components: UI_KIT.flatMap(g => g.items.map(i => i.id)), specKit: Object.keys(KIT_COMPONENTS),
       exportInto: !!(window.ProductScreens && typeof ProductScreens.exportInto === 'function'),
     };
   };
@@ -49,8 +49,76 @@
     return out;
   };
 
-  L.components = () => UI_KIT.flatMap(g => g.items.map(i => ({ id: i.id, group: g.group, name: i.name, use: i.use, states: i.states, ios: i.ios, web: !!i.web })));
-  L.fonts = () => FONTS.map(f => ({ name: f.name, category: f.category, cls: f.cls || '', weights: f.weights || '', italic: !!f.ital }));
+  /* Which spec-v2 kit names (KIT_COMPONENTS) style which UI kit ids: a name's selector fragments are matched against the drawn
+     .sb-k-cell[data-k=<id>] specimens. depth = how deep inside the specimen the nearest match sits (0 = the specimen's own
+     element). `spec` lists names matching at depth <= 2 (what the specimen shows), `inside` the ones that only style a part
+     deeper in (a button inside a dialog, a row inside a menu). */
+  const DIRECT_DEPTH = 2;
+  function kitMap() {
+    const st = stage();
+    const host = document.createElement('div');
+    host.className = 'sb-view'; host.style.cssText = 'width:944px;';
+    st.appendChild(host);
+    SeeBuilt.kitInto(host, { mode: 'light' });
+    const names = Object.keys(KIT_COMPONENTS);
+    const depthOf = (root, el) => { let d = 0; for (let n = el; n && n !== root; n = n.parentElement) d++; return d; };
+    const minDepth = (spec, frags) => {
+      let best = Infinity;
+      frags.forEach(f => { try { if (spec.matches(f)) best = Math.min(best, 0); spec.querySelectorAll(f).forEach(el => { best = Math.min(best, depthOf(spec, el)); }); } catch (e) { /* unusable fragment */ } });
+      return best;
+    };
+    const byId = {}, used = new Set();
+    UI_KIT.forEach(g => g.items.forEach(i => {
+      const cell = host.querySelector(`.sb-k-cell[data-k="${i.id}"]`);
+      const hits = [];
+      byId[i.id] = { hits, direct: [], inside: [] };
+      if (!cell) return;
+      const specs = Array.from(cell.querySelectorAll('.sb-k-spec'));
+      names.forEach(n => {
+        const d = Math.min(Infinity, ...specs.map(sp => minDepth(sp, KIT_COMPONENTS[n])));
+        if (d === Infinity) return;
+        used.add(n); hits.push({ name: n, depth: d });
+      });
+      hits.sort((a, b) => a.depth - b.depth);
+      byId[i.id].direct = hits.filter(h => h.depth <= DIRECT_DEPTH).map(h => h.name);
+      byId[i.id].inside = hits.filter(h => h.depth > DIRECT_DEPTH).map(h => h.name);
+    }));
+    stage().remove();
+    return { byId, unmatched: names.filter(n => !used.has(n)) };
+  }
+
+  L.components = () => {
+    const map = kitMap();
+    return {
+      rows: UI_KIT.flatMap(g => g.items.map(i => ({ id: i.id, group: g.group, name: i.name, use: i.use, states: i.states, ios: i.ios, web: !!i.web, spec: map.byId[i.id].direct, specInside: map.byId[i.id].inside }))),
+      unmatched: map.unmatched,
+    };
+  };
+
+  /* every kit name a spec-v2 `kit` map may use, with the material and state names it may be given */
+  L.specCatalog = () => {
+    const mats = Object.keys(SPEC_LAB.materials).sort().map(n => ({ name: n, move: SPEC_LAB.materials[n].move && SPEC_LAB.materials[n].move.id }));
+    const states = Object.keys(SPEC_LAB.states).sort().map(n => ({ name: n, move: SPEC_LAB.states[n].move && SPEC_LAB.states[n].move.id }));
+    const map = kitMap();
+    return { components: Object.keys(KIT_COMPONENTS).map(n => ({ name: n, ui: rankIds(map, n).slice(0, 3) })), materials: mats, states };
+  };
+
+  // spec kit name -> the UI kit ids it styles, best first: the nearest match to the specimen's own element, then the cell
+  // that is styled by the fewest other names (the specimen that is "about" this component), then kit order.
+  const rankIds = (map, name) => {
+    const order = UI_KIT.flatMap(g => g.items.map(i => i.id));
+    const ids = order.map((id, k) => { const r = map.byId[id], h = r.hits.find(x => x.name === name); return h ? { id, depth: h.depth, n: r.direct.length, k } : null; })
+      .filter(Boolean).sort((a, b) => a.depth - b.depth || a.n - b.n || a.k - b.k).map(x => x.id);
+    return ids;
+  };
+  L.resolveKit = ({ name }) => ({ ids: KIT_COMPONENTS[name] ? rankIds(kitMap(), name) : [] });
+
+  // The palette a look resolves to (state.colors): derived from primary + scheme, then look.colors merged over it.
+  L.palette = ({ primary, scheme, colors }) => {
+    const derived = derivePalette(primary, scheme);
+    const resolved = Object.assign({}, derived, colors || {});
+    return { primary, scheme, hue: Math.round(hexToHsl(resolved.primary).h), derived, resolved, overridden: Object.keys(colors || {}) };
+  };
 
   /* ---------- the look ---------- */
   // look: { style, brandName, primary, scheme, colors, heading, body, typography, pureBg, blend }. Returns the sheet warnings.
@@ -60,8 +128,8 @@
     saved.aestheticVersion = 'current';
     saved.headingFontName = look.heading; saved.bodyFontName = look.body;
     saved.scheme = look.scheme;
-    saved.colors = look.colors || derivePalette(look.primary, look.scheme);
-    saved.hue = Math.round(hexToHsl(look.primary).h);
+    saved.colors = Object.assign(derivePalette(look.primary, look.scheme), look.colors || {});   // colors: partial, merged over the derived palette
+    saved.hue = Math.round(hexToHsl(saved.colors.primary).h);
     saved.bgMode = mode || 'light';
     saved.pureBg = look.pureBg === true;
     saved.blend = look.blend || null;

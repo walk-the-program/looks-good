@@ -1,0 +1,4 @@
+{ "app": "Youch!", "repo": "~/Desktop/Projects/TTS+", "brandName": "Youch!",
+  "style": "youch-marker-proof", "blend": null, "primary": "#8290c7", "scheme": "analogous",
+  "colors": { "secondary": "#dde1f2", "accent": "#f6cf6b", "neutralDark": "#101116", "neutralLight": "#fafaf7" },
+  "heading": "Manrope", "body": "Inter", "typography": null, "pureBg": false, "modes": ["light", "dark"] }
