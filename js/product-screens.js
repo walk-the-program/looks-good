@@ -14,12 +14,15 @@
 
    Entry points:
      ProductScreens.renderInto(host, state, opts)   draw the tab into `host`
-     ProductScreens.compPng(state, screenId, mode)  Promise<Uint8Array> PNG, 390 x 844 at 2x
+     ProductScreens.compPng(state, screenId, mode)  Promise<Uint8Array> PNG at 2x: 390 x 844 (iPhone) or 1280 x 800 (Mac)
+     ProductScreens.exportInto(host, state, screenId, mode)  one comp at 1:1 into `host`; returns { width, height }
+   A product's `Platform: mac` draws Mac windows (1280 x 800, title bar, sidebar, centred column) instead of phones.
    The kit pieces come from SeeBuilt.api (js/see-built.js). Plain <script>, no modules.
 ------------------------------------------------------------------------ */
 
 (function () {
-  const PHONE_H = 844;
+  const PHONE_H = 844, PHONE_W = 390;
+  const MAC_W = 1280, MAC_H = 800;
   const TAB_H = 83;       // UI_KIT_PHONE.tabBarHeight, home-indicator area included
   const HOME_H = 34;      // home indicator area when there is no tab bar
   const api = () => (window.SeeBuilt && window.SeeBuilt.api) || null;
@@ -160,7 +163,7 @@
   /* ---------------- chrome ---------------- */
 
   const TAB_ICON_RULES = [[/home|today|feed/i, 'home'], [/stat|progress|chart|insight|report/i, 'chart'], [/setting|more/i, 'gear'], [/profile|account|^me$/i, 'user'],
-    [/people|team|friend|social/i, 'users'], [/shop|bag|order|box|store/i, 'box'], [/search|explore/i, 'search'], [/save|fav|like/i, 'heart'], [/mode|list|browse|library|plan/i, 'list']];
+    [/people|team|friend|social/i, 'users'], [/shop|bag|order|box|store/i, 'box'], [/search|explore/i, 'search'], [/save|fav|like/i, 'heart'], [/mode|list|browse|library|plan/i, 'list'], [/file|folder|document|doc/i, 'folder'], [/convert|export|share/i, 'share']];
   const TAB_ICON_CYCLE = ['home', 'list', 'chart', 'heart', 'user'];
   const tabIcon = (name, i) => (TAB_ICON_RULES.find(r => r[0].test(name)) || [0, TAB_ICON_CYCLE[i % TAB_ICON_CYCLE.length]])[1];
 
@@ -183,6 +186,7 @@
   // The phone screen for `screen` in the look of context X. opts.fold: draw the fold line and
   // the below-the-fold veil (the Product tab); false for the PNG comp.
   function screenHtml(A, X, product, screen, opts) {
+    if (product.platform === 'mac') return macHtml(A, X, product, screen, opts);
     const o = opts || {};
     const blocks = (screen.blocks || []).slice().sort((p, q) => p.rank - q.rank);
     // pin: bottom (actions) and the keypad sit in a bottom bar above the tab bar or home indicator
@@ -205,7 +209,7 @@
     const pinHtml = pins.map(b => `<div class="ps-pb" data-type="${A.e(b.type)}">${blockHtml(A, X, b, ctx)}</div>`).join('');
     const top = screen.chrome === 'topbar'
       ? `<div class="ps-top">${A.kTopbar(A.kPlain('back', 'Back'), A.e(screen.name), '')}</div>` : '';
-    const cls = ['sb-screen', 'sb-kit', 'ps-screen', o.fold ? 'has-fold' : 'is-comp', withTabs ? 'has-tabs' : '', `ps-chrome-${screen.chrome || 'topbar'}`].filter(Boolean).join(' ');
+    const cls = ['sb-screen', 'sb-kit', 'ps-screen', o.fold ? 'has-fold' : 'is-comp', o.exp ? 'ps-export' : '', withTabs ? 'has-tabs' : '', `ps-chrome-${screen.chrome || 'topbar'}`].filter(Boolean).join(' ');
     return `${A.rootOpen(X, cls, ` data-fold-y="${foldY}" data-screen="${A.e(screen.id)}"`)}
       <div class="sb-phone-in ps-in">
         ${A.statusBar()}
@@ -215,6 +219,55 @@
         ${withTabs ? tabBarHtml(A, product, screen) : ''}
         <div class="sb-homebar" aria-hidden="true"></div>
         ${o.fold ? `<div class="ps-veil" aria-hidden="true" style="top:${foldY}px"></div><div class="ps-fold" aria-hidden="true" style="top:${foldY}px"><span>Fold${withTabs ? ' · tab bar' : ''}</span></div>` : ''}
+      </div></section>`;
+  }
+
+
+  /* ---------------- the Mac window ---------------- */
+
+  // A 1280 x 800 window: title bar (neutral traffic lights, the screen name), an optional sidebar source list
+  // from the Tabs, and the content in a readable column. Everything is kit classes (top bar, nav rows, buttons,
+  // lists...), so each style draws the window its own way. pin: bottom blocks sit in a bar at the foot of the
+  // content area. Taller content is drawn in full, with the fold line and veil the phone comps use.
+  function macHtml(A, X, product, screen, opts) {
+    const o = opts || {};
+    const blocks = (screen.blocks || []).slice().sort((p, q) => p.rank - q.rank);
+    const isPin = b => b.type === 'keypad' || ((b.type === 'action' || b.type === 'action-secondary') && /^bottom$/i.test((b.props && b.props.pin) || ''));
+    const flow = blocks.filter(b => !isPin(b)), pins = blocks.filter(isPin);
+    const tabs = tabNames(product);
+    const chrome = screen.chrome || 'toolbar';
+    const side = chrome === 'sidebar' && tabs.length > 0;
+    const acts = blocks.filter(b => b.type === 'action');
+    const primary = acts.find(b => screen.primary && b.text.toLowerCase() === String(screen.primary).toLowerCase()) || acts[0];
+    const ctx = { primaryRank: primary ? primary.rank : -1 };
+    let prev = null;
+    const body = flow.map(b => {
+      const html = blockHtml(A, X, b, ctx);
+      if (!html) return '';
+      const gap = gapOf(prev, b);
+      const hero = prev === null && b === blocks[0];
+      prev = b;
+      return `<div class="ps-b" data-type="${A.e(b.type)}" data-gap="${gap}"${hero ? ' data-hero="1"' : ''}>${html}</div>`;
+    }).join('');
+    const pinHtml = pins.map(b => `<div class="ps-pb" data-type="${A.e(b.type)}">${blockHtml(A, X, b, ctx)}</div>`).join('');
+    const lights = '<span class="ps-lights" aria-hidden="true"><i></i><i></i><i></i></span>';
+    const tools = chrome === 'toolbar' ? `<span class="ps-mac-tools">${A.kPlain('search', 'Search')}${A.kPlain('more', 'More')}</span>` : '';
+    const nav = side ? `<aside class="sb-side ps-mac-side"><nav class="sb-nav" aria-label="${A.e(product.name || 'App')}">${tabs.map((t, i) => {
+      const on = slug(t) === screen.id || t.toLowerCase() === screen.name.toLowerCase();
+      return `<button type="button" class="sb-navi" tabindex="-1"${on ? ' aria-current="page"' : ''}>${A.icon(tabIcon(t, i), 18)}<span>${A.e(t)}</span></button>`;
+    }).join('')}</nav></aside>` : '';
+    const cls = ['sb-screen', 'sb-kit', 'ps-screen', 'ps-mac', o.fold ? 'has-fold' : 'is-comp', o.exp ? 'ps-export' : '', side ? 'has-side' : '', `ps-chrome-${chrome}`].filter(Boolean).join(' ');
+    // The window is wider than 600 px, which would switch on a board's hero scene rules (white headline); app screens have no hero art.
+    const open = A.rootOpen(X, cls, ` data-fold-y="${MAC_H}" data-screen="${A.e(screen.id)}"`).replace(/ data-hero="[^"]*"/, '');
+    return `${open}
+      <div class="ps-mac-in">
+        <div class="sb-k-topbar ps-mac-title">${lights}<span class="sb-k-tb-title">${A.e(screen.name)}</span>${tools || '<span></span>'}</div>
+        <div class="ps-mac-body">
+          ${nav}
+          <div class="ps-mac-main"><div class="ps-mac-col">${body}</div></div>
+        </div>
+        ${pinHtml ? `<div class="ps-pinbar">${pinHtml}</div>` : ''}
+        ${o.fold ? `<div class="ps-veil" aria-hidden="true" style="top:${MAC_H}px"></div><div class="ps-fold" aria-hidden="true" style="top:${MAC_H}px"><span>Fold</span></div>` : ''}
       </div></section>`;
   }
 
@@ -331,11 +384,13 @@
     const states = screen.states || {};
     const stateRows = [['Empty', states.empty], ['Loading', states.loading], ['Error', states.error], ['First run', states.firstRun]]
       .map(([k, v]) => `<li><b>${k}</b> ${esc(v || 'not specified')}</li>`).join('');
-    const phone = (X, label) => `<figure class="ps-phone"><div class="sb-dev ps-dev" inert><div class="sb-phone-frame"><span class="sb-island" aria-hidden="true"></span>${screenHtml(A, X, product, screen, { fold: true })}</div></div><figcaption>${label}</figcaption></figure>`;
+    const mac = product.platform === 'mac';
+    const win = (X, label) => `<figure class="ps-phone ps-winfig"><div class="ps-win" inert><div class="ps-win-in">${screenHtml(A, X, product, screen, { fold: true })}</div></div><figcaption>${label}</figcaption></figure>`;
+    const phone = (X, label) => mac ? win(X, label) : `<figure class="ps-phone"><div class="sb-dev ps-dev" inert><div class="sb-phone-frame"><span class="sb-island" aria-hidden="true"></span>${screenHtml(A, X, product, screen, { fold: true })}</div></div><figcaption>${label}</figcaption></figure>`;
     const hint = ui.hint[screen.id] ? `<p class="ps-hint" role="alert">${esc(ui.hint[screen.id])}</p>` : '';
     const noteBlock = s.ap && s.ap.note && ui.drafts[screen.id] == null ? `<p class="ps-note-shown"><b>Your note</b> ${esc(s.ap.note)}</p>` : '';
     return `<article class="ps-card" data-screen="${esc(screen.id)}" data-status="${s.key}">
-      <div class="ps-pair">${phone(Xl, 'Light')}${phone(Xd, 'Dark')}</div>
+      <div class="ps-pair${mac ? ' is-mac' : ''}">${phone(Xl, 'Light')}${phone(Xd, 'Dark')}</div>
       <div class="ps-info">
         <header class="ps-info-h"><h3>${esc(screen.name)}</h3><span class="ps-chip" data-status="${s.key}">${esc(s.label)}</span></header>
         <p class="ps-job">${esc(screen.job)}</p>
@@ -395,7 +450,7 @@
     const tabs = product.tabs && product.tabs.length ? product.tabs.join(', ') : '';
     host.innerHTML = `<header class="ps-head">
         <div class="ps-head-t"><p class="ps-eyebrow">Product sheet${product.source ? ' · ' + esc(product.source) : ''}</p><h2>${esc(product.name)}</h2><p class="ps-lede">${esc(product.purpose)}</p>
-          <dl class="ps-facts">${infoRow('Core action', product.coreAction)}${infoRow('Tabs', tabs)}</dl></div>
+          <dl class="ps-facts">${infoRow('Core action', product.coreAction)}${infoRow('Platform', product.platform === 'mac' ? 'Mac · 1280 × 800 window' : '')}${infoRow('Tabs', tabs)}</dl></div>
         <div class="ps-head-a"><button type="button" class="btn" data-ps="replace">Replace</button><button type="button" class="btn btn-ghost" data-ps="remove">Remove product</button></div>
       </header>
       ${ui.replace ? loaderHtml(true) : ''}${warningsHtml()}
@@ -412,6 +467,7 @@
   // (section gaps 28 to 20, chart 64pt, hero numeral one step down); only what still overflows is
   // veiled. The pinned bottom bar always sits just above the tab bar or home indicator.
   function fitScreen(scr) {
+    if (scr.classList.contains('ps-mac')) return fitMac(scr);
     const inn = scr.querySelector('.ps-in');
     if (!inn) return 0;
     const foldY = Number(scr.dataset.foldY);
@@ -438,12 +494,42 @@
     return bottom + (parseFloat(getComputedStyle(inn).paddingBottom) || 0);
   }
 
+
+  // The Mac window: the content column is compacted a step at a time like the phone's, the pin bar sits at the
+  // foot of the 800 px viewport, and whatever still runs past it is veiled. Returns the window's full height.
+  function fitMac(scr) {
+    const inn = scr.querySelector('.ps-mac-in');
+    if (!inn) return 0;
+    const bar = scr.querySelector('.ps-pinbar');
+    const barH = bar ? bar.offsetHeight : 0;
+    if (bar) bar.style.top = (MAC_H - barH - 20) + 'px';
+    const limit = MAC_H - (bar ? barH + 20 + 16 : 0);
+    const bottomOf = () => {
+      const kids = [...inn.querySelectorAll('.ps-mac-col > .ps-b')];
+      const last = kids[kids.length - 1];
+      let y = 0;
+      for (let el = last; el && el !== inn; el = el.offsetParent) y += el.offsetTop;
+      return last ? y + last.offsetHeight : 0;
+    };
+    ['ps-c1', 'ps-c2', 'ps-c3'].forEach(c => scr.classList.remove(c));
+    let bottom = bottomOf();
+    for (const c of ['ps-c1', 'ps-c2', 'ps-c3']) {
+      if (bottom <= limit) break;
+      scr.classList.add(c);
+      bottom = bottomOf();
+    }
+    scr.classList.toggle('ps-tall', bottom > limit);
+    const veil = scr.querySelector('.ps-veil');
+    if (veil) veil.style.top = limit + 'px';
+    return Math.max(MAC_H, Math.ceil(bottom + 40));
+  }
+
   // Each screen is as tall as its content needs (never under 844). Both looks of a screen share the
   // taller height.
   function measure(host) {
     if (!host.isConnected) return;
     host.querySelectorAll('.ps-pair').forEach(pair => {
-      let h = PHONE_H;
+      let h = pair.classList.contains('is-mac') ? MAC_H : PHONE_H;
       pair.querySelectorAll('.ps-screen').forEach(scr => { h = Math.max(h, Math.ceil(fitScreen(scr))); });
       pair.style.setProperty('--ps-h', h + 'px');
     });
@@ -500,38 +586,65 @@
     });
   }
 
-  /* ---------------- the PNG comp ---------------- */
+  /* ---------------- 1:1 export and the PNG comp ---------------- */
 
-  // One screen, offscreen, at 390 x 844 and 2x, in `mode` ('light' | 'dark'). No frame, fold line or
-  // veil. Uses the same html2canvas clean-up as the deck export (brand-deck.js) for colour-mix colours,
+  const sizeOf = st => (st && st.product && st.product.platform === 'mac' ? { w: MAC_W, h: MAC_H } : { w: PHONE_W, h: PHONE_H });
+
+  // Draws one comp at 1:1 (no scaling, no device frame) into `host`: iPhone 390 x 844, Mac 1280 x 800, or taller
+  // when the content runs past the fold (then drawn in full with the fold line and veil). Returns { width, height }.
+  // Needs only `st` (product and look) and the loaded scripts; the Product tab need not be open. Webfonts that
+  // are still loading can change line breaks: after `await document.fonts.ready`, call it again and use the new size.
+  // opts.fold === false: a fixed-size comp with no fold line or veil (what compPng draws).
+  function exportInto(host, st, screenId, mode, opts) {
+    const A = api();
+    st = st || state;
+    if (!A) throw new Error('UI kit is not loaded');
+    const product = st.product;
+    const screen = product && (product.screens || []).find(s => s.id === screenId);
+    if (!screen) throw new Error('No product screen "' + screenId + '"');
+    const fixed = !!(opts && opts.fold === false);
+    const base = sizeOf(st);
+    host.classList.add('ps-exp-host');
+    if (typeof setBoardFonts === 'function') setBoardFonts(host);
+    Object.entries(A.kitVars()).forEach(([k, v]) => host.style.setProperty(k, v));
+    const X = A.contextFor('brand', Object.assign({}, st, { bgMode: mode === 'dark' ? 'dark' : 'light' }));
+    host.innerHTML = screenHtml(A, X, product, screen, fixed ? { fold: false } : { fold: true, exp: true });
+    A.finish(host, X.def);
+    const el = host.querySelector('.ps-screen');
+    let h = Math.max(base.h, fitScreen(el));
+    if (fixed) h = base.h;
+    el.style.setProperty('--ps-h', h + 'px');
+    // content only ever ends above the fold in a comp that fits: no fold line then
+    el.classList.toggle('ps-fits', !el.classList.contains('ps-tall'));
+    const out = { width: base.w, height: h };
+    host.dataset.psWidth = String(out.width); host.dataset.psHeight = String(out.height);
+    return out;
+  }
+
+  // One screen, offscreen, at 2x in `mode` ('light' | 'dark'): 390 x 844 (iPhone) or 1280 x 800 (Mac). No frame,
+  // fold line or veil. Uses the same html2canvas clean-up as the deck export (brand-deck.js) for colour-mix colours,
   // switch knobs and rounded shadows. Resolves to the PNG bytes.
   async function compPng(st, screenId, mode) {
     const A = api();
     st = st || state;
     if (!A) throw new Error('UI kit is not loaded');
     if (typeof html2canvas !== 'function') throw new Error('html2canvas is not loaded');
-    const product = st.product;
-    const screen = product && (product.screens || []).find(s => s.id === screenId);
-    if (!screen) throw new Error('No product screen "' + screenId + '"');
     const host = document.createElement('div');
     host.className = 'ps-export-host';
     document.body.appendChild(host);
     try {
-      if (typeof setBoardFonts === 'function') setBoardFonts(host);
-      Object.entries(A.kitVars()).forEach(([k, v]) => host.style.setProperty(k, v));
-      const X = A.contextFor('brand', Object.assign({}, st, { bgMode: mode === 'dark' ? 'dark' : 'light' }));
-      host.innerHTML = screenHtml(A, X, product, screen, { fold: false });
-      A.finish(host, X.def);
+      const size = exportInto(host, st, screenId, mode, { fold: false });
+      host.style.width = size.width + 'px'; host.style.height = size.height + 'px';
       const el = host.querySelector('.ps-screen');
-      fitScreen(el);
       if (document.fonts && document.fonts.ready) {
         try { await Promise.race([document.fonts.ready, new Promise(r => setTimeout(r, 1500))]); } catch (err) { /* proceed */ }
       }
       await new Promise(r => setTimeout(r, 50));
+      fitScreen(el);
       if (typeof bdPrepareExportClone === 'function') await bdPrepareExportClone(el);
       const canvas = await html2canvas(el, {
         scale: 2, useCORS: true, backgroundColor: getComputedStyle(el).getPropertyValue('--ab-canvas').trim() || '#ffffff',
-        width: 390, height: PHONE_H, windowWidth: 390, windowHeight: PHONE_H, scrollX: 0, scrollY: 0,
+        width: size.width, height: size.height, windowWidth: size.width, windowHeight: size.height, scrollX: 0, scrollY: 0,
         onclone: (doc, root) => { if (typeof bdSanitizeClone === 'function') bdSanitizeClone(doc, root); },
       });
       const blob = await new Promise((res, rej) => canvas.toBlob(b => (b ? res(b) : rej(new Error('PNG encode failed'))), 'image/png'));
@@ -541,5 +654,5 @@
     }
   }
 
-  window.ProductScreens = { renderInto, compPng };
+  window.ProductScreens = { renderInto, compPng, exportInto };
 })();

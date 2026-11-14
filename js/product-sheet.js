@@ -7,10 +7,30 @@
 const PRODUCT_BLOCK_TYPES = ['title', 'hero-numeral', 'text', 'action', 'action-secondary', 'link', 'card', 'list', 'stats',
   'chart', 'segmented', 'toggle', 'field', 'keypad', 'tiles'];
 const PRODUCT_CHROMES = ['tabbar', 'topbar', 'none'];
+const PRODUCT_MAC_CHROMES = ['sidebar', 'toolbar', 'none'];
+const PRODUCT_PLATFORMS = ['iphone', 'mac'];
 const PRODUCT_STATE_KEYS = { empty: 'empty', loading: 'loading', error: 'error', 'first run': 'firstRun' };
 
 function productSlug(name) {
   return String(name || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') || 'screen';
+}
+
+// Screen chrome depends on the platform. iPhone: tabbar | topbar | none (default topbar). Mac: sidebar | toolbar | none,
+// where tabbar reads as sidebar and topbar as toolbar; the default is sidebar when the product has Tabs, else toolbar.
+function resolveChromes(product, warn) {
+  const mac = product.platform === 'mac';
+  product.screens.forEach(scr => {
+    const c = scr._chrome, line = scr._chromeLine;
+    delete scr._chrome; delete scr._chromeLine;
+    const fallback = mac ? (product.tabs.length ? 'sidebar' : 'toolbar') : 'topbar';
+    if (c == null) { scr.chrome = fallback; return; }
+    if (mac) {
+      const mapped = c === 'tabbar' ? 'sidebar' : c === 'topbar' ? 'toolbar' : c;
+      if (PRODUCT_MAC_CHROMES.indexOf(mapped) >= 0) scr.chrome = mapped;
+      else { scr.chrome = fallback; warn(line, `Chrome "${c}" is not sidebar, toolbar or none; using ${fallback}.`); }
+    } else if (PRODUCT_CHROMES.indexOf(c) >= 0) scr.chrome = c;
+    else { scr.chrome = 'topbar'; warn(line, `Chrome "${c}" is not tabbar, topbar or none; using topbar.`); }
+  });
 }
 
 // Never throws. Returns { product, warnings: [{ line, message }] }; product is null when the text holds neither
@@ -19,7 +39,7 @@ function parseProductSheet(text, sourceName) {
   const warnings = [];
   const warn = (line, message) => warnings.push({ line, message });
   const raw = text == null ? '' : String(text);
-  const product = { name: '', purpose: '', coreAction: '', tabs: [], screens: [], source: sourceName == null ? null : String(sourceName), raw };
+  const product = { name: '', purpose: '', coreAction: '', platform: 'iphone', tabs: [], screens: [], source: sourceName == null ? null : String(sourceName), raw };
   try {
     const lines = raw.replace(/^﻿/, '').split(/\r\n|\r|\n/);
     let hasHeader = false, scr = null, mode = null; // mode: 'content' | 'states' | null
@@ -68,7 +88,7 @@ function parseProductSheet(text, sourceName) {
         let id = productSlug(name), k = 2;
         while (ids[id]) id = productSlug(name) + '-' + k++;
         ids[id] = true;
-        scr = { id, name: name || 'Screen', job: '', primary: null, chrome: 'topbar', fold: null, signature: null, blocks: [],
+        scr = { id, name: name || 'Screen', job: '', primary: null, chrome: 'topbar', fold: null, signature: null, blocks: [], _chrome: null, _chromeLine: 0,
           states: { empty: 'not specified', loading: 'not specified', error: 'not specified', firstRun: 'not specified' }, notes: [], _line: n, _hasPrimary: false };
         product.screens.push(scr);
         mode = null;
@@ -76,11 +96,16 @@ function parseProductSheet(text, sourceName) {
       }
       if (/^#{1,6}\s/.test(line) && !scr) { warn(n, 'Unrecognised heading ignored.'); return; }
       if (!scr) {
-        if ((m = /^(Purpose|Core action|Tabs)\s*:\s*(.*)$/i.exec(line))) {
+        if ((m = /^(Purpose|Core action|Tabs|Platform)\s*:\s*(.*)$/i.exec(line))) {
           const key = m[1].toLowerCase();
           if (key === 'purpose') product.purpose = m[2].trim();
           else if (key === 'core action') product.coreAction = m[2].trim();
-          else product.tabs = m[2].split(',').map(s => s.trim()).filter(Boolean);
+          else if (key === 'platform') {
+            const p = m[2].trim().toLowerCase().replace(/\s+/g, '');
+            const q = p === 'macos' ? 'mac' : p;
+            if (PRODUCT_PLATFORMS.indexOf(q) >= 0) product.platform = q;
+            else { product.platform = 'iphone'; warn(n, `Platform "${m[2].trim()}" is not iphone or mac; using iphone.`); }
+          } else product.tabs = m[2].split(',').map(s => s.trim()).filter(Boolean);
         } else warn(n, `Line outside any screen was ignored: "${line.slice(0, 40)}".`);
         return;
       }
@@ -102,9 +127,7 @@ function parseProductSheet(text, sourceName) {
         if (key === 'job') scr.job = val;
         else if (key === 'primary action') { scr._hasPrimary = true; scr.primary = !val || /^none\.?$/i.test(val) ? null : val; }
         else if (key === 'chrome') {
-          const c = val.toLowerCase().replace(/\s+/g, '');
-          if (PRODUCT_CHROMES.indexOf(c) >= 0) scr.chrome = c;
-          else warn(n, `Chrome "${val}" is not tabbar, topbar or none; using topbar.`);
+          scr._chrome = val.toLowerCase().replace(/\s+/g, ''); scr._chromeLine = n;   // resolved once Platform is known
         } else if (key === 'fold') scr.fold = !val || /^none\.?$/i.test(val) ? null : val;
         else if (key === 'signature') scr.signature = !val || /^none\.?$/i.test(val) ? null : val;
         else if (key === 'content') { mode = 'content'; if (val) { warn(n, 'Text after "Content:" on the same line was kept in the screen\'s notes.'); scr.notes.push(val); } }
@@ -115,6 +138,7 @@ function parseProductSheet(text, sourceName) {
       scr.notes.push(line);
     });
     closeScreen();
+    resolveChromes(product, warn);
     if (!hasHeader) warn(1, 'Missing "# Product: <name>" line.');
     if (!product.purpose) warn(1, 'Missing "Purpose:" line.');
     if (!product.coreAction) warn(1, 'Missing "Core action:" line.');
@@ -152,6 +176,7 @@ function productScreenSig(state, screen) {
     scheme: st.scheme || null,
     typography: st.typography || null,
   };
+  if (st.product && st.product.platform === 'mac') look.platform = 'mac';   // iPhone sigs stay as they were
   return productHash(productStable({ screen: screen || null, look }));
 }
 

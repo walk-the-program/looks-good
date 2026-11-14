@@ -897,6 +897,19 @@ check('paste: empty text', run(`extractColors('').length`) === 0, 'found colors 
     check('product: a bare text has no product and warns; a sheet with only a screen still returns a product',
       bad[3].product === null && bad[3].warnings.length > 0 && bad[4].product !== null && bad[4].product.screens.length === 1 && bad[4].warnings.some(w => /Unknown block type/.test(w.message)), JSON.stringify(bad[3].warnings));
 
+    // platform and mac chrome
+    const PL = M(`(() => { const mk = (plat, tabs, chromes) => '# Product: P\\nPurpose: p\\nCore action: c\\n' + plat + (tabs ? 'Tabs: A, B\\n' : '') + chromes.map((c, i) => '## Screen: S' + i + '\\nJob: j\\nPrimary action: none\\n' + (c ? 'Chrome: ' + c + '\\n' : '') + 'Content:\\n1. text: hi\\n').join('');
+      const r = (plat, tabs, chromes) => { const x = parseProductSheet(mk(plat, tabs, chromes), 's'); return { plat: x.product.platform, ch: x.product.screens.map(s => s.chrome), w: x.warnings.map(w => w.line + ':' + w.message) }; };
+      return { none: r('', true, ['tabbar']), mac: r('Platform: mac\\n', true, ['', 'tabbar', 'topbar', 'none', 'toolbar', 'sidebar']), macNoTabs: r('Platform: Mac\\n', false, ['']), macos: r('Platform: macOS\\n', true, ['']),
+        bad: r('Platform: android\\n', false, ['topbar']), upper: r('platform: IPHONE\\n', false, ['']), macBadChrome: r('Platform: mac\\n', true, ['bogus']), phoneSidebar: r('', false, ['sidebar']) }; })()`);
+    check('product: Platform defaults to iphone, reads mac and macos case-insensitively, and a bad value warns with its line and falls back to iphone',
+      PL.none.plat === 'iphone' && PL.mac.plat === 'mac' && PL.macNoTabs.plat === 'mac' && PL.macos.plat === 'mac' && PL.upper.plat === 'iphone' && PL.upper.w.length === 0
+      && PL.bad.plat === 'iphone' && PL.bad.w.length === 1 && /^4:Platform "android"/.test(PL.bad.w[0]), JSON.stringify([PL.none, PL.bad]));
+    check('product: on mac, tabbar reads as sidebar and topbar as toolbar without a warning; the default is sidebar with Tabs, else toolbar; iPhone is unchanged',
+      JSON.stringify(PL.mac.ch) === '["sidebar","sidebar","toolbar","none","toolbar","sidebar"]' && PL.mac.w.length === 0 && PL.macNoTabs.ch[0] === 'toolbar' && PL.macos.ch[0] === 'sidebar'
+      && PL.none.ch[0] === 'tabbar' && PL.bad.ch[0] === 'topbar' && PL.upper.ch[0] === 'topbar'
+      && PL.macBadChrome.ch[0] === 'sidebar' && PL.macBadChrome.w.length === 1 && PL.phoneSidebar.ch[0] === 'topbar' && PL.phoneSidebar.w.length === 1, JSON.stringify(PL));
+
     // signature
     mc.P = P;
     const sig = M(`(() => { const st = kstate('dystopian-luxury'); st.scheme = 'analogous'; st.product = JSON.parse(JSON.stringify(P));

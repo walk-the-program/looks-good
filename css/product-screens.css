@@ -165,6 +165,38 @@
 /* offscreen host for compPng(): a plain 390 wide column, like the deck's export host */
 .ps-export-host { position: fixed; left: 0; top: 0; z-index: -1; opacity: 0; width: 390px; height: 844px; overflow: hidden; pointer-events: none; }
 
+
+/* ======================= the Mac window comps ======================= */
+
+/* In the Product tab a window is scaled down as a whole, like a phone; light and dark stack. */
+.ps-pair.is-mac { --ps-win-scale: 0.5; flex-direction: column; gap: 20px; }
+.ps-win { position: relative; flex: none; width: calc(1280px * var(--ps-win-scale)); height: calc(var(--ps-h, 800px) * var(--ps-win-scale)); border-radius: calc(12px * var(--ps-win-scale)); overflow: hidden; box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.18), 0 30px 60px -28px rgba(0, 0, 0, 0.45); }
+.ps-win-in { position: absolute; left: 0; top: 0; width: 1280px; transform: scale(var(--ps-win-scale)); transform-origin: 0 0; }
+
+:is(.ab.sb-ab, .sb-gen).sb-screen.ps-mac { width: 1280px; height: auto; min-height: var(--ps-h, 800px); border-radius: 0; overflow: hidden; }
+:is(.ab.sb-ab, .sb-gen).sb-screen.ps-mac.is-comp { height: 800px; min-height: 800px; }
+.ps-win .ps-mac { border-radius: 12px; }
+.ps-mac-in { position: relative; z-index: 1; display: flex; flex-direction: column; min-height: var(--ps-h, 800px); }
+.ps-mac.is-comp .ps-mac-in { min-height: 800px; }
+.ps-mac-title { flex: none; grid-template-columns: 140px minmax(0, 1fr) 140px; height: 52px; min-height: 52px; padding: 0 16px; box-sizing: border-box; }
+.ps-lights { display: flex; gap: 8px; align-items: center; }
+.ps-lights i { width: 12px; height: 12px; border-radius: 50%; background: color-mix(in srgb, var(--ab-ink) 22%, transparent); }
+.ps-mac-tools { display: flex; justify-content: flex-end; gap: 4px; }
+.ps-mac-body { flex: 1 1 auto; display: flex; align-items: stretch; min-height: 0; }
+.ps-mac-side { flex: none; width: 240px; box-sizing: border-box; padding-top: 16px; }
+.ps-mac-main { flex: 1 1 auto; min-width: 0; padding: 36px 40px 130px; box-sizing: border-box; }
+.ps-mac-col { max-width: 760px; margin: 0 auto; }
+.ps-mac .ps-pinbar { left: 0; padding-left: 40px; padding-right: 40px; }
+.ps-mac.has-side .ps-pinbar { left: 240px; }
+.ps-mac .ps-pinbar > .ps-pb { width: 100%; max-width: 760px; margin: 0 auto; box-sizing: border-box; }
+.ps-mac .ps-b[data-gap="first"], .ps-mac:not(.ps-chrome-topbar) .ps-b[data-gap="first"] { margin-top: 0; }
+.ps-mac .ps-keypad { max-width: 420px; }
+
+/* the 1:1 export: no device, so no round corners; the fold line shows only when content runs past it */
+:is(.ab.sb-ab, .sb-gen).sb-screen.ps-export { border-radius: 0; }
+.ps-export.ps-fits .ps-fold { display: none; }
+.ps-exp-host { display: block; width: fit-content; }
+
 /* brief page: the blocked actions (js/brief-view.js) */
 .bv-btn:disabled, .bv-btn[aria-disabled="true"] { opacity: 0.45; cursor: not-allowed; }
 

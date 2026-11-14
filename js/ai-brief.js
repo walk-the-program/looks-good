@@ -3636,9 +3636,13 @@ function aibSecProduct(ctx) {
   if (!P) return [];
   const out = ['## Product screens', `These are ${P.name || 'the product'}'s own screens, from its product sheet. What gets checked is the content ranking (1 is the most important), where the style's signature lands, and the fold budget; the layout itself is designed for the product from the kit's components, with no pixel positions given.` + (ctx.comps ? ' Each screen has a comp image in comps/ showing the intended look in light and dark; match its ranking and feel, not its exact positions.' : ' Comps of these screens are viewable in Looks Good only.')];
   const end = s => { const v = String(s == null ? '' : s).replace(/\s+/g, ' ').trim(); return v && !/[.!?]$/.test(v) ? v + '.' : v; };
+  const mac = P.platform === 'mac';
+  out.push(mac ? 'Platform: Mac. Each screen is a Mac app window, 1280x800 (comps are 2560x1600 at 2x); content taller than the window is drawn in full with a fold line at 800.'
+    : 'Platform: iPhone. Each screen is 390x844 (comps are 780x1688 at 2x); content taller than the screen is drawn in full with a fold line.');
   P.screens.forEach(sc => {
     const selected = (P.tabs || []).find(t => t.toLowerCase() === String(sc.name).toLowerCase());
-    const chrome = sc.chrome === 'tabbar' ? `Tab bar${(P.tabs || []).length ? ` (${P.tabs.join(', ')})` : ''}${selected ? `, ${selected} selected` : ''}` : sc.chrome === 'none' ? 'None: no top bar and no tab bar' : 'Top bar';
+    const chrome = mac ? (sc.chrome === 'sidebar' ? `Sidebar source list${(P.tabs || []).length ? ` (${P.tabs.join(', ')})` : ''}${selected ? `, ${selected} selected` : ''}` : sc.chrome === 'none' ? 'None: title bar only, no sidebar and no toolbar' : 'Toolbar in the title bar')
+      : sc.chrome === 'tabbar' ? `Tab bar${(P.tabs || []).length ? ` (${P.tabs.join(', ')})` : ''}${selected ? `, ${selected} selected` : ''}` : sc.chrome === 'none' ? 'None: no top bar and no tab bar' : 'Top bar';
     out.push('', `### ${sc.name}`,
       `- Job: ${end(sc.job) || 'not specified'}`,
       `- Primary action: ${sc.primary ? sc.primary : 'none on this screen'}`,
