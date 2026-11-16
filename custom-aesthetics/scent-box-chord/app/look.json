@@ -1,4 +1,4 @@
-{ "app": "Scent Box", "repo": null, "brandName": "Scent Box",
+{ "app": "Scent Box", "repo": "~/Desktop/Scent Box", "brandName": "Scent Box",
   "style": "scent-box-chord", "blend": null, "primary": "#8a847a", "scheme": "analogous",
   "colors": { "primary": "#8a847a", "secondary": "#2a2623", "accent": "#e8a02c", "neutralDark": "#0b0a0a", "neutralLight": "#f1eee8" },
   "heading": "Bricolage Grotesque", "body": "Inter Tight", "typography": null, "pureBg": false, "modes": ["dark", "light"] }
