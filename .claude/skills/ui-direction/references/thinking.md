@@ -161,13 +161,17 @@ the scent colours as the only colour, a strong type scale, and a real grid on th
 
 ## 9. When the renderer cannot draw the idea
 
-The product-sheet renderer draws ranked blocks in one column with the style's kit. It cannot draw a
-custom chart, a multi-column Mac layout, a colour chord, or most signature moments. That is a limit
-of the preview, not of the design. Never drop an idea because the renderer cannot show it:
+The product-sheet renderer draws ranked blocks with the style's kit, including coloured weighted
+`chord` bars and, on a Mac window, sidebar / main / inspector columns. It still cannot draw a custom
+chart, an illustration-like moment, or a many-item grid such as a 37-fragrance shelf of chords. That
+is a limit of the preview, not of the design. Never drop an idea because the renderer cannot show it:
 
 1. Push the renderer first: use every block type that fits (`hero-numeral`, `tiles`, `chart`,
-   `progress`, `callout`, `> ` selected rows, `pin: bottom`, `highlight`).
-2. For what it still cannot draw, write an HTML mock of that screen in `app/mocks/`, using the
+   `progress`, `callout`, `> ` selected rows, `pin: bottom`, `highlight`), `chord` (item colours,
+   `labels: inside|below|none`, `orient: vertical`) for anything shown as weighted colour, and on Mac
+   `column: side` or `column: inspector` to lay a window out as sidebar, main and inspector.
+2. A mock is only for what is still out of reach (custom charts, illustration-like moments, many-item
+   grids). For that, write an HTML mock of that screen in `app/mocks/`, using the
    style's real tokens and component CSS from `node dev/lg.js pack <folder> --draft`, so the mock
    and the style cannot drift apart.
 3. Render it with `node dev/lg.js shot` into the round's renders folder, and list it in section 8

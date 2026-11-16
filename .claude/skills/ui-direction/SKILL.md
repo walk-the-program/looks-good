@@ -62,7 +62,8 @@ For each direction (`a`, `b`, `c`):
    step 5).
 2. Render: `node dev/lg.js screens <built-in> --look <f>/app/look-a.json --sheet <f>/app/product-sheet.md --out <f>/app/renders/r1/a`.
    These renders test the kit and type on real content; the mocks below usually carry the direction.
-3. When the direction's structure or signature lives beyond the renderer (most will), mock the key
+3. First try `chord` blocks and Mac `column:` placement in the sheet. When the direction's structure or
+   signature still lives beyond the renderer, mock the key
    screen in `<f>/app/mocks/a-<screen>.html` with tokens from
    `node dev/lg.js pack <built-in> --look <f>/app/look-a.json --sheet <f>/app/product-sheet.md --draft --out <f>/app/mocks/a-pack.md`.
    Write the mock's dark mode with `@media (prefers-color-scheme: dark)`: `shot` sets it from

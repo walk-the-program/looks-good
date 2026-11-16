@@ -142,7 +142,8 @@ Why each reads as generic: .claude/skills/ui-direction/references/defaults-ledge
 
 ## 8. Beyond the renderer
 
-<!-- Ideas the product-sheet renderer cannot draw (layout, a custom chart, the signature moment). Each
+<!-- First draw the idea with `chord` blocks and `column:` placement; list here only what those still
+cannot draw (a custom chart, an illustration-like moment, a many-item grid). Each
 gets an HTML mock under app/mocks/, rendered with `node dev/lg.js shot` into the round's renders folder.
 The Mock path is relative to the app/ folder and must exist. If the renderer draws every idea, replace
 the table with this exact line:

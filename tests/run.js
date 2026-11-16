@@ -949,6 +949,51 @@ check('paste: empty text', run(`extractColors('').length`) === 0, 'found colors 
       && JSON.stringify(ap[2]) === '{"total":3,"approved":1,"stale":1,"pending":1,"allApproved":false}' && JSON.stringify(ap[3]) === '{"total":3,"approved":3,"stale":0,"pending":0,"allApproved":true}'
       && JSON.stringify(ap[4]) === '{"total":3,"approved":0,"stale":3,"pending":0,"allApproved":false}', JSON.stringify(ap));
 
+    // chord blocks and Mac columns (productChordItems, productColumnOf, warnings, signature stability, brief)
+    {
+      const CI = str => M(`productChordItems(${JSON.stringify(str)})`);
+      const a = CI('aromatic = 100 = #5E9C76; #fc0 = vanilla = 2.5; Plain; woody = #8B5A2B = 45');
+      check('chord: items are order-flexible; #rgb expands, colours lower-case, missing weight is 1, missing colour is null',
+        JSON.stringify(a.items) === '[{"label":"aromatic","weight":100,"color":"#5e9c76"},{"label":"vanilla","weight":2.5,"color":"#ffcc00"},{"label":"Plain","weight":1,"color":null},{"label":"woody","weight":45,"color":"#8b5a2b"}]' && a.problems.length === 0, JSON.stringify(a));
+      const b = CI('x = 0 = #12; y = abc; z = 5 = red; = 3 = #fff');
+      check('chord: bad weight, bad colour and a missing label are reported per item and the item still draws',
+        b.items.length === 4 && b.items[0].weight === 1 && b.items[0].color === null && b.items[2].weight === 5 && b.items[2].color === null && b.items[3].label === '' && b.items[3].color === '#ffffff'
+        && b.problems.length === 5 && /weight "0"/.test(b.problems[0]) && /colour "#12"/.test(b.problems[1]) && /weight "abc"/.test(b.problems[2]) && /colour "red"/.test(b.problems[3]) && /no label/.test(b.problems[4]), JSON.stringify(b));
+      check('chord: empty items give none', CI('').items.length === 0 && CI(' ; ;').items.length === 0, '');
+      const W = (plat, line) => M(`parseProductSheet(${JSON.stringify('# Product: P\nPurpose: p\nCore action: c\nPlatform: ' + plat + '\n## Screen: S\nJob: j\nPrimary action: none\nContent:\n' + line)}, 's')`);
+      const msgs = (plat, line) => W(plat, line).warnings.map(w => w.line + ':' + w.message);
+      const one = (plat, line, re) => { const m = msgs(plat, line); return m.length === 1 && re.test(m[0]); };
+      check('chord: each new warning names its line (no items, label, weight, colour, labels, orient)',
+        one('iphone', '1. chord: A', /^9:Chord has no items/) && one('iphone', '1. chord: A | items: = 2 = #fff', /^9:Chord item #1 has no label/)
+        && one('iphone', '1. chord: A | items: a = -1', /uses 1\./) && one('iphone', '1. chord: A | items: a = #12', /tonal steps/)
+        && one('iphone', '1. chord: A | items: a | labels: left', /labels "left" is not inside, below or none; uses inside/) && one('iphone', '1. chord: A | items: a | orient: tilted', /orient "tilted" is not horizontal or vertical; uses horizontal/)
+        && msgs('iphone', '1. chord: A | items: a | labels: BELOW | orient: Vertical').length === 0, JSON.stringify([1, 2, 3, 4, 5, 6].map(() => 0)));
+      check('column: warns on iphone, on an unknown value and on pinned blocks; raw props are kept',
+        one('iphone', '1. text: a | column: inspector', /^9:column applies to Mac windows; drawn in the single column\./) && one('mac', '1. text: a | column: left', /Column "left" is not side, main or inspector; uses main/)
+        && one('mac', '1. action: Go | pin: bottom | column: side', /Pinned blocks sit at the foot of the main column; column ignored/) && one('mac', '1. keypad:  | column: inspector', /Pinned blocks/)
+        && msgs('mac', '1. text: a | column: Sidebar').length === 0 && msgs('mac', '1. text: a | column: content').length === 0 && msgs('mac', '1. action: Go | pin: bottom | column: main').length === 0
+        && W('mac', '1. text: a | column: Sidebar').product.screens[0].blocks[0].props.column === 'Sidebar', '');
+      const col = (blk, plat) => M(`productColumnOf(${JSON.stringify(blk)}, ${JSON.stringify(plat)})`);
+      check('column: productColumnOf resolves mac aliases, defaults to main, and pins and iPhone are always main',
+        col({ type: 'text', props: { column: 'Side' } }, 'mac') === 'side' && col({ type: 'text', props: { column: 'sidebar' } }, 'mac') === 'side' && col({ type: 'text', props: { column: 'inspector' } }, 'mac') === 'inspector'
+        && col({ type: 'text', props: { column: 'content' } }, 'mac') === 'main' && col({ type: 'text', props: { column: 'wat' } }, 'mac') === 'main' && col({ type: 'text', props: {} }, 'mac') === 'main'
+        && col({ type: 'action', props: { pin: 'bottom', column: 'side' } }, 'mac') === 'main' && col({ type: 'keypad', props: { column: 'inspector' } }, 'mac') === 'main'
+        && col({ type: 'action', props: { column: 'side' } }, 'mac') === 'side' && col({ type: 'text', props: { column: 'inspector' } }, 'iphone') === 'main', '');
+      // an old-style sheet parses to the same data and signature as before this change (values recorded from the unchanged parser)
+      const sg = M(`(() => { const p = parseProductSheet(SHEET, 'docs-example').product; const st = { aesthetic: 'x', blend: null, colors: { primary: '#123456' }, headingFont: { name: 'A' }, bodyFont: { name: 'B' }, scheme: 'analogous', typography: null, product: p };
+        return [productScreenSig(st, p.screens[0]), productHash(productStable(p))]; })()`);
+      check('chord: a sheet without chord or column parses to the same product and signature as before', sg[0] === '3ff6a843' && sg[1] === '3a71cd4b', JSON.stringify(sg));
+      const brief = md => M(`aibSecProduct({ product: parseProductSheet(${JSON.stringify(md)}, 's').product }).join('\\n')`);
+      const head = '# Product: P\nPurpose: p\nCore action: c\n';
+      const bm = brief(head + 'Platform: mac\n## Screen: S\nJob: j\nPrimary action: none\nContent:\n1. chord: Accords, by weight | items: aromatic = 100 = #5E9C76; vanilla = 85 = #f2e3b3 | column: inspector\n2. chord: Notes | items: a; b | labels: below\n3. chord: | items: a = 1 = #fff | labels: none | orient: vertical | column: side\n4. text: hi | column: bogus\n');
+      check('brief: a chord reads in plain words, with the column suffix only on Mac side and inspector blocks',
+        bm.includes('1. Colour chord "Accords, by weight": one bar split by weight into aromatic (100, #5e9c76), vanilla (85, #f2e3b3); labels inside each segment, or as a key under the bar when one does not fit, in the inspector column.')
+        && bm.includes('2. Colour chord "Notes": one bar split by weight into a (1, a tonal step of the primary), b (1, a tonal step of the primary); separate tiles with the labels below each tile.')
+        && bm.includes('3. Colour chord: a vertical bar stacked top to bottom split by weight into a (1, #ffffff); a thin strip with no labels, in the sidebar column.') && bm.includes('4. Body line "hi".'), bm);
+      const bi = brief(head + '## Screen: S\nJob: j\nPrimary action: none\nContent:\n1. text: hi | column: inspector\n');
+      check('brief: column is ignored in the brief on an iPhone sheet', bi.includes('1. Body line "hi".') && !/column/.test(bi.split('Content, ranked:')[1]), bi);
+    }
+
     // brief with a product
     M(`var pstate = key => { const st = kstate(key); st.product = parseProductSheet(SHEET, 'x').product; st.productApprovals = {}; return st; };`);
     const withP = M(`(() => { const st = pstate('dystopian-luxury'); const o = { surface: 'app', target: 'web', noProbe: true, kitSnap: kitDL };

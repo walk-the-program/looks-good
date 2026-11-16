@@ -3588,7 +3588,7 @@ function aibSecWhy(ctx) {
 /* ---- Product screens: the product sheet's screens as a Screen spec per screen (docs/product-sheet-format.md) ---- */
 
 // One content block in plain words (no pixel positions).
-function aibProductBlock(b) {
+function aibProductBlock(b, platform) {
   const q = v => '"' + String(v == null ? '' : v).replace(/\s+/g, ' ').trim() + '"';
   const p = b.props || {}, t = b.text || '';
   const yes = v => /^(yes|true|on)$/i.test(String(v || '').trim());
@@ -3626,8 +3626,18 @@ function aibProductBlock(b) {
       const n = String(p.values || '').split(',').filter(x => x.trim()).length;
       s = `Tile strip ${q(t)}` + (n ? `, ${n} tiles in tonal steps` : ''); break;
     }
+    case 'chord': {
+      const ch = productChordItems(p.items).items, o = productChordOpts(p), vert = o.orient === 'vertical';
+      const mode = vert && o.labels === 'below' ? 'inside' : o.labels;
+      s = `Colour chord${t ? ' ' + q(t) : ''}: ${vert ? 'a vertical bar stacked top to bottom' : 'one bar'} split by weight into ` +
+        (ch.length ? ch.map(c => `${c.label || 'unnamed'} (${c.weight}, ${c.color || 'a tonal step of the primary'})`).join(', ') : 'no items') +
+        (mode === 'below' ? '; separate tiles with the labels below each tile' : mode === 'none' ? '; a thin strip with no labels' : '; labels inside each segment' + (vert ? '' : ', or as a key under the bar when one does not fit'));
+      break;
+    }
     default: s = `${b.type} ${q(t)}`;
   }
+  const col = platform === 'mac' && typeof productColumnOf === 'function' ? productColumnOf(b, 'mac') : 'main';
+  if (col !== 'main') s += `, in the ${col === 'side' ? 'sidebar' : 'inspector'} column`;
   return s;
 }
 
@@ -3648,7 +3658,7 @@ function aibSecProduct(ctx) {
       `- Primary action: ${sc.primary ? sc.primary : 'none on this screen'}`,
       `- Chrome: ${chrome}`,
       '- Content, ranked:');
-    sc.blocks.forEach(b => out.push(`  ${b.rank}. ${end(aibProductBlock(b))}`));
+    sc.blocks.forEach(b => out.push(`  ${b.rank}. ${end(aibProductBlock(b, P.platform))}`));
     out.push(`- Signature placement: ${sc.signature ? end(sc.signature) : 'none on this screen'}`,
       `- Fold budget: ${sc.fold ? end(sc.fold) : 'not specified'}`,
       '- States:',

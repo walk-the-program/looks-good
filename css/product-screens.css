@@ -133,6 +133,31 @@
 .ps-tiles { display: flex; gap: 6px; }
 .ps-tiles i { flex: 1 1 0; min-width: 0; height: 44px; border: 1px solid var(--ab-line); border-radius: min(var(--sb-r, 8px), 10px); background: color-mix(in srgb, var(--ab-primary) var(--ps-v, 50%), var(--ab-canvas)); }
 
+/* colour chord: one bar split by weight; the segments carry the content's own colours (the same in light and dark) */
+:is(.ab.sb-ab, .sb-gen).sb-kit .ps-chord-cap { margin: 0 0 8px !important; }
+.ps-chord-bar { display: flex; min-width: 0; height: 48px; border: 1px solid var(--ab-line); border-radius: min(var(--sb-r, 8px), 12px); overflow: hidden; box-sizing: border-box; }
+.ps-chord-s { display: flex; align-items: flex-end; justify-content: flex-start; min-width: 0; padding: 6px 8px; box-sizing: border-box; overflow: hidden; white-space: nowrap; font-family: inherit; font-size: var(--k-footnote, 13px); font-weight: 500; line-height: 1.2; }
+.ps-chord-s .ps-chord-l { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+/* the key under a horizontal inside chord whose labels do not fit; hideClippedChordLabels turns it on */
+.ps-chord-key { display: none; flex-wrap: wrap; gap: 6px 14px; margin-top: 8px; }
+.ps-chord-k { display: inline-flex; align-items: center; gap: 6px; font-size: var(--k-footnote, 13px); line-height: 1.25; color: color-mix(in srgb, var(--ab-ink) 28%, var(--ab-muted)); }
+.ps-chord-k i { display: block; flex: none; width: 10px; height: 10px; border: 1px solid var(--ab-line); border-radius: min(var(--sb-r, 8px), 3px); box-sizing: border-box; }
+.ps-chord-k i.is-tone { background: color-mix(in srgb, var(--ab-primary) var(--ps-v, 50%), var(--ab-canvas)); }
+.ps-chord.is-key .ps-chord-s .ps-chord-l { visibility: hidden; }
+.ps-chord.is-key .ps-chord-key { display: flex; }
+.ps-chord-s.is-tone, .ps-chord-i.is-tone { background: color-mix(in srgb, var(--ab-primary) var(--ps-v, 50%), var(--ab-canvas)); color: var(--ab-ink); }
+.ps-chord.is-none .ps-chord-bar { height: 20px; }
+/* labels below: separate tiles, each label under its own tile */
+.ps-chord.is-below .ps-chord-bar { gap: 4px; height: auto; border: 0; border-radius: 0; overflow: visible; align-items: flex-start; }
+.ps-chord-t { min-width: 0; }
+.ps-chord-i { display: block; height: 44px; border: 1px solid var(--ab-line); border-radius: min(var(--sb-r, 8px), 12px); box-sizing: border-box; }
+.ps-chord-t .ps-chord-l { display: block; margin-top: 6px; font-size: var(--k-footnote, 13px); line-height: 1.25; overflow-wrap: anywhere; color: color-mix(in srgb, var(--ab-ink) 28%, var(--ab-muted)); }
+/* vertical: stacked top to bottom by weight; a Mac column's last vertical chord is sized by fitMac */
+.ps-chord.is-v .ps-chord-bar { flex-direction: column; height: 280px; }
+.ps-chord.is-v .ps-chord-s { padding: 3px 8px; min-height: 0; }
+.ps-screen.ps-c2 .ps-chord.is-h.is-inside .ps-chord-bar { height: 40px; }
+.ps-screen.ps-c3 .ps-chord.is-h.is-none .ps-chord-bar { height: 14px; }
+
 /* text size: large (Title size, the display face) */
 :is(.ab.sb-ab, .sb-gen).sb-kit .ab-card-title.ps-text-large { margin: 0 !important; font-size: var(--k-title, 28px) !important; line-height: var(--k-title-lh, 34px) !important; overflow-wrap: anywhere; font-variant-numeric: tabular-nums; }
 
@@ -191,6 +216,11 @@
 .ps-mac .ps-pinbar > .ps-pb { width: 100%; max-width: 760px; margin: 0 auto; box-sizing: border-box; }
 .ps-mac .ps-b[data-gap="first"], .ps-mac:not(.ps-chrome-topbar) .ps-b[data-gap="first"] { margin-top: 0; }
 .ps-mac .ps-keypad { max-width: 420px; }
+
+/* Mac columns: a column: key puts blocks in the sidebar (240) or an inspector (360) beside the main column */
+.ps-mac-sideb { min-width: 0; }
+:is(.ab.sb-ab, .sb-gen).sb-kit .ps-mac-insp.sb-k-side { display: block !important; flex: none; width: 360px !important; box-sizing: border-box; border-radius: 0 !important; padding: 28px 24px 130px !important; }
+.ps-mac.has-insp .ps-pinbar { right: 360px; }
 
 /* the 1:1 export: no device, so no round corners; the fold line shows only when content runs past it */
 :is(.ab.sb-ab, .sb-gen).sb-screen.ps-export { border-radius: 0; }

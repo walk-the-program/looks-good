@@ -45,6 +45,7 @@
     if (t === 'text' && (p === 'title' || p === 'hero-numeral' || p === 'text')) return 'tight';
     if (t === 'link' && (p === 'action' || p === 'action-secondary')) return 'tight';
     if (t === 'action-secondary' && p === 'action') return 'tight';
+    if (t === 'chord') return p === 'chord' ? 'std' : 'wide';
     if (['list', 'stats', 'chart', 'tiles', 'segmented', 'card', 'keypad', 'action', 'field', 'toggle'].includes(t)) {
       if (t === 'field' && p === 'field') return 'std';
       if (t === 'toggle' && p === 'toggle') return 'flush';
@@ -77,6 +78,44 @@
       <div class="ps-plot"><svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" aria-hidden="true" focusable="false">
         <path class="ps-c-area" d="${line} L${W},${H} L0,${H} Z"/><path class="ps-c-line" d="${line}" vector-effect="non-scaling-stroke"/></svg>
         <span class="ps-dot" style="left:${(last[0] / W) * 100}%;top:${(last[1] / H) * 100}%"></span></div></div>`;
+  }
+
+  // WCAG relative luminance of '#rrggbb' -> the label ink (#111111 or #ffffff) with the higher contrast.
+  function chordInk(hex) {
+    const c = [1, 3, 5].map(i => parseInt(hex.slice(i, i + 2), 16) / 255).map(v => (v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4)));
+    const L = 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2];
+    const dark = (L + 0.05) / (0.0056 + 0.05), light = 1.05 / (L + 0.05);   // #111111 has luminance 0.0056
+    return dark >= light ? '#111111' : '#ffffff';
+  }
+
+  // A colour chord: one bar split by weight, each segment in its own content colour (colours are validated hex only).
+  // labels inside | below | none; orient horizontal | vertical (a vertical chord stacks top to bottom, so below reads as inside).
+  // A segment without a colour takes a tonal step of the style's primary, 85% down to 25% across those segments.
+  function chordHtml(A, b, ctx) {
+    const pr = b.props || {};
+    const { items } = productChordItems(pr.items);
+    const caption = b.text ? `<p class="ab-label ps-chord-cap">${A.e(b.text)}</p>` : '';
+    if (!items.length) return caption;
+    const o = productChordOpts(pr);
+    const vert = o.orient === 'vertical';
+    const mode = vert && o.labels === 'below' ? 'inside' : o.labels;
+    const tones = items.filter(it => !it.color).length;
+    let k = 0;
+    const paints = items.map(it => (it.color ? `background:${it.color}` : `--ps-v:${tones > 1 ? Math.round(85 - (60 * k++) / (tones - 1)) : 85}%`));
+    let at = 0;
+    const seg = it => {
+      const w = `flex:${it.weight} 1 0px`;
+      const paint = paints[at++];
+      const cls = it.color ? '' : ' is-tone';
+      const label = `<span class="ps-chord-l">${A.e(it.label)}</span>`;
+      if (mode === 'below') return `<div class="ps-chord-t" style="${w}"><i class="ps-chord-i${cls}" style="${paint}"></i>${label}</div>`;
+      return `<span class="ps-chord-s${cls}" style="${w};${paint}${it.color ? ';color:' + chordInk(it.color) : ''}">${mode === 'none' ? '' : label}</span>`;
+    };
+    const fill = vert && ctx && ctx.fill ? ' data-fill="1"' : '';
+    // a horizontal inside chord whose labels do not all fit shows them as a key under the bar (hideClippedChordLabels)
+    const key = !vert && mode === 'inside'
+      ? `<div class="ps-chord-key">${items.map((it, i) => `<span class="ps-chord-k"><i class="${it.color ? '' : 'is-tone'}" style="${paints[i]}"></i>${A.e(it.label)}</span>`).join('')}</div>` : '';
+    return `<div class="ps-chord ${vert ? 'is-v' : 'is-h'} is-${mode}"${fill}>${caption}<div class="ps-chord-bar">${items.map(seg).join('')}</div>${key}</div>`;
   }
 
   function listRows(A, rows) {
@@ -141,6 +180,7 @@
           `<div class="ab-card sb-k-card ps-stat"${A.win(l)}><p class="ab-label">${A.e(l)}</p><p class="ab-card-title ps-stat-v">${A.e(v)}</p></div>`).join('')}</div>`;
       }
       case 'chart': return chartHtml(A, b);
+      case 'chord': return chordHtml(A, b, ctx);
       case 'callout': {
         const tone = CALLOUT_TONES[String(pr.tone || '').trim().toLowerCase()] ? String(pr.tone).trim().toLowerCase() : 'info';
         return `<div class="sb-k-callout ps-callout" data-tone="${tone}" role="${tone === 'error' ? 'alert' : 'status'}">${A.icon(CALLOUT_TONES[tone], 20)}<div><span>${A.mid(b.text)}</span>${pr.action ? ` <button type="button" class="sb-k-textbtn ps-callout-act" tabindex="-1">${A.e(pr.action)}</button>` : ''}</div></div>`;
@@ -257,23 +297,35 @@
     const acts = blocks.filter(b => b.type === 'action');
     const primary = acts.find(b => screen.primary && b.text.toLowerCase() === String(screen.primary).toLowerCase()) || acts[0];
     const ctx = { primaryRank: primary ? primary.rank : -1 };
-    let prev = null;
-    const body = flow.map(b => {
-      const html = blockHtml(A, X, b, ctx);
-      if (!html) return '';
-      const gap = gapOf(prev, b);
-      const hero = prev === null && b === blocks[0];
-      prev = b;
-      return `<div class="ps-b" data-type="${A.e(b.type)}" data-gap="${gap}"${hero ? ' data-hero="1"' : ''}>${html}</div>`;
-    }).join('');
+    // One column's blocks in rank order; the first of each column has no gap above. A vertical chord that ends its column fills it (fitMac).
+    const flowHtml = list => {
+      let prev = null;
+      return list.map(b => {
+        const html = blockHtml(A, X, b, b === list[list.length - 1] ? Object.assign({ fill: true }, ctx) : ctx);
+        if (!html) return '';
+        const gap = gapOf(prev, b);
+        const hero = prev === null && b === blocks[0];
+        prev = b;
+        return `<div class="ps-b" data-type="${A.e(b.type)}" data-gap="${gap}"${hero ? ' data-hero="1"' : ''}>${html}</div>`;
+      }).join('');
+    };
+    const colOf = {};
+    flow.forEach(b => { colOf[b.rank] = productColumnOf(b, 'mac'); });
+    const sideBlocks = flow.filter(b => colOf[b.rank] === 'side'), inspBlocks = flow.filter(b => colOf[b.rank] === 'inspector');
+    const cols = sideBlocks.length > 0 || inspBlocks.length > 0;
+    const body = flowHtml(cols ? flow.filter(b => colOf[b.rank] === 'main') : flow);
     const pinHtml = pins.map(b => `<div class="ps-pb" data-type="${A.e(b.type)}">${blockHtml(A, X, b, ctx)}</div>`).join('');
     const lights = '<span class="ps-lights" aria-hidden="true"><i></i><i></i><i></i></span>';
     const tools = chrome === 'toolbar' ? `<span class="ps-mac-tools">${A.kPlain('search', 'Search')}${A.kPlain('more', 'More')}</span>` : '';
-    const nav = side ? `<aside class="sb-side ps-mac-side"><nav class="sb-nav" aria-label="${A.e(product.name || 'App')}">${tabs.map((t, i) => {
+    const navInner = side ? `<nav class="sb-nav" aria-label="${A.e(product.name || 'App')}">${tabs.map((t, i) => {
       const on = slug(t) === screen.id || t.toLowerCase() === screen.name.toLowerCase();
       return `<button type="button" class="sb-navi" tabindex="-1"${on ? ' aria-current="page"' : ''}>${A.icon(tabIcon(t, i), 18)}<span>${A.e(t)}</span></button>`;
-    }).join('')}</nav></aside>` : '';
-    const cls = ['sb-screen', 'sb-kit', 'ps-screen', 'ps-mac', o.fold ? 'has-fold' : 'is-comp', o.exp ? 'ps-export' : '', side ? 'has-side' : '', `ps-chrome-${chrome}`].filter(Boolean).join(' ');
+    }).join('')}</nav>` : '';
+    const sideHtml = cols && sideBlocks.length ? flowHtml(sideBlocks) : '';
+    const inspHtml = cols && inspBlocks.length ? flowHtml(inspBlocks) : '';
+    const nav = side || sideHtml ? `<aside class="sb-side ps-mac-side">${navInner}${sideHtml ? `<div class="ps-mac-sideb">${sideHtml}</div>` : ''}</aside>` : '';
+    const insp = inspHtml ? `<aside class="sb-k-side ps-mac-insp">${inspHtml}</aside>` : '';
+    const cls = ['sb-screen', 'sb-kit', 'ps-screen', 'ps-mac', o.fold ? 'has-fold' : 'is-comp', o.exp ? 'ps-export' : '', nav ? 'has-side' : '', insp ? 'has-insp' : '', cols ? 'ps-mac-cols' : '', `ps-chrome-${chrome}`].filter(Boolean).join(' ');
     // The window is wider than 600 px, which would switch on a board's hero scene rules (white headline); app screens have no hero art.
     const open = A.rootOpen(X, cls, ` data-fold-y="${MAC_H}" data-screen="${A.e(screen.id)}"`).replace(/ data-hero="[^"]*"/, '');
     return `${open}
@@ -282,6 +334,7 @@
         <div class="ps-mac-body">
           ${nav}
           <div class="ps-mac-main"><div class="ps-mac-col">${body}</div></div>
+          ${insp}
         </div>
         ${pinHtml ? `<div class="ps-pinbar">${pinHtml}</div>` : ''}
         ${o.fold ? `<div class="ps-veil" aria-hidden="true" style="top:${MAC_H}px"></div><div class="ps-fold" aria-hidden="true" style="top:${MAC_H}px"><span>Fold</span></div>` : ''}
@@ -483,7 +536,22 @@
   // Fit one screen to its fold. Content that crosses the fold is compacted first, a step at a time
   // (section gaps 28 to 20, chart 64pt, hero numeral one step down); only what still overflows is
   // veiled. The pinned bottom bar always sits just above the tab bar or home indicator.
+  // A chord label that does not fit its segment is never cut short. Horizontal inside chords go all or nothing: when any label
+  // overflows, every inside label is dropped and the chord shows its key under the bar. Vertical chords hide the labels that do not fit.
+  function hideClippedChordLabels(scr) {
+    const clipped = l => l.scrollWidth > l.clientWidth + 1 || l.scrollHeight > l.clientHeight + 1;
+    scr.querySelectorAll('.ps-chord.is-h.is-inside').forEach(c => {
+      c.classList.remove('is-key');
+      if ([...c.querySelectorAll('.ps-chord-s > .ps-chord-l')].some(clipped)) c.classList.add('is-key');
+    });
+    scr.querySelectorAll('.ps-chord.is-v .ps-chord-s > .ps-chord-l').forEach(l => {
+      l.style.visibility = '';
+      if (clipped(l)) l.style.visibility = 'hidden';
+    });
+  }
+
   function fitScreen(scr) {
+    hideClippedChordLabels(scr);
     if (scr.classList.contains('ps-mac')) return fitMac(scr);
     const inn = scr.querySelector('.ps-in');
     if (!inn) return 0;
@@ -521,24 +589,36 @@
     const barH = bar ? bar.offsetHeight : 0;
     if (bar) bar.style.top = (MAC_H - barH - 20) + 'px';
     const limit = MAC_H - (bar ? barH + 20 + 16 : 0);
-    const bottomOf = () => {
-      const kids = [...inn.querySelectorAll('.ps-mac-col > .ps-b')];
+    const yOf = el => { let y = 0; for (; el && el !== inn; el = el.offsetParent) y += el.offsetTop; return y; };
+    // A vertical chord that ends its column fills it down to 40 px above the fold (never under 160, never taller than the 800 window).
+    const fills = [...inn.querySelectorAll('.ps-chord[data-fill] > .ps-chord-bar')];
+    const fillChords = () => fills.forEach(el => {
+      el.style.height = '';
+      const floor = bar && el.closest('.ps-mac-main') ? limit : MAC_H - 40;
+      el.style.height = Math.max(160, Math.round(floor - yOf(el))) + 'px';
+    });
+    // The main column's bottom meets the pin-bar limit; side and inspector columns sit beside the pin bar, so they meet the window's foot.
+    const colBottom = c => {
+      const kids = [...inn.querySelectorAll(`${c} > .ps-b`)];
       const last = kids[kids.length - 1];
-      let y = 0;
-      for (let el = last; el && el !== inn; el = el.offsetParent) y += el.offsetTop;
-      return last ? y + last.offsetHeight : 0;
+      return last ? yOf(last) + last.offsetHeight : 0;
     };
+    const bottomOf = () => {
+      fillChords();
+      return { main: colBottom('.ps-mac-col'), other: Math.max(colBottom('.ps-mac-sideb'), colBottom('.ps-mac-insp')) };
+    };
+    const tooTall = b => b.main > limit || b.other > MAC_H - 24;
     ['ps-c1', 'ps-c2', 'ps-c3'].forEach(c => scr.classList.remove(c));
     let bottom = bottomOf();
     for (const c of ['ps-c1', 'ps-c2', 'ps-c3']) {
-      if (bottom <= limit) break;
+      if (!tooTall(bottom)) break;
       scr.classList.add(c);
       bottom = bottomOf();
     }
-    scr.classList.toggle('ps-tall', bottom > limit);
+    scr.classList.toggle('ps-tall', tooTall(bottom));
     const veil = scr.querySelector('.ps-veil');
     if (veil) veil.style.top = limit + 'px';
-    return Math.max(MAC_H, Math.ceil(bottom + 40));
+    return Math.max(MAC_H, Math.ceil(Math.max(bottom.main, bottom.other) + 40));
   }
 
   // Each screen is as tall as its content needs (never under 844). Both looks of a screen share the

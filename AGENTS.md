@@ -61,7 +61,8 @@ Steps:
    and into the style's `rules.dont` / `rules.do` so you don't repeat a killed look.
 2. **Write `app/product-sheet.md`** (format: `docs/product-sheet-format.md`; `Platform: mac` for a Mac
    app). Use the app's real screens and content, not placeholder copy. Show the app's signature in the
-   sheet: `> ` marks the selected list row, `callout` and `progress` blocks exist, and `~~text~~`
+   sheet: `> ` marks the selected list row, `callout` and `progress` blocks exist, `chord` draws
+   coloured weighted bars, Mac blocks take `column: side|main|inspector`, and `~~text~~`
    strikes text through. A screen is one window (Mac 1280x800, iPhone 390x844); content past it is
    drawn under a veiled fold, so keep what the owner must judge above the fold.
 3. **Study before inventing, after the thesis.** Once `direction.md` has its thesis and three

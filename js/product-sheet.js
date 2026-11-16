@@ -5,7 +5,7 @@
 ----------------------------------------------------------------------- */
 
 const PRODUCT_BLOCK_TYPES = ['title', 'hero-numeral', 'text', 'action', 'action-secondary', 'link', 'card', 'list', 'stats',
-  'chart', 'segmented', 'toggle', 'field', 'keypad', 'tiles', 'callout', 'progress'];
+  'chart', 'segmented', 'toggle', 'field', 'keypad', 'tiles', 'callout', 'progress', 'chord'];
 const PRODUCT_CHROMES = ['tabbar', 'topbar', 'none'];
 const PRODUCT_MAC_CHROMES = ['sidebar', 'toolbar', 'none'];
 const PRODUCT_PLATFORMS = ['iphone', 'mac'];
@@ -13,6 +13,63 @@ const PRODUCT_STATE_KEYS = { empty: 'empty', loading: 'loading', error: 'error',
 
 function productSlug(name) {
   return String(name || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') || 'screen';
+}
+
+/* ---- chord blocks and Mac columns: shared by the parser, the renderer (js/product-screens.js) and the brief (js/ai-brief.js) ---- */
+
+const PRODUCT_CHORD_LABELS = ['inside', 'below', 'none'];
+const PRODUCT_CHORD_ORIENTS = ['horizontal', 'vertical'];
+
+// '#rgb' or '#rrggbb' -> '#rrggbb' in lower case; anything else -> null. The only way a content colour reaches a style="".
+function productHex(v) {
+  const m = /^#([0-9a-f]{3}|[0-9a-f]{6})$/i.exec(String(v == null ? '' : v).trim());
+  if (!m) return null;
+  const h = m[1].toLowerCase();
+  return '#' + (h.length === 3 ? h.replace(/./g, c => c + c) : h);
+}
+
+// A chord's `items` ("label = weight = #colour; ...", the parts in any order) -> { items: [{ label, weight, color }], problems: [string] }.
+// A missing weight is 1; a missing or invalid colour is null (the style draws a tonal step).
+function productChordItems(str) {
+  const items = [], problems = [];
+  String(str == null ? '' : str).split(';').map(s => s.trim()).filter(Boolean).forEach((raw, i) => {
+    let color = null, weight = null;
+    const rest = [];
+    raw.split('=').map(s => s.trim()).filter(Boolean).forEach(b => {
+      if (color === null && productHex(b)) color = productHex(b);
+      else if (weight === null && Number.isFinite(Number(b)) && Number(b) > 0) weight = Number(b);
+      else rest.push(b);
+    });
+    const li = rest.findIndex(b => b.charAt(0) !== '#');
+    const label = li >= 0 ? rest.splice(li, 1)[0] : '';
+    const name = label ? `"${label}"` : `#${i + 1}`;
+    if (!label) problems.push(`Chord item ${name} has no label.`);
+    rest.forEach(b => {
+      if (b.charAt(0) !== '#' && (Number.isFinite(Number(b)) || weight === null)) problems.push(`Chord item ${name}: weight "${b}" is not a number above 0; uses 1.`);
+      else problems.push(`Chord item ${name}: colour "${b}" is not #rgb or #rrggbb; drawn in the style's tonal steps.`);
+    });
+    items.push({ label, weight: weight === null ? 1 : weight, color });
+  });
+  return { items, problems };
+}
+
+// The chord's `labels` and `orient`, with the sheet's fallbacks (inside, horizontal).
+function productChordOpts(props) {
+  const p = props || {};
+  const l = String(p.labels == null ? '' : p.labels).trim().toLowerCase(), o = String(p.orient == null ? '' : p.orient).trim().toLowerCase();
+  return { labels: PRODUCT_CHORD_LABELS.indexOf(l) >= 0 ? l : 'inside', orient: PRODUCT_CHORD_ORIENTS.indexOf(o) >= 0 ? o : 'horizontal' };
+}
+
+// A block that sits in the pinned bottom bar: the keypad, and actions marked `pin: bottom`.
+function productBlockPinned(b) {
+  return !!b && (b.type === 'keypad' || ((b.type === 'action' || b.type === 'action-secondary') && /^bottom$/i.test((b.props && b.props.pin) || '')));
+}
+
+// Which Mac column a block sits in: 'side' | 'main' | 'inspector'. Mac only; pinned blocks and iPhone are always 'main'.
+function productColumnOf(block, platform) {
+  if (platform !== 'mac' || !block || productBlockPinned(block)) return 'main';
+  const c = String((block.props && block.props.column) == null ? '' : block.props.column).trim().toLowerCase();
+  return c === 'side' || c === 'sidebar' ? 'side' : c === 'inspector' ? 'inspector' : 'main';
 }
 
 // Screen chrome depends on the platform. iPhone: tabbar | topbar | none (default topbar). Mac: sidebar | toolbar | none,
@@ -69,6 +126,19 @@ function parseProductSheet(text, sourceName) {
         else if (p) { warn(n, `"${p.slice(0, 30)}" is not "key: value"; added to the block text.`); textMain += (textMain ? ' | ' : '') + p; }
       });
       scr.blocks.push({ rank: scr.blocks.length + 1, type, text: textMain, props });
+      if (type === 'chord') {
+        const ch = productChordItems(props.items);
+        if (!ch.items.length) warn(n, 'Chord has no items; nothing is drawn.');
+        ch.problems.forEach(msg => warn(n, msg));
+        if (props.labels != null && PRODUCT_CHORD_LABELS.indexOf(props.labels.toLowerCase()) < 0) warn(n, `Chord labels "${props.labels}" is not inside, below or none; uses inside.`);
+        if (props.orient != null && PRODUCT_CHORD_ORIENTS.indexOf(props.orient.toLowerCase()) < 0) warn(n, `Chord orient "${props.orient}" is not horizontal or vertical; uses horizontal.`);
+      }
+      if (props.column) {
+        const c = props.column.toLowerCase();
+        if (product.platform !== 'mac') warn(n, 'column applies to Mac windows; drawn in the single column.');
+        else if (['side', 'sidebar', 'main', 'content', 'inspector'].indexOf(c) < 0) warn(n, `Column "${props.column}" is not side, main or inspector; uses main.`);
+        else if (c !== 'main' && c !== 'content' && productBlockPinned(scr.blocks[scr.blocks.length - 1])) warn(n, 'Pinned blocks sit at the foot of the main column; column ignored.');
+      }
     };
 
     lines.forEach((rawLine, i) => {
