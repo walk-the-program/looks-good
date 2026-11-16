@@ -1,0 +1,487 @@
+{
+ "rounds": [
+  {
+   "n": 1,
+   "date": "2026-11-15",
+   "by": "agent",
+   "summary": "Round 1 rendered three directions: A Swatch Shelf (japanese-minimal), B Label Ledger (editorial-serif), C Spectrum (live-tile), in app/renders/r1/a, b, c. The critic picked c+b: C's spectrum shelf with B's scent-strip detail. I agree: C's spectrum is the only signature that argues the thesis alone and the owner favours loud, structural ideas; B's blotter strip gives the detail screen the same chord.",
+   "changes": [
+    "Three directions written in direction.md section 5 and rendered, with HTML mocks for the shelf of each.",
+    "Chosen merge c+b recorded; the style scent-box-chord is built from it in round 2."
+   ],
+   "variants": [
+    {
+     "id": "r1a",
+     "change": "direction A Swatch Shelf (swatch tiles on paper)",
+     "verdict": "kill"
+    },
+    {
+     "id": "r1b",
+     "change": "direction B Label Ledger (ruled catalogue, scent strip detail)",
+     "verdict": "kill"
+    },
+    {
+     "id": "r1c",
+     "change": "direction C Spectrum (37 strips on dark)",
+     "verdict": "keep"
+    }
+   ],
+   "notes": [],
+   "shots": "shots/r1/"
+  },
+  {
+   "n": 2,
+   "date": "2026-11-15",
+   "by": "agent",
+   "summary": "Round 2 builds the c+b style scent-box-chord and answers the round 1 review (fixes f1 to f9). App renders are in app/renders/r2/: Shelf, Fragrance and Add fragrance Mac windows plus the kit, light and dark, and three HTML mocks (shelf, fragrance, add-fragrance) built from app/draft-pack.md tokens.",
+   "changes": [
+    "Kit restyled to the spectrum direction: buttons, tabs, segmented controls and fields are bare text with underlines, cards, panels and list rows are the ground, radius is 0, the selected list row is a 3px ink bar, the topbar is the canvas, and the primary arrow is blanked (f1).",
+    "Shelf mock draws all 37 strips in accord colours with a house monogram under each group and the d'Annam sampler kept as one group (f3).",
+    "Fragrance mock draws notes as three stacked colour bands beside a tall scent strip, and accords as one labelled weighted bar instead of 'aromatic 100' rows (f4, f7).",
+    "Labels and buttons in the mocks are sentence case with no tracked capitals and no boxed badges (f5).",
+    "The shelf numeral is 84px, about half the first mock, with the spectrum as the first read; Add fragrance is a bold word at the toolbar's trailing edge, not a slab (f6).",
+    "The format split (7 bottles, 3 small, 24 samples) is a bar along the foot of the shelf and the spectrum fills the window, so the screen ends deliberately (f9).",
+    "Add fragrance mock shows the chord in accord colours as the accords field is typed (f8).",
+    "Product sheet drops the 'aromatic 100' accord rows for a plain legend line."
+   ],
+   "variants": [
+    {
+     "id": "r2a",
+     "change": "material: grey tiles, outlined and filled buttons to bare text with underlines and no containers",
+     "verdict": "keep"
+    },
+    {
+     "id": "r2b",
+     "change": "primary action: heavy-underline material tried, killed because its label colour assumes a fill and fails contrast on 8 stress palettes; quiet-text bold kept",
+     "verdict": "kill"
+    },
+    {
+     "id": "r2c",
+     "change": "preview primary: cream #f2efe8 tried, killed because the sheet tile strip vanished in light mode; mid warm grey #8a847a kept",
+     "verdict": "keep"
+    }
+   ],
+   "notes": [
+    {
+     "id": "n1",
+     "target": "general",
+     "text": "f1 (P1): restyle the kit to match the mock with no grey tiles, black selected rows or slab buttons.",
+     "status": "done",
+     "doneIn": 2
+    },
+    {
+     "id": "n2",
+     "target": "board.palette",
+     "text": "f2 (P2): chord strips in the sheet renders are a one-colour ramp; the sheet's tiles block cannot take accord colours, so only the mocks show them.",
+     "status": "done",
+     "doneIn": 3
+    },
+    {
+     "id": "n3",
+     "target": "general",
+     "text": "f3 (P2): label the strips by house.",
+     "status": "done",
+     "doneIn": 2
+    },
+    {
+     "id": "n4",
+     "target": "general",
+     "text": "f4 (P2): notes as three stacked bands, accords as a weighted bar.",
+     "status": "done",
+     "doneIn": 2
+    },
+    {
+     "id": "n5",
+     "target": "kit.section-label",
+     "text": "f5 (P2): remove tracked caps. Done in the mocks; the renderer still sets sheet labels and the primary button in uppercase and the style cannot override it.",
+     "status": "done",
+     "doneIn": 3
+    },
+    {
+     "id": "n6",
+     "target": "general",
+     "text": "f6 (P2): shrink the shelf numeral and move Add away from the slab.",
+     "status": "done",
+     "doneIn": 2
+    },
+    {
+     "id": "n7",
+     "target": "general",
+     "text": "f7 (P2): replace 'aromatic 100' rows with the coloured weighted chord bar.",
+     "status": "done",
+     "doneIn": 2
+    },
+    {
+     "id": "n8",
+     "target": "general",
+     "text": "f8 (P3): chord preview as the accords field is typed.",
+     "status": "done",
+     "doneIn": 2
+    },
+    {
+     "id": "n9",
+     "target": "general",
+     "text": "f9 (P3): fill the empty lower area of the shelf.",
+     "status": "done",
+     "doneIn": 2
+    },
+    {
+     "id": "n10",
+     "target": "kit.button-primary",
+     "text": "The kit cannot draw the primary as a heavy-underlined word (label colour fails contrast); it is bold plain text in the kit and in the mocks.",
+     "status": "open"
+    }
+   ],
+   "shots": "shots/r2/"
+  },
+  {
+   "n": 3,
+   "date": "2026-11-15",
+   "by": "agent",
+   "summary": "Round 3 answers the round 2 review (fixes f1 to f10). It adds the generic code-tier moves label-case and press-fade in js/moves/bare-type.js, removes the accord tiles and pills from the sheet, pins the primary action, and fixes the mocks. App renders are in app/renders/r3/ (Shelf, Fragrance, Add fragrance, kit; light and dark; plus the three mocks).",
+   "changes": [
+    "f1: new move label-case sets case and tracking of labels, tabs, buttons and the top-bar title; the style uses none and 0, so no tracked capitals remain. The 'out of 10' and '7 bottles' pills are gone: the numerals no longer take a meta chip and the counts are a plain muted line.",
+    "f2: the accord tiles are removed from the sheet; accords are shown as words, and direction.md section 8 lists the chord, notes bands and live preview as mock-only. Nothing is faked.",
+    "f3: new state press-fade presses every button by fading it to 70% with no fill; kit pressed specimens lose the grey slab. The kit page's own cell frames are drawn by the kit page, not the style, and remain.",
+    "f4: Add fragrance, Save and Save fragrance are pinned to the bottom bar at full ink, above the fold.",
+    "f5: the shelf sheet drops list rows with chevrons and the Filter row for plain text lines grouped by house, so the numeral and tabs are the first read; Add is one bold word in the bottom bar.",
+    "f6: accord label ink in the mocks is chosen per segment by contrast against near-black or white.",
+    "f7: the shelf mock names every house in full, staggered on up to four rows under its group, instead of monograms.",
+    "f8: notes are plain text lines without chevrons in the sheet render; the mock keeps the three colour bands.",
+    "f9: the add mock keeps one chord (the tall strip, labelled inside) and drops the duplicate bar.",
+    "f10: the shelf mock names the d'Annam sampler group and ends on the format bar."
+   ],
+   "variants": [
+    {
+     "id": "r3a",
+     "change": "type: tracked uppercase everywhere to sentence case via the label-case move",
+     "verdict": "keep"
+    },
+    {
+     "id": "r3b",
+     "change": "press state: grey fill (press-darken) to opacity fade (press-fade)",
+     "verdict": "keep"
+    },
+    {
+     "id": "r3c",
+     "change": "sheet list rows with chevrons to plain text lines grouped by house",
+     "verdict": "keep"
+    }
+   ],
+   "notes": [
+    {
+     "id": "n11",
+     "target": "general",
+     "text": "f1 (P1): remove uppercase and tracking from every label, tab, header and button; delete the pills.",
+     "status": "done",
+     "doneIn": 3
+    },
+    {
+     "id": "n12",
+     "target": "general",
+     "text": "f2 (P1): chord swatches in the renders; the sheet cannot colour them, so they are removed and left to the mocks.",
+     "status": "done",
+     "doneIn": 3
+    },
+    {
+     "id": "n13",
+     "target": "general",
+     "text": "f3 (P1): pressed states are grey slabs and cards are boxed.",
+     "status": "done",
+     "doneIn": 3
+    },
+    {
+     "id": "n14",
+     "target": "general",
+     "text": "f4 (P1): Save is greyed on the fold line.",
+     "status": "done",
+     "doneIn": 3
+    },
+    {
+     "id": "n15",
+     "target": "general",
+     "text": "f5 (P2): give the shelf render a first read without chevron rows.",
+     "status": "done",
+     "doneIn": 3
+    },
+    {
+     "id": "n16",
+     "target": "general",
+     "text": "f6 (P2): accord label ink by luminance in the mocks.",
+     "status": "done",
+     "doneIn": 3
+    },
+    {
+     "id": "n17",
+     "target": "general",
+     "text": "f7 (P2): show house names in full.",
+     "status": "done",
+     "doneIn": 3
+    },
+    {
+     "id": "n18",
+     "target": "general",
+     "text": "f8 (P2): notes without chevrons.",
+     "status": "done",
+     "doneIn": 3
+    },
+    {
+     "id": "n19",
+     "target": "general",
+     "text": "The kit page's own specimen cell frames are not controllable from a style (no catalog move turns kit-cell-frame off).",
+     "status": "open"
+    }
+   ],
+   "shots": "shots/r3/"
+  },
+  {
+   "n": 4,
+   "date": "2026-11-15",
+   "by": "agent",
+   "summary": "Round 4 answers the round 3 review (f1 to f6). It adds the generic move bare-edge to js/moves/bare-type.js and tightens the mocks. App renders are in app/renders/r4/.",
+   "changes": [
+    "f1: the shelf mock labels each house on one row, 6px right of its tick, and drops the label for a group too narrow to hold it; no tick crosses a label.",
+    "f2: the pinned Add fragrance and Save sat 16px inside the text edge because the stock button caption keeps 16px side padding, which the style controls. New move bare-edge sets button padding to 0, so they align to the text edge. The window dots sat on the left edge because the style's topbar rule left no side padding; bare-edge now sets the title bar side padding to 20px.",
+    "f3: the shelf numeral is 56px (was 84px) and the focused name 76px, so the name is the first read after the spectrum.",
+    "f4: the add mock now shows how the fragrance will read on the shelf (house and name set large) beside the chord strip.",
+    "f5: the three grey window squares are removed from every mock; the toolbar starts on the 40px edge.",
+    "f6: the fragrance mock fills the lower left with the format split showing this bottle's share of the shelf."
+   ],
+   "variants": [
+    {
+     "id": "r4a",
+     "change": "structure: button caption padding 16px to 0 and title bar padding 0 to 20px via bare-edge",
+     "verdict": "keep"
+    }
+   ],
+   "notes": [
+    {
+     "id": "n20",
+     "target": "general",
+     "text": "f1 (P2): house labels on one row, ticks clear of labels.",
+     "status": "done",
+     "doneIn": 4
+    },
+    {
+     "id": "n21",
+     "target": "general",
+     "text": "f2 (P2): align pinned actions to the text edge and move the window dots in.",
+     "status": "done",
+     "doneIn": 4
+    },
+    {
+     "id": "n22",
+     "target": "general",
+     "text": "f3 (P3): the 37 numeral rivals the focused name.",
+     "status": "done",
+     "doneIn": 4
+    },
+    {
+     "id": "n23",
+     "target": "general",
+     "text": "f4 (P3): empty right half in the add mock.",
+     "status": "done",
+     "doneIn": 4
+    },
+    {
+     "id": "n24",
+     "target": "general",
+     "text": "f5 (P3): remove the three grey squares in the mocks.",
+     "status": "done",
+     "doneIn": 4
+    },
+    {
+     "id": "n25",
+     "target": "general",
+     "text": "f6 (P3): empty lower left in the fragrance mock.",
+     "status": "done",
+     "doneIn": 4
+    }
+   ],
+   "shots": "shots/r4/"
+  },
+  {
+   "n": 5,
+   "date": "2026-11-15",
+   "by": "agent",
+   "summary": "Round 5 answers the round 4 review (f1 to f5). App renders are in app/renders/r5/.",
+   "changes": [
+    "f1: every house group on the shelf mock is labelled: the full name where it fits, otherwise its monogram (two to four letters, 10.5px), always inside its group so no label touches a tick or the right edge.",
+    "f2: the rating numeral is 110px (was 150px) against the 92px name, so the fragrance is the first read on the detail screen.",
+    "f3: accord labels sit bottom-left in both the add chord strip and the accords bar.",
+    "f4: not changed. The sheet tiles block cannot take accord colours, so the renderer cannot draw a coloured chord beside a name; this stays mock-only.",
+    "f5: bare-edge gains a splitRule param; the style turns it off, so a split button has no divider box."
+   ],
+   "variants": [
+    {
+     "id": "r5a",
+     "change": "structure: split button divider removed via bare-edge splitRule",
+     "verdict": "keep"
+    }
+   ],
+   "notes": [
+    {
+     "id": "n26",
+     "target": "general",
+     "text": "f1 (P2): label every house group.",
+     "status": "done",
+     "doneIn": 5
+    },
+    {
+     "id": "n27",
+     "target": "general",
+     "text": "f2 (P3): rating outweighs the name.",
+     "status": "done",
+     "doneIn": 5
+    },
+    {
+     "id": "n28",
+     "target": "general",
+     "text": "f3 (P3): accord label corner.",
+     "status": "done",
+     "doneIn": 5
+    },
+    {
+     "id": "n29",
+     "target": "general",
+     "text": "f4 (P3): the rendered shelf shows no scent colour; the sheet cannot colour tiles.",
+     "status": "open"
+    },
+    {
+     "id": "n30",
+     "target": "kit.button-split",
+     "text": "f5 (P3): remove the split button divider.",
+     "status": "done",
+     "doneIn": 5
+    }
+   ],
+   "shots": "shots/r5/"
+  },
+  {
+   "n": 6,
+   "date": "2026-11-15",
+   "by": "agent",
+   "summary": "Round 6 answers the round 5 review (f1 to f6). App renders are in app/renders/r6/.",
+   "changes": [
+    "f1: the spectrum is 54px taller so the composition fills the window and the format bar keeps the foot margin.",
+    "f2: Parfums de Marly's second entry has no accords in scent-box.html, so it is now an outlined hatched empty strip with a 1px ink edge instead of a flat grey block.",
+    "f3: house labels are 12px at 78% ink with an ink tick; the focused house is full ink and bold; monograms remain for narrow groups.",
+    "f4: the scent strip on the fragrance mock is shortened to 560px so the columns end closer together.",
+    "f5: not changed; the sheet cannot colour tiles, so the chord stays mock-only.",
+    "f6: the split button's divider is already removed; its menu box belongs to the kit page and no move reaches it."
+   ],
+   "variants": [
+    {
+     "id": "r6a",
+     "change": "empty chord: flat grey fill to outlined hatch",
+     "verdict": "keep"
+    }
+   ],
+   "notes": [
+    {
+     "id": "n31",
+     "target": "general",
+     "text": "f1 (P2): dead band below the legend.",
+     "status": "done",
+     "doneIn": 6
+    },
+    {
+     "id": "n32",
+     "target": "general",
+     "text": "f2 (P2): PdM strip reads as missing.",
+     "status": "done",
+     "doneIn": 6
+    },
+    {
+     "id": "n33",
+     "target": "general",
+     "text": "f3 (P3): house labels too small and muted.",
+     "status": "done",
+     "doneIn": 6
+    },
+    {
+     "id": "n34",
+     "target": "general",
+     "text": "f4 (P3): empty space in the fragrance mock middle column.",
+     "status": "done",
+     "doneIn": 6
+    },
+    {
+     "id": "n35",
+     "target": "kit.button-split",
+     "text": "f6 (P3): split button menu box is drawn by the kit page and no move reaches it.",
+     "status": "open"
+    }
+   ],
+   "shots": "shots/r6/"
+  },
+  {
+   "n": 7,
+   "date": "2026-11-15",
+   "by": "agent",
+   "summary": "Round 7 answers the round 6 review. App renders are in app/renders/r7/.",
+   "changes": [
+    "f1: the fragrance mock's three columns now share one bottom edge: the scent strip, the format bar with its caption and My notes all end on the same baseline, 40px above the window foot, with no empty band.",
+    "The fragrance mock's description and facts take two different tones, so there are three text levels instead of one flat grey.",
+    "Shelf monograms checked in dark mode: they read at 12px on the dark ground."
+   ],
+   "variants": [
+    {
+     "id": "r7a",
+     "change": "layout: fragrance columns pinned to one height with the lower items bottom-aligned",
+     "verdict": "keep"
+    }
+   ],
+   "notes": [
+    {
+     "id": "n36",
+     "target": "general",
+     "text": "f1 (P2): fragrance mock columns end on one baseline.",
+     "status": "done",
+     "doneIn": 7
+    }
+   ],
+   "shots": "shots/r7/"
+  },
+  {
+   "n": 8,
+   "date": "2026-11-15",
+   "by": "agent",
+   "summary": "Round 8 reconciles r6 f1 and r7 f1. The r7 change applied 'fill the full height' too literally and opened voids inside the fragrance columns; this round composes each screen as one block. App renders are in app/renders/r8/.",
+   "changes": [
+    "Fragrance mock: columns end where their content ends. The middle column runs house, name, facts, description, rating, then the format bar directly under it. The right column runs notes tiers, accords bar, then My notes directly under it. The scent strip spans exactly the content block (top of the house line to the bottom of the taller column). The block is centred vertically in the window, and the note swatches are 72px (was 58px) so the block fills more of it.",
+    "Add mock: the chord strip ends exactly on the Accords underline, and the whole form block is centred vertically, so there is no empty bottom fifth.",
+    "This supersedes the r6 f1 and r7 f1 instruction to push items to the window foot (SKILL.md Phase 5 step 5: when a fix has more than one answer, try variants and keep one)."
+   ],
+   "variants": [
+    {
+     "id": "r8a",
+     "change": "layout: bottom-aligned lower items (r7) to content-height columns centred as one block",
+     "verdict": "keep"
+    },
+    {
+     "id": "r8b",
+     "change": "layout: pin format bar and My notes to the window foot (r7)",
+     "verdict": "kill"
+    }
+   ],
+   "notes": [
+    {
+     "id": "n37",
+     "target": "general",
+     "text": "r7 f1 (P2): fragrance columns have voids.",
+     "status": "done",
+     "doneIn": 8
+    },
+    {
+     "id": "n38",
+     "target": "general",
+     "text": "r7 f2 (P2): add mock chord strip must end on the Accords underline and the block must not leave an empty bottom fifth.",
+     "status": "done",
+     "doneIn": 8
+    }
+   ],
+   "shots": "shots/r8/"
+  }
+ ]
+}

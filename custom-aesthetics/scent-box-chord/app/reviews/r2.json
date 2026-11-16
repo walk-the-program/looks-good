@@ -1,0 +1,37 @@
+{
+  "round": 2,
+  "reviewer": "critic",
+  "date": "2026-11-15",
+  "renders": "app/renders/r2/",
+  "scores": {
+    "thesis": { "score": 4, "evidence": "mock-shelf-dark.png: 37 strips in the accords' own colours are the whole screen and the thesis reads at once. shelf-dark.png and fragrance-dark.png show a brown ramp of grey swatches, so the real kit does not carry it." },
+    "signature": { "score": 4, "evidence": "mock-shelf-light.png: the spectrum with the focused strip rising and a tick is memorable and born from the accord data; mock-fragrance-dark.png repeats it as the tall scent strip. It is absent from shelf-light.png, so it lives only in the mocks." },
+    "content": { "score": 4, "evidence": "mock-fragrance-light.png: notes as three tiers of colour swatches, accords as one weighted bar, 8.5 as one numeral. mock-shelf-light.png: format split bar. shelf-dark.png still draws the shelf as a text list with chevrons and 'Liked, not owned' strings." },
+    "hierarchy": { "score": 4, "evidence": "mock-shelf-dark.png: strips, then Harvest Moon, then facts, Add as a bold word top right. shelf-dark.png has no first read: ten equal ramp boxes, tabs, search, ADD FRAGRANCE and FILTER all at similar weight." },
+    "type": { "score": 3, "evidence": "mock-shelf-light.png: heavy grotesque against small Inter Tight is real contrast. shelf-dark.png, fragrance-light.png and add-fragrance-dark.png set FRAGRANCES ON THE SHELF, SHOW, MY RATING, ACCORDS, STATUS, SAVE FRAGRANCE and the tab bar in tracked or uppercase caps, which direction.md section 6 forbids." },
+    "colour": { "score": 4, "evidence": "mock-shelf-dark.png: full-strength scent colour on near-black with ink-only chrome; mock-fragrance-light.png holds in light mode. shelf-light.png and kit-light.png show no scent colour at all, and mock-fragrance-dark.png puts white labels on pastel accord segments (aromatic, amber) with low contrast." },
+    "restraint": { "score": 3, "evidence": "mock-shelf-light.png is one idea with no containers. fragrance-light.png adds a filled pill 'out of 10', shelf-light.png a filled pill '7 bottles · 3 small · 24 samples', chevrons on every row, and kit-light.png boxed cards and grey pressed slabs, all contradicting the no-container, zero-radius language." },
+    "craft": { "score": 3, "evidence": "mock-shelf-light.png: strong 40px left edge, grouped gaps, rising strip. fragrance-dark.png: SAVE sits on the fold line at 40 percent grey, nearly clipped; mock-fragrance-light.png has labels in mixed ink on pastel and a dead lower-left; mock-add-fragrance-dark.png shows the chord twice (tall strip and bar) with the right half empty; monograms SMN, D3, TK are cryptic." },
+    "distinct": { "score": 3, "evidence": "mock-shelf-dark.png is unmistakable, but shelf-light.png, fragrance-light.png and add-fragrance-light.png are a centred one-column list with chevrons and tracked caps, the default the owner has rejected. Distinct in one place, default elsewhere." },
+    "owner-fit": { "score": 4, "evidence": "mock-shelf-dark.png is the loud, structural, colour-keeping answer to 'cheap' and 'even simpler', with no grey boxes. kit-dark.png pressed states are still grey slabs, a small echo of the killed look." }
+  },
+  "generic": [
+    "Tracked-caps label stack and chevron list rows in the rendered screens (shelf-dark.png: FRAGRANCES ON THE SHELF, SHOW, FILTER, chevrons on every row)",
+    "Filled pill badges for '7 bottles · 3 small · 24 samples' and 'out of 10' (shelf-light.png, fragrance-light.png)",
+    "Boxed component cards and grey pressed-state slabs in the kit (kit-light.png, kit-dark.png)"
+  ],
+  "fixes": [
+    { "id": "f1", "priority": "P1", "target": "shelf-*.png, fragrance-*.png, add-fragrance-*.png, kit-*.png (carried from r1 f5, did not land)", "text": "Remove text-transform uppercase and letter-spacing from every label, tab, section header, page title and button in aesthetic.json; use sentence case, and delete the filled '7 bottles' and 'out of 10' pills." },
+    { "id": "f2", "priority": "P1", "target": "shelf-*.png, fragrance-*.png, add-fragrance-*.png (carried from r1 f2, did not land)", "text": "Chord swatches in the renders are still a one-colour brown ramp; draw them in each accord's own colour (code-tier move) or the renders contradict the mocks." },
+    { "id": "f3", "priority": "P1", "target": "kit-dark.png and kit-light.png (carried from r1 f1, partly landed)", "text": "Pressed states on primary, secondary, destructive, text, icon and floating buttons are still filled grey slabs and component cards are boxed; use the 70 percent opacity press from direction.md section 6 and remove fills." },
+    { "id": "f4", "priority": "P1", "target": "fragrance-dark.png and fragrance-light.png", "text": "SAVE is greyed and sits on the fold line, effectively clipped; put the primary action in the toolbar's trailing edge above the fold at full ink." },
+    { "id": "f5", "priority": "P2", "target": "shelf-dark.png", "text": "Give the render a first read: drop chevrons on list rows and the FILTER and ADD FRAGRANCE rows as stacked blocks; set Add as a bold trailing word and rows as name plus a coloured chord." },
+    { "id": "f6", "priority": "P2", "target": "mock-fragrance-dark.png", "text": "Accord labels use white on pastel segments (aromatic, amber, sweet); pick label ink per segment by luminance so all seven read at the same contrast in both modes." },
+    { "id": "f7", "priority": "P2", "target": "mock-shelf-dark.png", "text": "House monograms (SMN, D3, TK, IND) cannot be read; show the house name in full for the focused group and under each group where width allows." },
+    { "id": "f8", "priority": "P2", "target": "fragrance-light.png", "text": "Notes still draw as Top, Heart, Base rows with chevrons; render them as three coloured bands and drop the chevrons." },
+    { "id": "f9", "priority": "P3", "target": "mock-add-fragrance-light.png", "text": "The chord appears twice (tall strip and bar); keep one and use the freed right half for the empty-shelf wording or the format choice." },
+    { "id": "f10", "priority": "P3", "target": "mock-shelf-light.png", "text": "A 170px empty band sits between the accord legend and the format bar; lift the format bar or add the sampler group label so the screen ends deliberately." }
+  ],
+  "landed": ["f3", "f4", "f6", "f8"],
+  "verdict": "refine"
+}

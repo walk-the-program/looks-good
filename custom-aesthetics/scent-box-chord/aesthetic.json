@@ -1,0 +1,704 @@
+{
+ "spec": 2,
+ "key": "scent-box-chord",
+ "order": 955,
+ "name": "Scent Box Chord",
+ "descriptor": "Spectral · Bare · Loud",
+ "influences": "Paint-chip fans and barcode-like colour strips; the perfumer's accord chord; Swiss grotesque posters set huge on a dark ground",
+ "summary": "A bare dark interface where every fragrance is a strip of its own accord colours, split by weight, and nothing else on screen owns a colour.",
+ "coreTrick": "Every control is plain type on the ground with an underline, so the only colour on screen is each scent's accord chord: a bar split by weight in the accords' own colours.",
+ "motto": "The shelf is a spectrum.",
+ "kicker": "37 fragrances",
+ "mode": "dark",
+ "lineage": {
+  "forkedFrom": null,
+  "version": 1
+ },
+ "meta": {
+  "family": "graphic",
+  "fonts": {
+   "heading": {
+    "classes": [
+     "grotesk"
+    ],
+    "picks": [
+     "Bricolage Grotesque"
+    ]
+   },
+   "body": {
+    "classes": [
+     "neo-grotesk"
+    ],
+    "picks": [
+     "Inter Tight",
+     "Figtree"
+    ]
+   },
+   "mono": {
+    "picks": [
+     "Geist Mono"
+    ]
+   },
+   "avoid": [
+    "serif",
+    "script",
+    "slab",
+    "groovy",
+    "pixel",
+    "blackletter",
+    "mono"
+   ],
+   "why": "Names and the shelf count are set huge in a heavy, characterful grotesque so they stand against the strips; facts stay in a quiet neo-grotesk. Nothing is tracked capitals.",
+   "pairings": [
+    [
+     "Bricolage Grotesque",
+     "Inter Tight"
+    ],
+    [
+     "Bricolage Grotesque",
+     "Figtree"
+    ]
+   ]
+  }
+ },
+ "build": {
+  "cls": "flat",
+  "surface": "No containers: strips of colour and type sit directly on the ground; controls are text with an underline; corners are square.",
+  "press": {
+   "opacity": 0.7,
+   "ms": 90
+  },
+  "motion": {
+   "fast": 90,
+   "base": 140,
+   "slow": 220,
+   "ease": "out"
+  },
+  "pressText": "A pressed control drops to 70% opacity over 90 ms, ease-out; a selected strip rises 12px over 140 ms; focus is a 2px ink outline 3px off the control.",
+  "icons": "One 1.5pt line set, only where the label does not say it; square caps, no filled shapes.",
+  "appIcon": "A dark ground with a row of narrow vertical colour strips of unequal height."
+ },
+ "labels": {
+  "material": "Bare text",
+  "states": [
+   "Rest",
+   "Hover",
+   "Pressed"
+  ],
+  "statesKind": "button"
+ },
+ "copy": {
+  "motto": {
+   "label": "Motto",
+   "text": "The shelf is a spectrum."
+  },
+  "kicker": {
+   "label": "Kicker above the headline",
+   "text": "37 fragrances"
+  }
+ },
+ "layout": {
+  "hero": "poster",
+  "palette": "strips",
+  "sections": "asym"
+ },
+ "type": {
+  "ui": "sans",
+  "label": "sans",
+  "display": 1.35
+ },
+ "roles": {
+  "canvas": {
+   "use": "The ground; near-black in dark, warm off-white in light",
+   "never": "Text",
+   "coverage": "60-70%"
+  },
+  "ink": {
+   "use": "All type, the heavy underline on the primary action, the selected strip's tick",
+   "never": "Large fills; boxes around content",
+   "coverage": "15-20%"
+  },
+  "primary": {
+   "use": "The one main action, drawn as heavy-underlined text; nothing else",
+   "never": "Strips, tiles or panels",
+   "coverage": "about 3%"
+  },
+  "secondary": {
+   "use": "Quiet separators and disabled text",
+   "never": "The main action",
+   "coverage": "5%"
+  },
+  "accent": {
+   "use": "Nothing in the interface; the accord colours belong to the scents",
+   "never": "Buttons, rules, selection, type",
+   "coverage": "0% of chrome"
+  }
+ },
+ "rules": {
+  "do": [
+   "Draw every fragrance as a strip or bar split by accord weight in the accords' own colours; the chord is the first read on every screen.",
+   "Keep controls as plain text with an underline: Add fragrance and Save are heavy-underlined words in the toolbar, never filled blocks.",
+   "Set one number huge per screen (the shelf count or the rating) and cap it at roughly twice the strip height; everything else is small.",
+   "Label strips by house, under each group, in small sentence-case type.",
+   "Draw notes as three stacked bands in time order (top, heart, base), each note in its own colour, beside a tall scent strip.",
+   "Use the whole Mac width: toolbar tabs, the spectrum across the window, the readout beneath; never a centred phone column."
+  ],
+  "dont": [
+   "Put anything in a grey tile, a soft-tint box or a bento grid (the owner called it 'really cheap and like not thought out at all').",
+   "Use a black or filled slab for Add or Save, an arrow on a button, or a full-width button inside content.",
+   "Use tracked capitals for labels or buttons, boxed badges like '7 BOTTLES' or 'OUT OF 10', or italic placeholders.",
+   "Tint chords with the brand colour; chords use only the accord colours.",
+   "Show 'aromatic 100' label and value rows or five glyph stars; use weighted bars and one numeral.",
+   "Add bottle illustrations, patterns or art to any app screen."
+  ]
+ },
+ "highlight": "ink",
+ "slideShape": "minimal",
+ "colour": [
+  {
+   "move": "canvas-ink-pull",
+   "params": {
+    "light": 0.02,
+    "dark": 0.03
+   }
+  },
+  {
+   "move": "mono-plus-accent",
+   "params": {
+    "kitAccent": "ink",
+    "kitSecondary": "canvas",
+    "tintMix": 4,
+    "markWord": false
+   }
+  },
+  {
+   "move": "muted-contrast-floor",
+   "params": {
+    "min": 5.2
+   }
+  },
+  {
+   "move": "state-colour-derivation",
+   "params": {
+    "pressMix": 0.85,
+    "hoverMix": 0.92
+   }
+  }
+ ],
+ "moves": [
+  {
+   "move": "corner-radius",
+   "params": {
+    "base": 0,
+    "controls": 0,
+    "surfaces": 0,
+    "small": 0,
+    "pill": false,
+    "round": true
+   }
+  },
+  {
+   "move": "hairline-rule",
+   "params": {
+    "width": 1,
+    "colour": "line"
+   }
+  },
+  {
+   "move": "interface-sans",
+   "params": {}
+  },
+  {
+   "move": "display-weight",
+   "params": {
+    "headline": 800,
+    "brand": 800,
+    "cardTitle": 700,
+    "wordSpacing": 0
+   }
+  },
+  {
+   "move": "tight-display-tracking",
+   "params": {
+    "tracking": -0.035,
+    "leading": 0.92
+   }
+  },
+  {
+   "move": "tracked-micro-labels",
+   "params": {
+    "tag": 0,
+    "kicker": 0,
+    "foot": 0
+   }
+  },
+  {
+   "move": "focus-ring",
+   "params": {
+    "look": "outline",
+    "reach": "all-controls",
+    "width": 2,
+    "offset": 3,
+    "colour": "ink"
+   }
+  },
+  {
+   "move": "skyline-bars",
+   "params": {
+    "bars": 14,
+    "width": 6,
+    "step": 10,
+    "height": 30
+   },
+   "scope": "board"
+  },
+  {
+   "move": "label-case",
+   "params": {
+    "labels": "none",
+    "controls": "none",
+    "tracking": 0
+   }
+  },
+  {
+   "move": "bare-edge",
+   "params": {
+    "buttonPad": 0,
+    "titlePad": 20,
+    "splitRule": false
+   }
+  },
+  {
+   "move": "action-glyph",
+   "params": {
+    "glyph": " ",
+    "size": 10
+   }
+  }
+ ],
+ "kit": {
+  "button-primary": {
+   "material": "quiet-text",
+   "state": [
+    "press-fade",
+    "focus-outline"
+   ],
+   "params": {
+    "quiet-text": {
+     "size": 17,
+     "tracking": 0
+    }
+   }
+  },
+  "button-secondary": {
+   "material": "flat-paper",
+   "state": [
+    "press-fade",
+    "focus-outline"
+   ]
+  },
+  "button-ghost": {
+   "material": "quiet-text",
+   "state": [
+    "press-fade",
+    "focus-outline"
+   ],
+   "params": {
+    "quiet-text": {
+     "size": 15,
+     "tracking": 0
+    }
+   }
+  },
+  "button-icon": {
+   "material": "flat-paper",
+   "state": [
+    "press-fade",
+    "focus-outline"
+   ]
+  },
+  "button-danger": {
+   "material": "flat-paper",
+   "state": [
+    "press-fade",
+    "focus-outline"
+   ]
+  },
+  "field": {
+   "material": "underline-field",
+   "state": [
+    "underline-focus"
+   ],
+   "params": {
+    "underline-field": {
+     "italic": false,
+     "size": 17,
+     "rule": "strong"
+    }
+   }
+  },
+  "select": {
+   "material": "underline-field",
+   "state": [
+    "underline-focus"
+   ],
+   "params": {
+    "underline-field": {
+     "italic": false,
+     "size": 17,
+     "rule": "strong"
+    }
+   }
+  },
+  "switch": {
+   "material": "flat-fill",
+   "state": "ink-fill-selected"
+  },
+  "checkbox": {
+   "material": "flat-fill",
+   "state": "ink-fill-selected"
+  },
+  "radio": {
+   "material": "flat-fill",
+   "state": "ink-fill-selected"
+  },
+  "slider": {
+   "material": "rule-slider",
+   "state": "press-fade",
+   "params": {
+    "rule-slider": {
+     "track": 2,
+     "thumb": 16
+    }
+   }
+  },
+  "segmented": {
+   "material": "underline-tab",
+   "state": "rule-selected",
+   "params": {
+    "underline-tab": {
+     "gap": 24,
+     "size": 14,
+     "tracking": 0,
+     "kitSize": 14,
+     "kitTracking": 0
+    }
+   }
+  },
+  "tabs": {
+   "material": "underline-tab",
+   "state": "rule-selected",
+   "params": {
+    "underline-tab": {
+     "gap": 24,
+     "size": 14,
+     "tracking": 0,
+     "kitSize": 14,
+     "kitTracking": 0
+    }
+   }
+  },
+  "card": {
+   "material": "flat-paper"
+  },
+  "panel": {
+   "material": "flat-paper"
+  },
+  "list-row": {
+   "material": "flat-paper",
+   "state": "bar-selected"
+  },
+  "chip": {
+   "material": "quiet-text",
+   "state": [
+    "rule-selected",
+    "press-fade"
+   ],
+   "params": {
+    "quiet-text": {
+     "size": 14,
+     "tracking": 0
+    }
+   }
+  },
+  "badge": {
+   "material": "flat-fill",
+   "params": {
+    "flat-fill": {
+     "fill": "ink"
+    }
+   }
+  },
+  "progress": {
+   "material": "skyline-fill",
+   "params": {
+    "skyline-fill": {
+     "height": 14,
+     "cell": 30
+    }
+   }
+  },
+  "avatar": {
+   "material": "hairline-box"
+  },
+  "tooltip": {
+   "material": "flat-fill",
+   "params": {
+    "flat-fill": {
+     "fill": "ink"
+    }
+   }
+  },
+  "modal": {
+   "material": "hairline-box"
+  },
+  "sheet": {
+   "material": "hairline-box"
+  },
+  "toast": {
+   "material": "hairline-box"
+  },
+  "callout": {
+   "material": "hairline-box",
+   "scope": "kit"
+  },
+  "menu": {
+   "material": "hairline-box"
+  },
+  "navbar": {
+   "material": "flat-fill",
+   "params": {
+    "flat-fill": {
+     "fill": "canvas"
+    }
+   }
+  },
+  "topbar": {
+   "material": "flat-fill",
+   "params": {
+    "flat-fill": {
+     "fill": "canvas"
+    }
+   }
+  },
+  "button-split": {
+   "material": "quiet-text",
+   "state": [
+    "press-fade",
+    "focus-outline"
+   ],
+   "params": {
+    "quiet-text": {
+     "size": 15,
+     "tracking": 0
+    }
+   }
+  },
+  "button-fab": {
+   "material": "quiet-text",
+   "state": [
+    "press-fade",
+    "focus-outline"
+   ],
+   "params": {
+    "quiet-text": {
+     "size": 15,
+     "tracking": 0
+    }
+   }
+  },
+  "button-back-top": {
+   "material": "flat-paper",
+   "state": [
+    "press-fade",
+    "focus-outline"
+   ]
+  },
+  "link": {
+   "material": "quiet-text"
+  },
+  "stepper": {
+   "material": "underline-field",
+   "state": "press-fade"
+  },
+  "knob": {
+   "material": "flat-fill"
+  },
+  "date-field": {
+   "material": "underline-field",
+   "state": [
+    "underline-focus"
+   ],
+   "params": {
+    "underline-field": {
+     "italic": false,
+     "size": 17,
+     "rule": "strong"
+    }
+   }
+  },
+  "combo": {
+   "material": "underline-field",
+   "state": [
+    "underline-focus"
+   ],
+   "params": {
+    "underline-field": {
+     "italic": false,
+     "size": 17,
+     "rule": "strong"
+    }
+   }
+  },
+  "listbox": {
+   "material": "underline-field",
+   "state": [
+    "underline-focus"
+   ],
+   "params": {
+    "underline-field": {
+     "italic": false,
+     "size": 17,
+     "rule": "strong"
+    }
+   }
+  },
+  "calendar": {
+   "material": "hairline-box"
+  },
+  "calendar-day": {
+   "material": "hairline-box"
+  },
+  "wheel": {
+   "material": "flat-fill"
+  },
+  "accordion": {
+   "material": "hairline-box"
+  },
+  "carousel-card": {
+   "material": "hairline-box"
+  },
+  "matrix-tile": {
+   "material": "hairline-box"
+  },
+  "divider": {
+   "material": "flat-fill"
+  },
+  "section-label": {
+   "material": "serif-caption",
+   "params": {
+    "serif-caption": {
+     "size": 14
+    }
+   }
+  },
+  "empty-state": {
+   "material": "hairline-box"
+  },
+  "overlay-scrim": {
+   "material": "ink-scrim"
+  },
+  "side-sheet": {
+   "material": "hairline-box"
+  },
+  "drawer": {
+   "material": "hairline-box"
+  },
+  "popover": {
+   "material": "hairline-box"
+  },
+  "popup-tip": {
+   "material": "flat-fill",
+   "params": {
+    "flat-fill": {
+     "fill": "ink"
+    }
+   }
+  },
+  "lightbox": {
+   "material": "hairline-box"
+  },
+  "lightbox-control": {
+   "material": "hairline-box"
+  },
+  "topbar-title": {
+   "material": "quiet-text"
+  },
+  "tabbar": {
+   "material": "flat-fill",
+   "params": {
+    "flat-fill": {
+     "fill": "canvas"
+    }
+   }
+  },
+  "nav-menu": {
+   "material": "flat-fill",
+   "params": {
+    "flat-fill": {
+     "fill": "canvas"
+    }
+   }
+  },
+  "nav-item": {
+   "material": "hairline-box"
+  },
+  "breadcrumbs": {
+   "material": "quiet-text"
+  },
+  "anchor-nav": {
+   "material": "quiet-text"
+  },
+  "scrollbar": {
+   "material": "flat-fill"
+  },
+  "dropdown-trigger": {
+   "material": "underline-field",
+   "state": [
+    "underline-focus"
+   ],
+   "params": {
+    "underline-field": {
+     "italic": false,
+     "size": 17,
+     "rule": "strong"
+    }
+   }
+  },
+  "menu-item": {
+   "material": "hairline-box"
+  },
+  "mega-menu": {
+   "material": "hairline-box"
+  },
+  "menubar": {
+   "material": "hairline-box"
+  },
+  "ribbon": {
+   "material": "hairline-box"
+  },
+  "pie-menu": {
+   "material": "hairline-box"
+  },
+  "spinner": {
+   "material": "flat-fill"
+  },
+  "skeleton": {
+   "material": "hairline-box"
+  },
+  "notification-dot": {
+   "material": "flat-fill"
+  },
+  "kbd": {
+   "material": "hairline-box"
+  }
+ },
+ "art": {
+  "hero": {
+   "kind": "svg",
+   "src": "art/hero.svg",
+   "fit": "cover",
+   "alt": "A row of narrow vertical strips in accord colours of unequal height on a dark ground"
+  }
+ }
+}

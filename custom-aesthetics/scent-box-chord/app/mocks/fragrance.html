@@ -1,0 +1,43 @@
+<!doctype html><meta charset=utf-8><title>Fragrance</title><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Inter+Tight:wght@400;500;600&display=block" rel="stylesheet"><script>var m=new URLSearchParams(location.search).get("mode")||(matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light");document.documentElement.dataset.theme=m;</script><style>
+.fm{display:inline-block;background:currentColor;vertical-align:middle;opacity:.7}
+.fm-full{width:4px;height:16px}.fm-travel{width:4px;height:11px}.fm-decant{width:4px;height:7px}.fm-sample{width:5px;height:5px;border-radius:50%}.fm-none{width:5px;height:5px;border:1px solid currentColor;background:none;border-radius:50%}
+
+*{box-sizing:border-box;margin:0;padding:0}
+/* tokens from app/draft-pack.md (Part 2) */
+:root{--canvas:#121111;--ink:#f1eee8;--muted:#989692;--line:#333231;--edge:rgba(255,255,255,.16);--dur-fast:90ms;--dur-base:140ms;--font-heading:"Bricolage Grotesque",sans-serif;--font-body:"Inter Tight",sans-serif}
+:root[data-theme=light]{--canvas:#ece9e4;--ink:#0b0a0a;--muted:#656361;--line:#cac8c3;--edge:rgba(0,0,0,.22)}
+html,body{width:1280px;height:800px;overflow:hidden;background:var(--canvas);color:var(--ink);font:400 15px/1.4 var(--font-body);font-variant-numeric:tabular-nums}
+.dots{position:absolute;left:24px;top:22px;display:flex;gap:7px}.dots i{width:11px;height:11px;background:var(--line)}
+.tb{display:flex;align-items:center;gap:26px;height:56px;padding:0 40px 0 40px}
+.ttl{font:700 19px var(--font-heading);margin-right:12px}
+.tab{color:var(--muted);font-size:14px;padding:6px 0 8px;border-bottom:2px solid transparent;font-weight:500}.tab.on{color:var(--ink);font-weight:600;border-bottom-color:var(--ink)}.tab b{font-weight:inherit;margin-left:5px}
+.sp{flex:1}.fld{width:230px;color:var(--muted);border-bottom:1px solid var(--ink);padding:5px 0 7px;font-size:14px;white-space:nowrap}
+.prim{font:600 17px var(--font-body);color:var(--ink);white-space:nowrap}.sec{font:400 15px var(--font-body);color:var(--muted)}
+.chord{display:flex;flex-direction:column}.chord i{display:block}.chord .emp{flex:1;background:repeating-linear-gradient(135deg,transparent 0 6px,var(--muted) 6px 7px);box-shadow:inset 0 0 0 1px var(--ink)}
+.edge{position:relative}.edge:after{content:"";position:absolute;inset:0;box-shadow:inset 0 0 0 1px var(--edge);pointer-events:none}
+.fm{display:inline-block;background:currentColor;vertical-align:middle}.fm-full{width:4px;height:16px}.fm-travel{width:4px;height:11px}.fm-decant{width:4px;height:7px}.fm-sample{width:5px;height:5px;border-radius:50%}.fm-none{width:5px;height:5px;border:1px solid currentColor;border-radius:50%}
+.num{font:800 56px/.8 var(--font-heading);letter-spacing:-.035em}
+.big{font:800 76px/.95 var(--font-heading);letter-spacing:-.04em}
+
+.wrap{display:grid;grid-template-columns:112px 1fr 470px;gap:44px;padding:20px 40px 0 40px;height:744px;box-sizing:border-box;align-content:center;align-items:stretch;padding-top:0}.mid,.side{display:flex;flex-direction:column;min-height:0}.mid .where{margin-top:40px}
+.strip{min-height:0;position:relative}.strip .chord{position:absolute;inset:0}
+.hs{color:var(--muted);font-size:14px;margin-top:2px}.name{font:800 92px/.9 var(--font-heading);letter-spacing:-.04em;margin:8px 0 14px}
+.meta{color:var(--muted);font-size:14px;display:flex;gap:9px;align-items:center}.meta span{color:color-mix(in srgb,var(--ink) 62%,var(--canvas))}
+.desc{font-size:17px;line-height:1.5;max-width:520px;margin:22px 0 0;color:color-mix(in srgb,var(--ink) 82%,var(--canvas))}
+.rate{display:flex;align-items:flex-end;gap:14px;margin-top:34px}.rate b{font:800 110px/.8 var(--font-heading);letter-spacing:-.045em}.rate span{color:var(--muted);font-size:13px;padding-bottom:4px}
+.mine{margin-top:30px;padding-bottom:0;font-size:15px;color:var(--ink);max-width:480px;border-top:1px solid var(--line);padding-top:14px}.mine em{font-style:normal;color:var(--muted);display:block;font-size:12px;margin-bottom:4px}
+.side h3{font:600 14px var(--font-body);color:var(--muted);margin:2px 0 10px}
+.tier{display:grid;grid-template-columns:54px 1fr;align-items:start;margin-bottom:16px}.tier h4{font:600 14px var(--font-body);padding-top:2px}
+.nb{display:flex;height:auto;gap:2px}.nc{flex:1;min-width:0}.nc i{display:block;height:72px;position:relative}.nc i:after{content:"";position:absolute;inset:0;box-shadow:inset 0 0 0 1px var(--edge)}.nc span{display:block;font-size:11.5px;margin-top:6px;line-height:1.2;color:var(--muted)}
+.cb{display:flex;height:56px;margin-top:6px;position:relative}.cb:after{content:"";position:absolute;inset:0;box-shadow:inset 0 0 0 1px var(--edge)}.cb i{display:flex;align-items:flex-end;padding:0 0 6px 6px;font-size:11.5px;font-style:normal;overflow:hidden}.cb span{white-space:nowrap}
+.sec2{margin-top:30px}
+.where{max-width:520px}.where .bar{display:flex;height:10px;gap:2px}.where .bar i{background:var(--muted);opacity:.28}.where .bar i:first-child{position:relative;background:var(--ink)}.wl{font-size:13px;color:var(--muted);margin-top:7px}
+</style><div class="tb"><span class="sec">Shelf</span><span class="sp"></span><span class="prim">Save</span></div>
+<div class="wrap"><div class="strip edge"><div class="chord"><i style="flex:100;background:#5E9C76"></i><i style="flex:85;background:#F2E3B3"></i><i style="flex:75;background:#8BC34A"></i><i style="flex:65;background:#E8A0BF"></i><i style="flex:55;background:#D98E32"></i><i style="flex:45;background:#8B5A2B"></i><i style="flex:40;background:#F4D23C"></i></div></div>
+<div class="mid"><div class="hs">Givenchy</div><div class="name">Pi</div><div class="meta"><i class="fm fm-full"></i><span>Full bottle · Owned · EDT · 1998 · Olivier Cresp</span></div>
+<p class="desc">A fresh herbal opening of tarragon and mandarin gives way to anise and neroli, then settles into a warm vanilla, tonka and benzoin base.</p>
+<div class="rate"><b>8.5</b><span>my rating, out of 10</span></div>
+<div class="where"><div class="bar"><i style="flex:7;opacity:1"></i><i style="flex:3"></i><i style="flex:24"></i></div><div class="wl">One of 7 full bottles on the shelf</div></div>
+</div>
+<div class="side"><h3>Notes, in the order you smell them</h3><div class="tier"><h4>Top</h4><div class="nb"><div class="nc"><i style="background:#5E9C76"></i><span>Rosemary</span></div><div class="nc"><i style="background:#5E9C76"></i><span>Basil</span></div><div class="nc"><i style="background:#5E9C76"></i><span>Tarragon</span></div><div class="nc"><i style="background:#F4D23C"></i><span>Mandarin Orange</span></div></div></div><div class="tier"><h4>Heart</h4><div class="nb"><div class="nc"><i style="background:#E05A7A"></i><span>Geranium</span></div><div class="nc"><i style="background:#F7F3E8"></i><span>Lily-of-the-Valley</span></div><div class="nc"><i style="background:#C0392B"></i><span>Anise</span></div><div class="nc"><i style="background:#F4D23C"></i><span>Neroli</span></div></div></div><div class="tier"><h4>Base</h4><div class="nb"><div class="nc"><i style="background:#9C5B3A"></i><span>Benzoin</span></div><div class="nc"><i style="background:#F2E3B3"></i><span>Vanilla</span></div><div class="nc"><i style="background:#8B5A2B"></i><span>Cedar</span></div><div class="nc"><i style="background:#E6D3A8"></i><span>Tonka Bean</span></div></div></div>
+<div class="sec2"><h3>Accords, by weight</h3><div class="cb"><i style="flex:100;background:#5E9C76;color:#121111"><span>aromatic</span></i><i style="flex:85;background:#F2E3B3;color:#121111"><span>vanilla</span></i><i style="flex:75;background:#8BC34A;color:#121111"><span>fresh spicy</span></i><i style="flex:65;background:#E8A0BF;color:#121111"><span>sweet</span></i><i style="flex:55;background:#D98E32;color:#121111"><span>amber</span></i><i style="flex:45;background:#8B5A2B;color:#ffffff"><span>woody</span></i><i style="flex:40;background:#F4D23C;color:#121111"><span>citrus</span></i></div></div><div class="mine"><em>My notes</em>Best in spring. Two sprays; the vanilla stays all evening.</div></div></div>

@@ -1,0 +1,33 @@
+{
+  "round": 3,
+  "reviewer": "critic",
+  "date": "2026-11-15",
+  "renders": "app/renders/r3/",
+  "scores": {
+    "thesis": { "score": 4, "evidence": "mock-shelf-dark.png: 37 strips in the accords' own colours are the screen and the thesis reads at once; mock-fragrance-dark.png repeats it as one tall strip. shelf-dark.png and fragrance-light.png are neutral text lists with no scent colour, so the renderer screens carry only the type and chrome." },
+    "signature": { "score": 4, "evidence": "mock-shelf-light.png: the barcode-like spectrum with the focused strip risen and a tick under it is born from the accord data and survives the logo being covered. It exists only in the mocks; shelf-light.png has no trace of it." },
+    "content": { "score": 4, "evidence": "mock-fragrance-light.png: notes as three tiered swatch rows, accords as one weighted labelled bar, 8.5 as one numeral; mock-shelf-dark.png: format split bar. mock-add-fragrance-dark.png: the typed accord string becomes its chord live. shelf-dark.png still lists fragrances as 'House: Name (accords)' text." },
+    "hierarchy": { "score": 4, "evidence": "mock-shelf-dark.png: strips, then Harvest Moon, then the five accord labels, with Add as a bold word top right. The 37 numeral nearly competes with the name for first read, but the order holds. mock-add-fragrance-light.png: title, fields, chord strip in a clear order." },
+    "type": { "score": 4, "evidence": "mock-shelf-light.png and mock-add-fragrance-dark.png: heavy tight grotesque for 37, Harvest Moon and the title against small sentence-case Inter Tight; no tracked caps remain in shelf-dark.png or fragrance-dark.png. Facts sit at one weight and one muted ink, so the third level is a little flat." },
+    "colour": { "score": 4, "evidence": "mock-shelf-dark.png and mock-shelf-light.png: scent colour at full strength on a one-ink ground in both modes, dark ground a step off black. mock-fragrance-dark.png: accord labels now take dark ink on pastel segments. Near-ground strips such as the dark grey Parfums de Marly strip rely on a thin edge." },
+    "restraint": { "score": 4, "evidence": "mock-shelf-light.png: no boxes, no radius, no shadow; one idea. mock-fragrance-light.png: the one hairline above My notes is the only rule. The three grey squares at the top left of every mock (mock-shelf-dark.png) are decoration with no job." },
+    "craft": { "score": 3, "evidence": "mock-shelf-dark.png: the house-group tick lines run through the label text (Scents of Wood, Day Three, House of Cosmo) and labels stagger across three rows, so the baseline reads ragged. shelf-dark.png and fragrance-dark.png: Add fragrance and Save sit at x=431 against a 406 text edge, and the window dots touch the left edge. mock-fragrance-dark.png: the lower-left and mid column are empty." },
+    "distinct": { "score": 4, "evidence": "mock-shelf-dark.png and mock-fragrance-light.png are recognisably this product with the name hidden. shelf-light.png and add-fragrance-light.png are a centred single column, which direction.md section 8 declares a renderer limit, so I score the mocks." },
+    "owner-fit": { "score": 4, "evidence": "mock-shelf-dark.png is a loud, structural, colour-keeping answer to 'cheap' and 'even simpler'; there are no grey boxes in any mock. kit-dark.png pressed states are now dimmed text and the grey slabs are gone." }
+  },
+  "generic": [
+    "Centred single-column text-list layout with a stacked Show / Search label pair in the rendered screens (shelf-dark.png, shelf-light.png)",
+    "Underlined form fields and a small grey label above every value in the add form (add-fragrance-light.png, mock-add-fragrance-light.png)",
+    "Three grey squares plus a plain 'Shelf' back label as the window chrome in every mock (mock-fragrance-light.png, mock-shelf-dark.png)"
+  ],
+  "fixes": [
+    { "id": "f1", "priority": "P2", "target": "mock-shelf-dark.png and mock-shelf-light.png house labels", "text": "Group tick lines cut through labels and labels stagger over three rows; put every house label on one row below its group, 6px right of the tick, and drop the label for groups too narrow to hold it." },
+    { "id": "f2", "priority": "P2", "target": "shelf-dark.png and fragrance-dark.png", "text": "Align Add fragrance and Save to the 406px text edge instead of 431px, and move the window dots in from the left edge." },
+    { "id": "f3", "priority": "P3", "target": "mock-shelf-dark.png", "text": "The 37 numeral rivals the focused fragrance name; reduce 37 by a third or mute its ink so the name is the first read after the strips." },
+    { "id": "f4", "priority": "P3", "target": "mock-add-fragrance-dark.png", "text": "The right half beyond the chord strip is empty; set the empty-shelf wording or the format choice there, or move the strip to the right edge." },
+    { "id": "f5", "priority": "P3", "target": "mock-shelf-light.png and mock-fragrance-light.png", "text": "Remove the three grey squares in the top-left window chrome, or give them a job." },
+    { "id": "f6", "priority": "P3", "target": "mock-fragrance-dark.png", "text": "Lower-left below the scent strip and middle column are empty; place the format and sampler line there or cut the strip to the content height." }
+  ],
+  "landed": ["f1", "f2", "f3", "f4", "f5", "f6", "f7", "f8", "f9"],
+  "verdict": "refine"
+}

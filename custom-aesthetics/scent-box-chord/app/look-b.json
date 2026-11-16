@@ -1,0 +1,4 @@
+{ "app": "Scent Box", "repo": null, "brandName": "Scent Box",
+  "style": "editorial-serif", "blend": null, "primary": "#7a2a2a", "scheme": "analogous",
+  "colors": { "primary": "#7a2a2a", "secondary": "#e6dcc6", "accent": "#7a2a2a", "neutralDark": "#1d1612", "neutralLight": "#f4ecdc" },
+  "heading": "Libre Caslon Text", "body": "Source Sans 3", "typography": null, "pureBg": false, "modes": ["light", "dark"] }

@@ -1,0 +1,4 @@
+{ "app": "Scent Box", "repo": null, "brandName": "Scent Box",
+  "style": "japanese-minimal", "blend": null, "primary": "#8a6a3b", "scheme": "analogous",
+  "colors": { "primary": "#8a6a3b", "secondary": "#e9e3d6", "accent": "#9a7b4f", "neutralDark": "#1a1713", "neutralLight": "#f6f3ec" },
+  "heading": "Newsreader", "body": "Instrument Sans", "typography": null, "pureBg": false, "modes": ["light", "dark"] }

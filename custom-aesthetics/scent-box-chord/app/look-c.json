@@ -1,0 +1,4 @@
+{ "app": "Scent Box", "repo": null, "brandName": "Scent Box",
+  "style": "live-tile", "blend": null, "primary": "#f2efe8", "scheme": "analogous",
+  "colors": { "primary": "#f2efe8", "secondary": "#2a2623", "accent": "#e8a02c", "neutralDark": "#0b0a0a", "neutralLight": "#f1eee8" },
+  "heading": "Bricolage Grotesque", "body": "Inter Tight", "typography": null, "pureBg": false, "modes": ["light", "dark"] }

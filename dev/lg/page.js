@@ -19,6 +19,8 @@
     };
   };
 
+  L.fonts = () => FONTS.map(f => ({ name: f.name, category: f.category, cls: f.cls || '', weights: f.weights || '' }));
+
   const srcOf = key => (window.CustomAesthetics ? CustomAesthetics.source(key) : null) || 'builtin';
 
   L.styles = () => AESTHETICS.map(a => {

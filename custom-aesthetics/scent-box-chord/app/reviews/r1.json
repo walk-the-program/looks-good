@@ -1,0 +1,70 @@
+{
+  "round": 1,
+  "reviewer": "critic",
+  "date": "2026-11-15",
+  "renders": "app/renders/r1/",
+  "directions": {
+    "a": {
+      "scores": {
+        "thesis": { "score": 3, "evidence": "a/mock-shelf-light.png argues it (chord swatches in scent colours), but a/shelf-light.png, a/fragrance-light.png and a/add-fragrance-light.png show a brown ramp of identical boxes and a one-column list, so only the mock carries the thesis." },
+        "signature": { "score": 4, "evidence": "a/mock-shelf-light.png: the swatch tile with its coloured chord face is memorable and comes from the accord data; the Memories of Japan tray is a good touch." },
+        "content": { "score": 4, "evidence": "a/mock-shelf-light.png: accords are a weighted bar, rating is a large 9, format a small mark, shelf split a bar. a/fragrance-light.png still lists accords as 'aromatic 100' rows and notes as text." },
+        "hierarchy": { "score": 4, "evidence": "a/mock-shelf-light.png: swatches first, serif names second, quiet sidebar, Add top right. The detail pane on the right has the name and a 9 competing at similar weight." },
+        "type": { "score": 4, "evidence": "a/mock-shelf-light.png: Newsreader names against a sans UI with small caps houses is reasoned with real contrast. a/shelf-light.png reverts to tracked caps 'FRAGRANCES ON THE SHELF' and 'THE SHELF BY SMELL'." },
+        "colour": { "score": 4, "evidence": "a/mock-shelf-dark.png: scent colour on neutral warm charcoal, brass only on Add; both modes designed. a/kit-light.png has the brass but no scent colour." },
+        "restraint": { "score": 4, "evidence": "a/mock-shelf-light.png: one tile idea, no boxes around non-objects. Sidebar footer 37 plus format bar and the detail pane compete a little." },
+        "craft": { "score": 3, "evidence": "a/mock-shelf-light.png: the bottom 30 percent of the content area is empty, sampler captions wrap to two lines of small serif, selected swatch 2px ink edge is clear but the detail notes sit loose. a/fragrance-light.png is a centred column with a Save arrow." },
+        "distinct": { "score": 3, "evidence": "a/mock-shelf-light.png is distinct in the swatch tile but the paper ground, serif and brass read as the tasteful default; a/shelf-light.png is a generic list." },
+        "owner-fit": { "score": 4, "evidence": "a/mock-shelf-light.png keeps scent colour and answers 'even simpler, bento' with a tile grid that is not grey; but it is the calmest option and the owner prefers loud." }
+      }
+    },
+    "b": {
+      "scores": {
+        "thesis": { "score": 3, "evidence": "b/mock-library-light.png reads as a catalogue with a scent strip, but b/shelf-light.png, b/fragrance-light.png show oxblood ramps and tracked caps, so the render side says 'editorial template', not fragrance." },
+        "signature": { "score": 4, "evidence": "b/mock-library-light.png: the tall banded scent strip beside the notes is vivid and product-born, though the shelf rows do not carry anything as strong." },
+        "content": { "score": 3, "evidence": "b/mock-library-light.png: the row chord strips are 140px wide and thin, notes are coloured swatch lists not three stacked tiers, accords are still 'aromatic 100' label-value pairs. b/fragrance-light.png lists accords as rows with italic numerals." },
+        "hierarchy": { "score": 4, "evidence": "b/mock-library-light.png: house rule, large Pi, oxblood 8.5, then notes and accords read in order; the middle list has a clear selected row." },
+        "type": { "score": 3, "evidence": "b/mock-library-light.png is good (Caslon names, small caps), but b/shelf-light.png, b/add-fragrance-light.png set every label and the button in tracked caps, the ledger's most generic tell, and italics on placeholders and ratings." },
+        "colour": { "score": 3, "evidence": "b/mock-library-light.png keeps scent colour inside strips, but b/shelf-light.png, b/kit-light.png tint every swatch and button oxblood, so scent colour is absent in the renders. b/mock-library-dark.png salmon Add button is weaker than light." },
+        "restraint": { "score": 3, "evidence": "b/mock-library-light.png: dotted rules under every row, a heavy rule over every group, small caps, italics and oxblood all at once. b/shelf-light.png adds an outlined box around '7 BOTTLES'." },
+        "craft": { "score": 3, "evidence": "b/mock-library-light.png: strong left edge and clean rhythm, but the format mark and rating columns float; b/fragrance-light.png has a Save arrow and a boxed 'OUT OF 10' badge." },
+        "distinct": { "score": 4, "evidence": "b/mock-library-light.png: the blotter strip and ruled ledger are recognisably this product." },
+        "owner-fit": { "score": 3, "evidence": "b/mock-library-light.png is proficient but tame; the owner picks the loudest option and dislikes bland, and b/shelf-light.png is a lot of tracked caps and rules." }
+      }
+    },
+    "c": {
+      "scores": {
+        "thesis": { "score": 4, "evidence": "c/mock-spectrum-light.png: the 37 strips are the whole screen; anyone would say the shelf is a spectrum. c/shelf-light.png and c/fragrance-light.png do not show it at all." },
+        "signature": { "score": 5, "evidence": "c/mock-spectrum-dark.png: the barcode of the whole collection, with the focused strip rising and the name set huge, is born from the accord data and unlike any other app." },
+        "content": { "score": 5, "evidence": "c/mock-spectrum-light.png: each fragrance is its chord, format bar splits the count, the rating is one numeral, 5 accords are coloured chips under the name." },
+        "hierarchy": { "score": 4, "evidence": "c/mock-spectrum-light.png: strips then Harvest Moon then facts is a clear order; the huge 37 competes with the strips for first read, and Add is small top right." },
+        "type": { "score": 4, "evidence": "c/mock-spectrum-light.png: heavy Bricolage-style grotesque at 150px vs small facts is real contrast. c/shelf-light.png lowercases everything with no scale." },
+        "colour": { "score": 4, "evidence": "c/mock-spectrum-dark.png: full-saturation scent colour on near-black is excellent; c/mock-spectrum-light.png is fine but loses punch, and the c/kit-light.png has grey and black only plus a stray amber." },
+        "restraint": { "score": 4, "evidence": "c/mock-spectrum-light.png: no containers, no radius, one idea. c/shelf-light.png adds black selected blocks and grey slabs that contradict the no-container material." },
+        "craft": { "score": 3, "evidence": "c/mock-spectrum-light.png: strips are unlabeled with no house names or group labels, the lower 10 percent is empty, and group gaps are the only structure. c/fragrance-light.png has a grey header slab over the name." },
+        "distinct": { "score": 4, "evidence": "c/mock-spectrum-dark.png is unmistakable; c/shelf-light.png and c/add-fragrance-light.png are the grey default kit." },
+        "owner-fit": { "score": 3, "evidence": "c/mock-spectrum-dark.png is the loud, structural pick the owner favours, but c/shelf-light.png, c/fragrance-light.png and c/kit-light.png are equal grey boxes and a black slab, the look the owner called 'really cheap'." }
+      }
+    }
+  },
+  "chosen": "c+b",
+  "why": "C has the only signature that argues the thesis on its own (the 37-strip spectrum, c/mock-spectrum-dark.png) and the owner picks loud, structural ideas. Take C's shelf screen; take B's scent-strip detail (b/mock-library-light.png) so the detail screen also draws the chord, with notes as three tiers. A is a safe fallback but looks like a tasteful default.",
+  "generic": [
+    "All shelf, fragrance and add-fragrance renders (a, b, c) draw chords as a one-colour ramp and use a centred one-column list, e.g. c/shelf-light.png",
+    "Full-width Add and Save buttons with an arrow in the content (b/shelf-light.png, b/add-fragrance-light.png, a/fragrance-light.png)",
+    "Accords as 'aromatic 100' label and value rows with chevrons (a/fragrance-light.png, b/fragrance-light.png, c/fragrance-light.png), plus tracked caps labels in b"
+  ],
+  "fixes": [
+    { "id": "f1", "priority": "P1", "target": "c/shelf-light.png, c/fragrance-light.png, c/add-fragrance-light.png, c/kit-light.png", "text": "Restyle the kit to match the mock: drop the grey tiles, black selected rows and grey slab buttons; use no-container text controls with an underline and a white primary, as c/mock-spectrum-light.png does." },
+    { "id": "f2", "priority": "P2", "target": "all directions: shelf, fragrance and add-fragrance renders", "text": "Chord strips are drawn as a one-colour ramp of the brand colour; draw them in the accords' own colours so the renders agree with the mocks." },
+    { "id": "f3", "priority": "P2", "target": "c/mock-spectrum-light.png", "text": "Label the strips: add a house name under each group, so 37 anonymous strips can be scanned by house." },
+    { "id": "f4", "priority": "P2", "target": "b/mock-library-light.png detail pane", "text": "Draw top, heart and base as three stacked bands beside the strip instead of swatch lists, and replace the 'aromatic 100' rows with a weighted bar." },
+    { "id": "f5", "priority": "P2", "target": "b/shelf-light.png and b/add-fragrance-light.png", "text": "Remove tracked caps from every label and button; keep one tracked role at most, and drop the outlined '7 BOTTLES' and 'OUT OF 10' boxes." },
+    { "id": "f6", "priority": "P2", "target": "c/mock-spectrum-light.png", "text": "Make the first read the strips: shrink the 37 numeral to roughly half its size so it does not compete with the spectrum, and move Add fragrance away from the filled black slab." },
+    { "id": "f7", "priority": "P2", "target": "a/fragrance-light.png and b/fragrance-light.png", "text": "Replace the 'aromatic 100 >' accord rows with the coloured weighted chord bar plus a small label per segment." },
+    { "id": "f8", "priority": "P3", "target": "all add-fragrance renders", "text": "The accords field asks for typed 'tobacco:100, amber:85'; show the chord preview in accord colours as the field is typed." },
+    { "id": "f9", "priority": "P3", "target": "c/mock-spectrum-light.png", "text": "Fill the empty lower area: lift the facts row or add the format split so the screen ends deliberately." }
+  ],
+  "landed": [],
+  "verdict": "refine"
+}

@@ -8,6 +8,9 @@ description: Creates a new aesthetic (visual style) for the Looks Good repo from
 Source of truth: `docs/aesthetic-spec/AUTHORING.md`. Read it fully before starting; it has the
 12 stages, the field map, the rules and the definition of done. This file only routes you.
 
+A style for a specific app (it gets an `app/` folder) starts with `.claude/skills/ui-direction/SKILL.md`
+instead; it calls on this skill once the direction exists, and `lg.js` enforces that order.
+
 Related files:
 - Contract: `docs/aesthetic-spec/SPEC-v2.md`
 - Starter files: `docs/aesthetic-spec/template/` (`aesthetic.json`, `rounds.json`, `art/hero.svg`)

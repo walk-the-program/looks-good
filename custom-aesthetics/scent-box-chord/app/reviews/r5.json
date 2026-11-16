@@ -1,0 +1,33 @@
+{
+  "round": 5,
+  "reviewer": "critic",
+  "date": "2026-11-15",
+  "renders": "app/renders/r5/",
+  "scores": {
+    "thesis": { "score": 4, "evidence": "mock-shelf-dark.png: 37 strips in the accords' own colours are the shelf; mock-fragrance-light.png repeats it as one tall strip and mock-add-fragrance-dark.png as a live chord. shelf-dark.png and fragrance-dark.png are neutral text with no scent colour." },
+    "signature": { "score": 4, "evidence": "mock-shelf-light.png: the 37-strip spectrum with the focused strip risen under a tick comes straight from the accord data and survives the logo being covered. It is absent from shelf-light.png, so it lives only in the mocks." },
+    "content": { "score": 4, "evidence": "mock-fragrance-dark.png: notes as three tiered swatch rows, accords as one weighted labelled bar, 8.5 as one numeral; mock-shelf-dark.png: format split bar. shelf-dark.png still lists 'House: Name (accords)' as run-on text, a renderer limit." },
+    "hierarchy": { "score": 4, "evidence": "mock-shelf-dark.png: strips, then Harvest Moon, then accord labels; the 9 at right is a clear fourth read. mock-fragrance-light.png: Pi and 8.5 are now close in weight, so the name reads first but only just." },
+    "type": { "score": 4, "evidence": "mock-shelf-light.png and mock-add-fragrance-light.png: heavy tight grotesque for 37, names and the title against small sentence-case Inter Tight, no tracked caps. Facts share one muted ink, so the third level is flat (mock-fragrance-dark.png)." },
+    "colour": { "score": 4, "evidence": "mock-shelf-dark.png and mock-shelf-light.png: scent colour at full strength on a one-ink ground, dark a step off black, pale strips edged. The PdM strip is a flat near-ground grey in mock-shelf-dark.png and reads as a missing fragrance." },
+    "restraint": { "score": 4, "evidence": "mock-shelf-light.png: no boxes, radius or shadow. mock-fragrance-light.png: one hairline above My notes. kit-light.png: the split button menu still draws a boxed, bordered panel the language does not use." },
+    "craft": { "score": 3, "evidence": "mock-shelf-dark.png: all 18 houses are now labelled, but at about 11px muted grey on near-black they are hard to read, the PdM strip is an unexplained blank, and there is a dead band between the accord labels and the format bar. mock-fragrance-light.png: the middle column is empty below the format bar while the right column runs on." },
+    "distinct": { "score": 4, "evidence": "mock-shelf-dark.png and mock-fragrance-light.png are recognisably this product with the name hidden. shelf-light.png and add-fragrance-light.png are a centred column, a listed renderer limit, so I score the mocks." },
+    "owner-fit": { "score": 4, "evidence": "mock-shelf-dark.png is a loud, structural, colour-keeping answer to 'cheap' and 'even simpler'; no grey boxes in any mock, no slab buttons in kit-dark.png." }
+  },
+  "generic": [
+    "Centred single-column text list with stacked Show / Search label pairs in the rendered screens (shelf-dark.png, shelf-light.png)",
+    "Underlined form fields with a small grey label above every value (add-fragrance-light.png, mock-add-fragrance-light.png)",
+    "Fragrance detail facts as a muted line and paragraph in one grey ink (fragrance-dark.png, mock-fragrance-dark.png)"
+  ],
+  "fixes": [
+    { "id": "f1", "priority": "P2", "target": "mock-shelf-dark.png and mock-shelf-light.png layout below the spectrum", "text": "Close the dead band between the accord labels and the format bar: grow the spectrum height or move the format bar up under the readout so the screen has no unexplained gap." },
+    { "id": "f2", "priority": "P2", "target": "mock-shelf-dark.png PdM strip", "text": "The PdM strip is a flat near-ground grey that reads as missing; draw its real chord or, if it has no accords, show a hatched or outlined empty strip with a 1px ink edge." },
+    { "id": "f3", "priority": "P3", "target": "mock-shelf-dark.png house labels", "text": "Raise the house monograms from about 11px muted to 12px at the primary ink so they read at window size." },
+    { "id": "f4", "priority": "P3", "target": "mock-fragrance-dark.png middle column", "text": "Fill or shorten the empty space under the format bar so the three columns end together." },
+    { "id": "f5", "priority": "P3", "target": "shelf-dark.png and shelf-light.png", "text": "Rendered shelf still shows no scent colour; draw each fragrance as a small chord strip beside its name if a code-tier move allows." },
+    { "id": "f6", "priority": "P3", "target": "kit-light.png split button", "text": "Remove the bordered menu box and divider so it follows the no-container language." }
+  ],
+  "landed": ["f1", "f2", "f3"],
+  "verdict": "refine"
+}

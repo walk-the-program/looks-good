@@ -1,0 +1,40 @@
+<!doctype html><meta charset=utf-8><title>Add fragrance</title><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Inter+Tight:wght@400;500;600&display=block" rel="stylesheet"><script>var m=new URLSearchParams(location.search).get("mode")||(matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light");document.documentElement.dataset.theme=m;</script><style>
+.fm{display:inline-block;background:currentColor;vertical-align:middle;opacity:.7}
+.fm-full{width:4px;height:16px}.fm-travel{width:4px;height:11px}.fm-decant{width:4px;height:7px}.fm-sample{width:5px;height:5px;border-radius:50%}.fm-none{width:5px;height:5px;border:1px solid currentColor;background:none;border-radius:50%}
+
+*{box-sizing:border-box;margin:0;padding:0}
+/* tokens from app/draft-pack.md (Part 2) */
+:root{--canvas:#121111;--ink:#f1eee8;--muted:#989692;--line:#333231;--edge:rgba(255,255,255,.16);--dur-fast:90ms;--dur-base:140ms;--font-heading:"Bricolage Grotesque",sans-serif;--font-body:"Inter Tight",sans-serif}
+:root[data-theme=light]{--canvas:#ece9e4;--ink:#0b0a0a;--muted:#656361;--line:#cac8c3;--edge:rgba(0,0,0,.22)}
+html,body{width:1280px;height:800px;overflow:hidden;background:var(--canvas);color:var(--ink);font:400 15px/1.4 var(--font-body);font-variant-numeric:tabular-nums}
+.dots{position:absolute;left:24px;top:22px;display:flex;gap:7px}.dots i{width:11px;height:11px;background:var(--line)}
+.tb{display:flex;align-items:center;gap:26px;height:56px;padding:0 40px 0 40px}
+.ttl{font:700 19px var(--font-heading);margin-right:12px}
+.tab{color:var(--muted);font-size:14px;padding:6px 0 8px;border-bottom:2px solid transparent;font-weight:500}.tab.on{color:var(--ink);font-weight:600;border-bottom-color:var(--ink)}.tab b{font-weight:inherit;margin-left:5px}
+.sp{flex:1}.fld{width:230px;color:var(--muted);border-bottom:1px solid var(--ink);padding:5px 0 7px;font-size:14px;white-space:nowrap}
+.prim{font:600 17px var(--font-body);color:var(--ink);white-space:nowrap}.sec{font:400 15px var(--font-body);color:var(--muted)}
+.chord{display:flex;flex-direction:column}.chord i{display:block}.chord .emp{flex:1;background:repeating-linear-gradient(135deg,transparent 0 6px,var(--muted) 6px 7px);box-shadow:inset 0 0 0 1px var(--ink)}
+.edge{position:relative}.edge:after{content:"";position:absolute;inset:0;box-shadow:inset 0 0 0 1px var(--edge);pointer-events:none}
+.fm{display:inline-block;background:currentColor;vertical-align:middle}.fm-full{width:4px;height:16px}.fm-travel{width:4px;height:11px}.fm-decant{width:4px;height:7px}.fm-sample{width:5px;height:5px;border-radius:50%}.fm-none{width:5px;height:5px;border:1px solid currentColor;border-radius:50%}
+.num{font:800 56px/.8 var(--font-heading);letter-spacing:-.035em}
+.big{font:800 76px/.95 var(--font-heading);letter-spacing:-.04em}
+
+.wrap{display:grid;grid-template-columns:520px 1fr;gap:60px;padding:0 40px;height:744px;align-content:center;align-items:stretch}
+h1{font:800 64px/.95 var(--font-heading);letter-spacing:-.035em;margin-bottom:30px}
+.f{margin-bottom:22px}.f:last-child{margin-bottom:0}.f label{display:block;font-size:13px;color:var(--muted);margin-bottom:2px}.f .in{font-size:19px;border-bottom:1px solid var(--ink);padding:6px 0 9px}.f .in.ph{color:var(--muted)}
+.seg{display:flex;gap:24px;border-bottom:1px solid var(--line)}.seg span{font-size:14px;font-weight:500;color:var(--muted);padding:2px 0 10px;margin-bottom:-1px;border-bottom:2px solid transparent}.seg span.on{color:var(--ink);font-weight:600;border-bottom-color:var(--ink)}
+.cur{display:inline-block;width:2px;height:20px;background:var(--ink);vertical-align:-3px;margin-left:1px}
+.pv{display:flex;gap:28px;align-items:stretch}.pv .tall{width:104px;position:relative}.pv .tall .chord{position:absolute;inset:0}
+.pv h3{font:600 14px var(--font-body);color:var(--muted)}
+.cb{display:flex;height:56px;margin-top:8px;position:relative;width:360px}.cb:after{content:"";position:absolute;inset:0;box-shadow:inset 0 0 0 1px var(--edge)}.cb i{display:flex;align-items:flex-end;padding:0 0 6px 6px;font-size:11.5px;font-style:normal;overflow:hidden}
+.hint{font-size:13px;color:var(--muted);margin-top:14px;max-width:360px}
+.onshelf{margin-top:70px}.o1{font-size:13px;color:var(--muted)}.o2{font-size:14px;color:var(--muted);margin-top:16px}.o3{font:800 64px/.95 var(--font-heading);letter-spacing:-.04em;margin-top:4px;max-width:520px}.o4{font-size:14px;color:var(--muted);margin-top:14px}
+</style><div class="tb"><span class="sec">Shelf</span><span class="sp"></span><span class="prim">Save fragrance</span></div>
+<div class="wrap"><div><h1>Add fragrance</h1>
+<div class="f"><label>House</label><div class="in">Santa Maria Novella</div></div>
+<div class="f"><label>Name</label><div class="in">Tabacco Toscano</div></div>
+<div class="f"><label>Status</label><div class="seg"><span class="on">Owned</span><span>Interested</span><span>Liked</span></div></div>
+<div class="f"><label>Format</label><div class="seg"><span class="on">Full bottle</span><span>Travel</span><span>Decant</span><span>Sample</span></div></div>
+<div class="f"><label>Accords</label><div class="in">tobacco:100, amber:85, woody:75, leather:60<span class="cur"></span></div></div></div>
+<div class="pv"><div class="tall edge"><div class="chord"><i style="flex:100;background:#8D6E4C;color:#ffffff;display:flex;align-items:flex-end;padding:0 0 6px 6px;font-size:11.5px;font-style:normal">tobacco</i><i style="flex:85;background:#D98E32;color:#121111;display:flex;align-items:flex-end;padding:0 0 6px 6px;font-size:11.5px;font-style:normal">amber</i><i style="flex:75;background:#8B5A2B;color:#ffffff;display:flex;align-items:flex-end;padding:0 0 6px 6px;font-size:11.5px;font-style:normal">woody</i><i style="flex:60;background:#5D4037;color:#ffffff;display:flex;align-items:flex-end;padding:0 0 6px 6px;font-size:11.5px;font-style:normal">leather</i></div></div><div><h3>Its chord, as you type</h3><p class="hint">Type accord names with a strength from 0 to 100; each one takes its own colour and its share of the strip.</p>
+<div class="onshelf"><div class="o1">On the shelf it reads</div><div class="o2">Santa Maria Novella</div><div class="o3">Tabacco Toscano</div><div class="o4">Full bottle · Owned</div></div></div></div></div>

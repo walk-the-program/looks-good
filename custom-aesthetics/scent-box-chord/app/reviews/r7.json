@@ -1,0 +1,33 @@
+{
+  "round": 7,
+  "reviewer": "critic",
+  "date": "2026-11-15",
+  "renders": "app/renders/r7/",
+  "scores": {
+    "thesis": { "score": 4, "evidence": "mock-shelf-dark.png: 37 strips in accord colours are the shelf, and mock-fragrance-light.png and mock-add-fragrance-dark.png repeat the chord at one fragrance. shelf-dark.png and fragrance-light.png are neutral text with no scent colour, so the thesis lives only in the mocks." },
+    "signature": { "score": 4, "evidence": "mock-shelf-light.png: the grouped 37-strip spectrum with GS risen under a tick comes from the accord data and survives the logo being covered. It is absent from shelf-light.png." },
+    "content": { "score": 4, "evidence": "mock-fragrance-dark.png: notes as three tiered swatch rows, accords as one weighted labelled bar, 8.5 as one numeral; mock-shelf-dark.png: format split bar, hatched empty strip. shelf-dark.png still prints 'House: Name (accords)' as run-on text and fragrance-dark.png 'Top: ... Heart: ...' lines." },
+    "hierarchy": { "score": 4, "evidence": "mock-shelf-dark.png: strips, then Harvest Moon at about 90px, then accord labels; the 9 sits far right with a tiny caption so it is a weak second read. mock-fragrance-light.png: Pi and 8.5 now separate well, the name reading first." },
+    "type": { "score": 4, "evidence": "mock-shelf-light.png and mock-add-fragrance-light.png: heavy tight grotesque for 37, names and the title against small sentence-case Inter Tight, no tracked caps. mock-fragrance-dark.png: description, facts and notes now take distinct greys, but the 'Top / Heart / Base' bold labels and swatch captions are close in size." },
+    "colour": { "score": 4, "evidence": "mock-shelf-dark.png and mock-shelf-light.png: scent colour at full strength on a one-ink ground, dark a step off black, pale strips edged in light. Many strips are cream and pink pastels, so the spectrum reads sweet and flat beside the few saturated ones." },
+    "restraint": { "score": 4, "evidence": "mock-shelf-light.png: no boxes, radius or shadow; one hairline above My notes in mock-fragrance-light.png. kit-light.png: split button menu and kit cards still draw bordered panels the language does not use." },
+    "craft": { "score": 3, "evidence": "mock-fragrance-light.png: columns now share a bottom edge, but the middle column has a ~500px void between 8.5 and the format bar and the right column an empty band under the accord bar. mock-add-fragrance-light.png: the chord strip ends at 968 against the form's 882, and the bottom fifth of the window is empty. mock-shelf-dark.png: 'Interested 0' is still a dead tab." },
+    "distinct": { "score": 4, "evidence": "mock-shelf-dark.png and mock-fragrance-light.png are recognisably this product with the name hidden. shelf-light.png, fragrance-light.png and add-fragrance-light.png are a centred text column that could be any plain app." },
+    "owner-fit": { "score": 4, "evidence": "mock-shelf-dark.png answers 'cheap' and 'even simpler' with a loud structural idea and keeps scent colour (the r2 lesson); no grey boxes or slab buttons in kit-dark.png or any mock." }
+  },
+  "generic": [
+    "Centred single-column text list in the rendered screens, with stacked Show / Search label pairs (shelf-dark.png, shelf-light.png)",
+    "Underlined form fields with a small grey label above every value (add-fragrance-light.png, mock-add-fragrance-light.png)",
+    "Kit cards and split-button menu drawn as bordered boxes with a pale caption and status badge (kit-dark.png, kit-light.png)"
+  ],
+  "fixes": [
+    { "id": "f1", "priority": "P2", "target": "mock-fragrance-dark.png and mock-fragrance-light.png middle and right columns", "text": "Close the voids: set the rating numeral, format bar and caption as one block pinned to the bottom edge, and move My notes up under the accords bar so no column has an empty middle." },
+    { "id": "f2", "priority": "P2", "target": "mock-add-fragrance-dark.png and mock-add-fragrance-light.png", "text": "Make the chord strip end on the Accords field's underline (882) instead of 968, and fill or shorten the empty bottom fifth so the screen ends on one edge." },
+    { "id": "f3", "priority": "P3", "target": "mock-shelf-dark.png Interested tab", "text": "Dim 'Interested 0' further, or hide zero-count tabs, so a dead view does not read as equal." },
+    { "id": "f4", "priority": "P3", "target": "shelf-dark.png and shelf-light.png", "text": "Rendered shelf still shows no scent colour; draw each fragrance as a small chord strip beside its name through a code-tier move." },
+    { "id": "f5", "priority": "P3", "target": "kit-light.png split button", "text": "Remove the bordered menu box and divider so it follows the no-container language." },
+    { "id": "f6", "priority": "P3", "target": "mock-shelf-dark.png rating", "text": "Set the 9 at about 150px and its caption beside it so the rating is a real second read." }
+  ],
+  "landed": ["f1", "f2", "f3"],
+  "verdict": "refine"
+}

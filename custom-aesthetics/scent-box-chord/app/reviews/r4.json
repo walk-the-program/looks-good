@@ -1,0 +1,32 @@
+{
+  "round": 4,
+  "reviewer": "critic",
+  "date": "2026-11-15",
+  "renders": "app/renders/r4/",
+  "scores": {
+    "thesis": { "score": 4, "evidence": "mock-shelf-dark.png: 37 strips in the accords' own colours are the shelf and the thesis reads at once; mock-fragrance-dark.png repeats it as one tall strip and mock-add-fragrance-dark.png makes the typed string its chord. shelf-dark.png and fragrance-light.png are neutral text with no scent colour." },
+    "signature": { "score": 4, "evidence": "mock-shelf-light.png: the barcode-like spectrum with the focused strip risen and a tick under it comes from the accord data and survives the logo being covered. shelf-light.png has no trace of it, so it lives only in the mocks." },
+    "content": { "score": 4, "evidence": "mock-fragrance-light.png: notes as three tiered swatch rows, accords as one weighted labelled bar, 8.5 as one numeral; mock-shelf-dark.png: format split bar and a rising focused strip. shelf-dark.png still lists 'House: Name (accords)' as run-on text." },
+    "hierarchy": { "score": 4, "evidence": "mock-shelf-dark.png: strips, then Harvest Moon, then accord labels; 37 is now smaller and no longer rivals the name. mock-fragrance-dark.png: the 150px 8.5 outweighs the 'Pi' title, so the rating reads before the fragrance." },
+    "type": { "score": 4, "evidence": "mock-shelf-light.png and mock-add-fragrance-dark.png: heavy tight grotesque for 37, Harvest Moon and the title against small sentence-case Inter Tight; no tracked caps. Facts share one weight and one muted ink, so the third level is flat (mock-fragrance-dark.png)." },
+    "colour": { "score": 4, "evidence": "mock-shelf-dark.png and mock-shelf-light.png: scent colour at full strength on a one-ink ground in both modes, dark ground a step off black, edges on pale strips. The near-ground grey strip in mock-shelf-dark.png is faint." },
+    "restraint": { "score": 4, "evidence": "mock-shelf-light.png: no boxes, radius or shadow, and the three grey window squares are gone. mock-fragrance-light.png: one hairline above My notes, otherwise space groups. kit-light.png: split button still draws a boxed divider that the language does not use." },
+    "craft": { "score": 3, "evidence": "mock-shelf-dark.png: only five of 18 houses (Santa Maria Novella, Givenchy, d'Annam, Le Labo, Dior) are labelled, so most strips cannot be placed; the Dior label sits hard against the right edge. mock-add-fragrance-dark.png puts accord labels top-left of segments while mock-fragrance-dark.png puts them bottom-left. Edges now align at 406px in shelf-dark.png." },
+    "distinct": { "score": 4, "evidence": "mock-shelf-dark.png and mock-fragrance-light.png are recognisably this product with the name hidden. shelf-light.png and add-fragrance-light.png are a centred column, which direction.md section 8 lists as a renderer limit, so I score the mocks." },
+    "owner-fit": { "score": 4, "evidence": "mock-shelf-dark.png is a loud, structural, colour-keeping answer to 'cheap' and 'even simpler'; no grey boxes in any mock. kit-dark.png has no slab buttons." }
+  },
+  "generic": [
+    "Centred single-column text list with a stacked Show / Search label pair in the rendered screens (shelf-dark.png, shelf-light.png)",
+    "Underlined form fields with a small grey label above every value in the add form (add-fragrance-light.png, mock-add-fragrance-light.png)",
+    "Fragrance detail as a title, a muted facts line and a paragraph in one grey ink (fragrance-dark.png, mock-fragrance-dark.png)"
+  ],
+  "fixes": [
+    { "id": "f1", "priority": "P2", "target": "mock-shelf-dark.png and mock-shelf-light.png house labels", "text": "13 of 18 houses have no label; label every group (monogram or two-letter short name where the full name does not fit) so each strip can be placed, and inset the Dior label from the right edge." },
+    { "id": "f2", "priority": "P3", "target": "mock-fragrance-dark.png and mock-fragrance-light.png", "text": "The 8.5 numeral outweighs the Pi title; raise the name to about 92px or cut the rating to about 110px so the fragrance is the first read." },
+    { "id": "f3", "priority": "P3", "target": "mock-add-fragrance-dark.png and mock-fragrance-dark.png", "text": "Put accord labels at the same corner (bottom-left) in the add chord strip as in the accords bar." },
+    { "id": "f4", "priority": "P3", "target": "shelf-dark.png and shelf-light.png", "text": "Rendered shelf shows no scent colour; if the renderer allows a code-tier move, draw each fragrance as a small chord strip beside its name." },
+    { "id": "f5", "priority": "P3", "target": "kit-light.png split button", "text": "Remove the boxed divider between action and chevron so it follows the no-container language." }
+  ],
+  "landed": ["f1", "f2", "f3", "f4", "f5", "f6"],
+  "verdict": "refine"
+}

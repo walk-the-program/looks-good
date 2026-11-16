@@ -10,6 +10,7 @@ const U = require('./lg/util.js');
 const F = require('./lg/format.js');
 const server = require('./lg/server.js');
 const { openSession } = require('./lg/browser.js');
+const D = require('./lg-direction.js');
 
 const { ROOT, fail } = U;
 const USAGE = `Usage: node dev/lg.js <command> [options]      (add --json to any command for machine output)
@@ -37,12 +38,27 @@ See the colours a look resolves to
   palette [--primary #hex] [--scheme s] [--look file]   the state.colors the screens are drawn with (default: the preview brand)
       node dev/lg.js palette --primary #7f8cc6
 
+Direction first, then rounds reviewed by a critic, then the build pack (ui-direction skill)
+  direction <folder|key> [--init] [--gate brief|pack] [--json]
+      node dev/lg.js direction custom-aesthetics/my-app-look --init   (copies the template to <folder>/app/direction.md)
+      node dev/lg.js direction custom-aesthetics/my-app-look          (brief gate, then pack gate; exit 1 on a FAIL in --gate, default pack)
+                                      no browser, instant. brief gate = direction sections 1-5 filled in; pack gate = the whole
+                                      direction + 3 contiguous rounds, each with app/reviews/r<n>.json, the last one passing
+  shot <html-file> --out <png> [--size WxH] [--mode light|dark] [--full] [--json]
+      node dev/lg.js shot custom-aesthetics/my-app-look/app/mocks/chart.html --out custom-aesthetics/my-app-look/app/renders/r2/chart.png
+                                      renders an HTML mock (under the repo root) to a 2x PNG; default 1280x800, --full = whole page,
+                                      --mode sets prefers-color-scheme and appends ?mode=<mode> to the URL
+
 Render an app's own screens and export the build pack
-  screens <key|folder> [--look file] [--sheet file] [--round n] [--out dir]
+  screens <key|folder> [--look file] [--sheet file] [--round n] [--out dir] [--direction file]
+                                      refuses until the direction passes the brief gate, and until round n-1 has a critic review
       node dev/lg.js screens custom-aesthetics/my-app-look        (reads <folder>/app/look.json + product-sheet.md,
                                                                    writes <folder>/app/renders/r<n>/ PNGs + index.html)
-  pack <key|folder> [--look file] [--sheet file] [--target web|swiftui|both] [--surface app|web|both] [--out file]
+  pack <key|folder> [--look file] [--sheet file] [--target web|swiftui|both] [--surface app|web|both] [--out file] [--draft]
       node dev/lg.js pack custom-aesthetics/my-app-look --target swiftui   (writes <folder>/app/build-pack.md)
+                                      refuses (writes nothing) until the pack gate passes. --draft skips the gate and writes
+                                      <folder>/app/draft-pack.md with a "DRAFT: not for building" banner.
+                                      Every pack starts with the app's direction ("## Direction (read before building)").
 
 Options
   --json         machine output          --port <n>   use a server already running at the repo root (default: own, random port)
@@ -227,7 +243,7 @@ async function cmdInspect(a, compare) {
 }
 
 /* the folder + look + sheet a screens / pack run works from */
-async function prepareRun(a, cmd) {
+async function prepareRun(a, cmd, gate) {
   const arg = a._[1];
   if (!arg) fail(`${cmd} needs a key or folder: node dev/lg.js ${cmd} <key-or-folder>`);
   const warnings = [];
@@ -241,6 +257,7 @@ async function prepareRun(a, cmd) {
   const lookStyle = look.style && look.style !== spec.label ? look.style : null;
   let other = null;
   if (lookStyle) { other = prepareStyle(lookStyle, 1, extras); }
+  if (gate) gate({ spec, sheetFile });
   const P = await openPage(a.flags, extras, { lab: spec.lab });
   await importStyles(P, [spec].concat(other ? [other] : []));
   const styleKey = other ? other.key : spec.key;
@@ -268,21 +285,37 @@ ${rows}
 `;
 }
 
+const showPath = p => { const r = path.relative(process.cwd(), p); return r && !r.startsWith('..') ? r : p; };
+function gateFail(what, res, folder) {
+  const bad = res.filter(r => r.status === 'FAIL');
+  fail(`${what}:\n${bad.map(r => '  ' + D.fmt(r)).join('\n')}\nSee the full state: node dev/lg.js direction ${folder ? showPath(folder) : '<folder>'}`);
+}
+
 async function cmdScreens(a) {
-  const run = await prepareRun(a, 'screens');
+  let outDir, redoNote = null;
+  const run = await prepareRun(a, 'screens', ({ spec, sheetFile }) => {
+    if (a.flags.out) outDir = path.resolve(a.flags.out);
+    else {
+      if (!spec.folder) fail('a key without a folder needs --out <dir>');
+      const renders = path.join(spec.folder, 'app', 'renders');
+      let n;
+      if (a.flags.round) n = +a.flags.round;
+      else { const nx = D.nextScreensRound(path.join(spec.folder, 'app')); n = nx.n; if (nx.redo) redoNote = `r${n} has no critic review yet: re-rendering into r${n} (PNGs and index.html replaced) instead of starting r${n + 1}`; }
+      if (!(n >= 1)) fail('--round needs a number >= 1');
+      outDir = path.join(renders, 'r' + n);
+    }
+    const dirFile = a.flags.direction ? path.resolve(a.flags.direction)
+      : sheetFile ? path.join(path.dirname(sheetFile), 'direction.md')
+      : spec.folder ? path.join(spec.folder, 'app', 'direction.md') : null;
+    if (!dirFile) fail('screens needs a direction: pass --direction <file>');
+    const res = D.checkScreensGate(dirFile, outDir);
+    if (D.hasFail(res)) gateFail('screens refused: the direction gate has not passed', res, spec.folder);
+  });
   const { P, spec, look, styleKey, sheet } = run;
   if (!P.known.exportInto) fail('ProductScreens.exportInto is missing: update Looks Good');
   if (!sheet) fail('screens needs a product sheet: pass --sheet <file> or add <folder>/app/product-sheet.md');
-  let outDir;
-  if (a.flags.out) outDir = path.resolve(a.flags.out);
-  else {
-    if (!spec.folder) fail('a key without a folder needs --out <dir>');
-    const renders = path.join(spec.folder, 'app', 'renders');
-    const n = a.flags.round ? +a.flags.round : U.nextRound(renders);
-    if (!(n >= 1)) fail('--round needs a number >= 1');
-    outDir = path.join(renders, 'r' + n);
-  }
   mkdirp(outDir);
+  if (redoNote) { warn(redoNote); for (const f of fs.readdirSync(outDir)) if (/\.(png|html)$/i.test(f)) fs.rmSync(path.join(outDir, f)); }
   const files = [], screens = [];
   let sheetWarnings = [];
   for (const mode of look.modes) {
@@ -307,41 +340,154 @@ async function cmdScreens(a) {
   const html = path.join(outDir, 'index.html');
   fs.writeFileSync(html, contactSheet({ title: `${look.brandName || spec.label} - ${spec.label}`, style: spec.label, when: new Date().toISOString().slice(0, 16).replace('T', ' '), look: look.file ? path.basename(look.file) : 'preview brand', sheet: run.sheetFile ? path.basename(run.sheetFile) : '-', warnings: wl, screens, modes: look.modes }));
   files.push(html);
-  const o = { out: outDir, style: spec.label, modes: look.modes, screens: screens.map(s => ({ id: s.id, name: s.name, sizes: s.sizes })), files, warnings: wl };
-  out(o, a.flags, `rendered ${screens.length} screen(s) x ${look.modes.length} mode(s) in ${spec.label} -> ${outDir}\n` + files.map(f => '  ' + path.relative(outDir, f)).join('\n') + (wl.length ? '\nsheet warnings:\n' + wl.map(w => '  ' + w).join('\n') : '\nsheet warnings: none'));
+  const o = { out: outDir, redo: !!redoNote, style: spec.label, modes: look.modes, screens: screens.map(s => ({ id: s.id, name: s.name, sizes: s.sizes })), files, warnings: wl };
+  out(o, a.flags, (redoNote ? redoNote + '\n' : '') + `rendered ${screens.length} screen(s) x ${look.modes.length} mode(s) in ${spec.label} -> ${outDir}\n` + files.map(f => '  ' + path.relative(outDir, f)).join('\n') + (wl.length ? '\nsheet warnings:\n' + wl.map(w => '  ' + w).join('\n') : '\nsheet warnings: none'));
+}
+
+/* direction.md for pack: --direction, else beside the resolved sheet, else <folder>/app/direction.md */
+function packDirectionFile(a, spec, sheetFile) {
+  if (a.flags.direction) return path.resolve(a.flags.direction);
+  if (sheetFile && fs.existsSync(path.join(path.dirname(sheetFile), 'direction.md'))) return path.join(path.dirname(sheetFile), 'direction.md');
+  return spec.folder ? path.join(spec.folder, 'app', 'direction.md') : null;
 }
 
 async function cmdPack(a) {
-  const run = await prepareRun(a, 'pack');
-  const { P, spec, look, styleKey, sheet } = run;
-  for (const [flag, ok] of [['target', ['web', 'swiftui', 'both']], ['surface', ['app', 'web', 'both']]]) if (a.flags[flag] && !ok.includes(a.flags[flag])) fail(`--${flag} must be one of ${ok.join(', ')} (got "${a.flags[flag]}")`);
+  const draft = !!a.flags.draft;
   let outFile;
-  if (a.flags.out) outFile = path.resolve(a.flags.out);
-  else {
-    if (!spec.folder) fail('a key without a folder needs --out <file>');
-    outFile = path.join(spec.folder, 'app', 'build-pack.md');
-  }
+  const run = await prepareRun(a, 'pack', ({ spec }) => {
+    for (const [flag, ok] of [['target', ['web', 'swiftui', 'both']], ['surface', ['app', 'web', 'both']]]) if (a.flags[flag] && !ok.includes(a.flags[flag])) fail(`--${flag} must be one of ${ok.join(', ')} (got "${a.flags[flag]}")`);
+    if (!draft) {
+      if (!spec.folder) fail('pack needs a style folder with app/direction.md (or use --draft for an unfinished pack)');
+      const appDir = path.join(spec.folder, 'app');
+      const res = D.checkDirection(path.join(appDir, 'direction.md'), 'pack').concat(D.checkRounds(appDir));  // the gate always reads <folder>/app/direction.md
+      if (D.hasFail(res)) gateFail('pack refused: the direction and refinement gates have not passed (nothing written; --draft writes an unfinished pack)', res, spec.folder);
+    }
+    if (a.flags.out) outFile = path.resolve(a.flags.out);
+    else {
+      if (!spec.folder) fail('a key without a folder needs --out <file>');
+      outFile = path.join(spec.folder, 'app', draft ? 'draft-pack.md' : 'build-pack.md');
+    }
+  });
+  const { P, spec, look, styleKey, sheet } = run;
   const mode = look.modes[0] || 'light';
   const ap = await P.call('apply', { look: { ...look, style: styleKey }, mode, style: styleKey, sheet });
   const r = await P.call('pack', { target: a.flags.target || null, surface: a.flags.surface || null });
+  const appDir = spec.folder ? path.join(spec.folder, 'app') : null;
+  const dirFile = packDirectionFile(a, spec, run.sheetFile);
+  let md = D.insertDirection(r.md, dirFile, dirFile ? path.dirname(dirFile) : '');
+  if (draft) md = `> DRAFT: not for building. The direction and refinement gates have not passed (node dev/lg.js direction ${spec.folder ? showPath(spec.folder) : '<folder>'}).\n\n` + md;
   mkdirp(path.dirname(outFile));
-  fs.writeFileSync(outFile, r.md);
+  fs.writeFileSync(outFile, md);
   const notes = ap.warnings.map(w => `sheet line ${w.line}: ${w.message}`);
   if (r.blocked) notes.push('brief gate (the app would block Copy/Download until fixed, the pack is written anyway): ' + r.blocked);
   r.issues.forEach(m => { if (m !== r.blocked) notes.push('brief lint: ' + m); });
-  const o = { out: outFile, bytes: Buffer.byteLength(r.md), style: spec.label, target: r.target, surface: r.surface, notes };
-  out(o, a.flags, `build pack for ${spec.label} (target ${r.target}, surface ${r.surface}) -> ${outFile} (${(o.bytes / 1024).toFixed(1)} KB)` + (notes.length ? '\n' + notes.map(n => 'NOTE: ' + n).join('\n') : ''));
+  const o = { out: outFile, bytes: Buffer.byteLength(md), draft, style: spec.label, target: r.target, surface: r.surface, notes };
+  out(o, a.flags, `${draft ? 'DRAFT ' : ''}build pack for ${spec.label} (target ${r.target}, surface ${r.surface}) -> ${outFile} (${(o.bytes / 1024).toFixed(1)} KB)` + (notes.length ? '\n' + notes.map(n => 'NOTE: ' + n).join('\n') : ''));
+}
+
+/* ------------------------------------------------------------------ direction and shot */
+function folderOf(arg) {
+  if (!arg) fail('direction needs a folder or key: node dev/lg.js direction <folder|key>');
+  const abs = path.resolve(arg);
+  if (fs.existsSync(abs) && fs.statSync(abs).isDirectory()) return abs;
+  const f = path.join(ROOT, 'custom-aesthetics', arg);
+  if (!/[\\/]/.test(arg) && fs.existsSync(f) && fs.statSync(f).isDirectory()) return f;
+  fail(`no style folder "${arg}" (give a folder path or a key under custom-aesthetics/)`);
+}
+
+function cmdDirection(a) {
+  const folder = folderOf(a._[1]);
+  const appDir = path.join(folder, 'app');
+  const file = path.join(appDir, 'direction.md');
+  if (a.flags.init) {
+    if (fs.existsSync(file)) fail(`${file} already exists: fill it in, or delete it to start again`);
+    const tpl = path.join(ROOT, '.claude', 'skills', 'ui-direction', 'templates', 'direction.md');
+    if (!fs.existsSync(tpl)) fail(`template not found: ${tpl}`);
+    for (const d of ['', 'reviews', 'mocks']) mkdirp(path.join(appDir, d));
+    fs.copyFileSync(tpl, file);
+    const next = `Fill every {{...}} in ${showPath(file)}, section by section (thinking guide: .claude/skills/ui-direction/references/thinking.md), then run: node dev/lg.js direction ${showPath(folder)}`;
+    return out({ created: file, next }, a.flags, `created ${file}\n${next}`);
+  }
+  const gate = a.flags.gate || 'pack';
+  if (gate !== 'brief' && gate !== 'pack') fail(`--gate must be brief or pack (got "${gate}")`);
+  const brief = D.checkDirection(file, 'brief');
+  const briefOnly = gate === 'brief';
+  const packRes = briefOnly ? [] : D.checkDirection(file, 'pack').concat(D.checkRounds(appDir));
+  const o = { folder, gate, brief: { pass: !D.hasFail(brief), results: brief } };
+  if (!briefOnly) o.pack = { pass: !D.hasFail(packRes), results: packRes };
+  const text = ['brief gate (direction sections 1-5):'].concat(brief.map(r => '  ' + D.fmt(r)),
+    briefOnly ? [] : ['pack gate (whole direction + reviewed rounds):'].concat(packRes.map(r => '  ' + D.fmt(r))),
+    [`brief gate: ${o.brief.pass ? 'pass' : 'fail'}`], briefOnly ? [] : [`pack gate: ${o.pack.pass ? 'pass' : 'fail'}`]).join('\n');
+  out(o, a.flags, text);
+  return o[gate].pass ? 0 : 1;
+}
+
+async function cmdShot(a) {
+  const arg = a._[1];
+  if (!arg) fail('shot needs an HTML file: node dev/lg.js shot <html-file> --out <png>');
+  if (!a.flags.out) fail('shot needs --out <png>');
+  const file = path.resolve(arg);
+  if (!fs.existsSync(file) || !fs.statSync(file).isFile()) fail(`html file not found: ${file}`);
+  const rel = path.relative(ROOT, file);
+  if (rel.startsWith('..') || path.isAbsolute(rel)) fail('put mocks under custom-aesthetics/<key>/app/mocks/ (shot serves files from the Looks Good folder only)');
+  const mode = modeFlag(a);
+  const sm = /^(\d+)x(\d+)$/i.exec(a.flags.size || '1280x800');
+  if (!sm || !(+sm[1] > 0) || !(+sm[2] > 0)) fail(`--size must look like 1280x800 (got "${a.flags.size}")`);
+  const w = +sm[1], h = +sm[2];
+  const png = path.resolve(a.flags.out);
+  mkdirp(path.dirname(png));
+  const srv = await server.start(ROOT, 0, {});
+  cleanups.push(() => srv.close());
+  const work = fs.mkdtempSync(path.join(require('os').tmpdir(), 'lg-shot-'));
+  const name = `lg-shot-${process.pid}-${Date.now().toString(36)}`;
+  const cfg = path.join(work, 'cfg.json');
+  fs.writeFileSync(cfg, JSON.stringify({ browser: { browserName: 'chromium', launchOptions: { headless: true }, contextOptions: { deviceScaleFactor: 2, viewport: { width: w, height: h }, colorScheme: mode } } }));
+  const pw = (...args) => new Promise(resolve => {
+    const c = cp.spawn('playwright-cli', ['-s=' + name, ...args], { cwd: work, stdio: ['ignore', 'pipe', 'pipe'] });
+    let o = '', e = '';
+    const t = setTimeout(() => c.kill('SIGKILL'), 120000);
+    c.stdout.on('data', d => { o += d; }); c.stderr.on('data', d => { e += d; });
+    c.on('error', er => { clearTimeout(t); resolve({ status: 127, stdout: o, stderr: String(er) }); });
+    c.on('close', code => { clearTimeout(t); resolve({ status: code, stdout: o, stderr: e }); });
+  });
+  cleanups.push(async () => { await pw('close'); fs.rmSync(work, { recursive: true, force: true }); });
+  const url = `http://127.0.0.1:${srv.port}/${rel.split(path.sep).map(encodeURIComponent).join('/')}?mode=${mode}`;
+  const o1 = await pw('open', '--browser=chromium', `--config=${cfg}`, url);
+  if (o1.status !== 0 || /### Error/.test(o1.stdout)) fail('playwright-cli could not open the mock: ' + (o1.stderr || o1.stdout).trim().slice(0, 200));
+  const ev = await pw('--raw', 'eval', '(async()=>{await document.fonts.ready;await new Promise(r=>setTimeout(r,400));return JSON.stringify("ok")})()');
+  if (ev.status !== 0 || !/ok/.test(ev.stdout)) fail('mock did not settle: ' + (ev.stderr || ev.stdout).trim().slice(0, 200));
+  const sh = await pw('screenshot', '--hires', ...(a.flags.full ? ['--full-page'] : []), `--filename=${png}`);
+  if (sh.status !== 0 || !fs.existsSync(png)) fail('screenshot failed: ' + (sh.stderr || sh.stdout).trim().slice(0, 200));
+  const o = { out: png, size: `${w}x${h}`, mode, full: !!a.flags.full };
+  out(o, a.flags, `rendered ${showPath(file)} (${mode}, ${w}x${h}${a.flags.full ? ', full page' : ''}, 2x) -> ${png}`);
+}
+
+/* flags the shared parser (dev/lg/util.js) does not know */
+function extractFlags(argv) {
+  const valued = new Set(['direction', 'gate', 'size']), bools = new Set(['init', 'draft', 'full']);
+  const rest = [], extra = {};
+  for (let i = 0; i < argv.length; i++) {
+    const m = /^--([a-z]+)(?:=(.*))?$/s.exec(argv[i]);
+    if (m && valued.has(m[1])) {
+      let v = m[2];
+      if (v === undefined) { v = argv[++i]; if (v === undefined || v.startsWith('--')) fail(`--${m[1]} needs a value`); }
+      extra[m[1]] = v;
+    } else if (m && bools.has(m[1])) extra[m[1]] = true;
+    else rest.push(argv[i]);
+  }
+  return { rest, extra };
 }
 
 /* ------------------------------------------------------------------ main */
 async function main() {
-  const a = U.parseArgs(process.argv.slice(2));
+  const x = extractFlags(process.argv.slice(2));
+  const a = U.parseArgs(x.rest);
+  Object.assign(a.flags, x.extra);
   const cmd = a._[0];
   if (a.flags.help || !cmd || cmd === 'help') { console.log(USAGE); return cmd || a.flags.help ? 0 : 1; }
-  const table = { styles: cmdStyles, style: cmdStyle, components: cmdComponents, fonts: cmdFonts, palette: cmdPalette, moves: cmdMoves, inspect: x => cmdInspect(x, false), compare: x => cmdInspect(x, true), screens: cmdScreens, pack: cmdPack };
+  const table = { styles: cmdStyles, style: cmdStyle, components: cmdComponents, fonts: cmdFonts, palette: cmdPalette, moves: cmdMoves, inspect: x => cmdInspect(x, false), compare: x => cmdInspect(x, true), screens: cmdScreens, pack: cmdPack, direction: cmdDirection, shot: cmdShot };
   if (!table[cmd]) fail(`unknown command "${cmd}".${U.didYouMean(cmd, Object.keys(table))} See: node dev/lg.js --help`);
-  await table[cmd](a);
-  return 0;
+  return (await table[cmd](a)) || 0;
 }
 
 main().then(c => { process.exitCode = c; }, e => {
