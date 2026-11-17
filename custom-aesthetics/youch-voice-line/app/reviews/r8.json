@@ -1,0 +1,104 @@
+{
+  "round": 8,
+  "reviewer": "critic",
+  "date": "2026-11-16",
+  "renders": "app/renders/r8/",
+  "scores": {
+    "thesis": {
+      "score": 4,
+      "evidence": "mock-history-light.png states it in one look: every dictation is a periwinkle start dot and an ink talk line, on the day score and under each row, and the kept text sits over the struck said text on a time gutter. mock-dictionary-light.png (clip discs), mock-recordings-light.png (speaker discs on a time gutter), mock-settings-light.png (the hold key inked with a voice dot) and mock-welcome-light.png carry it on. Short of a 5: mock-insights-light.png has no voice form in it, and the renderer screens (history-light.png, insights-light.png) carry none of it, a listed limit."
+    },
+    "signature": {
+      "score": 4,
+      "evidence": "mock-history-light.png: the day score and the talk line in every row come from hold, talk, let go, on one scale (Mail's 0:31 is the longest in both), and the selected dictation's dot gets an ink ring on the score; mock-try-it-light.png lands the first dictation as the same dot and line, and mock-overlay-ring-light.png closes it into the ring. Short of a 5: the lines are still the thinnest marks in each row, and on the day score they lie on an 8 AM to 2 PM clock axis, so Mail's 0:31 line spans what reads as 45 minutes."
+    },
+    "content": {
+      "score": 4,
+      "evidence": "mock-history-light.png now reads like a marked galley: 'um so', 'like', 'prominent' and 'eight weeks oh actually' struck, a small periwinkle caret where 'Pramand' and 'six weeks' were put in (r7 f7 landed, so the edit mark no longer reads as a link), and one butter learned line with Undo. mock-dictionary-light.png counts clips as five discs beside struck mishearings; mock-recordings-light.png gives each speaker a lane on one time axis. Weak spots: the term names in mock-dictionary-light.png are list-sized, and mock-insights-light.png is still a number over a chart."
+    },
+    "hierarchy": {
+      "score": 4,
+      "evidence": "mock-history-light.png reads title, day score, the ink selected row, then the kept text, with Copy ⌘C at the trailing edge of the reader header; mock-insights-light.png reads 7,719, then the area, then one tabular line; mock-settings-light.png leads with the filled keycap. Weak spots unchanged: the cream selected row in mock-history-dark.png is the brightest block on the screen, and mock-try-it-light.png leaves about 40% of the window empty under 'Waiting for your voice.'"
+    },
+    "type": {
+      "score": 4,
+      "evidence": "Outfit 600 titles at about 56px with tight tracking and the 132px numeral (mock-insights-light.png) against Inter kept text at reading size, smaller said text and tabular time codes (mock-history-light.png); tracked caps only on section labels (KEPT, WHAT YOU SAID, WHO SPOKE, TERMS 3, WORDS, LAST 7 DAYS). Short of a 5: mock-dictionary-light.png sets Pramand, Zelcor and Priya Raman at about 19px, one step above their meta line, not the display word section 2 promises."
+    },
+    "colour": {
+      "score": 4,
+      "evidence": "The budget holds: periwinkle only on start dots, carets, clip discs, speaker discs and lanes, the play button and the keycap's voice dot; ink (cream in dark) for selection and actions; butter once per screen (mock-history-light.png, mock-dictionary-dark.png). Dark keeps periwinkle and has its own area mix (mock-insights-dark.png), but otherwise swaps ink and cream one for one, and the darkest speaker step stays dim on the dark canvas (Speaker 4 in mock-recordings-dark.png)."
+    },
+    "restraint": {
+      "score": 4,
+      "evidence": "One language across the mocks: 6px controls, square planes, round only for voice, groups made by 2px ink rules and hairlines, no cards (mock-history-light.png, mock-settings-light.png, mock-recordings-light.png). r7's double-duty underline is gone: underlines now mean actions only and corrections carry a caret (mock-history-light.png). Small outliers: a square peak marker on mock-insights-light.png and the left-ruled callout used for two different jobs (the hint in mock-dictionary-light.png, the lost-thread quote in mock-insights-light.png)."
+    },
+    "craft": {
+      "score": 3,
+      "evidence": "The mocks are clean: one edge 30px inside the rule on every pane, tabular gutters, consistent radii (mock-history-light.png, mock-settings-light.png), and r7 f1, f2 and f5 landed (the dark rest field line now measures #5C5D5E, about 2.9:1, in kit-dark.png and mock-dictionary-dark.png; menu checks show in kit-light.png; no hairline beside Dark in mock-settings-dark.png). But the kit's states are still weak: in kit-dark.png the focused field is a 1px #858687 line against the 1px #5C5D5E rest line, about 1.8:1 at the same weight, so focus barely shows; error and focus share one halo and the disabled secondary keeps its full frame (kit-light.png); and every renderer section header still sits on two parallel rules (history-light.png 'This dictation', dictionary-light.png 'Terms', recordings-light.png 'Transcript', settings-light.png 'Models, on this Mac')."
+    },
+    "distinct": {
+      "score": 4,
+      "evidence": "With the name hidden, mock-history-light.png (day score, talk lines, a marked-up said text), mock-settings-light.png (keycaps, stop tracks, square-slug switches) and mock-welcome-light.png (poster wordmark over a keyboard row with the hold key inked) could only be Youch!. Defaults remain on mock-insights-light.png (big number, area chart, label-value line) and in the renderer's full-width slabs and chevron rows (history-light.png, settings-light.png), a listed limit."
+    },
+    "owner-fit": {
+      "score": 4,
+      "evidence": "It answers 'kind of Bauhaus ... a little neo-brutal pop' with poster titles, 2px ink rules and ink fills (mock-welcome-light.png, mock-history-light.png), keeps the Mail-style two-pane History and the area graph (mock-insights-light.png), uses butter as one small disc with no highlight band, and shows the static only while capturing (mock-overlay-pill-light.png, mock-overlay-ring-light.png). Short of a 5: the owner's latest lesson is the product's own data drawn big and structural, and the talk lines remain the smallest marks on mock-history-light.png."
+    }
+  },
+  "generic": [
+    "mock-insights-light.png: a huge number over an area chart with a label-value stat line beneath is still the stock analytics hero.",
+    "The renderer's main actions are full-width ink slabs with left-set labels: Copy over a centred ⌘C in history-light.png, Add in dictionary-light.png, Export in recordings-light.png, Finish in try-it-light.png (a listed limit, and still the most generic thing on those screens).",
+    "Plain name, meta and trailing-action rows any app could have: the Models list in mock-settings-light.png, the Snippets column and the field-plus-Add row in mock-dictionary-light.png, and the chevron inspector in history-light.png."
+  ],
+  "fixes": [
+    {
+      "id": "f1",
+      "priority": "P2",
+      "target": "kit: text field focus in dark (kit-dark.png)",
+      "text": "Applying r7 f1 raised the dark rest line to #5C5D5E, which closed the gap the last three reviews relied on ('still below the #858687 focus frame'): focus is now a 1px #858687 line beside a 1px #5C5D5E rest line, about 1.8:1 at the same weight, while kit-light.png draws focus as a 2px ink frame. Note n34 and section 6 say focus is the cream border; it is not. Keep the rest line at about 3:1 (r7 f1) and make the dark focus border the 2px cream #FAFAF7 frame r4 f1 asked for, through a {light,dark} param on the field material, so both fixes hold."
+    },
+    {
+      "id": "f2",
+      "priority": "P3",
+      "target": "kit: text field error halo (kit-light.png, kit-dark.png)",
+      "text": "r7 f3 is still open (n36 calls it a base-kit rule): error and focus carry the same halo, so they differ only by frame weight. Drop the halo from the error state so the halo means focus and the heavy frame means error."
+    },
+    {
+      "id": "f3",
+      "priority": "P3",
+      "target": "kit: disabled secondary button (kit-light.png, kit-dark.png)",
+      "text": "r7 f4 is still open: disabled 'Not now' keeps the full 2px frame and reads as rest. Draw the disabled frame in the 1px muted line the rest field uses."
+    },
+    {
+      "id": "f4",
+      "priority": "P3",
+      "target": "kit: section header over a list (history-light.png, dictionary-light.png, recordings-light.png, settings-light.png)",
+      "text": "r7 f6 is still open: each header ('This dictation', 'Today', 'Terms', 'Learned from your fixes', 'Snippets', 'Transcript', 'Models, on this Mac') sits on its rule with the list's own top hairline about 9px below, two parallel rules where the mocks draw one. Drop the list group's top hairline so the header rule alone opens each list."
+    },
+    {
+      "id": "f5",
+      "priority": "P3",
+      "target": "kit: Link at rest in dark (kit-dark.png)",
+      "text": "The resting link and its underline are muted #858687, dimmer than the sentence around them, so a link reads as disabled; kit-light.png draws it ink, and every dark mock draws text actions cream (Undo in mock-history-dark.png, Record, Edit and Remove in mock-dictionary-dark.png). Make the dark resting link cream like the pressed one."
+    },
+    {
+      "id": "f6",
+      "priority": "P3",
+      "target": "mock-dictionary-light.png and mock-dictionary-dark.png: term names",
+      "text": "Pramand, Zelcor and Priya Raman sit at about 19px, one step above 'Sounds like ...', so the right spelling is not the display word section 2 promises. Set the term names in Outfit 600 at the 28px reader-title size."
+    },
+    {
+      "id": "f7",
+      "priority": "P3",
+      "target": "mock-try-it-light.png and mock-try-it-dark.png: practice area",
+      "text": "About 40% of the window is empty under 'Waiting for your voice.' Under the practice line, add History's two section labels, KEPT and WHAT YOU SAID, each on its hairline, so the space shows what the first dictation becomes."
+    }
+  ],
+  "landed": [
+    "f1",
+    "f2",
+    "f5",
+    "f7"
+  ],
+  "verdict": "refine"
+}

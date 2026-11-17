@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Voice Line · Try it</title>
+<link rel="stylesheet" href="voice-line.css">
+<style>
+
+.win{display:block;position:relative}
+.cap{position:relative;height:64px;border:2px solid var(--ink);border-radius:var(--r);flex:none}
+.cap .g{position:absolute;right:8px;top:6px;font-size:13px;font-weight:600}
+.cap .nm{position:absolute;left:9px;bottom:6px;font-size:12px;font-weight:500}
+.cap.on{background:var(--ink);color:var(--on-ink)}.cap .dot{position:absolute;left:8px;top:8px}
+.steps{display:flex;align-items:center;gap:6px}
+.steps u{display:block;width:24px;height:2px;background:var(--line)}.steps u.on{background:var(--ink)}
+.steps span{font-size:12.5px;color:var(--muted);margin-left:8px}
+
+.brand{position:absolute;left:96px;top:44px;margin:0}
+.c{position:absolute;left:96px;top:132px;width:840px}
+h1{font:600 56px/.92 var(--fh);letter-spacing:-.045em}
+.c p{font-size:16px;margin-top:18px}
+.box{position:relative;width:840px;margin-top:40px;padding:26px 0 0;border-top:2px solid var(--ink)}
+.wait{display:flex;align-items:center;gap:0;margin:6px 0 14px}.wait .dot{width:14px;height:14px}.wait u{display:block;flex:1;height:1px;background:var(--line);margin-left:0}.wait .cur{width:2px;height:22px;background:var(--ink);margin-left:6px;margin-right:0}
+.box .lead{font:600 15px var(--fh);display:flex;justify-content:space-between}.box .lead span{font:400 12.5px var(--fb);color:var(--muted)}
+.box .ph{font-size:16px;color:var(--muted)}
+.box .h{position:absolute;left:18px;bottom:14px;font-size:12.5px;color:var(--muted)}
+.foot{position:absolute;left:0;right:0;bottom:0;height:88px;border-top:var(--hair);padding:0 244px 0 96px;display:flex;flex-direction:column;justify-content:center;gap:12px}
+.fr{display:grid;grid-template-columns:1fr auto 1fr;align-items:center}
+.fc{display:flex;align-items:center;gap:14px;font-size:13px;color:var(--muted)}
+.trk{width:160px;height:2px;background:var(--line)}.trk u{display:block;width:42%;height:2px;background:var(--ink)}
+.fe{display:flex;justify-content:flex-end;align-items:center;gap:22px}
+.btn.dis{opacity:.35}
+.foot .steps{position:static}
+
+</style></head><body>
+<div class="win"><div class="brand"><svg class="mark" viewBox="0 0 26 26" fill="none"><circle cx="7" cy="13" r="6" fill="var(--voice)"/><path d="M15 6.5a9 9 0 0 1 0 13M19.5 3a13.5 13.5 0 0 1 0 20" stroke="var(--ink)" stroke-width="2.4" stroke-linecap="round"/></svg> Youch!</div><div class="c"><h1>Try it</h1><p>Hold <kbd>⌘</kbd> and say something, then let go. Your words land on the line below.</p><div class="box"><div class="lead">Your first dictation<span>Lands here as a talk line, then as text</span></div><div class="wait"><i class="dot"></i><span class="cur"></span><u></u></div><div class="ph">Waiting for your voice.</div></div></div>
+<div class="foot"><div class="fr"><div><span class="btn text">Back</span></div><div class="fc">Downloading models, 42% · less than a minute left<div class="trk"><u></u></div></div><div class="fe"><span class="btn text">Skip practice</span><span class="btn main dis">Finish</span></div></div><div class="steps"><u></u><u></u><u></u><u></u><u></u><u></u><u></u><u class=on></u><span>Step 8 of 8</span></div></div></div>
+</body></html>

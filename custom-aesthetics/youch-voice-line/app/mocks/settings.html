@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Voice Line · Settings</title>
+<link rel="stylesheet" href="voice-line.css">
+<style>
+
+.cols{display:grid;grid-template-columns:520px 1fr;min-height:0}
+.l{padding:22px 30px 0;border-right:var(--hair)}.r{padding:22px 30px 0}
+h3{font:600 17px/1.2 var(--fh)}
+.hint{font-size:13px;color:var(--muted);margin-top:3px}
+.keys{display:flex;gap:24px;margin-top:14px}
+.k{width:92px}
+.cap{position:relative;width:92px;height:72px;border:2px solid var(--ink);border-radius:var(--r)}
+.cap .g{position:absolute;right:8px;top:6px;font-size:13px;font-weight:600}
+.cap .nm{position:absolute;left:9px;bottom:7px;font-size:12px;font-weight:500}
+.cap.on{background:var(--ink);color:var(--on-ink)}
+.cap .dot{position:absolute;left:8px;top:8px}
+.k small{display:block;white-space:nowrap;font-size:12.5px;margin-top:6px}
+.stop{margin-top:20px}
+.stop b{font:600 15px var(--fh)}.stop p{font-size:13px;color:var(--muted)}
+.trk{position:relative;width:360px;height:12px;margin-top:12px}
+.trk::before{content:"";position:absolute;left:6px;right:6px;top:5px;height:2px;background:var(--line)}
+.trk i{position:absolute;top:0;width:12px;height:12px;border-radius:3px;border:2px solid var(--line);background:var(--canvas)}
+.trk i.on{background:var(--ink);border-color:var(--ink)}
+.lbl{position:relative;width:360px;height:18px;margin-top:6px;font-size:13px;color:var(--muted)}
+.lbl span{position:absolute;white-space:nowrap}.lbl .on{color:var(--ink);font-weight:600}
+.sr{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:11px 0;border-bottom:var(--hair)}
+.sr b{display:block;font:600 15px var(--fh)}.sr p{font-size:13px;color:var(--muted)}
+.blk{margin-bottom:26px}
+.appear .apl{background:var(--ink);color:var(--on-ink)}@media (prefers-color-scheme:dark){.appear .apl{background:transparent;color:var(--muted)}.appear .apd{background:var(--ink);color:var(--on-ink)}}.blk .seg{margin-top:12px}
+.mr{display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-bottom:var(--hair)}
+.mr b{display:block;font:600 15px var(--fh)}.mr p{font-size:13px;color:var(--muted)}.mr>span{font-size:13.5px;color:var(--muted)}
+.mr .btn{height:30px;font-size:13px}
+
+</style></head><body>
+<div class="win"><aside class="side"><div class="brand"><svg class="mark" viewBox="0 0 26 26" fill="none"><circle cx="7" cy="13" r="6" fill="var(--voice)"/><path d="M15 6.5a9 9 0 0 1 0 13M19.5 3a13.5 13.5 0 0 1 0 20" stroke="var(--ink)" stroke-width="2.4" stroke-linecap="round"/></svg> Youch!</div><div class="nav">History</div><div class="nav">Dictionary</div><div class="nav">Insights</div><div class="nav">Recordings</div><div class="nav on">Settings</div><div class="hold">Hold <kbd>⌘</kbd> to talk<small>Right Command. Let go and it pastes where you're typing.</small></div></aside><div class="page" style="grid-template-rows:auto 1fr"><div class="top"><h1>Settings</h1><span class="sub">Changes apply right away</span></div><div class="cols"><section class="l">
+<h3>Dictation key</h3><p class="hint">Hold to talk, let go to paste. Some external keyboards, like Logitech's, don't send Fn.</p>
+<div class="keys"><div class="k"><div class="cap"><span class="nm">fn</span></div><small>Fn</small></div><div class="k"><div class="cap"><span class="g">⌥</span><span class="nm">option</span></div><small>Right Option</small></div><div class="k"><div class="cap on"><i class="dot"></i><span class="g">⌘</span><span class="nm">command</span></div><small>Right Command</small></div></div>
+<div class="stop"><b>Cleanup</b><p>How much Youch! tidies what you said.</p><div class="trk"><i class="on" style="left:0"></i><i class="" style="left:calc(50% - 6px)"></i><i class="" style="right:0"></i></div><div class="lbl"><span class="on" style="left:0">Light</span><span class="" style="left:50%;transform:translateX(-50%)">Medium</span><span class="" style="right:0">Heavy</span></div></div><div class="stop"><b>Rewording</b><p>How far Youch! may reword. Off keeps your words.</p><div class="trk"><i class="on" style="left:0"></i><i class="" style="left:calc(50% - 6px)"></i><i class="" style="right:0"></i></div><div class="lbl"><span class="on" style="left:0">Off</span><span class="" style="left:50%;transform:translateX(-50%)">Low</span><span class="" style="right:0">High</span></div></div>
+<div style="margin-top:20px"><div class="sr" style="border-top:var(--hair)"><div><b>Fix spoken corrections at Light too</b><p>“Eight, no wait, five” becomes “five”.</p></div><i class="sw on"></i></div>
+<div class="sr"><div><b>Show the Youch! button</b><p>A small button at the bottom of the screen.</p></div><i class="sw on"></i></div>
+<div class="sr"><div><b>Launch at login</b></div><i class="sw"></i></div></div>
+</section><section class="r">
+<div class="blk"><h3>Appearance</h3><div class="seg appear"><span class="apl">Light</span><span class="apd">Dark</span><span>Match system</span></div></div>
+<div class="blk"><h3>Keep recordings</h3><p class="hint">Older audio is deleted; the text stays.</p><div class="seg"><span>Forever</span><span class="on">30 days</span><span>90 days</span><span>365 days</span></div></div>
+<h3>Models, on this Mac</h3><div style="margin-top:8px;border-top:var(--hair)">
+<div class="mr"><div><b>Speech model</b><p>Parakeet TDT 0.6B v2 · 464 MB</p></div><span>Ready</span></div>
+<div class="mr"><div><b>Vocabulary model</b><p>Parakeet CTC 110M · 103 MB</p></div><span>Ready</span></div>
+<div class="mr"><div><b>Cleanup model</b><p>Qwen3 1.7B · 1.4 GB</p></div><span>Ready</span></div>
+<div class="mr"><div><b>Speaker model</b><p>Diarization · 129 MB · for Recordings</p></div><span class="btn line">Download</span></div></div>
+<p class="hint" style="font-size:12.5px;margin-top:12px">Models run on this Mac. Nothing you say is sent anywhere.</p>
+</section></div></div></div>
+</body></html>

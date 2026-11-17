@@ -1,0 +1,4 @@
+{ "app": "Youch!", "repo": "~/Desktop/Projects/TTS+", "brandName": "Youch!",
+  "style": "mainframe", "blend": null, "primary": "#8290c7", "scheme": "analogous",
+  "colors": { "secondary": "#dde1f2", "accent": "#f6cf6b", "neutralDark": "#101116", "neutralLight": "#fafaf7" },
+  "heading": "IBM Plex Sans", "body": "IBM Plex Sans", "typography": null, "pureBg": false, "modes": ["light", "dark"] }

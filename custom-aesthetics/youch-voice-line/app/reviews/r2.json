@@ -1,0 +1,170 @@
+{
+  "round": 2,
+  "reviewer": "critic",
+  "date": "2026-11-16",
+  "renders": "app/renders/r2/",
+  "scores": {
+    "thesis": {
+      "score": 4,
+      "evidence": "mock-history-light.png states it outright: each dictation is a periwinkle dot and an ink line, on the day score and in every row, and the kept text sits above the said text with fillers struck. mock-recordings-light.png (speaker discs on a time-code gutter), mock-dictionary-light.png (clip discs beside struck mishearings) and mock-settings-light.png (a keycap with a voice dot) repeat it. It drops out on mock-try-it-light.png, which is an empty box, and is thin on mock-insights-light.png, where nothing is round."
+    },
+    "signature": {
+      "score": 4,
+      "evidence": "mock-history-light.png: the day score (dots on an 8 AM to 2 PM axis, each line as long as the talk) and the matching talk line under every row come straight from hold, talk, let go, and mock-overlay-ring-light.png closes the same idea into the finishing ring. At row size the dot and line read close to a mini audio scrubber, and the renderer's history-light.png carries none of it (a listed renderer limit, round 1 note n2)."
+    },
+    "content": {
+      "score": 4,
+      "evidence": "mock-history-light.png draws the product promise as content: the kept text at reading size, the said text beneath with 'um so', 'like' and 'eight weeks oh actually' struck and the corrections underlined, a time gutter, and a learned line. mock-dictionary-light.png has clip discs and struck mishearings, and mock-recordings-light.png has a who-spoke strip and turns. Dictionary still repeats '3 of 5' beside its discs, and the secondary figures on mock-insights-light.png are a label-value line."
+    },
+    "hierarchy": {
+      "score": 4,
+      "evidence": "mock-history-light.png reads title, day score, selected row, then the reader's kept text, with Copy ⌘C at the trailing edge of the reader header where a Mac action lives. mock-insights-light.png reads 7,719 first, the area second and one tabular line third. mock-try-it-light.png has no second level, and the renderer's full-width slabs (the Copy button in history-light.png) fight the content, which is a listed renderer limit."
+    },
+    "type": {
+      "score": 4,
+      "evidence": "mock-insights-light.png and mock-history-light.png: Outfit 600 titles at 56px with tight tracking and a 132px numeral, against Inter 21px kept text, 15px said text and small tabular time codes. The scale is real and each step has one job. Tracked caps appear only on section labels (KEPT, WHAT YOU SAID, WHO SPOKE), and Inter is the owner's locked text face. In history-light.png the kit sets the kept dictation as a bold Outfit headline, which the mock does not."
+    },
+    "colour": {
+      "score": 4,
+      "evidence": "mock-history-light.png and mock-history-dark.png keep the budget: periwinkle only on the start dots, the play disc and the mark; ink (cream in dark) for selection and Copy; butter once, as the learned disc. Dark mode is designed, with cream fills and periwinkle unchanged. The kit leaks periwinkle onto states that are not voice: the field focus halo and the menu checkmarks in kit-light.png."
+    },
+    "restraint": {
+      "score": 3,
+      "evidence": "The mocks speak one language: 6px controls, 0 on planes, round only for voice. The kit adds strays: a full-pill switch with a round knob (settings-light.png), a rounded grey chip under the numeral (insights-light.png), a 2px ink frame that boxes the whole inspector and runs off the window (history-light.png, dictionary-light.png, settings-light.png), and a soft periwinkle focus halo (kit-light.png)."
+    },
+    "craft": {
+      "score": 3,
+      "evidence": "The mocks are clean, with one strong left edge per pane and tabular times (mock-history-light.png). The kit has real bugs. The progress fill is drawn in the canvas colour, so 'Step 1 of 8' reads as nearly full and 42% reads as 58% (welcome-light.png, try-it-light.png, recordings-light.png). Menu and listbox text touches the border (kit-light.png), and the error field is invisible in dark mode (kit-dark.png). Smaller slips: mock-history-light.png scores six dictations but lists five, and mock-settings-dark.png has Appearance set to Light."
+    },
+    "distinct": {
+      "score": 4,
+      "evidence": "With the name hidden, mock-history-light.png, mock-settings-light.png (keycaps with a voice dot) and mock-welcome-light.png (a poster wordmark over a keyboard row) could only be Youch!. The renderer screens slide back to a black-and-white template, with full-width ink slabs, label-value rows with chevrons and a chip (history-light.png, insights-light.png), and mock-try-it-light.png is a stock form."
+    },
+    "owner-fit": {
+      "score": 4,
+      "evidence": "It answers 'kind of Bauhaus ... a little neo-brutal pop' with poster titles and ink fills (mock-welcome-light.png, mock-history-light.png), and it keeps the Mail-style two-pane History, the area graph (mock-insights-light.png), butter as one small disc and no highlight band anywhere. A risk to raise with the owner: the pill controls and 'periwinkle fills what is chosen' locked in D-037 are replaced by ink fills and 6px corners, a principled change he has not seen. Also, the overlay static now sits on an opaque dark disc (mock-overlay-pill-light.png) rather than the see-through circle he praised."
+    }
+  },
+  "generic": [
+    "The main actions are full-width ink slabs with left-set labels in the middle of the content: Copy in history-light.png, Add in dictionary-light.png, Export in recordings-light.png and Finish in try-it-light.png.",
+    "The Try it step is an empty double-ruled text box reading 'Your words appear here' above a grey disabled Finish (mock-try-it-light.png), which could be any onboarding form.",
+    "The inspector is a list of label-value rows with a chevron on every line ('App  Claude >', 'Cleanup  Light >' in history-light.png), which looks like an iOS Settings list."
+  ],
+  "fixes": [
+    {
+      "id": "f1",
+      "priority": "P2",
+      "target": "kit: inspector panel (history-light.png, dictionary-light.png, settings-light.png)",
+      "text": "The inspector is boxed in a 2px ink frame (cream in dark) that runs off the window's right and bottom edges: a box around a whole pane, in a style that promises no cards. Draw it with a single 1px hairline on its left edge and no frame."
+    },
+    {
+      "id": "f2",
+      "priority": "P2",
+      "target": "kit: progress bar (welcome-light.png, try-it-light.png, recordings-light.png)",
+      "text": "The fill is drawn in the canvas colour and the track in ink, so 'Step 1 of 8' reads as nearly full, 42% reads as 58%, and a clipped cap is left at the start. Draw the fill in ink (cream in dark) and the track as a 1px hairline."
+    },
+    {
+      "id": "f3",
+      "priority": "P2",
+      "target": "kit: menu, listbox and split-button items (kit-light.png, kit-dark.png)",
+      "text": "Option text ('Today', 'This week', 'Mobility basics') and the 'Save as draft' icon sit flush against the menu's left border. Give the items the same 16px left inset as the text field."
+    },
+    {
+      "id": "f4",
+      "priority": "P2",
+      "target": "kit: text and search field focus (kit-light.png, kit-dark.png)",
+      "text": "Field focus is a periwinkle border with a soft periwinkle halo, while buttons and the Try it mock focus with a 2px ink ring set 2px out, and periwinkle is reserved for voice. Use the same ink ring on fields."
+    },
+    {
+      "id": "f5",
+      "priority": "P2",
+      "target": "kit: text field error (kit-dark.png)",
+      "text": "The error state differs from rest only by a faint grey halo, which is invisible in dark mode. Put the ink alert icon the direction promises for errors before 'Enter a full email address.'"
+    },
+    {
+      "id": "f6",
+      "priority": "P2",
+      "target": "kit: switch (settings-light.png, settings-dark.png)",
+      "text": "The switch is a full pill with a round knob, although r1 f17 asked for a square knob and the direction keeps round shapes for voice. The mock-settings-light.png switch has 6px corners and a square knob; give the kit switch the same."
+    },
+    {
+      "id": "f7",
+      "priority": "P2",
+      "target": "insights-light.png: caption under 7,719",
+      "text": "'51 minutes of talking, 40 dictations' sits in a fully rounded grey chip. Chips are a ledger default the direction changed, and round is for spoken things. Set the caption as plain muted text with no fill."
+    },
+    {
+      "id": "f8",
+      "priority": "P2",
+      "target": "mock-try-it-light.png: practice box",
+      "text": "The first dictation lands in an empty double-ruled box with grey placeholder text, the one screen where the thesis does not show. Draw the waiting state in the History row form instead: a periwinkle start dot, an empty ink talk line and 'Hold ⌘ to talk', so the first words land as a talk line."
+    },
+    {
+      "id": "f9",
+      "priority": "P3",
+      "target": "mock-try-it-light.png: layout",
+      "text": "The content sits on a centred edge at 340px, while the logo sits at 75 and Welcome's content at 163. Put Try it on Welcome's flush-left edge."
+    },
+    {
+      "id": "f10",
+      "priority": "P3",
+      "target": "mock-history-light.png: list",
+      "text": "The day score shows six dictations (one at about 8:12) but the list shows five, with empty room below Terminal. Add the 8:10 AM Notes row so the score and the list agree."
+    },
+    {
+      "id": "f11",
+      "priority": "P3",
+      "target": "mock-history-light.png: day score",
+      "text": "The 1:52 PM talk line runs about 7px past the pane's right edge. Stop it at the content edge."
+    },
+    {
+      "id": "f12",
+      "priority": "P3",
+      "target": "mock-history-light.png: day score",
+      "text": "Each line uses the 3px-a-second talk scale on an hour axis, so the 0:31 Mail line spans about 45 minutes of axis and reads as a time span. Add a small key beside '6 dictations' saying the line is time talking."
+    },
+    {
+      "id": "f13",
+      "priority": "P3",
+      "target": "mock-settings-dark.png: Appearance",
+      "text": "The dark render shows Light selected. Select Dark in the dark mock."
+    },
+    {
+      "id": "f14",
+      "priority": "P3",
+      "target": "mock-settings-light.png: off switch",
+      "text": "The off switch is a pale grey fill at about 1.4:1 against the canvas, and near-black on near-black in mock-settings-dark.png. Draw the off state as a 2px ink outline with an ink knob."
+    },
+    {
+      "id": "f15",
+      "priority": "P3",
+      "target": "kit: primary button (kit-light.png)",
+      "text": "The primary label is left-set while the secondary, destructive and split labels are centred. Centre the primary label too."
+    },
+    {
+      "id": "f16",
+      "priority": "P3",
+      "target": "mock-recordings-dark.png: who-spoke strip",
+      "text": "The Speaker 3 and Speaker 4 tints sit within a step of each other, and Speaker 4 nearly meets the dark canvas. Widen the lightness steps between the four speaker tints."
+    }
+  ],
+  "landed": [
+    "f1",
+    "f2",
+    "f3",
+    "f4",
+    "f5",
+    "f6",
+    "f7",
+    "f8",
+    "f9",
+    "f10",
+    "f11",
+    "f12",
+    "f13",
+    "f14",
+    "f15",
+    "f16"
+  ],
+  "verdict": "refine"
+}

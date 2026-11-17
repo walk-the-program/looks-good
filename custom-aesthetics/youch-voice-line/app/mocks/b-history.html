@@ -1,0 +1,86 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>B Steno · History</title>
+<link rel="stylesheet" href="/fonts/fonts.css">
+<style>
+/* Direction B, Steno. Tokens from mocks/b-pack.md (mainframe + look-b): ruled, square, IBM Plex Sans. */
+:root{--canvas:#fafaf7;--layer:#f1f1ec;--ink:#101116;--muted:#66676d;--line:#d7d7d2;--rule:#101116;--primary:#8290c7;--accent:#f6cf6b;--f:"IBM Plex Sans",sans-serif}
+@media (prefers-color-scheme:dark){:root{--canvas:#101116;--layer:#181920;--ink:#ecedf2;--muted:#9a9ca6;--line:#2c2e36;--rule:#ecedf2;--primary:#97a4da;--accent:#f2cc6a}}
+*{box-sizing:border-box;margin:0;padding:0}
+body{width:1180px;height:780px;background:var(--canvas);color:var(--ink);font:400 13.5px/1.45 var(--f);display:grid;grid-template-columns:184px 404px 1fr;overflow:hidden;font-variant-numeric:tabular-nums}
+.side{padding:52px 0 16px;border-right:1px solid var(--line);display:flex;flex-direction:column}
+.brand{display:flex;align-items:center;gap:8px;font:600 17px var(--f);padding:0 20px 26px}
+.brand i{width:12px;height:12px;border-radius:50%;background:var(--primary)}
+.nav{height:34px;display:flex;align-items:center;padding:0 20px;font-size:14px;color:var(--muted);border-left:3px solid transparent}
+.nav.on{border-left-color:var(--ink);color:var(--ink);font-weight:600;background:var(--layer)}
+.nav em{margin-left:auto;font-style:normal;font-size:12px;color:var(--muted);font-weight:400}
+.hold{margin:auto 20px 0;font-size:12.5px;color:var(--muted);border-top:1px solid var(--line);padding-top:12px}
+.hold b{color:var(--ink);font-weight:600}
+.list{border-right:1px solid var(--line);display:flex;flex-direction:column;min-height:0}
+.lh{padding:44px 20px 12px;display:flex;align-items:baseline;gap:10px}
+h1{font:600 24px var(--f);letter-spacing:-.01em}.lh span{color:var(--muted);font-size:12.5px}
+.search{margin:0 20px 10px;height:32px;background:var(--layer);border-bottom:1px solid var(--muted);display:flex;align-items:center;padding:0 10px;color:var(--muted)}
+.cols,.row{display:grid;grid-template-columns:64px 74px 1fr 46px;column-gap:10px;padding:0 20px;align-items:center}
+.cols{height:28px;font:600 11px var(--f);color:var(--muted);border-bottom:1px solid var(--rule)}
+.cols span:last-child,.row .w{text-align:right}
+.day{padding:10px 20px 4px;font:600 11px var(--f);color:var(--muted)}
+.row{height:58px;border-bottom:1px solid var(--line);grid-template-rows:auto auto;align-content:center;row-gap:2px;border-left:3px solid transparent;padding-left:17px}
+.row.on{border-left-color:var(--ink);background:var(--layer)}
+.row time{color:var(--muted)}.row b{font-weight:600}
+.row .len{display:flex;align-items:center}.len i{width:7px;height:7px;border-radius:50%;background:var(--primary);flex:none}.len u{height:1.5px;background:var(--ink);display:block}
+.row p{grid-column:2/5;color:var(--muted);font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.reader{display:flex;flex-direction:column;min-height:0}
+.tool{display:flex;align-items:center;gap:8px;padding:40px 28px 14px;border-bottom:1px solid var(--rule)}
+.tool h2{font:600 18px var(--f)}.tool .m{color:var(--muted);font-size:12.5px;margin-left:6px}
+.tool .sp{flex:1}
+.b1{height:32px;padding:0 12px;background:var(--ink);color:var(--canvas);display:flex;align-items:center;gap:10px;font-weight:600;font-size:13px}
+.b1 kbd{font:400 11.5px var(--f);opacity:.65}
+.b2{height:32px;padding:0 12px;border:1px solid var(--ink);display:flex;align-items:center;font-size:13px}
+.doc{padding:18px 28px 0;display:grid;grid-template-columns:52px 1fr;column-gap:16px;row-gap:12px;overflow:hidden}
+.g{font:400 11.5px var(--f);color:var(--muted);padding-top:4px;text-align:right}
+.lab{grid-column:1/3;font:600 11px var(--f);color:var(--muted);border-bottom:1px solid var(--line);padding:12px 0 6px;display:flex;justify-content:space-between}
+.kept{font-size:17px;line-height:1.55}
+.said{font-size:14.5px;line-height:1.7}.said s{color:var(--muted)}
+.said mark{background:none;border-bottom:2px solid var(--primary);color:inherit}
+.learn{grid-column:2;display:flex;align-items:center;gap:8px;font-size:13px;padding-top:4px}
+.learn i{width:9px;height:9px;border-radius:50%;background:var(--accent)}.learn u{text-underline-offset:3px}
+.audio{margin-top:auto;display:grid;grid-template-columns:52px 1fr auto;column-gap:16px;align-items:center;padding:12px 28px;border-top:1px solid var(--line)}
+.audio .p{width:26px;height:26px;border-radius:50%;background:var(--primary);justify-self:end;display:grid;place-items:center}
+.audio .p:after{content:"";border-left:8px solid #101116;border-top:5px solid transparent;border-bottom:5px solid transparent;margin-left:2px}
+.audio .t{height:1.5px;background:var(--line);position:relative}.audio .t:before{content:"";position:absolute;left:0;top:-4px;width:2px;height:10px;background:var(--ink)}
+.meta{display:grid;grid-template-columns:repeat(4,auto);justify-content:start;column-gap:28px;padding:10px 28px 18px;font-size:12.5px;color:var(--muted)}
+.meta b{display:block;color:var(--ink);font-weight:600;font-size:13px}
+</style></head><body>
+<aside class="side">
+  <div class="brand"><i></i>Youch!</div>
+  <div class="nav on">History<em>40</em></div><div class="nav">Dictionary<em>3</em></div><div class="nav">Insights</div><div class="nav">Recordings<em>4</em></div><div class="nav">Settings</div>
+  <div class="hold"><b>Hold Right ⌘</b> to talk.<br>Let go to paste.</div>
+</aside>
+<section class="list">
+  <div class="lh"><h1>History</h1><span>40 in the last 7 days</span></div>
+  <div class="search">Search</div>
+  <div class="cols"><span>Time</span><span>App</span><span>Length</span><span>Words</span></div>
+  <div class="day">Today</div>
+  <div class="row on"><time>1:52 PM</time><b>Claude</b><span class="len"><i></i><u style="width:48px"></u></span><span class="w">25</span><p>Can you look at the Pramand proposal and tighten the second section?</p></div>
+  <div class="row"><time>11:05 AM</time><b>Mail</b><span class="len"><i></i><u style="width:56px"></u></span><span class="w">38</span><p>Hi Sarah, thanks for sending the Pramand brief over.</p></div>
+  <div class="row"><time>10:30 AM</time><b>Slack</b><span class="len"><i></i><u style="width:16px"></u></span><span class="w">10</span><p>Running about ten minutes late, grab a table without me.</p></div>
+  <div class="row"><time>9:41 AM</time><b>Claude</b><span class="len"><i></i><u style="width:34px"></u></span><span class="w">22</span><p>There are three things I need for the landing page.</p></div>
+  <div class="row"><time>8:55 AM</time><b>Terminal</b><span class="len"><i></i><u style="width:20px"></u></span><span class="w">13</span><p>Show me the last 20 commits that touched the audio folder.</p></div>
+  <div class="row"><time>8:10 AM</time><b>Notes</b><span class="len"><i></i><u style="width:24px"></u></span><span class="w">15</span><p>Send the Preman proposal to Dana by Friday.</p></div>
+  <div class="day">Yesterday</div>
+  <div class="row"><time>5:30 PM</time><b>Dia</b><span class="len"><i></i><u style="width:30px"></u></span><span class="w">22</span><p>Compare the three onboarding flows and tell me which one asks for the least setup.</p></div>
+</section>
+<main class="reader">
+  <div class="tool"><h2>Claude</h2><span class="m">Today, 1:52 PM</span><span class="sp"></span><span class="b2">Fix a word</span><span class="b2">Copy what you said</span><span class="b1">Copy <kbd>⌘C</kbd></span></div>
+  <div class="doc">
+    <div class="lab"><span>Kept</span><span>Pasted into Claude</span></div>
+    <div class="g">0:00</div><p class="kept">Can you look at the Pramand proposal and tighten the second section?</p>
+    <div class="g">0:09</div><p class="kept">Keep the pricing table as is, but the timeline should be six weeks.</p>
+    <div class="lab"><span>Said</span><span>3 fillers removed · 1 spoken correction</span></div>
+    <div class="g">0:00</div><p class="said"><s>um so</s> can you look at the <s>prominent</s> <mark>Pramand</mark> proposal and <s>like</s> tighten the second section</p>
+    <div class="g">0:09</div><p class="said">keep the pricing table as is but the timeline should be <s>eight weeks oh actually</s> six weeks</p>
+    <div class="learn"><i></i>Learned: Preman → Pramand. <u>Undo</u></div>
+  </div>
+  <div class="audio"><span class="p"></span><span class="t"></span><span>0:00 / 0:24</span></div>
+  <div class="meta"><span>App<b>Claude</b></span><span>Cleanup<b>Light</b></span><span>Rewording<b>Off</b></span><span>Release to paste<b>0.33 s</b></span></div>
+</main>
+</body></html>

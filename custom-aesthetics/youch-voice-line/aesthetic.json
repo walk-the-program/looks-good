@@ -1,0 +1,996 @@
+{
+ "spec": 2,
+ "key": "youch-voice-line",
+ "order": 960,
+ "name": "Voice Line",
+ "descriptor": "Spoken · Ruled · Exact",
+ "influences": "Bauhaus posters (Bayer, Moholy-Nagy) / court stenographer's transcripts / tape counters / Swiss ledgers",
+ "summary": "A plain ruled interface where only spoken things are round and periwinkle, and everything written sits as ink on a straight line.",
+ "coreTrick": "Round means spoken, straight means written: periwinkle discs only ever mark voice, while every control, selection and container is a straight-edged ink shape with 6px corners at most, and structure is drawn with rules instead of cards.",
+ "motto": "Say it. Keep it straight.",
+ "kicker": "Hold, talk, let go",
+ "mode": "light",
+ "lineage": {
+  "forkedFrom": null,
+  "version": 1
+ },
+ "meta": {
+  "family": "graphic",
+  "fonts": {
+   "heading": {
+    "classes": [
+     "geometric"
+    ],
+    "picks": [
+     "Outfit",
+     "Jost",
+     "Urbanist"
+    ]
+   },
+   "body": {
+    "classes": [
+     "neo-grotesk"
+    ],
+    "picks": [
+     "Inter",
+     "IBM Plex Sans"
+    ]
+   },
+   "mono": {
+    "picks": [
+     "IBM Plex Mono"
+    ]
+   },
+   "avoid": [
+    "didone",
+    "script",
+    "groovy",
+    "pixel",
+    "blackletter",
+    "woodtype"
+   ],
+   "why": "A geometric display face echoes the circle-and-line grammar at poster scale, and a plain neo-grotesk with tabular figures keeps transcripts, times and settings exact.",
+   "pairings": [
+    [
+     "Outfit",
+     "Inter"
+    ],
+    [
+     "Jost",
+     "Inter"
+    ],
+    [
+     "Urbanist",
+     "IBM Plex Sans"
+    ]
+   ]
+  }
+ },
+ "build": {
+  "cls": "flat",
+  "surface": "Flat canvas with no cards: groups are made by space and by rules (a 2px ink rule under titles and down the sidebar edge, 1px hairlines between rows). Controls are straight-edged with 6px corners and a 2px ink line; the only round shapes are voice: periwinkle discs for audio, clips, speakers and listening.",
+  "press": {
+   "dy": 1,
+   "ms": 80
+  },
+  "motion": {
+   "fast": 120,
+   "base": 180,
+   "slow": 240,
+   "ease": "out"
+  },
+  "pressText": "Pressed controls move 1px down over 80 ms with no colour change; hover fills a secondary control with a faint ink wash in 120 ms; the selected item fills with ink and its text flips to canvas, sliding 180 ms when the selection moves.",
+  "icons": "Text-first: nav and buttons carry no icons; where an icon is needed it is a 1.75px stroke, square caps, drawn on a 20px grid.",
+  "appIcon": "The navy ripple tile: a periwinkle disc with cream arcs on #16214a."
+ },
+ "labels": {
+  "material": "Ink line",
+  "states": [
+   "Rest",
+   "Hover",
+   "Chosen"
+  ],
+  "statesKind": "button"
+ },
+ "copy": {
+  "motto": {
+   "label": "Motto",
+   "text": "Say it. Keep it straight."
+  },
+  "kicker": {
+   "label": "Kicker above the headline",
+   "text": "Hold, talk, let go"
+  },
+  "rule": {
+   "label": "The rule",
+   "text": "Round is voice. Straight is text."
+  }
+ },
+ "layout": {
+  "hero": "split",
+  "palette": "strips",
+  "sections": "asym"
+ },
+ "type": {
+  "ui": "sans",
+  "label": "sans",
+  "display": 1.0
+ },
+ "roles": {
+  "canvas": {
+   "use": "Every surface; the page is one plane, grouped by rules and space",
+   "never": "Text",
+   "coverage": "70-80%"
+  },
+  "ink": {
+   "use": "Text, rules, control lines, the selected item and the main action (solid ink fills)",
+   "never": "Voice marks",
+   "coverage": "15-20%"
+  },
+  "primary": {
+   "use": "Voice only: listening, audio play heads, voice clips, speaker discs, the start dot of each dictation",
+   "never": "Buttons, selection, text, borders, large fills",
+   "coverage": "3-5%"
+  },
+  "secondary": {
+   "use": "The flat area under the Insights line",
+   "never": "Controls, text",
+   "coverage": "under 5%"
+  },
+  "accent": {
+   "use": "One small solid disc per screen marking something Youch! learned",
+   "never": "Behind text, bands, buttons, borders",
+   "coverage": "under 1%"
+  }
+ },
+ "rules": {
+  "do": [
+   "Draw only spoken things round and periwinkle: listening, audio, clips, speakers and each dictation's start dot.",
+   "Fill the selected item and the main action with solid ink; selection reads without colour.",
+   "Group with rules and space: a 2px ink rule under page titles and down the sidebar edge, 1px hairlines between rows.",
+   "Keep corners at 6px on controls and 0 on planes; circles only for voice.",
+   "Set page titles in the geometric display face at 56px or more, flush left and tight; set every number in tabular figures.",
+   "Show what was said beside what was kept, with removals struck through and time codes in a left gutter."
+  ],
+  "dont": [
+   "Put a colour band or highlight behind a title or a word (killed by the owner).",
+   "Use periwinkle on a button, a selected nav item or a segment.",
+   "Box lists or groups in cards; no shadows, gradients, blur or glass.",
+   "Draw a lollipop chart; Insights is a flat area under one ink line.",
+   "Put board art, shapes or stripes on app screens.",
+   "Set nav items, buttons or inline actions in tracked capitals; tracked caps are for section labels only."
+  ]
+ },
+ "highlight": "ink",
+ "slideShape": "geometric",
+ "colour": [
+  {
+   "move": "canvas-ink-pull",
+   "params": {
+    "light": 0,
+    "dark": 0
+   }
+  },
+  {
+   "move": "muted-contrast-floor",
+   "params": {
+    "min": 5.0
+   }
+  },
+  {
+   "move": "state-colour-derivation",
+   "params": {
+    "pressMix": 0.84,
+    "hoverMix": 0.94
+   }
+  },
+  {
+   "move": "mono-plus-accent",
+   "params": {
+    "kitAccent": "ink",
+    "kitSecondary": "secondary",
+    "tintMix": 4,
+    "markWord": false,
+    "sign": "·"
+   }
+  }
+ ],
+ "moves": [
+  {
+   "move": "corner-radius",
+   "params": {
+    "base": 6,
+    "controls": 1,
+    "surfaces": 0,
+    "small": 1,
+    "pill": false,
+    "round": true
+   }
+  },
+  {
+   "move": "hairline-rule",
+   "params": {
+    "width": 1,
+    "colour": "line"
+   }
+  },
+  {
+   "move": "outline-frame",
+   "params": {
+    "hair": 0.5,
+    "hairDark": 0.31,
+    "soft": 0.16,
+    "softDark": 0.16,
+    "columnRule": false
+   },
+   "scope": "kit"
+  },
+  {
+   "move": "interface-sans",
+   "params": {}
+  },
+  {
+   "move": "display-weight",
+   "params": {
+    "headline": 600,
+    "brand": 600,
+    "cardTitle": 600,
+    "wordSpacing": 0
+   }
+  },
+  {
+   "move": "tight-display-tracking",
+   "params": {
+    "tracking": -0.045,
+    "leading": 0.92
+   }
+  },
+  {
+   "move": "label-case",
+   "params": {
+    "labels": "none",
+    "controls": "none",
+    "tracking": 0
+   }
+  },
+  {
+   "move": "tracked-micro-labels",
+   "params": {
+    "tag": 0.08,
+    "kicker": 0.08,
+    "foot": 0.02
+   }
+  },
+  {
+   "move": "highlight-word",
+   "params": {
+    "italic": false,
+    "weight": 600,
+    "colour": "ink",
+    "band": false
+   }
+  },
+  {
+   "move": "focus-ring",
+   "params": {
+    "look": "outline",
+    "reach": "all-controls",
+    "width": 2,
+    "offset": 2,
+    "colour": "ink",
+    "tint": 0,
+    "ring": 0,
+    "recess": false
+   }
+  },
+  {
+   "move": "edge-underline",
+   "params": {
+    "width": 2
+   },
+   "scope": "board"
+  },
+  {
+   "move": "action-glyph",
+   "params": {
+    "glyph": "",
+    "size": 10
+   },
+   "scope": "kit"
+  }
+ ],
+ "kit": {
+  "button-primary": {
+   "material": "flat-fill",
+   "state": [
+    "press-sink"
+   ],
+   "params": {
+    "flat-fill": {
+     "fill": "ink"
+    }
+   }
+  },
+  "button-secondary": {
+   "material": "outlined",
+   "state": [
+    "ink-swap-hover",
+    "press-sink"
+   ],
+   "params": {
+    "outlined": {
+     "width": 2,
+     "colour": "ink",
+     "fill": "transparent"
+    }
+   }
+  },
+  "button-ghost": {
+   "material": "ruled-key",
+   "state": [
+    "press-sink"
+   ],
+   "params": {
+    "ruled-key": {
+     "fill": "none",
+     "colour": "ink",
+     "top": 0,
+     "bottom": 2,
+     "tracking": 0,
+     "weight": 600,
+     "padY": 4,
+     "padX": 0,
+     "kitSize": 14,
+     "kitTracking": 0
+    }
+   }
+  },
+  "button-icon": {
+   "material": "outlined",
+   "state": [
+    "ink-swap-hover",
+    "press-sink"
+   ],
+   "params": {
+    "outlined": {
+     "width": 2,
+     "colour": "ink",
+     "fill": "transparent"
+    }
+   }
+  },
+  "button-danger": {
+   "material": "outlined",
+   "state": [
+    "ink-swap-hover",
+    "press-sink"
+   ],
+   "params": {
+    "outlined": {
+     "width": 2,
+     "colour": "ink",
+     "fill": "transparent"
+    }
+   }
+  },
+  "field": {
+   "material": "hairline-box",
+   "state": [
+    "press-sink",
+    "focus-outline"
+   ],
+   "params": {
+    "hairline-box": {
+     "ring": "hair"
+    }
+   }
+  },
+  "select": {
+   "material": "hairline-box",
+   "state": [
+    "press-sink",
+    "focus-outline"
+   ],
+   "params": {
+    "hairline-box": {
+     "ring": "hair"
+    }
+   }
+  },
+  "switch": {
+   "material": "slug-switch",
+   "state": "ink-fill-selected",
+   "params": {
+    "slug-switch": {
+     "kitOnFill": "ink",
+     "kitW": 40,
+     "kitH": 24,
+     "kitSlug": 16
+    }
+   }
+  },
+  "checkbox": {
+   "material": "outlined",
+   "state": "ink-fill-selected",
+   "params": {
+    "outlined": {
+     "width": 2,
+     "colour": "ink",
+     "fill": "canvas"
+    }
+   }
+  },
+  "radio": {
+   "material": "outlined",
+   "state": "ink-fill-selected",
+   "params": {
+    "outlined": {
+     "width": 2,
+     "colour": "ink",
+     "fill": "canvas"
+    }
+   }
+  },
+  "slider": {
+   "material": "flat-fill",
+   "state": "ink-fill-selected",
+   "params": {
+    "flat-fill": {
+     "fill": "line"
+    }
+   }
+  },
+  "segmented": {
+   "material": "flat-paper",
+   "state": "ink-fill-selected",
+   "params": {
+    "flat-paper": {
+     "fill": "none"
+    }
+   }
+  },
+  "tabs": {
+   "material": "flat-paper",
+   "state": [
+    "ink-fill-selected",
+    "press-sink"
+   ],
+   "params": {
+    "flat-paper": {
+     "fill": "none"
+    }
+   }
+  },
+  "card": {
+   "material": "flat-paper",
+   "params": {
+    "flat-paper": {
+     "fill": "none",
+     "padded": false
+    }
+   }
+  },
+  "panel": {
+   "material": "flat-paper",
+   "params": {
+    "flat-paper": {
+     "fill": "none"
+    }
+   }
+  },
+  "list-row": {
+   "material": "ruled-row",
+   "state": "ink-fill-selected",
+   "params": {
+    "ruled-row": {
+     "rule": "soft",
+     "titles": "keep"
+    }
+   }
+  },
+  "chip": {
+   "material": "outlined",
+   "state": "ink-fill-selected",
+   "params": {
+    "outlined": {
+     "width": 2,
+     "colour": "ink",
+     "fill": "transparent"
+    }
+   }
+  },
+  "badge": {
+   "material": "ink-block"
+  },
+  "progress": {
+   "material": "rule-meter",
+   "params": {
+    "rule-meter": {
+     "kitHeight": 2
+    }
+   }
+  },
+  "avatar": {
+   "material": "flat-fill",
+   "params": {
+    "flat-fill": {
+     "fill": "secondary"
+    }
+   }
+  },
+  "tooltip": {
+   "material": "ink-block"
+  },
+  "modal": {
+   "material": "outlined",
+   "params": {
+    "outlined": {
+     "width": 2,
+     "colour": "ink",
+     "fill": "canvas"
+    }
+   }
+  },
+  "sheet": {
+   "material": "outlined",
+   "params": {
+    "outlined": {
+     "width": 2,
+     "colour": "ink",
+     "fill": "canvas"
+    }
+   }
+  },
+  "toast": {
+   "material": "ink-block"
+  },
+  "callout": {
+   "material": "rule-sidebar",
+   "params": {
+    "rule-sidebar": {
+     "top": 2
+    }
+   },
+   "scope": "kit"
+  },
+  "menu": {
+   "material": "outlined",
+   "params": {
+    "outlined": {
+     "width": 2,
+     "colour": "ink",
+     "fill": "canvas"
+    }
+   }
+  },
+  "navbar": {
+   "material": "flat-paper",
+   "params": {
+    "flat-paper": {
+     "fill": "canvas"
+    }
+   }
+  },
+  "topbar": {
+   "material": "flat-paper",
+   "params": {
+    "flat-paper": {
+     "fill": "canvas"
+    }
+   }
+  },
+  "button-split": {
+   "material": "flat-fill",
+   "state": [
+    "press-sink"
+   ],
+   "params": {
+    "flat-fill": {
+     "fill": "ink"
+    }
+   }
+  },
+  "button-fab": {
+   "material": "flat-fill",
+   "state": [
+    "press-sink"
+   ],
+   "params": {
+    "flat-fill": {
+     "fill": "ink"
+    }
+   }
+  },
+  "button-back-top": {
+   "material": "outlined",
+   "state": [
+    "ink-swap-hover",
+    "press-sink"
+   ],
+   "params": {
+    "outlined": {
+     "width": 2,
+     "colour": "ink",
+     "fill": "transparent"
+    }
+   }
+  },
+  "link": {
+   "material": "flat-paper",
+   "params": {
+    "flat-paper": {
+     "fill": "none"
+    }
+   }
+  },
+  "stepper": {
+   "material": "outlined",
+   "state": [
+    "press-sink"
+   ],
+   "params": {
+    "outlined": {
+     "width": 2,
+     "colour": "ink",
+     "fill": "transparent"
+    }
+   }
+  },
+  "knob": {
+   "material": "flat-fill",
+   "params": {
+    "flat-fill": {
+     "fill": "ink"
+    }
+   }
+  },
+  "date-field": {
+   "material": "hairline-box",
+   "state": [
+    "press-sink",
+    "focus-outline"
+   ],
+   "params": {
+    "hairline-box": {
+     "ring": "hair"
+    }
+   }
+  },
+  "combo": {
+   "material": "hairline-box",
+   "state": [
+    "press-sink",
+    "focus-outline"
+   ],
+   "params": {
+    "hairline-box": {
+     "ring": "hair"
+    }
+   }
+  },
+  "listbox": {
+   "material": "outlined",
+   "state": [
+    "press-sink"
+   ],
+   "params": {
+    "outlined": {
+     "width": 2,
+     "colour": "ink",
+     "fill": "canvas"
+    }
+   }
+  },
+  "calendar": {
+   "material": "flat-paper",
+   "params": {
+    "flat-paper": {
+     "fill": "none"
+    }
+   }
+  },
+  "calendar-day": {
+   "material": "flat-paper",
+   "state": "ink-fill-selected",
+   "params": {
+    "flat-paper": {
+     "fill": "none"
+    }
+   }
+  },
+  "wheel": {
+   "material": "flat-paper",
+   "params": {
+    "flat-paper": {
+     "fill": "none"
+    }
+   }
+  },
+  "accordion": {
+   "material": "ruled-row",
+   "params": {
+    "ruled-row": {
+     "rule": "soft"
+    }
+   }
+  },
+  "carousel-card": {
+   "material": "flat-paper",
+   "params": {
+    "flat-paper": {
+     "fill": "none"
+    }
+   }
+  },
+  "matrix-tile": {
+   "material": "flat-paper",
+   "params": {
+    "flat-paper": {
+     "fill": "none"
+    }
+   }
+  },
+  "divider": {
+   "material": "flat-fill",
+   "params": {
+    "flat-fill": {
+     "fill": "line"
+    }
+   }
+  },
+  "section-label": {
+   "material": "quiet-text",
+   "params": {
+    "quiet-text": {
+     "size": 11,
+     "tracking": 0.08
+    }
+   }
+  },
+  "empty-state": {
+   "material": "flat-paper",
+   "params": {
+    "flat-paper": {
+     "fill": "none"
+    }
+   }
+  },
+  "overlay-scrim": {
+   "material": "flat-fill",
+   "params": {
+    "flat-fill": {
+     "fill": "ink"
+    }
+   }
+  },
+  "side-sheet": {
+   "material": "flat-paper",
+   "params": {
+    "flat-paper": {
+     "fill": "none"
+    }
+   }
+  },
+  "drawer": {
+   "material": "outlined",
+   "params": {
+    "outlined": {
+     "width": 2,
+     "colour": "ink",
+     "fill": "canvas"
+    }
+   }
+  },
+  "popover": {
+   "material": "outlined",
+   "params": {
+    "outlined": {
+     "width": 2,
+     "colour": "ink",
+     "fill": "canvas"
+    }
+   }
+  },
+  "popup-tip": {
+   "material": "outlined",
+   "params": {
+    "outlined": {
+     "width": 2,
+     "colour": "ink",
+     "fill": "canvas"
+    }
+   }
+  },
+  "lightbox": {
+   "material": "flat-fill",
+   "params": {
+    "flat-fill": {
+     "fill": "ink"
+    }
+   }
+  },
+  "lightbox-control": {
+   "material": "outlined",
+   "state": [
+    "ink-swap-hover",
+    "press-sink"
+   ],
+   "params": {
+    "outlined": {
+     "width": 2,
+     "colour": "canvas",
+     "fill": "transparent"
+    }
+   }
+  },
+  "topbar-title": {
+   "material": "quiet-text",
+   "params": {
+    "quiet-text": {
+     "size": 15,
+     "tracking": 0
+    }
+   }
+  },
+  "tabbar": {
+   "material": "flat-paper",
+   "state": "ink-fill-selected",
+   "params": {
+    "flat-paper": {
+     "fill": "canvas"
+    }
+   }
+  },
+  "nav-menu": {
+   "material": "flat-paper",
+   "params": {
+    "flat-paper": {
+     "fill": "none"
+    }
+   }
+  },
+  "nav-item": {
+   "material": "flat-paper",
+   "state": "ink-fill-selected",
+   "params": {
+    "flat-paper": {
+     "fill": "none"
+    }
+   }
+  },
+  "breadcrumbs": {
+   "material": "quiet-text",
+   "params": {
+    "quiet-text": {
+     "size": 13,
+     "tracking": 0
+    }
+   }
+  },
+  "anchor-nav": {
+   "material": "quiet-text",
+   "state": "ink-fill-selected",
+   "params": {
+    "quiet-text": {
+     "size": 13,
+     "tracking": 0
+    }
+   }
+  },
+  "scrollbar": {
+   "material": "flat-fill",
+   "params": {
+    "flat-fill": {
+     "fill": "line"
+    }
+   }
+  },
+  "dropdown-trigger": {
+   "material": "outlined",
+   "state": [
+    "ink-swap-hover",
+    "press-sink"
+   ],
+   "params": {
+    "outlined": {
+     "width": 2,
+     "colour": "ink",
+     "fill": "transparent"
+    }
+   }
+  },
+  "menu-item": {
+   "material": "ruled-row",
+   "state": "rule-selected",
+   "params": {
+    "ruled-row": {
+     "rule": "soft"
+    },
+    "rule-selected": {
+     "colour": "ink",
+     "kitColour": "ink",
+     "weight": 600
+    }
+   }
+  },
+  "mega-menu": {
+   "material": "outlined",
+   "params": {
+    "outlined": {
+     "width": 2,
+     "colour": "ink",
+     "fill": "canvas"
+    }
+   }
+  },
+  "menubar": {
+   "material": "flat-paper",
+   "params": {
+    "flat-paper": {
+     "fill": "canvas"
+    }
+   }
+  },
+  "ribbon": {
+   "material": "flat-paper",
+   "state": "ink-fill-selected",
+   "params": {
+    "flat-paper": {
+     "fill": "none"
+    }
+   }
+  },
+  "pie-menu": {
+   "material": "outlined",
+   "params": {
+    "outlined": {
+     "width": 2,
+     "colour": "ink",
+     "fill": "canvas"
+    }
+   }
+  },
+  "spinner": {
+   "material": "flat-fill",
+   "params": {
+    "flat-fill": {
+     "fill": "ink"
+    }
+   }
+  },
+  "skeleton": {
+   "material": "flat-fill",
+   "params": {
+    "flat-fill": {
+     "fill": "line"
+    }
+   }
+  },
+  "notification-dot": {
+   "material": "flat-fill",
+   "params": {
+    "flat-fill": {
+     "fill": "ink"
+    }
+   }
+  },
+  "kbd": {
+   "material": "outlined",
+   "params": {
+    "outlined": {
+     "width": 2,
+     "colour": "ink",
+     "fill": "canvas"
+    }
+   }
+  }
+ },
+ "art": {
+  "hero": {
+   "kind": "svg",
+   "src": "art/hero.svg",
+   "fit": "cover",
+   "alt": "A row of periwinkle discs, each trailing a straight ink line of a different length, over two hairline rules"
+  }
+ }
+}

@@ -1,0 +1,31 @@
+:root {
+  color-scheme: light;
+  --canvas: #fafaf7; --ink: #101116; --muted: #6e6e70;
+  --line: #d7d7d5; --primary: #101116; --on-primary: #ffffff;
+  --secondary: #8290c7; --on-secondary: #141414; --error: #101116;
+  --on-error: #fafaf7; --kit-primary: #46464a; --kit-secondary: #46464a;
+  --ab-muted: #5b5b5e; --kit-field: #c62f2f; --white: #ffffff;
+  --success-icon: #717dac; --primary-text: #101116; --black: #000000;
+  --kit-stepper-text: #3b3a38; --kit-spinner-text: #7e7e80; --accent: #f6cf6b;
+  --on-accent: #141414; --accent-ink: #101116; --pri-tint: #dededc;
+  --sec-tint: #e7e9ef; --kit-stepper: #3b3a38;
+  --font-heading: "Outfit", -apple-system, sans-serif; --font-body: "Inter", -apple-system, sans-serif;
+  --font-geist-mono: "Geist Mono", ui-monospace, monospace;
+  --text-display: 34px; --text-eyebrow: 13px; --text-label: 13px; --text-large-title: 34px; --text-title: 28px; --text-title-2: 22px; --text-headline: 17px; --text-body: 17px; --text-callout: 16px; --text-subhead: 15px; --text-footnote: 13px; --text-caption: 12px; --text-tab-label: 10px;
+  --space-4: 4px; --space-8: 8px; --space-12: 12px; --space-16: 16px; --space-20: 20px; --space-24: 24px; --space-28: 28px; --space-32: 32px; --space-40: 40px; --space-48: 48px;
+  --status-bar: 54px; --home-indicator: 34px; --top-bar: 44px; --tab-bar: 83px; --margin: 20px;
+  --row: 52px; --row-detail: 60px;
+  --radius-control: 6px; --radius-field: 6px; --radius-card: 0px; --hit: 44px;
+  --shadow-toggle: var(--ink) 0 0 0 1px inset; --shadow-side-sheet: color-mix(in srgb, var(--black) 14%, transparent) -8px 0 24px -8px;
+  --dur-fast: 120ms; --dur-base: 180ms; --dur-slow: 240ms; --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --canvas: #101116; --ink: #fafaf7; --muted: #9c9d9d;
+  --line: #333438; --error: #fafaf7; --on-error: #101116;
+  --kit-primary: #fafaf7; --kit-secondary: #b6b7b6; --ab-muted: #9c9d9d;
+  --kit-field: #ff7b72; --success-icon: #8290c7; --primary-text: #858687;
+  --kit-stepper-text: #807f7e; --kit-spinner-text: #6d6e6d; --accent-ink: #f6cf6b;
+  --pri-tint: #101116; --sec-tint: #222532;
+}
+@media (prefers-reduced-motion: reduce) { :root { --dur-fast: 0ms; --dur-base: 0ms; --dur-slow: 0ms; } }

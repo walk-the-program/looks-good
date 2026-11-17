@@ -1,0 +1,106 @@
+{
+  "round": 7,
+  "reviewer": "critic",
+  "date": "2026-11-16",
+  "renders": "app/renders/r7/",
+  "scores": {
+    "thesis": {
+      "score": 4,
+      "evidence": "mock-history-light.png argues it in one look: each dictation a periwinkle start dot and an ink talk line, on the day score and under every row, with the kept text set over the struck said text. mock-dictionary-light.png (clip discs), mock-recordings-light.png (speaker discs on a time gutter, one lane per speaker), mock-settings-light.png (the hold key filled ink with a voice dot) and mock-welcome-light.png carry it on. Short of a 5: mock-insights-light.png has no voice in it, and the renderer screens (history-light.png, insights-light.png) carry none of it, a listed limit."
+    },
+    "signature": {
+      "score": 4,
+      "evidence": "mock-history-light.png: the day score and the talk line in every row come from hold, talk, let go, on one scale (Mail's 0:31 is the longest line in both the score and the list); mock-try-it-light.png lands the first dictation as the same dot and line, and mock-overlay-ring-light.png closes it into the ring. Short of a 5: the lines are still the thinnest marks in each row, and on the day score they lie along the 8 AM to 2 PM axis, so Mail's 0:31 line spans what reads as 50 minutes."
+    },
+    "content": {
+      "score": 4,
+      "evidence": "mock-history-light.png draws the promise: kept text at reading size on a time gutter, the said text beneath with 'um so', 'like' and 'eight weeks oh actually' struck, and one butter learned line. mock-dictionary-light.png counts clips as five discs beside struck mishearings; mock-recordings-light.png now gives each speaker a lane on one time axis, so who held the floor reads by position; mock-settings-light.png draws keycaps and stop tracks. Weak spot: the corrected words 'Pramand' and 'six weeks' carry the same 2px ink underline as the 'Undo' link below them, so the proof's edit mark reads as a link."
+    },
+    "hierarchy": {
+      "score": 4,
+      "evidence": "mock-history-light.png reads title, day score, the ink selected row, then the kept text, with Copy ⌘C at the trailing edge of the reader header; mock-insights-light.png reads 7,719, then the area, then one tabular line; mock-settings-light.png leads with the filled keycap. Weak spots unchanged from r6: the cream selected row in mock-history-dark.png is the brightest block on the screen, and mock-try-it-light.png leaves about 40% of the window empty under 'Waiting for your voice.'"
+    },
+    "type": {
+      "score": 4,
+      "evidence": "Outfit 600 titles at about 56px with tight tracking and the 132px numeral (mock-insights-light.png) against Inter 21px kept text, smaller said text and tabular time codes (mock-history-light.png); tracked caps only on section labels (KEPT, WHAT YOU SAID, WHO SPOKE, TERMS). r6's welcome scale is fixed: welcome-light.png now sets 'Youch!' about twice its tagline. Still short of a 5: mock-dictionary-light.png sets the term names (Pramand, Zelcor) at about 18px, barely above their meta line, not as the display word section 2 promises."
+    },
+    "colour": {
+      "score": 4,
+      "evidence": "The budget holds: periwinkle only on dots, discs, clips, speaker lanes, the play button and the keycap's voice dot; ink (cream in dark) for selection and actions; butter once per screen (mock-history-light.png, mock-dictionary-dark.png). Dark keeps periwinkle and gets its own area mix (mock-insights-dark.png), but otherwise swaps ink and cream one for one, and the darkest speaker step stays dim on the dark canvas (Speaker 4's disc and lane in mock-recordings-dark.png)."
+    },
+    "restraint": {
+      "score": 4,
+      "evidence": "One language across the mocks: 6px controls, square planes, round only for voice, groups made by 2px ink rules and hairlines, no cards (mock-history-light.png, mock-settings-light.png, mock-recordings-light.png). r6's stray shadow is gone: the side sheet in history-light.png is flat with no edge shadow and no ink top rule. The outlier left is one mark doing two jobs: in mock-history-light.png the 2px ink underline means both 'a link' (Undo) and 'a corrected word' (Pramand, six weeks)."
+    },
+    "craft": {
+      "score": 3,
+      "evidence": "The mocks are clean: one strong edge 30px inside the rule on every pane, tabular gutters, consistent radii (mock-history-light.png, mock-settings-light.png), and r6's sheet shadow and footer overrun are fixed (history-light.png, mock-try-it-light.png). But the states this review keeps flagging are still open: the dark rest field line measures #333438, about 1.5:1, in kit-dark.png, dictionary-dark.png and mock-dictionary-dark.png; the check and pencil on selected rows vanish ink on ink in kit-light.png; error and focus share one grey halo and the disabled secondary keeps its full frame (kit-light.png); the hairline beside 'Dark' remains (mock-settings-dark.png); and every renderer section header sits on two parallel rules about 9px apart (history-light.png 'This dictation', dictionary-light.png 'Terms', recordings-light.png 'Transcript', settings-light.png 'Models, on this Mac')."
+    },
+    "distinct": {
+      "score": 4,
+      "evidence": "With the name hidden, mock-history-light.png (day score and talk lines), mock-settings-light.png (keycaps, stop tracks, square-slug switches) and mock-welcome-light.png (poster wordmark over a keyboard row with the hold key inked) could only be Youch!. Defaults remain on mock-insights-light.png (a big number over an area with a label-value line beneath) and in the renderer's full-width slabs and chevron rows (history-light.png, settings-light.png), a listed limit."
+    },
+    "owner-fit": {
+      "score": 4,
+      "evidence": "It answers 'kind of Bauhaus ... a little neo-brutal pop' with poster titles, 2px ink rules and ink fills (mock-welcome-light.png, mock-history-light.png), keeps the Mail-style two-pane History and the area graph (mock-insights-light.png), uses butter as one small disc with no highlight band, and shows the static only while capturing (mock-overlay-pill-light.png, mock-overlay-ring-light.png). Short of a 5: the owner's latest lesson is the product's own data drawn big and structural, and the talk lines remain the smallest marks on mock-history-light.png."
+    }
+  },
+  "generic": [
+    "mock-insights-light.png: a huge number over an area chart with a label-value stat line beneath is still the stock analytics hero, even with the line now straight between the seven days.",
+    "The renderer's main actions are full-width ink slabs with left-set labels: Copy over a centred ⌘C in history-light.png, Add in dictionary-light.png, Export in recordings-light.png, Finish in try-it-light.png (a listed limit, and still the most generic thing on those screens).",
+    "Plain name, meta and trailing-action rows any app could have: the Models list in mock-settings-light.png, the Snippets column in mock-dictionary-light.png and the chevron inspector in history-light.png."
+  ],
+  "fixes": [
+    {
+      "id": "f1",
+      "priority": "P1",
+      "target": "dark rest field line (kit-dark.png, dictionary-dark.png, mock-dictionary-dark.png)",
+      "text": "r6 f3 (P2) did not land, so it returns as P1. Note n32 says the mocks draw the intended ~3:1 rest line, but the Add field frame in mock-dictionary-dark.png measures #333438, the same 1.5:1 as dictionary-dark.png and kit-dark.png, so the Add field still nearly vanishes in dark. Raise the dark rest line to about 3:1 (near #5A5B60): in the mock through its CSS, and in the kit with a kit-only field material whose rest line takes a {light,dark} param (AUTHORING.md section 8), since no catalog move reaches --ab-line in dark alone. Focus (#858687) stays above it, so r4 f1's intent holds."
+    },
+    {
+      "id": "f2",
+      "priority": "P2",
+      "target": "kit: selected select, listbox and menu rows in light (kit-light.png)",
+      "text": "Open since r4 f4 and left as a base-kit rule in n33; raised from P3 because craft is at 3 and this is a state invisible in one mode: the check on 'Today' and 'Mobility basics' and the pencil on 'Save as draft' are ink on the ink fill and vanish in light, while kit-dark.png shows them. Draw the glyph on a selected row in the row's text colour (canvas in light)."
+    },
+    {
+      "id": "f3",
+      "priority": "P3",
+      "target": "kit: text field error halo in light (kit-light.png)",
+      "text": "r6 f5 is still open: error and focus carry the same grey halo, so they differ only by a slightly heavier frame. Drop the halo from the error state so the halo means focus and the heavy frame means error."
+    },
+    {
+      "id": "f4",
+      "priority": "P3",
+      "target": "kit: disabled secondary button (kit-light.png, kit-dark.png)",
+      "text": "r6 f6 is still open: disabled 'Not now' keeps the full 2px ink frame and reads as rest. Draw the disabled frame in the 1px muted line the rest field uses."
+    },
+    {
+      "id": "f5",
+      "priority": "P3",
+      "target": "mock-settings-dark.png: Appearance options",
+      "text": "r6 f8 is still open: n33 changed which option is chosen, but the 1px grey hairline standing at the left edge of the chosen 'Dark' fill, which no other option has, is still there. Remove it."
+    },
+    {
+      "id": "f6",
+      "priority": "P3",
+      "target": "kit: section header over a list (history-light.png, dictionary-light.png, recordings-light.png, settings-light.png)",
+      "text": "Each header ('This dictation', 'Terms', 'Learned from your fixes', 'Snippets', 'Transcript', 'Models, on this Mac') sits on a #B3B4B3 rule with the list's own #D4D5D3 top hairline about 9px below it, two parallel rules where the mocks draw one. Drop the list group's top hairline so the header rule alone opens each list."
+    },
+    {
+      "id": "f7",
+      "priority": "P3",
+      "target": "mock-history-light.png and mock-history-dark.png: corrections in What you said",
+      "text": "'Pramand' and 'six weeks' carry the same 2px ink underline as the 'Undo' link beside them (and Record and Edit in mock-dictionary-light.png), so the proof's correction mark reads as a link. Keep the underline for actions, as r6 f2 asked, and mark each corrected word with the small periwinkle caret that section 2 promises instead of an underline."
+    }
+  ],
+  "landed": [
+    "f1",
+    "f2",
+    "f7",
+    "f9",
+    "f10",
+    "f11"
+  ],
+  "verdict": "refine"
+}

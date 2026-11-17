@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Voice Line · Dictionary</title>
+<link rel="stylesheet" href="voice-line.css">
+<style>
+
+.cols{display:grid;grid-template-columns:600px 1fr;min-height:0}
+.l{padding:24px 30px 0;border-right:var(--hair)}
+.r{padding:24px 30px 0}
+.add{display:flex;gap:10px}.add .field{flex:1}.add .btn{height:38px}
+.hd{display:flex;align-items:baseline;gap:8px;margin:22px 0 4px}
+.hd .label span{font-weight:600}
+.term{height:84px;display:flex;align-items:center;justify-content:space-between;gap:16px;border-bottom:var(--hair)}
+.term:first-of-type{border-top:var(--hair)}
+.term b{display:block;font:600 20px/1.15 var(--fh);letter-spacing:-.015em}
+.term p{font-size:13px;color:var(--muted);margin-top:3px}
+.clip{display:flex;align-items:center;gap:6px;flex:none}
+.clip i{width:14px;height:14px;border-radius:50%;border:1.5px solid var(--line);display:block}
+.clip i.f{background:var(--voice);border-color:var(--voice)}
+.clip .n{margin:0 6px 0 8px;font-size:13px;color:var(--muted)}
+.note{margin-top:20px;border-left:var(--rule);padding-left:14px;font-size:13px;color:var(--muted);line-height:1.5}
+.sec{display:flex;align-items:baseline;justify-content:space-between}
+.sec h3{font:600 17px/1.2 var(--fh)}
+.sec .btn{height:30px;font-size:13px;padding:0 11px}
+.hint{font-size:13px;color:var(--muted);margin:3px 0 0}
+.lrn{display:flex;align-items:center;gap:10px;padding:14px 0;border-top:var(--hair);border-bottom:var(--hair);margin-top:12px;font-size:15px}
+.lrn .d{margin-left:auto;display:flex;gap:14px;align-items:baseline}
+.lrn .d span{font-size:13px;color:var(--muted)}
+.snip{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:var(--hair)}
+.snip div{flex:1}.snip b{display:block;font:600 16px/1.2 var(--fh)}.snip p{font-size:13px;color:var(--muted);margin-top:2px}
+
+</style></head><body>
+<div class="win"><aside class="side"><div class="brand"><svg class="mark" viewBox="0 0 26 26" fill="none"><circle cx="7" cy="13" r="6" fill="var(--voice)"/><path d="M15 6.5a9 9 0 0 1 0 13M19.5 3a13.5 13.5 0 0 1 0 20" stroke="var(--ink)" stroke-width="2.4" stroke-linecap="round"/></svg> Youch!</div><div class="nav">History</div><div class="nav on">Dictionary</div><div class="nav">Insights</div><div class="nav">Recordings</div><div class="nav">Settings</div><div class="hold">Hold <kbd>⌘</kbd> to talk<small>Right Command. Let go and it pastes where you're typing.</small></div></aside><div class="page" style="grid-template-rows:auto 1fr"><div class="top"><h1>Dictionary</h1><span class="sub">The words, shortcuts and fixes Youch! keeps for you</span></div><div class="cols"><section class="l">
+<div class="add"><div class="field">Add a name or term</div><span class="btn main">Add</span></div>
+<div class="hd"><span class="label">Terms</span><span class="label"><span>3</span></span></div>
+<div class="term"><div><b>Pramand</b><p>Sounds like <s>prominent</s> <s>pro mand</s> · heard as promand</p></div><div class="clip"><i class="f"></i><i class="f"></i><i class="f"></i><i></i><i></i><span class="btn text">Record</span></div></div>
+<div class="term"><div><b>Zelcor</b><p>Sounds like <s>sell core</s> · heard as zelkor</p></div><div class="clip"><i class="f"></i><i></i><i></i><i></i><i></i><span class="btn text">Record</span></div></div>
+<div class="term"><div><b>Priya Raman</b><p>No clips yet</p></div><div class="clip"><i></i><i></i><i></i><i></i><i></i><span class="btn text">Record</span></div></div>
+<p class="note">Record yourself saying a term 3 to 5 times, 4 seconds at most each. What Youch! hears becomes a sound-alike it fixes. Everyday words like “prominent” are never swapped on their own.</p>
+</section><section class="r">
+<div class="sec"><h3>Learned from your fixes</h3></div><p class="hint">Fixed in History. Remove one and it stops applying.</p>
+<div class="lrn"><i class="learn"></i><span><s>Zelcore</s> → Zelcor</span><div class="d"><span>Nov 15</span><span class="btn text">Remove</span></div></div>
+<div class="sec" style="margin-top:34px"><h3>Snippets</h3><span class="btn line">Add a snippet</span></div><p class="hint" style="margin-bottom:12px">Say the trigger on its own and Youch! pastes the saved text exactly.</p>
+<div class="snip" style="border-top:var(--hair)"><div><b>“my address”</b><p>123 Main St · 1 more line</p></div><span class="btn text">Edit</span></div>
+<div class="snip"><div><b>“my signature”</b><p>Best, · 2 more lines</p></div><span class="btn text">Edit</span></div>
+<div class="snip"><div><b>“thumbs up”</b><p>Sounds good, thanks!</p></div><span class="btn text">Edit</span></div>
+</section></div></div></div>
+</body></html>

@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Voice Line · History</title>
+<link rel="stylesheet" href="voice-line.css">
+<style>
+/* History: the day score (an 8 AM to 2:30 PM axis, 2.128px a minute; each line 3px a second of talk),
+   talk lines in every row, ink selection, the reader's Copy in its header and B's time-code gutter. */
+.score { position: relative; height: 86px; margin: 0 30px; border-bottom: var(--hair); }
+.score .lab { position: absolute; left: 0; top: 12px; font: 600 14px/1.1 var(--fh); display: flex; align-items: baseline; gap: 12px; }
+.score .lab .key { display: inline-flex; align-items: center; gap: 0; margin-top: 0; font-size: 12px; white-space: nowrap; } .score .lab .key .dot { width: 6px; height: 6px; } .score .lab .key u { display: block; width: 14px; height: 2px; background: var(--ink); margin-right: 5px; }
+.score .lab small { display: inline-flex; font: 400 12px var(--fb); color: var(--muted); margin-top: 2px; }
+.axis { position: absolute; left: 0; top: 10px; width: 830px; height: 86px; }
+.axis .base { position: absolute; left: 0; right: 0; top: 43px; height: 1px; background: var(--line); }
+.axis .t { position: absolute; top: 43px; width: 1px; height: 6px; background: var(--muted); }
+.axis .t span { font-weight: 400; position: absolute; top: 9px; left: 0; transform: translateX(-50%); font-size: 11px; color: var(--muted); white-space: nowrap; }
+.n { position: absolute; top: 43px; display: flex; align-items: center; transform: translateY(-50%); }
+.n .dot { width: 11px; height: 11px; }
+.n u { display: block; height: 2px; background: var(--ink); }
+.n.on .dot { width: 15px; height: 15px; box-shadow: 0 0 0 2px var(--canvas), 0 0 0 4px var(--ink); }
+.n.on b { position: absolute; left: -6px; bottom: 22px; font: 600 12px/1 var(--fh); white-space: nowrap; }
+.kept { font: 400 21px/1.48 var(--fb); letter-spacing: -.012em; }
+.said { font-size: 15px; line-height: 1.7; }
+.learned { display: flex; align-items: center; gap: 9px; margin: 14px 0 0 calc(var(--gut) + 16px); font-size: 13.5px; }
+.learned .btn.text { font-size: 13.5px; }
+.foot { margin-top: auto; display: flex; align-items: center; gap: 14px; padding: 14px 0 20px; border-top: var(--hair); }
+.track { flex: 1; height: 2px; background: var(--line); position: relative; }
+.track::before { content: ""; position: absolute; left: 0; top: -5px; width: 2px; height: 12px; background: var(--ink); }
+.foot time { font-size: 12.5px; color: var(--muted); }
+</style></head><body>
+<div class="win">
+  <aside class="side">
+    <div class="brand"><svg class="mark" viewBox="0 0 26 26" fill="none"><circle cx="7" cy="13" r="6" fill="var(--voice)"/><path d="M15 6.5a9 9 0 0 1 0 13M19.5 3a13.5 13.5 0 0 1 0 20" stroke="var(--ink)" stroke-width="2.4" stroke-linecap="round"/></svg>Youch!</div>
+    <div class="nav on">History<em>40</em></div><div class="nav">Dictionary</div><div class="nav">Insights</div><div class="nav">Recordings</div><div class="nav">Settings</div>
+    <div class="hold">Hold <kbd>⌘</kbd> to talk<small>Right Command. Let go and it pastes where you're typing.</small></div>
+  </aside>
+  <div class="page" style="grid-template-rows:auto auto 1fr">
+    <div class="top"><h1>History</h1><span class="sub">40 in the last 7 days</span>
+      <div class="end"><div class="seg"><span class="on">All</span><span>Claude</span><span>Notes</span><span>Mail</span><span>Slack</span></div></div></div>
+    <div class="score"><div class="lab">Today<small>6 dictations</small><small class="key"><i class="dot"></i><u></u> time talking</small></div>
+      <div class="axis"><div class="base"></div>
+        <b class="t" style="left:0"><span style="transform:none">8 AM</span></b><b class="t" style="left:127.7px"><span>9</span></b><b class="t" style="left:255.4px"><span>10</span></b><b class="t" style="left:383px"><span>11</span></b><b class="t" style="left:510.8px"><span>12 PM</span></b><b class="t" style="left:638.5px"><span>1</span></b><b class="t" style="left:766.2px"><span>2</span></b>
+        <span class="n" style="left:21.3px"><i class="dot"></i><u style="width:27px"></u></span>
+        <span class="n" style="left:117px"><i class="dot"></i><u style="width:21px"></u></span>
+        <span class="n" style="left:215px"><i class="dot"></i><u style="width:42px"></u></span>
+        <span class="n" style="left:319px"><i class="dot"></i><u style="width:15px"></u></span>
+        <span class="n" style="left:393.7px"><i class="dot"></i><u style="width:93px"></u></span>
+        <span class="n on" style="left:747px"><i class="dot"></i><u style="width:72px"></u><b>1:52 PM · 0:24</b></span>
+      </div></div>
+    <div class="panes">
+      <section class="list">
+        <div class="label day">Today</div>
+        <div class="row on"><b>Claude</b><time>1:52 PM</time><p>Can you look at the Pramand proposal and tighten the second section?</p><span class="tl"><i class="dot"></i><u style="width:72px"></u><em>0:24</em></span></div>
+        <div class="row"><b>Mail</b><time>11:05 AM</time><p>Hi Sarah, thanks for sending the Pramand brief over.</p><span class="tl"><i class="dot"></i><u style="width:93px"></u><em>0:31</em></span></div>
+        <div class="row"><b>Slack</b><time>10:30 AM</time><p>Running about ten minutes late, grab a table without me.</p><span class="tl"><i class="dot"></i><u style="width:15px"></u><em>0:05</em></span></div>
+        <div class="row"><b>Claude</b><time>9:41 AM</time><p>There are three things I need for the landing page.</p><span class="tl"><i class="dot"></i><u style="width:42px"></u><em>0:14</em></span></div>
+        <div class="row"><b>Terminal</b><time>8:55 AM</time><p>Show me the last 20 commits that touched the audio folder.</p><span class="tl"><i class="dot"></i><u style="width:21px"></u><em>0:07</em></span></div>
+        <div class="row"><b>Notes</b><time>8:10 AM</time><p>Send the Preman proposal to Dana by Friday.</p><span class="tl"><i class="dot"></i><u style="width:27px"></u><em>0:09</em></span></div>
+      </section>
+      <main class="reader">
+        <div class="rh"><h2>Claude</h2><span class="m">Today, 1:52 PM · 25 words</span><div class="acts"><span class="btn line">Fix a word</span><span class="btn main">Copy <kbd>⌘C</kbd></span></div></div>
+        <div class="gut">
+          <div class="lab"><span class="label">Kept</span><span class="muted" style="font-size:12.5px">Pasted into Claude · Cleanup Light</span></div>
+          <span class="tc">0:00</span><p class="kept">Can you look at the Pramand proposal and tighten the second section?</p>
+          <span class="tc">0:09</span><p class="kept">Keep the pricing table as is, but the timeline should be six weeks.</p>
+          <div class="lab"><span class="label">What you said</span><span class="muted" style="font-size:12.5px">3 fillers removed · 1 spoken correction</span></div>
+          <span class="tc">0:00</span><p class="said"><s>um so</s> can you look at the <s>prominent</s> <span class="fix">Pramand</span> proposal and <s>like</s> tighten the second section</p>
+          <span class="tc">0:09</span><p class="said">keep the pricing table as is but the timeline should be <s>eight weeks oh actually</s> <span class="fix">six weeks</span></p>
+        </div>
+        <div class="learned"><i class="learn"></i>Learned: Preman → Pramand. Spelled that way from now on. <span class="btn text">Undo</span></div>
+        <div class="foot"><span class="play"></span><span class="track"></span><time>0:00 / 0:24</time><span class="btn line">Copy what you said</span></div>
+      </main>
+    </div>
+  </div>
+</div>
+</body></html>

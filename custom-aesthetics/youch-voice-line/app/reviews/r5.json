@@ -1,0 +1,122 @@
+{
+  "round": 5,
+  "reviewer": "critic",
+  "date": "2026-11-16",
+  "renders": "app/renders/r5/",
+  "scores": {
+    "thesis": {
+      "score": 4,
+      "evidence": "mock-history-light.png states it in one look: a periwinkle start dot and an ink talk line on the day score and under every row, kept text set over the said text with its fillers struck. mock-dictionary-light.png (clip discs), mock-recordings-light.png (speaker discs on a time gutter), mock-settings-light.png (the hold key filled with a voice dot) and mock-try-it-light.png (a dot waiting on an empty line) carry it on. It thins on mock-insights-light.png, where nothing is round, and the renderer screens (history-light.png, recordings-light.png) carry none of it, a listed limit."
+    },
+    "signature": {
+      "score": 4,
+      "evidence": "mock-history-light.png: the day score and the matching talk line in every row come straight from hold, talk, let go, and the 'time talking' key keeps the line from reading as a span of the hour axis. mock-try-it-light.png lands the first dictation as the same dot and line and mock-overlay-ring-light.png closes it into the ring. It stops short of mock-recordings-light.png, whose who-spoke strip is plain blocks, and the renderer's history-light.png cannot draw it (section 8)."
+    },
+    "content": {
+      "score": 4,
+      "evidence": "mock-history-light.png draws the product promise: kept text at reading size, said text beneath with 'um so', 'like' and 'eight weeks oh actually' struck, corrections underlined, a time gutter and one butter learned line. mock-dictionary-light.png counts clips as five discs, mock-recordings-light.png hangs turns on speaker discs and time codes, mock-settings-light.png draws the key as keycaps and the dials as stop tracks. Weak spots: the stat line in mock-insights-light.png is still label-value pairs, and the rendered sheets stay chevron rows (history-light.png inspector), a listed limit."
+    },
+    "hierarchy": {
+      "score": 4,
+      "evidence": "mock-history-light.png reads title, day score, the ink selected row, then the kept text, with Copy ⌘C at the trailing edge of the reader header; mock-insights-light.png reads 7,719, then the area, then one small line; mock-settings-light.png leads with the filled keycap. Weak spots unchanged from round 4: the cream selected row in mock-history-dark.png is the brightest block and pulls the eye off the reader, and mock-try-it-light.png leaves its lower half empty above a footer that stacks two progress lines."
+    },
+    "type": {
+      "score": 4,
+      "evidence": "Outfit 600 titles at about 56px with tight tracking and the 132px numeral (mock-insights-light.png) against Inter 21px kept text, 15px said text and small tabular time codes (mock-history-light.png): real contrast, one job per style. Tracked caps stay on section labels (KEPT, WHAT YOU SAID, WHO SPOKE), though 'WORDS, LAST 7 DAYS' in mock-insights-light.png is a caps label sitting on a value, and welcome-light.png still sets 'Youch!' barely larger than its tagline."
+    },
+    "colour": {
+      "score": 4,
+      "evidence": "The round 4 leaks are gone: the learned note is ink in history-light.png and cream in history-dark.png, and insights-light.png no longer paints a grey area. The mocks keep the budget in both modes: periwinkle only on dots, discs and the play head, ink (cream in dark) for selection and Copy, butter once (mock-history-light.png, mock-history-dark.png, mock-dictionary-dark.png). Left: recordings-dark.png draws the who-spoke chord in the light tints, so Speaker 4 is #E4E6EF on the dark canvas and reads as the cream selection colour, against the darker steps in mock-recordings-dark.png."
+    },
+    "restraint": {
+      "score": 4,
+      "evidence": "One language across the mocks: 6px controls, square planes, round only for voice, groups made by 2px ink rules and hairlines, no cards (mock-history-light.png, mock-settings-light.png, mock-recordings-light.png). The stray outlier is still the soft shadow fading off the side sheet's left edge in light (history-light.png, dictionary-light.png, settings-light.png), against 'no shadows anywhere'."
+    },
+    "craft": {
+      "score": 3,
+      "evidence": "The mocks are clean, with one strong edge per pane and tabular gutters (mock-history-light.png, mock-settings-light.png), and dark focus now reads above rest in kit-dark.png. The kit and the rendered screens still carry round 3 and 4 leftovers: the note icon floats about 10px above its line (history-light.png, recordings-light.png, dictionary-light.png); 'Copy' is left-set over a centred 'Copy what you said' (history-light.png); in kit-light.png the check and icon on selected select, listbox and menu rows are ink on ink and vanish, error and focus share the same grey halo, the disabled secondary keeps its full ink frame and the floating button's plus sits off-centre. New this round: the dark rest field line #333438 is about 1.5:1 to the canvas (kit-dark.png, dictionary-dark.png), and mock-settings-dark.png shows a stray hairline beside the chosen 'Dark' option."
+    },
+    "distinct": {
+      "score": 4,
+      "evidence": "With the name hidden, mock-history-light.png (day score and talk lines), mock-settings-light.png (keycaps, stop tracks, square slug switches) and mock-welcome-light.png (poster wordmark over a keyboard row) could only be Youch!. Defaults remain on mock-insights-light.png (a big number over a smoothed area) and in the renderer's full-width slabs and chevron rows (history-light.png, settings-light.png)."
+    },
+    "owner-fit": {
+      "score": 4,
+      "evidence": "It answers 'kind of Bauhaus ... a little neo-brutal pop' with poster titles, 2px ink rules and ink fills (mock-welcome-light.png, mock-history-light.png), keeps the Mail-style two-pane History, the area graph (mock-insights-light.png), butter as one small disc and no highlight band, and shows the static only while capturing (mock-overlay-pill-light.png). Still to raise with the owner: the static sits on an opaque dark disc rather than the see-through circle he praised, and D-037's periwinkle selection is now ink."
+    }
+  },
+  "generic": [
+    "mock-insights-light.png: a huge number over a smoothed area chart with a label-value stat line beneath is the stock analytics hero, and the spline invents curves between daily points.",
+    "The renderer's main actions are full-width ink slabs with left-set labels in the middle of the content: Copy in history-light.png, Add in dictionary-light.png, Export in recordings-light.png, Get started in welcome-light.png.",
+    "Label-value rows with a chevron on every line (the inspector in history-light.png, the models list in settings-light.png, the transcript rows in recordings-light.png) read as an iOS Settings list."
+  ],
+  "fixes": [
+    {
+      "id": "f1",
+      "priority": "P2",
+      "target": "recordings-dark.png: Who spoke chord colours",
+      "text": "r4 f10 landed in the mock only: the sheet's chord steps lighten toward white (#8290C7, #A7AFD6, #C7CCE4, #E4E6EF) in both modes, so the renderer's dark strip ends in a near-cream block. Step the four chord colours darker from #8290C7 instead (periwinkle mixed toward ink at about 100, 80, 62, 46%), which holds on both canvases, and draw mock-recordings-light.png's strip and discs with the same steps."
+    },
+    {
+      "id": "f2",
+      "priority": "P2",
+      "target": "kit: note icon (history-light.png, recordings-light.png, dictionary-light.png)",
+      "text": "Open since r3 f9 and r4 f9, and on all three main screens: the note's icon sits about 10px above its first line. Centre the icon on the first text line, with a code-tier state move if no catalog param reaches it."
+    },
+    {
+      "id": "f3",
+      "priority": "P2",
+      "target": "kit: secondary and destructive button labels (history-light.png, kit-light.png)",
+      "text": "Open since r3 f6 and r4 f7, in History's first read: 'Copy' is left-set and 'Copy what you said' centred, one above the other. Left-set the secondary and destructive labels at the primary's inset."
+    },
+    {
+      "id": "f4",
+      "priority": "P3",
+      "target": "kit: selected select, listbox and menu rows in light (kit-light.png)",
+      "text": "r4 f4 is still open: the check on 'Today' and 'Mobility basics' and the pencil on 'Save as draft' are ink on the ink fill and vanish, while kit-dark.png shows them. Draw the glyph on a selected row in the row's text colour (canvas in light)."
+    },
+    {
+      "id": "f5",
+      "priority": "P3",
+      "target": "kit: text field error halo in light (kit-light.png)",
+      "text": "r4 f5 is still open: error (2px ink) and focus (1px ink) carry the same grey halo. Drop the halo from the error state so the halo means focus and the heavy frame means error, as kit-dark.png nearly does."
+    },
+    {
+      "id": "f6",
+      "priority": "P3",
+      "target": "kit: disabled secondary button (kit-light.png, kit-dark.png)",
+      "text": "r4 f6 is still open: disabled 'Not now' keeps the full 2px ink frame and reads as rest. Draw the disabled frame in the 1px muted line the rest field uses."
+    },
+    {
+      "id": "f7",
+      "priority": "P3",
+      "target": "kit: side-sheet left edge in light (history-light.png, dictionary-light.png, settings-light.png)",
+      "text": "r4 f8 is still open: a shadow fades from #E9E9E6 into the content at the side sheet's edge. Set the side-sheet shadow to none."
+    },
+    {
+      "id": "f8",
+      "priority": "P3",
+      "target": "kit: dark rest field line (kit-dark.png, dictionary-dark.png)",
+      "text": "Applying r4 f1 by dimming the rest line to #333438 left the field edge at about 1.5:1 to the canvas. Raise the dark rest line to about 3:1 (near #5A5B60), still below the #858687 focus frame, so rest is findable and focus still reads above it."
+    },
+    {
+      "id": "f9",
+      "priority": "P3",
+      "target": "welcome-light.png: title scale",
+      "text": "r4 f11 is still open: 'Youch!' is set barely larger than 'Speech-to-text that just works. Locally.'. Set the onboarding title at least 1.6 times the tagline."
+    },
+    {
+      "id": "f10",
+      "priority": "P3",
+      "target": "mock-settings-dark.png: Appearance options",
+      "text": "A 1px grey hairline stands just left of the chosen 'Dark' fill, which no other option has. Remove it."
+    }
+  ],
+  "landed": [
+    "f1",
+    "f2",
+    "f3",
+    "f10"
+  ],
+  "verdict": "refine"
+}

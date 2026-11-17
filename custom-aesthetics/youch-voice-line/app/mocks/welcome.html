@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Voice Line · Welcome</title>
+<link rel="stylesheet" href="voice-line.css">
+<style>
+
+.win{display:block;position:relative}
+.cap{position:relative;height:64px;border:2px solid var(--ink);border-radius:var(--r);flex:none}
+.cap .g{position:absolute;right:8px;top:6px;font-size:13px;font-weight:600}
+.cap .nm{position:absolute;left:9px;bottom:6px;font-size:12px;font-weight:500}
+.cap.on{background:var(--ink);color:var(--on-ink)}.cap .dot{position:absolute;left:8px;top:8px}
+.steps{display:flex;align-items:center;gap:6px}
+.steps u{display:block;width:24px;height:2px;background:var(--line)}.steps u.on{background:var(--ink)}
+.steps span{font-size:12.5px;color:var(--muted);margin-left:8px}
+
+.mark{width:236px;height:236px;position:absolute;right:104px;top:58px}
+.c{position:absolute;left:96px;top:176px}
+h1{font:600 128px/1 var(--fh);letter-spacing:-.05em}
+.tag{font:500 26px/1.2 var(--fh);margin-top:6px}
+.kb{display:flex;gap:8px;margin-top:34px}
+.c .p1{font-size:16px;margin-top:22px}
+.c .p2{font-size:14px;color:var(--muted);max-width:520px;margin-top:12px}
+.c .btn{height:40px;font-size:16px;margin-top:24px;padding:0 20px}
+.steps{position:absolute;left:96px;top:712px}
+
+</style></head><body>
+<div class="win"><svg class="mark" viewBox="0 0 26 26" fill="none"><circle cx="7" cy="13" r="6" fill="var(--voice)"/><path d="M15 6.5a9 9 0 0 1 0 13M19.5 3a13.5 13.5 0 0 1 0 20" stroke="var(--ink)" stroke-width="2.4" stroke-linecap="round"/></svg><div class="c"><h1>Youch!</h1><div class="tag">Speech-to-text that just works. Locally.</div><div class="kb"><div class="cap" style="width:64px"><span class="nm">fn</span></div><div class="cap" style="width:64px"><span class="g">⌃</span><span class="nm">control</span></div><div class="cap" style="width:72px"><span class="g">⌥</span><span class="nm">option</span></div><div class="cap" style="width:80px"><span class="g">⌘</span><span class="nm">command</span></div><div class="cap" style="width:300px"></div><div class="cap on" style="width:80px"><i class="dot"></i><span class="g">⌘</span><span class="nm">command</span></div><div class="cap" style="width:72px"><span class="g">⌥</span><span class="nm">option</span></div></div><p class="p1">Hold <kbd>⌘</kbd> on the right, say it, let go. Youch! pastes it where you're typing.</p><p class="p2">Youch! uses models that run on this Mac (2.1 GB). You choose when they download, on the next screen. After that it works with no internet.</p><span class="btn main">Get started</span></div><div class="steps"><u class=on></u><u></u><u></u><u></u><u></u><u></u><u></u><u></u><span>Step 1 of 8</span></div></div>
+</body></html>

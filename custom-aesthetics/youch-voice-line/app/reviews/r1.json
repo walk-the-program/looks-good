@@ -1,0 +1,78 @@
+{
+  "round": 1,
+  "reviewer": "critic",
+  "date": "2026-11-16",
+  "renders": "app/renders/r1/",
+  "directions": {
+    "a": {
+      "scores": {
+        "thesis": { "score": 2, "evidence": "a/mock-history-light.png: every app in the list sits in a circle, so round no longer means spoken, and no dictation carries a talk line; periwinkle fills the selected nav and Copy. a/history-light.png shows only a stacked tint bar. You could not state 'voice is round, text is straight' from these screens." },
+        "signature": { "score": 3, "evidence": "a/mock-history-light.png: the proof margin (numbered notes for fillers, the spoken correction and the learned word) comes from the product's promise and is the best explanation of edits in the round, but it lives on one mock; a/history-light.png replaces it with a label: value inspector and a check-icon callout." },
+        "content": { "score": 2, "evidence": "a/mock-history-light.png draws the said text well (strikes, superscripts, margin notes) but the dictation rows are equal icon-name-preview rows with no length. a/dictionary-light.png prints '3 of 5 clips' as text, a/insights-light.png has four stat tiles, a/settings-light.png draws the key as underline tabs." },
+        "hierarchy": { "score": 3, "evidence": "a/mock-history-light.png: the Newsreader kept text is a clear first read. a/history-light.png: the full-width periwinkle COPY slab and the black-ruled COPY WHAT YOU SAID compete with the text; a/settings-light.png is four identical tracked-caps heads over four identical tab rows." },
+        "type": { "score": 3, "evidence": "a/mock-history-light.png: Newsreader for the kept text is the best reading type in the round, with Outfit heads. The kit disagrees: a/history-light.png sets the kept text in Outfit and the said text in the serif, and a/settings-light.png puts tracked caps on every nav item, label and button." },
+        "colour": { "score": 3, "evidence": "Brand-led and consistent across a/history-light.png and a/history-dark.png, dark mode designed, butter once in the mock. But periwinkle paints the selected nav, Copy and every full-width button (a/welcome-light.png), which contradicts the thesis's own rule that periwinkle means voice." },
+        "restraint": { "score": 3, "evidence": "a/mock-history-light.png mixes pill nav, pill search, circled app icons, a radius-20 card and a Copy button carrying a label, a shortcut and an icon disc. The kit in a/kit-light.png is square slabs with arrows, a second shape language." },
+        "craft": { "score": 3, "evidence": "Aligned and clean in a/mock-history-light.png, but the reader is empty below the said text; a/recordings-light.png wraps 'Northwind call' to two lines and uses a heart icon for Recordings; a/history-light.png puts chevrons on values that are not actions." },
+        "distinct": { "score": 2, "evidence": "a/mock-history-light.png reads as a tidy Mail clone; with the name hidden, a/history-light.png and a/insights-light.png pass for the editorial-serif built-in with a periwinkle accent." },
+        "owner-fit": { "score": 3, "evidence": "Keeps the locked Outfit with Inter and Walker's Mail-style two-pane (a/mock-history-light.png), but a serif proof page is a step away from 'a little bit more modern, slightly more character', and a/insights-light.png brings back the equal stat tiles the direction says must never appear." }
+      }
+    },
+    "b": {
+      "scores": {
+        "thesis": { "score": 3, "evidence": "b/mock-history-light.png argues it: every row has a periwinkle start dot and an ink length line, Copy is ink, periwinkle appears only on voice. The renderer screens lose it: b/history-light.png fills Copy in periwinkle and draws the stacked tint bar." },
+        "signature": { "score": 3, "evidence": "b/mock-history-light.png: the time-code gutter beside Kept and Said is born from the transcript, but it is a convention any transcription app shares, and b/recordings-light.png still puts time codes at the right edge, so the gutter shows on one mock only." },
+        "content": { "score": 3, "evidence": "b/mock-history-light.png shapes the main object: a ledger with time, app, a length line and tabular word count. Elsewhere it is raw: b/dictionary-light.png '3 of 5 clips' in mono, b/insights-light.png grey stat tiles." },
+        "hierarchy": { "score": 3, "evidence": "b/mock-history-light.png puts the actions in a toolbar where a Mac expects them, but Kept and Said are almost the same size so the second level blurs. b/history-light.png stacks a periwinkle Copy slab over a black Copy what you said slab." },
+        "type": { "score": 2, "evidence": "b/mock-history-light.png: Plex Sans with weak contrast (a 40px title, everything else 18 to 24px). The renderer adds Plex Mono to the title bar, times, labels, values and segments (b/settings-light.png), and drops the owner's locked Outfit and Inter." },
+        "colour": { "score": 3, "evidence": "b/mock-history-dark.png keeps the tonal budget: periwinkle only on voice, butter once. b/history-light.png and b/welcome-light.png fill slabs with a darker indigo that is not the brand periwinkle, so light and dark use two different accents." },
+        "restraint": { "score": 3, "evidence": "b/mock-history-light.png is the most restrained screen in the round. The renderer adds grey callout boxes, grey tiles and labelled ON/OFF switches (b/settings-light.png, b/insights-light.png)." },
+        "craft": { "score": 3, "evidence": "b/mock-history-light.png aligns its ledger columns, but the talk lines top out near 100px so a 38-word dictation barely differs from a 10-word one; b/settings-light.png wraps 'Vocabulary model' to two lines and the selected state is a grey tint." },
+        "distinct": { "score": 2, "evidence": "With the name hidden, b/mock-history-light.png is a well-made developer tool and b/history-light.png is the mainframe built-in with a periwinkle accent." },
+        "owner-fit": { "score": 2, "evidence": "The sober direction where the owner asked for 'slightly more character' and has called the bland option out before; it drops the locked Outfit, leans on mono (b/settings-light.png), and b/insights-light.png sets '51 minutes of talking' on a grey tint pill, a band behind text." }
+      }
+    },
+    "c": {
+      "scores": {
+        "thesis": { "score": 3, "evidence": "c/mock-history-light.png states it at a glance: periwinkle dots for voice, ink lines for text, ink selection and ink Copy. The renderer screens contradict it: c/settings-light.png and c/history-light.png fill selection and buttons in periwinkle, so it shows on one screen." },
+        "signature": { "score": 4, "evidence": "c/mock-history-light.png: the day score across the top (a dot and a line per dictation, the selected one ringed like the overlay) comes from the core action, sits in the first read, and you would describe the app by it. It is spaced 'in order' rather than on time, and it is absent from every renderer screen." },
+        "content": { "score": 3, "evidence": "c/mock-history-light.png draws each dictation as dot, line and tabular duration, with the said text struck beside the kept. The renderer screens stay generic: c/dictionary-light.png '3 of 5 clips', c/insights-light.png boxed tiles, and c/history-light.png sets the kept text in all caps." },
+        "hierarchy": { "score": 3, "evidence": "c/mock-history-light.png: the huge History, then the score, list and reader, a clear order. c/insights-light.png boxes the chart, the range control and every tile in heavy frames with stripes, so nothing below the big number leads." },
+        "type": { "score": 3, "evidence": "c/mock-history-light.png has the round's best scale contrast (about 90px History over 20px text). The renderer uppercases the kept text and headings (c/history-light.png, c/recordings-light.png), lowercases 'youch!' and 'try it' (c/welcome-light.png), and Space Grotesk replaces the locked Outfit." },
+        "colour": { "score": 3, "evidence": "c/mock-history-dark.png is the round's clearest strategy: voice periwinkle, ink and its inverse for every control, butter once, dark mode inverting selection to cream. The renderer breaks it: periwinkle fills nav, segments and buttons, and butter repeats in stripes and triangles (c/insights-light.png)." },
+        "restraint": { "score": 2, "evidence": "c/insights-light.png: Bauhaus shapes in the sidebar, a periwinkle/butter/ink stripe on the chart and every tile, double rules under each head and heavy boxes round everything: several ideas competing. The mock is restrained; the renderer screens are not." },
+        "craft": { "score": 3, "evidence": "c/mock-history-light.png holds one strong left edge, but the '1:52 PM · 0:24' label touches the top rule. c/settings-light.png mixes a square knob (on) with a round knob (off), and c/recordings-light.png wraps 'Northwind call'." },
+        "distinct": { "score": 3, "evidence": "c/mock-history-light.png is recognisably Youch! (talk lines, day score, solid ink selection). With the name hidden, c/dictionary-light.png and c/settings-light.png are the bauhaus-poster built-in with a periwinkle accent." },
+        "owner-fit": { "score": 2, "evidence": "c/mock-history-light.png answers 'more character', 'kind of Bauhaus' and 'neo-brutal pop', but the renderer brings back what the owner killed: board art (the circle, triangle and square in every sidebar, c/history-light.png) and a butter fill behind text (combo box in c/kit-light.png). Space Grotesk also replaces the locked Outfit." }
+      }
+    }
+  },
+  "chosen": "c+b",
+  "why": "C is the only direction whose mock argues the thesis and carries a signature born from the core action (the day score and per-row talk lines, c/mock-history-light.png), and it is the one that answers 'more modern, slightly more character'. Take from B the tabular time-code gutter for the said text and the Recordings transcript, and its no-card ruled discipline (b/mock-history-light.png). Everything wrong with C is in the built-in bauhaus-poster kit (shapes, stripes, periwinkle fills, caps), which a custom style drops; A's proof margin is the runner-up idea and can come back as notes in the reader if the edit summary proves too thin.",
+  "generic": [
+    "Full-width rectangular primary buttons with a trailing arrow (COPY, ADD, EXPORT, FINISH, GET STARTED) on every renderer screen: a/history-light.png, b/dictionary-light.png, c/recordings-light.png.",
+    "Insights' four equal stat tiles under the big number (Release to paste, Lost threads, Streak, Typing saved) in a/insights-light.png, b/insights-light.png and c/insights-light.png.",
+    "Tracked uppercase micro-labels on every nav item, section head and button (a/settings-light.png, c/settings-light.png), and mono caps in b/settings-light.png."
+  ],
+  "fixes": [
+    { "id": "f1", "priority": "P1", "target": "sidebar on c/history-light.png, c/dictionary-light.png, c/insights-light.png, c/recordings-light.png, c/settings-light.png", "text": "Remove the circle, triangle and square cluster at the foot of the sidebar: it is board art on an app screen, which the owner rejected." },
+    { "id": "f2", "priority": "P1", "target": "c/insights-light.png", "text": "Remove the periwinkle/butter/ink stripe from the chart frame and every tile: it shows butter six times and reads as a decorative band. Butter stays one small circle per screen." },
+    { "id": "f3", "priority": "P1", "target": "combo box in c/kit-light.png", "text": "Drop the butter fill behind the matched letters ('Ma') in the suggestions: it is the killed colour highlight behind text. Mark the match with weight instead." },
+    { "id": "f4", "priority": "P1", "target": "c/history-light.png", "text": "The talk line is missing from the renderer: the 'Today, by how long you talked' chord draws a stacked tint bar. Write a code-tier move that draws each item as a periwinkle dot and an ink line proportional to its value, as c/mock-history-light.png does." },
+    { "id": "f5", "priority": "P1", "target": "c/history-light.png", "text": "Set the kept text in sentence case, not all caps: shown in caps, the record of what Walker said looks rewritten, which breaks the product's promise." },
+    { "id": "f6", "priority": "P2", "target": "c/settings-light.png, c/history-light.png, c/insights-light.png", "text": "Fill the selected nav item, selected segment and primary button with ink, not periwinkle, as c/mock-history-light.png does; periwinkle is for voice only." },
+    { "id": "f7", "priority": "P2", "target": "primary button in c/kit-light.png", "text": "The mock and the kit disagree: replace the full-width square slab with a circled arrow by the compact ink 'Copy ⌘C' button from c/mock-history-light.png, with no arrow." },
+    { "id": "f8", "priority": "P2", "target": "display type in c/mock-history-light.png", "text": "Set the display tier in Outfit 700 (locked in D-037) at the mock's 90px scale instead of Space Grotesk; offer Space Grotesk to the owner as a named alternative, not a silent swap." },
+    { "id": "f9", "priority": "P2", "target": "day score in c/mock-history-light.png", "text": "Place each dot on an 8 AM to now time axis instead of spacing them evenly 'in order', so the gaps show the day's rhythm and the strip stops repeating the list." },
+    { "id": "f10", "priority": "P2", "target": "c/dictionary-light.png", "text": "Draw '3 of 5 clips' as five clip discs per term, filled for each recorded clip, the sheet's own Dictionary signature." },
+    { "id": "f11", "priority": "P2", "target": "c/insights-light.png", "text": "Replace the four boxed stat tiles with one line of small tabular figures under the area graph, so 7,719 stays the only large number." },
+    { "id": "f12", "priority": "P2", "target": "c/settings-light.png and c/welcome-light.png", "text": "Draw the dictation key as keycaps with legends, the chosen one filled in ink, instead of a text segmented control (Settings) and a bare sentence (Welcome)." },
+    { "id": "f13", "priority": "P2", "target": "c/recordings-light.png", "text": "Hang the transcript turns on a left gutter, with speaker disc and tabular time code on the left and the words in one column, as b/mock-history-light.png does for Kept and Said; drop the row chevrons." },
+    { "id": "f14", "priority": "P2", "target": "c/settings-light.png, c/history-light.png", "text": "Keep tracked caps for section labels only; set nav items, buttons and inline actions ('UNDO', 'YES, IT'S DEV', 'SKIP PRACTICE') in sentence case." },
+    { "id": "f15", "priority": "P3", "target": "c/mock-history-light.png", "text": "Give the '1:52 PM · 0:24' label above the selected dot the same gap from the top rule as the dots have below it." },
+    { "id": "f16", "priority": "P3", "target": "c/welcome-light.png, c/try-it-light.png", "text": "Set the titles as 'Youch!' and 'Try it'; the lowercase forms clash with every other title." },
+    { "id": "f17", "priority": "P3", "target": "c/settings-light.png", "text": "Use one square knob shape for both toggle states; the round off-knob borrows the voice shape." }
+  ],
+  "landed": [],
+  "verdict": "refine"
+}

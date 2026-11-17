@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300">
+<rect width="400" height="300" fill="var(--ab-canvas,#fafaf7)"/>
+<path d="M24 92H376M24 236H376" stroke="var(--ab-line,#d7d7d5)" stroke-width="1"/>
+<path d="M24 60H376" stroke="var(--ab-ink,#101116)" stroke-width="3"/>
+<g fill="var(--ab-primary,#8290c7)"><circle cx="40" cy="130" r="9"/><circle cx="40" cy="170" r="9"/><circle cx="40" cy="210" r="9"/><circle cx="268" cy="130" r="9"/></g>
+<g stroke="var(--ab-ink,#101116)" stroke-width="4"><path d="M49 130H190"/><path d="M49 170H96"/><path d="M49 210H250"/><path d="M277 130H330"/></g>
+<circle cx="352" cy="210" r="6" fill="var(--ab-accent,#f6cf6b)"/>
+</svg>

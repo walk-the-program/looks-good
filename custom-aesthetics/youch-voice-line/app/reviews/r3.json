@@ -1,0 +1,137 @@
+{
+  "round": 3,
+  "reviewer": "critic",
+  "date": "2026-11-16",
+  "renders": "app/renders/r3/",
+  "scores": {
+    "thesis": {
+      "score": 4,
+      "evidence": "mock-history-light.png argues it at once: periwinkle start dots and ink talk lines on the day score and in every row, kept text above said text with the fillers struck. mock-try-it-light.png now waits as a dot and an empty line, mock-recordings-light.png hangs turns on speaker discs, mock-dictionary-light.png has clip discs and mock-settings-light.png a keycap with a voice dot. It thins on mock-insights-light.png, where nothing is round, and the kit spends periwinkle on focus rings and checkmarks (kit-light.png), which blurs 'periwinkle means voice'."
+    },
+    "signature": {
+      "score": 4,
+      "evidence": "mock-history-light.png: the day score and the matching talk line under every row come from hold, talk, let go, and the new 'time talking' key stops the line reading as a span of the hour axis. mock-try-it-light.png lands the first dictation as the same dot and line, and mock-overlay-ring-light.png closes it into the ring. It does not reach mock-recordings-light.png, whose who-spoke strip is plain blocks, and the renderer's history-light.png carries none of it (a listed limit)."
+    },
+    "content": {
+      "score": 4,
+      "evidence": "mock-history-light.png draws the product promise: kept text at reading size, said text beneath with 'um so', 'like' and 'eight weeks oh actually' struck, corrections underlined, a time gutter and a butter learned line. mock-dictionary-light.png gives each term five clip discs and struck mishearings; mock-recordings-light.png a speaker and time-code gutter. Slips: '3 of 5' still repeats the discs, and the said text strikes 'prominent' while the learned line says 'Preman' and mock-dictionary-light.png says 'prominent' is never swapped."
+    },
+    "hierarchy": {
+      "score": 4,
+      "evidence": "mock-history-light.png reads title, day score, the ink selected row, then the kept text, with Copy ⌘C at the trailing edge of the reader header. mock-insights-light.png reads 7,719, then the area, then one small line. mock-settings-light.png leads with the filled keycap and groups by space. mock-try-it-light.png has a clear first read but an empty lower half, and the renderer's full-width slabs (Copy in history-light.png) still fight the content, a listed limit."
+    },
+    "type": {
+      "score": 4,
+      "evidence": "Outfit 600 titles at about 56px with tight tracking and a 132px numeral (mock-insights-light.png) against Inter 21px kept text, 15px said text and small tabular time codes (mock-history-light.png): real contrast, one job per style. Tracked caps sit only on section labels (KEPT, WHAT YOU SAID, WHO SPOKE, TERMS). The renderer keeps the roles (dictionary-light.png, settings-light.png), though welcome-light.png sets 'Youch!' barely larger than its tagline."
+    },
+    "colour": {
+      "score": 4,
+      "evidence": "mock-history-light.png and mock-history-dark.png keep the budget: periwinkle on the start dots, play disc and mark; ink (cream in dark) for selection and Copy; butter once, as the learned disc. Dark is designed, with cream fills and the area as a quiet periwinkle plane (mock-insights-dark.png). The kit still puts periwinkle on states that are not voice, the field focus border and halo and the select checkmarks (kit-light.png, kit-dark.png), and the renderer's area tint nearly vanishes in insights-dark.png."
+    },
+    "restraint": {
+      "score": 4,
+      "evidence": "Round 2's strays are gone: the switch is a square slug (settings-light.png), the Insights caption is plain text (insights-light.png) and the inspector frame is gone (history-light.png). The mocks keep one language: 6px controls, 0 on planes, round only for voice. Left over: the periwinkle field-focus halo (kit-light.png) and a soft shadow fading along the inspector's left edge in light (history-light.png, dictionary-light.png, settings-light.png), against 'no shadows anywhere'."
+    },
+    "craft": {
+      "score": 3,
+      "evidence": "The mocks are clean, with one strong edge per pane and tabular times (mock-history-light.png), and round 2's progress and menu-inset bugs are fixed (try-it-light.png, kit-light.png). What remains: the error field still differs from rest only by a grey halo, faint in kit-dark.png; mock-try-it-light.png puts Back and the step bar at 44px while its content sits at 96px, and still says 'Click the box' with no box drawn; the left-set primary label sits over a centred secondary label (history-light.png); note icons float above their one line of text (history-light.png, recordings-light.png); segmented groups are inset a few pixels from the rule edge (settings-light.png)."
+    },
+    "distinct": {
+      "score": 4,
+      "evidence": "With the name hidden, mock-history-light.png (day score and talk lines), mock-settings-light.png (keycaps, stop tracks, square slug switches) and mock-welcome-light.png (poster wordmark over a keyboard row) could only be Youch!. Defaults remain on mock-insights-light.png (a big number over a smoothed area) and in the renderer's full-width slabs and chevron rows (history-light.png)."
+    },
+    "owner-fit": {
+      "score": 4,
+      "evidence": "It answers 'kind of Bauhaus ... a little neo-brutal pop' with poster titles, 2px ink lines and ink fills (mock-welcome-light.png, mock-history-light.png), keeps the Mail-style two-pane History, the area graph (mock-insights-light.png), butter as one small disc and no highlight band, and shows the static only while capturing (mock-overlay-pill-light.png). Still to raise with the owner: D-037's pills and periwinkle-filled selection are replaced by 6px corners and ink fills, and the static sits on an opaque dark disc rather than the see-through circle he praised."
+    }
+  },
+  "generic": [
+    "mock-insights-light.png: a huge number over a smoothed area chart with a label-value line beneath is the stock analytics hero, and the bezier smoothing invents dips between days.",
+    "The renderer's main actions are full-width ink slabs with left-set labels in the middle of the content: Copy in history-light.png, Add in dictionary-light.png, Export in recordings-light.png, Finish in try-it-light.png.",
+    "Label-value rows with a chevron on every line (the inspector in history-light.png, the models list in settings-light.png, the transcript rows in recordings-light.png) read as an iOS Settings list."
+  ],
+  "fixes": [
+    {
+      "id": "f1",
+      "priority": "P1",
+      "target": "kit: text and search field focus (kit-light.png, kit-dark.png)",
+      "text": "r2 f4 did not land: focused fields still draw a periwinkle border with a 3px periwinkle halo, although round 2 note n7 says the halo is gone. Make field focus the same 2px ink ring set 2px out that the buttons use (cream in dark), then re-render the kit to confirm it shows."
+    },
+    {
+      "id": "f2",
+      "priority": "P1",
+      "target": "kit: text field error (kit-dark.png, kit-light.png)",
+      "text": "r2 f5 did not land: the error field still differs from rest only by a grey halo, faint on the dark panel, and has no icon. With no icon move available (note n8), draw the error state as a 4px ink frame (cream in dark) in place of the halo, so it reads against the 2px rest frame in both modes without colour."
+    },
+    {
+      "id": "f3",
+      "priority": "P2",
+      "target": "mock-try-it-light.png: instruction line",
+      "text": "Applying r2 f8 replaced the box with a talk line, but the instruction still says 'Click the box, hold ⌘ and say something'. Keep the talk line and rewrite the sentence to match it: 'Hold ⌘ and say something, then let go. Your words land on the line below.'"
+    },
+    {
+      "id": "f4",
+      "priority": "P2",
+      "target": "mock-try-it-light.png: footer",
+      "text": "Back and the step bar sit at 44px while the content above, and Welcome's step bar in mock-welcome-light.png, sit at 96px, so the screen has two left edges. Move the footer's leading edge to 96px."
+    },
+    {
+      "id": "f5",
+      "priority": "P2",
+      "target": "kit: segmented control (settings-light.png, insights-light.png)",
+      "text": "The renderer draws Appearance, Range and the dials as separate outlined boxes with gaps between them, while mock-settings-light.png, mock-history-light.png and mock-insights-light.png draw one 2px ink track with the chosen segment filled inside it. Give the kit segmented control the mocks' single joined track."
+    },
+    {
+      "id": "f6",
+      "priority": "P3",
+      "target": "kit: secondary button label (history-light.png, kit-light.png)",
+      "text": "r2 f15 is still open: 'Copy' is left-set and 'Copy what you said' centred, one above the other. Since the renderer cannot centre the primary label (round 2 note n14), left-set the secondary and destructive labels at the primary's inset so the stack shares one edge."
+    },
+    {
+      "id": "f7",
+      "priority": "P3",
+      "target": "kit: side-sheet left edge in light (history-light.png, dictionary-light.png, settings-light.png)",
+      "text": "A soft shadow fades about 10px into the content along the inspector's left edge, against 'no shadows anywhere'; it is absent in dark. Replace it with the 1px hairline r2 f1 asked for, or list it in direction.md section 8 if the renderer draws it."
+    },
+    {
+      "id": "f8",
+      "priority": "P3",
+      "target": "mock-history-light.png: what you said",
+      "text": "The said text strikes 'prominent' before 'Pramand', but the learned line says 'Preman → Pramand' and mock-dictionary-light.png says 'prominent' is never swapped on its own. Make the struck word 'Preman'."
+    },
+    {
+      "id": "f9",
+      "priority": "P3",
+      "target": "kit: note (history-light.png, recordings-light.png)",
+      "text": "The note's icon sits about 10px above its single line of text ('Learned: Preman → Pramand', 'Speaker 3 sounds like Dev'). Centre the icon on the first text line."
+    },
+    {
+      "id": "f10",
+      "priority": "P3",
+      "target": "insights-dark.png: area fill",
+      "text": "The renderer's area is about #212431 on the #101116 canvas, close to invisible and greyer than the 26% periwinkle plane in mock-insights-dark.png. Raise the chart fill tint to the mock's value in both modes."
+    },
+    {
+      "id": "f11",
+      "priority": "P3",
+      "target": "mock-dictionary-light.png: clip count",
+      "text": "'3 of 5' repeats what the five discs already show. Drop the count and keep Record beside the discs."
+    }
+  ],
+  "landed": [
+    "f1",
+    "f2",
+    "f3",
+    "f6",
+    "f7",
+    "f8",
+    "f9",
+    "f10",
+    "f11",
+    "f12",
+    "f13",
+    "f14",
+    "f16"
+  ],
+  "verdict": "refine"
+}

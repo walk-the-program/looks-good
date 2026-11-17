@@ -1,0 +1,487 @@
+{
+ "rounds": [
+  {
+   "n": 1,
+   "date": "2026-11-16",
+   "by": "agent",
+   "summary": "Round 1: three directions for Youch! rendered with their nearest built-ins (a editorial-serif, b mainframe, c bauhaus-poster) in app/renders/r1/a|b|c, each with a History mock at the real 1180x780 window. Critic review app/reviews/r1.json picked c+b; the author agrees.",
+   "changes": [
+    "A Proof: Mail-style two-pane, Newsreader for the kept text, a right margin of numbered proof notes, Circle & Line pills kept.",
+    "B Steno: three ruled columns with no cards, a ledger list with length lines and word counts, a time-code gutter beside the kept and said text, IBM Plex Sans.",
+    "C Score: a day score strip of periwinkle dots and ink length lines above the list, talk lines in every row, ink selection and an ink main action, square controls, big display title."
+   ],
+   "variants": [
+    {
+     "id": "r1a",
+     "change": "direction: A Proof (editorial-serif, Outfit + Newsreader)",
+     "verdict": "kill"
+    },
+    {
+     "id": "r1b",
+     "change": "direction: B Steno (mainframe, IBM Plex Sans)",
+     "verdict": "kill"
+    },
+    {
+     "id": "r1c",
+     "change": "direction: C Score (bauhaus-poster, Space Grotesk + Inter)",
+     "verdict": "keep"
+    }
+   ],
+   "notes": [
+    {
+     "id": "n1",
+     "target": "general",
+     "text": "Chosen c+b (critic and author): C's talk lines, day score, ink selection and square controls, plus B's time-code gutter and its ruled, card-free discipline. Everything wrong with C sat in the bauhaus-poster kit (art shapes, stripes, periwinkle fills, caps), which the custom style drops.",
+     "status": "done",
+     "doneIn": 2
+    },
+    {
+     "id": "n2",
+     "target": "general",
+     "text": "Critic f4 asks for a code-tier move to draw the talk line in the renderer. AGENTS.md forbids style agents editing js/ and index.html, and this job may commit only the style folder, so the talk line stays in the History mock (direction section 8) and the misleading stacked chord is removed from the sheet.",
+     "status": "done",
+     "doneIn": 2
+    },
+    {
+     "id": "n3",
+     "target": "general",
+     "text": "Critic f8: display back to the locked Outfit (600; the vendored Outfit has 400 and 600 only). Space Grotesk goes to the owner as a named alternative in the board README.",
+     "status": "done",
+     "doneIn": 2
+    }
+   ],
+   "shots": "app/renders/r1/"
+  },
+  {
+   "n": 2,
+   "date": "2026-11-16",
+   "by": "agent",
+   "summary": "Round 2: the first full Voice Line style (aesthetic.json) and a mock of every screen at the real 1180x780 window. App renders and mocks in app/renders/r2/; checker shots in shots/r2/.",
+   "changes": [
+    "Style written from scratch: ink-filled main action and selection, 2px ink control lines, 6px control corners and 0 on planes, flat-paper cards (no cards), ruled rows, periwinkle avatars only, no art on app screens (r1 f1, f2, f6).",
+    "Action arrow removed from every button with action-glyph set to an empty glyph (r1 f7, generic list); the renderer still draws the main action full width, which section 8 lists as a renderer limit. The mocks draw the compact ink Copy ⌘C in the reader header.",
+    "Highlight set to ink with no band and the highlight word in ink weight 600, so matched text is never filled with butter (r1 f3).",
+    "Kept text in sentence case; label-case drops tracked capitals from every label, tab, segment and button; tracked caps only on section labels via tracked-micro-labels (r1 f5, f14).",
+    "Display face back to the locked Outfit 600 (r1 f8; the vendored Outfit has no 700). Space Grotesk is kept for the owner as a named alternative.",
+    "History mock: the day score on an 8 AM to 2:30 PM axis (2.128px a minute) with each dictation's line at 3px a second, talk lines in every row, ink selection, Copy ⌘C in the reader header, and B's time-code gutter for Kept and What you said (r1 f9, f15, f4 as a mock).",
+    "Dictionary mock with five clip discs per term (r1 f10); Insights mock with one 132px numeral over one flat area graph and the other figures as one tabular line, and the sheet's stats tiles replaced by a text line (r1 f11).",
+    "Settings and Welcome mocks draw the dictation key as keycaps, Right Command filled in ink with a voice dot (r1 f12); Recordings mock hangs turns on a speaker-disc and time-code gutter (r1 f13).",
+    "Overlay mocks: a round backing instead of a pill, the clear static, and after release a cream ring closing around the held static.",
+    "Switch knobs are square in both states (r1 f17); the History sheet's stacked chord is removed so the renderer no longer shows a false talk line (r1 f4, see round 1 note n2)."
+   ],
+   "variants": [
+    {
+     "id": "r2a",
+     "change": "kit.tabs material: outlined (labels cramped inside tight boxes) killed for flat-paper with ink-fill-selected",
+     "verdict": "keep"
+    },
+    {
+     "id": "r2b",
+     "change": "kit.popup-tip material: ink-block (title vanished on the tip) killed for outlined",
+     "verdict": "keep"
+    },
+    {
+     "id": "r2c",
+     "change": "action glyph: the kit's arrow killed for no glyph",
+     "verdict": "keep"
+    }
+   ],
+   "notes": [
+    {
+     "id": "n4",
+     "target": "kit.side-sheet",
+     "text": "r2 f1: the inspector was boxed in a 2px ink frame. Now rule-sidebar with a 1px rule: no frame around the pane.",
+     "status": "done",
+     "doneIn": 3
+    },
+    {
+     "id": "n5",
+     "target": "kit.progress",
+     "text": "r2 f2: progress fill drawn in canvas on an ink track. Now rule-meter: an ink rule over a hairline track.",
+     "status": "done",
+     "doneIn": 3
+    },
+    {
+     "id": "n6",
+     "target": "kit.menu-item",
+     "text": "r2 f3: menu and listbox options sat flush on the border. The flat-paper menu-item material zeroed the option padding; menu-item is now ruled-row, which keeps the kit's 12px inset, and menu and listbox stay 2px ink outlines.",
+     "status": "done",
+     "doneIn": 3
+    },
+    {
+     "id": "n7",
+     "target": "kit.field",
+     "text": "r2 f4: field focus showed a periwinkle halo. focus-ring tint 0 and ring 0 remove the halo; the focus-visible outline is the 2px ink ring set 2px out. Underline fields were tried for the 'text on a straight line' idea and killed: the line vanished at rest.",
+     "status": "done",
+     "doneIn": 3
+    },
+    {
+     "id": "n8",
+     "target": "kit.field",
+     "text": "r2 f5: the error state's faint grey halo is gone with the halo removal; the kit field error keeps the 2px ink frame and its helper line. No catalog move adds an alert icon to the kit field; a code-tier move is off-limits for this job (round 1 note n2).",
+     "status": "done",
+     "doneIn": 3
+    },
+    {
+     "id": "n9",
+     "target": "kit.switch",
+     "text": "r2 f6 (and r1 f17): the switch is now slug-switch: square, a 16px square slug, an ink track when on, a 1px ink outline with an ink slug when off (outline-frame, kit scope, supplies the outline colour). legend-switch (mono legend, broken in dark), square-frame and outlined (both keep a round knob) were tried and killed. The mock switches now match it exactly (r2 f14).",
+     "status": "done",
+     "doneIn": 3
+    },
+    {
+     "id": "n10",
+     "target": "general",
+     "text": "insights: r2 f7: the caption under 7,719 was a rounded chip (the hero-numeral meta). The sheet now sets it as a plain muted text block.",
+     "status": "done",
+     "doneIn": 3
+    },
+    {
+     "id": "n11",
+     "target": "general",
+     "text": "try-it: r2 f8 and f9: Try it now waits as a talk line (a periwinkle start dot, a cursor and an empty hairline) under 'Your first dictation', on Welcome's flush-left edge at 96px.",
+     "status": "done",
+     "doneIn": 3
+    },
+    {
+     "id": "n12",
+     "target": "general",
+     "text": "history: r2 f10 to f12: the 8:10 AM Notes row is added, the score's lines stop inside the content edge, and a key ('time talking') sits beside 'Today · 6 dictations' in a header row above the axis.",
+     "status": "done",
+     "doneIn": 3
+    },
+    {
+     "id": "n13",
+     "target": "general",
+     "text": "settings, recordings: r2 f13 and f16: the dark Settings mock selects Dark; the four speaker steps are spread wider (100, 64, 38, 18% in light with a hairline on the palest; 100, 62, 34, 12% toward white in dark).",
+     "status": "done",
+     "doneIn": 3
+    },
+    {
+     "id": "n14",
+     "target": "kit.button-primary",
+     "text": "r2 f15 (P3): the renderer sets the primary label left with space-between; no catalog move centres it. Left open as polish.",
+     "status": "open"
+    }
+   ],
+   "shots": "shots/r2/"
+  },
+  {
+   "n": 3,
+   "date": "2026-11-16",
+   "by": "agent",
+   "summary": "Round 3: the round 2 critic's fixes (app/reviews/r2.json f1 to f16) in the kit and the mocks. App renders and mocks in app/renders/r3/; checker shots in shots/r3/.",
+   "changes": [
+    "Inspector drawn with a single rule, no frame (r2 f1).",
+    "Progress as an ink rule over a hairline (r2 f2).",
+    "Menu options keep their inset (r2 f3).",
+    "Field focus is the ink ring with no periwinkle halo (r2 f4, f5).",
+    "Square slug switch in kit and mocks (r2 f6, f14).",
+    "Insights caption as plain text (r2 f7).",
+    "Try it waits as a talk line on the flush-left edge (r2 f8, f9).",
+    "History: Notes row, score inside the edge, 'time talking' key (r2 f10 to f12).",
+    "Dark Settings selects Dark; wider speaker steps (r2 f13, f16)."
+   ],
+   "variants": [
+    {
+     "id": "r3a",
+     "change": "kit.switch: slug-switch with outline-frame (square slug, outlined off track) kept over legend-switch, square-frame and outlined",
+     "verdict": "keep"
+    },
+    {
+     "id": "r3b",
+     "change": "kit.field: underline-field with underline-focus killed (no line at rest); outlined kept",
+     "verdict": "kill"
+    },
+    {
+     "id": "r3c",
+     "change": "kit.menu-item: ruled-row kept over flat-paper (which zeroed option padding)",
+     "verdict": "keep"
+    }
+   ],
+   "notes": [
+    {
+     "id": "n15",
+     "target": "kit.field",
+     "text": "r3 f1 (r2 f4): note n7 was wrong; the halo was still there. Cause: css/see-built.css draws the kit's focus demo as border var(--k-pri-text) plus a 3px halo of var(--ab-primary), both !important, and js/see-built.js writes --k-pri-text from the palette primary. No catalog move reaches it. Fix: the palette roles now follow the thesis (primary = ink, secondary = periwinkle), so focus is an ink border with an ink-tinted ring, never periwinkle; the rest field is a 1px muted line, so focus reads as the change to ink in both modes. The exact 2px ring 2px out would need a code-tier move, which this job may not commit (round 1 note n2).",
+     "status": "done",
+     "doneIn": 4
+    },
+    {
+     "id": "n16",
+     "target": "kit.field",
+     "text": "r3 f2 (r2 f5): the rest field is now 1px muted, and the kit's ink-danger error draws a 2px ink frame (cream in dark), so error differs from rest by weight and colour in both modes.",
+     "status": "done",
+     "doneIn": 4
+    },
+    {
+     "id": "n17",
+     "target": "general",
+     "text": "try-it: r3 f3 and f4: the instruction now reads 'Hold ⌘ and say something, then let go. Your words land on the line below.', and the footer sits on the 96px edge.",
+     "status": "done",
+     "doneIn": 4
+    },
+    {
+     "id": "n18",
+     "target": "kit.segmented",
+     "text": "r3 f5: no catalog material draws one joined track for the kit's segmented control (outlined boxes each option; flat-paper, square-frame and hairline-box were tried). Solved the other way: the kit and every mock now draw segments as plain options with the chosen one filled ink and no track, so mock and kit agree.",
+     "status": "done",
+     "doneIn": 4
+    },
+    {
+     "id": "n19",
+     "target": "general",
+     "text": "dictionary: r3 f11: the '3 of 5' counts are gone; the discs say it.",
+     "status": "done",
+     "doneIn": 4
+    },
+    {
+     "id": "n20",
+     "target": "general",
+     "text": "history: r3 f8 (P3): 'prominent' struck before 'Pramand' is the app's own fixture (the speech model heard 'prominent'; the dictionary term swaps it in context), and 'Learned: Preman → Pramand' is a separate learned fix on the same dictation. Kept as real content.",
+     "status": "done",
+     "doneIn": 4
+    },
+    {
+     "id": "n21",
+     "target": "kit.side-sheet",
+     "text": "r3 f7 (P3): the inspector's light-mode edge shadow is the kit's --shadow-side-sheet token; open as polish.",
+     "status": "open"
+    }
+   ],
+   "shots": "shots/r3/"
+  },
+  {
+   "n": 4,
+   "date": "2026-11-16",
+   "by": "agent",
+   "summary": "Round 4: the round 3 critic's two P1s and three P2s (app/reviews/r3.json). App renders and mocks in app/renders/r4/; checker shots in shots/r4/.",
+   "changes": [
+    "look.json roles follow the thesis: primary #101116 (ink), secondary #8290c7 (periwinkle voice); mono-plus-accent kitSecondary is now secondary so avatars stay periwinkle discs; the sidebar's selected bar, focus, links and checkmarks turn ink (r3 f1, the thesis leaks noted in r3).",
+    "Fields: a 1px muted line at rest, ink on focus, a 2px ink frame on error, in the kit and every mock (r3 f1, f2).",
+    "Segmented controls: plain options with the chosen one filled ink, no track, in the kit and every mock (r3 f5).",
+    "Recordings sheet: the Who spoke chord carries explicit periwinkle steps, so the renderer strip stays voice-coloured with the new primary.",
+    "Try it: instruction and footer edge (r3 f3, f4); Dictionary: counts dropped (r3 f11)."
+   ],
+   "variants": [
+    {
+     "id": "r4a",
+     "change": "palette roles: primary periwinkle killed for primary ink with secondary periwinkle",
+     "verdict": "keep"
+    },
+    {
+     "id": "r4b",
+     "change": "kit.segmented: outlined (boxed options) killed for flat-paper with ink-fill-selected",
+     "verdict": "keep"
+    },
+    {
+     "id": "r4c",
+     "change": "kit.field: 2px ink outline killed for 1px muted outline",
+     "verdict": "keep"
+    }
+   ],
+   "notes": [
+    {
+     "id": "n22",
+     "target": "kit.field",
+     "text": "r4 f1: in dark the renderer tones the focus border to exactly 4.5:1 (#858687), which sat under the #9C9D9D rest line. The rest field in dark is now a 2px line in the rule colour (#333438), so focus is the brighter frame and error, a 2px cream frame, the strongest; light keeps a 1px muted rest, a 1px ink focus and a 2px ink error. The exact cream 2px focus would need a code-tier move (round 1 note n2); the problem named (focus cannot be seen in dark) is gone.",
+     "status": "done",
+     "doneIn": 5
+    },
+    {
+     "id": "n23",
+     "target": "general",
+     "text": "history: r4 f2: the learned callout is tone info, so its rule and icon are ink (cream in dark), not periwinkle.",
+     "status": "done",
+     "doneIn": 5
+    },
+    {
+     "id": "n24",
+     "target": "general",
+     "text": "insights: r4 f3: the renderer fills its chart area with 15% of the primary, which is ink by design (round 4). The chart block is removed from the sheet, like the History chord (round 1 note n2): the area graph lives in mocks/insights.html, already listed in direction.md section 8, with the periwinkle plane in both modes.",
+     "status": "done",
+     "doneIn": 5
+    },
+    {
+     "id": "n25",
+     "target": "general",
+     "text": "recordings: r4 f10 (P3): the dark speaker steps now step toward the canvas (100, 76, 54, 34%) with cream initials on the two darker discs, so no step reads as cream.",
+     "status": "done",
+     "doneIn": 5
+    },
+    {
+     "id": "n26",
+     "target": "general",
+     "text": "r4 f4 to f9, f11 (P3): selected-row glyphs, error halo, disabled secondary frame, label alignment, side-sheet shadow token, note icon offset and the kit title scale are base-kit rules no catalog move reaches; left open as polish for the build, where the app's own CSS draws them.",
+     "status": "open"
+    }
+   ],
+   "shots": "shots/r4/"
+  },
+  {
+   "n": 5,
+   "date": "2026-11-16",
+   "by": "agent",
+   "summary": "Round 5: the round 4 critic's P1 and two P2s (app/reviews/r4.json). App renders and mocks in app/renders/r5/; checker shots in shots/r5/.",
+   "changes": [
+    "Dark rest field drawn as a 2px rule-coloured line so focus and error read above it (r4 f1); mocks match.",
+    "Learned callout in ink (r4 f2).",
+    "Renderer chart removed from Insights; the mock carries the periwinkle area (r4 f3).",
+    "Dark speaker steps toward the canvas (r4 f10)."
+   ],
+   "variants": [
+    {
+     "id": "r5a",
+     "change": "kit.field dark rest: 1px muted killed for 2px line colour",
+     "verdict": "keep"
+    }
+   ],
+   "notes": [
+    {
+     "id": "n27",
+     "target": "general",
+     "text": "recordings: r5 f1: the Who spoke steps now run darker from #8290C7 (#8290C7, #6E79A7, #596287, #474E6B, mixed toward the ink) with cream initials on the three darker discs, the same hexes in the sheet's chord and in both modes of mocks/recordings.html, so no step reads as cream on the dark canvas.",
+     "status": "done",
+     "doneIn": 6
+    },
+    {
+     "id": "n28",
+     "target": "kit.callout",
+     "text": "r5 f2: the floating note icon is the base kit callout grid (css/see-built.css), which no catalog material re-aligns. The two notes on app screens (History's learned line, Recordings' speaker suggestion) are now a text line with an inline link, as the mocks draw them, so no floating icon is left on a screen.",
+     "status": "done",
+     "doneIn": 6
+    },
+    {
+     "id": "n29",
+     "target": "kit.button-secondary",
+     "text": "r5 f3: label alignment is base kit CSS (the main action is space-between, secondary labels centred) that no catalog move changes; code-tier moves are off-limits for this job. The sheet now shows secondary actions as links under the main action, so no left-set label sits over a centred one, and direction.md section 8 lists the compact Copy ⌘C header button, drawn in mocks/history.html.",
+     "status": "done",
+     "doneIn": 6
+    }
+   ],
+   "shots": "shots/r5/"
+  },
+  {
+   "n": 6,
+   "date": "2026-11-16",
+   "by": "agent",
+   "summary": "Round 6: the round 5 critic's three P2s (app/reviews/r5.json). App renders and mocks in app/renders/r6/; checker shots in shots/r6/.",
+   "changes": [
+    "Speaker steps darker from periwinkle in sheet and mock (r5 f1).",
+    "Screen notes as text plus link, no floating icon (r5 f2).",
+    "Secondary actions as links in the sheet; compact header action listed in section 8 (r5 f3)."
+   ],
+   "variants": [
+    {
+     "id": "r6a",
+     "change": "speaker steps: toward the canvas or white killed for toward the ink",
+     "verdict": "keep"
+    }
+   ],
+   "notes": [
+    {
+     "id": "n30",
+     "target": "kit.side-sheet",
+     "text": "r6 f1: the side sheet is flat-paper with no fill: no blurred edge shadow and no lone top rule.",
+     "status": "done",
+     "doneIn": 7
+    },
+    {
+     "id": "n31",
+     "target": "kit.button-ghost",
+     "text": "r6 f2: text actions are ruled-key with no top rule, a 2px ink bottom rule, no padding and no tracking: an ink underline at the label's width in both modes, as the mocks draw it. pair-link was tried and killed (its label takes the primary, now ink, and vanished in dark).",
+     "status": "done",
+     "doneIn": 7
+    },
+    {
+     "id": "n32",
+     "target": "kit.field",
+     "text": "r6 f3: a 3:1 rest line in dark needs a role between line (#333438) and muted (#9C9D9D); the only move that rewrites --ab-line is the darkroom lamp cast, and muted-contrast-floor can only raise muted. Muted at rest would bury the kit's fixed 4.5:1 focus tone (r4 f1). heavy-underline was tried and killed (it boxes the field on focus and dims in dark). So the kit field keeps a 2px line-coloured rest frame in dark, below focus and error; the mocks draw the intended ~3:1 rest line, and Try it's practice field is replaced in the sheet by the talk-line text its mock draws, so only Dictionary's add field shows the kit field in dark.",
+     "status": "done",
+     "doneIn": 7
+    },
+    {
+     "id": "n33",
+     "target": "general",
+     "text": "r6 P3s: welcome tagline set at body size so the title leads (f7); dark Settings selects only Dark (f8); Recordings speakers get their own lanes on one time axis (f9); the Insights line runs straight between the seven days (f10); Try it's footer ends at the content edge (f11). Kit-state P3s f4 to f6 are base-kit rules, left open.",
+     "status": "done",
+     "doneIn": 7
+    }
+   ],
+   "shots": "shots/r6/"
+  },
+  {
+   "n": 7,
+   "date": "2026-11-16",
+   "by": "agent",
+   "summary": "Round 7: the round 6 critic's three P2s and five P3s (app/reviews/r6.json). App renders and mocks in app/renders/r7/; checker shots in shots/r7/.",
+   "changes": [
+    "Flat side sheet (r6 f1).",
+    "Underlined ink text actions in the kit (r6 f2).",
+    "Dark field: stated limit, Try it field replaced by its talk-line text (r6 f3).",
+    "Welcome tagline at body size; Settings dark selection; speaker lanes; straight area line; Try it footer edge (r6 f7 to f11)."
+   ],
+   "variants": [
+    {
+     "id": "r7a",
+     "change": "kit.button-ghost: quiet-text killed for ruled-key underline",
+     "verdict": "keep"
+    },
+    {
+     "id": "r7b",
+     "change": "kit.field: heavy-underline tried and killed",
+     "verdict": "kill"
+    }
+   ],
+   "notes": [
+    {
+     "id": "n34",
+     "target": "kit.field",
+     "text": "r7 f1 (r6 f3): note n32 was wrong; the dark mock field was still #333438. Now both are fixed: the kit field is hairline-box with its hair ring, and outline-frame's hair alphas (0.5 light, 0.31 dark) set the rest line near #858687 in light and #5A5B60 in dark, about 3:1 in both; focus is the cream or ink border and error the 2px frame, both above rest. The mocks' .field uses the same 50% and 31% ink mixes, square like the kit.",
+     "status": "done",
+     "doneIn": 8
+    },
+    {
+     "id": "n35",
+     "target": "kit.menu-item",
+     "text": "r7 f2: menu, select and listbox options mark the choice with rule-selected (bold, ink rule) instead of an ink fill, so the check and the pencil glyph stay visible in light.",
+     "status": "done",
+     "doneIn": 8
+    },
+    {
+     "id": "n36",
+     "target": "general",
+     "text": "r7 P3s: the stray hairline beside Dark was the Light option reusing the left column's class (.l, with its border); renamed (f5). Corrections in What you said now carry a periwinkle caret, not an underline (f7). f3, f4 and f6 are base-kit rules, left open.",
+     "status": "done",
+     "doneIn": 8
+    }
+   ],
+   "shots": "shots/r7/"
+  },
+  {
+   "n": 8,
+   "date": "2026-11-16",
+   "by": "agent",
+   "summary": "Round 8: the round 7 critic's P1 and P2 (app/reviews/r7.json). App renders and mocks in app/renders/r8/; checker shots in shots/r8/.",
+   "changes": [
+    "Field rest line about 3:1 in both modes through hairline-box and outline-frame hair alphas; mocks match (r7 f1).",
+    "Menu choices bold with an ink rule, glyphs visible (r7 f2).",
+    "Settings Dark hairline removed; correction carets (r7 f5, f7)."
+   ],
+   "variants": [
+    {
+     "id": "r8a",
+     "change": "kit.field: outlined killed for hairline-box with hair 0.5 / hairDark 0.31",
+     "verdict": "keep"
+    },
+    {
+     "id": "r8b",
+     "change": "kit.menu-item state: ink-fill-selected killed for rule-selected",
+     "verdict": "keep"
+    }
+   ],
+   "notes": [],
+   "shots": "shots/r8/"
+  }
+ ]
+}

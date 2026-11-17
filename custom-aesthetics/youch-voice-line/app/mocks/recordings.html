@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Voice Line · Recordings</title>
+<link rel="stylesheet" href="voice-line.css">
+<style>
+
+.panes{grid-template-rows:minmax(0,1fr)}
+.list{display:flex;flex-direction:column;padding-bottom:0}
+.list .row p{white-space:normal}
+.prog{grid-column:1/3;height:2px;background:var(--line);margin-top:6px}.prog u{display:block;height:2px;width:64%;background:var(--ink)}
+.lf{margin-top:auto;border-top:var(--hair);padding:16px 0 20px}
+.lf p{font-size:13px;color:var(--muted);margin-bottom:12px}
+.watch{display:flex;align-items:center;justify-content:space-between;margin-top:16px;font:500 14px var(--fh)}
+.meta{color:var(--muted);font-size:13px;margin-top:8px}
+.who{margin-top:22px}
+.lanes{margin:12px 0 14px;display:grid;row-gap:3px}.ln{position:relative;height:5px;background:color-mix(in srgb,var(--line) 45%,transparent)}.ln i{position:absolute;top:0;height:5px}
+
+.y{background:var(--voice)}.s{background:#6e79a7;color:#fafaf7}.t3{background:#596287;color:#fafaf7}.t4{background:#474e6b;color:#fafaf7}
+.leg{display:flex;gap:22px}.leg div{display:flex;align-items:center;gap:8px}
+.leg b{font:600 14px var(--fh)}.leg span{font-size:13px;color:var(--muted)}
+.leg .disc{width:28px;height:28px}
+.sug{display:flex;align-items:center;gap:14px;margin:18px 0 6px;padding:12px 0;border-top:var(--hair);font-size:14px}
+.sug .btn{height:30px;font-size:13px}.sug .btn.text{font-size:13.5px}
+.tr{--gut:76px;row-gap:14px;margin-top:8px;align-items:start}
+.tr .g{display:flex;align-items:center;gap:6px;padding-top:1px}
+.tr .g .disc{width:24px;height:24px;font-size:11px}
+.tr .g span{font-size:12px;color:var(--muted)}
+.tr b{display:block;font:600 14px/1.3 var(--fh)}.tr p{font-size:15px;line-height:1.55}
+
+</style></head><body>
+<div class="win"><aside class="side"><div class="brand"><svg class="mark" viewBox="0 0 26 26" fill="none"><circle cx="7" cy="13" r="6" fill="var(--voice)"/><path d="M15 6.5a9 9 0 0 1 0 13M19.5 3a13.5 13.5 0 0 1 0 20" stroke="var(--ink)" stroke-width="2.4" stroke-linecap="round"/></svg> Youch!</div><div class="nav">History</div><div class="nav">Dictionary</div><div class="nav">Insights</div><div class="nav on">Recordings</div><div class="nav">Settings</div><div class="hold">Hold <kbd>⌘</kbd> to talk<small>Right Command. Let go and it pastes where you're typing.</small></div></aside><div class="page" style="grid-template-rows:auto minmax(0,1fr)"><div class="top"><h1>Recordings</h1><span class="sub">Meetings and interviews, transcribed on this Mac</span></div><div class="panes"><section class="list">
+<div class="label day">Today</div>
+<div class="row"><b>Customer call, Northwind</b><time>7:53 PM</time><p>Transcribing, 64%</p><span class="prog"><u></u></span></div>
+<div class="row on"><b>Weekly sync, launch week</b><time>5:05 PM</time><p>38:00 · 4 speakers</p></div>
+<div class="label day">Yesterday</div>
+<div class="row"><b>Interview, Priya Raman</b><time>4:10 PM</time><p>52:00 · 2 speakers</p></div>
+<div class="lf"><p>Drop a meeting or interview here. It never leaves this Mac.</p><span class="btn line">Choose file…</span><div class="watch"><span>Watch ~/Documents/Zoom</span><i class="sw"></i></div></div>
+</section><main class="reader">
+<div class="rh"><h2>Weekly sync, launch week</h2><div class="acts"><span class="btn text">Delete</span><span class="btn main">Export</span></div></div>
+<div class="meta">Today at 5:05 PM · 38:00 · 4 speakers · zoom_0.m4a</div>
+<div class="who"><div class="label">Who spoke</div><div class="lanes"><div class="ln"><i class="y" style="left:0.00%;width:6.00%"></i><i class="y" style="left:14.00%;width:4.00%"></i><i class="y" style="left:25.00%;width:5.00%"></i><i class="y" style="left:41.00%;width:8.00%"></i><i class="y" style="left:60.00%;width:7.00%"></i><i class="y" style="left:82.00%;width:7.00%"></i></div><div class="ln"><i class="s" style="left:6.00%;width:8.00%"></i><i class="s" style="left:30.00%;width:6.00%"></i><i class="s" style="left:49.00%;width:5.00%"></i><i class="s" style="left:73.00%;width:5.00%"></i><i class="s" style="left:89.00%;width:5.00%"></i></div><div class="ln"><i class="t3" style="left:18.00%;width:7.00%"></i><i class="t3" style="left:36.00%;width:5.00%"></i><i class="t3" style="left:67.00%;width:6.00%"></i><i class="t3" style="left:94.00%;width:6.00%"></i></div><div class="ln"><i class="t4" style="left:54.00%;width:6.00%"></i><i class="t4" style="left:78.00%;width:4.00%"></i></div></div>
+<div class="leg"><div><i class="disc y">Y</i><b>You</b><span>37%</span></div><div><i class="disc s">S</i><b>Sarah</b><span>29%</span></div><div><i class="disc t3">3</i><b>Speaker 3</b><span>24%</span></div><div><i class="disc t4">4</i><b>Speaker 4</b><span>10%</span></div></div></div>
+<div class="sug"><span>Speaker 3 sounds like Dev. Not set until you say so.</span><span class="btn line">Yes, it's Dev</span><span class="btn text">Name…</span></div>
+<div class="gut tr"><div class="g"><i class="disc y">Y</i><span>0:04</span></div><div><b>You</b><p>Thanks for joining. Let's start with the launch checklist.</p></div><div class="g"><i class="disc s">S</i><span>0:20</span></div><div><b>Sarah</b><p>The store listing is ready. I still need the final screenshots from design.</p></div><div class="g"><i class="disc y">Y</i><span>0:42</span></div><div><b>You</b><p>Dev, can you get those to her by Friday?</p></div><div class="g"><i class="disc t3">3</i><span>0:49</span></div><div><b>Speaker 3</b><p>Yes. I'll export them tonight and send the folder in the morning. One thing: the dark mode shots need a second pass.</p></div></div>
+</main></div></div></div>
+</body></html>

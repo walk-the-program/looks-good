@@ -1,0 +1,97 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>C Score · History</title>
+<link rel="stylesheet" href="/fonts/fonts.css">
+<style>
+/* Direction C, Score. Tokens from mocks/c-pack.md (bauhaus-poster + look-c): 2px ink line, square controls, circles only for voice. */
+:root{--canvas:#fafaf7;--plane:#f0f0ea;--ink:#101116;--on-ink:#fafaf7;--muted:#6e6e70;--line:#d7d7d5;--voice:#8290c7;--accent:#f6cf6b;--fh:"Space Grotesk",sans-serif;--fb:"Inter",sans-serif}
+@media (prefers-color-scheme:dark){:root{--canvas:#101116;--plane:#191a21;--ink:#f3f2ec;--on-ink:#101116;--muted:#9c9d9d;--line:#333438;--voice:#97a4da;--accent:#f2cc6a}}
+*{box-sizing:border-box;margin:0;padding:0}
+body{width:1180px;height:780px;background:var(--canvas);color:var(--ink);font:400 14px/1.45 var(--fb);display:grid;grid-template-columns:196px 1fr;overflow:hidden;font-variant-numeric:tabular-nums}
+.side{padding:48px 16px 16px;display:flex;flex-direction:column;gap:6px;border-right:2px solid var(--ink)}
+.brand{display:flex;align-items:center;gap:9px;font:600 21px/1 var(--fh);letter-spacing:-.03em;margin:0 0 28px 6px}
+.brand i{width:16px;height:16px;border-radius:50%;background:var(--voice)}
+.nav{height:38px;display:flex;align-items:center;padding:0 12px;font:500 15px var(--fh);border-radius:6px}
+.nav.on{background:var(--ink);color:var(--on-ink)}
+.hold{margin-top:auto;font:500 14px/1.35 var(--fh)}
+.hold kbd{display:inline-block;border:2px solid var(--ink);border-radius:6px;padding:0 6px;font:600 12px var(--fb)}
+.hold small{display:block;color:var(--muted);font:400 12.5px var(--fb);margin-top:6px}
+.wrap{display:grid;grid-template-rows:auto auto 1fr;min-height:0}
+.top{display:flex;align-items:flex-end;gap:16px;padding:36px 30px 0}
+h1{font:600 56px/.9 var(--fh);letter-spacing:-.045em}
+.top .sub{color:var(--muted);padding-bottom:4px}
+.seg{margin-left:auto;display:flex;border:2px solid var(--ink);border-radius:6px;overflow:hidden;font:500 13.5px var(--fh)}
+.seg span{padding:6px 12px}.seg .on{background:var(--ink);color:var(--on-ink)}
+.score{margin:22px 30px 0;padding:14px 0 12px;border-top:2px solid var(--ink);border-bottom:1px solid var(--line);display:flex;align-items:center;gap:0}
+.score .lbl{font:600 12px var(--fh);width:86px;flex:none}
+.score .lbl small{display:block;font:400 11.5px var(--fb);color:var(--muted)}
+.n{display:flex;align-items:center;margin-right:22px;position:relative}
+.n i{width:12px;height:12px;border-radius:50%;background:var(--voice);flex:none}
+.n u{height:3px;background:var(--ink);display:block}
+.n.on i{width:18px;height:18px;box-shadow:0 0 0 2px var(--canvas),0 0 0 4px var(--ink)}
+.n.on:after{content:"1:52 PM · 0:24";position:absolute;left:-4px;top:-22px;font:600 11.5px var(--fh);white-space:nowrap}
+.n.y i{opacity:.45}.n.y u{opacity:.35}
+.cols{display:grid;grid-template-columns:372px 1fr;min-height:0}
+.list{border-right:1px solid var(--line);padding:10px 0 0 30px;overflow:hidden}
+.day{font:600 12px var(--fh);color:var(--muted);margin:8px 0 2px}
+.row{padding:12px 16px 12px 12px;margin-left:-12px;border-radius:6px;display:grid;grid-template-columns:1fr auto;row-gap:3px}
+.row.on{background:var(--ink);color:var(--on-ink)}.row.on p,.row.on time{color:var(--on-ink);opacity:.75}.row.on u{background:var(--on-ink)}
+.row b{font:600 16px var(--fh);letter-spacing:-.01em}.row time{color:var(--muted);font-size:12.5px}
+.row p{grid-column:1/3;color:var(--muted);font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tl{grid-column:1/3;display:flex;align-items:center;gap:0;margin-top:5px}
+.tl i{width:8px;height:8px;border-radius:50%;background:var(--voice)}.tl u{height:2px;background:var(--ink);display:block}
+.tl em{font-style:normal;font-size:11.5px;margin-left:8px;opacity:.7}
+.reader{padding:18px 30px 0 30px;display:flex;flex-direction:column;min-height:0}
+.rh{display:flex;align-items:center;gap:12px}
+.rh h2{font:600 28px/1 var(--fh);letter-spacing:-.03em}.rh .m{color:var(--muted);font-size:13px}
+.acts{margin-left:auto;display:flex;gap:8px}
+.b1{height:36px;padding:0 14px;background:var(--ink);color:var(--on-ink);border-radius:6px;display:flex;align-items:center;gap:10px;font:600 14px var(--fh)}
+.b1 kbd{font:500 11.5px var(--fb);opacity:.65}
+.b2{height:36px;padding:0 12px;border:2px solid var(--ink);border-radius:6px;display:flex;align-items:center;font:500 13.5px var(--fh)}
+.kept{font:400 21px/1.5 var(--fb);letter-spacing:-.012em;margin-top:22px}
+.saidh{display:flex;gap:10px;align-items:baseline;margin:24px 0 8px;font:600 13px var(--fh)}
+.saidh span{font:400 12.5px var(--fb);color:var(--muted)}
+.said{font-size:15px;line-height:1.75;border-left:2px solid var(--ink);padding-left:16px}
+.said s{color:var(--muted)}.said mark{background:none;color:inherit;border-bottom:2px solid var(--voice)}
+.learn{display:flex;align-items:center;gap:8px;margin-top:16px;font-size:13.5px}
+.learn i{width:10px;height:10px;border-radius:50%;background:var(--accent)}.learn u{text-underline-offset:3px}
+.audio{margin-top:auto;padding:16px 0 22px;display:flex;align-items:center;gap:14px;border-top:1px solid var(--line)}
+.audio .p{width:36px;height:36px;border-radius:50%;background:var(--voice);display:grid;place-items:center}
+.audio .p:after{content:"";border-left:10px solid #101116;border-top:6px solid transparent;border-bottom:6px solid transparent;margin-left:3px}
+.audio .t{flex:1;height:3px;background:var(--line);position:relative}.audio .t:before{content:"";position:absolute;left:0;top:0;width:0;height:3px;background:var(--ink)}
+.audio time{font-size:12.5px;color:var(--muted)}
+</style></head><body>
+<aside class="side">
+  <div class="brand"><i></i>Youch!</div>
+  <div class="nav on">History</div><div class="nav">Dictionary</div><div class="nav">Insights</div><div class="nav">Recordings</div><div class="nav">Settings</div>
+  <div class="hold">Hold <kbd>⌘</kbd> to talk<small>Right Command. Let go to paste.</small></div>
+</aside>
+<div class="wrap">
+  <div class="top"><h1>History</h1><span class="sub">40 in the last 7 days</span><div class="seg"><span class="on">All</span><span>Claude</span><span>Notes</span><span>Mail</span><span>Slack</span></div></div>
+  <div class="score"><div class="lbl">Today<small>in order</small></div>
+    <span class="n"><i></i><u style="width:27px"></u></span>
+    <span class="n"><i></i><u style="width:21px"></u></span>
+    <span class="n"><i></i><u style="width:42px"></u></span>
+    <span class="n"><i></i><u style="width:15px"></u></span>
+    <span class="n"><i></i><u style="width:93px"></u></span>
+    <span class="n on"><i></i><u style="width:72px"></u></span>
+  </div>
+  <div class="cols">
+    <section class="list">
+      <div class="day">Today</div>
+      <div class="row on"><b>Claude</b><time>1:52 PM</time><p>Can you look at the Pramand proposal and tighten the second section?</p><span class="tl"><i></i><u style="width:72px"></u><em>0:24</em></span></div>
+      <div class="row"><b>Mail</b><time>11:05 AM</time><p>Hi Sarah, thanks for sending the Pramand brief over.</p><span class="tl"><i></i><u style="width:93px"></u><em>0:31</em></span></div>
+      <div class="row"><b>Slack</b><time>10:30 AM</time><p>Running about ten minutes late, grab a table without me.</p><span class="tl"><i></i><u style="width:15px"></u><em>0:05</em></span></div>
+      <div class="row"><b>Claude</b><time>9:41 AM</time><p>There are three things I need for the landing page.</p><span class="tl"><i></i><u style="width:42px"></u><em>0:14</em></span></div>
+      <div class="row"><b>Terminal</b><time>8:55 AM</time><p>Show me the last 20 commits that touched the audio folder.</p><span class="tl"><i></i><u style="width:21px"></u><em>0:07</em></span></div>
+    </section>
+    <main class="reader">
+      <div class="rh"><h2>Claude</h2><span class="m">1:52 PM · 25 words · Light</span><div class="acts"><span class="b2">Fix a word</span><span class="b1">Copy <kbd>⌘C</kbd></span></div></div>
+      <p class="kept">Can you look at the Pramand proposal and tighten the second section? Keep the pricing table as is, but the timeline should be six weeks.</p>
+      <div class="saidh">What you said <span>3 fillers removed · 1 spoken correction</span></div>
+      <p class="said"><s>um so</s> can you look at the <s>prominent</s> <mark>Pramand</mark> proposal and <s>like</s> tighten the second section keep the pricing table as is but the timeline should be <s>eight weeks oh actually</s> six weeks</p>
+      <div class="learn"><i></i>Learned: Preman → Pramand. <u>Undo</u></div>
+      <div class="audio"><span class="p"></span><span class="t"></span><time>0:00 / 0:24</time><span class="b2">Copy what you said</span></div>
+    </main>
+  </div>
+</div>
+</body></html>

@@ -1,0 +1,4 @@
+{ "app": "Youch!", "repo": "~/Desktop/Projects/TTS+", "brandName": "Youch!",
+  "style": "youch-voice-line", "blend": null, "primary": "#101116", "scheme": "analogous",
+  "colors": { "secondary": "#8290c7", "accent": "#f6cf6b", "neutralDark": "#101116", "neutralLight": "#fafaf7" },
+  "heading": "Outfit", "body": "Inter", "typography": null, "pureBg": false, "modes": ["light", "dark"] }

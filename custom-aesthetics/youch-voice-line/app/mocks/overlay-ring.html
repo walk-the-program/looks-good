@@ -1,0 +1,19 @@
+<!doctype html>
+<html data-ring="0.5"><head><meta charset="utf-8"><title>Overlay · ring</title>
+<style>
+/* The overlay, Voice Line: round means spoken. A round dark backing (not a pill), the clear periwinkle static,
+   and after release a cream line that closes around the voice as real progress (the icon's arc colour). */
+:root{--voice:#8290c7;--desk:#f2efe8;--edge:#0b0b0d;--back:rgba(16,17,22,.9);--line:#f7f6f2;--track:rgba(247,246,242,.16)}
+@media (prefers-color-scheme:dark){:root{--desk:#1d2330}}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{width:172px;height:112px;overflow:hidden}
+body{background:linear-gradient(90deg,var(--desk) calc(100% - 8px),var(--edge) calc(100% - 8px));position:relative}
+.o{position:absolute;right:20px;top:28px;width:56px;height:56px;border-radius:50%;background:var(--back);box-shadow:0 0 0 1px rgba(255,255,255,.08)}
+canvas{position:absolute;left:6px;top:6px;width:44px;height:44px;border-radius:50%}
+html[data-ring="0.5"] canvas{opacity:.42}
+svg{position:absolute;inset:0;width:56px;height:56px;transform:rotate(-90deg)}
+</style></head><body>
+<div class="o"><canvas id="v"></canvas>
+<svg viewBox="0 0 56 56" aria-hidden="true"><circle cx="28" cy="28" r="25" fill="none" stroke="var(--track)" stroke-width="2.5"/><circle id="r" cx="28" cy="28" r="25" fill="none" stroke="var(--line)" stroke-width="2.5" stroke-linecap="round"/></svg></div>
+<script src="overlay.js"></script>
+</body></html>
