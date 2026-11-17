@@ -62,6 +62,7 @@ industrial-device, blueprint.
 | 2026-11-14 | OpenText | "looks good but pick a different font", then Geist | Type is judged on its own; offer real alternatives. |
 | 2026-11-15 | Scent Box | r1: "even simpler, probably more bento box". r2: "really cheap and like not thought out at all" | Simpler means fewer, better ideas, never grey boxes; keep the scent colours. |
 | 2026-11-16 | Scent Box | On the r8 shelf (37 accord strips by house, huge name and numeral): "I like this, this is super cool bro"; signed off over the critic | The product's own data drawn big and structural is what lands; colour from content, none from the interface. |
+| 2026-11-16 | Youch! | On the Voice Line r8 board (ink for action, periwinkle only for voice, dot-and-line dictations, no cards): "obviously, keep the overlay in there, but I would switch to Voice Line for the product."; signed off over one open renderer-kit P2 | A semantic colour rule with the app's own data drawn as its signature beat a look he was already happy with; leave a loved signature piece (the overlay) alone. |
 
 ## 5. Adding to this file
 
