@@ -160,5 +160,5 @@ None: the renderer draws every idea. -->
 | The dictation key as keycaps with legends, Cleanup and Rewording as stop tracks | the renderer draws segmented text controls | mocks/settings.html |
 | Welcome as a flush-left poster with the brand mark at scale and the keyboard row, the hold key filled in ink with a voice dot | the renderer centres a phone-like column and has no keycap | mocks/welcome.html |
 | Try it with the focused practice box and the download line in the footer | the renderer has no onboarding footer bar | mocks/try-it.html |
-| The listening overlay: a round dark backing with the clear periwinkle static | the overlay is not a window the renderer draws | mocks/overlay-pill.html |
-| The finishing overlay: the static held still and a cream ring closing around it with real progress | same | mocks/overlay-ring.html |
+| The listening overlay: a round dark backing with the clear periwinkle static. Not adopted: the owner keeps today's overlay (2026-11-16) | the overlay is not a window the renderer draws | mocks/overlay-pill.html |
+| The finishing overlay: the static held still and a cream ring closing around it with real progress. Not adopted: the owner keeps today's listening pill and progress ring (D-025, D-028, D-035) | same | mocks/overlay-ring.html |

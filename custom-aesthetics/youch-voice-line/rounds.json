@@ -480,7 +480,21 @@
      "verdict": "keep"
     }
    ],
-   "notes": [],
+   "notes": [
+    {
+     "id": "n37",
+     "target": "general",
+     "text": "Owner sign-off on round 8 over the critic's open P2 (app/reviews/owner-r8.json), 2026-11-16, after seeing the comparison board in the app repo (design/directions/ui5/): \"obviously, keep the overlay in there, but I would switch to Voice Line for the product.\" Confirmed by the owner in this session. Scope: every app screen takes Voice Line; the overlay (listening pill, progress ring) stays as it is today, so mocks/overlay-pill.html and overlay-ring.html are not adopted.",
+     "status": "done",
+     "doneIn": 8
+    },
+    {
+     "id": "n38",
+     "target": "kit.field",
+     "text": "r8 f1 (P2, carried into the build pack): in the Looks Good renderer's kit, dark field focus is a 1px #858687 line beside a ~#5C5D5E rest line. The app's own CSS draws fields, so the build should give focus a 2px cream #FAFAF7 border (2px ink in light) with the ~3:1 rest hairline.",
+     "status": "open"
+    }
+   ],
    "shots": "shots/r8/"
   }
  ]
