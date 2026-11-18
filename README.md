@@ -30,6 +30,62 @@ python3 -m http.server 8080   # or: python -m http.server 8080
 
 `./start.sh` does the same on Mac and Linux, and picks a free port if 8765 is busy.
 
+## Design an app's look with an AI agent
+
+Looks Good can design a one-off look for an app you're building, working through Claude Code. The agent isn't allowed to jump straight to a style. It has to write down how the product should look and why, try three different directions, and get its screens past a separate reviewer agent before Looks Good will hand anything to your app.
+
+### Set up once
+
+1. Get the folder: clone this repo, or download the ZIP and unzip it. The agent looks for it at `~/Desktop/Looks Good` first. If you keep it somewhere else, set `LOOKS_GOOD_DIR` to its path, or tell the agent where it is when it asks.
+2. Install Node.js 18 or later, then the headless browser Looks Good renders screens with:
+   ```bash
+   npm install -g @playwright/cli
+   playwright-cli install-browser chromium
+   ```
+3. Install the skill that lets Claude Code use Looks Good from any project:
+   ```bash
+   mkdir -p ~/.claude/skills && cp -R skills/looks-good ~/.claude/skills/
+   ```
+   On Windows, in PowerShell: `Copy-Item -Recurse skills\looks-good $HOME\.claude\skills\`
+4. Check it works: from the Looks Good folder, `node dev/lg.js styles` should list the styles.
+
+When you update Looks Good, copy the skill again.
+
+### Use it
+
+Open Claude Code in your app's repo and say **"Design the look for this app in Looks Good."** The agent reads whatever describes the product, so a short product doc helps (it looks for `docs/product/one-pager.md` first): who the app is for, its main screens, and the feel you want.
+
+From there the agent works on its own:
+
+1. **Direction.** It writes `app/direction.md`: who uses the app and when, what the data really is, a one-line thesis, a signature moment, three directions that differ, and the full design system.
+2. **Round 1.** It renders the three directions, and a reviewer agent picks the strongest.
+3. **The style.** It builds the style in `custom-aesthetics/<key>/`.
+4. **Reviewed rounds.** A fresh reviewer scores each round on ten criteria, from the thesis to the craft. The agent keeps going for at least three rounds, until every criterion scores 4 out of 5 or better.
+5. **You.** You see the round that passes. React in plain words ("too busy", "try B instead") and your notes start the next round. When you're happy, say so: your exact words can sign off a round the reviewer hasn't passed.
+6. **Build pack.** Looks Good exports the build pack, and the agent copies it into your app's `design/` folder and builds from it.
+
+Expect it to take a while. Three rounds is the minimum, and a hard app can take eight.
+
+### What the gates enforce
+
+| Command | Refuses until |
+| --- | --- |
+| `node dev/lg.js screens` | The direction is written. From round 2 on, the last round has a review. |
+| `node dev/lg.js pack` | The whole direction is written, there are at least three reviewed rounds, and the latest review passes (or you signed it off). |
+
+`node dev/lg.js direction custom-aesthetics/<key>` shows what's missing at any point.
+
+### Where things end up
+
+- **In Looks Good:** `custom-aesthetics/<key>/` holds the style, the direction, every round's screens and every review. The style shows up in Looks Good's style lists marked "Built for" your app.
+- **In your app's repo:** `design/looks-good-build-pack.md` (colours, type, components and the direction), `design/looks-good-mocks/` (HTML mocks of the key screens), and `design/looks-good.json`, which points back to the style folder so an agent can pick up where the last one stopped.
+
+### Whose taste the reviewer uses
+
+Besides its rubric, the reviewer checks the work against a taste log, `.claude/skills/ui-direction/references/owner-taste.md`. It ships with the likes, dislikes and reactions of the person who maintains this repo. If you're designing for yourself, rewrite it with your own; the agent adds your reactions to it after each round you respond to.
+
+The agent tools are tested on macOS. They are written to run on Windows too, but nobody has tried them there yet.
+
 ## License
 
 MIT, see [LICENSE](LICENSE). The bundled fonts and libraries keep their own licenses, listed under Credits.

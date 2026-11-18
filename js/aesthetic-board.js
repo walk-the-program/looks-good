@@ -1165,12 +1165,13 @@ function buildAestheticList() {
   const list = document.getElementById('aeList');
   if (!list) return;
   const styleTiles = aeFamily === 'combos' ? [] : visibleAesthetics();
+  const forApp = def => { const a = window.CustomAesthetics && CustomAesthetics.madeFor ? CustomAesthetics.madeFor(def.key) : null; return a ? `<span class="gal-desc">Built for ${escapeHtml(a)}</span>` : ''; };
   list.innerHTML = styleTiles.map(def => `
     <div class="gal-tile" role="button" tabindex="-1" data-key="${def.key}" aria-pressed="false"
          aria-label="${escapeHtml(def.name)}: ${escapeHtml(def.descriptor)}" title="${escapeHtml(def.summary || def.name)}"
          data-search="${escapeHtml(`${def.name} ${def.descriptor} ${def.influences || ''} ${def.summary || ''}`.toLowerCase())}">
       <div class="gal-frame"><div class="gal-board" inert></div></div>
-      <div class="gal-meta"><span class="gal-num">${aestheticNumber(def.key)}</span><span class="gal-name">${escapeHtml(def.name)}</span><span class="gal-badge">Current</span><span class="gal-desc">${escapeHtml(def.descriptor)}</span></div>
+      <div class="gal-meta"><span class="gal-num">${aestheticNumber(def.key)}</span><span class="gal-name">${escapeHtml(def.name)}</span><span class="gal-badge">Current</span><span class="gal-desc">${escapeHtml(def.descriptor)}</span>${forApp(def)}</div>
     </div>`).join('') + aeComboTilesHtml();
   if (window.StyleGallery && typeof StyleGallery.listBuilt === 'function') StyleGallery.listBuilt();
 }

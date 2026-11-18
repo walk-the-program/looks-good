@@ -1145,11 +1145,12 @@ function blendOptionsHtml() {
     .filter(a => !q || `${a.name} ${a.descriptor} ${a.influences || ''}`.toLowerCase().includes(q));
   const none = !q ? `<button type="button" class="blend-opt blend-none" data-key="" aria-pressed="${!cur}"><span class="ae-name">None</span><span class="ae-desc">${escapeHtml(aestheticByKey(state.aesthetic).name)} on its own</span></button>` : '';
   if (!opts.length) return none + '<p class="blend-empty">No aesthetic matches.</p>';
+  const forApp = a => { const n = window.CustomAesthetics && CustomAesthetics.madeFor ? CustomAesthetics.madeFor(a.key) : null; return n ? ` · Built for ${escapeHtml(n)}` : ''; };
   return none + opts.map(a => `<button type="button" class="ae-tile blend-opt" data-key="${a.key}" aria-pressed="${!!cur && cur.with === a.key}">
       <span class="ae-motif" data-motif="${a.key}" aria-hidden="true"></span>
       <span class="ae-num">${aestheticNumber(a.key)}</span>
       <span class="ae-name">${escapeHtml(a.name)}</span>
-      <span class="ae-desc">${escapeHtml(a.descriptor)}</span>
+      <span class="ae-desc">${escapeHtml(a.descriptor)}${forApp(a)}</span>
     </button>`).join('');
 }
 

@@ -6,6 +6,7 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const cp = require('child_process');
+const { playwrightCommand } = require('./util');
 
 function run(cmd, args, cwd, timeout) {
   return new Promise(resolve => {
@@ -25,7 +26,7 @@ async function openSession(url) {
   const work = fs.mkdtempSync(path.join(os.tmpdir(), 'lg-cli-'));
   const cfg = path.join(work, 'cfg.json');
   fs.writeFileSync(cfg, JSON.stringify({ browser: { browserName: 'chromium', launchOptions: { headless: true }, contextOptions: { deviceScaleFactor: 2, viewport: { width: 1440, height: 1000 } } } }));
-  const pw = (...args) => run('playwright-cli', ['-s=' + name, ...args], work, 180000);
+  const pw = (...args) => run(playwrightCommand()[0], [...playwrightCommand()[1], '-s=' + name, ...args], work, 180000);
   let closed = false;
   const s = {
     pw,

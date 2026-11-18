@@ -1,0 +1,93 @@
+{
+ "rounds": [
+  {
+   "n": 1,
+   "date": "2026-11-15",
+   "by": "agent",
+   "summary": "First pass of Scent Box Clean on Collection, Fragrance detail and Add fragrance (Mac-sized 1280x800 windows) plus Collection on iPhone 390x844, light and dark. Renders are in app/renders/r1/.",
+   "changes": [
+    "Resting surfaces are open warm-white paper with a 1px hairline and no shadow; fields are underlined, rows are divided by hairlines.",
+    "The main action is a flat ink fill; chosen tabs, segments and chips fill ink; no other fill is used on the interface.",
+    "One sans (DM Sans) at regular and medium weight for everything.",
+    "Palette is ink and paper with a single muted brass accent so scent colours stay the only strong colour (sheet blocks cannot draw them yet).",
+    "Desktop sheet trimmed after the first render: filters merged into one line, accords cut to three, actions unpinned so they no longer cover content."
+   ],
+   "variants": [
+    {
+     "id": "r1a",
+     "change": "material: open hairline paper with ink-fill selection",
+     "verdict": "keep"
+    }
+   ],
+   "notes": [
+    {
+     "id": "n1",
+     "target": "general",
+     "text": "Product-sheet blocks cannot draw bottle tints, accord chips or a card grid, so the scent colour that this style depends on is absent from every render; judge the look from the build pack plus the owner's web page.",
+     "status": "open"
+    },
+    {
+     "id": "n2",
+     "target": "kit.segmented",
+     "text": "The chosen segment is a heavy ink fill; consider an ink underline instead so it reads quieter.",
+     "status": "done",
+     "doneIn": 2
+    },
+    {
+     "id": "n3",
+     "target": "general",
+     "text": "iPhone pinned Add fragrance bar covers the Memories of Japan sampler rows; unpin or shorten the sheet.",
+     "status": "done",
+     "doneIn": 2
+    },
+    {
+     "id": "n4",
+     "target": "general",
+     "text": "Platform is one per sheet, so the desktop screens are Mac windows with a title bar and the iPhone screen is rendered from product-sheet-phone.md and merged into r1 by hand.",
+     "status": "open"
+    }
+   ],
+   "shots": "shots/r1/"
+  },
+  {
+   "n": 2,
+   "date": "2026-11-15",
+   "by": "agent",
+   "summary": "Owner note on r1: \"even simpler, probably more bento box\". Moved from hairline paper to soft-tint tiles in a grid on a quiet ground. Renders are in app/renders/r2/ (Collection, Fragrance detail, Add fragrance as Mac windows; Collection on iPhone).",
+   "changes": [
+    "Cards, stat tiles, fragrance tiles and fields are flat soft-tint tiles (dark: a lighter warm grey) with an 18px radius, no border, rule or shadow; controls are pills.",
+    "Fragrance tiles and the Memories of Japan sampler are drawn as a 2-column stat grid (house small, name, stars); stats are a single row of three tiles.",
+    "Removed section eyebrow labels on tabs and stats, chevrons and ruled lists; filters collapse to one quiet Filter link.",
+    "Chosen tab or segment is a soft tint pill with ink text, not a black block (pair-colour-tints added so the tint shows).",
+    "Primary action sits above the fold, so it no longer reads grey under the fold veil; iPhone has no pinned bar, Add is a header-style link."
+   ],
+   "variants": [
+    {
+     "id": "r2a",
+     "change": "material: ruled hairline paper to soft-tint tiles (bento)",
+     "verdict": "keep"
+    },
+    {
+     "id": "r2b",
+     "change": "selected state: solid ink fill killed, tint pill kept",
+     "verdict": "keep"
+    }
+   ],
+   "notes": [
+    {
+     "id": "n5",
+     "target": "general",
+     "text": "Houses (18) is folded into the Filter link, not a fourth stat tile: the sheet stats grid cannot do four in one row without a 3+1 wrap. The fragrance tiles also cannot show format or accords or bottle tints.",
+     "status": "open"
+    },
+    {
+     "id": "n6",
+     "target": "kit.segmented",
+     "text": "Dark mode chosen pill is faint (warm dark tint on near-black); bold white text carries it.",
+     "status": "open"
+    }
+   ],
+   "shots": "shots/r2/"
+  }
+ ]
+}

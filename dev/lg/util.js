@@ -110,4 +110,27 @@ function nextRound(renders) {
   return n + 1;
 }
 
-module.exports = { ROOT, CUSTOM_DIR, Fail, fail, parseArgs, closeMatches, didYouMean, readLook, checkLook, checkStyle, resolveTarget, nextRound, PINNED, HEX, COLOR_KEYS };
+/* How to start playwright-cli: [command, argsPrefix]. Unix: the command itself. Windows (or LG_PW_NODE=1): the npm
+   global install is a .cmd shim Node cannot spawn without a shell, so run its JS entry with this Node instead. */
+let pwCache = null;
+function playwrightCommand() {
+  if (pwCache) return pwCache;
+  pwCache = ['playwright-cli', []];
+  if (process.platform === 'win32' || process.env.LG_PW_NODE === '1') {
+    try {
+      const r = require('child_process').spawnSync('npm root -g', { shell: true, encoding: 'utf8' });
+      const root = (r.stdout || '').trim().split(/\r?\n/).pop();
+      if (root) {
+        const dir = require('path').join(root, '@playwright', 'cli');
+        const bin = JSON.parse(require('fs').readFileSync(require('path').join(dir, 'package.json'), 'utf8')).bin;
+        const rel = typeof bin === 'string' ? bin : bin && bin['playwright-cli'];
+        const file = rel && require('path').resolve(dir, rel);
+        if (file && require('fs').existsSync(file)) pwCache = [process.execPath, [file]];
+      }
+    } catch (e) { /* fall back to the plain command; the caller reports the spawn error */ }
+  }
+  if (process.env.LG_DEBUG) process.stderr.write('lg: playwright-cli via ' + JSON.stringify(pwCache) + '\n');
+  return pwCache;
+}
+
+module.exports = { playwrightCommand, ROOT, CUSTOM_DIR, Fail, fail, parseArgs, closeMatches, didYouMean, readLook, checkLook, checkStyle, resolveTarget, nextRound, PINNED, HEX, COLOR_KEYS };

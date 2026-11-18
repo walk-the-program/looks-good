@@ -1,0 +1,4 @@
+{ "app": "Scent Box", "repo": null, "brandName": "Scent Box",
+  "style": "scent-box-clean", "blend": null, "primary": "#2f2b27", "scheme": "analogous",
+  "colors": { "primary": "#2f2b27", "secondary": "#ece7de", "accent": "#9a7b4f", "neutralDark": "#161412", "neutralLight": "#fbfaf7" },
+  "heading": "DM Sans", "body": "DM Sans", "typography": null, "pureBg": false, "modes": ["light", "dark"] }

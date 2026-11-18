@@ -131,9 +131,11 @@ const StylesHome = (function () {
   function tileHtml(d) {
     const yours = isYours(d.key), folder = srcOf(d.key) === 'folder';
     const tagShown = yours ? `<span class="st-tag" title="${folder ? 'Folder style: lives in custom-aesthetics/' + esc(d.key) + '/' : 'Your style'}">Yours</span>` : '';
+    const app = hasCustom() ? CustomAesthetics.madeFor(d.key) : null;
+    const forShown = app ? `<span class="st-desc">Built for ${esc(app)}</span>` : '';
     return `<button type="button" class="st-card" data-key="${esc(d.key)}" aria-label="${esc(d.name)}: ${esc(d.descriptor || '')}" title="${esc(d.summary || d.name)}">
       <span class="st-frame"><span class="st-board" inert></span></span>
-      <span class="st-meta"><span class="st-num">${esc(aestheticNumber(d.key))}</span><span class="st-name">${esc(d.name)}</span>${tagShown}<span class="st-desc">${esc(d.descriptor || '')}</span></span>
+      <span class="st-meta"><span class="st-num">${esc(aestheticNumber(d.key))}</span><span class="st-name">${esc(d.name)}</span>${tagShown}<span class="st-desc">${esc(d.descriptor || '')}</span>${forShown}</span>
     </button>`;
   }
 
@@ -470,6 +472,7 @@ const StylesHome = (function () {
       <dl class="st-dl">
         ${row('Core trick', d.coreTrick)}
         ${row('Influences', d.influences)}
+        ${row('Built for', hasCustom() ? CustomAesthetics.madeFor(openKey) : '')}
         ${row('Family', fam)}
         ${row('Looks best', d.mode === 'dark' ? 'Dark' : d.mode === 'light' ? 'Light' : '')}
       </dl>`;

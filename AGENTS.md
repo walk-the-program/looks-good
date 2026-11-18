@@ -79,6 +79,7 @@ Steps:
      "colors": { "secondary": "#dde1f2", "accent": "#f6cf6b", "neutralDark": "#101116", "neutralLight": "#fafaf7" },
      "heading": "Manrope", "body": "Inter", "typography": null, "pureBg": false, "modes": ["light", "dark"] }
    ```
+   `app` is the name Looks Good shows on the style, as "Built for Youch!", wherever styles are listed.
    `colors` is optional and partial: any of `primary, secondary, accent, neutralDark, neutralLight`
    (`#rrggbb`) overrides the palette derived from `primary` + `scheme`. Take them from the app's
    `design/brand.json`. `pureBg: true` uses pure white / black grounds. Check with `palette --look`.

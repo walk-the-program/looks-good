@@ -11,7 +11,7 @@ const list = (title, items, pad) => items && items.length ? `${title}\n${items.m
 
 function styles(rows) {
   const w = Math.max(...rows.map(r => r.key.length));
-  return rows.map(r => `${r.key.padEnd(w)}  ${r.name} - ${r.descriptor}  [${[r.family, r.mode, r.origin].filter(Boolean).join(', ')}]`).join('\n') + `\n${rows.length} styles (${rows.filter(r => r.origin === 'custom').length} custom). Details: node dev/lg.js style <key>`;
+  return rows.map(r => `${r.key.padEnd(w)}  ${r.name} - ${r.descriptor}  [${[r.family, r.mode, r.origin].filter(Boolean).join(', ')}]${r.madeFor ? ' built for ' + r.madeFor : ''}`).join('\n') + `\n${rows.length} styles (${rows.filter(r => r.origin === 'custom').length} custom). Details: node dev/lg.js style <key>`;
 }
 
 function style(s) {

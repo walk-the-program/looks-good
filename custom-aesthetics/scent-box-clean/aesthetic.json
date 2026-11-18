@@ -1,0 +1,1017 @@
+{
+ "spec": 2,
+ "key": "scent-box-clean",
+ "order": 970,
+ "name": "Scent Box Clean",
+ "descriptor": "Quiet · Tiled · Soft",
+ "influences": "Muji and Aesop shop shelves / printed perfume-house swatch cards / Apple Notes and Things / Swiss price lists",
+ "summary": "Soft warm-grey tiles in an even bento grid on a quiet ground, with nothing ruled or shadowed, so scent colour is the only colour.",
+ "coreTrick": "Every container is a flat, soft-tint tile of one radius sitting in a grid of equal gutters on a quiet warm-white ground, with no border, rule or shadow, and a chosen thing is marked by a tint pill with ink text, so the only saturated colour is the scent data.",
+ "motto": "Let the scent be the colour.",
+ "kicker": "A quiet shelf",
+ "mode": "light",
+ "lineage": {
+  "forkedFrom": null,
+  "version": 1
+ },
+ "meta": {
+  "family": "print",
+  "fonts": {
+   "heading": {
+    "classes": [
+     "geometric",
+     "neo-grotesk"
+    ],
+    "picks": [
+     "DM Sans",
+     "Figtree"
+    ]
+   },
+   "body": {
+    "classes": [
+     "geometric",
+     "neo-grotesk"
+    ],
+    "picks": [
+     "DM Sans",
+     "Figtree"
+    ]
+   },
+   "mono": {
+    "picks": [
+     "JetBrains Mono",
+     "IBM Plex Mono"
+    ]
+   },
+   "avoid": [
+    "script",
+    "groovy",
+    "blackletter",
+    "deco",
+    "pixel",
+    "heavy",
+    "woodtype"
+   ],
+   "why": "One calm sans at regular and medium weights keeps names, sizes and notes even, so the scent colours are the only loud thing on the page.",
+   "pairings": [
+    [
+     "DM Sans",
+     "DM Sans"
+    ],
+    [
+     "Figtree",
+     "Figtree"
+    ]
+   ]
+  }
+ },
+ "build": {
+  "cls": "flat",
+  "surface": "Flat tiles a step off the warm-white ground, one radius (18px cards, pills for controls), equal gutters, no border, rule, shadow or gradient. Fields are the same tile. Chosen tabs and segments are a tint pill with ink text; only the main action is ink-filled.",
+  "press": {
+   "dx": 0,
+   "dy": 0,
+   "ms": 120
+  },
+  "motion": {
+   "fast": 100,
+   "base": 160,
+   "slow": 240,
+   "ease": "out"
+  },
+  "pressText": "Rest is flat. Hover deepens the tile tint one step. Pressed drops opacity to 85% over 120 ms with no movement. Focus is a 2px ink outline 2px off the edge. Disabled text goes muted.",
+  "icons": "1.5px strokes, round caps, 20px; the selected icon is ink with a 1px rule beneath.",
+  "appIcon": "A warm-white rounded tile with one thin ink outline of a bottle and a single tinted drop."
+ },
+ "labels": {
+  "material": "Soft tile",
+  "states": [
+   "Rest",
+   "Chosen",
+   "Pressed"
+  ],
+  "statesKind": "chip"
+ },
+ "copy": {
+  "motto": {
+   "label": "Motto",
+   "text": "Let the scent be the colour."
+  },
+  "kicker": {
+   "label": "Kicker above the headline",
+   "text": "A quiet shelf"
+  }
+ },
+ "layout": {
+  "hero": "split",
+  "palette": "swatches",
+  "sections": "two-col"
+ },
+ "type": {
+  "ui": "sans",
+  "label": "sans",
+  "display": 1
+ },
+ "roles": {
+  "canvas": {
+   "use": "Page ground, a warm white in light and a warm near-black in dark; never pure",
+   "never": "Text",
+   "coverage": "70-80%"
+  },
+  "ink": {
+   "use": "Names, body text, hairlines on hover, the one filled action",
+   "never": "Large background fields in light mode",
+   "coverage": "10-15%"
+  },
+  "primary": {
+   "use": "The one main action and the chosen mark; kept close to ink so it never competes with scent colours",
+   "never": "Card fills, body text, accord chips",
+   "coverage": "about 5%"
+  },
+  "secondary": {
+   "use": "Quiet wash for the chosen row and badges",
+   "never": "Main action, body text",
+   "coverage": "5-10%"
+  },
+  "accent": {
+   "use": "One small brass mark per view: a rating star or a new badge",
+   "never": "Buttons, borders, fills, body text",
+   "coverage": "2% or less"
+  }
+ },
+ "rules": {
+  "do": [
+   "Put every group in a flat soft-tint tile of one radius, with equal gutters between tiles, on a warm-white ground.",
+   "Mix tile sizes in a grid: one wide tile for title, tabs and search, small tiles for numbers, medium tiles for items.",
+   "Let scent colour (bottle tints, accord chips) be the only strong colour on screen.",
+   "Mark the chosen tab or segment with a tint pill and ink text; keep the one ink-filled action per view.",
+   "Drop eyebrow labels where the tile already says what it is; fewer words, fewer visible controls.",
+   "Set everything in one sans at regular and medium weight; numbers in tabular figures."
+  ],
+  "dont": [
+   "Use hairline rules between rows, chevrons on tiles, or borders around tiles.",
+   "Use gradients, textures, glass blur or shadows on any surface (bottle tints excepted).",
+   "Colour the interface itself: tiles, tabs and buttons stay ink and warm grey.",
+   "Fill a selected tab or segment with solid black.",
+   "Pin a bar over content; keep Add in the header or a small round plus.",
+   "Use a serif or a second font family, or add dashboard widgets and charts."
+  ]
+ },
+ "highlight": "ink",
+ "slideShape": "minimal",
+ "colour": [
+  {
+   "move": "canvas-ink-pull",
+   "params": {
+    "light": 0.02,
+    "dark": 0.04
+   }
+  },
+  {
+   "move": "paper-edge",
+   "params": {
+    "amount": 0.22
+   }
+  },
+  {
+   "move": "muted-contrast-floor",
+   "params": {
+    "min": 5.2
+   }
+  },
+  {
+   "move": "state-colour-derivation",
+   "params": {
+    "pressMix": 0.85,
+    "hoverMix": 0.92
+   }
+  },
+  {
+   "move": "pair-colour-tints",
+   "params": {
+    "tint": {
+     "light": 0.16,
+     "dark": 0.5
+    },
+    "liftTo": 5
+   }
+  }
+ ],
+ "moves": [
+  {
+   "move": "corner-radius",
+   "params": {
+    "base": 12,
+    "controls": 1,
+    "surfaces": 1.5,
+    "small": 0.75,
+    "pill": true,
+    "round": true
+   }
+  },
+  {
+   "move": "hairline-rule",
+   "params": {
+    "width": 1,
+    "colour": "line"
+   }
+  },
+  {
+   "move": "interface-sans",
+   "params": {}
+  },
+  {
+   "move": "display-weight",
+   "params": {
+    "headline": 500,
+    "brand": 500,
+    "cardTitle": 500,
+    "wordSpacing": 0
+   }
+  },
+  {
+   "move": "tight-display-tracking",
+   "params": {
+    "tracking": -0.015,
+    "leading": 1.1
+   }
+  },
+  {
+   "move": "tracked-micro-labels",
+   "params": {
+    "tag": 0.06,
+    "kicker": 0.1,
+    "foot": 0
+   }
+  },
+  {
+   "move": "focus-ring",
+   "params": {
+    "look": "outline",
+    "reach": "all-controls",
+    "width": 2,
+    "offset": 2,
+    "colour": "ink"
+   }
+  }
+ ],
+ "kit": {
+  "button-primary": {
+   "material": "flat-fill",
+   "state": [
+    "press-darken",
+    "focus-outline",
+    "disabled-hatch"
+   ],
+   "params": {
+    "flat-fill": {
+     "fill": "ink"
+    }
+   }
+  },
+  "button-split": {
+   "material": "flat-fill",
+   "state": [
+    "press-darken",
+    "focus-outline",
+    "disabled-hatch"
+   ],
+   "params": {
+    "flat-fill": {
+     "fill": "ink"
+    }
+   }
+  },
+  "button-fab": {
+   "material": "flat-fill",
+   "state": [
+    "press-darken",
+    "focus-outline",
+    "disabled-hatch"
+   ],
+   "params": {
+    "flat-fill": {
+     "fill": "ink"
+    }
+   }
+  },
+  "button-secondary": {
+   "material": "outlined",
+   "state": [
+    "press-darken",
+    "focus-outline"
+   ],
+   "params": {
+    "outlined": {
+     "width": 1,
+     "colour": "line",
+     "fill": "transparent"
+    }
+   }
+  },
+  "button-icon": {
+   "material": "outlined",
+   "state": [
+    "press-darken",
+    "focus-outline"
+   ],
+   "params": {
+    "outlined": {
+     "width": 1,
+     "colour": "line",
+     "fill": "transparent"
+    }
+   }
+  },
+  "button-back-top": {
+   "material": "outlined",
+   "state": [
+    "press-darken",
+    "focus-outline"
+   ],
+   "params": {
+    "outlined": {
+     "width": 1,
+     "colour": "line",
+     "fill": "transparent"
+    }
+   }
+  },
+  "button-danger": {
+   "material": "outlined",
+   "state": [
+    "press-darken",
+    "focus-outline"
+   ],
+   "params": {
+    "outlined": {
+     "width": {
+      "light": 1,
+      "dark": 1.5
+     },
+     "colour": "ink",
+     "fill": "transparent"
+    }
+   }
+  },
+  "button-ghost": {
+   "material": "quiet-text",
+   "state": [
+    "press-darken"
+   ],
+   "params": {
+    "quiet-text": {
+     "size": 14,
+     "tracking": 0
+    }
+   }
+  },
+  "link": {
+   "material": "quiet-text",
+   "state": [
+    "press-darken"
+   ],
+   "params": {
+    "quiet-text": {
+     "size": 14,
+     "tracking": 0
+    }
+   }
+  },
+  "topbar-title": {
+   "material": "quiet-text",
+   "state": [
+    "press-darken"
+   ],
+   "params": {
+    "quiet-text": {
+     "size": 14,
+     "tracking": 0
+    }
+   }
+  },
+  "section-label": {
+   "material": "quiet-text",
+   "state": [
+    "press-darken"
+   ],
+   "params": {
+    "quiet-text": {
+     "size": 14,
+     "tracking": 0
+    }
+   }
+  },
+  "breadcrumbs": {
+   "material": "quiet-text",
+   "params": {
+    "quiet-text": {
+     "size": 13,
+     "tracking": 0
+    }
+   }
+  },
+  "anchor-nav": {
+   "material": "quiet-text",
+   "params": {
+    "quiet-text": {
+     "size": 13,
+     "tracking": 0
+    }
+   }
+  },
+  "field": {
+   "material": "flat-fill",
+   "state": "focus-outline",
+   "params": {
+    "flat-fill": {
+     "fill": {
+      "light": "tint",
+      "dark": "line"
+     }
+    }
+   }
+  },
+  "select": {
+   "material": "flat-fill",
+   "state": "focus-outline",
+   "params": {
+    "flat-fill": {
+     "fill": {
+      "light": "tint",
+      "dark": "line"
+     }
+    }
+   }
+  },
+  "date-field": {
+   "material": "flat-fill",
+   "state": "focus-outline",
+   "params": {
+    "flat-fill": {
+     "fill": {
+      "light": "tint",
+      "dark": "line"
+     }
+    }
+   }
+  },
+  "combo": {
+   "material": "flat-fill",
+   "state": "focus-outline",
+   "params": {
+    "flat-fill": {
+     "fill": {
+      "light": "tint",
+      "dark": "line"
+     }
+    }
+   }
+  },
+  "stepper": {
+   "material": "flat-fill",
+   "state": "focus-outline",
+   "params": {
+    "flat-fill": {
+     "fill": {
+      "light": "tint",
+      "dark": "line"
+     }
+    }
+   }
+  },
+  "dropdown-trigger": {
+   "material": "flat-fill",
+   "state": "focus-outline",
+   "params": {
+    "flat-fill": {
+     "fill": {
+      "light": "tint",
+      "dark": "line"
+     }
+    }
+   }
+  },
+  "listbox": {
+   "material": "flat-fill",
+   "state": "focus-outline",
+   "params": {
+    "flat-fill": {
+     "fill": {
+      "light": "tint",
+      "dark": "line"
+     }
+    }
+   }
+  },
+  "switch": {
+   "material": "knob-switch",
+   "state": "pair-selected"
+  },
+  "checkbox": {
+   "material": "ink-mark",
+   "state": "pair-selected",
+   "params": {
+    "ink-mark": {
+     "size": 20,
+     "round": false,
+     "ring": 1,
+     "bullet": 10
+    }
+   }
+  },
+  "radio": {
+   "material": "ink-mark",
+   "state": "pair-selected",
+   "params": {
+    "ink-mark": {
+     "size": 20,
+     "round": false,
+     "ring": 1,
+     "bullet": 10
+    }
+   }
+  },
+  "slider": {
+   "material": "rule-slider",
+   "state": "pair-selected",
+   "params": {
+    "rule-slider": {
+     "track": 2,
+     "thumb": 18
+    }
+   }
+  },
+  "segmented": {
+   "material": "outlined",
+   "state": "pair-selected",
+   "params": {
+    "pair-selected": {
+     "fill": "tint",
+     "tracking": 0
+    },
+    "outlined": {
+     "width": 1,
+     "colour": "canvas",
+     "fill": "transparent"
+    }
+   }
+  },
+  "tabs": {
+   "material": "outlined",
+   "state": "pair-selected",
+   "params": {
+    "pair-selected": {
+     "fill": "tint",
+     "tracking": 0
+    },
+    "outlined": {
+     "width": 1,
+     "colour": "canvas",
+     "fill": "transparent"
+    }
+   }
+  },
+  "chip": {
+   "material": "outlined",
+   "state": "pair-selected",
+   "params": {
+    "pair-selected": {
+     "fill": "tint",
+     "tracking": 0
+    },
+    "outlined": {
+     "width": 1,
+     "colour": "canvas",
+     "fill": "transparent"
+    }
+   }
+  },
+  "card": {
+   "material": "flat-fill",
+   "params": {
+    "flat-fill": {
+     "fill": {
+      "light": "tint",
+      "dark": "line"
+     }
+    }
+   }
+  },
+  "carousel-card": {
+   "material": "flat-fill",
+   "params": {
+    "flat-fill": {
+     "fill": {
+      "light": "tint",
+      "dark": "line"
+     }
+    }
+   }
+  },
+  "matrix-tile": {
+   "material": "flat-fill",
+   "params": {
+    "flat-fill": {
+     "fill": {
+      "light": "tint",
+      "dark": "line"
+     }
+    }
+   }
+  },
+  "panel": {
+   "material": "flat-paper",
+   "params": {
+    "flat-paper": {
+     "fill": "canvas",
+     "padded": true
+    }
+   }
+  },
+  "list-row": {
+   "material": "flat-fill",
+   "state": "pair-item-selected",
+   "params": {
+    "flat-fill": {
+     "fill": {
+      "light": "tint",
+      "dark": "line"
+     }
+    },
+    "pair-item-selected": {
+     "bar": 0
+    }
+   }
+  },
+  "badge": {
+   "material": "flat-fill",
+   "params": {
+    "flat-fill": {
+     "fill": "tint"
+    }
+   }
+  },
+  "notification-dot": {
+   "material": "square-mark",
+   "params": {
+    "square-mark": {
+     "size": 8
+    }
+   }
+  },
+  "progress": {
+   "material": "rule-meter",
+   "params": {
+    "rule-meter": {
+     "leader": "dashed",
+     "kitHeight": 2
+    }
+   }
+  },
+  "avatar": {
+   "material": "hairline-disc",
+   "params": {
+    "hairline-disc": {
+     "serif": false
+    }
+   }
+  },
+  "kbd": {
+   "material": "caps-key",
+   "params": {
+    "caps-key": {
+     "size": 11,
+     "tracking": 0.02
+    }
+   }
+  },
+  "tooltip": {
+   "material": "flat-fill",
+   "params": {
+    "flat-fill": {
+     "fill": "ink"
+    }
+   }
+  },
+  "modal": {
+   "material": "rule-frame",
+   "params": {
+    "rule-frame": {
+     "style": "rule-pair",
+     "top": 1,
+     "bottom": 1,
+     "fill": "canvas",
+     "face": "keep"
+    }
+   }
+  },
+  "sheet": {
+   "material": "rule-frame",
+   "params": {
+    "rule-frame": {
+     "style": "rule-pair",
+     "top": 1,
+     "bottom": 1,
+     "fill": "canvas",
+     "face": "keep"
+    }
+   }
+  },
+  "side-sheet": {
+   "material": "rule-frame",
+   "params": {
+    "rule-frame": {
+     "style": "rule-pair",
+     "top": 1,
+     "bottom": 1,
+     "fill": "canvas",
+     "face": "keep"
+    }
+   }
+  },
+  "drawer": {
+   "material": "rule-frame",
+   "params": {
+    "rule-frame": {
+     "style": "rule-pair",
+     "top": 1,
+     "bottom": 1,
+     "fill": "canvas",
+     "face": "keep"
+    }
+   }
+  },
+  "popover": {
+   "material": "rule-frame",
+   "params": {
+    "rule-frame": {
+     "style": "rule-pair",
+     "top": 1,
+     "bottom": 1,
+     "fill": "canvas",
+     "face": "keep"
+    }
+   }
+  },
+  "lightbox": {
+   "material": "rule-frame",
+   "params": {
+    "rule-frame": {
+     "style": "rule-pair",
+     "top": 1,
+     "bottom": 1,
+     "fill": "canvas",
+     "face": "keep"
+    }
+   }
+  },
+  "menu": {
+   "material": "flat-fill",
+   "params": {
+    "flat-fill": {
+     "fill": {
+      "light": "tint",
+      "dark": "line"
+     }
+    }
+   }
+  },
+  "menu-item": {
+   "material": "flat-fill",
+   "params": {
+    "flat-fill": {
+     "fill": {
+      "light": "tint",
+      "dark": "line"
+     }
+    }
+   }
+  },
+  "mega-menu": {
+   "material": "flat-fill",
+   "params": {
+    "flat-fill": {
+     "fill": {
+      "light": "tint",
+      "dark": "line"
+     }
+    }
+   }
+  },
+  "menubar": {
+   "material": "flat-fill",
+   "params": {
+    "flat-fill": {
+     "fill": {
+      "light": "tint",
+      "dark": "line"
+     }
+    }
+   }
+  },
+  "ribbon": {
+   "material": "flat-fill",
+   "params": {
+    "flat-fill": {
+     "fill": {
+      "light": "tint",
+      "dark": "line"
+     }
+    }
+   }
+  },
+  "calendar": {
+   "material": "flat-fill",
+   "params": {
+    "flat-fill": {
+     "fill": {
+      "light": "tint",
+      "dark": "line"
+     }
+    }
+   }
+  },
+  "popup-tip": {
+   "material": "flat-fill",
+   "params": {
+    "flat-fill": {
+     "fill": "tint"
+    }
+   }
+  },
+  "toast": {
+   "material": "rule-sidebar",
+   "params": {
+    "rule-sidebar": {
+     "top": 2
+    }
+   }
+  },
+  "callout": {
+   "material": "rule-sidebar",
+   "params": {
+    "rule-sidebar": {
+     "top": 2
+    }
+   },
+   "scope": "kit"
+  },
+  "navbar": {
+   "material": "flat-paper",
+   "params": {
+    "flat-paper": {
+     "fill": "canvas",
+     "padded": true
+    }
+   }
+  },
+  "topbar": {
+   "material": "flat-paper",
+   "params": {
+    "flat-paper": {
+     "fill": "canvas",
+     "padded": true
+    }
+   }
+  },
+  "tabbar": {
+   "material": "flat-paper",
+   "params": {
+    "flat-paper": {
+     "fill": "canvas",
+     "padded": true
+    }
+   }
+  },
+  "nav-menu": {
+   "material": "flat-paper",
+   "params": {
+    "flat-paper": {
+     "fill": "none",
+     "padded": true
+    }
+   }
+  },
+  "nav-item": {
+   "material": "flat-paper",
+   "state": "pair-current",
+   "params": {
+    "flat-paper": {
+     "fill": "none",
+     "padded": false
+    },
+    "pair-current": {
+     "fill": "tint",
+     "bar": 0
+    }
+   }
+  },
+  "pie-menu": {
+   "material": "hairline-disc",
+   "params": {
+    "hairline-disc": {
+     "serif": false
+    }
+   }
+  },
+  "knob": {
+   "material": "hairline-disc",
+   "params": {
+    "hairline-disc": {
+     "serif": false
+    }
+   }
+  },
+  "calendar-day": {
+   "material": "flat-paper",
+   "state": "pair-selected",
+   "params": {
+    "flat-paper": {
+     "fill": "none",
+     "padded": false
+    },
+    "pair-selected": {
+     "fill": "tint",
+     "tracking": 0
+    }
+   }
+  },
+  "wheel": {
+   "material": "flat-paper",
+   "params": {
+    "flat-paper": {
+     "fill": "none",
+     "padded": false
+    }
+   }
+  },
+  "accordion": {
+   "material": "ruled-accordion",
+   "params": {
+    "ruled-accordion": {
+     "bar": 1,
+     "body": 14
+    }
+   }
+  },
+  "divider": {
+   "material": "flat-fill"
+  },
+  "empty-state": {
+   "material": "italic-titles",
+   "params": {
+    "italic-titles": {
+     "glyph": "bare"
+    }
+   }
+  },
+  "overlay-scrim": {
+   "material": "ink-wash-scrim",
+   "params": {
+    "ink-wash-scrim": {
+     "pct": 22
+    }
+   }
+  },
+  "lightbox-control": {
+   "material": "outlined",
+   "state": "focus-outline",
+   "params": {
+    "outlined": {
+     "width": 1,
+     "colour": "line",
+     "fill": "canvas"
+    }
+   }
+  },
+  "scrollbar": {
+   "material": "ink-scrollbar",
+   "params": {
+    "ink-scrollbar": {
+     "inset": 3
+    }
+   }
+  },
+  "spinner": {
+   "material": "stepped-ring",
+   "params": {
+    "stepped-ring": {
+     "width": 2,
+     "steps": 12
+    }
+   }
+  },
+  "skeleton": {
+   "material": "flat-skeleton"
+  }
+ },
+ "art": {
+  "hero": {
+   "kind": "svg",
+   "src": "art/hero.svg",
+   "fit": "cover",
+   "alt": "A thin ink outline of a perfume bottle with a tinted liquid line"
+  }
+ }
+}

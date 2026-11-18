@@ -1,0 +1,5 @@
+Preview brand used for these shots (same for every round; override the primary with --palette <hex>)
+primary: #2f5d8a
+scheme: analogous (app derivePalette)
+heading font: Inter
+body font: Inter

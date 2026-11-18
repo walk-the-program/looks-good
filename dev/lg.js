@@ -443,7 +443,7 @@ async function cmdShot(a) {
   const cfg = path.join(work, 'cfg.json');
   fs.writeFileSync(cfg, JSON.stringify({ browser: { browserName: 'chromium', launchOptions: { headless: true }, contextOptions: { deviceScaleFactor: 2, viewport: { width: w, height: h }, colorScheme: mode } } }));
   const pw = (...args) => new Promise(resolve => {
-    const c = cp.spawn('playwright-cli', ['-s=' + name, ...args], { cwd: work, stdio: ['ignore', 'pipe', 'pipe'] });
+    const c = cp.spawn(U.playwrightCommand()[0], [...U.playwrightCommand()[1], '-s=' + name, ...args], { cwd: work, stdio: ['ignore', 'pipe', 'pipe'] });
     let o = '', e = '';
     const t = setTimeout(() => c.kill('SIGKILL'), 120000);
     c.stdout.on('data', d => { o += d; }); c.stderr.on('data', d => { e += d; });

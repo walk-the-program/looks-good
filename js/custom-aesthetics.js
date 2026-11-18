@@ -192,7 +192,7 @@ const CustomAesthetics = (function () {
     if (folderEntries.has(key)) { console.error(`custom aesthetics: ${file}: key "${key}" is listed twice; skipped`); return; }
     const def = registerSpecAesthetic(f.spec, { base: f.base, file, json: true, files: f.files, quietHooks: true });
     if (!def) return;
-    folderEntries.set(key, { key, folder: f.folder, base: f.base, spec: f.spec, rounds: f.rounds, files: f.files });
+    folderEntries.set(key, { key, folder: f.folder, base: f.base, spec: f.spec, rounds: f.rounds, files: f.files, madeFor: f.madeFor });
   }
 
   async function readFolder(folder) {
@@ -209,7 +209,17 @@ const CustomAesthetics = (function () {
       try { files[hero.src] = await getText(base + hero.src); }
       catch (e) { console.error(`custom aesthetics: cannot read art ${base}${hero.src} (${msg(e)})`); }
     }
-    return { folder, base, spec, rounds, files };
+    let madeFor = null;
+    try { madeFor = cleanAppName(JSON.parse(await getText(base + 'app/look.json')).app); }   // no look.json (404) or bad JSON: no label
+    catch (e) { /* not an app style */ }
+    return { folder, base, spec, rounds, files, madeFor };
+  }
+
+  // The app a style was built for: untrusted text, so a trimmed string of at most 60 characters with no < or >.
+  function cleanAppName(v) {
+    if (typeof v !== 'string') return null;
+    const s = v.trim();
+    return s && s.length <= 60 && !/[<>]/.test(s) ? s : null;
   }
 
   async function loadFolders() {
@@ -289,9 +299,9 @@ const CustomAesthetics = (function () {
   /* ---------------- public API ---------------- */
   function list() {
     const out = [];
-    folderEntries.forEach(e => out.push({ key: e.key, name: e.spec.name, source: 'folder', id: null, folder: e.folder, updatedAt: null, hasRounds: !!e.rounds }));
+    folderEntries.forEach(e => out.push({ key: e.key, name: e.spec.name, source: 'folder', id: null, folder: e.folder, updatedAt: null, hasRounds: !!e.rounds, madeFor: e.madeFor || null }));
     Array.from(mineEntries.values()).sort((a, b) => a.createdAt - b.createdAt).forEach(r => out.push({
-      key: r.bundle.aesthetic.key, name: r.bundle.aesthetic.name, source: 'mine', id: r.id, folder: null, updatedAt: r.updatedAt, hasRounds: !!r.bundle.rounds,
+      key: r.bundle.aesthetic.key, name: r.bundle.aesthetic.name, source: 'mine', id: r.id, folder: null, updatedAt: r.updatedAt, hasRounds: !!r.bundle.rounds, madeFor: null,
     }));
     return out;
   }
@@ -303,6 +313,12 @@ const CustomAesthetics = (function () {
     if (typeof SPEC_LAB !== 'undefined' && SPEC_LAB.specs[key]) return null;      // a lab spec, not custom
     if (AESTHETICS.some(a => a.key === key) || key.endsWith('--classic') || hasClassicAesthetic(key)) return 'builtin';
     return null;
+  }
+
+  // The app name a folder style was built for ("Scent Box"), or null.
+  function madeFor(key) {
+    const f = typeof key === 'string' ? folderEntries.get(key) : null;
+    return (f && f.madeFor) || null;
   }
 
   function rounds(key) {
@@ -582,7 +598,7 @@ const CustomAesthetics = (function () {
     return () => { const i = listeners.indexOf(fn); if (i >= 0) listeners.splice(i, 1); };
   }
 
-  return { ready, list, source, rounds, bundle, exportText, exportFile, importText, duplicate, rename, remove, onChange, uniqueKey, starters, starter, create, save, MAX_BUNDLE, MAX_ART, MAX_VERSIONS };
+  return { ready, list, source, madeFor, rounds, bundle, exportText, exportFile, importText, duplicate, rename, remove, onChange, uniqueKey, starters, starter, create, save, MAX_BUNDLE, MAX_ART, MAX_VERSIONS };
 })();
 
 window.CustomAesthetics = CustomAesthetics;

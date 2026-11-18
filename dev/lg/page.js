@@ -25,7 +25,7 @@
 
   L.styles = () => AESTHETICS.map(a => {
     const src = srcOf(a.key);
-    return { key: a.key, name: a.name, descriptor: a.descriptor || '', family: (typeof aestheticFamilyOf === 'function' && aestheticFamilyOf(a.key)) || '', summary: a.summary || '', mode: a.mode || '', origin: src === 'builtin' ? 'built-in' : 'custom' };
+    return { key: a.key, name: a.name, descriptor: a.descriptor || '', family: (typeof aestheticFamilyOf === 'function' && aestheticFamilyOf(a.key)) || '', summary: a.summary || '', mode: a.mode || '', origin: src === 'builtin' ? 'built-in' : 'custom', madeFor: (window.CustomAesthetics && CustomAesthetics.madeFor ? CustomAesthetics.madeFor(a.key) : null) };
   });
 
   L.style = async ({ key }) => {
