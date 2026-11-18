@@ -18,7 +18,8 @@ else ask the user once for the folder that holds `AGENTS.md`. Below, `<LG>` is t
    directory (`cd "<LG>" && node dev/lg.js styles`).
 4. Write the style and the app's files only under `custom-aesthetics/<key>/` in Looks Good, and list
    the key in `custom-aesthetics/index.json` so it shows in Looks Good's styles, labelled
-   "Built for <app>" from `app/look.json`. In the app's own repo, write only the copied build pack
+   "Built for <app>" from `app/look.json`; once the user accepts it, take the app's previous style out
+   of that list (AGENTS.md step 4). In the app's own repo, write only the copied build pack
    (`design/looks-good-build-pack.md`, create `design/` if missing), the copied mocks
    (`design/looks-good-mocks/`) and a pointer `design/looks-good.json`:
    `{ "style": "<key>", "folder": "<LG>/custom-aesthetics/<key>" }`.

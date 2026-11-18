@@ -77,7 +77,7 @@ Expect it to take a while. Three rounds is the minimum, and a hard app can take 
 
 ### Where things end up
 
-- **In Looks Good:** `custom-aesthetics/<key>/` holds the style, the direction, every round's screens and every review. The style shows up in Looks Good's style lists marked "Built for" your app.
+- **In Looks Good:** `custom-aesthetics/<key>/` holds the style, the direction, every round's screens and every review. The style ships with Looks Good: it shows under **Styles > Apps** and in every style list, marked "Built for" your app. Each app keeps one listed style, the one it uses; older attempts stay in their folders as history.
 - **In your app's repo:** `design/looks-good-build-pack.md` (colours, type, components and the direction), `design/looks-good-mocks/` (HTML mocks of the key screens), and `design/looks-good.json`, which points back to the style folder so an agent can pick up where the last one stopped.
 
 ### Whose taste the reviewer uses

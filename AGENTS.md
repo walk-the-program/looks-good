@@ -72,6 +72,9 @@ Steps:
    colour recipe, material, moves, every kit component). Use only names from `components --spec`.
    Pick a key like `<app>-<idea>` and add it to `custom-aesthetics/index.json` with the command in
    AUTHORING.md section 9 step 2 (it keeps the `starters` list). Template: `docs/aesthetic-spec/template/`.
+   Each app keeps one listed style, the one it uses: once the owner accepts a new style for an app,
+   take the app's previous key out of `aesthetics` (its folder stays as history). Listed styles ship
+   with Looks Good and show under Styles > Apps.
 5. **Write `app/look.json`** with the app's own colours, so renders show the real brand:
    ```json
    { "app": "Youch!", "repo": "~/Desktop/Projects/TTS+", "brandName": "Youch!",

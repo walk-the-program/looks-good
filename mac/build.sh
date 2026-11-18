@@ -56,8 +56,24 @@ cp "$ROOT/index.html" "$ROOT/favicon.svg" "$WEB/"
 # (dev/vendor-fonts.py) and the export libraries (html2canvas, jsPDF). The page loads
 # these local copies first; the CDN / Google Fonts are only a fallback.
 cp -R "$ROOT/css" "$ROOT/js" "$ROOT/fonts" "$ROOT/vendor" "$ROOT/patterns-library" "$WEB/"
-# Custom aesthetics (folder styles): aesthetic.json, art/ and rounds.json ship; the checker's shots/ do not.
-cp -R "$ROOT/custom-aesthetics" "$WEB/"
+# Custom aesthetics (folder styles): only index.json, starters/ (its "starters" are ids inside it) and the folders listed under "aesthetics".
+# Inside each, aesthetic.json, art/, rounds.json and app/look.json ship; the checker's shots/ and the rest of
+# app/ (renders, mocks, packs) do not. Unlisted folders (old app styles, scratch) stay out.
+mkdir -p "$WEB/custom-aesthetics"
+cp "$ROOT/custom-aesthetics/index.json" "$WEB/custom-aesthetics/"
+[ -d "$ROOT/custom-aesthetics/starters" ] && cp -R "$ROOT/custom-aesthetics/starters" "$WEB/custom-aesthetics/"
+python3 - "$ROOT/custom-aesthetics" <<'PY' | while IFS= read -r k; do
+import json, sys
+d = json.load(open(sys.argv[1] + '/index.json'))
+for k in d.get('aesthetics', []):
+    print(k)
+PY
+  [ -d "$ROOT/custom-aesthetics/$k" ] || { echo "listed style $k has no folder" >&2; continue; }
+  cp -R "$ROOT/custom-aesthetics/$k" "$WEB/custom-aesthetics/"
+  if [ -d "$WEB/custom-aesthetics/$k/app" ]; then
+    find "$WEB/custom-aesthetics/$k/app" -mindepth 1 -maxdepth 1 ! -name look.json -exec rm -rf {} +
+  fi
+done
 find "$WEB/custom-aesthetics" -name shots -type d -prune -exec rm -rf {} +
 # Patterns mode: the private Ptrn mirror (git-ignored; dev/sync-ptrn.py builds it).
 if [ -d "$ROOT/ptrn" ]; then

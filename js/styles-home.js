@@ -57,7 +57,9 @@ const StylesHome = (function () {
 
   // 'builtin' | 'folder' | 'mine' | 'lab' (the ?movelab=1 specs, which source() reports as null)
   const srcOf = key => (hasCustom() ? CustomAesthetics.source(key) || 'lab' : 'builtin');
-  const isYours = key => { const s = srcOf(key); return s === 'folder' || s === 'mine'; };
+  const isApp = key => !!(hasCustom() && CustomAesthetics.madeFor(key));
+  // 'Yours' = custom styles not made for an app; app styles have their own filter and 'App' pill
+  const isYours = key => { const s = srcOf(key); return (s === 'folder' || s === 'mine') && !isApp(key); };
   const defOf = key => AESTHETICS.find(a => a.key === key) || null;
   const pool = () => aePool().filter(d => d && d.key);
 
@@ -69,6 +71,7 @@ const StylesHome = (function () {
 
   function matches(d, q) {
     if (filters.source === 'builtin' && srcOf(d.key) !== 'builtin') return false;
+    if (filters.source === 'apps' && !isApp(d.key)) return false;
     if (filters.source === 'yours' && !isYours(d.key)) return false;
     if (filters.family && aestheticFamilyOf(d.key) !== filters.family) return false;
     if (!q) return true;
@@ -129,8 +132,8 @@ const StylesHome = (function () {
   /* ---------- grid ---------- */
 
   function tileHtml(d) {
-    const yours = isYours(d.key), folder = srcOf(d.key) === 'folder';
-    const tagShown = yours ? `<span class="st-tag" title="${folder ? 'Folder style: lives in custom-aesthetics/' + esc(d.key) + '/' : 'Your style'}">Yours</span>` : '';
+    const yours = isYours(d.key) || isApp(d.key), folder = srcOf(d.key) === 'folder';
+    const tagShown = yours ? `<span class="st-tag" title="${folder ? 'Folder style: lives in custom-aesthetics/' + esc(d.key) + '/' : 'Your style'}">${isApp(d.key) ? 'App' : 'Yours'}</span>` : '';
     const app = hasCustom() ? CustomAesthetics.madeFor(d.key) : null;
     const forShown = app ? `<span class="st-desc">Built for ${esc(app)}</span>` : '';
     return `<button type="button" class="st-card" data-key="${esc(d.key)}" aria-label="${esc(d.name)}: ${esc(d.descriptor || '')}" title="${esc(d.summary || d.name)}">
@@ -144,20 +147,24 @@ const StylesHome = (function () {
     const q = filters.q.trim().toLowerCase();
     visible = all.filter(d => matches(d, q));
     const yours = all.filter(d => isYours(d.key)).length;
+    const apps = all.filter(d => isApp(d.key)).length;
     const lab = all.filter(d => srcOf(d.key) === 'lab').length;
     const total = all.length;
-    const parts = `${total - yours - lab} built in · ${yours} yours${lab ? ` · ${lab} lab` : ''}`;
+    const parts = `${total - yours - apps - lab} built in${apps ? ` · ${apps} app` : ''} · ${yours} yours${lab ? ` · ${lab} lab` : ''}`;
     el.count.textContent = visible.length === total ? `${total} styles · ${parts}` : `${visible.length} of ${total} styles · ${parts}`;
     const none = visible.length === 0;
     el.none.hidden = !none;
     el.grid.hidden = none;
     if (none) {
+      const onlyApps = filters.source === 'apps' && !filters.q.trim() && !filters.family;
       const onlyYours = filters.source === 'yours' && !filters.q.trim() && !filters.family;
-      el.noneTitle.textContent = onlyYours ? 'No styles of your own yet' : 'No styles match';
-      el.noneText.textContent = onlyYours
+      el.noneTitle.textContent = onlyApps ? 'No app styles yet' : onlyYours ? 'No styles of your own yet' : 'No styles match';
+      el.noneText.textContent = onlyApps
+        ? 'Styles built for an app show up here once they are in custom-aesthetics/.'
+        : onlyYours
         ? 'No styles of your own yet. Import a style file, or add a folder to custom-aesthetics/.'
         : 'Try a different search or clear the filters.';
-      el.clear.hidden = onlyYours;
+      el.clear.hidden = onlyYours || onlyApps;
     }
     el.grid.innerHTML = visible.map(tileHtml).join('');
     redraw();
@@ -465,7 +472,7 @@ const StylesHome = (function () {
     const fam = aestheticFamilyLabel(aestheticFamilyOf(openKey));
     const row = (k, v) => (v ? `<div class="st-row"><dt>${esc(k)}</dt><dd>${esc(v)}</dd></div>` : '');
     el.dInfo.innerHTML = `
-      <div class="st-d-num">${esc(aestheticNumber(openKey))}${isYours(openKey) ? '<span class="st-tag">Yours</span>' : src === 'lab' ? '<span class="st-tag">Lab</span>' : ''}</div>
+      <div class="st-d-num">${esc(aestheticNumber(openKey))}${isApp(openKey) ? '<span class="st-tag">App</span>' : isYours(openKey) ? '<span class="st-tag">Yours</span>' : src === 'lab' ? '<span class="st-tag">Lab</span>' : ''}</div>
       <h2 class="st-d-name">${esc(d.name)}</h2>
       <p class="st-d-desc">${esc(d.descriptor || '')}</p>
       ${d.summary ? `<p class="st-d-sum">${esc(d.summary)}</p>` : ''}
@@ -476,7 +483,7 @@ const StylesHome = (function () {
         ${row('Family', fam)}
         ${row('Looks best', d.mode === 'dark' ? 'Dark' : d.mode === 'light' ? 'Light' : '')}
       </dl>`;
-    const yours = isYours(openKey);
+    const yours = isYours(openKey) || isApp(openKey);
     el.dActions.innerHTML = `
       <button type="button" class="btn btn-primary" data-act="use">Use on a brand</button>
       ${src === 'mine' ? '<button type="button" class="btn btn-ghost" data-act="edit">Edit</button>' : src === 'folder' ? '<button type="button" class="btn btn-ghost" data-act="edit-copy">Edit a copy</button>' : ''}
